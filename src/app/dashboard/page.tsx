@@ -300,7 +300,7 @@ export default function Dashboard() {
           {/* UPGRADE BANNER */}
           <div className="upgrade">
             <div className="upgrade-text">
-              <h3 serif="">Unlock Your Full Cosmic Blueprint ✦</h3>
+              <h3 >Unlock Your Full Cosmic Blueprint ✦</h3>
               <p>You are on the Free plan. Upgrade to access all 15+ engines, unlimited AI chat, and destiny timeline.</p>
             </div>
             <button className="upgrade-btn">Upgrade to Premium →</button>
