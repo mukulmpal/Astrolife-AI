@@ -1,20 +1,18 @@
 "use client";
 import { useState } from "react";
-import { calculateChart } from "@/lib/astro-engine/calculations";
 import { calculateLalKitab } from "@/lib/astro-engine/lalkitab";
-
-const DEMO = { name:"Mukul Pal", dob:"1995-07-04", tob:"12:30", city:"Delhi" };
+import { PremiumFeature } from "@/components/premium-feature";
+import { useUserChart } from "@/lib/user-chart";
 
 export default function LalKitabPage() {
   const [activeTab, setActiveTab] = useState<"planets"|"takkar"|"rin"|"ages">("planets");
   const [expanded, setExpanded] = useState<string|null>(null);
-
-  const chart  = calculateChart(DEMO.name, DEMO.dob, DEMO.tob, DEMO.city);
-  const result = calculateLalKitab(chart.planets as never, DEMO.dob);
+  const { birth, chart } = useUserChart();
+  const result = calculateLalKitab(chart.planets as never, birth.dob);
 
   const pakkaCount   = result.planets.filter(p=>p.status==="pakka").length;
   const dushmanCount = result.planets.filter(p=>p.status==="dushman").length;
-  const currentAge   = new Date().getFullYear() - new Date(DEMO.dob).getFullYear();
+  const currentAge   = new Date().getFullYear() - new Date(birth.dob).getFullYear();
 
   return (
     <>
@@ -130,15 +128,16 @@ export default function LalKitabPage() {
         <div className="page-tag">📕 Lal Kitab System</div>
         <h1 className="page-title serif">Lal Kitab <em>Analysis</em></h1>
         <p className="page-sub">Pakka Ghar · Dushman Ghar · Nishaniyan · Upaya · Takkar · Rin Siddhant</p>
+        <PremiumFeature feature="Lal Kitab Engine">
 
         {/* HEADER CARD */}
         <div className="header-card">
           <div className="header-orb"/>
           <div style={{position:"relative",zIndex:1}}>
             <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#ef4444",marginBottom:6}}>📕 Lal Kitab</div>
-            <div className="header-name serif">{DEMO.name}</div>
+            <div className="header-name serif">{birth.name}</div>
             <div style={{fontSize:13,color:"#605890",marginTop:4}}>
-              {new Date(DEMO.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {DEMO.tob} · {DEMO.city} · Age {currentAge}
+              {new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city} · Age {currentAge}
             </div>
           </div>
           <div className="header-stats" style={{position:"relative",zIndex:1}}>
@@ -350,6 +349,7 @@ export default function LalKitabPage() {
             </div>
           </div>
         )}
+        </PremiumFeature>
       </div>
     </>
   );

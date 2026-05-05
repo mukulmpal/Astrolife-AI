@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import "@/app/dashboard/shared.css";
+import { PremiumFeature } from "@/components/premium-feature";
 import {
   calculateMilan, NAKSHATRAS_27, RASHIS_12,
   type MilanResult, type KootScore,
@@ -151,6 +152,7 @@ export default function KundaliMilanPage() {
       <div className="page-tag">💑 Kundali Milan</div>
       <h1 className="page-title serif">Ashtakoot <em>Compatibility</em></h1>
       <p className="page-sub">36-Point Gun Milan · 8 Koots · Dosha Analysis · Psychological Insight</p>
+      <PremiumFeature feature="Kundali Milan">
 
       {/* INPUT CARDS */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
@@ -363,10 +365,11 @@ export default function KundaliMilanPage() {
             ))}
           </div>
           <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(200,160,48,0.06)", borderRadius: 8, border: "1px solid rgba(200,160,48,0.15)", fontSize: 12, color: "#c8c0a8", lineHeight: 1.8 }}>
-            <strong style={{ color: "#c8a030" }}>Scoring Guide:</strong> 28–36 = Excellent · 21–27 = Good · 18–20 = Average · Below 18 = Careful needed. Note: Score alone doesn't decide compatibility — dosha analysis and full chart comparison matter equally.
+            <strong style={{ color: "#c8a030" }}>Scoring Guide:</strong> 28–36 = Excellent · 21–27 = Good · 18–20 = Average · Below 18 = Careful needed. Note: Score alone doesn&apos;t decide compatibility — dosha analysis and full chart comparison matter equally.
           </div>
         </div>
       )}
+      </PremiumFeature>
     </div>
   );
 }

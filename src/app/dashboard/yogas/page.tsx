@@ -1,35 +1,26 @@
 "use client";
-import { useState, useEffect } from "react";
-import { calculateChart } from "@/lib/astro-engine/calculations";
+import { useState } from "react";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type YogaCategory, type PlanTier } from "@/lib/astro-engine/yogas";
-
-// ── Demo chart data (replace with real user chart from Supabase) ──
-const DEMO = { name:"Mukul Pal", dob:"1995-07-04", tob:"12:30", city:"Delhi" };
+import { useUserChart } from "@/lib/user-chart";
 
 const TIER: PlanTier = "free"; // replace with user's actual tier
 
 export default function YogasPage() {
-  const [yogas,    setYogas]    = useState<YogaResult[]>([]);
-  const [loading,  setLoading]  = useState(true);
+  const { birth, chart } = useUserChart();
   const [activeTab, setActiveTab] = useState<"all"|"present"|"doshas">("present");
   const [activeCategory, setActiveCategory] = useState<YogaCategory|"All">("All");
   const [expandedYoga, setExpandedYoga] = useState<string|null>(null);
-  const [score, setScore] = useState<{total:number;rating:string;rareCount:number}>({total:0,rating:"",rareCount:0});
-
-  useEffect(() => {
-    try {
-      const chart = calculateChart(DEMO.name, DEMO.dob, DEMO.tob, DEMO.city);
-      const all   = detectYogas(chart.planets as never, chart.lagnaNum, TIER);
-      setYogas(all);
-      const present = all.filter(y=>y.present&&!y.isDosha);
-      setScore(calculateYogaScore(present));
-    } catch(e) { console.error(e); }
-    setLoading(false);
-  }, []);
+  let yogas: YogaResult[] = [];
+  try {
+    yogas = detectYogas(chart.planets as never, chart.lagnaNum, TIER);
+  } catch(e) {
+    console.error(e);
+  }
 
   const present  = yogas.filter(y=>y.present&&!y.isDosha);
   const doshas   = yogas.filter(y=>y.present&&y.isDosha);
   const all      = yogas.filter(y=>!y.isDosha);
+  const score = calculateYogaScore(present);
 
   const displayList = activeTab==="doshas" ? doshas :
                       activeTab==="present" ? present : all;
@@ -170,17 +161,14 @@ export default function YogasPage() {
         <h1 className="page-title serif">Your <em>Cosmic Yogas</em></h1>
         <p className="page-sub">120 yogas analyzed · Pancha Mahapurusha · Raja · Dhana · Marriage · Career · Doshas</p>
 
-        {loading ? (
-          <div><div className="spinner"/><div style={{textAlign:"center",color:"#605890"}}>Detecting yogas...</div></div>
-        ) : (
-          <>
+        <>
             {/* SCORE CARD */}
             <div className="score-card">
               <div className="score-orb"/>
               <div className="score-left">
                 <div className="score-label">✦ Yoga Analysis</div>
-                <div className="score-name serif">{DEMO.name}</div>
-                <div className="score-meta">{new Date(DEMO.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {DEMO.tob} · {DEMO.city}</div>
+                <div className="score-name serif">{birth.name}</div>
+                <div className="score-meta">{new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city}</div>
               </div>
               <div className="score-right">
                 <div className="score-stat">
@@ -338,8 +326,7 @@ export default function YogasPage() {
                 ))}
               </div>
             )}
-          </>
-        )}
+        </>
       </div>
     </>
   );

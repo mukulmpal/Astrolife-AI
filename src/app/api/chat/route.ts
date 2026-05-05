@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerAiUsageState, incrementServerAiUsage } from "@/lib/server-usage";
 
 export const runtime = "edge";
 
@@ -151,6 +152,20 @@ async function callGroq(systemPrompt: string, messages: { role: string; content:
 // ── MAIN HANDLER ──
 export async function POST(req: NextRequest) {
   try {
+    const usageState = await getServerAiUsageState();
+    if (!usageState.allowed) {
+      const status = usageState.reason === "login_required" ? 401 : 402;
+      return NextResponse.json(
+        {
+          error: usageState.reason === "login_required"
+            ? "Please login to continue."
+            : "Free AI limit reached. Upgrade to continue.",
+          usage: usageState,
+        },
+        { status },
+      );
+    }
+
     const { messages, agentId = "general", chartContext } = await req.json();
 
     const agent = AGENTS[agentId] || AGENTS.general;
@@ -185,11 +200,14 @@ Sign off as: "${agent.emoji} ${agent.name}"`;
       }
     }
 
+    const usage = await incrementServerAiUsage(usageState);
+
     return NextResponse.json({
       message: text,
       agent: agent.name,
       emoji: agent.emoji,
       model: usedModel,
+      usage,
     });
 
   } catch (error) {

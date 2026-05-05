@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -275,7 +276,7 @@ export default function LoginPage() {
         <div className="ring r1" /><div className="ring r2" />
 
         {/* Back to home */}
-        <a href="/" className="home-link">← Home</a>
+        <Link href="/" className="home-link">← Home</Link>
 
         <div className="card">
           {/* Logo */}

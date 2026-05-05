@@ -1,10 +1,9 @@
 "use client";
 import { useState } from "react";
 import "@/app/dashboard/shared.css";
-import { calculateChart } from "@/lib/astro-engine/calculations";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
-
-const DEMO = { name:"Mukul Pal", dob:"1995-07-04", tob:"12:30", city:"Delhi" };
+import { PremiumFeature } from "@/components/premium-feature";
+import { useUserChart } from "@/lib/user-chart";
 
 // Radar SVG
 function PsychRadar({ vals, colors }: { vals: number[]; colors: string[] }) {
@@ -42,8 +41,7 @@ function PsychRadar({ vals, colors }: { vals: number[]; colors: string[] }) {
 export default function PsychPage() {
   const [activeTab, setActiveTab] = useState<"planets"|"pattern"|"guide">("pattern");
   const [expanded, setExpanded] = useState<string|null>(null);
-
-  const chart  = calculateChart(DEMO.name, DEMO.dob, DEMO.tob, DEMO.city);
+  const { birth, chart } = useUserChart();
   const result = calculatePsychology(chart.planets as never);
   const P = result.pattern;
 
@@ -63,15 +61,16 @@ export default function PsychPage() {
       <div className="page-tag">🧠 Psychology Engine</div>
       <h1 className="page-title serif">Psychological <em>Blueprint</em></h1>
       <p className="page-sub">9 psychological functions · Pattern analysis · Anxiety Index · Karma Loop · Shadow work</p>
+      <PremiumFeature feature="Psychology Engine">
 
       {/* HEADER */}
       <div className="header-card">
         <div className="header-orb"/>
         <div style={{position:"relative",zIndex:1}}>
           <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#ec4899",marginBottom:6}}>🧠 Psychology Analysis</div>
-          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{DEMO.name}</div>
+          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{birth.name}</div>
           <div style={{fontSize:13,color:"#605890",marginTop:4}}>
-            {new Date(DEMO.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {DEMO.tob} · {DEMO.city}
+            {new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city}
           </div>
         </div>
         <div style={{display:"flex",gap:12,flexWrap:"wrap",position:"relative",zIndex:1}}>
@@ -218,6 +217,7 @@ export default function PsychPage() {
           })}
         </div>
       )}
+      </PremiumFeature>
     </div>
   );
 }

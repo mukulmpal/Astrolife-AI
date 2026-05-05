@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
-import { calculateChart } from "@/lib/astro-engine/calculations";
 import { calculateShadbala, getShadbalaRadar, type ShadbalaPlanet } from "@/lib/astro-engine/shadbala";
-
-const DEMO = { name:"Mukul Pal", dob:"1995-07-04", tob:"12:30", city:"Delhi" };
+import { PremiumFeature } from "@/components/premium-feature";
+import { useUserChart } from "@/lib/user-chart";
 
 function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
   const data = getShadbalaRadar(planet);
@@ -50,8 +49,7 @@ function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
 export default function ShadbalaPage() {
   const [expanded, setExpanded] = useState<string|null>(null);
   const [activeTab, setActiveTab] = useState<"grid"|"table"|"summary">("grid");
-
-  const chart  = calculateChart(DEMO.name, DEMO.dob, DEMO.tob, DEMO.city);
+  const { birth, chart } = useUserChart();
   const result = calculateShadbala(chart.planets as never);
 
   const BALA_LABELS = [
@@ -160,15 +158,16 @@ export default function ShadbalaPage() {
         <div className="page-tag">✦ Shadbala Engine</div>
         <h1 className="page-title serif">Planetary <em>Strength Analysis</em></h1>
         <p className="page-sub">6-factor Shadbala system · Sthana · Dig · Kala · Cheshta · Naisargika · Drik</p>
+        <PremiumFeature feature="Shadbala Analysis">
 
         {/* HEADER CARD */}
         <div className="header-card">
           <div className="header-orb"/>
           <div style={{position:"relative",zIndex:1}}>
             <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#605890",marginBottom:6}}>✦ Shadbala Analysis</div>
-            <div className="header-name serif">{DEMO.name}</div>
+            <div className="header-name serif">{birth.name}</div>
             <div className="header-meta">
-              {new Date(DEMO.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {DEMO.tob} · {DEMO.city}
+              {new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city}
             </div>
           </div>
           <div className="header-stats" style={{position:"relative",zIndex:1}}>
@@ -349,6 +348,7 @@ export default function ShadbalaPage() {
             ))}
           </div>
         )}
+        </PremiumFeature>
       </div>
     </>
   );

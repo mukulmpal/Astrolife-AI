@@ -1,17 +1,15 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import "@/app/dashboard/shared.css";
-import { calculateChart } from "@/lib/astro-engine/calculations";
 import { calculateDestiny } from "@/lib/astro-engine/destiny";
-
-const DEMO = { name:"Mukul Pal", dob:"1995-07-04", tob:"12:30", city:"Delhi" };
+import { PremiumFeature } from "@/components/premium-feature";
+import { useUserChart } from "@/lib/user-chart";
 
 export default function DestinyPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeTab, setActiveTab] = useState<"curve"|"areas"|"dashas">("curve");
-
-  const chart  = calculateChart(DEMO.name, DEMO.dob, DEMO.tob, DEMO.city);
-  const result = calculateDestiny(chart.planets as never, chart.dashas, DEMO.dob);
+  const { birth, chart } = useUserChart();
+  const result = calculateDestiny(chart.planets as never, chart.dashas, birth.dob);
 
   // Draw canvas curve
   useEffect(() => {
@@ -65,7 +63,8 @@ export default function DestinyPage() {
     ctx.beginPath();
     result.points.forEach((p,i)=>{
       const x=L+(p.age/maxAge*chartW), y=T+chartH-(p.score/100*chartH);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      if (i === 0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
     });
     ctx.strokeStyle="rgba(200,160,48,0.9)"; ctx.lineWidth=2; ctx.stroke();
 
@@ -94,13 +93,14 @@ export default function DestinyPage() {
       <div className="page-tag">📈 Destiny Curve</div>
       <h1 className="page-title serif">Your <em>Life Timeline</em></h1>
       <p className="page-sub">Dasha-based life scoring · Peak & challenge periods · 6 life area scores</p>
+      <PremiumFeature feature="Destiny Timeline">
 
       {/* HEADER */}
       <div className="header-card">
         <div className="header-orb"/>
         <div style={{position:"relative",zIndex:1}}>
           <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#c8a030",marginBottom:6}}>📈 Destiny Analysis</div>
-          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{DEMO.name}</div>
+          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{birth.name}</div>
           <div style={{fontSize:13,color:"#605890",marginTop:4}}>Age {result.currentAge} · {result.currentDasha} Mahadasha · Score {result.currentScore}%</div>
         </div>
         <div style={{display:"flex",gap:12,flexWrap:"wrap",position:"relative",zIndex:1}}>
@@ -250,6 +250,7 @@ export default function DestinyPage() {
           })}
         </div>
       )}
+      </PremiumFeature>
     </div>
   );
 }

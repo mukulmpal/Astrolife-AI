@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
-import { calculateChart, RASHIS, type ChartData } from "@/lib/astro-engine/calculations";
+import { useEffect, useState } from "react";
+import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult } from "@/lib/astro-engine/yogas";
+import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary } from "@/lib/user-chart";
 
 const CITIES = [
   "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
@@ -78,11 +79,52 @@ export default function KundliPage() {
   const [yogas,     setYogas]     = useState<YogaResult[]>([]);
   const [yogaScore, setYogaScore] = useState<{total:number;rating:string;rareCount:number}>({total:0,rating:"",rareCount:0});
   const [loading,   setLoading]   = useState(false);
+  const [libraryLoading, setLibraryLoading] = useState(false);
+  const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
+  const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("chart");
   const [citySearch,setCitySearch]= useState("");
   const [showCities,setShowCities]= useState(false);
 
   const filtered = CITIES.filter(c=>c.toLowerCase().includes(citySearch.toLowerCase()));
+
+  const applyChart = (data: ChartData) => {
+    setChart(data);
+    setActiveTab("chart");
+    const allYogas = detectYogas(data.planets as never, data.lagnaNum, "free");
+    setYogas(allYogas);
+    const present = allYogas.filter(y=>y.present&&!y.isDosha);
+    setYogaScore(calculateYogaScore(present));
+  };
+
+  const refreshSavedCharts = async () => {
+    setLibraryLoading(true);
+    setSavedCharts(await listSavedCharts());
+    setLibraryLoading(false);
+  };
+
+  useEffect(() => {
+    const loadCharts = async () => {
+      setLibraryLoading(true);
+      setSavedCharts(await listSavedCharts());
+      setLibraryLoading(false);
+    };
+
+    loadCharts();
+  }, []);
+
+  const handleSelectSavedChart = async (chartId: string) => {
+    setLibraryLoading(true);
+    const nextChart = await selectSavedChart(chartId);
+    if (nextChart) {
+      applyChart(nextChart);
+      setSaveStatus("Primary chart switched.");
+      setSavedCharts(await listSavedCharts());
+    } else {
+      setSaveStatus("Chart library is not available yet. Apply Supabase schema to enable switching.");
+    }
+    setLibraryLoading(false);
+  };
 
   const handleGenerate = async () => {
     if(!form.name||!form.dob||!form.tob||!form.city) return;
@@ -90,12 +132,10 @@ export default function KundliPage() {
     await new Promise(r=>setTimeout(r,600));
     try {
       const data = calculateChart(form.name,form.dob,form.tob,form.city);
-      setChart(data);
-      setActiveTab("chart");
-      const allYogas = detectYogas(data.planets as never, data.lagnaNum, "free");
-      setYogas(allYogas);
-      const presentYogas = allYogas.filter(y=>y.present&&!y.isDosha);
-      setYogaScore(calculateYogaScore(presentYogas));
+      await saveChartToAccount(data);
+      applyChart(data);
+      setSaveStatus("Chart saved as primary.");
+      await refreshSavedCharts();
     } catch(e){ console.error(e); }
     setLoading(false);
   };
@@ -178,6 +218,17 @@ export default function KundliPage() {
         .abadge{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(200,160,48,0.1);color:#c8a030;border:1px solid rgba(200,160,48,0.2)}
         .btn-save{display:flex;align-items:center;gap:8px;padding:10px 20px;background:transparent;border:1px solid rgba(200,160,48,0.3);border-radius:10px;color:#c8a030;font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif}
         .btn-save:hover{background:rgba(200,160,48,0.08)}
+        .library{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:18px 20px;margin-bottom:24px}
+        .library-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+        .library-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0}
+        .library-sub{font-size:12px;color:#605890;margin-top:3px;line-height:1.6}
+        .library-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+        .library-card{background:#0a0720;border:1px solid #1c1840;border-radius:12px;padding:12px;text-align:left;cursor:pointer;transition:all 0.2s;color:inherit;font-family:'Outfit',sans-serif}
+        .library-card:hover{border-color:rgba(200,160,48,0.28);transform:translateY(-1px)}
+        .library-card.primary{border-color:rgba(200,160,48,0.4);background:rgba(200,160,48,0.05)}
+        .library-name{font-size:13px;font-weight:600;color:#f0e8d0;margin-bottom:5px}
+        .library-meta{font-size:11px;color:#605890;line-height:1.6}
+        .library-pill{display:inline-flex;margin-top:8px;padding:2px 8px;border-radius:999px;border:1px solid rgba(200,160,48,0.2);color:#c8a030;font-size:9px;letter-spacing:1px;text-transform:uppercase}
         /* YOGA STYLES */
         .yoga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
         .yoga-card{background:#0d0a22;border:1px solid rgba(200,160,48,0.12);border-radius:14px;padding:18px;transition:all 0.2s}
@@ -197,6 +248,42 @@ export default function KundliPage() {
         <div className="page-tag">✦ Kundli Engine</div>
         <h1 className="page-title serif">Generate Your<br /><em>Vedic Birth Chart</em></h1>
         <p className="page-sub">VSOP87 + ELP2000 · Lahiri ayanamsha · 120 Yogas detected</p>
+
+        <div className="library">
+          <div className="library-top">
+            <div>
+              <div className="card-tag">✦ Saved Charts</div>
+              <div className="library-title serif">Chart Library</div>
+              <div className="library-sub">{saveStatus}</div>
+            </div>
+            <button className="btn-save" onClick={refreshSavedCharts} disabled={libraryLoading}>
+              {libraryLoading ? "⟳ Loading..." : "↻ Refresh"}
+            </button>
+          </div>
+          {savedCharts.length > 0 ? (
+            <div className="library-list">
+              {savedCharts.map((saved) => (
+                <button
+                  key={saved.id}
+                  className={`library-card ${saved.isPrimary ? "primary" : ""}`}
+                  onClick={() => handleSelectSavedChart(saved.id)}
+                  disabled={libraryLoading}
+                >
+                  <div className="library-name">{saved.name}</div>
+                  <div className="library-meta">
+                    {new Date(saved.dob).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" })} · {saved.tob}<br />
+                    {saved.city}
+                  </div>
+                  {saved.isPrimary && <span className="library-pill">Primary</span>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="library-sub">
+              No account charts loaded yet. Generate a chart, then refresh after Supabase schema is applied.
+            </div>
+          )}
+        </div>
 
         {/* FORM */}
         <div className="form-card">
@@ -279,7 +366,9 @@ export default function KundliPage() {
                   <div style={{fontSize:10,color:"#605890",marginTop:2}}>YOGA SCORE</div>
                   <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:13,color:"#e8c060",marginTop:2}}>{yogaScore.rating}</div>
                 </div>
-                <button className="btn-save">💾 Save Chart</button>
+                <button className="btn-save" onClick={refreshSavedCharts} disabled={libraryLoading}>
+                  {libraryLoading ? "⟳ Syncing..." : "💾 Saved"}
+                </button>
               </div>
             </div>
 

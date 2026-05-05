@@ -1,31 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { calculateDestiny } from "@/lib/astro-engine/destiny";
+import { calculatePsychology } from "@/lib/astro-engine/psychology";
+import { checkSupabaseHealth, isSupabaseReady, type DbHealthItem } from "@/lib/db-health";
+import { useUserChart } from "@/lib/user-chart";
+import { getAccountAiUsageStatus, getFreeMonthlyAiLimit } from "@/lib/usage";
 
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
-
-const PLANETS = [
-  { name:"Sun",     sign:"Aries",    house:"1st",  icon:"☉", energy:"High",   col:"#f97316" },
-  { name:"Moon",    sign:"Cancer",   house:"4th",  icon:"☽", energy:"Calm",   col:"#c084fc" },
-  { name:"Mars",    sign:"Gemini",   house:"3rd",  icon:"♂", energy:"Active", col:"#ef4444" },
-  { name:"Mercury", sign:"Taurus",   house:"2nd",  icon:"☿", energy:"Sharp",  col:"#22c55e" },
-  { name:"Jupiter", sign:"Leo",      house:"5th",  icon:"♃", energy:"Expand", col:"#f59e0b" },
-  { name:"Venus",   sign:"Pisces",   house:"12th", icon:"♀", energy:"Divine", col:"#ec4899" },
-  { name:"Saturn",  sign:"Aquarius", house:"11th", icon:"♄", energy:"Karmic", col:"#60a5fa" },
-  { name:"Rahu",    sign:"Scorpio",  house:"8th",  icon:"☊", energy:"Intense",col:"#a78bfa" },
-];
-
-const INSIGHTS = [
-  { tag:"Saturn Transit", text:"Saturn in your 10th house is testing your career foundations. Stay disciplined — a breakthrough awaits in 3 months.", icon:"♄", urgent:true },
-  { tag:"Moon Energy",    text:"Today's Cancer moon amplifies your emotional intelligence. Ideal day for deep conversations and creative work.", icon:"☽", urgent:false },
-  { tag:"Rahu Dasha",     text:"You are currently in Rahu Mahadasha. Foreign connections, unexpected opportunities, and spiritual awakening are themes.", icon:"☊", urgent:false },
-];
+type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 
 const NAV_MAIN = [
   { icon:"🏠", label:"Dashboard",  href:"/dashboard" },
   { icon:"🔯", label:"My Charts",  href:"/dashboard/kundli" },
   { icon:"🤖", label:"AI Chat",    href:"/dashboard/chat" },
-  { icon:"📈", label:"Timeline",   href:"/dashboard/timeline" },
+  { icon:"📈", label:"Timeline",   href:"/dashboard/destiny" },
 ];
 
 const NAV_ENGINES = [
@@ -35,7 +25,7 @@ const NAV_ENGINES = [
   { icon:"🎼", label:"Sound Therapy", href:"/dashboard/chat" },
   { icon:"👨‍👩‍👧", label:"Family Karma",  href:"/dashboard/chat" },
   { icon:"💊", label:"Remedies",      href:"/dashboard/chat" },
-  { icon:"🏠", label:"Vastu",         href:"/dashboard/chat" },
+  { icon:"🏠", label:"Vastu",         href:"/dashboard/vastu" },
 ];
 
 const NAV_ACCOUNT = [
@@ -45,27 +35,112 @@ const NAV_ACCOUNT = [
 ];
 
 export default function Dashboard() {
+  const [supabase] = useState(() => createClient());
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [aiQuestionsLeft, setAiQuestionsLeft] = useState("0");
+  const [dbHealth, setDbHealth] = useState<DbHealthItem[]>([]);
   const [time, setTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState("overview");
-  const supabase = createClient();
+  const { birth, chart } = useUserChart();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const loadDashboardState = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+
+      if (data.user) {
+        const { data: nextProfile } = await supabase
+          .from("profiles")
+          .select("subscription_tier,subscription_expires_at")
+          .eq("id", data.user.id)
+          .maybeSingle();
+
+        setProfile(nextProfile);
+        const usage = await getAccountAiUsageStatus(nextProfile?.subscription_tier);
+        setAiQuestionsLeft(usage.isUnlimited ? "Unlimited" : String(usage.left));
+        return;
+      }
+
+      const usage = await getAccountAiUsageStatus(null);
+      setAiQuestionsLeft(String(usage.left));
+    };
+
+    loadDashboardState();
+    checkSupabaseHealth().then(setDbHealth);
     const interval = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(interval);
-  }, [supabase.auth]);
+  }, [supabase]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.href = "/login";
   };
 
-  const userName = user?.user_metadata?.full_name?.split(" ")[0] || "Seeker";
+  const userName = user?.user_metadata?.full_name?.split(" ")[0] || birth.name.split(" ")[0] || "Seeker";
   const greeting = time.getHours() < 12 ? "Shubh Prabhat" : time.getHours() < 17 ? "Namaste" : "Shubh Sandhya";
   const dayName  = time.toLocaleDateString("en-IN", { weekday:"long" });
   const dateStr  = time.toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" });
   const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard";
+  const destiny = calculateDestiny(chart.planets as never, chart.dashas, birth.dob);
+  const psychology = calculatePsychology(chart.planets as never);
+  const activeDasha = chart.dashas.find((entry) => entry.active) || chart.dashas[0];
+  const strongestArea = [...destiny.areas].sort((a, b) => b.score - a.score)[0];
+  const weakestArea = [...destiny.areas].sort((a, b) => a.score - b.score)[0];
+  const cosmicScore = (destiny.currentScore / 10).toFixed(1);
+  const plan = profile?.subscription_tier && profile.subscription_tier !== "free"
+    ? profile.subscription_tier.toUpperCase()
+    : "FREE";
+  const chartCount = chart.name ? "1" : "0";
+  const aiQuestionsChange = plan === "FREE"
+    ? `${getFreeMonthlyAiLimit()} free / month`
+    : `${plan} plan active`;
+  const dbReady = isSupabaseReady(dbHealth);
+  const pendingDbTables = dbHealth.filter((item) => item.status !== "ready");
+  const planetCards = [
+    { name:"Sun", icon:"☉", col:"#f97316" },
+    { name:"Moon", icon:"☽", col:"#c084fc" },
+    { name:"Mars", icon:"♂", col:"#ef4444" },
+    { name:"Mercury", icon:"☿", col:"#22c55e" },
+    { name:"Jupiter", icon:"♃", col:"#f59e0b" },
+    { name:"Venus", icon:"♀", col:"#ec4899" },
+    { name:"Saturn", icon:"♄", col:"#60a5fa" },
+    { name:"Rahu", icon:"☊", col:"#a78bfa" },
+  ].map((planet) => {
+    const details = chart.planets[planet.name];
+    const energy = details.dignity.includes("Exalted") || details.dignity.includes("Own")
+      ? "Strong"
+      : [6, 8, 12].includes(details.house)
+      ? "Intense"
+      : "Active";
+
+    return {
+      ...planet,
+      sign: details.sign,
+      house: `${details.house}th`,
+      energy,
+    };
+  });
+  const insights = [
+    {
+      tag: `${activeDasha.planet} Mahadasha`,
+      text: `${activeDasha.planet} is your active karmic teacher right now. Current life score is ${destiny.currentScore}%, so this is a phase for focused work in ${weakestArea.name.toLowerCase()} and steady gains in ${strongestArea.name.toLowerCase()}.`,
+      icon: "✦",
+      urgent: destiny.currentScore < 55,
+    },
+    {
+      tag: `${psychology.pattern.name}`,
+      text: `${psychology.summary} Anxiety index is ${psychology.pattern.anxietyIdx}, so today works best when you keep decisions simple and stay close to routines that calm the mind.`,
+      icon: "🧠",
+      urgent: psychology.pattern.anxietyIdx >= 70,
+    },
+    {
+      tag: `${strongestArea.name} Window`,
+      text: `${strongestArea.name} is currently your strongest life area at ${strongestArea.score}%. ${weakestArea.name} sits at ${weakestArea.score}%, so the dashboard should be used as a guide for balance, not just momentum.`,
+      icon: strongestArea.icon,
+      urgent: false,
+    },
+  ];
 
   return (
     <>
@@ -180,6 +255,11 @@ export default function Dashboard() {
         .upgrade{background:linear-gradient(135deg,rgba(60,40,128,0.4),rgba(200,160,48,0.1));border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
         .upgrade-btn{background:linear-gradient(135deg,#c8a030,#a07820);color:#060410;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;white-space:nowrap;text-decoration:none}
         .upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,160,48,0.3)}
+        .db-health{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.18);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+        .db-health-title{font-size:13px;color:#fdba74;font-weight:600;margin-bottom:4px}
+        .db-health-text{font-size:12px;color:#c8c0a8;line-height:1.7}
+        .db-health-tags{display:flex;gap:6px;flex-wrap:wrap}
+        .db-health-tag{font-size:10px;color:#fdba74;border:1px solid rgba(249,115,22,0.25);background:rgba(249,115,22,0.08);border-radius:999px;padding:3px 8px}
 
         @media(max-width:1024px){
           .sidebar{display:none}
@@ -207,10 +287,10 @@ export default function Dashboard() {
           <div className="nav-section">
             <div className="nav-section-title">Main</div>
             {NAV_MAIN.map(n => (
-              <a key={n.label} href={n.href}
+              <Link key={n.label} href={n.href}
                 className={`nav-item ${pathname === n.href ? "active" : ""}`}>
                 <span className="nav-icon">{n.icon}</span>{n.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -218,9 +298,9 @@ export default function Dashboard() {
           <div className="nav-section">
             <div className="nav-section-title">Engines</div>
             {NAV_ENGINES.map(n => (
-              <a key={n.label} href={n.href} className="nav-item">
+              <Link key={n.label} href={n.href} className="nav-item">
                 <span className="nav-icon">{n.icon}</span>{n.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -228,9 +308,9 @@ export default function Dashboard() {
           <div className="nav-section">
             <div className="nav-section-title">Account</div>
             {NAV_ACCOUNT.map(n => (
-              <a key={n.label} href={n.href} className="nav-item">
+              <Link key={n.label} href={n.href} className="nav-item">
                 <span className="nav-icon">{n.icon}</span>{n.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -253,7 +333,7 @@ export default function Dashboard() {
               <h1 className="greeting-h serif">
                 {greeting},<br /><em>{userName}</em>
               </h1>
-              <div className="greeting-sub">The stars have been waiting for you.</div>
+              <div className="greeting-sub">{birth.city} · Lagna {chart.lagnaRashi} · {activeDasha.planet} Mahadasha active</div>
             </div>
             <div className="topbar-right">
               <div className="date-chip">
@@ -277,12 +357,12 @@ export default function Dashboard() {
           <div className="today-card">
             <div className="today-orb" />
             <div className="today-tag">✦ Today&apos;s Cosmic Energy</div>
-            <div className="today-title serif">A day of karmic realignment and hidden opportunities</div>
+            <div className="today-title serif">{psychology.pattern.name} meets {activeDasha.planet} timing</div>
             <div className="today-text">
-              Saturn&apos;s aspect on your Moon creates emotional depth today. Mercury&apos;s position favors communication, contracts, and important decisions. Avoid impulsive financial moves.
+              {destiny.summary} Your strongest area is {strongestArea.name.toLowerCase()}, while {weakestArea.name.toLowerCase()} needs gentler handling. Use discipline over speed, especially when emotions feel louder than facts.
             </div>
             <div className="today-score">
-              <div className="score-n serif">7.4</div>
+              <div className="score-n serif">{cosmicScore}</div>
               <div className="score-l">COSMIC SCORE</div>
             </div>
           </div>
@@ -297,16 +377,32 @@ export default function Dashboard() {
                 Upgrade to access all 15+ engines, unlimited AI chat, and destiny timeline.
               </div>
             </div>
-            <a href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Premium →</a>
+            <Link href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Premium →</Link>
           </div>
+
+          {dbHealth.length > 0 && !dbReady && (
+            <div className="db-health">
+              <div>
+                <div className="db-health-title">Database setup pending</div>
+                <div className="db-health-text">
+                  Account persistence is in fallback mode. Apply `supabase/schema.sql` and follow `docs/SUPABASE_SETUP.md`.
+                </div>
+              </div>
+              <div className="db-health-tags">
+                {pendingDbTables.slice(0, 4).map((item) => (
+                  <span key={item.table} className="db-health-tag">{item.label}</span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* STATS */}
           <div className="stats-row">
             {[
-              { icon:"🔯", val:"1",    lbl:"Charts Created",    change:"+ Generate New" },
-              { icon:"🤖", val:"3",    lbl:"AI Questions Left",  change:"5 free / month" },
-              { icon:"⚡", val:"7.4",  lbl:"Today&apos;s Score", change:"↑ Better than yesterday" },
-              { icon:"🌙", val:"Rahu", lbl:"Active Dasha",       change:"Until 2031" },
+              { icon:"🔯", val:chartCount, lbl:"Charts Created", change:birth.city ? birth.city : "Create your first chart" },
+              { icon:"🤖", val:aiQuestionsLeft, lbl:"AI Questions Left", change:aiQuestionsChange },
+              { icon:"⚡", val:cosmicScore,  lbl:"Today&apos;s Score", change:`${strongestArea.name} is strongest` },
+              { icon:"🌙", val:activeDasha.planet, lbl:"Active Dasha", change:`Until ${activeDasha.end.getFullYear()}` },
             ].map((s,i) => (
               <div key={i} className="stat-card">
                 <div className="stat-icon">{s.icon}</div>
@@ -331,11 +427,11 @@ export default function Dashboard() {
                   { icon:"💑", label:"Kundali Milan",    desc:"36-point compatibility", href:"/dashboard/kundali-milan" },
                   { icon:"💎", label:"Upgrade",          desc:"Unlock all features",   href:"/dashboard/upgrade" },
                 ].map((a,i) => (
-                  <a key={i} href={a.href} className="action-btn">
+                  <Link key={i} href={a.href} className="action-btn">
                     <div className="action-btn-icon">{a.icon}</div>
                     <div className="action-btn-label">{a.label}</div>
                     <div className="action-btn-desc">{a.desc}</div>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -343,7 +439,7 @@ export default function Dashboard() {
             <div className="card">
               <div className="card-tag">✦ AI Insights</div>
               <div className="card-title serif">Your cosmic intelligence briefing</div>
-              {INSIGHTS.map((ins,i) => (
+              {insights.map((ins,i) => (
                 <div key={i} className={`insight ${ins.urgent?"urgent":""}`}>
                   <div className="insight-top">
                     <span className="insight-icon">{ins.icon}</span>
@@ -361,7 +457,7 @@ export default function Dashboard() {
             <div className="card-tag">✦ Planetary Positions</div>
             <div className="card-title serif">Your current cosmic blueprint</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 32px"}}>
-              {PLANETS.map((p,i) => (
+              {planetCards.map((p,i) => (
                 <div key={i} className="planet-row">
                   <span style={{fontSize:18,width:28,color:p.col}}>{p.icon}</span>
                   <span style={{flex:1,fontSize:13,color:"#c8c0a8"}}>{p.name}</span>

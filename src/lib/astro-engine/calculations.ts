@@ -95,10 +95,10 @@ export function getJD(date: string, time: string, tz: number): number {
   const [y, m, d] = date.split('-').map(Number);
   const [h, mn]   = time.split(':').map(Number);
   const utH = h + mn / 60 - tz;
-  let a = Math.floor((14 - m) / 12);
-  let yr = y + 4800 - a;
-  let mo = m + 12 * a - 3;
-  let jdn = d + Math.floor((153 * mo + 2) / 5) + 365 * yr
+  const a = Math.floor((14 - m) / 12);
+  const yr = y + 4800 - a;
+  const mo = m + 12 * a - 3;
+  const jdn = d + Math.floor((153 * mo + 2) / 5) + 365 * yr
     + Math.floor(yr / 4) - Math.floor(yr / 100) + Math.floor(yr / 400) - 32045;
   return jdn + (utH - 12) / 24;
 }
@@ -324,7 +324,6 @@ export function computeLagna(jd: number, lat: number, lonG: number): number {
   const T  = (jd - 2451545) / 36525;
   const T2 = T * T, T3 = T2 * T;
   const GMST = _n(280.46061837 + 360.98564736629 * (jd - 2451545) + 0.000387933 * T2 - T3 / 38710000);
-  const Om   = _n(125.04452 - 1934.136261 * T);
   const eps  = _obliquity(T);
   const dpsi = _nutation(T);
   const eqEq = dpsi * Math.cos(_r(eps));

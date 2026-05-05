@@ -73,8 +73,6 @@ const NAISARGIKA: Record<string,number> = {
   Sun:7, Moon:6, Venus:6, Jupiter:7, Mercury:5, Mars:5, Saturn:4
 };
 
-const md = (x: number, m: number) => ((x % m) + m) % m;
-
 // Classical Bala descriptions
 const BALA_DESC = {
   Sthana:    "Sthana Bala — Is planet ko apni jagah kitni takat milti hai. Uchcha (exalted) mein ho to maximum strength. Own sign mein ho to ghar jaisa aaram. Neecha (debilitated) mein bahut kamzor. Yeh planet ki mool takat hai — baaki sab iske upar build hota hai.",
@@ -182,7 +180,6 @@ export function calculateShadbala(
     // ── 6. DRIK BALA (Aspectual Strength) ────────────────────
     let drikBala = 4;
     const benefics = ["Jupiter","Venus","Moon","Mercury"];
-    const malefics = ["Saturn","Mars","Sun","Rahu","Ketu"];
 
     ["Jupiter","Venus","Saturn","Mars"].forEach(asp => {
       if (asp === planet || !planets[asp]) return;

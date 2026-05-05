@@ -2,8 +2,8 @@
 import { useState } from "react";
 import "@/app/dashboard/shared.css";
 import { calculateNumerology, type NumerologyNumber } from "@/lib/astro-engine/numerology";
-
-const DEMO = { name: "Mukul Pal", dob: "1995-07-04" };
+import { PremiumFeature } from "@/components/premium-feature";
+import { useUserChart } from "@/lib/user-chart";
 
 // ── Number Card ───────────────────────────────────────────────
 function NumCard({ n, expanded, onToggle }: { n: NumerologyNumber; expanded: boolean; onToggle: () => void }) {
@@ -75,8 +75,9 @@ function NumCard({ n, expanded, onToggle }: { n: NumerologyNumber; expanded: boo
 export default function NumerologyPage() {
   const [activeTab, setActiveTab] = useState<"numbers" | "name" | "year">("numbers");
   const [expanded, setExpanded]   = useState<string | null>("Life Path");
+  const { birth } = useUserChart();
 
-  const result = calculateNumerology(DEMO.name, DEMO.dob);
+  const result = calculateNumerology(birth.name, birth.dob);
   const { lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear, nameBreakdown, monthForecast } = result;
 
   const numbers: NumerologyNumber[] = [lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear];
@@ -88,15 +89,16 @@ export default function NumerologyPage() {
       <div className="page-tag">🔢 Numerology Engine</div>
       <h1 className="page-title serif">Your Numbers, <em>Decoded</em></h1>
       <p className="page-sub">Pythagorean system · 7 core numbers · Vedic planet mapping · {currentYear} forecast</p>
+      <PremiumFeature feature="Numerology Engine">
 
       {/* HEADER CARD */}
       <div className="header-card">
         <div className="header-orb" />
         <div style={{ position: "relative", zIndex: 1 }}>
           <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#c8a030", marginBottom: 6 }}>🔢 Numerology Profile</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, color: "#f0e8d0" }}>{DEMO.name}</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, color: "#f0e8d0" }}>{birth.name}</div>
           <div style={{ fontSize: 13, color: "#605890", marginTop: 4 }}>
-            {new Date(DEMO.dob).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+            {new Date(birth.dob).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
           </div>
         </div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", position: "relative", zIndex: 1 }}>
@@ -143,7 +145,7 @@ export default function NumerologyPage() {
           {/* Letter grid */}
           <div className="card">
             <div className="card-tag">✦ Pythagorean Name Chart</div>
-            <div className="card-title serif">{DEMO.name}</div>
+            <div className="card-title serif">{birth.name}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
               {nameBreakdown.map((l, i) =>
                 l.letter === " " ? (
@@ -300,6 +302,7 @@ export default function NumerologyPage() {
           </div>
         </div>
       )}
+      </PremiumFeature>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const PLANS = [
@@ -73,6 +74,7 @@ export default function UpgradePage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const supabase = createClient();
+  const router = useRouter();
 
   const loadRazorpay = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -92,7 +94,7 @@ export default function UpgradePage() {
     try {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { window.location.href = "/login"; return; }
+      if (!user) { router.push("/login"); return; }
 
       // Load Razorpay script
       const loaded = await loadRazorpay();
@@ -102,7 +104,7 @@ export default function UpgradePage() {
       const res = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planId, userId: user.id }),
+        body: JSON.stringify({ plan: planId }),
       });
       const order = await res.json();
       if (order.error) throw new Error(order.error);
@@ -135,7 +137,6 @@ export default function UpgradePage() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              userId: user.id,
               plan: planId,
             }),
           });
@@ -266,7 +267,7 @@ export default function UpgradePage() {
         </h1>
         <p className="page-sub">
           Start free. Upgrade when the stars align.<br />
-          Cancel anytime — no questions asked.
+          Testing mode stays open for now. Billing enforcement can be turned on at launch.
         </p>
 
         {/* PLANS */}

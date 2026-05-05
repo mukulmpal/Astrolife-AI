@@ -1,5 +1,15 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import {
+  ensureConversation,
+  listConversations,
+  loadConversationMessages,
+  saveMessage,
+  type SavedConversation,
+} from "@/lib/ai-conversations";
+import { formatChartContext, useUserChart } from "@/lib/user-chart";
+import { getAccountAiUsageStatus, getAiUsageStatus, incrementAccountMonthlyAiUsage, type AiUsageStatus } from "@/lib/usage";
 
 interface Message {
   role: "user" | "assistant";
@@ -44,28 +54,97 @@ const WELCOMES: Record<string, string> = {
 };
 
 export default function ChatPage() {
+  const [supabase] = useState(() => createClient());
   const [activeAgent, setActiveAgent] = useState(AGENTS[0]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<SavedConversation[]>([]);
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const [usageStatus, setUsageStatus] = useState<AiUsageStatus>(() => getAiUsageStatus(null));
+  const [messages, setMessages] = useState<Message[]>(() => [{
+    role: "assistant",
+    content: WELCOMES[AGENTS[0].id] || WELCOMES.general,
+    agent: AGENTS[0].name,
+    emoji: AGENTS[0].emoji,
+  }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { chart } = useUserChart();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
   useEffect(() => {
+    const loadPlan = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        setUsageStatus(getAiUsageStatus(null));
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      const tier = typeof profile?.subscription_tier === "string" ? profile.subscription_tier : null;
+      setSubscriptionTier(tier);
+      setUsageStatus(await getAccountAiUsageStatus(tier));
+    };
+
+    loadPlan();
+    listConversations().then(setConversations);
+  }, [supabase]);
+
+  const resetChat = (agent = activeAgent) => {
+    setConversationId(null);
     setMessages([{
       role: "assistant",
-      content: WELCOMES[activeAgent.id] || WELCOMES.general,
-      agent: activeAgent.name,
-      emoji: activeAgent.emoji,
+      content: WELCOMES[agent.id] || WELCOMES.general,
+      agent: agent.name,
+      emoji: agent.emoji,
     }]);
-  }, [activeAgent]);
+  };
+
+  const switchAgent = (agent: typeof AGENTS[number]) => {
+    setActiveAgent(agent);
+    resetChat(agent);
+  };
+
+  const openConversation = async (conversation: SavedConversation) => {
+    const agent = AGENTS.find((item) => item.id === conversation.agentId) || AGENTS[0];
+    const savedMessages = await loadConversationMessages(conversation.id);
+    if (savedMessages.length === 0) return;
+
+    setActiveAgent(agent);
+    setConversationId(conversation.id);
+    setMessages(savedMessages
+      .filter((message) => message.role !== "system")
+      .map((message) => ({
+        role: message.role === "assistant" ? "assistant" : "user",
+        content: message.content,
+        agent: message.role === "assistant" ? agent.name : undefined,
+        emoji: message.role === "assistant" ? agent.emoji : undefined,
+      })));
+  };
 
   const sendMessage = async (content: string) => {
     if (!content.trim() || loading) return;
+    const currentUsage = getAiUsageStatus(subscriptionTier);
+    if (currentUsage.isBlocked) {
+      setUsageStatus(currentUsage);
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "Free monthly limit poori ho chuki hai. Upgrade karo to continue, ya testing mode off hone tak wait karo.",
+        agent: activeAgent.name,
+        emoji: activeAgent.emoji,
+      }]);
+      return;
+    }
+
     const userMsg: Message = { role: "user", content };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
@@ -73,18 +152,40 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
+      const nextConversationId = await ensureConversation(conversationId, activeAgent.id, content);
+      if (nextConversationId) {
+        setConversationId(nextConversationId);
+        await saveMessage(nextConversationId, { role: "user", content });
+      }
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           agentId: activeAgent.id,
-          chartContext: `Name: Mukul Pal, DOB: 4 July 1995, TOB: 12:30, City: Delhi, Ascendant: Capricorn, Sun: Capricorn H1, Moon: Aries H4, Mars: Pisces H3, Mercury: Aquarius H2 (Retrograde), Jupiter: Taurus H5, Venus: Sagittarius H12, Saturn: Scorpio H11 (Retrograde), Rahu: Leo H8, Ketu: Aquarius H2, Active Dasha: Saturn Mahadasha 2018-2037`,
+          chartContext: formatChartContext(chart),
         }),
       });
 
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+
+      if (!subscriptionTier || subscriptionTier === "free") {
+        if (data.usage?.trackedOnServer && typeof data.usage.left === "number") {
+          setUsageStatus({
+            enforcementEnabled: Boolean(data.usage.enforced),
+            isBlocked: Boolean(data.usage.enforced) && data.usage.left === 0,
+            isUnlimited: false,
+            limit: Number(data.usage.limit),
+            used: Number(data.usage.used),
+            left: Number(data.usage.left),
+          });
+        } else {
+          await incrementAccountMonthlyAiUsage();
+          setUsageStatus(await getAccountAiUsageStatus("free"));
+        }
+      }
 
       setMessages(prev => [...prev, {
         role: "assistant",
@@ -92,6 +193,13 @@ export default function ChatPage() {
         agent: data.agent,
         emoji: data.emoji,
       }]);
+
+      await saveMessage(nextConversationId, {
+        role: "assistant",
+        content: data.message,
+        model: data.model,
+      });
+      setConversations(await listConversations());
     } catch {
       setMessages(prev => [...prev, {
         role: "assistant",
@@ -133,6 +241,13 @@ export default function ChatPage() {
         .agent-name{font-size:12px;font-weight:500;color:#c8c0a8;display:block}
         .agent-desc{font-size:10px;color:#605890;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
         .agent-btn.active .agent-name{color:#c8a030}
+        .history-section{border-top:1px solid #1c1840;padding:10px 8px 12px;max-height:210px;overflow-y:auto}
+        .history-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#605890;padding:0 8px 8px}
+        .history-btn{width:100%;border:none;background:transparent;text-align:left;border-radius:8px;padding:8px;color:#605890;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s}
+        .history-btn:hover{background:rgba(200,160,48,0.06);color:#c8c0a8}
+        .history-btn.active{background:rgba(200,160,48,0.1);color:#c8a030}
+        .history-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .history-meta{font-size:9px;color:#3a3060;margin-top:2px}
 
         /* MAIN */
         .chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -184,6 +299,8 @@ export default function ChatPage() {
         .input-footer{display:flex;justify-content:space-between;margin-top:8px;padding:0 4px}
         .input-hint{font-size:11px;color:#3a3060}
         .free-tag{font-size:10px;color:#605890;border:1px solid #1c1840;border-radius:6px;padding:2px 8px}
+        .usage-note{margin:0 24px 12px;padding:10px 14px;border-radius:12px;border:1px solid rgba(200,160,48,0.18);background:rgba(200,160,48,0.06);font-size:12px;line-height:1.6;color:#c8c0a8}
+        .usage-note strong{color:#c8a030}
 
         @media(max-width:768px){
           .agents-sidebar{display:none}
@@ -206,7 +323,7 @@ export default function ChatPage() {
               <button
                 key={a.id}
                 className={`agent-btn ${activeAgent.id === a.id ? "active" : ""}`}
-                onClick={() => setActiveAgent(a)}
+                onClick={() => switchAgent(a)}
               >
                 <span className="agent-emoji">{a.emoji}</span>
                 <span>
@@ -215,6 +332,23 @@ export default function ChatPage() {
                 </span>
               </button>
             ))}
+          </div>
+          <div className="history-section">
+            <div className="history-title">Recent Chats</div>
+            {conversations.length > 0 ? conversations.map((conversation) => (
+              <button
+                key={conversation.id}
+                className={`history-btn ${conversation.id === conversationId ? "active" : ""}`}
+                onClick={() => openConversation(conversation)}
+              >
+                <div className="history-name">{conversation.title}</div>
+                <div className="history-meta">
+                  {AGENTS.find((agent) => agent.id === conversation.agentId)?.name || "AstroLife AI"}
+                </div>
+              </button>
+            )) : (
+              <div className="history-meta" style={{padding:"0 8px 8px"}}>No saved chats yet</div>
+            )}
           </div>
         </div>
 
@@ -230,7 +364,7 @@ export default function ChatPage() {
                 <div className="sdot" /> Online — Ready to guide you
               </div>
             </div>
-            <button className="clear-btn" onClick={() => setActiveAgent({ ...activeAgent })}>
+            <button className="clear-btn" onClick={() => resetChat()}>
               Clear Chat
             </button>
           </div>
@@ -278,6 +412,14 @@ export default function ChatPage() {
             </div>
           )}
 
+          {!usageStatus.isUnlimited && (
+            <div className="usage-note">
+              {usageStatus.enforcementEnabled
+                ? <><strong>Free plan:</strong> {usageStatus.left}/{usageStatus.limit} questions left this month.</>
+                : <><strong>Testing mode:</strong> {usageStatus.left}/{usageStatus.limit} free questions left this month. Limit cross hone par bhi chat chalta rahega.</>}
+            </div>
+          )}
+
           {/* INPUT */}
           <div className="input-wrap">
             <div className="input-box">
@@ -298,14 +440,18 @@ export default function ChatPage() {
               <button
                 className="send-btn"
                 onClick={() => sendMessage(input)}
-                disabled={!input.trim() || loading}
+                disabled={!input.trim() || loading || usageStatus.isBlocked}
               >
                 ✦
               </button>
             </div>
             <div className="input-footer">
               <span className="input-hint">Enter to send · Shift+Enter for new line</span>
-              <span className="free-tag">Free Plan — 5 questions/day</span>
+              <span className="free-tag">
+                {usageStatus.isUnlimited
+                  ? `${subscriptionTier?.toUpperCase() ?? "PREMIUM"} Plan — Unlimited questions`
+                  : `Free Plan — ${usageStatus.left}/${usageStatus.limit} left this month`}
+              </span>
             </div>
           </div>
 

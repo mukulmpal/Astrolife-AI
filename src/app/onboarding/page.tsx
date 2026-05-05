@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { calculateChart } from "@/lib/astro-engine/calculations";
+import { saveChartToAccount } from "@/lib/user-chart";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -28,7 +30,6 @@ export default function Onboarding() {
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<FormData>({ name:"", gender:"", dob:"", tob:"", city:"", lat:null, lon:null });
   const [citySearch, setCitySearch] = useState("");
-  const [filteredCities, setFilteredCities] = useState<string[]>([]);
   const [calcStep, setCalcStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [animClass, setAnimClass] = useState("slide-in");
@@ -39,13 +40,9 @@ export default function Onboarding() {
     if (step === 1) nameRef.current?.focus();
   }, [step]);
 
-  useEffect(() => {
-    if (citySearch.length > 1) {
-      setFilteredCities(CITIES.filter(c => c.toLowerCase().includes(citySearch.toLowerCase())));
-    } else {
-      setFilteredCities([]);
-    }
-  }, [citySearch]);
+  const filteredCities = citySearch.length > 1
+    ? CITIES.filter(c => c.toLowerCase().includes(citySearch.toLowerCase()))
+    : [];
 
   // Calculation animation
   useEffect(() => {
@@ -92,9 +89,10 @@ export default function Onboarding() {
           city: form.city,
           lat: form.lat,
           lon: form.lon,
-          onboarding_complete: true,
+          onboarding_completed: true,
         });
       }
+      await saveChartToAccount(calculateChart(form.name, form.dob, form.tob, form.city), { replacePrimary: true });
     } catch (e) { console.log(e); }
     setLoading(false);
     goNext(4);
@@ -355,7 +353,7 @@ export default function Onboarding() {
               {filteredCities.length > 0 && (
                 <div className="city-dropdown">
                   {filteredCities.map(c => (
-                    <div key={c} className="city-opt" onClick={() => { setForm(f => ({ ...f, city: c })); setCitySearch(c); setFilteredCities([]); }}>
+                    <div key={c} className="city-opt" onClick={() => { setForm(f => ({ ...f, city: c })); setCitySearch(c); }}>
                       {c}
                     </div>
                   ))}

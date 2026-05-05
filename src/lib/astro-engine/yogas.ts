@@ -53,7 +53,6 @@ const md  = (x: number, m: number) => ((x % m) + m) % m;
 const isK = (h: number) => [1,4,7,10].includes(h);
 const isT = (h: number) => [1,5,9].includes(h);
 const isD = (h: number) => [6,8,12].includes(h);
-const isU = (h: number) => [3,6,10,11].includes(h);
 const isKT= (h: number) => isK(h) || isT(h);
 
 const SIGN_LORDS: Record<string,string> = {
