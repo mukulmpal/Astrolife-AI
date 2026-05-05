@@ -11,6 +11,7 @@ import {
   buildTransitEventRadarReportSection,
   buildDashaTimelineReportSection,
   buildFullPremiumReportSections,
+  buildAllYogasDoshasDetailedReportSections,
   ReportSection,
 } from "@/lib/report-data";
 import { useUserChart } from "@/lib/user-chart";
@@ -459,6 +460,10 @@ export default function PremiumReportPage() {
       const fullPremiumSections = useMemo(() => {
         return buildFullPremiumReportSections(chart);
       }, [chart]);
+
+      const allYogasDoshasDetailedSections = useMemo(() => {
+        return buildAllYogasDoshasDetailedReportSections(chart);
+      }, [chart]);
       
       const reportSections = useMemo(() => {
         const injectedSections = [
@@ -470,7 +475,11 @@ export default function PremiumReportPage() {
           transitRadarSection,
         ].filter(Boolean) as ReportSection[];
     
-        const injectedIds = new Set(injectedSections.map((section) => section.id));
+        const uniqueInjectedSections = injectedSections.filter((section, index, array) => {
+      return array.findIndex((item) => item.id === section.id) === index;
+    });
+
+    const injectedIds = new Set(uniqueInjectedSections.map((section) => section.id));
     
         const baseSections = report.sections.filter(
           (section) => !injectedIds.has(section.id)
@@ -478,12 +487,13 @@ export default function PremiumReportPage() {
     
         return [
           baseSections[0],
-          ...injectedSections,
+          ...uniqueInjectedSections,
           ...baseSections.slice(1),
         ].filter(Boolean) as ReportSection[];
     }, [
         report.sections,
         fullPremiumSections,
+        allYogasDoshasDetailedSections,
         yogasDoshasSection,
         shadbalaSection,
         ashtakavargaSection,
@@ -2155,6 +2165,161 @@ export default function PremiumReportPage() {
           }
         }
 
+
+
+        /* ASTROLIFE PDF FINAL REPAIR */
+        @page {
+          size: A4;
+          margin: 0;
+        }
+
+        @media print {
+          html,
+          body {
+            width: 210mm !important;
+            min-height: 297mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            color: #100625 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          body * {
+            visibility: hidden !important;
+          }
+
+          .report-shell,
+          .report-shell * {
+            visibility: visible !important;
+          }
+
+          .report-shell {
+            position: static !important;
+            width: 210mm !important;
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+          }
+
+          nav,
+          header,
+          aside,
+          .sidebar,
+          .topbar,
+          .bottom-nav,
+          .dashboard-nav,
+          .mobile-nav,
+          .report-toolbar,
+          .personal-report-meta,
+          footer:not(.page-footer),
+          [class*="sidebar"],
+          [class*="Sidebar"],
+          [class*="navbar"],
+          [class*="Navbar"],
+          [class*="nav-"],
+          [class*="Nav"],
+          [class*="toolbar"],
+          [class*="Toolbar"] {
+            display: none !important;
+            visibility: hidden !important;
+          }
+
+          .report-page {
+            position: relative !important;
+            display: block !important;
+            width: 210mm !important;
+            min-height: 297mm !important;
+            margin: 0 !important;
+            padding: 22mm 18mm 20mm !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            overflow: hidden !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            background:
+              linear-gradient(rgba(255,255,255,0.965), rgba(255,255,255,0.965)),
+              var(--paper) !important;
+            color: #100625 !important;
+          }
+
+          .report-page.final-page {
+            page-break-after: auto !important;
+            break-after: auto !important;
+          }
+
+          .report-page *,
+          .long-content p,
+          .summary-card,
+          .summary-card *,
+          .mini-card,
+          .mini-card *,
+          .section-heading,
+          .section-heading *,
+          .page-top,
+          .page-footer {
+            color: #100625 !important;
+            text-shadow: none !important;
+          }
+
+          .page-top {
+            position: absolute !important;
+            top: 10mm !important;
+            left: 18mm !important;
+            right: 18mm !important;
+            color: #433952 !important;
+          }
+
+          .page-footer {
+            position: absolute !important;
+            left: 18mm !important;
+            right: 18mm !important;
+            bottom: 10mm !important;
+            color: #433952 !important;
+            background: transparent !important;
+          }
+
+          .summary-card,
+          .mini-card,
+          .score-card,
+          .premium-chart-box,
+          .toc-row,
+          .final-card {
+            background: rgba(255,255,255,0.94) !important;
+            border-color: rgba(95,73,35,0.18) !important;
+            box-shadow: none !important;
+          }
+
+          .eyebrow,
+          .toc-row strong,
+          .chart-title-row > span,
+          .score-card span,
+          .toc-index,
+          .brand-mark {
+            color: #b8860b !important;
+          }
+
+          .long-content {
+            columns: auto !important;
+            column-count: auto !important;
+          }
+
+          .section-grid,
+          .two-col,
+          .content-grid,
+          .summary-card,
+          .mini-card {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          a {
+            color: inherit !important;
+            text-decoration: none !important;
+          }
+        }
 
       `}</style>
       <MobileBottomNav />

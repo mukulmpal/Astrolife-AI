@@ -37,7 +37,7 @@ export function MobileBottomNav() {
         @media (max-width: 768px) {
           .mobile-bottom-nav {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             position: fixed;
             left: 10px;
             right: 10px;
@@ -72,7 +72,7 @@ export function MobileBottomNav() {
           }
 
           .mobile-bottom-nav-label {
-            font-size: 10px;
+            font-size: 9px;
             letter-spacing: 0.2px;
           }
         }

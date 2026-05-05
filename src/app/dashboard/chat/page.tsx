@@ -25,8 +25,12 @@ interface Message {
   agent?: string;
   emoji?: string;
   sources?: string[];
+  sourceMeta?: Array<{ source: string; confidence: string; reason: string }>;
 }
 type LanguageMode = "hindi" | "english" | "hinglish";
+type ThemeMode = "dark" | "light";
+const CHAT_LANGUAGE_MODE_KEY = "chatLanguageMode";
+const CHAT_THEME_MODE_KEY = "chatThemeMode";
 
 const SOURCE_LINKS: Record<string, string> = {
   "Natal Chart": "/dashboard/kundli",
@@ -205,7 +209,15 @@ export default function ChatPage() {
   }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [languageMode, setLanguageMode] = useState<LanguageMode>("hinglish");
+  const [languageMode, setLanguageMode] = useState<LanguageMode>(() => {
+    if (typeof window === "undefined") return "hinglish";
+    const stored = window.localStorage.getItem(CHAT_LANGUAGE_MODE_KEY);
+    return stored === "hindi" || stored === "english" || stored === "hinglish" ? stored : "hinglish";
+  });
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    if (typeof window === "undefined") return "dark";
+    return window.localStorage.getItem(CHAT_THEME_MODE_KEY) === "light" ? "light" : "dark";
+  });
   const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard/chat";
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -267,6 +279,15 @@ export default function ChatPage() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(CHAT_LANGUAGE_MODE_KEY, languageMode);
+  }, [languageMode]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(CHAT_THEME_MODE_KEY, themeMode);
+  }, [themeMode]);
 
   useEffect(() => {
     const loadPlan = async () => {
@@ -390,6 +411,7 @@ export default function ChatPage() {
         agent: data.agent,
         emoji: data.emoji,
         sources: Array.isArray(data.sources) ? data.sources : [],
+        sourceMeta: Array.isArray(data.sourceMeta) ? data.sourceMeta : [],
       }]);
 
       await saveMessage(nextConversationId, {
@@ -454,10 +476,14 @@ export default function ChatPage() {
         .chat-header{padding:16px 24px;border-bottom:1px solid #1c1840;display:flex;align-items:center;gap:12px;background:#0a0720;flex-shrink:0}
         .agent-avatar{width:40px;height:40px;border-radius:12px;background:#0d0a22;border:1px solid #261f50;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
         .agent-label{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0}
-        .agent-status{font-size:11px;color:#1d9e75;display:flex;align-items:center;gap:4px;margin-top:2px;padding:14px 16px;border-bottom:1px solid #1c1840;background:#0a0720;flex-shrink:0}
+        .agent-status{font-size:11px;color:#1d9e75;display:flex;align-items:center;gap:4px;margin-top:2px;padding:14px 16px;border-bottom:1px solid #1c1840;background:#0a0720;flex-shrink:0;flex-wrap:wrap}
         .lang-toggle{margin-left:auto;display:flex;gap:6px;align-items:center}
         .lang-btn{border:1px solid #1c1840;background:#0d0a22;color:#605890;border-radius:999px;padding:3px 10px;font-size:10px;cursor:pointer}
         .lang-btn.active{color:#c8a030;border-color:rgba(200,160,48,0.28);background:rgba(200,160,48,0.08)}
+        .theme-toggle{display:flex;gap:6px;align-items:center}
+        .theme-btn{border:1px solid #1c1840;background:#0d0a22;color:#605890;border-radius:999px;padding:3px 10px;font-size:10px;cursor:pointer}
+        .theme-btn.active{color:#c8a030;border-color:rgba(200,160,48,0.28);background:rgba(200,160,48,0.08)}
+        .mobile-controls{display:none}
         .sdot{width:6px;height:6px;border-radius:50%;background:#1d9e75;animation:blink 2s infinite}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
         .clear-btn{margin-left:auto;padding:7px 14px;border-radius:8px;border:1px solid #1c1840;background:transparent;color:#605890;font-size:12px;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif}
@@ -477,6 +503,7 @@ export default function ChatPage() {
         .msg-sources{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
         .msg-source-chip{font-size:10px;color:#c8a030;border:1px solid rgba(200,160,48,0.24);background:rgba(200,160,48,0.08);padding:3px 8px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center}
         .msg-source-chip:hover{background:rgba(200,160,48,0.14);border-color:rgba(200,160,48,0.4)}
+        .msg-source-conf{font-size:9px;margin-left:6px;color:#f0d898}
 
         /* TYPING */
         .typing-wrap{display:flex;gap:12px;align-items:flex-start}
@@ -516,6 +543,10 @@ export default function ChatPage() {
           .agents-sidebar{display:none}
           .msg-bubble{max-width:90%}
           .agent-status{padding:12px}
+          .lang-toggle{margin-left:0;gap:4px}
+          .theme-toggle{gap:4px}
+          .lang-btn,.theme-btn{padding:4px 8px;font-size:9px}
+          .mobile-controls{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #1c1840;background:#0a0720}
           .messages{padding:16px 16px 104px}
           .input-wrap{padding:10px 12px;position:sticky;bottom:76px;z-index:20}
           .input-box{padding:10px 12px}
@@ -530,9 +561,16 @@ export default function ChatPage() {
           .mobile-nav-icon{font-size:16px;line-height:1}
           .mobile-nav-label{font-size:10px;letter-spacing:0.2px}
         }
+        .theme-light{background:#f7f4ea;color:#2a1f3a}
+        .theme-light .chat-main,.theme-light .agent-status,.theme-light .mobile-controls,.theme-light .input-wrap{background:#f7f4ea;border-color:#dfd3bf}
+        .theme-light .msg.assistant .msg-bubble{background:#fffdf8;border-color:#dfd3bf;color:#2f2745}
+        .theme-light .input-box{background:#fffdf8;border-color:#dfd3bf}
+        .theme-light .input-ta{color:#2f2745}
+        .theme-light .input-ta::placeholder{color:#8d7f6a}
+        .theme-light .lang-btn,.theme-light .theme-btn{background:#fffdf8;border-color:#dfd3bf}
       `}</style>
 
-      <div className="chat-layout">
+      <div className={`chat-layout ${themeMode === "light" ? "theme-light" : ""}`}>
 
         {/* AGENTS SIDEBAR */}
         <div className="agents-sidebar">
@@ -601,6 +639,21 @@ export default function ChatPage() {
               <button type="button" className={`lang-btn ${languageMode === "english" ? "active" : ""}`} onClick={() => setLanguageMode("english")}>English</button>
               <button type="button" className={`lang-btn ${languageMode === "hinglish" ? "active" : ""}`} onClick={() => setLanguageMode("hinglish")}>Hinglish</button>
             </div>
+            <div className="theme-toggle">
+              <button type="button" className={`theme-btn ${themeMode === "dark" ? "active" : ""}`} onClick={() => setThemeMode("dark")}>Dark</button>
+              <button type="button" className={`theme-btn ${themeMode === "light" ? "active" : ""}`} onClick={() => setThemeMode("light")}>Light</button>
+            </div>
+          </div>
+          <div className="mobile-controls">
+            <div className="lang-toggle">
+              <button type="button" className={`lang-btn ${languageMode === "hindi" ? "active" : ""}`} onClick={() => setLanguageMode("hindi")}>Hindi</button>
+              <button type="button" className={`lang-btn ${languageMode === "english" ? "active" : ""}`} onClick={() => setLanguageMode("english")}>English</button>
+              <button type="button" className={`lang-btn ${languageMode === "hinglish" ? "active" : ""}`} onClick={() => setLanguageMode("hinglish")}>Hinglish</button>
+            </div>
+            <div className="theme-toggle">
+              <button type="button" className={`theme-btn ${themeMode === "dark" ? "active" : ""}`} onClick={() => setThemeMode("dark")}>Dark</button>
+              <button type="button" className={`theme-btn ${themeMode === "light" ? "active" : ""}`} onClick={() => setThemeMode("light")}>Light</button>
+            </div>
           </div>
 
           {/* MESSAGES */}
@@ -621,8 +674,11 @@ export default function ChatPage() {
                   {m.role === "assistant" && m.sources && m.sources.length > 0 && (
                     <div className="msg-sources">
                       {m.sources.map((source) => (
-                        <Link key={source} href={SOURCE_LINKS[source] || "/dashboard"} className="msg-source-chip">
+                        <Link key={source} href={SOURCE_LINKS[source] || "/dashboard"} className="msg-source-chip" title={m.sourceMeta?.find((x)=>x.source===source)?.reason || ""}>
                           {source}
+                          <span className="msg-source-conf">
+                            {m.sourceMeta?.find((x)=>x.source===source)?.confidence || "Medium"}
+                          </span>
                         </Link>
                       ))}
                     </div>

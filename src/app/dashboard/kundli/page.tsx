@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult } from "@/lib/astro-engine/yogas";
-import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary } from "@/lib/user-chart";
+import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart } from "@/lib/user-chart";
 
 const CITIES = [
   "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
@@ -85,6 +85,8 @@ export default function KundliPage() {
   const [activeTab, setActiveTab] = useState("chart");
   const [citySearch,setCitySearch]= useState("");
   const [showCities,setShowCities]= useState(false);
+  const [showForm, setShowForm] = useState(true);
+  const { chart: primaryChart, loading: chartLoading } = useUserChart();
 
   const filtered = CITIES.filter(c=>c.toLowerCase().includes(citySearch.toLowerCase()));
 
@@ -112,6 +114,16 @@ export default function KundliPage() {
 
     loadCharts();
   }, []);
+
+  useEffect(() => {
+    if (chartLoading || !primaryChart) return;
+    if (!chart) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      applyChart(primaryChart);
+      setSaveStatus("Primary chart loaded.");
+      setShowForm(false);
+    }
+  }, [primaryChart, chartLoading, chart]);
 
   const handleSelectSavedChart = async (chartId: string) => {
     setLibraryLoading(true);
@@ -285,7 +297,7 @@ export default function KundliPage() {
           )}
         </div>
 
-        {/* FORM */}
+        {(showForm || !chart) && (
         <div className="form-card">
           <div className="form-grid">
             <div className="form-group">
@@ -331,6 +343,13 @@ export default function KundliPage() {
             {loading?"⟳ Calculating...":"🔯 Generate Kundli"}
           </button>
         </div>
+        )}
+
+        {chart && !showForm && (
+          <div style={{display:"flex",justifyContent:"flex-end",marginBottom:14}}>
+            <button className="btn-save" onClick={() => setShowForm(true)}>Edit Birth Details</button>
+          </div>
+        )}
 
         {/* LOADING */}
         {loading && (

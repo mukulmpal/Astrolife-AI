@@ -46,6 +46,21 @@ function detectIntentSources(params: {
   return ordered;
 }
 
+function buildSourceConfidence(params: {
+  source: string;
+  latestUser: string;
+}) {
+  const { source, latestUser } = params;
+  const timing = /(today|now|current|this week|timing|kab|abhi|phase|window|gochar|transit)/i.test(latestUser);
+  const remedy = /(remedy|upay|mantra|totka|daan|donate|fast|vrat|gem|stone)/i.test(latestUser);
+  const deep = /(career|job|business|promotion|work|profession|marriage|love|relationship|partner|shaadi|vivah|health|disease|medical)/i.test(latestUser);
+
+  if (source === "Transit/Gochar" && timing) return { confidence: "High", reason: "Current timing query detected." };
+  if (source === "Daily Feed" && (timing || remedy)) return { confidence: "High", reason: "Today/remedy guidance query detected." };
+  if (source === "Natal Chart" && deep) return { confidence: "High", reason: "Personal chart analysis query detected." };
+  return { confidence: "Medium", reason: "Supportive context used." };
+}
+
 const AGENTS: Record<string, { name: string; emoji: string; system: string }> = {
   general: {
     name: "AstroLife AI",
@@ -347,12 +362,17 @@ Sign off as: "${agent.emoji} ${agent.name}"`;
     }
 
     const usage = await incrementServerAiUsage(usageState);
+    const latestUser = [...messages].reverse().find((m: { role: string; content: string }) => m.role === "user")?.content ?? "";
     const sources = detectIntentSources({
       messages,
       hasChart: Boolean(chartContext),
       hasTransit: Boolean(transitContext),
       hasDailyFeed: Boolean(dailyFeedContext),
     });
+    const sourceMeta = sources.map((source) => ({
+      source,
+      ...buildSourceConfidence({ source, latestUser }),
+    }));
 
     return NextResponse.json({
       message: text,
@@ -360,6 +380,7 @@ Sign off as: "${agent.emoji} ${agent.name}"`;
       emoji: agent.emoji,
       model: usedModel,
       sources,
+      sourceMeta,
       usage,
     });
   } catch (error) {

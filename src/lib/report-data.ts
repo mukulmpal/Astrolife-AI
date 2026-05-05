@@ -1299,3 +1299,551 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
 
   return premiumSections;
 }
+
+
+function normalizeReportListItem(item: any, index: number, fallbackPrefix: string) {
+  if (typeof item === "string") {
+    return {
+      name: item,
+      category: fallbackPrefix,
+      strength: "Detected",
+      description: `${item} is detected in the available chart analysis. The exact intensity depends on planetary strength, house ownership, dignity, dasha activation and transit support.`,
+      remedy: "Use this as guidance and confirm timing through dasha and transit.",
+    };
+  }
+
+  return {
+    name:
+      safeText(
+        item?.name ??
+          item?.title ??
+          item?.yoga ??
+          item?.dosha ??
+          item?.type ??
+          item?.id,
+        `${fallbackPrefix} ${index + 1}`
+      ),
+    category: safeText(item?.category ?? item?.group ?? item?.kind, fallbackPrefix),
+    strength: safeText(
+      item?.strength ??
+        item?.status ??
+        item?.score ??
+        item?.level ??
+        item?.severity ??
+        item?.intensity,
+      "Detected"
+    ),
+    description: safeText(
+      item?.description ??
+        item?.meaning ??
+        item?.effect ??
+        item?.result ??
+        item?.interpretation ??
+        item?.summary,
+      "This combination is detected in the available chart analysis. Its results should be judged through planet strength, dignity, house connection, dasha and transit activation."
+    ),
+    remedy: safeText(
+      item?.remedy ??
+        item?.remedies?.join?.(", ") ??
+        item?.suggestion ??
+        item?.advice,
+      "Follow simple, non-fear-based remedies and practical behavioural correction."
+    ),
+  };
+}
+
+
+const REPORT_SIGN_NAMES = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces",
+];
+
+function normalizeReportSign(value: any): string {
+  if (typeof value === "string") {
+    const clean = value.trim().toLowerCase();
+    const match = REPORT_SIGN_NAMES.find((sign) => sign.toLowerCase() === clean);
+    if (match) return match;
+
+    const aliases: Record<string, string> = {
+      mesh: "Aries",
+      vrishabh: "Taurus",
+      mithun: "Gemini",
+      kark: "Cancer",
+      simha: "Leo",
+      kanya: "Virgo",
+      tula: "Libra",
+      vrishchik: "Scorpio",
+      dhanu: "Sagittarius",
+      makar: "Capricorn",
+      kumbh: "Aquarius",
+      meen: "Pisces",
+    };
+
+    return aliases[clean] ?? value;
+  }
+
+  const n = Number(value);
+
+  if (Number.isFinite(n)) {
+    if (n >= 0 && n <= 11) return REPORT_SIGN_NAMES[Math.round(n)] ?? "Unknown";
+    if (n >= 1 && n <= 12) return REPORT_SIGN_NAMES[Math.round(n - 1)] ?? "Unknown";
+    return REPORT_SIGN_NAMES[Math.floor((((n % 360) + 360) % 360) / 30)] ?? "Unknown";
+  }
+
+  return "Unknown";
+}
+
+function getReportPlanet(source: any, planetName: string): any {
+  const root = getChartRoot(source);
+  const lower = planetName.toLowerCase();
+
+  const candidates = [
+    root?.planets,
+    root?.planetData,
+    root?.grahas,
+    root?.chart?.planets,
+    root?.kundli?.planets,
+    source?.planets,
+    source?.chart?.planets,
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+
+    if (Array.isArray(candidate)) {
+      const found = candidate.find((planet: any) => {
+        const name = String(
+          planet?.name ??
+            planet?.planet ??
+            planet?.graha ??
+            planet?.id ??
+            ""
+        ).toLowerCase();
+
+        return name === lower;
+      });
+
+      if (found) return found;
+    }
+
+    if (typeof candidate === "object") {
+      return (
+        candidate?.[planetName] ??
+        candidate?.[lower] ??
+        candidate?.[planetName.toUpperCase()] ??
+        null
+      );
+    }
+  }
+
+  return null;
+}
+
+function getReportPlanetSign(source: any, planetName: string): string {
+  const planet = getReportPlanet(source, planetName);
+
+  return normalizeReportSign(
+    planet?.sign ??
+      planet?.rashi ??
+      planet?.signName ??
+      planet?.rashiName ??
+      planet?.signIndex ??
+      planet?.rashiIndex ??
+      planet?.longitude ??
+      planet?.lon ??
+      planet?.degree
+  );
+}
+
+function getReportPlanetHouse(source: any, planetName: string): number {
+  const planet = getReportPlanet(source, planetName);
+  const house = Number(planet?.house ?? planet?.bhava ?? planet?.houseNumber);
+
+  if (Number.isFinite(house) && house >= 1 && house <= 12) return Math.round(house);
+
+  return 0;
+}
+
+function reportSignDistance(fromSign: string, toSign: string): number {
+  const from = REPORT_SIGN_NAMES.findIndex((sign) => sign === fromSign);
+  const to = REPORT_SIGN_NAMES.findIndex((sign) => sign === toSign);
+
+  if (from < 0 || to < 0) return -1;
+
+  return ((to - from + 12) % 12) + 1;
+}
+
+function isReportKendraFrom(fromSign: string, toSign: string): boolean {
+  return [1, 4, 7, 10].includes(reportSignDistance(fromSign, toSign));
+}
+
+function sameReportSign(a: string, b: string): boolean {
+  return a !== "Unknown" && b !== "Unknown" && a === b;
+}
+
+function pushReportYoga(
+  items: any[],
+  name: string,
+  category: string,
+  strength: string,
+  description: string,
+  remedy: string
+) {
+  if (items.some((item) => String(item?.name).toLowerCase() === name.toLowerCase())) return;
+
+  items.push({
+    name,
+    category,
+    strength,
+    description,
+    remedy,
+  });
+}
+
+function buildFallbackDetectedYogas(source: any): any[] {
+  const items: any[] = [];
+
+  const sunSign = getReportPlanetSign(source, "Sun");
+  const moonSign = getReportPlanetSign(source, "Moon");
+  const marsSign = getReportPlanetSign(source, "Mars");
+  const mercurySign = getReportPlanetSign(source, "Mercury");
+  const jupiterSign = getReportPlanetSign(source, "Jupiter");
+  const venusSign = getReportPlanetSign(source, "Venus");
+  const saturnSign = getReportPlanetSign(source, "Saturn");
+
+  const marsHouse = getReportPlanetHouse(source, "Mars");
+  const mercuryHouse = getReportPlanetHouse(source, "Mercury");
+  const jupiterHouse = getReportPlanetHouse(source, "Jupiter");
+  const venusHouse = getReportPlanetHouse(source, "Venus");
+  const saturnHouse = getReportPlanetHouse(source, "Saturn");
+
+  if (sameReportSign(sunSign, mercurySign)) {
+    pushReportYoga(
+      items,
+      "Budh Aditya Yoga",
+      "Intelligence / Authority Yoga",
+      "Detected",
+      `Sun and Mercury are placed together in ${sunSign}. This forms Budh Aditya Yoga, which can support intelligence, communication, administration, business thinking, confidence and public expression when supported by strength and dasha.`,
+      "Use this yoga through disciplined communication, study, writing, business planning and respectful speech."
+    );
+  }
+
+  if (isReportKendraFrom(moonSign, jupiterSign)) {
+    pushReportYoga(
+      items,
+      "Gaj Kesari Yoga",
+      "Wisdom / Protection Yoga",
+      "Detected",
+      `Jupiter is placed in a kendra relationship from Moon. This forms Gaj Kesari Yoga, which can support wisdom, protection, respect, learning, emotional maturity and guidance from mentors when Jupiter and Moon are strong.`,
+      "Strengthen this yoga through learning, gratitude, charity, teacher respect and wise decision-making."
+    );
+  }
+
+  if (sameReportSign(moonSign, marsSign) || reportSignDistance(moonSign, marsSign) === 7) {
+    pushReportYoga(
+      items,
+      "Chandra Mangal Yoga",
+      "Wealth / Action Yoga",
+      "Detected",
+      `Moon and Mars are connected by conjunction or opposition pattern. This forms Chandra Mangal Yoga, which can support initiative, business instinct, money movement and action-oriented emotional energy, but it also needs emotional control.`,
+      "Use this yoga through disciplined action, anger control, financial planning and avoiding impulsive decisions."
+    );
+  }
+
+  if (sameReportSign(jupiterSign, marsSign) || isReportKendraFrom(jupiterSign, marsSign)) {
+    pushReportYoga(
+      items,
+      "Guru Mangal Yoga",
+      "Courage / Wisdom Yoga",
+      "Detected",
+      `Jupiter and Mars are connected by sign or kendra relationship. This can create Guru Mangal Yoga, supporting courageous wisdom, initiative, leadership, protection and dharmic action when both planets are well supported.`,
+      "Use this yoga through ethical action, physical discipline, learning and mentor-guided ambition."
+    );
+  }
+
+  if ([1, 4, 7, 10].includes(marsHouse) && ["Aries", "Scorpio", "Capricorn"].includes(marsSign)) {
+    pushReportYoga(
+      items,
+      "Ruchaka Mahapurusha Yoga",
+      "Panch Mahapurusha Yoga",
+      "Strong if Mars is unafflicted",
+      `Mars is in a kendra and in a strong sign condition. This indicates Ruchaka Mahapurusha Yoga, supporting courage, command, physical drive, competition, engineering ability and leadership.`,
+      "Use Mars through discipline, exercise, courage, protection of others and controlled speech."
+    );
+  }
+
+  if ([1, 4, 7, 10].includes(mercuryHouse) && ["Gemini", "Virgo"].includes(mercurySign)) {
+    pushReportYoga(
+      items,
+      "Bhadra Mahapurusha Yoga",
+      "Panch Mahapurusha Yoga",
+      "Strong if Mercury is unafflicted",
+      `Mercury is in a kendra and in a strong sign condition. This indicates Bhadra Mahapurusha Yoga, supporting intelligence, speech, business, analytics, learning, writing and adaptability.`,
+      "Use Mercury through study, writing, commerce, clear communication and honest calculation."
+    );
+  }
+
+  if ([1, 4, 7, 10].includes(jupiterHouse) && ["Sagittarius", "Pisces", "Cancer"].includes(jupiterSign)) {
+    pushReportYoga(
+      items,
+      "Hamsa Mahapurusha Yoga",
+      "Panch Mahapurusha Yoga",
+      "Strong if Jupiter is unafflicted",
+      `Jupiter is in a kendra and in a strong sign condition. This indicates Hamsa Mahapurusha Yoga, supporting wisdom, respect, spirituality, teaching, blessings and protection.`,
+      "Use Jupiter through learning, teaching, charity, ethics and respect for gurus."
+    );
+  }
+
+  if ([1, 4, 7, 10].includes(venusHouse) && ["Taurus", "Libra", "Pisces"].includes(venusSign)) {
+    pushReportYoga(
+      items,
+      "Malavya Mahapurusha Yoga",
+      "Panch Mahapurusha Yoga",
+      "Strong if Venus is unafflicted",
+      `Venus is in a kendra and in a strong sign condition. This indicates Malavya Mahapurusha Yoga, supporting charm, comfort, creativity, relationship harmony, aesthetics and prosperity.`,
+      "Use Venus through refined behaviour, art, relationship maturity and clean pleasure."
+    );
+  }
+
+  if ([1, 4, 7, 10].includes(saturnHouse) && ["Capricorn", "Aquarius", "Libra"].includes(saturnSign)) {
+    pushReportYoga(
+      items,
+      "Shasha Mahapurusha Yoga",
+      "Panch Mahapurusha Yoga",
+      "Strong if Saturn is unafflicted",
+      `Saturn is in a kendra and in a strong sign condition. This indicates Shasha Mahapurusha Yoga, supporting discipline, authority, endurance, structure, mass influence and long-term achievement.`,
+      "Use Saturn through patience, responsibility, service, humility and consistent work."
+    );
+  }
+
+  const beneficTenth =
+    [mercuryHouse, jupiterHouse, venusHouse].includes(10);
+
+  if (beneficTenth) {
+    pushReportYoga(
+      items,
+      "Amala Yoga",
+      "Reputation / Karma Yoga",
+      "Detected",
+      "A benefic planet is connected with the 10th house. This indicates Amala Yoga, which can support clean reputation, professional respect, public goodwill and positive karma through work.",
+      "Use this yoga through honest work, reputation care, service and consistent professional discipline."
+    );
+  }
+
+  return items;
+}
+
+function buildFallbackDetectedDoshas(source: any): any[] {
+  const items: any[] = [];
+
+  const marsHouse = getReportPlanetHouse(source, "Mars");
+  const sunSign = getReportPlanetSign(source, "Sun");
+  const rahuSign = getReportPlanetSign(source, "Rahu");
+  const ketuSign = getReportPlanetSign(source, "Ketu");
+
+  if ([1, 4, 7, 8, 12].includes(marsHouse)) {
+    items.push({
+      name: "Manglik / Kuja Dosha",
+      category: "Marriage / Mars Sensitivity",
+      strength: "Detected",
+      description: `Mars is placed in house ${marsHouse}, which is traditionally considered sensitive for Manglik or Kuja Dosha analysis. Final intensity depends on sign, aspects, cancellation factors and matching analysis.`,
+      remedy: "Use anger control, patience in relationships, Hanuman prayer, physical discipline and careful matching before marriage decisions.",
+    });
+  }
+
+  if (sameReportSign(sunSign, rahuSign) || sameReportSign(sunSign, ketuSign)) {
+    items.push({
+      name: "Pitru Dosha Signal",
+      category: "Ancestral / Sun Node Sensitivity",
+      strength: "Possible",
+      description: "Sun is connected with Rahu or Ketu by sign, creating a possible ancestral or father-line sensitivity. This should be confirmed through house placement, ninth house condition and dasha activation.",
+      remedy: "Respect father figures and ancestors, perform simple gratitude practice, donate food and avoid ego conflicts.",
+    });
+  }
+
+  return items;
+}
+
+
+function collectPossibleYogas(source: any): any[] {
+  const root = getChartRoot(source);
+  const candidates = [
+    root?.yogas,
+    root?.detectedYogas,
+    root?.yogaResults,
+    root?.yogaList,
+    root?.analysis?.yogas,
+    root?.chart?.yogas,
+    root?.kundli?.yogas,
+    source?.yogas,
+    source?.detectedYogas,
+    source?.yogaResults,
+    source?.chart?.yogas,
+  ];
+
+  const items: any[] = [];
+
+  candidates.forEach((candidate) => {
+    if (Array.isArray(candidate)) items.push(...candidate);
+    else if (candidate && typeof candidate === "object") items.push(...Object.values(candidate));
+  });
+
+  items.push(...buildFallbackDetectedYogas(source));
+
+  const seen = new Set<string>();
+
+  return items.filter((item, index) => {
+    const normalized = normalizeReportListItem(item, index, "Yoga");
+    const key = normalized.name.toLowerCase().trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function collectPossibleDoshas(source: any): any[] {
+  const root = getChartRoot(source);
+  const candidates = [
+    root?.doshas,
+    root?.detectedDoshas,
+    root?.doshaResults,
+    root?.doshaList,
+    root?.analysis?.doshas,
+    root?.chart?.doshas,
+    root?.kundli?.doshas,
+    source?.doshas,
+    source?.detectedDoshas,
+    source?.doshaResults,
+    source?.chart?.doshas,
+  ];
+
+  const items: any[] = [];
+
+  candidates.forEach((candidate) => {
+    if (Array.isArray(candidate)) items.push(...candidate);
+    else if (candidate && typeof candidate === "object") items.push(...Object.values(candidate));
+  });
+
+  items.push(...buildFallbackDetectedDoshas(source));
+
+  const seen = new Set<string>();
+
+  return items.filter((item, index) => {
+    const normalized = normalizeReportListItem(item, index, "Dosha");
+    const key = normalized.name.toLowerCase().trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function buildDetailedParagraphsFromItems(
+  rawItems: any[],
+  fallbackPrefix: string,
+  emptyParagraph: string
+) {
+  if (!rawItems.length) {
+    return [
+      emptyParagraph,
+      `A mature ${fallbackPrefix.toLowerCase()} reading should not depend only on the name of a combination. The same combination can behave differently depending on planet dignity, house ownership, conjunctions, aspects, dasha activation, transit support and the native’s practical actions.`,
+      `AstroLife treats ${fallbackPrefix.toLowerCase()} as guidance patterns, not fixed destiny. When more engine data is available, this section automatically expands into a complete item-wise interpretation.`,
+    ];
+  }
+
+  return rawItems.map((item, index) => {
+    const normalized = normalizeReportListItem(item, index, fallbackPrefix);
+
+    return `${index + 1}. ${normalized.name} — ${normalized.category}, strength/status: ${normalized.strength}. ${normalized.description} Practical guidance: ${normalized.remedy}`;
+  });
+}
+
+function buildSummaryFromItems(rawItems: any[], fallbackPrefix: string) {
+  if (!rawItems.length) {
+    return [
+      `No detailed ${fallbackPrefix.toLowerCase()} list was found in the current chart payload.`,
+      "The report will expand automatically when the engine sends item-wise data.",
+      "Interpretation should be confirmed through strength, dasha and transit.",
+      "Avoid fear-based conclusions.",
+      "Use remedies with practical action.",
+    ];
+  }
+
+  return rawItems.slice(0, 8).map((item, index) => {
+    const normalized = normalizeReportListItem(item, index, fallbackPrefix);
+    return `${normalized.name}: ${normalized.strength}`;
+  });
+}
+
+export function buildAllYogasDoshasDetailedReportSections(input: any): ReportSection[] {
+  const yogas = collectPossibleYogas(input);
+  const doshas = collectPossibleDoshas(input);
+
+  const yogaParagraphs = buildDetailedParagraphsFromItems(
+    yogas,
+    "Yoga",
+    "The available chart payload does not currently include a full item-wise yoga list. This means the detailed yoga section is ready, but it needs the yoga engine output to include all detected yoga objects."
+  );
+
+  const doshaParagraphs = buildDetailedParagraphsFromItems(
+    doshas,
+    "Dosha",
+    "The available chart payload does not currently include a full item-wise dosha list. This means the detailed dosha section is ready, but it needs the dosha engine output to include all detected dosha objects."
+  );
+
+  return [
+    makeSection({
+      id: "detailed-yogas",
+      title: "Detailed Yogas",
+      subtitle: yogas.length
+        ? `All detected yogas from the chart engine: ${yogas.length} combinations found.`
+        : "Complete yoga section prepared for all detected combinations.",
+      score: yogas.length ? Math.min(95, 68 + yogas.length * 3) : 64,
+      paragraphs: yogaParagraphs,
+      summary: buildSummaryFromItems(yogas, "Yoga"),
+      actionPlan: [
+        "Judge each yoga through planet strength, dignity and house connection.",
+        "Check dasha activation before expecting visible results.",
+        "Use strong yogas as skill-building and opportunity areas.",
+        "Do not assume every yoga gives full results immediately.",
+      ],
+      remedy: [
+        "Respect planets involved in strong yogas.",
+        "Use humility when success periods begin.",
+        "Strengthen yoga areas through real-world action and discipline.",
+      ],
+    }),
+
+    makeSection({
+      id: "detailed-doshas",
+      title: "Detailed Doshas & Corrections",
+      subtitle: doshas.length
+        ? `All detected doshas from the chart engine: ${doshas.length} sensitive patterns found.`
+        : "Complete dosha section prepared for all detected sensitive combinations.",
+      score: doshas.length ? Math.max(45, 72 - doshas.length * 2) : 66,
+      paragraphs: doshaParagraphs,
+      summary: buildSummaryFromItems(doshas, "Dosha"),
+      actionPlan: [
+        "Treat doshas as correction areas, not punishment.",
+        "Check when the dosha planet becomes active through dasha or transit.",
+        "Use simple behavioural remedies with spiritual practice.",
+        "Avoid fear-based decisions or expensive remedy pressure.",
+      ],
+      remedy: [
+        "For Saturn pressure: discipline, service and patience.",
+        "For Mars pressure: anger control, exercise and careful speech.",
+        "For Rahu/Ketu pressure: grounding, meditation and avoiding shortcuts.",
+        "For Moon pressure: sleep, hydration and emotional regulation.",
+      ],
+    }),
+  ];
+}

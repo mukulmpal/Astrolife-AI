@@ -107,7 +107,7 @@ function buildCoreInput(chart: NatalChartForTransit): { input: NatalChartInput; 
     const p = chart.planets[planet];
     const rashi = normalizeRashi(p.rashi);
     const hasPreciseLongitude = typeof p.longitude === "number" && Number.isFinite(p.longitude);
-    const lon = hasPreciseLongitude ? p.longitude : rashi * 30;
+    const lon = hasPreciseLongitude ? (p.longitude as number) : rashi * 30;
     if (!hasPreciseLongitude) missingLongitudePlanets.push(planet);
     acc[planet] = {
       rashi,

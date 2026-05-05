@@ -114,6 +114,7 @@ export default function Home() {
         .nav-link{color:${T.cream2};font-size:14px;cursor:pointer;transition:color 0.2s}.nav-link:hover{color:${T.cream}}
         .nav-btn{background:transparent;border:1px solid ${T.gold}66;color:${T.gold2};border-radius:8px;padding:9px 22px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.25s;font-family:'Outfit',sans-serif}
         .nav-btn:hover{background:${T.gold}14;border-color:${T.gold};box-shadow:0 0 20px ${T.gold}22}
+        .mobile-toggle{display:none;position:fixed;top:78px;right:14px;z-index:220}
 
         /* HERO */
         .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 100px;position:relative;overflow:hidden}
@@ -215,6 +216,7 @@ export default function Home() {
 
         @media(max-width:768px){
           .nav{padding:0 20px}.nav-links{display:none}
+          .mobile-toggle{display:block}
           .hero{padding:120px 20px 80px}
           .stats{padding:24px 20px}
           .stat{border-right:none;border-bottom:1px solid ${T.border}}.stat:last-child{border-bottom:none}
@@ -245,6 +247,12 @@ export default function Home() {
           <button className="nav-btn">Get Free Kundli</button>
         </div>
       </nav>
+      <div className="mobile-toggle">
+        <button className="toggle-wrap" onClick={toggle} title="Switch theme">
+          <div className="track"><div className="thumb" /></div>
+          <span className="toggle-label">{T.nextLabel}</span>
+        </button>
+      </div>
 
       {/* HERO */}
       <section className="hero">

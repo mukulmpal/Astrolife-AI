@@ -44,6 +44,7 @@ const MOBILE_NAV = [
   { icon: "🏠", label: "Home", href: "/dashboard" },
   { icon: "🔯", label: "Charts", href: "/dashboard/kundli" },
   { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
+  { icon: "🎵", label: "Sound", href: "/dashboard/astro-sound" },
   { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
   { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
 ];
@@ -134,6 +135,8 @@ export default function Dashboard() {
   const [time, setTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState("overview");
   const { birth, chart } = useUserChart();
+  const fallbackArea = { name: "Stability", score: 50, icon: "⚖️" };
+  const fallbackDasha = { planet: "Moon", start: new Date(), end: new Date(), yrs: 10, active: true };
 
   useEffect(() => {
     const loadDashboardState = async () => {
@@ -168,16 +171,16 @@ export default function Dashboard() {
     window.location.href = "/login";
   };
 
-  const userName = user?.user_metadata?.full_name?.split(" ")[0] || birth.name.split(" ")[0] || "Seeker";
+  const userName = user?.user_metadata?.full_name?.split(" ")[0] || birth.name?.split(" ")[0] || "Seeker";
   const greeting = time.getHours() < 12 ? "Shubh Prabhat" : time.getHours() < 17 ? "Namaste" : "Shubh Sandhya";
   const dayName  = time.toLocaleDateString("en-IN", { weekday:"long" });
   const dateStr  = time.toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" });
   const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard";
-  const destiny = calculateDestiny(chart.planets as never, chart.dashas, birth.dob);
+  const destiny = calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob);
   const psychology = calculatePsychology(chart.planets as never);
-  const activeDasha = chart.dashas.find((entry) => entry.active) || chart.dashas[0];
-  const strongestArea = [...destiny.areas].sort((a, b) => b.score - a.score)[0];
-  const weakestArea = [...destiny.areas].sort((a, b) => a.score - b.score)[0];
+  const activeDasha = chart.dashas?.find((entry) => entry.active) || chart.dashas?.[0] || fallbackDasha;
+  const strongestArea = [...(destiny.areas ?? [])].sort((a, b) => b.score - a.score)[0] || fallbackArea;
+  const weakestArea = [...(destiny.areas ?? [])].sort((a, b) => a.score - b.score)[0] || fallbackArea;
   const cosmicScore = (destiny.currentScore / 10).toFixed(1);
   const plan = profile?.subscription_tier && profile.subscription_tier !== "free"
     ? profile.subscription_tier.toUpperCase()
@@ -198,17 +201,19 @@ export default function Dashboard() {
     { name:"Saturn", icon:"♄", col:"#60a5fa" },
     { name:"Rahu", icon:"☊", col:"#a78bfa" },
   ].map((planet) => {
-    const details = chart.planets[planet.name];
-    const energy = details.dignity.includes("Exalted") || details.dignity.includes("Own")
+    const details = chart.planets?.[planet.name];
+    const dignity = details?.dignity ?? "";
+    const houseNum = typeof details?.house === "number" ? details.house : 1;
+    const energy = dignity.includes("Exalted") || dignity.includes("Own")
       ? "Strong"
-      : [6, 8, 12].includes(details.house)
+      : [6, 8, 12].includes(houseNum)
       ? "Intense"
       : "Active";
 
     return {
       ...planet,
-      sign: details.sign,
-      house: `${details.house}th`,
+      sign: details?.sign ?? "Unknown",
+      house: `${houseNum}th`,
       energy,
     };
   });
@@ -239,10 +244,12 @@ export default function Dashboard() {
     const transit = calculateTransitReport({ chart: transitChart, date: today, base: "moon" });
     const radar = calculateEventRadarReport({ chart: transitChart, startDate: today, days: 7, base: "moon" });
     const panchang = calculatePanchang(today, transitChart.tz);
-    const topArea = [...transit.areaScores].sort((a, b) => b.score - a.score)[0];
+    const topArea = [...(transit.areaScores ?? [])].sort((a, b) => b.score - a.score)[0] ?? { area: "Balance", score: 50 };
     const cautionCount = transit.alerts.filter((a) => a.severity === "high" || a.severity === "medium").length;
     const oppCount = transit.alerts.filter((a) => a.type === "opportunity").length;
-    return { panchang, transit, radar, topArea, cautionCount, oppCount };
+    const bestDay = radar.bestDay ?? { label: "N/A" };
+    const cautionDay = radar.cautionDay ?? { label: "N/A" };
+    return { panchang, transit, radar: { ...radar, bestDay, cautionDay }, topArea, cautionCount, oppCount };
   }, [chart]);
 
   return (
@@ -399,11 +406,11 @@ export default function Dashboard() {
           .card{padding:18px}
           .planet-row{gap:8px}
           .energy-pill{padding:2px 8px}
-          .mobile-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:10px;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120}
+          .mobile-nav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:10px;right:10px;bottom:10px;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120}
           .mobile-nav-item{text-decoration:none;color:#605890;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border-radius:10px}
           .mobile-nav-item.active{color:#c8a030;background:rgba(200,160,48,0.1)}
           .mobile-nav-icon{font-size:16px;line-height:1}
-          .mobile-nav-label{font-size:10px;letter-spacing:0.2px}
+          .mobile-nav-label{font-size:9px;letter-spacing:0.2px}
         }
       `}</style>
 
@@ -605,6 +612,7 @@ export default function Dashboard() {
                 {[
                   { icon:"🔯", label:"Generate Kundli",  desc:"Create birth chart",    href:"/dashboard/kundli" },
                   { icon:"🤖", label:"AI Chat",          desc:"Talk to AI astrologer", href:"/dashboard/chat" },
+                { icon:"🎵", label:"Astro Sound",      desc:"Raga-based sound remedy", href:"/dashboard/astro-sound" },
                 { icon:"📈", label:"Destiny Timeline", desc:"See your life arc",      href:"/dashboard/destiny" },
                 { icon:"📅", label:"Panchang",         desc:"Daily tithi & nakshatra", href:"/dashboard/panchang" },
                 { icon:"🧠", label:"Psychology",       desc:"Mind & soul analysis",  href:"/dashboard/psychology" },
