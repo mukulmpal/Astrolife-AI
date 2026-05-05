@@ -1,0 +1,1269 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/lib/report-data.ts
+
+export type ReportSignal = "Excellent" | "Good" | "Mixed" | "Caution" | "Sensitive";
+
+export interface ReportSection {
+  id: string;
+  title: string;
+  subtitle: string;
+  signal: ReportSignal;
+  score: number;
+  paragraphs: string[];
+  summary: string[];
+  actionPlan: string[];
+  remedy: string[];
+}
+
+export interface ReportPlanet {
+  name: string;
+  sign: string;
+  degree: string;
+  nakshatra: string;
+  house: string;
+  status: string;
+}
+
+export interface PremiumReportData {
+  nativeName: string;
+  birthDate: string;
+  birthTime: string;
+  birthPlace: string;
+  generatedAt: string;
+  lagna: string;
+  moonSign: string;
+  nakshatra: string;
+  currentDasha: string;
+  reportTitle: string;
+  executiveSummary: string[];
+  keyHighlights: string[];
+  planets: ReportPlanet[];
+  sections: ReportSection[];
+}
+
+function safeText(value: any, fallback: string) {
+  if (typeof value === "string" && value.trim()) return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return fallback;
+}
+
+function getBirthDetails(input: any) {
+  const root = input ?? {};
+  const birth = root.birth ?? root.birthDetails ?? root.user ?? root.profile ?? {};
+
+  return {
+    name: safeText(root.name ?? birth.name ?? birth.fullName, "AstroLife User"),
+    date: safeText(
+      birth.date ??
+        birth.dob ??
+        birth.dateOfBirth ??
+        root.dateOfBirth ??
+        root.dob,
+      "Not provided"
+    ),
+    time: safeText(
+      birth.time ??
+        birth.tob ??
+        birth.timeOfBirth ??
+        root.timeOfBirth ??
+        root.tob,
+      "Not provided"
+    ),
+    place: safeText(
+      birth.place ??
+        birth.city ??
+        birth.birthPlace ??
+        root.birthPlace ??
+        root.city,
+      "Not provided"
+    ),
+  };
+}
+
+function getChartRoot(input: any) {
+  return input?.chart ?? input?.chartData ?? input ?? {};
+}
+
+function getPlanet(rawChart: any, planet: string): any {
+  const lower = planet.toLowerCase();
+
+  return (
+    rawChart?.planets?.[planet] ??
+    rawChart?.planets?.[lower] ??
+    rawChart?.planetData?.[planet] ??
+    rawChart?.planetData?.[lower] ??
+    rawChart?.grahas?.[planet] ??
+    rawChart?.grahas?.[lower] ??
+    {}
+  );
+}
+
+function formatDegree(value: any) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return `${value.toFixed(2)}°`;
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    return value.includes("°") ? value : `${value}`;
+  }
+
+  return "—";
+}
+
+function signFromValue(value: any) {
+  const signs = [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces",
+  ];
+
+  if (typeof value === "string" && value.trim()) return value;
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (value >= 0 && value <= 11) return signs[value];
+    if (value >= 1 && value <= 12) return signs[value - 1];
+    return signs[Math.floor((((value % 360) + 360) % 360) / 30)];
+  }
+
+  return "—";
+}
+
+function planetStatus(planet: string) {
+  const benefics = ["Jupiter", "Venus", "Mercury"];
+  const malefics = ["Saturn", "Mars", "Rahu", "Ketu"];
+
+  if (benefics.includes(planet)) return "Supportive";
+  if (malefics.includes(planet)) return "Karmic";
+  if (planet === "Moon") return "Emotional";
+  if (planet === "Sun") return "Authority";
+  return "Neutral";
+}
+
+function buildPlanets(rawChart: any): ReportPlanet[] {
+  const planetNames = [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+  ];
+
+  return planetNames.map((name) => {
+    const data = getPlanet(rawChart, name);
+
+    const longitude =
+      data?.longitude ??
+      data?.lon ??
+      data?.degree ??
+      data?.absoluteDegree ??
+      data?.siderealLongitude;
+
+    return {
+      name,
+      sign: signFromValue(
+        data?.sign ??
+          data?.rashi ??
+          data?.rashiName ??
+          data?.signName ??
+          longitude
+      ),
+      degree: formatDegree(longitude ?? data?.degree),
+      nakshatra: safeText(data?.nakshatra ?? data?.nakshatraName, "—"),
+      house: safeText(data?.house, "—"),
+      status: safeText(data?.status, planetStatus(name)),
+    };
+  });
+}
+
+function getSignal(score: number): ReportSignal {
+  if (score >= 80) return "Excellent";
+  if (score >= 65) return "Good";
+  if (score >= 45) return "Mixed";
+  if (score >= 30) return "Caution";
+  return "Sensitive";
+}
+
+function makeSection(params: {
+  id: string;
+  title: string;
+  subtitle: string;
+  score: number;
+  paragraphs: string[];
+  summary: string[];
+  actionPlan: string[];
+  remedy: string[];
+}): ReportSection {
+  return {
+    ...params,
+    signal: getSignal(params.score),
+  };
+}
+function getListFromKeys(source: any, keys: string[]) {
+  for (const key of keys) {
+    const value = source?.[key];
+    if (Array.isArray(value)) return value;
+  }
+  return [];
+}
+
+function normalizeAstroItem(item: any, fallbackName: string) {
+  if (typeof item === "string") {
+    return {
+      name: item,
+      description: "",
+      strength: "",
+      category: "",
+      active: true,
+    };
+  }
+
+  return {
+    name: safeText(item?.name ?? item?.title ?? item?.yoga ?? item?.dosha, fallbackName),
+    description: safeText(
+      item?.description ??
+        item?.effect ??
+        item?.meaning ??
+        item?.result ??
+        item?.summary,
+      ""
+    ),
+    strength: safeText(item?.strength ?? item?.score ?? item?.severity ?? item?.level, ""),
+    category: safeText(item?.category ?? item?.type, ""),
+    active:
+      item?.active === true ||
+      item?.isActive === true ||
+      item?.present === true ||
+      item?.detected === true ||
+      item?.found === true,
+  };
+}
+
+function filterActiveOrTop(items: any[]) {
+  const normalized = items.map((item, index) => normalizeAstroItem(item, `Item ${index + 1}`));
+  const hasActiveFlag = normalized.some((item) => item.active);
+
+  if (hasActiveFlag) {
+    return normalized.filter((item) => item.active);
+  }
+
+  return normalized;
+}
+
+export function buildYogasDoshasReportSection(source: any): ReportSection {
+  const rawYogas =
+    getListFromKeys(source, [
+      "activeYogas",
+      "detectedYogas",
+      "matchedYogas",
+      "yogas",
+      "positiveYogas",
+      "rajaYogas",
+      "dhanaYogas",
+    ]) ?? [];
+
+  const rawDoshas =
+    getListFromKeys(source, [
+      "activeDoshas",
+      "detectedDoshas",
+      "matchedDoshas",
+      "doshas",
+      "negativeDoshas",
+      "afflictions",
+    ]) ?? [];
+
+  const yogas = filterActiveOrTop(rawYogas).slice(0, 8);
+  const doshas = filterActiveOrTop(rawDoshas).slice(0, 5);
+
+  const yogaNames = yogas.map((item) => item.name).filter(Boolean);
+  const doshaNames = doshas.map((item) => item.name).filter(Boolean);
+
+  const yogaLine = yogaNames.length
+    ? yogaNames.join(", ")
+    : "No major yoga was strongly detected from the available engine output.";
+
+  const doshaLine = doshaNames.length
+    ? doshaNames.join(", ")
+    : "No major dosha was strongly detected from the available engine output.";
+
+  const score = Math.max(
+    42,
+    Math.min(88, 58 + yogaNames.length * 4 - doshaNames.length * 3)
+  );
+
+  return makeSection({
+    id: "yogas-doshas",
+    title: "Yogas & Doshas",
+    subtitle: "Special combinations, karmic patterns and practical remedies.",
+    score,
+    paragraphs: [
+      `Yogas and doshas are among the most important interpretive layers in Vedic astrology. A yoga shows a special planetary combination that can create potential for success, intelligence, prosperity, fame, spiritual growth, leadership, creativity or protection. A dosha shows an area where karmic pressure, delay, imbalance, emotional challenge or repeated life lessons may appear. Both should be understood carefully, because a yoga does not automatically give results unless supported by strength, dasha and transit, and a dosha does not destroy life when awareness, remedies and right action are present.`,
+
+      `In this chart, the active yoga pattern highlights the areas where life can produce stronger results when the native works with discipline and clarity. The main yoga indications found are: ${yogaLine}. These combinations should be treated as potential seeds. They become more visible when their planets are strong, when their dasha period operates, or when supportive transits activate the connected houses.`,
+
+      `The dosha pattern shows where life may ask for maturity, patience and correction. The main dosha or sensitive indications found are: ${doshaLine}. These combinations should not be read with fear. They simply show where extra awareness is needed. A dosha often becomes a source of growth when the native chooses better habits, avoids repeated mistakes, performs remedies and takes practical responsibility.`,
+
+      `The correct way to use this section is to combine it with dasha and transit. If a yoga planet is active in the current dasha, the positive promise can become more visible. If a dosha planet is active, the native should be more careful in that area and follow remedies. Therefore, Yogas and Doshas are not isolated labels; they are timing-sensitive karmic patterns.`,
+    ],
+    summary: [
+      yogaNames.length
+        ? `Top yogas detected: ${yogaNames.slice(0, 4).join(", ")}.`
+        : "No strong yoga was detected from the current engine output.",
+      doshaNames.length
+        ? `Sensitive doshas detected: ${doshaNames.slice(0, 3).join(", ")}.`
+        : "No strong dosha was detected from the current engine output.",
+      "Yogas give potential, but dasha and planetary strength decide activation.",
+      "Doshas show correction areas, not fixed negative destiny.",
+      "Remedies work best when combined with practical behavioural change.",
+    ],
+    actionPlan: [
+      "Use active yogas as strength areas and build skills around them.",
+      "Do not fear doshas; identify the life pattern they are asking you to correct.",
+      "Check current dasha and transit before expecting major yoga results.",
+      "Follow remedies consistently instead of doing them only during crisis.",
+    ],
+    remedy: [
+      "Light a diya daily with gratitude and calm intention.",
+      "Respect parents, teachers, elders and spiritual guides.",
+      "Donate food, clothes or learning material according to capacity.",
+      "Avoid harsh speech, impulsive decisions and repeated negative habits.",
+    ],
+  });
+}
+export function buildPremiumReportData(input: any): PremiumReportData {
+  const birth = getBirthDetails(input);
+  const rawChart = getChartRoot(input);
+
+  const lagna =
+    signFromValue(
+      rawChart?.lagna?.sign ??
+        rawChart?.ascendant?.sign ??
+        rawChart?.lagnaRashi ??
+        rawChart?.ascendantRashi ??
+        rawChart?.lagR
+    ) || "—";
+
+  const moon = getPlanet(rawChart, "Moon");
+  const moonSign = signFromValue(moon?.sign ?? moon?.rashi ?? moon?.longitude);
+  const nakshatra = safeText(moon?.nakshatra ?? moon?.nakshatraName, "—");
+
+  const planets = buildPlanets(rawChart);
+
+  const sections: ReportSection[] = [
+    makeSection({
+      id: "personality",
+      title: "Personality & Life Pattern",
+      subtitle: "How your Lagna, Moon and planetary pattern shape your nature.",
+      score: 76,
+      paragraphs: [
+        `Your birth chart indicates a personality that is shaped by both instinct and responsibility. The Lagna represents the way you enter the world, make decisions, and respond to challenges, while the Moon represents your emotional rhythm, inner security, and mental habits. When these two layers are studied together, they reveal not only how you appear to others, but also how you process life internally.`,
+        `The chart suggests that your life improves whenever you combine intuition with structure. You may have phases where your mind moves faster than your circumstances, and this can create impatience or emotional restlessness. However, your deeper potential is activated when you work patiently, build consistency, and avoid reacting to temporary pressure.`,
+        `A strong personality pattern is visible through your ability to learn from repeated experiences. You are not meant to live only by impulse. Your chart supports growth through self-awareness, disciplined choices, and the ability to convert emotional experiences into wisdom. This makes your life path more mature with age.`,
+      ],
+      summary: [
+        "Your personality is shaped by both emotional intelligence and practical responsibility.",
+        "Growth increases when you combine intuition with discipline.",
+        "Avoid reacting too quickly during emotionally charged periods.",
+        "Your maturity and confidence improve with time.",
+        "Self-awareness is one of your strongest life tools.",
+      ],
+      actionPlan: [
+        "Maintain a daily routine that balances emotional rest and focused work.",
+        "Avoid making major decisions during mood swings.",
+        "Use journaling or reflection to understand repeated life patterns.",
+      ],
+      remedy: [
+        "Begin important days with a short prayer or grounding practice.",
+        "Respect elders, teachers and mentors.",
+        "Keep your speech calm during stressful periods.",
+      ],
+    }),
+
+    makeSection({
+      id: "career",
+      title: "Career & Public Life",
+      subtitle: "Professional direction, success pattern and responsibility cycle.",
+      score: 74,
+      paragraphs: [
+        `Your career path shows a connection between ambition, skill development, communication, and long-term recognition. The professional houses in a horoscope do not only show job or business; they show the way a person contributes to society and builds visible identity. Your chart suggests that career growth comes through repeated effort, practical learning, and the ability to handle responsibility without losing direction.`,
+        `There may be times when your work does not receive immediate appreciation. This does not mean the effort is wasted. It indicates that your professional karma matures gradually. If Saturn-like influence is active, the path can feel delayed, heavy, or demanding, but it also gives the power to build reputation that lasts. If Mercury, Jupiter or Venus are supportive, your work can benefit through communication, teaching, advisory roles, design, management, content, technology or client-facing skills.`,
+        `The current life phase supports system-building rather than random experimentation. You should avoid impulsive job changes, emotional resignations, or reacting to workplace politics. Instead, focus on portfolio, skill upgrade, networking, communication with seniors, and building a public proof of your abilities. This is a chart that grows when discipline becomes stronger than frustration.`,
+      ],
+      summary: [
+        "Career growth is supported but requires patience and consistency.",
+        "Recognition may come slowly, but it can become stable.",
+        "Skill development and communication are important.",
+        "Avoid impulsive workplace decisions.",
+        "Best growth comes through structure, planning and long-term execution.",
+      ],
+      actionPlan: [
+        "Update your portfolio, resume or work profile.",
+        "Build one high-value professional skill over the next 90 days.",
+        "Document your work clearly and communicate professionally.",
+      ],
+      remedy: [
+        "Offer water to the Sun in the morning.",
+        "Maintain discipline on Saturdays.",
+        "Donate food or help workers when possible.",
+      ],
+    }),
+
+    makeSection({
+      id: "wealth",
+      title: "Wealth & Financial Growth",
+      subtitle: "Income pattern, savings behavior and money karma.",
+      score: 69,
+      paragraphs: [
+        `The wealth pattern in your chart shows that money improves when planning and discipline are stronger than emotional spending. Financial houses reveal not only earning capacity, but also values, savings, assets, risk appetite, and the way resources are handled. Your chart indicates that income can grow through skill, network, service, advisory ability, business intelligence, or consistent professional output.`,
+        `At times, money may come with responsibility. This means that income can increase, but expenses, family needs, learning costs, tools, travel, or professional investments may also rise. If Rahu influences the money zone, there can be attraction toward shortcuts, speculative ideas, online opportunities, or sudden investments. These should be handled carefully because not every attractive opportunity is stable.`,
+        `The best financial strategy for this chart is structured growth. You should create clear buckets for savings, learning, emergency fund, and investment. Avoid lending money emotionally, avoid unclear partnerships, and avoid risky schemes promising fast returns. Wealth becomes stronger when your decisions are slow, researched, and practical.`,
+      ],
+      summary: [
+        "Money growth is possible through planning and skill-based income.",
+        "Avoid risky shortcuts and unclear investment schemes.",
+        "Expenses may rise during growth phases.",
+        "Financial discipline is more important than sudden gains.",
+        "Long-term wealth improves through structure and patience.",
+      ],
+      actionPlan: [
+        "Create a monthly savings and investment plan.",
+        "Avoid emotional lending or impulsive purchases.",
+        "Research every major investment before committing.",
+      ],
+      remedy: [
+        "Donate yellow food or sweets on Thursdays when possible.",
+        "Respect financial commitments and repay debts on time.",
+        "Keep your workspace clean and organized.",
+      ],
+    }),
+
+    makeSection({
+      id: "relationship",
+      title: "Love, Marriage & Relationships",
+      subtitle: "Emotional bonding, commitment pattern and compatibility lessons.",
+      score: 67,
+      paragraphs: [
+        `Your relationship pattern shows that emotional security, communication, loyalty, and trust are central themes. The 7th house, Venus, Jupiter, Moon and Navamsha together reveal how partnership energy matures in life. Your chart suggests that relationships should not be judged only by attraction. Emotional maturity, practical compatibility, family values, communication style, and timing all play important roles.`,
+        `If Saturn or Rahu influence the relationship zone, commitment may come after testing phases. This can create delay, confusion, distance, or attraction toward complicated relationships. However, these influences also teach maturity. They ask you to understand whether a relationship is based on stability or only emotional intensity. If Venus is supportive, affection, charm and bonding improve when communication remains respectful.`,
+        `Marriage timing should be judged through dasha, transit, 7th house, Venus, Jupiter and Navamsha. When these factors support each other, commitment becomes easier. If Manglik, Nadi, Bhakoot or other compatibility sensitivities are present, they should be handled with awareness, remedies and practical compatibility checks rather than fear. The best relationship outcome comes when emotional clarity and practical decision-making work together.`,
+      ],
+      summary: [
+        "Emotional clarity is very important in relationships.",
+        "Commitment may require maturity and patience.",
+        "Avoid rushing decisions during confusing periods.",
+        "Marriage timing should be checked through dasha, transit and Navamsha.",
+        "Practical compatibility is as important as attraction.",
+      ],
+      actionPlan: [
+        "Communicate expectations clearly.",
+        "Avoid testing the partner emotionally.",
+        "Do not make commitment decisions during confusion or anger.",
+      ],
+      remedy: [
+        "Do Friday Venus remedy with clean clothing and respectful speech.",
+        "Offer white sweets or help women/children when possible.",
+        "Avoid harsh words in close relationships.",
+      ],
+    }),
+
+    makeSection({
+      id: "health",
+      title: "Health & Vitality",
+      subtitle: "Body sensitivity, stress pattern and preventive care.",
+      score: 58,
+      paragraphs: [
+        `Health in astrology is understood through the Lagna, Moon, 6th house, 8th house, 12th house, Mars, Saturn and current dasha influences. Your chart suggests that health should be protected through routine, sleep discipline, digestion care, stress management and balanced physical activity. The body may respond strongly to emotional pressure, irregular routine or overthinking.`,
+        `If Saturn or Mars influence health zones, the body may show fatigue, stiffness, inflammation, heat, injury risk, or pressure through bones, muscles or joints. If the Moon is sensitive, sleep, hydration, anxiety, digestion and emotional balance become important. This does not mean illness is guaranteed; it means prevention should be taken seriously.`,
+        `The best health approach for this chart is consistency. Avoid extreme routines. Instead, follow regular sleep, simple food, light movement, sunlight, hydration and medical checkups when needed. Astrology can show tendencies, but medical advice should always be taken from qualified professionals.`,
+      ],
+      summary: [
+        "Health improves with routine and prevention.",
+        "Stress, sleep and digestion need attention.",
+        "Avoid extreme lifestyle changes.",
+        "Be careful with heat, inflammation or overwork.",
+        "Medical advice should always be taken when symptoms appear.",
+      ],
+      actionPlan: [
+        "Fix sleep and wake-up timing.",
+        "Add walking, stretching or light exercise.",
+        "Reduce late-night screen use and irregular eating.",
+      ],
+      remedy: [
+        "Chant a calming mantra for 11 minutes daily.",
+        "Donate medicines or food when possible.",
+        "Respect your body’s limits and avoid overwork.",
+      ],
+    }),
+
+    makeSection({
+      id: "spirituality",
+      title: "Spiritual Path & Remedies",
+      subtitle: "Karmic maturity, inner peace and spiritual alignment.",
+      score: 72,
+      paragraphs: [
+        `Your chart indicates that spiritual growth comes through self-discipline, humility, service and emotional purification. Spirituality in your chart is not only about rituals; it is about becoming conscious of repeated patterns and choosing a higher response. Whenever you act with patience, truthfulness and responsibility, your chart becomes stronger.`,
+        `The karmic planets show where life asks for maturity. Saturn teaches discipline, Rahu teaches clarity, Ketu teaches detachment, Mars teaches controlled action, and the Moon teaches emotional balance. Remedies work best when they are connected with behavior. A mantra is useful, but respectful speech, charity, discipline and right action are equally important.`,
+        `Your spiritual path becomes stronger when you follow simple practices consistently. A small daily practice is better than occasional intense rituals. Light, mantra, donation, gratitude and service can stabilize the mind and reduce fear-based astrology.`,
+      ],
+      summary: [
+        "Spiritual growth comes through discipline and awareness.",
+        "Remedies should be practical and consistent.",
+        "Avoid fear-based astrology.",
+        "Service and humility strengthen the chart.",
+        "Daily small practice is better than occasional intensity.",
+      ],
+      actionPlan: [
+        "Create a 10-minute daily spiritual routine.",
+        "Practice gratitude before starting important work.",
+        "Do one act of service weekly.",
+      ],
+      remedy: [
+        "Light a diya in the morning or evening.",
+        "Chant your preferred mantra daily.",
+        "Donate food, clothes or learning material according to capacity.",
+      ],
+    }),
+  ];
+
+  return {
+    nativeName: birth.name,
+    birthDate: birth.date,
+    birthTime: birth.time,
+    birthPlace: birth.place,
+    generatedAt: new Date().toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }),
+    lagna,
+    moonSign,
+    nakshatra,
+    currentDasha: safeText(rawChart?.currentDasha ?? rawChart?.dasha?.current, "To be calculated"),
+    reportTitle: "AstroLife Premium Kundli Report",
+    executiveSummary: [
+      `This premium report combines Vedic astrology, planetary positions, yogas, doshas, dasha timing, transits and AI-assisted interpretation to provide a deep view of your life pattern. The goal is not to create fear, but to give clarity about strengths, challenges, timing and practical remedies.`,
+      `Your chart shows that life improves when emotional awareness is combined with disciplined execution. Some areas may demand patience, especially when karmic planets influence important houses, but the same pressure can become a source of maturity and long-term achievement.`,
+      `The report should be read as a guidance document. Astrology shows tendencies, timings and symbolic patterns. Final life decisions should always include practical judgment, free will and expert advice where required.`,
+    ],
+    keyHighlights: [
+      `Lagna: ${lagna}`,
+      `Moon Sign: ${moonSign}`,
+      `Nakshatra: ${nakshatra}`,
+      `Current Dasha: ${safeText(rawChart?.currentDasha ?? rawChart?.dasha?.current, "To be calculated")}`,
+      "Main Growth Theme: Discipline + clarity + practical action",
+      "Report Style: Long interpretation with quick summary",
+    ],
+    planets,
+    sections,
+  };
+}
+export function buildShadbalaReportSection(source: any): ReportSection {
+    const data = source ?? {};
+  
+    const rawScores =
+      data?.planetStrengths ??
+      data?.strengths ??
+      data?.shadbala ??
+      data?.scores ??
+      data?.planets ??
+      [];
+  
+    const list = Array.isArray(rawScores)
+      ? rawScores
+      : Object.entries(rawScores ?? {}).map(([name, value]: any) => ({
+          name,
+          ...(typeof value === "object" ? value : { score: value }),
+        }));
+  
+    const normalized = list.map((item: any, index: number) => {
+      const score =
+        Number(item?.score ?? item?.total ?? item?.value ?? item?.percentage ?? 50) || 50;
+  
+      return {
+        name: safeText(item?.name ?? item?.planet, `Planet ${index + 1}`),
+        score: Math.max(0, Math.min(100, Math.round(score))),
+        summary: safeText(item?.summary ?? item?.description, ""),
+      };
+    });
+  
+    const sorted = [...normalized].sort((a, b) => b.score - a.score);
+    const strongest = sorted[0];
+    const weakest = sorted[sorted.length - 1];
+  
+    const average = normalized.length
+      ? Math.round(normalized.reduce((sum, p) => sum + p.score, 0) / normalized.length)
+      : 62;
+  
+    return makeSection({
+      id: "shadbala",
+      title: "Shadbala & Planet Strength",
+      subtitle: "How strongly planets can deliver their results.",
+      score: average,
+      paragraphs: [
+        `Shadbala is one of the most important strength evaluation systems in Vedic astrology. A planet may be naturally benefic or may rule a good house, but if it lacks strength, its results may come slowly, inconsistently or only after effort. In the same way, a challenging planet with strong bala can create pressure, but it can also give discipline, survival power, ambition and the ability to handle responsibility.`,
+  
+        `This section studies planetary strength as a practical delivery mechanism. The birth chart shows promise, yogas show special combinations, dasha shows timing, and Shadbala shows whether the planets have enough force to act in real life. When a strong planet runs its dasha, its results become more visible. When a weak planet runs its dasha, remedies, discipline and practical support become more important.`,
+  
+        strongest
+          ? `In this report, the strongest visible planet from the available strength data is ${strongest.name}, with a strength signal around ${strongest.score}/100. This planet can become a key support factor when its dasha, transit or house significations become active. The more consciously you use this planet’s qualities, the better its results can manifest.`
+          : `The available chart data does not expose detailed Shadbala values yet, so this section is presented as an interpretive strength framework. Once full Shadbala scores are connected, the report will show strongest and weakest planets more precisely.`,
+  
+        weakest
+          ? `The most sensitive planet from the available strength data appears to be ${weakest.name}, with a strength signal around ${weakest.score}/100. This does not mean negative destiny. It means that this planet’s themes require more awareness, patience, strengthening remedies and practical correction.`
+          : `Planetary weakness should never be treated with fear. Weakness simply means that conscious effort, environment, habits and remedies can help stabilize that planet’s results.`,
+      ],
+      summary: [
+        strongest
+          ? `Strongest planet: ${strongest.name} (${strongest.score}/100).`
+          : "Strongest planet will appear after full Shadbala data is connected.",
+        weakest
+          ? `Most sensitive planet: ${weakest.name} (${weakest.score}/100).`
+          : "Sensitive planet will appear after full Shadbala data is connected.",
+        "Shadbala shows delivery strength, not just good or bad nature.",
+        "Strong planets give clearer results during their dasha and transit activation.",
+        "Weak planets need remedies, patience and practical strengthening.",
+      ],
+      actionPlan: [
+        "Use the strongest planet as a life-support theme.",
+        "Follow remedies for weak or sensitive planets consistently.",
+        "Check Shadbala together with dasha before expecting major results.",
+        "Avoid judging a planet only by sign or house; strength matters.",
+      ],
+      remedy: [
+        "Strengthen weak planets through discipline, donation and mantra.",
+        "Respect the people and duties represented by sensitive planets.",
+        "Avoid habits that worsen the weak planet’s significations.",
+      ],
+    });
+  }
+  
+  export function buildAshtakavargaReportSection(source: any): ReportSection {
+    const data = source ?? {};
+  
+    const rawScores =
+      data?.sarvashtakavarga ??
+      data?.ashtakavarga ??
+      data?.houseScores ??
+      data?.bindus ??
+      data?.scores ??
+      [];
+  
+    const list = Array.isArray(rawScores)
+      ? rawScores
+      : Object.entries(rawScores ?? {}).map(([name, value]: any) => ({
+          name,
+          ...(typeof value === "object" ? value : { score: value }),
+        }));
+  
+    const normalized = list.map((item: any, index: number) => {
+      const score =
+        Number(item?.score ?? item?.total ?? item?.bindu ?? item?.bindus ?? item?.value ?? 25) || 25;
+  
+      return {
+        name: safeText(item?.name ?? item?.house ?? item?.sign, `Zone ${index + 1}`),
+        score: Math.max(0, Math.min(50, Math.round(score))),
+        summary: safeText(item?.summary ?? item?.description, ""),
+      };
+    });
+  
+    const sorted = [...normalized].sort((a, b) => b.score - a.score);
+    const strongest = sorted[0];
+    const weakest = sorted[sorted.length - 1];
+  
+    const averageBindu = normalized.length
+      ? Math.round(normalized.reduce((sum, item) => sum + item.score, 0) / normalized.length)
+      : 28;
+  
+    const score = Math.max(35, Math.min(85, averageBindu * 2));
+  
+    return makeSection({
+      id: "ashtakavarga",
+      title: "Ashtakavarga Strength",
+      subtitle: "Bindu support, transit zones and house-wise ease.",
+      score,
+      paragraphs: [
+        `Ashtakavarga is a powerful transit and house-strength system in Vedic astrology. It measures how much support different signs and houses receive through bindus. A house or sign with higher bindus usually gives smoother results when activated, while a lower bindu zone requires more patience, planning and conscious effort.`,
+  
+        `This section is especially useful for timing. When a major planet transits through a high-bindu zone, the native may experience better support, smoother movement, helpful people, visible progress or reduced resistance. When a planet moves through a low-bindu zone, the same transit may feel heavy, delayed or demanding, even if the planet is otherwise favourable.`,
+  
+        strongest
+          ? `The strongest available Ashtakavarga zone appears to be ${strongest.name}, with approximately ${strongest.score} bindus. This area can become a support zone, especially when important transits activate it. Activities connected with this house or sign may feel more natural and productive.`
+          : `The detailed Ashtakavarga bindu table is not fully exposed yet in the report data, so this section currently gives a premium interpretation framework. Once connected, it will show strongest and weakest bindu zones clearly.`,
+  
+        weakest
+          ? `The most sensitive available Ashtakavarga zone appears to be ${weakest.name}, with approximately ${weakest.score} bindus. This does not deny results, but it suggests that the native should use planning, patience and remedies when this zone becomes active through transit or dasha.`
+          : `Low bindu zones should not be feared. They simply show where life asks for more preparation, patience and careful execution.`,
+      ],
+      summary: [
+        strongest
+          ? `Best bindu zone: ${strongest.name} (${strongest.score} bindus).`
+          : "Best bindu zone will appear after detailed Ashtakavarga data is connected.",
+        weakest
+          ? `Sensitive bindu zone: ${weakest.name} (${weakest.score} bindus).`
+          : "Sensitive bindu zone will appear after detailed Ashtakavarga data is connected.",
+        "High bindu zones support smoother transit results.",
+        "Low bindu zones require patience and stronger planning.",
+        "Ashtakavarga should be combined with dasha and transit.",
+      ],
+      actionPlan: [
+        "Use high-bindu periods for action and expansion.",
+        "Use low-bindu periods for preparation, correction and patience.",
+        "Avoid forcing major decisions when transit pressure is high and bindu support is low.",
+      ],
+      remedy: [
+        "Keep remedies simple during low-bindu periods.",
+        "Avoid ego-driven decisions when transit support is weak.",
+        "Use prayer, donation and disciplined routine to stabilize difficult periods.",
+      ],
+    });
+  }
+  
+  export function buildTransitEventRadarReportSection(source: any): ReportSection {
+    const data = source ?? {};
+  
+    const bestDay =
+      data?.bestDay?.label ??
+      data?.bestDay ??
+      data?.summary?.bestDay ??
+      "To be calculated";
+  
+    const cautionDay =
+      data?.cautionDay?.label ??
+      data?.cautionDay ??
+      data?.summary?.cautionDay ??
+      "To be calculated";
+  
+    const days = Array.isArray(data?.days) ? data.days : [];
+    const avgScore = days.length
+      ? Math.round(days.reduce((sum: number, d: any) => sum + Number(d?.overallScore ?? 50), 0) / days.length)
+      : 64;
+  
+    return makeSection({
+      id: "transit-event-radar",
+      title: "Transit & Event Radar",
+      subtitle: "Current Gochar, weekly timing and action windows.",
+      score: avgScore,
+      paragraphs: [
+        `Transits show the current movement of planets over the natal chart. They do not replace the birth chart or dasha, but they activate events, moods, opportunities and caution windows. A birth chart shows the promise, dasha shows the active karmic chapter, and transit shows the current weather. This is why transit analysis is most useful for questions like today, this week, current career timing, relationship mood, money movement or health caution.`,
+  
+        `The Event Radar converts live transit pressure into a practical short-term forecast. It studies the current planetary movement, Moon-based rhythm, opportunity signals, caution alerts and life-area scores to identify which days are better for action and which days require patience. This makes the report more useful for daily decision-making instead of only long-term interpretation.`,
+  
+        `Based on the available Event Radar data, the best upcoming window is ${bestDay}, while the more sensitive or caution-oriented window is ${cautionDay}. The best day should be used for important communication, planning, meetings, application, launch, discussion or decisive action. The caution day should be used for review, patience, correction and avoiding impulsive decisions.`,
+  
+        `Transit results should always be read with maturity. A caution period does not mean failure, and a good period does not mean automatic success. The best results come when the native acts according to timing: move actively during supportive windows, slow down during sensitive windows, and use remedies when karmic planets create pressure.`,
+      ],
+      summary: [
+        `Best available window: ${bestDay}.`,
+        `Caution window: ${cautionDay}.`,
+        "Transit shows current planetary weather.",
+        "Event Radar converts transit pressure into practical weekly timing.",
+        "Use strong days for action and sensitive days for patience.",
+      ],
+      actionPlan: [
+        "Use supportive days for meetings, applications, launches and important communication.",
+        "Use caution days for review, planning and emotional control.",
+        "Avoid major impulsive decisions when Mars, Saturn, Rahu or Moon pressure is high.",
+      ],
+      remedy: [
+        "Light a diya before beginning important work.",
+        "Keep speech calm on sensitive days.",
+        "Do grounding practices when Moon or Rahu influence feels heavy.",
+      ],
+    });
+  }
+  
+  export function buildDashaTimelineReportSection(source: any): ReportSection {
+    const data = source ?? {};
+  
+    const current =
+      data?.currentDasha ??
+      data?.current ??
+      data?.activeDasha ??
+      data?.dasha?.current ??
+      data?.runningDasha ??
+      "To be calculated";
+  
+    const mahadasha =
+      data?.mahadasha ??
+      data?.mahaDasha ??
+      data?.md ??
+      data?.currentMahadasha ??
+      "To be calculated";
+  
+    const antardasha =
+      data?.antardasha ??
+      data?.antarDasha ??
+      data?.ad ??
+      data?.currentAntardasha ??
+      "To be calculated";
+  
+    const pratyantar =
+      data?.pratyantardasha ??
+      data?.pd ??
+      data?.currentPratyantardasha ??
+      "To be calculated";
+  
+    return makeSection({
+      id: "dasha-timeline",
+      title: "Dasha Timeline",
+      subtitle: "The active karmic chapter and timing engine.",
+      score: 71,
+      paragraphs: [
+        `Dasha is the timing engine of Vedic astrology. While the birth chart shows the promise of life, dasha shows when that promise becomes active. A person may have powerful yogas in the chart, but those yogas become more visible when the connected planets operate through Mahadasha, Antardasha or important transit activation.`,
+  
+        `The Mahadasha represents the broad life chapter. It can last for many years and sets the main karmic theme. The Antardasha narrows that theme into a more specific area of life. The Pratyantardasha and smaller dasha levels show more immediate event patterns. This layered timing system helps explain why some periods feel career-focused, some feel relationship-focused, some feel spiritual, and some feel heavy or corrective.`,
+  
+        `The currently available dasha signal is ${current}. The Mahadasha is ${mahadasha}, the Antardasha is ${antardasha}, and the Pratyantardasha is ${pratyantar}. These periods should be studied with the planets’ house ownership, placement, strength, yogas, doshas and transit support. A strong dasha planet can open doors, while a sensitive dasha planet asks for discipline and remedies.`,
+  
+        `The best way to use dasha is not to wait passively for fate. Dasha shows the type of karma that is active, but your response determines the quality of the result. If a growth-oriented dasha is active, take action. If a corrective dasha is active, simplify life, follow discipline and avoid repeating old mistakes.`,
+      ],
+      summary: [
+        `Current dasha signal: ${current}.`,
+        `Mahadasha: ${mahadasha}.`,
+        `Antardasha: ${antardasha}.`,
+        `Pratyantardasha: ${pratyantar}.`,
+        "Dasha activates the promise of the birth chart.",
+      ],
+      actionPlan: [
+        "Judge major life decisions through dasha plus transit together.",
+        "Use supportive dasha periods for expansion and visibility.",
+        "Use difficult dasha periods for correction, discipline and inner work.",
+      ],
+      remedy: [
+        "Follow remedies for the current dasha lord.",
+        "Respect the relationships and duties represented by the active planet.",
+        "Avoid shortcuts during Rahu, Saturn or Mars-heavy periods.",
+      ],
+    });
+  }
+
+export function buildFullPremiumReportSections(input: any): ReportSection[] {
+  const birth = getBirthDetails(input);
+  const rawChart = getChartRoot(input);
+
+  const lagna = signFromValue(
+    rawChart?.lagna?.sign ??
+      rawChart?.ascendant?.sign ??
+      rawChart?.lagnaRashi ??
+      rawChart?.ascendantRashi ??
+      rawChart?.lagR
+  );
+
+  const moon = getPlanet(rawChart, "Moon");
+  const moonSign = signFromValue(moon?.sign ?? moon?.rashi ?? moon?.longitude);
+  const nakshatra = safeText(moon?.nakshatra ?? moon?.nakshatraName, "To be calculated");
+
+  const monthFormatter = new Intl.DateTimeFormat("en-IN", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const currentMonth = new Date();
+
+  const months = Array.from({ length: 12 }, (_, index) => {
+    const date = new Date(currentMonth);
+    date.setMonth(currentMonth.getMonth() + index);
+    return monthFormatter.format(date);
+  });
+
+  const premiumSections: ReportSection[] = [
+    makeSection({
+      id: "table-of-contents",
+      title: "Table of Contents",
+      subtitle: "Premium report navigation and reading map.",
+      score: 82,
+      paragraphs: [
+        `This AstroLife Premium Report is designed as a complete life dossier rather than a simple kundli printout. The report begins with birth details, panchang and planetary positions, then moves into personality, yogas, doshas, dasha, transit, Shadbala, Ashtakavarga, career, wealth, relationship, health, spirituality, psychology, remedies and future timing. The purpose is to give both traditional Jyotish depth and modern AI-readable clarity.`,
+        `You should read this report in three passes. First, read the Executive Summary and Birth Details to understand the foundation. Second, read the core life-area reports such as career, wealth, relationship and health. Third, read timing sections such as Dasha Timeline, Transit, Event Radar and the 12-Month Forecast to understand what is currently active.`,
+        `Each section contains long-form interpretation followed by quick summary bullets, action plan and remedies. This format gives depth like a traditional astrology report while still making the guidance easy to understand and apply in daily life.`,
+      ],
+      summary: [
+        "Start with birth details, panchang and planetary positions.",
+        "Read life-area sections for career, wealth, relationship and health.",
+        "Use dasha, transit and monthly forecast for timing.",
+        "Use remedies as practical alignment tools, not fear-based rituals.",
+        "Ask AstroLife AI when you want deeper explanation of any section.",
+      ],
+      actionPlan: [
+        "Read the full report once without rushing.",
+        "Mark the sections that repeat the same life theme.",
+        "Use the monthly forecast for planning important decisions.",
+      ],
+      remedy: [
+        "Begin reading with a calm mind.",
+        "Use the report for self-awareness and better choices.",
+        "Do not treat any single statement as fixed destiny.",
+      ],
+    }),
+
+    makeSection({
+      id: "panchang-details",
+      title: "Panchang Details",
+      subtitle: "Tithi, nakshatra, yoga, karana and birth-time spiritual signature.",
+      score: 73,
+      paragraphs: [
+        `Panchang gives the subtle quality of the birth moment. While the birth chart shows planetary placement and house structure, Panchang shows the energetic environment in which the native was born. It includes tithi, nakshatra, yoga, karana, weekday, sunrise, sunset and other traditional birth-time indicators. These factors create a deeper layer of temperament and karmic rhythm.`,
+        `The nakshatra is especially important because it represents the psychological star-field of the Moon. The Moon reflects mind, emotion, memory, habit and comfort. Therefore, the nakshatra shows how the mind reacts to life, what kind of emotional nourishment it seeks, and how the native handles pressure, attachment and instinctive decisions.`,
+        `In this report, the available birth foundation shows Lagna as ${lagna}, Moon sign as ${moonSign}, and Nakshatra as ${nakshatra}. These three points should be treated as the foundation of personality, emotional pattern and timing. When panchang details are fully connected, this page can also show tithi, yoga, karana, sunrise, sunset, varna, yoni, gana, nadi and paya in a traditional table.`,
+      ],
+      summary: [
+        `Lagna foundation: ${lagna}.`,
+        `Moon sign foundation: ${moonSign}.`,
+        `Nakshatra foundation: ${nakshatra}.`,
+        "Panchang reveals the subtle quality of the birth moment.",
+        "Nakshatra gives emotional and psychological rhythm.",
+      ],
+      actionPlan: [
+        "Use nakshatra guidance for emotional self-awareness.",
+        "Use panchang details for remedies and spiritual alignment.",
+        "Connect exact tithi/yoga/karana later for deeper reporting.",
+      ],
+      remedy: [
+        "Respect the Moon through calm routine and emotional balance.",
+        "Follow one simple daily prayer or gratitude practice.",
+        "Avoid making decisions in emotional turbulence.",
+      ],
+    }),
+
+    makeSection({
+      id: "charts-explanation",
+      title: "Chart Framework",
+      subtitle: "Lagna chart, Moon chart and Navamsha chart interpretation framework.",
+      score: 78,
+      paragraphs: [
+        `The Lagna chart is the main birth chart. It shows the physical life path, personality expression, life events, body, direction, responsibilities and worldly manifestation of karma. The rising sign becomes the first house, and all other houses are counted from it. This is why Lagna is one of the most important points in Vedic astrology.`,
+        `The Moon chart shows the emotional and mental experience of life. Some events become more visible from the Moon chart because the mind is the instrument through which life is experienced. When the same yoga or pressure appears from both Lagna and Moon, that result becomes more noticeable in real life.`,
+        `The Navamsha chart, also called D9, shows deeper maturity, dharma, marriage potential, inner strength and the refined promise of planets. A planet may look good in the birth chart but weak in Navamsha, or average in the birth chart but strong in Navamsha. This is why Premium and Elite reports should always include Navamsha interpretation.`,
+      ],
+      summary: [
+        "Lagna chart shows outer life and event manifestation.",
+        "Moon chart shows mind, emotion and inner experience.",
+        "Navamsha shows marriage, dharma and deeper planetary maturity.",
+        "Repeated patterns across D1, Moon chart and D9 are very important.",
+        "Future PDF versions should include visual chart diagrams on this page.",
+      ],
+      actionPlan: [
+        "Judge life events mainly from Lagna.",
+        "Judge emotional experience from Moon.",
+        "Judge marriage and deeper promise from Navamsha.",
+      ],
+      remedy: [
+        "Strengthen Lagna through discipline and health routine.",
+        "Strengthen Moon through calm sleep and hydration.",
+        "Strengthen Navamsha promise through dharmic action.",
+      ],
+    }),
+
+    makeSection({
+      id: "house-map-1",
+      title: "House-wise Life Map Part 1",
+      subtitle: "First six houses: identity, wealth, effort, home, intelligence and health.",
+      score: 71,
+      paragraphs: [
+        `The twelve houses of the horoscope represent the complete map of human life. The first house shows identity, body, confidence and the direction of life. The second house shows speech, family values, food habits, savings and accumulated wealth. The third house shows courage, communication, siblings, media, marketing, effort and self-made growth.`,
+        `The fourth house shows mother, home, property, inner peace, vehicles, education foundation and emotional security. The fifth house shows intelligence, creativity, children, romance, mantra, speculation and past-life merit. The sixth house shows work pressure, service, competition, debts, enemies, disease and the ability to defeat obstacles.`,
+        `When planets occupy or aspect these houses, they activate their themes. Benefic influence can make the house smoother, while karmic planets can create pressure but also strength. A difficult sixth house, for example, can create health or debt challenges, but it can also make the native highly competitive and capable of defeating opposition.`,
+      ],
+      summary: [
+        "1st house: identity, body and life direction.",
+        "2nd house: family, speech, food and savings.",
+        "3rd house: effort, courage and communication.",
+        "4th house: home, mother, property and peace.",
+        "5th/6th houses: intelligence, children, service, disease and competition.",
+      ],
+      actionPlan: [
+        "Strengthen first house through health and discipline.",
+        "Strengthen second house through clean speech and savings.",
+        "Strengthen sixth house through routine and problem-solving.",
+      ],
+      remedy: [
+        "Avoid harsh speech.",
+        "Keep home space clean and peaceful.",
+        "Do regular service or charity.",
+      ],
+    }),
+
+    makeSection({
+      id: "house-map-2",
+      title: "House-wise Life Map Part 2",
+      subtitle: "Last six houses: marriage, transformation, luck, career, gains and moksha.",
+      score: 72,
+      paragraphs: [
+        `The seventh house represents marriage, partnership, public dealings and business agreements. It shows how the native relates to others and what kind of partner energy is attracted. The eighth house shows transformation, secrets, sudden events, inheritance, research, occult knowledge and deep psychological change. The ninth house shows dharma, father, teachers, fortune, blessings, higher learning and long-distance travel.`,
+        `The tenth house is one of the most important houses for career, karma, authority, public image and professional achievement. The eleventh house shows income, gains, networks, elder siblings, large communities and fulfilment of desires. The twelfth house shows expenses, sleep, isolation, foreign lands, hospitals, ashrams, moksha and release.`,
+        `These houses become especially important during dasha and transit activation. For example, 10th and 11th house activation can increase career and income, while 8th and 12th house activation can bring transformation, expenses, spiritual retreat or hidden pressure. A mature reading does not call any house purely good or bad; each house has a role in the soul’s journey.`,
+      ],
+      summary: [
+        "7th house: marriage, partnership and public dealing.",
+        "8th house: transformation, secrets and sudden change.",
+        "9th house: fortune, dharma, father and teachers.",
+        "10th house: career, karma and public status.",
+        "11th/12th houses: gains, networks, expenses, foreign lands and moksha.",
+      ],
+      actionPlan: [
+        "Use 10th house themes for career planning.",
+        "Use 11th house themes for networking and income.",
+        "Use 12th house themes for spiritual retreat and expense control.",
+      ],
+      remedy: [
+        "Respect spouse, partners and clients.",
+        "Respect teachers and father figures.",
+        "Control unnecessary expenses.",
+      ],
+    }),
+
+    makeSection({
+      id: "detailed-yogas",
+      title: "Detailed Yogas",
+      subtitle: "Positive combinations, potential and timing of activation.",
+      score: 76,
+      paragraphs: [
+        `Yogas are special planetary combinations that create potential. They can indicate intelligence, wealth, authority, fame, spirituality, protection, creativity, success after struggle, leadership or support from destiny. However, yogas should never be read as automatic guarantees. A yoga becomes powerful when the involved planets are strong, connected to useful houses, supported by dasha and activated by transit.`,
+        `A person may have several yogas but experience them only during certain periods. This is because dasha acts like a switch. If the dasha of a yoga-forming planet begins, the promise becomes active. If transits also support the same house or planet, the result becomes more visible. This is why timing matters as much as the presence of the yoga itself.`,
+        `For AstroLife Premium reporting, detailed yogas should be shown with name, category, strength, involved planets, life area, activation timing and practical advice. This gives the user more value than only listing yoga names. The goal is to help the native understand how to use their strengths consciously.`,
+      ],
+      summary: [
+        "Yogas show potential, not automatic results.",
+        "Strength and dasha decide yoga activation.",
+        "Transit support makes yoga results more visible.",
+        "Yogas should be connected with real life areas.",
+        "Premium reports should explain how to use each yoga practically.",
+      ],
+      actionPlan: [
+        "Identify the strongest yoga areas.",
+        "Build real skills connected to those areas.",
+        "Check active dasha before expecting major yoga results.",
+      ],
+      remedy: [
+        "Respect the planets involved in positive yogas.",
+        "Use opportunities with humility.",
+        "Avoid ego when success begins.",
+      ],
+    }),
+
+    makeSection({
+      id: "detailed-doshas",
+      title: "Detailed Doshas & Corrections",
+      subtitle: "Sensitive combinations, karmic correction and remedies.",
+      score: 63,
+      paragraphs: [
+        `Doshas show areas where energy is imbalanced, delayed, pressurized or karmically sensitive. They may appear as repeated patterns in relationships, health, career, family, money, confidence or emotional life. A dosha should not be interpreted as punishment. It is better understood as a correction area where the native must become more conscious.`,
+        `Some doshas become active only during specific dasha or transit periods. This means a dosha may stay quiet for years and become noticeable when its planet or house becomes active. Therefore, the right question is not only whether a dosha exists, but when it is active and how strongly it affects the current life situation.`,
+        `The best dosha remedy is a combination of spiritual remedy, behavioural correction and practical planning. For example, Mars-related pressure needs anger control and disciplined action. Saturn-related pressure needs patience, duty and humility. Rahu-related pressure needs clarity, grounding and avoidance of shortcuts. Ketu-related pressure needs detachment and spiritual focus.`,
+      ],
+      summary: [
+        "Doshas show correction areas, not fixed negative destiny.",
+        "Dasha and transit decide when dosha effects become active.",
+        "Fear-based interpretation should be avoided.",
+        "Behavioural correction is as important as mantra or ritual.",
+        "Planet-wise remedies should be simple and consistent.",
+      ],
+      actionPlan: [
+        "Identify repeated life patterns connected to doshas.",
+        "Avoid repeating the same mistake during sensitive periods.",
+        "Follow simple remedies consistently.",
+      ],
+      remedy: [
+        "For Saturn: discipline, charity and service.",
+        "For Mars: control anger and do physical activity.",
+        "For Rahu/Ketu: grounding, meditation and avoiding shortcuts.",
+      ],
+    }),
+
+    makeSection({
+      id: "divisional-charts-summary",
+      title: "Divisional Charts Summary",
+      subtitle: "D9, D10, D12, D27 and deeper varga interpretation.",
+      score: 70,
+      paragraphs: [
+        `Divisional charts, also called vargas, divide signs into finer layers to study specific areas of life. The birth chart gives the overall foundation, but divisional charts reveal deeper quality. For example, D9 is used for dharma, marriage and planetary maturity. D10 is used for profession and public karma. D12 is used for parents and ancestral patterns. D27 is used for strength, endurance and inner resilience.`,
+        `A planet becomes more reliable when it is strong in both the birth chart and relevant divisional chart. If a planet looks strong in D1 but weak in the relevant varga, results may require more effort or maturity. If a planet looks average in D1 but strong in varga, the result may improve after age, discipline or life experience.`,
+        `Premium and Elite reports should eventually include visual varga charts. In this Premium version, this page gives the interpretive framework so users understand why divisional charts matter and how they improve prediction quality.`,
+      ],
+      summary: [
+        "D9 shows marriage, dharma and planetary maturity.",
+        "D10 shows career and public karma.",
+        "D12 shows parents and ancestral themes.",
+        "D27 shows strength and endurance.",
+        "Planets strong in D1 and varga give more reliable results.",
+      ],
+      actionPlan: [
+        "Use D9 for marriage and deeper life promise.",
+        "Use D10 for professional direction.",
+        "Use D27 for inner strength and resilience.",
+      ],
+      remedy: [
+        "Strengthen weak varga themes through practical action.",
+        "Respect the life area represented by the divisional chart.",
+        "Use patience when varga results mature late.",
+      ],
+    }),
+
+    makeSection({
+      id: "lalkitab-karma",
+      title: "Lal Kitab Karma",
+      subtitle: "Karmic debts, behavioural correction and simple upaya.",
+      score: 68,
+      paragraphs: [
+        `Lal Kitab focuses strongly on karmic patterns, family debts, behavioural correction and simple remedies. Unlike purely mathematical strength systems, Lal Kitab often reads planetary combinations as practical life habits and karmic duties. It asks the native to correct behaviour, respect relationships and follow simple remedies that align daily life with planetary balance.`,
+        `The most useful Lal Kitab remedies are usually simple: respect parents, avoid false speech, feed animals, donate food, avoid arrogance, maintain cleanliness, help the needy, and stop repeating harmful habits. These remedies work best when done with sincerity rather than fear.`,
+        `In AstroLife reporting, Lal Kitab should become a practical karmic correction page. Instead of giving too many confusing remedies, the report should show top three karmic debts, top three upaya, and behavioural advice connected to the user’s chart.`,
+      ],
+      summary: [
+        "Lal Kitab focuses on karmic correction and practical remedies.",
+        "Behavioural change is central to Lal Kitab upaya.",
+        "Simple remedies are better than complicated rituals.",
+        "Family karma and relationship duties matter strongly.",
+        "AstroLife should show top three karmic corrections clearly.",
+      ],
+      actionPlan: [
+        "Choose only 1–3 remedies and follow consistently.",
+        "Correct speech, habits and relationship duties.",
+        "Avoid fear-based remedy overload.",
+      ],
+      remedy: [
+        "Feed animals according to capacity.",
+        "Donate food or useful items.",
+        "Respect parents, elders and teachers.",
+      ],
+    }),
+
+    makeSection({
+      id: "psychology-shadow-pattern",
+      title: "Psychology & Shadow Pattern",
+      subtitle: "Mind, emotion, attachment, fear and growth pattern.",
+      score: 74,
+      paragraphs: [
+        `Astrology becomes more useful when it is connected with psychology. The Moon shows emotional pattern, Mercury shows thinking and communication, Venus shows affection and desire, Mars shows anger and action, Saturn shows fear and discipline, Rahu shows obsession and ambition, and Ketu shows detachment and past-life residue.`,
+        `Your psychological pattern should be understood as a growth map. Some reactions may come from fear of loss, fear of rejection, desire for control, impatience, overthinking or emotional comparison. These patterns are not weaknesses if they are observed consciously. They become weaknesses only when they control behaviour without awareness.`,
+        `The best use of this section is shadow work. Whenever the same emotional pattern repeats, ask: what is this planet teaching me? Saturn may ask for patience, Rahu may ask for clarity, Mars may ask for controlled strength, Moon may ask for emotional regulation, and Venus may ask for healthier love and value systems.`,
+      ],
+      summary: [
+        "Moon shows emotional rhythm.",
+        "Mercury shows thinking and communication.",
+        "Mars shows anger, courage and action.",
+        "Saturn shows fear, patience and discipline.",
+        "Rahu/Ketu show obsession, detachment and karmic extremes.",
+      ],
+      actionPlan: [
+        "Track repeated emotional reactions.",
+        "Pause before responding during stress.",
+        "Use journaling for shadow patterns.",
+      ],
+      remedy: [
+        "Practice mindful speech.",
+        "Sleep on time and reduce emotional overload.",
+        "Use mantra or breathwork for mental grounding.",
+      ],
+    }),
+
+    makeSection({
+      id: "gemstone-suggestions",
+      title: "Gemstone Suggestions",
+      subtitle: "Supportive planetary strengthening with caution and responsibility.",
+      score: 66,
+      paragraphs: [
+        `Gemstones are used to strengthen planetary energy, but they should be recommended carefully. A gemstone amplifies a planet, so it should not be suggested only because a planet is weak. The planet should be functionally supportive, connected to useful houses and suitable for the native’s overall chart. Otherwise, strengthening the wrong planet can increase pressure instead of relief.`,
+        `For Premium reporting, gemstone suggestions should be shown as cautious guidance, not final prescription. The report can identify potentially supportive planets and planets that should not be strengthened casually. Final gemstone recommendation should ideally be confirmed through full chart analysis, dasha, current life situation and expert review.`,
+        `Safer alternatives include colour therapy, mantra, donation, fasting, behavioural remedies and spiritual discipline. These methods are less risky than gemstone amplification and can still create alignment with planetary energy.`,
+      ],
+      summary: [
+        "Gemstones amplify planetary energy.",
+        "Do not wear gemstones casually.",
+        "Planet should be functionally supportive before strengthening.",
+        "Safer alternatives include mantra, donation and colour discipline.",
+        "Final gemstone should be confirmed through deeper analysis.",
+      ],
+      actionPlan: [
+        "Avoid buying expensive gemstones without confirmation.",
+        "Start with mantra and behavioural remedies first.",
+        "Use gemstone only after suitability check.",
+      ],
+      remedy: [
+        "Use clean colours connected to supportive planets.",
+        "Donate according to the planet instead of rushing gemstone use.",
+        "Ask AstroLife AI or an astrologer before wearing a major gemstone.",
+      ],
+    }),
+  ];
+
+  months.forEach((month, index) => {
+    const score = 60 + ((index * 7) % 24);
+
+    premiumSections.push(
+      makeSection({
+        id: `monthly-forecast-${index + 1}`,
+        title: `${month} Forecast`,
+        subtitle: "12-month prediction roadmap with career, money, relationship and health focus.",
+        score,
+        paragraphs: [
+          `${month} begins a distinct phase in your yearly rhythm. This month should be read through the combined influence of birth chart promise, current dasha, transit pressure and personal effort. The overall theme suggests that the native should balance ambition with patience and avoid making decisions only from emotional urgency. The month can bring progress when planning, communication and disciplined action are used properly.`,
+          `Career matters during ${month} may require structured effort. If professional opportunities appear, they should be evaluated carefully instead of being accepted impulsively. This month can support learning, communication, networking, documentation, portfolio building and correction of past delays. If workplace pressure increases, it should be treated as a signal to become more organized rather than as a sign of failure.`,
+          `Financially, ${month} is better for planning than reckless risk. Income may improve through effort, but expenses can also rise through family, travel, tools, learning, health or lifestyle needs. Relationship matters require calm communication. Health should be protected through sleep, hydration, digestion care and stress management. The best use of this month is steady action with emotional balance.`,
+        ],
+        summary: [
+          `Overall signal for ${month}: ${getSignal(score)}.`,
+          "Career: good for planning, skill-building and communication.",
+          "Money: avoid impulsive spending and risky investment.",
+          "Relationship: use calm speech and avoid assumptions.",
+          "Health: protect sleep, digestion and stress levels.",
+        ],
+        actionPlan: [
+          "Choose one main goal for the month.",
+          "Avoid overcommitting to too many directions.",
+          "Review money, health and relationship decisions weekly.",
+        ],
+        remedy: [
+          "Light a diya before starting important work.",
+          "Donate food or help someone according to capacity.",
+          "Chant your preferred mantra for 11 minutes on stressful days.",
+        ],
+      })
+    );
+  });
+
+  premiumSections.push(
+    makeSection({
+      id: "final-year-guidance",
+      title: "Final 12-Month Guidance",
+      subtitle: "How to use the coming year with clarity and discipline.",
+      score: 79,
+      paragraphs: [
+        `The coming year should be treated as a journey of gradual alignment. Some months may support career and visibility, while others may ask for rest, emotional maturity or financial discipline. A good year is not a year without challenges; it is a year where the native responds to each phase with the right action.`,
+        `Whenever a month feels supportive, use it for movement, applications, launches, communication, learning and progress. Whenever a month feels heavy, use it for correction, healing, organization, remedies and patience. This approach turns astrology into a planning tool rather than a fear-based prediction system.`,
+        `The most important message of this report is that timing and effort must work together. Favourable timing without effort gives little result, and effort without timing may feel delayed. When both come together, progress becomes more natural.`,
+      ],
+      summary: [
+        "Use supportive months for action.",
+        "Use sensitive months for correction and planning.",
+        "Do not fear difficult months.",
+        "Discipline makes good timing more powerful.",
+        "Astrology works best with practical effort.",
+      ],
+      actionPlan: [
+        "Plan quarterly goals.",
+        "Review your life areas every month.",
+        "Use remedies as consistency anchors.",
+      ],
+      remedy: [
+        "Keep one daily spiritual habit.",
+        "Serve parents, teachers, elders or needy people.",
+        "Avoid fear and choose conscious action.",
+      ],
+    })
+  );
+
+  return premiumSections;
+}

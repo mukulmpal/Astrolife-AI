@@ -260,9 +260,24 @@ export default function Home() {
             15+ ancient systems. One cosmic intelligence.
           </p>
           <div className="hero-actions">
-            <button className="btn-gold">✦ Generate Free Kundli</button>
-            <button className="btn-ghost">▶ Watch Demo</button>
-          </div>
+  <button
+    className="btn-gold"
+    onClick={() => {
+      window.location.href = "/onboarding";
+    }}
+  >
+    ✦ Generate Free Kundli
+  </button>
+
+  <button
+    className="btn-ghost"
+    onClick={() => {
+      window.location.href = "/dashboard/kundli";
+    }}
+  >
+    ▶ Watch Demo
+  </button>
+</div>
         </div>
       </section>
 

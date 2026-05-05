@@ -1,50 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildAstroSoundChatContext } from "@/lib/astro-engine/astro-sound-chat-context";
 import {
   getServerAiUsageState,
   incrementServerAiUsage,
 } from "@/lib/server-usage";
 
 export const runtime = "edge";
-type LanguageMode = "hindi" | "english" | "hinglish";
-
-function detectIntentSources(params: {
-  messages: { role: string; content: string }[];
-  hasChart: boolean;
-  hasTransit: boolean;
-  hasDailyFeed: boolean;
-}) {
-  const { messages, hasChart, hasTransit, hasDailyFeed } = params;
-  const latestUser = [...messages].reverse().find((m) => m.role === "user")?.content?.toLowerCase() ?? "";
-  const isTiming = /(today|now|current|this week|timing|kab|abhi|phase|window|gochar|transit)/i.test(latestUser);
-  const isRemedy = /(remedy|upay|mantra|totka|daan|donate|fast|vrat|gem|stone)/i.test(latestUser);
-  const isCareer = /(career|job|business|promotion|work|profession)/i.test(latestUser);
-  const isRelationship = /(marriage|love|relationship|partner|shaadi|vivah)/i.test(latestUser);
-  const isHealth = /(health|disease|medical|wellness|anxiety|stress|sleep)/i.test(latestUser);
-
-  const ordered: string[] = [];
-  const pushIf = (label: string, ok: boolean) => {
-    if (ok && !ordered.includes(label)) ordered.push(label);
-  };
-
-  if (isTiming) {
-    pushIf("Transit/Gochar", hasTransit);
-    pushIf("Daily Feed", hasDailyFeed);
-  }
-  if (isRemedy) {
-    pushIf("Daily Feed", hasDailyFeed);
-    pushIf("Transit/Gochar", hasTransit);
-  }
-  if (isCareer || isRelationship || isHealth) {
-    pushIf("Natal Chart", hasChart);
-    pushIf("Transit/Gochar", hasTransit);
-  }
-
-  pushIf("Natal Chart", hasChart);
-  pushIf("Transit/Gochar", hasTransit);
-  pushIf("Daily Feed", hasDailyFeed);
-  return ordered;
-}
 
 const AGENTS: Record<string, { name: string; emoji: string; system: string }> = {
   general: {
@@ -231,22 +191,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const astroSoundRequestBody = await req.json();
     const {
       messages,
       agentId = "general",
       chartContext,
       transitContext,
       dailyFeedContext,
-      languageMode = "hinglish",
-    } = astroSoundRequestBody;
-
-    const astroSoundSignalInput = JSON.stringify({
-      agentId,
-      languageMode,
-      latestUserMessage: [...messages].reverse().find((m: { role: string; content: string }) => m.role === "user")?.content ?? "",
-    });
-    const astroSoundChatContext = buildAstroSoundChatContext(astroSoundSignalInput);
+    } = await req.json();
 
     const agent = AGENTS[agentId] || AGENTS.general;
 
@@ -296,26 +247,14 @@ When user asks practical next steps, align advice with this feed first, then sup
 DAILY PERSONAL FEED (TODAY-FIRST CONTEXT):
 Not provided.
 `;
-    const langMode = (["hindi", "english", "hinglish"].includes(languageMode) ? languageMode : "hinglish") as LanguageMode;
-    const languageBlock =
-      langMode === "hindi"
-        ? "LANGUAGE MODE: Hindi only (Devanagari script)."
-        : langMode === "english"
-          ? "LANGUAGE MODE: English only."
-          : "LANGUAGE MODE: Natural Hinglish (Roman Hindi + English mix).";
 
-    const systemPrompt = `
-ASTRO_SOUND_CONTEXT_INJECTED:
-${astroSoundChatContext}
-${agent.system}
+    const systemPrompt = `${agent.system}
 
 ${chartBlock}
 
 ${transitBlock}
 
 ${dailyFeedBlock}
-
-${languageBlock}
 
 RESPONSE STYLE:
 - Use simple, premium Hinglish when appropriate.
@@ -347,12 +286,11 @@ Sign off as: "${agent.emoji} ${agent.name}"`;
     }
 
     const usage = await incrementServerAiUsage(usageState);
-    const sources = detectIntentSources({
-      messages,
-      hasChart: Boolean(chartContext),
-      hasTransit: Boolean(transitContext),
-      hasDailyFeed: Boolean(dailyFeedContext),
-    });
+    const sources = [
+      chartContext ? "Natal Chart" : null,
+      transitContext ? "Transit/Gochar" : null,
+      dailyFeedContext ? "Daily Feed" : null,
+    ].filter(Boolean);
 
     return NextResponse.json({
       message: text,

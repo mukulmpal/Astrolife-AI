@@ -58,6 +58,22 @@ export async function POST(req: NextRequest) {
 
     const admin = createAdminClient();
 
+    // Idempotency: if this order is already marked paid, return success.
+    const { data: alreadyPaid } = await admin
+      .from("payments")
+      .select("id,plan")
+      .eq("provider_order_id", razorpay_order_id)
+      .eq("status", "paid")
+      .maybeSingle();
+
+    if (alreadyPaid?.id) {
+      return NextResponse.json({
+        success: true,
+        message: "Payment already verified",
+        plan: String(alreadyPaid.plan),
+      });
+    }
+
     const { error: profileError } = await admin
       .from("profiles")
       .update({
@@ -96,15 +112,35 @@ export async function POST(req: NextRequest) {
         await admin.from("payments").insert(paymentPayload);
       }
 
-      await admin.from("subscriptions").insert({
-        user_id: user.id,
-        plan,
-        status: "active",
-        provider: "razorpay",
-        provider_subscription_id: razorpay_order_id,
-        started_at: new Date().toISOString(),
-        expires_at: expiresAt.toISOString(),
-      });
+      const { data: existingSubscription } = await admin
+        .from("subscriptions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("provider", "razorpay")
+        .eq("provider_subscription_id", razorpay_order_id)
+        .maybeSingle();
+
+      if (existingSubscription?.id) {
+        await admin
+          .from("subscriptions")
+          .update({
+            plan,
+            status: "active",
+            started_at: new Date().toISOString(),
+            expires_at: expiresAt.toISOString(),
+          })
+          .eq("id", existingSubscription.id);
+      } else {
+        await admin.from("subscriptions").insert({
+          user_id: user.id,
+          plan,
+          status: "active",
+          provider: "razorpay",
+          provider_subscription_id: razorpay_order_id,
+          started_at: new Date().toISOString(),
+          expires_at: expiresAt.toISOString(),
+        });
+      }
     } catch (error) {
       console.warn("Payment ledger persistence skipped:", error);
     }

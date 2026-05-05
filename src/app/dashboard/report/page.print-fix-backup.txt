@@ -1,0 +1,2010 @@
+"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
+
+import { useEffect, useMemo, useState } from "react";
+import {
+  buildPremiumReportData,
+  buildYogasDoshasReportSection,
+  buildShadbalaReportSection,
+  buildAshtakavargaReportSection,
+  buildTransitEventRadarReportSection,
+  buildDashaTimelineReportSection,
+  buildFullPremiumReportSections,
+  ReportSection,
+} from "@/lib/report-data";
+import { useUserChart } from "@/lib/user-chart";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+
+
+function ReportPersonalizedMeta({
+  name,
+  generatedAt,
+}: {
+  name: string;
+  generatedAt: string;
+}) {
+  return (
+    <div className="personal-report-meta">
+      <span>Generated for</span>
+      <strong>{name}</strong>
+      <em>{generatedAt}</em>
+      <b>Premium</b>
+    </div>
+  );
+}
+
+function ScorePill({ score, signal }: { score: number; signal: string }) {
+  return (
+    <div className="score-pill">
+      <div>
+        <span className="score-label">AstroLife Signal</span>
+        <strong>{signal}</strong>
+      </div>
+      <div className="score-number">{score}</div>
+    </div>
+  );
+}
+
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="bullet-list">
+      {items.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
+function SectionBlock({ section, index }: { section: ReportSection; index: number }) {
+  return (
+    <section className="report-page section-page">
+      <div className="page-top">
+        <span>AstroLife Premium Report</span>
+        <span>Section {index + 1}</span>
+      </div>
+
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">{section.subtitle}</p>
+          <h2>{section.title}</h2>
+        </div>
+        <ScorePill score={section.score} signal={section.signal} />
+      </div>
+
+      <div className="long-content">
+        {section.paragraphs.map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
+      </div>
+
+      <div className="summary-grid">
+        <div className="summary-card">
+          <h3>Quick Summary</h3>
+          <BulletList items={section.summary} />
+        </div>
+
+        <div className="summary-card">
+          <h3>Action Plan</h3>
+          <BulletList items={section.actionPlan} />
+        </div>
+
+        <div className="summary-card remedy-card">
+          <h3>Remedy</h3>
+          <BulletList items={section.remedy} />
+        </div>
+      </div>
+
+      <div className="page-footer">
+        <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
+        <span>AstroLife AI</span>
+      </div>
+    </section>
+  );
+}
+
+
+const SIGN_ORDER = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces",
+];
+
+function getPlanetsBySign(planets: any[]) {
+  const grouped: Record<string, string[]> = {};
+
+  SIGN_ORDER.forEach((sign) => {
+    grouped[sign] = [];
+  });
+
+  planets.forEach((planet) => {
+    const sign = typeof planet?.sign === "string" ? planet.sign : "Unknown";
+    const name = typeof planet?.name === "string" ? planet.name : "Planet";
+
+    if (!grouped[sign]) grouped[sign] = [];
+    grouped[sign].push(name);
+  });
+
+  return grouped;
+}
+
+function shortPlanetName(name: string) {
+  const map: Record<string, string> = {
+    Sun: "Su",
+    Moon: "Mo",
+    Mars: "Ma",
+    Mercury: "Me",
+    Jupiter: "Ju",
+    Venus: "Ve",
+    Saturn: "Sa",
+    Rahu: "Ra",
+    Ketu: "Ke",
+    Ascendant: "As",
+  };
+
+  return map[name] ?? name.slice(0, 2);
+}
+
+function getChartCellPlanets(grouped: Record<string, string[]>, sign: string) {
+  return (grouped[sign] ?? []).map(shortPlanetName).join(" ");
+}
+
+function PremiumChartBox({
+  title,
+  subtitle,
+  planets,
+}: {
+  title: string;
+  subtitle: string;
+  planets: any[];
+}) {
+  const grouped = getPlanetsBySign(planets);
+
+  const cells = [
+    { sign: "Pisces", x: 260, y: 42, points: "200,0 320,0 260,85" },
+    { sign: "Aries", x: 140, y: 42, points: "80,0 200,0 140,85" },
+    { sign: "Taurus", x: 70, y: 130, points: "0,0 80,0 140,85 70,170" },
+    { sign: "Gemini", x: 140, y: 255, points: "70,170 140,85 210,170 140,320" },
+    { sign: "Cancer", x: 70, y: 410, points: "0,320 70,170 140,320 80,480" },
+    { sign: "Leo", x: 140, y: 438, points: "80,480 140,320 200,480" },
+    { sign: "Virgo", x: 260, y: 438, points: "200,480 260,320 320,480" },
+    { sign: "Libra", x: 330, y: 410, points: "320,480 260,320 330,170 400,320" },
+    { sign: "Scorpio", x: 260, y: 255, points: "190,170 260,85 330,170 260,320" },
+    { sign: "Sagittarius", x: 330, y: 130, points: "320,0 400,0 330,170 260,85" },
+    { sign: "Capricorn", x: 200, y: 170, points: "140,85 260,85 330,170 260,320 140,320 70,170" },
+    { sign: "Aquarius", x: 200, y: 330, points: "140,320 260,320 200,480" },
+  ];
+
+  return (
+    <div className="premium-chart-box north-diamond-box">
+      <div className="chart-title-row">
+        <div>
+          <h3>{title}</h3>
+          <p>{subtitle}</p>
+        </div>
+        <span>North Indian Style</span>
+      </div>
+
+      <div className="north-diamond-wrap">
+        <svg
+          className="north-diamond-chart"
+          viewBox="0 0 400 480"
+          role="img"
+          aria-label={title}
+        >
+          <rect x="0" y="0" width="400" height="480" rx="16" className="chart-bg" />
+
+          {cells.map((cell, index) => (
+            <g key={cell.sign}>
+              <polygon points={cell.points} className="chart-house-shape" />
+              <text x={cell.x} y={cell.y - 12} textAnchor="middle" className="chart-house-number">
+                {index + 1}
+              </text>
+              <text x={cell.x} y={cell.y + 6} textAnchor="middle" className="chart-sign-name">
+                {cell.sign}
+              </text>
+              <text x={cell.x} y={cell.y + 26} textAnchor="middle" className="chart-planet-text">
+                {getChartCellPlanets(grouped, cell.sign) || "—"}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+
+      <div className="chart-legend">
+        <span><strong>Su</strong> Sun</span>
+        <span><strong>Mo</strong> Moon</span>
+        <span><strong>Ma</strong> Mars</span>
+        <span><strong>Me</strong> Mercury</span>
+        <span><strong>Ju</strong> Jupiter</span>
+        <span><strong>Ve</strong> Venus</span>
+        <span><strong>Sa</strong> Saturn</span>
+        <span><strong>Ra</strong> Rahu</span>
+        <span><strong>Ke</strong> Ketu</span>
+      </div>
+    </div>
+  );
+}
+
+function PremiumChartPage({
+  title,
+  subtitle,
+  description,
+  summary,
+  planets,
+}: {
+  title: string;
+  subtitle: string;
+  description: string[];
+  summary: string[];
+  planets: any[];
+}) {
+  return (
+    <section className="report-page chart-report-page">
+      <div className="page-top">
+        <span>AstroLife Premium Report</span>
+        <span>{title}</span>
+      </div>
+
+      <div className="section-heading single">
+        <div>
+          <p className="eyebrow">{subtitle}</p>
+          <h2>{title}</h2>
+        </div>
+      </div>
+
+      <PremiumChartBox title={title} subtitle={subtitle} planets={planets} />
+
+      <div className="long-content chart-explanation">
+        {description.map((paragraph, index) => (
+          <p key={index}>{paragraph}</p>
+        ))}
+      </div>
+
+      <div className="summary-card full">
+        <h3>Quick Summary</h3>
+        <BulletList items={summary} />
+      </div>
+
+      <div className="page-footer">
+        <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
+        <span>AstroLife AI</span>
+      </div>
+    </section>
+  );
+}
+
+
+
+const REPORT_TOC_ITEMS = [
+  ["Cover Page", "1"],
+  ["Disclaimer & Spiritual Opening", "2"],
+  ["Birth Details", "3"],
+  ["Executive AI Summary", "4"],
+  ["Planetary Positions", "5"],
+  ["Lagna Chart", "6"],
+  ["Moon Chart", "7"],
+  ["Navamsha D9 Chart", "8"],
+  ["Table of Contents", "9"],
+  ["Panchang Details", "10"],
+  ["House-wise Life Map", "11–12"],
+  ["Yogas & Doshas", "13–15"],
+  ["Shadbala & Planet Strength", "16"],
+  ["Ashtakavarga Strength", "17"],
+  ["Dasha Timeline", "18"],
+  ["Transit & Event Radar", "19"],
+  ["Personality & Life Pattern", "20"],
+  ["Career & Public Life", "21"],
+  ["Wealth & Financial Growth", "22"],
+  ["Love, Marriage & Relationships", "23"],
+  ["Health & Vitality", "24"],
+  ["Spiritual Path & Remedies", "25"],
+  ["Divisional Charts Summary", "26"],
+  ["Lal Kitab Karma", "27"],
+  ["Psychology & Shadow Pattern", "28"],
+  ["Gemstone Suggestions", "29"],
+  ["12-Month Forecast", "30–41"],
+  ["Final Year Guidance", "42"],
+  ["Ask AstroLife AI CTA", "End"],
+];
+
+function PremiumTOCPage() {
+  return (
+    <section className="report-page toc-page">
+      <div className="page-top">
+        <span>AstroLife Premium Report</span>
+        <span>Table of Contents</span>
+      </div>
+
+      <div className="section-heading single">
+        <div>
+          <p className="eyebrow">Report Navigation</p>
+          <h2>Table of Contents</h2>
+        </div>
+      </div>
+
+      <div className="long-content toc-intro">
+        <p>
+          This report is structured as a complete AstroLife premium dossier. Start with the
+          birth foundation, then move through chart visuals, planetary strength, yogas,
+          doshas, timing systems, life-area reports, remedies and the 12-month forecast.
+        </p>
+      </div>
+
+      <div className="toc-list">
+        {REPORT_TOC_ITEMS.map(([label, page], index) => (
+          <div className="toc-row" key={label}>
+            <span className="toc-index">{String(index + 1).padStart(2, "0")}</span>
+            <span className="toc-label">{label}</span>
+            <span className="toc-dots" />
+            <strong>{page}</strong>
+          </div>
+        ))}
+      </div>
+
+      <div className="summary-card full toc-note">
+        <h3>How to Read</h3>
+        <BulletList
+          items={[
+            "Read Executive Summary first for the overall life theme.",
+            "Use chart pages to understand visual planetary placement.",
+            "Use dasha and transit sections for timing.",
+            "Use monthly forecast pages for planning the year.",
+            "Use remedies as practical alignment tools, not fear-based rituals.",
+          ]}
+        />
+      </div>
+
+      <div className="page-footer">
+        <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
+        <span>AstroLife AI</span>
+      </div>
+    </section>
+  );
+}
+
+
+export default function PremiumReportPage() {
+    const { chart, loading } = useUserChart();
+    const [yogasDoshasSection, setYogasDoshasSection] = useState<ReportSection | null>(null);
+    const [shadbalaSection, setShadbalaSection] = useState<ReportSection | null>(null);
+    const [ashtakavargaSection, setAshtakavargaSection] = useState<ReportSection | null>(null);
+    const [transitRadarSection, setTransitRadarSection] = useState<ReportSection | null>(null);
+    const [dashaSection, setDashaSection] = useState<ReportSection | null>(null);
+    useEffect(() => {
+        let cancelled = false;
+      
+        async function loadYogasDoshas() {
+          if (!chart) return;
+      
+          try {
+            const mod: any = await import("@/lib/astro-engine/yogas");
+            const rawChart: any = (chart as any)?.chart ?? chart;
+      
+            const possibleFunctionNames = [
+              "calculateYogaReport",
+              "calculateYogas",
+              "detectYogas",
+              "analyzeYogas",
+              "getYogaReport",
+              "getYogas",
+              "calculateDoshas",
+              "detectDoshas",
+            ];
+      
+            let result: any = null;
+      
+            for (const functionName of possibleFunctionNames) {
+              const fn = mod?.[functionName];
+      
+              if (typeof fn !== "function") continue;
+      
+              try {
+                result = await fn(rawChart);
+                if (result) break;
+              } catch {
+                // Try next possible function name.
+              }
+            }
+      
+            const fallbackSource =
+              result ??
+              (chart as any)?.yogas ??
+              (chart as any)?.chart?.yogas ??
+              (chart as any);
+      
+            if (!cancelled) {
+              setYogasDoshasSection(buildYogasDoshasReportSection(fallbackSource));
+            }
+          } catch (error) {
+            console.warn("Yogas/Doshas report section failed:", error);
+      
+            if (!cancelled) {
+              setYogasDoshasSection(buildYogasDoshasReportSection(chart));
+            }
+          }
+        }
+      
+        loadYogasDoshas();
+
+        return () => {
+          cancelled = true;
+        };
+      }, [chart]);
+
+      useEffect(() => {
+        if (!chart) return;
+
+        const rawChart: any = (chart as any)?.chart ?? chart;
+
+        setShadbalaSection(buildShadbalaReportSection(rawChart));
+        setAshtakavargaSection(buildAshtakavargaReportSection(rawChart));
+        setTransitRadarSection(buildTransitEventRadarReportSection(rawChart));
+        setDashaSection(buildDashaTimelineReportSection(rawChart));
+      }, [chart]);
+
+      const report = useMemo(() => {
+        return buildPremiumReportData(chart);
+      }, [chart]);
+
+      const fullPremiumSections = useMemo(() => {
+        return buildFullPremiumReportSections(chart);
+      }, [chart]);
+      
+      const reportSections = useMemo(() => {
+        const injectedSections = [
+          ...fullPremiumSections,
+          yogasDoshasSection,
+          shadbalaSection,
+          ashtakavargaSection,
+          dashaSection,
+          transitRadarSection,
+        ].filter(Boolean) as ReportSection[];
+    
+        const injectedIds = new Set(injectedSections.map((section) => section.id));
+    
+        const baseSections = report.sections.filter(
+          (section) => !injectedIds.has(section.id)
+        );
+    
+        return [
+          baseSections[0],
+          ...injectedSections,
+          ...baseSections.slice(1),
+        ].filter(Boolean) as ReportSection[];
+    }, [
+        report.sections,
+        fullPremiumSections,
+        yogasDoshasSection,
+        shadbalaSection,
+        ashtakavargaSection,
+        dashaSection,
+        transitRadarSection,
+      ]);
+  
+  if (loading) {
+    return (
+      <main className="report-shell">
+        <div className="loading-card">
+          <h1>Preparing AstroLife Report...</h1>
+          <p>Your premium kundli report is being generated.</p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="report-shell">
+      <div className="report-toolbar">
+        <div>
+          <strong>AstroLife Premium Report</strong>
+          <span>Printable HTML Preview</span>
+        </div>
+
+        <div className="toolbar-actions">
+          <a href="/dashboard" className="toolbar-btn ghost">
+            Back to Dashboard
+          </a>
+          <button className="toolbar-btn" onClick={() => window.print()}>
+            Download / Print PDF
+          </button>
+        </div>
+      </div>
+
+      {/* PERSONALIZED REPORT META */}
+      <ReportPersonalizedMeta
+        name={report.nativeName}
+        generatedAt={report.generatedAt}
+      />
+
+      {/* COVER */}
+      <section className="report-page cover-page">
+        <div className="cover-bg" />
+
+        <div className="cover-content">
+          <div className="brand-row">
+            <div className="brand-mark">✦</div>
+            <div>
+              <strong>AstroLife AI</strong>
+              <span>Vedic Astrology Intelligence</span>
+            </div>
+          </div>
+
+          <div className="cover-main">
+            <p className="cover-kicker">Premium Kundli Dossier</p>
+            <h1>{report.reportTitle}</h1>
+            <p className="cover-sub">
+              A detailed astrology report combining Vedic chart analysis, planetary
+              strength, dasha timing, transits, remedies and AI-assisted guidance.
+            </p>
+
+            <div className="native-card">
+              <h2>{report.nativeName}</h2>
+              <div className="native-grid">
+                <span>Date of Birth</span>
+                <strong>{report.birthDate}</strong>
+
+                <span>Time of Birth</span>
+                <strong>{report.birthTime}</strong>
+
+                <span>Birth Place</span>
+                <strong>{report.birthPlace}</strong>
+
+                <span>Generated On</span>
+                <strong>{report.generatedAt}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="cover-footer">
+            <span>Parashari · Lal Kitab · Nadi · KP · Psychology · Transit</span>
+            <span>Generated by AstroLife AI</span>
+          </div>
+        </div>
+      </section>
+
+      {/* DISCLAIMER */}
+      <section className="report-page">
+        <div className="page-top">
+          <span>AstroLife Premium Report</span>
+          <span>Disclaimer</span>
+        </div>
+
+        <div className="section-heading single">
+          <div>
+            <p className="eyebrow">Spiritual Opening & Responsible Guidance</p>
+            <h2>Before You Read This Report</h2>
+          </div>
+        </div>
+
+        <div className="long-content">
+          <p>
+            This report is prepared using principles of Vedic astrology, planetary
+            positions, dasha periods, transits, yogas, doshas and AI-assisted
+            interpretation. Astrology is a symbolic guidance system. It helps you
+            understand tendencies, timing patterns, strengths, challenges and possible
+            life directions.
+          </p>
+
+          <p>
+            The purpose of this report is not to create fear or dependency. The purpose
+            is to support self-awareness and better decision-making. Planetary
+            combinations can show potential and pressure, but your actions, choices,
+            environment, discipline and grace also shape the final outcome.
+          </p>
+
+          <p>
+            Please do not use astrology as a replacement for qualified medical, legal,
+            psychological or financial advice. For serious matters, consult the right
+            professional. Use this report as a mirror, not as a prison. The best result
+            comes when spiritual insight and practical action work together.
+          </p>
+        </div>
+
+        <div className="summary-grid two">
+          <div className="summary-card">
+            <h3>How to Use</h3>
+            <BulletList
+              items={[
+                "Read slowly and reflect on repeated themes.",
+                "Use predictions as guidance, not fixed destiny.",
+                "Focus on remedies, action plan and self-awareness.",
+                "Compare dasha, transit and life situation together.",
+              ]}
+            />
+          </div>
+
+          <div className="summary-card remedy-card">
+            <h3>Core Principle</h3>
+            <BulletList
+              items={[
+                "Awareness improves karma.",
+                "Discipline strengthens weak areas.",
+                "Remedies work best with right action.",
+                "Free will remains important.",
+              ]}
+            />
+          </div>
+        </div>
+
+        <div className="page-footer">
+          <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
+          <span>AstroLife AI</span>
+        </div>
+      </section>
+
+      {/* PREMIUM TABLE OF CONTENTS */}
+      <PremiumTOCPage />
+
+      {/* BIRTH DETAILS */}
+      <section className="report-page">
+        <div className="page-top">
+          <span>AstroLife Premium Report</span>
+          <span>Birth Details</span>
+        </div>
+
+        <div className="section-heading single">
+          <div>
+            <p className="eyebrow">Native Profile & Panchang Snapshot</p>
+            <h2>Birth Details</h2>
+          </div>
+        </div>
+
+        <div className="detail-grid">
+          <div className="detail-card">
+            <span>Name</span>
+            <strong>{report.nativeName}</strong>
+          </div>
+          <div className="detail-card">
+            <span>Date of Birth</span>
+            <strong>{report.birthDate}</strong>
+          </div>
+          <div className="detail-card">
+            <span>Time of Birth</span>
+            <strong>{report.birthTime}</strong>
+          </div>
+          <div className="detail-card">
+            <span>Birth Place</span>
+            <strong>{report.birthPlace}</strong>
+          </div>
+          <div className="detail-card">
+            <span>Lagna</span>
+            <strong>{report.lagna}</strong>
+          </div>
+          <div className="detail-card">
+            <span>Moon Sign</span>
+            <strong>{report.moonSign}</strong>
+          </div>
+          <div className="detail-card">
+            <span>Nakshatra</span>
+            <strong>{report.nakshatra}</strong>
+          </div>
+          <div className="detail-card">
+            <span>Current Dasha</span>
+            <strong>{report.currentDasha}</strong>
+          </div>
+        </div>
+
+        <div className="long-content">
+          <p>
+            Birth details are the foundation of the horoscope. Even a small difference in
+            time or place can change the ascendant, house positions, divisional chart
+            details and timing calculations. This is why accurate birth data is important
+            before interpreting deeper areas such as dasha, marriage timing, career
+            direction or transit results.
+          </p>
+
+          <p>
+            The Lagna shows the outer life path, physical identity and event manifestation.
+            The Moon sign shows emotional experience and mental timing. The Nakshatra
+            gives a deeper psychological and karmic pattern. Together, these three factors
+            create the starting point for understanding the native’s life direction.
+          </p>
+        </div>
+
+        <div className="summary-card full">
+          <h3>Key Highlights</h3>
+          <BulletList items={report.keyHighlights} />
+        </div>
+
+        <div className="page-footer">
+          <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
+          <span>AstroLife AI</span>
+        </div>
+      </section>
+
+      {/* EXECUTIVE SUMMARY */}
+      <section className="report-page">
+        <div className="page-top">
+          <span>AstroLife Premium Report</span>
+          <span>AI Summary</span>
+        </div>
+
+        <div className="section-heading single">
+          <div>
+            <p className="eyebrow">AstroLife AI Interpretation</p>
+            <h2>Executive Summary</h2>
+          </div>
+        </div>
+
+        <div className="long-content">
+          {report.executiveSummary.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
+
+        <div className="summary-grid two">
+          <div className="summary-card">
+            <h3>Life Direction</h3>
+            <BulletList
+              items={[
+                "Build discipline before chasing speed.",
+                "Use emotional intelligence as a strength.",
+                "Avoid fear-based decisions.",
+                "Focus on practical execution and long-term stability.",
+              ]}
+            />
+          </div>
+
+          <div className="summary-card remedy-card">
+            <h3>Report Focus</h3>
+            <BulletList
+              items={[
+                "Personality and life pattern.",
+                "Career, money and relationship direction.",
+                "Health, spirituality and remedies.",
+                "Dasha, transit and timing guidance.",
+              ]}
+            />
+          </div>
+        </div>
+
+        <div className="page-footer">
+          <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
+          <span>AstroLife AI</span>
+        </div>
+      </section>
+
+      {/* PLANETS */}
+      <section className="report-page wide-page">
+        <div className="page-top">
+          <span>AstroLife Premium Report</span>
+          <span>Planetary Positions</span>
+        </div>
+
+        <div className="section-heading single">
+          <div>
+            <p className="eyebrow">Graha Position Table</p>
+            <h2>Planetary Positions</h2>
+          </div>
+        </div>
+
+        <table className="planet-table">
+          <thead>
+            <tr>
+              <th>Planet</th>
+              <th>Sign</th>
+              <th>Degree</th>
+              <th>Nakshatra</th>
+              <th>House</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.planets.map((planet) => (
+              <tr key={planet.name}>
+                <td>{planet.name}</td>
+                <td>{planet.sign}</td>
+                <td>{planet.degree}</td>
+                <td>{planet.nakshatra}</td>
+                <td>{planet.house}</td>
+                <td>{planet.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="long-content">
+          <p>
+            Planetary positions show where the main forces of the horoscope are placed.
+            A planet’s sign shows its style of expression, its house shows the life area
+            where it becomes active, and its nakshatra reveals a deeper psychological and
+            karmic layer. No planet should be judged in isolation. Strength, dignity,
+            aspects, dasha and transits must be studied together.
+          </p>
+
+          <p>
+            Benefic planets can support growth, harmony and wisdom, while karmic planets
+            can create pressure, delay or transformation. However, challenging planets are
+            not always negative. They often create discipline, survival power, ambition and
+            maturity. The real value of astrology is to understand how to work with these
+            energies consciously.
+          </p>
+        </div>
+
+        <div className="summary-card full">
+          <h3>Quick Summary</h3>
+          <BulletList
+            items={[
+              "Planet sign shows expression style.",
+              "Planet house shows life area of activation.",
+              "Nakshatra gives deeper karmic and psychological meaning.",
+              "Planet strength decides how easily results manifest.",
+              "Dasha and transit decide timing of results.",
+            ]}
+          />
+        </div>
+
+        <div className="page-footer">
+          <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
+          <span>AstroLife AI</span>
+        </div>
+      </section>
+
+
+
+{reportSections.map((section, index) => (
+  <SectionBlock key={section.id} section={section} index={index} />
+))}
+
+
+
+      {/* CHART VISUAL PAGES */}
+      <PremiumChartPage
+        title="Lagna Chart"
+        subtitle="Birth Chart · Outer life path and event manifestation"
+        planets={report.planets}
+        description={[
+          "The Lagna chart is the central foundation of the horoscope. It shows the physical life path, personality expression, body, confidence, decision-making style and the way karma manifests in the outer world. The rising sign becomes the first house, and all other houses are counted from that point.",
+          "When planets occupy different signs and houses in the Lagna chart, they activate specific areas of life. Benefic planets can support ease, wisdom and growth, while karmic planets can create responsibility, pressure and maturity. A serious reading should never judge a planet alone; house placement, dignity, strength, dasha and transit must be studied together.",
+          "This chart page gives a visual overview of planetary distribution. In future Elite reports, this chart can be upgraded to a classical North Indian diamond format with house numbers, aspects, planetary degrees and clickable AI explanations."
+        ]}
+        summary={[
+          "Lagna chart shows outer life, body and practical destiny.",
+          "Planets here show which areas of life become strongly active.",
+          "Repeated patterns from Lagna and Moon chart are especially important.",
+          "Dasha decides when the promise of the Lagna chart becomes active.",
+          "Use this chart as the main foundation of the report."
+        ]}
+      />
+
+      <PremiumChartPage
+        title="Moon Chart"
+        subtitle="Chandra Kundli · Mind, emotion and inner experience"
+        planets={report.planets}
+        description={[
+          "The Moon chart shows how life is experienced internally. While the Lagna chart shows outer events, the Moon chart shows emotional response, mental rhythm, comfort patterns, memory, attachment and psychological sensitivity. This is why many predictions become clearer when checked from both Lagna and Moon.",
+          "If a yoga or pressure appears from both the Lagna chart and Moon chart, its result becomes more noticeable. For example, career strength seen from both charts can increase professional confidence, while relationship pressure seen from both charts may create repeated emotional lessons.",
+          "The Moon chart is also important for transit interpretation. Saturn, Jupiter, Rahu, Ketu and Moon transits from the natal Moon often show emotional weather, mental pressure, opportunity windows and short-term mood shifts."
+        ]}
+        summary={[
+          "Moon chart shows emotional and mental experience.",
+          "It helps judge how events feel internally.",
+          "Transit from Moon is very important for current timing.",
+          "Repeated patterns from Lagna and Moon become stronger.",
+          "Moon remedies help stabilize emotional life."
+        ]}
+      />
+
+      <PremiumChartPage
+        title="Navamsha D9 Chart"
+        subtitle="Dharma Chart · Marriage, maturity and deeper promise"
+        planets={report.planets}
+        description={[
+          "The Navamsha chart, also called D9, is one of the most important divisional charts in Vedic astrology. It reveals deeper planetary maturity, dharma, marriage quality, inner strength and the refined promise of the birth chart. A planet that looks strong in the birth chart but weak in D9 may require more maturity before giving stable results.",
+          "D9 is especially useful for marriage and long-term partnership analysis. It does not replace the birth chart, but it adds a deeper layer. When the 7th house, Venus, Jupiter and D9 support each other, commitment and marriage stability become stronger. When there is pressure, relationship maturity and remedies become important.",
+          "For Premium PDF reporting, the Navamsha page helps users understand that life results mature with time. Some blessings appear only after discipline, age, responsibility or spiritual growth. This is why D9 is often called the chart of deeper destiny."
+        ]}
+        summary={[
+          "Navamsha shows deeper promise and maturity.",
+          "It is very important for marriage and dharma.",
+          "Strong D1 plus strong D9 gives more reliable results.",
+          "Weak D9 planets may improve through discipline and remedies.",
+          "Elite reports can expand D9 with planet-wise interpretation."
+        ]}
+      />
+
+      {reportSections.map((section, index) => (
+        <SectionBlock key={section.id} section={section} index={index} />
+      ))}
+
+      {/* FINAL CTA */}
+      <section className="report-page final-page">
+        <div className="final-card">
+          <div className="brand-mark big">✦</div>
+          <h2>Your AstroLife Report Is Ready</h2>
+          <p>
+            This report gives you a premium foundation. For deeper timing, ask AstroLife AI
+            about marriage, career, health, money, transits, dasha, remedies or monthly
+            predictions.
+          </p>
+
+          <div className="final-actions">
+            <a href="/dashboard/chat">Ask AstroLife AI</a>
+            <a href="/dashboard/transits">View Live Transits</a>
+            <a href="/dashboard/event-radar">Open Event Radar</a>
+          </div>
+        </div>
+      </section>
+
+      <style jsx global>{`
+        :root {
+          --indigo: #07021a;
+          --deep: #100625;
+          --gold: #f5c542;
+          --gold-dark: #b8860b;
+          --text: #1c1633;
+          --muted: #6f6682;
+          --paper: #fffaf0;
+          --line: rgba(95, 73, 35, 0.18);
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          background: #05020f;
+        }
+
+        .report-shell {
+          counter-reset: reportPage;
+          min-height: 100vh;
+          background:
+            radial-gradient(circle at top left, rgba(124, 58, 237, 0.22), transparent 30%),
+            radial-gradient(circle at top right, rgba(245, 197, 66, 0.12), transparent 28%),
+            #05020f;
+          padding: 28px 18px 80px;
+          font-family:
+            Inter,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        }
+
+
+        .personal-report-meta {
+          max-width: 920px;
+          margin: 0 auto 20px;
+          display: grid;
+          grid-template-columns: auto 1fr auto auto;
+          gap: 12px;
+          align-items: center;
+          border: 1px solid rgba(245, 197, 66, 0.22);
+          background: rgba(255, 255, 255, 0.07);
+          color: white;
+          border-radius: 18px;
+          padding: 12px 16px;
+          backdrop-filter: blur(16px);
+        }
+
+        .personal-report-meta span {
+          color: rgba(255, 255, 255, 0.56);
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-weight: 800;
+        }
+
+        .personal-report-meta strong {
+          color: #f5c542;
+          font-size: 15px;
+        }
+
+        .personal-report-meta em {
+          color: rgba(255, 255, 255, 0.62);
+          font-style: normal;
+          font-size: 13px;
+          text-align: right;
+        }
+
+        .personal-report-meta b {
+          border-radius: 999px;
+          background: linear-gradient(135deg, #f5c542, #ffad00);
+          color: #140b00;
+          padding: 6px 10px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .report-toolbar {
+          max-width: 920px;
+          margin: 0 auto 22px;
+          padding: 14px 16px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.06);
+          border-radius: 18px;
+          color: white;
+          display: flex;
+          justify-content: space-between;
+          gap: 16px;
+          align-items: center;
+          position: sticky;
+          top: 12px;
+          z-index: 20;
+          backdrop-filter: blur(18px);
+        }
+
+        .report-toolbar strong {
+          display: block;
+          font-size: 15px;
+        }
+
+        .report-toolbar span {
+          color: rgba(255, 255, 255, 0.58);
+          font-size: 12px;
+        }
+
+        .toolbar-actions {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+
+        .toolbar-btn {
+          border: 0;
+          border-radius: 999px;
+          background: linear-gradient(135deg, #f5c542, #ffb000);
+          color: #140b00;
+          font-weight: 800;
+          padding: 11px 16px;
+          cursor: pointer;
+          text-decoration: none;
+          font-size: 13px;
+        }
+
+        .toolbar-btn.ghost {
+          background: rgba(255, 255, 255, 0.08);
+          color: white;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .loading-card {
+          max-width: 720px;
+          margin: 80px auto;
+          background: var(--paper);
+          border-radius: 28px;
+          padding: 40px;
+          text-align: center;
+        }
+
+        .report-page {
+          counter-increment: reportPage;
+          width: 920px;
+          min-height: 1280px;
+          margin: 0 auto 24px;
+          background:
+            linear-gradient(rgba(255, 250, 240, 0.96), rgba(255, 250, 240, 0.96)),
+            radial-gradient(circle at 12% 10%, rgba(245, 197, 66, 0.12), transparent 20%),
+            var(--paper);
+          color: var(--text);
+          border-radius: 4px;
+          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+          padding: 54px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .report-page::before {
+          content: "AstroLife Premium";
+          position: absolute;
+          inset: auto auto 160px 50%;
+          transform: translateX(-50%) rotate(-28deg);
+          font-size: 92px;
+          font-weight: 900;
+          color: rgba(82, 60, 130, 0.045);
+          pointer-events: none;
+          white-space: nowrap;
+        }
+
+        .report-page::after {
+          content: "Premium Report";
+          position: absolute;
+          top: 22px;
+          right: 54px;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: rgba(245, 197, 66, 0.11);
+          color: var(--gold-dark);
+          border-radius: 999px;
+          padding: 6px 10px;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          pointer-events: none;
+          z-index: 2;
+        }
+
+        .cover-page {
+          background: var(--indigo);
+          color: white;
+          padding: 0;
+        }
+
+        .cover-bg {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(circle at 25% 18%, rgba(124, 58, 237, 0.55), transparent 30%),
+            radial-gradient(circle at 75% 22%, rgba(245, 197, 66, 0.25), transparent 28%),
+            radial-gradient(circle at 50% 100%, rgba(14, 165, 233, 0.2), transparent 30%),
+            linear-gradient(135deg, #08021c, #16062d 45%, #05020f);
+        }
+
+        .cover-content {
+          position: relative;
+          z-index: 2;
+          min-height: 1280px;
+          padding: 58px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .brand-row {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .brand-mark {
+          width: 46px;
+          height: 46px;
+          display: grid;
+          place-items: center;
+          border-radius: 16px;
+          background: linear-gradient(135deg, var(--gold), #ff8a00);
+          color: #130800;
+          font-size: 24px;
+          font-weight: 900;
+          box-shadow: 0 10px 30px rgba(245, 197, 66, 0.28);
+        }
+
+        .brand-mark.big {
+          width: 70px;
+          height: 70px;
+          border-radius: 24px;
+          margin: 0 auto 22px;
+          font-size: 38px;
+        }
+
+        .brand-row strong {
+          display: block;
+          font-size: 22px;
+        }
+
+        .brand-row span {
+          color: rgba(255, 255, 255, 0.62);
+        }
+
+        .cover-main {
+          max-width: 720px;
+        }
+
+        .cover-kicker,
+        .eyebrow {
+          color: var(--gold);
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          font-size: 13px;
+          font-weight: 800;
+          margin: 0 0 12px;
+        }
+
+        .cover-main h1 {
+          font-size: 70px;
+          line-height: 0.94;
+          letter-spacing: -0.06em;
+          margin: 0 0 24px;
+        }
+
+        .cover-sub {
+          color: rgba(255, 255, 255, 0.72);
+          font-size: 21px;
+          line-height: 1.65;
+          max-width: 650px;
+          margin: 0 0 42px;
+        }
+
+        .native-card {
+          border: 1px solid rgba(245, 197, 66, 0.34);
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 28px;
+          padding: 28px;
+          backdrop-filter: blur(18px);
+        }
+
+        .native-card h2 {
+          margin: 0 0 22px;
+          font-size: 32px;
+          color: var(--gold);
+        }
+
+        .native-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.4fr;
+          gap: 13px 22px;
+        }
+
+        .native-grid span {
+          color: rgba(255, 255, 255, 0.58);
+        }
+
+        .native-grid strong {
+          color: white;
+        }
+
+        .cover-footer {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
+          color: rgba(255, 255, 255, 0.58);
+          font-size: 13px;
+          border-top: 1px solid rgba(255, 255, 255, 0.12);
+          padding-top: 18px;
+        }
+        .cover-footer span:last-child::after {
+         content: " · Page " counter(reportPage);
+         }
+        .page-top,
+        .page-footer {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
+          color: var(--muted);
+          font-size: 12px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .page-top {
+          border-bottom: 1px solid var(--line);
+          padding-bottom: 14px;
+          margin-bottom: 36px;
+        }
+
+        .page-footer {
+          position: absolute;
+          left: 54px;
+          right: 54px;
+          bottom: 34px;
+          border-top: 1px solid var(--line);
+          padding-top: 14px;
+          }
+
+          .page-footer span:last-child::after {
+        content: " · Page " counter(reportPage);
+        color: var(--muted);
+        }
+
+        .section-heading {
+          display: flex;
+          justify-content: space-between;
+          gap: 28px;
+          align-items: flex-start;
+          margin-bottom: 28px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .section-heading.single {
+          display: block;
+        }
+
+        .section-heading h2 {
+          font-size: 42px;
+          line-height: 1.05;
+          letter-spacing: -0.04em;
+          margin: 0;
+          color: var(--deep);
+        }
+
+        .score-pill {
+          min-width: 210px;
+          border-radius: 22px;
+          border: 1px solid rgba(245, 197, 66, 0.35);
+          background: linear-gradient(135deg, rgba(245, 197, 66, 0.16), rgba(255, 255, 255, 0.7));
+          padding: 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .score-label {
+          display: block;
+          font-size: 11px;
+          color: var(--muted);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin-bottom: 4px;
+        }
+
+        .score-pill strong {
+          color: var(--deep);
+          font-size: 18px;
+        }
+
+        .score-number {
+          width: 56px;
+          height: 56px;
+          display: grid;
+          place-items: center;
+          border-radius: 18px;
+          background: var(--deep);
+          color: var(--gold);
+          font-size: 24px;
+          font-weight: 900;
+        }
+
+        .long-content {
+          position: relative;
+          z-index: 1;
+          font-size: 17px;
+          line-height: 1.84;
+          color: #312941;
+        }
+
+        .long-content p {
+          margin: 0 0 20px;
+        }
+
+        .summary-grid {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-top: 30px;
+        }
+
+        .summary-grid.two {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .summary-card {
+          border: 1px solid var(--line);
+          border-radius: 22px;
+          background: rgba(255, 255, 255, 0.58);
+          padding: 20px;
+        }
+
+        .summary-card.full {
+          margin-top: 26px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .summary-card h3 {
+          margin: 0 0 12px;
+          font-size: 18px;
+          color: var(--deep);
+        }
+
+        .remedy-card {
+          background: rgba(245, 197, 66, 0.13);
+          border-color: rgba(184, 134, 11, 0.25);
+        }
+
+        .bullet-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: grid;
+          gap: 10px;
+        }
+
+        .bullet-list li {
+          position: relative;
+          padding-left: 20px;
+          color: #433952;
+          font-size: 14px;
+          line-height: 1.55;
+        }
+
+        .bullet-list li::before {
+          content: "•";
+          position: absolute;
+          left: 0;
+          color: var(--gold-dark);
+          font-weight: 900;
+        }
+
+        .detail-grid {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+          margin-bottom: 28px;
+        }
+
+        .detail-card {
+          border: 1px solid var(--line);
+          background: rgba(255, 255, 255, 0.62);
+          border-radius: 20px;
+          padding: 16px;
+        }
+
+        .detail-card span {
+          display: block;
+          color: var(--muted);
+          font-size: 12px;
+          margin-bottom: 6px;
+        }
+
+        .detail-card strong {
+          color: var(--deep);
+          font-size: 16px;
+        }
+
+        .planet-table {
+          position: relative;
+          z-index: 1;
+          width: 100%;
+          border-collapse: collapse;
+          overflow: hidden;
+          border-radius: 18px;
+          font-size: 13px;
+          margin-bottom: 26px;
+        }
+
+        .planet-table th {
+          background: var(--gold-dark);
+          color: white;
+          text-align: left;
+          padding: 13px 12px;
+        }
+
+        .planet-table td {
+          padding: 12px;
+          border-bottom: 1px solid rgba(95, 73, 35, 0.12);
+          background: rgba(255, 255, 255, 0.58);
+        }
+
+        .planet-table tr:nth-child(even) td {
+          background: rgba(245, 197, 66, 0.08);
+        }
+
+
+
+        .toc-page {
+          background:
+            linear-gradient(rgba(255, 250, 240, 0.97), rgba(255, 250, 240, 0.97)),
+            radial-gradient(circle at top right, rgba(245, 197, 66, 0.18), transparent 32%),
+            var(--paper);
+        }
+
+        .toc-intro {
+          margin-bottom: 26px;
+        }
+
+        .toc-list {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          gap: 9px;
+          margin-top: 24px;
+        }
+
+        .toc-row {
+          display: grid;
+          grid-template-columns: 48px auto 1fr 72px;
+          gap: 12px;
+          align-items: center;
+          padding: 11px 13px;
+          border: 1px solid rgba(95, 73, 35, 0.12);
+          background: rgba(255, 255, 255, 0.56);
+          border-radius: 14px;
+        }
+
+        .toc-index {
+          width: 34px;
+          height: 34px;
+          display: grid;
+          place-items: center;
+          border-radius: 12px;
+          background: var(--deep);
+          color: var(--gold);
+          font-weight: 900;
+          font-size: 12px;
+        }
+
+        .toc-label {
+          color: var(--deep);
+          font-weight: 800;
+          font-size: 14px;
+        }
+
+        .toc-dots {
+          height: 1px;
+          border-bottom: 1px dashed rgba(95, 73, 35, 0.26);
+        }
+
+        .toc-row strong {
+          color: var(--gold-dark);
+          text-align: right;
+          font-size: 14px;
+        }
+
+        .toc-note {
+          margin-top: 26px;
+        }
+
+        .premium-chart-box {
+          position: relative;
+          z-index: 1;
+          border: 1px solid rgba(184, 134, 11, 0.24);
+          background:
+            radial-gradient(circle at top left, rgba(245, 197, 66, 0.16), transparent 28%),
+            rgba(255, 255, 255, 0.62);
+          border-radius: 28px;
+          padding: 22px;
+          margin: 26px 0;
+        }
+
+        .chart-title-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 18px;
+          align-items: flex-start;
+          margin-bottom: 18px;
+        }
+
+        .chart-title-row h3 {
+          margin: 0 0 6px;
+          font-size: 24px;
+          color: var(--deep);
+        }
+
+        .chart-title-row p {
+          margin: 0;
+          color: var(--muted);
+          font-size: 13px;
+        }
+
+        .chart-title-row > span {
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: rgba(245, 197, 66, 0.14);
+          color: var(--gold-dark);
+          border-radius: 999px;
+          padding: 8px 12px;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .north-chart-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
+        }
+
+        .chart-sign-cell {
+          min-height: 116px;
+          border: 1px solid rgba(95, 73, 35, 0.16);
+          border-radius: 18px;
+          background: rgba(255, 250, 240, 0.78);
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .chart-sign-top {
+          display: flex;
+          justify-content: space-between;
+          gap: 8px;
+          align-items: center;
+          color: var(--muted);
+          font-size: 11px;
+        }
+
+        .chart-sign-top strong {
+          width: 24px;
+          height: 24px;
+          border-radius: 9px;
+          display: grid;
+          place-items: center;
+          background: var(--deep);
+          color: var(--gold);
+          font-size: 12px;
+        }
+
+        .chart-sign-top span {
+          text-align: right;
+          font-weight: 700;
+        }
+
+        .chart-planets {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 12px;
+        }
+
+        .chart-planets em {
+          font-style: normal;
+          border-radius: 999px;
+          background: rgba(16, 6, 37, 0.08);
+          color: var(--deep);
+          padding: 5px 8px;
+          font-size: 11px;
+          font-weight: 800;
+        }
+
+        .chart-planets small {
+          color: rgba(67, 57, 82, 0.38);
+        }
+
+
+        .north-diamond-box {
+          padding: 24px;
+        }
+
+        .north-diamond-wrap {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          justify-content: center;
+          margin: 18px auto 20px;
+          width: 100%;
+        }
+
+        .north-diamond-chart {
+          width: 100%;
+          max-width: 520px;
+          height: auto;
+          filter: drop-shadow(0 18px 36px rgba(16, 6, 37, 0.12));
+        }
+
+        .chart-bg {
+          fill: rgba(255, 250, 240, 0.92);
+          stroke: rgba(184, 134, 11, 0.28);
+          stroke-width: 2;
+        }
+
+        .chart-house-shape {
+          fill: rgba(255, 255, 255, 0.42);
+          stroke: rgba(100, 70, 20, 0.42);
+          stroke-width: 1.5;
+        }
+
+        .chart-house-number {
+          fill: #b8860b;
+          font-size: 12px;
+          font-weight: 900;
+        }
+
+        .chart-sign-name {
+          fill: #100625;
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .chart-planet-text {
+          fill: #4b244a;
+          font-size: 14px;
+          font-weight: 900;
+        }
+
+        .chart-legend {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          justify-content: center;
+          margin-top: 10px;
+        }
+
+        .chart-legend span {
+          border: 1px solid rgba(95, 73, 35, 0.14);
+          background: rgba(255, 255, 255, 0.58);
+          color: #433952;
+          border-radius: 999px;
+          padding: 6px 9px;
+          font-size: 11px;
+        }
+
+        .chart-legend strong {
+          color: var(--gold-dark);
+          margin-right: 4px;
+        }
+
+        .chart-explanation {
+          margin-top: 24px;
+        }
+
+        .final-page {
+          background:
+            radial-gradient(circle at top, rgba(245, 197, 66, 0.24), transparent 35%),
+            linear-gradient(135deg, #08021c, #15062d 55%, #05020f);
+          color: white;
+          display: grid;
+          place-items: center;
+          text-align: center;
+        }
+
+        .final-card {
+          max-width: 620px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .final-card h2 {
+          font-size: 46px;
+          line-height: 1.04;
+          letter-spacing: -0.05em;
+          margin: 0 0 20px;
+        }
+
+        .final-card p {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 18px;
+          line-height: 1.7;
+        }
+
+        .final-actions {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-top: 26px;
+        }
+
+        .final-actions a {
+          text-decoration: none;
+          border-radius: 999px;
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .final-actions a:first-child {
+          background: linear-gradient(135deg, var(--gold), #ffad00);
+          color: #130800;
+          font-weight: 900;
+        }
+
+        @media (max-width: 980px) {
+          .report-page,
+  
+        .personal-report-meta {
+          max-width: 920px;
+          margin: 0 auto 20px;
+          display: grid;
+          grid-template-columns: auto 1fr auto auto;
+          gap: 12px;
+          align-items: center;
+          border: 1px solid rgba(245, 197, 66, 0.22);
+          background: rgba(255, 255, 255, 0.07);
+          color: white;
+          border-radius: 18px;
+          padding: 12px 16px;
+          backdrop-filter: blur(16px);
+        }
+
+        .personal-report-meta span {
+          color: rgba(255, 255, 255, 0.56);
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-weight: 800;
+        }
+
+        .personal-report-meta strong {
+          color: #f5c542;
+          font-size: 15px;
+        }
+
+        .personal-report-meta em {
+          color: rgba(255, 255, 255, 0.62);
+          font-style: normal;
+          font-size: 13px;
+          text-align: right;
+        }
+
+        .personal-report-meta b {
+          border-radius: 999px;
+          background: linear-gradient(135deg, #f5c542, #ffad00);
+          color: #140b00;
+          padding: 6px 10px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .report-toolbar {
+            width: 100%;
+            max-width: 920px;
+          }
+
+          .report-page {
+            padding: 34px;
+            min-height: auto;
+          }
+
+          .cover-content {
+            min-height: 960px;
+            padding: 40px;
+          }
+
+          .cover-main h1 {
+            font-size: 48px;
+          }
+
+          .detail-grid,
+          .summary-grid,
+          .summary-grid.two {
+            grid-template-columns: 1fr;
+          }
+
+          .section-heading {
+            flex-direction: column;
+          }
+
+          .page-footer {
+            position: static;
+            margin-top: 40px;
+          }
+
+  
+        .personal-report-meta {
+          max-width: 920px;
+          margin: 0 auto 20px;
+          display: grid;
+          grid-template-columns: auto 1fr auto auto;
+          gap: 12px;
+          align-items: center;
+          border: 1px solid rgba(245, 197, 66, 0.22);
+          background: rgba(255, 255, 255, 0.07);
+          color: white;
+          border-radius: 18px;
+          padding: 12px 16px;
+          backdrop-filter: blur(16px);
+        }
+
+        .personal-report-meta span {
+          color: rgba(255, 255, 255, 0.56);
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-weight: 800;
+        }
+
+        .personal-report-meta strong {
+          color: #f5c542;
+          font-size: 15px;
+        }
+
+        .personal-report-meta em {
+          color: rgba(255, 255, 255, 0.62);
+          font-style: normal;
+          font-size: 13px;
+          text-align: right;
+        }
+
+        .personal-report-meta b {
+          border-radius: 999px;
+          background: linear-gradient(135deg, #f5c542, #ffad00);
+          color: #140b00;
+          padding: 6px 10px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .report-toolbar {
+            position: static;
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .toolbar-actions {
+            flex-direction: column;
+          }
+
+          .toolbar-btn {
+            text-align: center;
+          }
+        }
+
+        @media print {
+          body {
+            background: white !important;
+          }
+
+          .report-shell {
+            background: white !important;
+            padding: 0 !important;
+          }
+
+  
+        .personal-report-meta {
+          max-width: 920px;
+          margin: 0 auto 20px;
+          display: grid;
+          grid-template-columns: auto 1fr auto auto;
+          gap: 12px;
+          align-items: center;
+          border: 1px solid rgba(245, 197, 66, 0.22);
+          background: rgba(255, 255, 255, 0.07);
+          color: white;
+          border-radius: 18px;
+          padding: 12px 16px;
+          backdrop-filter: blur(16px);
+        }
+
+        .personal-report-meta span {
+          color: rgba(255, 255, 255, 0.56);
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-weight: 800;
+        }
+
+        .personal-report-meta strong {
+          color: #f5c542;
+          font-size: 15px;
+        }
+
+        .personal-report-meta em {
+          color: rgba(255, 255, 255, 0.62);
+          font-style: normal;
+          font-size: 13px;
+          text-align: right;
+        }
+
+        .personal-report-meta b {
+          border-radius: 999px;
+          background: linear-gradient(135deg, #f5c542, #ffad00);
+          color: #140b00;
+          padding: 6px 10px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .report-toolbar {
+            display: none !important;
+          }
+
+          .report-page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            page-break-after: always;
+            break-after: page;
+          }
+
+          .final-actions {
+            display: none;
+          }
+
+          a {
+            color: inherit;
+            text-decoration: none;
+          }
+        }
+      `}</style>
+      <MobileBottomNav />
+    </main>
+  );
+}

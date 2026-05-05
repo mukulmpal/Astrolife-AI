@@ -1,0 +1,1218 @@
+import { useEffect, useMemo, useState } from "react";
+
+export type GoalKey =
+  | "mind"
+  | "money"
+  | "travel"
+  | "sleep"
+  | "love"
+  | "career"
+  | "study"
+  | "spiritual";
+
+export type EmotionKey =
+  | "auto"
+  | "calm"
+  | "focus"
+  | "joy"
+  | "devotion"
+  | "confidence"
+  | "grief"
+  | "romance";
+
+export type VoiceKey =
+  | "any"
+  | "vocal"
+  | "flute"
+  | "sitar"
+  | "veena"
+  | "sarod"
+  | "tanpura";
+
+export type IntensityKey = "soft" | "medium" | "strong";
+
+export type ModeKey = "hybrid" | "astro" | "classical";
+
+export interface ChartPlanet {
+  rashi: number;
+  house: number;
+  lon: number;
+  status?: string;
+  retrograde?: boolean;
+}
+
+export interface ChartData {
+  lagR: number;
+  lagLon?: number;
+  dob?: string;
+  planets: Record<string, ChartPlanet>;
+}
+
+export interface RagaItem {
+  id: string;
+  name: string;
+  system: "Hindustani" | "Carnatic" | "Hybrid";
+  planets: string[];
+  goals: GoalKey[];
+  rasas: EmotionKey[];
+  energy: "cooling" | "warming" | "balancing" | "uplifting" | "grounding";
+  movement: "still" | "gentle" | "flowing" | "expansive" | "intense";
+  time: string;
+  laya: string;
+  instrument: VoiceKey[];
+  confidence: number;
+  caution?: string;
+  why: string;
+  protocol: string[];
+  avoidWhen?: string[];
+  related?: string[];
+}
+
+export interface AstroSoundInput {
+  chart: ChartData | null;
+  goal: GoalKey;
+  emotion: EmotionKey;
+  voice: VoiceKey;
+  intensity: IntensityKey;
+  mode: ModeKey;
+  memory?: AstroSoundMemory;
+}
+
+export interface AstroSoundResult {
+  title: string;
+  summary: string;
+  score: number;
+  status: "Excellent" | "Good" | "Balanced" | "Sensitive";
+  primary: RagaRecommendation;
+  alternatives: RagaRecommendation[];
+  avoid: RagaRecommendation[];
+  navarasa: Record<string, number>;
+  protocol: string[];
+  reasons: string[];
+  cautions: string[];
+  remedies: string[];
+  aiContext: string;
+}
+
+export interface RagaRecommendation {
+  raga: RagaItem;
+  score: number;
+  reasons: string[];
+}
+
+export const GOAL_META: Record<GoalKey, { label: string; emoji: string; desc: string }> = {
+  mind: {
+    label: "Mind Balance",
+    emoji: "🧠",
+    desc: "Calm thoughts, reduce mental heaviness, emotional regulation.",
+  },
+  money: {
+    label: "Money Flow",
+    emoji: "💰",
+    desc: "Grounded prosperity, stable decision-making, practical abundance.",
+  },
+  travel: {
+    label: "Travel Ease",
+    emoji: "✈️",
+    desc: "Movement, flexibility, protection and smooth journeys.",
+  },
+  sleep: {
+    label: "Sleep Support",
+    emoji: "🌙",
+    desc: "Slow down the nervous system and prepare the mind for rest.",
+  },
+  love: {
+    label: "Love & Harmony",
+    emoji: "💗",
+    desc: "Softness, bonding, forgiveness and emotional warmth.",
+  },
+  career: {
+    label: "Career Focus",
+    emoji: "📈",
+    desc: "Confidence, discipline, visibility and professional momentum.",
+  },
+  study: {
+    label: "Study & Learning",
+    emoji: "📚",
+    desc: "Concentration, retention, clarity and disciplined learning.",
+  },
+  spiritual: {
+    label: "Spiritual Alignment",
+    emoji: "🕯️",
+    desc: "Devotion, surrender, mantra, silence and inner connection.",
+  },
+};
+
+export const ALL_RASAS: { key: EmotionKey; label: string; emoji: string }[] = [
+  { key: "calm", label: "Calm", emoji: "🌊" },
+  { key: "focus", label: "Focus", emoji: "🎯" },
+  { key: "joy", label: "Joy", emoji: "☀️" },
+  { key: "devotion", label: "Devotion", emoji: "🙏" },
+  { key: "confidence", label: "Confidence", emoji: "🔥" },
+  { key: "grief", label: "Release", emoji: "🌧️" },
+  { key: "romance", label: "Romance", emoji: "🌹" },
+];
+
+export const RAGA_DB: RagaItem[] = [
+  {
+    id: "yaman",
+    name: "Yaman",
+    system: "Hindustani",
+    planets: ["Jupiter", "Venus", "Moon"],
+    goals: ["mind", "study", "spiritual", "love"],
+    rasas: ["calm", "devotion", "romance"],
+    energy: "balancing",
+    movement: "flowing",
+    time: "Evening",
+    laya: "Vilambit to Madhya",
+    instrument: ["vocal", "sitar", "flute", "tanpura"],
+    confidence: 92,
+    why: "Yaman is graceful, sattvic and balancing. It supports clarity, devotion, emotional refinement and a peaceful mental state.",
+    protocol: [
+      "Listen for 12–18 minutes after sunset.",
+      "Keep volume soft and avoid multitasking.",
+      "Use tanpura or slow vocal alap for best effect.",
+    ],
+    related: ["Bhoopali", "Hamsadhwani"],
+  },
+  {
+    id: "bhairav",
+    name: "Bhairav",
+    system: "Hindustani",
+    planets: ["Sun", "Saturn", "Ketu"],
+    goals: ["spiritual", "career", "mind"],
+    rasas: ["devotion", "confidence", "calm"],
+    energy: "grounding",
+    movement: "still",
+    time: "Early Morning",
+    laya: "Vilambit",
+    instrument: ["vocal", "tanpura", "sitar"],
+    confidence: 90,
+    why: "Bhairav brings seriousness, discipline and spiritual gravity. It is useful when the mind needs grounding and the day needs a sacred start.",
+    protocol: [
+      "Listen during sunrise or before work.",
+      "Sit with straight spine and slow breathing.",
+      "Use for discipline, prayer and Saturn-like patience.",
+    ],
+    caution: "May feel heavy if the listener is already emotionally low.",
+    avoidWhen: ["Very low mood", "Extreme fatigue"],
+    related: ["Ahir Bhairav", "Todi"],
+  },
+  {
+    id: "ahir-bhairav",
+    name: "Ahir Bhairav",
+    system: "Hindustani",
+    planets: ["Moon", "Saturn", "Jupiter"],
+    goals: ["mind", "sleep", "spiritual"],
+    rasas: ["calm", "devotion", "grief"],
+    energy: "cooling",
+    movement: "gentle",
+    time: "Morning",
+    laya: "Slow",
+    instrument: ["vocal", "flute", "tanpura"],
+    confidence: 89,
+    why: "Ahir Bhairav combines depth with softness. It supports emotional release, humility and calm reflection.",
+    protocol: [
+      "Listen for 10–15 minutes in the morning.",
+      "Good for journaling and emotional reset.",
+      "Avoid aggressive beats after listening.",
+    ],
+    related: ["Bhairav", "Bhimpalasi"],
+  },
+  {
+    id: "bhimpalasi",
+    name: "Bhimpalasi",
+    system: "Hindustani",
+    planets: ["Moon", "Venus", "Ketu"],
+    goals: ["mind", "sleep"],
+    rasas: ["grief", "romance", "calm"],
+    energy: "cooling",
+    movement: "gentle",
+    time: "Afternoon",
+    laya: "Slow to Madhya",
+    instrument: ["vocal", "flute", "sarod"],
+    confidence: 88,
+    why: "Bhimpalasi supports emotional processing, softness and inner release without forcing the mind.",
+    protocol: [
+      "Listen when emotions feel blocked.",
+      "Keep session short if you feel too sensitive.",
+      "End with 2 minutes of silence.",
+    ],
+    caution: "Can intensify emotional release for some people.",
+    related: ["Bageshri", "Ahir Bhairav"],
+  },
+  {
+    id: "bhoopali",
+    name: "Bhoopali",
+    system: "Hindustani",
+    planets: ["Jupiter", "Moon"],
+    goals: ["study", "mind", "spiritual"],
+    rasas: ["calm", "joy", "devotion"],
+    energy: "uplifting",
+    movement: "flowing",
+    time: "Evening",
+    laya: "Madhya",
+    instrument: ["flute", "vocal", "sitar"],
+    confidence: 87,
+    why: "Bhoopali is simple, bright and clean. It supports learning, optimism and mental clarity.",
+    protocol: [
+      "Listen before study or planning.",
+      "Use flute or clean vocal versions.",
+      "Pair with note-making or calm reading.",
+    ],
+    related: ["Yaman", "Hamsadhwani"],
+  },
+  {
+    id: "hamsadhwani",
+    name: "Hamsadhwani",
+    system: "Carnatic",
+    planets: ["Mercury", "Jupiter", "Sun"],
+    goals: ["study", "career", "spiritual"],
+    rasas: ["focus", "joy", "confidence"],
+    energy: "uplifting",
+    movement: "expansive",
+    time: "Morning / Opening",
+    laya: "Madhya to Drut",
+    instrument: ["vocal", "veena", "flute"],
+    confidence: 86,
+    why: "Hamsadhwani is bright and auspicious. It supports beginnings, learning, confidence and invocation-like clarity.",
+    protocol: [
+      "Use before starting a task.",
+      "Ideal for study, coding, writing or planning.",
+      "Avoid very fast versions if anxious.",
+    ],
+    related: ["Bhoopali", "Yaman"],
+  },
+  {
+    id: "darbari",
+    name: "Darbari Kanada",
+    system: "Hindustani",
+    planets: ["Saturn", "Moon"],
+    goals: ["sleep", "mind", "spiritual"],
+    rasas: ["calm", "grief", "devotion"],
+    energy: "grounding",
+    movement: "still",
+    time: "Late Night",
+    laya: "Vilambit",
+    instrument: ["vocal", "sarod", "tanpura"],
+    confidence: 85,
+    why: "Darbari is deep and heavy. It can help slow down an overstimulated mind, but should be used carefully.",
+    protocol: [
+      "Listen late evening at very low volume.",
+      "Best for grounding, not productivity.",
+      "Stop if it feels emotionally heavy.",
+    ],
+    caution: "Avoid during depressive or very low states.",
+    avoidWhen: ["Low mood", "Isolation", "Heavy grief"],
+    related: ["Malkauns", "Bhairav"],
+  },
+  {
+    id: "malkauns",
+    name: "Malkauns",
+    system: "Hindustani",
+    planets: ["Mars", "Saturn", "Ketu"],
+    goals: ["spiritual", "mind", "sleep"],
+    rasas: ["devotion", "confidence", "calm"],
+    energy: "grounding",
+    movement: "intense",
+    time: "Late Night",
+    laya: "Slow",
+    instrument: ["vocal", "sarod", "tanpura"],
+    confidence: 84,
+    why: "Malkauns is meditative and intense. It supports inner power, tapas and deep stillness.",
+    protocol: [
+      "Use for meditation, not casual listening.",
+      "Keep session under 15 minutes initially.",
+      "Good for mantra or silent sitting.",
+    ],
+    caution: "Can feel intense for sensitive listeners.",
+    related: ["Darbari", "Bhairav"],
+  },
+  {
+    id: "bageshri",
+    name: "Bageshri",
+    system: "Hindustani",
+    planets: ["Venus", "Moon"],
+    goals: ["love", "mind", "sleep"],
+    rasas: ["romance", "calm", "grief"],
+    energy: "cooling",
+    movement: "gentle",
+    time: "Night",
+    laya: "Slow to Madhya",
+    instrument: ["vocal", "flute", "sitar"],
+    confidence: 84,
+    why: "Bageshri softens the emotional body and supports intimacy, forgiveness and tenderness.",
+    protocol: [
+      "Listen in the evening.",
+      "Use for relationship softness, not confrontation.",
+      "Pair with gratitude reflection.",
+    ],
+    related: ["Bhimpalasi", "Kafi"],
+  },
+  {
+    id: "kafi",
+    name: "Kafi",
+    system: "Hindustani",
+    planets: ["Venus", "Moon", "Mercury"],
+    goals: ["love", "mind", "travel"],
+    rasas: ["joy", "romance", "calm"],
+    energy: "balancing",
+    movement: "flowing",
+    time: "Evening / Spring mood",
+    laya: "Madhya",
+    instrument: ["flute", "vocal", "sitar"],
+    confidence: 82,
+    why: "Kafi is earthy, human and expressive. It supports social warmth, emotional flexibility and natural joy.",
+    protocol: [
+      "Use after work or during relaxed evenings.",
+      "Good for social openness and emotional ease.",
+      "Avoid if you need strict focus.",
+    ],
+    related: ["Bageshri", "Desh"],
+  },
+  {
+    id: "desh",
+    name: "Desh",
+    system: "Hindustani",
+    planets: ["Moon", "Mercury", "Venus"],
+    goals: ["travel", "love", "mind"],
+    rasas: ["joy", "calm", "romance"],
+    energy: "uplifting",
+    movement: "flowing",
+    time: "Evening / Monsoon",
+    laya: "Madhya",
+    instrument: ["flute", "vocal", "sitar"],
+    confidence: 81,
+    why: "Desh brings freshness, memory and movement. It is useful for travel mood, nostalgia and heart opening.",
+    protocol: [
+      "Listen before travel or after emotional heaviness.",
+      "Good for lightness and gentle motivation.",
+      "Use medium volume.",
+    ],
+    related: ["Kafi", "Bhoopali"],
+  },
+  {
+    id: "todi",
+    name: "Todi",
+    system: "Hindustani",
+    planets: ["Saturn", "Mercury", "Ketu"],
+    goals: ["study", "spiritual", "mind"],
+    rasas: ["focus", "devotion", "calm"],
+    energy: "grounding",
+    movement: "intense",
+    time: "Late Morning",
+    laya: "Slow",
+    instrument: ["vocal", "sitar", "tanpura"],
+    confidence: 80,
+    why: "Todi is serious and introspective. It supports deep thought, discipline and inner examination.",
+    protocol: [
+      "Use for serious study or sadhana.",
+      "Keep sessions short at first.",
+      "Avoid if you need lightness.",
+    ],
+    caution: "May feel too serious for some moods.",
+    related: ["Bhairav", "Marwa"],
+  },
+  {
+    id: "marwa",
+    name: "Marwa",
+    system: "Hindustani",
+    planets: ["Sun", "Saturn", "Rahu"],
+    goals: ["career", "study", "spiritual"],
+    rasas: ["focus", "confidence"],
+    energy: "warming",
+    movement: "intense",
+    time: "Sunset",
+    laya: "Madhya",
+    instrument: ["vocal", "sitar", "sarod"],
+    confidence: 78,
+    why: "Marwa creates urgency and alertness. It can sharpen focus but may feel tense for anxious listeners.",
+    protocol: [
+      "Use before focused work, not before sleep.",
+      "Avoid if already stressed.",
+      "Keep volume low.",
+    ],
+    caution: "Can increase restlessness.",
+    avoidWhen: ["Anxiety", "Insomnia"],
+    related: ["Todi", "Puriya"],
+  },
+  {
+    id: "puriya",
+    name: "Puriya",
+    system: "Hindustani",
+    planets: ["Mercury", "Saturn", "Sun"],
+    goals: ["study", "career"],
+    rasas: ["focus", "confidence"],
+    energy: "balancing",
+    movement: "flowing",
+    time: "Evening",
+    laya: "Madhya",
+    instrument: ["vocal", "sitar"],
+    confidence: 79,
+    why: "Puriya supports concentration, subtle perception and evening productivity.",
+    protocol: [
+      "Use for focused evening work.",
+      "Best with low distraction environment.",
+      "Avoid fast versions if stressed.",
+    ],
+    related: ["Marwa", "Yaman"],
+  },
+  {
+    id: "hansdhwani-light",
+    name: "Hamsadhwani Light",
+    system: "Hybrid",
+    planets: ["Mercury", "Jupiter"],
+    goals: ["study", "career", "travel"],
+    rasas: ["joy", "focus"],
+    energy: "uplifting",
+    movement: "expansive",
+    time: "Morning",
+    laya: "Madhya",
+    instrument: ["flute", "veena", "vocal"],
+    confidence: 78,
+    why: "A lighter Hamsadhwani protocol supports quick activation, clear beginnings and optimism.",
+    protocol: [
+      "Listen for 7–10 minutes before a task.",
+      "Use when starting something new.",
+      "Pair with intention setting.",
+    ],
+    related: ["Hamsadhwani", "Bhoopali"],
+  },
+  {
+    id: "shankarabharanam",
+    name: "Shankarabharanam",
+    system: "Carnatic",
+    planets: ["Jupiter", "Sun", "Venus"],
+    goals: ["study", "career", "spiritual"],
+    rasas: ["joy", "confidence", "devotion"],
+    energy: "uplifting",
+    movement: "expansive",
+    time: "Day",
+    laya: "Madhya",
+    instrument: ["veena", "vocal", "flute"],
+    confidence: 80,
+    why: "Shankarabharanam is expansive and clear. It supports wisdom, confidence and auspicious learning.",
+    protocol: [
+      "Use before study or teaching.",
+      "Good for big-picture thinking.",
+      "Keep session clean and steady.",
+    ],
+    related: ["Yaman", "Kalyani"],
+  },
+  {
+    id: "kalyani",
+    name: "Kalyani",
+    system: "Carnatic",
+    planets: ["Jupiter", "Venus", "Moon"],
+    goals: ["spiritual", "study", "love"],
+    rasas: ["devotion", "joy", "romance"],
+    energy: "uplifting",
+    movement: "expansive",
+    time: "Evening",
+    laya: "Madhya",
+    instrument: ["veena", "vocal", "flute"],
+    confidence: 82,
+    why: "Kalyani is auspicious, devotional and elegant. It supports grace, blessings and refined emotional expression.",
+    protocol: [
+      "Listen after sunset or during prayer.",
+      "Good for gratitude and devotion.",
+      "Use gentle versions for emotional balance.",
+    ],
+    related: ["Yaman", "Shankarabharanam"],
+  },
+  {
+    id: "hindolam",
+    name: "Hindolam",
+    system: "Carnatic",
+    planets: ["Moon", "Ketu", "Venus"],
+    goals: ["sleep", "spiritual", "mind"],
+    rasas: ["calm", "devotion", "grief"],
+    energy: "cooling",
+    movement: "gentle",
+    time: "Night",
+    laya: "Slow",
+    instrument: ["veena", "flute", "vocal"],
+    confidence: 83,
+    why: "Hindolam is inward and soothing. It supports rest, devotional calm and emotional cooling.",
+    protocol: [
+      "Listen before sleep at low volume.",
+      "Avoid lyrical overstimulation.",
+      "End with silence.",
+    ],
+    related: ["Malkauns", "Bageshri"],
+  },
+  {
+    id: "mohanam",
+    name: "Mohanam",
+    system: "Carnatic",
+    planets: ["Jupiter", "Mercury", "Moon"],
+    goals: ["study", "mind", "travel"],
+    rasas: ["joy", "focus", "calm"],
+    energy: "uplifting",
+    movement: "flowing",
+    time: "Morning / Evening",
+    laya: "Madhya",
+    instrument: ["flute", "veena", "vocal"],
+    confidence: 82,
+    why: "Mohanam is clean and optimistic. It supports learning, clarity and emotional freshness.",
+    protocol: [
+      "Listen before study or travel.",
+      "Use for light motivation.",
+      "Good for children and beginners.",
+    ],
+    related: ["Bhoopali", "Hamsadhwani"],
+  },
+  {
+    id: "abhogi",
+    name: "Abhogi",
+    system: "Carnatic",
+    planets: ["Mercury", "Moon"],
+    goals: ["study", "mind"],
+    rasas: ["focus", "calm"],
+    energy: "balancing",
+    movement: "gentle",
+    time: "Evening",
+    laya: "Madhya",
+    instrument: ["veena", "flute", "vocal"],
+    confidence: 77,
+    why: "Abhogi supports clean focus and gentle introspection without becoming too heavy.",
+    protocol: [
+      "Use for study or writing.",
+      "Keep sessions 10–15 minutes.",
+      "Good after distractions.",
+    ],
+    related: ["Mohanam", "Hamsadhwani"],
+  },
+  {
+    id: "charukeshi",
+    name: "Charukeshi",
+    system: "Carnatic",
+    planets: ["Venus", "Moon", "Jupiter"],
+    goals: ["love", "mind", "spiritual"],
+    rasas: ["romance", "grief", "devotion"],
+    energy: "balancing",
+    movement: "flowing",
+    time: "Evening",
+    laya: "Madhya",
+    instrument: ["vocal", "veena", "flute"],
+    confidence: 80,
+    why: "Charukeshi combines emotion and devotion. It can soften the heart and support compassionate reflection.",
+    protocol: [
+      "Use during emotional reflection.",
+      "Avoid during acute sadness if it feels too deep.",
+      "Pair with gratitude or forgiveness.",
+    ],
+    caution: "May open emotional sensitivity.",
+    related: ["Bageshri", "Kalyani"],
+  },
+  {
+    id: "revati",
+    name: "Revati",
+    system: "Carnatic",
+    planets: ["Ketu", "Jupiter", "Moon"],
+    goals: ["spiritual", "sleep", "mind"],
+    rasas: ["devotion", "calm"],
+    energy: "cooling",
+    movement: "still",
+    time: "Night / Meditation",
+    laya: "Slow",
+    instrument: ["flute", "veena", "tanpura"],
+    confidence: 83,
+    why: "Revati is meditative and spacious. It supports surrender, mantra and peaceful closure of the day.",
+    protocol: [
+      "Use before meditation or sleep.",
+      "Keep lights low.",
+      "Good with breath awareness.",
+    ],
+    related: ["Hindolam", "Malkauns"],
+  },
+  {
+    id: "saraswati",
+    name: "Saraswati",
+    system: "Carnatic",
+    planets: ["Mercury", "Jupiter"],
+    goals: ["study", "spiritual", "career"],
+    rasas: ["focus", "devotion", "joy"],
+    energy: "uplifting",
+    movement: "flowing",
+    time: "Morning",
+    laya: "Madhya",
+    instrument: ["veena", "vocal"],
+    confidence: 79,
+    why: "Saraswati supports learning, knowledge, speech and devotional intelligence.",
+    protocol: [
+      "Use before study, writing or teaching.",
+      "Pair with note-taking.",
+      "Good for Mercury-Jupiter themes.",
+    ],
+    related: ["Hamsadhwani", "Mohanam"],
+  },
+  {
+    id: "megh",
+    name: "Megh",
+    system: "Hindustani",
+    planets: ["Moon", "Jupiter"],
+    goals: ["mind", "travel", "sleep"],
+    rasas: ["calm", "joy"],
+    energy: "cooling",
+    movement: "flowing",
+    time: "Monsoon / Evening",
+    laya: "Madhya",
+    instrument: ["flute", "vocal", "sitar"],
+    confidence: 76,
+    why: "Megh brings cooling and spaciousness. It can help when the system feels overheated or emotionally dry.",
+    protocol: [
+      "Use in evening or after heat/stress.",
+      "Good with hydration and rest.",
+      "Avoid very fast versions.",
+    ],
+    related: ["Desh", "Kafi"],
+  },
+  {
+    id: "piloo",
+    name: "Piloo",
+    system: "Hindustani",
+    planets: ["Venus", "Mercury", "Moon"],
+    goals: ["love", "mind", "travel"],
+    rasas: ["romance", "joy", "calm"],
+    energy: "balancing",
+    movement: "flowing",
+    time: "Light classical / Evening",
+    laya: "Madhya",
+    instrument: ["vocal", "sitar", "flute"],
+    confidence: 75,
+    why: "Piloo is light, expressive and human. It supports emotional ease and social warmth.",
+    protocol: [
+      "Use after work or social stress.",
+      "Good for softening speech.",
+      "Avoid if you need strict discipline.",
+    ],
+    related: ["Kafi", "Desh"],
+  },
+  {
+    id: "tilak-kamod",
+    name: "Tilak Kamod",
+    system: "Hindustani",
+    planets: ["Venus", "Jupiter", "Moon"],
+    goals: ["love", "money", "mind"],
+    rasas: ["joy", "romance", "calm"],
+    energy: "uplifting",
+    movement: "flowing",
+    time: "Night",
+    laya: "Madhya",
+    instrument: ["vocal", "sitar", "flute"],
+    confidence: 76,
+    why: "Tilak Kamod carries charm, sweetness and graceful joy. It supports pleasant mood and relational warmth.",
+    protocol: [
+      "Use in evening for lightness.",
+      "Good after conflict or stress.",
+      "Pair with gratitude practice.",
+    ],
+    related: ["Khamaj", "Piloo"],
+  },
+  {
+    id: "khamaj",
+    name: "Khamaj",
+    system: "Hindustani",
+    planets: ["Venus", "Moon"],
+    goals: ["love", "money", "mind"],
+    rasas: ["romance", "joy"],
+    energy: "warming",
+    movement: "flowing",
+    time: "Night",
+    laya: "Madhya",
+    instrument: ["vocal", "sitar", "flute"],
+    confidence: 75,
+    why: "Khamaj is graceful and affectionate. It supports Venusian softness and social comfort.",
+    protocol: [
+      "Listen when you want softness and warmth.",
+      "Good for relationship harmony.",
+      "Avoid if attachment feels excessive.",
+    ],
+    related: ["Tilak Kamod", "Bageshri"],
+  },
+  {
+    id: "jog",
+    name: "Jog",
+    system: "Hindustani",
+    planets: ["Moon", "Rahu", "Venus"],
+    goals: ["mind", "love", "sleep"],
+    rasas: ["calm", "romance", "grief"],
+    energy: "balancing",
+    movement: "gentle",
+    time: "Night",
+    laya: "Madhya",
+    instrument: ["vocal", "sitar", "flute"],
+    confidence: 75,
+    why: "Jog has a dreamy inward quality. It supports emotional cooling and imaginative release.",
+    protocol: [
+      "Use at night with low volume.",
+      "Good for creative reflection.",
+      "Avoid if it increases overthinking.",
+    ],
+    caution: "Can make sensitive minds more dreamy.",
+    related: ["Bageshri", "Kafi"],
+  },
+  {
+    id: "brindavani-sarang",
+    name: "Brindavani Sarang",
+    system: "Hindustani",
+    planets: ["Sun", "Jupiter", "Moon"],
+    goals: ["career", "travel", "mind"],
+    rasas: ["joy", "confidence", "calm"],
+    energy: "uplifting",
+    movement: "expansive",
+    time: "Afternoon",
+    laya: "Madhya",
+    instrument: ["flute", "vocal", "sitar"],
+    confidence: 76,
+    why: "Brindavani Sarang gives brightness and openness. It supports mobility, confidence and positive mood.",
+    protocol: [
+      "Use during afternoon slump.",
+      "Good before meetings or travel.",
+      "Keep listening light.",
+    ],
+    related: ["Desh", "Bhoopali"],
+  },
+];
+
+const PLANET_GOAL: Record<string, GoalKey[]> = {
+  Sun: ["career", "confidence", "spiritual"].filter(Boolean) as GoalKey[],
+  Moon: ["mind", "sleep", "love"],
+  Mars: ["career", "travel"],
+  Mercury: ["study", "career", "travel"],
+  Jupiter: ["study", "spiritual", "money"],
+  Venus: ["love", "money", "mind"],
+  Saturn: ["career", "mind", "spiritual"],
+  Rahu: ["career", "travel", "mind"],
+  Ketu: ["spiritual", "sleep", "mind"],
+};
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function getStatus(score: number): AstroSoundResult["status"] {
+  if (score >= 86) return "Excellent";
+  if (score >= 72) return "Good";
+  if (score >= 55) return "Balanced";
+  return "Sensitive";
+}
+
+function planetPressure(chart: ChartData | null, planet: string) {
+  if (!chart) return 0;
+  const p = chart.planets?.[planet];
+  if (!p) return 0;
+
+  let score = 0;
+
+  if ([6, 8, 12].includes(p.house)) score += 8;
+  if (p.retrograde) score += 4;
+  if (String(p.status ?? "").toLowerCase().includes("malefic")) score += 6;
+
+  return score;
+}
+
+function goalPlanetSupport(chart: ChartData | null, raga: RagaItem, goal: GoalKey) {
+  if (!chart) return 0;
+
+  let score = 0;
+
+  for (const planet of raga.planets) {
+    const p = chart.planets?.[planet];
+    if (!p) continue;
+
+    if ([1, 5, 9, 10, 11].includes(p.house)) score += 7;
+    if ([6, 8, 12].includes(p.house)) score -= 4;
+    if (p.retrograde) score -= 2;
+
+    const planetGoals = PLANET_GOAL[planet] ?? [];
+    if (planetGoals.includes(goal)) score += 5;
+  }
+
+  return score;
+}
+
+function memoryAdjustment(memory: AstroSoundMemory | undefined, ragaName: string) {
+  const item = memory?.ragas?.[ragaName];
+  if (!item) return 0;
+  return item.good * 3 - item.heavy * 4 - item.skip * 6;
+}
+
+function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
+  const reasons: string[] = [];
+  let score = raga.confidence;
+
+  if (raga.goals.includes(input.goal)) {
+    score += 18;
+    reasons.push(`Matches your goal: ${GOAL_META[input.goal].label}.`);
+  }
+
+  if (input.emotion !== "auto" && raga.rasas.includes(input.emotion)) {
+    score += 13;
+    reasons.push(`Supports current emotional need: ${input.emotion}.`);
+  }
+
+  if (input.voice !== "any" && raga.instrument.includes(input.voice)) {
+    score += 8;
+    reasons.push(`Works well with preferred sound: ${input.voice}.`);
+  }
+
+  if (input.intensity === "soft" && ["cooling", "grounding", "balancing"].includes(raga.energy)) {
+    score += 5;
+    reasons.push("Soft intensity selected, so calmer ragas are preferred.");
+  }
+
+  if (input.intensity === "strong" && ["uplifting", "warming"].includes(raga.energy)) {
+    score += 5;
+    reasons.push("Strong intensity selected, so energizing ragas are preferred.");
+  }
+
+  if (input.mode !== "classical") {
+    const support = goalPlanetSupport(input.chart, raga, input.goal);
+    score += support;
+
+    if (support > 0) {
+      reasons.push("Natal chart support improves this recommendation.");
+    }
+
+    const pressure = raga.planets.reduce((sum, planet) => sum + planetPressure(input.chart, planet), 0);
+    if (pressure > 12) {
+      score -= 5;
+      reasons.push("Some planetary pressure is present, so use gently.");
+    }
+  }
+
+  score += memoryAdjustment(input.memory, raga.name);
+
+  if (input.memory?.ragas?.[raga.name]?.good) {
+    reasons.push("Your past feedback favours this raga.");
+  }
+
+  if (input.memory?.ragas?.[raga.name]?.heavy) {
+    reasons.push("Past feedback says this may feel heavy, so use softly.");
+  }
+
+  score = clamp(Math.round(score), 0, 100);
+
+  if (!reasons.length) {
+    reasons.push("Balanced match based on raga mood, goal and classical usage.");
+  }
+
+  return {
+    raga,
+    score,
+    reasons,
+  };
+}
+
+function buildNavarasa(result: RagaRecommendation[]): Record<string, number> {
+  const rasaScores: Record<string, number> = {
+    calm: 0,
+    focus: 0,
+    joy: 0,
+    devotion: 0,
+    confidence: 0,
+    grief: 0,
+    romance: 0,
+  };
+
+  for (const rec of result.slice(0, 5)) {
+    for (const rasa of rec.raga.rasas) {
+      if (rasa === "auto") continue;
+      rasaScores[rasa] = clamp(rasaScores[rasa] + Math.round(rec.score / 5), 0, 100);
+    }
+  }
+
+  return rasaScores;
+}
+
+export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
+  const scored = RAGA_DB
+    .map((raga) => scoreRaga(input, raga))
+    .sort((a, b) => b.score - a.score);
+
+  const primary = scored[0];
+  const alternatives = scored.slice(1, 4);
+  const avoid = scored
+    .filter((item) => item.raga.caution || item.score < 58)
+    .slice(-3)
+    .reverse();
+
+  const score = primary?.score ?? 60;
+  const status = getStatus(score);
+  const navarasa = buildNavarasa(scored);
+
+  const protocol = [
+    ...primary.raga.protocol,
+    `Best time: ${primary.raga.time}.`,
+    `Suggested laya: ${primary.raga.laya}.`,
+    "Keep it guidance-oriented. Stop if the sound feels uncomfortable.",
+  ];
+
+  const cautions = [
+    primary.raga.caution,
+    ...avoid.map((item) => item.raga.caution),
+  ].filter(Boolean) as string[];
+
+  const remedies = [
+    "Listen with low to medium volume.",
+    "Keep phone notifications off during the session.",
+    "End with 1–2 minutes of silence.",
+    "Use this as supportive guidance, not medical treatment.",
+  ];
+
+  const reasons = [
+    ...primary.reasons,
+    `Primary planets: ${primary.raga.planets.join(", ")}.`,
+    `Energy profile: ${primary.raga.energy}, movement: ${primary.raga.movement}.`,
+  ];
+
+  const summary = `${primary.raga.name} is recommended for ${GOAL_META[input.goal].label}. It matches your selected mood, preference and available chart signals with a ${score}/100 Astro Sound score.`;
+
+  const aiContext = [
+    `Astro Sound Recommendation`,
+    `Goal: ${input.goal}`,
+    `Emotion: ${input.emotion}`,
+    `Voice: ${input.voice}`,
+    `Intensity: ${input.intensity}`,
+    `Mode: ${input.mode}`,
+    `Primary Raga: ${primary.raga.name}`,
+    `Score: ${score}`,
+    `Status: ${status}`,
+    `Why: ${primary.raga.why}`,
+    `Protocol: ${protocol.join(" ")}`,
+    `Cautions: ${cautions.join(" ") || "None"}`,
+  ].join("\n");
+
+  return {
+    title: `Astro Sound: ${primary.raga.name}`,
+    summary,
+    score,
+    status,
+    primary,
+    alternatives,
+    avoid,
+    navarasa,
+    protocol,
+    reasons,
+    cautions,
+    remedies,
+    aiContext,
+  };
+}
+
+export function buildReportText(result: AstroSoundResult): string {
+  return [
+    result.title,
+    "",
+    result.summary,
+    "",
+    "Primary Recommendation",
+    `${result.primary.raga.name} (${result.primary.raga.system}) — Score ${result.primary.score}/100`,
+    result.primary.raga.why,
+    "",
+    "Protocol",
+    ...result.protocol.map((item) => `- ${item}`),
+    "",
+    "Why this works",
+    ...result.reasons.map((item) => `- ${item}`),
+    "",
+    "Alternatives",
+    ...result.alternatives.map((item) => `- ${item.raga.name}: ${item.score}/100`),
+    "",
+    "Cautions",
+    ...(result.cautions.length ? result.cautions.map((item) => `- ${item}`) : ["- No major caution."]),
+    "",
+    "Safe Note",
+    "Music guidance only — not medical treatment. For serious mental health or medical concerns, consult a qualified professional.",
+  ].join("\n");
+}
+
+export interface RagaFeedback {
+  good: number;
+  heavy: number;
+  skip: number;
+}
+
+export interface AstroSoundMemory {
+  ragas: Record<string, RagaFeedback>;
+  lastRaga: string;
+  lastGoal: string;
+  lastFeedback: "good" | "heavy" | "skip" | "";
+  updatedAt: string;
+}
+
+export interface AstroSoundSettings {
+  goal: GoalKey;
+  mode: ModeKey;
+  emotion: EmotionKey;
+  voice: VoiceKey;
+  intensity: IntensityKey;
+}
+
+interface AstroSoundStore {
+  settings: AstroSoundSettings;
+  setSettings: (s: Partial<AstroSoundSettings>) => void;
+  result: AstroSoundResult | null;
+  setResult: (r: AstroSoundResult | null) => void;
+  loading: boolean;
+  setLoading: (v: boolean) => void;
+  memory: AstroSoundMemory;
+  recordFeedback: (kind: "good" | "heavy" | "skip", ragaName: string, goal: GoalKey) => void;
+  resetMemory: () => void;
+  lastReportText: string;
+  setLastReportText: (t: string) => void;
+}
+
+const ASTRO_SOUND_STORAGE_KEY = "astrolife-astrosound-memory-v1";
+
+const DEFAULT_SETTINGS: AstroSoundSettings = {
+  goal: "mind",
+  mode: "hybrid",
+  emotion: "auto",
+  voice: "any",
+  intensity: "medium",
+};
+
+const DEFAULT_MEMORY: AstroSoundMemory = {
+  ragas: {},
+  lastRaga: "",
+  lastGoal: "",
+  lastFeedback: "",
+  updatedAt: "",
+};
+
+function readAstroSoundStorage(): {
+  settings: AstroSoundSettings;
+  memory: AstroSoundMemory;
+} {
+  if (typeof window === "undefined") {
+    return { settings: DEFAULT_SETTINGS, memory: DEFAULT_MEMORY };
+  }
+
+  try {
+    const raw = window.localStorage.getItem(ASTRO_SOUND_STORAGE_KEY);
+    if (!raw) return { settings: DEFAULT_SETTINGS, memory: DEFAULT_MEMORY };
+
+    const parsed = JSON.parse(raw);
+
+    return {
+      settings: { ...DEFAULT_SETTINGS, ...(parsed?.settings ?? {}) },
+      memory: {
+        ...DEFAULT_MEMORY,
+        ...(parsed?.memory ?? {}),
+        ragas: parsed?.memory?.ragas ?? {},
+      },
+    };
+  } catch {
+    return { settings: DEFAULT_SETTINGS, memory: DEFAULT_MEMORY };
+  }
+}
+
+function writeAstroSoundStorage(settings: AstroSoundSettings, memory: AstroSoundMemory) {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(
+      ASTRO_SOUND_STORAGE_KEY,
+      JSON.stringify({ settings, memory })
+    );
+  } catch {
+    // localStorage can fail in private mode. Ignore safely.
+  }
+}
+
+export function useAstroSoundStore(): AstroSoundStore {
+  const [settings, setSettingsState] = useState<AstroSoundSettings>(() => {
+    return readAstroSoundStorage().settings;
+  });
+
+  const [memory, setMemory] = useState<AstroSoundMemory>(() => {
+    return readAstroSoundStorage().memory;
+  });
+
+  const [result, setResult] = useState<AstroSoundResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [lastReportText, setLastReportText] = useState("");
+
+  useEffect(() => {
+    writeAstroSoundStorage(settings, memory);
+  }, [settings, memory]);
+
+  const setSettings = (s: Partial<AstroSoundSettings>) => {
+    setSettingsState((prev) => ({ ...prev, ...s }));
+  };
+
+  const recordFeedback = (
+    kind: "good" | "heavy" | "skip",
+    ragaName: string,
+    goal: GoalKey
+  ) => {
+    setMemory((prev) => {
+      const ragas = { ...prev.ragas };
+
+      if (!ragas[ragaName]) {
+        ragas[ragaName] = { good: 0, heavy: 0, skip: 0 };
+      }
+
+      ragas[ragaName] = {
+        ...ragas[ragaName],
+        [kind]: ragas[ragaName][kind] + 1,
+      };
+
+      return {
+        ragas,
+        lastRaga: ragaName,
+        lastGoal: goal,
+        lastFeedback: kind,
+        updatedAt: new Date().toISOString(),
+      };
+    });
+  };
+
+  const resetMemory = () => {
+    setMemory(DEFAULT_MEMORY);
+  };
+
+  return {
+    settings,
+    setSettings,
+    result,
+    setResult,
+    loading,
+    setLoading,
+    memory,
+    recordFeedback,
+    resetMemory,
+    lastReportText,
+    setLastReportText,
+  };
+}
+
+export function getMemorySummary(memory: AstroSoundMemory): {
+  fav: string[];
+  last: string;
+  feedback: string;
+  feedbackScore: (name: string) => number;
+} {
+  const entries = Object.entries(memory.ragas);
+
+  entries.sort(
+    ([, a], [, b]) =>
+      b.good - b.heavy - b.skip - (a.good - a.heavy - a.skip)
+  );
+
+  const fav = entries.slice(0, 3).map(([name]) => name);
+
+  return {
+    fav,
+    last: memory.lastRaga || "—",
+    feedback: memory.lastFeedback || "—",
+    feedbackScore: (name: string) => {
+      const r = memory.ragas[name];
+      if (!r) return 0;
+      return r.good - r.heavy - r.skip;
+    },
+  };
+}

@@ -231,7 +231,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const astroSoundRequestBody = await req.json();
     const {
       messages,
       agentId = "general",
@@ -239,14 +238,17 @@ export async function POST(req: NextRequest) {
       transitContext,
       dailyFeedContext,
       languageMode = "hinglish",
-    } = astroSoundRequestBody;
+    } = await req.json();
 
-    const astroSoundSignalInput = JSON.stringify({
-      agentId,
-      languageMode,
-      latestUserMessage: [...messages].reverse().find((m: { role: string; content: string }) => m.role === "user")?.content ?? "",
-    });
-    const astroSoundChatContext = buildAstroSoundChatContext(astroSoundSignalInput);
+    const astroSoundChatContext = buildAstroSoundChatContext(
+      typeof body !== "undefined"
+        ? JSON.stringify(body)
+        : typeof json !== "undefined"
+          ? JSON.stringify(json)
+          : typeof payload !== "undefined"
+            ? JSON.stringify(payload)
+            : ""
+    );
 
     const agent = AGENTS[agentId] || AGENTS.general;
 

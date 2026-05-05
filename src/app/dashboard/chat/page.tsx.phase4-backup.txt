@@ -56,8 +56,6 @@ const SUGGESTED = [
   "What remedies do I need?",
   "Which raga suits my chart today?",
   "Suggest a sound remedy for sleep and calm mind?",
-  "What Astro Sound protocol should I follow for focus?",
-  "Which raga is good for my current emotional state?",
 ];
 const MOBILE_NAV = [
   { icon: "🏠", label: "Home", href: "/dashboard" },

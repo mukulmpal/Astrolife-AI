@@ -73,6 +73,7 @@ declare global {
 export default function UpgradePage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const supabase = createClient();
   const router = useRouter();
 
@@ -89,6 +90,7 @@ export default function UpgradePage() {
 
   const handleUpgrade = async (planId: string) => {
     if (planId === "free") return;
+    setStatusMessage(null);
     setLoading(planId);
 
     try {
@@ -98,7 +100,7 @@ export default function UpgradePage() {
 
       // Load Razorpay script
       const loaded = await loadRazorpay();
-      if (!loaded) { alert("Razorpay load nahi hua. Please try again."); return; }
+      if (!loaded) { setStatusMessage("Payment window load nahi hua. Please try again."); return; }
 
       // Create order
       const res = await fetch("/api/payment/create-order", {
@@ -144,10 +146,15 @@ export default function UpgradePage() {
           if (result.success) {
             setSuccess(true);
             setTimeout(() => window.location.href = "/dashboard", 2500);
+          } else {
+            setStatusMessage("Payment verify nahi ho paya. Agar amount deduct hua hai to support se contact karein.");
           }
         },
         modal: {
-          ondismiss: () => setLoading(null),
+          ondismiss: () => {
+            setStatusMessage("Payment cancel kiya gaya. Aap jab chahein dubara try kar sakte hain.");
+            setLoading(null);
+          },
         },
       };
 
@@ -156,7 +163,7 @@ export default function UpgradePage() {
 
     } catch (error) {
       console.error("Payment error:", error);
-      alert("Kuch error aa gaya. Please try again.");
+      setStatusMessage("Kuch error aa gaya. Please try again.");
     }
     setLoading(null);
   };
@@ -221,7 +228,7 @@ export default function UpgradePage() {
         .plan-features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
         .plan-feature{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#c8c0a8;line-height:1.5}
         .feat-dot{color:#c8a030;font-size:10px;margin-top:3px;flex-shrink:0}
-        .plan-btn{width:100%;padding:15px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.25s;font-family:'Outfit',sans-serif;border:none;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:8px}
+        .plan-btn{width:100%;padding:15px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.25s;font-family:'Outfit',sans-serif;border:none;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px}
         .btn-gold{background:linear-gradient(135deg,#c8a030,#a07820);color:#060410}
         .btn-gold:hover:not(:disabled){box-shadow:0 10px 28px rgba(200,160,48,0.4);transform:translateY(-2px);filter:brightness(1.08)}
         .btn-outline{background:transparent;border:1px solid #1c1840 !important;color:#605890;cursor:default}
@@ -251,11 +258,26 @@ export default function UpgradePage() {
         .guarantee-icon{font-size:40px;margin-bottom:12px}
         .guarantee-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:#f0e8d0;margin-bottom:8px}
         .guarantee-text{font-size:13px;color:#605890;line-height:1.7}
+        .value-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:-24px 0 44px}
+        .value-card{background:#0d0a22;border:1px solid #1c1840;border-radius:14px;padding:14px 16px}
+        .value-k{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#605890;margin-bottom:6px}
+        .value-v{font-size:13px;color:#c8c0a8;line-height:1.5}
+        .status-banner{margin:0 auto 20px;max-width:780px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);padding:10px 14px;border-radius:10px;color:#fcd34d;font-size:13px}
+        .mobile-cta{display:none}
 
         @media(max-width:900px){
           .plans-grid{grid-template-columns:1fr}
           .compare{display:none}
           .page{padding:32px 20px}
+          .value-strip{grid-template-columns:1fr}
+          .page-title{font-size:42px}
+          .page-sub{font-size:14px;margin-bottom:28px}
+          .plan{padding:24px 20px;border-radius:16px}
+          .plan-price{font-size:44px}
+          .plan-feature{font-size:13px}
+          .faq-item{padding:16px}
+          .mobile-cta{display:block;position:sticky;bottom:12px;z-index:20;padding-top:10px}
+          .mobile-cta .plan-btn{box-shadow:0 8px 30px rgba(200,160,48,0.35)}
         }
       `}</style>
 
@@ -269,6 +291,22 @@ export default function UpgradePage() {
           Start free. Upgrade when the stars align.<br />
           Testing mode stays open for now. Billing enforcement can be turned on at launch.
         </p>
+        {statusMessage && <div className="status-banner">{statusMessage}</div>}
+
+        <div className="value-strip">
+          <div className="value-card">
+            <div className="value-k">Why Premium</div>
+            <div className="value-v">Unlimited AI chat + all engines for serious guidance.</div>
+          </div>
+          <div className="value-card">
+            <div className="value-k">Clear Difference</div>
+            <div className="value-v">Free is trial. Premium is full workflow: transits, radar, report, remedies.</div>
+          </div>
+          <div className="value-card">
+            <div className="value-k">Activation</div>
+            <div className="value-v">Instant unlock after payment verification, no waiting window.</div>
+          </div>
+        </div>
 
         {/* PLANS */}
         <div className="plans-grid">
@@ -296,6 +334,15 @@ export default function UpgradePage() {
               </button>
             </div>
           ))}
+        </div>
+        <div className="mobile-cta">
+          <button
+            className="plan-btn btn-gold"
+            onClick={() => handleUpgrade("premium")}
+            disabled={loading === "premium"}
+          >
+            {loading === "premium" ? "⟳ Processing..." : "Upgrade to Premium"}
+          </button>
         </div>
 
         {/* GUARANTEE */}

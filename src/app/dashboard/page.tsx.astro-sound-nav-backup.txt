@@ -27,13 +27,13 @@ const NAV_ENGINES = [
   { icon:"🏠", label:"Dashboard",  href:"/dashboard" },
   { icon:"🔯", label:"My Charts",  href:"/dashboard/kundli" },
   { icon:"🪐", label:"Transits",   href:"/dashboard/transits" },
-  { icon:"🎵", label:"Astro Sound", href:"/dashboard/astro-sound" },
   { icon:"📡", label:"Event Radar", href:"/dashboard/event-radar" },
   { icon:"📅", label:"Panchang", href:"/dashboard/panchang" },
   { icon:"📄", label:"Report", href:"/dashboard/report" },
   { icon:"🤖", label:"AI Chat",    href:"/dashboard/chat" },
   { icon:"📈", label:"Timeline",   href:"/dashboard/destiny" },
-  { icon:"🏠", label:"Vastu",         href:"/dashboard/vastu" },];
+  { icon:"🏠", label:"Vastu",         href:"/dashboard/vastu" },
+];
 
 const NAV_ACCOUNT = [
   { icon:"👤", label:"Profile",  href:"/dashboard/profile" },
