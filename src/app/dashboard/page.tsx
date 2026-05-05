@@ -29,7 +29,8 @@ const NAV_MAIN = [
 ];
 
 const NAV_ENGINES = [
-  { icon:"🧠", label:"Psychology",    href:"/dashboard/chat" },
+  { icon:"🔢", label:"Numerology",    href:"/dashboard/numerology" },
+  { icon:"🧠", label:"Psychology",    href:"/dashboard/psychology" },
   { icon:"🎼", label:"Sound Therapy", href:"/dashboard/chat" },
   { icon:"👨‍👩‍👧", label:"Family Karma",  href:"/dashboard/chat" },
   { icon:"💊", label:"Remedies",      href:"/dashboard/chat" },
