@@ -31,6 +31,7 @@ const NAV_MAIN = [
 const NAV_ENGINES = [
   { icon:"🔢", label:"Numerology",    href:"/dashboard/numerology" },
   { icon:"🧠", label:"Psychology",    href:"/dashboard/psychology" },
+  { icon:"💑", label:"Kundali Milan", href:"/dashboard/kundali-milan" },
   { icon:"🎼", label:"Sound Therapy", href:"/dashboard/chat" },
   { icon:"👨‍👩‍👧", label:"Family Karma",  href:"/dashboard/chat" },
   { icon:"💊", label:"Remedies",      href:"/dashboard/chat" },
@@ -325,9 +326,9 @@ export default function Dashboard() {
                 {[
                   { icon:"🔯", label:"Generate Kundli",  desc:"Create birth chart",    href:"/dashboard/kundli" },
                   { icon:"🤖", label:"AI Chat",          desc:"Talk to AI astrologer", href:"/dashboard/chat" },
-                  { icon:"📈", label:"Destiny Timeline", desc:"See your life arc",      href:"/dashboard/chat" },
-                  { icon:"🧠", label:"Psychology",       desc:"Mind & soul analysis",  href:"/dashboard/chat" },
-                  { icon:"🎼", label:"Sound Therapy",    desc:"Planetary frequencies", href:"/dashboard/chat" },
+                  { icon:"📈", label:"Destiny Timeline", desc:"See your life arc",      href:"/dashboard/destiny" },
+                  { icon:"🧠", label:"Psychology",       desc:"Mind & soul analysis",  href:"/dashboard/psychology" },
+                  { icon:"💑", label:"Kundali Milan",    desc:"36-point compatibility", href:"/dashboard/kundali-milan" },
                   { icon:"💎", label:"Upgrade",          desc:"Unlock all features",   href:"/dashboard/upgrade" },
                 ].map((a,i) => (
                   <a key={i} href={a.href} className="action-btn">
