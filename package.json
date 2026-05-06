@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "qa:phase1": "npm run lint && npm run build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

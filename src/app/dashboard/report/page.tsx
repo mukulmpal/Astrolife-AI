@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import { useEffect, useMemo, useState } from "react";
@@ -11,11 +10,30 @@ import {
   buildTransitEventRadarReportSection,
   buildDashaTimelineReportSection,
   buildFullPremiumReportSections,
-  buildAllYogasDoshasDetailedReportSections,
   ReportSection,
 } from "@/lib/report-data";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+
+type ReportPlanet = {
+  name?: string;
+  sign?: string;
+};
+
+type RawChartWithOptionalYogas = {
+  yogas?: unknown;
+  chart?: {
+    yogas?: unknown;
+  };
+};
+
+function asRawChart(input: unknown): unknown {
+  if (input && typeof input === "object" && "chart" in input) {
+    const maybeChart = (input as { chart?: unknown }).chart;
+    return maybeChart ?? input;
+  }
+  return input;
+}
 
 
 function ReportPersonalizedMeta({
@@ -120,7 +138,7 @@ const SIGN_ORDER = [
   "Pisces",
 ];
 
-function getPlanetsBySign(planets: any[]) {
+function getPlanetsBySign(planets: ReportPlanet[]) {
   const grouped: Record<string, string[]> = {};
 
   SIGN_ORDER.forEach((sign) => {
@@ -166,7 +184,7 @@ function PremiumChartBox({
 }: {
   title: string;
   subtitle: string;
-  planets: any[];
+  planets: ReportPlanet[];
 }) {
   const grouped = getPlanetsBySign(planets);
 
@@ -247,7 +265,7 @@ function PremiumChartPage({
   subtitle: string;
   description: string[];
   summary: string[];
-  planets: any[];
+  planets: ReportPlanet[];
 }) {
   return (
     <section className="report-page chart-report-page">
@@ -381,6 +399,11 @@ export default function PremiumReportPage() {
     const [ashtakavargaSection, setAshtakavargaSection] = useState<ReportSection | null>(null);
     const [transitRadarSection, setTransitRadarSection] = useState<ReportSection | null>(null);
     const [dashaSection, setDashaSection] = useState<ReportSection | null>(null);
+    const reloadLatestReport = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("cb", String(Date.now()));
+      window.location.href = url.toString();
+    };
     useEffect(() => {
         let cancelled = false;
       
@@ -388,8 +411,8 @@ export default function PremiumReportPage() {
           if (!chart) return;
       
           try {
-            const mod: any = await import("@/lib/astro-engine/yogas");
-            const rawChart: any = (chart as any)?.chart ?? chart;
+            const mod = (await import("@/lib/astro-engine/yogas")) as Record<string, unknown>;
+            const rawChart = asRawChart(chart);
       
             const possibleFunctionNames = [
               "calculateYogaReport",
@@ -402,15 +425,15 @@ export default function PremiumReportPage() {
               "detectDoshas",
             ];
       
-            let result: any = null;
+            let result: unknown = null;
       
             for (const functionName of possibleFunctionNames) {
               const fn = mod?.[functionName];
-      
+
               if (typeof fn !== "function") continue;
-      
+
               try {
-                result = await fn(rawChart);
+                result = await (fn as (payload: unknown) => unknown | Promise<unknown>)(rawChart);
                 if (result) break;
               } catch {
                 // Try next possible function name.
@@ -419,9 +442,9 @@ export default function PremiumReportPage() {
       
             const fallbackSource =
               result ??
-              (chart as any)?.yogas ??
-              (chart as any)?.chart?.yogas ??
-              (chart as any);
+              (chart as RawChartWithOptionalYogas | null | undefined)?.yogas ??
+              (chart as RawChartWithOptionalYogas | null | undefined)?.chart?.yogas ??
+              chart;
       
             if (!cancelled) {
               setYogasDoshasSection(buildYogasDoshasReportSection(fallbackSource));
@@ -445,7 +468,7 @@ export default function PremiumReportPage() {
       useEffect(() => {
         if (!chart) return;
 
-        const rawChart: any = (chart as any)?.chart ?? chart;
+        const rawChart = asRawChart(chart);
 
         setShadbalaSection(buildShadbalaReportSection(rawChart));
         setAshtakavargaSection(buildAshtakavargaReportSection(rawChart));
@@ -461,10 +484,6 @@ export default function PremiumReportPage() {
         return buildFullPremiumReportSections(chart);
       }, [chart]);
 
-      const allYogasDoshasDetailedSections = useMemo(() => {
-        return buildAllYogasDoshasDetailedReportSections(chart);
-      }, [chart]);
-      
       const reportSections = useMemo(() => {
         const injectedSections = [
           ...fullPremiumSections,
@@ -493,7 +512,6 @@ export default function PremiumReportPage() {
     }, [
         report.sections,
         fullPremiumSections,
-        allYogasDoshasDetailedSections,
         yogasDoshasSection,
         shadbalaSection,
         ashtakavargaSection,
@@ -524,6 +542,9 @@ export default function PremiumReportPage() {
           <a href="/dashboard" className="toolbar-btn ghost">
             Back to Dashboard
           </a>
+          <button className="toolbar-btn ghost" onClick={reloadLatestReport}>
+            Load Latest
+          </button>
           <button className="toolbar-btn" onClick={() => window.print()}>
             Download / Print PDF
           </button>
@@ -859,14 +880,6 @@ export default function PremiumReportPage() {
           <span>AstroLife AI</span>
         </div>
       </section>
-
-
-
-{reportSections.map((section, index) => (
-  <SectionBlock key={section.id} section={section} index={index} />
-))}
-
-
 
       {/* CHART VISUAL PAGES */}
       <PremiumChartPage

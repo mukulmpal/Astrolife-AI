@@ -8,7 +8,6 @@ const ITEMS = [
   { icon: "🔯", label: "Charts", href: "/dashboard/kundli" },
   { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
   { icon:"🎵", label:"Astro Sound", href:"/dashboard/astro-sound" },
-  { icon:"💎", label:"Gems", href:"/dashboard/gemstone" },
   { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
   { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
 ];

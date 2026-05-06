@@ -1,4 +1,5 @@
 // ============================================================
+import { assertVastuResultContract } from "./contracts";
 // ASTROLIFE ASTRO-VASTU ENGINE v1.0
 // MahaVastu 16-Zone System — extracted from AstroLife legacy HTML
 // Planet-Direction Mapping · Zone Scoring · Remedies · Psych Bridge
@@ -213,5 +214,7 @@ export function calculateVastu(planets: Record<string, PlanetData>): VastuResult
     { room:"Cash / Locker",   idealDir:"North-NW (NNW)",  reason:"NNW = income & savings zone. Mercury governs wealth here." },
   ];
 
-  return { zones, strongZones, weakZones, overallScore, houseMap, psychBridge: psychBridge(planets), roomGuide, transitAlerts };
+  const report = { zones, strongZones, weakZones, overallScore, houseMap, psychBridge: psychBridge(planets), roomGuide, transitAlerts };
+  assertVastuResultContract(report);
+  return report;
 }

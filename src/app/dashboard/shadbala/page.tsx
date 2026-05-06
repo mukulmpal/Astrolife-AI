@@ -191,8 +191,8 @@ export default function ShadbalaPage() {
 
         {/* TABS */}
         <div className="tabs">
-          {[["grid","Planet Cards"],["table","Comparison Table"],["summary","Bala Guide"]].map(([t,l])=>(
-            <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t as never)}>{l}</button>
+          {([["grid","Planet Cards"],["table","Comparison Table"],["summary","Bala Guide"]] as const).map(([t,l])=>(
+            <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{l}</button>
           ))}
         </div>
 

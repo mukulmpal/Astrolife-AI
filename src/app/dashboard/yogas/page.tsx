@@ -222,8 +222,8 @@ export default function YogasPage() {
 
             {/* TABS */}
             <div className="tabs">
-              {([["present","✦ Present Yogas"],["doshas","⚠️ Doshas"],["all","All Yogas"]] as [string,string][]).map(([t,label])=>(
-                <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>{setActiveTab(t as never);setActiveCategory("All")}}>
+              {([["present","✦ Present Yogas"],["doshas","⚠️ Doshas"],["all","All Yogas"]] as const).map(([t,label])=>(
+                <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>{setActiveTab(t);setActiveCategory("All")}}>
                   {label} {t==="present"?`(${present.length})`:t==="doshas"?`(${doshas.length})`:`(${all.length})`}
                 </button>
               ))}

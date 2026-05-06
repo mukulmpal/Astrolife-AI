@@ -1,82 +1,16 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useMemo, useState } from "react";
 import { calculateEventRadarReport, EventRadarSignal } from "@/lib/astro-engine/event-radar";
-import { PlanetName, TransitBase } from "@/lib/astro-engine/transits";
+import { TransitBase } from "@/lib/astro-engine/transits";
+import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { EngineStateCard } from "@/components/engine-state-card";
 import "@/app/dashboard/shared.css";
 
-const PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 const AREA_ICON: Record<string, string> = { career: "💼", love: "💞", money: "💰", health: "🧘", family: "🏡", spirituality: "🕉️" };
 const SIGNAL_LABEL: Record<EventRadarSignal, string> = { excellent: "Excellent", good: "Good", mixed: "Mixed", caution: "Caution", sensitive: "Sensitive" };
-
-function mod(n: number, m: number) {
-  return ((n % m) + m) % m;
-}
-
-function toRashi(value: any): number {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    if (value >= 0 && value <= 11) return value;
-    if (value >= 1 && value <= 12) return value - 1;
-    return Math.floor(mod(value, 360) / 30);
-  }
-  return 0;
-}
-
-function getPlanetData(chart: any, planet: PlanetName) {
-  const lower = planet.toLowerCase();
-  return (
-    chart?.planets?.[planet] ??
-    chart?.planets?.[lower] ??
-    chart?.planetData?.[planet] ??
-    chart?.planetData?.[lower] ??
-    chart?.grahas?.[planet] ??
-    chart?.grahas?.[lower] ??
-    {}
-  );
-}
-
-function normalizeChartForTransit(userChart: any) {
-  const raw = userChart?.chart ?? userChart;
-  const lagnaRaw =
-    raw?.lagR ??
-    raw?.lagnaRashi ??
-    raw?.ascendantRashi ??
-    raw?.ascendant?.rashi ??
-    raw?.ascendant?.sign ??
-    raw?.lagna?.rashi ??
-    raw?.lagna?.sign ??
-    raw?.houses?.[0]?.rashi ??
-    raw?.houses?.[1]?.rashi ??
-    0;
-  const lagR = toRashi(lagnaRaw);
-
-  const planets = PLANETS.reduce((acc, planet) => {
-    const data = getPlanetData(raw, planet);
-    const longitude = data?.longitude ?? data?.lon ?? data?.lng ?? data?.degree ?? data?.absoluteDegree ?? data?.siderealLongitude ?? 0;
-    const rashi = toRashi(data?.rashi ?? data?.sign ?? data?.signIndex ?? data?.rashiIndex ?? data?.zodiacSign ?? longitude);
-    const house =
-      typeof data?.house === "number" && Number.isFinite(data.house)
-        ? data.house >= 1 && data.house <= 12
-          ? data.house
-          : mod(data.house - 1, 12) + 1
-        : mod(rashi - lagR, 12) + 1;
-
-    acc[planet] = {
-      longitude,
-      rashi,
-      house,
-      rashiName: data?.rashiName ?? data?.signName,
-      nakshatra: data?.nakshatra,
-      retrograde: Boolean(data?.retrograde ?? data?.isRetrograde),
-    };
-    return acc;
-  }, {} as any);
-
-  return { tz: raw?.tz ?? raw?.timezone ?? 5.5, lagR, planets };
-}
 
 export default function EventRadarPage() {
   const [base, setBase] = useState<TransitBase>("moon");
@@ -101,17 +35,31 @@ export default function EventRadarPage() {
     return (
       <main className="er-wrap">
         <div className="er-shell">
-          <section className="er-card">
-            <h1 className="er-title">Event Radar</h1>
-            <p className="er-sub">{loading ? "Scanning your next 7 days..." : "Please complete onboarding first."}</p>
-          </section>
+          <EngineStateCard
+            title="Event Radar"
+            loading={loading}
+            loadingText="Scanning your next 7 days..."
+            emptyText="Please complete onboarding to unlock Event Radar."
+          />
         </div>
         <MobileBottomNav />
       </main>
     );
   }
 
-  const today = report.days[0];
+  const days = Array.isArray(report.days) ? report.days : [];
+  const fallbackDay = {
+    date: "",
+    label: "Today",
+    weekday: "Today",
+    overallScore: 50,
+    signal: "mixed" as EventRadarSignal,
+    bestArea: "career",
+    cautionArea: "health",
+    advice: "Keep your schedule simple and avoid overreaction.",
+    remedy: "Deep breathing and a calm routine.",
+  };
+  const today = days[0] ?? fallbackDay;
 
   return (
     <main className="er-wrap">
@@ -151,7 +99,7 @@ export default function EventRadarPage() {
             <div>
               <div className="er-kicker">7 Day Cosmic Forecast</div>
               <h1 className="er-title">Event Radar</h1>
-              <p className="er-sub">Best day {report.bestDay.label} · Caution day {report.cautionDay.label}</p>
+              <p className="er-sub">Best day {report.bestDay?.label ?? "N/A"} · Caution day {report.cautionDay?.label ?? "N/A"}</p>
             </div>
             <div className="er-switch">
               <button className={`er-btn ${base === "moon" ? "active" : ""}`} onClick={() => setBase("moon")}>Moon Base</button>
@@ -177,7 +125,7 @@ export default function EventRadarPage() {
               <span className="er-pill">Base: {base === "moon" ? "Moon" : "Lagna"}</span>
             </div>
             <div className="er-days">
-              {report.days.map((d) => (
+              {days.map((d) => (
                 <div className="er-day" key={d.date}>
                   <div className="er-muted">{d.weekday}</div>
                   <strong>{d.label}</strong>

@@ -773,3 +773,5 @@ export function runTransitEngine(
     summary,
   };
 }
+// Core transit calculation engine consumed by `transits.ts`.
+// Keep this file as the low-level module; UI pages should import from `transits.ts`.

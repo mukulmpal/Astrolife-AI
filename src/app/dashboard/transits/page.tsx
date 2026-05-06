@@ -1,87 +1,14 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useMemo, useState } from "react";
-import { calculateTransitReport, PlanetName, TransitBase } from "@/lib/astro-engine/transits";
+import { calculateTransitReport, TransitBase } from "@/lib/astro-engine/transits";
+import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { EngineStateCard } from "@/components/engine-state-card";
 import "@/app/dashboard/shared.css";
 
-const PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 const AREA_ICON: Record<string, string> = { career: "💼", love: "💞", money: "💰", health: "🧘", family: "🏡", spirituality: "🕉️" };
-
-function mod(n: number, m: number) {
-  return ((n % m) + m) % m;
-}
-
-function toRashi(value: any): number {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    if (value >= 0 && value <= 11) return value;
-    if (value >= 1 && value <= 12) return value - 1;
-    return Math.floor(mod(value, 360) / 30);
-  }
-  return 0;
-}
-
-function getPlanetData(chart: any, planet: PlanetName) {
-  const lower = planet.toLowerCase();
-  return (
-    chart?.planets?.[planet] ??
-    chart?.planets?.[lower] ??
-    chart?.planetData?.[planet] ??
-    chart?.planetData?.[lower] ??
-    chart?.grahas?.[planet] ??
-    chart?.grahas?.[lower] ??
-    {}
-  );
-}
-
-function normalizeChartForTransit(userChart: any) {
-  const raw = userChart?.chart ?? userChart;
-  const lagnaRaw =
-    raw?.lagR ??
-    raw?.lagnaRashi ??
-    raw?.ascendantRashi ??
-    raw?.ascendant?.rashi ??
-    raw?.ascendant?.sign ??
-    raw?.lagna?.rashi ??
-    raw?.lagna?.sign ??
-    raw?.houses?.[0]?.rashi ??
-    raw?.houses?.[1]?.rashi ??
-    0;
-  const lagR = toRashi(lagnaRaw);
-
-  const planets = PLANETS.reduce((acc, planet) => {
-    const data = getPlanetData(raw, planet);
-    const longitude =
-      data?.longitude ??
-      data?.lon ??
-      data?.lng ??
-      data?.degree ??
-      data?.absoluteDegree ??
-      data?.siderealLongitude ??
-      0;
-    const rashi = toRashi(data?.rashi ?? data?.sign ?? data?.signIndex ?? data?.rashiIndex ?? data?.zodiacSign ?? longitude);
-    const house =
-      typeof data?.house === "number" && Number.isFinite(data.house)
-        ? data.house >= 1 && data.house <= 12
-          ? data.house
-          : mod(data.house - 1, 12) + 1
-        : mod(rashi - lagR, 12) + 1;
-
-    acc[planet] = {
-      longitude,
-      rashi,
-      house,
-      rashiName: data?.rashiName ?? data?.signName,
-      nakshatra: data?.nakshatra,
-      retrograde: Boolean(data?.retrograde ?? data?.isRetrograde),
-    };
-    return acc;
-  }, {} as any);
-
-  return { tz: raw?.tz ?? raw?.timezone ?? 5.5, lagR, planets };
-}
 
 export default function TransitPage() {
   const [base, setBase] = useState<TransitBase>("lagna");
@@ -106,19 +33,24 @@ export default function TransitPage() {
     return (
       <main className="tr-wrap">
         <div className="tr-shell">
-          <section className="tr-card">
-            <h1 className="tr-title">Transit Engine</h1>
-            <p className="tr-sub">{loading ? "Loading your current Gochar..." : "Please complete onboarding first."}</p>
-          </section>
+          <EngineStateCard
+            title="Transit Engine"
+            loading={loading}
+            loadingText="Loading your current Gochar..."
+            emptyText="Please complete onboarding to unlock transit analysis."
+          />
         </div>
         <MobileBottomNav />
       </main>
     );
   }
 
-  const topArea = [...report.areaScores].sort((a, b) => b.score - a.score)[0];
-  const caution = report.alerts.filter((a) => a.severity === "high" || a.severity === "medium");
-  const opportunities = report.alerts.filter((a) => a.type === "opportunity");
+  const areaScores = Array.isArray(report.areaScores) ? report.areaScores : [];
+  const topArea = [...areaScores].sort((a, b) => b.score - a.score)[0] ?? { area: "balance", score: 50, summary: "Keep actions steady today." };
+  const alerts = Array.isArray(report.alerts) ? report.alerts : [];
+  const caution = alerts.filter((a) => a.severity === "high" || a.severity === "medium");
+  const opportunities = alerts.filter((a) => a.type === "opportunity");
+  const planets = Array.isArray(report.planets) ? report.planets : [];
 
   return (
     <main className="tr-wrap">
@@ -215,7 +147,7 @@ export default function TransitPage() {
           <article className="tr-card span-12">
             <h3 className="tr-h">Life Area Strength</h3>
             <div className="tr-areas">
-              {report.areaScores.map((a) => (
+              {areaScores.map((a) => (
                 <div className="tr-area" key={a.area}>
                   <div className="tr-area-top">
                     <strong>{AREA_ICON[a.area]} {a.area}</strong>
@@ -231,7 +163,7 @@ export default function TransitPage() {
           <article className="tr-card span-12">
             <h3 className="tr-h">Planetary Positions</h3>
             <div className="tr-planets">
-              {report.planets.map((p) => (
+              {planets.map((p) => (
                 <div className="tr-planet" key={p.planet}>
                   <div className="tr-row">
                     <strong>{p.planet}</strong>

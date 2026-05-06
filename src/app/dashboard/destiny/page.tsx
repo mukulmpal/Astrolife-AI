@@ -123,8 +123,8 @@ export default function DestinyPage() {
 
       {/* TABS */}
       <div className="tabs">
-        {[["curve","Life Curve"],["areas","6 Life Areas"],["dashas","Dasha Timeline"]].map(([t,l])=>(
-          <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t as never)}>{l}</button>
+        {([["curve","Life Curve"],["areas","6 Life Areas"],["dashas","Dasha Timeline"]] as const).map(([t,l])=>(
+          <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{l}</button>
         ))}
       </div>
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useCallback, useMemo, useRef, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
+import { ragaMusicReferences, type MusicReferenceType } from "@/data/astrosound/ragaMusicReferences";
 import {
   ALL_RASAS,
   GOAL_META,
@@ -79,15 +80,18 @@ const MODE_OPTIONS: { key: ModeKey; label: string; desc: string }[] = [
 ];
 
 function modNum(n: number, m: number) {
+
   return ((n % m) + m) % m;
 }
 
-function normalizeNumber(value: any, fallback = 0) {
+type GenericObj = Record<string, unknown>;
+
+function normalizeNumber(value: unknown, fallback = 0) {
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 }
 
-function toRashiIndex(value: any): number {
+function toRashiIndex(value: unknown): number {
   if (typeof value === "string") {
     const key = value.trim().toLowerCase();
     if (key in SIGN_NAME_TO_INDEX) return SIGN_NAME_TO_INDEX[key];
@@ -104,42 +108,53 @@ function toRashiIndex(value: any): number {
   return 0;
 }
 
-function getPlanetSource(root: any, planet: string) {
+function getPlanetSource(root: GenericObj | null | undefined, planet: string): GenericObj {
   const lower = planet.toLowerCase();
+  const base = root as GenericObj | undefined;
+  const planets = (base?.planets as GenericObj | undefined) ?? undefined;
+  const planetData = (base?.planetData as GenericObj | undefined) ?? undefined;
+  const grahas = (base?.grahas as GenericObj | undefined) ?? undefined;
+  const chart = (base?.chart as GenericObj | undefined) ?? undefined;
+  const chartPlanets = (chart?.planets as GenericObj | undefined) ?? undefined;
 
   return (
-    root?.planets?.[planet] ??
-    root?.planets?.[lower] ??
-    root?.planetData?.[planet] ??
-    root?.planetData?.[lower] ??
-    root?.grahas?.[planet] ??
-    root?.grahas?.[lower] ??
-    root?.chart?.planets?.[planet] ??
-    root?.chart?.planets?.[lower] ??
+    (planets?.[planet] as GenericObj | undefined) ??
+    (planets?.[lower] as GenericObj | undefined) ??
+    (planetData?.[planet] as GenericObj | undefined) ??
+    (planetData?.[lower] as GenericObj | undefined) ??
+    (grahas?.[planet] as GenericObj | undefined) ??
+    (grahas?.[lower] as GenericObj | undefined) ??
+    (chartPlanets?.[planet] as GenericObj | undefined) ??
+    (chartPlanets?.[lower] as GenericObj | undefined) ??
     {}
   );
 }
 
-function normalizeAstroSoundChart(source: any): ChartData | null {
-  const root = source?.chart ?? source;
+function normalizeAstroSoundChart(source: unknown): ChartData | null {
+  const src = (source as GenericObj | null | undefined) ?? undefined;
+  const root = ((src?.chart as GenericObj | undefined) ?? src) as GenericObj | undefined;
 
   if (!root) return null;
+  const ascendant = (root.ascendant as GenericObj | undefined) ?? undefined;
+  const lagna = (root.lagna as GenericObj | undefined) ?? undefined;
+  const birth = (root.birth as GenericObj | undefined) ?? undefined;
+  const houses = (root.houses as Array<GenericObj> | undefined) ?? [];
 
   const lagnaRaw =
     root?.lagR ??
     root?.lagnaRashi ??
     root?.ascendantRashi ??
-    root?.ascendant?.rashi ??
-    root?.ascendant?.sign ??
-    root?.lagna?.rashi ??
-    root?.lagna?.sign ??
-    root?.houses?.[0]?.rashi ??
-    root?.houses?.[1]?.rashi ??
+    ascendant?.rashi ??
+    ascendant?.sign ??
+    lagna?.rashi ??
+    lagna?.sign ??
+    houses?.[0]?.rashi ??
+    houses?.[1]?.rashi ??
     0;
 
   const lagR = toRashiIndex(lagnaRaw);
 
-  const planets = ASTRO_SOUND_PLANETS.reduce((acc: Record<string, any>, planet) => {
+  const planets = ASTRO_SOUND_PLANETS.reduce((acc: Record<string, { rashi: number; house: number; lon: number; status: string; retrograde: boolean }>, planet) => {
     const raw = getPlanetSource(root, planet);
 
     const lon = normalizeNumber(
@@ -182,8 +197,8 @@ function normalizeAstroSoundChart(source: any): ChartData | null {
 
   return {
     lagR,
-    lagLon: normalizeNumber(root?.lagLon ?? root?.ascendant?.longitude, lagR * 30),
-    dob: String(root?.dob ?? root?.birth?.date ?? ""),
+    lagLon: normalizeNumber(root?.lagLon ?? ascendant?.longitude, lagR * 30),
+    dob: String(root?.dob ?? birth?.date ?? ""),
     planets,
   };
 }
@@ -213,6 +228,39 @@ function buildListenLinks(ragaName: string) {
     spotify: buildSearchUrl("spotify", `${ragaName} raga`),
     tanpura: buildSearchUrl("youtube", `tanpura drone ${ragaName} raga`),
   };
+}
+
+
+const MUSIC_REFERENCE_TABS: { type: MusicReferenceType; label: string; emoji: string }[] = [
+  { type: "film_bollywood", label: "Film / Bollywood", emoji: "🎬" },
+  { type: "sufi_qawwali", label: "Sufi / Qawwali", emoji: "🕋" },
+  { type: "bhajan_devotional", label: "Bhajan / Devotional", emoji: "🙏" },
+  { type: "classical_bandish", label: "Classical / Bandish", emoji: "🎼" },
+  { type: "modern_fusion", label: "Modern / Fusion", emoji: "🎧" },
+  { type: "regional_devotional", label: "Regional Devotional", emoji: "🌺" },
+];
+
+function normalizeRagaKey(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function findMusicReferencesForRaga(ragaId: string, ragaName: string) {
+  const idKey = normalizeRagaKey(ragaId);
+  const nameKey = normalizeRagaKey(ragaName);
+
+  return ragaMusicReferences.find((group) => {
+    const keys = [
+      group.ragaId,
+      group.ragaName,
+      ...(group.aliases ?? []),
+    ].map(normalizeRagaKey);
+
+    return keys.includes(idKey) || keys.includes(nameKey);
+  });
 }
 
 function buildSevenDayProtocol(ragaName: string, goalLabel: string) {
@@ -257,15 +305,30 @@ function buildSevenDayProtocol(ragaName: string, goalLabel: string) {
 
 
 export default function AstroSoundPage() {
+  const [mounted, setMounted] = useState(false);
+  const runIdRef = useRef(0);
+  const aliveRef = useRef(true);
+  const [uiNotice, setUiNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setMounted(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      aliveRef.current = false;
+      runIdRef.current += 1;
+    };
+  }, []);
+
+
+  const [musicReferenceType, setMusicReferenceType] = useState<MusicReferenceType>("film_bollywood");
   const { chart, loading: chartLoading } = useUserChart();
   const chartData = useMemo(() => normalizeAstroSoundChart(chart), [chart]);
-
-  const selectionSummary = useMemo(() => {
-    return {
-      goal: GOAL_META,
-      chartConnected: Boolean(chartData),
-    };
-  }, [chartData]);
 
   const {
     settings,
@@ -290,15 +353,29 @@ export default function AstroSoundPage() {
     return buildListenLinks(result.primary.raga.name);
   }, [result]);
 
+
+  const musicReferenceGroup = useMemo(() => {
+    if (!result) return undefined;
+    return findMusicReferencesForRaga(result.primary.raga.id, result.primary.raga.name);
+  }, [result]);
+
+  const visibleMusicReferences = useMemo(() => {
+    return musicReferenceGroup?.references.filter((item) => item.type === musicReferenceType) ?? [];
+  }, [musicReferenceGroup, musicReferenceType]);
+
   const sevenDayProtocol = useMemo(() => {
     if (!result) return [];
     return buildSevenDayProtocol(result.primary.raga.name, GOAL_META[settings.goal].label);
   }, [result, settings.goal]);
 
   const generate = useCallback(() => {
+    const runId = runIdRef.current + 1;
+    runIdRef.current = runId;
     setLoading(true);
+    setUiNotice(null);
 
     window.setTimeout(() => {
+      if (!aliveRef.current || runId !== runIdRef.current) return;
       const next = runAstroSound({
         chart: chartData,
         goal: settings.goal,
@@ -309,6 +386,7 @@ export default function AstroSoundPage() {
         memory,
       });
 
+      if (!aliveRef.current || runId !== runIdRef.current) return;
       setResult(next);
       setLastReportText(buildReportText(next));
       setLoading(false);
@@ -320,9 +398,9 @@ export default function AstroSoundPage() {
 
     try {
       await navigator.clipboard.writeText(lastReportText);
-      alert("Astro Sound report copied.");
+      setUiNotice("Astro Sound report copied.");
     } catch {
-      alert("Could not copy report.");
+      setUiNotice("Could not copy report.");
     }
   };
 
@@ -338,12 +416,24 @@ export default function AstroSoundPage() {
     a.click();
 
     URL.revokeObjectURL(url);
+    setUiNotice("Report downloaded.");
   };
 
   const feedback = (kind: "good" | "heavy" | "skip") => {
     if (!result) return;
     recordFeedback(kind, result.primary.raga.name, settings.goal);
   };
+
+  if (!mounted) {
+    return (
+      <main className="astro-sound-page" suppressHydrationWarning>
+        <section className="as-hero">
+          <p>AstroSound</p>
+          <h1>Preparing your sound map...</h1>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="as-shell">
@@ -384,9 +474,10 @@ export default function AstroSoundPage() {
             <label>Goal</label>
             <div className="as-chip-grid">
               {(Object.keys(GOAL_META) as GoalKey[]).map((goal) => (
-                <button type="button"
+                <button
+                  type="button"
                   key={goal}
-                  className={settings.goal === goal ? "active" : ""}
+                  className={mounted && settings.goal === goal ? "active" : ""}
                   onClick={() => setSettings({ goal })}
                 >
                   <span>{GOAL_META[goal].emoji}</span>
@@ -564,6 +655,74 @@ export default function AstroSoundPage() {
                 </div>
               </div>
 
+              <div className="as-music-references">
+                  <div className="as-section-heading">
+                    <span>Raag Music References</span>
+                    <h3>Listen through familiar songs</h3>
+                    <p>
+                      Film, bhajan and qawwali music may use raag-ang or cinematic liberties,
+                      so each reference includes a confidence label.
+                    </p>
+                  </div>
+
+                  <div className="as-music-tabs">
+                    {MUSIC_REFERENCE_TABS.map((tab) => (
+                      <button
+                        type="button"
+                        key={tab.type}
+                        className={musicReferenceType === tab.type ? "active" : ""}
+                        onClick={() => setMusicReferenceType(tab.type)}
+                      >
+                        <span>{tab.emoji}</span>
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {visibleMusicReferences.length > 0 ? (
+                    <div className="as-music-list">
+                      {visibleMusicReferences.map((item) => (
+                        <article className="as-music-card" key={`${item.type}-${item.title}`}>
+                          <div>
+                            <strong>{item.title}</strong>
+                            <p>
+                              {[item.artist, item.filmOrAlbum, item.composer]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </p>
+                            <small>{item.note}</small>
+
+                            <div className="as-music-actions">
+                              <a
+                                href={buildSearchUrl("youtube", item.sourceQuery ?? `${item.title} ${item.artist ?? ""}`)}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                ▶ YouTube
+                              </a>
+                              <a
+                                href={buildSearchUrl("spotify", item.sourceQuery ?? `${item.title} ${item.artist ?? ""}`)}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                🎧 Spotify
+                              </a>
+                            </div>
+                          </div>
+
+                          <div className={`as-confidence as-confidence-${item.confidence}`}>
+                            {item.confidence}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="as-empty-music">
+                      No references mapped yet for this category. Try another music tab.
+                    </div>
+                  )}
+                </div>
+
               {listenLinks && (
                 <div className="as-listen-card">
                   <div>
@@ -590,17 +749,17 @@ export default function AstroSoundPage() {
               )}
 
               <div className="as-tabs">
-                {[
+                {([
                   ["protocol", "Protocol"],
                   ["timing", "Timing"],
                   ["rasa", "Navarasa"],
                   ["why", "Why this"],
                   ["memory", "Memory"],
-                ].map(([key, label]) => (
+                ] as const).map(([key, label]) => (
                   <button type="button"
                     key={key}
                     className={activeTab === key ? "active" : ""}
-                    onClick={() => setActiveTab(key as any)}
+                    onClick={() => setActiveTab(key)}
                   >
                     {label}
                   </button>
@@ -754,6 +913,7 @@ export default function AstroSoundPage() {
                 <button type="button" onClick={copyReport}>Copy report</button>
                 <button type="button" onClick={downloadReport}>Download text</button>
               </div>
+              {uiNotice && <div className="as-inline-notice">{uiNotice}</div>}
             </>
           )}
         </section>
@@ -1443,6 +1603,16 @@ export default function AstroSoundPage() {
           text-align: center;
         }
 
+        .as-inline-notice {
+          margin-top: 10px;
+          border: 1px solid rgba(245, 197, 66, 0.3);
+          background: rgba(245, 197, 66, 0.12);
+          color: #f7dd95;
+          border-radius: 10px;
+          padding: 9px 12px;
+          font-size: 12px;
+        }
+
         .as-roadmap {
           max-width: 1200px;
           margin: 20px auto 0;
@@ -1470,6 +1640,123 @@ export default function AstroSoundPage() {
           line-height: 1.55;
           margin: 7px 0 0;
           font-size: 13px;
+        }
+
+
+        .as-music-references {
+          margin-top: 18px;
+          padding: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 24px;
+          background: rgba(255, 255, 255, 0.055);
+        }
+
+        .as-music-tabs {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin: 14px 0 16px;
+        }
+
+        .as-music-tabs button {
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.06);
+          color: inherit;
+          padding: 9px 12px;
+          cursor: pointer;
+          font-size: 0.82rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+        }
+
+        .as-music-tabs button.active {
+          border-color: rgba(245, 197, 107, 0.75);
+          background: rgba(245, 197, 107, 0.16);
+        }
+
+        .as-music-list {
+          display: grid;
+          gap: 12px;
+        }
+
+        .as-music-card {
+          display: flex;
+          justify-content: space-between;
+          gap: 14px;
+          padding: 14px;
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.16);
+        }
+
+        .as-music-card strong {
+          display: block;
+          margin-bottom: 5px;
+        }
+
+        .as-music-card p {
+          margin: 0 0 6px;
+          opacity: 0.78;
+          font-size: 0.86rem;
+        }
+
+        .as-music-card small {
+          display: block;
+          opacity: 0.68;
+          line-height: 1.45;
+        }
+
+        .as-music-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 12px;
+        }
+
+        .as-music-actions a {
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 999px;
+          padding: 7px 10px;
+          color: inherit;
+          text-decoration: none;
+          background: rgba(255, 255, 255, 0.07);
+          font-size: 0.78rem;
+        }
+
+        .as-music-actions a:hover {
+          border-color: rgba(245, 197, 107, 0.7);
+          background: rgba(245, 197, 107, 0.13);
+        }
+
+        .as-confidence {
+          align-self: flex-start;
+          border-radius: 999px;
+          padding: 5px 9px;
+          font-size: 0.72rem;
+          text-transform: capitalize;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          background: rgba(255, 255, 255, 0.08);
+        }
+
+        .as-confidence-high {
+          border-color: rgba(83, 224, 160, 0.55);
+        }
+
+        .as-confidence-medium {
+          border-color: rgba(245, 197, 107, 0.65);
+        }
+
+        .as-confidence-low {
+          border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .as-empty-music {
+          padding: 14px;
+          border-radius: 18px;
+          border: 1px dashed rgba(255, 255, 255, 0.16);
+          opacity: 0.72;
         }
 
         @media (max-width: 980px) {

@@ -1,0 +1,920 @@
+// ══════════════════════════════════════════════════════════════
+// ASTROLIFE — KP System Engine
+// Krishnamurti Paddhati · Star Lord · Sub Lord · Cusp · Events
+// ══════════════════════════════════════════════════════════════
+
+export type KPPlanet =
+  | "Ketu"
+  | "Venus"
+  | "Sun"
+  | "Moon"
+  | "Mars"
+  | "Rahu"
+  | "Jupiter"
+  | "Saturn"
+  | "Mercury";
+
+export type KPPointName =
+  | "Lagna"
+  | "Sun"
+  | "Moon"
+  | "Mars"
+  | "Mercury"
+  | "Jupiter"
+  | "Venus"
+  | "Saturn"
+  | "Rahu"
+  | "Ketu";
+
+export type EventTopic =
+  | "career"
+  | "marriage"
+  | "child"
+  | "health"
+  | "wealth"
+  | "travel"
+  | "education"
+  | "property"
+  | "litigation"
+  | "separation";
+
+export interface KPPlanetInput {
+  lon: number;
+  house: number;
+  rashi: number;
+  rashiName: string;
+  retrograde?: boolean;
+}
+
+export interface NatalKPInput {
+  lagR: number;
+  lagLon: number;
+  planets: Record<string, KPPlanetInput>;
+  currentMD?: string;
+  currentAD?: string;
+}
+
+export interface KPRow {
+  name: KPPointName;
+  lon: number;
+  degreeText: string;
+  position: string;
+  sign: string;
+  signLord: string;
+  house: number;
+  nakshatra: string;
+  starLord: KPPlanet;
+  pada: number;
+  subLord: KPPlanet;
+  subSubLord: KPPlanet;
+  subLordPosition: string;
+  subLordHouse: number;
+  significance: string;
+  significatorHouses: number[];
+  isSignificantForTopic: boolean;
+  topicHit: string;
+  retrograde: boolean;
+}
+
+export interface KPCuspRow {
+  house: number;
+  lon: number;
+  degreeText: string;
+  sign: string;
+  signLord: string;
+  nakshatra: string;
+  starLord: KPPlanet;
+  pada: number;
+  subLord: KPPlanet;
+  subSubLord: KPPlanet;
+  promise: string;
+}
+
+export interface SignificatorSet {
+  topic: EventTopic;
+  label: string;
+  positiveHouses: number[];
+  negativeHouses: number[];
+  karaka: string;
+  occupants: string[];
+  lords: Array<{ house: number; lord: string }>;
+  starLordLinks: string[];
+  subLordLinks: string[];
+  cuspSubLord: string;
+  cuspPromise: string;
+  score: number;
+  verdict: "strong" | "moderate" | "weak" | "blocked";
+  verdictNote: string;
+  dashaLink: string;
+  actionPlan: string[];
+}
+
+export interface KPEngineResult {
+  input: NatalKPInput;
+  rows: KPRow[];
+  cusps: KPCuspRow[];
+  significators: SignificatorSet[];
+  houseLords: Record<number, string>;
+  topEventHints: Array<{ topic: string; color: string; note: string }>;
+  subLordSummary: string;
+  strongestEvent: SignificatorSet | null;
+  weakestEvent: SignificatorSet | null;
+}
+
+const DASHA_ORDER: KPPlanet[] = [
+  "Ketu",
+  "Venus",
+  "Sun",
+  "Moon",
+  "Mars",
+  "Rahu",
+  "Jupiter",
+  "Saturn",
+  "Mercury",
+];
+
+const DASHA_YEARS: Record<KPPlanet, number> = {
+  Ketu: 7,
+  Venus: 20,
+  Sun: 6,
+  Moon: 10,
+  Mars: 7,
+  Rahu: 18,
+  Jupiter: 16,
+  Saturn: 19,
+  Mercury: 17,
+};
+
+const NAKSHATRAS = [
+  "Ashwini",
+  "Bharani",
+  "Krittika",
+  "Rohini",
+  "Mrigashira",
+  "Ardra",
+  "Punarvasu",
+  "Pushya",
+  "Ashlesha",
+  "Magha",
+  "Purva Phalguni",
+  "Uttara Phalguni",
+  "Hasta",
+  "Chitra",
+  "Swati",
+  "Vishakha",
+  "Anuradha",
+  "Jyeshtha",
+  "Mula",
+  "Purva Ashadha",
+  "Uttara Ashadha",
+  "Shravana",
+  "Dhanishtha",
+  "Shatabhisha",
+  "Purva Bhadrapada",
+  "Uttara Bhadrapada",
+  "Revati",
+];
+
+const NAK_LORDS: KPPlanet[] = [
+  "Ketu",
+  "Venus",
+  "Sun",
+  "Moon",
+  "Mars",
+  "Rahu",
+  "Jupiter",
+  "Saturn",
+  "Mercury",
+  "Ketu",
+  "Venus",
+  "Sun",
+  "Moon",
+  "Mars",
+  "Rahu",
+  "Jupiter",
+  "Saturn",
+  "Mercury",
+  "Ketu",
+  "Venus",
+  "Sun",
+  "Moon",
+  "Mars",
+  "Rahu",
+  "Jupiter",
+  "Saturn",
+  "Mercury",
+];
+
+const SIGN_LORD: Record<number, KPPlanet> = {
+  0: "Mars",
+  1: "Venus",
+  2: "Mercury",
+  3: "Moon",
+  4: "Sun",
+  5: "Mercury",
+  6: "Venus",
+  7: "Mars",
+  8: "Jupiter",
+  9: "Saturn",
+  10: "Saturn",
+  11: "Jupiter",
+};
+
+const RASHIS_EN = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces",
+];
+
+const TOPIC_DEFS: Record<
+  EventTopic,
+  {
+    label: string;
+    positive: number[];
+    negative: number[];
+    karaka: string;
+    desc: string;
+    cuspHouse: number;
+    actionPlan: string[];
+  }
+> = {
+  career: {
+    label: "💼 Career",
+    positive: [2, 6, 10, 11],
+    negative: [5, 8, 12],
+    karaka: "Saturn / Sun / Mercury",
+    desc: "Career event becomes stronger when 2-6-10-11 houses are connected through star lord, sub lord, dasha and 10th cusp.",
+    cuspHouse: 10,
+    actionPlan: [
+      "Check 10th cusp sub lord for career promise.",
+      "Use 2-6-10-11 periods for job, promotion and work growth.",
+      "If 8/12 are heavy, upgrade skill and avoid sudden resignation.",
+    ],
+  },
+  marriage: {
+    label: "💍 Marriage",
+    positive: [2, 7, 11],
+    negative: [1, 6, 10, 12],
+    karaka: "Venus / Jupiter",
+    desc: "Marriage promise needs 2-7-11. Houses 6-8-12 can delay, conflict or create distance.",
+    cuspHouse: 7,
+    actionPlan: [
+      "Check 7th cusp sub lord before final marriage timing.",
+      "2-7-11 support shows settlement, family formation and agreement.",
+      "If 6/8/12 dominate, focus on compatibility and patience.",
+    ],
+  },
+  child: {
+    label: "👶 Children",
+    positive: [2, 5, 11],
+    negative: [1, 4, 10],
+    karaka: "Jupiter",
+    desc: "Child-related outcomes are linked with 2-5-11 and the 5th cusp.",
+    cuspHouse: 5,
+    actionPlan: [
+      "Check 5th cusp sub lord and Jupiter support.",
+      "2-5-11 periods are favourable for child matters.",
+      "Use medical and practical planning where needed.",
+    ],
+  },
+  health: {
+    label: "🏥 Health Sensitivity",
+    positive: [1, 5, 11],
+    negative: [6, 8, 12],
+    karaka: "Sun / Moon / Lagna",
+    desc: "This is preventive health guidance only. 6-8-12 pressure needs care, rest and professional advice.",
+    cuspHouse: 1,
+    actionPlan: [
+      "Use this as preventive guidance, not diagnosis.",
+      "If 6-8-12 dominate, strengthen routine and consult professionals.",
+      "Recovery improves when 1/5/11 support is active.",
+    ],
+  },
+  wealth: {
+    label: "💰 Wealth",
+    positive: [2, 5, 9, 11],
+    negative: [6, 8, 12],
+    karaka: "Jupiter / Venus",
+    desc: "Money and gains improve when 2-5-9-11 are active and 8/12 are controlled.",
+    cuspHouse: 2,
+    actionPlan: [
+      "Check 2nd and 11th cusp support for income.",
+      "Avoid high-risk speculation if 8/12 dominate.",
+      "Use strong 2-11 periods for savings and income growth.",
+    ],
+  },
+  travel: {
+    label: "✈️ Foreign / Travel",
+    positive: [3, 9, 12],
+    negative: [4, 10],
+    karaka: "Moon / Rahu",
+    desc: "Short travel is seen from 3rd, long distance from 9th, foreign settlement from 12th.",
+    cuspHouse: 12,
+    actionPlan: [
+      "Check 9th and 12th cusp for foreign movement.",
+      "3-9-12 support helps travel and relocation.",
+      "4th house pressure can show emotional attachment to home.",
+    ],
+  },
+  education: {
+    label: "📚 Education",
+    positive: [4, 5, 9, 11],
+    negative: [6, 8, 12],
+    karaka: "Mercury / Jupiter",
+    desc: "Education success needs 4-5-9-11 with Mercury/Jupiter support.",
+    cuspHouse: 4,
+    actionPlan: [
+      "Check 4th and 9th cusp sub lords.",
+      "Use Mercury/Jupiter periods for study and exams.",
+      "If 6/8/12 dominate, reduce distraction and improve discipline.",
+    ],
+  },
+  property: {
+    label: "🏠 Property",
+    positive: [4, 11, 12],
+    negative: [3, 6, 8],
+    karaka: "Mars / Saturn / Venus",
+    desc: "Property and vehicle matters need 4th house, gains from 11th and expense/settlement from 12th.",
+    cuspHouse: 4,
+    actionPlan: [
+      "Check 4th cusp sub lord for property promise.",
+      "Use 4-11 periods for purchase and 12th for payment/settlement.",
+      "Verify legal documents carefully if 8th is active.",
+    ],
+  },
+  litigation: {
+    label: "⚖️ Litigation / Competition",
+    positive: [6, 10, 11],
+    negative: [8, 12],
+    karaka: "Mars / Saturn",
+    desc: "Competition and litigation success requires 6th house strength with 10th/11th support.",
+    cuspHouse: 6,
+    actionPlan: [
+      "Keep documents clean and avoid emotional conflict.",
+      "6-10-11 periods help defeat competition.",
+      "If 8/12 dominate, expenses and hidden stress may rise.",
+    ],
+  },
+  separation: {
+    label: "🪐 Separation / Distance",
+    positive: [6, 8, 12],
+    negative: [2, 7, 11],
+    karaka: "Saturn / Rahu / Ketu",
+    desc: "Use this carefully. 6-8-12 can show distance, conflict or withdrawal, while 2-7-11 supports repair.",
+    cuspHouse: 7,
+    actionPlan: [
+      "Do not use this as fear-based prediction.",
+      "If 2-7-11 are stronger, relationship repair is possible.",
+      "If 6-8-12 dominate, focus on maturity and communication.",
+    ],
+  },
+};
+
+export const KP_PLANET_COLORS: Record<string, string> = {
+  Sun: "#f97316",
+  Moon: "#c084fc",
+  Mars: "#ef4444",
+  Mercury: "#22c55e",
+  Jupiter: "#f59e0b",
+  Venus: "#ec4899",
+  Saturn: "#60a5fa",
+  Rahu: "#a78bfa",
+  Ketu: "#fb7185",
+  Lagna: "#fbbf24",
+};
+
+function md(n: number, m: number): number {
+  return ((n % m) + m) % m;
+}
+
+function safeNumber(value: any, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function normalizeLon(value: any) {
+  return md(safeNumber(value, 0), 360);
+}
+
+function signIndexFrom(value: any) {
+  if (typeof value === "string") {
+    const found = RASHIS_EN.findIndex((rashi) => rashi.toLowerCase() === value.toLowerCase());
+    if (found >= 0) return found;
+  }
+
+  const n = safeNumber(value, 0);
+
+  if (n >= 0 && n <= 11) return Math.round(n);
+  if (n >= 1 && n <= 12) return Math.round(n - 1);
+
+  return Math.floor(normalizeLon(n) / 30);
+}
+
+function getNakIndex(lon: number) {
+  return Math.min(26, Math.floor(md(lon, 360) / (360 / 27)));
+}
+
+export function getNakshatra(lon: number): string {
+  return NAKSHATRAS[getNakIndex(lon)] ?? "—";
+}
+
+export function getStarLord(lon: number): KPPlanet {
+  return NAK_LORDS[getNakIndex(lon)] ?? "Ketu";
+}
+
+export function getPada(lon: number): number {
+  const nakSize = 360 / 27;
+  const rem = md(lon, 360) - getNakIndex(lon) * nakSize;
+  return Math.min(4, Math.floor(rem / (nakSize / 4)) + 1);
+}
+
+export function getSubLord(lon: number): KPPlanet {
+  const nakSize = 360 / 27;
+  const lonN = md(lon, 360);
+  const nakIdx = Math.floor(lonN / nakSize);
+  const rem = lonN - nakIdx * nakSize;
+  const starLord = NAK_LORDS[nakIdx] ?? "Ketu";
+  const startIdx = DASHA_ORDER.indexOf(starLord);
+
+  let acc = 0;
+
+  for (let i = 0; i < 9; i += 1) {
+    const subPlanet = DASHA_ORDER[(startIdx + i) % 9];
+    const segSize = nakSize * (DASHA_YEARS[subPlanet] / 120);
+    acc += segSize;
+
+    if (rem <= acc + 1e-9) return subPlanet;
+  }
+
+  return starLord;
+}
+
+export function getSubSubLord(lon: number): KPPlanet {
+  const nakSize = 360 / 27;
+  const lonN = md(lon, 360);
+  const nakIdx = Math.floor(lonN / nakSize);
+  const rem = lonN - nakIdx * nakSize;
+  const starLord = NAK_LORDS[nakIdx] ?? "Ketu";
+  const startIdx = DASHA_ORDER.indexOf(starLord);
+
+  let acc1 = 0;
+
+  for (let i = 0; i < 9; i += 1) {
+    const subPlanet = DASHA_ORDER[(startIdx + i) % 9];
+    const segSize = nakSize * (DASHA_YEARS[subPlanet] / 120);
+
+    if (rem <= acc1 + segSize + 1e-9) {
+      const subRem = rem - acc1;
+      const subStart = DASHA_ORDER.indexOf(subPlanet);
+      let acc2 = 0;
+
+      for (let j = 0; j < 9; j += 1) {
+        const ssPlanet = DASHA_ORDER[(subStart + j) % 9];
+        const ssSize = segSize * (DASHA_YEARS[ssPlanet] / 120);
+        acc2 += ssSize;
+
+        if (subRem <= acc2 + 1e-9) return ssPlanet;
+      }
+
+      return subPlanet;
+    }
+
+    acc1 += segSize;
+  }
+
+  return starLord;
+}
+
+export function buildHouseLords(lagR: number): Record<number, string> {
+  const lords: Record<number, string> = {};
+
+  for (let h = 1; h <= 12; h += 1) {
+    lords[h] = SIGN_LORD[(lagR + h - 1) % 12] ?? "—";
+  }
+
+  return lords;
+}
+
+function degreeText(lon: number) {
+  const signDegree = md(lon, 30);
+  return `${signDegree.toFixed(2)}°`;
+}
+
+function houseFromLon(lagR: number, lon: number) {
+  const sign = Math.floor(md(lon, 360) / 30);
+  return md(sign - lagR, 12) + 1;
+}
+
+function getChartRoot(input: any) {
+  return input?.chart?.chart ?? input?.chart ?? input?.rawChart ?? input ?? {};
+}
+
+function readPlanet(source: any, planetName: string) {
+  const root = getChartRoot(source);
+  const lower = planetName.toLowerCase();
+
+  const candidates = [
+    root?.planets,
+    root?.planetData,
+    root?.grahas,
+    root?.positions,
+    root?.planetaryPositions,
+    source?.planets,
+    source?.chart?.planets,
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+
+    if (Array.isArray(candidate)) {
+      const found = candidate.find((item: any) => {
+        const name = String(item?.name ?? item?.planet ?? item?.graha ?? item?.id ?? "").toLowerCase();
+        return name === lower;
+      });
+
+      if (found) return found;
+    }
+
+    if (typeof candidate === "object") {
+      const found =
+        candidate?.[planetName] ??
+        candidate?.[lower] ??
+        candidate?.[planetName.toUpperCase()];
+
+      if (found) return found;
+    }
+  }
+
+  return null;
+}
+
+function readAscendant(source: any) {
+  const root = getChartRoot(source);
+
+  return (
+    readPlanet(source, "Ascendant") ??
+    readPlanet(source, "Lagna") ??
+    root?.ascendant ??
+    root?.lagna ??
+    root?.asc ??
+    source?.ascendant ??
+    {}
+  );
+}
+
+function readLonFromPlanet(source: any, planetName: string) {
+  const planet = planetName === "Lagna" ? readAscendant(source) : readPlanet(source, planetName);
+
+  const raw =
+    planet?.lon ??
+    planet?.longitude ??
+    planet?.lng ??
+    planet?.degree ??
+    planet?.degrees ??
+    planet?.absoluteDegree ??
+    planet?.siderealLongitude;
+
+  if (raw !== undefined && raw !== null) return normalizeLon(raw);
+
+  const signRaw =
+    planet?.rashi ??
+    planet?.sign ??
+    planet?.rashiIndex ??
+    planet?.signIndex ??
+    planet?.rashiName ??
+    planet?.signName;
+
+  const sign = signIndexFrom(signRaw);
+  const inner = safeNumber(planet?.degreeInSign ?? planet?.signDegree ?? planet?.degreesInSign, 0);
+
+  return normalizeLon(sign * 30 + inner);
+}
+
+function readHouse(source: any, planetName: string, lagR: number, lon: number) {
+  const planet = planetName === "Lagna" ? readAscendant(source) : readPlanet(source, planetName);
+  const house = safeNumber(planet?.house ?? planet?.bhava ?? planet?.houseNumber, 0);
+
+  if (house >= 1 && house <= 12) return Math.round(house);
+
+  return houseFromLon(lagR, lon);
+}
+
+function readCurrentDasha(source: any) {
+  const root = getChartRoot(source);
+  const dasha =
+    root?.currentDasha ??
+    root?.dasha ??
+    root?.vimshottari ??
+    source?.currentDasha ??
+    source?.dasha ??
+    {};
+
+  const md =
+    dasha?.mahadasha ??
+    dasha?.mahaDasha ??
+    dasha?.md ??
+    dasha?.currentMD ??
+    root?.currentMD ??
+    source?.currentMD;
+
+  const ad =
+    dasha?.antardasha ??
+    dasha?.antarDasha ??
+    dasha?.ad ??
+    dasha?.currentAD ??
+    root?.currentAD ??
+    source?.currentAD;
+
+  return {
+    currentMD: typeof md === "string" ? md : String(md?.planet ?? md?.name ?? ""),
+    currentAD: typeof ad === "string" ? ad : String(ad?.planet ?? ad?.name ?? ""),
+  };
+}
+
+export function normalizeToKPInput(input: any): NatalKPInput {
+  const source = getChartRoot(input);
+  const asc = readAscendant(source);
+
+  const lagLon = readLonFromPlanet(source, "Lagna");
+  const lagR = signIndexFrom(
+    asc?.rashi ??
+      asc?.sign ??
+      asc?.rashiIndex ??
+      asc?.signIndex ??
+      asc?.rashiName ??
+      asc?.signName ??
+      lagLon
+  );
+
+  const planets: Record<string, KPPlanetInput> = {};
+
+  (["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"] as const).forEach(
+    (planetName) => {
+      const planet = readPlanet(source, planetName) ?? {};
+      const lon = readLonFromPlanet(source, planetName);
+      const rashi = Math.floor(lon / 30);
+
+      planets[planetName] = {
+        lon,
+        house: readHouse(source, planetName, lagR, lon),
+        rashi,
+        rashiName: RASHIS_EN[rashi] ?? "Unknown",
+        retrograde: Boolean(planet?.retrograde ?? planet?.isRetrograde ?? planet?.R),
+      };
+    }
+  );
+
+  const dasha = readCurrentDasha(source);
+
+  return {
+    lagR,
+    lagLon,
+    planets,
+    currentMD: dasha.currentMD || undefined,
+    currentAD: dasha.currentAD || undefined,
+  };
+}
+
+function lordHouse(lord: string, input: NatalKPInput) {
+  const planet = input.planets[lord];
+
+  return planet?.house ?? 0;
+}
+
+function buildKPRow(name: KPPointName, lon: number, house: number, input: NatalKPInput, retrograde = false): KPRow {
+  const signIndex = Math.floor(md(lon, 360) / 30);
+  const sign = RASHIS_EN[signIndex] ?? "Unknown";
+  const signLord = SIGN_LORD[signIndex] ?? "Ketu";
+  const nakshatra = getNakshatra(lon);
+  const starLord = getStarLord(lon);
+  const subLord = getSubLord(lon);
+  const subSubLord = getSubSubLord(lon);
+  const subLordHouse = lordHouse(subLord, input);
+  const starLordHouse = lordHouse(starLord, input);
+
+  const significatorHouses = [
+    house,
+    starLordHouse,
+    subLordHouse,
+    signIndex + 1,
+  ].filter((item, index, array) => item >= 1 && item <= 12 && array.indexOf(item) === index);
+
+  return {
+    name,
+    lon,
+    degreeText: degreeText(lon),
+    sign,
+    signLord,
+    house,
+    position: `${sign} H${house}`,
+    nakshatra,
+    starLord,
+    pada: getPada(lon),
+    subLord,
+    subSubLord,
+    subLordPosition: subLordHouse ? `H${subLordHouse}` : "—",
+    subLordHouse,
+    significance: significatorHouses.length ? `H${significatorHouses.join(" · H")}` : "—",
+    significatorHouses,
+    isSignificantForTopic: false,
+    topicHit: "",
+    retrograde,
+  };
+}
+
+
+function buildRows(input: NatalKPInput): KPRow[] {
+  const rows: KPRow[] = [
+    buildKPRow("Lagna", input.lagLon, 1, input, false),
+  ];
+
+  (Object.keys(input.planets) as KPPointName[]).forEach((name) => {
+    const planet = input.planets[name];
+
+    if (!planet) return;
+
+    rows.push(buildKPRow(name, planet.lon, planet.house, input, Boolean(planet.retrograde)));
+  });
+
+  return rows;
+}
+
+function buildCusps(input: NatalKPInput): KPCuspRow[] {
+  return Array.from({ length: 12 }).map((_, index) => {
+    const house = index + 1;
+    const lon = md(input.lagLon + index * 30, 360);
+    const signIndex = Math.floor(lon / 30);
+    const sign = RASHIS_EN[signIndex] ?? "Unknown";
+    const starLord = getStarLord(lon);
+    const subLord = getSubLord(lon);
+    const subSubLord = getSubSubLord(lon);
+
+    return {
+      house,
+      lon,
+      degreeText: degreeText(lon),
+      sign,
+      signLord: SIGN_LORD[signIndex] ?? "Ketu",
+      nakshatra: getNakshatra(lon),
+      starLord,
+      pada: getPada(lon),
+      subLord,
+      subSubLord,
+      promise: `H${house} cusp is ruled by ${subLord} at sub level and ${subSubLord} at sub-sub level.`,
+    };
+  });
+}
+
+function evaluateTopic(topic: EventTopic, input: NatalKPInput, rows: KPRow[], cusps: KPCuspRow[], houseLords: Record<number, string>): SignificatorSet {
+  const def = TOPIC_DEFS[topic];
+  const cusp = cusps.find((item) => item.house === def.cuspHouse) ?? cusps[0];
+
+  const occupants = rows
+    .filter((row) => row.name !== "Lagna" && def.positive.includes(row.house))
+    .map((row) => row.name);
+
+  const lords = def.positive.map((house) => ({
+    house,
+    lord: houseLords[house] ?? "—",
+  }));
+
+  const starLordLinks = rows
+    .filter((row) => row.name !== "Lagna" && def.positive.includes(lordHouse(row.starLord, input)))
+    .map((row) => `${row.name} → ${row.starLord}`);
+
+  const subLordLinks = rows
+    .filter((row) => row.name !== "Lagna" && def.positive.includes(row.subLordHouse))
+    .map((row) => `${row.name} → ${row.subLord}`);
+
+  const negativeLinks = rows.filter((row) => {
+    return row.name !== "Lagna" && row.significatorHouses.some((house) => def.negative.includes(house));
+  });
+
+  const cuspSupport =
+    def.positive.includes(lordHouse(cusp.subLord, input)) ||
+    def.positive.includes(lordHouse(cusp.starLord, input)) ||
+    def.positive.includes(cusp.house);
+
+  const mdHit =
+    input.currentMD && rows.some((row) => row.name === input.currentMD && row.significatorHouses.some((house) => def.positive.includes(house)));
+
+  const adHit =
+    input.currentAD && rows.some((row) => row.name === input.currentAD && row.significatorHouses.some((house) => def.positive.includes(house)));
+
+  let score = 25;
+  score += occupants.length * 8;
+  score += starLordLinks.length * 8;
+  score += subLordLinks.length * 10;
+  score += cuspSupport ? 18 : -8;
+  score += mdHit ? 10 : 0;
+  score += adHit ? 8 : 0;
+  score -= negativeLinks.length * 4;
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  const verdict: SignificatorSet["verdict"] =
+    score >= 76 ? "strong" : score >= 56 ? "moderate" : score >= 36 ? "weak" : "blocked";
+
+  const cuspPromise = cuspSupport
+    ? `${def.cuspHouse}th cusp supports this event because its star/sub chain connects with required houses.`
+    : `${def.cuspHouse}th cusp needs caution because sub-level support is not clearly aligned.`;
+
+  const dashaLink =
+    mdHit || adHit
+      ? `Current dasha connection supports this topic. MD: ${input.currentMD || "—"}, AD: ${input.currentAD || "—"}.`
+      : `Current dasha connection is not strongly visible. MD: ${input.currentMD || "—"}, AD: ${input.currentAD || "—"}.`;
+
+  const verdictNote =
+    verdict === "strong"
+      ? `${def.label} has strong KP promise through event houses ${def.positive.join("-")}.`
+      : verdict === "moderate"
+        ? `${def.label} has usable promise, but mixed support and caution houses must be checked.`
+        : verdict === "weak"
+          ? `${def.label} is latent or delayed; stronger dasha/transit trigger may be required.`
+          : `${def.label} looks blocked or delayed because required KP support is weak.`;
+
+  return {
+    topic,
+    label: def.label,
+    positiveHouses: def.positive,
+    negativeHouses: def.negative,
+    karaka: def.karaka,
+    occupants,
+    lords,
+    starLordLinks,
+    subLordLinks,
+    cuspSubLord: cusp.subLord,
+    cuspPromise,
+    score,
+    verdict,
+    verdictNote,
+    dashaLink,
+    actionPlan: def.actionPlan,
+  };
+}
+
+export function runKPEngine(rawInput: any): KPEngineResult {
+  const input = normalizeToKPInput(rawInput);
+  const houseLords = buildHouseLords(input.lagR);
+  let rows = buildRows(input);
+  const cusps = buildCusps(input);
+
+  const significators = (Object.keys(TOPIC_DEFS) as EventTopic[]).map((topic) =>
+    evaluateTopic(topic, input, rows, cusps, houseLords)
+  );
+
+  const activeTopic = significators[0];
+
+  rows = rows.map((row) => {
+    const hit = activeTopic?.positiveHouses.some((house) => row.significatorHouses.includes(house)) ?? false;
+
+    return {
+      ...row,
+      isSignificantForTopic: hit,
+      topicHit: hit ? activeTopic.topic : "",
+    };
+  });
+
+  const sorted = [...significators].sort((a, b) => b.score - a.score);
+  const strongestEvent = sorted[0] ?? null;
+  const weakestEvent = sorted[sorted.length - 1] ?? null;
+
+  return {
+    input,
+    rows,
+    cusps,
+    significators,
+    houseLords,
+    strongestEvent,
+    weakestEvent,
+    topEventHints: sorted.slice(0, 4).map((item) => ({
+      topic: item.label,
+      color:
+        item.verdict === "strong"
+          ? "#4ade80"
+          : item.verdict === "moderate"
+            ? "#fbbf24"
+            : item.verdict === "weak"
+              ? "#94a3b8"
+              : "#f87171",
+      note: `${item.score}/100 · ${item.verdictNote}`,
+    })),
+    subLordSummary:
+      "KP gives high importance to star lord and sub lord. The cusp sub lord shows whether an event is promised, while dasha and transit show when it may activate.",
+  };
+}
+
+export const calculateKpReport = runKPEngine;
+export const calculateKPReport = runKPEngine;
+export const calculateKp = runKPEngine;
+export const getKpReport = runKPEngine;
+export const analyzeKpEvents = runKPEngine;

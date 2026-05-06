@@ -179,14 +179,14 @@ export default function LalKitabPage() {
 
         {/* TABS */}
         <div className="tabs">
-          {[
+          {([
             ["planets",`Planets (${result.planets.length})`],
             ["takkar", `Takkar (${result.takkars.length})`],
             ["rin",    `Rin (${result.rins.length})`],
             ["ages",   "Activation Ages"],
-          ].map(([t,l])=>(
+          ] as const).map(([t,l])=>(
             <button key={t} className={`tab ${activeTab===t?"active":""}`}
-              onClick={()=>setActiveTab(t as never)}>{l}</button>
+              onClick={()=>setActiveTab(t)}>{l}</button>
           ))}
         </div>
 

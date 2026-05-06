@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type GoalKey =
   | "mind"
@@ -1306,25 +1306,16 @@ function writeAstroSoundStorage(settings: AstroSoundSettings, memory: AstroSound
 }
 
 export function useAstroSoundStore(): AstroSoundStore {
-  const [hasLoadedStorage, setHasLoadedStorage] = useState(false);
-  const [settings, setSettingsState] = useState<AstroSoundSettings>(DEFAULT_SETTINGS);
-  const [memory, setMemory] = useState<AstroSoundMemory>(DEFAULT_MEMORY);
+  const [settings, setSettingsState] = useState<AstroSoundSettings>(() => readAstroSoundStorage().settings);
+  const [memory, setMemory] = useState<AstroSoundMemory>(() => readAstroSoundStorage().memory);
 
   const [result, setResult] = useState<AstroSoundResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastReportText, setLastReportText] = useState("");
 
   useEffect(() => {
-    const stored = readAstroSoundStorage();
-    setSettingsState(stored.settings);
-    setMemory(stored.memory);
-    setHasLoadedStorage(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hasLoadedStorage) return;
     writeAstroSoundStorage(settings, memory);
-  }, [hasLoadedStorage, settings, memory]);
+  }, [settings, memory]);
 
   const setSettings = (s: Partial<AstroSoundSettings>) => {
     setSettingsState((prev) => ({ ...prev, ...s }));

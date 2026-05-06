@@ -1,5 +1,7 @@
 import type { TransitBase, TransitReport } from "./transits";
 import type { EventRadarArea, EventRadarReport, EventRadarSignal } from "./event-radar";
+import type { PanchangResult } from "./panchang";
+import type { VastuResult } from "./vastu";
 
 export const PLANET_NAMES = [
   "Sun",
@@ -72,4 +74,23 @@ export function assertEventRadarReportContract(report: unknown): asserts report 
   }
   if (typeof report.summary !== "string") throw new Error("EventRadarReport.summary must be string");
   if (typeof report.aiContext !== "string") throw new Error("EventRadarReport.aiContext must be string");
+}
+
+export function assertPanchangResultContract(report: unknown): asserts report is PanchangResult {
+  if (!isObject(report)) throw new Error("PanchangResult must be an object");
+  if (typeof report.date !== "string") throw new Error("PanchangResult.date must be string");
+  if (typeof report.weekday !== "string") throw new Error("PanchangResult.weekday must be string");
+  if (typeof report.tithi !== "string") throw new Error("PanchangResult.tithi must be string");
+  if (!["Shukla", "Krishna"].includes(String(report.paksha))) {
+    throw new Error("PanchangResult.paksha must be Shukla|Krishna");
+  }
+  if (!Array.isArray(report.notes)) throw new Error("PanchangResult.notes must be array");
+}
+
+export function assertVastuResultContract(report: unknown): asserts report is VastuResult {
+  if (!isObject(report)) throw new Error("VastuResult must be an object");
+  if (!Array.isArray(report.zones) || report.zones.length === 0) throw new Error("VastuResult.zones must be non-empty");
+  if (!Array.isArray(report.strongZones)) throw new Error("VastuResult.strongZones must be array");
+  if (!Array.isArray(report.weakZones)) throw new Error("VastuResult.weakZones must be array");
+  if (typeof report.overallScore !== "number") throw new Error("VastuResult.overallScore must be number");
 }

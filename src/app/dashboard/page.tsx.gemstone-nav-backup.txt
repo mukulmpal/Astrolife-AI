@@ -29,7 +29,6 @@ const NAV_ENGINES = [
   { icon:"🔯", label:"My Charts",  href:"/dashboard/kundli" },
   { icon:"🪐", label:"Transits",   href:"/dashboard/transits" },
   { icon:"🎵", label:"Astro Sound", href:"/dashboard/astro-sound" },
-  { icon:"💎", label:"Gemstone", href:"/dashboard/gemstone" },
   { icon:"📡", label:"Event Radar", href:"/dashboard/event-radar" },
   { icon:"📅", label:"Panchang", href:"/dashboard/panchang" },
   { icon:"📄", label:"Report", href:"/dashboard/report" },
@@ -47,7 +46,6 @@ const MOBILE_NAV = [
   { icon: "🔯", label: "Charts", href: "/dashboard/kundli" },
   { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
   { icon: "🎵", label: "Sound", href: "/dashboard/astro-sound" },
-  { icon: "💎", label: "Gems", href: "/dashboard/gemstone" },
   { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
   { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
 ];
@@ -768,7 +766,6 @@ export default function Dashboard() {
                   { icon:"🔢", label:"Numerology",        desc:"Name and date numbers",       href:"/dashboard/numerology" },
                   { icon:"🏠", label:"Vastu",             desc:"16-zone vastu engine",        href:"/dashboard/vastu" },
                   { icon:"🧭", label:"KP Engine",         desc:"Krishnamurti precision",      href:"/dashboard/kp" },
-                  { icon:"💎", label:"Gemstone",         desc:"Safe gemstone guidance",       href:"/dashboard/gemstone" },
                   { icon:"📄", label:"Premium Report",    desc:"Full integrated report",      href:"/dashboard/report" },
                   { icon:"🤖", label:"AI Chat",           desc:"Talk to AI astrologer",       href:"/dashboard/chat" },
               ].map((a,i) => (

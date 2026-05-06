@@ -53,8 +53,8 @@ export default function AKVPage() {
 
       {/* TABS */}
       <div className="tabs">
-        {[["sarva","Sarvashtakavarga"],["planets","Planet Bindus"],["houses","House Guide"]].map(([t,l])=>(
-          <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t as never)}>{l}</button>
+        {([["sarva","Sarvashtakavarga"],["planets","Planet Bindus"],["houses","House Guide"]] as const).map(([t,l])=>(
+          <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{l}</button>
         ))}
       </div>
 

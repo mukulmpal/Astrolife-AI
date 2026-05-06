@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -14,10 +13,10 @@ import { formatChartContext, useUserChart } from "@/lib/user-chart";
 import { getAccountAiUsageStatus, getAiUsageStatus, incrementAccountMonthlyAiUsage, type AiUsageStatus } from "@/lib/usage";
 import {
   calculateTransitReport,
-  PlanetName,
 } from "@/lib/astro-engine/transits";
 import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
+import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 
 interface Message {
   role: "user" | "assistant";
@@ -71,109 +70,6 @@ const MOBILE_NAV = [
   { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
 ];
 
-const PLANETS: PlanetName[] = [
-  "Sun",
-  "Moon",
-  "Mars",
-  "Mercury",
-  "Jupiter",
-  "Venus",
-  "Saturn",
-  "Rahu",
-  "Ketu",
-];
-
-function mod(n: number, m: number) {
-  return ((n % m) + m) % m;
-}
-
-function toRashi(value: any): number {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    if (value >= 0 && value <= 11) return value;
-    if (value >= 1 && value <= 12) return value - 1;
-    return Math.floor(mod(value, 360) / 30);
-  }
-
-  return 0;
-}
-
-function getPlanetData(chart: any, planet: PlanetName) {
-  const lower = planet.toLowerCase();
-
-  return (
-    chart?.planets?.[planet] ??
-    chart?.planets?.[lower] ??
-    chart?.planetData?.[planet] ??
-    chart?.planetData?.[lower] ??
-    chart?.grahas?.[planet] ??
-    chart?.grahas?.[lower] ??
-    {}
-  );
-}
-
-function normalizeChartForTransit(userChart: any) {
-  const rawChart = userChart?.chart ?? userChart;
-
-  const lagnaRaw =
-    rawChart?.lagR ??
-    rawChart?.lagnaRashi ??
-    rawChart?.ascendantRashi ??
-    rawChart?.ascendant?.rashi ??
-    rawChart?.ascendant?.sign ??
-    rawChart?.lagna?.rashi ??
-    rawChart?.lagna?.sign ??
-    rawChart?.houses?.[0]?.rashi ??
-    rawChart?.houses?.[1]?.rashi ??
-    0;
-
-  const lagR = toRashi(lagnaRaw);
-
-  const planets = PLANETS.reduce((acc, planet) => {
-    const data = getPlanetData(rawChart, planet);
-
-    const longitude =
-      data?.longitude ??
-      data?.lon ??
-      data?.lng ??
-      data?.degree ??
-      data?.absoluteDegree ??
-      data?.siderealLongitude ??
-      0;
-
-    const rashi = toRashi(
-      data?.rashi ??
-        data?.sign ??
-        data?.signIndex ??
-        data?.rashiIndex ??
-        data?.zodiacSign ??
-        longitude
-    );
-
-    const house =
-      typeof data?.house === "number" && Number.isFinite(data.house)
-        ? data.house >= 1 && data.house <= 12
-          ? data.house
-          : mod(data.house - 1, 12) + 1
-        : mod(rashi - lagR, 12) + 1;
-
-    acc[planet] = {
-      longitude,
-      rashi,
-      house,
-      rashiName: data?.rashiName ?? data?.signName,
-      nakshatra: data?.nakshatra,
-      retrograde: Boolean(data?.retrograde ?? data?.isRetrograde),
-    };
-
-    return acc;
-  }, {} as any);
-
-  return {
-    tz: rawChart?.tz ?? rawChart?.timezone ?? 5.5,
-    lagR,
-    planets,
-  };
-}
 const WELCOMES: Record<string, string> = {
   general:    "✦ Namaste! I am AstroLife AI — your personal Vedic astrology guide.\n\nI combine the wisdom of Vedic astrology, Lal Kitab, KP System, and modern psychology to give you deep, personalized insights.\n\nShare your birth details or ask me anything about your chart!",
   career:     "📈 Namaste! I am your Career Astrology Agent.\n\nI specialize in career timing, profession analysis, and success periods using your 10th house, D-10 chart, and planetary dashas.\n\nShare your birth details and I'll reveal your ideal career path!",

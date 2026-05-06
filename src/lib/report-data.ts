@@ -850,7 +850,6 @@ export function buildShadbalaReportSection(source: any): ReportSection {
   }
 
 export function buildFullPremiumReportSections(input: any): ReportSection[] {
-  const birth = getBirthDetails(input);
   const rawChart = getChartRoot(input);
 
   const lagna = signFromValue(
@@ -1198,8 +1197,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       ],
     }),
   ];
-
-
+  premiumSections.push(
     makeSection({
       id: "astro-sound-protocol",
       title: "Astro Sound Protocol",
@@ -1229,7 +1227,8 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
         "Stop if the raga feels uncomfortable or emotionally heavy.",
         "For serious health or mental-health concerns, consult a qualified professional.",
       ],
-    }),
+    })
+  );
 
   months.forEach((month, index) => {
     const score = 60 + ((index * 7) % 24);

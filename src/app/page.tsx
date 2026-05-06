@@ -234,9 +234,9 @@ export default function Home() {
           <span className="logo-name">AstroLife</span>
         </div>
         <div className="nav-links">
-          <span className="nav-link">Features</span>
-          <span className="nav-link">How It Works</span>
-          <span className="nav-link">Pricing</span>
+          <span className="nav-link" onClick={() => { window.location.hash = "features"; }}>Features</span>
+          <span className="nav-link" onClick={() => { window.location.hash = "how-it-works"; }}>How It Works</span>
+          <span className="nav-link" onClick={() => { window.location.hash = "pricing"; }}>Pricing</span>
 
           {/* ── THEME TOGGLE ── */}
           <button className="toggle-wrap" onClick={toggle} title="Switch theme">
@@ -244,7 +244,7 @@ export default function Home() {
             <span className="toggle-label">{T.nextLabel}</span>
           </button>
 
-          <button className="nav-btn">Get Free Kundli</button>
+          <button className="nav-btn" onClick={() => { window.location.href = "/onboarding"; }}>Get Free Kundli</button>
         </div>
       </nav>
       <div className="mobile-toggle">
@@ -300,7 +300,7 @@ export default function Home() {
       </div>
 
       {/* FEATURES */}
-      <div className="feat-bg">
+      <div className="feat-bg" id="features">
         <div className="section">
           <div className="stag">✦ Platform Features</div>
           <h2 className="sh serif">15+ Ancient Engines.<br /><em>One AI Intelligence.</em></h2>
@@ -320,7 +320,7 @@ export default function Home() {
       <div className="divider" />
 
       {/* HOW IT WORKS */}
-      <div className="section">
+      <div className="section" id="how-it-works">
         <div className="stag">✦ How It Works</div>
         <h2 className="sh serif">Your Cosmic Blueprint<br /><em>in Under 60 Seconds</em></h2>
         <p className="sp">No astrology knowledge needed. From birth details to profound life insights in moments.</p>
@@ -343,7 +343,7 @@ export default function Home() {
       <div className="divider" />
 
       {/* PRICING */}
-      <div className="price-bg">
+      <div className="price-bg" id="pricing">
         <div className="section" style={{textAlign:"center"}}>
           <div className="stag">✦ Pricing</div>
           <h2 className="sh serif" style={{marginBottom:14}}>Simple. Honest.<br /><em>Transparent Pricing.</em></h2>
@@ -359,7 +359,12 @@ export default function Home() {
                 <ul className="plan-feats">
                   {p.feats.map((f,j)=><li key={j} className="plan-feat"><span className="fc">✦</span>{f}</li>)}
                 </ul>
-                <button className={`plan-cta ${p.hi?"cta-g":"cta-o"}`}>{p.cta} →</button>
+                <button
+                  className={`plan-cta ${p.hi?"cta-g":"cta-o"}`}
+                  onClick={() => { window.location.href = p.name === "Free" ? "/onboarding" : "/dashboard/upgrade"; }}
+                >
+                  {p.cta} →
+                </button>
               </div>
             ))}
           </div>
@@ -400,7 +405,11 @@ export default function Home() {
           <p style={{color:T.cream2,fontSize:17,marginBottom:44,lineHeight:1.8}}>
             Join 50,000+ seekers who found clarity, direction,<br />and purpose through AstroLife AI.
           </p>
-          <button className="btn-gold" style={{fontSize:16,padding:"18px 48px",margin:"0 auto"}}>
+          <button
+            className="btn-gold"
+            style={{fontSize:16,padding:"18px 48px",margin:"0 auto"}}
+            onClick={() => { window.location.href = "/onboarding"; }}
+          >
             ✦ Generate Your Free Kundli
           </button>
         </div>

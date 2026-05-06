@@ -1,4 +1,5 @@
 import { computePlanets, getJD } from "./calculations";
+import { assertPanchangResultContract } from "./contracts";
 
 export interface PanchangResult {
   date: string;
@@ -92,7 +93,7 @@ export function calculatePanchang(date = new Date(), tz = 5.5): PanchangResult {
   if (tithiLabel === "Purnima/Amavasya") notes.push("Emotional intensity high ho sakti hai, grounding zaroor karein.");
   if (nakPada === 4) notes.push("Nakshatra pada-4 emotional closure aur completion tendency dikhata hai.");
 
-  return {
+  const report = {
     date: yyyyMmDd,
     weekday: weekdayName(date),
     tithi: `${tithiLabel} (${tithiNumber}/30)`,
@@ -107,4 +108,7 @@ export function calculatePanchang(date = new Date(), tz = 5.5): PanchangResult {
     sunriseAssumed: "06:00 (local approx)",
     notes,
   };
+
+  assertPanchangResultContract(report);
+  return report;
 }

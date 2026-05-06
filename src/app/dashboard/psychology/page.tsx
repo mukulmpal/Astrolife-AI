@@ -85,8 +85,8 @@ export default function PsychPage() {
 
       {/* TABS */}
       <div className="tabs">
-        {[["pattern","Pattern Analysis"],["planets","9 Functions"],["guide","Shadow Work"]].map(([t,l])=>(
-          <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t as never)}>{l}</button>
+        {([["pattern","Pattern Analysis"],["planets","9 Functions"],["guide","Shadow Work"]] as const).map(([t,l])=>(
+          <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{l}</button>
         ))}
       </div>
 

@@ -1,0 +1,861 @@
+// src/lib/astro-engine/gemstone.ts
+// AstroLife Gemstone Engine — chart-normalized, safe recommendation version
+
+export type Planet =
+  | "Sun"
+  | "Moon"
+  | "Mars"
+  | "Mercury"
+  | "Jupiter"
+  | "Venus"
+  | "Saturn"
+  | "Rahu"
+  | "Ketu"
+  | "Ascendant";
+
+export type ZodiacSign =
+  | "Aries"
+  | "Taurus"
+  | "Gemini"
+  | "Cancer"
+  | "Leo"
+  | "Virgo"
+  | "Libra"
+  | "Scorpio"
+  | "Sagittarius"
+  | "Capricorn"
+  | "Aquarius"
+  | "Pisces";
+
+export interface PlanetPosition {
+  planet: Planet;
+  sign: ZodiacSign;
+  degree: number;
+  house: number;
+  isRetrograde?: boolean;
+  nakshatra?: string;
+  nakshatraPada?: number;
+  dignity?: "exalted" | "own" | "friendly" | "neutral" | "enemy" | "debilitated";
+}
+
+export interface NatalChart {
+  ascendant: ZodiacSign;
+  ascendantDegree: number;
+  planets: PlanetPosition[];
+  lagnaLord?: Planet;
+}
+
+export interface GemstoneRecommendation {
+  gemstone: string;
+  alternateGemstone: string;
+  planet: Planet;
+  reason: string;
+  benefits: string[];
+  cautions: string[];
+  wearing: {
+    metal: string;
+    finger: string;
+    day: string;
+    time: string;
+    mantra: string;
+    weight: string;
+  };
+  strength: "Primary" | "Secondary" | "Tertiary";
+  score: number;
+  color: string;
+  hexColor: string;
+  chakra: string;
+  element: string;
+}
+
+export interface AvoidGemstone {
+  gemstone: string;
+  planet: Planet;
+  reason: string;
+}
+
+export interface GemstoneReport {
+  primaryGemstone: GemstoneRecommendation;
+  secondaryGemstones: GemstoneRecommendation[];
+  avoidGemstones: AvoidGemstone[];
+  lagnaSign: ZodiacSign;
+  lagnaLord: Planet;
+  analysisNotes: string[];
+  safetyNote: string;
+}
+
+export interface RudrakshaRecommendation {
+  planet: Exclude<Planet, "Ascendant">;
+  mukhi: string;
+  bead: string;
+  mantra: string;
+  reason: string;
+}
+
+export interface DashaGemRecommendation {
+  level: "Mahadasha" | "Antardasha";
+  planet: Exclude<Planet, "Ascendant">;
+  gemstone: string;
+  alternateGemstone: string;
+  rudraksha: RudrakshaRecommendation;
+  wearing: {
+    metal: string;
+    finger: string;
+    day: string;
+    time: string;
+    mantra: string;
+    weight: string;
+  };
+  reason: string;
+}
+
+const SIGNS: ZodiacSign[] = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces",
+];
+
+export const SIGN_RULERS: Record<ZodiacSign, Planet> = {
+  Aries: "Mars",
+  Taurus: "Venus",
+  Gemini: "Mercury",
+  Cancer: "Moon",
+  Leo: "Sun",
+  Virgo: "Mercury",
+  Libra: "Venus",
+  Scorpio: "Mars",
+  Sagittarius: "Jupiter",
+  Capricorn: "Saturn",
+  Aquarius: "Saturn",
+  Pisces: "Jupiter",
+};
+
+export const PLANET_GEMSTONES: Record<
+  Planet,
+  { primary: string; alternate: string; color: string; hex: string; chakra: string; element: string }
+> = {
+  Sun: {
+    primary: "Ruby",
+    alternate: "Red Spinel / Garnet",
+    color: "Deep Red",
+    hex: "#C0392B",
+    chakra: "Manipura",
+    element: "Fire",
+  },
+  Moon: {
+    primary: "Pearl",
+    alternate: "Moonstone / White Coral",
+    color: "Milky White",
+    hex: "#F0EAD6",
+    chakra: "Swadhisthana",
+    element: "Water",
+  },
+  Mars: {
+    primary: "Red Coral",
+    alternate: "Carnelian / Red Jasper",
+    color: "Orange Red",
+    hex: "#E74C3C",
+    chakra: "Muladhara",
+    element: "Fire",
+  },
+  Mercury: {
+    primary: "Emerald",
+    alternate: "Green Tourmaline / Peridot",
+    color: "Vivid Green",
+    hex: "#27AE60",
+    chakra: "Anahata",
+    element: "Earth",
+  },
+  Jupiter: {
+    primary: "Yellow Sapphire",
+    alternate: "Citrine / Yellow Topaz",
+    color: "Golden Yellow",
+    hex: "#F1C40F",
+    chakra: "Sahasrara",
+    element: "Ether",
+  },
+  Venus: {
+    primary: "Diamond",
+    alternate: "White Sapphire / Zircon",
+    color: "Clear White",
+    hex: "#ECF0F1",
+    chakra: "Anahata",
+    element: "Water",
+  },
+  Saturn: {
+    primary: "Blue Sapphire",
+    alternate: "Amethyst / Blue Spinel",
+    color: "Deep Blue",
+    hex: "#2980B9",
+    chakra: "Ajna",
+    element: "Air",
+  },
+  Rahu: {
+    primary: "Hessonite",
+    alternate: "Spessartite Garnet",
+    color: "Honey Orange",
+    hex: "#E67E22",
+    chakra: "Vishuddha",
+    element: "Air",
+  },
+  Ketu: {
+    primary: "Cat's Eye",
+    alternate: "Chrysoberyl",
+    color: "Greenish Yellow",
+    hex: "#B7950B",
+    chakra: "Muladhara",
+    element: "Fire",
+  },
+  Ascendant: {
+    primary: "—",
+    alternate: "—",
+    color: "—",
+    hex: "#888888",
+    chakra: "—",
+    element: "—",
+  },
+};
+
+export const PLANET_WEARING: Record<
+  Planet,
+  { metal: string; finger: string; day: string; time: string; mantra: string; weight: string }
+> = {
+  Sun: {
+    metal: "Gold",
+    finger: "Ring finger",
+    day: "Sunday",
+    time: "Sunrise",
+    mantra: "Om Suryaya Namah",
+    weight: "3–5 carats",
+  },
+  Moon: {
+    metal: "Silver",
+    finger: "Little finger",
+    day: "Monday",
+    time: "Evening",
+    mantra: "Om Chandraya Namah",
+    weight: "4–6 carats",
+  },
+  Mars: {
+    metal: "Gold / Copper",
+    finger: "Ring finger",
+    day: "Tuesday",
+    time: "Morning",
+    mantra: "Om Mangalaya Namah",
+    weight: "6–9 carats",
+  },
+  Mercury: {
+    metal: "Gold",
+    finger: "Little finger",
+    day: "Wednesday",
+    time: "Morning",
+    mantra: "Om Budhaya Namah",
+    weight: "3–5 carats",
+  },
+  Jupiter: {
+    metal: "Gold",
+    finger: "Index finger",
+    day: "Thursday",
+    time: "Morning",
+    mantra: "Om Brihaspataye Namah",
+    weight: "4–5 carats",
+  },
+  Venus: {
+    metal: "Silver / Platinum",
+    finger: "Middle finger",
+    day: "Friday",
+    time: "Morning",
+    mantra: "Om Shukraya Namah",
+    weight: "0.5–1 carat",
+  },
+  Saturn: {
+    metal: "Silver / Iron",
+    finger: "Middle finger",
+    day: "Saturday",
+    time: "Twilight",
+    mantra: "Om Shanaischaraya Namah",
+    weight: "4–5 carats",
+  },
+  Rahu: {
+    metal: "Silver / Panchdhatu",
+    finger: "Middle finger",
+    day: "Saturday",
+    time: "Evening",
+    mantra: "Om Rahave Namah",
+    weight: "6–8 carats",
+  },
+  Ketu: {
+    metal: "Silver / Panchdhatu",
+    finger: "Little finger",
+    day: "Tuesday",
+    time: "Morning",
+    mantra: "Om Ketave Namah",
+    weight: "6–8 carats",
+  },
+  Ascendant: {
+    metal: "—",
+    finger: "—",
+    day: "—",
+    time: "—",
+    mantra: "—",
+    weight: "—",
+  },
+};
+
+const LAGNA_BENEFICS: Record<ZodiacSign, Planet[]> = {
+  Aries: ["Sun", "Moon", "Mars", "Jupiter"],
+  Taurus: ["Venus", "Mercury", "Saturn"],
+  Gemini: ["Venus", "Saturn", "Mercury"],
+  Cancer: ["Moon", "Mars", "Jupiter"],
+  Leo: ["Sun", "Mars", "Jupiter"],
+  Virgo: ["Mercury", "Venus", "Saturn"],
+  Libra: ["Venus", "Saturn", "Mercury"],
+  Scorpio: ["Moon", "Sun", "Jupiter", "Mars"],
+  Sagittarius: ["Sun", "Mars", "Jupiter"],
+  Capricorn: ["Venus", "Mercury", "Saturn"],
+  Aquarius: ["Venus", "Saturn", "Mercury"],
+  Pisces: ["Moon", "Mars", "Jupiter"],
+};
+
+const LAGNA_MALEFICS: Record<ZodiacSign, Planet[]> = {
+  Aries: ["Saturn", "Mercury", "Venus"],
+  Taurus: ["Sun", "Moon", "Mars", "Jupiter"],
+  Gemini: ["Sun", "Moon", "Mars", "Jupiter"],
+  Cancer: ["Saturn", "Venus", "Mercury"],
+  Leo: ["Saturn", "Venus", "Mercury"],
+  Virgo: ["Sun", "Moon", "Mars", "Jupiter"],
+  Libra: ["Sun", "Moon", "Mars", "Jupiter"],
+  Scorpio: ["Venus", "Mercury", "Saturn"],
+  Sagittarius: ["Saturn", "Venus", "Mercury"],
+  Capricorn: ["Sun", "Moon", "Mars", "Jupiter"],
+  Aquarius: ["Sun", "Moon", "Mars", "Jupiter"],
+  Pisces: ["Saturn", "Venus", "Mercury"],
+};
+
+const EXALTATION: Record<Planet, ZodiacSign> = {
+  Sun: "Aries",
+  Moon: "Taurus",
+  Mars: "Capricorn",
+  Mercury: "Virgo",
+  Jupiter: "Cancer",
+  Venus: "Pisces",
+  Saturn: "Libra",
+  Rahu: "Taurus",
+  Ketu: "Scorpio",
+  Ascendant: "Aries",
+};
+
+const DEBILITATION: Record<Planet, ZodiacSign> = {
+  Sun: "Libra",
+  Moon: "Scorpio",
+  Mars: "Cancer",
+  Mercury: "Pisces",
+  Jupiter: "Capricorn",
+  Venus: "Virgo",
+  Saturn: "Aries",
+  Rahu: "Scorpio",
+  Ketu: "Taurus",
+  Ascendant: "Libra",
+};
+
+const PLANET_BENEFITS: Record<Planet, string[]> = {
+  Sun: ["Leadership", "Authority", "Confidence", "Recognition", "Vitality"],
+  Moon: ["Emotional stability", "Peace", "Intuition", "Mother connection", "Creativity"],
+  Mars: ["Courage", "Physical strength", "Property drive", "Action power", "Protection"],
+  Mercury: ["Intellect", "Communication", "Business", "Education", "Writing"],
+  Jupiter: ["Wisdom", "Spirituality", "Prosperity", "Children blessings", "Grace"],
+  Venus: ["Love", "Marriage harmony", "Art", "Luxury", "Creativity"],
+  Saturn: ["Discipline", "Longevity", "Career endurance", "Karma clearance", "Structure"],
+  Rahu: ["Innovation", "Foreign gains", "Research", "Technology", "Unconventional success"],
+  Ketu: ["Spiritual insight", "Detachment", "Occult wisdom", "Intuition", "Moksha path"],
+  Ascendant: [],
+};
+
+const PLANET_CAUTIONS: Record<Planet, string[]> = {
+  Sun: ["Can increase ego if unsuitable.", "Avoid casual use if Sun is functionally harsh."],
+  Moon: ["Can increase emotional sensitivity.", "Use gently if Moon is afflicted."],
+  Mars: ["Can increase aggression.", "Avoid casual use if Mars is harsh for relationship houses."],
+  Mercury: ["Can increase overthinking.", "Use carefully if Mercury connects with 8th-house pressure."],
+  Jupiter: ["Can increase weight or over-expansion.", "Avoid if Jupiter is functionally difficult."],
+  Venus: ["Can increase attachment or indulgence.", "Avoid if Venus is functional malefic."],
+  Saturn: ["Test carefully before major use.", "Can intensify Saturn pressure if unsuitable."],
+  Rahu: ["Very strong amplifier.", "Avoid without expert confirmation."],
+  Ketu: ["Can increase detachment.", "Use only with clear spiritual purpose."],
+  Ascendant: [],
+};
+
+const PLANET_RUDRAKSHA: Record<Exclude<Planet, "Ascendant">, { mukhi: string; bead: string; mantra: string }> = {
+  Sun: { mukhi: "1 Mukhi", bead: "Eka Mukhi", mantra: "Om Hreem Namah" },
+  Moon: { mukhi: "2 Mukhi", bead: "Do Mukhi", mantra: "Om Namah" },
+  Mars: { mukhi: "3 Mukhi", bead: "Teen Mukhi", mantra: "Om Kleem Namah" },
+  Mercury: { mukhi: "4 Mukhi", bead: "Char Mukhi", mantra: "Om Hreem Namah" },
+  Jupiter: { mukhi: "5 Mukhi", bead: "Paanch Mukhi", mantra: "Om Hreem Namah" },
+  Venus: { mukhi: "6 Mukhi", bead: "Chhah Mukhi", mantra: "Om Hreem Hum Namah" },
+  Saturn: { mukhi: "7 Mukhi", bead: "Saat Mukhi", mantra: "Om Hum Namah" },
+  Rahu: { mukhi: "8 Mukhi", bead: "Aath Mukhi", mantra: "Om Hum Namah" },
+  Ketu: { mukhi: "9 Mukhi", bead: "Nau Mukhi", mantra: "Om Hreem Hum Namah" },
+};
+
+function mod(n: number, m: number) {
+  return ((n % m) + m) % m;
+}
+
+type Dict = Record<string, unknown>;
+
+function safeNumber(value: unknown, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function normalizeSign(value: unknown): ZodiacSign {
+  if (typeof value === "string") {
+    const clean = value.trim().toLowerCase();
+    const aliases: Record<string, ZodiacSign> = {
+      aries: "Aries",
+      mesh: "Aries",
+      taurus: "Taurus",
+      vrishabh: "Taurus",
+      gemini: "Gemini",
+      mithun: "Gemini",
+      cancer: "Cancer",
+      kark: "Cancer",
+      leo: "Leo",
+      simha: "Leo",
+      virgo: "Virgo",
+      kanya: "Virgo",
+      libra: "Libra",
+      tula: "Libra",
+      scorpio: "Scorpio",
+      vrishchik: "Scorpio",
+      sagittarius: "Sagittarius",
+      dhanu: "Sagittarius",
+      capricorn: "Capricorn",
+      makar: "Capricorn",
+      aquarius: "Aquarius",
+      kumbh: "Aquarius",
+      pisces: "Pisces",
+      meen: "Pisces",
+    };
+
+    if (aliases[clean]) return aliases[clean];
+
+    const numeric = Number(clean);
+    if (Number.isFinite(numeric)) return normalizeSign(numeric);
+  }
+
+  const n = safeNumber(value, 0);
+
+  if (n >= 0 && n <= 11) return SIGNS[Math.round(n)] ?? "Aries";
+  if (n >= 1 && n <= 12) return SIGNS[Math.round(n - 1)] ?? "Aries";
+
+  return SIGNS[Math.floor(mod(n, 360) / 30)] ?? "Aries";
+}
+
+function signIndex(sign: ZodiacSign) {
+  return SIGNS.indexOf(sign);
+}
+
+function houseFromLagna(lagna: ZodiacSign, sign: ZodiacSign) {
+  return mod(signIndex(sign) - signIndex(lagna), 12) + 1;
+}
+
+function getDignity(planet: Planet, sign: ZodiacSign): PlanetPosition["dignity"] {
+  if (EXALTATION[planet] === sign) return "exalted";
+  if (DEBILITATION[planet] === sign) return "debilitated";
+  if (SIGN_RULERS[sign] === planet) return "own";
+  return "neutral";
+}
+
+function asDict(value: unknown): Dict {
+  return value && typeof value === "object" ? (value as Dict) : {};
+}
+
+function getRoot(input: unknown): Dict {
+  const root = asDict(input);
+  const chart = asDict(root.chart);
+  return asDict(chart.chart ?? root.chart ?? root.rawChart ?? root);
+}
+
+function getPlanetObject(source: unknown, planetName: string) {
+  const root = getRoot(source);
+  const sourceObj = asDict(source);
+  const sourceChart = asDict(sourceObj.chart);
+  const lower = planetName.toLowerCase();
+
+  const containers = [
+    root?.planets,
+    root?.grahas,
+    root?.planetData,
+    root?.positions,
+    root?.planetaryPositions,
+    sourceObj?.planets,
+    sourceChart?.planets,
+  ];
+
+  for (const container of containers) {
+    if (!container) continue;
+
+    if (Array.isArray(container)) {
+      const found = container.find((item) => {
+        const obj = asDict(item);
+        const name = String(obj.planet ?? obj.name ?? obj.graha ?? obj.id ?? "").toLowerCase();
+        return name === lower;
+      });
+
+      if (found) return found;
+    }
+
+    if (typeof container === "object") {
+      const map = container as Dict;
+      const found =
+        map?.[planetName] ??
+        map?.[lower] ??
+        map?.[planetName.toUpperCase()];
+      if (found) return found;
+    }
+  }
+
+  return null;
+}
+
+function getAscendantObject(source: unknown) {
+  const root = getRoot(source);
+
+  return (
+    getPlanetObject(source, "Ascendant") ??
+    getPlanetObject(source, "Lagna") ??
+    root?.ascendant ??
+    root?.lagna ??
+    root?.asc ??
+    {}
+  );
+}
+
+function getPlanetSign(source: unknown, planetName: string): ZodiacSign {
+  const planet = asDict(planetName === "Ascendant" ? getAscendantObject(source) : getPlanetObject(source, planetName));
+
+  return normalizeSign(
+    planet?.signName ??
+      planet?.rashiName ??
+      planet?.zodiacSign ??
+      planet?.sign ??
+      planet?.rashi ??
+      planet?.signIndex ??
+      planet?.rashiIndex ??
+      planet?.longitude ??
+      planet?.lon ??
+      planet?.degree
+  );
+}
+
+function getPlanetDegree(source: unknown, planetName: string) {
+  const planet = asDict(planetName === "Ascendant" ? getAscendantObject(source) : getPlanetObject(source, planetName));
+
+  const absolute =
+    planet?.absoluteDegree ??
+    planet?.absoluteDegrees ??
+    planet?.fullDegree ??
+    planet?.longitude ??
+    planet?.lon ??
+    planet?.lng;
+
+  if (absolute !== undefined && absolute !== null) {
+    const n = safeNumber(absolute, 0);
+    return mod(n, 30);
+  }
+
+  return safeNumber(
+    planet?.degreeInSign ??
+      planet?.signDegree ??
+      planet?.degreesInSign ??
+      planet?.rashiDegree ??
+      planet?.degree ??
+      planet?.degrees,
+    0
+  );
+}
+
+function getPlanetHouse(source: unknown, planetName: string, lagna: ZodiacSign, sign: ZodiacSign) {
+  const planet = asDict(planetName === "Ascendant" ? getAscendantObject(source) : getPlanetObject(source, planetName));
+  const house = safeNumber(planet?.house ?? planet?.bhava ?? planet?.houseNumber, 0);
+
+  if (house >= 1 && house <= 12) return Math.round(house);
+
+  return houseFromLagna(lagna, sign);
+}
+
+export function buildNatalChartFromAnyChart(input: unknown): NatalChart {
+  const root = getRoot(input);
+  const asc = asDict(getAscendantObject(root));
+
+  const ascendant = normalizeSign(
+    asc?.signName ??
+      asc?.rashiName ??
+      asc?.zodiacSign ??
+      asc?.sign ??
+      asc?.rashi ??
+      root?.lagnaSign ??
+      root?.lagnaRashi ??
+      root?.ascendantSign ??
+      root?.ascendantRashi ??
+      root?.lagR
+  );
+
+  const ascendantDegree = getPlanetDegree(root, "Ascendant");
+
+  const planets: PlanetPosition[] = ([
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+  ] as Planet[]).map((planet) => {
+    const obj = asDict(getPlanetObject(root, planet));
+    const sign = getPlanetSign(root, planet);
+
+    return {
+      planet,
+      sign,
+      degree: getPlanetDegree(root, planet),
+      house: getPlanetHouse(root, planet, ascendant, sign),
+      isRetrograde: Boolean(obj?.retrograde ?? obj?.isRetrograde ?? obj?.R),
+      nakshatra:
+        typeof (obj?.nakshatra ?? obj?.nak) === "string"
+          ? String(obj?.nakshatra ?? obj?.nak)
+          : undefined,
+      nakshatraPada: safeNumber(obj?.pada ?? obj?.nakshatraPada, 0) || undefined,
+      dignity: getDignity(planet, sign),
+    };
+  });
+
+  return {
+    ascendant,
+    ascendantDegree,
+    planets,
+    lagnaLord: SIGN_RULERS[ascendant],
+  };
+}
+
+export function buildNatalChartFromLagR(lagRData: unknown): NatalChart {
+  return buildNatalChartFromAnyChart(lagRData);
+}
+
+function getPlanetStrengthScore(pos: PlanetPosition, lagna: ZodiacSign): number {
+  let score = 45;
+
+  const dignity = pos.dignity ?? getDignity(pos.planet, pos.sign);
+
+  if (dignity === "exalted") score += 20;
+  else if (dignity === "own") score += 14;
+  else if (dignity === "debilitated") score -= 22;
+
+  if (pos.isRetrograde) score -= 6;
+  if ([1, 4, 7, 10].includes(pos.house)) score += 10;
+  if ([5, 9].includes(pos.house)) score += 14;
+  if ([6, 8, 12].includes(pos.house)) score -= 12;
+
+  if (LAGNA_BENEFICS[lagna]?.includes(pos.planet)) score += 10;
+  if (LAGNA_MALEFICS[lagna]?.includes(pos.planet)) score -= 14;
+
+  return Math.max(18, Math.min(86, Math.round(score)));
+}
+
+function getMaleficEffect(planet: Planet): string {
+  const effects: Partial<Record<Planet, string>> = {
+    Saturn: "delay, pressure, heaviness or nervous system stress",
+    Mars: "aggression, conflict, accident-prone behaviour or blood pressure",
+    Sun: "ego clashes, authority conflict or heat",
+    Mercury: "overthinking, anxiety or business confusion",
+    Venus: "overindulgence, relationship attachment or expense",
+    Jupiter: "overexpansion, false confidence or weight gain",
+    Rahu: "confusion, obsession or sudden volatility",
+    Ketu: "detachment, isolation or sudden breaks",
+  };
+
+  return effects[planet] ?? "unfavourable results";
+}
+
+export function generateGemstoneReport(chart: NatalChart): GemstoneReport {
+  const lagna = chart.ascendant;
+  const lagnaLord = SIGN_RULERS[lagna];
+  const benefics = LAGNA_BENEFICS[lagna] ?? [];
+  const malefics = LAGNA_MALEFICS[lagna] ?? [];
+  const analysisNotes: string[] = [];
+
+  const scoredPlanets = benefics
+    .filter((planet) => planet !== "Ascendant")
+    .map((planet) => {
+      const pos = chart.planets.find((item) => item.planet === planet) ?? null;
+      const score = pos ? getPlanetStrengthScore(pos, lagna) : 28;
+      return { planet, score, pos };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  if (!scoredPlanets.length) {
+    const fallbackPlanet: Exclude<Planet, "Ascendant"> = lagnaLord === "Ascendant" ? "Sun" : lagnaLord;
+    scoredPlanets.push({ planet: fallbackPlanet, score: 50, pos: null });
+  }
+
+  const buildRec = (
+    sp: (typeof scoredPlanets)[number],
+    strength: GemstoneRecommendation["strength"]
+  ): GemstoneRecommendation => {
+    const meta = PLANET_GEMSTONES[sp.planet];
+    const wearing = PLANET_WEARING[sp.planet];
+    const dignity = sp.pos ? getDignity(sp.planet, sp.pos.sign) : "neutral";
+
+    let reason = `${sp.planet} is functionally supportive for ${lagna} lagna.`;
+    if (dignity === "exalted") reason += ` It is exalted in ${sp.pos?.sign}.`;
+    else if (dignity === "own") reason += ` It occupies its own sign ${sp.pos?.sign}.`;
+    else if (dignity === "debilitated") reason += ` It is debilitated, so use only after confirmation.`;
+
+    if (sp.pos && [1, 4, 5, 7, 9, 10].includes(sp.pos.house)) {
+      reason += ` It is connected with favourable house ${sp.pos.house}.`;
+    }
+
+    return {
+      gemstone: meta.primary,
+      alternateGemstone: meta.alternate,
+      planet: sp.planet,
+      reason,
+      benefits: PLANET_BENEFITS[sp.planet],
+      cautions: PLANET_CAUTIONS[sp.planet],
+      wearing,
+      strength,
+      score: sp.score,
+      color: meta.color,
+      hexColor: meta.hex,
+      chakra: meta.chakra,
+      element: meta.element,
+    };
+  };
+
+  const primaryGemstone = buildRec(scoredPlanets[0], "Primary");
+  const secondaryGemstones = scoredPlanets
+    .slice(1, 3)
+    .map((item, index) => buildRec(item, index === 0 ? "Secondary" : "Tertiary"));
+
+  const avoidGemstones: AvoidGemstone[] = malefics
+    .filter((planet) => planet !== "Ascendant")
+    .map((planet) => ({
+      gemstone: PLANET_GEMSTONES[planet].primary,
+      planet,
+      reason: `${planet} is functionally sensitive for ${lagna} lagna. Wearing its gemstone casually may amplify ${getMaleficEffect(planet)}.`,
+    }));
+
+  const lagnaLordPosition = chart.planets.find((planet) => planet.planet === lagnaLord);
+  if (lagnaLordPosition && [1, 4, 5, 9, 10].includes(lagnaLordPosition.house)) {
+    analysisNotes.push(`Lagna lord ${lagnaLord} is placed in house ${lagnaLordPosition.house}, so lagna-supportive remedies become more relevant.`);
+  }
+
+  const afflictedBenefics = chart.planets.filter(
+    (planet) => benefics.includes(planet.planet) && [6, 8, 12].includes(planet.house)
+  );
+
+  if (afflictedBenefics.length) {
+    analysisNotes.push(
+      `${afflictedBenefics.map((planet) => planet.planet).join(", ")} are supportive but placed in sensitive houses, so start with alternatives before major gemstones.`
+    );
+  }
+
+  analysisNotes.push("Start with mantra, colour discipline, donation and behavioural remedies before buying an expensive gemstone.");
+  analysisNotes.push("Final wearing should be confirmed through full chart, dasha, current life situation and expert review.");
+
+  return {
+    primaryGemstone,
+    secondaryGemstones,
+    avoidGemstones,
+    lagnaSign: lagna,
+    lagnaLord,
+    analysisNotes,
+    safetyNote:
+      "Gemstones amplify planetary energy. This page gives guidance, not a final prescription. Test gently and confirm before wearing expensive stones.",
+  };
+}
+
+export function generateGemstoneReportFromChart(input: unknown): GemstoneReport {
+  return generateGemstoneReport(buildNatalChartFromAnyChart(input));
+}
+
+function isPlanetName(value: unknown): value is Exclude<Planet, "Ascendant"> {
+  return ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(String(value));
+}
+
+function findActiveDashaPlanet(input: unknown, key: "dashas" | "antardasha"): Exclude<Planet, "Ascendant"> | null {
+  const root = getRoot(input);
+  const inputObj = asDict(input);
+  const pool = root?.[key] ?? inputObj?.[key] ?? [];
+  if (!Array.isArray(pool) || !pool.length) return null;
+  const active = pool.find((item) => asDict(item)?.active) ?? pool[0];
+  const activeObj = asDict(active);
+  return isPlanetName(activeObj?.planet) ? activeObj.planet : null;
+}
+
+function getHouseRelevanceLine(planetPos: PlanetPosition | undefined): string {
+  if (!planetPos) return "Chart position unavailable, so start with mantra + trial period first.";
+  if ([1, 5, 9].includes(planetPos.house)) return `Strong trikona support: placed in H${planetPos.house} (1/5/9).`;
+  if ([4, 7, 10].includes(planetPos.house)) return `Kendra support present: placed in H${planetPos.house}.`;
+  if ([6, 8, 12].includes(planetPos.house)) return `Placed in sensitive house H${planetPos.house}; prefer milder start and strict testing.`;
+  return `Placed in H${planetPos.house}; use based on current life priorities and tolerance.`;
+}
+
+function makeRudrakshaRecommendation(
+  planet: Exclude<Planet, "Ascendant">,
+  planetPos: PlanetPosition | undefined
+): RudrakshaRecommendation {
+  const data = PLANET_RUDRAKSHA[planet];
+  return {
+    planet,
+    mukhi: data.mukhi,
+    bead: data.bead,
+    mantra: data.mantra,
+    reason: `${planet} balancing support. ${getHouseRelevanceLine(planetPos)}`,
+  };
+}
+
+function makeDashaRecommendation(
+  level: "Mahadasha" | "Antardasha",
+  planet: Exclude<Planet, "Ascendant">,
+  chart: NatalChart
+): DashaGemRecommendation {
+  const gem = PLANET_GEMSTONES[planet];
+  const wear = PLANET_WEARING[planet];
+  const pos = chart.planets.find((p) => p.planet === planet);
+  return {
+    level,
+    planet,
+    gemstone: gem.primary,
+    alternateGemstone: gem.alternate,
+    rudraksha: makeRudrakshaRecommendation(planet, pos),
+    wearing: wear,
+    reason: `${level} planet ${planet} is currently active. ${getHouseRelevanceLine(pos)}`,
+  };
+}
+
+export function generateDashaGemstoneRecommendationsFromChart(input: unknown): DashaGemRecommendation[] {
+  const natal = buildNatalChartFromAnyChart(input);
+  const md = findActiveDashaPlanet(input, "dashas");
+  const ad = findActiveDashaPlanet(input, "antardasha");
+  const result: DashaGemRecommendation[] = [];
+
+  if (md) result.push(makeDashaRecommendation("Mahadasha", md, natal));
+  if (ad) result.push(makeDashaRecommendation("Antardasha", ad, natal));
+  return result;
+}
+
+export const calculateGemstoneReport = generateGemstoneReportFromChart;
+export const getGemstoneReport = generateGemstoneReportFromChart;
+export const analyzeGemstones = generateGemstoneReportFromChart;
