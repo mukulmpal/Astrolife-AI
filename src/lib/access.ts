@@ -52,14 +52,21 @@ export const FEATURE_ACCESS: Record<FeatureKey, SubscriptionTier[]> = {
 };
 
 export function normalizeTier(tier?: string | null): SubscriptionTier {
+  if (isFullAccessEnabled()) return "elite";
   return tier === "premium" || tier === "elite" ? tier : "free";
 }
 
+export function isFullAccessEnabled() {
+  return process.env.NEXT_PUBLIC_FULL_ACCESS_ENABLED === "true";
+}
+
 export function isBillingEnforced() {
+  if (isFullAccessEnabled()) return false;
   return process.env.NEXT_PUBLIC_BILLING_ENFORCED === "true";
 }
 
 export function canAccessFeature(feature: FeatureKey, tier?: string | null) {
+  if (isFullAccessEnabled()) return true;
   return FEATURE_ACCESS[feature].includes(normalizeTier(tier));
 }
 

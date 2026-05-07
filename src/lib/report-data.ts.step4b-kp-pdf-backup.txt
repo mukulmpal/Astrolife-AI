@@ -1,16 +1,5 @@
 import { generateGemstoneReportFromChart } from "@/lib/astro-engine/gemstone";
 import { calculateKpReport } from "@/lib/astro-engine/kp";
-import { calculatePanchang } from "@/lib/astro-engine/panchang";
-import { calculateLalKitab } from "@/lib/astro-engine/lalkitab";
-import { calculateShadbala } from "@/lib/astro-engine/shadbala";
-import { calculateAshtakavarga } from "@/lib/astro-engine/ashtakavarga";
-import { calculateVastu } from "@/lib/astro-engine/vastu";
-import { calculatePsychology } from "@/lib/astro-engine/psychology";
-import { calculateDivisional, getDashamshaAnalysis, getNavamshaAnalysis } from "@/lib/astro-engine/divisional";
-import { calculateDestiny } from "@/lib/astro-engine/destiny";
-import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
-import { calculateTransitReport } from "@/lib/astro-engine/transits";
-import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/report-data.ts
 
@@ -159,94 +148,6 @@ function planetStatus(planet: string) {
   if (planet === "Moon") return "Emotional";
   if (planet === "Sun") return "Authority";
   return "Neutral";
-}
-
-function getLagnaSign(rawChart: any): string {
-  return signFromValue(
-    rawChart?.lagna?.sign ??
-      rawChart?.ascendant?.sign ??
-      rawChart?.lagnaRashi ??
-      rawChart?.ascendantRashi ??
-      rawChart?.lagR ??
-      rawChart?.lagnaNum
-  );
-}
-
-function formatDateLike(value: any): string {
-  if (!value) return "";
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return safeText(value, "");
-
-  return date.toLocaleDateString("en-IN", {
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function getActiveDasha(rawChart: any): any {
-  const dashas = Array.isArray(rawChart?.dashas) ? rawChart.dashas : [];
-  const active = dashas.find((entry: any) => entry?.active) ?? dashas[0];
-
-  return (
-    rawChart?.currentDasha ??
-    rawChart?.dasha?.current ??
-    rawChart?.runningDasha ??
-    rawChart?.activeDasha ??
-    active ??
-    null
-  );
-}
-
-function formatDashaLabel(value: any): string {
-  if (!value) return "To be calculated";
-  if (typeof value === "string") return value;
-
-  const planet = value?.planet ?? value?.name ?? value?.lord ?? value?.dashaLord;
-  if (!planet) return safeText(value, "To be calculated");
-
-  const start = formatDateLike(value?.start ?? value?.startDate ?? value?.from);
-  const end = formatDateLike(value?.end ?? value?.endDate ?? value?.to);
-  const range = start || end ? ` (${[start, end].filter(Boolean).join(" - ")})` : "";
-
-  return `${planet} Mahadasha${range}`;
-}
-
-function getEngineChart(input: any): any {
-  const root = getChartRoot(input);
-  return root?.planets ? root : input;
-}
-
-function getChartDate(input: any): Date {
-  const root = getEngineChart(input);
-  const date = safeText(root?.dob ?? root?.dateOfBirth ?? root?.birth?.dob, "");
-  const parsed = date ? new Date(`${date}T12:00:00`) : new Date();
-  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
-}
-
-function safeSection(
-  fallbackId: string,
-  title: string,
-  error: unknown,
-): ReportSection {
-  return makeSection({
-    id: fallbackId,
-    title,
-    subtitle: "Real engine call failed.",
-    score: 45,
-    paragraphs: [
-      `AstroLife attempted to call the real ${title} engine for this PDF section, but the engine did not return a usable result.`,
-      `Failure detail: ${error instanceof Error ? error.message : "Unknown engine error"}.`,
-    ],
-    summary: [
-      "This section is not using generic interpretation intentionally.",
-      "The engine call needs to be fixed or given the expected chart payload.",
-    ],
-    actionPlan: [
-      "Check the engine input contract.",
-      "Confirm the chart object contains planets, houses, lagna and birth data.",
-    ],
-    remedy: ["Do not treat this failed section as a prediction."],
-  });
 }
 
 function buildPlanets(rawChart: any): ReportPlanet[] {
@@ -447,7 +348,14 @@ export function buildPremiumReportData(input: any): PremiumReportData {
   const birth = getBirthDetails(input);
   const rawChart = getChartRoot(input);
 
-  const lagna = getLagnaSign(rawChart) || "—";
+  const lagna =
+    signFromValue(
+      rawChart?.lagna?.sign ??
+        rawChart?.ascendant?.sign ??
+        rawChart?.lagnaRashi ??
+        rawChart?.ascendantRashi ??
+        rawChart?.lagR
+    ) || "—";
 
   const moon = getPlanet(rawChart, "Moon");
   const moonSign = signFromValue(moon?.sign ?? moon?.rashi ?? moon?.longitude);
@@ -644,18 +552,18 @@ export function buildPremiumReportData(input: any): PremiumReportData {
     lagna,
     moonSign,
     nakshatra,
-    currentDasha: formatDashaLabel(getActiveDasha(rawChart)),
+    currentDasha: safeText(rawChart?.currentDasha ?? rawChart?.dasha?.current, "To be calculated"),
     reportTitle: "AstroLife Premium Kundli Report",
     executiveSummary: [
-      `This premium report combines Vedic astrology, planetary positions, yogas, doshas, dasha timing, transits and AI-assisted interpretation for ${birth.name}. The visible birth foundation is ${lagna} Lagna, ${moonSign} Moon sign and ${nakshatra} Nakshatra.`,
-      `The current timing layer shows ${formatDashaLabel(getActiveDasha(rawChart))}. Read the life-area sections through this dasha context, because the same chart promise becomes more visible when the connected planet is active.`,
+      `This premium report combines Vedic astrology, planetary positions, yogas, doshas, dasha timing, transits and AI-assisted interpretation to provide a deep view of your life pattern. The goal is not to create fear, but to give clarity about strengths, challenges, timing and practical remedies.`,
+      `Your chart shows that life improves when emotional awareness is combined with disciplined execution. Some areas may demand patience, especially when karmic planets influence important houses, but the same pressure can become a source of maturity and long-term achievement.`,
       `The report should be read as a guidance document. Astrology shows tendencies, timings and symbolic patterns. Final life decisions should always include practical judgment, free will and expert advice where required.`,
     ],
     keyHighlights: [
       `Lagna: ${lagna}`,
       `Moon Sign: ${moonSign}`,
       `Nakshatra: ${nakshatra}`,
-      `Current Dasha: ${formatDashaLabel(getActiveDasha(rawChart))}`,
+      `Current Dasha: ${safeText(rawChart?.currentDasha ?? rawChart?.dasha?.current, "To be calculated")}`,
       "Main Growth Theme: Discipline + clarity + practical action",
       "Report Style: Long interpretation with quick summary",
     ],
@@ -878,26 +786,23 @@ export function buildShadbalaReportSection(source: any): ReportSection {
     });
   }
   
-export function buildDashaTimelineReportSection(source: any): ReportSection {
+  export function buildDashaTimelineReportSection(source: any): ReportSection {
     const data = source ?? {};
-    const activeDasha = getActiveDasha(data);
   
-    const current = formatDashaLabel(
+    const current =
       data?.currentDasha ??
-        data?.current ??
-        data?.activeDasha ??
-        data?.dasha?.current ??
-        data?.runningDasha ??
-        activeDasha
-    );
+      data?.current ??
+      data?.activeDasha ??
+      data?.dasha?.current ??
+      data?.runningDasha ??
+      "To be calculated";
   
-    const mahadasha = formatDashaLabel(
+    const mahadasha =
       data?.mahadasha ??
-        data?.mahaDasha ??
-        data?.md ??
-        data?.currentMahadasha ??
-        activeDasha
-    );
+      data?.mahaDasha ??
+      data?.md ??
+      data?.currentMahadasha ??
+      "To be calculated";
   
     const antardasha =
       data?.antardasha ??
@@ -949,7 +854,13 @@ export function buildDashaTimelineReportSection(source: any): ReportSection {
 export function buildFullPremiumReportSections(input: any): ReportSection[] {
   const rawChart = getChartRoot(input);
 
-  const lagna = getLagnaSign(rawChart);
+  const lagna = signFromValue(
+    rawChart?.lagna?.sign ??
+      rawChart?.ascendant?.sign ??
+      rawChart?.lagnaRashi ??
+      rawChart?.ascendantRashi ??
+      rawChart?.lagR
+  );
 
   const moon = getPlanet(rawChart, "Moon");
   const moonSign = signFromValue(moon?.sign ?? moon?.rashi ?? moon?.longitude);
@@ -1260,7 +1171,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
     }),
 
     makeSection({
-      id: "gemstone-suitability",
+      id: "gemstone-suggestions",
       title: "Gemstone Suggestions",
       subtitle: "Supportive planetary strengthening with caution and responsibility.",
       score: 66,
@@ -2205,499 +2116,4 @@ export function buildKpReportSections(input: any): ReportSection[] {
       }),
     ];
   }
-}
-
-export function buildRealPanchangEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const p = calculatePanchang(getChartDate(chart), Number(chart?.tz ?? 5.5));
-    return makeSection({
-      id: "panchang-details",
-      title: "Panchang Details",
-      subtitle: `${p.weekday} · ${p.tithi} · ${p.nakshatra} Pada ${p.nakshatraPada}`,
-      score: 78,
-      paragraphs: [
-        `The real Panchang engine was called for ${p.date}. It calculates the lunar day from Sun-Moon distance, nakshatra from Moon longitude, yoga from Sun plus Moon longitude and karana from half-tithi movement.`,
-        `This birth/day Panchang shows ${p.paksha} Paksha ${p.tithi}, ${p.nakshatra} Nakshatra Pada ${p.nakshatraPada}, ${p.yoga} Yoga and ${p.karana} Karana.`,
-        `Moon is in ${p.moonSign} and Sun is in ${p.sunSign}. These values should be read with Lagna, Moon sign, dasha and the rest of the natal chart before making deeper predictions.`,
-      ],
-      summary: [
-        `Date: ${p.date}`,
-        `Weekday: ${p.weekday}`,
-        `Tithi: ${p.tithi} · ${p.paksha} Paksha`,
-        `Nakshatra: ${p.nakshatra} Pada ${p.nakshatraPada}`,
-        `Yoga: ${p.yoga} · Karana: ${p.karana}`,
-        `Moon Sign: ${p.moonSign} · Sun Sign: ${p.sunSign}`,
-      ],
-      actionPlan: [
-        `Use ${p.nakshatra} for mental and emotional reading.`,
-        `Use ${p.tithi} and ${p.karana} for spiritual rhythm and remedy timing.`,
-        "For exact muhurta, add local sunrise correction in a later phase.",
-      ],
-      remedy: p.notes.length
-        ? p.notes
-        : ["Keep intention clear, speech soft and daily discipline steady."],
-    });
-  } catch (error) {
-    return safeSection("panchang-details", "Panchang Details", error);
-  }
-}
-
-export function buildRealLalKitabReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const lk = calculateLalKitab(chart.planets, chart.dob);
-    const pakka = lk.planets.filter((p: any) => p.status === "pakka");
-    const dushman = lk.planets.filter((p: any) => p.status === "dushman");
-    const activeAges = lk.planets.filter((p: any) => p.isActNow);
-
-    return makeSection({
-      id: "lalkitab-karma",
-      title: "Lal Kitab Karma",
-      subtitle: `${pakka.length} Pakka Ghar · ${dushman.length} Dushman Ghar · ${lk.rins.length} Rin zones`,
-      score: Math.max(42, Math.min(84, 70 + pakka.length * 3 - dushman.length * 4)),
-      paragraphs: [
-        `The real Lal Kitab engine was called using the chart planet houses and date of birth. It evaluates Pakka Ghar, Dushman Ghar, Nishaniyan, Upaya, planetary takkar, Rin Siddhant and activation ages.`,
-        lk.summary,
-        lk.hasPitraRin
-          ? "Pitra Rin is detected in this chart. This should be handled through respectful ancestral remedies, father-line healing and consistent behavioural correction rather than fear."
-          : "No strong Pitra Rin alert was detected by the Lal Kitab engine in this pass.",
-      ],
-      summary: [
-        `Pakka Ghar planets: ${pakka.map((p: any) => `${p.planet} H${p.house}`).join(", ") || "None"}`,
-        `Dushman Ghar planets: ${dushman.map((p: any) => `${p.planet} H${p.house}`).join(", ") || "None"}`,
-        `Takkar combinations: ${lk.takkars.map((t: any) => `${t.p1}-${t.p2} H${t.house}`).join(", ") || "None"}`,
-        `Rin zones: ${lk.rins.map((r: any) => `${r.planet} H${r.house}`).join(", ") || "None"}`,
-        `Activation now: ${activeAges.map((p: any) => `${p.planet} age ${p.actAge}`).join(", ") || "None"}`,
-      ],
-      actionPlan: [
-        "Prioritize Dushman Ghar planets for behavioural correction.",
-        "Follow only the top 1-3 upaya consistently instead of remedy overload.",
-        "Check activation age planets for current-year sensitivity.",
-      ],
-      remedy: [
-        ...dushman.slice(0, 3).map((p: any) => `${p.planet} H${p.house}: ${p.upaya}`),
-        ...lk.rins.slice(0, 2).map((r: any) => `${r.planet} Rin: ${r.upaya}`),
-      ].slice(0, 5),
-    });
-  } catch (error) {
-    return safeSection("lalkitab-karma", "Lal Kitab Karma", error);
-  }
-}
-
-export function buildRealShadbalaEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const result = calculateShadbala(chart.planets);
-    const strongest = result.planets.find((p: any) => p.planet === result.strongest) ?? result.planets[0];
-    const weakest = result.planets.find((p: any) => p.planet === result.weakest) ?? result.planets[result.planets.length - 1];
-
-    return makeSection({
-      id: "shadbala",
-      title: "Shadbala & Planet Strength",
-      subtitle: `Average strength ${result.avgStrength}% · Strongest ${result.strongest} · Weakest ${result.weakest}`,
-      score: result.avgStrength,
-      paragraphs: [
-        "The real Shadbala engine was called for this PDF. It evaluates Sthana, Dig, Kala, Cheshta, Naisargika and Drik Bala for each planet from the natal chart.",
-        result.summary,
-        strongest ? `${strongest.planet} is the strongest visible planet with ${strongest.percentage}% strength and ${strongest.grade} grade.` : "Strongest planet could not be resolved.",
-        weakest ? `${weakest.planet} is the most sensitive planet with ${weakest.percentage}% strength and ${weakest.grade} grade.` : "Weakest planet could not be resolved.",
-      ],
-      summary: result.planets
-        .slice()
-        .sort((a: any, b: any) => b.percentage - a.percentage)
-        .map((p: any) => `${p.planet}: ${p.percentage}% · ${p.grade}`),
-      actionPlan: [
-        `Use ${result.strongest} as a support planet during action periods.`,
-        `Treat ${result.weakest} themes with patience, remedy and practical discipline.`,
-        "Read strength together with dasha before expecting major results.",
-      ],
-      remedy: [
-        weakest ? `Strengthen ${weakest.planet} through its mantra, duty and behavioural correction.` : "Use simple daily discipline.",
-        "Respect weak planet significations instead of fearing them.",
-      ],
-    });
-  } catch (error) {
-    return safeSection("shadbala", "Shadbala & Planet Strength", error);
-  }
-}
-
-export function buildRealAshtakavargaEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const result = calculateAshtakavarga(chart.planets, Number(chart.lagnaNum ?? 0));
-
-    return makeSection({
-      id: "ashtakavarga",
-      title: "Ashtakavarga Strength",
-      subtitle: `Sarvashtakavarga total ${result.sarvaTotal} bindus`,
-      score: Math.max(40, Math.min(90, Math.round(result.sarvaTotal / 4))),
-      paragraphs: [
-        "The real Ashtakavarga engine was called for this PDF. It calculates planet-wise bindu tables and Sarvashtakavarga house strength from the natal chart.",
-        result.summary,
-        `Strongest houses from the engine are H${result.strongest.map((i: number) => i + 1).join(", H")}; weakest houses are H${result.weakest.map((i: number) => i + 1).join(", H")}.`,
-      ],
-      summary: result.houses.map((h: any) => `H${h.house} ${h.name}: ${h.score} bindus · ${h.grade}`),
-      actionPlan: [
-        "Use strong bindu houses for action and growth.",
-        "Use weak bindu houses for planning, patience and remedies.",
-        "Read Ashtakavarga with dasha and transit timing.",
-      ],
-      remedy: result.houses
-        .filter((h: any) => h.grade === "Weak")
-        .slice(0, 4)
-        .map((h: any) => `H${h.house} ${h.name}: slow down, plan carefully and avoid forcing results.`),
-    });
-  } catch (error) {
-    return safeSection("ashtakavarga", "Ashtakavarga Strength", error);
-  }
-}
-
-export function buildRealTransitRadarEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = normalizeChartForTransit(getEngineChart(input));
-    const transit = calculateTransitReport({ chart, base: "lagna", date: new Date() });
-    const radar = calculateEventRadarReport({ chart, startDate: new Date(), days: 7, base: "lagna" });
-    const best = [...radar.days].sort((a: any, b: any) => b.overallScore - a.overallScore)[0];
-    const caution = [...radar.days].sort((a: any, b: any) => a.overallScore - b.overallScore)[0];
-
-    return makeSection({
-      id: "transit-event-radar",
-      title: "Transit & Event Radar",
-      subtitle: `${transit.baseLabel} · Best ${best?.label ?? "N/A"} · Caution ${caution?.label ?? "N/A"}`,
-      score: best?.overallScore ?? 65,
-      paragraphs: [
-        "The real Transit and Event Radar engines were called for this PDF. Transit calculates current planetary movement against the natal chart, and Event Radar converts the next 7 days into action/caution windows.",
-        transit.summary,
-        radar.summary,
-      ],
-      summary: [
-        `Best day: ${best?.label ?? "N/A"} · ${best?.bestArea ?? "N/A"} · ${best?.overallScore ?? "N/A"}`,
-        `Caution day: ${caution?.label ?? "N/A"} · ${caution?.cautionArea ?? "N/A"} · ${caution?.overallScore ?? "N/A"}`,
-        ...transit.areaScores.map((a: any) => `${a.area}: ${a.score} · ${a.summary}`),
-      ],
-      actionPlan: [
-        "Use high-score days for applications, meetings and launch actions.",
-        "Use low-score days for review, patience and correction.",
-        "Read transit weather through the active dasha.",
-      ],
-      remedy: radar.days.slice(0, 3).map((d: any) => `${d.label}: ${d.remedy}`),
-    });
-  } catch (error) {
-    return safeSection("transit-event-radar", "Transit & Event Radar", error);
-  }
-}
-
-export function buildRealPsychologyEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const result = calculatePsychology(chart.planets);
-    const strong = result.planets.filter((p: any) => p.status === "Strong");
-    const weak = result.planets.filter((p: any) => p.status === "Weak/Blocked");
-
-    return makeSection({
-      id: "psychology-shadow-pattern",
-      title: "Psychology & Shadow Pattern",
-      subtitle: `${result.pattern.name} · Anxiety ${result.pattern.anxietyIdx} · Karma loop ${result.pattern.karmaLoop}`,
-      score: Math.max(35, Math.min(88, 72 - result.pattern.anxietyIdx / 5 + strong.length * 2)),
-      paragraphs: [
-        "The real Psychology engine was called for this PDF. It evaluates planetary psychological functions, strength, shadows, anxiety index, karma loop and behavioural bias.",
-        result.summary,
-        `${result.pattern.name}: ${result.pattern.desc}`,
-        `Shadow work: ${result.pattern.shadow}`,
-      ],
-      summary: [
-        `Dominant pattern: ${result.pattern.name}`,
-        `Anxiety index: ${result.pattern.anxietyIdx}`,
-        `Karma loop: ${result.pattern.karmaLoop}`,
-        `Behavioural bias: ${result.pattern.behavBias}`,
-        `Strong functions: ${strong.map((p: any) => p.planet).join(", ") || "None"}`,
-        `Blocked functions: ${weak.map((p: any) => p.planet).join(", ") || "None"}`,
-      ],
-      actionPlan: [
-        "Work first on blocked psychological planets.",
-        "Use journaling and behavioural tracking for repeated emotional loops.",
-        "Convert strong psychological functions into daily discipline.",
-      ],
-      remedy: weak.slice(0, 4).map((p: any) => `${p.planet}: ${p.weak}`),
-    });
-  } catch (error) {
-    return safeSection("psychology-shadow-pattern", "Psychology & Shadow Pattern", error);
-  }
-}
-
-export function buildRealVastuEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const result = calculateVastu(chart.planets);
-
-    return makeSection({
-      id: "vastu-zones",
-      title: "Astro-Vastu 16 Zone Analysis",
-      subtitle: `Overall score ${result.overallScore} · ${result.strongZones.length} strong · ${result.weakZones.length} weak`,
-      score: result.overallScore,
-      paragraphs: [
-        "The real Astro-Vastu engine was called for this PDF. It maps natal planetary signals to 16 Vastu zones, direction strength, room guidance, alerts and remedies.",
-        `Overall Vastu score is ${result.overallScore}/100. The chart shows ${result.strongZones.length} strong zones and ${result.weakZones.length} weak zones.`,
-        `Strong zones: ${result.strongZones.map((z: any) => `${z.dir} ${z.name}`).join(", ") || "None"}. Weak zones: ${result.weakZones.map((z: any) => `${z.dir} ${z.name}`).join(", ") || "None"}.`,
-      ],
-      summary: result.zones.map((z: any) => `${z.dir} ${z.name}: ${z.score}/100 · ${z.status} · ${z.domain}`),
-      actionPlan: [
-        "Use strong zones for important rooms and supportive activity.",
-        "Correct weak zones with cleanliness, light, colour and simple remedies.",
-        "Avoid making Vastu changes from fear; use practical corrections first.",
-      ],
-      remedy: result.weakZones.slice(0, 5).map((z: any) => `${z.dir} ${z.name}: ${z.remedy}`),
-    });
-  } catch (error) {
-    return safeSection("vastu-zones", "Astro-Vastu 16 Zone Analysis", error);
-  }
-}
-
-export function buildRealDivisionalEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const divs = calculateDivisional(chart.planets, chart.lagnaNum, chart.lagnaLon);
-    const d9 = divs.find((d: any) => d.key === "D9");
-    const d10 = divs.find((d: any) => d.key === "D10");
-    const d9Insights = d9 ? getNavamshaAnalysis(d9) : [];
-    const d10Insights = d10 ? getDashamshaAnalysis(d10) : [];
-
-    return makeSection({
-      id: "divisional-charts-summary",
-      title: "Divisional Charts Summary",
-      subtitle: `D9 ${d9?.lagna ?? "N/A"} · D10 ${d10?.lagna ?? "N/A"} · ${divs.length} varga charts`,
-      score: 74,
-      paragraphs: [
-        "The real Divisional Chart engine was called for this PDF. It calculates D1, D3, D7, D9, D10, D12 and D27 placements from natal planet longitudes.",
-        d9 ? `Navamsha D9 Lagna is ${d9.lagna}. ${d9.keyInsight}` : "D9 data could not be resolved.",
-        d10 ? `Dashamsha D10 Lagna is ${d10.lagna}. ${d10.keyInsight}` : "D10 data could not be resolved.",
-      ],
-      summary: divs.map((d: any) => `${d.key} ${d.name}: Lagna ${d.lagna}`),
-      actionPlan: [
-        "Use D9 for marriage, dharma and mature planetary promise.",
-        "Use D10 for career and public karma.",
-        "Use D27 for endurance and inner strength.",
-      ],
-      remedy: [...d9Insights.slice(0, 3), ...d10Insights.slice(0, 3)],
-    });
-  } catch (error) {
-    return safeSection("divisional-charts-summary", "Divisional Charts Summary", error);
-  }
-}
-
-export function buildRealDestinyEngineReportSection(input: any): ReportSection {
-  try {
-    const chart = getEngineChart(input);
-    const result = calculateDestiny(chart.planets, chart.dashas, chart.dob);
-
-    return makeSection({
-      id: "destiny-timeline",
-      title: "Destiny Timeline",
-      subtitle: `Age ${result.currentAge} · ${result.currentDasha} Mahadasha · Score ${result.currentScore}%`,
-      score: result.currentScore,
-      paragraphs: [
-        "The real Destiny Curve engine was called for this PDF. It scores life phases through dasha periods, current age, peak period, challenge period and six life-area scores.",
-        result.summary,
-        `Peak period: ${result.peak?.planet ?? "N/A"} Mahadasha with score ${result.peak?.score ?? "N/A"}%. Challenge period: ${result.challenge?.planet ?? "N/A"} Mahadasha with score ${result.challenge?.score ?? "N/A"}%.`,
-      ],
-      summary: result.areas.map((a: any) => `${a.name}: ${a.score}/100 · ${a.status}`),
-      actionPlan: [
-        "Use high-score dasha phases for growth and visibility.",
-        "Use challenge phases for correction, discipline and foundation building.",
-        "Read annual/monthly planning through current dasha and transit.",
-      ],
-      remedy: [
-        `Current dasha focus: ${result.currentDasha}. Respect this planet through disciplined action.`,
-        "Do not wait passively for timing; use timing to choose better action.",
-      ],
-    });
-  } catch (error) {
-    return safeSection("destiny-timeline", "Destiny Timeline", error);
-  }
-}
-
-export function buildRealEngineReportSections(input: any): ReportSection[] {
-  const chart = getEngineChart(input);
-
-  return [
-    buildRealPanchangEngineReportSection(chart),
-    ...buildAllYogasDoshasDetailedReportSections(chart),
-    buildRealShadbalaEngineReportSection(chart),
-    buildRealAshtakavargaEngineReportSection(chart),
-    buildDashaTimelineReportSection(chart),
-    buildRealTransitRadarEngineReportSection(chart),
-    buildRealDestinyEngineReportSection(chart),
-    buildRealDivisionalEngineReportSection(chart),
-    buildRealLalKitabReportSection(chart),
-    buildRealPsychologyEngineReportSection(chart),
-    buildRealVastuEngineReportSection(chart),
-    ...buildGemstoneReportSection(chart),
-    ...buildKpReportSections(chart),
-  ];
-}
-
-
-function getAstroLifeReportRoot(input: any): any {
-  return input?.chart?.chart ?? input?.chart ?? input?.rawChart ?? input?.kundli ?? input?.data ?? input ?? {};
-}
-
-function pickAstroLifeValue(root: any, keys: string[]): any {
-  for (const key of keys) {
-    const parts = key.split(".");
-    let current = root;
-
-    for (const part of parts) {
-      current = current?.[part];
-    }
-
-    if (current !== undefined && current !== null && current !== "") {
-      return current;
-    }
-  }
-
-  return "";
-}
-
-function formatAstroLifeValue(value: any): string {
-  if (value === undefined || value === null || value === "") return "Not connected";
-
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  if (Array.isArray(value)) {
-    return value.map(formatAstroLifeValue).filter(Boolean).join(", ");
-  }
-
-  if (typeof value === "object") {
-    const common =
-      value.name ??
-      value.value ??
-      value.label ??
-      value.planet ??
-      value.lord ??
-      value.sign ??
-      value.rashi ??
-      value.nakshatra;
-
-    if (common !== undefined && common !== null && common !== "") {
-      return formatAstroLifeValue(common);
-    }
-
-    return Object.entries(value)
-      .slice(0, 3)
-      .map(([key, val]) => `${key}: ${formatAstroLifeValue(val)}`)
-      .join(", ");
-  }
-
-  return String(value);
-}
-
-export function buildRealPanchangReportSections(input: any): ReportSection[] {
-  const root = getAstroLifeReportRoot(input);
-
-  const panchang =
-    root?.panchang ??
-    root?.panchangDetails ??
-    root?.birthPanchang ??
-    root?.basicPanchang ??
-    root?.astroDetails ??
-    root?.astrologicalDetails ??
-    root?.details ??
-    {};
-
-  const basic =
-    root?.basicDetails ??
-    root?.birthDetails ??
-    root?.nativeDetails ??
-    root?.profile ??
-    root?.user ??
-    {};
-
-  const astro =
-    root?.astrologicalDetails ??
-    root?.astroDetails ??
-    root?.ghatkaChakra ??
-    root?.ghatakaChakra ??
-    {};
-
-  const read = (keys: string[]) => {
-    return formatAstroLifeValue(
-      pickAstroLifeValue(panchang, keys) ||
-        pickAstroLifeValue(astro, keys) ||
-        pickAstroLifeValue(basic, keys) ||
-        pickAstroLifeValue(root, keys)
-    );
-  };
-
-  const tithi = read(["tithi", "Tithi", "lunarTithi", "panchang.tithi"]);
-  const yoga = read(["yog", "yoga", "Yog", "Yoga", "panchang.yoga"]);
-  const karana = read(["karana", "Karana", "panchang.karana"]);
-  const nakshatra = read(["nakshatra", "Nakshatra", "birthNakshatra", "moonNakshatra"]);
-  const nakshatraLord = read(["nakshatraLord", "nakshatra_lord", "nakLord", "Nakshatra lord"]);
-  const rasi = read(["rasi", "rashi", "moonSign", "moonRashi", "Rasi"]);
-  const rasiLord = read(["rasiLord", "rashiLord", "Rasi lord", "moonSignLord"]);
-  const varna = read(["varna", "Varna"]);
-  const yoni = read(["yoni", "Yoni"]);
-  const vasya = read(["vasya", "Vasya"]);
-  const nadi = read(["nadi", "Nadi"]);
-  const gana = read(["gana", "Gana"]);
-  const paya = read(["paya", "Paya"]);
-  const tatva = read(["tatva", "tatwa", "element", "Tatva"]);
-  const sunrise = read(["sunrise", "Sunrise"]);
-  const sunset = read(["sunset", "Sunset"]);
-  const weekday = read(["weekday", "day", "birthDay", "Month"]);
-  const nameAlphabet = read(["nameAlphabet", "nameAlphabetStarting", "Name Alphabet"]);
-
-  const summary = [
-    `Tithi: ${tithi}`,
-    `Yoga/Yog: ${yoga}`,
-    `Karana: ${karana}`,
-    `Nakshatra: ${nakshatra}`,
-    `Nakshatra Lord: ${nakshatraLord}`,
-    `Rasi / Moon Sign: ${rasi}`,
-    `Rasi Lord: ${rasiLord}`,
-    `Varna: ${varna}`,
-    `Yoni: ${yoni}`,
-    `Vasya: ${vasya}`,
-    `Nadi: ${nadi}`,
-    `Gana: ${gana}`,
-    `Paya: ${paya}`,
-    `Tatva: ${tatva}`,
-    `Weekday: ${weekday}`,
-    `Sunrise: ${sunrise}`,
-    `Sunset: ${sunset}`,
-    `Name Alphabet: ${nameAlphabet}`,
-  ];
-
-  const connectedCount = summary.filter((item) => !item.includes("Not connected")).length;
-  const score = connectedCount >= 12 ? 82 : connectedCount >= 8 ? 74 : connectedCount >= 4 ? 66 : 58;
-
-  return [
-    makeSection({
-      id: "real-panchang-details",
-      title: "Panchang Details",
-      subtitle: "Tithi, Nakshatra, Yoga, Karana and Birth-Time Spiritual Signature",
-      score,
-      paragraphs: [
-        "Panchang is the subtle quality of the birth moment. It gives the lunar day, nakshatra, yoga, karana and traditional birth-time indicators that shape temperament, emotional rhythm and spiritual alignment.",
-        `For this chart, the available Panchang data shows Tithi as ${tithi}, Nakshatra as ${nakshatra}, Yoga/Yog as ${yoga}, and Karana as ${karana}.`,
-        `Moon/Rasi foundation is ${rasi}, with Rasi Lord ${rasiLord}. Nakshatra Lord is ${nakshatraLord}. These values should be used together with Lagna, Moon sign and dasha before making deeper predictions.`,
-      ],
-      summary,
-      actionPlan: [
-        `Use Nakshatra ${nakshatra} for emotional and psychological self-awareness.`,
-        `Use Tithi ${tithi} and Karana ${karana} for spiritual rhythm and remedy timing.`,
-        `Use Rasi ${rasi} and Rasi Lord ${rasiLord} while reading Moon-based results.`,
-        "If any field says Not connected, connect that field from the chart API/panchang engine.",
-      ],
-      remedy: [
-        "Respect the Moon through calm sleep, hydration and emotional balance.",
-        "Use a simple daily prayer or gratitude practice.",
-        "Avoid major decisions during emotional turbulence.",
-        "Use Panchang values for deeper muhurta and remedy planning.",
-      ],
-    }),
-  ];
 }

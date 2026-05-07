@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { GlobalPreferencesToggle } from "@/components/global-preferences-toggle";
+import { HtmlPreferencesSync } from "@/components/global-preferences-toggle";
 
 export const metadata: Metadata = {
   title: "AstroLife",
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         {children}
-        <GlobalPreferencesToggle />
+        <HtmlPreferencesSync />
       </body>
     </html>
   );

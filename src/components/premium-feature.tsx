@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { isBillingEnforced, normalizeTier } from "@/lib/access";
+import { isBillingEnforced, isFullAccessEnabled, normalizeTier } from "@/lib/access";
 
 type PremiumFeatureProps = {
   children: React.ReactNode;
@@ -13,8 +13,11 @@ type PremiumFeatureProps = {
 export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
   const [supabase] = useState(() => createClient());
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const fullAccess = isFullAccessEnabled();
 
   useEffect(() => {
+    if (fullAccess) return;
+
     const loadTier = async () => {
       const { data } = await supabase.auth.getUser();
       if (!data.user) return;
@@ -29,7 +32,11 @@ export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
     };
 
     loadTier();
-  }, [supabase]);
+  }, [fullAccess, supabase]);
+
+  if (fullAccess) {
+    return <>{children}</>;
+  }
 
   const enforced = isBillingEnforced();
   const currentTier = normalizeTier(subscriptionTier);

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 type Theme = "indigo" | "saffron";
+const LANDING_THEME_KEY = "landingTheme";
 
 const THEMES = {
   indigo: {
@@ -29,7 +30,10 @@ const THEMES = {
 };
 
 export default function Home() {
-  const [theme, setTheme] = useState<Theme>("indigo");
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "indigo";
+    return window.localStorage.getItem(LANDING_THEME_KEY) === "saffron" ? "saffron" : "indigo";
+  });
   const [scrollY, setScrollY] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const T = THEMES[theme];
@@ -63,6 +67,11 @@ export default function Home() {
     draw();
     return () => { cancelAnimationFrame(id); window.removeEventListener("resize", resize); };
   }, [theme, T.star]);
+
+  useEffect(() => {
+    window.localStorage.setItem(LANDING_THEME_KEY, theme);
+    document.documentElement.dataset.landingTheme = theme;
+  }, [theme]);
 
   const toggle = () => setTheme(p => p === "indigo" ? "saffron" : "indigo");
 

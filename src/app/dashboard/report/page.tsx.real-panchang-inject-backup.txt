@@ -10,14 +10,10 @@ import {
   buildTransitEventRadarReportSection,
   buildDashaTimelineReportSection,
   buildFullPremiumReportSections,
-  buildRealEngineReportSections,
   ReportSection,
 } from "@/lib/report-data";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-import { calculatePanchang } from "@/lib/astro-engine/panchang";
-import { calculateKpReport } from "@/lib/astro-engine/kp";
-import type { ChartData, PlanetData } from "@/lib/astro-engine/calculations";
 
 type ReportPlanet = {
   name?: string;
@@ -29,24 +25,6 @@ type RawChartWithOptionalYogas = {
   chart?: {
     yogas?: unknown;
   };
-};
-
-type DataTableRow = Record<string, string>;
-
-const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-const SIGN_LORDS: Record<string, string> = {
-  Aries: "Mars",
-  Taurus: "Venus",
-  Gemini: "Mercury",
-  Cancer: "Moon",
-  Leo: "Sun",
-  Virgo: "Mercury",
-  Libra: "Venus",
-  Scorpio: "Mars",
-  Sagittarius: "Jupiter",
-  Capricorn: "Saturn",
-  Aquarius: "Saturn",
-  Pisces: "Jupiter",
 };
 
 function asRawChart(input: unknown): unknown {
@@ -95,177 +73,6 @@ function BulletList({ items }: { items: string[] }) {
       ))}
     </ul>
   );
-}
-
-function formatReportValue(value: unknown, fallback = "Not calculated yet") {
-  if (typeof value === "number" && Number.isFinite(value)) return String(value);
-  if (typeof value === "string" && value.trim()) return value;
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  return fallback;
-}
-
-function formatReportDegree(value: unknown) {
-  if (typeof value === "number" && Number.isFinite(value)) return `${value.toFixed(2)}°`;
-  return formatReportValue(value, "—");
-}
-
-function formatFullDegree(planet: PlanetData | undefined) {
-  if (!planet) return "—";
-  if (typeof planet.lon === "number" && Number.isFinite(planet.lon)) return `${planet.lon.toFixed(2)}°`;
-  return formatReportDegree(planet.degree);
-}
-
-function formatDashaRange(entry: { planet?: string; start?: Date; end?: Date } | undefined) {
-  if (!entry) return "Not calculated yet";
-  const start = entry.start instanceof Date && !Number.isNaN(entry.start.getTime()) ? entry.start.getFullYear() : "";
-  const end = entry.end instanceof Date && !Number.isNaN(entry.end.getTime()) ? entry.end.getFullYear() : "";
-  return `${entry.planet ?? "Unknown"}${start || end ? ` (${[start, end].filter(Boolean).join("-")})` : ""}`;
-}
-
-function makeBirthDate(chart: ChartData) {
-  const date = new Date(`${chart.dob}T12:00:00`);
-  return Number.isNaN(date.getTime()) ? new Date() : date;
-}
-
-function ReportDataTable({
-  title,
-  columns,
-  rows,
-}: {
-  title: string;
-  columns: string[];
-  rows: DataTableRow[];
-}) {
-  return (
-    <div className="real-data-table-wrap">
-      <h3>{title}</h3>
-      <table className="real-data-table">
-        <thead>
-          <tr>
-            {columns.map((column) => (
-              <th key={column}>{column}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {columns.map((column) => (
-                <td key={column}>{row[column] ?? "—"}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function buildBasicRows(chart: ChartData, generatedAt: string): DataTableRow[] {
-  const activeMD = chart.dashas.find((entry) => entry.active) ?? chart.dashas[0];
-  const activeAD = chart.antardasha.find((entry) => entry.active) ?? chart.antardasha[0];
-  const moon = chart.planets.Moon;
-
-  return [
-    { Field: "Name", Value: chart.name },
-    { Field: "Date of Birth", Value: chart.dob },
-    { Field: "Time of Birth", Value: chart.tob },
-    { Field: "Birth Place", Value: chart.city },
-    { Field: "Latitude", Value: formatReportDegree(chart.lat) },
-    { Field: "Longitude", Value: formatReportDegree(chart.lon) },
-    { Field: "Timezone", Value: `UTC+${chart.tz}` },
-    { Field: "Julian Day", Value: chart.jd.toFixed(5) },
-    { Field: "Lagna", Value: `${chart.lagnaRashi} (${formatReportDegree(chart.lagnaLon)})` },
-    { Field: "Moon Sign", Value: moon?.sign ?? "Not calculated yet" },
-    { Field: "Moon Nakshatra", Value: moon ? `${moon.nakshatra} Pada ${moon.pada}` : "Not calculated yet" },
-    { Field: "Mahadasha", Value: formatDashaRange(activeMD) },
-    { Field: "Antardasha", Value: formatDashaRange(activeAD) },
-    { Field: "Generated On", Value: generatedAt },
-  ];
-}
-
-function buildAstroDetailRows(chart: ChartData): DataTableRow[] {
-  const lagnaLord = SIGN_LORDS[chart.lagnaRashi] ?? "Not calculated yet";
-  const moon = chart.planets.Moon;
-  const sun = chart.planets.Sun;
-
-  return [
-    { Field: "Ascendant / Lagna", Value: chart.lagnaRashi },
-    { Field: "Lagna Lord", Value: lagnaLord },
-    { Field: "Moon Rashi", Value: moon?.sign ?? "Not calculated yet" },
-    { Field: "Moon Rashi Lord", Value: moon?.sign ? SIGN_LORDS[moon.sign] ?? "Not calculated yet" : "Not calculated yet" },
-    { Field: "Sun Sign", Value: sun?.sign ?? "Not calculated yet" },
-    { Field: "Sun Sign Lord", Value: sun?.sign ? SIGN_LORDS[sun.sign] ?? "Not calculated yet" : "Not calculated yet" },
-    { Field: "Birth Nakshatra", Value: moon ? `${moon.nakshatra} Pada ${moon.pada}` : "Not calculated yet" },
-    { Field: "Nakshatra Lord", Value: moon?.nakshatraLord ?? "Not calculated yet" },
-    { Field: "Current Dasha Source", Value: "Calculated from Moon nakshatra using Vimshottari sequence" },
-  ];
-}
-
-function buildPanchangRows(chart: ChartData): DataTableRow[] {
-  const panchang = calculatePanchang(makeBirthDate(chart), chart.tz);
-  return [
-    { Field: "Panchang Date", Value: panchang.date },
-    { Field: "Weekday / Vaar", Value: panchang.weekday },
-    { Field: "Sunrise", Value: panchang.sunriseAssumed },
-    { Field: "Tithi", Value: panchang.tithi },
-    { Field: "Paksha", Value: panchang.paksha },
-    { Field: "Nakshatra", Value: `${panchang.nakshatra} Pada ${panchang.nakshatraPada}` },
-    { Field: "Yoga", Value: panchang.yoga },
-    { Field: "Karana", Value: panchang.karana },
-    { Field: "Moon Sign", Value: panchang.moonSign },
-    { Field: "Sun Sign", Value: panchang.sunSign },
-    { Field: "Engine Notes", Value: panchang.notes.join(" ") || "No special note from current panchang engine." },
-  ];
-}
-
-function buildPlanetRows(chart: ChartData): DataTableRow[] {
-  return PLANET_ORDER.map((name) => {
-    const planet = chart.planets[name];
-    return {
-      Planet: name,
-      Sign: planet?.sign ?? "—",
-      "Full Degree": formatFullDegree(planet),
-      "Sign Degree": formatReportDegree(planet?.degree),
-      "Sign Lord": planet?.sign ? SIGN_LORDS[planet.sign] ?? "—" : "—",
-      Nakshatra: planet ? `${planet.nakshatra} Pada ${planet.pada}` : "—",
-      "Nakshatra Lord": planet?.nakshatraLord ?? "—",
-      House: planet ? `H${planet.house}` : "—",
-      Dignity: planet?.dignity ?? "—",
-      Retrograde: planet?.retrograde ? "Yes" : "No",
-    };
-  });
-}
-
-function buildKpPlanetRows(chart: ChartData): DataTableRow[] {
-  const kp = calculateKpReport(chart);
-  return kp.rows.map((row) => ({
-    Planet: row.name,
-    Sign: row.sign,
-    Degree: row.degreeText,
-    "Sign Lord": row.signLord,
-    Nakshatra: `${row.nakshatra} Pada ${row.pada}`,
-    "Star Lord": row.starLord,
-    "Sub Lord": row.subLord,
-    "Sub-Sub Lord": row.subSubLord,
-    House: `H${row.house}`,
-    Significators: row.significance,
-  }));
-}
-
-function buildKpCuspRows(chart: ChartData): DataTableRow[] {
-  const kp = calculateKpReport(chart);
-  return kp.cusps.map((row) => ({
-    House: `H${row.house}`,
-    Sign: row.sign,
-    Degree: row.degreeText,
-    "Sign Lord": row.signLord,
-    Nakshatra: `${row.nakshatra} Pada ${row.pada}`,
-    "Star Lord": row.starLord,
-    "Sub Lord": row.subLord,
-    "Sub-Sub Lord": row.subSubLord,
-    Promise: row.promise,
-  }));
 }
 
 function SectionBlock({ section, index }: { section: ReportSection; index: number }) {
@@ -500,15 +307,14 @@ function PremiumChartPage({
 const REPORT_TOC_ITEMS = [
   ["Cover Page", "1"],
   ["Disclaimer & Spiritual Opening", "2"],
-  ["Birth Details + Real Tables", "3"],
-  ["Panchang Data Table", "4"],
-  ["Executive AI Summary", "5"],
-  ["Planetary Positions Table", "6"],
-  ["KP Planetary Details", "7"],
-  ["KP House Cusps", "8"],
-  ["Lagna Chart", "9"],
-  ["Moon Chart", "10"],
-  ["Navamsha D9 Chart", "11"],
+  ["Birth Details", "3"],
+  ["Executive AI Summary", "4"],
+  ["Planetary Positions", "5"],
+  ["Lagna Chart", "6"],
+  ["Moon Chart", "7"],
+  ["Navamsha D9 Chart", "8"],
+  ["Table of Contents", "9"],
+  ["Panchang Details", "10"],
   ["House-wise Life Map", "11–12"],
   ["Yogas & Doshas", "13–15"],
   ["Shadbala & Planet Strength", "16"],
@@ -674,29 +480,12 @@ export default function PremiumReportPage() {
         return buildPremiumReportData(chart);
       }, [chart]);
 
-      const realDataTables = useMemo(() => {
-        return {
-          basic: buildBasicRows(chart, report.generatedAt),
-          astro: buildAstroDetailRows(chart),
-          panchang: buildPanchangRows(chart),
-          planets: buildPlanetRows(chart),
-          kpPlanets: buildKpPlanetRows(chart),
-          kpCusps: buildKpCuspRows(chart),
-        };
-      }, [chart, report.generatedAt]);
-
       const fullPremiumSections = useMemo(() => {
         return buildFullPremiumReportSections(chart);
       }, [chart]);
 
-      const engineReportSections = useMemo(() => {
-        const rawChart = asRawChart(chart);
-        return buildRealEngineReportSections(rawChart);
-      }, [chart]);
-
       const reportSections = useMemo(() => {
         const injectedSections = [
-          ...engineReportSections,
           ...fullPremiumSections,
           yogasDoshasSection,
           shadbalaSection,
@@ -715,21 +504,14 @@ export default function PremiumReportPage() {
           (section) => !injectedIds.has(section.id)
         );
     
-        const tableFirstIds = new Set([
-          "panchang-details",
-          "kp-cusps-report",
-          "kp-planetary-details-report",
-        ]);
-
         return [
           baseSections[0],
           ...uniqueInjectedSections,
           ...baseSections.slice(1),
-        ].filter((section): section is ReportSection => Boolean(section) && !tableFirstIds.has(section.id));
+        ].filter(Boolean) as ReportSection[];
     }, [
         report.sections,
         fullPremiumSections,
-        engineReportSections,
         yogasDoshasSection,
         shadbalaSection,
         ashtakavargaSection,
@@ -943,19 +725,6 @@ export default function PremiumReportPage() {
           </div>
         </div>
 
-        <div className="real-table-grid">
-          <ReportDataTable
-            title="Basic Astrological Details"
-            columns={["Field", "Value"]}
-            rows={realDataTables.basic}
-          />
-          <ReportDataTable
-            title="Astrological Details"
-            columns={["Field", "Value"]}
-            rows={realDataTables.astro}
-          />
-        </div>
-
         <div className="long-content">
           <p>
             Birth details are the foundation of the horoscope. Even a small difference in
@@ -976,40 +745,6 @@ export default function PremiumReportPage() {
         <div className="summary-card full">
           <h3>Key Highlights</h3>
           <BulletList items={report.keyHighlights} />
-        </div>
-
-        <div className="page-footer">
-          <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
-          <span>AstroLife AI</span>
-        </div>
-      </section>
-
-      {/* PANCHANG REAL TABLE */}
-      <section className="report-page">
-        <div className="page-top">
-          <span>AstroLife Premium Report</span>
-          <span>Panchang Details</span>
-        </div>
-
-        <div className="section-heading single">
-          <div>
-            <p className="eyebrow">Birth Panchang · Real Engine Values</p>
-            <h2>Panchang Details</h2>
-          </div>
-        </div>
-
-        <ReportDataTable
-          title="Panchang Details"
-          columns={["Field", "Value"]}
-          rows={realDataTables.panchang}
-        />
-
-        <div className="long-content compact-copy">
-          <p>
-            Panchang values describe the lunar quality of the birth moment. This table is generated from
-            the current AstroLife Panchang engine using the chart date and timezone, so interpretation below
-            should be read from these real tithi, nakshatra, yoga and karana values.
-          </p>
         </div>
 
         <div className="page-footer">
@@ -1084,22 +819,30 @@ export default function PremiumReportPage() {
           </div>
         </div>
 
-        <ReportDataTable
-          title="Planetary Positions"
-          columns={[
-            "Planet",
-            "Sign",
-            "Full Degree",
-            "Sign Degree",
-            "Sign Lord",
-            "Nakshatra",
-            "Nakshatra Lord",
-            "House",
-            "Dignity",
-            "Retrograde",
-          ]}
-          rows={realDataTables.planets}
-        />
+        <table className="planet-table">
+          <thead>
+            <tr>
+              <th>Planet</th>
+              <th>Sign</th>
+              <th>Degree</th>
+              <th>Nakshatra</th>
+              <th>House</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.planets.map((planet) => (
+              <tr key={planet.name}>
+                <td>{planet.name}</td>
+                <td>{planet.sign}</td>
+                <td>{planet.degree}</td>
+                <td>{planet.nakshatra}</td>
+                <td>{planet.house}</td>
+                <td>{planet.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
         <div className="long-content">
           <p>
@@ -1134,86 +877,6 @@ export default function PremiumReportPage() {
 
         <div className="page-footer">
           <span>Astrology is guidance-oriented. Use practical judgment for final decisions.</span>
-          <span>AstroLife AI</span>
-        </div>
-      </section>
-
-      {/* KP REAL TABLES */}
-      <section className="report-page wide-page">
-        <div className="page-top">
-          <span>AstroLife Premium Report</span>
-          <span>KP Details</span>
-        </div>
-
-        <div className="section-heading single">
-          <div>
-            <p className="eyebrow">Krishnamurti Paddhati · Star Lord and Sub Lord Tables</p>
-            <h2>KP Planetary Details</h2>
-          </div>
-        </div>
-
-        <ReportDataTable
-          title="KP Planetary Details"
-          columns={[
-            "Planet",
-            "Sign",
-            "Degree",
-            "Sign Lord",
-            "Nakshatra",
-            "Star Lord",
-            "Sub Lord",
-            "Sub-Sub Lord",
-            "House",
-            "Significators",
-          ]}
-          rows={realDataTables.kpPlanets}
-        />
-
-        <div className="page-footer">
-          <span>KP is timing guidance. Confirm with dasha, transit and real-life context.</span>
-          <span>AstroLife AI</span>
-        </div>
-      </section>
-
-      <section className="report-page wide-page">
-        <div className="page-top">
-          <span>AstroLife Premium Report</span>
-          <span>KP House Cusps</span>
-        </div>
-
-        <div className="section-heading single">
-          <div>
-            <p className="eyebrow">House Cusps · Sub Lord Promise</p>
-            <h2>KP House Cusps</h2>
-          </div>
-        </div>
-
-        <ReportDataTable
-          title="KP House Cusps"
-          columns={[
-            "House",
-            "Sign",
-            "Degree",
-            "Sign Lord",
-            "Nakshatra",
-            "Star Lord",
-            "Sub Lord",
-            "Sub-Sub Lord",
-            "Promise",
-          ]}
-          rows={realDataTables.kpCusps}
-        />
-
-        <div className="long-content compact-copy">
-          <p>
-            KP cusp data is currently produced from the app&apos;s normalized chart and whole-sign cusp logic
-            unless exact cusp degrees are supplied in the chart payload. This keeps the table transparent
-            while preparing the report structure for future exact Placidus/KP cusp data.
-          </p>
-        </div>
-
-        <div className="page-footer">
-          <span>Confirm exact birth time for advanced KP cusp accuracy.</span>
           <span>AstroLife AI</span>
         </div>
       </section>
@@ -1838,78 +1501,6 @@ export default function PremiumReportPage() {
 
         .planet-table tr:nth-child(even) td {
           background: rgba(245, 197, 66, 0.08);
-        }
-
-        .real-table-grid {
-          position: relative;
-          z-index: 1;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 18px;
-          margin: 8px 0 26px;
-        }
-
-        .real-data-table-wrap {
-          position: relative;
-          z-index: 1;
-          margin-bottom: 26px;
-          border: 1px solid rgba(95, 73, 35, 0.16);
-          border-radius: 16px;
-          overflow: hidden;
-          background: rgba(255, 255, 255, 0.56);
-        }
-
-        .real-data-table-wrap h3 {
-          margin: 0;
-          padding: 13px 14px;
-          background: linear-gradient(135deg, rgba(184, 134, 11, 0.92), rgba(245, 197, 66, 0.82));
-          color: #fffaf0;
-          font-size: 13px;
-          letter-spacing: 0;
-        }
-
-        .real-data-table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 11.5px;
-          line-height: 1.42;
-        }
-
-        .real-data-table th {
-          padding: 10px 9px;
-          background: rgba(16, 6, 37, 0.92);
-          color: #fffaf0;
-          text-align: left;
-          font-weight: 700;
-          vertical-align: top;
-        }
-
-        .real-data-table td {
-          padding: 9px;
-          border-top: 1px solid rgba(95, 73, 35, 0.1);
-          border-right: 1px solid rgba(95, 73, 35, 0.08);
-          color: #211735;
-          vertical-align: top;
-          overflow-wrap: anywhere;
-        }
-
-        .real-data-table td:last-child,
-        .real-data-table th:last-child {
-          border-right: 0;
-        }
-
-        .real-data-table tr:nth-child(even) td {
-          background: rgba(245, 197, 66, 0.07);
-        }
-
-        .compact-copy {
-          margin-top: -8px;
-        }
-
-        @media (max-width: 820px) {
-          .real-table-grid {
-            grid-template-columns: 1fr;
-          }
         }
 
 
@@ -2745,7 +2336,7 @@ export default function PremiumReportPage() {
 
       `}</style>
       <MobileBottomNav />
-
+    
       <style jsx global>{`
         /* ASTROLIFE_REPORT_PRINT_CLEANUP */
         @page {

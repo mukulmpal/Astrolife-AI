@@ -1,6 +1,6 @@
 "use client";
 
-import { PLAN_LIMITS, isBillingEnforced } from "@/lib/access";
+import { PLAN_LIMITS, isBillingEnforced, isFullAccessEnabled } from "@/lib/access";
 import { createClient } from "@/lib/supabase/client";
 
 const FREE_MONTHLY_AI_LIMIT = PLAN_LIMITS.free.aiQuestionsPerMonth;
@@ -108,11 +108,23 @@ export async function incrementAccountMonthlyAiUsage() {
 }
 
 export function getAiQuestionsLeft(subscriptionTier?: string | null) {
+  if (isFullAccessEnabled()) return "Unlimited";
   if (subscriptionTier && subscriptionTier !== "free") return "Unlimited";
   return String(Math.max(FREE_MONTHLY_AI_LIMIT - getMonthlyAiUsage(), 0));
 }
 
 export function getAiUsageStatus(subscriptionTier?: string | null): AiUsageStatus {
+  if (isFullAccessEnabled()) {
+    return {
+      enforcementEnabled: false,
+      isBlocked: false,
+      isUnlimited: true,
+      limit: FREE_MONTHLY_AI_LIMIT,
+      used: 0,
+      left: FREE_MONTHLY_AI_LIMIT,
+    };
+  }
+
   if (subscriptionTier && subscriptionTier !== "free") {
     return {
       enforcementEnabled: isBillingEnforced(),
@@ -139,6 +151,10 @@ export function getAiUsageStatus(subscriptionTier?: string | null): AiUsageStatu
 }
 
 export async function getAccountAiUsageStatus(subscriptionTier?: string | null): Promise<AiUsageStatus> {
+  if (isFullAccessEnabled()) {
+    return getAiUsageStatus("elite");
+  }
+
   if (subscriptionTier && subscriptionTier !== "free") {
     return getAiUsageStatus(subscriptionTier);
   }

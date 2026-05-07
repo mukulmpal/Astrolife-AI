@@ -80,7 +80,7 @@ function PrimaryGemHero({ gem }: { gem: GemstoneRecommendation }) {
       <div className="gem-hero-info">
         <div className="gem-label-row">
           <span style={{ color: gem.hexColor, background: `${gem.hexColor}22` }}>
-            Primary Suitability
+            Primary Guidance
           </span>
           <ScoreBar score={gem.score} color={gem.hexColor} />
         </div>
@@ -252,7 +252,7 @@ export default function GemstonePage() {
 
   const report = useMemo(() => {
     const natal = buildNatalChartFromAnyChart(chart);
-    return generateGemstoneReport(natal, chart);
+    return generateGemstoneReport(natal);
   }, [chart]);
   const dashaRecs = useMemo(() => generateDashaGemstoneRecommendationsFromChart(chart), [chart]);
 
@@ -269,7 +269,7 @@ export default function GemstonePage() {
       <main className="gem-page">
         <section style={{ maxWidth: 1120, margin: "0 auto" }}>
           <EngineStateCard
-            title="Gemstone Suitability"
+            title="Your Gemstone Report"
             loading
             loadingText="Chart loading... gemstone and rudraksha guidance will update automatically."
           />
@@ -307,9 +307,9 @@ export default function GemstonePage() {
 
       <section className="gem-header">
         <span>Gemstone Intelligence</span>
-        <h1>Gemstone Suitability</h1>
+        <h1>Your Gemstone Report</h1>
         <p>
-          {report.lagnaSign} Lagna · Lagna Lord {report.lagnaLord}. Suitability guidance only — gemstones
+          {report.lagnaSign} Lagna · Lagna Lord {report.lagnaLord}. Guidance only — gemstones
           amplify planets, so confirm before wearing expensive stones.
         </p>
         <p>
@@ -319,24 +319,6 @@ export default function GemstonePage() {
       </section>
 
       <PrimaryGemHero gem={report.primaryGemstone} />
-
-      <section className="gem-foundation-grid">
-        <div>
-          <span>Lagna</span>
-          <strong>{report.lagnaSign}</strong>
-          <p>Gemstone judgement starts from ascendant and functional benefics.</p>
-        </div>
-        <div>
-          <span>Lagna Lord</span>
-          <strong>{report.lagnaLord}</strong>
-          <p>The lagna lord shows body, identity and life direction support.</p>
-        </div>
-        <div>
-          <span>Current Dasha</span>
-          <strong>{report.currentDasha}</strong>
-          <p>Gemstones should be confirmed with current dasha before wearing.</p>
-        </div>
-      </section>
 
       <section className="gem-tabs">
         {tabs.map((tab) => (
@@ -549,16 +531,9 @@ export default function GemstonePage() {
           opacity: 0.14;
         }
 
-        .gem-hero-card > svg {
-          position: relative;
-          z-index: 1;
-          justify-self: center;
-        }
-
         .gem-hero-info {
           position: relative;
           z-index: 1;
-          min-width: 0;
         }
 
         .gem-label-row {
@@ -616,7 +591,7 @@ export default function GemstonePage() {
 
         .gem-meta-grid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, 1fr);
           gap: 10px;
           margin-bottom: 16px;
         }
@@ -649,50 +624,6 @@ export default function GemstonePage() {
         .gem-avoid-list p {
           color: var(--cream-soft);
           line-height: 1.65;
-        }
-
-        .gem-foundation-grid {
-          position: relative;
-          z-index: 1;
-          max-width: 1120px;
-          margin: 18px auto 0;
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-        }
-
-        .gem-foundation-grid div {
-          border: 1px solid rgba(255,255,255,0.09);
-          background:
-            radial-gradient(circle at top left, rgba(245,197,66,0.10), transparent 34%),
-            rgba(255,255,255,0.055);
-          border-radius: 22px;
-          padding: 16px;
-          backdrop-filter: blur(16px);
-        }
-
-        .gem-foundation-grid span {
-          display: block;
-          color: rgba(255,255,255,0.48);
-          font-size: 11px;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          font-weight: 950;
-          margin-bottom: 7px;
-        }
-
-        .gem-foundation-grid strong {
-          display: block;
-          color: #f5c542;
-          font-size: 20px;
-          margin-bottom: 7px;
-        }
-
-        .gem-foundation-grid p {
-          margin: 0;
-          color: rgba(255,255,255,0.62);
-          line-height: 1.55;
-          font-size: 13px;
         }
 
         .gem-tabs {
@@ -861,21 +792,11 @@ export default function GemstonePage() {
           }
 
           .gem-hero-card,
-          .gem-foundation-grid,
           .gem-grid-two,
           .gem-secondary-grid,
           .gem-secondary-card,
           .gem-meta-grid {
             grid-template-columns: 1fr;
-          }
-
-          .gem-hero-card {
-            text-align: left;
-            padding: 22px;
-          }
-
-          .gem-hero-card > svg {
-            justify-self: start;
           }
 
           .gem-tabs button {

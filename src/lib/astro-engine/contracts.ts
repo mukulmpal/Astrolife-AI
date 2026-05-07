@@ -84,6 +84,12 @@ export function assertPanchangResultContract(report: unknown): asserts report is
   if (!["Shukla", "Krishna"].includes(String(report.paksha))) {
     throw new Error("PanchangResult.paksha must be Shukla|Krishna");
   }
+  if (typeof report.nakshatraLord !== "string") throw new Error("PanchangResult.nakshatraLord must be string");
+  if (!isObject(report.rahuKaal)) throw new Error("PanchangResult.rahuKaal must be object");
+  if (!isObject(report.abhijitMuhurta)) throw new Error("PanchangResult.abhijitMuhurta must be object");
+  if (!Array.isArray(report.shubhKarya)) throw new Error("PanchangResult.shubhKarya must be array");
+  if (!Array.isArray(report.avoidKarya)) throw new Error("PanchangResult.avoidKarya must be array");
+  if (typeof report.aiContext !== "string") throw new Error("PanchangResult.aiContext must be string");
   if (!Array.isArray(report.notes)) throw new Error("PanchangResult.notes must be array");
 }
 

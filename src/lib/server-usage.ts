@@ -1,4 +1,4 @@
-import { isBillingEnforced, PLAN_LIMITS } from "@/lib/access";
+import { isBillingEnforced, isFullAccessEnabled, PLAN_LIMITS } from "@/lib/access";
 import { createClient } from "@/lib/supabase/server";
 
 type ServerUsageState = {
@@ -25,6 +25,20 @@ function isPaidTier(tier?: string | null) {
 export async function getServerAiUsageState(): Promise<ServerUsageState> {
   const enforced = isBillingEnforced();
   const limit = PLAN_LIMITS.free.aiQuestionsPerMonth;
+
+  if (isFullAccessEnabled()) {
+    return {
+      allowed: true,
+      authenticated: true,
+      dbAvailable: false,
+      enforced: false,
+      tier: "elite",
+      used: 0,
+      left: null,
+      limit: null,
+      reason: "temporary_full_access",
+    };
+  }
 
   try {
     const supabase = await createClient();

@@ -25,17 +25,27 @@ type Profile = { subscription_tier?: string | null; subscription_expires_at?: st
   ];
 
 const NAV_ENGINES = [
-  { icon:"🏠", label:"Dashboard",  href:"/dashboard" },
-  { icon:"🔯", label:"My Charts",  href:"/dashboard/kundli" },
-  { icon:"🪐", label:"Transits",   href:"/dashboard/transits" },
-  { icon:"🎵", label:"Astro Sound", href:"/dashboard/astro-sound" },
-  { icon:"💎", label:"Gemstone", href:"/dashboard/gemstone" },
+  { icon:"🔯", label:"Kundli", href:"/dashboard/kundli" },
+  { icon:"🪐", label:"Transits", href:"/dashboard/transits" },
+  { icon:"🧿", label:"Yogas", href:"/dashboard/yogas" },
+  { icon:"⚖️", label:"Shadbala", href:"/dashboard/shadbala" },
+  { icon:"📘", label:"Lal Kitab", href:"/dashboard/lalkitab" },
+  { icon:"🧠", label:"Psychology", href:"/dashboard/psychology" },
+  { icon:"📈", label:"Destiny", href:"/dashboard/destiny" },
+  { icon:"⏳", label:"Dasha", href:"/dashboard/dasha" },
+  { icon:"🌅", label:"Special Lagnas", href:"/dashboard/special-lagnas" },
+  { icon:"🧮", label:"Ashtakavarga", href:"/dashboard/ashtakavarga" },
+  { icon:"🧩", label:"Divisional", href:"/dashboard/divisional" },
+  { icon:"🔢", label:"Numerology", href:"/dashboard/numerology" },
+  { icon:"💑", label:"Kundali Milan", href:"/dashboard/kundali-milan" },
+  { icon:"🧭", label:"KP System", href:"/dashboard/kp" },
   { icon:"📡", label:"Event Radar", href:"/dashboard/event-radar" },
   { icon:"📅", label:"Panchang", href:"/dashboard/panchang" },
+  { icon:"🎵", label:"Astro Sound", href:"/dashboard/astro-sound" },
+  { icon:"💎", label:"Gemstone", href:"/dashboard/gemstone" },
+  { icon:"🏠", label:"Vastu", href:"/dashboard/vastu" },
   { icon:"📄", label:"Report", href:"/dashboard/report" },
-  { icon:"🤖", label:"AI Chat",    href:"/dashboard/chat" },
-  { icon:"📈", label:"Timeline",   href:"/dashboard/destiny" },
-  { icon:"🏠", label:"Vastu",         href:"/dashboard/vastu" },];
+];
 
 const NAV_ACCOUNT = [
   { icon:"👤", label:"Profile",  href:"/dashboard/profile" },
@@ -44,10 +54,26 @@ const NAV_ACCOUNT = [
 ];
 const MOBILE_NAV = [
   { icon: "🏠", label: "Home", href: "/dashboard" },
-  { icon: "🔯", label: "Charts", href: "/dashboard/kundli" },
+  { icon: "🔯", label: "Kundli", href: "/dashboard/kundli" },
   { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
+  { icon: "🧿", label: "Yogas", href: "/dashboard/yogas" },
+  { icon: "⚖️", label: "Shadbala", href: "/dashboard/shadbala" },
+  { icon: "📘", label: "Lal Kitab", href: "/dashboard/lalkitab" },
+  { icon: "🧠", label: "Mind", href: "/dashboard/psychology" },
+  { icon: "📈", label: "Destiny", href: "/dashboard/destiny" },
+  { icon: "⏳", label: "Dasha", href: "/dashboard/dasha" },
+  { icon: "🌅", label: "Lagnas", href: "/dashboard/special-lagnas" },
+  { icon: "🧮", label: "Ashtak", href: "/dashboard/ashtakavarga" },
+  { icon: "🧩", label: "Varga", href: "/dashboard/divisional" },
+  { icon: "🔢", label: "Numbers", href: "/dashboard/numerology" },
+  { icon: "💑", label: "Milan", href: "/dashboard/kundali-milan" },
+  { icon: "🧭", label: "KP", href: "/dashboard/kp" },
+  { icon: "📡", label: "Radar", href: "/dashboard/event-radar" },
+  { icon: "📅", label: "Panchang", href: "/dashboard/panchang" },
   { icon: "🎵", label: "Sound", href: "/dashboard/astro-sound" },
   { icon: "💎", label: "Gems", href: "/dashboard/gemstone" },
+  { icon: "🏠", label: "Vastu", href: "/dashboard/vastu" },
+  { icon: "📄", label: "Report", href: "/dashboard/report" },
   { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
   { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
 ];
@@ -489,8 +515,9 @@ export default function Dashboard() {
           .card{padding:18px}
           .planet-row{gap:8px}
           .energy-pill{padding:2px 8px}
-          .mobile-nav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:10px;right:10px;bottom:10px;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120}
-          .mobile-nav-item{text-decoration:none;color:#605890;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border-radius:10px}
+          .mobile-nav{display:flex;gap:4px;position:fixed;left:10px;right:10px;bottom:10px;overflow-x:auto;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120;scrollbar-width:none}
+          .mobile-nav::-webkit-scrollbar{display:none}
+          .mobile-nav-item{text-decoration:none;color:#605890;display:flex;flex:0 0 58px;min-height:44px;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:10px}
           .mobile-nav-item.active{color:#c8a030;background:rgba(200,160,48,0.1)}
           .mobile-nav-icon{font-size:16px;line-height:1}
           .mobile-nav-label{font-size:9px;letter-spacing:0.2px}
@@ -520,7 +547,8 @@ export default function Dashboard() {
           <div className="nav-section">
             <div className="nav-section-title">Engines</div>
             {NAV_ENGINES.map(n => (
-              <Link key={n.label} href={n.href} className="nav-item">
+              <Link key={n.label} href={n.href}
+                className={`nav-item ${pathname === n.href ? "active" : ""}`}>
                 <span className="nav-icon">{n.icon}</span>{n.label}
               </Link>
             ))}
@@ -758,6 +786,7 @@ export default function Dashboard() {
                   { icon:"📅", label:"Panchang",          desc:"Daily tithi & nakshatra",     href:"/dashboard/panchang" },
                   { icon:"🎵", label:"Astro Sound",       desc:"Raga-based sound remedy",     href:"/dashboard/astro-sound" },
                   { icon:"📈", label:"Destiny Timeline",  desc:"Life arc and dasha flow",     href:"/dashboard/destiny" },
+                  { icon:"⏳", label:"Dasha Timeline",   desc:"Maha + Antar + Pratyantar",   href:"/dashboard/dasha" },
                   { icon:"🧠", label:"Psychology",        desc:"Mind and behavior mapping",   href:"/dashboard/psychology" },
                   { icon:"💑", label:"Kundali Milan",     desc:"36-point compatibility",      href:"/dashboard/kundali-milan" },
                   { icon:"📘", label:"Lal Kitab",         desc:"Karmic remedies",             href:"/dashboard/lalkitab" },

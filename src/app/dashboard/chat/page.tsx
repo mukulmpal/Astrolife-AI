@@ -10,6 +10,7 @@ import {
   type SavedConversation,
 } from "@/lib/ai-conversations";
 import { formatChartContext, useUserChart } from "@/lib/user-chart";
+import { buildAiEngineContext } from "@/lib/ai-engine-context";
 import { getAccountAiUsageStatus, getAiUsageStatus, incrementAccountMonthlyAiUsage, type AiUsageStatus } from "@/lib/usage";
 import {
   calculateTransitReport,
@@ -31,8 +32,38 @@ type ThemeMode = "dark" | "light";
 const CHAT_LANGUAGE_MODE_KEY = "chatLanguageMode";
 const CHAT_THEME_MODE_KEY = "chatThemeMode";
 
+function getInitialLanguageMode(): LanguageMode {
+  if (typeof window === "undefined") return "hinglish";
+  const htmlMode = document.documentElement.dataset.languageMode;
+  const stored = window.localStorage.getItem(CHAT_LANGUAGE_MODE_KEY);
+  if (htmlMode === "hindi" || htmlMode === "english" || htmlMode === "hinglish") return htmlMode;
+  return stored === "hindi" || stored === "english" || stored === "hinglish" ? stored : "hinglish";
+}
+
+function getInitialThemeMode(): ThemeMode {
+  if (typeof window === "undefined") return "dark";
+  const htmlMode = document.documentElement.dataset.themeMode;
+  if (htmlMode === "light" || htmlMode === "dark") return htmlMode;
+  return window.localStorage.getItem(CHAT_THEME_MODE_KEY) === "light" ? "light" : "dark";
+}
+
+function writeLanguagePreference(mode: LanguageMode) {
+  window.localStorage.setItem(CHAT_LANGUAGE_MODE_KEY, mode);
+  document.documentElement.dataset.languageMode = mode;
+  document.documentElement.lang = mode === "hindi" ? "hi" : "en";
+  window.dispatchEvent(new Event("astrolife-preferences-change"));
+}
+
+function writeThemePreference(mode: ThemeMode) {
+  window.localStorage.setItem(CHAT_THEME_MODE_KEY, mode);
+  document.documentElement.dataset.themeMode = mode;
+  document.body.dataset.themeMode = mode;
+  window.dispatchEvent(new Event("astrolife-preferences-change"));
+}
+
 const SOURCE_LINKS: Record<string, string> = {
   "Natal Chart": "/dashboard/kundli",
+  "Full Engine Context": "/dashboard/report",
   "Transit/Gochar": "/dashboard/transits",
   "Daily Feed": "/dashboard/panchang",
 };
@@ -64,8 +95,26 @@ const SUGGESTED = [
 ];
 const MOBILE_NAV = [
   { icon: "🏠", label: "Home", href: "/dashboard" },
-  { icon: "🔯", label: "Charts", href: "/dashboard/kundli" },
+  { icon: "🔯", label: "Kundli", href: "/dashboard/kundli" },
   { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
+  { icon: "🧿", label: "Yogas", href: "/dashboard/yogas" },
+  { icon: "⚖️", label: "Shadbala", href: "/dashboard/shadbala" },
+  { icon: "📘", label: "Lal Kitab", href: "/dashboard/lalkitab" },
+  { icon: "🧠", label: "Mind", href: "/dashboard/psychology" },
+  { icon: "📈", label: "Destiny", href: "/dashboard/destiny" },
+  { icon: "⏳", label: "Dasha", href: "/dashboard/dasha" },
+  { icon: "🌅", label: "Lagnas", href: "/dashboard/special-lagnas" },
+  { icon: "🧮", label: "Ashtak", href: "/dashboard/ashtakavarga" },
+  { icon: "🧩", label: "Varga", href: "/dashboard/divisional" },
+  { icon: "🔢", label: "Numbers", href: "/dashboard/numerology" },
+  { icon: "💑", label: "Milan", href: "/dashboard/kundali-milan" },
+  { icon: "🧭", label: "KP", href: "/dashboard/kp" },
+  { icon: "📡", label: "Radar", href: "/dashboard/event-radar" },
+  { icon: "📅", label: "Panchang", href: "/dashboard/panchang" },
+  { icon: "🎵", label: "Sound", href: "/dashboard/astro-sound" },
+  { icon: "💎", label: "Gems", href: "/dashboard/gemstone" },
+  { icon: "🏠", label: "Vastu", href: "/dashboard/vastu" },
+  { icon: "📄", label: "Report", href: "/dashboard/report" },
   { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
   { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
 ];
@@ -105,19 +154,24 @@ export default function ChatPage() {
   }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [languageMode, setLanguageMode] = useState<LanguageMode>(() => {
-    if (typeof window === "undefined") return "hinglish";
-    const stored = window.localStorage.getItem(CHAT_LANGUAGE_MODE_KEY);
-    return stored === "hindi" || stored === "english" || stored === "hinglish" ? stored : "hinglish";
-  });
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    if (typeof window === "undefined") return "dark";
-    return window.localStorage.getItem(CHAT_THEME_MODE_KEY) === "light" ? "light" : "dark";
-  });
+  const [languageMode, setLanguageMode] = useState<LanguageMode>(getInitialLanguageMode);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialThemeMode);
   const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard/chat";
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { chart } = useUserChart();
+  const changeLanguageMode = (mode: LanguageMode) => {
+    if (typeof window !== "undefined") writeLanguagePreference(mode);
+    setLanguageMode(mode);
+  };
+  const changeThemeMode = (mode: ThemeMode) => {
+    if (typeof window !== "undefined") writeThemePreference(mode);
+    setThemeMode(mode);
+  };
+  const aiEngineContext = useMemo(() => {
+    if (!chart) return "";
+    return buildAiEngineContext(chart);
+  }, [chart]);
   const transitContext = useMemo(() => {
     if (!chart) return "";
   
@@ -178,11 +232,11 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(CHAT_LANGUAGE_MODE_KEY, languageMode);
+    writeLanguagePreference(languageMode);
   }, [languageMode]);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(CHAT_THEME_MODE_KEY, themeMode);
+    writeThemePreference(themeMode);
   }, [themeMode]);
 
   useEffect(() => {
@@ -276,6 +330,7 @@ export default function ChatPage() {
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           agentId: activeAgent.id,
           chartContext: formatChartContext(chart),
+          aiEngineContext,
           transitContext: transitContext,
           dailyFeedContext,
           languageMode,
@@ -451,8 +506,9 @@ export default function ChatPage() {
           .usage-note{margin:0 12px 10px}
           .usage-row{flex-direction:column;align-items:flex-start}
           .free-tag{display:none}
-          .mobile-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:10px;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:130}
-          .mobile-nav-item{text-decoration:none;color:#605890;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border-radius:10px}
+          .mobile-nav{display:flex;gap:4px;position:fixed;left:10px;right:10px;bottom:10px;overflow-x:auto;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:130;scrollbar-width:none}
+          .mobile-nav::-webkit-scrollbar{display:none}
+          .mobile-nav-item{text-decoration:none;color:#605890;display:flex;flex:0 0 58px;min-height:44px;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:10px}
           .mobile-nav-item.active{color:#c8a030;background:rgba(200,160,48,0.1)}
           .mobile-nav-icon{font-size:16px;line-height:1}
           .mobile-nav-label{font-size:10px;letter-spacing:0.2px}
@@ -531,24 +587,24 @@ export default function ChatPage() {
               🪐 Live Transit Active
             </span>
             <div className="lang-toggle">
-              <button type="button" className={`lang-btn ${languageMode === "hindi" ? "active" : ""}`} onClick={() => setLanguageMode("hindi")}>Hindi</button>
-              <button type="button" className={`lang-btn ${languageMode === "english" ? "active" : ""}`} onClick={() => setLanguageMode("english")}>English</button>
-              <button type="button" className={`lang-btn ${languageMode === "hinglish" ? "active" : ""}`} onClick={() => setLanguageMode("hinglish")}>Hinglish</button>
+              <button type="button" className={`lang-btn ${languageMode === "hindi" ? "active" : ""}`} onClick={() => changeLanguageMode("hindi")}>Hindi</button>
+              <button type="button" className={`lang-btn ${languageMode === "english" ? "active" : ""}`} onClick={() => changeLanguageMode("english")}>English</button>
+              <button type="button" className={`lang-btn ${languageMode === "hinglish" ? "active" : ""}`} onClick={() => changeLanguageMode("hinglish")}>Hinglish</button>
             </div>
             <div className="theme-toggle">
-              <button type="button" className={`theme-btn ${themeMode === "dark" ? "active" : ""}`} onClick={() => setThemeMode("dark")}>Dark</button>
-              <button type="button" className={`theme-btn ${themeMode === "light" ? "active" : ""}`} onClick={() => setThemeMode("light")}>Light</button>
+              <button type="button" className={`theme-btn ${themeMode === "dark" ? "active" : ""}`} onClick={() => changeThemeMode("dark")}>Dark</button>
+              <button type="button" className={`theme-btn ${themeMode === "light" ? "active" : ""}`} onClick={() => changeThemeMode("light")}>Light</button>
             </div>
           </div>
           <div className="mobile-controls">
             <div className="lang-toggle">
-              <button type="button" className={`lang-btn ${languageMode === "hindi" ? "active" : ""}`} onClick={() => setLanguageMode("hindi")}>Hindi</button>
-              <button type="button" className={`lang-btn ${languageMode === "english" ? "active" : ""}`} onClick={() => setLanguageMode("english")}>English</button>
-              <button type="button" className={`lang-btn ${languageMode === "hinglish" ? "active" : ""}`} onClick={() => setLanguageMode("hinglish")}>Hinglish</button>
+              <button type="button" className={`lang-btn ${languageMode === "hindi" ? "active" : ""}`} onClick={() => changeLanguageMode("hindi")}>Hindi</button>
+              <button type="button" className={`lang-btn ${languageMode === "english" ? "active" : ""}`} onClick={() => changeLanguageMode("english")}>English</button>
+              <button type="button" className={`lang-btn ${languageMode === "hinglish" ? "active" : ""}`} onClick={() => changeLanguageMode("hinglish")}>Hinglish</button>
             </div>
             <div className="theme-toggle">
-              <button type="button" className={`theme-btn ${themeMode === "dark" ? "active" : ""}`} onClick={() => setThemeMode("dark")}>Dark</button>
-              <button type="button" className={`theme-btn ${themeMode === "light" ? "active" : ""}`} onClick={() => setThemeMode("light")}>Light</button>
+              <button type="button" className={`theme-btn ${themeMode === "dark" ? "active" : ""}`} onClick={() => changeThemeMode("dark")}>Dark</button>
+              <button type="button" className={`theme-btn ${themeMode === "light" ? "active" : ""}`} onClick={() => changeThemeMode("light")}>Light</button>
             </div>
           </div>
 

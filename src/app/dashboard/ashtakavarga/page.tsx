@@ -6,7 +6,7 @@ import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 
 export default function AKVPage() {
-  const [activeTab, setActiveTab] = useState<"sarva"|"planets"|"houses">("sarva");
+  const [activeTab, setActiveTab] = useState<"sarva"|"planets"|"houses"|"sodhya">("sarva");
   const { birth, chart } = useUserChart();
   const result = calculateAshtakavarga(chart.planets as never, chart.lagnaNum);
 
@@ -53,7 +53,7 @@ export default function AKVPage() {
 
       {/* TABS */}
       <div className="tabs">
-        {([["sarva","Sarvashtakavarga"],["planets","Planet Bindus"],["houses","House Guide"]] as const).map(([t,l])=>(
+        {([["sarva","Sarvashtakavarga"],["planets","Planet Bindus"],["houses","House Guide"],["sodhya","Sodhya Pinda"]] as const).map(([t,l])=>(
           <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{l}</button>
         ))}
       </div>
@@ -190,6 +190,61 @@ export default function AKVPage() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── SODHYA PINDA TAB ── */}
+      {activeTab==="sodhya" && (
+        <div>
+          <div className="card" style={{marginBottom:16}}>
+            <div className="card-tag">✦ Sodhya Pinda Foundation</div>
+            <div className="card-title serif">Transit Delivery Strength</div>
+            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8,marginBottom:14}}>
+              Sodhya Pinda-style scoring combines house bindus with rashi/planet dignity weighting. Use it as a
+              transit delivery guide: high Sodhya houses can give smoother results when activated by dasha and gochar,
+              while low zones need patience, planning and remedies.
+            </div>
+            <div className="grid-auto">
+              {result.sodhyaPinda.map((h)=>(
+                <div key={h.house} className="card" style={{borderColor:`${h.color}44`,background:`${h.color}0d`}}>
+                  <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"flex-start"}}>
+                    <div>
+                      <div style={{fontSize:10,color:"#605890",marginBottom:3}}>H{h.house} · {h.sign}</div>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:17,fontWeight:600,color:"#f0e8d0"}}>{h.name}</div>
+                    </div>
+                    <div style={{textAlign:"right"}}>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:31,fontWeight:700,color:h.color,lineHeight:1}}>{h.score}</div>
+                      <div style={{fontSize:10,color:h.color}}>{h.grade}</div>
+                    </div>
+                  </div>
+                  <div className="bar-track" style={{margin:"12px 0 10px"}}>
+                    <div className="bar-fill" style={{width:`${Math.min(100,(h.score/40)*100)}%`,background:h.color}}/>
+                  </div>
+                  <div style={{fontSize:11,color:"#605890",marginBottom:6}}>SAV bindus: {h.bindus}</div>
+                  <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7}}>{h.guidance}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-tag">✦ Transit Ranking</div>
+            <div className="card-title serif">Best & Sensitive Houses</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              <div>
+                <div style={{fontSize:12,color:"#22c55e",fontWeight:700,marginBottom:8}}>Best Transit Zones</div>
+                {result.bestTransitHouses.map((h)=>(
+                  <div key={h.house} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8}}>H{h.house} {h.name} — <span style={{color:"#22c55e"}}>{h.score}</span></div>
+                ))}
+              </div>
+              <div>
+                <div style={{fontSize:12,color:"#ef4444",fontWeight:700,marginBottom:8}}>Sensitive Transit Zones</div>
+                {result.sensitiveTransitHouses.map((h)=>(
+                  <div key={h.house} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8}}>H{h.house} {h.name} — <span style={{color:"#ef4444"}}>{h.score}</span></div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
       </PremiumFeature>

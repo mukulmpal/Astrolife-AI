@@ -92,7 +92,10 @@ export default function Onboarding() {
           onboarding_completed: true,
         });
       }
-      await saveChartToAccount(calculateChart(form.name, form.dob, form.tob, form.city), { replacePrimary: true });
+      await saveChartToAccount(
+        calculateChart(form.name, form.dob, form.tob, form.city, form.lat ?? undefined, form.lon ?? undefined),
+        { replacePrimary: true },
+      );
     } catch (e) { console.log(e); }
     setLoading(false);
     goNext(4);

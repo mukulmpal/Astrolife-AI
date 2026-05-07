@@ -691,23 +691,11 @@ function getMaleficEffect(planet: Planet): string {
 }
 
 
-function readRecordValue(value: unknown, key: string): unknown {
-  return value && typeof value === "object"
-    ? (value as Record<string, unknown>)[key]
-    : undefined;
-}
-
-function normalizeGemstoneDashaName(value: unknown): string {
+function normalizeGemstoneDashaName(value: any): string {
   const raw =
     typeof value === "string"
       ? value
-      : String(
-          readRecordValue(value, "planet") ??
-            readRecordValue(value, "name") ??
-            readRecordValue(value, "lord") ??
-            readRecordValue(value, "graha") ??
-            ""
-        );
+      : String(value?.planet ?? value?.name ?? value?.lord ?? value?.graha ?? "");
 
   const clean = raw.trim().toLowerCase();
 
@@ -737,16 +725,16 @@ function normalizeGemstoneDashaName(value: unknown): string {
   return aliases[clean] ?? raw.trim();
 }
 
-function readGemstoneDasha(input: unknown): string {
+function readGemstoneDasha(input: any): string {
   const root = getRoot(input);
 
   const candidates = [
-    readRecordValue(input, "currentDasha"),
-    readRecordValue(input, "dasha"),
-    readRecordValue(input, "vimshottari"),
-    readRecordValue(input, "vimshottariDasha"),
-    readRecordValue(input, "dashaInfo"),
-    readRecordValue(input, "activeDasha"),
+    input?.currentDasha,
+    input?.dasha,
+    input?.vimshottari,
+    input?.vimshottariDasha,
+    input?.dashaInfo,
+    input?.activeDasha,
     root?.currentDasha,
     root?.dasha,
     root?.vimshottari,
@@ -761,40 +749,40 @@ function readGemstoneDasha(input: unknown): string {
     }
 
     const md = normalizeGemstoneDashaName(
-      readRecordValue(candidate, "mahadasha") ??
-        readRecordValue(candidate, "mahaDasha") ??
-        readRecordValue(candidate, "md") ??
-        readRecordValue(candidate, "currentMD") ??
-        readRecordValue(candidate, "major") ??
-        readRecordValue(candidate, "majorLord")
+      candidate?.mahadasha ??
+        candidate?.mahaDasha ??
+        candidate?.md ??
+        candidate?.currentMD ??
+        candidate?.major ??
+        candidate?.majorLord
     );
 
     const ad = normalizeGemstoneDashaName(
-      readRecordValue(candidate, "antardasha") ??
-        readRecordValue(candidate, "antarDasha") ??
-        readRecordValue(candidate, "ad") ??
-        readRecordValue(candidate, "currentAD") ??
-        readRecordValue(candidate, "sub") ??
-        readRecordValue(candidate, "subLord")
+      candidate?.antardasha ??
+        candidate?.antarDasha ??
+        candidate?.ad ??
+        candidate?.currentAD ??
+        candidate?.sub ??
+        candidate?.subLord
     );
 
     const pd = normalizeGemstoneDashaName(
-      readRecordValue(candidate, "pratyantardasha") ??
-        readRecordValue(candidate, "pratyantarDasha") ??
-        readRecordValue(candidate, "pd") ??
-        readRecordValue(candidate, "currentPD")
+      candidate?.pratyantardasha ??
+        candidate?.pratyantarDasha ??
+        candidate?.pd ??
+        candidate?.currentPD
     );
 
     const path =
-      readRecordValue(candidate, "dashaPath") ??
-      readRecordValue(candidate, "path") ??
-      readRecordValue(candidate, "label") ??
+      candidate?.dashaPath ??
+      candidate?.path ??
+      candidate?.label ??
       [md, ad, pd].filter(Boolean).join(" > ");
 
     if (path) return String(path);
   }
 
-  const directPathValue =
+  const directPath =
     root?.dashaPath ??
     root?.currentDashaPath ??
     [root?.currentMD, root?.currentAD, root?.currentPD]
@@ -802,16 +790,11 @@ function readGemstoneDasha(input: unknown): string {
       .filter(Boolean)
       .join(" > ");
 
-  const directPath =
-    typeof directPathValue === "string"
-      ? directPathValue
-      : normalizeGemstoneDashaName(directPathValue);
-
   return directPath || "Not connected";
 }
 
 
-export function generateGemstoneReport(chart: NatalChart, rawInput?: unknown): GemstoneReport {
+export function generateGemstoneReport(chart: NatalChart, rawInput?: any): GemstoneReport {
   const lagna = chart.ascendant;
   const lagnaLord = SIGN_RULERS[lagna];
   const benefics = LAGNA_BENEFICS[lagna] ?? [];

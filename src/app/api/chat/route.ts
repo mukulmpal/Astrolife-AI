@@ -11,10 +11,11 @@ type LanguageMode = "hindi" | "english" | "hinglish";
 function detectIntentSources(params: {
   messages: { role: string; content: string }[];
   hasChart: boolean;
+  hasEngineContext: boolean;
   hasTransit: boolean;
   hasDailyFeed: boolean;
 }) {
-  const { messages, hasChart, hasTransit, hasDailyFeed } = params;
+  const { messages, hasChart, hasEngineContext, hasTransit, hasDailyFeed } = params;
   const latestUser = [...messages].reverse().find((m) => m.role === "user")?.content?.toLowerCase() ?? "";
   const isTiming = /(today|now|current|this week|timing|kab|abhi|phase|window|gochar|transit)/i.test(latestUser);
   const isRemedy = /(remedy|upay|mantra|totka|daan|donate|fast|vrat|gem|stone)/i.test(latestUser);
@@ -36,10 +37,12 @@ function detectIntentSources(params: {
     pushIf("Transit/Gochar", hasTransit);
   }
   if (isCareer || isRelationship || isHealth) {
+    pushIf("Full Engine Context", hasEngineContext);
     pushIf("Natal Chart", hasChart);
     pushIf("Transit/Gochar", hasTransit);
   }
 
+  pushIf("Full Engine Context", hasEngineContext);
   pushIf("Natal Chart", hasChart);
   pushIf("Transit/Gochar", hasTransit);
   pushIf("Daily Feed", hasDailyFeed);
@@ -57,6 +60,7 @@ function buildSourceConfidence(params: {
 
   if (source === "Transit/Gochar" && timing) return { confidence: "High", reason: "Current timing query detected." };
   if (source === "Daily Feed" && (timing || remedy)) return { confidence: "High", reason: "Today/remedy guidance query detected." };
+  if (source === "Full Engine Context" && (deep || remedy || timing)) return { confidence: "High", reason: "Full multi-engine chart context was provided." };
   if (source === "Natal Chart" && deep) return { confidence: "High", reason: "Personal chart analysis query detected." };
   return { confidence: "Medium", reason: "Supportive context used." };
 }
@@ -251,6 +255,7 @@ export async function POST(req: NextRequest) {
       messages,
       agentId = "general",
       chartContext,
+      aiEngineContext,
       transitContext,
       dailyFeedContext,
       languageMode = "hinglish",
@@ -299,6 +304,19 @@ Not provided.
 If the user asks current timing questions, explain that transit data is needed for accurate timing.
 `;
 
+    const engineBlock = aiEngineContext
+      ? `
+FULL ASTROLIFE ENGINE CONTEXT:
+${aiEngineContext}
+
+Use this as the complete background picture across natal chart, dasha, Shadbala, Ashtakavarga, KP, Lal Kitab, Psychology, Destiny, Divisional charts, Gemstone, Numerology, Vastu, Transit, Event Radar and Panchang.
+Synthesize the relevant signals instead of listing every engine mechanically.
+`
+      : `
+FULL ASTROLIFE ENGINE CONTEXT:
+Not provided.
+`;
+
     const dailyFeedBlock = dailyFeedContext
       ? `
 DAILY PERSONAL FEED (TODAY-FIRST CONTEXT):
@@ -327,6 +345,8 @@ ${agent.system}
 ${chartBlock}
 
 ${transitBlock}
+
+${engineBlock}
 
 ${dailyFeedBlock}
 
@@ -366,6 +386,7 @@ Sign off as: "${agent.emoji} ${agent.name}"`;
     const sources = detectIntentSources({
       messages,
       hasChart: Boolean(chartContext),
+      hasEngineContext: Boolean(aiEngineContext),
       hasTransit: Boolean(transitContext),
       hasDailyFeed: Boolean(dailyFeedContext),
     });

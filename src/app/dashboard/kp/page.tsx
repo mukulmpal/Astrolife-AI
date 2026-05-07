@@ -34,6 +34,10 @@ function KPTableRow({ row }: { row: KPRow }) {
         {row.retrograde ? <span className="retro">℞</span> : null}
       </td>
       <td>{row.position}</td>
+      <td>
+        H{row.rashiHouse} → H{row.bhavaHouse}
+        {row.bhavaShift !== 0 ? <span className="bhava-shift">shift</span> : null}
+      </td>
       <td>{row.degreeText}</td>
       <td>{row.signLord}</td>
       <td>{row.nakshatra}</td>
@@ -130,9 +134,12 @@ export default function KPPage() {
           <strong>KP Foundation Check</strong>
           <p>
             Lagna: {result.input.lagR === 5 ? "Virgo" : ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"][result.input.lagR]} ·
-            Lagna Degree: {result.input.lagLon.toFixed(2)}°. Houses are counted from ascendant:
-            Virgo H1, Libra H2, Leo H12.
+            Lagna Degree: {result.input.lagLon.toFixed(2)}°. KP uses Bhava Chalit houses for event judgement.
           </p>
+          <em>
+            Cusp source: {result.input.cuspSource.replaceAll("-", " ")} · House mode:{" "}
+            {result.input.bhavaMode.replaceAll("-", " ")}
+          </em>
         </div>
         <div>
           <strong>Current Dasha</strong>
@@ -178,6 +185,7 @@ export default function KPPage() {
                 <tr>
                   <th>Planet</th>
                   <th>Position</th>
+                  <th>Rashi → Bhava</th>
                   <th>Degree</th>
                   <th>Sign Lord</th>
                   <th>Nakshatra</th>
@@ -218,6 +226,7 @@ export default function KPPage() {
                   <th>Pada</th>
                   <th>Sub Lord</th>
                   <th>S-S Lord</th>
+                  <th>Source</th>
                   <th>Promise</th>
                 </tr>
               </thead>
@@ -233,6 +242,7 @@ export default function KPPage() {
                     <td>{cusp.pada}</td>
                     <td>{cusp.subLord}</td>
                     <td>{cusp.subSubLord}</td>
+                    <td>{cusp.source.replaceAll("-", " ")}</td>
                     <td>{cusp.promise}</td>
                   </tr>
                 ))}
@@ -599,6 +609,15 @@ export default function KPPage() {
           color: rgba(232, 227, 240, 0.66);
           line-height: 1.55;
           font-size: 13px;
+        }
+
+        .kp-logic-note em {
+          display: block;
+          margin-top: 8px;
+          color: rgba(245, 197, 66, 0.72);
+          font-size: 11px;
+          font-style: normal;
+          text-transform: capitalize;
         }
 
         .kp-events-wrap,
@@ -1022,6 +1041,17 @@ export default function KPPage() {
         .retro {
           margin-left: 5px;
           color: #fb7185;
+        }
+
+        .bhava-shift {
+          display: inline-flex;
+          margin-left: 6px;
+          padding: 2px 6px;
+          border-radius: 999px;
+          background: rgba(245, 197, 66, 0.12);
+          color: #f5c542;
+          font-size: 10px;
+          text-transform: uppercase;
         }
 
         .sub-pill {

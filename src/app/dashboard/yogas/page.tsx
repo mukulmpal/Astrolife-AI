@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type YogaCategory, type PlanTier } from "@/lib/astro-engine/yogas";
 import { useUserChart } from "@/lib/user-chart";
+import { isFullAccessEnabled } from "@/lib/access";
 
-const TIER: PlanTier = "free"; // replace with user's actual tier
+const TIER: PlanTier = isFullAccessEnabled() ? "elite" : "free"; // replace with user's actual tier
 
 export default function YogasPage() {
   const { birth, chart } = useUserChart();

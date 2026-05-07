@@ -1,14 +1,45 @@
 "use client";
 import { useState } from "react";
 import "@/app/dashboard/shared.css";
-import { calculateDivisional, getNavamshaAnalysis, getDashamshaAnalysis, type DivChart } from "@/lib/astro-engine/divisional";
+import {
+  calculateDivisional,
+  getChartAnalysis,
+  getSpecialFindings,
+  type DivChart,
+} from "@/lib/astro-engine/divisional";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 const SIGN_ICONS = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
 const md = (x:number,m:number)=>((x%m)+m)%m;
 
-// Mini North Indian Chart SVG
+const CHART_COLORS: Record<string,string> = {
+  D1:"#c8a030",D3:"#22c55e",D7:"#ec4899",D9:"#a855f7",D10:"#f97316",D12:"#60a5fa",D27:"#2dd4bf"
+};
+const CHART_META: Record<string,{icon:string;domain:string}> = {
+  D1: {icon:"🔯", domain:"Overall Life"},
+  D2: {icon:"💰", domain:"Wealth & Income"},
+  D3: {icon:"⚡", domain:"Siblings & Courage"},
+  D4: {icon:"🏠", domain:"Property & Home"},
+  D5: {icon:"🙏", domain:"Past Merit"},
+  D6: {icon:"🛡️", domain:"Health & Enemies"},
+  D7: {icon:"👶", domain:"Children"},
+  D8: {icon:"⚡", domain:"Sudden Events"},
+  D9: {icon:"💍", domain:"Marriage & Soul"},
+  D10:{icon:"💼", domain:"Career & Status"},
+  D11:{icon:"🎯", domain:"Gains & Income"},
+  D12:{icon:"👨‍👩‍👧", domain:"Parents & Ancestors"},
+  D16:{icon:"🚗", domain:"Vehicles & Comfort"},
+  D20:{icon:"🕉️", domain:"Spiritual Path"},
+  D24:{icon:"📚", domain:"Education"},
+  D27:{icon:"🌟", domain:"Soul Strengths"},
+  D30:{icon:"⚠️", domain:"Obstacles & Karma"},
+  D40:{icon:"☯️", domain:"General Karma"},
+  D45:{icon:"🎭", domain:"Character & Values"},
+  D60:{icon:"🌀", domain:"Past Life Karma"},
+};
+
 function MiniChart({ chart }: { chart: DivChart }) {
   const S=220, h=S/2;
   const CELLS = [
@@ -37,8 +68,8 @@ function MiniChart({ chart }: { chart: DivChart }) {
         const here = byHouse[hn]||[];
         return (
           <g key={hn}>
-            <text x={cx} y={cy-8} textAnchor="middle" fontSize="7" fill={isL?"#d4af37":"#3a3060"}>{rIdx+1}</text>
-            <text x={cx} y={cy+2} textAnchor="middle" fontSize="9" fill={isL?"#d4af37":"#444060"}>{SIGN_ICONS[rIdx]}</text>
+            <text x={cx} y={cy-8}  textAnchor="middle" fontSize="7" fill={isL?"#d4af37":"#3a3060"}>{rIdx+1}</text>
+            <text x={cx} y={cy+2}  textAnchor="middle" fontSize="9" fill={isL?"#d4af37":"#444060"}>{SIGN_ICONS[rIdx]}</text>
             {here.map((p,pi)=>(
               <text key={pi} x={cx+(here.length>1?(pi-(here.length-1)/2)*11:0)} y={cy+14+pi*10}
                 textAnchor="middle" fontSize="10" fill={p.color}>{p.icon}{p.retro?"ℛ":""}</text>
@@ -53,82 +84,114 @@ function MiniChart({ chart }: { chart: DivChart }) {
 export default function DivisionalPage() {
   const [activeChart, setActiveChart] = useState("D9");
   const { birth, chart } = useUserChart();
-  const divs    = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
-  const current = divs.find(d=>d.key===activeChart) || divs[0];
 
-  const d9Insights = getNavamshaAnalysis(divs.find(d=>d.key==="D9")!);
-  const d10Insights= getDashamshaAnalysis(divs.find(d=>d.key==="D10")!);
-
-  const CHART_COLORS: Record<string,string> = {
-    D1:"#c8a030",D3:"#22c55e",D7:"#ec4899",D9:"#a855f7",D10:"#f97316",D12:"#60a5fa",D27:"#2dd4bf"
-  };
+  const divs     = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
+  const current  = divs.find(d=>d.key===activeChart) || divs[0];
+  const analysis = getChartAnalysis(current, divs);
+  const findings = getSpecialFindings(divs);
+  const color    = CHART_COLORS[current.key] ?? "#a855f7";
+  const meta     = CHART_META[current.key];
 
   return (
     <div className="page">
-      <div className="page-tag">📐 Divisional Charts</div>
-      <h1 className="page-title serif">Divisional <em>Chart Analysis</em></h1>
-      <p className="page-sub">D-1 · D-3 · D-7 · D-9 Navamsha · D-10 Dashamsha · D-12 · D-27</p>
+      <style>{`
+        .page{min-height:100vh;background:linear-gradient(135deg,#060212,#0a0520);color:#f0e8d0;padding:28px 20px 110px;font-family:'Outfit',sans-serif}
+        .dv-header{background:linear-gradient(135deg,#120d30,#1a1140);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:22px;margin-bottom:20px}
+        .dv-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#a855f7;margin-bottom:6px}
+        .dv-title{font-size:28px;font-weight:700;color:#f0e8d0;margin:0}
+        .dv-sub{font-size:13px;color:#605890;margin-top:4px}
+        .dv-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+        .dv-tab{padding:8px 16px;border-radius:10px;border:1px solid #1c1840;background:transparent;color:#605890;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;text-align:center}
+        .dv-tab.active{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 15%,transparent);color:var(--tc)}
+        .dv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+        @media(max-width:640px){.dv-grid{grid-template-columns:1fr}}
+        .dv-card{background:#0d0a22;border:1px solid #1f1a42;border-radius:16px;padding:18px}
+        .dv-card-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#605890;margin-bottom:10px}
+        .dv-planet-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #1a1740}
+        .dv-badge{font-size:9px;padding:2px 7px;border-radius:6px;border:1px solid}
+        .dv-insight{padding:8px 0;border-bottom:1px solid #1a1740;font-size:13px;color:#c8c0a8;line-height:1.75;display:flex;gap:8px}
+        .dv-finding{border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid}
+        .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+        .stat{background:#0d0a22;border:1px solid #1f1a42;border-radius:10px;padding:10px 14px;flex:1;min-width:100px}
+        .stat-n{font-size:18px;font-weight:700}
+        .stat-l{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#605890;margin-top:2px}
+      `}</style>
+
+      {/* Header */}
+      <div className="dv-header">
+        <div className="dv-kicker">📐 Divisional Charts</div>
+        <h1 className="dv-title">Divisional Chart Analysis</h1>
+        <div className="dv-sub">{birth?.name} · D-1 to D-27 · Varga Analysis</div>
+        <div className="stat-row">
+          <div className="stat">
+            <div className="stat-n" style={{fontSize:14}}>{divs.find(d=>d.key==="D9")?.lagna}</div>
+            <div className="stat-l">D-9 Lagna</div>
+          </div>
+          <div className="stat">
+            <div className="stat-n" style={{fontSize:14}}>{divs.find(d=>d.key==="D10")?.lagna}</div>
+            <div className="stat-l">D-10 Lagna</div>
+          </div>
+          <div className="stat">
+            <div className="stat-n">{findings.filter(f=>f.type==="positive").length}</div>
+            <div className="stat-l">Positive Yogas</div>
+          </div>
+          <div className="stat">
+            <div className="stat-n">{findings.filter(f=>f.type==="caution").length}</div>
+            <div className="stat-l">Cautions</div>
+          </div>
+        </div>
+      </div>
+
       <PremiumFeature feature="Divisional Charts">
 
-      {/* HEADER */}
-      <div className="header-card">
-        <div className="header-orb"/>
-        <div style={{position:"relative",zIndex:1}}>
-          <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#a855f7",marginBottom:6}}>📐 Divisional Charts</div>
-          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{birth.name}</div>
-          <div style={{fontSize:13,color:"#605890",marginTop:4}}>
-            D-1 Lagna: {chart.lagnaRashi} · D-9 Lagna: {divs.find(d=>d.key==="D9")?.lagna} · D-10 Lagna: {divs.find(d=>d.key==="D10")?.lagna}
-          </div>
-        </div>
-        <div style={{display:"flex",gap:12,flexWrap:"wrap",position:"relative",zIndex:1}}>
-          <div className="hstat"><div className="hstat-n" style={{fontSize:14}}>{divs.find(d=>d.key==="D9")?.lagna}</div><div className="hstat-l">D-9 LAGNA</div></div>
-          <div className="hstat"><div className="hstat-n" style={{fontSize:14}}>{divs.find(d=>d.key==="D10")?.lagna}</div><div className="hstat-l">D-10 LAGNA</div></div>
-          <div className="hstat"><div className="hstat-n">{divs.length}</div><div className="hstat-l">CHARTS</div></div>
-        </div>
+      {/* Chart Selector */}
+      <div className="dv-tabs">
+        {divs.map(d=>{
+          const c = CHART_COLORS[d.key]??"#a855f7";
+          const m = CHART_META[d.key];
+          return (
+            <button key={d.key}
+              className={`dv-tab${activeChart===d.key?" active":""}`}
+              style={{"--tc":c} as React.CSSProperties}
+              onClick={()=>setActiveChart(d.key)}>
+              <span>{m?.icon} {d.key}</span>
+              <div style={{fontSize:10,opacity:0.7,marginTop:2}}>{m?.domain}</div>
+            </button>
+          );
+        })}
       </div>
 
-      {/* CHART SELECTOR */}
-      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:24}}>
-        {divs.map(d=>(
-          <button key={d.key}
-            onClick={()=>setActiveChart(d.key)}
-            style={{padding:"8px 16px",borderRadius:10,border:`1px solid ${activeChart===d.key?CHART_COLORS[d.key]:"#1c1840"}`,
-              background:activeChart===d.key?`${CHART_COLORS[d.key]}15`:"transparent",
-              color:activeChart===d.key?CHART_COLORS[d.key]:"#605890",
-              cursor:"pointer",fontFamily:"Outfit,sans-serif",fontSize:13,fontWeight:500,transition:"all 0.2s"}}>
-            {d.key}
-          </button>
-        ))}
-      </div>
+      {/* Main Grid: Chart + Planets */}
+      <div className="dv-grid" style={{marginBottom:16}}>
 
-      {/* MAIN CONTENT */}
-      <div className="grid-2" style={{marginBottom:24}}>
-        {/* Chart */}
-        <div className="card">
-          <div className="card-tag">✦ {current.key} — {current.name}</div>
-          <div className="card-title serif">{current.name}</div>
+        {/* Mini Chart */}
+        <div className="dv-card" style={{borderColor:color+"33"}}>
+          <div className="dv-card-title">{meta?.icon} {current.key} — {current.name}</div>
           <MiniChart chart={current}/>
-          <div style={{marginTop:12,padding:"10px 14px",background:"rgba(168,85,247,0.05)",border:"1px solid rgba(168,85,247,0.15)",borderRadius:10}}>
-            <div style={{fontSize:10,color:"#a855f7",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:4}}>Purpose</div>
-            <div style={{fontSize:13,color:"#c8c0a8",lineHeight:1.7}}>{current.purpose}</div>
+          <div style={{marginTop:12,padding:"8px 12px",background:color+"0d",border:`1px solid ${color}22`,borderRadius:8}}>
+            <div style={{fontSize:10,color:color,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>Purpose</div>
+            <div style={{fontSize:12,color:"#b0a8c8",lineHeight:1.7}}>{current.purpose}</div>
+          </div>
+          <div style={{marginTop:8,padding:"8px 12px",background:"rgba(255,255,255,0.02)",borderRadius:8,border:"1px solid #1f1a42"}}>
+            <div style={{fontSize:10,color:"#605890",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>{current.key} Lagna</div>
+            <div style={{fontSize:15,color:"#f0e8d0",fontWeight:600}}>{current.lagna}</div>
           </div>
         </div>
 
-        {/* Planet positions */}
-        <div className="card">
-          <div className="card-tag">✦ Planet Positions in {current.key}</div>
-          <div className="card-title serif">Lagna: {current.lagna}</div>
+        {/* Planet Positions */}
+        <div className="dv-card">
+          <div className="dv-card-title">Planet Positions in {current.key}</div>
           {current.planets.map((p,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 0",borderBottom:"1px solid #1c1840"}}>
-              <span style={{fontSize:16,color:p.color,width:22}}>{p.icon}</span>
+            <div key={i} className="dv-planet-row">
+              <span style={{fontSize:15,color:p.color,width:20}}>{p.icon}</span>
               <span style={{flex:1,fontSize:12,color:"#c8c0a8"}}>{p.planet}</span>
               <span style={{fontSize:12,color:"#f0e8d0"}}>{p.sign}</span>
-              <span style={{fontSize:11,color:"#605890",width:24,textAlign:"right"}}>H{p.house}</span>
+              <span style={{fontSize:11,color:"#605890",width:26,textAlign:"right"}}>H{p.house}</span>
               {p.dignity!=="—"&&(
-                <span style={{fontSize:9,padding:"1px 6px",borderRadius:6,
+                <span className="dv-badge" style={{
                   color:p.dignity==="Exalted"?"#c8a030":p.dignity==="Own"?"#22c55e":"#ef4444",
                   background:p.dignity==="Exalted"?"rgba(200,160,48,0.08)":p.dignity==="Own"?"rgba(34,197,94,0.08)":"rgba(239,68,68,0.08)",
-                  border:`1px solid ${p.dignity==="Exalted"?"rgba(200,160,48,0.2)":p.dignity==="Own"?"rgba(34,197,94,0.2)":"rgba(239,68,68,0.2)"}`}}>
+                  borderColor:p.dignity==="Exalted"?"rgba(200,160,48,0.25)":p.dignity==="Own"?"rgba(34,197,94,0.25)":"rgba(239,68,68,0.25)"}}>
                   {p.dignity}
                 </span>
               )}
@@ -138,34 +201,70 @@ export default function DivisionalPage() {
         </div>
       </div>
 
-      {/* Key Insight */}
-      <div className="card" style={{marginBottom:24,borderColor:`${CHART_COLORS[current.key]}33`}}>
-        <div className="card-tag">✦ {current.key} Key Insight</div>
-        <div style={{fontSize:14,color:"#c8c0a8",lineHeight:1.85}}>{current.keyInsight}</div>
+      {/* Interpretation for selected chart */}
+      <div className="dv-card" style={{marginBottom:16,borderColor:color+"44"}}>
+        <div className="dv-card-title" style={{color}}>{meta?.icon} {current.key} — {meta?.domain} Interpretation</div>
+        {analysis.map((ins,i)=>(
+          <div key={i} className="dv-insight">
+            <span style={{color,marginTop:3,flexShrink:0}}>✦</span>
+            <span>{ins}</span>
+          </div>
+        ))}
       </div>
 
-      {/* D9 + D10 Special Insights */}
-      <div className="grid-2">
-        <div className="card" style={{borderColor:"rgba(168,85,247,0.2)"}}>
-          <div className="card-tag">✦ D-9 Navamsha Insights</div>
-          <div className="card-title serif">Marriage & Soul Path</div>
-          {d9Insights.map((ins,i)=>(
-            <div key={i} style={{padding:"8px 0",borderBottom:"1px solid #1c1840",fontSize:13,color:"#c8c0a8",lineHeight:1.7}}>
-              ✦ {ins}
+      {/* Special Findings — cross-chart patterns */}
+      <div className="dv-card" style={{marginBottom:16}}>
+        <div className="dv-card-title">⚡ Special Findings — Cross-Chart Patterns</div>
+        {findings.map((f,i)=>(
+          <div key={i} className="dv-finding" style={{
+            background:f.type==="positive"?"rgba(34,197,94,0.06)":f.type==="caution"?"rgba(239,68,68,0.06)":"rgba(148,163,184,0.05)",
+            borderColor:f.type==="positive"?"rgba(34,197,94,0.25)":f.type==="caution"?"rgba(239,68,68,0.25)":"rgba(148,163,184,0.15)",
+          }}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+              <span style={{fontSize:16}}>{f.type==="positive"?"✅":f.type==="caution"?"⚠️":"◆"}</span>
+              <span style={{fontWeight:600,fontSize:14,color:"#f0e8d0"}}>{f.title}</span>
+              <span style={{marginLeft:"auto",display:"flex",gap:4}}>
+                {f.charts.map(c=>(
+                  <span key={c} style={{fontSize:9,padding:"1px 6px",borderRadius:4,background:CHART_COLORS[c]+"22",color:CHART_COLORS[c],border:`1px solid ${CHART_COLORS[c]}44`}}>{c}</span>
+                ))}
+              </span>
             </div>
-          ))}
-        </div>
-        <div className="card" style={{borderColor:"rgba(249,115,22,0.2)"}}>
-          <div className="card-tag">✦ D-10 Dashamsha Insights</div>
-          <div className="card-title serif">Career & Profession</div>
-          {d10Insights.map((ins,i)=>(
-            <div key={i} style={{padding:"8px 0",borderBottom:"1px solid #1c1840",fontSize:13,color:"#c8c0a8",lineHeight:1.7}}>
-              ✦ {ins}
-            </div>
-          ))}
-        </div>
+            <div style={{fontSize:13,color:"#c8c0a8",lineHeight:1.75}}>{f.detail}</div>
+          </div>
+        ))}
       </div>
+
+      {/* All Charts Quick Summary */}
+      <div className="dv-card">
+        <div className="dv-card-title">📊 All Charts — Key Insights at a Glance</div>
+        {divs.map(d=>{
+          const c = CHART_COLORS[d.key]??"#a855f7";
+          const m = CHART_META[d.key];
+          const strong = d.planets.filter(p=>p.dignity==="Exalted"||p.dignity==="Own");
+          const deb    = d.planets.filter(p=>p.dignity==="Debilitated");
+          return (
+            <div key={d.key} style={{padding:"10px 0",borderBottom:"1px solid #1a1740",display:"flex",alignItems:"flex-start",gap:10,cursor:"pointer"}}
+              onClick={()=>setActiveChart(d.key)}>
+              <span style={{fontSize:18,width:26,flexShrink:0}}>{m?.icon}</span>
+              <div style={{flex:1}}>
+                <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3}}>
+                  <span style={{fontWeight:600,fontSize:13,color:c}}>{d.key}</span>
+                  <span style={{fontSize:11,color:"#605890"}}>{d.name}</span>
+                  <span style={{fontSize:11,color:"#605890",marginLeft:"auto"}}>Lagna: {d.lagna}</span>
+                </div>
+                <div style={{fontSize:11,color:"#8b80bf"}}>
+                  {strong.length>0&&<span style={{color:"#22c55e",marginRight:8}}>✓ {strong.map(p=>p.planet).join(", ")} strong</span>}
+                  {deb.length>0&&<span style={{color:"#ef4444"}}>⚠ {deb.map(p=>p.planet).join(", ")} weak</span>}
+                  {strong.length===0&&deb.length===0&&<span>Balanced positions</span>}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       </PremiumFeature>
+      <MobileBottomNav />
     </div>
   );
 }

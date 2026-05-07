@@ -27,15 +27,39 @@ export interface AKVPlanet {
     interp:   string;
     topPlanets: string[];
   }
+
+  export interface AKVMatrixRow {
+    house: number;
+    sign: string;
+    planetBindus: Record<string, number>;
+    total: number;
+    grade: "Strong" | "Average" | "Weak";
+  }
+
+  export interface SodhyaPindaHouse {
+    house: number;
+    sign: string;
+    name: string;
+    bindus: number;
+    score: number;
+    grade: "Excellent" | "Good" | "Average" | "Weak";
+    color: string;
+    guidance: string;
+  }
   
   export interface AKVResult {
     planets:  AKVPlanet[];
     sarva:    number[];
     sarvaTotal: number;
+    matrix: AKVMatrixRow[];
     houses:   AKVHouse[];
+    sodhyaPinda: SodhyaPindaHouse[];
     strongest: number[];  // top 3 house indices
     weakest:   number[];  // bottom 3 house indices
+    bestTransitHouses: SodhyaPindaHouse[];
+    sensitiveTransitHouses: SodhyaPindaHouse[];
     summary:  string;
+    aiContext: string;
   }
   
   interface PD { house:number; sign:string; signNum:number; retrograde:boolean; dignity:string; lon:number; }
@@ -117,6 +141,28 @@ export interface AKVPlanet {
        mid:"Average — some unnecessary expenses, sleep issues possible.",
        low:"Weak 12H — heavy expenses, hidden enemies. Budget strictly."},
   };
+
+  const SIGN_LORDS = ["Mars","Venus","Mercury","Moon","Sun","Mercury","Venus","Mars","Jupiter","Saturn","Saturn","Jupiter"];
+  const RASHIS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  const EXALT: Record<string, number> = {Sun:0,Moon:1,Mars:9,Mercury:5,Jupiter:3,Venus:11,Saturn:6};
+  const DEBIL: Record<string, number> = {Sun:6,Moon:7,Mars:3,Mercury:11,Jupiter:9,Venus:5,Saturn:0};
+  const OWN: Record<string, number[]> = {Sun:[4],Moon:[3],Mars:[0,7],Mercury:[2,5],Jupiter:[8,11],Venus:[1,6],Saturn:[9,10]};
+  const FRIEND: Record<string, string[]> = {
+    Sun:["Moon","Mars","Jupiter"],
+    Moon:["Sun","Mercury"],
+    Mars:["Sun","Moon","Jupiter"],
+    Mercury:["Sun","Venus"],
+    Jupiter:["Sun","Moon","Mars"],
+    Venus:["Mercury","Saturn"],
+    Saturn:["Mercury","Venus"],
+  };
+
+  function rashiStrength(planet: string, rashiIdx: number) {
+    if (rashiIdx === EXALT[planet]) return 2;
+    if (OWN[planet]?.includes(rashiIdx)) return 1.75;
+    if (rashiIdx === DEBIL[planet]) return 0.5;
+    return FRIEND[planet]?.includes(SIGN_LORDS[rashiIdx]) ? 1.25 : 1;
+  }
   
   // ── MAIN CALCULATOR ───────────────────────────────────────────
   export function calculateAshtakavarga(
@@ -180,14 +226,64 @@ export interface AKVPlanet {
   
       return { house:h, score, grade, color, name:data.name, theme:data.theme, interp, topPlanets };
     });
+
+    const matrix: AKVMatrixRow[] = sarva.map((total, i) => {
+      const h = i + 1;
+      const grade: "Strong"|"Average"|"Weak" = total>=28?"Strong":total>=25?"Average":"Weak";
+      return {
+        house: h,
+        sign: RASHIS[md(lagnaNum + i, 12)],
+        planetBindus: PLS7.reduce<Record<string, number>>((acc, planet) => {
+          acc[planet] = planetResults[planet].bindus[i];
+          return acc;
+        }, {}),
+        total,
+        grade,
+      };
+    });
+
+    const sodhyaPinda: SodhyaPindaHouse[] = sarva.map((bindus, i) => {
+      const house = i + 1;
+      const signIdx = md(lagnaNum + i, 12);
+      let score = 0;
+      PLS7.forEach((planet) => {
+        score += planetResults[planet].bindus[i] * rashiStrength(planet, signIdx);
+      });
+      const rounded = Math.round(score * 10) / 10;
+      const grade: SodhyaPindaHouse["grade"] =
+        rounded >= 28 ? "Excellent" : rounded >= 22 ? "Good" : rounded >= 16 ? "Average" : "Weak";
+      const color = grade === "Excellent" ? "#22c55e" : grade === "Good" ? "#c8a030" : grade === "Average" ? "#60a5fa" : "#ef4444";
+      const data = HOUSE_DATA[house];
+
+      return {
+        house,
+        sign: RASHIS[signIdx],
+        name: data.name,
+        bindus,
+        score: rounded,
+        grade,
+        color,
+        guidance:
+          grade === "Excellent"
+            ? `Strong transit delivery zone. Major benefic transits through H${house} can produce visible gains.`
+            : grade === "Good"
+              ? `Usable transit zone. Results improve when dasha and planet strength support H${house}.`
+              : grade === "Average"
+                ? `Moderate transit zone. Use planning and patience when this house is activated.`
+                : `Sensitive transit zone. Avoid forcing results; use remedies and practical safeguards.`,
+      };
+    });
   
     const sorted    = [...sarva].map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v);
     const strongest = sorted.slice(0,3).map(x=>x.i);
     const weakest   = sorted.slice(-3).reverse().map(x=>x.i);
+    const bestTransitHouses = [...sodhyaPinda].sort((a,b)=>b.score-a.score).slice(0,3);
+    const sensitiveTransitHouses = [...sodhyaPinda].sort((a,b)=>a.score-b.score).slice(0,3);
   
     const summary = `Sarvashtakavarga total: ${sarvaTotal} bindus (standard 337). `+
       `Strongest houses: H${strongest.map(i=>i+1).join(", H")}. `+
       `Weakest houses: H${weakest.map(i=>i+1).join(", H")}.`;
+    const aiContext = `${summary} Best Sodhya Pinda transit houses: ${bestTransitHouses.map(h=>`H${h.house} ${h.name} ${h.score}`).join(", ")}. Sensitive transit houses: ${sensitiveTransitHouses.map(h=>`H${h.house} ${h.name} ${h.score}`).join(", ")}.`;
   
-    return { planets:planetObjs, sarva, sarvaTotal, houses, strongest, weakest, summary };
+    return { planets:planetObjs, sarva, sarvaTotal, matrix, houses, sodhyaPinda, strongest, weakest, bestTransitHouses, sensitiveTransitHouses, summary, aiContext };
   }

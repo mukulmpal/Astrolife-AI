@@ -42,12 +42,8 @@ export type EventTopic =
 export interface KPPlanetInput {
   lon: number;
   house: number;
-  rashiHouse: number;
-  bhavaHouse: number;
-  bhavaShift: number;
   rashi: number;
   rashiName: string;
-  bhavaNote?: string;
   retrograde?: boolean;
 }
 
@@ -55,14 +51,8 @@ export interface NatalKPInput {
   lagR: number;
   lagLon: number;
   planets: Record<string, KPPlanetInput>;
-  cuspSource: "provided" | "degree-equal-bhava" | "whole-sign-fallback";
-  bhavaMode: "provided" | "degree-equal-bhava" | "whole-sign";
   currentMD?: string;
   currentAD?: string;
-  currentPD?: string;
-  currentSD?: string;
-  dashaPath?: string;
-  rawSource?: any;
 }
 
 export interface KPRow {
@@ -73,10 +63,6 @@ export interface KPRow {
   sign: string;
   signLord: string;
   house: number;
-  rashiHouse: number;
-  bhavaHouse: number;
-  bhavaShift: number;
-  bhavaNote: string;
   nakshatra: string;
   starLord: KPPlanet;
   pada: number;
@@ -102,7 +88,6 @@ export interface KPCuspRow {
   pada: number;
   subLord: KPPlanet;
   subSubLord: KPPlanet;
-  source: "provided" | "degree-equal-bhava" | "whole-sign-fallback";
   promise: string;
 }
 
@@ -571,6 +556,11 @@ export function buildHouseLords(lagR: number): Record<number, string> {
   return lords;
 }
 
+function degreeText(lon: number) {
+  const signDegree = md(lon, 30);
+  return `${signDegree.toFixed(2)}°`;
+}
+
 function absoluteDegreeText(lon: number) {
   return `${normalizeLon(lon).toFixed(2)}°`;
 }
@@ -848,63 +838,33 @@ export function normalizeToKPInput(input: unknown): NatalKPInput {
   }
 
   const planets: Record<string, KPPlanetInput> = {};
-  const rawCusps = Array.isArray((sourceObj as any)?.houseCusps)
-    ? (sourceObj as any).houseCusps
-    : Array.isArray((inputObj as any)?.houseCusps)
-      ? (inputObj as any).houseCusps
-      : null;
-  const hasDegreeBhavaCusps = Boolean(rawCusps && rawCusps.length >= 12);
 
   (["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"] as const).forEach(
     (planetName) => {
       const planet = readPlanet(source, planetName) ?? {};
       const lon = readLonFromPlanet(source, planetName);
       const rashi = Math.floor(lon / 30);
-      const rashiHouse = houseFromLon(lagR, lon);
-      const bhavaHouse =
-        safeNumber(
-          planet?.bhavaHouse ??
-            planet?.chalitHouse ??
-            planet?.houseBhava ??
-            planet?.bhava,
-          hasDegreeBhavaCusps ? md(Math.floor(md(lon - lagLon + 15, 360) / 30), 12) + 1 : rashiHouse
-        );
-      const normalizedBhavaHouse = Math.max(1, Math.min(12, Math.round(bhavaHouse)));
-      const bhavaShift = normalizedBhavaHouse - rashiHouse;
 
       planets[planetName] = {
         lon,
-        house: normalizedBhavaHouse,
-        rashiHouse,
-        bhavaHouse: normalizedBhavaHouse,
-        bhavaShift,
+        // Whole-sign house from ascendant.
+        // Virgo Lagna => Virgo H1, Libra H2, Leo H12.
+        house: houseFromLon(lagR, lon),
         rashi,
         rashiName: RASHIS_EN[rashi] ?? "Unknown",
-        bhavaNote:
-          typeof planet?.bhavaNote === "string"
-            ? planet.bhavaNote
-            : bhavaShift === 0
-              ? "Same as Rashi house"
-              : `Bhava Chalit shifts from H${rashiHouse} to H${normalizedBhavaHouse}`,
         retrograde: Boolean(planet?.retrograde ?? planet?.isRetrograde ?? planet?.R),
       };
     }
   );
 
-  const dasha = readCurrentDasha(source) as any;
+  const dasha = readCurrentDasha(source);
 
   return {
     lagR,
     lagLon,
     planets,
-    cuspSource: hasDegreeBhavaCusps ? "degree-equal-bhava" : "whole-sign-fallback",
-    bhavaMode: hasDegreeBhavaCusps ? "degree-equal-bhava" : "whole-sign",
     currentMD: dasha.currentMD || undefined,
     currentAD: dasha.currentAD || undefined,
-    currentPD: dasha.currentPD || undefined,
-    currentSD: dasha.currentSD || undefined,
-    dashaPath: dasha.dashaPath || undefined,
-    rawSource: source,
   };
 }
 
@@ -914,14 +874,7 @@ function lordHouse(lord: string, input: NatalKPInput) {
   return planet?.house ?? 0;
 }
 
-function buildKPRow(
-  name: KPPointName,
-  lon: number,
-  house: number,
-  input: NatalKPInput,
-  retrograde = false,
-  bhavaMeta?: Pick<KPPlanetInput, "rashiHouse" | "bhavaHouse" | "bhavaShift" | "bhavaNote">
-): KPRow {
+function buildKPRow(name: KPPointName, lon: number, house: number, input: NatalKPInput, retrograde = false): KPRow {
   const signIndex = Math.floor(md(lon, 360) / 30);
   const sign = RASHIS_EN[signIndex] ?? "Unknown";
   const signLord = SIGN_LORD[signIndex] ?? "Ketu";
@@ -942,14 +895,10 @@ function buildKPRow(
   return {
     name,
     lon,
-    degreeText: absoluteDegreeText(lon),
+    degreeText: degreeText(lon),
     sign,
     signLord,
     house,
-    rashiHouse: bhavaMeta?.rashiHouse ?? house,
-    bhavaHouse: bhavaMeta?.bhavaHouse ?? house,
-    bhavaShift: bhavaMeta?.bhavaShift ?? 0,
-    bhavaNote: bhavaMeta?.bhavaNote ?? "Same as Rashi house",
     position: `${sign} H${house}`,
     nakshatra,
     starLord,
@@ -969,12 +918,7 @@ function buildKPRow(
 
 function buildRows(input: NatalKPInput): KPRow[] {
   const rows: KPRow[] = [
-    buildKPRow("Lagna", input.lagLon, 1, input, false, {
-      rashiHouse: 1,
-      bhavaHouse: 1,
-      bhavaShift: 0,
-      bhavaNote: "Lagna cusp",
-    }),
+    buildKPRow("Lagna", input.lagLon, 1, input, false),
   ];
 
   (Object.keys(input.planets) as KPPointName[]).forEach((name) => {
@@ -982,23 +926,18 @@ function buildRows(input: NatalKPInput): KPRow[] {
 
     if (!planet) return;
 
-    rows.push(buildKPRow(name, planet.lon, planet.house, input, Boolean(planet.retrograde), planet));
+    rows.push(buildKPRow(name, planet.lon, planet.house, input, Boolean(planet.retrograde)));
   });
 
   return rows;
 }
 
 function buildCusps(input: NatalKPInput): KPCuspRow[] {
-  const raw: any = input.rawSource ?? input;
+  const raw: any = input as any;
   const possibleCusps =
     raw?.kpCusps ??
     raw?.cusps ??
     raw?.houseCusps ??
-    raw?.houses ??
-    raw?.bhavaCusps ??
-    raw?.houseCuspData ??
-    raw?.kp?.cusps ??
-    raw?.kp?.houseCusps ??
     raw?.chart?.kpCusps ??
     raw?.chart?.cusps ??
     raw?.chart?.houseCusps;
@@ -1046,42 +985,7 @@ function buildCusps(input: NatalKPInput): KPCuspRow[] {
         pada: getPada(lon),
         subLord,
         subSubLord,
-        source: cusp?.source === "degree-equal-bhava" ? "degree-equal-bhava" : "provided",
-        promise:
-          cusp?.source === "degree-equal-bhava"
-            ? `Degree-based Bhava cusp: ${sign} H${house}. Sub lord ${subLord}, sub-sub lord ${subSubLord}.`
-            : `H${house} cusp is ruled by ${subLord} at sub level and ${subSubLord} at sub-sub level.`,
-      };
-    });
-  }
-
-  const generatedCusps = Array.isArray((input.rawSource as any)?.houseCusps)
-    ? (input.rawSource as any).houseCusps
-    : [];
-
-  if (generatedCusps.length >= 12) {
-    return generatedCusps.slice(0, 12).map((cusp: any, index: number) => {
-      const house = index + 1;
-      const lon = normalizeLon(cusp?.lon ?? cusp?.longitude ?? input.lagLon + index * 30);
-      const signIndex = Math.floor(lon / 30);
-      const sign = RASHIS_EN[signIndex] ?? "Unknown";
-      const starLord = getStarLord(lon);
-      const subLord = getSubLord(lon);
-      const subSubLord = getSubSubLord(lon);
-
-      return {
-        house,
-        lon,
-        degreeText: absoluteDegreeText(lon),
-        sign,
-        signLord: SIGN_LORD[signIndex] ?? "Ketu",
-        nakshatra: getNakshatra(lon),
-        starLord,
-        pada: getPada(lon),
-        subLord,
-        subSubLord,
-        source: "degree-equal-bhava",
-        promise: `Degree-based Bhava cusp: ${sign} H${house}. Sub lord ${subLord}, sub-sub lord ${subSubLord}.`,
+        promise: `H${house} cusp is ruled by ${subLord} at sub level and ${subSubLord} at sub-sub level.`,
       };
     });
   }
@@ -1113,7 +1017,6 @@ function buildCusps(input: NatalKPInput): KPCuspRow[] {
       pada: getPada(lon),
       subLord,
       subSubLord,
-      source: "whole-sign-fallback",
       promise: `Whole-sign fallback cusp: ${sign} H${house}. Sub lord ${subLord}, sub-sub lord ${subSubLord}. Exact KP cusp degree can be added when house cusp data is available.`,
     };
   });

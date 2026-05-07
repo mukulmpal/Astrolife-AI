@@ -37,48 +37,6 @@ html[data-language-mode="hindi"] body {
   font-family: "Noto Sans Devanagari", "Mangal", "Kohinoor Devanagari", Arial, sans-serif;
 }
 
-.global-pref-toggle {
-  position: fixed;
-  right: 12px;
-  bottom: 72px;
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px;
-  border: 1px solid rgba(200, 160, 48, 0.28);
-  border-radius: 12px;
-  background: rgba(10, 8, 24, 0.92);
-  backdrop-filter: blur(8px);
-}
-
-.global-pref-row {
-  display: flex;
-  gap: 6px;
-}
-
-.global-pref-btn {
-  border: 1px solid rgba(96, 88, 144, 0.5);
-  border-radius: 999px;
-  background: rgba(13, 10, 34, 0.95);
-  color: #c8c0a8;
-  font-size: 10px;
-  line-height: 1;
-  padding: 5px 9px;
-  cursor: pointer;
-}
-
-.global-pref-btn.active {
-  border-color: rgba(200, 160, 48, 0.52);
-  background: rgba(200, 160, 48, 0.12);
-  color: #f0e8d0;
-}
-
-html[data-theme-mode="light"] .global-pref-toggle {
-  background: rgba(247, 244, 234, 0.95);
-  border-color: rgba(200, 160, 48, 0.34);
-}
-
 html[data-theme-mode="light"] main,
 html[data-theme-mode="light"] .page,
 html[data-theme-mode="light"] .layout,
@@ -87,29 +45,4 @@ html[data-theme-mode="light"] .er-wrap,
 html[data-theme-mode="light"] .report-shell {
   background: var(--app-bg) !important;
   color: var(--app-fg) !important;
-}
-
-html[data-theme-mode="light"] .global-pref-btn {
-  background: #fffdf8;
-  border-color: #dfd3bf;
-  color: #5d4b2d;
-}
-
-html[data-theme-mode="light"] .global-pref-btn.active {
-  background: rgba(200, 160, 48, 0.14);
-  border-color: rgba(200, 160, 48, 0.58);
-  color: #3a2f17;
-}
-
-@media (max-width: 640px) {
-  .global-pref-toggle {
-    right: 8px;
-    bottom: 78px;
-    padding: 7px;
-  }
-
-  .global-pref-btn {
-    font-size: 9px;
-    padding: 4px 8px;
-  }
 }

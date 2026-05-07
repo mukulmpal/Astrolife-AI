@@ -14,12 +14,29 @@ export interface PlanetData {
   degree: number;
   minutes: number;
   house: number;
+  rashiHouse: number;
+  bhavaHouse: number;
+  bhavaShift: number;
+  bhavaNote: string;
   nakshatra: string;
   nakshatraLord: string;
   pada: number;
   retrograde: boolean;
   dignity: string;
   navamsha: string;
+}
+
+export interface HouseCuspData {
+  house: number;
+  lon: number;
+  sign: string;
+  signNum: number;
+  degree: number;
+  minutes: number;
+  nakshatra: string;
+  nakshatraLord: string;
+  pada: number;
+  source: "degree-equal-bhava";
 }
 
 export interface ChartData {
@@ -35,6 +52,8 @@ export interface ChartData {
   lagnaRashi: string;
   lagnaNum: number;
   planets: Record<string, PlanetData>;
+  houseCusps: HouseCuspData[];
+  houseSystem: "degree-equal-bhava";
   dashas: DashaEntry[];
   antardasha: DashaEntry[];
 }
@@ -343,6 +362,34 @@ function getHouse(planetLon: number, lagnaLon: number): number {
   const lagR = dR(lagnaLon);
   return md(ri - lagR, 12) + 1;
 }
+
+function getBhavaHouse(planetLon: number, lagnaLon: number): number {
+  return md(Math.floor(md(planetLon - lagnaLon + 15, 360) / 30), 12) + 1;
+}
+
+function buildHouseCusps(lagnaLon: number): HouseCuspData[] {
+  return Array.from({ length: 12 }).map((_, index) => {
+    const house = index + 1;
+    const lon = _n(lagnaLon + index * 30);
+    const signNum = dR(lon);
+    const deg = Math.floor(dIR(lon));
+    const mins = Math.floor((dIR(lon) - deg) * 60);
+    const nak = getNak(lon);
+
+    return {
+      house,
+      lon,
+      sign: RASHIS[signNum],
+      signNum,
+      degree: deg,
+      minutes: mins,
+      nakshatra: nak.name,
+      nakshatraLord: nak.lord,
+      pada: nak.pada,
+      source: "degree-equal-bhava",
+    };
+  });
+}
   
 // ── Vimshottari Dasha ─────────────────────────────────────────
 export function buildDashaSeq(moonLon: number, dob: string, tob: string): DashaEntry[] {
@@ -450,6 +497,7 @@ export function calculateChart(
   // Calculate planets
   const rawPlanets = computePlanets(jd);
   const retrograde = computeRetro(jd);
+  const houseCusps = buildHouseCusps(lagnaLon);
 
   // Build planet data
   const planets: Record<string, PlanetData> = {};
@@ -461,7 +509,9 @@ export function calculateChart(
     const deg   = Math.floor(dIR(lon2));
     const mins  = Math.floor((dIR(lon2) - deg) * 60);
     const nak   = getNak(lon2);
-    const house = getHouse(lon2, lagnaLon);
+    const rashiHouse = getHouse(lon2, lagnaLon);
+    const bhavaHouse = getBhavaHouse(lon2, lagnaLon);
+    const bhavaShift = bhavaHouse - rashiHouse;
 
     planets[p] = {
       lon:          lon2,
@@ -469,7 +519,11 @@ export function calculateChart(
       signNum:      signN,
       degree:       deg,
       minutes:      mins,
-      house,
+      house:        rashiHouse,
+      rashiHouse,
+      bhavaHouse,
+      bhavaShift,
+      bhavaNote:    bhavaShift === 0 ? "Same as Rashi house" : `Bhava Chalit shifts from H${rashiHouse} to H${bhavaHouse}`,
       nakshatra:    nak.name,
       nakshatraLord: nak.lord,
       pada:         nak.pada,
@@ -491,6 +545,8 @@ export function calculateChart(
     lagnaRashi: RASHIS[lagnaNum],
     lagnaNum,
     planets,
+    houseCusps,
+    houseSystem: "degree-equal-bhava",
     dashas,
     antardasha,
   };

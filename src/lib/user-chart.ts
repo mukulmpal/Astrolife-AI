@@ -104,6 +104,24 @@ function getProfileBirth(profile: Record<string, unknown> | null): BirthDetails 
   };
 }
 
+function getChartRowBirth(row: Record<string, unknown> | null): BirthDetails | null {
+  if (!row) return null;
+  const name = typeof row.name === "string" ? row.name : "";
+  const dob = typeof row.dob === "string" ? row.dob : "";
+  const tob = typeof row.tob === "string" ? row.tob : "";
+  const city = typeof row.city === "string" ? row.city : "";
+  if (!name || !dob || !tob || !city) return null;
+
+  return {
+    name,
+    dob,
+    tob,
+    city,
+    lat: typeof row.lat === "number" ? row.lat : null,
+    lon: typeof row.lon === "number" ? row.lon : null,
+  };
+}
+
 export function saveCurrentChart(chart: ChartData) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chart));
@@ -232,13 +250,18 @@ async function loadPrimaryChartFromAccount(): Promise<ChartData | null> {
 
   const { data, error } = await supabase
     .from("charts")
-    .select("chart_json")
+    .select("chart_json,name,dob,tob,city,lat,lon")
     .eq("user_id", user.id)
     .eq("is_primary", true)
     .maybeSingle();
 
-  if (error || !data?.chart_json || !isStoredChart(data.chart_json)) return null;
-  return reviveChartDates(data.chart_json);
+  if (error || !data) return null;
+  if (data.chart_json && isStoredChart(data.chart_json)) {
+    return reviveChartDates(data.chart_json);
+  }
+
+  const birth = getChartRowBirth(data);
+  return birth ? buildChart(birth) : null;
 }
 
 export function formatChartContext(chart: ChartData): string {
@@ -281,20 +304,6 @@ export function useUserChart() {
           return;
         }
 
-        const stored = window.localStorage.getItem(CHART_STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (isStoredChart(parsed)) {
-            const storedChart = reviveChartDates(parsed);
-            if (!cancelled) {
-              setBirth(getBirthFromChart(storedChart));
-              setChart(storedChart);
-              setLoading(false);
-            }
-            return;
-          }
-        }
-
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -312,6 +321,20 @@ export function useUserChart() {
             if (!cancelled) {
               setBirth(profileBirth);
               setChart(nextChart);
+              setLoading(false);
+            }
+            return;
+          }
+        }
+
+        const stored = window.localStorage.getItem(CHART_STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (isStoredChart(parsed)) {
+            const storedChart = reviveChartDates(parsed);
+            if (!cancelled) {
+              setBirth(getBirthFromChart(storedChart));
+              setChart(storedChart);
               setLoading(false);
             }
             return;
