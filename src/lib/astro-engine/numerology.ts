@@ -561,6 +561,110 @@ function buildIntensityMap(name: string): IntensityEntry[] {
   });
 }
 
+// ── Number Checker (Mobile / Vehicle / ATM PIN) ───────────────
+
+const NUM_COMPAT: Record<number, number[]> = {
+  1:[1,2,3,9], 2:[1,2,3,6,9], 3:[1,2,3,6,9],
+  4:[1,4,5,8], 5:[1,3,5,6,9], 6:[2,3,5,6,9],
+  7:[1,2,7],   8:[2,4,8],     9:[1,3,5,6,9],
+  11:[2,4,11,22], 22:[4,8,11,22], 33:[3,6,9,33],
+};
+
+export type CompatScore = "excellent" | "good" | "neutral" | "challenging";
+
+export interface DigitAnalysis {
+  raw: string;
+  digits: string;
+  sum: number;
+  root: number;
+  last4: string;
+  last4sum: number;
+  last4root: number;
+  lastDigit: number;
+  compatScore: CompatScore;
+  last4CompatScore: CompatScore;
+  narrative: string;
+  suggestedLastDigits: { digit: number; root: number; score: CompatScore }[];
+  idealRoots: number[];
+}
+
+export interface ATMPin {
+  pin: string;
+  root: number;
+  score: CompatScore;
+}
+
+function compatScore(a: number, b: number): CompatScore {
+  const ca = NUM_COMPAT[a] ?? [];
+  const cb = NUM_COMPAT[b] ?? [];
+  if (ca.includes(b) && cb.includes(a)) return "excellent";
+  if (ca.includes(b) || cb.includes(a)) return "good";
+  if (Math.abs(a - b) <= 2) return "neutral";
+  return "challenging";
+}
+
+function friendlyRoots(lp: number): number[] {
+  if ([1,3,9].includes(lp)) return [1,3,5,9];
+  if ([2,6].includes(lp)) return [2,3,6,9];
+  if ([4,8].includes(lp)) return [4,5,6,8];
+  if ([5].includes(lp)) return [1,3,5,6];
+  if ([7].includes(lp)) return [1,2,7];
+  return [1,2,3,6,9];
+}
+
+export function analyzeNumber(numStr: string, lifePath: number, destiny: number): DigitAnalysis | null {
+  const digits = numStr.replace(/\D/g, "");
+  if (!digits || digits.length < 1) return null;
+
+  const sum = digits.split("").reduce((a, b) => a + Number(b), 0);
+  const root = reduce(sum);
+  const last4 = digits.slice(-4);
+  const last4sum = last4.split("").reduce((a, b) => a + Number(b), 0);
+  const last4root = reduce(last4sum);
+  const lastDigit = Number(digits[digits.length - 1]);
+
+  const cs = compatScore(lifePath, root);
+  const l4cs = compatScore(lifePath, last4root);
+  const ideal = friendlyRoots(lifePath);
+
+  // Suggest last digits that shift root to friendly
+  const suggestedLastDigits: { digit: number; root: number; score: CompatScore }[] = [];
+  for (let last = 0; last <= 9; last++) {
+    const baseSum = sum - lastDigit + last;
+    const newRoot = reduce(baseSum);
+    const sc = compatScore(lifePath, newRoot);
+    const sc2 = compatScore(destiny, newRoot);
+    if ((sc === "excellent" || sc === "good") && (sc2 === "excellent" || sc2 === "good")) {
+      suggestedLastDigits.push({ digit: last, root: newRoot, score: sc === "excellent" && sc2 === "excellent" ? "excellent" : "good" });
+    }
+  }
+
+  const NARRATIVES: Record<CompatScore, string> = {
+    excellent: `Excellent match — total root ${root} harmonises perfectly with your Life Path ${lifePath}. This number amplifies your natural strengths. Calls connect, responses come fast, opportunities flow through it.`,
+    good: `Good match — root ${root} and Life Path ${lifePath} have a friendly planetary relationship. Results are generally positive. Check last-4 root ${last4root} for finer tuning.`,
+    neutral: `Neutral — root ${root} and Life Path ${lifePath} are neither friends nor enemies. Usable without major issues, but a small last-digit change can make it more compatible.`,
+    challenging: `Vibrational friction — root ${root} has a tense relationship with Life Path ${lifePath}. This can manifest as missed connections, delayed responses, or subtle resistance. Changing the last digit will shift the total root to a compatible one.`,
+  };
+
+  return { raw: numStr, digits, sum, root, last4, last4sum, last4root, lastDigit, compatScore: cs, last4CompatScore: l4cs, narrative: NARRATIVES[cs], suggestedLastDigits, idealRoots: ideal };
+}
+
+export function suggestATMPins(lifePath: number, destiny: number): ATMPin[] {
+  const targets = new Set([...(NUM_COMPAT[lifePath] ?? []), ...(NUM_COMPAT[destiny] ?? [])]);
+  const pins: ATMPin[] = [];
+  for (let pin = 1000; pin <= 9999 && pins.length < 8; pin++) {
+    const d = pin.toString().split("").map(Number);
+    if (d[0] === d[1] && d[1] === d[2] && d[2] === d[3]) continue; // 1111
+    if (d[1]-d[0]===1 && d[2]-d[1]===1 && d[3]-d[2]===1) continue; // 1234
+    const root = reduce(d.reduce((a, b) => a + b, 0));
+    if (targets.has(root)) {
+      const sc = compatScore(lifePath, root);
+      pins.push({ pin: pin.toString(), root, score: sc });
+    }
+  }
+  return pins;
+}
+
 // ── Master Function ───────────────────────────────────────────
 export function calculateNumerology(name: string, dob: string): NumerologyResult {
   const lpVal = calcLifePath(dob);

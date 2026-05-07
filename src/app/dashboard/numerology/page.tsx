@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { calculateNumerology, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry } from "@/lib/astro-engine/numerology";
+import { useState, useCallback } from "react";
+import { calculateNumerology, analyzeNumber, suggestATMPins, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry, type DigitAnalysis, type CompatScore } from "@/lib/astro-engine/numerology";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import "@/app/dashboard/shared.css";
@@ -128,11 +128,96 @@ function IntensityBar({ entry }: { entry: IntensityEntry }) {
   );
 }
 
+// ── Number Checker Components ─────────────────────────────────────────────────
+
+const COMPAT_META: Record<CompatScore, { color: string; bg: string; label: string; icon: string }> = {
+  excellent:   { color: "#22c55e", bg: "rgba(34,197,94,0.12)",  label: "Excellent",   icon: "✅" },
+  good:        { color: "#eab308", bg: "rgba(234,179,8,0.12)",  label: "Good",        icon: "🟡" },
+  neutral:     { color: "#60a5fa", bg: "rgba(96,165,250,0.10)", label: "Neutral",     icon: "⚡" },
+  challenging: { color: "#ef4444", bg: "rgba(239,68,68,0.12)",  label: "Challenging", icon: "❌" },
+};
+
+function NumberResult({ analysis, context }: { analysis: DigitAnalysis; context: string }) {
+  const fc = COMPAT_META[analysis.compatScore];
+  const lc = COMPAT_META[analysis.last4CompatScore];
+  return (
+    <div className="flex flex-col gap-3 mt-3">
+      {/* 3-stat header */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-xl p-3 text-center" style={{ background: fc.bg, border: `1px solid ${fc.color}44` }}>
+          <p className="text-[10px] text-white/35 mb-1">Total Root</p>
+          <p className="text-3xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: fc.color }}>{analysis.root}</p>
+          <p className="text-[10px] font-semibold mt-1" style={{ color: fc.color }}>{fc.icon} {fc.label}</p>
+        </div>
+        <div className="rounded-xl p-3 text-center" style={{ background: lc.bg, border: `1px solid ${lc.color}44` }}>
+          <p className="text-[10px] text-white/35 mb-1">Last 4 Root ({analysis.last4})</p>
+          <p className="text-3xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: lc.color }}>{analysis.last4root}</p>
+          <p className="text-[10px] font-semibold mt-1" style={{ color: lc.color }}>{lc.icon} {lc.label}</p>
+        </div>
+        <div className="rounded-xl p-3 text-center" style={{ background: "rgba(200,160,48,0.08)", border: "1px solid rgba(200,160,48,0.25)" }}>
+          <p className="text-[10px] text-white/35 mb-1">Sum</p>
+          <p className="text-3xl font-bold text-amber-300" style={{ fontFamily: "Cormorant Garamond, serif" }}>{analysis.sum}</p>
+          <p className="text-[10px] text-white/40 mt-1">→ {analysis.root}</p>
+        </div>
+      </div>
+
+      {/* Narrative */}
+      <div className="rounded-xl p-4" style={{ background: fc.bg, border: `1px solid ${fc.color}33` }}>
+        <p className="text-xs font-semibold mb-2" style={{ color: fc.color }}>Numerological Reading — {context}</p>
+        <p className="text-sm text-white/65 leading-relaxed">{analysis.narrative}</p>
+      </div>
+
+      {/* Ideal roots */}
+      <div className="rounded-xl p-3 bg-white/[0.03] border border-white/08">
+        <p className="text-xs text-white/35 mb-2">Your friendly roots: <span className="text-sky-300 font-semibold">{analysis.idealRoots.join(" · ")}</span></p>
+        <p className="text-xs text-white/35">Digits breakdown: <span className="text-white/60 tracking-widest font-mono">{analysis.digits}</span> → Sum {analysis.sum} → Root <strong style={{ color: fc.color }}>{analysis.root}</strong></p>
+      </div>
+
+      {/* Correction suggestions if needed */}
+      {(analysis.compatScore === "challenging" || analysis.last4CompatScore === "challenging") && analysis.suggestedLastDigits.length > 0 && (
+        <div className="rounded-xl p-4" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.25)" }}>
+          <p className="text-xs font-semibold text-red-400 mb-2">⚠ Suggested correction — change last digit to:</p>
+          <p className="text-xs text-white/40 mb-3">Current last digit: <strong className="text-red-300">{analysis.lastDigit}</strong>. Change only this digit to shift the total root into compatible territory.</p>
+          <div className="flex flex-wrap gap-2">
+            {analysis.suggestedLastDigits.map(s => {
+              const sm = COMPAT_META[s.score];
+              return (
+                <div key={s.digit} className="rounded-lg p-2.5 text-center min-w-[60px]" style={{ background: sm.bg, border: `1px solid ${sm.color}44` }}>
+                  <p className="text-xs text-white/40">End in</p>
+                  <p className="text-2xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: sm.color }}>{s.digit}</p>
+                  <p className="text-[10px]" style={{ color: sm.color }}>Root {s.root}</p>
+                  <p className="text-[10px]" style={{ color: sm.color }}>{sm.label}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Compatible confirmation */}
+      {analysis.compatScore !== "challenging" && analysis.last4CompatScore !== "challenging" && (
+        <div className="rounded-xl p-3" style={{ background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.20)" }}>
+          <p className="text-sm text-emerald-400 font-semibold">✅ This {context} is compatible — use it confidently.</p>
+          {analysis.idealRoots.includes(analysis.root) && (
+            <p className="text-xs text-white/50 mt-1">Root {analysis.root} is in your friendly set. Excellent alignment.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function NumerologyPage() {
-  const [activeTab, setActiveTab] = useState<"core" | "name" | "pinnacles" | "year">("core");
+  const [activeTab, setActiveTab] = useState<"core" | "name" | "pinnacles" | "year" | "checker">("core");
   const [expandedCard, setExpandedCard] = useState<string | null>("Life Path");
+  const [mobileInput, setMobileInput] = useState("");
+  const [vehicleInput, setVehicleInput] = useState("");
+  const [mobileResult, setMobileResult] = useState<DigitAnalysis | null>(null);
+  const [vehicleResult, setVehicleResult] = useState<DigitAnalysis | null>(null);
+  const [mobileError, setMobileError] = useState("");
+  const [vehicleError, setVehicleError] = useState("");
   const { birth } = useUserChart();
 
   const result = calculateNumerology(birth.name, birth.dob);
@@ -145,12 +230,27 @@ export default function NumerologyPage() {
 
   const coreNumbers: NumerologyNumber[] = [lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear];
   const currentYear = new Date().getFullYear();
+  const atmPins = suggestATMPins(lifePath.value, destiny.value);
+
+  const checkMobile = useCallback(() => {
+    const digits = mobileInput.replace(/\D/g, "");
+    if (digits.length < 5) { setMobileError("Valid mobile number enter karein (min 5 digits)"); return; }
+    setMobileError("");
+    setMobileResult(analyzeNumber(mobileInput, lifePath.value, destiny.value));
+  }, [mobileInput, lifePath.value, destiny.value]);
+
+  const checkVehicle = useCallback(() => {
+    if (!vehicleInput.trim()) { setVehicleError("Vehicle number enter karein (e.g. DL3CAB1234)"); return; }
+    setVehicleError("");
+    setVehicleResult(analyzeNumber(vehicleInput, lifePath.value, destiny.value));
+  }, [vehicleInput, lifePath.value, destiny.value]);
 
   const tabs = [
     { key: "core",      label: "Core Numbers" },
     { key: "name",      label: "Name Analysis" },
     { key: "pinnacles", label: "Pinnacles & Challenges" },
     { key: "year",      label: `${currentYear} Forecast` },
+    { key: "checker",   label: "Number Checker" },
   ] as const;
 
   return (
@@ -468,6 +568,85 @@ export default function NumerologyPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── NUMBER CHECKER ── */}
+        {activeTab === "checker" && (
+          <section className="flex flex-col gap-6">
+            <div className="rounded-2xl border border-white/08 bg-white/[0.02] p-4">
+              <p className="text-xs uppercase tracking-widest text-white/30 mb-1">SP Bhagat Principle</p>
+              <p className="text-sm text-white/50 leading-relaxed">
+                Every number you carry daily — phone, vehicle, ATM PIN — creates a vibrational field. When that field aligns with your Life Path ({lifePath.value}) and Destiny ({destiny.value}), it subtly amplifies your energy. When it conflicts, it creates friction. Small changes in the last digit can shift the entire vibration.
+              </p>
+            </div>
+
+            {/* Mobile Number */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs uppercase tracking-widest text-sky-300 mb-3">📱 Mobile Number Checker</p>
+              <div className="flex gap-2">
+                <input
+                  type="tel"
+                  value={mobileInput}
+                  onChange={e => setMobileInput(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && checkMobile()}
+                  placeholder="e.g. 9876543210"
+                  className="flex-1 rounded-xl px-4 py-3 text-sm text-white bg-white/[0.06] border border-white/15 outline-none focus:border-sky-500/50 placeholder:text-white/25 tracking-widest font-mono"
+                />
+                <button
+                  onClick={checkMobile}
+                  className="px-5 py-3 rounded-xl text-sm font-semibold text-sky-300 transition-all"
+                  style={{ background: "rgba(14,165,233,0.15)", border: "1px solid rgba(14,165,233,0.35)" }}
+                >
+                  Analyse
+                </button>
+              </div>
+              {mobileError && <p className="text-xs text-red-400 mt-2">{mobileError}</p>}
+              {mobileResult && <NumberResult analysis={mobileResult} context="Mobile Number" />}
+            </div>
+
+            {/* Vehicle Number */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs uppercase tracking-widest text-emerald-300 mb-3">🚗 Vehicle Number Checker</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={vehicleInput}
+                  onChange={e => setVehicleInput(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === "Enter" && checkVehicle()}
+                  placeholder="e.g. DL3CAB1234 or MH01AB1234"
+                  className="flex-1 rounded-xl px-4 py-3 text-sm text-white bg-white/[0.06] border border-white/15 outline-none focus:border-emerald-500/50 placeholder:text-white/25 tracking-widest font-mono uppercase"
+                />
+                <button
+                  onClick={checkVehicle}
+                  className="px-5 py-3 rounded-xl text-sm font-semibold text-emerald-300 transition-all"
+                  style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.35)" }}
+                >
+                  Analyse
+                </button>
+              </div>
+              <p className="text-xs text-white/30 mt-1.5">Only digits are extracted — letters are ignored in calculation</p>
+              {vehicleError && <p className="text-xs text-red-400 mt-2">{vehicleError}</p>}
+              {vehicleResult && <NumberResult analysis={vehicleResult} context="Vehicle Number" />}
+            </div>
+
+            {/* ATM PIN Suggestions */}
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] p-5">
+              <p className="text-xs uppercase tracking-widest text-amber-300 mb-1">🔐 Lucky ATM PIN Suggestions</p>
+              <p className="text-sm text-white/45 mb-4">4-digit PINs whose digit sum is compatible with your Life Path ({lifePath.value}) and Destiny ({destiny.value}). No sequential (1234) or repeated (1111) patterns.</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {atmPins.map(p => {
+                  const m = COMPAT_META[p.score];
+                  return (
+                    <div key={p.pin} className="rounded-xl p-3 text-center" style={{ background: m.bg, border: `1px solid ${m.color}44` }}>
+                      <p className="text-2xl font-bold tracking-widest font-mono" style={{ color: m.color }}>{p.pin}</p>
+                      <p className="text-[10px] mt-1" style={{ color: m.color }}>Root {p.root} · {m.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-white/30 mt-3">⚠ These are numerological suggestions only — use your own judgment for PIN security.</p>
             </div>
           </section>
         )}
