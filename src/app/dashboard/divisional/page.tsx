@@ -41,12 +41,20 @@ const CHART_META: Record<string,{icon:string;domain:string}> = {
 };
 
 function MiniChart({ chart }: { chart: DivChart }) {
-  const S=220, h=S/2;
+  const S=220;
   const CELLS = [
-    {hn:1,cx:h,    cy:h-66},{hn:2,cx:h+66, cy:h-66},{hn:3,cx:h+99, cy:h},
-    {hn:4,cx:h+66, cy:h+66},{hn:5,cx:h,    cy:h+66},{hn:6,cx:h-66, cy:h+66},
-    {hn:7,cx:h-99, cy:h},   {hn:8,cx:h-66, cy:h-66},{hn:9,cx:h-66, cy:h-110},
-    {hn:10,cx:h,   cy:h-110},{hn:11,cx:h+66,cy:h-110},{hn:12,cx:h+66,cy:h-15},
+    {hn:1, cx:S/2,   cy:S/4},
+    {hn:2, cx:S/4,   cy:S/8},
+    {hn:3, cx:S/8,   cy:S/4},
+    {hn:4, cx:S/4,   cy:S/2},
+    {hn:5, cx:S/8,   cy:3*S/4},
+    {hn:6, cx:S/4,   cy:7*S/8},
+    {hn:7, cx:S/2,   cy:3*S/4},
+    {hn:8, cx:3*S/4, cy:7*S/8},
+    {hn:9, cx:7*S/8, cy:3*S/4},
+    {hn:10,cx:3*S/4, cy:S/2},
+    {hn:11,cx:7*S/8, cy:S/4},
+    {hn:12,cx:3*S/4, cy:S/8},
   ];
   const byHouse: Record<number,{icon:string;color:string;retro:boolean}[]> = {};
   for(let i=1;i<=12;i++) byHouse[i]=[];
@@ -56,10 +64,10 @@ function MiniChart({ chart }: { chart: DivChart }) {
     <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{maxWidth:220,display:"block",margin:"0 auto"}}>
       <rect width={S} height={S} fill="#08051a" rx="8"/>
       <rect x={0} y={0} width={S} height={S} fill="none" stroke="#3a3260" strokeWidth="1" rx="8"/>
-      <line x1={h} y1={0}   x2={S}   y2={h}   stroke="#2a2250" strokeWidth="0.8"/>
-      <line x1={S} y1={h}   x2={h}   y2={S}   stroke="#2a2250" strokeWidth="0.8"/>
-      <line x1={h} y1={S}   x2={0}   y2={h}   stroke="#2a2250" strokeWidth="0.8"/>
-      <line x1={0} y1={h}   x2={h}   y2={0}   stroke="#2a2250" strokeWidth="0.8"/>
+      <line x1={S/2} y1={0}   x2={S}   y2={S/2}   stroke="#2a2250" strokeWidth="0.8"/>
+      <line x1={S} y1={S/2}   x2={S/2}   y2={S}   stroke="#2a2250" strokeWidth="0.8"/>
+      <line x1={S/2} y1={S}   x2={0}   y2={S/2}   stroke="#2a2250" strokeWidth="0.8"/>
+      <line x1={0} y1={S/2}   x2={S/2}   y2={0}   stroke="#2a2250" strokeWidth="0.8"/>
       <line x1={0} y1={0}   x2={S}   y2={S}   stroke="#1c1840" strokeWidth="0.5"/>
       <line x1={S} y1={0}   x2={0}   y2={S}   stroke="#1c1840" strokeWidth="0.5"/>
       {CELLS.map(({hn,cx,cy})=>{
@@ -71,7 +79,7 @@ function MiniChart({ chart }: { chart: DivChart }) {
             <text x={cx} y={cy-8}  textAnchor="middle" fontSize="7" fill={isL?"#d4af37":"#3a3060"}>{rIdx+1}</text>
             <text x={cx} y={cy+2}  textAnchor="middle" fontSize="9" fill={isL?"#d4af37":"#444060"}>{SIGN_ICONS[rIdx]}</text>
             {here.map((p,pi)=>(
-              <text key={pi} x={cx+(here.length>1?(pi-(here.length-1)/2)*11:0)} y={cy+14+pi*10}
+              <text key={pi} x={cx+(here.length>1?(pi-(here.length-1)/2)*11:0)} y={cy+(isL?17:14)}
                 textAnchor="middle" fontSize="10" fill={p.color}>{p.icon}{p.retro?"ℛ":""}</text>
             ))}
           </g>

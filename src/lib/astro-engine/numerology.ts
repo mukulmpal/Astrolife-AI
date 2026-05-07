@@ -38,19 +38,64 @@ export interface MonthForecast {
   isCurrent: boolean;
 }
 
+export interface PinnacleNumber {
+  number:    number;
+  isMaster:  boolean;
+  label:     string;
+  ageFrom:   number;
+  ageTo:     number | null;
+  isActive:  boolean;
+  theme:     string;
+  guidance:  string;
+}
+
+export interface ChallengeNumber {
+  number:   number;
+  label:    string;
+  ageFrom:  number;
+  ageTo:    number | null;
+  isActive: boolean;
+  meaning:  string;
+}
+
+export interface KarmicDebt {
+  number:    number;
+  reducedTo: number;
+  source:    string;
+  meaning:   string;
+  remedy:    string;
+}
+
+export interface IntensityEntry {
+  digit:    number;
+  count:    number;
+  missing:  boolean;
+  meaning:  string;
+}
+
 export interface NumerologyResult {
-  name:          string;
-  dob:           string;
-  lifePath:      NumerologyNumber;
-  destiny:       NumerologyNumber;
-  soulUrge:      NumerologyNumber;
-  personality:   NumerologyNumber;
-  birthday:      NumerologyNumber;
-  maturity:      NumerologyNumber;
-  personalYear:  NumerologyNumber;
-  nameBreakdown: NameLetter[];
-  monthForecast: MonthForecast[];
-  summary:       string;
+  name:           string;
+  dob:            string;
+  currentAge:     number;
+  lifePath:       NumerologyNumber;
+  destiny:        NumerologyNumber;
+  soulUrge:       NumerologyNumber;
+  personality:    NumerologyNumber;
+  birthday:       NumerologyNumber;
+  maturity:       NumerologyNumber;
+  personalYear:   NumerologyNumber;
+  personalDay:    number;
+  bridgeNumber:   number;
+  hiddenPassion:  number[];
+  pinnacles:      PinnacleNumber[];
+  challenges:     ChallengeNumber[];
+  activePinnacle: PinnacleNumber | null;
+  activeChallenge: ChallengeNumber | null;
+  karmicDebts:    KarmicDebt[];
+  intensityMap:   IntensityEntry[];
+  nameBreakdown:  NameLetter[];
+  monthForecast:  MonthForecast[];
+  summary:        string;
 }
 
 // ── Pythagorean Letter Values ─────────────────────────────────
@@ -316,6 +361,206 @@ function buildMonthForecast(personalYear: number): MonthForecast[] {
   });
 }
 
+// ── Pinnacle & Challenge Data ─────────────────────────────────
+const PINNACLE_THEMES: Record<number, { theme: string; guidance: string }> = {
+  1:  { theme: "Leadership & Self-Reliance",     guidance: "Pioneer your path, build independence, lead with courage and originality." },
+  2:  { theme: "Partnership & Cooperation",      guidance: "Collaborate deeply, practice patience, serve through harmony and diplomacy." },
+  3:  { theme: "Creative Expression",            guidance: "Create freely, communicate joyfully, share your authentic gifts with the world." },
+  4:  { theme: "Work & Foundation Building",     guidance: "Build methodically, embrace discipline — sustained effort creates lasting value." },
+  5:  { theme: "Change & Freedom",               guidance: "Embrace transformation and adventure; use freedom consciously for growth." },
+  6:  { theme: "Love & Responsibility",          guidance: "Nurture home and community; give from fullness, not fear." },
+  7:  { theme: "Introspection & Wisdom",         guidance: "Go inward, develop mastery through study, reflection, and spiritual practice." },
+  8:  { theme: "Achievement & Authority",        guidance: "Build lasting success; claim your power ethically and lead with integrity." },
+  9:  { theme: "Completion & Compassion",        guidance: "Give back, complete cycles, release the past, serve humanity generously." },
+  11: { theme: "Spiritual Illumination",         guidance: "Channel inspiration and higher vision; your intuition is your greatest tool." },
+  22: { theme: "Master Building",               guidance: "Turn grand visions into reality; create systems and legacies that transform the world." },
+};
+
+const CHALLENGE_MEANINGS: Record<number, string> = {
+  0: "No dominant challenge — rare freedom to direct your energy fully. The test is conscious discipline without external pressure.",
+  1: "Independence — overcome self-doubt and dependency. Learn to initiate and stand alone with genuine confidence.",
+  2: "Sensitivity — develop emotional resilience and assertiveness. Release the need for constant external approval.",
+  3: "Self-expression — conquer fear of judgment. Your authentic voice, ideas, and creativity are your gifts to the world.",
+  4: "Discipline — balance structure without rigidity. Work methodically without becoming a slave to routine.",
+  5: "Responsibility — harness freedom wisely. Stop escaping depth through endless novelty and stimulation.",
+  6: "Perfectionism — release control in love and service. Care given from fear becomes manipulation, not love.",
+  7: "Trust — open to connection and faith. Isolation protects but also imprisons the heart from true wisdom.",
+  8: "Power — heal your relationship with money, authority, and ambition. Your fear of success is the real obstacle.",
+};
+
+const KARMIC_DEBT_DATA: Record<number, { meaning: string; remedy: string }> = {
+  13: {
+    meaning: "Karma of laziness and manipulation from a past life. This incarnation demands honest, sustained effort — there are no shortcuts. Tasks will feel heavy until you commit fully.",
+    remedy:  "Embrace hard work as devotion. Finish what you start. Never claim credit you haven't earned.",
+  },
+  14: {
+    meaning: "Karma of excess and misuse of freedom in a past life. This life demands temperance and conscious use of the senses.",
+    remedy:  "Practice deliberate moderation. Use discipline as self-respect, not punishment.",
+  },
+  16: {
+    meaning: "Karma of fallen pride and ego destruction. This life brings periodic collapse of ego structures to force genuine humility.",
+    remedy:  "Practice humility before life forces it. Each ego defeat is a spiritual purification — surrender to it gracefully.",
+  },
+  19: {
+    meaning: "Karma of self-centeredness and isolation in a past life. This life demands learning to receive help and acknowledge interdependence.",
+    remedy:  "Accept help gracefully. Vulnerability and interdependence are not weakness — they are spiritual maturity.",
+  },
+};
+
+const INTENSITY_MEANINGS: Record<number, { abundant: string; missing: string }> = {
+  1: { abundant: "Strong drive, leadership, and initiative — watch for ego and inflexibility.", missing: "Difficulty asserting yourself — the lesson is to initiate without waiting for permission." },
+  2: { abundant: "Highly empathetic and cooperative — watch for over-sensitivity and people-pleasing.", missing: "Relationship challenges — the lesson is to nurture connection and practice patience." },
+  3: { abundant: "Gifted communicator and creator — watch for scattered energy and superficiality.", missing: "Self-expression blocks — the lesson is to share your inner world despite fear of judgment." },
+  4: { abundant: "Disciplined and reliable — watch for rigidity and resistance to change.", missing: "Avoiding hard work — the lesson is to embrace methodical effort and build solid foundations." },
+  5: { abundant: "Adventurous and versatile — watch for restlessness and commitment avoidance.", missing: "Fear of change — the lesson is to embrace uncertainty as the doorway to growth." },
+  6: { abundant: "Loving and responsible — watch for martyrdom and perfectionism in relationships.", missing: "Difficulty with commitment — the lesson is to embrace responsibility as an act of love." },
+  7: { abundant: "Analytical and introspective — watch for isolation and emotional detachment.", missing: "Spiritual disconnection — the lesson is to trust inner knowing beyond what can be proven." },
+  8: { abundant: "Ambitious and authoritative — watch for materialism and power struggles.", missing: "Fear of success and authority — the lesson is to claim your right to abundance and leadership." },
+  9: { abundant: "Deeply compassionate — watch for over-giving and unresolved resentment.", missing: "Difficulty releasing the past — the lesson is completion, forgiveness, and letting go." },
+};
+
+// ── New Calculation Functions ─────────────────────────────────
+
+function calcCurrentAge(dob: string): number {
+  const birth = new Date(dob);
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const m = now.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+  return age;
+}
+
+function lpBase(lp: number): number {
+  if (lp === 11) return 2;
+  if (lp === 22) return 4;
+  if (lp === 33) return 6;
+  return lp;
+}
+
+function calcPinnacles(dob: string, lp: number, currentAge: number): PinnacleNumber[] {
+  const [y, m, d] = dob.split("-").map(Number);
+  const rm = reduce(m);
+  const rd = reduce(d);
+  const ry = reduce(digitSum(y));
+  const p1v = reduce(rm + rd);
+  const p2v = reduce(rd + ry);
+  const p3v = reduce(p1v + p2v);
+  const p4v = reduce(rm + ry);
+
+  const base = lpBase(lp);
+  const end1 = 36 - base;
+  const end2 = end1 + 9;
+  const end3 = end2 + 9;
+
+  const pinnacles = [
+    { number: p1v, label: "1st Pinnacle", ageFrom: 0,    ageTo: end1 },
+    { number: p2v, label: "2nd Pinnacle", ageFrom: end1, ageTo: end2 },
+    { number: p3v, label: "3rd Pinnacle", ageFrom: end2, ageTo: end3 },
+    { number: p4v, label: "4th Pinnacle", ageFrom: end3, ageTo: null },
+  ];
+
+  return pinnacles.map(p => {
+    const isActive = currentAge >= p.ageFrom && (p.ageTo === null || currentAge < p.ageTo);
+    const meta = PINNACLE_THEMES[p.number] ?? PINNACLE_THEMES[reduce(p.number)] ?? PINNACLE_THEMES[1];
+    return { ...p, isMaster: MASTERS.has(p.number), isActive, theme: meta.theme, guidance: meta.guidance };
+  });
+}
+
+function calcChallenges(dob: string, lp: number, currentAge: number): ChallengeNumber[] {
+  const [y, m, d] = dob.split("-").map(Number);
+  const rm = reduce(m);
+  const rd = reduce(d);
+  const ry = reduce(digitSum(y));
+  const c1 = Math.abs(rm - rd);
+  const c2 = Math.abs(rd - ry);
+  const c3 = Math.abs(c1 - c2);
+  const c4 = Math.abs(rm - ry);
+
+  const base = lpBase(lp);
+  const end1 = 36 - base;
+  const end2 = end1 + 9;
+  const end3 = end2 + 9;
+
+  const challenges = [
+    { number: c1, label: "1st Challenge", ageFrom: 0,    ageTo: end1 },
+    { number: c2, label: "2nd Challenge", ageFrom: end1, ageTo: end2 },
+    { number: c3, label: "Major Challenge (Life)", ageFrom: 0, ageTo: null },
+    { number: c4, label: "4th Challenge", ageFrom: end3, ageTo: null },
+  ];
+
+  return challenges.map(c => ({
+    ...c,
+    isActive: currentAge >= c.ageFrom && (c.ageTo === null || currentAge < c.ageTo),
+    meaning: CHALLENGE_MEANINGS[c.number] ?? CHALLENGE_MEANINGS[0],
+  }));
+}
+
+function detectKarmicDebts(dob: string, name: string, lpVal: number, deVal: number): KarmicDebt[] {
+  const debts: KarmicDebt[] = [];
+  const [y, m, d] = dob.split("-").map(Number);
+
+  const checkRaw = (raw: number, source: string) => {
+    if ([13, 14, 16, 19].includes(raw)) {
+      const data = KARMIC_DEBT_DATA[raw];
+      if (data) debts.push({ number: raw, reducedTo: reduce(raw), source, meaning: data.meaning, remedy: data.remedy });
+    }
+  };
+
+  // Check Life Path intermediate sums
+  checkRaw(reduce(d) + reduce(m) + reduce(digitSum(y)), "Life Path (full sum)");
+  checkRaw(reduce(d), "Birth Day");
+
+  // Check Destiny intermediate sums
+  const letters = name.toUpperCase().replace(/[^A-Z]/g, "").split("");
+  const rawDestiny = letters.reduce((s, l) => s + (LETTER_VALUES[l] ?? 0), 0);
+  checkRaw(rawDestiny % 100, "Destiny Number");
+
+  // Deduplicate
+  const seen = new Set<number>();
+  return debts.filter(d => { if (seen.has(d.number)) return false; seen.add(d.number); return true; });
+}
+
+function calcHiddenPassion(name: string): number[] {
+  const counts: Record<number, number> = {};
+  name.toUpperCase().replace(/[^A-Z]/g, "").split("").forEach(l => {
+    const v = LETTER_VALUES[l];
+    if (v) counts[v] = (counts[v] ?? 0) + 1;
+  });
+  if (Object.keys(counts).length === 0) return [1];
+  const max = Math.max(...Object.values(counts));
+  return Object.entries(counts).filter(([, c]) => c === max).map(([d]) => Number(d)).sort((a, b) => a - b);
+}
+
+function calcBridge(lp: number, destiny: number): number {
+  return Math.abs(lpBase(lp) - (MASTERS.has(destiny) ? lpBase(destiny) : destiny));
+}
+
+function calcPersonalDay(dob: string): number {
+  const now = new Date();
+  const [, m, d] = dob.split("-").map(Number);
+  const pyVal = calcPersonalYear(dob);
+  return reduce(pyVal + reduce(now.getMonth() + 1) + reduce(now.getDate()));
+}
+
+function buildIntensityMap(name: string): IntensityEntry[] {
+  const counts: Record<number, number> = {};
+  name.toUpperCase().replace(/[^A-Z]/g, "").split("").forEach(l => {
+    const v = LETTER_VALUES[l];
+    if (v) counts[v] = (counts[v] ?? 0) + 1;
+  });
+  return Array.from({ length: 9 }, (_, i) => {
+    const digit = i + 1;
+    const count = counts[digit] ?? 0;
+    const meta = INTENSITY_MEANINGS[digit];
+    return {
+      digit,
+      count,
+      missing: count === 0,
+      meaning: count === 0 ? meta.missing : meta.abundant,
+    };
+  });
+}
+
 // ── Master Function ───────────────────────────────────────────
 export function calculateNumerology(name: string, dob: string): NumerologyResult {
   const lpVal = calcLifePath(dob);
@@ -334,6 +579,16 @@ export function calculateNumerology(name: string, dob: string): NumerologyResult
   const maturity     = buildNumber(mtVal, "Maturity");
   const personalYear = buildNumber(pyVal, "Personal Year");
 
+  const currentAge    = calcCurrentAge(dob);
+  const pinnacles     = calcPinnacles(dob, lpVal, currentAge);
+  const challenges    = calcChallenges(dob, lpVal, currentAge);
+  const activePinnacle  = pinnacles.find(p => p.isActive) ?? null;
+  const activeChallenge = challenges.find(c => c.isActive && c.label !== "Major Challenge (Life)") ?? null;
+  const karmicDebts   = detectKarmicDebts(dob, name, lpVal, deVal);
+  const hiddenPassion = calcHiddenPassion(name);
+  const bridgeNumber  = calcBridge(lpVal, deVal);
+  const personalDay   = calcPersonalDay(dob);
+  const intensityMap  = buildIntensityMap(name);
   const nameBreakdown = buildNameBreakdown(name);
   const monthForecast = buildMonthForecast(pyVal);
 
@@ -343,5 +598,9 @@ export function calculateNumerology(name: string, dob: string): NumerologyResult
     ? `${firstName} carries master number energy — a soul with an extraordinary dharmic mission. Rare spiritual responsibility and immense creative potential define this lifetime.`
     : `Life Path ${lpVal} (${lifePath.archetype}) meets Destiny ${deVal} (${destiny.archetype}). ${lifePath.theme}`;
 
-  return { name, dob, lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear, nameBreakdown, monthForecast, summary };
+  return {
+    name, dob, currentAge, lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear,
+    personalDay, bridgeNumber, hiddenPassion, pinnacles, challenges, activePinnacle, activeChallenge,
+    karmicDebts, intensityMap, nameBreakdown, monthForecast, summary,
+  };
 }

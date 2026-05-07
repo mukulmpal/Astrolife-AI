@@ -8,6 +8,17 @@
   --app-card: #0d0a22;
   --app-border: #1c1840;
   --app-muted: #605890;
+  --app-accent: #3c2880;
+  --app-gold: #c8a030;
+  --app-gold-strong: #f0d898;
+  --app-soft: #c8c0a8;
+  --app-muted-deep: #3a3060;
+  --app-card-alt: #0f0c28;
+  --app-border-strong: #261f50;
+  --chart-bg: #09051a;
+  --chart-line: #3b3267;
+  --chart-line-soft: #2a2250;
+  --chart-label: #786aa6;
 }
 
 @theme inline {
@@ -15,6 +26,27 @@
   --color-foreground: var(--foreground);
   --font-sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
   --font-mono: "SFMono-Regular", "Cascadia Code", monospace;
+}
+
+html[data-landing-theme="saffron"] {
+  --background: #0c0804;
+  --foreground: #fdf0d8;
+  --app-bg: #0c0804;
+  --app-fg: #fdf0d8;
+  --app-card: #130a04;
+  --app-border: #2a1808;
+  --app-muted: #806040;
+  --app-accent: #8b3a10;
+  --app-gold: #c87820;
+  --app-gold-strong: #ffd080;
+  --app-soft: #c8a878;
+  --app-muted-deep: #4a2a12;
+  --app-card-alt: #1c1008;
+  --app-border-strong: #3a2210;
+  --chart-bg: #100803;
+  --chart-line: #6b421d;
+  --chart-line-soft: #3f2410;
+  --chart-label: #b0804a;
 }
 
 html[data-theme-mode="light"] {
@@ -25,6 +57,17 @@ html[data-theme-mode="light"] {
   --app-card: #fffdf8;
   --app-border: #dfd3bf;
   --app-muted: #7b6a55;
+  --app-accent: #795548;
+  --app-gold: #b98524;
+  --app-gold-strong: #6f4c14;
+  --app-soft: #5f523f;
+  --app-muted-deep: #9b8b76;
+  --app-card-alt: #fff9ee;
+  --app-border-strong: #c8b899;
+  --chart-bg: #fff9ee;
+  --chart-line: #c9ad7a;
+  --chart-line-soft: #dfcfb0;
+  --chart-label: #8b7357;
 }
 
 body {

@@ -71,6 +71,8 @@ export default function Home() {
   useEffect(() => {
     window.localStorage.setItem(LANDING_THEME_KEY, theme);
     document.documentElement.dataset.landingTheme = theme;
+    document.body.dataset.landingTheme = theme;
+    window.dispatchEvent(new Event("astrolife-preferences-change"));
   }, [theme]);
 
   const toggle = () => setTheme(p => p === "indigo" ? "saffron" : "indigo");

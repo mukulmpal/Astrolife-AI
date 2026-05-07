@@ -44,6 +44,7 @@ const NAV_ENGINES = [
   { icon:"🎵", label:"Astro Sound", href:"/dashboard/astro-sound" },
   { icon:"💎", label:"Gemstone", href:"/dashboard/gemstone" },
   { icon:"🏠", label:"Vastu", href:"/dashboard/vastu" },
+  { icon:"🔱", label:"Jaimini", href:"/dashboard/jaimini" },
   { icon:"📄", label:"Report", href:"/dashboard/report" },
 ];
 
@@ -160,21 +161,20 @@ function normalizeChartForTransit(rawChartInput: unknown) {
 
 function CompactNorthChart({ chart }: { chart: DivChart }) {
   const S = 300;
-  const h = S / 2;
   const lagR = chart.lagnaNum;
   const houses = [
-    { h:1,  lx:h,        ly:h-88   },
-    { h:2,  lx:h+88,     ly:h-88   },
-    { h:3,  lx:h+130,    ly:h      },
-    { h:4,  lx:h+88,     ly:h+88   },
-    { h:5,  lx:h,        ly:h+88   },
-    { h:6,  lx:h-88,     ly:h+88   },
-    { h:7,  lx:h-130,    ly:h      },
-    { h:8,  lx:h-88,     ly:h-88   },
-    { h:9,  lx:h-88,     ly:h-148  },
-    { h:10, lx:h,        ly:h-148  },
-    { h:11, lx:h+88,     ly:h-148  },
-    { h:12, lx:h+88,     ly:h-20   },
+    { h:1,  lx:S/2,     ly:S/4     },
+    { h:2,  lx:S/4,     ly:S/8     },
+    { h:3,  lx:S/8,     ly:S/4     },
+    { h:4,  lx:S/4,     ly:S/2     },
+    { h:5,  lx:S/8,     ly:3*S/4   },
+    { h:6,  lx:S/4,     ly:7*S/8   },
+    { h:7,  lx:S/2,     ly:3*S/4   },
+    { h:8,  lx:3*S/4,   ly:7*S/8   },
+    { h:9,  lx:7*S/8,   ly:3*S/4   },
+    { h:10, lx:3*S/4,   ly:S/2     },
+    { h:11, lx:7*S/8,   ly:S/4     },
+    { h:12, lx:3*S/4,   ly:S/8     },
   ];
   const pByH: Record<number, DivPlanet[]> = {};
   for (let i = 1; i <= 12; i += 1) pByH[i] = [];
@@ -184,33 +184,33 @@ function CompactNorthChart({ chart }: { chart: DivChart }) {
 
   return (
     <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{ maxWidth: 330, display: "block", margin: "0 auto" }}>
-      <rect width={S} height={S} fill="#08051a" rx="8"/>
-      <rect x={0} y={0} width={S} height={S} fill="none" stroke="#3a3260" strokeWidth="1.4" rx="8"/>
-      <line x1={0} y1={0} x2={S} y2={S} stroke="#2a2250" strokeWidth="1"/>
-      <line x1={S} y1={0} x2={0} y2={S} stroke="#2a2250" strokeWidth="1"/>
-      <line x1={h} y1={0} x2={S} y2={h} stroke="#2a2250" strokeWidth="1"/>
-      <line x1={S} y1={h} x2={h} y2={S} stroke="#2a2250" strokeWidth="1"/>
-      <line x1={h} y1={S} x2={0} y2={h} stroke="#2a2250" strokeWidth="1"/>
-      <line x1={0} y1={h} x2={h} y2={0} stroke="#2a2250" strokeWidth="1"/>
+      <rect width={S} height={S} fill="var(--chart-bg)" rx="8"/>
+      <rect x={0} y={0} width={S} height={S} fill="none" stroke="var(--chart-line)" strokeWidth="1.4" rx="8"/>
+      <line x1={0} y1={0} x2={S} y2={S} stroke="var(--chart-line-soft)" strokeWidth="1"/>
+      <line x1={S} y1={0} x2={0} y2={S} stroke="var(--chart-line-soft)" strokeWidth="1"/>
+      <line x1={S/2} y1={0} x2={S} y2={S/2} stroke="var(--chart-line-soft)" strokeWidth="1"/>
+      <line x1={S} y1={S/2} x2={S/2} y2={S} stroke="var(--chart-line-soft)" strokeWidth="1"/>
+      <line x1={S/2} y1={S} x2={0} y2={S/2} stroke="var(--chart-line-soft)" strokeWidth="1"/>
+      <line x1={0} y1={S/2} x2={S/2} y2={0} stroke="var(--chart-line-soft)" strokeWidth="1"/>
       {houses.map(({ h: houseNo, lx, ly }) => {
         const rIdx = mod(lagR + houseNo - 1, 12);
         const here = pByH[houseNo] ?? [];
         const isLagna = houseNo === 1;
         return (
           <g key={houseNo}>
-            <text x={lx} y={ly - 10} textAnchor="middle" fontSize="9" fill={isLagna ? "#d4af37" : "#4a4070"} fontWeight={isLagna ? "700" : "400"}>
+            <text x={lx} y={ly - 6} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={isLagna ? "var(--app-gold)" : "var(--chart-label)"} fontWeight={isLagna ? "700" : "400"}>
               {rIdx + 1}
             </text>
-            {isLagna && <text x={lx} y={ly + 2} textAnchor="middle" fontSize="6" fill="#d4af37" fontWeight="700">Lagna</text>}
+            {isLagna && <text x={lx} y={ly + 5} textAnchor="middle" dominantBaseline="middle" fontSize="6.5" fill="var(--app-gold)" fontWeight="700">Lagna</text>}
             {here.map((p, idx) => {
               const pIdx = CHART_PLANETS.indexOf(p.planet);
-              const ox = here.length > 1 ? (idx - (here.length - 1) / 2) * 14 : 0;
+              const ox = here.length > 1 ? (idx - (here.length - 1) / 2) * 13 : 0;
               return (
                 <g key={`${houseNo}-${p.planet}-${idx}`}>
-                  <text x={lx + ox} y={ly + (isLagna ? 16 : 12) + idx * 13} textAnchor="middle" fontSize="12.5" fill={pIdx >= 0 ? p.color : "#aaa"}>
+                  <text x={lx + ox} y={ly + (isLagna ? 18 : 14)} textAnchor="middle" dominantBaseline="middle" fontSize="12.5" fill={pIdx >= 0 ? p.color : "#aaa"}>
                     {pIdx >= 0 ? CHART_EMOJI[pIdx] : p.planet.slice(0, 2)}
                   </text>
-                  {p.retrograde && <text x={lx + ox + 8} y={ly + (isLagna ? 10 : 6) + idx * 13} textAnchor="middle" fontSize="6" fill="#f97316" fontWeight="700">℞</text>}
+                  {p.retrograde && <text x={lx + ox + 8} y={ly + (isLagna ? 13 : 9)} textAnchor="middle" fontSize="6" fill="#f97316" fontWeight="700">℞</text>}
                 </g>
               );
             })}
@@ -522,6 +522,38 @@ export default function Dashboard() {
           .mobile-nav-icon{font-size:16px;line-height:1}
           .mobile-nav-label{font-size:9px;letter-spacing:0.2px}
         }
+
+        body{background:var(--app-bg);color:var(--app-fg)}
+        .layout,.main{background:var(--app-bg);color:var(--app-fg)}
+        .sidebar{background:var(--app-card-alt);border-color:var(--app-border)}
+        .sidebar-logo,.sidebar-bottom{border-color:var(--app-border)}
+        .logo-gem,.user-av{background:linear-gradient(135deg,var(--app-accent),var(--app-gold))}
+        .nav-section-title,.logout-btn{color:var(--app-muted-deep)}
+        .nav-item{color:var(--app-muted)}
+        .nav-item:hover{background:color-mix(in srgb,var(--app-gold) 7%,transparent);color:var(--app-soft)}
+        .nav-item.active{background:color-mix(in srgb,var(--app-gold) 12%,transparent);border-color:color-mix(in srgb,var(--app-gold) 20%,transparent);color:var(--app-gold)}
+        .user-chip,.date-chip,.notif-btn,.stat-card,.card,.today-summary-card{background:var(--app-card);border-color:var(--app-border);color:var(--app-fg)}
+        .user-name,.date-full,.today-text,.insight-text,.action-btn-label,.db-health-text{color:var(--app-soft)}
+        .greeting-h,.card-title,.today-title,.today-summary-v{color:var(--app-fg)}
+        .greeting-sub,.date-day,.tabs .tab,.stat-lbl,.card-tag,.action-btn-desc,.today-summary-k,.score-l{color:var(--app-muted)}
+        .greeting-tag,.greeting-h em,.stat-val,.today-tag,.score-n,.today-summary-hint,.energy-pill{color:var(--app-gold)}
+        .tabs{background:var(--app-card-alt);border-color:var(--app-border)}
+        .tab.active{background:color-mix(in srgb,var(--app-gold) 12%,var(--app-card));color:var(--app-fg)}
+        .today-card{background:linear-gradient(135deg,var(--app-card),var(--app-card-alt));border-color:color-mix(in srgb,var(--app-gold) 22%,var(--app-border))}
+        .action-btn,.insight{background:var(--app-card-alt);border-color:var(--app-border)}
+        .action-btn:hover,.insight:hover,.today-summary-card:hover,.card:hover{border-color:color-mix(in srgb,var(--app-gold) 25%,transparent)}
+        .planet-row{border-color:var(--app-border)}
+        .energy-pill{background:color-mix(in srgb,var(--app-gold) 10%,transparent);border-color:color-mix(in srgb,var(--app-gold) 18%,transparent)}
+        .upgrade{background:linear-gradient(135deg,color-mix(in srgb,var(--app-accent) 16%,var(--app-card)),color-mix(in srgb,var(--app-gold) 10%,var(--app-card)));border-color:color-mix(in srgb,var(--app-gold) 28%,transparent)}
+        .chart-panel{background:var(--chart-bg);border:1px solid var(--chart-line);border-radius:12px;padding:14px}
+        .chart-table-panel{background:var(--app-card-alt);border:1px solid var(--app-border);border-radius:12px;padding:12px}
+        .chart-panel-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--app-muted);margin-bottom:8px}
+        .chart-table-title{font-size:11px;color:var(--app-gold);margin-bottom:8px}
+        .chart-house-row{font-size:11px;color:var(--app-soft);display:flex;gap:8px;align-items:center}
+        .chart-house-no{color:var(--app-muted);width:30px}
+        .mobile-nav{background:color-mix(in srgb,var(--app-card-alt) 96%,transparent);border-color:var(--app-border)}
+        .mobile-nav-item{color:var(--app-muted)}
+        .mobile-nav-item.active{color:var(--app-gold);background:color-mix(in srgb,var(--app-gold) 12%,transparent)}
       `}</style>
 
       <div className="layout">
@@ -607,34 +639,34 @@ export default function Dashboard() {
             <div className="card-tag">✦ D1 + D9 Home Charts</div>
             <div className="card-title serif">Lagna Chart and Navamsha with House/Rashi/Planet Placement</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
-              <div style={{ background: "#0a0720", border: "1px solid #1c1840", borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", marginBottom: 8 }}>D1 · Rasi</div>
+              <div className="chart-panel">
+                <div className="chart-panel-title">D1 · Rasi</div>
                 <CompactNorthChart chart={chartLayers.d1} />
               </div>
-              <div style={{ background: "#0a0720", border: "1px solid #1c1840", borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", marginBottom: 8 }}>D9 · Navamsha</div>
+              <div className="chart-panel">
+                <div className="chart-panel-title">D9 · Navamsha</div>
                 <CompactNorthChart chart={chartLayers.d9} />
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, marginTop: 14 }}>
-              <div style={{ background: "#0a0720", border: "1px solid #1c1840", borderRadius: 12, padding: 12 }}>
-                <div style={{ fontSize: 11, color: "#c8a030", marginBottom: 8 }}>D1 House · Rashi · Planets</div>
+              <div className="chart-table-panel">
+                <div className="chart-table-title">D1 House · Rashi · Planets</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {chartLayers.d1Houses.map((h) => (
-                    <div key={`d1-${h.house}`} style={{ fontSize: 11, color: "#c8c0a8", display: "flex", gap: 8, alignItems: "center" }}>
-                      <span style={{ color: "#605890", width: 30 }}>H{h.house}</span>
+                    <div key={`d1-${h.house}`} className="chart-house-row">
+                      <span className="chart-house-no">H{h.house}</span>
                       <span style={{ width: 90 }}>{h.rashi}</span>
                       <span>{h.occupants.length ? h.occupants.map((p) => p.planet).join(", ") : "—"}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div style={{ background: "#0a0720", border: "1px solid #1c1840", borderRadius: 12, padding: 12 }}>
-                <div style={{ fontSize: 11, color: "#c8a030", marginBottom: 8 }}>D9 House · Rashi · Planets</div>
+              <div className="chart-table-panel">
+                <div className="chart-table-title">D9 House · Rashi · Planets</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {chartLayers.d9Houses.map((h) => (
-                    <div key={`d9-${h.house}`} style={{ fontSize: 11, color: "#c8c0a8", display: "flex", gap: 8, alignItems: "center" }}>
-                      <span style={{ color: "#605890", width: 30 }}>H{h.house}</span>
+                    <div key={`d9-${h.house}`} className="chart-house-row">
+                      <span className="chart-house-no">H{h.house}</span>
                       <span style={{ width: 90 }}>{h.rashi}</span>
                       <span>{h.occupants.length ? h.occupants.map((p) => p.planet).join(", ") : "—"}</span>
                     </div>
@@ -799,6 +831,7 @@ export default function Dashboard() {
                   { icon:"🧭", label:"KP Engine",         desc:"Krishnamurti precision",      href:"/dashboard/kp" },
                   { icon:"💎", label:"Gemstone",         desc:"Safe gemstone guidance",       href:"/dashboard/gemstone" },
                   { icon:"📄", label:"Premium Report",    desc:"Full integrated report",      href:"/dashboard/report" },
+                  { icon:"🔱", label:"Jaimini",           desc:"Chara Karakas, Arudha, Dasha", href:"/dashboard/jaimini" },
                   { icon:"🤖", label:"AI Chat",           desc:"Talk to AI astrologer",       href:"/dashboard/chat" },
               ].map((a,i) => (
                   <Link key={i} href={a.href} className="action-btn">

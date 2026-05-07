@@ -1,68 +1,66 @@
 "use client";
-import { useState } from "react";
-import "@/app/dashboard/shared.css";
-import { calculateNumerology, type NumerologyNumber } from "@/lib/astro-engine/numerology";
-import { PremiumFeature } from "@/components/premium-feature";
-import { useUserChart } from "@/lib/user-chart";
 
-// ── Number Card ───────────────────────────────────────────────
+import { useState } from "react";
+import { calculateNumerology, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry } from "@/lib/astro-engine/numerology";
+import { useUserChart } from "@/lib/user-chart";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import "@/app/dashboard/shared.css";
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function qualityColor(n: NumerologyNumber) { return n.color; }
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
 function NumCard({ n, expanded, onToggle }: { n: NumerologyNumber; expanded: boolean; onToggle: () => void }) {
+  const c = n.color;
   return (
     <div
-      className="card"
-      style={{ cursor: "pointer", borderColor: expanded ? `${n.color}55` : "#1c1840", transition: "border-color 0.2s" }}
+      className="rounded-2xl p-5 cursor-pointer transition-all"
+      style={{ background: c + "0e", border: `1px solid ${expanded ? c + "55" : c + "22"}` }}
       onClick={onToggle}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{
-            fontFamily: "Cormorant Garamond,serif", fontSize: 52, fontWeight: 700,
-            color: n.color, lineHeight: 1, minWidth: 52, textAlign: "center",
-          }}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="text-5xl font-bold shrink-0" style={{ fontFamily: "Cormorant Garamond, serif", color: c, lineHeight: 1 }}>
             {n.value}
           </div>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "#605890", marginBottom: 4 }}>{n.label}</div>
-            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: "#f0e8d0" }}>{n.archetype}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
-              <span style={{ fontSize: 14, color: n.color }}>{n.planetIcon}</span>
-              <span style={{ fontSize: 11, color: "#605890" }}>{n.planet}</span>
-              <span className="badge badge-gold" style={{ fontSize: 9 }}>{n.keyword}</span>
-              {n.isMaster && <span className="badge" style={{ fontSize: 9, background: "rgba(200,160,48,0.15)", color: "#f0d898", border: "1px solid rgba(200,160,48,0.3)" }}>MASTER</span>}
+            <p className="text-xs uppercase tracking-widest text-white/35 mb-1">{n.label}</p>
+            <p className="text-lg font-semibold text-white" style={{ fontFamily: "Cormorant Garamond, serif" }}>{n.archetype}</p>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className="text-sm" style={{ color: c }}>{n.planetIcon}</span>
+              <span className="text-xs text-white/40">{n.planet}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: c + "20", color: c }}>{n.keyword}</span>
+              {n.isMaster && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">MASTER</span>}
             </div>
           </div>
         </div>
-        <span style={{ fontSize: 11, color: "#3a3060", marginTop: 4 }}>{expanded ? "▲" : "▼"}</span>
+        <span className="text-white/20 text-sm shrink-0 mt-1">{expanded ? "▲" : "▼"}</span>
       </div>
 
-      <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.7, marginBottom: expanded ? 16 : 0 }}>{n.theme}</div>
+      <p className="text-sm text-white/55 mt-3 leading-relaxed">{n.theme}</p>
 
       {expanded && (
-        <div style={{ borderTop: "1px solid #1c1840", paddingTop: 16, marginTop: 4 }}>
-          <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.85, marginBottom: 16 }}>{n.desc}</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
-            <div style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: 10, padding: "12px 14px" }}>
-              <div style={{ fontSize: 9, color: "#22c55e", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 8 }}>Strengths</div>
-              {n.strengths.map(s => (
-                <div key={s} style={{ fontSize: 12, color: "#c8c0a8", marginBottom: 4 }}>✦ {s}</div>
-              ))}
+        <div className="mt-4 pt-4 border-t border-white/08 flex flex-col gap-4">
+          <p className="text-sm text-white/70 leading-[1.85]">{n.desc}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl p-3" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.18)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-2">Strengths</p>
+              {n.strengths.map(s => <p key={s} className="text-xs text-white/65 mb-1.5">✦ {s}</p>)}
             </div>
-            <div style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "12px 14px" }}>
-              <div style={{ fontSize: 9, color: "#ef4444", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 8 }}>Challenges</div>
-              {n.challenges.map(c => (
-                <div key={c} style={{ fontSize: 12, color: "#c8c0a8", marginBottom: 4 }}>⚠ {c}</div>
-              ))}
+            <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-red-400 mb-2">Challenges</p>
+              {n.challenges.map(ch => <p key={ch} className="text-xs text-white/65 mb-1.5">⚠ {ch}</p>)}
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ fontSize: 11, color: "#605890" }}>Lucky days: <span style={{ color: "#c8a030" }}>{n.luckyDays}</span></span>
-            <span style={{ fontSize: 11, color: "#605890" }}>Compatible: {n.compatibleWith.map(x => (
-              <span key={x} style={{ display: "inline-block", width: 22, height: 22, lineHeight: "22px", textAlign: "center", borderRadius: "50%", background: "rgba(200,160,48,0.12)", border: "1px solid rgba(200,160,48,0.2)", fontSize: 11, color: "#c8a030", marginLeft: 4 }}>{x}</span>
+          <div className="flex items-center gap-4 flex-wrap text-xs text-white/40">
+            <span>Lucky: <span style={{ color: c }}>{n.luckyDays}</span></span>
+            <span>Compatible: {n.compatibleWith.map(x => (
+              <span key={x} className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ml-1" style={{ background: c + "20", color: c }}>{x}</span>
             ))}</span>
-            <div style={{ display: "flex", gap: 5, marginLeft: "auto" }}>
-              {n.luckyColors.map(c => (
-                <div key={c} style={{ width: 16, height: 16, borderRadius: "50%", background: c, border: "1px solid rgba(255,255,255,0.1)" }} />
-              ))}
+            <div className="flex gap-1.5 ml-auto">
+              {n.luckyColors.map(col => <div key={col} className="w-3.5 h-3.5 rounded-full border border-white/10" style={{ background: col }} />)}
             </div>
           </div>
         </div>
@@ -71,238 +69,411 @@ function NumCard({ n, expanded, onToggle }: { n: NumerologyNumber; expanded: boo
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────
+function PinnacleCard({ p }: { p: PinnacleNumber }) {
+  const colors = ["#f97316", "#22c55e", "#6366f1", "#eab308"];
+  const idx = ["1st", "2nd", "3rd", "4th"].indexOf(p.label.split(" ")[0]);
+  const c = colors[idx] ?? "#94a3b8";
+  return (
+    <div className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: p.isActive ? c + "18" : c + "08", border: `1px solid ${p.isActive ? c + "55" : c + "22"}` }}>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: c }}>{p.label}</span>
+        {p.isActive && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: c + "25", color: c }}>ACTIVE NOW</span>}
+        {p.isMaster && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/15 text-amber-300">MASTER</span>}
+      </div>
+      <p className="text-3xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: c }}>{p.number}</p>
+      <p className="text-sm font-semibold text-white">{p.theme}</p>
+      <p className="text-xs text-white/50 leading-relaxed">{p.guidance}</p>
+      <p className="text-xs text-white/30 mt-1">Age {p.ageFrom} – {p.ageTo ?? "∞"}</p>
+    </div>
+  );
+}
+
+function ChallengeCard({ c: ch }: { c: ChallengeNumber }) {
+  const isLifelong = ch.label.includes("Life");
+  const color = isLifelong ? "#f59e0b" : "#ef4444";
+  return (
+    <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: ch.isActive ? color + "12" : color + "06", border: `1px solid ${ch.isActive ? color + "45" : color + "20"}` }}>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color }}>{ch.label}</span>
+        {ch.isActive && !isLifelong && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: color + "20", color }}>ACTIVE</span>}
+        {isLifelong && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300">WHOLE LIFE</span>}
+      </div>
+      <p className="text-2xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color }}>{ch.number}</p>
+      <p className="text-xs text-white/55 leading-relaxed">{ch.meaning}</p>
+      {!isLifelong && <p className="text-xs text-white/30">Age {ch.ageFrom} – {ch.ageTo ?? "∞"}</p>}
+    </div>
+  );
+}
+
+function IntensityBar({ entry }: { entry: IntensityEntry }) {
+  const max = 5;
+  const pct = Math.min(100, (entry.count / max) * 100);
+  const color = entry.missing ? "#ef4444" : entry.count >= 4 ? "#f59e0b" : "#22c55e";
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 font-bold text-xs" style={{ background: color + "20", color }}>
+        {entry.digit}
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-white/50">{entry.missing ? "Missing" : `×${entry.count}`}</span>
+          <span className="text-[10px]" style={{ color }}>{entry.missing ? "Karmic Lesson" : entry.count >= 4 ? "Intensified" : "Present"}</span>
+        </div>
+        <div className="h-1 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+        </div>
+        <p className="text-[11px] text-white/35 mt-1 leading-snug">{entry.meaning}</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
+
 export default function NumerologyPage() {
-  const [activeTab, setActiveTab] = useState<"numbers" | "name" | "year">("numbers");
-  const [expanded, setExpanded]   = useState<string | null>("Life Path");
+  const [activeTab, setActiveTab] = useState<"core" | "name" | "pinnacles" | "year">("core");
+  const [expandedCard, setExpandedCard] = useState<string | null>("Life Path");
   const { birth } = useUserChart();
 
   const result = calculateNumerology(birth.name, birth.dob);
-  const { lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear, nameBreakdown, monthForecast } = result;
+  const {
+    lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear,
+    pinnacles, challenges, activePinnacle, activeChallenge,
+    karmicDebts, hiddenPassion, bridgeNumber, personalDay, intensityMap,
+    nameBreakdown, monthForecast, summary, currentAge,
+  } = result;
 
-  const numbers: NumerologyNumber[] = [lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear];
-
+  const coreNumbers: NumerologyNumber[] = [lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear];
   const currentYear = new Date().getFullYear();
 
+  const tabs = [
+    { key: "core",      label: "Core Numbers" },
+    { key: "name",      label: "Name Analysis" },
+    { key: "pinnacles", label: "Pinnacles & Challenges" },
+    { key: "year",      label: `${currentYear} Forecast` },
+  ] as const;
+
   return (
-    <div className="page">
-      <div className="page-tag">🔢 Numerology Engine</div>
-      <h1 className="page-title serif">Your Numbers, <em>Decoded</em></h1>
-      <p className="page-sub">Pythagorean system · 7 core numbers · Vedic planet mapping · {currentYear} forecast</p>
-      <PremiumFeature feature="Numerology Engine">
+    <main
+      className="min-h-screen text-white"
+      style={{
+        padding: "32px 24px 110px",
+        background:
+          "radial-gradient(circle at top left, rgba(200,160,48,0.10), transparent 35%), radial-gradient(circle at bottom right, rgba(99,102,241,0.08), transparent 30%), #05020f",
+      }}
+    >
+      <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%" }} className="flex flex-col gap-6">
 
-      {/* HEADER CARD */}
-      <div className="header-card">
-        <div className="header-orb" />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#c8a030", marginBottom: 6 }}>🔢 Numerology Profile</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, color: "#f0e8d0" }}>{birth.name}</div>
-          <div style={{ fontSize: 13, color: "#605890", marginTop: 4 }}>
-            {new Date(birth.dob).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", position: "relative", zIndex: 1 }}>
-          {[
-            { n: lifePath.value,    l: "LIFE PATH",    c: lifePath.color },
-            { n: destiny.value,     l: "DESTINY",      c: destiny.color },
-            { n: personalYear.value,l: "PERSONAL YEAR",c: personalYear.color },
-          ].map(s => (
-            <div key={s.l} className="hstat">
-              <div className="hstat-n" style={{ color: s.c }}>{s.n}</div>
-              <div className="hstat-l">{s.l}</div>
+        {/* Header */}
+        <section>
+          <p className="text-xs uppercase tracking-[0.2em] text-amber-300">Pythagorean Numerology</p>
+          <h1 className="text-3xl font-bold mt-1" style={{ fontFamily: "Cormorant Garamond, serif" }}>Your Numbers, <em>Decoded</em></h1>
+          <p className="text-white/50 text-sm mt-1">Pythagorean system · 7 core + Pinnacles + Challenges · Master numbers · Karmic debt · {currentYear} forecast</p>
+        </section>
+
+        {/* Profile summary bar */}
+        <section className="rounded-2xl p-5" style={{ background: "rgba(200,160,48,0.07)", border: "1px solid rgba(200,160,48,0.25)" }}>
+          <div className="flex items-start justify-between flex-wrap gap-4">
+            <div>
+              <p className="text-white/40 text-xs uppercase tracking-widest mb-1">Numerology Profile</p>
+              <p className="text-2xl font-semibold text-white" style={{ fontFamily: "Cormorant Garamond, serif" }}>{birth.name}</p>
+              <p className="text-sm text-white/40 mt-0.5">Age {currentAge} · Personal Day: <span className="font-bold text-amber-300">{personalDay}</span></p>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* SUMMARY */}
-      <div className="summary-strip">🔢 {result.summary}</div>
-
-      {/* TABS */}
-      <div className="tabs">
-        {([["numbers", "Core Numbers"], ["name", "Name Analysis"], ["year", `${currentYear} Forecast`]] as const).map(([t, l]) => (
-          <button key={t} className={`tab ${activeTab === t ? "active" : ""}`} onClick={() => setActiveTab(t)}>{l}</button>
-        ))}
-      </div>
-
-      {/* ── NUMBERS TAB ── */}
-      {activeTab === "numbers" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {numbers.map(n => (
-            <NumCard
-              key={n.label}
-              n={n}
-              expanded={expanded === n.label}
-              onToggle={() => setExpanded(expanded === n.label ? null : n.label)}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ── NAME TAB ── */}
-      {activeTab === "name" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Letter grid */}
-          <div className="card">
-            <div className="card-tag">✦ Pythagorean Name Chart</div>
-            <div className="card-title serif">{birth.name}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
-              {nameBreakdown.map((l, i) =>
-                l.letter === " " ? (
-                  <div key={i} style={{ width: 12 }} />
-                ) : (
-                  <div key={i} style={{
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-                    background: l.isVowel ? "rgba(236,72,153,0.08)" : "rgba(96,165,250,0.08)",
-                    border: `1px solid ${l.isVowel ? "rgba(236,72,153,0.25)" : "rgba(96,165,250,0.25)"}`,
-                    borderRadius: 8, padding: "8px 10px", minWidth: 36,
-                  }}>
-                    <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: l.isVowel ? "#ec4899" : "#60a5fa" }}>{l.letter}</span>
-                    <span style={{ fontSize: 11, color: l.isVowel ? "#ec4899" : "#60a5fa", fontWeight: 600 }}>{l.value}</span>
-                  </div>
-                )
-              )}
-            </div>
-            <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#605890" }}>
-              <span><span style={{ color: "#ec4899" }}>■</span> Vowels (Soul Urge)</span>
-              <span><span style={{ color: "#60a5fa" }}>■</span> Consonants (Personality)</span>
-            </div>
-          </div>
-
-          {/* Three name numbers */}
-          <div className="grid-3">
-            {[destiny, soulUrge, personality].map(n => (
-              <div key={n.label} className="card" style={{ textAlign: "center", borderColor: `${n.color}22` }}>
-                <div style={{ fontSize: 9, letterSpacing: "2px", textTransform: "uppercase", color: "#605890", marginBottom: 8 }}>{n.label}</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 48, fontWeight: 700, color: n.color, lineHeight: 1, marginBottom: 8 }}>{n.value}</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 15, color: "#f0e8d0", marginBottom: 6 }}>{n.archetype}</div>
-                <div style={{ fontSize: 11, color: "#605890", marginBottom: 8 }}>{n.planetIcon} {n.planet}</div>
-                <div style={{ fontSize: 11, color: "#c8c0a8", lineHeight: 1.6 }}>{n.theme}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* What each name number means */}
-          <div className="card">
-            <div className="card-tag">✦ What Your Name Numbers Mean</div>
-            {[
-              { num: destiny,     role: "All letters", meaning: "Your outer purpose — what you are meant to accomplish and how the world sees your potential." },
-              { num: soulUrge,    role: "Vowels only", meaning: "Your inner motivation — the deepest desire of your soul that drives every decision from within." },
-              { num: personality, role: "Consonants",  meaning: "Your outer mask — how you present yourself to the world before people know you deeply." },
-            ].map(({ num, role, meaning }) => (
-              <div key={num.label} style={{ display: "flex", gap: 14, padding: "12px 0", borderBottom: "1px solid #1c1840" }}>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 28, fontWeight: 700, color: num.color, minWidth: 36, textAlign: "center" }}>{num.value}</div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e8d0", marginBottom: 2 }}>{num.label} <span style={{ fontSize: 10, color: "#605890", fontWeight: 400 }}>({role})</span></div>
-                  <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.65 }}>{meaning}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── YEAR TAB ── */}
-      {activeTab === "year" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Personal Year big card */}
-          <div className="card" style={{ borderColor: `${personalYear.color}33` }}>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
-              <div style={{ textAlign: "center", minWidth: 100 }}>
-                <div style={{ fontSize: 9, letterSpacing: "2px", textTransform: "uppercase", color: "#605890", marginBottom: 8 }}>Personal Year</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 80, fontWeight: 700, color: personalYear.color, lineHeight: 1 }}>{personalYear.value}</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, color: "#f0e8d0", marginTop: 8 }}>{personalYear.archetype}</div>
-                {personalYear.isMaster && (
-                  <span className="badge" style={{ marginTop: 8, fontSize: 9, background: "rgba(200,160,48,0.15)", color: "#f0d898", border: "1px solid rgba(200,160,48,0.3)" }}>MASTER NUMBER</span>
-                )}
-              </div>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: personalYear.color, marginBottom: 8 }}>{personalYear.keyword} · {currentYear}</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600, color: "#f0e8d0", marginBottom: 12, lineHeight: 1.3 }}>
-                  {personalYear.theme}
-                </div>
-                <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.85, marginBottom: 16 }}>{personalYear.desc}</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                  <div style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: 10, padding: "10px 12px" }}>
-                    <div style={{ fontSize: 9, color: "#22c55e", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 6 }}>Focus On</div>
-                    {personalYear.strengths.map(s => (
-                      <div key={s} style={{ fontSize: 11, color: "#c8c0a8", marginBottom: 3 }}>✦ {s}</div>
-                    ))}
-                  </div>
-                  <div style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "10px 12px" }}>
-                    <div style={{ fontSize: 9, color: "#ef4444", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 6 }}>Watch For</div>
-                    {personalYear.challenges.map(c => (
-                      <div key={c} style={{ fontSize: 11, color: "#c8c0a8", marginBottom: 3 }}>⚠ {c}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Monthly forecast grid */}
-          <div className="card">
-            <div className="card-tag">✦ Month-by-Month Energy</div>
-            <div className="card-title serif">{currentYear} Monthly Guide</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 10 }}>
-              {monthForecast.map(m => (
-                <div key={m.month} style={{
-                  background: m.isCurrent ? "rgba(200,160,48,0.06)" : "rgba(0,0,0,0.2)",
-                  border: `1px solid ${m.isCurrent ? "rgba(200,160,48,0.35)" : "#1c1840"}`,
-                  borderRadius: 12, padding: "14px 14px",
-                  position: "relative",
-                }}>
-                  {m.isCurrent && (
-                    <div style={{ position: "absolute", top: -10, left: 12, background: "#c8a030", color: "#060410", fontSize: 8, fontWeight: 700, padding: "3px 10px", borderRadius: 100, letterSpacing: "1px", textTransform: "uppercase" }}>NOW</div>
-                  )}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: m.isCurrent ? "#c8a030" : "#c8c0a8" }}>{m.monthName}</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                      <span style={{ fontSize: 13 }}>{m.icon}</span>
-                      <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 700, color: m.isMaster ? "#c8a030" : "#605890" }}>{m.energy}</span>
-                      {m.isMaster && <span style={{ fontSize: 8, color: "#c8a030" }}>★</span>}
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 10, color: "#605890", lineHeight: 1.5 }}>{m.theme}</div>
+            <div className="flex gap-4 flex-wrap">
+              {[
+                { n: lifePath.value,     l: "Life Path",    c: lifePath.color },
+                { n: destiny.value,      l: "Destiny",      c: destiny.color },
+                { n: personalYear.value, l: "Personal Year", c: personalYear.color },
+                { n: personalDay,        l: "Personal Day", c: "#94a3b8" },
+              ].map(s => (
+                <div key={s.l} className="text-center">
+                  <p className="text-3xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: s.c }}>{s.n}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-white/35 mt-0.5">{s.l}</p>
                 </div>
               ))}
             </div>
           </div>
+          <p className="text-sm text-white/55 mt-3 leading-relaxed border-t border-white/08 pt-3">{summary}</p>
+        </section>
 
-          {/* 9-year cycle */}
-          <div className="card">
-            <div className="card-tag">✦ Your 9-Year Cycle</div>
-            <div className="card-title serif">Where You Are in the Journey</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {Array.from({ length: 9 }, (_, i) => {
-                const yr = currentYear - (personalYear.value - 1) + i;
-                const py = i + 1;
-                const isCurr = yr === currentYear;
-                return (
-                  <div key={i} style={{
-                    flex: 1, minWidth: 64, textAlign: "center",
-                    padding: "12px 8px", borderRadius: 10,
-                    background: isCurr ? "rgba(200,160,48,0.1)" : "rgba(0,0,0,0.2)",
-                    border: `1px solid ${isCurr ? "rgba(200,160,48,0.35)" : "#1c1840"}`,
-                  }}>
-                    <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 700, color: isCurr ? "#c8a030" : "#3a3060" }}>{py}</div>
-                    <div style={{ fontSize: 10, color: isCurr ? "#c8c0a8" : "#3a3060", marginTop: 2 }}>{yr}</div>
+        {/* Active Pinnacle + Challenge quick view */}
+        {(activePinnacle || activeChallenge) && (
+          <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {activePinnacle && (
+              <div className="rounded-2xl p-4" style={{ background: "rgba(99,102,241,0.10)", border: "1px solid rgba(99,102,241,0.35)" }}>
+                <p className="text-xs uppercase tracking-widest text-indigo-300 mb-2">Active Pinnacle</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-4xl font-bold text-indigo-300" style={{ fontFamily: "Cormorant Garamond, serif" }}>{activePinnacle.number}</span>
+                  <div>
+                    <p className="font-semibold text-white">{activePinnacle.theme}</p>
+                    <p className="text-xs text-white/50 mt-0.5">Ages {activePinnacle.ageFrom}–{activePinnacle.ageTo ?? "∞"}</p>
                   </div>
-                );
-              })}
+                </div>
+              </div>
+            )}
+            {activeChallenge && (
+              <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.30)" }}>
+                <p className="text-xs uppercase tracking-widest text-red-300 mb-2">Active Challenge</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-4xl font-bold text-red-300" style={{ fontFamily: "Cormorant Garamond, serif" }}>{activeChallenge.number}</span>
+                  <p className="text-sm text-white/65 leading-relaxed">{activeChallenge.meaning.split("—")[0]?.trim()}</p>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Karmic Debt alert */}
+        {karmicDebts.length > 0 && (
+          <section className="rounded-2xl p-4" style={{ background: "rgba(245,158,11,0.09)", border: "1px solid rgba(245,158,11,0.35)" }}>
+            <p className="text-xs uppercase tracking-widest text-amber-300 mb-3">⚠ Karmic Debt Detected</p>
+            <div className="flex flex-col gap-4">
+              {karmicDebts.map(debt => (
+                <div key={debt.number} className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-amber-300" style={{ fontFamily: "Cormorant Garamond, serif" }}>{debt.number}/{debt.reducedTo}</span>
+                    <span className="text-xs text-white/40">from {debt.source}</span>
+                  </div>
+                  <p className="text-sm text-white/65 leading-relaxed">{debt.meaning}</p>
+                  <p className="text-xs text-amber-300/80 italic">Remedy: {debt.remedy}</p>
+                </div>
+              ))}
             </div>
-            <div style={{ marginTop: 14, fontSize: 12, color: "#605890", lineHeight: 1.7 }}>
-              You are in Year <strong style={{ color: "#c8a030" }}>{personalYear.value}</strong> of your 9-year cycle.
-              {personalYear.value <= 3
-                ? " The cycle is in its early phase — plant seeds and build momentum."
-                : personalYear.value <= 6
-                ? " The cycle is in its active phase — harvest what you've built and expand."
-                : " The cycle is in its completion phase — release what no longer serves and prepare for renewal."}
-            </div>
-          </div>
+          </section>
+        )}
+
+        {/* Tabs */}
+        <div className="flex gap-2 flex-wrap">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
+              style={{
+                background: activeTab === tab.key ? "rgba(200,160,48,0.20)" : "rgba(255,255,255,0.05)",
+                border: `1px solid ${activeTab === tab.key ? "rgba(200,160,48,0.55)" : "rgba(255,255,255,0.10)"}`,
+                color: activeTab === tab.key ? "#fbbf24" : "rgba(255,255,255,0.45)",
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-      )}
-      </PremiumFeature>
-    </div>
+
+        {/* ── CORE NUMBERS ── */}
+        {activeTab === "core" && (
+          <section className="flex flex-col gap-4">
+            {/* Bridge + Hidden Passion quick stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="rounded-xl p-3 border border-white/08 bg-white/[0.03]">
+                <p className="text-[10px] uppercase tracking-widest text-white/35 mb-1">Bridge Number</p>
+                <p className="text-2xl font-bold text-white" style={{ fontFamily: "Cormorant Garamond, serif" }}>{bridgeNumber}</p>
+                <p className="text-[11px] text-white/40 mt-0.5">Gap between life path & destiny</p>
+              </div>
+              <div className="rounded-xl p-3 border border-white/08 bg-white/[0.03]">
+                <p className="text-[10px] uppercase tracking-widest text-white/35 mb-1">Hidden Passion</p>
+                <p className="text-2xl font-bold text-amber-300" style={{ fontFamily: "Cormorant Garamond, serif" }}>{hiddenPassion.join(", ")}</p>
+                <p className="text-[11px] text-white/40 mt-0.5">Most frequent digit in name</p>
+              </div>
+              <div className="rounded-xl p-3 border border-white/08 bg-white/[0.03]">
+                <p className="text-[10px] uppercase tracking-widest text-white/35 mb-1">Birthday Number</p>
+                <p className="text-2xl font-bold text-white" style={{ fontFamily: "Cormorant Garamond, serif", color: birthday.color }}>{birthday.value}</p>
+                <p className="text-[11px] text-white/40 mt-0.5">{birthday.archetype}</p>
+              </div>
+              <div className="rounded-xl p-3 border border-white/08 bg-white/[0.03]">
+                <p className="text-[10px] uppercase tracking-widest text-white/35 mb-1">Maturity Number</p>
+                <p className="text-2xl font-bold text-white" style={{ fontFamily: "Cormorant Garamond, serif", color: maturity.color }}>{maturity.value}</p>
+                <p className="text-[11px] text-white/40 mt-0.5">Your 40+ destiny</p>
+              </div>
+            </div>
+            {coreNumbers.map(n => (
+              <NumCard key={n.label} n={n} expanded={expandedCard === n.label} onToggle={() => setExpandedCard(expandedCard === n.label ? null : n.label)} />
+            ))}
+          </section>
+        )}
+
+        {/* ── NAME ANALYSIS ── */}
+        {activeTab === "name" && (
+          <section className="flex flex-col gap-4">
+            {/* Letter grid */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs uppercase tracking-widest text-white/35 mb-1">Pythagorean Name Chart</p>
+              <p className="text-2xl font-semibold text-white mb-4" style={{ fontFamily: "Cormorant Garamond, serif" }}>{birth.name}</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {nameBreakdown.map((l, i) =>
+                  l.letter === " " ? (
+                    <div key={i} className="w-4" />
+                  ) : (
+                    <div key={i} className="flex flex-col items-center gap-1 rounded-lg px-2.5 py-2 min-w-[32px]"
+                      style={{
+                        background: l.isVowel ? "rgba(236,72,153,0.10)" : "rgba(96,165,250,0.10)",
+                        border: `1px solid ${l.isVowel ? "rgba(236,72,153,0.30)" : "rgba(96,165,250,0.30)"}`,
+                      }}>
+                      <span className="text-lg font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: l.isVowel ? "#ec4899" : "#60a5fa" }}>{l.letter}</span>
+                      <span className="text-xs font-bold" style={{ color: l.isVowel ? "#ec4899" : "#60a5fa" }}>{l.value}</span>
+                    </div>
+                  )
+                )}
+              </div>
+              <div className="flex gap-4 text-xs text-white/40">
+                <span><span className="text-pink-400">■</span> Vowels → Soul Urge ({soulUrge.value})</span>
+                <span><span className="text-blue-400">■</span> Consonants → Personality ({personality.value})</span>
+              </div>
+            </div>
+
+            {/* Three name numbers */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[destiny, soulUrge, personality].map(n => (
+                <div key={n.label} className="rounded-2xl p-4 text-center" style={{ background: n.color + "0e", border: `1px solid ${n.color}30` }}>
+                  <p className="text-xs uppercase tracking-widest text-white/35 mb-2">{n.label}</p>
+                  <p className="text-5xl font-bold mb-2" style={{ fontFamily: "Cormorant Garamond, serif", color: n.color }}>{n.value}</p>
+                  <p className="text-base font-semibold text-white">{n.archetype}</p>
+                  <p className="text-xs text-white/40 mt-1">{n.planetIcon} {n.planet}</p>
+                  <p className="text-xs text-white/50 leading-relaxed mt-2">{n.theme}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Intensity Map */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs uppercase tracking-widest text-white/35 mb-1">Intensity Map</p>
+              <p className="text-sm text-white/40 mb-4">Frequency of each number in your name — missing = karmic lesson, excess = intensified trait</p>
+              <div className="flex flex-col gap-4">
+                {intensityMap.map(entry => <IntensityBar key={entry.digit} entry={entry} />)}
+              </div>
+            </div>
+
+            {/* Hidden Passion */}
+            <div className="rounded-2xl p-4" style={{ background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.30)" }}>
+              <p className="text-xs uppercase tracking-widest text-amber-300 mb-2">Hidden Passion Number · {hiddenPassion.join(", ")}</p>
+              <p className="text-sm text-white/65 leading-relaxed">
+                Your Hidden Passion is the most frequently appearing number in your name. It reveals an innate talent or deep inner drive that operates quietly but powerfully beneath the surface — a strength you may take for granted because it comes so naturally.
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* ── PINNACLES & CHALLENGES ── */}
+        {activeTab === "pinnacles" && (
+          <section className="flex flex-col gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-white/35 mb-3">4 Pinnacle Numbers — Major life phases and their energy</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {pinnacles.map(p => <PinnacleCard key={p.label} p={p} />)}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/08 bg-white/[0.02] p-4">
+              <p className="text-xs uppercase tracking-widest text-white/30 mb-2">About Pinnacle Numbers</p>
+              <p className="text-sm text-white/50 leading-relaxed">
+                Pinnacles represent the major chapters of your life — the prevailing energy governing each phase of your journey.
+                Your Life Path number determines when each pinnacle begins and ends. The active pinnacle is the energy you are currently living through,
+                shaping the opportunities and lessons available to you right now.
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-white/35 mb-3">4 Challenge Numbers — Obstacles and karmic lessons</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {challenges.map(c => <ChallengeCard key={c.label} c={c} />)}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/08 bg-white/[0.02] p-4">
+              <p className="text-xs uppercase tracking-widest text-white/30 mb-2">About Challenge Numbers</p>
+              <p className="text-sm text-white/50 leading-relaxed">
+                Challenge numbers reveal the specific lessons and obstacles you must overcome in each life phase.
+                The Major Challenge (Challenge 3) operates across your entire life. A Challenge of 0 is rare and
+                indicates karmic freedom — but demands conscious self-direction. These are not punishments but doorways
+                to your most significant growth.
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* ── YEAR FORECAST ── */}
+        {activeTab === "year" && (
+          <section className="flex flex-col gap-4">
+            {/* Personal Year big card */}
+            <div className="rounded-2xl p-5" style={{ background: personalYear.color + "12", border: `1px solid ${personalYear.color}40` }}>
+              <div className="flex items-start gap-6 flex-wrap">
+                <div className="text-center min-w-[90px]">
+                  <p className="text-[10px] uppercase tracking-widest text-white/35 mb-2">Personal Year</p>
+                  <p className="text-7xl font-bold leading-none" style={{ fontFamily: "Cormorant Garamond, serif", color: personalYear.color }}>{personalYear.value}</p>
+                  <p className="text-sm font-semibold text-white mt-2">{personalYear.archetype}</p>
+                  {personalYear.isMaster && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 mt-1 inline-block">MASTER</span>}
+                </div>
+                <div className="flex-1 min-w-[200px]">
+                  <p className="text-xs uppercase tracking-widest mb-2" style={{ color: personalYear.color }}>{personalYear.keyword} · {currentYear}</p>
+                  <p className="text-xl font-semibold text-white leading-snug mb-3" style={{ fontFamily: "Cormorant Garamond, serif" }}>{personalYear.theme}</p>
+                  <p className="text-sm text-white/65 leading-[1.85] mb-4">{personalYear.desc}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl p-3" style={{ background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.20)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-2">Focus On</p>
+                      {personalYear.strengths.map(s => <p key={s} className="text-xs text-white/60 mb-1.5">✦ {s}</p>)}
+                    </div>
+                    <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.20)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-red-400 mb-2">Watch For</p>
+                      {personalYear.challenges.map(c => <p key={c} className="text-xs text-white/60 mb-1.5">⚠ {c}</p>)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 9-year cycle */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs uppercase tracking-widest text-white/35 mb-3">Your 9-Year Cycle · You are in Year {personalYear.value}</p>
+              <div className="flex gap-2 flex-wrap">
+                {Array.from({ length: 9 }, (_, i) => {
+                  const yr = currentYear - (personalYear.value - 1) + i;
+                  const py = i + 1;
+                  const isCurr = yr === currentYear;
+                  return (
+                    <div key={i} className="flex-1 min-w-[60px] text-center rounded-xl p-3"
+                      style={{ background: isCurr ? "rgba(200,160,48,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${isCurr ? "rgba(200,160,48,0.40)" : "rgba(255,255,255,0.07)"}` }}>
+                      <p className="text-xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: isCurr ? "#fbbf24" : "rgba(255,255,255,0.20)" }}>{py}</p>
+                      <p className="text-[10px]" style={{ color: isCurr ? "rgba(255,255,255,0.60)" : "rgba(255,255,255,0.20)" }}>{yr}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-sm text-white/45 mt-4 leading-relaxed">
+                {personalYear.value <= 3
+                  ? "Early phase — plant seeds, build momentum, and initiate new directions."
+                  : personalYear.value <= 6
+                  ? "Active phase — harvest what you've built, expand relationships and commitments."
+                  : "Completion phase — release what no longer serves and prepare for the next cycle."}
+              </p>
+            </div>
+
+            {/* Monthly forecast */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs uppercase tracking-widest text-white/35 mb-3">{currentYear} Month-by-Month Energy Guide</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {monthForecast.map(m => (
+                  <div key={m.month} className="rounded-xl p-3 relative"
+                    style={{ background: m.isCurrent ? "rgba(200,160,48,0.09)" : "rgba(255,255,255,0.02)", border: `1px solid ${m.isCurrent ? "rgba(200,160,48,0.40)" : "rgba(255,255,255,0.06)"}` }}>
+                    {m.isCurrent && (
+                      <span className="absolute -top-2.5 left-3 text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-black uppercase tracking-wider">NOW</span>
+                    )}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold" style={{ color: m.isCurrent ? "#fbbf24" : "rgba(255,255,255,0.60)" }}>{m.monthName}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm">{m.icon}</span>
+                        <span className="text-lg font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: m.isMaster ? "#fbbf24" : "rgba(255,255,255,0.35)" }}>{m.energy}</span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-white/40 leading-snug">{m.theme}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+      </div>
+      <MobileBottomNav />
+    </main>
   );
 }

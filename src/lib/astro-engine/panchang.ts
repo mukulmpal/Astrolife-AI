@@ -19,6 +19,11 @@ export interface PanchangWindow {
   guidance: string;
 }
 
+export interface ChaughadiaWindow extends PanchangWindow {
+  isCurrent: boolean;
+  period: "day" | "night";
+}
+
 export interface PanchangResult {
   date: string;
   weekday: string;
@@ -49,6 +54,10 @@ export interface PanchangResult {
   gulikaKaal: PanchangWindow;
   yamaganda: PanchangWindow;
   abhijitMuhurta: PanchangWindow;
+  chaughadiaDay: ChaughadiaWindow[];
+  chaughadiaNight: ChaughadiaWindow[];
+  currentChaughadia: ChaughadiaWindow | null;
+  muhurtaYogas: string[];
   currentHora: string;
   currentHoraLord: string;
   nextHoraLord: string;
@@ -143,6 +152,56 @@ const YAMAGANDA_SLOT: Record<string, number> = {
   Saturday: 6,
 };
 
+const CHAUGHADIA_DAY: Record<string, string[]> = {
+  Sunday:    ["Udveg", "Chal", "Labh", "Amrit", "Kaal", "Shubh", "Rog", "Udveg"],
+  Monday:    ["Amrit", "Kaal", "Shubh", "Rog", "Udveg", "Chal", "Labh", "Amrit"],
+  Tuesday:   ["Rog", "Udveg", "Chal", "Labh", "Amrit", "Kaal", "Shubh", "Rog"],
+  Wednesday: ["Labh", "Amrit", "Kaal", "Shubh", "Rog", "Udveg", "Chal", "Labh"],
+  Thursday:  ["Shubh", "Rog", "Udveg", "Chal", "Labh", "Amrit", "Kaal", "Shubh"],
+  Friday:    ["Chal", "Labh", "Amrit", "Kaal", "Shubh", "Rog", "Udveg", "Chal"],
+  Saturday:  ["Kaal", "Shubh", "Rog", "Udveg", "Chal", "Labh", "Amrit", "Kaal"],
+};
+
+const CHAUGHADIA_NIGHT: Record<string, string[]> = {
+  Sunday:    ["Shubh", "Amrit", "Chal", "Rog", "Kaal", "Labh", "Udveg", "Shubh"],
+  Monday:    ["Chal", "Rog", "Kaal", "Labh", "Udveg", "Shubh", "Amrit", "Chal"],
+  Tuesday:   ["Kaal", "Labh", "Udveg", "Shubh", "Amrit", "Chal", "Rog", "Kaal"],
+  Wednesday: ["Udveg", "Shubh", "Amrit", "Chal", "Rog", "Kaal", "Labh", "Udveg"],
+  Thursday:  ["Amrit", "Chal", "Rog", "Kaal", "Labh", "Udveg", "Shubh", "Amrit"],
+  Friday:    ["Rog", "Kaal", "Labh", "Udveg", "Shubh", "Amrit", "Chal", "Rog"],
+  Saturday:  ["Labh", "Udveg", "Shubh", "Amrit", "Chal", "Rog", "Kaal", "Labh"],
+};
+
+const CHAUGHADIA_QUALITY: Record<string, PanchangQuality> = {
+  Amrit: "Auspicious", Shubh: "Auspicious", Labh: "Auspicious",
+  Chal: "Mixed", Udveg: "Caution", Kaal: "Sensitive", Rog: "Sensitive",
+};
+
+const CHAUGHADIA_GUIDANCE: Record<string, string> = {
+  Amrit: "Best muhurta — excellent for all auspicious work, medicine, important decisions.",
+  Shubh: "Very good — ideal for marriage, ceremonies, important launches.",
+  Labh: "Profitable — good for business, trade, financial decisions.",
+  Chal: "Neutral — suitable for travel, movement, flexible activities.",
+  Udveg: "Agitated — avoid new beginnings; government and bold actions may work.",
+  Kaal: "Inauspicious — avoid all important work; Saturn-related tasks only.",
+  Rog: "Disease-prone — avoid medical procedures, travel, and new initiatives.",
+};
+
+const SARVARTHA_SIDDHI: Record<string, string[]> = {
+  Sunday:    ["Hasta", "Pushya", "Mula", "Ashwini", "Uttara Phalguni", "Uttara Ashadha", "Uttara Bhadrapada"],
+  Monday:    ["Rohini", "Mrigashira", "Hasta", "Shravana", "Punarvasu", "Pushya", "Shatabhisha"],
+  Tuesday:   ["Ashwini", "Krittika", "Mrigashira", "Chitra", "Dhanishtha"],
+  Wednesday: ["Krittika", "Rohini", "Anuradha", "Hasta", "Jyeshtha", "Revati"],
+  Thursday:  ["Punarvasu", "Pushya", "Vishakha", "Hasta", "Ashwini", "Anuradha", "Uttara Bhadrapada"],
+  Friday:    ["Shatabhisha", "Anuradha", "Revati", "Purva Phalguni", "Purva Ashadha", "Purva Bhadrapada"],
+  Saturday:  ["Rohini", "Swati", "Anuradha", "Revati", "Mula"],
+};
+
+const AMRIT_SIDDHI: Record<string, string> = {
+  Sunday: "Hasta", Monday: "Mrigashira", Tuesday: "Ashwini",
+  Wednesday: "Anuradha", Thursday: "Pushya", Friday: "Revati", Saturday: "Rohini",
+};
+
 const RASHIS = [
   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
@@ -195,6 +254,50 @@ function formatWindow(name: string, start: number, end: number, quality: Panchan
     quality,
     guidance,
   };
+}
+
+function buildChaughadia(weekday: string, sunrise: string, sunset: string, now: Date, tz: number): {
+  day: ChaughadiaWindow[];
+  night: ChaughadiaWindow[];
+  current: ChaughadiaWindow | null;
+} {
+  const srH = timeToDecimal(sunrise);
+  const ssH = timeToDecimal(sunset);
+  const dayLen = ssH - srH;
+  const nightLen = 24 - dayLen;
+  const daySlot = dayLen / 8;
+  const nightSlot = nightLen / 8;
+  const nowH = mod((now.getTime() + tz * 3600000) / 3600000, 24);
+  const dayNames = CHAUGHADIA_DAY[weekday] ?? CHAUGHADIA_DAY.Sunday;
+  const nightNames = CHAUGHADIA_NIGHT[weekday] ?? CHAUGHADIA_NIGHT.Sunday;
+  let current: ChaughadiaWindow | null = null;
+
+  const day: ChaughadiaWindow[] = dayNames.map((name, i) => {
+    const s = srH + i * daySlot;
+    const e = srH + (i + 1) * daySlot;
+    const isCurrent = nowH >= s && nowH < e;
+    const w: ChaughadiaWindow = { name, start: decimalHoursToTime(s), end: decimalHoursToTime(e), quality: CHAUGHADIA_QUALITY[name] ?? "Mixed", guidance: CHAUGHADIA_GUIDANCE[name] ?? "", isCurrent, period: "day" };
+    if (isCurrent) current = w;
+    return w;
+  });
+
+  const night: ChaughadiaWindow[] = nightNames.map((name, i) => {
+    const s = ssH + i * nightSlot;
+    const e = ssH + (i + 1) * nightSlot;
+    const isCurrent = nowH >= s && nowH < e;
+    const w: ChaughadiaWindow = { name, start: decimalHoursToTime(s), end: decimalHoursToTime(e), quality: CHAUGHADIA_QUALITY[name] ?? "Mixed", guidance: CHAUGHADIA_GUIDANCE[name] ?? "", isCurrent, period: "night" };
+    if (isCurrent) current = w;
+    return w;
+  });
+
+  return { day, night, current };
+}
+
+function getMuhurtaYogas(weekday: string, nakshatra: string): string[] {
+  const yogas: string[] = [];
+  if ((SARVARTHA_SIDDHI[weekday] ?? []).includes(nakshatra)) yogas.push("Sarvartha Siddhi Yoga");
+  if (AMRIT_SIDDHI[weekday] === nakshatra) yogas.push("Amrit Siddhi Yoga");
+  return yogas;
 }
 
 function calculateSunWindow(date: Date, lat?: number, lon?: number, tz = 5.5) {
@@ -373,6 +476,8 @@ export function calculatePanchang(date = new Date(), tz = 5.5, location?: { lat?
   const nakshatraEnd = getEndTime(yyyyMmDd, tz, nakIdx, 360 / 27, (_sun, moon) => mod(moon, 360));
   const yogaEnd = getEndTime(yyyyMmDd, tz, yogaIdx, 360 / 27, (sun, moon) => mod(sun + moon, 360));
   const karanaEnd = getEndTime(yyyyMmDd, tz, karanaIdx, 6, (sun, moon) => mod(moon - sun, 360));
+  const { day: chaughadiaDay, night: chaughadiaNight, current: currentChaughadia } = buildChaughadia(weekday, sunrise, sunset, date, tz);
+  const muhurtaYogas = getMuhurtaYogas(weekday, nakshatra);
   const shubhKarya = Array.from(new Set([...tithiGuide.goodFor, ...nakGuide.goodFor, ...yogaGuide.goodFor])).slice(0, 6);
   const avoidKarya = Array.from(new Set([...tithiGuide.avoid, ...nakGuide.avoid, ...yogaGuide.avoid])).slice(0, 6);
 
@@ -412,12 +517,16 @@ export function calculatePanchang(date = new Date(), tz = 5.5, location?: { lat?
     gulikaKaal,
     yamaganda,
     abhijitMuhurta,
+    chaughadiaDay,
+    chaughadiaNight,
+    currentChaughadia,
+    muhurtaYogas,
     currentHora: `${currentHoraLord} Hora`,
     currentHoraLord,
     nextHoraLord,
     shubhKarya,
     avoidKarya,
-    aiContext: `${weekday} ruled by ${varaLord}. ${paksha} Paksha ${tithiLabel} until ${tithiEnd}. ${nakshatra} Nakshatra Pada ${nakPada}, lord ${nakshatraLord}, until ${nakshatraEnd}. ${yoga} Yoga until ${yogaEnd}. Rahu Kaal ${rahuKaal.start}-${rahuKaal.end}. Abhijit ${abhijitMuhurta.start}-${abhijitMuhurta.end}. Good for: ${shubhKarya.join(", ")}. Avoid: ${avoidKarya.join(", ")}.`,
+    aiContext: `${weekday} ruled by ${varaLord}. ${paksha} Paksha ${tithiLabel} until ${tithiEnd}. ${nakshatra} Nakshatra Pada ${nakPada}, lord ${nakshatraLord}, until ${nakshatraEnd}. ${yoga} Yoga until ${yogaEnd}. Rahu Kaal ${rahuKaal.start}-${rahuKaal.end}. Abhijit ${abhijitMuhurta.start}-${abhijitMuhurta.end}. Current Chaughadia: ${currentChaughadia?.name ?? "unknown"}. ${muhurtaYogas.length ? "Special Muhurta Yogas: " + muhurtaYogas.join(", ") + "." : ""} Good for: ${shubhKarya.join(", ")}. Avoid: ${avoidKarya.join(", ")}.`,
     notes,
   };
 

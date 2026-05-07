@@ -173,6 +173,92 @@ export default function PanchangPage() {
           </div>
         </section>
 
+        {/* Muhurta Yogas */}
+        {panchang.muhurtaYogas.length > 0 && (
+          <section className="rounded-2xl p-4" style={{ background: "rgba(234,179,8,0.10)", border: "1px solid rgba(234,179,8,0.4)" }}>
+            <p className="text-xs uppercase tracking-widest text-amber-300 mb-2">Special Muhurta Yogas Today</p>
+            <div className="flex flex-wrap gap-2">
+              {panchang.muhurtaYogas.map((yoga) => (
+                <span key={yoga} className="text-sm font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(234,179,8,0.2)", color: "#fbbf24" }}>
+                  ✦ {yoga}
+                </span>
+              ))}
+            </div>
+            <p className="text-xs text-white/50 mt-2">These rare Vara + Nakshatra combinations make today especially powerful for auspicious work.</p>
+          </section>
+        )}
+
+        {/* Chaughadia */}
+        <section>
+          <p className="text-xs uppercase tracking-widest text-white/35 mb-3">Chaughadia Muhurta</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Day */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-xs uppercase tracking-widest text-amber-300 mb-3">Day · Sunrise to Sunset</p>
+              <div className="flex flex-col gap-1.5">
+                {panchang.chaughadiaDay.map((w, i) => {
+                  const qColor = w.quality === "Auspicious" ? "#22c55e" : w.quality === "Mixed" ? "#94a3b8" : w.quality === "Caution" ? "#f59e0b" : "#ef4444";
+                  return (
+                    <div key={i} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all"
+                      style={{
+                        background: w.isCurrent ? qColor + "20" : "transparent",
+                        border: `1px solid ${w.isCurrent ? qColor + "55" : "rgba(255,255,255,0.06)"}`,
+                      }}>
+                      <div className="w-1.5 h-8 rounded-full shrink-0" style={{ background: qColor }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm text-white">{w.name}</span>
+                          {w.isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
+                        </div>
+                        <p className="text-[11px] text-white/40">{w.start} – {w.end}</p>
+                      </div>
+                      <span className="text-[10px] text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Night */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-xs uppercase tracking-widest text-indigo-300 mb-3">Night · Sunset to Sunrise</p>
+              <div className="flex flex-col gap-1.5">
+                {panchang.chaughadiaNight.map((w, i) => {
+                  const qColor = w.quality === "Auspicious" ? "#22c55e" : w.quality === "Mixed" ? "#94a3b8" : w.quality === "Caution" ? "#f59e0b" : "#ef4444";
+                  return (
+                    <div key={i} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all"
+                      style={{
+                        background: w.isCurrent ? qColor + "20" : "transparent",
+                        border: `1px solid ${w.isCurrent ? qColor + "55" : "rgba(255,255,255,0.06)"}`,
+                      }}>
+                      <div className="w-1.5 h-8 rounded-full shrink-0" style={{ background: qColor }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm text-white">{w.name}</span>
+                          {w.isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
+                        </div>
+                        <p className="text-[11px] text-white/40">{w.start} – {w.end}</p>
+                      </div>
+                      <span className="text-[10px] text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          {panchang.currentChaughadia && (() => {
+            const qColor = panchang.currentChaughadia.quality === "Auspicious" ? "#22c55e" : panchang.currentChaughadia.quality === "Mixed" ? "#94a3b8" : panchang.currentChaughadia.quality === "Caution" ? "#f59e0b" : "#ef4444";
+            return (
+              <div className="mt-3 rounded-xl p-3 flex gap-3 items-start" style={{ background: qColor + "14", border: `1px solid ${qColor}40` }}>
+                <span className="text-2xl">⏰</span>
+                <div>
+                  <p className="font-semibold text-white text-sm">Current: {panchang.currentChaughadia.name} ({panchang.currentChaughadia.start} – {panchang.currentChaughadia.end})</p>
+                  <p className="text-sm text-white/60 mt-0.5">{panchang.currentChaughadia.guidance}</p>
+                </div>
+              </div>
+            );
+          })()}
+        </section>
+
         {/* Navtara Card */}
         {navtara && (
           <section

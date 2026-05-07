@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult } from "@/lib/astro-engine/yogas";
 import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart } from "@/lib/user-chart";
+import NorthIndianChart from "@/components/north-indian-chart";
 
 const CITIES = [
   "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
@@ -14,64 +15,6 @@ const CITIES = [
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["☉","☽","♂","☿","♃","♀","♄","☊","☋"];
 const PCOL = ["#f97316","#c084fc","#ef4444","#22c55e","#f59e0b","#ec4899","#60a5fa","#a78bfa","#fb7185"];
-
-const md = (x: number, m: number) => ((x % m) + m) % m;
-
-function NorthIndianChart({ chart }: { chart: ChartData }) {
-  const S = 310, h = S / 2;
-  const lagR = chart.lagnaNum;
-  const HOUSES = [
-    { h:1,  lx:h,        ly:h-90   },
-    { h:2,  lx:h+90,     ly:h-90   },
-    { h:3,  lx:h+135,    ly:h      },
-    { h:4,  lx:h+90,     ly:h+90   },
-    { h:5,  lx:h,        ly:h+90   },
-    { h:6,  lx:h-90,     ly:h+90   },
-    { h:7,  lx:h-135,    ly:h      },
-    { h:8,  lx:h-90,     ly:h-90   },
-    { h:9,  lx:h-90,     ly:h-155  },
-    { h:10, lx:h,        ly:h-155  },
-    { h:11, lx:h+90,     ly:h-155  },
-    { h:12, lx:h+90,     ly:h-20   },
-  ];
-  const pByH: Record<number,{name:string;retro:boolean}[]> = {};
-  for(let i=1;i<=12;i++) pByH[i]=[];
-  PLS.forEach(p=>{ const pd=chart.planets[p]; if(pd&&pd.house>=1&&pd.house<=12) pByH[pd.house].push({name:p,retro:pd.retrograde}); });
-
-  return (
-    <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{maxWidth:360,display:"block",margin:"0 auto"}}>
-      <rect width={S} height={S} fill="#08051a" rx="8"/>
-      <rect x={0} y={0} width={S} height={S} fill="none" stroke="#3a3260" strokeWidth="1.5" rx="8"/>
-      <line x1={0}   y1={0}   x2={S}   y2={S}   stroke="#2a2250" strokeWidth="1"/>
-      <line x1={S}   y1={0}   x2={0}   y2={S}   stroke="#2a2250" strokeWidth="1"/>
-      <line x1={h}   y1={0}   x2={S}   y2={h}   stroke="#2a2250" strokeWidth="1"/>
-      <line x1={S}   y1={h}   x2={h}   y2={S}   stroke="#2a2250" strokeWidth="1"/>
-      <line x1={h}   y1={S}   x2={0}   y2={h}   stroke="#2a2250" strokeWidth="1"/>
-      <line x1={0}   y1={h}   x2={h}   y2={0}   stroke="#2a2250" strokeWidth="1"/>
-      {HOUSES.map(({h:hn,lx,ly})=>{
-        const rIdx = md(lagR+hn-1,12);
-        const here = pByH[hn]||[];
-        const isL  = hn===1;
-        return (
-          <g key={hn}>
-            <text x={lx} y={ly-10} textAnchor="middle" fontSize="9" fill={isL?"#d4af37":"#4a4070"} fontWeight={isL?"700":"400"}>{rIdx+1}</text>
-            {isL && <text x={lx} y={ly+2} textAnchor="middle" fontSize="6" fill="#d4af37" fontWeight="700">Lagna</text>}
-            {here.map((p,pi)=>{
-              const piIdx=PLS.indexOf(p.name);
-              const ox=here.length>1?(pi-(here.length-1)/2)*14:0;
-              return (
-                <g key={p.name}>
-                  <text x={lx+ox} y={ly+(isL?16:12)+pi*13} textAnchor="middle" fontSize="13" fill={piIdx>=0?PCOL[piIdx]:"#aaa"}>{piIdx>=0?PEMO[piIdx]:p.name.slice(0,2)}</text>
-                  {p.retro && <text x={lx+ox+8} y={ly+(isL?10:6)+pi*13} textAnchor="middle" fontSize="6" fill="#f97316" fontWeight="700">℞</text>}
-                </g>
-              );
-            })}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 export default function KundliPage() {
   const [form,      setForm]      = useState({name:"",dob:"",tob:"",city:""});
@@ -414,7 +357,7 @@ export default function KundliPage() {
                 <div className="card">
                   <div className="card-tag">✦ North Indian Chart</div>
                   <div className="card-title serif">Janma Kundli</div>
-                  <NorthIndianChart chart={chart}/>
+                  <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} />
                   <div style={{marginTop:16,padding:"12px 14px",background:"rgba(200,160,48,0.05)",border:"1px solid rgba(200,160,48,0.1)",borderRadius:10}}>
                     <div style={{fontSize:11,color:"#c8a030",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:4}}>Lagna — {chart.lagnaRashi}</div>
                     <div style={{fontSize:13,color:"#c8c0a8",lineHeight:1.7}}>
