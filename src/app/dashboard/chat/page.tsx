@@ -18,6 +18,7 @@ import {
 import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 interface Message {
   role: "user" | "assistant";
@@ -93,31 +94,6 @@ const SUGGESTED = [
   "What Astro Sound protocol should I follow for focus?",
   "Which raga is good for my current emotional state?",
 ];
-const MOBILE_NAV = [
-  { icon: "🏠", label: "Home", href: "/dashboard" },
-  { icon: "🔯", label: "Kundli", href: "/dashboard/kundli" },
-  { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
-  { icon: "🧿", label: "Yogas", href: "/dashboard/yogas" },
-  { icon: "⚖️", label: "Shadbala", href: "/dashboard/shadbala" },
-  { icon: "📘", label: "Lal Kitab", href: "/dashboard/lalkitab" },
-  { icon: "🧠", label: "Mind", href: "/dashboard/psychology" },
-  { icon: "📈", label: "Destiny", href: "/dashboard/destiny" },
-  { icon: "⏳", label: "Dasha", href: "/dashboard/dasha" },
-  { icon: "🌅", label: "Lagnas", href: "/dashboard/special-lagnas" },
-  { icon: "🧮", label: "Ashtak", href: "/dashboard/ashtakavarga" },
-  { icon: "🧩", label: "Varga", href: "/dashboard/divisional" },
-  { icon: "🔢", label: "Numbers", href: "/dashboard/numerology" },
-  { icon: "💑", label: "Milan", href: "/dashboard/kundali-milan" },
-  { icon: "🧭", label: "KP", href: "/dashboard/kp" },
-  { icon: "📡", label: "Radar", href: "/dashboard/event-radar" },
-  { icon: "📅", label: "Panchang", href: "/dashboard/panchang" },
-  { icon: "🎵", label: "Sound", href: "/dashboard/astro-sound" },
-  { icon: "💎", label: "Gems", href: "/dashboard/gemstone" },
-  { icon: "🏠", label: "Vastu", href: "/dashboard/vastu" },
-  { icon: "📄", label: "Report", href: "/dashboard/report" },
-  { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
-  { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
-];
 
 const WELCOMES: Record<string, string> = {
   general:    "✦ Namaste! I am AstroLife AI — your personal Vedic astrology guide.\n\nI combine the wisdom of Vedic astrology, Lal Kitab, KP System, and modern psychology to give you deep, personalized insights.\n\nShare your birth details or ask me anything about your chart!",
@@ -156,7 +132,6 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [languageMode, setLanguageMode] = useState<LanguageMode>(getInitialLanguageMode);
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialThemeMode);
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard/chat";
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { chart } = useUserChart();
@@ -720,18 +695,7 @@ export default function ChatPage() {
 
         </div>
       </div>
-      <nav className="mobile-nav" aria-label="Mobile navigation">
-        {MOBILE_NAV.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`mobile-nav-item ${pathname === item.href ? "active" : ""}`}
-          >
-            <span className="mobile-nav-icon">{item.icon}</span>
-            <span className="mobile-nav-label">{item.label}</span>
-          </Link>
-        ))}
-      </nav>
+      <MobileBottomNav />
     </>
   );
 }

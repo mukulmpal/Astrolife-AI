@@ -9,9 +9,12 @@ import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { generateGemstoneReportFromChart } from "@/lib/astro-engine/gemstone";
 import { calculateKpReport } from "@/lib/astro-engine/kp";
 import { calculateLalKitab } from "@/lib/astro-engine/lalkitab";
+import { calculateMedical } from "@/lib/astro-engine/medical";
 import { calculateNumerology } from "@/lib/astro-engine/numerology";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
+import { calculateRemedies } from "@/lib/astro-engine/remedy";
+import { calculateSarvatobhadra } from "@/lib/astro-engine/sarvatobhadra";
 import { calculateShadbala } from "@/lib/astro-engine/shadbala";
 import { calculateSpecialLagnas } from "@/lib/astro-engine/special-lagnas";
 import { calculateTransitReport } from "@/lib/astro-engine/transits";
@@ -128,6 +131,34 @@ export function buildAiEngineContext(chart: ChartData): string {
     return `Primary ${g.primaryGemstone.gemstone} for ${g.primaryGemstone.planet}, score ${g.primaryGemstone.score}/100. Current dasha ${g.currentDasha}. Avoid/caution: ${avoid || "none listed"}. Safety: confirm before wearing expensive stones.`;
   }));
 
+  lines.push(...safeLines("Medical Astrology", () => {
+    const m = calculateMedical(chart);
+    const alerts = m.alerts
+      .slice(0, 4)
+      .map((item) => `${item.planet} H${item.house}: ${item.disease} (${item.severity})`);
+    const scores = Object.entries(m.scores)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([key, value]) => `${key} ${value}/100`);
+    return `Constitution ${m.lagnaSign}: ${m.prakriti} Top concern zones: ${joinItems(m.topConcerns)}. Risk scores: ${scores.join(", ") || "not elevated"}. Accident risk ${m.accidentRisk}/100. Alerts: ${alerts.join("; ") || "none major"}. Always add soft medical disclaimer.`;
+  }));
+
+  lines.push(...safeLines("Remedy Engine", () => {
+    const r = calculateRemedies(chart);
+    const top = r.cards
+      .slice(0, 5)
+      .map((item) => `${item.planet} H${item.house} ${item.priority}: ${item.practice}`);
+    return `Urgent remedies ${r.urgentCount}. Top priority ${r.topPriority ? `${r.topPriority.planet} H${r.topPriority.house}` : "none"}. Remedies: ${top.join("; ") || "simple daily discipline"}. Prefer affordable behavioural, mantra and charity remedies before costly gemstones.`;
+  }));
+
+  lines.push(...safeLines("Sarvatobhadra", () => {
+    const s = calculateSarvatobhadra(chart);
+    const alerts = s.vedhaAlerts
+      .slice(0, 5)
+      .map((item) => `${item.planet} on ${item.nakshatra}: ${item.description} (${item.severity})`);
+    return `Janma nakshatra ${s.birthNakshatra}. Active vedha alerts ${s.vedhaAlerts.length}. ${alerts.length ? `Vedhas: ${alerts.join("; ")}.` : "No major vedha alerts today."}`;
+  }));
+
   lines.push(...safeLines("Numerology", () => {
     const n = calculateNumerology(chart.name, chart.dob);
     return `Life Path ${n.lifePath.value} (${n.lifePath.archetype}), Destiny ${n.destiny.value}, Personal Year ${n.personalYear.value}. ${n.summary}`;
@@ -153,6 +184,10 @@ export function buildAiEngineContext(chart: ChartData): string {
     const p = calculatePanchang(today, chart.tz, { lat: chart.lat, lon: chart.lon });
     return p.aiContext;
   }));
+
+  lines.push(
+    "Prashna: Use the Prashna engine concept only when the user asks a specific time-bound question. It needs the exact current question moment, topic and location/timezone; do not mix Prashna judgment into general natal answers unless the user asks a Prashna-style question."
+  );
 
   lines.push(
     "Instruction: Use this full engine summary as the complete background map. Do not mention every engine in every answer; synthesize only the relevant signals."

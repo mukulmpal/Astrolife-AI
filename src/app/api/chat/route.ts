@@ -309,7 +309,7 @@ If the user asks current timing questions, explain that transit data is needed f
 FULL ASTROLIFE ENGINE CONTEXT:
 ${aiEngineContext}
 
-Use this as the complete background picture across natal chart, dasha, Shadbala, Ashtakavarga, KP, Lal Kitab, Psychology, Destiny, Divisional charts, Gemstone, Numerology, Vastu, Transit, Event Radar and Panchang.
+Use this as the complete background picture across natal chart, dasha, Shadbala, Ashtakavarga, KP, Lal Kitab, Psychology, Destiny, Divisional charts, Gemstone, Medical Astrology, Remedy Engine, Sarvatobhadra, Prashna readiness, Numerology, Vastu, Transit, Event Radar and Panchang.
 Synthesize the relevant signals instead of listing every engine mechanically.
 `
       : `

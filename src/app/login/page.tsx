@@ -3,6 +3,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
+function normalizeIndianPhone(value: string) {
+  let digits = value.replace(/\D/g, "");
+  if (digits.startsWith("91") && digits.length === 12) digits = digits.slice(2);
+  if (digits.startsWith("0") && digits.length === 11) digits = digits.slice(1);
+  return digits.length === 10 ? `+91${digits}` : null;
+}
+
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -25,14 +32,15 @@ export default function LoginPage() {
 
   // Send OTP
   const handleSendOtp = async () => {
-    if (!phone || phone.length < 10) {
+    const normalizedPhone = normalizeIndianPhone(phone);
+    if (!normalizedPhone) {
       setError("Valid phone number daalo");
       return;
     }
     setLoading(true);
     setError("");
     const { error } = await supabase.auth.signInWithOtp({
-      phone: `+91${phone}`,
+      phone: normalizedPhone,
     });
     if (error) setError(error.message);
     else setStep("otp");
@@ -41,14 +49,19 @@ export default function LoginPage() {
 
   // Verify OTP
   const handleVerifyOtp = async () => {
+    const normalizedPhone = normalizeIndianPhone(phone);
     if (!otp || otp.length < 4) {
       setError("OTP daalo");
+      return;
+    }
+    if (!normalizedPhone) {
+      setError("Valid phone number daalo");
       return;
     }
     setLoading(true);
     setError("");
     const { error } = await supabase.auth.verifyOtp({
-      phone: `+91${phone}`,
+      phone: normalizedPhone,
       token: otp,
       type: "sms",
     });

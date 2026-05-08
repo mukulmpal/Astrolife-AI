@@ -127,6 +127,20 @@ export function saveCurrentChart(chart: ChartData) {
   window.localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chart));
 }
 
+export function clearCurrentChart() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(CHART_STORAGE_KEY);
+}
+
+function loadCurrentChartFromDevice(): ChartData | null {
+  if (typeof window === "undefined") return null;
+  const stored = window.localStorage.getItem(CHART_STORAGE_KEY);
+  if (!stored) return null;
+
+  const parsed = JSON.parse(stored);
+  return isStoredChart(parsed) ? reviveChartDates(parsed) : null;
+}
+
 export async function saveChartToAccount(chart: ChartData, options: { replacePrimary?: boolean } = {}) {
   saveCurrentChart(chart);
   const replacePrimary = options.replacePrimary ?? false;
@@ -293,6 +307,8 @@ export function useUserChart() {
 
     const loadChart = async () => {
       try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
         const accountChart = await loadPrimaryChartFromAccount();
         if (accountChart) {
           saveCurrentChart(accountChart);
@@ -304,9 +320,6 @@ export function useUserChart() {
           return;
         }
 
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
         if (user) {
           const { data: profile } = await supabase
             .from("profiles")
@@ -317,7 +330,7 @@ export function useUserChart() {
           const profileBirth = getProfileBirth(profile);
           if (profileBirth) {
             const nextChart = buildChart(profileBirth);
-            await saveChartToAccount(nextChart);
+            await saveChartToAccount(nextChart, { replacePrimary: true });
             if (!cancelled) {
               setBirth(profileBirth);
               setChart(nextChart);
@@ -325,20 +338,33 @@ export function useUserChart() {
             }
             return;
           }
-        }
 
-        const stored = window.localStorage.getItem(CHART_STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (isStoredChart(parsed)) {
-            const storedChart = reviveChartDates(parsed);
+          const deviceChart = loadCurrentChartFromDevice();
+          if (deviceChart) {
+            await saveChartToAccount(deviceChart, { replacePrimary: true });
             if (!cancelled) {
-              setBirth(getBirthFromChart(storedChart));
-              setChart(storedChart);
+              setBirth(getBirthFromChart(deviceChart));
+              setChart(deviceChart);
               setLoading(false);
             }
             return;
           }
+
+          clearCurrentChart();
+          if (!cancelled) {
+            setLoading(false);
+          }
+          return;
+        }
+
+        const storedChart = loadCurrentChartFromDevice();
+        if (storedChart) {
+          if (!cancelled) {
+            setBirth(getBirthFromChart(storedChart));
+            setChart(storedChart);
+            setLoading(false);
+          }
+          return;
         }
       } catch (error) {
         console.error("User chart load error:", error);

@@ -11,6 +11,9 @@ import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { calculateTransitReport } from "@/lib/astro-engine/transits";
 import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
+import { calculateMedical } from "@/lib/astro-engine/medical";
+import { calculateRemedies } from "@/lib/astro-engine/remedy";
+import { calculateSarvatobhadra } from "@/lib/astro-engine/sarvatobhadra";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/report-data.ts
 
@@ -1006,7 +1009,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       paragraphs: [
         `Panchang gives the subtle quality of the birth moment. While the birth chart shows planetary placement and house structure, Panchang shows the energetic environment in which the native was born. It includes tithi, nakshatra, yoga, karana, weekday, sunrise, sunset and other traditional birth-time indicators. These factors create a deeper layer of temperament and karmic rhythm.`,
         `The nakshatra is especially important because it represents the psychological star-field of the Moon. The Moon reflects mind, emotion, memory, habit and comfort. Therefore, the nakshatra shows how the mind reacts to life, what kind of emotional nourishment it seeks, and how the native handles pressure, attachment and instinctive decisions.`,
-        `In this report, the available birth foundation shows Lagna as ${lagna}, Moon sign as ${moonSign}, and Nakshatra as ${nakshatra}. These three points should be treated as the foundation of personality, emotional pattern and timing. When panchang details are fully connected, this page can also show tithi, yoga, karana, sunrise, sunset, varna, yoni, gana, nadi and paya in a traditional table.`,
+        `In this report, the available birth foundation shows Lagna as ${lagna}, Moon sign as ${moonSign}, and Nakshatra as ${nakshatra}. These three points should be treated as the foundation of personality, emotional pattern and timing. The real Panchang engine section later in this report adds calculated tithi, yoga, karana, weekday, Sun sign, Moon sign and nakshatra pada so the birth moment is no longer read only through generic explanation.`,
       ],
       summary: [
         `Lagna foundation: ${lagna}.`,
@@ -1018,7 +1021,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       actionPlan: [
         "Use nakshatra guidance for emotional self-awareness.",
         "Use panchang details for remedies and spiritual alignment.",
-        "Connect exact tithi/yoga/karana later for deeper reporting.",
+        "Cross-check this overview with the real Panchang table section.",
       ],
       remedy: [
         "Respect the Moon through calm routine and emotional balance.",
@@ -2517,6 +2520,127 @@ export function buildRealDestinyEngineReportSection(input: any): ReportSection {
   }
 }
 
+export function buildRealMedicalEngineReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const result = calculateMedical(chart);
+    const scoreRows = Object.entries(result.scores)
+      .sort((a: any, b: any) => Number(b[1]) - Number(a[1]))
+      .map(([name, score]) => `${name}: ${score}/100`);
+    const topAlerts = result.alerts.slice(0, 8);
+
+    return makeSection({
+      id: "medical-astrology",
+      title: "Medical Astrology",
+      subtitle: `${result.lagnaSign} constitution · Accident risk ${result.accidentRisk}/100`,
+      score: Math.max(35, Math.min(86, 82 - result.accidentRisk / 3 - topAlerts.filter((a: any) => a.severity === "high").length * 4)),
+      paragraphs: [
+        "The real Medical Astrology engine was called for this report. It reads lagna constitution, Moon nakshatra, disease-sensitive houses, planet-house health alerts, combination alerts and broad body-system risk scores.",
+        `Constitutional base: ${result.prakriti}`,
+        result.nakshatraDisease
+          ? `Nakshatra sensitivity: ${result.birthNakshatra} indicates ${result.nakshatraDisease.disease}. This is a tendency marker, not a diagnosis.`
+          : `Birth nakshatra ${result.birthNakshatra || "not resolved"} does not show a strong nakshatra-specific health alert in this pass.`,
+        "Medical astrology is only a wellness reflection layer. It must not replace diagnosis, treatment, emergency care or qualified medical advice.",
+      ],
+      summary: [
+        `Lagna constitution: ${result.lagnaSign}`,
+        `Top concern zones: ${result.topConcerns.join(", ") || "None elevated"}`,
+        `Accident risk: ${result.accidentRisk}/100`,
+        ...scoreRows,
+        ...topAlerts.map((a: any) => `${a.planet} H${a.house}: ${a.disease} · ${a.severity}`),
+      ].slice(0, 14),
+      actionPlan: [
+        "Use this section for prevention, routine and awareness only.",
+        "Prioritize sleep, hydration, movement and medical screening when a body-system score is elevated.",
+        "Consult a qualified doctor for symptoms, diagnosis, medicine and emergency decisions.",
+      ],
+      remedy: [
+        "Keep a soft daily health discipline instead of fear-based conclusions.",
+        "For elevated mental scores, use breathwork, counselling support and steady sleep routine.",
+        "For accident risk, drive carefully, avoid impulsive actions and respect safety protocols.",
+      ],
+    });
+  } catch (error) {
+    return safeSection("medical-astrology", "Medical Astrology", error);
+  }
+}
+
+export function buildRealRemedyEngineReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const result = calculateRemedies(chart);
+    const urgent = result.cards.filter((card: any) => card.priority === "urgent");
+    const recommended = result.cards.filter((card: any) => card.priority === "recommended");
+
+    return makeSection({
+      id: "remedy-engine",
+      title: "Remedy Engine",
+      subtitle: `${result.urgentCount} urgent · ${recommended.length} recommended · top ${result.topPriority?.planet ?? "N/A"}`,
+      score: Math.max(42, Math.min(88, 76 - urgent.length * 4 + recommended.length)),
+      paragraphs: [
+        "The real Remedy engine was called for this report. It converts planet, house, sign, nakshatra and dignity into practical upaya covering mantra, charity, behaviour, colour discipline and gemstone caution.",
+        result.topPriority
+          ? `Top priority remedy belongs to ${result.topPriority.planet} in House ${result.topPriority.house}. The practical instruction is: ${result.topPriority.houseRemedy}`
+          : "No single urgent remedy dominates this chart; simple steady discipline is preferred.",
+        "AstroLife prioritizes affordable and behavioural remedies first. Gemstones should be treated carefully and confirmed before expensive purchase or long-term wearing.",
+      ],
+      summary: result.cards
+        .slice(0, 9)
+        .map((card: any) => `${card.planet} H${card.house} ${card.sign}: ${card.priority} · ${card.summary}`),
+      actionPlan: [
+        "Pick only the top 1-3 remedies and follow them consistently.",
+        "Start with mantra, donation and behavioural correction before gemstones.",
+        "Review remedies through active dasha and actual life situation.",
+      ],
+      remedy: result.cards
+        .slice(0, 6)
+        .map((card: any) => `${card.planet}: ${card.mantra}; ${card.donate}; ${card.practice}`),
+    });
+  } catch (error) {
+    return safeSection("remedy-engine", "Remedy Engine", error);
+  }
+}
+
+export function buildRealSarvatobhadraEngineReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const result = calculateSarvatobhadra(chart);
+    const highAlerts = result.vedhaAlerts.filter((alert: any) => alert.severity === "high");
+    const activeRows = result.rows.filter((row: any) => row.isActive).slice(0, 10);
+
+    return makeSection({
+      id: "sarvatobhadra-chakra",
+      title: "Sarvatobhadra Chakra",
+      subtitle: `Janma ${result.birthNakshatra} · ${result.vedhaAlerts.length} vedha alerts`,
+      score: Math.max(38, Math.min(84, 78 - highAlerts.length * 6)),
+      paragraphs: [
+        "The real Sarvatobhadra Chakra engine was called for this report. It maps the birth Moon nakshatra, sensitive vedha nakshatras, natal planet nakshatra positions and current transit nakshatra hits.",
+        `Birth Moon nakshatra is ${result.birthNakshatra}. Sensitive vedha points are calculated by classical distance logic from the janma nakshatra.`,
+        result.vedhaAlerts.length
+          ? `Current vedha alerts are active. The strongest signals are ${result.vedhaAlerts.slice(0, 4).map((a: any) => `${a.planet} in ${a.nakshatra}`).join(", ")}.`
+          : "No major current Sarvatobhadra vedha alert is active in this pass.",
+      ],
+      summary: [
+        `Janma nakshatra: ${result.birthNakshatra}`,
+        `Janma index: ${result.birthNakshatraIndex + 1}/27`,
+        `High alerts: ${highAlerts.length}`,
+        ...result.vedhaAlerts.slice(0, 8).map((a: any) => `${a.planet}: ${a.nakshatra} · ${a.description} · ${a.severity}`),
+        ...activeRows.map((row: any) => `${row.name}: natal ${row.natalPlanets.join(", ") || "-"} · transit ${row.transitPlanets.join(", ") || "-"}`),
+      ].slice(0, 14),
+      actionPlan: [
+        "Use Sarvatobhadra for short-term sensitivity and transit caution.",
+        "When malefic vedha is active, avoid rushing and choose cleaner timing.",
+        "When benefic activation is present, use the day for constructive work.",
+      ],
+      remedy: highAlerts.length
+        ? highAlerts.slice(0, 4).map((a: any) => `${a.planet}: slow down, keep discipline and avoid impulsive decisions around ${a.description.toLowerCase()}.`)
+        : ["Maintain simple prayer, clean intention and steady action during current transit weather."],
+    });
+  } catch (error) {
+    return safeSection("sarvatobhadra-chakra", "Sarvatobhadra Chakra", error);
+  }
+}
+
 export function buildRealEngineReportSections(input: any): ReportSection[] {
   const chart = getEngineChart(input);
 
@@ -2533,6 +2657,9 @@ export function buildRealEngineReportSections(input: any): ReportSection[] {
     buildRealPsychologyEngineReportSection(chart),
     buildRealVastuEngineReportSection(chart),
     ...buildGemstoneReportSection(chart),
+    buildRealMedicalEngineReportSection(chart),
+    buildRealRemedyEngineReportSection(chart),
+    buildRealSarvatobhadraEngineReportSection(chart),
     ...buildKpReportSections(chart),
   ];
 }

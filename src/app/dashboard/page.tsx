@@ -9,8 +9,9 @@ import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculateTransitReport, type PlanetName } from "@/lib/astro-engine/transits";
 import { calculateDivisional, type DivChart, type DivPlanet } from "@/lib/astro-engine/divisional";
 import { checkSupabaseHealth, isSupabaseReady, type DbHealthItem } from "@/lib/db-health";
-import { useUserChart } from "@/lib/user-chart";
+import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
 import { getAccountAiUsageStatus, getFreeMonthlyAiLimit } from "@/lib/usage";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
@@ -45,6 +46,10 @@ const NAV_ENGINES = [
   { icon:"💎", label:"Gemstone", href:"/dashboard/gemstone" },
   { icon:"🏠", label:"Vastu", href:"/dashboard/vastu" },
   { icon:"🔱", label:"Jaimini", href:"/dashboard/jaimini" },
+  { icon:"🏥", label:"Medical", href:"/dashboard/medical" },
+  { icon:"❓", label:"Prashna", href:"/dashboard/prashna" },
+  { icon:"💊", label:"Remedy", href:"/dashboard/remedy" },
+  { icon:"🔯", label:"Sarvatobhadra", href:"/dashboard/sarvatobhadra" },
   { icon:"📄", label:"Report", href:"/dashboard/report" },
 ];
 
@@ -52,31 +57,6 @@ const NAV_ACCOUNT = [
   { icon:"👤", label:"Profile",  href:"/dashboard/profile" },
   { icon:"💎", label:"Upgrade",  href:"/dashboard/upgrade" },
   { icon:"⚙️", label:"Settings", href:"/dashboard/settings" },
-];
-const MOBILE_NAV = [
-  { icon: "🏠", label: "Home", href: "/dashboard" },
-  { icon: "🔯", label: "Kundli", href: "/dashboard/kundli" },
-  { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
-  { icon: "🧿", label: "Yogas", href: "/dashboard/yogas" },
-  { icon: "⚖️", label: "Shadbala", href: "/dashboard/shadbala" },
-  { icon: "📘", label: "Lal Kitab", href: "/dashboard/lalkitab" },
-  { icon: "🧠", label: "Mind", href: "/dashboard/psychology" },
-  { icon: "📈", label: "Destiny", href: "/dashboard/destiny" },
-  { icon: "⏳", label: "Dasha", href: "/dashboard/dasha" },
-  { icon: "🌅", label: "Lagnas", href: "/dashboard/special-lagnas" },
-  { icon: "🧮", label: "Ashtak", href: "/dashboard/ashtakavarga" },
-  { icon: "🧩", label: "Varga", href: "/dashboard/divisional" },
-  { icon: "🔢", label: "Numbers", href: "/dashboard/numerology" },
-  { icon: "💑", label: "Milan", href: "/dashboard/kundali-milan" },
-  { icon: "🧭", label: "KP", href: "/dashboard/kp" },
-  { icon: "📡", label: "Radar", href: "/dashboard/event-radar" },
-  { icon: "📅", label: "Panchang", href: "/dashboard/panchang" },
-  { icon: "🎵", label: "Sound", href: "/dashboard/astro-sound" },
-  { icon: "💎", label: "Gems", href: "/dashboard/gemstone" },
-  { icon: "🏠", label: "Vastu", href: "/dashboard/vastu" },
-  { icon: "📄", label: "Report", href: "/dashboard/report" },
-  { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
-  { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
 ];
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 const CHART_PLANETS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
@@ -263,6 +243,7 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    clearCurrentChart();
     window.location.href = "/login";
   };
 
@@ -861,18 +842,7 @@ export default function Dashboard() {
 
         </main>
       </div>
-      <nav className="mobile-nav" aria-label="Mobile navigation">
-        {MOBILE_NAV.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`mobile-nav-item ${pathname === item.href ? "active" : ""}`}
-          >
-            <span className="mobile-nav-icon">{item.icon}</span>
-            <span className="mobile-nav-label">{item.label}</span>
-          </Link>
-        ))}
-      </nav>
+      <MobileBottomNav />
     </>
   );
 }
