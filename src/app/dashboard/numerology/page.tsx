@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { calculateNumerology, analyzeNumber, suggestATMPins, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry, type DigitAnalysis, type CompatScore } from "@/lib/astro-engine/numerology";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import "@/app/dashboard/shared.css";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function qualityColor(n: NumerologyNumber) { return n.color; }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -218,6 +216,9 @@ export default function NumerologyPage() {
   const [vehicleResult, setVehicleResult] = useState<DigitAnalysis | null>(null);
   const [mobileError, setMobileError] = useState("");
   const [vehicleError, setVehicleError] = useState("");
+  const [atmInput, setAtmInput] = useState("");
+  const [atmResult, setAtmResult] = useState<DigitAnalysis | null>(null);
+  const [atmError, setAtmError] = useState("");
   const { birth } = useUserChart();
 
   const result = calculateNumerology(birth.name, birth.dob);
@@ -232,18 +233,25 @@ export default function NumerologyPage() {
   const currentYear = new Date().getFullYear();
   const atmPins = suggestATMPins(lifePath.value, destiny.value);
 
-  const checkMobile = useCallback(() => {
+  const checkMobile = () => {
     const digits = mobileInput.replace(/\D/g, "");
     if (digits.length < 5) { setMobileError("Valid mobile number enter karein (min 5 digits)"); return; }
     setMobileError("");
     setMobileResult(analyzeNumber(mobileInput, lifePath.value, destiny.value));
-  }, [mobileInput, lifePath.value, destiny.value]);
+  };
 
-  const checkVehicle = useCallback(() => {
+  const checkVehicle = () => {
     if (!vehicleInput.trim()) { setVehicleError("Vehicle number enter karein (e.g. DL3CAB1234)"); return; }
     setVehicleError("");
     setVehicleResult(analyzeNumber(vehicleInput, lifePath.value, destiny.value));
-  }, [vehicleInput, lifePath.value, destiny.value]);
+  };
+
+  const checkAtm = () => {
+    const digits = atmInput.replace(/\D/g, "");
+    if (digits.length < 4) { setAtmError("Minimum 4 digits enter karein"); return; }
+    setAtmError("");
+    setAtmResult(analyzeNumber(atmInput, lifePath.value, destiny.value));
+  };
 
   const tabs = [
     { key: "core",      label: "Core Numbers" },
@@ -629,6 +637,32 @@ export default function NumerologyPage() {
               <p className="text-xs text-white/30 mt-1.5">Only digits are extracted — letters are ignored in calculation</p>
               {vehicleError && <p className="text-xs text-red-400 mt-2">{vehicleError}</p>}
               {vehicleResult && <NumberResult analysis={vehicleResult} context="Vehicle Number" />}
+            </div>
+
+            {/* ATM Card Number Checker */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs uppercase tracking-widest text-amber-300 mb-3">💳 ATM Card Number Checker</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={atmInput}
+                  onChange={e => setAtmInput(e.target.value.replace(/\D/g, "").slice(0, 16))}
+                  onKeyDown={e => e.key === "Enter" && checkAtm()}
+                  placeholder="Enter last 4–8 digits of ATM card"
+                  className="flex-1 rounded-xl px-4 py-3 text-sm text-white bg-white/[0.06] border border-white/15 outline-none focus:border-amber-500/50 placeholder:text-white/25 tracking-widest font-mono"
+                  maxLength={16}
+                />
+                <button
+                  onClick={checkAtm}
+                  className="px-5 py-3 rounded-xl text-sm font-semibold text-amber-300 transition-all"
+                  style={{ background: "rgba(234,179,8,0.15)", border: "1px solid rgba(234,179,8,0.35)" }}
+                >
+                  Analyse
+                </button>
+              </div>
+              <p className="text-xs text-white/30 mt-1.5">Enter visible digits — full card or last 4–8 digits only (do not share full card number publicly)</p>
+              {atmError && <p className="text-xs text-red-400 mt-2">{atmError}</p>}
+              {atmResult && <NumberResult analysis={atmResult} context="ATM Card" />}
             </div>
 
             {/* ATM PIN Suggestions */}
