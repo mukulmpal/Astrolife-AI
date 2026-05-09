@@ -10,8 +10,10 @@
     "qa:phase1": "npm run lint && npm run build"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.76",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.1",
+    "ai": "^6.0.177",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
