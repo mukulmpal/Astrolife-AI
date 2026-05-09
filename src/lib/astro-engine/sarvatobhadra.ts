@@ -17,6 +17,7 @@ export interface SvbAlert {
   nakshatra: string;
   type: "janma_vedha" | "sensitive_vedha";
   severity: "high" | "medium";
+  description: string;
 }
 
 export interface SarvatobhadraResult {
@@ -25,6 +26,23 @@ export interface SarvatobhadraResult {
   rows: SvbRow[];
   vedhaAlerts: SvbAlert[];
   sensitiveIndices: Set<number>;
+  janmaIndex: number;
+  transitDate: Date;
+}
+
+function getVedhaDescription(planet: string) {
+  const descriptions: Record<string, string> = {
+    Mars: "Conflict / accident risk",
+    Saturn: "Delay / pressure / karmic weight",
+    Rahu: "Confusion / unexpected events",
+    Ketu: "Past karma activation / spiritual correction",
+    Jupiter: "Opportunity / protection",
+    Venus: "Relationship / pleasure activation",
+    Sun: "Authority / vitality activation",
+    Moon: "Emotional sensitivity",
+    Mercury: "Communication / travel sensitivity",
+  };
+  return descriptions[planet] ?? "Cosmic influence activated";
 }
 
 export function calculateSarvatobhadra(chart: ChartData): SarvatobhadraResult {
@@ -47,18 +65,29 @@ export function calculateSarvatobhadra(chart: ChartData): SarvatobhadraResult {
       natalPlanets[nakIdx] = (natalPlanets[nakIdx] || []).concat(p);
     }
   });
+
+  const now = new Date();
+  const jd = now.getTime() / 86400000 + 2440587.5;
+  const transitLons = computePlanets(jd);
+  const transitPlanets: Record<number, string[]> = {};
+  ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'].forEach((p) => {
+    const lon = transitLons[p];
+    if (lon === undefined || lon === null) return;
+    const nakIdx = Math.floor(((lon % 360) + 360) % 360 * 27 / 360);
+    transitPlanets[nakIdx] = (transitPlanets[nakIdx] || []).concat(p);
+  });
   
   const rows: SvbRow[] = NAK27.map((name, i) => ({
     index: i,
     name,
     type: i === janmaIndex ? 'janma' : sensitiveIndices.has(i) ? 'vedha' : 'normal',
     natalPlanets: natalPlanets[i] || [],
-    transitPlanets: [],
-    isActive: !!(natalPlanets[i] || (i === janmaIndex)),
+    transitPlanets: transitPlanets[i] || [],
+    isActive: !!(natalPlanets[i] || transitPlanets[i] || (i === janmaIndex)),
   }));
   
   const vedhaAlerts: SvbAlert[] = [];
-  Object.entries(natalPlanets).forEach(([idx, planets]) => {
+  Object.entries(transitPlanets).forEach(([idx, planets]) => {
     const i = parseInt(idx);
     if (sensitiveIndices.has(i)) {
       planets.forEach((p) => {
@@ -67,10 +96,11 @@ export function calculateSarvatobhadra(chart: ChartData): SarvatobhadraResult {
           nakshatra: NAK27[i],
           type: i === janmaIndex ? 'janma_vedha' : 'sensitive_vedha',
           severity: i === janmaIndex ? 'high' : 'medium',
+          description: getVedhaDescription(p),
         });
       });
     }
   });
   
-  return { birthNakshatra, birthNakshatraIndex: janmaIndex, rows, vedhaAlerts, sensitiveIndices };
+  return { birthNakshatra, birthNakshatraIndex: janmaIndex, rows, vedhaAlerts, sensitiveIndices, janmaIndex, transitDate: now };
 }

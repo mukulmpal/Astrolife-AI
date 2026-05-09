@@ -1,8 +1,6 @@
-import { computePlanets, computeLagna, getJD, RASHIS } from "./calculations";
+import { computePlanets, computeLagna, RASHIS } from "./calculations";
 
 export type PrashnaTopic = "career" | "marriage" | "health" | "finance" | "travel" | "education" | "property" | "legal" | "child" | "general";
-
-const NAK27 = ['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
 
 const LAGNA_LORDS = ['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
 const TOPIC_HOUSES: Record<PrashnaTopic, {positive: number[]; negative: number[]; karaka: string; primary: number}> = {
@@ -34,6 +32,7 @@ export interface PrashnaResult {
 }
 
 export function calculatePrashna(question: string, topic: PrashnaTopic, lat: number, lon: number, tz: number): PrashnaResult {
+  void tz;
   const now = new Date();
   const jd = now.getTime() / 86400000 + 2440587.5;
   

@@ -7,8 +7,8 @@ import { useState } from "react";
 const PRIMARY_ITEMS = [
   { icon: "🏠", label: "Home", href: "/dashboard" },
   { icon: "🔯", label: "Kundali", href: "/dashboard/kundli" },
+  { icon: "📊", label: "History", href: "/dashboard/history" },
   { icon: "🧿", label: "Yogas", href: "/dashboard/yogas" },
-  { icon: "📈", label: "Destiny", href: "/dashboard/destiny" },
 ];
 
 const ENGINE_ITEMS = [

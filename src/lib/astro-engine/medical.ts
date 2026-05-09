@@ -20,20 +20,31 @@ export interface HealthAlert {
 
 export interface MedicalResult {
   lagnaSign: string;
+  prakriti: string;
   birthNakshatra: string;
   nakshatraDisease: string;
   alerts: HealthAlert[];
+  scores: Record<string, number>;
   topConcerns: string[];
   accidentRisk: number;
 }
 
 export function calculateMedical(chart: ChartData): MedicalResult {
   const lagnaSign = chart.lagnaRashi;
+  const prakriti = `${lagnaSign} constitution indicates the body should be read through lagna strength, Moon condition and sensitive dusthana placements.`;
   const birthNakshatra = chart.planets.Moon?.nakshatra || 'Unknown';
   const nakshatraDisease = NAKSHATRA_DISEASE[birthNakshatra] || 'None specific';
   
   const alerts: HealthAlert[] = [];
   const diseaseMap: Record<string, number> = {};
+  const scores: Record<string, number> = {
+    Vitality: 0,
+    Mental: 0,
+    Digestive: 0,
+    Respiratory: 0,
+    Bone: 0,
+    Reproductive: 0,
+  };
   
   ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach((planet) => {
     const pd = chart.planets[planet];
@@ -44,6 +55,12 @@ export function calculateMedical(chart: ChartData): MedicalResult {
     
     alerts.push({ planet, house: pd.house, disease, severity });
     diseaseMap[disease] = (diseaseMap[disease] || 0) + (severity === 'high' ? 3 : severity === 'medium' ? 2 : 1);
+    if (planet === "Sun") scores.Vitality += severity === "high" ? 32 : 16;
+    if (planet === "Moon" || planet === "Rahu") scores.Mental += severity === "high" ? 32 : 16;
+    if (planet === "Mercury" || planet === "Jupiter") scores.Digestive += severity === "high" ? 28 : 14;
+    if (planet === "Saturn") scores.Bone += severity === "high" ? 30 : 15;
+    if (planet === "Venus" || planet === "Mars") scores.Reproductive += severity === "high" ? 24 : 12;
+    if (pd.house === 3 || pd.house === 4) scores.Respiratory += severity === "high" ? 24 : 12;
   });
   
   let accidentRisk = 0;
@@ -51,6 +68,10 @@ export function calculateMedical(chart: ChartData): MedicalResult {
   if (chart.planets.Mars && [8].includes(chart.planets.Mars.house)) accidentRisk += 30;
   
   const topConcerns = Object.entries(diseaseMap).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => k);
-  
-  return { lagnaSign, birthNakshatra, nakshatraDisease, alerts, topConcerns, accidentRisk: Math.min(accidentRisk, 95) };
+
+  Object.keys(scores).forEach((key) => {
+    scores[key] = Math.min(scores[key], 95);
+  });
+
+  return { lagnaSign, prakriti, birthNakshatra, nakshatraDisease, alerts, scores, topConcerns, accidentRisk: Math.min(accidentRisk, 95) };
 }

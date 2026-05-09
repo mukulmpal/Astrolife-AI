@@ -1,16 +1,34 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Bot, Clock3, FileText, HandHeart, Radar, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Bot, Clock3, FileText, HandHeart, Sparkles } from "lucide-react";
 import { chatHref, ctaHref, trustBadges } from "@/data/landing";
 
 export function Hero() {
   return (
     <section className="landing-hero" id="kundli">
+      <Image
+        src="/images/cosmic-bg.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="landing-hero-bg-image"
+        aria-hidden="true"
+      />
       <div className="landing-stars" aria-hidden="true" />
       <div className="landing-hero-orb landing-hero-orb-one" aria-hidden="true" />
       <div className="landing-hero-orb landing-hero-orb-two" aria-hidden="true" />
 
       <div className="landing-container landing-hero-grid">
-        <div className="landing-hero-copy">
+        <motion.div
+          className="landing-hero-copy"
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="landing-kicker">
             <Sparkles size={15} aria-hidden="true" />
             Your Destiny, Decoded by AI
@@ -41,62 +59,31 @@ export function Hero() {
               </span>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        <div className="landing-hero-visual" aria-label="AstroLife dashboard preview">
-          <div className="kundli-wheel">
-            <div className="kundli-ring ring-a" />
-            <div className="kundli-ring ring-b" />
-            <div className="kundli-core">ॐ</div>
-            {["Ar", "Ta", "Ge", "Ca", "Le", "Vi", "Li", "Sc", "Sa", "Cp", "Aq", "Pi"].map((sign, index) => (
-              <span key={sign} className={`kundli-sign sign-${index + 1}`}>
-                {sign}
-              </span>
-            ))}
+        <motion.div
+          className="landing-hero-visual landing-hero-visual-image"
+          aria-label="AstroLife dashboard preview"
+          initial={{ opacity: 0, scale: 0.94, y: 30 }}
+          animate={{ opacity: 1, scale: 1, y: [0, -10, 0] }}
+          transition={{
+            opacity: { duration: 0.7, delay: 0.15 },
+            scale: { duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] },
+            y: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.95 },
+          }}
+        >
+          <div className="landing-hero-image-shell">
+            <Image
+              src="/images/hero-kundli.png"
+              alt="AstroLife kundli dashboard with AI astrologer, dasha timeline, destiny score and remedies"
+              fill
+              priority
+              sizes="(max-width: 1024px) 92vw, 560px"
+              className="landing-hero-dashboard-image"
+            />
+            <div className="landing-hero-image-shine" aria-hidden="true" />
           </div>
-
-          <div className="mock-card mock-chat">
-            <div className="mock-card-title">
-              <Bot size={15} aria-hidden="true" />
-              AI Astrologer
-            </div>
-            <p>Saturn dasha is asking for discipline, but Jupiter transit supports career visibility.</p>
-          </div>
-
-          <div className="mock-card mock-score">
-            <div className="mock-score-value">87</div>
-            <div>
-              <div className="mock-card-title">Destiny Score</div>
-              <p>Very promising</p>
-            </div>
-          </div>
-
-          <div className="mock-card mock-radar">
-            <div className="mock-card-title">
-              <Radar size={15} aria-hidden="true" />
-              Transit Radar
-            </div>
-            <div className="mock-bars">
-              <span style={{ width: "88%" }} />
-              <span style={{ width: "64%" }} />
-              <span style={{ width: "76%" }} />
-            </div>
-          </div>
-
-          <div className="mock-card mock-remedy">
-            <div className="mock-card-title">
-              <HandHeart size={15} aria-hidden="true" />
-              Remedy
-            </div>
-            <p>Surya mantra, focused routine, and Sunday gratitude practice.</p>
-          </div>
-
-          <div className="mock-timeline">
-            <span>Dasha</span>
-            <div />
-            <strong>Mercury AD</strong>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

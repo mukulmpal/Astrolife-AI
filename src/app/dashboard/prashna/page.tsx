@@ -1,15 +1,15 @@
 "use client";
-import { useState, useRef } from "react";
-import { calculatePrashna } from "@/lib/astro-engine/prashna";
+import { useState } from "react";
+import { calculatePrashna, type PrashnaResult, type PrashnaTopic } from "@/lib/astro-engine/prashna";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 export default function PrashnaPage() {
   const [question, setQuestion] = useState("");
-  const [topic, setTopic] = useState<"career" | "marriage" | "health" | "finance" | "travel" | "education" | "property" | "legal" | "child" | "general">("general");
+  const [topic, setTopic] = useState<PrashnaTopic>("general");
   const [lat, setLat] = useState("28.6139");
   const [lon, setLon] = useState("77.2090");
   const [tz, setTz] = useState("5.5");
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<PrashnaResult | null>(null);
 
   const handleCalculate = () => {
     if (!question.trim()) return alert("Please enter your question");
@@ -53,7 +53,7 @@ export default function PrashnaPage() {
 
           <div className="prashna-form-group">
             <div className="prashna-label">📂 Topic</div>
-            <select className="prashna-select" value={topic} onChange={(e) => setTopic(e.target.value as any)}>
+            <select className="prashna-select" value={topic} onChange={(e) => setTopic(e.target.value as PrashnaTopic)}>
               <option value="career">💼 Career</option>
               <option value="marriage">💑 Marriage</option>
               <option value="health">🏥 Health</option>

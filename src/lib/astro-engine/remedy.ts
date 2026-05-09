@@ -62,7 +62,8 @@ export function calculateRemedies(chart: ChartData): RemedyResult {
     });
   });
 
-  cards.sort((a, b) => (a.priority === "urgent" ? -1 : 1));
+  const order: Record<RemedyCard["priority"], number> = { urgent: 0, recommended: 1, optional: 2 };
+  cards.sort((a, b) => order[a.priority] - order[b.priority]);
   const urgentCount = cards.filter((c) => c.priority === "urgent").length;
   const topPriority = cards[0] || null;
 

@@ -1,10 +1,39 @@
 import type { Metadata } from "next";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { HtmlPreferencesSync } from "@/components/global-preferences-toggle";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "AstroLife",
-  description: "AI-powered Vedic astrology and life intelligence platform.",
+  metadataBase: new URL("https://astrolife-ai.vercel.app"),
+  title: "AstroLife — AI Vedic Astrology, Free Kundli & Personalized Remedies",
+  description:
+    "Generate your free AI Kundli and get personalized Vedic astrology insights, dashas, transits, remedies, marriage, career and wealth guidance.",
+  openGraph: {
+    title: "AstroLife — AI Vedic Astrology, Free Kundli & Personalized Remedies",
+    description:
+      "Generate your free AI Kundli and get personalized Vedic astrology insights, dashas, transits, remedies, marriage, career and wealth guidance.",
+    url: "https://astrolife-ai.vercel.app",
+    siteName: "AstroLife AI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AstroLife — AI Vedic Astrology, Free Kundli & Personalized Remedies",
+    description:
+      "Generate your free AI Kundli and get personalized Vedic astrology insights, dashas, transits, remedies, marriage, career and wealth guidance.",
+  },
 };
 
 const preferencesScript = `
@@ -33,7 +62,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className={`${inter.variable} ${cormorant.variable} min-h-full flex flex-col`} suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: preferencesScript }} />
         {children}
         <HtmlPreferencesSync />

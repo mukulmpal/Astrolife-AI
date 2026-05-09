@@ -4,6 +4,7 @@ import { useUserChart } from "@/lib/user-chart";
 import { calculateRemedies } from "@/lib/astro-engine/remedy";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { EducationTooltip } from "@/components/education-tooltip";
 
 export default function RemedyPage() {
   const { chart, loading } = useUserChart();
@@ -32,7 +33,7 @@ export default function RemedyPage() {
       
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <div className="rem-hero">💊 Remedy Engine</div>
-        <div className="rem-sub">Vedic Planetary Remedies — Gems · Mantras · Donations · Daily Practices</div>
+        <div className="rem-sub">Vedic Planetary Remedies — Gems · Mantras · Donations · Daily Practices · Learn about <EducationTooltip term="dosha">Doshas</EducationTooltip></div>
         
         <div style={{ marginBottom: "20px", padding: "14px", background: "rgba(200, 160, 48, 0.1)", borderRadius: "8px", border: "1px solid rgba(200, 160, 48, 0.2)" }}>
           <div style={{ fontSize: "14px" }}>

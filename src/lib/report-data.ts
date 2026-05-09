@@ -2524,7 +2524,8 @@ export function buildRealMedicalEngineReportSection(input: any): ReportSection {
   try {
     const chart = getEngineChart(input);
     const result = calculateMedical(chart);
-    const scoreRows = Object.entries(result.scores)
+    const nakshatraDisease = String(result.nakshatraDisease ?? "None specific");
+    const scoreRows = Object.entries(result.scores ?? {})
       .sort((a: any, b: any) => Number(b[1]) - Number(a[1]))
       .map(([name, score]) => `${name}: ${score}/100`);
     const topAlerts = result.alerts.slice(0, 8);
@@ -2537,8 +2538,8 @@ export function buildRealMedicalEngineReportSection(input: any): ReportSection {
       paragraphs: [
         "The real Medical Astrology engine was called for this report. It reads lagna constitution, Moon nakshatra, disease-sensitive houses, planet-house health alerts, combination alerts and broad body-system risk scores.",
         `Constitutional base: ${result.prakriti}`,
-        result.nakshatraDisease
-          ? `Nakshatra sensitivity: ${result.birthNakshatra} indicates ${result.nakshatraDisease.disease}. This is a tendency marker, not a diagnosis.`
+        nakshatraDisease && nakshatraDisease !== "None specific"
+          ? `Nakshatra sensitivity: ${result.birthNakshatra} indicates ${nakshatraDisease}. This is a tendency marker, not a diagnosis.`
           : `Birth nakshatra ${result.birthNakshatra || "not resolved"} does not show a strong nakshatra-specific health alert in this pass.`,
         "Medical astrology is only a wellness reflection layer. It must not replace diagnosis, treatment, emergency care or qualified medical advice.",
       ],
@@ -2580,13 +2581,13 @@ export function buildRealRemedyEngineReportSection(input: any): ReportSection {
       paragraphs: [
         "The real Remedy engine was called for this report. It converts planet, house, sign, nakshatra and dignity into practical upaya covering mantra, charity, behaviour, colour discipline and gemstone caution.",
         result.topPriority
-          ? `Top priority remedy belongs to ${result.topPriority.planet} in House ${result.topPriority.house}. The practical instruction is: ${result.topPriority.houseRemedy}`
+          ? `Top priority remedy belongs to ${result.topPriority.planet} in House ${result.topPriority.house}. The practical instruction is: ${result.topPriority.practice}`
           : "No single urgent remedy dominates this chart; simple steady discipline is preferred.",
         "AstroLife prioritizes affordable and behavioural remedies first. Gemstones should be treated carefully and confirmed before expensive purchase or long-term wearing.",
       ],
       summary: result.cards
         .slice(0, 9)
-        .map((card: any) => `${card.planet} H${card.house} ${card.sign}: ${card.priority} · ${card.summary}`),
+        .map((card: any) => `${card.planet} H${card.house} ${card.sign}: ${card.priority} · ${card.status}`),
       actionPlan: [
         "Pick only the top 1-3 remedies and follow them consistently.",
         "Start with mantra, donation and behavioural correction before gemstones.",
