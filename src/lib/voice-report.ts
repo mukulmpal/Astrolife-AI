@@ -2,7 +2,7 @@ import type { ChartData } from "./astro-engine/calculations";
 import { calculateRemedies } from "./astro-engine/remedy";
 
 export interface VoiceReportOptions {
-  type: "full" | "kundli" | "remedy" | "summary";
+  type: "full" | "kundli" | "remedy" | "medical" | "destiny" | "summary";
   rate?: number;
   pitch?: number;
 }
@@ -31,27 +31,28 @@ export function generateVoiceScript(chart: ChartData, options: VoiceReportOption
 
   if (options.type === "remedy" || options.type === "full") {
     const remedies = calculateRemedies(chart);
-
     script += `
-    Remedy Engine Analysis:
-    
-    You have ${remedies.urgentCount} planets requiring immediate remedies.
+    Recommended Remedies:
+    ${remedies.cards.map(c => `${c.planet}: Gem ${c.gem}, Mantra ${c.mantra.substring(0, 30)}, Donate ${c.donate}`).join(". ")}
     `;
-
-    remedies.cards.slice(0, 3).forEach((card) => {
-      script += `
-      ${card.planet}: Wear ${card.gem}. 
-      Chant the mantra ${card.mantra.substring(0, 30)}.
-      Donate ${card.donate}.
-      `;
-    });
   }
 
-  script += `
-  
-  For detailed analysis, visit your AstroLife dashboard.
-  May the stars guide your path.
-  `;
+  if (options.type === "medical" || options.type === "full") {
+    script += `
+    Medical Astrology Insights:
+    Based on your birth chart, certain areas require attention.
+    Please consult with healthcare professionals for medical advice.
+    Astrology is a complementary tool, not a substitute for medical care.
+    `;
+  }
+
+  if (options.type === "destiny" || options.type === "full") {
+    script += `
+    Destiny and Life Path:
+    Your chart indicates specific karmic patterns and life lessons.
+    These are areas for personal growth and development throughout your life.
+    `;
+  }
 
   return script;
 }

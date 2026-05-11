@@ -3,6 +3,11 @@ import jsPDF from "jspdf";
 import type { ChartData } from "./astro-engine/calculations";
 import { calculateRemedies } from "./astro-engine/remedy";
 import { calculateMedical } from "./astro-engine/medical";
+import { calculatePsychology } from "./astro-engine/psychology";
+import { detectYogas } from "./astro-engine/yogas";
+import { calculateShadbala } from "./astro-engine/shadbala";
+import { calculateLalKitab } from "./astro-engine/lalkitab";
+import { calculateTransitReport } from "./astro-engine/transits";
 
 export interface ReportOptions {
   type: "full" | "kundli" | "remedy" | "medical" | "destiny";
@@ -105,7 +110,170 @@ export async function generatePDFReport(
 
   yPosition += 60;
 
-  // Remedy Section (if requested)
+  // Yoga Section (Auspicious Combinations)
+  if (options.type === "full") {
+    pdf.addPage();
+    yPosition = 20;
+
+    pdf.setFontSize(14);
+    pdf.setTextColor(200, 160, 48);
+    pdf.text("Yogas (Auspicious Combinations)", 20, yPosition);
+
+    try {
+      const yogas = detectYogas(chart.planets, chart.lagnaNum, "premium");
+      if (yogas && yogas.length > 0) {
+        yPosition += 12;
+        pdf.setFontSize(10);
+        pdf.setTextColor(0, 0, 0);
+
+        yogas.slice(0, 15).forEach((yoga) => {
+          if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          pdf.text(`• ${yoga.name}`, 25, yPosition);
+          yPosition += 6;
+        });
+      } else {
+        yPosition += 12;
+        pdf.setFontSize(10);
+        pdf.text("Analyzing yogas...", 20, yPosition);
+      }
+    } catch (e) {
+      yPosition += 12;
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("Yoga analysis unavailable", 20, yPosition);
+    }
+  }
+
+  // Psychology & Personality Section
+  if (options.type === "full") {
+    pdf.addPage();
+    yPosition = 20;
+
+    pdf.setFontSize(14);
+    pdf.setTextColor(200, 160, 48);
+    pdf.text("Personality & Psychology Analysis", 20, yPosition);
+
+    try {
+      const psych = calculatePsychology(chart.planets);
+      yPosition += 12;
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
+
+      pdf.text(`Summary: ${psych.summary.substring(0, 70)}...`, 20, yPosition);
+      yPosition += 10;
+      pdf.text(`Pattern: ${psych.pattern.name}`, 20, yPosition);
+      yPosition += 8;
+      pdf.text(`Description: ${psych.pattern.desc.substring(0, 60)}...`, 20, yPosition);
+      yPosition += 15;
+
+      pdf.text("Planetary Influences:", 20, yPosition);
+      yPosition += 8;
+
+      psych.planets.slice(0, 9).forEach((p) => {
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        pdf.setFontSize(9);
+        pdf.text(`• ${p.planet}: ${p.trait.substring(0, 50)}...`, 25, yPosition);
+        yPosition += 6;
+      });
+    } catch (e) {
+      yPosition += 12;
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("Psychology analysis unavailable", 20, yPosition);
+    }
+  }
+
+  // Shadbala Analysis (Planetary Strengths)
+  if (options.type === "full") {
+    pdf.addPage();
+    yPosition = 20;
+
+    pdf.setFontSize(14);
+    pdf.setTextColor(200, 160, 48);
+    pdf.text("Shadbala (Planetary Strengths)", 20, yPosition);
+
+    try {
+      const shadbala = calculateShadbala(chart.planets);
+      yPosition += 12;
+      pdf.setFontSize(9);
+      pdf.setTextColor(0, 0, 0);
+
+      pdf.text(`Summary: ${shadbala.summary.substring(0, 70)}...`, 20, yPosition);
+      yPosition += 8;
+      pdf.text(`Strongest: ${shadbala.strongest}`, 20, yPosition);
+      yPosition += 6;
+      pdf.text(`Weakest: ${shadbala.weakest}`, 20, yPosition);
+      yPosition += 6;
+      pdf.text(`Average Strength: ${shadbala.avgStrength.toFixed(2)}/6`, 20, yPosition);
+      yPosition += 12;
+
+      pdf.text("Individual Strengths:", 20, yPosition);
+      yPosition += 8;
+
+      shadbala.planets.slice(0, 9).forEach((p) => {
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        const total = (p.sthanaBala + p.digBala + p.kalaBala + p.cheshtaBala) / 4;
+        pdf.text(`• ${p.planet} (${p.sign}): ${total.toFixed(1)}/6`, 20, yPosition);
+        yPosition += 6;
+      });
+    } catch (e) {
+      yPosition += 12;
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("Shadbala analysis unavailable", 20, yPosition);
+    }
+  }
+
+  // Lal Kitab Insights
+  if (options.type === "full") {
+    pdf.addPage();
+    yPosition = 20;
+
+    pdf.setFontSize(14);
+    pdf.setTextColor(200, 160, 48);
+    pdf.text("Lal Kitab Predictions & Insights", 20, yPosition);
+
+    try {
+      const lalkitab = calculateLalKitab(chart.planets, chart.dob);
+      yPosition += 12;
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
+
+      pdf.text(`Summary: ${lalkitab.summary.substring(0, 70)}...`, 20, yPosition);
+      yPosition += 10;
+
+      if (lalkitab.planets && lalkitab.planets.length > 0) {
+        pdf.text("Planetary Readings:", 20, yPosition);
+        yPosition += 8;
+        
+        lalkitab.planets.slice(0, 9).forEach((p) => {
+          if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          pdf.setFontSize(9);
+          pdf.text(`• ${p.planet} (H${p.house}): ${p.upaya.substring(0, 50)}...`, 25, yPosition);
+          yPosition += 6;
+        });
+      } else {
+        pdf.text("Lal Kitab analysis in progress...", 20, yPosition);
+      }
+    } catch (e) {
+      yPosition += 12;
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("Lal Kitab analysis unavailable", 20, yPosition);
+    }
+  }
   if (options.type === "full" || options.type === "remedy") {
     pdf.addPage();
     yPosition = 20;
@@ -122,7 +290,7 @@ export async function generatePDFReport(
     pdf.text(`Urgent Remedies: ${remedies.urgentCount}`, 20, yPosition);
 
     yPosition += 12;
-    remedies.cards.slice(0, 5).forEach((card) => {
+    remedies.cards.forEach((card, idx) => {
       if (yPosition > 250) {
         pdf.addPage();
         yPosition = 20;
@@ -130,7 +298,7 @@ export async function generatePDFReport(
 
       pdf.setFontSize(10);
       pdf.setTextColor(200, 160, 48);
-      pdf.text(`${card.planet} (${card.priority})`, 20, yPosition);
+      pdf.text(`${idx + 1}. ${card.planet} (${card.priority})`, 20, yPosition);
 
       yPosition += 6;
       pdf.setFontSize(9);
@@ -176,6 +344,102 @@ export async function generatePDFReport(
       pdf.text(`• ${concern}`, 25, yPosition);
       yPosition += 6;
     });
+  }
+
+  // House Analysis Section
+  if (options.type === "full") {
+    pdf.addPage();
+    yPosition = 20;
+
+    pdf.setFontSize(14);
+    pdf.setTextColor(200, 160, 48);
+    pdf.text("House Analysis (Bhavas)", 20, yPosition);
+
+    yPosition += 12;
+    pdf.setFontSize(9);
+    pdf.setTextColor(0, 0, 0);
+
+    const houseMeanings: Record<number, string> = {
+      1: "Self, Identity, Personality",
+      2: "Wealth, Family, Speech",
+      3: "Siblings, Communication, Short travels",
+      4: "Home, Mother, Education, Property",
+      5: "Children, Creativity, Romance",
+      6: "Health, Service, Enemies",
+      7: "Marriage, Partnership, Public image",
+      8: "Longevity, Sudden gains, Inheritance",
+      9: "Luck, Higher learning, Travel",
+      10: "Career, Status, Father",
+      11: "Gains, Friendships, Aspirations",
+      12: "Losses, Spirituality, Foreign land"
+    };
+
+    Object.entries(houseMeanings).forEach(([house, meaning]) => {
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      pdf.text(`House ${house}: ${meaning}`, 20, yPosition);
+      yPosition += 5;
+    });
+  }
+
+  // Numerology Insights
+  if (options.type === "full") {
+    try {
+      const { calculateNumerology } = await import("./astro-engine/numerology");
+      pdf.addPage();
+      yPosition = 20;
+
+      pdf.setFontSize(14);
+      pdf.setTextColor(200, 160, 48);
+      pdf.text("Numerology Insights", 20, yPosition);
+
+      yPosition += 12;
+      const birthNumbers = calculateNumerology(chart.name, chart.dob);
+      
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
+      if (birthNumbers.lifePath) {
+        pdf.text(`Life Path: ${birthNumbers.lifePath.value} (${birthNumbers.lifePath.label})`, 20, yPosition);
+        yPosition += 8;
+      }
+      if (birthNumbers.destiny) {
+        pdf.text(`Destiny: ${birthNumbers.destiny.value} (${birthNumbers.destiny.label})`, 20, yPosition);
+        yPosition += 8;
+      }
+      if (birthNumbers.soulUrge) {
+        pdf.text(`Soul Urge: ${birthNumbers.soulUrge.value} (${birthNumbers.soulUrge.label})`, 20, yPosition);
+        yPosition += 8;
+      }
+    } catch (e) {
+      // Numerology optional
+    }
+  }
+
+  // Transits Overview
+  if (options.type === "full") {
+    try {
+      pdf.addPage();
+      yPosition = 20;
+
+      pdf.setFontSize(14);
+      pdf.setTextColor(200, 160, 48);
+      pdf.text("Current Transits Overview", 20, yPosition);
+
+      yPosition += 12;
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("Transit analysis shows current planetary positions and their effects.", 20, yPosition);
+      yPosition += 8;
+      pdf.text("Check your dashboard for detailed transit predictions.", 20, yPosition);
+      yPosition += 8;
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("Generated on: " + new Date().toLocaleDateString(), 20, yPosition);
+    } catch (e) {
+      // Optional
+    }
   }
 
   // Footer

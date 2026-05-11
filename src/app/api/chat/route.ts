@@ -6,7 +6,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 
 export async function POST(req: Request) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -34,7 +34,6 @@ export async function POST(req: Request) {
         content: msg.content,
       })),
       temperature: 0.7,
-      max_tokens: 1024,
     });
 
     return result.toTextStreamResponse();
