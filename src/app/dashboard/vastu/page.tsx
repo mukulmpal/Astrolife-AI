@@ -1,406 +1,901 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import "@/app/dashboard/shared.css";
-import { calculateVastu, VASTU_ZONES_DEF, type VastuZone, type VastuResult } from "@/lib/astro-engine/vastu";
-import { PremiumFeature } from "@/components/premium-feature";
-import { useUserChart } from "@/lib/user-chart";
 
-// ── Compass Canvas ────────────────────────────────────────────
-function VastuCompass({ zones }: { zones: VastuZone[] }) {
-  const ref = useRef<HTMLCanvasElement>(null);
+import { useEffect, useMemo, useState } from "react";
+
+type Direction = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "CENTER" | "";
+
+type VastuResult = {
+  engineVersion?: string;
+  summary?: string;
+  scores?: {
+    overall?: number;
+    wealth?: number;
+    health?: number;
+    relationship?: number;
+    career?: number;
+    children?: number;
+    spiritual?: number;
+    business?: number;
+    mentalPeace?: number;
+    construction?: number;
+  };
+  strengths?: Array<{
+    title: string;
+    explanation: string;
+    score: number;
+  }>;
+  defects?: Array<{
+    title: string;
+    explanation: string;
+    severity: number;
+    remedies: string[];
+  }>;
+  recommendations?: Array<{
+    title: string;
+    priority: string;
+    system: string;
+    steps: string[];
+    requiresKundli?: boolean;
+  }>;
+};
+
+type RoomInput = {
+  id: string;
+  type: string;
+  name: string;
+  direction: Direction;
+};
+
+type NormalizedKundli = {
+  weakPlanets: string[];
+  currentMahadasha?: string;
+  currentAntardasha?: string;
+  lalKitabHouses: Record<string, string[]>;
+  source: string;
+};
+
+const directionOptions: Array<{ value: Direction; label: string }> = [
+  { value: "", label: "Select" },
+  { value: "N", label: "North" },
+  { value: "NE", label: "North-East" },
+  { value: "E", label: "East" },
+  { value: "SE", label: "South-East" },
+  { value: "S", label: "South" },
+  { value: "SW", label: "South-West" },
+  { value: "W", label: "West" },
+  { value: "NW", label: "North-West" },
+  { value: "CENTER", label: "Brahmasthan / Center" },
+];
+
+const roomTypeOptions = [
+  { value: "main_entrance", label: "Main Entrance" },
+  { value: "kitchen", label: "Kitchen" },
+  { value: "master_bedroom", label: "Master Bedroom" },
+  { value: "bedroom", label: "Bedroom" },
+  { value: "toilet", label: "Toilet" },
+  { value: "bathroom", label: "Bathroom" },
+  { value: "pooja_room", label: "Pooja Room" },
+  { value: "study_room", label: "Study Room" },
+  { value: "staircase", label: "Staircase" },
+  { value: "underground_water", label: "Underground Water" },
+  { value: "overhead_tank", label: "Overhead Tank" },
+  { value: "septic_tank", label: "Septic Tank" },
+  { value: "office_cabin", label: "Office Cabin" },
+  { value: "locker", label: "Locker / Safe" },
+];
+
+const initialRooms: RoomInput[] = [
+  { id: "room-main-entrance", type: "main_entrance", name: "Main Entrance", direction: "" },
+  { id: "room-kitchen", type: "kitchen", name: "Kitchen", direction: "" },
+  { id: "room-master-bedroom", type: "master_bedroom", name: "Master Bedroom", direction: "" },
+  { id: "room-bedroom", type: "bedroom", name: "Bedroom", direction: "" },
+  { id: "room-toilet", type: "toilet", name: "Toilet", direction: "" },
+  { id: "room-pooja", type: "pooja_room", name: "Pooja Room", direction: "" },
+];
+
+const possibleChartStorageKeys = [
+  "astrolife_chart",
+  "astrolife_chart_data",
+  "astrolife_current_chart",
+  "astrolife_user_chart",
+  "chartData",
+  "kundliData",
+  "kundli",
+  "userChart",
+  "birthChart",
+  "currentChart",
+  "astroChart",
+  "astro_chart",
+  "premiumReportData",
+  "reportData",
+];
+
+function safeJsonParse(value: string | null) {
+  if (!value) return null;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function readNested(obj: unknown, paths: string[]): unknown {
+  if (!obj || typeof obj !== "object") return undefined;
+
+  for (const path of paths) {
+    const parts = path.split(".");
+    let current: unknown = obj;
+
+    for (const part of parts) {
+      if (!current || typeof current !== "object") {
+        current = undefined;
+        break;
+      }
+
+      current = (current as Record<string, unknown>)[part];
+    }
+
+    if (current !== undefined && current !== null && current !== "") {
+      return current;
+    }
+  }
+
+  return undefined;
+}
+
+function normalizePlanetName(value: unknown): string {
+  const raw = String(value || "").trim();
+  const lower = raw.toLowerCase();
+
+  const map: Record<string, string> = {
+    sun: "Sun",
+    surya: "Sun",
+    moon: "Moon",
+    chandra: "Moon",
+    mars: "Mars",
+    mangal: "Mars",
+    mercury: "Mercury",
+    budh: "Mercury",
+    jupiter: "Jupiter",
+    guru: "Jupiter",
+    venus: "Venus",
+    shukra: "Venus",
+    saturn: "Saturn",
+    shani: "Saturn",
+    rahu: "Rahu",
+    ketu: "Ketu",
+  };
+
+  return map[lower] || raw;
+}
+
+function collectPlanetsArray(chart: unknown): Array<Record<string, unknown>> {
+  const candidates = [
+    readNested(chart, ["planets"]),
+    readNested(chart, ["planetaryPositions"]),
+    readNested(chart, ["planetPositions"]),
+    readNested(chart, ["chart.planets"]),
+    readNested(chart, ["rasi.planets"]),
+    readNested(chart, ["birthChart.planets"]),
+    readNested(chart, ["data.planets"]),
+    readNested(chart, ["kundli.planets"]),
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.filter((item): item is Record<string, unknown> => {
+        return Boolean(item && typeof item === "object");
+      });
+    }
+
+    if (candidate && typeof candidate === "object") {
+      return Object.entries(candidate as Record<string, unknown>).map(([planet, value]) => {
+        if (value && typeof value === "object") {
+          return { planet, ...(value as Record<string, unknown>) };
+        }
+
+        return { planet, house: value };
+      });
+    }
+  }
+
+  return [];
+}
+
+function buildLalKitabHousesFromChart(chart: unknown): Record<string, string[]> {
+  const direct = readNested(chart, [
+    "lalKitabHouses",
+    "lalKitab.houses",
+    "lalKitab.khana",
+    "kundli.lalKitabHouses",
+    "data.lalKitabHouses",
+  ]);
+
+  if (direct && typeof direct === "object" && !Array.isArray(direct)) {
+    const normalized: Record<string, string[]> = {};
+
+    for (const [house, planets] of Object.entries(direct as Record<string, unknown>)) {
+      if (Array.isArray(planets)) {
+        normalized[String(house)] = planets.map(normalizePlanetName).filter(Boolean);
+      } else if (typeof planets === "string") {
+        normalized[String(house)] = planets
+          .split(/[,\s]+/)
+          .map(normalizePlanetName)
+          .filter(Boolean);
+      }
+    }
+
+    if (Object.keys(normalized).length > 0) return normalized;
+  }
+
+  const houses: Record<string, string[]> = {};
+  const planets = collectPlanetsArray(chart);
+
+  for (const item of planets) {
+    const planet = normalizePlanetName(
+      item.name || item.planet || item.planetName || item.key || item.graha
+    );
+
+    const houseRaw =
+      item.house ||
+      item.bhava ||
+      item.houseNumber ||
+      item.lalKitabHouse ||
+      item.khana ||
+      item.lkHouse;
+
+    const house = Number(houseRaw);
+
+    if (planet && Number.isFinite(house) && house >= 1 && house <= 12) {
+      const key = String(house);
+      houses[key] ||= [];
+      if (!houses[key].includes(planet)) houses[key].push(planet);
+    }
+  }
+
+  return houses;
+}
+
+function normalizeWeakPlanets(chart: unknown): string[] {
+  const direct = readNested(chart, [
+    "weakPlanets",
+    "analysis.weakPlanets",
+    "strength.weakPlanets",
+    "planetStrengths.weakPlanets",
+    "kundli.weakPlanets",
+    "data.weakPlanets",
+  ]);
+
+  if (Array.isArray(direct)) {
+    return direct.map(normalizePlanetName).filter(Boolean);
+  }
+
+  const planets = collectPlanetsArray(chart);
+  const weak: string[] = [];
+
+  for (const item of planets) {
+    const planet = normalizePlanetName(
+      item.name || item.planet || item.planetName || item.key || item.graha
+    );
+
+    const strengthRaw = String(
+      item.strength || item.status || item.dignity || item.condition || ""
+    ).toLowerCase();
+
+    const numericStrength = Number(item.score ?? item.strengthScore ?? item.shadbalaScore);
+
+    if (
+      planet &&
+      (
+        strengthRaw.includes("weak") ||
+        strengthRaw.includes("debilitated") ||
+        strengthRaw.includes("neecha") ||
+        strengthRaw.includes("afflicted") ||
+        (Number.isFinite(numericStrength) && numericStrength < 35)
+      )
+    ) {
+      weak.push(planet);
+    }
+  }
+
+  return Array.from(new Set(weak));
+}
+
+function normalizeKundli(chart: unknown, source: string): NormalizedKundli {
+  const currentMahadasha = readNested(chart, [
+    "currentMahadasha",
+    "currentMD",
+    "dasha.currentMahadasha",
+    "dasha.currentMD",
+    "vimshottari.currentMahadasha",
+    "vimshottari.currentMD",
+    "kundli.currentMahadasha",
+    "kundli.dasha.currentMD",
+    "data.dasha.currentMD",
+  ]);
+
+  const currentAntardasha = readNested(chart, [
+    "currentAntardasha",
+    "currentAD",
+    "dasha.currentAntardasha",
+    "dasha.currentAD",
+    "vimshottari.currentAntardasha",
+    "vimshottari.currentAD",
+    "kundli.currentAntardasha",
+    "kundli.dasha.currentAD",
+    "data.dasha.currentAD",
+  ]);
+
+  return {
+    weakPlanets: normalizeWeakPlanets(chart),
+    currentMahadasha: currentMahadasha ? normalizePlanetName(currentMahadasha) : undefined,
+    currentAntardasha: currentAntardasha ? normalizePlanetName(currentAntardasha) : undefined,
+    lalKitabHouses: buildLalKitabHousesFromChart(chart),
+    source,
+  };
+}
+
+function loadUserChartFromStorage(): { chart: unknown; source: string } | null {
+  if (typeof window === "undefined") return null;
+
+  const stores = [
+    { name: "localStorage", store: window.localStorage },
+    { name: "sessionStorage", store: window.sessionStorage },
+  ];
+
+  for (const { name, store } of stores) {
+    for (const key of possibleChartStorageKeys) {
+      const parsed = safeJsonParse(store.getItem(key));
+
+      if (parsed && typeof parsed === "object") {
+        return {
+          chart: parsed,
+          source: `${name}:${key}`,
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+function scoreColor(score: number) {
+  if (score >= 80) return "text-green-300";
+  if (score >= 60) return "text-amber-300";
+  return "text-red-300";
+}
+
+export default function VastuDashboardPage() {
+  const [kundli, setKundli] = useState<NormalizedKundli | null>(null);
+  const [chartLoadMessage, setChartLoadMessage] = useState("Chart not loaded yet.");
+  const [propertyType, setPropertyType] = useState("home");
+  const [facing, setFacing] = useState<Direction>("");
+  const [rooms, setRooms] = useState<RoomInput[]>(initialRooms);
+  const [northOpen, setNorthOpen] = useState(true);
+  const [eastOpen, setEastOpen] = useState(true);
+  const [southWestHeavy, setSouthWestHeavy] = useState(true);
+  const [brahmasthanOpen, setBrahmasthanOpen] = useState(true);
+  const [includeLalKitab, setIncludeLalKitab] = useState(true);
+  const [includeConstruction, setIncludeConstruction] = useState(false);
+  const [shape, setShape] = useState("rectangle");
+  const [lengthHasta, setLengthHasta] = useState("");
+  const [widthHasta, setWidthHasta] = useState("");
+  const [result, setResult] = useState<VastuResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [errorText, setErrorText] = useState("");
+
+  function refreshChart() {
+    const loaded = loadUserChartFromStorage();
+
+    if (!loaded) {
+      setKundli(null);
+      setChartLoadMessage(
+        "No saved chart found in browser storage. Open/generate a Kundli first, then return here and click Refresh Chart."
+      );
+      return;
+    }
+
+    const normalized = normalizeKundli(loaded.chart, loaded.source);
+    setKundli(normalized);
+
+    const planetsCount = Object.values(normalized.lalKitabHouses).reduce(
+      (sum, planets) => sum + planets.length,
+      0
+    );
+
+    setChartLoadMessage(
+      `Loaded user chart from ${normalized.source}. Weak planets: ${
+        normalized.weakPlanets.length ? normalized.weakPlanets.join(", ") : "not detected"
+      }. Lal Kitab planets mapped: ${planetsCount}.`
+    );
+  }
 
   useEffect(() => {
-    const canvas = ref.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d"); if (!ctx) return;
-    const W = 300, cx = 150, cy = 150, r = 120;
-    ctx.clearRect(0, 0, W, W);
-    ctx.fillStyle = "#08051a"; ctx.fillRect(0, 0, W, W);
+    refreshChart();
+  }, []);
 
-    VASTU_ZONES_DEF.forEach(z => {
-      const zone = zones.find(zz => zz.dir === z.dir);
-      const score = zone?.score ?? 50;
-      const col   = zone?.statusColor ?? "#c8a030";
-      const start = (z.deg - 11.25 - 90) * Math.PI / 180;
-      const end   = (z.deg + 11.25 - 90) * Math.PI / 180;
+  const activeRooms = useMemo(() => {
+    return rooms
+      .filter((room) => room.type && room.direction)
+      .map((room) => ({
+        type: room.type,
+        direction: room.direction,
+        name: room.name || roomTypeOptions.find((option) => option.value === room.type)?.label || room.type,
+      }));
+  }, [rooms]);
 
-      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, end); ctx.closePath();
-      ctx.fillStyle   = col + (score >= 70 ? "44" : score >= 50 ? "28" : "18");
-      ctx.strokeStyle = col + "99"; ctx.lineWidth = 1;
-      ctx.fill(); ctx.stroke();
+  function updateRoom(id: string, patch: Partial<RoomInput>) {
+    setRooms((prev) =>
+      prev.map((room) => (room.id === id ? { ...room, ...patch } : room))
+    );
+  }
 
-      const mid = (z.deg - 90) * Math.PI / 180;
-      const tx  = cx + Math.cos(mid) * (r * 0.72);
-      const ty  = cy + Math.sin(mid) * (r * 0.72);
-      ctx.fillStyle = col; ctx.font = "bold 8.5px Outfit,sans-serif";
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(z.dir, tx, ty);
+  function addRoom() {
+    setRooms((prev) => [
+      ...prev,
+      {
+        id: `room-${Date.now()}`,
+        type: "bedroom",
+        name: "New Room",
+        direction: "",
+      },
+    ]);
+  }
 
-      // Score micro text
-      const sx = cx + Math.cos(mid) * (r * 0.88);
-      const sy = cy + Math.sin(mid) * (r * 0.88);
-      ctx.fillStyle = col + "cc"; ctx.font = "6px Outfit,sans-serif";
-      ctx.fillText(String(score), sx, sy);
-    });
+  function removeRoom(id: string) {
+    setRooms((prev) => prev.filter((room) => room.id !== id));
+  }
 
-    // Center orb
-    ctx.beginPath(); ctx.arc(cx, cy, 28, 0, Math.PI * 2);
-    ctx.fillStyle = "#0d0b24"; ctx.fill();
-    ctx.strokeStyle = "#c8a030"; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.fillStyle = "#c8a030"; ctx.font = "18px serif";
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText("🏠", cx, cy);
+  async function runAnalysis() {
+    setLoading(true);
+    setErrorText("");
+    setResult(null);
 
-    // Cardinal labels
-    [["N",cx,12],["S",cx,W-8],["E",W-8,cy],["W",8,cy]].forEach(([l,x,y]) => {
-      ctx.fillStyle = "#3a3060"; ctx.font = "bold 9px Outfit,sans-serif";
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(String(l), Number(x), Number(y));
-    });
-  }, [zones]);
+    try {
+      if (!facing) {
+        throw new Error("Please select property facing direction.");
+      }
+
+      if (activeRooms.length === 0) {
+        throw new Error("Please add at least one room with direction.");
+      }
+
+      const measurements =
+        lengthHasta && widthHasta
+          ? {
+              shape,
+              lengthHasta: Number(lengthHasta),
+              widthHasta: Number(widthHasta),
+            }
+          : {
+              shape,
+            };
+
+      const payload = {
+        propertyType,
+        facing,
+        rooms: activeRooms,
+        kundli: kundli || undefined,
+        features: {
+          northOpen,
+          eastOpen,
+          southWestHeavy,
+          brahmasthanOpen,
+        },
+        measurements,
+        options: {
+          includeLalKitab,
+          includeConstruction,
+        },
+      };
+
+      const response = await fetch("/api/vastu/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `API failed with status ${response.status}`);
+      }
+
+      const data = (await response.json()) as VastuResult;
+      setResult(data);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setErrorText(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const scores = result?.scores || {};
+  const strengths = result?.strengths || [];
+  const defects = result?.defects || [];
+  const recommendations = result?.recommendations || [];
 
   return (
-    <canvas ref={ref} width={300} height={300}
-      style={{ width: "100%", maxWidth: 300, height: "auto", borderRadius: 12, display: "block", margin: "0 auto" }} />
-  );
-}
+    <main className="min-h-screen bg-[#070515] px-4 py-8 text-white">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <section className="rounded-3xl border border-amber-400/20 bg-white/[0.04] p-6 shadow-2xl">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-300">
+            AstroLife Vastu Intelligence
+          </p>
 
-// ── Zone Card ─────────────────────────────────────────────────
-function ZoneCard({ zone }: { zone: VastuZone }) {
-  const [open, setOpen] = useState(false);
-  const pct = zone.score;
+          <h1 className="text-3xl font-bold md:text-5xl">
+            User Chart Based Vastu Analysis
+          </h1>
 
-  return (
-    <div onClick={() => setOpen(o => !o)} style={{
-      background: "#0d0b24", border: `1px solid ${open ? zone.statusColor + "55" : "#1c1840"}`,
-      borderRadius: 12, padding: "12px 14px", cursor: "pointer", transition: "border-color 0.2s",
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{
-          width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
-          background: zone.statusColor,
-          boxShadow: `0 0 6px ${zone.statusColor}88`,
-        }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 14, fontWeight: 600, color: "#f0e8d0" }}>
-              {zone.dir} — {zone.name}
-            </span>
-            {zone.hasDosha && (
-              <span style={{ fontSize: 9, background: "rgba(239,68,68,0.12)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 4, padding: "1px 5px" }}>WEAK</span>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-white/70 md:text-base">
+            This dashboard now uses the logged-in user&apos;s saved Kundli/chart
+            from browser storage and combines it with property room directions.
+            Vastu still needs property data; the chart personalizes severity,
+            Lal Kitab Makan Vastu and kundli-safe remedies.
+          </p>
+
+          <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-white">Chart Status</p>
+                <p className="mt-1 text-sm text-white/60">{chartLoadMessage}</p>
+              </div>
+
+              <button
+                onClick={refreshChart}
+                className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                Refresh Chart
+              </button>
+            </div>
+
+            {kundli && (
+              <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                <div className="rounded-xl bg-white/[0.04] p-3">
+                  <p className="text-white/45">Mahadasha</p>
+                  <p className="font-semibold">{kundli.currentMahadasha || "Not detected"}</p>
+                </div>
+                <div className="rounded-xl bg-white/[0.04] p-3">
+                  <p className="text-white/45">Antardasha</p>
+                  <p className="font-semibold">{kundli.currentAntardasha || "Not detected"}</p>
+                </div>
+                <div className="rounded-xl bg-white/[0.04] p-3">
+                  <p className="text-white/45">Weak Planets</p>
+                  <p className="font-semibold">
+                    {kundli.weakPlanets.length ? kundli.weakPlanets.join(", ") : "Not detected"}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
-          <div style={{ fontSize: 10, color: "#605890" }}>{zone.planet} · {zone.deity} · {zone.domain}</div>
-          <div style={{ marginTop: 6, height: 3, background: "#1c1840", borderRadius: 2 }}>
-            <div style={{ height: 3, width: `${pct}%`, background: zone.statusColor, borderRadius: 2, transition: "width 0.6s ease" }} />
-          </div>
-        </div>
-        <div style={{ textAlign: "right", minWidth: 38 }}>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 700, color: zone.statusColor, lineHeight: 1 }}>{zone.score}</div>
-          <div style={{ fontSize: 8, color: "#3a3060" }}>/100</div>
-        </div>
-        <span style={{ fontSize: 10, color: "#3a3060" }}>{open ? "▲" : "▼"}</span>
-      </div>
+        </section>
 
-      {open && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #1c1840", display: "flex", flexDirection: "column", gap: 8 }}>
-          {zone.planets.length > 0 && (
-            <div style={{ fontSize: 11, color: "#c8c0a8" }}>
-              <span style={{ color: "#605890" }}>Planets here: </span>
-              {zone.planets.join(", ")}
+        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+          <h2 className="text-2xl font-bold">Property Inputs</h2>
+          <p className="mt-2 text-sm text-white/60">
+            Fill actual property directions. This replaces the old samplePayload.
+          </p>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <label className="space-y-2">
+              <span className="text-sm text-white/60">Property Type</span>
+              <select
+                value={propertyType}
+                onChange={(event) => setPropertyType(event.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none"
+              >
+                <option value="home">Home</option>
+                <option value="flat">Flat / Apartment</option>
+                <option value="office">Office</option>
+                <option value="shop">Shop</option>
+                <option value="factory">Factory</option>
+                <option value="plot">Plot</option>
+              </select>
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm text-white/60">Facing</span>
+              <select
+                value={facing}
+                onChange={(event) => setFacing(event.target.value as Direction)}
+                className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none"
+              >
+                {directionOptions.map((option) => (
+                  <option key={option.value || "blank-facing"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm text-white/60">Plot Shape</span>
+              <select
+                value={shape}
+                onChange={(event) => setShape(event.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none"
+              >
+                <option value="rectangle">Rectangle</option>
+                <option value="square">Square</option>
+                <option value="irregular">Irregular</option>
+                <option value="triangular">Triangular</option>
+                <option value="cut">Cut Plot</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm text-white/60">Length in Hasta / Hand Units optional</span>
+              <input
+                value={lengthHasta}
+                onChange={(event) => setLengthHasta(event.target.value)}
+                placeholder="Example: 15"
+                inputMode="decimal"
+                className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm text-white/60">Width in Hasta / Hand Units optional</span>
+              <input
+                value={widthHasta}
+                onChange={(event) => setWidthHasta(event.target.value)}
+                placeholder="Example: 7"
+                inputMode="decimal"
+                className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              />
+            </label>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {[
+              {
+                label: "North open/light",
+                value: northOpen,
+                onChange: setNorthOpen,
+              },
+              {
+                label: "East open/light",
+                value: eastOpen,
+                onChange: setEastOpen,
+              },
+              {
+                label: "South-West heavy/stable",
+                value: southWestHeavy,
+                onChange: setSouthWestHeavy,
+              },
+              {
+                label: "Brahmasthan open",
+                value: brahmasthanOpen,
+                onChange: setBrahmasthanOpen,
+              },
+              {
+                label: "Include Lal Kitab Makan Vastu",
+                value: includeLalKitab,
+                onChange: setIncludeLalKitab,
+              },
+              {
+                label: "Include Construction Rules",
+                value: includeConstruction,
+                onChange: setIncludeConstruction,
+              },
+            ].map((item) => (
+              <label
+                key={item.label}
+                className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/75"
+              >
+                <input
+                  type="checkbox"
+                  checked={item.value}
+                  onChange={(event) => item.onChange(event.target.checked)}
+                  className="h-4 w-4"
+                />
+                {item.label}
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">Room Directions</h2>
+              <p className="mt-2 text-sm text-white/60">
+                Add real room placements from the user&apos;s property/floor plan.
+              </p>
             </div>
-          )}
-          <div style={{ fontSize: 11, color: "#605890" }}>
-            <span style={{ color: "#c8a030" }}>Ideal room: </span>{zone.roomIdeal}
-          </div>
-          <div style={{
-            background: zone.hasDosha ? "rgba(239,68,68,0.06)" : "rgba(200,160,48,0.05)",
-            border: `1px solid ${zone.hasDosha ? "rgba(239,68,68,0.2)" : "rgba(200,160,48,0.15)"}`,
-            borderRadius: 8, padding: "8px 10px", fontSize: 11,
-            color: zone.hasDosha ? "#fca5a5" : "#d4b896", lineHeight: 1.8,
-          }}>
-            {zone.remedy}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
-// ── Main Page ─────────────────────────────────────────────────
-export default function VastuPage() {
-  const { birth, chart } = useUserChart();
-  const result: VastuResult = calculateVastu(chart.planets as never);
-  const [tab, setTab] = useState<"compass"|"zones"|"rooms"|"psych"|"alerts">("compass");
-
-  const scoreColor = result.overallScore >= 70 ? "#22c55e" : result.overallScore >= 50 ? "#c8a030" : "#ef4444";
-
-  return (
-    <div className="page">
-      <div className="page-tag">🏠 Vastu Engine</div>
-      <h1 className="page-title serif">Astro-Vastu <em>16 Zone Analysis</em></h1>
-      <p className="page-sub">MahaVastu · Planet-Direction Mapping · Zone Scores · Remedies · Psych Bridge</p>
-      <PremiumFeature feature="Astro-Vastu Engine">
-
-      {/* HEADER */}
-      <div className="header-card" style={{ marginBottom: 16 }}>
-        <div className="header-orb" />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#c8a030", marginBottom: 6 }}>🏠 Astro-Vastu Analysis</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, color: "#f0e8d0" }}>{birth.name}</div>
-          <div style={{ fontSize: 13, color: "#605890", marginTop: 4 }}>
-            {result.strongZones.length} Strong Zones · {result.weakZones.length} Weak Zones · {result.zones.filter(z => z.status === "Average").length} Average
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", position: "relative", zIndex: 1 }}>
-          <div className="hstat">
-            <div className="hstat-n" style={{ color: scoreColor }}>{result.overallScore}</div>
-            <div className="hstat-l">OVERALL</div>
-          </div>
-          <div className="hstat">
-            <div className="hstat-n" style={{ color: "#22c55e" }}>{result.strongZones.length}</div>
-            <div className="hstat-l">STRONG</div>
-          </div>
-          <div className="hstat">
-            <div className="hstat-n" style={{ color: "#ef4444" }}>{result.weakZones.length}</div>
-            <div className="hstat-l">WEAK</div>
-          </div>
-        </div>
-      </div>
-
-      {/* SUMMARY STRIP */}
-      <div className="summary-strip" style={{ marginBottom: 16 }}>
-        🧭 Strong: {result.strongZones.map(z => z.dir).join(", ") || "None"} ·
-        Weak: {result.weakZones.map(z => z.dir).join(", ") || "None"}
-      </div>
-
-      {/* TABS */}
-      <div className="tabs" style={{ marginBottom: 16 }}>
-        {([
-          ["compass","Compass"],
-          ["zones","16 Zones"],
-          ["rooms","Room Guide"],
-          ["psych","Psychology"],
-          ["alerts","Alerts"],
-        ] as const).map(([t, l]) => (
-          <button key={t} className={`tab ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>{l}</button>
-        ))}
-      </div>
-
-      {/* ── COMPASS TAB ── */}
-      {tab === "compass" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div className="card" style={{ textAlign: "center" }}>
-            <div className="card-tag">✦ Vastu Compass — 16 Zone View</div>
-            <div className="card-title serif">Your Home&apos;s Energy Map</div>
-            <p style={{ fontSize: 12, color: "#605890", marginBottom: 16, lineHeight: 1.7 }}>
-              360° ÷ 16 = 22.5° per zone. Each zone is ruled by a planet, deity & element.
-              Zone strength = natal planets (40%) + ruling planet position (60%).
-            </p>
-            <VastuCompass zones={result.zones} />
-            <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 14, fontSize: 11, flexWrap: "wrap" }}>
-              <span style={{ color: "#22c55e" }}>● Strong (70+)</span>
-              <span style={{ color: "#c8a030" }}>● Average (50–69)</span>
-              <span style={{ color: "#ef4444" }}>● Weak (&lt;50)</span>
-            </div>
+            <button
+              onClick={addRoom}
+              className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Add Room
+            </button>
           </div>
 
-          {/* Quick score grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-            {result.zones.map(z => (
-              <div key={z.dir} style={{
-                background: "#0d0b24", border: `1px solid ${z.statusColor}33`,
-                borderRadius: 10, padding: "10px 8px", textAlign: "center",
-              }}>
-                <div style={{ fontSize: 9, color: "#605890", marginBottom: 4 }}>{z.dir}</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 700, color: z.statusColor, lineHeight: 1 }}>{z.score}</div>
-                <div style={{ fontSize: 8, color: z.statusColor, marginTop: 3 }}>{z.status}</div>
+          <div className="mt-5 space-y-3">
+            {rooms.map((room) => (
+              <div
+                key={room.id}
+                className="grid gap-3 rounded-2xl border border-white/10 bg-black/20 p-3 md:grid-cols-[1.1fr_1fr_1fr_auto]"
+              >
+                <input
+                  value={room.name}
+                  onChange={(event) => updateRoom(room.id, { name: event.target.value })}
+                  placeholder="Room name"
+                  className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                />
+
+                <select
+                  value={room.type}
+                  onChange={(event) => updateRoom(room.id, { type: event.target.value })}
+                  className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none"
+                >
+                  {roomTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={room.direction}
+                  onChange={(event) => updateRoom(room.id, { direction: event.target.value as Direction })}
+                  className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none"
+                >
+                  {directionOptions.map((option) => (
+                    <option key={`${room.id}-${option.value || "blank"}`} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={() => removeRoom(room.id)}
+                  className="rounded-xl border border-red-400/30 px-4 py-3 text-sm text-red-200 transition hover:bg-red-500/10"
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
 
-      {/* ── ZONES TAB ── */}
-      {tab === "zones" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div className="card" style={{ marginBottom: 4 }}>
-            <div className="card-tag">✦ 16 Zone Analysis</div>
-            <div className="card-title serif">Tap any zone for detail & remedy</div>
-            <div style={{ fontSize: 11, color: "#605890", lineHeight: 1.7 }}>
-              System: 360° ÷ 16 = 22.5° per zone. Zone strength computed from natal planets in that house + ruling planet position.
-            </div>
-          </div>
-          {/* Weak zones first */}
-          {result.weakZones.length > 0 && (
-            <div style={{ fontSize: 10, color: "#ef4444", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4, paddingLeft: 4 }}>
-              ⚠️ Weak Zones — Need Attention
+          <button
+            onClick={runAnalysis}
+            disabled={loading}
+            className="mt-6 rounded-full bg-amber-400 px-6 py-3 text-sm font-bold text-black transition hover:bg-amber-300 disabled:opacity-60"
+          >
+            {loading ? "Analyzing User Chart..." : "Run User Chart Vastu Analysis"}
+          </button>
+
+          {errorText && (
+            <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200">
+              {errorText}
             </div>
           )}
-          {result.weakZones.map(z => <ZoneCard key={z.dir} zone={z} />)}
+        </section>
 
-          {result.zones.filter(z => z.status === "Average").length > 0 && (
-            <div style={{ fontSize: 10, color: "#c8a030", letterSpacing: "1.5px", textTransform: "uppercase", margin: "8px 0 4px", paddingLeft: 4 }}>
-              ⚡ Average Zones
-            </div>
-          )}
-          {result.zones.filter(z => z.status === "Average").map(z => <ZoneCard key={z.dir} zone={z} />)}
+        {result && (
+          <>
+            <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+              <p className="text-sm text-white/50">
+                Engine Version: {result.engineVersion || "unknown"}
+              </p>
+              <h2 className="mt-2 text-2xl font-bold">Summary</h2>
+              <p className="mt-3 text-white/75">{result.summary || "Analysis complete."}</p>
+            </section>
 
-          {result.strongZones.length > 0 && (
-            <div style={{ fontSize: 10, color: "#22c55e", letterSpacing: "1.5px", textTransform: "uppercase", margin: "8px 0 4px", paddingLeft: 4 }}>
-              ✅ Strong Zones
-            </div>
-          )}
-          {result.strongZones.map(z => <ZoneCard key={z.dir} zone={z} />)}
-        </div>
-      )}
-
-      {/* ── ROOMS TAB ── */}
-      {tab === "rooms" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div className="card">
-            <div className="card-tag">✦ Ideal Room Placement</div>
-            <div className="card-title serif">Where Should Each Room Be?</div>
-            <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.7, marginBottom: 16 }}>
-              MahaVastu room placement based on planetary zone rulership. Place rooms in their ideal directions to amplify zone energy.
-            </div>
-            {result.roomGuide.map((r, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: "1px solid #1c1840", alignItems: "flex-start" }}>
-                <div style={{ fontSize: 22, minWidth: 32, textAlign: "center" }}>
-                  {r.room.includes("Bedroom") ? "🛏️" : r.room.includes("Prayer") ? "🙏" : r.room.includes("Kitchen") ? "🍳" : r.room.includes("Study") ? "📚" : r.room.includes("Children") ? "🧒" : r.room.includes("Guest") ? "🛋️" : r.room.includes("Dining") ? "🍽️" : r.room.includes("Cash") ? "💰" : "🚗"}
+            <section className="grid gap-4 md:grid-cols-5">
+              {Object.entries(scores).map(([key, value]) => (
+                <div
+                  key={key}
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"
+                >
+                  <p className="text-xs uppercase tracking-widest text-white/45">
+                    {key}
+                  </p>
+                  <p className={`mt-2 text-3xl font-bold ${scoreColor(Number(value || 0))}`}>
+                    {String(value ?? 0)}
+                  </p>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 15, fontWeight: 600, color: "#f0e8d0", marginBottom: 3 }}>{r.room}</div>
-                  <div style={{ fontSize: 12, color: "#c8a030", marginBottom: 4 }}>Ideal: {r.idealDir}</div>
-                  <div style={{ fontSize: 11, color: "#605890", lineHeight: 1.7 }}>{r.reason}</div>
+              ))}
+            </section>
+
+            <section className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-3xl border border-green-400/20 bg-green-500/5 p-6">
+                <h2 className="text-2xl font-bold text-green-200">Strengths</h2>
+                <div className="mt-4 space-y-4">
+                  {strengths.length === 0 && (
+                    <p className="text-white/60">No major strengths detected.</p>
+                  )}
+
+                  {strengths.map((item, index) => (
+                    <div
+                      key={`${item.title}-${index}`}
+                      className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                    >
+                      <p className="font-semibold">{item.title}</p>
+                      <p className="mt-2 text-sm text-white/65">{item.explanation}</p>
+                      <p className="mt-2 text-xs text-green-200">
+                        Score: {item.score}/10
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* House-Direction map */}
-          <div className="card">
-            <div className="card-tag">✦ House → Direction Mapping</div>
-            <div className="card-title serif">Your Planets in Each Direction</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 8 }}>
-              {result.houseMap.map(h => (
-                <div key={h.house} style={{ background: "#08051a", borderRadius: 8, padding: "10px 12px", border: "1px solid #1c1840" }}>
-                  <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 13, fontWeight: 600, color: "#c8a030", marginBottom: 3 }}>
-                    H{h.house} → {h.dir}
-                  </div>
-                  <div style={{ fontSize: 11, color: h.planets.length ? "#c8c0a8" : "#3a3060" }}>
-                    {h.planets.length ? h.planets.join(", ") : "Empty"}
-                  </div>
+              <div className="rounded-3xl border border-red-400/20 bg-red-500/5 p-6">
+                <h2 className="text-2xl font-bold text-red-200">Defects</h2>
+                <div className="mt-4 space-y-4">
+                  {defects.length === 0 && (
+                    <p className="text-white/60">No major defects detected.</p>
+                  )}
+
+                  {defects.map((item, index) => (
+                    <div
+                      key={`${item.title}-${index}`}
+                      className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                    >
+                      <p className="font-semibold">{item.title}</p>
+                      <p className="mt-2 text-sm text-white/65">{item.explanation}</p>
+                      <p className="mt-2 text-xs text-red-200">
+                        Severity: {item.severity}/10
+                      </p>
+                      {item.remedies.length > 0 && (
+                        <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/60">
+                          {item.remedies.map((remedy) => (
+                            <li key={remedy}>{remedy}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+              </div>
+            </section>
 
-      {/* ── PSYCH TAB ── */}
-      {tab === "psych" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div className="card">
-            <div className="card-tag">✦ Psychological-Vastu Bridge</div>
-            <div className="card-title serif">How Your Chart Shapes Your Space</div>
-            <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.8, marginBottom: 16 }}>
-              Each planetary zone corresponds to a psychological pattern. Weak zones don&apos;t just affect your home — they reflect behavioral and mental tendencies that need healing.
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {result.psychBridge.map((insight, i) => (
-                <div key={i} style={{
-                  background: "rgba(200,160,48,0.04)", border: "1px solid rgba(200,160,48,0.12)",
-                  borderRadius: 10, padding: "12px 14px", fontSize: 12, color: "#c8c0a8", lineHeight: 1.8,
-                }}>
-                  • {insight}
-                </div>
-              ))}
-            </div>
-          </div>
+            <section className="rounded-3xl border border-amber-400/20 bg-amber-500/5 p-6">
+              <h2 className="text-2xl font-bold text-amber-200">Recommendations</h2>
 
-          {/* Scientific note */}
-          <div className="card" style={{ borderColor: "rgba(6,182,212,0.2)" }}>
-            <div className="card-tag" style={{ color: "#06b6d4" }}>🔬 Scientific Approach</div>
-            <div className="card-title serif">Why Vastu Works Psychologically</div>
-            <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.9 }}>
-              Zone weaknesses correlate with electromagnetic field imbalances in corresponding building areas. Heavy objects, electronics, or structural cuts in specific zones amplify astrological planetary pressures — creating measurable behavioral and emotional patterns in inhabitants.
-            </div>
-            <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { planet:"NE Zone", insight:"Brain waves, morning light, serotonin regulation — affects clarity & spiritual receptivity." },
-                { planet:"SW Zone", insight:"Earth's gravitational center in a building — affects stability, relationships & sense of security." },
-                { planet:"North Zone", insight:"Magnetic north — affects iron in blood, mental alertness & financial decision-making." },
-                { planet:"SE Zone", insight:"Fire/heat zone — affects digestion, metabolism & action drive when used as kitchen." },
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", gap: 10 }}>
-                  <span style={{ color: "#06b6d4", fontSize: 13, minWidth: 80, fontFamily: "Cormorant Garamond,serif", fontWeight: 600 }}>{item.planet}</span>
-                  <span style={{ fontSize: 11, color: "#605890", lineHeight: 1.7 }}>{item.insight}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── ALERTS TAB ── */}
-      {tab === "alerts" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div className="card">
-            <div className="card-tag">✦ Transit Zone Alerts</div>
-            <div className="card-title serif">Current Planetary Pressure on Zones</div>
-            <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.7, marginBottom: 14 }}>
-              Natal planet positions create permanent zone pressure. Benefics energize zones; malefics create stress.
-            </div>
-            {result.transitAlerts.length === 0 ? (
-              <div style={{ textAlign: "center", padding: 24, color: "#605890", fontSize: 13 }}>No critical zone alerts detected.</div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {result.transitAlerts.map((a, i) => (
-                  <div key={i} style={{
-                    background: a.positive ? "rgba(34,197,94,0.05)" : "rgba(239,68,68,0.05)",
-                    border: `1px solid ${a.positive ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)"}`,
-                    borderRadius: 10, padding: "12px 14px",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: a.positive ? "#22c55e" : "#ef4444" }}>
-                        {a.positive ? "✅" : "⚠️"} {a.planet}
-                      </span>
-                      <span style={{ fontSize: 11, color: "#605890" }}>→ {a.zone} Zone</span>
-                      <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: a.positive ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", color: a.positive ? "#22c55e" : "#ef4444" }}>
-                        {a.positive ? "ENERGIZING" : "PRESSURE"}
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {recommendations.map((item, index) => (
+                  <div
+                    key={`${item.title}-${index}`}
+                    className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-semibold">{item.title}</p>
+                      <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
+                        {item.priority}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11, color: "#c8c0a8", marginBottom: 6 }}>{a.domain} — {a.effect}</div>
-                    <div style={{ fontSize: 11, color: a.positive ? "#22c55e" : "#f59e0b", lineHeight: 1.7 }}>
-                      💊 {a.remedy}
-                    </div>
+
+                    <p className="mt-2 text-xs uppercase tracking-widest text-white/40">
+                      {item.system}
+                    </p>
+
+                    {item.requiresKundli && (
+                      <p className="mt-2 text-xs text-amber-200">
+                        Kundli validation required
+                      </p>
+                    )}
+
+                    <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/65">
+                      {item.steps.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-
-          {/* General Vastu principles */}
-          <div className="card">
-            <div className="card-tag">✦ Universal Vastu Rules</div>
-            <div className="card-title serif">Always Follow These</div>
-            {[
-              { rule:"NE must always be kept clean & sacred", why:"Ishan Kona — Shiva's zone. Blocks here create health & wealth issues." },
-              { rule:"SW must be heaviest room", why:"SW anchors the house. Light/open SW creates instability in relationships." },
-              { rule:"No toilet in NE or North", why:"Destroys Mercury (wealth) & Jupiter (wisdom) zone energy." },
-              { rule:"Main door ideally in N, NE, or E", why:"These are benefic zones — Kubera, Shiva, Indra energies welcome prosperity." },
-              { rule:"Kitchen in SE — never NE or SW", why:"Fire in water/earth zones creates elemental conflict & health issues." },
-              { rule:"Master bedroom in SW — head pointing South", why:"Earth's magnetic field aligns with body when sleeping with head South." },
-            ].map((item, i) => (
-              <div key={i} style={{ padding: "10px 0", borderBottom: "1px solid #1c1840" }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#c8a030", marginBottom: 3 }}>✦ {item.rule}</div>
-                <div style={{ fontSize: 11, color: "#605890", lineHeight: 1.7 }}>{item.why}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      </PremiumFeature>
-    </div>
+            </section>
+          </>
+        )}
+      </div>
+    </main>
   );
 }

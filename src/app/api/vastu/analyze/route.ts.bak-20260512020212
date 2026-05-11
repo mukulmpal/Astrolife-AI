@@ -1,0 +1,23 @@
+import { NextRequest, NextResponse } from "next/server";
+import { analyzeVastuProperty } from "@/lib/vastu-intelligence";
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+
+    if (!body || !Array.isArray(body.rooms)) {
+      return NextResponse.json(
+        { error: "Invalid payload. Expected { rooms: [{ type, direction }] }." },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(analyzeVastuProperty(body));
+  } catch (error) {
+    console.error("Vastu analyze API error:", error);
+    return NextResponse.json(
+      { error: "Failed to analyze Vastu property." },
+      { status: 500 }
+    );
+  }
+}

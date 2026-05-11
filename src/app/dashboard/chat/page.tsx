@@ -46,7 +46,10 @@ export default function ChatPage() {
         }),
       });
 
-      if (!response.ok) throw new Error("Chat failed");
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        throw new Error(errorText || `Chat failed with status ${response.status}`);
+      }
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();

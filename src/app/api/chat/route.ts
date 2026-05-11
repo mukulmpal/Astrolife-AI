@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAgent } from "@/lib/ai-agents";
-import { calculateChart } from "@/lib/astro-engine/calculations";
 import { streamText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
+
+type ChatMessage = {
+  role: "user" | "assistant" | "system";
+  content: string;
+};
 
 export async function POST(req: Request) {
   try {
@@ -29,7 +33,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: anthropic("claude-3-5-sonnet-20241022"),
       system: systemPrompt,
-      messages: messages.map((msg: any) => ({
+      messages: messages.map((msg: ChatMessage) => ({
         role: msg.role,
         content: msg.content,
       })),
@@ -37,8 +41,9 @@ export async function POST(req: Request) {
     });
 
     return result.toTextStreamResponse();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Chat error:", error);
-    return new Response(`Error: ${error.message}`, { status: 500 });
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return new Response(`Error: ${message}`, { status: 500 });
   }
 }

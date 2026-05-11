@@ -1,0 +1,48 @@
+# AstroLife Advanced Vastu Engine v2
+
+Import:
+
+```ts
+import { analyzeVastuProperty } from "@/lib/vastu-intelligence";
+```
+
+Example:
+
+```ts
+const result = analyzeVastuProperty({
+  propertyType: "home",
+  facing: "E",
+  rooms: [
+    { type: "kitchen", direction: "SE" },
+    { type: "toilet", direction: "NE" },
+    { type: "master_bedroom", direction: "SW" },
+    { type: "bedroom", direction: "SE" }
+  ],
+  kundli: {
+    weakPlanets: ["Jupiter"],
+    currentMahadasha: "Jupiter",
+    lalKitabHouses: { "1": [], "7": ["Jupiter"] }
+  },
+  features: {
+    northOpen: true,
+    eastOpen: true,
+    southWestHeavy: true,
+    brahmasthanOpen: false
+  },
+  measurements: {
+    shape: "rectangle",
+    lengthHasta: 15,
+    widthHasta: 7
+  },
+  options: {
+    includeLalKitab: true,
+    includeConstruction: true
+  }
+});
+```
+
+Policy:
+- Classical Vastu runs without kundli.
+- Lal Kitab Makan Vastu is separate and kundli-gated.
+- Symbolic remedies are not generic.
+- MahaVastu remedies should be secondary no-demolition support.

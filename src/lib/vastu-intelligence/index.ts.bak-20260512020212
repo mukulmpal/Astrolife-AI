@@ -1,0 +1,675 @@
+export type VastuSystem =
+  | "classical_vastu"
+  | "modern_practical_vastu"
+  | "mahavastu_remedy"
+  | "lal_kitab_makan_vastu";
+
+export type DirectionCode = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "CENTER";
+export type PlanetName = "Sun" | "Moon" | "Mars" | "Mercury" | "Jupiter" | "Venus" | "Saturn" | "Rahu" | "Ketu";
+export type RoomType =
+  | "main_entrance" | "kitchen" | "bedroom" | "master_bedroom" | "kids_room"
+  | "toilet" | "bathroom" | "pooja_room" | "study_room" | "staircase"
+  | "balcony" | "underground_water" | "overhead_tank" | "septic_tank"
+  | "store_room" | "office_cabin" | "locker" | "living_room" | "dining_room"
+  | "guest_room" | "open_space" | "other";
+
+export type LifeDomain =
+  | "wealth" | "health" | "relationship" | "career" | "children"
+  | "spiritual" | "business" | "mental_peace" | "construction" | "overall";
+
+export interface VastuSourceTag {
+  system: VastuSystem;
+  authority: "primary" | "secondary" | "experimental";
+  confidence: "high" | "medium" | "low" | "conditional";
+  sourceName: string;
+  note?: string;
+}
+
+export interface RoomPlacement {
+  type: RoomType;
+  direction: DirectionCode | string;
+  name?: string;
+}
+
+export interface KundliContext {
+  weakPlanets?: PlanetName[];
+  afflictedPlanets?: PlanetName[];
+  currentMahadasha?: PlanetName;
+  currentAntardasha?: PlanetName;
+  lalKitabHouses?: Record<string, PlanetName[]>;
+  sunSevereAffliction?: boolean;
+}
+
+export interface PropertyMeasurements {
+  shape?: "square" | "rectangle" | "triangular" | "irregular" | "cut" | "flat_many_corners";
+  lengthHasta?: number;
+  widthHasta?: number;
+  ownerHastaInches?: number;
+}
+
+export interface ConstructionContext {
+  materialZones?: DirectionCode[];
+  waterPitZone?: DirectionCode;
+  southWestIsLow?: boolean;
+  northEastIsCut?: boolean;
+  brahmasthanHasLiftOrStairs?: boolean;
+}
+
+export interface PropertyFeatures {
+  northOpen?: boolean;
+  eastOpen?: boolean;
+  southWestHeavy?: boolean;
+  brahmasthanOpen?: boolean;
+  northNeighborHigher?: boolean;
+  southNeighborLower?: boolean;
+  climate?: "hot" | "temperate" | "cold" | "mountain";
+}
+
+export interface VastuAnalyzeInput {
+  propertyType?: "home" | "flat" | "office" | "shop" | "factory" | "hotel" | "plot" | "other";
+  facing?: DirectionCode | string;
+  rooms: RoomPlacement[];
+  kundli?: KundliContext;
+  measurements?: PropertyMeasurements;
+  construction?: ConstructionContext;
+  features?: PropertyFeatures;
+  options?: {
+    includeLalKitab?: boolean;
+    includeConstruction?: boolean;
+    strictClassicalMode?: boolean;
+  };
+}
+
+export interface VastuDefect {
+  code: string;
+  title: string;
+  room?: RoomType;
+  direction?: DirectionCode;
+  severity: number;
+  domains: LifeDomain[];
+  explanation: string;
+  source: VastuSourceTag;
+  remedies: string[];
+  requiresKundli?: boolean;
+  isContradictionAware?: boolean;
+}
+
+export interface VastuStrength {
+  code: string;
+  title: string;
+  room?: RoomType;
+  direction?: DirectionCode;
+  score: number;
+  explanation: string;
+  source: VastuSourceTag;
+}
+
+export interface VastuScores {
+  overall: number;
+  wealth: number;
+  health: number;
+  relationship: number;
+  career: number;
+  children: number;
+  spiritual: number;
+  business: number;
+  mentalPeace: number;
+  construction: number;
+}
+
+export interface VastuRecommendation {
+  title: string;
+  priority: "critical" | "high" | "medium" | "low";
+  system: VastuSystem;
+  steps: string[];
+  requiresKundli?: boolean;
+  caution?: string;
+}
+
+export interface VastuAnalyzeResult {
+  engineVersion: string;
+  scores: VastuScores;
+  strengths: VastuStrength[];
+  defects: VastuDefect[];
+  recommendations: VastuRecommendation[];
+  lalKitab?: unknown;
+  construction?: unknown;
+  summary: string;
+  disclaimers: string[];
+}
+
+export const VASTU_ENGINE_VERSION = "2.0.0-astrolife-advanced";
+
+const SOURCE_CLASSICAL: VastuSourceTag = {
+  system: "classical_vastu",
+  authority: "primary",
+  confidence: "high",
+  sourceName: "Samarangana Sutradhara / Vishwakarma Prakash / Classical Vastu corpus",
+};
+
+const SOURCE_MODERN: VastuSourceTag = {
+  system: "modern_practical_vastu",
+  authority: "secondary",
+  confidence: "medium",
+  sourceName: "Saral/Advance Vaastu + practical Vastu",
+};
+
+const SOURCE_LAL_KITAB: VastuSourceTag = {
+  system: "lal_kitab_makan_vastu",
+  authority: "experimental",
+  confidence: "conditional",
+  sourceName: "Lal Kitab Makan Vastu transcript layer",
+  note: "Keep separate from classical Vastu; symbolic remedies require kundli validation.",
+};
+
+const DIRECTION_ALIASES: Record<string, DirectionCode> = {
+  n: "N", north: "N",
+  ne: "NE", northeast: "NE", "north-east": "NE",
+  e: "E", east: "E",
+  se: "SE", southeast: "SE", "south-east": "SE",
+  s: "S", south: "S",
+  sw: "SW", southwest: "SW", "south-west": "SW",
+  w: "W", west: "W",
+  nw: "NW", northwest: "NW", "north-west": "NW",
+  center: "CENTER", centre: "CENTER", brahmasthan: "CENTER", markaz: "CENTER",
+};
+
+export function normalizeDirection(value: DirectionCode | string | undefined): DirectionCode {
+  if (!value) return "CENTER";
+  const key = String(value).trim().toLowerCase();
+  return DIRECTION_ALIASES[key] ?? (String(value).toUpperCase() as DirectionCode);
+}
+
+const DIRECTION_PLANET: Record<DirectionCode, PlanetName | undefined> = {
+  N: "Mercury",
+  NE: "Jupiter",
+  E: "Sun",
+  SE: "Mars",
+  S: "Mars",
+  SW: "Saturn",
+  W: "Saturn",
+  NW: "Moon",
+  CENTER: undefined,
+};
+
+interface RoomRule {
+  room: RoomType;
+  direction: DirectionCode;
+  suitability: number;
+  severityIfWrong: number;
+  domains: LifeDomain[];
+  interpretation: string;
+  remedies: string[];
+  source: VastuSourceTag;
+}
+
+const ROOM_RULES: RoomRule[] = [
+  // Entrance
+  { room: "main_entrance", direction: "NE", suitability: 10, severityIfWrong: 0, domains: ["wealth", "spiritual", "career"], interpretation: "NE entrance supports opportunity, clarity and auspicious flow.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "main_entrance", direction: "E", suitability: 9, severityIfWrong: 0, domains: ["health", "career"], interpretation: "East entrance supports sunlight, vitality and recognition.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "main_entrance", direction: "N", suitability: 8, severityIfWrong: 0, domains: ["wealth", "business"], interpretation: "North entrance supports opportunity and business flow.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "main_entrance", direction: "SW", suitability: 3, severityIfWrong: 7, domains: ["relationship", "wealth", "overall"], interpretation: "SW entrance is a classical caution because it disturbs the stability anchor.", remedies: ["Strengthen SW with weight/stability.", "Keep entrance clean and well-lit.", "Use expert pada-specific review."], source: SOURCE_CLASSICAL },
+
+  // Kitchen
+  { room: "kitchen", direction: "SE", suitability: 10, severityIfWrong: 0, domains: ["health", "wealth"], interpretation: "Kitchen aligns with Agni/fire zone.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "kitchen", direction: "NW", suitability: 7, severityIfWrong: 2, domains: ["business", "health"], interpretation: "NW kitchen is a practical secondary placement.", remedies: ["Ensure ventilation.", "Control fire-water clash."], source: SOURCE_CLASSICAL },
+  { room: "kitchen", direction: "NE", suitability: 2, severityIfWrong: 8, domains: ["mental_peace", "spiritual", "health", "wealth"], interpretation: "Kitchen in NE disturbs the spiritual/water clarity zone.", remedies: ["Shift active cooking to SE if possible.", "Keep NE clean and light.", "Separate fire and water elements."], source: SOURCE_CLASSICAL },
+  { room: "kitchen", direction: "SW", suitability: 3, severityIfWrong: 7, domains: ["relationship", "wealth"], interpretation: "Kitchen in SW heats the stability and relationship zone.", remedies: ["Reduce heat dominance.", "Increase earth stability.", "Avoid clutter."], source: SOURCE_CLASSICAL },
+
+  // Bedrooms
+  { room: "master_bedroom", direction: "SW", suitability: 10, severityIfWrong: 0, domains: ["relationship", "wealth", "overall"], interpretation: "Master bedroom in SW supports stability, authority and grounding.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "master_bedroom", direction: "S", suitability: 8, severityIfWrong: 1, domains: ["relationship", "overall"], interpretation: "South is acceptable when SW is unavailable.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "master_bedroom", direction: "W", suitability: 7, severityIfWrong: 2, domains: ["relationship", "career"], interpretation: "West can work for bedroom in practical layouts.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "master_bedroom", direction: "NE", suitability: 2, severityIfWrong: 8, domains: ["mental_peace", "spiritual", "relationship"], interpretation: "NE master bedroom can disturb the sacred/light zone.", remedies: ["Use NE for cleanliness/meditation.", "Shift sleeping activity if possible."], source: SOURCE_CLASSICAL },
+  { room: "master_bedroom", direction: "SE", suitability: 4, severityIfWrong: 6, domains: ["relationship", "health"], interpretation: "Classical caution: SE fire can disturb sleep/relationship. Lal Kitab may conditionally allow after kundli check.", remedies: ["Cool the fire element.", "Avoid aggressive red overload.", "Check Lal Kitab module before final judgement."], source: SOURCE_CLASSICAL },
+  { room: "bedroom", direction: "SE", suitability: 4, severityIfWrong: 6, domains: ["relationship", "health"], interpretation: "Classical caution: SE bedroom is fire-sensitive; Lal Kitab may allow conditionally.", remedies: ["Use calmer colours.", "Avoid heat/electrical overload."], source: SOURCE_CLASSICAL },
+  { room: "bedroom", direction: "SW", suitability: 9, severityIfWrong: 0, domains: ["relationship", "overall"], interpretation: "SW bedroom is stable and grounding.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "bedroom", direction: "NW", suitability: 7, severityIfWrong: 1, domains: ["relationship", "career"], interpretation: "NW can suit guest or temporary bedroom.", remedies: [], source: SOURCE_CLASSICAL },
+
+  // Toilet
+  { room: "toilet", direction: "NW", suitability: 9, severityIfWrong: 0, domains: ["health", "overall"], interpretation: "NW toilet is generally acceptable.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "toilet", direction: "W", suitability: 7, severityIfWrong: 1, domains: ["health"], interpretation: "West toilet is manageable.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "toilet", direction: "NE", suitability: 0, severityIfWrong: 10, domains: ["spiritual", "mental_peace", "health", "wealth"], interpretation: "NE toilet is critical because it pollutes clarity/spiritual zone.", remedies: ["Keep dry and ventilated.", "Relocate if possible.", "Use no-demolition isolation as secondary support only."], source: SOURCE_CLASSICAL },
+  { room: "toilet", direction: "CENTER", suitability: 0, severityIfWrong: 10, domains: ["health", "overall", "mental_peace"], interpretation: "Toilet in Brahmasthan affects central vitality.", remedies: ["Relocate if possible.", "Keep centre light and dry.", "Expert structural review."], source: SOURCE_CLASSICAL },
+  { room: "toilet", direction: "SW", suitability: 2, severityIfWrong: 8, domains: ["relationship", "wealth", "overall"], interpretation: "SW toilet weakens stability, relationship and authority zone.", remedies: ["Keep dry.", "Apply earth stability correction.", "Avoid leakage."], source: SOURCE_CLASSICAL },
+
+  // Pooja, study, stairs, water
+  { room: "pooja_room", direction: "NE", suitability: 10, severityIfWrong: 0, domains: ["spiritual", "mental_peace"], interpretation: "NE is ideal for pooja and meditation.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "pooja_room", direction: "E", suitability: 8, severityIfWrong: 1, domains: ["spiritual", "health"], interpretation: "East pooja supports sunrise/prana.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "study_room", direction: "NE", suitability: 9, severityIfWrong: 0, domains: ["children", "career", "mental_peace"], interpretation: "NE supports clarity and learning.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "study_room", direction: "E", suitability: 8, severityIfWrong: 1, domains: ["children", "health"], interpretation: "East supports learning with light.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "staircase", direction: "SW", suitability: 8, severityIfWrong: 1, domains: ["overall"], interpretation: "SW can hold staircase load if designed well.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "staircase", direction: "NE", suitability: 2, severityIfWrong: 8, domains: ["spiritual", "mental_peace"], interpretation: "NE staircase loads the clarity zone.", remedies: ["Keep NE light.", "Avoid storage under NE stairs."], source: SOURCE_CLASSICAL },
+  { room: "staircase", direction: "CENTER", suitability: 1, severityIfWrong: 9, domains: ["health", "overall"], interpretation: "Staircase in Brahmasthan blocks central distribution.", remedies: ["Declutter.", "Light the centre.", "Structural review."], source: SOURCE_CLASSICAL },
+  { room: "underground_water", direction: "NE", suitability: 10, severityIfWrong: 0, domains: ["wealth", "health", "spiritual"], interpretation: "NE underground water supports flow and purity.", remedies: [], source: SOURCE_CLASSICAL },
+  { room: "underground_water", direction: "SW", suitability: 1, severityIfWrong: 9, domains: ["relationship", "wealth", "overall"], interpretation: "SW underground water weakens earth/stability anchor.", remedies: ["Relocate if possible.", "Increase SW weight."], source: SOURCE_CLASSICAL },
+  { room: "open_space", direction: "CENTER", suitability: 10, severityIfWrong: 0, domains: ["health", "overall", "mental_peace"], interpretation: "Open Brahmasthan supports circulation and harmony.", remedies: [], source: SOURCE_CLASSICAL },
+];
+
+export const LAL_KITAB_KHANA_DIRECTION_MAP: Record<number, string[]> = {
+  1: ["EAST"],
+  2: ["NORTH_WEST"],
+  3: ["SOUTH"],
+  4: ["NORTH_EAST", "EAST_END"],
+  6: ["NORTH", "BASEMENT"],
+  7: ["SOUTH_WEST"],
+  8: ["SOUTH_END", "SOUTH_WALL"],
+  9: ["BRAHMASTHAN", "MARKAZ", "CENTER"],
+  10: ["WEST"],
+  11: ["WEST_END"],
+  12: ["SOUTH_EAST", "ROOF"],
+};
+
+const LAL_KITAB_DIRECTION_TO_KHANA: Partial<Record<DirectionCode, number[]>> = {
+  E: [1],
+  NW: [2],
+  S: [3, 8],
+  NE: [4],
+  N: [6],
+  SW: [7],
+  CENTER: [9],
+  W: [10, 11],
+  SE: [12],
+};
+
+export const LAL_KITAB_FIXED_ROOM_PLANET_MAP: Partial<Record<RoomType | string, PlanetName | "Central Energy">> = {
+  kitchen: "Mars",
+  toilet: "Rahu",
+  bathroom: "Rahu",
+  bedroom: "Venus",
+  master_bedroom: "Venus",
+  underground_water: "Moon",
+  overhead_tank: "Moon",
+  septic_tank: "Rahu",
+  staircase: "Saturn",
+  store_room: "Saturn",
+  locker: "Venus",
+  pooja_room: "Jupiter",
+  open_space: "Central Energy",
+};
+
+export function calculateMakanAukat(lengthHasta?: number, widthHasta?: number, shape?: string) {
+  if (!lengthHasta || !widthHasta) {
+    return { isApplicable: false, reason: "Length and width in hasta are required." };
+  }
+  if (shape && !["square", "rectangle"].includes(shape)) {
+    return { isApplicable: false, reason: "Makan Aukat applies only to square/rectangular four-corner properties." };
+  }
+  const raw = ((lengthHasta + widthHasta) * 3) - 1;
+  const mod = raw % 8;
+  const remainder = mod === 0 ? 8 : mod;
+  const map: Record<number, { pair: string[]; text: string }> = {
+    1: { pair: ["Sun", "Jupiter"], text: "Auspicious; royal/supportive effect." },
+    2: { pair: ["Jupiter", "Venus"], text: "Problematic; needs correction and discipline." },
+    3: { pair: ["Jupiter", "Mars"], text: "Generally useful; energetic growth potential." },
+    4: { pair: ["Moon", "Saturn"], text: "Problematic; emotional heaviness/delay." },
+    5: { pair: ["Sun", "Jupiter"], text: "Auspicious; dharmic support." },
+    6: { pair: ["Sun", "Saturn"], text: "Problematic; authority-delay pressure." },
+    7: { pair: ["Moon", "Venus"], text: "Auspicious; comfort/relationship support." },
+    8: { pair: ["Mars", "Saturn"], text: "Harsh/high-risk; correction recommended." },
+  };
+  const good = [1, 3, 5, 7].includes(remainder);
+  return {
+    isApplicable: true,
+    raw,
+    remainder,
+    isAuspicious: good,
+    isInauspicious: !good,
+    planetPair: map[remainder].pair,
+    interpretation: map[remainder].text,
+    suggestedRemedy: good ? [] : [
+      "Ketu khana 6 style remedy after kundli review.",
+      "Transcript example: 3 bananas for 43 days in temple.",
+      "Dog feeding/service as gentle support.",
+    ],
+  };
+}
+
+export function canRecommendEastSunSymbol(kundli?: KundliContext) {
+  const fallback = [
+    "Keep East clean and bright.",
+    "Allow natural morning light.",
+    "Do not install symbolic Sun activation without kundli check.",
+  ];
+  if (!kundli) {
+    return { remedyId: "LK_EAST_SUN_SYMBOL", allowed: false, reason: "Kundli required before East Sun/Ram/Copper Sun remedy.", fallback };
+  }
+  const khana1 = kundli.lalKitabHouses?.["1"] ?? [];
+  const blocked = khana1.filter((p) => ["Rahu", "Ketu", "Saturn", "Venus"].includes(p));
+  if (blocked.length) {
+    return { remedyId: "LK_EAST_SUN_SYMBOL", allowed: false, reason: `Avoid because khana 1 contains ${blocked.join(", ")}.`, fallback };
+  }
+  if (kundli.sunSevereAffliction || kundli.afflictedPlanets?.includes("Sun")) {
+    return { remedyId: "LK_EAST_SUN_SYMBOL", allowed: false, reason: "Avoid due to severe Sun affliction.", fallback };
+  }
+  return { remedyId: "LK_EAST_SUN_SYMBOL", allowed: true, reason: "Khana 1 appears safe for symbolic Sun activation.", fallback: [] };
+}
+
+export function analyzeConstructionVastu(context?: ConstructionContext) {
+  const findings: Array<{ code: string; severity: number; explanation: string; recommendation: string }> = [];
+  let score = 100;
+  if (!context) return { findings, score };
+  if (context.materialZones?.some((z) => ["N", "NE", "E"].includes(z))) {
+    findings.push({
+      code: "CONSTRUCTION_MATERIAL_IN_N_E_NE",
+      severity: 7,
+      explanation: "Heavy material in North/East/NE can block opportunity/light during construction.",
+      recommendation: "Shift cement, bricks, sand, iron and heavy material to South/West/SW.",
+    });
+    score -= 25;
+  }
+  if (context.waterPitZone && !["NE", "N", "E"].includes(context.waterPitZone)) {
+    findings.push({
+      code: "CONSTRUCTION_WATER_PIT_NOT_NE",
+      severity: 5,
+      explanation: "Temporary water pit/tank is better in NE/N/E when possible.",
+      recommendation: "Prefer NE water support if layout allows.",
+    });
+    score -= 12;
+  }
+  if (context.southWestIsLow) {
+    findings.push({
+      code: "SW_LOW_DURING_CONSTRUCTION",
+      severity: 8,
+      explanation: "Low/weak SW can delay stability and completion.",
+      recommendation: "Increase filling, height, mass or heaviness in SW.",
+    });
+    score -= 30;
+  }
+  if (context.northEastIsCut) {
+    findings.push({
+      code: "NE_CUT_DURING_CONSTRUCTION",
+      severity: 8,
+      explanation: "NE cut weakens clarity and intake.",
+      recommendation: "Correct/extend/balance NE where practical.",
+    });
+    score -= 28;
+  }
+  if (context.brahmasthanHasLiftOrStairs) {
+    findings.push({
+      code: "BRAHMASTHAN_LIFT_STAIRS",
+      severity: 9,
+      explanation: "Lift/stairs in central Brahmasthan can block central distribution.",
+      recommendation: "Keep centre light/open; use expert architectural correction if impossible.",
+    });
+    score -= 35;
+  }
+  return { findings, score: Math.max(0, Math.round(score)) };
+}
+
+export function analyzeLalKitabMakanVastu(input: { rooms?: RoomPlacement[]; kundli?: KundliContext; measurements?: PropertyMeasurements; features?: PropertyFeatures }) {
+  const findings: unknown[] = [];
+  const notes = [
+    "Lal Kitab Makan Vastu is separate from Classical Vastu.",
+    "Symbolic remedies are kundli-gated; do not recommend generically.",
+  ];
+
+  for (const room of input.rooms ?? []) {
+    const direction = normalizeDirection(room.direction);
+    const khanas = LAL_KITAB_DIRECTION_TO_KHANA[direction] ?? [];
+    const planet = LAL_KITAB_FIXED_ROOM_PLANET_MAP[room.type];
+
+    if (direction === "SE" && (room.type === "bedroom" || room.type === "master_bedroom")) {
+      findings.push({
+        code: "LK_SE_BEDROOM_CONDITIONAL",
+        title: "SE bedroom is conditional in Lal Kitab",
+        severity: 4,
+        requiresKundli: true,
+        explanation: "Classical Vastu cautions SE bedroom, but Lal Kitab maps SE to khana 12 where Venus logic can support bedroom after kundli validation.",
+        recommendations: ["Do not call universally wrong.", "Check Venus/Mars/Jupiter/Rahu/Ketu/Saturn.", "Keep separate from classical Agni-zone analysis."],
+      });
+    }
+
+    if (room.type === "kitchen" && direction === "SE") {
+      findings.push({
+        code: "LK_SE_KITCHEN_SUPPORTIVE",
+        title: "SE kitchen supportive",
+        severity: 1,
+        requiresKundli: false,
+        explanation: "Kitchen is fixed Mars and SE/khana 12 supports controlled fire if layout is clean.",
+        recommendations: ["Maintain clean fire zone.", "Avoid fire-water clash."],
+      });
+    }
+
+    if (room.type === "toilet") {
+      findings.push({
+        code: `LK_TOILET_${direction}`,
+        title: `Toilet creates fixed Rahu in ${direction}`,
+        severity: ["NE", "SW", "CENTER"].includes(direction) ? 9 : 5,
+        requiresKundli: true,
+        explanation: `Toilet acts as fixed Rahu anchor. Direction khana(s): ${khanas.join(", ") || "unknown"}.`,
+        recommendations: ["Do not rely only on symbolic remedies.", "Keep dry and ventilated.", "Check kundli before metal/colour/light remedies."],
+      });
+    }
+
+    if (planet) notes.push(`${room.name ?? room.type} in ${direction} activates fixed room-planet: ${planet}.`);
+  }
+
+  const safety = canRecommendEastSunSymbol(input.kundli);
+  const makanAukat = input.measurements?.lengthHasta && input.measurements?.widthHasta
+    ? calculateMakanAukat(input.measurements.lengthHasta, input.measurements.widthHasta, input.measurements.shape)
+    : undefined;
+
+  return {
+    system: "lal_kitab_makan_vastu",
+    enabled: true,
+    findings,
+    safeSymbolicRemedies: safety.allowed ? [safety.remedyId] : [],
+    blockedSymbolicRemedies: safety.allowed ? [] : [`${safety.remedyId}: ${safety.reason}`],
+    notes,
+    makanAukat,
+  };
+}
+
+function emptyScores(): VastuScores {
+  return { overall: 100, wealth: 100, health: 100, relationship: 100, career: 100, children: 100, spiritual: 100, business: 100, mentalPeace: 100, construction: 100 };
+}
+
+function clamp(n: number, min = 0, max = 100) {
+  return Math.max(min, Math.min(max, Math.round(n)));
+}
+
+function scoreKey(domain: LifeDomain): keyof VastuScores | null {
+  const map: Record<string, keyof VastuScores> = {
+    wealth: "wealth",
+    health: "health",
+    relationship: "relationship",
+    career: "career",
+    children: "children",
+    spiritual: "spiritual",
+    business: "business",
+    mental_peace: "mentalPeace",
+    construction: "construction",
+    overall: "overall",
+  };
+  return map[domain] ?? null;
+}
+
+function astroBoost(base: number, direction: DirectionCode, kundli?: KundliContext) {
+  if (!kundli) return { severity: base, notes: [] as string[] };
+  let severity = base;
+  const notes: string[] = [];
+  const planet = DIRECTION_PLANET[direction];
+
+  if (planet && kundli.weakPlanets?.includes(planet)) {
+    severity *= 1.25;
+    notes.push(`${planet} is weak, so ${direction} defect is amplified.`);
+  }
+  if (planet && kundli.afflictedPlanets?.includes(planet)) {
+    severity *= 1.25;
+    notes.push(`${planet} is afflicted, so ${direction} defect is amplified.`);
+  }
+  if (planet && kundli.currentMahadasha === planet) {
+    severity *= 1.2;
+    notes.push(`${planet} mahadasha activates this Vastu zone.`);
+  }
+  if (planet && kundli.currentAntardasha === planet) {
+    severity *= 1.1;
+    notes.push(`${planet} antardasha adds timing sensitivity.`);
+  }
+  return { severity: Math.min(10, Math.round(severity)), notes };
+}
+
+function addPenalty(scores: VastuScores, domains: LifeDomain[], severity: number) {
+  const penalty = Math.round(severity * 4.2);
+  for (const domain of domains) {
+    const key = scoreKey(domain);
+    if (key) scores[key] = clamp(scores[key] - penalty);
+  }
+  scores.overall = clamp(scores.overall - Math.round(penalty * 0.6));
+}
+
+function recommendationFromDefect(defect: VastuDefect): VastuRecommendation {
+  return {
+    title: defect.title,
+    priority: defect.severity >= 9 ? "critical" : defect.severity >= 7 ? "high" : "medium",
+    system: defect.source.system,
+    steps: defect.remedies.length ? defect.remedies : ["Keep the zone clean, light, dry and clutter-free.", "Prefer functional relocation if possible."],
+    requiresKundli: defect.requiresKundli,
+  };
+}
+
+export function analyzeVastuProperty(input: VastuAnalyzeInput): VastuAnalyzeResult {
+  const scores = emptyScores();
+  const strengths: VastuStrength[] = [];
+  const defects: VastuDefect[] = [];
+  const recommendations: VastuRecommendation[] = [];
+
+  for (const room of input.rooms ?? []) {
+    const direction = normalizeDirection(room.direction);
+    const rule = ROOM_RULES.find((r) => r.room === room.type && r.direction === direction);
+    if (!rule) continue;
+
+    if (rule.suitability >= 7) {
+      strengths.push({
+        code: `${room.type}_${direction}_GOOD`.toUpperCase(),
+        title: `${room.name ?? room.type} in ${direction} is supportive`,
+        room: room.type,
+        direction,
+        score: rule.suitability,
+        explanation: rule.interpretation,
+        source: rule.source,
+      });
+      continue;
+    }
+
+    if (rule.severityIfWrong >= 5 || rule.suitability <= 4) {
+      const boosted = astroBoost(rule.severityIfWrong, direction, input.kundli);
+      const defect: VastuDefect = {
+        code: `${room.type}_${direction}_DEFECT`.toUpperCase(),
+        title: `${room.name ?? room.type} in ${direction} needs correction`,
+        room: room.type,
+        direction,
+        severity: boosted.severity,
+        domains: rule.domains,
+        explanation: [rule.interpretation, ...boosted.notes].join(" "),
+        source: rule.source,
+        remedies: rule.remedies,
+        isContradictionAware: (room.type === "bedroom" || room.type === "master_bedroom") && direction === "SE",
+      };
+      defects.push(defect);
+      addPenalty(scores, rule.domains, boosted.severity);
+    }
+  }
+
+  if (input.features?.northOpen === false) {
+    const d: VastuDefect = { code: "NORTH_BLOCKED", title: "North side is blocked/heavy", direction: "N", severity: 7, domains: ["wealth", "business", "career"], explanation: "North is linked with opportunity and flow; heavy blockage reduces business/cash movement.", source: SOURCE_CLASSICAL, remedies: ["Open/declutter North.", "Improve light and movement.", "Avoid heavy storage in North."] };
+    defects.push(d); addPenalty(scores, d.domains, d.severity);
+  }
+  if (input.features?.eastOpen === false) {
+    const d: VastuDefect = { code: "EAST_BLOCKED", title: "East side is blocked/dark", direction: "E", severity: 7, domains: ["health", "career", "mental_peace"], explanation: "East supports morning light, vitality and positivity.", source: SOURCE_CLASSICAL, remedies: ["Improve morning light.", "Keep East clean.", "Avoid heavy blockage."] };
+    defects.push(d); addPenalty(scores, d.domains, d.severity);
+  }
+  if (input.features?.southWestHeavy === false) {
+    const d: VastuDefect = { code: "SW_WEAK", title: "South-West is weak/low/open", direction: "SW", severity: 8, domains: ["relationship", "wealth", "overall"], explanation: "SW is the stability anchor. Weak SW reduces grounding and authority.", source: SOURCE_CLASSICAL, remedies: ["Add stable/heavy storage in SW.", "Keep SW closed/protected.", "Avoid water leakage or pits in SW."] };
+    defects.push(d); addPenalty(scores, d.domains, d.severity);
+  }
+  if (input.features?.brahmasthanOpen === false) {
+    const d: VastuDefect = { code: "BRAHMASTHAN_BLOCKED", title: "Brahmasthan is blocked", direction: "CENTER", severity: 9, domains: ["health", "mental_peace", "overall"], explanation: "Centre distributes space energy. Heavy blockage, toilet, lift or staircase here is high priority.", source: SOURCE_CLASSICAL, remedies: ["Declutter centre.", "Increase light/free movement.", "Avoid heavy storage in centre."] };
+    defects.push(d); addPenalty(scores, d.domains, d.severity);
+  }
+  if (input.features?.climate === "cold" || input.features?.climate === "mountain") {
+    strengths.push({ code: "CLIMATE_EXCEPTION_AWARENESS", title: "Climate exception applied", score: 7, explanation: "In cold/mountain regions, South sunlight/opening may be practical and should not be penalized rigidly.", source: SOURCE_MODERN });
+  }
+
+  const lalKitab = (input.options?.includeLalKitab || input.kundli || input.measurements)
+    ? analyzeLalKitabMakanVastu({ rooms: input.rooms, kundli: input.kundli, measurements: input.measurements, features: input.features })
+    : undefined;
+
+  const construction = (input.options?.includeConstruction || input.construction)
+    ? analyzeConstructionVastu(input.construction)
+    : undefined;
+
+  if (input.construction?.materialZones?.some((z) => ["N", "NE", "E"].includes(z))) {
+    scores.construction = clamp(scores.construction - 25);
+    scores.overall = clamp(scores.overall - 8);
+  }
+  if (input.construction?.brahmasthanHasLiftOrStairs) {
+    scores.construction = clamp(scores.construction - 35);
+    scores.overall = clamp(scores.overall - 12);
+  }
+
+  if (input.measurements?.lengthHasta && input.measurements?.widthHasta) {
+    const aukat = calculateMakanAukat(input.measurements.lengthHasta, input.measurements.widthHasta, input.measurements.shape);
+    if (aukat.isApplicable && aukat.isInauspicious) {
+      scores.overall = clamp(scores.overall - 8);
+      recommendations.push({
+        title: "Lal Kitab Makan Aukat needs correction",
+        priority: "medium",
+        system: "lal_kitab_makan_vastu",
+        steps: ["Treat as optional Lal Kitab layer, not classical Vastu.", "Consider Ketu khana 6 style remedy only after kundli review.", "Do not use fear-based interpretation."],
+        requiresKundli: true,
+        caution: "Transcript-based rule; use as advanced/experimental layer.",
+      });
+    }
+  }
+
+  for (const defect of defects) recommendations.push(recommendationFromDefect(defect));
+
+  const seen = new Set<string>();
+  const uniqueRecommendations = recommendations.filter((r) => seen.has(r.title) ? false : (seen.add(r.title), true));
+  const critical = defects.filter((d) => d.severity >= 8).length;
+  const summary = critical
+    ? `Property score ${scores.overall}/100. ${critical} critical Vastu issue(s) need priority correction. ${strengths.length} supportive placement(s) found.`
+    : scores.overall >= 80
+      ? `Property score ${scores.overall}/100. Overall Vastu is supportive with manageable improvements.`
+      : scores.overall >= 60
+        ? `Property score ${scores.overall}/100. The property is average and needs targeted corrections.`
+        : `Property score ${scores.overall}/100. Multiple high-impact defects require a structured correction plan.`;
+
+  return {
+    engineVersion: VASTU_ENGINE_VERSION,
+    scores,
+    strengths,
+    defects,
+    recommendations: uniqueRecommendations,
+    lalKitab,
+    construction,
+    summary,
+    disclaimers: [
+      "Classical Vastu, Modern Practical Vastu, MahaVastu remedies and Lal Kitab Makan Vastu are source-separated.",
+      "Lal Kitab symbolic remedies require kundli validation and are not generic.",
+      "Vastu guidance is practical/spiritual support, not medical/legal/financial guarantee.",
+    ],
+  };
+}
+
+export function analyzeLegacyVastu(
+  rooms: Array<{ type: string; direction: string; name?: string }>,
+  options?: Partial<VastuAnalyzeInput>
+) {
+  return analyzeVastuProperty({
+    propertyType: options?.propertyType ?? "home",
+    facing: options?.facing,
+    rooms: rooms.map((r) => ({ type: r.type as RoomType, direction: r.direction as DirectionCode, name: r.name })),
+    kundli: options?.kundli,
+    features: options?.features,
+    measurements: options?.measurements,
+    construction: options?.construction,
+    options: options?.options,
+  });
+}
+
+export function getVastuScore(input: VastuAnalyzeInput): number {
+  return analyzeVastuProperty(input).scores.overall;
+}

@@ -151,7 +151,7 @@ export default function ReportPage() {
             {isSpeaking ? "⏹️ Stop Speaking" : "🎧 Play Voice Report"}
           </button>
           <div style={{ fontSize: "11px", color: "#605890", marginTop: "8px" }}>
-            Note: Uses browser's built-in voice synthesis. Premium audio MP3 coming soon!
+            Note: Uses browser&apos;s built-in voice synthesis. Premium audio MP3 coming soon!
           </div>
         </div>
 

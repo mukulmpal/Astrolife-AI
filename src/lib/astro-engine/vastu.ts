@@ -218,3 +218,17 @@ export function calculateVastu(planets: Record<string, PlanetData>): VastuResult
   assertVastuResultContract(report);
   return report;
 }
+
+/* ASTROLIFE_ADVANCED_VASTU_BRIDGE_START */
+// Auto-added by patch_vastu_engine_v2.py
+/* ASTROLIFE_ADVANCED_VASTU_BRIDGE_END */
+
+// AstroLife Vastu Intelligence bridge
+// Added by patch_vastu_engine_complete.py
+// Prefer importing directly from "@/lib/vastu-intelligence" in new code.
+export {
+  analyzeVastuProperty,
+  calculateMakanAukat,
+  LAL_KITAB_DIRECTION_KHANA_MAP,
+  ROOM_PLANET_MAP,
+} from "../vastu-intelligence";
