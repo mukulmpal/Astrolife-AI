@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { downloadVastuPDFReport } from "@/lib/report-generator";
 
 type Direction = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "CENTER" | "";
 
@@ -424,6 +425,7 @@ export default function VastuDashboardPage() {
   const [errorText, setErrorText] = useState("");
   const [mindMakanTab, setMindMakanTab] = useState<"physical" | "behavioural" | "routine" | "emotional" | "spiritual">("physical");
   const [activeZoneTab, setActiveZoneTab] = useState<"all" | "strong" | "weak" | "psych" | "transit">("all");
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   function refreshChart() {
     const loaded = loadUserChartFromStorage();
@@ -550,6 +552,24 @@ export default function VastuDashboardPage() {
       setErrorText(message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function downloadVastuReport() {
+    if (!result) return;
+    setPdfLoading(true);
+    try {
+      await downloadVastuPDFReport(result, {
+        ownerName: kundli ? `User (${kundli.source.split(":")[1] || "chart"})` : undefined,
+        type:   propertyType,
+        facing: facing || undefined,
+        shape,
+        rooms: activeRooms.map((r) => ({ name: r.name, type: r.type, direction: r.direction })),
+      });
+    } catch (err) {
+      console.error("Vastu PDF error:", err);
+    } finally {
+      setPdfLoading(false);
     }
   }
 
@@ -823,9 +843,20 @@ export default function VastuDashboardPage() {
           <>
             {/* ── SUMMARY + SCORE ── */}
             <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-              <p className="text-xs text-white/40">Engine: {result.engineVersion || "unknown"}</p>
-              <h2 className="mt-2 text-2xl font-bold">Summary</h2>
-              <p className="mt-3 text-white/75">{result.summary || "Analysis complete."}</p>
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div className="flex-1">
+                  <p className="text-xs text-white/40">Engine: {result.engineVersion || "unknown"}</p>
+                  <h2 className="mt-2 text-2xl font-bold">Summary</h2>
+                  <p className="mt-3 text-white/75">{result.summary || "Analysis complete."}</p>
+                </div>
+                <button
+                  onClick={downloadVastuReport}
+                  disabled={pdfLoading}
+                  className="shrink-0 rounded-full bg-amber-400 px-6 py-3 text-sm font-bold text-black transition hover:bg-amber-300 disabled:opacity-60"
+                >
+                  {pdfLoading ? "Generating PDF..." : "Download PDF Report"}
+                </button>
+              </div>
             </section>
 
             <section className="grid gap-3 md:grid-cols-5">
