@@ -4,6 +4,21 @@ import { useEffect, useMemo, useState } from "react";
 
 type Direction = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "CENTER" | "";
 
+type VastuZoneRow = {
+  dir: string;
+  name: string;
+  planet: string;
+  domain: string;
+  color: string;
+  score: number;
+  status: string;
+  statusColor: string;
+  planets: string[];
+  remedy: string;
+  roomIdeal: string;
+  hasDosha: boolean;
+};
+
 type VastuResult = {
   engineVersion?: string;
   summary?: string;
@@ -19,17 +34,8 @@ type VastuResult = {
     mentalPeace?: number;
     construction?: number;
   };
-  strengths?: Array<{
-    title: string;
-    explanation: string;
-    score: number;
-  }>;
-  defects?: Array<{
-    title: string;
-    explanation: string;
-    severity: number;
-    remedies: string[];
-  }>;
+  strengths?: Array<{ title: string; explanation: string; score: number }>;
+  defects?: Array<{ title: string; explanation: string; severity: number; remedies: string[] }>;
   recommendations?: Array<{
     title: string;
     priority: string;
@@ -37,6 +43,38 @@ type VastuResult = {
     steps: string[];
     requiresKundli?: boolean;
   }>;
+  correctionPlan?: {
+    thirtyDay: string[];
+    sixtyDay: string[];
+    ninetyDay: string[];
+  };
+  mindMakan?: {
+    physical: string[];
+    behavioural: string[];
+    routine: string[];
+    emotional: string[];
+    spiritual: string[];
+  };
+  vastuPurushaHealth?: {
+    affectedZones: string[];
+    observations: string[];
+  };
+  zoneAnalysis?: {
+    zones: VastuZoneRow[];
+    strongZones: VastuZoneRow[];
+    weakZones: VastuZoneRow[];
+    overallScore: number;
+    psychBridge: string[];
+    transitAlerts: Array<{
+      planet: string;
+      zone: string;
+      domain: string;
+      effect: string;
+      remedy: string;
+      positive: boolean;
+    }>;
+    roomGuide: ReadonlyArray<{ room: string; idealDir: string; reason: string }>;
+  };
 };
 
 type RoomInput = {
@@ -384,6 +422,8 @@ export default function VastuDashboardPage() {
   const [result, setResult] = useState<VastuResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState("");
+  const [mindMakanTab, setMindMakanTab] = useState<"physical" | "behavioural" | "routine" | "emotional" | "spiritual">("physical");
+  const [activeZoneTab, setActiveZoneTab] = useState<"all" | "strong" | "weak" | "psych" | "transit">("all");
 
   function refreshChart() {
     const loaded = loadUserChartFromStorage();
@@ -781,23 +821,17 @@ export default function VastuDashboardPage() {
 
         {result && (
           <>
+            {/* ── SUMMARY + SCORE ── */}
             <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-              <p className="text-sm text-white/50">
-                Engine Version: {result.engineVersion || "unknown"}
-              </p>
+              <p className="text-xs text-white/40">Engine: {result.engineVersion || "unknown"}</p>
               <h2 className="mt-2 text-2xl font-bold">Summary</h2>
               <p className="mt-3 text-white/75">{result.summary || "Analysis complete."}</p>
             </section>
 
-            <section className="grid gap-4 md:grid-cols-5">
+            <section className="grid gap-3 md:grid-cols-5">
               {Object.entries(scores).map(([key, value]) => (
-                <div
-                  key={key}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"
-                >
-                  <p className="text-xs uppercase tracking-widest text-white/45">
-                    {key}
-                  </p>
+                <div key={key} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-xs uppercase tracking-widest text-white/45">{key}</p>
                   <p className={`mt-2 text-3xl font-bold ${scoreColor(Number(value || 0))}`}>
                     {String(value ?? 0)}
                   </p>
@@ -805,51 +839,42 @@ export default function VastuDashboardPage() {
               ))}
             </section>
 
+            {/* ── STRENGTHS + DEFECTS ── */}
             <section className="grid gap-6 md:grid-cols-2">
               <div className="rounded-3xl border border-green-400/20 bg-green-500/5 p-6">
-                <h2 className="text-2xl font-bold text-green-200">Strengths</h2>
-                <div className="mt-4 space-y-4">
-                  {strengths.length === 0 && (
-                    <p className="text-white/60">No major strengths detected.</p>
-                  )}
-
-                  {strengths.map((item, index) => (
-                    <div
-                      key={`${item.title}-${index}`}
-                      className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                    >
+                <h2 className="text-2xl font-bold text-green-200">Strengths ({strengths.length})</h2>
+                <div className="mt-4 space-y-3">
+                  {strengths.length === 0 && <p className="text-white/60">No major strengths detected.</p>}
+                  {strengths.map((item, i) => (
+                    <div key={`s-${i}`} className="rounded-2xl border border-white/10 bg-black/20 p-4">
                       <p className="font-semibold">{item.title}</p>
-                      <p className="mt-2 text-sm text-white/65">{item.explanation}</p>
-                      <p className="mt-2 text-xs text-green-200">
-                        Score: {item.score}/10
-                      </p>
+                      <p className="mt-1 text-sm text-white/65">{item.explanation}</p>
+                      <p className="mt-2 text-xs text-green-300">Score: {item.score}/10</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="rounded-3xl border border-red-400/20 bg-red-500/5 p-6">
-                <h2 className="text-2xl font-bold text-red-200">Defects</h2>
-                <div className="mt-4 space-y-4">
-                  {defects.length === 0 && (
-                    <p className="text-white/60">No major defects detected.</p>
-                  )}
-
-                  {defects.map((item, index) => (
-                    <div
-                      key={`${item.title}-${index}`}
-                      className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                    >
-                      <p className="font-semibold">{item.title}</p>
-                      <p className="mt-2 text-sm text-white/65">{item.explanation}</p>
-                      <p className="mt-2 text-xs text-red-200">
-                        Severity: {item.severity}/10
-                      </p>
+                <h2 className="text-2xl font-bold text-red-200">Defects ({defects.length})</h2>
+                <div className="mt-4 space-y-3">
+                  {defects.length === 0 && <p className="text-white/60">No major defects detected.</p>}
+                  {defects.map((item, i) => (
+                    <div key={`d-${i}`} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-semibold">{item.title}</p>
+                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${
+                          item.severity >= 9 ? "bg-red-500/30 text-red-200" :
+                          item.severity >= 7 ? "bg-orange-500/30 text-orange-200" :
+                          "bg-yellow-500/20 text-yellow-200"
+                        }`}>
+                          {item.severity}/10
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-white/65">{item.explanation}</p>
                       {item.remedies.length > 0 && (
-                        <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/60">
-                          {item.remedies.map((remedy) => (
-                            <li key={remedy}>{remedy}</li>
-                          ))}
+                        <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/55">
+                          {item.remedies.map((r, ri) => <li key={ri}>{r}</li>)}
                         </ul>
                       )}
                     </div>
@@ -858,41 +883,258 @@ export default function VastuDashboardPage() {
               </div>
             </section>
 
+            {/* ── RECOMMENDATIONS ── */}
             <section className="rounded-3xl border border-amber-400/20 bg-amber-500/5 p-6">
               <h2 className="text-2xl font-bold text-amber-200">Recommendations</h2>
-
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                {recommendations.map((item, index) => (
-                  <div
-                    key={`${item.title}-${index}`}
-                    className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                  >
-                    <div className="flex items-center justify-between gap-3">
+                {recommendations.map((item, i) => (
+                  <div key={`r-${i}`} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="flex items-center justify-between gap-2">
                       <p className="font-semibold">{item.title}</p>
-                      <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        item.priority === "critical" ? "bg-red-500/30 text-red-200" :
+                        item.priority === "high"     ? "bg-orange-500/30 text-orange-200" :
+                        item.priority === "medium"   ? "bg-amber-500/20 text-amber-200" :
+                        "bg-white/10 text-white/60"
+                      }`}>
                         {item.priority}
                       </span>
                     </div>
-
-                    <p className="mt-2 text-xs uppercase tracking-widest text-white/40">
-                      {item.system}
-                    </p>
-
+                    <p className="mt-1 text-xs uppercase tracking-widest text-white/35">{item.system}</p>
                     {item.requiresKundli && (
-                      <p className="mt-2 text-xs text-amber-200">
-                        Kundli validation required
-                      </p>
+                      <p className="mt-1 text-xs text-amber-300">Kundli validation required</p>
                     )}
-
-                    <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/65">
-                      {item.steps.map((step) => (
-                        <li key={step}>{step}</li>
-                      ))}
+                    <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/60">
+                      {item.steps.map((step, si) => <li key={si}>{step}</li>)}
                     </ul>
                   </div>
                 ))}
               </div>
             </section>
+
+            {/* ── 30/60/90 DAY CORRECTION PLAN ── */}
+            {result.correctionPlan && (
+              <section className="rounded-3xl border border-cyan-400/20 bg-cyan-500/5 p-6">
+                <h2 className="text-2xl font-bold text-cyan-200">30 / 60 / 90 Day Correction Plan</h2>
+                <p className="mt-2 text-sm text-white/55">
+                  Phased action plan based on defect severity. Start with physical corrections, not symbolic remedies.
+                </p>
+                <div className="mt-5 grid gap-5 md:grid-cols-3">
+                  {[
+                    { label: "First 30 Days", color: "border-red-400/30 bg-red-500/5", heading: "text-red-200", items: result.correctionPlan.thirtyDay },
+                    { label: "Days 31–60",    color: "border-amber-400/30 bg-amber-500/5", heading: "text-amber-200", items: result.correctionPlan.sixtyDay },
+                    { label: "Days 61–90",    color: "border-green-400/30 bg-green-500/5", heading: "text-green-200", items: result.correctionPlan.ninetyDay },
+                  ].map((col) => (
+                    <div key={col.label} className={`rounded-2xl border p-4 ${col.color}`}>
+                      <p className={`font-bold ${col.heading}`}>{col.label}</p>
+                      <ul className="mt-3 space-y-2">
+                        {col.items.map((item, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                            <span className={`mt-0.5 text-xs font-bold ${col.heading}`}>{i + 1}.</span>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* ── MIND + MAKAN ENERGY LOOP ── */}
+            {result.mindMakan && (
+              <section className="rounded-3xl border border-purple-400/20 bg-purple-500/5 p-6">
+                <h2 className="text-2xl font-bold text-purple-200">Mind + Makan Energy Loop</h2>
+                <p className="mt-2 text-sm text-white/55">
+                  House affects mind. Mind affects house. Physical correction alone is not enough — five layers of correction.
+                </p>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {(["physical", "behavioural", "routine", "emotional", "spiritual"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setMindMakanTab(tab)}
+                      className={`rounded-full px-4 py-1.5 text-sm font-semibold transition capitalize ${
+                        mindMakanTab === tab
+                          ? "bg-purple-500 text-white"
+                          : "border border-white/15 text-white/60 hover:bg-white/10"
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                <ul className="mt-5 space-y-2">
+                  {(result.mindMakan[mindMakanTab] || []).map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 rounded-xl border border-white/8 bg-black/20 p-3 text-sm text-white/70">
+                      <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-purple-500/30 text-center text-xs font-bold leading-5 text-purple-300">
+                        {i + 1}
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* ── VASTU PURUSHA HEALTH MAP ── */}
+            {result.vastuPurushaHealth && result.vastuPurushaHealth.observations.length > 1 && (
+              <section className="rounded-3xl border border-teal-400/20 bg-teal-500/5 p-6">
+                <h2 className="text-2xl font-bold text-teal-200">Vastu Purusha — Symbolic Health Map</h2>
+                <p className="mt-2 text-sm text-white/55">
+                  Traditional symbolic mapping of Vastu zones to body and life areas. Use as guidance, not medical advice.
+                </p>
+
+                {result.vastuPurushaHealth.affectedZones.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="text-sm text-white/40">Affected zones:</span>
+                    {result.vastuPurushaHealth.affectedZones.map((zone) => (
+                      <span key={zone} className="rounded-full border border-teal-400/30 bg-teal-500/10 px-3 py-1 text-xs font-semibold text-teal-300">
+                        {zone}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <ul className="mt-4 space-y-2">
+                  {result.vastuPurushaHealth.observations.map((obs, i) => (
+                    <li key={i} className="flex items-start gap-3 rounded-xl border border-white/8 bg-black/20 p-3 text-sm text-white/65">
+                      <span className="mt-0.5 shrink-0 text-teal-400">→</span>
+                      {obs}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* ── 16-ZONE KUNDLI-BASED ZONE ANALYSIS ── */}
+            {result.zoneAnalysis ? (
+              <section className="rounded-3xl border border-indigo-400/20 bg-indigo-500/5 p-6">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-indigo-200">16-Zone MahaVastu Analysis</h2>
+                    <p className="mt-1 text-sm text-white/55">
+                      Kundli planet-based zone scoring. Overall zone score: {result.zoneAnalysis.overallScore}/92
+                    </p>
+                  </div>
+                  <div className="flex gap-2 text-sm">
+                    <span className="rounded-full bg-green-500/20 px-3 py-1 text-green-300">{result.zoneAnalysis.strongZones.length} Strong</span>
+                    <span className="rounded-full bg-red-500/20 px-3 py-1 text-red-300">{result.zoneAnalysis.weakZones.length} Weak</span>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {(["all", "strong", "weak", "psych", "transit"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveZoneTab(tab)}
+                      className={`rounded-full px-4 py-1.5 text-sm font-semibold transition capitalize ${
+                        activeZoneTab === tab
+                          ? "bg-indigo-500 text-white"
+                          : "border border-white/15 text-white/60 hover:bg-white/10"
+                      }`}
+                    >
+                      {tab === "psych" ? "Psych Bridge" : tab === "transit" ? "Transit Alerts" : tab}
+                    </button>
+                  ))}
+                </div>
+
+                {(activeZoneTab === "all" || activeZoneTab === "strong" || activeZoneTab === "weak") && (
+                  <div className="mt-5 grid gap-3 md:grid-cols-4">
+                    {(activeZoneTab === "all"
+                      ? result.zoneAnalysis.zones
+                      : activeZoneTab === "strong"
+                      ? result.zoneAnalysis.strongZones
+                      : result.zoneAnalysis.weakZones
+                    ).map((zone) => (
+                      <div
+                        key={zone.dir}
+                        className={`rounded-2xl border p-4 ${
+                          zone.status === "Strong" ? "border-green-400/25 bg-green-500/5" :
+                          zone.status === "Weak"   ? "border-red-400/25 bg-red-500/5" :
+                          "border-white/10 bg-black/20"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white/40">{zone.dir}</span>
+                          <span className={`text-sm font-bold ${
+                            zone.status === "Strong" ? "text-green-300" :
+                            zone.status === "Weak"   ? "text-red-300" : "text-amber-300"
+                          }`}>{zone.score}</span>
+                        </div>
+                        <p className="mt-1 text-sm font-semibold text-white">{zone.name}</p>
+                        <p className="mt-0.5 text-xs text-white/45">{zone.planet} · {zone.status}</p>
+                        <p className="mt-2 text-xs text-white/40 line-clamp-2">{zone.domain}</p>
+                        {zone.planets.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {zone.planets.map((p) => (
+                              <span key={p} className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-xs text-indigo-300">{p}</span>
+                            ))}
+                          </div>
+                        )}
+                        {zone.hasDosha && (
+                          <p className="mt-2 text-xs text-red-300">Dosha present</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeZoneTab === "psych" && (
+                  <div className="mt-5 space-y-3">
+                    <p className="text-sm font-semibold text-indigo-300">Psychology Bridge — Planet-Zone Insights</p>
+                    {result.zoneAnalysis.psychBridge.map((insight, i) => (
+                      <div key={i} className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/70">
+                        {insight}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeZoneTab === "transit" && (
+                  <div className="mt-5 space-y-3">
+                    <p className="text-sm font-semibold text-indigo-300">Transit Alerts — Planet Zone Effects</p>
+                    {result.zoneAnalysis.transitAlerts.length === 0 && (
+                      <p className="text-sm text-white/50">No significant transit alerts for this chart configuration.</p>
+                    )}
+                    {result.zoneAnalysis.transitAlerts.map((alert, i) => (
+                      <div
+                        key={i}
+                        className={`rounded-xl border p-4 text-sm ${
+                          alert.positive
+                            ? "border-green-400/25 bg-green-500/5"
+                            : "border-red-400/25 bg-red-500/5"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={`font-bold ${alert.positive ? "text-green-300" : "text-red-300"}`}>
+                            {alert.planet}
+                          </span>
+                          <span className="text-white/40">→</span>
+                          <span className="text-white/70">{alert.zone}</span>
+                          <span className={`ml-auto rounded-full px-2 py-0.5 text-xs ${
+                            alert.positive ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"
+                          }`}>
+                            {alert.positive ? "Benefic" : "Malefic"}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-white/55">{alert.effect}</p>
+                        <p className="mt-1 text-xs text-white/40">Remedy: {alert.remedy}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            ) : (
+              <section className="rounded-3xl border border-indigo-400/15 bg-indigo-500/3 p-6">
+                <h2 className="text-xl font-bold text-indigo-300">16-Zone MahaVastu Analysis</h2>
+                <p className="mt-2 text-sm text-white/50">
+                  This section requires your Kundli with full planet house positions. Generate your Kundli on the Kundli page,
+                  then return here and click Refresh Chart. If planet positions are saved, the zone analysis will activate automatically.
+                </p>
+              </section>
+            )}
           </>
         )}
       </div>
