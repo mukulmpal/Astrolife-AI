@@ -91,6 +91,12 @@ export default function KundliPage() {
       applyChart(data);
       setSaveStatus("Chart saved as primary.");
       await refreshSavedCharts();
+      // Track for admin
+      await fetch("/api/charts/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, dob: form.dob, tob: form.tob, city: form.city }),
+      }).catch(() => {});
     } catch(e){ console.error(e); }
     setLoading(false);
   };
@@ -245,7 +251,7 @@ export default function KundliPage() {
           <div className="form-grid">
             <div className="form-group">
               <label className="label">Full Name</label>
-              <input className="input" placeholder="e.g. Mukul Pal"
+              <input className="input" placeholder="Enter your full name"
                 value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/>
             </div>
             <div className="form-group">

@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
@@ -9,59 +10,20 @@ import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculateTransitReport, type PlanetName } from "@/lib/astro-engine/transits";
 import { calculateDivisional, type DivChart, type DivPlanet } from "@/lib/astro-engine/divisional";
 import { checkSupabaseHealth, isSupabaseReady, type DbHealthItem } from "@/lib/db-health";
-import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
+import { clearCurrentChart, useUserChart, saveChartToAccount } from "@/lib/user-chart";
 import { getAccountAiUsageStatus, getFreeMonthlyAiLimit } from "@/lib/usage";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
-
-  const NAV_MAIN = [
-    { icon:"🏠", label:"Dashboard",  href:"/dashboard" },
-    { icon:"🔯", label:"My Charts",  href:"/dashboard/kundli" },
-    { icon:"🪐", label:"Transits",   href:"/dashboard/transits" },
-    { icon:"📡", label:"Event Radar", href:"/dashboard/event-radar" },
-    { icon:"🤖", label:"AI Chat",    href:"/dashboard/chat" },
-    { icon:"📈", label:"Timeline",   href:"/dashboard/destiny" },
-  ];
-
-const NAV_ENGINES = [
-  { icon:"🔯", label:"Kundli", href:"/dashboard/kundli" },
-  { icon:"🪐", label:"Transits", href:"/dashboard/transits" },
-  { icon:"🧿", label:"Yogas", href:"/dashboard/yogas" },
-  { icon:"⚖️", label:"Shadbala", href:"/dashboard/shadbala" },
-  { icon:"📘", label:"Lal Kitab", href:"/dashboard/lalkitab" },
-  { icon:"🧠", label:"Psychology", href:"/dashboard/psychology" },
-  { icon:"📈", label:"Destiny", href:"/dashboard/destiny" },
-  { icon:"⏳", label:"Dasha", href:"/dashboard/dasha" },
-  { icon:"🌅", label:"Special Lagnas", href:"/dashboard/special-lagnas" },
-  { icon:"🧮", label:"Ashtakavarga", href:"/dashboard/ashtakavarga" },
-  { icon:"🧩", label:"Divisional", href:"/dashboard/divisional" },
-  { icon:"🔢", label:"Numerology", href:"/dashboard/numerology" },
-  { icon:"💑", label:"Kundali Milan", href:"/dashboard/kundali-milan" },
-  { icon:"🧭", label:"KP System", href:"/dashboard/kp" },
-  { icon:"📡", label:"Event Radar", href:"/dashboard/event-radar" },
-  { icon:"📅", label:"Panchang", href:"/dashboard/panchang" },
-  { icon:"🎵", label:"Astro Sound", href:"/dashboard/astro-sound" },
-  { icon:"💎", label:"Gemstone", href:"/dashboard/gemstone" },
-  { icon:"🏠", label:"Vastu", href:"/dashboard/vastu" },
-  { icon:"🔱", label:"Jaimini", href:"/dashboard/jaimini" },
-  { icon:"🏥", label:"Medical", href:"/dashboard/medical" },
-  { icon:"❓", label:"Prashna", href:"/dashboard/prashna" },
-  { icon:"💊", label:"Remedy", href:"/dashboard/remedy" },
-  { icon:"🔯", label:"Sarvatobhadra", href:"/dashboard/sarvatobhadra" },
-  { icon:"📄", label:"Report", href:"/dashboard/report" },
-];
-
-const NAV_ACCOUNT = [
-  { icon:"👤", label:"Profile",  href:"/dashboard/profile" },
-  { icon:"💎", label:"Upgrade",  href:"/dashboard/upgrade" },
-  { icon:"⚙️", label:"Settings", href:"/dashboard/settings" },
-];
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 const CHART_PLANETS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const CHART_EMOJI = ["☉","☽","♂","☿","♃","♀","♄","☊","☋"];
 const RASHI_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const CITIES = [
+  "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
+  "Pune","Ahmedabad","Jaipur","Lucknow","Chandigarh","Bhopal",
+  "Indore","Nagpur","Surat","Varanasi","Amritsar","Dehradun",
+  "Kochi","Patna","Agra","Mysuru","Coimbatore","Visakhapatnam","New Delhi",
+];
 
 function mod(n: number, m: number) {
   return ((n % m) + m) % m;
@@ -209,9 +171,28 @@ export default function Dashboard() {
   const [dbHealth, setDbHealth] = useState<DbHealthItem[]>([]);
   const [time, setTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState("overview");
+  const [chartForm, setChartForm] = useState({name:"",dob:"",tob:"",city:""});
+  const [chartLoading, setChartLoading] = useState(false);
+  const [citySearch, setCitySearch] = useState("");
+  const [showCities, setShowCities] = useState(false);
   const { birth, chart } = useUserChart();
   const fallbackArea = { name: "Stability", score: 50, icon: "⚖️" };
   const fallbackDasha = { planet: "Moon", start: new Date(), end: new Date(), yrs: 10, active: true };
+
+  const filteredCities = CITIES.filter(c=>c.toLowerCase().includes(citySearch.toLowerCase()));
+
+  const handleGenerateChart = async () => {
+    if(!chartForm.name||!chartForm.dob||!chartForm.tob||!chartForm.city) return;
+    setChartLoading(true);
+    await new Promise(r=>setTimeout(r,600));
+    try {
+      const newChart = calculateChart(chartForm.name,chartForm.dob,chartForm.tob,chartForm.city);
+      await saveChartToAccount(newChart);
+      setChartForm({name:"",dob:"",tob:"",city:""});
+      setActiveTab("overview");
+    } catch(e){ console.error(e); }
+    setChartLoading(false);
+  };
 
   useEffect(() => {
     const loadDashboardState = async () => {
@@ -241,17 +222,10 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [supabase]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    clearCurrentChart();
-    window.location.href = "/login";
-  };
-
   const userName = user?.user_metadata?.full_name?.split(" ")[0] || birth.name?.split(" ")[0] || "Seeker";
   const greeting = time.getHours() < 12 ? "Shubh Prabhat" : time.getHours() < 17 ? "Namaste" : "Shubh Sandhya";
   const dayName  = time.toLocaleDateString("en-IN", { weekday:"long" });
   const dateStr  = time.toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" });
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard";
   const destiny = calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob);
   const psychology = calculatePsychology(chart.planets as never);
   const activeDasha = chart.dashas?.find((entry) => entry.active) || chart.dashas?.[0] || fallbackDasha;
@@ -353,33 +327,8 @@ export default function Dashboard() {
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#060410}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-        /* LAYOUT */
-        .layout{display:flex;min-height:100vh}
-
-        /* SIDEBAR */
-        .sidebar{width:240px;flex-shrink:0;background:#0a0720;border-right:1px solid #1c1840;display:flex;flex-direction:column;padding:24px 0;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
-        .sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:1px solid #1c1840;margin-bottom:20px}
-        .logo-gem{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#3c2880,#c8a030);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(200,160,48,0.25)}
-        .logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;background:linear-gradient(135deg,#c8a030,#f0d898);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-
-        .nav-section{padding:0 12px;margin-bottom:8px}
-        .nav-section-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a3060;padding:0 8px;margin-bottom:8px}
-
-        /* NAV ITEMS — both div and a */
-        .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all 0.2s;margin-bottom:2px;font-size:13px;color:#605890;text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:'Outfit',sans-serif}
-        .nav-item:hover{background:rgba(200,160,48,0.06);color:#c8c0a8}
-        .nav-item.active{background:rgba(200,160,48,0.1);color:#c8a030;border:1px solid rgba(200,160,48,0.15)}
-        .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-
-        .sidebar-bottom{margin-top:auto;padding:16px 12px;border-top:1px solid #1c1840}
-        .user-chip{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid #1c1840}
-        .user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3c2880,#c8a030);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:13px;color:#f0e8d0;flex-shrink:0;font-weight:600}
-        .user-name{font-size:13px;color:#c8c0a8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .logout-btn{background:none;border:none;color:#3a3060;cursor:pointer;font-size:16px;transition:color 0.2s;padding:4px}
-        .logout-btn:hover{color:#c8a030}
-
         /* MAIN */
-        .main{margin-left:240px;flex:1;padding:32px;min-height:100vh}
+        .main{padding:32px;min-height:100vh}
 
         /* TOPBAR */
         .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px}
@@ -469,8 +418,6 @@ export default function Dashboard() {
         .mobile-nav{display:none}
 
         @media(max-width:1024px){
-          .sidebar{display:none}
-          .main{margin-left:0}
           .stats-row{grid-template-columns:repeat(2,1fr)}
           .grid-2{grid-template-columns:1fr}
           .actions-grid{grid-template-columns:repeat(2,1fr)}
@@ -505,16 +452,9 @@ export default function Dashboard() {
         }
 
         body{background:var(--app-bg);color:var(--app-fg)}
-        .layout,.main{background:var(--app-bg);color:var(--app-fg)}
-        .sidebar{background:var(--app-card-alt);border-color:var(--app-border)}
-        .sidebar-logo,.sidebar-bottom{border-color:var(--app-border)}
-        .logo-gem,.user-av{background:linear-gradient(135deg,var(--app-accent),var(--app-gold))}
-        .nav-section-title,.logout-btn{color:var(--app-muted-deep)}
-        .nav-item{color:var(--app-muted)}
-        .nav-item:hover{background:color-mix(in srgb,var(--app-gold) 7%,transparent);color:var(--app-soft)}
-        .nav-item.active{background:color-mix(in srgb,var(--app-gold) 12%,transparent);border-color:color-mix(in srgb,var(--app-gold) 20%,transparent);color:var(--app-gold)}
-        .user-chip,.date-chip,.notif-btn,.stat-card,.card,.today-summary-card{background:var(--app-card);border-color:var(--app-border);color:var(--app-fg)}
-        .user-name,.date-full,.today-text,.insight-text,.action-btn-label,.db-health-text{color:var(--app-soft)}
+        .main{background:var(--app-bg);color:var(--app-fg)}
+        .date-chip,.notif-btn,.stat-card,.card,.today-summary-card{background:var(--app-card);border-color:var(--app-border);color:var(--app-fg)}
+        .date-full,.today-text,.insight-text,.action-btn-label,.db-health-text{color:var(--app-soft)}
         .greeting-h,.card-title,.today-title,.today-summary-v{color:var(--app-fg)}
         .greeting-sub,.date-day,.tabs .tab,.stat-lbl,.card-tag,.action-btn-desc,.today-summary-k,.score-l{color:var(--app-muted)}
         .greeting-tag,.greeting-h em,.stat-val,.today-tag,.score-n,.today-summary-hint,.energy-pill{color:var(--app-gold)}
@@ -537,57 +477,7 @@ export default function Dashboard() {
         .mobile-nav-item.active{color:var(--app-gold);background:color-mix(in srgb,var(--app-gold) 12%,transparent)}
       `}</style>
 
-      <div className="layout">
-        {/* SIDEBAR */}
-        <aside className="sidebar">
-          <div className="sidebar-logo">
-            <div className="logo-gem">✦</div>
-            <span className="logo-name">AstroLife</span>
-          </div>
-
-          {/* Main Nav */}
-          <div className="nav-section">
-            <div className="nav-section-title">Main</div>
-            {NAV_MAIN.map(n => (
-              <Link key={n.label} href={n.href}
-                className={`nav-item ${pathname === n.href ? "active" : ""}`}>
-                <span className="nav-icon">{n.icon}</span>{n.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Engines Nav */}
-          <div className="nav-section">
-            <div className="nav-section-title">Engines</div>
-            {NAV_ENGINES.map(n => (
-              <Link key={n.label} href={n.href}
-                className={`nav-item ${pathname === n.href ? "active" : ""}`}>
-                <span className="nav-icon">{n.icon}</span>{n.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Account Nav */}
-          <div className="nav-section">
-            <div className="nav-section-title">Account</div>
-            {NAV_ACCOUNT.map(n => (
-              <Link key={n.label} href={n.href} className="nav-item">
-                <span className="nav-icon">{n.icon}</span>{n.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* User chip */}
-          <div className="sidebar-bottom">
-            <div className="user-chip">
-              <div className="user-av">{userName[0]}</div>
-              <span className="user-name">{userName}</span>
-              <button className="logout-btn" onClick={handleLogout} title="Logout">↩</button>
-            </div>
-          </div>
-        </aside>
-
-        {/* MAIN */}
+      <div>
         <main className="main">
           {/* TOPBAR */}
           <div className="topbar">
@@ -616,6 +506,8 @@ export default function Dashboard() {
             ))}
           </div>
 
+          {activeTab === "overview" && (
+          <>
           <div className="card" style={{ marginBottom: 24 }}>
             <div className="card-tag">✦ D1 + D9 Home Charts</div>
             <div className="card-title serif">Lagna Chart and Navamsha with House/Rashi/Planet Placement</div>
@@ -786,8 +678,160 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* QUICK ACTIONS + INSIGHTS */}
-          <div className="grid-2">
+          </>
+          )}
+
+          {activeTab === "charts" && (
+          <>
+          <div className="card" style={{ marginBottom: 24 }}>
+            <div className="card-tag">✦ Chart Generator</div>
+            <div className="card-title serif">Generate or Update Your Chart</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Full Name</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%", transition: "border-color 0.2s" }}
+                  placeholder="Enter your name"
+                  value={chartForm.name}
+                  onChange={e=>setChartForm(f=>({...f,name:e.target.value}))}
+                  onFocus={e => e.currentTarget.style.borderColor = "#c8a030"}
+                  onBlur={e => e.currentTarget.style.borderColor = "#1c1840"}/>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Date of Birth</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%", colorScheme: "dark" }}
+                  type="date"
+                  value={chartForm.dob}
+                  max={new Date().toISOString().split("T")[0]}
+                  onChange={e=>setChartForm(f=>({...f,dob:e.target.value}))}/>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Time of Birth</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%", colorScheme: "dark" }}
+                  type="time"
+                  value={chartForm.tob}
+                  onChange={e=>setChartForm(f=>({...f,tob:e.target.value}))}/>
+              </div>
+              <div style={{ position: "relative" }}>
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Birth City</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%" }}
+                  placeholder="Search city..."
+                  value={citySearch}
+                  onChange={e=>{setCitySearch(e.target.value);setChartForm(f=>({...f,city:""}));setShowCities(true);}}
+                  onFocus={()=>setShowCities(true)}/>
+                {showCities && citySearch.length>0 && filteredCities.length>0 && (
+                  <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#0f0c28", border: "1px solid #261f50", borderRadius: 10, zIndex: 20, maxHeight: 160, overflowY: "auto" }}>
+                    {filteredCities.map(c=>(
+                      <div key={c} style={{ padding: "11px 14px", fontSize: 13, color: "#c8c0a8", cursor: "pointer", transition: "background 0.15s" }}
+                        onClick={()=>{setChartForm(f=>({...f,city:c}));setCitySearch(c);setShowCities(false);}}
+                        onMouseEnter={e => e.currentTarget.style.background = "rgba(200,160,48,0.08)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <button style={{ width: "100%", marginTop: 20, padding: 16, background: "linear-gradient(135deg,#c8a030,#3c2880cc)", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600, color: "#060410", cursor: "pointer", transition: "all 0.25s", fontFamily: "Outfit,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+              onClick={handleGenerateChart}
+              disabled={!chartForm.name||!chartForm.dob||!chartForm.tob||!chartForm.city||chartLoading}
+              onMouseEnter={e => !chartLoading && (e.currentTarget.style.transform = "translateY(-2px)")}
+              onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+              {chartLoading?"⟳ Calculating...":"🔯 Generate Chart"}
+            </button>
+          </div>
+
+          <div className="card" style={{ marginBottom: 24 }}>
+            <div className="card-tag">✦ D1 + D9 Home Charts</div>
+            <div className="card-title serif">Lagna Chart and Navamsha with House/Rashi/Planet Placement</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
+              <div className="chart-panel">
+                <div className="chart-panel-title">D1 · Rasi</div>
+                <CompactNorthChart chart={chartLayers.d1} />
+              </div>
+              <div className="chart-panel">
+                <div className="chart-panel-title">D9 · Navamsha</div>
+                <CompactNorthChart chart={chartLayers.d9} />
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, marginTop: 14 }}>
+              <div className="chart-table-panel">
+                <div className="chart-table-title">D1 House · Rashi · Planets</div>
+                <div style={{ display: "grid", gap: 6 }}>
+                  {chartLayers.d1Houses.map((h) => (
+                    <div key={`d1-${h.house}`} className="chart-house-row">
+                      <span className="chart-house-no">H{h.house}</span>
+                      <span style={{ width: 90 }}>{h.rashi}</span>
+                      <span>{h.occupants.length ? h.occupants.map((p) => p.planet).join(", ") : "—"}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="chart-table-panel">
+                <div className="chart-table-title">D9 House · Rashi · Planets</div>
+                <div style={{ display: "grid", gap: 6 }}>
+                  {chartLayers.d9Houses.map((h) => (
+                    <div key={`d9-${h.house}`} className="chart-house-row">
+                      <span className="chart-house-no">H{h.house}</span>
+                      <span style={{ width: 90 }}>{h.rashi}</span>
+                      <span>{h.occupants.length ? h.occupants.map((p) => p.planet).join(", ") : "—"}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          </>
+          )}
+
+          {activeTab === "insights" && (
+          <div className="card" style={{ marginBottom: 24 }}>
+            <div className="card-tag">✦ AI Insights</div>
+            <div className="card-title serif">Your cosmic intelligence briefing</div>
+            {insights.map((ins,i) => (
+              <div key={i} className={`insight ${ins.urgent?"urgent":""}`}>
+                <div className="insight-top">
+                  <span className="insight-icon">{ins.icon}</span>
+                  <span className="insight-tag">{ins.tag}</span>
+                  {ins.urgent && <div className="insight-urgent-dot" />}
+                </div>
+                <div className="insight-text">{ins.text}</div>
+              </div>
+            ))}
+          </div>
+          )}
+
+          {activeTab === "remedies" && (
+          <div className="card" style={{ marginBottom: 24 }}>
+            <div className="card-tag">✦ Daily Personal Feed</div>
+            <div className="card-title serif">Actionables for today</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12 }}>
+              <div className="today-summary-card">
+                <div className="today-summary-k">Panchang</div>
+                <div className="today-summary-v">{dailyFeed.panchang.tithi} · {dailyFeed.panchang.nakshatra} · {dailyFeed.panchang.yoga}</div>
+                <div className="today-summary-hint">Moon {dailyFeed.panchang.moonSign} · {dailyFeed.panchang.paksha} Paksha</div>
+              </div>
+              <div className="today-summary-card">
+                <div className="today-summary-k">Transit Pulse</div>
+                <div className="today-summary-v">Best focus: {dailyFeed.topArea.area} ({dailyFeed.topArea.score}/100)</div>
+                <div className="today-summary-hint">{dailyFeed.oppCount} opportunities · {dailyFeed.cautionCount} cautions</div>
+              </div>
+              <div className="today-summary-card">
+                <div className="today-summary-k">7-Day Radar</div>
+                <div className="today-summary-v">Best day: {dailyFeed.radar.bestDay.label} · Caution: {dailyFeed.radar.cautionDay.label}</div>
+                <div className="today-summary-hint">Today score {dailyFeed.radar.days[0]?.overallScore ?? "-"} / 100</div>
+              </div>
+              <div className="today-summary-card">
+                <div className="today-summary-k">Remedy</div>
+                <div className="today-summary-v">{dailyFeed.radar.days[0]?.remedy ?? "Keep routine stable and avoid impulsive reactions."}</div>
+                <div className="today-summary-hint"><Link href="/dashboard/event-radar" style={{ color: "#c8a030", textDecoration: "none" }}>Open Event Radar →</Link></div>
+              </div>
+            </div>
+          </div>
+          )}
+
+          {/* QUICK ACTIONS */}
+          <div>
             <div className="card">
               <div className="card-tag">✦ Quick Actions</div>
               <div className="card-title serif">What would you like to explore?</div>
@@ -822,27 +866,11 @@ export default function Dashboard() {
                   </Link>
                 ))}
               </div>
-            </div>
-
-            <div className="card">
-              <div className="card-tag">✦ AI Insights</div>
-              <div className="card-title serif">Your cosmic intelligence briefing</div>
-              {insights.map((ins,i) => (
-                <div key={i} className={`insight ${ins.urgent?"urgent":""}`}>
-                  <div className="insight-top">
-                    <span className="insight-icon">{ins.icon}</span>
-                    <span className="insight-tag">{ins.tag}</span>
-                    {ins.urgent && <div className="insight-urgent-dot" />}
-                  </div>
-                  <div className="insight-text">{ins.text}</div>
-                </div>
-              ))}
-            </div>
+          </div>
           </div>
 
         </main>
       </div>
-      <MobileBottomNav />
     </>
   );
 }
