@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.76",
+    "@sparticuz/chromium": "^148.0.0",
+    "@sparticuz/chromium-min": "^148.0.0",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.1",
     "ai": "^6.0.177",
@@ -20,6 +22,7 @@
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
     "pdfkit": "^0.18.0",
+    "puppeteer-core": "^25.0.4",
     "razorpay": "^2.9.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
