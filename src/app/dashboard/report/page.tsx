@@ -1,18 +1,33 @@
 "use client";
 import { useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
-import { downloadPDFReport, type ReportOptions } from "@/lib/report-generator";
+import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type ReportCover } from "@/lib/report-html-generator";
 import { generateVoiceScript, speakVoiceReport, stopVoiceReport } from "@/lib/voice-report";
 import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-import { EducationTooltip } from "@/components/education-tooltip";
+
+// Palette definitions for the toggle UI
+const PALETTE_OPTIONS: { value: ReportPalette; label: string; bg: string; gold: string }[] = [
+  { value: "midnight", label: "Midnight",  bg: "#0A0E1F", gold: "#C9A961" },
+  { value: "saffron",  label: "Saffron",   bg: "#1A0F0A", gold: "#E8923C" },
+  { value: "ivory",    label: "Ivory",     bg: "#F2ECDF", gold: "#8C7440" },
+  { value: "forest",   label: "Forest",    bg: "#0A1812", gold: "#C9A961" },
+  { value: "maroon",   label: "Maroon",    bg: "#1A080C", gold: "#D4A656" },
+];
+
+const COVER_OPTIONS: { value: ReportCover; label: string; desc: string }[] = [
+  { value: "wheel",      label: "Zodiac Wheel",       desc: "Classic 12-house wheel centred on cover" },
+  { value: "lagnalord",  label: "Lagna Lord Mandala", desc: "Chart-ruler deity mandala with Sanskrit labels" },
+];
 
 export default function ReportPage() {
   const { chart, loading } = useUserChart();
-  const [reportType, setReportType] = useState<ReportOptions["type"]>("full");
+  const [reportType, setReportType]   = useState<ReportOptions["type"]>("full");
+  const [palette, setPalette]         = useState<ReportPalette>("midnight");
+  const [cover, setCover]             = useState<ReportCover>("wheel");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [isSpeaking, setIsSpeaking]   = useState(false);
+  const [copied, setCopied]           = useState(false);
 
   if (loading || !chart) {
     return (
@@ -28,7 +43,7 @@ export default function ReportPage() {
   const handleDownloadPDF = async () => {
     setIsGenerating(true);
     try {
-      await downloadPDFReport(chart, { type: reportType });
+      await downloadReportAsPDF(chart, { type: reportType, palette, cover });
     } catch (error) {
       console.error("PDF generation error:", error);
       alert("Error generating PDF");
@@ -96,6 +111,11 @@ export default function ReportPage() {
         .rep-btn.primary { background: #c8a030; color: #060410; border-color: #c8a030; }
         .rep-btn.primary:hover { background: #d4b240; }
         .rep-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+        .seg-group { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+        .seg-btn { display: flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid #1c1840; border-radius: 8px; background: #08051a; color: #b8b0d8; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.18s; }
+        .seg-btn:hover { border-color: rgba(200,160,48,0.5); }
+        .seg-swatch { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
+        .cover-desc { font-size: 11px; color: #605890; margin-top: 2px; }
       `}</style>
 
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
@@ -108,7 +128,7 @@ export default function ReportPage() {
         <div className="rep-section">
           <div className="rep-title">Report Type</div>
           <div className="rep-tabs">
-            {["full", "kundli", "remedy", "medical"].map((type) => (
+            {["full", "kundli", "remedy", "medical", "destiny"].map((type) => (
               <button
                 key={type}
                 className={`rep-tab ${reportType === type ? "active" : ""}`}
@@ -120,9 +140,78 @@ export default function ReportPage() {
                   ? "🔯 Kundli"
                   : type === "remedy"
                   ? "💊 Remedy"
+                  : type === "destiny"
+                  ? "📈 Destiny"
                   : "🏥 Medical"}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Palette Toggle */}
+        <div className="rep-section">
+          <div className="rep-title">🎨 Colour Palette</div>
+          <div style={{ fontSize: "13px", color: "#b8b0d8" }}>
+            Choose the visual theme for your PDF report
+          </div>
+          <div className="seg-group">
+            {PALETTE_OPTIONS.map((opt) => {
+              const isActive = palette === opt.value;
+              const goldRgb = opt.gold;
+              return (
+                <button
+                  key={opt.value}
+                  className="seg-btn"
+                  onClick={() => setPalette(opt.value)}
+                  style={{
+                    borderColor: isActive ? opt.gold : undefined,
+                    background: isActive ? `color-mix(in srgb, ${opt.gold} 18%, transparent)` : undefined,
+                    color: isActive ? opt.gold : undefined,
+                  }}
+                >
+                  <span
+                    className="seg-swatch"
+                    style={{
+                      background: opt.bg,
+                      border: `1.5px solid ${isActive ? opt.gold : goldRgb + "80"}`,
+                    }}
+                  />
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Cover Toggle */}
+        <div className="rep-section">
+          <div className="rep-title">🖼️ Cover Style</div>
+          <div style={{ fontSize: "13px", color: "#b8b0d8" }}>
+            Select the artwork on your report&apos;s cover page
+          </div>
+          <div className="seg-group">
+            {COVER_OPTIONS.map((opt) => {
+              const isActive = cover === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  className="seg-btn"
+                  onClick={() => setCover(opt.value)}
+                  style={{
+                    borderColor: isActive ? "#c8a030" : undefined,
+                    background: isActive ? "rgba(200,160,48,0.15)" : undefined,
+                    color: isActive ? "#c8a030" : undefined,
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "2px",
+                    minWidth: "160px",
+                  }}
+                >
+                  <span style={{ fontWeight: 600 }}>{opt.label}</span>
+                  <span className="cover-desc">{opt.desc}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -130,11 +219,16 @@ export default function ReportPage() {
         <div className="rep-section">
           <div className="rep-title">📥 Download PDF Report</div>
           <div style={{ fontSize: "13px", color: "#b8b0d8", marginBottom: "16px" }}>
-            Beautiful, printable PDF with your chart analysis, <EducationTooltip term="yoga">yogas</EducationTooltip>, and recommendations
+            Server-rendered premium PDF — cover art, North Indian chart, dasha interpretations, remedies &amp; more. Downloads directly on any device.
           </div>
           <button className="rep-btn primary" onClick={handleDownloadPDF} disabled={isGenerating}>
-            {isGenerating ? "Generating..." : "📄 Download PDF"}
+            {isGenerating ? "⏳ Generating PDF…" : "📄 Download PDF"}
           </button>
+          {isGenerating && (
+            <div style={{ fontSize: "11px", color: "#605890", marginTop: "8px" }}>
+              Rendering on server — usually 15–30 seconds. Please wait…
+            </div>
+          )}
         </div>
 
         {/* Voice Report */}
@@ -218,10 +312,9 @@ export default function ReportPage() {
           </div>
           <ul style={{ fontSize: "12px", color: "#b8b0d8", marginLeft: "20px", lineHeight: "1.8" }}>
             <li>High-quality MP3 voice reports (ElevenLabs integration)</li>
-            <li>Premium PDF templates with beautiful charts</li>
+            <li>PDF delivery via email</li>
             <li>Social media story generator</li>
             <li>Shareable chart infographics</li>
-            <li>Email report delivery</li>
           </ul>
         </div>
       </div>
