@@ -1486,7 +1486,10 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
 <title>AstroLife — Cosmic Blueprint · ${esc(chart.name)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<!-- font-display:swap means text renders immediately with fallback,
+     then swaps when the real font arrives. No blocking on font load. -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Noto+Serif+Devanagari:wght@500&display=swap" rel="stylesheet">
 <style>
 ${STYLES_CSS}
 </style>

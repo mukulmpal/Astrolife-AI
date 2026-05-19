@@ -4,6 +4,7 @@ import "@/app/dashboard/shared.css";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
+import { useLanguage } from "@/lib/language-context";
 
 // Radar SVG
 function PsychRadar({ vals, colors }: { vals: number[]; colors: string[] }) {
@@ -42,6 +43,7 @@ export default function PsychPage() {
   const [activeTab, setActiveTab] = useState<"planets"|"pattern"|"guide">("pattern");
   const [expanded, setExpanded] = useState<string|null>(null);
   const { birth, chart } = useUserChart();
+  const { t } = useLanguage();
   const result = calculatePsychology(chart.planets as never);
   const P = result.pattern;
 
@@ -58,8 +60,8 @@ export default function PsychPage() {
 
   return (
     <div className="page">
-      <div className="page-tag">🧠 Psychology Engine</div>
-      <h1 className="page-title serif">Psychological <em>Blueprint</em></h1>
+      <div className="page-tag">{t("psychology.page_tag")}</div>
+      <h1 className="page-title serif">{t("psychology.page_title")}</h1>
       <p className="page-sub">9 psychological functions · Pattern analysis · Anxiety Index · Karma Loop · Shadow work</p>
       <PremiumFeature feature="Psychology Engine">
 
@@ -120,6 +122,29 @@ export default function PsychPage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="grid-2" style={{marginBottom:16}}>
+            <div className="card">
+              <div className="card-tag">✦ Dominant Functions</div>
+              <div className="card-title serif">Use These Strengths</div>
+              {(result.dominantFunctions.length ? result.dominantFunctions : ["No single function dominates; build one stable habit first."]).map((line,i)=>(
+                <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.dominantFunctions.length-1?"none":"1px solid #1c1840"}}>
+                  {line}
+                </div>
+              ))}
+            </div>
+            <div className="card">
+              <div className="card-tag">✦ Risk Flags</div>
+              <div className="card-title serif">Watch Before Reacting</div>
+              {(result.riskFlags.length ? result.riskFlags : [{title:"No major psychological risk flag",detail:"Current profile is workable with ordinary self-awareness.",severity:"low" as const}]).map(flag=>(
+                <div key={flag.title} style={{padding:"7px 0",borderBottom:"1px solid #1c1840"}}>
+                  <span className={`badge ${flag.severity==="high"?"badge-red":flag.severity==="medium"?"badge-gold":"badge-green"}`}>{flag.severity}</span>
+                  <div style={{fontSize:12,fontWeight:600,color:"#f0e8d0",marginTop:6}}>{flag.title}</div>
+                  <div style={{fontSize:11,color:"#605890",lineHeight:1.6}}>{flag.detail}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Planet strength overview */}
@@ -188,6 +213,26 @@ export default function PsychPage() {
       {/* ── GUIDE TAB ── */}
       {activeTab==="guide" && (
         <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          <div className="grid-2">
+            <div className="card" style={{borderColor:"rgba(34,197,94,0.25)"}}>
+              <div className="card-tag">✦ Stabilizers</div>
+              <div className="card-title serif">Daily Nervous System Support</div>
+              {result.stabilizers.map((line,i)=>(
+                <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.stabilizers.length-1?"none":"1px solid #1c1840"}}>
+                  {line}
+                </div>
+              ))}
+            </div>
+            <div className="card" style={{borderColor:"rgba(236,72,153,0.25)"}}>
+              <div className="card-tag">✦ Growth Plan</div>
+              <div className="card-title serif">Specific Work</div>
+              {result.growthPlan.map((line,i)=>(
+                <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.growthPlan.length-1?"none":"1px solid #1c1840"}}>
+                  {line}
+                </div>
+              ))}
+            </div>
+          </div>
           {[
             {icon:"☉",planet:"Sun",title:"Ego & Identity Shadow",desc:"Weak Sun = authority issues, approval seeking, unresolved father karma. Work: Daily affirmations, boundary setting, leadership practice.",c:"#f97316"},
             {icon:"☽",planet:"Moon",title:"Emotional Memory Healing",desc:"Weak Moon = anxiety, mother wound, emotional reactivity. Work: Therapy, journaling, Moon mantra, mother relationship repair.",c:"#c084fc"},

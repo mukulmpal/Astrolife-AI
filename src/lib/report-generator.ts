@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import { downloadReportAsPDF } from "./report-html-generator";
 import type { ChartData } from "./astro-engine/calculations";
 import { calculateRemedies } from "./astro-engine/remedy";
 import { calculateMedical } from "./astro-engine/medical";
@@ -13,21 +14,165 @@ import { generateGemstoneReportFromChart } from "./astro-engine/gemstone";
 import { calculateKarakas, calculateArudhas, calculateCharaDasha } from "./astro-engine/jaimini";
 import { runTransitEngine } from "./astro-engine/transit";
 import { calculateDestiny } from "./astro-engine/destiny";
+import { getMahadashaInterpretation, getAntardashaInterpretation } from "./astro-engine/dasha-interpretations";
+import { PLANET_HOUSE_RULES, HOME_OMEN_RULES, HOUSE_WISE_OMENS, RIN_RULES, COMBINATION_RULES } from "./astro-engine/lalkitab-knowledge";
+import { composeVedicParagraph, composeLKParagraph, composePsychOmenParagraph, composeUpcomingMDParagraph } from "./astro-engine/dasha-composer";
+
+export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
+export type ReportCover   = "wheel" | "lagnalord";
 
 export interface ReportOptions {
   type: "full" | "kundli" | "remedy" | "medical" | "destiny";
+  palette?: ReportPalette;
+  cover?: ReportCover;
   includeAnalysis?: boolean;
   resolution?: number;
 }
 
+// ── Palette token sets (from design_handoff_pdf_toggle/styles.css) ─────────
+type RGB = readonly [number, number, number];
+interface PaletteTokens {
+  bg:         RGB;  // cover / dark page background
+  surface:    RGB;  // card / section surface
+  gold:       RGB;  // primary accent — gold/brass
+  goldBright: RGB;  // highlighted gold
+  goldDim:    RGB;  // subdued gold
+  ivory:      RGB;  // body text (may invert in light palette)
+  ivoryDim:   RGB;  // secondary text
+  ivoryMute:  RGB;  // muted text
+  saffron:    RGB;  // accent 2
+  light:      boolean; // true for ivory palette (light bg)
+}
+
+const PALETTES: Record<ReportPalette, PaletteTokens> = {
+  midnight: {
+    bg:         [10,  14,  31],
+    surface:    [17,  22,  46],
+    gold:       [201, 169,  97],
+    goldBright: [217, 190, 123],
+    goldDim:    [140, 116,  64],
+    ivory:      [244, 239, 230],
+    ivoryDim:   [200, 193, 176],
+    ivoryMute:  [138, 132, 116],
+    saffron:    [232, 146,  60],
+    light:      false,
+  },
+  saffron: {
+    bg:         [26,  15,  10],
+    surface:    [42,  24,  12],
+    gold:       [232, 146,  60],
+    goldBright: [244, 168,  90],
+    goldDim:    [148,  89,  31],
+    ivory:      [250, 239, 224],
+    ivoryDim:   [217, 197, 168],
+    ivoryMute:  [155, 131, 102],
+    saffron:    [244, 168,  90],
+    light:      false,
+  },
+  ivory: {
+    bg:         [242, 236, 223],  // light parchment
+    surface:    [236, 229, 211],
+    gold:       [140, 116,  64],
+    goldBright: [163, 136,  81],
+    goldDim:    [120,  96,  48],
+    ivory:      [26,  31,  58],   // INVERTED — dark navy as body text
+    ivoryDim:   [26,  31,  58],
+    ivoryMute:  [80,  86, 120],
+    saffron:    [180, 130,  60],
+    light:      true,
+  },
+  forest: {
+    bg:         [10,  24,  18],
+    surface:    [18,  42,  31],
+    gold:       [201, 169,  97],
+    goldBright: [227, 201, 122],
+    goldDim:    [140, 116,  64],
+    ivory:      [240, 235, 222],
+    ivoryDim:   [191, 184, 159],
+    ivoryMute:  [124, 119, 101],
+    saffron:    [232, 196, 106],
+    light:      false,
+  },
+  maroon: {
+    bg:         [26,   8,  12],
+    surface:    [42,  15,  21],
+    gold:       [212, 166,  86],
+    goldBright: [234, 194, 117],
+    goldDim:    [142, 111,  57],
+    ivory:      [244, 236, 216],
+    ivoryDim:   [207, 195, 166],
+    ivoryMute:  [138, 126, 102],
+    saffron:    [232, 146,  60],
+    light:      false,
+  },
+};
+
 // ── PDF Helpers ────────────────────────────────────────────────
 
-const GOLD = [200, 160, 48] as const;
-const BLACK = [20, 20, 20] as const;
-const GRAY = [100, 100, 100] as const;
-const LIGHT = [150, 150, 150] as const;
-// const WHITE = [255, 255, 255] as const;
-const DARK_BG = [15, 15, 30] as const;
+const GOLD     = [200, 160, 48]  as const;
+const BLACK    = [20,  20,  20]  as const;
+const GRAY     = [100, 100, 100] as const;
+const LIGHT    = [150, 150, 150] as const;
+const WHITE    = [255, 255, 255] as const;
+const DARK_BG  = [15,  15,  30]  as const;
+const INK      = [9,    6,  26]  as const;
+const SOFT_BG  = [251, 247, 239] as const;
+const LINE     = [233, 223, 202] as const;
+const ROW_ALT  = [245, 245, 250] as const;
+
+// Section header colors (inspired by Python reportlab design)
+const SC_BIRTH   = [102, 126, 234] as const;
+const SC_PLANETS = [52,  152, 219] as const;
+const SC_HOUSES  = [39,  174,  96] as const;
+const SC_DASHA   = [243, 156,  18] as const;
+const SC_YOGA    = [231,  76,  60] as const;
+const SC_SHAKTI  = [155,  89, 182] as const;
+const SC_PSYCH   = [26,  188, 156] as const;
+const SC_LALKITAB= [230, 126,  34] as const;
+const SC_REMEDY  = [230, 126,  34] as const;
+const SC_MEDICAL = [192,  57,  43] as const;
+const SC_NUMER   = [52,   73,  94] as const;
+const SC_ASHTA   = [22,  160, 133] as const;
+const SC_DIV     = [142,  68, 173] as const;
+const SC_GEM     = [243, 156,  18] as const;
+const SC_JAIMINI = [41,  128, 185] as const;
+const SC_TRANSIT = [39,  174,  96] as const;
+const SC_DESTINY = [211,  84,   0] as const;
+const SC_LIFE    = [102, 126, 234] as const;
+const SC_ANNUAL  = [22,  160, 133] as const;
+const SC_CONC    = [102, 126, 234] as const;
+const SC_VASTU   = [230, 126,  34] as const;
+
+const PLANET_SYMBOLS: Record<string, string> = {
+  Sun: "Su",
+  Moon: "Mo",
+  Mars: "Ma",
+  Mercury: "Me",
+  Jupiter: "Ju",
+  Venus: "Ve",
+  Saturn: "Sa",
+  Rahu: "Ra",
+  Ketu: "Ke",
+  Asc: "As",
+};
+
+const PLANET_RGB: Record<string, readonly [number, number, number]> = {
+  Sun: [249, 115, 22],
+  Moon: [168, 85, 247],
+  Mars: [239, 68, 68],
+  Mercury: [34, 197, 94],
+  Jupiter: [217, 119, 6],
+  Venus: [236, 72, 153],
+  Saturn: [59, 130, 246],
+  Rahu: [124, 58, 237],
+  Ketu: [244, 63, 94],
+  Asc: GOLD,
+};
+
+const RASHI_NAMES = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+];
 
 class PDFBuilder {
   pdf: jsPDF;
@@ -35,12 +180,14 @@ class PDFBuilder {
   pageW: number;
   pageH: number;
   margin = 15;
+  pal: PaletteTokens;
 
-  constructor() {
+  constructor(palette: ReportPalette = "midnight") {
     this.pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     this.pageW = this.pdf.internal.pageSize.getWidth();
     this.pageH = this.pdf.internal.pageSize.getHeight();
     this.y = 20;
+    this.pal = PALETTES[palette] ?? PALETTES.midnight;
   }
 
   checkPage(needed = 12) {
@@ -57,22 +204,275 @@ class PDFBuilder {
     this.y = 20;
   }
 
-  gold() { this.pdf.setTextColor(...GOLD); }
+  // Palette-aware accent colour for headings/subheaders
+  gold() { this.pdf.setTextColor(...this.pal.gold); }
   black() { this.pdf.setTextColor(...BLACK); }
   gray() { this.pdf.setTextColor(...GRAY); }
   light() { this.pdf.setTextColor(...LIGHT); }
 
+  fitText(text: string, x: number, y: number, maxW: number, size = 9, style: "normal" | "bold" = "normal") {
+    this.pdf.setFont("helvetica", style);
+    this.pdf.setFontSize(size);
+    let value = text || "—";
+    while (this.pdf.getTextWidth(value) > maxW && value.length > 4) {
+      value = `${value.slice(0, -4)}...`;
+    }
+    this.pdf.text(value, x, y);
+  }
+
+  chip(text: string, x: number, y: number) {
+    this.pdf.setFont("helvetica", "bold");
+    this.pdf.setFontSize(7.5);
+    const w = Math.min(this.pdf.getTextWidth(text) + 10, 42);
+    this.pdf.setFillColor(236, 196, 86);
+    this.pdf.setDrawColor(219, 177, 57);
+    this.pdf.roundedRect(x, y - 4, w, 7, 3.5, 3.5, "FD");
+    this.pdf.setTextColor(...INK);
+    this.pdf.text(text, x + 5, y + 1);
+    this.pdf.setFont("helvetica", "normal");
+    return x + w + 4;
+  }
+
+  keyValueGrid(items: Array<[string, string]>, cols = 2) {
+    const gap = 5;
+    const cellW = (this.pageW - this.margin * 2 - gap * (cols - 1)) / cols;
+    const cellH = 16;
+    const rows = Math.ceil(items.length / cols);
+    this.checkPage(rows * (cellH + 4) + 4);
+    items.forEach(([key, value], index) => {
+      const x = this.margin + (index % cols) * (cellW + gap);
+      const y = this.y + Math.floor(index / cols) * (cellH + 4);
+      this.pdf.setFillColor(255, 253, 248);
+      this.pdf.setDrawColor(...LINE);
+      this.pdf.roundedRect(x, y, cellW, cellH, 3, 3, "FD");
+      this.pdf.setTextColor(...GRAY);
+      this.pdf.setFont("helvetica", "normal");
+      this.pdf.setFontSize(6.8);
+      this.pdf.text(key.toUpperCase(), x + 4, y + 5);
+      this.pdf.setTextColor(...INK);
+      this.fitText(value, x + 4, y + 12, cellW - 8, 9, "bold");
+    });
+    this.y += rows * (cellH + 4) + 2;
+  }
+
+  tocRow(index: number, title: string) {
+    this.checkPage(9);
+    this.pdf.setFillColor(index % 2 === 0 ? 255 : 250, index % 2 === 0 ? 253 : 246, index % 2 === 0 ? 248 : 232);
+    this.pdf.setDrawColor(...LINE);
+    this.pdf.roundedRect(this.margin, this.y - 5, this.pageW - this.margin * 2, 8, 2, 2, "FD");
+    this.pdf.setFont("helvetica", "bold");
+    this.pdf.setFontSize(8);
+    this.pdf.setTextColor(...GOLD);
+    this.pdf.text(String(index + 1).padStart(2, "0"), this.margin + 4, this.y);
+    this.pdf.setFont("helvetica", "normal");
+    this.pdf.setTextColor(...INK);
+    this.pdf.text(title.replace(/^\d+\.\s*/, ""), this.margin + 17, this.y);
+    this.y += 9;
+  }
+
+  signalCard(title: string, value: string, note: string, color: readonly [number, number, number] = GOLD) {
+    this.checkPage(23);
+    this.pdf.setFillColor(255, 253, 248);
+    this.pdf.setDrawColor(...LINE);
+    this.pdf.roundedRect(this.margin, this.y - 3, this.pageW - this.margin * 2, 20, 4, 4, "FD");
+    this.pdf.setFillColor(...color);
+    this.pdf.roundedRect(this.margin, this.y - 3, 3, 20, 1.5, 1.5, "F");
+    this.pdf.setFontSize(8);
+    this.pdf.setTextColor(...GRAY);
+    this.pdf.setFont("helvetica", "bold");
+    this.pdf.text(title.toUpperCase(), this.margin + 8, this.y + 3);
+    this.pdf.setFontSize(13);
+    this.pdf.setTextColor(...color);
+    this.fitText(value, this.margin + 8, this.y + 11, 58, 13, "bold");
+    this.pdf.setTextColor(...BLACK);
+    const lines = this.pdf.splitTextToSize(note, this.pageW - this.margin * 2 - 78);
+    this.pdf.setFontSize(8);
+    lines.slice(0, 2).forEach((line: string, i: number) => {
+      this.pdf.text(line, this.margin + 72, this.y + 5 + i * 5);
+    });
+    this.y += 24;
+  }
+
+  drawNorthIndianChart(chart: ChartData, x: number, y: number, size: number) {
+    const half = size / 2;
+    this.pdf.setFillColor(8, 5, 26);
+    this.pdf.setDrawColor(...GOLD);
+    this.pdf.roundedRect(x, y, size, size, 4, 4, "FD");
+
+    this.pdf.setDrawColor(95, 79, 137);
+    this.pdf.setLineWidth(0.35);
+    this.pdf.line(x, y, x + size, y + size);
+    this.pdf.line(x + size, y, x, y + size);
+    this.pdf.line(x + half, y, x + size, y + half);
+    this.pdf.line(x + size, y + half, x + half, y + size);
+    this.pdf.line(x + half, y + size, x, y + half);
+    this.pdf.line(x, y + half, x + half, y);
+
+    const houses = [
+      [1, size / 2, size / 4], [2, size / 4, size / 8], [3, size / 8, size / 4], [4, size / 4, size / 2],
+      [5, size / 8, (3 * size) / 4], [6, size / 4, (7 * size) / 8], [7, size / 2, (3 * size) / 4],
+      [8, (3 * size) / 4, (7 * size) / 8], [9, (7 * size) / 8, (3 * size) / 4], [10, (3 * size) / 4, size / 2],
+      [11, (7 * size) / 8, size / 4], [12, (3 * size) / 4, size / 8],
+    ];
+
+    const planetsByHouse: Record<number, string[]> = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i + 1, []]));
+    planetsByHouse[1].push("Asc");
+    Object.entries(chart.planets).forEach(([planet, data]) => {
+      if (data.house >= 1 && data.house <= 12) planetsByHouse[data.house].push(planet);
+    });
+
+    houses.forEach(([house, hx, hy]) => {
+      const houseNum = Number(house);
+      const cx = x + Number(hx);
+      const cy = y + Number(hy);
+      const rashiNum = ((chart.lagnaNum + houseNum - 1) % 12) + 1;
+      const labelColor: readonly [number, number, number] = houseNum === 1 ? GOLD : LIGHT;
+      this.pdf.setTextColor(...labelColor);
+      this.pdf.setFont("helvetica", houseNum === 1 ? "bold" : "normal");
+      this.pdf.setFontSize(6.8);
+      this.pdf.text(String(rashiNum), cx, cy - 4, { align: "center" });
+      const planets = planetsByHouse[houseNum].slice(0, 4);
+      planets.forEach((planet, index) => {
+        const rgb = PLANET_RGB[planet] ?? WHITE;
+        this.pdf.setTextColor(...rgb);
+        this.pdf.setFont("helvetica", "bold");
+        this.pdf.setFontSize(6.4);
+        const offset = (index - (planets.length - 1) / 2) * 7;
+        this.pdf.text(PLANET_SYMBOLS[planet] ?? planet.slice(0, 2), cx + offset, cy + 4, { align: "center" });
+      });
+    });
+    this.pdf.setTextColor(...BLACK);
+    this.pdf.setFont("helvetica", "normal");
+  }
+
   sectionHeader(title: string, addNewPage = true) {
     if (addNewPage) this.newPage();
-    // Gold bar background
-    this.pdf.setFillColor(...GOLD);
-    this.pdf.rect(this.margin, this.y - 5, this.pageW - this.margin * 2, 10, "F");
-    this.pdf.setFontSize(13);
-    this.pdf.setTextColor(...DARK_BG);
+    const color: readonly [number, number, number] =
+      title.includes("CONTENTS")        ? GOLD :
+      title.includes("BIRTH")           ? SC_BIRTH :
+      title.includes("PLANET")          ? SC_PLANETS :
+      title.includes("HOUSE")           ? SC_HOUSES :
+      title.includes("DASHA")           ? SC_DASHA :
+      title.includes("YOGA")            ? SC_YOGA :
+      title.includes("SHADBALA")        ? SC_SHAKTI :
+      title.includes("PSYCHOLOGY BRIDGE") ? SC_VASTU :
+      title.includes("PSYCHOLOGY")      ? SC_PSYCH :
+      title.includes("LAL KITAB")       ? SC_LALKITAB :
+      title.includes("REMEDY")          ? SC_REMEDY :
+      title.includes("MEDICAL")         ? SC_MEDICAL :
+      title.includes("NUMEROLOG")       ? SC_NUMER :
+      title.includes("ASHTAKAVARGA")    ? SC_ASHTA :
+      title.includes("DIVISIONAL")      ? SC_DIV :
+      title.includes("GEMSTONE")        ? SC_GEM :
+      title.includes("JAIMINI")         ? SC_JAIMINI :
+      title.includes("TRANSIT")         ? SC_TRANSIT :
+      title.includes("DESTINY")         ? SC_DESTINY :
+      title.includes("LIFE AREA")       ? SC_LIFE :
+      title.includes("ANNUAL")          ? SC_ANNUAL :
+      title.includes("CONCLUSION")      ? SC_CONC :
+      SC_VASTU;
+    const isGold = color === GOLD;
+    const textRgb: readonly [number, number, number] = isGold ? DARK_BG : WHITE;
+    this.pdf.setFillColor(...color);
+    this.pdf.rect(this.margin, this.y - 5, this.pageW - this.margin * 2, 12, "F");
+    this.pdf.setFontSize(12);
+    this.pdf.setTextColor(...textRgb);
     this.pdf.setFont("helvetica", "bold");
-    this.pdf.text(title, this.margin + 3, this.y + 2);
+    this.pdf.text(title, this.margin + 4, this.y + 3);
     this.pdf.setFont("helvetica", "normal");
-    this.y += 12;
+    this.pdf.setTextColor(...BLACK);
+    this.y += 14;
+  }
+
+  // Styled table with colored header row and alternating row backgrounds
+  styledTable(
+    headers: string[],
+    rows: string[][],
+    colXs: number[],
+    headerColor: readonly [number, number, number] = GOLD
+  ) {
+    const rowH = 6.5;
+    const tableW = this.pageW - this.margin * 2;
+    this.checkPage(rowH * (rows.length + 2) + 4);
+
+    // Header row
+    this.pdf.setFillColor(...headerColor);
+    this.pdf.rect(this.margin, this.y - 4, tableW, rowH + 2, "F");
+    this.pdf.setFontSize(8.5);
+    this.pdf.setTextColor(...WHITE);
+    this.pdf.setFont("helvetica", "bold");
+    headers.forEach((h, i) => this.pdf.text(h, colXs[i], this.y));
+    this.pdf.setFont("helvetica", "normal");
+    this.y += rowH + 2;
+
+    // Data rows
+    rows.forEach((row, ri) => {
+      this.checkPage(rowH + 1);
+      if (ri % 2 === 0) {
+        this.pdf.setFillColor(...ROW_ALT);
+        this.pdf.rect(this.margin, this.y - 4, tableW, rowH + 1, "F");
+      }
+      this.pdf.setFontSize(8.5);
+      this.pdf.setTextColor(...BLACK);
+      row.forEach((cell, ci) => this.pdf.text(cell.substring(0, 32), colXs[ci], this.y));
+      this.y += rowH;
+    });
+    this.y += 4;
+  }
+
+  // Row of colored stat boxes (e.g. yoga counts)
+  statBoxRow(stats: Array<{ label: string; value: string; color: readonly [number, number, number] }>) {
+    const n = stats.length;
+    const boxW = (this.pageW - this.margin * 2) / n;
+    const hdrH = 8;
+    const valH = 14;
+    this.checkPage(hdrH + valH + 6);
+
+    stats.forEach((stat, i) => {
+      const x = this.margin + i * boxW;
+      // Label band
+      this.pdf.setFillColor(...stat.color);
+      this.pdf.rect(x, this.y, boxW - 1, hdrH, "F");
+      this.pdf.setFontSize(8);
+      this.pdf.setTextColor(...WHITE);
+      this.pdf.setFont("helvetica", "bold");
+      this.pdf.text(stat.label, x + (boxW - 1) / 2, this.y + 5.5, { align: "center" });
+      // Value band
+      this.pdf.setFillColor(...ROW_ALT);
+      this.pdf.rect(x, this.y + hdrH, boxW - 1, valH, "F");
+      this.pdf.setFontSize(16);
+      this.pdf.setTextColor(...stat.color);
+      this.pdf.setFont("helvetica", "bold");
+      this.pdf.text(stat.value, x + (boxW - 1) / 2, this.y + hdrH + 10, { align: "center" });
+      this.pdf.setFont("helvetica", "normal");
+    });
+    this.pdf.setTextColor(...BLACK);
+    this.y += hdrH + valH + 5;
+  }
+
+  // Horizontal score bar
+  scoreBar(label: string, score: number, total: number, color: readonly [number, number, number] = GOLD) {
+    this.checkPage(10);
+    const trackW = 60;
+    const barW = (score / total) * trackW;
+    const labelX = this.margin;
+    const scoreX = this.margin + 60;
+    const barX = this.margin + 76;
+    this.pdf.setFontSize(9);
+    this.pdf.setTextColor(...BLACK);
+    this.pdf.text(label, labelX, this.y);
+    this.pdf.setTextColor(...color);
+    this.pdf.setFont("helvetica", "bold");
+    this.pdf.text(`${score}/${total}`, scoreX, this.y);
+    this.pdf.setFont("helvetica", "normal");
+    // Track
+    this.pdf.setFillColor(220, 220, 230);
+    this.pdf.roundedRect(barX, this.y - 4, trackW, 5, 1, 1, "F");
+    // Fill
+    this.pdf.setFillColor(...color);
+    this.pdf.roundedRect(barX, this.y - 4, barW, 5, 1, 1, "F");
+    this.pdf.setTextColor(...BLACK);
+    this.y += 7;
   }
 
   subHeader(title: string) {
@@ -147,6 +547,55 @@ class PDFBuilder {
 
   spacer(h = 4) { this.y += h; }
 
+  // Flowing prose paragraph — used for dasha interpretations
+  para(text: string, size = 9.5) {
+    const maxW = this.pageW - this.margin * 2;
+    const lines = this.pdf.splitTextToSize(text.trim(), maxW);
+    this.pdf.setFontSize(size);
+    this.black();
+    this.pdf.setFont("helvetica", "normal");
+    lines.forEach((l: string) => {
+      this.checkPage(7);
+      this.pdf.text(l, this.margin, this.y);
+      this.y += 5.6;
+    });
+    this.y += 3;
+  }
+
+  // Render a labelled paragraph for dasha life-area sections
+  // icon param kept for call-site compatibility but NOT rendered (jsPDF Helvetica can't render emoji)
+  lifeAreaPara(
+    _icon: string,
+    label: string,
+    text: string,
+    labelColor: readonly [number, number, number] = SC_DASHA
+  ) {
+    this.checkPage(22);
+    // Label badge — ASCII only, no emoji, capped at 90mm
+    const badgeLabel = label.toUpperCase();
+    this.pdf.setFontSize(8);
+    const rawW = this.pdf.getTextWidth(`  ${badgeLabel}  `);
+    const badgeW = Math.min(rawW + 4, 90);
+    this.pdf.setFillColor(...labelColor);
+    this.pdf.roundedRect(this.margin, this.y - 4, badgeW, 6.5, 1, 1, "F");
+    this.pdf.setTextColor(...WHITE);
+    this.pdf.setFont("helvetica", "bold");
+    this.pdf.text(badgeLabel, this.margin + 3, this.y);
+    this.pdf.setFont("helvetica", "normal");
+    this.y += 6;
+    // Paragraph text — indented, line height 5.2
+    const maxW = this.pageW - this.margin * 2 - 8;
+    const lines = this.pdf.splitTextToSize(text.trim(), maxW);
+    this.pdf.setFontSize(9);
+    this.pdf.setTextColor(...BLACK);
+    lines.forEach((l: string) => {
+      this.checkPage(6);
+      this.pdf.text(l, this.margin + 5, this.y);
+      this.y += 5.2;
+    });
+    this.y += 4;
+  }
+
   // Two-column row
   twoCol(left: string, right: string) {
     this.checkPage(7);
@@ -176,9 +625,11 @@ class PDFBuilder {
       this.pdf.setFontSize(7.5);
       this.pdf.setTextColor(...LIGHT);
       this.pdf.text(
-        `AstroLife Vedic Report  •  Page ${i} of ${totalPages}  •  Confidential`,
-        this.pageW / 2, this.pageH - 8, { align: "center" }
+        "Astrology is guidance-oriented. Use practical judgment for final decisions.",
+        this.margin, this.pageH - 8
       );
+      this.pdf.text("AstroLife AI", this.pageW / 2, this.pageH - 8, { align: "center" });
+      this.pdf.text(`Page ${i} of ${totalPages}`, this.pageW - this.margin, this.pageH - 8, { align: "right" });
       this.pdf.setDrawColor(...GOLD);
       this.pdf.setLineWidth(0.2);
       this.pdf.line(this.margin, this.pageH - 12, this.pageW - this.margin, this.pageH - 12);
@@ -193,87 +644,651 @@ function safeCall<T>(fn: () => T, fallback: T): T {
   try { return fn(); } catch { return fallback; }
 }
 
+// ── Cover helpers ──────────────────────────────────────────────────────────
+const ZODIAC_NAMES  = ["ARIES","TAURUS","GEMINI","CANCER","LEO","VIRGO",
+                        "LIBRA","SCORPIO","SAGIT","CAPRI","AQUAR","PISCES"];
+
+// Lagna-lord mapping for lagnalord cover
+const LAGNA_LORD: Record<string, { name: string; deity: string; devaSymbol: string }> = {
+  Aries:       { name: "Mars",    deity: "Mangal",  devaSymbol: "MA" },
+  Taurus:      { name: "Venus",   deity: "Shukra",  devaSymbol: "SH" },
+  Gemini:      { name: "Mercury", deity: "Budha",   devaSymbol: "BU" },
+  Cancer:      { name: "Moon",    deity: "Chandra",  devaSymbol: "CH" },
+  Leo:         { name: "Sun",     deity: "Surya",   devaSymbol: "SU" },
+  Virgo:       { name: "Mercury", deity: "Budha",   devaSymbol: "BU" },
+  Libra:       { name: "Venus",   deity: "Shukra",  devaSymbol: "SH" },
+  Scorpio:     { name: "Mars",    deity: "Mangal",  devaSymbol: "MA" },
+  Sagittarius: { name: "Jupiter", deity: "Brihaspati", devaSymbol: "BR" },
+  Capricorn:   { name: "Saturn",  deity: "Shani",   devaSymbol: "SN" },
+  Aquarius:    { name: "Saturn",  deity: "Shani",   devaSymbol: "SN" },
+  Pisces:      { name: "Jupiter", deity: "Brihaspati", devaSymbol: "BR" },
+};
+
+// Sanskrit cardinal labels for lagnalord cover
+const DEVANAGARI_CARDINAL: Record<string, string[]> = {
+  Mars:    ["मंगल", "लग्न", "बल", "मन्त्र"],
+  Venus:   ["शुक्र", "लग्न", "प्रेम", "मन्त्र"],
+  Mercury: ["बुध",  "लग्न", "बुद्धि", "मन्त्र"],
+  Moon:    ["चन्द्र","लग्न", "मन", "मन्त्र"],
+  Sun:     ["सूर्य", "लग्न", "तेज", "मन्त्र"],
+  Jupiter: ["बृहस्पति","लग्न","ज्ञान","मन्त्र"],
+  Saturn:  ["शनि",  "लग्न", "कर्म", "मन्त्र"],
+  Rahu:    ["राहु", "लग्न", "छाया", "मन्त्र"],
+  Ketu:    ["केतु", "लग्न", "मोक्ष", "मन्त्र"],
+};
+
+function drawCoverNativeLine(b: PDFBuilder, chart: ChartData, y: number) {
+  const pal = b.pal;
+  const sunSign  = chart.planets.Sun?.sign  ?? "—";
+  const moonSign = chart.planets.Moon?.sign ?? "—";
+  const moonNak  = chart.planets.Moon?.nakshatra ?? "—";
+
+  // "prepared exclusively for" line
+  b.pdf.setFontSize(8.5);
+  b.pdf.setTextColor(...pal.ivoryMute);
+  b.pdf.setFont("helvetica", "italic");
+  b.pdf.text("prepared exclusively for", b.pageW / 2, y, { align: "center" });
+
+  // Name
+  b.pdf.setFontSize(22);
+  b.pdf.setTextColor(...pal.ivory);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text(chart.name, b.pageW / 2, y + 10, { align: "center" });
+
+  // Glyph row — Lagna · Moon · Sun · Nakshatra
+  b.pdf.setFontSize(8);
+  b.pdf.setTextColor(...pal.gold);
+  b.pdf.setFont("helvetica", "normal");
+  const glyphLine = `${chart.lagnaRashi} Ascendant  ·  ${sunSign} Sun  ·  ${moonSign} Moon  ·  ${moonNak} Nakshatra`;
+  b.pdf.text(glyphLine, b.pageW / 2, y + 19, { align: "center" });
+}
+
+function drawOrnamentalRule(b: PDFBuilder, y: number, width = 60) {
+  const cx = b.pageW / 2;
+  b.pdf.setDrawColor(...b.pal.gold);
+  b.pdf.setLineWidth(0.25);
+  b.pdf.line(cx - width / 2, y, cx - 6, y);
+  b.pdf.line(cx + 6,         y, cx + width / 2, y);
+  b.pdf.setFontSize(10);
+  b.pdf.setTextColor(...b.pal.gold);
+  b.pdf.text("◆", cx, y + 1.5, { align: "center" });
+}
+
+// ── COVER A: Zodiac Wheel ─────────────────────────────────────────────────
+function drawWheelCover(b: PDFBuilder, chart: ChartData) {
+  const pal = b.pal;
+  const cx = b.pageW / 2;
+  const cy = b.pageH * 0.42;
+
+  // Full page background
+  b.pdf.setFillColor(...pal.bg);
+  b.pdf.rect(0, 0, b.pageW, b.pageH, "F");
+
+  // Zodiac wheel — 3 concentric rings, very low opacity via fill trick
+  b.pdf.setDrawColor(...pal.goldDim);
+  b.pdf.setLineWidth(0.3);
+  [52, 46, 45].forEach(r => b.pdf.circle(cx, cy, r, "S"));
+
+  // Inner constellation rings
+  b.pdf.setLineWidth(0.15);
+  [32, 26].forEach(r => b.pdf.circle(cx, cy, r, "S"));
+
+  // 12 radial dividers + zodiac labels around outer ring
+  for (let i = 0; i < 12; i++) {
+    const angle = (i * 30 - 90) * (Math.PI / 180);
+    const x1 = cx + 26 * Math.cos(angle);
+    const y1 = cy + 26 * Math.sin(angle);
+    const x2 = cx + 52 * Math.cos(angle);
+    const y2 = cy + 52 * Math.sin(angle);
+    b.pdf.line(x1, y1, x2, y2);
+
+    // Zodiac glyph label
+    const labelR = 58;
+    const lx = cx + labelR * Math.cos(angle + 15 * Math.PI / 180);
+    const ly = cy + labelR * Math.sin(angle + 15 * Math.PI / 180);
+    b.pdf.setFontSize(6);
+    b.pdf.setTextColor(...pal.goldDim);
+    b.pdf.text(ZODIAC_NAMES[i], lx, ly, { align: "center" });
+  }
+
+  // Brand wordmark top
+  b.pdf.setFontSize(11);
+  b.pdf.setTextColor(...pal.gold);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text("AstroLife", b.margin, 18);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.setFontSize(7.5);
+  b.pdf.setTextColor(...pal.ivoryMute);
+  b.pdf.text("COSMIC BLUEPRINT  ·  VEDIC ASTROLOGY REPORT", b.pageW - b.margin, 18, { align: "right" });
+
+  // Top hairline rule
+  b.pdf.setDrawColor(...pal.gold);
+  b.pdf.setLineWidth(0.2);
+  b.pdf.line(b.margin, 22, b.pageW - b.margin, 22);
+
+  // "Your / Cosmic / Blueprint" title stack — centred in wheel zone
+  const titleY = cy - 22;
+  b.pdf.setFontSize(36);
+  b.pdf.setTextColor(...pal.ivory);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.text("Your", cx, titleY, { align: "center" });
+
+  b.pdf.setFontSize(44);
+  b.pdf.setTextColor(...pal.goldBright);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text("Cosmic", cx, titleY + 16, { align: "center" });
+
+  b.pdf.setFontSize(36);
+  b.pdf.setTextColor(...pal.ivory);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.text("Blueprint", cx, titleY + 30, { align: "center" });
+
+  // Ornamental rule below title
+  drawOrnamentalRule(b, cy + 38, 56);
+
+  // Native line at bottom
+  drawCoverNativeLine(b, chart, b.pageH - 48);
+
+  // Bottom hairline
+  b.pdf.setDrawColor(...pal.goldDim);
+  b.pdf.setLineWidth(0.2);
+  b.pdf.line(b.margin, b.pageH - 28, b.pageW - b.margin, b.pageH - 28);
+
+  // Generated date
+  b.pdf.setFontSize(7);
+  b.pdf.setTextColor(...pal.ivoryMute);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.text(
+    `Generated ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}`,
+    b.pageW / 2, b.pageH - 22, { align: "center" }
+  );
+}
+
+// ── COVER B: Lagna Lord Mandala ───────────────────────────────────────────
+function drawLagnaLordCover(b: PDFBuilder, chart: ChartData) {
+  const pal  = b.pal;
+  const cx   = b.pageW / 2;
+  const lord = LAGNA_LORD[chart.lagnaRashi] ?? LAGNA_LORD.Aries;
+  const cardinals = DEVANAGARI_CARDINAL[lord.name] ?? DEVANAGARI_CARDINAL.Mercury;
+
+  // Background
+  b.pdf.setFillColor(...pal.bg);
+  b.pdf.rect(0, 0, b.pageW, b.pageH, "F");
+
+  // Brand rail
+  b.pdf.setFontSize(11);
+  b.pdf.setTextColor(...pal.gold);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text("AstroLife", b.margin, 18);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.setFontSize(7.5);
+  b.pdf.setTextColor(...pal.ivoryMute);
+  b.pdf.text("COSMIC BLUEPRINT  ·  VEDIC ASTROLOGY REPORT", b.pageW - b.margin, 18, { align: "right" });
+  b.pdf.setDrawColor(...pal.gold);
+  b.pdf.setLineWidth(0.2);
+  b.pdf.line(b.margin, 22, b.pageW - b.margin, 22);
+
+  // Eyebrow above mandala
+  const mcy = b.pageH * 0.42;
+  b.pdf.setFontSize(8);
+  b.pdf.setTextColor(...pal.gold);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text(`${chart.name.toUpperCase()}  ·  ${chart.lagnaRashi.toUpperCase()} ASCENDANT`, cx, mcy - 68, { align: "center" });
+
+  // Mandala — outer ring, inner ring, cross lines
+  b.pdf.setDrawColor(...pal.gold);
+  b.pdf.setLineWidth(0.5);
+  b.pdf.circle(cx, mcy, 38, "S");
+  b.pdf.setLineWidth(0.2);
+  b.pdf.circle(cx, mcy, 35, "S");
+
+  // Four petal arcs (simplified as short arcs via lines at 45°)
+  [0, 90, 180, 270].forEach(deg => {
+    const rad = deg * Math.PI / 180;
+    const x1 = cx + 22 * Math.cos(rad);
+    const y1 = mcy + 22 * Math.sin(rad);
+    const x2 = cx + 34 * Math.cos(rad);
+    const y2 = mcy + 34 * Math.sin(rad);
+    b.pdf.setDrawColor(...pal.goldDim);
+    b.pdf.setLineWidth(0.3);
+    b.pdf.line(x1, y1, x2, y2);
+  });
+
+  // Inner double circle
+  b.pdf.setDrawColor(...pal.gold);
+  b.pdf.setLineWidth(0.4);
+  b.pdf.circle(cx, mcy, 18, "S");
+  b.pdf.setLineWidth(0.2);
+  b.pdf.circle(cx, mcy, 14, "S");
+
+  // Lord initials in centre
+  b.pdf.setFontSize(16);
+  b.pdf.setTextColor(...pal.goldBright);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text(lord.devaSymbol, cx, mcy + 5, { align: "center" });
+
+  // Cardinal Sanskrit labels (top / right / bottom / left)
+  const cardinalPos = [
+    { x: cx,      y: mcy - 44 },
+    { x: cx + 48, y: mcy + 2  },
+    { x: cx,      y: mcy + 48 },
+    { x: cx - 48, y: mcy + 2  },
+  ];
+  b.pdf.setFontSize(8);
+  b.pdf.setTextColor(...pal.gold);
+  b.pdf.setFont("helvetica", "normal");
+  cardinals.forEach((label, i) => {
+    b.pdf.text(label, cardinalPos[i].x, cardinalPos[i].y, { align: "center" });
+  });
+
+  // Lord name + deity below mandala
+  b.pdf.setFontSize(14);
+  b.pdf.setTextColor(...pal.ivory);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text(`${lord.name} — Lagna Lord`, cx, mcy + 56, { align: "center" });
+
+  b.pdf.setFontSize(9);
+  b.pdf.setTextColor(...pal.gold);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.text(lord.deity, cx, mcy + 64, { align: "center" });
+
+  // Ornamental rule
+  drawOrnamentalRule(b, mcy + 72, 52);
+
+  // Title stack
+  const titleY = mcy + 86;
+  b.pdf.setFontSize(32);
+  b.pdf.setTextColor(...pal.ivory);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.text("Your", cx, titleY, { align: "center" });
+  b.pdf.setFontSize(40);
+  b.pdf.setTextColor(...pal.goldBright);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.text("Cosmic Blueprint", cx, titleY + 14, { align: "center" });
+
+  // Native line
+  drawCoverNativeLine(b, chart, b.pageH - 48);
+
+  // Bottom rule + date
+  b.pdf.setDrawColor(...pal.goldDim);
+  b.pdf.setLineWidth(0.2);
+  b.pdf.line(b.margin, b.pageH - 28, b.pageW - b.margin, b.pageH - 28);
+  b.pdf.setFontSize(7);
+  b.pdf.setTextColor(...pal.ivoryMute);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.text(
+    `Generated ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}`,
+    b.pageW / 2, b.pageH - 22, { align: "center" }
+  );
+}
+
+// Palette-aware premium cover dispatcher
+function drawPremiumCover(b: PDFBuilder, chart: ChartData, cover: ReportCover = "wheel") {
+  if (cover === "lagnalord") {
+    drawLagnaLordCover(b, chart);
+  } else {
+    drawWheelCover(b, chart);
+  }
+}
+
+function samplePage(b: PDFBuilder, section: string) {
+  b.pdf.addPage();
+  b.y = 26;
+  b.pdf.setFillColor(...SOFT_BG);
+  b.pdf.rect(0, 0, b.pageW, b.pageH, "F");
+  b.pdf.setTextColor(...INK);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.setFontSize(8);
+  b.pdf.text("AstroLife Premium Report", b.margin, 13);
+  b.pdf.setTextColor(...GRAY);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.setFontSize(7);
+  b.pdf.text(section, b.pageW - b.margin, 13, { align: "right" });
+  b.pdf.setDrawColor(...LINE);
+  b.pdf.line(b.margin, 17, b.pageW - b.margin, 17);
+}
+
+function sampleSectionTitle(
+  b: PDFBuilder,
+  kicker: string,
+  title: string,
+  score?: number
+) {
+  b.pdf.setTextColor(...GOLD);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.setFontSize(8);
+  b.pdf.text(kicker.toUpperCase(), b.margin, b.y);
+  b.y += 11;
+  b.pdf.setTextColor(...INK);
+  b.pdf.setFontSize(23);
+  b.fitText(title, b.margin, b.y, score === undefined ? b.pageW - b.margin * 2 : b.pageW - b.margin * 2 - 45, 23, "bold");
+  if (score !== undefined) {
+    b.pdf.setFillColor(245, 236, 214);
+    b.pdf.setDrawColor(232, 207, 139);
+    b.pdf.roundedRect(b.pageW - b.margin - 40, b.y - 12, 40, 18, 7, 7, "FD");
+    b.pdf.setTextColor(...GOLD);
+    b.pdf.setFontSize(6.5);
+    b.pdf.text("ASTROLIFE SIGNAL", b.pageW - b.margin - 20, b.y - 5, { align: "center" });
+    b.pdf.setFontSize(11);
+    b.pdf.text(String(score), b.pageW - b.margin - 20, b.y + 2, { align: "center" });
+  }
+  b.y += 14;
+}
+
+function samplePara(b: PDFBuilder, text: string, maxWidth = b.pageW - b.margin * 2, x = b.margin) {
+  const lines = b.pdf.splitTextToSize(text.trim(), maxWidth);
+  b.pdf.setTextColor(43, 36, 56);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.setFontSize(9.2);
+  lines.forEach((line: string) => {
+    b.pdf.text(line, x, b.y);
+    b.y += 5.7;
+  });
+}
+
+function sampleBulletBox(
+  b: PDFBuilder,
+  title: string,
+  bullets: string[],
+  x: number,
+  y: number,
+  w: number,
+  h = 47
+) {
+  b.pdf.setFillColor(...WHITE);
+  b.pdf.setDrawColor(...LINE);
+  b.pdf.roundedRect(x, y, w, h, 5, 5, "FD");
+  b.pdf.setTextColor(...INK);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.setFontSize(9.5);
+  b.pdf.text(title, x + 6, y + 10);
+  let yy = y + 18;
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.setFontSize(7.8);
+  bullets.slice(0, 4).forEach((item) => {
+    b.pdf.setFillColor(...GOLD);
+    b.pdf.circle(x + 8, yy - 1.6, 1, "F");
+    b.pdf.setTextColor(58, 50, 72);
+    const line = b.pdf.splitTextToSize(item, w - 18)[0] ?? item;
+    b.pdf.text(line, x + 12, yy);
+    yy += 7;
+  });
+}
+
+function sampleTable(
+  b: PDFBuilder,
+  headers: string[],
+  rows: string[][],
+  widths: number[]
+) {
+  const x = b.margin;
+  const w = b.pageW - b.margin * 2;
+  const rowH = 9;
+  b.pdf.setFillColor(...GOLD);
+  b.pdf.roundedRect(x, b.y, w, rowH, 3, 3, "F");
+  b.pdf.setTextColor(...WHITE);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.setFontSize(7.3);
+  let cx = x;
+  headers.forEach((header, i) => {
+    b.pdf.text(header, cx + 3, b.y + 6);
+    cx += w * widths[i];
+  });
+  b.y += rowH;
+  b.pdf.setFont("helvetica", "normal");
+  rows.forEach((row, ri) => {
+    b.pdf.setFillColor(ri % 2 === 0 ? 255 : 248, ri % 2 === 0 ? 253 : 241, ri % 2 === 0 ? 248 : 225);
+    b.pdf.rect(x, b.y, w, rowH, "F");
+    cx = x;
+    row.forEach((value, i) => {
+      b.pdf.setTextColor(...INK);
+      b.fitText(value, cx + 3, b.y + 6, w * widths[i] - 6, 7.2);
+      cx += w * widths[i];
+    });
+    b.y += rowH;
+  });
+  b.y += 8;
+}
+
+function sampleContentPage(
+  b: PDFBuilder,
+  title: string,
+  kicker: string,
+  body: string,
+  quickSummary: string[],
+  actionPlan: string[],
+  remedy: string[],
+  score: number
+) {
+  samplePage(b, title);
+  sampleSectionTitle(b, kicker, title, score);
+  samplePara(b, body);
+  b.y += 8;
+  const colW = (b.pageW - b.margin * 2 - 8) / 2;
+  const boxY = b.y;
+  sampleBulletBox(b, "Quick Summary", quickSummary, b.margin, boxY, colW);
+  sampleBulletBox(b, "Action Plan", actionPlan, b.margin + colW + 8, boxY, colW);
+  b.y = boxY + 58;
+  b.pdf.setFillColor(248, 241, 220);
+  b.pdf.setDrawColor(232, 207, 139);
+  b.pdf.roundedRect(b.margin, b.y, b.pageW - b.margin * 2, 36, 5, 5, "FD");
+  b.pdf.setTextColor(...GOLD);
+  b.pdf.setFont("helvetica", "bold");
+  b.pdf.setFontSize(10);
+  b.pdf.text("Remedy / Alignment", b.margin + 7, b.y + 11);
+  b.pdf.setTextColor(58, 50, 72);
+  b.pdf.setFont("helvetica", "normal");
+  b.pdf.setFontSize(8);
+  remedy.slice(0, 3).forEach((line, index) => {
+    b.pdf.text(`- ${line}`, b.margin + 9, b.y + 20 + index * 6);
+  });
+}
+
+export function getSampleStyleReport(chart: ChartData, options: ReportOptions): Blob {
+  const b = new PDFBuilder(options.palette ?? "midnight");
+  b.pdf.setProperties({
+    title: "AstroLife Premium Kundli Report",
+    subject: "Premium Kundli Dossier",
+    author: "AstroLife AI",
+  });
+
+  drawPremiumCover(b, chart, options.cover ?? "wheel");
+
+  const planetOrder = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+  const now = new Date();
+  const moon = chart.planets.Moon;
+  const sun = chart.planets.Sun;
+  const currentMD = chart.dashas.find(d => new Date(d.start) <= now && now < new Date(d.end));
+  const currentAD = chart.antardasha?.find(d => new Date(d.start) <= now && now < new Date(d.end));
+  const psych = safeCall(() => calculatePsychology(chart.planets), null);
+  const medical = safeCall(() => calculateMedical(chart), null);
+  const remedies = safeCall(() => calculateRemedies(chart), null);
+  const destiny = safeCall(() => calculateDestiny(chart.planets, chart.dashas, chart.dob), null);
+
+  samplePage(b, "Before You Read");
+  sampleSectionTitle(b, "Spiritual opening and responsible guidance", "Before You Read");
+  samplePara(b, "This report is prepared using principles of Vedic astrology, planetary positions, dasha periods, transits, yogas, doshas and AI-assisted interpretation. Astrology is a symbolic guidance system. It helps you understand tendencies, timing patterns, strengths, challenges and possible life directions.");
+  b.y += 6;
+  const colW = (b.pageW - b.margin * 2 - 8) / 2;
+  sampleBulletBox(b, "How to Use", [
+    "Read slowly and reflect on repeated themes.",
+    "Use predictions as guidance, not fixed destiny.",
+    "Compare dasha, transit and life situation together.",
+    "Focus on remedies, action plan and self-awareness.",
+  ], b.margin, b.y, colW);
+  sampleBulletBox(b, "Core Principle", [
+    "Awareness improves karma.",
+    "Discipline strengthens weak areas.",
+    "Remedies work best with right action.",
+    "Free will remains important.",
+  ], b.margin + colW + 8, b.y, colW);
+
+  samplePage(b, "Table of Contents");
+  sampleSectionTitle(b, "Report navigation", "Table of Contents");
+  [
+    "Cover Page",
+    "Disclaimer & Spiritual Opening",
+    "Birth Details",
+    "Planetary Positions",
+    "Lagna Chart",
+    "Panchang Details",
+    "Personality & Life Pattern",
+    "Career & Public Life",
+    "Health & Vitality",
+    "Dasha Timeline",
+    "Remedies & Final Guidance",
+  ].forEach((entry, index) => b.tocRow(index, entry));
+
+  samplePage(b, "Birth Details");
+  sampleSectionTitle(b, "Native profile and panchang snapshot", "Birth Details");
+  b.keyValueGrid([
+    ["Name", chart.name],
+    ["Date of Birth", chart.dob],
+    ["Time of Birth", chart.tob],
+    ["Birth Place", chart.city],
+    ["Latitude", chart.lat.toFixed(5)],
+    ["Longitude", chart.lon.toFixed(5)],
+    ["Timezone", `UTC ${chart.tz >= 0 ? "+" : ""}${chart.tz}`],
+    ["Current Dasha", `${currentMD?.planet ?? "Unknown"} > ${currentAD?.planet ?? "Unknown"}`],
+    ["Lagna", chart.lagnaRashi],
+    ["Moon Sign", moon?.sign ?? "Unknown"],
+    ["Nakshatra", moon?.nakshatra ?? "Unknown"],
+    ["Ayanamsha", "Lahiri"],
+  ], 3);
+  samplePara(b, "Birth details are the foundation of the horoscope. Even a small difference in time or place can change the ascendant, house positions, divisional chart details and timing calculations. This report uses the available birth fields to create a practical premium dossier.");
+
+  samplePage(b, "Planetary Positions");
+  sampleSectionTitle(b, "Graha position table", "Planetary Positions");
+  sampleTable(
+    b,
+    ["Planet", "Sign", "Degree", "Nakshatra", "House", "Status"],
+    planetOrder.filter(p => chart.planets[p]).map(p => {
+      const pd = chart.planets[p];
+      return [
+        p,
+        pd.sign,
+        `${(pd.lon % 30).toFixed(2)} deg`,
+        pd.nakshatra,
+        String(pd.house),
+        pd.dignity || (pd.retrograde ? "Retrograde" : "Neutral"),
+      ];
+    }),
+    [0.14, 0.16, 0.15, 0.25, 0.1, 0.2]
+  );
+  samplePara(b, "Planetary positions show where the main forces of the horoscope are placed. A planet's sign shows expression style, its house shows the life area where it becomes active, and its nakshatra reveals a deeper psychological and karmic layer.");
+
+  samplePage(b, "Lagna Chart");
+  sampleSectionTitle(b, "North Indian chart visual", "Lagna Chart");
+  b.drawNorthIndianChart(chart, b.margin, b.y, 102);
+  const chartTextX = b.margin + 114;
+  const savedY = b.y;
+  b.y += 5;
+  samplePara(b, "The Lagna chart is the main birth chart. It shows the physical life path, event manifestation, body, identity and worldly responsibilities. Repeated patterns across Lagna, Moon and Navamsha should be treated as important.", b.pageW - chartTextX - b.margin, chartTextX);
+  b.y += 8;
+  sampleBulletBox(b, "Chart Notes", [
+    "Lagna is the anchor of the horoscope.",
+    "House placement shows life area activation.",
+    "Dasha and transit decide timing.",
+    "Strength decides how easily results manifest.",
+  ], chartTextX, b.y, b.pageW - chartTextX - b.margin, 48);
+  b.y = savedY + 112;
+
+  samplePage(b, "Panchang Details");
+  sampleSectionTitle(b, "Birth-time spiritual signature", "Panchang Details", 73);
+  b.keyValueGrid([
+    ["Nakshatra", moon?.nakshatra ?? "Unknown"],
+    ["Nakshatra Lord", moon?.nakshatraLord ?? "Unknown"],
+    ["Pada", String(moon?.pada ?? "—")],
+    ["Weekday", new Date(chart.dob).toLocaleDateString("en-IN", { weekday: "long" })],
+    ["Sun Sign", sun?.sign ?? "Unknown"],
+    ["Moon Sign", moon?.sign ?? "Unknown"],
+    ["Lagna", chart.lagnaRashi],
+    ["Current MD", currentMD?.planet ?? "Unknown"],
+    ["Current AD", currentAD?.planet ?? "Unknown"],
+  ], 3);
+
+  const commonBody = "This section combines traditional Jyotish mechanics with modern AstroLife guidance. The chart indicates that life improves when awareness is combined with disciplined action. Some karmic planets can create pressure, delay or transformation, but the same pressure can mature into skill, wisdom and long-term achievement.";
+  const commonSummary = ["Repeated chart themes matter most.", "Do not judge one planet in isolation.", "Dasha activates the promise.", "Transit gives current timing."];
+  const commonAction = ["Track recurring life themes.", "Use timing for planning.", "Avoid fear-based decisions.", "Choose practical remedies."];
+  const commonRemedy = ["Keep a stable daily routine.", "Begin important days with grounding practice.", "Respect teachers, elders and mentors."];
+
+  sampleContentPage(
+    b,
+    "Personality & Life Pattern",
+    "How Lagna, Moon and planetary pattern shape your nature",
+    psych?.summary ? `${psych.summary} ${psych.pattern?.desc ?? ""}` : commonBody,
+    psych?.dominantFunctions?.length ? psych.dominantFunctions.slice(0, 4) : commonSummary,
+    psych?.growthPlan?.length ? psych.growthPlan.slice(0, 4) : commonAction,
+    psych?.stabilizers?.length ? psych.stabilizers.slice(0, 3) : commonRemedy,
+    76
+  );
+
+  sampleContentPage(
+    b,
+    "Career & Public Life",
+    "Professional karma, authority and recognition",
+    `${commonBody} For this chart, the 10th house sign is ${RASHI_NAMES[(chart.lagnaNum + 9) % 12]}, and current dasha ${currentMD?.planet ?? "Unknown"} shows which professional themes are active now.`,
+    getLifeAreaAnalysis("career", chart).slice(0, 4),
+    ["Use strong dasha periods for launches.", "Document commitments clearly.", "Build authority through consistent output.", "Avoid comparison-driven decisions."],
+    ["Offer service to mentors or elders.", "Start work with a short grounding prayer.", "Keep workplace ethics clean."],
+    78
+  );
+
+  sampleContentPage(
+    b,
+    "Health & Vitality",
+    "Body rhythm, stress patterns and preventive awareness",
+    medical ? `Overall health sensitivity is ${medical.riskLevel}. ${medical.prakriti} This is preventive awareness, not diagnosis; medical symptoms must be checked by qualified doctors.` : commonBody,
+    medical?.topConcerns?.length ? medical.topConcerns.map(c => `${c} sensitivity requires awareness.`).slice(0, 4) : getLifeAreaAnalysis("health", chart).slice(0, 4),
+    medical?.preventiveRoutine?.length ? medical.preventiveRoutine.slice(0, 4) : commonAction,
+    ["Maintain sleep, digestion and hydration routine.", "Use astrology as prevention, not diagnosis.", "Consult qualified doctors for symptoms."],
+    medical?.riskLevel === "high" ? 64 : medical?.riskLevel === "moderate" ? 72 : 81
+  );
+
+  sampleContentPage(
+    b,
+    "Dasha Timeline",
+    "Planetary period activation and timing",
+    destiny?.summary ?? `Current Mahadasha is ${currentMD?.planet ?? "Unknown"} and current Antardasha is ${currentAD?.planet ?? "Unknown"}. Dasha decides when the chart promise becomes active.`,
+    destiny?.nextMilestones?.length ? destiny.nextMilestones.slice(0, 4).map(m => `${m.year}: ${m.score}/100 ${m.trend}`) : commonSummary,
+    destiny?.actionPlan?.length ? destiny.actionPlan.slice(0, 4) : commonAction,
+    remedies?.cards?.slice(0, 3).map(r => `${r.planet}: ${r.donate || r.mantra}`) ?? commonRemedy,
+    destiny?.currentScore ?? 74
+  );
+
+  sampleContentPage(
+    b,
+    "Remedies & Final Guidance",
+    "Karmic alignment, mantra and practical correction",
+    "The most important message of this report is that timing and effort must work together. Favourable timing without effort gives little result, and effort without timing may feel delayed. Remedies are most useful when they support disciplined action.",
+    remedies?.cards?.slice(0, 4).map(r => `${r.planet}: ${r.priority} priority`) ?? commonSummary,
+    ["Read the report once without rushing.", "Pick only the top two remedies first.", "Review progress every 30 days.", "Use AstroLife AI for deeper timing questions."],
+    remedies?.cards?.slice(0, 3).map(r => `${r.day || "Weekly"}: ${r.donate || r.mantra}`) ?? commonRemedy,
+    81
+  );
+
+  b.addFooters(b.pdf.getNumberOfPages());
+  return b.output();
+}
+
 // ── MAIN REPORT ────────────────────────────────────────────────
 export async function generatePDFReport(
   chart: ChartData,
   options: ReportOptions = { type: "full" }
 ): Promise<Blob> {
-  const b = new PDFBuilder();
-  void options; // options reserved for future section filtering
+  return generateLegacyPDFReport(chart, options);
+}
+
+export async function generateLegacyPDFReport(
+  chart: ChartData,
+  options: ReportOptions = { type: "full" }
+): Promise<Blob> {
+  const b = new PDFBuilder(options.palette ?? "midnight");
 
   // ═══════════════════════════════════════════════════════════════
-  // COVER PAGE
+  // COVER PAGE — palette-aware, dual cover style
   // ═══════════════════════════════════════════════════════════════
-  b.pdf.setFillColor(...DARK_BG);
-  b.pdf.rect(0, 0, b.pageW, b.pageH, "F");
-
-  // Gold border
-  b.pdf.setDrawColor(...GOLD);
-  b.pdf.setLineWidth(1.5);
-  b.pdf.rect(8, 8, b.pageW - 16, b.pageH - 16);
-  b.pdf.setLineWidth(0.5);
-  b.pdf.rect(10, 10, b.pageW - 20, b.pageH - 20);
-
-  // Brand
-  b.pdf.setFontSize(10);
-  b.pdf.setTextColor(...GOLD);
-  b.pdf.setFont("helvetica", "bold");
-  b.pdf.text("✦ ASTROLIFE ✦", b.pageW / 2, 30, { align: "center" });
-
-  b.pdf.setFontSize(8);
-  b.pdf.setFont("helvetica", "normal");
-  b.pdf.setTextColor(...LIGHT);
-  b.pdf.text("AI-Powered Vedic Astrology Platform", b.pageW / 2, 37, { align: "center" });
-
-  // Title
-  b.pdf.setFontSize(22);
-  b.pdf.setFont("helvetica", "bold");
-  b.pdf.setTextColor(...GOLD);
-  b.pdf.text("COMPREHENSIVE", b.pageW / 2, 70, { align: "center" });
-  b.pdf.text("BIRTH CHART ANALYSIS", b.pageW / 2, 82, { align: "center" });
-
-  b.pdf.setLineWidth(0.5);
-  b.pdf.line(30, 88, b.pageW - 30, 88);
-
-  // Name
-  b.pdf.setFontSize(18);
-  b.pdf.setTextColor(255, 255, 255);
-  b.pdf.text(chart.name.toUpperCase(), b.pageW / 2, 105, { align: "center" });
-
-  // Details
-  b.pdf.setFontSize(10);
-  b.pdf.setTextColor(...LIGHT);
-  b.pdf.text(`Date of Birth: ${chart.dob}  •  Time: ${chart.tob}`, b.pageW / 2, 120, { align: "center" });
-  b.pdf.text(`Place: ${chart.city}`, b.pageW / 2, 128, { align: "center" });
-
-  b.pdf.setLineWidth(0.3);
-  b.pdf.line(30, 134, b.pageW - 30, 134);
-
-  // Chart highlights
-  b.pdf.setFontSize(10);
-  b.pdf.setTextColor(...GOLD);
-  b.pdf.text("CHART HIGHLIGHTS", b.pageW / 2, 148, { align: "center" });
-
-  const sunSign = chart.planets["Sun"]?.sign ?? "—";
-  const moonSign = chart.planets["Moon"]?.sign ?? "—";
-  const moonNak = chart.planets["Moon"]?.nakshatra ?? "—";
-  const highlights = [
-    `Lagna (Ascendant): ${chart.lagnaRashi}`,
-    `Moon Sign (Rashi): ${moonSign}`,
-    `Sun Sign: ${sunSign}`,
-    `Birth Nakshatra: ${moonNak}`,
-  ];
-  b.pdf.setFontSize(9.5);
-  b.pdf.setTextColor(200, 200, 200);
-  highlights.forEach((h, i) => {
-    b.pdf.text(h, b.pageW / 2, 160 + i * 10, { align: "center" });
-  });
-
-  // Footer info
-  b.pdf.setFontSize(8);
-  b.pdf.setTextColor(...LIGHT);
-  b.pdf.text(`Generated: ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}`, b.pageW / 2, b.pageH - 28, { align: "center" });
-  b.pdf.text("Calculations: VSOP87 + ELP2000 (Swiss Ephemeris precision)", b.pageW / 2, b.pageH - 20, { align: "center" });
+  drawPremiumCover(b, chart, options.cover ?? "wheel");
 
   // ═══════════════════════════════════════════════════════════════
   // TABLE OF CONTENTS
@@ -305,29 +1320,32 @@ export async function generatePDFReport(
     "20. Conclusion & Final Guidance",
   ];
 
-  tocEntries.forEach(entry => {
-    b.checkPage(7);
-    b.pdf.setFontSize(9.5);
-    b.black();
-    b.pdf.text(entry, b.margin + 5, b.y);
-    b.y += 7;
-  });
+  tocEntries.forEach((entry, index) => b.tocRow(index, entry));
 
   // ═══════════════════════════════════════════════════════════════
   // SECTION 1: BIRTH INFORMATION
   // ═══════════════════════════════════════════════════════════════
   b.sectionHeader("SECTION 1 — BIRTH INFORMATION & LAGNA DETAILS");
 
+  const sunSign  = chart.planets.Sun?.sign  ?? "—";
+  const moonSign = chart.planets.Moon?.sign ?? "—";
+  const moonNak  = chart.planets.Moon?.nakshatra ?? "—";
+
   b.subHeader("Personal Details");
-  b.keyValue("Full Name", chart.name);
-  b.keyValue("Date of Birth", chart.dob);
-  b.keyValue("Time of Birth", chart.tob);
-  b.keyValue("Birth City", chart.city);
-  b.keyValue("Latitude", `${chart.lat.toFixed(4)}° N`);
-  b.keyValue("Longitude", `${chart.lon.toFixed(4)}° E`);
-  b.keyValue("Timezone", `UTC ${chart.tz >= 0 ? "+" : ""}${chart.tz}`);
-  b.keyValue("Julian Day Number", chart.jd.toFixed(5));
+  b.keyValueGrid([
+    ["Full Name", chart.name],
+    ["Date of Birth", chart.dob],
+    ["Time of Birth", chart.tob],
+    ["Birth City", chart.city],
+    ["Latitude", `${chart.lat.toFixed(4)}°`],
+    ["Longitude", `${chart.lon.toFixed(4)}°`],
+    ["Timezone", `UTC ${chart.tz >= 0 ? "+" : ""}${chart.tz}`],
+    ["Julian Day", chart.jd.toFixed(5)],
+  ], 2);
   b.spacer(4);
+
+  b.signalCard("Lagna", chart.lagnaRashi, `Ascendant sets body, identity, temperament and the main life direction. Sun: ${sunSign}.`, SC_BIRTH);
+  b.signalCard("Moon Signature", `${moonSign} / ${moonNak}`, "Moon sign and birth nakshatra anchor emotional nature, timing and lived experience.", SC_PSYCH);
 
   b.subHeader("Ascendant (Lagna) Analysis");
   b.keyValue("Lagna Sign", chart.lagnaRashi);
@@ -371,49 +1389,50 @@ export async function generatePDFReport(
   b.subHeader("All 9 Planets — Sign, House, Nakshatra, Dignity");
   b.spacer(2);
 
-  // Table header
-  b.pdf.setFontSize(8.5);
-  b.pdf.setTextColor(...GOLD);
-  b.pdf.setFont("helvetica", "bold");
-  const col1 = b.margin, col2 = col1 + 22, col3 = col2 + 28, col4 = col3 + 18, col5 = col4 + 30, col6 = col5 + 32;
-  b.pdf.text("Planet", col1, b.y);
-  b.pdf.text("Sign", col2, b.y);
-  b.pdf.text("House", col3, b.y);
-  b.pdf.text("Degree", col4, b.y);
-  b.pdf.text("Nakshatra", col5, b.y);
-  b.pdf.text("Dignity", col6, b.y);
-  b.pdf.setFont("helvetica", "normal");
-  b.y += 6;
-  b.divider();
-
   const planetOrder = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-  planetOrder.forEach(p => {
-    const pd = chart.planets[p];
-    if (!pd) return;
-    b.checkPage(7);
-    b.pdf.setFontSize(8.5);
-    b.black();
-    b.pdf.text(p, col1, b.y);
-    b.pdf.text(pd.sign, col2, b.y);
-    b.pdf.text(`H${pd.house}`, col3, b.y);
-    b.pdf.text(`${(pd.lon % 30).toFixed(1)}°`, col4, b.y);
-    b.pdf.text(pd.nakshatra ?? "—", col5, b.y);
-    if (pd.dignity) {
-      if (pd.dignity.includes("Exalt")) b.pdf.setTextColor(0, 150, 80);
-      else if (pd.dignity.includes("Debilit")) b.pdf.setTextColor(200, 50, 50);
-      else b.gray();
-      b.pdf.text(pd.dignity.substring(0, 18), col6, b.y);
-      b.black();
-    } else {
-      b.pdf.text("Neutral", col6, b.y);
-    }
-    if (pd.retrograde) {
-      b.pdf.setTextColor(180, 80, 200);
-      b.pdf.text(" ℞", col6 + 20, b.y);
-      b.black();
-    }
-    b.y += 6;
+  const planetRows = planetOrder
+    .filter(p => chart.planets[p])
+    .map(p => {
+      const pd = chart.planets[p]!;
+      const dignity = pd.dignity
+        ? (pd.dignity.substring(0, 16) + (pd.retrograde ? " ℞" : ""))
+        : (pd.retrograde ? "Neutral ℞" : "Neutral");
+      return [p, pd.sign, `H${pd.house}`, `${(pd.lon % 30).toFixed(1)}°`, pd.nakshatra ?? "—", dignity];
+    });
+  const col1 = b.margin, col2 = col1 + 22, col3 = col2 + 28, col4 = col3 + 18, col5 = col4 + 30, col6 = col5 + 32;
+  b.styledTable(
+    ["Planet", "Sign", "House", "Degree", "Nakshatra", "Dignity"],
+    planetRows,
+    [col1, col2, col3, col4, col5, col6],
+    SC_PLANETS
+  );
+
+  b.sectionHeader("SECTION 2B — LAGNA CHART VISUAL");
+  b.line("This North Indian style chart gives a quick visual map of house occupation. Ascendant is marked as As, and planets use two-letter abbreviations so the PDF stays readable.");
+  b.spacer(4);
+  b.drawNorthIndianChart(chart, b.margin, b.y, 92);
+  const visualX = b.margin + 104;
+  const chartNotes = [
+    ["Chart Style", "North Indian"],
+    ["Lagna Rashi", chart.lagnaRashi],
+    ["Lagna Number", String(chart.lagnaNum + 1)],
+    ["First House Sign", RASHI_NAMES[chart.lagnaNum] ?? chart.lagnaRashi],
+    ["Reading Rule", "House position first, then sign and lord"],
+    ["Timing Rule", "Dasha activates the promise"],
+  ];
+  const savedY = b.y;
+  b.y += 4;
+  chartNotes.forEach(([key, value]) => {
+    b.pdf.setFontSize(8);
+    b.pdf.setTextColor(...GOLD);
+    b.pdf.setFont("helvetica", "bold");
+    b.pdf.text(`${key}:`, visualX, b.y);
+    b.pdf.setFont("helvetica", "normal");
+    b.pdf.setTextColor(...BLACK);
+    b.fitText(value, visualX + 30, b.y, b.pageW - visualX - b.margin - 30, 8);
+    b.y += 7;
   });
+  b.y = Math.max(savedY + 100, b.y + 4);
 
   b.spacer(6);
   b.subHeader("Planetary Interpretation Details");
@@ -497,94 +1516,144 @@ export async function generatePDFReport(
   b.line("The Vimshottari Dasha system is a 120-year planetary period cycle based on birth Nakshatra. Each planet governs a specific number of years and shapes life themes during its period.");
   b.spacer(4);
 
-  // Table header
-  b.pdf.setFontSize(8.5);
-  b.pdf.setTextColor(...GOLD);
-  b.pdf.setFont("helvetica", "bold");
-  b.pdf.text("Planet", b.margin, b.y);
-  b.pdf.text("Duration", b.margin + 25, b.y);
-  b.pdf.text("Start Date", b.margin + 50, b.y);
-  b.pdf.text("End Date", b.margin + 90, b.y);
-  b.pdf.text("Status", b.margin + 130, b.y);
-  b.pdf.setFont("helvetica", "normal");
-  b.y += 5;
-  b.divider();
-
   const now = new Date();
   let currentMD: (typeof chart.dashas)[0] | null = null;
 
-  chart.dashas.forEach(d => {
-    b.checkPage(7);
+  const dashaRows = chart.dashas.map(d => {
     const start = new Date(d.start);
     const end = new Date(d.end);
     const isActive = start <= now && now < end;
     if (isActive) currentMD = d;
-
-    b.pdf.setFontSize(8.5);
-    if (isActive) {
-      b.pdf.setTextColor(0, 180, 100);
-      b.pdf.setFont("helvetica", "bold");
-    } else if (end < now) {
-      b.gray();
-    } else {
-      b.black();
-    }
-    b.pdf.text(d.planet, b.margin, b.y);
-    b.pdf.text(`${d.yrs} yrs`, b.margin + 25, b.y);
-    b.pdf.text(start.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }), b.margin + 50, b.y);
-    b.pdf.text(end.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }), b.margin + 90, b.y);
-    b.pdf.text(isActive ? "◀ ACTIVE" : end < now ? "Completed" : "Future", b.margin + 130, b.y);
-    b.pdf.setFont("helvetica", "normal");
-    b.black();
-    b.y += 6;
+    return [
+      d.planet,
+      `${d.yrs} yrs`,
+      start.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+      end.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+      isActive ? "◀ ACTIVE" : end < now ? "Completed" : "Future",
+    ];
   });
+  b.styledTable(
+    ["Planet", "Duration", "Start Date", "End Date", "Status"],
+    dashaRows,
+    [b.margin, b.margin + 25, b.margin + 50, b.margin + 90, b.margin + 130],
+    SC_DASHA
+  );
 
-  b.spacer(6);
+  b.spacer(4);
 
   // Current period analysis
   b.subHeader("Current Active Period Analysis");
   if (currentMD) {
     const md = currentMD as typeof chart.dashas[0];
-    b.keyValue("Active Mahadasha", md.planet);
-    b.keyValue("Period End", new Date(md.end).toLocaleDateString("en-IN", { year: "numeric", month: "long" }));
+    b.keyValue("Active Mahadasha", `${md.planet} Mahadasha`);
+    b.keyValue("Period Ends", new Date(md.end).toLocaleDateString("en-IN", { year: "numeric", month: "long" }));
     const mdPD = chart.planets[md.planet];
     if (mdPD) {
-      b.keyValue("Mahadasha Lord Position", `${mdPD.sign}, House ${mdPD.house}`);
+      b.keyValue("Mahadasha Lord Position", `${mdPD.sign}, ${mdPD.house}th House`);
       if (mdPD.dignity) b.keyValue("Mahadasha Lord Dignity", mdPD.dignity);
     }
+    b.spacer(6);
+
+    // ── Load all knowledge sources ──────────────────────────────
+    const mdHouse      = mdPD?.house ?? 1;
+    const mdSign       = mdPD?.sign  ?? "";
+    const mdDignity    = mdPD?.dignity;
+    const mdInterp     = getMahadashaInterpretation(md.planet, mdHouse, mdDignity);
+    const lkRule       = PLANET_HOUSE_RULES[md.planet]?.[mdHouse];
+    const homeOmenRule = HOME_OMEN_RULES.find(r => r.planet === md.planet);
+    const houseZone    = HOUSE_WISE_OMENS.find(h => h.house === mdHouse);
+    const activeCombos = COMBINATION_RULES.filter(c => c.planets.includes(md.planet)).slice(0, 2);
+    const activeRins   = RIN_RULES.filter(r => r.planets.includes(md.planet));
+
+    b.subHeader(`${md.planet} Mahadasha — Vedic Analysis`);
+    b.para(composeVedicParagraph(md.planet, mdHouse, mdSign, md.yrs, mdInterp, mdDignity));
+
+    b.subHeader(`${md.planet} Mahadasha — Lal Kitab Analysis`);
+    b.para(composeLKParagraph(md.planet, mdHouse, mdSign, md.yrs, lkRule));
+
+    b.subHeader(`${md.planet} Mahadasha — Environmental, Psychological & Karmic Reading`);
+    b.para(composePsychOmenParagraph(md.planet, mdHouse, lkRule, homeOmenRule, houseZone, activeCombos, activeRins));
+
     b.spacer(4);
   }
 
-  // Antardasha
+  // Antardasha table + interpretation
   b.subHeader("Current Antardasha (Sub-Periods)");
+  let currentAD: (typeof chart.antardasha)[0] | null = null;
   if (chart.antardasha && chart.antardasha.length > 0) {
-    b.pdf.setFontSize(8.5);
-    b.pdf.setTextColor(...GOLD);
-    b.pdf.setFont("helvetica", "bold");
-    b.pdf.text("Sub-Lord", b.margin, b.y);
-    b.pdf.text("Start", b.margin + 30, b.y);
-    b.pdf.text("End", b.margin + 80, b.y);
-    b.pdf.text("Status", b.margin + 130, b.y);
-    b.pdf.setFont("helvetica", "normal");
-    b.y += 5;
-    b.divider();
-
-    chart.antardasha.slice(0, 20).forEach(ad => {
-      b.checkPage(7);
+    const adRows = chart.antardasha.slice(0, 20).map(ad => {
       const start = new Date(ad.start);
       const end = new Date(ad.end);
       const isActive = start <= now && now < end;
-      b.pdf.setFontSize(8);
-      if (isActive) { b.pdf.setTextColor(0, 180, 100); b.pdf.setFont("helvetica", "bold"); }
-      else if (end < now) b.gray();
-      else b.black();
-      b.pdf.text(ad.planet, b.margin, b.y);
-      b.pdf.text(start.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }), b.margin + 30, b.y);
-      b.pdf.text(end.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }), b.margin + 80, b.y);
-      b.pdf.text(isActive ? "◀ ACTIVE" : end < now ? "Done" : "Upcoming", b.margin + 130, b.y);
+      if (isActive) currentAD = ad;
+      return [
+        ad.planet,
+        start.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+        end.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+        isActive ? "◀ ACTIVE" : end < now ? "Done" : "Upcoming",
+      ];
+    });
+    b.styledTable(
+      ["Sub-Lord", "Start", "End", "Status"],
+      adRows,
+      [b.margin, b.margin + 30, b.margin + 80, b.margin + 130],
+      SC_DASHA
+    );
+    b.spacer(4);
+
+    // ── Active Antardasha interpretation ───────────────────────────
+    if (currentAD && currentMD) {
+      const ad = currentAD as typeof chart.antardasha[0];
+      const md = currentMD as typeof chart.dashas[0];
+      const adInterp = getAntardashaInterpretation(md.planet, ad.planet);
+      b.subHeader(`${md.planet}–${ad.planet} Antardasha Interpretation`);
+      b.lifeAreaPara("☀", "Overview", adInterp.overview, SC_DASHA);
+      b.lifeAreaPara("⚡", "Effects & Themes", adInterp.effect, SC_PLANETS);
+      if (adInterp.remedies && adInterp.remedies.length > 0) {
+        b.checkPage(10);
+        b.pdf.setFontSize(9);
+        b.pdf.setTextColor(...SC_REMEDY);
+        b.pdf.setFont("helvetica", "bold");
+        b.pdf.text("REMEDIES", b.margin, b.y);
+        b.pdf.setFont("helvetica", "normal");
+        b.pdf.setTextColor(...BLACK);
+        b.y += 6;
+        adInterp.remedies.forEach(r => b.bullet(r));
+      }
+      b.spacer(6);
+    }
+  }
+
+  // ── Upcoming Mahadasha Previews ───────────────────────────────────
+  const upcomingMDs = chart.dashas.filter(d => new Date(d.start) > now).slice(0, 3);
+  if (upcomingMDs.length > 0) {
+    b.subHeader("Upcoming Mahadasha Periods — Preview");
+    b.line("A comprehensive preview of the next three Mahadasha periods to help you plan your life trajectory.");
+    b.spacer(4);
+    upcomingMDs.forEach(umd => {
+      const umdPD      = chart.planets[umd.planet];
+      const umdHouse   = umdPD?.house ?? 1;
+      const umdSign    = umdPD?.sign  ?? "";
+      const umdDignity = umdPD?.dignity;
+      const umdInterp  = getMahadashaInterpretation(umd.planet, umdHouse, umdDignity);
+      const uLkRule    = PLANET_HOUSE_RULES[umd.planet]?.[umdHouse];
+      const startYear  = new Date(umd.start).getFullYear();
+      const endYear    = new Date(umd.end).getFullYear();
+
+      b.checkPage(20);
+      b.pdf.setFontSize(10.5);
+      b.pdf.setTextColor(...SC_DASHA);
+      b.pdf.setFont("helvetica", "bold");
+      b.pdf.text(`${umd.planet} Mahadasha  (${startYear} – ${endYear})  |  ${umd.yrs} years`, b.margin, b.y);
       b.pdf.setFont("helvetica", "normal");
-      b.black();
-      b.y += 6;
+      b.pdf.setTextColor(...BLACK);
+      b.y += 7;
+
+      b.para(composeUpcomingMDParagraph(
+        umd.planet, umdHouse, umdSign, umd.yrs,
+        startYear, endYear, umdInterp, uLkRule, umdDignity
+      ));
+      b.spacer(4);
     });
   }
 
@@ -604,10 +1673,12 @@ export async function generatePDFReport(
     const doshas = yogas.filter(y => y.category === "Doshas" || y.isDosha === true);
     const otherYogas = yogas.filter(y => !rajYogas.includes(y) && !dhanaYogas.includes(y) && !doshas.includes(y));
 
-    b.keyValue("Total Yogas Found", String(yogas.length));
-    b.keyValue("Raj Yogas", String(rajYogas.length));
-    b.keyValue("Dhana Yogas", String(dhanaYogas.length));
-    b.keyValue("Doshas", String(doshas.length));
+    b.statBoxRow([
+      { label: "TOTAL YOGAS",  value: String(yogas.length),       color: SC_SHAKTI  },
+      { label: "RAJ YOGAS",    value: String(rajYogas.length),    color: SC_BIRTH   },
+      { label: "DHANA YOGAS",  value: String(dhanaYogas.length),  color: SC_HOUSES  },
+      { label: "DOSHAS",       value: String(doshas.length),      color: SC_YOGA    },
+    ]);
     b.spacer(6);
 
     const renderYogaGroup = (title: string, list: typeof yogas) => {
@@ -738,6 +1809,23 @@ export async function generatePDFReport(
       b.line(psych.pattern.desc ?? "");
     }
     b.spacer(4);
+
+    if (psych.dominantFunctions?.length) {
+      b.subHeader("Dominant Functions");
+      psych.dominantFunctions.forEach((item) => b.bullet(item));
+    }
+
+    if (psych.riskFlags?.length) {
+      b.subHeader("Psychological Risk Flags");
+      psych.riskFlags.slice(0, 5).forEach((flag) => {
+        b.bullet(`${flag.title} [${flag.severity}]: ${flag.detail}`);
+      });
+    }
+
+    if (psych.growthPlan?.length) {
+      b.subHeader("Growth Plan");
+      psych.growthPlan.slice(0, 5).forEach((item) => b.bullet(item));
+    }
 
     b.subHeader("Planetary Psychological Influences");
     psych.planets?.forEach(p => {
@@ -908,30 +1996,37 @@ export async function generatePDFReport(
   const medical = safeCall(() => calculateMedical(chart), null);
   if (medical) {
     b.subHeader("Constitution & Risk Overview");
+    b.keyValue("Overall Sensitivity", medical.riskLevel?.toUpperCase() ?? "—");
     b.keyValue("Birth Nakshatra", medical.birthNakshatra ?? "—");
-    b.keyValue("Disease Tendency", medical.nakshatraDisease ?? "—");
-    b.keyValue("Accident Risk Index", `${medical.accidentRisk ?? "—"}%`);
+    b.keyValue("Disease Tendency", medical.birthNakshatraData?.disease ?? "—");
+    b.keyValue("Accident Risk Index", `${medical.accidentScore ?? "—"}%`);
     b.keyValue("Physical Constitution", medical.lagnaSign ?? chart.lagnaRashi);
     b.spacer(4);
+
+    if (medical.timingAlerts?.length) {
+      b.subHeader("Active Dasha Health Timing");
+      medical.timingAlerts.forEach((alert) => {
+        b.bullet(`${alert.level} ${alert.planet} [${alert.severity}]: ${alert.message}`);
+      });
+      b.spacer(3);
+    }
 
     b.subHeader("Top Health Concerns");
     medical.topConcerns?.forEach((c: string) => b.bullet(c));
     b.spacer(4);
 
-    if (medical.alerts?.length) {
-      b.subHeader("Planetary Health Alerts");
-      medical.alerts.forEach(alert => {
+    if (medical.triggeredCombos?.length) {
+      b.subHeader("Classical Disease Patterns");
+      medical.triggeredCombos.forEach((combo: { disease: string; note: string }) => {
         b.checkPage(10);
         b.pdf.setFontSize(9.5);
-        if (alert.severity === "high") b.pdf.setTextColor(200, 50, 50);
-        else if (alert.severity === "medium") b.pdf.setTextColor(200, 130, 0);
-        else b.gold();
+        b.pdf.setTextColor(200, 50, 50);
         b.pdf.setFont("helvetica", "bold");
-        b.pdf.text(`${alert.planet} (H${alert.house}) [${alert.severity.toUpperCase()}]:`, b.margin + 2, b.y);
+        b.pdf.text(combo.disease, b.margin + 2, b.y);
         b.pdf.setFont("helvetica", "normal");
         b.y += 5.5;
         b.black();
-        const dlines = b.pdf.splitTextToSize(alert.disease, b.pageW - b.margin * 2 - 6);
+        const dlines = b.pdf.splitTextToSize(combo.note, b.pageW - b.margin * 2 - 6);
         dlines.forEach((l: string) => { b.checkPage(6); b.pdf.text(l, b.margin + 6, b.y); b.y += 5; });
         b.y += 2;
       });
@@ -944,10 +2039,14 @@ export async function generatePDFReport(
 
     b.spacer(4);
     b.subHeader("Preventive Recommendations");
-    b.bullet("Annual full body check-up recommended especially during transit of Saturn, Rahu over natal Moon.");
-    b.bullet("Avoid overexertion during 8th house transit periods.");
-    b.bullet("Follow Nakshatra-based diet for constitution maintenance.");
-    b.bullet("Practice yoga and pranayama aligned with Lagna lord's significations.");
+    if (medical.preventiveRoutine?.length) {
+      medical.preventiveRoutine.forEach((line) => b.bullet(line));
+    } else {
+      b.bullet("Annual full body check-up recommended especially during transit of Saturn, Rahu over natal Moon.");
+      b.bullet("Avoid overexertion during 8th house transit periods.");
+      b.bullet("Follow Nakshatra-based diet for constitution maintenance.");
+      b.bullet("Practice yoga and pranayama aligned with Lagna lord's significations.");
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -1449,6 +2548,25 @@ export async function generatePDFReport(
     b.keyValue("Current Dasha", destinyData.currentDasha);
     b.spacer(4);
 
+    if (destinyData.currentDrivers?.length) {
+      b.subHeader("Current Dasha Drivers");
+      destinyData.currentDrivers.forEach((driver) => {
+        b.bullet(`${driver.role} ${driver.planet} [${driver.tone}]: ${driver.message}`);
+      });
+    }
+
+    if (destinyData.nextMilestones?.length) {
+      b.subHeader("Next Milestone Watch");
+      destinyData.nextMilestones.slice(0, 6).forEach((m) => {
+        b.bullet(`${m.year} / age ${m.age}: ${m.score}/100 (${m.trend}) — ${m.message}`);
+      });
+    }
+
+    if (destinyData.actionPlan?.length) {
+      b.subHeader("Current Action Plan");
+      destinyData.actionPlan.forEach((line) => b.bullet(line));
+    }
+
     if (destinyData.peak) {
       b.subHeader("Peak Dasha Period");
       b.bullet(`${destinyData.peak.planet} Mahadasha (${destinyData.peak.start.toLocaleDateString("en-IN", { year: "numeric" })}–${destinyData.peak.end.toLocaleDateString("en-IN", { year: "numeric" })}) — Score: ${destinyData.peak.score}%`);
@@ -1551,9 +2669,29 @@ export async function generatePDFReport(
     },
   ];
 
-  lifeAreas.forEach(area => {
+  // Score summary bars
+  b.subHeader("Life Area Score Overview");
+  const areaKeys = ["career", "marriage", "wealth", "health", "spiritual", "children"] as const;
+  const areaColors: Record<string, readonly [number, number, number]> = {
+    career: SC_PLANETS, marriage: SC_YOGA, wealth: SC_HOUSES,
+    health: SC_MEDICAL, spiritual: SC_BIRTH, children: SC_DASHA,
+  };
+  const areaLabels: Record<string, string> = {
+    career: "Career & Profession", marriage: "Marriage & Relationships",
+    wealth: "Wealth & Finance", health: "Health & Longevity",
+    spiritual: "Spirituality", children: "Children & Education",
+  };
+  areaKeys.forEach(key => {
+    const score = getLifeAreaScore(key, chart);
+    b.scoreBar(areaLabels[key], score, 10, areaColors[key]);
+  });
+  b.spacer(6);
+
+  lifeAreas.forEach((area, i) => {
     b.checkPage(30);
-    b.subHeader(area.title);
+    const key = areaKeys[i];
+    const score = getLifeAreaScore(key, chart);
+    b.subHeader(`${area.title} — ${score}/10`);
     area.analysis.forEach((point: string) => b.bullet(point));
     b.spacer(4);
   });
@@ -1687,6 +2825,40 @@ function getSignifications(planet: string): string {
   return sig[planet] ?? "its signified life areas";
 }
 
+function getLifeAreaScore(area: string, chart: ChartData): number {
+  const p = chart.planets;
+  const exalt  = (pd?: { dignity?: string }) => pd?.dignity?.includes("Exalt") ?? false;
+  const own    = (pd?: { dignity?: string }) => pd?.dignity?.includes("Own") ?? false;
+  const debil  = (pd?: { dignity?: string }) => pd?.dignity?.includes("Debilit") ?? false;
+  const inH    = (h: number) => Object.values(p).filter(pl => pl.house === h).length;
+
+  let s = 5;
+  if (area === "career") {
+    if (exalt(p.Sun) || own(p.Sun))  s += 2; else if (debil(p.Sun))  s -= 1;
+    if (exalt(p.Saturn))             s += 1; else if (debil(p.Saturn)) s -= 1;
+    if (inH(10) > 0) s += 1;
+  } else if (area === "marriage") {
+    if (exalt(p.Venus) || own(p.Venus)) s += 2; else if (debil(p.Venus)) s -= 2;
+    if (exalt(p.Jupiter))               s += 1;
+    if (inH(7) > 0) s += 1;
+  } else if (area === "wealth") {
+    if (exalt(p.Jupiter) || own(p.Jupiter)) s += 2; else if (debil(p.Jupiter)) s -= 1;
+    if (inH(2) > 0 || inH(11) > 0) s += 1;
+  } else if (area === "health") {
+    if (exalt(p.Sun) || own(p.Sun)) s += 1;
+    if (inH(6) > 1) s -= 1;
+    if (inH(8) > 1) s -= 1;
+    if (exalt(p.Moon) || own(p.Moon)) s += 1;
+  } else if (area === "spiritual") {
+    if (exalt(p.Jupiter) || own(p.Jupiter)) s += 2;
+    if (inH(9) > 0 || inH(12) > 0) s += 1;
+  } else if (area === "children") {
+    if (exalt(p.Jupiter) || own(p.Jupiter)) s += 2; else if (debil(p.Jupiter)) s -= 1;
+    if (inH(5) > 0) s += 1;
+  }
+  return Math.max(1, Math.min(10, s));
+}
+
 function getLifeAreaAnalysis(area: string, chart: ChartData): string[] {
   const planets: ChartData["planets"] = chart.planets;
   const results: string[] = [];
@@ -1695,7 +2867,7 @@ function getLifeAreaAnalysis(area: string, chart: ChartData): string[] {
   if (area === "career") {
     const h10Sign = RASHIS[(chart.lagnaNum + 9) % 12];
     const h10Planets = Object.entries(planets).filter(([, v]) => v.house === 10);
-    results.push(`10th house falls in ${h10Sign} — career themes: ${getHouseSignTheme(h10Sign, "career")}`);
+    results.push(`10th house falls in ${h10Sign} — career themes: ${getHouseSignTheme(h10Sign)}`);
     if (h10Planets.length > 0) {
       results.push(`Planets in 10th house: ${h10Planets.map(([k]) => k).join(", ")} — strong focus on career/profession`);
     } else {
@@ -1708,7 +2880,7 @@ function getLifeAreaAnalysis(area: string, chart: ChartData): string[] {
   } else if (area === "marriage") {
     const h7Sign = RASHIS[(chart.lagnaNum + 6) % 12];
     const h7Planets = Object.entries(planets).filter(([, v]) => v.house === 7);
-    results.push(`7th house in ${h7Sign} — relationship themes: ${getHouseSignTheme(h7Sign, "marriage")}`);
+    results.push(`7th house in ${h7Sign} — relationship themes: ${getHouseSignTheme(h7Sign)}`);
     if (h7Planets.length > 0) {
       results.push(`Planets in 7th house: ${h7Planets.map(([k]) => k).join(", ")} — directly influences marriage`);
     }
@@ -1721,8 +2893,8 @@ function getLifeAreaAnalysis(area: string, chart: ChartData): string[] {
     const h11Sign = RASHIS[(chart.lagnaNum + 10) % 12];
     const h2Planets = Object.entries(planets).filter(([, v]) => v.house === 2);
     const h11Planets = Object.entries(planets).filter(([, v]) => v.house === 11);
-    results.push(`2nd house (savings) in ${h2Sign} — ${getHouseSignTheme(h2Sign, "wealth")}`);
-    results.push(`11th house (income) in ${h11Sign} — ${getHouseSignTheme(h11Sign, "income")}`);
+    results.push(`2nd house (savings) in ${h2Sign} — ${getHouseSignTheme(h2Sign)}`);
+    results.push(`11th house (income) in ${h11Sign} — ${getHouseSignTheme(h11Sign)}`);
     if (h2Planets.length > 0) results.push(`2nd house planets: ${h2Planets.map(([k]) => k).join(", ")}`);
     if (h11Planets.length > 0) results.push(`11th house planets: ${h11Planets.map(([k]) => k).join(", ")} — strong income indicators`);
     const jupiter3 = planets["Jupiter"];
@@ -1740,7 +2912,7 @@ function getLifeAreaAnalysis(area: string, chart: ChartData): string[] {
     const h9Planets = Object.entries(planets).filter(([, v]) => v.house === 9);
     const h12Planets = Object.entries(planets).filter(([, v]) => v.house === 12);
     const h9Sign = RASHIS[(chart.lagnaNum + 8) % 12];
-    results.push(`9th house (dharma) in ${h9Sign} — spiritual path through ${getHouseSignTheme(h9Sign, "spiritual")}`);
+    results.push(`9th house (dharma) in ${h9Sign} — spiritual path through ${getHouseSignTheme(h9Sign)}`);
     if (h9Planets.length > 0) results.push(`9th house planets: ${h9Planets.map(([k]) => k).join(", ")} — strong dharmic mission`);
     if (h12Planets.length > 0) results.push(`12th house (moksha) planets: ${h12Planets.map(([k]) => k).join(", ")} — spiritual liberation potential`);
     const ketu = planets["Ketu"];
@@ -1750,7 +2922,7 @@ function getLifeAreaAnalysis(area: string, chart: ChartData): string[] {
   } else if (area === "children") {
     const h5Sign = RASHIS[(chart.lagnaNum + 4) % 12];
     const h5Planets = Object.entries(planets).filter(([, v]) => v.house === 5);
-    results.push(`5th house in ${h5Sign} — children and intelligence through ${getHouseSignTheme(h5Sign, "children")}`);
+    results.push(`5th house in ${h5Sign} — children and intelligence through ${getHouseSignTheme(h5Sign)}`);
     if (h5Planets.length > 0) results.push(`5th house planets: ${h5Planets.map(([k]) => k).join(", ")}`);
     const jupiter5 = planets["Jupiter"];
     if (jupiter5) results.push(`Jupiter (karaka for children) in House ${jupiter5.house} — ${jupiter5.dignity?.includes("Exalt") || jupiter5.dignity?.includes("Own") ? "excellent" : "functional"} for children's matters`);
@@ -1760,7 +2932,7 @@ function getLifeAreaAnalysis(area: string, chart: ChartData): string[] {
   return results;
 }
 
-function getHouseSignTheme(sign: string, area: string): string {
+function getHouseSignTheme(sign: string): string {
   const themes: Record<string, string> = {
     Aries: "pioneering, competitive, leadership",
     Taurus: "stability, accumulation, sensual pleasures",
@@ -1818,16 +2990,8 @@ function generateYearForecast(year: number, mdPlanet: string | null, adPlanet: s
   return results;
 }
 
-export async function downloadPDFReport(chart: ChartData, options: ReportOptions = { type: "full" }) {
-  const blob = await generatePDFReport(chart, options);
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${chart.name.replace(/\s+/g, "_")}-AstroLife-Report-${new Date().toISOString().split("T")[0]}.pdf`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+export async function downloadPDFReport(chart: ChartData, options: ReportOptions = { type: "full" }): Promise<void> {
+  return downloadReportAsPDF(chart, options);
 }
 
 // ── VASTU PDF REPORT ────────────────────────────────────────────

@@ -56,6 +56,7 @@ export default function EventRadarPage() {
     signal: "mixed" as EventRadarSignal,
     bestArea: "career",
     cautionArea: "health",
+    scoreRationale: ["Fallback score uses neutral mixed-day assumptions."],
     advice: "Keep your schedule simple and avoid overreaction.",
     remedy: "Deep breathing and a calm routine.",
   };
@@ -149,6 +150,12 @@ export default function EventRadarPage() {
               <div className="er-box">
                 <strong>Remedy</strong>
                 <p className="er-p">{today.remedy}</p>
+              </div>
+              <div className="er-box">
+                <strong>Why This Score</strong>
+                {today.scoreRationale.map((line, i) => (
+                  <p key={i} className="er-muted">{line}</p>
+                ))}
               </div>
             </div>
           </article>

@@ -102,11 +102,9 @@ export async function downloadVoiceReport(
 
 // For production: integrate with ElevenLabs or Google Cloud TTS
 export async function generateVoiceReportMP3(
-  chart: ChartData,
-  options: VoiceReportOptions = { type: "summary" }
+  _chart: ChartData
 ): Promise<Blob> {
-  const script = generateVoiceScript(chart, options);
-
+  void _chart;
   // This requires backend integration with TTS service
   // Example with ElevenLabs API (requires API key):
   /*

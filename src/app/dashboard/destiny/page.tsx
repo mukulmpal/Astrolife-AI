@@ -4,11 +4,13 @@ import "@/app/dashboard/shared.css";
 import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
+import { useLanguage } from "@/lib/language-context";
 
 export default function DestinyPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeTab, setActiveTab] = useState<"curve"|"areas"|"dashas">("curve");
+  const [activeTab, setActiveTab] = useState<"curve"|"areas"|"dashas"|"now">("curve");
   const { birth, chart } = useUserChart();
+  const { t } = useLanguage();
   const result = calculateDestiny(chart.planets as never, chart.dashas, birth.dob);
 
   // Draw canvas curve
@@ -90,8 +92,8 @@ export default function DestinyPage() {
 
   return (
     <div className="page">
-      <div className="page-tag">📈 Destiny Curve</div>
-      <h1 className="page-title serif">Your <em>Life Timeline</em></h1>
+      <div className="page-tag">{t("destiny.page_tag")}</div>
+      <h1 className="page-title serif">{t("destiny.page_title")}</h1>
       <p className="page-sub">Dasha-based life scoring · Peak & challenge periods · 6 life area scores</p>
       <PremiumFeature feature="Destiny Timeline">
 
@@ -123,7 +125,7 @@ export default function DestinyPage() {
 
       {/* TABS */}
       <div className="tabs">
-        {([["curve","Life Curve"],["areas","6 Life Areas"],["dashas","Dasha Timeline"]] as const).map(([t,l])=>(
+        {([["curve","Life Curve"],["now","Now & Next"],["areas","6 Life Areas"],["dashas","Dasha Timeline"]] as const).map(([t,l])=>(
           <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{l}</button>
         ))}
       </div>
@@ -171,6 +173,46 @@ export default function DestinyPage() {
                 This period requires extra patience and preparation. Focus on inner work, remedies, and building foundations rather than expecting quick results.
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── NOW TAB ── */}
+      {activeTab==="now" && (
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          <div className="grid-2">
+            {result.currentDrivers.map(d=>(
+              <div key={`${d.role}-${d.planet}`} className="card" style={{borderColor:d.tone==="support"?"rgba(34,197,94,0.3)":d.tone==="caution"?"rgba(239,68,68,0.3)":"rgba(200,160,48,0.3)"}}>
+                <div className="card-tag">✦ {d.role} Driver</div>
+                <div className="card-title serif">{d.planet}</div>
+                <span className={`badge ${d.tone==="support"?"badge-green":d.tone==="caution"?"badge-red":"badge-gold"}`}>{d.tone}</span>
+                <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,marginTop:10}}>{d.message}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="card">
+            <div className="card-tag">✦ Next 5 Years</div>
+            <div className="card-title serif">Milestone Watch</div>
+            {result.nextMilestones.map(m=>(
+              <div key={`${m.year}-${m.age}`} style={{display:"flex",gap:12,alignItems:"center",padding:"9px 0",borderBottom:"1px solid #1c1840"}}>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,fontWeight:700,color:m.trend==="rise"?"#22c55e":m.trend==="dip"?"#ef4444":"#c8a030",width:48}}>{m.score}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:12,fontWeight:600,color:"#f0e8d0"}}>Age {m.age} · {m.year} · {m.trend}</div>
+                  <div style={{fontSize:11,color:"#605890",lineHeight:1.6}}>{m.message}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="card">
+            <div className="card-tag">✦ Action Plan</div>
+            <div className="card-title serif">Current Dasha Guidance</div>
+            {result.actionPlan.map((line,i)=>(
+              <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.actionPlan.length-1?"none":"1px solid #1c1840"}}>
+                {i+1}. {line}
+              </div>
+            ))}
           </div>
         </div>
       )}

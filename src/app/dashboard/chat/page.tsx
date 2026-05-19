@@ -1,210 +1,727 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
-import { useUserChart } from "@/lib/user-chart";
-import { getAgentList, type AgentType } from "@/lib/ai-agents";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-import { EducationTooltip } from "@/components/education-tooltip";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useRef, useEffect, useMemo } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import {
+  ensureConversation,
+  listConversations,
+  loadConversationMessages,
+  saveMessage,
+  type SavedConversation,
+} from "@/lib/ai-conversations";
+import { formatChartContext, useUserChart } from "@/lib/user-chart";
+import { getAccountAiUsageStatus, getAiUsageStatus, incrementAccountMonthlyAiUsage, type AiUsageStatus } from "@/lib/usage";
+import {
+  calculateTransitReport,
+  PlanetName,
+} from "@/lib/astro-engine/transits";
+import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
+import { calculatePanchang } from "@/lib/astro-engine/panchang";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  agent?: string;
+  emoji?: string;
+  sources?: string[];
+}
+type LanguageMode = "hindi" | "english" | "hinglish";
+
+const SOURCE_LINKS: Record<string, string> = {
+  "Natal Chart": "/dashboard/kundli",
+  "Transit/Gochar": "/dashboard/transits",
+  "Daily Feed": "/dashboard/panchang",
+};
+
+const AGENTS = [
+  { id:"general",    name:"AstroLife AI",  emoji:"✦",  desc:"General astrology guidance"     },
+  { id:"career",     name:"Career",        emoji:"📈", desc:"Profession & success timing"    },
+  { id:"marriage",   name:"Marriage",      emoji:"💑", desc:"Love, relationships & timing"   },
+  { id:"karmic",     name:"Karmic",        emoji:"☯️", desc:"Past life & soul lessons"       },
+  { id:"wealth",     name:"Wealth",        emoji:"💰", desc:"Money, finance & prosperity"    },
+  { id:"health",     name:"Health",        emoji:"🌿", desc:"Medical astrology & wellness"   },
+  { id:"psychology", name:"Psychology",    emoji:"🧠", desc:"Mind, emotions & personality"  },
+  { id:"remedy",     name:"Remedy",        emoji:"🕯️", desc:"Mantras, gems & rituals"       },
+  { id:"lalkitab",   name:"Lal Kitab",     emoji:"📕", desc:"Red Book karmic remedies"      },
+  { id:"spiritual",  name:"Spiritual",     emoji:"🙏", desc:"Dharma, moksha & soul path"    },
+];
+
+const SUGGESTED = [
+  "What does my Saturn placement mean?",
+  "When will I get married?",
+  "What career suits my chart?",
+  "Tell me about my Rahu-Ketu axis",
+  "What are my wealth yogas?",
+  "What remedies do I need?",
+  "Which raga suits my chart today?",
+  "Suggest a sound remedy for sleep and calm mind?",
+];
+const MOBILE_NAV = [
+  { icon: "🏠", label: "Home", href: "/dashboard" },
+  { icon: "🔯", label: "Charts", href: "/dashboard/kundli" },
+  { icon: "🪐", label: "Transits", href: "/dashboard/transits" },
+  { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
+  { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },
+];
+
+const PLANETS: PlanetName[] = [
+  "Sun",
+  "Moon",
+  "Mars",
+  "Mercury",
+  "Jupiter",
+  "Venus",
+  "Saturn",
+  "Rahu",
+  "Ketu",
+];
+
+function mod(n: number, m: number) {
+  return ((n % m) + m) % m;
 }
 
-export default function ChatPage() {
-  const { chart, loading } = useUserChart();
-  const [selectedAgent, setSelectedAgent] = useState<AgentType>("career");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEnd = useRef<HTMLDivElement>(null);
-  const agents = getAgentList();
+function toRashi(value: any): number {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (value >= 0 && value <= 11) return value;
+    if (value >= 1 && value <= 12) return value - 1;
+    return Math.floor(mod(value, 360) / 30);
+  }
 
-  const scrollToBottom = () => {
-    messagesEnd.current?.scrollIntoView({ behavior: "smooth" });
+  return 0;
+}
+
+function getPlanetData(chart: any, planet: PlanetName) {
+  const lower = planet.toLowerCase();
+
+  return (
+    chart?.planets?.[planet] ??
+    chart?.planets?.[lower] ??
+    chart?.planetData?.[planet] ??
+    chart?.planetData?.[lower] ??
+    chart?.grahas?.[planet] ??
+    chart?.grahas?.[lower] ??
+    {}
+  );
+}
+
+function normalizeChartForTransit(userChart: any) {
+  const rawChart = userChart?.chart ?? userChart;
+
+  const lagnaRaw =
+    rawChart?.lagR ??
+    rawChart?.lagnaRashi ??
+    rawChart?.ascendantRashi ??
+    rawChart?.ascendant?.rashi ??
+    rawChart?.ascendant?.sign ??
+    rawChart?.lagna?.rashi ??
+    rawChart?.lagna?.sign ??
+    rawChart?.houses?.[0]?.rashi ??
+    rawChart?.houses?.[1]?.rashi ??
+    0;
+
+  const lagR = toRashi(lagnaRaw);
+
+  const planets = PLANETS.reduce((acc, planet) => {
+    const data = getPlanetData(rawChart, planet);
+
+    const longitude =
+      data?.longitude ??
+      data?.lon ??
+      data?.lng ??
+      data?.degree ??
+      data?.absoluteDegree ??
+      data?.siderealLongitude ??
+      0;
+
+    const rashi = toRashi(
+      data?.rashi ??
+        data?.sign ??
+        data?.signIndex ??
+        data?.rashiIndex ??
+        data?.zodiacSign ??
+        longitude
+    );
+
+    const house =
+      typeof data?.house === "number" && Number.isFinite(data.house)
+        ? data.house >= 1 && data.house <= 12
+          ? data.house
+          : mod(data.house - 1, 12) + 1
+        : mod(rashi - lagR, 12) + 1;
+
+    acc[planet] = {
+      longitude,
+      rashi,
+      house,
+      rashiName: data?.rashiName ?? data?.signName,
+      nakshatra: data?.nakshatra,
+      retrograde: Boolean(data?.retrograde ?? data?.isRetrograde),
+    };
+
+    return acc;
+  }, {} as any);
+
+  return {
+    tz: rawChart?.tz ?? rawChart?.timezone ?? 5.5,
+    lagR,
+    planets,
   };
+}
+const WELCOMES: Record<string, string> = {
+  general:    "✦ Namaste! I am AstroLife AI — your personal Vedic astrology guide.\n\nI combine the wisdom of Vedic astrology, Lal Kitab, KP System, and modern psychology to give you deep, personalized insights.\n\nShare your birth details or ask me anything about your chart!",
+  career:     "📈 Namaste! I am your Career Astrology Agent.\n\nI specialize in career timing, profession analysis, and success periods using your 10th house, D-10 chart, and planetary dashas.\n\nShare your birth details and I'll reveal your ideal career path!",
+  marriage:   "💑 Namaste! I am your Marriage & Relationship Agent.\n\nI analyze your 7th house, Venus, and Navamsha chart to reveal your relationship patterns and marriage timing.\n\nWhat would you like to know about your love life?",
+  karmic:     "☯️ Namaste, dear soul. I am your Karmic Intelligence Agent.\n\nThrough your Rahu-Ketu axis and past-life indicators, I reveal the deeper purpose of your current incarnation.\n\nWhat karmic patterns shall we explore today?",
+  wealth:     "💰 Namaste! I am your Wealth & Finance Agent.\n\nUsing your 2nd, 11th house, and Dhana yogas, I reveal your wealth potential and best timing for financial growth.\n\nAsk me about your wealth yogas!",
+  health:     "🌿 Namaste! I am your Medical Astrology Agent.\n\nI analyze your 6th and 8th houses to reveal health vulnerabilities and healing periods.\n\nNote: Always consult a qualified doctor for medical decisions.",
+  psychology: "🧠 Namaste! I am your Psychology & Mind Agent.\n\nThrough your Moon sign, nakshatra, and Mercury placement, I reveal your emotional patterns and mental strengths.\n\nLet's explore your emotional blueprint!",
+  remedy:     "🕯️ Namaste! I am your Vedic Remedy Agent.\n\nI specialize in practical, affordable remedies — mantras, gemstones, charity, and rituals that create real change.\n\nTell me your challenges and I'll prescribe the right remedy!",
+  lalkitab:   "📕 Namaste! I am your Lal Kitab Specialist.\n\nThe Red Book of astrology has unique remedies that are simple, cheap, and remarkably effective.\n\nAsk me about your Lal Kitab chart or remedies!",
+  spiritual:  "🙏 Namaste dear seeker! I am your Spiritual Growth Agent.\n\nThrough your 9th house, Jupiter, and moksha indicators, I reveal your dharmic path and ideal spiritual practices.\n\nWhat is your spiritual question today?",
+};
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSendMessage = async () => {
-    if (!input.trim() || !chart || isLoading) return;
-
-    const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
+export default function ChatPage() {
+  const [supabase] = useState(() => createClient());
+  const [activeAgent, setActiveAgent] = useState(AGENTS[0]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<SavedConversation[]>([]);
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const [usageStatus, setUsageStatus] = useState<AiUsageStatus>(() => ({
+    enforcementEnabled: false,
+    isBlocked: false,
+    isUnlimited: false,
+    limit: 5,
+    used: 0,
+    left: 5,
+  }));
+  const [usageReady, setUsageReady] = useState(false);  const [messages, setMessages] = useState<Message[]>(() => [{
+    role: "assistant",
+    content: WELCOMES[AGENTS[0].id] || WELCOMES.general,
+    agent: AGENTS[0].name,
+    emoji: AGENTS[0].emoji,
+  }]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [languageMode, setLanguageMode] = useState<LanguageMode>("hinglish");
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard/chat";
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { chart } = useUserChart();
+  const transitContext = useMemo(() => {
+    if (!chart) return "";
+  
+    try {
+      const transitChart = normalizeChartForTransit(chart);
+  
+      const transitReport = calculateTransitReport({
+        chart: transitChart,
+        base: "moon",
+        date: new Date(),
+      });
+  
+      return transitReport.aiContext;
+    } catch (error) {
+      console.warn("Transit context failed:", error);
+      return "";
+    }
+  }, [chart]);
+  const dailyFeedContext = useMemo(() => {
+    if (!chart) return "";
 
     try {
-      const response = await fetch("/api/chat", {
+      const transitChart = normalizeChartForTransit(chart);
+      const today = new Date();
+      today.setHours(12, 0, 0, 0);
+
+      const transit = calculateTransitReport({
+        chart: transitChart,
+        base: "moon",
+        date: today,
+      });
+      const radar = calculateEventRadarReport({
+        chart: transitChart,
+        startDate: today,
+        days: 7,
+        base: "moon",
+      });
+      const panchang = calculatePanchang(today, transitChart.tz);
+      const topArea = [...transit.areaScores].sort((a, b) => b.score - a.score)[0];
+      const cautionCount = transit.alerts.filter((a) => a.severity === "high" || a.severity === "medium").length;
+      const opportunityCount = transit.alerts.filter((a) => a.type === "opportunity").length;
+      const todayRadar = radar.days[0];
+
+      return [
+        `Panchang: ${panchang.tithi}, ${panchang.nakshatra}, ${panchang.yoga}, ${panchang.paksha} Paksha.`,
+        `Transit Pulse: Best area ${topArea.area} (${topArea.score}/100), opportunities ${opportunityCount}, cautions ${cautionCount}.`,
+        `Event Radar: Today score ${todayRadar?.overallScore ?? "-"} / 100, best day ${radar.bestDay.label}, caution day ${radar.cautionDay.label}.`,
+        `Recommended remedy: ${todayRadar?.remedy ?? "Keep routine stable and avoid impulsive decisions."}`,
+      ].join("\n");
+    } catch (error) {
+      console.warn("Daily feed context failed:", error);
+      return "";
+    }
+  }, [chart]);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  useEffect(() => {
+    const loadPlan = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+  setUsageStatus(getAiUsageStatus(null));
+  setUsageReady(true);
+  return;
+}
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      const tier = typeof profile?.subscription_tier === "string" ? profile.subscription_tier : null;
+      setSubscriptionTier(tier);
+      setUsageStatus(await getAccountAiUsageStatus(tier));
+      setUsageReady(true);
+    };
+
+    loadPlan().finally(() => setUsageReady(true));
+    listConversations().then(setConversations);
+    }, [supabase]);
+
+  const resetChat = (agent = activeAgent) => {
+    setConversationId(null);
+    setMessages([{
+      role: "assistant",
+      content: WELCOMES[agent.id] || WELCOMES.general,
+      agent: agent.name,
+      emoji: agent.emoji,
+    }]);
+  };
+
+  const switchAgent = (agent: typeof AGENTS[number]) => {
+    setActiveAgent(agent);
+    resetChat(agent);
+  };
+
+  const openConversation = async (conversation: SavedConversation) => {
+    const agent = AGENTS.find((item) => item.id === conversation.agentId) || AGENTS[0];
+    const savedMessages = await loadConversationMessages(conversation.id);
+    if (savedMessages.length === 0) return;
+
+    setActiveAgent(agent);
+    setConversationId(conversation.id);
+    setMessages(savedMessages
+      .filter((message) => message.role !== "system")
+      .map((message) => ({
+        role: message.role === "assistant" ? "assistant" : "user",
+        content: message.content,
+        agent: message.role === "assistant" ? agent.name : undefined,
+        emoji: message.role === "assistant" ? agent.emoji : undefined,
+      })));
+  };
+
+  const sendMessage = async (content: string) => {
+    if (!content.trim() || loading) return;
+    const currentUsage = getAiUsageStatus(subscriptionTier);
+    if (currentUsage.isBlocked) {
+      setUsageStatus(currentUsage);
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "Free monthly limit poori ho chuki hai. Upgrade karo to continue, ya testing mode off hone tak wait karo.",
+        agent: activeAgent.name,
+        emoji: activeAgent.emoji,
+      }]);
+      return;
+    }
+
+    const userMsg: Message = { role: "user", content };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const nextConversationId = await ensureConversation(conversationId, activeAgent.id, content);
+      if (nextConversationId) {
+        setConversationId(nextConversationId);
+        await saveMessage(nextConversationId, { role: "user", content });
+      }
+
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          agentId: selectedAgent,
-          messages: [...messages, userMessage],
-          chartData: chart,
+          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          agentId: activeAgent.id,
+          chartContext: formatChartContext(chart),
+          transitContext: transitContext,
+          dailyFeedContext,
+          languageMode,
         }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => "");
-        throw new Error(errorText || `Chat failed with status ${response.status}`);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      if (!subscriptionTier || subscriptionTier === "free") {
+        if (data.usage?.trackedOnServer && typeof data.usage.left === "number") {
+          setUsageStatus({
+            enforcementEnabled: Boolean(data.usage.enforced),
+            isBlocked: Boolean(data.usage.enforced) && data.usage.left === 0,
+            isUnlimited: false,
+            limit: Number(data.usage.limit),
+            used: Number(data.usage.used),
+            left: Number(data.usage.left),
+          });
+        } else {
+          await incrementAccountMonthlyAiUsage();
+          setUsageStatus(await getAccountAiUsageStatus("free"));
+        }
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantMessage = "";
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: data.message,
+        agent: data.agent,
+        emoji: data.emoji,
+        sources: Array.isArray(data.sources) ? data.sources : [],
+      }]);
 
-      while (true) {
-        const { done, value } = await reader!.read();
-        if (done) break;
-        assistantMessage += decoder.decode(value);
-      }
-
-      setMessages((prev) => [...prev, { role: "assistant", content: assistantMessage }]);
-    } catch (error) {
-      console.error("Chat error:", error);
-      setMessages((prev) => [...prev, { role: "assistant", content: "Error: Could not get response from agent" }]);
-    } finally {
-      setIsLoading(false);
+      await saveMessage(nextConversationId, {
+        role: "assistant",
+        content: data.message,
+        model: data.model,
+      });
+      setConversations(await listConversations());
+    } catch {
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "Sorry dost, kuch error aa gaya. Please try again! 🙏",
+        agent: activeAgent.name,
+        emoji: activeAgent.emoji,
+      }]);
     }
+    setLoading(false);
+    inputRef.current?.focus();
   };
 
-  if (loading || !chart) {
-    return (
-      <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center", paddingTop: "40px" }}>
-          <div style={{ fontSize: "20px", fontWeight: "700", marginBottom: "12px" }}>Loading chart...</div>
-          <div style={{ fontSize: "14px", color: "#b8b0d8" }}>Please complete onboarding to access AI agents.</div>
-        </div>
-        <MobileBottomNav />
-      </main>
-    );
-  }
-
-  const currentAgent = agents.find((a) => a.id === selectedAgent);
+  const formatMessage = (text: string) =>
+    text
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+      .replace(/✦/g, '<span style="color:#c8a030">✦</span>')
+      .replace(/\n/g, "<br/>");
 
   return (
-    <main style={{ minHeight: "100vh", background: "#060410", display: "flex", flexDirection: "column" }}>
+    <>
       <style>{`
-        .chat-header { background: #0d0a22; border-bottom: 1px solid #1c1840; padding: 16px 20px; }
-        .chat-agent-name { font-size: 16px; font-weight: 700; color: "#f0e8d0"; margin-bottom: 4px; }
-        .chat-agent-title { font-size: 12px; color: "#b8b0d8"; }
-        .chat-agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; overflow-x: auto; padding: 12px 20px; border-bottom: 1px solid #1c1840; }
-        .chat-agent-btn { background: #0d0a22; border: 1px solid #1c1840; border-radius: 8px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s; color: #b8b0d8; }
-        .chat-agent-btn:hover { border-color: #c8a030; background: rgba(200, 160, 48, 0.05); }
-        .chat-agent-btn.active { border-color: currentColor; background: rgba(200, 160, 48, 0.15); color: #c8a030; }
-        .chat-emoji { font-size: 20px; display: block; margin-bottom: 4px; }
-        .chat-label { font-size: 10px; font-weight: 700; }
-        .chat-body { flex: 1; overflow-y: auto; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; }
-        .chat-msg { margin-bottom: 16px; display: flex; gap: 12px; }
-        .chat-msg.user { justify-content: flex-end; }
-        .chat-bubble { max-width: 70%; padding: 12px 16px; border-radius: 10px; font-size: 13px; line-height: 1.6; }
-        .chat-msg.assistant .chat-bubble { background: #0d0a22; border: 1px solid #1c1840; color: #f0e8d0; }
-        .chat-msg.user .chat-bubble { background: #c8a030; color: #060410; }
-        .chat-footer { padding: 16px 20px; border-top: 1px solid #1c1840; background: #0d0a22; max-width: 800px; margin: 0 auto; width: 100%; }
-        .chat-input-wrapper { display: flex; gap: 8px; }
-        .chat-input { flex: 1; background: #08051a; border: 1px solid #1c1840; border-radius: 8px; padding: 12px 14px; color: #f0e8d0; font-family: inherit; }
-        .chat-send { background: #c8a030; border: none; border-radius: 8px; padding: 12px 20px; color: #060410; font-weight: 700; cursor: pointer; }
-        .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        body{background:#060410;color:#f0e8d0;font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#060410}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
+
+        .chat-layout{display:flex;height:100vh;overflow:hidden}
+
+        /* SIDEBAR */
+        .agents-sidebar{width:220px;flex-shrink:0;background:#0a0720;border-right:1px solid #1c1840;display:flex;flex-direction:column}
+        .agents-header{padding:20px 16px 12px;border-bottom:1px solid #1c1840}
+        .agents-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#605890}
+        .agents-list{flex:1;overflow-y:auto;padding:8px}
+        .agent-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:none;background:none;cursor:pointer;transition:all 0.2s;text-align:left;margin-bottom:2px}
+        .agent-btn:hover{background:rgba(255,255,255,0.04)}
+        .agent-btn.active{background:rgba(200,160,48,0.1);border:1px solid rgba(200,160,48,0.2)}
+        .agent-emoji{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+        .agent-name{font-size:12px;font-weight:500;color:#c8c0a8;display:block}
+        .agent-desc{font-size:10px;color:#605890;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+        .agent-btn.active .agent-name{color:#c8a030}
+        .history-section{border-top:1px solid #1c1840;padding:10px 8px 12px;max-height:210px;overflow-y:auto}
+        .history-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#605890;padding:0 8px 8px}
+        .history-btn{width:100%;border:none;background:transparent;text-align:left;border-radius:8px;padding:8px;color:#605890;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s}
+        .history-btn:hover{background:rgba(200,160,48,0.06);color:#c8c0a8}
+        .history-btn.active{background:rgba(200,160,48,0.1);color:#c8a030}
+        .history-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .history-meta{font-size:9px;color:#3a3060;margin-top:2px}
+
+        /* MAIN */
+        .chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+        /* HEADER */
+        .chat-header{padding:16px 24px;border-bottom:1px solid #1c1840;display:flex;align-items:center;gap:12px;background:#0a0720;flex-shrink:0}
+        .agent-avatar{width:40px;height:40px;border-radius:12px;background:#0d0a22;border:1px solid #261f50;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+        .agent-label{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0}
+        .agent-status{font-size:11px;color:#1d9e75;display:flex;align-items:center;gap:4px;margin-top:2px;padding:14px 16px;border-bottom:1px solid #1c1840;background:#0a0720;flex-shrink:0}
+        .lang-toggle{margin-left:auto;display:flex;gap:6px;align-items:center}
+        .lang-btn{border:1px solid #1c1840;background:#0d0a22;color:#605890;border-radius:999px;padding:3px 10px;font-size:10px;cursor:pointer}
+        .lang-btn.active{color:#c8a030;border-color:rgba(200,160,48,0.28);background:rgba(200,160,48,0.08)}
+        .sdot{width:6px;height:6px;border-radius:50%;background:#1d9e75;animation:blink 2s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+        .clear-btn{margin-left:auto;padding:7px 14px;border-radius:8px;border:1px solid #1c1840;background:transparent;color:#605890;font-size:12px;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif}
+        .clear-btn:hover{color:#c8c0a8;border-color:#261f50}
+
+        /* MESSAGES */
+        .messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;overscroll-behavior:contain}
+        .msg{display:flex;gap:12px;animation:fadeUp 0.3s ease}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .msg.user{flex-direction:row-reverse}
+        .msg-av{width:36px;height:36px;border-radius:10px;background:#0d0a22;border:1px solid #1c1840;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+        .msg.user .msg-av{background:linear-gradient(135deg,#3c2880,#c8a030);border:none;font-size:13px;font-family:'Cormorant Garamond',serif;color:#f0e8d0;font-weight:600}
+        .msg-bubble{max-width:72%;padding:14px 18px;border-radius:16px;font-size:14px;line-height:1.85}
+        .msg.assistant .msg-bubble{background:#0d0a22;border:1px solid #1c1840;color:#c8c0a8;border-radius:4px 16px 16px 16px}
+        .msg.user .msg-bubble{background:linear-gradient(135deg,#1c1840,#261f50);color:#f0e8d0;border-radius:16px 4px 16px 16px}
+        .msg-agent-lbl{font-size:10px;color:#c8a030;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+        .msg-sources{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+        .msg-source-chip{font-size:10px;color:#c8a030;border:1px solid rgba(200,160,48,0.24);background:rgba(200,160,48,0.08);padding:3px 8px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center}
+        .msg-source-chip:hover{background:rgba(200,160,48,0.14);border-color:rgba(200,160,48,0.4)}
+
+        /* TYPING */
+        .typing-wrap{display:flex;gap:12px;align-items:flex-start}
+        .typing-bubble{display:flex;gap:5px;align-items:center;padding:14px 18px;background:#0d0a22;border:1px solid #1c1840;border-radius:4px 16px 16px 16px}
+        .tdot{width:7px;height:7px;border-radius:50%;background:#605890;animation:bounce 1.2s ease-in-out infinite}
+        .tdot:nth-child(2){animation-delay:0.2s}
+        .tdot:nth-child(3){animation-delay:0.4s}
+        @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+
+        /* SUGGESTIONS */
+        .suggestions{padding:0 24px 12px;display:flex;gap:8px;flex-wrap:wrap}
+        .sugg{padding:7px 14px;background:rgba(255,255,255,0.03);border:1px solid #1c1840;border-radius:100px;font-size:12px;color:#605890;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+        .sugg:hover{border-color:rgba(200,160,48,0.3);color:#c8a030;background:rgba(200,160,48,0.05)}
+
+        /* INPUT */
+        .input-wrap{padding:16px 24px;border-top:1px solid #1c1840;background:#0a0720;flex-shrink:0}
+        .input-box{display:flex;gap:10px;align-items:flex-end;background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:12px 16px;transition:border-color 0.2s}
+        .input-box:focus-within{border-color:rgba(200,160,48,0.35)}
+        .input-ta{flex:1;background:transparent;border:none;outline:none;font-size:14px;color:#f0e8d0;font-family:'Outfit',sans-serif;resize:none;max-height:120px;line-height:1.6}
+        .input-ta::placeholder{color:#3a3060}
+        .send-btn{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#c8a030,#3c2880);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.2s;flex-shrink:0;color:#060410;font-weight:700}
+        .send-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(200,160,48,0.3)}
+        .send-btn:disabled{opacity:0.4;cursor:not-allowed}
+        .input-footer{display:flex;justify-content:space-between;margin-top:8px;padding:0 4px}
+        .input-hint{font-size:11px;color:#3a3060}
+        .free-tag{font-size:10px;color:#605890;border:1px solid #1c1840;border-radius:6px;padding:2px 8px}
+        .usage-note{margin:0 24px 12px;padding:10px 14px;border-radius:12px;border:1px solid rgba(200,160,48,0.18);background:rgba(200,160,48,0.06);font-size:12px;line-height:1.6;color:#c8c0a8}
+        .usage-note strong{color:#c8a030}
+        .usage-progress{height:6px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;margin-top:8px}
+        .usage-progress > span{display:block;height:100%;background:linear-gradient(90deg,#c8a030,#3c2880)}
+        .usage-row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+        .usage-link{font-size:11px;color:#c8a030;text-decoration:none}
+        .usage-link:hover{text-decoration:underline}
+        .mobile-nav{display:none}
+
+        @media(max-width:768px){
+          .agents-sidebar{display:none}
+          .msg-bubble{max-width:90%}
+          .agent-status{padding:12px}
+          .messages{padding:16px 16px 104px}
+          .input-wrap{padding:10px 12px;position:sticky;bottom:76px;z-index:20}
+          .input-box{padding:10px 12px}
+          .input-ta{font-size:16px}
+          .send-btn{width:44px;height:44px}
+          .usage-note{margin:0 12px 10px}
+          .usage-row{flex-direction:column;align-items:flex-start}
+          .free-tag{display:none}
+          .mobile-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:10px;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:130}
+          .mobile-nav-item{text-decoration:none;color:#605890;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border-radius:10px}
+          .mobile-nav-item.active{color:#c8a030;background:rgba(200,160,48,0.1)}
+          .mobile-nav-icon{font-size:16px;line-height:1}
+          .mobile-nav-label{font-size:10px;letter-spacing:0.2px}
+        }
       `}</style>
 
-      <div className="chat-header">
-        <div className="chat-agent-name">
-          {currentAgent?.emoji} {currentAgent?.name}
+      <div className="chat-layout">
+
+        {/* AGENTS SIDEBAR */}
+        <div className="agents-sidebar">
+          <div className="agents-header">
+            <div className="agents-title">✦ AI Agents</div>
+          </div>
+          <div className="agents-list">
+            {AGENTS.map(a => (
+              <button
+                key={a.id}
+                className={`agent-btn ${activeAgent.id === a.id ? "active" : ""}`}
+                onClick={() => switchAgent(a)}
+              >
+                <span className="agent-emoji">{a.emoji}</span>
+                <span>
+                  <span className="agent-name">{a.name}</span>
+                  <span className="agent-desc">{a.desc}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="history-section">
+            <div className="history-title">Recent Chats</div>
+            {conversations.length > 0 ? conversations.map((conversation) => (
+              <button
+                key={conversation.id}
+                className={`history-btn ${conversation.id === conversationId ? "active" : ""}`}
+                onClick={() => openConversation(conversation)}
+              >
+                <div className="history-name">{conversation.title}</div>
+                <div className="history-meta">
+                  {AGENTS.find((agent) => agent.id === conversation.agentId)?.name || "AstroLife AI"}
+                </div>
+              </button>
+            )) : (
+              <div className="history-meta" style={{padding:"0 8px 8px"}}>No saved chats yet</div>
+            )}
+          </div>
         </div>
-        <div className="chat-agent-title">{currentAgent?.description}</div>
-      </div>
 
-      <div className="chat-agents-grid">
-        {agents.map((agent) => (
-          <button
-            key={agent.id}
-            className={`chat-agent-btn ${selectedAgent === agent.id ? "active" : ""}`}
-            onClick={() => {
-              setSelectedAgent(agent.id);
-              setMessages([]);
-            }}
-            style={{ color: selectedAgent === agent.id ? agent.color : undefined }}
-          >
-            <span className="chat-emoji">{agent.emoji}</span>
-            <span className="chat-label">{agent.name.split(" ")[0]}</span>
-          </button>
-        ))}
-      </div>
+        {/* MAIN CHAT */}
+        <div className="chat-main">
 
-      <div className="chat-body">
-        {messages.length === 0 ? (
-          <div style={{ textAlign: "center", color: "#b8b0d8", paddingTop: "40px" }}>
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>{currentAgent?.emoji}</div>
-            <div style={{ fontSize: "16px", fontWeight: "700", marginBottom: "8px" }}>
-              {currentAgent?.name}
-            </div>
-            <div style={{ fontSize: "12px", marginBottom: "24px" }}>
-              {currentAgent?.title}
-            </div>
-            <div style={{ fontSize: "12px", lineHeight: "1.8", color: "#8b80bf" }}>
-              <strong>Try asking:</strong>
-              <div style={{ marginTop: "12px" }}>
-                {currentAgent?.exampleQuestions.slice(0, 3).map((q, i) => (
-                  <div key={i} style={{ marginBottom: "8px" }}>
-                    • {q}
-                  </div>
-                ))}
-              </div>
+          {/* HEADER */}
+          <div className="agent-status">
+            <span className="sdot"></span>
+            Online
+            <span
+              style={{
+                marginLeft: "10px",
+                padding: "3px 8px",
+                borderRadius: "999px",
+                border: "1px solid rgba(200,160,48,0.25)",
+                background: "rgba(200,160,48,0.08)",
+                color: "#c8a030",
+                fontSize: "10px",
+                letterSpacing: "0.5px",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              🪐 Live Transit Active
+            </span>
+            <div className="lang-toggle">
+              <button type="button" className={`lang-btn ${languageMode === "hindi" ? "active" : ""}`} onClick={() => setLanguageMode("hindi")}>Hindi</button>
+              <button type="button" className={`lang-btn ${languageMode === "english" ? "active" : ""}`} onClick={() => setLanguageMode("english")}>English</button>
+              <button type="button" className={`lang-btn ${languageMode === "hinglish" ? "active" : ""}`} onClick={() => setLanguageMode("hinglish")}>Hinglish</button>
             </div>
           </div>
-        ) : (
-          <>
-            {messages.map((msg, i) => (
-              <div key={i} className={`chat-msg ${msg.role}`}>
-                <div className="chat-bubble">{msg.content}</div>
+
+          {/* MESSAGES */}
+          <div className="messages">
+            {messages.map((m, i) => (
+              <div key={i} className={`msg ${m.role}`}>
+                <div className="msg-av">
+                  {m.role === "assistant" ? (m.emoji || "✦") : "M"}
+                </div>
+                <div>
+                  {m.role === "assistant" && (
+                    <div className="msg-agent-lbl">{m.agent || activeAgent.name}</div>
+                  )}
+                  <div
+                    className="msg-bubble"
+                    dangerouslySetInnerHTML={{ __html: formatMessage(m.content) }}
+                  />
+                  {m.role === "assistant" && m.sources && m.sources.length > 0 && (
+                    <div className="msg-sources">
+                      {m.sources.map((source) => (
+                        <Link key={source} href={SOURCE_LINKS[source] || "/dashboard"} className="msg-source-chip">
+                          {source}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="chat-msg assistant">
-                <div className="chat-bubble" style={{ color: "#a855f7" }}>
-                  ✨ Agent is thinking...
+
+            {/* Typing indicator */}
+            {loading && (
+              <div className="msg assistant">
+                <div className="msg-av">{activeAgent.emoji}</div>
+                <div>
+                  <div className="msg-agent-lbl">{activeAgent.name}</div>
+                  <div className="typing-bubble">
+                    <div className="tdot" /><div className="tdot" /><div className="tdot" />
+                  </div>
                 </div>
               </div>
             )}
-            <div ref={messagesEnd} />
-          </>
-        )}
-      </div>
+            <div ref={bottomRef} />
+          </div>
 
-      <div className="chat-footer">
-        <div className="chat-input-wrapper">
-          <input
-            className="chat-input"
-            type="text"
-            placeholder="Ask your question..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-            disabled={isLoading}
-          />
-          <button
-            className="chat-send"
-            onClick={handleSendMessage}
-            disabled={isLoading || !input.trim()}
+          {/* SUGGESTIONS — only on first message */}
+          {messages.length <= 1 && !loading && (
+            <div className="suggestions">
+              {SUGGESTED.map((s, i) => (
+                <button key={i} className="sugg" onClick={() => sendMessage(s)}>{s}</button>
+              ))}
+            </div>
+          )}
+
+          {usageReady && !usageStatus.isUnlimited && (
+          <div className="usage-note">
+    <div className="usage-row">
+    {usageStatus.enforcementEnabled ? (
+      <>
+        <strong>Free plan:</strong> {usageStatus.left}/{usageStatus.limit} questions left this month.
+      </>
+    ) : (
+      <>
+        <strong>Testing mode:</strong> {usageStatus.left}/{usageStatus.limit} free questions left this month. Limit cross hone par bhi chat chalta rahega.
+      </>
+    )}
+    <Link className="usage-link" href="/dashboard/upgrade">Upgrade</Link>
+    </div>
+    <div className="usage-progress">
+      <span style={{ width: `${Math.max(0, Math.min(100, (usageStatus.used / Math.max(usageStatus.limit, 1)) * 100))}%` }} />
+    </div>
+          </div>
+          )}
+
+          {/* INPUT */}
+          <div className="input-wrap">
+            <div className="input-box">
+              <textarea
+                ref={inputRef}
+                className="input-ta"
+                placeholder={`Ask ${activeAgent.name} anything...`}
+                value={input}
+                rows={1}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(input);
+                  }
+                }}
+              />
+              <button
+                className="send-btn"
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || loading || usageStatus.isBlocked}
+              >
+                ✦
+              </button>
+            </div>
+            <div className="input-footer">
+              <span className="input-hint">Enter to send · Shift+Enter for new line</span>
+              <span className="free-tag">
+                {usageStatus.isUnlimited
+                  ? `${subscriptionTier?.toUpperCase() ?? "PREMIUM"} Plan — Unlimited questions`
+                  : `Free Plan — ${usageStatus.left}/${usageStatus.limit} left this month`}
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <nav className="mobile-nav" aria-label="Mobile navigation">
+        {MOBILE_NAV.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`mobile-nav-item ${pathname === item.href ? "active" : ""}`}
           >
-            Send
-          </button>
-        </div>
-        <div style={{ fontSize: "10px", color: "#605890", marginTop: "8px", textAlign: "center" }}>
-          <EducationTooltip term="dasha">About Dasha periods</EducationTooltip> •{" "}
-          <EducationTooltip term="yoga">Auspicious Yogas</EducationTooltip> •{" "}
-          <EducationTooltip term="dosha">Understanding Doshas</EducationTooltip>
-        </div>
-      </div>
-
-      <MobileBottomNav />
-    </main>
+            <span className="mobile-nav-icon">{item.icon}</span>
+            <span className="mobile-nav-label">{item.label}</span>
+          </Link>
+        ))}
+      </nav>
+    </>
   );
 }

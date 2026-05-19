@@ -2524,19 +2524,19 @@ export function buildRealMedicalEngineReportSection(input: any): ReportSection {
   try {
     const chart = getEngineChart(input);
     const result = calculateMedical(chart);
-    const nakshatraDisease = String(result.nakshatraDisease ?? "None specific");
-    const scoreRows = Object.entries(result.scores ?? {})
+    const nakshatraDisease = result.birthNakshatraData?.disease ?? "None specific";
+    const scoreRows = Object.entries(result.healthScores)
       .sort((a: any, b: any) => Number(b[1]) - Number(a[1]))
       .map(([name, score]) => `${name}: ${score}/100`);
-    const topAlerts = result.alerts.slice(0, 8);
+    const topCombos = result.triggeredCombos.slice(0, 4).map(c => c.disease);
 
     return makeSection({
       id: "medical-astrology",
       title: "Medical Astrology",
-      subtitle: `${result.lagnaSign} constitution · Accident risk ${result.accidentRisk}/100`,
-      score: Math.max(35, Math.min(86, 82 - result.accidentRisk / 3 - topAlerts.filter((a: any) => a.severity === "high").length * 4)),
+      subtitle: `${result.lagnaSign} constitution · Accident risk ${result.accidentScore}/100`,
+      score: Math.max(35, Math.min(86, 82 - result.accidentScore / 3 - result.triggeredCombos.length * 4)),
       paragraphs: [
-        "The real Medical Astrology engine was called for this report. It reads lagna constitution, Moon nakshatra, disease-sensitive houses, planet-house health alerts, combination alerts and broad body-system risk scores.",
+        "The real Medical Astrology engine was called for this report. It reads lagna constitution, Moon nakshatra, disease-sensitive houses, planet-house health notes, classical combination alerts and broad body-system risk scores.",
         `Constitutional base: ${result.prakriti}`,
         nakshatraDisease && nakshatraDisease !== "None specific"
           ? `Nakshatra sensitivity: ${result.birthNakshatra} indicates ${nakshatraDisease}. This is a tendency marker, not a diagnosis.`
@@ -2546,9 +2546,9 @@ export function buildRealMedicalEngineReportSection(input: any): ReportSection {
       summary: [
         `Lagna constitution: ${result.lagnaSign}`,
         `Top concern zones: ${result.topConcerns.join(", ") || "None elevated"}`,
-        `Accident risk: ${result.accidentRisk}/100`,
+        `Accident risk: ${result.accidentScore}/100`,
         ...scoreRows,
-        ...topAlerts.map((a: any) => `${a.planet} H${a.house}: ${a.disease} · ${a.severity}`),
+        ...(topCombos.length ? [`Classical patterns: ${topCombos.join(", ")}`] : []),
       ].slice(0, 14),
       actionPlan: [
         "Use this section for prevention, routine and awareness only.",

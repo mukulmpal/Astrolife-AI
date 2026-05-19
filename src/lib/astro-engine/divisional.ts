@@ -777,7 +777,7 @@ export function getShastiamshaAnalysis(d60: DivChart): string[] {
 
 // ── MASTER: get analysis for any chart ───────────────────────────────────────
 
-export function getChartAnalysis(chart: DivChart, _allCharts: DivChart[]): string[] {
+export function getChartAnalysis(chart: DivChart): string[] {
   switch(chart.key) {
     case "D1":  return getRasiAnalysis(chart);
     case "D2":  return getHoraAnalysis(chart);

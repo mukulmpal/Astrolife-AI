@@ -16,6 +16,7 @@ import {
   type DashaLord,
 } from "@/lib/astro-engine/dasha";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -30,10 +31,12 @@ function ActiveCard({
   label,
   period,
   sub,
+  tp,
 }: {
   label: string;
   period: DashaPeriod;
   sub?: string;
+  tp: (n: string) => string;
 }) {
   const color = LORD_COLOR[period.lord];
   return (
@@ -47,7 +50,7 @@ function ActiveCard({
       <div className="flex items-center gap-2">
         <span className="text-2xl">{LORD_ICON[period.lord]}</span>
         <div>
-          <p className="text-xl font-bold text-white">{period.lord}</p>
+          <p className="text-xl font-bold text-white">{tp(period.lord)}</p>
           {sub && <p className="text-xs text-white/50">{sub}</p>}
         </div>
       </div>
@@ -66,7 +69,7 @@ function ActiveCard({
   );
 }
 
-function TimelineRow({ period, onClick, selected }: { period: DashaPeriod; onClick: () => void; selected: boolean }) {
+function TimelineRow({ period, onClick, selected, tp }: { period: DashaPeriod; onClick: () => void; selected: boolean; tp: (n: string) => string }) {
   const color = LORD_COLOR[period.lord];
   const now = new Date();
   const isPast = period.endDate < now;
@@ -83,7 +86,7 @@ function TimelineRow({ period, onClick, selected }: { period: DashaPeriod; onCli
       <span className="text-xl w-7 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-white text-sm">{period.lord} Mahadasha</span>
+          <span className="font-semibold text-white text-sm">{tp(period.lord)} Mahadasha</span>
           {period.isActive && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
               style={{ background: color + "33", color }}>ACTIVE</span>
@@ -103,7 +106,7 @@ function TimelineRow({ period, onClick, selected }: { period: DashaPeriod; onCli
   );
 }
 
-function AntarRow({ period }: { period: DashaPeriod }) {
+function AntarRow({ period, tp }: { period: DashaPeriod; tp: (n: string) => string }) {
   const color = LORD_COLOR[period.lord];
   const now = new Date();
   const isPast = period.endDate < now;
@@ -118,7 +121,7 @@ function AntarRow({ period }: { period: DashaPeriod }) {
     >
       <span className="text-base w-5 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-white/90">{period.lord}</span>
+        <span className="text-sm font-medium text-white/90">{tp(period.lord)}</span>
         <p className="text-[11px] text-white/40">
           {formatDashaDate(period.startDate)} — {formatDashaDate(period.endDate)}
         </p>
@@ -136,6 +139,7 @@ function AntarRow({ period }: { period: DashaPeriod }) {
 
 export default function DashaPage() {
   const { chart, loading } = useUserChart();
+  const { t, tp } = useLanguage();
   const [selectedMD, setSelectedMD] = useState<DashaLord | null>(null);
 
   const dashaTree = useMemo(() => {
@@ -199,17 +203,20 @@ export default function DashaPage() {
         {/* Current Active Periods */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ActiveCard
-            label="Mahadasha"
+            label={t("dasha.mahadasha")}
             period={current.mahadasha}
             sub={LORD_YEARS_DESC[current.mahadasha.lord]}
+            tp={tp}
           />
           <ActiveCard
-            label={`Antardasha · ${current.mahadasha.lord} MD`}
+            label={`${t("dasha.antardasha")} · ${tp(current.mahadasha.lord)} MD`}
             period={current.antardasha}
+            tp={tp}
           />
           <ActiveCard
-            label={`Pratyantar · ${current.antardasha.lord} AD`}
+            label={`Pratyantar · ${tp(current.antardasha.lord)} AD`}
             period={current.pratyantardasha}
+            tp={tp}
           />
         </section>
 
@@ -253,6 +260,7 @@ export default function DashaPage() {
                 period={period}
                 selected={selectedMD === period.lord && dashaTree.timeline.indexOf(period) === dashaTree.timeline.findIndex(p => p.lord === period.lord)}
                 onClick={() => setSelectedMD(prev => prev === period.lord ? null : period.lord)}
+                tp={tp}
               />
             ))}
           </div>
@@ -262,14 +270,14 @@ export default function DashaPage() {
         {selectedPeriod && (
           <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
             <p className="text-xs uppercase tracking-widest text-white/40 mb-1">
-              Antardashas in {selectedPeriod.md.lord} Mahadasha
+              Antardashas in {tp(selectedPeriod.md.lord)} Mahadasha
             </p>
             <p className="text-xs text-white/30 mb-3">
               {formatDashaDate(selectedPeriod.md.startDate)} — {formatDashaDate(selectedPeriod.md.endDate)}
             </p>
             <div className="flex flex-col gap-1.5">
               {selectedPeriod.antardashas.map((ad, i) => (
-                <AntarRow key={i} period={ad} />
+                <AntarRow key={i} period={ad} tp={tp} />
               ))}
             </div>
           </section>
@@ -278,14 +286,14 @@ export default function DashaPage() {
         {/* Pratyantardasha for current AD */}
         <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
           <p className="text-xs uppercase tracking-widest text-white/40 mb-1">
-            Pratyantardashas · {current.antardasha.lord} Antardasha
+            Pratyantardashas · {tp(current.antardasha.lord)} {t("dasha.antardasha")}
           </p>
           <p className="text-xs text-white/30 mb-3">
             {formatDashaDate(current.antardasha.startDate)} — {formatDashaDate(current.antardasha.endDate)}
           </p>
           <div className="flex flex-col gap-1.5">
             {dashaTree.pratyantardashas.map((pd, i) => (
-              <AntarRow key={i} period={pd} />
+              <AntarRow key={i} period={pd} tp={tp} />
             ))}
           </div>
         </section>

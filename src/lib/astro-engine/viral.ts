@@ -29,30 +29,6 @@ export interface FamilyCurseAnalysis {
   shareHashtags: string[];
 }
 
-const ROAST_TEMPLATES = [
-  "Your chart screams {personality} but your {planet} placement says {contradiction}. It's giving {vibe}.",
-  "Chart says you're a {archetype}, but {planet_affliction} in {house} be like 'not today.' You're basically a {humor}.",
-  "Your {planet} is so {affliction} that even {planet2} can't save you. That's peak {archetype} energy.",
-  "Blessed with {strength}, cursed with {weakness}. You're the definition of {condition}.",
-];
-
-const COUPLE_VIBES = [
-  { score: 90, vibe: "🔥 Soulmate Synchronicity", desc: "The universe literally aligned for this" },
-  { score: 75, vibe: "💫 Cosmic Chemistry", desc: "Strong planets meet, chemistry happens" },
-  { score: 60, vibe: "🌙 Karmic Connection", desc: "It's complicated but deeply meant" },
-  { score: 45, vibe: "🎭 Drama Romance", desc: "Growth through friction, learning through conflict" },
-  { score: 30, vibe: "⚡ Redemption Arc", desc: "You both have work to do, together" },
-  { score: 15, vibe: "🚩 Intense Lesson", desc: "If it works, it's because you leveled up" },
-];
-
-const CURSE_PATTERNS = [
-  { pattern: "7th house Mars", curse: "The Relationship Shaker", desc: "Mars in 7th = passion turns to conflict. Your family probably has wild love stories." },
-  { pattern: "Saturn in 4th", curse: "The Heavy Home", desc: "Generational trauma around family property/legacy. Breaking this cycle = freedom." },
-  { pattern: "Rahu conjunct Lagna", curse: "The Identity Chaos", desc: "Family members lose themselves in pursuits. Success eludes until self-awareness blooms." },
-  { pattern: "Moon in 8th", curse: "The Psychological Depth", desc: "Your family faces emotional intensity across generations. Healing work is sacred duty." },
-  { pattern: "Sun-Saturn conjunction", curse: "The Father Wound", desc: "Paternal absence or harshness echoes through lineage. You're here to break it." },
-];
-
 export function generateRoastPrompt(chart: ChartData): string {
   const sunSign = chart.planets.Sun?.sign || "Unknown";
   const moonSign = chart.planets.Moon?.sign || "Unknown";

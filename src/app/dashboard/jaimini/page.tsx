@@ -13,7 +13,7 @@ import {
   type ArudhaPada,
   type CharaDashaPeriod,
 } from "@/lib/astro-engine/jaimini";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -102,7 +102,6 @@ function CharaRow({ period, selected, onClick }: { period: CharaDashaPeriod; sel
 
 // ── Aspect Grid ───────────────────────────────────────────────────────────────
 
-const SIGN_NAMES_SHORT = ["Ar", "Ta", "Ge", "Ca", "Le", "Vi", "Li", "Sc", "Sa", "Ca", "Aq", "Pi"];
 const ASPECT_MAP: Record<number, number[]> = {
   0: [4,7,10], 1: [0,6,9], 2: [5,8,11], 3: [1,7,10], 4: [0,3,9], 5: [2,8,11],
   6: [1,4,10], 7: [0,3,6], 8: [2,5,11], 9: [1,4,7], 10: [3,6,9], 11: [2,5,8],
@@ -112,6 +111,7 @@ const ASPECT_MAP: Record<number, number[]> = {
 
 export default function JaiminiPage() {
   const { chart, loading } = useUserChart();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"karakas" | "arudhas" | "dasha" | "aspects">("karakas");
 
   const jaimini = useMemo(() => {
@@ -121,17 +121,17 @@ export default function JaiminiPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ background: "#05020f" }}>
-        <p className="text-white/40 animate-pulse">Loading Jaimini...</p>
-      </main>
+      <div className="page" style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"60vh"}}>
+        <p style={{color:"#605890"}}>Loading Jaimini...</p>
+      </div>
     );
   }
 
   if (!chart || !jaimini) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ background: "#05020f" }}>
-        <p className="text-white/40">Birth chart required for Jaimini analysis.</p>
-      </main>
+      <div className="page" style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"60vh"}}>
+        <p style={{color:"#605890"}}>Birth chart required for Jaimini analysis.</p>
+      </div>
     );
   }
 
@@ -143,24 +143,17 @@ export default function JaiminiPage() {
   ] as const;
 
   return (
-    <main
-      className="min-h-screen text-white"
-      style={{
-        padding: "32px 24px 110px",
-        background:
-          "radial-gradient(circle at top left, rgba(139,92,246,0.14), transparent 32%), radial-gradient(circle at top right, rgba(234,179,8,0.08), transparent 30%), #05020f",
-      }}
-    >
-      <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%" }} className="flex flex-col gap-6">
+    <div className="page">
+      <div className="flex flex-col gap-6">
 
         {/* Header */}
         <section>
-          <p className="text-xs uppercase tracking-[0.2em] text-violet-300">Jaimini Jyotish</p>
-          <h1 className="text-3xl font-bold mt-1">Jaimini Analysis</h1>
-          <p className="text-white/50 text-sm mt-1">
-            Lagna: <span className="text-white/80 font-medium">{RASHI_ICONS[chart.lagnaNum]} {chart.lagnaRashi}</span>
+          <div className="page-tag">{t("jaimini.page_tag")}</div>
+          <h1 className="page-title serif">{t("jaimini.page_title")}</h1>
+          <p className="page-sub">
+            Lagna: <span style={{color:"#f0e8d0",fontWeight:500}}>{RASHI_ICONS[chart.lagnaNum]} {chart.lagnaRashi}</span>
             {jaimini.currentDasha && (
-              <> · Current Chara Dasha: <span className="text-violet-300 font-medium">{jaimini.currentDasha.sign}</span></>
+              <> · Current Chara Dasha: <span style={{color:"#a855f7",fontWeight:500}}>{jaimini.currentDasha.sign}</span></>
             )}
           </p>
         </section>
@@ -320,7 +313,6 @@ export default function JaiminiPage() {
         )}
 
       </div>
-      <MobileBottomNav />
-    </main>
+    </div>
   );
 }

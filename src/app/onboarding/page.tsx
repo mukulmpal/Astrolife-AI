@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { calculateChart } from "@/lib/astro-engine/calculations";
 import { saveChartToAccount } from "@/lib/user-chart";
+import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -14,22 +15,30 @@ interface FormData {
   city: string;
   lat: number | null;
   lon: number | null;
+  tz: number | null;
 }
 
 const ZODIAC = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
 
-const CITIES = [
-  "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
-  "Pune","Ahmedabad","Jaipur","Lucknow","Chandigarh","Bhopal",
-  "Indore","Nagpur","Surat","Vadodara","Patna","Ranchi",
-  "Bhubaneswar","Kochi","Thiruvananthapuram","Coimbatore",
-  "Mysuru","Visakhapatnam","Agra","Varanasi","Amritsar","Dehradun",
-];
+function ianaToUtcOffset(timezone: string, dob: string, tob: string): number {
+  try {
+    const dt = new Date(`${dob}T${tob || "12:00"}`);
+    const parts = new Intl.DateTimeFormat("en", {
+      timeZone: timezone,
+      timeZoneName: "shortOffset",
+    }).formatToParts(dt);
+    const tzStr = parts.find(p => p.type === "timeZoneName")?.value ?? "GMT+5:30";
+    const m = tzStr.match(/GMT([+-])(\d+)(?::(\d+))?/);
+    if (!m) return 5.5;
+    const sign = m[1] === "+" ? 1 : -1;
+    return sign * (parseInt(m[2], 10) + (parseInt(m[3] ?? "0", 10) / 60));
+  } catch { return 5.5; }
+}
 
 export default function Onboarding() {
   const [step, setStep] = useState<Step>(1);
-  const [form, setForm] = useState<FormData>({ name:"", gender:"", dob:"", tob:"", city:"", lat:null, lon:null });
-  const [citySearch, setCitySearch] = useState("");
+  const [form, setForm] = useState<FormData>({ name:"", gender:"", dob:"", tob:"", city:"", lat:null, lon:null, tz:null });
+  const [selectedCity, setSelectedCity] = useState<CitySearchResult | null>(null);
   const [calcStep, setCalcStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [animClass, setAnimClass] = useState("slide-in");
@@ -40,9 +49,15 @@ export default function Onboarding() {
     if (step === 1) nameRef.current?.focus();
   }, [step]);
 
-  const filteredCities = citySearch.length > 1
-    ? CITIES.filter(c => c.toLowerCase().includes(citySearch.toLowerCase()))
-    : [];
+  function handleCitySelect(city: CitySearchResult | null) {
+    setSelectedCity(city);
+    if (city) {
+      const tz = city.timezone ? ianaToUtcOffset(city.timezone, form.dob, form.tob) : 5.5;
+      setForm(f => ({ ...f, city: city.displayName, lat: city.latitude, lon: city.longitude, tz }));
+    } else {
+      setForm(f => ({ ...f, city: "", lat: null, lon: null, tz: null }));
+    }
+  }
 
   // Calculation animation
   useEffect(() => {
@@ -93,9 +108,15 @@ export default function Onboarding() {
         });
       }
       await saveChartToAccount(
-        calculateChart(form.name, form.dob, form.tob, form.city, form.lat ?? undefined, form.lon ?? undefined),
+        calculateChart(form.name, form.dob, form.tob, form.city, form.lat ?? undefined, form.lon ?? undefined, form.tz ?? undefined),
         { replacePrimary: true },
       );
+      // Track chart generation for admin (await so it doesn't get cancelled on navigate)
+      await fetch("/api/charts/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, dob: form.dob, tob: form.tob, city: form.city, lat: form.lat, lon: form.lon }),
+      }).catch(() => {});
     } catch (e) { console.log(e); }
     setLoading(false);
     goNext(4);
@@ -344,31 +365,14 @@ export default function Onboarding() {
             <h1 className="heading">Where were<br /><em>you born?</em></h1>
             <p className="subheading">Your birthplace anchors your chart to the Earth&apos;s grid — longitude and latitude shape your destiny.</p>
 
-            <label className="label">Birth City</label>
-            <div className="city-wrap">
-              <input
-                className="input"
-                style={{ marginBottom: 0 }}
-                placeholder="Search city... e.g. Mumbai"
-                value={citySearch}
-                onChange={e => { setCitySearch(e.target.value); setForm(f => ({ ...f, city: "" })); }}
+            <div style={{ marginBottom: 20 }}>
+              <CityAutocomplete
+                label="Birth City"
+                value={selectedCity}
+                onChange={handleCitySelect}
+                placeholder="Search city, e.g. Mumbai, London, New York"
               />
-              {filteredCities.length > 0 && (
-                <div className="city-dropdown">
-                  {filteredCities.map(c => (
-                    <div key={c} className="city-opt" onClick={() => { setForm(f => ({ ...f, city: c })); setCitySearch(c); }}>
-                      {c}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
-
-            {form.city && (
-              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:"color-mix(in srgb,var(--onboard-gold) 6%,transparent)", border:"1px solid color-mix(in srgb,var(--onboard-gold) 22%,transparent)", borderRadius:10, marginBottom:20, fontSize:13, color:"var(--onboard-gold)" }}>
-                ✦ {form.city} selected
-              </div>
-            )}
 
             <label className="label" style={{ marginTop:4 }}>Your Zodiac (optional preview)</label>
             <div className="zodiac-row">
@@ -379,7 +383,7 @@ export default function Onboarding() {
 
             <button
               className="btn"
-              disabled={!form.city || loading}
+              disabled={!selectedCity || loading}
               onClick={handleSubmit}
             >
               {loading ? "Saving..." : "Build My Cosmic Blueprint ✦"}

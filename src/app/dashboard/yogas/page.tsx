@@ -3,11 +3,14 @@ import { useState } from "react";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type YogaCategory, type PlanTier } from "@/lib/astro-engine/yogas";
 import { useUserChart } from "@/lib/user-chart";
 import { isFullAccessEnabled } from "@/lib/access";
+import { EngineHeader, EngineShell } from "@/components/engine/EngineShell";
+import { useLanguage } from "@/lib/language-context";
 
 const TIER: PlanTier = isFullAccessEnabled() ? "elite" : "free"; // replace with user's actual tier
 
 export default function YogasPage() {
   const { birth, chart } = useUserChart();
+  const { t, tp } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all"|"present"|"doshas">("present");
   const [activeCategory, setActiveCategory] = useState<YogaCategory|"All">("All");
   const [expandedYoga, setExpandedYoga] = useState<string|null>(null);
@@ -156,40 +159,23 @@ export default function YogasPage() {
         }
       `}</style>
 
-      <div className="page">
-        {/* HEADER */}
-        <div className="page-tag">✦ Yoga Engine</div>
-        <h1 className="page-title serif">Your <em>Cosmic Yogas</em></h1>
-        <p className="page-sub">120 yogas analyzed · Pancha Mahapurusha · Raja · Dhana · Marriage · Career · Doshas</p>
+      <EngineShell>
+        <EngineHeader
+          eyebrow={t("yogas.page_tag")}
+          title={t("yogas.page_title")}
+          subtitle="120 yogas analyzed - Pancha Mahapurusha, Raja, Dhana, Marriage, Career and Doshas."
+          icon="✦"
+          metrics={[
+            { label: "Yoga Score", value: score.total },
+            { label: "Present", value: present.length, tone: "green" },
+            { label: "Doshas", value: doshas.length, tone: "red" },
+            { label: "Rare Yogas", value: score.rareCount, tone: "violet" },
+          ]}
+        />
 
         <>
-            {/* SCORE CARD */}
-            <div className="score-card">
-              <div className="score-orb"/>
-              <div className="score-left">
-                <div className="score-label">✦ Yoga Analysis</div>
-                <div className="score-name serif">{birth.name}</div>
-                <div className="score-meta">{new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city}</div>
-              </div>
-              <div className="score-right">
-                <div className="score-stat">
-                  <div className="score-n serif">{score.total}</div>
-                  <div className="score-l">YOGA SCORE</div>
-                  <div className="score-rating">{score.rating}</div>
-                </div>
-                <div className="score-stat">
-                  <div className="score-n serif" style={{color:"#c8a030"}}>{present.length}</div>
-                  <div className="score-l">YOGAS PRESENT</div>
-                </div>
-                <div className="score-stat">
-                  <div className="score-n serif" style={{color:"#fb7185"}}>{doshas.length}</div>
-                  <div className="score-l">DOSHAS</div>
-                </div>
-                <div className="score-stat">
-                  <div className="score-n serif" style={{color:"#a855f7"}}>{score.rareCount}</div>
-                  <div className="score-l">RARE YOGAS</div>
-                </div>
-              </div>
+            <div className="summary-strip">
+              ✦ Yoga Analysis for <strong>{birth.name}</strong> - {new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} - {birth.tob} - {birth.city}. Current rating: <span style={{color:"#c8a030"}}>{score.rating}</span>.
             </div>
 
             {/* STAT ROW */}
@@ -301,7 +287,7 @@ export default function YogasPage() {
                     {/* PLANETS */}
                     {y.planets.length > 0 && (
                       <div className="planets-row">
-                        {y.planets.map(p => <span key={p} className="planet-pill">{p}</span>)}
+                        {y.planets.map(p => <span key={p} className="planet-pill">{tp(p)}</span>)}
                       </div>
                     )}
 
@@ -328,7 +314,7 @@ export default function YogasPage() {
               </div>
             )}
         </>
-      </div>
+      </EngineShell>
     </>
   );
 }

@@ -284,7 +284,7 @@ export function detectYogas(
   add("Kubera Yoga","Dhana Yogas",
     "2nd lord exalted and 11th lord in trikona/kendra — treasury like Kubera, god of wealth.",
     "Exceptional financial accumulation, lasting wealth, recognized as prosperous. Named after Kubera, the divine treasurer.",
-    82, (() => { const l2=L(2),l11=L(11); return !!l2&&isExalted(SIGN_LORDS[P[Object.keys(P).find(k=>P[k]===l2)||""]?.sign||""]||"",l2.sign)&&!!l11&&isKT(l11.house); })(),
+    82, (() => { const l2=L(2),l11=L(11); if(!l2||!l11)return false; const l2Name=Object.keys(P).find(k=>P[k]===l2)||""; return isExalted(l2Name,l2.sign)&&isKT(l11.house); })(),
     [],"premium",true);
 
   add("Dhana Yoga (2nd-9th)","Dhana Yogas",

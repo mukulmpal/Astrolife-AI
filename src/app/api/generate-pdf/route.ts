@@ -9,6 +9,9 @@ import type { ChartData } from "@/lib/astro-engine/calculations";
 
 export const maxDuration = 60; // Vercel Pro: 60s — set in vercel.json too
 export const dynamic = "force-dynamic";
+// Increase memory allocation — Vercel functions get more CPU proportional to memory.
+// Max for Pro plan is 3008MB which roughly doubles CPU vs the default 1024MB.
+export const runtime = "nodejs";
 
 async function launchBrowser() {
   if (process.env.VERCEL || process.env.NODE_ENV === "production") {
@@ -57,17 +60,23 @@ export async function POST(request: NextRequest) {
 
     await page.setViewport({ width: REPORT_PAGE_SIZE.width, height: REPORT_PAGE_SIZE.height });
 
-    // Load HTML and wait for fonts + network idle
+    // Set print media early so @media print CSS applies during font/layout work
+    await page.emulateMediaType("print");
+
+    // Load HTML — domcontentloaded is enough since we'll await fonts.ready explicitly
     await page.setContent(html, {
-      waitUntil: ["load", "domcontentloaded"],
+      waitUntil: "domcontentloaded",
       timeout: 45_000,
     });
-    // Small safety buffer for CSS variable painting after network idle
-    await new Promise((r) => setTimeout(r, 1500));
 
-    // Extra render pass — ensures SVG + CSS vars are painted
-    await page.evaluate(() => document.fonts.ready);
-    await page.emulateMediaType("print");
+    // Wait for fonts to actually finish loading instead of a fixed sleep.
+    // This is responsive: returns immediately when ready, capped at 8s safety.
+    await page.evaluate(() =>
+      Promise.race([
+        document.fonts.ready,
+        new Promise((r) => setTimeout(r, 8000)),
+      ])
+    );
 
     const pdf = await page.pdf({
       width: `${REPORT_PAGE_SIZE.width}px`,

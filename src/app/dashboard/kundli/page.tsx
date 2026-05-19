@@ -4,6 +4,7 @@ import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations"
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult } from "@/lib/astro-engine/yogas";
 import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
+import { useLanguage } from "@/lib/language-context";
 
 const CITIES = [
   "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
@@ -17,6 +18,7 @@ const PEMO = ["☉","☽","♂","☿","♃","♀","♄","☊","☋"];
 const PCOL = ["#f97316","#c084fc","#ef4444","#22c55e","#f59e0b","#ec4899","#60a5fa","#a78bfa","#fb7185"];
 
 export default function KundliPage() {
+  const { tp, ts, tn } = useLanguage();
   const [form,      setForm]      = useState({name:"",dob:"",tob:"",city:""});
   const [chart,     setChart]     = useState<ChartData|null>(null);
   const [yogas,     setYogas]     = useState<YogaResult[]>([]);
@@ -380,8 +382,8 @@ export default function KundliPage() {
                       return (
                         <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:i<8?"1px solid #1c1840":"none"}}>
                           <span style={{fontSize:16,width:24,color:PCOL[i]}}>{PEMO[i]}</span>
-                          <span style={{flex:1,fontSize:13,color:"#c8c0a8"}}>{p}</span>
-                          <span style={{fontSize:13,color:"#f0e8d0"}}>{pl.sign}</span>
+                          <span style={{flex:1,fontSize:13,color:"#c8c0a8"}}>{tp(p)}</span>
+                          <span style={{fontSize:13,color:"#f0e8d0"}}>{ts(pl.sign)}</span>
                           <span style={{fontSize:11,color:"#605890",width:24,textAlign:"right"}}>H{pl.house}</span>
                           {pl.retrograde&&<span style={{fontSize:9,color:"#f97316",border:"1px solid rgba(249,115,22,0.3)",borderRadius:4,padding:"1px 4px"}}>℞</span>}
                         </div>
@@ -390,14 +392,14 @@ export default function KundliPage() {
                   </div>
                   <div className="card">
                     <div className="card-tag">✦ Active Dasha</div>
-                    <div className="card-title serif">{chart.dashas.find(d=>d.active)?.planet} Mahadasha</div>
+                    <div className="card-title serif">{tp(chart.dashas.find(d=>d.active)?.planet || "")} Mahadasha</div>
                     {(()=>{
                       const active=chart.dashas.find(d=>d.active);
                       const activeAD=chart.antardasha.find(d=>d.active);
                       return (
                         <div style={{fontSize:13,color:"#605890",lineHeight:1.9}}>
-                          Active: <span style={{color:"#c8a030"}}>{active?.planet} MD</span>
-                          {activeAD&&<> / <span style={{color:"#e8c060"}}>{activeAD.planet} AD</span></>}<br/>
+                          Active: <span style={{color:"#c8a030"}}>{tp(active?.planet || "")} MD</span>
+                          {activeAD&&<> / <span style={{color:"#e8c060"}}>{tp(activeAD.planet)} AD</span></>}<br/>
                           <span style={{color:"#c8c0a8"}}>{active&&formatDate(active.start)} → {active&&formatDate(active.end)}</span>
                         </div>
                       );
@@ -424,11 +426,11 @@ export default function KundliPage() {
                       const pl=chart.planets[p]; if(!pl) return null;
                       return (
                         <tr key={i}>
-                          <td><span style={{color:PCOL[i],marginRight:8,fontSize:16}}>{PEMO[i]}</span><span style={{color:"#c8c0a8",fontWeight:500}}>{p}</span>{pl.retrograde&&<span className="retro">℞</span>}</td>
-                          <td style={{color:"#f0e8d0"}}>{pl.sign}</td>
+                          <td><span style={{color:PCOL[i],marginRight:8,fontSize:16}}>{PEMO[i]}</span><span style={{color:"#c8c0a8",fontWeight:500}}>{tp(p)}</span>{pl.retrograde&&<span className="retro">℞</span>}</td>
+                          <td style={{color:"#f0e8d0"}}>{ts(pl.sign)}</td>
                           <td style={{color:"#605890",fontSize:12}}>{pl.degree}° {pl.minutes}&apos;</td>
                           <td style={{color:"#605890"}}>H{pl.house}</td>
-                          <td style={{color:"#c8c0a8",fontSize:12}}>{pl.nakshatra}</td>
+                          <td style={{color:"#c8c0a8",fontSize:12}}>{tn(pl.nakshatra)}</td>
                           <td style={{color:"#605890",fontSize:12}}>P{pl.pada}</td>
                           <td><span className="dpill" style={{color:dignityColor(pl.dignity)}}>{pl.dignity||"—"}</span></td>
                         </tr>

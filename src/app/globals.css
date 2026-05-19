@@ -134,6 +134,10 @@ html[data-theme-mode="light"] .landing-header {
   color: var(--landing-fg) !important;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .landing-page {
   min-height: 100vh;
   overflow: hidden;

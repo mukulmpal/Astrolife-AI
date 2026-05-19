@@ -10,6 +10,7 @@ import {
   type SignificatorSet,
 } from "@/lib/astro-engine/kp";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { useLanguage } from "@/lib/language-context";
 
 function VerdictBadge({ value }: { value: SignificatorSet["verdict"] }) {
   const map = {
@@ -22,15 +23,17 @@ function VerdictBadge({ value }: { value: SignificatorSet["verdict"] }) {
   return <span className={`kp-verdict ${value}`}>{map[value]}</span>;
 }
 
-function KPTableRow({ row }: { row: KPRow }) {
+function KPTableRow({ row, tp, tn }: { row: KPRow; tp?: (n: string) => string; tn?: (n: string) => string }) {
   const color = KP_PLANET_COLORS[row.name] ?? "#e8e3f0";
   const starColor = KP_PLANET_COLORS[row.starLord] ?? "#e8e3f0";
   const subColor = KP_PLANET_COLORS[row.subLord] ?? "#e8e3f0";
+  const _tp = tp || ((n: string) => n);
+  const _tn = tn || ((n: string) => n);
 
   return (
     <tr className={row.isSignificantForTopic ? "hit" : ""}>
       <td>
-        <strong style={{ color }}>{row.name}</strong>
+        <strong style={{ color }}>{_tp(row.name)}</strong>
         {row.retrograde ? <span className="retro">℞</span> : null}
       </td>
       <td>{row.position}</td>
@@ -39,16 +42,16 @@ function KPTableRow({ row }: { row: KPRow }) {
         {row.bhavaShift !== 0 ? <span className="bhava-shift">shift</span> : null}
       </td>
       <td>{row.degreeText}</td>
-      <td>{row.signLord}</td>
-      <td>{row.nakshatra}</td>
-      <td style={{ color: starColor }}>{row.starLord}</td>
+      <td>{_tp(row.signLord)}</td>
+      <td>{_tn(row.nakshatra)}</td>
+      <td style={{ color: starColor }}>{_tp(row.starLord)}</td>
       <td>{row.pada}</td>
       <td>
         <span className="sub-pill" style={{ color: subColor }}>
-          {row.subLord}
+          {_tp(row.subLord)}
         </span>
       </td>
-      <td>{row.subSubLord}</td>
+      <td>{_tp(row.subSubLord)}</td>
       <td>{row.significance}</td>
     </tr>
   );
@@ -76,6 +79,7 @@ function HouseLordGrid({ lords }: { lords: Record<number, string> }) {
 
 export default function KPPage() {
   const { chart, loading } = useUserChart();
+  const { tp, ts, tn } = useLanguage();
   const [activeTab, setActiveTab] = useState<"table" | "cusps" | "events" | "forecast" | "lords" | "guide">("events");
   const [activeEventId, setActiveEventId] = useState<string>("career");
 
@@ -198,7 +202,7 @@ export default function KPPage() {
               </thead>
               <tbody>
                 {result.rows.map((row) => (
-                  <KPTableRow key={row.name} row={row} />
+                  <KPTableRow key={row.name} row={row} tp={tp} tn={tn} />
                 ))}
               </tbody>
             </table>
@@ -234,13 +238,13 @@ export default function KPPage() {
                 {result.cusps.map((cusp) => (
                   <tr key={cusp.house}>
                     <td>H{cusp.house}</td>
-                    <td>{cusp.sign}</td>
+                    <td>{ts(cusp.sign)}</td>
                     <td>{cusp.degreeText}</td>
-                    <td>{cusp.signLord}</td>
-                    <td>{cusp.nakshatra}</td>
-                    <td>{cusp.starLord}</td>
+                    <td>{tp(cusp.signLord)}</td>
+                    <td>{tn(cusp.nakshatra)}</td>
+                    <td>{tp(cusp.starLord)}</td>
                     <td>{cusp.pada}</td>
-                    <td>{cusp.subLord}</td>
+                    <td>{tp(cusp.subLord)}</td>
                     <td>{cusp.subSubLord}</td>
                     <td>{cusp.source.replaceAll("-", " ")}</td>
                     <td>{cusp.promise}</td>

@@ -35,6 +35,10 @@ export interface PsychPattern {
 export interface PsychResult {
   planets:  PsychPlanet[];
   pattern:  PsychPattern;
+  dominantFunctions: string[];
+  riskFlags: { title: string; detail: string; severity: "low" | "medium" | "high" }[];
+  stabilizers: string[];
+  growthPlan: string[];
   summary:  string;
 }
 
@@ -237,16 +241,78 @@ export function calculatePsychology(planets: Record<string,PD>): PsychResult {
   const weakCount   = psychPlanets.filter(p=>p.status==="Weak/Blocked").length;
 
   const summary = strongCount >= 5
-    ? `${DEMO_NAME}'s psychological profile shows exceptional planetary strength. ${strongCount} of 9 functions are strong — high mental resilience and emotional intelligence.`
+    ? `Psychological profile shows exceptional planetary strength. ${strongCount} of 9 functions are strong — high mental resilience and emotional intelligence.`
     : weakCount >= 4
     ? `${weakCount} psychological functions are challenged. Conscious shadow work and remedies will significantly improve mental wellbeing.`
     : `Balanced psychological profile with ${strongCount} strong functions. Mixed patterns create a nuanced, adaptable personality.`;
 
+  const dominantFunctions = psychPlanets
+    .filter(p=>p.status==="Strong")
+    .sort((a,b)=>b.strength-a.strength)
+    .slice(0,3)
+    .map(p=>`${p.planet}: ${p.func}`);
+
+  const riskFlags: PsychResult["riskFlags"] = [];
+  if (anxietyIdx >= 75) {
+    riskFlags.push({
+      title: "High anxiety loop",
+      severity: "high",
+      detail: "Saturn/Moon/Rahu stress is strong. Avoid making decisions from fear, panic, or imagined rejection.",
+    });
+  } else if (anxietyIdx >= 55) {
+    riskFlags.push({
+      title: "Moderate anxiety sensitivity",
+      severity: "medium",
+      detail: "Stress can distort timing. Pause before sending important messages or making reactive commitments.",
+    });
+  }
+  if (karmaLoop >= 70) {
+    riskFlags.push({
+      title: "Repeating karma pattern",
+      severity: "medium",
+      detail: "Similar people or situations may repeat until the response pattern changes consciously.",
+    });
+  }
+  if (behavBias >= 70) {
+    riskFlags.push({
+      title: "Behavioral bias active",
+      severity: "medium",
+      detail: "The chart shows a tendency to over-identify with one response style. Ask for feedback before big choices.",
+    });
+  }
+  psychPlanets
+    .filter(p=>p.status==="Weak/Blocked")
+    .slice(0,2)
+    .forEach(p=>{
+      riskFlags.push({
+        title: `${p.planet} function blocked`,
+        severity: [6,8,12].includes(p.house) ? "high" : "medium",
+        detail: `${p.func} needs conscious work: ${p.weak}`,
+      });
+    });
+
+  const stabilizers = [
+    moonWeak ? "Moon stabilizer: sleep rhythm, hydration, journaling, and fewer late-night emotional decisions." : "Moon stabilizer: keep emotional routines steady so intuition stays clean.",
+    satWeak ? "Saturn stabilizer: fixed wake time, simple daily discipline, and one completed task before distraction." : "Saturn stabilizer: use structure as support, not self-punishment.",
+    rahu && [1,6,7,8,12].includes(rahu.house) ? "Rahu stabilizer: reduce comparison, screen overload, shortcuts, and addictive loops." : "Rahu stabilizer: channel ambition into one measurable goal.",
+  ];
+
+  const weakest = psychPlanets.filter(p=>p.status==="Weak/Blocked").slice(0,3);
+  const growthPlan = weakest.length
+    ? weakest.map(p=>`Work ${p.planet} weekly: strengthen ${p.func.toLowerCase()} through one practical habit and one remedy.`)
+    : [
+      "Maintain the strong functions with routine, mentorship, and honest feedback.",
+      "Pick one shadow pattern each month instead of trying to fix everything at once.",
+    ];
+  growthPlan.push(`Primary pattern work: ${shadow}`);
+
   return {
     planets: psychPlanets,
     pattern: { name:patternName, desc:patternDesc, shadow, anxietyIdx, karmaLoop, behavBias, radarVals },
+    dominantFunctions,
+    riskFlags,
+    stabilizers,
+    growthPlan,
     summary,
   };
 }
-
-const DEMO_NAME = "Mukul"; // Replace with dynamic user name

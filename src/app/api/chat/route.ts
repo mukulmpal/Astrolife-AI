@@ -1,49 +1,136 @@
-import { createClient } from "@/lib/supabase/server";
-import { getAgent } from "@/lib/ai-agents";
-import { streamText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { NextRequest, NextResponse } from "next/server";
 
-type ChatMessage = {
-  role: "user" | "assistant" | "system";
-  content: string;
+const AGENTS: Record<string, { name: string; emoji: string; system: string }> = {
+  general: {
+    name: "AstroLife AI", emoji: "✦",
+    system: `You are AstroLife AI — India's most advanced Vedic astrology assistant. Combine Vedic, Lal Kitab, KP, Nadi, Transit analysis. Be warm, insightful, personalized. Use ✦ bullets. Max 200 words. End with a follow-up question.`,
+  },
+  career: {
+    name: "Career Agent", emoji: "📈",
+    system: `You are AstroLife Career Agent. Focus: 10th house, D-10, Saturn, Sun, Mercury, career dashas. Analyze: profession yogas, timing peaks, business vs job. Professional, strategic. ✦ bullets. Max 200 words.`,
+  },
+  marriage: {
+    name: "Marriage Agent", emoji: "💑",
+    system: `You are AstroLife Marriage Agent. Focus: 7th house, Venus, Jupiter, Navamsha D-9, Venus/Jupiter transits. Analyze: marriage timing, compatibility, relationship karma. Empathetic, romantic. ✦ bullets. Max 200 words.`,
+  },
+  karmic: {
+    name: "Karmic Agent", emoji: "☯️",
+    system: `You are AstroLife Karmic Intelligence Agent. Focus: Rahu-Ketu axis, past life karma, 12th house, Saturn karmas. Philosophical, spiritually illuminating. ✦ bullets. Max 200 words.`,
+  },
+  wealth: {
+    name: "Wealth Agent", emoji: "💰",
+    system: `You are AstroLife Wealth Agent. Focus: 2nd, 11th house, Dhana yogas, Jupiter, Venus, Mercury transits. Practical, strategic, financially focused. ✦ bullets. Max 200 words.`,
+  },
+  health: {
+    name: "Health Agent", emoji: "🌿",
+    system: `You are AstroLife Medical Astrology Agent. Focus: 6th, 8th house, Saturn, Mars, Rahu/Ketu. Always add: consult a real doctor. Caring, holistic. ✦ bullets. Max 200 words.`,
+  },
+  psychology: {
+    name: "Psychology Agent", emoji: "🧠",
+    system: `You are AstroLife Psychology Agent. Focus: Moon sign, nakshatra, Mercury, 4th house. Analyze emotional patterns, mental strengths. Compassionate, therapeutic. ✦ bullets. Max 200 words.`,
+  },
+  remedy: {
+    name: "Remedy Agent", emoji: "🕯️",
+    system: `You are AstroLife Vedic Remedy Agent. Specialize: mantras, gemstones, charity, rituals, fasting. Affordable, actionable. ✦ bullets. Max 200 words.`,
+  },
+  lalkitab: {
+    name: "Lal Kitab Agent", emoji: "📕",
+    system: `You are AstroLife Lal Kitab Specialist. Focus: house-wise planets, SP Bhagat remedies, donation timings, daily practices. Practical, action-oriented. ✦ bullets. Max 200 words.`,
+  },
+  spiritual: {
+    name: "Spiritual Agent", emoji: "🙏",
+    system: `You are AstroLife Spiritual Growth Agent. Focus: dharma (9th), moksha (12th), guru yoga, Jupiter/Ketu transits. Deeply spiritual, compassionate. ✦ bullets. Max 200 words.`,
+  },
 };
 
-export async function POST(req: Request) {
+async function callGemini(system: string, messages: { role: string; content: string }[]): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("Missing GEMINI_API_KEY");
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
+      generationConfig: { temperature: 0.8, maxOutputTokens: 1500 },
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || "Gemini error");
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+}
+
+async function callGroq(system: string, messages: { role: string; content: string }[]): Promise<string> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error("Missing GROQ_API_KEY");
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      messages: [{ role: "system", content: system }, ...messages],
+      max_tokens: 1024,
+      temperature: 0.8,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || "Groq error");
+  return data.choices?.[0]?.message?.content || "";
+}
+
+async function saveChatMessages(userId: string | null, sessionId: string, agentId: string, userMsg: string, aiMsg: string) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return new Response("Unauthorized", { status: 401 });
+    const admin = createAdminClient();
+    const { error } = await admin.from("chat_messages").insert([
+      { user_id: userId, session_id: sessionId, agent_id: agentId, role: "user", content: userMsg },
+      { user_id: userId, session_id: sessionId, agent_id: agentId, role: "assistant", content: aiMsg },
+    ]);
+    if (error) console.error("chat save error:", error.message);
+  } catch (e) { console.error("chat save exception:", e); }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { messages, agentId = "general", chartContext, transitContext, dailyFeedContext } = await req.json();
+    const agent = AGENTS[agentId] || AGENTS.general;
+
+    const systemPrompt = [
+      agent.system,
+      chartContext   ? `\nUSER'S BIRTH CHART:\n${chartContext}` : "",
+      transitContext ? `\nCURRENT TRANSITS:\n${transitContext}` : "",
+      dailyFeedContext ? `\nDAILY FEED:\n${dailyFeedContext}` : "",
+      `\nStyle: Premium Hinglish. ✦ bullets. Max 200 words. Sign off as: "${agent.emoji} ${agent.name}"`,
+    ].join("");
+
+    // Try Gemini first, fallback to Groq
+    let text = "";
+    let model = "gemini";
+    try {
+      text = await callGemini(systemPrompt, messages);
+    } catch (e) {
+      console.warn("Gemini failed, trying Groq:", e);
+      text = await callGroq(systemPrompt, messages);
+      model = "groq";
     }
 
-    const { agentId, messages, chartData } = await req.json();
+    const sources = [
+      chartContext    ? "Natal Chart"     : null,
+      transitContext  ? "Transit/Gochar"  : null,
+      dailyFeedContext ? "Daily Feed"     : null,
+    ].filter(Boolean);
 
-    if (!agentId || !messages || !chartData) {
-      return new Response("Missing required fields", { status: 400 });
+    // Save to DB — always, even for anonymous users
+    const lastUserMsg = [...(messages as { role: string; content: string }[])].reverse().find((m) => m.role === "user");
+    if (lastUserMsg?.content) {
+      const sid = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await saveChatMessages(null, sid, agentId, lastUserMsg.content, text);
     }
 
-    const agent = getAgent(agentId);
-    if (!agent) {
-      return new Response("Invalid agent", { status: 400 });
-    }
-
-    const systemPrompt = agent.systemPrompt(chartData);
-
-    const result = streamText({
-      model: anthropic("claude-3-5-sonnet-20241022"),
-      system: systemPrompt,
-      messages: messages.map((msg: ChatMessage) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-      temperature: 0.7,
-    });
-
-    return result.toTextStreamResponse();
-  } catch (error: unknown) {
-    console.error("Chat error:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(`Error: ${message}`, { status: 500 });
+    return NextResponse.json({ message: text, agent: agent.name, emoji: agent.emoji, model, sources, usage: { left: 999, limit: 999, used: 0, enforced: false, trackedOnServer: false } });
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return NextResponse.json({ error: "AI service unavailable. Please try again." }, { status: 500 });
   }
 }

@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
+import "@/app/dashboard/shared.css";
 import { calculateShadbala, getShadbalaRadar, type ShadbalaPlanet } from "@/lib/astro-engine/shadbala";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
+import { useLanguage } from "@/lib/language-context";
 
 function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
   const data = getShadbalaRadar(planet);
@@ -50,6 +52,7 @@ export default function ShadbalaPage() {
   const [expanded, setExpanded] = useState<string|null>(null);
   const [activeTab, setActiveTab] = useState<"grid"|"table"|"summary">("grid");
   const { birth, chart } = useUserChart();
+  const { t, tp, ts } = useLanguage();
   const result = calculateShadbala(chart.planets as never);
 
   const BALA_LABELS = [
@@ -64,45 +67,13 @@ export default function ShadbalaPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
-        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        body{background:#060410;color:#f0e8d0;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
-        .serif{font-family:'Cormorant Garamond',Georgia,serif}
-        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#060410}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
-
-        .page{max-width:1200px;margin:0 auto;padding:32px}
-        .page-tag{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#c8a030;margin-bottom:8px}
-        .page-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:#f0e8d0;line-height:1.1}
-        .page-title em{font-style:italic;color:#c8a030}
-        .page-sub{font-size:14px;color:#605890;margin-top:6px;margin-bottom:28px}
-
-        /* HEADER CARD */
-        .header-card{background:linear-gradient(135deg,#0f0c28,#1a1040);border:1px solid rgba(200,160,48,0.2);border-radius:20px;padding:28px 32px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;position:relative;overflow:hidden}
-        .header-orb{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(200,160,48,0.08) 0%,transparent 70%);right:-60px;top:-60px;pointer-events:none}
         .header-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#f0e8d0}
         .header-meta{font-size:13px;color:#605890;margin-top:4px}
         .header-stats{display:flex;gap:12px;flex-wrap:wrap}
-        .hstat{text-align:center;background:rgba(0,0,0,0.2);border-radius:12px;padding:12px 16px;border:1px solid rgba(200,160,48,0.1);min-width:90px}
-        .hstat-n{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:#c8a030;line-height:1}
-        .hstat-l{font-size:10px;color:#605890;margin-top:4px;letter-spacing:0.5px}
-
-        /* SUMMARY STRIP */
-        .summary-strip{background:rgba(200,160,48,0.05);border:1px solid rgba(200,160,48,0.15);border-radius:12px;padding:14px 20px;margin-bottom:24px;font-size:13px;color:#c8c0a8;line-height:1.7}
-
-        /* TABS */
-        .tabs{display:flex;gap:4px;background:#0a0720;border:1px solid #1c1840;border-radius:12px;padding:4px;width:fit-content;margin-bottom:24px}
-        .tab{padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#605890;border:none;background:none;font-family:'Outfit',sans-serif}
-        .tab.active{background:#1c1840;color:#c8c0a8}
-
-        /* PLANET GRID */
         .planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
-
-        /* PLANET CARD */
         .planet-card{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:20px;cursor:pointer;transition:all 0.25s}
         .planet-card:hover{transform:translateY(-2px);border-color:rgba(200,160,48,0.2)}
         .planet-card.expanded{border-color:rgba(200,160,48,0.35)}
-
-        /* CARD TOP */
         .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
         .card-left{display:flex;align-items:center;gap:10px}
         .planet-icon{font-size:24px}
@@ -110,53 +81,34 @@ export default function ShadbalaPage() {
         .planet-pos{font-size:11px;color:#605890;margin-top:2px}
         .planet-pct{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;line-height:1}
         .planet-grade{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:2px;text-align:right}
-
-        /* STRENGTH BAR */
         .bar-wrap{margin-bottom:14px}
-        .bar-track{height:4px;background:#1c1840;border-radius:2px;overflow:hidden}
-        .bar-fill{height:100%;border-radius:2px;transition:width 0.8s ease}
-
-        /* BALA MINI GRID */
         .bala-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
         .bala-item{background:#0a0720;border:1px solid #1c1840;border-radius:8px;padding:8px;text-align:center}
         .bala-val{font-size:16px;font-weight:600;font-family:'Cormorant Garamond',serif;line-height:1;margin-bottom:2px}
         .bala-lbl{font-size:9px;color:#605890;letter-spacing:0.5px}
         .bala-max{font-size:8px;color:#3a3060}
-
-        /* RADAR */
         .radar-wrap{margin-bottom:14px}
-
-        /* EXPANDED */
         .expanded-content{border-top:1px solid #1c1840;margin-top:14px;padding-top:14px}
         .bala-detail{margin-bottom:12px;padding:12px;background:#0a0720;border:1px solid #1c1840;border-radius:10px}
         .bala-detail-title{font-size:11px;font-weight:600;color:#c8a030;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
         .bala-detail-txt{font-size:12px;color:#c8c0a8;line-height:1.7}
         .bala-def{font-size:11px;color:#3a3060;line-height:1.6;margin-top:6px;padding-top:6px;border-top:1px solid #1c1840}
-
-        /* TABLE */
         .sb-table{width:100%;border-collapse:collapse}
         .sb-table th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#3a3060;padding:0 12px 14px;text-align:center;font-weight:400}
         .sb-table th:first-child{text-align:left}
         .sb-table td{padding:12px;border-bottom:1px solid #1c1840;font-size:13px;text-align:center;vertical-align:middle}
         .sb-table tr:last-child td{border-bottom:none}
         .sb-table td:first-child{text-align:left}
-
-        /* SUMMARY TAB */
         .bala-explain{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:24px;margin-bottom:16px}
         .bala-explain-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0;margin-bottom:12px}
         .bala-explain-text{font-size:13px;color:#c8c0a8;line-height:1.85}
-
-        @media(max-width:768px){
-          .page{padding:20px}
-          .planet-grid{grid-template-columns:1fr}
-          .header-card{flex-direction:column}
-        }
+        @media(max-width:768px){.planet-grid{grid-template-columns:1fr}}
       `}</style>
 
       <div className="page">
         {/* HEADER */}
-        <div className="page-tag">✦ Shadbala Engine</div>
-        <h1 className="page-title serif">Planetary <em>Strength Analysis</em></h1>
+        <div className="page-tag">{t("shadbala.page_tag")}</div>
+        <h1 className="page-title serif">{t("shadbala.page_title")}</h1>
         <p className="page-sub">6-factor Shadbala system · Sthana · Dig · Kala · Cheshta · Naisargika · Drik</p>
         <PremiumFeature feature="Shadbala Analysis">
 
@@ -209,8 +161,8 @@ export default function ShadbalaPage() {
                   <div className="card-left">
                     <span className="planet-icon" style={{color:p.color}}>{p.icon}</span>
                     <div>
-                      <div className="planet-name">{p.planet}</div>
-                      <div className="planet-pos">{p.sign} · House {p.house}{p.retrograde?" · ℞ Vakri":""}</div>
+                      <div className="planet-name">{tp(p.planet)}</div>
+                      <div className="planet-pos">{ts(p.sign)} · House {p.house}{p.retrograde?" · ℞ Vakri":""}</div>
                     </div>
                   </div>
                   <div>

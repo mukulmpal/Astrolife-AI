@@ -28,6 +28,21 @@ export interface DestinyPoint {
     score:  number;
     color:  string;
   }
+
+  export interface DestinyDriver {
+    planet: string;
+    role: "Mahadasha" | "Antardasha";
+    tone: "support" | "mixed" | "caution";
+    message: string;
+  }
+
+  export interface DestinyMilestone {
+    age: number;
+    year: number;
+    score: number;
+    trend: "rise" | "dip" | "stable";
+    message: string;
+  }
   
   export interface DestinyResult {
     points:      DestinyPoint[];
@@ -38,6 +53,9 @@ export interface DestinyPoint {
     currentAge:  number;
     currentScore:number;
     currentDasha:string;
+    currentDrivers: DestinyDriver[];
+    nextMilestones: DestinyMilestone[];
+    actionPlan: string[];
     summary:     string;
   }
   
@@ -50,6 +68,27 @@ export interface DestinyPoint {
   const DY: Record<string,number> = {Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17};
   
   const md = (x:number,m:number)=>((x%m)+m)%m;
+
+  function planetTone(planet: string, pd?: PD): DestinyDriver["tone"] {
+    if (!pd) return "mixed";
+    if (pd.dignity?.includes("Exalted") || pd.dignity?.includes("Own") || [1,4,5,7,9,10,11].includes(pd.house)) {
+      return "support";
+    }
+    if (pd.dignity?.includes("Debilitated") || [6,8,12].includes(pd.house) || pd.retrograde) {
+      return "caution";
+    }
+    return "mixed";
+  }
+
+  function driverMessage(planet: string, role: DestinyDriver["role"], pd?: PD): string {
+    if (!pd) return `${role} ${planet} is active, but natal placement data is limited.`;
+    const dignity = pd.dignity ? `, ${pd.dignity}` : "";
+    const retro = pd.retrograde ? ", retrograde" : "";
+    const base = `${role} ${planet} is operating from H${pd.house} ${pd.sign}${dignity}${retro}.`;
+    if (planetTone(planet, pd) === "support") return `${base} Use this period for visible progress and clear commitments.`;
+    if (planetTone(planet, pd) === "caution") return `${base} Move with patience, documentation, and remedies before major risks.`;
+    return `${base} Results improve through steady effort rather than shortcuts.`;
+  }
   
   function buildAD(mdPlanet:string, mdStart:Date, mdYrs:number): DashaEntry[] {
     const mi=DO.indexOf(mdPlanet); const seq:DashaEntry[]=[]; let cur=new Date(mdStart); const now=new Date();
@@ -163,9 +202,49 @@ export interface DestinyPoint {
   
     const currentAge   = Math.floor((now.getTime()-dobDate.getTime())/(365.25*24*3600*1000));
     const currentScore = scoreYear(now.getFullYear());
+    const currentADSeq = activeMD ? buildAD(activeMD.planet, activeMD.start, activeMD.yrs) : [];
+    const activeAD = currentADSeq.find(s=>s.start<=now&&s.end>now);
+
+    const currentDrivers: DestinyDriver[] = [
+      {
+        planet: activeMD.planet,
+        role: "Mahadasha",
+        tone: planetTone(activeMD.planet, planets[activeMD.planet]),
+        message: driverMessage(activeMD.planet, "Mahadasha", planets[activeMD.planet]),
+      },
+      ...(activeAD ? [{
+        planet: activeAD.planet,
+        role: "Antardasha" as const,
+        tone: planetTone(activeAD.planet, planets[activeAD.planet]),
+        message: driverMessage(activeAD.planet, "Antardasha", planets[activeAD.planet]),
+      }] : []),
+    ];
+
+    const nextMilestones: DestinyMilestone[] = points
+      .filter(p=>p.age>=currentAge && p.age<=currentAge+5)
+      .slice(0,6)
+      .map((pnt, i, arr)=>{
+        const previous = i === 0 ? currentScore : arr[i-1].score;
+        const diff = pnt.score - previous;
+        const trend: DestinyMilestone["trend"] = diff >= 5 ? "rise" : diff <= -5 ? "dip" : "stable";
+        const message = trend === "rise"
+          ? `${pnt.dasha || "Current"} period shows improving support; plan important steps.`
+          : trend === "dip"
+          ? `${pnt.dasha || "Current"} period needs extra caution and preparation.`
+          : `${pnt.dasha || "Current"} period stays steady; consistency matters more than speed.`;
+        return { age:pnt.age, year:pnt.year, score:pnt.score, trend, message };
+      });
+
+    const weakestAreas = [...areas].sort((a,b)=>a.score-b.score).slice(0,2);
+    const strongestArea = [...areas].sort((a,b)=>b.score-a.score)[0];
+    const actionPlan = [
+      strongestArea ? `Use ${strongestArea.name} as the main growth lever in the current dasha.` : "Use your strongest active area as the main growth lever.",
+      weakestAreas.length ? `Give weekly attention to ${weakestAreas.map(a=>a.name).join(" and ")} so weak areas do not drain momentum.` : "Keep weak areas under weekly review.",
+      currentScore >= 70 ? "This is an action phase: launch, negotiate, decide, and compound gains." : currentScore >= 50 ? "This is a build phase: improve systems before taking irreversible decisions." : "This is a protection phase: reduce risk, finish pending karma, and strengthen remedies.",
+    ];
   
     const summary = `Peak period is ${peak?.planet} Mahadasha (${peak?.start.getFullYear()}–${peak?.end.getFullYear()}) with score ${peak?.score}%. `+
       `Challenge period is ${challenge?.planet} Mahadasha. Current score: ${currentScore}%.`;
   
-    return { points, areas, bands, peak, challenge, currentAge, currentScore, currentDasha:activeMD.planet, summary };
+    return { points, areas, bands, peak, challenge, currentAge, currentScore, currentDasha:activeMD.planet, currentDrivers, nextMilestones, actionPlan, summary };
   }

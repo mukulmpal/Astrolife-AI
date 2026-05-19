@@ -133,14 +133,12 @@ export function buildAiEngineContext(chart: ChartData): string {
 
   lines.push(...safeLines("Medical Astrology", () => {
     const m = calculateMedical(chart);
-    const alerts = m.alerts
-      .slice(0, 4)
-      .map((item) => `${item.planet} H${item.house}: ${item.disease} (${item.severity})`);
-    const scores = Object.entries(m.scores)
+    const scores = Object.entries(m.healthScores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 4)
       .map(([key, value]) => `${key} ${value}/100`);
-    return `Constitution ${m.lagnaSign}: ${m.prakriti} Top concern zones: ${joinItems(m.topConcerns)}. Risk scores: ${scores.join(", ") || "not elevated"}. Accident risk ${m.accidentRisk}/100. Alerts: ${alerts.join("; ") || "none major"}. Always add soft medical disclaimer.`;
+    const combos = m.triggeredCombos.slice(0, 3).map(c => c.disease).join(", ");
+    return `Constitution ${m.lagnaSign}: ${m.prakriti} Top concern zones: ${joinItems(m.topConcerns)}. Risk scores: ${scores.join(", ") || "not elevated"}. Accident risk ${m.accidentScore}/100. Classical combos: ${combos || "none triggered"}. Always add soft medical disclaimer.`;
   }));
 
   lines.push(...safeLines("Remedy Engine", () => {

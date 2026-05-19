@@ -11,26 +11,26 @@ body{background:var(--app-bg,#060410);color:var(--app-fg,#f0e8d0);font-family:'O
 /* PAGE */
 .page{max-width:1200px;margin:0 auto;padding:32px}
 .page-tag{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#c8a030;margin-bottom:8px}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:#f0e8d0;line-height:1.1}
-.page-title em{font-style:italic;color:#c8a030}
-.page-sub{font-size:14px;color:#605890;margin-top:6px;margin-bottom:28px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;background:linear-gradient(135deg,#f0e8d0,#c8a030,#f0d898);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+.page-title em{font-style:italic}
+.page-sub{font-size:16px;color:#605890;margin-top:6px;margin-bottom:28px}
 
 /* CARDS */
 .card{background:var(--app-card,#0d0a22);border:1px solid var(--app-border,#1c1840);border-radius:16px;padding:24px}
 .card:hover{border-color:rgba(200,160,48,0.15)}
 .card-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#605890;margin-bottom:6px}
-.card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0;margin-bottom:16px}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#f0e8d0;margin-bottom:16px}
 
 /* HEADER CARD */
 .header-card{background:linear-gradient(135deg,#0f0c28,#1a1040);border:1px solid rgba(200,160,48,0.2);border-radius:20px;padding:28px 32px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;position:relative;overflow:hidden}
 .header-orb{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(200,160,48,0.08) 0%,transparent 70%);right:-60px;top:-60px;pointer-events:none}
 .hstat{text-align:center;background:rgba(0,0,0,0.2);border-radius:12px;padding:12px 16px;border:1px solid rgba(200,160,48,0.1);min-width:90px}
-.hstat-n{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:#c8a030;line-height:1}
+.hstat-n{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:#c8a030;line-height:1}
 .hstat-l{font-size:10px;color:#605890;margin-top:4px;letter-spacing:0.5px}
 
 /* TABS */
 .tabs{display:flex;gap:4px;background:#0a0720;border:1px solid #1c1840;border-radius:12px;padding:4px;width:fit-content;margin-bottom:24px;flex-wrap:wrap}
-.tab{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#605890;border:none;background:none;font-family:'Outfit',sans-serif}
+.tab{padding:8px 18px;border-radius:9px;font-size:15px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#605890;border:none;background:none;font-family:'Outfit',sans-serif}
 .tab.active{background:#1c1840;color:#c8c0a8}
 
 /* GRIDS */
@@ -39,7 +39,7 @@ body{background:var(--app-bg,#060410);color:var(--app-fg,#f0e8d0);font-family:'O
 .grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
 
 /* SUMMARY STRIP */
-.summary-strip{background:rgba(200,160,48,0.05);border:1px solid rgba(200,160,48,0.15);border-radius:12px;padding:14px 20px;margin-bottom:24px;font-size:13px;color:var(--app-fg,#c8c0a8);line-height:1.7}
+.summary-strip{background:rgba(200,160,48,0.05);border:1px solid rgba(200,160,48,0.15);border-radius:12px;padding:14px 20px;margin-bottom:24px;font-size:15px;color:var(--app-fg,#c8c0a8);line-height:1.7}
 
 /* BADGES */
 .badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;font-weight:500}
@@ -91,4 +91,598 @@ body{background:var(--app-bg,#060410);color:var(--app-fg,#f0e8d0);font-family:'O
   .grid-3{grid-template-columns:1fr 1fr}
   .header-card{flex-direction:column}
   .tab{padding:6px 12px;font-size:12px}
+}
+
+/* AstroLife OS dashboard system
+   UI-only layer: shared surface, rhythm, and interaction polish for all engines. */
+.astro-os-root {
+  --engine-bg: var(--app-bg, #060410);
+  --engine-bg-soft: #09071a;
+  --engine-fg: var(--app-fg, #f0e8d0);
+  --engine-soft: var(--app-soft, #c8c0a8);
+  --engine-muted: #8f86ad;
+  --engine-card: color-mix(in srgb, var(--app-card, #0d0a22) 86%, transparent);
+  --engine-card-strong: color-mix(in srgb, var(--app-card-alt, #0f0c28) 92%, transparent);
+  --engine-border: color-mix(in srgb, var(--app-border, #1c1840) 80%, white 7%);
+  --engine-border-strong: color-mix(in srgb, var(--app-gold, #c8a030) 34%, var(--app-border, #1c1840));
+  --engine-gold: var(--app-gold, #c8a030);
+  --engine-gold-strong: var(--app-gold-strong, #f0d898);
+  --engine-green: #22c55e;
+  --engine-red: #ef4444;
+  --engine-blue: #60a5fa;
+  --engine-violet: #a855f7;
+  --engine-radius: 18px;
+  --engine-radius-lg: 24px;
+  --engine-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 16% -8%, color-mix(in srgb, var(--engine-violet) 14%, transparent), transparent 28rem),
+    radial-gradient(circle at 86% 6%, color-mix(in srgb, var(--engine-gold) 12%, transparent), transparent 24rem),
+    linear-gradient(180deg, var(--engine-bg), var(--engine-bg-soft) 46%, var(--engine-bg));
+  color: var(--engine-fg);
+}
+
+.astro-os-root :is(.page, .tr-shell, .er-shell, .report-shell) {
+  width: min(1200px, calc(100% - 40px));
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.astro-os-root :is(.page, .tr-wrap, .er-wrap, .report-shell) {
+  color: var(--engine-fg);
+}
+
+.astro-os-root :is(.page) {
+  padding: 32px 0 110px;
+}
+
+.astro-os-root :is(.tr-wrap, .er-wrap) {
+  background:
+    radial-gradient(circle at 16% -8%, color-mix(in srgb, var(--engine-violet) 14%, transparent), transparent 28rem),
+    radial-gradient(circle at 86% 6%, color-mix(in srgb, var(--engine-gold) 12%, transparent), transparent 24rem),
+    var(--engine-bg) !important;
+  padding: 30px 22px 110px;
+}
+
+.engine-shell {
+  width: min(1200px, calc(100% - 40px));
+  margin-inline: auto;
+  padding: 32px 0 110px;
+  color: var(--engine-fg);
+}
+
+.engine-hero,
+.astro-os-root :is(.header-card, .score-card, .tr-hero, .er-hero) {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--engine-border-strong) !important;
+  border-radius: var(--engine-radius-lg) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.07), transparent 36%),
+    radial-gradient(circle at 82% 4%, color-mix(in srgb, var(--engine-gold) 13%, transparent), transparent 20rem),
+    linear-gradient(135deg, #0f0c28, #171039) !important;
+  box-shadow: var(--engine-shadow);
+}
+
+.engine-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 24px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+}
+
+.engine-hero-orb,
+.astro-os-root :is(.header-orb, .score-orb) {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  right: -70px;
+  top: -90px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--engine-gold) 14%, transparent) 0%, transparent 68%) !important;
+  pointer-events: none;
+}
+
+.engine-hero-copy,
+.engine-hero-side {
+  position: relative;
+  z-index: 1;
+}
+
+.engine-eyebrow,
+.astro-os-root :is(.page-tag, .tr-kicker, .er-kicker, .score-label, .card-tag) {
+  color: var(--engine-gold) !important;
+  font-size: 10px !important;
+  letter-spacing: 2.4px !important;
+  text-transform: uppercase !important;
+  font-weight: 700;
+}
+
+.engine-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+
+.engine-eyebrow-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--engine-gold) 12%, transparent);
+}
+
+.engine-hero h1,
+.astro-os-root :is(.page-title, .tr-title, .er-title, .rem-hero) {
+  color: var(--engine-fg) !important;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif !important;
+  font-size: clamp(34px, 4vw, 48px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0 !important;
+}
+
+.engine-hero h1 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.engine-hero p,
+.astro-os-root :is(.page-sub, .tr-sub, .er-sub, .rem-sub, .score-meta) {
+  color: var(--engine-muted) !important;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+}
+
+.engine-hero p {
+  margin: 8px 0 0;
+  max-width: 660px;
+}
+
+.engine-hero-side {
+  display: grid;
+  align-content: center;
+  justify-items: end;
+  gap: 14px;
+}
+
+.engine-metrics,
+.astro-os-root :is(.score-right, .header-stats) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.engine-metric,
+.astro-os-root :is(.hstat, .score-stat, .stat-card, .idx-card) {
+  border: 1px solid color-mix(in srgb, var(--engine-gold) 16%, var(--engine-border)) !important;
+  border-radius: 14px !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.engine-metric {
+  min-width: 94px;
+  padding: 13px 16px;
+  text-align: center;
+}
+
+.engine-metric strong,
+.astro-os-root :is(.hstat-n, .score-n, .stat-n, .idx-n) {
+  color: var(--engine-gold) !important;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif !important;
+  line-height: 1 !important;
+}
+
+.engine-metric.green strong { color: var(--engine-green) !important; }
+.engine-metric.red strong { color: var(--engine-red) !important; }
+.engine-metric.blue strong { color: var(--engine-blue) !important; }
+.engine-metric.violet strong { color: var(--engine-violet) !important; }
+
+.engine-metric span,
+.astro-os-root :is(.hstat-l, .score-l, .stat-l, .idx-l) {
+  display: block;
+  margin-top: 5px;
+  color: var(--engine-muted) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.engine-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.engine-card,
+.astro-os-root :is(.card, .yoga-card, .planet-card, .tr-card, .er-card, .rem-card, .kp-panel, .gem-card) {
+  border-color: var(--engine-border) !important;
+  border-radius: var(--engine-radius) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), transparent 42%),
+    var(--engine-card) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.astro-os-root :is(
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+):is(
+  .border,
+  [class*="border-"]
+) {
+  border-color: var(--engine-border);
+}
+
+.astro-os-root :is(
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+):is(
+  [class*="bg-black"],
+  [class*="bg-white/"],
+  [class*="bg-slate"],
+  [class*="bg-zinc"],
+  [class*="bg-neutral"]
+) {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent 42%),
+    var(--engine-card);
+}
+
+.astro-os-root :is(.text-white\/40, .text-white\/50, .text-white\/60, .text-white\/70) {
+  color: var(--engine-muted);
+}
+
+.astro-os-root :is(.text-white, .text-slate-50, .text-zinc-50) {
+  color: var(--engine-fg);
+}
+
+.engine-card {
+  padding: 22px;
+}
+
+.engine-card:hover,
+.astro-os-root :is(.card, .yoga-card, .planet-card, .tr-card, .er-card, .rem-card, .gem-card):hover {
+  border-color: var(--engine-border-strong) !important;
+  box-shadow: var(--engine-shadow);
+}
+
+.engine-section-title {
+  margin: 34px 0 16px;
+}
+
+.engine-section-title span {
+  display: block;
+  color: var(--engine-gold);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.engine-section-title h2 {
+  margin: 7px 0 0;
+  color: var(--engine-fg);
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 30px;
+  line-height: 1.12;
+}
+
+.engine-section-title p {
+  margin: 8px 0 0;
+  color: var(--engine-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.engine-state-card h1 {
+  margin: 8px 0 0;
+  color: var(--engine-fg);
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.engine-state-card p {
+  margin: 7px 0 0;
+  color: var(--engine-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.astro-os-root :is(.tabs, .tr-switch, .er-switch) {
+  border-color: var(--engine-border) !important;
+  background: rgba(4, 4, 12, 0.72) !important;
+  border-radius: 14px !important;
+  padding: 5px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.astro-os-root :is(.tab, .tr-btn, .er-btn, .cat-btn) {
+  border-radius: 10px !important;
+  color: var(--engine-muted) !important;
+}
+
+.astro-os-root :is(.tab.active, .tr-btn.active, .er-btn.active, .cat-btn.active) {
+  background: color-mix(in srgb, var(--engine-gold) 13%, var(--engine-card-strong)) !important;
+  border-color: var(--engine-border-strong) !important;
+  color: var(--engine-gold-strong) !important;
+}
+
+.astro-os-root :is(.summary-strip, .upgrade, .pitra-alert, .upaya-box, .remedy-box) {
+  border-color: color-mix(in srgb, var(--engine-gold) 20%, var(--engine-border)) !important;
+  border-radius: 16px !important;
+  background: color-mix(in srgb, var(--engine-gold) 7%, transparent) !important;
+  color: var(--engine-soft) !important;
+}
+
+.astro-os-root :is(.bar-track, .strength-bar, .as-progress, .gem-score > div) {
+  background: color-mix(in srgb, var(--engine-border) 80%, black) !important;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.astro-os-root :is(table) {
+  border-color: var(--engine-border) !important;
+}
+
+.astro-os-root :is(th) {
+  color: var(--engine-gold) !important;
+}
+
+.astro-os-root :is(td) {
+  color: var(--engine-soft);
+}
+
+.astro-os-root :is(a, button) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media(max-width:768px){
+  .astro-os-root :is(.page, .tr-shell, .er-shell, .report-shell),
+  .engine-shell {
+    width: min(100% - 28px, 1200px);
+    padding-top: 22px;
+    padding-bottom: 104px;
+  }
+
+  .engine-hero,
+  .astro-os-root :is(.header-card, .score-card, .tr-hero, .er-hero) {
+    padding: 22px !important;
+    border-radius: 20px !important;
+  }
+
+  .engine-hero {
+    flex-direction: column;
+  }
+
+  .engine-hero-side {
+    justify-items: stretch;
+  }
+
+  .engine-metrics,
+  .astro-os-root :is(.score-right, .header-stats) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .engine-metric {
+    min-width: 0;
+  }
+
+  .astro-os-root :is(.tabs, .tr-switch, .er-switch, .cat-filters) {
+    width: 100% !important;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+  }
+
+  .astro-os-root :is(.tabs, .tr-switch, .er-switch, .cat-filters)::-webkit-scrollbar {
+    display: none;
+  }
+
+  .astro-os-root :is(.tab, .tr-btn, .er-btn, .cat-btn) {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+/* ── PERSISTENT SIDEBAR ──────────────────────────────────────── */
+.dash-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.dash-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--engine-bg-soft, #09071a) 96%, white 1%);
+  border-right: 1px solid var(--engine-border, #1c1840);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dash-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 20px;
+  border-bottom: 1px solid var(--engine-border, #1c1840);
+  flex-shrink: 0;
+}
+
+.dash-logo-gem {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #3c2880, #c8a030);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 0 18px rgba(200, 160, 48, 0.22);
+  flex-shrink: 0;
+}
+
+.dash-logo-name {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 20px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #c8a030, #f0d898);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dash-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 10px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #1c1840 transparent;
+}
+
+.dash-nav::-webkit-scrollbar { width: 2px; }
+.dash-nav::-webkit-scrollbar-track { background: transparent; }
+.dash-nav::-webkit-scrollbar-thumb { background: #1c1840; border-radius: 2px; }
+
+.dash-nav-section { margin-bottom: 4px; }
+
+.dash-nav-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #7878c0;
+  padding: 8px 8px 5px;
+}
+
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  color: #9080c8;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  border: 1px solid transparent;
+  margin-bottom: 1px;
+  line-height: 1;
+  white-space: nowrap;
+  min-height: 36px;
+}
+
+.dash-nav-item:focus-visible {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+}
+
+.dash-nav-item:hover {
+  color: #c8c0a8;
+  background: rgba(200, 160, 48, 0.06);
+}
+
+.dash-nav-item.active {
+  color: #c8a030;
+  background: rgba(200, 160, 48, 0.1);
+  border-color: rgba(200, 160, 48, 0.18);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #c8a030;
+}
+
+.dash-upgrade-item {
+  color: #c8a030 !important;
+  background: rgba(200, 160, 48, 0.06) !important;
+  border-color: rgba(200, 160, 48, 0.14) !important;
+  margin-top: 4px;
+}
+
+.dash-upgrade-item:hover {
+  background: rgba(200, 160, 48, 0.12) !important;
+  border-color: rgba(200, 160, 48, 0.28) !important;
+}
+
+.dash-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-top: 1px solid var(--engine-border, #1c1840);
+  flex-shrink: 0;
+}
+
+.dash-user-av {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3c2880, #c8a030);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 13px;
+  color: #f0e8d0;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.dash-user-name {
+  font-size: 12.5px;
+  color: #c8c0a8;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dash-logout {
+  background: none;
+  border: none;
+  color: #7878b8;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  flex-shrink: 0;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.dash-logout:hover { color: #c8a030; }
+
+.dash-logout:focus-visible {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* ── MAIN CONTENT AREA ───────────────────────────────────────── */
+.dash-main {
+  margin-left: 240px;
+  flex: 1;
+  min-height: 100vh;
+}
+
+@media (max-width: 1024px) {
+  .dash-sidebar { display: none; }
+  .dash-main { margin-left: 0; padding-bottom: 84px; }
 }

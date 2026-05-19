@@ -9,8 +9,7 @@ import {
 } from "@/lib/astro-engine/divisional";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-
+import { useLanguage } from "@/lib/language-context";
 const SIGN_ICONS = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
 const md = (x:number,m:number)=>((x%m)+m)%m;
 
@@ -92,10 +91,11 @@ function MiniChart({ chart }: { chart: DivChart }) {
 export default function DivisionalPage() {
   const [activeChart, setActiveChart] = useState("D9");
   const { birth, chart } = useUserChart();
+  const { t } = useLanguage();
 
   const divs     = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
   const current  = divs.find(d=>d.key===activeChart) || divs[0];
-  const analysis = getChartAnalysis(current, divs);
+  const analysis = getChartAnalysis(current);
   const findings = getSpecialFindings(divs);
   const color    = CHART_COLORS[current.key] ?? "#a855f7";
   const meta     = CHART_META[current.key];
@@ -103,13 +103,8 @@ export default function DivisionalPage() {
   return (
     <div className="page">
       <style>{`
-        .page{min-height:100vh;background:linear-gradient(135deg,#060212,#0a0520);color:#f0e8d0;padding:28px 20px 110px;font-family:'Outfit',sans-serif}
-        .dv-header{background:linear-gradient(135deg,#120d30,#1a1140);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:22px;margin-bottom:20px}
-        .dv-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#a855f7;margin-bottom:6px}
-        .dv-title{font-size:28px;font-weight:700;color:#f0e8d0;margin:0}
-        .dv-sub{font-size:13px;color:#605890;margin-top:4px}
         .dv-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-        .dv-tab{padding:8px 16px;border-radius:10px;border:1px solid #1c1840;background:transparent;color:#605890;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;text-align:center}
+        .dv-tab{padding:8px 16px;border-radius:10px;border:1px solid #1c1840;background:transparent;color:#605890;cursor:pointer;font-size:14px;font-weight:500;transition:all 0.2s;text-align:center}
         .dv-tab.active{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 15%,transparent);color:var(--tc)}
         .dv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
         @media(max-width:640px){.dv-grid{grid-template-columns:1fr}}
@@ -117,35 +112,40 @@ export default function DivisionalPage() {
         .dv-card-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#605890;margin-bottom:10px}
         .dv-planet-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #1a1740}
         .dv-badge{font-size:9px;padding:2px 7px;border-radius:6px;border:1px solid}
-        .dv-insight{padding:8px 0;border-bottom:1px solid #1a1740;font-size:13px;color:#c8c0a8;line-height:1.75;display:flex;gap:8px}
+        .dv-insight{padding:8px 0;border-bottom:1px solid #1a1740;font-size:14px;color:#c8c0a8;line-height:1.75;display:flex;gap:8px}
         .dv-finding{border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid}
-        .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-        .stat{background:#0d0a22;border:1px solid #1f1a42;border-radius:10px;padding:10px 14px;flex:1;min-width:100px}
-        .stat-n{font-size:18px;font-weight:700}
-        .stat-l{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#605890;margin-top:2px}
+        .dv-stat-row{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+        .dv-stat{text-align:center;background:rgba(0,0,0,0.2);border-radius:12px;padding:12px 16px;border:1px solid rgba(168,85,247,0.15);min-width:90px}
+        .dv-stat-n{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#a855f7;line-height:1}
+        .dv-stat-l{font-size:10px;color:#605890;margin-top:4px;letter-spacing:0.5px}
       `}</style>
 
       {/* Header */}
-      <div className="dv-header">
-        <div className="dv-kicker">📐 Divisional Charts</div>
-        <h1 className="dv-title">Divisional Chart Analysis</h1>
-        <div className="dv-sub">{birth?.name} · D-1 to D-27 · Varga Analysis</div>
-        <div className="stat-row">
-          <div className="stat">
-            <div className="stat-n" style={{fontSize:14}}>{divs.find(d=>d.key==="D9")?.lagna}</div>
-            <div className="stat-l">D-9 Lagna</div>
+      <div className="page-tag">{t("divisional.page_tag")}</div>
+      <h1 className="page-title serif">{t("divisional.page_title")}</h1>
+      <p className="page-sub">{birth?.name} · D-1 to D-27 · Varga Analysis</p>
+      <div className="header-card" style={{marginBottom:24}}>
+        <div className="header-orb"/>
+        <div style={{position:"relative",zIndex:1}}>
+          <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#a855f7",marginBottom:6}}>📐 Chart Analysis</div>
+          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,fontWeight:600,color:"#f0e8d0"}}>{birth?.name}</div>
+        </div>
+        <div className="dv-stat-row">
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{fontSize:16}}>{divs.find(d=>d.key==="D9")?.lagna}</div>
+            <div className="dv-stat-l">D-9 LAGNA</div>
           </div>
-          <div className="stat">
-            <div className="stat-n" style={{fontSize:14}}>{divs.find(d=>d.key==="D10")?.lagna}</div>
-            <div className="stat-l">D-10 Lagna</div>
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{fontSize:16}}>{divs.find(d=>d.key==="D10")?.lagna}</div>
+            <div className="dv-stat-l">D-10 LAGNA</div>
           </div>
-          <div className="stat">
-            <div className="stat-n">{findings.filter(f=>f.type==="positive").length}</div>
-            <div className="stat-l">Positive Yogas</div>
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{color:"#22c55e"}}>{findings.filter(f=>f.type==="positive").length}</div>
+            <div className="dv-stat-l">POSITIVE</div>
           </div>
-          <div className="stat">
-            <div className="stat-n">{findings.filter(f=>f.type==="caution").length}</div>
-            <div className="stat-l">Cautions</div>
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{color:"#ef4444"}}>{findings.filter(f=>f.type==="caution").length}</div>
+            <div className="dv-stat-l">CAUTIONS</div>
           </div>
         </div>
       </div>
@@ -272,7 +272,6 @@ export default function DivisionalPage() {
       </div>
 
       </PremiumFeature>
-      <MobileBottomNav />
     </div>
   );
 }

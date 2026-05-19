@@ -35,6 +35,7 @@ import { assertEventRadarReportContract } from "./contracts";
     areaScores: TransitAreaScore[];
     topAlerts: TransitAlert[];
     opportunities: TransitAlert[];
+    scoreRationale: string[];
     advice: string;
     remedy: string;
     aiContext: string;
@@ -173,6 +174,32 @@ import { assertEventRadarReportContract } from "./contracts";
   
     return Math.round(clamp(score));
   }
+
+  function buildScoreRationale(params: {
+    rawAverage: number;
+    highAlerts: number;
+    mediumAlerts: number;
+    opportunities: number;
+    dayIndex: number;
+    bestArea: EventRadarArea;
+    cautionArea: EventRadarArea;
+  }) {
+    const rationale = [
+      `Area average starts at ${params.rawAverage}/100; strongest area is ${params.bestArea}.`,
+      `${params.highAlerts} high and ${params.mediumAlerts} medium caution alerts adjusted the score.`,
+      `${params.opportunities} opportunity signals plus daily Moon rhythm added usable variation.`,
+    ];
+
+    if (params.bestArea !== params.cautionArea) {
+      rationale.push(`Use ${params.bestArea} for action and keep ${params.cautionArea} lighter.`);
+    }
+
+    if (params.dayIndex === 0) {
+      rationale.push("Today is weighted as the practical anchor for immediate planning.");
+    }
+
+    return rationale;
+  }
   
   function buildDayAiContext(day: EventRadarDay) {
     const areaLines = day.areaScores
@@ -215,6 +242,9 @@ import { assertEventRadarReportContract } from "./contracts";
   
   Remedy:
   ${day.remedy}
+
+  Score Rationale:
+  ${day.scoreRationale.join("\n")}
   `.trim();
   }
   
@@ -274,6 +304,15 @@ import { assertEventRadarReportContract } from "./contracts";
       const signal = getSignal(overallScore);
       const advice = getSignalAdvice(signal, bestArea);
       const remedy = getRemedy(signal, cautionAlerts);
+      const scoreRationale = buildScoreRationale({
+        rawAverage,
+        highAlerts,
+        mediumAlerts,
+        opportunities: opportunities.length,
+        dayIndex: i,
+        bestArea,
+        cautionArea,
+      });
   
       const day: EventRadarDay = {
         date: date.toISOString(),
@@ -286,6 +325,7 @@ import { assertEventRadarReportContract } from "./contracts";
         areaScores: transit.areaScores,
         topAlerts: cautionAlerts,
         opportunities,
+        scoreRationale,
         advice,
         remedy,
         aiContext: "",

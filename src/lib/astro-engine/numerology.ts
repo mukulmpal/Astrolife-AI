@@ -495,9 +495,9 @@ function calcChallenges(dob: string, lp: number, currentAge: number): ChallengeN
   }));
 }
 
-function detectKarmicDebts(dob: string, name: string, lpVal: number, deVal: number): KarmicDebt[] {
+function detectKarmicDebts(dob: string, name: string): KarmicDebt[] {
   const debts: KarmicDebt[] = [];
-  const [y, m, d] = dob.split("-").map(Number);
+  const [y, month, day] = dob.split("-").map(Number);
 
   const checkRaw = (raw: number, source: string) => {
     if ([13, 14, 16, 19].includes(raw)) {
@@ -507,8 +507,8 @@ function detectKarmicDebts(dob: string, name: string, lpVal: number, deVal: numb
   };
 
   // Check Life Path intermediate sums
-  checkRaw(reduce(d) + reduce(m) + reduce(digitSum(y)), "Life Path (full sum)");
-  checkRaw(reduce(d), "Birth Day");
+  checkRaw(reduce(day) + reduce(month) + reduce(digitSum(y)), "Life Path (full sum)");
+  checkRaw(reduce(day), "Birth Day");
 
   // Check Destiny intermediate sums
   const letters = name.toUpperCase().replace(/[^A-Z]/g, "").split("");
@@ -537,7 +537,6 @@ function calcBridge(lp: number, destiny: number): number {
 
 function calcPersonalDay(dob: string): number {
   const now = new Date();
-  const [, m, d] = dob.split("-").map(Number);
   const pyVal = calcPersonalYear(dob);
   return reduce(pyVal + reduce(now.getMonth() + 1) + reduce(now.getDate()));
 }
@@ -688,7 +687,7 @@ export function calculateNumerology(name: string, dob: string): NumerologyResult
   const challenges    = calcChallenges(dob, lpVal, currentAge);
   const activePinnacle  = pinnacles.find(p => p.isActive) ?? null;
   const activeChallenge = challenges.find(c => c.isActive && c.label !== "Major Challenge (Life)") ?? null;
-  const karmicDebts   = detectKarmicDebts(dob, name, lpVal, deVal);
+  const karmicDebts   = detectKarmicDebts(dob, name);
   const hiddenPassion = calcHiddenPassion(name);
   const bridgeNumber  = calcBridge(lpVal, deVal);
   const personalDay   = calcPersonalDay(dob);

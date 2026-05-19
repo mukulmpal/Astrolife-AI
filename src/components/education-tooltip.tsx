@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { getEducation, type AstroTerm } from "@/lib/astro-education";
+import { getEducation } from "@/lib/astro-education";
 
 export function EducationTooltip({ term, children }: { term: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);

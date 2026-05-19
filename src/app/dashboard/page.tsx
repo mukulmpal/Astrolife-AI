@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
+import { calculateChart } from "@/lib/astro-engine/calculations";
 import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
@@ -10,7 +10,7 @@ import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculateTransitReport, type PlanetName } from "@/lib/astro-engine/transits";
 import { calculateDivisional, type DivChart, type DivPlanet } from "@/lib/astro-engine/divisional";
 import { checkSupabaseHealth, isSupabaseReady, type DbHealthItem } from "@/lib/db-health";
-import { clearCurrentChart, useUserChart, saveChartToAccount } from "@/lib/user-chart";
+import { useUserChart, saveChartToAccount } from "@/lib/user-chart";
 import { getAccountAiUsageStatus, getFreeMonthlyAiLimit } from "@/lib/usage";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };

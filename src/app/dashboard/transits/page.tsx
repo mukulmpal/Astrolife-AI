@@ -6,11 +6,13 @@ import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
 
 const AREA_ICON: Record<string, string> = { career: "💼", love: "💞", money: "💰", health: "🧘", family: "🏡", spirituality: "🕉️" };
 
 export default function TransitPage() {
+  const { tp, ts } = useLanguage();
   const [base, setBase] = useState<TransitBase>("lagna");
   const [today] = useState<Date>(() => {
     const now = new Date();
@@ -166,10 +168,10 @@ export default function TransitPage() {
               {planets.map((p) => (
                 <div className="tr-planet" key={p.planet}>
                   <div className="tr-row">
-                    <strong>{p.planet}</strong>
+                    <strong>{tp(p.planet)}</strong>
                     <span className="tr-muted">{p.effect}</span>
                   </div>
-                  <p className="tr-muted">{p.rashiName} {p.degreeInRashi}°{p.retrograde ? " ℞" : ""}</p>
+                  <p className="tr-muted">{ts(p.rashiName)} {p.degreeInRashi}°{p.retrograde ? " ℞" : ""}</p>
                   <p className="tr-muted">H{p.houseFromBase} from {p.baseLabel}</p>
                   {p.natalHitPlanets.length > 0 && <p className="tr-muted">Activates: {p.natalHitPlanets.join(", ")}</p>}
                   <p className="tr-p" style={{ marginTop: 6 }}>{p.note}</p>
