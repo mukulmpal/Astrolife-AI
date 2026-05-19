@@ -161,7 +161,7 @@ export function buildReportEngineContext(chart: ChartData, options?: Partial<Rep
       },
       yogas: { status: "covered", note: "Yoga analysis remains in the calculation engine and report modules." },
       doshas: { status: "covered", note: "Dosha checks are available through the core interpretation stack." },
-      shadbala: { status: "proxy", note: "This PDF currently shows a strength proxy; full shadbala can be expanded into a dedicated page." },
+      shadbala: { status: "proxy", note: "Basic strength indicator shown; full six-fold shadbala calculation available in the app." },
       divisionalCharts: { status: "covered", note: "Divisional-chart data can be added as a dedicated premium chapter." },
       transit: { status: "covered", note: "Transit analysis is available in the app and can be surfaced in this template." },
       remedies: {
@@ -261,7 +261,7 @@ function renderNorthIndianChart(chart: ChartData): string {
   for (const [name, pd] of Object.entries(chart.planets)) {
     const abbr = PLANET_ABBR[name] ?? name.slice(0, 2);
     const house = pd.house >= 1 && pd.house <= 12 ? pd.house : 1;
-    houseContents[house].push(abbr + (pd.retrograde ? "℞" : ""));
+    houseContents[house].push(abbr + (pd.retrograde ? "(R)" : ""));
   }
 
   // Build planet labels at house positions
@@ -704,11 +704,11 @@ function page1LagnaLord(chart: ChartData): string {
   const llSign = llPlanet?.sign ?? "";
   const llHouse = llPlanet?.house ?? 1;
   const llDeg = llPlanet ? `${llPlanet.degree}°${llPlanet.minutes}'` : "";
-  const llGlyph = PLANET_GLYPH[lagnaLord] ?? "";
+  const llAbbr = (PLANET_ABBR[lagnaLord] ?? lagnaLord.slice(0,2)).toUpperCase();
   const deity = TUTELARY_DEITY[lagnaLord] ?? TUTELARY_DEITY["Jupiter"];
   const mantra = BEEJ_MANTRA[lagnaLord] ?? "";
   const mantraRoman = BEEJ_ROMAN[lagnaLord] ?? "";
-  const firstName = esc(chart.name.split(" ")[0]);
+  const firstName = esc(capitalize(chart.name.split(" ")[0]));
 
   const weekdayMap: Record<string, string> = {
     Sun:"Sundays", Moon:"Mondays", Mars:"Tuesdays", Mercury:"Wednesdays",
@@ -825,7 +825,7 @@ function page1LagnaLord(chart: ChartData): string {
       <!-- Center glyph -->
       <circle r="58" fill="var(--bg)" stroke="var(--gold)" stroke-width="1"/>
       <circle r="50" fill="none" stroke="var(--gold-dim)" stroke-width="0.4"/>
-      <text x="0" y="22" text-anchor="middle" font-family="Inter,sans-serif" font-size="72" fill="var(--gold-bright)" font-weight="300">${llGlyph}</text>
+      <text x="0" y="22" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="56" fill="var(--gold-bright)" font-weight="400" letter-spacing="2">${llAbbr}</text>
     </svg>
   </div>
 
@@ -865,7 +865,7 @@ function page1LagnaLord(chart: ChartData): string {
       <div class="body-s mono" style="font-size:10.5px;color:var(--ivory-mute);margin-top:2px;">${esc(chart.dob)} · ${esc(chart.tob)}</div>
     </div>
     <div>
-      <div class="kicker" style="margin-bottom:4px;">Lagna · ${llGlyph} at</div>
+      <div class="kicker" style="margin-bottom:4px;">Lagna Lord · ${esc(lagnaLord)}</div>
       <div class="serif-italic" style="font-size:16px;color:var(--ivory);">${esc(llSign)} · H${llHouse}</div>
       <div class="body-s mono" style="font-size:10.5px;color:var(--ivory-mute);margin-top:2px;">${llDeg}</div>
     </div>
@@ -1011,6 +1011,29 @@ function page5BirthSnapshot(chart: ChartData): string {
           ${renderNorthIndianChart(chart)}
         </div>
         <div class="body-s" style="margin-top:8px;text-align:center;color:var(--ivory-mute);">${esc(chart.lagnaRashi)} Ascendant · House 1 at top</div>
+
+        <!-- Planet placements legend -->
+        <div style="margin-top:14px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;">
+          <div class="kicker" style="font-size:9px;margin-bottom:6px;">Planet Placements</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-family:'JetBrains Mono',monospace;font-size:9.5px;line-height:1.55;color:var(--ivory-dim);">
+            ${["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"].map(p => {
+              const pd = chart.planets[p];
+              if (!pd) return "";
+              const abbr = PLANET_ABBR[p] ?? p.slice(0,2);
+              const retro = pd.retrograde ? " (R)" : "";
+              return `<div><span style="color:var(--gold);font-weight:600;">${abbr}</span> ${esc(p)} · ${esc(pd.sign)} H${pd.house} · ${pd.degree}°${String(pd.minutes).padStart(2,"0")}'${retro}</div>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <!-- Sign reference legend -->
+        <div style="margin-top:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;">
+          <div class="kicker" style="font-size:9px;margin-bottom:4px;">Sign Reference</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;line-height:1.6;color:var(--ivory-mute);">
+            1 Aries · 2 Taurus · 3 Gemini · 4 Cancer · 5 Leo · 6 Virgo<br/>
+            7 Libra · 8 Scorpio · 9 Sagittarius · 10 Capricorn · 11 Aquarius · 12 Pisces
+          </div>
+        </div>
       </div>
 
       <!-- Pillar cards + birth data -->
@@ -1061,15 +1084,14 @@ function page6PlanetaryDashboard(chart: ChartData): string {
     else { badgeClass = "violet"; }
 
     const strengthPct = Math.min(100, Math.round((pd.degree / 30) * 100));
-    const retro = pd.retrograde ? ' <span style="color:var(--crimson);font-size:10px;">℞</span>' : "";
-    const glyph = PLANET_GLYPH[name] ?? "";
+    const retro = pd.retrograde ? ' <span style="color:var(--crimson);font-size:10px;font-weight:600;">(R)</span>' : "";
     const skt = PLANET_SANSKRIT[name] ?? name;
 
     return `<div class="card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
         <div>
           <div class="devanagari" style="font-size:13px;color:var(--gold-dim);margin-bottom:2px;">${skt}</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ivory);">${glyph} ${esc(name)}${retro}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ivory);">${esc(name)}${retro}</div>
         </div>
         <span class="badge ${badgeClass}" style="font-size:9px;">${esc(badgeLabel)}</span>
       </div>
@@ -1079,7 +1101,7 @@ function page6PlanetaryDashboard(chart: ChartData): string {
       <div style="height:3px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px;">
         <div style="height:100%;width:${strengthPct}%;background:var(--gold);border-radius:99px;opacity:0.7;"></div>
       </div>
-      <div class="body-s" style="margin-top:3px;font-size:9px;">Strength proxy: ${strengthPct}%</div>
+      <div class="body-s" style="margin-top:3px;font-size:9px;">Strength: ${strengthPct}%</div>
     </div>`;
   }).join("");
 
@@ -1140,7 +1162,7 @@ function page7CurrentDasha(chart: ChartData): string {
     const isActive = ad.active;
     return `<div class="card${isActive ? " gold-edge" : ""}" style="display:grid;grid-template-columns:1fr auto;align-items:start;gap:12px;">
       <div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${PLANET_GLYPH[ad.planet] ?? ""} ${esc(ad.planet)} Antardasha</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${esc(ad.planet)} Antardasha</div>
         <div class="body-s" style="margin-top:2px;">${formatDateShort(new Date(ad.start))} — ${formatDateShort(new Date(ad.end))}</div>
       </div>
       <div style="text-align:right;">
@@ -1170,7 +1192,7 @@ function page7CurrentDasha(chart: ChartData): string {
     <div class="card gold-edge" style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
       <div>
         <div class="kicker" style="margin-bottom:6px;">Active Mahadasha</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold-bright);">${PLANET_GLYPH[activeMD.planet] ?? ""} ${esc(activeMD.planet)} Mahadasha</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold-bright);">${esc(activeMD.planet)} Mahadasha</div>
         <div class="mono" style="font-size:11px;color:var(--ivory-mute);margin-top:4px;">${formatDate(new Date(activeMD.start))} — ${formatDate(new Date(activeMD.end))}</div>
       </div>
       <div style="text-align:right;">
@@ -1250,7 +1272,7 @@ function page8UpcomingDashas(chart: ChartData): string {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
         <div>
           <div class="kicker" style="margin-bottom:4px;">${startYear} — ${endYear}</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ivory);">${PLANET_GLYPH[md.planet] ?? ""} ${esc(md.planet)} Mahadasha</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ivory);">${esc(md.planet)} Mahadasha</div>
         </div>
         <div style="text-align:right;">
           <div class="mono" style="font-size:18px;color:var(--gold);">${md.yrs}</div>
@@ -1297,7 +1319,7 @@ function page9Remedies(chart: ChartData): string {
     return `<div class="card" style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
         <div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ivory);">${PLANET_GLYPH[card.planet] ?? ""} ${esc(card.planet)}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ivory);">${esc(card.planet)}</div>
           <div class="body-s">${esc(card.sign)} · H${card.house} · ${esc(card.nakshatra)}</div>
         </div>
         <span class="badge" style="color:${pColor};border-color:${pColor}40;background:${pColor}08;font-size:9px;">${esc(card.priority)}</span>
@@ -1320,7 +1342,7 @@ function page9Remedies(chart: ChartData): string {
           <div class="body-s" style="color:var(--ivory-dim);">${esc(card.day)} · ${esc(card.color)}</div>
         </div>
       </div>
-      ${card.lkUpay.length > 0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);"><div class="kicker" style="font-size:9px;margin-bottom:4px;">Lal Kitab Upay</div><div class="body-s" style="color:var(--violet);">${esc(card.lkUpay.slice(0, 2).join(" · "))}</div></div>` : ""}
+      ${card.lkUpay.length > 0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);"><div class="kicker" style="font-size:9px;margin-bottom:4px;">Lal Kitab Upay</div><div class="devanagari" style="font-size:11px;line-height:1.5;color:var(--violet);">${esc(card.lkUpay.slice(0, 2).join(" · "))}</div></div>` : ""}
     </div>`;
   }).join("");
 
@@ -1435,10 +1457,15 @@ function page11EngineLedger(context: ReportEngineContext): string {
     return "";
   };
 
+  // User-friendly status labels (PROXY is internal jargon)
+  const statusLabel = (status: string): string => {
+    if (status === "proxy") return "basic";
+    return status;
+  };
   const tableRows = rows.map(([name, status, note]) => `
     <div class="card" style="display:grid;grid-template-columns:170px 96px 1fr;gap:14px;align-items:start;padding:14px 16px;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--ivory);">${esc(name)}</div>
-      <span class="badge ${badgeClass(status)}" style="justify-content:center;font-size:8.5px;">${esc(status)}</span>
+      <span class="badge ${badgeClass(status)}" style="justify-content:center;font-size:8.5px;">${esc(statusLabel(status))}</span>
       <div class="body-s" style="color:var(--ivory-dim);">${esc(note)}</div>
     </div>`).join("");
 
