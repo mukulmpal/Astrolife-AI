@@ -7,7 +7,7 @@ import {
   Sparkles, Timer, BarChart3, Grid3x3, Layers, Target,
   Brain, BookOpen, Hash, Calendar, Music, Gem, Home as HomeIcon,
   HeartPulse, HelpCircle, Leaf, Users, FileText, Zap,
-  Sunrise, History, Star, HeartHandshake,
+  Sunrise, History, Star, HeartHandshake, ShoppingBag,
   LogOut, type LucideIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -21,6 +21,7 @@ const NAV_CORE: NavItem[] = [
   { label: "AI Chat",     href: "/dashboard/chat",        Icon: Bot             },
   { label: "Event Radar", href: "/dashboard/event-radar", Icon: Radar           },
   { label: "Transits",    href: "/dashboard/transits",    Icon: Globe           },
+  { label: "Purchase Guide", href: "/dashboard/transit-purchase", Icon: ShoppingBag },
   { label: "Destiny",     href: "/dashboard/destiny",     Icon: TrendingUp      },
 ];
 

@@ -45,3 +45,21 @@ next-env.d.ts
 data/lalkitab_grammar/full/
 data/lalkitab_grammar/raw_html/
 data/lalkitab_grammar/raw_bodies/
+data/lalkitab_grammar/raw/
+data/lalkitab_grammar/markdown/
+
+# Python cache
+__pycache__/
+*.pyc
+
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Lal Kitab research data - do not commit scraped content
+data/lalkitab_grammar/raw/
+data/lalkitab_grammar/markdown/
+data/lalkitab_grammar/full/
+data/lalkitab_grammar/raw_html/
+data/lalkitab_grammar/raw_bodies/
