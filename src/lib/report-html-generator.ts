@@ -266,19 +266,44 @@ function renderNorthIndianChart(chart: ChartData): string {
 
   // Build planet labels at house positions
   let labels = "";
+  // lagnaNum is 0-indexed in calculations.ts (Math.floor(lagnaLon / 30)):
+  //   Aries=0, Taurus=1, ..., Aquarius=10, Pisces=11
+  // Bhava h holds sign (lagnaNum + h - 1) mod 12
   for (let h = 1; h <= 12; h++) {
     const [cx, cy] = HOUSE_POSITIONS[h];
     const items = houseContents[h];
-    // Sign number for this house (bhava = lagnaNum + h - 1 mod 12)
-    const signIdx = ((chart.lagnaNum - 1 + h - 1) % 12 + 12) % 12;
-    const signNames = ["Ar","Ta","Ge","Cn","Le","Vi","Li","Sc","Sa","Cp","Aq","Pi"];
-    const signAbbr = signNames[signIdx] ?? "";
+    const signIdx = ((chart.lagnaNum + (h - 1)) % 12 + 12) % 12;
+    // Display sign as 1-indexed number (1=Aries ... 12=Pisces) — traditional
+    // North Indian chart convention
+    const signNumber = signIdx + 1;
 
-    labels += `<text x="${cx}" y="${cy - 10}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8C7440" font-style="italic">${signAbbr}</text>`;
+    labels += `<text x="${cx}" y="${cy - 10}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#8C7440">${signNumber}</text>`;
 
-    items.forEach((item, i) => {
-      labels += `<text x="${cx}" y="${cy + 6 + i * 13}" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#C9A961">${esc(item)}</text>`;
-    });
+    // Multi-planet layout: ≤3 planets stack 1 column, 4+ use 2 columns
+    // and a smaller font so they never overflow into adjacent houses.
+    if (items.length <= 3) {
+      const fontSize = items.length === 0 ? 10 : 10;
+      const lineH    = 13;
+      // Center vertically around cy + 6
+      const startY = cy + 6 - ((items.length - 1) * lineH) / 2;
+      items.forEach((item, i) => {
+        labels += `<text x="${cx}" y="${startY + i * lineH}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${fontSize}" fill="#C9A961">${esc(item)}</text>`;
+      });
+    } else {
+      // 2-column compact layout — never overflow even with 6+ planets
+      const fontSize = 8.5;
+      const lineH    = 10;
+      const colDx    = 13;
+      const rows     = Math.ceil(items.length / 2);
+      const startY   = cy + 4 - ((rows - 1) * lineH) / 2;
+      items.forEach((item, i) => {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const x = cx + (col === 0 ? -colDx / 2 : colDx / 2);
+        const y = startY + row * lineH;
+        labels += `<text x="${x}" y="${y}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${fontSize}" fill="#C9A961">${esc(item)}</text>`;
+      });
+    }
   }
 
   return `<svg width="360" height="360" viewBox="0 0 360 360">
@@ -860,7 +885,7 @@ function page1LagnaLord(chart: ChartData): string {
 function page2Welcome(chart: ChartData): string {
   const firstName = esc(capitalize(chart.name.split(" ")[0]));
   return `<section class="page cream">
-  ${pageRail("A Letter from Your Astrologer", "i", true)}
+  ${pageRail("A Letter from Your Astrologer", "2", true)}
 
   <div style="flex:1;padding-top:36px;">
     <div class="eyebrow" style="margin-bottom:14px;">Welcome</div>
@@ -890,7 +915,7 @@ function page2Welcome(chart: ChartData): string {
 
 function page3Foreword(): string {
   return `<section class="page cream">
-  ${pageRail("On Astrology, Karma & Remedies", "ii", true)}
+  ${pageRail("On Astrology, Karma & Remedies", "3", true)}
 
   <div style="flex:1;padding-top:36px;">
     <div class="eyebrow" style="margin-bottom:14px;">Foreword</div>
@@ -918,7 +943,7 @@ function page4TOC(): string {
   return `<section class="page">
   <div class="starfield"></div>
   <div class="glow-br"></div>
-  ${pageRail("Contents", "iii")}
+  ${pageRail("Contents", "4")}
 
   <div style="position:relative;z-index:2;padding-top:22px;flex:1;display:flex;flex-direction:column;">
     <div class="eyebrow" style="margin-bottom:10px;">Seven Chapters</div>
@@ -927,18 +952,18 @@ function page4TOC(): string {
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 36px;margin-top:14px;flex:1;">
       <div>
-        <div class="toc-part-heading"><span class="part-no">Part I</span><span class="part-name">The Chart</span></div>
-        <div class="toc-row"><span class="num">01</span><div><div class="title">Birth Snapshot</div><div class="meta">Four pillars · North Indian chart</div></div><div></div><span class="pg">5</span></div>
-        <div class="toc-row"><span class="num">02</span><div><div class="title">Planetary Dashboard</div><div class="meta">Nine grahas · Shadbala · Dignity</div></div><div></div><span class="pg">6</span></div>
-        <div class="toc-part-heading"><span class="part-no">Part II</span><span class="part-name">Time</span></div>
-        <div class="toc-row"><span class="num">03</span><div><div class="title">Vimshottari Dasha</div><div class="meta">Current period interpretation</div></div><div></div><span class="pg">7</span></div>
-        <div class="toc-row"><span class="num">04</span><div><div class="title">Upcoming Mahadashas</div><div class="meta">Next five periods · forecasts</div></div><div></div><span class="pg">8</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 1</span><span class="part-name">The Chart</span></div>
+        <div class="toc-row"><span class="num">1</span><div><div class="title">Birth Snapshot</div><div class="meta">Four pillars · North Indian chart</div></div><div></div><span class="pg">5</span></div>
+        <div class="toc-row"><span class="num">2</span><div><div class="title">Planetary Dashboard</div><div class="meta">Nine grahas · Shadbala · Dignity</div></div><div></div><span class="pg">6</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 2</span><span class="part-name">Time</span></div>
+        <div class="toc-row"><span class="num">3</span><div><div class="title">Vimshottari Dasha</div><div class="meta">Current period interpretation</div></div><div></div><span class="pg">7</span></div>
+        <div class="toc-row"><span class="num">4</span><div><div class="title">Upcoming Mahadashas</div><div class="meta">Next periods · forecasts</div></div><div></div><span class="pg">9</span></div>
       </div>
       <div>
-        <div class="toc-part-heading"><span class="part-no">Part III</span><span class="part-name">Remedy &amp; Closing</span></div>
-        <div class="toc-row"><span class="num">05</span><div><div class="title">Remedies</div><div class="meta">Mantras · Gems · Practices</div></div><div></div><span class="pg">9</span></div>
-        <div class="toc-row"><span class="num">06</span><div><div class="title">Closing</div><div class="meta">A final reflection</div></div><div></div><span class="pg">10</span></div>
-        <div class="toc-row"><span class="num">07</span><div><div class="title">Engine Ledger</div><div class="meta">Data modules used in this report</div></div><div></div><span class="pg">11</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">Remedy &amp; Closing</span></div>
+        <div class="toc-row"><span class="num">5</span><div><div class="title">Remedies</div><div class="meta">Mantras · Gems · Practices</div></div><div></div><span class="pg">10</span></div>
+        <div class="toc-row"><span class="num">6</span><div><div class="title">Closing</div><div class="meta">A final reflection</div></div><div></div><span class="pg">11</span></div>
+        <div class="toc-row"><span class="num">7</span><div><div class="title">Engine Ledger</div><div class="meta">Data modules used in this report</div></div><div></div><span class="pg">12</span></div>
       </div>
     </div>
   </div>
@@ -1176,7 +1201,7 @@ function page7CurrentDasha(chart: ChartData): string {
 <section class="page dense">
   <div class="starfield"></div>
   <div class="glow-tl"></div>
-  ${pageRail("Vimshottari Dasha · Analysis", "7")}
+  ${pageRail("Vimshottari Dasha · Analysis", "8")}
 
   <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;gap:20px;">
     <div>
@@ -1202,7 +1227,7 @@ function page8UpcomingDashas(chart: ChartData): string {
   const upcoming = chart.dashas.filter(d => new Date(d.end) > now && !d.active).slice(0, 3);
 
   if (upcoming.length === 0) {
-    return `<section class="page dense">${pageRail("Upcoming Mahadashas","8")}<div class="body" style="padding-top:24px;">No upcoming dasha data available.</div>${pageFoot("astrolife · cosmic blueprint","Upcoming Dashas")}</section>`;
+    return `<section class="page dense">${pageRail("Upcoming Mahadashas","9")}<div class="body" style="padding-top:24px;">No upcoming dasha data available.</div>${pageFoot("astrolife · cosmic blueprint","Upcoming Dashas")}</section>`;
   }
 
   const lkData = calculateLalKitab(chart.planets, chart.dob, chart.lagnaNum);
@@ -1239,7 +1264,7 @@ function page8UpcomingDashas(chart: ChartData): string {
   return `<section class="page dense">
   <div class="starfield"></div>
   <div class="glow-br"></div>
-  ${pageRail("Upcoming Mahadashas", "8")}
+  ${pageRail("Upcoming Mahadashas", "9")}
 
   <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
     <div class="section-title" style="margin-bottom:20px;">
@@ -1302,7 +1327,7 @@ function page9Remedies(chart: ChartData): string {
   return `<section class="page dense">
   <div class="starfield"></div>
   <div class="glow-tl"></div>
-  ${pageRail("Remedies · Upaya", "9")}
+  ${pageRail("Remedies · Upaya", "10")}
 
   <div style="position:relative;z-index:2;padding-top:24px;flex:1;">
     <div class="section-title" style="margin-bottom:8px;">
@@ -1326,7 +1351,7 @@ function page9Remedies(chart: ChartData): string {
 // ── Page 10: Closing ──────────────────────────────────────────────────────
 
 function page10Closing(chart: ChartData): string {
-  const firstName = esc(chart.name.split(" ")[0]);
+  const firstName = esc(capitalize(chart.name.split(" ")[0]));
   return `<section class="page">
   <div class="starfield"></div>
   <div class="glow-tl"></div>
@@ -1420,7 +1445,7 @@ function page11EngineLedger(context: ReportEngineContext): string {
   return `<section class="page dense">
   <div class="starfield"></div>
   <div class="glow-br"></div>
-  ${pageRail("Engine Ledger", "11")}
+  ${pageRail("Engine Ledger", "12")}
 
   <div style="position:relative;z-index:2;padding-top:24px;flex:1;">
     <div class="section-title" style="margin-bottom:14px;">
