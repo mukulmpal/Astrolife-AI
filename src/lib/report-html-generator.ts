@@ -666,7 +666,7 @@ function page1Wheel(chart: ChartData): string {
       <div style="width:80px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);"></div>
     </div>
     <div class="serif-italic" style="font-size:18px;color:var(--ivory-mute);margin-top:24px;">prepared exclusively for</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:46px;color:var(--ivory);margin-top:8px;letter-spacing:0.005em;">${esc(chart.name)}</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:46px;color:var(--ivory);margin-top:8px;letter-spacing:0.005em;">${esc(capitalize(chart.name))}</div>
     <div class="mono" style="font-size:11px;color:var(--gold);letter-spacing:0.24em;text-transform:uppercase;margin-top:8px;">${lagnaGlyph} &nbsp; ${esc(chart.lagnaRashi)} Ascendant &nbsp;·&nbsp; ${sunGlyph} &nbsp; ${esc(sunSign)} Sun &nbsp;·&nbsp; ${moonGlyph} &nbsp; ${esc(moonSign)} Moon</div>
   </div>
 
@@ -737,7 +737,7 @@ function page1LagnaLord(chart: ChartData): string {
   </div>
 
   <div style="text-align:center;margin-top:18px;position:relative;z-index:3;">
-    <div class="eyebrow" style="opacity:0.8;">For <span style="color:var(--ivory);">${esc(chart.name)}</span> · ${esc(chart.lagnaRashi)} Ascendant</div>
+    <div class="eyebrow" style="opacity:0.8;">For <span style="color:var(--ivory);">${esc(capitalize(chart.name))}</span> · ${esc(chart.lagnaRashi)} Ascendant</div>
   </div>
 
   <!-- Hero: Lagna Lord mandala -->
@@ -849,19 +849,19 @@ function page1LagnaLord(chart: ChartData): string {
     <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:74px;line-height:0.95;color:var(--ivory);letter-spacing:-0.01em;">
       Your <span style="color:var(--gold-bright);">Cosmic Blueprint</span>
     </div>
-    <div class="serif-italic" style="font-size:18px;color:var(--ivory-mute);margin-top:6px;letter-spacing:0.05em;">— under the patronage of ${deity.sa} ${deity.en}, ${deity.epithet}.</div>
+    <div class="serif-italic" style="font-size:18px;color:var(--ivory-mute);margin-top:6px;letter-spacing:0.05em;">— under the patronage of <span class="devanagari" style="font-style:normal;">${deity.sa}</span> ${deity.en}, ${deity.epithet}.</div>
   </div>
 
   <!-- Bottom info grid -->
   <div style="position:relative;z-index:3;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:18px;padding-top:24px;margin-top:24px;border-top:1px solid var(--line);">
     <div>
       <div class="kicker" style="margin-bottom:4px;">Tutelary deity</div>
-      <div class="serif-italic" style="font-size:18px;color:var(--gold-bright);">${deity.sa} · ${deity.en}</div>
+      <div style="font-size:18px;color:var(--gold-bright);"><span class="devanagari">${deity.sa}</span> <span class="serif-italic">· ${deity.en}</span></div>
       <div class="body-s mono" style="font-size:10.5px;color:var(--ivory-mute);margin-top:2px;">${deity.epithet}</div>
     </div>
     <div>
       <div class="kicker" style="margin-bottom:4px;">Native</div>
-      <div class="serif-italic" style="font-size:16px;color:var(--ivory);">${esc(chart.name)}</div>
+      <div class="serif-italic" style="font-size:16px;color:var(--ivory);">${esc(capitalize(chart.name))}</div>
       <div class="body-s mono" style="font-size:10.5px;color:var(--ivory-mute);margin-top:2px;">${esc(chart.dob)} · ${esc(chart.tob)}</div>
     </div>
     <div>
@@ -894,7 +894,7 @@ function page2Welcome(chart: ChartData): string {
     <div class="foreword-col dropcap body" style="font-size:14px;line-height:1.72;">
       <p>What you hold in your hands — or rather, what is being rendered before your eyes — is not a prediction. It is a mirror. A mirror fashioned from the precise positions of nine planets at the exact moment you drew your first breath, on the meridian of the city that witnessed your arrival into this world.</p>
       <p>Vedic astrology, the <em>Jyotish</em> tradition, is one of the six auxiliary limbs of the Vedas — the <em>Vedangas</em>. It is often translated as "the eye of the Vedas." Its purpose has never been to frighten or flatter. Its purpose is to illuminate — to bring the unseen patterns of a life into the light of awareness, where they can be understood, worked with, and, where necessary, consciously redirected.</p>
-      <p>Your chart is entirely unique. Among all seven billion people alive today, no two share the same planetary positions, ascendant, and birthplace. This report has been generated from your personal data: ${esc(chart.name)}, born on ${esc(chart.dob)} at ${esc(chart.tob)} in ${esc(chart.city)}.</p>
+      <p>Your chart is entirely unique. Among all seven billion people alive today, no two share the same planetary positions, ascendant, and birthplace. This report has been generated from your personal data: ${esc(capitalize(chart.name))}, born on ${esc(chart.dob)} at ${esc(chart.tob)} in ${esc(chart.city)}.</p>
       <p>The pages that follow move through your chart in layers — from the foundational birth snapshot and planetary positions, through the unfolding time map of Vimshottari Dasha, into the more intimate territories of psychological patterns, karmic debts, environmental omens, and the remedies that tradition prescribes to ease difficulty and amplify grace.</p>
       <p>A word of caution and encouragement in equal measure: astrology is a language of probability and tendency, not of certainty. The planets incline; they do not compel. Your awareness, your choices, and your consistent effort remain the sovereign forces in your life. This report is a sophisticated navigational tool — not a sentence.</p>
       <p>Read slowly. Return to these pages at different seasons of your life. You will find that what seems abstract today becomes vivid and personal as time unfolds. That is the nature of Jyotish: it is most fully understood in retrospect, and most powerfully used in the present.</p>
@@ -1048,7 +1048,7 @@ function page5BirthSnapshot(chart: ChartData): string {
         <div class="card gold-edge">
           <div class="kicker" style="margin-bottom:12px;">Birth Data</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;">
-            <div><div class="body-s">Name</div><div class="body" style="color:var(--ivory);">${esc(chart.name)}</div></div>
+            <div><div class="body-s">Name</div><div class="body" style="color:var(--ivory);">${esc(capitalize(chart.name))}</div></div>
             <div><div class="body-s">Date of Birth</div><div class="body" style="color:var(--ivory);">${esc(chart.dob)}</div></div>
             <div><div class="body-s">Time of Birth</div><div class="body" style="color:var(--ivory);">${esc(chart.tob)}</div></div>
             <div><div class="body-s">Place</div><div class="body" style="color:var(--ivory);">${esc(chart.city)}</div></div>
@@ -1426,7 +1426,7 @@ function page10Closing(chart: ChartData): string {
   </div>
 
   <div style="position:relative;z-index:2;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
-    <div class="body-s" style="letter-spacing:0.18em;text-transform:uppercase;">Prepared for ${esc(chart.name)}</div>
+    <div class="body-s" style="letter-spacing:0.18em;text-transform:uppercase;">Prepared for ${esc(capitalize(chart.name))}</div>
     <div class="mono" style="font-size:10px;color:var(--gold-dim);">astrolife.ai · ${new Date().getFullYear()}</div>
   </div>
 </section>`;
@@ -1535,7 +1535,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=820"/>
-<title>AstroLife — Cosmic Blueprint · ${esc(chart.name)}</title>
+<title>AstroLife — Cosmic Blueprint · ${esc(capitalize(chart.name))}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.gstatic.com">
