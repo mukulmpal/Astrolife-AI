@@ -23,6 +23,13 @@ import {
   RIN_RULES,
   COMBINATION_RULES,
 } from "./astro-engine/lalkitab-knowledge";
+// Phase-1 expansion: rich engines for the 120-page premium report
+import { detectYogas, type YogaResult } from "./astro-engine/yogas";
+import { calculateShadbala } from "./astro-engine/shadbala";
+import { calculateDivisional, getNavamshaAnalysis, getDashamshaAnalysis } from "./astro-engine/divisional";
+import { calculateMedical } from "./astro-engine/medical";
+import { calculatePsychology } from "./astro-engine/psychology";
+import { calculateNumerology } from "./astro-engine/numerology";
 
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
@@ -182,11 +189,6 @@ const SIGN_RULER: Record<string, string> = {
   Aries: "Mars", Taurus: "Venus", Gemini: "Mercury", Cancer: "Moon",
   Leo: "Sun", Virgo: "Mercury", Libra: "Venus", Scorpio: "Mars",
   Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Saturn", Pisces: "Jupiter",
-};
-
-const PLANET_GLYPH: Record<string, string> = {
-  Sun: "☉", Moon: "☽", Mars: "♂", Mercury: "☿",
-  Jupiter: "♃", Venus: "♀", Saturn: "♄", Rahu: "☊", Ketu: "☋",
 };
 
 const SIGN_GLYPH: Record<string, string> = {
@@ -946,24 +948,35 @@ function page4TOC(): string {
   ${pageRail("Contents", "4")}
 
   <div style="position:relative;z-index:2;padding-top:22px;flex:1;display:flex;flex-direction:column;">
-    <div class="eyebrow" style="margin-bottom:10px;">Seven Chapters</div>
+    <div class="eyebrow" style="margin-bottom:10px;">Twelve Chapters</div>
     <div class="display-l" style="line-height:1;color:var(--ivory);">Contents.</div>
     <hr class="hairline gold" style="margin-top:14px;"/>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 36px;margin-top:14px;flex:1;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 30px;margin-top:14px;flex:1;font-size:13px;">
       <div>
         <div class="toc-part-heading"><span class="part-no">Part 1</span><span class="part-name">The Chart</span></div>
         <div class="toc-row"><span class="num">1</span><div><div class="title">Birth Snapshot</div><div class="meta">Four pillars · North Indian chart</div></div><div></div><span class="pg">5</span></div>
-        <div class="toc-row"><span class="num">2</span><div><div class="title">Planetary Dashboard</div><div class="meta">Nine grahas · Shadbala · Dignity</div></div><div></div><span class="pg">6</span></div>
-        <div class="toc-part-heading"><span class="part-no">Part 2</span><span class="part-name">Time</span></div>
-        <div class="toc-row"><span class="num">3</span><div><div class="title">Vimshottari Dasha</div><div class="meta">Current period interpretation</div></div><div></div><span class="pg">7</span></div>
-        <div class="toc-row"><span class="num">4</span><div><div class="title">Upcoming Mahadashas</div><div class="meta">Next periods · forecasts</div></div><div></div><span class="pg">9</span></div>
+        <div class="toc-row"><span class="num">2</span><div><div class="title">Planetary Dashboard</div><div class="meta">Nine grahas · Shadbala proxy · Dignity</div></div><div></div><span class="pg">6</span></div>
+        <div class="toc-row"><span class="num">3</span><div><div class="title">Yogas</div><div class="meta">Special combinations &amp; rajayoga</div></div><div></div><span class="pg">7</span></div>
+        <div class="toc-row"><span class="num">4</span><div><div class="title">Doshas</div><div class="meta">Karmic disturbances · remedies</div></div><div></div><span class="pg">8</span></div>
+        <div class="toc-row"><span class="num">5</span><div><div class="title">Shadbala</div><div class="meta">Six-fold strength · all planets</div></div><div></div><span class="pg">9</span></div>
+        <div class="toc-row"><span class="num">6</span><div><div class="title">Divisional Charts</div><div class="meta">D9 Navamsa · D10 Dashamsha</div></div><div></div><span class="pg">10</span></div>
+
+        <div class="toc-part-heading"><span class="part-no">Part 2</span><span class="part-name">Time &amp; Mind</span></div>
+        <div class="toc-row"><span class="num">7</span><div><div class="title">Vimshottari Dasha</div><div class="meta">Current period interpretation</div></div><div></div><span class="pg">11</span></div>
+        <div class="toc-row"><span class="num">8</span><div><div class="title">Upcoming Mahadashas</div><div class="meta">Next periods · forecasts</div></div><div></div><span class="pg">13</span></div>
+        <div class="toc-row"><span class="num">9</span><div><div class="title">Birth Nakshatra</div><div class="meta">Janma nakshatra deep dive</div></div><div></div><span class="pg">14</span></div>
       </div>
       <div>
-        <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">Remedy &amp; Closing</span></div>
-        <div class="toc-row"><span class="num">5</span><div><div class="title">Remedies</div><div class="meta">Mantras · Gems · Practices</div></div><div></div><span class="pg">10</span></div>
-        <div class="toc-row"><span class="num">6</span><div><div class="title">Closing</div><div class="meta">A final reflection</div></div><div></div><span class="pg">11</span></div>
-        <div class="toc-row"><span class="num">7</span><div><div class="title">Engine Ledger</div><div class="meta">Data modules used in this report</div></div><div></div><span class="pg">12</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">Life Areas</span></div>
+        <div class="toc-row"><span class="num">10</span><div><div class="title">Health &amp; Wellness</div><div class="meta">Vedic medical · prakriti</div></div><div></div><span class="pg">15</span></div>
+        <div class="toc-row"><span class="num">11</span><div><div class="title">Psychology</div><div class="meta">Mind pattern · shadow work</div></div><div></div><span class="pg">16</span></div>
+        <div class="toc-row"><span class="num">12</span><div><div class="title">Numerology</div><div class="meta">Life path · destiny · soul urge</div></div><div></div><span class="pg">17</span></div>
+
+        <div class="toc-part-heading"><span class="part-no">Part 4</span><span class="part-name">Remedy &amp; Closing</span></div>
+        <div class="toc-row"><span class="num">13</span><div><div class="title">Remedies</div><div class="meta">Mantras · Gems · Practices</div></div><div></div><span class="pg">18</span></div>
+        <div class="toc-row"><span class="num">14</span><div><div class="title">Closing</div><div class="meta">A final reflection</div></div><div></div><span class="pg">19</span></div>
+        <div class="toc-row"><span class="num">15</span><div><div class="title">Engine Ledger</div><div class="meta">Data modules used in this report</div></div><div></div><span class="pg">20</span></div>
       </div>
     </div>
   </div>
@@ -1496,6 +1509,421 @@ function page11EngineLedger(context: ReportEngineContext): string {
 </section>`;
 }
 
+// ============================================================
+// PHASE 1 EXPANSION — Engine-driven detail pages
+// ============================================================
+
+// ── Yogas (combinations & rajayoga) ───────────────────────────────────────
+
+function pageYogas(chart: ChartData): string {
+  const yogas: YogaResult[] = detectYogas(
+    chart.planets as Parameters<typeof detectYogas>[0],
+    chart.lagnaNum,
+    "elite"
+  );
+  const present = yogas.filter(y => y.present && !y.isDosha);
+  const top = present
+    .slice()
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6);
+
+  const cards = top.length === 0
+    ? `<div class="body" style="padding:20px;text-align:center;color:var(--ivory-mute);">No major yogas detected in this chart. Foundational karma is the primary path.</div>`
+    : top.map((y, i) => `
+      <div class="card${i === 0 ? " gold-edge" : ""}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);">${esc(y.name)}</div>
+            <div class="kicker" style="margin-top:2px;font-size:9px;">${esc(y.category)}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="mono" style="font-size:18px;color:var(--gold);">${y.score}</div>
+            <div class="body-s" style="font-size:9px;">score</div>
+          </div>
+        </div>
+        <div class="body-s" style="margin-bottom:6px;">${esc(y.description)}</div>
+        <div class="body-s" style="color:var(--jade);"><strong>Impact:</strong> ${esc(y.impact)}</div>
+        ${y.planets.length > 0 ? `<div class="mono" style="font-size:9px;color:var(--gold-dim);margin-top:6px;">${y.planets.map(p => esc(p)).join(" · ")}</div>` : ""}
+      </div>`).join("");
+
+  return `<section class="page dense">
+    ${pageRail("Yogas · Special Combinations", "8")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">05</span>
+        <h2>Yogas</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:16px;max-width:600px;">
+        Yogas are specific planetary combinations that amplify or shape outcomes. Below are the most significant active yogas in your chart, ranked by strength.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        ${cards}
+      </div>
+      <div class="body-s" style="margin-top:auto;padding-top:12px;color:var(--ivory-mute);text-align:center;">
+        Total active yogas detected: <strong style="color:var(--gold);">${present.length}</strong> · Showing top ${top.length}
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Yogas")}
+  </section>`;
+}
+
+// ── Doshas (manglik, kaal sarp, etc) ──────────────────────────────────────
+
+function pageDoshas(chart: ChartData): string {
+  const all: YogaResult[] = detectYogas(
+    chart.planets as Parameters<typeof detectYogas>[0],
+    chart.lagnaNum,
+    "elite"
+  );
+  const doshas = all.filter(y => y.isDosha && y.present);
+
+  const cards = doshas.length === 0
+    ? `<div class="card jade-edge" style="padding:24px;text-align:center;">
+        <div class="display-s" style="color:var(--jade);margin-bottom:8px;">No Major Doshas</div>
+        <div class="body-s">Your chart shows no significant doshas. This is a favourable foundational marker.</div>
+      </div>`
+    : doshas.map(d => `
+      <div class="card" style="border-color:rgba(201,85,95,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--crimson);">${esc(d.name)}</div>
+          <span class="badge crimson" style="font-size:9px;">${esc(d.category)}</span>
+        </div>
+        <div class="body-s" style="margin-bottom:8px;">${esc(d.description)}</div>
+        <div class="body-s" style="color:var(--saffron);margin-bottom:6px;"><strong>Impact:</strong> ${esc(d.impact)}</div>
+        ${d.remedy ? `<div class="body-s" style="color:var(--jade);"><strong>Remedy:</strong> ${esc(d.remedy)}</div>` : ""}
+      </div>`).join("");
+
+  return `<section class="page dense">
+    ${pageRail("Doshas · Karmic Disturbances", "9")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">06</span>
+        <h2>Doshas</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:16px;max-width:600px;">
+        Doshas indicate specific karmic obstructions. Most have prescribed remedies — they are not destinies but signals.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${cards}
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Doshas")}
+  </section>`;
+}
+
+// ── Shadbala — Six-fold Strength ──────────────────────────────────────────
+
+function pageShadbala(chart: ChartData): string {
+  const result = calculateShadbala(chart.planets as Parameters<typeof calculateShadbala>[0]);
+
+  const rows = result.planets.map(p => {
+    const pct = p.percentage;
+    return `<tr>
+      <td style="padding:8px 6px;font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--ivory);">${esc(p.planet)}</td>
+      <td style="padding:8px 6px;text-align:center;color:var(--ivory-dim);" class="mono body-s">${p.sthanaBala.toFixed(1)}</td>
+      <td style="padding:8px 6px;text-align:center;color:var(--ivory-dim);" class="mono body-s">${p.digBala.toFixed(1)}</td>
+      <td style="padding:8px 6px;text-align:center;color:var(--ivory-dim);" class="mono body-s">${p.kalaBala.toFixed(1)}</td>
+      <td style="padding:8px 6px;text-align:center;color:var(--ivory-dim);" class="mono body-s">${p.cheshtaBala.toFixed(1)}</td>
+      <td style="padding:8px 6px;text-align:center;color:var(--ivory-dim);" class="mono body-s">${p.naisargika.toFixed(1)}</td>
+      <td style="padding:8px 6px;text-align:center;color:var(--ivory-dim);" class="mono body-s">${p.drikBala.toFixed(1)}</td>
+      <td style="padding:8px 6px;text-align:right;color:var(--gold);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:11px;">${p.total.toFixed(2)}</td>
+      <td style="padding:8px 6px;text-align:right;color:${pct >= 75 ? "var(--jade)" : pct >= 50 ? "var(--gold)" : "var(--crimson)"};font-weight:600;font-family:'JetBrains Mono',monospace;font-size:11px;">${pct}%</td>
+    </tr>`;
+  }).join("");
+
+  return `<section class="page dense">
+    ${pageRail("Shadbala · Six-fold Strength", "10")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">07</span>
+        <h2>Shadbala</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:14px;max-width:600px;">
+        Six factors determine each planet's strength: Sthana (positional), Dig (directional), Kala (temporal), Cheshta (motional), Naisargika (natural), Drik (aspectual). Total in Rupas — minimum required for full effect: 5.0.
+      </div>
+      <div class="card" style="padding:14px 12px;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--line-strong);">
+              <th style="padding:6px;text-align:left;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Planet</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Sthana</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Dig</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Kala</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Cheshta</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Nais.</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Drik</th>
+              <th style="padding:6px;text-align:right;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Total</th>
+              <th style="padding:6px;text-align:right;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">%</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="body-s" style="margin-top:14px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;">
+        <strong style="color:var(--gold);">Strongest:</strong> ${esc(result.strongest)} ·
+        <strong style="color:var(--crimson);">Weakest:</strong> ${esc(result.weakest)} ·
+        <strong style="color:var(--gold-bright);">Average:</strong> <span class="mono">${result.avgStrength.toFixed(2)} Rupas</span>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Shadbala")}
+  </section>`;
+}
+
+// ── D9 Navamsa + D10 Dashamsha ────────────────────────────────────────────
+
+function pageDivisional(chart: ChartData): string {
+  const divResult = calculateDivisional(
+    chart.planets as Parameters<typeof calculateDivisional>[0],
+    chart.lagnaNum,
+    chart.lagnaLon
+  );
+  const d9 = divResult.find(c => c.key === "D9");
+  const d10 = divResult.find(c => c.key === "D10");
+  const d9Notes = d9 ? getNavamshaAnalysis(d9) : [];
+  const d10Notes = d10 ? getDashamshaAnalysis(d10) : [];
+
+  type DC = (typeof divResult)[number];
+  const renderChartMini = (chart_: DC | undefined, title: string): string => {
+    if (!chart_) return `<div class="body-s">Data unavailable.</div>`;
+    return `<div>
+      <div class="kicker" style="margin-bottom:6px;">${title}</div>
+      <div class="card" style="padding:14px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-bright);margin-bottom:4px;">${esc(chart_.lagna)} Lagna</div>
+        <div class="body-s" style="margin-bottom:10px;">${chart_.planets.length} planets placed</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ivory-dim);">
+          ${chart_.planets.map((p) => `<div><span style="color:var(--gold);">${PLANET_ABBR[p.planet] ?? p.planet.slice(0,2)}</span> ${esc(p.sign)} · H${p.house}</div>`).join("")}
+        </div>
+      </div>
+    </div>`;
+  };
+
+  return `<section class="page dense">
+    ${pageRail("Divisional Charts · Navamsa & Dashamsha", "11")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">08</span>
+        <h2>Divisional Charts</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:18px;max-width:620px;">
+        Vargas (divisional charts) sub-divide each sign to reveal life-area-specific karma. <strong>D9 (Navamsa)</strong> shows the soul, marriage, and dharma. <strong>D10 (Dashamsha)</strong> shows career, profession, and public position.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+        ${renderChartMini(d9, "D9 — Navamsa · Soul & Marriage")}
+        ${renderChartMini(d10, "D10 — Dashamsha · Career & Status")}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Navamsa Notes</div>
+          <div class="body-s" style="line-height:1.6;">${d9Notes.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n)}</div>`).join("")}</div>
+        </div>
+        <div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Dashamsha Notes</div>
+          <div class="body-s" style="line-height:1.6;">${d10Notes.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n)}</div>`).join("")}</div>
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Divisional")}
+  </section>`;
+}
+
+// ── Health & Wellness (Medical) ───────────────────────────────────────────
+
+function pageHealth(chart: ChartData): string {
+  const m = calculateMedical(chart);
+  const topConcernsHtml = m.topConcerns.length === 0
+    ? `<div class="body-s">No major concerns flagged. Maintain preventive routine.</div>`
+    : m.topConcerns.slice(0, 5).map(c => `<div class="body-s" style="margin-bottom:4px;">• ${esc(c)}</div>`).join("");
+
+  const riskColor = m.riskLevel === "high" ? "var(--crimson)" : m.riskLevel === "moderate" ? "var(--saffron)" : "var(--jade)";
+
+  return `<section class="page dense">
+    ${pageRail("Health & Wellness · Vedic Medical", "16")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">09</span>
+        <h2>Health &amp; Wellness</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="card">
+          <div class="kicker" style="margin-bottom:6px;">Prakriti</div>
+          <div class="display-s" style="color:var(--gold-bright);">${esc(m.prakriti)}</div>
+        </div>
+        <div class="card">
+          <div class="kicker" style="margin-bottom:6px;">Lagna Body Zone</div>
+          <div class="body" style="color:var(--ivory);font-size:14px;">${esc(m.lagnaBodyZone)}</div>
+        </div>
+        <div class="card" style="border-color:${riskColor};">
+          <div class="kicker" style="margin-bottom:6px;">Risk Level</div>
+          <div class="display-s" style="color:${riskColor};text-transform:capitalize;">${esc(m.riskLevel)}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="card">
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Birth Nakshatra · ${esc(m.birthNakshatra)}</div>
+          ${m.birthNakshatraData ? `
+            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">Disease tendency:</strong> ${esc(m.birthNakshatraData.disease)}</div>
+            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">Body area:</strong> ${esc(m.birthNakshatraData.body)}</div>
+            <div class="body-s"><strong style="color:var(--gold);">Note:</strong> ${esc(m.birthNakshatraData.note)}</div>
+          ` : `<div class="body-s">Data unavailable.</div>`}
+        </div>
+        <div class="card">
+          <div class="kicker" style="margin-bottom:8px;color:var(--violet);">Top Concerns</div>
+          ${topConcernsHtml}
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker" style="margin-bottom:8px;color:var(--jade);">Preventive Routine</div>
+        ${m.preventiveRoutine.slice(0, 5).map(r => `<div class="body-s" style="margin-bottom:4px;">• ${esc(r)}</div>`).join("")}
+      </div>
+      <div style="margin-top:auto;padding-top:10px;">
+        <div class="body-s" style="color:var(--ivory-mute);text-align:center;font-style:italic;">
+          This is astrological analysis, not medical advice. Consult a qualified physician for any health concern.
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Health")}
+  </section>`;
+}
+
+// ── Psychology Profile ────────────────────────────────────────────────────
+
+function pagePsychology(chart: ChartData): string {
+  const p = calculatePsychology(chart.planets as Parameters<typeof calculatePsychology>[0]);
+
+  const cards = p.planets.slice(0, 6).map(pl => `
+    <div class="card" style="padding:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ivory);">${esc(pl.planet)}</div>
+          <div class="kicker" style="font-size:9px;margin-top:1px;">${esc(pl.func)}</div>
+        </div>
+        <div class="mono" style="font-size:11px;color:var(--gold);">${pl.strength}/10</div>
+      </div>
+      <div class="body-s" style="margin-bottom:4px;color:${pl.strength >= 6 ? "var(--jade)" : "var(--saffron)"};">
+        ${pl.strength >= 6 ? esc(pl.strong) : esc(pl.weak)}
+      </div>
+    </div>`).join("");
+
+  return `<section class="page dense">
+    ${pageRail("Psychological Profile", "17")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">10</span>
+        <h2>Psychology</h2>
+      </div>
+      <div class="card gold-edge" style="margin-bottom:14px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Dominant Pattern</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);margin-bottom:6px;">${esc(p.pattern.name)}</div>
+        <div class="body-s" style="margin-bottom:6px;">${esc(p.pattern.desc)}</div>
+        <div class="body-s" style="color:var(--violet);"><strong>Shadow side:</strong> ${esc(p.pattern.shadow)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+        ${cards}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Stabilizers</div>
+          ${p.stabilizers.slice(0, 3).map(s => `<div class="body-s" style="margin-bottom:3px;">• ${esc(s)}</div>`).join("")}
+        </div>
+        <div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Growth Plan</div>
+          ${p.growthPlan.slice(0, 3).map(g => `<div class="body-s" style="margin-bottom:3px;">• ${esc(g)}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Psychology")}
+  </section>`;
+}
+
+// ── Numerology ────────────────────────────────────────────────────────────
+
+function pageNumerology(chart: ChartData): string {
+  const n = calculateNumerology(chart.name, chart.dob);
+
+  const numberCard = (label: string, num: typeof n.lifePath, accent: string) => `
+    <div class="card" style="padding:12px;">
+      <div class="kicker" style="margin-bottom:4px;color:${accent};font-size:9px;">${esc(label)}</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
+        <div class="display-l" style="font-size:36px;color:${accent};line-height:1;">${num.value}</div>
+        <div class="body-s">${esc(num.archetype)}</div>
+      </div>
+      <div class="body-s">${esc(num.keyword)}</div>
+    </div>`;
+
+  return `<section class="page dense">
+    ${pageRail("Numerology · Vibrational Map", "18")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">11</span>
+        <h2>Numerology</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:14px;max-width:620px;">
+        Each name and birthdate carries a numerical vibration. These five core numbers describe your soul's blueprint in numbers.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+        ${numberCard("Life Path", n.lifePath, "var(--gold-bright)")}
+        ${numberCard("Destiny", n.destiny, "var(--saffron)")}
+        ${numberCard("Soul Urge", n.soulUrge, "var(--violet)")}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        ${numberCard("Personality", n.personality, "var(--jade)")}
+        ${numberCard("Birthday", n.birthday, "var(--gold)")}
+      </div>
+      <div class="card gold-edge">
+        <div class="kicker" style="margin-bottom:6px;">Life Path · ${n.lifePath.value} · ${esc(n.lifePath.archetype)}</div>
+        <div class="body-s" style="line-height:1.6;">${esc(n.lifePath.desc)}</div>
+      </div>
+      <div class="body-s" style="margin-top:auto;padding-top:10px;color:var(--ivory-mute);text-align:center;">
+        Personal Year <strong style="color:var(--gold);">${n.personalYear.value}</strong> · Personal Day <strong style="color:var(--gold);">${n.personalDay}</strong> · Age <strong style="color:var(--gold);">${n.currentAge}</strong>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Numerology")}
+  </section>`;
+}
+
+// ── Nakshatra Deep Dive (birth nakshatra) ─────────────────────────────────
+
+function pageNakshatra(chart: ChartData): string {
+  const moon = chart.planets["Moon"];
+  if (!moon) return `<section class="page dense">${pageRail("Birth Nakshatra","14")}<div class="body" style="padding-top:24px;">No moon data available.</div>${pageFoot("astrolife · cosmic blueprint","Nakshatra")}</section>`;
+
+  const medical = calculateMedical(chart);
+  const nakData = medical.birthNakshatraData;
+
+  return `<section class="page dense">
+    ${pageRail("Birth Nakshatra · " + moon.nakshatra, "14")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">12</span>
+        <h2>Birth Nakshatra</h2>
+      </div>
+      <div class="card gold-edge" style="margin-bottom:14px;text-align:center;padding:24px;">
+        <div class="kicker" style="margin-bottom:8px;">Janma Nakshatra</div>
+        <div class="display-l" style="font-size:48px;color:var(--gold-bright);margin-bottom:4px;">${esc(moon.nakshatra)}</div>
+        <div class="body-s">Pada <strong style="color:var(--gold);">${moon.pada}</strong> · Lord <strong style="color:var(--gold);">${esc(moon.nakshatraLord)}</strong> · Moon in ${esc(moon.sign)} · House ${moon.house}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="card">
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Body & Health</div>
+          ${nakData ? `
+            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">Body zone:</strong> ${esc(nakData.body)}</div>
+            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">Tendency:</strong> ${esc(nakData.disease)}</div>
+            <div class="body-s"><strong style="color:var(--gold);">Note:</strong> ${esc(nakData.note)}</div>
+          ` : `<div class="body-s">Data unavailable.</div>`}
+        </div>
+        <div class="card">
+          <div class="kicker" style="margin-bottom:8px;color:var(--jade);">Remedial Practice</div>
+          <div class="body-s">${esc(medical.birthNakshatraUpay)}</div>
+        </div>
+      </div>
+      <div class="body-s" style="margin-top:auto;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;color:var(--ivory-mute);">
+        The Moon's nakshatra is the most personal marker in Vedic astrology — it shapes emotional temperament, instinctive responses, and dharmic direction. Returning to it ritually each month on the same lunar position is a classical practice for self-attunement.
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Nakshatra")}
+  </section>`;
+}
+
 // ── Master HTML builder ───────────────────────────────────────────────────
 
 export function generateReportHTML(chart: ChartData, options?: Partial<ReportOptions>): string {
@@ -1516,6 +1944,24 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     }
   }
 
+  // Per report type, choose which sections to include.
+  // full = everything; kundli = chart-heavy; remedy = remedy-heavy;
+  // medical = health-only; destiny = career + dasha focus.
+  const t = context.settings.type;
+  const include = {
+    chart:       true,                                              // always
+    yogas:       t === "full" || t === "kundli" || t === "destiny",
+    doshas:      t === "full" || t === "kundli",
+    shadbala:    t === "full" || t === "kundli",
+    divisional:  t === "full" || t === "kundli",
+    dasha:       t === "full" || t === "remedy" || t === "destiny",
+    nakshatra:   t === "full" || t === "kundli" || t === "remedy",
+    health:      t === "full" || t === "medical",
+    psychology:  t === "full",
+    numerology:  t === "full",
+    remedies:    t === "full" || t === "remedy" || t === "medical",
+  };
+
   const pages = [
     safe(() => coverPage,                    "Cover"),
     safe(() => page2Welcome(chart),          "Welcome"),
@@ -1523,12 +1969,20 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     safe(() => page4TOC(),                   "Contents"),
     safe(() => page5BirthSnapshot(chart),    "Birth Snapshot"),
     safe(() => page6PlanetaryDashboard(chart),"Planetary Dashboard"),
-    safe(() => page7CurrentDasha(chart),     "Current Dasha"),
-    safe(() => page8UpcomingDashas(chart),   "Upcoming Dashas"),
-    safe(() => page9Remedies(chart),         "Remedies"),
+    include.yogas      ? safe(() => pageYogas(chart),       "Yogas")           : "",
+    include.doshas     ? safe(() => pageDoshas(chart),      "Doshas")          : "",
+    include.shadbala   ? safe(() => pageShadbala(chart),    "Shadbala")        : "",
+    include.divisional ? safe(() => pageDivisional(chart),  "Divisional")      : "",
+    include.dasha      ? safe(() => page7CurrentDasha(chart),  "Current Dasha")  : "",
+    include.dasha      ? safe(() => page8UpcomingDashas(chart),"Upcoming Dashas"): "",
+    include.nakshatra  ? safe(() => pageNakshatra(chart),   "Nakshatra")       : "",
+    include.health     ? safe(() => pageHealth(chart),      "Health")          : "",
+    include.psychology ? safe(() => pagePsychology(chart),  "Psychology")      : "",
+    include.numerology ? safe(() => pageNumerology(chart),  "Numerology")      : "",
+    include.remedies   ? safe(() => page9Remedies(chart),   "Remedies")        : "",
     safe(() => page10Closing(chart),         "Closing"),
     safe(() => page11EngineLedger(context),  "Engine Ledger"),
-  ].join("\n\n");
+  ].filter(Boolean).join("\n\n");
 
   return `<!doctype html>
 <html lang="en">
