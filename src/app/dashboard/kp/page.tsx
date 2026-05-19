@@ -34,7 +34,7 @@ function KPTableRow({ row, tp, tn }: { row: KPRow; tp?: (n: string) => string; t
     <tr className={row.isSignificantForTopic ? "hit" : ""}>
       <td>
         <strong style={{ color }}>{_tp(row.name)}</strong>
-        {row.retrograde ? <span className="retro">℞</span> : null}
+        {row.retrograde ? <span className="retro" style={{marginLeft:6,fontWeight:600}}>(R)</span> : null}
       </td>
       <td>{row.position}</td>
       <td>

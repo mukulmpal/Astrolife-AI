@@ -203,7 +203,7 @@ export default function DivisionalPage() {
                   {p.dignity}
                 </span>
               )}
-              {p.retrograde&&<span style={{fontSize:9,color:"#f97316"}}>℞</span>}
+              {p.retrograde&&<span style={{fontSize:9,color:"#f97316",fontWeight:600}}>(R)</span>}
             </div>
           ))}
         </div>

@@ -194,7 +194,7 @@ export default function PsychPage() {
               <div className="bar-track" style={{marginBottom:10}}>
                 <div className="bar-fill" style={{width:`${p.strength}%`,background:p.statusColor}}/>
               </div>
-              <div style={{fontSize:11,color:"#605890",marginBottom:8}}>{p.trait} · H{p.house} {p.sign}{p.retrograde?" · ℞":""}</div>
+              <div style={{fontSize:11,color:"#605890",marginBottom:8}}>{p.trait} · H{p.house} {p.sign}{p.retrograde?" · (R)":""}</div>
               <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7}}>
                 {p.status==="Strong"?p.strong:p.status==="Weak/Blocked"?p.weak:p.cog}
               </div>
@@ -234,15 +234,15 @@ export default function PsychPage() {
             </div>
           </div>
           {[
-            {icon:"☉",planet:"Sun",title:"Ego & Identity Shadow",desc:"Weak Sun = authority issues, approval seeking, unresolved father karma. Work: Daily affirmations, boundary setting, leadership practice.",c:"#f97316"},
-            {icon:"☽",planet:"Moon",title:"Emotional Memory Healing",desc:"Weak Moon = anxiety, mother wound, emotional reactivity. Work: Therapy, journaling, Moon mantra, mother relationship repair.",c:"#c084fc"},
-            {icon:"♂",planet:"Mars",title:"Anger & Impulse Work",desc:"Weak Mars = aggression or passivity. Work: Physical exercise, martial arts, breathwork for anger, assertiveness training.",c:"#ef4444"},
-            {icon:"☿",planet:"Mercury",title:"Cognitive Pattern Work",desc:"Weak Mercury = overthinking, communication blocks. Work: Meditation for mental stillness, writing practice, breathwork.",c:"#22c55e"},
-            {icon:"♃",planet:"Jupiter",title:"Belief System Expansion",desc:"Weak Jupiter = pessimism, lack of faith. Work: Study wisdom texts, find a mentor, practice gratitude, expand worldview.",c:"#f59e0b"},
-            {icon:"♀",planet:"Venus",title:"Pleasure & Bonding Work",desc:"Weak Venus = relationship patterns, self-worth issues. Work: Self-love practice, creative expression, healthy pleasure.",c:"#ec4899"},
-            {icon:"♄",planet:"Saturn",title:"Fear & Limitation Release",desc:"Weak Saturn = depression, fear loops, self-sabotage. Work: Discipline practice, therapy, Saturn mantra, structured routines.",c:"#60a5fa"},
-            {icon:"☊",planet:"Rahu",title:"Obsession & Craving Work",desc:"Strong Rahu = addiction risk, obsessive patterns. Work: Mindfulness, detachment practices, Rahu mantra, simplify desires.",c:"#a78bfa"},
-            {icon:"☋",planet:"Ketu",title:"Detachment & Grounding",desc:"Strong Ketu = dissociation, apathy. Work: Grounding practices, physical activity, Ketu mantra, find earthly purpose.",c:"#fb7185"},
+            {icon:"Su",planet:"Sun",title:"Ego & Identity Shadow",desc:"Weak Sun = authority issues, approval seeking, unresolved father karma. Work: Daily affirmations, boundary setting, leadership practice.",c:"#f97316"},
+            {icon:"Mo",planet:"Moon",title:"Emotional Memory Healing",desc:"Weak Moon = anxiety, mother wound, emotional reactivity. Work: Therapy, journaling, Moon mantra, mother relationship repair.",c:"#c084fc"},
+            {icon:"Ma",planet:"Mars",title:"Anger & Impulse Work",desc:"Weak Mars = aggression or passivity. Work: Physical exercise, martial arts, breathwork for anger, assertiveness training.",c:"#ef4444"},
+            {icon:"Me",planet:"Mercury",title:"Cognitive Pattern Work",desc:"Weak Mercury = overthinking, communication blocks. Work: Meditation for mental stillness, writing practice, breathwork.",c:"#22c55e"},
+            {icon:"Ju",planet:"Jupiter",title:"Belief System Expansion",desc:"Weak Jupiter = pessimism, lack of faith. Work: Study wisdom texts, find a mentor, practice gratitude, expand worldview.",c:"#f59e0b"},
+            {icon:"Ve",planet:"Venus",title:"Pleasure & Bonding Work",desc:"Weak Venus = relationship patterns, self-worth issues. Work: Self-love practice, creative expression, healthy pleasure.",c:"#ec4899"},
+            {icon:"Sa",planet:"Saturn",title:"Fear & Limitation Release",desc:"Weak Saturn = depression, fear loops, self-sabotage. Work: Discipline practice, therapy, Saturn mantra, structured routines.",c:"#60a5fa"},
+            {icon:"Ra",planet:"Rahu",title:"Obsession & Craving Work",desc:"Strong Rahu = addiction risk, obsessive patterns. Work: Mindfulness, detachment practices, Rahu mantra, simplify desires.",c:"#a78bfa"},
+            {icon:"Ke",planet:"Ketu",title:"Detachment & Grounding",desc:"Strong Ketu = dissociation, apathy. Work: Grounding practices, physical activity, Ketu mantra, find earthly purpose.",c:"#fb7185"},
           ].map(g=>{
             const planet = result.planets.find(p=>p.planet===g.planet);
             return (

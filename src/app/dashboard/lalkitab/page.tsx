@@ -266,7 +266,7 @@ export default function LalKitabPage() {
                         <span className="state-dot" style={{background:stateColor(p.state)}}/>
                         {tp(p.planet)}
                       </div>
-                      <div className="p-pos">{ts(p.sign)} · House {p.house}{p.retrograde?" · ℞":""}</div>
+                      <div className="p-pos">{ts(p.sign)} · House {p.house}{p.retrograde?" · (R)":""}</div>
                     </div>
                   </div>
                   <div className="card-badges">
@@ -289,7 +289,7 @@ export default function LalKitabPage() {
                 {/* SUB-BADGES */}
                 {p.retrograde && (
                   <div className="retro-badge">
-                    ℞ Soyaa hua Graha — Dheeray dheeray results deta hai. Pehle obstacles, phir success.
+                    (R) Soyaa hua Graha — Dheeray dheeray results deta hai. Pehle obstacles, phir success.
                   </div>
                 )}
                 {p.enemies.length > 0 && (

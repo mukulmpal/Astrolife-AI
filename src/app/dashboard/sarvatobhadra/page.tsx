@@ -6,7 +6,7 @@ import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 
 const PLANET_EMOJI: Record<string, string> = {
-  Sun:"☀️", Moon:"🌙", Mars:"♂️", Mercury:"☿", Jupiter:"♃", Venus:"♀️", Saturn:"♄", Rahu:"☊", Ketu:"☋"
+  Sun:"Su", Moon:"Mo", Mars:"Ma", Mercury:"Me", Jupiter:"Ju", Venus:"Ve", Saturn:"Sa", Rahu:"Ra", Ketu:"Ke"
 };
 const PLANET_COLOR: Record<string, string> = {
   Sun:"#f97316", Moon:"#c084fc", Mars:"#ef4444", Mercury:"#22c55e",

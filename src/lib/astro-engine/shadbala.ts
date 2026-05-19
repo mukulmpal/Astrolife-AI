@@ -54,7 +54,7 @@ interface PD {
 
 // ── Constants ─────────────────────────────────────────────────
 const PLANET_LIST = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn"];
-const ICONS  = ["☉","☽","♂","☿","♃","♀","♄"];
+const ICONS  = ["Su","Mo","Ma","Me","Ju","Ve","Sa"];
 const COLORS = ["#f97316","#c084fc","#ef4444","#22c55e","#f59e0b","#ec4899","#60a5fa"];
 const SIGNS  = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
 

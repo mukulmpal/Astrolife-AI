@@ -171,7 +171,7 @@ export default function TransitPage() {
                     <strong>{tp(p.planet)}</strong>
                     <span className="tr-muted">{p.effect}</span>
                   </div>
-                  <p className="tr-muted">{ts(p.rashiName)} {p.degreeInRashi}°{p.retrograde ? " ℞" : ""}</p>
+                  <p className="tr-muted">{ts(p.rashiName)} {p.degreeInRashi}°{p.retrograde ? " (R)" : ""}</p>
                   <p className="tr-muted">H{p.houseFromBase} from {p.baseLabel}</p>
                   {p.natalHitPlanets.length > 0 && <p className="tr-muted">Activates: {p.natalHitPlanets.join(", ")}</p>}
                   <p className="tr-p" style={{ marginTop: 6 }}>{p.note}</p>

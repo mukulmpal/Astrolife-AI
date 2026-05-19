@@ -22,13 +22,13 @@ const NAK_LORD_REMEDY: Record<string, { remedy: string; mantra: string; color: s
 
 // ── Vara (weekday) lord remedies ──────────────────────────────────────────────
 const VARA_LORD: Record<string, { lord: string; remedy: string; icon: string }> = {
-  Sunday:    { lord: "Sun",     icon: "☀",  remedy: "Offer water to Sun at sunrise. Eat once. Wear red/orange." },
-  Monday:    { lord: "Moon",    icon: "☽",  remedy: "Offer milk to Shivling. Wear white. Eat light food." },
-  Tuesday:   { lord: "Mars",    icon: "♂",  remedy: "Visit Hanuman temple. Offer red flowers. Fast optional." },
-  Wednesday: { lord: "Mercury", icon: "☿",  remedy: "Feed green grass to cows. Donate to students." },
-  Thursday:  { lord: "Jupiter", icon: "♃",  remedy: "Offer yellow flowers to Vishnu. Donate to Guru/Brahmin." },
-  Friday:    { lord: "Venus",   icon: "♀",  remedy: "Offer white sweets to young girls. Worship Lakshmi/Durga." },
-  Saturday:  { lord: "Saturn",  icon: "♄",  remedy: "Light sesame oil lamp at dusk. Serve poor or elderly." },
+  Sunday:    { lord: "Sun",     icon: "Su", remedy: "Offer water to Sun at sunrise. Eat once. Wear red/orange." },
+  Monday:    { lord: "Moon",    icon: "Mo", remedy: "Offer milk to Shivling. Wear white. Eat light food." },
+  Tuesday:   { lord: "Mars",    icon: "Ma", remedy: "Visit Hanuman temple. Offer red flowers. Fast optional." },
+  Wednesday: { lord: "Mercury", icon: "Me", remedy: "Feed green grass to cows. Donate to students." },
+  Thursday:  { lord: "Jupiter", icon: "Ju", remedy: "Offer yellow flowers to Vishnu. Donate to Guru/Brahmin." },
+  Friday:    { lord: "Venus",   icon: "Ve", remedy: "Offer white sweets to young girls. Worship Lakshmi/Durga." },
+  Saturday:  { lord: "Saturn",  icon: "Sa", remedy: "Light sesame oil lamp at dusk. Serve poor or elderly." },
 };
 
 // ── Navtara remedy map ────────────────────────────────────────────────────────

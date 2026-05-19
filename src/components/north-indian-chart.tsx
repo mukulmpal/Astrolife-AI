@@ -1,7 +1,9 @@
 "use client";
 
 const PLS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-const PEMO = ["☉", "☽", "♂", "☿", "♃", "♀", "♄", "☊", "☋"];
+// Short text labels — render in any font, no missing-glyph boxes in PDFs
+// or on devices without astrological symbol fonts.
+const PABBR = ["Su", "Mo", "Ma", "Me", "Ju", "Ve", "Sa", "Ra", "Ke"];
 const PCOL = ["#f97316", "#c084fc", "#ef4444", "#22c55e", "#f59e0b", "#ec4899", "#60a5fa", "#a78bfa", "#fb7185"];
 
 const md = (x: number, m: number) => ((x % m) + m) % m;
@@ -132,21 +134,24 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310 }: Prop
                     y={py}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fontSize="12"
+                    fontSize="11"
+                    fontWeight="600"
+                    fontFamily="sans-serif"
                     fill={PCOL[piIdx]}
                   >
-                    {PEMO[piIdx]}
+                    {PABBR[piIdx]}
                   </text>
                   {p.retro && (
                     <text
-                      x={lx + ox + 7}
+                      x={lx + ox + 9}
                       y={py - 5}
                       textAnchor="middle"
-                      fontSize="6"
+                      fontSize="6.5"
                       fill="#f97316"
                       fontWeight="700"
+                      fontFamily="sans-serif"
                     >
-                      ℞
+                      (R)
                     </text>
                   )}
                 </g>

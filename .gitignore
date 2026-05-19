@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Lal Kitab research safety
+data/lalkitab_grammar/full/
+data/lalkitab_grammar/raw_html/
+data/lalkitab_grammar/raw_bodies/

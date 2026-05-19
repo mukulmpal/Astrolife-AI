@@ -273,7 +273,7 @@ export default function DestinyPage() {
               <div key={i} className={`dasha-item ${isNow?"active":""}`} style={{borderColor:isNow?`${b.color}55`:"#1c1840"}}>
                 <div style={{width:8,height:8,borderRadius:"50%",background:isNow?b.color:"#1c1840",flexShrink:0,
                   boxShadow:isNow?`0 0 8px ${b.color}88`:"none"}}/>
-                <span style={{fontSize:16,color:b.color,width:24}}>{["☉","☽","♂","☿","♃","♀","♄","☊","☋"][["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"].indexOf(b.planet)]}</span>
+                <span style={{fontSize:13,fontWeight:600,color:b.color,width:24}}>{["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"][["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"].indexOf(b.planet)]}</span>
                 <div style={{flex:1}}>
                   <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:isNow?b.color:"#c8c0a8"}}>
                     {b.planet} Mahadasha

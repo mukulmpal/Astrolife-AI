@@ -364,7 +364,7 @@ export default function KundaliMilanPage() {
           />
           <LayerCard
             title="Manglik Balance"
-            icon="♂️"
+            icon="Ma"
             score={relResult.layers.manglikBalance.score}
             paragraph={relResult.layers.manglikBalance.paragraph}
             color={colorForLabel(relResult.layers.manglikBalance.label)}

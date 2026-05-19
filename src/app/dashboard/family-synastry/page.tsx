@@ -32,7 +32,7 @@ const ROLE_ICONS: Record<FamilyRole | "self", string> = {
   child: "🧒", sibling: "🤝", grandparent: "🌿", other: "⭐",
 };
 const PLANET_LIST = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
-const PLANET_SYM: Record<string, string> = { Sun:"☉", Moon:"☽", Mars:"♂", Mercury:"☿", Jupiter:"♃", Venus:"♀", Saturn:"♄", Rahu:"☊", Ketu:"☋" };
+const PLANET_SYM: Record<string, string> = { Sun:"Su", Moon:"Mo", Mars:"Ma", Mercury:"Me", Jupiter:"Ju", Venus:"Ve", Saturn:"Sa", Rahu:"Ra", Ketu:"Ke" };
 const PLANET_COL: Record<string, string> = {
   Sun:"#f97316", Moon:"#c084fc", Mars:"#ef4444", Mercury:"#22c55e",
   Jupiter:"#f59e0b", Venus:"#ec4899", Saturn:"#60a5fa", Rahu:"#a78bfa", Ketu:"#fb7185",
@@ -112,7 +112,7 @@ function D1Grid({ chart, label, color }: { chart: ChartData; label: string; colo
           return (
             <div key={p} style={{ fontSize: 11, color: PLANET_COL[p], background: PLANET_COL[p] + "14", border: `1px solid ${PLANET_COL[p]}33`, borderRadius: 20, padding: "2px 8px" }}>
               {PLANET_SYM[p]} {p} · H{pd.house} · {pd.sign}
-              {pd.retrograde ? " ℞" : ""}{pd.dignity === "Debilitated" ? " ▼" : pd.dignity?.startsWith("Exalted") ? " ▲" : ""}
+              {pd.retrograde ? " (R)" : ""}{pd.dignity === "Debilitated" ? " (Deb)" : pd.dignity?.startsWith("Exalted") ? " (Exa)" : ""}
             </div>
           );
         })}

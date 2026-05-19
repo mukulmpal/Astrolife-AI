@@ -16,7 +16,7 @@ type User = { email?: string; phone?: string; user_metadata?: { full_name?: stri
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 const CHART_PLANETS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
-const CHART_EMOJI = ["☉","☽","♂","☿","♃","♀","♄","☊","☋"];
+const CHART_EMOJI = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
 const RASHI_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
 const CITIES = [
   "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
@@ -152,7 +152,7 @@ function CompactNorthChart({ chart }: { chart: DivChart }) {
                   <text x={lx + ox} y={ly + (isLagna ? 18 : 14)} textAnchor="middle" dominantBaseline="middle" fontSize="12.5" fill={pIdx >= 0 ? p.color : "#aaa"}>
                     {pIdx >= 0 ? CHART_EMOJI[pIdx] : p.planet.slice(0, 2)}
                   </text>
-                  {p.retrograde && <text x={lx + ox + 8} y={ly + (isLagna ? 13 : 9)} textAnchor="middle" fontSize="6" fill="#f97316" fontWeight="700">℞</text>}
+                  {p.retrograde && <text x={lx + ox + 9} y={ly + (isLagna ? 13 : 9)} textAnchor="middle" fontSize="6.5" fill="#f97316" fontWeight="700">(R)</text>}
                 </g>
               );
             })}
@@ -243,14 +243,14 @@ export default function Dashboard() {
   const dbReady = isSupabaseReady(dbHealth);
   const pendingDbTables = dbHealth.filter((item) => item.status !== "ready");
   const planetCards = [
-    { name:"Sun", icon:"☉", col:"#f97316" },
-    { name:"Moon", icon:"☽", col:"#c084fc" },
-    { name:"Mars", icon:"♂", col:"#ef4444" },
-    { name:"Mercury", icon:"☿", col:"#22c55e" },
-    { name:"Jupiter", icon:"♃", col:"#f59e0b" },
-    { name:"Venus", icon:"♀", col:"#ec4899" },
-    { name:"Saturn", icon:"♄", col:"#60a5fa" },
-    { name:"Rahu", icon:"☊", col:"#a78bfa" },
+    { name:"Sun", icon:"Su", col:"#f97316" },
+    { name:"Moon", icon:"Mo", col:"#c084fc" },
+    { name:"Mars", icon:"Ma", col:"#ef4444" },
+    { name:"Mercury", icon:"Me", col:"#22c55e" },
+    { name:"Jupiter", icon:"Ju", col:"#f59e0b" },
+    { name:"Venus", icon:"Ve", col:"#ec4899" },
+    { name:"Saturn", icon:"Sa", col:"#60a5fa" },
+    { name:"Rahu", icon:"Ra", col:"#a78bfa" },
   ].map((planet) => {
     const details = chart.planets?.[planet.name];
     const dignity = details?.dignity ?? "";

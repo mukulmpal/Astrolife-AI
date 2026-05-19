@@ -24,7 +24,7 @@ const PRIORITY_LABEL: Record<RemedyCard["priority"], string> = {
   "optional":     "✓ Optional",
 };
 const PLANET_EMOJI: Record<string, string> = {
-  Sun:"☀️", Moon:"🌙", Mars:"♂️", Mercury:"☿", Jupiter:"♃", Venus:"♀️", Saturn:"♄", Rahu:"☊", Ketu:"☋"
+  Sun:"Su", Moon:"Mo", Mars:"Ma", Mercury:"Me", Jupiter:"Ju", Venus:"Ve", Saturn:"Sa", Rahu:"Ra", Ketu:"Ke"
 };
 
 export default function RemedyPage() {
@@ -277,7 +277,7 @@ export default function RemedyPage() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: "14px" }}>
                       {card.planet} — H{card.house}
-                      {card.retrograde && <span style={{ color: "#f97316", marginLeft: "6px", fontSize: "11px" }}>℞</span>}
+                      {card.retrograde && <span style={{ color: "#f97316", marginLeft: "6px", fontSize: "11px", fontWeight: 600 }}>(R)</span>}
                     </div>
                     <div style={{ fontSize: "11px", color: "#8880a8" }}>{card.sign} · {card.nakshatra}</div>
                   </div>

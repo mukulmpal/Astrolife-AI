@@ -14,7 +14,7 @@ const CITIES = [
 ];
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
-const PEMO = ["☉","☽","♂","☿","♃","♀","♄","☊","☋"];
+const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
 const PCOL = ["#f97316","#c084fc","#ef4444","#22c55e","#f59e0b","#ec4899","#60a5fa","#a78bfa","#fb7185"];
 
 export default function KundliPage() {
@@ -385,7 +385,7 @@ export default function KundliPage() {
                           <span style={{flex:1,fontSize:13,color:"#c8c0a8"}}>{tp(p)}</span>
                           <span style={{fontSize:13,color:"#f0e8d0"}}>{ts(pl.sign)}</span>
                           <span style={{fontSize:11,color:"#605890",width:24,textAlign:"right"}}>H{pl.house}</span>
-                          {pl.retrograde&&<span style={{fontSize:9,color:"#f97316",border:"1px solid rgba(249,115,22,0.3)",borderRadius:4,padding:"1px 4px"}}>℞</span>}
+                          {pl.retrograde&&<span style={{fontSize:9,color:"#f97316",border:"1px solid rgba(249,115,22,0.3)",borderRadius:4,padding:"1px 4px",fontWeight:600}}>(R)</span>}
                         </div>
                       );
                     })}
@@ -426,7 +426,7 @@ export default function KundliPage() {
                       const pl=chart.planets[p]; if(!pl) return null;
                       return (
                         <tr key={i}>
-                          <td><span style={{color:PCOL[i],marginRight:8,fontSize:16}}>{PEMO[i]}</span><span style={{color:"#c8c0a8",fontWeight:500}}>{tp(p)}</span>{pl.retrograde&&<span className="retro">℞</span>}</td>
+                          <td><span style={{color:PCOL[i],marginRight:8,fontSize:13,fontWeight:600}}>{PEMO[i]}</span><span style={{color:"#c8c0a8",fontWeight:500}}>{tp(p)}</span>{pl.retrograde&&<span className="retro" style={{marginLeft:6}}>(R)</span>}</td>
                           <td style={{color:"#f0e8d0"}}>{ts(pl.sign)}</td>
                           <td style={{color:"#605890",fontSize:12}}>{pl.degree}° {pl.minutes}&apos;</td>
                           <td style={{color:"#605890"}}>H{pl.house}</td>

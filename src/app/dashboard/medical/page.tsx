@@ -8,7 +8,7 @@ import { EngineStateCard } from "@/components/engine-state-card";
 const DOSHA_COLOR: Record<string, string> = { Pitta: "#ef4444", Kapha: "#22c55e", Vata: "#60a5fa" };
 const FUNC_COLOR = { benefic: "#22c55e", malefic: "#ef4444", neutral: "#8880a8" };
 const PLANET_EMOJI: Record<string, string> = {
-  Sun:"☀️", Moon:"🌙", Mars:"♂️", Mercury:"☿", Jupiter:"♃", Venus:"♀️", Saturn:"♄", Rahu:"☊", Ketu:"☋"
+  Sun:"Su", Moon:"Mo", Mars:"Ma", Mercury:"Me", Jupiter:"Ju", Venus:"Ve", Saturn:"Sa", Rahu:"Ra", Ketu:"Ke"
 };
 
 type Tab = "overview" | "planets" | "combos" | "nakshatra" | "signs";
@@ -201,7 +201,7 @@ export default function MedicalPage() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: "14px" }}>
                       {card.planet} — H{card.house}
-                      {card.retrograde && <span style={{ color: "#f97316", marginLeft: "6px", fontSize: "11px" }}>℞</span>}
+                      {card.retrograde && <span style={{ color: "#f97316", marginLeft: "6px", fontSize: "11px", fontWeight: 600 }}>(R)</span>}
                     </div>
                     <div style={{ fontSize: "11px", color: "#8880a8" }}>{card.sign} · {card.nakshatra} P{card.pada}</div>
                   </div>

@@ -162,7 +162,7 @@ export default function ShadbalaPage() {
                     <span className="planet-icon" style={{color:p.color}}>{p.icon}</span>
                     <div>
                       <div className="planet-name">{tp(p.planet)}</div>
-                      <div className="planet-pos">{ts(p.sign)} · House {p.house}{p.retrograde?" · ℞ Vakri":""}</div>
+                      <div className="planet-pos">{ts(p.sign)} · House {p.house}{p.retrograde?" · (R) Vakri":""}</div>
                     </div>
                   </div>
                   <div>
@@ -257,7 +257,7 @@ export default function ShadbalaPage() {
                     <td>
                       <span style={{color:p.color,fontSize:18,marginRight:8}}>{p.icon}</span>
                       <span style={{fontWeight:500,color:"#c8c0a8"}}>{p.planet}</span>
-                      {p.retrograde&&<span style={{fontSize:9,color:"#f97316",marginLeft:4}}>℞</span>}
+                      {p.retrograde&&<span style={{fontSize:9,color:"#f97316",marginLeft:4,fontWeight:600}}>(R)</span>}
                     </td>
                     {[p.sthanaBala,p.digBala,p.kalaBala,p.cheshtaBala,p.naisargika,p.drikBala].map((v,i)=>{
                       const max=BALA_LABELS[i].max;
