@@ -84,6 +84,8 @@ export async function POST(request: NextRequest) {
       printBackground: true,
       preferCSSPageSize: true,
       margin: { top: "0", right: "0", bottom: "0", left: "0" },
+      // tagged: false reduces PDF metadata overhead
+      tagged: false,
     });
 
     await page.close();

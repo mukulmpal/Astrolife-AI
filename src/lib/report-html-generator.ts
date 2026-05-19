@@ -1516,6 +1516,21 @@ ${STYLES_CSS}
     color-adjust: exact !important;
   }
   #report-toolbar { display: none !important; }
+
+  /* ── PDF performance — hide bitmap-heavy decorations ──
+     Puppeteer rasterizes CSS radial-gradients into the PDF as
+     full-page bitmaps with transparency. Across 17 pages this
+     produces a heavy PDF that lags in mobile viewers (30s+ to
+     first paint, scroll stutter). The solid background colour
+     remains, which renders instantly in any PDF viewer. */
+  .starfield,
+  .glow-tl,
+  .glow-br,
+  .page-watermark {
+    display: none !important;
+  }
+  /* Drop expensive transparency layers on every page */
+  .page::before, .page::after { display: none !important; }
 }
 @page {
   size: ${REPORT_PAGE_SIZE.width}px ${REPORT_PAGE_SIZE.height}px;
