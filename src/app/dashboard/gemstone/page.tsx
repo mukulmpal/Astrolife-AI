@@ -1,36 +1,130 @@
 "use client";
 
-import { useMemo, useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
 import {
-  buildNatalChartFromAnyChart,
-  generateGemstoneReport,
-  generateDashaGemstoneRecommendationsFromChart,
-  type AvoidGemstone,
-  type DashaGemRecommendation,
-  type GemstoneRecommendation,
-} from "@/lib/astro-engine/gemstone";
+
+  runGemstoneMedicalMasterEngineV2,
+  type GemstoneMedicalInput,
+  type GemstoneMedicalMasterReport,
+  type GemstoneReportItem,
+  type GemStatus,
+  type Planet,
+  type Sign,
+  type Dignity,
+} from "@/lib/astro-engine/gemstone-medical-master-v2";
 import { EngineStateCard } from "@/components/engine-state-card";
 
-type TabKey = "wearing" | "dasha" | "secondary" | "avoid" | "notes";
+// ─── Adapter ──────────────────────────────────────────────────────────────────
+
+const VALID_PLANETS = new Set<string>(["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"]);
+
+function mapDignity(d: string): Dignity {
+  if (!d || d === "—") return "neutral";
+  const l = d.toLowerCase();
+  if (l.startsWith("exalted")) return "exalted";
+  if (l === "debilitated") return "debilitated";
+  if (l === "moolatrikona") return "moolatrikona";
+  if (l === "own") return "own";
+  return "neutral";
+}
+
+function chartToMedicalInput(chart: unknown): GemstoneMedicalInput | null {
+  if (!chart || typeof chart !== "object") return null;
+  const c = chart as Record<string, unknown>;
+  const ascendant = c.lagnaRashi as Sign | undefined;
+  if (!ascendant) return null;
+
+  const planetsObj = c.planets as Record<string, Record<string, unknown>> | undefined;
+  if (!planetsObj) return null;
+
+  const planets: GemstoneMedicalInput["planets"] = [];
+  for (const [name, pd] of Object.entries(planetsObj)) {
+    if (!VALID_PLANETS.has(name)) continue;
+    planets.push({
+      planet: name as Planet,
+      sign: (pd.sign as Sign) ?? "Aries",
+      house: (pd.house as number) ?? 1,
+      degree: pd.degree as number | undefined,
+      nakshatra: pd.nakshatra as string | undefined,
+      dignity: mapDignity((pd.dignity as string) ?? ""),
+      isRetrograde: (pd.retrograde as boolean) ?? false,
+    });
+  }
+
+  const dashasArr = c.dashas as Array<Record<string, unknown>> | undefined;
+  const antarArr = c.antardasha as Array<Record<string, unknown>> | undefined;
+
+  let mahadasha: Planet | undefined;
+  let antardasha: Planet | undefined;
+
+  if (Array.isArray(dashasArr) && dashasArr.length) {
+    const active = dashasArr.find((d) => d.active) ?? dashasArr[0];
+    if (active?.planet) mahadasha = active.planet as Planet;
+  }
+  if (Array.isArray(antarArr) && antarArr.length) {
+    const active = antarArr.find((d) => d.active) ?? antarArr[0];
+    if (active?.planet) antardasha = active.planet as Planet;
+  }
+
+  const moonSign = planetsObj["Moon"]?.sign as Sign | undefined;
+
+  return {
+    nativeName: c.name as string | undefined,
+    ascendant,
+    moonSign,
+    planets,
+    dasha: mahadasha ? { mahadasha, antardasha } : undefined,
+  };
+}
+
+// ─── Visual helpers ───────────────────────────────────────────────────────────
+
+const PLANET_HEX: Record<string, string> = {
+  Sun: "#E85D04", Moon: "#A8B9D0", Mars: "#CC2200", Mercury: "#50C878",
+  Jupiter: "#F5C542", Venus: "#E8D4F0", Saturn: "#6B5CA5",
+  Rahu: "#4B0082", Ketu: "#8B6914",
+};
+
+const STATUS_HEX: Record<GemStatus, string> = {
+  highly_recommended: "#22c55e",
+  recommended: "#3b82f6",
+  supportive: "#f59e0b",
+  use_carefully: "#f97316",
+  avoid: "#ef4444",
+};
+
+const STATUS_LABEL: Record<GemStatus, string> = {
+  highly_recommended: "Highly Recommended",
+  recommended: "Recommended",
+  supportive: "Supportive",
+  use_carefully: "Use Carefully",
+  avoid: "Avoid",
+};
+
+function hexFor(item: GemstoneReportItem): string {
+  return PLANET_HEX[item.planet] ?? "#C8A030";
+}
+
+
+const p = (parts: Array<string | null | undefined | false>): string =>
+  parts.filter(Boolean).join("\n\n");
+
+// ─── Star background ──────────────────────────────────────────────────────────
 
 const STAR_POINTS = [
-  { x: 8, y: 12, r: 1.2, o: 0.42 },
-  { x: 18, y: 28, r: 0.8, o: 0.32 },
-  { x: 28, y: 8, r: 1.1, o: 0.38 },
-  { x: 41, y: 18, r: 0.7, o: 0.28 },
-  { x: 52, y: 34, r: 1.4, o: 0.45 },
-  { x: 66, y: 12, r: 0.9, o: 0.34 },
-  { x: 78, y: 26, r: 1.2, o: 0.4 },
-  { x: 88, y: 9, r: 0.8, o: 0.3 },
-  { x: 11, y: 62, r: 1.1, o: 0.35 },
-  { x: 23, y: 76, r: 0.9, o: 0.3 },
-  { x: 36, y: 58, r: 1.3, o: 0.42 },
-  { x: 49, y: 82, r: 0.8, o: 0.28 },
-  { x: 61, y: 66, r: 1.2, o: 0.38 },
-  { x: 74, y: 88, r: 0.7, o: 0.3 },
+  { x: 8, y: 12, r: 1.2, o: 0.42 }, { x: 18, y: 28, r: 0.8, o: 0.32 },
+  { x: 28, y: 8, r: 1.1, o: 0.38 }, { x: 41, y: 18, r: 0.7, o: 0.28 },
+  { x: 52, y: 34, r: 1.4, o: 0.45 }, { x: 66, y: 12, r: 0.9, o: 0.34 },
+  { x: 78, y: 26, r: 1.2, o: 0.4 }, { x: 88, y: 9, r: 0.8, o: 0.3 },
+  { x: 11, y: 62, r: 1.1, o: 0.35 }, { x: 23, y: 76, r: 0.9, o: 0.3 },
+  { x: 36, y: 58, r: 1.3, o: 0.42 }, { x: 49, y: 82, r: 0.8, o: 0.28 },
+  { x: 61, y: 66, r: 1.2, o: 0.38 }, { x: 74, y: 88, r: 0.7, o: 0.3 },
   { x: 92, y: 70, r: 1.1, o: 0.36 },
 ];
+
+// ─── UI components ────────────────────────────────────────────────────────────
 
 function GemIcon({ color, size = 96 }: { color: string; size?: number }) {
   return (
@@ -54,9 +148,7 @@ function GemIcon({ color, size = 96 }: { color: string; size?: number }) {
 function ScoreBar({ score, color }: { score: number; color: string }) {
   return (
     <div className="gem-score">
-      <div>
-        <span style={{ width: `${score}%`, background: color }} />
-      </div>
+      <div><span style={{ width: `${score}%`, background: color }} /></div>
       <strong>{score}%</strong>
     </div>
   );
@@ -71,197 +163,250 @@ function MetaPill({ label, value }: { label: string; value: string }) {
   );
 }
 
-function PrimaryGemHero({ gem }: { gem: GemstoneRecommendation }) {
+function StatusBadge({ status }: { status: GemStatus }) {
+  const hex = STATUS_HEX[status];
   return (
-    <section className="gem-hero-card" style={{ borderColor: `${gem.hexColor}45` }}>
-      <div className="gem-glow" style={{ background: gem.hexColor }} />
-      <GemIcon color={gem.hexColor} size={120} />
+    <span className="gem-status-badge" style={{ color: hex, background: `${hex}22`, borderColor: `${hex}55` }}>
+      {STATUS_LABEL[status]}
+    </span>
+  );
+}
 
+function PrimaryGemHero({ gem }: { gem: GemstoneReportItem }) {
+  const hex = hexFor(gem);
+  return (
+    <section className="gem-hero-card" style={{ borderColor: `${hex}45` }}>
+      <div className="gem-glow" style={{ background: hex }} />
+      <GemIcon color={hex} size={120} />
       <div className="gem-hero-info">
         <div className="gem-label-row">
-          <span style={{ color: gem.hexColor, background: `${gem.hexColor}22` }}>
-            Primary Suitability
-          </span>
-          <ScoreBar score={gem.score} color={gem.hexColor} />
+          <StatusBadge status={gem.status} />
+          <ScoreBar score={gem.score} color={STATUS_HEX[gem.status]} />
         </div>
-
         <h2>{gem.gemstone}</h2>
-        <p className="gem-alt">Alternate: {gem.alternateGemstone}</p>
-
+        <p className="gem-alt">{gem.sanskritName} · Alt: {gem.substitute}</p>
         <div className="gem-meta-grid">
           <MetaPill label="Planet" value={gem.planet} />
-          <MetaPill label="Chakra" value={gem.chakra} />
-          <MetaPill label="Element" value={gem.element} />
-          <MetaPill label="Colour" value={gem.color} />
+          <MetaPill label="Colour" value={gem.colour} />
+          <MetaPill label="Confidence" value={`${gem.confidence}%`} />
+          <MetaPill label="Status" value={STATUS_LABEL[gem.status]} />
         </div>
-
-        <p className="gem-reason">{gem.reason}</p>
+        <p className="gem-reason">{gem.shortVerdict}</p>
       </div>
     </section>
   );
 }
 
-function WearingGuide({ gem }: { gem: GemstoneRecommendation }) {
-  const rows = [
-    ["Metal", gem.wearing.metal],
-    ["Finger", gem.wearing.finger],
-    ["Day", gem.wearing.day],
-    ["Time", gem.wearing.time],
-    ["Weight", gem.wearing.weight],
-    ["Mantra", gem.wearing.mantra],
-  ];
-
+function TextSection({ title, body }: { title: string; body: string }) {
   return (
-    <div className="gem-grid-two">
+    <div className="gem-panel">
+      <h3>{title}</h3>
+      <p style={{ whiteSpace: "pre-wrap" }}>{body}</p>
+    </div>
+  );
+}
+
+function AnalysisTab({ gem }: { gem: GemstoneReportItem }) {
+  return (
+    <div className="gem-analysis-grid">
+      <TextSection title="Why AstroLife Recommends It" body={gem.whyAstroLifeRecommendsIt} />
+      <TextSection title="Scoring Explanation" body={gem.scoringExplanation} />
+      <TextSection title="Book-Style Interpretation" body={gem.bookStyleInterpretation} />
+      <TextSection title="Expected Benefits" body={gem.expectedBenefits} />
       <div className="gem-panel">
-        <h3>Wearing Guide</h3>
+        <h3>Score Breakdown</h3>
         <div className="gem-table">
-          {rows.map(([label, value]) => (
-            <div key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
+          {gem.scoreComponents.map((sc) => (
+            <div key={sc.label}>
+              <span>{sc.label}</span>
+              <strong style={{ color: sc.points >= 0 ? "#22c55e" : "#ef4444" }}>
+                {sc.points >= 0 ? "+" : ""}{sc.points}
+              </strong>
             </div>
           ))}
         </div>
       </div>
+      <TextSection title="Health & Psychology" body={gem.healthAndPsychologyConnection} />
+    </div>
+  );
+}
 
-      <div className="gem-panel">
-        <h3>Benefits</h3>
-        <ul>
-          {gem.benefits.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="gem-panel caution">
-        <h3>Cautions</h3>
-        <ul>
-          {gem.cautions.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="gem-panel">
-        <h3>Safer First Step</h3>
-        <p>
-          Start with mantra, colour discipline and donation connected to {gem.planet}.
-          Wear the gemstone only after suitability confirmation.
-        </p>
+function WearingTab({ gem }: { gem: GemstoneReportItem }) {
+  return (
+    <div className="gem-grid-two">
+      <TextSection title="Wearing Guidance" body={gem.wearingGuidance} />
+      <TextSection title="Caution & Avoidance" body={gem.cautionOrAvoidance} />
+      <div className="gem-panel" style={{ gridColumn: "1 / -1" }}>
+        <h3>Alternative Remedies</h3>
+        <p style={{ whiteSpace: "pre-wrap" }}>{gem.alternativeRemedies}</p>
       </div>
     </div>
   );
 }
 
-function SecondaryGemGrid({ gems }: { gems: GemstoneRecommendation[] }) {
-  if (!gems.length) {
+function DashaTab({ gem }: { gem: GemstoneReportItem }) {
+  return (
+    <div className="gem-grid-two">
+      <TextSection title="Dasha Timing Interpretation" body={gem.dashaTimingInterpretation} />
+      <div className="gem-panel">
+        <h3>PDF Summary</h3>
+        <p style={{ whiteSpace: "pre-wrap" }}>{gem.pdfReadyParagraph}</p>
+      </div>
+    </div>
+  );
+}
+
+function SecondaryGemCard({ gem }: { gem: GemstoneReportItem }) {
+  const hex = hexFor(gem);
+  return (
+    <div className="gem-secondary-card" style={{ borderColor: `${hex}35` }}>
+      <GemIcon color={hex} size={70} />
+      <div>
+        <StatusBadge status={gem.status} />
+        <h3>{gem.gemstone}</h3>
+        <p>{gem.planet} · {gem.colour}</p>
+        <ScoreBar score={gem.score} color={STATUS_HEX[gem.status]} />
+        <p className="gem-card-reason">{gem.shortVerdict}</p>
+      </div>
+    </div>
+  );
+}
+
+function SecondaryTab({ report }: { report: GemstoneMedicalMasterReport }) {
+  const all = [...report.secondaryRecommendations, ...report.supportiveRecommendations];
+  if (!all.length) {
     return <div className="gem-empty">No secondary gemstones found for this chart.</div>;
   }
-
   return (
     <div className="gem-secondary-grid">
-      {gems.map((gem) => (
-        <div key={gem.planet} className="gem-secondary-card" style={{ borderColor: `${gem.hexColor}35` }}>
-          <GemIcon color={gem.hexColor} size={70} />
-          <div>
-            <span>{gem.strength}</span>
-            <h3>{gem.gemstone}</h3>
-            <p>{gem.planet} · {gem.color}</p>
-            <ScoreBar score={gem.score} color={gem.hexColor} />
-            <p className="gem-card-reason">{gem.reason}</p>
-          </div>
-        </div>
-      ))}
+      {all.map((gem) => <SecondaryGemCard key={gem.planet} gem={gem} />)}
     </div>
   );
 }
 
-function AvoidGemList({ gems }: { gems: AvoidGemstone[] }) {
-  if (!gems.length) {
-    return <div className="gem-empty">No specific avoid list found for this chart.</div>;
-  }
+function AvoidTab({ report }: { report: GemstoneMedicalMasterReport }) {
+  const avoid = report.avoidList;
+  const careful = report.useCarefullyList;
 
   return (
-    <div className="gem-avoid-list">
-      {gems.map((gem) => (
-        <div key={gem.planet}>
-          <div className="gem-avoid-icon">⊗</div>
-          <div>
-            <h3>{gem.gemstone}</h3>
-            <span>{gem.planet}</span>
-            <p>{gem.reason}</p>
+    <div className="gem-analysis-grid">
+      {careful.length > 0 && (
+        <div className="gem-panel">
+          <h3>Use Carefully</h3>
+          <div className="gem-avoid-list">
+            {careful.map((gem) => (
+              <div key={gem.planet} className="gem-avoid-row">
+                <div className="gem-avoid-icon" style={{ color: STATUS_HEX.use_carefully, background: `${STATUS_HEX.use_carefully}22` }}>⚠</div>
+                <div>
+                  <strong>{gem.gemstone}</strong>
+                  <span> · {gem.planet}</span>
+                  <p>{gem.cautionOrAvoidance}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      )}
+      {avoid.length > 0 && (
+        <div className="gem-panel caution">
+          <h3>Avoid These</h3>
+          <div className="gem-avoid-list">
+            {avoid.map((gem) => (
+              <div key={gem.planet} className="gem-avoid-row">
+                <div className="gem-avoid-icon">⊗</div>
+                <div>
+                  <strong>{gem.gemstone}</strong>
+                  <span> · {gem.planet}</span>
+                  <p>{gem.cautionOrAvoidance}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {!avoid.length && !careful.length && (
+        <div className="gem-empty">No specific avoid list for this chart.</div>
+      )}
     </div>
   );
 }
 
-function NotesPanel({ notes, safetyNote }: { notes: string[]; safetyNote: string }) {
+function MedicalTab({ report }: { report: GemstoneMedicalMasterReport }) {
+  const m = report.medicalAwareness;
   return (
-    <div className="gem-grid-two">
-      <div className="gem-panel">
-        <h3>Jyotish Analysis Notes</h3>
-        <ul>
-          {notes.map((note) => (
-            <li key={note}>{note}</li>
-          ))}
-        </ul>
-      </div>
-
+    <div className="gem-analysis-grid">
+      <TextSection title="Constitutional Profile" body={m.constitutionalProfile} />
+      <TextSection title="Wellness Interpretation" body={m.wellnessInterpretation} />
+      {m.findings.length > 0 && (
+        <div className="gem-panel" style={{ gridColumn: "1 / -1" }}>
+          <h3>Planetary Health Indicators</h3>
+          <div className="gem-medical-findings">
+            {m.findings.map((f) => (
+              <div key={`${f.planet}-${f.house}`} className={`gem-finding gem-finding-${f.severity}`}>
+                <div className="gem-finding-header">
+                  <strong>{f.title}</strong>
+                  <span>{f.symbolicBodyArea}</span>
+                </div>
+                <p>{f.paragraph}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <TextSection title="Preventive Guidance" body={m.preventiveGuidance} />
       <div className="gem-panel caution">
-        <h3>Safety Note</h3>
-        <p>{safetyNote}</p>
+        <h3>Medical Disclaimer</h3>
+        <p>{m.medicalDisclaimer}</p>
       </div>
     </div>
   );
 }
 
-function DashaPanel({ items }: { items: DashaGemRecommendation[] }) {
-  if (!items.length) {
-    return <div className="gem-empty">Dasha data not found. Mahadasha/Antardasha ratna sync will appear after chart dasha is available.</div>;
-  }
+// ─── Main page ────────────────────────────────────────────────────────────────
 
-  return (
-    <div className="gem-grid-two">
-      {items.map((item) => (
-        <div key={`${item.level}-${item.planet}`} className="gem-panel">
-          <h3>{item.level}: {item.planet}</h3>
-          <p><strong>Ratna:</strong> {item.gemstone} <span style={{ color: "rgba(255,255,255,0.55)" }}>(Alt: {item.alternateGemstone})</span></p>
-          <p><strong>Rudraksha:</strong> {item.rudraksha.mukhi} ({item.rudraksha.bead})</p>
-          <p>{item.reason}</p>
-          <div className="gem-table" style={{ marginTop: 10 }}>
-            <div><span>Day</span><strong>{item.wearing.day}</strong></div>
-            <div><span>Time</span><strong>{item.wearing.time}</strong></div>
-            <div><span>Metal</span><strong>{item.wearing.metal}</strong></div>
-            <div><span>Finger</span><strong>{item.wearing.finger}</strong></div>
-            <div><span>Weight</span><strong>{item.wearing.weight}</strong></div>
-            <div><span>Planet Mantra</span><strong>{item.wearing.mantra}</strong></div>
-            <div><span>Rudraksha Mantra</span><strong>{item.rudraksha.mantra}</strong></div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+type TabKey = "analysis" | "wearing" | "dasha" | "secondary" | "avoid" | "medical";
 
 export default function GemstonePage() {
-  const { chart, loading } = useUserChart();
-  const [activeTab, setActiveTab] = useState<TabKey>("wearing");
+  const [mounted, setMounted] = useState(false);
 
-  const report = useMemo(() => {
-    const natal = buildNatalChartFromAnyChart(chart);
-    return generateGemstoneReport(natal, chart);
-  }, [chart]);
-  const dashaRecs = useMemo(() => generateDashaGemstoneRecommendationsFromChart(chart), [chart]);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <main className="gem-page">
+        <section style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <EngineStateCard
+            title="Gemstone Suitability"
+            loading
+            loadingText="Preparing gemstone intelligence..."
+          />
+        </section>
+      </main>
+    );
+  }
+
+  return <GemstonePageContent />;
+}
+
+function GemstonePageContent() {
+  const { chart, loading } = useUserChart();
+  const [activeTab, setActiveTab] = useState<TabKey>("analysis");
+
+  const input = useMemo(() => chartToMedicalInput(chart), [chart]);
+  const report = useMemo(
+    () => (input ? runGemstoneMedicalMasterEngineV2(input) : null),
+    [input],
+  );
 
   const tabs: Array<{ id: TabKey; label: string }> = [
-    { id: "wearing", label: "◈ Wearing Guide" },
-    { id: "dasha", label: "🪐 Dasha Ratna + Rudraksha" },
+    { id: "analysis",  label: "◈ Analysis" },
+    { id: "wearing",   label: "◎ Wearing Guide" },
+    { id: "dasha",     label: "🪐 Dasha Timing" },
     { id: "secondary", label: "◇ Secondary Gems" },
-    { id: "avoid", label: "⊗ Avoid These" },
-    { id: "notes", label: "✦ Notes" },
+    { id: "avoid",     label: "⊗ Avoid / Careful" },
+    { id: "medical",   label: "✦ Medical Awareness" },
   ];
 
   if (loading) {
@@ -278,6 +423,24 @@ export default function GemstonePage() {
     );
   }
 
+  if (!report || !report.primaryRecommendation) {
+    return (
+      <main className="gem-page">
+        <section style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <EngineStateCard
+            title="Gemstone Suitability"
+            emptyText="Chart data incomplete. Please complete your birth details in onboarding."
+          />
+        </section>
+      </main>
+    );
+  }
+
+  const primary = report.primaryRecommendation;
+  const dashaStr = input?.dasha
+    ? [input.dasha.mahadasha, input.dasha.antardasha].filter(Boolean).join(" › ")
+    : "Not connected";
+
   return (
     <main className="gem-page">
       <div className="gem-bg">
@@ -285,14 +448,7 @@ export default function GemstonePage() {
         <div className="gem-orb two" />
         <svg className="gem-stars" viewBox="0 0 100 100" preserveAspectRatio="none">
           {STAR_POINTS.map((star) => (
-            <circle
-              key={`${star.x}-${star.y}`}
-              cx={star.x}
-              cy={star.y}
-              r={star.r}
-              fill="white"
-              opacity={star.o}
-            />
+            <circle key={`${star.x}-${star.y}`} cx={star.x} cy={star.y} r={star.r} fill="white" opacity={star.o} />
           ))}
         </svg>
       </div>
@@ -306,35 +462,32 @@ export default function GemstonePage() {
       </header>
 
       <section className="gem-header">
-        <span>Gemstone Intelligence</span>
+        <span>Gemstone Intelligence · Medical Master Engine V2</span>
         <h1>Gemstone Suitability</h1>
         <p>
-          {report.lagnaSign} Lagna · Lagna Lord {report.lagnaLord}. Suitability guidance only — gemstones
-          amplify planets, so confirm before wearing expensive stones.
+          {input?.ascendant} Lagna · Moon in {input?.moonSign ?? "—"}. Comprehensive scoring across
+          house ownership, dignity, Shadbala, dasha activation and yogakaraka status.
         </p>
-        <p>
-          Chart sync: recommendations are computed from your current saved chart planets, houses and active dasha.
-          Trikona houses (1,5,9) are treated as stronger support zones.
-        </p>
+        <p>{report.executiveSummary}</p>
       </section>
 
-      <PrimaryGemHero gem={report.primaryGemstone} />
+      <PrimaryGemHero gem={primary} />
 
       <section className="gem-foundation-grid">
         <div>
           <span>Lagna</span>
-          <strong>{report.lagnaSign}</strong>
-          <p>Gemstone judgement starts from ascendant and functional benefics.</p>
+          <strong>{input?.ascendant}</strong>
+          <p>All gemstone scoring is anchored to the ascendant lord and functional benefics.</p>
         </div>
         <div>
-          <span>Lagna Lord</span>
-          <strong>{report.lagnaLord}</strong>
-          <p>The lagna lord shows body, identity and life direction support.</p>
+          <span>Moon Sign</span>
+          <strong>{input?.moonSign ?? "—"}</strong>
+          <p>Moon sign influences emotional resonance and healing colour choices.</p>
         </div>
         <div>
           <span>Current Dasha</span>
-          <strong>{report.currentDasha}</strong>
-          <p>Gemstones should be confirmed with current dasha before wearing.</p>
+          <strong>{dashaStr}</strong>
+          <p>Dasha activation adds up to +12 pts to the ruling planet's gemstone score.</p>
         </div>
       </section>
 
@@ -352,11 +505,12 @@ export default function GemstonePage() {
       </section>
 
       <section className="gem-content">
-        {activeTab === "wearing" && <WearingGuide gem={report.primaryGemstone} />}
-        {activeTab === "dasha" && <DashaPanel items={dashaRecs} />}
-        {activeTab === "secondary" && <SecondaryGemGrid gems={report.secondaryGemstones} />}
-        {activeTab === "avoid" && <AvoidGemList gems={report.avoidGemstones} />}
-        {activeTab === "notes" && <NotesPanel notes={report.analysisNotes} safetyNote={report.safetyNote} />}
+        {activeTab === "analysis"  && <AnalysisTab gem={primary} />}
+        {activeTab === "wearing"   && <WearingTab gem={primary} />}
+        {activeTab === "dasha"     && <DashaTab gem={primary} />}
+        {activeTab === "secondary" && <SecondaryTab report={report} />}
+        {activeTab === "avoid"     && <AvoidTab report={report} />}
+        {activeTab === "medical"   && <MedicalTab report={report} />}
       </section>
 
       <style jsx global>{`
@@ -569,13 +723,14 @@ export default function GemstonePage() {
           margin-bottom: 12px;
         }
 
-        .gem-label-row > span {
+        .gem-status-badge {
           border-radius: 999px;
           padding: 6px 11px;
           font-size: 10px;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           font-weight: 600;
+          border: 1px solid transparent;
         }
 
         .gem-score {
@@ -732,9 +887,14 @@ export default function GemstonePage() {
           gap: 16px;
         }
 
+        .gem-analysis-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+        }
+
         .gem-panel,
-        .gem-secondary-card,
-        .gem-avoid-list > div {
+        .gem-secondary-card {
           border: 1px solid var(--border);
           background: var(--card);
           border-radius: 16px;
@@ -742,24 +902,17 @@ export default function GemstonePage() {
           backdrop-filter: blur(16px);
         }
 
-        .gem-panel.caution,
-        .gem-avoid-list > div {
+        .gem-panel.caution {
           border-color: rgba(200, 160, 48, 0.2);
           background: rgba(200, 160, 48, 0.06);
         }
 
         .gem-panel h3,
-        .gem-secondary-card h3,
-        .gem-avoid-list h3 {
+        .gem-secondary-card h3 {
           margin: 0 0 12px;
           color: var(--gold-soft);
           font-family: "Cormorant Garamond", serif;
           font-size: 22px;
-        }
-
-        .gem-panel ul {
-          margin: 0;
-          padding-left: 18px;
         }
 
         .gem-table {
@@ -811,11 +964,12 @@ export default function GemstonePage() {
         .gem-avoid-list {
           display: grid;
           gap: 14px;
+          margin-top: 8px;
         }
 
-        .gem-avoid-list > div {
+        .gem-avoid-row {
           display: flex;
-          gap: 16px;
+          gap: 14px;
           align-items: flex-start;
         }
 
@@ -831,28 +985,82 @@ export default function GemstonePage() {
           font-size: 22px;
         }
 
-        .gem-avoid-list span {
-          display: inline-flex;
+        .gem-avoid-row span {
           color: var(--gold-soft);
-          margin-bottom: 6px;
           font-size: 12px;
         }
 
-        .gem-empty,
-        .gem-loading {
+        .gem-avoid-row strong {
+          color: var(--cream);
+          font-size: 14px;
+        }
+
+        .gem-avoid-row p {
+          margin: 6px 0 0;
+          color: var(--cream-soft);
+          font-size: 13px;
+          line-height: 1.55;
+        }
+
+        .gem-medical-findings {
+          display: grid;
+          gap: 12px;
+          margin-top: 8px;
+        }
+
+        .gem-finding {
+          border-radius: 12px;
+          padding: 14px;
+          border-left: 3px solid;
+        }
+
+        .gem-finding-mild {
+          border-color: #f59e0b;
+          background: rgba(245, 158, 11, 0.06);
+        }
+
+        .gem-finding-moderate {
+          border-color: #f97316;
+          background: rgba(249, 115, 22, 0.06);
+        }
+
+        .gem-finding-strong {
+          border-color: #ef4444;
+          background: rgba(239, 68, 68, 0.06);
+        }
+
+        .gem-finding-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .gem-finding-header strong {
+          color: var(--cream);
+          font-size: 14px;
+        }
+
+        .gem-finding-header span {
+          color: var(--muted);
+          font-size: 12px;
+        }
+
+        .gem-finding p {
+          margin: 0;
+          color: var(--cream-soft);
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .gem-empty {
           border: 1px solid var(--border);
           background: var(--card);
           border-radius: 14px;
           padding: 18px;
           color: var(--cream-soft);
-        }
-
-        .gem-loading {
-          position: fixed;
-          right: 18px;
-          bottom: 18px;
-          z-index: 10;
-          color: var(--gold-soft);
         }
 
         @media (max-width: 860px) {
@@ -863,6 +1071,7 @@ export default function GemstonePage() {
           .gem-hero-card,
           .gem-foundation-grid,
           .gem-grid-two,
+          .gem-analysis-grid,
           .gem-secondary-grid,
           .gem-secondary-card,
           .gem-meta-grid {

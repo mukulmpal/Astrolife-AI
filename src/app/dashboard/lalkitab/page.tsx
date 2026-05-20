@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import "@/app/dashboard/shared.css";
 import { calculateLalKitab } from "@/lib/astro-engine/lalkitab";
+import { calculateLalKitabTimeEngine } from "@/lib/lal-kitab";
 import {
   analyzeAdvancedLalKitab,
   type Planet,
@@ -11,10 +12,32 @@ import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
 
-type Tab = "planets" | "takkar" | "rin" | "ages" | "combos" | "varshphal" | "ghar" | "safety";
+type Tab = "planets" | "accuracy" | "takkar" | "rin" | "ages" | "combos" | "varshphal" | "lkgochar" | "ghar" | "safety";
 type DomainTab = "nishani" | "career" | "money" | "marriage" | "health" | "psychology";
 
 const ADVANCED_PLANETS: Planet[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+const LK_ABBR: Record<string, string> = {
+  Sun: "Su",
+  Moon: "Mo",
+  Mars: "Ma",
+  Mercury: "Me",
+  Jupiter: "Ju",
+  Venus: "Ve",
+  Saturn: "Sa",
+  Rahu: "Ra",
+  Ketu: "Ke",
+};
+const LK_COLORS: Record<string, string> = {
+  Sun: "#f97316",
+  Moon: "#c084fc",
+  Mars: "#ef4444",
+  Mercury: "#22c55e",
+  Jupiter: "#f59e0b",
+  Venus: "#ec4899",
+  Saturn: "#60a5fa",
+  Rahu: "#a78bfa",
+  Ketu: "#fb7185",
+};
 
 function buildAdvancedPlacements(planets: Record<string, { house?: number }>): PlanetPlacement[] {
   return ADVANCED_PLANETS.flatMap((planet) => {
@@ -25,6 +48,111 @@ function buildAdvancedPlacements(planets: Record<string, { house?: number }>): P
   });
 }
 
+function shiftedHouse(house: number, shift: number) {
+  return ((house + shift - 1) % 12) + 1;
+}
+
+function buildShiftedPlanets(
+  planets: Record<string, { house: number; retrograde?: boolean }>,
+  shift: number,
+) {
+  const shifted: Record<string, { house: number; retrograde: boolean }> = {};
+  ADVANCED_PLANETS.forEach((planet) => {
+    const data = planets[planet];
+    if (!data) return;
+    shifted[planet] = {
+      house: shiftedHouse(data.house, shift),
+      retrograde: Boolean(data.retrograde),
+    };
+  });
+  return shifted;
+}
+
+function LalKitabHouseChart({
+  title,
+  subtitle,
+  planets,
+  activeHouse,
+  lagnaSignIndex,
+}: {
+  title: string;
+  subtitle: string;
+  planets: Record<string, { house: number; retrograde: boolean }>;
+  activeHouse?: number;
+  lagnaSignIndex?: number;
+}) {
+  const size = 300;
+  const half = size / 2;
+  const normalizedLagna = typeof lagnaSignIndex === "number" && Number.isFinite(lagnaSignIndex)
+    ? ((lagnaSignIndex % 12) + 12) % 12
+    : null;
+  const houses = [
+    { h: 1, lx: size / 2, ly: size / 4 },
+    { h: 2, lx: size / 4, ly: size / 8 },
+    { h: 3, lx: size / 8, ly: size / 4 },
+    { h: 4, lx: size / 4, ly: size / 2 },
+    { h: 5, lx: size / 8, ly: 3 * size / 4 },
+    { h: 6, lx: size / 4, ly: 7 * size / 8 },
+    { h: 7, lx: size / 2, ly: 3 * size / 4 },
+    { h: 8, lx: 3 * size / 4, ly: 7 * size / 8 },
+    { h: 9, lx: 7 * size / 8, ly: 3 * size / 4 },
+    { h: 10, lx: 3 * size / 4, ly: size / 2 },
+    { h: 11, lx: 7 * size / 8, ly: size / 4 },
+    { h: 12, lx: 3 * size / 4, ly: size / 8 },
+  ];
+  const byHouse: Record<number, string[]> = {};
+  for (let house = 1; house <= 12; house += 1) byHouse[house] = [];
+  ADVANCED_PLANETS.forEach((planet) => {
+    const house = planets[planet]?.house;
+    if (house >= 1 && house <= 12) byHouse[house].push(planet);
+  });
+
+  return (
+    <div className="lk-chart-card">
+      <div className="varsh-col-title" style={{color:"#c8a030"}}>{subtitle}</div>
+      <div className="lk-chart-title serif">{title}</div>
+      <svg viewBox={`0 0 ${size} ${size}`} width="100%" className="lk-chart" role="img" aria-label={title}>
+        <rect width={size} height={size} fill="#08051a" rx="8" />
+        <rect x="0" y="0" width={size} height={size} fill="none" stroke="#3a3260" strokeWidth="1.5" rx="8" />
+        <line x1="0" y1="0" x2={size} y2={size} stroke="#2a2250" />
+        <line x1={size} y1="0" x2="0" y2={size} stroke="#2a2250" />
+        <line x1={half} y1="0" x2={size} y2={half} stroke="#2a2250" />
+        <line x1={size} y1={half} x2={half} y2={size} stroke="#2a2250" />
+        <line x1={half} y1={size} x2="0" y2={half} stroke="#2a2250" />
+        <line x1="0" y1={half} x2={half} y2="0" stroke="#2a2250" />
+        {houses.map(({ h, lx, ly }) => {
+          const here = byHouse[h] ?? [];
+          const highlighted = activeHouse === h;
+          const signNumber = normalizedLagna === null ? null : ((normalizedLagna + h - 1) % 12) + 1;
+          return (
+            <g key={h}>
+              {highlighted && (
+                <circle cx={lx} cy={ly + 6} r="24" fill="rgba(200,160,48,.1)" stroke="rgba(200,160,48,.45)" />
+              )}
+              <text x={lx} y={ly - 8} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={highlighted ? "#d4af37" : "#4a4070"} fontWeight={highlighted ? "700" : "400"}>
+                H{h}
+              </text>
+              {signNumber !== null && (
+                <text x={lx + 20} y={ly - 8} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#c8a030" fontWeight="800">
+                  {signNumber}
+                </text>
+              )}
+              {here.map((planet, index) => {
+                const offset = here.length > 1 ? (index - (here.length - 1) / 2) * 13 : 0;
+                return (
+                  <text key={planet} x={lx + offset} y={ly + 12} textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="700" fill={LK_COLORS[planet]}>
+                    {LK_ABBR[planet]}{planets[planet].retrograde ? "R" : ""}
+                  </text>
+                );
+              })}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
 export default function LalKitabPage() {
   const [activeTab, setActiveTab]     = useState<Tab>("planets");
   const [expanded, setExpanded]       = useState<string | null>(null);
@@ -32,6 +160,19 @@ export default function LalKitabPage() {
   const { birth, chart }              = useUserChart();
   const { t, tp, ts, lang } = useLanguage();
   const result = calculateLalKitab(chart.planets as never, birth.dob, (chart as never as { lagnaNum?: number }).lagnaNum ?? 0);
+  const timeResult = calculateLalKitabTimeEngine({
+    dob: birth.dob,
+    planets: chart.planets,
+    lagnaNum: (chart as never as { lagnaNum?: number }).lagnaNum ?? 0,
+    targetDate: new Date(),
+  });
+  const natalLagnaIndex = (chart as never as { lagnaNum?: number }).lagnaNum ?? 0;
+  const natalChart = buildShiftedPlanets(chart.planets, 0);
+  const varshChart = buildShiftedPlanets(chart.planets, timeResult.varshphal.yearShift);
+  const monthlyChart = buildShiftedPlanets(
+    chart.planets,
+    timeResult.varshphal.yearShift + timeResult.monthlyPhal.monthIndex,
+  );
 
   const pakkaCount   = result.planets.filter(p => p.status === "pakka").length;
   const dushmanCount = result.planets.filter(p => p.status === "dushman").length;
@@ -156,7 +297,45 @@ export default function LalKitabPage() {
         .indicator-card{background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.18);border-radius:12px;padding:14px}
         .protocol-list{display:grid;gap:7px;margin-top:10px}
         .protocol-item{font-size:12px;color:#d8cfb8;line-height:1.6;padding:8px 10px;border-radius:8px;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.12)}
+        .lk-gochar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}
+        .lk-chart-card{background:rgba(13,10,34,0.7);border:1px solid rgba(96,165,250,0.18);border-radius:14px;padding:16px}
+        .lk-chart-title{font-size:20px;font-weight:700;color:#f0e8d0;margin-bottom:8px}
+        .lk-chart{max-width:300px;display:block;margin:8px auto 0}
+        .lk-time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+        .lk-time-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px}
+        .lk-time-stat{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:#f4df9d;line-height:1;margin-bottom:6px}
+        .lk-mini-list{display:grid;gap:8px;margin-top:12px}
+        .lk-mini-item{font-size:12px;color:#c8c0a8;line-height:1.65;padding:9px 11px;border-radius:9px;background:rgba(9,6,29,0.8);border:1px solid rgba(38,31,76,0.9)}
+        .lk-remedy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
+        .lk-remedy-card{border-radius:14px;padding:15px;background:rgba(9,6,29,0.78);border:1px solid rgba(38,31,76,0.9)}
+        .lk-remedy-title{font-size:15px;font-weight:800;color:#f0e8d0;margin-bottom:7px}
+        .lk-remedy-text{font-size:12px;color:#c8c0a8;line-height:1.75}
+        .lk-vastu-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+        .lk-vastu{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#d8cfb8}
+        .lk-vastu.can{border-color:rgba(34,197,94,0.28);background:rgba(34,197,94,0.08);color:#86efac}
+        .lk-vastu.no{border-color:rgba(239,68,68,0.28);background:rgba(239,68,68,0.08);color:#fca5a5}
+        .lk-vastu.soft{border-color:rgba(245,158,11,0.28);background:rgba(245,158,11,0.08);color:#fcd34d}
+        .detail-note{font-size:13px;color:#c8c0a8;line-height:1.85;padding:13px 16px;border-radius:12px;background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.15);margin-bottom:14px}
+        .lk-table-wrap{overflow-x:auto;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.03);margin-bottom:14px}
+        .lk-table{width:100%;border-collapse:collapse;min-width:780px}
+        .lk-table th{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:#c8a030;text-align:left;padding:12px 14px;border-bottom:1px solid rgba(200,160,48,0.2);background:rgba(200,160,48,0.06)}
+        .lk-table td{font-size:13px;color:#d8cfb8;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);vertical-align:top}
+        .lk-table tr:last-child td{border-bottom:none}
+        .bm-benefic{color:#22c55e;font-weight:800}
+        .bm-malefic{color:#ef4444;font-weight:800}
+        .bm-mixed{color:#f59e0b;font-weight:800}
+        .yes-no{font-size:12px;font-weight:800}
+        .yes-no.yes{color:#f59e0b}.yes-no.no{color:#605890}
+        .prediction-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
+        .prediction-card{background:rgba(9,6,29,0.78);border:1px solid rgba(38,31,76,0.9);border-radius:14px;padding:14px}
+        .prediction-title{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#c8a030;margin-bottom:8px}
+        .prediction-text{font-size:13px;color:#c8c0a8;line-height:1.8}
+        .lk-report-block{background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin-bottom:14px}
+        .lk-report-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#f0e8d0;margin-bottom:10px}
+        .lk-report-p{font-size:14px;color:#c8c0a8;line-height:1.95;margin-bottom:10px}
+        .lk-bullet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}
         @media(max-width:768px){.planet-grid{grid-template-columns:1fr}.combo-grid{grid-template-columns:1fr}.varsh-grid{grid-template-columns:1fr}}
+        @media(max-width:900px){.lk-gochar-grid,.lk-time-grid{grid-template-columns:1fr}}
       `}</style>
 
       <div className="page">
@@ -232,11 +411,13 @@ export default function LalKitabPage() {
         <div className="tabs">
           {([
             ["planets",  `Planets (${result.planets.length})`],
+            ["accuracy", "Core Accuracy"],
             ["takkar",   `Takkar (${result.takkars.length})`],
             ["rin",      `Rin (${result.rins.length})`],
             ["ages",     "Ages"],
             ["combos",   `Combos (${result.combinations.length})`],
             ["varshphal","Varshphal"],
+            ["lkgochar", "LK Gochar"],
             ["ghar",     "Ghar"],
             ["safety",   "Safety"],
           ] as [Tab,string][]).map(([t,l]) => (
@@ -423,14 +604,66 @@ export default function LalKitabPage() {
           </div>
         )}
 
+        {/* ── CORE ACCURACY TAB ── */}
+        {activeTab === "accuracy" && (
+          <div>
+            <div className="detail-note">
+              Core Accuracy table Lal Kitab judgement ka base hai. Yahan har grah ka sign position, soya/jagnewala state, benefic/malefic result aur reason ek jagah dikhaya gaya hai, taaki remedy aur Varshphal dono confused na hon.
+            </div>
+            <div className="lk-table-wrap">
+              <table className="lk-table">
+                <thead>
+                  <tr>
+                    <th>Planet</th>
+                    <th>Sign</th>
+                    <th>House</th>
+                    <th>Position</th>
+                    <th>Soya</th>
+                    <th>Kismat Jaganewala</th>
+                    <th>Benefic/Malefic</th>
+                    <th>Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.coreAccuracy.map((row) => (
+                    <tr key={row.planet}>
+                      <td style={{fontWeight:800,color:LK_COLORS[row.planet]}}>{row.planet}</td>
+                      <td>{row.signShort}<br /><span style={{fontSize:11,color:"#605890"}}>{row.sign}</span></td>
+                      <td>H{row.house}</td>
+                      <td>{row.position.replaceAll("_", " ")}</td>
+                      <td><span className={`yes-no ${row.soya ? "yes" : "no"}`}>{row.soya ? "Yes" : "No"}</span></td>
+                      <td><span className={`yes-no ${row.kismatJaganewala ? "yes" : "no"}`}>{row.kismatJaganewala ? "Yes" : "No"}</span></td>
+                      <td>
+                        <span className={row.beneficMalefic === "Benefic" ? "bm-benefic" : row.beneficMalefic === "Malefic" ? "bm-malefic" : "bm-mixed"}>
+                          {row.beneficMalefic}
+                        </span>
+                      </td>
+                      <td>{row.reason}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="safety-card" style={{background:"rgba(34,197,94,0.04)",borderColor:"rgba(34,197,94,0.18)"}}>
+              <div className="safety-title">How To Use This Table</div>
+              <div className="safety-text">
+                Benefic grah ki main vastu ka daan avoid rakhein; uski maryada, relation aur conduct strong karein. Malefic ya soya grah ko jagane ke liye pehle soft correction, ghar ke nimit aur safe daan dekhein. Mixed grah ke liye direct daan se pehle Varshphal aur active house confirm karein.
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── TAKKAR TAB ── */}
         {activeTab === "takkar" && (
           <div>
+            <div className="detail-note">
+              Takkar sirf tab count hota hai jab do grah ek hi Lal Kitab ghar mein baithkar ya known enemy relation se ek doosre ko disturb karte hain. Agar count zero ho, iska matlab engine broken nahi hai; iska matlab major same-house takkar nahi mila. Planet-wise dushman ghar, mandi halat aur rin signals Planets/Safety tabs mein alag se read honge.
+            </div>
             {result.takkars.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">✅</div>
                 <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#c8c0a8"}}>Koi bada Takkar nahi</div>
-                <div style={{fontSize:13,marginTop:8}}>Planets ek doosre ke saath theek hain</div>
+                <div style={{fontSize:13,marginTop:8}}>Same-house enemy clash nahi mila. Ab judgement planet condition aur varshphal timing se hoga.</div>
               </div>
             ) : (
               result.takkars.map((t, i) => (
@@ -486,7 +719,7 @@ export default function LalKitabPage() {
         {activeTab === "ages" && (
           <div>
             <div style={{background:"rgba(200,160,48,0.05)",border:"1px solid rgba(200,160,48,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
-              ⏰ Lal Kitab mein har planet ek specific age pe activate hota hai — us age ke aas paas us planet ke results strongest hote hain (±3 years).
+              ⏰ Lal Kitab mein har planet ek specific age pe activate hota hai. Iska matlab sirf ek event nahi hota; us age ke aas paas grah ke house, state, rin, family signal, career/money/health theme aur upaya ki need zyada clearly saamne aati hai. Active Now ka matlab hai abhi us grah ka nimit aur phal zyada dhyan se dekhna chahiye.
             </div>
             <div className="ages-grid">
               {result.planets.map(p => {
@@ -507,6 +740,9 @@ export default function LalKitabPage() {
                     <div style={{marginTop:8,fontSize:11,color:scoreColor(p.score),fontWeight:600}}>
                       Score: {p.score}/95
                     </div>
+                    <div style={{marginTop:8,fontSize:11,color:"#c8c0a8",lineHeight:1.5}}>
+                      H{p.house} · {p.status === "pakka" ? "supportive house" : p.status === "dushman" ? "challenge house" : "mixed house"} · {p.state}
+                    </div>
                   </div>
                 );
               })}
@@ -517,17 +753,17 @@ export default function LalKitabPage() {
         {/* ── COMBOS TAB ── */}
         {activeTab === "combos" && (
           <div>
+            <div style={{background:"rgba(167,139,250,0.05)",border:"1px solid rgba(167,139,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+              🔮 <strong style={{color:"#a78bfa"}}>Graha Yoga</strong> — Lal Kitab combo tab same-house combinations ko dikhata hai. Agar do grah ek hi ghar mein hain aur classical rule available hai to detailed yoga aayega; agar rule specific nahi hai to ab generic same-house reading bhi show hogi, taaki important combinations hide na hon.
+            </div>
             {result.combinations.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">🔮</div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#c8c0a8"}}>Koi vishesh Yoga nahi mila</div>
-                <div style={{fontSize:13,marginTop:8}}>Aapke chart mein koi notable planetary combination nahi hai</div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#c8c0a8"}}>Same-house Combo nahi mila</div>
+                <div style={{fontSize:13,marginTop:8}}>Is chart mein koi do grah ek hi Lal Kitab ghar mein strong conjunction nahi bana rahe. Reading ab individual planets, takkar, rin, varshphal aur ghar ke sanket se hogi.</div>
               </div>
             ) : (
               <>
-                <div style={{background:"rgba(167,139,250,0.05)",border:"1px solid rgba(167,139,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
-                  🔮 <strong style={{color:"#a78bfa"}}>Graha Yoga</strong> — Jab do ya zyada planets ek ghar mein hote hain, ek special combination banta hai jo life ko ek khaas disha deta hai.
-                </div>
                 {result.combinations.map((c, i) => (
                   <div key={i} className="combo-card">
                     <div className="combo-title serif">{c.title}</div>
@@ -573,6 +809,8 @@ export default function LalKitabPage() {
                 <div>
                   <div className="varsh-year serif">{result.varshphal.year}</div>
                   <div className="varsh-lagna">
+                    Period: {result.varshphal.periodLabel}
+                    <br />
                     Varsh Lagna: {result.varshphal.lagnaSign}
                     <span style={{marginLeft:8,fontSize:11,color:"#605890"}}>
                       (Shift: +{result.varshphal.yearShift} ghar)
@@ -581,6 +819,66 @@ export default function LalKitabPage() {
                 </div>
               </div>
               <div className="varsh-summary">{result.varshphal.summary}</div>
+              <div className="prediction-grid">
+                <div className="prediction-card">
+                  <div className="prediction-title">Year Headline</div>
+                  <div className="prediction-text">{result.varshphal.annualPrediction.headline}</div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Career</div>
+                  <div className="prediction-text">{result.varshphal.annualPrediction.career}</div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Money</div>
+                  <div className="prediction-text">{result.varshphal.annualPrediction.money}</div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Family</div>
+                  <div className="prediction-text">{result.varshphal.annualPrediction.family}</div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Health</div>
+                  <div className="prediction-text">{result.varshphal.annualPrediction.health}</div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Remedy</div>
+                  <div className="prediction-text">{result.varshphal.annualPrediction.remedy}</div>
+                </div>
+              </div>
+              <div className="lk-table-wrap" style={{marginTop:14}}>
+                <table className="lk-table">
+                  <thead>
+                    <tr>
+                      <th>Planet</th>
+                      <th>Natal</th>
+                      <th>Varsh</th>
+                      <th>Sign</th>
+                      <th>Soya</th>
+                      <th>Kismat</th>
+                      <th>Annual Condition</th>
+                      <th>Reading</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.varshphal.chartRows.map((row) => (
+                      <tr key={row.planet}>
+                        <td style={{fontWeight:800,color:LK_COLORS[row.planet]}}>{row.planet}</td>
+                        <td>H{row.natalHouse}</td>
+                        <td>H{row.varshHouse}</td>
+                        <td>{row.signShort}<br /><span style={{fontSize:11,color:"#605890"}}>{row.sign}</span></td>
+                        <td><span className={`yes-no ${row.soya ? "yes" : "no"}`}>{row.soya ? "Yes" : "No"}</span></td>
+                        <td><span className={`yes-no ${row.kismatJaganewala ? "yes" : "no"}`}>{row.kismatJaganewala ? "Yes" : "No"}</span></td>
+                        <td>
+                          <span className={row.beneficMalefic === "Benefic" ? "bm-benefic" : row.beneficMalefic === "Malefic" ? "bm-malefic" : "bm-mixed"}>
+                            {row.beneficMalefic}
+                          </span>
+                        </td>
+                        <td>{row.reading}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <div className="varsh-grid">
                 <div className="varsh-col shubh">
                   <div className="varsh-col-title" style={{color:"#22c55e"}}>✨ Shubh Graha (Is Saal)</div>
@@ -600,6 +898,211 @@ export default function LalKitabPage() {
                       ))
                   }
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── LK GOCHAR TAB ── */}
+        {activeTab === "lkgochar" && (
+          <div>
+            <div style={{background:"rgba(200,160,48,0.06)",border:"1px solid rgba(200,160,48,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+              📕 <strong style={{color:"#c8a030"}}>LK Gochar</strong> — Yeh normal transit/gochar nahi hai. Yeh Lal Kitab ka time-reading layer hai: natal condition, 35-sala chakra, varshphal aur monthly phal ko ek saath read karta hai.
+            </div>
+
+            <div className="lk-time-grid">
+              <div className="lk-time-card">
+                <div className="varsh-col-title" style={{color:"#c8a030"}}>Running Age</div>
+                <div className="lk-time-stat">{timeResult.age.runningAge}</div>
+                <div className="safety-text">
+                  Completed age {timeResult.age.completedAge}. 35-sala cycle {timeResult.age.cycleNumber}, year {timeResult.age.cycleYear}.
+                </div>
+              </div>
+              <div className="lk-time-card">
+                <div className="varsh-col-title" style={{color:"#60a5fa"}}>35-Sala Active House</div>
+                <div className="lk-time-stat">H{timeResult.thirtyFiveYearChakra.activeHouse}</div>
+                <div className="safety-text">{timeResult.thirtyFiveYearChakra.prediction}</div>
+              </div>
+              <div className="lk-time-card">
+                <div className="varsh-col-title" style={{color:"#22c55e"}}>Reading Mode</div>
+                <div className="lk-time-stat" style={{fontSize:26}}>Pure LK</div>
+                <div className="safety-text">{timeResult.accuracyStatus}</div>
+              </div>
+            </div>
+
+            <div className="lk-gochar-grid">
+              <LalKitabHouseChart
+                title="Natal Lal Kitab Chart"
+                subtitle="Birth promise"
+                planets={natalChart}
+                lagnaSignIndex={natalLagnaIndex}
+              />
+              <LalKitabHouseChart
+                title="Varshphal Chart"
+                subtitle={timeResult.varshphal.periodLabel}
+                planets={varshChart}
+                activeHouse={timeResult.varshphal.activeHouse}
+                lagnaSignIndex={natalLagnaIndex + timeResult.varshphal.yearShift}
+              />
+              <LalKitabHouseChart
+                title="Monthly Phal Chart"
+                subtitle={`${timeResult.monthlyPhal.monthName} · Varsh month ${timeResult.monthlyPhal.runningMonth}`}
+                planets={monthlyChart}
+                activeHouse={timeResult.monthlyPhal.activeHouse}
+                lagnaSignIndex={natalLagnaIndex + timeResult.varshphal.yearShift + timeResult.monthlyPhal.monthIndex}
+              />
+            </div>
+
+            <div className="varsh-card" style={{marginBottom:14}}>
+              <div className="varsh-year serif" style={{fontSize:32}}>35-Sala Chakra</div>
+              <div className="varsh-summary">{timeResult.thirtyFiveYearChakra.actionLine}</div>
+              <div className="prediction-grid">
+                <div className="prediction-card">
+                  <div className="prediction-title">Overview</div>
+                  <div className="prediction-text">{timeResult.thirtyFiveYearChakra.overview}</div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">House Meaning</div>
+                  <div className="prediction-text">{timeResult.thirtyFiveYearChakra.houseExplanation}</div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Planet Activation</div>
+                  <div className="prediction-text">{timeResult.thirtyFiveYearChakra.planetActivationExplanation}</div>
+                </div>
+              </div>
+              <div className="lk-mini-list">
+                {(timeResult.thirtyFiveYearChakra.activePlanets.length
+                  ? timeResult.thirtyFiveYearChakra.activePlanets
+                  : ["No direct planet trigger"]
+                ).map((planet) => (
+                  <div key={planet} className="lk-mini-item">{planet}</div>
+                ))}
+              </div>
+              <div className="lk-report-block" style={{marginTop:14}}>
+                <div className="prediction-title">Nimit To Watch</div>
+                <div className="lk-bullet-grid">
+                  {timeResult.thirtyFiveYearChakra.nimitToWatch.map((item) => (
+                    <div key={item} className="lk-mini-item">{item}</div>
+                  ))}
+                </div>
+                <div className="prediction-title" style={{marginTop:14}}>Practical Guidance</div>
+                <div className="lk-bullet-grid">
+                  {timeResult.thirtyFiveYearChakra.practicalGuidance.map((item) => (
+                    <div key={item} className="lk-mini-item">{item}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="varsh-grid">
+              <div className="varsh-col shubh">
+                <div className="varsh-col-title" style={{color:"#22c55e"}}>Varshphal Reading</div>
+                <div className="safety-text" style={{fontSize:14,lineHeight:1.95}}>{timeResult.varshphal.prediction}</div>
+                <div className="lk-mini-list">
+                  <div className="lk-mini-item">Shubh: {timeResult.varshphal.shubhPlanets.length ? timeResult.varshphal.shubhPlanets.join(", ") : "No strong shubh marker"}</div>
+                  <div className="lk-mini-item">Savdhani: {timeResult.varshphal.cautionPlanets.length ? timeResult.varshphal.cautionPlanets.join(", ") : "No strong caution marker"}</div>
+                </div>
+              </div>
+              <div className="varsh-col caution">
+                <div className="varsh-col-title" style={{color:"#f59e0b"}}>Monthly Phal</div>
+                <div className="safety-text" style={{fontSize:14,lineHeight:1.95}}>{timeResult.monthlyPhal.prediction}</div>
+                <div className="lk-mini-list">
+                  <div className="lk-mini-item">{timeResult.monthlyPhal.actionLine}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lk-report-block" style={{marginTop:14}}>
+              <div className="lk-report-title">Monthly Phal Detailed Reading</div>
+              <p className="lk-report-p">{timeResult.monthlyPhal.overview}</p>
+              <p className="lk-report-p">{timeResult.monthlyPhal.moneyCareer}</p>
+              <p className="lk-report-p">{timeResult.monthlyPhal.familyHealth}</p>
+              <div className="prediction-grid">
+                <div className="prediction-card">
+                  <div className="prediction-title">Nimit This Month</div>
+                  <div className="lk-bullet-grid">
+                    {timeResult.monthlyPhal.nimitToWatch.map((item) => <div key={item} className="lk-mini-item">{item}</div>)}
+                  </div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Do This Month</div>
+                  <div className="lk-bullet-grid">
+                    {timeResult.monthlyPhal.doThisMonth.map((item) => <div key={item} className="lk-mini-item">{item}</div>)}
+                  </div>
+                </div>
+                <div className="prediction-card">
+                  <div className="prediction-title">Avoid This Month</div>
+                  <div className="lk-bullet-grid">
+                    {timeResult.monthlyPhal.avoidThisMonth.map((item) => <div key={item} className="lk-mini-item">{item}</div>)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="safety-card" style={{marginTop:14,background:"rgba(34,197,94,0.04)",borderColor:"rgba(34,197,94,0.18)"}}>
+              <div className="safety-title">Daan & Remedy Decision</div>
+              <div className="safety-text">
+                Lal Kitab mein daan planet-wise aur condition-wise hota hai. Jo grah 6/8/12, mandi ya dushman zone mein active ho uski vastu ka controlled daan kiya ja sakta hai. Jo grah nek, pakka ya supportive ho uski core vastu ka daan avoid rakhein; uske liye seva, discipline aur achha conduct better remedy hai.
+              </div>
+              <div className="lk-remedy-grid">
+                {timeResult.remedyGuidance.map((guidance) => {
+                  const color = guidance.decision === "daan_allowed" ? "#22c55e" : guidance.decision === "daan_avoid" ? "#ef4444" : "#f59e0b";
+                  return (
+                      <div key={`${guidance.planet}-${guidance.natalHouse}`} className="lk-remedy-card" style={{borderColor:`${color}44`}}>
+                        <div className="lk-remedy-title">{guidance.title} · H{guidance.natalHouse || "-"}</div>
+                        <div className="lk-remedy-text">{guidance.explanation}</div>
+                        <div className="lk-remedy-text" style={{marginTop:8}}>{guidance.detailedExplanation}</div>
+                        {guidance.canDonate.length > 0 && (
+                        <>
+                          <div className="varsh-col-title" style={{color:"#22c55e",marginTop:10}}>Daan kar sakte hain</div>
+                          <div className="lk-vastu-row">
+                            {guidance.canDonate.map((item) => <span key={item} className="lk-vastu can">{item}</span>)}
+                          </div>
+                        </>
+                      )}
+                      {guidance.doNotDonate.length > 0 && (
+                        <>
+                          <div className="varsh-col-title" style={{color:"#ef4444",marginTop:10}}>Daan nahi karna</div>
+                          <div className="lk-vastu-row">
+                            {guidance.doNotDonate.map((item) => <span key={item} className="lk-vastu no">{item}</span>)}
+                          </div>
+                        </>
+                      )}
+                      {guidance.preferredCorrection.length > 0 && (
+                        <>
+                          <div className="varsh-col-title" style={{color:"#f59e0b",marginTop:10}}>Safe correction</div>
+                          <div className="lk-vastu-row">
+                            {guidance.preferredCorrection.map((item) => <span key={item} className="lk-vastu soft">{item}</span>)}
+                          </div>
+                        </>
+                      )}
+                      {guidance.nimit.length > 0 && (
+                        <>
+                          <div className="varsh-col-title" style={{color:"#60a5fa",marginTop:10}}>Nimit watch</div>
+                          <div className="lk-vastu-row">
+                            {guidance.nimit.map((item) => <span key={item} className="lk-vastu">{item}</span>)}
+                          </div>
+                        </>
+                      )}
+                      {guidance.protocol.length > 0 && (
+                        <>
+                          <div className="varsh-col-title" style={{color:"#c8a030",marginTop:10}}>Protocol</div>
+                          <div className="lk-mini-list">
+                            {guidance.protocol.map((item) => <div key={item} className="lk-mini-item">{item}</div>)}
+                          </div>
+                        </>
+                      )}
+                      {guidance.avoidMistakes.length > 0 && (
+                        <>
+                          <div className="varsh-col-title" style={{color:"#ef4444",marginTop:10}}>Avoid mistakes</div>
+                          <div className="lk-mini-list">
+                            {guidance.avoidMistakes.map((item) => <div key={item} className="lk-mini-item">{item}</div>)}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -63,7 +63,7 @@ export default function TransitPurchasePage() {
       <main className="tp-wrap">
         <div className="tp-shell">
           <EngineStateCard
-            title="Transit Purchase Guidance"
+            title="Gochar Purchase Guidance"
             loading={loading}
             loadingText="Loading your chart..."
             emptyText="Complete onboarding or run sample guidance."
@@ -103,9 +103,12 @@ export default function TransitPurchasePage() {
         <section className="tp-hero">
           <div className="tp-row">
             <div>
-              <div className="tp-kicker">Transit + Lal Kitab</div>
-              <h1 className="tp-title">Transit Purchase Guidance</h1>
-              <p className="tp-sub">Buy, wait, or avoid guidance using current transit pressure plus Lal Kitab object and gift caution.</p>
+              <div className="tp-kicker">Gochar + Lal Kitab Object Grammar</div>
+              <h1 className="tp-title">Gochar Purchase Guidance</h1>
+              <p className="tp-sub">
+                Buy, wait, or avoid guidance using standard Gochar timing plus Lal Kitab object and gift caution.
+                Lal Kitab 35-sala chakra, varshphal and monthly phal are separate methods.
+              </p>
             </div>
             <button className="tp-btn" type="button" onClick={() => setUseSample(true)}>Run Sample Guidance</button>
           </div>
@@ -123,6 +126,7 @@ export default function TransitPurchasePage() {
                 <div>
                   <h2 className="tp-h">Overall: {guidance.overall}</h2>
                   <p className="tp-p">{guidance.summary}</p>
+                  <p className="tp-muted" style={{ marginTop: 8 }}>{guidance.methodNote}</p>
                 </div>
                 <Badge verdict={guidance.overall} />
               </div>
@@ -135,7 +139,7 @@ export default function TransitPurchasePage() {
 
             <article className="tp-card span-12">
               <div className="tp-row">
-                <h2 className="tp-h">Transit Buying Windows</h2>
+                <h2 className="tp-h">Gochar Buying Windows</h2>
                 <span className="tp-chip">{guidance.transit.windows.length} categories</span>
               </div>
               <div className="tp-list">
@@ -157,7 +161,7 @@ export default function TransitPurchasePage() {
             <article className="tp-card span-12">
               <div className="tp-row">
                 <h2 className="tp-h">Lal Kitab Object & Gift Caution</h2>
-                <span className="tp-chip">Derived grammar rules</span>
+                <span className="tp-chip">Not 35-sala / varshphal</span>
               </div>
               <div className="tp-list">
                 {guidance.lalKitab.map((item) => (

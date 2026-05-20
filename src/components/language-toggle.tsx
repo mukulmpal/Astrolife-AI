@@ -1,52 +1,76 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLanguage, type Language } from "@/lib/language-context";
 
-const LANGS: { key: Language; label: string; short: string }[] = [
-  { key: "english", label: "EN", short: "EN" },
-  { key: "hindi", label: "हि", short: "हि" },
-  { key: "hinglish", label: "Hi-En", short: "Hi" },
+const LANGS: Array<{ key: Language; label: string }> = [
+  { key: "english" as Language, label: "EN" },
+  { key: "hinglish" as Language, label: "Hi-En" },
 ];
 
-export function LanguageToggle({ compact = false }: { compact?: boolean }) {
+export function LanguageToggle() {
   const { lang, setLang } = useLanguage();
+  const [mounted, setMounted] = useState(false);
 
-  return (
-    <div data-no-translate style={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 0,
-      background: "#0d0b24",
-      border: "1px solid #1c1840",
-      borderRadius: 20,
-      padding: "3px 4px",
-      fontSize: compact ? 10 : 11,
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const shellStyle = {
+    display: "inline-flex",
+    gap: 4,
+    padding: 4,
+    borderRadius: 20,
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  } as const;
+
+  const getButtonStyle = (active: boolean, disabled = false) =>
+    ({
+      border: "none",
+      cursor: disabled ? "default" : "pointer",
+      padding: "5px 12px",
+      borderRadius: 16,
+      fontSize: 11,
       fontWeight: 600,
       fontFamily: "Outfit, sans-serif",
-    }}>
-      {LANGS.map(l => (
-        <button
-          key={l.key}
-          onClick={() => setLang(l.key)}
-          style={{
-            border: "none",
-            cursor: "pointer",
-            padding: compact ? "4px 8px" : "5px 12px",
-            borderRadius: 16,
-            fontSize: compact ? 10 : 11,
-            fontWeight: 600,
-            fontFamily: "Outfit, sans-serif",
-            letterSpacing: "0.5px",
-            transition: "all 0.2s ease",
-            background: lang === l.key
-              ? "linear-gradient(135deg, #c8a030, #a06820)"
-              : "transparent",
-            color: lang === l.key ? "#08051a" : "#605890",
-          }}
-        >
-          {compact ? l.short : l.label}
+      letterSpacing: "0.5px",
+      transition: "all 0.2s ease",
+      background: active
+        ? "linear-gradient(135deg, #c8a030, #a06820)"
+        : "transparent",
+      color: active ? "#08051a" : "#605890",
+    }) as const;
+
+  if (!mounted) {
+    return (
+      <div suppressHydrationWarning style={shellStyle}>
+        <button type="button" disabled style={getButtonStyle(true, true)}>
+          EN
         </button>
-      ))}
+        <button type="button" disabled style={getButtonStyle(false, true)}>
+          Hi-En
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div suppressHydrationWarning style={shellStyle}>
+      {LANGS.map((l) => {
+        const active = lang === l.key;
+
+        return (
+          <button
+            key={String(l.key)}
+            type="button"
+            onClick={() => setLang(l.key)}
+            style={getButtonStyle(active)}
+          >
+            {l.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

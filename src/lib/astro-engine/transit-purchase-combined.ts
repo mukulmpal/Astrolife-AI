@@ -21,6 +21,7 @@ export interface CombinedTransitPurchaseInput {
 export interface CombinedTransitPurchaseResult {
   overall: PurchaseVerdict;
   strongestWarning: string;
+  methodNote: string;
   transit: TransitPurchaseGuidanceResult;
   lalKitab: LalKitabPurchaseResult[];
   avoid: Array<{ title: string; reason: string; source: "transit" | "lal_kitab" }>;
@@ -97,9 +98,11 @@ export function generateCombinedTransitPurchaseGuidance(
       .map((item) => ({ title: item.title, reason: item.favourableWhen[0] ?? item.explanation, source: "lal_kitab" as const })),
   ];
 
-  return {
+    return {
     overall,
     strongestWarning,
+    methodNote:
+      "This combines standard Gochar transit purchase timing with Lal Kitab object/gift grammar. It is not Lal Kitab 35-sala chakra, Lal Kitab varshphal, or monthly phal.",
     transit,
     lalKitab,
     avoid,
@@ -107,7 +110,7 @@ export function generateCombinedTransitPurchaseGuidance(
     favourable,
     summary:
       overall === "AVOID"
-        ? "Overall: AVOID. Transit and Lal Kitab object signals show strong caution."
+        ? "Overall: AVOID. Gochar timing and Lal Kitab object signals show strong caution."
         : overall === "WAIT"
           ? "Overall: WAIT. Delay non-essential purchases and re-check documents."
           : overall === "BUY_CAREFULLY"

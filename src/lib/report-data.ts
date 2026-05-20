@@ -2,6 +2,7 @@ import { generateGemstoneReportFromChart } from "@/lib/astro-engine/gemstone";
 import { calculateKpReport } from "@/lib/astro-engine/kp";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import { calculateLalKitab } from "@/lib/astro-engine/lalkitab";
+import { calculateLalKitabTimeEngine } from "@/lib/lal-kitab";
 import { calculateShadbala } from "@/lib/astro-engine/shadbala";
 import { calculateAshtakavarga } from "@/lib/astro-engine/ashtakavarga";
 import { calculateVastu } from "@/lib/astro-engine/vastu";
@@ -2249,24 +2250,38 @@ export function buildRealPanchangEngineReportSection(input: any): ReportSection 
 export function buildRealLalKitabReportSection(input: any): ReportSection {
   try {
     const chart = getEngineChart(input);
-    const lk = calculateLalKitab(chart.planets, chart.dob);
+    const lk = calculateLalKitab(chart.planets, chart.dob, chart.lagnaNum ?? 0);
+    const time = calculateLalKitabTimeEngine({
+      dob: chart.dob,
+      planets: chart.planets,
+      lagnaNum: chart.lagnaNum ?? 0,
+      targetDate: new Date(),
+    });
     const pakka = lk.planets.filter((p: any) => p.status === "pakka");
     const dushman = lk.planets.filter((p: any) => p.status === "dushman");
     const activeAges = lk.planets.filter((p: any) => p.isActNow);
+    const supportive = lk.coreAccuracy.filter((p: any) => p.beneficMalefic === "Benefic");
+    const challenging = lk.coreAccuracy.filter((p: any) => p.beneficMalefic === "Malefic");
+    const annual = lk.varshphal.annualPrediction;
+    const topRemedies = time.remedyGuidance.slice(0, 4);
 
     return makeSection({
       id: "lalkitab-karma",
-      title: "Lal Kitab Karma",
-      subtitle: `${pakka.length} Pakka Ghar · ${dushman.length} Dushman Ghar · ${lk.rins.length} Rin zones`,
+      title: "Lal Kitab Core, Timing & Remedy",
+      subtitle: `${supportive.length} supportive · ${challenging.length} needs care · ${lk.varshphal.periodLabel}`,
       score: Math.max(42, Math.min(84, 70 + pakka.length * 3 - dushman.length * 4)),
       paragraphs: [
-        `The real Lal Kitab engine was called using the chart planet houses and date of birth. It evaluates Pakka Ghar, Dushman Ghar, Nishaniyan, Upaya, planetary takkar, Rin Siddhant and activation ages.`,
-        lk.summary,
+        `The Lal Kitab report first verifies the natal condition of each planet before suggesting daan or remedy. Supportive planets are protected; challenging planets receive selective soft correction, behaviour guidance and safe upaya.`,
+        `${annual.headline} ${annual.career} ${annual.money} ${annual.family} ${annual.health} ${annual.remedy}`,
+        `${time.thirtyFiveYearChakra.overview} ${time.thirtyFiveYearChakra.houseExplanation} ${time.thirtyFiveYearChakra.planetActivationExplanation}`,
+        `${time.monthlyPhal.overview} ${time.monthlyPhal.moneyCareer} ${time.monthlyPhal.familyHealth}`,
         lk.hasPitraRin
           ? "Pitra Rin is detected in this chart. This should be handled through respectful ancestral remedies, father-line healing and consistent behavioural correction rather than fear."
           : "No strong Pitra Rin alert was detected by the Lal Kitab engine in this pass.",
       ],
       summary: [
+        `Supportive planets: ${supportive.map((p: any) => `${p.planet} H${p.house}`).join(", ") || "None"}`,
+        `Planets needing care: ${challenging.map((p: any) => `${p.planet} H${p.house}`).join(", ") || "None"}`,
         `Pakka Ghar planets: ${pakka.map((p: any) => `${p.planet} H${p.house}`).join(", ") || "None"}`,
         `Dushman Ghar planets: ${dushman.map((p: any) => `${p.planet} H${p.house}`).join(", ") || "None"}`,
         `Takkar combinations: ${lk.takkars.map((t: any) => `${t.p1}-${t.p2} H${t.house}`).join(", ") || "None"}`,
@@ -2274,12 +2289,17 @@ export function buildRealLalKitabReportSection(input: any): ReportSection {
         `Activation now: ${activeAges.map((p: any) => `${p.planet} age ${p.actAge}`).join(", ") || "None"}`,
       ],
       actionPlan: [
-        "Prioritize Dushman Ghar planets for behavioural correction.",
+        "Do not donate the core vastu of a supportive planet; preserve its strength first.",
+        "Use daan only where the Lal Kitab condition allows it, especially for challenging 6/8/12-style pressure zones.",
+        "Read Varshphal, 35-sala chakra and monthly phal as separate Lal Kitab timing layers, not as ordinary transit.",
         "Follow only the top 1-3 upaya consistently instead of remedy overload.",
-        "Check activation age planets for current-year sensitivity.",
       ],
       remedy: [
-        ...dushman.slice(0, 3).map((p: any) => `${p.planet} H${p.house}: ${p.upaya}`),
+        ...topRemedies.map((r: any) => {
+          if (r.decision === "daan_allowed") return `${r.planet}: daan allowed for ${r.canDonate.join(", ")}`;
+          if (r.decision === "daan_avoid") return `${r.planet}: avoid donating ${r.doNotDonate.join(", ")}`;
+          return `${r.planet}: ${r.preferredCorrection.join(", ")}`;
+        }),
         ...lk.rins.slice(0, 2).map((r: any) => `${r.planet} Rin: ${r.upaya}`),
       ].slice(0, 5),
     });

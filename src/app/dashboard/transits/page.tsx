@@ -34,6 +34,30 @@ export default function TransitPage() {
   if (loading || !report) {
     return (
       <main className="tr-wrap">
+
+      <a
+        href="/dashboard/transits/ripple"
+        style={{
+          display: "block",
+          margin: "20px 0",
+          padding: "20px",
+          borderRadius: "20px",
+          border: "1px solid rgba(250,204,21,0.25)",
+          background: "rgba(250,204,21,0.08)",
+          color: "inherit",
+          textDecoration: "none",
+        }}
+      >
+        <p style={{ color: "#facc15", fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase", margin: 0 }}>
+          New Transit Intelligence
+        </p>
+        <h2 style={{ margin: "8px 0 6px" }}>Transit Ripple V4</h2>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>
+          Direct house impact, planetary aspects, full 12-house ripple map,
+          remedies, and premium book-style transit prediction.
+        </p>
+      </a>
+
         <div className="tr-shell">
           <EngineStateCard
             title="Transit Engine"

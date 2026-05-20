@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       engine: "Transit Purchase Guidance",
       version: "0.1.0",
-      safety: "Combines transit timing with derived Lal Kitab object/gift caution. Use with chart validation.",
+      safety:
+        "Combines standard Gochar transit timing with derived Lal Kitab object/gift caution. This is not Lal Kitab 35-sala chakra, varshphal, or monthly phal.",
       result,
     });
   } catch (error) {
