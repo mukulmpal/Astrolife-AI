@@ -46,7 +46,7 @@ export const LAL_KITAB_PURCHASE_RULES: LalKitabPurchaseRule[] = [
       "Saturn items can be used only with clean need, discipline and chart validation.",
     ],
     explanation:
-      "In Lal Kitab grammar, Saturn is linked with oldness, burden, labour, iron, leather, delay and karmic pressure. When Saturn is difficult by dasha or transit, these objects can behave as symbolic triggers for delay, repair cost, debt, loss or responsibility. This is not a blind ban; it becomes stronger only when natal promise, dasha and transit agree.",
+      "In Lal Kitab grammar, Saturn is linked with oldness, burden, labour, iron, leather, delay and karmic pressure. When Saturn is difficult by dasha and a separate Gochar overlay also shows pressure, these objects can behave as symbolic triggers for delay, repair cost, debt, loss or responsibility. This is not a blind ban; it becomes stronger only when natal promise, dasha and timing layers agree.",
     sourceBasis: [
       "Lal Kitab Amrit: Saturn remedies include urad, leather/chamda and iron/loha.",
       "U.C. Mahajan Lal Kitab: Saturn-linked business/items include iron, leather and machines in loss-risk context.",
@@ -122,7 +122,7 @@ export const LAL_KITAB_PURCHASE_RULES: LalKitabPurchaseRule[] = [
       "Avoid impulsive gadget upgrades.",
     ],
     favourableWhen: [
-      "Mercury dasha/transit supports 3rd/5th/9th/10th/11th.",
+      "Mercury dasha and separate Gochar support 3rd/5th/9th/10th/11th.",
       "Purchase supports learning, business or communication.",
     ],
     explanation:
@@ -188,7 +188,7 @@ function planetActive(input: LalKitabPurchaseInput, planet: LalKitabPlanet) {
   const houses = input.transitHouses?.[planet] ?? [];
   const difficult = houses.filter((house) => [6, 8, 12].includes(house));
   if (difficult.length > 0) {
-    triggers.push(`${planet} transit activating difficult house(s): ${difficult.join(", ")}`);
+    triggers.push(`${planet} Gochar overlay activating difficult house(s): ${difficult.join(", ")}`);
   }
 
   return triggers;

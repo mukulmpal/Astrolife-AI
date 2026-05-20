@@ -20,6 +20,39 @@ const COVER_OPTIONS: { value: ReportCover; label: string; desc: string }[] = [
   { value: "lagnalord",  label: "Lagna Lord Mandala", desc: "Chart-ruler deity mandala with Sanskrit labels" },
 ];
 
+const REPORT_FEATURES: Record<ReportOptions["type"], string[]> = {
+  full: [
+    "Lal Kitab Core Accuracy",
+    "Varshphal, 35-sala and Monthly Phal",
+    "Selective Remedy Intelligence",
+    "Dasha, yogas, divisional charts and health",
+  ],
+  kundli: [
+    "Birth chart and planet-by-planet pages",
+    "Lal Kitab Core Accuracy",
+    "Varshphal timing pages",
+    "Yogas, doshas, shadbala and divisional charts",
+  ],
+  remedy: [
+    "Current dasha remedy context",
+    "Lal Kitab daan allowed / daan avoid rules",
+    "Monthly phal and active nimit",
+    "Selective upaya without remedy overload",
+  ],
+  medical: [
+    "Health and preventive routine",
+    "Medical astrology risk patterns",
+    "Remedy support pages",
+    "Practical stabilizers",
+  ],
+  destiny: [
+    "Dasha and career timing",
+    "Yogas and destiny signals",
+    "Upcoming Mahadasha windows",
+    "Action-focused reading",
+  ],
+};
+
 export default function ReportPage() {
   const { chart, loading } = useUserChart();
   const [reportType, setReportType]   = useState<ReportOptions["type"]>("full");
@@ -116,6 +149,17 @@ export default function ReportPage() {
         .seg-btn:hover { border-color: rgba(200,160,48,0.5); }
         .seg-swatch { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
         .cover-desc { font-size: 11px; color: #605890; margin-top: 2px; }
+        .rep-preview { display:grid; grid-template-columns:1.1fr 0.9fr; gap:14px; align-items:stretch; }
+        .rep-panel { border:1px solid #211d48; background:linear-gradient(145deg, rgba(200,160,48,0.08), rgba(13,10,34,0.95)); border-radius:10px; padding:16px; }
+        .rep-panel-title { font-size:13px; font-weight:800; color:#f0e8d0; margin-bottom:8px; }
+        .rep-pill-row { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+        .rep-pill { border:1px solid rgba(200,160,48,0.32); color:#d9c782; background:rgba(200,160,48,0.08); border-radius:999px; padding:6px 9px; font-size:11px; font-weight:650; }
+        .rep-check-list { display:grid; gap:8px; margin-top:10px; }
+        .rep-check { display:flex; gap:8px; align-items:flex-start; font-size:12px; color:#cfc8e8; line-height:1.45; }
+        .rep-check-mark { width:17px; height:17px; border-radius:50%; background:#c8a030; color:#060410; font-size:11px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:900; }
+        @media (max-width: 720px) {
+          .rep-preview { grid-template-columns:1fr; }
+        }
       `}</style>
 
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
@@ -145,6 +189,36 @@ export default function ReportPage() {
                   : "🏥 Medical"}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Export Preview */}
+        <div className="rep-section">
+          <div className="rep-title">Premium Export Preview</div>
+          <div className="rep-preview">
+            <div className="rep-panel">
+              <div className="rep-panel-title">What this report will include</div>
+              <div className="rep-check-list">
+                {REPORT_FEATURES[reportType].map((feature) => (
+                  <div className="rep-check" key={feature}>
+                    <span className="rep-check-mark">✓</span>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rep-panel">
+              <div className="rep-panel-title">Lal Kitab report standard</div>
+              <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: 1.65 }}>
+                Full, Kundli and Remedy exports now carry separate Lal Kitab pages for natal planet condition, Varshphal reading, 35-sala chakra, monthly phal and daan/remedy decisions.
+              </div>
+              <div className="rep-pill-row">
+                <span className="rep-pill">Core Accuracy</span>
+                <span className="rep-pill">LK Gochar</span>
+                <span className="rep-pill">Daan Filter</span>
+                <span className="rep-pill">Descriptive Reading</span>
+              </div>
+            </div>
           </div>
         </div>
 

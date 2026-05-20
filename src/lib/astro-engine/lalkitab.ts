@@ -105,11 +105,49 @@ export interface LKKismat {
 
 export interface LKVarshphal {
   year:           number;
+  startDate:      string;
+  endDate:        string;
+  periodLabel:    string;
   yearShift:      number;
   lagnaSign:      string;
   shubhPlanets:   string[];
   cautionPlanets: string[];
   summary:        string;
+  chartRows:      LKVarshphalPlanet[];
+  annualPrediction: LKVarshphalPrediction;
+}
+
+export interface LKCoreAccuracyRow {
+  planet:       string;
+  sign:         string;
+  signShort:    string;
+  house:        number;
+  position:     "EXALTED" | "DEBILITATED" | "OWN_SIGN" | "FRIEND_SIGN" | "ENEMY_SIGN" | "NEUTRAL_SIGN";
+  soya:         boolean;
+  kismatJaganewala: boolean;
+  beneficMalefic: "Benefic" | "Malefic" | "Mixed";
+  reason:       string;
+}
+
+export interface LKVarshphalPlanet {
+  planet:       string;
+  natalHouse:   number;
+  varshHouse:   number;
+  sign:         string;
+  signShort:    string;
+  beneficMalefic: "Benefic" | "Malefic" | "Mixed";
+  soya:         boolean;
+  kismatJaganewala: boolean;
+  reading:      string;
+}
+
+export interface LKVarshphalPrediction {
+  headline: string;
+  career:   string;
+  money:    string;
+  family:   string;
+  health:   string;
+  remedy:   string;
 }
 
 export interface LKHouseOmen extends HouseOmenRule {
@@ -127,6 +165,7 @@ export interface LKResult {
   homeOmens:     LKHomeOmen[];
   houseOmens:    LKHouseOmen[];
   kismat:        LKKismat;
+  coreAccuracy:  LKCoreAccuracyRow[];
   varshphal:     LKVarshphal;
   summary:       string;
 }
@@ -148,6 +187,122 @@ const PCOL  = ["#f97316","#c084fc","#ef4444","#22c55e","#f59e0b","#ec4899","#60a
 
 const RASHIS_SA = ["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya",
                    "Tula","Vrishchika","Dhanu","Makara","Kumbha","Meena"];
+const SIGN_SHORT = ["Ar","Ta","Ge","Ca","Le","Vi","Li","Sc","Sg","Cp","Aq","Pi"];
+
+const EXALT_SIGN: Record<string,number> = {
+  Sun: 0, Moon: 1, Mars: 9, Mercury: 5, Jupiter: 3, Venus: 11, Saturn: 6, Rahu: 1, Ketu: 7,
+};
+
+const DEBIL_SIGN: Record<string,number> = {
+  Sun: 6, Moon: 7, Mars: 3, Mercury: 11, Jupiter: 9, Venus: 5, Saturn: 0, Rahu: 7, Ketu: 1,
+};
+
+const OWN_SIGNS: Record<string,number[]> = {
+  Sun: [4], Moon: [3], Mars: [0,7], Mercury: [2,5], Jupiter: [8,11], Venus: [1,6], Saturn: [9,10],
+  Rahu: [], Ketu: [],
+};
+
+function formatLKDate(date: Date) {
+  return date.toLocaleDateString("en-IN", { day: "numeric", month: "numeric", year: "numeric" });
+}
+
+function parseLKDate(value: string) {
+  const raw = String(value || "").trim();
+
+  const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) {
+    const [, y, m, d] = iso;
+    return new Date(Number(y), Number(m) - 1, Number(d));
+  }
+
+  const slash = raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})$/);
+  if (slash) {
+    const [, first, second, yearRaw] = slash;
+    const a = Number(first);
+    const b = Number(second);
+    const y = Number(yearRaw.length === 2 ? `20${yearRaw}` : yearRaw);
+    const day = b > 12 ? b : a;
+    const month = b > 12 ? a : b;
+    return new Date(y, month - 1, day);
+  }
+
+  return new Date(raw);
+}
+
+function getRunningVarsh(dob: string, target = new Date()) {
+  const birth = parseLKDate(dob);
+  const birthdayThisYear = new Date(target.getFullYear(), birth.getMonth(), birth.getDate());
+  const startYear = target >= birthdayThisYear ? target.getFullYear() : target.getFullYear() - 1;
+  const startDate = new Date(startYear, birth.getMonth(), birth.getDate());
+  const endDate = new Date(startYear + 1, birth.getMonth(), birth.getDate());
+  const completedYears = startYear - birth.getFullYear();
+  return { startYear, startDate, endDate, completedYears };
+}
+
+function planetPosition(planet: string, signNum: number): LKCoreAccuracyRow["position"] {
+  if (signNum === EXALT_SIGN[planet]) return "EXALTED";
+  if (signNum === DEBIL_SIGN[planet]) return "DEBILITATED";
+  if ((OWN_SIGNS[planet] || []).includes(signNum)) return "OWN_SIGN";
+  const signLord = ["Mars","Venus","Mercury","Moon","Sun","Mercury","Venus","Mars","Jupiter","Saturn","Saturn","Jupiter"][signNum];
+  if ((LK_FRIENDS[planet] || []).includes(signLord)) return "FRIEND_SIGN";
+  if ((LK_ENEMY_PLANET[planet] || []).includes(signLord)) return "ENEMY_SIGN";
+  return "NEUTRAL_SIGN";
+}
+
+function isSoyaPlanet(planet: string, status: LKPlanet["status"], state: LKPlanet["state"], position: LKCoreAccuracyRow["position"]) {
+  return status === "dushman" || state === "mandi" || position === "DEBILITATED" || ["Rahu","Ketu"].includes(planet);
+}
+
+function beneficMalefic(
+  planet: string,
+  house: number,
+  status: LKPlanet["status"],
+  state: LKPlanet["state"],
+  position: LKCoreAccuracyRow["position"],
+): LKCoreAccuracyRow["beneficMalefic"] {
+  if (state === "nek" || status === "pakka" || position === "EXALTED" || position === "OWN_SIGN") return "Benefic";
+  if (state === "mandi" || status === "dushman" || position === "DEBILITATED") return "Malefic";
+  if ([6,8,12].includes(house) && ["Saturn","Mars","Rahu","Ketu"].includes(planet)) return "Malefic";
+  if ([1,4,5,9,10,11].includes(house)) return "Benefic";
+  return "Mixed";
+}
+
+function coreReason(row: {
+  planet: string;
+  house: number;
+  status: LKPlanet["status"];
+  state: LKPlanet["state"];
+  position: LKCoreAccuracyRow["position"];
+  beneficMalefic: LKCoreAccuracyRow["beneficMalefic"];
+  kismatJaganewala: boolean;
+}) {
+  const parts = [
+    `${row.planet} H${row.house} mein hai`,
+    row.status === "pakka" ? "pakka ghar support deta hai" : row.status === "dushman" ? "dushman ghar challenge deta hai" : "sadharan ghar mixed phal deta hai",
+    row.position.replaceAll("_", " ").toLowerCase(),
+    row.state === "nek" ? "nek halat" : row.state === "mandi" ? "mandi halat" : "madhyam halat",
+  ];
+  if (row.kismatJaganewala) parts.push("kismat jagane wala grah");
+  return `${parts.join("; ")}. Isliye isko ${row.beneficMalefic} maana gaya.`;
+}
+
+function houseReading(house: number) {
+  const map: Record<number,string> = {
+    1: "self, health aur personality ka year",
+    2: "family, speech aur savings ka year",
+    3: "effort, courage, siblings aur skill ka year",
+    4: "home, mother, property aur emotional base ka year",
+    5: "education, children, intelligence aur judgement ka year",
+    6: "debt, disease, dispute aur service correction ka year",
+    7: "marriage, partnership, business dealing aur public image ka year",
+    8: "sudden change, hidden stress, repair aur ancestral correction ka year",
+    9: "fortune, dharma, guru, father aur blessings ka year",
+    10: "career, authority, karma aur public responsibility ka year",
+    11: "income, gains, network aur fulfilment ka year",
+    12: "expense, sleep, foreign, isolation aur spiritual correction ka year",
+  };
+  return map[house] || `House ${house} ka year`;
+}
 
 // Pakka Ghar (multi-house — for display)
 const LK_PAKKA: Record<string,number[]> = {
@@ -637,8 +792,8 @@ export function calculateLalKitab(
   lagnaNum = 0
 ): LKResult {
   const birthYear  = new Date(dob).getFullYear();
-  const currentYear= new Date().getFullYear();
-  const currentAge = currentYear - birthYear;
+  const runningVarsh = getRunningVarsh(dob);
+  const currentAge = runningVarsh.completedYears;
 
   // ── conditionScore ────────────────────────────────────
   function conditionScore(planet: string): { score: number; state: "nek"|"neutral"|"mandi" } {
@@ -812,7 +967,7 @@ export function calculateLalKitab(
   );
 
   // ── Combinations ──────────────────────────────────────
-  const activeCombinations: LKCombination[] = COMBINATION_RULES.filter(rule => {
+  const ruledCombinations: LKCombination[] = COMBINATION_RULES.filter(rule => {
     const p1 = planets[rule.planets[0]];
     const p2 = planets[rule.planets[1]];
     return p1 && p2 && p1.house === p2.house;
@@ -826,6 +981,30 @@ export function calculateLalKitab(
     strengths:  rule.strengths,
     remedies:   rule.remedies,
   }));
+  const ruledPairs = new Set(ruledCombinations.map(rule => [...rule.planets].sort().join("-")));
+  const genericCombinations: LKCombination[] = [];
+  for (let i = 0; i < PLS.length; i += 1) {
+    for (let j = i + 1; j < PLS.length; j += 1) {
+      const p1 = PLS[i];
+      const p2 = PLS[j];
+      if (!planets[p1] || !planets[p2]) continue;
+      if (planets[p1].house !== planets[p2].house) continue;
+      const pairKey = [p1, p2].sort().join("-");
+      if (ruledPairs.has(pairKey)) continue;
+      const house = planets[p1].house;
+      genericCombinations.push({
+        id: `generic_${p1.toLowerCase()}_${p2.toLowerCase()}_h${house}`,
+        planets: [p1, p2],
+        title: `${p1} + ${p2} in House ${house}`,
+        prediction: `${p1} aur ${p2} ek hi Lal Kitab ghar mein baithkar H${house} ke phal ko milate hain. Yeh combination strong tab maana jayega jab dono grahon ki state, pakka/dushman ghar aur takkar relation bhi same direction mein signal dein.`,
+        psychology: `Native ke andar ${p1} ki pravritti aur ${p2} ki pravritti ek saath react karti hain; isliye decisions mein mixed behaviour, sudden reaction ya double strength dikh sakti hai.`,
+        risks: ["mixed results if one planet is mandi", "confusion if planets are mutual enemies", "wrong remedy can disturb the better planet"],
+        strengths: ["double activation of one life area", "faster results when both planets are supportive", "clear nimit from that house"],
+        remedies: ["judge both planets separately first", "avoid blind daan", "use soft conduct correction before material remedy"],
+      });
+    }
+  }
+  const activeCombinations = [...ruledCombinations, ...genericCombinations];
 
   // ── Home Omens ────────────────────────────────────────
   const homeOmens: LKHomeOmen[] = HOME_OMEN_RULES.map((rule) => ({
@@ -854,8 +1033,35 @@ export function calculateLalKitab(
     interpretation: `${topKismat.planet} in H${topKismat.house} acts as your major fortune activator. Strengthen its positive behaviour before using material remedies.`,
   };
 
+  const coreAccuracy: LKCoreAccuracyRow[] = lkPlanets.map((planet) => {
+    const pd = planets[planet.planet];
+    const position = planetPosition(planet.planet, pd.signNum);
+    const soya = isSoyaPlanet(planet.planet, planet.status, planet.state, position);
+    const kismatJaganewala = planet.planet === kismat.planet || planet.isActNow || planet.state === "nek";
+    const bm = beneficMalefic(planet.planet, planet.house, planet.status, planet.state, position);
+    return {
+      planet: planet.planet,
+      sign: planet.sign,
+      signShort: SIGN_SHORT[pd.signNum] ?? planet.sign.slice(0, 2),
+      house: planet.house,
+      position,
+      soya,
+      kismatJaganewala,
+      beneficMalefic: bm,
+      reason: coreReason({
+        planet: planet.planet,
+        house: planet.house,
+        status: planet.status,
+        state: planet.state,
+        position,
+        beneficMalefic: bm,
+        kismatJaganewala,
+      }),
+    };
+  });
+
   // ── Varshphal ─────────────────────────────────────────
-  const yearShift = (currentYear - birthYear) % 12;
+  const yearShift = ((runningVarsh.completedYears % 12) + 12) % 12;
   const varshLagna = (lagnaNum + yearShift) % 12;
   const varshHits = PLS.map(p => {
     if (!planets[p]) return null;
@@ -864,20 +1070,63 @@ export function calculateLalKitab(
     return { planet: p, natalH, vh };
   }).filter(Boolean) as { planet:string; natalH:number; vh:number }[];
 
-  const shubhPlanets  = varshHits.filter(x => [1,4,7,10,11].includes(x.vh) && ["Jupiter","Venus","Moon","Mercury"].includes(x.planet)).map(x => x.planet);
-  const cautionPlanets= varshHits.filter(x => [6,8,12].includes(x.vh)       && ["Saturn","Mars","Rahu","Ketu"].includes(x.planet)).map(x => x.planet);
+  const varshRows: LKVarshphalPlanet[] = varshHits.map((hit) => {
+    const core = coreAccuracy.find(row => row.planet === hit.planet);
+    const pd = planets[hit.planet];
+    const shiftedCondition = beneficMalefic(
+      hit.planet,
+      hit.vh,
+      core?.beneficMalefic === "Benefic" ? "pakka" : core?.beneficMalefic === "Malefic" ? "dushman" : "sadharan",
+      core?.beneficMalefic === "Benefic" ? "nek" : core?.beneficMalefic === "Malefic" ? "mandi" : "neutral",
+      core?.position ?? planetPosition(hit.planet, pd.signNum),
+    );
+    return {
+      planet: hit.planet,
+      natalHouse: hit.natalH,
+      varshHouse: hit.vh,
+      sign: pd.sign,
+      signShort: SIGN_SHORT[pd.signNum] ?? pd.sign.slice(0, 2),
+      beneficMalefic: shiftedCondition,
+      soya: Boolean(core?.soya),
+      kismatJaganewala: Boolean(core?.kismatJaganewala),
+      reading: `${hit.planet} natal H${hit.natalH} se Varshphal H${hit.vh} mein shift hota hai. ${houseReading(hit.vh)}. Iska annual condition ${shiftedCondition} read hoga, natal condition ko ignore nahi karna.`,
+    };
+  });
+
+  const shubhPlanets  = varshRows.filter(x => x.beneficMalefic === "Benefic" && [1,4,7,10,11].includes(x.varshHouse)).map(x => x.planet);
+  const cautionPlanets= varshRows.filter(x => x.beneficMalefic === "Malefic" || [6,8,12].includes(x.varshHouse)).map(x => x.planet);
+  const strongAnnual = varshRows.filter(row => row.kismatJaganewala || row.beneficMalefic !== "Mixed").slice(0, 3);
+  const annualPrediction: LKVarshphalPrediction = {
+    headline:
+      `Is Varshphal mein lagna ${RASHIS_SA[varshLagna]} shift hota hai aur year focus ${houseReading(((yearShift % 12) + 1))} par aata hai. ${strongAnnual.length ? `${strongAnnual.map(row => `${row.planet} H${row.varshHouse}`).join(", ")} sabse zyada visible rahenge.` : "Year ka result balanced rahega, koi ek grah excessively loud nahi."}`,
+    career:
+      `Career reading mein H10, H11, H6 aur active grahon ko priority milegi. ${varshRows.filter(row => [6,10,11].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Koi direct work-house trigger loud nahi"}; isliye kaam mein discipline, documentation aur timing ko pakadna zaroori hai.`,
+    money:
+      `Money reading H2, H11, H8 aur H12 se niklegi. ${varshRows.filter(row => [2,8,11,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Money houses par direct heavy trigger nahi"}; unnecessary debt, impulsive luxury aur unclear documentation avoid karein.`,
+    family:
+      `Family reading H2, H4, H7 aur H9 se dekhi gayi. ${varshRows.filter(row => [2,4,7,9].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Family houses balanced hain"}; parents, spouse, home peace aur guru/father blessings ko year ke nimit maana jayega.`,
+    health:
+      `Health reading H1, H6, H8 aur H12 se dekhi gayi. ${varshRows.filter(row => [1,6,8,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Major health warning loud nahi"}; sleep, digestion, stress aur chronic patterns par early correction rakhein.`,
+    remedy:
+      `Remedy rule simple hai: Varshphal sirf timing batata hai, daan ka final decision natal Lal Kitab condition se hoga. Supportive grah ki core vastu daan avoid; challenged grah ki vastu controlled tareeke se, bina fear ke.`,
+  };
 
   const varshphal: LKVarshphal = {
-    year:      currentYear,
+    year:      runningVarsh.startYear,
+    startDate: formatLKDate(runningVarsh.startDate),
+    endDate:   formatLKDate(runningVarsh.endDate),
+    periodLabel: `${formatLKDate(runningVarsh.startDate)} to ${formatLKDate(runningVarsh.endDate)}`,
     yearShift,
     lagnaSign: RASHIS_SA[varshLagna],
     shubhPlanets,
     cautionPlanets,
+    chartRows: varshRows,
+    annualPrediction,
     summary: shubhPlanets.length
-      ? `${currentYear} mein ${shubhPlanets.join(", ")} shubh phal de sakte hain.${cautionPlanets.length ? ` ${cautionPlanets.join(", ")} se savdhaan rahein.` : ""}`
+      ? `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${shubhPlanets.join(", ")} shubh phal de sakte hain.${cautionPlanets.length ? ` ${cautionPlanets.join(", ")} se savdhaan rahein.` : ""}`
       : cautionPlanets.length
-        ? `${currentYear} mein ${cautionPlanets.join(", ")} se savdhaan rahein. Upaya karein.`
-        : `${currentYear} ka chart balanced hai — koi bada shubh ya ashubh pattern nahi.`,
+        ? `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${cautionPlanets.join(", ")} se savdhaan rahein. Upaya chart-specific rakhein.`
+        : `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak balanced hai — koi bada shubh ya ashubh pattern loud nahi.`,
   };
 
   // ── Summary ───────────────────────────────────────────
@@ -902,5 +1151,5 @@ export function calculateLalKitab(
     };
   });
 
-  return { planets: lkPlanets, takkars, rins, hasPitraRin, combinations: activeCombinations, homeOmens, houseOmens, kismat, varshphal, summary };
+  return { planets: lkPlanets, takkars, rins, hasPitraRin, combinations: activeCombinations, homeOmens, houseOmens, kismat, coreAccuracy, varshphal, summary };
 }

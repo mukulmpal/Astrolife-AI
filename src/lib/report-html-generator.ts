@@ -7,6 +7,7 @@
 import type { ChartData } from "./astro-engine/calculations";
 import { calculateRemedies } from "./astro-engine/remedy";
 import { calculateLalKitab } from "./astro-engine/lalkitab";
+import { calculateLalKitabTimeEngine } from "./lal-kitab";
 import {
   composeVedicParagraph,
   composeLKParagraph,
@@ -30,6 +31,7 @@ import { calculateDivisional, getNavamshaAnalysis, getDashamshaAnalysis } from "
 import { calculateMedical } from "./astro-engine/medical";
 import { calculatePsychology } from "./astro-engine/psychology";
 import { calculateNumerology } from "./astro-engine/numerology";
+import { calculateAshtakavarga } from "./astro-engine/ashtakavarga";
 
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
@@ -1314,6 +1316,138 @@ function page8UpcomingDashas(chart: ChartData): string {
 </section>`;
 }
 
+// ── Lal Kitab Premium Pages ───────────────────────────────────────────────
+
+function pageLalKitabCoreAccuracy(chart: ChartData): string {
+  const lk = calculateLalKitab(chart.planets, chart.dob, chart.lagnaNum ?? 0);
+  const benefic = lk.coreAccuracy.filter(row => row.beneficMalefic === "Benefic");
+  const malefic = lk.coreAccuracy.filter(row => row.beneficMalefic === "Malefic");
+
+  const rows = lk.coreAccuracy.map(row => {
+    const badge = row.beneficMalefic === "Benefic" ? "jade" : row.beneficMalefic === "Malefic" ? "crimson" : "saffron";
+    return `<tr>
+      <td>${esc(row.planet)}</td>
+      <td>${esc(row.signShort)} · H${row.house}</td>
+      <td>${esc(row.position.replaceAll("_", " "))}</td>
+      <td>${row.soya ? "Yes" : "No"}</td>
+      <td>${row.kismatJaganewala ? "Yes" : "No"}</td>
+      <td><span class="badge ${badge}" style="font-size:8px;">${esc(row.beneficMalefic)}</span></td>
+    </tr>`;
+  }).join("");
+
+  const headline = malefic.length > benefic.length
+    ? "This chart needs selective correction, not remedy overload."
+    : "This chart has usable planetary support; remedies must protect the helpful planets first.";
+
+  return `<section class="page dense">
+  <div class="starfield"></div>
+  <div class="glow-tl"></div>
+  ${pageRail("Lal Kitab · Core Accuracy", "LK-1")}
+
+  <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+    <div class="section-title" style="margin-bottom:14px;">
+      <span class="section-num">LK</span>
+      <h2>Lal Kitab Core Accuracy</h2>
+    </div>
+
+    <div class="card gold-edge" style="margin-bottom:16px;">
+      <div class="kicker" style="margin-bottom:6px;">Benefic / Malefic Verification</div>
+      <div class="body" style="font-size:14px;line-height:1.7;">${esc(headline)} Daan is not shown for every planet. The report first checks whether the natal Lal Kitab condition is supportive, mixed or challenging, then gives guidance only where correction is meaningful.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+      <div class="card"><div class="kicker">Supportive</div><div class="display-s" style="color:var(--jade);">${benefic.length}</div><div class="body-s">${esc(benefic.map(p => p.planet).join(", ") || "None")}</div></div>
+      <div class="card"><div class="kicker">Needs Care</div><div class="display-s" style="color:var(--crimson);">${malefic.length}</div><div class="body-s">${esc(malefic.map(p => p.planet).join(", ") || "None")}</div></div>
+      <div class="card"><div class="kicker">Kismat Trigger</div><div class="display-s" style="color:var(--gold);">${esc(lk.kismat.planet)}</div><div class="body-s">H${lk.kismat.house} · Score ${lk.kismat.score}</div></div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;font-size:10.5px;">
+      <thead>
+        <tr style="color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Planet</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Sign / House</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Position</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Soya</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Jaganewala</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Result</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="body-s" style="margin-top:14px;line-height:1.65;">${esc(lk.summary)}</div>
+  </div>
+
+  ${pageFoot("astrolife · lal kitab engine", "Core Accuracy")}
+</section>`;
+}
+
+function pageLalKitabTimingAndRemedy(chart: ChartData): string {
+  const lk = calculateLalKitab(chart.planets, chart.dob, chart.lagnaNum ?? 0);
+  const time = calculateLalKitabTimeEngine({
+    dob: chart.dob,
+    planets: chart.planets,
+    lagnaNum: chart.lagnaNum ?? 0,
+    targetDate: new Date(),
+  });
+
+  const annual = lk.varshphal.annualPrediction;
+  const remedies = time.remedyGuidance.slice(0, 4).map(item => {
+    const badge = item.condition === "supportive" ? "jade" : item.condition === "challenging" ? "crimson" : "saffron";
+    const decision = item.decision === "daan_allowed"
+      ? `Can donate: ${item.canDonate.join(", ")}`
+      : item.decision === "daan_avoid"
+        ? `Do not donate: ${item.doNotDonate.join(", ")}`
+        : `Soft correction: ${item.preferredCorrection.join(", ")}`;
+
+    return `<div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${esc(item.planet)} · H${item.natalHouse}</div>
+          <div class="body-s" style="margin-top:3px;">${esc(decision)}</div>
+        </div>
+        <span class="badge ${badge}" style="font-size:8px;">${esc(item.condition)}</span>
+      </div>
+      <div class="body-s" style="margin-top:8px;line-height:1.55;">${esc(item.detailedExplanation)}</div>
+    </div>`;
+  }).join("");
+
+  return `<section class="page dense">
+  <div class="starfield"></div>
+  <div class="glow-br"></div>
+  ${pageRail("Lal Kitab · Timing & Remedy", "LK-2")}
+
+  <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+    <div class="section-title" style="margin-bottom:14px;">
+      <span class="section-num">LK</span>
+      <h2>Varshphal, Monthly Phal &amp; Remedy</h2>
+    </div>
+
+    <div class="card gold-edge" style="margin-bottom:12px;">
+      <div class="kicker" style="margin-bottom:5px;">Varshphal · ${esc(lk.varshphal.periodLabel)}</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);margin-bottom:6px;">${esc(annual.headline)}</div>
+      <div class="body-s" style="line-height:1.6;">${esc(annual.career)} ${esc(annual.money)} ${esc(annual.family)} ${esc(annual.health)} ${esc(annual.remedy)}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div class="card">
+        <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">35-Sala Chakra</div>
+        <div class="body-s" style="line-height:1.62;">${esc(time.thirtyFiveYearChakra.overview)} ${esc(time.thirtyFiveYearChakra.houseExplanation)} ${esc(time.thirtyFiveYearChakra.planetActivationExplanation)}</div>
+      </div>
+      <div class="card">
+        <div class="kicker" style="margin-bottom:6px;color:var(--violet);">Monthly Phal</div>
+        <div class="body-s" style="line-height:1.62;">${esc(time.monthlyPhal.overview)} ${esc(time.monthlyPhal.moneyCareer)} ${esc(time.monthlyPhal.familyHealth)}</div>
+      </div>
+    </div>
+
+    <div class="kicker" style="margin-bottom:8px;color:var(--jade);">Selective Remedy Intelligence</div>
+    ${remedies || `<div class="card"><div class="body-s">No urgent Lal Kitab remedy correction is required in this pass.</div></div>`}
+  </div>
+
+  ${pageFoot("astrolife · lal kitab engine", "Timing & Remedy")}
+</section>`;
+}
+
 // ── Page 9: Remedies ──────────────────────────────────────────────────────
 
 function page9Remedies(chart: ChartData): string {
@@ -2217,6 +2351,219 @@ function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string): stri
   </section>`;
 }
 
+// ============================================================
+// PHASE 3 — Life Areas, Ashtakavarga, Antardasha
+// ============================================================
+
+interface LifeAreaConfig {
+  title: string;
+  pageLabel: string;
+  houses: number[];     // primary houses governing this area
+  karakas: string[];    // natural significator planets
+  intro: string;        // what this area covers
+  guidance: string;     // closing reflection
+}
+
+const SIGNS_ARR = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const SIGN_RULER_FULL: Record<string,string> = {
+  Aries:"Mars",Taurus:"Venus",Gemini:"Mercury",Cancer:"Moon",Leo:"Sun",Virgo:"Mercury",
+  Libra:"Venus",Scorpio:"Mars",Sagittarius:"Jupiter",Capricorn:"Saturn",Aquarius:"Saturn",Pisces:"Jupiter",
+};
+
+function pageLifeArea(chart: ChartData, cfg: LifeAreaConfig, pageNum: string): string {
+  // Assess each governing house
+  const houseRows = cfg.houses.map(h => {
+    const signIdx = ((chart.lagnaNum + (h - 1)) % 12 + 12) % 12;
+    const sign = SIGNS_ARR[signIdx];
+    const lord = SIGN_RULER_FULL[sign];
+    const lordPd = chart.planets[lord];
+    const occupants = Object.entries(chart.planets).filter(([, pd]) => pd.house === h).map(([n]) => n);
+    const hp = HOUSE_PROFILE[h];
+    return `<div class="card" style="padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-bright);">House ${h} · ${esc(sign)}</div>
+        <div class="kicker" style="font-size:8px;">${esc(hp?.name.split(" · ")[1] ?? "")}</div>
+      </div>
+      <div class="body-s">Lord <strong style="color:var(--ivory);">${esc(lord)}</strong>${lordPd ? ` in ${esc(lordPd.sign)} (H${lordPd.house}) · ${esc(lordPd.dignity)}` : ""}.
+      ${occupants.length > 0 ? ` Occupied by <strong style="color:var(--gold);">${occupants.map(esc).join(", ")}</strong>.` : " No occupants."}</div>
+    </div>`;
+  }).join("");
+
+  const karakaRows = cfg.karakas.map(k => {
+    const pd = chart.planets[k];
+    if (!pd) return "";
+    const dl = pd.dignity.toLowerCase();
+    const dc = dl.includes("exalt") ? "var(--jade)" : dl.includes("debilit") ? "var(--crimson)" : dl.includes("own") || dl.includes("sva") ? "var(--gold)" : "var(--violet)";
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line);">
+      <span class="body-s"><strong style="color:var(--ivory);">${esc(k)}</strong> · ${esc(pd.sign)} H${pd.house}</span>
+      <span class="body-s" style="color:${dc};">${esc(pd.dignity)}</span>
+    </div>`;
+  }).join("");
+
+  return `<section class="page dense">
+    ${pageRail(cfg.title, pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">✦</span>
+        <h2>${esc(cfg.title)}</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:16px;max-width:600px;line-height:1.6;">${esc(cfg.intro)}</div>
+
+      <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Governing Houses</div>
+      ${houseRows}
+
+      <div class="card gold-edge" style="margin-top:6px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Natural Significators (Karakas)</div>
+        ${karakaRows || `<div class="body-s">Significator data unavailable.</div>`}
+      </div>
+
+      <div class="body-s" style="margin-top:auto;padding-top:12px;color:var(--ivory-mute);font-style:italic;line-height:1.6;">${esc(cfg.guidance)}</div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", cfg.pageLabel)}
+  </section>`;
+}
+
+const LIFE_AREAS: LifeAreaConfig[] = [
+  {
+    title: "Career & Profession", pageLabel: "Career",
+    houses: [10, 1, 6], karakas: ["Sun", "Saturn", "Mercury"],
+    intro: "Your professional life is read primarily from the 10th house (karma, status), supported by the 1st (drive, self) and 6th (daily work, service). The lords of these houses and the natural karakas of work reveal the shape of your vocation.",
+    guidance: "Career is not fixed by the chart — it is a field of probability. Where significators are strong, momentum comes easily; where they need support, conscious effort and the right timing (dasha) unlock the same potential.",
+  },
+  {
+    title: "Wealth & Finances", pageLabel: "Wealth",
+    houses: [2, 11, 5], karakas: ["Jupiter", "Venus", "Mercury"],
+    intro: "Wealth flows through the 2nd house (accumulated assets, savings), the 11th (gains, income, fulfilled desires), and the 5th (speculation, intelligence applied to money). Jupiter is the prime karaka of prosperity.",
+    guidance: "Sustainable wealth comes from aligning earning with dharma. Strong 2nd and 11th lords indicate capacity; the dasha sequence indicates timing of the major financial chapters.",
+  },
+  {
+    title: "Marriage & Relationships", pageLabel: "Marriage",
+    houses: [7, 2, 11], karakas: ["Venus", "Jupiter", "Moon"],
+    intro: "Partnership is governed by the 7th house (spouse, union), with the 2nd (family expansion) and 11th (fulfilment of desire) as supports. Venus signifies love and harmony for all; Jupiter signifies the husband in a woman's chart.",
+    guidance: "Relationship karma is among the most workable in the chart. Awareness of one's own patterns — shown by the 7th lord and its placement — is the first remedy. The Navamsa (D9) refines this reading further.",
+  },
+  {
+    title: "Family & Home", pageLabel: "Family",
+    houses: [4, 2, 9], karakas: ["Moon", "Venus", "Sun"],
+    intro: "The 4th house is the seat of mother, home, and emotional security; the 2nd governs the immediate family unit; the 9th governs the father and lineage. Together they describe your roots and domestic life.",
+    guidance: "The home is the foundation of inner peace (sukha). When the 4th house and Moon are supported, domestic life nourishes; when stressed, conscious cultivation of a peaceful home environment becomes the practice.",
+  },
+  {
+    title: "Children & Creativity", pageLabel: "Children",
+    houses: [5, 9, 2], karakas: ["Jupiter"],
+    intro: "The 5th house governs progeny, creative intelligence, and purva-punya (past-life merit); the 9th supports through fortune and dharma; the 2nd through family continuity. Jupiter is the karaka of children.",
+    guidance: "The 5th house is the house of joy and creative output, whether through children or works of the mind and heart. Its strength shows where your generative energy flows most naturally.",
+  },
+  {
+    title: "Education & Intellect", pageLabel: "Education",
+    houses: [4, 5, 9], karakas: ["Mercury", "Jupiter"],
+    intro: "Learning is read from the 4th house (foundational education, degrees), the 5th (intelligence, application), and the 9th (higher knowledge, wisdom). Mercury governs analytical skill; Jupiter governs wisdom and higher learning.",
+    guidance: "Education is a lifelong arc in Vedic thought. Mercury's condition shows your learning style; Jupiter's shows the depth of wisdom you can ultimately embody.",
+  },
+  {
+    title: "Spirituality & Dharma", pageLabel: "Spirituality",
+    houses: [9, 12, 5], karakas: ["Jupiter", "Ketu", "Sun"],
+    intro: "The spiritual axis runs through the 9th house (dharma, guru, higher purpose), the 12th (moksha, liberation, surrender), and the 5th (mantra, past-life merit). Jupiter is the karaka of wisdom; Ketu of liberation.",
+    guidance: "Spirituality in the chart is not about belief but about the soul's trajectory toward liberation. A strong 9th-12th axis indicates a life where the inner journey carries real weight and reward.",
+  },
+  {
+    title: "Health & Longevity", pageLabel: "Longevity",
+    houses: [1, 8, 6], karakas: ["Sun", "Saturn", "Moon"],
+    intro: "Vitality is read from the 1st house (body, constitution), longevity from the 8th (lifespan, resilience), and health challenges from the 6th (disease, recovery). Sun governs vitality; Saturn governs endurance and the ageing process.",
+    guidance: "This is astrological analysis, not medical advice. The chart shows constitutional tendencies and timing of vulnerability — always paired with the understanding that lifestyle and conscious care are the sovereign remedies.",
+  },
+];
+
+// ── Ashtakavarga ──────────────────────────────────────────────────────────
+
+function pageAshtakavarga(chart: ChartData, pageNum: string): string {
+  const akv = calculateAshtakavarga(
+    chart.planets as Parameters<typeof calculateAshtakavarga>[0],
+    chart.lagnaNum
+  );
+
+  const houseBars = akv.houses.map(h => {
+    const pct = Math.min(100, Math.round((h.score / 8) * 100));
+    return `<div style="display:grid;grid-template-columns:30px 1fr 36px;align-items:center;gap:8px;padding:3px 0;">
+      <span class="mono body-s" style="color:var(--gold-dim);">H${h.house}</span>
+      <div style="height:8px;background:var(--line);border-radius:99px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${h.color};border-radius:99px;"></div>
+      </div>
+      <span class="mono body-s" style="text-align:right;color:${h.color};font-weight:600;">${h.score}</span>
+    </div>`;
+  }).join("");
+
+  return `<section class="page dense">
+    ${pageRail("Ashtakavarga · Bindu Strength", pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">AV</span>
+        <h2>Ashtakavarga</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:16px;max-width:620px;line-height:1.6;">
+        Ashtakavarga assigns benefic points (bindus) to each house from the perspective of all seven planets plus the Lagna. The Sarvashtakavarga total per house reveals which life areas carry the most natural support. Total across the chart: <strong style="color:var(--gold);">${akv.sarvaTotal}</strong> bindus (classical average 337).
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="kicker" style="margin-bottom:10px;color:var(--saffron);">House Strength (Sarvashtakavarga)</div>
+        ${houseBars}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="card" style="border-color:rgba(111,181,138,0.3);">
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Strongest Life Areas</div>
+          ${akv.topLifeAreas.slice(0, 4).map(a => `<div class="body-s" style="margin-bottom:3px;">• ${esc(a)}</div>`).join("") || `<div class="body-s">—</div>`}
+        </div>
+        <div class="card" style="border-color:rgba(201,85,95,0.25);">
+          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">Needs Support</div>
+          ${akv.weakLifeAreas.slice(0, 4).map(a => `<div class="body-s" style="margin-bottom:3px;">• ${esc(a)}</div>`).join("") || `<div class="body-s">—</div>`}
+        </div>
+      </div>
+      <div class="body-s" style="margin-top:auto;padding-top:12px;color:var(--ivory-mute);line-height:1.6;">${esc(akv.lifeSummary)}</div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Ashtakavarga")}
+  </section>`;
+}
+
+// ── Antardasha Detail (sub-periods of active Mahadasha) ───────────────────
+
+function pageAntardashaDetail(chart: ChartData, pageNum: string): string {
+  const activeMD = chart.dashas.find(d => d.active) ?? chart.dashas[0];
+  const ads = chart.antardasha.slice(0, 9); // full antardasha sequence
+
+  if (ads.length === 0) {
+    return `<section class="page dense">${pageRail("Antardasha Sequence", pageNum)}<div class="body" style="padding-top:24px;">No antardasha data available.</div>${pageFoot("astrolife · cosmic blueprint", "Antardasha")}</section>`;
+  }
+
+  const rows = ads.map(ad => {
+    const pd = chart.planets[ad.planet];
+    const interp = pd ? getMahadashaInterpretation(ad.planet, pd.house, pd.dignity) : null;
+    const isActive = ad.active;
+    return `<div class="card${isActive ? " gold-edge" : ""}" style="padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:${isActive ? "var(--gold-bright)" : "var(--ivory)"};">
+          ${esc(activeMD?.planet ?? "")}–${esc(ad.planet)} ${isActive ? "<span class='badge' style='font-size:8px;'>Active</span>" : ""}
+        </div>
+        <div class="mono body-s" style="color:var(--ivory-mute);">${formatDateShort(new Date(ad.start))} — ${formatDateShort(new Date(ad.end))}</div>
+      </div>
+      ${interp ? `<div class="body-s" style="line-height:1.55;">${esc(interp.overview.slice(0, 240))}${interp.overview.length > 240 ? "…" : ""}</div>` : ""}
+    </div>`;
+  }).join("");
+
+  return `<section class="page dense">
+    ${pageRail("Antardasha Sequence · " + (activeMD?.planet ?? "") + " Mahadasha", pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">AD</span>
+        <h2>Antardasha Sequence</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:14px;max-width:600px;line-height:1.6;">
+        Within the ${esc(activeMD?.planet ?? "")} Mahadasha, nine sub-periods (antardashas) unfold in sequence — each colouring the larger period with its own planetary flavour. This is the finer texture of your current time-map.
+      </div>
+      ${rows}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Antardasha")}
+  </section>`;
+}
+
 // ── Master HTML builder ───────────────────────────────────────────────────
 
 export function generateReportHTML(chart: ChartData, options?: Partial<ReportOptions>): string {
@@ -2254,7 +2601,12 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     health:      t === "full" || t === "medical",
     psychology:  t === "full",
     numerology:  t === "full",
+    lalkitab:    t === "full" || t === "kundli" || t === "remedy",
     remedies:    t === "full" || t === "remedy" || t === "medical",
+    // Phase 3
+    ashtakavarga: t === "full" || t === "kundli",
+    antardasha:   t === "full" || t === "remedy" || t === "destiny",
+    lifeAreas:    t === "full" || t === "destiny",
   };
 
   // Per-planet deep-dive pages (Phase 2). Page numbers are cosmetic labels.
@@ -2266,6 +2618,11 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
   // Per-house deep-dive pages (Phase 2) — all 12 bhavas.
   const perHousePages = include.perHouse
     ? Array.from({ length: 12 }, (_, i) => safe(() => pagePerHouse(chart, i + 1, String(16 + i)), `House:${i + 1}`))
+    : [];
+
+  // Life-area pages (Phase 3) — 8 areas.
+  const lifeAreaPages = include.lifeAreas
+    ? LIFE_AREAS.map((cfg, i) => safe(() => pageLifeArea(chart, cfg, String(40 + i)), `LifeArea:${cfg.pageLabel}`))
     : [];
 
   const pages = [
@@ -2280,10 +2637,15 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.yogas      ? safe(() => pageYogas(chart),       "Yogas")           : "",
     include.doshas     ? safe(() => pageDoshas(chart),      "Doshas")          : "",
     include.shadbala   ? safe(() => pageShadbala(chart),    "Shadbala")        : "",
+    include.ashtakavarga ? safe(() => pageAshtakavarga(chart, "Av"), "Ashtakavarga") : "",
     include.divisional ? safe(() => pageDivisional(chart),  "Divisional")      : "",
     include.dasha      ? safe(() => page7CurrentDasha(chart),  "Current Dasha")  : "",
     include.dasha      ? safe(() => page8UpcomingDashas(chart),"Upcoming Dashas"): "",
+    include.antardasha ? safe(() => pageAntardashaDetail(chart, "Ad"), "Antardasha") : "",
+    include.lalkitab   ? safe(() => pageLalKitabCoreAccuracy(chart), "Lal Kitab Core Accuracy") : "",
+    include.lalkitab   ? safe(() => pageLalKitabTimingAndRemedy(chart), "Lal Kitab Timing & Remedy") : "",
     include.nakshatra  ? safe(() => pageNakshatra(chart),   "Nakshatra")       : "",
+    ...lifeAreaPages,
     include.health     ? safe(() => pageHealth(chart),      "Health")          : "",
     include.psychology ? safe(() => pagePsychology(chart),  "Psychology")      : "",
     include.numerology ? safe(() => pageNumerology(chart),  "Numerology")      : "",
