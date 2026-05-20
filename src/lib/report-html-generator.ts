@@ -1924,6 +1924,299 @@ function pageNakshatra(chart: ChartData): string {
   </section>`;
 }
 
+// ============================================================
+// PHASE 2 — Per-Planet & Per-House Deep Dives
+// ============================================================
+
+interface PlanetProfile {
+  karaka: string;        // what it signifies
+  domain: string;        // life areas
+  strongTrait: string;   // when well-placed
+  weakTrait: string;     // when afflicted
+  body: string;          // body part governed
+  day: string;           // weekday
+  color: string;         // colour
+  gem: string;           // gemstone
+  metal: string;         // metal
+  direction: string;     // direction
+}
+
+const PLANET_PROFILE: Record<string, PlanetProfile> = {
+  Sun: {
+    karaka: "Soul, ego, father, authority, vitality, government",
+    domain: "Self-expression, leadership, status, the father, bones & heart",
+    strongTrait: "Confident, principled, naturally commanding, radiant health and clear purpose",
+    weakTrait: "Ego friction, authority clashes, low vitality, strained relationship with father",
+    body: "Heart, eyes, spine, general vitality",
+    day: "Sunday", color: "Red / Copper-gold", gem: "Ruby", metal: "Gold / Copper", direction: "East",
+  },
+  Moon: {
+    karaka: "Mind, emotions, mother, nourishment, the public",
+    domain: "Emotional life, intuition, the mother, fluids, comfort and home",
+    strongTrait: "Emotionally intelligent, nurturing, intuitive, popular and adaptable",
+    weakTrait: "Mood swings, anxiety, emotional dependency, mother-related karma",
+    body: "Mind, blood, fluids, chest, stomach",
+    day: "Monday", color: "White / Silver", gem: "Pearl / Moonstone", metal: "Silver", direction: "North-West",
+  },
+  Mars: {
+    karaka: "Energy, courage, siblings, land, drive, conflict",
+    domain: "Action, ambition, brothers, property, blood and muscle",
+    strongTrait: "Courageous, disciplined, decisive, protective and physically vigorous",
+    weakTrait: "Anger, impulsiveness, accidents, disputes and inflammation",
+    body: "Muscles, blood, bone marrow, reproductive system",
+    day: "Tuesday", color: "Red / Coral", gem: "Red Coral", metal: "Copper", direction: "South",
+  },
+  Mercury: {
+    karaka: "Intellect, speech, communication, commerce, skill",
+    domain: "Logic, learning, business, writing, nervous system",
+    strongTrait: "Quick-witted, articulate, commercially sharp, adaptable and skilful",
+    weakTrait: "Overthinking, nervous tension, scattered speech, indecision",
+    body: "Skin, nervous system, lungs, hands",
+    day: "Wednesday", color: "Green", gem: "Emerald", metal: "Bronze", direction: "North",
+  },
+  Jupiter: {
+    karaka: "Wisdom, fortune, children, guru, dharma, expansion",
+    domain: "Knowledge, ethics, wealth, teachers, children, the liver",
+    strongTrait: "Wise, optimistic, generous, fortunate, naturally guided and protected",
+    weakTrait: "Over-indulgence, dogma, weight issues, misplaced faith",
+    body: "Liver, fat, thighs, sugar metabolism",
+    day: "Thursday", color: "Yellow / Gold", gem: "Yellow Sapphire", metal: "Gold", direction: "North-East",
+  },
+  Venus: {
+    karaka: "Love, beauty, marriage, luxury, art, pleasure",
+    domain: "Relationships, aesthetics, comfort, vehicles, reproductive health",
+    strongTrait: "Charming, artistic, refined, harmonious relationships and material grace",
+    weakTrait: "Indulgence, relationship turbulence, vanity, hormonal imbalance",
+    body: "Kidneys, reproductive organs, face, hormones",
+    day: "Friday", color: "White / Pastel", gem: "Diamond / White Sapphire", metal: "Silver / Platinum", direction: "South-East",
+  },
+  Saturn: {
+    karaka: "Discipline, karma, longevity, labour, restriction",
+    domain: "Endurance, structure, the masses, chronic matters, longevity",
+    strongTrait: "Disciplined, patient, enduring, just and capable of long sustained effort",
+    weakTrait: "Delay, depression, fear loops, chronic fatigue and isolation",
+    body: "Bones, joints, teeth, nerves, knees",
+    day: "Saturday", color: "Blue / Black", gem: "Blue Sapphire", metal: "Iron / Steel", direction: "West",
+  },
+  Rahu: {
+    karaka: "Ambition, obsession, foreign, illusion, technology",
+    domain: "Worldly desire, the unconventional, foreign lands, sudden events",
+    strongTrait: "Ambitious, innovative, magnetic, capable of meteoric unconventional rise",
+    weakTrait: "Obsession, deception, anxiety, addiction and confusion",
+    body: "Nervous disorders, mysterious ailments, skin",
+    day: "Saturday", color: "Smoky / Dark blue", gem: "Hessonite (Gomed)", metal: "Lead", direction: "South-West",
+  },
+  Ketu: {
+    karaka: "Liberation, detachment, past-life, spirituality, mysticism",
+    domain: "Moksha, hidden knowledge, sudden losses, the occult",
+    strongTrait: "Intuitive, spiritual, investigative, capable of deep liberation and insight",
+    weakTrait: "Dissociation, apathy, sudden separations, hard-to-diagnose problems",
+    body: "Hidden inflammation, spine base, subtle nervous system",
+    day: "Tuesday", color: "Multi / Grey", gem: "Cat's Eye", metal: "Mixed alloy", direction: "North-West",
+  },
+};
+
+// ── Per-Planet Deep Dive ──────────────────────────────────────────────────
+
+function pagePerPlanet(chart: ChartData, name: string, pageNum: string): string {
+  const pd = chart.planets[name];
+  const prof = PLANET_PROFILE[name];
+  if (!pd || !prof) {
+    return `<section class="page dense">${pageRail(name, pageNum)}<div class="body" style="padding-top:24px;">No data for ${esc(name)}.</div>${pageFoot("astrolife · cosmic blueprint", name)}</section>`;
+  }
+
+  const skt = PLANET_SANSKRIT[name] ?? name;
+  const dignityLower = pd.dignity.toLowerCase();
+  let dignityColor = "var(--violet)";
+  if (dignityLower.includes("exalt")) dignityColor = "var(--jade)";
+  else if (dignityLower.includes("debilit")) dignityColor = "var(--crimson)";
+  else if (dignityLower.includes("own") || dignityLower.includes("sva")) dignityColor = "var(--gold)";
+
+  // House-effect text from Lal Kitab knowledge if available
+  const houseRule = PLANET_HOUSE_RULES[name]?.[pd.house];
+  const lkInterp = getMahadashaInterpretation(name, pd.house, pd.dignity);
+
+  return `<section class="page dense">
+    ${pageRail(name + " · Graha Analysis", pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num devanagari">${esc(skt)}</span>
+        <h2>${esc(name)}</h2>
+      </div>
+
+      <!-- Placement banner -->
+      <div class="card gold-edge" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div class="kicker" style="margin-bottom:4px;">Placement</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-bright);">${esc(pd.sign)} · House ${pd.house}</div>
+          <div class="mono" style="font-size:11px;color:var(--ivory-mute);margin-top:2px;">${pd.degree}°${String(pd.minutes).padStart(2,"0")}' · ${esc(pd.nakshatra)} Pada ${pd.pada}${pd.retrograde ? " · Retrograde (R)" : ""}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="kicker" style="margin-bottom:4px;">Dignity</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:${dignityColor};">${esc(pd.dignity)}</div>
+        </div>
+      </div>
+
+      <!-- Karaka + domain -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="card">
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Significations (Karaka)</div>
+          <div class="body-s">${esc(prof.karaka)}</div>
+        </div>
+        <div class="card">
+          <div class="kicker" style="margin-bottom:6px;color:var(--violet);">Life Domains</div>
+          <div class="body-s">${esc(prof.domain)}</div>
+        </div>
+      </div>
+
+      <!-- Strong / weak -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="card" style="border-color:rgba(111,181,138,0.3);">
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">When Well-Placed</div>
+          <div class="body-s">${esc(prof.strongTrait)}</div>
+        </div>
+        <div class="card" style="border-color:rgba(201,85,95,0.25);">
+          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">When Afflicted</div>
+          <div class="body-s">${esc(prof.weakTrait)}</div>
+        </div>
+      </div>
+
+      <!-- Interpretation -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--gold);">In Your Chart — House ${pd.house}</div>
+        <div class="body-s" style="line-height:1.65;">${esc(houseRule?.core || lkInterp.overview || `${name} in house ${pd.house} channels its energy into ${prof.domain.toLowerCase()}.`)}</div>
+        ${houseRule?.career ? `<div class="body-s" style="line-height:1.6;margin-top:8px;"><strong style="color:var(--gold-dim);">Career:</strong> ${esc(houseRule.career)}</div>` : ""}
+        ${houseRule?.health ? `<div class="body-s" style="line-height:1.6;margin-top:6px;"><strong style="color:var(--gold-dim);">Health:</strong> ${esc(houseRule.health)}</div>` : ""}
+      </div>
+
+      <!-- Quick reference strip -->
+      <div style="margin-top:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;">
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Day</div><div class="body-s">${esc(prof.day)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Colour</div><div class="body-s">${esc(prof.color)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Gem</div><div class="body-s">${esc(prof.gem)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Metal</div><div class="body-s">${esc(prof.metal)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Body</div><div class="body-s">${esc(prof.body)}</div></div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", name)}
+  </section>`;
+}
+
+// ── Per-House Deep Dive ───────────────────────────────────────────────────
+
+interface HouseProfile {
+  sanskrit: string;
+  name: string;
+  category: "Kendra" | "Trikona" | "Dusthana" | "Upachaya" | "Maraka";
+  karaka: string;       // natural significator planet
+  areas: string;        // life areas
+  detail: string;       // detailed significations
+  strong: string;       // when well-supported
+  weak: string;         // when afflicted
+}
+
+const HOUSE_PROFILE: Record<number, HouseProfile> = {
+  1:  { sanskrit:"तनु भाव", name:"Tanu · Self", category:"Kendra", karaka:"Sun", areas:"Body, personality, vitality, the head, overall life direction", detail:"The ascendant governs your physical body, temperament, appearance, health constitution, and the lens through which you meet the world. It is the foundation on which the whole chart rests.", strong:"Strong vitality, clear identity, commanding presence and good health.", weak:"Health fragility, identity confusion, low self-confidence." },
+  2:  { sanskrit:"धन भाव", name:"Dhana · Wealth", category:"Maraka", karaka:"Jupiter", areas:"Wealth, family, speech, food, accumulated resources, the face", detail:"The second house rules your earning capacity, savings, family lineage, speech, and what you value. It also governs the face, mouth, and eating habits.", strong:"Steady wealth, eloquent speech, supportive family, refined tastes.", weak:"Financial instability, harsh speech, family discord, food issues." },
+  3:  { sanskrit:"पराक्रम भाव", name:"Parakrama · Courage", category:"Upachaya", karaka:"Mars", areas:"Courage, siblings, communication, short travel, skills, hands", detail:"The third house governs initiative, valour, younger siblings, hobbies, writing, and self-effort. It is a house that improves with age and conscious effort.", strong:"Courageous, skilled, supportive siblings, strong communication.", weak:"Timidity, sibling friction, scattered effort, communication blocks." },
+  4:  { sanskrit:"सुख भाव", name:"Sukha · Happiness", category:"Kendra", karaka:"Moon", areas:"Mother, home, property, vehicles, emotional security, the heart", detail:"The fourth house is the seat of inner happiness, the mother, real estate, vehicles, education foundations, and emotional roots.", strong:"Domestic comfort, property, strong mother bond, inner peace.", weak:"Restlessness, property disputes, mother-related karma, emotional unease." },
+  5:  { sanskrit:"पुत्र भाव", name:"Putra · Creativity", category:"Trikona", karaka:"Jupiter", areas:"Children, intelligence, romance, speculation, past-life merit, mantra", detail:"The fifth house governs progeny, creative intelligence, romance, education, and purva-punya (past-life good karma). A key house for dharma and joy.", strong:"Creative brilliance, good children, romantic fulfilment, sharp intellect.", weak:"Difficulty with children, blocked creativity, romantic turbulence." },
+  6:  { sanskrit:"रिपु भाव", name:"Ripu · Challenges", category:"Dusthana", karaka:"Mars", areas:"Enemies, disease, debt, service, daily work, competition", detail:"The sixth house rules obstacles, health challenges, debts, litigation, service, and the capacity to overcome adversity. An upachaya house that strengthens over time.", strong:"Defeats enemies, overcomes disease, excels in service and competition.", weak:"Chronic health issues, debt, litigation, workplace conflict." },
+  7:  { sanskrit:"कलत्र भाव", name:"Kalatra · Partnership", category:"Kendra", karaka:"Venus", areas:"Marriage, spouse, business partners, public dealings, trade", detail:"The seventh house governs marriage, the spouse's nature, business partnerships, and all one-to-one relationships and public interactions.", strong:"Harmonious marriage, supportive spouse, successful partnerships.", weak:"Marital friction, partnership disputes, relationship delays." },
+  8:  { sanskrit:"आयु भाव", name:"Ayu · Transformation", category:"Dusthana", karaka:"Saturn", areas:"Longevity, transformation, inheritance, occult, sudden events", detail:"The eighth house governs longevity, deep transformation, inheritances, in-laws, occult knowledge, and sudden upheavals. The house of hidden things and rebirth.", strong:"Longevity, occult insight, inheritance, transformative resilience.", weak:"Sudden disruptions, health crises, inheritance disputes, anxiety." },
+  9:  { sanskrit:"धर्म भाव", name:"Dharma · Fortune", category:"Trikona", karaka:"Jupiter", areas:"Luck, dharma, father, guru, higher learning, long travel, pilgrimage", detail:"The ninth house is the most auspicious trikona — governing fortune, the father, gurus, philosophy, higher education, and one's connection to dharma.", strong:"Great fortune, wise guidance, dharmic life, supportive father and teachers.", weak:"Fluctuating luck, faith struggles, distance from father or guru." },
+  10: { sanskrit:"कर्म भाव", name:"Karma · Career", category:"Kendra", karaka:"Mercury", areas:"Career, status, authority, public reputation, the knees", detail:"The tenth house is the pinnacle of the chart — governing profession, social standing, authority, fame, and one's contribution to the world.", strong:"Career success, authority, public recognition, professional integrity.", weak:"Career instability, status struggles, reputational challenges." },
+  11: { sanskrit:"लाभ भाव", name:"Labha · Gains", category:"Upachaya", karaka:"Jupiter", areas:"Gains, income, elder siblings, social networks, fulfilled desires", detail:"The eleventh house governs all forms of gain — income, profits, friendships, elder siblings, and the fulfilment of desires. The strongest house for material accumulation.", strong:"Strong income, influential network, fulfilled ambitions.", weak:"Blocked gains, unreliable friends, unfulfilled desires." },
+  12: { sanskrit:"व्यय भाव", name:"Vyaya · Liberation", category:"Dusthana", karaka:"Saturn", areas:"Loss, expenditure, foreign lands, spirituality, sleep, moksha", detail:"The twelfth house governs expenditure, foreign residence, isolation, spirituality, sleep, and ultimately liberation (moksha). The house of letting go.", strong:"Spiritual depth, foreign success, restful sleep, charitable nature.", weak:"Excessive expenditure, isolation, sleep issues, hidden enemies." },
+};
+
+const HOUSE_CAT_COLOR: Record<string, string> = {
+  Kendra: "var(--gold)", Trikona: "var(--jade)", Dusthana: "var(--crimson)",
+  Upachaya: "var(--saffron)", Maraka: "var(--violet)",
+};
+
+function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string): string {
+  const prof = HOUSE_PROFILE[houseNum];
+  if (!prof) return `<section class="page dense">${pageRail("House " + houseNum, pageNum)}<div class="body" style="padding-top:24px;">No data.</div>${pageFoot("astrolife · cosmic blueprint", "House")}</section>`;
+
+  const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  const SIGN_RULER_MAP: Record<string,string> = {
+    Aries:"Mars",Taurus:"Venus",Gemini:"Mercury",Cancer:"Moon",Leo:"Sun",Virgo:"Mercury",
+    Libra:"Venus",Scorpio:"Mars",Sagittarius:"Jupiter",Capricorn:"Saturn",Aquarius:"Saturn",Pisces:"Jupiter",
+  };
+  const houseSignIdx = ((chart.lagnaNum + (houseNum - 1)) % 12 + 12) % 12;
+  const houseSign = SIGNS[houseSignIdx];
+  const houseLord = SIGN_RULER_MAP[houseSign];
+  const lordPd = chart.planets[houseLord];
+
+  // Occupants
+  const occupants = Object.entries(chart.planets)
+    .filter(([, pd]) => pd.house === houseNum)
+    .map(([n]) => n);
+
+  const catColor = HOUSE_CAT_COLOR[prof.category] ?? "var(--gold)";
+
+  return `<section class="page dense">
+    ${pageRail(prof.name, pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">${houseNum}</span>
+        <h2>${esc(prof.name.split(" · ")[1] ?? prof.name)}</h2>
+      </div>
+
+      <!-- House banner -->
+      <div class="card gold-edge" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div class="devanagari" style="font-size:18px;color:var(--gold-dim);margin-bottom:2px;">${esc(prof.sanskrit)}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);">House ${houseNum} · ${esc(houseSign)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="kicker" style="margin-bottom:4px;">Category</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:${catColor};">${esc(prof.category)}</div>
+        </div>
+      </div>
+
+      <!-- Detail -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Significations</div>
+        <div class="body-s" style="margin-bottom:8px;">${esc(prof.areas)}</div>
+        <div class="body-s" style="line-height:1.65;">${esc(prof.detail)}</div>
+      </div>
+
+      <!-- Lord + occupants -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="card">
+          <div class="kicker" style="margin-bottom:6px;color:var(--gold);">House Lord · ${esc(houseLord)}</div>
+          ${lordPd
+            ? `<div class="body-s">Placed in <strong style="color:var(--ivory);">${esc(lordPd.sign)}</strong>, House <strong style="color:var(--ivory);">${lordPd.house}</strong> at ${lordPd.degree}°${String(lordPd.minutes).padStart(2,"0")}'.</div>
+               <div class="body-s" style="margin-top:6px;">Dignity: <strong style="color:var(--gold-bright);">${esc(lordPd.dignity)}</strong></div>`
+            : `<div class="body-s">Lord placement unavailable.</div>`}
+        </div>
+        <div class="card">
+          <div class="kicker" style="margin-bottom:6px;color:var(--violet);">Occupants</div>
+          ${occupants.length > 0
+            ? `<div class="body-s">${occupants.map(o => `<span style="color:var(--gold);">${esc(o)}</span>`).join(", ")}</div>
+               <div class="body-s" style="margin-top:6px;color:var(--ivory-mute);">${occupants.length} planet${occupants.length > 1 ? "s" : ""} activate this house directly.</div>`
+            : `<div class="body-s" style="color:var(--ivory-mute);">No planets occupy this house. It is read primarily through its lord and aspects.</div>`}
+        </div>
+      </div>
+
+      <!-- Strong / weak -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:auto;">
+        <div class="card" style="border-color:rgba(111,181,138,0.3);">
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">When Supported</div>
+          <div class="body-s">${esc(prof.strong)}</div>
+        </div>
+        <div class="card" style="border-color:rgba(201,85,95,0.25);">
+          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">When Afflicted</div>
+          <div class="body-s">${esc(prof.weak)}</div>
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", prof.name.split(" · ")[1] ?? "House")}
+  </section>`;
+}
+
 // ── Master HTML builder ───────────────────────────────────────────────────
 
 export function generateReportHTML(chart: ChartData, options?: Partial<ReportOptions>): string {
@@ -1950,6 +2243,8 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
   const t = context.settings.type;
   const include = {
     chart:       true,                                              // always
+    perPlanet:   t === "full" || t === "kundli",
+    perHouse:    t === "full" || t === "kundli",
     yogas:       t === "full" || t === "kundli" || t === "destiny",
     doshas:      t === "full" || t === "kundli",
     shadbala:    t === "full" || t === "kundli",
@@ -1962,6 +2257,17 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     remedies:    t === "full" || t === "remedy" || t === "medical",
   };
 
+  // Per-planet deep-dive pages (Phase 2). Page numbers are cosmetic labels.
+  const PLANET_ORDER = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
+  const perPlanetPages = include.perPlanet
+    ? PLANET_ORDER.map((p, i) => safe(() => pagePerPlanet(chart, p, String(7 + i)), `Planet:${p}`))
+    : [];
+
+  // Per-house deep-dive pages (Phase 2) — all 12 bhavas.
+  const perHousePages = include.perHouse
+    ? Array.from({ length: 12 }, (_, i) => safe(() => pagePerHouse(chart, i + 1, String(16 + i)), `House:${i + 1}`))
+    : [];
+
   const pages = [
     safe(() => coverPage,                    "Cover"),
     safe(() => page2Welcome(chart),          "Welcome"),
@@ -1969,6 +2275,8 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     safe(() => page4TOC(),                   "Contents"),
     safe(() => page5BirthSnapshot(chart),    "Birth Snapshot"),
     safe(() => page6PlanetaryDashboard(chart),"Planetary Dashboard"),
+    ...perPlanetPages,
+    ...perHousePages,
     include.yogas      ? safe(() => pageYogas(chart),       "Yogas")           : "",
     include.doshas     ? safe(() => pageDoshas(chart),      "Doshas")          : "",
     include.shadbala   ? safe(() => pageShadbala(chart),    "Shadbala")        : "",
