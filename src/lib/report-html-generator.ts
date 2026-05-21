@@ -28,6 +28,11 @@ import {
 import { detectYogas, type YogaResult } from "./astro-engine/yogas";
 import { calculateShadbala } from "./astro-engine/shadbala";
 import { calculateDivisional, getNavamshaAnalysis, getDashamshaAnalysis } from "./astro-engine/divisional";
+import {
+  analyzeUniversalShodashaVarga,
+  extractDashaInput,
+  formatVargaLabel,
+} from "./astro-intelligence/universal-shodasha-varga-engine";
 import { calculateMedical } from "./astro-engine/medical";
 import { calculatePsychology } from "./astro-engine/psychology";
 import { calculateNumerology } from "./astro-engine/numerology";
@@ -412,6 +417,7 @@ body {
 .display-s  { font-family:'Cormorant Garamond',serif; font-weight:500; font-size:26px; line-height:1.15; }
 .serif-italic { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; }
 .devanagari { font-family:'Noto Serif Devanagari',serif; font-weight:500; }
+.glyph { font-family:'Noto Sans Symbols 2','Noto Serif Devanagari',serif; }
 .eyebrow { font-family:'Inter',sans-serif; font-weight:500; font-size:10.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); }
 .kicker  { font-family:'Inter',sans-serif; font-weight:500; font-size:11px;   letter-spacing:0.2em;  text-transform:uppercase; color:var(--ivory-mute); }
 .body    { font-family:'Inter',sans-serif; font-size:13.5px; line-height:1.65; color:var(--ivory-dim); }
@@ -1815,6 +1821,12 @@ function pageDivisional(chart: ChartData): string {
   const d10 = divResult.find(c => c.key === "D10");
   const d9Notes = d9 ? getNavamshaAnalysis(d9) : [];
   const d10Notes = d10 ? getDashamshaAnalysis(d10) : [];
+  const universal = analyzeUniversalShodashaVarga({
+    language: "hinglish",
+    birthTimeConfidence: 86,
+    charts: divResult,
+    dasha: extractDashaInput(chart),
+  });
 
   type DC = (typeof divResult)[number];
   const renderChartMini = (chart_: DC | undefined, title: string): string => {
@@ -1839,7 +1851,14 @@ function pageDivisional(chart: ChartData): string {
         <h2>Divisional Charts</h2>
       </div>
       <div class="body-s" style="margin-bottom:18px;max-width:620px;">
-        Vargas (divisional charts) sub-divide each sign to reveal life-area-specific karma. <strong>D9 (Navamsa)</strong> shows the soul, marriage, and dharma. <strong>D10 (Dashamsha)</strong> shows career, profession, and public position.
+        ${esc(universal.overallNarrative)}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+        ${universal.sections.slice(0, 16).map((section) => `<div class="card" style="padding:9px;">
+          <div class="kicker" style="margin-bottom:3px;">${esc(section.chart)} · ${esc(section.shortName)}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);line-height:1;">${section.score}</div>
+          <div class="body-s" style="font-size:9px;line-height:1.35;">${esc(formatVargaLabel(section.label))} · ${esc(section.confidenceText)}</div>
+        </div>`).join("")}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
         ${renderChartMini(d9, "D9 — Navamsa · Soul & Marriage")}
@@ -1847,12 +1866,12 @@ function pageDivisional(chart: ChartData): string {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div>
-          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Navamsa Notes</div>
-          <div class="body-s" style="line-height:1.6;">${d9Notes.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n)}</div>`).join("")}</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Strongest Varga Support</div>
+          <div class="body-s" style="line-height:1.6;">${universal.strongestAreas.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n.chart)} ${esc(n.shortName)}: ${esc(n.paragraph)}</div>`).join("") || d9Notes.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n)}</div>`).join("")}</div>
         </div>
         <div>
-          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Dashamsha Notes</div>
-          <div class="body-s" style="line-height:1.6;">${d10Notes.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n)}</div>`).join("")}</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Growth & Care Areas</div>
+          <div class="body-s" style="line-height:1.6;">${universal.growthAreas.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n.chart)} ${esc(n.shortName)}: ${esc(n.recommendations[0] ?? n.paragraph)}</div>`).join("") || d10Notes.slice(0, 4).map(n => `<div style="margin-bottom:4px;">• ${esc(n)}</div>`).join("")}</div>
         </div>
       </div>
     </div>
@@ -2564,6 +2583,165 @@ function pageAntardashaDetail(chart: ChartData, pageNum: string): string {
   </section>`;
 }
 
+// ============================================================
+// STAR MAP — circular ecliptic chart (ported from design v2)
+// Ascendant anchored at LEFT (9 o'clock). theta = 180 - (L - asc).
+// screen x = r·cos(theta), y = -r·sin(theta).
+// ============================================================
+
+const PLANET_HEX: Record<string, string> = {
+  Sun: "#E8923C", Moon: "#F4EFE6", Mars: "#C9555F", Mercury: "#6FB58A",
+  Jupiter: "#C9A961", Venus: "#8B7BC4", Saturn: "#C9A961", Rahu: "#8B7BC4", Ketu: "#8B7BC4",
+};
+const PLANET_GLYPH_UNI: Record<string, string> = {
+  Sun: "☉", Moon: "☽", Mars: "♂", Mercury: "☿", Jupiter: "♃",
+  Venus: "♀", Saturn: "♄", Rahu: "☊", Ketu: "☋",
+};
+
+function pageStarMap(chart: ChartData, pageNum: string): string {
+  const asc = chart.lagnaLon;
+  const R_RING = 240, R_GLYPH = 220, R_NAME = 234, R_PLANET = 160;
+  // math angle (radians) for sidereal longitude L, ascendant at left (180°)
+  const ang = (L: number) => ((180 - (L - asc)) * Math.PI) / 180;
+  const xy = (L: number, r: number): [number, number] => {
+    const t = ang(L);
+    return [+(r * Math.cos(t)).toFixed(1), +(-r * Math.sin(t)).toFixed(1)];
+  };
+
+  const SIGN_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  const SIGN_GLY = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+
+  // 12 dividers at sidereal L = 0,30,...330
+  let dividers = "";
+  for (let k = 0; k < 12; k++) {
+    const [x, y] = xy(k * 30, R_RING);
+    dividers += `<line x1="0" y1="0" x2="${x}" y2="${y}"/>`;
+  }
+  // glyphs + names at sign midpoints (L+15)
+  let signGlyphs = "", signNames = "";
+  for (let k = 0; k < 12; k++) {
+    const mid = k * 30 + 15;
+    const [gx, gy] = xy(mid, R_GLYPH);
+    const [nx, ny] = xy(mid, R_NAME);
+    signGlyphs += `<text class="glyph" x="${gx}" y="${gy + 5}" text-anchor="middle" font-size="18" fill="#C9A961">${SIGN_GLY[k]}</text>`;
+    signNames += `<text x="${nx}" y="${ny + 3}" text-anchor="middle" font-family="Cormorant Garamond" font-style="italic" font-size="9" fill="rgba(201,169,97,0.55)">${SIGN_NAMES[k]}</text>`;
+  }
+
+  // Planets — plot at R_PLANET with simple radial stagger to avoid overlap
+  const order = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
+  const placed: { L: number; r: number }[] = [];
+  let planetEls = "";
+  for (const name of order) {
+    const pd = chart.planets[name];
+    if (!pd) continue;
+    // stagger radius if another planet is within 7° of longitude
+    let r = R_PLANET;
+    for (const p of placed) {
+      if (Math.abs(((pd.lon - p.L + 540) % 360) - 180) > 173 && Math.abs(r - p.r) < 22) r -= 24;
+    }
+    placed.push({ L: pd.lon, r });
+    const [x, y] = xy(pd.lon, r);
+    const labelOut = y >= 0 ? y + 16 : y - 14;
+    const col = PLANET_HEX[name] ?? "#C9A961";
+    planetEls += `
+      <circle cx="${x}" cy="${y}" r="6" fill="var(--bg)" stroke="${col}" stroke-width="1.4"/>
+      <text class="glyph" x="${x}" y="${y + 3.5}" text-anchor="middle" font-size="11" font-weight="600" fill="${col}">${PLANET_GLYPH_UNI[name] ?? ""}</text>
+      <text x="${x}" y="${labelOut}" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" fill="${col}">${PLANET_ABBR[name]} ${pd.degree}°</text>`;
+  }
+
+  // ASC marker on left horizon
+  const [ascX] = xy(asc, R_RING + 20);
+  void ascX;
+
+  // Find stellium (house with 3+ planets) + Rahu/Ketu houses
+  const houseCount: Record<number, string[]> = {};
+  for (const [n, pd] of Object.entries(chart.planets)) {
+    (houseCount[pd.house] ??= []).push(n);
+  }
+  const stelliumEntry = Object.entries(houseCount).find(([, ps]) => ps.length >= 3);
+  const rahuH = chart.planets["Rahu"]?.house ?? "—";
+  const ketuH = chart.planets["Ketu"]?.house ?? "—";
+
+  return `<section class="page">
+  <div class="starfield"></div>
+  <div class="glow-tl"></div>
+  ${pageRail("Star Map", pageNum)}
+
+  <div style="position:relative;z-index:2;padding-top:24px;display:flex;flex-direction:column;gap:18px;flex:1;">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px;">The sky over ${esc(chart.city)} · ${esc(chart.dob)} · ${esc(chart.tob)}</div>
+        <div class="display-l" style="line-height:1;color:var(--ivory);">Where the planets <span class="serif-italic" style="color:var(--gold-bright);">stood</span>.</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="kicker">Ayanamsha · Lahiri</div>
+        <div class="mono" style="font-size:13px;color:var(--gold);margin-top:2px;">${Math.floor((24 + (new Date(chart.dob).getFullYear() - 2000) * 0.0139))}°</div>
+      </div>
+    </div>
+
+    <hr class="hairline gold"/>
+
+    <div style="display:flex;align-items:center;justify-content:center;flex:1;">
+      <svg width="560" height="560" viewBox="-280 -280 560 560">
+        <defs>
+          <radialGradient id="ecliptic-glow" cx="0" cy="0" r="260" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#C9A961" stop-opacity="0.08"/>
+            <stop offset="80%" stop-color="#C9A961" stop-opacity="0.02"/>
+            <stop offset="100%" stop-color="#C9A961" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle r="260" fill="url(#ecliptic-glow)"/>
+        <circle r="240" stroke="#C9A961" stroke-width="0.5" fill="none" opacity="0.6"/>
+        <circle r="232" stroke="#C9A961" stroke-width="0.3" fill="none" opacity="0.4"/>
+        <circle r="200" stroke="#C9A961" stroke-width="0.3" fill="none" opacity="0.3"/>
+        <circle r="160" stroke="#C9A961" stroke-width="0.4" fill="none" opacity="0.5"/>
+        <circle r="100" stroke="#C9A961" stroke-width="0.3" fill="none" opacity="0.3"/>
+        <g stroke="#C9A961" stroke-width="0.3" opacity="0.5">${dividers}</g>
+        ${signGlyphs}
+        ${signNames}
+        <!-- Ascendant marker (left horizon) -->
+        <line x1="-260" y1="0" x2="-180" y2="0" stroke="#E8923C" stroke-width="1.2"/>
+        <polygon points="-265,-5 -255,0 -265,5" fill="#E8923C"/>
+        <text x="-262" y="-12" font-family="Inter" font-size="9" fill="#E8923C" letter-spacing="2">ASC</text>
+        <text x="-262" y="22" font-family="JetBrains Mono" font-size="8" fill="#E8923C">${chart.planets["Sun"] ? "" : ""}${esc(chart.lagnaRashi.slice(0,3))}</text>
+        <!-- horizon + meridian -->
+        <line x1="-260" y1="0" x2="260" y2="0" stroke="#C9A961" stroke-width="0.3" stroke-dasharray="3 3" opacity="0.3"/>
+        <line x1="0" y1="-260" x2="0" y2="260" stroke="#C9A961" stroke-width="0.3" stroke-dasharray="3 3" opacity="0.3"/>
+        ${planetEls}
+        <circle r="2" fill="#E8923C"/>
+        <circle r="6" fill="none" stroke="#E8923C" stroke-width="0.3" opacity="0.5"/>
+        <g font-family="JetBrains Mono" font-size="8" fill="rgba(201,169,97,0.6)" letter-spacing="2">
+          <text x="0" y="-270" text-anchor="middle">N · MC</text>
+          <text x="0" y="278" text-anchor="middle">S · IC</text>
+          <text x="270" y="3">W · DSC</text>
+          <text x="-270" y="3" text-anchor="end">E · ASC</text>
+        </g>
+      </svg>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+      <div class="card" style="padding:12px 14px;">
+        <div class="kicker" style="font-size:9px;">Stellium</div>
+        <div class="serif-italic" style="font-size:15px;color:var(--ivory);margin-top:3px;">${stelliumEntry ? `House ${stelliumEntry[0]}` : "None"}</div>
+        <div class="body-s" style="margin-top:2px;">${stelliumEntry ? esc(stelliumEntry[1].join(" · ")) : "No 3+ planet cluster."}</div>
+      </div>
+      <div class="card" style="padding:12px 14px;">
+        <div class="kicker" style="font-size:9px;">Ascendant</div>
+        <div class="serif-italic" style="font-size:15px;color:var(--ivory);margin-top:3px;">${esc(chart.lagnaRashi)}</div>
+        <div class="body-s" style="margin-top:2px;">The rising sign — your outward self.</div>
+      </div>
+      <div class="card" style="padding:12px 14px;">
+        <div class="kicker" style="font-size:9px;">Karmic axis</div>
+        <div class="serif-italic" style="font-size:15px;color:var(--ivory);margin-top:3px;">Rahu ${rahuH} · Ketu ${ketuH}</div>
+        <div class="body-s" style="margin-top:2px;">Outward struggle, inward release.</div>
+      </div>
+    </div>
+  </div>
+
+  ${pageFoot("astrolife · cosmic blueprint", "Star Map")}
+</section>`;
+}
+
 // ── Master HTML builder ───────────────────────────────────────────────────
 
 export function generateReportHTML(chart: ChartData, options?: Partial<ReportOptions>): string {
@@ -2590,6 +2768,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
   const t = context.settings.type;
   const include = {
     chart:       true,                                              // always
+    starMap:     true,                                              // always — the planetary sky chart
     perPlanet:   t === "full" || t === "kundli",
     perHouse:    t === "full" || t === "kundli",
     yogas:       t === "full" || t === "kundli" || t === "destiny",
@@ -2631,6 +2810,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     safe(() => page3Foreword(),              "Foreword"),
     safe(() => page4TOC(),                   "Contents"),
     safe(() => page5BirthSnapshot(chart),    "Birth Snapshot"),
+    include.starMap    ? safe(() => pageStarMap(chart, "5b"),   "Star Map")        : "",
     safe(() => page6PlanetaryDashboard(chart),"Planetary Dashboard"),
     ...perPlanetPages,
     ...perHousePages,
@@ -2665,7 +2845,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
 <link rel="dns-prefetch" href="https://fonts.gstatic.com">
 <!-- font-display:swap means text renders immediately with fallback,
      then swaps when the real font arrives. No blocking on font load. -->
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Noto+Serif+Devanagari:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Noto+Serif+Devanagari:wght@500&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
 <style>
 ${STYLES_CSS}
 </style>
