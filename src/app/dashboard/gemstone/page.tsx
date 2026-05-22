@@ -19,141 +19,39 @@ import { EngineStateCard } from "@/components/engine-state-card";
 // ─── Adapter ──────────────────────────────────────────────────────────────────
 
 const VALID_PLANETS = new Set<string>(["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"]);
-const SIGNS: Sign[] = [
-  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
-];
-const SIGN_ALIASES: Record<string, Sign> = {
-  ar: "Aries",
-  mesha: "Aries",
-  ta: "Taurus",
-  vrishabha: "Taurus",
-  ge: "Gemini",
-  mithuna: "Gemini",
-  ca: "Cancer",
-  karka: "Cancer",
-  le: "Leo",
-  simha: "Leo",
-  vi: "Virgo",
-  kanya: "Virgo",
-  li: "Libra",
-  tula: "Libra",
-  sc: "Scorpio",
-  vrishchika: "Scorpio",
-  sa: "Sagittarius",
-  dhanu: "Sagittarius",
-  cp: "Capricorn",
-  cap: "Capricorn",
-  makara: "Capricorn",
-  aq: "Aquarius",
-  kumbha: "Aquarius",
-  pi: "Pisces",
-  meena: "Pisces",
-};
 
 function mapDignity(d: string): Dignity {
   if (!d || d === "—") return "neutral";
   const l = d.toLowerCase();
-  if (l.startsWith("exalted") || l === "exalted" || l === "uchcha") return "exalted";
-  if (l === "debilitated" || l === "neecha") return "debilitated";
+  if (l.startsWith("exalted")) return "exalted";
+  if (l === "debilitated") return "debilitated";
   if (l === "moolatrikona") return "moolatrikona";
-  if (l === "own" || l.includes("sva") || l.includes("own sign")) return "own";
-  if (l.includes("friend")) return "friendly";
-  if (l.includes("enemy")) return "enemy";
+  if (l === "own") return "own";
   return "neutral";
-}
-
-function toFiniteNumber(value: unknown): number | undefined {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : undefined;
-  }
-  return undefined;
-}
-
-function mod(value: number, divisor: number): number {
-  return ((value % divisor) + divisor) % divisor;
-}
-
-function signIndexFromNumber(value: unknown): number | undefined {
-  const n = toFiniteNumber(value);
-  if (n === undefined) return undefined;
-  if (n >= 0 && n <= 11) return Math.trunc(n);
-  if (n >= 1 && n <= 12) return Math.trunc(n - 1);
-  return Math.floor(mod(n, 360) / 30);
-}
-
-function normalizeSign(value: unknown): Sign | undefined {
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    const exact = SIGNS.find((sign) => sign.toLowerCase() === trimmed.toLowerCase());
-    if (exact) return exact;
-    return SIGN_ALIASES[trimmed.toLowerCase()];
-  }
-
-  const idx = signIndexFromNumber(value);
-  return idx === undefined ? undefined : SIGNS[idx];
-}
-
-function normalizeHouse(value: unknown, fallback: number): number {
-  const n = toFiniteNumber(value);
-  if (n === undefined) return fallback;
-  return mod(Math.trunc(n) - 1, 12) + 1;
-}
-
-function readPlanetData(container: Record<string, unknown>, planet: string): Record<string, unknown> | null {
-  const raw = container[planet] ?? container[planet.toLowerCase()];
-  return raw && typeof raw === "object" ? raw as Record<string, unknown> : null;
 }
 
 function chartToMedicalInput(chart: unknown): GemstoneMedicalInput | null {
   if (!chart || typeof chart !== "object") return null;
   const c = chart as Record<string, unknown>;
-
-  const ascendant =
-    normalizeSign(c.lagnaRashi) ??
-    normalizeSign(c.ascendantRashi) ??
-    normalizeSign(c.lagnaSign) ??
-    normalizeSign(c.ascendantSign) ??
-    normalizeSign(c.lagnaNum) ??
-    normalizeSign(c.lagnaLon);
+  const ascendant = c.lagnaRashi as Sign | undefined;
   if (!ascendant) return null;
-  const ascendantIndex = SIGNS.indexOf(ascendant);
 
-  const planetsObj = c.planets as Record<string, unknown> | undefined;
+  const planetsObj = c.planets as Record<string, Record<string, unknown>> | undefined;
   if (!planetsObj) return null;
 
   const planets: GemstoneMedicalInput["planets"] = [];
-  for (const name of VALID_PLANETS) {
-    const pd = readPlanetData(planetsObj, name);
-    if (!pd) continue;
+  for (const [name, pd] of Object.entries(planetsObj)) {
     if (!VALID_PLANETS.has(name)) continue;
-    const sign =
-      normalizeSign(pd.sign) ??
-      normalizeSign(pd.rashiName) ??
-      normalizeSign(pd.signName) ??
-      normalizeSign(pd.rashi) ??
-      normalizeSign(pd.signNum) ??
-      normalizeSign(pd.rashiIndex) ??
-      normalizeSign(pd.lon) ??
-      normalizeSign(pd.longitude);
-    if (!sign) continue;
-
-    const signIndex = SIGNS.indexOf(sign);
-    const fallbackHouse = mod(signIndex - ascendantIndex, 12) + 1;
     planets.push({
       planet: name as Planet,
-      sign,
-      house: normalizeHouse(pd.house ?? pd.rashiHouse ?? pd.bhavaHouse, fallbackHouse),
-      degree: toFiniteNumber(pd.degree ?? pd.deg ?? pd.lon ?? pd.longitude),
-      nakshatra: typeof pd.nakshatra === "string" ? pd.nakshatra : undefined,
-      dignity: mapDignity(String(pd.dignity ?? pd.status ?? "")),
-      isRetrograde: Boolean(pd.retrograde ?? pd.isRetrograde),
+      sign: (pd.sign as Sign) ?? "Aries",
+      house: (pd.house as number) ?? 1,
+      degree: pd.degree as number | undefined,
+      nakshatra: pd.nakshatra as string | undefined,
+      dignity: mapDignity((pd.dignity as string) ?? ""),
+      isRetrograde: (pd.retrograde as boolean) ?? false,
     });
   }
-
-  if (planets.length < 7) return null;
 
   const dashasArr = c.dashas as Array<Record<string, unknown>> | undefined;
   const antarArr = c.antardasha as Array<Record<string, unknown>> | undefined;
@@ -170,8 +68,7 @@ function chartToMedicalInput(chart: unknown): GemstoneMedicalInput | null {
     if (active?.planet) antardasha = active.planet as Planet;
   }
 
-  const moonData = readPlanetData(planetsObj, "Moon");
-  const moonSign = normalizeSign(moonData?.sign ?? moonData?.rashiName ?? moonData?.signNum ?? moonData?.lon);
+  const moonSign = planetsObj["Moon"]?.sign as Sign | undefined;
 
   return {
     nativeName: c.name as string | undefined,
@@ -209,9 +106,6 @@ const STATUS_LABEL: Record<GemStatus, string> = {
 function hexFor(item: GemstoneReportItem): string {
   return PLANET_HEX[item.planet] ?? "#C8A030";
 }
-
-const p = (parts: Array<string | null | undefined | false>): string =>
-  parts.filter(Boolean).join("\n\n");
 
 
 // ─── Star background ──────────────────────────────────────────────────────────
@@ -496,22 +390,12 @@ export default function GemstonePage() {
 function GemstonePageContent() {
   const { chart, loading } = useUserChart();
   const [activeTab, setActiveTab] = useState<TabKey>("analysis");
-  const { input, report, error: engineError } = useMemo((): {
-    input: GemstoneMedicalInput | null;
-    report: GemstoneMedicalMasterReport | null;
-    error: string | null;
-  } => {
-    if (loading) return { input: null, report: null, error: null };
-    try {
-      const inp = chartToMedicalInput(chart);
-      if (!inp) return { input: null, report: null, error: "chartToMedicalInput returned null — chart may be incomplete" };
-      const rep = runGemstoneMedicalMasterEngineV2(inp);
-      return { input: inp, report: rep, error: null };
-    } catch (err) {
-      console.error("Gemstone engine error:", err);
-      return { input: null, report: null, error: String(err) };
-    }
-  }, [chart, loading]);
+
+  const input = useMemo(() => chartToMedicalInput(chart), [chart]);
+  const report = useMemo(
+    () => (input ? runGemstoneMedicalMasterEngineV2(input) : null),
+    [input],
+  );
 
   const tabs: Array<{ id: TabKey; label: string }> = [
     { id: "analysis",  label: "◈ Analysis" },
@@ -542,15 +426,8 @@ function GemstonePageContent() {
         <section style={{ maxWidth: 1120, margin: "0 auto" }}>
           <EngineStateCard
             title="Gemstone Suitability"
-            emptyText={engineError
-              ? p([`Engine error: ${engineError}`])
-              : "Chart data incomplete. Please complete your birth details in onboarding."}
+            emptyText="Chart data incomplete. Please complete your birth details in onboarding."
           />
-          {engineError && (
-            <div style={{ marginTop: 16, padding: 16, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 12, fontSize: 13, color: "#ef4444", fontFamily: "monospace", wordBreak: "break-all" }}>
-              {engineError}
-            </div>
-          )}
         </section>
       </main>
     );

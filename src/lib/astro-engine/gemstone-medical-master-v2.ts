@@ -832,17 +832,17 @@ function buildPdfParagraph(item: { p: PlanetInput; score: number; status: GemSta
   ]);
 }
 
-function buildGemstoneReportItem(input: GemstoneMedicalInput, p: PlanetInput): GemstoneReportItem {
-  const components = scorePlanet(input, p);
+function buildGemstoneReportItem(input: GemstoneMedicalInput, planetInput: PlanetInput): GemstoneReportItem {
+  const components = scorePlanet(input, planetInput);
   const score = totalScore(components);
   const status = statusFromScore(score);
-  const gem = GEM_KNOWLEDGE[p.planet];
+  const gem = GEM_KNOWLEDGE[planetInput.planet];
 
-  const why = buildWhyRecommended(input, p, score, status);
-  const benefits = buildExpectedBenefits(p, status);
+  const why = buildWhyRecommended(input, planetInput, score, status);
+  const benefits = buildExpectedBenefits(planetInput, status);
 
   return {
-    planet: p.planet,
+    planet: planetInput.planet,
     gemstone: gem.gemstone,
     sanskritName: gem.sanskritName,
     substitute: gem.substitute,
@@ -852,20 +852,20 @@ function buildGemstoneReportItem(input: GemstoneMedicalInput, p: PlanetInput): G
     confidence: score,
     scoreComponents: components,
 
-    verdictTitle: `${gem.gemstone} for ${p.planet}: ${statusLabel(status)}`,
+    verdictTitle: `${gem.gemstone} for ${planetInput.planet}: ${statusLabel(status)}`,
     shortVerdict: `${gem.gemstone} is classified as ${statusLabel(status)} with ${score}/100 confidence.`,
 
-    scoringExplanation: buildScoringNarrative(p, components, score),
+    scoringExplanation: buildScoringNarrative(planetInput, components, score),
     whyAstroLifeRecommendsIt: why,
-    bookStyleInterpretation: buildBookStyleInterpretation(p),
+    bookStyleInterpretation: buildBookStyleInterpretation(planetInput),
     expectedBenefits: benefits,
-    healthAndPsychologyConnection: buildHealthConnection(p),
-    dashaTimingInterpretation: buildDashaTiming(input, p, status),
-    wearingGuidance: buildWearingGuidance(p, status),
-    cautionOrAvoidance: buildCaution(p, status),
-    alternativeRemedies: buildAlternativeRemedies(p),
+    healthAndPsychologyConnection: buildHealthConnection(planetInput),
+    dashaTimingInterpretation: buildDashaTiming(input, planetInput, status),
+    wearingGuidance: buildWearingGuidance(planetInput, status),
+    cautionOrAvoidance: buildCaution(planetInput, status),
+    alternativeRemedies: buildAlternativeRemedies(planetInput),
 
-    pdfReadyParagraph: buildPdfParagraph({ p, score, status, why, benefits }),
+    pdfReadyParagraph: buildPdfParagraph({ p: planetInput, score, status, why, benefits }),
   };
 }
 
