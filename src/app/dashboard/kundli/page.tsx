@@ -6,6 +6,7 @@ import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartS
 import NorthIndianChart from "@/components/north-indian-chart";
 import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
+import { EngineStateCard } from "@/components/engine-state-card";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -330,10 +331,11 @@ export default function KundliPage() {
 
         {/* LOADING */}
         {loading && (
-          <div className="loading-wrap">
-            <div className="spinner"/>
-            <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#c8a030",fontStyle:"italic"}}>Aligning the planets...</div>
-          </div>
+          <EngineStateCard
+            title="Janma Kundli"
+            loading
+            loadingText="Aligning the planets… your cosmic blueprint is being calculated."
+          />
         )}
 
         {/* RESULT */}

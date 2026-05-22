@@ -297,7 +297,7 @@ export default function LalKitabPage() {
         .tag-retro{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);color:#f97316}
         .domain-tabs{display:flex;gap:4px;flex-wrap:wrap;margin:12px 0 8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px}
         .dtab{font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#605890;cursor:pointer;transition:all 0.2s}
-        .dtab.active{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.3);color:#f59e0b}
+        .dtab.active{background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.3);color:#fbbf24}
         .domain-txt{font-size:13px;color:#c8c0a8;line-height:1.8;margin-bottom:8px}
         .home-env-list{display:flex;flex-direction:column;gap:4px;margin:6px 0}
         .home-env-item{font-size:12px;color:#c8c0a8;padding:4px 8px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid rgba(245,158,11,0.3)}
