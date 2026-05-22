@@ -679,10 +679,16 @@ body{background:var(--app-bg,#060410);color:var(--app-fg,#f0e8d0);font-family:'O
 .dash-main {
   margin-left: 240px;
   flex: 1;
+  min-width: 0;
+  width: calc(100% - 240px);
   min-height: 100vh;
 }
 
 @media (max-width: 1024px) {
   .dash-sidebar { display: none; }
-  .dash-main { margin-left: 0; padding-bottom: 84px; }
+  .dash-main {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 84px;
+  }
 }

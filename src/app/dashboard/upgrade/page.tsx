@@ -209,7 +209,7 @@ export default function UpgradePage() {
 
         /* HEADER */
         .page-tag{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#c8a030;margin-bottom:12px;text-align:center}
-        .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,56px);font-weight:600;color:#f0e8d0;text-align:center;line-height:1.1;margin-bottom:14px}
+        .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,48px,56px);font-weight:600;color:#f0e8d0;text-align:center;line-height:1.1;margin-bottom:14px}
         .page-title em{font-style:italic;color:#c8a030}
         .page-sub{font-size:16px;color:#605890;text-align:center;margin-bottom:60px;line-height:1.7}
 
@@ -270,7 +270,7 @@ export default function UpgradePage() {
           .compare{display:none}
           .page{padding:32px 20px}
           .value-strip{grid-template-columns:1fr}
-          .page-title{font-size:42px}
+          .page-title{font-size:38px}
           .page-sub{font-size:14px;margin-bottom:28px}
           .plan{padding:24px 20px;border-radius:16px}
           .plan-price{font-size:44px}

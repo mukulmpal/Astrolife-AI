@@ -2,8 +2,6 @@
 // AstroLife Gemstone Medical Master Engine V2
 // Full scoring: Yogakaraka, house ownership, dignity, Shadbala, dasha, affliction, aspects
 
-/* eslint-disable no-console */
-
 export type Planet =
   | "Sun"
   | "Moon"
@@ -451,10 +449,6 @@ function statusLabel(status: GemStatus): string {
     case "use_carefully": return "Use Carefully";
     case "avoid": return "Avoid";
   }
-}
-
-function getPlanet(input: GemstoneMedicalInput, planet: Planet): PlanetInput | undefined {
-  return input.planets.find((p) => p.planet === planet);
 }
 
 function paragraphJoin(parts: string[]): string {
