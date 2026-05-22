@@ -789,10 +789,11 @@ function expandHomeTag(tag: string, planet: string): string {
 export function calculateLalKitab(
   planets: Record<string,PD>,
   dob:     string,
-  lagnaNum = 0
+  lagnaNum = 0,
+  targetDate = new Date()
 ): LKResult {
-  const birthYear  = new Date(dob).getFullYear();
-  const runningVarsh = getRunningVarsh(dob);
+  const birthYear  = parseLKDate(dob).getFullYear();
+  const runningVarsh = getRunningVarsh(dob, targetDate);
   const currentAge = runningVarsh.completedYears;
 
   // ── conditionScore ────────────────────────────────────

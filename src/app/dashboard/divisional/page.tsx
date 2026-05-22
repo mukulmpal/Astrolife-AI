@@ -7,6 +7,15 @@ import {
   getSpecialFindings,
   type DivChart,
 } from "@/lib/astro-engine/divisional";
+import {
+  buildMarriageDivisionalIntelligence,
+  buildShodashvargaMarriageWisdom,
+} from "@/lib/astro-engine/marriage-intelligence-v2";
+import {
+  analyzeUniversalShodashaVarga,
+  extractDashaInput,
+  formatVargaLabel,
+} from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
@@ -99,6 +108,13 @@ export default function DivisionalPage() {
   const findings = getSpecialFindings(divs);
   const color    = CHART_COLORS[current.key] ?? "#a855f7";
   const meta     = CHART_META[current.key];
+  const universal = analyzeUniversalShodashaVarga({
+    language: "hinglish",
+    birthTimeConfidence: 86,
+    charts: divs,
+    dasha: extractDashaInput(chart),
+  });
+  const currentUniversal = universal.sections.find((section) => section.chart === current.key);
 
   return (
     <div className="page">
@@ -118,6 +134,51 @@ export default function DivisionalPage() {
         .dv-stat{text-align:center;background:rgba(0,0,0,0.2);border-radius:12px;padding:12px 16px;border:1px solid rgba(168,85,247,0.15);min-width:90px}
         .dv-stat-n{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#a855f7;line-height:1}
         .dv-stat-l{font-size:10px;color:#605890;margin-top:4px;letter-spacing:0.5px}
+        .dv-marriage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+        .dv-marriage-card{background:rgba(13,10,34,0.82);border:1px solid rgba(236,72,153,0.2);border-radius:14px;padding:15px}
+        .dv-marriage-score{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;line-height:1;color:#ec4899}
+        .dv-marriage-title{font-size:14px;font-weight:800;color:#f0e8d0;margin:6px 0}
+        .dv-marriage-text{font-size:12px;color:#c8c0a8;line-height:1.7}
+        .dv-marriage-chip{display:inline-flex;margin-top:8px;border:1px solid rgba(200,160,48,.25);border-radius:999px;padding:4px 9px;font-size:10px;color:#d8c47a}
+        .dv-shodash{background:#0d0a22;border:1px solid rgba(200,160,48,0.16);border-radius:16px;padding:16px;margin-bottom:16px}
+        .dv-shodash-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+        .dv-shodash-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#f0e8d0}
+        .dv-shodash-sub{font-size:12px;color:#8f86b7;line-height:1.65;margin-top:4px}
+        .dv-shodash-grid{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:10px;overflow-x:auto;padding-bottom:4px}
+        .dv-shodash-card{background:rgba(8,5,26,0.82);border:1px solid rgba(255,255,255,0.08);border-radius:13px;padding:13px;min-height:178px}
+        .dv-shodash-top{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}
+        .dv-shodash-key{font-size:12px;font-weight:900;color:#c8a030}
+        .dv-shodash-score{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:800;color:#ec4899;line-height:1}
+        .dv-shodash-card h3{font-size:14px;color:#f0e8d0;margin:0 0 5px}
+        .dv-shodash-card p{font-size:12px;color:#c8c0a8;line-height:1.65;margin:0}
+        .dv-shodash-domain{font-size:10px;color:#8f86b7;line-height:1.4;margin-bottom:8px}
+        .dv-universal{background:linear-gradient(135deg,rgba(16,12,42,.96),rgba(10,7,28,.96));border:1px solid rgba(200,160,48,.22);border-radius:18px;padding:18px;margin-bottom:16px}
+        .dv-universal-head{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:14px}
+        .dv-universal-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:6px;font-weight:800}
+        .dv-universal-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:800;color:#f0e8d0}
+        .dv-universal-text{font-size:13px;color:#c8c0a8;line-height:1.8;margin-top:7px}
+        .dv-universal-score{text-align:center;border:1px solid rgba(236,72,153,.25);border-radius:16px;padding:12px 16px;background:rgba(236,72,153,.08);min-width:130px}
+        .dv-universal-score strong{display:block;font-family:'Cormorant Garamond',serif;font-size:38px;line-height:1;color:#f0abfc}
+        .dv-universal-score span{font-size:10px;color:#d8c47a;text-transform:uppercase;letter-spacing:.12em}
+        .dv-universal-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+        .dv-universal-card{background:rgba(8,5,26,.82);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px;cursor:pointer;text-align:left}
+        .dv-universal-card.active{border-color:rgba(200,160,48,.55);background:rgba(200,160,48,.08)}
+        .dv-universal-card-top{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;align-items:center}
+        .dv-universal-card b{font-size:12px;color:#c8a030}
+        .dv-universal-card strong{font-size:22px;color:#f0e8d0}
+        .dv-universal-card h3{font-size:13px;color:#f0e8d0;margin:0 0 5px}
+        .dv-universal-card p{font-size:11px;color:#9e95c8;line-height:1.55;margin:0}
+        .dv-current-reading{background:rgba(8,5,26,.78);border:1px solid rgba(200,160,48,.18);border-radius:16px;padding:16px;margin-bottom:16px}
+        .dv-current-reading h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:#f0e8d0;margin:0 0 8px}
+        .dv-current-reading p{font-size:13px;color:#c8c0a8;line-height:1.85;margin:0 0 12px}
+        .dv-current-reading ul{display:grid;gap:7px;margin:0;padding-left:18px;color:#a99fd0;font-size:12px;line-height:1.7}
+        .dv-growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+        .dv-growth-box{background:#0d0a22;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
+        .dv-growth-box h3{font-size:14px;color:#f0e8d0;margin:0 0 8px}
+        .dv-growth-box p{font-size:12px;color:#b8b0d8;line-height:1.75;margin:0}
+        @media(max-width:920px){.dv-universal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dv-universal-head,.dv-growth-grid{grid-template-columns:1fr}}
+        @media(max-width:640px){.dv-universal-grid{grid-template-columns:1fr}}
+        @media(max-width:920px){.dv-marriage-grid{grid-template-columns:1fr}}
       `}</style>
 
       {/* Header */}
@@ -151,6 +212,114 @@ export default function DivisionalPage() {
       </div>
 
       <PremiumFeature feature="Divisional Charts">
+
+      {/* Universal Shodasha Varga Intelligence */}
+      <section className="dv-universal">
+        <div className="dv-universal-head">
+          <div>
+            <div className="dv-universal-kicker">Universal Shodasha Varga Intelligence</div>
+            <div className="dv-universal-title">D1 Promise + 16 Varga Confirmation</div>
+            <p className="dv-universal-text">{universal.overallNarrative}</p>
+          </div>
+          <div className="dv-universal-score">
+            <strong>{universal.overallScore}</strong>
+            <span>{formatVargaLabel(universal.overallLabel)}</span>
+          </div>
+        </div>
+        <div className="dv-universal-grid">
+          {universal.sections.map((section) => (
+            <button
+              type="button"
+              key={section.chart}
+              className={`dv-universal-card${activeChart === section.chart ? " active" : ""}`}
+              onClick={() => setActiveChart(section.chart)}
+            >
+              <div className="dv-universal-card-top">
+                <b>{section.chart}</b>
+                <strong>{section.score}</strong>
+              </div>
+              <h3>{section.shortName}</h3>
+              <p>{section.confidenceText} · {formatVargaLabel(section.label)}</p>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {currentUniversal && (
+        <section className="dv-current-reading">
+          <h2>{currentUniversal.title}</h2>
+          <p>{currentUniversal.paragraph}</p>
+          <ul>
+            {currentUniversal.recommendations.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="dv-growth-grid">
+        <div className="dv-growth-box">
+          <h3>Strongest Varga Support</h3>
+          <p>{universal.strongestAreas.map((section) => `${section.chart} ${section.shortName} (${section.score})`).join(" · ")}</p>
+        </div>
+        <div className="dv-growth-box">
+          <h3>Growth & Care Areas</h3>
+          <p>{universal.growthAreas.map((section) => `${section.chart} ${section.shortName} (${section.score})`).join(" · ")}</p>
+        </div>
+      </section>
+
+      {/* Marriage Trigger Engine: Divisional layer */}
+      {(() => {
+        const marriage = buildMarriageDivisionalIntelligence(divs);
+        const cards = [
+          marriage.d9MarriageDelivery,
+          marriage.d9ContinuityCare,
+          marriage.d7ChildrenAwareness,
+        ];
+        return (
+          <div className="dv-marriage-grid">
+            {cards.map((item) => (
+              <div key={item.title} className="dv-marriage-card">
+                <div className="dv-marriage-score">{item.score}</div>
+                <div className="dv-marriage-title">{item.title}</div>
+                <div className="dv-marriage-text">{item.paragraph}</div>
+                <span className="dv-marriage-chip">{item.label.replaceAll("_", " ")}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+
+      {/* Shodashvarga relationship wisdom */}
+      {(() => {
+        const wisdom = buildShodashvargaMarriageWisdom(divs);
+        return (
+          <div className="dv-shodash">
+            <div className="dv-shodash-head">
+              <div>
+                <div className="dv-shodash-title">Shodashvarga Marriage Wisdom</div>
+                <div className="dv-shodash-sub">
+                  D1 se D60 tak har varga marriage ko alag lens se refine karta hai: promise, finance, home, romance, conflict repair, children, dharma, career, ancestors, comfort, values aur deep karma.
+                </div>
+              </div>
+              <span className="dv-marriage-chip">20 varga lenses</span>
+            </div>
+            <div className="dv-shodash-grid">
+              {wisdom.map((item) => (
+                <div key={item.key} className="dv-shodash-card">
+                  <div className="dv-shodash-top">
+                    <span className="dv-shodash-key">{item.key}</span>
+                    <span className="dv-shodash-score">{item.score}</span>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <div className="dv-shodash-domain">{item.domain}</div>
+                  <p>{item.paragraph}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Chart Selector */}
       <div className="dv-tabs">

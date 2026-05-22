@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
+import { useUserChart } from "@/lib/user-chart";
+import {
+  buildTransitRipplePayloadFromChart,
+  type TransitRipplePayloadMeta,
+} from "@/lib/astro-engine/transit-master-v2";
 
 type TransitRippleReport = {
   title: string;
@@ -48,11 +53,29 @@ type TransitRippleReport = {
 };
 
 export function TransitRipplePanel() {
+  const { chart, loading: chartLoading, hasUserChart } = useUserChart();
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<TransitRippleReport | null>(null);
   const [error, setError] = useState("");
 
+  const payloadResult = useMemo(() => {
+    if (!hasUserChart || !chart) return null;
+
+    try {
+      return buildTransitRipplePayloadFromChart(chart, "Saturn");
+    } catch {
+      return null;
+    }
+  }, [chart, hasUserChart]);
+
+  const payloadMeta: TransitRipplePayloadMeta | null = payloadResult?.meta ?? null;
+
   async function generateTransit() {
+    if (!payloadResult) {
+      setError("Save or load your birth chart first. Transit Ripple now runs only on your base chart.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setReport(null);
@@ -63,19 +86,7 @@ export function TransitRipplePanel() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          nativeName: "Sample Native",
-          ascendant: "Taurus",
-          moonSign: "Scorpio",
-          transitPlanet: "Saturn",
-          transitSign: "Pisces",
-          transitNakshatra: "Revati",
-          transitSpeed: "direct",
-          currentMahadasha: "Saturn",
-          currentAntardasha: "Mercury",
-          periodLabel: "Saturn in Revati activation window",
-          includeMoonSignReading: true,
-        }),
+        body: JSON.stringify(payloadResult.payload),
       });
 
       const data = await res.json();
@@ -99,22 +110,36 @@ export function TransitRipplePanel() {
         <h1 style={title}>Transit Ripple V4</h1>
         <p style={subtitle}>
           Direct house, aspect houses, 12-house ripple map, remedies, and
-          premium PDF-ready conclusion. Current test: Saturn in Pisces / Revati
-          for Taurus ascendant.
+          premium PDF-ready conclusion. The engine now reads your saved birth
+          chart, Moon sign, active dasha and current Saturn transit instead of
+          sample data.
         </p>
+
+        <div style={contextPanel}>
+          <Stat label="Base Chart" value={payloadMeta?.chartName ?? (chartLoading ? "Loading..." : "Not connected")} />
+          <Stat label="Birth Place" value={payloadMeta?.chartCity ?? "Save a chart first"} />
+          <Stat label="Transit Anchor" value={payloadResult ? `${payloadResult.payload.transitPlanet} in ${payloadResult.payload.transitSign}` : "Waiting"} />
+          <Stat label="Dasha" value={payloadResult ? `${payloadResult.payload.currentMahadasha}-${payloadResult.payload.currentAntardasha}` : "Waiting"} />
+        </div>
 
         <button
           type="button"
           onClick={generateTransit}
-          disabled={loading}
+          disabled={loading || chartLoading || !payloadResult}
           style={{
             ...button,
-            opacity: loading ? 0.65 : 1,
-            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading || chartLoading || !payloadResult ? 0.65 : 1,
+            cursor: loading || chartLoading || !payloadResult ? "not-allowed" : "pointer",
           }}
         >
-          {loading ? "Generating Transit Reading..." : "Generate Transit Ripple"}
+          {loading ? "Generating Transit Reading..." : "Generate From My Birth Chart"}
         </button>
+
+        {!payloadResult && !chartLoading ? (
+          <p style={helperText}>
+            Open Kundli or Onboarding, save your birth chart as primary, then return here.
+          </p>
+        ) : null}
 
         {error ? <pre style={errorBox}>{error}</pre> : null}
       </div>
@@ -250,6 +275,19 @@ const button: CSSProperties = {
   background: "#facc15",
   color: "#111",
   fontWeight: 800,
+};
+
+const contextPanel: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gap: 12,
+  marginTop: 20,
+};
+
+const helperText: CSSProperties = {
+  marginTop: 10,
+  color: "rgba(255,255,255,0.58)",
+  fontSize: 13,
 };
 
 const errorBox: CSSProperties = {

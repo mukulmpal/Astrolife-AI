@@ -68,6 +68,56 @@ function buildShiftedPlanets(
   return shifted;
 }
 
+function parseLKDate(value: string) {
+  const raw = String(value || "").trim();
+  const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+
+  const slash = raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})$/);
+  if (slash) {
+    const first = Number(slash[1]);
+    const second = Number(slash[2]);
+    const year = Number(slash[3].length === 2 ? `20${slash[3]}` : slash[3]);
+    const day = second > 12 ? second : first;
+    const month = second > 12 ? first : second;
+    return new Date(year, month - 1, day);
+  }
+
+  return new Date(raw);
+}
+
+function addLKMonths(date: Date, monthIndex: number) {
+  return new Date(date.getFullYear(), date.getMonth() + monthIndex, date.getDate(), 12);
+}
+
+function getRunningVarshStart(dob: string, target: Date) {
+  const birth = parseLKDate(dob);
+  const birthdayThisYear = new Date(target.getFullYear(), birth.getMonth(), birth.getDate(), 12);
+  const startYear = target >= birthdayThisYear ? target.getFullYear() : target.getFullYear() - 1;
+  return new Date(startYear, birth.getMonth(), birth.getDate(), 12);
+}
+
+function runningVarshMonthIndex(startDate: Date, targetDate: Date) {
+  let monthIndex =
+    (targetDate.getFullYear() - startDate.getFullYear()) * 12 +
+    (targetDate.getMonth() - startDate.getMonth());
+  if (targetDate.getDate() < startDate.getDate()) monthIndex -= 1;
+  return Math.max(0, Math.min(11, monthIndex));
+}
+
+function buildLKTargetDate(dob: string, yearOffset: number, selectedMonthIndex: number | null) {
+  const today = new Date();
+  const currentStart = getRunningVarshStart(dob, today);
+  const currentMonthIndex = runningVarshMonthIndex(currentStart, today);
+  const targetStart = new Date(
+    currentStart.getFullYear() + yearOffset,
+    currentStart.getMonth(),
+    currentStart.getDate(),
+    12,
+  );
+  return addLKMonths(targetStart, selectedMonthIndex ?? currentMonthIndex);
+}
+
 function LalKitabHouseChart({
   title,
   subtitle,
@@ -157,14 +207,20 @@ export default function LalKitabPage() {
   const [activeTab, setActiveTab]     = useState<Tab>("planets");
   const [expanded, setExpanded]       = useState<string | null>(null);
   const [domainTab, setDomainTab]     = useState<DomainTab>("nishani");
+  const [lkYearOffset, setLkYearOffset] = useState(0);
+  const [lkMonthIndex, setLkMonthIndex] = useState<number | null>(null);
   const { birth, chart }              = useUserChart();
   const { t, tp, ts, lang } = useLanguage();
   const result = calculateLalKitab(chart.planets as never, birth.dob, (chart as never as { lagnaNum?: number }).lagnaNum ?? 0);
+  const lkTargetDate = useMemo(
+    () => buildLKTargetDate(birth.dob, lkYearOffset, lkMonthIndex),
+    [birth.dob, lkYearOffset, lkMonthIndex],
+  );
   const timeResult = calculateLalKitabTimeEngine({
     dob: birth.dob,
     planets: chart.planets,
     lagnaNum: (chart as never as { lagnaNum?: number }).lagnaNum ?? 0,
-    targetDate: new Date(),
+    targetDate: lkTargetDate,
   });
   const natalLagnaIndex = (chart as never as { lagnaNum?: number }).lagnaNum ?? 0;
   const natalChart = buildShiftedPlanets(chart.planets, 0);
@@ -334,6 +390,11 @@ export default function LalKitabPage() {
         .lk-report-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#f0e8d0;margin-bottom:10px}
         .lk-report-p{font-size:14px;color:#c8c0a8;line-height:1.95;margin-bottom:10px}
         .lk-bullet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}
+        .lk-scroll-panel{background:rgba(255,255,255,0.035);border:1px solid rgba(200,160,48,0.18);border-radius:14px;padding:14px;margin-bottom:16px}
+        .lk-scroll-row{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:thin}
+        .lk-scroll-btn{white-space:nowrap;border:1px solid rgba(255,255,255,0.1);background:#08051a;color:#c8c0a8;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:750;cursor:pointer}
+        .lk-scroll-btn.active{border-color:#c8a030;background:rgba(200,160,48,0.15);color:#f4df9d}
+        .lk-scroll-meta{font-size:12px;color:#8f86b8;line-height:1.6;margin-top:4px}
         @media(max-width:768px){.planet-grid{grid-template-columns:1fr}.combo-grid{grid-template-columns:1fr}.varsh-grid{grid-template-columns:1fr}}
         @media(max-width:900px){.lk-gochar-grid,.lk-time-grid{grid-template-columns:1fr}}
       `}</style>
@@ -908,6 +969,41 @@ export default function LalKitabPage() {
           <div>
             <div style={{background:"rgba(200,160,48,0.06)",border:"1px solid rgba(200,160,48,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
               📕 <strong style={{color:"#c8a030"}}>LK Gochar</strong> — Yeh normal transit/gochar nahi hai. Yeh Lal Kitab ka time-reading layer hai: natal condition, 35-sala chakra, varshphal aur monthly phal ko ek saath read karta hai.
+            </div>
+
+            <div className="lk-scroll-panel">
+              <div className="varsh-col-title" style={{color:"#c8a030"}}>Year Scroll</div>
+              <div className="lk-scroll-row" aria-label="Select Lal Kitab Varshphal year">
+                {[-3, -2, -1, 0, 1, 2, 3, 4, 5].map((offset) => (
+                  <button
+                    key={offset}
+                    type="button"
+                    className={`lk-scroll-btn ${lkYearOffset === offset ? "active" : ""}`}
+                    onClick={() => {
+                      setLkYearOffset(offset);
+                      setLkMonthIndex(null);
+                    }}
+                  >
+                    {offset === 0 ? "Current Year" : offset > 0 ? `+${offset} Year` : `${offset} Year`}
+                  </button>
+                ))}
+              </div>
+              <div className="varsh-col-title" style={{color:"#60a5fa",marginTop:8}}>Monthly Phal Scroll</div>
+              <div className="lk-scroll-row" aria-label="Select month inside selected Lal Kitab Varshphal year">
+                {Array.from({length: 12}, (_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`lk-scroll-btn ${timeResult.monthlyPhal.monthIndex === index ? "active" : ""}`}
+                    onClick={() => setLkMonthIndex(index)}
+                  >
+                    Month {index + 1}
+                  </button>
+                ))}
+              </div>
+              <div className="lk-scroll-meta">
+                Generated for {timeResult.varshphal.periodLabel}. Active monthly layer: {timeResult.monthlyPhal.monthName}, Varsh month {timeResult.monthlyPhal.runningMonth}. Use Current Year to return to today&apos;s running Lal Kitab year.
+              </div>
             </div>
 
             <div className="lk-time-grid">

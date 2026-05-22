@@ -21,8 +21,8 @@ export function Footer() {
             <div key={column.title}>
               <h3>{column.title}</h3>
               {column.links.map((link) => (
-                <Link key={link} href="#">
-                  {link}
+                <Link key={link.label} href={link.href}>
+                  {link.label}
                 </Link>
               ))}
             </div>

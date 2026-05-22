@@ -9,6 +9,13 @@ import {
   type KPRow,
   type SignificatorSet,
 } from "@/lib/astro-engine/kp";
+import { calculateDivisional } from "@/lib/astro-engine/divisional";
+import { buildMarriageKPIntelligence } from "@/lib/astro-engine/marriage-intelligence-v2";
+import {
+  analyzeUniversalShodashaVarga,
+  extractDashaInput,
+  formatVargaLabel,
+} from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { useLanguage } from "@/lib/language-context";
 
@@ -86,6 +93,18 @@ export default function KPPage() {
   const result: KPEngineResult = useMemo(() => {
     return runKPEngine(chart);
   }, [chart]);
+  const marriageKP = useMemo(() => buildMarriageKPIntelligence(result), [result]);
+  const kpVargaValidation = useMemo(() => {
+    if (!chart?.planets) return [];
+    const divs = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
+    const universal = analyzeUniversalShodashaVarga({
+      language: "hinglish",
+      birthTimeConfidence: 86,
+      charts: divs,
+      dasha: extractDashaInput(chart),
+    });
+    return universal.sections.filter((section) => ["D9", "D10", "D4", "D7"].includes(section.chart));
+  }, [chart]);
 
   if (loading) {
     return (
@@ -151,6 +170,38 @@ export default function KPPage() {
             MD: {result.input.currentMD || "Not connected"} · AD:{" "}
             {result.input.currentAD || "Not connected"}
           </p>
+        </div>
+      </section>
+
+      <section className="kp-marriage-v2">
+        <div>
+          <span>Marriage Trigger Engine · KP Layer</span>
+          <h2>{marriageKP.title}</h2>
+          <p>{marriageKP.paragraph}</p>
+        </div>
+        <aside>
+          <strong>{marriageKP.score}</strong>
+          <em>{marriageKP.label.replaceAll("_", " ")}</em>
+        </aside>
+      </section>
+
+      <section className="kp-varga-validation">
+        <div className="kp-varga-validation-head">
+          <span>KP + Varga Validation</span>
+          <p>
+            KP decides event promise through cusp, star lord and sub lord. Varga confirms whether the birth chart has
+            enough domain support before timing is trusted.
+          </p>
+        </div>
+        <div className="kp-varga-validation-grid">
+          {kpVargaValidation.map((section) => (
+            <div key={section.chart}>
+              <strong>{section.chart}</strong>
+              <span>{section.shortName}</span>
+              <em>{section.score}/100</em>
+              <p>{formatVargaLabel(section.label)} · KP houses H{section.kpPositiveHouses.join(" H")}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -622,6 +673,138 @@ export default function KPPage() {
           font-size: 11px;
           font-style: normal;
           text-transform: capitalize;
+        }
+
+        .kp-marriage-v2 {
+          max-width: 1180px;
+          margin: 0 auto 18px;
+          border: 1px solid rgba(236, 72, 153, 0.22);
+          background:
+            radial-gradient(circle at top left, rgba(236, 72, 153, 0.14), transparent 32%),
+            rgba(255, 255, 255, 0.055);
+          border-radius: 24px;
+          padding: 18px;
+          display: grid;
+          grid-template-columns: 1fr 130px;
+          gap: 16px;
+          align-items: center;
+        }
+
+        .kp-marriage-v2 span {
+          color: #f0abfc;
+          font-size: 11px;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+          font-weight: 950;
+        }
+
+        .kp-marriage-v2 h2 {
+          margin: 8px 0;
+          font-size: 24px;
+        }
+
+        .kp-marriage-v2 p {
+          margin: 0;
+          color: rgba(232,227,240,0.68);
+          line-height: 1.7;
+        }
+
+        .kp-marriage-v2 aside {
+          text-align: center;
+          border: 1px solid rgba(236,72,153,0.22);
+          border-radius: 18px;
+          padding: 14px;
+          background: rgba(0,0,0,0.18);
+        }
+
+        .kp-marriage-v2 aside strong {
+          display: block;
+          font-size: 34px;
+          color: #f0abfc;
+          line-height: 1;
+        }
+
+        .kp-marriage-v2 aside em {
+          display: block;
+          margin-top: 6px;
+          color: rgba(232,227,240,0.62);
+          font-size: 11px;
+          font-style: normal;
+          text-transform: capitalize;
+        }
+
+        .kp-varga-validation {
+          max-width: 1180px;
+          margin: 0 auto 18px;
+          border: 1px solid rgba(200, 160, 48, 0.16);
+          background: rgba(255, 255, 255, 0.045);
+          border-radius: 24px;
+          padding: 18px;
+        }
+
+        .kp-varga-validation-head {
+          display: flex;
+          justify-content: space-between;
+          gap: 18px;
+          align-items: flex-start;
+          margin-bottom: 12px;
+        }
+
+        .kp-varga-validation-head span {
+          color: #f5c542;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
+          font-weight: 900;
+          white-space: nowrap;
+        }
+
+        .kp-varga-validation-head p {
+          color: rgba(232, 227, 240, 0.68);
+          line-height: 1.65;
+          margin: 0;
+          max-width: 780px;
+        }
+
+        .kp-varga-validation-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 10px;
+        }
+
+        .kp-varga-validation-grid div {
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(0, 0, 0, 0.18);
+          border-radius: 16px;
+          padding: 13px;
+        }
+
+        .kp-varga-validation-grid strong {
+          color: #f5c542;
+          font-size: 13px;
+        }
+
+        .kp-varga-validation-grid span {
+          display: block;
+          color: rgba(232, 227, 240, 0.9);
+          font-weight: 800;
+          margin-top: 4px;
+        }
+
+        .kp-varga-validation-grid em {
+          display: block;
+          color: #f0abfc;
+          font-style: normal;
+          font-weight: 950;
+          font-size: 24px;
+          margin: 6px 0;
+        }
+
+        .kp-varga-validation-grid p {
+          color: rgba(232, 227, 240, 0.62);
+          font-size: 12px;
+          line-height: 1.55;
+          margin: 0;
         }
 
         .kp-events-wrap,
@@ -1429,6 +1612,8 @@ export default function KPPage() {
           .kp-header,
           .kp-top-hints,
           .kp-logic-note,
+          .kp-varga-validation-head,
+          .kp-varga-validation-grid,
           .kp-events-grid,
           .kp-forecast-grid,
           .kp-event-picker,

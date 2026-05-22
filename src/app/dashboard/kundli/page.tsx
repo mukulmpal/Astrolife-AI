@@ -5,21 +5,37 @@ import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult } from 
 import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
 import { useLanguage } from "@/lib/language-context";
-
-const CITIES = [
-  "Mumbai","Delhi","Bangalore","Chennai","Kolkata","Hyderabad",
-  "Pune","Ahmedabad","Jaipur","Lucknow","Chandigarh","Bhopal",
-  "Indore","Nagpur","Surat","Varanasi","Amritsar","Dehradun",
-  "Kochi","Patna","Agra","Mysuru","Coimbatore","Visakhapatnam","New Delhi",
-];
+import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
 const PCOL = ["#f97316","#c084fc","#ef4444","#22c55e","#f59e0b","#ec4899","#60a5fa","#a78bfa","#fb7185"];
 
+function ianaToUtcOffset(timezone: string | null, dob: string, tob: string): number {
+  if (!timezone) return 5.5;
+
+  try {
+    const date = new Date(`${dob || "2000-01-01"}T${tob || "12:00"}:00Z`);
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: timezone,
+      timeZoneName: "shortOffset",
+    }).formatToParts(date);
+    const tzStr = parts.find((part) => part.type === "timeZoneName")?.value ?? "GMT+5:30";
+    const match = tzStr.match(/GMT([+-])(\d+)(?::(\d+))?/);
+    if (!match) return 5.5;
+    const sign = match[1] === "-" ? -1 : 1;
+    const hours = Number(match[2] ?? 0);
+    const minutes = Number(match[3] ?? 0);
+    return sign * (hours + minutes / 60);
+  } catch {
+    return 5.5;
+  }
+}
+
 export default function KundliPage() {
   const { tp, ts, tn } = useLanguage();
-  const [form,      setForm]      = useState({name:"",dob:"",tob:"",city:""});
+  const [form,      setForm]      = useState({name:"",dob:"",tob:"",city:"",lat:null as number | null,lon:null as number | null,tz:null as number | null});
+  const [selectedCity, setSelectedCity] = useState<CitySearchResult | null>(null);
   const [chart,     setChart]     = useState<ChartData|null>(null);
   const [yogas,     setYogas]     = useState<YogaResult[]>([]);
   const [yogaScore, setYogaScore] = useState<{total:number;rating:string;rareCount:number}>({total:0,rating:"",rareCount:0});
@@ -28,12 +44,8 @@ export default function KundliPage() {
   const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
   const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("chart");
-  const [citySearch,setCitySearch]= useState("");
-  const [showCities,setShowCities]= useState(false);
   const [showForm, setShowForm] = useState(true);
   const { chart: primaryChart, loading: chartLoading } = useUserChart();
-
-  const filtered = CITIES.filter(c=>c.toLowerCase().includes(citySearch.toLowerCase()));
 
   const applyChart = (data: ChartData) => {
     setChart(data);
@@ -84,11 +96,19 @@ export default function KundliPage() {
   };
 
   const handleGenerate = async () => {
-    if(!form.name||!form.dob||!form.tob||!form.city) return;
+    if(!form.name||!form.dob||!form.tob||!form.city||!selectedCity) return;
     setLoading(true);
     await new Promise(r=>setTimeout(r,600));
     try {
-      const data = calculateChart(form.name,form.dob,form.tob,form.city);
+      const data = calculateChart(
+        form.name,
+        form.dob,
+        form.tob,
+        form.city,
+        form.lat ?? undefined,
+        form.lon ?? undefined,
+        form.tz ?? undefined,
+      );
       await saveChartToAccount(data);
       applyChart(data);
       setSaveStatus("Chart saved as primary.");
@@ -97,7 +117,7 @@ export default function KundliPage() {
       await fetch("/api/charts/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, dob: form.dob, tob: form.tob, city: form.city }),
+        body: JSON.stringify({ name: form.name, dob: form.dob, tob: form.tob, city: form.city, lat: form.lat, lon: form.lon }),
       }).catch(() => {});
     } catch(e){ console.error(e); }
     setLoading(false);
@@ -135,10 +155,7 @@ export default function KundliPage() {
         .input{height:50px;padding:0 16px;background:rgba(255,255,255,0.03);border:1px solid #1c1840;border-radius:12px;outline:none;font-size:14px;color:#f0e8d0;font-family:'Outfit',sans-serif;transition:border-color 0.2s;width:100%}
         .input:focus{border-color:#c8a030}
         .input::placeholder{color:#3a3060}
-        .city-wrap{position:relative}
-        .city-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0f0c28;border:1px solid #261f50;border-radius:12px;z-index:20;max-height:180px;overflow-y:auto}
-        .city-opt{padding:11px 16px;font-size:13px;color:#c8c0a8;cursor:pointer;transition:background 0.15s}
-        .city-opt:hover{background:rgba(200,160,48,0.08);color:#f0e8d0}
+        .city-note{margin-top:8px;font-size:12px;color:#605890;line-height:1.6}
         .btn-gen{width:100%;margin-top:20px;padding:16px;background:linear-gradient(135deg,#c8a030,#3c2880cc);border:none;border-radius:12px;font-size:15px;font-weight:600;color:#060410;cursor:pointer;transition:all 0.25s;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
         .btn-gen:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px rgba(200,160,48,0.3)}
         .btn-gen:disabled{opacity:0.5;cursor:not-allowed}
@@ -260,37 +277,46 @@ export default function KundliPage() {
               <label className="label">Date of Birth</label>
               <input className="input" type="date" value={form.dob}
                 max={new Date().toISOString().split("T")[0]}
-                onChange={e=>setForm(f=>({...f,dob:e.target.value}))}
+                onChange={e=>setForm(f=>({
+                  ...f,
+                  dob:e.target.value,
+                  tz:selectedCity ? ianaToUtcOffset(selectedCity.timezone, e.target.value, f.tob) : f.tz,
+                }))}
                 style={{colorScheme:"dark"}}/>
             </div>
             <div className="form-group">
               <label className="label">Time of Birth</label>
               <input className="input" type="time" value={form.tob}
-                onChange={e=>setForm(f=>({...f,tob:e.target.value}))}
+                onChange={e=>setForm(f=>({
+                  ...f,
+                  tob:e.target.value,
+                  tz:selectedCity ? ianaToUtcOffset(selectedCity.timezone, f.dob, e.target.value) : f.tz,
+                }))}
                 style={{colorScheme:"dark"}}/>
             </div>
             <div className="form-group">
-              <label className="label">Birth City</label>
-              <div className="city-wrap">
-                <input className="input" placeholder="Search city..."
-                  value={citySearch}
-                  onChange={e=>{setCitySearch(e.target.value);setForm(f=>({...f,city:""}));setShowCities(true);}}
-                  onFocus={()=>setShowCities(true)}/>
-                {showCities && citySearch.length>0 && filtered.length>0 && (
-                  <div className="city-drop">
-                    {filtered.map(c=>(
-                      <div key={c} className="city-opt"
-                        onClick={()=>{setForm(f=>({...f,city:c}));setCitySearch(c);setShowCities(false);}}>
-                        {c}
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <CityAutocomplete
+                label="Birth City"
+                value={selectedCity}
+                placeholder="Search from 68k+ cities, e.g. Mumbai, London, New York"
+                onChange={(city) => {
+                  setSelectedCity(city);
+                  setForm((prev) => ({
+                    ...prev,
+                    city: city?.displayName ?? "",
+                    lat: city?.latitude ?? null,
+                    lon: city?.longitude ?? null,
+                    tz: city ? ianaToUtcOffset(city.timezone, prev.dob, prev.tob) : null,
+                  }));
+                }}
+              />
+              <div className="city-note">
+                No manual latitude or longitude needed. Select your city and AstroLife applies coordinates and timezone automatically.
               </div>
             </div>
           </div>
           <button className="btn-gen" onClick={handleGenerate}
-            disabled={!form.name||!form.dob||!form.tob||!form.city||loading}>
+            disabled={!form.name||!form.dob||!form.tob||!form.city||!selectedCity||loading}>
             {loading?"⟳ Calculating...":"🔯 Generate Kundli"}
           </button>
         </div>

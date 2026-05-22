@@ -12,7 +12,7 @@ const AGENTS: Record<string, { name: string; emoji: string; system: string }> = 
   },
   marriage: {
     name: "Marriage Agent", emoji: "💑",
-    system: `You are AstroLife Marriage Agent. Focus: 7th house, Venus, Jupiter, Navamsha D-9, Venus/Jupiter transits. Analyze: marriage timing, compatibility, relationship karma. Empathetic, romantic. ✦ bullets. Max 200 words.`,
+    system: `You are AstroLife Marriage Agent using the AstroLife Marriage Trigger Engine. Focus: D1/D9 promise, 7th house, Venus, Jupiter, KP 2-7-11 validation, dasha activation and transit/event trigger windows. Do not attribute this to any external named marriage system. Analyze marriage timing, compatibility and relationship karma. Empathetic, practical. ✦ bullets. Max 200 words.`,
   },
   karmic: {
     name: "Karmic Agent", emoji: "☯️",
@@ -93,12 +93,13 @@ async function saveChatMessages(userId: string | null, sessionId: string, agentI
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, agentId = "general", chartContext, transitContext, dailyFeedContext } = await req.json();
+    const { messages, agentId = "general", chartContext, transitContext, dailyFeedContext, vargaContext } = await req.json();
     const agent = AGENTS[agentId] || AGENTS.general;
 
     const systemPrompt = [
       agent.system,
       chartContext   ? `\nUSER'S BIRTH CHART:\n${chartContext}` : "",
+      vargaContext   ? `\nSHODASHA VARGA INTELLIGENCE:\n${vargaContext}` : "",
       transitContext ? `\nCURRENT TRANSITS:\n${transitContext}` : "",
       dailyFeedContext ? `\nDAILY FEED:\n${dailyFeedContext}` : "",
       `\nStyle: Premium Hinglish. ✦ bullets. Max 200 words. Sign off as: "${agent.emoji} ${agent.name}"`,
@@ -117,6 +118,7 @@ export async function POST(req: NextRequest) {
 
     const sources = [
       chartContext    ? "Natal Chart"     : null,
+      vargaContext    ? "Shodasha Varga"   : null,
       transitContext  ? "Transit/Gochar"  : null,
       dailyFeedContext ? "Daily Feed"     : null,
     ].filter(Boolean);

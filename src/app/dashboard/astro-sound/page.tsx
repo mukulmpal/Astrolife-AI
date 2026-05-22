@@ -148,6 +148,17 @@ function hasPlanetSignal(raw: GenericObj) {
   ].some((value) => value !== undefined && value !== null && value !== "");
 }
 
+function getChartLongitude(root: GenericObj, ascendant: GenericObj | undefined, lagR: number) {
+  return normalizeNumber(
+    root?.lagLon ??
+      root?.lagnaLon ??
+      root?.ascendantLongitude ??
+      ascendant?.lon ??
+      ascendant?.longitude,
+    lagR * 30
+  );
+}
+
 function normalizeAstroSoundChart(source: unknown): ChartData | null {
   const src = (source as GenericObj | null | undefined) ?? undefined;
   const root = ((src?.chart as GenericObj | undefined) ?? src) as GenericObj | undefined;
@@ -221,7 +232,7 @@ function normalizeAstroSoundChart(source: unknown): ChartData | null {
 
   return {
     lagR,
-    lagLon: normalizeNumber(root?.lagLon ?? ascendant?.longitude, lagR * 30),
+    lagLon: getChartLongitude(root, ascendant, lagR),
     dob: String(root?.dob ?? birth?.date ?? ""),
     planets,
   };
@@ -400,20 +411,30 @@ export default function AstroSoundPage() {
 
     window.setTimeout(() => {
       if (!aliveRef.current || runId !== runIdRef.current) return;
-      const next = runAstroSound({
-        chart: chartData,
-        goal: settings.goal,
-        emotion: settings.emotion,
-        voice: settings.voice,
-        intensity: settings.intensity,
-        mode: settings.mode,
-        memory,
-      });
 
-      if (!aliveRef.current || runId !== runIdRef.current) return;
-      setResult(next);
-      setLastReportText(buildReportText(next));
-      setLoading(false);
+      try {
+        const next = runAstroSound({
+          chart: chartData,
+          goal: settings.goal,
+          emotion: settings.emotion,
+          voice: settings.voice,
+          intensity: settings.intensity,
+          mode: settings.mode,
+          memory,
+        });
+
+        if (!aliveRef.current || runId !== runIdRef.current) return;
+        setResult(next);
+        setLastReportText(buildReportText(next));
+      } catch {
+        if (aliveRef.current && runId === runIdRef.current) {
+          setUiNotice("Astro Sound could not generate right now. Please try again.");
+        }
+      } finally {
+        if (aliveRef.current && runId === runIdRef.current) {
+          setLoading(false);
+        }
+      }
     }, 250);
   }, [chartData, memory, setLastReportText, setLoading, setResult, settings]);
 
@@ -989,7 +1010,7 @@ export default function AstroSoundPage() {
           max-width: 1200px;
           margin: 0 auto 22px;
           border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 30px;
+          border-radius: 8px;
           padding: 30px;
           background: rgba(255, 255, 255, 0.06);
           display: grid;
@@ -1012,7 +1033,7 @@ export default function AstroSoundPage() {
           margin: 0 0 12px;
           font-size: clamp(38px, 6vw, 74px);
           line-height: 0.92;
-          letter-spacing: -0.07em;
+          letter-spacing: 0;
         }
 
         .as-hero p {
@@ -1033,7 +1054,7 @@ export default function AstroSoundPage() {
         .as-orb {
           width: 190px;
           height: 190px;
-          border-radius: 50%;
+          border-radius: 8px;
           display: grid;
           place-items: center;
           justify-self: end;
@@ -1075,7 +1096,7 @@ export default function AstroSoundPage() {
         .as-roadmap {
           border: 1px solid rgba(255, 255, 255, 0.1);
           background: rgba(255, 255, 255, 0.06);
-          border-radius: 28px;
+          border-radius: 8px;
           padding: 22px;
           backdrop-filter: blur(18px);
         }
@@ -1788,6 +1809,15 @@ export default function AstroSoundPage() {
             padding: 16px;
           }
 
+          .as-hero {
+            padding: 22px;
+          }
+
+          .as-hero h1 {
+            font-size: 42px;
+            line-height: 1;
+          }
+
           .as-hero,
           .as-grid {
             grid-template-columns: 1fr;
@@ -1795,6 +1825,8 @@ export default function AstroSoundPage() {
 
           .as-orb {
             justify-self: start;
+            width: 150px;
+            height: 150px;
           }
 
           .as-meta-grid,
@@ -1814,6 +1846,37 @@ export default function AstroSoundPage() {
 
           .as-primary {
             grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .as-shell {
+            padding: 12px;
+          }
+
+          .as-hero,
+          .as-panel,
+          .as-result,
+          .as-roadmap,
+          .as-card,
+          .as-music-references {
+            padding: 16px;
+          }
+
+          .as-chip-grid,
+          .as-chip-grid.small,
+          .as-segment,
+          .as-music-card {
+            grid-template-columns: 1fr;
+          }
+
+          .as-music-card {
+            display: grid;
+          }
+
+          .as-primary h2 {
+            font-size: 34px;
+            letter-spacing: 0;
           }
         }
       `}</style>

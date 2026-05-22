@@ -209,8 +209,37 @@ export const trustPoints = [
 ];
 
 export const footerColumns = [
-  { title: "Product", links: ["Free Kundli", "AI Chat", "Reports", "Pricing"] },
-  { title: "Engines", links: ["KP", "Lal Kitab", "Nadi", "Dasha", "Transit"] },
-  { title: "Company", links: ["About", "Contact", "Blog"] },
-  { title: "Legal", links: ["Privacy", "Terms", "Refunds"] },
+  {
+    title: "Product",
+    links: [
+      { label: "Free Kundli", href: "/dashboard/kundli" },
+      { label: "AI Chat", href: "/dashboard/chat" },
+      { label: "Reports", href: "/dashboard/report" },
+      { label: "Pricing", href: "/dashboard/upgrade" },
+    ],
+  },
+  {
+    title: "Engines",
+    links: [
+      { label: "KP", href: "/dashboard/kp" },
+      { label: "Lal Kitab", href: "/dashboard/lalkitab" },
+      { label: "Dasha", href: "/dashboard/dasha" },
+      { label: "Transit", href: "/dashboard/transits" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "Contact", href: "/contact" },
+      { label: "Disclaimer", href: "/disclaimer" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+      { label: "Refunds", href: "/refund" },
+    ],
+  },
 ];

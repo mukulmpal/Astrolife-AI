@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useLanguage, type Language } from "@/lib/language-context";
 
 const LANGS: Array<{ key: Language; label: string }> = [
@@ -10,11 +10,11 @@ const LANGS: Array<{ key: Language; label: string }> = [
 
 export function LanguageToggle() {
   const { lang, setLang } = useLanguage();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const shellStyle = {
     display: "inline-flex",

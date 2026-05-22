@@ -2,6 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { calculateEventRadarReport, EventRadarSignal } from "@/lib/astro-engine/event-radar";
+import { runKPEngine } from "@/lib/astro-engine/kp";
+import { calculateDivisional } from "@/lib/astro-engine/divisional";
+import { buildMarriageEventRadar, buildMarriageKPIntelligence } from "@/lib/astro-engine/marriage-intelligence-v2";
+import {
+  analyzeUniversalShodashaVarga,
+  extractDashaInput,
+  formatVargaLabel,
+} from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
 import { TransitBase } from "@/lib/astro-engine/transits";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
@@ -30,6 +38,24 @@ export default function EventRadarPage() {
     if (!transitChart) return null;
     return calculateEventRadarReport({ chart: transitChart, startDate, days: 7, base });
   }, [transitChart, startDate, base]);
+  const marriageRadar = useMemo(() => {
+    if (!report || !userChart) return null;
+    const kp = buildMarriageKPIntelligence(runKPEngine(userChart));
+    return buildMarriageEventRadar(report, kp);
+  }, [report, userChart]);
+  const vargaTiming = useMemo(() => {
+    if (!userChart?.planets) return null;
+    const divs = calculateDivisional(userChart.planets as never, userChart.lagnaNum, userChart.lagnaLon);
+    const universal = analyzeUniversalShodashaVarga({
+      language: "hinglish",
+      birthTimeConfidence: 86,
+      charts: divs,
+      dasha: extractDashaInput(userChart),
+    });
+    return universal.sections.filter((section) => (
+      section.chart === "D9" || section.chart === "D10" || section.chart === "D4" || section.chart === "D2"
+    ));
+  }, [userChart]);
 
   if (loading || !report) {
     return (
@@ -90,8 +116,16 @@ export default function EventRadarPage() {
         .er-detail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
         .er-box{background:#0a0720;border:1px solid #221d45;border-radius:12px;padding:12px}
         .er-muted{font-size:12px;color:#8f86b7}
+        .er-marriage-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+        .er-marriage-day{background:#0a0720;border:1px solid rgba(236,72,153,.22);border-radius:12px;padding:12px}
+        .er-marriage-score{font-size:24px;font-weight:800;color:#f0abfc}
+        .er-varga-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+        .er-varga-card{background:#0a0720;border:1px solid rgba(200,160,48,.18);border-radius:12px;padding:13px}
+        .er-varga-top{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px}
+        .er-varga-top span{font-size:12px;color:#c8a030;font-weight:800}
+        .er-varga-top strong{font-size:22px;color:#f0e8d0}
         @media(max-width:1024px){.span-8,.span-4{grid-column:span 12}.er-days{grid-template-columns:repeat(3,minmax(0,1fr))}.er-detail{grid-template-columns:1fr}}
-        @media(max-width:640px){.er-wrap{padding:20px 14px 98px}.er-title{font-size:28px}.er-days{grid-template-columns:1fr}}
+        @media(max-width:640px){.er-wrap{padding:20px 14px 98px}.er-title{font-size:28px}.er-days,.er-marriage-list,.er-varga-grid{grid-template-columns:1fr}}
       `}</style>
 
       <div className="er-shell">
@@ -139,6 +173,61 @@ export default function EventRadarPage() {
               ))}
             </div>
           </article>
+
+          {marriageRadar && (
+            <article className="er-card span-12">
+              <div className="er-row">
+                <div>
+                  <h3 className="er-h">{marriageRadar.title}</h3>
+                  <p className="er-p">{marriageRadar.paragraph}</p>
+                </div>
+                <span className="er-pill">{marriageRadar.score}/100 · {marriageRadar.label.replaceAll("_", " ")}</span>
+              </div>
+              <div className="er-marriage-list">
+                {marriageRadar.windows.length ? marriageRadar.windows.map((window) => (
+                  <div className="er-marriage-day" key={window.date}>
+                    <div className="er-muted">{window.weekday}</div>
+                    <strong>{window.label}</strong>
+                    <div className="er-marriage-score">{window.score}</div>
+                    <p className="er-muted">{window.reason}</p>
+                    <p className="er-p">{window.action}</p>
+                  </div>
+                )) : (
+                  <div className="er-marriage-day">
+                    <strong>No strong window</strong>
+                    <p className="er-p">Use this week for observation, repair and calm communication instead of forcing marriage decisions.</p>
+                  </div>
+                )}
+              </div>
+            </article>
+          )}
+
+          {vargaTiming && (
+            <article className="er-card span-12">
+              <div className="er-row">
+                <div>
+                  <h3 className="er-h">Varga Confirmed Event Support</h3>
+                  <p className="er-p">
+                    Event Radar uses transit as the current weather. These cards add the birth-chart promise layer:
+                    D9 for marriage, D10 for career, D4 for property and D2 for money.
+                  </p>
+                </div>
+                <span className="er-pill">D1 + Varga + Dasha</span>
+              </div>
+              <div className="er-varga-grid">
+                {vargaTiming.map((section) => (
+                  <div key={section.chart} className="er-varga-card">
+                    <div className="er-varga-top">
+                      <span>{section.chart} · {section.shortName}</span>
+                      <strong>{section.score}</strong>
+                    </div>
+                    <p className="er-muted">{section.confidenceText} · {formatVargaLabel(section.label)}</p>
+                    <p className="er-p">{section.activatedByDasha.length ? `${section.activatedByDasha.join(", ")} dasha activation is live.` : "No direct dasha activation; use as promise support."}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          )}
 
           <article className="er-card span-12">
             <h3 className="er-h">Today Guidance</h3>

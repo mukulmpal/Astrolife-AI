@@ -417,7 +417,6 @@ body {
 .display-s  { font-family:'Cormorant Garamond',serif; font-weight:500; font-size:26px; line-height:1.15; }
 .serif-italic { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; }
 .devanagari { font-family:'Noto Serif Devanagari',serif; font-weight:500; }
-.glyph { font-family:'Noto Sans Symbols 2','Noto Serif Devanagari',serif; }
 .eyebrow { font-family:'Inter',sans-serif; font-weight:500; font-size:10.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); }
 .kicker  { font-family:'Inter',sans-serif; font-weight:500; font-size:11px;   letter-spacing:0.2em;  text-transform:uppercase; color:var(--ivory-mute); }
 .body    { font-family:'Inter',sans-serif; font-size:13.5px; line-height:1.65; color:var(--ivory-dim); }
@@ -1092,38 +1091,82 @@ function page5BirthSnapshot(chart: ChartData): string {
 function page6PlanetaryDashboard(chart: ChartData): string {
   const planets = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 
+  // Natural nature (well-established classical classification)
+  const NATURE: Record<string, { label: string; cls: string }> = {
+    Sun:     { label: "Malefic",      cls: "crimson" },
+    Moon:    { label: "Neutral",      cls: "" },
+    Mars:    { label: "Malefic",      cls: "crimson" },
+    Mercury: { label: "Benefic",      cls: "jade" },
+    Jupiter: { label: "Benefic",      cls: "jade" },
+    Venus:   { label: "Benefic",      cls: "jade" },
+    Saturn:  { label: "Malefic",      cls: "crimson" },
+    Rahu:    { label: "Nat. Malefic", cls: "violet" },
+    Ketu:    { label: "Nat. Malefic", cls: "violet" },
+  };
+
+  // Strength 0-10: shadbala for Sun-Saturn, placement proxy for Rahu/Ketu
+  let strengthMap: Record<string, number> = {};
+  try {
+    const sb = calculateShadbala(chart.planets as Parameters<typeof calculateShadbala>[0]);
+    for (const p of sb.planets) strengthMap[p.planet] = +(p.percentage / 10).toFixed(1);
+  } catch { strengthMap = {}; }
+  const strengthFor = (name: string, pd: ChartData["planets"][string]): number => {
+    if (strengthMap[name] != null) return strengthMap[name];
+    // node proxy: dignity + degree
+    const dl = pd.dignity.toLowerCase();
+    let base = 5.0;
+    if (dl.includes("exalt") || dl.includes("own") || dl.includes("sva")) base = 7.0;
+    else if (dl.includes("debilit")) base = 3.5;
+    return +(base + (pd.degree / 30) * 1.5).toFixed(1);
+  };
+
+  // Find strongest / weakest
+  const scored = planets
+    .filter(n => chart.planets[n])
+    .map(n => ({ n, s: strengthFor(n, chart.planets[n]) }))
+    .sort((a, b) => b.s - a.s);
+  const strongest = scored[0]?.n ?? "—";
+  const weakest = scored[scored.length - 1]?.n ?? "—";
+
   const cards = planets.map(name => {
     const pd = chart.planets[name];
     if (!pd) return `<div class="card"><div class="kicker">${esc(name)}</div><div class="body-s" style="margin-top:8px;">No data</div></div>`;
-
-    const dignityLower = pd.dignity.toLowerCase();
-    let badgeClass = "";
-    const badgeLabel = pd.dignity;
-    if (dignityLower.includes("exalt")) { badgeClass = "jade"; }
-    else if (dignityLower.includes("debilit")) { badgeClass = "crimson"; }
-    else if (dignityLower.includes("own") || dignityLower.includes("sva")) { badgeClass = ""; }
-    else { badgeClass = "violet"; }
-
-    const strengthPct = Math.min(100, Math.round((pd.degree / 30) * 100));
-    const retro = pd.retrograde ? ' <span style="color:var(--crimson);font-size:10px;font-weight:600;">(R)</span>' : "";
+    const nat = NATURE[name] ?? { label: pd.dignity, cls: "" };
     const skt = PLANET_SANSKRIT[name] ?? name;
+    const abbr = PLANET_ABBR[name] ?? name.slice(0, 2);
+    const col = PLANET_HEX[name] ?? "#C9A961";
+    const score = strengthFor(name, pd);
+    const pct = Math.min(100, Math.round((score / 10) * 100));
+    const barColor = score >= 6.5 ? "var(--jade)" : score < 4 ? "var(--crimson)" : "var(--gold)";
+    const retro = pd.retrograde ? ' <span style="color:var(--crimson);font-size:10px;font-weight:700;">(R)</span>' : "";
 
-    return `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-        <div>
-          <div class="devanagari" style="font-size:13px;color:var(--gold-dim);margin-bottom:2px;">${skt}</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ivory);">${esc(name)}${retro}</div>
+    return `<div class="card" style="padding:14px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1px solid ${col};color:${col};font-family:'Inter';font-size:9px;font-weight:700;">${abbr}</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--ivory);">${esc(name)}</span>
+          <span class="devanagari" style="color:var(--ivory-mute);font-size:13px;">${skt}</span>${retro}
         </div>
-        <span class="badge ${badgeClass}" style="font-size:9px;">${esc(badgeLabel)}</span>
+        <span class="badge ${nat.cls}" style="font-size:8.5px;padding:2px 7px;">${esc(nat.label)}</span>
       </div>
-      <div class="body-s" style="margin-bottom:2px;">${esc(pd.sign)} · H${pd.house}</div>
-      <div class="mono" style="font-size:10px;color:var(--gold);margin-bottom:4px;">${pd.degree}°${pd.minutes}' · ${esc(pd.nakshatra)} P${pd.pada}</div>
-      <!-- Shadbala bar -->
-      <div style="height:3px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px;">
-        <div style="height:100%;width:${strengthPct}%;background:var(--gold);border-radius:99px;opacity:0.7;"></div>
+      <div style="display:flex;gap:14px;margin-top:10px;">
+        <div><div class="kicker" style="font-size:8.5px;">Sign</div><div class="serif-italic" style="font-size:15px;color:var(--gold-bright);">${esc(pd.sign)}</div></div>
+        <div><div class="kicker" style="font-size:8.5px;">House</div><div class="serif-italic" style="font-size:15px;color:var(--gold-bright);">${pd.house}</div></div>
+        <div><div class="kicker" style="font-size:8.5px;">Degree</div><div class="mono" style="font-size:12px;color:var(--ivory);">${pd.degree}°${String(pd.minutes).padStart(2,"0")}'</div></div>
       </div>
-      <div class="body-s" style="margin-top:3px;font-size:9px;">Strength: ${strengthPct}%</div>
+      <div class="body-s" style="margin-top:6px;">${esc(pd.nakshatra)} · pada ${pd.pada} · ${esc(pd.nakshatraLord)}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+        <div style="flex:1;height:4px;background:rgba(201,169,97,0.1);border-radius:1px;"><div style="height:100%;width:${pct}%;background:${barColor};"></div></div>
+        <span class="mono" style="font-size:10px;color:${barColor};">${score.toFixed(1)}</span>
+      </div>
     </div>`;
+  }).join("");
+
+  // Shadbala summary strip
+  const summaryStrip = planets.filter(n => chart.planets[n]).map(n => {
+    const s = strengthFor(n, chart.planets[n]);
+    const c = s >= 6.5 ? "var(--jade)" : s < 4 ? "var(--crimson)" : "var(--gold-bright)";
+    return `<div style="text-align:center;"><div class="kicker" style="font-size:8px;">${PLANET_ABBR[n]}</div><div class="mono" style="font-size:14px;color:${c};margin-top:2px;">${s.toFixed(1)}</div></div>`;
   }).join("");
 
   return `<section class="page dense">
@@ -1131,13 +1174,24 @@ function page6PlanetaryDashboard(chart: ChartData): string {
   <div class="glow-br"></div>
   ${pageRail("Planetary Dashboard", "6")}
 
-  <div style="position:relative;z-index:2;padding-top:24px;flex:1;">
-    <div class="section-title" style="margin-bottom:24px;">
-      <span class="section-num">06</span>
-      <h2>Planetary Dashboard</h2>
+  <div style="position:relative;z-index:2;padding-top:24px;display:flex;flex-direction:column;gap:16px;flex:1;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px;">All nine grahas · sign, house, strength, status</div>
+        <div class="display-l" style="line-height:1;color:var(--ivory);">The nine <span class="serif-italic" style="color:var(--gold-bright);">witnesses</span>.</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="kicker">Strongest · Weakest</div>
+        <div class="serif-italic" style="font-size:18px;color:var(--gold-bright);margin-top:2px;">${esc(strongest)} · ${esc(weakest)}</div>
+      </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    <hr class="hairline gold"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
       ${cards}
+    </div>
+    <div class="card" style="padding:12px 16px;margin-top:auto;">
+      <div class="kicker" style="font-size:8.5px;margin-bottom:8px;">Shadbala Summary · sixfold strength of each graha · scale 0–10</div>
+      <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:4px;">${summaryStrip}</div>
     </div>
   </div>
 
@@ -2593,11 +2647,6 @@ const PLANET_HEX: Record<string, string> = {
   Sun: "#E8923C", Moon: "#F4EFE6", Mars: "#C9555F", Mercury: "#6FB58A",
   Jupiter: "#C9A961", Venus: "#8B7BC4", Saturn: "#C9A961", Rahu: "#8B7BC4", Ketu: "#8B7BC4",
 };
-const PLANET_GLYPH_UNI: Record<string, string> = {
-  Sun: "☉", Moon: "☽", Mars: "♂", Mercury: "☿", Jupiter: "♃",
-  Venus: "♀", Saturn: "♄", Rahu: "☊", Ketu: "☋",
-};
-
 function pageStarMap(chart: ChartData, pageNum: string): string {
   const asc = chart.lagnaLon;
   const R_RING = 240, R_GLYPH = 220, R_NAME = 234, R_PLANET = 160;
@@ -2609,7 +2658,6 @@ function pageStarMap(chart: ChartData, pageNum: string): string {
   };
 
   const SIGN_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
-  const SIGN_GLY = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
 
   // 12 dividers at sidereal L = 0,30,...330
   let dividers = "";
@@ -2617,13 +2665,13 @@ function pageStarMap(chart: ChartData, pageNum: string): string {
     const [x, y] = xy(k * 30, R_RING);
     dividers += `<line x1="0" y1="0" x2="${x}" y2="${y}"/>`;
   }
-  // glyphs + names at sign midpoints (L+15)
+  // sign number (1-12) + italic name at sign midpoints (L+15)
   let signGlyphs = "", signNames = "";
   for (let k = 0; k < 12; k++) {
     const mid = k * 30 + 15;
     const [gx, gy] = xy(mid, R_GLYPH);
     const [nx, ny] = xy(mid, R_NAME);
-    signGlyphs += `<text class="glyph" x="${gx}" y="${gy + 5}" text-anchor="middle" font-size="18" fill="#C9A961">${SIGN_GLY[k]}</text>`;
+    signGlyphs += `<text x="${gx}" y="${gy + 5}" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="600" fill="#C9A961">${k + 1}</text>`;
     signNames += `<text x="${nx}" y="${ny + 3}" text-anchor="middle" font-family="Cormorant Garamond" font-style="italic" font-size="9" fill="rgba(201,169,97,0.55)">${SIGN_NAMES[k]}</text>`;
   }
 
@@ -2644,9 +2692,9 @@ function pageStarMap(chart: ChartData, pageNum: string): string {
     const labelOut = y >= 0 ? y + 16 : y - 14;
     const col = PLANET_HEX[name] ?? "#C9A961";
     planetEls += `
-      <circle cx="${x}" cy="${y}" r="6" fill="var(--bg)" stroke="${col}" stroke-width="1.4"/>
-      <text class="glyph" x="${x}" y="${y + 3.5}" text-anchor="middle" font-size="11" font-weight="600" fill="${col}">${PLANET_GLYPH_UNI[name] ?? ""}</text>
-      <text x="${x}" y="${labelOut}" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" fill="${col}">${PLANET_ABBR[name]} ${pd.degree}°</text>`;
+      <circle cx="${x}" cy="${y}" r="8.5" fill="var(--bg)" stroke="${col}" stroke-width="1.4"/>
+      <text x="${x}" y="${y + 3.5}" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="${col}">${PLANET_ABBR[name]}</text>
+      <text x="${x}" y="${labelOut}" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" fill="${col}">${pd.degree}°${pd.retrograde ? " R" : ""}</text>`;
   }
 
   // ASC marker on left horizon
@@ -2845,7 +2893,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
 <link rel="dns-prefetch" href="https://fonts.gstatic.com">
 <!-- font-display:swap means text renders immediately with fallback,
      then swaps when the real font arrives. No blocking on font load. -->
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Noto+Serif+Devanagari:wght@500&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Noto+Serif+Devanagari:wght@500&display=swap" rel="stylesheet">
 <style>
 ${STYLES_CSS}
 </style>

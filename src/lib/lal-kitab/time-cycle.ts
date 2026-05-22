@@ -505,7 +505,7 @@ function buildVarshphal(
   input: LalKitabTimeEngineInput,
   targetDate: Date,
 ): LalKitabAnnualVarshphal {
-  const base = calculateLalKitab(input.planets, input.dob, input.lagnaNum ?? 0).varshphal;
+  const base = calculateLalKitab(input.planets, input.dob, input.lagnaNum ?? 0, targetDate).varshphal;
   const runningVarsh = getRunningVarsh(input.dob, targetDate);
   const yearShift = positiveMod(runningVarsh.completedYears, 12);
   const activeHouse = houseFromShift(1, yearShift);

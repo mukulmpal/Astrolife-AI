@@ -8,6 +8,11 @@ import { calculateAshtakavarga } from "@/lib/astro-engine/ashtakavarga";
 import { calculateVastu } from "@/lib/astro-engine/vastu";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
 import { calculateDivisional, getDashamshaAnalysis, getNavamshaAnalysis } from "@/lib/astro-engine/divisional";
+import {
+  analyzeUniversalShodashaVarga,
+  extractDashaInput,
+  formatVargaLabel,
+} from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
 import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { calculateTransitReport } from "@/lib/astro-engine/transits";
@@ -2485,24 +2490,37 @@ export function buildRealDivisionalEngineReportSection(input: any): ReportSectio
     const d10 = divs.find((d: any) => d.key === "D10");
     const d9Insights = d9 ? getNavamshaAnalysis(d9) : [];
     const d10Insights = d10 ? getDashamshaAnalysis(d10) : [];
+    const universal = analyzeUniversalShodashaVarga({
+      language: "hinglish",
+      birthTimeConfidence: 86,
+      charts: divs,
+      dasha: extractDashaInput(chart),
+    });
 
     return makeSection({
       id: "divisional-charts-summary",
-      title: "Divisional Charts Summary",
-      subtitle: `D9 ${d9?.lagna ?? "N/A"} · D10 ${d10?.lagna ?? "N/A"} · ${divs.length} varga charts`,
-      score: 74,
+      title: "Universal Shodasha Varga Intelligence",
+      subtitle: `Overall ${universal.overallScore}/100 · ${formatVargaLabel(universal.overallLabel)} · 16 classical vargas`,
+      score: universal.overallScore,
       paragraphs: [
-        "The real Divisional Chart engine was called for this PDF. It calculates D1, D3, D7, D9, D10, D12 and D27 placements from natal planet longitudes.",
+        universal.overallNarrative,
+        "The real Divisional Chart engine was called for this PDF. It calculates the main varga placements from natal planet longitudes and reads D1 promise, varga confirmation, dasha activation and birth-time sensitivity together.",
         d9 ? `Navamsha D9 Lagna is ${d9.lagna}. ${d9.keyInsight}` : "D9 data could not be resolved.",
         d10 ? `Dashamsha D10 Lagna is ${d10.lagna}. ${d10.keyInsight}` : "D10 data could not be resolved.",
+        ...universal.strongestAreas.slice(0, 2).map((section) => section.paragraph),
+        ...universal.growthAreas.slice(0, 2).map((section) => section.paragraph),
       ],
-      summary: divs.map((d: any) => `${d.key} ${d.name}: Lagna ${d.lagna}`),
+      summary: universal.sections.map((section) => `${section.chart} ${section.shortName}: ${section.score}/100 ${formatVargaLabel(section.label)} (${section.confidenceText})`),
       actionPlan: [
-        "Use D9 for marriage, dharma and mature planetary promise.",
-        "Use D10 for career and public karma.",
-        "Use D27 for endurance and inner strength.",
+        "Use D1 as promise, then confirm the topic through its relevant varga.",
+        "Use D9 for marriage, D10 for career, D4 for property, D2 for wealth and D7 for children.",
+        "Use D40/D45/D60 as refinement only when birth time is reliable.",
       ],
-      remedy: [...d9Insights.slice(0, 3), ...d10Insights.slice(0, 3)],
+      remedy: [
+        ...universal.growthAreas.slice(0, 4).flatMap((section) => section.recommendations.slice(0, 1)),
+        ...d9Insights.slice(0, 2),
+        ...d10Insights.slice(0, 2),
+      ],
     });
   } catch (error) {
     return safeSection("divisional-charts-summary", "Divisional Charts Summary", error);
