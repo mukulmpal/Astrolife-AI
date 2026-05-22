@@ -300,6 +300,7 @@ export function formatChartContext(chart: ChartData): string {
 export function useUserChart() {
   const [birth, setBirth] = useState<BirthDetails>(DEMO_BIRTH);
   const [chart, setChart] = useState<ChartData>(() => buildChart(DEMO_BIRTH));
+  const [hasUserChart, setHasUserChart] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -315,6 +316,7 @@ export function useUserChart() {
           if (!cancelled) {
             setBirth(getBirthFromChart(accountChart));
             setChart(accountChart);
+            setHasUserChart(true);
             setLoading(false);
           }
           return;
@@ -334,6 +336,7 @@ export function useUserChart() {
             if (!cancelled) {
               setBirth(profileBirth);
               setChart(nextChart);
+              setHasUserChart(true);
               setLoading(false);
             }
             return;
@@ -345,6 +348,7 @@ export function useUserChart() {
             if (!cancelled) {
               setBirth(getBirthFromChart(deviceChart));
               setChart(deviceChart);
+              setHasUserChart(true);
               setLoading(false);
             }
             return;
@@ -352,6 +356,7 @@ export function useUserChart() {
 
           clearCurrentChart();
           if (!cancelled) {
+            setHasUserChart(false);
             setLoading(false);
           }
           return;
@@ -362,6 +367,7 @@ export function useUserChart() {
           if (!cancelled) {
             setBirth(getBirthFromChart(storedChart));
             setChart(storedChart);
+            setHasUserChart(true);
             setLoading(false);
           }
           return;
@@ -371,6 +377,7 @@ export function useUserChart() {
       }
 
       if (!cancelled) {
+        setHasUserChart(false);
         setLoading(false);
       }
     };
@@ -381,5 +388,5 @@ export function useUserChart() {
     };
   }, []);
 
-  return { birth, chart, loading };
+  return { birth, chart, loading, hasUserChart, isDemoChart: !hasUserChart };
 }

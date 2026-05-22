@@ -130,6 +130,24 @@ function getPlanetSource(root: GenericObj | null | undefined, planet: string): G
   );
 }
 
+function hasPlanetSignal(raw: GenericObj) {
+  return [
+    raw?.lon,
+    raw?.longitude,
+    raw?.lng,
+    raw?.degree,
+    raw?.absoluteDegree,
+    raw?.siderealLongitude,
+    raw?.rashi,
+    raw?.sign,
+    raw?.rashiIndex,
+    raw?.signIndex,
+    raw?.rashiName,
+    raw?.signName,
+    raw?.house,
+  ].some((value) => value !== undefined && value !== null && value !== "");
+}
+
 function normalizeAstroSoundChart(source: unknown): ChartData | null {
   const src = (source as GenericObj | null | undefined) ?? undefined;
   const root = ((src?.chart as GenericObj | undefined) ?? src) as GenericObj | undefined;
@@ -154,8 +172,12 @@ function normalizeAstroSoundChart(source: unknown): ChartData | null {
 
   const lagR = toRashiIndex(lagnaRaw);
 
+  let validPlanetCount = 0;
+
   const planets = ASTRO_SOUND_PLANETS.reduce((acc: Record<string, { rashi: number; house: number; lon: number; status: string; retrograde: boolean }>, planet) => {
     const raw = getPlanetSource(root, planet);
+
+    if (hasPlanetSignal(raw)) validPlanetCount += 1;
 
     const lon = normalizeNumber(
       raw?.lon ??
@@ -194,6 +216,8 @@ function normalizeAstroSoundChart(source: unknown): ChartData | null {
 
     return acc;
   }, {});
+
+  if (validPlanetCount < 5) return null;
 
   return {
     lagR,
@@ -327,8 +351,8 @@ export default function AstroSoundPage() {
 
 
   const [musicReferenceType, setMusicReferenceType] = useState<MusicReferenceType>("film_bollywood");
-  const { chart, loading: chartLoading } = useUserChart();
-  const chartData = useMemo(() => normalizeAstroSoundChart(chart), [chart]);
+  const { chart, loading: chartLoading, hasUserChart } = useUserChart();
+  const chartData = useMemo(() => hasUserChart ? normalizeAstroSoundChart(chart) : null, [chart, hasUserChart]);
 
   const {
     settings,

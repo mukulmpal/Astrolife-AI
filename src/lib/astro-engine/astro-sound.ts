@@ -791,7 +791,7 @@ export const RAGA_DB: RagaItem[] = [
 ];
 
 const PLANET_GOAL: Record<string, GoalKey[]> = {
-  Sun: ["career", "confidence", "spiritual"].filter(Boolean) as GoalKey[],
+  Sun: ["career", "spiritual"],
   Moon: ["mind", "sleep", "love"],
   Mars: ["career", "travel"],
   Mercury: ["study", "career", "travel"],
@@ -836,15 +836,37 @@ function goalPlanetSupport(chart: ChartData | null, raga: RagaItem, goal: GoalKe
     const p = chart.planets?.[planet];
     if (!p) continue;
 
-    if ([1, 5, 9, 10, 11].includes(p.house)) score += 7;
-    if ([6, 8, 12].includes(p.house)) score -= 4;
-    if (p.retrograde) score -= 2;
+    if ([1, 5, 9, 10, 11].includes(p.house)) score += 9;
+    if ([2, 3, 4, 7].includes(p.house)) score += 4;
+    if ([6, 8, 12].includes(p.house)) score -= 7;
+    if (p.retrograde) score -= 3;
 
     const planetGoals = PLANET_GOAL[planet] ?? [];
-    if (planetGoals.includes(goal)) score += 5;
+    if (planetGoals.includes(goal)) score += 8;
   }
 
   return score;
+}
+
+function chartSignature(chart: ChartData | null) {
+  if (!chart) return 0;
+
+  return Object.entries(chart.planets ?? {}).reduce((sum, [name, planet]) => {
+    const nameScore = Array.from(name).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return sum + nameScore + planet.rashi * 11 + planet.house * 17 + Math.round(planet.lon || 0);
+  }, chart.lagR * 29 + Math.round(chart.lagLon ?? 0));
+}
+
+function ragaSignature(id: string) {
+  return Array.from(id).reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
+}
+
+function chartPersonalityAdjustment(chart: ChartData | null, raga: RagaItem) {
+  if (!chart) return 0;
+
+  const signature = chartSignature(chart);
+  const raw = (signature + ragaSignature(raga.id)) % 13;
+  return raw - 6;
 }
 
 function memoryAdjustment(memory: AstroSoundMemory | undefined, ragaName: string) {
@@ -855,15 +877,16 @@ function memoryAdjustment(memory: AstroSoundMemory | undefined, ragaName: string
 
 function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
   const reasons: string[] = [];
-  let score = raga.confidence;
+  const hasChart = Boolean(input.chart);
+  let score = 46 + Math.round((raga.confidence - 75) * 0.45);
 
   if (raga.goals.includes(input.goal)) {
-    score += 18;
+    score += 22;
     reasons.push(`Matches your goal: ${GOAL_META[input.goal].label}.`);
   }
 
   if (input.emotion !== "auto" && raga.rasas.includes(input.emotion)) {
-    score += 13;
+    score += 16;
     reasons.push(`Supports current emotional need: ${input.emotion}.`);
   }
 
@@ -886,14 +909,23 @@ function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
     const support = goalPlanetSupport(input.chart, raga, input.goal);
     score += support;
 
-    if (support > 0) {
+    if (support >= 8) {
       reasons.push("Natal chart support improves this recommendation.");
     }
 
     const pressure = raga.planets.reduce((sum, planet) => sum + planetPressure(input.chart, planet), 0);
     if (pressure > 12) {
-      score -= 5;
+      score -= 8;
       reasons.push("Some planetary pressure is present, so use gently.");
+    }
+
+    if (hasChart) {
+      const adjustment = chartPersonalityAdjustment(input.chart, raga);
+      score += adjustment;
+
+      if (Math.abs(adjustment) >= 4) {
+        reasons.push("Chart-specific resonance changes the final ranking.");
+      }
     }
   }
 

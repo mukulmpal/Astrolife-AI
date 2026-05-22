@@ -6,6 +6,7 @@ import { EngineStateCard } from "@/components/engine-state-card";
 import { calculateTransitReport, type NatalChartForTransit } from "@/lib/astro-engine/transits";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { generateCombinedTransitPurchaseGuidance } from "@/lib/astro-engine/transit-purchase-combined";
+import type { LalKitabPlanet } from "@/lib/lal-kitab";
 import { useUserChart } from "@/lib/user-chart";
 import "@/app/dashboard/shared.css";
 
@@ -25,6 +26,31 @@ const SAMPLE_CHART: NatalChartForTransit = {
   },
 };
 
+const LAL_KITAB_PLANETS = new Set<LalKitabPlanet>(["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]);
+
+function toLalKitabPlanet(value: string | undefined, fallback: LalKitabPlanet): LalKitabPlanet {
+  return LAL_KITAB_PLANETS.has(value as LalKitabPlanet) ? value as LalKitabPlanet : fallback;
+}
+
+function activeDashaPlanet(entries: Array<{ planet?: string; active?: boolean }> | undefined, fallback: LalKitabPlanet) {
+  return toLalKitabPlanet(entries?.find((entry) => entry.active)?.planet ?? entries?.[0]?.planet, fallback);
+}
+
+function buildLalKitabTiming(chart: ReturnType<typeof useUserChart>["chart"] | null, useSample: boolean) {
+  if (!chart && !useSample) return undefined;
+
+  const currentMahadasha = chart ? activeDashaPlanet(chart.dashas, "Moon") : "Moon";
+  const currentAntardasha = chart ? activeDashaPlanet(chart.antardasha, currentMahadasha) : "Moon";
+  const activePlanets = Array.from(new Set([currentMahadasha, currentAntardasha].filter(Boolean)));
+
+  return {
+    currentMahadasha,
+    currentAntardasha,
+    currentPratyantardasha: currentAntardasha,
+    activePlanets,
+  };
+}
+
 function Badge({ verdict }: { verdict: string }) {
   const color =
     verdict === "AVOID" ? "#ff6b7a" :
@@ -35,28 +61,25 @@ function Badge({ verdict }: { verdict: string }) {
 }
 
 export default function TransitPurchasePage() {
-  const { chart, loading } = useUserChart();
+  const { chart, loading, hasUserChart } = useUserChart();
   const [useSample, setUseSample] = useState(false);
 
   const activeChart = useMemo(() => {
     if (useSample) return SAMPLE_CHART;
-    if (!chart) return null;
+    if (!hasUserChart || !chart) return null;
     return normalizeChartForTransit(chart);
-  }, [chart, useSample]);
+  }, [chart, hasUserChart, useSample]);
 
   const guidance = useMemo(() => {
     if (!activeChart) return null;
     const transitReport = calculateTransitReport({ chart: activeChart, base: "lagna", date: new Date() });
+    const lalKitab = buildLalKitabTiming(useSample ? null : chart, useSample);
+
     return generateCombinedTransitPurchaseGuidance({
       transitReport,
-      lalKitab: {
-        currentMahadasha: "Saturn",
-        currentAntardasha: "Mercury",
-        currentPratyantardasha: "Saturn",
-        activePlanets: ["Saturn"],
-      },
+      lalKitab,
     });
-  }, [activeChart]);
+  }, [activeChart, chart, useSample]);
 
   if (loading && !useSample) {
     return (
