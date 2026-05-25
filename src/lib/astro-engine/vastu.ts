@@ -37,6 +37,31 @@ export interface VastuResult {
 
 interface PlanetData { house: number; dignity: string; retrograde: boolean; lon?: number; }
 
+// Nakshatra rulers in order (27 nakshatras → planet)
+const NAK_RULER: string[] = [
+  "Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury", // 1-9
+  "Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury", // 10-18
+  "Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury", // 19-27
+];
+
+function getNakshatraRuler(lon: number): string {
+  const nak = Math.floor(((lon % 360) + 360) % 360 * 27 / 360) % 27;
+  return NAK_RULER[nak];
+}
+
+// Zone planet affinity: is the dasha planet a friend/enemy of the zone's ruling planet?
+const PLANET_FRIENDS: Record<string, string[]> = {
+  Sun:     ["Moon","Mars","Jupiter"],
+  Moon:    ["Sun","Mercury"],
+  Mars:    ["Sun","Moon","Jupiter"],
+  Mercury: ["Sun","Venus"],
+  Jupiter: ["Sun","Moon","Mars"],
+  Venus:   ["Mercury","Saturn"],
+  Saturn:  ["Mercury","Venus","Rahu"],
+  Rahu:    ["Saturn","Venus","Mercury"],
+  Ketu:    ["Mars","Venus","Saturn"],
+};
+
 const PLANETS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const BENEFICS = ["Jupiter","Venus","Mercury","Moon","Sun"];
 const MALEFICS = ["Saturn","Mars","Rahu","Ketu"];
@@ -94,28 +119,70 @@ const ZONE_ROOMS: Record<string, string> = {
   NNW:"Cash / Locker Room",
 };
 
-function scoreZone(zone: typeof VASTU_ZONES_DEF[number], planets: Record<string, PlanetData>): number {
+function scoreZone(
+  zone: typeof VASTU_ZONES_DEF[number],
+  planets: Record<string, PlanetData>,
+  activeDashaPlanet?: string
+): number {
   let score = 50;
   const h = zone.house;
 
-  // Planets occupying this zone's house
+  // 1. Planets occupying this zone's house (natal)
   PLANETS.forEach(p => {
     if (planets[p]?.house === h) {
       if (BENEFICS.includes(p)) score += 8;
       if (MALEFICS.includes(p)) score -= 6;
-      if (planets[p].dignity?.includes("Exalted"))    score += 6;
-      if (planets[p].dignity?.includes("Debilitated")) score -= 8;
+      if (planets[p].dignity?.includes("Exalted"))      score += 6;
+      if (planets[p].dignity?.includes("Moolatrikona")) score += 4;
+      if (planets[p].dignity?.includes("Debilitated"))  score -= 8;
+      if (planets[p].retrograde && MALEFICS.includes(p)) score -= 3;
     }
   });
 
-  // Ruling planet of this zone
+  // 2. Zone's ruling planet placement and dignity
   const ruler = planets[zone.planet];
   if (ruler) {
-    if ([1,4,7,10].includes(ruler.house)) score += 7;
-    if ([6,8,12].includes(ruler.house))  score -= 7;
-    if (ruler.dignity?.includes("Exalted"))    score += 5;
-    if (ruler.dignity?.includes("Debilitated")) score -= 8;
-    if (ruler.retrograde) score -= 4;
+    if ([1,4,7,10].includes(ruler.house))      score += 8;  // Kendra = strong
+    else if ([5,9].includes(ruler.house))       score += 6;  // Trikona
+    else if ([2,11].includes(ruler.house))      score += 3;  // Mild positive
+    else if ([6,8,12].includes(ruler.house))    score -= 8;  // Dusthana
+
+    if (ruler.dignity?.includes("Exalted"))     score += 6;
+    else if (ruler.dignity?.includes("Moolatrikona")) score += 4;
+    else if (ruler.dignity?.includes("Own"))    score += 3;
+    else if (ruler.dignity?.includes("Debilitated")) score -= 9;
+    else if (ruler.dignity?.includes("Enemy"))  score -= 4;
+
+    if (ruler.retrograde) score -= 3; // Retrograde ruler = delayed zone activation
+
+    // 3. Nakshatra ruler of the zone planet — if it's a benefic, boost score
+    if (ruler.lon !== undefined) {
+      const nakRuler = getNakshatraRuler(ruler.lon);
+      if (BENEFICS.includes(nakRuler)) score += 4;
+      if (MALEFICS.includes(nakRuler)) score -= 3;
+    }
+  }
+
+  // 4. Dasha planet influence on zone (active Mahadasha lord)
+  if (activeDashaPlanet) {
+    const zonePlanet = zone.planet;
+    const friends    = PLANET_FRIENDS[activeDashaPlanet] ?? [];
+    const isFriend   = friends.includes(zonePlanet);
+    const isEnemy    = (PLANET_FRIENDS[zonePlanet] ?? []).length > 0 &&
+                       !(PLANET_FRIENDS[zonePlanet] ?? []).includes(activeDashaPlanet) &&
+                       activeDashaPlanet !== zonePlanet;
+
+    // Dasha planet same as zone ruler — strong activation
+    if (activeDashaPlanet === zonePlanet) score += 10;
+    // Dasha planet is a friend of zone ruler — mild support
+    else if (isFriend) score += 5;
+    // Dasha planet is an enemy of zone ruler — mild suppression
+    else if (isEnemy) score -= 4;
+
+    // Dasha planet occupying this zone's house — amplifies zone energy
+    if (planets[activeDashaPlanet]?.house === h) {
+      score += BENEFICS.includes(activeDashaPlanet) ? 7 : -4;
+    }
   }
 
   return Math.min(92, Math.max(15, Math.round(score)));
@@ -140,9 +207,13 @@ function psychBridge(planets: Record<string, PlanetData>): string[] {
   return insights;
 }
 
-export function calculateVastu(planets: Record<string, PlanetData>): VastuResult {
+// activeDashaPlanet: current Mahadasha lord (e.g., "Jupiter") — optional but recommended
+export function calculateVastu(
+  planets: Record<string, PlanetData>,
+  activeDashaPlanet?: string
+): VastuResult {
   const zones: VastuZone[] = VASTU_ZONES_DEF.map(z => {
-    const score = scoreZone(z, planets);
+    const score = scoreZone(z, planets, activeDashaPlanet);
     const status = score >= 70 ? "Strong" : score >= 50 ? "Average" : "Weak";
     const statusColor = score >= 70 ? "#22c55e" : score >= 50 ? "#c8a030" : "#ef4444";
     const planetsHere = PLANETS.filter(p => planets[p]?.house === z.house);

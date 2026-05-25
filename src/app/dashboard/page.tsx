@@ -226,7 +226,7 @@ export default function Dashboard() {
   const greeting = time.getHours() < 12 ? "Shubh Prabhat" : time.getHours() < 17 ? "Namaste" : "Shubh Sandhya";
   const dayName  = time.toLocaleDateString("en-IN", { weekday:"long" });
   const dateStr  = time.toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" });
-  const destiny = calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob);
+  const destiny = calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob, chart.lagnaNum ?? 0);
   const psychology = calculatePsychology(chart.planets as never);
   const activeDasha = chart.dashas?.find((entry) => entry.active) || chart.dashas?.[0] || fallbackDasha;
   const activeAntardasha = chart.antardasha?.find((entry) => entry.active) || chart.antardasha?.[0] || null;

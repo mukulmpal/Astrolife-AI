@@ -44,12 +44,13 @@ export interface ShadbalaResult {
 }
 
 interface PD {
-  house:      number;
-  sign:       string;
-  signNum:    number;
-  retrograde: boolean;
-  dignity:    string;
-  lon:        number;
+  house:        number;
+  sign:         string;
+  signNum:      number;
+  retrograde:   boolean;
+  dignity:      string;
+  lon:          number;
+  dailyMotion?: number; // degrees/day; positive = direct, negative = retrograde
 }
 
 // ── Constants ─────────────────────────────────────────────────
@@ -83,9 +84,17 @@ const BALA_DESC = {
   Drik:      "Drik Bala — Drishti ki takat. Benefic (Jupiter, Venus) ka aspect mile to strength badhti hai. Malefic (Saturn, Mars, Rahu) ka aspect ho to kamzori aati hai.",
 };
 
+// Mean daily motions (degrees/day) for Cheshta Bala fallback
+const MEAN_MOTION: Record<string, number> = {
+  Sun: 0.9856, Moon: 13.1764, Mars: 0.5240,
+  Mercury: 1.3833, Jupiter: 0.0831, Venus: 1.2, Saturn: 0.0335,
+};
+
 // ── MAIN SHADBALA CALCULATOR ──────────────────────────────────
+// birthHourLocal: 0-23 local solar hour at birth (default noon if omitted)
 export function calculateShadbala(
-  planets: Record<string, PD>
+  planets: Record<string, PD>,
+  birthHourLocal: number = 12
 ): ShadbalaResult {
   const results: ShadbalaPlanet[] = [];
 
@@ -124,9 +133,8 @@ export function calculateShadbala(
       ? `Dig bala poori hai (10/10) — H${pd.house} mein yeh planet peak directional strength pe hai. Sabse effective house yahi hai.`
       : `Dig bala ${digBala}/10 — Peak H${peakHouse} mein hota, yahan H${pd.house} mein hai. ${digBala >= 7 ? "Achhi strength hai." : digBala >= 5 ? "Average strength." : "Kam strength — direction se distance zyada hai."}`;
 
-    // ── 3. KALA BALA (Temporal Strength) ─────────────────────
-    const hour = new Date().getHours();
-    const isDay = hour >= 6 && hour < 18;
+    // ── 3. KALA BALA (Temporal Strength) — uses BIRTH hour, not server clock ──
+    const isDay = birthHourLocal >= 6 && birthHourLocal < 18;
     const dayPlanets   = ["Sun","Jupiter","Venus"];
     const nightPlanets = ["Moon","Mars","Saturn"];
     let kalaBala: number;
@@ -135,19 +143,21 @@ export function calculateShadbala(
     if (dayPlanets.includes(planet)) {
       kalaBala = isDay ? 7 : 4;
       kalaTxt  = isDay
-        ? `${planet} din ka planet hai aur abhi din hai — Kala bala strong (7/10). Results tez aate hain.`
-        : `${planet} din ka planet hai par abhi raat hai — Kala bala thoda kam (4/10). Din mein zyada active rahega.`;
+        ? `${planet} din ka planet hai aur janam din mein hua — Kala bala strong (7/10). Results tez aate hain.`
+        : `${planet} din ka planet hai par janam raat mein hua — Kala bala thoda kam (4/10). Din ke ghatnaon mein zyada active.`;
     } else if (nightPlanets.includes(planet)) {
       kalaBala = isDay ? 4 : 7;
       kalaTxt  = !isDay
-        ? `${planet} raat ka planet hai aur abhi raat hai — Kala bala strong (7/10). Raat mein zyada powerful.`
-        : `${planet} raat ka planet hai par abhi din hai — Kala bala thoda kam (4/10).`;
+        ? `${planet} raat ka planet hai aur janam raat mein hua — Kala bala strong (7/10). Raat mein zyada powerful.`
+        : `${planet} raat ka planet hai par janam din mein hua — Kala bala thoda kam (4/10).`;
     } else {
       kalaBala = 5;
       kalaTxt  = `${planet} (Mercury) din aur raat dono mein moderate strength rakhta hai — Kala bala 5/10.`;
     }
 
     // ── 4. CHESHTA BALA (Motional Strength) ──────────────────
+    // Primary: true vs mean velocity differential (if dailyMotion provided)
+    // Fallback: Sun-elongation bands (classical proxy)
     let cheshtaBala: number;
     let cheshtaTxt: string;
 
@@ -157,21 +167,57 @@ export function calculateShadbala(
       360 - Math.abs(pd.lon - sunLon)
     );
 
+    // Combustion always overrides everything — planet loses independent motion
     if (pd.dignity?.includes("Combust") || angSep < 8) {
       cheshtaBala = 1;
       cheshtaTxt  = `Ast (combust) hai — Cheshta bala minimum (1/10). Sun ke bahut paas hone se planet ki independent shakti lup jaati hai. Results mein Sun ka dominance hoga.`;
     } else if (pd.retrograde) {
-      cheshtaBala = 8;
-      cheshtaTxt  = `Vakri (retrograde) hai — Cheshta bala maximum (8/10). Classical rule: retrograde planets extra effort karte hain. Results intense aur lasting hote hain par delay ke saath zaroor aate hain.`;
-    } else if (angSep < 15) {
-      cheshtaBala = 2;
-      cheshtaTxt  = `Sun ke kaafi paas hai (${angSep.toFixed(1)}°) — Cheshta bala kam (2/10). Partial combustion effect.`;
-    } else if (angSep < 30) {
-      cheshtaBala = 4;
-      cheshtaTxt  = `Sun se moderate distance (${angSep.toFixed(1)}°) — Cheshta bala 4/10. Average motional strength.`;
+      // Retrograde = max cheshta in classical system
+      // Refine with actual speed if available
+      if (pd.dailyMotion !== undefined) {
+        const absSpeed   = Math.abs(pd.dailyMotion);
+        const meanSpeed  = MEAN_MOTION[planet] || 1;
+        const speedRatio = absSpeed / meanSpeed; // >1 = fast retrograde, <1 = slow retrograde
+        cheshtaBala = speedRatio >= 1.5 ? 10 : speedRatio >= 0.8 ? 8 : 6;
+        cheshtaTxt  = `Vakri (retrograde) hai — actual speed ${absSpeed.toFixed(3)}°/day (mean: ${meanSpeed}°/day). Cheshta bala ${cheshtaBala}/10. Results intense, delay ke saath aate hain.`;
+      } else {
+        cheshtaBala = 8;
+        cheshtaTxt  = `Vakri (retrograde) hai — Cheshta bala ${cheshtaBala}/10. Classical rule: retrograde planets extra effort karte hain. Results intense aur lasting, delay ke saath zaroor aate hain.`;
+      }
+    } else if (pd.dailyMotion !== undefined) {
+      // Direct planet with known speed — use true vs mean velocity ratio
+      const trueSpeed  = Math.abs(pd.dailyMotion);
+      const meanSpeed  = MEAN_MOTION[planet] || 1;
+      const ratio      = trueSpeed / meanSpeed;
+      // Classical: fast direct = high cheshta; slow direct (near station) = lower cheshta
+      if (angSep < 15) {
+        cheshtaBala = 2;
+        cheshtaTxt  = `Sun ke paas hai (${angSep.toFixed(1)}°), partial combustion — Cheshta bala 2/10. Speed ${trueSpeed.toFixed(3)}°/day. Planet partially eclipsed by solar proximity.`;
+      } else if (ratio >= 1.3) {
+        cheshtaBala = 8;
+        cheshtaTxt  = `Tez gati (${trueSpeed.toFixed(3)}°/day vs mean ${meanSpeed}°/day) — Cheshta bala 8/10. Planet is running fast; strong decisive action energy.`;
+      } else if (ratio >= 0.9) {
+        cheshtaBala = 6;
+        cheshtaTxt  = `Normal gati (${trueSpeed.toFixed(3)}°/day) — Cheshta bala 6/10. Steady direct motion, reliable results.`;
+      } else if (ratio >= 0.5) {
+        cheshtaBala = 4;
+        cheshtaTxt  = `Dheemi gati (${trueSpeed.toFixed(3)}°/day, ${(ratio * 100).toFixed(0)}% of mean) — Cheshta bala 4/10. Near station; deliberate but delayed energy.`;
+      } else {
+        cheshtaBala = 2;
+        cheshtaTxt  = `Bahut dheemi gati (${trueSpeed.toFixed(3)}°/day) — Cheshta bala 2/10. Planet almost stationary; results come very slowly.`;
+      }
     } else {
-      cheshtaBala = 6;
-      cheshtaTxt  = `Direct motion mein aur Sun se achhi door hai — Cheshta bala 6/10. Smooth energy delivery.`;
+      // Fallback: elongation bands (no speed data available)
+      if (angSep < 15) {
+        cheshtaBala = 2;
+        cheshtaTxt  = `Sun ke kaafi paas hai (${angSep.toFixed(1)}°) — Cheshta bala kam (2/10). Partial combustion effect.`;
+      } else if (angSep < 30) {
+        cheshtaBala = 4;
+        cheshtaTxt  = `Sun se moderate distance (${angSep.toFixed(1)}°) — Cheshta bala 4/10. Average motional strength.`;
+      } else {
+        cheshtaBala = 6;
+        cheshtaTxt  = `Direct motion mein aur Sun se achhi door hai (${angSep.toFixed(1)}°) — Cheshta bala 6/10. Smooth energy delivery.`;
+      }
     }
 
     // ── 5. NAISARGIKA BALA (Natural Strength — fixed) ────────

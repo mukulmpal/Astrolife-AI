@@ -1103,7 +1103,7 @@ export function getSampleStyleReport(chart: ChartData, options: ReportOptions): 
   const psych = safeCall(() => calculatePsychology(chart.planets), null);
   const medical = safeCall(() => calculateMedical(chart), null);
   const remedies = safeCall(() => calculateRemedies(chart), null);
-  const destiny = safeCall(() => calculateDestiny(chart.planets, chart.dashas, chart.dob), null);
+  const destiny = safeCall(() => calculateDestiny(chart.planets, chart.dashas, chart.dob, chart.lagnaNum ?? 0), null);
 
   samplePage(b, "Before You Read");
   sampleSectionTitle(b, "Spiritual opening and responsible guidance", "Before You Read");
@@ -2535,7 +2535,7 @@ export async function generateLegacyPDFReport(
     const dashaSeq = chart.dashas.map(d => ({
       planet: d.planet, start: d.start, end: d.end, yrs: d.yrs
     }));
-    return calculateDestiny(chart.planets, dashaSeq as Parameters<typeof calculateDestiny>[1], chart.dob);
+    return calculateDestiny(chart.planets, dashaSeq as Parameters<typeof calculateDestiny>[1], chart.dob, chart.lagnaNum ?? 0);
   }, null);
 
   if (destinyData) {

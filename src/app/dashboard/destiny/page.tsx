@@ -11,7 +11,7 @@ export default function DestinyPage() {
   const [activeTab, setActiveTab] = useState<"curve"|"areas"|"dashas"|"now">("curve");
   const { birth, chart } = useUserChart();
   const { t } = useLanguage();
-  const result = calculateDestiny(chart.planets as never, chart.dashas, birth.dob);
+  const result = calculateDestiny(chart.planets as never, chart.dashas, birth.dob, chart.lagnaNum ?? 0);
 
   // Draw canvas curve
   useEffect(() => {

@@ -20,6 +20,14 @@ import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculateMedical } from "@/lib/astro-engine/medical";
 import { calculateRemedies } from "@/lib/astro-engine/remedy";
 import { calculateSarvatobhadra } from "@/lib/astro-engine/sarvatobhadra";
+import { calculateSpecialLagnas } from "@/lib/astro-engine/special-lagnas";
+import { buildMarriageIntelligenceV2 } from "@/lib/astro-engine/marriage-intelligence-v2";
+import { analyzeRelationshipIntelligence } from "@/lib/astro-engine/relationship-intelligence";
+import type { RelationshipInput } from "@/lib/astro-engine/relationship-intelligence";
+import { buildTransitRipplePayloadFromChart } from "@/lib/astro-engine/transit-ripple-v4";
+import type { TransitRipplePlanet } from "@/lib/astro-engine/transit-ripple-v4";
+import { calculateKarakas, calculateArudhas, calculateCharaDasha } from "@/lib/astro-engine/jaimini";
+import { runAstroSound } from "@/lib/astro-engine/astro-sound";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/report-data.ts
 
@@ -1297,38 +1305,72 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       ],
     }),
   ];
-  premiumSections.push(
-    makeSection({
+  // Bug Fix #3 — real Astro Sound engine call
+  const SOUND_RASHIS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  let astroSoundSection: ReportSection;
+  try {
+    const soundPlanets: Record<string, { rashi: number; house: number; lon: number; status?: string; retrograde?: boolean }> = {};
+    for (const [name, p] of Object.entries(rawChart.planets ?? {})) {
+      const pd = p as any;
+      soundPlanets[name] = {
+        rashi: Math.max(0, SOUND_RASHIS.indexOf(pd.sign ?? "")) >= 0 ? SOUND_RASHIS.indexOf(pd.sign ?? "") : (pd.house ?? 1) - 1,
+        house: pd.house ?? 1,
+        lon: pd.lon ?? 0,
+        status: pd.status,
+        retrograde: pd.retrograde,
+      };
+    }
+    const soundResult = runAstroSound({
+      chart: { lagR: rawChart.lagnaNum ?? 0, lagLon: rawChart.lagnaLon, dob: rawChart.dob, planets: soundPlanets },
+      goal: "mind",
+      emotion: "auto",
+      voice: "any",
+      intensity: "medium",
+      mode: "hybrid",
+    });
+    astroSoundSection = makeSection({
+      id: "astro-sound-protocol",
+      title: "Astro Sound Protocol",
+      subtitle: `${soundResult.primary.raga.name} · ${soundResult.status} · ${soundResult.score}/100`,
+      score: soundResult.score,
+      paragraphs: [
+        soundResult.summary,
+        `Primary Raga: ${soundResult.primary.raga.name}. ${soundResult.primary.raga.why}`,
+        soundResult.protocol.slice(0, 3).join(" "),
+        `Timing: ${soundResult.timing.activePlanet} — ${soundResult.timing.activePlanetReason}. Best window: ${soundResult.timing.bestWindow}.`,
+      ],
+      summary: [
+        `Raga: ${soundResult.primary.raga.name}`,
+        `Score: ${soundResult.score}/100 · Status: ${soundResult.status}`,
+        `System: ${soundResult.primary.raga.system} · Energy: ${soundResult.primary.raga.energy}`,
+        `Best time: ${soundResult.primary.raga.time}`,
+        ...soundResult.reasons.slice(0, 3),
+      ],
+      actionPlan: [
+        "Open Astro Sound from the dashboard for full personalized guidance.",
+        `Primary raga for mind balance: ${soundResult.primary.raga.name}.`,
+        `Best listening window: ${soundResult.timing.bestWindow}.`,
+        "Try the 21-day sadhana for deeper effect.",
+      ],
+      remedy: soundResult.remedies,
+    });
+  } catch {
+    astroSoundSection = makeSection({
       id: "astro-sound-protocol",
       title: "Astro Sound Protocol",
       subtitle: "Personalized raga guidance, sound remedy and 21-day listening sadhana.",
-      score: 81,
+      score: 78,
       paragraphs: [
-        `Astro Sound is AstroLife’s guidance-oriented sound layer. It connects planetary symbolism, emotional rasa, user intention and classical raga mood to suggest a listening protocol. This is not a medical treatment or cure. It is a supportive spiritual and psychological practice that may help the native create a calmer environment, improve focus, support devotion or process emotion with more awareness.`,
-        `The engine works by comparing the user's selected goal with raga qualities. For example, mind balance may favour calm ragas such as Yaman, Ahir Bhairav or Bhoopali. Sleep support may favour Hindolam, Revati or soft Bageshri. Study and focus may favour Hamsadhwani, Saraswati, Bhoopali or Abhogi. Love and harmony may favour Bageshri, Kafi, Khamaj or Charukeshi. Spiritual alignment may favour Bhairav, Yaman, Revati or carefully used Malkauns.`,
-        `Astro Sound also adds a timing layer. The recommendation can consider an active planet focus, a weekday planetary influence, sensitivity level and a 21-day raga sadhana. If the timing layer is sensitive, the report recommends a shorter, softer listening session. If timing is supportive, the user can listen for a fuller 12–18 minute session with silence afterwards.`,
+        "Astro Sound connects planetary symbolism, emotional rasa and classical raga mood to suggest a personalised listening protocol. Open the Astro Sound dashboard to generate your chart-specific recommendation.",
+        "For mind balance: Yaman, Ahir Bhairav or Bhoopali. For sleep: Hindolam or Revati. For study: Hamsadhwani or Abhogi.",
+        "Follow the 21-day sadhana for consistent benefit. Listen at low volume with 2 minutes of silence afterwards.",
       ],
-      summary: [
-        "Astro Sound recommends ragas based on goal, rasa, chart signals and timing sensitivity.",
-        "It uses safe language and should not be treated as medical or mental-health treatment.",
-        "Listen Now links can open YouTube, Spotify and tanpura drone searches.",
-        "The timing protocol supports a 21-day raga sadhana.",
-        "Best use: low volume, no multitasking, short silence after listening.",
-      ],
-      actionPlan: [
-        "Open Astro Sound from the dashboard.",
-        "Choose one goal such as mind, sleep, study, career, love, money or spirituality.",
-        "Generate the recommendation and follow it for at least 3 days before changing raga.",
-        "Use feedback buttons: Felt good, Too heavy or Skip next time.",
-      ],
-      remedy: [
-        "Listen at low to medium volume.",
-        "Prefer alap, slow instrumental, vocal or tanpura-backed versions.",
-        "Stop if the raga feels uncomfortable or emotionally heavy.",
-        "For serious health or mental-health concerns, consult a qualified professional.",
-      ],
-    })
-  );
+      summary: ["Open Astro Sound from the dashboard.", "Choose goal: mind, sleep, study, career, love, money or spirituality.", "Follow recommendation for at least 3 days before changing raga."],
+      actionPlan: ["Open Astro Sound from the dashboard.", "Select goal and generate recommendation.", "Use feedback buttons to improve future suggestions."],
+      remedy: ["Listen at low to medium volume.", "Prefer alap, slow instrumental or tanpura-backed versions.", "Stop if uncomfortable.", "Consult a qualified professional for serious health concerns."],
+    });
+  }
+  premiumSections.push(astroSoundSection);
 
   months.forEach((month, index) => {
     const score = 60 + ((index * 7) % 24);
@@ -2530,7 +2572,7 @@ export function buildRealDivisionalEngineReportSection(input: any): ReportSectio
 export function buildRealDestinyEngineReportSection(input: any): ReportSection {
   try {
     const chart = getEngineChart(input);
-    const result = calculateDestiny(chart.planets, chart.dashas, chart.dob);
+    const result = calculateDestiny(chart.planets, chart.dashas, chart.dob, chart.lagnaNum ?? 0);
 
     return makeSection({
       id: "destiny-timeline",
@@ -2680,6 +2722,239 @@ export function buildRealSarvatobhadraEngineReportSection(input: any): ReportSec
   }
 }
 
+// Bug Fix #1 — Jaimini section (was only in report-generator.ts)
+export function buildRealJaiminiReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const karakas = calculateKarakas(chart.planets) as any[];
+    const arudhas = calculateArudhas(chart) as any[];
+    const charaDasha = calculateCharaDasha(chart) as any[];
+    const atmakaraka = karakas.find((k: any) => k.karaka === "AK" || k.karaka === "Atmakaraka") ?? karakas[0];
+    const active = charaDasha.find((cd: any) => cd.active) ?? charaDasha[0];
+
+    return makeSection({
+      id: "jaimini-system",
+      title: "Jaimini System",
+      subtitle: `Karakas · Arudhas · Chara Dasha`,
+      score: 70,
+      paragraphs: [
+        "The Jaimini system uses planet degrees to assign Karakas (significators). Atmakaraka represents the soul's deepest lesson, Amatyakaraka shows career path, Darakaraka shows marriage and Putrakaraka shows children.",
+        atmakaraka
+          ? `Atmakaraka is ${atmakaraka.planet} at ${(atmakaraka.lon % 30).toFixed(2)}° in ${atmakaraka.sign}. This planet represents the primary karmic mission of the soul.`
+          : "Karaka data not fully available — connect planet degrees for precise Jaimini Karaka judgement.",
+        active
+          ? `Current Chara Dasha period: ${active.sign} sign (${new Date(active.start).getFullYear()}–${new Date(active.end).getFullYear()}). This sign and its lord govern the current Jaimini timing layer.`
+          : "Chara Dasha timing data requires birth date to be calculated.",
+        "Arudhas show the visible external manifestation of houses. Arudha Lagna (A1) shows public image and Upapada (UL) shows marriage karma. Jaimini should be read alongside Parashara for a complete picture.",
+      ],
+      summary: [
+        ...karakas.slice(0, 7).map((k: any) => `${k.karaka}: ${k.planet} at ${(k.lon % 30).toFixed(2)}° ${k.sign}`),
+        ...arudhas.slice(0, 3).map((a: any) => `${a.key ?? a.name ?? "Arudha"}: ${a.sign} H${a.house}`),
+        active ? `Active Chara Dasha: ${active.sign}` : "Chara Dasha: connect birth date",
+      ].slice(0, 10),
+      actionPlan: [
+        atmakaraka ? `Work consciously with ${atmakaraka.planet} themes as your soul's primary lesson.` : "Connect planetary degrees for Atmakaraka analysis.",
+        "Use Arudha Lagna to understand public reputation and external image.",
+        "Use Chara Dasha for alternate Jaimini timing alongside Vimshottari.",
+        "Read Atmakaraka sign in Navamsha for deeper soul purpose analysis.",
+      ],
+      remedy: [
+        atmakaraka ? `Strengthen ${atmakaraka.planet} through disciplined focus on its significations.` : "Use mantra and meditation for inner clarity.",
+        "Respect the soul's lessons without resistance or fear.",
+        "Use Jaimini karakas as a guide to conscious life direction.",
+      ],
+    });
+  } catch (error) {
+    return safeSection("jaimini-system", "Jaimini System", error);
+  }
+}
+
+// Part 1 #1 — Transit Ripple
+export function buildRealTransitRippleReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const planets: TransitRipplePlanet[] = ["Saturn", "Jupiter", "Rahu"];
+    const ripples = planets.map(planet => {
+      try { return buildTransitRipplePayloadFromChart(chart, planet); } catch { return null; }
+    }).filter(Boolean) as NonNullable<ReturnType<typeof buildTransitRipplePayloadFromChart>>[];
+
+    const saturn = ripples.find(r => r.payload.transitPlanet === "Saturn");
+    const jupiter = ripples.find(r => r.payload.transitPlanet === "Jupiter");
+    const rahu = ripples.find(r => r.payload.transitPlanet === "Rahu");
+
+    return makeSection({
+      id: "transit-ripple",
+      title: "Transit Ripple Analysis",
+      subtitle: "Saturn · Jupiter · Rahu current position and impact",
+      score: 68,
+      paragraphs: [
+        "Transit Ripple shows how the three major karmic planets are currently moving relative to your natal chart. Saturn governs karma, discipline and long-term structure. Jupiter governs wisdom, expansion and protection. Rahu governs obsession, ambition and direction of desire.",
+        saturn
+          ? `Saturn is currently in ${saturn.payload.transitSign}, ${saturn.payload.transitNakshatra}, moving ${saturn.payload.transitSpeed}. Dasha context: ${saturn.payload.currentMahadasha}–${saturn.payload.currentAntardasha}.`
+          : "Saturn transit data could not be calculated for this chart.",
+        jupiter
+          ? `Jupiter is currently in ${jupiter.payload.transitSign}, ${jupiter.payload.transitNakshatra}, moving ${jupiter.payload.transitSpeed}.`
+          : "Jupiter transit data could not be calculated.",
+        rahu
+          ? `Rahu is currently in ${rahu.payload.transitSign}, ${rahu.payload.transitNakshatra}, moving ${rahu.payload.transitSpeed}. The Rahu-Ketu axis shows where material desire and spiritual release are active.`
+          : "Rahu transit data could not be calculated.",
+      ],
+      summary: ripples.map(r => `${r.payload.transitPlanet}: ${r.payload.transitSign} · ${r.payload.transitNakshatra} · ${r.payload.transitSpeed}`),
+      actionPlan: [
+        "Read major transit planets through the current Mahadasha planet first.",
+        "Saturn transit through 12/1/2 from Moon (Sade Sati) needs patience and discipline.",
+        "Jupiter transit through kendra from Moon can improve results.",
+        "Rahu transit through 1/5/9 can increase ambition and opportunity.",
+      ],
+      remedy: [
+        "For Saturn transit: Saturday discipline, oil lamp, Shani mantra.",
+        "For Rahu transit: grounding, clarity, avoiding shortcuts.",
+        "For Jupiter: charity, gratitude, study and respect for teachers.",
+      ],
+    });
+  } catch (error) {
+    return safeSection("transit-ripple", "Transit Ripple Analysis", error);
+  }
+}
+
+// Part 1 #2 — Special Lagnas
+export function buildRealSpecialLagnasReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const result = calculateSpecialLagnas(chart);
+    const al = result.items.find(i => i.key === "AL");
+    const ul = result.items.find(i => i.key === "UL");
+    const hl = result.items.find(i => i.key === "HL");
+    const gl = result.items.find(i => i.key === "GL");
+
+    return makeSection({
+      id: "special-lagnas",
+      title: "Special Lagnas",
+      subtitle: `Arudha Lagna · Upapada · Hora · Ghati Lagnas`,
+      score: 72,
+      paragraphs: [
+        "Special Lagnas are derived sensitive points that reveal specific areas of life. Arudha Lagna shows public image. Upapada shows marriage karma. Hora Lagna shows wealth timing. Ghati Lagna shows authority and power.",
+        result.summary,
+        al ? `Arudha Lagna (${al.sign}, H${al.house}): ${al.interpretation}` : "Arudha Lagna could not be calculated.",
+        ul ? `Upapada Lagna (${ul.sign}, H${ul.house}): ${ul.interpretation}` : "Upapada Lagna could not be calculated.",
+      ],
+      summary: result.items.map(i => `${i.name} (${i.key}): ${i.sign} H${i.house} · ${i.meaning}`),
+      actionPlan: [
+        al ? `Align public behaviour with ${al.sign} AL qualities to protect reputation.` : "Calculate Arudha Lagna from lagna lord position.",
+        ul ? `Read ${ul.sign} UL with Venus and 7th house for marriage karma.` : "Connect marriage charts through Upapada.",
+        hl ? `Use ${hl.sign} Hora Lagna for wealth timing and money decisions.` : "Use Hora Lagna for money cycle analysis.",
+        gl ? `${gl.sign} Ghati Lagna indicates authority area and power expression.` : "Ghati Lagna connects to positions of authority.",
+      ],
+      remedy: [
+        "Strengthen Arudha Lagna through consistent, authentic public behaviour.",
+        "Use Upapada for marriage readiness awareness, not fear.",
+        "Hora Lagna periods support financial planning and disciplined money decisions.",
+      ],
+    });
+  } catch (error) {
+    return safeSection("special-lagnas", "Special Lagnas", error);
+  }
+}
+
+// Part 1 #3 — Marriage Intelligence
+export function buildRealMarriageIntelligenceReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const divs = calculateDivisional(chart.planets, chart.lagnaNum, chart.lagnaLon);
+    let kp: any = null;
+    try { kp = calculateKpReport(chart); } catch { /* optional */ }
+    const result = buildMarriageIntelligenceV2({ divs, kp: kp ?? undefined });
+
+    return makeSection({
+      id: "marriage-intelligence",
+      title: "Marriage Intelligence",
+      subtitle: `${result.label.replace(/_/g, " ")} · D9 ${result.divisional.d9MarriageDelivery.score}/100 · Overall ${result.overallScore}/100`,
+      score: result.overallScore,
+      paragraphs: [
+        result.narrative,
+        result.divisional.d9MarriageDelivery.paragraph,
+        result.divisional.d9ContinuityCare.paragraph,
+        result.kp ? `KP Validation: ${result.kp.paragraph}` : "KP validation supports this analysis when cusp data is connected.",
+        result.safetyBoundary,
+      ],
+      summary: [
+        `Overall: ${result.overallScore}/100 · ${result.label.replace(/_/g, " ")}`,
+        `D9 Marriage Delivery: ${result.divisional.d9MarriageDelivery.score}/100`,
+        `D9 Continuity Care: ${result.divisional.d9ContinuityCare.score}/100`,
+        `D7 Children Awareness: ${result.divisional.d7ChildrenAwareness.score}/100`,
+        ...result.divisional.d9MarriageDelivery.indicators.slice(0, 4),
+      ],
+      actionPlan: [
+        ...result.divisional.d9MarriageDelivery.recommendations.slice(0, 3),
+        "Check Dasha activation for marriage timing alongside this divisional analysis.",
+      ],
+      remedy: [
+        ...result.divisional.d9ContinuityCare.recommendations.slice(0, 3),
+      ],
+    });
+  } catch (error) {
+    return safeSection("marriage-intelligence", "Marriage Intelligence", error);
+  }
+}
+
+// Part 1 #4 — Relationship Intelligence
+function buildRelationshipInput(chart: any): RelationshipInput {
+  const PLANET_KEYS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] as const;
+  const planets = PLANET_KEYS
+    .filter(name => chart.planets?.[name])
+    .map(name => {
+      const p = chart.planets[name];
+      return { planet: name as any, house: p.house ?? 1, sign: p.sign, nakshatra: p.nakshatra, isRetrograde: p.retrograde ?? false };
+    });
+  const houses = Array.from({ length: 12 }, (_, i) => ({ house: i + 1 }));
+  const activeMD = chart.dashas?.find((d: any) => d.active) ?? chart.dashas?.[0];
+  const activeAD = chart.antardasha?.find((d: any) => d.active) ?? chart.antardasha?.[0];
+  return {
+    language: "english" as const,
+    planets,
+    houses,
+    dasha: activeMD ? { mahadasha: activeMD.planet as any, antardasha: activeAD?.planet as any } : undefined,
+  };
+}
+
+export function buildRealRelationshipIntelligenceReportSection(input: any): ReportSection {
+  try {
+    const chart = getEngineChart(input);
+    const result = analyzeRelationshipIntelligence(buildRelationshipInput(chart));
+
+    return makeSection({
+      id: "relationship-intelligence",
+      title: "Relationship Intelligence",
+      subtitle: `Marriage ${result.marriageScore}/100 · Children ${result.childrenScore}/100`,
+      score: Math.round((result.marriageScore + result.childrenScore) / 2),
+      paragraphs: [
+        result.marriageNarrative,
+        result.childrenNarrative,
+        result.layers.marriagePromise.paragraph,
+        result.layers.relationshipPsychology.paragraph,
+        result.safetyBoundary,
+      ],
+      summary: [
+        `Marriage score: ${result.marriageScore}/100`,
+        `Children awareness: ${result.childrenScore}/100`,
+        `Marriage promise: ${result.layers.marriagePromise.score}/100`,
+        `Relationship psychology: ${result.layers.relationshipPsychology.score}/100`,
+        `Marriage timing: ${result.layers.marriageTimingSupport.score}/100`,
+        `Manglik balance: ${result.layers.manglikBalance.score}/100`,
+      ],
+      actionPlan: [
+        "Read marriage indicators through Venus, Jupiter, 7th house and Navamsha together.",
+        "Check Dasha timing for marriage activation windows.",
+        "Use relationship psychology to understand communication patterns.",
+        "Avoid making marriage decisions from single indicators — use combined analysis.",
+      ],
+      remedy: [result.safeRelationshipRemedies],
+    });
+  } catch (error) {
+    return safeSection("relationship-intelligence", "Relationship Intelligence", error);
+  }
+}
+
 export function buildRealEngineReportSections(input: any): ReportSection[] {
   const chart = getEngineChart(input);
 
@@ -2692,14 +2967,19 @@ export function buildRealEngineReportSections(input: any): ReportSection[] {
     buildRealTransitRadarEngineReportSection(chart),
     buildRealDestinyEngineReportSection(chart),
     buildRealDivisionalEngineReportSection(chart),
+    buildRealJaiminiReportSection(chart),          // Bug Fix #1
     buildRealLalKitabReportSection(chart),
     buildRealPsychologyEngineReportSection(chart),
     buildRealVastuEngineReportSection(chart),
+    buildRealSarvatobhadraEngineReportSection(chart),
     ...buildGemstoneReportSection(chart),
     buildRealMedicalEngineReportSection(chart),
     buildRealRemedyEngineReportSection(chart),
-    buildRealSarvatobhadraEngineReportSection(chart),
     ...buildKpReportSections(chart),
+    buildRealTransitRippleReportSection(chart),    // Part 1 #1
+    buildRealSpecialLagnasReportSection(chart),    // Part 1 #2
+    buildRealMarriageIntelligenceReportSection(chart), // Part 1 #3
+    buildRealRelationshipIntelligenceReportSection(chart), // Part 1 #4
   ];
 }
 

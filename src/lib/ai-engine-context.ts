@@ -91,7 +91,7 @@ export function buildAiEngineContext(chart: ChartData): string {
   }));
 
   lines.push(...safeLines("Destiny", () => {
-    const d = calculateDestiny(chart.planets, chart.dashas, chart.dob);
+    const d = calculateDestiny(chart.planets, chart.dashas, chart.dob, chart.lagnaNum ?? 0);
     const strongest = [...d.areas].sort((a, b) => b.score - a.score)[0];
     const weakest = [...d.areas].sort((a, b) => a.score - b.score)[0];
     return `Current score ${d.currentScore}/100 in ${d.currentDasha} MD. Strongest area ${strongest?.name ?? "n/a"} ${strongest?.score ?? ""}. Weakest area ${weakest?.name ?? "n/a"} ${weakest?.score ?? ""}. ${d.summary}`;

@@ -38,12 +38,47 @@ export interface CharaDashaPeriod {
   progressPercent: number;
 }
 
+// ── NEW: Chara Dasha Antardasha ────────────────────────────────────────────────
+export interface CharaDashaAD {
+  mdSign: string;
+  mdSignNum: number;
+  adSign: string;
+  adSignNum: number;
+  years: number;
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+  daysRemaining: number;
+  progressPercent: number;
+}
+
+// ── NEW: Jaimini Raja Yoga ─────────────────────────────────────────────────────
+export interface JaiminiRajaYoga {
+  name: string;
+  description: string;
+  strength: "Strong" | "Moderate";
+  involved: string[]; // planets or arudhas involved
+}
+
+// ── NEW: Argala (planetary intervention) ──────────────────────────────────────
+export interface ArgalaEntry {
+  referenceSign: string;
+  referenceSignNum: number;
+  argalaHouses: { position: string; planets: string[]; type: "Argala" | "VirodhArgala" }[];
+  netArgala: "Positive" | "Negative" | "Neutral";
+  interpretation: string;
+}
+
 export interface JaiminiResult {
   karakas: Karaka[];
   arudhas: ArudhaPada[];
   aspects: JaiminiAspect[];
   charaDasha: CharaDashaPeriod[];
   currentDasha: CharaDashaPeriod | null;
+  currentDashaAD: CharaDashaAD[];
+  activeAD: CharaDashaAD | null;
+  rajaYogas: JaiminiRajaYoga[];
+  argala: ArgalaEntry[];
   specialFindings: string[];
 }
 
@@ -287,16 +322,286 @@ export function getJaiminiFindings(karakas: Karaka[], arudhas: ArudhaPada[], cha
   return findings;
 }
 
+// ── Chara Dasha Antardasha ────────────────────────────────────────────────────
+// Within a Mahadasha, the ADs cycle through all 12 signs in the same direction
+// as the MD sequence. Each AD duration = MD total years / 12.
+
+export function calculateCharaDashaAD(
+  mdPeriod: CharaDashaPeriod,
+  chart: ChartData
+): CharaDashaAD[] {
+  const lagnaNum    = Math.floor(md(chart.lagnaLon, 360) / 30);
+  const isOddLagna  = lagnaNum % 2 === 0; // Aries=0,Gem=2,Leo=4,Lib=6,Sag=8,Aqr=10 → odd signs
+  const adYears     = mdPeriod.years / 12; // equal-duration ADs
+  const now         = new Date();
+  const ads: CharaDashaAD[] = [];
+  let cursor        = new Date(mdPeriod.startDate);
+
+  for (let i = 0; i < 12; i++) {
+    // AD starts from MD sign itself, progresses in lagna direction
+    const adSignNum = isOddLagna
+      ? md(mdPeriod.signNum + i, 12)
+      : md(mdPeriod.signNum - i + 12, 12);
+    const adStart   = new Date(cursor);
+    const adEnd     = new Date(cursor.getTime() + adYears * 365.25 * 24 * 3600 * 1000);
+    const isActive  = now >= adStart && now < adEnd;
+    const totalMs   = adEnd.getTime() - adStart.getTime();
+    const elapsedMs = now.getTime() - adStart.getTime();
+    const daysRemaining = Math.max(0, Math.ceil((adEnd.getTime() - now.getTime()) / 86400000));
+    const progressPercent = isActive
+      ? Number(Math.min(100, (elapsedMs / totalMs) * 100).toFixed(1))
+      : now >= adEnd ? 100 : 0;
+
+    ads.push({
+      mdSign: mdPeriod.sign,
+      mdSignNum: mdPeriod.signNum,
+      adSign: RASHIS[adSignNum],
+      adSignNum,
+      years: Number(adYears.toFixed(2)),
+      startDate: adStart,
+      endDate: adEnd,
+      isActive,
+      daysRemaining,
+      progressPercent,
+    });
+    cursor = new Date(adEnd);
+  }
+  return ads;
+}
+
+// ── Jaimini Raja Yogas ────────────────────────────────────────────────────────
+// Classical Raja Yogas from Jaimini Sutras
+
+export function detectJaiminiRajaYogas(
+  karakas: Karaka[],
+  arudhas: ArudhaPada[],
+  chart: ChartData
+): JaiminiRajaYoga[] {
+  const yogas: JaiminiRajaYoga[] = [];
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+
+  const EXALTATION: Record<string, number> = {
+    Sun: 0, Moon: 1, Mars: 9, Mercury: 5, Jupiter: 3, Venus: 11, Saturn: 6,
+  };
+  const OWN_SIGNS: Record<string, number[]> = {
+    Sun: [4], Moon: [3], Mars: [0, 7], Mercury: [2, 5],
+    Jupiter: [8, 11], Venus: [1, 6], Saturn: [9, 10],
+  };
+
+  const ak  = karakas.find(k => k.role === "AK");
+  const amk = karakas.find(k => k.role === "AmK");
+  const pk  = karakas.find(k => k.role === "PK");
+  const al  = arudhas.find(a => a.house === 1);
+  const a10 = arudhas.find(a => a.house === 10);
+  const ul  = arudhas.find(a => a.house === 12);
+  const a7  = arudhas.find(a => a.house === 7);
+
+  // 1. AK + AmK same sign (strongest Raja Yoga in Jaimini)
+  if (ak && amk && ak.signNum === amk.signNum) {
+    yogas.push({
+      name: "AK-AmK Conjunction",
+      description: `${ak.planet} (Atmakaraka) and ${amk.planet} (Amatyakaraka) are in the same sign ${ak.sign}. This is the pinnacle Jaimini Raja Yoga — soul purpose aligns directly with career and worldly success. Exceptional achievement is indicated.`,
+      strength: "Strong",
+      involved: [ak.planet, amk.planet],
+    });
+  }
+
+  // 2. AK + AmK in mutual Rashi Drishti
+  if (ak && amk && ak.signNum !== amk.signNum &&
+    (doesSignAspect(ak.signNum, amk.signNum) || doesSignAspect(amk.signNum, ak.signNum))) {
+    yogas.push({
+      name: "AK-AmK Mutual Aspect",
+      description: `${ak.planet} (AK) and ${amk.planet} (AmK) have mutual Jaimini aspect between ${ak.sign} and ${amk.sign}. Career and soul purpose support each other — authority and recognition come through dharmic work.`,
+      strength: "Moderate",
+      involved: [ak.planet, amk.planet],
+    });
+  }
+
+  // 3. AK exalted
+  if (ak && EXALTATION[ak.planet] === ak.signNum) {
+    yogas.push({
+      name: "Exalted Atmakaraka",
+      description: `${ak.planet} (Atmakaraka) is exalted in ${ak.sign}. The soul has extraordinary clarity of purpose. Whatever this person chooses to accomplish, they do so with full spiritual backing. High status and recognition in life.`,
+      strength: "Strong",
+      involved: [ak.planet],
+    });
+  }
+
+  // 4. AK in own sign
+  if (ak && OWN_SIGNS[ak.planet]?.includes(ak.signNum)) {
+    yogas.push({
+      name: "AK in Own Sign",
+      description: `${ak.planet} (Atmakaraka) is in own sign ${ak.sign}. Soul path is confident and self-directed. Success through authenticity — no pretense needed; the native achieves by being exactly who they are.`,
+      strength: "Moderate",
+      involved: [ak.planet],
+    });
+  }
+
+  // 5. AmK in 1st or 10th from Lagna
+  if (amk) {
+    const amkHouseFromLagna = md(amk.signNum - lagnaNum, 12) + 1;
+    if ([1, 10].includes(amkHouseFromLagna)) {
+      yogas.push({
+        name: "AmK in Power Position",
+        description: `${amk.planet} (Amatyakaraka) is in H${amkHouseFromLagna} from Lagna — a cardinal house for career. Career planet occupies the house of body/authority (H1) or career itself (H10). Professional success and public recognition are strongly supported.`,
+        strength: "Strong",
+        involved: [amk.planet],
+      });
+    }
+  }
+
+  // 6. AL + A10 in same sign or mutual aspect
+  if (al && a10) {
+    if (al.signNum === a10.signNum) {
+      yogas.push({
+        name: "AL-A10 Conjunction",
+        description: `Arudha Lagna (AL) and Rajya Pada (A10) are in the same sign ${al.sign}. Public image and career power merge — the native becomes famous through their work. Very strong indicator for public authority and recognition.`,
+        strength: "Strong",
+        involved: ["AL", "A10"],
+      });
+    } else if (doesSignAspect(al.signNum, a10.signNum) || doesSignAspect(a10.signNum, al.signNum)) {
+      yogas.push({
+        name: "AL aspects A10",
+        description: `Arudha Lagna (${al.sign}) and Rajya Pada A10 (${a10.sign}) are in mutual Jaimini aspect. Public identity and career authority reinforce each other. The native's public face directly supports career advancement.`,
+        strength: "Moderate",
+        involved: ["AL", "A10"],
+      });
+    }
+  }
+
+  // 7. Atmakaraka in 5th from Lagna (Jaimini's special Raja Yoga)
+  if (ak) {
+    const akFromLagna = md(ak.signNum - lagnaNum, 12) + 1;
+    if (akFromLagna === 5) {
+      yogas.push({
+        name: "AK in 5th (Jaimini RY)",
+        description: `${ak.planet} (Atmakaraka) is in the 5th from Lagna. Jaimini specifically marks this as a Raja Yoga — the soul purpose operates through intelligence, creativity, and children. Authority through creative expression or education.`,
+        strength: "Moderate",
+        involved: [ak.planet],
+      });
+    }
+  }
+
+  // 8. UL and A7 in same sign — destined marriage and partnership
+  if (ul && a7 && ul.signNum === a7.signNum) {
+    yogas.push({
+      name: "UL-A7 Conjunction",
+      description: `Upapada Lagna (UL) and Darapada (A7) are in the same sign ${ul.sign}. Marriage is both destined and publicly visible — spouse brings status, and the partnership itself becomes a source of social recognition.`,
+      strength: "Strong",
+      involved: ["UL", "A7"],
+    });
+  }
+
+  // 9. PK strong — fortune and father support
+  if (pk && (EXALTATION[pk.planet] === pk.signNum || OWN_SIGNS[pk.planet]?.includes(pk.signNum))) {
+    yogas.push({
+      name: "Strong Pitrukaraka",
+      description: `${pk.planet} (Pitrukaraka) is in ${pk.sign} — ${EXALTATION[pk.planet] === pk.signNum ? "exalted" : "own sign"}. Father and Guru give strong support. Fortune, dharma, and higher education are well-supported. Blessings from lineage and teachers compound over time.`,
+      strength: "Moderate",
+      involved: [pk.planet],
+    });
+  }
+
+  return yogas;
+}
+
+// ── Argala (Planetary Interventions) ─────────────────────────────────────────
+// Argala: planets in 2nd, 4th, 11th from a reference sign create positive intervention
+// Virodha Argala: planets in 12th, 10th, 3rd counteract
+// Net result determines if the reference house is helped or obstructed
+
+export function calculateArgala(chart: ChartData): ArgalaEntry[] {
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+
+  // Check which planets occupy a given sign number
+  function planetsInSign(signNum: number): string[] {
+    const normalizedSign = md(signNum, 12);
+    return ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"]
+      .filter(p => {
+        const pData = chart.planets[p];
+        if (!pData) return false;
+        return Math.floor(md(pData.lon, 360) / 30) === normalizedSign;
+      });
+  }
+
+  // Argala houses (offsets from reference): 2nd, 4th, 11th = positive
+  // Virodha houses: 12th, 10th, 3rd = counteractive
+  const ARGALA_OFFSETS: { offset: number; type: "Argala" | "VirodhArgala"; position: string }[] = [
+    { offset: 1,  type: "Argala",       position: "2nd" },
+    { offset: 3,  type: "Argala",       position: "4th" },
+    { offset: 10, type: "Argala",       position: "11th" },
+    { offset: 11, type: "VirodhArgala", position: "12th" },
+    { offset: 9,  type: "VirodhArgala", position: "10th" },
+    { offset: 2,  type: "VirodhArgala", position: "3rd" },
+  ];
+
+  // Calculate Argala for key reference points: Lagna, AL, AK sign
+  const lagnaSign = lagnaNum;
+  const alOffset  = md(lagnaNum + 0, 12); // Lagna itself; AL computed via arudhas
+  const karakas   = calculateKarakas(chart.planets);
+  const akSignNum = karakas.find(k => k.role === "AK")?.signNum ?? lagnaNum;
+
+  const referencePoints = [
+    { sign: RASHIS[lagnaSign], signNum: lagnaSign },
+    { sign: RASHIS[akSignNum], signNum: akSignNum },
+  ];
+
+  return referencePoints.map(ref => {
+    const argalaHouses = ARGALA_OFFSETS.map(ao => ({
+      position: ao.position,
+      planets: planetsInSign(ref.signNum + ao.offset),
+      type: ao.type,
+    }));
+
+    const argalaCount   = argalaHouses.filter(h => h.type === "Argala" && h.planets.length > 0).length;
+    const virodhCount   = argalaHouses.filter(h => h.type === "VirodhArgala" && h.planets.length > 0).length;
+    const argalaPlanets = argalaHouses.filter(h => h.type === "Argala").flatMap(h => h.planets);
+    const virodhPlanets = argalaHouses.filter(h => h.type === "VirodhArgala").flatMap(h => h.planets);
+
+    const netArgala: ArgalaEntry["netArgala"] =
+      argalaCount > virodhCount ? "Positive" :
+      virodhCount > argalaCount ? "Negative" : "Neutral";
+
+    const interpretation = netArgala === "Positive"
+      ? `${ref.sign} receives Argala support from ${argalaPlanets.join(", ")} in key positions. Events and people naturally help the significations of this reference point forward.`
+      : netArgala === "Negative"
+      ? `${ref.sign} faces Virodha Argala — ${virodhPlanets.join(", ")} in counteractive positions resist or delay outcomes. External resistance needs to be worked through.`
+      : `${ref.sign} has balanced Argala and Virodha — support and resistance are roughly equal. Outcomes depend on timing, remedies, and personal effort.`;
+
+    return {
+      referenceSign: ref.sign,
+      referenceSignNum: ref.signNum,
+      argalaHouses,
+      netArgala,
+      interpretation,
+    };
+  });
+}
+
 // ── Master function ───────────────────────────────────────────────────────────
 
 export function buildJaiminiChart(chart: ChartData): JaiminiResult {
-  const karakas = calculateKarakas(chart.planets);
-  const arudhas = calculateArudhas(chart);
-  const aspects = getJaiminiAspects();
-  const charaDasha = calculateCharaDasha(chart);
+  const karakas      = calculateKarakas(chart.planets);
+  const arudhas      = calculateArudhas(chart);
+  const aspects      = getJaiminiAspects();
+  const charaDasha   = calculateCharaDasha(chart);
   const currentDasha = charaDasha.find(d => d.isActive) ?? null;
+
+  // Chara Dasha Antardasha for the active MD (or first period if none active)
+  const mdForAD        = currentDasha ?? charaDasha[0];
+  const currentDashaAD = mdForAD ? calculateCharaDashaAD(mdForAD, chart) : [];
+  const activeAD       = currentDashaAD.find(d => d.isActive) ?? null;
+
+  const rajaYogas      = detectJaiminiRajaYogas(karakas, arudhas, chart);
+  const argala         = calculateArgala(chart);
   const specialFindings = getJaiminiFindings(karakas, arudhas, chart);
-  return { karakas, arudhas, aspects, charaDasha, currentDasha, specialFindings };
+
+  return {
+    karakas, arudhas, aspects, charaDasha, currentDasha,
+    currentDashaAD, activeAD,
+    rajaYogas, argala,
+    specialFindings,
+  };
 }
 
 export function formatCharaDate(date: Date): string {
