@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { createRequestId, monitor } from "@/lib/server-monitoring";
+import { getServerFeatureAccess, premiumBlockedResponse } from "@/lib/server-feature-access";
 import { buildRichMeaning, PLANET_KNOWLEDGE, HOUSE_KNOWLEDGE } from "@/lib/astro-engine/transit-knowledge-base";
 
 export const runtime = "nodejs";
@@ -751,6 +752,21 @@ export async function POST(req: NextRequest) {
   const startedAt = Date.now();
 
   try {
+    const access = await getServerFeatureAccess("transit_ripple");
+    if (!access.allowed) {
+      monitor.warn("premium.blocked", {
+        requestId,
+        feature: access.feature,
+        reason: access.reason,
+        tier: access.tier,
+      });
+
+      return NextResponse.json(
+        { ...premiumBlockedResponse(access), requestId },
+        { status: access.authenticated ? 402 : 401 },
+      );
+    }
+
     const body = await req.json();
 
     if (body.mode === "monthly") {
@@ -769,6 +785,7 @@ export async function POST(req: NextRequest) {
       monitor.info("transit_ripple.monthly_generated", {
         requestId,
         engine: "typescript",
+        tier: access.tier,
         transitPoints: body.transitPoints.length,
         durationMs: Date.now() - startedAt,
       });
@@ -805,6 +822,7 @@ export async function POST(req: NextRequest) {
       monitor.info("transit_ripple.generated", {
         requestId,
         engine: "python",
+        tier: access.tier,
         transitPlanet: body.transitPlanet,
         transitSign: body.transitSign,
         durationMs: Date.now() - startedAt,
@@ -818,6 +836,7 @@ export async function POST(req: NextRequest) {
       parsed = buildTsTransitRippleReport(body as TransitRippleRequest);
       monitor.warn("transit_ripple.python_unavailable_fallback_used", {
         requestId,
+        tier: access.tier,
         transitPlanet: body.transitPlanet,
         transitSign: body.transitSign,
         durationMs: Date.now() - startedAt,

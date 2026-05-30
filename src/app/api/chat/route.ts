@@ -1,4 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getServerAiUsageState, incrementServerAiUsage } from "@/lib/server-usage";
+import { monitor } from "@/lib/server-monitoring";
 import { NextRequest, NextResponse } from "next/server";
 
 const AGENTS: Record<string, { name: string; emoji: string; system: string }> = {
@@ -95,6 +97,27 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, agentId = "general", chartContext, transitContext, dailyFeedContext, vargaContext } = await req.json();
     const agent = AGENTS[agentId] || AGENTS.general;
+    const usageState = await getServerAiUsageState();
+
+    if (!usageState.allowed) {
+      monitor.warn("ai_chat.blocked", {
+        agentId,
+        reason: usageState.reason,
+        tier: usageState.tier,
+        used: usageState.used,
+        limit: usageState.limit,
+      });
+
+      return NextResponse.json(
+        {
+          error: usageState.reason === "login_required"
+            ? "Login required to use AstroLife AI."
+            : "Your free AI question limit is finished. Please upgrade to continue.",
+          usage: usageState,
+        },
+        { status: usageState.authenticated ? 402 : 401 },
+      );
+    }
 
     const systemPrompt = [
       agent.system,
@@ -111,7 +134,11 @@ export async function POST(req: NextRequest) {
     try {
       text = await callGemini(systemPrompt, messages);
     } catch (e) {
-      console.warn("Gemini failed, trying Groq:", e);
+      monitor.warn("ai_chat.gemini_failed_groq_fallback", {
+        agentId,
+        errorName: e instanceof Error ? e.name : undefined,
+        errorMessage: e instanceof Error ? e.message : String(e),
+      });
       text = await callGroq(systemPrompt, messages);
       model = "groq";
     }
@@ -130,9 +157,19 @@ export async function POST(req: NextRequest) {
       await saveChatMessages(null, sid, agentId, lastUserMsg.content, text);
     }
 
-    return NextResponse.json({ message: text, agent: agent.name, emoji: agent.emoji, model, sources, usage: { left: 999, limit: 999, used: 0, enforced: false, trackedOnServer: false } });
+    const usage = await incrementServerAiUsage(usageState);
+    monitor.info("ai_chat.generated", {
+      agentId,
+      model,
+      tier: usage.tier,
+      used: usage.used,
+      limit: usage.limit,
+      trackedOnServer: usage.trackedOnServer,
+    });
+
+    return NextResponse.json({ message: text, agent: agent.name, emoji: agent.emoji, model, sources, usage });
   } catch (error) {
-    console.error("Chat API error:", error);
+    monitor.error("ai_chat.failed", error);
     return NextResponse.json({ error: "AI service unavailable. Please try again." }, { status: 500 });
   }
 }

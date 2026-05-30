@@ -6,6 +6,8 @@ import {
 } from "@/lib/report-html-generator";
 import type { ReportOptions } from "@/lib/report-html-generator";
 import type { ChartData } from "@/lib/astro-engine/calculations";
+import { getServerFeatureAccess, premiumBlockedResponse } from "@/lib/server-feature-access";
+import { monitor } from "@/lib/server-monitoring";
 
 export const maxDuration = 60; // Vercel Pro: 60s — set in vercel.json too
 export const dynamic = "force-dynamic";
@@ -43,6 +45,20 @@ async function launchBrowser() {
 export async function POST(request: NextRequest) {
   let browser;
   try {
+    const access = await getServerFeatureAccess("reports");
+    if (!access.allowed) {
+      monitor.warn("premium.blocked", {
+        feature: access.feature,
+        reason: access.reason,
+        tier: access.tier,
+      });
+
+      return NextResponse.json(
+        premiumBlockedResponse(access),
+        { status: access.authenticated ? 402 : 401 },
+      );
+    }
+
     const body = await request.json() as { chart: ChartData; options: ReportOptions };
     const { chart, options } = body;
 
@@ -95,6 +111,14 @@ export async function POST(request: NextRequest) {
       .trim()
       .replace(/\s+/g, "-");
 
+    monitor.info("report_pdf.generated", {
+      feature: "reports",
+      tier: access.tier,
+      reportType: safeOptions.type,
+      palette: safeOptions.palette,
+      cover: safeOptions.cover,
+    });
+
     return new NextResponse(Buffer.from(pdf), {
       status: 200,
       headers: {
@@ -107,7 +131,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (err) {
-    console.error("[generate-pdf]", err);
+    monitor.error("report_pdf.failed", err);
     return NextResponse.json(
       { error: "PDF generation failed", detail: String(err) },
       { status: 500 }

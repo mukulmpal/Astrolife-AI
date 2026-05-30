@@ -3,9 +3,12 @@
 import { useMemo, useState } from "react";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { PremiumFeature } from "@/components/premium-feature";
 import { calculateTransitReport, type NatalChartForTransit } from "@/lib/astro-engine/transits";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { generateCombinedTransitPurchaseGuidance } from "@/lib/astro-engine/transit-purchase-combined";
+import { generatePlanetPurchaseReport } from "@/lib/astro-engine/transit-planet-purchase";
+import type { PlanetName } from "@/lib/astro-engine/transits";
 import type { LalKitabPlanet } from "@/lib/lal-kitab";
 import { useUserChart } from "@/lib/user-chart";
 import "@/app/dashboard/shared.css";
@@ -63,6 +66,7 @@ function Badge({ verdict }: { verdict: string }) {
 export default function TransitPurchasePage() {
   const { chart, loading, hasUserChart } = useUserChart();
   const [useSample, setUseSample] = useState(false);
+  const [activePlanet, setActivePlanet] = useState<PlanetName>("Sun");
 
   const activeChart = useMemo(() => {
     if (useSample) return SAMPLE_CHART;
@@ -70,16 +74,26 @@ export default function TransitPurchasePage() {
     return normalizeChartForTransit(chart);
   }, [chart, hasUserChart, useSample]);
 
-  const guidance = useMemo(() => {
+  const transitReport = useMemo(() => {
     if (!activeChart) return null;
-    const transitReport = calculateTransitReport({ chart: activeChart, base: "lagna", date: new Date() });
-    const lalKitab = buildLalKitabTiming(useSample ? null : chart, useSample);
+    return calculateTransitReport({ chart: activeChart, base: "lagna", date: new Date() });
+  }, [activeChart]);
 
-    return generateCombinedTransitPurchaseGuidance({
-      transitReport,
-      lalKitab,
-    });
-  }, [activeChart, chart, useSample]);
+  const guidance = useMemo(() => {
+    if (!transitReport) return null;
+    const lalKitab = buildLalKitabTiming(useSample ? null : chart, useSample);
+    return generateCombinedTransitPurchaseGuidance({ transitReport, lalKitab });
+  }, [transitReport, chart, useSample]);
+
+  const planetReport = useMemo(() => {
+    if (!transitReport) return null;
+    return generatePlanetPurchaseReport(transitReport);
+  }, [transitReport]);
+
+  const activePlanetGuidance = useMemo(
+    () => planetReport?.planets.find((p) => p.planet === activePlanet) ?? planetReport?.planets[0] ?? null,
+    [planetReport, activePlanet]
+  );
 
   if (loading && !useSample) {
     return (
@@ -119,9 +133,29 @@ export default function TransitPurchasePage() {
         .tp-item-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
         .tp-muted{font-size:12px;color:#8e84b8;line-height:1.6}
         .tp-chip{font-size:11px;color:#c8a030;border:1px solid rgba(200,160,48,.25);padding:4px 8px;border-radius:999px}
-        @media(max-width:900px){.span-7,.span-5,.span-6{grid-column:span 12}.tp-title{font-size:28px}}
+        .tp-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+        .tp-tab{display:flex;align-items:center;gap:7px;border:1px solid #2a2350;background:#0b0820;color:#b8b0d8;border-radius:12px;padding:8px 13px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+        .tp-tab:hover{border-color:rgba(200,160,48,.4);color:#e8cf8b}
+        .tp-tab.active{background:rgba(200,160,48,.14);border-color:rgba(200,160,48,.6);color:#e8cf8b}
+        .tp-tab .glyph{font-size:16px;line-height:1}
+        .tp-tab .dot{width:7px;height:7px;border-radius:999px}
+        .tp-planet-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+        .tp-planet-title{display:flex;align-items:center;gap:12px}
+        .tp-glyph-lg{font-size:34px;line-height:1;color:#e8cf8b}
+        .tp-snap{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:14px}
+        .tp-snap-item{background:#09061d;border:1px solid #261f4c;border-radius:10px;padding:10px 12px}
+        .tp-snap-k{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#7d74aa}
+        .tp-snap-v{font-size:14px;font-weight:700;color:#e8e2ff;margin-top:3px}
+        .tp-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+        .tp-bullet{font-size:12.5px;color:#c4bce4;line-height:1.65;padding-left:16px;position:relative}
+        .tp-bullet::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:999px}
+        .tp-good::before{background:#71d99a}.tp-bad::before{background:#ff6b7a}.tp-neutral::before{background:#c8a030}
+        .tp-objects{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+        .tp-obj{font-size:11.5px;color:#cfc6ee;background:#0b0820;border:1px solid #2a2350;border-radius:999px;padding:5px 11px}
+        @media(max-width:900px){.span-7,.span-5,.span-6{grid-column:span 12}.tp-title{font-size:28px}.tp-cols{grid-template-columns:1fr}}
       `}</style>
 
+      <PremiumFeature feature="Gochar Purchase Guidance">
       <div className="tp-shell">
         <section className="tp-hero">
           <div className="tp-row">
@@ -159,6 +193,93 @@ export default function TransitPurchasePage() {
               <h2 className="tp-h">{guidance.strongestWarning}</h2>
               <p className="tp-p">This is the first object/timing signal to handle before making a purchase.</p>
             </article>
+
+            {planetReport && activePlanetGuidance && (
+              <article className="tp-card span-12">
+                <div className="tp-row">
+                  <div>
+                    <div className="tp-kicker">Per-Planet Gochar — Live Transit</div>
+                    <h2 className="tp-h">Har Graha ke hisaab se kya kharidein</h2>
+                  </div>
+                  <span className="tp-chip">Base: {planetReport.baseLabel}</span>
+                </div>
+                <p className="tp-muted" style={{ marginTop: 4 }}>
+                  Each planet&apos;s verdict is computed live from its current Gochar position (rashi, house, retrograde, strength).
+                  Tap a graha to see exactly what to buy, wait on, or avoid right now.
+                </p>
+
+                {/* Planet tabs */}
+                <div className="tp-tabs">
+                  {planetReport.planets.map((p) => {
+                    const c =
+                      p.verdict === "AVOID" ? "#ff6b7a" :
+                      p.verdict === "WAIT" ? "#e8a33a" :
+                      p.verdict === "BUY_CAREFULLY" ? "#d8bf67" : "#71d99a";
+                    return (
+                      <button
+                        key={p.planet}
+                        type="button"
+                        className={`tp-tab${activePlanet === p.planet ? " active" : ""}`}
+                        onClick={() => setActivePlanet(p.planet)}
+                      >
+                        <span className="glyph">{p.glyph}</span>
+                        {p.planet}
+                        <span className="dot" style={{ background: c }} />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Active planet detail */}
+                <div className="tp-item" style={{ marginTop: 14 }}>
+                  <div className="tp-planet-head">
+                    <div className="tp-planet-title">
+                      <span className="tp-glyph-lg">{activePlanetGuidance.glyph}</span>
+                      <div>
+                        <strong style={{ fontSize: 18 }}>{activePlanetGuidance.planet} · {activePlanetGuidance.hindiName}</strong>
+                        <p className="tp-muted">{activePlanetGuidance.domain}</p>
+                      </div>
+                    </div>
+                    <Badge verdict={activePlanetGuidance.verdict} />
+                  </div>
+
+                  <p className="tp-p" style={{ marginTop: 10 }}>{activePlanetGuidance.guidance}</p>
+                  <p className="tp-muted" style={{ marginTop: 6 }}>{activePlanetGuidance.timing}</p>
+
+                  {/* Live transit snapshot */}
+                  <div className="tp-snap">
+                    <div className="tp-snap-item"><div className="tp-snap-k">Rashi</div><div className="tp-snap-v">{activePlanetGuidance.transit.rashiName} {Math.round(activePlanetGuidance.transit.degreeInRashi)}°</div></div>
+                    <div className="tp-snap-item"><div className="tp-snap-k">House (from {activePlanetGuidance.transit.baseLabel})</div><div className="tp-snap-v">{activePlanetGuidance.transit.houseFromBase}{activePlanetGuidance.transit.difficultHouse ? " ⚠" : ""}</div></div>
+                    <div className="tp-snap-item"><div className="tp-snap-k">Effect</div><div className="tp-snap-v" style={{ textTransform: "capitalize" }}>{activePlanetGuidance.transit.effect}</div></div>
+                    <div className="tp-snap-item"><div className="tp-snap-k">Strength</div><div className="tp-snap-v">{activePlanetGuidance.score}/100</div></div>
+                    <div className="tp-snap-item"><div className="tp-snap-k">Motion</div><div className="tp-snap-v">{activePlanetGuidance.transit.retrograde ? "Retrograde" : "Direct"}</div></div>
+                  </div>
+
+                  {/* Objects governed */}
+                  <div className="tp-objects">
+                    {activePlanetGuidance.objects.map((o) => <span className="tp-obj" key={o}>{o}</span>)}
+                  </div>
+
+                  {/* Favourable / Avoid */}
+                  <div className="tp-cols">
+                    <div>
+                      <div className="tp-kicker" style={{ color: "#71d99a" }}>Good to buy now</div>
+                      {activePlanetGuidance.favourable.map((f) => <p className="tp-bullet tp-good" key={f}>{f}</p>)}
+                    </div>
+                    <div>
+                      <div className="tp-kicker" style={{ color: "#ff6b7a" }}>Avoid now</div>
+                      {activePlanetGuidance.avoid.map((a) => <p className="tp-bullet tp-bad" key={a}>{a}</p>)}
+                    </div>
+                  </div>
+
+                  {/* Practical checks */}
+                  <div style={{ marginTop: 12 }}>
+                    <div className="tp-kicker">Practical checks</div>
+                    {activePlanetGuidance.checks.map((c) => <p className="tp-bullet tp-neutral" key={c}>{c}</p>)}
+                  </div>
+                </div>
+              </article>
+            )}
 
             <article className="tp-card span-12">
               <div className="tp-row">
@@ -217,6 +338,7 @@ export default function TransitPurchasePage() {
           </section>
         )}
       </div>
+      </PremiumFeature>
 
       <MobileBottomNav />
     </main>

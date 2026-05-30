@@ -5,6 +5,7 @@ import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type Repor
 import { generateVoiceScript, speakVoiceReport, stopVoiceReport } from "@/lib/voice-report";
 import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { PremiumFeature } from "@/components/premium-feature";
 
 const PALETTE_OPTIONS: { value: ReportPalette; label: string; bg: string; gold: string }[] = [
   { value: "midnight", label: "Midnight",  bg: "#0A0E1F", gold: "#C9A961" },
@@ -278,6 +279,7 @@ export default function ReportPage() {
         </div>
       )}
 
+      <PremiumFeature feature="Premium PDF Reports">
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
         {/* Hero */}
         <div style={{ marginBottom: "28px" }}>
@@ -420,6 +422,7 @@ export default function ReportPage() {
         </div>
 
       </div>
+      </PremiumFeature>
       <MobileBottomNav />
     </main>
   );

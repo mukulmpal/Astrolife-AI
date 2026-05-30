@@ -6,6 +6,8 @@ import {
   type BirthContext,
   type PalmistryReport,
 } from "@/lib/astro-engine/palmistry-engine";
+import { getServerFeatureAccess, premiumBlockedResponse } from "@/lib/server-feature-access";
+import { monitor } from "@/lib/server-monitoring";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,6 +82,20 @@ async function analyzeWithGemini(
 
 export async function POST(request: NextRequest): Promise<NextResponse<PalmistryResponse>> {
   try {
+    const access = await getServerFeatureAccess("palmistry");
+    if (!access.allowed) {
+      monitor.warn("premium.blocked", {
+        feature: access.feature,
+        reason: access.reason,
+        tier: access.tier,
+      });
+
+      return NextResponse.json(
+        premiumBlockedResponse(access),
+        { status: access.authenticated ? 402 : 401 },
+      );
+    }
+
     const body = (await request.json()) as Partial<PalmistryRequest>;
 
     if (!body.image || typeof body.image !== "string") {
@@ -117,10 +133,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<Palmistry
     const rawText = await analyzeWithGemini(parsed.base64.replace(/\s/g, ""), parsed.mime, prompt);
     const report = parsePalmistryReport(extractJson(rawText));
 
+    monitor.info("palmistry.generated", {
+      feature: "palmistry",
+      tier: access.tier,
+      confidence: report.finalIntelligenceScore?.confidence,
+      score: report.finalIntelligenceScore?.score,
+    });
+
     return NextResponse.json({ success: true, report, model: "gemini-2.5-flash" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("[palmistry-api]", message);
+    monitor.error("palmistry.failed", error, { message });
     return NextResponse.json(
       { success: false, error: "Palm analysis failed. Please try again with a clearer photo." },
       { status: 500 }

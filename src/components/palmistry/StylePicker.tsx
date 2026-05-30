@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 
 export type ReportStyle = "dashboard" | "manuscript" | "holographic" | "executive";
 
@@ -51,16 +51,31 @@ const STYLES: StyleOption[] = [
 
 interface StylePickerProps {
   onSelect: (style: ReportStyle) => void;
+  /** When provided, the picker can be dismissed (used when a style is already chosen). */
+  onClose?: () => void;
 }
 
-export function StylePicker({ onSelect }: StylePickerProps) {
+export function StylePicker({ onSelect, onClose }: StylePickerProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      onClick={onClose ? (e) => { if (e.target === e.currentTarget) onClose(); } : undefined}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-4xl w-full"
+        className="relative max-w-4xl w-full"
       >
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute -top-2 right-0 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#c8a030]/40 bg-black/80 text-white/70 transition-colors hover:text-white"
+          >
+            <X size={16} />
+          </button>
+        )}
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#c8a030]/30 bg-black/40 px-4 py-2 mb-4">

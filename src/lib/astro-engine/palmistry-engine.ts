@@ -27,6 +27,15 @@ export const PALM_MOUNTS = [
 export type PalmMountId = (typeof PALM_MOUNTS)[number]["id"];
 
 // ── Report shape ──────────────────────────────────────────────
+// Normalized image coordinate: x and y are percentages (0-100) of the
+// uploaded image width/height. x=0 is the left edge, y=0 is the top edge.
+// These let the UI draw the line/mount overlays exactly where they appear
+// on the user's real palm, so the analysis feels genuine.
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export interface PalmLineReading {
   id: PalmLineId;
   name: string;
@@ -35,6 +44,7 @@ export interface PalmLineReading {
   confidence: number;      // 0-100
   summary: string;         // one-line
   detail: string;          // 2-3 sentences
+  points?: Point[];        // traced path of this line in the actual image
 }
 
 export interface MountReading {
@@ -43,6 +53,7 @@ export interface MountReading {
   score: number;           // 0-100
   keywords: string;        // "ambition, leadership, confidence"
   summary: string;
+  pos?: Point;             // mount center in the actual image
 }
 
 export interface FingerReading {
@@ -164,6 +175,57 @@ export interface BirthContext {
 const DISCLAIMER =
   "Palmistry is a traditional art for self-reflection and guidance, not a deterministic prediction. Use these insights as perspective, not certainty.";
 
+// ── Overlay geometry (normalized 0-100 image space) ───────────
+// Fallback line traces + mount centres for a RIGHT hand, used only when the
+// model does not return per-image coordinates. The UI mirrors these for a
+// left hand. Model-detected `points`/`pos` always take priority.
+export const FALLBACK_LINE_POINTS: Record<PalmLineId, Point[]> = {
+  heart:   [{ x: 16.7, y: 31.0 }, { x: 36.7, y: 25.3 }, { x: 58.3, y: 26.3 }, { x: 83.3, y: 31.6 }],
+  head:    [{ x: 19.3, y: 42.0 }, { x: 40.0, y: 39.5 }, { x: 63.3, y: 44.2 }, { x: 81.7, y: 46.8 }],
+  life:    [{ x: 23.3, y: 33.7 }, { x: 24.0, y: 52.6 }, { x: 36.7, y: 71.0 }, { x: 50.0, y: 86.8 }],
+  fate:    [{ x: 56.0, y: 86.8 }, { x: 57.3, y: 65.8 }, { x: 56.7, y: 47.4 }, { x: 54.0, y: 31.6 }],
+  sun:     [{ x: 70.0, y: 86.8 }, { x: 71.3, y: 68.4 }, { x: 72.0, y: 52.6 }, { x: 71.3, y: 39.5 }],
+  mercury: [{ x: 80.0, y: 86.8 }, { x: 82.0, y: 71.0 }, { x: 81.3, y: 57.9 }, { x: 78.7, y: 46.8 }],
+};
+
+export const FALLBACK_MOUNT_POS: Record<PalmMountId, Point> = {
+  jupiter:   { x: 16, y: 24 },
+  saturn:    { x: 42, y: 14 },
+  sun:       { x: 66, y: 18 },
+  mercury:   { x: 86, y: 30 },
+  venus:     { x: 14, y: 74 },
+  moon:      { x: 84, y: 76 },
+  upperMars: { x: 88, y: 52 },
+  lowerMars: { x: 12, y: 50 },
+};
+
+// Mirror a normalized point horizontally (for left vs right hand).
+export function mirrorX(p: Point, mirror: boolean): Point {
+  return mirror ? { x: 100 - p.x, y: p.y } : p;
+}
+
+// Build a smooth SVG path (Catmull-Rom → cubic bezier) through points in
+// 0-100 space. Render the SVG with viewBox "0 0 100 100" preserveAspectRatio="none".
+export function buildLinePath(points: Point[]): string {
+  if (points.length === 0) return "";
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+  if (points.length === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] ?? points[i];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] ?? p2;
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+  return d;
+}
+
 // ── Prompt builder ────────────────────────────────────────────
 export function buildPalmistryPrompt(birth?: BirthContext): string {
   const birthBlock =
@@ -174,6 +236,19 @@ export function buildPalmistryPrompt(birth?: BirthContext): string {
   return `You are AstroLife's AI Palm Intelligence Engine — a world-class palmistry researcher, Samudrika Shastra expert, behavioral psychology analyst, product-grade report writer, and computer vision interpreter.
 
 You will be shown a photograph of a human palm. Analyse the lines, mounts, fingers, and overall hand shape that you can actually observe. Where a feature is unclear in the image, infer the most probable reading and lower its confidence accordingly — never refuse.
+
+SPATIAL GROUNDING (critical for an authentic report): You must locate each major line and each mount AS THEY ACTUALLY APPEAR in this specific image. For every line, trace its real path as a series of points. For every mount, give its real centre. Use a coordinate system where x and y are percentages from 0 to 100: x=0 is the LEFT edge of the image, x=100 the RIGHT edge; y=0 is the TOP edge, y=100 the BOTTOM edge.
+
+STEP 1 — DETERMINE THE HAND (do this before any coordinates, get it right):
+- The thumb is the short, thick digit set lower and apart from the four long fingers.
+- With the palm facing the camera: if the thumb is on the RIGHT side of the image, it is a LEFT hand. If the thumb is on the LEFT side of the image, it is a RIGHT hand.
+- Report this in meta.hand. Double-check by the thumb side — this single fact controls which side everything sits on.
+
+STEP 2 — ANCHOR EVERYTHING TO WHAT YOU SEE (these constraints MUST hold, or your hand call was wrong — recheck it):
+- The THUMB, the Venus mount (ball of the thumb) and the Life line all sit on the SAME side as the thumb. So x of the Venus mount and the Life line must be on the thumb side of the palm.
+- The Moon mount sits on the side OPPOSITE the thumb (outer edge), near the bottom.
+- The four finger mounts sit just below their fingers, in this order across the hand: Jupiter below the index finger (the finger nearest the thumb), then Saturn (middle), Sun (ring), Mercury (little finger, far from the thumb). On a LEFT hand the index/Jupiter is on the RIGHT; on a RIGHT hand it is on the LEFT.
+- Coordinates must match the REAL photo, never a generic left-or-right template.
 
 Core philosophy:
 - Palm is pattern recognition, not fixed prediction.
@@ -213,11 +288,11 @@ Respond with ONLY a JSON object (no markdown, no code fences) matching EXACTLY t
     "metrics": [ { "label": string, "value": number } ]   // 4 items, value 0-100, e.g. Emotional Depth, Practical Intelligence, Resilience, Self-Made Success
   },
   "lines": [
-    { "id": "heart"|"head"|"life"|"fate"|"sun"|"mercury", "confidence": number, "summary": string, "detail": string }
-  ],                                          // all 6 lines, confidence 0-100
+    { "id": "heart"|"head"|"life"|"fate"|"sun"|"mercury", "confidence": number, "summary": string, "detail": string, "points": [[x,y], ...] }
+  ],                                          // all 6 lines, confidence 0-100. "points": 4-8 [x,y] pairs (percent 0-100) tracing the line as seen in THIS image, ordered start→end. Omit a line's points only if that line is genuinely not visible.
   "mounts": [
-    { "id": "jupiter"|"saturn"|"sun"|"mercury"|"venus"|"moon"|"upperMars"|"lowerMars", "score": number, "keywords": string, "summary": string }
-  ],                                          // all 8 mounts, score 0-100
+    { "id": "jupiter"|"saturn"|"sun"|"mercury"|"venus"|"moon"|"upperMars"|"lowerMars", "score": number, "keywords": string, "summary": string, "pos": [x,y] }
+  ],                                          // all 8 mounts, score 0-100. "pos": [x,y] percent (0-100) centre of the mount region in THIS image.
   "fingers": [
     { "id": string, "name": string, "planet": string, "keywords": [string], "summary": string }
   ],                                          // 5 fingers incl. thumb
@@ -297,6 +372,33 @@ function asArr(v: unknown): unknown[] {
   return Array.isArray(v) ? v : [];
 }
 
+function clampPct(n: unknown): number | null {
+  const v = typeof n === "number" ? n : Number(n);
+  if (!Number.isFinite(v)) return null;
+  return Math.max(0, Math.min(100, v));
+}
+
+// Accept a point as [x,y] or {x,y}; returns null when invalid.
+function parsePoint(v: unknown): Point | null {
+  if (Array.isArray(v) && v.length >= 2) {
+    const x = clampPct(v[0]); const y = clampPct(v[1]);
+    return x !== null && y !== null ? { x, y } : null;
+  }
+  if (v && typeof v === "object") {
+    const o = v as Record<string, unknown>;
+    const x = clampPct(o.x); const y = clampPct(o.y);
+    return x !== null && y !== null ? { x, y } : null;
+  }
+  return null;
+}
+
+// A line needs at least 2 valid points to be drawable.
+function parsePoints(v: unknown): Point[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const pts = v.map(parsePoint).filter((p): p is Point => p !== null);
+  return pts.length >= 2 ? pts : undefined;
+}
+
 const FINGER_FALLBACK = [
   { id: "jupiter", name: "Index Finger / Jupiter", planet: "Jupiter", keywords: ["Leadership", "Ambition", "Confidence"] },
   { id: "saturn", name: "Middle Finger / Saturn", planet: "Saturn", keywords: ["Discipline", "Responsibility", "Wisdom"] },
@@ -349,6 +451,7 @@ export function parsePalmistryReport(raw: unknown): PalmistryReport {
       confidence: clampScore(l.confidence, 80),
       summary: str(l.summary, `${def.name} reading pending clearer image.`),
       detail: str(l.detail, str(l.summary, "")),
+      points: parsePoints(l.points),
     };
   });
 
@@ -364,6 +467,7 @@ export function parsePalmistryReport(raw: unknown): PalmistryReport {
       score: clampScore(m.score, 78),
       keywords: str(m.keywords, ""),
       summary: str(m.summary, ""),
+      pos: parsePoint(m.pos) ?? undefined,
     };
   });
 

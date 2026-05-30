@@ -1,31 +1,18 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, Sparkles } from "lucide-react";
-import { type PalmistryReport, PALM_LINES } from "@/lib/astro-engine/palmistry-engine";
+import {
+  type PalmistryReport,
+  PALM_LINES,
+  FALLBACK_LINE_POINTS,
+  FALLBACK_MOUNT_POS,
+  buildLinePath,
+  mirrorX,
+} from "@/lib/astro-engine/palmistry-engine";
 
 const GOLD = "#c8a030";
-
-const LINE_PATHS: Record<string, string> = {
-  heart:   "M50,118 C110,96 175,100 250,120",
-  head:    "M58,160 C120,150 190,168 245,178",
-  life:    "M70,128 C72,200 110,270 150,330",
-  fate:    "M168,330 C172,250 170,180 162,120",
-  sun:     "M210,330 C214,260 216,200 214,150",
-  mercury: "M240,330 C246,270 244,220 236,178",
-};
-
-const MOUNT_POS: Record<string, { x: number; y: number }> = {
-  jupiter:   { x: 16, y: 24 },
-  saturn:    { x: 42, y: 14 },
-  sun:       { x: 66, y: 18 },
-  mercury:   { x: 86, y: 30 },
-  venus:     { x: 14, y: 74 },
-  moon:      { x: 84, y: 76 },
-  upperMars: { x: 88, y: 52 },
-  lowerMars: { x: 12, y: 50 },
-};
 
 function GlassCard({
   children, className = "", delay = 0,
@@ -119,16 +106,29 @@ function IntelligenceCard({ section, delay = 0 }: { section: PalmistryReport["in
 function PalmScanner({
   src, report,
 }: { src: string; report: PalmistryReport | null }) {
-  const mountById = useMemo(
-    () => new Map<string, PalmistryReport["mounts"][number]>(report?.mounts.map((m) => [m.id as string, m]) ?? []),
+  const [aspect, setAspect] = useState(3 / 3.6);
+  const lineById = useMemo(
+    () => new Map<string, PalmistryReport["lines"][number]>(report?.lines.map((l) => [l.id as string, l]) ?? []),
     [report]
   );
+  const mirror = report?.meta.hand === "left";
 
   return (
-    <div className="relative mx-auto aspect-[3/3.6] w-full max-w-sm overflow-hidden rounded-3xl border border-[#c8a030]/30 bg-black shadow-[0_0_60px_-15px_rgba(200,160,48,0.5)]">
+    <div
+      className="relative mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-[#c8a030]/30 bg-black shadow-[0_0_60px_-15px_rgba(200,160,48,0.5)]"
+      style={{ aspectRatio: String(aspect) }}
+    >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(200,160,48,0.18),transparent_60%)]" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="Your palm" className="absolute inset-0 h-full w-full object-cover opacity-90" />
+      <img
+        src={src}
+        alt="Your palm"
+        className="absolute inset-0 h-full w-full object-cover opacity-90"
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          if (img.naturalWidth && img.naturalHeight) setAspect(img.naturalWidth / img.naturalHeight);
+        }}
+      />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
 
       <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -140,29 +140,36 @@ function PalmScanner({
         ))}
       </svg>
 
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 300 380">
-        {PALM_LINES.map((def, i) => (
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {PALM_LINES.map((def, i) => {
+          const reading = lineById.get(def.id);
+          const raw = reading?.points ?? FALLBACK_LINE_POINTS[def.id];
+          const pts = reading?.points ? raw : raw.map((p) => mirrorX(p, mirror));
+          return (
             <motion.path
               key={def.id}
-              d={LINE_PATHS[def.id]}
+              d={buildLinePath(pts)}
               fill="none"
               stroke={def.color}
-              strokeWidth={2.4}
+              strokeWidth={0.9}
               strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
               style={{ filter: `drop-shadow(0 0 4px ${def.color})` }}
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.95 }}
               transition={{ duration: 1.4, delay: 0.3 + i * 0.25, ease: "easeInOut" }}
             />
-        ))}
+          );
+        })}
       </svg>
 
-      {report && Object.entries(MOUNT_POS).map(([id, pos], i) => {
-        const m = mountById.get(id);
-        if (!m) return null;
+      {report && report.mounts.map((m, i) => {
+        const fallback = FALLBACK_MOUNT_POS[m.id];
+        const pos = m.pos ?? (fallback ? mirrorX(fallback, mirror) : undefined);
+        if (!pos) return null;
         return (
           <motion.div
-            key={id}
+            key={m.id}
             className="absolute -translate-x-1/2 -translate-y-1/2"
             style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
             initial={{ opacity: 0, scale: 0.6 }}
@@ -222,13 +229,11 @@ function LineAccordion({ report }: { report: PalmistryReport }) {
 interface DashboardReportProps {
   report: PalmistryReport;
   preview: string;
-  onExportPdf: () => Promise<void>;
-  onShare: () => Promise<void>;
 }
 
 export function DashboardReport({ report, preview }: DashboardReportProps) {
   return (
-    <div ref={undefined} className="mt-8 space-y-8">
+    <div className="mt-8 space-y-8">
       {/* Top 3-column */}
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr_1fr]">
         {/* Left: overall + fingers */}

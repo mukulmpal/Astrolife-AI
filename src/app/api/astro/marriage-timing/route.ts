@@ -4,6 +4,8 @@ import type { MarriageTimingInput } from "@/lib/astro-engine/marriage-timing-kn-
 import type { DivChart } from "@/lib/astro-engine/divisional";
 import type { KPEngineResult } from "@/lib/astro-engine/kp";
 import type { EventRadarReport } from "@/lib/astro-engine/event-radar";
+import { getServerFeatureAccess, premiumBlockedResponse } from "@/lib/server-feature-access";
+import { monitor } from "@/lib/server-monitoring";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,6 +38,20 @@ interface MarriageTimingResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse<MarriageTimingResponse>> {
   try {
+    const access = await getServerFeatureAccess("marriage_timing");
+    if (!access.allowed) {
+      monitor.warn("premium.blocked", {
+        feature: access.feature,
+        reason: access.reason,
+        tier: access.tier,
+      });
+
+      return NextResponse.json(
+        premiumBlockedResponse(access),
+        { status: access.authenticated ? 402 : 401 },
+      );
+    }
+
     const body = await request.json() as Partial<MarriageTimingRequest>;
 
     if (!body.knRaoTiming) {
@@ -106,13 +122,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<MarriageT
       report = result.knRaoTiming?.chatContext;
     }
 
+    monitor.info("marriage_timing.generated", {
+      feature: "marriage_timing",
+      tier: access.tier,
+      outputFormat,
+      overallScore: result.overallScore,
+    });
+
     return NextResponse.json({
       success: true,
       report,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("[marriage-timing-api]", errorMessage);
+    monitor.error("marriage_timing.failed", error, { errorMessage });
 
     return NextResponse.json(
       {

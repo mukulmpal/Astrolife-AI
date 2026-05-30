@@ -14,7 +14,12 @@ export type FeatureKey =
   | "lalkitab"
   | "shadbala"
   | "reports"
-  | "family_charts";
+  | "family_charts"
+  | "transit_ripple"
+  | "marriage_timing"
+  | "palmistry"
+  | "transit_purchase"
+  | "astro_sound";
 
 export const PLAN_LIMITS = {
   free: {
@@ -49,6 +54,11 @@ export const FEATURE_ACCESS: Record<FeatureKey, SubscriptionTier[]> = {
   shadbala: ["premium", "elite"],
   reports: ["premium", "elite"],
   family_charts: ["elite"],
+  transit_ripple: ["premium", "elite"],
+  marriage_timing: ["premium", "elite"],
+  palmistry: ["premium", "elite"],
+  transit_purchase: ["premium", "elite"],
+  astro_sound: ["premium", "elite"],
 };
 
 export function normalizeTier(tier?: string | null): SubscriptionTier {

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { HtmlPreferencesSync } from "@/components/global-preferences-toggle";
+import { Analytics } from "@/components/analytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -71,6 +72,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${cormorant.variable} min-h-full flex flex-col`} suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: preferencesScript }} />
         {children}
+        <Analytics />
         <HtmlPreferencesSync />
       </body>
     </html>

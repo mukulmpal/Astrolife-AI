@@ -7,7 +7,15 @@ import {
   AlertCircle, Hand, X, Loader2, Settings,
 } from "lucide-react";
 import { useUserChart } from "@/lib/user-chart";
-import { PALM_LINES, type PalmistryReport } from "@/lib/astro-engine/palmistry-engine";
+import {
+  PALM_LINES,
+  FALLBACK_LINE_POINTS,
+  FALLBACK_MOUNT_POS,
+  buildLinePath,
+  mirrorX,
+  type PalmistryReport,
+} from "@/lib/astro-engine/palmistry-engine";
+import { detectHandGeometry, applyHandGeometry } from "@/lib/palmistry/hand-geometry";
 import { StylePicker, type ReportStyle } from "./StylePicker";
 import { DashboardReport } from "./DashboardReport";
 import { ManuscriptReport } from "./ManuscriptReport";
@@ -16,28 +24,6 @@ import { ExecutiveReport } from "./ExecutiveReport";
 
 const GOLD = "#c8a030";
 const MAX_MB = 5;
-
-// Stylised palm line paths over a 300x380 viewBox (right hand).
-const LINE_PATHS: Record<string, string> = {
-  heart:   "M50,118 C110,96 175,100 250,120",
-  head:    "M58,160 C120,150 190,168 245,178",
-  life:    "M70,128 C72,200 110,270 150,330",
-  fate:    "M168,330 C172,250 170,180 162,120",
-  sun:     "M210,330 C214,260 216,200 214,150",
-  mercury: "M240,330 C246,270 244,220 236,178",
-};
-
-// Floating mount label positions (% of palm frame).
-const MOUNT_POS: Record<string, { x: number; y: number }> = {
-  jupiter:   { x: 16, y: 24 },
-  saturn:    { x: 42, y: 14 },
-  sun:       { x: 66, y: 18 },
-  mercury:   { x: 86, y: 30 },
-  venus:     { x: 14, y: 74 },
-  moon:      { x: 84, y: 76 },
-  upperMars: { x: 88, y: 52 },
-  lowerMars: { x: 12, y: 50 },
-};
 
 // ── Reusable primitives ───────────────────────────────────────
 function GlassCard({
@@ -81,22 +67,35 @@ function PalmScanner({
   src, report, scanning,
 }: { src: string; report: PalmistryReport | null; scanning: boolean }) {
   const [hover, setHover] = useState<string | null>(null);
+  const [aspect, setAspect] = useState(3 / 3.6);
   const lineById = useMemo(
     () => new Map<string, PalmistryReport["lines"][number]>(report?.lines.map((l) => [l.id as string, l]) ?? []),
     [report]
   );
-  const mountById = useMemo(
-    () => new Map<string, PalmistryReport["mounts"][number]>(report?.mounts.map((m) => [m.id as string, m]) ?? []),
-    [report]
-  );
+  // Mirror the fallback (right-hand) geometry for a left hand. Model-supplied
+  // coordinates are already from the real image, so they are never mirrored.
+  const mirror = report?.meta.hand === "left";
 
   return (
-    <div className="relative mx-auto aspect-[3/3.6] w-full max-w-sm overflow-hidden rounded-3xl border border-[#c8a030]/30 bg-black shadow-[0_0_60px_-15px_rgba(200,160,48,0.5)]">
+    <div
+      className="relative mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-[#c8a030]/30 bg-black shadow-[0_0_60px_-15px_rgba(200,160,48,0.5)]"
+      style={{ aspectRatio: String(aspect) }}
+    >
       {/* radial glow */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(200,160,48,0.18),transparent_60%)]" />
-      {/* palm image — user-supplied data URL, next/image not applicable */}
+      {/* palm image — user-supplied data URL, next/image not applicable.
+          Container aspect matches the image so object-cover neither crops nor
+          letterboxes, keeping the overlay aligned to the real palm. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="Your palm" className="absolute inset-0 h-full w-full object-cover opacity-90" />
+      <img
+        src={src}
+        alt="Your palm"
+        className="absolute inset-0 h-full w-full object-cover opacity-90"
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          if (img.naturalWidth && img.naturalHeight) setAspect(img.naturalWidth / img.naturalHeight);
+        }}
+      />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
 
       {/* gold grid */}
@@ -119,19 +118,23 @@ function PalmScanner({
         />
       )}
 
-      {/* line overlays */}
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 300 380">
+      {/* line overlays — drawn in normalized 0-100 image space */}
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         {PALM_LINES.map((def, i) => {
           const reading = lineById.get(def.id);
+          const raw = reading?.points ?? FALLBACK_LINE_POINTS[def.id];
+          const usingModel = Boolean(reading?.points);
+          const pts = usingModel ? raw : raw.map((p) => mirrorX(p, mirror));
           const active = hover === def.id;
           return (
             <motion.path
               key={def.id}
-              d={LINE_PATHS[def.id]}
+              d={buildLinePath(pts)}
               fill="none"
               stroke={def.color}
-              strokeWidth={active ? 4 : 2.4}
+              strokeWidth={active ? 1.4 : 0.9}
               strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
               style={{ filter: `drop-shadow(0 0 ${active ? 8 : 4}px ${def.color})`, cursor: "pointer" }}
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: scanning ? 0.35 : 0.95 }}
@@ -163,14 +166,15 @@ function PalmScanner({
         )}
       </AnimatePresence>
 
-      {/* floating mount labels */}
+      {/* floating mount labels — at real (or mirrored fallback) positions */}
       {report &&
-        Object.entries(MOUNT_POS).map(([id, pos], i) => {
-          const m = mountById.get(id);
-          if (!m) return null;
+        report.mounts.map((m, i) => {
+          const fallback = FALLBACK_MOUNT_POS[m.id];
+          const pos = m.pos ?? (fallback ? mirrorX(fallback, mirror) : undefined);
+          if (!pos) return null;
           return (
             <motion.div
-              key={id}
+              key={m.id}
               className="absolute -translate-x-1/2 -translate-y-1/2"
               style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
               initial={{ opacity: 0, scale: 0.6 }}
@@ -274,6 +278,9 @@ export function PalmistryAnalyzer() {
     setError("");
     setReport(null);
     try {
+      // Detect exact hand landmarks (client-side) in parallel with the AI call.
+      // Run on the full-resolution preview for best landmark accuracy.
+      const geoPromise = detectHandGeometry(preview ?? dataUrl).catch(() => null);
       const res = await fetch("/api/astro/palmistry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -284,15 +291,17 @@ export function PalmistryAnalyzer() {
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Analysis failed");
+      const geo = await geoPromise;
       // small delay so the scan animation reads as intentional
       await new Promise((r) => setTimeout(r, 600));
-      setReport(json.report as PalmistryReport);
+      // Merge landmark geometry so overlays sit exactly on the real palm.
+      setReport(applyHandGeometry(json.report as PalmistryReport, geo));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Kuch galat ho gaya. Dobara try karein.");
     } finally {
       setScanning(false);
     }
-  }, [dataUrl, birth]);
+  }, [dataUrl, preview, birth]);
 
   const exportPdf = useCallback(async () => {
     if (!reportRef.current) return;
@@ -322,7 +331,10 @@ export function PalmistryAnalyzer() {
       {/* Style Picker Modal */}
       <AnimatePresence>
         {showStylePicker && (
-          <StylePicker onSelect={handleStyleSelect} />
+          <StylePicker
+            onSelect={handleStyleSelect}
+            onClose={selectedStyle ? () => setShowStylePicker(false) : undefined}
+          />
         )}
       </AnimatePresence>
 
@@ -417,7 +429,7 @@ export function PalmistryAnalyzer() {
       {report && preview && selectedStyle && (
         <div ref={reportRef} className="mt-8">
           {selectedStyle === "dashboard" && (
-            <DashboardReport report={report} preview={preview} onExportPdf={exportPdf} onShare={share} />
+            <DashboardReport report={report} preview={preview} />
           )}
           {selectedStyle === "manuscript" && (
             <ManuscriptReport report={report} preview={preview} />
