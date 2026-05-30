@@ -1,6 +1,7 @@
 import type { PalmCategory, PalmCondition, PalmRule, PalmRuleRiskLevel } from "../../types";
 
 const medicalGuardrail = "This is not a medical diagnosis. Use only as vitality/lifestyle reflection.";
+const noGuaranteeGuardrail = "Use soft probability language. Do not guarantee life events.";
 
 type BatchSeed = {
   id: string;
@@ -17,7 +18,13 @@ type BatchSeed = {
 const eq = (feature: string, value: string | boolean): PalmCondition => ({ feature, operator: "equals", value });
 
 function rule(seed: BatchSeed): PalmRule {
-  const riskLevel = seed.riskLevel ?? "safe";
+  const category = seed.category ?? "personality";
+  const guardrail = category === "health_vitality"
+    ? medicalGuardrail
+    : category === "relationship" || category === "family" || category === "travel"
+      ? noGuaranteeGuardrail
+      : undefined;
+  const riskLevel = seed.riskLevel ?? (category === "health_vitality" ? "medical_guarded" : guardrail ? "sensitive" : "safe");
   return {
     id: seed.id,
     type: "atomic",
@@ -26,7 +33,7 @@ function rule(seed: BatchSeed): PalmRule {
     sourceNotes: "Phase 3A Batch 1 inventory. Read with supporting and contradicting signs, never as a one-line prediction.",
     pageRef: "Phase 3A Batch 1 rule inventory",
     tradition: "dayanand",
-    category: seed.category ?? "personality",
+    category,
     tier: seed.id.includes("unknown") ? "free" : "premium",
     status: seed.id.includes("unknown") ? "reviewed" : "active",
     riskLevel,
@@ -40,7 +47,7 @@ function rule(seed: BatchSeed): PalmRule {
     },
     confidenceBase: seed.base ?? 0.64,
     severity: riskLevel === "medical_guarded" ? "medium" : "low",
-    guardrail: riskLevel === "medical_guarded" ? medicalGuardrail : undefined,
+    guardrail,
     reportPriority: seed.priority ?? 60,
   };
 }

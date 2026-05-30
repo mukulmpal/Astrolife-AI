@@ -127,6 +127,20 @@ export interface PalmRuleHit {
   sourceIds: string[];
   matchedSupport: number;
   contradicted: number;
+  ruleId?: string;
+  title?: string;
+  category?: PalmCategory;
+  tradition?: PalmTradition;
+  severity?: PalmSeverity;
+  interpretation?: string;
+  matchedRequired?: string[];
+  matchedSupporting?: string[];
+  matchedContradicting?: string[];
+  guardrail?: string;
+  type?: PalmRuleType;
+  tier?: PalmRuleTier;
+  riskLevel?: PalmRuleRiskLevel;
+  reportPriority?: number;
 }
 
 export interface PalmReportSection {

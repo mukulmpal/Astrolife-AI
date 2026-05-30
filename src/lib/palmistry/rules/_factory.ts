@@ -1,5 +1,11 @@
 import type { PalmCategory, PalmCondition, PalmRule, PalmSeverity, PalmTradition } from "../types";
 
+function defaultGuardrail(category: PalmCategory): PalmRule["guardrail"] | undefined {
+  if (category === "health_vitality" || category === "vitality") return "no_diagnosis";
+  if (category === "relationship" || category === "family" || category === "travel") return "no_guarantee";
+  return undefined;
+}
+
 export function makeRule(args: {
   id: string;
   title: string;
@@ -18,6 +24,8 @@ export function makeRule(args: {
   guardrail?: PalmRule["guardrail"];
   reportPriority?: number;
 }): PalmRule {
+  const guardrail = args.guardrail ?? defaultGuardrail(args.category);
+
   return {
     id: args.id,
     type: "atomic",
@@ -27,7 +35,7 @@ export function makeRule(args: {
     category: args.category,
     tier: "premium",
     status: "active",
-    riskLevel: args.guardrail === "no_diagnosis" ? "medical_guarded" : args.guardrail ? "sensitive" : "safe",
+    riskLevel: guardrail === "no_diagnosis" ? "medical_guarded" : guardrail ? "sensitive" : "safe",
     required: [{ path: args.path, equals: args.value }],
     supporting: args.supporting ?? [],
     contradicting: args.contradicting ?? [],
@@ -38,7 +46,7 @@ export function makeRule(args: {
     },
     confidenceBase: args.confidenceBase ?? 0.68,
     severity: args.severity ?? "supportive",
-    guardrail: args.guardrail,
+    guardrail,
     reportPriority: args.reportPriority ?? 60,
   };
 }

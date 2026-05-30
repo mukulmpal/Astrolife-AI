@@ -98,7 +98,11 @@ const lenses: LensSeed[] = [
 
 function makePhase3Rule(seed: FeatureSeed, lens: LensSeed, index: number): PalmRule {
   const category = lens.category ?? seed.category;
-  const guarded = category === "health_vitality" ? "Health language is limited to vitality, stress and lifestyle balance." : undefined;
+  const guarded = category === "health_vitality"
+    ? "Health language is limited to vitality, stress and lifestyle balance. Do not diagnose disease."
+    : category === "relationship" || category === "family" || category === "travel"
+      ? "Use soft probability language. Do not guarantee life events."
+      : undefined;
   return {
     id: `p3_${seed.key}_${lens.key}_${String(index).padStart(3, "0")}`,
     type: lens.type,
@@ -110,7 +114,7 @@ function makePhase3Rule(seed: FeatureSeed, lens: LensSeed, index: number): PalmR
     category,
     tier: lens.tier,
     status: "active",
-    riskLevel: category === "health_vitality" ? "medical_guarded" : lens.riskLevel,
+    riskLevel: category === "health_vitality" ? "medical_guarded" : guarded ? "sensitive" : lens.riskLevel,
     required: [{ feature: seed.feature, operator: "equals", value: seed.value }],
     supporting: lens.support ?? [],
     contradicting: lens.contradict ?? [],
