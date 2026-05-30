@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+// React hooks are loaded lazily inside useAstroSoundStore so that
+// runAstroSound can be safely called in server-side contexts (e.g. PDF generation).
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const _reactLazy = () => require("react") as typeof import("react");
 
 export type GoalKey =
   | "mind"
@@ -1338,6 +1341,7 @@ function writeAstroSoundStorage(settings: AstroSoundSettings, memory: AstroSound
 }
 
 export function useAstroSoundStore(): AstroSoundStore {
+  const { useState, useEffect } = _reactLazy();
   const [settings, setSettingsState] = useState<AstroSoundSettings>(() => readAstroSoundStorage().settings);
   const [memory, setMemory] = useState<AstroSoundMemory>(() => readAstroSoundStorage().memory);
 

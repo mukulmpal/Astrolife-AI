@@ -1,6 +1,7 @@
 import type { DivChart } from "./divisional";
 import type { EventRadarReport } from "./event-radar";
 import type { KPEngineResult, SignificatorSet } from "./kp";
+import { analyzeMarriageTimingKNRao, type MarriageTimingInput, type MarriageTimingResult } from "./marriage-timing-kn-rao";
 
 type MarriageLabel = "strong_support" | "supportive" | "mixed" | "needs_patience" | "needs_careful_handling";
 
@@ -36,6 +37,10 @@ export interface MarriageV2Result {
   overallScore: number;
   label: MarriageLabel;
   narrative: string;
+
+  // === K.N. RAO TIMING ENGINE (NEW) ===
+  knRaoTiming: MarriageTimingResult | null;
+
   divisional: {
     d9MarriageDelivery: MarriageV2Section;
     d9ContinuityCare: MarriageV2Section;
@@ -344,28 +349,38 @@ export function buildMarriageIntelligenceV2(params: {
   divs?: DivChart[];
   kp?: KPEngineResult;
   radar?: EventRadarReport;
+  knRaoTiming?: MarriageTimingInput;
 }): MarriageV2Result {
   const divisional = buildMarriageDivisionalIntelligence(params.divs ?? []);
   const shodashvargaWisdom = buildShodashvargaMarriageWisdom(params.divs ?? []);
   const kp = params.kp ? buildMarriageKPIntelligence(params.kp) : null;
   const eventRadar = params.radar ? buildMarriageEventRadar(params.radar, kp) : null;
+
+  // === K.N. RAO TIMING ENGINE ===
+  const knRaoTiming = params.knRaoTiming ? analyzeMarriageTimingKNRao(params.knRaoTiming) : null;
+
   const scores = [
     divisional.d9MarriageDelivery.score,
     divisional.d9ContinuityCare.score,
     divisional.d7ChildrenAwareness.score,
     kp?.score,
     eventRadar?.score,
+    knRaoTiming?.timingScore,
   ].filter((score): score is number => typeof score === "number");
+
   const overallScore = scores.length
     ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
     : 50;
 
   return {
-    title: "Marriage Trigger Engine",
+    title: "Marriage Trigger Engine – K.N. Rao Timing + Divisional + KP",
     overallScore,
     label: labelFromScore(overallScore),
-    narrative:
-      `Marriage Trigger Engine separates the judgement into promise, divisional delivery, KP validation and event windows. This prevents one method from becoming a confusing final verdict. The current combined signal is ${labelText(labelFromScore(overallScore))}.`,
+    narrative: `Marriage Trigger Engine separates judgement into K.N. Rao timing parameters, divisional delivery, KP validation and event windows. This prevents one method from becoming confusing final verdict. ${knRaoTiming ? `K.N. Rao timing shows ${knRaoTiming.strengthLabel} with ${knRaoTiming.activeParameterCount}/8 parameters active. ` : ""}The current combined signal is ${labelText(labelFromScore(overallScore))}.`,
+
+    // === K.N. RAO TIMING (NEW SECTION) ===
+    knRaoTiming,
+
     divisional,
     shodashvargaWisdom,
     kp,

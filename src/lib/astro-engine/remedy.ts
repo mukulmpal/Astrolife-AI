@@ -318,6 +318,8 @@ export interface RemedyCard {
   houseRemedy: string;
   lkUpay: string[];
   priority: "dasha-active" | "urgent" | "recommended" | "optional";
+  safety: "safe-first" | "caution" | "validate-first";
+  safetyNote: string;
 }
 
 export interface RemedyResult {
@@ -327,6 +329,33 @@ export interface RemedyResult {
   antardashaActive: string;
   pratyantardashaActive: string;
   topPriority: RemedyCard | null;
+  unifiedSafetyPlan: string[];
+  contradictionSafePlan: string;
+}
+
+function getRemedySafety(
+  planet: string,
+  isWeak: boolean,
+  isActiveDasha: boolean,
+  isKATWeak: boolean
+): Pick<RemedyCard, "safety" | "safetyNote"> {
+  const highImpact = ["Sun", "Mars", "Saturn", "Rahu", "Ketu"].includes(planet);
+  if (isActiveDasha && (isWeak || highImpact)) {
+    return {
+      safety: "validate-first",
+      safetyNote: "Dasha-active and sensitive: start with behaviour, mantra and routine; validate donation, metal, yantra and gemstone before strong use.",
+    };
+  }
+  if (isWeak || isKATWeak || highImpact) {
+    return {
+      safety: "caution",
+      safetyNote: "Use soft remedies first. Avoid expensive gemstones, heavy donation or intense rituals until the chart promise and dasha context agree.",
+    };
+  }
+  return {
+    safety: "safe-first",
+    safetyNote: "Safe first-line remedies are enough: discipline, respectful behaviour, simple mantra, service and clean daily routine.",
+  };
 }
 
 export function calculateRemedies(chart: ChartData): RemedyResult {
@@ -377,6 +406,8 @@ export function calculateRemedies(chart: ChartData): RemedyResult {
     else if (isWeak) priority = "urgent";
     else if (isKATWeak) priority = "recommended";
 
+    const safety = getRemedySafety(planet, isWeak, isActiveDasha, isKATWeak);
+
     return {
       planet,
       house: pd.house,
@@ -399,6 +430,7 @@ export function calculateRemedies(chart: ChartData): RemedyResult {
       houseRemedy,
       lkUpay,
       priority,
+      ...safety,
     };
   }).filter(Boolean) as RemedyCard[];
 
@@ -409,6 +441,18 @@ export function calculateRemedies(chart: ChartData): RemedyResult {
   cards.sort((a, b) => order[a.priority] - order[b.priority]);
 
   const urgentCount = cards.filter(c => c.priority === "urgent" || c.priority === "dasha-active").length;
+  const validateFirst = cards.filter(c => c.safety === "validate-first").map(c => c.planet);
+  const caution = cards.filter(c => c.safety === "caution").map(c => c.planet);
+  const unifiedSafetyPlan = [
+    "Start with behaviour correction, daily routine, prayer/mantra and service before gemstone, metal, daan or 43-day intensive remedies.",
+    validateFirst.length
+      ? `Validate first before strong remedies for: ${validateFirst.join(", ")}.`
+      : "No dasha-active high-caution planet dominates; keep remedies simple and steady.",
+    caution.length
+      ? `Use soft correction only for caution planets: ${caution.slice(0, 5).join(", ")}.`
+      : "Caution load is low; avoid adding unnecessary remedies.",
+    "Never run many planet remedies at once. Choose the top 1-3 and review after 30-40 days.",
+  ];
 
   return {
     cards,
@@ -417,5 +461,7 @@ export function calculateRemedies(chart: ChartData): RemedyResult {
     antardashaActive: antardashaActivePlanet,
     pratyantardashaActive: pratyantardashaActivePlanet,
     topPriority: cards[0] || null,
+    unifiedSafetyPlan,
+    contradictionSafePlan: unifiedSafetyPlan.join(" "),
   };
 }

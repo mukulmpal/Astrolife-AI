@@ -3,6 +3,7 @@
 // Generates a full HTML document for browser print-to-PDF.
 // No jsPDF dependency. All layout is CSS/HTML.
 // ============================================================
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { ChartData } from "./astro-engine/calculations";
 import { calculateRemedies } from "./astro-engine/remedy";
@@ -37,6 +38,23 @@ import { calculateMedical } from "./astro-engine/medical";
 import { calculatePsychology } from "./astro-engine/psychology";
 import { calculateNumerology } from "./astro-engine/numerology";
 import { calculateAshtakavarga } from "./astro-engine/ashtakavarga";
+// Phase 4 — 12 missing engine pages
+import { calculateVastu } from "./astro-engine/vastu";
+import { calculateSarvatobhadra } from "./astro-engine/sarvatobhadra";
+import { calculateKarakas, calculateArudhas, calculateCharaDasha } from "./astro-engine/jaimini";
+import { calculateKpReport } from "./astro-engine/kp";
+import { calculateSpecialLagnas } from "./astro-engine/special-lagnas";
+import { buildMarriageIntelligenceV2 } from "./astro-engine/marriage-intelligence-v2";
+import { analyzeRelationshipIntelligence } from "./astro-engine/relationship-intelligence";
+import type { RelationshipInput } from "./astro-engine/relationship-intelligence";
+import { buildTransitRipplePayloadFromChart } from "./astro-engine/transit-ripple-v4";
+import type { TransitRipplePlanet } from "./astro-engine/transit-ripple-v4";
+import { runAstroSound } from "./astro-engine/astro-sound";
+import { generateGemstoneReportFromChart } from "./astro-engine/gemstone";
+import { calculateDestiny } from "./astro-engine/destiny";
+import { normalizeChartForTransit } from "./astro-engine/chart-normalize";
+import { calculateTransitReport } from "./astro-engine/transits";
+import { calculateEventRadarReport } from "./astro-engine/event-radar";
 
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
@@ -2792,6 +2810,629 @@ function pageStarMap(chart: ChartData, pageNum: string): string {
 
 // ── Master HTML builder ───────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 4 — 12 missing engine pages
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Destiny Timeline ──────────────────────────────────────────────────────
+function pageDestiny(chart: ChartData): string {
+  const result = calculateDestiny(chart.planets as any, chart.dashas, chart.dob, chart.lagnaNum ?? 0) as any;
+  const areas = result.areas ?? [];
+  return `<section class="page dense">
+    ${pageRail("Destiny Timeline · Life Phase Curve", "DT")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">DT</span>
+        <h2>Destiny Timeline</h2>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;">
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Current Age</div>
+          <div style="font-size:28px;font-weight:700;color:var(--ivory);">${result.currentAge ?? "—"}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Phase Score</div>
+          <div style="font-size:28px;font-weight:700;color:${(result.currentScore ?? 0) >= 70 ? "var(--jade)" : (result.currentScore ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${result.currentScore ?? "—"}%</div>
+        </div>
+        <div class="card" style="padding:12px 18px;flex:1;">
+          <div class="kicker">Active Mahadasha</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);">${esc(result.currentDasha ?? "—")}</div>
+        </div>
+      </div>
+      <div class="card" style="padding:12px;margin-bottom:12px;">
+        <div class="body-s" style="line-height:1.65;">${esc(result.summary ?? "")}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+        ${areas.slice(0,6).map((a: any) => `<div class="card" style="padding:9px;">
+          <div class="mono" style="font-size:9px;color:var(--gold-dim);margin-bottom:3px;">${esc(a.name ?? "")}</div>
+          <div style="font-size:22px;font-weight:700;color:${(a.score ?? 0) >= 70 ? "var(--jade)" : (a.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${a.score ?? "—"}</div>
+          <div class="body-s" style="font-size:9px;">${esc(a.status ?? "")}</div>
+        </div>`).join("")}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        ${result.peak ? `<div class="card" style="padding:10px 12px;border-left:3px solid var(--jade);">
+          <div class="kicker" style="margin-bottom:4px;color:var(--jade);">Peak Period</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--jade);">${esc(result.peak.planet ?? "")} Mahadasha</div>
+          <div class="body-s">Score: ${result.peak.score ?? "—"}%</div>
+        </div>` : ""}
+        ${result.challenge ? `<div class="card" style="padding:10px 12px;border-left:3px solid var(--saffron);">
+          <div class="kicker" style="margin-bottom:4px;color:var(--saffron);">Challenge Period</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--saffron);">${esc(result.challenge.planet ?? "")} Mahadasha</div>
+          <div class="body-s">Score: ${result.challenge.score ?? "—"}% · Use discipline and patience.</div>
+        </div>` : ""}
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Destiny")}
+  </section>`;
+}
+
+// ── Transit & Event Radar ─────────────────────────────────────────────────
+function pageTransitRadar(chart: ChartData): string {
+  const normChart = normalizeChartForTransit(chart);
+  const transit = calculateTransitReport({ chart: normChart, base: "lagna", date: new Date() }) as any;
+  const radar = calculateEventRadarReport({ chart: normChart, startDate: new Date(), days: 7, base: "lagna" }) as any;
+  const days = radar.days ?? [];
+  const best = [...days].sort((a: any, b: any) => b.overallScore - a.overallScore)[0];
+  const caution = [...days].sort((a: any, b: any) => a.overallScore - b.overallScore)[0];
+  const areaScores = transit.areaScores ?? [];
+  return `<section class="page dense">
+    ${pageRail("Transit & Event Radar · 7-Day Activation", "ER")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--jade);">ER</span>
+        <h2>Transit &amp; Event Radar</h2>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:14px;">
+        ${best ? `<div class="card" style="padding:10px 14px;border-left:3px solid var(--jade);flex:1;">
+          <div class="kicker" style="color:var(--jade);">Best Day</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--jade);">${esc(best.label ?? "")}</div>
+          <div class="body-s">${esc(best.bestArea ?? "")} · Score ${best.overallScore ?? "—"}</div>
+        </div>` : ""}
+        ${caution ? `<div class="card" style="padding:10px 14px;border-left:3px solid var(--crimson);flex:1;">
+          <div class="kicker" style="color:var(--crimson);">Caution Day</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--crimson);">${esc(caution.label ?? "")}</div>
+          <div class="body-s">${esc(caution.cautionArea ?? "")} · Score ${caution.overallScore ?? "—"}</div>
+        </div>` : ""}
+      </div>
+      ${areaScores.length ? `<div class="card" style="padding:10px 12px;margin-bottom:12px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Life Area Transit Scores</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+          ${areaScores.slice(0,8).map((a: any) => `<div style="padding:6px;background:var(--surface);border-radius:3px;text-align:center;">
+            <div style="font-size:8px;color:var(--gold-dim);margin-bottom:2px;">${esc(a.area ?? "")}</div>
+            <div style="font-size:18px;font-weight:700;color:${(a.score ?? 0) >= 70 ? "var(--jade)" : (a.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${a.score ?? "—"}</div>
+          </div>`).join("")}
+        </div>
+      </div>` : ""}
+      <div class="card" style="padding:10px 12px;margin-bottom:12px;">
+        <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);">${esc(transit.summary ?? "")} ${esc(radar.summary ?? "")}</div>
+      </div>
+      ${days.length ? `<div class="card" style="padding:10px 12px;">
+        <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">7-Day Event Radar</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+          ${days.slice(0,7).map((d: any) => `<div style="padding:5px;background:var(--surface);border-radius:3px;text-align:center;">
+            <div style="font-size:8px;color:var(--ivory-dim);margin-bottom:1px;">${esc((d.label ?? "").slice(0,5))}</div>
+            <div style="font-size:14px;font-weight:700;color:${(d.overallScore ?? 0) >= 70 ? "var(--jade)" : (d.overallScore ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${d.overallScore ?? "—"}</div>
+          </div>`).join("")}
+        </div>
+      </div>` : ""}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Transit Radar")}
+  </section>`;
+}
+
+// ── Jaimini System ────────────────────────────────────────────────────────
+function pageJaimini(chart: ChartData): string {
+  const karakas = calculateKarakas(chart.planets) as any[];
+  const arudhas  = calculateArudhas(chart) as any[];
+  const charaDasha = calculateCharaDasha(chart) as any[];
+  const atmakaraka = karakas.find((k: any) => k.karaka === "AK" || k.karaka === "Atmakaraka") ?? karakas[0];
+  const active = charaDasha.find((cd: any) => cd.active) ?? charaDasha[0];
+  return `<section class="page dense">
+    ${pageRail("Jaimini System · Karakas &amp; Chara Dasha", "J1")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--saffron);">J1</span>
+        <h2>Jaimini System</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:16px;max-width:620px;color:var(--ivory-dim);">
+        Jaimini uses planet degrees to assign soul-level Karakas. Atmakaraka is the soul's primary lesson. Amatyakaraka is career. Darakaraka is marriage. Chara Dasha gives Jaimini timing by sign.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card" style="padding:14px;">
+          <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Karakas</div>
+          <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            ${karakas.slice(0,7).map((k: any) => `<tr style="border-bottom:1px solid var(--line);">
+              <td style="padding:5px 4px;color:var(--gold);">${esc(k.karaka ?? "")}</td>
+              <td style="padding:5px 4px;color:var(--ivory);">${esc(k.planet ?? "")}</td>
+              <td style="padding:5px 4px;color:var(--ivory-dim);" class="mono">${((k.lon ?? 0) % 30).toFixed(2)}°</td>
+              <td style="padding:5px 4px;color:var(--ivory-dim);">${esc(k.sign ?? "")}</td>
+            </tr>`).join("")}
+          </table>
+        </div>
+        <div class="card" style="padding:14px;">
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Arudha Lagnas</div>
+          <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            ${arudhas.slice(0,8).map((a: any) => `<tr style="border-bottom:1px solid var(--line);">
+              <td style="padding:5px 4px;color:var(--saffron);">${esc(a.key ?? a.name ?? "A")}</td>
+              <td style="padding:5px 4px;color:var(--ivory);">${esc(a.sign ?? "")}</td>
+              <td style="padding:5px 4px;color:var(--ivory-dim);">H${a.house ?? "—"}</td>
+            </tr>`).join("")}
+          </table>
+        </div>
+      </div>
+      ${atmakaraka ? `<div class="card" style="padding:12px;margin-bottom:10px;border-left:3px solid var(--gold);">
+        <div class="kicker" style="margin-bottom:4px;">Atmakaraka · Soul Planet</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);">${esc(atmakaraka.planet ?? "")} in ${esc(atmakaraka.sign ?? "")}</div>
+        <div class="body-s" style="margin-top:4px;">${esc(atmakaraka.planet ?? "")} themes represent the primary karmic mission of the soul. Work with this planet consciously throughout life.</div>
+      </div>` : ""}
+      ${active ? `<div class="card" style="padding:12px;border-left:3px solid var(--saffron);">
+        <div class="kicker" style="margin-bottom:4px;">Active Chara Dasha Period</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--saffron);">${esc(active.sign ?? "")}</div>
+        <div class="body-s" style="margin-top:4px;">${active.start ? new Date(active.start).getFullYear() : "—"} – ${active.end ? new Date(active.end).getFullYear() : "—"} · This sign and its lord govern the current Jaimini timing layer.</div>
+      </div>` : ""}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Jaimini")}
+  </section>`;
+}
+
+// ── Astro-Vastu ───────────────────────────────────────────────────────────
+function pageVastu(chart: ChartData): string {
+  const result = calculateVastu(chart.planets as any) as any;
+  const zones = result.zones ?? [];
+  const strong = result.strongZones ?? [];
+  const weak = result.weakZones ?? [];
+  return `<section class="page dense">
+    ${pageRail("Astro-Vastu · 16 Zone Analysis", "V1")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--jade);">V1</span>
+        <h2>Astro-Vastu</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Overall Score</div>
+          <div style="font-size:32px;font-weight:700;color:${(result.overallScore ?? 0) >= 70 ? "var(--jade)" : (result.overallScore ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${result.overallScore ?? "—"}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker" style="color:var(--jade);">Strong Zones</div>
+          <div style="font-size:28px;font-weight:700;color:var(--jade);">${strong.length}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker" style="color:var(--crimson);">Weak Zones</div>
+          <div style="font-size:28px;font-weight:700;color:var(--crimson);">${weak.length}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;">
+        ${zones.slice(0,16).map((z: any) => `<div class="card" style="padding:7px;border-left:2px solid ${(z.score ?? 0) >= 70 ? "var(--jade)" : (z.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">
+          <div class="mono" style="font-size:9px;color:var(--gold-dim);margin-bottom:2px;">${esc(z.dir ?? "")}</div>
+          <div style="font-size:11px;color:var(--ivory);font-weight:600;">${esc(z.name ?? "")}</div>
+          <div style="font-size:14px;font-weight:700;color:${(z.score ?? 0) >= 70 ? "var(--jade)" : (z.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${z.score ?? "—"}</div>
+          <div class="mono" style="font-size:9px;color:var(--ivory-dim);">${esc(z.domain ?? "")}</div>
+        </div>`).join("")}
+      </div>
+      ${weak.length ? `<div class="card" style="padding:10px 12px;">
+        <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">Weak Zone Remedies</div>
+        <div class="body-s" style="line-height:1.7;">
+          ${weak.slice(0,5).map((z: any) => `<div style="margin-bottom:3px;"><span style="color:var(--saffron);font-weight:600;">${esc(z.dir ?? "")} ${esc(z.name ?? "")}</span> — ${esc(z.remedy ?? "Clean and light the zone.")}</div>`).join("")}
+        </div>
+      </div>` : `<div class="card" style="padding:10px 12px;border-left:3px solid var(--jade);"><div class="body-s">No major weak zones detected. Maintain cleanliness in all directions.</div></div>`}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Astro-Vastu")}
+  </section>`;
+}
+
+// ── Sarvatobhadra Chakra ──────────────────────────────────────────────────
+function pageSarvatobhadra(chart: ChartData): string {
+  const result = calculateSarvatobhadra(chart) as any;
+  const alerts = result.vedhaAlerts ?? [];
+  const high = alerts.filter((a: any) => a.severity === "high");
+  const rows = (result.rows ?? []).filter((r: any) => r.isActive).slice(0,8);
+  return `<section class="page dense">
+    ${pageRail("Sarvatobhadra Chakra · Vedha Analysis", "SB")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--saffron);">SB</span>
+        <h2>Sarvatobhadra Chakra</h2>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;">
+        <div class="card" style="padding:12px 16px;text-align:center;">
+          <div class="kicker">Janma Nakshatra</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);">${esc(result.birthNakshatra ?? "—")}</div>
+        </div>
+        <div class="card" style="padding:12px 16px;text-align:center;">
+          <div class="kicker" style="color:var(--crimson);">High Alerts</div>
+          <div style="font-size:24px;font-weight:700;color:${high.length > 2 ? "var(--crimson)" : "var(--gold)"};">${high.length}</div>
+        </div>
+        <div class="card" style="padding:12px 16px;text-align:center;">
+          <div class="kicker">Total Vedha</div>
+          <div style="font-size:24px;font-weight:700;color:var(--ivory);">${alerts.length}</div>
+        </div>
+      </div>
+      ${alerts.length ? `<div class="card" style="padding:12px;margin-bottom:12px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Current Vedha Alerts</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr style="border-bottom:1px solid var(--line-strong);">
+            <th style="padding:5px 4px;text-align:left;color:var(--gold-dim);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;">Planet</th>
+            <th style="padding:5px 4px;text-align:left;color:var(--gold-dim);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;">Nakshatra</th>
+            <th style="padding:5px 4px;text-align:left;color:var(--gold-dim);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;">Severity</th>
+            <th style="padding:5px 4px;text-align:left;color:var(--gold-dim);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;">Description</th>
+          </tr></thead>
+          <tbody>
+            ${alerts.slice(0,8).map((a: any) => `<tr style="border-bottom:1px solid var(--line);">
+              <td style="padding:5px 4px;color:var(--gold);">${esc(a.planet ?? "")}</td>
+              <td style="padding:5px 4px;color:var(--ivory);" class="mono">${esc(a.nakshatra ?? "")}</td>
+              <td style="padding:5px 4px;color:${a.severity === "high" ? "var(--crimson)" : "var(--gold)"};">${esc(a.severity ?? "")}</td>
+              <td style="padding:5px 4px;color:var(--ivory-dim);">${esc((a.description ?? "").slice(0,48))}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>` : `<div class="card" style="padding:12px;border-left:3px solid var(--jade);margin-bottom:12px;"><div class="body-s">No active Sarvatobhadra vedha alerts. Maintain clean intention and steady action.</div></div>`}
+      ${rows.length ? `<div class="card" style="padding:12px;">
+        <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Active Nakshatra Rows</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:10px;">
+          ${rows.map((r: any) => `<div style="padding:3px 0;border-bottom:1px solid var(--line);"><span style="color:var(--gold);">${esc(r.name ?? "")}</span> · natal: ${esc((r.natalPlanets ?? []).join(", ") || "—")} · transit: ${esc((r.transitPlanets ?? []).join(", ") || "—")}</div>`).join("")}
+        </div>
+      </div>` : ""}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Sarvatobhadra")}
+  </section>`;
+}
+
+// ── KP Krishnamurti ────────────────────────────────────────────────────────
+function pageKP(chart: ChartData): string {
+  const kp = calculateKpReport(chart) as any;
+  const events = Array.isArray(kp.significators) ? kp.significators : [];
+  const cusps = Array.isArray(kp.cusps) ? kp.cusps : [];
+  const rows = Array.isArray(kp.rows) ? kp.rows : [];
+  const topEvents = events.slice().sort((a: any, b: any) => Number(b.score ?? 0) - Number(a.score ?? 0)).slice(0,6);
+  const dashaPath = kp.input?.dashaPath ?? "—";
+  return `<section class="page dense">
+    ${pageRail("Krishnamurti Paddhati · Sub-Lord Timing", "KP")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--violet);">KP</span>
+        <h2>Krishnamurti Paddhati</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:16px;max-width:620px;color:var(--ivory-dim);">
+        KP reads each house through cusp sub-lord and star-lord. Dasha activation confirms timing. Active dasha: <span style="color:var(--gold);">${esc(String(dashaPath))}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Event Possibility Index</div>
+          ${topEvents.length ? topEvents.map((e: any) => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line);font-size:11px;">
+            <span style="color:var(--ivory);">${esc(String(e.label ?? e.topic ?? "Event"))}</span>
+            <span style="color:var(--gold-bright);font-weight:700;" class="mono">${e.score ?? "—"}%</span>
+          </div>`).join("") : `<div class="body-s" style="color:var(--ivory-dim);">Connect dasha data for event timing.</div>`}
+        </div>
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Star &amp; Sub Lords</div>
+          ${rows.slice(0,9).map((r: any) => `<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:4px 0;border-bottom:1px solid var(--line);font-size:10px;">
+            <span style="color:var(--gold);">${esc(String(r.name ?? ""))}</span>
+            <span style="color:var(--ivory-dim);">★ ${esc(String(r.starLord ?? ""))}</span>
+            <span style="color:var(--ivory-dim);">Sub ${esc(String(r.subLord ?? ""))}</span>
+          </div>`).join("") || `<div class="body-s" style="color:var(--ivory-dim);">KP planet table not available.</div>`}
+        </div>
+      </div>
+      <div class="card" style="padding:12px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--jade);">House Cusps · Sub Lord</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:10px;">
+          ${cusps.slice(0,12).map((c: any) => `<div style="padding:5px;background:var(--surface);border-radius:3px;text-align:center;">
+            <div style="color:var(--gold-dim);font-size:8px;margin-bottom:2px;">H${c.house ?? "—"}</div>
+            <div style="color:var(--ivory);font-size:9px;">${esc(String(c.sign ?? ""))}</div>
+            <div style="color:var(--saffron);font-size:8px;" class="mono">${esc(String(c.subLord ?? ""))}</div>
+          </div>`).join("") || `<div class="body-s" style="color:var(--ivory-dim);">Exact KP cusps not connected.</div>`}
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "KP")}
+  </section>`;
+}
+
+// ── Transit Ripple ────────────────────────────────────────────────────────
+function pageTransitRipple(chart: ChartData): string {
+  const RIPPLE_PLANETS: TransitRipplePlanet[] = ["Saturn","Jupiter","Rahu","Ketu","Mars","Sun","Moon","Mercury","Venus"];
+  const ripples = RIPPLE_PLANETS.map(planet => {
+    try { return buildTransitRipplePayloadFromChart(chart, planet); } catch { return null; }
+  }).filter(Boolean) as NonNullable<ReturnType<typeof buildTransitRipplePayloadFromChart>>[];
+  const major = ripples.filter(r => ["Saturn","Jupiter","Rahu","Ketu"].includes(r.payload.transitPlanet));
+  const dashaLinked = ripples.filter(r =>
+    r.payload.transitPlanet === r.payload.currentMahadasha ||
+    r.payload.transitPlanet === r.payload.currentAntardasha
+  );
+  return `<section class="page dense">
+    ${pageRail("Transit Ripple · Current Activations", "TR")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--saffron);">TR</span>
+        <h2>Transit Ripple</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:14px;max-width:620px;color:var(--ivory-dim);">
+        Current transit positions of all major planets against the natal chart.
+        ${dashaLinked.length ? `Dasha-linked transits (louder this period): <span style="color:var(--gold);">${dashaLinked.map(r => r.payload.transitPlanet).join(", ")}</span>` : "No dasha-linked transits active this period."}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+        ${ripples.map(r => {
+          const isMajor = ["Saturn","Jupiter","Rahu","Ketu"].includes(r.payload.transitPlanet);
+          const isDasha = r.payload.transitPlanet === r.payload.currentMahadasha || r.payload.transitPlanet === r.payload.currentAntardasha;
+          return `<div class="card" style="padding:9px;border-left:2px solid ${isDasha ? "var(--gold)" : isMajor ? "var(--saffron)" : "var(--line)"};">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="color:var(--gold);font-weight:700;font-size:13px;">${esc(r.payload.transitPlanet)}</span>
+              ${isDasha ? `<span style="font-size:8px;background:rgba(200,160,48,0.15);color:var(--gold);padding:1px 5px;border-radius:3px;">DASHA</span>` : ""}
+            </div>
+            <div style="color:var(--ivory);font-size:11px;margin-bottom:2px;">${esc(r.payload.transitSign)}</div>
+            <div style="color:var(--ivory-dim);font-size:10px;">${esc(r.payload.transitNakshatra)}</div>
+            <div style="color:var(--ivory-dim);font-size:9px;" class="mono">${esc(r.payload.transitSpeed)}</div>
+          </div>`;
+        }).join("")}
+      </div>
+      ${major.length ? `<div class="card" style="padding:12px;">
+        <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Major Planet Dasha Context</div>
+        <div class="body-s" style="line-height:1.7;">
+          ${major.map(r => `<div style="margin-bottom:4px;"><span style="color:var(--gold);font-weight:600;">${esc(r.payload.transitPlanet)}</span> in <span style="color:var(--ivory);">${esc(r.payload.transitSign)} / ${esc(r.payload.transitNakshatra)}</span> · MD: <span style="color:var(--saffron);">${esc(r.payload.currentMahadasha)}</span> · AD: ${esc(r.payload.currentAntardasha)}</div>`).join("")}
+        </div>
+      </div>` : ""}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Transit Ripple")}
+  </section>`;
+}
+
+// ── Special Lagnas ────────────────────────────────────────────────────────
+function pageSpecialLagnas(chart: ChartData): string {
+  const result = calculateSpecialLagnas(chart) as any;
+  const items = result.items ?? [];
+  const al = items.find((i: any) => i.key === "AL");
+  const ul = items.find((i: any) => i.key === "UL");
+  const hl = items.find((i: any) => i.key === "HL");
+  const gl = items.find((i: any) => i.key === "GL");
+  return `<section class="page dense">
+    ${pageRail("Special Lagnas · Arudhas &amp; Sensitive Points", "SL")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--jade);">SL</span>
+        <h2>Special Lagnas</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:16px;max-width:620px;color:var(--ivory-dim);">${esc(result.summary ?? "Special lagnas are derived sensitive points revealing specific life areas.")}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        ${[al, ul, hl, gl].filter(Boolean).map((item: any) => `<div class="card" style="padding:12px;border-left:3px solid var(--gold);">
+          <div class="kicker" style="margin-bottom:4px;">${esc(item.name ?? "")} (${esc(item.key ?? "")})</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);">${esc(item.sign ?? "")} · H${item.house ?? "—"}</div>
+          <div class="body-s" style="margin-top:6px;color:var(--ivory-dim);">${esc(item.meaning ?? item.interpretation ?? "")}</div>
+        </div>`).join("")}
+      </div>
+      <div class="card" style="padding:12px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">All Special Points</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+          ${items.map((item: any) => `<div style="padding:6px;background:var(--surface);border-radius:3px;">
+            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:0.1em;">${esc(item.key ?? "")}</div>
+            <div style="color:var(--ivory);font-size:12px;font-weight:600;">${esc(item.sign ?? "")}</div>
+            <div style="color:var(--ivory-dim);font-size:10px;">H${item.house ?? "—"}</div>
+          </div>`).join("")}
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Special Lagnas")}
+  </section>`;
+}
+
+// ── Marriage Intelligence ─────────────────────────────────────────────────
+function pageMarriageIntelligence(chart: ChartData): string {
+  const divs = calculateDivisional(chart.planets as Parameters<typeof calculateDivisional>[0], chart.lagnaNum, chart.lagnaLon);
+  let kp: any = null;
+  try { kp = calculateKpReport(chart); } catch { /* optional */ }
+  const result = buildMarriageIntelligenceV2({ divs, kp: kp ?? undefined }) as any;
+  const label = (result.label ?? "").replace(/_/g, " ");
+  const d9 = result.divisional?.d9MarriageDelivery;
+  const d9c = result.divisional?.d9ContinuityCare;
+  const d7 = result.divisional?.d7ChildrenAwareness;
+  return `<section class="page dense">
+    ${pageRail("Marriage Intelligence · D9 &amp; KP Analysis", "MI")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">MI</span>
+        <h2>Marriage Intelligence</h2>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;">
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Overall Score</div>
+          <div style="font-size:32px;font-weight:700;color:${(result.overallScore ?? 0) >= 70 ? "var(--jade)" : (result.overallScore ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${result.overallScore ?? "—"}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;flex:1;">
+          <div class="kicker" style="margin-bottom:4px;">Assessment</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);text-transform:capitalize;">${esc(label)}</div>
+        </div>
+      </div>
+      <div class="card" style="padding:12px;margin-bottom:12px;">
+        <div class="body-s" style="line-height:1.7;color:var(--ivory-dim);">${esc(result.narrative ?? "")}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+        ${[{l:"D9 Marriage Delivery",d:d9},{l:"D9 Continuity Care",d:d9c},{l:"D7 Children Awareness",d:d7}].map(({l,d}) => d ? `<div class="card" style="padding:10px;">
+          <div class="kicker" style="margin-bottom:4px;font-size:8px;">${esc(l)}</div>
+          <div style="font-size:22px;font-weight:700;color:${(d.score ?? 0) >= 70 ? "var(--jade)" : (d.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${d.score ?? "—"}</div>
+          <div class="body-s" style="font-size:9px;line-height:1.4;">${esc((d.paragraph ?? "").slice(0,80))}</div>
+        </div>` : "").join("")}
+      </div>
+      ${d9?.indicators?.length ? `<div class="card" style="padding:10px 12px;">
+        <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Key Indicators</div>
+        <div class="body-s" style="line-height:1.6;">${(d9.indicators as string[]).slice(0,4).map(ind => `<div style="margin-bottom:3px;">• ${esc(ind)}</div>`).join("")}</div>
+      </div>` : ""}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Marriage Intelligence")}
+  </section>`;
+}
+
+// ── Relationship Intelligence ─────────────────────────────────────────────
+function pageRelationshipIntelligence(chart: ChartData): string {
+  const PLANET_KEYS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] as const;
+  const planets = PLANET_KEYS
+    .filter(name => (chart.planets as any)?.[name])
+    .map(name => {
+      const p = (chart.planets as any)[name];
+      return { planet: name as any, house: p.house ?? 1, sign: p.sign, nakshatra: p.nakshatra, isRetrograde: p.retrograde ?? false };
+    });
+  const houses = Array.from({ length: 12 }, (_, i) => ({ house: i + 1 }));
+  const activeMD = chart.dashas?.find((d: any) => d.active) ?? chart.dashas?.[0];
+  const activeAD = (chart as any).antardasha?.find((d: any) => d.active) ?? (chart as any).antardasha?.[0];
+  const relInput: RelationshipInput = {
+    language: "english",
+    planets,
+    houses,
+    dasha: activeMD ? { mahadasha: activeMD.planet as any, antardasha: activeAD?.planet as any } : undefined,
+  };
+  const result = analyzeRelationshipIntelligence(relInput) as any;
+  const layers = result.layers ?? {};
+  return `<section class="page dense">
+    ${pageRail("Relationship Intelligence · Marriage &amp; Children", "RI")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">RI</span>
+        <h2>Relationship Intelligence</h2>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:14px;">
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Marriage Score</div>
+          <div style="font-size:30px;font-weight:700;color:${(result.marriageScore ?? 0) >= 70 ? "var(--jade)" : (result.marriageScore ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${result.marriageScore ?? "—"}</div>
+          <div class="body-s" style="font-size:9px;">${esc(result.marriageLabel ?? "")}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Children Score</div>
+          <div style="font-size:30px;font-weight:700;color:${(result.childrenScore ?? 0) >= 70 ? "var(--jade)" : (result.childrenScore ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${result.childrenScore ?? "—"}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;flex:1;">
+          <div class="kicker" style="margin-bottom:4px;">Narrative</div>
+          <div class="body-s" style="line-height:1.5;">${esc((result.marriageNarrative ?? "").slice(0,120))}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+        ${Object.entries(layers).slice(0,6).map(([key, val]: [string, any]) => `<div class="card" style="padding:8px;">
+          <div class="mono" style="font-size:8px;color:var(--gold-dim);margin-bottom:3px;">${esc(key.replace(/([A-Z])/g, " $1").trim())}</div>
+          <div style="font-size:20px;font-weight:700;color:${(val?.score ?? 0) >= 70 ? "var(--jade)" : (val?.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${val?.score ?? "—"}</div>
+          <div class="body-s" style="font-size:8px;line-height:1.3;">${esc((val?.paragraph ?? "").slice(0,60))}</div>
+        </div>`).join("")}
+      </div>
+      <div class="card" style="padding:10px 12px;border-left:3px solid var(--jade);">
+        <div class="kicker" style="margin-bottom:4px;color:var(--jade);">Safe Remedies</div>
+        <div class="body-s">${esc(result.safeRelationshipRemedies ?? "")}</div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Relationship Intel")}
+  </section>`;
+}
+
+// ── Astro Sound Protocol ──────────────────────────────────────────────────
+const ASTRO_SOUND_RASHIS_HTML = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+function pageAstroSound(chart: ChartData): string {
+  const soundPlanets: Record<string, { rashi: number; house: number; lon: number; status?: string; retrograde?: boolean }> = {};
+  for (const [name, p] of Object.entries(chart.planets ?? {})) {
+    const pd = p as any;
+    const rashi = ASTRO_SOUND_RASHIS_HTML.indexOf(pd.sign ?? "");
+    soundPlanets[name] = { rashi: rashi >= 0 ? rashi : (pd.house ?? 1) - 1, house: pd.house ?? 1, lon: pd.lon ?? 0, status: pd.status, retrograde: pd.retrograde };
+  }
+  const soundResult = runAstroSound({
+    chart: { lagR: chart.lagnaNum ?? 0, lagLon: (chart as any).lagnaLon, dob: chart.dob, planets: soundPlanets },
+    goal: "mind", emotion: "auto", voice: "any", intensity: "medium", mode: "hybrid",
+  }) as any;
+  const primary = soundResult.primary?.raga ?? soundResult.primary ?? {};
+  const timing = soundResult.timing ?? {};
+  return `<section class="page dense">
+    ${pageRail("Astro Sound Protocol · Raga &amp; Frequency Therapy", "AS")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--violet);">AS</span>
+        <h2>Astro Sound Protocol</h2>
+      </div>
+      <div style="display:flex;gap:14px;margin-bottom:16px;">
+        <div class="card" style="padding:12px 18px;text-align:center;flex:1.2;">
+          <div class="kicker">Primary Raga</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-bright);">${esc(primary.name ?? soundResult.title ?? "—")}</div>
+          <div class="body-s" style="font-size:10px;color:var(--saffron);">${esc(soundResult.status ?? "")}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Score</div>
+          <div style="font-size:28px;font-weight:700;color:var(--gold);">${soundResult.score ?? "—"}</div>
+        </div>
+        <div class="card" style="padding:12px 18px;text-align:center;">
+          <div class="kicker">Active Planet</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ivory);">${esc(timing.activePlanet ?? "—")}</div>
+        </div>
+      </div>
+      <div class="card" style="padding:12px;margin-bottom:12px;">
+        <div class="body-s" style="line-height:1.7;color:var(--ivory-dim);">${esc(soundResult.summary ?? "")}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="card" style="padding:10px 12px;">
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Protocol</div>
+          <div class="body-s" style="line-height:1.6;">
+            ${(soundResult.protocol ?? []).slice(0,4).map((p: string) => `<div style="margin-bottom:3px;">• ${esc(p)}</div>`).join("") || "<div>Listen at dawn and dusk for 20–30 minutes.</div>"}
+          </div>
+        </div>
+        <div class="card" style="padding:10px 12px;">
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">21-Day Sadhana</div>
+          <div class="body-s" style="line-height:1.6;">${esc(timing.twentyOneDaySadhana ?? "Daily listening for 21 days builds the raga's planetary resonance.")}</div>
+        </div>
+      </div>
+      ${(soundResult.remedies ?? []).length ? `<div class="card" style="padding:10px 12px;border-left:3px solid var(--violet);">
+        <div class="kicker" style="margin-bottom:4px;">Sound Remedies</div>
+        <div class="body-s">${(soundResult.remedies as string[]).slice(0,3).map(r => `<div style="margin-bottom:3px;">• ${esc(r)}</div>`).join("")}</div>
+      </div>` : ""}
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Astro Sound")}
+  </section>`;
+}
+
+// ── Gemstone Suitability ──────────────────────────────────────────────────
+function pageGemstone(chart: ChartData): string {
+  const report = generateGemstoneReportFromChart(chart) as any;
+  const primary = report.primaryGemstone ?? {};
+  const wearing = primary.wearing ?? {};
+  return `<section class="page dense">
+    ${pageRail("Gemstone Suitability · Planetary Ratna", "GS")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">GS</span>
+        <h2>Gemstone Suitability</h2>
+      </div>
+      <div style="display:flex;gap:14px;margin-bottom:16px;">
+        <div class="card" style="padding:14px 20px;flex:1;text-align:center;">
+          <div class="kicker">Primary Gemstone</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold-bright);">${esc(primary.gemstone ?? "—")}</div>
+          <div class="body-s" style="color:var(--saffron);">For ${esc(primary.planet ?? "")} · ${esc(report.lagnaSign ?? "")} Lagna</div>
+        </div>
+        <div class="card" style="padding:14px;flex:0.8;">
+          <div class="kicker" style="margin-bottom:4px;">Suitability</div>
+          <div style="font-size:28px;font-weight:700;color:${(primary.score ?? 0) >= 70 ? "var(--jade)" : (primary.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${primary.score ?? "—"}%</div>
+          <div class="body-s" style="font-size:9px;">Alternate: ${esc(primary.alternateGemstone ?? "—")}</div>
+        </div>
+      </div>
+      <div class="card" style="padding:12px;margin-bottom:12px;">
+        <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);">${esc(primary.reason ?? report.dashaNote ?? "Gemstone guidance will be refined with full chart data.")}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="card" style="padding:10px 12px;">
+          <div class="kicker" style="margin-bottom:6px;color:var(--gold);">Wearing Instructions</div>
+          <div class="body-s" style="line-height:1.7;">
+            <div>Metal: <span style="color:var(--ivory);">${esc(wearing.metal ?? "—")}</span></div>
+            <div>Finger: <span style="color:var(--ivory);">${esc(wearing.finger ?? "—")}</span></div>
+            <div>Day: <span style="color:var(--ivory);">${esc(wearing.day ?? "—")}</span></div>
+            <div>Weight: <span style="color:var(--ivory);">${esc(wearing.weight ?? "—")}</span></div>
+          </div>
+        </div>
+        <div class="card" style="padding:10px 12px;">
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Mantra &amp; Timing</div>
+          <div class="body-s" style="line-height:1.7;">
+            <div style="margin-bottom:4px;font-style:italic;color:var(--ivory-dim);">${esc(wearing.mantra ?? "—")}</div>
+            <div>Best time: ${esc(wearing.time ?? "Sunrise")}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:10px 12px;border-left:3px solid var(--crimson);">
+        <div class="kicker" style="margin-bottom:4px;color:var(--crimson);">Important Caution</div>
+        <div class="body-s">Suitability guidance only — not a final prescription. Wear expensive gemstones only after expert confirmation. Start with mantra and colour discipline first.</div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · cosmic blueprint", "Gemstone")}
+  </section>`;
+}
+
 export function generateReportHTML(chart: ChartData, options?: Partial<ReportOptions>): string {
   const context = buildReportEngineContext(chart, options);
   const { palette, cover } = context.settings;
@@ -2834,6 +3475,19 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     ashtakavarga: t === "full" || t === "kundli",
     antardasha:   t === "full" || t === "remedy" || t === "destiny",
     lifeAreas:    t === "full" || t === "destiny",
+    // Phase 4 — new engines
+    destiny:       t === "full" || t === "destiny",
+    transitRadar:  t === "full" || t === "destiny",
+    jaimini:       t === "full" || t === "kundli",
+    vastu:         t === "full",
+    sarvatobhadra: t === "full",
+    kp:            t === "full" || t === "kundli",
+    transitRipple: t === "full" || t === "destiny",
+    specialLagnas: t === "full" || t === "kundli",
+    marriageIntel: t === "full",
+    relationshipIntel: t === "full",
+    astroSound:    t === "full",
+    gemstone:      t === "full",
   };
 
   // Per-planet deep-dive pages (Phase 2). Page numbers are cosmetic labels.
@@ -2877,7 +3531,20 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.health     ? safe(() => pageHealth(chart),      "Health")          : "",
     include.psychology ? safe(() => pagePsychology(chart),  "Psychology")      : "",
     include.numerology ? safe(() => pageNumerology(chart),  "Numerology")      : "",
-    include.remedies   ? safe(() => page9Remedies(chart),   "Remedies")        : "",
+    include.remedies         ? safe(() => page9Remedies(chart),             "Remedies")             : "",
+    // Phase 4 — 12 new engine pages
+    include.destiny          ? safe(() => pageDestiny(chart),               "Destiny")              : "",
+    include.transitRadar     ? safe(() => pageTransitRadar(chart),          "Transit Radar")        : "",
+    include.jaimini          ? safe(() => pageJaimini(chart),               "Jaimini")              : "",
+    include.vastu            ? safe(() => pageVastu(chart),                 "Vastu")                : "",
+    include.sarvatobhadra    ? safe(() => pageSarvatobhadra(chart),         "Sarvatobhadra")        : "",
+    include.kp               ? safe(() => pageKP(chart),                   "KP")                   : "",
+    include.transitRipple    ? safe(() => pageTransitRipple(chart),         "Transit Ripple")       : "",
+    include.specialLagnas    ? safe(() => pageSpecialLagnas(chart),         "Special Lagnas")       : "",
+    include.marriageIntel    ? safe(() => pageMarriageIntelligence(chart),  "Marriage Intelligence"): "",
+    include.relationshipIntel? safe(() => pageRelationshipIntelligence(chart),"Relationship Intel") : "",
+    include.astroSound       ? safe(() => pageAstroSound(chart),            "Astro Sound")          : "",
+    include.gemstone         ? safe(() => pageGemstone(chart),              "Gemstone")             : "",
     safe(() => page10Closing(chart),         "Closing"),
     safe(() => page11EngineLedger(context),  "Engine Ledger"),
   ].filter(Boolean).join("\n\n");

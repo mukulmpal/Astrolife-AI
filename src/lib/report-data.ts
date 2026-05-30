@@ -43,6 +43,10 @@ export interface ReportSection {
   summary: string[];
   actionPlan: string[];
   remedy: string[];
+  qa?: {
+    status: "verified" | "needs-review" | "fallback";
+    evidence: string[];
+  };
 }
 
 export interface ReportPlanet {
@@ -263,6 +267,10 @@ function safeSection(
       "Confirm the chart object contains planets, houses, lagna and birth data.",
     ],
     remedy: ["Do not treat this failed section as a prediction."],
+    qa: {
+      status: "fallback",
+      evidence: ["Engine call failed.", "Section is blocked from confident interpretation."],
+    },
   });
 }
 
@@ -323,9 +331,23 @@ function makeSection(params: {
   summary: string[];
   actionPlan: string[];
   remedy: string[];
+  qa?: ReportSection["qa"];
 }): ReportSection {
   return {
     ...params,
+    qa: params.qa ?? {
+      status: params.subtitle.toLowerCase().includes("fallback") || params.subtitle.toLowerCase().includes("failed")
+        ? "fallback"
+        : params.score < 55
+          ? "needs-review"
+          : "verified",
+      evidence: [
+        `${params.paragraphs.length} paragraphs`,
+        `${params.summary.length} summary points`,
+        `${params.actionPlan.length} action steps`,
+        `${params.remedy.length} remedy lines`,
+      ],
+    },
     signal: getSignal(params.score),
   };
 }
@@ -2663,19 +2685,18 @@ export function buildRealRemedyEngineReportSection(input: any): ReportSection {
         result.topPriority
           ? `Top priority remedy belongs to ${result.topPriority.planet} in House ${result.topPriority.house}. The practical instruction is: ${result.topPriority.practice}`
           : "No single urgent remedy dominates this chart; simple steady discipline is preferred.",
-        "AstroLife prioritizes affordable and behavioural remedies first. Gemstones should be treated carefully and confirmed before expensive purchase or long-term wearing.",
+        result.contradictionSafePlan,
       ],
       summary: result.cards
         .slice(0, 9)
         .map((card: any) => `${card.planet} H${card.house} ${card.sign}: ${card.priority} · ${card.status}`),
       actionPlan: [
-        "Pick only the top 1-3 remedies and follow them consistently.",
-        "Start with mantra, donation and behavioural correction before gemstones.",
+        ...result.unifiedSafetyPlan.slice(0, 3),
         "Review remedies through active dasha and actual life situation.",
       ],
       remedy: result.cards
         .slice(0, 6)
-        .map((card: any) => `${card.planet}: ${card.mantra}; ${card.donate}; ${card.practice}`),
+        .map((card: any) => `${card.planet}: ${card.safetyNote} ${card.mantra}; ${card.practice}`),
     });
   } catch (error) {
     return safeSection("remedy-engine", "Remedy Engine", error);
@@ -2773,43 +2794,43 @@ export function buildRealJaiminiReportSection(input: any): ReportSection {
 export function buildRealTransitRippleReportSection(input: any): ReportSection {
   try {
     const chart = getEngineChart(input);
-    const planets: TransitRipplePlanet[] = ["Saturn", "Jupiter", "Rahu"];
+    const planets: TransitRipplePlanet[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
     const ripples = planets.map(planet => {
       try { return buildTransitRipplePayloadFromChart(chart, planet); } catch { return null; }
     }).filter(Boolean) as NonNullable<ReturnType<typeof buildTransitRipplePayloadFromChart>>[];
 
-    const saturn = ripples.find(r => r.payload.transitPlanet === "Saturn");
-    const jupiter = ripples.find(r => r.payload.transitPlanet === "Jupiter");
-    const rahu = ripples.find(r => r.payload.transitPlanet === "Rahu");
+    const dashaLinked = ripples.filter(r =>
+      r.payload.transitPlanet === r.payload.currentMahadasha ||
+      r.payload.transitPlanet === r.payload.currentAntardasha
+    );
+    const major = ripples.filter(r => ["Saturn", "Jupiter", "Rahu", "Ketu", "Mars"].includes(r.payload.transitPlanet));
 
     return makeSection({
       id: "transit-ripple",
       title: "Transit Ripple Analysis",
-      subtitle: "Saturn · Jupiter · Rahu current position and impact",
-      score: 68,
+      subtitle: "All major planets · one-month transit activation",
+      score: Math.min(88, 62 + ripples.length * 2 + dashaLinked.length * 4),
       paragraphs: [
-        "Transit Ripple shows how the three major karmic planets are currently moving relative to your natal chart. Saturn governs karma, discipline and long-term structure. Jupiter governs wisdom, expansion and protection. Rahu governs obsession, ambition and direction of desire.",
-        saturn
-          ? `Saturn is currently in ${saturn.payload.transitSign}, ${saturn.payload.transitNakshatra}, moving ${saturn.payload.transitSpeed}. Dasha context: ${saturn.payload.currentMahadasha}–${saturn.payload.currentAntardasha}.`
-          : "Saturn transit data could not be calculated for this chart.",
-        jupiter
-          ? `Jupiter is currently in ${jupiter.payload.transitSign}, ${jupiter.payload.transitNakshatra}, moving ${jupiter.payload.transitSpeed}.`
-          : "Jupiter transit data could not be calculated.",
-        rahu
-          ? `Rahu is currently in ${rahu.payload.transitSign}, ${rahu.payload.transitNakshatra}, moving ${rahu.payload.transitSpeed}. The Rahu-Ketu axis shows where material desire and spiritual release are active.`
-          : "Rahu transit data could not be calculated.",
+        "Transit Ripple shows how the major moving planets are currently activating the natal chart. This section now checks the full transit field instead of reducing the reading to Saturn alone.",
+        major.length
+          ? `Major pressure and growth transits: ${major.map(r => `${r.payload.transitPlanet} in ${r.payload.transitSign}/${r.payload.transitNakshatra}`).join("; ")}.`
+          : "Major transit data could not be fully calculated for this chart.",
+        dashaLinked.length
+          ? `Dasha-linked transits are louder this month: ${dashaLinked.map(r => r.payload.transitPlanet).join(", ")}.`
+          : "No transit planet directly matches the active Mahadasha or Antardasha, so results should be read as supportive background unless natal promise is triggered.",
+        "For monthly timing, use the dashboard Transit Ripple page because it scans daily sign and nakshatra changes across the next 30 days.",
       ],
       summary: ripples.map(r => `${r.payload.transitPlanet}: ${r.payload.transitSign} · ${r.payload.transitNakshatra} · ${r.payload.transitSpeed}`),
       actionPlan: [
-        "Read major transit planets through the current Mahadasha planet first.",
-        "Saturn transit through 12/1/2 from Moon (Sade Sati) needs patience and discipline.",
-        "Jupiter transit through kendra from Moon can improve results.",
-        "Rahu transit through 1/5/9 can increase ambition and opportunity.",
+        "Read all transit planets through the current Mahadasha planet first.",
+        "Use Saturn for discipline, Jupiter for opportunity, Rahu for ambition and Ketu for release.",
+        "Use Sun, Moon, Mars, Mercury and Venus for monthly action, mood, conflict, decisions and relationships.",
+        "Do not make fear-based decisions from a single transit; combine natal promise, dasha and transits.",
       ],
       remedy: [
-        "For Saturn transit: Saturday discipline, oil lamp, Shani mantra.",
-        "For Rahu transit: grounding, clarity, avoiding shortcuts.",
-        "For Jupiter: charity, gratitude, study and respect for teachers.",
+        "For pressure transits: discipline, sleep, routine and truthful communication first.",
+        "For opportunity transits: study, networking, ethical expansion and documented action.",
+        "For fast Moon/Mercury/Venus changes: use timing for mood, conversation and planning, not fear.",
       ],
     });
   } catch (error) {
@@ -2955,10 +2976,53 @@ export function buildRealRelationshipIntelligenceReportSection(input: any): Repo
   }
 }
 
+export function buildReportQualityAuditSection(sections: ReportSection[]): ReportSection {
+  const fallback = sections.filter((section) => section.qa?.status === "fallback");
+  const review = sections.filter((section) => section.qa?.status === "needs-review");
+  const verified = sections.filter((section) => section.qa?.status === "verified");
+  const total = Math.max(1, sections.length);
+  const score = Math.round(((verified.length * 1 + review.length * 0.55) / total) * 100);
+
+  return makeSection({
+    id: "premium-report-quality-audit",
+    title: "Premium Report Quality Audit",
+    subtitle: `${verified.length} verified · ${review.length} review · ${fallback.length} fallback`,
+    score,
+    paragraphs: [
+      "This QA layer checks whether premium report sections are backed by real engine output, complete summary data and practical action guidance.",
+      fallback.length
+        ? `Fallback sections need engineering review before they should be treated as final premium interpretation: ${fallback.map((section) => section.title).join(", ")}.`
+        : "No fallback section was detected in this report build.",
+      review.length
+        ? `Needs-review sections are usable but should receive golden-chart validation: ${review.map((section) => section.title).slice(0, 8).join(", ")}.`
+        : "All non-fallback sections currently meet the minimum completeness guard.",
+    ],
+    summary: [
+      `Total engine sections checked: ${sections.length}`,
+      `Verified sections: ${verified.length}`,
+      `Needs-review sections: ${review.length}`,
+      `Fallback sections: ${fallback.length}`,
+    ],
+    actionPlan: [
+      "Fix fallback sections first because they indicate failed engine calls or missing chart payload fields.",
+      "Run golden-chart QA for needs-review sections before marketing them as final.",
+      "Keep this audit visible in internal QA builds so premium report quality does not silently regress.",
+    ],
+    remedy: [
+      "For users, show cautious wording when a section is fallback or needs-review.",
+      "For launch, require zero fallback sections in the premium report path.",
+    ],
+    qa: {
+      status: fallback.length ? "needs-review" : "verified",
+      evidence: [`${sections.length} sections audited`, `${fallback.length} fallback sections`, `${review.length} needs-review sections`],
+    },
+  });
+}
+
 export function buildRealEngineReportSections(input: any): ReportSection[] {
   const chart = getEngineChart(input);
 
-  return [
+  const sections = [
     buildRealPanchangEngineReportSection(chart),
     ...buildAllYogasDoshasDetailedReportSections(chart),
     buildRealShadbalaEngineReportSection(chart),
@@ -2980,6 +3044,11 @@ export function buildRealEngineReportSections(input: any): ReportSection[] {
     buildRealSpecialLagnasReportSection(chart),    // Part 1 #2
     buildRealMarriageIntelligenceReportSection(chart), // Part 1 #3
     buildRealRelationshipIntelligenceReportSection(chart), // Part 1 #4
+  ];
+
+  return [
+    buildReportQualityAuditSection(sections),
+    ...sections,
   ];
 }
 

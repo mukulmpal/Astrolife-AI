@@ -1,19 +1,88 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { calculatePrashna, type PrashnaResult, type PrashnaTopic } from "@/lib/astro-engine/prashna";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+
+type CityResult = {
+  displayName: string;
+  latitude: number;
+  longitude: number;
+  timezone?: string | null;
+};
+
+function getTimeZoneHours(timeZone?: string | null) {
+  if (!timeZone) return 5.5;
+  try {
+    const date = new Date();
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).formatToParts(date);
+    const value = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 0);
+    const asUtc = Date.UTC(value("year"), value("month") - 1, value("day"), value("hour"), value("minute"), value("second"));
+    return Math.round(((asUtc - date.getTime()) / 3_600_000) * 10) / 10;
+  } catch {
+    return 5.5;
+  }
+}
 
 export default function PrashnaPage() {
   const [question, setQuestion] = useState("");
   const [topic, setTopic] = useState<PrashnaTopic>("general");
+  const [cityQuery, setCityQuery] = useState("Delhi");
+  const [city, setCity] = useState<CityResult>({ displayName: "Delhi, IN", latitude: 28.6139, longitude: 77.2090, timezone: "Asia/Kolkata" });
+  const [cityResults, setCityResults] = useState<CityResult[]>([]);
+  const [cityLoading, setCityLoading] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [lat, setLat] = useState("28.6139");
   const [lon, setLon] = useState("77.2090");
   const [tz, setTz] = useState("5.5");
   const [result, setResult] = useState<PrashnaResult | null>(null);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const query = cityQuery.trim();
+    if (query.length < 2) {
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      setCityLoading(true);
+      try {
+        const res = await fetch(`/api/locations/search?q=${encodeURIComponent(query)}&limit=6`);
+        const data = await res.json();
+        setCityResults(Array.isArray(data) ? data : []);
+      } catch {
+        setCityResults([]);
+      } finally {
+        setCityLoading(false);
+      }
+    }, 240);
+
+    return () => window.clearTimeout(timer);
+  }, [cityQuery]);
+
+  const selectCity = (nextCity: CityResult) => {
+    setCity(nextCity);
+    setCityQuery(nextCity.displayName);
+    setLat(String(nextCity.latitude));
+    setLon(String(nextCity.longitude));
+    setTz(String(getTimeZoneHours(nextCity.timezone)));
+    setCityResults([]);
+  };
+
   const handleCalculate = () => {
     if (!question.trim()) { setError("Please enter your question"); return; }
+    if (!Number.isFinite(parseFloat(lat)) || !Number.isFinite(parseFloat(lon))) {
+      setError("Please choose a valid question city.");
+      return;
+    }
     setError("");
     try {
       const res = calculatePrashna(question, topic, parseFloat(lat), parseFloat(lon), parseFloat(tz));
@@ -32,6 +101,9 @@ export default function PrashnaPage() {
         .pr-input, .pr-select { width: 100%; background: #08051a; border: 1px solid #1c1840; border-radius: 8px; padding: 10px 12px; color: #f0e8d0; font-family: inherit; font-size: 13px; }
         .pr-input:focus, .pr-select:focus { outline: none; border-color: rgba(168,85,247,0.5); }
         .pr-btn { width: 100%; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; padding: 12px; color: #f0e8d0; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px; }
+        .pr-ghost-btn { background: transparent; border: 1px solid rgba(168,85,247,.35); color: #c4b5fd; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .pr-city-list { display: grid; gap: 6px; margin-top: 8px; }
+        .pr-city-item { text-align: left; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); color: #d8d0ef; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 12px; }
         .pr-row { font-size: 12px; color: #b8b0d8; margin-bottom: 5px; display: flex; gap: 8px; }
         .pr-row strong { color: #f0e8d0; min-width: 90px; flex-shrink: 0; }
         .factor-item { font-size: 11px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
@@ -88,15 +160,59 @@ export default function PrashnaPage() {
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
-            <div>
-              <div className="pr-label">Latitude</div>
-              <input type="number" className="pr-input" value={lat} onChange={e => setLat(e.target.value)} step="0.01" placeholder="28.6139" />
+          <div style={{ marginBottom: "14px" }}>
+            <div className="pr-label">Question City</div>
+            <input
+              type="text"
+              className="pr-input"
+              value={cityQuery}
+              onChange={(e) => {
+                const value = e.target.value;
+                setCityQuery(value);
+                if (value.trim().length < 2) setCityResults([]);
+              }}
+              placeholder="Search city, e.g. Delhi, Mumbai, London"
+            />
+            {cityLoading && <div style={{ fontSize: "11px", color: "#8880a8", marginTop: "6px" }}>Searching cities...</div>}
+            {cityResults.length > 0 && (
+              <div className="pr-city-list">
+                {cityResults.map((item) => (
+                  <button key={`${item.displayName}-${item.latitude}-${item.longitude}`} type="button" className="pr-city-item" onClick={() => selectCity(item)}>
+                    {item.displayName}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div style={{ fontSize: "11px", color: "#8880a8", marginTop: "6px" }}>
+              Using {city.displayName} for the exact Prashna moment.
             </div>
-            <div>
-              <div className="pr-label">Longitude</div>
-              <input type="number" className="pr-input" value={lon} onChange={e => setLon(e.target.value)} step="0.01" placeholder="77.2090" />
+          </div>
+
+          <div style={{ marginBottom: "14px" }}>
+            <button type="button" className="pr-ghost-btn" onClick={() => setShowAdvanced(!showAdvanced)}>
+              {showAdvanced ? "Hide advanced coordinates" : "Advanced coordinates"}
+            </button>
+          </div>
+
+          {showAdvanced && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+              <div>
+                <div className="pr-label">Latitude</div>
+                <input type="number" className="pr-input" value={lat} onChange={e => setLat(e.target.value)} step="0.01" placeholder="28.6139" />
+              </div>
+              <div>
+                <div className="pr-label">Longitude</div>
+                <input type="number" className="pr-input" value={lon} onChange={e => setLon(e.target.value)} step="0.01" placeholder="77.2090" />
+              </div>
+              <div>
+                <div className="pr-label">TZ Hours</div>
+                <input type="number" className="pr-input" value={tz} onChange={e => setTz(e.target.value)} step="0.5" placeholder="5.5" />
+              </div>
             </div>
+          )}
+
+          <div style={{ background: "rgba(168,85,247,0.07)", border: "1px solid rgba(168,85,247,0.18)", borderRadius: "8px", padding: "9px 11px", fontSize: "11px", color: "#b8b0d8", lineHeight: 1.6, marginBottom: "12px" }}>
+            Prashna is judged for the place where the question is asked. City search keeps the experience clean; coordinates stay available only for advanced correction.
           </div>
 
           {error && <div style={{ color: "#ef4444", fontSize: "12px", marginBottom: "8px" }}>{error}</div>}

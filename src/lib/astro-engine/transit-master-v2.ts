@@ -1,5 +1,9 @@
 export {
   buildTransitRipplePayloadFromChart,
+  buildMonthlyTransitRipplePayloadFromChart,
+  type MonthlyTransitRipplePayload,
+  type MonthlyTransitRipplePayloadResult,
+  type MonthlyTransitRipplePoint,
   type TransitRipplePayload,
   type TransitRipplePayloadMeta,
   type TransitRipplePayloadResult,

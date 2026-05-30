@@ -1,7 +1,7 @@
-import { TransitRipplePanel } from "@/components/transit/TransitRipplePanel";
+import { TransitRipplePanelV2 } from "@/components/transit/TransitRipplePanelV2";
 
 export const dynamic = "force-dynamic";
 
 export default function DashboardTransitRipplePage() {
-  return <TransitRipplePanel />;
+  return <TransitRipplePanelV2 />;
 }

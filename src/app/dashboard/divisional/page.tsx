@@ -48,6 +48,47 @@ const CHART_META: Record<string,{icon:string;domain:string}> = {
   D60:{icon:"🌀", domain:"Past Life Karma"},
 };
 
+const VARGA_DECISION_GUIDE: Record<string, { judge: string; avoid: string; next: string }> = {
+  D7: {
+    judge: "Use D7 with D1 5th house, Jupiter, relevant dasha and family context for children or lineage matters.",
+    avoid: "Do not convert D7 into medical or fertility certainty.",
+    next: "Check Jupiter, 5th lord, dasha activation and supportive timing before final advice.",
+  },
+  D9: {
+    judge: "Use D9 after D1 promise to judge marriage delivery, dharma maturity, spouse support and planet reliability.",
+    avoid: "Do not overrule the birth chart from one Navamsha placement.",
+    next: "Compare D1 7th house, Venus, Jupiter, D9 lagna, D9 7th and active dasha planets.",
+  },
+  D10: {
+    judge: "Use D10 for career authority, public karma, work status and professional responsibility.",
+    avoid: "Do not judge career only from D10 when D1 10th, Saturn, Sun and dasha disagree.",
+    next: "Compare D1 10th house, 10th lord, Saturn/Sun, D10 lagna and current dasha.",
+  },
+  D12: {
+    judge: "Use D12 for parents, ancestry, inherited family patterns and elder support.",
+    avoid: "Do not make harsh family conclusions from a single malefic placement.",
+    next: "Read D12 with D1 4th/9th houses, Sun, Moon and active family-period dashas.",
+  },
+  D30: {
+    judge: "Use D30 for obstacle patterns, stress points and karmic correction areas.",
+    avoid: "Do not use D30 to create fear; it is a prevention and discipline chart.",
+    next: "Match D30 pressure with D1 dusthana houses, Saturn/Mars/Rahu/Ketu and remedy discipline.",
+  },
+  D60: {
+    judge: "Use D60 only when birth time is highly reliable; it refines deep karmic tone.",
+    avoid: "Do not give strong D60 claims if birth time confidence is weak.",
+    next: "Treat D60 as a subtle confirmation layer after D1, D9 and dasha.",
+  },
+};
+
+function getVargaGuide(key: string) {
+  return VARGA_DECISION_GUIDE[key] ?? {
+    judge: "Use this varga as a focused confirmation layer after the birth chart promise is established.",
+    avoid: "Do not make a final prediction from this chart alone.",
+    next: "Compare D1 promise, relevant karaka, house lord, varga lagna and current dasha.",
+  };
+}
+
 function MiniChart({ chart }: { chart: DivChart }) {
   const S=220;
   const CELLS = [
@@ -172,11 +213,15 @@ export default function DivisionalPage() {
         .dv-current-reading h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:#f0e8d0;margin:0 0 8px}
         .dv-current-reading p{font-size:13px;color:#c8c0a8;line-height:1.85;margin:0 0 12px}
         .dv-current-reading ul{display:grid;gap:7px;margin:0;padding-left:18px;color:#a99fd0;font-size:12px;line-height:1.7}
+        .dv-decision-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+        .dv-decision-card{background:#0d0a22;border:1px solid rgba(168,85,247,.16);border-radius:14px;padding:14px}
+        .dv-decision-card b{display:block;font-size:11px;color:#c8a030;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+        .dv-decision-card p{font-size:12px;color:#c8c0a8;line-height:1.7;margin:0}
         .dv-growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
         .dv-growth-box{background:#0d0a22;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
         .dv-growth-box h3{font-size:14px;color:#f0e8d0;margin:0 0 8px}
         .dv-growth-box p{font-size:12px;color:#b8b0d8;line-height:1.75;margin:0}
-        @media(max-width:920px){.dv-universal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dv-universal-head,.dv-growth-grid{grid-template-columns:1fr}}
+        @media(max-width:920px){.dv-universal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dv-universal-head,.dv-growth-grid,.dv-decision-grid{grid-template-columns:1fr}}
         @media(max-width:640px){.dv-universal-grid{grid-template-columns:1fr}}
         @media(max-width:920px){.dv-marriage-grid{grid-template-columns:1fr}}
       `}</style>
@@ -256,6 +301,26 @@ export default function DivisionalPage() {
           </ul>
         </section>
       )}
+
+      {(() => {
+        const guide = getVargaGuide(current.key);
+        return (
+          <section className="dv-decision-grid">
+            <div className="dv-decision-card">
+              <b>How to judge {current.key}</b>
+              <p>{guide.judge}</p>
+            </div>
+            <div className="dv-decision-card">
+              <b>What to avoid</b>
+              <p>{guide.avoid}</p>
+            </div>
+            <div className="dv-decision-card">
+              <b>Next validation</b>
+              <p>{guide.next}</p>
+            </div>
+          </section>
+        );
+      })()}
 
       <section className="dv-growth-grid">
         <div className="dv-growth-box">

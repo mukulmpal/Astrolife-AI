@@ -7,8 +7,8 @@ import {
   Sparkles, Timer, BarChart3, Grid3x3, Layers, Target,
   Brain, BookOpen, Hash, Calendar, Music, Gem, Home as HomeIcon,
   HeartPulse, HelpCircle, Leaf, Users, FileText, Zap,
-  Sunrise, History, Star, HeartHandshake, ShoppingBag,
-  LogOut, type LucideIcon,
+  Sunrise, History, Star, HeartHandshake, ShoppingBag, Heart,
+  Hand, LogOut, type LucideIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
@@ -40,6 +40,8 @@ const NAV_ENGINES: NavItem[] = [
   { label: "Gemstone",       href: "/dashboard/gemstone",       Icon: Gem        },
   { label: "Vastu",          href: "/dashboard/vastu",          Icon: HomeIcon   },
   { label: "Kundali Milan",  href: "/dashboard/kundali-milan",  Icon: Users           },
+  { label: "Marriage Timing",href: "/dashboard/marriage-timing", Icon: Heart           },
+  { label: "Palmistry",      href: "/dashboard/palmistry",       Icon: Hand            },
   { label: "Family Karma",   href: "/dashboard/family-synastry", Icon: HeartHandshake  },
   { label: "Jaimini",        href: "/dashboard/jaimini",        Icon: Star       },
   { label: "Medical",        href: "/dashboard/medical",        Icon: HeartPulse },

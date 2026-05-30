@@ -124,6 +124,9 @@ export default function RemedyPage() {
         .phase-title { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 700; color: #f0e8d0; margin-bottom: 8px; }
         .phase-text { font-size: 12px; color: #b8b0d8; line-height: 1.75; white-space: pre-line; }
         .phase-pill { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid rgba(34,197,94,0.3); background: rgba(34,197,94,0.08); color: #86efac; margin-bottom: 8px; }
+        .safe-plan { background: rgba(34,197,94,0.055); border: 1px solid rgba(34,197,94,0.18); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; }
+        .safe-plan-title { font-size: 12px; font-weight: 800; color: #86efac; letter-spacing: .5px; margin-bottom: 8px; text-transform: uppercase; }
+        .safe-plan-line { font-size: 12px; color: #b8b0d8; line-height: 1.65; padding: 4px 0; }
       `}</style>
 
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
@@ -150,6 +153,13 @@ export default function RemedyPage() {
         {/* Summary bar */}
         <div style={{ background: "rgba(200,160,48,0.08)", border: "1px solid rgba(200,160,48,0.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "18px", fontSize: "12px", color: "#c8a030" }}>
           {result.urgentCount} planet{result.urgentCount !== 1 ? "s" : ""} need immediate upay &nbsp;·&nbsp; {result.cards.filter(c => c.priority === "dasha-active").length} dasha-active
+        </div>
+
+        <div className="safe-plan">
+          <div className="safe-plan-title">Unified Safe Remedy Protocol</div>
+          {result.unifiedSafetyPlan.map((line) => (
+            <div key={line} className="safe-plan-line">• {line}</div>
+          ))}
         </div>
 
         {/* Contradiction Warnings */}
@@ -313,6 +323,7 @@ export default function RemedyPage() {
                   {/* Vedic remedies */}
                   <div className="rem-section">
                     <div className="rem-section-title" style={{ color: "#c8a030" }}>Vedic Remedies</div>
+                    <div className="rem-row"><strong>🛡️ Safety:</strong> {card.safetyNote}</div>
                     <div className="rem-row"><strong>💎 Gem:</strong> {card.gem}</div>
                     <div className="rem-row"><strong>🪄 Mantra:</strong> {card.mantra}</div>
                     <div className="rem-row"><strong>💝 Donate:</strong> {card.donate}</div>

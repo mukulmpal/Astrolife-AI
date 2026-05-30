@@ -133,10 +133,8 @@ function getMoonVelocity(moonLon: number, jd: number): { velocity: "fast" | "nor
 
 function getMoonApplying(
   moonLon: number,
-  planetLons: Record<string, number>,
-  lagnaNum: number
+  planetLons: Record<string, number>
 ): { voidOfCourse: boolean; applyingTo: string | null } {
-  const moonSign = Math.floor(((moonLon % 360) + 360) % 360 / 30);
   const moonDegInSign = ((moonLon % 360) + 360) % 360 % 30;
   const degreesLeftInSign = 30 - moonDegInSign;
 
@@ -327,7 +325,7 @@ export function calculatePrashna(question: string, topic: PrashnaTopic, lat: num
   // ── New: Moon velocity, void-of-course, applying planet ──
   const { velocity: moonVelocity, degreesPerDay: moonDPD } = getMoonVelocity(moonLon, jd);
   const { voidOfCourse: moonVoidOfCourse, applyingTo: moonApplyingTo } =
-    getMoonApplying(moonLon, planets, lagnaNum);
+    getMoonApplying(moonLon, planets);
 
   // ── New: Saham for this topic ──
   const saham = computeSaham(topic, lagnaLon, planets, lagnaNum);

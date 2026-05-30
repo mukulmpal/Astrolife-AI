@@ -22,6 +22,8 @@ const ENGINE_ITEMS = [
   { icon: "🧩", label: "Divisional", href: "/dashboard/divisional" },
   { icon: "🔢", label: "Numerology", href: "/dashboard/numerology" },
   { icon: "💑", label: "Kundali Milan", href: "/dashboard/kundali-milan" },
+  { icon: "💍", label: "Marriage Timing", href: "/dashboard/marriage-timing" },
+  { icon: "🤚", label: "Palmistry", href: "/dashboard/palmistry" },
   { icon: "🧭", label: "KP System", href: "/dashboard/kp" },
   { icon: "📡", label: "Event Radar", href: "/dashboard/event-radar" },
   { icon: "📅", label: "Panchang", href: "/dashboard/panchang" },

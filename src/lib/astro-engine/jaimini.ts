@@ -537,7 +537,6 @@ export function calculateArgala(chart: ChartData): ArgalaEntry[] {
 
   // Calculate Argala for key reference points: Lagna, AL, AK sign
   const lagnaSign = lagnaNum;
-  const alOffset  = md(lagnaNum + 0, 12); // Lagna itself; AL computed via arudhas
   const karakas   = calculateKarakas(chart.planets);
   const akSignNum = karakas.find(k => k.role === "AK")?.signNum ?? lagnaNum;
 
