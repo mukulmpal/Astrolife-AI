@@ -1,6 +1,7 @@
 "use client";
 import { PremiumFeature } from "@/components/premium-feature";
 import { PalmistryAnalyzer } from "@/components/palmistry/PalmistryAnalyzer";
+import { ManualPalmistryWorkbench } from "@/components/palmistry/manual-palmistry-workbench";
 import "@/app/dashboard/shared.css";
 
 export default function PalmistryPage() {
@@ -8,6 +9,7 @@ export default function PalmistryPage() {
     <div className="page">
       <PremiumFeature feature="AI Palmistry">
         <PalmistryAnalyzer />
+        <ManualPalmistryWorkbench />
       </PremiumFeature>
     </div>
   );

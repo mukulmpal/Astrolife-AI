@@ -1,0 +1,38 @@
+import type { PalmCategory, PalmCondition, PalmRule, PalmSeverity, PalmTradition } from "../types";
+
+export function makeRule(args: {
+  id: string;
+  title: string;
+  category: PalmCategory;
+  path: string;
+  value: unknown;
+  sourceIds?: string[];
+  tradition?: PalmTradition;
+  supporting?: PalmCondition[];
+  contradicting?: PalmCondition[];
+  classical: string;
+  scientific: string;
+  luxury: string;
+  confidenceBase?: number;
+  severity?: PalmSeverity;
+  guardrail?: PalmRule["guardrail"];
+}): PalmRule {
+  return {
+    id: args.id,
+    title: args.title,
+    sourceIds: args.sourceIds ?? ["DAYANAND_MASTER", "WRITER_SCIENTIFIC_IV"],
+    tradition: args.tradition ?? "hybrid",
+    category: args.category,
+    required: [{ path: args.path, equals: args.value }],
+    supporting: args.supporting ?? [],
+    contradicting: args.contradicting ?? [],
+    interpretation: {
+      classical: args.classical,
+      scientific: args.scientific,
+      luxury: args.luxury,
+    },
+    confidenceBase: args.confidenceBase ?? 68,
+    severity: args.severity ?? "supportive",
+    guardrail: args.guardrail,
+  };
+}
