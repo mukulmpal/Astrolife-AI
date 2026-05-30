@@ -19,4 +19,13 @@ export const CATEGORY_TITLES: Record<PalmCategory, string> = {
   vitality: "Vitality & Lifestyle Balance",
   travel: "Travel & Movement Indicators",
   remedies: "AI Growth & Remedy Protocol",
+  personality: "Personality Intelligence",
+  wealth: "Wealth Pattern Indicators",
+  health_vitality: "Health & Vitality Guardrails",
+  spirituality: "Spiritual Intelligence",
+  education: "Learning & Education Indicators",
+  family: "Family Pattern Indicators",
+  fame: "Recognition & Public Influence",
+  remedy: "Remedy & Growth Guidance",
+  general: "General Synthesis",
 };

@@ -1,7 +1,16 @@
 export type HandSide = "left" | "right" | "both" | "unknown";
 export type DominantHand = "left" | "right" | "unknown";
 export type PalmReportStyle = "classical" | "scientific" | "luxury";
-export type PalmTradition = "indian" | "western" | "hybrid";
+export type PalmTradition =
+  | "indian"
+  | "western"
+  | "hybrid"
+  | "samudrik"
+  | "dayanand"
+  | "anthony_writer"
+  | "cheiro"
+  | "scientific"
+  | "astrolife_fusion";
 export type PalmCategory =
   | "hand_shape"
   | "thumb"
@@ -12,9 +21,22 @@ export type PalmCategory =
   | "career"
   | "vitality"
   | "travel"
-  | "remedies";
+  | "remedies"
+  | "personality"
+  | "wealth"
+  | "health_vitality"
+  | "spirituality"
+  | "education"
+  | "family"
+  | "fame"
+  | "remedy"
+  | "general";
 
-export type PalmSeverity = "supportive" | "watch" | "growth" | "strong";
+export type PalmSeverity = "supportive" | "watch" | "growth" | "strong" | "low" | "medium" | "high";
+export type PalmRuleStatus = "draft" | "reviewed" | "active" | "disabled";
+export type PalmRuleTier = "free" | "premium" | "elite";
+export type PalmRuleRiskLevel = "safe" | "sensitive" | "medical_guarded" | "blocked";
+export type PalmRuleType = "atomic" | "modifier" | "combination" | "contradiction" | "remedy" | "fusion";
 
 export interface PalmImageQuality {
   score: number;
@@ -56,24 +78,36 @@ export interface PalmFeatures {
 }
 
 export interface PalmCondition {
-  path: string;
+  path?: string;
+  feature?: string;
+  operator?: "equals" | "not_equals" | "exists";
   equals?: unknown;
+  value?: unknown;
   exists?: boolean;
 }
 
 export interface PalmRule {
   id: string;
+  type: PalmRuleType;
   title: string;
   sourceIds: string[];
+  sourceNotes?: string;
+  pageRef?: string;
   tradition: PalmTradition;
   category: PalmCategory;
+  tier: PalmRuleTier;
+  status: PalmRuleStatus;
+  riskLevel: PalmRuleRiskLevel;
   required: PalmCondition[];
   supporting: PalmCondition[];
   contradicting: PalmCondition[];
+  modifiesRuleIds?: string[];
+  blocksRuleIds?: string[];
   interpretation: Record<PalmReportStyle, string>;
   confidenceBase: number;
   severity: PalmSeverity;
-  guardrail?: "no_death" | "no_diagnosis" | "no_guarantee";
+  guardrail?: "no_death" | "no_diagnosis" | "no_guarantee" | string;
+  reportPriority: number;
 }
 
 export interface PalmRuleHit {
@@ -104,6 +138,8 @@ export interface PalmAnalyzeInput {
   handSide: HandSide;
   dominantHand: DominantHand;
   reportStyle: PalmReportStyle;
+  tier?: PalmRuleTier;
+  userConfirmed?: boolean;
   imageQuality: PalmImageQuality;
   features: Omit<PalmFeatures, "handSide" | "dominantHand">;
 }
