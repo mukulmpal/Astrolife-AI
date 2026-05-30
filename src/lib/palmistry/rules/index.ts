@@ -2,6 +2,7 @@ import { CAREER_RULES } from "./career-rules";
 import { PHASE3A_BATCH1_RULES } from "./atomic/batch1-rules";
 import { PHASE3A_BATCH2_MOUNT_RULES } from "./atomic/mount-batch2-rules";
 import { PHASE3A_BATCH3_MAJOR_LINE_RULES } from "./atomic/major-line-batch3-rules";
+import { PHASE3A_BATCH4_MINOR_SIGN_REMEDY_RULES } from "./atomic/minor-sign-remedy-rules";
 import { FINGER_RULES } from "./finger-rules";
 import { HAND_SHAPE_RULES } from "./hand-shape-rules";
 import { MAJOR_LINE_RULES } from "./major-line-rules";
@@ -25,6 +26,7 @@ export const ALL_PALM_RULES: PalmRule[] = [
   ...PHASE3A_BATCH1_RULES,
   ...PHASE3A_BATCH2_MOUNT_RULES,
   ...PHASE3A_BATCH3_MAJOR_LINE_RULES,
+  ...PHASE3A_BATCH4_MINOR_SIGN_REMEDY_RULES,
 ];
 
 export const ALL_PALMISTRY_RULES = ALL_PALM_RULES;
