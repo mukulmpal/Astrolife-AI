@@ -16,6 +16,7 @@ import {
   type PalmistryReport,
 } from "@/lib/astro-engine/palmistry-engine";
 import { detectHandGeometry, applyHandGeometry } from "@/lib/palmistry/hand-geometry";
+import { PalmLoadingScreen } from "./PalmLoadingScreen";
 import { StylePicker, type ReportStyle } from "./StylePicker";
 import { DashboardReport } from "./DashboardReport";
 import { ManuscriptReport } from "./ManuscriptReport";
@@ -328,6 +329,9 @@ export function PalmistryAnalyzer() {
 
   return (
     <div className="text-white">
+      {/* ── Full-screen loading overlay (replaces blank screen during analysis) ── */}
+      <PalmLoadingScreen visible={scanning} preview={preview} />
+
       {/* Style Picker Modal */}
       <AnimatePresence>
         {showStylePicker && (
