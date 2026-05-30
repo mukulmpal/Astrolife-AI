@@ -1,4 +1,5 @@
 import { CAREER_RULES } from "./career-rules";
+import { PHASE3A_BATCH1_RULES } from "./atomic/batch1-rules";
 import { FINGER_RULES } from "./finger-rules";
 import { HAND_SHAPE_RULES } from "./hand-shape-rules";
 import { MAJOR_LINE_RULES } from "./major-line-rules";
@@ -19,6 +20,7 @@ export const ALL_PALM_RULES: PalmRule[] = [
   ...CAREER_RULES,
   ...REMEDIES_RULES,
   ...PHASE3_RULE_BANK,
+  ...PHASE3A_BATCH1_RULES,
 ];
 
 export const ALL_PALMISTRY_RULES = ALL_PALM_RULES;

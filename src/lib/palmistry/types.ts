@@ -49,9 +49,11 @@ export interface PalmFeatures {
   handSide: HandSide;
   dominantHand: DominantHand;
   palm: {
-    shape: "square" | "rectangular" | "conic" | "spatulate" | "mixed" | "unknown";
-    texture: "soft" | "supple" | "firm" | "coarse" | "unknown";
+    shape: "square" | "rectangular" | "conic" | "spatulate" | "long" | "broad" | "mixed" | "unknown";
+    texture: "soft" | "supple" | "firm" | "coarse" | "hard" | "unknown";
     lineDensity: "few" | "balanced" | "many" | "unknown";
+    color?: "pink" | "pale" | "reddish" | "yellowish" | "bluish" | "dark" | "unknown";
+    flexibility?: "stiff" | "balanced" | "flexible" | "unknown";
   };
   thumb: {
     length: "short" | "medium" | "long" | "unknown";
@@ -61,8 +63,17 @@ export interface PalmFeatures {
   };
   fingers: {
     length: "short" | "medium" | "long" | "unknown";
-    tips: "square" | "conic" | "spatulate" | "mixed" | "unknown";
-    setting: "low" | "balanced" | "uneven" | "unknown";
+    tips: "square" | "conic" | "pointed" | "spatulate" | "mixed" | "unknown";
+    setting: "low" | "balanced" | "high" | "uneven" | "unknown";
+    spacing?: "close" | "balanced" | "wide" | "unknown";
+    indexRelative?: "short" | "balanced" | "long" | "unknown";
+    ringRelative?: "short" | "balanced" | "long" | "unknown";
+    littleRelative?: "short" | "balanced" | "long" | "unknown";
+  };
+  nails?: {
+    shape: "long" | "short" | "broad" | "narrow" | "oval" | "square" | "unknown";
+    color: "pink" | "pale" | "reddish" | "bluish" | "yellowish" | "unknown";
+    texture: "smooth" | "ridged" | "brittle" | "unknown";
   };
   mounts: Record<"jupiter" | "saturn" | "sun" | "mercury" | "venus" | "moon" | "mars", { prominence: "weak" | "balanced" | "strong" | "unknown" }>;
   lines: Record<"life" | "head" | "heart" | "saturn" | "sun" | "mercury" | "travel" | "intuition", {
