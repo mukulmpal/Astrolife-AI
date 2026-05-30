@@ -39,10 +39,17 @@ function SelectField<T extends string>({ label, value, options, onChange }: { la
   );
 }
 
+function FieldConfidence({ path, confidence }: { path: string; confidence?: Record<string, number> }) {
+  const value = confidence?.[path];
+  if (typeof value !== "number") return null;
+  return <span className="text-[10px] uppercase tracking-[0.16em] text-[#e6c869]/70">AI {Math.round(value * 100)}%</span>;
+}
+
 export function PalmFeatureForm({
   handSide,
   dominantHand,
   features,
+  featureConfidence,
   onHandSide,
   onDominantHand,
   onFeatures,
@@ -50,6 +57,7 @@ export function PalmFeatureForm({
   handSide: HandSide;
   dominantHand: DominantHand;
   features: PalmAnalyzeInput["features"];
+  featureConfidence?: Record<string, number>;
   onHandSide: (value: HandSide) => void;
   onDominantHand: (value: DominantHand) => void;
   onFeatures: (value: PalmAnalyzeInput["features"]) => void;
@@ -58,16 +66,17 @@ export function PalmFeatureForm({
     <div className="grid gap-4 rounded-2xl border border-[#c8a030]/20 bg-black/30 p-4 md:grid-cols-2">
       <SelectField label="Hand side" value={handSide} options={["right", "left", "both", "unknown"]} onChange={onHandSide} />
       <SelectField label="Dominant hand" value={dominantHand} options={["right", "left", "unknown"]} onChange={onDominantHand} />
-      <SelectField label="Palm shape" value={features.palm.shape} options={["rectangular", "square", "conic", "spatulate", "mixed", "unknown"]} onChange={(shape) => onFeatures({ ...features, palm: { ...features.palm, shape } })} />
+      <div className="grid gap-1"><SelectField label="Palm shape" value={features.palm.shape} options={["rectangular", "square", "conic", "spatulate", "mixed", "unknown"]} onChange={(shape) => onFeatures({ ...features, palm: { ...features.palm, shape } })} /><FieldConfidence path="palm.shape" confidence={featureConfidence} /></div>
       <SelectField label="Line density" value={features.palm.lineDensity} options={["many", "balanced", "few", "unknown"]} onChange={(lineDensity) => onFeatures({ ...features, palm: { ...features.palm, lineDensity } })} />
-      <SelectField label="Thumb length" value={features.thumb.length} options={["long", "medium", "short", "unknown"]} onChange={(length) => onFeatures({ ...features, thumb: { ...features.thumb, length } })} />
+      <div className="grid gap-1"><SelectField label="Thumb length" value={features.thumb.length} options={["long", "medium", "short", "unknown"]} onChange={(length) => onFeatures({ ...features, thumb: { ...features.thumb, length } })} /><FieldConfidence path="thumb.length" confidence={featureConfidence} /></div>
       <SelectField label="Thumb angle" value={features.thumb.angle} options={["balanced", "wide", "closed", "unknown"]} onChange={(angle) => onFeatures({ ...features, thumb: { ...features.thumb, angle } })} />
       <SelectField label="Finger length" value={features.fingers.length} options={["long", "medium", "short", "unknown"]} onChange={(length) => onFeatures({ ...features, fingers: { ...features.fingers, length } })} />
       <SelectField label="Finger tips" value={features.fingers.tips} options={["conic", "square", "spatulate", "mixed", "unknown"]} onChange={(tips) => onFeatures({ ...features, fingers: { ...features.fingers, tips } })} />
-      <SelectField label="Jupiter mount" value={features.mounts.jupiter.prominence} options={["strong", "balanced", "weak", "unknown"]} onChange={(prominence) => onFeatures({ ...features, mounts: { ...features.mounts, jupiter: { prominence } } })} />
+      <div className="grid gap-1"><SelectField label="Jupiter mount" value={features.mounts.jupiter.prominence} options={["strong", "balanced", "weak", "unknown"]} onChange={(prominence) => onFeatures({ ...features, mounts: { ...features.mounts, jupiter: { prominence } } })} /><FieldConfidence path="mounts.jupiter.prominence" confidence={featureConfidence} /></div>
       <SelectField label="Moon mount" value={features.mounts.moon.prominence} options={["strong", "balanced", "weak", "unknown"]} onChange={(prominence) => onFeatures({ ...features, mounts: { ...features.mounts, moon: { prominence } } })} />
-      <SelectField label="Life line clarity" value={features.lines.life.clarity ?? "clear"} options={["clear", "broken", "chained"]} onChange={(clarity) => onFeatures({ ...features, lines: { ...features.lines, life: { ...features.lines.life, clarity } } })} />
-      <SelectField label="Heart line ending" value={features.lines.heart.ending ?? "jupiter"} options={["jupiter", "saturn", "between", "unknown"]} onChange={(ending) => onFeatures({ ...features, lines: { ...features.lines, heart: { ...features.lines.heart, ending } } })} />
+      <div className="grid gap-1"><SelectField label="Life line clarity" value={features.lines.life.clarity ?? "clear"} options={["clear", "broken", "chained"]} onChange={(clarity) => onFeatures({ ...features, lines: { ...features.lines, life: { ...features.lines.life, clarity } } })} /><FieldConfidence path="lines.life.visible" confidence={featureConfidence} /></div>
+      <div className="grid gap-1"><SelectField label="Head line direction" value={features.lines.head.direction ?? "unknown"} options={["straight", "moon", "jupiter", "unknown"]} onChange={(direction) => onFeatures({ ...features, lines: { ...features.lines, head: { ...features.lines.head, direction } } })} /><FieldConfidence path="lines.head.direction" confidence={featureConfidence} /></div>
+      <div className="grid gap-1"><SelectField label="Heart line ending" value={features.lines.heart.ending ?? "jupiter"} options={["jupiter", "saturn", "between", "unknown"]} onChange={(ending) => onFeatures({ ...features, lines: { ...features.lines, heart: { ...features.lines.heart, ending } } })} /><FieldConfidence path="lines.heart.ending" confidence={featureConfidence} /></div>
     </div>
   );
 }

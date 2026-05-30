@@ -107,3 +107,15 @@ export interface PalmAnalyzeInput {
   imageQuality: PalmImageQuality;
   features: Omit<PalmFeatures, "handSide" | "dominantHand">;
 }
+
+export interface PalmVisionResult {
+  imageQuality: PalmImageQuality;
+  detectedHand: {
+    handSide: HandSide;
+    orientation: "upright" | "rotated" | "unknown";
+  };
+  features: PalmAnalyzeInput["features"];
+  featureConfidence: Record<string, number>;
+  uncertainFeatures: string[];
+  warnings: string[];
+}

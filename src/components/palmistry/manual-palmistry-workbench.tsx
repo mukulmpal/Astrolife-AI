@@ -6,7 +6,7 @@ import { DEFAULT_MANUAL_FEATURES, PalmFeatureForm } from "./palm-feature-form";
 import { PalmistryReportView } from "./palmistry-report";
 import { PalmistryStyleToggle } from "./palmistry-style-toggle";
 import { PalmistryUpload } from "./palmistry-upload";
-import type { DominantHand, HandSide, PalmAnalyzeInput, PalmReportStyle, PalmRuleReport } from "@/lib/palmistry/types";
+import type { DominantHand, HandSide, PalmAnalyzeInput, PalmReportStyle, PalmRuleReport, PalmVisionResult } from "@/lib/palmistry/types";
 
 export function ManualPalmistryWorkbench() {
   const [style, setStyle] = useState<PalmReportStyle>("luxury");
@@ -14,7 +14,14 @@ export function ManualPalmistryWorkbench() {
   const [dominantHand, setDominantHand] = useState<DominantHand>("right");
   const [features, setFeatures] = useState<PalmAnalyzeInput["features"]>(DEFAULT_MANUAL_FEATURES);
   const [report, setReport] = useState<PalmRuleReport | null>(null);
+  const [vision, setVision] = useState<PalmVisionResult | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const applyVision = (result: PalmVisionResult) => {
+    setVision(result);
+    setFeatures(result.features);
+    if (result.detectedHand.handSide !== "unknown") setHandSide(result.detectedHand.handSide);
+  };
 
   const generate = async () => {
     setLoading(true);
@@ -54,8 +61,19 @@ export function ManualPalmistryWorkbench() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <PalmistryUpload onPreview={() => undefined} />
-        <PalmFeatureForm handSide={handSide} dominantHand={dominantHand} features={features} onHandSide={setHandSide} onDominantHand={setDominantHand} onFeatures={setFeatures} />
+        <div className="space-y-4">
+          <PalmistryUpload onPreview={() => undefined} onExtracted={applyVision} />
+          {vision && <VisionConfidenceCard vision={vision} />}
+        </div>
+        <PalmFeatureForm
+          handSide={handSide}
+          dominantHand={dominantHand}
+          features={features}
+          featureConfidence={vision?.featureConfidence}
+          onHandSide={setHandSide}
+          onDominantHand={setDominantHand}
+          onFeatures={setFeatures}
+        />
       </div>
 
       <button
@@ -70,5 +88,37 @@ export function ManualPalmistryWorkbench() {
 
       {report && <PalmistryReportView report={report} style={style} />}
     </section>
+  );
+}
+
+function VisionConfidenceCard({ vision }: { vision: PalmVisionResult }) {
+  return (
+    <div className="rounded-2xl border border-[#c8a030]/20 bg-black/30 p-4">
+      <div className="text-xs uppercase tracking-[0.18em] text-[#e6c869]/75">AI Vision Confidence</div>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+          <div className="text-lg font-semibold text-white">{Math.round(vision.imageQuality.score * 100)}%</div>
+          <div className="text-[10px] text-white/45">Quality</div>
+        </div>
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+          <div className="text-lg font-semibold text-white">{vision.imageQuality.canAnalyze ? "Yes" : "No"}</div>
+          <div className="text-[10px] text-white/45">Analyze</div>
+        </div>
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+          <div className="text-lg font-semibold text-white">{vision.imageQuality.canAnalyzeFingerprints ? "Yes" : "No"}</div>
+          <div className="text-[10px] text-white/45">Prints</div>
+        </div>
+      </div>
+      {[...vision.imageQuality.issues, ...vision.warnings].length > 0 && (
+        <div className="mt-3 space-y-1">
+          {[...vision.imageQuality.issues, ...vision.warnings].slice(0, 4).map((item) => (
+            <p key={item} className="rounded-lg bg-[#c8a030]/10 px-3 py-2 text-xs text-white/60">{item}</p>
+          ))}
+        </div>
+      )}
+      {vision.uncertainFeatures.length > 0 && (
+        <p className="mt-3 text-xs text-white/45">Uncertain: {vision.uncertainFeatures.slice(0, 6).join(", ")}</p>
+      )}
+    </div>
   );
 }
