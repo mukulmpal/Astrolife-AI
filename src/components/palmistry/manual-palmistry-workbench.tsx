@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { BookOpen, Loader2, Sparkles } from "lucide-react";
 import { DEFAULT_MANUAL_FEATURES, PalmFeatureForm } from "./palm-feature-form";
+import { PalmistryFeedback } from "./palmistry-feedback";
 import { PalmistryReportView } from "./palmistry-report";
+import { PalmistrySaveButton } from "./palmistry-save-button";
 import { PalmistryStyleToggle } from "./palmistry-style-toggle";
 import { PalmistryUpload } from "./palmistry-upload";
 import type { DominantHand, HandSide, PalmAnalyzeInput, PalmReportStyle, PalmRuleReport, PalmVisionResult } from "@/lib/palmistry/types";
@@ -14,6 +16,9 @@ export function ManualPalmistryWorkbench() {
   const [dominantHand, setDominantHand] = useState<DominantHand>("right");
   const [features, setFeatures] = useState<PalmAnalyzeInput["features"]>(DEFAULT_MANUAL_FEATURES);
   const [report, setReport] = useState<PalmRuleReport | null>(null);
+  const [reportInput, setReportInput] = useState<PalmAnalyzeInput | null>(null);
+  const [reportRevision, setReportRevision] = useState(0);
+  const [savedSessionId, setSavedSessionId] = useState<string | null>(null);
   const [vision, setVision] = useState<PalmVisionResult | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,20 +31,25 @@ export function ManualPalmistryWorkbench() {
   const generate = async () => {
     setLoading(true);
     try {
+      const input: PalmAnalyzeInput = {
+        handSide,
+        dominantHand,
+        reportStyle: style,
+        tier: "elite",
+        imageQuality: vision?.imageQuality ?? { score: 0.86, canAnalyze: true, canAnalyzeFingerprints: false, issues: [] },
+        features,
+      };
       const res = await fetch("/api/palmistry/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          handSide,
-          dominantHand,
-          reportStyle: style,
-          imageQuality: { score: 0.86, canAnalyze: true, canAnalyzeFingerprints: false, issues: [] },
-          features,
-        }),
+        body: JSON.stringify(input),
       });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || "Manual palmistry analysis failed");
+      setReportInput(input);
       setReport(json.result);
+      setReportRevision((value) => value + 1);
+      setSavedSessionId(null);
     } finally {
       setLoading(false);
     }
@@ -86,7 +96,24 @@ export function ManualPalmistryWorkbench() {
         Generate Book-backed Report
       </button>
 
-      {report && <PalmistryReportView report={report} style={style} />}
+      {report && reportInput && (
+        <div className="space-y-5">
+          <PalmistryReportView report={report} style={style} />
+          <div className="grid gap-5 lg:grid-cols-2">
+            <PalmistrySaveButton
+              key={`save-${reportRevision}`}
+              input={reportInput}
+              result={report}
+              imageUrl={null}
+              onSaved={setSavedSessionId}
+            />
+            <PalmistryFeedback
+              sessionId={savedSessionId}
+              result={report}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
