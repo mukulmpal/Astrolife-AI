@@ -1,23 +1,66 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { BookOpen, Feather, Gem, ShieldCheck, Sparkles } from "lucide-react";
 import { type PalmistryReport } from "@/lib/astro-engine/palmistry-engine";
 
-function ManuscriptCard({
-  children, className = "",
-}: { children: React.ReactNode; className?: string }) {
+function Page({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={`rounded-xl border-2 border-[#c8a030] bg-[#0f0d1a]/40 p-6 backdrop-blur-sm ${className}`}>
-      {children}
+    <div className={`relative overflow-hidden rounded-[2rem] border border-[#8b6134]/30 bg-[#d8c09d] p-6 text-[#2b2118] shadow-inner sm:p-8 ${className}`}>
+      <div className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: "linear-gradient(90deg, rgba(70,45,25,.08) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      <div className="relative">{children}</div>
     </div>
   );
 }
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+function DarkPage({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <h2 className="mb-6 border-b border-[#c8a030]/40 pb-4 text-center font-serif text-2xl font-bold text-[#e6c869]">
-      {children}
-    </h2>
+    <div className={`relative overflow-hidden rounded-[2rem] border border-[#c8a030]/25 bg-[linear-gradient(135deg,#120d08,#2c2117)] p-6 text-amber-50 shadow-[0_30px_100px_rgba(0,0,0,.45)] sm:p-8 ${className}`}>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(230,200,105,.18),transparent_42%)]" />
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
+
+function ChapterTitle({ kicker, title }: { kicker: string; title: string }) {
+  return (
+    <div className="mb-6 text-center">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.32em] opacity-55">{kicker}</div>
+      <h2 className="mt-2 font-serif text-3xl leading-tight">{title}</h2>
+      <div className="mx-auto mt-4 h-px w-32 bg-current opacity-25" />
+    </div>
+  );
+}
+
+function InkScore({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-2xl border border-[#5b3b20]/20 bg-[#efdcb9]/45 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-semibold uppercase tracking-[0.16em] opacity-60">{label}</span>
+        <b className="font-serif text-2xl">{value}</b>
+      </div>
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#5b3b20]/15">
+        <motion.div
+          className="h-full rounded-full bg-[#5b3b20]"
+          initial={{ width: 0 }}
+          whileInView={{ width: `${value}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9 }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -28,175 +71,154 @@ interface ManuscriptReportProps {
 
 export function ManuscriptReport({ report, preview }: ManuscriptReportProps) {
   return (
-    <div className="mx-auto mt-8 max-w-2xl">
-      {/* Gold border frame */}
-      <div className="rounded-2xl border-8 border-[#c8a030] bg-gradient-to-b from-black/80 via-black/60 to-black/80 p-6 shadow-[0_0_40px_rgba(200,160,48,0.3)] sm:p-8">
-        {/* Title section - "The Map of You" */}
-        <div className="mb-8 border-b-2 border-[#c8a030]/40 pb-8 text-center">
-          <div className="mb-4 font-serif text-sm uppercase tracking-[0.3em] text-[#c8a030]">A Personal Journey</div>
-          <h1 className="mb-2 font-serif text-4xl font-bold leading-tight text-[#e6c869] sm:text-5xl">
-            The Map of You
-          </h1>
-          <p className="font-serif text-lg italic text-white/50">A Classical Palmistry Reading</p>
-          <p className="mt-4 text-xs text-white/40">Analyzed by AstroLife AI</p>
-        </div>
+    <div className="mx-auto mt-8 max-w-7xl">
+      <div className="rounded-[2.5rem] border border-[#c8a030]/25 bg-[#160f0a] p-3 shadow-[0_40px_140px_rgba(0,0,0,.55)] sm:p-5">
+        <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+          <DarkPage className="min-h-[720px]">
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-[#c8a030]/40 bg-[#c8a030]/10">
+              <Sparkles className="text-[#e6c869]" size={24} />
+            </div>
+            <p className="mt-8 text-center text-[10px] uppercase tracking-[0.45em] text-[#e6c869]/70">AstroLife Manuscript</p>
+            <h1 className="mt-5 text-center font-serif text-5xl leading-none text-[#f5e7b8] sm:text-6xl">The Map of You</h1>
+            <p className="mx-auto mt-5 max-w-md text-center text-sm leading-relaxed text-amber-100/55">
+              A luxury palm intelligence manuscript translating visible hand patterns into personality, love, wealth, timing and inner-growth themes.
+            </p>
 
-        {/* Palm preview - centered and prominent */}
-        <div className="mb-8 flex justify-center">
-          <div className="h-64 w-48 overflow-hidden rounded-lg border border-[#c8a030]/50 shadow-[0_0_30px_rgba(200,160,48,0.2)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Your palm" className="h-full w-full object-cover" />
-          </div>
-        </div>
+            <div className="mx-auto mt-10 max-w-sm overflow-hidden rounded-[40%] border border-[#c8a030]/35 bg-black/30 shadow-[0_0_45px_rgba(200,160,48,.2)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={preview} alt="Your palm" className="aspect-[4/5] h-full w-full object-cover sepia-[.35] saturate-[.85]" />
+            </div>
 
-        {/* Overall impression - manuscript style */}
-        <ManuscriptCard className="mb-8 border-[#c8a030]/70 bg-[#1a1625]/50">
-          <h2 className="mb-3 font-serif text-2xl font-bold text-[#e6c869]">Your Story</h2>
-          <p className="mb-4 font-serif text-lg leading-relaxed text-white/90">{report.overallImpression.headline}</p>
-          <p className="italic leading-relaxed text-white/70">{report.overallImpression.summary}</p>
-          <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3">
-            {report.overallImpression.metrics.map((m) => (
-              <div key={m.label}>
-                <div className="flex justify-between text-xs">
-                  <span className="text-white/60">{m.label}</span>
-                  <span className="font-semibold text-[#e6c869]">{m.value}%</span>
+            <div className="mt-10 grid gap-3 sm:grid-cols-3">
+              {[
+                ["Final Score", report.finalIntelligenceScore.score],
+                ["Confidence", report.finalIntelligenceScore.confidence],
+                ["Kundli Align", report.palmKundliCorrelation.alignmentScore],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-[#c8a030]/20 bg-black/25 p-4 text-center">
+                  <div className="font-serif text-3xl text-[#e6c869]">{value}</div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-amber-100/45">{label}</div>
                 </div>
-                <div className="mt-1 h-1 overflow-hidden rounded-full bg-white/10">
-                  <motion.div className="h-full rounded-full bg-gradient-to-r from-[#c8a030] to-[#e6c869]"
-                    initial={{ width: 0 }} whileInView={{ width: `${m.value}%` }} viewport={{ once: true }} transition={{ duration: 0.9 }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </ManuscriptCard>
+              ))}
+            </div>
+          </DarkPage>
 
-        {/* Life path insights — all six lines */}
-        <div className="mb-8 space-y-6">
-          <SectionHeading>Life&apos;s Pathways</SectionHeading>
-          {report.lines.map((line) => (
-            <ManuscriptCard key={line.id} className="border-[#c8a030]/60">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="mt-2 h-3 w-3 rounded-full" style={{ background: line.color, boxShadow: `0 0 12px ${line.color}` }} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-serif text-xl font-bold text-[#e6c869]">{line.name}</h3>
-                  <p className="mb-2 text-xs text-white/50">{line.sanskrit}</p>
-                  <p className="leading-relaxed text-white/75">{line.detail || line.summary}</p>
-                  <div className="mt-3 text-xs text-white/50">Clarity: <span className="font-semibold text-[#e6c869]">{line.confidence}%</span></div>
-                </div>
-              </div>
-            </ManuscriptCard>
-          ))}
-        </div>
+          <Page className="min-h-[720px]">
+            <ChapterTitle kicker="Chapter One" title="Your Human Blueprint" />
+            <p className="mx-auto max-w-xl text-center text-base leading-8 opacity-80">{report.overallImpression.summary}</p>
 
-        {/* Planetary mounts */}
-        <div className="mb-8">
-          <SectionHeading>The Planetary Mounts</SectionHeading>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {report.mounts.map((m) => (
-              <div key={m.id} className="rounded-lg border border-[#c8a030]/40 bg-[#0f0d1a]/40 p-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-serif text-base font-bold text-white">{m.name.replace("Mount of ", "")}</h4>
-                  <span className="font-serif text-lg font-bold text-[#e6c869]">{m.score}%</span>
-                </div>
-                {m.keywords && <p className="mt-1 text-xs italic text-white/50">{m.keywords}</p>}
-                {m.summary && <p className="mt-2 text-sm leading-relaxed text-white/70">{m.summary}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {report.overallImpression.metrics.map((metric) => (
+                <InkScore key={metric.label} label={metric.label} value={metric.value} />
+              ))}
+            </div>
 
-        {/* Predictions - elegant cards */}
-        <div className="mb-8">
-          <SectionHeading>What Awaits You</SectionHeading>
-          <div className="space-y-4">
-            {report.predictions.map((p) => (
-              <ManuscriptCard key={p.id} className="border-[#c8a030]/50">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h4 className="font-serif text-lg font-bold text-white">{p.title}</h4>
-                    <p className="mt-2 text-sm leading-relaxed text-white/70">{p.summary}</p>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              {report.lines.map((line) => (
+                <div key={line.id} className="rounded-2xl border border-[#5b3b20]/20 bg-[#efddc1]/55 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-serif text-xl">{line.name}</h3>
+                      <p className="text-xs opacity-55">{line.sanskrit}</p>
+                    </div>
+                    <b className="font-serif text-xl">{line.confidence}%</b>
                   </div>
-                  <div className="flex-shrink-0 text-right">
-                    <div className="font-serif text-2xl font-bold text-[#e6c869]">{p.strength}%</div>
-                    <div className="text-xs text-white/40">Strength</div>
+                  <p className="mt-3 text-sm leading-6 opacity-75">{line.detail || line.summary}</p>
+                </div>
+              ))}
+            </div>
+          </Page>
+        </div>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+          <Page>
+            <ChapterTitle kicker="Chapter Two" title="Planetary Mounts & Life Timing" />
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {report.mounts.map((mount) => (
+                <div key={mount.id} className="rounded-2xl border border-[#5b3b20]/20 bg-[#efddc1]/55 p-4">
+                  <div className="font-serif text-lg">{mount.name.replace("Mount of ", "")}</div>
+                  <div className="mt-1 font-serif text-3xl">{mount.score}</div>
+                  <p className="mt-2 text-xs leading-5 opacity-65">{mount.keywords}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-5">
+              {report.timeline.map((phase, i) => (
+                <motion.div
+                  key={phase.range}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className="rounded-2xl border border-[#5b3b20]/20 bg-[#efddc1]/45 p-4"
+                >
+                  <div className="text-xs font-bold uppercase tracking-[0.16em] opacity-55">{phase.range}</div>
+                  <h4 className="mt-2 font-serif text-lg">{phase.title}</h4>
+                  <p className="mt-2 text-xs leading-5 opacity-70">{phase.summary}</p>
+                </motion.div>
+              ))}
+            </div>
+          </Page>
+
+          <DarkPage>
+            <ChapterTitle kicker="Chapter Three" title="Royal Guidance" />
+            <div className="space-y-4">
+              {report.predictions.map((prediction) => (
+                <div key={prediction.id} className="rounded-2xl border border-[#c8a030]/20 bg-black/25 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-serif text-xl text-[#f5e7b8]">{prediction.title}</h3>
+                    <b className="font-serif text-2xl text-[#e6c869]">{prediction.strength}</b>
                   </div>
+                  <p className="mt-2 text-sm leading-6 text-amber-100/60">{prediction.summary}</p>
                 </div>
-              </ManuscriptCard>
-            ))}
-          </div>
+              ))}
+            </div>
+          </DarkPage>
         </div>
 
-        {/* Deeper chapters — intelligence sections */}
-        <div className="mb-8">
-          <SectionHeading>Deeper Chapters</SectionHeading>
-          <div className="space-y-4">
-            {report.intelligenceSections.map((s) => (
-              <div key={s.id} className="rounded-lg border border-[#c8a030]/40 bg-[#0f0d1a]/40 p-5">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h4 className="font-serif text-lg font-bold text-[#e6c869]">{s.title}</h4>
-                  <span className="whitespace-nowrap text-xs text-white/45">{s.score} · {s.confidence}% conf</span>
+        <div className="mt-5 grid gap-5 lg:grid-cols-3">
+          <DarkPage>
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="text-emerald-300" />
+              <h3 className="font-serif text-2xl text-[#f5e7b8]">Palm + Kundli</h3>
+            </div>
+            <p className="mt-4 text-sm leading-7 text-amber-100/60">{report.palmKundliCorrelation.summary}</p>
+            <div className="mt-5 font-serif text-5xl text-[#e6c869]">{report.palmKundliCorrelation.alignmentScore}</div>
+          </DarkPage>
+
+          <Page>
+            <div className="flex items-center gap-3">
+              <Gem />
+              <h3 className="font-serif text-2xl">Fortune Notes</h3>
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-4 text-sm">
+              <div><b>Numbers</b><p>{report.luck.numbers.join(", ")}</p></div>
+              <div><b>Days</b><p>{report.luck.days.join(", ")}</p></div>
+              <div><b>Colors</b><p>{report.luck.colors.join(", ")}</p></div>
+              <div><b>Gemstones</b><p>{report.luck.gemstones.join(", ")}</p></div>
+            </div>
+          </Page>
+
+          <DarkPage>
+            <div className="flex items-center gap-3">
+              <Feather className="text-[#e6c869]" />
+              <h3 className="font-serif text-2xl text-[#f5e7b8]">Growth Plan</h3>
+            </div>
+            <div className="mt-4 space-y-3">
+              {report.growthPlan.slice(0, 4).map((item, i) => (
+                <div key={item} className="flex gap-3 text-sm leading-6 text-amber-100/65">
+                  <span className="font-serif text-[#e6c869]">{i + 1}</span>
+                  <span>{item}</span>
                 </div>
-                <p className="mt-2 leading-relaxed text-white/75">{s.interpretation}</p>
-                <p className="mt-2 text-sm italic leading-relaxed text-white/55">{s.recommendation}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </DarkPage>
         </div>
 
-        {/* Timeline - elegant vertical */}
-        <div className="mb-8">
-          <SectionHeading>Your Life Journey</SectionHeading>
-          <div className="space-y-4">
-            {report.timeline.map((t, i) => (
-              <motion.div
-                key={t.range}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex items-start gap-6"
-              >
-                <div className="whitespace-nowrap font-serif text-sm font-bold text-[#e6c869]">{t.range}</div>
-                <div className="flex-1 border-l border-[#c8a030]/40 py-2 pl-6">
-                  {t.title && <div className="mb-1 font-semibold text-white">{t.title}</div>}
-                  <p className="text-sm text-white/70">{t.summary}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Lucky elements - manuscript footer */}
-        <ManuscriptCard className="mb-8 border-[#c8a030]/60 bg-[#1a1625]/50">
-          <h2 className="mb-4 text-center font-serif text-xl font-bold text-[#e6c869]">Fortune&apos;s Blessings</h2>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="mb-2 font-semibold text-[#e6c869]">Lucky Numbers</p>
-              <p className="text-white/70">{report.luck.numbers.join(", ")}</p>
-            </div>
-            <div>
-              <p className="mb-2 font-semibold text-[#e6c869]">Lucky Days</p>
-              <p className="text-white/70">{report.luck.days.join(", ")}</p>
-            </div>
-            <div>
-              <p className="mb-2 font-semibold text-[#e6c869]">Lucky Colors</p>
-              <p className="text-white/70">{report.luck.colors.join(", ")}</p>
-            </div>
-            <div>
-              <p className="mb-2 font-semibold text-[#e6c869]">Lucky Gemstones</p>
-              <p className="text-white/70">{report.luck.gemstones.join(", ")}</p>
-            </div>
-          </div>
-        </ManuscriptCard>
-
-        {/* Closing note */}
-        <div className="border-t-2 border-[#c8a030]/40 pt-8 text-center">
-          <p className="mb-4 font-serif text-sm italic leading-relaxed text-white/60">
-            This reading represents a moment in time. Your palm, like your life, continues to evolve with your choices and growth.
-          </p>
-          <p className="font-serif text-xs tracking-[0.2em] text-[#e6c869]">ASTROLIFE AI PALM INTELLIGENCE</p>
+        <div className="mt-5 rounded-[2rem] border border-[#c8a030]/20 bg-black/25 p-5 text-center">
+          <BookOpen className="mx-auto text-[#e6c869]" size={18} />
+          <p className="mt-3 text-xs leading-relaxed text-amber-100/45">{report.meta.disclaimer}</p>
         </div>
       </div>
     </div>

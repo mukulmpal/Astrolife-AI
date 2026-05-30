@@ -1,322 +1,220 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { type PalmistryReport } from "@/lib/astro-engine/palmistry-engine";
+import React, { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Activity, Brain, CircleDollarSign, Heart, Orbit, ScanLine, Sparkles, Zap } from "lucide-react";
+import {
+  type PalmistryReport,
+  PALM_LINES,
+  FALLBACK_LINE_POINTS,
+  buildLinePath,
+  mirrorX,
+} from "@/lib/astro-engine/palmistry-engine";
 
 interface HolographicReportProps {
   report: PalmistryReport;
   preview: string;
 }
 
-export function HolographicReport({ report, preview }: HolographicReportProps) {
-  const [selectedLine, setSelectedLine] = useState<string | null>(null);
-  const [selectedPrediction, setSelectedPrediction] = useState<string | null>(null);
+function HoloCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -3 }}
+      className={`rounded-[1.5rem] border border-cyan-300/18 bg-[#020811]/70 p-5 shadow-[0_0_42px_rgba(41,230,209,.10)] backdrop-blur-xl ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
-  // Responsive radial layout: radius scales with the scanner container so the
-  // orbiting prediction nodes never overflow on small / mobile screens.
-  const scannerRef = useRef<HTMLDivElement>(null);
-  const [radius, setRadius] = useState(160);
-  useEffect(() => {
-    const el = scannerRef.current;
-    if (!el) return;
-    const update = () => {
-      const w = el.clientWidth;
-      // keep nodes (40px half-size) inside the box; scale with width, clamp.
-      setRadius(Math.max(96, Math.min(180, w * 0.36)));
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+function HoloScanner({ report, preview }: HolographicReportProps) {
+  const lineById = useMemo(
+    () => new Map<string, PalmistryReport["lines"][number]>(report.lines.map((line) => [line.id, line])),
+    [report.lines],
+  );
+  const mirror = report.meta.hand === "left";
+
+  return (
+    <div className="relative min-h-[620px] overflow-hidden rounded-[2rem] border border-cyan-300/25 bg-[#010711] p-5 shadow-[0_0_120px_rgba(41,230,209,.18)]">
+      <div className="pointer-events-none absolute inset-0 opacity-25" style={{ backgroundImage: "linear-gradient(rgba(83,231,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(83,231,255,.08) 1px, transparent 1px)", backgroundSize: "44px 44px" }} />
+      <div className="absolute left-1/2 top-5 z-20 -translate-x-1/2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
+        <ScanLine size={13} className="mr-2 inline" /> Spatial Palm Scan {report.finalIntelligenceScore.confidence}%
+      </div>
+
+      <div className="relative mx-auto mt-12 aspect-[4/5] max-h-[500px] max-w-[420px] overflow-hidden rounded-[42%]">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[88%] w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/25" />
+        <motion.div animate={{ rotate: -360 }} transition={{ duration: 38, repeat: Infinity, ease: "linear" }} className="absolute left-[13%] top-[13%] h-[74%] w-[74%] rounded-full border border-dashed border-violet-300/25" />
+        <motion.div animate={{ y: [0, 430, 0] }} transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }} className="absolute left-[20%] right-[20%] z-30 h-px bg-cyan-100 shadow-[0_0_28px_8px_rgba(83,231,255,.34)]" />
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={preview} alt="Your palm" className="absolute inset-0 h-full w-full object-cover opacity-95 mix-blend-screen" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#010711]/70 via-transparent to-[#010711]/20" />
+        <svg className="absolute inset-0 z-20 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {PALM_LINES.map((def, i) => {
+            const reading = lineById.get(def.id);
+            const raw = reading?.points ?? FALLBACK_LINE_POINTS[def.id];
+            const pts = reading?.points ? raw : raw.map((p) => mirrorX(p, mirror));
+            return (
+              <motion.path
+                key={def.id}
+                d={buildLinePath(pts)}
+                fill="none"
+                stroke={def.color}
+                strokeWidth={1}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                style={{ filter: `drop-shadow(0 0 6px ${def.color})` }}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 0.96 }}
+                transition={{ duration: 1.2, delay: 0.15 + i * 0.18 }}
+              />
+            );
+          })}
+        </svg>
+      </div>
+
+      {report.predictions.slice(0, 5).map((prediction, i) => {
+        const slots = [
+          "left-5 top-24",
+          "right-5 top-24",
+          "left-5 bottom-28",
+          "right-5 bottom-28",
+          "left-1/2 bottom-8 -translate-x-1/2",
+        ];
+        return (
+          <motion.button
+            key={prediction.id}
+            type="button"
+            className={`absolute z-30 hidden w-44 rounded-2xl border border-cyan-300/20 bg-black/45 p-3 text-left backdrop-blur-xl lg:block ${slots[i]}`}
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7 + i * 0.08 }}
+          >
+            <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-200/55">{prediction.title}</div>
+            <div className="mt-1 text-3xl font-light text-cyan-100">{prediction.strength}%</div>
+            <p className="mt-1 text-xs leading-relaxed text-white/50">{prediction.summary}</p>
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function HolographicReport({ report, preview }: HolographicReportProps) {
+  const [selectedLine, setSelectedLine] = useState<string | null>(report.lines[0]?.id ?? null);
+  const selected = report.lines.find((line) => line.id === selectedLine);
+  const icons = [Brain, Heart, Activity, CircleDollarSign, Orbit, Zap];
 
   return (
     <div className="mt-8 space-y-8">
-      {/* Hero section with neon glow */}
-      <div className="relative overflow-hidden rounded-3xl border border-cyan-500/50 bg-black p-8 text-center shadow-[0_0_60px_rgba(0,245,255,0.3)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(0,245,255,0.15),transparent_50%)]" />
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative"
-        >
-          <div className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-cyan-400">━━ NEURAL SCAN INITIATED ━━</div>
-          <h1 className="mb-2 bg-gradient-to-r from-cyan-400 via-pink-400 to-purple-400 bg-clip-text text-4xl font-black text-transparent sm:text-5xl">
-            HOLOGRAPHIC PALM ANALYSIS
-          </h1>
-          <p className="text-sm text-white/60">AI.CONSCIOUSNESS.PATTERN.RECOGNITION</p>
-          <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-cyan-400/40 bg-black/60 px-5 py-2">
-            <span className="text-[11px] uppercase tracking-widest text-white/50">Intelligence Index</span>
-            <span className="text-xl font-black text-cyan-400">{report.finalIntelligenceScore.score}</span>
-            <span className="text-[11px] text-white/40">{report.finalIntelligenceScore.confidence}% conf</span>
+      <div className="relative overflow-hidden rounded-[2rem] border border-cyan-300/25 bg-[#020811] p-6 shadow-[0_0_120px_rgba(41,230,209,.16)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(41,230,209,.18),transparent_42%),radial-gradient(circle_at_80%_70%,rgba(196,92,255,.14),transparent_34%)]" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-[10px] uppercase tracking-[0.28em] text-cyan-100">
+              <Sparkles size={13} /> AstroLife Holographic AI
+            </div>
+            <h1 className="mt-5 bg-gradient-to-r from-cyan-200 via-white to-violet-200 bg-clip-text font-serif text-5xl font-light tracking-[0.06em] text-transparent sm:text-6xl">
+              Spatial Palm Intelligence
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">{report.finalIntelligenceScore.summary}</p>
           </div>
-        </motion.div>
+          <div className="grid grid-cols-3 gap-3 lg:w-[420px]">
+            {[
+              ["Index", report.finalIntelligenceScore.score],
+              ["Confidence", report.finalIntelligenceScore.confidence],
+              ["Alignment", report.palmKundliCorrelation.alignmentScore],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-2xl border border-cyan-300/18 bg-black/35 p-4 text-center">
+                <div className="text-3xl font-light text-cyan-100">{value}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-white/35">{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Central palm scanner with radial data points */}
-      <div className="relative mx-auto w-full max-w-3xl">
-        <div ref={scannerRef} className="relative aspect-square rounded-2xl border border-purple-500/40 bg-black/80 p-4 shadow-[0_0_40px_rgba(168,85,247,0.2)] sm:p-8">
-          {/* Grid background */}
-          <svg className="absolute inset-0 h-full w-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-            {Array.from({ length: 11 }).map((_, i) => (
-              <line key={`v${i}`} x1={i * 10} y1="0" x2={i * 10} y2="100" stroke="#00f5ff" strokeWidth="0.2" />
-            ))}
-            {Array.from({ length: 11 }).map((_, i) => (
-              <line key={`h${i}`} x1="0" y1={i * 10} x2="100" y2={i * 10} stroke="#00f5ff" strokeWidth="0.2" />
-            ))}
-          </svg>
-
-          {/* Central palm image */}
-          <div className="relative mx-auto h-48 w-36 overflow-hidden rounded-xl border border-cyan-400/50 shadow-[0_0_30px_rgba(0,245,255,0.4)] sm:h-64 sm:w-48">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Your palm" className="h-full w-full object-cover" />
-            {/* Scanning overlay */}
-            <motion.div
-              className="absolute inset-0 border-2 border-cyan-400"
-              animate={{ boxShadow: ["inset 0 0 20px rgba(0,245,255,0.4)", "inset 0 0 5px rgba(0,245,255,0.2)"] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
-
-          {/* Radial data points around palm */}
-          {report.predictions.slice(0, 4).map((pred, i) => {
-            const angle = (i / 4) * Math.PI * 2 - Math.PI / 2;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <HoloScanner report={report} preview={preview} />
+        <div className="space-y-4">
+          {report.intelligenceSections.slice(0, 6).map((section, i) => {
+            const Icon = icons[i] ?? Brain;
             return (
-              <motion.div
-                key={pred.id}
-                className="absolute flex h-16 w-16 items-center justify-center rounded-full border border-cyan-400/60 bg-black/60 cursor-pointer sm:h-20 sm:w-20"
-                style={{ left: "50%", top: "50%", marginLeft: -32, marginTop: -32 }}
-                animate={{
-                  x, y,
-                  boxShadow: selectedPrediction === pred.id
-                    ? "0 0 30px rgba(0,245,255,0.6)"
-                    : "0 0 10px rgba(0,245,255,0.2)",
-                }}
-                onClick={() => setSelectedPrediction(selectedPrediction === pred.id ? null : pred.id)}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="text-center">
-                  <div className="text-xs font-bold text-cyan-400">{pred.strength}%</div>
-                  <div className="mt-0.5 text-[9px] text-white/60">{pred.title.split(" ")[0]}</div>
+              <HoloCard key={section.id}>
+                <div className="flex items-center justify-between gap-3">
+                  <Icon className="text-cyan-200" size={18} />
+                  <span className="text-2xl font-light text-cyan-100">{section.score}</span>
                 </div>
-              </motion.div>
+                <h3 className="mt-3 font-serif text-xl text-white">{section.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/52">{section.interpretation}</p>
+              </HoloCard>
             );
           })}
         </div>
-
-        {/* Selected prediction details */}
-        <AnimatePresence>
-          {selectedPrediction && report.predictions.find((p) => p.id === selectedPrediction) && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="mt-6 rounded-xl border border-cyan-400/50 bg-black/80 p-6 shadow-[0_0_30px_rgba(0,245,255,0.2)]"
-            >
-              <h3 className="text-lg font-bold text-cyan-400">
-                {report.predictions.find((p) => p.id === selectedPrediction)?.title}
-              </h3>
-              <p className="mt-2 text-sm text-white/70">
-                {report.predictions.find((p) => p.id === selectedPrediction)?.summary}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
-      {/* Overall impression - neon card */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        className="rounded-2xl border border-pink-500/50 bg-black/60 p-8 shadow-[0_0_40px_rgba(255,0,110,0.2)]"
-      >
-        <h2 className="mb-4 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-2xl font-black text-transparent">
-          CONSCIOUSNESS SIGNATURE
-        </h2>
-        <p className="mb-2 leading-relaxed text-white/80">{report.overallImpression.headline}</p>
-        <p className="text-sm italic leading-relaxed text-white/60">{report.overallImpression.summary}</p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {report.overallImpression.metrics.map((m) => (
-            <div key={m.label} className="rounded-xl border border-pink-400/25 bg-black/50 p-3">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-white/50">{m.label}</span>
-                <span className="font-bold text-pink-300">{m.value}%</span>
+      <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+        <HoloCard>
+          <div className="mb-4 text-[10px] uppercase tracking-[0.28em] text-cyan-200/60">Neural Pathway Selector</div>
+          <div className="flex flex-wrap gap-2">
+            {report.lines.map((line) => (
+              <button
+                key={line.id}
+                type="button"
+                onClick={() => setSelectedLine(line.id)}
+                className={`rounded-full border px-3 py-2 text-xs transition ${selectedLine === line.id ? "border-cyan-300/60 bg-cyan-300/15" : "border-white/10 bg-white/[0.03]"}`}
+                style={{ color: line.color }}
+              >
+                {line.name} · {line.confidence}%
+              </button>
+            ))}
+          </div>
+          <AnimatePresence mode="wait">
+            {selected && (
+              <motion.div key={selected.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                <h3 className="font-serif text-2xl" style={{ color: selected.color }}>{selected.name}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/58">{selected.detail || selected.summary}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </HoloCard>
+
+        <HoloCard>
+          <div className="mb-4 text-[10px] uppercase tracking-[0.28em] text-violet-200/60">Advanced Intelligence Layer</div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {report.advancedInsights.slice(0, 8).map((insight) => (
+              <div key={insight.title} className="rounded-2xl border border-violet-300/15 bg-violet-300/[0.06] p-3">
+                <h4 className="text-sm font-semibold text-violet-100">{insight.title}</h4>
+                <p className="mt-1 text-xs leading-relaxed text-white/45">{insight.body}</p>
               </div>
-              <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
-                <motion.div className="h-full rounded-full bg-gradient-to-r from-pink-400 to-purple-400"
-                  initial={{ width: 0 }} whileInView={{ width: `${m.value}%` }} viewport={{ once: true }} transition={{ duration: 0.8 }} />
-              </div>
+            ))}
+          </div>
+        </HoloCard>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {report.mounts.map((mount) => (
+          <HoloCard key={mount.id}>
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-sm font-semibold text-cyan-100">{mount.name.replace("Mount of ", "")}</h3>
+              <b className="text-2xl font-light text-cyan-200">{mount.score}</b>
             </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Major lines - interactive grid */}
-      <div>
-        <h2 className="mb-6 text-center text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-          NEURAL PATHWAYS DECODED
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {report.lines.map((line, i) => (
-            <motion.button
-              key={line.id}
-              onClick={() => setSelectedLine(selectedLine === line.id ? null : line.id)}
-              className="relative overflow-hidden rounded-xl border border-cyan-400/30 bg-black/80 p-4 text-left transition-all hover:border-cyan-400/60 hover:shadow-[0_0_20px_rgba(0,245,255,0.3)]"
-              whileHover={{ y: -2 }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <h3 className="font-bold text-cyan-400">{line.name}</h3>
-                <span className="text-xs text-white/40">{line.confidence}%</span>
-              </div>
-              <p className="mb-2 text-[11px] text-white/50">{line.sanskrit}</p>
-              <AnimatePresence>
-                {selectedLine === line.id && (
-                  <motion.p
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="mt-2 overflow-hidden text-xs leading-relaxed text-white/60"
-                  >
-                    {line.detail || line.summary}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      {/* Planetary mounts - neon energy grid */}
-      <div>
-        <h2 className="mb-6 text-center text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-          PLANETARY ENERGY MOUNTS
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {report.mounts.map((m, i) => (
-            <motion.div
-              key={m.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="rounded-xl border border-purple-400/30 bg-black/80 p-4 shadow-[0_0_18px_rgba(168,85,247,0.12)]"
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-purple-300">{m.name.replace("Mount of ", "")}</h3>
-                <span className="text-xs font-bold text-cyan-400">{m.score}%</span>
-              </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                <motion.div className="h-full rounded-full bg-gradient-to-r from-purple-400 to-cyan-400"
-                  initial={{ width: 0 }} whileInView={{ width: `${m.score}%` }} viewport={{ once: true }} transition={{ duration: 0.8 }} />
-              </div>
-              {m.keywords && <p className="mt-2 text-[10px] uppercase tracking-wide text-white/40">{m.keywords}</p>}
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Intelligence modules - data matrix */}
-      <div>
-        <h2 className="mb-6 text-center text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-400">
-          INTELLIGENCE MATRIX
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {report.intelligenceSections.map((s, i) => (
-            <motion.div
-              key={s.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.03 }}
-              className="rounded-xl border border-cyan-400/25 bg-black/80 p-4 shadow-[0_0_16px_rgba(0,245,255,0.08)]"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-bold text-cyan-300">{s.title}</h3>
-                <div className="text-right">
-                  <div className="text-lg font-black leading-none text-cyan-400">{s.score}</div>
-                  <div className="text-[9px] text-white/40">{s.confidence}% conf</div>
-                </div>
-              </div>
-              <p className="mt-2 text-xs leading-relaxed text-white/55">{s.interpretation}</p>
-              <p className="mt-2 rounded-lg border border-pink-400/15 bg-pink-400/[0.06] px-2.5 py-1.5 text-[11px] leading-relaxed text-pink-100/75">{s.recommendation}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Life timeline - neon vertical */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="rounded-2xl border border-purple-500/40 bg-black/60 p-8 shadow-[0_0_40px_rgba(168,85,247,0.15)]"
-      >
-        <h2 className="mb-6 text-center text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-          TEMPORAL PATHWAYS
-        </h2>
-        <div className="space-y-4 border-l-2 border-purple-500/40 pl-6">
-          {report.timeline.map((t, i) => (
-            <motion.div
-              key={t.range}
-              initial={{ opacity: 0, x: -12 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="relative"
-            >
-              <span className="absolute -left-[13px] top-2 h-2 w-2 rounded-full border border-purple-400 bg-black shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
-              <div className="text-sm font-bold text-purple-400">{t.range}</div>
-              {t.title && <div className="text-sm font-semibold text-white/85">{t.title}</div>}
-              <p className="mt-1 text-xs leading-relaxed text-white/55">{t.summary}</p>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Lucky elements - holographic grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          { label: "Lucky Numbers", items: report.luck.numbers.map(String) },
-          { label: "Lucky Days", items: report.luck.days },
-          { label: "Lucky Colors", items: report.luck.colors },
-          { label: "Lucky Gemstones", items: report.luck.gemstones },
-          { label: "Lucky Directions", items: report.luck.directions },
-          { label: "Lucky Career Fields", items: report.luck.careerFields },
-        ].map((group, i) => (
-          <motion.div
-            key={group.label}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-cyan-400/30 bg-black/80 p-4 shadow-[0_0_20px_rgba(0,245,255,0.1)]"
-          >
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-cyan-400">{group.label}</h3>
-            <div className="flex flex-wrap gap-2">
-              {group.items.map((item) => (
-                <span key={item} className="rounded-full border border-cyan-400/40 bg-cyan-400/5 px-3 py-1 text-[11px] text-cyan-300">
-                  {item}
-                </span>
-              ))}
-            </div>
-          </motion.div>
+            <p className="mt-2 text-xs leading-relaxed text-white/48">{mount.summary || mount.keywords}</p>
+          </HoloCard>
         ))}
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-white/10 pt-8 text-center">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Neural Analysis Complete</p>
+      <div className="rounded-[2rem] border border-white/10 bg-white/[0.02] p-5 text-center">
+        <p className="text-xs leading-relaxed text-white/38">{report.meta.disclaimer}</p>
       </div>
     </div>
   );
