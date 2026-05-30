@@ -65,7 +65,17 @@ export function calculateThemeConfidence(params: {
     astro_only: -0.04,
   };
 
-  return clampFusionConfidence(avgStrength + sourceDiversity + supportBoost + agreementBoost[params.agreement] - challengePenalty);
+  const confidence = clampFusionConfidence(avgStrength + sourceDiversity + supportBoost + agreementBoost[params.agreement] - challengePenalty);
+  const agreementCap: Record<FusionAgreement, number> = {
+    strong_alignment: 0.98,
+    partial_alignment: 0.9,
+    mixed: 0.78,
+    contradictory: 0.62,
+    palm_only: 0.72,
+    astro_only: 0.78,
+  };
+
+  return Math.min(confidence, agreementCap[params.agreement]);
 }
 
 export function sortFusionInsights(insights: FusionInsight[]) {

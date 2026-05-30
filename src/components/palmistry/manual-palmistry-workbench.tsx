@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BookOpen, Loader2, Sparkles } from "lucide-react";
 import { DEFAULT_MANUAL_FEATURES, PalmFeatureForm } from "./palm-feature-form";
 import { PalmistryFeedback } from "./palmistry-feedback";
+import { PalmistryFusionButton } from "./palmistry-fusion-button";
 import { PalmistryReportView } from "./palmistry-report";
 import { PalmistrySaveButton } from "./palmistry-save-button";
 import { PalmistryStyleToggle } from "./palmistry-style-toggle";
@@ -99,6 +100,11 @@ export function ManualPalmistryWorkbench() {
       {report && reportInput && (
         <div className="space-y-5">
           <PalmistryReportView report={report} style={style} />
+          <PalmistryFusionButton
+            palmResult={report}
+            reportStyle={style}
+            userTier="elite"
+          />
           <div className="grid gap-5 lg:grid-cols-2">
             <PalmistrySaveButton
               key={`save-${reportRevision}`}
