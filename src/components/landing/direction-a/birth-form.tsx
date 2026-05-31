@@ -40,8 +40,8 @@ export function BirthDetailsForm() {
         from: 'homepage',
       });
 
-      // Redirect to signup with pre-filled birth data
-      router.push(`/auth/signup?${params.toString()}`);
+      // Redirect to dashboard to generate kundli immediately (no signup required)
+      router.push(`/dashboard?${params.toString()}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
       setLoading(false);
