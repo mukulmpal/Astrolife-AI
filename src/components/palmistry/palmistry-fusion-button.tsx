@@ -18,11 +18,17 @@ export function PalmistryFusionButton({
   palmResult,
   reportStyle,
   userTier = "elite",
+  astroContext,
+  raw,
+  birthData,
   rawAstroContext,
 }: {
   palmResult: PalmRuleReport;
   reportStyle: PalmReportStyle;
   userTier?: PalmRuleTier;
+  astroContext?: AstroLifeFusionContext;
+  raw?: unknown;
+  birthData?: unknown;
   rawAstroContext?: unknown;
 }) {
   const [loading, setLoading] = useState(false);
@@ -38,7 +44,7 @@ export function PalmistryFusionButton({
       const contextResponse = await fetch("/api/palmistry/build-fusion-context", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ raw: rawAstroContext ?? {} }),
+        body: JSON.stringify({ raw: rawAstroContext ?? raw ?? { birthData } }),
       });
       const contextJson = await contextResponse.json();
       if (!contextResponse.ok || !contextJson.ok) {
@@ -50,7 +56,9 @@ export function PalmistryFusionButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           palmResult,
-          astroContext: contextJson.context as AstroLifeFusionContext,
+          astroContext: astroContext ?? contextJson.context as AstroLifeFusionContext,
+          raw: rawAstroContext ?? raw,
+          birthData,
           reportStyle,
           userTier,
         }),

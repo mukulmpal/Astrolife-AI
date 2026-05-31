@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAstroPalmFusion } from "@/lib/palmistry/fusion/astro-palm-fusion";
+import { normalizeAstroLifeFusionContext } from "@/lib/palmistry/fusion/fusion-context-normalizer";
 import { buildPremiumPalmReport } from "@/lib/palmistry/report/premium-report-builder";
 import type { AstroLifeFusionContext } from "@/lib/palmistry/fusion/fusion-types";
 import type {
@@ -11,6 +12,8 @@ import type {
 type PremiumReportRequest = {
   palmResult: PalmRuleReport;
   astroContext?: AstroLifeFusionContext;
+  raw?: unknown;
+  birthData?: unknown;
   reportStyle?: PalmReportStyle;
   userTier?: PalmRuleTier;
 };
@@ -27,10 +30,13 @@ export async function POST(req: Request) {
     }
 
     const userTier = body.userTier ?? "premium";
+    const astroContext = body.astroContext ?? normalizeAstroLifeFusionContext(body.raw ?? {
+      birthData: body.birthData,
+    });
 
     const fusion = createAstroPalmFusion({
       palmResult: body.palmResult,
-      astroContext: body.astroContext,
+      astroContext,
       userTier,
     });
 
@@ -40,7 +46,7 @@ export async function POST(req: Request) {
       style: body.reportStyle ?? "luxury",
     });
 
-    return NextResponse.json({ ok: true, fusion, report });
+    return NextResponse.json({ ok: true, astroContext, fusion, report });
   } catch (error) {
     console.error("Palmistry premium report failed:", error);
 

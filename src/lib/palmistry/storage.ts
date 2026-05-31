@@ -144,3 +144,55 @@ export async function getPalmistrySession(params: {
 
   return data;
 }
+
+function createShareToken() {
+  return crypto.randomUUID().replace(/-/g, "");
+}
+
+export async function enablePalmistryShare(params: {
+  sessionId: string;
+  userId?: string | null;
+}) {
+  const supabase = getSupabaseAdmin();
+  const shareToken = createShareToken();
+
+  let query = supabase
+    .from("palmistry_sessions")
+    .update({
+      share_token: shareToken,
+      is_share_enabled: true,
+      shared_at: new Date().toISOString(),
+    })
+    .eq("id", params.sessionId);
+
+  if (params.userId) {
+    query = query.eq("user_id", params.userId);
+  }
+
+  const { data, error } = await query
+    .select("id,share_token,is_share_enabled,shared_at")
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to enable palmistry share: ${error.message}`);
+  }
+
+  return data;
+}
+
+export async function getPalmistrySessionByShareToken(shareToken: string) {
+  const supabase = getSupabaseAdmin();
+
+  const { data, error } = await supabase
+    .from("palmistry_sessions")
+    .select("*")
+    .eq("share_token", shareToken)
+    .eq("is_share_enabled", true)
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to get shared palmistry session: ${error.message}`);
+  }
+
+  return data;
+}
