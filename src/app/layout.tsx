@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { HtmlPreferencesSync } from "@/components/global-preferences-toggle";
 import { Analytics } from "@/components/analytics";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,6 +59,19 @@ const preferencesScript = `
     document.documentElement.lang = safeLanguage === "hindi" ? "hi" : "en";
     document.body.dataset.themeMode = safeTheme;
     document.body.dataset.landingTheme = safeLandingTheme;
+
+    // ── Vedic day-based palette ──────────────────────────────
+    // Each weekday maps to its ruling graha's palette.
+    // User can pin a preference via localStorage("astroTheme");
+    // otherwise the day rotates automatically.
+    const PALETTES = ["saffron","ivory","maroon","forest","midnight","ivory","twilight"];
+    const VALID = new Set(PALETTES);
+    const pinned = localStorage.getItem("astroTheme");
+    const palette = (pinned && VALID.has(pinned)) ? pinned : PALETTES[new Date().getDay()];
+    // Remove any previous theme class and apply the new one
+    document.body.classList.forEach(c => { if (c.startsWith("theme-")) document.body.classList.remove(c); });
+    document.body.classList.add("theme-" + palette);
+    document.documentElement.dataset.palette = palette;
   } catch {}
 })();
 `;
@@ -71,9 +85,11 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className={`${inter.variable} ${cormorant.variable} min-h-full flex flex-col`} suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: preferencesScript }} />
-        {children}
-        <Analytics />
-        <HtmlPreferencesSync />
+        <ThemeProvider>
+          {children}
+          <Analytics />
+          <HtmlPreferencesSync />
+        </ThemeProvider>
       </body>
     </html>
   );

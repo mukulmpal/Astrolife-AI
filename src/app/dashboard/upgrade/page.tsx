@@ -31,7 +31,7 @@ const PLANS = [
     color: "#c8a030",
     features: [
       "Unlimited AI Chat — All 10 Agents",
-      "All 15+ Astrology Engines",
+      "All 25+ Astrology Engines",
       "Full Dasha + KP + Lal Kitab + Nadi",
       "Astro Sound Engine",
       "Transit Alerts (Email + Push)",

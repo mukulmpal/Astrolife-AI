@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { calculatePrashna, type PrashnaResult, type PrashnaTopic } from "@/lib/astro-engine/prashna";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 

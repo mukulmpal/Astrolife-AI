@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateSpecialLagnas, type SpecialLagnaItem } from "@/lib/astro-engine/special-lagnas";

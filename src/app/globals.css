@@ -1,8 +1,223 @@
 @import "tailwindcss";
 
+/* ============================================================
+   AstroLife · Unified Design Token System
+   From design handoff — single source of truth.
+   Each day auto-applies its Vedic graha palette:
+     Sun=saffron  Mon=ivory  Tue=maroon  Wed=forest
+     Thu=midnight  Fri=ivory  Sat=twilight
+   Swap by setting <body class="theme-*"> on the server/client.
+   ============================================================ */
+
+/* ── Midnight (default · Thursday · Jupiter) ─────────────── */
+:root,
+body.theme-midnight {
+  --al-bg:          #0A0E1F;
+  --al-bg-2:        #0E1428;
+  --al-surface:     #11162E;
+  --al-surface-2:   #161D38;
+  --al-line:        rgba(201,169,97,0.18);
+  --al-line-strong: rgba(201,169,97,0.35);
+  --al-gold:        #C9A961;
+  --al-gold-bright: #D9BE7B;
+  --al-gold-dim:    #8C7440;
+  --al-saffron:     #E8923C;
+  --al-violet:      #8B7BC4;
+  --al-crimson:     #C9555F;
+  --al-jade:        #6FB58A;
+  --al-ivory:       #F4EFE6;
+  --al-ivory-dim:   #C8C1B0;
+  --al-ivory-mute:  #8A8474;
+  --al-cream:       #F2ECDF;
+  --al-cream-dark:  #1A1F3A;
+  --al-text:        var(--al-ivory);
+  --al-text-dim:    var(--al-ivory-dim);
+  --al-text-mute:   var(--al-ivory-mute);
+  --al-primary:     var(--al-gold);
+  --al-primary-strong: var(--al-gold-bright);
+  --al-primary-on:  var(--al-bg);
+  --al-success:     var(--al-jade);
+  --al-warning:     var(--al-saffron);
+  --al-danger:      var(--al-crimson);
+  /* graha of the day metadata */
+  --al-day-graha:   "Jupiter";
+  --al-day-glyph:   "♃";
+}
+
+/* ── Saffron (Sunday · Surya · Sun) ──────────────────────── */
+body.theme-saffron {
+  --al-bg:#1A0F0A; --al-bg-2:#221308; --al-surface:#2A180C; --al-surface-2:#321D10;
+  --al-line:rgba(232,146,60,0.22); --al-line-strong:rgba(232,146,60,0.42);
+  --al-gold:#E8923C; --al-gold-bright:#F4A85A; --al-gold-dim:#94591F;
+  --al-saffron:#F4A85A; --al-violet:#C99F6B;
+  --al-ivory:#FAEFE0; --al-ivory-dim:#D9C5A8; --al-ivory-mute:#9B8366;
+  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
+  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
+  --al-day-graha: "Sun"; --al-day-glyph: "☉";
+}
+
+/* ── Ivory (Monday · Chandra · Moon + Friday · Shukra · Venus) */
+body.theme-ivory {
+  --al-bg:#F2ECDF; --al-bg-2:#EAE3D2; --al-surface:#ECE5D3; --al-surface-2:#E3DAC4;
+  --al-line:rgba(26,31,58,0.14); --al-line-strong:rgba(26,31,58,0.30);
+  --al-gold:#8C7440; --al-gold-bright:#A38851; --al-gold-dim:#7A6536;
+  --al-saffron:#E8923C; --al-violet:#6B5B8C; --al-crimson:#C9555F; --al-jade:#4A8A62;
+  --al-ivory:#1A1F3A; --al-ivory-dim:rgba(26,31,58,0.78); --al-ivory-mute:rgba(26,31,58,0.55);
+  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
+  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:#FAEFE0;
+  --al-day-graha: "Moon / Venus"; --al-day-glyph: "☽";
+}
+
+/* ── Maroon (Tuesday · Mangal · Mars) ────────────────────── */
+body.theme-maroon {
+  --al-bg:#1A080C; --al-bg-2:#220B10; --al-surface:#2A0F15; --al-surface-2:#34141C;
+  --al-line:rgba(212,166,86,0.18); --al-line-strong:rgba(212,166,86,0.36);
+  --al-gold:#D4A656; --al-gold-bright:#EAC275; --al-gold-dim:#8E6F39;
+  --al-saffron:#E8923C; --al-violet:#B07B8C;
+  --al-ivory:#F4ECD8; --al-ivory-dim:#CFC3A6; --al-ivory-mute:#8A7E66;
+  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
+  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
+  --al-day-graha: "Mars"; --al-day-glyph: "♂";
+}
+
+/* ── Forest (Wednesday · Budha · Mercury) ────────────────── */
+body.theme-forest {
+  --al-bg:#0A1812; --al-bg-2:#0F2118; --al-surface:#122A1F; --al-surface-2:#163424;
+  --al-line:rgba(201,169,97,0.16); --al-line-strong:rgba(201,169,97,0.32);
+  --al-gold:#C9A961; --al-gold-bright:#E3C97A; --al-gold-dim:#8C7440;
+  --al-saffron:#E8C46A; --al-violet:#6FB58A;
+  --al-ivory:#F0EBDE; --al-ivory-dim:#BFB89F; --al-ivory-mute:#7C7765;
+  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
+  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
+  --al-day-graha: "Mercury"; --al-day-glyph: "☿";
+}
+
+/* ── Twilight (Saturday · Shani · Saturn) ────────────────── */
+body.theme-twilight {
+  --al-bg:#0A081C; --al-bg-2:#100D26; --al-surface:#171234; --al-surface-2:#1F1947;
+  --al-line:rgba(183,148,244,0.16); --al-line-strong:rgba(183,148,244,0.34);
+  --al-gold:#E8A24E; --al-gold-bright:#F6C572; --al-gold-dim:#A0712E;
+  --al-saffron:#E8A24E; --al-violet:#B794F4; --al-crimson:#F092D0;
+  --al-ivory:#F4EFE6; --al-ivory-dim:#D2CBE0; --al-ivory-mute:#8E87A6;
+  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
+  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
+  --al-day-graha: "Saturn"; --al-day-glyph: "♄";
+}
+
+/* ── Shared typography & spacing tokens (palette-independent) */
+:root {
+  --al-font-display: var(--font-cormorant, 'Cormorant Garamond', Georgia, serif);
+  --al-font-body:    var(--font-inter, 'Inter', system-ui, sans-serif);
+  --al-font-mono:    'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  --al-font-deva:    'Noto Serif Devanagari', serif;
+  --al-display-xl:   72px;
+  --al-display-l:    54px;
+  --al-display-m:    38px;
+  --al-display-s:    26px;
+  --al-text-xs:      11px;
+  --al-text-sm:      13px;
+  --al-text-md:      15px;
+  --al-text-lg:      17px;
+  --al-eyebrow-tracking: 0.28em;
+  --al-kicker-tracking:  0.22em;
+  --al-lh-display:   1.05;
+  --al-lh-body:      1.65;
+  --al-lh-tight:     1.2;
+  --al-space-1:4px; --al-space-2:8px; --al-space-3:12px; --al-space-4:16px;
+  --al-space-5:24px; --al-space-6:32px; --al-space-7:48px; --al-space-8:64px;
+  --al-radius-sm:2px; --al-radius-md:6px; --al-radius-lg:10px;
+  --al-radius-xl:14px; --al-radius-pill:99px;
+  --al-shadow-sm:  0 4px 12px -2px rgba(0,0,0,0.3);
+  --al-shadow-md:  0 14px 30px -10px rgba(0,0,0,0.45);
+  --al-shadow-lg:  0 30px 60px -16px rgba(0,0,0,0.55);
+  --al-shadow-gold:0 14px 32px -8px rgba(201,169,97,0.35);
+  --al-ease:       cubic-bezier(0.7, 0.1, 0.3, 1);
+  --al-dur-fast:   180ms; --al-dur-base:260ms; --al-dur-slow:480ms;
+  --al-max-content:1140px;
+}
+
+/* ── Bridge: existing app vars → al tokens ───────────────── */
+/* These keep every existing component working while tying them
+   to the unified palette. No component needs to be changed. */
+:root,
+body.theme-midnight, body.theme-saffron, body.theme-ivory,
+body.theme-maroon, body.theme-forest, body.theme-twilight {
+  /* Core surfaces */
+  --background:         var(--al-bg);
+  --foreground:         var(--al-text);
+  --app-bg:             var(--al-bg);
+  --app-fg:             var(--al-text);
+  --app-card:           var(--al-surface);
+  --app-card-alt:       var(--al-surface-2);
+  --app-border:         var(--al-line);
+  --app-border-strong:  var(--al-line-strong);
+  --app-gold:           var(--al-gold);
+  --app-gold-strong:    var(--al-gold-bright);
+  --app-soft:           var(--al-ivory-dim);
+  --app-muted:          var(--al-ivory-mute);
+  --app-muted-deep:     var(--al-surface-2);
+  /* Landing surface bridge */
+  --landing-bg:         var(--al-bg);
+  --landing-bg-soft:    var(--al-bg-2);
+  --landing-fg:         var(--al-text);
+  --landing-soft:       var(--al-text-dim);
+  --landing-muted:      var(--al-text-mute);
+  --landing-card:       color-mix(in srgb, var(--al-surface) 72%, transparent);
+  --landing-card-strong:color-mix(in srgb, var(--al-surface-2) 86%, transparent);
+  --landing-border:     var(--al-line);
+  --landing-border-strong: var(--al-line-strong);
+  --landing-primary:    var(--al-gold);
+  --landing-primary-glow: var(--al-gold-bright);
+  /* Vedic North-chart vars — must stay visible on every palette.
+     Previously mapped to surface tokens, which on dark themes made the
+     diamond diagonals invisible (same colour as the chart background). */
+  --chart-bg:           var(--al-surface);
+  --chart-line:         var(--al-gold-dim);       /* outer frame: solid hairline */
+  --chart-line-soft:    var(--al-line-strong);    /* diagonals: 35% gold alpha */
+  --chart-label:        var(--al-ivory-mute);
+}
+
+/* ── Utility classes from design system ──────────────────── */
+.al-serif       { font-family: var(--al-font-display); }
+.al-mono        { font-family: var(--al-font-mono); }
+.al-eyebrow {
+  font-size: var(--al-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--al-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--al-primary);
+}
+.al-kicker {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: var(--al-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--al-text-mute);
+}
+.al-rule-gold {
+  height: 1px; border: 0;
+  background: linear-gradient(90deg, transparent, var(--al-primary), transparent);
+  opacity: 0.6;
+}
+/* Day indicator — a tiny "today's graha" badge, optional to show */
+.al-day-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--al-line-strong);
+  border-radius: var(--al-radius-pill);
+  color: var(--al-primary);
+  background: color-mix(in srgb, var(--al-gold) 10%, transparent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ── Original vars (kept for backward-compat; now via bridge) */
 :root {
   --background: #060410;
-  --foreground: #f0e8d0;
   --primary: #f4a12a;
   --primary-glow: #ffd37a;
   --accent: #7c4dff;
@@ -1261,4 +1476,70 @@ html {
   .landing-footer-bottom {
     flex-direction: column;
   }
+}
+
+/* ============================================================
+   Direction A — "The Manuscript" · world-class editorial kit
+   Namespaced .dira-* so nothing leaks into other pages.
+   ============================================================ */
+@keyframes dira-spin       { to { transform: rotate(360deg); } }
+@keyframes dira-spin-rev   { to { transform: rotate(-360deg); } }
+@keyframes dira-float      { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes dira-twinkle    { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
+@keyframes dira-rise       { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes dira-draw       { from { stroke-dashoffset: var(--dira-len, 1200); } to { stroke-dashoffset: 0; } }
+@keyframes dira-pulse-glow { 0%,100% { opacity:.45; transform:scale(1);} 50% { opacity:.8; transform:scale(1.06);} }
+
+.dira-reveal      { opacity: 0; }
+.dira-reveal.in   { animation: dira-rise .9s cubic-bezier(.2,.7,.2,1) forwards; }
+.dira-reveal-1.in { animation-delay: .05s; }
+.dira-reveal-2.in { animation-delay: .14s; }
+.dira-reveal-3.in { animation-delay: .24s; }
+.dira-reveal-4.in { animation-delay: .34s; }
+.dira-reveal-5.in { animation-delay: .44s; }
+
+/* film grain overlay */
+.dira-grain::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  opacity: .05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* refined serif display sizing */
+.dira-display {
+  font-family: var(--al-font-display);
+  font-weight: 400;
+  line-height: .98;
+  letter-spacing: -0.02em;
+  font-size: clamp(2.6rem, 7vw, 6rem);
+}
+.dira-display-sm {
+  font-family: var(--al-font-display);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  font-size: clamp(1.9rem, 4vw, 3.1rem);
+}
+/* hairline-flanked label */
+.dira-rule-label {
+  display: inline-flex; align-items: center; gap: 14px;
+  font-family: var(--al-font-body); font-size: 10px; font-weight: 500;
+  letter-spacing: .34em; text-transform: uppercase; color: var(--al-gold);
+}
+.dira-rule-label::before, .dira-rule-label::after {
+  content: ""; width: 38px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--al-gold) 60%);
+}
+.dira-rule-label::after { background: linear-gradient(90deg, var(--al-gold), transparent 40%); }
+
+/* drop cap */
+.dira-dropcap::first-letter {
+  font-family: var(--al-font-display); float: left; font-size: 3.4em;
+  line-height: .76; padding: 6px 12px 0 0; color: var(--al-gold-bright);
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dira-reveal, .dira-reveal.in { opacity: 1 !important; animation: none !important; }
+  [class*="dira-spin"], .dira-float { animation: none !important; }
 }

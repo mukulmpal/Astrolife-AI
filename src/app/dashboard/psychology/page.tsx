@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import "@/app/dashboard/shared.css";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
 import { PremiumFeature } from "@/components/premium-feature";
@@ -58,11 +60,22 @@ export default function PsychPage() {
   const strongCount = result.planets.filter(p=>p.status==="Strong").length;
   const weakCount   = result.planets.filter(p=>p.status==="Weak/Blocked").length;
 
+  if (!birth.name) {
+    const intro = engineIntros['psychology'];
+    return <EngineEmptyState engineName={intro.title} whatItAnalyzes={intro.whatItAnalyzes} />;
+  }
+
   return (
     <div className="page">
       <div className="page-tag">{t("psychology.page_tag")}</div>
       <h1 className="page-title serif">{t("psychology.page_title")}</h1>
       <p className="page-sub">9 psychological functions · Pattern analysis · Anxiety Index · Karma Loop · Shadow work</p>
+
+      {(() => {
+        const intro = engineIntros['psychology'];
+        return <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />;
+      })()}
+
       <PremiumFeature feature="Psychology Engine">
 
       {/* HEADER */}

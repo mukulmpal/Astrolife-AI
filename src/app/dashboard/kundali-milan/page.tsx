@@ -1,5 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import "@/app/dashboard/shared.css";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";

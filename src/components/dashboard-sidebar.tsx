@@ -14,43 +14,79 @@ import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
 
 type NavItem = { label: string; href: string; Icon: LucideIcon };
+type NavGroup = { label: string; items: NavItem[] };
 
-const NAV_CORE: NavItem[] = [
-  { label: "Dashboard",   href: "/dashboard",             Icon: LayoutDashboard },
-  { label: "My Kundli",   href: "/dashboard/kundli",      Icon: CircleDot       },
-  { label: "AI Chat",     href: "/dashboard/chat",        Icon: Bot             },
-  { label: "Event Radar", href: "/dashboard/event-radar", Icon: Radar           },
-  { label: "Transits",    href: "/dashboard/transits",    Icon: Globe           },
-  { label: "Purchase Guide", href: "/dashboard/transit-purchase", Icon: ShoppingBag },
-  { label: "Destiny",     href: "/dashboard/destiny",     Icon: TrendingUp      },
-];
-
-const NAV_ENGINES: NavItem[] = [
-  { label: "Yogas",          href: "/dashboard/yogas",          Icon: Sparkles   },
-  { label: "Dasha",          href: "/dashboard/dasha",          Icon: Timer      },
-  { label: "Shadbala",       href: "/dashboard/shadbala",       Icon: BarChart3  },
-  { label: "Ashtakavarga",   href: "/dashboard/ashtakavarga",   Icon: Grid3x3    },
-  { label: "Divisional",     href: "/dashboard/divisional",     Icon: Layers     },
-  { label: "KP System",      href: "/dashboard/kp",             Icon: Target     },
-  { label: "Psychology",     href: "/dashboard/psychology",     Icon: Brain      },
-  { label: "Lal Kitab",      href: "/dashboard/lalkitab",       Icon: BookOpen   },
-  { label: "Numerology",     href: "/dashboard/numerology",     Icon: Hash       },
-  { label: "Panchang",       href: "/dashboard/panchang",       Icon: Calendar   },
-  { label: "Astro Sound",    href: "/dashboard/astro-sound",    Icon: Music      },
-  { label: "Gemstone",       href: "/dashboard/gemstone",       Icon: Gem        },
-  { label: "Vastu",          href: "/dashboard/vastu",          Icon: HomeIcon   },
-  { label: "Kundali Milan",  href: "/dashboard/kundali-milan",  Icon: Users           },
-  { label: "Marriage Timing",href: "/dashboard/marriage-timing", Icon: Heart           },
-  { label: "Palmistry",      href: "/dashboard/palmistry",       Icon: Hand            },
-  { label: "Family Karma",   href: "/dashboard/family-synastry", Icon: HeartHandshake  },
-  { label: "Jaimini",        href: "/dashboard/jaimini",        Icon: Star       },
-  { label: "Medical",        href: "/dashboard/medical",        Icon: HeartPulse },
-  { label: "Prashna",        href: "/dashboard/prashna",        Icon: HelpCircle },
-  { label: "Remedy",         href: "/dashboard/remedy",         Icon: Leaf       },
-  { label: "Sarvatobhadra",  href: "/dashboard/sarvatobhadra",  Icon: Grid3x3    },
-  { label: "Special Lagnas", href: "/dashboard/special-lagnas", Icon: Sunrise    },
-  { label: "History",        href: "/dashboard/history",        Icon: History    },
-  { label: "Report",         href: "/dashboard/report",         Icon: FileText   },
+/**
+ * Sidebar grouping per the AstroLife product picture:
+ * Overview → Birth Chart Foundation → Prediction & Timing →
+ * Life Areas → Remedies & Guidance → Reports & Tools.
+ * Routes, labels and icons are preserved — only the order
+ * and grouping changes.
+ */
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { label: "Dashboard", href: "/dashboard",        Icon: LayoutDashboard },
+      { label: "My Kundli", href: "/dashboard/kundli", Icon: CircleDot       },
+    ],
+  },
+  {
+    label: "Birth Chart Foundation",
+    items: [
+      { label: "Yogas",          href: "/dashboard/yogas",          Icon: Sparkles  },
+      { label: "Dasha",          href: "/dashboard/dasha",          Icon: Timer     },
+      { label: "Shadbala",       href: "/dashboard/shadbala",       Icon: BarChart3 },
+      { label: "Ashtakavarga",   href: "/dashboard/ashtakavarga",   Icon: Grid3x3   },
+      { label: "Divisional",     href: "/dashboard/divisional",     Icon: Layers    },
+      { label: "Special Lagnas", href: "/dashboard/special-lagnas", Icon: Sunrise   },
+    ],
+  },
+  {
+    label: "Prediction & Timing",
+    items: [
+      { label: "Transits",       href: "/dashboard/transits",         Icon: Globe       },
+      { label: "Transit Ripple", href: "/dashboard/transit-ripple",   Icon: TrendingUp  },
+      { label: "Event Radar",    href: "/dashboard/event-radar",      Icon: Radar       },
+      { label: "KP System",      href: "/dashboard/kp",               Icon: Target      },
+      { label: "Jaimini",        href: "/dashboard/jaimini",          Icon: Star        },
+      { label: "Prashna",        href: "/dashboard/prashna",          Icon: HelpCircle  },
+      { label: "Sarvatobhadra",  href: "/dashboard/sarvatobhadra",    Icon: Grid3x3     },
+    ],
+  },
+  {
+    label: "Life Areas",
+    items: [
+      { label: "Destiny",         href: "/dashboard/destiny",         Icon: TrendingUp      },
+      { label: "Psychology",      href: "/dashboard/psychology",      Icon: Brain           },
+      { label: "Marriage Timing", href: "/dashboard/marriage-timing", Icon: Heart           },
+      { label: "Kundali Milan",   href: "/dashboard/kundali-milan",   Icon: Users           },
+      { label: "Family Karma",    href: "/dashboard/family-synastry", Icon: HeartHandshake  },
+      { label: "Medical",         href: "/dashboard/medical",         Icon: HeartPulse      },
+      { label: "Numerology",      href: "/dashboard/numerology",      Icon: Hash            },
+    ],
+  },
+  {
+    label: "Remedies & Guidance",
+    items: [
+      { label: "Lal Kitab",    href: "/dashboard/lalkitab",    Icon: BookOpen },
+      { label: "Remedy",       href: "/dashboard/remedy",      Icon: Leaf     },
+      { label: "Gemstone",     href: "/dashboard/gemstone",    Icon: Gem      },
+      { label: "Vastu",        href: "/dashboard/vastu",       Icon: HomeIcon },
+      { label: "Astro Sound",  href: "/dashboard/astro-sound", Icon: Music    },
+      { label: "Panchang",     href: "/dashboard/panchang",    Icon: Calendar },
+    ],
+  },
+  {
+    label: "Reports & Tools",
+    items: [
+      { label: "AI Chat",         href: "/dashboard/chat",             Icon: Bot         },
+      { label: "Palmistry",       href: "/dashboard/palmistry",        Icon: Hand        },
+      { label: "Report",          href: "/dashboard/report",           Icon: FileText    },
+      { label: "Purchase Guide",  href: "/dashboard/transit-purchase", Icon: ShoppingBag },
+      { label: "History",         href: "/dashboard/history",          Icon: History     },
+    ],
+  },
 ];
 
 export function DashboardSidebar() {
@@ -76,35 +112,22 @@ export function DashboardSidebar() {
 
       {/* Scrollable nav */}
       <nav className="dash-nav" aria-label="Main navigation">
-        <div className="dash-nav-section">
-          <div className="dash-nav-label" aria-hidden="true">Core</div>
-          {NAV_CORE.map(({ label, href, Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`dash-nav-item${pathname === href ? " active" : ""}`}
-              aria-current={pathname === href ? "page" : undefined}
-            >
-              <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
-              <span>{label}</span>
-            </Link>
-          ))}
-        </div>
-
-        <div className="dash-nav-section">
-          <div className="dash-nav-label" aria-hidden="true">Engines</div>
-          {NAV_ENGINES.map(({ label, href, Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`dash-nav-item${pathname === href ? " active" : ""}`}
-              aria-current={pathname === href ? "page" : undefined}
-            >
-              <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
-              <span>{label}</span>
-            </Link>
-          ))}
-        </div>
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label} className="dash-nav-section">
+            <div className="dash-nav-label" aria-hidden="true">{group.label}</div>
+            {group.items.map(({ label, href, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`dash-nav-item${pathname === href ? " active" : ""}`}
+                aria-current={pathname === href ? "page" : undefined}
+              >
+                <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
+                <span>{label}</span>
+              </Link>
+            ))}
+          </div>
+        ))}
 
         <div className="dash-nav-section">
           <Link

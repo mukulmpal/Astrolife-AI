@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import { useUserChart } from "@/lib/user-chart";
 import { buildDashaTreeFromChart, getNavtara, LORD_COLOR, LORD_ICON, type DashaLord } from "@/lib/astro-engine/dasha";

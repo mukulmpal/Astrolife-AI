@@ -65,7 +65,7 @@ export default function Onboarding() {
     const steps = [
       "Reading your birth coordinates...",
       "Calculating planetary positions...",
-      "Mapping 15+ astrology systems...",
+      "Mapping 25+ astrology engines...",
       "Detecting yogas & dashas...",
       "Building your AI personality profile...",
       "Your cosmic blueprint is ready ✦",
@@ -125,7 +125,7 @@ export default function Onboarding() {
   const calcSteps = [
     "Reading your birth coordinates...",
     "Calculating planetary positions...",
-    "Mapping 15+ astrology systems...",
+    "Mapping 25+ astrology engines...",
     "Detecting yogas & dashas...",
     "Building your AI personality profile...",
     "Your cosmic blueprint is ready ✦",

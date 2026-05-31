@@ -2,6 +2,8 @@
 
 
 import { useMemo, useState, useSyncExternalStore } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import {
 
@@ -467,6 +469,11 @@ function GemstonePageContent() {
         </p>
         <p>{report.executiveSummary}</p>
       </section>
+
+      {(() => {
+        const intro = engineIntros['gemstone'];
+        return <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />;
+      })()}
 
       <PrimaryGemHero gem={primary} />
 

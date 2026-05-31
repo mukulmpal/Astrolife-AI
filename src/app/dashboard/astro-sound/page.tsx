@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useCallback, useMemo, useRef, useState } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { ragaMusicReferences, type MusicReferenceType } from "@/data/astrosound/ragaMusicReferences";
 import {

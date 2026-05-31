@@ -1,5 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateMedical, NAKSHATRA_DISEASE_BOOK, SIGN_DISEASE } from "@/lib/astro-engine/medical";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
@@ -58,6 +60,11 @@ export default function MedicalPage() {
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "34px", fontWeight: 700 }}>🏥 Medical Astrology</div>
           <div style={{ fontSize: "13px", color: "#8880a8", marginTop: "4px" }}>Dr. S. Krishna Kumar Method · {result.planetCards.length} planets analyzed · Natal chart</div>
         </div>
+
+        {(() => {
+          const intro = engineIntros['medical'];
+          return <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />;
+        })()}
 
         {/* Disclaimer banner */}
         <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "10px", padding: "12px 16px", marginBottom: "18px", fontSize: "12px", lineHeight: "1.6" }}>

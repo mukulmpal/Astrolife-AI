@@ -482,11 +482,16 @@ export default function Dashboard() {
           {/* TOPBAR */}
           <div className="topbar">
             <div>
-              <div className="greeting-tag">✦ Your Cosmic Dashboard</div>
+              <div className="greeting-tag">✦ Your AstroLife Command Center</div>
               <h1 className="greeting-h serif">
-                {greeting},<br /><em>{userName}</em>
+                {greeting}, <em>{userName}</em>
               </h1>
-              <div className="greeting-sub">{birth.city} · Lagna {chart.lagnaRashi} · {activeDasha.planet} MD{activeAntardasha ? ` / ${activeAntardasha.planet} AD` : ""}</div>
+              <div className="greeting-sub" style={{ marginTop: 8 }}>
+                AI Vedic Astrology operating system &middot; 25+ engines &middot; 30+ modules
+              </div>
+              <div className="greeting-sub">
+                {birth.city} &middot; Lagna {chart.lagnaRashi} &middot; {activeDasha.planet} MD{activeAntardasha ? ` / ${activeAntardasha.planet} AD` : ""}
+              </div>
             </div>
             <div className="topbar-right">
               <div className="date-chip">
@@ -639,7 +644,7 @@ export default function Dashboard() {
                 Unlock Your Full Cosmic Blueprint ✦
               </div>
               <div style={{fontSize:13,color:"#605890"}}>
-                Upgrade to access all 15+ engines, unlimited AI chat, and destiny timeline.
+                Upgrade to access all 25+ engines, 30+ modules, unlimited AI chat, and destiny timeline.
               </div>
             </div>
             <Link href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Premium →</Link>

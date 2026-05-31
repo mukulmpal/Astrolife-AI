@@ -1,5 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateRemedies, type RemedyCard } from "@/lib/astro-engine/remedy";
 import { REMEDY_CONTRADICTION_RULES } from "@/lib/astro-engine/lalkitab-knowledge";
@@ -136,6 +138,11 @@ export default function RemedyPage() {
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "34px", fontWeight: 700 }}>💊 Remedy Engine</div>
           <div style={{ fontSize: "13px", color: "#8880a8", marginTop: "4px" }}>Vedic Upay · Lal Kitab Amrit · Karma Alignment · {result.cards.length} planets analyzed</div>
         </div>
+
+        {(() => {
+          const intro = engineIntros['remedy'];
+          return <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />;
+        })()}
 
         {/* Active Dasha Banner */}
         <div style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: "10px", padding: "12px 16px", marginBottom: "18px", fontSize: "13px" }}>

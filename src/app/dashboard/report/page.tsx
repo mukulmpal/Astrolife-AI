@@ -1,11 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type ReportCover } from "@/lib/report-html-generator";
 import { generateVoiceScript, speakVoiceReport, stopVoiceReport } from "@/lib/voice-report";
 import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { PremiumFeature } from "@/components/premium-feature";
+import { AstroLoadingScreen } from "@/components/AstroLoadingScreen";
 
 const PALETTE_OPTIONS: { value: ReportPalette; label: string; bg: string; gold: string }[] = [
   { value: "midnight", label: "Midnight",  bg: "#0A0E1F", gold: "#C9A961" },
@@ -113,7 +116,6 @@ const LOADING_STEPS = [
   "Almost ready — packaging download...",
 ];
 
-const ZODIAC_GLYPHS = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
 
 export default function ReportPage() {
   const { chart, loading } = useUserChart();
@@ -123,16 +125,6 @@ export default function ReportPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSpeaking, setIsSpeaking]   = useState(false);
   const [copied, setCopied]           = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0);
-  const [elapsedSec, setElapsedSec]   = useState(0);
-
-  // Cycle loading messages & elapsed timer while generating
-  useEffect(() => {
-    if (!isGenerating) return;
-    const msgInterval = setInterval(() => setLoadingStep(s => (s + 1) % LOADING_STEPS.length), 2200);
-    const secInterval = setInterval(() => setElapsedSec(s => s + 1), 1000);
-    return () => { clearInterval(msgInterval); clearInterval(secInterval); };
-  }, [isGenerating]);
 
   if (loading || !chart) {
     return (
@@ -146,8 +138,6 @@ export default function ReportPage() {
   }
 
   const handleDownloadPDF = async () => {
-    setLoadingStep(0);
-    setElapsedSec(0);
     setIsGenerating(true);
     try {
       await downloadReportAsPDF(chart, { type: reportType, palette, cover });
@@ -217,67 +207,18 @@ export default function ReportPage() {
         .rep-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
         .rep-share-btn { padding:12px 10px; border:1px solid #1c1840; border-radius:8px; background:#08051a; color:#f0e8d0; cursor:pointer; font-weight:600; font-size:12px; transition:all 0.2s; text-align:center; }
         .rep-share-btn:hover { border-color:#c8a030; }
-        /* Loading overlay */
-        .gen-overlay { position:fixed; inset:0; background:rgba(6,4,16,0.97); z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; }
-        .gen-wheel-wrap { position:relative; width:200px; height:200px; margin-bottom:32px; }
-        .gen-wheel-ring { position:absolute; inset:0; border-radius:50%; border:2px solid rgba(200,160,48,0.2); animation:spin-slow 12s linear infinite; }
-        .gen-wheel-ring-2 { position:absolute; inset:10px; border-radius:50%; border:1px solid rgba(200,160,48,0.12); animation:spin-slow 8s linear infinite reverse; }
-        .gen-wheel-center { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px; }
-        .gen-glyph { position:absolute; font-size:18px; transform-origin:100px 100px; }
-        .gen-step { font-size:15px; color:#c8a030; font-weight:600; text-align:center; max-width:340px; animation:slide-up 0.4s ease; min-height:26px; }
-        .gen-timer { font-size:12px; color:#605890; margin-top:8px; font-family:monospace; }
-        .gen-bar-wrap { width:280px; height:3px; background:#1c1840; border-radius:99px; margin-top:20px; overflow:hidden; }
-        .gen-bar { height:100%; background:linear-gradient(90deg,#c8a030,#a07828); border-radius:99px; animation:pulse-glow 1.8s ease-in-out infinite; }
-        .gen-hint { font-size:11px; color:#453f70; margin-top:16px; text-align:center; max-width:300px; line-height:1.6; }
+        /* gen-overlay replaced by AstroLoadingScreen component */
         @media(max-width:600px) { .rep-hero { font-size:28px; } .rep-btn.primary { width:100%; } }
       `}</style>
 
-      {/* ── Astrology Loading Overlay ── */}
-      {isGenerating && (
-        <div className="gen-overlay">
-          <div className="gen-wheel-wrap">
-            <div className="gen-wheel-ring" />
-            <div className="gen-wheel-ring-2" />
-            {/* 12 zodiac glyphs around ring */}
-            {ZODIAC_GLYPHS.map((glyph, i) => {
-              const angle = (i * 30 - 90) * (Math.PI / 180);
-              const r = 88;
-              const x = 100 + r * Math.cos(angle) - 9;
-              const y = 100 + r * Math.sin(angle) - 9;
-              return (
-                <span key={glyph} className="gen-glyph" style={{ left: x, top: y, color: `hsl(${i * 30},60%,60%)`, fontSize: "16px", position: "absolute" }}>
-                  {glyph}
-                </span>
-              );
-            })}
-            <div className="gen-wheel-center">
-              <div style={{ fontSize: "38px", animation: "spin-slow 6s linear infinite" }}>☸</div>
-              <div style={{ fontSize: "11px", color: "#605890", fontFamily: "monospace" }}>{elapsedSec}s</div>
-            </div>
-          </div>
-
-          <div style={{ fontSize: "22px", fontFamily: "'Cormorant Garamond',serif", color: "#f0e8d0", marginBottom: "10px", fontWeight: 700 }}>
-            Generating Your Report
-          </div>
-          <div style={{ fontSize: "12px", color: "#605890", marginBottom: "20px" }}>
-            {ENGINE_COUNT[reportType]} engines · {PAGE_COUNT[reportType]}
-          </div>
-
-          <div className="gen-step" key={loadingStep}>
-            {LOADING_STEPS[loadingStep]}
-          </div>
-
-          <div className="gen-bar-wrap">
-            <div className="gen-bar" style={{ width: `${Math.min(95, (loadingStep / LOADING_STEPS.length) * 100 + 10)}%`, transition: "width 2s ease" }} />
-          </div>
-
-          <div className="gen-timer">{elapsedSec}s elapsed · usually 30–90s for full report</div>
-
-          <div className="gen-hint">
-            All {ENGINE_COUNT[reportType]} engines are running in parallel on our server. Your PDF will download automatically when ready.
-          </div>
-        </div>
-      )}
+      {/* ── V1 Orbiting Grahas loading overlay (design handoff implementation) ── */}
+      <AstroLoadingScreen
+        visible={isGenerating}
+        title={"Generating your\nCosmic Blueprint"}
+        subtitle={`${ENGINE_COUNT[reportType]} engines · ${PAGE_COUNT[reportType]} · premium edition`}
+        statusMessages={LOADING_STEPS}
+        statusIntervalMs={2200}
+      />
 
       <PremiumFeature feature="Premium PDF Reports">
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>

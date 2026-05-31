@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { PremiumFeature } from "@/components/premium-feature";
 import { PalmistryAnalyzer } from "@/components/palmistry/PalmistryAnalyzer";
 import { ManualPalmistryWorkbench } from "@/components/palmistry/manual-palmistry-workbench";
@@ -17,6 +19,12 @@ export default function PalmistryPage() {
             View Palm History
           </Link>
         </div>
+
+        {(() => {
+          const intro = engineIntros['palmistry'];
+          return <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />;
+        })()}
+
         <PalmistryAnalyzer />
         <ManualPalmistryWorkbench />
       </PremiumFeature>

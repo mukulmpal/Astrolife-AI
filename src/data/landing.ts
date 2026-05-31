@@ -11,15 +11,15 @@ export const navLinks = [
 
 export const trustBadges = [
   "Free Kundli in 60 seconds",
-  "15+ Astrology Engines",
-  "10 AI Specialist Agents",
+  "25+ Astrology Engines",
+  "30+ Intelligent Modules",
   "Personalized Remedies",
   "Premium PDF Reports",
 ];
 
 export const metrics = [
-  { value: "15+", label: "Astrology Engines" },
-  { value: "10", label: "AI Agents" },
+  { value: "25+", label: "Astrology Engines" },
+  { value: "30+", label: "Modules" },
   { value: "60-sec", label: "Free Kundli" },
   { value: "12-month", label: "Forecasts" },
   { value: "PDF", label: "Premium Reports" },

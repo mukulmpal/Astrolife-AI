@@ -5,11 +5,19 @@ import { useUserChart } from "@/lib/user-chart";
 import { isFullAccessEnabled } from "@/lib/access";
 import { EngineHeader, EngineShell } from "@/components/engine/EngineShell";
 import { useLanguage } from "@/lib/language-context";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 
 const TIER: PlanTier = isFullAccessEnabled() ? "elite" : "free"; // replace with user's actual tier
 
 export default function YogasPage() {
   const { birth, chart } = useUserChart();
+
+  // Early return: empty state if no chart
+  if (!birth.name) {
+    const intro = engineIntros['yogas'];
+    return <EngineEmptyState engineName={intro.title} whatItAnalyzes={intro.whatItAnalyzes} />;
+  }
   const { t, tp } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all"|"present"|"doshas">("present");
   const [activeCategory, setActiveCategory] = useState<YogaCategory|"All">("All");
@@ -172,6 +180,11 @@ export default function YogasPage() {
             { label: "Rare Yogas", value: score.rareCount, tone: "violet" },
           ]}
         />
+
+        {(() => {
+          const intro = engineIntros['yogas'];
+          return <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />;
+        })()}
 
         <>
             <div className="summary-strip">

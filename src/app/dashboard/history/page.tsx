@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EducationTooltip } from "@/components/education-tooltip";
