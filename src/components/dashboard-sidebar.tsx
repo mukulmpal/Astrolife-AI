@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 
 type NavItem = { label: string; href: string; Icon: LucideIcon };
 type NavGroup = { label: string; items: NavItem[] };
@@ -102,10 +103,12 @@ export function DashboardSidebar() {
     router.push("/login");
   };
 
+  const theme = useCurrentTheme();
+
   return (
-    <aside className="dash-sidebar">
+    <aside className="dash-sidebar" style={{ borderTopColor: theme.primary, borderRightColor: theme.secondary }}>
       {/* Logo */}
-      <div className="dash-logo">
+      <div className="dash-logo" style={{ color: theme.primary }}>
         <div className="dash-logo-gem">✦</div>
         <span className="dash-logo-name">AstroLife</span>
       </div>
