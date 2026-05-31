@@ -29,18 +29,6 @@ export default function SignupForm() {
     if (nameParam) setName(decodeURIComponent(nameParam));
   }, [searchParams]);
 
-  // Google Signup
-  const handleGoogle = async () => {
-    setLoading(true);
-    setError('');
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) setError(error.message);
-    setLoading(false);
-  };
-
   // Send OTP
   const handleSendOtp = async () => {
     if (!name.trim()) {
@@ -212,27 +200,7 @@ export default function SignupForm() {
               {loading ? 'OTP bhej raha hoon...' : 'Send OTP'}
             </button>
 
-            {/* Google */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t" style={{ borderColor: '#1c1840' }} />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span style={{ background: '#0f0c23', color: '#8880a8', padding: '0 8px' }}>OR</span>
-              </div>
-            </div>
 
-            <button
-              onClick={handleGoogle}
-              disabled={loading}
-              className="w-full py-3 rounded-lg font-semibold text-sm border transition-all hover:opacity-80 disabled:opacity-50 flex items-center justify-center gap-2"
-              style={{
-                borderColor: '#1c1840',
-                color: '#c8a030',
-              }}
-            >
-              <span>🔵</span> Continue with Google
-            </button>
 
             <p className="text-center text-sm" style={{ color: '#a79fbd' }}>
               Already have an account?{' '}
