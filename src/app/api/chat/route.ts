@@ -1,6 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getServerAiUsageState, incrementServerAiUsage } from "@/lib/server-usage";
 import { monitor } from "@/lib/server-monitoring";
+import {
+  buildPalmistryChatContext,
+  palmistryChatContextToPrompt,
+} from "@/lib/palmistry/ai-chat-context";
 import { NextRequest, NextResponse } from "next/server";
 
 const AGENTS: Record<string, { name: string; emoji: string; system: string }> = {
@@ -95,7 +99,8 @@ async function saveChatMessages(userId: string | null, sessionId: string, agentI
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, agentId = "general", chartContext, transitContext, dailyFeedContext, vargaContext } = await req.json();
+    const body = await req.json();
+    const { messages, agentId = "general", chartContext, transitContext, dailyFeedContext, vargaContext } = body;
     const agent = AGENTS[agentId] || AGENTS.general;
     const usageState = await getServerAiUsageState();
 
@@ -119,12 +124,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const requestUrl = new URL(req.url);
+    const palmSessionId = body.palmSessionId ?? requestUrl.searchParams.get("palmSessionId");
+    const palmistryContext = await buildPalmistryChatContext({
+      palmSessionId,
+      userId: body.userId ?? null,
+    });
+    const palmistryPrompt = palmistryChatContextToPrompt(palmistryContext);
+
     const systemPrompt = [
       agent.system,
       chartContext   ? `\nUSER'S BIRTH CHART:\n${chartContext}` : "",
       vargaContext   ? `\nSHODASHA VARGA INTELLIGENCE:\n${vargaContext}` : "",
       transitContext ? `\nCURRENT TRANSITS:\n${transitContext}` : "",
       dailyFeedContext ? `\nDAILY FEED:\n${dailyFeedContext}` : "",
+      palmistryPrompt,
       `\nStyle: Premium Hinglish. ✦ bullets. Max 200 words. Sign off as: "${agent.emoji} ${agent.name}"`,
     ].join("");
 
@@ -148,6 +162,7 @@ export async function POST(req: NextRequest) {
       vargaContext    ? "Shodasha Varga"   : null,
       transitContext  ? "Transit/Gochar"  : null,
       dailyFeedContext ? "Daily Feed"     : null,
+      palmistryPrompt ? "Palmistry Report" : null,
     ].filter(Boolean);
 
     // Save to DB — always, even for anonymous users

@@ -205,6 +205,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [languageMode, setLanguageMode] = useState<LanguageMode>("hinglish");
   const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard/chat";
+  const palmSessionId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("palmSessionId") : null;
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { chart } = useUserChart();
@@ -360,6 +361,7 @@ export default function ChatPage() {
           transitContext: transitContext,
           dailyFeedContext,
           languageMode,
+          palmSessionId,
         }),
       });
 
