@@ -122,10 +122,28 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310 }: Prop
             )}
 
             {here.map((p, idx) => {
-              const ox = total > 1 ? (idx - (total - 1) / 2) * 13 : 0;
-              const py = ly + (isLagna ? 18 : 14);
               const piIdx = PLS.indexOf(p.name);
               if (piIdx < 0) return null;
+
+              // Smart positioning for overlapping planets
+              let ox = 0;
+              let oy = 0;
+              let fontSize = 11;
+
+              if (total > 1) {
+                // Horizontal offset increases with more planets
+                const horizontalSpacing = total > 4 ? 16 : total > 2 ? 14 : 13;
+                ox = (idx - (total - 1) / 2) * horizontalSpacing;
+
+                // Vertical offset for houses with many planets (5+)
+                if (total > 4) {
+                  const rowIdx = Math.floor(idx / 3); // 3 planets per row
+                  oy = rowIdx * 13;
+                  fontSize = 10; // Reduce font size slightly
+                }
+              }
+
+              const py = ly + (isLagna ? 18 : 14) + oy;
 
               return (
                 <g key={p.name}>
@@ -134,7 +152,7 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310 }: Prop
                     y={py}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fontSize="11"
+                    fontSize={fontSize}
                     fontWeight="600"
                     fontFamily="sans-serif"
                     fill={PCOL[piIdx]}
