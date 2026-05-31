@@ -18,6 +18,7 @@ import {
 } from "@/lib/astro-engine/transits";
 import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
+import { PalmistryAiChatBanner } from "@/components/palmistry/palmistry-ai-chat-banner";
 
 interface Message {
   role: "user" | "assistant";
@@ -32,6 +33,7 @@ const SOURCE_LINKS: Record<string, string> = {
   "Natal Chart": "/dashboard/kundli",
   "Transit/Gochar": "/dashboard/transits",
   "Daily Feed": "/dashboard/panchang",
+  "Palmistry Report": "/dashboard/palmistry/history",
 };
 
 const AGENTS = [
@@ -477,6 +479,7 @@ export default function ChatPage() {
         .msg-sources{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
         .msg-source-chip{font-size:10px;color:#c8a030;border:1px solid rgba(200,160,48,0.24);background:rgba(200,160,48,0.08);padding:3px 8px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center}
         .msg-source-chip:hover{background:rgba(200,160,48,0.14);border-color:rgba(200,160,48,0.4)}
+        .palm-chat-banner-wrap{padding:16px 24px 0}
 
         /* TYPING */
         .typing-wrap{display:flex;gap:12px;align-items:flex-start}
@@ -517,6 +520,7 @@ export default function ChatPage() {
           .msg-bubble{max-width:90%}
           .agent-status{padding:12px}
           .messages{padding:16px 16px 104px}
+          .palm-chat-banner-wrap{padding:12px 16px 0}
           .input-wrap{padding:10px 12px;position:sticky;bottom:76px;z-index:20}
           .input-box{padding:10px 12px}
           .input-ta{font-size:16px}
@@ -604,6 +608,10 @@ export default function ChatPage() {
           </div>
 
           {/* MESSAGES */}
+          <div className="palm-chat-banner-wrap">
+            <PalmistryAiChatBanner />
+          </div>
+
           <div className="messages">
             {messages.map((m, i) => (
               <div key={i} className={`msg ${m.role}`}>

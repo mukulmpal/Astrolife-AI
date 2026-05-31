@@ -11,9 +11,10 @@ import { PHASE3_RULE_BANK } from "./phase3-rule-bank";
 import { RELATIONSHIP_RULES } from "./relationship-rules";
 import { REMEDIES_RULES } from "./remedies-rules";
 import { THUMB_RULES } from "./thumb-rules";
+import { applyPalmistryTuningOverrides } from "./apply-tuning-overrides";
 import type { PalmRule } from "../types";
 
-export const ALL_PALM_RULES: PalmRule[] = [
+export const RAW_PALMISTRY_RULES: PalmRule[] = [
   ...HAND_SHAPE_RULES,
   ...THUMB_RULES,
   ...FINGER_RULES,
@@ -28,5 +29,8 @@ export const ALL_PALM_RULES: PalmRule[] = [
   ...PHASE3A_BATCH3_MAJOR_LINE_RULES,
   ...PHASE3A_BATCH4_MINOR_SIGN_REMEDY_RULES,
 ];
+
+export const ALL_PALM_RULES: PalmRule[] =
+  applyPalmistryTuningOverrides(RAW_PALMISTRY_RULES);
 
 export const ALL_PALMISTRY_RULES = ALL_PALM_RULES;
