@@ -77,6 +77,23 @@ function average(values: number[]) {
   return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2));
 }
 
+function isMissingTableError(error: { message?: string; code?: string }) {
+  return (
+    error.code === "PGRST205" ||
+    error.message?.includes("Could not find the table") ||
+    error.message?.includes("does not exist")
+  );
+}
+
+function emptyAnalytics(days: number): PalmistryEngineAnalytics {
+  return {
+    days,
+    feedbackCount: 0,
+    sessionCount: 0,
+    ruleAccuracy: [],
+  };
+}
+
 function getHitRuleId(hit: PalmRuleHit) {
   return hit.ruleId ?? hit.rule?.id;
 }
@@ -136,6 +153,10 @@ export async function getPalmistryEngineAnalytics(params?: {
     .gte("created_at", since);
 
   if (feedbackError) {
+    if (isMissingTableError(feedbackError)) {
+      return emptyAnalytics(days);
+    }
+
     throw new Error(`Failed to load palmistry feedback analytics: ${feedbackError.message}`);
   }
 
@@ -143,12 +164,7 @@ export async function getPalmistryEngineAnalytics(params?: {
   const sessionIds = [...new Set(feedback.map((item) => item.session_id).filter(Boolean))];
 
   if (sessionIds.length === 0) {
-    return {
-      days,
-      feedbackCount: 0,
-      sessionCount: 0,
-      ruleAccuracy: [],
-    };
+    return emptyAnalytics(days);
   }
 
   const { data: sessionRows, error: sessionError } = await supabase
@@ -157,6 +173,10 @@ export async function getPalmistryEngineAnalytics(params?: {
     .in("id", sessionIds);
 
   if (sessionError) {
+    if (isMissingTableError(sessionError)) {
+      return emptyAnalytics(days);
+    }
+
     throw new Error(`Failed to load palmistry sessions for analytics: ${sessionError.message}`);
   }
 
