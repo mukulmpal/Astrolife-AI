@@ -314,11 +314,11 @@ export function buildMarriageEventRadar(report: EventRadarReport, kp?: MarriageV
         label: day.label,
         weekday: day.weekday,
         score,
-        reason: `Love/relationship radar ${loveScore(day)}/100${kp ? ` with KP adjustment from ${kp.score}/100` : ""}.`,
+        reason: `Relationship radar ${loveScore(day)}/100${kp ? ` with KP validation adjustment from ${kp.score}/100` : ""}.`,
         action: score >= 68
-          ? "Good for proposal discussion, matchmaking, relationship repair or commitment clarity."
+          ? "Good for calm proposal discussion, matchmaking review, relationship repair or commitment clarity. Not a fixed marriage date."
           : score >= 50
-            ? "Good for gentle conversation, not pressure."
+            ? "Good for gentle conversation and emotional clarity; avoid pressure or final decisions."
             : "Avoid forcing relationship decisions; keep communication calm.",
       };
     })
@@ -331,16 +331,16 @@ export function buildMarriageEventRadar(report: EventRadarReport, kp?: MarriageV
     : 45;
 
   return {
-    title: "Marriage Trigger Windows",
+    title: "Relationship Readiness Signals",
     score: average,
     label: labelFromScore(average),
     paragraph:
-      `Event Radar should be used as the final trigger layer only. Promise comes from D1/D9, event validation from KP, and these daily windows show when conversation, proposal, repair or family discussion can move with less friction.`,
+      `Event Radar is a 7-day conversation and readiness layer, not a marriage-date finder. Promise comes from D1/D9, event validation from KP, and these support days only show when conversation, proposal review, repair or family discussion may move with less friction.`,
     windows,
     cautions: [
-      "Do not finalize marriage timing from transit alone.",
-      "If love area is weak or caution area is love, avoid ultimatums and harsh speech.",
-      "Use supportive days for clarity, not emotional pressure.",
+      "Do not finalize marriage timing from Event Radar or daily transit alone.",
+      "Use Marriage Timing for monthly commitment windows and Kundali Milan for compatibility.",
+      "If love area is weak or caution area is love, avoid ultimatums, harsh speech and emotional pressure.",
     ],
   };
 }
@@ -373,10 +373,10 @@ export function buildMarriageIntelligenceV2(params: {
     : 50;
 
   return {
-    title: "Marriage Trigger Engine – K.N. Rao Timing + Divisional + KP",
+    title: "Marriage Readiness Engine - K.N. Rao Timing + Divisional + KP",
     overallScore,
     label: labelFromScore(overallScore),
-    narrative: `Marriage Trigger Engine separates judgement into K.N. Rao timing parameters, divisional delivery, KP validation and event windows. This prevents one method from becoming confusing final verdict. ${knRaoTiming ? `K.N. Rao timing shows ${knRaoTiming.strengthLabel} with ${knRaoTiming.activeParameterCount}/8 parameters active. ` : ""}The current combined signal is ${labelText(labelFromScore(overallScore))}.`,
+    narrative: `Marriage Readiness Engine separates judgement into K.N. Rao timing parameters, divisional delivery, KP validation and support periods. This prevents one method from becoming a confusing final verdict. ${knRaoTiming ? `K.N. Rao timing shows ${knRaoTiming.strengthLabel} with ${knRaoTiming.activeParameterCount}/8 parameters active. ` : ""}The current combined signal is ${labelText(labelFromScore(overallScore))}.`,
 
     // === K.N. RAO TIMING (NEW SECTION) ===
     knRaoTiming,

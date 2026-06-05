@@ -62,8 +62,8 @@ body.theme-ivory {
   --al-line:rgba(26,31,58,0.14); --al-line-strong:rgba(26,31,58,0.30);
   --al-gold:#8C7440; --al-gold-bright:#A38851; --al-gold-dim:#7A6536;
   --al-saffron:#E8923C; --al-violet:#6B5B8C; --al-crimson:#C9555F; --al-jade:#4A8A62;
-  --al-ivory:#1A1F3A; --al-ivory-dim:rgba(26,31,58,0.78); --al-ivory-mute:rgba(26,31,58,0.55);
-  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
+  --al-ivory:#1A1F3A; --al-ivory-dim:#3D4554; --al-ivory-mute:#6B7280;
+  --al-text:#1A1F3A; --al-text-dim:#3D4554; --al-text-mute:#6B7280;
   --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:#FAEFE0;
   --al-day-graha: "Moon / Venus"; --al-day-glyph: "☽";
 }
@@ -217,33 +217,33 @@ body.theme-maroon, body.theme-forest, body.theme-twilight {
 
 /* ── Original vars (kept for backward-compat; now via bridge) */
 :root {
-  --background: #060410;
-  --primary: #f4a12a;
-  --primary-glow: #ffd37a;
-  --accent: #7c4dff;
-  --card: #0d0a22;
-  --border: #241b46;
-  --muted: #a79fbd;
-  --gradient-cosmic: radial-gradient(circle at 50% 0%, rgba(124, 77, 255, 0.22), transparent 34%), linear-gradient(135deg, #060410 0%, #111128 48%, #05060e 100%);
-  --gradient-gold: linear-gradient(135deg, #ffd37a 0%, #f4a12a 45%, #bf6b18 100%);
-  --shadow-glow: 0 0 42px rgba(244, 161, 42, 0.28);
+  --background: var(--al-bg);
+  --primary: var(--al-gold);
+  --primary-glow: var(--al-gold-bright);
+  --accent: var(--al-violet);
+  --card: var(--al-surface);
+  --border: var(--al-line-strong);
+  --muted: var(--al-text-mute);
+  --gradient-cosmic: radial-gradient(circle at 50% 0%, rgba(124, 77, 255, 0.22), transparent 34%), linear-gradient(135deg, var(--al-bg) 0%, var(--al-bg-2) 48%, var(--al-bg) 100%);
+  --gradient-gold: linear-gradient(135deg, var(--al-gold-bright) 0%, var(--al-gold) 45%, var(--al-gold-dim) 100%);
+  --shadow-glow: 0 0 42px rgba(201,169,97, 0.28);
   --shadow-elegant: 0 24px 80px rgba(0, 0, 0, 0.38);
-  --app-bg: #060410;
-  --app-fg: #f0e8d0;
-  --app-card: #0d0a22;
-  --app-border: #1c1840;
-  --app-muted: #605890;
-  --app-accent: #3c2880;
-  --app-gold: #c8a030;
-  --app-gold-strong: #f0d898;
-  --app-soft: #c8c0a8;
-  --app-muted-deep: #3a3060;
-  --app-card-alt: #0f0c28;
-  --app-border-strong: #261f50;
-  --chart-bg: #09051a;
-  --chart-line: #3b3267;
-  --chart-line-soft: #2a2250;
-  --chart-label: #786aa6;
+  --app-bg: var(--al-bg);
+  --app-fg: var(--al-text);
+  --app-card: var(--al-surface);
+  --app-border: var(--al-line);
+  --app-muted: var(--al-text-mute);
+  --app-accent: var(--al-violet);
+  --app-gold: var(--al-gold);
+  --app-gold-strong: var(--al-gold-bright);
+  --app-soft: var(--al-text-dim);
+  --app-muted-deep: var(--al-surface-2);
+  --app-card-alt: var(--al-surface-2);
+  --app-border-strong: var(--al-line-strong);
+  --chart-bg: var(--al-surface);
+  --chart-line: var(--al-gold-dim);
+  --chart-line-soft: var(--al-line-strong);
+  --chart-label: var(--al-text-mute);
 }
 
 @theme inline {

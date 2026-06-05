@@ -180,7 +180,7 @@ export function DirectionAPricing() {
       bullets: ['Everything in Free', 'Unlimited AI conversations', 'Full daśā · antardaśā · pratyantar', 'KP · Lāl Kitāb · Nāḍī · Vāstu', 'Compatibility & matching', 'Printed Cosmic Blueprint (PDF)'],
       cta: 'Begin Premium' },
     { tier: 'Elite', price: '₹1,999', note: 'For the seekers', primary: false,
-      bullets: ['Everything in Premium', 'A named, voiced AI astrologer', 'Family-karma chart linking', 'Annual Varṣaphala forecast', 'Priority WhatsApp line', 'Quarterly human review'],
+      bullets: ['Everything in Premium', 'A named, personalized AI astrologer', 'Family-karma chart linking', 'Annual Varṣaphala forecast', 'Priority WhatsApp line', 'Quarterly human review'],
       cta: 'Go Elite' },
   ];
   return (

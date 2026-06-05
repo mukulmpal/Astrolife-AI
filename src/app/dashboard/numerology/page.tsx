@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { EngineHeader, EngineShell } from "@/components/engine/EngineShell";
 import { engineIntros } from "@/data/engine-intros";
 import { calculateNumerology, analyzeNumber, suggestATMPins, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry, type DigitAnalysis, type CompatScore } from "@/lib/astro-engine/numerology";
 import { useUserChart } from "@/lib/user-chart";
@@ -221,9 +222,11 @@ export default function NumerologyPage() {
   const [atmInput, setAtmInput] = useState("");
   const [atmResult, setAtmResult] = useState<DigitAnalysis | null>(null);
   const [atmError, setAtmError] = useState("");
-  const { birth } = useUserChart();
+  const { birth, hasUserChart } = useUserChart();
 
-  const result = calculateNumerology(birth.name, birth.dob);
+  // Safe placeholders keep numerology math crash-proof during the no-chart
+  // render; the real output is gated behind the hasUserChart guard below.
+  const result = calculateNumerology(birth.name || "Seeker", birth.dob || "2000-01-01");
   const {
     lifePath, destiny, soulUrge, personality, birthday, maturity, personalYear,
     pinnacles, challenges, activePinnacle, activeChallenge,
@@ -263,26 +266,33 @@ export default function NumerologyPage() {
     { key: "checker",   label: "Number Checker" },
   ] as const;
 
+  if (!hasUserChart || !birth.name || !birth.dob) {
+    return (
+      <EngineEmptyState
+        engineName="Numerology"
+        engineIcon="🔢"
+        whatItAnalyzes={["Life Path & Destiny", "Soul Urge & Personality", "Pinnacles & Challenges", "Personal Year forecast"]}
+      />
+    );
+  }
+
   return (
-    <main
-      className="min-h-screen text-white"
-      style={{
-        padding: "32px 24px 110px",
-        background:
-          "radial-gradient(circle at top left, rgba(200,160,48,0.10), transparent 35%), radial-gradient(circle at bottom right, rgba(99,102,241,0.08), transparent 30%), #05020f",
-      }}
-    >
+    <EngineShell>
+      <EngineHeader
+        eyebrow="Numerology Engine"
+        title="AstroLife Numerology Intelligence"
+        subtitle={`Life Path, Destiny, name vibration, personal year and practical number guidance for ${birth.name}.`}
+        icon="🔢"
+        metrics={[
+          { label: "Life Path", value: lifePath.value, tone: "gold" },
+          { label: "Destiny", value: destiny.value, tone: "violet" },
+          { label: "Personal Year", value: personalYear.value, tone: "blue" },
+          { label: "Personal Day", value: personalDay, tone: "green" },
+        ]}
+      />
       <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%" }} className="flex flex-col gap-6">
 
-        {/* Header */}
-        <section>
-          <p className="text-xs uppercase tracking-[0.2em] text-amber-300">Pythagorean Numerology</p>
-          <h1 className="text-3xl font-bold mt-1" style={{ fontFamily: "Cormorant Garamond, serif" }}>Your Numbers, <em>Decoded</em></h1>
-          <p className="text-white/50 text-sm mt-1">Pythagorean system · 7 core + Pinnacles + Challenges · Master numbers · Karmic debt · {currentYear} forecast</p>
-        </section>
-
-        {/* Profile summary bar */}
-        <section className="rounded-2xl p-5" style={{ background: "rgba(200,160,48,0.07)", border: "1px solid rgba(200,160,48,0.25)" }}>
+        <section className="card" style={{ display: "block" }}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <p className="text-white/40 text-xs uppercase tracking-widest mb-1">Numerology Profile</p>
@@ -352,18 +362,13 @@ export default function NumerologyPage() {
           </section>
         )}
 
-        {/* Tabs */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="tabs">
           {tabs.map(tab => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setActiveTab(tab.key)}
-              className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
-              style={{
-                background: activeTab === tab.key ? "rgba(200,160,48,0.20)" : "rgba(255,255,255,0.05)",
-                border: `1px solid ${activeTab === tab.key ? "rgba(200,160,48,0.55)" : "rgba(255,255,255,0.10)"}`,
-                color: activeTab === tab.key ? "#fbbf24" : "rgba(255,255,255,0.45)",
-              }}
+              className={`tab ${activeTab === tab.key ? "active" : ""}`}
             >
               {tab.label}
             </button>
@@ -689,6 +694,6 @@ export default function NumerologyPage() {
 
       </div>
       <MobileBottomNav />
-    </main>
+    </EngineShell>
   );
 }

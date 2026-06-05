@@ -16,15 +16,15 @@ const PLANET_EMOJI: Record<string, string> = {
 type Tab = "overview" | "planets" | "combos" | "nakshatra" | "signs";
 
 export default function MedicalPage() {
-  const { chart, loading } = useUserChart();
-  const result = useMemo(() => (chart ? calculateMedical(chart) : null), [chart]);
+  const { chart, loading, hasUserChart } = useUserChart();
+  const result = useMemo(() => (chart && hasUserChart ? calculateMedical(chart) : null), [chart, hasUserChart]);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [expanded, setExpanded] = useState<string | null>(null);
 
   if (loading || !result) {
     return (
       <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
-        <EngineStateCard title="🏥 Medical Astrology" loading={loading} loadingText="Analyzing health patterns..." emptyText="Complete onboarding to view analysis." />
+        <EngineStateCard title="Health & Vitality" loading={loading} loadingText="Analyzing vitality patterns..." emptyText="Complete onboarding to view analysis." />
         <MobileBottomNav />
       </main>
     );
@@ -57,8 +57,8 @@ export default function MedicalPage() {
 
         {/* Header */}
         <div style={{ marginBottom: "20px" }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "34px", fontWeight: 700 }}>🏥 Medical Astrology</div>
-          <div style={{ fontSize: "13px", color: "#8880a8", marginTop: "4px" }}>Dr. S. Krishna Kumar Method · {result.planetCards.length} planets analyzed · Natal chart</div>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "34px", fontWeight: 700 }}>Health & Vitality</div>
+          <div style={{ fontSize: "13px", color: "#8880a8", marginTop: "4px" }}>Wellness awareness · {result.planetCards.length} planets analyzed · Natal chart</div>
         </div>
 
         {(() => {
@@ -68,7 +68,7 @@ export default function MedicalPage() {
 
         {/* Disclaimer banner */}
         <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "10px", padding: "12px 16px", marginBottom: "18px", fontSize: "12px", lineHeight: "1.6" }}>
-          <span style={{ color: "#fca5a5", fontWeight: 700 }}>⚕️ Medical Disclaimer:</span>
+          <span style={{ color: "#fca5a5", fontWeight: 700 }}>Wellness Disclaimer:</span>
           <span style={{ color: "#b8b0d8", marginLeft: "8px" }}>This is a pattern-detection awareness tool based on classical Vedic texts. It does <strong style={{ color: "#f0e8d0" }}>NOT</strong> constitute medical diagnosis, treatment, or advice. Always consult a qualified registered medical doctor for any health concerns.</span>
         </div>
 

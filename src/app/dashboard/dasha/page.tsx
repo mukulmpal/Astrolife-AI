@@ -140,14 +140,14 @@ function AntarRow({ period, tp }: { period: DashaPeriod; tp: (n: string) => stri
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DashaPage() {
-  const { chart, loading } = useUserChart();
+  const { chart, loading, hasUserChart } = useUserChart();
   const { t, tp } = useLanguage();
   const [selectedMD, setSelectedMD] = useState<DashaLord | null>(null);
 
   const dashaTree = useMemo(() => {
-    if (!chart) return null;
+    if (!chart || !hasUserChart) return null;
     return buildDashaTreeFromChart(chart);
-  }, [chart]);
+  }, [chart, hasUserChart]);
 
   const panchang = useMemo(() => calculatePanchang(new Date(), typeof chart?.tz === "number" ? chart.tz : 5.5), [chart]);
 

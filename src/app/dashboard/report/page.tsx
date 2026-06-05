@@ -1,14 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type ReportCover } from "@/lib/report-html-generator";
-import { generateVoiceScript, speakVoiceReport, stopVoiceReport } from "@/lib/voice-report";
 import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-import { PremiumFeature } from "@/components/premium-feature";
 import { AstroLoadingScreen } from "@/components/AstroLoadingScreen";
+import { createClient } from "@/lib/supabase/client";
+import { isBillingEnforced, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
 
 const PALETTE_OPTIONS: { value: ReportPalette; label: string; bg: string; gold: string }[] = [
   { value: "midnight", label: "Midnight",  bg: "#0A0E1F", gold: "#C9A961" },
@@ -25,6 +25,25 @@ const COVER_OPTIONS: { value: ReportCover; label: string; desc: string }[] = [
 
 // Engines per report type
 const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; engines: string[] }[]> = {
+  basic: [
+    { group: "Free Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
+    { group: "Starter Intelligence", color: "#34d399", engines: ["Basic Yogas", "Chart Summary", "Engine Ledger"] },
+  ],
+  premium: [
+    { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
+    { group: "Per-Planet (9)", color: "#a78bfa", engines: ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] },
+    { group: "Per-House (12)", color: "#60a5fa", engines: ["Bhava 1–4","Bhava 5–8","Bhava 9–12"] },
+    { group: "Strength & Charts", color: "#34d399", engines: ["Shadbala","Ashtakavarga","Divisional Charts","Yogas","Doshas"] },
+    { group: "Timing", color: "#f97316", engines: ["Current Dasha","Upcoming Dashas","Antardasha","Destiny Timeline","Transit Ripple","Transit Radar"] },
+    { group: "Systems", color: "#f472b6", engines: ["Jaimini","KP System","Lal Kitab","Special Lagnas"] },
+    { group: "Life Areas", color: "#facc15", engines: ["Career","Wealth","Relationship","Family","Travel","Spirituality","Education"] },
+    { group: "Synthesis", color: "#fb923c", engines: ["Vastu","Astro Sound","Gemstone","Remedies","Closing Reading"] },
+  ],
+  elite: [
+    { group: "Everything in Premium", color: "#C9A961", engines: ["Full Kundli Intelligence", "All Timing Engines", "All Remedy Engines"] },
+    { group: "Elite Intelligence", color: "#c084fc", engines: ["Palmistry Fusion", "Family Karma", "Relationship Intel", "Marriage Intelligence"] },
+    { group: "Luxury Export", color: "#60a5fa", engines: ["Advanced PDF Layout", "Unlimited History", "Personal Synthesis", "Priority Report Quality"] },
+  ],
   full: [
     { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
     { group: "Per-Planet (9)", color: "#a78bfa", engines: ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] },
@@ -33,7 +52,7 @@ const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; 
     { group: "Timing", color: "#f97316", engines: ["Current Dasha","Upcoming Dashas","Antardasha","Destiny Timeline","Transit Ripple","Transit Radar"] },
     { group: "Systems", color: "#f472b6", engines: ["Jaimini","KP System","Lal Kitab","Special Lagnas"] },
     { group: "Life Areas (8)", color: "#facc15", engines: ["Career","Wealth","Health","Relationship","Family","Travel","Spirituality","Education"] },
-    { group: "Intelligence", color: "#c084fc", engines: ["Marriage Intelligence","Relationship Intel","Psychology","Medical Astrology","Astro Sound","Gemstone"] },
+    { group: "Intelligence", color: "#c084fc", engines: ["Marriage Intelligence","Relationship Intel","Psychology","Astro Sound","Gemstone"] },
     { group: "Environment", color: "#4ade80", engines: ["Vastu Zones","Sarvatobhadra","Numerology"] },
     { group: "Synthesis", color: "#fb923c", engines: ["Remedies","Closing Reading","Engine Ledger"] },
   ],
@@ -69,6 +88,9 @@ const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; 
 };
 
 const PAGE_COUNT: Record<ReportOptions["type"], string> = {
+  basic:   "12+ pages",
+  premium: "65+ pages",
+  elite:   "90+ pages",
   full:    "65+ pages",
   kundli:  "45+ pages",
   remedy:  "28+ pages",
@@ -77,6 +99,9 @@ const PAGE_COUNT: Record<ReportOptions["type"], string> = {
 };
 
 const ENGINE_COUNT: Record<ReportOptions["type"], number> = {
+  basic:   5,
+  premium: 28,
+  elite:   35,
   full:    28,
   kundli:  18,
   remedy:  10,
@@ -108,7 +133,6 @@ const LOADING_STEPS = [
   "Composing per-planet deep dives...",
   "Writing per-house Bhava readings...",
   "Rendering Life Area pages...",
-  "Building Medical Astrology section...",
   "Running Psychology & Shadow Pattern...",
   "Assembling Remedy Engine output...",
   "Typesetting cover & chart wheel...",
@@ -116,15 +140,68 @@ const LOADING_STEPS = [
   "Almost ready — packaging download...",
 ];
 
+const REPORT_PLANS: Array<{
+  type: "basic" | "premium" | "elite";
+  tier: SubscriptionTier;
+  label: string;
+  desc: string;
+}> = [
+  { type: "basic", tier: "free", label: "Free Basic PDF", desc: "Starter Kundli snapshot with basic chart intelligence." },
+  { type: "premium", tier: "premium", label: "Premium Full PDF", desc: "Complete astrology intelligence report for serious users." },
+  { type: "elite", tier: "elite", label: "Elite Intelligence PDF", desc: "Luxury dossier with fusion, family and advanced synthesis positioning." },
+];
+
+const TIER_RANK: Record<SubscriptionTier, number> = { free: 0, premium: 1, elite: 2 };
+
 
 export default function ReportPage() {
-  const { chart, loading } = useUserChart();
-  const [reportType, setReportType]   = useState<ReportOptions["type"]>("full");
+  const { chart, loading, hasUserChart } = useUserChart();
+  const fullAccess = isFullAccessEnabled();
+  const enforced = isBillingEnforced();
+  const [supabase] = useState(() => createClient());
+  const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>(() => fullAccess ? "elite" : "free");
+  const [reportType, setReportType]   = useState<ReportOptions["type"]>("basic");
   const [palette, setPalette]         = useState<ReportPalette>("midnight");
   const [cover, setCover]             = useState<ReportCover>("wheel");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSpeaking, setIsSpeaking]   = useState(false);
   const [copied, setCopied]           = useState(false);
+  const [latestPalmSessionId, setLatestPalmSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (fullAccess) return;
+
+    const loadTier = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) return;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      setSubscriptionTier(normalizeTier(profile?.subscription_tier));
+    };
+
+    loadTier();
+  }, [fullAccess, supabase]);
+
+  useEffect(() => {
+    const loadLatestPalmSession = async () => {
+      const { data } = await supabase.auth.getUser();
+      const userId = data.user?.id;
+      if (!userId) {
+        setLatestPalmSessionId(null);
+        return;
+      }
+
+      const response = await fetch(`/api/palmistry/history?userId=${encodeURIComponent(userId)}&limit=1`);
+      const json = await response.json().catch(() => null) as { ok?: boolean; sessions?: Array<{ id?: string }> } | null;
+      setLatestPalmSessionId(json?.ok && json.sessions?.[0]?.id ? json.sessions[0].id : null);
+    };
+
+    loadLatestPalmSession().catch(() => setLatestPalmSessionId(null));
+  }, [supabase]);
 
   if (loading || !chart) {
     return (
@@ -137,28 +214,41 @@ export default function ReportPage() {
     );
   }
 
+  if (!hasUserChart) {
+    return (
+      <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
+        <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center", paddingTop: "60px" }}>
+          <div style={{ fontSize: 56, opacity: 0.3, marginBottom: 16 }}>📄</div>
+          <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "Cormorant Garamond,serif", marginBottom: 10 }}>Your chart is needed</div>
+          <p style={{ color: "#a79fbd", fontSize: 14, marginBottom: 24 }}>Generate your kundli first to build a full integrated report.</p>
+          <a href="/dashboard" style={{ background: "#c8a030", color: "#060410", padding: "12px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>Generate My Kundli</a>
+        </div>
+        <MobileBottomNav />
+      </main>
+    );
+  }
+
   const handleDownloadPDF = async () => {
+    const plan = REPORT_PLANS.find((item) => item.type === reportType);
+    const locked = Boolean(plan && enforced && TIER_RANK[subscriptionTier] < TIER_RANK[plan.tier]);
+    if (locked) {
+      alert(`${plan?.label ?? "This report"} requires ${plan?.tier.toUpperCase()} access.`);
+      return;
+    }
+
     setIsGenerating(true);
     try {
-      await downloadReportAsPDF(chart, { type: reportType, palette, cover });
+      await downloadReportAsPDF(chart, {
+        type: reportType,
+        palette,
+        cover,
+        palmistrySessionId: reportType === "elite" ? latestPalmSessionId ?? undefined : undefined,
+      });
     } catch (error) {
       console.error("PDF generation error:", error);
       alert("Error generating PDF. Please try again.");
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const handleVoiceReport = async () => {
-    if (isSpeaking) { stopVoiceReport(); setIsSpeaking(false); return; }
-    setIsSpeaking(true);
-    try {
-      const script = generateVoiceScript(chart, { type: reportType });
-      await speakVoiceReport(script, { type: reportType });
-      setIsSpeaking(false);
-    } catch {
-      alert("Voice synthesis not supported");
-      setIsSpeaking(false);
     }
   };
 
@@ -174,6 +264,8 @@ export default function ReportPage() {
   const engines = ENGINE_MAP[reportType];
   const totalEngines = ENGINE_COUNT[reportType];
   const pageCount = PAGE_COUNT[reportType];
+  const selectedPlan = REPORT_PLANS.find((item) => item.type === reportType) ?? REPORT_PLANS[0];
+  const selectedLocked = enforced && TIER_RANK[subscriptionTier] < TIER_RANK[selectedPlan.tier];
 
   return (
     <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0", position: "relative" }}>
@@ -220,7 +312,6 @@ export default function ReportPage() {
         statusIntervalMs={2200}
       />
 
-      <PremiumFeature feature="Premium PDF Reports">
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
         {/* Hero */}
         <div style={{ marginBottom: "28px" }}>
@@ -244,14 +335,23 @@ export default function ReportPage() {
 
         {/* Report Type */}
         <div className="rep-section">
-          <div className="rep-title">Report Type</div>
+          <div className="rep-title">Report Tier</div>
           <div className="rep-tabs">
-            {(["full","kundli","remedy","medical","destiny"] as const).map((type) => (
-              <button key={type} className={`rep-tab ${reportType === type ? "active" : ""}`} onClick={() => setReportType(type)}>
-                {type === "full" ? "📊 Full Report" : type === "kundli" ? "🔯 Kundli" : type === "remedy" ? "💊 Remedy" : type === "destiny" ? "📈 Destiny" : "🏥 Medical"}
-                <span style={{ marginLeft: "6px", fontSize: "10px", opacity: 0.7 }}>({PAGE_COUNT[type]})</span>
+            {REPORT_PLANS.map((plan) => {
+              const locked = enforced && TIER_RANK[subscriptionTier] < TIER_RANK[plan.tier];
+              return (
+              <button key={plan.type} className={`rep-tab ${reportType === plan.type ? "active" : ""}`} onClick={() => setReportType(plan.type)}>
+                {locked ? "🔒 " : ""}{plan.label}
+                <span style={{ marginLeft: "6px", fontSize: "10px", opacity: 0.7 }}>({PAGE_COUNT[plan.type]})</span>
+                <div style={{ marginTop: 5, fontSize: 11, color: reportType === plan.type ? "#d8c47a" : "#605890", maxWidth: 190, lineHeight: 1.4 }}>
+                  {plan.desc}
+                </div>
               </button>
-            ))}
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 12, fontSize: 12, color: selectedLocked ? "#fca5a5" : "#86efac" }}>
+            Current access: {subscriptionTier.toUpperCase()} · {selectedLocked ? `${selectedPlan.label} is locked` : `${selectedPlan.label} is available`}
           </div>
         </div>
 
@@ -324,21 +424,19 @@ export default function ReportPage() {
           <div style={{ fontSize: "12px", color: "#605890", marginBottom: "24px" }}>
             {totalEngines} engines · {pageCount} · {palette} palette · {COVER_OPTIONS.find(c => c.value === cover)?.label}
           </div>
+          {reportType === "elite" && (
+            <div style={{ fontSize: "12px", color: latestPalmSessionId ? "#86efac" : "#facc15", marginBottom: "16px" }}>
+              {latestPalmSessionId
+                ? "Latest saved palm scan will be fused inside the Elite PDF."
+                : "No saved palm scan found. Elite PDF will show a palm-fusion missing-context page."}
+            </div>
+          )}
           <button className="rep-btn primary" onClick={handleDownloadPDF} disabled={isGenerating}>
-            {isGenerating ? "⏳ Generating…" : `📥 Download ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report PDF`}
+            {isGenerating ? "⏳ Generating…" : selectedLocked ? `🔒 Upgrade for ${selectedPlan.label}` : `📥 Download ${selectedPlan.label}`}
           </button>
           <div style={{ fontSize: "11px", color: "#453f70", marginTop: "10px" }}>
             Server-rendered via Puppeteer · downloads automatically · all {totalEngines} engines run fresh for your chart
           </div>
-        </div>
-
-        {/* Voice Report */}
-        <div className="rep-section">
-          <div className="rep-title">🎵 Voice Report</div>
-          <div style={{ fontSize: "13px", color: "#b8b0d8", marginBottom: "14px" }}>Listen to your analysis read aloud via browser speech synthesis</div>
-          <button className="rep-btn" onClick={handleVoiceReport} style={{ background: isSpeaking ? "#ef4444" : undefined, borderColor: isSpeaking ? "#ef4444" : undefined }}>
-            {isSpeaking ? "⏹️ Stop Speaking" : "🎧 Play Voice Report"}
-          </button>
         </div>
 
         {/* Share */}
@@ -363,7 +461,6 @@ export default function ReportPage() {
         </div>
 
       </div>
-      </PremiumFeature>
       <MobileBottomNav />
     </main>
   );

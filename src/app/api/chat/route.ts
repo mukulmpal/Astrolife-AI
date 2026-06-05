@@ -3,6 +3,17 @@ import { getServerAiUsageState, incrementServerAiUsage } from "@/lib/server-usag
 import { monitor } from "@/lib/server-monitoring";
 import { buildUnifiedAstroLifeChatPrompt } from "@/lib/ai-chat/astrolife-unified-context";
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import {
+  fail,
+  isRecord,
+  ok,
+  optionalText,
+  readJsonWithLimit,
+  sanitizeText,
+  validationErrorResponse,
+  type ValidationResult,
+} from "@/lib/validation/api";
 
 const AGENTS: Record<string, { name: string; emoji: string; system: string }> = {
   general: {
@@ -47,11 +58,22 @@ const AGENTS: Record<string, { name: string; emoji: string; system: string }> = 
   },
 };
 
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 18_000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function callGemini(system: string, messages: { role: string; content: string }[]): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("Missing GEMINI_API_KEY");
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -68,7 +90,7 @@ async function callGemini(system: string, messages: { role: string; content: str
 async function callGroq(system: string, messages: { role: string; content: string }[]): Promise<string> {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error("Missing GROQ_API_KEY");
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  const res = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
@@ -77,7 +99,7 @@ async function callGroq(system: string, messages: { role: string; content: strin
       max_tokens: 1024,
       temperature: 0.8,
     }),
-  });
+  }, 12_000);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || "Groq error");
   return data.choices?.[0]?.message?.content || "";
@@ -94,9 +116,67 @@ async function saveChatMessages(userId: string | null, sessionId: string, agentI
   } catch (e) { console.error("chat save exception:", e); }
 }
 
+type ChatMessage = { role: "user" | "assistant"; content: string };
+type ChatRequestBody = {
+  messages: ChatMessage[];
+  agentId: string;
+  chartContext?: string;
+  transitContext?: string;
+  dailyFeedContext?: string;
+  vargaContext?: string;
+  palmSessionId?: string;
+  userId?: string;
+};
+
+function validateChatBody(value: unknown): ValidationResult<ChatRequestBody> {
+  if (!isRecord(value)) return fail("Chat payload must be an object.");
+  const issues: string[] = [];
+  const rawMessages = value.messages;
+
+  if (!Array.isArray(rawMessages) || rawMessages.length < 1 || rawMessages.length > 20) {
+    issues.push("messages must contain 1-20 items.");
+  }
+
+  const messages: ChatMessage[] = [];
+  if (Array.isArray(rawMessages)) {
+    for (const item of rawMessages.slice(0, 20)) {
+      if (!isRecord(item)) {
+        issues.push("Each message must be an object.");
+        continue;
+      }
+      const role = item.role;
+      const content = sanitizeText(item.content, 4_000);
+      if (role !== "user" && role !== "assistant") issues.push("Message role must be user or assistant.");
+      if (!content) issues.push("Message content is required and must be under 4000 characters.");
+      if ((role === "user" || role === "assistant") && content) messages.push({ role, content });
+    }
+  }
+
+  const agentId = typeof value.agentId === "string" && AGENTS[value.agentId] ? value.agentId : "general";
+  const body: ChatRequestBody = {
+    messages,
+    agentId,
+    chartContext: optionalText(value.chartContext, 20_000),
+    transitContext: optionalText(value.transitContext, 12_000),
+    dailyFeedContext: optionalText(value.dailyFeedContext, 12_000),
+    vargaContext: optionalText(value.vargaContext, 20_000),
+    palmSessionId: optionalText(value.palmSessionId, 120),
+    userId: optionalText(value.userId, 120),
+  };
+
+  if (issues.length) return fail("Invalid chat payload.", issues.slice(0, 8));
+  return ok(body);
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const limit = checkRateLimit(req, { scope: "api-chat", limit: 30, windowMs: 60_000 });
+    if (!limit.allowed) return rateLimitResponse(limit.resetAt);
+
+    const parsed = await readJsonWithLimit(req, validateChatBody, { maxBytes: 90_000, routeName: "api-chat" });
+    if (!parsed.ok) return validationErrorResponse(parsed);
+
+    const body = parsed.data;
     const { messages, agentId = "general", chartContext, transitContext, dailyFeedContext, vargaContext } = body;
     const agent = AGENTS[agentId] || AGENTS.general;
     const usageState = await getServerAiUsageState();
@@ -164,7 +244,7 @@ export async function POST(req: NextRequest) {
     ].filter(Boolean);
 
     // Save to DB — always, even for anonymous users
-    const lastUserMsg = [...(messages as { role: string; content: string }[])].reverse().find((m) => m.role === "user");
+    const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
     if (lastUserMsg?.content) {
       const sid = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       await saveChatMessages(null, sid, agentId, lastUserMsg.content, text);

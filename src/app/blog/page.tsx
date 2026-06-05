@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'AstroLife Blog',
@@ -22,7 +23,7 @@ export default function BlogPage() {
             Coming Soon
           </h2>
           <p style={{ color: '#a79fbd' }}>
-            We're preparing articles on dasha timing, yogas, compatibility, remedies, and more.
+            We&apos;re preparing articles on dasha timing, yogas, compatibility, remedies, and more.
           </p>
           <p className="mt-4 text-sm" style={{ color: '#8880a8' }}>
             Check back soon for deep dives into Vedic astrology.
@@ -30,7 +31,7 @@ export default function BlogPage() {
         </div>
 
         <div className="mt-12">
-          <a
+          <Link
             href="/"
             className="inline-block rounded-full px-8 py-3 text-sm font-semibold transition-transform hover:scale-105"
             style={{
@@ -39,7 +40,7 @@ export default function BlogPage() {
             }}
           >
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     </main>

@@ -390,10 +390,10 @@ export default function GemstonePage() {
 }
 
 function GemstonePageContent() {
-  const { chart, loading } = useUserChart();
+  const { chart, loading, hasUserChart } = useUserChart();
   const [activeTab, setActiveTab] = useState<TabKey>("analysis");
 
-  const input = useMemo(() => chartToMedicalInput(chart), [chart]);
+  const input = useMemo(() => (hasUserChart ? chartToMedicalInput(chart) : null), [chart, hasUserChart]);
   const report = useMemo(
     () => (input ? runGemstoneMedicalMasterEngineV2(input) : null),
     [input],

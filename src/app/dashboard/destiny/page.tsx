@@ -5,11 +5,12 @@ import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
+import { EngineEmptyState } from "@/components/engine/engine-intro";
 
 export default function DestinyPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeTab, setActiveTab] = useState<"curve"|"areas"|"dashas"|"now">("curve");
-  const { birth, chart } = useUserChart();
+  const { birth, chart, hasUserChart } = useUserChart();
   const { t } = useLanguage();
   const result = calculateDestiny(chart.planets as never, chart.dashas, birth.dob, chart.lagnaNum ?? 0);
 
@@ -89,6 +90,16 @@ export default function DestinyPage() {
       ctx.textAlign="center"; ctx.fillText("PEAK",pkX,pkY-10);
     }
   }, [result]);
+
+  if (!hasUserChart || !birth.name) {
+    return (
+      <EngineEmptyState
+        engineName="Destiny Timeline"
+        engineIcon="📈"
+        whatItAnalyzes={["Life-score curve", "Peak & challenge periods", "6 life-area scores", "Dasha-based timing"]}
+      />
+    );
+  }
 
   return (
     <div className="page">

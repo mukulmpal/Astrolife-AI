@@ -4,6 +4,8 @@ import path from "node:path";
 import { createRequestId, monitor } from "@/lib/server-monitoring";
 import { getServerFeatureAccess, premiumBlockedResponse } from "@/lib/server-feature-access";
 import { buildRichMeaning, PLANET_KNOWLEDGE, HOUSE_KNOWLEDGE } from "@/lib/astro-engine/transit-knowledge-base";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { fail, isFiniteNumber, isRecord, ok, readJsonWithLimit, sanitizeText, validationErrorResponse, type ValidationResult } from "@/lib/validation/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,7 +32,7 @@ const HOUSE_AREAS: Record<number, string> = {
   4: "Home, mother, property and emotional peace",
   5: "Education, children, creativity and intelligence",
   6: "Health routine, competition, debts and service",
-  7: "Marriage, partnership, clients and public dealings",
+  7: "Partnerships, clients, contracts and public dealings",
   8: "Transformation, hidden matters, research and vulnerability",
   9: "Luck, dharma, father, mentors and higher learning",
   10: "Career, karma, authority and public status",
@@ -45,7 +47,7 @@ const HOUSE_ACTIONS: Record<number, string[]> = {
   4: ["Protect emotional peace and property documents.", "Do not carry work stress into home life."],
   5: ["Choose disciplined study over speculation.", "Support children and creative work with structure."],
   6: ["Prioritize health routines and debt discipline.", "Handle competition with patience, not panic."],
-  7: ["Clarify expectations in marriage and partnerships.", "Keep client promises realistic and documented."],
+  7: ["Clarify expectations in partnerships and commitments.", "Keep client promises realistic and documented."],
   8: ["Avoid secrecy in shared money and sensitive decisions.", "Use research, therapy or sadhana constructively."],
   9: ["Respect mentors, law and dharma.", "Plan travel and education commitments carefully."],
   10: ["Show consistency in career and public duties.", "Avoid shortcuts with authority figures."],
@@ -108,6 +110,62 @@ type MonthlyTransitRippleRequest = {
   transitPoints: MonthlyTransitRipplePoint[];
   natalPoints?: MonthlyTransitNatalPoint[];
 };
+
+function isSign(value: unknown): value is string {
+  return typeof value === "string" && SIGNS.some((sign) => sign.toLowerCase() === value.toLowerCase());
+}
+
+function isDateString(value: unknown) {
+  return typeof value === "string" && Number.isFinite(new Date(value).getTime());
+}
+
+function validateTransitPoint(value: unknown): value is MonthlyTransitRipplePoint {
+  return isRecord(value) &&
+    Boolean(sanitizeText(value.date, 30)) &&
+    Boolean(sanitizeText(value.planet, 30)) &&
+    isSign(value.sign) &&
+    Boolean(sanitizeText(value.nakshatra, 80)) &&
+    isFiniteNumber(value.houseFromAscendant) &&
+    value.houseFromAscendant >= 1 &&
+    value.houseFromAscendant <= 12 &&
+    isFiniteNumber(value.houseFromMoon) &&
+    value.houseFromMoon >= 1 &&
+    value.houseFromMoon <= 12;
+}
+
+function validateTransitRippleBody(value: unknown): ValidationResult<TransitRippleRequest | MonthlyTransitRippleRequest> {
+  if (!isRecord(value)) return fail("Transit Ripple payload must be an object.");
+  const issues: string[] = [];
+
+  if (value.mode === "monthly") {
+    if (!isSign(value.ascendant)) issues.push("ascendant must be a valid zodiac sign.");
+    if (value.moonSign !== undefined && value.moonSign !== "" && !isSign(value.moonSign)) issues.push("moonSign must be a valid zodiac sign.");
+    if (!isDateString(value.startDate)) issues.push("startDate must be a valid date.");
+    if (!isDateString(value.endDate)) issues.push("endDate must be a valid date.");
+    if (!Array.isArray(value.transitPoints) || value.transitPoints.length < 1 || value.transitPoints.length > 400) {
+      issues.push("transitPoints must contain 1-400 points.");
+    } else if (!value.transitPoints.every(validateTransitPoint)) {
+      issues.push("transitPoints contain invalid planet/date/house fields.");
+    }
+    if (Array.isArray(value.natalPoints) && value.natalPoints.length > 80) issues.push("natalPoints cannot exceed 80 items.");
+    if (issues.length) return fail("Invalid monthly Transit Ripple payload.", issues);
+    return ok(value as MonthlyTransitRippleRequest);
+  }
+
+  if (!isSign(value.ascendant)) issues.push("ascendant must be a valid zodiac sign.");
+  if (!sanitizeText(value.transitPlanet, 30)) issues.push("transitPlanet is required.");
+  if (!isSign(value.transitSign)) issues.push("transitSign must be a valid zodiac sign.");
+  if (!sanitizeText(value.transitNakshatra, 80)) issues.push("transitNakshatra is required.");
+  if (value.moonSign !== undefined && value.moonSign !== "" && !isSign(value.moonSign)) issues.push("moonSign must be a valid zodiac sign.");
+  if (issues.length) return fail("Invalid Transit Ripple payload.", issues);
+  return ok(value as TransitRippleRequest);
+}
+
+function isMonthlyTransitRippleRequest(
+  value: TransitRippleRequest | MonthlyTransitRippleRequest,
+): value is MonthlyTransitRippleRequest {
+  return "mode" in value && value.mode === "monthly";
+}
 
 function toCamelCase(value: unknown): unknown {
   if (Array.isArray(value)) {
@@ -408,7 +466,7 @@ const EVENT_RULES: Record<string, string[]> = {
 
 const EVENT_LABELS: Record<string, string> = {
   career: "Career & Status",
-  relationship: "Relationship & Marriage",
+  relationship: "Relationship & Partnership",
   money: "Money & Gains",
   healthRoutine: "Health Routine",
   propertyHome: "Property & Home",
@@ -752,6 +810,9 @@ export async function POST(req: NextRequest) {
   const startedAt = Date.now();
 
   try {
+    const limit = checkRateLimit(req, { scope: "transit-ripple", limit: 24, windowMs: 60 * 60_000 });
+    if (!limit.allowed) return rateLimitResponse(limit.resetAt);
+
     const access = await getServerFeatureAccess("transit_ripple");
     if (!access.allowed) {
       monitor.warn("premium.blocked", {
@@ -767,20 +828,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
+    const parsedBody = await readJsonWithLimit(req, validateTransitRippleBody, { maxBytes: 650_000, routeName: "transit-ripple" });
+    if (!parsedBody.ok) return validationErrorResponse(parsedBody);
+    const body = parsedBody.data;
 
-    if (body.mode === "monthly") {
-      if (!body.ascendant || !body.startDate || !body.endDate || !Array.isArray(body.transitPoints)) {
-        return NextResponse.json(
-          {
-            success: false,
-            requestId,
-            error: "Missing required monthly fields: ascendant, startDate, endDate, transitPoints",
-          },
-          { status: 400 },
-        );
-      }
-
+    if (isMonthlyTransitRippleRequest(body)) {
       const report = buildMonthlyTransitRippleReport(body as MonthlyTransitRippleRequest);
       monitor.info("transit_ripple.monthly_generated", {
         requestId,

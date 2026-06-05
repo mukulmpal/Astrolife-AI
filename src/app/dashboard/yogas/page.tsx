@@ -10,18 +10,24 @@ import { engineIntros } from "@/data/engine-intros";
 
 const TIER: PlanTier = isFullAccessEnabled() ? "elite" : "free"; // replace with user's actual tier
 
+// Planet name abbreviations
+const PLANET_ABBR: Record<string, string> = {
+  'Sun': 'Su', 'Moon': 'Mo', 'Mars': 'Ma', 'Mercury': 'Me',
+  'Jupiter': 'Ju', 'Venus': 'Ve', 'Saturn': 'Sa', 'Rahu': 'Ra', 'Ketu': 'Ke'
+};
+
 export default function YogasPage() {
   const { birth, chart } = useUserChart();
-
-  // Early return: empty state if no chart
-  if (!birth.name) {
-    const intro = engineIntros['yogas'];
-    return <EngineEmptyState engineName={intro.title} whatItAnalyzes={intro.whatItAnalyzes} />;
-  }
-  const { t, tp } = useLanguage();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all"|"present"|"doshas">("present");
   const [activeCategory, setActiveCategory] = useState<YogaCategory|"All">("All");
   const [expandedYoga, setExpandedYoga] = useState<string|null>(null);
+
+  // Early return: empty state if no chart
+  if (!birth.name || !chart?.planets) {
+    const intro = engineIntros['yogas'];
+    return <EngineEmptyState engineName={intro.title} whatItAnalyzes={intro.whatItAnalyzes} />;
+  }
   let yogas: YogaResult[] = [];
   try {
     yogas = detectYogas(chart.planets as never, chart.lagnaNum, TIER);
@@ -300,7 +306,7 @@ export default function YogasPage() {
                     {/* PLANETS */}
                     {y.planets.length > 0 && (
                       <div className="planets-row">
-                        {y.planets.map(p => <span key={p} className="planet-pill">{tp(p)}</span>)}
+                        {y.planets.map(p => <span key={p} className="planet-pill">{PLANET_ABBR[p] || p}</span>)}
                       </div>
                     )}
 

@@ -3,12 +3,13 @@ import { useState, useCallback } from "react";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
-import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
+import { calculateChart, RASHIS, type ChartData } from "@/lib/astro-engine/calculations";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import {
   analyzeFamilySynastry, chartToFamilyMember,
   type FamilyMemberChart, type FamilyRole, type FamilyPatternResult, type KaalSarpResult,
 } from "@/lib/astro-engine/family-synastry";
+import NorthIndianChart from "@/components/north-indian-chart";
 import "@/app/dashboard/shared.css";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -69,55 +70,71 @@ function HarmonyRing({ score }: { score: number }) {
   );
 }
 
-function D1Grid({ chart, label, color }: { chart: ChartData; label: string; color: string }) {
-  // group planets by house
-  const byHouse: Record<number, string[]> = {};
-  for (let h = 1; h <= 12; h++) byHouse[h] = [];
-  PLANET_LIST.forEach(p => {
+function MemberD1Chart({ chart, label, color }: { chart: ChartData; label: string; color: string }) {
+  const planets: Record<string, { house: number; retrograde: boolean }> = {};
+  PLANET_LIST.forEach((p) => {
     const pd = chart.planets[p];
-    if (pd) byHouse[pd.house]?.push(p);
+    if (pd) planets[p] = { house: pd.house, retrograde: pd.retrograde };
+  });
+
+  const houseRows = Array.from({ length: 12 }, (_, idx) => {
+    const house = idx + 1;
+    const rashi = RASHIS[(chart.lagnaNum + idx) % 12] ?? "—";
+    const occupants = PLANET_LIST.filter((p) => chart.planets[p]?.house === house);
+    return { house, rashi, occupants };
   });
 
   return (
     <div style={{ background: "#0d0a22", border: `1px solid ${color}33`, borderRadius: 14, padding: "18px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
-        <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, fontWeight: 600, color: "#f0e8d0" }}>{label}</span>
-        <span style={{ fontSize: 11, color: "#605890" }}>Lagna: {chart.lagnaRashi}</span>
-      </div>
-      {/* 3×4 house grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
-        {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
-          <div key={h} style={{
-            background: "#08061a", border: `1px solid ${byHouse[h].length ? color + "44" : "#1c1840"}`,
-            borderRadius: 8, padding: "8px 10px", minHeight: 64,
-          }}>
-            <div style={{ fontSize: 9, color: "#3a3060", fontWeight: 600, marginBottom: 4 }}>H{h}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-              {byHouse[h].map(p => (
-                <span key={p} title={p} style={{
-                  fontSize: 11, color: PLANET_COL[p], fontWeight: 600,
-                  background: PLANET_COL[p] + "18", borderRadius: 4, padding: "1px 5px",
-                }}>
-                  {PLANET_SYM[p]}
-                </span>
-              ))}
-            </div>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: 1.6, textTransform: "uppercase", color, marginBottom: 4 }}>
+            D1 · Rasi Chart
           </div>
-        ))}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
+            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, color: "#f0e8d0" }}>{label}</span>
+          </div>
+        </div>
+        <div style={{ textAlign: "right", background: "rgba(200,160,48,0.06)", border: "1px solid rgba(200,160,48,0.14)", borderRadius: 10, padding: "8px 10px" }}>
+          <div style={{ fontSize: 9, color: "#605890", letterSpacing: 1.2, textTransform: "uppercase" }}>Lagna</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 700, color: "#c8a030", lineHeight: 1.15 }}>{chart.lagnaRashi}</div>
+        </div>
       </div>
-      {/* Planet legend */}
-      <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 6 }}>
-        {PLANET_LIST.map(p => {
-          const pd = chart.planets[p];
-          if (!pd) return null;
-          return (
-            <div key={p} style={{ fontSize: 11, color: PLANET_COL[p], background: PLANET_COL[p] + "14", border: `1px solid ${PLANET_COL[p]}33`, borderRadius: 20, padding: "2px 8px" }}>
-              {PLANET_SYM[p]} {p} · H{pd.house} · {pd.sign}
-              {pd.retrograde ? " (R)" : ""}{pd.dignity === "Debilitated" ? " (Deb)" : pd.dignity?.startsWith("Exalted") ? " (Exa)" : ""}
+
+      <div style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 12, padding: "12px 10px" }}>
+        <NorthIndianChart lagnaNum={chart.lagnaNum} planets={planets} size={300} />
+      </div>
+
+      <div style={{ marginTop: 12, background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px" }}>
+        <div style={{ fontSize: 10, letterSpacing: 1.4, textTransform: "uppercase", color: "#c8a030", marginBottom: 8 }}>
+          D1 House · Rashi · Planets
+        </div>
+        <div style={{ display: "grid", gap: 6 }}>
+          {houseRows.map((row) => (
+            <div
+              key={row.house}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "34px minmax(76px, 1fr) minmax(90px, 1.4fr)",
+                gap: 8,
+                alignItems: "center",
+                fontSize: 11,
+                color: "#c8c0a8",
+                padding: "6px 8px",
+                borderRadius: 8,
+                background: row.house === 1 ? "rgba(200,160,48,0.08)" : "rgba(255,255,255,0.025)",
+                border: row.house === 1 ? "1px solid rgba(200,160,48,0.18)" : "1px solid rgba(255,255,255,0.04)",
+              }}
+            >
+              <span style={{ color: row.house === 1 ? "#c8a030" : "#605890", fontWeight: 700 }}>H{row.house}</span>
+              <span>{row.rashi}</span>
+              <span style={{ color: row.occupants.length ? "#f0e8d0" : "#605890" }}>
+                {row.occupants.length ? row.occupants.map((p) => PLANET_SYM[p]).join(", ") : "—"}
+              </span>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -245,7 +262,7 @@ const MEMBER_COLORS = ["#c8a030", "#a855f7", "#22c55e", "#60a5fa", "#f97316"];
 // ── main page ─────────────────────────────────────────────────────────────────
 
 export default function FamilySynastryPage() {
-  const { chart: selfChart } = useUserChart();
+  const { chart: selfChart, hasUserChart } = useUserChart();
   const [memberForms, setMemberForms] = useState<MemberForm[]>([{ ...BLANK_FORM }]);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [activeTab, setActiveTab] = useState<"charts" | "overview" | "patterns" | "ksd">("charts");
@@ -320,6 +337,16 @@ export default function FamilySynastryPage() {
   };
 
   const ksdAffected = result?.analysis.kaalSarpAnalysis.filter(r => r.result.present) ?? [];
+
+  if (!hasUserChart || !selfChart.name) {
+    return (
+      <EngineEmptyState
+        engineName="Family Karma"
+        engineIcon="🤝"
+        whatItAnalyzes={["Family harmony score", "Ancestral karma patterns", "Kaal Sarp in family", "Relationship synastry"]}
+      />
+    );
+  }
 
   return (
     <>
@@ -501,7 +528,7 @@ export default function FamilySynastryPage() {
             {activeTab === "charts" && (
               <div style={{ display: "grid", gap: 20 }}>
                 {result.members.map(({ member, chart, color }) => (
-                  <D1Grid
+                  <MemberD1Chart
                     key={member.id}
                     chart={chart}
                     label={`${ROLE_ICONS[member.role as keyof typeof ROLE_ICONS]} ${member.name || member.role} — D1 Chart`}

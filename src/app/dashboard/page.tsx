@@ -1,8 +1,9 @@
 "use client";
+import { Suspense } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { calculateChart } from "@/lib/astro-engine/calculations";
+import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
@@ -10,7 +11,7 @@ import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculateTransitReport, type PlanetName } from "@/lib/astro-engine/transits";
 import { calculateDivisional, type DivChart, type DivPlanet } from "@/lib/astro-engine/divisional";
 import { checkSupabaseHealth, isSupabaseReady, type DbHealthItem } from "@/lib/db-health";
-import { useUserChart, saveChartToAccount } from "@/lib/user-chart";
+import { useUserChart, saveChartToAccount, saveCurrentChart } from "@/lib/user-chart";
 import { getAccountAiUsageStatus, getFreeMonthlyAiLimit } from "@/lib/usage";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
@@ -24,6 +25,62 @@ const CITIES = [
   "Indore","Nagpur","Surat","Varanasi","Amritsar","Dehradun",
   "Kochi","Patna","Agra","Mysuru","Coimbatore","Visakhapatnam","New Delhi",
 ];
+const EMPTY_CHART_FORM = {name:"",dob:"",tob:"",city:""};
+
+function getInitialChartForm() {
+  if (typeof window === "undefined") return EMPTY_CHART_FORM;
+  const searchParams = new URLSearchParams(window.location.search);
+  const name = searchParams.get('name');
+  const dob = searchParams.get('dob');
+  const tob = searchParams.get('tob');
+  const city = searchParams.get('city');
+
+  if (name && dob && tob && city) {
+    return {
+      name: decodeURIComponent(name),
+      dob,
+      tob,
+      city: decodeURIComponent(city),
+    };
+  }
+
+  return EMPTY_CHART_FORM;
+}
+
+/**
+ * Auto-calculate chart from homepage URL params — runs synchronously
+ * on the very first render (before useUserChart's effect fires), so the
+ * whole dashboard + every engine page immediately shows the user's real
+ * chart instead of the sample. No "Generate" click required.
+ * Returns the freshly built chart (or null if nothing to do).
+ */
+function autoCalculateFromUrl(): ChartData | null {
+  if (typeof window === "undefined") return null;
+
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get("name");
+  const dob = params.get("dob");
+  const tob = params.get("tob");
+  const city = params.get("city");
+
+  // No complete birth details in the URL → nothing to auto-generate.
+  if (!name || !dob || !tob || !city) return null;
+
+  try {
+    const chart = calculateChart(
+      decodeURIComponent(name),
+      dob,
+      tob,
+      decodeURIComponent(city),
+    );
+    // Persist to device so useUserChart picks it up on its mount-effect.
+    saveCurrentChart(chart);
+    return chart;
+  } catch (e) {
+    console.error("Auto chart calculation failed:", e);
+    return null;
+  }
+}
 
 function mod(n: number, m: number) {
   return ((n % m) + m) % m;
@@ -101,6 +158,42 @@ function normalizeChartForTransit(rawChartInput: unknown) {
   };
 }
 
+function planetLabelSlots(total: number) {
+  if (total <= 1) return [{ x: 0, y: 0, font: 12 }];
+  if (total === 2) return [{ x: -14, y: 0, font: 10.5 }, { x: 14, y: 0, font: 10.5 }];
+  if (total === 3) return [{ x: -20, y: 0, font: 10 }, { x: 0, y: 0, font: 10 }, { x: 20, y: 0, font: 10 }];
+  if (total === 4) {
+    return [
+      { x: -14, y: -7, font: 9.5 },
+      { x: 14, y: -7, font: 9.5 },
+      { x: -14, y: 8, font: 9.5 },
+      { x: 14, y: 8, font: 9.5 },
+    ];
+  }
+  if (total === 5) {
+    return [
+      { x: -13, y: -8, font: 9 },
+      { x: 13, y: -8, font: 9 },
+      { x: -21, y: 8, font: 9 },
+      { x: 0, y: 8, font: 9 },
+      { x: 21, y: 8, font: 9 },
+    ];
+  }
+
+  return Array.from({ length: total }, (_, idx) => {
+    const cols = 3;
+    const rows = Math.ceil(total / cols);
+    const row = Math.floor(idx / cols);
+    const col = idx % cols;
+    const rowCount = row === rows - 1 ? total - row * cols : cols;
+    return {
+      x: (col - (rowCount - 1) / 2) * 18,
+      y: (row - (rows - 1) / 2) * 12,
+      font: total > 7 ? 8 : 8.5,
+    };
+  });
+}
+
 function CompactNorthChart({ chart }: { chart: DivChart }) {
   const S = 300;
   const lagR = chart.lagnaNum;
@@ -146,13 +239,14 @@ function CompactNorthChart({ chart }: { chart: DivChart }) {
             {isLagna && <text x={lx} y={ly + 5} textAnchor="middle" dominantBaseline="middle" fontSize="6.5" fill="var(--app-gold)" fontWeight="700">Lagna</text>}
             {here.map((p, idx) => {
               const pIdx = CHART_PLANETS.indexOf(p.planet);
-              const ox = here.length > 1 ? (idx - (here.length - 1) / 2) * 13 : 0;
+              const slot = planetLabelSlots(here.length)[idx] ?? { x: 0, y: 0, font: 9 };
+              const baseY = ly + (isLagna ? 20 : 15);
               return (
                 <g key={`${houseNo}-${p.planet}-${idx}`}>
-                  <text x={lx + ox} y={ly + (isLagna ? 18 : 14)} textAnchor="middle" dominantBaseline="middle" fontSize="12.5" fill={pIdx >= 0 ? p.color : "#aaa"}>
+                  <text x={lx + slot.x} y={baseY + slot.y} textAnchor="middle" dominantBaseline="middle" fontSize={slot.font} fontWeight="700" fill={pIdx >= 0 ? p.color : "#aaa"}>
                     {pIdx >= 0 ? CHART_EMOJI[pIdx] : p.planet.slice(0, 2)}
                   </text>
-                  {p.retrograde && <text x={lx + ox + 9} y={ly + (isLagna ? 13 : 9)} textAnchor="middle" fontSize="6.5" fill="#f97316" fontWeight="700">(R)</text>}
+                  {p.retrograde && <text x={lx + slot.x + 8} y={baseY + slot.y - 5} textAnchor="middle" fontSize="5.8" fill="#f97316" fontWeight="700">(R)</text>}
                 </g>
               );
             })}
@@ -163,7 +257,7 @@ function CompactNorthChart({ chart }: { chart: DivChart }) {
   );
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const [supabase] = useState(() => createClient());
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -171,11 +265,24 @@ export default function Dashboard() {
   const [dbHealth, setDbHealth] = useState<DbHealthItem[]>([]);
   const [time, setTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState("overview");
-  const [chartForm, setChartForm] = useState({name:"",dob:"",tob:"",city:""});
+  const [chartForm, setChartForm] = useState(getInitialChartForm);
   const [chartLoading, setChartLoading] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [showCities, setShowCities] = useState(false);
-  const { birth, chart } = useUserChart();
+  // Synchronously auto-build the chart from homepage URL params on first
+  // render — BEFORE useUserChart's mount-effect runs — so the dashboard and
+  // every engine immediately use the real chart, never the sample.
+  const [autoChart] = useState(autoCalculateFromUrl);
+  const { birth, chart, hasUserChart, loading: chartLoading2 } = useUserChart();
+
+  // No real chart yet and nothing being auto-built → send the user straight
+  // to the chart generator instead of showing any sample data.
+  useEffect(() => {
+    if (!chartLoading2 && !hasUserChart && !autoChart) {
+      const timer = window.setTimeout(() => setActiveTab("charts"), 0);
+      return () => window.clearTimeout(timer);
+    }
+  }, [chartLoading2, hasUserChart, autoChart]);
   const fallbackArea = { name: "Stability", score: 50, icon: "⚖️" };
   const fallbackDasha = { planet: "Moon", start: new Date(), end: new Date(), yrs: 10, active: true };
 
@@ -188,7 +295,7 @@ export default function Dashboard() {
     try {
       const newChart = calculateChart(chartForm.name,chartForm.dob,chartForm.tob,chartForm.city);
       await saveChartToAccount(newChart);
-      setChartForm({name:"",dob:"",tob:"",city:""});
+      setChartForm(EMPTY_CHART_FORM);
       setActiveTab("overview");
     } catch(e){ console.error(e); }
     setChartLoading(false);
@@ -218,6 +325,16 @@ export default function Dashboard() {
 
     loadDashboardState();
     checkSupabaseHealth().then(setDbHealth);
+
+    // If we auto-built a chart from URL params, persist it to the account
+    // (logged-in users) and strip the params so a refresh stays clean.
+    if (autoChart) {
+      saveChartToAccount(autoChart, { replacePrimary: true }).catch(() => {});
+      if (typeof window !== "undefined" && window.location.search) {
+        window.history.replaceState(null, "", "/dashboard");
+      }
+    }
+
     const interval = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(interval);
   }, [supabase]);
@@ -877,5 +994,21 @@ export default function Dashboard() {
         </main>
       </div>
     </>
+  );
+}
+
+function DashboardLoading() {
+  return (
+    <div style={{ minHeight: '100vh', background: '#060410', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: '#c8a030', fontSize: 18 }}>Loading your cosmic command center...</div>
+    </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardContent />
+    </Suspense>
   );
 }

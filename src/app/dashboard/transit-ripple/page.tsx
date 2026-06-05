@@ -1,12 +1,5 @@
-import { TransitRipplePanelV2 } from "@/components/transit/TransitRipplePanelV2";
-import { PremiumFeature } from "@/components/premium-feature";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default function DashboardTransitRipplePage() {
-  return (
-    <PremiumFeature feature="Transit Ripple">
-      <TransitRipplePanelV2 />
-    </PremiumFeature>
-  );
+export default function LegacyTransitRippleRedirect() {
+  redirect("/dashboard/transits/ripple");
 }

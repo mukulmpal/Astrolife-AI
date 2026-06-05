@@ -35,8 +35,8 @@ function LagnaCard({ item }: { item: SpecialLagnaItem }) {
 }
 
 export default function SpecialLagnasPage() {
-  const { chart, loading } = useUserChart();
-  const result = useMemo(() => (chart ? calculateSpecialLagnas(chart) : null), [chart]);
+  const { chart, loading, hasUserChart } = useUserChart();
+  const result = useMemo(() => (chart && hasUserChart ? calculateSpecialLagnas(chart) : null), [chart, hasUserChart]);
 
   if (loading || !result) {
     return (

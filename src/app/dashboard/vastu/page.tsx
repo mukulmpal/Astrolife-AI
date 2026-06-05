@@ -293,6 +293,85 @@ function priorityColor(p: string): { bg: string; text: string } {
   return { bg: "rgba(96,88,144,0.15)", text: "#8f86ad" };
 }
 
+type RoomPlacementResult = {
+  score: number;
+  status: "Excellent" | "Good" | "Needs Remedy" | "High Caution";
+  color: string;
+  verdict: string;
+  recommendation: string;
+};
+
+const roomDirectionRules: Record<string, {
+  ideal: Direction[];
+  good: Direction[];
+  avoid: Direction[];
+  remedy: string;
+}> = {
+  main_entrance: { ideal: ["N", "NE", "E"], good: ["NW"], avoid: ["SW", "S"], remedy: "Keep entrance clean, bright and obstruction-free; add warm lighting and avoid clutter." },
+  kitchen: { ideal: ["SE"], good: ["NW", "E"], avoid: ["NE", "SW", "CENTER"], remedy: "Use red/copper accents near the cooking zone and keep water/fire separation clear." },
+  master_bedroom: { ideal: ["SW"], good: ["S", "W"], avoid: ["NE", "CENTER"], remedy: "Use heavier furniture in South-West and keep sleeping head toward South or East." },
+  bedroom: { ideal: ["SW", "S", "W"], good: ["NW"], avoid: ["NE", "CENTER"], remedy: "Stabilize the room with calm colors, clean storage and minimal mirror exposure." },
+  toilet: { ideal: ["NW", "W"], good: ["S"], avoid: ["NE", "CENTER", "SW"], remedy: "Keep door closed, ventilation strong and use salt cleansing weekly." },
+  bathroom: { ideal: ["NW", "W"], good: ["E"], avoid: ["NE", "CENTER", "SW"], remedy: "Keep drainage clean, dry surfaces quickly and avoid water stagnation." },
+  pooja_room: { ideal: ["NE"], good: ["E", "N"], avoid: ["S", "SW", "CENTER"], remedy: "Keep the altar light, clean and elevated; avoid storage around sacred space." },
+  study_room: { ideal: ["NE", "E"], good: ["N"], avoid: ["SW", "CENTER"], remedy: "Face East/North while studying and keep books organized in the West/South wall." },
+  staircase: { ideal: ["S", "SW", "W"], good: ["NW"], avoid: ["NE", "CENTER"], remedy: "Keep staircase area heavy, clean and well-lit; avoid storage under sacred zones." },
+  underground_water: { ideal: ["NE", "N"], good: ["E"], avoid: ["SW", "S"], remedy: "If not movable, keep South-West heavier and North-East cleaner/lighter." },
+  overhead_tank: { ideal: ["SW", "W"], good: ["S"], avoid: ["NE", "CENTER"], remedy: "Balance with heavier South-West and avoid leakage or dampness." },
+  septic_tank: { ideal: ["NW", "W"], good: ["S"], avoid: ["NE", "CENTER", "SW"], remedy: "Maintain hygiene, ventilation and avoid symbolic activation of the affected zone." },
+  office_cabin: { ideal: ["SW", "W"], good: ["S"], avoid: ["NE", "CENTER"], remedy: "Sit facing North/East, keep back support solid and avoid clutter behind the chair." },
+  locker: { ideal: ["SW", "S"], good: ["W"], avoid: ["NE", "CENTER"], remedy: "Place locker so it opens toward North/East and keep financial papers organized." },
+};
+
+function scoreRoomPlacement(room: { type: string; name: string; direction: Direction }): RoomPlacementResult {
+  const label = roomTypeOptions.find(o => o.value === room.type)?.label || room.name;
+  const direction = directionOptions.find(o => o.value === room.direction)?.label || room.direction;
+  const rule = roomDirectionRules[room.type];
+  if (!rule) {
+    return {
+      score: 62,
+      status: "Good",
+      color: "#fbbf24",
+      verdict: `${label} in ${direction} is acceptable, but needs manual review.`,
+      recommendation: "Use the zone score and chart-linked recommendations for final correction.",
+    };
+  }
+  if (rule.ideal.includes(room.direction)) {
+    return {
+      score: 92,
+      status: "Excellent",
+      color: "#4ade80",
+      verdict: `${label} in ${direction} is excellent.`,
+      recommendation: "Preserve this placement and keep the zone clean, functional and uncluttered.",
+    };
+  }
+  if (rule.good.includes(room.direction)) {
+    return {
+      score: 76,
+      status: "Good",
+      color: "#c8a030",
+      verdict: `${label} in ${direction} is workable with supportive balancing.`,
+      recommendation: rule.remedy,
+    };
+  }
+  if (rule.avoid.includes(room.direction)) {
+    return {
+      score: 36,
+      status: "High Caution",
+      color: "#f87171",
+      verdict: `${label} in ${direction} needs remedy.`,
+      recommendation: rule.remedy,
+    };
+  }
+  return {
+    score: 58,
+    status: "Needs Remedy",
+    color: "#fb923c",
+    verdict: `${label} in ${direction} is mixed and should be balanced.`,
+    recommendation: rule.remedy,
+  };
+}
+
 /* ─── Complete Analysis Panel ─────────────────────────────────── */
 function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null }) {
   const [zoneTab, setZoneTab] = useState<"all" | "strong" | "weak" | "psych" | "transit" | "rooms">("all");
@@ -451,7 +530,7 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
 
 /* ─── Main Page ───────────────────────────────────────────────── */
 export default function VastuDashboardPage() {
-  const { chart, loading: chartLoading } = useUserChart();
+  const { chart, loading: chartLoading, hasUserChart } = useUserChart();
   const [kundli, setKundli] = useState<NormalizedKundli | null>(null);
   const [analysisMode, setAnalysisMode] = useState<"kundli" | "property">("kundli");
   const [chartLoadMessage, setChartLoadMessage] = useState("Chart not loaded yet.");
@@ -504,6 +583,15 @@ export default function VastuDashboardPage() {
         name: r.name || roomTypeOptions.find(o => o.value === r.type)?.label || r.type,
       }));
   }, [rooms]);
+  const roomPlacementScorecard = useMemo(() => {
+    return activeRooms.map(room => ({
+      ...room,
+      placement: scoreRoomPlacement(room),
+    }));
+  }, [activeRooms]);
+  const roomPlacementOverall = roomPlacementScorecard.length
+    ? Math.round(roomPlacementScorecard.reduce((sum, room) => sum + room.placement.score, 0) / roomPlacementScorecard.length)
+    : 0;
 
   function updateRoom(id: string, patch: Partial<RoomInput>) {
     setRooms(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
@@ -583,6 +671,16 @@ export default function VastuDashboardPage() {
     );
   }
 
+  if (!hasUserChart) {
+    return (
+      <EngineEmptyState
+        engineName="Vastu Shastra"
+        engineIcon="🏠"
+        whatItAnalyzes={["16-zone MahaVastu map", "Strong & weak zones", "Room placement", "Remedial directions"]}
+      />
+    );
+  }
+
   return (
     <EngineShell>
       <EngineHeader
@@ -595,7 +693,11 @@ export default function VastuDashboardPage() {
           { label: "Strong Zones", value: completeAnalysis.strongZones.length, tone: "green" },
           { label: "Weak Zones",   value: completeAnalysis.weakZones.length,   tone: "red"   },
           { label: "Transits",     value: completeAnalysis.transitAlerts.length },
-        ] : []}
+        ] : [
+          { label: "Mode", value: analysisMode === "kundli" ? "Kundli" : "Property", tone: "gold" },
+          { label: "Rooms", value: rooms.length, tone: "blue" },
+          { label: "Chart", value: chart ? "Linked" : "Needed", tone: chart ? "green" : "red" },
+        ]}
       />
 
         
@@ -821,6 +923,44 @@ export default function VastuDashboardPage() {
                   </button>
                 </div>
               ))}
+            </div>
+
+            <div style={{ marginTop: 18, borderRadius: 14, border: "1px solid rgba(20,184,166,0.2)", background: "rgba(20,184,166,0.045)", padding: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 12 }}>
+                <div>
+                  <div className="card-tag">Room Placement Intelligence</div>
+                  <div style={{ fontSize: 13, color: "#8f86ad", marginTop: 4 }}>
+                    Direction-by-direction placement score before final chart-linked analysis.
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 700, color: zoneScoreColor(roomPlacementOverall) }}>
+                    {roomPlacementScorecard.length ? roomPlacementOverall : "--"}
+                  </div>
+                  <div style={{ fontSize: 10, color: "#605890", textTransform: "uppercase", letterSpacing: 1 }}>Room Score</div>
+                </div>
+              </div>
+              {roomPlacementScorecard.length === 0 ? (
+                <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.7 }}>
+                  Select directions for rooms to see placement scoring.
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 10 }}>
+                  {roomPlacementScorecard.map((room) => (
+                    <div key={`${room.type}-${room.direction}-${room.name}`} style={{ borderRadius: 11, border: `1px solid ${room.placement.color}33`, background: "rgba(0,0,0,0.22)", padding: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", marginBottom: 6 }}>
+                        <div style={{ fontSize: 13, color: "#f0e8d0", fontWeight: 700 }}>{room.name}</div>
+                        <span className="badge" style={{ background: `${room.placement.color}18`, color: room.placement.color, border: `1px solid ${room.placement.color}44`, flexShrink: 0 }}>
+                          {room.placement.score}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: room.placement.color, fontWeight: 700, marginBottom: 5 }}>{room.placement.status}</div>
+                      <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.6 }}>{room.placement.verdict}</div>
+                      <div style={{ fontSize: 11, color: "#8f86ad", lineHeight: 1.55, marginTop: 6 }}>{room.placement.recommendation}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <button

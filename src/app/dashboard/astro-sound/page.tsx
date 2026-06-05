@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useMemo, useRef, useState } from "react";
+import { EngineShell, EngineHeader } from "@/components/engine/EngineShell";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
@@ -483,26 +484,19 @@ export default function AstroSoundPage() {
   }
 
   return (
-    <main className="as-shell">
-      <section className="as-hero">
-        <div>
-          <div className="as-kicker">AstroLife Experimental Engine</div>
-          <h1>Astro Sound</h1>
-          <p>
-            Personalized raga guidance based on your chart, goal, emotional state and listening
-            preference. Music guidance only — not medical treatment.
-          </p>
-          <div className="as-safe-note">
-            For serious mental health or medical concerns, consult a qualified professional.
-          </div>
-        </div>
-
-        <div className="as-orb">
-          <span>♫</span>
-          <strong>{result ? result.score : "AI"}</strong>
-          <em>{result ? result.status : "Sound Protocol"}</em>
-        </div>
-      </section>
+    <EngineShell className="as-shell">
+      <EngineHeader
+        eyebrow="Astro Sound Engine"
+        title="AstroLife Sound Intelligence"
+        subtitle="Personalized raga guidance from your chart, intention, emotional state and listening preference. Music guidance only, not medical treatment."
+        icon="♫"
+        metrics={[
+          { label: "Score", value: result ? result.score : "—", tone: "gold" },
+          { label: "Status", value: result ? result.status : "Ready", tone: "violet" },
+          { label: "Goal", value: GOAL_META[settings.goal].label, tone: "blue" },
+          { label: "Chart", value: chartData ? "Linked" : "Optional", tone: chartData ? "green" : "red" },
+        ]}
+      />
 
       <section className="as-grid">
         <aside className="as-panel">
@@ -1882,6 +1876,6 @@ export default function AstroSoundPage() {
           }
         }
       `}</style>
-    </main>
+    </EngineShell>
   );
 }

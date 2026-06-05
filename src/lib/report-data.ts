@@ -3037,7 +3037,6 @@ export function buildRealEngineReportSections(input: any): ReportSection[] {
     buildRealVastuEngineReportSection(chart),
     buildRealSarvatobhadraEngineReportSection(chart),
     ...buildGemstoneReportSection(chart),
-    buildRealMedicalEngineReportSection(chart),
     buildRealRemedyEngineReportSection(chart),
     ...buildKpReportSections(chart),
     buildRealTransitRippleReportSection(chart),    // Part 1 #1

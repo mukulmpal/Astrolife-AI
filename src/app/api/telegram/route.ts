@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     if (text === "/start") {
       await sendTelegramMessage(
         chatId,
-        "Namaste Mukul JI 🙏 Main Chitragupt AI hoon. AstroLife Telegram bot connected hai ✅"
+        "Namaste 🙏 Main Chitragupt AI hoon. AstroLife Telegram bot connected hai ✅"
       );
     } else if (text === "/help") {
       await sendTelegramMessage(
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     } else {
       await sendTelegramMessage(
         chatId,
-        `Mukul JI, maine aapka message receive kiya: ${text}`
+        `Namaste 🙏 maine aapka message receive kiya: ${text}`
       );
     }
 

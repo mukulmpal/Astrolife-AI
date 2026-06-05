@@ -23,6 +23,40 @@ interface Props {
   size?: number;
 }
 
+function planetSlots(total: number) {
+  if (total <= 1) return [{ x: 0, y: 0, font: 11 }];
+  if (total === 2) return [{ x: -14, y: 0, font: 10.5 }, { x: 14, y: 0, font: 10.5 }];
+  if (total === 3) return [{ x: -20, y: 0, font: 10 }, { x: 0, y: 0, font: 10 }, { x: 20, y: 0, font: 10 }];
+  if (total === 4) {
+    return [
+      { x: -14, y: -7, font: 9.5 },
+      { x: 14, y: -7, font: 9.5 },
+      { x: -14, y: 8, font: 9.5 },
+      { x: 14, y: 8, font: 9.5 },
+    ];
+  }
+  if (total === 5) {
+    return [
+      { x: -13, y: -8, font: 9 },
+      { x: 13, y: -8, font: 9 },
+      { x: -21, y: 8, font: 9 },
+      { x: 0, y: 8, font: 9 },
+      { x: 21, y: 8, font: 9 },
+    ];
+  }
+
+  return Array.from({ length: total }, (_, idx) => {
+    const cols = 3;
+    const rows = Math.ceil(total / cols);
+    const row = Math.floor(idx / cols);
+    const col = idx % cols;
+    const rowCount = row === rows - 1 ? total - row * cols : cols;
+    const x = (col - (rowCount - 1) / 2) * 19;
+    const y = (row - (rows - 1) / 2) * 13;
+    return { x, y, font: total > 7 ? 8 : 8.5 };
+  });
+}
+
 export default function NorthIndianChart({ lagnaNum, planets, size = 310 }: Props) {
   const S = size;
 
@@ -124,35 +158,17 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310 }: Prop
             {here.map((p, idx) => {
               const piIdx = PLS.indexOf(p.name);
               if (piIdx < 0) return null;
-
-              // Smart positioning for overlapping planets
-              let ox = 0;
-              let oy = 0;
-              let fontSize = 11;
-
-              if (total > 1) {
-                // Horizontal offset increases with more planets
-                const horizontalSpacing = total > 4 ? 16 : total > 2 ? 14 : 13;
-                ox = (idx - (total - 1) / 2) * horizontalSpacing;
-
-                // Vertical offset for houses with many planets (5+)
-                if (total > 4) {
-                  const rowIdx = Math.floor(idx / 3); // 3 planets per row
-                  oy = rowIdx * 13;
-                  fontSize = 10; // Reduce font size slightly
-                }
-              }
-
-              const py = ly + (isLagna ? 18 : 14) + oy;
+              const slot = planetSlots(total)[idx] ?? { x: 0, y: 0, font: 9 };
+              const py = ly + (isLagna ? 20 : 15) + slot.y;
 
               return (
                 <g key={p.name}>
                   <text
-                    x={lx + ox}
+                    x={lx + slot.x}
                     y={py}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fontSize={fontSize}
+                    fontSize={slot.font}
                     fontWeight="600"
                     fontFamily="sans-serif"
                     fill={PCOL[piIdx]}
@@ -161,10 +177,10 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310 }: Prop
                   </text>
                   {p.retro && (
                     <text
-                      x={lx + ox + 9}
+                      x={lx + slot.x + 8}
                       y={py - 5}
                       textAnchor="middle"
-                      fontSize="6.5"
+                      fontSize="5.8"
                       fill="#f97316"
                       fontWeight="700"
                       fontFamily="sans-serif"

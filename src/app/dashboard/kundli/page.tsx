@@ -46,7 +46,7 @@ export default function KundliPage() {
   const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("chart");
   const [showForm, setShowForm] = useState(true);
-  const { chart: primaryChart, loading: chartLoading } = useUserChart();
+  const { chart: primaryChart, loading: chartLoading, hasUserChart } = useUserChart();
 
   const applyChart = (data: ChartData) => {
     setChart(data);
@@ -74,14 +74,16 @@ export default function KundliPage() {
   }, []);
 
   useEffect(() => {
-    if (chartLoading || !primaryChart) return;
+    // Only auto-load when the user actually has a real chart — never the
+    // internal demo structure.
+    if (chartLoading || !hasUserChart || !primaryChart) return;
     if (!chart) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       applyChart(primaryChart);
       setSaveStatus("Primary chart loaded.");
       setShowForm(false);
     }
-  }, [primaryChart, chartLoading, chart]);
+  }, [primaryChart, chartLoading, hasUserChart, chart]);
 
   const handleSelectSavedChart = async (chartId: string) => {
     setLibraryLoading(true);

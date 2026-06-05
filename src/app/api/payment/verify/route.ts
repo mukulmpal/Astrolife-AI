@@ -4,24 +4,56 @@ import Razorpay from "razorpay";
 import { PAID_PLANS, isPaidPlan } from "@/lib/plans";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { fail, isRecord, ok, readJsonWithLimit, sanitizeText, validationErrorResponse, type ValidationResult } from "@/lib/validation/api";
 
 const razorpay = new Razorpay({
   key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
+type VerifyPaymentBody = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+  plan: keyof typeof PAID_PLANS;
+};
+
+function validateVerifyPaymentBody(value: unknown): ValidationResult<VerifyPaymentBody> {
+  if (!isRecord(value)) return fail("Payment verification payload must be an object.");
+  const razorpay_order_id = sanitizeText(value.razorpay_order_id, 120);
+  const razorpay_payment_id = sanitizeText(value.razorpay_payment_id, 120);
+  const razorpay_signature = sanitizeText(value.razorpay_signature, 256);
+  const issues: string[] = [];
+
+  if (!razorpay_order_id) issues.push("razorpay_order_id is required.");
+  if (!razorpay_payment_id) issues.push("razorpay_payment_id is required.");
+  if (!razorpay_signature || !/^[a-f0-9]{64}$/i.test(razorpay_signature)) issues.push("razorpay_signature must be a valid SHA-256 hex signature.");
+  if (!isPaidPlan(value.plan)) issues.push("Invalid plan.");
+
+  if (issues.length) return fail("Invalid payment payload.", issues);
+  return ok({
+    razorpay_order_id: razorpay_order_id!,
+    razorpay_payment_id: razorpay_payment_id!,
+    razorpay_signature: razorpay_signature!,
+    plan: value.plan as keyof typeof PAID_PLANS,
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const limit = checkRateLimit(req, { scope: "payment-verify", limit: 20, windowMs: 15 * 60_000 });
+    if (!limit.allowed) return rateLimitResponse(limit.resetAt);
+
+    const parsed = await readJsonWithLimit(req, validateVerifyPaymentBody, { maxBytes: 12_000, routeName: "payment-verify" });
+    if (!parsed.ok) return validationErrorResponse(parsed);
+
     const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
       plan,
-    } = await req.json();
-
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !isPaidPlan(plan)) {
-      return NextResponse.json({ error: "Invalid payment payload" }, { status: 400 });
-    }
+    } = parsed.data;
 
     const authClient = await createClient();
     const { data: { user } } = await authClient.auth.getUser();

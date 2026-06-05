@@ -211,15 +211,19 @@ export default function LalKitabPage() {
   const [domainTab, setDomainTab]     = useState<DomainTab>("nishani");
   const [lkYearOffset, setLkYearOffset] = useState(0);
   const [lkMonthIndex, setLkMonthIndex] = useState<number | null>(null);
-  const { birth, chart }              = useUserChart();
+  const { birth, chart, hasUserChart }              = useUserChart();
   const { t, tp, ts, lang } = useLanguage();
-  const result = calculateLalKitab(chart.planets as never, birth.dob, (chart as never as { lagnaNum?: number }).lagnaNum ?? 0);
+  // Safe DOB used purely for crash-proof computation when no chart exists yet.
+  // The real render is gated behind the hasUserChart guard below, so this
+  // placeholder is never shown to the user.
+  const safeDob = birth.dob || "2000-01-01";
+  const result = calculateLalKitab(chart.planets as never, safeDob, (chart as never as { lagnaNum?: number }).lagnaNum ?? 0);
   const lkTargetDate = useMemo(
-    () => buildLKTargetDate(birth.dob, lkYearOffset, lkMonthIndex),
-    [birth.dob, lkYearOffset, lkMonthIndex],
+    () => buildLKTargetDate(safeDob, lkYearOffset, lkMonthIndex),
+    [safeDob, lkYearOffset, lkMonthIndex],
   );
   const timeResult = calculateLalKitabTimeEngine({
-    dob: birth.dob,
+    dob: safeDob,
     planets: chart.planets,
     lagnaNum: (chart as never as { lagnaNum?: number }).lagnaNum ?? 0,
     targetDate: lkTargetDate,
@@ -234,7 +238,7 @@ export default function LalKitabPage() {
 
   const pakkaCount   = result.planets.filter(p => p.status === "pakka").length;
   const dushmanCount = result.planets.filter(p => p.status === "dushman").length;
-  const currentAge   = new Date().getFullYear() - new Date(birth.dob).getFullYear();
+  const currentAge   = new Date().getFullYear() - new Date(safeDob).getFullYear();
   const advancedResult = useMemo(() => {
     const natalPlanets = buildAdvancedPlacements(chart.planets);
     return analyzeAdvancedLalKitab({
@@ -252,6 +256,16 @@ export default function LalKitabPage() {
     st === "nek" ? "Nek Halat" : st === "mandi" ? "Mandi Halat" : "Madhyam";
   const stateColor = (st: string) =>
     st === "nek" ? "#22c55e" : st === "mandi" ? "#ef4444" : "#f59e0b";
+
+  if (!hasUserChart || !birth.dob) {
+    return (
+      <EngineEmptyState
+        engineName="Lal Kitab"
+        engineIcon="📕"
+        whatItAnalyzes={["Planet halat (status)", "Karmic debts (Rin)", "Pitra dosha", "Practical upay (remedies)"]}
+      />
+    );
+  }
 
   return (
     <>

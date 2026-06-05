@@ -53,7 +53,7 @@ function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
 export default function ShadbalaPage() {
   const [expanded, setExpanded] = useState<string|null>(null);
   const [activeTab, setActiveTab] = useState<"grid"|"table"|"summary">("grid");
-  const { birth, chart } = useUserChart();
+  const { birth, chart, hasUserChart } = useUserChart();
   const { t, tp, ts } = useLanguage();
   const result = calculateShadbala(chart.planets as never);
 
@@ -65,6 +65,16 @@ export default function ShadbalaPage() {
     { key:"naisargika",  label:"Naisarg",max:7  },
     { key:"drikBala",    label:"Drik",   max:8  },
   ];
+
+  if (!hasUserChart || !birth.name) {
+    return (
+      <EngineEmptyState
+        engineName="Shadbala"
+        engineIcon="⚖️"
+        whatItAnalyzes={["Sthana, Dig, Kala bala", "Cheshta & Naisargika bala", "Drik bala", "Planet strength ranking"]}
+      />
+    );
+  }
 
   return (
     <>
@@ -111,10 +121,9 @@ export default function ShadbalaPage() {
         {/* HEADER */}
         <div className="page-tag">{t("shadbala.page_tag")}</div>
         <h1 className="page-title serif">{t("shadbala.page_title")}</h1>
-        <p className="page-sub">6-factor Shadbala system · Sthana · Dig · Kala · Cheshta · Naisargika · Drik</p>
+        <p className="page-sub">Six classical strength measures — which planets can actually deliver results in your chart.</p>
         <PremiumFeature feature="Shadbala Analysis">
 
-        {/* HEADER CARD */}
         <div className="header-card">
           <div className="header-orb"/>
           <div style={{position:"relative",zIndex:1}}>
@@ -141,7 +150,39 @@ export default function ShadbalaPage() {
         </div>
 
         {/* SUMMARY */}
-        <div className="summary-strip">✦ {result.summary}</div>
+        <div className="summary-strip" style={{ lineHeight: 1.8 }}>
+          <div style={{ marginBottom: 8 }}>✦ {result.summary}</div>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#c8c0a8" }}>
+            <li>Strongest: {result.strongest} — reliable for initiatives aligned with that graha.</li>
+            <li>Weakest: {result.weakest} — expect friction until dasha or remedies support it.</li>
+            <li>Chart average {result.avgStrength}% — open planet cards for per-bala breakdown.</li>
+          </ul>
+        </div>
+
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card-tag">Plain-English Guidance</div>
+          <div className="card-title serif">Which Planets Can Deliver Results</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+            <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 11, color: "#22c55e", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Use More</div>
+              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+                {result.strongest} is the most reliable planet in this chart. Its significations can carry decisions with better consistency.
+              </p>
+            </div>
+            <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 11, color: "#ef4444", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Support First</div>
+              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+                {result.weakest} needs support. Do not rely on its themes blindly during weak dasha, harsh transit or rushed decisions.
+              </p>
+            </div>
+            <div style={{ background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 11, color: "#60a5fa", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>How To Use</div>
+              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+                Shadbala is a reliability score, not a prediction by itself. Combine it with dasha and transit before choosing timing.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* TABS */}
         <div className="tabs">

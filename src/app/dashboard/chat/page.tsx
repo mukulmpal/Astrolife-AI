@@ -210,10 +210,10 @@ export default function ChatPage() {
   const palmSessionId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("palmSessionId") : null;
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { chart } = useUserChart();
+  const { chart, hasUserChart } = useUserChart();
   const transitContext = useMemo(() => {
-    if (!chart) return "";
-  
+    if (!chart || !hasUserChart) return "";
+
     try {
       const transitChart = normalizeChartForTransit(chart);
   

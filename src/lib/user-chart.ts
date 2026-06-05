@@ -26,11 +26,22 @@ export interface SavedChartSummary {
 
 const CHART_STORAGE_KEY = "currentChart";
 
-const DEMO_BIRTH: BirthDetails = {
-  name: "Mukul Pal",
-  dob: "1995-07-04",
-  tob: "12:30",
+// Internal-only seed used purely to build a structurally-valid chart object so
+// engine pages never crash on a missing chart. It is NEVER shown to the user —
+// it carries no real person's name and `birth` always defaults to EMPTY_BIRTH,
+// so every page's empty-state guard fires until the user's real chart loads.
+const PLACEHOLDER_BIRTH: BirthDetails = {
+  name: "",
+  dob: "2000-01-01",
+  tob: "12:00",
   city: "Delhi",
+};
+
+const EMPTY_BIRTH: BirthDetails = {
+  name: "",
+  dob: "",
+  tob: "",
+  city: "",
 };
 
 function buildChart(birth: BirthDetails): ChartData {
@@ -122,6 +133,35 @@ function getChartRowBirth(row: Record<string, unknown> | null): BirthDetails | n
   };
 }
 
+function getLegacyChartRowBirth(row: Record<string, unknown> | null): BirthDetails | null {
+  if (!row) return null;
+  const name = typeof row.name === "string" ? row.name : "";
+  const dob = typeof row.dob === "string" ? row.dob : "";
+  const tob = typeof row.tob === "string" ? row.tob : "";
+  const city = typeof row.city === "string" ? row.city : "";
+  if (!name || !dob || !tob || !city) return null;
+
+  const latitude = row.latitude ?? row.lat;
+  const longitude = row.longitude ?? row.lon;
+
+  return {
+    name,
+    dob,
+    tob,
+    city,
+    lat: typeof latitude === "number" ? latitude : null,
+    lon: typeof longitude === "number" ? longitude : null,
+  };
+}
+
+function legacyChartId(chartId: string) {
+  return chartId.startsWith("legacy:");
+}
+
+function stripLegacyChartId(chartId: string) {
+  return chartId.replace(/^legacy:/, "");
+}
+
 export function saveCurrentChart(chart: ChartData) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chart));
@@ -139,6 +179,101 @@ function loadCurrentChartFromDevice(): ChartData | null {
 
   const parsed = JSON.parse(stored);
   return isStoredChart(parsed) ? reviveChartDates(parsed) : null;
+}
+
+export type SaveChartResult =
+  | { ok: true; id?: string }
+  | { ok: false; duplicate?: boolean; error: string };
+
+function chartBirthKey(chart: Pick<ChartData, "name" | "dob" | "tob" | "city">) {
+  return `${chart.name.trim().toLowerCase()}|${chart.dob}|${chart.tob}|${chart.city.trim().toLowerCase()}`;
+}
+
+/** Load a saved chart without changing which chart is primary. */
+export async function loadSavedChart(chartId: string): Promise<ChartData | null> {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    if (legacyChartId(chartId)) {
+      const { data, error } = await supabase
+        .from("user_charts")
+        .select("chart_data,name,dob,tob,city,latitude,longitude")
+        .eq("id", stripLegacyChartId(chartId))
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error || !data) return null;
+      if (data.chart_data && isStoredChart(data.chart_data)) return reviveChartDates(data.chart_data);
+      const birth = getLegacyChartRowBirth(data);
+      return birth ? buildChart(birth) : null;
+    }
+
+    const { data, error } = await supabase
+      .from("charts")
+      .select("chart_json")
+      .eq("id", chartId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error || !data?.chart_json || !isStoredChart(data.chart_json)) return null;
+    return reviveChartDates(data.chart_json);
+  } catch (error) {
+    console.warn("Chart load skipped:", error);
+    return null;
+  }
+}
+
+/** Save an extra chart to the library without switching primary. */
+export async function saveAdditionalChart(chart: ChartData): Promise<SaveChartResult> {
+  saveCurrentChart(chart);
+
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { ok: false, error: "Sign in to save charts to your account." };
+
+    const key = chartBirthKey(chart);
+    const { data: existing } = await supabase
+      .from("charts")
+      .select("id,name,dob,tob,city")
+      .eq("user_id", user.id);
+
+    const duplicate = (existing ?? []).some(
+      (row) => chartBirthKey({
+        name: String(row.name),
+        dob: String(row.dob),
+        tob: String(row.tob),
+        city: String(row.city),
+      }) === key,
+    );
+    if (duplicate) return { ok: false, duplicate: true, error: "This chart is already in your library." };
+
+    const payload = {
+      user_id: user.id,
+      chart_type: "self",
+      name: chart.name,
+      dob: chart.dob,
+      tob: chart.tob,
+      city: chart.city,
+      lat: chart.lat,
+      lon: chart.lon,
+      chart_json: serializeChart(chart),
+      is_primary: false,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase.from("charts").insert(payload).select("id").single();
+    if (error) throw error;
+    return { ok: true, id: data?.id ? String(data.id) : undefined };
+  } catch (error) {
+    console.warn("Additional chart save skipped:", error);
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Could not save chart.",
+    };
+  }
 }
 
 export async function saveChartToAccount(chart: ChartData, options: { replacePrimary?: boolean } = {}) {
@@ -205,7 +340,7 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
 
     if (error || !data) return [];
 
-    return data.map((item) => ({
+    const primaryCharts = data.map((item) => ({
       id: String(item.id),
       name: String(item.name),
       dob: String(item.dob),
@@ -215,6 +350,28 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
       isPrimary: Boolean(item.is_primary),
       createdAt: String(item.created_at),
     }));
+
+    const existingKeys = new Set(primaryCharts.map((item) => chartBirthKey(item)));
+    const { data: legacyData } = await supabase
+      .from("user_charts")
+      .select("id,name,dob,tob,city,created_at,is_default")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    const legacyCharts = (legacyData ?? [])
+      .map((item) => ({
+        id: `legacy:${String(item.id)}`,
+        name: String(item.name),
+        dob: String(item.dob),
+        tob: String(item.tob),
+        city: String(item.city),
+        chartType: "self",
+        isPrimary: Boolean(item.is_default),
+        createdAt: String(item.created_at),
+      }))
+      .filter((item) => !existingKeys.has(chartBirthKey(item)));
+
+    return [...primaryCharts, ...legacyCharts];
   } catch (error) {
     console.warn("Chart list load skipped:", error);
     return [];
@@ -226,6 +383,14 @@ export async function selectSavedChart(chartId: string): Promise<ChartData | nul
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
+
+    if (legacyChartId(chartId)) {
+      const chart = await loadSavedChart(chartId);
+      if (!chart) return null;
+      await saveChartToAccount(chart, { replacePrimary: true });
+      saveCurrentChart(chart);
+      return chart;
+    }
 
     const { data, error } = await supabase
       .from("charts")
@@ -298,8 +463,11 @@ export function formatChartContext(chart: ChartData): string {
 }
 
 export function useUserChart() {
-  const [birth, setBirth] = useState<BirthDetails>(DEMO_BIRTH);
-  const [chart, setChart] = useState<ChartData>(() => buildChart(DEMO_BIRTH));
+  // birth starts BLANK so empty-state guards fire until a real chart loads.
+  // chart starts as a valid demo *structure* only to keep pages crash-safe;
+  // it is never surfaced because hasUserChart stays false until real data.
+  const [birth, setBirth] = useState<BirthDetails>(EMPTY_BIRTH);
+  const [chart, setChart] = useState<ChartData>(() => buildChart(PLACEHOLDER_BIRTH));
   const [hasUserChart, setHasUserChart] = useState(false);
   const [loading, setLoading] = useState(true);
 

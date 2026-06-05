@@ -151,7 +151,7 @@ export function DirectionBPricing() {
       tag: "For the seekers",
       bullets: [
         "Everything in Premium",
-        "Personal AI astrologer (named, voiced)",
+        "Personal AI astrologer (named, personalized)",
         "Family-karma chart linking",
         "Annual Varshaphala forecast",
         "Priority WhatsApp assistant",

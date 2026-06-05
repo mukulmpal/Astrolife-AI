@@ -220,8 +220,8 @@ export default function KundaliMilanPage() {
   const { t, lang } = useLanguage();
 
   // Ashtakoot inputs
-  const [p1, setP1] = useState<PersonInput>({ name: "Mukul", nakIdx: 3, rashiIdx: 3 });
-  const [p2, setP2] = useState<PersonInput>({ name: "Priya", nakIdx: 10, rashiIdx: 4 });
+  const [p1, setP1] = useState<PersonInput>({ name: "", nakIdx: 0, rashiIdx: 0 });
+  const [p2, setP2] = useState<PersonInput>({ name: "", nakIdx: 0, rashiIdx: 0 });
   const [milanResult, setMilanResult] = useState<MilanResult | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>("marriage");
 

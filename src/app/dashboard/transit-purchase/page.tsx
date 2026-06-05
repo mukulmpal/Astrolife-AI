@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { PremiumFeature } from "@/components/premium-feature";
-import { calculateTransitReport, type NatalChartForTransit } from "@/lib/astro-engine/transits";
+import { calculateTransitReport } from "@/lib/astro-engine/transits";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { generateCombinedTransitPurchaseGuidance } from "@/lib/astro-engine/transit-purchase-combined";
 import { generatePlanetPurchaseReport } from "@/lib/astro-engine/transit-planet-purchase";
@@ -12,22 +12,6 @@ import type { PlanetName } from "@/lib/astro-engine/transits";
 import type { LalKitabPlanet } from "@/lib/lal-kitab";
 import { useUserChart } from "@/lib/user-chart";
 import "@/app/dashboard/shared.css";
-
-const SAMPLE_CHART: NatalChartForTransit = {
-  tz: 5.5,
-  lagR: 0,
-  planets: {
-    Sun: { rashi: 4, house: 5, longitude: 132 },
-    Moon: { rashi: 11, house: 12, longitude: 345 },
-    Mars: { rashi: 2, house: 3, longitude: 74 },
-    Mercury: { rashi: 5, house: 6, longitude: 164 },
-    Jupiter: { rashi: 1, house: 2, longitude: 51 },
-    Venus: { rashi: 6, house: 7, longitude: 184 },
-    Saturn: { rashi: 9, house: 10, longitude: 294 },
-    Rahu: { rashi: 7, house: 8, longitude: 218 },
-    Ketu: { rashi: 1, house: 2, longitude: 38 },
-  },
-};
 
 const LAL_KITAB_PLANETS = new Set<LalKitabPlanet>(["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]);
 
@@ -39,11 +23,11 @@ function activeDashaPlanet(entries: Array<{ planet?: string; active?: boolean }>
   return toLalKitabPlanet(entries?.find((entry) => entry.active)?.planet ?? entries?.[0]?.planet, fallback);
 }
 
-function buildLalKitabTiming(chart: ReturnType<typeof useUserChart>["chart"] | null, useSample: boolean) {
-  if (!chart && !useSample) return undefined;
+function buildLalKitabTiming(chart: ReturnType<typeof useUserChart>["chart"] | null) {
+  if (!chart) return undefined;
 
-  const currentMahadasha = chart ? activeDashaPlanet(chart.dashas, "Moon") : "Moon";
-  const currentAntardasha = chart ? activeDashaPlanet(chart.antardasha, currentMahadasha) : "Moon";
+  const currentMahadasha = activeDashaPlanet(chart.dashas, "Moon");
+  const currentAntardasha = activeDashaPlanet(chart.antardasha, currentMahadasha);
   const activePlanets = Array.from(new Set([currentMahadasha, currentAntardasha].filter(Boolean)));
 
   return {
@@ -65,25 +49,23 @@ function Badge({ verdict }: { verdict: string }) {
 
 export default function TransitPurchasePage() {
   const { chart, loading, hasUserChart } = useUserChart();
-  const [useSample, setUseSample] = useState(false);
   const [activePlanet, setActivePlanet] = useState<PlanetName>("Sun");
 
   const activeChart = useMemo(() => {
-    if (useSample) return SAMPLE_CHART;
     if (!hasUserChart || !chart) return null;
     return normalizeChartForTransit(chart);
-  }, [chart, hasUserChart, useSample]);
+  }, [chart, hasUserChart]);
 
   const transitReport = useMemo(() => {
     if (!activeChart) return null;
-    return calculateTransitReport({ chart: activeChart, base: "lagna", date: new Date() });
+    return calculateTransitReport({ chart: activeChart, base: "moon", date: new Date() });
   }, [activeChart]);
 
   const guidance = useMemo(() => {
     if (!transitReport) return null;
-    const lalKitab = buildLalKitabTiming(useSample ? null : chart, useSample);
+    const lalKitab = buildLalKitabTiming(chart);
     return generateCombinedTransitPurchaseGuidance({ transitReport, lalKitab });
-  }, [transitReport, chart, useSample]);
+  }, [transitReport, chart]);
 
   const planetReport = useMemo(() => {
     if (!transitReport) return null;
@@ -95,7 +77,7 @@ export default function TransitPurchasePage() {
     [planetReport, activePlanet]
   );
 
-  if (loading && !useSample) {
+  if (loading || !hasUserChart) {
     return (
       <main className="tp-wrap">
         <div className="tp-shell">
@@ -103,7 +85,7 @@ export default function TransitPurchasePage() {
             title="Gochar Purchase Guidance"
             loading={loading}
             loadingText="Loading your chart..."
-            emptyText="Complete onboarding or run sample guidance."
+            emptyText="Generate your kundli first to unlock purchase guidance."
           />
         </div>
         <MobileBottomNav />
@@ -163,18 +145,17 @@ export default function TransitPurchasePage() {
               <div className="tp-kicker">Gochar + Lal Kitab Object Grammar</div>
               <h1 className="tp-title">Gochar Purchase Guidance</h1>
               <p className="tp-sub">
-                Buy, wait, or avoid guidance using standard Gochar timing plus Lal Kitab object and gift caution.
+                Buy, wait, or avoid guidance using Moon-first Gochar timing plus Lal Kitab object and gift caution.
                 Lal Kitab 35-sala chakra, varshphal and monthly phal are separate methods.
               </p>
             </div>
-            <button className="tp-btn" type="button" onClick={() => setUseSample(true)}>Run Sample Guidance</button>
           </div>
         </section>
 
         {!guidance ? (
           <EngineStateCard
             title="Chart Required"
-            emptyText="Complete onboarding or click Run Sample Guidance."
+            emptyText="Generate your kundli first to unlock purchase guidance."
           />
         ) : (
           <section className="tp-grid">
@@ -192,6 +173,46 @@ export default function TransitPurchasePage() {
               <div className="tp-kicker">Strongest Warning</div>
               <h2 className="tp-h">{guidance.strongestWarning}</h2>
               <p className="tp-p">This is the first object/timing signal to handle before making a purchase.</p>
+              <p className="tp-muted" style={{ marginTop: 8 }}>{guidance.strongestWarningReason}</p>
+            </article>
+
+            <article className="tp-card span-12">
+              <div className="tp-row">
+                <div>
+                  <div className="tp-kicker">Moon Transit Zone</div>
+                  <h2 className="tp-h">{guidance.sadeSatiZone.title}</h2>
+                  <p className="tp-p">{guidance.sadeSatiZone.description}</p>
+                </div>
+                <Badge verdict={guidance.sadeSatiZone.active ? "WAIT" : "BUY_CAREFULLY"} />
+              </div>
+              <div className="tp-snap">
+                <div className="tp-snap-item">
+                  <div className="tp-snap-k">Phase</div>
+                  <div className="tp-snap-v" style={{ textTransform: "capitalize" }}>{guidance.sadeSatiZone.phase}</div>
+                </div>
+                <div className="tp-snap-item">
+                  <div className="tp-snap-k">Severity</div>
+                  <div className="tp-snap-v" style={{ textTransform: "capitalize" }}>{guidance.sadeSatiZone.severity}</div>
+                </div>
+                <div className="tp-snap-item">
+                  <div className="tp-snap-k">Purchase Impact</div>
+                  <div className="tp-snap-v">{guidance.sadeSatiZone.scoreImpact}</div>
+                </div>
+              </div>
+              <div className="tp-cols">
+                <div>
+                  <div className="tp-kicker" style={{ color: "#ffb1bb" }}>Purchase cautions</div>
+                  {guidance.sadeSatiZone.purchaseCautions.map((item) => (
+                    <p className="tp-bullet tp-bad" key={item}>{item}</p>
+                  ))}
+                </div>
+                <div>
+                  <div className="tp-kicker" style={{ color: "#71d99a" }}>Remedies</div>
+                  {guidance.sadeSatiZone.remedies.map((item) => (
+                    <p className="tp-bullet tp-good" key={item}>{item}</p>
+                  ))}
+                </div>
+              </div>
             </article>
 
             {planetReport && activePlanetGuidance && (

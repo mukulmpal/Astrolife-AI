@@ -1,5 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getMissingFusionContext, normalizeAstroLifeFusionContext } from "@/lib/palmistry/fusion/fusion-context-normalizer";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { fail, isRecord, ok, readJsonWithLimit, validationErrorResponse, type ValidationResult } from "@/lib/validation/api";
 
 type BuildFusionContextRequest = {
   raw?: unknown;
@@ -8,9 +10,19 @@ type BuildFusionContextRequest = {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(req: Request) {
+function validateBuildFusionContextBody(value: unknown): ValidationResult<BuildFusionContextRequest> {
+  if (!isRecord(value)) return fail("Fusion context payload must be an object.");
+  return ok(value as BuildFusionContextRequest);
+}
+
+export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as BuildFusionContextRequest;
+    const limit = checkRateLimit(req, { scope: "palmistry-build-fusion-context", limit: 60, windowMs: 60 * 60_000 });
+    if (!limit.allowed) return rateLimitResponse(limit.resetAt);
+
+    const parsed = await readJsonWithLimit(req, validateBuildFusionContextBody, { maxBytes: 250_000, routeName: "palmistry-build-fusion-context" });
+    if (!parsed.ok) return validationErrorResponse(parsed);
+    const body = parsed.data;
     const context = normalizeAstroLifeFusionContext(body.raw ?? body);
 
     return NextResponse.json({

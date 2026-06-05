@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 .cleanup-archive/
+.tmp/
+.tmp_deploy.txt
+supabase/.temp/
 
 # debug
 npm-debug.log*

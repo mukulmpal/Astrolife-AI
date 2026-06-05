@@ -142,7 +142,7 @@ function MiniChart({ chart }: { chart: DivChart }) {
 
 export default function DivisionalPage() {
   const [activeChart, setActiveChart] = useState("D9");
-  const { birth, chart } = useUserChart();
+  const { birth, chart, hasUserChart } = useUserChart();
   const { t } = useLanguage();
 
   const divs     = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
@@ -158,6 +158,16 @@ export default function DivisionalPage() {
     dasha: extractDashaInput(chart),
   });
   const currentUniversal = universal.sections.find((section) => section.chart === current.key);
+
+  if (!hasUserChart || !birth.name) {
+    return (
+      <EngineEmptyState
+        engineName="Divisional Charts"
+        engineIcon="🧩"
+        whatItAnalyzes={["D9 Navamsha", "D10 Dashamsha", "16 Shodasha vargas", "Varga-based strength"]}
+      />
+    );
+  }
 
   return (
     <div className="page">

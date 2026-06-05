@@ -200,6 +200,12 @@ export function getLalKitabPurchaseGuidance(
   return LAL_KITAB_PURCHASE_RULES.map((rule) => {
     const activeTriggers = planetActive(input, rule.planet);
     const hasDifficultTransit = activeTriggers.some((trigger) => trigger.includes("difficult"));
+    const hasDashaActivation = activeTriggers.some((trigger) =>
+      trigger.includes("Mahadasha") ||
+      trigger.includes("Antardasha") ||
+      trigger.includes("Pratyantardasha") ||
+      trigger.includes("marked active")
+    );
     const activeCount = activeTriggers.length;
 
     let verdict: LalKitabPurchaseResult["verdict"] = "SAFE";
@@ -211,11 +217,11 @@ export function getLalKitabPurchaseGuidance(
     }
 
     if (rule.planet === "Saturn" && activeCount > 0) {
-      verdict = hasDifficultTransit ? "AVOID" : "GIFT_CAUTION";
-      score -= 25;
+      verdict = hasDashaActivation ? "GIFT_CAUTION" : "CAUTION";
+      score -= hasDashaActivation ? 18 : 8;
     }
 
-    if (hasDifficultTransit && activeCount >= 2) {
+    if (hasDifficultTransit && activeCount >= 2 && (rule.planet !== "Saturn" || hasDashaActivation)) {
       verdict = "AVOID";
       score -= 18;
     }

@@ -1,0 +1,6 @@
+-- Remote migration baseline.
+--
+-- The linked Supabase project already records migration version 20260531113728.
+-- The original SQL for that remote-applied migration was not present in this
+-- repository, so this placeholder keeps local migration history aligned without
+-- applying new DDL.

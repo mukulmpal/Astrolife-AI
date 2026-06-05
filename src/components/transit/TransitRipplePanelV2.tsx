@@ -9,7 +9,7 @@ import {
 } from "@/lib/astro-engine/transit-ripple-v4";
 import { NAKSHATRA_KNOWLEDGE } from "@/lib/astro-engine/transit-knowledge-base";
 
-type TabType = "planets" | "houses" | "nakshatra";
+type TabType = "planets" | "lifeAreas";
 
 type TransitRippleReport = {
   planetTimelines?: Array<{
@@ -79,6 +79,118 @@ const PLANET_COLORS: Record<string, string> = {
 };
 
 const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+
+type PlanetTimelineList = NonNullable<TransitRippleReport["planetTimelines"]>;
+
+function TransitRippleChart({ planetList }: { planetList: PlanetTimelineList }) {
+  const allWindows = planetList.flatMap((planet) =>
+    planet.windows.map((window) => ({
+      planet: planet.planet,
+      planetScore: planet.score,
+      ...window,
+    }))
+  );
+
+  if (allWindows.length === 0) {
+    return (
+      <section style={card}>
+        <p style={sectionLabel}>Monthly Ripple Map</p>
+        <h2 style={h2}>Transit Flow</h2>
+        <p style={paragraph}>No transit windows available yet.</p>
+      </section>
+    );
+  }
+
+  const dayMs = 24 * 60 * 60 * 1000;
+  const minTime = Math.min(...allWindows.map((window) => new Date(window.startDate).getTime()));
+  const maxTime = Math.max(...allWindows.map((window) => new Date(window.endDate).getTime()));
+  const spanDays = Math.max(1, Math.ceil((maxTime - minTime) / dayMs));
+  const chartWidth = Math.max(760, spanDays * 26);
+  const rowHeight = 56;
+  const topPad = 42;
+  const leftPad = 92;
+  const rightPad = 34;
+  const bottomPad = 38;
+  const chartHeight = topPad + planetList.length * rowHeight + bottomPad;
+  const plotWidth = chartWidth - leftPad - rightPad;
+  const xForTime = (time: number) => leftPad + ((time - minTime) / Math.max(dayMs, maxTime - minTime)) * plotWidth;
+  const weekTicks = Array.from({ length: Math.ceil(spanDays / 7) + 1 }, (_, index) => {
+    const time = minTime + index * 7 * dayMs;
+    return { time: Math.min(time, maxTime), label: new Date(Math.min(time, maxTime)).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) };
+  });
+
+  return (
+    <section style={card}>
+      <p style={sectionLabel}>Monthly Ripple Map</p>
+      <h2 style={h2}>All Planet Transits in One Month</h2>
+      <p style={{ ...paragraph, marginBottom: 14 }}>
+        Each row is one planet. Larger pulses mean stronger monthly influence. Hover any pulse to see sign, nakshatra, houses and date window.
+      </p>
+      <div style={{ overflowX: "auto", borderRadius: 18, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.26)" }}>
+        <svg width={chartWidth} height={chartHeight} role="img" aria-label="Monthly transit ripple chart">
+          <defs>
+            <filter id="rippleGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          {weekTicks.map((tick, index) => {
+            const x = xForTime(tick.time);
+            return (
+              <g key={`${tick.label}-${index}`}>
+                <line x1={x} y1={topPad - 16} x2={x} y2={chartHeight - bottomPad + 4} stroke="rgba(255,255,255,0.08)" />
+                <text x={x} y={24} textAnchor="middle" fill="rgba(255,255,255,0.55)" fontSize="11">{tick.label}</text>
+              </g>
+            );
+          })}
+          {planetList.map((planet, rowIndex) => {
+            const y = topPad + rowIndex * rowHeight + rowHeight / 2;
+            const color = PLANET_COLORS[planet.planet] || "#94a3b8";
+            return (
+              <g key={planet.planet}>
+                <text x={20} y={y + 4} fill={color} fontSize="13" fontWeight="700">{planet.planet}</text>
+                <line x1={leftPad} y1={y} x2={chartWidth - rightPad} y2={y} stroke="rgba(255,255,255,0.1)" />
+                {planet.windows.map((window, index) => {
+                  const start = new Date(window.startDate).getTime();
+                  const end = new Date(window.endDate).getTime();
+                  const cx = xForTime(start + (end - start) / 2);
+                  const segmentWidth = Math.max(18, Math.abs(xForTime(end) - xForTime(start)));
+                  const radius = Math.max(7, Math.min(17, 6 + planet.score / 8));
+                  return (
+                    <g key={`${planet.planet}-${window.startDate}-${index}`}>
+                      <line
+                        x1={Math.max(leftPad, cx - segmentWidth / 2)}
+                        x2={Math.min(chartWidth - rightPad, cx + segmentWidth / 2)}
+                        y1={y}
+                        y2={y}
+                        stroke={color}
+                        strokeWidth="5"
+                        strokeLinecap="round"
+                        opacity="0.28"
+                      />
+                      <circle cx={cx} cy={y} r={radius + 8} fill="none" stroke={color} opacity="0.14" />
+                      <circle cx={cx} cy={y} r={radius} fill={color} opacity="0.82" filter="url(#rippleGlow)">
+                        <title>{`${planet.planet}: ${window.startDate} to ${window.endDate} · ${window.sign}/${window.nakshatra} · Asc H${window.houseFromAscendant}, Moon H${window.houseFromMoon} · ${planet.score}/100`}</title>
+                      </circle>
+                    </g>
+                  );
+                })}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div style={{ ...legendGrid, marginTop: 14 }}>
+        <div style={legendItem}><span style={{ ...legendDot, background: "#f97316" }} />Large pulse: strongest planet influence</div>
+        <div style={legendItem}><span style={{ ...legendDot, background: "#94a3b8" }} />Line length: transit stay in sign/nakshatra window</div>
+        <div style={legendItem}><span style={{ ...legendDot, background: "#facc15" }} />Use planet tab for detailed proof</div>
+      </div>
+    </section>
+  );
+}
 
 export function TransitRipplePanelV2() {
   const { chart, loading: chartLoading, hasUserChart } = useUserChart();
@@ -216,14 +328,14 @@ export function TransitRipplePanelV2() {
           {/* === TOP-LEVEL TABS === */}
           <section style={card}>
             <div style={tabsContainer}>
-              {["planets", "houses", "nakshatra"].map((tab) => (
+              {(["planets", "lifeAreas"] as const).map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab as TabType)}
+                  onClick={() => setActiveTab(tab)}
                   style={tabButton(activeTab === tab)}
                 >
                   <span style={{ fontSize: 15, fontWeight: 700, textTransform: "capitalize" }}>
-                    {tab === "nakshatra" ? "Nakshatras" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    {tab === "planets" ? "Planet Transits" : "Life Areas"}
                   </span>
                 </button>
               ))}
@@ -233,6 +345,8 @@ export function TransitRipplePanelV2() {
           {/* === PLANETS TAB === */}
           {activeTab === "planets" && (
             <>
+              <TransitRippleChart planetList={planetList} />
+
               <section style={card}>
                 <p style={sectionLabel}>Planet Timelines</p>
                 <h2 style={h2}>Select a Planet to Explore</h2>
@@ -337,7 +451,7 @@ export function TransitRipplePanelV2() {
                     {uniqueHouses.map((house) => {
                       const houseNames: Record<number, string> = {
                         1: "Self", 2: "Wealth", 3: "Courage", 4: "Home", 5: "Creativity", 6: "Health",
-                        7: "Marriage", 8: "Secrets", 9: "Dharma", 10: "Career", 11: "Gains", 12: "Release",
+                        7: "Partnerships", 8: "Secrets", 9: "Dharma", 10: "Career", 11: "Gains", 12: "Release",
                       };
                       return (
                         <div key={house} style={houseCard(PLANET_COLORS[activePlanet.planet])}>
@@ -405,8 +519,8 @@ export function TransitRipplePanelV2() {
             </>
           )}
 
-          {/* === HOUSES TAB === */}
-          {activeTab === "houses" && (
+          {/* === LIFE AREAS TAB === */}
+          {activeTab === "lifeAreas" && (
             <>
               <section style={card}>
                 <p style={sectionLabel}>House Activations</p>
@@ -418,7 +532,7 @@ export function TransitRipplePanelV2() {
                   {report?.topActivationHouses?.map((house) => {
                     const houseNames: Record<number, string> = {
                       1: "Self", 2: "Wealth", 3: "Courage", 4: "Home", 5: "Creativity", 6: "Health",
-                      7: "Marriage", 8: "Secrets", 9: "Dharma", 10: "Career", 11: "Gains", 12: "Release",
+                      7: "Partnerships", 8: "Secrets", 9: "Dharma", 10: "Career", 11: "Gains", 12: "Release",
                     };
                     const houseDescriptions: Record<number, string> = {
                       1: "Identity, appearance, self-perception",
@@ -427,7 +541,7 @@ export function TransitRipplePanelV2() {
                       4: "Home, mother, emotions, foundation",
                       5: "Children, creativity, intellect",
                       6: "Health, enemies, debts, service",
-                      7: "Marriage, partnerships, contracts",
+                      7: "Partnerships, contracts, clients",
                       8: "Inheritance, secrets, transformation",
                       9: "Higher learning, luck, dharma",
                       10: "Career, status, public image",
@@ -481,8 +595,8 @@ export function TransitRipplePanelV2() {
             </>
           )}
 
-          {/* === NAKSHATRA TAB === */}
-          {activeTab === "nakshatra" && (
+          {/* === NAKSHATRA SECTION INSIDE LIFE AREAS === */}
+          {activeTab === "lifeAreas" && (
             <>
               <section style={card}>
                 <p style={sectionLabel}>Lunar Mansions</p>

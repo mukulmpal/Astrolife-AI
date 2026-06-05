@@ -30,8 +30,8 @@ const PLANET_EMOJI: Record<string, string> = {
 };
 
 export default function RemedyPage() {
-  const { chart, loading } = useUserChart();
-  const result = useMemo(() => (chart ? calculateRemedies(chart) : null), [chart]);
+  const { chart, loading, hasUserChart } = useUserChart();
+  const result = useMemo(() => (chart && hasUserChart ? calculateRemedies(chart) : null), [chart, hasUserChart]);
   const [activeTab, setActiveTab] = useState<"all" | "urgent" | "lk" | "phase1">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -104,6 +104,9 @@ export default function RemedyPage() {
     if (activeTab === "phase1") return false;
     return true;
   });
+  const personalizedPlan = [...result.cards]
+    .sort((a, b) => b.personalizationScore - a.personalizationScore)
+    .slice(0, 3);
 
   return (
     <main style={{ minHeight: "100vh", background: "#060410", padding: "24px 18px 110px", color: "#f0e8d0" }}>
@@ -167,6 +170,24 @@ export default function RemedyPage() {
           {result.unifiedSafetyPlan.map((line) => (
             <div key={line} className="safe-plan-line">• {line}</div>
           ))}
+        </div>
+
+        <div style={{ background: "rgba(20,184,166,0.055)", border: "1px solid rgba(20,184,166,0.2)", borderRadius: 12, padding: "14px 16px", marginBottom: 18 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#5eead4", letterSpacing: ".5px", marginBottom: 10, textTransform: "uppercase" }}>
+            Personalized Remedy Plan
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {personalizedPlan.map((card) => (
+              <div key={`personalized-${card.planet}`} style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", marginBottom: 5 }}>
+                  <strong style={{ fontSize: 13, color: "#f0e8d0" }}>{PLANET_EMOJI[card.planet]} {card.planet}</strong>
+                  <span style={{ fontSize: 11, color: "#5eead4", fontWeight: 800 }}>{card.personalizationScore}/100</span>
+                </div>
+                <div style={{ fontSize: 12, color: "#b8b0d8", lineHeight: 1.55 }}>{card.whyPersonalized}</div>
+                <div style={{ fontSize: 11, color: "#c8a030", marginTop: 6 }}>Timing: {card.timing}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Contradiction Warnings */}
@@ -326,6 +347,21 @@ export default function RemedyPage() {
                       <div style={{ marginTop: "5px" }}>Physical remedy: <strong style={{ color: "#f0e8d0" }}>{card.katRemedy}</strong></div>
                     </div>
                   )}
+
+                  {/* Vedic remedies */}
+                  <div className="rem-section">
+                    <div className="rem-section-title" style={{ color: "#5eead4" }}>Personalized Prescription</div>
+                    <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.65", background: "rgba(20,184,166,0.05)", border: "1px solid rgba(20,184,166,0.18)", borderRadius: "7px", padding: "9px 11px", marginBottom: 8 }}>
+                      <strong style={{ color: "#5eead4" }}>{card.personalizationScore}/100 relevance</strong> · {card.whyPersonalized}
+                    </div>
+                    <div className="rem-row"><strong>Timing:</strong> {card.timing}</div>
+                    {card.recommendedActions.length > 0 && (
+                      <div className="rem-row"><strong>Do:</strong> {card.recommendedActions.join(" · ")}</div>
+                    )}
+                    {card.avoidActions.length > 0 && (
+                      <div className="rem-row"><strong>Avoid:</strong> {card.avoidActions.join(" · ")}</div>
+                    )}
+                  </div>
 
                   {/* Vedic remedies */}
                   <div className="rem-section">

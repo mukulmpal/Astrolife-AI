@@ -55,14 +55,25 @@ import { calculateDestiny } from "./astro-engine/destiny";
 import { normalizeChartForTransit } from "./astro-engine/chart-normalize";
 import { calculateTransitReport } from "./astro-engine/transits";
 import { calculateEventRadarReport } from "./astro-engine/event-radar";
+import { createAstroPalmFusion } from "./palmistry/fusion/astro-palm-fusion";
+import type { AstroLifeFusionContext, AstroPalmFusionOutput, FusionInsight } from "./palmistry/fusion/fusion-types";
+import type { PalmRuleReport } from "./palmistry/types";
 
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
+export type ReportType = "basic" | "premium" | "elite" | "full" | "kundli" | "remedy" | "medical" | "destiny";
 export interface ReportOptions {
-  type: "full" | "kundli" | "remedy" | "medical" | "destiny";
+  type: ReportType;
   palette?: ReportPalette;
   cover?: ReportCover;
+  palmistrySessionId?: string;
+  palmistryFusion?: {
+    palmResult?: PalmRuleReport;
+    astroContext?: AstroLifeFusionContext;
+  };
 }
+
+type NormalizedReportOptions = ReportOptions & Required<Pick<ReportOptions, "type" | "palette" | "cover">>;
 
 export const REPORT_PAGE_SIZE = {
   width: 820,
@@ -75,7 +86,7 @@ export const REPORT_COVERS = ["wheel", "lagnalord"] as const;
 export interface ReportEngineContext {
   reportId: string;
   generatedAt: string;
-  settings: Required<ReportOptions>;
+  settings: NormalizedReportOptions;
   birth: {
     name: string;
     dob: string;
@@ -98,6 +109,15 @@ export interface ReportEngineContext {
     astroSound: { status: "covered" | "pending"; note: string };
     vastu: { status: "covered" | "pending"; note: string };
     familySynastry: { status: "covered" | "pending"; note: string };
+    sarvatobhadra: { status: "covered" | "pending"; note: string };
+    kp: { status: "covered" | "pending"; note: string };
+    jaimini: { status: "covered" | "pending"; note: string };
+    transitRipple: { status: "covered" | "pending"; note: string };
+    specialLagnas: { status: "covered" | "pending"; note: string };
+    marriageIntel: { status: "covered" | "pending"; note: string };
+    relationshipIntel: { status: "covered" | "pending"; note: string };
+    gemstone: { status: "covered" | "pending"; note: string };
+    palmistryFusion: { status: "ready" | "requires-scan"; note: string };
   };
 }
 
@@ -132,8 +152,8 @@ function isReportCover(value: unknown): value is ReportCover {
   return typeof value === "string" && REPORT_COVERS.includes(value as ReportCover);
 }
 
-export function normalizeReportOptions(options?: Partial<ReportOptions>): Required<ReportOptions> {
-  const validTypes: ReportOptions["type"][] = ["full", "kundli", "remedy", "medical", "destiny"];
+export function normalizeReportOptions(options?: Partial<ReportOptions>): NormalizedReportOptions {
+  const validTypes: ReportOptions["type"][] = ["basic", "premium", "elite", "full", "kundli", "remedy", "medical", "destiny"];
   const type = options?.type && validTypes.includes(options.type) ? options.type : "full";
   return {
     type,
@@ -149,6 +169,10 @@ function makeReportId(chart: ChartData, generatedAt: string): string {
     hash = Math.imul(31, hash) + seed.charCodeAt(i) | 0;
   }
   return `AL-${new Date(generatedAt).getFullYear()}-${Math.abs(hash).toString(36).toUpperCase().padStart(6, "0").slice(0, 6)}`;
+}
+
+function hasPalmistryFusionData(options?: Partial<ReportOptions>) {
+  return Boolean(options?.palmistryFusion?.palmResult);
 }
 
 export function buildReportEngineContext(chart: ChartData, options?: Partial<ReportOptions>): ReportEngineContext {
@@ -201,9 +225,20 @@ export function buildReportEngineContext(chart: ChartData, options?: Partial<Rep
         urgentCount: remedies.urgentCount,
         topPlanet: remedies.cards[0]?.planet ?? "Unavailable",
       },
-      astroSound: { status: "covered", note: "AstroSound/voice report has a separate engine and can feed summary text here." },
+      astroSound: { status: "covered", note: "AstroSound has a separate recommendation engine and can feed summary text here." },
       vastu: { status: "covered", note: "Vastu complete analysis and calculator live as separate experiences." },
       familySynastry: { status: "pending", note: "Synastry needs second-person birth data before it can be rendered in this report." },
+      sarvatobhadra: { status: "covered", note: "Sarvatobhadra vedha alerts are rendered in Premium and Elite reports." },
+      kp: { status: "covered", note: "KP sub-lord timing is rendered with significator and cusp tables." },
+      jaimini: { status: "covered", note: "Jaimini karakas, arudhas and Chara Dasha are rendered." },
+      transitRipple: { status: "covered", note: "Transit Ripple is rendered with all major planets and Moon-first context." },
+      specialLagnas: { status: "covered", note: "Special lagnas and arudha-sensitive points are rendered." },
+      marriageIntel: { status: "covered", note: "Marriage Intelligence is rendered from D9, D7 and KP context." },
+      relationshipIntel: { status: "covered", note: "Relationship Intelligence is rendered from natal relationship signatures." },
+      gemstone: { status: "covered", note: "Gemstone suitability is rendered with caution and wearing protocol." },
+      palmistryFusion: hasPalmistryFusionData(options)
+        ? { status: "ready", note: "Elite PDF includes linked palm evidence and Palm + Kundli fusion synthesis." }
+        : { status: "requires-scan", note: "Elite PDF includes a fusion bridge; full palm evidence requires a linked palm scan session." },
     },
   };
 }
@@ -275,6 +310,42 @@ const HOUSE_POSITIONS: Record<number, [number, number]> = {
   9: [298, 258], 10: [290, 183], 11: [298, 108], 12: [260, 62],
 };
 
+function chartLabelSlots(total: number) {
+  if (total <= 1) return [{ x: 0, y: 0, font: 10 }];
+  if (total === 2) return [{ x: -13, y: 0, font: 9.5 }, { x: 13, y: 0, font: 9.5 }];
+  if (total === 3) return [{ x: -19, y: 0, font: 9 }, { x: 0, y: 0, font: 9 }, { x: 19, y: 0, font: 9 }];
+  if (total === 4) {
+    return [
+      { x: -13, y: -7, font: 8.5 },
+      { x: 13, y: -7, font: 8.5 },
+      { x: -13, y: 8, font: 8.5 },
+      { x: 13, y: 8, font: 8.5 },
+    ];
+  }
+  if (total === 5) {
+    return [
+      { x: -13, y: -8, font: 8 },
+      { x: 13, y: -8, font: 8 },
+      { x: -20, y: 8, font: 8 },
+      { x: 0, y: 8, font: 8 },
+      { x: 20, y: 8, font: 8 },
+    ];
+  }
+
+  return Array.from({ length: total }, (_, idx) => {
+    const cols = 3;
+    const rows = Math.ceil(total / cols);
+    const row = Math.floor(idx / cols);
+    const col = idx % cols;
+    const rowCount = row === rows - 1 ? total - row * cols : cols;
+    return {
+      x: (col - (rowCount - 1) / 2) * 18,
+      y: (row - (rows - 1) / 2) * 12,
+      font: total > 7 ? 7.2 : 7.8,
+    };
+  });
+}
+
 // ── North Indian Chart SVG ────────────────────────────────────────────────
 
 function renderNorthIndianChart(chart: ChartData): string {
@@ -306,31 +377,11 @@ function renderNorthIndianChart(chart: ChartData): string {
 
     labels += `<text x="${cx}" y="${cy - 10}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#8C7440">${signNumber}</text>`;
 
-    // Multi-planet layout: ≤3 planets stack 1 column, 4+ use 2 columns
-    // and a smaller font so they never overflow into adjacent houses.
-    if (items.length <= 3) {
-      const fontSize = items.length === 0 ? 10 : 10;
-      const lineH    = 13;
-      // Center vertically around cy + 6
-      const startY = cy + 6 - ((items.length - 1) * lineH) / 2;
-      items.forEach((item, i) => {
-        labels += `<text x="${cx}" y="${startY + i * lineH}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${fontSize}" fill="#C9A961">${esc(item)}</text>`;
-      });
-    } else {
-      // 2-column compact layout — never overflow even with 6+ planets
-      const fontSize = 8.5;
-      const lineH    = 10;
-      const colDx    = 13;
-      const rows     = Math.ceil(items.length / 2);
-      const startY   = cy + 4 - ((rows - 1) * lineH) / 2;
-      items.forEach((item, i) => {
-        const col = i % 2;
-        const row = Math.floor(i / 2);
-        const x = cx + (col === 0 ? -colDx / 2 : colDx / 2);
-        const y = startY + row * lineH;
-        labels += `<text x="${x}" y="${y}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${fontSize}" fill="#C9A961">${esc(item)}</text>`;
-      });
-    }
+    const slots = chartLabelSlots(items.length);
+    items.forEach((item, i) => {
+      const slot = slots[i] ?? { x: 0, y: 0, font: 8 };
+      labels += `<text x="${cx + slot.x}" y="${cy + 7 + slot.y}" text-anchor="middle" dominant-baseline="middle" font-family="Inter,sans-serif" font-size="${slot.font}" font-weight="700" fill="#C9A961">${esc(item)}</text>`;
+    });
   }
 
   return `<svg width="360" height="360" viewBox="0 0 360 360">
@@ -994,14 +1045,13 @@ function page4TOC(): string {
       </div>
       <div>
         <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">Life Areas</span></div>
-        <div class="toc-row"><span class="num">10</span><div><div class="title">Health &amp; Wellness</div><div class="meta">Vedic medical · prakriti</div></div><div></div><span class="pg">15</span></div>
-        <div class="toc-row"><span class="num">11</span><div><div class="title">Psychology</div><div class="meta">Mind pattern · shadow work</div></div><div></div><span class="pg">16</span></div>
-        <div class="toc-row"><span class="num">12</span><div><div class="title">Numerology</div><div class="meta">Life path · destiny · soul urge</div></div><div></div><span class="pg">17</span></div>
+        <div class="toc-row"><span class="num">10</span><div><div class="title">Psychology</div><div class="meta">Mind pattern · shadow work</div></div><div></div><span class="pg">15</span></div>
+        <div class="toc-row"><span class="num">11</span><div><div class="title">Numerology</div><div class="meta">Life path · destiny · soul urge</div></div><div></div><span class="pg">16</span></div>
 
         <div class="toc-part-heading"><span class="part-no">Part 4</span><span class="part-name">Remedy &amp; Closing</span></div>
-        <div class="toc-row"><span class="num">13</span><div><div class="title">Remedies</div><div class="meta">Mantras · Gems · Practices</div></div><div></div><span class="pg">18</span></div>
-        <div class="toc-row"><span class="num">14</span><div><div class="title">Closing</div><div class="meta">A final reflection</div></div><div></div><span class="pg">19</span></div>
-        <div class="toc-row"><span class="num">15</span><div><div class="title">Engine Ledger</div><div class="meta">Data modules used in this report</div></div><div></div><span class="pg">20</span></div>
+        <div class="toc-row"><span class="num">12</span><div><div class="title">Remedies</div><div class="meta">Mantras · Gems · Practices</div></div><div></div><span class="pg">17</span></div>
+        <div class="toc-row"><span class="num">13</span><div><div class="title">Closing</div><div class="meta">A final reflection</div></div><div></div><span class="pg">18</span></div>
+        <div class="toc-row"><span class="num">14</span><div><div class="title">Engine Ledger</div><div class="meta">Data modules used in this report</div></div><div></div><span class="pg">19</span></div>
       </div>
     </div>
   </div>
@@ -1526,6 +1576,45 @@ function pageLalKitabTimingAndRemedy(chart: ChartData): string {
 </section>`;
 }
 
+function pageLalKitabPlanetDomains(chart: ChartData): string {
+  const lk = calculateLalKitab(chart.planets, chart.dob, chart.lagnaNum ?? 0);
+  const rows = lk.planets.map((p) => {
+    const badge = p.state === "nek" ? "jade" : p.state === "mandi" ? "crimson" : "saffron";
+    return `<div class="card" style="padding:10px 12px;border-left:2px solid ${p.state === "nek" ? "var(--jade)" : p.state === "mandi" ? "var(--crimson)" : "var(--gold)"};">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px;">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${esc(p.icon)} ${esc(p.planet)} · H${p.house}</div>
+          <div class="mono" style="font-size:9px;color:var(--gold-dim);">${esc(p.statusLabel)} · ${esc(p.sign)} · Score ${p.score}</div>
+        </div>
+        <span class="badge ${badge}" style="font-size:8px;">${esc(p.state)}</span>
+      </div>
+      <div class="body-s" style="line-height:1.55;margin-bottom:6px;"><strong style="color:var(--gold-dim);">Money:</strong> ${esc(p.money)}</div>
+      <div class="body-s" style="line-height:1.55;margin-bottom:6px;"><strong style="color:var(--saffron);">Career:</strong> ${esc(p.career)}</div>
+      <div class="body-s" style="line-height:1.55;margin-bottom:6px;"><strong style="color:var(--violet);">Family:</strong> ${esc(p.family)}</div>
+      <div class="body-s" style="line-height:1.55;"><strong style="color:var(--jade);">Remedy:</strong> ${esc(p.upaya)}</div>
+    </div>`;
+  }).join("");
+
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail("Lal Kitab · Planet Domains", "LK-3")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num">LK</span>
+        <h2>Lal Kitab Planet Domains</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:14px;max-width:640px;color:var(--ivory-dim);line-height:1.7;">
+        This page expands Lal Kitab beyond generic upay. Every graha is read through money, career, family and correction language so the user knows where the planet is actually operating.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        ${rows}
+      </div>
+    </div>
+    ${pageFoot("astrolife · lal kitab engine", "Planet Domains")}
+  </section>`;
+}
+
 // ── Page 9: Remedies ──────────────────────────────────────────────────────
 
 function page9Remedies(chart: ChartData): string {
@@ -1667,24 +1756,36 @@ function page11EngineLedger(context: ReportEngineContext): string {
     ["Yogas", context.engines.yogas.status, context.engines.yogas.note],
     ["Doshas", context.engines.doshas.status, context.engines.doshas.note],
     ["Shadbala", context.engines.shadbala.status, context.engines.shadbala.note],
+    ["Ashtakavarga", "covered", "Sarvashtakavarga and house bindu scores are rendered in Premium and Elite."],
     ["Divisional Charts", context.engines.divisionalCharts.status, context.engines.divisionalCharts.note],
-    ["Transit", context.engines.transit.status, context.engines.transit.note],
+    ["Transit Radar", context.engines.transit.status, "Moon-first transit and 7-day Event Radar are rendered with Lagna cross-check."],
+    ["Transit Ripple", context.engines.transitRipple.status, context.engines.transitRipple.note],
+    ["KP", context.engines.kp.status, context.engines.kp.note],
+    ["Jaimini", context.engines.jaimini.status, context.engines.jaimini.note],
+    ["Sarvatobhadra", context.engines.sarvatobhadra.status, context.engines.sarvatobhadra.note],
+    ["Special Lagnas", context.engines.specialLagnas.status, context.engines.specialLagnas.note],
+    ["Lal Kitab", "covered", "Core accuracy, timing, remedy and planet-domain money/career matrix are rendered."],
     ["Remedies", context.engines.remedies.status, `${context.engines.remedies.topPlanet} focus · ${context.engines.remedies.urgentCount} urgent items`],
     ["AstroSound", context.engines.astroSound.status, context.engines.astroSound.note],
     ["Vastu", context.engines.vastu.status, context.engines.vastu.note],
+    ["Marriage Intelligence", context.engines.marriageIntel.status, context.engines.marriageIntel.note],
+    ["Relationship Intelligence", context.engines.relationshipIntel.status, context.engines.relationshipIntel.note],
+    ["Gemstone", context.engines.gemstone.status, context.engines.gemstone.note],
+    ["Palmistry Fusion", context.engines.palmistryFusion.status, context.engines.palmistryFusion.note],
     ["Family Synastry", context.engines.familySynastry.status, context.engines.familySynastry.note],
   ];
 
   const badgeClass = (status: string) => {
     if (status === "ready" || status === "covered") return "jade";
     if (status === "proxy" || status === "partial") return "saffron";
-    if (status === "missing" || status === "pending") return "crimson";
+    if (status === "missing" || status === "pending" || status === "requires-scan") return "crimson";
     return "";
   };
 
   // User-friendly status labels (PROXY is internal jargon)
   const statusLabel = (status: string): string => {
     if (status === "proxy") return "basic";
+    if (status === "requires-scan") return "scan needed";
     return status;
   };
   const tableRows = rows.map(([name, status, note]) => `
@@ -2869,18 +2970,25 @@ function pageDestiny(chart: ChartData): string {
 // ── Transit & Event Radar ─────────────────────────────────────────────────
 function pageTransitRadar(chart: ChartData): string {
   const normChart = normalizeChartForTransit(chart);
-  const transit = calculateTransitReport({ chart: normChart, base: "lagna", date: new Date() }) as any;
-  const radar = calculateEventRadarReport({ chart: normChart, startDate: new Date(), days: 7, base: "lagna" }) as any;
-  const days = radar.days ?? [];
+  const moonTransit = calculateTransitReport({ chart: normChart, base: "moon", date: new Date() }) as any;
+  const lagnaTransit = calculateTransitReport({ chart: normChart, base: "lagna", date: new Date() }) as any;
+  const moonRadar = calculateEventRadarReport({ chart: normChart, startDate: new Date(), days: 7, base: "moon" }) as any;
+  const lagnaRadar = calculateEventRadarReport({ chart: normChart, startDate: new Date(), days: 7, base: "lagna" }) as any;
+  const days = moonRadar.days ?? [];
   const best = [...days].sort((a: any, b: any) => b.overallScore - a.overallScore)[0];
   const caution = [...days].sort((a: any, b: any) => a.overallScore - b.overallScore)[0];
-  const areaScores = transit.areaScores ?? [];
+  const areaScores = moonTransit.areaScores ?? [];
+  const lagnaTop = [...(lagnaTransit.areaScores ?? [])].sort((a: any, b: any) => Number(b.score ?? 0) - Number(a.score ?? 0))[0];
+  const moonTop = [...(moonTransit.areaScores ?? [])].sort((a: any, b: any) => Number(b.score ?? 0) - Number(a.score ?? 0))[0];
   return `<section class="page dense">
-    ${pageRail("Transit & Event Radar · 7-Day Activation", "ER")}
+    ${pageRail("Moon Transit & Event Radar · 7-Day Activation", "ER")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num" style="color:var(--jade);">ER</span>
-        <h2>Transit &amp; Event Radar</h2>
+        <h2>Moon-First Transit &amp; Event Radar</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:12px;max-width:640px;color:var(--ivory-dim);line-height:1.65;">
+        Moon base is the primary transit lens for lived pressure, mood, timing sensitivity and felt results. Lagna base is shown as the secondary manifestation lens for external events.
       </div>
       <div style="display:flex;gap:12px;margin-bottom:14px;">
         ${best ? `<div class="card" style="padding:10px 14px;border-left:3px solid var(--jade);flex:1;">
@@ -2894,6 +3002,18 @@ function pageTransitRadar(chart: ChartData): string {
           <div class="body-s">${esc(caution.cautionArea ?? "")} · Score ${caution.overallScore ?? "—"}</div>
         </div>` : ""}
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div class="card" style="padding:10px 12px;border-left:3px solid var(--jade);">
+          <div class="kicker" style="margin-bottom:4px;color:var(--jade);">Moon Base Primary</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--jade);">${esc(moonTop?.area ?? "balance")} · ${moonTop?.score ?? "—"}</div>
+          <div class="body-s" style="font-size:10px;color:var(--ivory-dim);">${esc(moonTransit.summary ?? "")}</div>
+        </div>
+        <div class="card" style="padding:10px 12px;border-left:3px solid var(--gold);">
+          <div class="kicker" style="margin-bottom:4px;color:var(--gold);">Lagna Base Manifestation</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);">${esc(lagnaTop?.area ?? "balance")} · ${lagnaTop?.score ?? "—"}</div>
+          <div class="body-s" style="font-size:10px;color:var(--ivory-dim);">${esc(lagnaTransit.summary ?? "")}</div>
+        </div>
+      </div>
       ${areaScores.length ? `<div class="card" style="padding:10px 12px;margin-bottom:12px;">
         <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Life Area Transit Scores</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
@@ -2904,7 +3024,7 @@ function pageTransitRadar(chart: ChartData): string {
         </div>
       </div>` : ""}
       <div class="card" style="padding:10px 12px;margin-bottom:12px;">
-        <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);">${esc(transit.summary ?? "")} ${esc(radar.summary ?? "")}</div>
+        <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);">${esc(moonRadar.summary ?? "")} Lagna cross-check: ${esc(lagnaRadar.summary ?? "")}</div>
       </div>
       ${days.length ? `<div class="card" style="padding:10px 12px;">
         <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">7-Day Event Radar</div>
@@ -3131,6 +3251,9 @@ function pageKP(chart: ChartData): string {
 // ── Transit Ripple ────────────────────────────────────────────────────────
 function pageTransitRipple(chart: ChartData): string {
   const RIPPLE_PLANETS: TransitRipplePlanet[] = ["Saturn","Jupiter","Rahu","Ketu","Mars","Sun","Moon","Mercury","Venus"];
+  const normChart = normalizeChartForTransit(chart);
+  const moonTransit = calculateTransitReport({ chart: normChart, base: "moon", date: new Date() }) as any;
+  const lagnaTransit = calculateTransitReport({ chart: normChart, base: "lagna", date: new Date() }) as any;
   const ripples = RIPPLE_PLANETS.map(planet => {
     try { return buildTransitRipplePayloadFromChart(chart, planet); } catch { return null; }
   }).filter(Boolean) as NonNullable<ReturnType<typeof buildTransitRipplePayloadFromChart>>[];
@@ -3147,8 +3270,20 @@ function pageTransitRipple(chart: ChartData): string {
         <h2>Transit Ripple</h2>
       </div>
       <div class="body-s" style="margin-bottom:14px;max-width:620px;color:var(--ivory-dim);">
-        Current transit positions of all major planets against the natal chart.
+        Current transit positions of all major planets against the natal chart. Moon base is treated as primary; Lagna is used as manifestation cross-check.
         ${dashaLinked.length ? `Dasha-linked transits (louder this period): <span style="color:var(--gold);">${dashaLinked.map(r => r.payload.transitPlanet).join(", ")}</span>` : "No dasha-linked transits active this period."}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div class="card" style="padding:10px 12px;border-left:3px solid var(--jade);">
+          <div class="kicker" style="margin-bottom:4px;color:var(--jade);">Moon Ripple Context</div>
+          <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);">${esc(moonTransit.summary ?? "")}</div>
+          <div class="body-s" style="font-size:9px;margin-top:5px;color:var(--gold-dim);">${esc((moonTransit.alerts ?? []).slice(0,2).map((a: any) => a.title).join(" · ") || "No major Moon-base alert")}</div>
+        </div>
+        <div class="card" style="padding:10px 12px;border-left:3px solid var(--gold);">
+          <div class="kicker" style="margin-bottom:4px;color:var(--gold);">Lagna Ripple Context</div>
+          <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);">${esc(lagnaTransit.summary ?? "")}</div>
+          <div class="body-s" style="font-size:9px;margin-top:5px;color:var(--gold-dim);">${esc((lagnaTransit.alerts ?? []).slice(0,2).map((a: any) => a.title).join(" · ") || "No major Lagna-base alert")}</div>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
         ${ripples.map(r => {
@@ -3430,6 +3565,289 @@ function pageGemstone(chart: ChartData): string {
       </div>
     </div>
     ${pageFoot("astrolife · cosmic blueprint", "Gemstone")}
+</section>`;
+}
+
+function scoreTone(score: number) {
+  if (score >= 78) return "var(--jade)";
+  if (score >= 62) return "var(--gold)";
+  return "var(--crimson)";
+}
+
+function buildEliteScore(chart: ChartData) {
+  const shadbala = calculateShadbala(chart.planets as Parameters<typeof calculateShadbala>[0]) as any;
+  const yogas = detectYogas(chart.planets as Parameters<typeof detectYogas>[0], chart.lagnaNum, "premium");
+  const remedies = calculateRemedies(chart);
+  const destiny = calculateDestiny(chart.planets as any, chart.dashas, chart.dob, chart.lagnaNum ?? 0) as any;
+  const akv = calculateAshtakavarga(chart.planets as Parameters<typeof calculateAshtakavarga>[0], chart.lagnaNum) as any;
+  const yogaScore = Math.min(95, 55 + yogas.length * 4);
+  const strengthScore = Math.round(Number(shadbala?.overallScore ?? shadbala?.totalScore ?? 68));
+  const destinyScore = Math.round(Number(destiny?.overallScore ?? destiny?.currentScore ?? 70));
+  const ashtakaScore = Math.round(Math.min(95, Math.max(45, Number(akv?.sarvaTotal ?? 337) / 4.4)));
+  const remedyScore = Math.max(48, 86 - remedies.urgentCount * 7);
+  const finalScore = Math.round((strengthScore * 0.25) + (yogaScore * 0.2) + (destinyScore * 0.25) + (ashtakaScore * 0.15) + (remedyScore * 0.15));
+  return { finalScore, strengthScore, yogaScore, destinyScore, ashtakaScore, remedyScore, yogaCount: yogas.length, urgentCount: remedies.urgentCount };
+}
+
+function pageEliteSynthesis(chart: ChartData): string {
+  const elite = buildEliteScore(chart);
+  const activeMD = chart.dashas.find(d => d.active) ?? chart.dashas[0];
+  const activeAD = chart.antardasha.find(d => d.active) ?? chart.antardasha[0];
+  const normChart = normalizeChartForTransit(chart);
+  const moonTransit = calculateTransitReport({ chart: normChart, base: "moon", date: new Date() }) as any;
+  const topTransit = [...(moonTransit.areaScores ?? [])].sort((a: any, b: any) => Number(b.score ?? 0) - Number(a.score ?? 0))[0];
+  const rows = [
+    ["Planet Strength", elite.strengthScore, "Shadbala and dignity layer"],
+    ["Yoga Activation", elite.yogaScore, `${elite.yogaCount} active yogas/doshas reviewed`],
+    ["Dasha Destiny", elite.destinyScore, `${activeMD?.planet ?? "—"} MD · ${activeAD?.planet ?? "—"} AD`],
+    ["Ashtakavarga Support", elite.ashtakaScore, "House bindu support map"],
+    ["Correction Load", elite.remedyScore, `${elite.urgentCount} urgent remedy items`],
+  ].map(([label, score, note]) => `<div class="card" style="padding:10px 12px;">
+    <div class="kicker" style="font-size:8px;margin-bottom:4px;">${esc(String(label))}</div>
+    <div style="font-size:28px;font-weight:700;color:${scoreTone(Number(score))};">${score}</div>
+    <div class="body-s" style="font-size:9px;line-height:1.4;color:var(--ivory-dim);">${esc(String(note))}</div>
+  </div>`).join("");
+
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-br"></div>
+    ${pageRail("Elite Synthesis · Final Intelligence", "EI")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">EI</span>
+        <h2>Elite Intelligence Score</h2>
+      </div>
+      <div style="display:flex;gap:16px;margin-bottom:16px;align-items:stretch;">
+        <div class="card gold-edge" style="padding:18px 24px;text-align:center;min-width:210px;">
+          <div class="kicker">Final AI Intelligence Score</div>
+          <div style="font-size:56px;line-height:1;font-weight:800;color:${scoreTone(elite.finalScore)};">${elite.finalScore}</div>
+          <div class="body-s" style="color:var(--ivory-dim);">/100 · multi-engine synthesis</div>
+        </div>
+        <div class="card" style="padding:14px;flex:1;">
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Premium Synthesis</div>
+          <div class="body-s" style="line-height:1.75;color:var(--ivory-dim);">
+            AstroLife weighs natal promise, dasha activation, Moon-first transit pressure, yogas, strength scores and remedy load together. Current timing is led by <span style="color:var(--gold);">${esc(activeMD?.planet ?? "—")}</span> Mahadasha and <span style="color:var(--gold);">${esc(activeAD?.planet ?? "—")}</span> Antardasha. Moon-transit emphasis points to <span style="color:var(--jade);">${esc(topTransit?.area ?? "balance")}</span> as the strongest live theme.
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;">${rows}</div>
+      <div class="card" style="padding:12px;border-left:3px solid var(--jade);">
+        <div class="kicker" style="margin-bottom:5px;color:var(--jade);">Elite Action Priority</div>
+        <div class="body-s" style="line-height:1.7;">Act where dasha, strength and Moon transit agree. Delay high-risk choices where remedy load and caution transits overlap. This is the core Elite layer: convergence beats isolated prediction.</div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · elite intelligence", "Elite Score")}
+  </section>`;
+}
+
+function buildAstroFusionContextFromChart(chart: ChartData): AstroLifeFusionContext {
+  const activeMD = chart.dashas.find(d => d.active) ?? chart.dashas[0];
+  const activeAD = chart.antardasha.find(d => d.active) ?? chart.antardasha[0];
+  const numerology = calculateNumerology(chart.name, chart.dob);
+  const strengthCandidates = Object.entries(chart.planets)
+    .filter(([, planet]: any) => {
+      const dignity = String(planet?.dignity ?? "").toLowerCase();
+      return dignity.includes("own") || dignity.includes("exalt") || dignity.includes("sva") || dignity.includes("mool");
+    })
+    .map(([planet]) => planet);
+
+  return {
+    chart: {
+      ascendant: chart.lagnaRashi,
+      moonSign: chart.planets.Moon?.sign,
+      sunSign: chart.planets.Sun?.sign,
+      strongPlanets: strengthCandidates.length ? strengthCandidates : Object.keys(chart.planets).slice(0, 3),
+      activeHouses: [
+        chart.planets.Mercury?.house,
+        chart.planets.Jupiter?.house,
+        chart.planets.Venus?.house,
+        chart.planets.Saturn?.house,
+      ].filter((house): house is number => typeof house === "number"),
+      careerIndicators: [`${activeMD?.planet ?? "Current"} dasha timing is active`, `10th-house context reviewed from ${chart.lagnaRashi} lagna`],
+      wealthIndicators: [`2nd/11th house support reviewed through linked Kundli`],
+      relationshipIndicators: [`Venus and D9-style relationship signatures reviewed`],
+      travelIndicators: [`Moon/Rahu/12th-house movement signals reviewed`],
+      vitalityIndicators: [`Moon-first vitality and stress rhythm reviewed`],
+    },
+    dasha: {
+      currentMD: activeMD?.planet,
+      currentAD: activeAD?.planet,
+      activePlanets: [activeMD?.planet, activeAD?.planet].filter(Boolean) as string[],
+      startDate: activeMD?.start ? new Date(activeMD.start).toISOString() : undefined,
+      endDate: activeMD?.end ? new Date(activeMD.end).toISOString() : undefined,
+      themes: [`${activeMD?.planet ?? "Current"} period sets the main timing tone`],
+    },
+    numerology: {
+      lifePathNumber: numerology.lifePath.value,
+      destinyNumber: numerology.destiny.value,
+      personalYearNumber: numerology.personalYear.value,
+      favorableNumbers: numerology.lifePath.compatibleWith,
+      themes: [numerology.lifePath.keyword, numerology.personalYear.keyword],
+    },
+  };
+}
+
+function pct(value: number) {
+  return Math.round(value > 1 ? value : value * 100);
+}
+
+function renderFusionInsightCard(insight: FusionInsight) {
+  const sourceLine = [
+    insight.palmSignals.length ? `${insight.palmSignals.length} palm` : "",
+    insight.astroSignals.length ? `${insight.astroSignals.length} chart` : "",
+    insight.timingSignals.length ? `${insight.timingSignals.length} timing` : "",
+    insight.numerologySignals.length ? `${insight.numerologySignals.length} numerology` : "",
+  ].filter(Boolean).join(" · ");
+
+  return `<div class="card" style="padding:10px 12px;">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:5px;">
+      <div class="kicker" style="font-size:8px;color:var(--gold);">${esc(insight.title)}</div>
+      <div style="font-size:18px;font-weight:800;color:${scoreTone(pct(insight.confidence))};">${pct(insight.confidence)}</div>
+    </div>
+    <div class="body-s" style="font-size:9.5px;line-height:1.45;color:var(--ivory-dim);">${esc(insight.summary)}</div>
+    <div style="margin-top:6px;font-size:8.5px;color:var(--jade);">${esc(sourceLine || insight.agreement)}</div>
+  </div>`;
+}
+
+function pageElitePalmistryFusion(chart: ChartData, options?: Partial<ReportOptions>): string {
+  const palmResult = options?.palmistryFusion?.palmResult;
+
+  if (palmResult) {
+    const astroContext = options?.palmistryFusion?.astroContext ?? buildAstroFusionContextFromChart(chart);
+    const fusion: AstroPalmFusionOutput = createAstroPalmFusion({
+      palmResult,
+      astroContext,
+      userTier: "elite",
+    });
+    const topInsights = fusion.insights.slice(0, 6);
+    const topPalmSections = palmResult.sections
+      .filter(section => section.hits.length > 0)
+      .slice(0, 5)
+      .map(section => `<div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(255,255,255,0.07);padding:5px 0;">
+        <span>${esc(section.title)}</span>
+        <strong style="color:${scoreTone(section.confidence)};">${Math.round(section.confidence)}</strong>
+      </div>`)
+      .join("");
+    const insightCards = topInsights.map(renderFusionInsightCard).join("");
+    const recommendation = topInsights[0]?.guidance?.slice(0, 3).map(item => `<li>${esc(item)}</li>`).join("") || "<li>Attach a clearer palm scan to strengthen cross-system confidence.</li>";
+
+    return `<section class="page dense">
+      <div class="starfield"></div>
+      <div class="glow-tl"></div>
+      ${pageRail("Palmistry Fusion · Elite Evidence", "PF")}
+      <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+        <div class="section-title" style="margin-bottom:12px;">
+          <span class="section-num" style="color:var(--violet);">PF</span>
+          <h2>Elite Palmistry Fusion</h2>
+        </div>
+        <div class="card gold-edge" style="padding:13px;margin-bottom:12px;">
+          <div class="kicker" style="margin-bottom:5px;color:var(--jade);">Linked Palm Scan Active</div>
+          <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);">${esc(fusion.overallSummary)} Palmistry is used as visible behavioural evidence; Kundli, Dasha and Numerology are used as timing and blueprint confirmation.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:10px;margin-bottom:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">${insightCards}</div>
+          <div class="card" style="padding:12px;">
+            <div class="kicker" style="margin-bottom:7px;color:var(--saffron);">Palm Evidence Confidence</div>
+            <div class="body-s" style="line-height:1.5;color:var(--ivory-dim);">${topPalmSections || "Palm section confidence is not available in this session."}</div>
+          </div>
+        </div>
+        <div class="card" style="padding:12px;border-left:3px solid var(--violet);">
+          <div class="kicker" style="margin-bottom:5px;color:var(--violet);">Elite Fusion Recommendation</div>
+          <ul class="body-s" style="margin:0;padding-left:16px;line-height:1.65;color:var(--ivory-dim);">${recommendation}</ul>
+          ${fusion.missingContext.length ? `<div class="body-s" style="margin-top:7px;color:var(--crimson);">Missing context: ${esc(fusion.missingContext.join(", "))}</div>` : ""}
+        </div>
+      </div>
+      ${pageFoot("astrolife · palm fusion", "Palm Fusion")}
+    </section>`;
+  }
+
+  const moon = chart.planets.Moon;
+  const mercury = chart.planets.Mercury;
+  const venus = chart.planets.Venus;
+  const saturn = chart.planets.Saturn;
+  const themes = [
+    ["Mind & Decision Style", moon?.sign ?? "Moon", "Palm Head Line and thumb logic should be compared with Moon/Mercury patterns."],
+    ["Communication & Business", mercury?.sign ?? "Mercury", "Palm Mercury mount/line should confirm speech, trade and adaptability signals."],
+    ["Relationship Pattern", venus?.sign ?? "Venus", "Heart Line, Venus mount and relationship markings should be cross-checked with Venus/D9 signatures."],
+    ["Discipline & Karma", saturn?.sign ?? "Saturn", "Saturn mount, Fate Line and career markings should confirm long-term burden and maturity patterns."],
+  ].map(([title, signal, note]) => `<div class="card" style="padding:11px 12px;">
+    <div class="kicker" style="font-size:8px;margin-bottom:4px;">${esc(title)}</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-bright);">${esc(signal)}</div>
+    <div class="body-s" style="font-size:10px;line-height:1.5;color:var(--ivory-dim);">${esc(note)}</div>
+  </div>`).join("");
+
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail("Palmistry Fusion · Elite Bridge", "PF")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--violet);">PF</span>
+        <h2>Palmistry Fusion</h2>
+      </div>
+      <div class="card gold-edge" style="padding:14px;margin-bottom:14px;">
+        <div class="kicker" style="margin-bottom:6px;">Elite Fusion Status</div>
+        <div class="body-s" style="line-height:1.75;color:var(--ivory-dim);">
+          This Kundli PDF is palm-fusion ready. A full palm evidence layer requires a linked AstroLife palm scan session, which remains available through the separate Palmistry PDF export. Once linked, this page should replace readiness notes with palm line confidence, mount scores, finger intelligence and Palm + Kundli alignment.
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">${themes}</div>
+      <div class="card" style="padding:12px;border-left:3px solid var(--violet);">
+        <div class="kicker" style="margin-bottom:5px;color:var(--violet);">Fusion Recommendation</div>
+        <div class="body-s" style="line-height:1.7;">Generate or attach a palm report for this user, then compare Head Line with Mercury/Moon, Heart Line with Venus/D9, Fate Line with Saturn/10th house, and Mount Jupiter with Jupiter/9th house. Only aligned signals should be promoted as high-confidence Elite insights.</div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · palm fusion", "Palm Fusion")}
+  </section>`;
+}
+
+function pageEliteAstrologerReview(chart: ChartData): string {
+  const activeMD = chart.dashas.find(d => d.active) ?? chart.dashas[0];
+  const activeAD = chart.antardasha.find(d => d.active) ?? chart.antardasha[0];
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-br"></div>
+    ${pageRail("Elite · Real Astrologer Review", "RA")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">RA</span>
+        <h2>Real Astrologer Review</h2>
+      </div>
+      <div class="card gold-edge" style="padding:16px;margin-bottom:16px;">
+        <div class="kicker" style="margin-bottom:6px;">Included With Elite</div>
+        <div class="body-s" style="line-height:1.8;color:var(--ivory-dim);">
+          Elite report users should receive a human astrologer review layer after the AI engine has generated the complete dossier. The astrologer verifies the strongest chart themes, corrects over-emphasis, and gives the final human judgement on timing, remedies and priority actions.
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="card" style="padding:12px;border-left:3px solid var(--jade);">
+          <div class="kicker" style="margin-bottom:5px;color:var(--jade);">What The Astrologer Checks</div>
+          <div class="body-s" style="line-height:1.7;">
+            <div>• Birth data and chart consistency</div>
+            <div>• Current dasha: ${esc(activeMD?.planet ?? "—")} MD · ${esc(activeAD?.planet ?? "—")} AD</div>
+            <div>• High-confidence yogas and doshas</div>
+            <div>• Remedy safety and practicality</div>
+            <div>• Moon transit pressure versus Lagna manifestation</div>
+          </div>
+        </div>
+        <div class="card" style="padding:12px;border-left:3px solid var(--gold);">
+          <div class="kicker" style="margin-bottom:5px;color:var(--gold);">Delivery Promise</div>
+          <div class="body-s" style="line-height:1.7;">
+            <div>• Human-reviewed priority summary</div>
+            <div>• Final action list for career, money, relationship and remedies</div>
+            <div>• Clarification of confusing or conflicting signals</div>
+            <div>• No fear-based prediction, no medical/legal/financial certainty</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:12px;border-left:3px solid var(--violet);">
+        <div class="kicker" style="margin-bottom:5px;color:var(--violet);">AstroLife Standard</div>
+        <div class="body-s" style="line-height:1.75;color:var(--ivory-dim);">
+          AI gives scale and depth. The real astrologer gives final discernment. This is what makes Elite different from a large automated PDF.
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · elite human review", "Astrologer Review")}
   </section>`;
 }
 
@@ -3455,39 +3873,49 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
   // full = everything; kundli = chart-heavy; remedy = remedy-heavy;
   // medical = health-only; destiny = career + dasha focus.
   const t = context.settings.type;
+  const isBasicReport = t === "basic";
+  const isPremiumReport = t === "full" || t === "premium" || t === "elite";
+  const isEliteReport = t === "elite";
+  const isKundliReport = t === "kundli";
+  const isRemedyReport = t === "remedy";
+  const isDestinyReport = t === "destiny";
+  const isMedicalReport = t === "medical";
   const include = {
     chart:       true,                                              // always
     starMap:     true,                                              // always — the planetary sky chart
-    perPlanet:   t === "full" || t === "kundli",
-    perHouse:    t === "full" || t === "kundli",
-    yogas:       t === "full" || t === "kundli" || t === "destiny",
-    doshas:      t === "full" || t === "kundli",
-    shadbala:    t === "full" || t === "kundli",
-    divisional:  t === "full" || t === "kundli",
-    dasha:       t === "full" || t === "remedy" || t === "destiny",
-    nakshatra:   t === "full" || t === "kundli" || t === "remedy",
-    health:      t === "full" || t === "medical",
-    psychology:  t === "full",
-    numerology:  t === "full",
-    lalkitab:    t === "full" || t === "kundli" || t === "remedy",
-    remedies:    t === "full" || t === "remedy" || t === "medical",
+    perPlanet:   isPremiumReport || isKundliReport || isEliteReport,
+    perHouse:    isPremiumReport || isKundliReport || isEliteReport,
+    yogas:       isBasicReport || isPremiumReport || isKundliReport || isDestinyReport || isEliteReport,
+    doshas:      isPremiumReport || isKundliReport || isEliteReport,
+    shadbala:    isPremiumReport || isKundliReport || isEliteReport,
+    divisional:  isPremiumReport || isKundliReport || isEliteReport,
+    dasha:       isPremiumReport || isRemedyReport || isDestinyReport || isEliteReport,
+    nakshatra:   isBasicReport || isPremiumReport || isKundliReport || isRemedyReport || isEliteReport,
+    health:      isMedicalReport,
+    psychology:  isPremiumReport || isEliteReport,
+    numerology:  isPremiumReport || isEliteReport,
+    lalkitab:    isPremiumReport || isKundliReport || isRemedyReport || isEliteReport,
+    remedies:    isPremiumReport || isRemedyReport || isMedicalReport || isEliteReport,
     // Phase 3
-    ashtakavarga: t === "full" || t === "kundli",
-    antardasha:   t === "full" || t === "remedy" || t === "destiny",
-    lifeAreas:    t === "full" || t === "destiny",
+    ashtakavarga: isPremiumReport || isKundliReport || isEliteReport,
+    antardasha:   isPremiumReport || isRemedyReport || isDestinyReport || isEliteReport,
+    lifeAreas:    isPremiumReport || isDestinyReport || isEliteReport,
     // Phase 4 — new engines
-    destiny:       t === "full" || t === "destiny",
-    transitRadar:  t === "full" || t === "destiny",
-    jaimini:       t === "full" || t === "kundli",
-    vastu:         t === "full",
-    sarvatobhadra: t === "full",
-    kp:            t === "full" || t === "kundli",
-    transitRipple: t === "full" || t === "destiny",
-    specialLagnas: t === "full" || t === "kundli",
-    marriageIntel: t === "full",
-    relationshipIntel: t === "full",
-    astroSound:    t === "full",
-    gemstone:      t === "full",
+    destiny:       isPremiumReport || isDestinyReport || isEliteReport,
+    transitRadar:  isPremiumReport || isDestinyReport || isEliteReport,
+    jaimini:       isPremiumReport || isKundliReport || isEliteReport,
+    vastu:         isPremiumReport || isEliteReport,
+    sarvatobhadra: isPremiumReport || isEliteReport,
+    kp:            isPremiumReport || isKundliReport || isEliteReport,
+    transitRipple: isPremiumReport || isDestinyReport || isEliteReport,
+    specialLagnas: isPremiumReport || isKundliReport || isEliteReport,
+    marriageIntel: isPremiumReport || isEliteReport,
+    relationshipIntel: isPremiumReport || isEliteReport,
+    astroSound:    isPremiumReport || isEliteReport,
+    gemstone:      isPremiumReport || isEliteReport,
+    eliteSynthesis: isEliteReport,
+    palmistryFusion: isEliteReport,
+    astrologerReview: isEliteReport,
   };
 
   // Per-planet deep-dive pages (Phase 2). Page numbers are cosmetic labels.
@@ -3526,6 +3954,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.antardasha ? safe(() => pageAntardashaDetail(chart, "Ad"), "Antardasha") : "",
     include.lalkitab   ? safe(() => pageLalKitabCoreAccuracy(chart), "Lal Kitab Core Accuracy") : "",
     include.lalkitab   ? safe(() => pageLalKitabTimingAndRemedy(chart), "Lal Kitab Timing & Remedy") : "",
+    include.lalkitab   ? safe(() => pageLalKitabPlanetDomains(chart), "Lal Kitab Planet Domains") : "",
     include.nakshatra  ? safe(() => pageNakshatra(chart),   "Nakshatra")       : "",
     ...lifeAreaPages,
     include.health     ? safe(() => pageHealth(chart),      "Health")          : "",
@@ -3545,6 +3974,9 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.relationshipIntel? safe(() => pageRelationshipIntelligence(chart),"Relationship Intel") : "",
     include.astroSound       ? safe(() => pageAstroSound(chart),            "Astro Sound")          : "",
     include.gemstone         ? safe(() => pageGemstone(chart),              "Gemstone")             : "",
+    include.palmistryFusion  ? safe(() => pageElitePalmistryFusion(chart, options),  "Palmistry Fusion")     : "",
+    include.eliteSynthesis   ? safe(() => pageEliteSynthesis(chart),        "Elite Synthesis")      : "",
+    include.astrologerReview ? safe(() => pageEliteAstrologerReview(chart), "Real Astrologer Review") : "",
     safe(() => page10Closing(chart),         "Closing"),
     safe(() => page11EngineLedger(context),  "Engine Ledger"),
   ].filter(Boolean).join("\n\n");

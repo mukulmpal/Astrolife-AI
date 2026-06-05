@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
@@ -84,13 +84,28 @@ function RemedyCard({ title, icon, remedies, color, tag }: {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
+function shiftDays(d: Date, days: number) {
+  const copy = new Date(d);
+  copy.setDate(copy.getDate() + days);
+  return copy;
+}
+
+function toDateInputValue(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function toTimeInputValue(d: Date) {
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 export default function PanchangPage() {
   const { chart } = useUserChart();
   const tz = typeof chart?.tz === "number" ? chart.tz : 5.5;
+  const [selectedMoment, setSelectedMoment] = useState(() => new Date());
 
   const panchang = useMemo(
-    () => calculatePanchang(new Date(), tz, { lat: chart?.lat, lon: chart?.lon }),
-    [chart?.lat, chart?.lon, tz]
+    () => calculatePanchang(selectedMoment, tz, { lat: chart?.lat, lon: chart?.lon }),
+    [chart?.lat, chart?.lon, tz, selectedMoment]
   );
 
   const dashaTree = useMemo(() => {
@@ -136,6 +151,56 @@ export default function PanchangPage() {
           <p className="text-xs uppercase tracking-[0.2em] text-sky-300">Panchang Engine</p>
           <h1 className="text-3xl font-bold mt-1">Daily Panchang</h1>
           <p className="text-white/50 text-sm mt-1">{panchang.weekday}, {panchang.date}</p>
+          <div className="flex flex-wrap gap-2 items-center mt-4">
+            <button
+              type="button"
+              className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white/80"
+              onClick={() => setSelectedMoment((d) => shiftDays(d, -1))}
+            >
+              ← Prev day
+            </button>
+            <input
+              type="date"
+              className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+              value={toDateInputValue(selectedMoment)}
+              onChange={(e) => {
+                if (!e.target.value) return;
+                const [y, m, day] = e.target.value.split("-").map(Number);
+                setSelectedMoment((prev) => {
+                  const next = new Date(prev);
+                  next.setFullYear(y, m - 1, day);
+                  return next;
+                });
+              }}
+            />
+            <input
+              type="time"
+              className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+              value={toTimeInputValue(selectedMoment)}
+              onChange={(e) => {
+                const [hh, mm] = e.target.value.split(":").map(Number);
+                setSelectedMoment((prev) => {
+                  const next = new Date(prev);
+                  next.setHours(hh, mm, 0, 0);
+                  return next;
+                });
+              }}
+            />
+            <button
+              type="button"
+              className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white/80"
+              onClick={() => setSelectedMoment((d) => shiftDays(d, 1))}
+            >
+              Next day →
+            </button>
+            <button
+              type="button"
+              className="rounded-lg border border-sky-400/40 bg-sky-400/10 px-3 py-2 text-sm text-sky-200"
+              onClick={() => setSelectedMoment(new Date())}
+            >
+              Now
+            </button>
+          </div>
         </section>
 
         {/* Panchang 5 Elements */}

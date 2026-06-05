@@ -8,6 +8,8 @@ import {
 } from "@/lib/astro-engine/palmistry-engine";
 import { getServerFeatureAccess, premiumBlockedResponse } from "@/lib/server-feature-access";
 import { monitor } from "@/lib/server-monitoring";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { fail, isRecord, ok, optionalText, readJsonWithLimit, sanitizeText, type ValidationResult } from "@/lib/validation/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,6 +29,20 @@ interface PalmistryResponse {
   error?: string;
   report?: PalmistryReport;
   model?: string;
+}
+
+function validatePalmistryBody(value: unknown): ValidationResult<PalmistryRequest> {
+  if (!isRecord(value)) return fail("Palmistry payload must be an object.");
+  const image = sanitizeText(value.image, 7_200_000);
+  const mimeType = optionalText(value.mimeType, 40);
+  if (!image) return fail("Missing palm image.");
+  if (mimeType && !ALLOWED.includes(mimeType.toLowerCase())) return fail("Only JPG and PNG images are supported.");
+
+  return ok({
+    image,
+    mimeType,
+    birth: isRecord(value.birth) ? value.birth as BirthContext : undefined,
+  });
 }
 
 function parseDataUrl(image: string, fallbackMime?: string): { mime: string; base64: string } | null {
@@ -82,6 +98,9 @@ async function analyzeWithGemini(
 
 export async function POST(request: NextRequest): Promise<NextResponse<PalmistryResponse>> {
   try {
+    const limit = checkRateLimit(request, { scope: "astro-palmistry", limit: 12, windowMs: 60 * 60_000 });
+    if (!limit.allowed) return rateLimitResponse(limit.resetAt) as NextResponse<PalmistryResponse>;
+
     const access = await getServerFeatureAccess("palmistry");
     if (!access.allowed) {
       monitor.warn("premium.blocked", {
@@ -96,14 +115,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<Palmistry
       );
     }
 
-    const body = (await request.json()) as Partial<PalmistryRequest>;
-
-    if (!body.image || typeof body.image !== "string") {
+    const parsedBody = await readJsonWithLimit(request, validatePalmistryBody, { maxBytes: 7_500_000, routeName: "astro-palmistry" });
+    if (!parsedBody.ok) {
       return NextResponse.json(
-        { success: false, error: "Missing palm image." },
-        { status: 400 }
+        { success: false, error: parsedBody.error },
+        { status: 400 },
       );
     }
+    const body = parsedBody.data;
 
     const parsed = parseDataUrl(body.image, body.mimeType);
     if (!parsed) {

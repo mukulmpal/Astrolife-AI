@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -16,18 +16,15 @@ export default function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [phone, setPhone] = useState('');
-  const [name, setName] = useState('');
+  const [name, setName] = useState(() => {
+    const nameParam = searchParams.get('name');
+    return nameParam ? decodeURIComponent(nameParam) : '';
+  });
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'init' | 'otp'>('init');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const supabase = createClient();
-
-  // Pre-fill data from homepage
-  useEffect(() => {
-    const nameParam = searchParams.get('name');
-    if (nameParam) setName(decodeURIComponent(nameParam));
-  }, [searchParams]);
 
   // Send OTP
   const handleSendOtp = async () => {

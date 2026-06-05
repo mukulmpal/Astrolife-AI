@@ -88,7 +88,7 @@ function HouseLordGrid({ lords }: { lords: Record<number, string> }) {
 }
 
 export default function KPPage() {
-  const { chart, loading } = useUserChart();
+  const { chart, loading, hasUserChart } = useUserChart();
   const { tp, ts, tn } = useLanguage();
   const [activeTab, setActiveTab] = useState<"table" | "cusps" | "events" | "forecast" | "lords" | "guide">("events");
   const [activeEventId, setActiveEventId] = useState<string>("career");
@@ -117,6 +117,19 @@ export default function KPPage() {
             title="KP Destiny Timing"
             loading
             loadingText="Chart loading... KP output will auto-sync in a moment."
+          />
+        </section>
+      </main>
+    );
+  }
+
+  if (!hasUserChart) {
+    return (
+      <main className="kp-page">
+        <section style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <EngineStateCard
+            title="KP Destiny Timing"
+            emptyText="Generate your kundli first to unlock KP (Krishnamurti) timing analysis."
           />
         </section>
       </main>

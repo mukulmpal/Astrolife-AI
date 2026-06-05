@@ -2,8 +2,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect, useMemo } from "react";
-import { useUserChart } from "@/lib/user-chart";
-import { calculateChart } from "@/lib/astro-engine/calculations";
+import {
+  listSavedCharts,
+  loadSavedChart,
+  type SavedChartSummary,
+  useUserChart,
+} from "@/lib/user-chart";
+import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
+import { calculateMilan, type MilanResult } from "@/lib/astro-engine/kundali-milan";
+import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import { buildJaiminiChart } from "@/lib/astro-engine/jaimini";
 import { scanMarriageWindows, type MarriageWindowScanResult, type MonthlyMarriageWindow } from "@/lib/astro-engine/marriage-window-scanner";
 
@@ -62,6 +69,156 @@ function strengthDisplay(label: string) {
   return "Weak (<3/8)";
 }
 
+function commitmentUseCase(w: MonthlyMarriageWindow): string {
+  if (w.adjustedScore >= 75) return "Best for formal family discussion, engagement planning or final commitment review.";
+  if (w.adjustedScore >= 63) return "Best for serious proposal talks, compatibility review and practical family alignment.";
+  if (w.adjustedScore >= 50) return "Best for observation, conversations and clearing practical doubts before commitment.";
+  return "Use as a low-pressure month; avoid forcing decisions only because timing looks active.";
+}
+
+function commitmentCaution(w: MonthlyMarriageWindow): string {
+  const cautions: string[] = [];
+  if (w.antardashaChanged) cautions.push("Antardasha changes this month, so decisions may need extra emotional patience.");
+  if (w.jupiterSignChanged) cautions.push("Jupiter changes sign, so the relationship support pattern is shifting.");
+  if (w.activeParameterCount < 4) cautions.push("Core timing parameters are below strong threshold.");
+  if (w.bonusActiveCount > 0) cautions.push("Advanced observations support the window, but they are secondary to core promise.");
+  return cautions.join(" ") || "No major timing caution detected; still combine with compatibility and real-life readiness.";
+}
+
+type PartnerReadiness = {
+  score: number;
+  adjustment: number;
+  status: string;
+  signals: string[];
+  cautions: string[];
+};
+
+function partnerReadinessFromChart(chart: ChartData | null): PartnerReadiness | null {
+  if (!chart) return null;
+
+  const seventhSign = SIGNS[(chart.lagnaNum + 6) % 12] ?? "Libra";
+  const seventhLord = SIGN_LORDS[seventhSign] ?? "Venus";
+  const md = chart.dashas.find((entry) => entry.active)?.planet;
+  const ad = chart.antardasha.find((entry) => entry.active)?.planet;
+  const d9LagnaNum = getD9LagnaNum(chart.lagnaLon);
+  const relationshipPlanets = ["Venus", "Jupiter", "Moon", seventhLord];
+  const supportiveHouses = new Set([1, 4, 5, 7, 9, 10, 11]);
+  const sensitiveHouses = new Set([6, 8, 12]);
+
+  let score = 50;
+  const signals: string[] = [];
+  const cautions: string[] = [];
+
+  const seventhLordData = chart.planets[seventhLord];
+  if (seventhLordData && supportiveHouses.has(seventhLordData.house)) {
+    score += 8;
+    signals.push(`Partner D1 7th lord ${seventhLord} is in supportive H${seventhLordData.house}.`);
+  } else if (seventhLordData && sensitiveHouses.has(seventhLordData.house)) {
+    score -= 6;
+    cautions.push(`Partner D1 7th lord ${seventhLord} is in sensitive H${seventhLordData.house}.`);
+  }
+
+  for (const planet of ["Venus", "Jupiter", "Moon"]) {
+    const data = chart.planets[planet];
+    if (!data) continue;
+    if (supportiveHouses.has(data.house)) {
+      score += planet === "Venus" ? 7 : 5;
+      signals.push(`Partner ${planet} supports relationship themes from H${data.house}.`);
+    } else if (sensitiveHouses.has(data.house)) {
+      score -= planet === "Venus" ? 5 : 3;
+      cautions.push(`Partner ${planet} needs care from H${data.house}.`);
+    }
+  }
+
+  for (const planet of relationshipPlanets) {
+    const data = chart.planets[planet];
+    if (!data) continue;
+    const d9SignNum = Math.floor((data.lon % 360) / (360 / 108)) % 12;
+    const d9House = ((d9SignNum - d9LagnaNum + 12) % 12) + 1;
+    if ([1, 5, 7, 9, 10, 11].includes(d9House)) {
+      score += 3;
+      signals.push(`Partner D9 ${planet} supports commitment from H${d9House}.`);
+    } else if ([6, 8, 12].includes(d9House)) {
+      score -= 2;
+      cautions.push(`Partner D9 ${planet} asks patience from H${d9House}.`);
+    }
+  }
+
+  if (md && relationshipPlanets.includes(md)) {
+    score += 6;
+    signals.push(`Partner active Mahadasha ${md} is relationship-relevant.`);
+  }
+  if (ad && relationshipPlanets.includes(ad)) {
+    score += 4;
+    signals.push(`Partner active Antardasha ${ad} supports relationship review.`);
+  }
+
+  const finalScore = Math.max(20, Math.min(95, Math.round(score)));
+  const adjustment = finalScore >= 78 ? 8 : finalScore >= 68 ? 5 : finalScore >= 58 ? 2 : finalScore >= 45 ? 0 : -5;
+  const status = finalScore >= 78 ? "Very Supportive" : finalScore >= 68 ? "Supportive" : finalScore >= 58 ? "Workable" : finalScore >= 45 ? "Mixed" : "Sensitive";
+
+  return {
+    score: finalScore,
+    adjustment,
+    status,
+    signals: signals.slice(0, 5),
+    cautions: cautions.slice(0, 4),
+  };
+}
+
+function partnerFusionAdjustment(milan: MilanResult | null, readiness: PartnerReadiness | null = null) {
+  const readinessAdjustment = readiness?.adjustment ?? 0;
+  if (!milan) return 0;
+  if (milan.percentage >= 80) return 8 + readinessAdjustment;
+  if (milan.percentage >= 70) return 5 + readinessAdjustment;
+  if (milan.percentage >= 58) return 2 + readinessAdjustment;
+  if (milan.percentage >= 45) return -4 + readinessAdjustment;
+  return -10 + readinessAdjustment;
+}
+
+function partnerFusedScore(w: MonthlyMarriageWindow, milan: MilanResult | null, readiness: PartnerReadiness | null = null) {
+  return Math.max(0, Math.min(100, w.adjustedScore + partnerFusionAdjustment(milan, readiness)));
+}
+
+function partnerFusionNote(milan: MilanResult | null, readiness: PartnerReadiness | null = null) {
+  if (!milan) return "Add partner chart to convert this from individual timing into partner-fusion timing.";
+  const readinessText = readiness ? ` Partner readiness: ${readiness.status} (${readiness.score}/100).` : "";
+  if (milan.percentage >= 80) return `Partner compatibility strongly supports this timing window.${readinessText}`;
+  if (milan.percentage >= 70) return `Partner compatibility adds useful support to this timing window.${readinessText}`;
+  if (milan.percentage >= 58) return `Partner compatibility is workable; use practical family alignment before final decisions.${readinessText}`;
+  if (milan.percentage >= 45) return `Partner compatibility is mixed; treat high timing months as discussion windows, not automatic commitment months.${readinessText}`;
+  return `Partner compatibility is sensitive; use timing only for clarity, counselling and careful review.${readinessText}`;
+}
+
+function moonMilanIndices(chart: ChartData) {
+  const moon = chart.planets.Moon;
+  if (!moon) return { nakIdx: 0, rashiIdx: 0 };
+  return {
+    nakIdx: Math.floor((moon.lon % 360) / (360 / 27)) % 27,
+    rashiIdx: Math.floor((moon.lon % 360) / 30) % 12,
+  };
+}
+
+function commitmentBreakdown(w: MonthlyMarriageWindow, milan: MilanResult | null) {
+  const dashaParams = w.parameters.filter(p => /dasha|mahadasha|antardasha/i.test(p.name));
+  const transitParams = w.parameters.filter(p => /transit|jupiter|saturn|venus/i.test(p.name));
+  const divisionalParams = w.parameters.filter(p => /d9|navamsha|jaimini|darakaraka|upapada|saham|seventh/i.test(p.name));
+  const average = (items: typeof w.parameters) => items.length
+    ? Math.round(items.reduce((sum, item) => sum + item.score, 0) / items.length)
+    : 0;
+  return [
+    { label: "Dasha", value: average(dashaParams), note: dashaParams.filter(p => p.isActive).length, placeholder: false },
+    { label: "Transit", value: average(transitParams), note: transitParams.filter(p => p.isActive).length, placeholder: false },
+    { label: "D9 / Promise", value: average(divisionalParams), note: divisionalParams.filter(p => p.isActive).length, placeholder: false },
+    {
+      label: "Compatibility",
+      value: milan?.percentage ?? 0,
+      note: milan?.totalScore ?? 0,
+      placeholder: !milan,
+    },
+  ];
+}
+
 // ── Score Ring ────────────────────────────────────────────────
 function ScoreRing({ score, size = 88 }: { score: number; size?: number }) {
   const r = size * 0.41, circ = 2 * Math.PI * r;
@@ -106,17 +263,88 @@ interface AnalysisResult {
 
 // ── Main Component ─────────────────────────────────────────────
 export function MarriageTimingAnalyzer() {
-  const { chart } = useUserChart();
+  const { chart, hasUserChart } = useUserChart();
   const [loading, setLoading]       = useState(false);
   const [scanning, setScanning]     = useState(false);
   const [error, setError]           = useState("");
   const [result, setResult]         = useState<AnalysisResult | null>(null);
   const [scanResult, setScanResult] = useState<MarriageWindowScanResult | null>(null);
   const [activeTab, setActiveTab]   = useState<TabKey>("overview");
+  const [partnerChart, setPartnerChart] = useState<ChartData | null>(null);
+  const [partnerForm, setPartnerForm] = useState({
+    name: "",
+    dob: "",
+    tob: "",
+    city: "",
+    lat: null as number | null,
+    lon: null as number | null,
+    tz: null as number | null,
+  });
+  const [partnerCity, setPartnerCity] = useState<CitySearchResult | null>(null);
+  const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
+  const [partnerSavedId, setPartnerSavedId] = useState("");
+
+  useEffect(() => {
+    listSavedCharts().then(setSavedCharts).catch(() => setSavedCharts([]));
+  }, []);
+
+  const partnerMilan = useMemo(() => {
+    if (!chart || !hasUserChart || !partnerChart) return null;
+    const self = moonMilanIndices(chart);
+    const partner = moonMilanIndices(partnerChart);
+    return calculateMilan(
+      chart.name,
+      self.nakIdx,
+      self.rashiIdx,
+      partnerChart.name,
+      partner.nakIdx,
+      partner.rashiIdx,
+    );
+  }, [chart, hasUserChart, partnerChart]);
+
+  const partnerReadiness = useMemo(() => partnerReadinessFromChart(partnerChart), [partnerChart]);
+
+  const fusedWindows = useMemo(() => {
+    if (!scanResult) return [];
+    return scanResult.windows
+      .map((window) => ({
+        window,
+        fusedScore: partnerFusedScore(window, partnerMilan, partnerReadiness),
+        compatibilityDelta: partnerFusionAdjustment(partnerMilan, partnerReadiness),
+      }))
+      .sort((a, b) => b.fusedScore - a.fusedScore);
+  }, [partnerMilan, partnerReadiness, scanResult]);
+
+  const bestFusionWindow = fusedWindows[0];
+  const highlightedFusionWindow = bestFusionWindow
+    ?? (scanResult?.bestWindow
+      ? { window: scanResult.bestWindow, fusedScore: scanResult.bestWindow.score, compatibilityDelta: 0 }
+      : null);
+
+  const applyPartnerFromForm = () => {
+    if (!partnerForm.name || !partnerForm.dob || !partnerForm.tob || !partnerForm.city) return;
+    setPartnerChart(
+      calculateChart(
+        partnerForm.name,
+        partnerForm.dob,
+        partnerForm.tob,
+        partnerForm.city,
+        partnerForm.lat ?? undefined,
+        partnerForm.lon ?? undefined,
+        partnerForm.tz ?? undefined,
+      ),
+    );
+  };
+
+  const applyPartnerFromSaved = async (chartId: string) => {
+    setPartnerSavedId(chartId);
+    const loaded = await loadSavedChart(chartId);
+    if (loaded) setPartnerChart(loaded);
+  };
 
   // ── Extract ALL params from chart ───────────────────────────
   const params = useMemo(() => {
-    if (!chart) return null;
+    if (!chart || !hasUserChart) return null;
 
     // Dasha
     const mahadasha  = chart.dashas.find(d => d.active)?.planet ?? "Venus";
@@ -294,9 +522,9 @@ export function MarriageTimingAnalyzer() {
 
   // ── Run 9-month scan (on demand or auto) ────────────────────
   useEffect(() => {
-    if (chart) runWindowScan();
+    if (chart && hasUserChart) runWindowScan();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chart]);
+  }, [chart, hasUserChart]);
 
   async function runCurrentAnalysis(p: typeof params) {
     if (!p) return;
@@ -367,6 +595,15 @@ export function MarriageTimingAnalyzer() {
             transitPlanetHouses:       p.transitPlanetHouses,
           },
           outputFormat: "full",
+          partnerGunaMilan: partnerMilan
+            ? {
+                totalScore: partnerMilan.totalScore,
+                maxScore: partnerMilan.maxScore,
+                percentage: partnerMilan.percentage,
+                verdict: partnerMilan.verdict,
+                partnerName: partnerChart?.name,
+              }
+            : undefined,
         }),
       });
       const data = await res.json();
@@ -392,12 +629,12 @@ export function MarriageTimingAnalyzer() {
   }
 
   // ── Empty state ──────────────────────────────────────────────
-  if (!chart) {
+  if (!chart || !hasUserChart) {
     return (
       <div className="empty">
         <div className="empty-icon">💍</div>
         <div className="empty-text">Birth Chart Required</div>
-        <p style={{ fontSize:13, color:"#605890" }}>Complete onboarding to see K.N. Rao marriage timing analysis.</p>
+        <p style={{ fontSize:13, color:"#605890" }}>Generate your kundli first to see K.N. Rao marriage timing analysis.</p>
       </div>
     );
   }
@@ -445,7 +682,7 @@ export function MarriageTimingAnalyzer() {
             <div className="page-tag" style={{ marginBottom:4 }}>💍 K.N. RAO MARRIAGE TIMING ENGINE</div>
             <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:20, fontWeight:600,
               color:"#f0e8d0", marginBottom:6 }}>
-              {chart.name}&apos;s Marriage Window Analysis
+              {chart.name}&apos;s Commitment Readiness Analysis
             </div>
             {result && !loading && (
               <div style={{ display:"inline-flex", alignItems:"center", gap:6,
@@ -453,7 +690,7 @@ export function MarriageTimingAnalyzer() {
                 borderRadius:8, padding:"4px 12px" }}>
                 <span style={{ fontFamily:"Cormorant Garamond,serif", fontSize:14, fontWeight:700,
                   color:scoreColor(score) }}>
-                  {strengthDisplay(strength)} Window
+                  {strengthDisplay(strength)} Readiness
                 </span>
               </div>
             )}
@@ -501,6 +738,127 @@ export function MarriageTimingAnalyzer() {
         </div>
       )}
 
+      {/* ── PARTNER COMPATIBILITY ─────────────────────────── */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-tag">PARTNER CHART (GUNA MILAN)</div>
+        <div className="card-title serif" style={{ marginBottom: 10 }}>
+          Optional partner compatibility
+        </div>
+        <p style={{ fontSize: 12, color: "#605890", marginBottom: 12, lineHeight: 1.6 }}>
+          Add a partner birth chart or pick a saved chart to score Ashtakoot (36-point) compatibility in commitment windows.
+        </p>
+        {savedCharts.length > 0 && (
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, color: "#605890", marginBottom: 6, letterSpacing: 1 }}>SAVED CHART</div>
+            <select
+              value={partnerSavedId}
+              onChange={(e) => {
+                const id = e.target.value;
+                if (id) applyPartnerFromSaved(id);
+                else setPartnerChart(null);
+              }}
+              style={{
+                width: "100%",
+                background: "#08051a",
+                border: "1px solid #1c1840",
+                borderRadius: 8,
+                padding: "10px 12px",
+                color: "#f0e8d0",
+                fontSize: 12,
+              }}
+            >
+              <option value="">— Select saved chart —</option>
+              {savedCharts.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} · {c.dob}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 10, marginBottom: 10 }}>
+          <input
+            placeholder="Partner name"
+            value={partnerForm.name}
+            onChange={(e) => setPartnerForm((f) => ({ ...f, name: e.target.value }))}
+            className="pr-input"
+            style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px", color: "#f0e8d0", fontSize: 12 }}
+          />
+          <input
+            type="date"
+            value={partnerForm.dob}
+            onChange={(e) => setPartnerForm((f) => ({ ...f, dob: e.target.value }))}
+            style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px", color: "#f0e8d0", fontSize: 12 }}
+          />
+          <input
+            type="time"
+            value={partnerForm.tob}
+            onChange={(e) => setPartnerForm((f) => ({ ...f, tob: e.target.value }))}
+            style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px", color: "#f0e8d0", fontSize: 12 }}
+          />
+        </div>
+        <div style={{ marginBottom: 10 }}>
+          <CityAutocomplete
+            label="Partner birth place"
+            value={partnerCity}
+            onChange={(city) => {
+              setPartnerCity(city);
+              if (!city) return;
+              setPartnerForm((f) => ({
+                ...f,
+                city: city.displayName,
+                lat: city.latitude,
+                lon: city.longitude,
+              }));
+            }}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={applyPartnerFromForm}
+          style={{
+            background: "rgba(200,160,48,0.15)",
+            border: "1px solid rgba(200,160,48,0.35)",
+            borderRadius: 8,
+            padding: "10px 16px",
+            color: "#e8cf8b",
+            fontWeight: 700,
+            cursor: "pointer",
+            fontSize: 12,
+          }}
+        >
+          Calculate partner chart
+        </button>
+        {partnerMilan && (
+          <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 10, border: `1px solid ${partnerMilan.verdictColor}44`, background: `${partnerMilan.verdictColor}10` }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: partnerMilan.verdictColor }}>
+              {partnerMilan.totalScore}/{partnerMilan.maxScore} Guna · {partnerMilan.verdict}
+            </div>
+            <p style={{ fontSize: 12, color: "#c8c0a8", marginTop: 6, lineHeight: 1.6 }}>{partnerMilan.recommendation}</p>
+          </div>
+        )}
+        {partnerReadiness && (
+          <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 10, border: `1px solid ${scoreColor(partnerReadiness.score)}44`, background: `${scoreColor(partnerReadiness.score)}10` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: scoreColor(partnerReadiness.score) }}>
+                Partner Chart Readiness · {partnerReadiness.status}
+              </div>
+              <span className="badge" style={{ color: scoreColor(partnerReadiness.score), border: `1px solid ${scoreColor(partnerReadiness.score)}44`, background: `${scoreColor(partnerReadiness.score)}14` }}>
+                {partnerReadiness.score}/100
+              </span>
+            </div>
+            <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 8 }}>
+              <div style={{ fontSize: 11, color: "#86efac", lineHeight: 1.55 }}>
+                <strong>Supports:</strong> {partnerReadiness.signals.length ? partnerReadiness.signals.slice(0, 2).join(" ") : "No major partner support signal detected yet."}
+              </div>
+              <div style={{ fontSize: 11, color: "#fca5a5", lineHeight: 1.55 }}>
+                <strong>Cautions:</strong> {partnerReadiness.cautions.length ? partnerReadiness.cautions.slice(0, 2).join(" ") : "No major partner readiness caution detected."}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* ── ERROR ───────────────────────────────────────────── */}
       {error && (
         <div style={{ marginBottom:16, padding:"12px 16px", borderRadius:10,
@@ -537,7 +895,7 @@ export function MarriageTimingAnalyzer() {
                     <div className="card-tag">TIMING WINDOW — K.N. RAO RESEARCH LAYER</div>
                     <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:22, fontWeight:700,
                       color:scoreColor(score), marginBottom:6 }}>
-                      {strengthDisplay(strength)} Window
+                      {strengthDisplay(strength)} Readiness
                     </div>
                     <div style={{ fontSize:13, color:"#c8c0a8", lineHeight:1.8 }}>
                       {result.formats?.dashboardCard?.brief}
@@ -569,7 +927,7 @@ export function MarriageTimingAnalyzer() {
                     {active}/8 Fulfilled — {active >= 6 ? "K.N. Rao Threshold Met ✦" : active >= 4 ? "Moderate Support" : "Below Threshold"}
                   </div>
                   <div style={{ fontSize:11, color:"#605890", marginBottom:14 }}>
-                    √ = fulfilled (binary) · ~ = partial · × = not met · 6+/8 = strong marriage window per K.N. Rao research
+                    √ = fulfilled (binary) · ~ = partial · × = not met · 6+/8 = strong commitment-support period per K.N. Rao research
                   </div>
                   <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                     {Object.values(result.backendJson.parameters as Record<string, any>).map((p: any) => {
@@ -698,39 +1056,94 @@ export function MarriageTimingAnalyzer() {
               </div>
 
               {/* Best Window Highlight */}
-              {scanResult.bestWindow && (
+              {highlightedFusionWindow && (
                 <div className="card" style={{ borderColor:"rgba(200,160,48,0.4)",
                   background:"linear-gradient(135deg,rgba(200,160,48,0.06),rgba(232,121,249,0.04))" }}>
-                  <div className="card-tag">⭐ BEST MARRIAGE WINDOW NEXT 9 MONTHS</div>
+                  <div className="card-tag">⭐ BEST PARTNER-FUSION SUPPORT WINDOW NEXT 9 MONTHS</div>
                   <div style={{ display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
-                    <ScoreRing score={scanResult.bestWindow.score} size={80} />
+                    <ScoreRing score={highlightedFusionWindow.fusedScore} size={80} />
                     <div style={{ flex:1 }}>
                       <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:22, fontWeight:700,
                         color:"#c8a030", marginBottom:4 }}>
-                        {scanResult.bestWindow.month}
+                        {highlightedFusionWindow.window.month}
                       </div>
                       <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                        <span className="badge badge-gold">MD: {scanResult.bestWindow.mahadasha}</span>
-                        <span className="badge badge-purple">AD: {scanResult.bestWindow.antardasha}</span>
-                        <span className="badge badge-blue">♄ H{scanResult.bestWindow.transitSaturnHouse}</span>
-                        <span className="badge badge-blue">♃ H{scanResult.bestWindow.transitJupiterHouse}</span>
-                        <span className="badge badge-green">{scanResult.bestWindow.activeParameterCount}/8 Active</span>
+                        <span className="badge badge-gold">MD: {highlightedFusionWindow.window.mahadasha}</span>
+                        <span className="badge badge-purple">AD: {highlightedFusionWindow.window.antardasha}</span>
+                        <span className="badge badge-blue">♄ H{highlightedFusionWindow.window.transitSaturnHouse}</span>
+                        <span className="badge badge-blue">♃ H{highlightedFusionWindow.window.transitJupiterHouse}</span>
+                        <span className="badge badge-green">{highlightedFusionWindow.window.activeParameterCount}/8 Active</span>
+                        {partnerMilan && (
+                          <span className="badge" style={{ color: partnerMilan.verdictColor, border: `1px solid ${partnerMilan.verdictColor}44`, background: `${partnerMilan.verdictColor}12` }}>
+                            Partner {partnerMilan.percentage}/100
+                          </span>
+                        )}
                       </div>
-                      {scanResult.bestWindow.activeParams.length > 0 && (
+                      {highlightedFusionWindow.window.activeParams.length > 0 && (
                         <div style={{ marginTop:10, fontSize:12, color:"#605890" }}>
-                          Active: {scanResult.bestWindow.activeParams.join(" · ")}
+                          Active: {highlightedFusionWindow.window.activeParams.join(" · ")}
                         </div>
                       )}
+                      <div style={{ marginTop:10, fontSize:12, color:"#c8c0a8", lineHeight:1.7 }}>
+                        {commitmentUseCase(highlightedFusionWindow.window)} {partnerFusionNote(partnerMilan, partnerReadiness)}
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
+              <div className="card">
+                <div className="card-tag">TOP 5 READINESS WINDOWS</div>
+                <div className="card-title serif" style={{ marginBottom:6 }}>
+                  Partner-Fusion Commitment Planner
+                </div>
+                <div style={{ fontSize:12, color:"#605890", marginBottom:14, lineHeight:1.6 }}>
+                  These are not fixed wedding dates. When partner chart is added, ranking combines timing strength with Ashtakoot compatibility.
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                  {(fusedWindows.length ? fusedWindows : scanResult.windows.map((window) => ({ window, fusedScore: window.adjustedScore, compatibilityDelta: 0 })))
+                    .slice(0, 5)
+                    .map(({ window: w, fusedScore, compatibilityDelta }, index) => {
+                      const col = scoreColor(fusedScore);
+                      return (
+                        <div key={`top-window-${w.date}`} style={{ padding:"14px 16px", borderRadius:12, border:`1px solid ${col}33`, background:"rgba(0,0,0,0.18)" }}>
+                          <div style={{ display:"flex", justifyContent:"space-between", gap:12, alignItems:"flex-start", marginBottom:8 }}>
+                            <div>
+                              <div style={{ fontSize:12, color:"#605890", marginBottom:2 }}>#{index + 1}</div>
+                              <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, fontWeight:700, color:"#f0e8d0" }}>{w.month}</div>
+                            </div>
+                            <span className="badge" style={{ background:`${col}18`, color:col, border:`1px solid ${col}44` }}>
+                              {fusedScore}/100
+                            </span>
+                          </div>
+                          <div style={{ fontSize:12, color:"#c8c0a8", lineHeight:1.65, marginBottom:10 }}>{commitmentUseCase(w)}</div>
+                          <div style={{ fontSize:11, color:partnerMilan ? partnerMilan.verdictColor : "#8f86ad", lineHeight:1.6, marginBottom:10 }}>
+                            {partnerFusionNote(partnerMilan, partnerReadiness)}
+                            {partnerMilan && ` Partner-fusion adjustment: ${compatibilityDelta >= 0 ? "+" : ""}${compatibilityDelta} points.`}
+                          </div>
+                          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:8, marginBottom:10 }}>
+                            {commitmentBreakdown(w, partnerMilan).map(item => (
+                              <div key={item.label} style={{ padding:"8px 10px", borderRadius:8, border:"1px solid #1c1840", background:"rgba(255,255,255,0.02)" }}>
+                                <div style={{ fontSize:10, color:"#605890", textTransform:"uppercase", letterSpacing:1 }}>{item.label}</div>
+                                <div style={{ fontSize:13, color:item.placeholder ? "#8f86ad" : scoreColor(item.value), fontWeight:700, marginTop:3 }}>
+                                  {item.placeholder ? "Add partner chart" : `${item.value}/100`}
+                                </div>
+                                {!item.placeholder && <div style={{ fontSize:10, color:"#605890" }}>{item.note} active signals</div>}
+                              </div>
+                            ))}
+                          </div>
+                          <div style={{ fontSize:11, color:"#8f86ad", lineHeight:1.6 }}>{commitmentCaution(w)}</div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
               {/* Month-by-Month Timeline */}
               <div className="card">
                 <div className="card-tag">📅 MONTH-BY-MONTH TIMING SCAN</div>
                 <div className="card-title serif" style={{ marginBottom:16 }}>
-                  9-Month Marriage Window Timeline
+                  9-Month Readiness Window Timeline
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                   {scanResult.windows.map((w) => (
@@ -826,7 +1239,7 @@ export function MarriageTimingAnalyzer() {
               {result.backendJson?.strongestEvidence?.length > 0 && (
                 <div className="card">
                   <div className="card-tag">✦ STRONGEST EVIDENCE</div>
-                  <div className="card-title serif" style={{ marginBottom:12 }}>What&apos;s Supporting This Window</div>
+                  <div className="card-title serif" style={{ marginBottom:12 }}>What&apos;s Supporting This Period</div>
                   {result.backendJson.strongestEvidence.map((ev: string, i: number) => (
                     <div key={i} style={{ padding:"10px 14px", borderRadius:8, marginBottom:8,
                       background:"rgba(200,160,48,0.05)", border:"1px solid rgba(200,160,48,0.2)",
@@ -858,7 +1271,7 @@ export function MarriageTimingAnalyzer() {
                   <span className="badge badge-gold">Score: {score}/100</span>
                   <span className="badge" style={{ background:`${scoreColor(score)}18`,
                     color:scoreColor(score), border:`1px solid ${scoreColor(score)}44` }}>
-                    {strengthDisplay(strength)} Window
+                    {strengthDisplay(strength)} Readiness
                   </span>
                   <span className="badge badge-purple">{active}/8 √ Fulfilled</span>
                 </div>
@@ -911,11 +1324,11 @@ export function MarriageTimingAnalyzer() {
                 </p>
               </div>
 
-              {/* 9-Month Window Summary in Report */}
+              {/* 9-Month Readiness Summary in Report */}
               {scanResult && (
                 <div className="card">
                   <div className="card-tag">📅 9-MONTH OUTLOOK</div>
-                  <div className="card-title serif" style={{ marginBottom:12 }}>Future Window Preview</div>
+                  <div className="card-title serif" style={{ marginBottom:12 }}>Future Readiness Preview</div>
                   <p style={{ fontSize:13, color:"#c8c0a8", marginBottom:14, lineHeight:1.8 }}>
                     {scanResult.overallOutlook}
                   </p>

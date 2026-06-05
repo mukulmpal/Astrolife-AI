@@ -27,7 +27,7 @@ export default function EventRadarPage() {
     d.setHours(12, 0, 0, 0);
     return d;
   });
-  const { chart: userChart, loading } = useUserChart();
+  const { chart: userChart, loading, hasUserChart } = useUserChart();
 
   const transitChart = useMemo(() => {
     if (!userChart) return null;
@@ -57,7 +57,7 @@ export default function EventRadarPage() {
     ));
   }, [userChart]);
 
-  if (loading || !report) {
+  if (loading || !hasUserChart || !report) {
     return (
       <main className="er-wrap">
         <div className="er-shell">
@@ -65,7 +65,7 @@ export default function EventRadarPage() {
             title="Event Radar"
             loading={loading}
             loadingText="Scanning your next 7 days..."
-            emptyText="Please complete onboarding to unlock Event Radar."
+            emptyText="Generate your kundli first to unlock Event Radar."
           />
         </div>
         <MobileBottomNav />
@@ -116,16 +116,16 @@ export default function EventRadarPage() {
         .er-detail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
         .er-box{background:#0a0720;border:1px solid #221d45;border-radius:12px;padding:12px}
         .er-muted{font-size:12px;color:#8f86b7}
-        .er-marriage-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
-        .er-marriage-day{background:#0a0720;border:1px solid rgba(236,72,153,.22);border-radius:12px;padding:12px}
-        .er-marriage-score{font-size:24px;font-weight:800;color:#f0abfc}
+        .er-relationship-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+        .er-relationship-day{background:#0a0720;border:1px solid rgba(236,72,153,.22);border-radius:12px;padding:12px}
+        .er-relationship-score{font-size:24px;font-weight:800;color:#f0abfc}
         .er-varga-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
         .er-varga-card{background:#0a0720;border:1px solid rgba(200,160,48,.18);border-radius:12px;padding:13px}
         .er-varga-top{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px}
         .er-varga-top span{font-size:12px;color:#c8a030;font-weight:800}
         .er-varga-top strong{font-size:22px;color:#f0e8d0}
         @media(max-width:1024px){.span-8,.span-4{grid-column:span 12}.er-days{grid-template-columns:repeat(3,minmax(0,1fr))}.er-detail{grid-template-columns:1fr}}
-        @media(max-width:640px){.er-wrap{padding:20px 14px 98px}.er-title{font-size:28px}.er-days,.er-marriage-list,.er-varga-grid{grid-template-columns:1fr}}
+        @media(max-width:640px){.er-wrap{padding:20px 14px 98px}.er-title{font-size:28px}.er-days,.er-relationship-list,.er-varga-grid{grid-template-columns:1fr}}
       `}</style>
 
       <div className="er-shell">
@@ -183,19 +183,19 @@ export default function EventRadarPage() {
                 </div>
                 <span className="er-pill">{marriageRadar.score}/100 · {marriageRadar.label.replaceAll("_", " ")}</span>
               </div>
-              <div className="er-marriage-list">
+              <div className="er-relationship-list">
                 {marriageRadar.windows.length ? marriageRadar.windows.map((window) => (
-                  <div className="er-marriage-day" key={window.date}>
+                  <div className="er-relationship-day" key={window.date}>
                     <div className="er-muted">{window.weekday}</div>
                     <strong>{window.label}</strong>
-                    <div className="er-marriage-score">{window.score}</div>
+                    <div className="er-relationship-score">{window.score}</div>
                     <p className="er-muted">{window.reason}</p>
                     <p className="er-p">{window.action}</p>
                   </div>
                 )) : (
-                  <div className="er-marriage-day">
-                    <strong>No strong window</strong>
-                    <p className="er-p">Use this week for observation, repair and calm communication instead of forcing marriage decisions.</p>
+                  <div className="er-relationship-day">
+                    <strong>No strong support day</strong>
+                    <p className="er-p">Use this week for observation, repair and calm communication instead of forcing commitment decisions.</p>
                   </div>
                 )}
               </div>
@@ -209,7 +209,7 @@ export default function EventRadarPage() {
                   <h3 className="er-h">Varga Confirmed Event Support</h3>
                   <p className="er-p">
                     Event Radar uses transit as the current weather. These cards add the birth-chart promise layer:
-                    D9 for marriage, D10 for career, D4 for property and D2 for money.
+                    D9 for relationship fulfilment, D10 for career, D4 for property and D2 for money.
                   </p>
                 </div>
                 <span className="er-pill">D1 + Varga + Dasha</span>

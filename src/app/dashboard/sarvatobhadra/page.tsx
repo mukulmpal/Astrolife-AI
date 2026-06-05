@@ -6,6 +6,7 @@ import { useUserChart } from "@/lib/user-chart";
 import { calculateSarvatobhadra } from "@/lib/astro-engine/sarvatobhadra";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
+import "@/app/dashboard/shared.css";
 
 const PLANET_EMOJI: Record<string, string> = {
   Sun:"Su", Moon:"Mo", Mars:"Ma", Mercury:"Me", Jupiter:"Ju", Venus:"Ve", Saturn:"Sa", Rahu:"Ra", Ketu:"Ke"
@@ -26,8 +27,8 @@ const INTENSITY_COLOR = { EXTREME: "#ef4444", HIGH: "#f97316", MEDIUM: "#f59e0b"
 type Tab = "alerts" | "profile" | "natal" | "grid" | "guide";
 
 export default function SarvatobhadraPage() {
-  const { chart, loading } = useUserChart();
-  const result = useMemo(() => (chart ? calculateSarvatobhadra(chart) : null), [chart]);
+  const { chart, loading, hasUserChart } = useUserChart();
+  const result = useMemo(() => (chart && hasUserChart ? calculateSarvatobhadra(chart) : null), [chart, hasUserChart]);
   const [activeTab, setActiveTab] = useState<Tab>("alerts");
   const [expandedAlert, setExpandedAlert] = useState<number | null>(null);
 
@@ -44,7 +45,7 @@ export default function SarvatobhadraPage() {
   const nak = result.birthNakshatraData;
 
   return (
-    <main style={{ minHeight: "100vh", background: "#060410", padding: "24px 18px 110px", color: "#f0e8d0" }}>
+    <main className="page" style={{ minHeight: "100vh", paddingBottom: 110 }}>
       <style>{`
         .svb-card { background: #0d0a22; border: 1px solid #1c1840; border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
         .svb-row { font-size: 12px; color: #b8b0d8; margin-bottom: 6px; display: flex; gap: 8px; line-height: 1.55; }
@@ -63,12 +64,56 @@ export default function SarvatobhadraPage() {
       `}</style>
 
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        <div className="page-tag">Nakshatra grid</div>
+        <h1 className="page-title serif">Sarvatobhadra Chakra</h1>
+        <p className="page-sub">
+          Vedha-style transit stress on your birth nakshatra — updated {result.transitDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}.
+        </p>
 
-        {/* Header */}
-        <div style={{ marginBottom: "20px" }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "34px", fontWeight: 700 }}>🔯 Sarvatobhadra Chakra</div>
-          <div style={{ fontSize: "13px", color: "#8880a8", marginTop: "4px" }}>
-            Ancient Vedic Nakshatra Grid · Vedha Transit System · Live Analysis · {result.transitDate.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}
+        <div className="header-card" style={{ marginBottom: 16 }}>
+          <div className="header-orb" />
+          <div style={{ position: "relative", zIndex: 1, flex: 1 }}>
+            <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#06b6d4", marginBottom: 6 }}>
+              Executive summary
+            </div>
+            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600, color: "#f0e8d0" }}>
+              Period: {result.currentPeriodAssessment}
+            </div>
+            <div style={{ fontSize: 12, color: "#b8b0d8", marginTop: 8, lineHeight: 1.7 }}>
+              {result.currentPeriodReason}
+            </div>
+          </div>
+        </div>
+
+        <div className="summary-strip" style={{ marginBottom: 16, lineHeight: 1.8 }}>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#c8c0a8" }}>
+            <li>Janma nakshatra {result.birthNakshatra} anchors the grid — transits vedha this row first.</li>
+            <li>Benefic vedha supports travel and launches; malefic vedha favors caution and remedies.</li>
+            <li>Check active alerts before scheduling surgery, property, or confrontation-heavy meetings.</li>
+          </ul>
+        </div>
+
+        <div className="svb-card" style={{ padding: 16 }}>
+          <div className="section-title" style={{ color: "#06b6d4" }}>Plain-English Decision Guide</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 10 }}>
+            <div className="knowledge-box" style={{ marginBottom: 0 }}>
+              <strong style={{ color: period.color }}>Today&apos;s traffic light:</strong><br />
+              {result.currentPeriodAssessment === "Auspicious"
+                ? "Green zone. Good for normal launches, outreach and steady progress."
+                : result.currentPeriodAssessment === "Mixed"
+                  ? "Yellow zone. Move ahead, but keep backup plans and avoid emotional decisions."
+                  : "Caution zone. Handle sensitive work slowly and avoid forcing risky commitments."}
+            </div>
+            <div className="knowledge-box" style={{ marginBottom: 0 }}>
+              <strong style={{ color: "#f0e8d0" }}>What is being hit:</strong><br />
+              {result.vedhaAlerts.length
+                ? `${result.vedhaAlerts.length} transit vedha signal(s) are active on your nakshatra grid.`
+                : "No major vedha alert is active, so the day is comparatively stable."}
+            </div>
+            <div className="knowledge-box" style={{ marginBottom: 0 }}>
+              <strong style={{ color: "#f0e8d0" }}>Best use:</strong><br />
+              Use this engine as a day-quality filter before timing travel, surgery, property, confrontation, or high-stakes meetings.
+            </div>
           </div>
         </div>
 

@@ -10,12 +10,22 @@ import { useLanguage } from "@/lib/language-context";
 
 export default function AKVPage() {
   const [activeTab, setActiveTab] = useState<"lifemap"|"sarva"|"planets"|"houses"|"sodhya"|"guide">("lifemap");
-  const { birth, chart } = useUserChart();
+  const { birth, chart, hasUserChart } = useUserChart();
   const { t, tp } = useLanguage();
   const result = calculateAshtakavarga(chart.planets as never, chart.lagnaNum);
 
   const binduColor = (v:number) =>
     v>=5?"#22c55e":v>=4?"#c8a030":v>=3?"#60a5fa":v>=1?"#f97316":"#ef4444";
+
+  if (!hasUserChart || !birth.name) {
+    return (
+      <EngineEmptyState
+        engineName="Ashtakavarga"
+        engineIcon="🔢"
+        whatItAnalyzes={["Sarvashtakavarga totals", "Bhinnashtakavarga per planet", "House bindu strength", "Sodhya pinda"]}
+      />
+    );
+  }
 
   return (
     <div className="page">
@@ -54,6 +64,31 @@ export default function AKVPage() {
         <span style={{marginLeft:8,color:result.sarvaTotal>=337?"#22c55e":"#ef4444"}}>
           {result.sarvaTotal>=337?"✅ Above standard (337)":"⚠️ Below standard (337)"}
         </span>
+      </div>
+
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-tag">Plain-English Guidance</div>
+        <div className="card-title serif">Where Life Supports You Naturally</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+          <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 11, color: "#22c55e", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Push Here</div>
+            <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              Houses H{result.strongest.map(i => i + 1).join(", H")} have better natural support. Start important actions through these life areas when possible.
+            </p>
+          </div>
+          <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 11, color: "#ef4444", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Plan Carefully</div>
+            <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              Houses H{result.weakest.map(i => i + 1).join(", H")} need better timing, patience and remedies. Avoid expecting effortless results there.
+            </p>
+          </div>
+          <div style={{ background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 11, color: "#60a5fa", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>How To Use</div>
+            <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              Treat Ashtakavarga as a delivery map. High bindu houses deliver transits more smoothly; low bindu houses need preparation before major moves.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* TABS */}

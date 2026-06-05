@@ -1,144 +1,203 @@
 "use client";
-import { useEffect, useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
-import { engineIntros } from "@/data/engine-intros";
-import { useUserChart } from "@/lib/user-chart";
+
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EducationTooltip } from "@/components/education-tooltip";
-
-interface SavedChart {
-  id: string;
-  name: string;
-  dob: string;
-  tob: string;
-  city: string;
-  created_at: string;
-}
+import {
+  listSavedCharts,
+  loadSavedChart,
+  saveAdditionalChart,
+  selectSavedChart,
+  type SavedChartSummary,
+  useUserChart,
+} from "@/lib/user-chart";
+import "@/app/dashboard/shared.css";
 
 export default function HistoryPage() {
-  const { chart } = useUserChart();
-  const [charts, setCharts] = useState<SavedChart[]>([]);
+  const router = useRouter();
+  const { chart, hasUserChart } = useUserChart();
+  const [charts, setCharts] = useState<SavedChartSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [switchingId, setSwitchingId] = useState<string | null>(null);
+
+  const refreshCharts = useCallback(async () => {
+    setLoading(true);
+    try {
+      setCharts(await listSavedCharts());
+    } catch (error) {
+      console.error("Load charts error:", error);
+      setSaveError("Could not load your chart library.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function loadCharts() {
+    let active = true;
+
+    async function loadInitialCharts() {
       try {
-        const res = await fetch("/api/charts/list");
-        const data = await res.json();
-        setCharts(data.charts || []);
+        const savedCharts = await listSavedCharts();
+        if (active) setCharts(savedCharts);
       } catch (error) {
         console.error("Load charts error:", error);
+        if (active) setSaveError("Could not load your chart library.");
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
-    loadCharts();
+
+    void loadInitialCharts();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleSaveChart = async () => {
-    if (!chart) return;
-    try {
-      const res = await fetch("/api/charts/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: chart.name,
-          dob: chart.dob,
-          tob: chart.tob,
-          city: chart.city,
-          lat: chart.lat,
-          lon: chart.lon,
-          tz: chart.tz,
-          chartData: chart,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setCharts([data.chart, ...charts]);
-        alert("Chart saved successfully!");
-      }
-    } catch (error) {
-      console.error("Save error:", error);
-      alert("Error saving chart");
+    if (!chart || !hasUserChart) return;
+    setSaveMessage("");
+    setSaveError("");
+    const result = await saveAdditionalChart(chart);
+    if (result.ok) {
+      setSaveMessage("Chart saved to your library.");
+      await refreshCharts();
+      return;
     }
+    if (result.duplicate) {
+      setSaveError("This birth data is already saved. Select it below to load.");
+      return;
+    }
+    setSaveError(result.error);
+  };
+
+  const handleSelectChart = async (chartId: string) => {
+    setSwitchingId(chartId);
+    setSaveMessage("");
+    setSaveError("");
+    const loaded = await selectSavedChart(chartId);
+    if (loaded) {
+      setSaveMessage("Primary chart updated. Redirecting to Kundli…");
+      router.push("/dashboard/kundli");
+    } else {
+      const preview = await loadSavedChart(chartId);
+      if (preview) {
+        setSaveError("Could not set primary chart. Try again from My Kundli.");
+      } else {
+        setSaveError("Could not load this chart.");
+      }
+    }
+    setSwitchingId(null);
   };
 
   return (
-    <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
-      <style>{`
-        .hist-hero { font-family: "Cormorant Garamond", serif; font-size: 42px; font-weight: 700; margin-bottom: 8px; }
-        .hist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 24px; }
-        .hist-card { background: #0d0a22; border: 1px solid #1c1840; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; }
-        .hist-card:hover { border-color: #c8a030; background: rgba(200, 160, 48, 0.05); }
-        .hist-name { font-weight: 700; font-size: 16px; color: #c8a030; margin-bottom: 8px; }
-        .hist-meta { font-size: 12px; color: #b8b0d8; }
-        .hist-btn { background: #c8a030; color: #060410; border: none; border-radius: 6px; padding: 10px 16px; font-weight: 700; cursor: pointer; }
-        .hist-info { background: rgba(10, 7, 32, 0.8); border: 1px solid #1c1840; border-radius: 12px; padding: 20px; margin-top: 24px; }
-      `}</style>
+    <main className="page" style={{ minHeight: "100vh", paddingBottom: 110 }}>
+      <div className="page-tag">Chart Library</div>
+      <h1 className="page-title serif">Chart History</h1>
+      <p className="page-sub">
+        Save and switch between charts. Learn <EducationTooltip term="house_1">about Lagna</EducationTooltip> and your birth chart structure.
+      </p>
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <div className="hist-hero">📊 Chart History</div>
-        <div style={{ fontSize: "14px", color: "#b8b0d8", marginBottom: "16px" }}>
-          Save and manage your astrology charts. Learn <EducationTooltip term="house_1">about Lagna</EducationTooltip> and your birth chart structure.
+      {hasUserChart && chart && (
+        <div style={{ marginBottom: 20 }}>
+          <button
+            type="button"
+            onClick={handleSaveChart}
+            style={{
+              background: "#c8a030",
+              color: "#060410",
+              border: "none",
+              borderRadius: 6,
+              padding: "10px 16px",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Save current chart: {chart.name}
+          </button>
         </div>
+      )}
 
-        {chart && (
-          <div style={{ marginBottom: "24px" }}>
-            <button className="hist-btn" onClick={handleSaveChart}>
-              💾 Save Current Chart: {chart.name}
-            </button>
+      {saveMessage && (
+        <div className="summary-strip" style={{ marginBottom: 12, color: "#22c55e" }}>
+          {saveMessage}
+        </div>
+      )}
+      {saveError && (
+        <div className="summary-strip" style={{ marginBottom: 12, color: "#ef4444", borderColor: "rgba(239,68,68,0.35)" }}>
+          {saveError}
+        </div>
+      )}
+
+      <div className="header-card" style={{ marginBottom: 24 }}>
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#c8a030", marginBottom: 6 }}>
+            Understanding your chart
           </div>
-        )}
-
-        <div className="hist-info">
-          <h3 style={{ color: "#a855f7", marginTop: 0 }}>📚 Understanding Your Chart</h3>
-          <p style={{ fontSize: "12px", lineHeight: "1.8", color: "#b8b0d8", margin: 0 }}>
-            Your birth chart is a snapshot of planetary positions at your exact birth moment. It contains 9 planets across 12 houses and 27 nakshatras. Each engine analyzes different aspects:
+          <p style={{ fontSize: 12, lineHeight: 1.8, color: "#b8b0d8", margin: 0 }}>
+            Your birth chart is a snapshot of planetary positions at your exact birth moment — 9 planets across 12 houses and 27 nakshatras.
           </p>
-          <ul style={{ fontSize: "12px", color: "#b8b0d8", margin: "12px 0 0 20px" }}>
-            <li><strong>Kundali:</strong> Core planetary positions and house placements</li>
-            <li><strong>Yogas:</strong> Auspicious planetary combinations (e.g., <EducationTooltip term="yoga">Gaja Kesari</EducationTooltip>)</li>
-            <li><strong>Dasha:</strong> Your current life period and timing (<EducationTooltip term="dasha">what&apos;s a Dasha?</EducationTooltip>)</li>
-            <li><strong>Medical:</strong> Health patterns from your <EducationTooltip term="nakshatra">birth nakshatra</EducationTooltip></li>
-            <li><strong>Remedy:</strong> Personalized planetary remedies based on weaknesses</li>
-          </ul>
-        </div>
-
-        <h3 style={{ marginTop: "32px", marginBottom: "16px", color: "#f0e8d0" }}>Saved Charts ({charts.length})</h3>
-
-        {loading ? (
-          <div style={{ textAlign: "center", color: "#b8b0d8", padding: "40px" }}>Loading charts...</div>
-        ) : charts.length === 0 ? (
-          <div style={{ textAlign: "center", color: "#b8b0d8", padding: "40px", background: "rgba(200, 160, 48, 0.05)", borderRadius: "8px" }}>
-            No saved charts yet. Click &ldquo;Save Current Chart&rdquo; to get started.
-          </div>
-        ) : (
-          <div className="hist-grid">
-            {charts.map((c) => (
-              <div key={c.id} className="hist-card">
-                <div className="hist-name">{c.name}</div>
-                <div className="hist-meta">
-                  📅 {c.dob} at {c.tob}
-                  <br />
-                  📍 {c.city}
-                  <br />
-                  🕐 {new Date(c.created_at).toLocaleDateString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="hist-info" style={{ marginTop: "32px" }}>
-          <h3 style={{ color: "#2dd4bf", marginTop: 0 }}>💡 Pro Tips</h3>
-          <ul style={{ fontSize: "12px", color: "#b8b0d8", margin: 0 }}>
-            <li>Save multiple family members&apos; charts to compare <EducationTooltip term="guna_milan">Guna Milan (compatibility)</EducationTooltip></li>
-            <li>Compare your chart across different <EducationTooltip term="dasha">Dasha periods</EducationTooltip> to predict life events</li>
-            <li>Use <EducationTooltip term="kp_system">KP Prashna System</EducationTooltip> for yes/no questions about timing</li>
-            <li>Your <EducationTooltip term="nakshatra">Nakshatra</EducationTooltip> (birth moon position) reveals hidden personality traits</li>
+          <ul style={{ fontSize: 12, color: "#b8b0d8", margin: "12px 0 0 20px" }}>
+            <li><strong>Kundali:</strong> Core planetary positions</li>
+            <li><strong>Yogas:</strong> Auspicious combinations (e.g. <EducationTooltip term="yoga">Gaja Kesari</EducationTooltip>)</li>
+            <li><strong>Dasha:</strong> Current life period (<EducationTooltip term="dasha">what is Dasha?</EducationTooltip>)</li>
           </ul>
         </div>
       </div>
+
+      <h3 className="serif" style={{ marginBottom: 16, color: "#f0e8d0" }}>
+        Saved charts ({charts.length})
+      </h3>
+
+      {loading ? (
+        <p style={{ textAlign: "center", color: "#b8b0d8", padding: 40 }}>Loading charts…</p>
+      ) : charts.length === 0 ? (
+        <div style={{ textAlign: "center", color: "#b8b0d8", padding: 40, background: "rgba(200,160,48,0.05)", borderRadius: 8 }}>
+          No saved charts yet. Save your current chart to build a family library.
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+          {charts.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => handleSelectChart(c.id)}
+              disabled={switchingId === c.id}
+              style={{
+                textAlign: "left",
+                background: "#0d0a22",
+                border: `1px solid ${c.isPrimary ? "rgba(200,160,48,0.45)" : "#1c1840"}`,
+                borderRadius: 12,
+                padding: 16,
+                cursor: switchingId === c.id ? "wait" : "pointer",
+                color: "inherit",
+              }}
+            >
+              <div style={{ fontWeight: 700, fontSize: 16, color: "#c8a030", marginBottom: 8 }}>
+                {c.name}
+                {c.isPrimary && (
+                  <span style={{ marginLeft: 8, fontSize: 10, color: "#22c55e", textTransform: "uppercase" }}>
+                    Primary
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 12, color: "#b8b0d8" }}>
+                {c.dob} at {c.tob}
+                <br />
+                {c.city}
+                <br />
+                {new Date(c.createdAt).toLocaleDateString()}
+              </div>
+              <div style={{ fontSize: 11, color: "#605890", marginTop: 10 }}>
+                {switchingId === c.id ? "Loading…" : "Tap to set as primary chart"}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
 
       <MobileBottomNav />
     </main>

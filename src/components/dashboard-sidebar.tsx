@@ -6,12 +6,13 @@ import {
   LayoutDashboard, CircleDot, Bot, Radar, Globe, TrendingUp,
   Sparkles, Timer, BarChart3, Grid3x3, Layers, Target,
   Brain, BookOpen, Hash, Calendar, Music, Gem, Home as HomeIcon,
-  HeartPulse, HelpCircle, Leaf, Users, FileText, Zap,
+  HelpCircle, Leaf, Users, FileText, Zap, ShieldPlus,
   Sunrise, History, Star, HeartHandshake, ShoppingBag, Heart,
   Hand, LogOut, type LucideIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 
 type NavItem = { label: string; href: string; Icon: LucideIcon };
 type NavGroup = { label: string; items: NavItem[] };
@@ -46,7 +47,6 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Prediction & Timing",
     items: [
       { label: "Transits",       href: "/dashboard/transits",         Icon: Globe       },
-      { label: "Transit Ripple", href: "/dashboard/transit-ripple",   Icon: TrendingUp  },
       { label: "Event Radar",    href: "/dashboard/event-radar",      Icon: Radar       },
       { label: "KP System",      href: "/dashboard/kp",               Icon: Target      },
       { label: "Jaimini",        href: "/dashboard/jaimini",          Icon: Star        },
@@ -59,10 +59,10 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Destiny",         href: "/dashboard/destiny",         Icon: TrendingUp      },
       { label: "Psychology",      href: "/dashboard/psychology",      Icon: Brain           },
+      { label: "Health & Vitality", href: "/dashboard/medical",       Icon: ShieldPlus      },
       { label: "Marriage Timing", href: "/dashboard/marriage-timing", Icon: Heart           },
       { label: "Kundali Milan",   href: "/dashboard/kundali-milan",   Icon: Users           },
       { label: "Family Karma",    href: "/dashboard/family-synastry", Icon: HeartHandshake  },
-      { label: "Medical",         href: "/dashboard/medical",         Icon: HeartPulse      },
       { label: "Numerology",      href: "/dashboard/numerology",      Icon: Hash            },
     ],
   },
@@ -94,6 +94,7 @@ export function DashboardSidebar() {
   const router = useRouter();
   const { birth } = useUserChart();
   const userName = birth.name?.split(" ")[0] || "Seeker";
+  const theme = useCurrentTheme();
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -105,7 +106,8 @@ export function DashboardSidebar() {
   return (
     <aside className="dash-sidebar">
       {/* Logo */}
-      <div className="dash-logo">
+      <div className="dash-logo" style={{ borderBottomColor: 'var(--al-primary)' }}>
+
         <div className="dash-logo-gem">✦</div>
         <span className="dash-logo-name">AstroLife</span>
       </div>
@@ -120,6 +122,7 @@ export function DashboardSidebar() {
                 key={href}
                 href={href}
                 className={`dash-nav-item${pathname === href ? " active" : ""}`}
+                style={pathname === href ? { borderLeftColor: 'var(--al-primary)', color: 'var(--al-primary)' } : undefined}
                 aria-current={pathname === href ? "page" : undefined}
               >
                 <Icon size={15} strokeWidth={1.7} aria-hidden="true" />

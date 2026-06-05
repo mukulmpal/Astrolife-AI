@@ -320,6 +320,11 @@ export interface RemedyCard {
   priority: "dasha-active" | "urgent" | "recommended" | "optional";
   safety: "safe-first" | "caution" | "validate-first";
   safetyNote: string;
+  personalizationScore: number;
+  timing: string;
+  whyPersonalized: string;
+  recommendedActions: string[];
+  avoidActions: string[];
 }
 
 export interface RemedyResult {
@@ -355,6 +360,71 @@ function getRemedySafety(
   return {
     safety: "safe-first",
     safetyNote: "Safe first-line remedies are enough: discipline, respectful behaviour, simple mantra, service and clean daily routine.",
+  };
+}
+
+function buildPersonalizedRemedyLayer(args: {
+  planet: string;
+  house: number;
+  sign: string;
+  weakReasons: string[];
+  isWeak: boolean;
+  isActiveDasha: boolean;
+  isKATWeak: boolean;
+  retrograde: boolean;
+  safety: RemedyCard["safety"];
+  day: string;
+  practice: string;
+  mantra: string;
+  houseRemedy: string;
+  lkUpay: string[];
+  katRemedy: string;
+}): Pick<RemedyCard, "personalizationScore" | "timing" | "whyPersonalized" | "recommendedActions" | "avoidActions"> {
+  const score = Math.min(100,
+    35 +
+    (args.isActiveDasha ? 25 : 0) +
+    (args.isWeak ? 20 : 0) +
+    (args.isKATWeak ? 10 : 0) +
+    (args.retrograde ? 5 : 0) +
+    (args.lkUpay.length > 0 ? 5 : 0)
+  );
+
+  const recommendedActions = [
+    args.practice,
+    args.mantra,
+    args.houseRemedy,
+    args.isKATWeak ? args.katRemedy : "",
+    args.lkUpay[0] || "",
+  ].filter(Boolean).slice(0, 4);
+
+  const avoidActions = [
+    args.safety === "validate-first"
+      ? "Do not start gemstone, metal, yantra or heavy donation without chart validation."
+      : "",
+    args.weakReasons.length >= 2
+      ? "Avoid running many remedies together; keep this planet as a focused 30-day protocol."
+      : "",
+    args.retrograde
+      ? "Avoid urgent, fear-based decisions; retrograde patterns need steady repetition."
+      : "",
+    ["Sun", "Mars", "Saturn", "Rahu", "Ketu"].includes(args.planet)
+      ? "Avoid aggressive rituals; prefer discipline, service, mantra and behaviour correction first."
+      : "",
+  ].filter(Boolean);
+
+  const weaknessLine = args.weakReasons.length
+    ? `Stress signals: ${args.weakReasons.join(", ")}.`
+    : "No major weakness signal detected.";
+  const dashaLine = args.isActiveDasha
+    ? "It is active in the current dasha chain, so its remedy impact is time-sensitive."
+    : "It is not the main active dasha planet, so keep the remedy light and supportive.";
+
+  return {
+    personalizationScore: score,
+    timing: `${args.day}; ${args.isActiveDasha ? "prioritize during the current dasha/antardasha window" : "use as a weekly low-intensity routine"}. Review after 30-40 days.`,
+    whyPersonalized: `${args.planet} is placed in house ${args.house} in ${args.sign}. ${weaknessLine} ${dashaLine}`,
+    recommendedActions,
+    avoidActions,
   };
 }
 
@@ -407,6 +477,23 @@ export function calculateRemedies(chart: ChartData): RemedyResult {
     else if (isKATWeak) priority = "recommended";
 
     const safety = getRemedySafety(planet, isWeak, isActiveDasha, isKATWeak);
+    const personalized = buildPersonalizedRemedyLayer({
+      planet,
+      house: pd.house,
+      sign: pd.sign,
+      weakReasons,
+      isWeak,
+      isActiveDasha,
+      isKATWeak,
+      retrograde: isRetrograde,
+      safety: safety.safety,
+      day: r.day,
+      practice: r.practice,
+      mantra: r.mantra,
+      houseRemedy,
+      lkUpay,
+      katRemedy: KAT_REMEDY[planet] || "",
+    });
 
     return {
       planet,
@@ -431,6 +518,7 @@ export function calculateRemedies(chart: ChartData): RemedyResult {
       lkUpay,
       priority,
       ...safety,
+      ...personalized,
     };
   }).filter(Boolean) as RemedyCard[];
 

@@ -21,7 +21,9 @@ export interface CombinedTransitPurchaseInput {
 export interface CombinedTransitPurchaseResult {
   overall: PurchaseVerdict;
   strongestWarning: string;
+  strongestWarningReason: string;
   methodNote: string;
+  sadeSatiZone: SadeSatiPurchaseZone;
   transit: TransitPurchaseGuidanceResult;
   lalKitab: LalKitabPurchaseResult[];
   avoid: Array<{ title: string; reason: string; source: "transit" | "lal_kitab" }>;
@@ -31,6 +33,17 @@ export interface CombinedTransitPurchaseResult {
 }
 
 const LAL_KITAB_PLANETS: LalKitabPlanet[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+
+export interface SadeSatiPurchaseZone {
+  active: boolean;
+  phase: "entry" | "peak" | "exit" | "kantak" | "clear";
+  severity: "low" | "medium" | "high";
+  scoreImpact: number;
+  title: string;
+  description: string;
+  purchaseCautions: string[];
+  remedies: string[];
+}
 
 function toLalKitabPlanet(planet: PlanetName): LalKitabPlanet | null {
   return LAL_KITAB_PLANETS.includes(planet as LalKitabPlanet) ? planet as LalKitabPlanet : null;
@@ -52,10 +65,70 @@ function mergeOverall(transit: PurchaseVerdict, lalKitab: LalKitabPurchaseResult
   return transit;
 }
 
+function sadeSatiPhase(title: string): SadeSatiPurchaseZone["phase"] {
+  if (title.includes("Entry")) return "entry";
+  if (title.includes("Exit")) return "exit";
+  if (title.includes("Peak")) return "peak";
+  return "peak";
+}
+
+function buildSadeSatiZone(report: TransitReport): SadeSatiPurchaseZone {
+  const saturnAlert = report.alerts.find((alert) => alert.type === "sade_sati" || alert.type === "ashtama_shani");
+
+  if (!saturnAlert) {
+    return {
+      active: false,
+      phase: "clear",
+      severity: "low",
+      scoreImpact: 0,
+      title: "Sade Sati Zone Clear",
+      description:
+        "No Sade Sati or Kantak Shani alert is active from Moon transit right now. Use normal practical purchase checks.",
+      purchaseCautions: [
+        "Keep normal bill, warranty, return policy and budget checks active.",
+        "Do not buy old, damaged or undocumented Saturn-type objects casually.",
+      ],
+      remedies: [
+        "Maintain steady Saturday discipline without fear-based remedies.",
+        "Keep old, broken and unused items cleaned or responsibly removed.",
+      ],
+    };
+  }
+
+  const phase = saturnAlert.type === "ashtama_shani" ? "kantak" : sadeSatiPhase(saturnAlert.title);
+  const scoreImpact = saturnAlert.severity === "high" ? -18 : saturnAlert.severity === "medium" ? -10 : -5;
+  const title =
+    phase === "kantak"
+      ? "Kantak Shani Purchase Zone"
+      : `Sade Sati ${phase.charAt(0).toUpperCase()}${phase.slice(1)} Purchase Zone`;
+
+  return {
+    active: true,
+    phase,
+    severity: saturnAlert.severity,
+    scoreImpact,
+    title,
+    description:
+      `${saturnAlert.description} Purchase guidance is Moon-first here because Chandra Lagna shows lived pressure, anxiety, delay and emotional load.`,
+    purchaseCautions: [
+      "Avoid high-value used leather, old shoes, scrap iron, heavy machinery or repair-heavy objects without full verification.",
+      "Do not accept Saturn-type gifts casually: used shoes, damaged tools, broken machinery, old black items or unclear-liability objects.",
+      "For property, vehicle, machinery and long-term contracts, re-check papers, warranty, hidden dues and service history.",
+    ],
+    remedies: [
+      "Use practical Saturn remedies: discipline, patience, clean commitments and honest documentation.",
+      "On Saturday, serve elderly people, workers or people carrying heavy responsibility; keep it simple and non-fear based.",
+      "Donate food, black sesame or useful essentials according to capacity, without superstition or panic.",
+      "Chant Om Sham Shanaishcharaya Namah 108 times on Saturday only if it feels grounding to the user.",
+    ],
+  };
+}
+
 export function generateCombinedTransitPurchaseGuidance(
   input: CombinedTransitPurchaseInput
 ): CombinedTransitPurchaseResult {
   const transit = generateTransitPurchaseGuidance(input.transitReport);
+  const sadeSatiZone = buildSadeSatiZone(input.transitReport);
   const lalKitabInput: LalKitabPurchaseInput = {
     ...(input.lalKitab ?? {}),
     transitHouses: {
@@ -66,12 +139,26 @@ export function generateCombinedTransitPurchaseGuidance(
   const lalKitab = getLalKitabPurchaseGuidance(lalKitabInput);
   const overall = mergeOverall(transit.overall, lalKitab);
   const topLalKitab = lalKitab[0];
+  const transitWarning = transit.strongestWarning;
+  const lalKitabIsStrongWarning = topLalKitab?.verdict === "AVOID" || topLalKitab?.verdict === "GIFT_CAUTION";
+  const saturnZoneIsStrongWarning = sadeSatiZone.active && sadeSatiZone.severity !== "low";
   const strongestWarning =
-    topLalKitab?.verdict === "AVOID" || topLalKitab?.verdict === "GIFT_CAUTION"
+    lalKitabIsStrongWarning
       ? topLalKitab.title
-      : transit.strongestWarning?.title ?? topLalKitab?.title ?? "No strong warning";
+      : saturnZoneIsStrongWarning
+        ? sadeSatiZone.title
+      : transitWarning?.title ?? topLalKitab?.title ?? "No strong warning";
+  const strongestWarningReason =
+    lalKitabIsStrongWarning
+      ? topLalKitab.activeTriggers.join(" · ") || topLalKitab.explanation
+      : saturnZoneIsStrongWarning
+        ? sadeSatiZone.purchaseCautions[0]
+      : transitWarning?.timing ?? topLalKitab?.activeTriggers.join(" · ") ?? "No urgent warning trigger.";
 
   const avoid = [
+    ...(sadeSatiZone.active
+      ? [{ title: sadeSatiZone.title, reason: sadeSatiZone.purchaseCautions[0], source: "transit" as const }]
+      : []),
     ...transit.windows
       .filter((window) => window.verdict === "AVOID" || window.verdict === "WAIT")
       .map((window) => ({ title: window.title, reason: window.timing, source: "transit" as const })),
@@ -101,8 +188,10 @@ export function generateCombinedTransitPurchaseGuidance(
     return {
     overall,
     strongestWarning,
+    strongestWarningReason,
     methodNote:
-      "This combines standard Gochar transit purchase timing with Lal Kitab object/gift grammar. It is not Lal Kitab 35-sala chakra, Lal Kitab varshphal, or monthly phal.",
+      "This combines Moon-first standard Gochar transit purchase timing with Lal Kitab object/gift grammar. It is not Lal Kitab 35-sala chakra, Lal Kitab varshphal, or monthly phal.",
+    sadeSatiZone,
     transit,
     lalKitab,
     avoid,

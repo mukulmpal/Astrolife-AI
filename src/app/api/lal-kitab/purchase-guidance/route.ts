@@ -3,10 +3,22 @@ import {
   getLalKitabPurchaseGuidance,
   type LalKitabPurchaseInput,
 } from "@/lib/lal-kitab";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { fail, isRecord, ok, readJsonWithLimit, validationErrorResponse, type ValidationResult } from "@/lib/validation/api";
+
+function validateLalKitabPurchaseBody(value: unknown): ValidationResult<LalKitabPurchaseInput> {
+  if (!isRecord(value)) return fail("Lal Kitab purchase payload must be an object.");
+  return ok(value as LalKitabPurchaseInput);
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as LalKitabPurchaseInput;
+    const limit = checkRateLimit(req, { scope: "lal-kitab-purchase-guidance", limit: 40, windowMs: 60 * 60_000 });
+    if (!limit.allowed) return rateLimitResponse(limit.resetAt);
+
+    const parsed = await readJsonWithLimit(req, validateLalKitabPurchaseBody, { maxBytes: 80_000, routeName: "lal-kitab-purchase-guidance" });
+    if (!parsed.ok) return validationErrorResponse(parsed);
+    const body = parsed.data;
     const guidance = getLalKitabPurchaseGuidance(body);
 
     return NextResponse.json({

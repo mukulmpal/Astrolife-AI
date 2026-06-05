@@ -6,6 +6,8 @@ import type { KPEngineResult } from "@/lib/astro-engine/kp";
 import type { EventRadarReport } from "@/lib/astro-engine/event-radar";
 import { getServerFeatureAccess, premiumBlockedResponse } from "@/lib/server-feature-access";
 import { monitor } from "@/lib/server-monitoring";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { fail, isRecord, ok, readJsonWithLimit, type ValidationResult } from "@/lib/validation/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,8 +38,29 @@ interface MarriageTimingResponse {
   report?: unknown;
 }
 
+const OUTPUT_FORMATS = ["full", "json-only", "narrative-only", "dashboard", "pdf", "chat"] as const;
+const LANGUAGES = ["hinglish", "hindi", "english"] as const;
+
+function validateMarriageTimingBody(value: unknown): ValidationResult<Partial<MarriageTimingRequest> & { knRaoTiming: MarriageTimingInput }> {
+  if (!isRecord(value)) return fail("Marriage timing payload must be an object.");
+  const issues: string[] = [];
+  if (!isRecord(value.knRaoTiming)) issues.push("knRaoTiming is required.");
+  if (value.outputFormat !== undefined && !OUTPUT_FORMATS.includes(value.outputFormat as typeof OUTPUT_FORMATS[number])) {
+    issues.push("Invalid outputFormat.");
+  }
+  if (value.language !== undefined && !LANGUAGES.includes(value.language as typeof LANGUAGES[number])) {
+    issues.push("Invalid language.");
+  }
+  if (Array.isArray(value.divs) && value.divs.length > 32) issues.push("Too many divisional charts.");
+  if (issues.length) return fail("Invalid marriage timing payload.", issues);
+  return ok(value as Partial<MarriageTimingRequest> & { knRaoTiming: MarriageTimingInput });
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse<MarriageTimingResponse>> {
   try {
+    const limit = checkRateLimit(request, { scope: "marriage-timing", limit: 30, windowMs: 60 * 60_000 });
+    if (!limit.allowed) return rateLimitResponse(limit.resetAt) as NextResponse<MarriageTimingResponse>;
+
     const access = await getServerFeatureAccess("marriage_timing");
     if (!access.allowed) {
       monitor.warn("premium.blocked", {
@@ -52,17 +75,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<MarriageT
       );
     }
 
-    const body = await request.json() as Partial<MarriageTimingRequest>;
-
-    if (!body.knRaoTiming) {
+    const parsedBody = await readJsonWithLimit(request, validateMarriageTimingBody, { maxBytes: 400_000, routeName: "marriage-timing" });
+    if (!parsedBody.ok) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Missing required field: knRaoTiming",
-        },
-        { status: 400 }
+        { success: false, error: parsedBody.error },
+        { status: 400 },
       );
     }
+    const body = parsedBody.data;
 
     // Build the marriage intelligence result with K.N. Rao timing
     const result = buildMarriageIntelligenceV2({

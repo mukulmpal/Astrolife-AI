@@ -3,7 +3,29 @@ import { useEffect, useState } from "react";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { calculatePrashna, type PrashnaResult, type PrashnaTopic } from "@/lib/astro-engine/prashna";
+import NorthIndianChart from "@/components/north-indian-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+
+const PRASHNA_SIGNS = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+];
+
+function prashnaChartView(result: PrashnaResult, base: "lagna" | "moon" = "lagna") {
+  const baseSign = base === "moon" ? result.moonSign : result.lagnaRashi;
+  const lagnaNum = Math.max(0, PRASHNA_SIGNS.indexOf(baseSign));
+  const planets: Record<string, { house: number; retrograde: boolean }> = {};
+  for (const [name, pd] of Object.entries(result.planetPositions)) {
+    if (base === "lagna") {
+      planets[name] = { house: pd.house, retrograde: false };
+      continue;
+    }
+
+    const signNum = Math.max(0, PRASHNA_SIGNS.indexOf(pd.sign));
+    planets[name] = { house: ((signNum - lagnaNum + 12) % 12) + 1, retrograde: false };
+  }
+  return { lagnaNum, planets };
+}
 
 type CityResult = {
   displayName: string;
@@ -46,6 +68,7 @@ export default function PrashnaPage() {
   const [lon, setLon] = useState("77.2090");
   const [tz, setTz] = useState("5.5");
   const [result, setResult] = useState<PrashnaResult | null>(null);
+  const [resultTab, setResultTab] = useState<"judgment" | "lagnaChart" | "moonChart">("judgment");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -224,6 +247,44 @@ export default function PrashnaPage() {
         {/* Result */}
         {result && (
           <>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+              {(["judgment", "lagnaChart", "moonChart"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setResultTab(tab)}
+                  style={{
+                    padding: "8px 14px",
+                    borderRadius: 8,
+                    border: resultTab === tab ? "1px solid rgba(168,85,247,0.5)" : "1px solid #1c1840",
+                    background: resultTab === tab ? "rgba(168,85,247,0.15)" : "transparent",
+                    color: resultTab === tab ? "#e9d5ff" : "#8880a8",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    cursor: "pointer",
+                  }}
+                >
+                  {tab === "judgment" ? "Judgment" : tab === "lagnaChart" ? "Prashna Lagna" : "Chandra Lagna"}
+                </button>
+              ))}
+            </div>
+
+            {resultTab === "lagnaChart" || resultTab === "moonChart" ? (
+              <div className="pr-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                <div style={{ fontWeight: 700, fontSize: 13, color: "#c4b5fd" }}>
+                  {resultTab === "lagnaChart"
+                    ? `Prashna Lagna · ${result.lagnaRashi}`
+                    : `Chandra Lagna · ${result.moonSign}`}
+                </div>
+                <p style={{ margin: 0, maxWidth: 520, textAlign: "center", fontSize: 12, color: "#b8b0d8", lineHeight: 1.7 }}>
+                  {resultTab === "lagnaChart"
+                    ? "Use this chart for event outcome, visible circumstances, and whether the matter can manifest."
+                    : "Use this chart for the questioner's mind, emotional pressure, clarity, and how the situation feels internally."}
+                </p>
+                <NorthIndianChart {...prashnaChartView(result, resultTab === "lagnaChart" ? "lagna" : "moon")} size={320} />
+              </div>
+            ) : (
+          <>
             {/* Verdict */}
             <div style={{ background: `${result.color}11`, border: `2px solid ${result.color}55`, borderRadius: "14px", padding: "20px", marginBottom: "12px", textAlign: "center" }}>
               <div style={{ fontSize: "36px", marginBottom: "8px" }}>{result.icon}</div>
@@ -306,6 +367,8 @@ export default function PrashnaPage() {
                 <div key={i} style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.65", padding: "3px 0" }}>{i + 1}. {line}</div>
               ))}
             </div>
+          </>
+            )}
           </>
         )}
       </div>

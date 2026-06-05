@@ -1,7 +1,5 @@
-import { TransitRipplePanel } from "@/components/transit/TransitRipplePanel";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default function TransitsRipplePage() {
-  return <TransitRipplePanel />;
+export default function TransitsRippleRedirectPage() {
+  redirect("/dashboard/transits");
 }
