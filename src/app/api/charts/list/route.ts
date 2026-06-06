@@ -1,6 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
+function isMissingChartsTable(error: unknown) {
+  const message = error instanceof Error ? error.message : String((error as { message?: unknown })?.message ?? error ?? "");
+  return message.includes("public.charts") || message.includes("Could not find the table");
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -16,7 +21,32 @@ export async function GET() {
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (error) throw error;
+    if (error) {
+      if (!isMissingChartsTable(error)) throw error;
+
+      const { data: legacyData, error: legacyError } = await supabase
+        .from("user_charts")
+        .select("id, name, dob, tob, city, created_at, is_default")
+        .eq("user_id", user.id)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (legacyError) throw legacyError;
+
+      return NextResponse.json({
+        charts: (legacyData ?? []).map((row) => ({
+          id: `legacy:${String(row.id)}`,
+          name: String(row.name),
+          dob: String(row.dob),
+          tob: String(row.tob),
+          city: String(row.city),
+          created_at: String(row.created_at),
+          is_primary: Boolean(row.is_default),
+        })),
+        storage: "legacy_user_charts",
+      });
+    }
 
     const charts = (data ?? []).map((row) => ({
       id: String(row.id),
