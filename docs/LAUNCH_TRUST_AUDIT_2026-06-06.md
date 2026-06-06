@@ -28,6 +28,8 @@ This file is the release checklist for the current launch-hardening batch. It se
 | Production Supabase anon key | Fixed | Production and local anon key had an extra leading `t`; corrected key now has `eyJ` prefix and latest production deploy is `dpl_4DgDCUumDFvhp4ouXSEfmA8PgNGE` |
 | Real account chart save/list | Pass with legacy storage | Disposable free, premium, and elite users authenticated; `/api/charts/save` and `/api/charts/list` pass using `legacy_user_charts` fallback because production lacks `public.charts` |
 | Payment order creation | Blocked | Razorpay direct credential test returns `401 Authentication failed`; `/api/payment/create-order` returns 500 until the Razorpay key/secret pair is corrected |
+| Real UI route smoke | Pass | Production routes `/`, `/auth/signup`, `/onboarding`, `/dashboard`, `/dashboard/history`, `/dashboard/kundli`, `/dashboard/transits`, `/dashboard/report`, `/dashboard/upgrade`, `/dashboard/palmistry`, and `/dashboard/marriage-timing` all returned 200 with no app-error marker |
+| Production PDF generation | Pass | Disposable authenticated users generated Basic, Premium, and Elite PDFs through `/api/generate-pdf`: Basic 1.20 MB / 10.0s, Premium 4.93 MB / 15.9s, Elite 5.04 MB / 21.1s |
 
 ## Plan And Report Tier Matrix
 
@@ -45,15 +47,16 @@ This file is the release checklist for the current launch-hardening batch. It se
 | Premium / Full | Per-planet, per-house, yogas, doshas, shadbala, divisional, dasha, antardasha, life areas, psychology, numerology, lalkitab, remedies, destiny, transit radar, jaimini, vastu, sarvatobhadra, KP, transit ripple, special lagnas, marriage intelligence, relationship intelligence, astro sound, gemstone |
 | Elite | Premium plus Elite Palmistry Fusion, Elite Intelligence Score, Real Astrologer Review |
 
-## Real User-Flow Tests Still Required
+## Real User-Flow Status
 
-These cannot be honestly marked complete without test credentials, a browser session, or explicit approval to pull production env secrets for disposable test users.
-
-1. Free account: signup UI, onboarding UI, free engine access, premium lock state, basic PDF.
-2. Premium account: payment/upgrade, premium engines, premium PDF, palmistry upload, transit ripple, marriage timing partner fusion.
-3. Elite account: elite PDF with palmistry session attached, family charts, Real Astrologer Review page, full report download.
-4. Production storage: save chart, reload browser, login again, confirm chart persists.
-5. Payment safety: Razorpay order creation, payment verification, profile tier update, duplicate payment handling.
+| Flow | Status | Evidence / gap |
+| --- | --- | --- |
+| Free account API flow | Pass | Disposable free user authenticated; chart save/list passes through legacy storage; Basic PDF returns `application/pdf` |
+| Premium account API flow | Pass except payment | Disposable premium user authenticated; Premium PDF returns `application/pdf`; payment order creation blocked by Razorpay credentials |
+| Elite account API flow | Pass except palm-session attachment | Disposable elite user authenticated; Elite PDF returns `application/pdf`; palmistry-session-attached Elite PDF still needs a saved real palm session test |
+| Production storage | Partial pass | Save/list persists through `legacy_user_charts`; new `charts` table path still waits on production schema migration |
+| Browser click-through | Still required | HTTP route smoke passed, but full visual/click testing on phone/desktop still needs browser/manual QA |
+| Payment safety | Blocked | Razorpay direct credential test returns `401 Authentication failed`; cannot verify paid upgrade until credentials are corrected |
 
 ## Launch Risks To Close Before Paid Public Launch
 
