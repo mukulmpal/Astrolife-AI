@@ -22,7 +22,9 @@ This file is the release checklist for the current launch-hardening batch. It se
 | Live API validation smoke | Pass | Invalid `/api/generate-pdf` payload returns controlled 400 `Chart must be an object.` |
 | Supabase push dry-run | Blocked | `supabase db push --dry-run` fails with `SUPABASE_DB_PASSWORD` / pooler auth failure; no production migration push was applied |
 | Local dev smoke | Blocked | `next dev` could not bind `0.0.0.0:3000` inside sandbox; escalated retry was blocked by the system usage gate |
-| Production deploy after audit | Blocked | Vercel deploy connector was blocked by the system usage gate; latest local audit/fix changes are not deployed by this turn |
+| Production deploy | Pass | Commit `9b7fa94` deployed as `dpl_B4EQxqJWpiLUAnwE9uhnXjWXjodj` and aliased to `https://astrolife-ai.vercel.app` |
+| Unauthenticated production gates | Pass | `/api/payment/create-order` returns 401 login required; `/api/charts/save` returns 401 unauthorized; invalid elite PDF payload returns controlled 400 |
+| Real disposable account API test | Blocked | Service-role user creation reached production, but `profiles.onboarding_completed` is missing from production schema cache and local Supabase anon key returns `Invalid API key`; Vercel production env pull was rejected without explicit approval |
 
 ## Plan And Report Tier Matrix
 
@@ -42,7 +44,7 @@ This file is the release checklist for the current launch-hardening batch. It se
 
 ## Real User-Flow Tests Still Required
 
-These cannot be honestly marked complete without test credentials for each tier.
+These cannot be honestly marked complete without test credentials, a browser session, or explicit approval to pull production env secrets for disposable test users.
 
 1. Free account: signup, onboarding chart, `/dashboard/history`, free engine access, premium lock state, basic PDF.
 2. Premium account: payment/upgrade, premium engines, premium PDF, palmistry upload, transit ripple, marriage timing partner fusion.
