@@ -25,6 +25,9 @@ This file is the release checklist for the current launch-hardening batch. It se
 | Production deploy | Pass | Commit `9b7fa94` deployed as `dpl_B4EQxqJWpiLUAnwE9uhnXjWXjodj` and aliased to `https://astrolife-ai.vercel.app` |
 | Unauthenticated production gates | Pass | `/api/payment/create-order` returns 401 login required; `/api/charts/save` returns 401 unauthorized; invalid elite PDF payload returns controlled 400 |
 | Real disposable account API test | Blocked | Service-role user creation reached production, but `profiles.onboarding_completed` is missing from production schema cache and local Supabase anon key returns `Invalid API key`; Vercel production env pull was rejected without explicit approval |
+| Production Supabase anon key | Fixed | Production and local anon key had an extra leading `t`; corrected key now has `eyJ` prefix and latest production deploy is `dpl_4DgDCUumDFvhp4ouXSEfmA8PgNGE` |
+| Real account chart save/list | Pass with legacy storage | Disposable free, premium, and elite users authenticated; `/api/charts/save` and `/api/charts/list` pass using `legacy_user_charts` fallback because production lacks `public.charts` |
+| Payment order creation | Blocked | Razorpay direct credential test returns `401 Authentication failed`; `/api/payment/create-order` returns 500 until the Razorpay key/secret pair is corrected |
 
 ## Plan And Report Tier Matrix
 
@@ -46,7 +49,7 @@ This file is the release checklist for the current launch-hardening batch. It se
 
 These cannot be honestly marked complete without test credentials, a browser session, or explicit approval to pull production env secrets for disposable test users.
 
-1. Free account: signup, onboarding chart, `/dashboard/history`, free engine access, premium lock state, basic PDF.
+1. Free account: signup UI, onboarding UI, free engine access, premium lock state, basic PDF.
 2. Premium account: payment/upgrade, premium engines, premium PDF, palmistry upload, transit ripple, marriage timing partner fusion.
 3. Elite account: elite PDF with palmistry session attached, family charts, Real Astrologer Review page, full report download.
 4. Production storage: save chart, reload browser, login again, confirm chart persists.
@@ -56,11 +59,12 @@ These cannot be honestly marked complete without test credentials, a browser ses
 
 1. Replace in-memory rate limiting with durable Redis/Upstash. In-memory limits reset per serverless instance.
 2. Reconcile Supabase migration ledger in production. Some schema work was applied directly earlier, so the DB can be correct while migration history is not clean; Docker is also required for deeper `supabase db dump` schema inspection.
-3. Remove lint warnings from unused imports and hook dependency warnings. Not a runtime blocker, but it weakens release hygiene.
-4. Run mobile visual QA on dense pages: Kundli, Transits, Palmistry, Marriage Timing, Vastu, Numerology, AstroSound, Reports.
-5. Confirm PostHog/Sentry-style production monitoring keys are set. Code has PostHog hooks and server monitoring, but deployment env must be verified.
-6. Consolidate legacy chart tables once confidence is high: `user_charts` and `charts` are bridged, but still represent historical storage drift.
-7. Deploy this launch-trust batch after the system usage gate allows Vercel actions again.
+3. Apply or manually add the Phase 0 SaaS tables in production: `charts`, `payments`, `subscriptions`, `usage_limits`, `reports`, and related RLS policies.
+4. Replace invalid Razorpay credentials with a valid key/secret pair, then rerun payment create-order and verify flow.
+5. Remove lint warnings from unused imports and hook dependency warnings. Not a runtime blocker, but it weakens release hygiene.
+6. Run mobile visual QA on dense pages: Kundli, Transits, Palmistry, Marriage Timing, Vastu, Numerology, AstroSound, Reports.
+7. Confirm PostHog/Sentry-style production monitoring keys are set. Code has PostHog hooks and server monitoring, but deployment env must be verified.
+8. Consolidate legacy chart tables once confidence is high: `user_charts` and `charts` are bridged, but still represent historical storage drift.
 
 ## Recommendation
 
