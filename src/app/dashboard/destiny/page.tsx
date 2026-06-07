@@ -380,7 +380,7 @@ export default function DestinyPage() {
                 ))}
               </div>
 
-              <div style={{display:"grid",gridTemplateColumns:"minmax(0,1.3fr) minmax(240px,0.7fr)",gap:14}}>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14}}>
                 <div style={{background:"#08051a",border:"1px solid #1c1840",borderRadius:8,padding:14,overflow:"hidden"}}>
                   <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",marginBottom:12}}>
                     <div>
@@ -426,7 +426,8 @@ export default function DestinyPage() {
                     ).filter((year) => year >= startYear && year <= endYear);
 
                     return (
-                      <div style={{position:"relative",height:330,borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 44px"}}>
+                      <div style={{overflowX:"auto",paddingBottom:4}}>
+                        <div style={{position:"relative",height:330,minWidth:720,borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 44px"}}>
                         {[20,40,60,80].map((score)=>(
                           <div key={score} style={{position:"absolute",left:14,right:14,bottom:`${34 + score * 2.35}px`,borderTop:"1px solid rgba(96,88,144,0.2)"}}>
                             <span style={{position:"absolute",left:0,top:-9,fontSize:9,color:"#8f82c8"}}>{score}%</span>
@@ -526,6 +527,7 @@ export default function DestinyPage() {
                           <span>Score trend line</span>
                           <span>Green = peak · Red = low · Bands = Antardasha</span>
                         </div>
+                        </div>
                       </div>
                     );
                   })()}
@@ -542,6 +544,72 @@ export default function DestinyPage() {
                   ))}
                 </div>
               </div>
+
+              {(() => {
+                const groups: Record<string, typeof adResult.bands> = {};
+                adResult.bands.forEach((band) => {
+                  const key = band.navtara?.taraName ?? "Unknown";
+                  groups[key] = [...(groups[key] ?? []), band];
+                });
+                const orderedTara = ["Janma", "Sampat", "Vipat", "Kshema", "Pratyari", "Sadhaka", "Vadha", "Mitra", "Parama Mitra"];
+                const taraNames = [
+                  ...orderedTara.filter((name) => groups[name]?.length),
+                  ...Object.keys(groups).filter((name) => !orderedTara.includes(name)),
+                ];
+
+                return (
+                  <div className="card" style={{padding:14}}>
+                    <div className="card-tag">✦ Navtara Map</div>
+                    <div className="card-title serif" style={{fontSize:20}}>Which Planet Is Which Tara?</div>
+                    <div style={{fontSize:12,color:"#605890",lineHeight:1.6,marginBottom:12}}>
+                      This shows how the Antardasha planets behave from your birth Moon nakshatra. Kshema and Sampat support stability and resources; Janma is personal and intense; Vipat, Pratyari and Vadha need more caution.
+                    </div>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:10}}>
+                      {taraNames.map((taraName) => {
+                        const items = groups[taraName] ?? [];
+                        const sample = items[0];
+                        const isSupport = ["Sampat", "Kshema", "Sadhaka", "Mitra", "Parama Mitra"].includes(taraName);
+                        const isCaution = ["Vipat", "Pratyari", "Vadha"].includes(taraName);
+                        return (
+                          <div
+                            key={`${selectedMd.planet}-${taraName}-navtara`}
+                            style={{
+                              border:"1px solid",
+                              borderColor:isSupport?"rgba(34,197,94,0.26)":isCaution?"rgba(239,68,68,0.26)":"rgba(200,160,48,0.24)",
+                              background:isSupport?"rgba(34,197,94,0.06)":isCaution?"rgba(239,68,68,0.06)":"rgba(200,160,48,0.06)",
+                              borderRadius:8,
+                              padding:10,
+                            }}
+                          >
+                            <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",marginBottom:6}}>
+                              <div style={{fontSize:12,fontWeight:800,color:sample?.navtara?.color ?? "#c8a030"}}>
+                                {sample?.navtara?.icon ?? "✦"} {taraName}
+                              </div>
+                              <span style={{fontSize:10,color:isSupport?"#22c55e":isCaution?"#ef4444":"#c8a030",fontWeight:800}}>
+                                {isSupport ? "Support" : isCaution ? "Caution" : "Intense"}
+                              </span>
+                            </div>
+                            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                              {items.map((item) => (
+                                <span
+                                  key={`${item.adPlanet}-${item.start.toISOString()}-${taraName}`}
+                                  style={{fontSize:11,fontWeight:700,color:item.color,background:"rgba(8,5,26,0.72)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"4px 7px"}}
+                                  title={`${selectedMd.planet}/${item.adPlanet}: ${formatPeriodDate(item.start)} - ${formatPeriodDate(item.end)}`}
+                                >
+                                  {item.adPlanet}
+                                </span>
+                              ))}
+                            </div>
+                            <div style={{fontSize:10,color:"#8f82c8",lineHeight:1.5,marginTop:8}}>
+                              {sample?.navtara?.quality ?? "Tara quality unavailable"}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:10}}>
                 {adResult.bands.map((band)=> {
