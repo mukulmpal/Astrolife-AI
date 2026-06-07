@@ -402,7 +402,11 @@ export default function DestinyPage() {
                     const mdDuration = Math.max(1, mdEnd - mdStart);
                     const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
                     const toX = (date: Date) => clamp(((date.getTime() - mdStart) / mdDuration) * 100, 0, 100);
-                    const toY = (score: number) => clamp(96 - score, 10, 86);
+                    const scores = adResult.points.map((point) => point.score);
+                    const minScore = Math.min(...scores);
+                    const maxScore = Math.max(...scores);
+                    const scoreRange = Math.max(10, maxScore - minScore);
+                    const toY = (score: number) => clamp(84 - ((score - minScore) / scoreRange) * 64, 12, 84);
                     const graphPoints = adResult.points.map((point) => ({
                       ...point,
                       x: toX(point.date),
@@ -416,7 +420,7 @@ export default function DestinyPage() {
                     const lowPoint = graphPoints.reduce((best, point) => point.score < best.score ? point : best, graphPoints[0]);
                     const startYear = selectedMd.start.getFullYear();
                     const endYear = selectedMd.end.getFullYear();
-                    const yearStep = endYear - startYear > 16 ? 5 : 2;
+                    const yearStep = endYear - startYear > 16 ? 5 : endYear - startYear > 8 ? 3 : 1;
                     const yearTicks = Array.from(
                       new Set([
                         startYear,
@@ -426,11 +430,10 @@ export default function DestinyPage() {
                     ).filter((year) => year >= startYear && year <= endYear);
 
                     return (
-                      <div style={{overflowX:"auto",paddingBottom:4}}>
-                        <div style={{position:"relative",height:330,minWidth:720,borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 44px"}}>
-                        {[20,40,60,80].map((score)=>(
-                          <div key={score} style={{position:"absolute",left:14,right:14,bottom:`${34 + score * 2.35}px`,borderTop:"1px solid rgba(96,88,144,0.2)"}}>
-                            <span style={{position:"absolute",left:0,top:-9,fontSize:9,color:"#8f82c8"}}>{score}%</span>
+                      <div style={{position:"relative",height:340,width:"100%",borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 44px",overflow:"hidden"}}>
+                        {[maxScore, Math.round((maxScore + minScore) / 2), minScore].map((score)=>(
+                          <div key={score} style={{position:"absolute",left:58,right:18,top:`${toY(score)}%`,borderTop:"1px solid rgba(96,88,144,0.22)"}}>
+                            <span style={{position:"absolute",left:-42,top:-9,fontSize:9,color:"#8f82c8"}}>{score}%</span>
                           </div>
                         ))}
 
@@ -524,9 +527,8 @@ export default function DestinyPage() {
                         </div>
 
                         <div style={{position:"absolute",left:72,right:22,bottom:10,display:"flex",justifyContent:"space-between",fontSize:10,color:"#8f82c8"}}>
-                          <span>Score trend line</span>
+                          <span>Score trend line · normalized for this MD</span>
                           <span>Green = peak · Red = low · Bands = Antardasha</span>
-                        </div>
                         </div>
                       </div>
                     );
