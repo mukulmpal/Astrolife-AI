@@ -1,18 +1,47 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import "@/app/dashboard/shared.css";
-import { calculateDestiny } from "@/lib/astro-engine/destiny";
+import { calculateADDestiny, calculateDestiny } from "@/lib/astro-engine/destiny";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 
+const PLANET_SHORT: Record<string, string> = {
+  Sun: "Su",
+  Moon: "Mo",
+  Mars: "Ma",
+  Mercury: "Me",
+  Jupiter: "Ju",
+  Venus: "Ve",
+  Saturn: "Sa",
+  Rahu: "Ra",
+  Ketu: "Ke",
+};
+
+function formatPeriodDate(date: Date) {
+  return date.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+}
+
 export default function DestinyPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeTab, setActiveTab] = useState<"curve"|"areas"|"dashas"|"now">("curve");
+  const [dashaView, setDashaView] = useState<"md"|"ad">("md");
+  const [selectedMdIndex, setSelectedMdIndex] = useState(0);
   const { birth, chart, hasUserChart } = useUserChart();
   const { t } = useLanguage();
   const result = calculateDestiny(chart.planets as never, chart.dashas, birth.dob, chart.lagnaNum ?? 0);
+  const selectedMd = result.bands[selectedMdIndex] ?? result.bands.find((band) => band.startAge <= result.currentAge && result.currentAge < band.endAge) ?? result.bands[0];
+  const adResult = selectedMd
+    ? calculateADDestiny(
+        selectedMd.planet,
+        selectedMd.start,
+        selectedMd.end,
+        (selectedMd.end.getTime() - selectedMd.start.getTime()) / (365.25 * 24 * 3600 * 1000),
+        chart.planets as never,
+        chart.lagnaNum ?? 0,
+      )
+    : null;
 
   // Draw canvas curve
   useEffect(() => {
@@ -35,9 +64,12 @@ export default function DestinyPage() {
     });
     [0,10,20,30,40,50,60,70,80,90].forEach(a=>{
       const x=L+(a/maxAge*chartW);
+      const baseYear = result.points[0]?.year;
+      const axisYear = result.points.find((point) => point.age === a)?.year ?? (typeof baseYear === "number" ? baseYear + a : a);
       ctx.beginPath(); ctx.moveTo(x,T); ctx.lineTo(x,T+chartH); ctx.stroke();
       ctx.fillStyle="#3a3060"; ctx.font="9px Outfit,sans-serif";
-      ctx.textAlign="center"; ctx.fillText(String(1995+a),x,H-4);
+      ctx.textAlign="center";
+      ctx.fillText(String(axisYear),x,H-4);
     });
 
     // Dasha bands
@@ -276,31 +308,192 @@ export default function DestinyPage() {
       {/* ── DASHAS TAB ── */}
       {activeTab==="dashas" && (
         <div className="card">
-          <div className="card-tag">✦ Mahadasha Timeline</div>
-          <div className="card-title serif">Life Periods Scored</div>
-          {result.bands.map((b,i)=>{
-            const isNow=b.startAge<=result.currentAge&&result.currentAge<b.endAge;
-            return (
-              <div key={i} className={`dasha-item ${isNow?"active":""}`} style={{borderColor:isNow?`${b.color}55`:"#1c1840"}}>
-                <div style={{width:8,height:8,borderRadius:"50%",background:isNow?b.color:"#1c1840",flexShrink:0,
-                  boxShadow:isNow?`0 0 8px ${b.color}88`:"none"}}/>
-                <span style={{fontSize:13,fontWeight:600,color:b.color,width:24}}>{["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"][["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"].indexOf(b.planet)]}</span>
-                <div style={{flex:1}}>
-                  <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:isNow?b.color:"#c8c0a8"}}>
-                    {b.planet} Mahadasha
+          <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",flexWrap:"wrap",marginBottom:14}}>
+            <div>
+              <div className="card-tag">✦ Mahadasha - Antardasha Destiny Chart</div>
+              <div className="card-title serif">Life Periods Scored</div>
+              <div style={{fontSize:12,color:"#605890",lineHeight:1.6}}>
+                View the full Mahadasha map, then open any MD to see its Antardasha sequence with start year, end year and confidence score.
+              </div>
+            </div>
+            <div style={{display:"flex",gap:8,background:"#08051a",border:"1px solid #1c1840",borderRadius:8,padding:4}}>
+              <button className={`tab ${dashaView==="md"?"active":""}`} style={{padding:"8px 12px"}} onClick={()=>setDashaView("md")}>MD Chart</button>
+              <button className={`tab ${dashaView==="ad"?"active":""}`} style={{padding:"8px 12px"}} onClick={()=>setDashaView("ad")}>MD - AD Chart</button>
+            </div>
+          </div>
+
+          {dashaView==="md" && (
+            <div>
+              {result.bands.map((b,i)=>{
+                const isNow=b.startAge<=result.currentAge&&result.currentAge<b.endAge;
+                const isSelected=i===selectedMdIndex;
+                return (
+                  <button
+                    key={`${b.planet}-${b.start.toISOString()}`}
+                    className={`dasha-item ${isNow?"active":""}`}
+                    style={{
+                      width:"100%",
+                      textAlign:"left",
+                      cursor:"pointer",
+                      borderColor:isSelected?`${b.color}88`:isNow?`${b.color}55`:"#1c1840",
+                      background:isSelected?`${b.color}12`:undefined,
+                    }}
+                    onClick={()=>{ setSelectedMdIndex(i); setDashaView("ad"); }}
+                  >
+                    <div style={{width:8,height:8,borderRadius:"50%",background:isNow?b.color:"#1c1840",flexShrink:0,
+                      boxShadow:isNow?`0 0 8px ${b.color}88`:"none"}}/>
+                    <span style={{fontSize:13,fontWeight:600,color:b.color,width:24}}>{PLANET_SHORT[b.planet] ?? b.planet.slice(0,2)}</span>
+                    <div style={{flex:1}}>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:isNow?b.color:"#c8c0a8"}}>
+                        {b.planet} Mahadasha
+                      </div>
+                      <div style={{fontSize:11,color:"#605890"}}>
+                        Age {Math.round(b.startAge)} - {Math.round(b.endAge)} · {formatPeriodDate(b.start)} - {formatPeriodDate(b.end)}
+                      </div>
+                      <div style={{fontSize:10,color:"#8f82c8",marginTop:3}}>
+                        Click to open {b.planet} MD antardasha chart
+                      </div>
+                    </div>
+                    <div style={{textAlign:"right"}}>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,fontWeight:700,
+                        color:b.score>=70?"#22c55e":b.score>=50?"#c8a030":"#ef4444"}}>{b.score}%</div>
+                      {isNow&&<div style={{fontSize:10,color:"#22c55e",fontWeight:600}}>ACTIVE</div>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {dashaView==="ad" && selectedMd && adResult && (
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4}}>
+                {result.bands.map((b,i)=>(
+                  <button
+                    key={`${b.planet}-${b.start.toISOString()}-selector`}
+                    className={`tab ${i===selectedMdIndex?"active":""}`}
+                    style={{whiteSpace:"nowrap",padding:"8px 12px",borderColor:i===selectedMdIndex?`${b.color}77`:undefined}}
+                    onClick={()=>setSelectedMdIndex(i)}
+                  >
+                    {b.planet} MD · {b.start.getFullYear()}-{b.end.getFullYear()}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{display:"grid",gridTemplateColumns:"minmax(0,1.3fr) minmax(240px,0.7fr)",gap:14}}>
+                <div style={{background:"#08051a",border:"1px solid #1c1840",borderRadius:8,padding:14,overflow:"hidden"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",marginBottom:12}}>
+                    <div>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,fontWeight:700,color:selectedMd.color}}>
+                        {selectedMd.planet} Mahadasha Antardasha Flow
+                      </div>
+                      <div style={{fontSize:11,color:"#605890"}}>
+                        {formatPeriodDate(selectedMd.start)} - {formatPeriodDate(selectedMd.end)} · {adResult.bands.length} sub-periods
+                      </div>
+                    </div>
+                    <span className={`badge ${adResult.currentAD?.tone==="support"?"badge-green":adResult.currentAD?.tone==="caution"?"badge-red":"badge-gold"}`}>
+                      Current AD: {adResult.currentAD?.adPlanet ?? "Not active"}
+                    </span>
                   </div>
-                  <div style={{fontSize:11,color:"#605890"}}>
-                    Age {Math.round(b.startAge)} – {Math.round(b.endAge)} · {b.start.getFullYear()} – {b.end.getFullYear()}
+
+                  <div style={{position:"relative",height:260,borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 34px"}}>
+                    {[20,40,60,80].map((score)=>(
+                      <div key={score} style={{position:"absolute",left:14,right:14,bottom:`${18 + score * 2}px`,borderTop:"1px solid rgba(96,88,144,0.18)"}}>
+                        <span style={{position:"absolute",left:0,top:-9,fontSize:9,color:"#605890"}}>{score}%</span>
+                      </div>
+                    ))}
+
+                    <div style={{position:"absolute",left:58,right:14,top:18,bottom:34}}>
+                      {adResult.bands.map((band)=>{
+                        const startPct=(band.start.getTime()-selectedMd.start.getTime())/(selectedMd.end.getTime()-selectedMd.start.getTime())*100;
+                        const endPct=(band.end.getTime()-selectedMd.start.getTime())/(selectedMd.end.getTime()-selectedMd.start.getTime())*100;
+                        const left=Math.max(0,startPct);
+                        const width=Math.max(4,Math.min(100,endPct)-left);
+                        return (
+                          <div
+                            key={`${band.adPlanet}-${band.start.toISOString()}-band`}
+                            title={`${selectedMd.planet}/${band.adPlanet}: ${formatPeriodDate(band.start)} - ${formatPeriodDate(band.end)} · ${band.score}%`}
+                            style={{position:"absolute",left:`${left}%`,width:`${width}%`,top:0,bottom:0,background:`${band.color}18`,borderLeft:`1px solid ${band.color}55`}}
+                          >
+                            <div style={{fontSize:10,fontWeight:700,color:band.color,textAlign:"center",paddingTop:8,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                              {selectedMd.planet}/{band.adPlanet}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{position:"absolute",inset:0,overflow:"visible"}}>
+                        <polyline
+                          points={adResult.points.map((point)=>{
+                            const x=(point.date.getTime()-selectedMd.start.getTime())/(selectedMd.end.getTime()-selectedMd.start.getTime())*100;
+                            const y=100-point.score;
+                            return `${Math.max(0,Math.min(100,x))},${Math.max(5,Math.min(85,y))}`;
+                          }).join(" ")}
+                          fill="none"
+                          stroke="rgba(200,160,48,0.95)"
+                          strokeWidth="1.5"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      </svg>
+
+                      {adResult.bands.map((band)=> {
+                        const mid=((band.start.getTime()+band.end.getTime())/2-selectedMd.start.getTime())/(selectedMd.end.getTime()-selectedMd.start.getTime())*100;
+                        return (
+                          <div key={`${band.adPlanet}-${band.start.toISOString()}-dot`} style={{position:"absolute",left:`${Math.max(0,Math.min(100,mid))}%`,bottom:`${Math.max(8,Math.min(88,band.score))}%`,transform:"translate(-50%,50%)"}}>
+                            <div style={{width:8,height:8,borderRadius:"50%",background:band.color,boxShadow:`0 0 10px ${band.color}aa`}}/>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-                <div style={{textAlign:"right"}}>
-                  <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,fontWeight:700,
-                    color:b.score>=70?"#22c55e":b.score>=50?"#c8a030":"#ef4444"}}>{b.score}%</div>
-                  {isNow&&<div style={{fontSize:10,color:"#22c55e",fontWeight:600}}>ACTIVE</div>}
+
+                <div className="card" style={{padding:14}}>
+                  <div className="card-tag">✦ AD Intelligence</div>
+                  <div className="card-title serif" style={{fontSize:20}}>{adResult.mdPlanet} MD</div>
+                  <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7,marginBottom:12}}>{adResult.summary}</div>
+                  {adResult.actionPlan.slice(0,3).map((line,i)=>(
+                    <div key={i} style={{fontSize:11,color:"#8f82c8",lineHeight:1.65,padding:"7px 0",borderTop:"1px solid #1c1840"}}>
+                      {i+1}. {line}
+                    </div>
+                  ))}
                 </div>
               </div>
-            );
-          })}
+
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:10}}>
+                {adResult.bands.map((band)=> {
+                  const isCurrent=band.start<=new Date() && new Date()<band.end;
+                  return (
+                    <div key={`${band.adPlanet}-${band.start.toISOString()}-card`} className="card" style={{padding:12,borderColor:isCurrent?`${band.color}88`:"#1c1840"}}>
+                      <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",marginBottom:8}}>
+                        <div>
+                          <div style={{fontSize:10,color:"#605890",textTransform:"uppercase",letterSpacing:1}}>
+                            {selectedMd.planet} / {band.adPlanet}
+                          </div>
+                          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,fontWeight:700,color:band.color}}>
+                            {band.adPlanet} Antardasha
+                          </div>
+                        </div>
+                        <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:700,color:band.score>=70?"#22c55e":band.score>=50?"#c8a030":"#ef4444"}}>
+                          {band.score}
+                        </div>
+                      </div>
+                      <div style={{fontSize:11,color:"#605890",marginBottom:8}}>
+                        {formatPeriodDate(band.start)} - {formatPeriodDate(band.end)} · {band.yrs} yrs
+                      </div>
+                      <div className="bar-track" style={{marginBottom:8}}>
+                        <div className="bar-fill" style={{width:`${band.score}%`,background:band.color}}/>
+                      </div>
+                      <div style={{fontSize:11,color:"#c8c0a8",lineHeight:1.6}}>
+                        {band.navtara?.icon} {band.navtara?.taraName} · {band.functionalRole}
+                      </div>
+                      {isCurrent && <div style={{fontSize:10,color:"#22c55e",fontWeight:700,marginTop:8}}>ACTIVE NOW</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
       </PremiumFeature>
