@@ -10,6 +10,7 @@ import {
   ALL_RASAS,
   GOAL_META,
   buildReportText,
+  getAstroSoundCatalogStats,
   getMemorySummary,
   runAstroSound,
   useAstroSoundStore,
@@ -81,6 +82,8 @@ const MODE_OPTIONS: { key: ModeKey; label: string; desc: string }[] = [
   { key: "astro", label: "Astro", desc: "Planet-heavy scoring" },
   { key: "classical", label: "Classical", desc: "Raga mood only" },
 ];
+
+const ASTROSOUND_CATALOG_STATS = getAstroSoundCatalogStats();
 
 function modNum(n: number, m: number) {
 
@@ -493,6 +496,7 @@ export default function AstroSoundPage() {
         metrics={[
           { label: "Score", value: result ? result.score : "—", tone: "gold" },
           { label: "Status", value: result ? result.status : "Ready", tone: "violet" },
+          { label: "Catalog", value: `${ASTROSOUND_CATALOG_STATS.totalRagas} ragas`, tone: "green" },
           { label: "Goal", value: GOAL_META[settings.goal].label, tone: "blue" },
           { label: "Chart", value: chartData ? "Linked" : "Optional", tone: chartData ? "green" : "red" },
         ]}
@@ -676,6 +680,14 @@ export default function AstroSoundPage() {
                   <span>Energy</span>
                   <strong>{result.primary.raga.energy}</strong>
                 </div>
+                <div>
+                  <span>Evidence</span>
+                  <strong>{result.primary.raga.evidence?.replace(/_/g, " ") ?? "classical"}</strong>
+                </div>
+                <div>
+                  <span>Protocol</span>
+                  <strong>{result.primary.raga.protocolDays ?? 3} days</strong>
+                </div>
               </div>
 
               <div className="as-calc-card">
@@ -693,6 +705,25 @@ export default function AstroSoundPage() {
                   <span>{settings.mode}</span>
                   <span>{chartData ? "Chart connected" : "Fallback scoring"}</span>
                   {result && <span>{result.timing.activePlanet}</span>}
+                </div>
+              </div>
+
+              <div className="as-calc-card">
+                <div>
+                  <strong>AstroSound 108 Intelligence</strong>
+                  <p>
+                    This recommendation is selected from an active {ASTROSOUND_CATALOG_STATS.totalRagas}-raga catalog,
+                    including the 108-raaga wellness layer, chart scoring, listening-time discipline, feedback memory,
+                    evidence tiers and medical safety guardrails.
+                  </p>
+                </div>
+                <div className="as-calc-pills">
+                  {(result.primary.raga.wellnessSupport ?? []).slice(0, 6).map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                  {result.primary.raga.medicalGuardrail && result.primary.raga.medicalGuardrail !== "general" && (
+                    <span>{result.primary.raga.medicalGuardrail.replace(/_/g, " ")}</span>
+                  )}
                 </div>
               </div>
 
@@ -980,8 +1011,12 @@ export default function AstroSoundPage() {
             <p>Dashboard card, AI chat context, Premium PDF section and roadmap integration.</p>
           </div>
           <div>
-            <strong>Phase 5 · Later</strong>
-            <p>Future expansion: 108 raga database, mantra pairing, playlists and Astro Sound PDF export.</p>
+            <strong>Phase 5 · Active</strong>
+            <p>108-raaga wellness catalog, evidence tiers, Yaman anti-bias logic and medical safety guardrails.</p>
+          </div>
+          <div>
+            <strong>Phase 6 · Later</strong>
+            <p>Mantra pairing, curated playlists and separate Astro Sound PDF export.</p>
           </div>
         </div>
       </section>

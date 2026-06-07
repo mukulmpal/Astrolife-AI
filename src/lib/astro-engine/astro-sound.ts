@@ -69,6 +69,11 @@ export interface RagaItem {
   protocol: string[];
   avoidWhen?: string[];
   related?: string[];
+  catalogIndex?: number;
+  evidence?: "clinical_raga_specific" | "traditional_plus_research_adjacent" | "traditional";
+  wellnessSupport?: string[];
+  protocolDays?: number;
+  medicalGuardrail?: "general" | "medical_first" | "urgent_medical";
 }
 
 export interface AstroSoundInput {
@@ -793,6 +798,246 @@ export const RAGA_DB: RagaItem[] = [
   },
 ];
 
+const MEDICAL_FIRST_CONCERNS = new Set([
+  "uti_infection",
+  "paralysis_support",
+  "severe_depression",
+]);
+
+const URGENT_CONCERNS = new Set(["chest_pain"]);
+
+const CLINICAL_RAGA_SPECIFIC = new Set(["Bhairavi"]);
+
+const RESEARCH_ADJACENT_RAGAS = new Set([
+  "Ahir Bhairav",
+  "Malkauns",
+  "Todi",
+  "Darbari Kanada",
+  "Yaman",
+  "Bhimpalasi",
+  "Charukeshi",
+]);
+
+const SUPPLEMENTAL_108_RAAGS = [
+  "Yaman|evening|Jupiter,Venus|general_calm,stress_anxiety,emotional_balance,devotion",
+  "Yaman Kalyan|evening|Jupiter,Venus,Moon|general_calm,emotional_balance,devotion",
+  "Bhairav|early_morning|Sun,Saturn|general_calm,anger_cooling,focus_clarity",
+  "Ahir Bhairav|early_morning|Moon,Sun|stress_anxiety,hypertension_relaxation,anger_cooling,general_calm",
+  "Bhairavi|early_morning|Moon,Ketu|stress_anxiety,emotional_grief,general_calm,hypertension_relaxation",
+  "Darbari Kanada|late_night|Saturn,Rahu|sleep_issue,stress_anxiety,emotional_grief",
+  "Malkauns|late_night|Saturn,Ketu|sleep_issue,digestion_comfort,acidity_gastric,general_calm,spiritual_meditation",
+  "Bageshree|night|Moon,Venus|sleep_issue,emotional_grief,relationship_softening",
+  "Kafi|evening|Moon,Venus,Mercury|relationship_softening,emotional_balance,anger_cooling",
+  "Khamaj|late_evening|Venus,Moon|relationship_softening,low_energy,emotional_balance",
+  "Desh|late_evening|Moon,Mercury|emotional_grief,relationship_softening,general_calm",
+  "Jaijaivanti|night|Venus,Jupiter|headache_support,emotional_balance,devotion",
+  "Patdeep|afternoon|Moon,Venus|emotional_balance,general_calm",
+  "Madhuwanti|afternoon|Venus,Jupiter|stress_anxiety,general_calm,emotional_balance",
+  "Jog|night|Mercury,Ketu|focus_clarity,spiritual_meditation,general_calm",
+  "Shivranjani|night|Moon,Ketu|emotional_grief,focus_clarity,emotional_balance",
+  "Durga|evening|Sun,Mars|confidence_building,stress_anxiety,low_energy",
+  "Bhopali|early_morning|Jupiter,Moon|general_calm,low_energy,stress_anxiety",
+  "Hamsadhwani|morning|Mercury,Jupiter|focus_clarity,low_energy,confidence_building",
+  "Tilak Kamod|evening|Venus,Moon|pregnancy_wellness,relationship_softening,emotional_balance",
+  "Pilu|anytime|Moon,Venus|relationship_softening,general_calm",
+  "Pahadi|anytime|Moon,Mercury|general_calm,emotional_balance",
+  "Kirwani|night|Moon,Ketu|emotional_grief,spiritual_meditation",
+  "Chandrakauns|late_night|Moon,Rahu|sleep_issue,general_calm,spiritual_meditation",
+  "Megh|monsoon|Moon,Rahu|general_calm,emotional_balance",
+  "Megh Malhar|monsoon|Moon,Venus|stress_anxiety,emotional_balance,general_calm",
+  "Miyan Ki Malhar|monsoon|Moon,Mars|emotional_grief,low_energy,emotional_balance",
+  "Gaud Malhar|monsoon|Moon,Jupiter|general_calm,low_energy",
+  "Surdasi Malhar|monsoon|Moon,Jupiter|devotion,general_calm",
+  "Ramdasi Malhar|monsoon|Jupiter,Moon|devotion,emotional_balance",
+  "Nat Malhar|monsoon|Mercury,Moon|low_energy,general_calm",
+  "Jayant Malhar|monsoon|Jupiter,Moon|low_energy,emotional_balance",
+  "Lalit|early_morning|Ketu,Sun|spiritual_meditation,focus_clarity,general_calm",
+  "Ramkali|morning|Sun,Saturn|focus_clarity,general_calm",
+  "Jogiya|early_morning|Ketu,Saturn|spiritual_meditation,general_calm",
+  "Bibhas|early_morning|Sun,Mars|focus_clarity,confidence_building",
+  "Todi|morning|Ketu,Saturn|stress_anxiety,focus_clarity,hypertension_relaxation",
+  "Miyan Ki Todi|morning|Saturn,Ketu|focus_clarity,stress_anxiety",
+  "Gujari Todi|morning|Ketu,Moon|emotional_grief,emotional_balance",
+  "Multani|afternoon|Saturn,Rahu|focus_clarity,general_calm",
+  "Bhimpalasi|afternoon|Moon,Venus|stress_anxiety,hypertension_relaxation,emotional_grief",
+  "Brindavani Sarang|afternoon|Mercury,Jupiter|low_energy,general_calm",
+  "Shuddha Sarang|afternoon|Sun,Mercury|focus_clarity,low_energy",
+  "Gaud Sarang|afternoon|Sun,Jupiter|confidence_building,low_energy",
+  "Miyan Ki Sarang|afternoon|Sun,Jupiter|confidence_building,focus_clarity",
+  "Marwa|evening|Mars,Ketu|emotional_grief,focus_clarity",
+  "Puriya|evening|Saturn,Mercury|focus_clarity,general_calm",
+  "Puriya Dhanashree|evening|Saturn,Jupiter|devotion,focus_clarity,general_calm",
+  "Shree|evening|Sun,Saturn|devotion,focus_clarity,general_calm",
+  "Poorvi|evening|Saturn,Ketu|spiritual_meditation,focus_clarity",
+  "Adana|late_night|Mars,Saturn|confidence_building,low_energy,focus_clarity",
+  "Kaunsi Kanada|late_night|Saturn,Rahu|sleep_issue,general_calm",
+  "Basant|spring|Venus,Jupiter|low_energy,emotional_balance",
+  "Bahar|spring|Venus,Moon|low_energy,relationship_softening",
+  "Hindol|morning|Venus,Ketu|stress_anxiety,acidity_gastric,spiritual_meditation",
+  "Kamod|evening|Venus,Moon|relationship_softening,emotional_balance",
+  "Vasant Mukhari|morning|Jupiter,Ketu|devotion,emotional_grief",
+  "Deepak|evening|Sun,Mars|low_energy,confidence_building",
+  "Jaunpuri|morning|Moon,Saturn|digestion_comfort,acidity_gastric,emotional_grief",
+  "Tilang|night|Venus,Jupiter|devotion,general_calm",
+  "Nand|night|Venus,Jupiter|low_energy,devotion,relationship_softening",
+  "Kedar|night|Jupiter,Moon|stress_anxiety,general_calm,confidence_building",
+  "Hamir|night|Sun,Jupiter|confidence_building,low_energy",
+  "Chhayanat|night|Jupiter,Venus|low_energy,emotional_balance",
+  "Bihag|night|Venus,Jupiter|relationship_softening,sleep_issue",
+  "Rageshree|night|Venus,Moon|relationship_softening,emotional_balance",
+  "Sohini|late_night|Mercury,Mars|headache_support,focus_clarity",
+  "Vachaspati|evening|Jupiter,Mercury|focus_clarity,memory_support",
+  "Charukeshi|evening|Venus,Moon|stress_anxiety,emotional_grief",
+  "Abhogi|night|Moon,Venus|sleep_issue,general_calm",
+  "Kalavati|night|Mercury,Venus|stress_anxiety,hypertension_relaxation,focus_clarity",
+  "Malkosh|late_night|Saturn,Ketu|sleep_issue,spiritual_meditation",
+  "Kaushik Dhwani|night|Ketu,Mercury|focus_clarity,spiritual_meditation",
+  "Hemant|night|Saturn,Moon|general_calm,spiritual_meditation",
+  "Shankara|night|Sun,Mars|confidence_building,focus_clarity",
+  "Mand|evening|Venus,Moon|relationship_softening,general_calm",
+  "Gara|anytime|Venus,Moon|relationship_softening,emotional_balance",
+  "Jhinjhoti|night|Mercury,Venus|low_energy,relationship_softening",
+  "Sindhu Bhairavi|anytime|Moon,Ketu|emotional_grief,pregnancy_wellness,general_calm",
+  "Shuddha Kalyan|evening|Jupiter,Venus|devotion,general_calm",
+  "Bhoop Kalyan|evening|Jupiter,Moon|general_calm,low_energy",
+  "Gorakh Kalyan|night|Ketu,Moon|spiritual_meditation,general_calm",
+  "Shyam Kalyan|evening|Jupiter,Venus|devotion,general_calm",
+  "Maru Bihag|night|Venus,Jupiter|relationship_softening,confidence_building",
+  "Nat Bhairav|morning|Sun,Saturn|focus_clarity,general_calm",
+  "Anand Bhairav|early_morning|Sun,Moon|confidence_building,devotion,general_calm",
+  "Bairagi Bhairav|early_morning|Ketu,Sun|spiritual_meditation,general_calm",
+  "Komal Rishabh Asavari|morning|Saturn,Moon|emotional_grief,general_calm",
+  "Asavari|morning|Saturn,Mars|confidence_building,general_calm",
+  "Bilaskhani Todi|morning|Ketu,Moon|emotional_grief,general_calm",
+  "Madhu Kauns|late_night|Venus,Ketu|sleep_issue,spiritual_meditation",
+  "Jogkauns|late_night|Ketu,Saturn|sleep_issue,spiritual_meditation",
+  "Nand Kauns|night|Venus,Moon|sleep_issue,relationship_softening",
+  "Bhinna Shadja|morning|Mercury,Sun|focus_clarity,low_energy",
+  "Saraswati|morning|Mercury,Jupiter|focus_clarity,memory_support",
+  "Madhu Sarang|afternoon|Venus,Mercury|low_energy,general_calm",
+  "Samant Sarang|afternoon|Sun,Mercury|focus_clarity,low_energy",
+  "Madhmad Sarang|afternoon|Moon,Mercury|general_calm,low_energy",
+  "Sorath|evening|Sun,Jupiter|confidence_building,devotion",
+  "Gauri|morning|Sun,Jupiter|devotion,focus_clarity",
+  "Devgiri Bilawal|morning|Jupiter,Sun|general_calm,focus_clarity",
+  "Alhaiya Bilawal|morning|Jupiter,Mercury|focus_clarity,low_energy",
+  "Bihagda|night|Venus,Jupiter|relationship_softening,low_energy",
+  "Paraj|late_night|Ketu,Sun|devotion,spiritual_meditation",
+  "Lalita Gauri|early_morning|Ketu,Moon|spiritual_meditation,general_calm",
+  "Vibhas|early_morning|Sun,Mars|focus_clarity,confidence_building",
+  "Dhanashree|evening|Venus,Jupiter|devotion,relationship_softening",
+  "Nayaki Kanada|night|Venus,Saturn|general_calm,emotional_balance",
+] as const;
+
+function normalizeRagaName(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function titleCaseConcern(concern: string) {
+  return concern.replace(/_/g, " ");
+}
+
+function concernsToGoals(concerns: string[]): GoalKey[] {
+  const goals = new Set<GoalKey>();
+  for (const concern of concerns) {
+    if (["sleep_issue"].includes(concern)) goals.add("sleep");
+    if (["focus_clarity", "memory_support"].includes(concern)) goals.add("study");
+    if (["relationship_softening"].includes(concern)) goals.add("love");
+    if (["confidence_building", "low_energy"].includes(concern)) goals.add("career");
+    if (["spiritual_meditation", "devotion"].includes(concern)) goals.add("spiritual");
+    if (["general_calm", "stress_anxiety", "emotional_balance", "anger_cooling", "emotional_grief"].includes(concern)) goals.add("mind");
+  }
+  if (!goals.size) goals.add("mind");
+  return Array.from(goals);
+}
+
+function concernsToRasas(concerns: string[]): EmotionKey[] {
+  const rasas = new Set<EmotionKey>();
+  for (const concern of concerns) {
+    if (["stress_anxiety", "sleep_issue", "general_calm", "hypertension_relaxation"].includes(concern)) rasas.add("calm");
+    if (["focus_clarity", "memory_support"].includes(concern)) rasas.add("focus");
+    if (["low_energy", "confidence_building"].includes(concern)) rasas.add("confidence");
+    if (["emotional_grief"].includes(concern)) rasas.add("grief");
+    if (["relationship_softening"].includes(concern)) rasas.add("romance");
+    if (["spiritual_meditation", "devotion"].includes(concern)) rasas.add("devotion");
+    if (["emotional_balance", "pregnancy_wellness"].includes(concern)) rasas.add("joy");
+  }
+  if (!rasas.size) rasas.add("calm");
+  return Array.from(rasas);
+}
+
+function timeLabel(time: string) {
+  return time
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function buildSupplementalRaga(line: string, index: number): RagaItem {
+  const [name, rawTime, rawPlanets, rawConcerns] = line.split("|");
+  const planets = rawPlanets.split(",");
+  const concerns = rawConcerns.split(",");
+  const intense = ["Marwa", "Sohini", "Deepak"].includes(name);
+  const medicalGuardrail = concerns.some((c) => URGENT_CONCERNS.has(c))
+    ? "urgent_medical"
+    : concerns.some((c) => MEDICAL_FIRST_CONCERNS.has(c))
+      ? "medical_first"
+      : "general";
+  const evidence = CLINICAL_RAGA_SPECIFIC.has(name)
+    ? "clinical_raga_specific"
+    : RESEARCH_ADJACENT_RAGAS.has(name)
+      ? "traditional_plus_research_adjacent"
+      : "traditional";
+
+  return {
+    id: normalizeRagaName(name),
+    name,
+    system: "Hindustani",
+    planets,
+    goals: concernsToGoals(concerns),
+    rasas: concernsToRasas(concerns),
+    energy: intense ? "warming" : concerns.includes("low_energy") ? "uplifting" : concerns.includes("sleep_issue") ? "grounding" : "balancing",
+    movement: intense ? "intense" : concerns.includes("sleep_issue") || concerns.includes("spiritual_meditation") ? "still" : "flowing",
+    time: timeLabel(rawTime),
+    laya: intense ? "Madhya with restraint" : concerns.includes("sleep_issue") ? "Vilambit" : "Slow to Madhya",
+    instrument: ["vocal", "flute", "sitar", "tanpura"],
+    confidence: evidence === "clinical_raga_specific" ? 91 : evidence === "traditional_plus_research_adjacent" ? 86 : 80,
+    why: `${name} is mapped in the AstroSound 108 catalog for ${concerns.slice(0, 3).map(titleCaseConcern).join(", ")} support. It is interpreted through planetary resonance with ${planets.join(", ")} and classical listening-time discipline.`,
+    protocol: [
+      `Listen for ${intense ? 10 : 15} minutes during ${timeLabel(rawTime).toLowerCase()} when practical.`,
+      "Use a clean alap, instrumental or slow vocal version before faster compositions.",
+      "Observe the mind after listening and stop if the raga feels heavy.",
+    ],
+    caution: intense ? "This raga can feel intense; use short, low-volume sessions." : undefined,
+    avoidWhen: intense ? ["High anxiety", "Insomnia", "Agitation"] : undefined,
+    catalogIndex: index + 1,
+    evidence,
+    wellnessSupport: concerns.map(titleCaseConcern),
+    protocolDays: intense ? 3 : 6,
+    medicalGuardrail,
+  };
+}
+
+const existingRagas = new Set(RAGA_DB.map((raga) => normalizeRagaName(raga.name)));
+for (const [index, line] of SUPPLEMENTAL_108_RAAGS.entries()) {
+  const name = line.split("|")[0];
+  const normalized = normalizeRagaName(name);
+  if (!existingRagas.has(normalized)) {
+    RAGA_DB.push(buildSupplementalRaga(line, index));
+    existingRagas.add(normalized);
+  }
+}
+
+export function getAstroSoundCatalogStats() {
+  return {
+    totalRagas: RAGA_DB.length,
+    sourceCatalogRagas: SUPPLEMENTAL_108_RAAGS.length,
+    clinicalEvidenceRagas: RAGA_DB.filter((raga) => raga.evidence === "clinical_raga_specific").length,
+    researchAdjacentRagas: RAGA_DB.filter((raga) => raga.evidence === "traditional_plus_research_adjacent").length,
+    medicalGuardrailRagas: RAGA_DB.filter((raga) => raga.medicalGuardrail && raga.medicalGuardrail !== "general").length,
+  };
+}
+
 const PLANET_GOAL: Record<string, GoalKey[]> = {
   Sun: ["career", "spiritual"],
   Moon: ["mind", "sleep", "love"],
@@ -878,6 +1123,13 @@ function memoryAdjustment(memory: AstroSoundMemory | undefined, ragaName: string
   return item.good * 3 - item.heavy * 4 - item.skip * 6;
 }
 
+function evidenceAdjustment(raga: RagaItem) {
+  if (raga.evidence === "clinical_raga_specific") return 12;
+  if (raga.evidence === "traditional_plus_research_adjacent") return 7;
+  if (raga.evidence === "traditional") return 3;
+  return 0;
+}
+
 function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
   const reasons: string[] = [];
   const hasChart = Boolean(input.chart);
@@ -940,6 +1192,31 @@ function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
 
   if (input.memory?.ragas?.[raga.name]?.heavy) {
     reasons.push("Past feedback says this may feel heavy, so use softly.");
+  }
+
+  const evidenceBonus = evidenceAdjustment(raga);
+  if (evidenceBonus) {
+    score += evidenceBonus;
+    reasons.push(
+      raga.evidence === "clinical_raga_specific"
+        ? "Evidence tier: strongest raga-specific wellness support in this catalog."
+        : raga.evidence === "traditional_plus_research_adjacent"
+          ? "Evidence tier: classical raga chikitsa support with research-adjacent relevance."
+          : "Evidence tier: traditional raga chikitsa association."
+    );
+  }
+
+  if (raga.name === "Yaman") {
+    score -= 8;
+    reasons.push("Anti-bias cap applied so Yaman does not become the default recommendation.");
+  }
+
+  if (raga.medicalGuardrail === "urgent_medical") {
+    score -= 24;
+    reasons.push("Urgent medical guardrail: music guidance is not appropriate as the primary answer.");
+  } else if (raga.medicalGuardrail === "medical_first") {
+    score -= 12;
+    reasons.push("Medical-first guardrail: use only as supportive relaxation, never as treatment.");
   }
 
   score = clamp(Math.round(score), 0, 100);
@@ -1184,6 +1461,9 @@ export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
     `Score: ${score}`,
     `Status: ${status}`,
     `Why: ${primary.raga.why}`,
+    `Catalog: ${RAGA_DB.length} active ragas, including AstroSound 108 wellness layer`,
+    `Evidence Tier: ${primary.raga.evidence ?? "classical"}`,
+    `Wellness Support: ${(primary.raga.wellnessSupport ?? []).join(", ") || "General sound balancing"}`,
     `Protocol: ${protocol.join(" ")}`,
     `Timing Planet: ${timing.activePlanet}`,
     `Current Day Planet: ${timing.currentDayPlanet}`,
@@ -1219,6 +1499,12 @@ export function buildReportText(result: AstroSoundResult): string {
     "Primary Recommendation",
     `${result.primary.raga.name} (${result.primary.raga.system}) — Score ${result.primary.score}/100`,
     result.primary.raga.why,
+    "",
+    "AstroSound Intelligence Layer",
+    `Catalog: ${RAGA_DB.length} active ragas, including the 108-raaga wellness layer`,
+    `Evidence tier: ${result.primary.raga.evidence?.replace(/_/g, " ") ?? "classical"}`,
+    `Wellness support: ${(result.primary.raga.wellnessSupport ?? ["General sound balancing"]).join(", ")}`,
+    `Safety guardrail: ${(result.primary.raga.medicalGuardrail ?? "general").replace(/_/g, " ")}`,
     "",
     "Protocol",
     ...result.protocol.map((item) => `- ${item}`),
