@@ -1120,7 +1120,7 @@ function chartPersonalityAdjustment(chart: ChartData | null, raga: RagaItem) {
 function memoryAdjustment(memory: AstroSoundMemory | undefined, ragaName: string) {
   const item = memory?.ragas?.[ragaName];
   if (!item) return 0;
-  return item.good * 3 - item.heavy * 4 - item.skip * 6;
+  return -(item.heavy * 6 + item.skip * 10);
 }
 
 function evidenceAdjustment(raga: RagaItem) {
@@ -1128,6 +1128,19 @@ function evidenceAdjustment(raga: RagaItem) {
   if (raga.evidence === "traditional_plus_research_adjacent") return 7;
   if (raga.evidence === "traditional") return 3;
   return 0;
+}
+
+function isYamanFamily(ragaName: string) {
+  return ["Yaman", "Yaman Kalyan"].includes(ragaName);
+}
+
+function hasSpecificYamanNeed(input: AstroSoundInput) {
+  const devotionalNeed = input.goal === "spiritual" && ["auto", "devotion", "calm"].includes(input.emotion);
+  const refinedLoveNeed = input.goal === "love" && ["romance", "devotion"].includes(input.emotion);
+  const learningNeed = input.goal === "study" && input.emotion === "devotion";
+  const classicalNeed = input.mode === "classical" && ["devotion", "romance"].includes(input.emotion);
+
+  return devotionalNeed || refinedLoveNeed || learningNeed || classicalNeed;
 }
 
 function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
@@ -1187,7 +1200,7 @@ function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
   score += memoryAdjustment(input.memory, raga.name);
 
   if (input.memory?.ragas?.[raga.name]?.good) {
-    reasons.push("Your past feedback favours this raga.");
+    reasons.push("Past positive feedback is recorded but does not boost rank; AstroSound avoids saved-preference bias.");
   }
 
   if (input.memory?.ragas?.[raga.name]?.heavy) {
@@ -1206,9 +1219,14 @@ function scoreRaga(input: AstroSoundInput, raga: RagaItem): RagaRecommendation {
     );
   }
 
-  if (raga.name === "Yaman") {
-    score -= 8;
-    reasons.push("Anti-bias cap applied so Yaman does not become the default recommendation.");
+  if (isYamanFamily(raga.name)) {
+    if (hasSpecificYamanNeed(input)) {
+      score -= 6;
+      reasons.push("Yaman-family soft cap applied; allowed because the current need is devotional/refined enough.");
+    } else {
+      score -= 24;
+      reasons.push("Yaman-family gate applied so it appears only for a clear devotional, refined love or study need.");
+    }
   }
 
   if (raga.medicalGuardrail === "urgent_medical") {
@@ -1690,28 +1708,28 @@ export function useAstroSoundStore(): AstroSoundStore {
 }
 
 export function getMemorySummary(memory: AstroSoundMemory): {
-  fav: string[];
+  avoid: string[];
   last: string;
   feedback: string;
   feedbackScore: (name: string) => number;
 } {
-  const entries = Object.entries(memory.ragas);
+  const entries = Object.entries(memory.ragas).filter(([, item]) => item.heavy || item.skip);
 
   entries.sort(
     ([, a], [, b]) =>
-      b.good - b.heavy - b.skip - (a.good - a.heavy - a.skip)
+      b.heavy + b.skip * 2 - (a.heavy + a.skip * 2)
   );
 
-  const fav = entries.slice(0, 3).map(([name]) => name);
+  const avoid = entries.slice(0, 3).map(([name]) => name);
 
   return {
-    fav,
+    avoid,
     last: memory.lastRaga || "—",
     feedback: memory.lastFeedback || "—",
     feedbackScore: (name: string) => {
       const r = memory.ragas[name];
       if (!r) return 0;
-      return r.good - r.heavy - r.skip;
+      return -(r.heavy * 6 + r.skip * 10);
     },
   };
 }

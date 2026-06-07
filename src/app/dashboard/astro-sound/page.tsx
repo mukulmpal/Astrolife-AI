@@ -713,8 +713,8 @@ export default function AstroSoundPage() {
                   <strong>AstroSound 108 Intelligence</strong>
                   <p>
                     This recommendation is selected from an active {ASTROSOUND_CATALOG_STATS.totalRagas}-raga catalog,
-                    including the 108-raaga wellness layer, chart scoring, listening-time discipline, feedback memory,
-                    evidence tiers and medical safety guardrails.
+                    including the 108-raaga wellness layer, chart scoring, listening-time discipline, avoid-memory,
+                    evidence tiers, Yaman gating and medical safety guardrails.
                   </p>
                 </div>
                 <div className="as-calc-pills">
@@ -958,8 +958,8 @@ export default function AstroSoundPage() {
                   <p>Last raga: {memorySummary.last}</p>
                   <p>Last feedback: {memorySummary.feedback}</p>
                   <p>
-                    Favourites:{" "}
-                    {memorySummary.fav.length ? memorySummary.fav.join(", ") : "No favourites yet"}
+                    Avoid memory:{" "}
+                    {memorySummary.avoid.length ? memorySummary.avoid.join(", ") : "No heavy/skip ragas yet"}
                   </p>
                   <button type="button" className="as-mini-btn" onClick={resetMemory}>
                     Reset memory
@@ -1012,7 +1012,7 @@ export default function AstroSoundPage() {
           </div>
           <div>
             <strong>Phase 5 · Active</strong>
-            <p>108-raaga wellness catalog, evidence tiers, Yaman anti-bias logic and medical safety guardrails.</p>
+            <p>108-raaga wellness catalog, evidence tiers, Yaman need-gating, avoid-memory and medical safety guardrails.</p>
           </div>
           <div>
             <strong>Phase 6 · Later</strong>
