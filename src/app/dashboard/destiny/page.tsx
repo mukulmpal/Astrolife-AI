@@ -402,16 +402,22 @@ export default function DestinyPage() {
                     const mdDuration = Math.max(1, mdEnd - mdStart);
                     const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
                     const toX = (date: Date) => clamp(((date.getTime() - mdStart) / mdDuration) * 100, 0, 100);
-                    const scores = adResult.points.map((point) => point.score);
+                    const scores = adResult.bands.map((band) => band.score);
                     const minScore = Math.min(...scores);
                     const maxScore = Math.max(...scores);
                     const scoreRange = Math.max(10, maxScore - minScore);
                     const toY = (score: number) => clamp(84 - ((score - minScore) / scoreRange) * 64, 12, 84);
-                    const graphPoints = adResult.points.map((point) => ({
-                      ...point,
-                      x: toX(point.date),
-                      y: toY(point.score),
-                    }));
+                    const graphPoints = adResult.bands.map((band) => {
+                      const midDate = new Date((band.start.getTime() + band.end.getTime()) / 2);
+                      return {
+                        adPlanet: band.adPlanet,
+                        color: band.color,
+                        date: midDate,
+                        score: band.score,
+                        x: (toX(band.start) + toX(band.end)) / 2,
+                        y: toY(band.score),
+                      };
+                    });
                     const pathLine = graphPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
                     const areaPath = graphPoints.length
                       ? `${pathLine} L ${graphPoints[graphPoints.length - 1].x.toFixed(2)} 96 L ${graphPoints[0].x.toFixed(2)} 96 Z`
@@ -530,10 +536,9 @@ export default function DestinyPage() {
                           })}
 
                           {adResult.bands.map((band)=> {
-                            const mid = (toX(band.start) + toX(band.end)) / 2;
                             const bandPoint = graphPoints.find((point) => point.adPlanet === band.adPlanet) ?? graphPoints[0];
                             return (
-                              <div key={`${band.adPlanet}-${band.start.toISOString()}-label`} style={{position:"absolute",left:`${mid}%`,top:`${bandPoint ? bandPoint.y : 50}%`,transform:"translate(-50%,-50%)",zIndex:2}}>
+                              <div key={`${band.adPlanet}-${band.start.toISOString()}-label`} style={{position:"absolute",left:`${bandPoint?.x ?? 50}%`,top:`${bandPoint ? bandPoint.y : 50}%`,transform:"translate(-50%,-50%)",zIndex:2}}>
                                 <div style={{width:7,height:7,borderRadius:"50%",background:band.color,border:"1px solid rgba(255,255,255,0.7)",boxShadow:`0 0 10px ${band.color}aa`}}/>
                               </div>
                             );
