@@ -380,7 +380,7 @@ export default function DestinyPage() {
                 ))}
               </div>
 
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14}}>
+              <div style={{display:"flex",flexDirection:"column",gap:14}}>
                 <div style={{background:"#08051a",border:"1px solid #1c1840",borderRadius:8,padding:14,overflow:"hidden"}}>
                   <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",marginBottom:12}}>
                     <div>
@@ -421,6 +421,10 @@ export default function DestinyPage() {
                     const startYear = selectedMd.start.getFullYear();
                     const endYear = selectedMd.end.getFullYear();
                     const yearStep = endYear - startYear > 16 ? 5 : endYear - startYear > 8 ? 3 : 1;
+                    const everyYearTick = Array.from(
+                      { length: Math.max(0, endYear - startYear + 1) },
+                      (_, idx) => startYear + idx,
+                    );
                     const yearTicks = Array.from(
                       new Set([
                         startYear,
@@ -430,14 +434,14 @@ export default function DestinyPage() {
                     ).filter((year) => year >= startYear && year <= endYear);
 
                     return (
-                      <div style={{position:"relative",height:340,width:"100%",borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 44px",overflow:"hidden"}}>
+                      <div style={{position:"relative",height:430,width:"100%",borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 92px",overflow:"hidden"}}>
                         {[maxScore, Math.round((maxScore + minScore) / 2), minScore].map((score)=>(
                           <div key={score} style={{position:"absolute",left:58,right:18,top:`${toY(score)}%`,borderTop:"1px solid rgba(96,88,144,0.22)"}}>
                             <span style={{position:"absolute",left:-42,top:-9,fontSize:9,color:"#8f82c8"}}>{score}%</span>
                           </div>
                         ))}
 
-                        <div style={{position:"absolute",left:58,right:18,top:18,bottom:44}}>
+                        <div style={{position:"absolute",left:58,right:18,top:18,bottom:92}}>
                           {adResult.bands.map((band)=>{
                             const startPct=toX(band.start);
                             const endPct=toX(band.end);
@@ -448,18 +452,54 @@ export default function DestinyPage() {
                                 title={`${selectedMd.planet}/${band.adPlanet}: ${formatPeriodDate(band.start)} - ${formatPeriodDate(band.end)} · ${band.score}%`}
                                 style={{position:"absolute",left:`${startPct}%`,width:`${width}%`,top:0,bottom:0,background:`${band.color}14`,borderLeft:`1px solid ${band.color}55`}}
                               >
-                                <div style={{fontSize:10,fontWeight:700,color:band.color,textAlign:"center",paddingTop:8,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                                <div style={{fontSize:10,fontWeight:800,color:band.color,textAlign:"center",paddingTop:8,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
                                   {PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/{PLANET_SHORT[band.adPlanet] ?? band.adPlanet}
                                 </div>
+                                <div style={{fontSize:8,color:"#8f82c8",textAlign:"center",paddingTop:3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                                  {band.start.getFullYear()}-{band.end.getFullYear()}
+                                </div>
                               </div>
+                            );
+                          })}
+
+                          {everyYearTick.map((year)=> {
+                            const x = toX(new Date(year, 0, 1));
+                            return (
+                              <div
+                                key={`${selectedMd.planet}-${year}-minor-year-bar`}
+                                style={{position:"absolute",left:`${x}%`,bottom:-38,width:1,height:16,background:"rgba(200,192,168,0.32)",transform:"translateX(-50%)"}}
+                                title={`${year}`}
+                              />
                             );
                           })}
 
                           {yearTicks.map((year)=> {
                             const x = toX(new Date(year, 0, 1));
                             return (
-                              <div key={`${selectedMd.planet}-${year}-tick`} style={{position:"absolute",left:`${x}%`,top:0,bottom:-22,borderLeft:"1px solid rgba(255,255,255,0.08)"}}>
-                                <span style={{position:"absolute",bottom:-20,left:0,transform:"translateX(-50%)",fontSize:9,color:"#605890"}}>{year}</span>
+                              <div key={`${selectedMd.planet}-${year}-tick`} style={{position:"absolute",left:`${x}%`,top:0,bottom:-58,borderLeft:"1px solid rgba(255,255,255,0.08)"}}>
+                                <span style={{position:"absolute",bottom:-54,left:0,transform:"translateX(-50%)",fontSize:9,color:"#605890"}}>{year}</span>
+                              </div>
+                            );
+                          })}
+
+                          {adResult.bands.map((band)=> {
+                            const startPct = toX(band.start);
+                            const endPct = toX(band.end);
+                            const labelLeft = Math.min(96, Math.max(2, startPct));
+                            return (
+                              <div
+                                key={`${band.adPlanet}-${band.start.toISOString()}-start-year`}
+                                style={{position:"absolute",left:`${labelLeft}%`,bottom:-70,transform:"translateX(-50%)",zIndex:4,textAlign:"center",minWidth:44}}
+                                title={`${selectedMd.planet}/${band.adPlanet} starts ${formatPeriodDate(band.start)} and ends ${formatPeriodDate(band.end)}`}
+                              >
+                                <div style={{height:20,borderLeft:`2px solid ${band.color}`,margin:"0 auto 3px",width:1,opacity:0.9}} />
+                                <div style={{fontSize:9,fontWeight:800,color:band.color,lineHeight:1}}>{band.start.getFullYear()}</div>
+                                <div style={{fontSize:8,color:"#8f82c8",whiteSpace:"nowrap",lineHeight:1.2}}>
+                                  {PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/{PLANET_SHORT[band.adPlanet] ?? band.adPlanet}
+                                </div>
+                                {endPct - startPct > 10 && (
+                                  <div style={{position:"absolute",left:"50%",right:`-${Math.max(8, endPct - startPct)}%`,bottom:18,borderTop:"1px solid rgba(200,160,48,0.24)"}} />
+                                )}
                               </div>
                             );
                           })}
@@ -526,8 +566,9 @@ export default function DestinyPage() {
                           })}
                         </div>
 
-                        <div style={{position:"absolute",left:72,right:22,bottom:10,display:"flex",justifyContent:"space-between",fontSize:10,color:"#8f82c8"}}>
+                        <div style={{position:"absolute",left:72,right:22,bottom:12,display:"flex",justifyContent:"space-between",gap:12,fontSize:10,color:"#8f82c8",flexWrap:"wrap"}}>
                           <span>Score trend line · normalized for this MD</span>
+                          <span>| = yearly marker · colored labels = AD start year</span>
                           <span>Green = peak · Red = low · Bands = Antardasha</span>
                         </div>
                       </div>
