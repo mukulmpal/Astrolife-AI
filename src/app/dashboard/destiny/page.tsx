@@ -39,8 +39,8 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
     const H = canvas.height;
     const L = 76;
     const R = 24;
-    const T = 36;
-    const plotH = 280;
+    const T = 72;
+    const plotH = 286;
     const axisTop = T + plotH + 22;
     const chartW = W - L - R;
     const mdStart = selectedMd.start.getTime();
@@ -48,7 +48,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
     const mdDuration = Math.max(1, mdEnd - mdStart);
     const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
     const toX = (date: Date) => L + clamp(((date.getTime() - mdStart) / mdDuration) * chartW, 0, chartW);
-    const scoreTicks = [100, 80, 60, 40, 20, 0];
+    const scoreTicks = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0];
     const toY = (score: number) => T + plotH - (clamp(score, 0, 100) / 100) * plotH;
 
     ctx.clearRect(0, 0, W, H);
@@ -72,18 +72,11 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
       ctx.lineTo(sx, T + plotH);
       ctx.stroke();
 
-      ctx.fillStyle = band.color;
-      ctx.font = "bold 14px Outfit, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(`${PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/${PLANET_SHORT[band.adPlanet] ?? band.adPlanet}`, (sx + ex) / 2, T + 22);
-      ctx.fillStyle = "#8f82c8";
-      ctx.font = "11px Outfit, sans-serif";
-      ctx.fillText(`${band.start.getFullYear()}-${band.end.getFullYear()}`, (sx + ex) / 2, T + 44);
     });
 
     scoreTicks.forEach((score) => {
       const y = toY(score);
-      ctx.strokeStyle = "rgba(96,88,144,0.24)";
+      ctx.strokeStyle = score % 20 === 0 ? "rgba(96,88,144,0.24)" : "rgba(96,88,144,0.13)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(L, y);
@@ -146,12 +139,14 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
       { point: peakPoint, label: `Peak ${peakPoint.score}%`, color: "#22c55e", above: true },
       { point: lowPoint, label: `Low ${lowPoint.score}%`, color: "#ef4444", above: false },
     ].forEach(({ point, label, color, above }) => {
-      const labelY = above ? Math.max(T + 24, point.y - 32) : Math.min(T + plotH - 18, point.y + 34);
+      const nearTop = point.y < T + 48;
+      const placeAbove = above && !nearTop;
+      const labelY = placeAbove ? Math.max(T + 24, point.y - 32) : Math.min(T + plotH - 18, point.y + 34);
       ctx.strokeStyle = `${color}99`;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(point.x, point.y);
-      ctx.lineTo(point.x, above ? labelY + 14 : labelY - 14);
+      ctx.lineTo(point.x, placeAbove ? labelY + 14 : labelY - 14);
       ctx.stroke();
       ctx.font = "bold 13px Outfit, sans-serif";
       const textW = ctx.measureText(label).width + 24;
@@ -170,10 +165,33 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
 
     ctx.restore();
 
+    adResult.bands.forEach((band) => {
+      const sx = toX(band.start);
+      const ex = toX(band.end);
+      const bandW = Math.max(3, ex - sx);
+      const labelX = (sx + ex) / 2;
+      const mdShort = PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet;
+      const adShort = PLANET_SHORT[band.adPlanet] ?? band.adPlanet;
+      const compact = bandW < 132;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(sx + 4, 6, Math.max(1, bandW - 8), T - 12);
+      ctx.clip();
+      ctx.textAlign = "center";
+      ctx.fillStyle = band.color;
+      ctx.font = `bold ${compact ? 12 : 13}px Outfit, sans-serif`;
+      ctx.fillText(`${mdShort}/${adShort}`, labelX, 30);
+      ctx.fillStyle = "#8f82c8";
+      ctx.font = `${compact ? 10 : 11}px Outfit, sans-serif`;
+      ctx.fillText(`(${band.start.getFullYear()}-${band.end.getFullYear()})`, labelX, 49);
+      ctx.restore();
+    });
+
     scoreTicks.forEach((score) => {
       const y = toY(score);
       ctx.fillStyle = "#8f82c8";
-      ctx.font = "12px Outfit, sans-serif";
+      ctx.font = "10.5px Outfit, sans-serif";
       ctx.textAlign = "right";
       ctx.fillText(`${score}%`, L - 12, y + 4);
     });
@@ -227,7 +245,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
       <canvas
         ref={canvasRef}
         width={1600}
-        height={430}
+        height={470}
         style={{display:"block",width:"100%",minWidth:900,height:"auto",borderRadius:8}}
       />
     </div>
