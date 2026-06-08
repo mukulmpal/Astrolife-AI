@@ -1360,7 +1360,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       paragraphs: [
         soundResult.summary,
         `Primary Raga: ${soundResult.primary.raga.name}. ${soundResult.primary.raga.why}`,
-        `Mantra Pairing: Mahadasha ${soundResult.mantraPlan.mahadasha ? `${soundResult.mantraPlan.mahadasha.planet} — ${soundResult.mantraPlan.mahadasha.mantra}` : "not detected"}; Antardasha ${soundResult.mantraPlan.antardasha ? `${soundResult.mantraPlan.antardasha.planet} — ${soundResult.mantraPlan.antardasha.mantra}` : "not detected"}; Raga support ${soundResult.mantraPlan.ragaSupport.planet} — ${soundResult.mantraPlan.ragaSupport.mantra}.`,
+        `Dasha Mantra Pairing: Major Period / Mahadasha ${soundResult.mantraPlan.mahadasha ? `${soundResult.mantraPlan.mahadasha.planet} — ${soundResult.mantraPlan.mahadasha.mantra}` : "not detected"}; Sub Period / Antardasha ${soundResult.mantraPlan.antardasha ? `${soundResult.mantraPlan.antardasha.planet} — ${soundResult.mantraPlan.antardasha.mantra}` : "not detected"}; Raga support ${soundResult.mantraPlan.ragaSupport.planet} — ${soundResult.mantraPlan.ragaSupport.mantra}. This is traditional spiritual support for focus and emotional steadiness, not medical treatment or a guaranteed result.`,
         soundResult.protocol.slice(0, 3).join(" "),
         `Timing: ${soundResult.timing.activePlanet} — ${soundResult.timing.activePlanetReason}. Best window: ${soundResult.timing.bestWindow}.`,
       ],
@@ -1375,6 +1375,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       actionPlan: [
         "Open Astro Sound from the dashboard for full personalized guidance.",
         `Primary raga for mind balance: ${soundResult.primary.raga.name}.`,
+        "Use the major-period mantra first, sub-period mantra second, then the raga listening protocol.",
         `Best listening window: ${soundResult.timing.bestWindow}.`,
         "Try the 21-day sadhana for deeper effect.",
       ],

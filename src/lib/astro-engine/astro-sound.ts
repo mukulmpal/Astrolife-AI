@@ -1480,10 +1480,10 @@ function buildMantraPlan(input: AstroSoundInput, primary: RagaRecommendation): A
 
   const practice = [
     mahadasha
-      ? `Mahadasha first: chant ${mahadasha.mantra} ${mahadasha.count} to align the major life-period planet.`
+      ? `Major Period first: chant ${mahadasha.mantra} ${mahadasha.count} to support the Mahadasha planet that frames the broader life phase.`
       : "Mahadasha not detected, so AstroSound uses the primary raga planet as the main mantra support.",
     antardasha
-      ? `Antardasha second: chant ${antardasha.mantra} ${antardasha.count} to tune the active sub-period.`
+      ? `Sub Period second: chant ${antardasha.mantra} ${antardasha.count} to support the Antardasha planet active inside the major period.`
       : "Antardasha not detected; keep the practice simple and do not force a second mantra.",
     `Then listen to ${primary.raga.name} with ${ragaSupport.planet} support: ${ragaSupport.mantra}.`,
     "Do not mix many mantras loudly. Keep it soft, short and consistent.",
@@ -1494,7 +1494,7 @@ function buildMantraPlan(input: AstroSoundInput, primary: RagaRecommendation): A
     antardasha,
     ragaSupport,
     practice,
-    note: "Planetary mantra pairing is for spiritual and reflective support only. It is not a medical or guaranteed-result remedy.",
+    note: "This pairing follows the Jyotish idea that Mahadasha shows the major period and Antardasha shows the active sub-period. Use it for spiritual alignment, focus and emotional steadiness only; it is not medical treatment or a guaranteed-result remedy.",
   };
 }
 
@@ -1610,8 +1610,8 @@ export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
     `Catalog: ${RAGA_DB.length} active ragas, including AstroSound 108 wellness layer`,
     `Evidence Tier: ${primary.raga.evidence ?? "classical"}`,
     `Wellness Support: ${(primary.raga.wellnessSupport ?? []).join(", ") || "General sound balancing"}`,
-    `Mahadasha Mantra: ${mantraPlan.mahadasha ? `${mantraPlan.mahadasha.planet} - ${mantraPlan.mahadasha.mantra}` : "Not available"}`,
-    `Antardasha Mantra: ${mantraPlan.antardasha ? `${mantraPlan.antardasha.planet} - ${mantraPlan.antardasha.mantra}` : "Not available"}`,
+    `Major Period Mantra: ${mantraPlan.mahadasha ? `${mantraPlan.mahadasha.planet} Mahadasha - ${mantraPlan.mahadasha.mantra}` : "Not available"}`,
+    `Sub Period Mantra: ${mantraPlan.antardasha ? `${mantraPlan.antardasha.planet} Antardasha - ${mantraPlan.antardasha.mantra}` : "Not available"}`,
     `Raga Support Mantra: ${mantraPlan.ragaSupport.planet} - ${mantraPlan.ragaSupport.mantra}`,
     `Protocol: ${protocol.join(" ")}`,
     `Timing Planet: ${timing.activePlanet}`,
@@ -1656,14 +1656,15 @@ export function buildReportText(result: AstroSoundResult): string {
     `Wellness support: ${(result.primary.raga.wellnessSupport ?? ["General sound balancing"]).join(", ")}`,
     `Safety guardrail: ${(result.primary.raga.medicalGuardrail ?? "general").replace(/_/g, " ")}`,
     "",
-    "Mantra Pairing",
+    "Dasha Mantra Pairing",
     ...(result.mantraPlan.mahadasha
-      ? [`Mahadasha: ${result.mantraPlan.mahadasha.planet} — ${result.mantraPlan.mahadasha.mantra} (${result.mantraPlan.mahadasha.count})`]
-      : ["Mahadasha: not available from chart timing."]),
+      ? [`Major Period / Mahadasha: ${result.mantraPlan.mahadasha.planet} — ${result.mantraPlan.mahadasha.mantra} (${result.mantraPlan.mahadasha.count})`]
+      : ["Major Period / Mahadasha: not available from chart timing."]),
     ...(result.mantraPlan.antardasha
-      ? [`Antardasha: ${result.mantraPlan.antardasha.planet} — ${result.mantraPlan.antardasha.mantra} (${result.mantraPlan.antardasha.count})`]
-      : ["Antardasha: not available from chart timing."]),
+      ? [`Sub Period / Antardasha: ${result.mantraPlan.antardasha.planet} — ${result.mantraPlan.antardasha.mantra} (${result.mantraPlan.antardasha.count})`]
+      : ["Sub Period / Antardasha: not available from chart timing."]),
     `Raga support: ${result.mantraPlan.ragaSupport.planet} — ${result.mantraPlan.ragaSupport.mantra}`,
+    `Use case: spiritual alignment, focus and emotional steadiness during the active dasha period. Not medical treatment or a guaranteed result.`,
     ...result.mantraPlan.practice.map((item) => `- ${item}`),
     "",
     "Protocol",

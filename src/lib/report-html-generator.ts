@@ -3499,13 +3499,14 @@ function pageAstroSound(chart: ChartData): string {
         <div class="body-s" style="line-height:1.7;color:var(--ivory-dim);">${esc(soundResult.summary ?? "")}</div>
       </div>
       <div class="card" style="padding:10px 12px;margin-bottom:12px;border-left:3px solid var(--gold);">
-        <div class="kicker" style="margin-bottom:6px;color:var(--gold);">Mahadasha + Antardasha Mantra Pairing</div>
+        <div class="kicker" style="margin-bottom:6px;color:var(--gold);">Major + Sub Period Mantra Pairing</div>
         <div class="body-s" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;line-height:1.55;">
-          <div><span style="color:var(--saffron);font-weight:600;">MD:</span> ${esc(mantra.mahadasha?.planet ?? "—")} · ${esc(mantra.mahadasha?.mantra ?? "Not detected")}</div>
-          <div><span style="color:var(--saffron);font-weight:600;">AD:</span> ${esc(mantra.antardasha?.planet ?? "—")} · ${esc(mantra.antardasha?.mantra ?? "Not detected")}</div>
+          <div><span style="color:var(--saffron);font-weight:600;">Major / MD:</span> ${esc(mantra.mahadasha?.planet ?? "—")} · ${esc(mantra.mahadasha?.mantra ?? "Not detected")}</div>
+          <div><span style="color:var(--saffron);font-weight:600;">Sub / AD:</span> ${esc(mantra.antardasha?.planet ?? "—")} · ${esc(mantra.antardasha?.mantra ?? "Not detected")}</div>
           <div><span style="color:var(--jade);font-weight:600;">Raga:</span> ${esc(mantra.ragaSupport?.planet ?? "—")} · ${esc(mantra.ragaSupport?.mantra ?? "—")}</div>
-          <div><span style="color:var(--violet);font-weight:600;">Rule:</span> MD first, AD second, then raga support.</div>
+          <div><span style="color:var(--violet);font-weight:600;">Rule:</span> Major period first, sub-period second, then raga support.</div>
         </div>
+        <div class="body-s" style="margin-top:8px;color:var(--ivory-dim);line-height:1.55;">This is traditional spiritual support for focus, emotional steadiness and dasha alignment. It is not medical treatment or a guaranteed-result remedy.</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
         <div class="card" style="padding:10px 12px;">

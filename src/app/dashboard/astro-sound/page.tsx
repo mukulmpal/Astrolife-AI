@@ -918,24 +918,24 @@ export default function AstroSoundPage() {
                     </div>
                   </div>
 
-                  <h3>Mahadasha + Antardasha Mantra Pairing</h3>
+                  <h3>Major + Sub Period Mantra Pairing</h3>
                   <div className="as-timing-grid">
                     <div>
-                      <span>Mahadasha Mantra</span>
-                      <strong>{result.mantraPlan.mahadasha?.planet ?? "Not detected"}</strong>
+                      <span>Major Period / Mahadasha</span>
+                      <strong>{result.mantraPlan.mahadasha ? `${result.mantraPlan.mahadasha.planet} Mantra` : "Not detected"}</strong>
                       <p>
                         {result.mantraPlan.mahadasha
-                          ? `${result.mantraPlan.mahadasha.mantra} · ${result.mantraPlan.mahadasha.count}. ${result.mantraPlan.mahadasha.purpose}`
+                          ? `${result.mantraPlan.mahadasha.mantra} · ${result.mantraPlan.mahadasha.count}. Supports the broader life-period planet for ${result.mantraPlan.mahadasha.purpose.toLowerCase()}`
                           : "Saved chart timing did not expose active Mahadasha, so use the raga support mantra only."}
                       </p>
                     </div>
 
                     <div>
-                      <span>Antardasha Mantra</span>
-                      <strong>{result.mantraPlan.antardasha?.planet ?? "Not detected"}</strong>
+                      <span>Sub Period / Antardasha</span>
+                      <strong>{result.mantraPlan.antardasha ? `${result.mantraPlan.antardasha.planet} Mantra` : "Not detected"}</strong>
                       <p>
                         {result.mantraPlan.antardasha
-                          ? `${result.mantraPlan.antardasha.mantra} · ${result.mantraPlan.antardasha.count}. ${result.mantraPlan.antardasha.purpose}`
+                          ? `${result.mantraPlan.antardasha.mantra} · ${result.mantraPlan.antardasha.count}. Supports the active sub-period for ${result.mantraPlan.antardasha.purpose.toLowerCase()}`
                           : "Saved chart timing did not expose active Antardasha; do not force a second mantra."}
                       </p>
                     </div>
