@@ -518,6 +518,23 @@ export default function DestinyPage() {
                               strokeLinejoin="round"
                               vectorEffect="non-scaling-stroke"
                             />
+                            {graphPoints.map((point) => {
+                              const isPeak = point === peakPoint;
+                              const isLow = point === lowPoint;
+                              return (
+                                <g key={`${point.adPlanet}-${point.date.toISOString()}-svg-dot`}>
+                                  <circle
+                                    cx={point.x}
+                                    cy={point.y}
+                                    r={isPeak || isLow ? 1.55 : 1.05}
+                                    fill={isPeak ? "#22c55e" : isLow ? "#ef4444" : point.color}
+                                    stroke="rgba(240,232,208,0.95)"
+                                    strokeWidth={isPeak || isLow ? 0.65 : 0.35}
+                                    vectorEffect="non-scaling-stroke"
+                                  />
+                                </g>
+                              );
+                            })}
                           </svg>
 
                           {[peakPoint, lowPoint].filter(Boolean).map((point, index) => {
@@ -525,21 +542,11 @@ export default function DestinyPage() {
                             return (
                               <div
                                 key={`${point.date.toISOString()}-${isPeak ? "peak" : "low"}`}
-                                style={{position:"absolute",left:`${point.x}%`,top:`${point.y}%`,transform:"translate(-50%,-50%)",zIndex:3}}
+                                style={{position:"absolute",left:`${point.x}%`,top:`${point.y}%`,transform:"translate(-50%,-50%)",zIndex:3,pointerEvents:"none"}}
                               >
-                                <div style={{width:12,height:12,borderRadius:"50%",background:isPeak?"#22c55e":"#ef4444",border:"2px solid #f0e8d0",boxShadow:isPeak?"0 0 18px rgba(34,197,94,0.8)":"0 0 18px rgba(239,68,68,0.75)"}}/>
                                 <div style={{position:"absolute",left:"50%",top:isPeak?-32:16,transform:"translateX(-50%)",whiteSpace:"nowrap",fontSize:10,fontWeight:800,color:isPeak?"#22c55e":"#ef4444",background:"rgba(8,5,26,0.82)",border:`1px solid ${isPeak?"rgba(34,197,94,0.45)":"rgba(239,68,68,0.45)"}`,borderRadius:999,padding:"3px 7px"}}>
                                   {isPeak ? "Peak" : "Low"} {point.score}%
                                 </div>
-                              </div>
-                            );
-                          })}
-
-                          {adResult.bands.map((band)=> {
-                            const bandPoint = graphPoints.find((point) => point.adPlanet === band.adPlanet) ?? graphPoints[0];
-                            return (
-                              <div key={`${band.adPlanet}-${band.start.toISOString()}-label`} style={{position:"absolute",left:`${bandPoint?.x ?? 50}%`,top:`${bandPoint ? bandPoint.y : 50}%`,transform:"translate(-50%,-50%)",zIndex:2}}>
-                                <div style={{width:7,height:7,borderRadius:"50%",background:band.color,border:"1px solid rgba(255,255,255,0.7)",boxShadow:`0 0 10px ${band.color}aa`}}/>
                               </div>
                             );
                           })}
