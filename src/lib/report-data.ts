@@ -1349,6 +1349,8 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       voice: "any",
       intensity: "medium",
       mode: "hybrid",
+      currentMahadasha: rawChart.dashas?.find((d: any) => d.active)?.planet ?? rawChart.dashas?.[0]?.planet,
+      currentAntardasha: rawChart.antardasha?.find((d: any) => d.active)?.planet ?? rawChart.antardasha?.[0]?.planet,
     });
     astroSoundSection = makeSection({
       id: "astro-sound-protocol",
@@ -1358,6 +1360,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
       paragraphs: [
         soundResult.summary,
         `Primary Raga: ${soundResult.primary.raga.name}. ${soundResult.primary.raga.why}`,
+        `Mantra Pairing: Mahadasha ${soundResult.mantraPlan.mahadasha ? `${soundResult.mantraPlan.mahadasha.planet} — ${soundResult.mantraPlan.mahadasha.mantra}` : "not detected"}; Antardasha ${soundResult.mantraPlan.antardasha ? `${soundResult.mantraPlan.antardasha.planet} — ${soundResult.mantraPlan.antardasha.mantra}` : "not detected"}; Raga support ${soundResult.mantraPlan.ragaSupport.planet} — ${soundResult.mantraPlan.ragaSupport.mantra}.`,
         soundResult.protocol.slice(0, 3).join(" "),
         `Timing: ${soundResult.timing.activePlanet} — ${soundResult.timing.activePlanetReason}. Best window: ${soundResult.timing.bestWindow}.`,
       ],
@@ -1366,6 +1369,7 @@ export function buildFullPremiumReportSections(input: any): ReportSection[] {
         `Score: ${soundResult.score}/100 · Status: ${soundResult.status}`,
         `System: ${soundResult.primary.raga.system} · Energy: ${soundResult.primary.raga.energy}`,
         `Best time: ${soundResult.primary.raga.time}`,
+        `Mantra: ${soundResult.mantraPlan.ragaSupport.mantra}`,
         ...soundResult.reasons.slice(0, 3),
       ],
       actionPlan: [

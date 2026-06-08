@@ -83,7 +83,25 @@ export interface AstroSoundInput {
   voice: VoiceKey;
   intensity: IntensityKey;
   mode: ModeKey;
+  currentMahadasha?: string;
+  currentAntardasha?: string;
   memory?: AstroSoundMemory;
+}
+
+export interface AstroSoundMantra {
+  planet: string;
+  mantra: string;
+  count: string;
+  timing: string;
+  purpose: string;
+}
+
+export interface AstroSoundMantraPlan {
+  mahadasha?: AstroSoundMantra;
+  antardasha?: AstroSoundMantra;
+  ragaSupport: AstroSoundMantra;
+  practice: string[];
+  note: string;
 }
 
 export interface AstroSoundTiming {
@@ -114,6 +132,7 @@ export interface AstroSoundResult {
   remedies: string[];
   aiContext: string;
   timing: AstroSoundTiming;
+  mantraPlan: AstroSoundMantraPlan;
 }
 
 export interface RagaRecommendation {
@@ -1373,6 +1392,112 @@ function getBestSoundWindow(dayPlanet: string, ragaTime: string) {
   return `${dayWindow[dayPlanet] ?? ragaTime}. Classical raga time: ${ragaTime}.`;
 }
 
+const PLANET_MANTRAS: Record<string, AstroSoundMantra> = {
+  Sun: {
+    planet: "Sun",
+    mantra: "Om Suryaya Namah",
+    count: "11 or 27 chants",
+    timing: "Morning after sunrise",
+    purpose: "Clarity, confidence, authority and clean self-expression.",
+  },
+  Moon: {
+    planet: "Moon",
+    mantra: "Om Som Somaya Namah",
+    count: "11 or 27 chants",
+    timing: "Evening or Monday before listening",
+    purpose: "Emotional calm, sleep rhythm, softness and mental cooling.",
+  },
+  Mars: {
+    planet: "Mars",
+    mantra: "Om Angarakaya Namah",
+    count: "11 chants",
+    timing: "Tuesday morning or before action",
+    purpose: "Courage, discipline, controlled energy and anger regulation.",
+  },
+  Mercury: {
+    planet: "Mercury",
+    mantra: "Om Budhaya Namah",
+    count: "11 or 27 chants",
+    timing: "Wednesday before study, writing or meetings",
+    purpose: "Focus, speech, learning, business intelligence and communication.",
+  },
+  Jupiter: {
+    planet: "Jupiter",
+    mantra: "Om Gurave Namah",
+    count: "11 or 27 chants",
+    timing: "Thursday morning or before prayer/study",
+    purpose: "Wisdom, guidance, faith, teaching and prosperity with ethics.",
+  },
+  Venus: {
+    planet: "Venus",
+    mantra: "Om Shukraya Namah",
+    count: "11 or 27 chants",
+    timing: "Friday evening or before relationship reflection",
+    purpose: "Harmony, beauty, affection, art, comfort and relational softness.",
+  },
+  Saturn: {
+    planet: "Saturn",
+    mantra: "Om Sham Shanicharaya Namah",
+    count: "11 chants",
+    timing: "Saturday or quiet evening with low-volume sound",
+    purpose: "Patience, responsibility, karmic discipline and emotional steadiness.",
+  },
+  Rahu: {
+    planet: "Rahu",
+    mantra: "Om Rahave Namah",
+    count: "11 chants",
+    timing: "Saturday evening or during a grounded, distraction-free session",
+    purpose: "Mental grounding, ambition control, obsession cooling and clarity in uncertainty.",
+  },
+  Ketu: {
+    planet: "Ketu",
+    mantra: "Om Ketave Namah",
+    count: "11 chants",
+    timing: "Before meditation or night practice",
+    purpose: "Detachment, intuition, spiritual reflection and release of overthinking.",
+  },
+};
+
+function normalizePlanetName(value?: string) {
+  if (!value) return "";
+  const q = value.trim().toLowerCase();
+  return Object.keys(PLANET_MANTRAS).find((planet) => planet.toLowerCase() === q) ?? "";
+}
+
+function mantraForPlanet(planet: string | undefined, fallbackPlanet = "Moon"): AstroSoundMantra {
+  const normalized = normalizePlanetName(planet) || fallbackPlanet;
+  return PLANET_MANTRAS[normalized] ?? PLANET_MANTRAS.Moon;
+}
+
+function buildMantraPlan(input: AstroSoundInput, primary: RagaRecommendation): AstroSoundMantraPlan {
+  const ragaPlanet = primary.raga.planets[0] ?? "Moon";
+  const mdPlanet = normalizePlanetName(input.currentMahadasha);
+  const adPlanet = normalizePlanetName(input.currentAntardasha);
+
+  const mahadasha = mdPlanet ? mantraForPlanet(mdPlanet) : undefined;
+  const antardasha = adPlanet ? mantraForPlanet(adPlanet) : undefined;
+  const ragaSupport = mantraForPlanet(ragaPlanet);
+
+  const practice = [
+    mahadasha
+      ? `Mahadasha first: chant ${mahadasha.mantra} ${mahadasha.count} to align the major life-period planet.`
+      : "Mahadasha not detected, so AstroSound uses the primary raga planet as the main mantra support.",
+    antardasha
+      ? `Antardasha second: chant ${antardasha.mantra} ${antardasha.count} to tune the active sub-period.`
+      : "Antardasha not detected; keep the practice simple and do not force a second mantra.",
+    `Then listen to ${primary.raga.name} with ${ragaSupport.planet} support: ${ragaSupport.mantra}.`,
+    "Do not mix many mantras loudly. Keep it soft, short and consistent.",
+  ];
+
+  return {
+    mahadasha,
+    antardasha,
+    ragaSupport,
+    practice,
+    note: "Planetary mantra pairing is for spiritual and reflective support only. It is not a medical or guaranteed-result remedy.",
+  };
+}
+
 function buildAstroSoundTiming(
   input: AstroSoundInput,
   primary: RagaRecommendation
@@ -1459,6 +1584,7 @@ export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
   ];
 
   const timing = buildAstroSoundTiming(input, primary);
+  const mantraPlan = buildMantraPlan(input, primary);
 
   const reasons = [
     ...primary.reasons,
@@ -1475,6 +1601,8 @@ export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
     `Voice: ${input.voice}`,
     `Intensity: ${input.intensity}`,
     `Mode: ${input.mode}`,
+    `Mahadasha: ${input.currentMahadasha ?? "Unavailable"}`,
+    `Antardasha: ${input.currentAntardasha ?? "Unavailable"}`,
     `Primary Raga: ${primary.raga.name}`,
     `Score: ${score}`,
     `Status: ${status}`,
@@ -1482,6 +1610,9 @@ export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
     `Catalog: ${RAGA_DB.length} active ragas, including AstroSound 108 wellness layer`,
     `Evidence Tier: ${primary.raga.evidence ?? "classical"}`,
     `Wellness Support: ${(primary.raga.wellnessSupport ?? []).join(", ") || "General sound balancing"}`,
+    `Mahadasha Mantra: ${mantraPlan.mahadasha ? `${mantraPlan.mahadasha.planet} - ${mantraPlan.mahadasha.mantra}` : "Not available"}`,
+    `Antardasha Mantra: ${mantraPlan.antardasha ? `${mantraPlan.antardasha.planet} - ${mantraPlan.antardasha.mantra}` : "Not available"}`,
+    `Raga Support Mantra: ${mantraPlan.ragaSupport.planet} - ${mantraPlan.ragaSupport.mantra}`,
     `Protocol: ${protocol.join(" ")}`,
     `Timing Planet: ${timing.activePlanet}`,
     `Current Day Planet: ${timing.currentDayPlanet}`,
@@ -1505,6 +1636,7 @@ export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
     remedies,
     aiContext,
     timing,
+    mantraPlan,
   };
 }
 
@@ -1523,6 +1655,16 @@ export function buildReportText(result: AstroSoundResult): string {
     `Evidence tier: ${result.primary.raga.evidence?.replace(/_/g, " ") ?? "classical"}`,
     `Wellness support: ${(result.primary.raga.wellnessSupport ?? ["General sound balancing"]).join(", ")}`,
     `Safety guardrail: ${(result.primary.raga.medicalGuardrail ?? "general").replace(/_/g, " ")}`,
+    "",
+    "Mantra Pairing",
+    ...(result.mantraPlan.mahadasha
+      ? [`Mahadasha: ${result.mantraPlan.mahadasha.planet} — ${result.mantraPlan.mahadasha.mantra} (${result.mantraPlan.mahadasha.count})`]
+      : ["Mahadasha: not available from chart timing."]),
+    ...(result.mantraPlan.antardasha
+      ? [`Antardasha: ${result.mantraPlan.antardasha.planet} — ${result.mantraPlan.antardasha.mantra} (${result.mantraPlan.antardasha.count})`]
+      : ["Antardasha: not available from chart timing."]),
+    `Raga support: ${result.mantraPlan.ragaSupport.planet} — ${result.mantraPlan.ragaSupport.mantra}`,
+    ...result.mantraPlan.practice.map((item) => `- ${item}`),
     "",
     "Protocol",
     ...result.protocol.map((item) => `- ${item}`),

@@ -61,6 +61,17 @@ const ASTRO_SOUND_PLANETS = [
   "Ketu",
 ];
 
+function activePeriodPlanet(entries: unknown): string | undefined {
+  if (!Array.isArray(entries)) return undefined;
+  const active = entries.find((entry) => {
+    const item = entry as GenericObj;
+    return Boolean(item?.active);
+  }) as GenericObj | undefined;
+  const first = entries[0] as GenericObj | undefined;
+  const planet = active?.planet ?? active?.name ?? first?.planet ?? first?.name;
+  return typeof planet === "string" && planet.trim() ? planet.trim() : undefined;
+}
+
 const VOICE_OPTIONS: { key: VoiceKey; label: string; emoji: string }[] = [
   { key: "any", label: "Any", emoji: "✨" },
   { key: "vocal", label: "Vocal", emoji: "🎙️" },
@@ -370,6 +381,14 @@ export default function AstroSoundPage() {
   const [musicReferenceType, setMusicReferenceType] = useState<MusicReferenceType>("film_bollywood");
   const { chart, loading: chartLoading, hasUserChart } = useUserChart();
   const chartData = useMemo(() => hasUserChart ? normalizeAstroSoundChart(chart) : null, [chart, hasUserChart]);
+  const dashaPlanets = useMemo(() => {
+    const rawChart = chart as unknown as GenericObj | null | undefined;
+    const root = ((rawChart?.chart as GenericObj | undefined) ?? rawChart) as GenericObj | undefined;
+    return {
+      currentMahadasha: activePeriodPlanet(root?.dashas),
+      currentAntardasha: activePeriodPlanet(root?.antardasha),
+    };
+  }, [chart]);
 
   const {
     settings,
@@ -426,6 +445,8 @@ export default function AstroSoundPage() {
           voice: settings.voice,
           intensity: settings.intensity,
           mode: settings.mode,
+          currentMahadasha: dashaPlanets.currentMahadasha,
+          currentAntardasha: dashaPlanets.currentAntardasha,
           memory,
         });
 
@@ -442,7 +463,7 @@ export default function AstroSoundPage() {
         }
       }
     }, 250);
-  }, [chartData, memory, setLastReportText, setLoading, setResult, settings]);
+  }, [chartData, dashaPlanets, memory, setLastReportText, setLoading, setResult, settings]);
 
   const copyReport = async () => {
     if (!lastReportText) return;
@@ -896,6 +917,50 @@ export default function AstroSoundPage() {
                       <p>Use this as a timing guide, not a rigid rule.</p>
                     </div>
                   </div>
+
+                  <h3>Mahadasha + Antardasha Mantra Pairing</h3>
+                  <div className="as-timing-grid">
+                    <div>
+                      <span>Mahadasha Mantra</span>
+                      <strong>{result.mantraPlan.mahadasha?.planet ?? "Not detected"}</strong>
+                      <p>
+                        {result.mantraPlan.mahadasha
+                          ? `${result.mantraPlan.mahadasha.mantra} · ${result.mantraPlan.mahadasha.count}. ${result.mantraPlan.mahadasha.purpose}`
+                          : "Saved chart timing did not expose active Mahadasha, so use the raga support mantra only."}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span>Antardasha Mantra</span>
+                      <strong>{result.mantraPlan.antardasha?.planet ?? "Not detected"}</strong>
+                      <p>
+                        {result.mantraPlan.antardasha
+                          ? `${result.mantraPlan.antardasha.mantra} · ${result.mantraPlan.antardasha.count}. ${result.mantraPlan.antardasha.purpose}`
+                          : "Saved chart timing did not expose active Antardasha; do not force a second mantra."}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span>Raga Support Mantra</span>
+                      <strong>{result.mantraPlan.ragaSupport.planet}</strong>
+                      <p>
+                        {result.mantraPlan.ragaSupport.mantra} · {result.mantraPlan.ragaSupport.count}. Use before {result.primary.raga.name}.
+                      </p>
+                    </div>
+
+                    <div>
+                      <span>Practice Rule</span>
+                      <strong>MD → AD → Raga</strong>
+                      <p>{result.mantraPlan.note}</p>
+                    </div>
+                  </div>
+
+                  <h3>Mantra Instructions</h3>
+                  <ul>
+                    {result.mantraPlan.practice.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
 
                   <h3>Timing Instructions</h3>
                   <ul>

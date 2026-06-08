@@ -3462,12 +3462,17 @@ function pageAstroSound(chart: ChartData): string {
     const rashi = ASTRO_SOUND_RASHIS_HTML.indexOf(pd.sign ?? "");
     soundPlanets[name] = { rashi: rashi >= 0 ? rashi : (pd.house ?? 1) - 1, house: pd.house ?? 1, lon: pd.lon ?? 0, status: pd.status, retrograde: pd.retrograde };
   }
+  const activeMD = chart.dashas?.find((d: any) => d.active) ?? chart.dashas?.[0];
+  const activeAD = chart.antardasha?.find((d: any) => d.active) ?? chart.antardasha?.[0];
   const soundResult = runAstroSound({
     chart: { lagR: chart.lagnaNum ?? 0, lagLon: (chart as any).lagnaLon, dob: chart.dob, planets: soundPlanets },
     goal: "mind", emotion: "auto", voice: "any", intensity: "medium", mode: "hybrid",
+    currentMahadasha: activeMD?.planet,
+    currentAntardasha: activeAD?.planet,
   }) as any;
   const primary = soundResult.primary?.raga ?? soundResult.primary ?? {};
   const timing = soundResult.timing ?? {};
+  const mantra = soundResult.mantraPlan ?? {};
   return `<section class="page dense">
     ${pageRail("Astro Sound Protocol · Raga &amp; Frequency Therapy", "AS")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
@@ -3492,6 +3497,15 @@ function pageAstroSound(chart: ChartData): string {
       </div>
       <div class="card" style="padding:12px;margin-bottom:12px;">
         <div class="body-s" style="line-height:1.7;color:var(--ivory-dim);">${esc(soundResult.summary ?? "")}</div>
+      </div>
+      <div class="card" style="padding:10px 12px;margin-bottom:12px;border-left:3px solid var(--gold);">
+        <div class="kicker" style="margin-bottom:6px;color:var(--gold);">Mahadasha + Antardasha Mantra Pairing</div>
+        <div class="body-s" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;line-height:1.55;">
+          <div><span style="color:var(--saffron);font-weight:600;">MD:</span> ${esc(mantra.mahadasha?.planet ?? "—")} · ${esc(mantra.mahadasha?.mantra ?? "Not detected")}</div>
+          <div><span style="color:var(--saffron);font-weight:600;">AD:</span> ${esc(mantra.antardasha?.planet ?? "—")} · ${esc(mantra.antardasha?.mantra ?? "Not detected")}</div>
+          <div><span style="color:var(--jade);font-weight:600;">Raga:</span> ${esc(mantra.ragaSupport?.planet ?? "—")} · ${esc(mantra.ragaSupport?.mantra ?? "—")}</div>
+          <div><span style="color:var(--violet);font-weight:600;">Rule:</span> MD first, AD second, then raga support.</div>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
         <div class="card" style="padding:10px 12px;">
