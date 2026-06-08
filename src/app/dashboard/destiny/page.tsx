@@ -405,8 +405,10 @@ export default function DestinyPage() {
                     const scores = adResult.bands.map((band) => band.score);
                     const minScore = Math.min(...scores);
                     const maxScore = Math.max(...scores);
-                    const scoreRange = Math.max(10, maxScore - minScore);
-                    const toY = (score: number) => clamp(84 - ((score - minScore) / scoreRange) * 64, 12, 84);
+                    const axisMin = Math.max(0, minScore - 2);
+                    const axisMax = Math.min(100, maxScore + 2);
+                    const scoreRange = Math.max(8, axisMax - axisMin);
+                    const toY = (score: number) => clamp(84 - ((score - axisMin) / scoreRange) * 68, 12, 86);
                     const graphPoints = adResult.bands.map((band) => {
                       const midDate = new Date((band.start.getTime() + band.end.getTime()) / 2);
                       return {
@@ -420,7 +422,7 @@ export default function DestinyPage() {
                     });
                     const pathLine = graphPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
                     const areaPath = graphPoints.length
-                      ? `${pathLine} L ${graphPoints[graphPoints.length - 1].x.toFixed(2)} 96 L ${graphPoints[0].x.toFixed(2)} 96 Z`
+                      ? `${pathLine} L ${graphPoints[graphPoints.length - 1].x.toFixed(2)} 88 L ${graphPoints[0].x.toFixed(2)} 88 Z`
                       : "";
                     const peakPoint = graphPoints.reduce((best, point) => point.score > best.score ? point : best, graphPoints[0]);
                     const lowPoint = graphPoints.reduce((best, point) => point.score < best.score ? point : best, graphPoints[0]);
@@ -487,8 +489,8 @@ export default function DestinyPage() {
                           <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{position:"absolute",inset:0,overflow:"hidden",zIndex:1}}>
                             <defs>
                               <linearGradient id={`ad-score-fill-${selectedMd.planet}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="rgba(250, 204, 21, 0.34)" />
-                                <stop offset="100%" stopColor="rgba(250, 204, 21, 0.02)" />
+                                <stop offset="0%" stopColor="rgba(250, 204, 21, 0.18)" />
+                                <stop offset="100%" stopColor="rgba(250, 204, 21, 0.01)" />
                               </linearGradient>
                               <filter id={`ad-score-glow-${selectedMd.planet}`} x="-20%" y="-20%" width="140%" height="140%">
                                 <feGaussianBlur stdDeviation="1.6" result="coloredBlur" />
@@ -503,7 +505,7 @@ export default function DestinyPage() {
                               d={pathLine}
                               fill="none"
                               stroke="rgba(250,204,21,0.98)"
-                              strokeWidth="2.8"
+                              strokeWidth="3.2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               vectorEffect="non-scaling-stroke"
@@ -526,10 +528,10 @@ export default function DestinyPage() {
                                   <circle
                                     cx={point.x}
                                     cy={point.y}
-                                    r={isPeak || isLow ? 1.55 : 1.05}
+                                    r={isPeak || isLow ? 0.95 : 0.62}
                                     fill={isPeak ? "#22c55e" : isLow ? "#ef4444" : point.color}
                                     stroke="rgba(240,232,208,0.95)"
-                                    strokeWidth={isPeak || isLow ? 0.65 : 0.35}
+                                    strokeWidth={isPeak || isLow ? 0.5 : 0.28}
                                     vectorEffect="non-scaling-stroke"
                                   />
                                 </g>
@@ -544,7 +546,8 @@ export default function DestinyPage() {
                                 key={`${point.date.toISOString()}-${isPeak ? "peak" : "low"}`}
                                 style={{position:"absolute",left:`${point.x}%`,top:`${point.y}%`,transform:"translate(-50%,-50%)",zIndex:3,pointerEvents:"none"}}
                               >
-                                <div style={{position:"absolute",left:"50%",top:isPeak?-32:16,transform:"translateX(-50%)",whiteSpace:"nowrap",fontSize:10,fontWeight:800,color:isPeak?"#22c55e":"#ef4444",background:"rgba(8,5,26,0.82)",border:`1px solid ${isPeak?"rgba(34,197,94,0.45)":"rgba(239,68,68,0.45)"}`,borderRadius:999,padding:"3px 7px"}}>
+                                <div style={{position:"absolute",left:"50%",top:isPeak?-22:16,width:1,height:isPeak?18:12,background:isPeak?"rgba(34,197,94,0.55)":"rgba(239,68,68,0.55)",transform:"translateX(-50%)"}} />
+                                <div style={{position:"absolute",left:"50%",top:isPeak?-42:26,transform:"translateX(-50%)",whiteSpace:"nowrap",fontSize:10,fontWeight:800,color:isPeak?"#22c55e":"#ef4444",background:"rgba(8,5,26,0.9)",border:`1px solid ${isPeak?"rgba(34,197,94,0.55)":"rgba(239,68,68,0.55)"}`,borderRadius:999,padding:"3px 7px"}}>
                                   {isPeak ? "Peak" : "Low"} {point.score}%
                                 </div>
                               </div>
