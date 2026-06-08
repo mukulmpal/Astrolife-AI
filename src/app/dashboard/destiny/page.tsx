@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import "@/app/dashboard/shared.css";
 import { calculateADDestiny, calculateDestiny } from "@/lib/astro-engine/destiny";
+import type { ADDestinyBand, AntardashaDestinyResult, DashaBand } from "@/lib/astro-engine/destiny";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
@@ -21,6 +22,216 @@ const PLANET_SHORT: Record<string, string> = {
 
 function formatPeriodDate(date: Date) {
   return date.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+}
+
+type ADGraphPoint = ADDestinyBand & { x: number; y: number };
+
+function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand; adResult: AntardashaDestinyResult }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !selectedMd || !adResult?.bands?.length) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const W = canvas.width;
+    const H = canvas.height;
+    const L = 76;
+    const R = 24;
+    const T = 36;
+    const plotH = 280;
+    const axisTop = T + plotH + 22;
+    const chartW = W - L - R;
+    const mdStart = selectedMd.start.getTime();
+    const mdEnd = selectedMd.end.getTime();
+    const mdDuration = Math.max(1, mdEnd - mdStart);
+    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+    const toX = (date: Date) => L + clamp(((date.getTime() - mdStart) / mdDuration) * chartW, 0, chartW);
+    const scoreTicks = [100, 80, 60, 40, 20, 0];
+    const toY = (score: number) => T + plotH - (clamp(score, 0, 100) / 100) * plotH;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#08051a";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(L, T, chartW, plotH, 8);
+    ctx.clip();
+
+    adResult.bands.forEach((band) => {
+      const sx = toX(band.start);
+      const ex = toX(band.end);
+      ctx.fillStyle = `${band.color}18`;
+      ctx.fillRect(sx, T, Math.max(3, ex - sx), plotH);
+      ctx.strokeStyle = `${band.color}66`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx, T);
+      ctx.lineTo(sx, T + plotH);
+      ctx.stroke();
+
+      ctx.fillStyle = band.color;
+      ctx.font = "bold 14px Outfit, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`${PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/${PLANET_SHORT[band.adPlanet] ?? band.adPlanet}`, (sx + ex) / 2, T + 22);
+      ctx.fillStyle = "#8f82c8";
+      ctx.font = "11px Outfit, sans-serif";
+      ctx.fillText(`${band.start.getFullYear()}-${band.end.getFullYear()}`, (sx + ex) / 2, T + 44);
+    });
+
+    scoreTicks.forEach((score) => {
+      const y = toY(score);
+      ctx.strokeStyle = "rgba(96,88,144,0.24)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(L, y);
+      ctx.lineTo(L + chartW, y);
+      ctx.stroke();
+    });
+
+    const points: ADGraphPoint[] = adResult.bands.map((band) => {
+      const x = (toX(band.start) + toX(band.end)) / 2;
+      return { ...band, x, y: toY(band.score) };
+    });
+
+    const grad = ctx.createLinearGradient(0, T, 0, T + plotH);
+    grad.addColorStop(0, "rgba(250,204,21,0.22)");
+    grad.addColorStop(1, "rgba(250,204,21,0.03)");
+    ctx.beginPath();
+    points.forEach((point, index) => {
+      if (index === 0) {
+        ctx.moveTo(point.x, T + plotH);
+        ctx.lineTo(point.x, point.y);
+      } else {
+        ctx.lineTo(point.x, point.y);
+      }
+    });
+    ctx.lineTo(points[points.length - 1].x, T + plotH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    points.forEach((point, index) => {
+      if (index === 0) ctx.moveTo(point.x, point.y);
+      else ctx.lineTo(point.x, point.y);
+    });
+    ctx.strokeStyle = "rgba(250,204,21,0.96)";
+    ctx.lineWidth = 3;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.shadowColor = "rgba(250,204,21,0.5)";
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    const peakPoint = points.reduce((best, point) => point.score > best.score ? point : best, points[0]);
+    const lowPoint = points.reduce((best, point) => point.score < best.score ? point : best, points[0]);
+
+    points.forEach((point) => {
+      const isPeak = point === peakPoint;
+      const isLow = point === lowPoint;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, isPeak || isLow ? 8 : 5, 0, Math.PI * 2);
+      ctx.fillStyle = isPeak ? "#22c55e" : isLow ? "#ef4444" : point.color;
+      ctx.fill();
+      ctx.lineWidth = isPeak || isLow ? 3 : 1.5;
+      ctx.strokeStyle = "#f0e8d0";
+      ctx.stroke();
+    });
+
+    [
+      { point: peakPoint, label: `Peak ${peakPoint.score}%`, color: "#22c55e", above: true },
+      { point: lowPoint, label: `Low ${lowPoint.score}%`, color: "#ef4444", above: false },
+    ].forEach(({ point, label, color, above }) => {
+      const labelY = above ? Math.max(T + 24, point.y - 32) : Math.min(T + plotH - 18, point.y + 34);
+      ctx.strokeStyle = `${color}99`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(point.x, point.y);
+      ctx.lineTo(point.x, above ? labelY + 14 : labelY - 14);
+      ctx.stroke();
+      ctx.font = "bold 13px Outfit, sans-serif";
+      const textW = ctx.measureText(label).width + 24;
+      const x = clamp(point.x - textW / 2, L + 4, L + chartW - textW - 4);
+      ctx.fillStyle = "rgba(8,5,26,0.88)";
+      ctx.strokeStyle = `${color}88`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(x, labelY - 13, textW, 26, 13);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.textAlign = "center";
+      ctx.fillText(label, x + textW / 2, labelY + 5);
+    });
+
+    ctx.restore();
+
+    scoreTicks.forEach((score) => {
+      const y = toY(score);
+      ctx.fillStyle = "#8f82c8";
+      ctx.font = "12px Outfit, sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(`${score}%`, L - 12, y + 4);
+    });
+
+    ctx.strokeStyle = "rgba(96,88,144,0.28)";
+    ctx.beginPath();
+    ctx.moveTo(L, axisTop);
+    ctx.lineTo(L + chartW, axisTop);
+    ctx.stroke();
+
+    const startYear = selectedMd.start.getFullYear();
+    const endYear = selectedMd.end.getFullYear();
+    for (let year = startYear; year <= endYear; year += 1) {
+      const x = toX(new Date(year, 0, 1));
+      ctx.strokeStyle = "rgba(200,192,168,0.28)";
+      ctx.beginPath();
+      ctx.moveTo(x, axisTop);
+      ctx.lineTo(x, axisTop + 18);
+      ctx.stroke();
+    }
+
+    adResult.bands.forEach((band) => {
+      const x = toX(band.start);
+      ctx.strokeStyle = band.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, axisTop + 14);
+      ctx.lineTo(x, axisTop + 34);
+      ctx.stroke();
+      ctx.fillStyle = band.color;
+      ctx.font = "bold 13px Outfit, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(String(band.start.getFullYear()), x, axisTop + 50);
+      ctx.fillStyle = "#8f82c8";
+      ctx.font = "11px Outfit, sans-serif";
+      ctx.fillText(`${PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/${PLANET_SHORT[band.adPlanet] ?? band.adPlanet}`, x, axisTop + 66);
+    });
+
+    ctx.fillStyle = "#8f82c8";
+    ctx.font = "12px Outfit, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Score trend line · same scale as AD intelligence", L, H - 14);
+    ctx.textAlign = "center";
+    ctx.fillText("| = yearly marker · colored labels = AD start year", L + chartW / 2, H - 14);
+    ctx.textAlign = "right";
+    ctx.fillText("Green = peak · Red = low · Bands = Antardasha", L + chartW, H - 14);
+  }, [selectedMd, adResult]);
+
+  return (
+    <div style={{width:"100%",borderRadius:8,background:"#08051a",border:"1px solid #1c1840",padding:14,overflowX:"auto"}}>
+      <canvas
+        ref={canvasRef}
+        width={1600}
+        height={430}
+        style={{display:"block",width:"100%",minWidth:900,height:"auto",borderRadius:8}}
+      />
+    </div>
+  );
 }
 
 export default function DestinyPage() {
@@ -395,207 +606,7 @@ export default function DestinyPage() {
                       Current AD: {adResult.currentAD?.adPlanet ?? "Not active"}
                     </span>
                   </div>
-
-                  {(() => {
-                    const mdStart = selectedMd.start.getTime();
-                    const mdEnd = selectedMd.end.getTime();
-                    const mdDuration = Math.max(1, mdEnd - mdStart);
-                    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
-                    const toX = (date: Date) => clamp(((date.getTime() - mdStart) / mdDuration) * 100, 0, 100);
-                    const scores = adResult.bands.map((band) => band.score);
-                    const minScore = Math.min(...scores);
-                    const maxScore = Math.max(...scores);
-                    const axisMin = Math.max(0, minScore - 2);
-                    const axisMax = Math.min(100, maxScore + 2);
-                    const scoreRange = Math.max(8, axisMax - axisMin);
-                    const toY = (score: number) => clamp(84 - ((score - axisMin) / scoreRange) * 68, 12, 86);
-                    const graphPoints = adResult.bands.map((band) => {
-                      const midDate = new Date((band.start.getTime() + band.end.getTime()) / 2);
-                      return {
-                        adPlanet: band.adPlanet,
-                        color: band.color,
-                        date: midDate,
-                        score: band.score,
-                        x: (toX(band.start) + toX(band.end)) / 2,
-                        y: toY(band.score),
-                      };
-                    });
-                    const pathLine = graphPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
-                    const areaPath = graphPoints.length
-                      ? `${pathLine} L ${graphPoints[graphPoints.length - 1].x.toFixed(2)} 88 L ${graphPoints[0].x.toFixed(2)} 88 Z`
-                      : "";
-                    const peakPoint = graphPoints.reduce((best, point) => point.score > best.score ? point : best, graphPoints[0]);
-                    const lowPoint = graphPoints.reduce((best, point) => point.score < best.score ? point : best, graphPoints[0]);
-                    const startYear = selectedMd.start.getFullYear();
-                    const endYear = selectedMd.end.getFullYear();
-                    const yearStep = endYear - startYear > 16 ? 5 : endYear - startYear > 8 ? 3 : 1;
-                    const everyYearTick = Array.from(
-                      { length: Math.max(0, endYear - startYear + 1) },
-                      (_, idx) => startYear + idx,
-                    );
-                    const yearTicks = Array.from(
-                      new Set([
-                        startYear,
-                        ...Array.from({ length: Math.max(0, Math.floor((endYear - startYear) / yearStep) + 1) }, (_, idx) => startYear + idx * yearStep),
-                        endYear,
-                      ]),
-                    ).filter((year) => year >= startYear && year <= endYear);
-
-                    return (
-                      <div style={{width:"100%",borderRadius:8,background:"linear-gradient(180deg,#0b0822,#08051a)",border:"1px solid #1c1840",padding:"18px 14px 12px",overflow:"hidden"}}>
-                        <div style={{display:"grid",gridTemplateColumns:"44px 1fr",gap:10,alignItems:"stretch"}}>
-                          <div style={{position:"relative",height:330}}>
-                            {[maxScore, Math.round((maxScore + minScore) / 2), minScore].map((score)=>(
-                              <div key={score} style={{position:"absolute",right:0,top:`${toY(score)}%`,transform:"translateY(-50%)",fontSize:10,color:"#8f82c8"}}>
-                                {score}%
-                              </div>
-                            ))}
-                          </div>
-
-                          <div style={{position:"relative",height:330,overflow:"hidden",borderRadius:6}}>
-                          {adResult.bands.map((band)=>{
-                            const startPct=toX(band.start);
-                            const endPct=toX(band.end);
-                            const width=Math.max(3,endPct-startPct);
-                            return (
-                              <div
-                                key={`${band.adPlanet}-${band.start.toISOString()}-band`}
-                                title={`${selectedMd.planet}/${band.adPlanet}: ${formatPeriodDate(band.start)} - ${formatPeriodDate(band.end)} · ${band.score}%`}
-                                style={{position:"absolute",left:`${startPct}%`,width:`${width}%`,top:0,bottom:0,background:`${band.color}14`,borderLeft:`1px solid ${band.color}55`}}
-                              >
-                                <div style={{fontSize:10,fontWeight:800,color:band.color,textAlign:"center",paddingTop:8,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
-                                  {PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/{PLANET_SHORT[band.adPlanet] ?? band.adPlanet}
-                                </div>
-                                <div style={{fontSize:8,color:"#8f82c8",textAlign:"center",paddingTop:3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
-                                  {band.start.getFullYear()}-{band.end.getFullYear()}
-                                </div>
-                              </div>
-                            );
-                          })}
-
-                          {yearTicks.map((year)=> {
-                            const x = toX(new Date(year, 0, 1));
-                            return (
-                              <div key={`${selectedMd.planet}-${year}-tick`} style={{position:"absolute",left:`${x}%`,top:0,bottom:0,borderLeft:"1px solid rgba(255,255,255,0.08)"}}>
-                                <span className="sr-only">{year}</span>
-                              </div>
-                            );
-                          })}
-
-                          {[maxScore, Math.round((maxScore + minScore) / 2), minScore].map((score)=>(
-                            <div key={`${score}-grid`} style={{position:"absolute",left:0,right:0,top:`${toY(score)}%`,borderTop:"1px solid rgba(96,88,144,0.22)"}} />
-                          ))}
-
-                          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{position:"absolute",inset:0,overflow:"hidden",zIndex:1}}>
-                            <defs>
-                              <linearGradient id={`ad-score-fill-${selectedMd.planet}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="rgba(250, 204, 21, 0.18)" />
-                                <stop offset="100%" stopColor="rgba(250, 204, 21, 0.01)" />
-                              </linearGradient>
-                              <filter id={`ad-score-glow-${selectedMd.planet}`} x="-20%" y="-20%" width="140%" height="140%">
-                                <feGaussianBlur stdDeviation="1.6" result="coloredBlur" />
-                                <feMerge>
-                                  <feMergeNode in="coloredBlur" />
-                                  <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                              </filter>
-                            </defs>
-                            {areaPath && <path d={areaPath} fill={`url(#ad-score-fill-${selectedMd.planet})`} />}
-                            <path
-                              d={pathLine}
-                              fill="none"
-                              stroke="rgba(250,204,21,0.98)"
-                              strokeWidth="3.2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              vectorEffect="non-scaling-stroke"
-                              filter={`url(#ad-score-glow-${selectedMd.planet})`}
-                            />
-                            <path
-                              d={pathLine}
-                              fill="none"
-                              stroke="rgba(255,255,255,0.45)"
-                              strokeWidth="0.8"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              vectorEffect="non-scaling-stroke"
-                            />
-                            {graphPoints.map((point) => {
-                              const isPeak = point === peakPoint;
-                              const isLow = point === lowPoint;
-                              return (
-                                <g key={`${point.adPlanet}-${point.date.toISOString()}-svg-dot`}>
-                                  <circle
-                                    cx={point.x}
-                                    cy={point.y}
-                                    r={isPeak || isLow ? 0.95 : 0.62}
-                                    fill={isPeak ? "#22c55e" : isLow ? "#ef4444" : point.color}
-                                    stroke="rgba(240,232,208,0.95)"
-                                    strokeWidth={isPeak || isLow ? 0.5 : 0.28}
-                                    vectorEffect="non-scaling-stroke"
-                                  />
-                                </g>
-                              );
-                            })}
-                          </svg>
-
-                          {[peakPoint, lowPoint].filter(Boolean).map((point, index) => {
-                            const isPeak = index === 0;
-                            return (
-                              <div
-                                key={`${point.date.toISOString()}-${isPeak ? "peak" : "low"}`}
-                                style={{position:"absolute",left:`${point.x}%`,top:`${point.y}%`,transform:"translate(-50%,-50%)",zIndex:3,pointerEvents:"none"}}
-                              >
-                                <div style={{position:"absolute",left:"50%",top:isPeak?-22:16,width:1,height:isPeak?18:12,background:isPeak?"rgba(34,197,94,0.55)":"rgba(239,68,68,0.55)",transform:"translateX(-50%)"}} />
-                                <div style={{position:"absolute",left:"50%",top:isPeak?-42:26,transform:"translateX(-50%)",whiteSpace:"nowrap",fontSize:10,fontWeight:800,color:isPeak?"#22c55e":"#ef4444",background:"rgba(8,5,26,0.9)",border:`1px solid ${isPeak?"rgba(34,197,94,0.55)":"rgba(239,68,68,0.55)"}`,borderRadius:999,padding:"3px 7px"}}>
-                                  {isPeak ? "Peak" : "Low"} {point.score}%
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                          <div />
-                          <div style={{position:"relative",height:64,borderTop:"1px solid rgba(96,88,144,0.2)"}}>
-                            {everyYearTick.map((year)=> {
-                              const x = toX(new Date(year, 0, 1));
-                              return (
-                                <div
-                                  key={`${selectedMd.planet}-${year}-minor-year-bar`}
-                                  style={{position:"absolute",left:`${x}%`,top:0,width:1,height:16,background:"rgba(200,192,168,0.28)",transform:"translateX(-50%)"}}
-                                  title={`${year}`}
-                                />
-                              );
-                            })}
-
-                            {adResult.bands.map((band)=> {
-                              const startPct = toX(band.start);
-                              const labelLeft = Math.min(97, Math.max(3, startPct));
-                              return (
-                                <div
-                                  key={`${band.adPlanet}-${band.start.toISOString()}-start-year`}
-                                  style={{position:"absolute",left:`${labelLeft}%`,top:12,transform:"translateX(-50%)",zIndex:4,textAlign:"center",minWidth:46}}
-                                  title={`${selectedMd.planet}/${band.adPlanet} starts ${formatPeriodDate(band.start)} and ends ${formatPeriodDate(band.end)}`}
-                                >
-                                  <div style={{height:12,borderLeft:`2px solid ${band.color}`,margin:"0 auto 3px",width:1,opacity:0.9}} />
-                                  <div style={{fontSize:10,fontWeight:800,color:band.color,lineHeight:1}}>{band.start.getFullYear()}</div>
-                                  <div style={{fontSize:8,color:"#8f82c8",whiteSpace:"nowrap",lineHeight:1.2}}>
-                                    {PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/{PLANET_SHORT[band.adPlanet] ?? band.adPlanet}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        <div style={{display:"flex",justifyContent:"space-between",gap:12,fontSize:10,color:"#8f82c8",flexWrap:"wrap",padding:"8px 0 0 54px"}}>
-                          <span>Score trend line · normalized for this MD</span>
-                          <span>| = yearly marker · colored labels = AD start year</span>
-                          <span>Green = peak · Red = low · Bands = Antardasha</span>
-                        </div>
-                      </div>
-                    );
-                  })()}
+                  <AntardashaFlowCanvas selectedMd={selectedMd} adResult={adResult} />
                 </div>
 
                 <div className="card" style={{padding:14}}>
