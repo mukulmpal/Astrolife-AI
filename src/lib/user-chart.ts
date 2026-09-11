@@ -133,6 +133,29 @@ function getChartRowBirth(row: Record<string, unknown> | null): BirthDetails | n
   };
 }
 
+function getSavedChartRowBirth(row: Record<string, unknown> | null): BirthDetails | null {
+  if (!row) return null;
+  const name = typeof row.name === "string" ? row.name : "";
+  const dob = typeof row.birth_date === "string" ? row.birth_date : "";
+  const tob = typeof row.birth_time === "string" ? row.birth_time.slice(0, 5) : "";
+  const city = typeof row.birth_place === "string" ? row.birth_place : "";
+  if (!name || !dob || !tob || !city) return null;
+
+  const latitude = row.latitude;
+  const longitude = row.longitude;
+  const latNumber = typeof latitude === "number" ? latitude : typeof latitude === "string" ? Number(latitude) : null;
+  const lonNumber = typeof longitude === "number" ? longitude : typeof longitude === "string" ? Number(longitude) : null;
+
+  return {
+    name,
+    dob,
+    tob,
+    city,
+    lat: typeof latNumber === "number" && Number.isFinite(latNumber) ? latNumber : null,
+    lon: typeof lonNumber === "number" && Number.isFinite(lonNumber) ? lonNumber : null,
+  };
+}
+
 function getLegacyChartRowBirth(row: Record<string, unknown> | null): BirthDetails | null {
   if (!row) return null;
   const name = typeof row.name === "string" ? row.name : "";
@@ -162,6 +185,14 @@ function stripLegacyChartId(chartId: string) {
   return chartId.replace(/^legacy:/, "");
 }
 
+function savedChartId(chartId: string) {
+  return chartId.startsWith("saved:");
+}
+
+function stripSavedChartId(chartId: string) {
+  return chartId.replace(/^saved:/, "");
+}
+
 export function saveCurrentChart(chart: ChartData) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chart));
@@ -184,6 +215,45 @@ function loadCurrentChartFromDevice(): ChartData | null {
 export type SaveChartResult =
   | { ok: true; id?: string }
   | { ok: false; duplicate?: boolean; error: string };
+
+export type UserProfileInput = Partial<Pick<BirthDetails, "name" | "dob" | "tob" | "city">> & {
+  lat?: number | null;
+  lon?: number | null;
+  tz?: number | null;
+  onboarding_completed?: boolean;
+};
+
+export async function ensureUserProfile(input: UserProfileInput = {}) {
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) return null;
+
+  const payload = {
+    id: user.id,
+    name: input.name ?? user.user_metadata?.name ?? user.email ?? null,
+    dob: input.dob ?? null,
+    tob: input.tob ?? null,
+    city: input.city ?? null,
+    lat: input.lat ?? null,
+    lon: input.lon ?? null,
+    tz: input.tz ?? null,
+    onboarding_completed: input.onboarding_completed ?? false,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .upsert(payload, { onConflict: "id" })
+    .select("id,name,dob,tob,city,lat,lon,tz,onboarding_completed")
+    .maybeSingle();
+
+  if (error) {
+    console.warn("User profile ensure failed:", error);
+    return null;
+  }
+
+  return data;
+}
 
 function chartBirthKey(chart: Pick<ChartData, "name" | "dob" | "tob" | "city">) {
   return `${chart.name.trim().toLowerCase()}|${chart.dob}|${chart.tob}|${chart.city.trim().toLowerCase()}`;
@@ -210,6 +280,20 @@ export async function loadSavedChart(chartId: string): Promise<ChartData | null>
       return birth ? buildChart(birth) : null;
     }
 
+    if (savedChartId(chartId)) {
+      const { data, error } = await supabase
+        .from("saved_charts")
+        .select("chart_payload,name,birth_date,birth_time,birth_place,latitude,longitude")
+        .eq("id", stripSavedChartId(chartId))
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error || !data) return null;
+      if (data.chart_payload && isStoredChart(data.chart_payload)) return reviveChartDates(data.chart_payload);
+      const birth = getSavedChartRowBirth(data);
+      return birth ? buildChart(birth) : null;
+    }
+
     const { data, error } = await supabase
       .from("charts")
       .select("chart_json")
@@ -233,6 +317,14 @@ export async function saveAdditionalChart(chart: ChartData): Promise<SaveChartRe
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { ok: false, error: "Sign in to save charts to your account." };
+    await ensureUserProfile({
+      name: chart.name,
+      dob: chart.dob,
+      tob: chart.tob,
+      city: chart.city,
+      lat: chart.lat,
+      lon: chart.lon,
+    });
 
     const key = chartBirthKey(chart);
     const { data: existing } = await supabase
@@ -284,6 +376,16 @@ export async function saveChartToAccount(chart: ChartData, options: { replacePri
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+
+    await ensureUserProfile({
+      name: chart.name,
+      dob: chart.dob,
+      tob: chart.tob,
+      city: chart.city,
+      lat: chart.lat,
+      lon: chart.lon,
+      onboarding_completed: true,
+    });
 
     const payload = {
       user_id: user.id,
@@ -371,7 +473,27 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
       }))
       .filter((item) => !existingKeys.has(chartBirthKey(item)));
 
-    return [...primaryCharts, ...legacyCharts];
+    const { data: savedData } = await supabase
+      .from("saved_charts")
+      .select("id,name,birth_date,birth_time,birth_place,created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    const nextKeys = new Set([...existingKeys, ...legacyCharts.map((item) => chartBirthKey(item))]);
+    const savedCharts = (savedData ?? [])
+      .map((item) => ({
+        id: `saved:${String(item.id)}`,
+        name: String(item.name),
+        dob: String(item.birth_date),
+        tob: String(item.birth_time).slice(0, 5),
+        city: String(item.birth_place),
+        chartType: "self",
+        isPrimary: false,
+        createdAt: String(item.created_at),
+      }))
+      .filter((item) => !nextKeys.has(chartBirthKey(item)));
+
+    return [...primaryCharts, ...legacyCharts, ...savedCharts];
   } catch (error) {
     console.warn("Chart list load skipped:", error);
     return [];
@@ -385,6 +507,14 @@ export async function selectSavedChart(chartId: string): Promise<ChartData | nul
     if (!user) return null;
 
     if (legacyChartId(chartId)) {
+      const chart = await loadSavedChart(chartId);
+      if (!chart) return null;
+      await saveChartToAccount(chart, { replacePrimary: true });
+      saveCurrentChart(chart);
+      return chart;
+    }
+
+    if (savedChartId(chartId)) {
       const chart = await loadSavedChart(chartId);
       if (!chart) return null;
       await saveChartToAccount(chart, { replacePrimary: true });

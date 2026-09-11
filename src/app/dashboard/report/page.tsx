@@ -1,7 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
-import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type ReportCover } from "@/lib/report-html-generator";
 import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
@@ -27,9 +25,11 @@ const COVER_OPTIONS: { value: ReportCover; label: string; desc: string }[] = [
 const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; engines: string[] }[]> = {
   basic: [
     { group: "Free Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
-    { group: "Starter Intelligence", color: "#34d399", engines: ["Basic Yogas", "Chart Summary", "Engine Ledger"] },
+    { group: "Starter Intelligence", color: "#34d399", engines: ["Destiny Snapshot", "AstroLife Scores", "Basic Yogas", "AI Advisor", "Engine Ledger"] },
   ],
   premium: [
+    { group: "Report Intelligence V4", color: "#c084fc", engines: ["Destiny Snapshot","Deep Personalization","Action Blueprint Pages","Life Mission","Personality Deep Dive","Karmic Blueprint","AI Advisor"] },
+    { group: "Opportunity Blueprint", color: "#34d399", engines: ["Wealth Intelligence","Career Intelligence","Foreign Connection","Event Radar Strategy","Ranked Remedies"] },
     { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
     { group: "Per-Planet (9)", color: "#a78bfa", engines: ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] },
     { group: "Per-House (12)", color: "#60a5fa", engines: ["Bhava 1–4","Bhava 5–8","Bhava 9–12"] },
@@ -41,8 +41,8 @@ const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; 
   ],
   elite: [
     { group: "Everything in Premium", color: "#C9A961", engines: ["Full Kundli Intelligence", "All Timing Engines", "All Remedy Engines"] },
-    { group: "Elite Intelligence", color: "#c084fc", engines: ["Palmistry Fusion", "Family Karma", "Relationship Intel", "Marriage Intelligence"] },
-    { group: "Luxury Export", color: "#60a5fa", engines: ["Advanced PDF Layout", "Unlimited History", "Personal Synthesis", "Priority Report Quality"] },
+    { group: "Elite Intelligence", color: "#c084fc", engines: ["Palmistry Fusion", "AI Life Story", "Family Karma", "Relationship Intel", "Marriage Intelligence"] },
+    { group: "Luxury Export", color: "#60a5fa", engines: ["Advanced PDF Layout", "Personal Operating System", "Real Astrologer Page", "Priority Report Quality"] },
   ],
   full: [
     { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
@@ -88,25 +88,25 @@ const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; 
 };
 
 const PAGE_COUNT: Record<ReportOptions["type"], string> = {
-  basic:   "12+ pages",
-  premium: "65+ pages",
-  elite:   "90+ pages",
-  full:    "65+ pages",
-  kundli:  "45+ pages",
-  remedy:  "28+ pages",
+  basic:   "13 pages",
+  premium: "91 pages",
+  elite:   "94 pages",
+  full:    "91 pages",
+  kundli:  "43 pages",
+  remedy:  "20 pages",
   medical: "22+ pages",
-  destiny: "38+ pages",
+  destiny: "47 pages",
 };
 
 const ENGINE_COUNT: Record<ReportOptions["type"], number> = {
-  basic:   5,
-  premium: 28,
-  elite:   35,
-  full:    28,
+  basic:   8,
+  premium: 40,
+  elite:   47,
+  full:    30,
   kundli:  18,
   remedy:  10,
   medical: 9,
-  destiny: 15,
+  destiny: 17,
 };
 
 // Astrology loading messages — cycles while PDF generates
@@ -152,6 +152,17 @@ const REPORT_PLANS: Array<{
 ];
 
 const TIER_RANK: Record<SubscriptionTier, number> = { free: 0, premium: 1, elite: 2 };
+
+const REPORT_EDITION_LABEL: Record<ReportOptions["type"], string> = {
+  basic: "basic edition",
+  premium: "premium edition",
+  elite: "elite edition",
+  full: "premium edition",
+  kundli: "kundli edition",
+  remedy: "remedy edition",
+  medical: "health edition",
+  destiny: "destiny edition",
+};
 
 
 export default function ReportPage() {
@@ -307,7 +318,7 @@ export default function ReportPage() {
       <AstroLoadingScreen
         visible={isGenerating}
         title={"Generating your\nCosmic Blueprint"}
-        subtitle={`${ENGINE_COUNT[reportType]} engines · ${PAGE_COUNT[reportType]} · premium edition`}
+        subtitle={`${ENGINE_COUNT[reportType]} engines · ${PAGE_COUNT[reportType]} · ${REPORT_EDITION_LABEL[reportType]}`}
         statusMessages={LOADING_STEPS}
         statusIntervalMs={2200}
       />

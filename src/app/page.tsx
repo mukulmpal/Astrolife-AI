@@ -10,7 +10,7 @@ export default function Home() {
     <DirectionALanding
       showTestimonials
       onGetStarted={() => router.push('/auth/signup')}
-      onSignIn={() => router.push('/auth/signin')}
+      onSignIn={() => router.push('/login')}
     />
   );
 }

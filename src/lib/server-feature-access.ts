@@ -56,7 +56,18 @@ export async function getServerFeatureAccess(feature: FeatureKey): Promise<Serve
       };
     }
 
-    const tier = normalizeTier(profile?.subscription_tier);
+    let tier = normalizeTier(profile?.subscription_tier);
+    if (!profile) {
+      await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          name: user.user_metadata?.name ?? user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "AstroLife User",
+          subscription_tier: "free",
+        }, { onConflict: "id" });
+      tier = "free";
+    }
+
     const allowedByPlan = FEATURE_ACCESS[feature].includes(tier);
 
     return {
@@ -80,11 +91,12 @@ export async function getServerFeatureAccess(feature: FeatureKey): Promise<Serve
 }
 
 export function premiumBlockedResponse(access: ServerFeatureAccess) {
+  const label = access.feature === "basic_kundli" ? "report" : "premium engine";
   return {
     success: false,
     error: access.reason === "login_required"
-      ? "Login required to use this premium engine."
-      : "Upgrade required to use this premium engine.",
+      ? `Login required to use this ${label}.`
+      : `Upgrade required to use this ${label}.`,
     access,
   };
 }

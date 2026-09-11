@@ -1,4 +1,8 @@
-export const ctaHref = "/onboarding";
+import { isBillingEnforced } from "@/lib/access";
+
+export const ctaHref = isBillingEnforced()
+  ? "/login?next=/dashboard/upgrade"
+  : "/onboarding";
 export const chatHref = "/dashboard/chat";
 
 export const navLinks = [

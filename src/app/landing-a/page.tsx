@@ -11,7 +11,7 @@ export default function LandingAPage() {
   };
 
   const handleSignIn = () => {
-    router.push('/auth/signin');
+    router.push('/login');
   };
 
   return (

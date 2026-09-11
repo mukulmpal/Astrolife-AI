@@ -66,7 +66,12 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
 
         <div className="flex items-center gap-3">
           <a
-            href="/auth/signin"
+            href="/login"
+            onClick={(event) => {
+              if (!onSignIn) return;
+              event.preventDefault();
+              onSignIn();
+            }}
             className="hidden text-sm font-medium sm:inline"
             style={{ color: 'var(--al-ivory)' }}
           >

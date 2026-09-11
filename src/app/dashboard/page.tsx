@@ -337,7 +337,7 @@ function DashboardContent() {
 
     const interval = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(interval);
-  }, [supabase]);
+  }, [supabase, autoChart]);
 
   const userName = user?.user_metadata?.full_name?.split(" ")[0] || birth.name?.split(" ")[0] || "Seeker";
   const greeting = time.getHours() < 12 ? "Shubh Prabhat" : time.getHours() < 17 ? "Namaste" : "Shubh Sandhya";

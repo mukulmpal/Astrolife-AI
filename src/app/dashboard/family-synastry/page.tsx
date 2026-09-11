@@ -1,7 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
-import { engineIntros } from "@/data/engine-intros";
+import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateChart, RASHIS, type ChartData } from "@/lib/astro-engine/calculations";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";

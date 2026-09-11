@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { calculateChart } from "@/lib/astro-engine/calculations";
 import { saveChartToAccount } from "@/lib/user-chart";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
+import { isBillingEnforced } from "@/lib/access";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -44,6 +45,32 @@ export default function Onboarding() {
   const [animClass, setAnimClass] = useState("slide-in");
   const supabase = createClient();
   const nameRef = useRef<HTMLInputElement>(null);
+
+  // Require an authenticated user before they can create a chart.
+  useEffect(() => {
+    let mounted = true;
+
+    const ensureSignedIn = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!mounted) return;
+
+        if (!user) {
+          window.location.href = "/auth/signup?next=/onboarding";
+          return;
+        }
+
+        if (isBillingEnforced()) {
+          window.location.href = "/login?next=/dashboard/upgrade";
+        }
+      } catch (e) {
+        console.warn("Onboarding auth check failed", e);
+      }
+    };
+
+    void ensureSignedIn();
+    return () => { mounted = false; };
+  }, [supabase]);
 
   useEffect(() => {
     if (step === 1) nameRef.current?.focus();

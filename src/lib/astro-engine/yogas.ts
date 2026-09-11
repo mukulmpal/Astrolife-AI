@@ -738,11 +738,11 @@ export function detectYogas(
 
   // FREE DOSHAS (3)
   add("Mangal Dosha","Doshas",
-    "Mars in 1st, 2nd, 4th, 7th, 8th, or 12th house — classic Kuja Dosha.",
-    "Challenges in marriage, delay or conflict in partnerships. Energy imbalance in relationships. Remedies: marry another Manglik, Mangal puja, coral gemstone.",
+    "Mars in a relationship-sensitive house. AstroLife treats this as a scored Mars relationship pattern, not a binary fear label.",
+    "May show heat in communication, home, intimacy, family or partnership decisions. Final intensity depends on Lagna, Moon, Venus, Mars strength, affliction, protection, D9, dasha activation and partner balance.",
     35, !!P.Mars&&[1,2,4,7,8,12].includes(P.Mars.house)&&!isExalted("Mars",P.Mars.sign),
     ["Mars"],"free",false,true,
-    "Marry another Manglik. Mangal puja on Tuesdays. Red coral gemstone. Hanuman Chalisa daily.");
+    "Use Mangal Dosha Intelligence for evidence and scoring. Prefer anger regulation, clear communication, fitness discipline, Hanuman or Kartikeya support and full compatibility review. Do not assume cancellation or wear coral without full chart validation.");
 
   add("Kaalsarpa Yoga","Doshas",
     "All planets fall between Rahu and Ketu axis — serpent energy encircles the chart.",

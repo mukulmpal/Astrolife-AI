@@ -5,7 +5,8 @@ import { useLanguage, type Language } from "@/lib/language-context";
 
 const LANGS: Array<{ key: Language; label: string }> = [
   { key: "english" as Language, label: "EN" },
-  { key: "hinglish" as Language, label: "Hi-En" },
+  { key: "hindi" as Language, label: "हिंदी" },
+  { key: "hinglish" as Language, label: "Hinglish" },
 ];
 
 export function LanguageToggle() {
@@ -29,7 +30,7 @@ export function LanguageToggle() {
     ({
       border: "none",
       cursor: disabled ? "default" : "pointer",
-      padding: "5px 12px",
+      padding: "5px 10px",
       borderRadius: 16,
       fontSize: 11,
       fontWeight: 600,
@@ -49,7 +50,10 @@ export function LanguageToggle() {
           EN
         </button>
         <button type="button" disabled style={getButtonStyle(false, true)}>
-          Hi-En
+          हिंदी
+        </button>
+        <button type="button" disabled style={getButtonStyle(false, true)}>
+          Hinglish
         </button>
       </div>
     );

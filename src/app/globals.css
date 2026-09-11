@@ -60,11 +60,11 @@ body.theme-saffron {
 body.theme-ivory {
   --al-bg:#F2ECDF; --al-bg-2:#EAE3D2; --al-surface:#ECE5D3; --al-surface-2:#E3DAC4;
   --al-line:rgba(26,31,58,0.14); --al-line-strong:rgba(26,31,58,0.30);
-  --al-gold:#8C7440; --al-gold-bright:#A38851; --al-gold-dim:#7A6536;
+  --al-gold:#735821; --al-gold-bright:#5E4314; --al-gold-dim:#6A5528;
   --al-saffron:#E8923C; --al-violet:#6B5B8C; --al-crimson:#C9555F; --al-jade:#4A8A62;
-  --al-ivory:#1A1F3A; --al-ivory-dim:#3D4554; --al-ivory-mute:#6B7280;
-  --al-text:#1A1F3A; --al-text-dim:#3D4554; --al-text-mute:#6B7280;
-  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:#FAEFE0;
+  --al-ivory:#1A1F3A; --al-ivory-dim:#334155; --al-ivory-mute:#4B5563;
+  --al-text:#1A1F3A; --al-text-dim:#334155; --al-text-mute:#4B5563;
+  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:#fffdf8;
   --al-day-graha: "Moon / Venus"; --al-day-glyph: "☽";
 }
 
@@ -153,6 +153,7 @@ body.theme-maroon, body.theme-forest, body.theme-twilight {
   --app-border-strong:  var(--al-line-strong);
   --app-gold:           var(--al-gold);
   --app-gold-strong:    var(--al-gold-bright);
+  --app-primary-on:     var(--al-primary-on);
   --app-soft:           var(--al-ivory-dim);
   --app-muted:          var(--al-ivory-mute);
   --app-muted-deep:     var(--al-surface-2);
@@ -236,6 +237,7 @@ body.theme-maroon, body.theme-forest, body.theme-twilight {
   --app-accent: var(--al-violet);
   --app-gold: var(--al-gold);
   --app-gold-strong: var(--al-gold-bright);
+  --app-primary-on: var(--al-primary-on);
   --app-soft: var(--al-text-dim);
   --app-muted-deep: var(--al-surface-2);
   --app-card-alt: var(--al-surface-2);
@@ -271,6 +273,7 @@ html[data-landing-theme="saffron"] {
   --app-accent: #8b3a10;
   --app-gold: #c87820;
   --app-gold-strong: #ffd080;
+  --app-primary-on: #0c0804;
   --app-soft: #c8a878;
   --app-muted-deep: #4a2a12;
   --app-card-alt: #1c1008;
@@ -292,6 +295,7 @@ html[data-theme-mode="light"] {
   --app-accent: #795548;
   --app-gold: #b98524;
   --app-gold-strong: #6f4c14;
+  --app-primary-on: #fffdf8;
   --app-soft: #5f523f;
   --app-muted-deep: #9b8b76;
   --app-card-alt: #fff9ee;

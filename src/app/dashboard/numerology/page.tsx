@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { EngineHeader, EngineShell } from "@/components/engine/EngineShell";
-import { engineIntros } from "@/data/engine-intros";
 import { calculateNumerology, analyzeNumber, suggestATMPins, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry, type DigitAnalysis, type CompatScore } from "@/lib/astro-engine/numerology";
 import { useUserChart } from "@/lib/user-chart";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";

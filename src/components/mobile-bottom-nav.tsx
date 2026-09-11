@@ -246,7 +246,7 @@ export function MobileBottomNav() {
             appearance: none;
             -webkit-appearance: none;
             text-decoration: none;
-            color: var(--app-muted, #605890);
+            color: var(--app-soft, #605890);
             display: flex;
             width: 100%;
             height: 46px;
@@ -270,8 +270,8 @@ export function MobileBottomNav() {
           }
 
           .mobile-bottom-nav-item.active {
-            color: var(--app-gold, #c8a030);
-            background: color-mix(in srgb, var(--app-gold, #c8a030) 12%, transparent);
+            color: var(--app-gold-strong, #c8a030);
+            background: color-mix(in srgb, var(--app-gold, #c8a030) 14%, transparent);
           }
 
           .mobile-bottom-nav-icon {

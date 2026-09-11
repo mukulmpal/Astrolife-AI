@@ -3,7 +3,7 @@ import { useState } from "react";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type YogaCategory, type PlanTier } from "@/lib/astro-engine/yogas";
 import { useUserChart } from "@/lib/user-chart";
 import { isFullAccessEnabled } from "@/lib/access";
-import { EngineHeader, EngineShell } from "@/components/engine/EngineShell";
+import { EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
 import { useLanguage } from "@/lib/language-context";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
@@ -179,12 +179,22 @@ export default function YogasPage() {
           title={t("yogas.page_title")}
           subtitle="120 yogas analyzed - Pancha Mahapurusha, Raja, Dhana, Marriage, Career and Doshas."
           icon="✦"
+          confidence={{
+            value: "High",
+            detail: "Uses saved birth chart placements; delivery depends on strength, dasha and transit activation.",
+          }}
           metrics={[
             { label: "Yoga Score", value: score.total },
             { label: "Present", value: present.length, tone: "green" },
             { label: "Doshas", value: doshas.length, tone: "red" },
             { label: "Rare Yogas", value: score.rareCount, tone: "violet" },
           ]}
+        />
+
+        <EngineTrustPanel
+          confidence="High"
+          dataUsed={["Saved birth chart", "Planetary placements", "Lagna", "Yoga rules", "Plan tier visibility"]}
+          caveat="A present yoga shows a chart pattern. Its actual delivery should be judged with Shadbala, Dasha, Ashtakavarga and real-life context."
         />
 
         {(() => {

@@ -12,6 +12,7 @@ import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations"
 import { calculateMilan, type MilanResult } from "@/lib/astro-engine/kundali-milan";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import { buildJaiminiChart } from "@/lib/astro-engine/jaimini";
+import { buildMangalDoshaInsight, type MangalDoshaInsight } from "@/lib/astro-engine/mangal-dosha-adapter";
 import { scanMarriageWindows, type MarriageWindowScanResult, type MonthlyMarriageWindow } from "@/lib/astro-engine/marriage-window-scanner";
 
 // ── Constants ─────────────────────────────────────────────────
@@ -176,8 +177,76 @@ function partnerFusionAdjustment(milan: MilanResult | null, readiness: PartnerRe
   return -10 + readinessAdjustment;
 }
 
-function partnerFusedScore(w: MonthlyMarriageWindow, milan: MilanResult | null, readiness: PartnerReadiness | null = null) {
-  return Math.max(0, Math.min(100, w.adjustedScore + partnerFusionAdjustment(milan, readiness)));
+function clampScore(value: number) {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function mangalTimingAdjustment(insight: MangalDoshaInsight | null) {
+  if (!insight) {
+    return {
+      adjustment: 0,
+      score: 50,
+      label: "Mars readiness not calculated",
+      color: "#8f86ad",
+      notes: ["Generate a valid birth chart to add Mangal Dosha timing context."],
+    };
+  }
+
+  const { result } = insight;
+  const notes: string[] = [];
+  let adjustment = 0;
+
+  if (result.scores.natalSeverity >= 75) {
+    adjustment -= 10;
+    notes.push("Severe multi-factor Mars pressure asks for slower commitment decisions.");
+  } else if (result.scores.natalSeverity >= 60) {
+    adjustment -= 7;
+    notes.push("Strong Manglik pattern reduces impulsive marriage-window confidence.");
+  } else if (result.scores.natalSeverity >= 45) {
+    adjustment -= 4;
+    notes.push("Moderate Mars relationship pressure asks for compatibility confirmation.");
+  } else if (result.scores.natalSeverity <= 20) {
+    adjustment += 2;
+    notes.push("Low Manglik severity does not materially obstruct timing confidence.");
+  }
+
+  if (result.scores.protection >= 35) {
+    adjustment += 4;
+    notes.push("Protection factors are present, so Mars pressure should be interpreted with balance.");
+  }
+
+  if ((result.scores.activation ?? 0) >= 60) {
+    adjustment -= 4;
+    notes.push(`Current activation is ${result.activationLabel}; avoid rushing relationship decisions.`);
+  }
+
+  if (result.scores.constructivePotential >= 70) {
+    adjustment += 2;
+    notes.push("Constructive Mars can support decisive action when communication is mature.");
+  }
+
+  return {
+    adjustment,
+    score: clampScore(50 + adjustment * 3),
+    label: adjustment >= 4
+      ? "Supportive Mars readiness"
+      : adjustment >= 0
+        ? "Manageable Mars readiness"
+        : adjustment >= -6
+          ? "Caution Mars readiness"
+          : "High Mars caution",
+    color: adjustment >= 4 ? "#22c55e" : adjustment >= 0 ? "#c8a030" : adjustment >= -6 ? "#f97316" : "#ef4444",
+    notes: notes.slice(0, 4),
+  };
+}
+
+function partnerFusedScore(
+  w: MonthlyMarriageWindow,
+  milan: MilanResult | null,
+  readiness: PartnerReadiness | null = null,
+  marsAdjustment = 0,
+) {
+  return clampScore(w.adjustedScore + partnerFusionAdjustment(milan, readiness) + marsAdjustment);
 }
 
 function partnerFusionNote(milan: MilanResult | null, readiness: PartnerReadiness | null = null) {
@@ -303,22 +372,32 @@ export function MarriageTimingAnalyzer() {
   }, [chart, hasUserChart, partnerChart]);
 
   const partnerReadiness = useMemo(() => partnerReadinessFromChart(partnerChart), [partnerChart]);
+  const mangalInsight = useMemo(() => {
+    if (!chart || !hasUserChart) return null;
+    try {
+      return buildMangalDoshaInsight(chart);
+    } catch {
+      return null;
+    }
+  }, [chart, hasUserChart]);
+  const mangalTiming = useMemo(() => mangalTimingAdjustment(mangalInsight), [mangalInsight]);
 
   const fusedWindows = useMemo(() => {
     if (!scanResult) return [];
     return scanResult.windows
       .map((window) => ({
         window,
-        fusedScore: partnerFusedScore(window, partnerMilan, partnerReadiness),
+        fusedScore: partnerFusedScore(window, partnerMilan, partnerReadiness, mangalTiming.adjustment),
         compatibilityDelta: partnerFusionAdjustment(partnerMilan, partnerReadiness),
+        marsDelta: mangalTiming.adjustment,
       }))
       .sort((a, b) => b.fusedScore - a.fusedScore);
-  }, [partnerMilan, partnerReadiness, scanResult]);
+  }, [mangalTiming.adjustment, partnerMilan, partnerReadiness, scanResult]);
 
   const bestFusionWindow = fusedWindows[0];
   const highlightedFusionWindow = bestFusionWindow
     ?? (scanResult?.bestWindow
-      ? { window: scanResult.bestWindow, fusedScore: scanResult.bestWindow.score, compatibilityDelta: 0 }
+      ? { window: scanResult.bestWindow, fusedScore: clampScore(scanResult.bestWindow.score + mangalTiming.adjustment), compatibilityDelta: 0, marsDelta: mangalTiming.adjustment }
       : null);
 
   const applyPartnerFromForm = () => {
@@ -512,7 +591,7 @@ export function MarriageTimingAnalyzer() {
       seventhLordTransitHouse, seventhLordTransitSign,
       transitPlanetHouses,
     };
-  }, [chart]);
+  }, [chart, hasUserChart]);
 
   // ── Auto-run current analysis ────────────────────────────────
   useEffect(() => {
@@ -906,6 +985,7 @@ export function MarriageTimingAnalyzer() {
                         { label:"Core Score",         val:`${score}/100`,    col:scoreColor(score) },
                         { label:"Observations",       val:`${bonusActive}/${bonusTotal} (+${bonusScore})`, col:"#38bdf8" },
                         { label:"Adjusted",           val:`${adjustedScore}/100`, col:scoreColor(adjustedScore) },
+                        { label:"Mars Readiness",     val:`${mangalTiming.adjustment >= 0 ? "+" : ""}${mangalTiming.adjustment}`, col:mangalTiming.color },
                         { label:"Strength",           val:strengthDisplay(strength), col:scoreColor(score) },
                       ].map(stat => (
                         <div key={stat.label} style={{ padding:"6px 14px", borderRadius:8,
@@ -916,6 +996,42 @@ export function MarriageTimingAnalyzer() {
                       ))}
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Mangal Dosha Timing Context */}
+              <div className="card" style={{ borderColor:`${mangalTiming.color}33`,
+                background:`linear-gradient(135deg,${mangalTiming.color}10,rgba(20,16,42,0.65))` }}>
+                <div className="card-tag">✦ MANGAL DOSHA TIMING CONTEXT</div>
+                <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) auto", gap:16, alignItems:"center" }}>
+                  <div>
+                    <div className="card-title serif" style={{ color:mangalTiming.color, marginBottom:6 }}>
+                      {mangalTiming.label}
+                    </div>
+                    <div style={{ fontSize:12, color:"#c8c0a8", lineHeight:1.7 }}>
+                      K.N. Rao timing remains the base score. This Mars layer adjusts commitment readiness by reading
+                      Mangal severity, protection, activation and constructive potential.
+                    </div>
+                  </div>
+                  <ScoreRing score={mangalTiming.score} size={74} />
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(145px,1fr))", gap:8, marginTop:14 }}>
+                  {[
+                    { label:"Severity", val:mangalInsight ? `${mangalInsight.result.scores.natalSeverity}/100` : "—" },
+                    { label:"Protection", val:mangalInsight ? `${mangalInsight.result.scores.protection}/100` : "—" },
+                    { label:"Activation", val:mangalInsight ? `${mangalInsight.result.scores.activation}/100` : "—" },
+                    { label:"Timing Delta", val:`${mangalTiming.adjustment >= 0 ? "+" : ""}${mangalTiming.adjustment}` },
+                  ].map(item => (
+                    <div key={item.label} style={{ padding:"8px 10px", borderRadius:8, border:"1px solid #1c1840", background:"rgba(255,255,255,0.02)" }}>
+                      <div style={{ fontSize:10, color:"#605890", textTransform:"uppercase", letterSpacing:1 }}>{item.label}</div>
+                      <div style={{ fontSize:14, color:"#f0e8d0", fontWeight:700, marginTop:3 }}>{item.val}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop:12, display:"grid", gap:6 }}>
+                  {mangalTiming.notes.map(note => (
+                    <div key={note} style={{ fontSize:11, color:"#8f86ad", lineHeight:1.55 }}>• {note}</div>
+                  ))}
                 </div>
               </div>
 
@@ -1098,12 +1214,17 @@ export function MarriageTimingAnalyzer() {
                   Partner-Fusion Commitment Planner
                 </div>
                 <div style={{ fontSize:12, color:"#605890", marginBottom:14, lineHeight:1.6 }}>
-                  These are not fixed wedding dates. When partner chart is added, ranking combines timing strength with Ashtakoot compatibility.
+                  These are not fixed wedding dates. Ranking combines timing strength, partner compatibility and Mangal readiness.
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  {(fusedWindows.length ? fusedWindows : scanResult.windows.map((window) => ({ window, fusedScore: window.adjustedScore, compatibilityDelta: 0 })))
+                  {(fusedWindows.length ? fusedWindows : scanResult.windows.map((window) => ({
+                    window,
+                    fusedScore: clampScore(window.adjustedScore + mangalTiming.adjustment),
+                    compatibilityDelta: 0,
+                    marsDelta: mangalTiming.adjustment,
+                  })))
                     .slice(0, 5)
-                    .map(({ window: w, fusedScore, compatibilityDelta }, index) => {
+                    .map(({ window: w, fusedScore, compatibilityDelta, marsDelta }, index) => {
                       const col = scoreColor(fusedScore);
                       return (
                         <div key={`top-window-${w.date}`} style={{ padding:"14px 16px", borderRadius:12, border:`1px solid ${col}33`, background:"rgba(0,0,0,0.18)" }}>
@@ -1120,6 +1241,7 @@ export function MarriageTimingAnalyzer() {
                           <div style={{ fontSize:11, color:partnerMilan ? partnerMilan.verdictColor : "#8f86ad", lineHeight:1.6, marginBottom:10 }}>
                             {partnerFusionNote(partnerMilan, partnerReadiness)}
                             {partnerMilan && ` Partner-fusion adjustment: ${compatibilityDelta >= 0 ? "+" : ""}${compatibilityDelta} points.`}
+                            {` Mars readiness adjustment: ${marsDelta >= 0 ? "+" : ""}${marsDelta} points.`}
                           </div>
                           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:8, marginBottom:10 }}>
                             {commitmentBreakdown(w, partnerMilan).map(item => (

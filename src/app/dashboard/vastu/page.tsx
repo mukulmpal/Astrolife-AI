@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
-import { engineIntros } from "@/data/engine-intros";
+import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { downloadVastuPDFReport } from "@/lib/report-generator";
 import { calculateVastu, type VastuResult as CompleteVastuResult } from "@/lib/astro-engine/vastu";
 import { useUserChart } from "@/lib/user-chart";

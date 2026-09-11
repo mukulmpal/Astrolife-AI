@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
-import { engineIntros } from "@/data/engine-intros";
+import { EngineEmptyState } from "@/components/engine/engine-intro";
 import "@/app/dashboard/shared.css";
 import { calculateShadbala, getShadbalaRadar, type ShadbalaPlanet } from "@/lib/astro-engine/shadbala";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
+import { EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
 
 function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
   const data = getShadbalaRadar(planet);
@@ -55,7 +55,6 @@ export default function ShadbalaPage() {
   const [activeTab, setActiveTab] = useState<"grid"|"table"|"summary">("grid");
   const { birth, chart, hasUserChart } = useUserChart();
   const { t, tp, ts } = useLanguage();
-  const result = calculateShadbala(chart.planets as never);
 
   const BALA_LABELS = [
     { key:"sthanaBala",  label:"Sthana", max:10 },
@@ -66,7 +65,7 @@ export default function ShadbalaPage() {
     { key:"drikBala",    label:"Drik",   max:8  },
   ];
 
-  if (!hasUserChart || !birth.name) {
+  if (!hasUserChart || !birth.name || !chart) {
     return (
       <EngineEmptyState
         engineName="Shadbala"
@@ -76,8 +75,10 @@ export default function ShadbalaPage() {
     );
   }
 
+  const result = calculateShadbala(chart.planets as never);
+
   return (
-    <>
+    <EngineShell>
       <style>{`
         .header-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#f0e8d0}
         .header-meta{font-size:13px;color:#605890;margin-top:4px}
@@ -117,11 +118,26 @@ export default function ShadbalaPage() {
         @media(max-width:768px){.planet-grid{grid-template-columns:1fr}}
       `}</style>
 
-      <div className="page">
-        {/* HEADER */}
-        <div className="page-tag">{t("shadbala.page_tag")}</div>
-        <h1 className="page-title serif">{t("shadbala.page_title")}</h1>
-        <p className="page-sub">Six classical strength measures — which planets can actually deliver results in your chart.</p>
+      <div>
+        <EngineHeader
+          eyebrow={t("shadbala.page_tag")}
+          title={t("shadbala.page_title")}
+          subtitle="Six classical strength measures showing which planets can actually deliver results in your chart."
+          confidence={{
+            value: "High",
+            detail: "Calculated from the saved birth chart; use with Dasha and Transits for timing decisions.",
+          }}
+          metrics={[
+            { label: "Avg Strength", value: `${result.avgStrength}%`, tone: "gold" },
+            { label: "Strongest", value: result.strongest, tone: "green" },
+            { label: "Weakest", value: result.weakest, tone: "red" },
+          ]}
+        />
+        <EngineTrustPanel
+          confidence="High"
+          dataUsed={["Saved birth chart", "Planet dignity", "House position", "Aspect strength", "Six bala factors"]}
+          caveat="Shadbala is a reliability layer, not a prediction by itself. A strong planet still needs the right dasha and transit activation to deliver."
+        />
         <PremiumFeature feature="Shadbala Analysis">
 
         <div className="header-card">
@@ -345,6 +361,6 @@ export default function ShadbalaPage() {
         )}
         </PremiumFeature>
       </div>
-    </>
+    </EngineShell>
   );
 }

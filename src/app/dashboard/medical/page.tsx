@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { EngineIntro } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateMedical, NAKSHATRA_DISEASE_BOOK, SIGN_DISEASE } from "@/lib/astro-engine/medical";

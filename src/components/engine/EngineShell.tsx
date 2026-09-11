@@ -16,9 +16,14 @@ type EngineHeaderProps = {
   icon?: ReactNode;
   actions?: ReactNode;
   metrics?: Array<{ label: string; value: ReactNode; tone?: "gold" | "green" | "red" | "blue" | "violet" }>;
+  confidence?: {
+    label?: string;
+    value: string;
+    detail?: string;
+  };
 };
 
-export function EngineHeader({ eyebrow, title, subtitle, icon, actions, metrics = [] }: EngineHeaderProps) {
+export function EngineHeader({ eyebrow, title, subtitle, icon, actions, metrics = [], confidence }: EngineHeaderProps) {
   return (
     <section className="engine-hero">
       <div className="engine-hero-orb" aria-hidden="true" />
@@ -29,6 +34,12 @@ export function EngineHeader({ eyebrow, title, subtitle, icon, actions, metrics 
         </div>
         <h1>{title}</h1>
         {subtitle && <p>{subtitle}</p>}
+        {confidence && (
+          <div className="engine-confidence">
+            <strong>{confidence.label ?? "Data Confidence"}: {confidence.value}</strong>
+            {confidence.detail && <span>{confidence.detail}</span>}
+          </div>
+        )}
       </div>
       {(metrics.length > 0 || actions) && (
         <div className="engine-hero-side">
@@ -65,6 +76,61 @@ export function EngineSectionTitle({ eyebrow, title, subtitle }: { eyebrow?: str
       {eyebrow && <span>{eyebrow}</span>}
       <h2>{title}</h2>
       {subtitle && <p>{subtitle}</p>}
+    </div>
+  );
+}
+
+type EngineTrustPanelProps = {
+  dataUsed: string[];
+  confidence: "High" | "Medium" | "Limited";
+  caveat?: string;
+  nextAction?: ReactNode;
+};
+
+export function EngineTrustPanel({ dataUsed, confidence, caveat, nextAction }: EngineTrustPanelProps) {
+  const tone = confidence === "High" ? "green" : confidence === "Medium" ? "gold" : "blue";
+  return (
+    <EngineCard className="engine-trust-panel" accent={tone}>
+      <div>
+        <div className="engine-trust-label">Calculation Clarity</div>
+        <h2>What This Result Is Based On</h2>
+        {caveat && <p>{caveat}</p>}
+      </div>
+      <div className="engine-trust-grid">
+        <div className={`engine-trust-confidence ${tone}`}>
+          <strong>{confidence}</strong>
+          <span>Data Confidence</span>
+        </div>
+        <div className="engine-trust-data">
+          {dataUsed.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+      </div>
+      {nextAction && <div className="engine-trust-action">{nextAction}</div>}
+    </EngineCard>
+  );
+}
+
+type EngineGuidanceGridProps = {
+  items: Array<{
+    label: string;
+    title: string;
+    body: string;
+    tone?: "gold" | "green" | "red" | "blue" | "violet";
+  }>;
+};
+
+export function EngineGuidanceGrid({ items }: EngineGuidanceGridProps) {
+  return (
+    <div className="engine-guidance-grid">
+      {items.map((item) => (
+        <EngineCard key={item.label} className="engine-guidance-card" accent={item.tone ?? "gold"}>
+          <span>{item.label}</span>
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+        </EngineCard>
+      ))}
     </div>
   );
 }

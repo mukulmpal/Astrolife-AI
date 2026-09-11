@@ -24,16 +24,16 @@ export function EngineIntro({
       }}
     >
       <div className="mx-auto max-w-4xl">
-        <div className="mb-3 text-11px font-semibold uppercase tracking-widest" style={{ color: '#c8a030' }}>
+        <div className="mb-3 text-11px font-semibold uppercase tracking-widest" style={{ color: 'var(--app-gold)' }}>
           ✦ Engine
         </div>
-        <h1 className="font-serif text-3xl font-600 leading-tight md:text-4xl" style={{ color: '#f0e8d0', marginBottom: '8px' }}>
+        <h1 className="font-serif text-3xl font-600 leading-tight md:text-4xl" style={{ color: 'var(--app-fg)', marginBottom: '8px' }}>
           {title}
         </h1>
-        <p className="mb-4 text-base leading-relaxed md:text-lg" style={{ color: '#c8c0a8' }}>
+        <p className="mb-4 text-base leading-relaxed md:text-lg" style={{ color: 'var(--app-soft)' }}>
           {subtitle}
         </p>
-        <p className="max-w-2xl text-sm leading-relaxed md:text-base" style={{ color: '#a79fbd' }}>
+        <p className="max-w-2xl text-sm leading-relaxed md:text-base" style={{ color: 'var(--app-muted)' }}>
           {description}
         </p>
         {safetyNote && (
@@ -42,10 +42,10 @@ export function EngineIntro({
             style={{
               borderColor: 'var(--app-border)',
               background: 'color-mix(in srgb, var(--app-accent) 8%, transparent)',
-              color: '#a79fbd',
+              color: 'var(--app-muted)',
             }}
           >
-            <strong style={{ color: '#f0e8d0' }}>Note: </strong>
+            <strong style={{ color: 'var(--app-fg)' }}>Note: </strong>
             {safetyNote}
           </div>
         )}
@@ -74,22 +74,22 @@ export function EngineEmptyState({
       <div className="text-6xl mb-4" style={{ opacity: 0.3 }}>
         {engineIcon}
       </div>
-      <h2 className="mb-2 font-serif text-2xl font-600 md:text-3xl" style={{ color: '#f0e8d0' }}>
+      <h2 className="mb-2 font-serif text-2xl font-600 md:text-3xl" style={{ color: 'var(--app-fg)' }}>
         Your chart is needed
       </h2>
-      <p className="mb-6 max-w-md text-center text-sm md:text-base" style={{ color: '#a79fbd' }}>
+      <p className="mb-6 max-w-md text-center text-sm md:text-base" style={{ color: 'var(--app-muted)' }}>
         {engineName} uses your birth chart to calculate personalized insights. Create or select a chart to begin.
       </p>
 
       {whatItAnalyzes && whatItAnalyzes.length > 0 && (
         <div className="mb-8 rounded-lg border p-4 md:p-6" style={{ borderColor: 'var(--app-border)', background: 'var(--app-card)', maxWidth: '380px' }}>
-          <div className="mb-3 text-11px font-semibold uppercase tracking-widest" style={{ color: '#c8a030' }}>
+          <div className="mb-3 text-11px font-semibold uppercase tracking-widest" style={{ color: 'var(--app-gold-strong)' }}>
             What this engine analyzes:
           </div>
           <ul className="space-y-2">
             {whatItAnalyzes.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm" style={{ color: '#c8c0a8' }}>
-                <span style={{ color: '#c8a030', marginTop: '2px' }}>✦</span>
+              <li key={item} className="flex items-start gap-2 text-sm" style={{ color: 'var(--app-soft)' }}>
+                <span style={{ color: 'var(--app-gold-strong)', marginTop: '2px' }}>✦</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -102,8 +102,8 @@ export function EngineEmptyState({
           href="/onboarding"
           className="rounded-lg border-none px-6 py-3 text-sm font-semibold"
           style={{
-            background: '#c8a030',
-            color: '#060410',
+            background: 'var(--app-gold)',
+            color: 'var(--app-primary-on, #060410)',
           }}
         >
           Create My Kundli
@@ -113,7 +113,7 @@ export function EngineEmptyState({
           className="rounded-lg border px-6 py-3 text-sm font-semibold"
           style={{
             borderColor: 'var(--app-border)',
-            color: '#c8a030',
+            color: 'var(--app-gold-strong)',
           }}
         >
           Use Saved Chart

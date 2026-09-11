@@ -31,12 +31,12 @@ export function DirectionALanding({
   return (
     <div id="top" style={{ background: 'var(--al-bg)', color: 'var(--al-ivory)' }}>
       <DirectionANav onSignIn={onSignIn} onGetStarted={onGetStarted} />
-      <DirectionAHero onGetStarted={onGetStarted} />
+      <DirectionAHero />
       <DirectionAProblem />
       <DirectionAFeatures />
       <DirectionAHowItWorks />
       <DirectionAPricing />
-      <DirectionATestimonials />
+      {showTestimonials && <DirectionATestimonials />}
       <DirectionAClosing onGetStarted={onGetStarted} />
       <DirectionAFooter />
     </div>

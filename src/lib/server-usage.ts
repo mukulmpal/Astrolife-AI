@@ -64,7 +64,18 @@ export async function getServerAiUsageState(): Promise<ServerUsageState> {
       .eq("id", user.id)
       .maybeSingle();
 
-    const tier = typeof profile?.subscription_tier === "string" ? profile.subscription_tier : "free";
+    let tier = typeof profile?.subscription_tier === "string" ? profile.subscription_tier : "free";
+    if (!profile) {
+      await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          name: user.user_metadata?.name ?? user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "AstroLife User",
+          subscription_tier: "free",
+        }, { onConflict: "id" });
+      tier = "free";
+    }
+
     if (isPaidTier(tier)) {
       return {
         allowed: true,

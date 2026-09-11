@@ -1,23 +1,22 @@
 "use client";
 import { useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
-import { engineIntros } from "@/data/engine-intros";
+import { EngineEmptyState } from "@/components/engine/engine-intro";
 import "@/app/dashboard/shared.css";
 import { calculateAshtakavarga } from "@/lib/astro-engine/ashtakavarga";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
+import { EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
 
 export default function AKVPage() {
   const [activeTab, setActiveTab] = useState<"lifemap"|"sarva"|"planets"|"houses"|"sodhya"|"guide">("lifemap");
   const { birth, chart, hasUserChart } = useUserChart();
   const { t, tp } = useLanguage();
-  const result = calculateAshtakavarga(chart.planets as never, chart.lagnaNum);
 
   const binduColor = (v:number) =>
     v>=5?"#22c55e":v>=4?"#c8a030":v>=3?"#60a5fa":v>=1?"#f97316":"#ef4444";
 
-  if (!hasUserChart || !birth.name) {
+  if (!hasUserChart || !birth.name || !chart) {
     return (
       <EngineEmptyState
         engineName="Ashtakavarga"
@@ -27,11 +26,29 @@ export default function AKVPage() {
     );
   }
 
+  const result = calculateAshtakavarga(chart.planets as never, chart.lagnaNum);
+
   return (
-    <div className="page">
-      <div className="page-tag">{t("akv.page_tag")}</div>
-      <h1 className="page-title serif">{t("akv.page_title")}</h1>
-      <p className="page-sub">{t("akv.page_sub")}</p>
+    <EngineShell>
+      <EngineHeader
+        eyebrow={t("akv.page_tag")}
+        title={t("akv.page_title")}
+        subtitle={`${t("akv.page_sub")} Use this as a delivery-support map, then validate timing with Dasha and Transits.`}
+        confidence={{
+          value: "High",
+          detail: "Calculated from the saved birth chart; interpretation improves when fused with active timing engines.",
+        }}
+        metrics={[
+          { label: "Total Bindus", value: result.sarvaTotal, tone: result.sarvaTotal >= 337 ? "green" : "red" },
+          { label: "Strongest", value: `H${result.strongest.map(i => i + 1).join(",")}`, tone: "green" },
+          { label: "Weakest", value: `H${result.weakest.map(i => i + 1).join(",")}`, tone: "red" },
+        ]}
+      />
+      <EngineTrustPanel
+        confidence="High"
+        dataUsed={["Saved birth chart", "Planet positions", "House bindus", "Sarvashtakavarga", "Sodhya pinda"]}
+        caveat="Ashtakavarga measures delivery support. It does not replace promise, dasha, transit or real-world context."
+      />
       <PremiumFeature feature="Ashtakavarga Analysis">
 
       {/* HEADER */}
@@ -484,6 +501,6 @@ export default function AKVPage() {
       )}
 
       </PremiumFeature>
-    </div>
+    </EngineShell>
   );
 }

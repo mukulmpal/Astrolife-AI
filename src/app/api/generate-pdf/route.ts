@@ -50,6 +50,22 @@ async function launchBrowser() {
 
 type PdfRequestBody = { chart: ChartData; options: Partial<ReportOptions> };
 
+function reviveChartDates(chart: ChartData): ChartData {
+  return {
+    ...chart,
+    dashas: (chart.dashas ?? []).map((entry) => ({
+      ...entry,
+      start: entry.start instanceof Date ? entry.start : new Date(entry.start),
+      end: entry.end instanceof Date ? entry.end : new Date(entry.end),
+    })),
+    antardasha: (chart.antardasha ?? []).map((entry) => ({
+      ...entry,
+      start: entry.start instanceof Date ? entry.start : new Date(entry.start),
+      end: entry.end instanceof Date ? entry.end : new Date(entry.end),
+    })),
+  };
+}
+
 function validatePdfBody(value: unknown): ValidationResult<PdfRequestBody> {
   if (!isRecord(value)) return fail("PDF payload must be an object.");
   const chartResult = validateChartData(value.chart);
@@ -58,7 +74,7 @@ function validatePdfBody(value: unknown): ValidationResult<PdfRequestBody> {
   const options = rawOptions as Partial<ReportOptions>;
   const palmistrySessionId = optionalText(rawOptions.palmistrySessionId, 120);
   if (palmistrySessionId) options.palmistrySessionId = palmistrySessionId;
-  return ok({ chart: chartResult.data, options });
+  return ok({ chart: reviveChartDates(chartResult.data), options });
 }
 
 async function attachPalmistryFusion(options: Partial<ReportOptions>, userId?: string | null): Promise<Partial<ReportOptions>> {

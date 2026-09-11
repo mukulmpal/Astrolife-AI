@@ -2,7 +2,7 @@
 
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
+import { EngineIntro } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import {

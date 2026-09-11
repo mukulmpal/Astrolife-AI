@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult } from "@/lib/astro-engine/yogas";
 import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart } from "@/lib/user-chart";
@@ -7,6 +8,7 @@ import NorthIndianChart from "@/components/north-indian-chart";
 import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { createClient } from "@/lib/supabase/client";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -34,6 +36,7 @@ function ianaToUtcOffset(timezone: string | null, dob: string, tob: string): num
 }
 
 export default function KundliPage() {
+  const router = useRouter();
   const { tp, ts, tn } = useLanguage();
   const [form,      setForm]      = useState({name:"",dob:"",tob:"",city:"",lat:null as number | null,lon:null as number | null,tz:null as number | null});
   const [selectedCity, setSelectedCity] = useState<CitySearchResult | null>(null);
@@ -47,6 +50,43 @@ export default function KundliPage() {
   const [activeTab, setActiveTab] = useState("chart");
   const [showForm, setShowForm] = useState(true);
   const { chart: primaryChart, loading: chartLoading, hasUserChart } = useUserChart();
+
+  const saveChartToLibrary = async (data: ChartData) => {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      router.push("/login?next=/dashboard/kundli");
+      return false;
+    }
+
+    const response = await fetch("/api/charts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: data.name,
+        birth_date: data.dob,
+        birth_time: data.tob,
+        birth_place: data.city,
+        latitude: data.lat,
+        longitude: data.lon,
+        timezone: String(data.tz),
+        chart_payload: data,
+      }),
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null) as { error?: string } | null;
+      setSaveStatus(payload?.error ?? "Could not save chart. Check Supabase saved_charts migration.");
+      return false;
+    }
+
+    await refreshSavedCharts();
+    setSaveStatus("Chart saved to your account.");
+    return true;
+  };
 
   const applyChart = (data: ChartData) => {
     setChart(data);
@@ -114,8 +154,7 @@ export default function KundliPage() {
       );
       await saveChartToAccount(data);
       applyChart(data);
-      setSaveStatus("Chart saved as primary.");
-      await refreshSavedCharts();
+      setSaveStatus("Chart generated. Use Save Chart to store it in your account library.");
       // Track for admin
       await fetch("/api/charts/track", {
         method: "POST",
@@ -124,6 +163,17 @@ export default function KundliPage() {
       }).catch(() => {});
     } catch(e){ console.error(e); }
     setLoading(false);
+  };
+
+  const handleSaveCurrentChart = async () => {
+    if (!chart) return;
+    setLibraryLoading(true);
+    try {
+      await saveChartToAccount(chart, { replacePrimary: true });
+      await saveChartToLibrary(chart);
+    } finally {
+      setLibraryLoading(false);
+    }
   };
 
   const dignityColor = (d:string) => {
@@ -366,8 +416,8 @@ export default function KundliPage() {
                   <div style={{fontSize:10,color:"#605890",marginTop:2}}>YOGA SCORE</div>
                   <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:13,color:"#e8c060",marginTop:2}}>{yogaScore.rating}</div>
                 </div>
-                <button className="btn-save" onClick={refreshSavedCharts} disabled={libraryLoading}>
-                  {libraryLoading ? "⟳ Syncing..." : "💾 Saved"}
+                <button className="btn-save" onClick={handleSaveCurrentChart} disabled={libraryLoading}>
+                  {libraryLoading ? "⟳ Saving..." : "💾 Save Chart"}
                 </button>
               </div>
             </div>

@@ -3,11 +3,7 @@
 import { Aurora, StarField } from './celestial';
 import { BirthDetailsForm } from './birth-form';
 
-interface DirectionAHeroProps {
-  onGetStarted?: () => void;
-}
-
-export function DirectionAHero({ onGetStarted }: DirectionAHeroProps) {
+export function DirectionAHero() {
   return (
     <section
       className="dira-grain relative flex min-h-[100svh] items-center overflow-hidden px-6 pt-28 pb-16 md:px-10"

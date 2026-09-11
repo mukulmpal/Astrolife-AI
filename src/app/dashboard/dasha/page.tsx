@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
-import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import {
@@ -19,6 +17,8 @@ import {
 } from "@/lib/astro-engine/dasha";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { useLanguage } from "@/lib/language-context";
+import { EngineEmptyState } from "@/components/engine/engine-intro";
+import { EngineGuidanceGrid, EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
 import "@/app/dashboard/shared.css";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -166,41 +166,69 @@ export default function DashaPage() {
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ background: "#05020f" }}>
-        <p className="text-white/40 animate-pulse">Loading Dasha...</p>
+        <p className="text-slate-300 animate-pulse">Loading Dasha...</p>
       </main>
     );
   }
 
   if (!chart || !dashaTree) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ background: "#05020f" }}>
-        <p className="text-white/40">Birth chart required to calculate Dasha.</p>
-      </main>
+      <EngineEmptyState
+        engineName="Dasha Timeline"
+        engineIcon="⏳"
+        whatItAnalyzes={["Mahadasha", "Antardasha", "Pratyantardasha", "Birth nakshatra", "Timing context"]}
+      />
     );
   }
 
   const { current } = dashaTree;
 
   return (
-    <main
-      className="min-h-screen text-white"
-      style={{
-        padding: "32px 24px 110px",
-        background:
-          "radial-gradient(circle at top left, rgba(14,165,233,0.12), transparent 32%), radial-gradient(circle at top right, rgba(250,204,21,0.08), transparent 30%), #05020f",
-      }}
-    >
-      <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%" }} className="flex flex-col gap-6">
+    <EngineShell>
+      <div className="flex flex-col gap-6">
+        <EngineHeader
+          eyebrow="Vimshottari Timing Engine"
+          title="Dasha Timeline"
+          subtitle={`Birth Nakshatra: ${dashaTree.birthNakshatra.name} Pada ${dashaTree.birthNakshatra.pada} · Lord: ${dashaTree.birthNakshatra.lord}. See the active planetary periods shaping timing, decisions and life themes.`}
+          confidence={{
+            value: "High",
+            detail: "Uses the saved birth chart and Moon nakshatra; timing is interpretive, not deterministic.",
+          }}
+          metrics={[
+            { label: "Mahadasha", value: tp(current.mahadasha.lord), tone: "gold" },
+            { label: "Antardasha", value: tp(current.antardasha.lord), tone: "blue" },
+            { label: "Progress", value: `${pct(current.mahadasha)}%`, tone: "green" },
+          ]}
+        />
 
-        {/* Header */}
-        <section>
-          <p className="text-xs uppercase tracking-[0.2em] text-sky-300">Vimshottari Dasha</p>
-          <h1 className="text-3xl font-bold mt-1">Dasha Timeline</h1>
-          <p className="text-white/50 text-sm mt-1">
-            Birth Nakshatra: <span className="text-white/80 font-medium">{dashaTree.birthNakshatra.name}</span>
-            {" "}Pada {dashaTree.birthNakshatra.pada} · Lord: <span className="text-white/80 font-medium">{dashaTree.birthNakshatra.lord}</span>
-          </p>
-        </section>
+        <EngineTrustPanel
+          confidence="High"
+          dataUsed={["Saved birth chart", "Moon nakshatra", "Vimshottari sequence", "Current date", "Daily Panchang"]}
+          caveat="Dasha shows which planetary period is active. It should be fused with chart promise, transits, KP validation and real-life readiness before making major decisions."
+        />
+
+        <EngineGuidanceGrid
+          items={[
+            {
+              label: "Use This For",
+              title: "Timing Themes",
+              body: "Understand which life themes are active now and which planet is carrying the current chapter.",
+              tone: "green",
+            },
+            {
+              label: "Do Not Use For",
+              title: "Fixed Fate Claims",
+              body: "A dasha period is not a guaranteed event. It is a timing layer that needs validation from other engines.",
+              tone: "red",
+            },
+            {
+              label: "Best Pairing",
+              title: "Transit + KP",
+              body: "Use Transits for current activation and KP for event validation when a specific question matters.",
+              tone: "blue",
+            },
+          ]}
+        />
 
         {/* Current Active Periods */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -302,6 +330,6 @@ export default function DashaPage() {
 
       </div>
       <MobileBottomNav />
-    </main>
+    </EngineShell>
   );
 }

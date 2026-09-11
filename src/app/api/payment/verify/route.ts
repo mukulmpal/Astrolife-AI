@@ -108,11 +108,12 @@ export async function POST(req: NextRequest) {
 
     const { error: profileError } = await admin
       .from("profiles")
-      .update({
+      .upsert({
+        id: user.id,
+        name: user.user_metadata?.name ?? user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "AstroLife User",
         subscription_tier: plan,
         subscription_expires_at: expiresAt.toISOString(),
-      })
-      .eq("id", user.id);
+      }, { onConflict: "id" });
 
     if (profileError) throw profileError;
 

@@ -228,7 +228,7 @@ export default function ChatPage() {
       console.warn("Transit context failed:", error);
       return "";
     }
-  }, [chart]);
+  }, [chart, hasUserChart]);
   const dailyFeedContext = useMemo(() => {
     if (!chart) return "";
 

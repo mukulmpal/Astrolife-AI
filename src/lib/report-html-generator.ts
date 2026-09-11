@@ -45,6 +45,8 @@ import { calculateKarakas, calculateArudhas, calculateCharaDasha } from "./astro
 import { calculateKpReport } from "./astro-engine/kp";
 import { calculateSpecialLagnas } from "./astro-engine/special-lagnas";
 import { buildMarriageIntelligenceV2 } from "./astro-engine/marriage-intelligence-v2";
+import { scanMarriageWindows, type MonthlyMarriageWindow } from "./astro-engine/marriage-window-scanner";
+import { buildMangalDoshaInsight, type MangalDoshaInsight } from "./astro-engine/mangal-dosha-adapter";
 import { analyzeRelationshipIntelligence } from "./astro-engine/relationship-intelligence";
 import type { RelationshipInput } from "./astro-engine/relationship-intelligence";
 import { buildTransitRipplePayloadFromChart } from "./astro-engine/transit-ripple-v4";
@@ -58,6 +60,7 @@ import { calculateEventRadarReport } from "./astro-engine/event-radar";
 import { createAstroPalmFusion } from "./palmistry/fusion/astro-palm-fusion";
 import type { AstroLifeFusionContext, AstroPalmFusionOutput, FusionInsight } from "./palmistry/fusion/fusion-types";
 import type { PalmRuleReport } from "./palmistry/types";
+import { buildReportIntelligence, type NarrativeBlock } from "./report-intelligence";
 
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
@@ -123,7 +126,8 @@ export interface ReportEngineContext {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function esc(s: string): string {
+function esc(value: unknown): string {
+  const s = value == null ? "" : typeof value === "string" ? value : String(value);
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
@@ -590,17 +594,17 @@ body {
 }
 
 .toc-row {
-  display:grid; grid-template-columns:36px 1fr auto 36px;
-  align-items:baseline; gap:14px; padding:9px 0; border-bottom:1px dashed var(--line);
+  display:grid; grid-template-columns:30px 1fr auto 34px;
+  align-items:baseline; gap:12px; padding:6px 0; border-bottom:1px dashed var(--line);
 }
-.toc-row .num   { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); letter-spacing:0.1em; }
-.toc-row .title { font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--ivory); font-weight:500; }
-.toc-row .meta  { font-family:'Inter',sans-serif; font-size:11px; color:var(--ivory-mute); letter-spacing:0.06em; }
-.toc-row .pg    { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--gold-bright); text-align:right; }
+.toc-row .num   { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--gold); letter-spacing:0.08em; }
+.toc-row .title { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--ivory); font-weight:500; line-height:1.08; }
+.toc-row .meta  { font-family:'Inter',sans-serif; font-size:9.5px; line-height:1.28; color:var(--ivory-mute); letter-spacing:0.04em; }
+.toc-row .pg    { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--gold-bright); text-align:right; }
 
-.toc-part-heading { display:flex; align-items:baseline; gap:14px; margin:22px 0 10px; }
-.toc-part-heading .part-no   { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.24em; color:var(--gold); text-transform:uppercase; }
-.toc-part-heading .part-name { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:22px; color:var(--gold-bright); }
+.toc-part-heading { display:flex; align-items:baseline; gap:12px; margin:15px 0 7px; }
+.toc-part-heading .part-no   { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; }
+.toc-part-heading .part-name { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; color:var(--gold-bright); }
 
 .al-wordmark { font-family:'Cormorant Garamond',serif; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; }
 .cover-wordmark { font-family:'Cormorant Garamond',serif; font-weight:300; letter-spacing:0.42em; text-transform:uppercase; font-size:14px; color:var(--gold); }
@@ -666,7 +670,21 @@ function pageFoot(left: string, right: string): string {
 
 // ── Page 1: Cover – Wheel ─────────────────────────────────────────────────
 
-function page1Wheel(chart: ChartData): string {
+function reportEditionLabel(type: ReportType): string {
+  const labels: Record<ReportType, string> = {
+    basic: "Basic",
+    premium: "Premium",
+    elite: "Elite",
+    full: "Premium",
+    kundli: "Kundli",
+    remedy: "Remedy",
+    medical: "Health & Vitality",
+    destiny: "Destiny",
+  };
+  return labels[type] ?? "Premium";
+}
+
+function page1Wheel(chart: ChartData, editionLabel: string): string {
   const sunSign  = chart.planets["Sun"]?.sign  ?? "";
   const moonSign = chart.planets["Moon"]?.sign ?? "";
   const sunGlyph  = SIGN_GLYPH[sunSign]  ?? "";
@@ -767,7 +785,7 @@ function page1Wheel(chart: ChartData): string {
     </div>
     <div style="text-align:right;">
       <div class="kicker" style="margin-bottom:6px;">Edition</div>
-      <div class="serif-italic" style="font-size:16px;color:var(--gold-bright);">Premium</div>
+      <div class="serif-italic" style="font-size:16px;color:var(--gold-bright);">${esc(editionLabel)}</div>
       <div class="mono" style="font-size:10.5px;color:var(--gold);margin-top:2px;">AL · 2026</div>
     </div>
   </div>
@@ -776,7 +794,7 @@ function page1Wheel(chart: ChartData): string {
 
 // ── Page 1B: Cover – Lagna Lord ───────────────────────────────────────────
 
-function page1LagnaLord(chart: ChartData): string {
+function page1LagnaLord(chart: ChartData, editionLabel: string): string {
   const lagnaLord = SIGN_RULER[chart.lagnaRashi] ?? "Jupiter";
   const llPlanet = chart.planets[lagnaLord];
   const llSign = llPlanet?.sign ?? "";
@@ -786,7 +804,6 @@ function page1LagnaLord(chart: ChartData): string {
   const deity = TUTELARY_DEITY[lagnaLord] ?? TUTELARY_DEITY["Jupiter"];
   const mantra = BEEJ_MANTRA[lagnaLord] ?? "";
   const mantraRoman = BEEJ_ROMAN[lagnaLord] ?? "";
-  const firstName = esc(capitalize(chart.name.split(" ")[0]));
 
   const weekdayMap: Record<string, string> = {
     Sun:"Sundays", Moon:"Mondays", Mars:"Tuesdays", Mercury:"Wednesdays",
@@ -949,30 +966,28 @@ function page1LagnaLord(chart: ChartData): string {
     </div>
     <div style="text-align:right;">
       <div class="kicker" style="margin-bottom:4px;">Edition</div>
-      <div class="serif-italic" style="font-size:16px;color:var(--gold-bright);">Premium</div>
+      <div class="serif-italic" style="font-size:16px;color:var(--gold-bright);">${esc(editionLabel)}</div>
       <div class="body-s mono" style="font-size:10.5px;color:var(--gold);margin-top:2px;">AL · 2026</div>
     </div>
   </div>
 
-  <div style="display:none">${firstName}</div>
 </section>`;
 }
 
 // ── Page 2: Welcome Letter ────────────────────────────────────────────────
 
-function page2Welcome(chart: ChartData): string {
-  const firstName = esc(capitalize(chart.name.split(" ")[0]));
+function page2Welcome(): string {
   return `<section class="page cream">
   ${pageRail("A Letter from Your Astrologer", "2", true)}
 
   <div style="flex:1;padding-top:36px;">
     <div class="eyebrow" style="margin-bottom:14px;">Welcome</div>
-    <div class="display-m" style="color:#1A1F3A;margin-bottom:24px;">Dear ${firstName},</div>
+    <div class="display-m" style="color:#1A1F3A;margin-bottom:24px;">A Personal Reading Note</div>
 
     <div class="foreword-col dropcap body" style="font-size:14px;line-height:1.72;">
       <p>What you hold in your hands — or rather, what is being rendered before your eyes — is not a prediction. It is a mirror. A mirror fashioned from the precise positions of nine planets at the exact moment you drew your first breath, on the meridian of the city that witnessed your arrival into this world.</p>
       <p>Vedic astrology, the <em>Jyotish</em> tradition, is one of the six auxiliary limbs of the Vedas — the <em>Vedangas</em>. It is often translated as "the eye of the Vedas." Its purpose has never been to frighten or flatter. Its purpose is to illuminate — to bring the unseen patterns of a life into the light of awareness, where they can be understood, worked with, and, where necessary, consciously redirected.</p>
-      <p>Your chart is entirely unique. Among all seven billion people alive today, no two share the same planetary positions, ascendant, and birthplace. This report has been generated from your personal data: ${esc(capitalize(chart.name))}, born on ${esc(chart.dob)} at ${esc(chart.tob)} in ${esc(chart.city)}.</p>
+      <p>Your chart is entirely unique. Among all seven billion people alive today, no two share the same planetary positions, ascendant, and birthplace. This report uses the birth details shown on the cover as its calculation base. The name, date, time and place are used only to calculate chart factors and personalize the reading context.</p>
       <p>The pages that follow move through your chart in layers — from the foundational birth snapshot and planetary positions, through the unfolding time map of Vimshottari Dasha, into the more intimate territories of psychological patterns, karmic debts, environmental omens, and the remedies that tradition prescribes to ease difficulty and amplify grace.</p>
       <p>A word of caution and encouragement in equal measure: astrology is a language of probability and tendency, not of certainty. The planets incline; they do not compel. Your awareness, your choices, and your consistent effort remain the sovereign forces in your life. This report is a sophisticated navigational tool — not a sentence.</p>
       <p>Read slowly. Return to these pages at different seasons of your life. You will find that what seems abstract today becomes vivid and personal as time unfolds. That is the nature of Jyotish: it is most fully understood in retrospect, and most powerfully used in the present.</p>
@@ -1017,47 +1032,910 @@ function page3Foreword(): string {
 
 // ── Page 4: Table of Contents ─────────────────────────────────────────────
 
-function page4TOC(): string {
+function page4TOC(type: ReportType, include: {
+  intelligenceScoreboardV4: boolean;
+  narrativeDigestsV4: boolean;
+  lifePatternV4: boolean;
+  lifeChaptersV4: boolean;
+  lifeMissionV4: boolean;
+  karmicV4: boolean;
+  opportunityV4: boolean;
+  eventRemedyV4: boolean;
+  advisorV4: boolean;
+  confidenceMethodologyV4: boolean;
+  next90DaysV4: boolean;
+  perPlanet: boolean;
+  perHouse: boolean;
+  doshas: boolean;
+  shadbala: boolean;
+  divisional: boolean;
+  dasha: boolean;
+  ashtakavarga: boolean;
+  lalkitab: boolean;
+  remedies: boolean;
+  transitRadar: boolean;
+  jaimini: boolean;
+  vastu: boolean;
+  sarvatobhadra: boolean;
+  kp: boolean;
+  transitRipple: boolean;
+  marriageTimingFusion: boolean;
+  marriageIntel: boolean;
+  relationshipIntel: boolean;
+  astroSound: boolean;
+  gemstone: boolean;
+  eliteSynthesis: boolean;
+  palmistryFusion: boolean;
+  astrologerReview: boolean;
+}): string {
+  const edition = reportEditionLabel(type);
+  const strategicRows = [
+    { title: "Destiny Snapshot", meta: "Executive summary, key scores and fused life themes", show: true },
+    { title: "Universal Scoreboard", meta: "Career, wealth, relationship, vitality and spiritual scores", show: include.intelligenceScoreboardV4 },
+    { title: "Life Pattern Decoder", meta: "Dominant patterns, confidence, reasoning and actions", show: include.lifePatternV4 },
+    { title: "Life Chapters", meta: "Age-wise phases, momentum and practical guidance", show: include.lifeChaptersV4 },
+    { title: "Intelligence Digests", meta: "Concise narrative pages for major life domains", show: include.narrativeDigestsV4 },
+    { title: "Life Mission & Opportunity", meta: "Purpose, career, wealth and foreign opportunity signals", show: include.lifeMissionV4 || include.opportunityV4 },
+    { title: "Why This Report Says This", meta: "Confidence method, evidence logic and score reasoning", show: include.confidenceMethodologyV4 },
+    { title: "Next 90 Days Action Plan", meta: "Decision plan, careful choices and practical timing", show: include.next90DaysV4 },
+  ].filter((row) => row.show);
+  const chartRows = [
+    { title: "Birth Snapshot", meta: "Core chart, lagna, planets and calculation base", show: true },
+    { title: "Planetary Dashboard", meta: "Graha strength, dignity and house activation", show: true },
+    { title: "Planet & House Deep Dive", meta: "Detailed interpretation for grahas and bhavas", show: include.perPlanet || include.perHouse },
+    { title: "Yogas, Doshas & Shadbala", meta: "Combinations, caution zones and strength logic", show: include.doshas || include.shadbala },
+    { title: "Divisional & Ashtakavarga", meta: "D9/D10 and bindu-based support signals", show: include.divisional || include.ashtakavarga },
+    { title: "Dasha & Antardasha", meta: "Timing periods, current phase and future windows", show: include.dasha },
+  ].filter((row) => row.show);
+  const premiumRows = [
+    { title: "Lal Kitab & Remedies", meta: "Planet-wise practical remedies and behavior corrections", show: include.lalkitab || include.remedies },
+    { title: "Transit & Event Radar", meta: "Moon-first timing, ripple view and upcoming patterns", show: include.transitRadar || include.transitRipple },
+    { title: "Jaimini, KP & Sarvatobhadra", meta: "Technical engines translated into plain guidance", show: include.jaimini || include.kp || include.sarvatobhadra },
+    { title: "Vastu, AstroSound & Gemstone", meta: "Environment, sound protocol and supportive recommendations", show: include.vastu || include.astroSound || include.gemstone },
+    { title: "Marriage & Relationship", meta: "Readiness windows, Mangal context and emotional blueprint", show: include.marriageTimingFusion || include.marriageIntel || include.relationshipIntel },
+    { title: "AstroLife AI Advisor", meta: "Final synthesis, next steps and careful guidance", show: include.advisorV4 },
+  ].filter((row) => row.show);
+  const eliteRows = [
+    { title: "Elite Synthesis", meta: "Premium cross-engine intelligence and final score", show: include.eliteSynthesis },
+    { title: "Palmistry Fusion", meta: "Palm + Kundli + Dasha + Numerology alignment", show: include.palmistryFusion },
+    { title: "Real Astrologer Review", meta: "Elite handoff page for expert consultation", show: include.astrologerReview },
+  ].filter((row) => row.show);
+  const enginePartName: Record<ReportType, string> = {
+    basic: "Guidance Layer",
+    premium: "Premium Engines",
+    elite: "Premium Engines",
+    full: "Premium Engines",
+    kundli: "Kundli Engines",
+    remedy: "Remedy Guidance",
+    medical: "Health Guidance",
+    destiny: "Timing Engines",
+  };
+  const renderRows = (rows: typeof strategicRows, start: number) =>
+    rows.map((row, index) => `<div class="toc-row"><span class="num">${start + index}</span><div><div class="title">${esc(row.title)}</div><div class="meta">${esc(row.meta)}</div></div><div></div><span class="pg">Section</span></div>`).join("");
+
   return `<section class="page">
   <div class="starfield"></div>
   <div class="glow-br"></div>
   ${pageRail("Contents", "4")}
 
   <div style="position:relative;z-index:2;padding-top:22px;flex:1;display:flex;flex-direction:column;">
-    <div class="eyebrow" style="margin-bottom:10px;">Twelve Chapters</div>
+    <div class="eyebrow" style="margin-bottom:10px;">${esc(edition)} Report Map</div>
     <div class="display-l" style="line-height:1;color:var(--ivory);">Contents.</div>
     <hr class="hairline gold" style="margin-top:14px;"/>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 30px;margin-top:14px;flex:1;font-size:13px;">
       <div>
-        <div class="toc-part-heading"><span class="part-no">Part 1</span><span class="part-name">The Chart</span></div>
-        <div class="toc-row"><span class="num">1</span><div><div class="title">Birth Snapshot</div><div class="meta">Four pillars · North Indian chart</div></div><div></div><span class="pg">5</span></div>
-        <div class="toc-row"><span class="num">2</span><div><div class="title">Planetary Dashboard</div><div class="meta">Nine grahas · Shadbala proxy · Dignity</div></div><div></div><span class="pg">6</span></div>
-        <div class="toc-row"><span class="num">3</span><div><div class="title">Yogas</div><div class="meta">Special combinations &amp; rajayoga</div></div><div></div><span class="pg">7</span></div>
-        <div class="toc-row"><span class="num">4</span><div><div class="title">Doshas</div><div class="meta">Karmic disturbances · remedies</div></div><div></div><span class="pg">8</span></div>
-        <div class="toc-row"><span class="num">5</span><div><div class="title">Shadbala</div><div class="meta">Six-fold strength · all planets</div></div><div></div><span class="pg">9</span></div>
-        <div class="toc-row"><span class="num">6</span><div><div class="title">Divisional Charts</div><div class="meta">D9 Navamsa · D10 Dashamsha</div></div><div></div><span class="pg">10</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 1</span><span class="part-name">Intelligence Layer</span></div>
+        ${renderRows(strategicRows, 1)}
 
-        <div class="toc-part-heading"><span class="part-no">Part 2</span><span class="part-name">Time &amp; Mind</span></div>
-        <div class="toc-row"><span class="num">7</span><div><div class="title">Vimshottari Dasha</div><div class="meta">Current period interpretation</div></div><div></div><span class="pg">11</span></div>
-        <div class="toc-row"><span class="num">8</span><div><div class="title">Upcoming Mahadashas</div><div class="meta">Next periods · forecasts</div></div><div></div><span class="pg">13</span></div>
-        <div class="toc-row"><span class="num">9</span><div><div class="title">Birth Nakshatra</div><div class="meta">Janma nakshatra deep dive</div></div><div></div><span class="pg">14</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 2</span><span class="part-name">Chart Foundation</span></div>
+        ${renderRows(chartRows, strategicRows.length + 1)}
       </div>
       <div>
-        <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">Life Areas</span></div>
-        <div class="toc-row"><span class="num">10</span><div><div class="title">Psychology</div><div class="meta">Mind pattern · shadow work</div></div><div></div><span class="pg">15</span></div>
-        <div class="toc-row"><span class="num">11</span><div><div class="title">Numerology</div><div class="meta">Life path · destiny · soul urge</div></div><div></div><span class="pg">16</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">${esc(enginePartName[type] ?? "Report Engines")}</span></div>
+        ${renderRows(premiumRows, strategicRows.length + chartRows.length + 1)}
 
-        <div class="toc-part-heading"><span class="part-no">Part 4</span><span class="part-name">Remedy &amp; Closing</span></div>
-        <div class="toc-row"><span class="num">12</span><div><div class="title">Remedies</div><div class="meta">Mantras · Gems · Practices</div></div><div></div><span class="pg">17</span></div>
-        <div class="toc-row"><span class="num">13</span><div><div class="title">Closing</div><div class="meta">A final reflection</div></div><div></div><span class="pg">18</span></div>
-        <div class="toc-row"><span class="num">14</span><div><div class="title">Engine Ledger</div><div class="meta">Data modules used in this report</div></div><div></div><span class="pg">19</span></div>
+        ${eliteRows.length ? `<div class="toc-part-heading"><span class="part-no">Part 4</span><span class="part-name">Elite Layer</span></div>${renderRows(eliteRows, strategicRows.length + chartRows.length + premiumRows.length + 1)}` : ""}
+
+        <div class="toc-part-heading"><span class="part-no">${eliteRows.length ? "Part 5" : "Part 4"}</span><span class="part-name">Closing</span></div>
+        <div class="toc-row"><span class="num">✓</span><div><div class="title">Closing Reflection</div><div class="meta">A final synthesis written for practical use</div></div><div></div><span class="pg">End</span></div>
+        <div class="toc-row"><span class="num">✓</span><div><div class="title">Engine Ledger</div><div class="meta">Transparent list of report modules and coverage</div></div><div></div><span class="pg">End</span></div>
       </div>
     </div>
   </div>
 
   ${pageFoot("astrolife · cosmic blueprint", "Contents")}
 </section>`;
+}
+
+function scoreColor(score: number): string {
+  if (score >= 85) return "var(--jade)";
+  if (score >= 72) return "var(--gold)";
+  if (score >= 55) return "var(--saffron)";
+  return "var(--crimson)";
+}
+
+function clampReportScore(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function mangalReadinessAdjustment(insight: MangalDoshaInsight) {
+  const { result } = insight;
+  const notes: string[] = [];
+  let adjustment = 0;
+
+  if (result.scores.natalSeverity >= 75) {
+    adjustment -= 10;
+    notes.push("Severe multi-factor Mars pressure asks for slower commitment decisions.");
+  } else if (result.scores.natalSeverity >= 60) {
+    adjustment -= 7;
+    notes.push("Strong Manglik pattern reduces impulsive marriage-window confidence.");
+  } else if (result.scores.natalSeverity >= 45) {
+    adjustment -= 4;
+    notes.push("Moderate Mars relationship pressure asks for compatibility confirmation.");
+  } else if (result.scores.natalSeverity <= 20) {
+    adjustment += 2;
+    notes.push("Low Manglik severity does not materially obstruct timing confidence.");
+  }
+
+  if (result.scores.protection >= 35) {
+    adjustment += 4;
+    notes.push("Protection factors are present, so Mars pressure should be interpreted with balance.");
+  }
+  if ((result.scores.activation ?? 0) >= 60) {
+    adjustment -= 4;
+    notes.push(`Current activation is ${result.activationLabel}; avoid rushing relationship decisions.`);
+  }
+  if (result.scores.constructivePotential >= 70) {
+    adjustment += 2;
+    notes.push("Constructive Mars can support decisive action when communication is mature.");
+  }
+
+  const label = adjustment >= 4
+    ? "Supportive Mars readiness"
+    : adjustment >= 0
+      ? "Manageable Mars readiness"
+      : adjustment >= -6
+        ? "Caution Mars readiness"
+        : "High Mars caution";
+
+  return {
+    adjustment,
+    label,
+    score: clampReportScore(50 + adjustment * 3),
+    notes: notes.slice(0, 4),
+  };
+}
+
+function marriageWindowUseCase(window: MonthlyMarriageWindow): string {
+  if (window.verdict === "very_strong" || window.verdict === "strong") {
+    return "Best used for serious family discussion, commitment planning, engagement or structured next steps.";
+  }
+  if (window.verdict === "moderate") {
+    return "Best used for meeting families, clarifying expectations and testing practical readiness.";
+  }
+  if (window.verdict === "possible") {
+    return "Possible but not automatic; use it for discussion and preparation rather than pressure.";
+  }
+  return "Weak readiness month; avoid forcing decisions unless practical circumstances are already stable.";
+}
+
+function renderScoreTiles(scores: ReturnType<typeof buildReportIntelligence>["scores"], limit = 8): string {
+  return scores.slice(0, limit).map((item) => `
+    <div class="card" style="padding:12px 14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;">
+        <div class="kicker" style="font-size:8px;color:var(--ivory-mute);">${esc(item.label)}</div>
+        <div class="mono" style="font-size:10px;color:${scoreColor(item.score)};">${esc(item.tone)}</div>
+      </div>
+      <div style="font-size:34px;line-height:1;font-weight:800;color:${scoreColor(item.score)};">${item.score}</div>
+      <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin:10px 0 8px;">
+        <div style="width:${item.score}%;height:100%;background:${scoreColor(item.score)};"></div>
+      </div>
+      <div class="body-s" style="font-size:9.5px;line-height:1.45;color:var(--ivory-dim);">${esc(item.action)}</div>
+    </div>
+  `).join("");
+}
+
+function renderFusedPatternCards(patterns: ReturnType<typeof buildReportIntelligence>["patterns"], limit = 3): string {
+  return patterns.slice(0, limit).map((pattern) => `
+    <div class="card" style="padding:12px;border-left:3px solid ${scoreColor(pattern.strength)};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">
+        <div class="kicker" style="color:${scoreColor(pattern.strength)};">${esc(pattern.title)}</div>
+        <div class="mono" style="font-size:10px;color:var(--ivory-mute);">${pattern.confidence}% conf</div>
+      </div>
+      <div style="font-size:28px;line-height:1;font-weight:800;color:${scoreColor(pattern.strength)};margin-bottom:7px;">${pattern.strength}</div>
+      <div class="body-s" style="font-size:9.5px;line-height:1.5;color:var(--ivory-dim);">${esc(pattern.reason[0] ?? pattern.narrativeSeed.observation)}</div>
+      <div class="body-s" style="font-size:9px;line-height:1.45;color:var(--gold);margin-top:7px;">${esc(pattern.actions[0] ?? pattern.narrativeSeed.advice)}</div>
+    </div>
+  `).join("");
+}
+
+function scoreBlockEntries(scoreBlock: ReturnType<typeof buildReportIntelligence>["scoreBlock"]) {
+  return [
+    { key: "career", label: "Career", value: scoreBlock.career, note: "Authority, visibility and professional direction" },
+    { key: "wealth", label: "Wealth", value: scoreBlock.wealth, note: "Assets, income systems and money discipline" },
+    { key: "relationship", label: "Relationship", value: scoreBlock.relationship, note: "Commitment, reciprocity and emotional maturity" },
+    { key: "foreign", label: "Foreign", value: scoreBlock.foreign, note: "Travel, global reach and cross-border opportunity" },
+    { key: "leadership", label: "Leadership", value: scoreBlock.leadership, note: "Responsibility, standards and earned authority" },
+    { key: "spirituality", label: "Spirituality", value: scoreBlock.spirituality, note: "Reflection, detachment and inner growth" },
+    { key: "business", label: "Business", value: scoreBlock.business, note: "Commercial clarity and scalable value" },
+    { key: "vitality", label: "Vitality", value: scoreBlock.vitality, note: "Rhythm, recovery and sustainable pace" },
+    { key: "emotional", label: "Emotional Resilience", value: scoreBlock.emotionalResilience, note: "Sensitivity, boundaries and decision calm" },
+  ];
+}
+
+function pageIntelligenceScoreboardV4(intel: ReturnType<typeof buildReportIntelligence>): string {
+  const scores = scoreBlockEntries(intel.scoreBlock);
+  const strongest = [...scores].sort((a, b) => b.value - a.value)[0];
+  const watch = [...scores].sort((a, b) => a.value - b.value)[0];
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail("Universal Intelligence Scoreboard", "US")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">AI</span>
+        <h2>Universal Intelligence Scoreboard</h2>
+      </div>
+      <div class="body" style="max-width:740px;line-height:1.65;color:var(--ivory-dim);margin-bottom:14px;">
+        This page merges universal insights, fused life patterns and existing engine evidence into one score layer. It is designed to show where the report is strongest, where caution is needed and which direction deserves focused action.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="card gold-edge" style="padding:16px;border-left:3px solid ${scoreColor(strongest.value)};">
+          <div class="kicker" style="color:${scoreColor(strongest.value)};margin-bottom:6px;">Strongest Growth Pillar</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ivory);line-height:1.15;">${esc(strongest.label)} · ${strongest.value}/100</div>
+          <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);margin-top:6px;">${esc(strongest.note)}</div>
+        </div>
+        <div class="card" style="padding:16px;border-left:3px solid ${scoreColor(watch.value)};">
+          <div class="kicker" style="color:${scoreColor(watch.value)};margin-bottom:6px;">Watch Area</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ivory);line-height:1.15;">${esc(watch.label)} · ${watch.value}/100</div>
+          <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);margin-top:6px;">${esc(watch.note)}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        ${scores.map((item) => `<div class="card" style="padding:12px;">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px;">
+            <div class="kicker" style="color:var(--ivory-mute);">${esc(item.label)}</div>
+            <div class="mono" style="font-size:11px;color:${scoreColor(item.value)};">${item.value}</div>
+          </div>
+          <div style="height:6px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,0.07);margin-bottom:7px;">
+            <div style="height:100%;width:${item.value}%;background:${scoreColor(item.value)};"></div>
+          </div>
+          <div class="body-s" style="font-size:9.5px;line-height:1.45;color:var(--ivory-dim);">${esc(item.note)}</div>
+        </div>`).join("")}
+      </div>
+      <div class="card" style="padding:14px;margin-top:auto;">
+        <div class="kicker" style="color:var(--gold);margin-bottom:7px;">Final Score Logic</div>
+        <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);">
+          Scores are not isolated planet claims. They are normalized from mapped insights, pattern fusion and confidence-weighted evidence. This is the layer that turns separate astrology engines into one readable intelligence system.
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · universal scoring", "Scoreboard")}
+  </section>`;
+}
+
+function renderEvidenceList(items: string[]): string {
+  const clean = items.filter(Boolean);
+  if (!clean.length) {
+    return `<div class="body-s" style="line-height:1.45;color:var(--ivory-mute);">No single engine dominates this section. The guidance is based on blended chart context and should be read as a lower-confidence synthesis.</div>`;
+  }
+  return clean.slice(0, 4).map((item) => `
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;">
+      <span style="color:var(--gold);font-size:10px;margin-top:2px;">◆</span>
+      <span class="body-s" style="line-height:1.45;color:var(--ivory-dim);">${esc(item)}</span>
+    </div>
+  `).join("");
+}
+
+function renderActionList(items: string[]): string {
+  const clean = items.filter(Boolean);
+  if (!clean.length) {
+    return `<div class="body-s" style="line-height:1.55;color:var(--ivory-mute);">Keep this area under monthly review. Act only when timing, readiness and practical evidence agree.</div>`;
+  }
+  return clean.slice(0, 4).map((item, index) => `
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:${index === 0 ? "0" : "1px solid var(--line)"};">
+      <span class="mono" style="font-size:10px;color:var(--gold);min-width:20px;">0${index + 1}</span>
+      <span class="body-s" style="line-height:1.55;color:var(--ivory-dim);">${esc(item)}</span>
+    </div>
+  `).join("");
+}
+
+function activeDashaLabel(chart: ChartData): string {
+  const md = chart.dashas.find((d) => d.active) ?? chart.dashas[0];
+  const ad = chart.antardasha.find((d) => d.active) ?? chart.antardasha[0];
+  return `${md?.planet ?? "Current"} Mahadasha · ${ad?.planet ?? "Active"} Antardasha`;
+}
+
+function chartSignatureBullets(chart: ChartData): string[] {
+  const lagnaLord = SIGN_RULER[chart.lagnaRashi] ?? "Lagna lord";
+  const lagnaLordData = chart.planets[lagnaLord];
+  const sun = chart.planets.Sun;
+  const moon = chart.planets.Moon;
+  const venus = chart.planets.Venus;
+  const saturn = chart.planets.Saturn;
+  return [
+    `${chart.lagnaRashi} Lagna makes ${lagnaLord} a primary operating planet${lagnaLordData ? `, placed in H${lagnaLordData.house} ${lagnaLordData.sign}` : ""}.`,
+    sun ? `Sun in H${sun.house} ${sun.sign} shows where identity and visibility seek expression.` : "",
+    moon ? `Moon in H${moon.house} ${moon.sign} shows the emotional rhythm behind decisions.` : "",
+    venus ? `Venus in H${venus.house} ${venus.sign} colors relationship, aesthetics and value exchange.` : "",
+    saturn ? `Saturn in H${saturn.house} ${saturn.sign} shows the maturity lesson and long-term pressure point.` : "",
+    activeDashaLabel(chart),
+  ].filter(Boolean);
+}
+
+function planetPlacement(chart: ChartData, planet: string) {
+  const data = chart.planets[planet];
+  if (!data) return `${planet} placement unavailable`;
+  return `${planet} in H${data.house} ${data.sign}`;
+}
+
+function personalizedDomainSignals(chart: ChartData, sectionId: string): Array<{ label: string; value: string; note: string }> {
+  const lower = sectionId.toLowerCase();
+  const lagnaLord = SIGN_RULER[chart.lagnaRashi] ?? "Jupiter";
+  const active = activeDashaLabel(chart);
+
+  if (lower.includes("career") || lower.includes("business")) {
+    return [
+      { label: "Career Houses", value: `${planetPlacement(chart, "Sun")} · ${planetPlacement(chart, "Mercury")}`, note: "Shows where visibility, skill, communication and professional identity are asking to mature." },
+      { label: "Execution Planet", value: planetPlacement(chart, "Saturn"), note: "Saturn shows the work standard, delayed rewards and the discipline required for authority." },
+      { label: "Active Timing", value: active, note: "The report reads this section through current dasha activation, not a generic career template." },
+    ];
+  }
+
+  if (lower.includes("wealth") || lower.includes("money")) {
+    return [
+      { label: "Value Exchange", value: `${planetPlacement(chart, "Jupiter")} · ${planetPlacement(chart, "Venus")}`, note: "Jupiter and Venus show prosperity style, advisory value, assets and comfort patterns." },
+      { label: "Commercial Skill", value: planetPlacement(chart, "Mercury"), note: "Mercury shows how money improves through trade, language, calculation, systems or client communication." },
+      { label: "Timing Lens", value: active, note: "Wealth advice is weighted by the current Mahadasha and Antardasha rather than luck claims." },
+    ];
+  }
+
+  if (lower.includes("relationship") || lower.includes("marriage") || lower.includes("love")) {
+    return [
+      { label: "Relationship Signature", value: `${planetPlacement(chart, "Venus")} · ${planetPlacement(chart, "Moon")}`, note: "Venus shows affection and values; Moon shows emotional rhythm and attachment style." },
+      { label: "Maturity Lesson", value: planetPlacement(chart, "Saturn"), note: "Saturn indicates where patience, boundaries and long-term responsibility enter partnership." },
+      { label: "Current Lens", value: active, note: "The relationship reading changes in tone when the active dasha changes." },
+    ];
+  }
+
+  if (lower.includes("foreign") || lower.includes("travel")) {
+    return [
+      { label: "Movement Axis", value: `${planetPlacement(chart, "Rahu")} · ${planetPlacement(chart, "Moon")}`, note: "Rahu and Moon help separate real mobility potential from temporary restlessness." },
+      { label: "Purpose Route", value: planetPlacement(chart, "Jupiter"), note: "Jupiter shows whether foreign links grow through education, guidance, networks or opportunity." },
+      { label: "Timing Lens", value: active, note: "Foreign movement is strongest when natal promise and timing agree." },
+    ];
+  }
+
+  if (lower.includes("spiritual") || lower.includes("karma")) {
+    return [
+      { label: "Karmic Axis", value: `${planetPlacement(chart, "Rahu")} · ${planetPlacement(chart, "Ketu")}`, note: "Rahu shows the growth edge; Ketu shows old mastery, detachment or avoidance patterns." },
+      { label: "Wisdom Channel", value: planetPlacement(chart, "Jupiter"), note: "Jupiter shows how learning, guidance and inner belief become practical wisdom." },
+      { label: "Active Lesson", value: active, note: "The current dasha shows which part of the karmic pattern is currently loudest." },
+    ];
+  }
+
+  if (lower.includes("vitality") || lower.includes("health")) {
+    return [
+      { label: "Energy Pattern", value: `${planetPlacement(chart, "Mars")} · ${planetPlacement(chart, "Moon")}`, note: "Mars shows drive; Moon shows recovery rhythm. This is wellness guidance, not disease diagnosis." },
+      { label: "Discipline Pattern", value: planetPlacement(chart, "Saturn"), note: "Saturn indicates where routine, sleep, patience and structure protect performance." },
+      { label: "Current Lens", value: active, note: "Vitality advice is safest when it is practical, low-risk and timing-aware." },
+    ];
+  }
+
+  return [
+    { label: "Lagna Operating System", value: `${chart.lagnaRashi} Lagna · ${planetPlacement(chart, lagnaLord)}`, note: "The Lagna and its lord anchor how the whole report personalizes guidance." },
+    { label: "Mind And Identity", value: `${planetPlacement(chart, "Moon")} · ${planetPlacement(chart, "Sun")}`, note: "Moon and Sun show the difference between inner rhythm and outward identity." },
+    { label: "Active Timing", value: active, note: "The reading is weighted by current dasha, not only static natal placement." },
+  ];
+}
+
+function renderPersonalizationPanel(chart: ChartData, sectionId: string): string {
+  const signals = personalizedDomainSignals(chart, sectionId);
+  return `<div class="card" style="padding:14px;border-left:3px solid var(--gold);background:rgba(201,169,97,0.055);">
+    <div class="kicker" style="color:var(--gold);margin-bottom:8px;">Personalized Chart Logic</div>
+    ${signals.map((signal) => `<div style="padding:7px 0;border-top:1px solid var(--line);">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+        <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">${esc(signal.label)}</div>
+        <div class="mono" style="font-size:9px;color:var(--saffron);text-align:right;max-width:58%;">${esc(signal.value)}</div>
+      </div>
+      <div class="body-s" style="font-size:9.5px;line-height:1.45;color:var(--ivory-dim);margin-top:3px;">${esc(signal.note)}</div>
+    </div>`).join("")}
+  </div>`;
+}
+
+function pageDestinySnapshotV4(chart: ChartData, intel = buildReportIntelligence(chart)): string {
+  const topScores = [...intel.scores].sort((a, b) => b.score - a.score).slice(0, 3);
+  const fusedPatterns = renderFusedPatternCards(intel.patterns, 3);
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail("Destiny Snapshot · Personal OS", "DS")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">V4</span>
+        <h2>Destiny Snapshot</h2>
+      </div>
+      <div class="card gold-edge" style="padding:18px 20px;margin-bottom:14px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Who am I? · Executive Summary</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;line-height:1.25;color:var(--ivory);">${esc(intel.executiveSummary)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+        ${renderScoreTiles(intel.scores, 8)}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        ${topScores.map((item) => `<div class="card" style="padding:12px;border-left:3px solid ${scoreColor(item.score)};">
+          <div class="kicker" style="color:${scoreColor(item.score)};margin-bottom:5px;">Top Pillar · ${esc(item.label)}</div>
+          <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);">${esc(item.interpretation)}</div>
+          <div class="kicker" style="color:var(--gold);margin:9px 0 4px;">Why this score</div>
+          <div class="body-s" style="font-size:9.5px;line-height:1.45;color:var(--ivory-mute);">${esc(item.evidence.slice(0, 2).join(" · ") || item.action)}</div>
+        </div>`).join("")}
+      </div>
+      ${fusedPatterns ? `<div class="kicker" style="margin:14px 0 8px;color:var(--gold);">Fused Life Patterns · Signal Mapper + Pattern Fusion</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        ${fusedPatterns}
+      </div>` : ""}
+    </div>
+    ${pageFoot("astrolife · personal operating system", "Destiny Snapshot")}
+  </section>`;
+}
+
+function pageNarrativeBlock(chart: ChartData, block: NarrativeBlock, pageNum: string, chapter = "AstroLife Intelligence"): string {
+  const score = typeof block.score === "number" ? block.score : null;
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-br"></div>
+    ${pageRail(`${chapter} · ${block.title}`, pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:${score === null ? "var(--gold)" : scoreColor(score)};">${score === null ? "AI" : score}</span>
+        <h2>${esc(block.title)}</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1.5fr 0.9fr;gap:14px;margin-bottom:14px;">
+        <div class="card gold-edge" style="padding:18px 20px;">
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Narrative Intelligence</div>
+          ${block.paragraphs.map((paragraph) => `<div class="body" style="line-height:1.85;color:var(--ivory-dim);margin-bottom:12px;">${esc(paragraph)}</div>`).join("")}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${score === null ? "" : `<div class="card" style="padding:16px;text-align:center;">
+            <div class="kicker" style="margin-bottom:6px;">AstroLife Score</div>
+            <div style="font-size:54px;line-height:1;font-weight:800;color:${scoreColor(score)};">${score}</div>
+            <div class="body-s" style="color:var(--ivory-mute);">/100 · ${esc(block.title)}</div>
+          </div>`}
+          <div class="card" style="padding:14px;">
+            <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Evidence</div>
+            ${renderEvidenceList(block.evidence)}
+          </div>
+          ${renderPersonalizationPanel(chart, block.id)}
+        </div>
+      </div>
+      <div class="card" style="padding:14px;">
+        <div class="kicker" style="margin-bottom:8px;color:var(--jade);">Action Plan</div>
+        ${renderActionList(block.action)}
+      </div>
+      <div class="body-s" style="margin-top:auto;color:var(--ivory-mute);line-height:1.55;">
+        This section uses chart factors, engine scores and timing context to create guidance. It is not a guarantee; it is a practical interpretation layer.
+      </div>
+    </div>
+    ${pageFoot("astrolife · narrative engine", block.title)}
+  </section>`;
+}
+
+function pageReportNarrativeSectionV4(
+  section: ReturnType<typeof buildReportIntelligence>["lifePatternDecoder"],
+  pageNum: string,
+  chapter = "AstroLife Intelligence"
+): string {
+  const score = typeof section.score === "number" ? section.score : null;
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-br"></div>
+    ${pageRail(`${chapter} · ${section.title}`, pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:${score === null ? "var(--gold)" : scoreColor(score)};">${score === null ? "AI" : score}</span>
+        <h2>${esc(section.title)}</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 0.9fr;gap:14px;margin-bottom:14px;">
+        <div class="card gold-edge" style="padding:18px 20px;">
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Long-Form Intelligence</div>
+          ${section.longNarrative.split("\n\n").map((paragraph) => `<div class="body" style="line-height:1.8;color:var(--ivory-dim);margin-bottom:12px;">${esc(paragraph)}</div>`).join("")}
+          <div class="card" style="padding:12px;margin-top:8px;background:rgba(255,255,255,0.03);">
+            <div class="kicker" style="color:var(--gold);margin-bottom:6px;">What This Means For You</div>
+            <div class="body-s" style="line-height:1.6;color:var(--ivory-dim);">${esc(section.whatThisMeansForYou)}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card" style="padding:16px;text-align:center;">
+            <div class="kicker" style="margin-bottom:6px;">Confidence</div>
+            <div style="font-size:48px;line-height:1;font-weight:800;color:${scoreColor(section.confidence)};">${section.confidence}</div>
+            <div class="body-s" style="color:var(--ivory-mute);">/100 · synthesis confidence</div>
+          </div>
+          <div class="card" style="padding:14px;">
+            <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Evidence</div>
+            ${renderEvidenceList(section.evidence)}
+          </div>
+          ${section.reflectionQuestion ? `<div class="card" style="padding:14px;border-left:3px solid var(--saffron);">
+            <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">Reflection Question</div>
+            <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);">${esc(section.reflectionQuestion)}</div>
+          </div>` : ""}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="color:var(--jade);margin-bottom:6px;">Opportunities</div>
+          ${renderActionList(section.opportunities.slice(0, 3))}
+        </div>
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="color:var(--crimson);margin-bottom:6px;">Risks</div>
+          ${renderActionList(section.risks.slice(0, 3))}
+        </div>
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="color:var(--gold);margin-bottom:6px;">Actions</div>
+          ${renderActionList(section.actions.slice(0, 3))}
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · life intelligence", section.title)}
+  </section>`;
+}
+
+function pageNarrativeSectionDigestV4(
+  section: ReturnType<typeof buildReportIntelligence>["narrativeSections"][number],
+  pageNum: string,
+  chart: ChartData
+): string {
+  const score = typeof section.score === "number" ? section.score : section.confidence;
+  const paragraphs = section.longNarrative.split("\n\n").slice(0, 2);
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-br"></div>
+    ${pageRail(`Intelligence Digest · ${section.title}`, pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:${scoreColor(score)};">${score}</span>
+        <h2>${esc(section.title)}</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1.35fr 0.85fr;gap:14px;margin-bottom:12px;">
+        <div class="card gold-edge" style="padding:18px 20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;">
+            <div class="kicker" style="color:var(--saffron);">Premium Narrative</div>
+            <div class="mono" style="font-size:11px;color:var(--ivory-mute);">${section.confidence}% confidence</div>
+          </div>
+          ${paragraphs.map((paragraph) => `<div class="body" style="line-height:1.78;color:var(--ivory-dim);margin-bottom:12px;">${esc(paragraph)}</div>`).join("")}
+          <div class="card" style="padding:12px;background:rgba(255,255,255,0.03);">
+            <div class="kicker" style="color:var(--gold);margin-bottom:6px;">What This Means</div>
+            <div class="body-s" style="line-height:1.58;color:var(--ivory-dim);">${esc(section.whatThisMeansForYou)}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${renderPersonalizationPanel(chart, section.id)}
+          <div class="card" style="padding:14px;">
+            <div class="kicker" style="color:var(--gold);margin-bottom:8px;">Evidence</div>
+            ${renderEvidenceList(section.evidence.slice(0, 4))}
+          </div>
+          ${section.reflectionQuestion ? `<div class="card" style="padding:14px;border-left:3px solid var(--saffron);">
+            <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">Reflection Question</div>
+            <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);">${esc(section.reflectionQuestion)}</div>
+          </div>` : ""}
+        </div>
+      </div>
+      <div class="card" style="padding:14px;margin-top:auto;">
+        <div class="kicker" style="color:var(--jade);margin-bottom:7px;">Primary Action</div>
+        <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);">${esc(section.actions[0] ?? "Act with timing, clarity and consistency.")}</div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · intelligence digest", section.title)}
+  </section>`;
+}
+
+function pageNarrativeSectionActionV4(
+  section: ReturnType<typeof buildReportIntelligence>["narrativeSections"][number],
+  pageNum: string,
+  chart: ChartData
+): string {
+  const score = typeof section.score === "number" ? section.score : section.confidence;
+  const signals = personalizedDomainSignals(chart, section.id);
+  const cleanTitle = section.title.replace(/\s+Blueprint$/i, "");
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail(`Action Blueprint · ${cleanTitle}`, pageNum)}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:${scoreColor(score)};">${score}</span>
+        <h2>${esc(cleanTitle)} Blueprint</h2>
+      </div>
+      <div class="card gold-edge" style="padding:16px 18px;margin-bottom:12px;">
+        <div class="kicker" style="color:var(--saffron);margin-bottom:7px;">Why This Is Personal</div>
+        <div class="body" style="line-height:1.75;color:var(--ivory-dim);">
+          This page expands the ${esc(cleanTitle.toLowerCase())} reading into practical decisions using the chart's exact signature: ${esc(signals.map((signal) => signal.value).join(" · "))}. The purpose is to make the guidance usable without squeezing every instruction into the first narrative page.
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto;">
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="color:var(--jade);margin-bottom:6px;">Opportunities</div>
+          ${renderActionList(section.opportunities)}
+        </div>
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="color:var(--crimson);margin-bottom:6px;">Careful With</div>
+          ${renderActionList(section.risks)}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <div class="card" style="padding:12px;">
+          <div class="kicker" style="color:var(--gold);margin-bottom:6px;">Action Rules</div>
+          ${renderActionList(section.actions)}
+        </div>
+        <div class="card" style="padding:12px;border-left:3px solid var(--saffron);">
+          <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">Decision Rule</div>
+          <div class="body-s" style="line-height:1.6;color:var(--ivory-dim);">${esc(section.reflectionQuestion ?? "Act when chart timing, practical readiness and emotional clarity agree. Delay when only urgency is present.")}</div>
+          <div class="kicker" style="color:var(--gold);margin:10px 0 5px;">Timing Note</div>
+          <div class="body-s" style="line-height:1.55;color:var(--ivory-mute);">${esc(activeDashaLabel(chart))} is the timing context for this recommendation.</div>
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · action blueprint", section.title)}
+  </section>`;
+}
+
+function pageLifeChaptersV4(intel: ReturnType<typeof buildReportIntelligence>): string {
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail("Life Chapters · Dasha Strategy", "LC")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">3</span>
+        <h2>Life Chapters</h2>
+      </div>
+      <div class="body" style="max-width:720px;line-height:1.65;color:var(--ivory-dim);margin-bottom:14px;">
+        These chapters convert Mahadasha, Antardasha and pattern fusion into a readable life strategy. Read them as long-arc operating themes: where to focus, what to mature and what to avoid overreacting to.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex:1;">
+        ${intel.lifeChapters.map((chapter, index) => `<div class="card gold-edge" style="padding:15px;display:flex;flex-direction:column;">
+          <div class="mono" style="font-size:10px;color:var(--gold);margin-bottom:6px;">Chapter 0${index + 1} · ${esc(chapter.period)}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;line-height:1.1;color:var(--ivory);margin-bottom:5px;">${esc(chapter.title)}</div>
+          <div class="kicker" style="color:var(--saffron);margin-bottom:8px;">${esc(chapter.theme)}</div>
+          <div class="body-s" style="line-height:1.58;color:var(--ivory-dim);margin-bottom:10px;">${esc(chapter.narrative)}</div>
+          <div style="margin-top:auto;">
+            <div class="kicker" style="color:var(--jade);margin-bottom:5px;">Lessons</div>
+            ${renderActionList(chapter.lessons.slice(0, 3))}
+            <div class="kicker" style="color:var(--crimson);margin:8px 0 5px;">Avoid</div>
+            ${renderActionList(chapter.avoid.slice(0, 2))}
+          </div>
+        </div>`).join("")}
+      </div>
+    </div>
+    ${pageFoot("astrolife · life chapters", "Life Chapters")}
+  </section>`;
+}
+
+function pageWealthCareerForeignV4(chart: ChartData, intel = buildReportIntelligence(chart)): string {
+  const blocks = [intel.wealth, intel.career, intel.foreign];
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail("Wealth · Career · Foreign Blueprint", "WCF")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">OS</span>
+        <h2>Opportunity Blueprint</h2>
+      </div>
+      <div class="body" style="max-width:660px;line-height:1.65;color:var(--ivory-dim);margin-bottom:14px;">
+        This page converts engine signals into practical strategy. It shows where value is likely to be created, how it becomes visible, and where the chart asks for discipline.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex:1;">
+        ${blocks.map((block) => `<div class="card gold-edge" style="padding:14px;display:flex;flex-direction:column;">
+          <div class="kicker" style="margin-bottom:6px;color:${scoreColor(block.score ?? 50)};">${esc(block.title)}</div>
+          <div style="font-size:42px;line-height:1;font-weight:800;color:${scoreColor(block.score ?? 50)};margin-bottom:10px;">${block.score ?? "—"}</div>
+          <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);margin-bottom:12px;">${esc(block.paragraphs[0] ?? "")}</div>
+          <div style="margin-top:auto;">
+            <div class="kicker" style="margin-bottom:6px;color:var(--gold);">Do This</div>
+            ${renderActionList(block.action.slice(0, 2))}
+          </div>
+        </div>`).join("")}
+      </div>
+    </div>
+    ${pageFoot("astrolife · opportunity blueprint", "Wealth Career Foreign")}
+  </section>`;
+}
+
+function pageEventAndRemedyV4(chart: ChartData, intel = buildReportIntelligence(chart)): string {
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-br"></div>
+    ${pageRail("Event Radar · Ranked Remedies", "ERR")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--jade);">24M</span>
+        <h2>Timing &amp; Correction Plan</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:14px;flex:1;">
+        <div class="card gold-edge" style="padding:18px 20px;">
+          <div class="kicker" style="color:var(--jade);margin-bottom:8px;">Event Radar Narrative</div>
+          ${intel.eventRadar.paragraphs.map((paragraph) => `<div class="body" style="line-height:1.85;color:var(--ivory-dim);margin-bottom:12px;">${esc(paragraph)}</div>`).join("")}
+          <hr class="hairline" style="margin:12px 0;"/>
+          <div class="kicker" style="color:var(--gold);margin-bottom:8px;">Use It Like This</div>
+          ${renderActionList(intel.eventRadar.action)}
+        </div>
+        <div class="card" style="padding:16px;">
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Highest Impact Remedies</div>
+          ${intel.remedyRanking.map((item, index) => `<div style="padding:10px 0;border-top:${index === 0 ? "0" : "1px solid var(--line)"};">
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${index + 1}. ${esc(item.label)}</div>
+              <div class="mono" style="font-size:13px;color:${scoreColor(item.score)};">${item.score}</div>
+            </div>
+            <div class="body-s" style="font-size:10px;line-height:1.5;color:var(--ivory-dim);margin-top:3px;">${esc(item.reason)}</div>
+          </div>`).join("")}
+          <div class="body-s" style="margin-top:12px;line-height:1.55;color:var(--ivory-mute);">
+            Remedies are ranked by relevance and timing. Fewer high-quality corrections are better than a long generic list.
+          </div>
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · timing correction", "Event Radar")}
+  </section>`;
+}
+
+function pageAstroLifeAdvisorV4(intel: ReturnType<typeof buildReportIntelligence>): string {
+  return `<section class="page">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    <div class="glow-br"></div>
+    ${pageRail("AstroLife AI Advisor", "AI")}
+    <div style="position:relative;z-index:2;padding-top:34px;flex:1;display:flex;flex-direction:column;">
+      <div class="eyebrow" style="margin-bottom:12px;">If You Follow Only 3 Things</div>
+      <div class="display-l" style="line-height:0.98;color:var(--ivory);max-width:620px;">The Operating Plan.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:30px 0 18px;">
+        ${intel.threeThings.map((item, index) => `<div class="card gold-edge" style="padding:18px 16px;min-height:150px;">
+          <div class="mono" style="font-size:11px;color:var(--gold);margin-bottom:12px;">0${index + 1}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;line-height:1.25;color:var(--ivory);">${esc(item)}</div>
+        </div>`).join("")}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="card" style="padding:16px;border-left:3px solid var(--gold);">
+          <div class="kicker" style="color:var(--gold);margin-bottom:8px;">Biggest Strength</div>
+          <div class="body" style="line-height:1.75;color:var(--ivory-dim);">${esc(intel.synthesis.biggestStrength)}</div>
+        </div>
+        <div class="card" style="padding:16px;border-left:3px solid var(--jade);">
+          <div class="kicker" style="color:var(--jade);margin-bottom:8px;">Biggest Opportunity</div>
+          <div class="body" style="line-height:1.75;color:var(--ivory-dim);">${esc(intel.biggestOpportunity)}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+        <div class="card" style="padding:16px;border-left:3px solid var(--crimson);">
+          <div class="kicker" style="color:var(--crimson);margin-bottom:8px;">Biggest Risk</div>
+          <div class="body" style="line-height:1.75;color:var(--ivory-dim);">${esc(intel.biggestRisk)}</div>
+        </div>
+        <div class="card" style="padding:16px;border-left:3px solid var(--saffron);">
+          <div class="kicker" style="color:var(--saffron);margin-bottom:8px;">Life Story</div>
+          <div class="body" style="line-height:1.75;color:var(--ivory-dim);">${esc(intel.synthesis.lifeStory)}</div>
+        </div>
+      </div>
+      <div class="card" style="padding:18px 20px;margin-top:12px;">
+        <div class="kicker" style="color:var(--gold);margin-bottom:8px;">Final Guidance</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;line-height:1.35;color:var(--ivory);">${esc(intel.synthesis.finalGuidance)}</div>
+      </div>
+      <div class="body-s" style="margin-top:auto;color:var(--ivory-mute);line-height:1.55;">
+        This is AstroLife's synthesis layer: it reads convergence across engines and turns it into a compact strategy. It does not replace personal responsibility or professional advice.
+      </div>
+    </div>
+    ${pageFoot("astrolife · ai synthesis", "Advisor")}
+  </section>`;
+}
+
+function pageConfidenceMethodologyV4(chart: ChartData, intel: ReturnType<typeof buildReportIntelligence>): string {
+  const strongest = [...intel.scores].sort((a, b) => b.score - a.score).slice(0, 4);
+  const sensitive = [...intel.scores].sort((a, b) => a.score - b.score).slice(0, 3);
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-br"></div>
+    ${pageRail("Confidence Methodology · Why This Report Says This", "CM")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">WHY</span>
+        <h2>Why This Report Says This</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr 0.9fr;gap:14px;margin-bottom:12px;">
+        <div class="card gold-edge" style="padding:18px 20px;">
+          <div class="kicker" style="color:var(--saffron);margin-bottom:8px;">Method</div>
+          <div class="body" style="line-height:1.8;color:var(--ivory-dim);margin-bottom:12px;">
+            AstroLife does not treat one isolated planet as a final answer. The report weighs natal placements, dasha activation, yogas, shadbala strength, ashtakavarga support, Moon-first transits, remedies and fused cross-engine patterns. A score rises when several independent signals agree. Confidence drops when evidence is thin, mixed or timing-dependent.
+          </div>
+          <div class="body" style="line-height:1.8;color:var(--ivory-dim);">
+            The goal is practical intelligence: show where potential is strong, where caution is needed, and what action improves the outcome. This is why the report uses scores, confidence, evidence and recommendations together.
+          </div>
+        </div>
+        <div class="card" style="padding:15px;">
+          <div class="kicker" style="color:var(--gold);margin-bottom:8px;">Chart Signature Used</div>
+          ${renderEvidenceList(chartSignatureBullets(chart))}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;">
+        <div class="card" style="padding:14px;">
+          <div class="kicker" style="color:var(--jade);margin-bottom:8px;">High-Confidence Signals</div>
+          ${strongest.map((item) => `<div style="padding:8px 0;border-top:1px solid var(--line);">
+            <div style="display:flex;justify-content:space-between;gap:10px;">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${esc(item.label)}</div>
+              <div class="mono" style="color:${scoreColor(item.score)};">${item.score}</div>
+            </div>
+            <div class="body-s" style="font-size:10px;line-height:1.5;color:var(--ivory-mute);">${esc(item.evidence.slice(0, 2).join(" · ") || item.interpretation)}</div>
+          </div>`).join("")}
+        </div>
+        <div class="card" style="padding:14px;">
+          <div class="kicker" style="color:var(--saffron);margin-bottom:8px;">Needs Careful Reading</div>
+          ${sensitive.map((item) => `<div style="padding:8px 0;border-top:1px solid var(--line);">
+            <div style="display:flex;justify-content:space-between;gap:10px;">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${esc(item.label)}</div>
+              <div class="mono" style="color:${scoreColor(item.score)};">${item.score}</div>
+            </div>
+            <div class="body-s" style="font-size:10px;line-height:1.5;color:var(--ivory-mute);">${esc(item.action)}</div>
+          </div>`).join("")}
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · report methodology", "Confidence Methodology")}
+  </section>`;
+}
+
+function pageNext90DaysPlanV4(chart: ChartData, intel: ReturnType<typeof buildReportIntelligence>): string {
+  const top = [...intel.scores].sort((a, b) => b.score - a.score)[0];
+  const weak = [...intel.scores].sort((a, b) => a.score - b.score)[0];
+  const decisions = [
+    `Double down on ${top.label.toLowerCase()}: build one visible proof-of-work asset and make it easy to evaluate.`,
+    `Protect ${weak.label.toLowerCase()}: define one routine, boundary or review rule before pressure increases.`,
+    "Do not take major decisions only from emotion. Check dasha, Moon transit, practical readiness and financial downside.",
+    "Use strong windows for launch, negotiation, outreach and commitment. Use caution windows for repair and planning.",
+    "If a choice affects money, partnership, relocation or health rhythm, wait for two forms of confirmation before acting.",
+  ];
+  const phases = [
+    {
+      title: "Days 1-30 · Clarify",
+      note: "Remove scattered effort. Name the one domain where the chart is asking for visible progress now.",
+      actions: [intel.threeThings[0] ?? decisions[0], "Write the current dasha theme in practical language.", "List the decisions that can wait."],
+    },
+    {
+      title: "Days 31-60 · Build",
+      note: "Turn strength into evidence. The report should lead to one visible project, offer, routine or relationship conversation.",
+      actions: [intel.threeThings[1] ?? decisions[1], "Create one measurable proof point.", "Avoid adding a second major direction too early."],
+    },
+    {
+      title: "Days 61-90 · Decide",
+      note: "Review results and timing. Advance only what has evidence, energy and clean practical support.",
+      actions: [intel.threeThings[2] ?? decisions[2], "Use Event Radar before irreversible commitments.", "Convert lessons into next-quarter rules."],
+    },
+  ];
+  return `<section class="page dense">
+    <div class="starfield"></div>
+    <div class="glow-tl"></div>
+    ${pageRail("Next 90 Days · Decision Plan", "90D")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--jade);">90</span>
+        <h2>Next 90 Days Action Plan</h2>
+      </div>
+      <div class="card gold-edge" style="padding:16px 18px;margin-bottom:12px;">
+        <div class="kicker" style="color:var(--saffron);margin-bottom:7px;">Current Timing Lens</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;line-height:1.3;color:var(--ivory);">${esc(activeDashaLabel(chart))}</div>
+        <div class="body-s" style="margin-top:7px;line-height:1.55;color:var(--ivory-dim);">${esc(intel.next12Months)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+        ${phases.map((phase) => `<div class="card" style="padding:13px;display:flex;flex-direction:column;">
+          <div class="kicker" style="color:var(--gold);margin-bottom:6px;">${esc(phase.title)}</div>
+          <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);margin-bottom:8px;">${esc(phase.note)}</div>
+          <div style="margin-top:auto;">${renderActionList(phase.actions)}</div>
+        </div>`).join("")}
+      </div>
+      <div class="card" style="padding:14px;">
+        <div class="kicker" style="color:var(--crimson);margin-bottom:8px;">Top 5 Decisions To Handle Carefully</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;">
+          ${decisions.map((item) => `<div class="body-s" style="line-height:1.55;color:var(--ivory-dim);border-top:1px solid var(--line);padding-top:7px;">${esc(item)}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · next 90 days", "Action Plan")}
+  </section>`;
 }
 
 // ── Page 5: Birth Snapshot ────────────────────────────────────────────────
@@ -1686,8 +2564,7 @@ function page9Remedies(chart: ChartData): string {
 
 // ── Page 10: Closing ──────────────────────────────────────────────────────
 
-function page10Closing(chart: ChartData): string {
-  const firstName = esc(capitalize(chart.name.split(" ")[0]));
+function page10Closing(): string {
   return `<section class="page">
   <div class="starfield"></div>
   <div class="glow-tl"></div>
@@ -1711,7 +2588,7 @@ function page10Closing(chart: ChartData): string {
     </div>
 
     <div class="body" style="max-width:520px;margin-bottom:40px;line-height:1.75;">
-      Dear ${firstName}, this blueprint is the beginning of a conversation between you and the cosmos — not an ending. Carry it lightly. Return to it in different seasons. Let it be a companion, not an oracle. The truest astrology is the one that makes you more yourself.
+      This blueprint is the beginning of a conversation between awareness and action — not an ending. Carry it lightly. Return to it in different seasons. Let it be a companion, not an oracle. The truest astrology is the one that makes life more conscious.
     </div>
 
     <!-- Ornament divider -->
@@ -1740,7 +2617,7 @@ function page10Closing(chart: ChartData): string {
   </div>
 
   <div style="position:relative;z-index:2;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
-    <div class="body-s" style="letter-spacing:0.18em;text-transform:uppercase;">Prepared for ${esc(capitalize(chart.name))}</div>
+    <div class="body-s" style="letter-spacing:0.18em;text-transform:uppercase;">Prepared by AstroLife Intelligence</div>
     <div class="mono" style="font-size:10px;color:var(--gold-dim);">astrolife.ai · ${new Date().getFullYear()}</div>
   </div>
 </section>`;
@@ -1889,6 +2766,54 @@ function pageDoshas(chart: ChartData): string {
     "elite"
   );
   const doshas = all.filter(y => y.isDosha && y.present);
+  const mangalInsight = buildMangalDoshaInsight(chart);
+  const mangalTone = scoreColor(100 - mangalInsight.result.scores.natalSeverity);
+  const mangalCancellation = mangalInsight.result.cancellationFactors.slice(0, 3);
+  const mangalCard = `<div class="card gold-edge" style="border-color:${mangalTone};">
+    <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:10px;">
+      <div>
+        <div class="kicker" style="margin-bottom:4px;color:var(--gold);">Mangal Dosha Intelligence</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);">${esc(mangalInsight.result.severityLabel)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="mono" style="font-size:22px;color:${mangalTone};">${mangalInsight.result.scores.natalSeverity}</div>
+        <div class="body-s" style="font-size:9px;color:var(--ivory-mute);">severity</div>
+      </div>
+    </div>
+    <div class="body-s" style="line-height:1.62;color:var(--ivory-dim);margin-bottom:10px;">${esc(mangalInsight.summary)}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+      ${[
+        ["Protection", mangalInsight.result.scores.protection],
+        ["Activation", mangalInsight.result.scores.activation],
+        ["Constructive", mangalInsight.result.scores.constructivePotential],
+      ].map(([label, value]) => `<div style="padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,0.025);">
+        <div class="kicker" style="font-size:8px;margin-bottom:3px;">${esc(label)}</div>
+        <div class="mono" style="font-size:16px;color:${scoreColor(Number(value ?? 0))};">${Number(value ?? 0)}/100</div>
+      </div>`).join("")}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+      ${[
+        ["Status", mangalInsight.result.calculationStatus],
+        ["Quality", `${mangalInsight.result.dataQualityScore}/100`],
+        ["Confidence", mangalInsight.result.scoreConfidence],
+      ].map(([label, value]) => `<div style="padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,0.02);">
+        <div class="kicker" style="font-size:8px;margin-bottom:3px;">${esc(label)}</div>
+        <div class="body-s" style="font-size:10px;color:var(--ivory);text-transform:capitalize;">${esc(String(value).replace(/_/g, " "))}</div>
+      </div>`).join("")}
+    </div>
+    <div class="body-s" style="line-height:1.52;color:var(--ivory-dim);margin-bottom:8px;">
+      <strong style="color:var(--gold);">Traditional tag:</strong> ${esc(mangalInsight.result.traditionalConcentration.label)}. ${esc(mangalInsight.result.traditionalConcentration.modernInterpretation)}
+    </div>
+    ${mangalCancellation.length ? `<div class="body-s" style="line-height:1.5;color:var(--jade);margin-bottom:8px;">
+      ${mangalCancellation.map(item => `<div style="margin-bottom:3px;">• ${esc(item.title)} (${esc(item.confidence)})</div>`).join("")}
+    </div>` : ""}
+    <div class="body-s" style="line-height:1.52;color:var(--crimson);margin-bottom:8px;">
+      <strong>Gemstone safety:</strong> ${esc(mangalInsight.result.gemstoneSafety.title)} · ${esc(mangalInsight.result.gemstoneSafety.caution)}
+    </div>
+    <div class="body-s" style="line-height:1.55;color:var(--jade);">
+      ${mangalInsight.productGuidance.slice(0, 3).map(item => `<div style="margin-bottom:3px;">• ${esc(item)}</div>`).join("")}
+    </div>
+  </div>`;
 
   const cards = doshas.length === 0
     ? `<div class="card jade-edge" style="padding:24px;text-align:center;">
@@ -1914,9 +2839,10 @@ function pageDoshas(chart: ChartData): string {
         <h2>Doshas</h2>
       </div>
       <div class="body-s" style="margin-bottom:16px;max-width:600px;">
-        Doshas indicate specific karmic obstructions. Most have prescribed remedies — they are not destinies but signals.
+        Doshas indicate specific karmic pressure points. They are not destinies; AstroLife reads them through score, protection, activation and practical correction.
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
+        ${mangalCard}
         ${cards}
       </div>
     </div>
@@ -3350,11 +4276,89 @@ function pageSpecialLagnas(chart: ChartData): string {
 }
 
 // ── Marriage Intelligence ─────────────────────────────────────────────────
+function pageMarriageTimingFusion(chart: ChartData): string {
+  const scan = scanMarriageWindows(chart);
+  const mangalInsight = buildMangalDoshaInsight(chart);
+  const mangal = mangalReadinessAdjustment(mangalInsight);
+  const topWindows = scan.windows
+    .map((window) => ({
+      window,
+      fusedScore: clampReportScore(window.adjustedScore + mangal.adjustment),
+    }))
+    .sort((a, b) => b.fusedScore - a.fusedScore)
+    .slice(0, 5);
+  const best = topWindows[0];
+
+  return `<section class="page dense">
+    ${pageRail("Marriage Timing Fusion · Readiness Windows", "MT")}
+    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span class="section-num" style="color:var(--gold);">MT</span>
+        <h2>Marriage Timing Fusion</h2>
+      </div>
+      <div class="body-s" style="margin-bottom:14px;max-width:640px;line-height:1.6;">
+        These are not fixed wedding dates. They are readiness windows that combine K.N. Rao style marriage timing, monthly dasha/transit support and Mangal Dosha readiness. Partner-fusion scoring can be added when a second chart is attached to the PDF request.
+      </div>
+
+      ${best ? `<div class="card gold-edge" style="margin-bottom:12px;display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center;">
+        <div style="text-align:center;">
+          <div class="mono" style="font-size:42px;line-height:1;color:${scoreColor(best.fusedScore)};">${best.fusedScore}</div>
+          <div class="kicker" style="font-size:8px;">best readiness</div>
+        </div>
+        <div>
+          <div class="kicker" style="margin-bottom:5px;color:var(--saffron);">Strongest Window</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-bright);margin-bottom:4px;">${esc(best.window.month)}</div>
+          <div class="body-s" style="line-height:1.6;color:var(--ivory-dim);">${esc(marriageWindowUseCase(best.window))}</div>
+          <div class="mono" style="font-size:10px;color:var(--ivory-mute);margin-top:6px;">MD ${esc(best.window.mahadasha)} · AD ${esc(best.window.antardasha)} · ${best.window.activeParameterCount}/8 timing parameters active</div>
+        </div>
+      </div>` : ""}
+
+      <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:12px;margin-bottom:12px;">
+        <div class="card">
+          <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Top 5 Readiness Windows</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            ${topWindows.map(({ window, fusedScore }, index) => `<div style="display:grid;grid-template-columns:24px 1fr 58px;gap:10px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:7px;">
+              <div class="mono" style="color:var(--ivory-mute);font-size:10px;">#${index + 1}</div>
+              <div>
+                <div style="font-weight:700;color:var(--ivory);font-size:12px;">${esc(window.month)}</div>
+                <div class="body-s" style="font-size:9px;color:var(--ivory-mute);">${esc(window.mahadasha)}/${esc(window.antardasha)} · ${esc(window.verdict.replace(/_/g, " "))}</div>
+              </div>
+              <div class="mono" style="text-align:right;font-size:13px;color:${scoreColor(fusedScore)};">${fusedScore}/100</div>
+            </div>`).join("")}
+          </div>
+        </div>
+        <div class="card" style="border-color:${scoreColor(mangal.score)};">
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Mangal Readiness Layer</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);margin-bottom:5px;">${esc(mangal.label)}</div>
+          <div class="mono" style="font-size:28px;color:${scoreColor(mangal.score)};margin-bottom:5px;">${mangal.adjustment >= 0 ? "+" : ""}${mangal.adjustment}</div>
+          <div class="body-s" style="font-size:10px;color:var(--ivory-mute);margin-bottom:8px;">timing adjustment points</div>
+          <div class="body-s" style="line-height:1.48;color:var(--ivory-dim);">
+            ${mangal.notes.map(note => `<div style="margin-bottom:4px;">• ${esc(note)}</div>`).join("")}
+          </div>
+          <div class="body-s" style="line-height:1.48;color:var(--crimson);margin-top:8px;">
+            <strong>Gemstone:</strong> ${esc(mangalInsight.result.gemstoneSafety.status.replace(/_/g, " "))}. ${esc(mangalInsight.result.gemstoneSafety.title)}
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:auto;border-left:3px solid var(--jade);">
+        <div class="kicker" style="margin-bottom:5px;color:var(--jade);">How To Use This Page</div>
+        <div class="body-s" style="line-height:1.65;color:var(--ivory-dim);">
+          Treat high months as planning windows, not guarantees. Final marriage decisions should still include partner compatibility, family context, emotional readiness and practical circumstances. Low months are useful for counselling, clarity and preparation.
+        </div>
+      </div>
+    </div>
+    ${pageFoot("astrolife · marriage intelligence", "Marriage Timing")}
+  </section>`;
+}
+
 function pageMarriageIntelligence(chart: ChartData): string {
   const divs = calculateDivisional(chart.planets as Parameters<typeof calculateDivisional>[0], chart.lagnaNum, chart.lagnaLon);
   let kp: any = null;
   try { kp = calculateKpReport(chart); } catch { /* optional */ }
   const result = buildMarriageIntelligenceV2({ divs, kp: kp ?? undefined }) as any;
+  const mangalInsight = buildMangalDoshaInsight(chart);
+  const mangal = mangalReadinessAdjustment(mangalInsight);
   const label = (result.label ?? "").replace(/_/g, " ");
   const d9 = result.divisional?.d9MarriageDelivery;
   const d9c = result.divisional?.d9ContinuityCare;
@@ -3375,6 +4379,12 @@ function pageMarriageIntelligence(chart: ChartData): string {
           <div class="kicker" style="margin-bottom:4px;">Assessment</div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);text-transform:capitalize;">${esc(label)}</div>
         </div>
+        <div class="card" style="padding:12px 18px;text-align:center;border-color:${scoreColor(mangal.score)};">
+          <div class="kicker">Mangal Layer</div>
+          <div style="font-size:24px;font-weight:700;color:${scoreColor(mangal.score)};">${mangal.adjustment >= 0 ? "+" : ""}${mangal.adjustment}</div>
+          <div class="body-s" style="font-size:9px;">${esc(mangal.label)}</div>
+          <div class="body-s" style="font-size:8px;color:var(--ivory-mute);margin-top:3px;text-transform:capitalize;">${esc(mangalInsight.result.scoreConfidence)} confidence</div>
+        </div>
       </div>
       <div class="card" style="padding:12px;margin-bottom:12px;">
         <div class="body-s" style="line-height:1.7;color:var(--ivory-dim);">${esc(result.narrative ?? "")}</div>
@@ -3390,6 +4400,12 @@ function pageMarriageIntelligence(chart: ChartData): string {
         <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Key Indicators</div>
         <div class="body-s" style="line-height:1.6;">${(d9.indicators as string[]).slice(0,4).map(ind => `<div style="margin-bottom:3px;">• ${esc(ind)}</div>`).join("")}</div>
       </div>` : ""}
+      <div class="card" style="padding:10px 12px;margin-top:auto;border-color:rgba(200,160,48,.26);">
+        <div class="kicker" style="margin-bottom:6px;color:var(--gold);">Mangal Safety Note</div>
+        <div class="body-s" style="line-height:1.55;color:var(--ivory-dim);">
+          ${esc(mangalInsight.result.traditionalConcentration.label)} · ${esc(mangalInsight.result.gemstoneSafety.title)}. Partner-fusion timing requires attaching the second chart to the PDF request; this page shows the native chart readiness layer only.
+        </div>
+      </div>
     </div>
     ${pageFoot("astrolife · cosmic blueprint", "Marriage Intelligence")}
   </section>`;
@@ -3869,8 +4885,8 @@ function pageEliteAstrologerReview(chart: ChartData): string {
 export function generateReportHTML(chart: ChartData, options?: Partial<ReportOptions>): string {
   const context = buildReportEngineContext(chart, options);
   const { palette, cover } = context.settings;
-
-  const coverPage = cover === "lagnalord" ? page1LagnaLord(chart) : page1Wheel(chart);
+  const editionLabel = reportEditionLabel(context.settings.type);
+  const coverPage = cover === "lagnalord" ? page1LagnaLord(chart, editionLabel) : page1Wheel(chart, editionLabel);
 
   // Wrap every page in try-catch so one data error never blanks the whole report
   function safe(fn: () => string, label: string): string {
@@ -3895,6 +4911,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
   const isRemedyReport = t === "remedy";
   const isDestinyReport = t === "destiny";
   const isMedicalReport = t === "medical";
+  const reportIntelligence = buildReportIntelligence(chart);
   const include = {
     chart:       true,                                              // always
     starMap:     true,                                              // always — the planetary sky chart
@@ -3924,6 +4941,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     kp:            isPremiumReport || isKundliReport || isEliteReport,
     transitRipple: isPremiumReport || isDestinyReport || isEliteReport,
     specialLagnas: isPremiumReport || isKundliReport || isEliteReport,
+    marriageTimingFusion: isPremiumReport || isEliteReport,
     marriageIntel: isPremiumReport || isEliteReport,
     relationshipIntel: isPremiumReport || isEliteReport,
     astroSound:    isPremiumReport || isEliteReport,
@@ -3931,6 +4949,20 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     eliteSynthesis: isEliteReport,
     palmistryFusion: isEliteReport,
     astrologerReview: isEliteReport,
+    destinySnapshotV4: isBasicReport || isPremiumReport || isKundliReport || isDestinyReport || isEliteReport,
+    intelligenceScoreboardV4: isPremiumReport || isDestinyReport || isEliteReport,
+    narrativeDigestsV4: isPremiumReport || isDestinyReport || isEliteReport,
+    lifePatternV4: isPremiumReport || isDestinyReport || isEliteReport,
+    lifeChaptersV4: isPremiumReport || isDestinyReport || isEliteReport,
+    lifeMissionV4: isPremiumReport || isDestinyReport || isEliteReport,
+    personalityV4: isPremiumReport || isEliteReport,
+    karmicV4: isPremiumReport || isRemedyReport || isEliteReport,
+    opportunityV4: isPremiumReport || isDestinyReport || isEliteReport,
+    relationshipV4: isPremiumReport || isEliteReport,
+    eventRemedyV4: isPremiumReport || isRemedyReport || isDestinyReport || isEliteReport,
+    advisorV4: isBasicReport || isPremiumReport || isDestinyReport || isEliteReport,
+    confidenceMethodologyV4: isPremiumReport || isDestinyReport || isEliteReport,
+    next90DaysV4: isPremiumReport || isDestinyReport || isEliteReport,
   };
 
   // Per-planet deep-dive pages (Phase 2). Page numbers are cosmetic labels.
@@ -3949,11 +4981,31 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     ? LIFE_AREAS.map((cfg, i) => safe(() => pageLifeArea(chart, cfg, String(40 + i)), `LifeArea:${cfg.pageLabel}`))
     : [];
 
+  const narrativeDigestPages = include.narrativeDigestsV4
+    ? reportIntelligence.narrativeSections.flatMap((section, index) => [
+        safe(() => pageNarrativeSectionDigestV4(section, `ID${index + 1}A`, chart), `NarrativeDigest:${section.title}`),
+        safe(() => pageNarrativeSectionActionV4(section, `ID${index + 1}B`, chart), `NarrativeAction:${section.title}`),
+      ])
+    : [];
+
   const pages = [
     safe(() => coverPage,                    "Cover"),
-    safe(() => page2Welcome(chart),          "Welcome"),
+    safe(() => page2Welcome(),              "Welcome"),
     safe(() => page3Foreword(),              "Foreword"),
-    safe(() => page4TOC(),                   "Contents"),
+    safe(() => page4TOC(t, include),         "Contents"),
+    include.destinySnapshotV4 ? safe(() => pageDestinySnapshotV4(chart, reportIntelligence), "Destiny Snapshot V4") : "",
+    include.intelligenceScoreboardV4 ? safe(() => pageIntelligenceScoreboardV4(reportIntelligence), "Universal Scoreboard") : "",
+    include.lifePatternV4    ? safe(() => pageReportNarrativeSectionV4(reportIntelligence.lifePatternDecoder, "LP", "Life Pattern Decoder"), "Life Pattern Decoder") : "",
+    include.lifeChaptersV4   ? safe(() => pageLifeChaptersV4(reportIntelligence), "Life Chapters") : "",
+    include.confidenceMethodologyV4 ? safe(() => pageConfidenceMethodologyV4(chart, reportIntelligence), "Confidence Methodology") : "",
+    include.next90DaysV4     ? safe(() => pageNext90DaysPlanV4(chart, reportIntelligence), "Next 90 Days Action Plan") : "",
+    ...narrativeDigestPages,
+    include.lifeMissionV4    ? safe(() => pageNarrativeBlock(chart, reportIntelligence.lifeMission, "LM", "Life Mission Engine"), "Life Mission") : "",
+    include.personalityV4    ? safe(() => pageNarrativeBlock(chart, reportIntelligence.personality, "PD", "Personality Intelligence"), "Personality Deep Dive") : "",
+    include.karmicV4         ? safe(() => pageNarrativeBlock(chart, reportIntelligence.karmicBlueprint, "KB", "Karmic Blueprint"), "Karmic Blueprint") : "",
+    include.opportunityV4    ? safe(() => pageWealthCareerForeignV4(chart, reportIntelligence), "Opportunity Blueprint") : "",
+    include.relationshipV4   ? safe(() => pageNarrativeBlock(chart, reportIntelligence.relationship, "RI", "Relationship Intelligence"), "Relationship Intelligence V4") : "",
+    include.eventRemedyV4    ? safe(() => pageEventAndRemedyV4(chart, reportIntelligence), "Event Remedy Strategy") : "",
     safe(() => page5BirthSnapshot(chart),    "Birth Snapshot"),
     include.starMap    ? safe(() => pageStarMap(chart, "5b"),   "Star Map")        : "",
     safe(() => page6PlanetaryDashboard(chart),"Planetary Dashboard"),
@@ -3985,6 +5037,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.kp               ? safe(() => pageKP(chart),                   "KP")                   : "",
     include.transitRipple    ? safe(() => pageTransitRipple(chart),         "Transit Ripple")       : "",
     include.specialLagnas    ? safe(() => pageSpecialLagnas(chart),         "Special Lagnas")       : "",
+    include.marriageTimingFusion ? safe(() => pageMarriageTimingFusion(chart), "Marriage Timing Fusion") : "",
     include.marriageIntel    ? safe(() => pageMarriageIntelligence(chart),  "Marriage Intelligence"): "",
     include.relationshipIntel? safe(() => pageRelationshipIntelligence(chart),"Relationship Intel") : "",
     include.astroSound       ? safe(() => pageAstroSound(chart),            "Astro Sound")          : "",
@@ -3992,7 +5045,8 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.palmistryFusion  ? safe(() => pageElitePalmistryFusion(chart, options),  "Palmistry Fusion")     : "",
     include.eliteSynthesis   ? safe(() => pageEliteSynthesis(chart),        "Elite Synthesis")      : "",
     include.astrologerReview ? safe(() => pageEliteAstrologerReview(chart), "Real Astrologer Review") : "",
-    safe(() => page10Closing(chart),         "Closing"),
+    include.advisorV4        ? safe(() => pageAstroLifeAdvisorV4(reportIntelligence),    "AstroLife Advisor")    : "",
+    safe(() => page10Closing(),              "Closing"),
     safe(() => page11EngineLedger(context),  "Engine Ledger"),
   ].filter(Boolean).join("\n\n");
 

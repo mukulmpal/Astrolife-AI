@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { isBillingEnforced } from '@/lib/access';
 
 export function BirthDetailsForm() {
   const router = useRouter();
@@ -31,7 +32,11 @@ export function BirthDetailsForm() {
     setLoading(true);
 
     try {
-      // Format the data for URL params
+      if (isBillingEnforced()) {
+        router.push('/login?next=/dashboard/upgrade');
+        return;
+      }
+
       const params = new URLSearchParams({
         name: formData.name,
         dob: formData.dob,
@@ -40,7 +45,6 @@ export function BirthDetailsForm() {
         from: 'homepage',
       });
 
-      // Redirect to dashboard to generate kundli immediately (no signup required)
       router.push(`/dashboard?${params.toString()}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
