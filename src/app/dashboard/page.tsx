@@ -717,25 +717,25 @@ function DashboardContent() {
 
           <div className="today-summary-grid">
             <Link href="/dashboard/transits" className="today-summary-card">
-              <div className="today-summary-k">Transit Focus</div>
+              <div className="today-summary-k">Transit Engine</div>
               <div className="today-summary-v">
-                {strongestArea.name} is your best window today.
+                {strongestArea.name} domain is actively supported today.
               </div>
-              <div className="today-summary-hint">Open Transit Engine →</div>
+              <div className="today-summary-hint">Open Transit Calculations →</div>
             </Link>
-            <Link href="/dashboard/event-radar" className="today-summary-card">
-              <div className="today-summary-k">Event Radar</div>
+            <Link href="/dashboard/dashas" className="today-summary-card">
+              <div className="today-summary-k">Dasha Cycle</div>
               <div className="today-summary-v">
-                Watch {weakestArea.name.toLowerCase()} decisions with patience.
+                Active {activeDasha.planet} MD {activeAntardasha ? `· ${activeAntardasha.planet} AD` : ""}.
               </div>
-              <div className="today-summary-hint">See 7-day radar →</div>
+              <div className="today-summary-hint">Explore Vimshottari Timeline →</div>
             </Link>
             <Link href="/dashboard/report" className="today-summary-card">
-              <div className="today-summary-k">Premium Report</div>
+              <div className="today-summary-k">Personal Vedic Report</div>
               <div className="today-summary-v">
-                Deep dive on {activeDasha.planet} dasha + remedies.
+                Full Shastra breakdown & planetary remedial alignment.
               </div>
-              <div className="today-summary-hint">Open full report →</div>
+              <div className="today-summary-hint">View Complete Report →</div>
             </Link>
           </div>
 

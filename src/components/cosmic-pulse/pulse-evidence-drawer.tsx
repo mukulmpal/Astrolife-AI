@@ -131,39 +131,55 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
   const karakaB = PLANET_KARAKAS[planetB] || { karaka: "Planetary influence", nature: "Vedic archetype" };
 
   return (
-    <div className="mt-4 pt-4 border-t border-[#c8a030]/30 bg-[#080518]/95 rounded-2xl p-4 sm:p-6 text-xs text-[#c8c0a8] shadow-2xl transition-all">
+    <div
+      className="mt-4 pt-4 border-t rounded-2xl p-4 sm:p-6 text-xs shadow-2xl transition-all"
+      style={{
+        background: "var(--app-card-alt)",
+        borderColor: "color-mix(in srgb, var(--app-gold) 35%, var(--app-border))",
+        color: "var(--app-soft)",
+      }}
+    >
       {/* Header & Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#1c1840]">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b" style={{ borderColor: "var(--app-border)" }}>
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-[#c8a030] font-semibold">
+          <div
+            className="text-[10px] uppercase tracking-widest font-semibold"
+            style={{ color: "var(--app-gold)" }}
+          >
             Vedic Shastra Learning & Verification Layer
           </div>
-          <h3 className="text-base sm:text-lg font-serif font-bold text-[#f0e8d0] mt-0.5">
+          <h3
+            className="text-base sm:text-lg font-serif font-bold mt-0.5"
+            style={{ color: "var(--app-fg)" }}
+          >
             Kyu aur Kaise? — The AstroLife Vedic Engine Explained
           </h3>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex bg-[#0a0720] border border-[#1c1840] rounded-lg p-0.5">
+          <div
+            className="flex border rounded-lg p-0.5"
+            style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+          >
             <button
               type="button"
               onClick={() => setActiveTab("evidence")}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                activeTab === "evidence"
-                  ? "bg-[#1c1840] text-[#f0e8d0]"
-                  : "text-[#8e88b8] hover:text-[#c8c0a8]"
-              }`}
+              className="px-3 py-1 rounded-md text-xs font-medium transition-colors"
+              style={{
+                background: activeTab === "evidence" ? "color-mix(in srgb, var(--app-gold) 18%, var(--app-card))" : "transparent",
+                color: activeTab === "evidence" ? "var(--app-gold)" : "var(--app-muted)",
+              }}
             >
               Trigger Evidence
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("masterclass")}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                activeTab === "masterclass"
-                  ? "bg-[#1c1840] text-[#f0e8d0]"
-                  : "text-[#8e88b8] hover:text-[#c8c0a8]"
-              }`}
+              className="px-3 py-1 rounded-md text-xs font-medium transition-colors"
+              style={{
+                background: activeTab === "masterclass" ? "color-mix(in srgb, var(--app-gold) 18%, var(--app-card))" : "transparent",
+                color: activeTab === "masterclass" ? "var(--app-gold)" : "var(--app-muted)",
+              }}
             >
               Vedic Pathshala (5 Concepts)
             </button>
@@ -172,7 +188,12 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg bg-[#1c1840]/60 hover:bg-[#1c1840] text-[#a098c0] flex items-center justify-center text-sm font-bold transition-colors"
+            className="w-7 h-7 rounded-lg border flex items-center justify-center text-sm font-bold transition-colors"
+            style={{
+              background: "var(--app-card)",
+              borderColor: "var(--app-border)",
+              color: "var(--app-muted)",
+            }}
           >
             ✕
           </button>
@@ -186,38 +207,53 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
             <>
               {/* 1. Mathematical Basis */}
               <div>
-                <div className="text-[11px] font-bold text-[#c8a030] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <div
+                  className="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"
+                  style={{ color: "var(--app-gold)" }}
+                >
                   <span>📐</span> 1. Astronomical & Mathematical Basis
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-2.5">
-                    <div className="text-[10px] text-[#605890] uppercase tracking-wide">Graha A ({planetA})</div>
-                    <div className="text-sm font-semibold text-[#f0e8d0] font-mono mt-0.5">
+                  <div
+                    className="border rounded-xl p-2.5"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-[10px] uppercase tracking-wide" style={{ color: "var(--app-muted)" }}>Graha A ({planetA})</div>
+                    <div className="text-sm font-semibold font-mono mt-0.5" style={{ color: "var(--app-fg)" }}>
                       {lonA.formatted}
                     </div>
-                    <div className="text-[10px] text-[#8e88b8] mt-0.5">Absolute: {evidence.longitudeA.toFixed(2)}°</div>
+                    <div className="text-[10px] mt-0.5" style={{ color: "var(--app-muted)" }}>Absolute: {evidence.longitudeA.toFixed(2)}°</div>
                   </div>
 
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-2.5">
-                    <div className="text-[10px] text-[#605890] uppercase tracking-wide">Graha B ({planetB})</div>
-                    <div className="text-sm font-semibold text-[#f0e8d0] font-mono mt-0.5">
+                  <div
+                    className="border rounded-xl p-2.5"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-[10px] uppercase tracking-wide" style={{ color: "var(--app-muted)" }}>Graha B ({planetB})</div>
+                    <div className="text-sm font-semibold font-mono mt-0.5" style={{ color: "var(--app-fg)" }}>
                       {lonB.formatted}
                     </div>
-                    <div className="text-[10px] text-[#8e88b8] mt-0.5">Absolute: {evidence.longitudeB.toFixed(2)}°</div>
+                    <div className="text-[10px] mt-0.5" style={{ color: "var(--app-muted)" }}>Absolute: {evidence.longitudeB.toFixed(2)}°</div>
                   </div>
 
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-2.5">
-                    <div className="text-[10px] text-[#605890] uppercase tracking-wide">Angular Separation & Orb</div>
-                    <div className="text-sm font-semibold text-[#c8a030] font-mono mt-0.5">
+                  <div
+                    className="border rounded-xl p-2.5"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-[10px] uppercase tracking-wide" style={{ color: "var(--app-muted)" }}>Angular Separation & Orb</div>
+                    <div className="text-sm font-semibold font-mono mt-0.5" style={{ color: "var(--app-gold)" }}>
                       {evidence.exactAspectDeg}° (Orb {orbStr})
                     </div>
-                    <div className="text-[10px] text-[#8e88b8] mt-0.5">
+                    <div className="text-[10px] mt-0.5" style={{ color: "var(--app-muted)" }}>
                       {evidence.isApplying ? "Approaching (Applying)" : "Separating Phase"}
                     </div>
                   </div>
 
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-2.5">
-                    <div className="text-[10px] text-[#605890] uppercase tracking-wide">Vedic Classification</div>
+                  <div
+                    className="border rounded-xl p-2.5"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-[10px] uppercase tracking-wide" style={{ color: "var(--app-muted)" }}>Vedic Classification</div>
                     <div className="text-sm font-semibold text-[#a855f7] mt-0.5">
                       {evidence.aspectType}
                     </div>
@@ -228,25 +264,44 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
 
               {/* 2. Classical Shastra Interpretation */}
               <div>
-                <div className="text-[11px] font-bold text-[#c8a030] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <div
+                  className="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"
+                  style={{ color: "var(--app-gold)" }}
+                >
                   <span>📜</span> 2. Classical Shastra Archetypes & Tension Pattern
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-3 leading-relaxed">
-                    <div className="text-xs font-semibold text-[#f0e8d0] mb-1">{planetA} Significators (Karakatwa)</div>
-                    <div className="text-[11px] text-[#c8c0a8] mb-1.5">{karakaA.karaka}</div>
-                    <div className="text-[10px] text-[#8e88b8] italic">Nature: {karakaA.nature}</div>
+                  <div
+                    className="border rounded-xl p-3 leading-relaxed"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-xs font-semibold mb-1" style={{ color: "var(--app-fg)" }}>{planetA} Significators (Karakatwa)</div>
+                    <div className="text-[11px] mb-1.5" style={{ color: "var(--app-soft)" }}>{karakaA.karaka}</div>
+                    <div className="text-[10px] italic" style={{ color: "var(--app-muted)" }}>Nature: {karakaA.nature}</div>
                   </div>
 
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-3 leading-relaxed">
-                    <div className="text-xs font-semibold text-[#f0e8d0] mb-1">{planetB} Significators (Karakatwa)</div>
-                    <div className="text-[11px] text-[#c8c0a8] mb-1.5">{karakaB.karaka}</div>
-                    <div className="text-[10px] text-[#8e88b8] italic">Nature: {karakaB.nature}</div>
+                  <div
+                    className="border rounded-xl p-3 leading-relaxed"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-xs font-semibold mb-1" style={{ color: "var(--app-fg)" }}>{planetB} Significators (Karakatwa)</div>
+                    <div className="text-[11px] mb-1.5" style={{ color: "var(--app-soft)" }}>{karakaB.karaka}</div>
+                    <div className="text-[10px] italic" style={{ color: "var(--app-muted)" }}>Nature: {karakaB.nature}</div>
                   </div>
                 </div>
 
-                <div className="bg-[#0a0720]/80 border border-[#1c1840] rounded-xl p-3 mt-2.5 leading-relaxed text-xs text-[#d4ccb8]">
-                  <div className="text-[10px] uppercase font-bold tracking-wider text-[#c8a030] mb-1">
+                <div
+                  className="border rounded-xl p-3 mt-2.5 leading-relaxed text-xs"
+                  style={{
+                    background: "var(--app-card)",
+                    borderColor: "var(--app-border)",
+                    color: "var(--app-soft)",
+                  }}
+                >
+                  <div
+                    className="text-[10px] uppercase font-bold tracking-wider mb-1"
+                    style={{ color: "var(--app-gold)" }}
+                  >
                     Why the tension arises:
                   </div>
                   When {planetA} and {planetB} form a strong geometric aspect, the traditional Vedic framework treats their significations as being placed in direct psychological tension. One graha represents personal will and self-assertion, while the other demands patience, duty, and reality-testing. The Shastra advises balance over extreme reactivity.
@@ -255,17 +310,26 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
 
               {/* 3. Why this matters in YOUR chart */}
               <div>
-                <div className="text-[11px] font-bold text-[#c8a030] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <div
+                  className="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"
+                  style={{ color: "var(--app-gold)" }}
+                >
                   <span>🎯</span> 3. Application in Your Unique Natal Chart
                 </div>
-                <div className="bg-gradient-to-r from-[#0d0a26] to-[#120e35] border border-[#c8a030]/20 rounded-xl p-3.5 leading-relaxed">
-                  <div className="text-xs text-[#f0e8d0] font-medium mb-1">
+                <div
+                  className="border rounded-xl p-3.5 leading-relaxed"
+                  style={{
+                    background: "var(--app-card)",
+                    borderColor: "color-mix(in srgb, var(--app-gold) 25%, var(--app-border))",
+                  }}
+                >
+                  <div className="text-xs font-medium mb-1" style={{ color: "var(--app-fg)" }}>
                     Activated Axis: {trigger.activatedHouses.map((h) => `House ${h}`).join(" ↔ ")}
                   </div>
-                  <div className="text-xs text-[#c8c0a8]">
+                  <div className="text-xs" style={{ color: "var(--app-soft)" }}>
                     This is why this trigger isn&apos;t just an abstract &ldquo;{planetA} vs {planetB}&rdquo; textbook quote. Because it falls across your {trigger.activatedHouses.map((h) => `House ${h}`).join(" and ")} axis, it directly influences {trigger.lifeAreas.join(" and ")}. Consciously align with this energy by applying your recommended 1-minute reset.
                   </div>
-                  <div className="mt-2 text-[10px] text-[#8e88b8] font-mono">
+                  <div className="mt-2 text-[10px] font-mono" style={{ color: "var(--app-muted)" }}>
                     Classical Source Tradition: {evidence.shastraReference}
                   </div>
                 </div>
@@ -273,36 +337,48 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
 
               {/* 4. Nativity Modifiers & Micro-Timing */}
               <div>
-                <div className="text-[11px] font-bold text-[#c8a030] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <div
+                  className="text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"
+                  style={{ color: "var(--app-gold)" }}
+                >
                   <span>🌙</span> 4. Personal Modifiers & Timing Calculations
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-2.5">
-                    <div className="text-[10px] text-[#605890] uppercase tracking-wide">Tara Bala Calculation</div>
-                    <div className="text-xs font-semibold text-[#f0e8d0] mt-0.5">
+                  <div
+                    className="border rounded-xl p-2.5"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-[10px] uppercase tracking-wide" style={{ color: "var(--app-muted)" }}>Tara Bala Calculation</div>
+                    <div className="text-xs font-semibold mt-0.5" style={{ color: "var(--app-fg)" }}>
                       {taraBala.name} Tara (#{taraBala.number})
                     </div>
-                    <div className="text-[10px] text-[#8e88b8] mt-0.5">
+                    <div className="text-[10px] mt-0.5" style={{ color: "var(--app-muted)" }}>
                       {taraBala.birthNakshatra} → {taraBala.transitNakshatra}
                     </div>
                   </div>
 
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-2.5">
-                    <div className="text-[10px] text-[#605890] uppercase tracking-wide">Chandra Bala Calculation</div>
-                    <div className="text-xs font-semibold text-[#f0e8d0] mt-0.5">
+                  <div
+                    className="border rounded-xl p-2.5"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-[10px] uppercase tracking-wide" style={{ color: "var(--app-muted)" }}>Chandra Bala Calculation</div>
+                    <div className="text-xs font-semibold mt-0.5" style={{ color: "var(--app-fg)" }}>
                       House {chandraBala.houseFromNatalMoon} from Moon
                     </div>
-                    <div className="text-[10px] text-[#8e88b8] mt-0.5">
+                    <div className="text-[10px] mt-0.5" style={{ color: "var(--app-muted)" }}>
                       {chandraBala.natalMoonSign} → {chandraBala.transitMoonSign}
                     </div>
                   </div>
 
-                  <div className="bg-[#0a0720] border border-[#1c1840] rounded-xl p-2.5">
-                    <div className="text-[10px] text-[#605890] uppercase tracking-wide">Diurnal Windows</div>
-                    <div className="text-xs font-semibold text-[#4ade80] mt-0.5">
+                  <div
+                    className="border rounded-xl p-2.5"
+                    style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+                  >
+                    <div className="text-[10px] uppercase tracking-wide" style={{ color: "var(--app-muted)" }}>Diurnal Windows</div>
+                    <div className="text-xs font-semibold text-emerald-500 mt-0.5">
                       Abhijit: {timing.actionWindow.start}–{timing.actionWindow.end}
                     </div>
-                    <div className="text-[10px] text-[#f87171] mt-0.5">
+                    <div className="text-[10px] text-rose-500 mt-0.5">
                       Rahu Kaal: {timing.avoidWindow.start}–{timing.avoidWindow.end}
                     </div>
                   </div>
@@ -310,7 +386,7 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
               </div>
             </>
           ) : (
-            <div className="py-4 text-center text-xs text-[#8e88b8]">
+            <div className="py-4 text-center text-xs" style={{ color: "var(--app-muted)" }}>
               No active tension trigger is currently exerting peak pressure on your chart. Explore the Vedic Pathshala tab below to learn the foundational principles.
             </div>
           )}
@@ -320,7 +396,7 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
       {/* Tab 2: Vedic Pathshala (5 Concepts) */}
       {activeTab === "masterclass" && (
         <div className="pt-4 space-y-4">
-          <div className="text-[11px] text-[#8e88b8] leading-relaxed">
+          <div className="text-[11px] leading-relaxed" style={{ color: "var(--app-muted)" }}>
             Astrology is not a superstition; it is an ancient observational science (Vedanga Jyotisha) of time, geometry, and human consciousness. Here are the 5 core mechanics that drive every calculation in your Cosmic Pulse:
           </div>
 
@@ -328,27 +404,28 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
             {CLASSICAL_CONCEPTS.map((concept) => (
               <div
                 key={concept.id}
-                className="bg-[#0a0720] border border-[#1c1840] hover:border-[#c8a030]/30 transition-colors rounded-xl p-3.5"
+                className="border transition-colors rounded-xl p-3.5"
+                style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1.5">
-                  <span className="text-sm font-serif font-bold text-[#f0e8d0]">
+                  <span className="text-sm font-serif font-bold" style={{ color: "var(--app-fg)" }}>
                     {concept.title}
                   </span>
-                  <span className="text-[11px] font-serif text-[#c8a030] tracking-wide">
+                  <span className="text-[11px] font-serif tracking-wide" style={{ color: "var(--app-gold)" }}>
                     {concept.sanskrit}
                   </span>
                 </div>
 
                 <div className="space-y-1.5 text-xs">
                   <div>
-                    <span className="text-[#c8a030] font-semibold">Kaise Kaam Karta Hai (Mechanism): </span>
-                    <span className="text-[#c8c0a8]">{concept.howItWorks}</span>
+                    <span className="font-semibold" style={{ color: "var(--app-gold)" }}>Kaise Kaam Karta Hai (Mechanism): </span>
+                    <span style={{ color: "var(--app-soft)" }}>{concept.howItWorks}</span>
                   </div>
                   <div>
-                    <span className="text-[#a855f7] font-semibold">Kyu Zaroori Hai (Psychological Impact): </span>
-                    <span className="text-[#c8c0a8]">{concept.whyItMatters}</span>
+                    <span className="font-semibold text-purple-400">Kyu Zaroori Hai (Psychological Impact): </span>
+                    <span style={{ color: "var(--app-soft)" }}>{concept.whyItMatters}</span>
                   </div>
-                  <div className="text-[10px] text-[#605890] font-mono pt-1">
+                  <div className="text-[10px] font-mono pt-1" style={{ color: "var(--app-muted)" }}>
                     📖 Shastra Principle: {concept.classicalRule}
                   </div>
                 </div>

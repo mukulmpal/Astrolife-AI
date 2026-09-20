@@ -14,56 +14,65 @@ export const PulseBalance: React.FC<PulseBalanceProps> = ({
   const isTaraCaution = taraBala.quality === "caution";
 
   return (
-    <div className="pt-3 border-t border-[#1c1840]/60">
+    <div className="pt-3 border-t" style={{ borderColor: "var(--app-border)" }}>
       <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] uppercase tracking-wider font-semibold text-[#8e88b8]">
+        <div
+          className="text-[10px] uppercase tracking-wider font-semibold"
+          style={{ color: "var(--app-muted)" }}
+        >
           Personal Modifiers · Nativity Filter
         </div>
-        <div className="text-[10px] text-[#605890] italic">
+        <div className="text-[10px] italic" style={{ color: "var(--app-muted)" }}>
           Filters macro transit through your birth Moon
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Tara Bala */}
-        <div className="bg-[#0a0720]/60 border border-[#1c1840] rounded-xl p-3">
+        <div
+          className="rounded-xl p-3 border"
+          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+        >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-semibold text-[#f0e8d0]">
+            <span className="text-xs font-semibold" style={{ color: "var(--app-fg)" }}>
               {taraBala.name} Tara (T#{taraBala.number})
             </span>
             <span
               className={`text-[10px] font-medium px-2 py-0.5 rounded ${
                 isTaraSupportive
-                  ? "text-[#4ade80] bg-[#22c55e]/10 border border-[#22c55e]/25"
+                  ? "text-emerald-500 bg-emerald-500/10 border border-emerald-500/25"
                   : isTaraCaution
-                  ? "text-[#fbbf24] bg-[#f59e0b]/10 border border-[#f59e0b]/25"
-                  : "text-[#93c5fd] bg-[#3b82f6]/10 border border-[#3b82f6]/25"
+                  ? "text-amber-500 bg-amber-500/10 border border-amber-500/25"
+                  : "text-sky-400 bg-sky-500/10 border border-sky-500/25"
               }`}
             >
               {isTaraSupportive ? "Supportive" : isTaraCaution ? "Cautionary" : "Neutral"}
             </span>
           </div>
-          <div className="text-[11px] text-[#a098c0] leading-snug">
+          <div className="text-[11px] leading-snug" style={{ color: "var(--app-soft)" }}>
             {taraBala.guidance}
           </div>
-          <div className="text-[10px] text-[#605890] mt-1.5 font-mono">
+          <div className="text-[10px] mt-1.5 font-mono" style={{ color: "var(--app-muted)" }}>
             {taraBala.birthNakshatra} (Birth) → {taraBala.transitNakshatra} (Transit)
           </div>
         </div>
 
         {/* Chandra Bala */}
-        <div className="bg-[#0a0720]/60 border border-[#1c1840] rounded-xl p-3">
+        <div
+          className="rounded-xl p-3 border"
+          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+        >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-semibold text-[#f0e8d0]">
+            <span className="text-xs font-semibold" style={{ color: "var(--app-fg)" }}>
               Chandra Bala ({chandraBala.houseFromNatalMoon}th House)
             </span>
             <span
               className={`text-[10px] font-medium px-2 py-0.5 rounded ${
                 chandraBala.isAshtamaChandra
-                  ? "text-[#f87171] bg-[#ef4444]/10 border border-[#ef4444]/25"
+                  ? "text-rose-500 bg-rose-500/10 border border-rose-500/25"
                   : chandraBala.isSupportive
-                  ? "text-[#4ade80] bg-[#22c55e]/10 border border-[#22c55e]/25"
-                  : "text-[#fbbf24] bg-[#f59e0b]/10 border border-[#f59e0b]/25"
+                  ? "text-emerald-500 bg-emerald-500/10 border border-emerald-500/25"
+                  : "text-amber-500 bg-amber-500/10 border border-amber-500/25"
               }`}
             >
               {chandraBala.isAshtamaChandra
@@ -73,10 +82,10 @@ export const PulseBalance: React.FC<PulseBalanceProps> = ({
                 : "Gentle Handling"}
             </span>
           </div>
-          <div className="text-[11px] text-[#a098c0] leading-snug">
+          <div className="text-[11px] leading-snug" style={{ color: "var(--app-soft)" }}>
             {chandraBala.guidance}
           </div>
-          <div className="text-[10px] text-[#605890] mt-1.5 font-mono">
+          <div className="text-[10px] mt-1.5 font-mono" style={{ color: "var(--app-muted)" }}>
             Moon in {chandraBala.transitMoonSign} from Natal {chandraBala.natalMoonSign}
           </div>
         </div>

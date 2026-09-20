@@ -12,28 +12,48 @@ export const PulseRemedy: React.FC<PulseRemedyProps> = ({
   durationMinutes = 1,
 }) => {
   return (
-    <div className="pt-3 border-t border-[#1c1840]/60">
-      <div className="text-[10px] uppercase tracking-wider font-semibold text-[#8e88b8] mb-2 flex items-center gap-1.5">
+    <div className="pt-3 border-t" style={{ borderColor: "var(--app-border)" }}>
+      <div
+        className="text-[10px] uppercase tracking-wider font-semibold mb-2 flex items-center gap-1.5"
+        style={{ color: "var(--app-muted)" }}
+      >
         <span>⚡</span> Practical Alignment & Upaya
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* 1-Minute Behavioral Reset */}
-        <div className="bg-gradient-to-br from-[#0a0720] to-[#120e30] border border-[#c8a030]/25 rounded-xl p-3">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#c8a030] mb-1.5">
+        <div
+          className="rounded-xl p-3 border"
+          style={{
+            background: "var(--app-card-alt)",
+            borderColor: "color-mix(in srgb, var(--app-gold) 35%, var(--app-border))",
+          }}
+        >
+          <div
+            className="flex items-center gap-1.5 text-xs font-semibold mb-1.5"
+            style={{ color: "var(--app-gold)" }}
+          >
             <span className="text-sm">⏱️</span> {durationMinutes}-Minute Behavioral Reset
           </div>
-          <div className="text-xs text-[#f0e8d0] leading-relaxed">
+          <div className="text-xs leading-relaxed" style={{ color: "var(--app-soft)" }}>
             {behavioralReset}
           </div>
         </div>
 
         {/* Traditional Vedic Upaya */}
-        <div className="bg-gradient-to-br from-[#0a0720] to-[#1a1238] border border-[#a855f7]/25 rounded-xl p-3">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#c084fc] mb-1.5">
+        <div
+          className="rounded-xl p-3 border"
+          style={{
+            background: "var(--app-card-alt)",
+            borderColor: "color-mix(in srgb, var(--al-violet, #a855f7) 35%, var(--app-border))",
+          }}
+        >
+          <div
+            className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-purple-400"
+          >
             <span className="text-sm">🪔</span> Traditional Vedic Upaya
           </div>
-          <div className="text-xs text-[#e2d8c0] leading-relaxed">
+          <div className="text-xs leading-relaxed" style={{ color: "var(--app-soft)" }}>
             {traditionalUpaya}
           </div>
         </div>

@@ -16,10 +16,10 @@ export const PulseAlert: React.FC<PulseAlertProps> = ({
   if (!trigger) {
     return (
       <div className="py-4">
-        <div className="text-xl serif text-[#f0e8d0] font-semibold">
+        <div className="text-xl serif font-semibold" style={{ color: "var(--app-fg)" }}>
           Quiet Celestial Current · Balanced Alignment
         </div>
-        <div className="text-sm text-[#c8c0a8] mt-2 leading-relaxed max-w-2xl">
+        <div className="text-sm mt-2 leading-relaxed max-w-2xl" style={{ color: "var(--app-soft)" }}>
           No harsh planetary oppositions or conflicting special aspects are dominating your chart right now. 
           Use this window for steady momentum, constructive discipline, and foundational progress.
         </div>
@@ -37,49 +37,67 @@ export const PulseAlert: React.FC<PulseAlertProps> = ({
     <div className="py-4 space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <span className="text-2xl font-serif font-bold text-[#f0e8d0] tracking-wide">
+          <span className="text-2xl font-serif font-bold tracking-wide" style={{ color: "var(--app-fg)" }}>
             {planetPair}
           </span>
-          <span className="text-xs uppercase tracking-wider font-semibold text-[#c8a030] bg-[#c8a030]/10 border border-[#c8a030]/20 px-2.5 py-0.5 rounded">
+          <span
+            className="text-xs uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded border"
+            style={{
+              background: "color-mix(in srgb, var(--app-gold) 12%, transparent)",
+              borderColor: "color-mix(in srgb, var(--app-gold) 25%, transparent)",
+              color: "var(--app-gold)",
+            }}
+          >
             {trigger.evidence.aspectType.replace(/Pratikool/gi, "Pattern")}
           </span>
         </div>
-        <div className="text-xs text-[#a098c0]">
-          Orb distance: <span className="text-[#f0e8d0] font-mono">{orbStr}</span>
+        <div className="text-xs" style={{ color: "var(--app-muted)" }}>
+          Orb distance: <span className="font-mono font-bold" style={{ color: "var(--app-fg)" }}>{orbStr}</span>
         </div>
       </div>
 
-      <div className="text-base text-[#e2d8c0] font-medium leading-relaxed">
+      <div className="text-base font-medium leading-relaxed" style={{ color: "var(--app-fg)" }}>
         {trigger.headline}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#8e88b8]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs">
         {trigger.activatedHouses && trigger.activatedHouses.length > 0 && (
           <div>
-            <span className="text-[#605890]">Activated Houses:</span>{" "}
-            <span className="text-[#c8c0a8] font-mono">
+            <span style={{ color: "var(--app-muted)" }}>Activated Houses:</span>{" "}
+            <span className="font-mono" style={{ color: "var(--app-soft)" }}>
               {trigger.activatedHouses.map((h) => `H${h}`).join(" ↔ ")}
             </span>
           </div>
         )}
         {trigger.lifeAreas.length > 0 && (
           <div>
-            <span className="text-[#605890]">Focus Domain:</span>{" "}
-            <span className="text-[#c8a030]">{lifeAreasFormatted}</span>
+            <span style={{ color: "var(--app-muted)" }}>Focus Domain:</span>{" "}
+            <span style={{ color: "var(--app-gold)" }}>{lifeAreasFormatted}</span>
           </div>
         )}
       </div>
 
       {trigger.supportingSignals && trigger.supportingSignals.length > 0 && (
-        <div className="bg-[#0a0720]/80 border border-[#1c1840] rounded-xl p-2.5">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-[#a098c0] mb-1.5 flex items-center gap-1.5">
+        <div
+          className="rounded-xl p-2.5 border"
+          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+        >
+          <div
+            className="text-[10px] font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-1.5"
+            style={{ color: "var(--app-muted)" }}
+          >
             <span>✦</span> Supporting Signals (Trigger Fusion):
           </div>
           <div className="flex flex-wrap gap-1.5">
             {trigger.supportingSignals.map((signal, idx) => (
               <span
                 key={idx}
-                className="text-[11px] text-[#c8c0a8] bg-[#1c1840]/60 border border-[#1c1840] px-2 py-0.5 rounded-md"
+                className="text-[11px] px-2 py-0.5 rounded-md border"
+                style={{
+                  background: "color-mix(in srgb, var(--app-border) 40%, transparent)",
+                  borderColor: "var(--app-border)",
+                  color: "var(--app-soft)",
+                }}
               >
                 • {signal}
               </span>
@@ -89,19 +107,25 @@ export const PulseAlert: React.FC<PulseAlertProps> = ({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-        <div className="bg-[#0a0720]/70 border border-[#1c1840] rounded-xl p-3 text-xs leading-relaxed">
-          <div className="flex items-center gap-1.5 text-[#4ade80] font-semibold mb-1">
+        <div
+          className="rounded-xl p-3 text-xs leading-relaxed border"
+          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+        >
+          <div className="flex items-center gap-1.5 text-emerald-500 font-semibold mb-1">
             <span>✓</span> Action Strategy
           </div>
-          <div className="text-[#c8c0a8]">{trigger.action}</div>
+          <div style={{ color: "var(--app-soft)" }}>{trigger.action}</div>
         </div>
 
         {trigger.precaution && (
-          <div className="bg-[#0a0720]/70 border border-[#1c1840] rounded-xl p-3 text-xs leading-relaxed">
-            <div className="flex items-center gap-1.5 text-[#fbbf24] font-semibold mb-1">
+          <div
+            className="rounded-xl p-3 text-xs leading-relaxed border"
+            style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+          >
+            <div className="flex items-center gap-1.5 text-amber-500 font-semibold mb-1">
               <span>⚠</span> Conscious Precaution
             </div>
-            <div className="text-[#c8c0a8]">{trigger.precaution}</div>
+            <div style={{ color: "var(--app-soft)" }}>{trigger.precaution}</div>
           </div>
         )}
       </div>
@@ -110,7 +134,12 @@ export const PulseAlert: React.FC<PulseAlertProps> = ({
         <button
           type="button"
           onClick={onOpenEvidence}
-          className="group inline-flex items-center gap-2 text-xs font-semibold text-[#c8a030] hover:text-[#ffd700] transition-colors py-1.5 px-3 rounded-lg bg-[#c8a030]/10 hover:bg-[#c8a030]/15 border border-[#c8a030]/25"
+          className="group inline-flex items-center gap-2 text-xs font-semibold transition-all py-1.5 px-3 rounded-lg border"
+          style={{
+            background: "color-mix(in srgb, var(--app-gold) 10%, transparent)",
+            borderColor: "color-mix(in srgb, var(--app-gold) 28%, transparent)",
+            color: "var(--app-gold)",
+          }}
         >
           <span>{isEvidenceOpen ? "▲ Close Evidence & Shastra" : "▼ Why is this active? (Astronomical & Shastra Evidence)"}</span>
         </button>

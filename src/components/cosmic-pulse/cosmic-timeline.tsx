@@ -17,12 +17,18 @@ export const CosmicTimeline: React.FC<CosmicTimelineProps> = ({
 }) => {
   if (events.length === 0) {
     return (
-      <div className="py-12 px-4 text-center rounded-xl bg-[#0a0720]/60 border border-[#1a1440]">
-        <div className="text-3xl mb-3">✦</div>
-        <h4 className="text-base font-serif font-bold text-[#f0e8d0]">
+      <div
+        className="py-12 px-4 text-center rounded-xl border"
+        style={{
+          background: "var(--app-card)",
+          borderColor: "var(--app-border)",
+        }}
+      >
+        <div className="text-3xl mb-3" style={{ color: "var(--app-gold)" }}>✦</div>
+        <h4 className="text-base font-serif font-bold" style={{ color: "var(--app-fg)" }}>
           Quiet Celestial Current
         </h4>
-        <p className="text-xs sm:text-sm text-[#8e88b8] max-w-md mx-auto mt-1 leading-relaxed">
+        <p className="text-xs sm:text-sm max-w-md mx-auto mt-1 leading-relaxed" style={{ color: "var(--app-muted)" }}>
           No conflicting planetary aspects or exact natal transit hits culminate within this window. 
           Use this period of astrological stability to pursue sustained, focused efforts.
         </p>
@@ -60,22 +66,37 @@ export const CosmicTimeline: React.FC<CosmicTimelineProps> = ({
         <div key={secIdx} className="space-y-3">
           {/* Section Header */}
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-[#c8a030]" />
-            <h4 className="text-xs uppercase tracking-widest font-bold text-[#c8a030] font-mono">
+            <span className="w-2 h-2 rounded-full" style={{ background: "var(--app-gold)" }} />
+            <h4
+              className="text-xs uppercase tracking-widest font-bold font-mono"
+              style={{ color: "var(--app-gold)" }}
+            >
               {section.title}
             </h4>
-            <div className="flex-1 h-[1px] bg-gradient-to-r from-[#2a2256] to-transparent" />
-            <span className="text-[11px] text-[#706898] font-mono">
+            <div
+              className="flex-1 h-[1px]"
+              style={{ background: "linear-gradient(to right, var(--app-border), transparent)" }}
+            />
+            <span className="text-[11px] font-mono" style={{ color: "var(--app-muted)" }}>
               {section.items.length} {section.items.length === 1 ? "event" : "events"}
             </span>
           </div>
 
           {/* Events List */}
-          <div className="relative pl-4 sm:pl-6 border-l-2 border-[#1c1648] space-y-4">
+          <div
+            className="relative pl-4 sm:pl-6 border-l-2 space-y-4"
+            style={{ borderColor: "var(--app-border)" }}
+          >
             {section.items.map((event) => (
               <div key={event.id} className="relative">
                 {/* Timeline node icon on the vertical line */}
-                <div className="absolute -left-[21px] sm:-left-[29px] top-5 w-3 h-3 rounded-full bg-[#0a0720] border-2 border-[#c8a030]" />
+                <div
+                  className="absolute -left-[21px] sm:-left-[29px] top-5 w-3 h-3 rounded-full border-2"
+                  style={{
+                    background: "var(--app-card)",
+                    borderColor: "var(--app-gold)",
+                  }}
+                />
                 <CosmicEvent
                   event={event}
                   onOpenDetails={onOpenDetails}

@@ -126,6 +126,7 @@ export interface KPEventPromiseResult {
   cuspSubLord?: KPPlanet; // convenience alias
 
   status: EventPromiseStatus;
+  verdict?: EventPromiseStatus;
   significationStrength: SignificationStrength;
 
   signifiedHouses: number[];
@@ -146,5 +147,7 @@ export interface KPPredictiveEvidence {
   planetSignifications: Record<KPPlanet, PlanetSignifications>;
   cuspPromises: Record<number, CuspPromiseEvidence>;
   eventPromises?: Record<string, KPEventPromiseResult>;
+  dashaEvidence?: any;
+  dashaActivations?: any;
 }
 

@@ -7,49 +7,70 @@ interface PulseTimingProps {
 
 export const PulseTiming: React.FC<PulseTimingProps> = ({ timing }) => {
   return (
-    <div className="pt-3 border-t border-[#1c1840]/60">
-      <div className="text-[10px] uppercase tracking-wider font-semibold text-[#8e88b8] mb-2">
+    <div className="pt-3 border-t" style={{ borderColor: "var(--app-border)" }}>
+      <div
+        className="text-[10px] uppercase tracking-wider font-semibold mb-2"
+        style={{ color: "var(--app-muted)" }}
+      >
         Today&apos;s Windows · Vedic Micro-Timing
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Action Window */}
-        <div className="bg-[#0a0720]/80 border border-[#22c55e]/25 hover:border-[#22c55e]/40 transition-colors rounded-xl p-3 flex flex-col justify-between">
+        <div
+          className="border transition-colors rounded-xl p-3 flex flex-col justify-between"
+          style={{
+            background: "var(--app-card-alt)",
+            borderColor: "color-mix(in srgb, #22c55e 35%, var(--app-border))",
+          }}
+        >
           <div>
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-[#4ade80] uppercase">
-                <span className="w-2 h-2 rounded-full bg-[#22c55e]" />
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-emerald-500 uppercase">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 Action Window
               </span>
-              <span className="text-[11px] font-medium text-[#c8a030]">
+              <span className="text-[11px] font-medium" style={{ color: "var(--app-gold)" }}>
                 {timing.actionWindow.name}
               </span>
             </div>
-            <div className="text-lg font-serif font-bold text-[#f0e8d0] my-1 font-mono tracking-tight">
+            <div
+              className="text-lg font-serif font-bold my-1 font-mono tracking-tight"
+              style={{ color: "var(--app-fg)" }}
+            >
               {timing.actionWindow.start} — {timing.actionWindow.end}
             </div>
           </div>
-          <div className="text-[11px] text-[#a098c0] leading-snug">
+          <div className="text-[11px] leading-snug" style={{ color: "var(--app-soft)" }}>
             {timing.actionWindow.guidance}
           </div>
         </div>
 
         {/* Caution Window */}
-        <div className="bg-[#0a0720]/80 border border-[#ef4444]/25 hover:border-[#ef4444]/40 transition-colors rounded-xl p-3 flex flex-col justify-between">
+        <div
+          className="border transition-colors rounded-xl p-3 flex flex-col justify-between"
+          style={{
+            background: "var(--app-card-alt)",
+            borderColor: "color-mix(in srgb, #ef4444 35%, var(--app-border))",
+          }}
+        >
           <div>
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-[#f87171] uppercase">
-                <span className="w-2 h-2 rounded-full bg-[#ef4444]" />
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-rose-500 uppercase">
+                <span className="w-2 h-2 rounded-full bg-rose-500" />
                 Caution Window
               </span>
-              <span className="text-[11px] font-medium text-[#c084fc]">
+              <span className="text-[11px] font-medium text-purple-400">
                 {timing.avoidWindow.name}
               </span>
             </div>
-            <div className="text-lg font-serif font-bold text-[#f0e8d0] my-1 font-mono tracking-tight">
+            <div
+              className="text-lg font-serif font-bold my-1 font-mono tracking-tight"
+              style={{ color: "var(--app-fg)" }}
+            >
               {timing.avoidWindow.start} — {timing.avoidWindow.end}
             </div>
           </div>
-          <div className="text-[11px] text-[#a098c0] leading-snug">
+          <div className="text-[11px] leading-snug" style={{ color: "var(--app-soft)" }}>
             {timing.avoidWindow.guidance}
           </div>
         </div>

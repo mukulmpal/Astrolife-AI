@@ -20,7 +20,9 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
   horizons,
   onOpenLiveEvidence,
 }) => {
-  const [activeHorizon, setActiveHorizon] = useState<HorizonTab>("next30");
+  const [activeHorizon, setActiveHorizon] = useState<HorizonTab>(
+    horizons.now.length > 0 ? "now" : "next30"
+  );
   const [activeCategory, setActiveCategory] = useState<FilterCategory>("all");
   const [activeRelevance, setActiveRelevance] = useState<RelevanceFilter>("all");
   const [selectedEvent, setSelectedEvent] = useState<CosmicForecastEvent | null>(null);
@@ -38,49 +40,71 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
   const next90Count = horizons.next90Days.length;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a0720] via-[#0d0928] to-[#070518] border border-[#c8a030]/25 shadow-xl p-5 sm:p-6 mb-6">
+    <div
+      className="relative overflow-hidden rounded-2xl border shadow-xl p-5 sm:p-6 mb-6 transition-colors duration-300"
+      style={{
+        background: "linear-gradient(135deg, var(--app-card), var(--app-card-alt))",
+        borderColor: "var(--app-border-strong)",
+      }}
+    >
       {/* Background Subtle Radial Glow */}
       <div
         className="absolute top-0 left-1/3 w-80 h-80 rounded-full pointer-events-none opacity-15 blur-3xl"
-        style={{ background: "radial-gradient(circle, #38bdf8 0%, #c8a030 50%, transparent 80%)" }}
+        style={{ background: "radial-gradient(circle, var(--al-violet, #38bdf8) 0%, var(--app-gold) 50%, transparent 80%)" }}
       />
 
       {/* Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div>
-          <div className="text-[10px] tracking-[2px] uppercase font-bold text-[#c8a030] flex items-center gap-1.5 font-mono">
+          <div
+            className="text-[10px] tracking-[2px] uppercase font-bold flex items-center gap-1.5 font-mono"
+            style={{ color: "var(--app-gold)" }}
+          >
             <span>✦</span> Cosmic Radar · Multi-Horizon Forecasting
           </div>
-          <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#f0e8d0] tracking-tight mt-0.5">
+          <h2
+            className="text-xl sm:text-2xl font-serif font-bold tracking-tight mt-0.5"
+            style={{ color: "var(--app-fg)" }}
+          >
             Predictive Planetary & Dasha Horizon
           </h2>
-          <p className="text-xs text-[#8e88b8] mt-1 max-w-xl">
+          <p className="text-xs mt-1 max-w-xl" style={{ color: "var(--app-muted)" }}>
             Continuous root-finding ephemeris scan identifying exact planetary culminations, retrograde passes, and dasha transitions.
           </p>
         </div>
 
         {/* Shastra Live Badge */}
-        <div className="text-[11px] text-[#c8a030] bg-[#c8a030]/10 border border-[#c8a030]/25 px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
+        <div
+          className="text-[11px] px-3 py-1 rounded-full flex items-center gap-1.5 font-mono border"
+          style={{
+            background: "color-mix(in srgb, var(--app-gold) 12%, transparent)",
+            borderColor: "color-mix(in srgb, var(--app-gold) 30%, transparent)",
+            color: "var(--app-gold)",
+          }}
+        >
           <span>Lahiri Sidereal Precision</span>
         </div>
       </div>
 
       {/* 3 Horizon Tabs (NOW, NEXT 30 DAYS, NEXT 90 DAYS) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1c1642] pb-3 mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3 mb-4" style={{ borderColor: "var(--app-border)" }}>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveHorizon("now")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
-              activeHorizon === "now"
-                ? "bg-[#c8a030] text-[#060410] shadow-md shadow-[#c8a030]/20"
-                : "bg-[#140f38] text-[#8e88b8] hover:text-[#f0e8d0] border border-[#201a52]"
-            }`}
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
+            style={{
+              background: activeHorizon === "now" ? "var(--app-gold)" : "var(--app-card)",
+              color: activeHorizon === "now" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
+              borderColor: activeHorizon === "now" ? "var(--app-gold)" : "var(--app-border)",
+            }}
           >
             <span>NOW (Live)</span>
             <span
-              className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
-                activeHorizon === "now" ? "bg-[#060410]/20 text-[#060410]" : "bg-[#201a52] text-[#c8a030]"
-              }`}
+              className="text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold"
+              style={{
+                background: activeHorizon === "now" ? "rgba(0,0,0,0.2)" : "var(--app-card-alt)",
+                color: activeHorizon === "now" ? "inherit" : "var(--app-gold)",
+              }}
             >
               {nowCount}
             </span>
@@ -88,17 +112,20 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
 
           <button
             onClick={() => setActiveHorizon("next30")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
-              activeHorizon === "next30"
-                ? "bg-[#c8a030] text-[#060410] shadow-md shadow-[#c8a030]/20"
-                : "bg-[#140f38] text-[#8e88b8] hover:text-[#f0e8d0] border border-[#201a52]"
-            }`}
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
+            style={{
+              background: activeHorizon === "next30" ? "var(--app-gold)" : "var(--app-card)",
+              color: activeHorizon === "next30" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
+              borderColor: activeHorizon === "next30" ? "var(--app-gold)" : "var(--app-border)",
+            }}
           >
             <span>NEXT 30 DAYS</span>
             <span
-              className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
-                activeHorizon === "next30" ? "bg-[#060410]/20 text-[#060410]" : "bg-[#201a52] text-[#c8a030]"
-              }`}
+              className="text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold"
+              style={{
+                background: activeHorizon === "next30" ? "rgba(0,0,0,0.2)" : "var(--app-card-alt)",
+                color: activeHorizon === "next30" ? "inherit" : "var(--app-gold)",
+              }}
             >
               {next30Count}
             </span>
@@ -106,17 +133,20 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
 
           <button
             onClick={() => setActiveHorizon("next90")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
-              activeHorizon === "next90"
-                ? "bg-[#c8a030] text-[#060410] shadow-md shadow-[#c8a030]/20"
-                : "bg-[#140f38] text-[#8e88b8] hover:text-[#f0e8d0] border border-[#201a52]"
-            }`}
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
+            style={{
+              background: activeHorizon === "next90" ? "var(--app-gold)" : "var(--app-card)",
+              color: activeHorizon === "next90" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
+              borderColor: activeHorizon === "next90" ? "var(--app-gold)" : "var(--app-border)",
+            }}
           >
             <span>NEXT 90 DAYS</span>
             <span
-              className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
-                activeHorizon === "next90" ? "bg-[#060410]/20 text-[#060410]" : "bg-[#201a52] text-[#c8a030]"
-              }`}
+              className="text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold"
+              style={{
+                background: activeHorizon === "next90" ? "rgba(0,0,0,0.2)" : "var(--app-card-alt)",
+                color: activeHorizon === "next90" ? "inherit" : "var(--app-gold)",
+              }}
             >
               {next90Count}
             </span>
@@ -127,35 +157,39 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
         {activeHorizon !== "now" && (
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {/* Priority Tiers */}
-            <div className="flex items-center gap-1 bg-[#0b0825] p-1 rounded-lg border border-[#1e174c]">
+            <div
+              className="flex items-center gap-1 p-1 rounded-lg border"
+              style={{ background: "var(--app-card)", borderColor: "var(--app-border)" }}
+            >
               <button
                 onClick={() => setActiveRelevance("all")}
-                className={`px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors ${
-                  activeRelevance === "all"
-                    ? "bg-[#282060] text-[#f0e8d0]"
-                    : "text-[#706898] hover:text-[#c8c0e8]"
-                }`}
+                className="px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors"
+                style={{
+                  background: activeRelevance === "all" ? "color-mix(in srgb, var(--app-gold) 20%, var(--app-card))" : "transparent",
+                  color: activeRelevance === "all" ? "var(--app-fg)" : "var(--app-muted)",
+                }}
               >
                 All
               </button>
               <button
                 onClick={() => setActiveRelevance("primary")}
-                className={`px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1 ${
-                  activeRelevance === "primary"
-                    ? "bg-[#c8a030]/25 text-[#c8a030] font-bold"
-                    : "text-[#706898] hover:text-[#c8c0e8]"
-                }`}
+                className="px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors flex items-center gap-1"
+                style={{
+                  background: activeRelevance === "primary" ? "color-mix(in srgb, var(--app-gold) 25%, transparent)" : "transparent",
+                  color: activeRelevance === "primary" ? "var(--app-gold)" : "var(--app-muted)",
+                  fontWeight: activeRelevance === "primary" ? 700 : 500,
+                }}
               >
                 <span>✦</span>
                 <span>Primary</span>
               </button>
               <button
                 onClick={() => setActiveRelevance("supporting")}
-                className={`px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors ${
-                  activeRelevance === "supporting"
-                    ? "bg-[#282060] text-[#a098c8]"
-                    : "text-[#706898] hover:text-[#c8c0e8]"
-                }`}
+                className="px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors"
+                style={{
+                  background: activeRelevance === "supporting" ? "color-mix(in srgb, var(--app-gold) 20%, var(--app-card))" : "transparent",
+                  color: activeRelevance === "supporting" ? "var(--app-fg)" : "var(--app-muted)",
+                }}
               >
                 Supporting
               </button>
@@ -163,46 +197,28 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
 
             {/* Category Chips */}
             <div className="flex items-center gap-1">
-              <button
-                onClick={() => setActiveCategory("all")}
-                className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-                  activeCategory === "all"
-                    ? "bg-[#261f5a] text-[#c8a030] border border-[#c8a030]/40"
-                    : "text-[#706898] hover:text-[#c8c0e8]"
-                }`}
-              >
-                All Types
-              </button>
-              <button
-                onClick={() => setActiveCategory("transit_hit")}
-                className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-                  activeCategory === "transit_hit"
-                    ? "bg-[#261f5a] text-[#c8a030] border border-[#c8a030]/40"
-                    : "text-[#706898] hover:text-[#c8c0e8]"
-                }`}
-              >
-                Natal Hits
-              </button>
-              <button
-                onClick={() => setActiveCategory("planetary_aspect")}
-                className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-                  activeCategory === "planetary_aspect"
-                    ? "bg-[#261f5a] text-[#c8a030] border border-[#c8a030]/40"
-                    : "text-[#706898] hover:text-[#c8c0e8]"
-                }`}
-              >
-                Aspects
-              </button>
-              <button
-                onClick={() => setActiveCategory("dasha_milestone")}
-                className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-                  activeCategory === "dasha_milestone"
-                    ? "bg-[#261f5a] text-[#c8a030] border border-[#c8a030]/40"
-                    : "text-[#706898] hover:text-[#c8c0e8]"
-                }`}
-              >
-                Dasha Shifts
-              </button>
+              {[
+                { id: "all", label: "All Types" },
+                { id: "transit_hit", label: "Natal Hits" },
+                { id: "planetary_aspect", label: "Aspects" },
+                { id: "dasha_milestone", label: "Dasha Shifts" },
+              ].map((cat) => {
+                const isSelected = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id as FilterCategory)}
+                    className="px-2.5 py-1 rounded text-[11px] font-medium transition-colors border"
+                    style={{
+                      background: isSelected ? "color-mix(in srgb, var(--app-gold) 16%, var(--app-card))" : "var(--app-card)",
+                      borderColor: isSelected ? "var(--app-gold)" : "var(--app-border)",
+                      color: isSelected ? "var(--app-gold)" : "var(--app-muted)",
+                    }}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -212,7 +228,14 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
       {activeHorizon === "now" ? (
         <div className="space-y-4">
           {horizons.now.length === 0 ? (
-            <div className="py-10 text-center text-xs text-[#8e88b8]">
+            <div
+              className="py-10 text-center text-xs rounded-xl border"
+              style={{
+                background: "var(--app-card)",
+                borderColor: "var(--app-border)",
+                color: "var(--app-muted)",
+              }}
+            >
               No active tension signals right now. Celestial balance is calm.
             </div>
           ) : (
@@ -223,7 +246,11 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="bg-[#0f0b2e] border border-[#201a4e] rounded-xl p-4 flex flex-wrap items-center justify-between gap-3"
+                    className="rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 border"
+                    style={{
+                      background: "var(--app-card)",
+                      borderColor: "var(--app-border)",
+                    }}
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -237,27 +264,32 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
                         >
                           {trigger.severity}
                         </span>
-                        <span className="text-sm font-serif font-bold text-[#f0e8d0]">
+                        <span className="text-sm font-serif font-bold" style={{ color: "var(--app-fg)" }}>
                           {trigger.primaryPlanets.join(" ↔ ")}
                         </span>
-                        <span className="text-[11px] text-[#c8a030] font-mono">
+                        <span className="text-[11px] font-mono" style={{ color: "var(--app-gold)" }}>
                           {trigger.evidence.aspectType}
                         </span>
                       </div>
-                      <div className="text-xs text-[#c8c0a8] max-w-xl">
+                      <div className="text-xs max-w-xl" style={{ color: "var(--app-soft)" }}>
                         {trigger.headline}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <div className="text-[10px] text-[#605890] uppercase font-mono">Current Orb</div>
-                        <div className="text-xs font-mono font-bold text-[#f0e8d0]">{orbStr}</div>
+                        <div className="text-[10px] uppercase font-mono" style={{ color: "var(--app-muted)" }}>Current Orb</div>
+                        <div className="text-xs font-mono font-bold" style={{ color: "var(--app-fg)" }}>{orbStr}</div>
                       </div>
                       {onOpenLiveEvidence && (
                         <button
                           onClick={onOpenLiveEvidence}
-                          className="text-xs font-semibold text-[#c8a030] bg-[#1a1444] hover:bg-[#241c5a] border border-[#c8a030]/30 px-3 py-1.5 rounded-lg transition-colors"
+                          className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors border"
+                          style={{
+                            background: "color-mix(in srgb, var(--app-gold) 12%, transparent)",
+                            borderColor: "color-mix(in srgb, var(--app-gold) 30%, transparent)",
+                            color: "var(--app-gold)",
+                          }}
                         >
                           View Shastra ✦
                         </button>

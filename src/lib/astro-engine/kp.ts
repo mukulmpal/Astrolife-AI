@@ -22,6 +22,7 @@ import { build4FoldHouseSignificators } from "./kp-significators";
 import { evaluateAllCuspPromises } from "./kp-cusp-promise";
 import { evaluateAllEventRules } from "./kp-event-promise";
 import { buildCurrentDashaHierarchyEvidence } from "./kp-dasha-evidence";
+import { evaluateAllDashaActivations } from "./kp-dasha-activation";
 
 export * from "./kp-evidence-types";
 export * from "./kp-significators";
@@ -29,6 +30,7 @@ export * from "./kp-cusp-promise";
 export * from "./kp-rule-registry";
 export * from "./kp-event-promise";
 export * from "./kp-dasha-evidence";
+export * from "./kp-dasha-activation";
 
 export type KPPlanet =
   | "Ketu"
@@ -201,6 +203,8 @@ export interface KPEngineResult {
   weakestEvent: SignificatorSet | null;
   coordinateProvenance?: KPCoordinateProvenance;
   predictiveEvidence?: KPPredictiveEvidence;
+  eventPromises?: Record<string, any>;
+  dashaActivations?: Record<string, any>;
 }
 
 const DASHA_ORDER: KPPlanet[] = [
@@ -1632,11 +1636,15 @@ export function runKPEngine(rawInput: unknown): KPEngineResult {
   const eventPromises = evaluateAllEventRules(predictiveEvidence);
   predictiveEvidence.eventPromises = eventPromises;
 
+  let dashaActivations: Record<string, any> | undefined = undefined;
   const chartObj: any = getChartRoot(rawInput);
   if (chartObj?.dob && chartObj?.tob) {
     try {
       const dashaEvidence = buildCurrentDashaHierarchyEvidence(chartObj, predictiveEvidence);
       (predictiveEvidence as any).dashaEvidence = dashaEvidence;
+
+      dashaActivations = evaluateAllDashaActivations(eventPromises, dashaEvidence);
+      (predictiveEvidence as any).dashaActivations = dashaActivations;
     } catch {
       // Gracefully omit if birth dates cannot be parsed
     }
@@ -1667,6 +1675,8 @@ export function runKPEngine(rawInput: unknown): KPEngineResult {
       "KP gives high importance to star lord and sub lord. The cusp sub lord shows whether an event is promised, while dasha and transit show when it may activate.",
     coordinateProvenance: input.coordinateProvenance,
     predictiveEvidence,
+    eventPromises,
+    dashaActivations,
   };
 }
 

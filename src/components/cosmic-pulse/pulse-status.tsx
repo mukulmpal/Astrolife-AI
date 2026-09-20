@@ -26,7 +26,10 @@ export const PulseStatus: React.FC<PulseStatusProps> = ({
     : null;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#1c1840]/60">
+    <div
+      className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b"
+      style={{ borderColor: "var(--app-border)" }}
+    >
       <div className="flex items-center gap-2">
         <span
           className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wider uppercase border"
@@ -42,18 +45,32 @@ export const PulseStatus: React.FC<PulseStatusProps> = ({
         </span>
 
         {lifecycle && (
-          <span className="text-[12px] text-[#a098c0] font-medium bg-[#0a0720]/80 border border-[#1c1840] px-2.5 py-1 rounded-full">
+          <span
+            className="text-[12px] font-medium px-2.5 py-1 rounded-full border"
+            style={{
+              background: "var(--app-card-alt)",
+              borderColor: "var(--app-border)",
+              color: "var(--app-soft)",
+            }}
+          >
             {lifecycle.badge}
           </span>
         )}
       </div>
 
       {dashaMilestone && (
-        <div className="text-[11px] text-[#e0b040] flex items-center gap-1.5 bg-[#c8a030]/10 border border-[#c8a030]/25 px-2.5 py-1 rounded-full">
+        <div
+          className="text-[11px] flex items-center gap-1.5 px-2.5 py-1 rounded-full border"
+          style={{
+            background: "color-mix(in srgb, var(--app-gold) 12%, transparent)",
+            borderColor: "color-mix(in srgb, var(--app-gold) 30%, transparent)",
+            color: "var(--app-gold)",
+          }}
+        >
           <span>⏳</span>
           <span className="font-medium">{dashaMilestone.headline}</span>
-          <span className="text-[#8e88b8]">·</span>
-          <span className="text-[#c8c0a8]">{dashaMilestone.daysRemaining} days left</span>
+          <span style={{ color: "var(--app-muted)" }}>·</span>
+          <span style={{ color: "var(--app-soft)" }}>{dashaMilestone.daysRemaining} days left</span>
         </div>
       )}
     </div>
