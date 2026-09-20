@@ -63,6 +63,7 @@ export const FEATURE_ACCESS: Record<FeatureKey, SubscriptionTier[]> = {
 
 export const ELITE_EMAILS = new Set([
   "mukulpal9@gmail.com",
+  "9palmukul@gmail.com",
   "prachi269pal@gmail.com",
 ]);
 
@@ -73,6 +74,7 @@ export function isEliteEmail(email?: string | null): boolean {
 
 export const ADMIN_EMAILS = new Set([
   "mukulpal9@gmail.com",
+  "9palmukul@gmail.com",
 ]);
 
 export function isAdminUser(email?: string | null): boolean {

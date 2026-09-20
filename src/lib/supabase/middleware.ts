@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .maybeSingle();
 
-    const tier = normalizeTier(profile?.subscription_tier);
+    const tier = normalizeTier(profile?.subscription_tier, user.email);
     if (tier === "free") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard/upgrade";

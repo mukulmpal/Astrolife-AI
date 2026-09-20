@@ -118,24 +118,59 @@ test("2I-D Audit 5 — Provisional Rules Preserve Provenance and Disclaimer", ()
   const kpResult = runKPEngine(chart);
   const evidence = kpResult.predictiveEvidence!;
 
-  const businessRule = KP_EVENT_RULE_REGISTRY["KP-RULE-BUSINESS-TRADE-01"];
-  assert.equal(businessRule.status, "Provisional");
+  const separationRule = KP_EVENT_RULE_REGISTRY["KP-RULE-MARITAL-SEPARATION-01"];
+  assert.equal(separationRule.status, "Provisional");
 
-  const businessResult = evidence.eventPromises!["KP-RULE-BUSINESS-TRADE-01"];
-  assert.ok(businessResult);
-  assert.equal(businessResult.ruleStatus, "Provisional");
-  assert.ok(businessResult.summary.includes("[PROVISIONAL METHODOLOGY]"));
+  const separationResult = evidence.eventPromises!["KP-RULE-MARITAL-SEPARATION-01"];
+  assert.ok(separationResult);
+  assert.equal(separationResult.ruleStatus, "Provisional");
+  assert.ok(separationResult.summary.includes("[PROVISIONAL METHODOLOGY]"));
 });
 
 test("2I-D Audit 6 — Verified Rules Have Exact Foundational Reader Citations", () => {
   const verifiedRules = getRulesByStatus("Verified");
-  assert.ok(verifiedRules.length >= 8, "Expected 8 Verified rules in canonical registry");
+  assert.ok(verifiedRules.length >= 19, `Expected at least 19 Verified rules, got ${verifiedRules.length}`);
 
   verifiedRules.forEach((rule) => {
     assert.equal(rule.status, "Verified");
     const src = rule.canonicalSource;
     assert.ok(src.includes("KP Reader"), `Verified rule ${rule.id} must cite KP Reader, got: ${src}`);
     assert.ok(src.includes("pp.") || src.includes("p."), `Must cite specific pages, got: ${src}`);
+  });
+});
+
+test("2I-D Audit 6b — Newly Attested Reader III Rules Are Verified & Evaluated", () => {
+  const chart = calculateChart("Delhi", "1995-05-15", "14:30", "Delhi", 28.6139, 77.209, 5.5);
+  const kpResult = runKPEngine(chart);
+  const evidence = kpResult.predictiveEvidence!;
+
+  const newReaderIIIRules = [
+    "KP-RULE-BUSINESS-TRADE-01",
+    "KP-RULE-HIGHER-EDUCATION-01",
+    "KP-RULE-SERVICE-TERMINATION-01",
+    "KP-RULE-SERVICE-REINSTATEMENT-01",
+    "KP-RULE-PROPERTY-DISPOSAL-01",
+    "KP-RULE-IMPRISONMENT-01",
+    "KP-RULE-IMPRISONMENT-RELEASE-01",
+    "KP-RULE-SCHOLARSHIP-01",
+    "KP-RULE-VEHICLE-ACQUISITION-01",
+    "KP-RULE-LOAN-BORROWING-01",
+    "KP-RULE-HOSPITALIZATION-01",
+  ];
+
+  newReaderIIIRules.forEach((ruleId) => {
+    const rule = KP_EVENT_RULE_REGISTRY[ruleId];
+    assert.ok(rule, `Rule ${ruleId} must exist`);
+    assert.equal(rule.status, "Verified", `Rule ${ruleId} must be Verified`);
+    assert.ok(rule.canonicalSource.includes("Reader 3"), `Rule ${ruleId} must cite Reader 3`);
+
+    const promise = evidence.eventPromises![ruleId];
+    assert.ok(promise, `Promise evaluation for ${ruleId} must exist`);
+    assert.equal(promise.ruleStatus, "Verified");
+    assert.ok(
+      ["SUPPORTED", "OBSTRUCTED", "MIXED", "INCONCLUSIVE"].includes(promise.status),
+      `Status for ${ruleId} must be a valid deterministic outcome`
+    );
   });
 });
 

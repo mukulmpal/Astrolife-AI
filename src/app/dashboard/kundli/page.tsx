@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
-import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult } from "@/lib/astro-engine/yogas";
+import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type PlanTier } from "@/lib/astro-engine/yogas";
 import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
 import { useLanguage } from "@/lib/language-context";
@@ -10,6 +10,7 @@ import CityAutocomplete, { type CitySearchResult } from "@/components/location/C
 import { EngineStateCard } from "@/components/engine-state-card";
 import { createClient } from "@/lib/supabase/client";
 import { calculateDivisional, type DivChart } from "@/lib/astro-engine/divisional";
+import { isFullAccessEnabled, isEliteEmail, normalizeTier } from "@/lib/access";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -28,8 +29,8 @@ function ianaToUtcOffset(timezone: string | null, dob: string, tob: string): num
     const match = tzStr.match(/GMT([+-])(\d+)(?::(\d+))?/);
     if (!match) return 5.5;
     const sign = match[1] === "-" ? -1 : 1;
-    const hours = Number(match[2] ?? 0);
-    const minutes = Number(match[3] ?? 0);
+    const hours = parseInt(match[2], 10);
+    const minutes = match[3] ? parseInt(match[3], 10) : 0;
     return sign * (hours + minutes / 60);
   } catch {
     return 5.5;
@@ -51,7 +52,40 @@ export default function KundliPage() {
   const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("chart");
   const [showForm, setShowForm] = useState(true);
+  const [userTier, setUserTier] = useState<PlanTier>(() => isFullAccessEnabled() ? "elite" : "free");
   const { chart: primaryChart, loading: chartLoading, hasUserChart } = useUserChart();
+
+  useEffect(() => {
+    if (isFullAccessEnabled()) {
+      setUserTier("elite");
+      return;
+    }
+    const loadTier = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.auth.getUser();
+        const user = data.user;
+        if (!user) return;
+        const isElite = (user.email && isEliteEmail(user.email)) ||
+          (user as any).app_metadata?.subscription_tier === "elite" ||
+          (user as any).user_metadata?.subscription_tier === "elite";
+        if (isElite) {
+          setUserTier("elite");
+          return;
+        }
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("subscription_tier")
+          .eq("id", user.id)
+          .maybeSingle();
+        const effective = normalizeTier(profile?.subscription_tier, user.email);
+        setUserTier(effective as PlanTier);
+      } catch (err) {
+        console.warn("Failed to load user tier in kundli page:", err);
+      }
+    };
+    loadTier();
+  }, []);
 
   const saveChartToLibrary = async (data: ChartData) => {
     const supabase = createClient();
@@ -90,15 +124,24 @@ export default function KundliPage() {
     return true;
   };
 
-  const applyChart = (data: ChartData) => {
+  const applyChart = (data: ChartData, tier: PlanTier = userTier) => {
     setChart(data);
     setActiveTab("chart");
-    const allYogas = detectYogas(data.planets as never, data.lagnaNum, "free");
+    const allYogas = detectYogas(data.planets as never, data.lagnaNum, tier);
     setYogas(allYogas);
     const present = allYogas.filter(y=>y.present&&!y.isDosha);
     setYogaScore(calculateYogaScore(present));
     setDivCharts(calculateDivisional(data.planets as never, data.lagnaNum, data.lagnaLon));
   };
+
+  useEffect(() => {
+    if (chart?.planets) {
+      const allYogas = detectYogas(chart.planets as never, chart.lagnaNum, userTier);
+      setYogas(allYogas);
+      const present = allYogas.filter(y=>y.present&&!y.isDosha);
+      setYogaScore(calculateYogaScore(present));
+    }
+  }, [userTier]);
 
   const downloadPDF = async () => {
     const element = document.querySelector(".page") as HTMLElement;
