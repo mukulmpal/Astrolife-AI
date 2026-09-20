@@ -149,7 +149,14 @@ export default function DashaPage() {
     return buildDashaTreeFromChart(chart);
   }, [chart, hasUserChart]);
 
-  const panchang = useMemo(() => calculatePanchang(new Date(), typeof chart?.tz === "number" ? chart.tz : 5.5), [chart]);
+  const panchang = useMemo(
+    () =>
+      calculatePanchang(new Date(), typeof chart?.tz === "number" ? chart.tz : 5.5, {
+        lat: chart?.lat,
+        lon: chart?.lon,
+      }),
+    [chart]
+  );
 
   const navtara = useMemo(() => {
     if (!dashaTree) return null;

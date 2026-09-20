@@ -1,495 +1,383 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { isAdminUser } from "@/lib/access";
+import Link from "next/link";
+import { Shield, ShieldAlert, Sparkles, UserCheck, Search, CheckCircle2, RefreshCw } from "lucide-react";
 
-// ── Types ──────────────────────────────────────────────────────
-
-type Stats = {
-  totalUsers: number;
-  totalCharts: number;
-  totalMessages: number;
-  totalQuestions: number;
-  todayMessages: number;
-  topAgents: Array<{ agent: string; count: number }>;
-  recentActivity: Array<{
-    user_id: string;
-    agent_id: string;
-    content: string;
-    created_at: string;
-  }>;
-};
-
-type AdminUser = {
+type UserRecord = {
   id: string;
   email: string;
-  joinedAt: string;
-  lastSignIn: string | null;
-  provider: string;
-  chartCount: number;
-  charts: Array<{ id: string; name: string; created_at: string }>;
-  questionCount: number;
-  replyCount: number;
-};
-
-type ChatMsg = {
-  id: string;
-  user_id: string;
-  userEmail: string;
-  session_id: string;
-  agent_id: string;
-  content: string;
-  aiResponse: string | null;
-  chart_name: string | null;
+  name: string;
+  subscription_tier: string;
+  subscription_expires_at: string | null;
   created_at: string;
+  last_sign_in_at: string | null;
 };
 
-type Tab = "overview" | "users" | "chat";
+export default function AdminPage() {
+  const [users, setUsers] = useState<UserRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-const AGENT_LABELS: Record<string, string> = {
-  career: "Career",
-  marriage: "Marriage",
-  lalkitab: "Lal Kitab",
-  karmic: "Karmic",
-  wealth: "Wealth",
-  psychology: "Psychology",
-  health: "Health",
-  remedy: "Remedy",
-  spiritual: "Spiritual",
-  transit: "Transit",
-};
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
 
-function fmt(dt: string | null) {
-  if (!dt) return "—";
-  return new Date(dt).toLocaleString("en-IN", {
-    day: "2-digit", month: "short", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
-  });
-}
-
-function timeAgo(dt: string | null) {
-  if (!dt) return "never";
-  const diff = Date.now() - new Date(dt).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1)  return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
-
-// ── Stat Card ─────────────────────────────────────────────────
-
-function StatCard({ label, value, sub, color = "amber" }: { label: string; value: string | number; sub?: string; color?: string }) {
-  const border = color === "green" ? "border-green-400/20 bg-green-500/5" :
-                 color === "cyan"  ? "border-cyan-400/20 bg-cyan-500/5"  :
-                 color === "purple"? "border-purple-400/20 bg-purple-500/5" :
-                 "border-amber-400/20 bg-amber-500/5";
-  const text   = color === "green" ? "text-green-300" :
-                 color === "cyan"  ? "text-cyan-300"  :
-                 color === "purple"? "text-purple-300" :
-                 "text-amber-300";
-  return (
-    <div className={`rounded-2xl border p-5 ${border}`}>
-      <p className="text-xs uppercase tracking-widest text-white/45">{label}</p>
-      <p className={`mt-2 text-4xl font-bold ${text}`}>{value}</p>
-      {sub && <p className="mt-1 text-xs text-white/40">{sub}</p>}
-    </div>
-  );
-}
-
-// ── Main Page ─────────────────────────────────────────────────
-
-export default function AdminDashboardPage() {
-  const [tab, setTab]             = useState<Tab>("overview");
-  const [stats, setStats]         = useState<Stats | null>(null);
-  const [users, setUsers]         = useState<AdminUser[]>([]);
-  const [anon, setAnon]           = useState<{ chartCount: number; charts: { id: string; name: string; dob: string; tob: string; city: string; created_at: string }[]; questionCount: number } | null>(null);
-  const [chat, setChat]           = useState<ChatMsg[]>([]);
-  const [chatTotal, setChatTotal] = useState(0);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState("");
-  const [searchChat, setSearchChat] = useState("");
-  const [filterAgent, setFilterAgent] = useState("");
-  const [expandedUser, setExpandedUser] = useState<string | null>(null);
-  const [chatOffset, setChatOffset] = useState(0);
-  const CHAT_PAGE = 50;
-
-  // ── Fetch helpers ──────────────────────────────────────────
-
-  const loadStats = useCallback(async () => {
+  const loadUsers = async () => {
     setLoading(true);
-    setError("");
     try {
-      const res = await fetch("/api/admin/stats");
-      if (!res.ok) throw new Error(await res.text());
-      setStats(await res.json());
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
-    } finally { setLoading(false); }
-  }, []);
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
 
-  const loadUsers = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
+      if (!user || !isAdminUser(user.email)) {
+        setAuthorized(false);
+        setLoading(false);
+        return;
+      }
+
+      setAuthorized(true);
       const res = await fetch("/api/admin/users");
-      if (!res.ok) throw new Error(await res.text());
-      const d = await res.json();
-      setUsers(d.users ?? []);
-      setAnon(d.anonymous ?? null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
-    } finally { setLoading(false); }
-  }, []);
-
-  const loadChat = useCallback(async (offset = 0, agent = "", search = "") => {
-    setLoading(true);
-    setError("");
-    try {
-      const params = new URLSearchParams({ limit: String(CHAT_PAGE), offset: String(offset) });
-      if (agent)  params.set("agent", agent);
-      if (search) params.set("search", search);
-      const res = await fetch(`/api/admin/chat-history?${params}`);
-      if (!res.ok) throw new Error(await res.text());
-      const d = await res.json();
-      setChat(d.messages ?? []);
-      setChatTotal(d.total ?? 0);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
-    } finally { setLoading(false); }
-  }, []);
-
-  // ── Tab switch ─────────────────────────────────────────────
+      const data = await res.json();
+      if (res.ok) {
+        setUsers(data.users || []);
+      } else {
+        showToast(data.error || "Failed to load users", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Network error loading users", "error");
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    void Promise.resolve().then(() => {
-      if (tab === "overview") loadStats();
-      if (tab === "users")    loadUsers();
-      if (tab === "chat")     loadChat(0, filterAgent, searchChat);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
+    loadUsers();
+  }, []);
 
-  function applyFilter() {
-    setChatOffset(0);
-    loadChat(0, filterAgent, searchChat);
+  const handleUpdateTier = async (userId: string, targetTier: "free" | "premium" | "elite") => {
+    setUpdatingId(userId);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, tier: targetTier }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`User updated to ${targetTier.toUpperCase()} successfully!`);
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === userId
+              ? {
+                  ...u,
+                  subscription_tier: targetTier,
+                  subscription_expires_at: data.expiresAt,
+                }
+              : u
+          )
+        );
+      } else {
+        showToast(data.error || "Update failed", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Error updating user tier", "error");
+    }
+    setUpdatingId(null);
+  };
+
+  if (authorized === false) {
+    return (
+      <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ background: "#0d0a22", border: "1px solid #2a2050", borderRadius: 20, padding: 36, textAlign: "center", maxWidth: 440 }}>
+          <ShieldAlert size={48} style={{ color: "#ef4444", margin: "0 auto 16px" }} />
+          <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 28, color: "#f0e8d0", marginBottom: 8 }}>
+            Access Restricted
+          </h2>
+          <p style={{ color: "#8078a8", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
+            Yeh area keval AstroLife Administrator accounts ke liye reserved hai.
+          </p>
+          <Link href="/dashboard" style={{ display: "inline-block", background: "linear-gradient(135deg,#c8a030,#a07820)", color: "#060410", padding: "10px 22px", borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+            Return to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
   }
 
-  // ── Render ─────────────────────────────────────────────────
+  const filteredUsers = users.filter(
+    (u) =>
+      u.email.toLowerCase().includes(search.toLowerCase()) ||
+      u.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const stats = {
+    total: users.length,
+    free: users.filter((u) => u.subscription_tier === "free").length,
+    premium: users.filter((u) => u.subscription_tier === "premium").length,
+    elite: users.filter((u) => u.subscription_tier === "elite").length,
+  };
 
   return (
-    <main className="min-h-screen bg-[#070515] px-4 py-8 text-white">
-      <div className="mx-auto max-w-7xl space-y-6">
-
-        {/* Header */}
-        <section className="rounded-3xl border border-amber-400/20 bg-white/[0.04] p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-300">Admin Only</p>
-          <h1 className="mt-1 text-3xl font-bold">AstroLife — User Experience Dashboard</h1>
-          <p className="mt-2 text-sm text-white/55">
-            Real-time view of users, their charts, and every question they ask the AI.
+    <div style={{ padding: "32px 28px", maxWidth: 1200, margin: "0 auto", color: "#f0e8d0" }}>
+      {/* HEADER */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16, marginBottom: 30 }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#c8a030", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>
+            <Shield size={14} /> AstroLife Command Center
+          </div>
+          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 34, fontWeight: 600, color: "#f0e8d0" }}>
+            User Role & Tier Management
+          </h1>
+          <p style={{ color: "#706898", fontSize: 13, marginTop: 4 }}>
+            Manage user entitlements, grant VIP Elite or Premium access, and inspect live Supabase subscribers.
           </p>
-        </section>
-
-        {/* Tabs */}
-        <div className="flex gap-2">
-          {([["overview", "Overview"], ["users", "Users"], ["chat", "Chat Questions"]] as const).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setTab(key)}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
-                tab === key
-                  ? "bg-amber-400 text-black"
-                  : "border border-white/15 text-white/60 hover:bg-white/10"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
         </div>
 
-        {error && (
-          <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200">
-            {error === '{"error":"Forbidden"}' || error.includes("Forbidden")
-              ? "Access denied. This page is only for the admin account."
-              : error}
-          </div>
-        )}
-
-        {loading && (
-          <div className="py-12 text-center text-white/40 text-sm">Loading…</div>
-        )}
-
-        {/* ── OVERVIEW TAB ── */}
-        {tab === "overview" && stats && !loading && (
-          <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-5">
-              <StatCard label="Total Users"     value={stats.totalUsers}     color="amber" />
-              <StatCard label="Total Charts"    value={stats.totalCharts}    color="green" />
-              <StatCard label="Total Questions" value={stats.totalQuestions} color="cyan"  />
-              <StatCard label="AI Replies"      value={stats.totalMessages - stats.totalQuestions} color="purple" />
-              <StatCard label="Today Messages"  value={stats.todayMessages}  color="amber" sub="last 24 hours" />
-            </div>
-
-            {/* Top Agents */}
-            <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-              <h2 className="text-xl font-bold">Most Used AI Agents</h2>
-              <div className="mt-4 grid gap-3 md:grid-cols-4">
-                {stats.topAgents.map((a) => (
-                  <div key={a.agent} className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <p className="font-semibold">{AGENT_LABELS[a.agent] ?? a.agent}</p>
-                    <p className="mt-1 text-2xl font-bold text-amber-300">{a.count}</p>
-                    <p className="text-xs text-white/40">questions</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Recent Activity */}
-            <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-              <h2 className="text-xl font-bold">Recent Questions</h2>
-              <div className="mt-4 space-y-3">
-                {stats.recentActivity.length === 0 && (
-                  <p className="text-sm text-white/40">No chat activity yet. Run SQL migration first.</p>
-                )}
-                {stats.recentActivity.map((a, i) => (
-                  <div key={i} className="flex items-start gap-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 text-xs text-white/40">
-                        <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-amber-300 font-semibold">
-                          {AGENT_LABELS[a.agent_id] ?? a.agent_id}
-                        </span>
-                        <span>{timeAgo(a.created_at)}</span>
-                      </div>
-                      <p className="mt-1 text-sm text-white/80 line-clamp-2">{a.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-        )}
-
-        {/* ── USERS TAB ── */}
-        {tab === "users" && !loading && (
-          <div className="space-y-5">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">All Users ({users.length})</h2>
-              <button
-                onClick={loadUsers}
-                className="rounded-full border border-white/15 px-4 py-1.5 text-sm text-white/60 hover:bg-white/10"
-              >
-                Refresh
-              </button>
-            </div>
-
-            <div className="mt-5 space-y-3">
-              {users.length === 0 && (
-                <p className="text-sm text-white/40">No users found.</p>
-              )}
-              {users.map((u) => (
-                <div key={u.id} className="rounded-2xl border border-white/10 bg-black/20">
-                  <button
-                    className="flex w-full items-center gap-4 p-4 text-left"
-                    onClick={() => setExpandedUser(expandedUser === u.id ? null : u.id)}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold text-white truncate">{u.email}</p>
-                        <span className="rounded-full border border-white/15 px-2 py-0.5 text-xs text-white/50">
-                          {u.provider}
-                        </span>
-                      </div>
-                      <div className="mt-1 flex flex-wrap gap-3 text-xs text-white/40">
-                        <span>Joined: {fmt(u.joinedAt)}</span>
-                        <span>Last seen: {timeAgo(u.lastSignIn)}</span>
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 gap-3 text-sm">
-                      <span className="rounded-full bg-green-500/15 px-3 py-1 text-green-300">
-                        {u.chartCount} charts
-                      </span>
-                      <span className="rounded-full bg-cyan-500/15 px-3 py-1 text-cyan-300">
-                        {u.questionCount} questions
-                      </span>
-                    </div>
-                    <span className="ml-2 text-white/30">{expandedUser === u.id ? "▲" : "▼"}</span>
-                  </button>
-
-                  {expandedUser === u.id && (
-                    <div className="border-t border-white/10 p-4">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-widest text-white/40 mb-2">
-                            Charts ({u.chartCount})
-                          </p>
-                          {u.charts.length === 0 && <p className="text-sm text-white/30">No charts saved.</p>}
-                          {u.charts.map((c) => (
-                            <div key={c.id} className="mb-2 rounded-xl border border-white/8 bg-white/[0.03] p-3 text-sm">
-                              <p className="font-semibold">{c.name}</p>
-                              <p className="text-xs text-white/40">{fmt(c.created_at)}</p>
-                            </div>
-                          ))}
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-widest text-white/40 mb-2">
-                            Activity
-                          </p>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between rounded-xl border border-white/8 bg-white/[0.03] p-3">
-                              <span className="text-white/60">Questions asked</span>
-                              <span className="font-bold text-cyan-300">{u.questionCount}</span>
-                            </div>
-                            <div className="flex justify-between rounded-xl border border-white/8 bg-white/[0.03] p-3">
-                              <span className="text-white/60">AI replies received</span>
-                              <span className="font-bold text-purple-300">{u.replyCount}</span>
-                            </div>
-                            <div className="flex justify-between rounded-xl border border-white/8 bg-white/[0.03] p-3">
-                              <span className="text-white/60">Last sign in</span>
-                              <span className="font-semibold">{timeAgo(u.lastSignIn)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Anonymous visitors block */}
-          {anon && (anon.chartCount > 0 || anon.questionCount > 0) && (
-            <section className="rounded-3xl border border-orange-400/20 bg-orange-500/5 p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-orange-300">Anonymous Visitors</h2>
-                <div className="flex gap-3 text-sm">
-                  <span className="rounded-full bg-orange-500/15 px-3 py-1 text-orange-300">{anon.chartCount} charts generated</span>
-                  <span className="rounded-full bg-cyan-500/15 px-3 py-1 text-cyan-300">{anon.questionCount} questions asked</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {anon.charts.map((c) => (
-                  <div key={c.id} className="rounded-2xl border border-white/10 bg-black/20 p-3 flex flex-wrap items-center gap-3 text-sm">
-                    <span className="font-semibold text-white">{c.name}</span>
-                    <span className="text-white/40">{c.dob} · {c.tob}</span>
-                    <span className="text-white/40">{c.city}</span>
-                    <span className="ml-auto text-white/30 text-xs">{fmt(c.created_at)}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          </div>
-        )}
-
-        {/* ── CHAT QUESTIONS TAB ── */}
-        {tab === "chat" && !loading && (
-          <div className="space-y-4">
-            {/* Filters */}
-            <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
-              <div className="flex flex-col gap-3 md:flex-row md:items-end">
-                <div className="flex-1 space-y-1">
-                  <label className="text-xs text-white/50">Search in questions</label>
-                  <input
-                    value={searchChat}
-                    onChange={(e) => setSearchChat(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && applyFilter()}
-                    placeholder="Type to search..."
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/30"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-white/50">Filter by agent</label>
-                  <select
-                    value={filterAgent}
-                    onChange={(e) => setFilterAgent(e.target.value)}
-                    className="rounded-2xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white outline-none"
-                  >
-                    <option value="">All Agents</option>
-                    {Object.entries(AGENT_LABELS).map(([k, v]) => (
-                      <option key={k} value={k}>{v}</option>
-                    ))}
-                  </select>
-                </div>
-                <button
-                  onClick={applyFilter}
-                  className="rounded-full bg-amber-400 px-5 py-2.5 text-sm font-bold text-black hover:bg-amber-300"
-                >
-                  Search
-                </button>
-              </div>
-              <p className="mt-3 text-xs text-white/35">
-                Showing {chat.length} of {chatTotal} user questions
-              </p>
-            </section>
-
-            {/* Messages */}
-            <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-              <h2 className="text-xl font-bold">Chat Questions</h2>
-
-              <div className="mt-4 space-y-3">
-                {chat.length === 0 && (
-                  <p className="text-sm text-white/40">
-                    No chat messages found. Run the SQL migration in Supabase, then users will start chatting and questions will appear here.
-                  </p>
-                )}
-                {chat.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                  >
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                      <span className="font-semibold text-white/70">{msg.userEmail}</span>
-                      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-amber-300 font-semibold">
-                        {AGENT_LABELS[msg.agent_id] ?? msg.agent_id}
-                      </span>
-                      {msg.chart_name && (
-                        <span className="rounded-full bg-white/10 px-2 py-0.5 text-white/50">
-                          {msg.chart_name}
-                        </span>
-                      )}
-                      <span className="ml-auto text-white/35">{fmt(msg.created_at)}</span>
-                    </div>
-                    <p className="mt-2 text-sm text-white/80">
-                      <span className="text-amber-400/60 text-xs mr-1">Q:</span>{msg.content}
-                    </p>
-                    {msg.aiResponse && (
-                      <p className="mt-2 text-sm text-white/50 border-t border-white/5 pt-2 line-clamp-3">
-                        <span className="text-emerald-400/60 text-xs mr-1">AI:</span>{msg.aiResponse}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {chatTotal > CHAT_PAGE && (
-                <div className="mt-6 flex justify-between">
-                  <button
-                    disabled={chatOffset === 0}
-                    onClick={() => { const o = chatOffset - CHAT_PAGE; setChatOffset(o); loadChat(o, filterAgent, searchChat); }}
-                    className="rounded-full border border-white/15 px-4 py-2 text-sm disabled:opacity-30 hover:bg-white/10"
-                  >
-                    ← Previous
-                  </button>
-                  <span className="text-sm text-white/40">
-                    {chatOffset + 1}–{Math.min(chatOffset + CHAT_PAGE, chatTotal)} of {chatTotal}
-                  </span>
-                  <button
-                    disabled={chatOffset + CHAT_PAGE >= chatTotal}
-                    onClick={() => { const o = chatOffset + CHAT_PAGE; setChatOffset(o); loadChat(o, filterAgent, searchChat); }}
-                    className="rounded-full border border-white/15 px-4 py-2 text-sm disabled:opacity-30 hover:bg-white/10"
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
-            </section>
-          </div>
-        )}
-
+        <button
+          onClick={loadUsers}
+          disabled={loading}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 18px",
+            borderRadius: 10,
+            background: "#0d0a22",
+            border: "1px solid #2a2050",
+            color: "#c8a030",
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          <RefreshCw size={14} className={loading ? "spin" : ""} /> Refresh
+        </button>
       </div>
-    </main>
+
+      {/* TOAST */}
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            padding: "12px 20px",
+            borderRadius: 12,
+            background: toast.type === "success" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
+            border: `1px solid ${toast.type === "success" ? "#22c55e" : "#ef4444"}`,
+            color: toast.type === "success" ? "#86efac" : "#fca5a5",
+            fontSize: 13,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          }}
+        >
+          <CheckCircle2 size={16} /> {toast.message}
+        </div>
+      )}
+
+      {/* STATS */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 28 }}>
+        <div style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 16, padding: "20px 24px" }}>
+          <div style={{ fontSize: 11, color: "#605890", textTransform: "uppercase", letterSpacing: 1.5 }}>Total Registered</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#f0e8d0", marginTop: 4 }}>{stats.total}</div>
+        </div>
+        <div style={{ background: "#0d0a22", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: "20px 24px" }}>
+          <div style={{ fontSize: 11, color: "#c084fc", textTransform: "uppercase", letterSpacing: 1.5 }}>Elite VIP Members</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#c084fc", marginTop: 4 }}>{stats.elite}</div>
+        </div>
+        <div style={{ background: "#0d0a22", border: "1px solid rgba(200,160,48,0.25)", borderRadius: 16, padding: "20px 24px" }}>
+          <div style={{ fontSize: 11, color: "#c8a030", textTransform: "uppercase", letterSpacing: 1.5 }}>Premium Users</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#c8a030", marginTop: 4 }}>{stats.premium}</div>
+        </div>
+        <div style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 16, padding: "20px 24px" }}>
+          <div style={{ fontSize: 11, color: "#605890", textTransform: "uppercase", letterSpacing: 1.5 }}>Free Tier</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#8078a8", marginTop: 4 }}>{stats.free}</div>
+        </div>
+      </div>
+
+      {/* SEARCH BAR */}
+      <div style={{ position: "relative", marginBottom: 20 }}>
+        <Search size={16} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "#605890" }} />
+        <input
+          type="text"
+          placeholder="Search seekers by email or name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            width: "100%",
+            background: "#0a0720",
+            border: "1px solid #1c1840",
+            borderRadius: 12,
+            padding: "12px 16px 12px 44px",
+            color: "#f0e8d0",
+            fontSize: 14,
+            outline: "none",
+          }}
+        />
+      </div>
+
+      {/* TABLE */}
+      <div style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 16, overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid #1c1840", background: "rgba(10,7,32,0.6)", color: "#605890", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.2 }}>
+              <th style={{ padding: "16px 20px" }}>Seeker</th>
+              <th style={{ padding: "16px 20px" }}>Current Tier</th>
+              <th style={{ padding: "16px 20px" }}>Expiration</th>
+              <th style={{ padding: "16px 20px" }}>Joined</th>
+              <th style={{ padding: "16px 20px", textAlign: "right" }}>Assign Plan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#605890" }}>
+                  Loading seekers data from Supabase...
+                </td>
+              </tr>
+            ) : filteredUsers.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#605890" }}>
+                  No users found matching &quot;{search}&quot;.
+                </td>
+              </tr>
+            ) : (
+              filteredUsers.map((u) => {
+                const isUpdating = updatingId === u.id;
+                const tier = u.subscription_tier.toLowerCase();
+                return (
+                  <tr key={u.id} style={{ borderBottom: "1px solid #161234", transition: "background 0.2s" }}>
+                    <td style={{ padding: "16px 20px" }}>
+                      <div style={{ fontWeight: 600, color: "#f0e8d0" }}>{u.name}</div>
+                      <div style={{ fontSize: 12, color: "#605890", marginTop: 2 }}>{u.email}</div>
+                    </td>
+
+                    <td style={{ padding: "16px 20px" }}>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          padding: "4px 10px",
+                          borderRadius: 999,
+                          fontSize: 10.5,
+                          fontWeight: 700,
+                          letterSpacing: 1,
+                          textTransform: "uppercase",
+                          background:
+                            tier === "elite"
+                              ? "rgba(168,85,247,0.15)"
+                              : tier === "premium"
+                              ? "rgba(200,160,48,0.15)"
+                              : "rgba(100,100,130,0.15)",
+                          color:
+                            tier === "elite"
+                              ? "#c084fc"
+                              : tier === "premium"
+                              ? "#c8a030"
+                              : "#8078a8",
+                          border: `1px solid ${
+                            tier === "elite"
+                              ? "rgba(168,85,247,0.3)"
+                              : tier === "premium"
+                              ? "rgba(200,160,48,0.3)"
+                              : "rgba(100,100,130,0.2)"
+                          }`,
+                        }}
+                      >
+                        {tier === "elite" ? <Sparkles size={11} /> : null}
+                        {tier}
+                      </span>
+                    </td>
+
+                    <td style={{ padding: "16px 20px", color: "#8078a8", fontSize: 12 }}>
+                      {u.subscription_expires_at
+                        ? new Date(u.subscription_expires_at).toLocaleDateString("en-IN", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "—"}
+                    </td>
+
+                    <td style={{ padding: "16px 20px", color: "#605890", fontSize: 12 }}>
+                      {new Date(u.created_at).toLocaleDateString("en-IN", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+
+                    <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                      <div style={{ display: "inline-flex", gap: 6 }}>
+                        <button
+                          onClick={() => handleUpdateTier(u.id, "free")}
+                          disabled={isUpdating || tier === "free"}
+                          style={{
+                            padding: "6px 10px",
+                            borderRadius: 8,
+                            fontSize: 11,
+                            fontWeight: 500,
+                            background: "#0a0720",
+                            border: "1px solid #221c48",
+                            color: tier === "free" ? "#443c68" : "#8078a8",
+                            cursor: tier === "free" || isUpdating ? "default" : "pointer",
+                          }}
+                        >
+                          Free
+                        </button>
+                        <button
+                          onClick={() => handleUpdateTier(u.id, "premium")}
+                          disabled={isUpdating || tier === "premium"}
+                          style={{
+                            padding: "6px 12px",
+                            borderRadius: 8,
+                            fontSize: 11,
+                            fontWeight: 600,
+                            background: tier === "premium" ? "rgba(200,160,48,0.1)" : "#0a0720",
+                            border: "1px solid rgba(200,160,48,0.3)",
+                            color: "#c8a030",
+                            cursor: tier === "premium" || isUpdating ? "default" : "pointer",
+                          }}
+                        >
+                          Premium
+                        </button>
+                        <button
+                          onClick={() => handleUpdateTier(u.id, "elite")}
+                          disabled={isUpdating || tier === "elite"}
+                          style={{
+                            padding: "6px 14px",
+                            borderRadius: 8,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            background: "linear-gradient(135deg,#a855f7,#7c3aed)",
+                            border: "none",
+                            color: "#fff",
+                            cursor: tier === "elite" || isUpdating ? "default" : "pointer",
+                            opacity: tier === "elite" ? 0.4 : 1,
+                          }}
+                        >
+                          ✦ Elite (10y)
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

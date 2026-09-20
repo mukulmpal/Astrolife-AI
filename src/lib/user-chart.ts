@@ -11,6 +11,7 @@ export interface BirthDetails {
   city: string;
   lat?: number | null;
   lon?: number | null;
+  tz?: number | null;
 }
 
 export interface SavedChartSummary {
@@ -35,6 +36,7 @@ const PLACEHOLDER_BIRTH: BirthDetails = {
   dob: "2000-01-01",
   tob: "12:00",
   city: "Delhi",
+  tz: 5.5,
 };
 
 const EMPTY_BIRTH: BirthDetails = {
@@ -52,6 +54,7 @@ function buildChart(birth: BirthDetails): ChartData {
     birth.city,
     birth.lat ?? undefined,
     birth.lon ?? undefined,
+    birth.tz ?? undefined
   );
 }
 
@@ -74,6 +77,7 @@ function getBirthFromChart(chart: ChartData): BirthDetails {
     city: chart.city,
     lat: chart.lat,
     lon: chart.lon,
+    tz: chart.tz,
   };
 }
 
@@ -105,6 +109,9 @@ function getProfileBirth(profile: Record<string, unknown> | null): BirthDetails 
   const city = typeof profile.city === "string" ? profile.city : "";
   if (!name || !dob || !tob || !city) return null;
 
+  const tzValue = (profile as Record<string, unknown>).tz ?? (profile as Record<string, unknown>).timezone;
+  const tzNumber = typeof tzValue === "number" ? tzValue : typeof tzValue === "string" ? Number(tzValue) : null;
+
   return {
     name,
     dob,
@@ -112,6 +119,7 @@ function getProfileBirth(profile: Record<string, unknown> | null): BirthDetails 
     city,
     lat: typeof profile.lat === "number" ? profile.lat : null,
     lon: typeof profile.lon === "number" ? profile.lon : null,
+    tz: typeof tzNumber === "number" && Number.isFinite(tzNumber) ? tzNumber : null,
   };
 }
 
@@ -123,6 +131,9 @@ function getChartRowBirth(row: Record<string, unknown> | null): BirthDetails | n
   const city = typeof row.city === "string" ? row.city : "";
   if (!name || !dob || !tob || !city) return null;
 
+  const tzValue = row.tz ?? row.timezone;
+  const tzNumber = typeof tzValue === "number" ? tzValue : typeof tzValue === "string" ? Number(tzValue) : null;
+
   return {
     name,
     dob,
@@ -130,6 +141,7 @@ function getChartRowBirth(row: Record<string, unknown> | null): BirthDetails | n
     city,
     lat: typeof row.lat === "number" ? row.lat : null,
     lon: typeof row.lon === "number" ? row.lon : null,
+    tz: typeof tzNumber === "number" && Number.isFinite(tzNumber) ? tzNumber : null,
   };
 }
 
@@ -146,6 +158,9 @@ function getSavedChartRowBirth(row: Record<string, unknown> | null): BirthDetail
   const latNumber = typeof latitude === "number" ? latitude : typeof latitude === "string" ? Number(latitude) : null;
   const lonNumber = typeof longitude === "number" ? longitude : typeof longitude === "string" ? Number(longitude) : null;
 
+  const tzValue = row.timezone_offset ?? row.tz ?? row.timezone;
+  const tzNumber = typeof tzValue === "number" ? tzValue : typeof tzValue === "string" ? Number(tzValue) : null;
+
   return {
     name,
     dob,
@@ -153,6 +168,7 @@ function getSavedChartRowBirth(row: Record<string, unknown> | null): BirthDetail
     city,
     lat: typeof latNumber === "number" && Number.isFinite(latNumber) ? latNumber : null,
     lon: typeof lonNumber === "number" && Number.isFinite(lonNumber) ? lonNumber : null,
+    tz: typeof tzNumber === "number" && Number.isFinite(tzNumber) ? tzNumber : null,
   };
 }
 
@@ -166,6 +182,8 @@ function getLegacyChartRowBirth(row: Record<string, unknown> | null): BirthDetai
 
   const latitude = row.latitude ?? row.lat;
   const longitude = row.longitude ?? row.lon;
+  const tzValue = row.tz ?? row.timezone;
+  const tzNumber = typeof tzValue === "number" ? tzValue : typeof tzValue === "string" ? Number(tzValue) : null;
 
   return {
     name,
@@ -174,6 +192,7 @@ function getLegacyChartRowBirth(row: Record<string, unknown> | null): BirthDetai
     city,
     lat: typeof latitude === "number" ? latitude : null,
     lon: typeof longitude === "number" ? longitude : null,
+    tz: typeof tzNumber === "number" && Number.isFinite(tzNumber) ? tzNumber : null,
   };
 }
 
@@ -623,7 +642,7 @@ export function useUserChart() {
         if (user) {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("name,dob,tob,city,lat,lon")
+            .select("name,dob,tob,city,lat,lon,tz")
             .eq("id", user.id)
             .maybeSingle();
 

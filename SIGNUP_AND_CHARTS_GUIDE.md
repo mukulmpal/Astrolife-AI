@@ -4,7 +4,7 @@
 
 Users can now:
 1. Fill birth details on **homepage**
-2. Sign up with **phone (OTP)** or **Google**
+2. Sign up with **Google only**
 3. Save **multiple charts** to their account
 4. View all saved charts in **dashboard**
 5. Delete or manage charts anytime
@@ -22,8 +22,8 @@ Users can now:
                    ▼
 ┌─────────────────────────────────────────────────────────┐
 │ 2. SIGN UP PAGE (/auth/signup)                         │
-│    - Phone OTP + Name                                   │
-│    - OR Google Sign-in                                  │
+│    - Google-only sign-in                                │
+│    - Redirect to onboarding on success                  │
 │    - Pre-filled data from homepage                      │
 └──────────────────┬──────────────────────────────────────┘
                    │
@@ -170,10 +170,10 @@ Response:
 ## Frontend Implementation
 
 ### 1. Signup Page (`/auth/signup`)
-✓ Phone + OTP authentication
-✓ Google OAuth
-✓ Pre-fill name from homepage
-✓ Store user metadata
+✓ Google OAuth only
+✓ Redirects to onboarding or safe next route
+✓ Pre-fill name from homepage when available
+✓ Keeps user identity tied to profile + saved charts
 
 ### 2. Dashboard Changes Needed
 1. **My Charts section**
@@ -219,7 +219,7 @@ Response:
 
 ## Security
 
-✅ **Authentication**: Supabase Auth (Phone OTP + Google)
+✅ **Authentication**: Supabase Auth (Google only)
 ✅ **Authorization**: RLS policies on user_charts table
 ✅ **Data Encryption**: Supabase encrypts data in transit (HTTPS)
 ✅ **User Isolation**: Charts are user-specific and RLS-protected
@@ -293,8 +293,8 @@ async function getUserCharts() {
 ## Testing
 
 1. **Sign Up Flow**
-   - Fill homepage form → Go to signup → OTP → Dashboard
-   - Sign up with Google → Should redirect to dashboard
+   - Fill homepage form → Go to signup → Google OAuth → Onboarding → Dashboard
+   - After login, verify saved charts load under the same authenticated user
 
 2. **Save Chart**
    - Generate kundli → Click "Save Chart" → Verify in list

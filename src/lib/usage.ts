@@ -1,6 +1,6 @@
 "use client";
 
-import { PLAN_LIMITS, isBillingEnforced, isFullAccessEnabled } from "@/lib/access";
+import { PLAN_LIMITS, isBillingEnforced, isEliteEmail, isFullAccessEnabled } from "@/lib/access";
 import { createClient } from "@/lib/supabase/client";
 
 const FREE_MONTHLY_AI_LIMIT = PLAN_LIMITS.free.aiQuestionsPerMonth;
@@ -155,9 +155,24 @@ export async function getAccountAiUsageStatus(subscriptionTier?: string | null):
     return getAiUsageStatus("elite");
   }
 
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (
+      (user?.email && isEliteEmail(user.email)) ||
+      user?.app_metadata?.subscription_tier === "elite" ||
+      user?.user_metadata?.subscription_tier === "elite"
+    ) {
+      return getAiUsageStatus("elite");
+    }
+  } catch {
+    // Non-fatal, fallback to passed subscriptionTier
+  }
+
   if (subscriptionTier && subscriptionTier !== "free") {
     return getAiUsageStatus(subscriptionTier);
   }
+
 
   const used = await getAccountMonthlyAiUsage();
   const left = Math.max(FREE_MONTHLY_AI_LIMIT - used, 0);

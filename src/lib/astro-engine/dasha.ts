@@ -63,7 +63,7 @@ export interface NakshatraInfo {
 
 export interface DashaPeriod {
   lord: DashaLord;
-  level: "mahadasha" | "antardasha" | "pratyantardasha";
+  level: "mahadasha" | "antardasha" | "pratyantardasha" | "sookshma" | "prana";
   startDate: Date;
   endDate: Date;
   durationDays: number;
@@ -175,7 +175,7 @@ export function getAntardashas(md: DashaPeriod): DashaPeriod[] {
     const adLord = VIMSHOTTARI_ORDER[(mdStartIdx + i) % 9];
     const adYears = (DASHA_YEARS[md.lord] * DASHA_YEARS[adLord]) / DASHA_TOTAL_YEARS;
     const adMs = (adYears / DASHA_YEARS[md.lord]) * mdTotalMs;
-    const end = cursor + adMs;
+    const end = i === 8 ? md.endDate.getTime() : cursor + adMs;
     periods.push(makePeriod(adLord, "antardasha", cursor, end, md.lord));
     cursor = end;
   }
@@ -191,11 +191,82 @@ export function getPratyantardashas(ad: DashaPeriod, md: DashaPeriod): DashaPeri
   for (let i = 0; i < 9; i++) {
     const pdLord = VIMSHOTTARI_ORDER[(adStartIdx + i) % 9];
     const pdMs = (DASHA_YEARS[pdLord] / DASHA_TOTAL_YEARS) * adTotalMs;
-    const end = cursor + pdMs;
+    const end = i === 8 ? ad.endDate.getTime() : cursor + pdMs;
     periods.push(makePeriod(pdLord, "pratyantardasha", cursor, end, ad.lord, md.lord));
     cursor = end;
   }
   return periods;
+}
+
+export function getSookshmadashas(
+  pd: DashaPeriod,
+  ad: DashaPeriod,
+  md: DashaPeriod
+): DashaPeriod[] {
+  const pdStartIdx = VIMSHOTTARI_ORDER.indexOf(pd.lord);
+  const pdTotalMs = pd.endDate.getTime() - pd.startDate.getTime();
+  const periods: DashaPeriod[] = [];
+  let cursor = pd.startDate.getTime();
+
+  for (let i = 0; i < 9; i++) {
+    const sdLord = VIMSHOTTARI_ORDER[(pdStartIdx + i) % 9];
+    const sdMs = (DASHA_YEARS[sdLord] / DASHA_TOTAL_YEARS) * pdTotalMs;
+    const end = i === 8 ? pd.endDate.getTime() : cursor + sdMs;
+    periods.push(makePeriod(sdLord, "sookshma", cursor, end, pd.lord, ad.lord));
+    cursor = end;
+  }
+  return periods;
+}
+
+export function getPranadashas(
+  sd: DashaPeriod,
+  pd: DashaPeriod,
+  ad: DashaPeriod,
+  md: DashaPeriod
+): DashaPeriod[] {
+  const sdStartIdx = VIMSHOTTARI_ORDER.indexOf(sd.lord);
+  const sdTotalMs = sd.endDate.getTime() - sd.startDate.getTime();
+  const periods: DashaPeriod[] = [];
+  let cursor = sd.startDate.getTime();
+
+  for (let i = 0; i < 9; i++) {
+    const pranaLord = VIMSHOTTARI_ORDER[(sdStartIdx + i) % 9];
+    const pranaMs = (DASHA_YEARS[pranaLord] / DASHA_TOTAL_YEARS) * sdTotalMs;
+    const end = i === 8 ? sd.endDate.getTime() : cursor + pranaMs;
+    periods.push(makePeriod(pranaLord, "prana", cursor, end, sd.lord, pd.lord));
+    cursor = end;
+  }
+  return periods;
+}
+
+export function getCurrentDashaHierarchy5Levels(
+  birthDate: Date,
+  nak: NakshatraInfo,
+  atDate: Date = new Date()
+) {
+  const atMs = atDate.getTime();
+  const mds = getMahadashas(birthDate, nak);
+  const currentMD = mds.find((p) => atMs >= p.startDate.getTime() && atMs < p.endDate.getTime()) ?? mds[0];
+
+  const ads = getAntardashas(currentMD);
+  const currentAD = ads.find((p) => atMs >= p.startDate.getTime() && atMs < p.endDate.getTime()) ?? ads[0];
+
+  const pds = getPratyantardashas(currentAD, currentMD);
+  const currentPD = pds.find((p) => atMs >= p.startDate.getTime() && atMs < p.endDate.getTime()) ?? pds[0];
+
+  const sds = getSookshmadashas(currentPD, currentAD, currentMD);
+  const currentSD = sds.find((p) => atMs >= p.startDate.getTime() && atMs < p.endDate.getTime()) ?? sds[0];
+
+  const pranas = getPranadashas(currentSD, currentPD, currentAD, currentMD);
+  const currentPrana = pranas.find((p) => atMs >= p.startDate.getTime() && atMs < p.endDate.getTime()) ?? pranas[0];
+
+  return {
+    mahadasha: currentMD,
+    antardasha: currentAD,
+    pratyantardasha: currentPD,
+    sookshma: currentSD,
+    prana: currentPrana,
+  };
 }
 
 export function buildDashaTree(birthDate: Date, nak: NakshatraInfo): DashaTree {

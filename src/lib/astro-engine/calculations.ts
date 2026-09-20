@@ -8,6 +8,15 @@
 // Ayanamsha: Lahiri/Chitrapaksha (precession + IAU 1980 nutation).
 // ============================================================
 import ephemeris from "ephemeris";
+import { detectMoonBoundarySensitivity, type LunarBoundarySensitivity } from "./lunar-boundary";
+import { computeKPAyanamsha, computePlacidusCusps } from "./placidus";
+import {
+  buildTimeScaleProvenance,
+  calculateDeltaT,
+  jdToGregorian,
+  type TimeScaleProvenance,
+  utcToTT,
+} from "./time-scales";
 
 // ── Types ────────────────────────────────────────────────────
 export interface PlanetData {
@@ -27,6 +36,7 @@ export interface PlanetData {
   retrograde: boolean;
   dignity: string;
   navamsha: string;
+  boundarySensitivity?: LunarBoundarySensitivity;
 }
 
 export interface HouseCuspData {
@@ -39,7 +49,15 @@ export interface HouseCuspData {
   nakshatra: string;
   nakshatraLord: string;
   pada: number;
-  source: "degree-equal-bhava";
+  source: "degree-equal-bhava" | "placidus";
+  starLord?: string;
+  subLord?: string;
+  subSubLord?: string;
+}
+
+export interface ChartProvenance {
+  timeScale: TimeScaleProvenance;
+  moonBoundarySensitivity?: LunarBoundarySensitivity;
 }
 
 export interface ChartData {
@@ -56,9 +74,11 @@ export interface ChartData {
   lagnaNum: number;
   planets: Record<string, PlanetData>;
   houseCusps: HouseCuspData[];
+  kpCusps?: HouseCuspData[];
   houseSystem: "degree-equal-bhava";
   dashas: DashaEntry[];
   antardasha: DashaEntry[];
+  provenance?: ChartProvenance;
 }
 
 export interface DashaEntry {
@@ -161,6 +181,16 @@ export function getJD(date: string, time: string, tz: number): number {
 }
 
 // ── Nutation in longitude — IAU 1980, 9 leading terms ─────────
+// Multiplier array maps to [D, M, Mp, F, Om]:
+//   D:  Mean elongation of the Moon from the Sun
+//   M:  Mean anomaly of the Sun (Earth)
+//   Mp: Mean anomaly of the Moon
+//   F:  Mean argument of latitude of the Moon
+//   Om: Mean longitude of the ascending node of the Moon (Omega)
+//
+// Note on term 1: The principal 18.6-year nutation term (-17.2" sin Om) depends strictly
+// on Om (index 4). The multiplier array has exactly 5 elements [0, 0, 0, 0, 1] so that
+// mults[4] maps to Om (correcting an earlier off-by-one bug where Om was omitted).
 function _nutation(T: number): number {
   const D  = _n(297.85036 + 445267.111480 * T - 0.0019142 * T * T);
   const M  = _n(357.52772 + 35999.050340  * T - 0.0001603 * T * T);
@@ -168,7 +198,7 @@ function _nutation(T: number): number {
   const F  = _n( 93.27191 + 483202.017538 * T - 0.0036825 * T * T);
   const Om = _n(125.04452 - 1934.136261   * T + 0.0020708 * T * T);
   const terms: number[][] = [
-    [-171996 - 174.2 * T, 0, 0, 0, 1],
+    [-171996 - 174.2 * T, 0, 0, 0, 0, 1], // [D=0, M=0, Mp=0, F=0, Om=1] -> principal 18.6-yr nutation
     [ -13187 -   1.6 * T,-2, 0, 0, 2, 2],
     [  -2274 -   0.2 * T, 0, 0, 0, 2, 2],
     [   2062 +   0.2 * T, 0, 0, 0, 0, 2],
@@ -187,11 +217,52 @@ function _nutation(T: number): number {
   return dpsi * 0.0001 / 3600;
 }
 
-// ── Lahiri Ayanamsha with nutation ────────────────────────────
-function lahiri(jd: number): number {
+// ── Lahiri (Chitrapaksha) Ayanamsha ──────────────────────────
+// Baseline: Indian Calendar Reform Committee (Saha Committee) / Indian Astronomical
+// Ephemeris standard baseline at J2000.0 (JD 2451545.0) is 23° 51' 11.5" = 23.853194°.
+// (Swiss Ephemeris SIDM_LAHIRI uses 23° 51' 12.0" = 23.853333°).
+// Precession model: IAU precession rate 1.396971° / Julian century.
+// Nutation: IAU 1980 nutation in longitude (dpsi), projected onto the ecliptic by cos(eps).
+export function lahiri(jd: number): number {
   const T = (jd - 2451545.0) / 36525;
-  const precession = 23.85045 + 1.39720 * T + 0.000139 * T * T - 0.0000001 * T * T * T;
-  return precession + _nutation(T);
+  const precession = 23.853194 + 1.396971 * T + 0.000309 * T * T;
+  const epsRad = _r(_obliquity(T));
+  const dpsi = _nutation(T);
+  return precession + dpsi * Math.cos(epsRad);
+}
+
+// ── Multi-Ayanamsha Dynamic Conversion ────────────────────────
+export type SupportedAyanamsha = "Lahiri_Chitrapaksha" | "KP_Krishnamurti";
+
+/**
+ * Returns the exact evaluated ayanamsha angle for a given Julian Day epoch.
+ */
+export function getAyanamshaForEpoch(ayanamsha: SupportedAyanamsha, jd: number): number {
+  if (ayanamsha === "KP_Krishnamurti") {
+    return computeKPAyanamsha(jd);
+  }
+  return lahiri(jd);
+}
+
+/**
+ * Converts a sidereal longitude from one ayanamsha frame to another for a specific chart epoch.
+ * Formula: tropical = lon_from + A_from(epoch); lon_to = tropical - A_to(epoch).
+ * Dynamic and epoch-dependent: avoids any hardcoded offset constants.
+ */
+export function convertLongitudeBetweenAyanamshas(
+  longitude: number,
+  fromAyanamsha: SupportedAyanamsha,
+  toAyanamsha: SupportedAyanamsha,
+  jd: number
+): number {
+  if (fromAyanamsha === toAyanamsha) {
+    return _n(longitude);
+  }
+  const fromAyan = getAyanamshaForEpoch(fromAyanamsha, jd);
+  const toAyan = getAyanamshaForEpoch(toAyanamsha, jd);
+  const tropical = longitude + fromAyan;
+  const converted = tropical - toAyan;
+  return _n(converted);
 }
 
 // ── Nakshatra lookup ──────────────────────────────────────────
@@ -246,16 +317,23 @@ const _MOSHIER_BODY: Record<string, string> = {
   Mars: "mars", Jupiter: "jupiter", Saturn: "saturn",
 };
 
-// ── MAIN PLANET COMPUTATION — Moshier ephemeris (arc-second) ──
-// Returns sidereal (Lahiri) longitudes. The package gives apparent
-// (nutation+aberration included) longitude; Lahiri "true" ayanamsha also
-// includes nutation, so subtracting cancels nutation correctly.
-export function computePlanets(jd: number): Record<string, number> {
-  const ay = lahiri(jd);
-  const sid = (lon: number) => _n(lon - ay);
-  const T = (jd - 2451545) / 36525;
+// ── MAIN PLANET COMPUTATION — Moshier ephemeris with TT evaluation ──
+// Planetary and lunar orbits are evaluated at Terrestrial Time (TT = UT + Delta T),
+// matching the fundamental dynamical time-scale parameterization of Moshier / JPL ephemerides.
+// Returns sidereal (Lahiri) longitudes.
+export function computePlanets(jd: number, jdTTOverride?: number): Record<string, number> {
+  let jdTT = jdTTOverride;
+  if (jdTT === undefined) {
+    const { year, month } = jdToGregorian(jd);
+    const { deltaTSec } = calculateDeltaT(year, month);
+    jdTT = utcToTT(jd, deltaTSec);
+  }
 
-  const observed = ephemeris.getAllPlanets(_jdToDate(jd), 0, 0, 0).observed;
+  const ay = lahiri(jdTT);
+  const sid = (lon: number) => _n(lon - ay);
+  const T = (jdTT - 2451545) / 36525;
+
+  const observed = ephemeris.getAllPlanets(_jdToDate(jdTT), 0, 0, 0).observed;
   const out: Record<string, number> = {};
   for (const [name, key] of Object.entries(_MOSHIER_BODY)) {
     out[name] = sid(observed[key].apparentLongitudeDd);
@@ -424,22 +502,38 @@ function resolveChartLocation(
   customTz?: number,
 ): { lat: number; lon: number; tz: number } {
   const cityCoords = CITY_COORDS[city];
-  if (cityCoords) return cityCoords;
-
-  const hasCustomLocation =
-    customLat !== undefined &&
-    customLon !== undefined &&
-    customTz !== undefined;
-
-  if (!hasCustomLocation) {
-    throw new Error(`City "${city}" is not available. Please select a supported city or provide latitude, longitude and timezone.`);
+  if (cityCoords) {
+    return {
+      lat: customLat !== undefined ? assertFiniteRange(customLat, "Latitude", -90, 90) : cityCoords.lat,
+      lon: customLon !== undefined ? assertFiniteRange(customLon, "Longitude", -180, 180) : cityCoords.lon,
+      tz: customTz !== undefined ? assertFiniteRange(customTz, "Timezone", -12, 14) : cityCoords.tz,
+    };
   }
 
-  return {
-    lat: assertFiniteRange(customLat, "Latitude", -90, 90),
-    lon: assertFiniteRange(customLon, "Longitude", -180, 180),
-    tz: assertFiniteRange(customTz, "Timezone", -12, 14),
-  };
+  const hasCoords =
+    customLat !== undefined &&
+    customLon !== undefined;
+
+  if (hasCoords) {
+    let resolvedTz = customTz;
+    if (resolvedTz === undefined) {
+      // Default to India standard time if coordinates fall in Indian geodetic bounding box
+      if (customLat >= 6 && customLat <= 37.5 && customLon >= 68 && customLon <= 98) {
+        resolvedTz = 5.5;
+      } else {
+        // Approximate standard timezone from longitude (nearest 30-minute increment)
+        resolvedTz = Math.round((customLon / 15) * 2) / 2;
+      }
+    }
+
+    return {
+      lat: assertFiniteRange(customLat, "Latitude", -90, 90),
+      lon: assertFiniteRange(customLon, "Longitude", -180, 180),
+      tz: assertFiniteRange(resolvedTz, "Timezone", -12, 14),
+    };
+  }
+
+  throw new Error(`City "${city}" is not available in static directory. Please provide coordinates or select a supported city.`);
 }
 
 // ── MAIN CHART CALCULATOR ─────────────────────────────────────
@@ -466,6 +560,10 @@ export function calculateChart(
   const rawPlanets = computePlanets(jd);
   const retrograde = computeRetro(jd);
   const houseCusps = buildHouseCusps(lagnaLon);
+
+  // Calculate KP Placidus Cusps
+  const kpAyanamsha = computeKPAyanamsha(jd);
+  const kpCusps: HouseCuspData[] = computePlacidusCusps(jd, lat, lon, kpAyanamsha);
 
   // Build planet data
   const planets: Record<string, PlanetData> = {};
@@ -506,6 +604,13 @@ export function calculateChart(
   const activeMD  = dashas.find(d => d.active) || dashas[0];
   const antardasha = buildAntarDasha(activeMD.planet, activeMD.start, activeMD.yrs);
 
+  // Provenance & Lunar Boundary checks
+  const timeScaleInfo = buildTimeScaleProvenance(jd);
+  const moonBoundarySensitivity = detectMoonBoundarySensitivity(rawPlanets.Moon);
+  if (planets.Moon) {
+    planets.Moon.boundarySensitivity = moonBoundarySensitivity;
+  }
+
   return {
     name, dob, tob, city,
     lat, lon, tz, jd,
@@ -514,8 +619,14 @@ export function calculateChart(
     lagnaNum,
     planets,
     houseCusps,
+    kpCusps,
     houseSystem: "degree-equal-bhava",
     dashas,
     antardasha,
+    provenance: {
+      timeScale: timeScaleInfo.provenance,
+      moonBoundarySensitivity,
+    },
   };
 }
+

@@ -4,6 +4,32 @@
 // Krishnamurti Paddhati · Star Lord · Sub Lord · Cusp · Events
 // ══════════════════════════════════════════════════════════════
 
+import {
+  computeKPAyanamsha,
+  computePlacidusCusps,
+  getPlacidusBhavaHouse,
+} from "./placidus";
+import {
+  convertLongitudeBetweenAyanamshas,
+  getAyanamshaForEpoch,
+  SupportedAyanamsha,
+} from "./calculations";
+import type {
+  KPPredictiveEvidence,
+  KPPointEvidence,
+} from "./kp-evidence-types";
+import { build4FoldHouseSignificators } from "./kp-significators";
+import { evaluateAllCuspPromises } from "./kp-cusp-promise";
+import { evaluateAllEventRules } from "./kp-event-promise";
+import { buildCurrentDashaHierarchyEvidence } from "./kp-dasha-evidence";
+
+export * from "./kp-evidence-types";
+export * from "./kp-significators";
+export * from "./kp-cusp-promise";
+export * from "./kp-rule-registry";
+export * from "./kp-event-promise";
+export * from "./kp-dasha-evidence";
+
 export type KPPlanet =
   | "Ketu"
   | "Venus"
@@ -39,8 +65,23 @@ export type EventTopic =
   | "litigation"
   | "separation";
 
+export interface KPCoordinateProvenance {
+  sourceAyanamsha: string;
+  targetAyanamsha: string;
+  sourceAyanamshaValue: number;
+  targetAyanamshaValue: number;
+  deltaArcsec: number;
+  epochJD: number;
+  conversionMethod: string;
+  unifiedFrame: boolean;
+}
+
 export interface KPPlanetInput {
   lon: number;
+  sourceLon?: number;
+  sourceAyanamsha?: string;
+  kpAyanamsha?: string;
+  conversionMethod?: string;
   house: number;
   rashiHouse: number;
   bhavaHouse: number;
@@ -55,19 +96,24 @@ export interface NatalKPInput {
   lagR: number;
   lagLon: number;
   planets: Record<string, KPPlanetInput>;
-  cuspSource: "provided" | "degree-equal-bhava" | "whole-sign-fallback";
-  bhavaMode: "provided" | "degree-equal-bhava" | "whole-sign";
+  cuspSource: "provided" | "degree-equal-bhava" | "whole-sign-fallback" | "placidus";
+  bhavaMode: "provided" | "degree-equal-bhava" | "whole-sign" | "placidus";
   currentMD?: string;
   currentAD?: string;
   currentPD?: string;
   currentSD?: string;
   dashaPath?: string;
   rawSource?: any;
+  coordinateProvenance?: KPCoordinateProvenance;
 }
 
 export interface KPRow {
   name: KPPointName;
   lon: number;
+  sourceLon?: number;
+  sourceAyanamsha?: string;
+  kpAyanamsha?: string;
+  conversionMethod?: string;
   degreeText: string;
   position: string;
   sign: string;
@@ -102,7 +148,7 @@ export interface KPCuspRow {
   pada: number;
   subLord: KPPlanet;
   subSubLord: KPPlanet;
-  source: "provided" | "degree-equal-bhava" | "whole-sign-fallback";
+  source: "provided" | "degree-equal-bhava" | "whole-sign-fallback" | "placidus";
   promise: string;
 }
 
@@ -153,6 +199,8 @@ export interface KPEngineResult {
   subLordSummary: string;
   strongestEvent: SignificatorSet | null;
   weakestEvent: SignificatorSet | null;
+  coordinateProvenance?: KPCoordinateProvenance;
+  predictiveEvidence?: KPPredictiveEvidence;
 }
 
 const DASHA_ORDER: KPPlanet[] = [
@@ -848,6 +896,68 @@ export function normalizeToKPInput(input: unknown): NatalKPInput {
   }
 
   const planets: Record<string, KPPlanetInput> = {};
+  const rawKpCusps = Array.isArray((sourceObj as any)?.kpCusps)
+    ? (sourceObj as any).kpCusps
+    : Array.isArray((inputObj as any)?.kpCusps)
+      ? (inputObj as any).kpCusps
+      : null;
+
+  let placidusCusps = rawKpCusps;
+  const jd = safeNumber((sourceObj as any)?.jd ?? (inputObj as any)?.jd, 2451545.0);
+  if (!placidusCusps || placidusCusps.length < 12) {
+    const lat = (sourceObj as any)?.lat ?? (inputObj as any)?.lat;
+    const lonCoord =
+      (sourceObj as any)?.lon ??
+      (sourceObj as any)?.lng ??
+      (inputObj as any)?.lon ??
+      (inputObj as any)?.lng;
+    if (jd > 0 && typeof lat === "number" && typeof lonCoord === "number") {
+      const ayan = computeKPAyanamsha(jd);
+      placidusCusps = computePlacidusCusps(jd, lat, lonCoord, ayan);
+    }
+  }
+
+  const hasPlacidusCusps = Boolean(placidusCusps && placidusCusps.length >= 12);
+  const placidusCuspLons: number[] = hasPlacidusCusps
+    ? (placidusCusps as any[]).map((c) => normalizeLon(c.lon ?? c.longitude ?? 0))
+    : [];
+
+  if (hasPlacidusCusps && !(sourceObj as any).kpCusps) {
+    (sourceObj as any).kpCusps = placidusCusps;
+  }
+
+  // Dynamic Multi-Ayanamsha Conversion for KP Engine
+  // Converts planetary input from source frame (typically Lahiri) to KP Krishnamurti frame
+  // using the exact epoch-dependent difference between the two models (no hardcoded offset constants).
+  const sourceAyanamsha: SupportedAyanamsha =
+    (sourceObj as any)?.ayanamsha === "KP_Krishnamurti" ||
+    (inputObj as any)?.ayanamsha === "KP_Krishnamurti"
+      ? "KP_Krishnamurti"
+      : "Lahiri_Chitrapaksha";
+  const targetAyanamsha: SupportedAyanamsha = "KP_Krishnamurti";
+  const sourceAyanValue = getAyanamshaForEpoch(sourceAyanamsha, jd);
+  const targetAyanValue = getAyanamshaForEpoch(targetAyanamsha, jd);
+  const deltaArcsec = ((sourceAyanValue - targetAyanValue + 540) % 360 - 180) * 3600;
+  const coordinateProvenance: KPCoordinateProvenance = {
+    sourceAyanamsha,
+    targetAyanamsha,
+    sourceAyanamshaValue: sourceAyanValue,
+    targetAyanamshaValue: targetAyanValue,
+    deltaArcsec,
+    epochJD: jd,
+    conversionMethod: "epoch-dynamic-ayanamsha-conversion-v1",
+    unifiedFrame: true,
+  };
+
+  // Align Lagna to KP frame if Placidus cusps are active
+  if (hasPlacidusCusps && placidusCusps && placidusCusps.length > 0) {
+    const rawCusp1 = placidusCusps[0].lon ?? placidusCusps[0].longitude;
+    if (typeof rawCusp1 === "number" && Number.isFinite(rawCusp1)) {
+      lagLon = normalizeLon(rawCusp1);
+      lagR = Math.floor(lagLon / 30);
+    }
+  }
+
   const rawCusps = Array.isArray((sourceObj as any)?.houseCusps)
     ? (sourceObj as any).houseCusps
     : Array.isArray((inputObj as any)?.houseCusps)
@@ -858,22 +968,30 @@ export function normalizeToKPInput(input: unknown): NatalKPInput {
   (["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"] as const).forEach(
     (planetName) => {
       const planet = readPlanet(source, planetName) ?? {};
-      const lon = readLonFromPlanet(source, planetName);
-      const rashi = Math.floor(lon / 30);
-      const rashiHouse = houseFromLon(lagR, lon);
-      const bhavaHouse =
-        safeNumber(
-          planet?.bhavaHouse ??
-            planet?.chalitHouse ??
-            planet?.houseBhava ??
-            planet?.bhava,
-          hasDegreeBhavaCusps ? md(Math.floor(md(lon - lagLon + 15, 360) / 30), 12) + 1 : rashiHouse
-        );
+      const rawLon = readLonFromPlanet(source, planetName);
+      const kpLon = hasPlacidusCusps
+        ? convertLongitudeBetweenAyanamshas(rawLon, sourceAyanamsha, targetAyanamsha, jd)
+        : rawLon;
+      const rashi = Math.floor(kpLon / 30);
+      const rashiHouse = houseFromLon(lagR, kpLon);
+      const bhavaHouse = hasPlacidusCusps
+        ? getPlacidusBhavaHouse(kpLon, placidusCuspLons)
+        : safeNumber(
+            planet?.bhavaHouse ??
+              planet?.chalitHouse ??
+              planet?.houseBhava ??
+              planet?.bhava,
+            hasDegreeBhavaCusps ? md(Math.floor(md(kpLon - lagLon + 15, 360) / 30), 12) + 1 : rashiHouse
+          );
       const normalizedBhavaHouse = Math.max(1, Math.min(12, Math.round(bhavaHouse)));
       const bhavaShift = normalizedBhavaHouse - rashiHouse;
 
       planets[planetName] = {
-        lon,
+        lon: kpLon,
+        sourceLon: rawLon,
+        sourceAyanamsha,
+        kpAyanamsha: targetAyanamsha,
+        conversionMethod: coordinateProvenance.conversionMethod,
         house: normalizedBhavaHouse,
         rashiHouse,
         bhavaHouse: normalizedBhavaHouse,
@@ -897,14 +1015,23 @@ export function normalizeToKPInput(input: unknown): NatalKPInput {
     lagR,
     lagLon,
     planets,
-    cuspSource: hasDegreeBhavaCusps ? "degree-equal-bhava" : "whole-sign-fallback",
-    bhavaMode: hasDegreeBhavaCusps ? "degree-equal-bhava" : "whole-sign",
+    cuspSource: hasPlacidusCusps
+      ? "placidus"
+      : hasDegreeBhavaCusps
+        ? "degree-equal-bhava"
+        : "whole-sign-fallback",
+    bhavaMode: hasPlacidusCusps
+      ? "placidus"
+      : hasDegreeBhavaCusps
+        ? "degree-equal-bhava"
+        : "whole-sign",
     currentMD: dasha.currentMD || undefined,
     currentAD: dasha.currentAD || undefined,
     currentPD: dasha.currentPD || undefined,
     currentSD: dasha.currentSD || undefined,
     dashaPath: dasha.dashaPath || undefined,
     rawSource: source,
+    coordinateProvenance,
   };
 }
 
@@ -920,7 +1047,17 @@ function buildKPRow(
   house: number,
   input: NatalKPInput,
   retrograde = false,
-  bhavaMeta?: Pick<KPPlanetInput, "rashiHouse" | "bhavaHouse" | "bhavaShift" | "bhavaNote">
+  bhavaMeta?: Pick<
+    KPPlanetInput,
+    | "rashiHouse"
+    | "bhavaHouse"
+    | "bhavaShift"
+    | "bhavaNote"
+    | "sourceLon"
+    | "sourceAyanamsha"
+    | "kpAyanamsha"
+    | "conversionMethod"
+  >
 ): KPRow {
   const signIndex = Math.floor(md(lon, 360) / 30);
   const sign = RASHIS_EN[signIndex] ?? "Unknown";
@@ -942,6 +1079,10 @@ function buildKPRow(
   return {
     name,
     lon,
+    sourceLon: bhavaMeta?.sourceLon ?? lon,
+    sourceAyanamsha: bhavaMeta?.sourceAyanamsha,
+    kpAyanamsha: bhavaMeta?.kpAyanamsha,
+    conversionMethod: bhavaMeta?.conversionMethod,
     degreeText: absoluteDegreeText(lon),
     sign,
     signLord,
@@ -968,13 +1109,19 @@ function buildKPRow(
 
 
 function buildRows(input: NatalKPInput): KPRow[] {
+  const lagnaMeta = {
+    rashiHouse: 1,
+    bhavaHouse: 1,
+    bhavaShift: 0,
+    bhavaNote: "Lagna cusp",
+    sourceLon: input.coordinateProvenance ? md(input.lagLon - (input.coordinateProvenance.deltaArcsec / 3600), 360) : input.lagLon,
+    sourceAyanamsha: input.coordinateProvenance?.sourceAyanamsha,
+    kpAyanamsha: input.coordinateProvenance?.targetAyanamsha,
+    conversionMethod: input.coordinateProvenance?.conversionMethod,
+  };
+
   const rows: KPRow[] = [
-    buildKPRow("Lagna", input.lagLon, 1, input, false, {
-      rashiHouse: 1,
-      bhavaHouse: 1,
-      bhavaShift: 0,
-      bhavaNote: "Lagna cusp",
-    }),
+    buildKPRow("Lagna", input.lagLon, 1, input, false, lagnaMeta),
   ];
 
   (Object.keys(input.planets) as KPPointName[]).forEach((name) => {
@@ -1046,11 +1193,18 @@ function buildCusps(input: NatalKPInput): KPCuspRow[] {
         pada: getPada(lon),
         subLord,
         subSubLord,
-        source: cusp?.source === "degree-equal-bhava" ? "degree-equal-bhava" : "provided",
+        source:
+          cusp?.source === "placidus" || possibleCusps === raw?.kpCusps
+            ? "placidus"
+            : cusp?.source === "degree-equal-bhava"
+              ? "degree-equal-bhava"
+              : "provided",
         promise:
-          cusp?.source === "degree-equal-bhava"
-            ? `Degree-based Bhava cusp: ${sign} H${house}. Sub lord ${subLord}, sub-sub lord ${subSubLord}.`
-            : `H${house} cusp is ruled by ${subLord} at sub level and ${subSubLord} at sub-sub level.`,
+          cusp?.source === "placidus" || possibleCusps === raw?.kpCusps
+            ? `Placidus KP cusp: ${sign} H${house}. Star lord ${starLord}, Sub lord ${subLord}, Sub-sub lord ${subSubLord}.`
+            : cusp?.source === "degree-equal-bhava"
+              ? `Degree-based Bhava cusp: ${sign} H${house}. Sub lord ${subLord}, sub-sub lord ${subSubLord}.`
+              : `H${house} cusp is ruled by ${subLord} at sub level and ${subSubLord} at sub-sub level.`,
       };
     });
   }
@@ -1331,6 +1485,163 @@ export function runKPEngine(rawInput: unknown): KPEngineResult {
   const weakestEvent = sorted[sorted.length - 1] ?? null;
   const forecast = buildKPSixMonthForecast(significators);
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // PHASE 2I: PREDICTIVE ENGINE FOUNDATION (2I-A, 2I-B, 2I-C)
+  // ──────────────────────────────────────────────────────────────────────────
+  const kpHouseLords: Record<number, KPPlanet> = {};
+  for (let h = 1; h <= 12; h++) {
+    const c = cusps[h - 1];
+    kpHouseLords[h] = (c?.signLord as KPPlanet) || (houseLords[h] as KPPlanet) || "Mars";
+  }
+
+  const planetOwnedHouses: Record<KPPlanet, number[]> = {
+    Sun: [],
+    Moon: [],
+    Mars: [],
+    Mercury: [],
+    Jupiter: [],
+    Venus: [],
+    Saturn: [],
+    Rahu: [],
+    Ketu: [],
+  };
+  for (let h = 1; h <= 12; h++) {
+    const lord = kpHouseLords[h];
+    if (planetOwnedHouses[lord]) {
+      planetOwnedHouses[lord].push(h);
+    }
+  }
+
+  const pointEvidence: Record<string, KPPointEvidence> = {};
+
+  const ALL_PLANETS: KPPlanet[] = [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+  ];
+
+  ALL_PLANETS.forEach((planetName) => {
+    const pInput = input.planets[planetName];
+    const pLon = pInput ? pInput.lon : 0;
+    const signIdx = Math.floor(md(pLon, 360) / 30);
+    const pStarLord = getStarLord(pLon);
+    const pSubLord = getSubLord(pLon);
+    const pSubSubLord = getSubSubLord(pLon);
+    const pOccupied = pInput ? pInput.house : 0;
+
+    pointEvidence[planetName] = {
+      id: planetName,
+      name: planetName,
+      type: "planet",
+      longitude: pLon,
+      sign: RASHIS_EN[signIdx] ?? "Unknown",
+      signLord: SIGN_LORD[signIdx] ?? "Ketu",
+      signIndex: signIdx,
+      nakshatra: getNakshatra(pLon),
+      starLord: pStarLord,
+      pada: getPada(pLon),
+      subLord: pSubLord,
+      subSubLord: pSubSubLord,
+      house: pOccupied,
+      houseLord: kpHouseLords[pOccupied] ?? "Mars",
+      occupiedHouse: pOccupied,
+      ownedHouses: planetOwnedHouses[planetName] ?? [],
+      starLordOccupiedHouse: input.planets[pStarLord]?.house ?? 0,
+      starLordOwnedHouses: planetOwnedHouses[pStarLord] ?? [],
+      subLordOccupiedHouse: input.planets[pSubLord]?.house ?? 0,
+      subLordOwnedHouses: planetOwnedHouses[pSubLord] ?? [],
+      retrograde: Boolean(pInput?.retrograde),
+    };
+  });
+
+  const lagLon = input.lagLon;
+  const lagSignIdx = Math.floor(md(lagLon, 360) / 30);
+  const lagStar = getStarLord(lagLon);
+  const lagSub = getSubLord(lagLon);
+  const lagSubSub = getSubSubLord(lagLon);
+  pointEvidence["Lagna"] = {
+    id: "Lagna",
+    name: "Lagna",
+    type: "lagna",
+    longitude: lagLon,
+    sign: RASHIS_EN[lagSignIdx] ?? "Unknown",
+    signLord: SIGN_LORD[lagSignIdx] ?? "Ketu",
+    signIndex: lagSignIdx,
+    nakshatra: getNakshatra(lagLon),
+    starLord: lagStar,
+    pada: getPada(lagLon),
+    subLord: lagSub,
+    subSubLord: lagSubSub,
+    house: 1,
+    houseLord: kpHouseLords[1] ?? "Mars",
+    occupiedHouse: 1,
+    ownedHouses: [],
+    starLordOccupiedHouse: input.planets[lagStar]?.house ?? 0,
+    starLordOwnedHouses: planetOwnedHouses[lagStar] ?? [],
+    subLordOccupiedHouse: input.planets[lagSub]?.house ?? 0,
+    subLordOwnedHouses: planetOwnedHouses[lagSub] ?? [],
+  };
+
+  cusps.forEach((c) => {
+    const cLon = c.lon;
+    const cSignIdx = Math.floor(md(cLon, 360) / 30);
+    pointEvidence[`Cusp${c.house}`] = {
+      id: `Cusp${c.house}`,
+      name: `Cusp ${c.house}`,
+      type: "cusp",
+      longitude: cLon,
+      sign: c.sign,
+      signLord: c.signLord as KPPlanet,
+      signIndex: cSignIdx,
+      nakshatra: c.nakshatra,
+      starLord: c.starLord,
+      pada: c.pada,
+      subLord: c.subLord,
+      subSubLord: c.subSubLord,
+      house: c.house,
+      houseLord: kpHouseLords[c.house] ?? "Mars",
+      occupiedHouse: c.house,
+      ownedHouses: [c.house],
+      starLordOccupiedHouse: input.planets[c.starLord]?.house ?? 0,
+      starLordOwnedHouses: planetOwnedHouses[c.starLord] ?? [],
+      subLordOccupiedHouse: input.planets[c.subLord]?.house ?? 0,
+      subLordOwnedHouses: planetOwnedHouses[c.subLord] ?? [],
+    };
+  });
+
+  const { houseSignificators, planetSignifications } = build4FoldHouseSignificators(
+    pointEvidence,
+    kpHouseLords
+  );
+
+  const cuspPromises = evaluateAllCuspPromises(cusps, planetSignifications);
+
+  const predictiveEvidence: KPPredictiveEvidence = {
+    pointEvidence,
+    houseSignificators,
+    planetSignifications,
+    cuspPromises,
+  };
+
+  const eventPromises = evaluateAllEventRules(predictiveEvidence);
+  predictiveEvidence.eventPromises = eventPromises;
+
+  const chartObj: any = getChartRoot(rawInput);
+  if (chartObj?.dob && chartObj?.tob) {
+    try {
+      const dashaEvidence = buildCurrentDashaHierarchyEvidence(chartObj, predictiveEvidence);
+      (predictiveEvidence as any).dashaEvidence = dashaEvidence;
+    } catch {
+      // Gracefully omit if birth dates cannot be parsed
+    }
+  }
+
   return {
     input,
     rows,
@@ -1354,6 +1665,8 @@ export function runKPEngine(rawInput: unknown): KPEngineResult {
     })),
     subLordSummary:
       "KP gives high importance to star lord and sub lord. The cusp sub lord shows whether an event is promised, while dasha and transit show when it may activate.",
+    coordinateProvenance: input.coordinateProvenance,
+    predictiveEvidence,
   };
 }
 

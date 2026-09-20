@@ -13,6 +13,10 @@ import { calculateDivisional, type DivChart, type DivPlanet } from "@/lib/astro-
 import { checkSupabaseHealth, isSupabaseReady, type DbHealthItem } from "@/lib/db-health";
 import { useUserChart, saveChartToAccount, saveCurrentChart } from "@/lib/user-chart";
 import { getAccountAiUsageStatus, getFreeMonthlyAiLimit } from "@/lib/usage";
+import { isEliteEmail } from "@/lib/access";
+import { calculateCosmicPulse } from "@/lib/astro-engine/cosmic-pulse";
+import { buildRadarHorizons } from "@/lib/astro-engine/cosmic-pulse/forecast";
+import { CosmicPulseCard, CosmicRadar } from "@/components/cosmic-pulse";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -307,17 +311,26 @@ function DashboardContent() {
       setUser(data.user);
 
       if (data.user) {
+        const isElite = (data.user.email && isEliteEmail(data.user.email)) ||
+          (data.user as any).app_metadata?.subscription_tier === "elite" ||
+          (data.user as any).user_metadata?.subscription_tier === "elite";
+
         const { data: nextProfile } = await supabase
           .from("profiles")
           .select("subscription_tier,subscription_expires_at")
           .eq("id", data.user.id)
           .maybeSingle();
 
-        setProfile(nextProfile);
-        const usage = await getAccountAiUsageStatus(nextProfile?.subscription_tier);
+        const effectiveProfile: Profile = isElite
+          ? { ...nextProfile, subscription_tier: "elite" }
+          : (nextProfile ?? { subscription_tier: "free" });
+
+        setProfile(effectiveProfile);
+        const usage = await getAccountAiUsageStatus(effectiveProfile.subscription_tier);
         setAiQuestionsLeft(usage.isUnlimited ? "Unlimited" : String(usage.left));
         return;
       }
+
 
       const usage = await getAccountAiUsageStatus(null);
       setAiQuestionsLeft(String(usage.left));
@@ -349,7 +362,6 @@ function DashboardContent() {
   const activeAntardasha = chart.antardasha?.find((entry) => entry.active) || chart.antardasha?.[0] || null;
   const strongestArea = [...(destiny.areas ?? [])].sort((a, b) => b.score - a.score)[0] || fallbackArea;
   const weakestArea = [...(destiny.areas ?? [])].sort((a, b) => a.score - b.score)[0] || fallbackArea;
-  const cosmicScore = (destiny.currentScore / 10).toFixed(1);
   const plan = profile?.subscription_tier && profile.subscription_tier !== "free"
     ? profile.subscription_tier.toUpperCase()
     : "FREE";
@@ -388,7 +400,7 @@ function DashboardContent() {
   const insights = [
     {
       tag: `${activeDasha.planet} Mahadasha`,
-      text: `${activeDasha.planet} is your active karmic teacher right now. Current life score is ${destiny.currentScore}%, so this is a phase for focused work in ${weakestArea.name.toLowerCase()} and steady gains in ${strongestArea.name.toLowerCase()}.`,
+      text: `${activeDasha.planet} is your active karmic teacher right now. This is a phase for focused work in ${weakestArea.name.toLowerCase()} and steady discipline in ${strongestArea.name.toLowerCase()}.`,
       icon: "✦",
       urgent: destiny.currentScore < 55,
     },
@@ -400,7 +412,7 @@ function DashboardContent() {
     },
     {
       tag: `${strongestArea.name} Window`,
-      text: `${strongestArea.name} is currently your strongest life area at ${strongestArea.score}%. ${weakestArea.name} sits at ${weakestArea.score}%, so the dashboard should be used as a guide for balance, not just momentum.`,
+      text: `${strongestArea.name} is currently your strongest life domain, while ${weakestArea.name} requires mindful pacing and emotional balance.`,
       icon: strongestArea.icon,
       urgent: false,
     },
@@ -411,13 +423,39 @@ function DashboardContent() {
     today.setHours(12, 0, 0, 0);
     const transit = calculateTransitReport({ chart: transitChart, date: today, base: "moon" });
     const radar = calculateEventRadarReport({ chart: transitChart, startDate: today, days: 7, base: "moon" });
-    const panchang = calculatePanchang(today, transitChart.tz);
+    const chartCoords = chart as { lat?: number; lon?: number } | null | undefined;
+    const panchang = calculatePanchang(today, transitChart.tz, {
+      lat: chartCoords?.lat,
+      lon: chartCoords?.lon,
+    });
     const topArea = [...(transit.areaScores ?? [])].sort((a, b) => b.score - a.score)[0] ?? { area: "Balance", score: 50 };
     const cautionCount = transit.alerts.filter((a) => a.severity === "high" || a.severity === "medium").length;
     const oppCount = transit.alerts.filter((a) => a.type === "opportunity").length;
     const bestDay = radar.bestDay ?? { label: "N/A" };
     const cautionDay = radar.cautionDay ?? { label: "N/A" };
-    return { panchang, transit, radar: { ...radar, bestDay, cautionDay }, topArea, cautionCount, oppCount };
+
+    const transitPlanetsCoords = transit.planets.map((p) => ({
+      name: p.planet,
+      longitude: p.longitude,
+      house: p.natalHouse,
+      speed: 1,
+    }));
+
+    const cosmicPulse = calculateCosmicPulse({
+      chart,
+      panchang,
+      transitPlanetsCoords,
+      currentDate: today,
+    });
+
+    const cosmicRadarHorizons = buildRadarHorizons({
+      chart,
+      panchang,
+      startDate: today,
+      daysAhead: 90,
+    });
+
+    return { panchang, transit, radar: { ...radar, bestDay, cautionDay }, topArea, cautionCount, oppCount, cosmicPulse, cosmicRadarHorizons };
   }, [chart]);
   const chartLayers = useMemo(() => {
     const divisional = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
@@ -671,21 +709,11 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* TODAY CARD */}
-          <div className="today-card">
-            <div className="today-orb" />
-            <div className="today-tag">✦ Today&apos;s Cosmic Energy</div>
-            <div className="today-title serif">{activeDasha.planet} MD {activeAntardasha ? `· ${activeAntardasha.planet} AD` : "active"} timing</div>
-            <div className="today-text">
-              Current Mahadasha: {activeDasha.planet} ({activeDasha.start.getFullYear()}–{activeDasha.end.getFullYear()}).
-              {activeAntardasha ? ` Current Antardasha: ${activeAntardasha.planet} (${activeAntardasha.start.getFullYear()}–${activeAntardasha.end.getFullYear()}).` : ""}
-              {" "}Your strongest area is {strongestArea.name.toLowerCase()}, while {weakestArea.name.toLowerCase()} needs gentler handling. Use discipline over speed, especially when emotions feel louder than facts.
-            </div>
-            <div className="today-score">
-              <div className="score-n serif">{cosmicScore}</div>
-              <div className="score-l">COSMIC SCORE</div>
-            </div>
-          </div>
+          {/* COSMIC PULSE INTELLIGENCE CARD */}
+          <CosmicPulseCard pulse={dailyFeed.cosmicPulse} />
+
+          {/* COSMIC RADAR MULTI-HORIZON FORECAST */}
+          <CosmicRadar horizons={dailyFeed.cosmicRadarHorizons} />
 
           <div className="today-summary-grid">
             <Link href="/dashboard/transits" className="today-summary-card">
@@ -722,13 +750,13 @@ function DashboardContent() {
               </div>
               <div className="today-summary-card">
                 <div className="today-summary-k">Transit Pulse</div>
-                <div className="today-summary-v">Best focus: {dailyFeed.topArea.area} ({dailyFeed.topArea.score}/100)</div>
+                <div className="today-summary-v">Best focus: {dailyFeed.topArea.area}</div>
                 <div className="today-summary-hint">{dailyFeed.oppCount} opportunities · {dailyFeed.cautionCount} cautions</div>
               </div>
               <div className="today-summary-card">
                 <div className="today-summary-k">7-Day Radar</div>
                 <div className="today-summary-v">Best day: {dailyFeed.radar.bestDay.label} · Caution: {dailyFeed.radar.cautionDay.label}</div>
-                <div className="today-summary-hint">Today score {dailyFeed.radar.days[0]?.overallScore ?? "-"} / 100</div>
+                <div className="today-summary-hint">Transit cycle alignment overview</div>
               </div>
               <div className="today-summary-card">
                 <div className="today-summary-k">Remedy</div>
@@ -754,18 +782,35 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* UPGRADE BANNER */}
-          <div className="upgrade">
-            <div>
-              <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,color:"#f0e8d0",marginBottom:4}}>
-                Unlock Your Full Cosmic Blueprint ✦
+          {/* UPGRADE / ELITE BANNER */}
+          {plan === "ELITE" ? (
+            <div className="upgrade" style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.15), rgba(200,160,48,0.15))", borderColor: "rgba(168,85,247,0.35)" }}>
+              <div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:"#f0e8d0",marginBottom:4}}>
+                  ✦ AstroLife Elite Universe Active
+                </div>
+                <div style={{fontSize:13,color:"#c084fc"}}>
+                  All 25+ astrology engines, unlimited AI questions, luxury dossiers, and VIP intelligence unlocked.
+                </div>
               </div>
-              <div style={{fontSize:13,color:"#605890"}}>
-                Upgrade to access all 25+ engines, 30+ modules, unlimited AI chat, and destiny timeline.
+              <div style={{ padding: "8px 18px", borderRadius: 10, background: "linear-gradient(135deg,#a855f7,#7c3aed)", color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>
+                ✦ Elite Member
               </div>
             </div>
-            <Link href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Premium →</Link>
-          </div>
+          ) : (
+            <div className="upgrade">
+              <div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,color:"#f0e8d0",marginBottom:4}}>
+                  Unlock Your Full Cosmic Blueprint ✦
+                </div>
+                <div style={{fontSize:13,color:"#605890"}}>
+                  Upgrade to access all 25+ engines, 30+ modules, unlimited AI chat, and destiny timeline.
+                </div>
+              </div>
+              <Link href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Premium →</Link>
+            </div>
+          )}
+
 
           {dbHealth.length > 0 && !dbReady && (
             <div className="db-health">
@@ -788,7 +833,7 @@ function DashboardContent() {
             {[
               { icon:"🔯", val:chartCount, lbl:"Charts Created", change:birth.city ? birth.city : "Create your first chart" },
               { icon:"🤖", val:aiQuestionsLeft, lbl:"AI Questions Left", change:aiQuestionsChange },
-              { icon:"⚡", val:cosmicScore,  lbl:"Today&apos;s Score", change:`${strongestArea.name} is strongest` },
+              { icon:"⚡", val:dailyFeed.cosmicPulse.taraBala.name, lbl:"Tara Bala Rhythm", change:`${dailyFeed.cosmicPulse.taraBala.quality === "supportive" ? "Supportive" : "Mindful"} star flow` },
               { icon:"🌙", val:activeDasha.planet, lbl:"Active Dasha", change:`Until ${activeDasha.end.getFullYear()}` },
             ].map((s,i) => (
               <div key={i} className="stat-card">
@@ -935,13 +980,13 @@ function DashboardContent() {
               </div>
               <div className="today-summary-card">
                 <div className="today-summary-k">Transit Pulse</div>
-                <div className="today-summary-v">Best focus: {dailyFeed.topArea.area} ({dailyFeed.topArea.score}/100)</div>
+                <div className="today-summary-v">Best focus: {dailyFeed.topArea.area}</div>
                 <div className="today-summary-hint">{dailyFeed.oppCount} opportunities · {dailyFeed.cautionCount} cautions</div>
               </div>
               <div className="today-summary-card">
                 <div className="today-summary-k">7-Day Radar</div>
                 <div className="today-summary-v">Best day: {dailyFeed.radar.bestDay.label} · Caution: {dailyFeed.radar.cautionDay.label}</div>
-                <div className="today-summary-hint">Today score {dailyFeed.radar.days[0]?.overallScore ?? "-"} / 100</div>
+                <div className="today-summary-hint">Transit cycle alignment overview</div>
               </div>
               <div className="today-summary-card">
                 <div className="today-summary-k">Remedy</div>

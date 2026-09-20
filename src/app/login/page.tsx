@@ -3,19 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 
-const PHONE_OTP_ENABLED =
-  process.env.NEXT_PUBLIC_ENABLE_PHONE_OTP === "true" ||
-  process.env.ENABLE_PHONE_OTP === "true";
-
-function normalizePhone(value: string) {
-  const cleaned = value.trim().replace(/[^\d+]/g, "");
-  if (cleaned.startsWith("+")) return cleaned;
-  const digits = cleaned.replace(/\D/g, "");
-  if (digits.length === 10) return `+91${digits}`;
-  if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
-  return null;
-}
-
 function getNextPath() {
   if (typeof window === "undefined") return "/dashboard";
   const next = new URLSearchParams(window.location.search).get("next");
@@ -23,84 +10,26 @@ function getNextPath() {
 }
 
 export default function LoginPage() {
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [loading, setLoading] = useState<"google" | "phone" | "verify" | null>(null);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-
-  // Surface any error passed as a query param (e.g. from the OAuth callback)
-  // so the user sees why sign in failed instead of looping silently.
-  if (typeof window !== "undefined") {
+  const queryState = () => {
+    if (typeof window === "undefined") return { error: "", message: "" };
     const params = new URLSearchParams(window.location.search);
-    const err = params.get("error");
-    if (err && !error) setError(decodeURIComponent(err));
-    const msg = params.get("message");
-    if (msg && !message) setMessage(decodeURIComponent(msg));
-  }
+    return {
+      error: params.get("error") ? decodeURIComponent(params.get("error") ?? "") : "",
+      message: params.get("message") ? decodeURIComponent(params.get("message") ?? "") : "",
+    };
+  };
 
-  const handleGoogle = async () => {
+  const initialQueryState = queryState();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(initialQueryState.message);
+  const [error, setError] = useState(initialQueryState.error);
+
+  const handleGoogle = () => {
     setError("");
     setMessage("");
-    setLoading("google");
+    setLoading(true);
     const next = getNextPath();
     window.location.assign(`/auth/google?next=${encodeURIComponent(next)}`);
-  };
-
-  const handleSendOtp = async () => {
-    if (!PHONE_OTP_ENABLED) return;
-    const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    const normalizedPhone = normalizePhone(phone);
-    if (!normalizedPhone) {
-      setError("Enter a valid phone number with country code.");
-      return;
-    }
-
-    setError("");
-    setMessage("");
-    setLoading("phone");
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      phone: normalizedPhone,
-    });
-    setLoading(null);
-
-    if (otpError) {
-      setError(otpError.message);
-      return;
-    }
-
-    setOtpSent(true);
-    setMessage("OTP sent. Enter the code from SMS.");
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!PHONE_OTP_ENABLED) return;
-    const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    const normalizedPhone = normalizePhone(phone);
-    if (!normalizedPhone || otp.length < 4) {
-      setError("Enter your phone number and OTP.");
-      return;
-    }
-
-    setError("");
-    setMessage("");
-    setLoading("verify");
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      phone: normalizedPhone,
-      token: otp,
-      type: "sms",
-    });
-    setLoading(null);
-
-    if (verifyError) {
-      setError(verifyError.message);
-      return;
-    }
-
-    window.location.assign(getNextPath());
   };
 
   return (
@@ -117,11 +46,6 @@ export default function LoginPage() {
         .login-button:hover:not(:disabled){border-color:#c8a030;background:rgba(200,160,48,.08)}
         .login-button:disabled{opacity:.55;cursor:not-allowed}
         .login-button.primary{background:linear-gradient(135deg,#c8a030,#a07820);border-color:#c8a030;color:#060410}
-        .login-divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:#605890;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
-        .login-divider:before,.login-divider:after{content:"";height:1px;background:#1c1840;flex:1}
-        .login-label{display:block;margin:0 0 8px;color:#8f86bd;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
-        .login-input{width:100%;height:48px;background:#08051a;border:1px solid #1c1840;border-radius:12px;color:#f0e8d0;padding:0 14px;font:inherit;margin-bottom:12px}
-        .login-input:focus{outline:none;border-color:#c8a030}
         .login-note{font-size:12px;line-height:1.65;color:#a79fbd;background:rgba(200,160,48,.06);border:1px solid rgba(200,160,48,.16);border-radius:12px;padding:12px;margin-bottom:14px}
         .login-error,.login-message{font-size:13px;line-height:1.6;border-radius:10px;padding:10px 12px;margin-bottom:14px}
         .login-error{color:#fca5a5;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.18)}
@@ -137,58 +61,17 @@ export default function LoginPage() {
         </div>
 
         <h1 className="login-title">Sign in to AstroLife</h1>
-        <p className="login-sub">Google login is active now. Your saved charts stay attached to your private Supabase account.</p>
+        <p className="login-sub">Continue with your Google account to access your saved charts and birth profile.</p>
 
         {error && <div className="login-error">{error}</div>}
         {message && <div className="login-message">{message}</div>}
 
-        <button className="login-button primary" type="button" onClick={handleGoogle} disabled={loading !== null}>
-          {loading === "google" ? "Connecting..." : "Continue with Google"}
-        </button>
-
-        <div className="login-divider">Phone OTP</div>
-
         <div className="login-note">
-          Phone OTP requires SMS provider setup and billing in Supabase/Auth provider settings. Google login is active now.
+          We only support Google sign-in for this product so onboarding and saved charts stay consistent for each account.
         </div>
 
-        <label className="login-label" htmlFor="phone">Phone number</label>
-        <input
-          id="phone"
-          className="login-input"
-          value={phone}
-          onChange={(event) => setPhone(event.target.value)}
-          placeholder="+91 98765 43210"
-          disabled={!PHONE_OTP_ENABLED || loading !== null}
-        />
-
-        {otpSent && (
-          <>
-            <label className="login-label" htmlFor="otp">OTP</label>
-            <input
-              id="otp"
-              className="login-input"
-              value={otp}
-              onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))}
-              placeholder="Enter SMS code"
-              disabled={!PHONE_OTP_ENABLED || loading !== null}
-            />
-          </>
-        )}
-
-        <button
-          className="login-button"
-          type="button"
-          onClick={otpSent ? handleVerifyOtp : handleSendOtp}
-          disabled={!PHONE_OTP_ENABLED || loading !== null}
-        >
-          {!PHONE_OTP_ENABLED
-            ? "Phone OTP disabled until SMS provider is configured"
-            : loading === "phone" || loading === "verify"
-              ? "Please wait..."
-              : otpSent
-                ? "Verify OTP"
-                : "Send OTP"}
+        <button className="login-button primary" type="button" onClick={handleGoogle} disabled={loading}>
+          {loading ? "Connecting..." : "Continue with Google"}
         </button>
 
         <div className="login-footer">

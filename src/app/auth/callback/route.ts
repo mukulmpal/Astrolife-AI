@@ -2,7 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/dashboard")) return "/dashboard";
+  if (!value) return "/dashboard";
+  const allowed = value.startsWith("/dashboard") || value.startsWith("/onboarding");
+  if (!allowed) return "/dashboard";
   if (value.startsWith("//") || value.includes("://")) return "/dashboard";
   return value;
 }

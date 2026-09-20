@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { isBillingEnforced, isFullAccessEnabled, normalizeTier } from "@/lib/access";
+import { isBillingEnforced, isEliteEmail, isFullAccessEnabled, normalizeTier } from "@/lib/access";
 
 type PremiumFeatureProps = {
   children: React.ReactNode;
@@ -22,17 +22,27 @@ export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
       const { data } = await supabase.auth.getUser();
       if (!data.user) return;
 
+      const isElite = (data.user.email && isEliteEmail(data.user.email)) ||
+        (data.user as any).app_metadata?.subscription_tier === "elite" ||
+        (data.user as any).user_metadata?.subscription_tier === "elite";
+
+      if (isElite) {
+        setSubscriptionTier("elite");
+        return;
+      }
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("subscription_tier")
         .eq("id", data.user.id)
         .maybeSingle();
 
-      setSubscriptionTier(typeof profile?.subscription_tier === "string" ? profile.subscription_tier : null);
+      setSubscriptionTier(normalizeTier(profile?.subscription_tier, data.user.email));
     };
 
     loadTier();
   }, [fullAccess, supabase]);
+
 
   if (fullAccess) {
     return <>{children}</>;

@@ -1,7 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+
 import { usePathname, useRouter } from "next/navigation";
+
 import {
   LayoutDashboard, CircleDot, Bot, TrendingUp,
   Sparkles, Timer, Layers, Target, BarChart3, Grid3x3,
@@ -10,7 +13,9 @@ import {
   History, Star, HeartHandshake, Heart, HelpCircle, Hash,
   Hand, LogOut, type LucideIcon,
   Archive, Radar, Globe, ShoppingBag, Sunrise, Activity,
+  Shield,
 } from "lucide-react";
+
 import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
 
@@ -93,6 +98,41 @@ export function DashboardSidebar() {
   const router = useRouter();
   const { birth } = useUserChart();
   const userName = birth.name?.split(" ")[0] || "Seeker";
+  const [isElite, setIsElite] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { isEliteEmail, isAdminUser } = await import("@/lib/access");
+          if (isAdminUser(user.email)) {
+            setIsAdmin(true);
+          }
+          if (
+            (user.email && isEliteEmail(user.email)) ||
+            (user as any).app_metadata?.subscription_tier === "elite" ||
+            (user as any).user_metadata?.subscription_tier === "elite"
+          ) {
+            setIsElite(true);
+            return;
+          }
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("subscription_tier")
+            .eq("id", user.id)
+            .maybeSingle();
+          if (profile?.subscription_tier === "elite") {
+            setIsElite(true);
+          }
+        }
+      } catch {}
+    };
+    checkStatus();
+  }, []);
+
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -131,16 +171,49 @@ export function DashboardSidebar() {
         ))}
 
         <div className="dash-nav-section">
-          <Link
-            href="/dashboard/upgrade"
-            className={`dash-nav-item dash-upgrade-item${pathname === "/dashboard/upgrade" ? " active" : ""}`}
-            aria-current={pathname === "/dashboard/upgrade" ? "page" : undefined}
-          >
-            <Zap size={15} strokeWidth={1.7} aria-hidden="true" />
-            <span>Upgrade to Premium</span>
-          </Link>
+          {isElite ? (
+            <div
+              className="dash-nav-item"
+              style={{
+                color: "#c084fc",
+                borderLeftColor: "#a855f7",
+                background: "rgba(168,85,247,0.08)",
+                cursor: "default",
+              }}
+            >
+              <Sparkles size={15} strokeWidth={1.7} aria-hidden="true" style={{ color: "#c084fc" }} />
+              <span style={{ fontWeight: 600 }}>✦ Elite Member</span>
+            </div>
+          ) : (
+            <Link
+              href="/dashboard/upgrade"
+              className={`dash-nav-item dash-upgrade-item${pathname === "/dashboard/upgrade" ? " active" : ""}`}
+              aria-current={pathname === "/dashboard/upgrade" ? "page" : undefined}
+            >
+              <Zap size={15} strokeWidth={1.7} aria-hidden="true" />
+              <span>Upgrade to Premium</span>
+            </Link>
+          )}
+
+          {isAdmin && (
+            <Link
+              href="/dashboard/admin"
+              className={`dash-nav-item${pathname === "/dashboard/admin" ? " active" : ""}`}
+              style={
+                pathname === "/dashboard/admin"
+                  ? { borderLeftColor: "#eab308", color: "#eab308", background: "rgba(234,179,8,0.1)" }
+                  : { color: "#eab308" }
+              }
+              aria-current={pathname === "/dashboard/admin" ? "page" : undefined}
+            >
+              <Shield size={15} strokeWidth={1.7} aria-hidden="true" />
+              <span style={{ fontWeight: 600 }}>Admin Panel</span>
+            </Link>
+          )}
         </div>
       </nav>
+
+
 
       {/* User chip */}
       <div className="dash-user">

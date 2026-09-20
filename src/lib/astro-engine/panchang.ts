@@ -301,13 +301,31 @@ function getMuhurtaYogas(weekday: string, nakshatra: string): string[] {
 }
 
 function calculateSunWindow(date: Date, lat?: number, lon?: number, tz = 5.5) {
-  if (typeof lat !== "number" || typeof lon !== "number" || !Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return { sunrise: "06:00", sunset: "18:00", assumed: true };
+  let effectiveLat = lat;
+  let effectiveLon = lon;
+  let assumed = false;
+
+  if (
+    typeof effectiveLat !== "number" ||
+    typeof effectiveLon !== "number" ||
+    !Number.isFinite(effectiveLat) ||
+    !Number.isFinite(effectiveLon)
+  ) {
+    assumed = true;
+    if (Math.abs(tz - 5.5) < 0.01) {
+      // Default to New Delhi (national standard reference for IST panchang)
+      effectiveLat = 28.6139;
+      effectiveLon = 77.209;
+    } else {
+      // Central meridian for given timezone, temperate reference latitude 20.0
+      effectiveLon = tz * 15;
+      effectiveLat = 20.0;
+    }
   }
 
   const start = new Date(date.getFullYear(), 0, 0);
   const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86400000);
-  const lngHour = lon / 15;
+  const lngHour = effectiveLon / 15;
   const zenith = 90.833;
   const calc = (isRise: boolean) => {
     const t = dayOfYear + ((isRise ? 6 : 18) - lngHour) / 24;
@@ -327,8 +345,8 @@ function calculateSunWindow(date: Date, lat?: number, lon?: number, tz = 5.5) {
     const sinDec = 0.39782 * Math.sin((Math.PI / 180) * trueLon);
     const cosDec = Math.cos(Math.asin(sinDec));
     const cosH =
-      (Math.cos((Math.PI / 180) * zenith) - sinDec * Math.sin((Math.PI / 180) * lat)) /
-      (cosDec * Math.cos((Math.PI / 180) * lat));
+      (Math.cos((Math.PI / 180) * zenith) - sinDec * Math.sin((Math.PI / 180) * effectiveLat)) /
+      (cosDec * Math.cos((Math.PI / 180) * effectiveLat));
 
     if (cosH < -1 || cosH > 1) return isRise ? 6 : 18;
     const hourAngle = isRise ? 360 - (180 / Math.PI) * Math.acos(cosH) : (180 / Math.PI) * Math.acos(cosH);
@@ -339,7 +357,7 @@ function calculateSunWindow(date: Date, lat?: number, lon?: number, tz = 5.5) {
   return {
     sunrise: decimalHoursToTime(calc(true)),
     sunset: decimalHoursToTime(calc(false)),
-    assumed: false,
+    assumed,
   };
 }
 
@@ -512,7 +530,7 @@ export function calculatePanchang(date = new Date(), tz = 5.5, location?: { lat?
     sunLongitude: Number(sunLon.toFixed(4)),
     sunrise,
     sunset,
-    sunriseAssumed: assumed ? "06:00 (local approx)" : sunrise,
+    sunriseAssumed: assumed ? `${sunrise} (regional approx)` : sunrise,
     rahuKaal,
     gulikaKaal,
     yamaganda,

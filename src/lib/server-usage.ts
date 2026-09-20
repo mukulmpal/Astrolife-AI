@@ -1,4 +1,4 @@
-import { isBillingEnforced, isFullAccessEnabled, PLAN_LIMITS } from "@/lib/access";
+import { isBillingEnforced, isEliteEmail, isFullAccessEnabled, PLAN_LIMITS } from "@/lib/access";
 import { createClient } from "@/lib/supabase/server";
 
 type ServerUsageState = {
@@ -58,11 +58,29 @@ export async function getServerAiUsageState(): Promise<ServerUsageState> {
       };
     }
 
+    const isElite = (user.email && isEliteEmail(user.email)) ||
+      user.app_metadata?.subscription_tier === "elite" ||
+      user.user_metadata?.subscription_tier === "elite";
+
+    if (isElite) {
+      return {
+        allowed: true,
+        authenticated: true,
+        dbAvailable: true,
+        enforced,
+        tier: "elite",
+        used: 0,
+        left: null,
+        limit: null,
+      };
+    }
+
     const { data: profile } = await supabase
       .from("profiles")
       .select("subscription_tier")
       .eq("id", user.id)
       .maybeSingle();
+
 
     let tier = typeof profile?.subscription_tier === "string" ? profile.subscription_tier : "free";
     if (!profile) {

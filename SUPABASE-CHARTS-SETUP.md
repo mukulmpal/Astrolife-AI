@@ -20,30 +20,26 @@ It also enables Row Level Security and creates safe policies so users can only a
 
 ---
 
-## 2) Signup / Login (client) — OTP (phone) flow
+## 2) Signup / Login (client) — Google-only flow
 
-This project already uses phone OTP. Example (client):
+This product is intentionally set to Google-only auth. The signup and login screens redirect users to Supabase Google OAuth, then send them to `/onboarding` or the requested safe route after sign-in.
 
 ```tsx
-// src/app/auth/signup/signup-form.tsx (already present in repo)
-import { createClient } from '@/lib/supabase/client';
-const supabase = createClient();
-
-// Send OTP
-await supabase.auth.signInWithOtp({
-  phone: '+91XXXXXXXXXX',
-  options: { data: { name: 'User Name' } }
+// src/app/auth/google/route.ts
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    redirectTo: `${origin}/auth/callback`,
+    queryParams: {
+      access_type: 'offline',
+      prompt: 'select_account',
+    },
+  },
 });
-
-// Verify OTP
-await supabase.auth.verifyOtp({ phone: '+91XXXXXXXXXX', token: '123456', type: 'sms' });
-
-// Update user metadata (optional)
-await supabase.auth.updateUser({ data: { name: 'User Name' } });
 ```
 
 Notes:
-- The repo's signup form already stores `name` in user metadata on signInWithOtp.
+- Phone OTP is intentionally disabled in the client and product copy.
 - After the user is authenticated, `supabase.auth.getUser()` returns their id for saves.
 
 ---
@@ -134,7 +130,7 @@ Test RLS via the Supabase SQL Editor by running queries as `anon` and verifying 
    - [ ] Rotate any keys that have been exposed or are in the working tree
 
 3. App behavior
-   - [ ] Signup / OTP flow works in production (test with a real phone number)
+   - [ ] Google-only signup flow works in production (test with a real Google account)
    - [ ] After login, `supabase.auth.getUser()` returns a valid user id
    - [ ] Creating a chart and calling `POST /api/charts` succeeds and returns 201
    - [ ] Saved chart appears in the library (`GET /api/charts`)

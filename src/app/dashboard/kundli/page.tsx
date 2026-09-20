@@ -9,6 +9,7 @@ import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { createClient } from "@/lib/supabase/client";
+import { calculateDivisional, type DivChart } from "@/lib/astro-engine/divisional";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -41,6 +42,7 @@ export default function KundliPage() {
   const [form,      setForm]      = useState({name:"",dob:"",tob:"",city:"",lat:null as number | null,lon:null as number | null,tz:null as number | null});
   const [selectedCity, setSelectedCity] = useState<CitySearchResult | null>(null);
   const [chart,     setChart]     = useState<ChartData|null>(null);
+  const [divCharts, setDivCharts] = useState<DivChart[]>([]);
   const [yogas,     setYogas]     = useState<YogaResult[]>([]);
   const [yogaScore, setYogaScore] = useState<{total:number;rating:string;rareCount:number}>({total:0,rating:"",rareCount:0});
   const [loading,   setLoading]   = useState(false);
@@ -95,6 +97,25 @@ export default function KundliPage() {
     setYogas(allYogas);
     const present = allYogas.filter(y=>y.present&&!y.isDosha);
     setYogaScore(calculateYogaScore(present));
+    setDivCharts(calculateDivisional(data.planets as never, data.lagnaNum, data.lagnaLon));
+  };
+
+  const downloadPDF = async () => {
+    const element = document.querySelector(".page") as HTMLElement;
+    if (!element) return;
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const { jsPDF } = await import("jspdf");
+      const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#060410" });
+      const imgData = canvas.toDataURL("image/jpeg", 0.9);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${chart?.name || "Astrolife"}_Kundli.pdf`);
+    } catch (e) {
+      console.error("PDF generation failed", e);
+    }
   };
 
   const refreshSavedCharts = async () => {
@@ -229,7 +250,10 @@ export default function KundliPage() {
         .tabs{display:flex;gap:4px;margin-bottom:24px;background:#0a0720;border:1px solid #1c1840;border-radius:12px;padding:4px;width:fit-content;flex-wrap:wrap}
         .tab{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#605890;border:none;background:none;font-family:'Outfit',sans-serif}
         .tab.active{background:#1c1840;color:#c8c0a8}
-        .chart-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+        .chart-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+        @media(max-width:1100px){
+          .chart-layout{grid-template-columns:1fr 1fr}
+        }
         .card{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:24px}
         .card-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#605890;margin-bottom:6px}
         .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0;margin-bottom:16px}
@@ -289,9 +313,17 @@ export default function KundliPage() {
               <div className="library-title serif">Chart Library</div>
               <div className="library-sub">{saveStatus}</div>
             </div>
-            <button className="btn-save" onClick={refreshSavedCharts} disabled={libraryLoading}>
-              {libraryLoading ? "⟳ Loading..." : "↻ Refresh"}
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button className="btn-save" onClick={() => setShowForm(!showForm)} style={{ borderColor: showForm ? 'rgba(239,68,68,0.3)' : 'rgba(200,160,48,0.3)', color: showForm ? '#ef4444' : '#c8a030' }}>
+                {showForm ? "✕ Cancel" : "✦ New Chart"}
+              </button>
+              <button className="btn-save" onClick={downloadPDF} style={{ color: "#22c55e", borderColor: "rgba(34,197,94,0.3)" }}>
+                ↓ Download PDF
+              </button>
+              <button className="btn-save" onClick={refreshSavedCharts} disabled={libraryLoading}>
+                {libraryLoading ? "⟳ Loading..." : "↻ Refresh"}
+              </button>
+            </div>
           </div>
           {savedCharts.length > 0 ? (
             <div className="library-list">
@@ -443,8 +475,8 @@ export default function KundliPage() {
             {activeTab==="chart" && (
               <div className="chart-layout">
                 <div className="card">
-                  <div className="card-tag">✦ North Indian Chart</div>
-                  <div className="card-title serif">Janma Kundli</div>
+                  <div className="card-tag">✦ Birth Chart (D-1)</div>
+                  <div className="card-title serif">Lagna Kundli</div>
                   <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} />
                   <div style={{marginTop:16,padding:"12px 14px",background:"rgba(200,160,48,0.05)",border:"1px solid rgba(200,160,48,0.1)",borderRadius:10}}>
                     <div style={{fontSize:11,color:"#c8a030",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:4}}>Lagna — {chart.lagnaRashi}</div>
@@ -453,6 +485,28 @@ export default function KundliPage() {
                     </div>
                   </div>
                 </div>
+                {(()=>{
+                  const d9 = divCharts.find(c => c.key === "D9");
+                  if(!d9) return <div className="card">D-9 Not Calculated</div>;
+                  const d9Planets = {} as Record<string, any>;
+                  d9.planets.forEach(p => {
+                    d9Planets[p.planet] = { house: p.house, retrograde: p.retrograde, signNum: p.signNum };
+                  });
+                  return (
+                    <div className="card">
+                      <div className="card-tag">✦ Marriage & Soul (D-9)</div>
+                      <div className="card-title serif">Navamsha</div>
+                      <NorthIndianChart lagnaNum={d9.lagnaNum} planets={d9Planets} />
+                      <div style={{marginTop:16,padding:"12px 14px",background:"rgba(200,160,48,0.05)",border:"1px solid rgba(200,160,48,0.1)",borderRadius:10}}>
+                        <div style={{fontSize:11,color:"#c8a030",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:4}}>Navamsha Lagna — {d9.lagna}</div>
+                        <div style={{fontSize:13,color:"#c8c0a8",lineHeight:1.7}}>
+                          <strong style={{color:"#f0e8d0"}}>{d9.lagna} Rising</strong> — inner potential, soul purpose, and marriage dynamics.
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+                
                 <div style={{display:"flex",flexDirection:"column",gap:16}}>
                   <div className="card">
                     <div className="card-tag">✦ Key Positions</div>
@@ -575,7 +629,12 @@ export default function KundliPage() {
                         </div>
                         {/* Strength Bar */}
                         <div style={{height:2,borderRadius:2,background:`linear-gradient(90deg,${y.isDosha?"#ef4444":"#c8a030"} ${y.score}%,#1c1840 ${y.score}%)`,marginBottom:10}}/>
-                        <div style={{fontSize:12,color:"#605890",lineHeight:1.7,marginBottom:y.remedy?10:0}}>{y.description}</div>
+                        <div style={{fontSize:12,color:"#605890",lineHeight:1.7,marginBottom:y.impact||y.remedy?6:0}}>{y.description}</div>
+                        {y.impact && (
+                          <div style={{fontSize:12.5,color:"#c8c0a8",lineHeight:1.7,marginBottom:y.remedy?10:0,fontFamily:"Cormorant Garamond,serif",fontStyle:"italic"}}>
+                            "{y.impact}"
+                          </div>
+                        )}
                         {y.remedy&&(
                           <div style={{padding:"8px 12px",background:"rgba(200,160,48,0.04)",border:"1px solid rgba(200,160,48,0.1)",borderRadius:8,fontSize:11,color:"#c8c0a8",lineHeight:1.7}}>
                             ✦ {y.remedy}

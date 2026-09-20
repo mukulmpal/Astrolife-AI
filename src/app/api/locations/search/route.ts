@@ -82,21 +82,51 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "City search failed" }, { status: 500 });
     }
 
+    const IN_STATES: Record<string, string> = {
+      "01": "A&N", "02": "AP", "03": "Assam", "05": "Chandigarh", "07": "Delhi",
+      "09": "Gujarat", "10": "Haryana", "11": "HP", "12": "J&K", "13": "Kerala",
+      "14": "Lakshadweep", "16": "MH", "17": "Manipur", "18": "Meghalaya", "19": "KA",
+      "20": "Nagaland", "21": "Odisha", "22": "Puducherry", "23": "Punjab", "24": "RJ",
+      "25": "TN", "26": "Tripura", "28": "WB", "29": "Sikkim", "30": "Arunachal",
+      "31": "Mizoram", "33": "Goa", "34": "Bihar", "35": "MP", "36": "UP",
+      "37": "CG", "38": "JH", "39": "UK", "40": "TG", "41": "Ladakh", "52": "Daman & Diu"
+    };
+
+    const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+
     const results = (data ?? [])
       .sort((a: CityRow, b: CityRow) => scoreCity(b, q) - scoreCity(a, q))
       .slice(0, limit)
-      .map((city: CityRow) => ({
-        geonameId: city.geoname_id,
-        name: city.name,
-        asciiName: city.ascii_name,
-        countryCode: city.country_code,
-        admin1: city.admin1_code,
-        latitude: city.latitude,
-        longitude: city.longitude,
-        timezone: city.timezone,
-        population: city.population ?? 0,
-        displayName: `${city.name}${city.admin1_code ? ", " + city.admin1_code : ""}, ${city.country_code}`,
-      }));
+      .map((city: CityRow) => {
+        let countryName = city.country_code;
+        try { countryName = regionNames.of(city.country_code) || city.country_code; } catch {}
+        
+        let stateName = city.admin1_code || "";
+        if (city.country_code === "IN" && stateName && IN_STATES[stateName]) {
+          stateName = IN_STATES[stateName];
+        } else if (stateName && /^\d+$/.test(stateName)) {
+          // If the state code is purely numeric and we don't have a map for it, hide it.
+          // This prevents things like "Paris, 11, France" or "Tokyo, 40, Japan"
+          stateName = "";
+        }
+
+        const displayParts = [city.name];
+        if (stateName) displayParts.push(stateName);
+        displayParts.push(countryName);
+
+        return {
+          geonameId: city.geoname_id,
+          name: city.name,
+          asciiName: city.ascii_name,
+          countryCode: city.country_code,
+          admin1: city.admin1_code,
+          latitude: city.latitude,
+          longitude: city.longitude,
+          timezone: city.timezone,
+          population: city.population ?? 0,
+          displayName: displayParts.join(", "),
+        };
+      });
 
     return NextResponse.json(results);
   } catch (error: unknown) {

@@ -2288,7 +2288,10 @@ export function buildKpReportSections(input: any): ReportSection[] {
 export function buildRealPanchangEngineReportSection(input: any): ReportSection {
   try {
     const chart = getEngineChart(input);
-    const p = calculatePanchang(getChartDate(chart), Number(chart?.tz ?? 5.5));
+    const p = calculatePanchang(getChartDate(chart), Number(chart?.tz ?? 5.5), {
+      lat: chart?.lat,
+      lon: chart?.lon,
+    });
     return makeSection({
       id: "panchang-details",
       title: "Panchang Details",

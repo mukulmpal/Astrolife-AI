@@ -12,6 +12,8 @@ import {
 } from "@/lib/ai-conversations";
 import { formatChartContext, useUserChart } from "@/lib/user-chart";
 import { getAccountAiUsageStatus, getAiUsageStatus, incrementAccountMonthlyAiUsage, type AiUsageStatus } from "@/lib/usage";
+import { isEliteEmail } from "@/lib/access";
+
 import {
   calculateTransitReport,
   PlanetName,
@@ -248,7 +250,10 @@ export default function ChatPage() {
         days: 7,
         base: "moon",
       });
-      const panchang = calculatePanchang(today, transitChart.tz);
+      const panchang = calculatePanchang(today, transitChart.tz, {
+        lat: chart?.lat,
+        lon: chart?.lon,
+      });
       const topArea = [...transit.areaScores].sort((a, b) => b.score - a.score)[0];
       const cautionCount = transit.alerts.filter((a) => a.severity === "high" || a.severity === "medium").length;
       const opportunityCount = transit.alerts.filter((a) => a.type === "opportunity").length;
@@ -273,10 +278,21 @@ export default function ChatPage() {
     const loadPlan = async () => {
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
-  setUsageStatus(getAiUsageStatus(null));
-  setUsageReady(true);
-  return;
-}
+        setUsageStatus(getAiUsageStatus(null));
+        setUsageReady(true);
+        return;
+      }
+
+      const isElite = (data.user.email && isEliteEmail(data.user.email)) ||
+        (data.user as any).app_metadata?.subscription_tier === "elite" ||
+        (data.user as any).user_metadata?.subscription_tier === "elite";
+
+      if (isElite) {
+        setSubscriptionTier("elite");
+        setUsageStatus(getAiUsageStatus("elite"));
+        setUsageReady(true);
+        return;
+      }
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -289,6 +305,7 @@ export default function ChatPage() {
       setUsageStatus(await getAccountAiUsageStatus(tier));
       setUsageReady(true);
     };
+
 
     loadPlan().finally(() => setUsageReady(true));
     listConversations().then(setConversations);

@@ -61,8 +61,29 @@ export const FEATURE_ACCESS: Record<FeatureKey, SubscriptionTier[]> = {
   astro_sound: ["premium", "elite"],
 };
 
-export function normalizeTier(tier?: string | null): SubscriptionTier {
+export const ELITE_EMAILS = new Set([
+  "mukulpal9@gmail.com",
+  "prachi269pal@gmail.com",
+]);
+
+export function isEliteEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return ELITE_EMAILS.has(email.toLowerCase().trim());
+}
+
+export const ADMIN_EMAILS = new Set([
+  "mukulpal9@gmail.com",
+]);
+
+export function isAdminUser(email?: string | null): boolean {
+  if (!email) return false;
+  return ADMIN_EMAILS.has(email.toLowerCase().trim());
+}
+
+
+export function normalizeTier(tier?: string | null, email?: string | null): SubscriptionTier {
   if (isFullAccessEnabled()) return "elite";
+  if (email && isEliteEmail(email)) return "elite";
   return tier === "premium" || tier === "elite" ? tier : "free";
 }
 
@@ -75,15 +96,17 @@ export function isBillingEnforced() {
   return process.env.NEXT_PUBLIC_BILLING_ENFORCED === "true";
 }
 
-export function canAccessFeature(feature: FeatureKey, tier?: string | null) {
+export function canAccessFeature(feature: FeatureKey, tier?: string | null, email?: string | null) {
   if (isFullAccessEnabled()) return true;
-  return FEATURE_ACCESS[feature].includes(normalizeTier(tier));
+  if (email && isEliteEmail(email)) return true;
+  return FEATURE_ACCESS[feature].includes(normalizeTier(tier, email));
 }
 
-export function shouldSoftGateFeature(feature: FeatureKey, tier?: string | null) {
-  return !canAccessFeature(feature, tier) && !isBillingEnforced();
+export function shouldSoftGateFeature(feature: FeatureKey, tier?: string | null, email?: string | null) {
+  return !canAccessFeature(feature, tier, email) && !isBillingEnforced();
 }
 
-export function shouldBlockFeature(feature: FeatureKey, tier?: string | null) {
-  return !canAccessFeature(feature, tier) && isBillingEnforced();
+export function shouldBlockFeature(feature: FeatureKey, tier?: string | null, email?: string | null) {
+  return !canAccessFeature(feature, tier, email) && isBillingEnforced();
 }
+

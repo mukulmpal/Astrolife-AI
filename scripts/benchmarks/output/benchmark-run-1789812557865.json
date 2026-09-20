@@ -1,0 +1,558 @@
+{
+  "runTimestamp": "2026-09-19T10:09:17.777Z",
+  "engineName": "AstroLife Calculation Engine (calculations.ts)",
+  "engineVersion": "3.0.0-moshier",
+  "referenceSource": "Swiss Ephemeris v2.10.03 (DE431) [BASELINE PENDING]",
+  "summary": {
+    "totalCases": 10,
+    "totalMetrics": 10,
+    "passed": 0,
+    "failed": 10,
+    "review": 0,
+    "referencePending": 0
+  },
+  "caseResults": [
+    {
+      "testCase": {
+        "id": "TC-NAKSHATRA-SANDHI-01",
+        "category": "nakshatra-boundary",
+        "description": "Moon at Revati-Ashwini junction (critical Nakshatra Sandhi & Gandanta boundary)",
+        "birthDate": "2024-04-09",
+        "birthTime": "07:32",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata (IST)",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "moonLongitude": "REFERENCE_PENDING",
+          "nakshatra": "REFERENCE_PENDING",
+          "nakshatraPada": "REFERENCE_PENDING",
+          "dashaBalanceYears": "REFERENCE_PENDING",
+          "ascendant": "REFERENCE_PENDING"
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "ascendantLongitudeDeg": 0.02,
+          "dashaBalanceYears": 0.05
+        },
+        "notes": [
+          "Tests dasha lord transition at 0° Aries sidereal boundary.",
+          "Crucial for Gandanta boundary detection."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 30
+    },
+    {
+      "testCase": {
+        "id": "TC-NAVAMSHA-SANDHI-02",
+        "category": "navamsha-boundary",
+        "description": "Planet positioned at exact 3°20' Navamsha boundary threshold",
+        "birthDate": "2023-05-15",
+        "birthTime": "14:15",
+        "latitude": 19.076,
+        "longitude": 72.8777,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata (IST)",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": "REFERENCE_PENDING",
+          "moonLongitude": "REFERENCE_PENDING",
+          "ascendant": "REFERENCE_PENDING",
+          "vargaPlacements": [
+            {
+              "varga": "D9",
+              "planet": "Jupiter",
+              "sign": "REFERENCE_PENDING",
+              "signNum": -1
+            }
+          ]
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "ascendantLongitudeDeg": 0.02
+        },
+        "notes": [
+          "Tests D9 sign assignment near 3°20' boundary.",
+          "A 0.01° drift flips the Navamsha sign entirely."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 9
+    },
+    {
+      "testCase": {
+        "id": "TC-CUSP-BOUNDARY-03",
+        "category": "cusp-boundary",
+        "description": "Ascendant at boundary between two Rashis (Rashi Sandhi)",
+        "birthDate": "2022-09-22",
+        "birthTime": "06:12",
+        "latitude": 13.0827,
+        "longitude": 80.2707,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata (IST)",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "ascendant": "REFERENCE_PENDING",
+          "houseCusps": [
+            {
+              "house": 1,
+              "longitude": "REFERENCE_PENDING"
+            },
+            {
+              "house": 10,
+              "longitude": "REFERENCE_PENDING"
+            }
+          ]
+        },
+        "tolerances": {
+          "ascendantLongitudeDeg": 0.01,
+          "houseCuspLongitudeDeg": 0.02
+        },
+        "notes": [
+          "Tests rising sign determination when local sidereal time aligns closely with rashi change."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 7
+    },
+    {
+      "testCase": {
+        "id": "TC-HISTORICAL-TZ-04",
+        "category": "historical-timezone",
+        "description": "Indian War Time (1943) — UTC+6:30 offset vs standard IST 5:30",
+        "birthDate": "1943-08-15",
+        "birthTime": "10:30",
+        "latitude": 22.5726,
+        "longitude": 88.3639,
+        "timezone": 6.5,
+        "timezoneSource": "Historical Indian War Time (Gazette of India 1942)",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": "REFERENCE_PENDING",
+          "moonLongitude": "REFERENCE_PENDING",
+          "ascendant": "REFERENCE_PENDING"
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.01,
+          "ascendantLongitudeDeg": 0.05
+        },
+        "notes": [
+          "Tests system capability to accept and process non-standard historical UTC offsets.",
+          "If default 5.5 is assumed instead of 6.5, Julian Day drifts by 1 hour (~15° Lagna error)."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 8
+    },
+    {
+      "testCase": {
+        "id": "TC-MIDNIGHT-BOUNDARY-05",
+        "category": "midnight-boundary",
+        "description": "Birth at exactly 00:00 (midnight) date change boundary",
+        "birthDate": "2020-01-01",
+        "birthTime": "00:00",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": "REFERENCE_PENDING",
+          "moonLongitude": "REFERENCE_PENDING",
+          "ascendant": "REFERENCE_PENDING",
+          "tithi": "REFERENCE_PENDING",
+          "yoga": "REFERENCE_PENDING",
+          "karana": "REFERENCE_PENDING"
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "ascendantLongitudeDeg": 0.02
+        },
+        "notes": [
+          "Tests that 00:00:00 is not misparsed as 24:00 or previous calendar day.",
+          "Verifies Julian Day fractional hour calculation (utH = 0 - 5.5 = -5.5 hours UTC)."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 5
+    },
+    {
+      "testCase": {
+        "id": "TC-SUNRISE-SUNSET-06",
+        "category": "sunrise-sunset",
+        "description": "Birth at local astronomical sunrise (Sun conjunct Lagna)",
+        "birthDate": "2024-03-20",
+        "birthTime": "06:24",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": "REFERENCE_PENDING",
+          "ascendant": "REFERENCE_PENDING",
+          "tithi": "REFERENCE_PENDING"
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.01,
+          "ascendantLongitudeDeg": 0.05
+        },
+        "notes": [
+          "At true sunrise, Sun longitude and Ascendant longitude should be within ~1°.",
+          "Tests Panchang sunrise assumption vs actual calculation."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 6
+    },
+    {
+      "testCase": {
+        "id": "TC-RETROGRADE-STATIONARY-07",
+        "category": "retrograde-stationary",
+        "description": "Saturn at stationary station turning retrograde",
+        "birthDate": "2023-06-17",
+        "birthTime": "12:00",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "planetLongitudes": {
+            "Saturn": "REFERENCE_PENDING"
+          },
+          "planetSpeeds": {
+            "Saturn": "REFERENCE_PENDING"
+          }
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005
+        },
+        "notes": [
+          "Tests numerical derivative / finite difference calculation in computeRetro(jd).",
+          "Near zero speed, minor roundoff can erroneously flip retrograde boolean."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 5
+    },
+    {
+      "testCase": {
+        "id": "TC-HIGH-LATITUDE-08",
+        "category": "high-latitude",
+        "description": "Arctic Circle birth (Tromsø, Norway at 69.65° N)",
+        "birthDate": "2023-06-21",
+        "birthTime": "12:00",
+        "latitude": 69.6492,
+        "longitude": 18.9553,
+        "timezone": 2,
+        "timezoneSource": "Europe/Oslo",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": "REFERENCE_PENDING",
+          "ascendant": "REFERENCE_PENDING",
+          "houseCusps": [
+            {
+              "house": 1,
+              "longitude": "REFERENCE_PENDING"
+            },
+            {
+              "house": 10,
+              "longitude": "REFERENCE_PENDING"
+            }
+          ]
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.01,
+          "ascendantLongitudeDeg": 0.1
+        },
+        "notes": [
+          "Tests computeLagna for high latitudes where tan(phi) is large.",
+          "Ensures Math.atan2 does not experience singularity or sign flip error."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 5
+    },
+    {
+      "testCase": {
+        "id": "TC-NODE-DIVERGENCE-09",
+        "category": "true-mean-node",
+        "description": "Maximum divergence between True Node and Mean Node",
+        "birthDate": "2024-01-11",
+        "birthTime": "11:57",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "rahuLongitude": "REFERENCE_PENDING",
+          "ketuLongitude": "REFERENCE_PENDING"
+        },
+        "tolerances": {
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Documents current mean node baseline vs external True Node reference.",
+          "Critical for determining when user charts flip Rahu/Ketu nakshatra."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 5
+    },
+    {
+      "testCase": {
+        "id": "TC-COMBUSTION-BOUNDARY-10",
+        "category": "combustion-boundary",
+        "description": "Mars at the exact 17.0° combustion threshold from Sun",
+        "birthDate": "2023-10-18",
+        "birthTime": "12:00",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "Swiss Ephemeris v2.10.03 (DE431) [REFERENCE_PENDING]",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": "REFERENCE_PENDING",
+          "planetLongitudes": {
+            "Mars": "REFERENCE_PENDING"
+          }
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005
+        },
+        "notes": [
+          "Tests angular separation between Sun and Mars near 17.0° threshold.",
+          "Combustion radically changes Shadbala and Yoga interpretation."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Engine Execution",
+          "actual": "CRASH",
+          "expected": "SUCCESS",
+          "status": "FAIL",
+          "notes": "Engine threw an unhandled exception: date.getTime is not a function"
+        }
+      ],
+      "overallStatus": "FAIL",
+      "executionDurationMs": 5
+    }
+  ],
+  "criticalDiscrepancies": [
+    {
+      "caseId": "TC-NAKSHATRA-SANDHI-01",
+      "category": "nakshatra-boundary",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-NAVAMSHA-SANDHI-02",
+      "category": "navamsha-boundary",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-CUSP-BOUNDARY-03",
+      "category": "cusp-boundary",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-HISTORICAL-TZ-04",
+      "category": "historical-timezone",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-MIDNIGHT-BOUNDARY-05",
+      "category": "midnight-boundary",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-SUNRISE-SUNSET-06",
+      "category": "sunrise-sunset",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-RETROGRADE-STATIONARY-07",
+      "category": "retrograde-stationary",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-HIGH-LATITUDE-08",
+      "category": "high-latitude",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-NODE-DIVERGENCE-09",
+      "category": "true-mean-node",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    },
+    {
+      "caseId": "TC-COMBUSTION-BOUNDARY-10",
+      "category": "combustion-boundary",
+      "metricName": "Engine Execution",
+      "expected": "SUCCESS",
+      "actual": "CRASH",
+      "difference": 999,
+      "tolerance": 0,
+      "affectedSubsystem": "General Subsystem"
+    }
+  ]
+}

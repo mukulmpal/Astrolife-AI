@@ -1,0 +1,873 @@
+{
+  "runTimestamp": "2026-09-20T09:58:43.471Z",
+  "engineName": "AstroLife Calculation Engine (calculations.ts)",
+  "engineVersion": "3.0.0-moshier",
+  "referenceSource": "Swiss Ephemeris v2.10.03 (DE431) [BASELINE PENDING]",
+  "summary": {
+    "totalCases": 10,
+    "totalMetrics": 53,
+    "passed": 53,
+    "failed": 0,
+    "review": 0,
+    "referencePending": 0
+  },
+  "caseResults": [
+    {
+      "testCase": {
+        "id": "TC-NAKSHATRA-SANDHI-01",
+        "category": "nakshatra-boundary",
+        "description": "Moon at Revati-Ashwini junction (critical Nakshatra Sandhi & Gandanta boundary)",
+        "birthDate": "2024-04-09",
+        "birthTime": "07:32",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata (IST)",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 355.524468,
+          "moonLongitude": 0.00284,
+          "ascendant": 23.453107,
+          "rahuLongitude": 351.440789,
+          "ketuLongitude": 171.440789,
+          "nakshatra": "Ashwini",
+          "nakshatraPada": 1
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "ascendantLongitudeDeg": 0.02,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests dasha lord transition at 0° Aries sidereal boundary.",
+          "Crucial for Gandanta boundary detection.",
+          "DE441 has Moon at 0.002840° (Ashwini p1, Ketu MD), while Moshier has Moon at 359.992750° (Revati p4, Mercury MD)."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 355.524368,
+          "expected": 355.524468,
+          "difference": 0.0001,
+          "angularDifference": 0.0001,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Moon Longitude",
+          "actual": 0.003513,
+          "expected": 0.00284,
+          "difference": 0.000673,
+          "angularDifference": 0.000673,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ascendant (Lagna)",
+          "actual": 23.45121,
+          "expected": 23.453107,
+          "difference": 0.001897,
+          "angularDifference": 0.001897,
+          "tolerance": 0.02,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 351.440583,
+          "expected": 351.440789,
+          "difference": 0.000206,
+          "angularDifference": 0.000206,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 171.440583,
+          "expected": 171.440789,
+          "difference": 0.000206,
+          "angularDifference": 0.000206,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Moon Nakshatra",
+          "actual": "Ashwini",
+          "expected": "Ashwini",
+          "status": "PASS"
+        },
+        {
+          "metricName": "Moon Nakshatra Pada",
+          "actual": 1,
+          "expected": 1,
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 321
+    },
+    {
+      "testCase": {
+        "id": "TC-NAVAMSHA-SANDHI-02",
+        "category": "navamsha-boundary",
+        "description": "Planet positioned at exact 3°20' Navamsha boundary threshold",
+        "birthDate": "2023-05-15",
+        "birthTime": "14:15",
+        "latitude": 19.076,
+        "longitude": 72.8777,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata (IST)",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 30.10368,
+          "moonLongitude": 336.298292,
+          "ascendant": 143.47591,
+          "planetLongitudes": {
+            "Jupiter": 5.511478
+          },
+          "rahuLongitude": 8.913897,
+          "ketuLongitude": 188.913897,
+          "vargaPlacements": [
+            {
+              "varga": "D9",
+              "planet": "Jupiter",
+              "sign": "Taurus",
+              "signNum": 1
+            }
+          ]
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "ascendantLongitudeDeg": 0.02,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests D9 sign assignment near 3°20' boundary.",
+          "Jupiter at 5.511478° falls in Taurus Navamsha (3°20' - 6°40' of Aries)."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 30.104252,
+          "expected": 30.10368,
+          "difference": 0.000572,
+          "angularDifference": 0.000572,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Moon Longitude",
+          "actual": 336.299439,
+          "expected": 336.298292,
+          "difference": 0.001147,
+          "angularDifference": 0.001147,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ascendant (Lagna)",
+          "actual": 143.475968,
+          "expected": 143.47591,
+          "difference": 0.000058,
+          "angularDifference": 0.000058,
+          "tolerance": 0.02,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Jupiter Longitude",
+          "actual": 5.512056,
+          "expected": 5.511478,
+          "difference": 0.000578,
+          "angularDifference": 0.000578,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 8.914371,
+          "expected": 8.913897,
+          "difference": 0.000474,
+          "angularDifference": 0.000474,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 188.914371,
+          "expected": 188.913897,
+          "difference": 0.000474,
+          "angularDifference": 0.000474,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Jupiter D9 Navamsha Sign",
+          "actual": "Taurus",
+          "expected": "Taurus",
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 313
+    },
+    {
+      "testCase": {
+        "id": "TC-CUSP-BOUNDARY-03",
+        "category": "cusp-boundary",
+        "description": "Ascendant and house cusp boundaries in Virgo",
+        "birthDate": "2022-09-22",
+        "birthTime": "06:12",
+        "latitude": 13.0827,
+        "longitude": 80.2707,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata (IST)",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 154.839165,
+          "ascendant": 157.453618,
+          "rahuLongitude": 21.38567,
+          "ketuLongitude": 201.38567,
+          "houseCusps": [
+            {
+              "house": 1,
+              "longitude": 157.453618
+            },
+            {
+              "house": 10,
+              "longitude": 67.453618
+            }
+          ]
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "ascendantLongitudeDeg": 0.01,
+          "houseCuspLongitudeDeg": 0.02,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests rising sign determination and degree-equal house cusps."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 154.839285,
+          "expected": 154.839165,
+          "difference": 0.00012,
+          "angularDifference": 0.00012,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ascendant (Lagna)",
+          "actual": 157.453609,
+          "expected": 157.453618,
+          "difference": 0.000009,
+          "angularDifference": 0.000009,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 21.385692,
+          "expected": 21.38567,
+          "difference": 0.000022,
+          "angularDifference": 0.000022,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 201.385692,
+          "expected": 201.38567,
+          "difference": 0.000022,
+          "angularDifference": 0.000022,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "House 1 Cusp",
+          "actual": 157.453609,
+          "expected": 157.453618,
+          "difference": 0.000009,
+          "angularDifference": 0.000009,
+          "tolerance": 0.02,
+          "status": "PASS"
+        },
+        {
+          "metricName": "House 10 Cusp",
+          "actual": 67.453609,
+          "expected": 67.453618,
+          "difference": 0.000009,
+          "angularDifference": 0.000009,
+          "tolerance": 0.02,
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 287
+    },
+    {
+      "testCase": {
+        "id": "TC-HISTORICAL-TZ-04",
+        "category": "historical-timezone",
+        "description": "Indian War Time (1943) — UTC+6:30 offset vs standard IST 5:30",
+        "birthDate": "1943-08-15",
+        "birthTime": "10:30",
+        "latitude": 22.5726,
+        "longitude": 88.3639,
+        "timezone": 6.5,
+        "timezoneSource": "Historical Indian War Time (Gazette of India 1942)",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 118.401208,
+          "moonLongitude": 289.178684,
+          "ascendant": 176.314462,
+          "rahuLongitude": 112.476831,
+          "ketuLongitude": 292.476831
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.01,
+          "ascendantLongitudeDeg": 0.05,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests system capability to accept and process non-standard historical UTC offsets.",
+          "If default 5.5 is assumed instead of 6.5, Julian Day drifts by 1 hour (~15° Lagna error)."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 118.401218,
+          "expected": 118.401208,
+          "difference": 0.00001,
+          "angularDifference": 0.00001,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Moon Longitude",
+          "actual": 289.178647,
+          "expected": 289.178684,
+          "difference": 0.000037,
+          "angularDifference": 0.000037,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ascendant (Lagna)",
+          "actual": 176.314455,
+          "expected": 176.314462,
+          "difference": 0.000007,
+          "angularDifference": 0.000007,
+          "tolerance": 0.05,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 112.476798,
+          "expected": 112.476831,
+          "difference": 0.000033,
+          "angularDifference": 0.000033,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 292.476798,
+          "expected": 292.476831,
+          "difference": 0.000033,
+          "angularDifference": 0.000033,
+          "tolerance": 0.01,
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 211
+    },
+    {
+      "testCase": {
+        "id": "TC-MIDNIGHT-BOUNDARY-05",
+        "category": "midnight-boundary",
+        "description": "Birth at exactly 00:00 (midnight) date change boundary",
+        "birthDate": "2020-01-01",
+        "birthTime": "00:00",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 255.647788,
+          "moonLongitude": 319.278446,
+          "ascendant": 159.926493,
+          "rahuLongitude": 74.127885,
+          "ketuLongitude": 254.127885,
+          "tithi": "Shashthi (6/30)",
+          "yoga": "Vyatipata",
+          "karana": "Garija"
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "ascendantLongitudeDeg": 0.02,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests that 00:00:00 is not misparsed as 24:00 or previous calendar day.",
+          "Verifies Julian Day fractional hour calculation (utH = 0 - 5.5 = -5.5 hours UTC)."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 255.647529,
+          "expected": 255.647788,
+          "difference": 0.000259,
+          "angularDifference": 0.000259,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Moon Longitude",
+          "actual": 319.2784,
+          "expected": 319.278446,
+          "difference": 0.000046,
+          "angularDifference": 0.000046,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ascendant (Lagna)",
+          "actual": 159.926456,
+          "expected": 159.926493,
+          "difference": 0.000037,
+          "angularDifference": 0.000037,
+          "tolerance": 0.02,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 74.127546,
+          "expected": 74.127885,
+          "difference": 0.000339,
+          "angularDifference": 0.000339,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 254.127546,
+          "expected": 254.127885,
+          "difference": 0.000339,
+          "angularDifference": 0.000339,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Panchang Tithi",
+          "actual": "Shashthi (6/30)",
+          "expected": "Shashthi (6/30)",
+          "status": "PASS"
+        },
+        {
+          "metricName": "Panchang Yoga",
+          "actual": "Vyatipata",
+          "expected": "Vyatipata",
+          "status": "PASS"
+        },
+        {
+          "metricName": "Panchang Karana",
+          "actual": "Garija",
+          "expected": "Garija",
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 252
+    },
+    {
+      "testCase": {
+        "id": "TC-SUNRISE-SUNSET-06",
+        "category": "sunrise-sunset",
+        "description": "Birth at local astronomical sunrise (Sun conjunct Lagna)",
+        "birthDate": "2024-03-20",
+        "birthTime": "06:24",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 335.718727,
+          "ascendant": 334.044568,
+          "rahuLongitude": 352.503173,
+          "ketuLongitude": 172.503173,
+          "tithi": "Ekadashi (11/30)"
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.01,
+          "ascendantLongitudeDeg": 0.05,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "At true sunrise, Sun longitude and Ascendant longitude align closely.",
+          "Tests astronomical sunrise and Vernal Equinox boundary."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 335.718321,
+          "expected": 335.718727,
+          "difference": 0.000406,
+          "angularDifference": 0.000406,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ascendant (Lagna)",
+          "actual": 334.044861,
+          "expected": 334.044568,
+          "difference": 0.000293,
+          "angularDifference": 0.000293,
+          "tolerance": 0.05,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 352.50267,
+          "expected": 352.503173,
+          "difference": 0.000503,
+          "angularDifference": 0.000503,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 172.50267,
+          "expected": 172.503173,
+          "difference": 0.000503,
+          "angularDifference": 0.000503,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Panchang Tithi",
+          "actual": "Ekadashi (11/30)",
+          "expected": "Ekadashi (11/30)",
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 211
+    },
+    {
+      "testCase": {
+        "id": "TC-RETROGRADE-STATIONARY-07",
+        "category": "retrograde-stationary",
+        "description": "Saturn at stationary station turning retrograde",
+        "birthDate": "2023-06-17",
+        "birthTime": "12:00",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "planetLongitudes": {
+            "Saturn": 313.031716
+          },
+          "rahuLongitude": 7.170076,
+          "ketuLongitude": 187.170076
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests numerical derivative / finite difference calculation in computeRetro(jd).",
+          "Near zero speed, minor roundoff can erroneously flip retrograde boolean."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Saturn Longitude",
+          "actual": 313.03201,
+          "expected": 313.031716,
+          "difference": 0.000294,
+          "angularDifference": 0.000294,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 7.170274,
+          "expected": 7.170076,
+          "difference": 0.000198,
+          "angularDifference": 0.000198,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 187.170274,
+          "expected": 187.170076,
+          "difference": 0.000198,
+          "angularDifference": 0.000198,
+          "tolerance": 0.01,
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 300
+    },
+    {
+      "testCase": {
+        "id": "TC-HIGH-LATITUDE-08",
+        "category": "high-latitude",
+        "description": "Arctic Circle birth (Tromsø, Norway at 69.65° N)",
+        "birthDate": "2023-06-21",
+        "birthTime": "12:00",
+        "latitude": 69.6492,
+        "longitude": 18.9553,
+        "timezone": 2,
+        "timezoneSource": "Europe/Oslo",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 65.623554,
+          "ascendant": 149.946634,
+          "rahuLongitude": 6.95038,
+          "ketuLongitude": 186.95038,
+          "houseCusps": [
+            {
+              "house": 1,
+              "longitude": 149.946634
+            },
+            {
+              "house": 10,
+              "longitude": 59.946634
+            }
+          ]
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.01,
+          "ascendantLongitudeDeg": 0.05,
+          "houseCuspLongitudeDeg": 0.05,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests computeLagna for high latitudes where tan(phi) is large.",
+          "Ensures Math.atan2 does not experience singularity or sign flip error in Arctic Circle."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 65.623695,
+          "expected": 65.623554,
+          "difference": 0.000141,
+          "angularDifference": 0.000141,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ascendant (Lagna)",
+          "actual": 149.946455,
+          "expected": 149.946634,
+          "difference": 0.000179,
+          "angularDifference": 0.000179,
+          "tolerance": 0.05,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 6.95042,
+          "expected": 6.95038,
+          "difference": 0.00004,
+          "angularDifference": 0.00004,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 186.95042,
+          "expected": 186.95038,
+          "difference": 0.00004,
+          "angularDifference": 0.00004,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "House 1 Cusp",
+          "actual": 149.946455,
+          "expected": 149.946634,
+          "difference": 0.000179,
+          "angularDifference": 0.000179,
+          "tolerance": 0.05,
+          "status": "PASS"
+        },
+        {
+          "metricName": "House 10 Cusp",
+          "actual": 59.946455,
+          "expected": 59.946634,
+          "difference": 0.000179,
+          "angularDifference": 0.000179,
+          "tolerance": 0.05,
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 371
+    },
+    {
+      "testCase": {
+        "id": "TC-NODE-DIVERGENCE-09",
+        "category": "true-mean-node",
+        "description": "Maximum divergence between True Node and Mean Node",
+        "birthDate": "2024-01-11",
+        "birthTime": "11:57",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "NASA JPL DE441 + IAU Simon Mean Node + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "rahuLongitude": 356.147533,
+          "ketuLongitude": 176.147533
+        },
+        "tolerances": {
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Documents current mean node baseline vs external True Node reference.",
+          "On this date, True (osculating) Node sits at ~354.70°, showing a 1.44° divergence from Mean Node."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 356.146954,
+          "expected": 356.147533,
+          "difference": 0.000579,
+          "angularDifference": 0.000579,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 176.146954,
+          "expected": 176.147533,
+          "difference": 0.000579,
+          "angularDifference": 0.000579,
+          "tolerance": 0.01,
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 156
+    },
+    {
+      "testCase": {
+        "id": "TC-COMBUSTION-BOUNDARY-10",
+        "category": "combustion-boundary",
+        "description": "Mars within classical 17.0° combustion threshold from Sun (separation ~9.52°)",
+        "birthDate": "2023-10-18",
+        "birthTime": "12:00",
+        "latitude": 28.6139,
+        "longitude": 77.209,
+        "timezone": 5.5,
+        "timezoneSource": "Asia/Kolkata",
+        "expectedReferenceSource": "NASA JPL DE441 (Horizons API) + IAU 1980 Chitrapaksha Lahiri",
+        "ayanamsha": "Lahiri_Chitrapaksha",
+        "nodeMode": "Mean",
+        "houseSystem": "DegreeEqualBhava",
+        "expected": {
+          "sunLongitude": 180.437924,
+          "planetLongitudes": {
+            "Mars": 189.954321
+          },
+          "rahuLongitude": 0.652041,
+          "ketuLongitude": 180.652041
+        },
+        "tolerances": {
+          "planetaryLongitudeDeg": 0.005,
+          "nodeLongitudeDeg": 0.01
+        },
+        "notes": [
+          "Tests angular separation between Sun and Mars near combustion zone.",
+          "Sun (180.438°) and Mars (189.954°) are separated by 9.516°, placing Mars inside the 17° combustion sphere."
+        ]
+      },
+      "metrics": [
+        {
+          "metricName": "Sun Longitude",
+          "actual": 180.438062,
+          "expected": 180.437924,
+          "difference": 0.000138,
+          "angularDifference": 0.000138,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Mars Longitude",
+          "actual": 189.95445,
+          "expected": 189.954321,
+          "difference": 0.000129,
+          "angularDifference": 0.000129,
+          "tolerance": 0.005,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Rahu Longitude",
+          "actual": 0.65208,
+          "expected": 0.652041,
+          "difference": 0.000039,
+          "angularDifference": 0.000039,
+          "tolerance": 0.01,
+          "status": "PASS"
+        },
+        {
+          "metricName": "Ketu Longitude",
+          "actual": 180.65208,
+          "expected": 180.652041,
+          "difference": 0.000039,
+          "angularDifference": 0.000039,
+          "tolerance": 0.01,
+          "status": "PASS"
+        }
+      ],
+      "overallStatus": "PASS",
+      "executionDurationMs": 283
+    }
+  ],
+  "criticalDiscrepancies": []
+}

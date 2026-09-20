@@ -191,8 +191,9 @@ export default function ReportPage() {
         .eq("id", data.user.id)
         .maybeSingle();
 
-      setSubscriptionTier(normalizeTier(profile?.subscription_tier));
+      setSubscriptionTier(normalizeTier(profile?.subscription_tier, data.user.email));
     };
+
 
     loadTier();
   }, [fullAccess, supabase]);
