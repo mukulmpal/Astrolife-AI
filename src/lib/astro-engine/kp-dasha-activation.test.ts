@@ -128,6 +128,10 @@ test("2I-E-B — Test C & H: Supporting MD + AD + PD + SD -> TIMING_ALIGNED with
   alignedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.detrimentHousesMatched = [];
   alignedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.barrierHousesMatched = [];
 
+  alignedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.supportingHousesMatched = [7];
+  alignedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.detrimentHousesMatched = [];
+  alignedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.barrierHousesMatched = [];
+
   const result = evaluateDashaActivation(supportedPromise, alignedHierarchy, marriageRule);
 
   assert.equal(result.timingState, "TIMING_ALIGNED");
@@ -226,7 +230,7 @@ test("2I-E-B — Test E: Single 12th-House Connection Does NOT Produce PROMISE_D
   const fixedDate = new Date("2026-09-20T12:00:00Z");
   const dashaHierarchy = buildCurrentDashaHierarchyEvidence(chart, evidence, fixedDate);
 
-  const propertyRule = KP_EVENT_RULE_REGISTRY["KP-RULE-PROPERTY-01"]; // primary cusp 4
+  const propertyRule = KP_EVENT_RULE_REGISTRY["KP-RULE-PROPERTY-ACQUISITION-01"]; // primary cusp 4
   const supportedPromise = getMockSupportedPromise(propertyRule);
 
   // Planet signifies house 4 and 11, but also house 12
@@ -249,7 +253,7 @@ test("2I-E-B — Test G: Property-Style Multi-Level Combination (Moon MD + Venus
   const fixedDate = new Date("2026-09-20T12:00:00Z");
   const dashaHierarchy = buildCurrentDashaHierarchyEvidence(chart, evidence, fixedDate);
 
-  const propertyRule = KP_EVENT_RULE_REGISTRY["KP-RULE-PROPERTY-01"];
+  const propertyRule = KP_EVENT_RULE_REGISTRY["KP-RULE-PROPERTY-ACQUISITION-01"];
   const supportedPromise = getMockSupportedPromise(propertyRule);
 
   // Classical KP example: Moon Dasa (4), Venus Bhukti (11), Mars Anthra (4), Saturn Sookshma (2, 4)
@@ -261,15 +265,23 @@ test("2I-E-B — Test G: Property-Style Multi-Level Combination (Moon MD + Venus
 
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.mahadasha.supportingHousesMatched = [4];
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.mahadasha.detrimentHousesMatched = [];
+  propHierarchy.eventEvidenceByRule[propertyRule.id].levels.mahadasha.barrierHousesMatched = [];
 
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.antardasha.supportingHousesMatched = [11];
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.antardasha.detrimentHousesMatched = [];
+  propHierarchy.eventEvidenceByRule[propertyRule.id].levels.antardasha.barrierHousesMatched = [];
 
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.pratyantardasha.supportingHousesMatched = [4];
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.pratyantardasha.detrimentHousesMatched = [];
+  propHierarchy.eventEvidenceByRule[propertyRule.id].levels.pratyantardasha.barrierHousesMatched = [];
 
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.sookshma.supportingHousesMatched = [2, 4];
   propHierarchy.eventEvidenceByRule[propertyRule.id].levels.sookshma.detrimentHousesMatched = [];
+  propHierarchy.eventEvidenceByRule[propertyRule.id].levels.sookshma.barrierHousesMatched = [];
+
+  propHierarchy.eventEvidenceByRule[propertyRule.id].levels.prana.supportingHousesMatched = [4];
+  propHierarchy.eventEvidenceByRule[propertyRule.id].levels.prana.detrimentHousesMatched = [];
+  propHierarchy.eventEvidenceByRule[propertyRule.id].levels.prana.barrierHousesMatched = [];
 
   const result = evaluateDashaActivation(supportedPromise, propHierarchy, propertyRule);
 
@@ -303,6 +315,15 @@ test("2I-E-B — Test: Complete Hierarchical Obstruction Produces OBSTRUCTED_WIN
 
   obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.pratyantardasha.supportingHousesMatched = [];
   obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.pratyantardasha.detrimentHousesMatched = [1, 6];
+  obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.pratyantardasha.barrierHousesMatched = [];
+
+  obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.supportingHousesMatched = [];
+  obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.detrimentHousesMatched = [1, 6];
+  obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.barrierHousesMatched = [];
+
+  obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.supportingHousesMatched = [];
+  obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.detrimentHousesMatched = [1, 6];
+  obstructedHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.barrierHousesMatched = [];
 
   const result = evaluateDashaActivation(supportedPromise, obstructedHierarchy, marriageRule);
 
@@ -335,6 +356,14 @@ test("2I-E-B — Test: Neutral Period Produces NEUTRAL_WINDOW", () => {
   neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.pratyantardasha.supportingHousesMatched = [];
   neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.pratyantardasha.detrimentHousesMatched = [];
   neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.pratyantardasha.barrierHousesMatched = [];
+
+  neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.supportingHousesMatched = [];
+  neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.detrimentHousesMatched = [];
+  neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.sookshma.barrierHousesMatched = [];
+
+  neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.supportingHousesMatched = [];
+  neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.detrimentHousesMatched = [];
+  neutralHierarchy.eventEvidenceByRule["KP-RULE-MARRIAGE-01"].levels.prana.barrierHousesMatched = [];
 
   const result = evaluateDashaActivation(supportedPromise, neutralHierarchy, marriageRule);
 

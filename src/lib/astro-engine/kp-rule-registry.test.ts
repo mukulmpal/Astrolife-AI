@@ -60,9 +60,9 @@ test("2I-D Audit 2 — Explicit SignificationStrength and Evidence Details Prese
   assert.ok(marriageRes.primaryCuspStarLord);
 
   // If supporting houses are matched, each detail must have an explicit astrological grade and reason
-  if (marriageRes.supportingHousesMatched.length > 0) {
+  if (marriageRes.supportingHousesMatched!.length > 0) {
     const matchedDetails = marriageRes.evidenceDetails.filter((d) =>
-      marriageRes.supportingHousesMatched.includes(d.house)
+      marriageRes.supportingHousesMatched!.includes(d.house)
     );
     assert.ok(matchedDetails.length > 0, "Matched supporting houses must have traceable details");
     matchedDetails.forEach((d) => {
@@ -110,7 +110,7 @@ test("2I-D Audit 4 — Strict Reference_Pending Guard (No Normal Predictive Verd
     "REFERENCE_PENDING",
     "Reference_Pending rule MUST return status REFERENCE_PENDING"
   );
-  assert.ok(specResult.summary.includes("REFERENCE_PENDING"));
+  assert.ok(specResult.summary!.includes("REFERENCE_PENDING"));
 });
 
 test("2I-D Audit 5 — Provisional Rules Preserve Provenance and Disclaimer", () => {
@@ -124,7 +124,7 @@ test("2I-D Audit 5 — Provisional Rules Preserve Provenance and Disclaimer", ()
   const separationResult = evidence.eventPromises!["KP-RULE-MARITAL-SEPARATION-01"];
   assert.ok(separationResult);
   assert.equal(separationResult.ruleStatus, "Provisional");
-  assert.ok(separationResult.summary.includes("[PROVISIONAL METHODOLOGY]"));
+  assert.ok(separationResult.summary!.includes("[PROVISIONAL METHODOLOGY]"));
 });
 
 test("2I-D Audit 6 — Verified Rules Have Exact Foundational Reader Citations", () => {
