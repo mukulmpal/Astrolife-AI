@@ -23,6 +23,14 @@ import { evaluateAllCuspPromises } from "./kp-cusp-promise";
 import { evaluateAllEventRules } from "./kp-event-promise";
 import { buildCurrentDashaHierarchyEvidence } from "./kp-dasha-evidence";
 import { evaluateAllDashaActivations } from "./kp-dasha-activation";
+import { evaluateAllTransitConfirmations } from "./kp-transit-confirmation";
+import {
+  calculateRulingPlanets,
+  evaluateAllRulingPlanetsConfirmations,
+} from "./kp-ruling-planets";
+import {
+  resolveAllPredictiveConflicts,
+} from "./kp-conflict-resolver";
 
 export * from "./kp-evidence-types";
 export * from "./kp-significators";
@@ -31,6 +39,9 @@ export * from "./kp-rule-registry";
 export * from "./kp-event-promise";
 export * from "./kp-dasha-evidence";
 export * from "./kp-dasha-activation";
+export * from "./kp-transit-confirmation";
+export * from "./kp-ruling-planets";
+export * from "./kp-conflict-resolver";
 
 export type KPPlanet =
   | "Ketu"
@@ -205,6 +216,10 @@ export interface KPEngineResult {
   predictiveEvidence?: KPPredictiveEvidence;
   eventPromises?: Record<string, any>;
   dashaActivations?: Record<string, any>;
+  transitConfirmations?: Record<string, any>;
+  rulingPlanetsSnapshot?: any;
+  rulingPlanetsConfirmations?: Record<string, any>;
+  predictiveSynthesis?: Record<string, any>;
 }
 
 const DASHA_ORDER: KPPlanet[] = [
@@ -1637,6 +1652,7 @@ export function runKPEngine(rawInput: unknown): KPEngineResult {
   predictiveEvidence.eventPromises = eventPromises;
 
   let dashaActivations: Record<string, any> | undefined = undefined;
+  let transitConfirmations: Record<string, any> | undefined = undefined;
   const chartObj: any = getChartRoot(rawInput);
   if (chartObj?.dob && chartObj?.tob) {
     try {
@@ -1645,6 +1661,34 @@ export function runKPEngine(rawInput: unknown): KPEngineResult {
 
       dashaActivations = evaluateAllDashaActivations(eventPromises, dashaEvidence);
       (predictiveEvidence as any).dashaActivations = dashaActivations;
+
+      transitConfirmations = evaluateAllTransitConfirmations(predictiveEvidence, dashaActivations);
+      (predictiveEvidence as any).transitConfirmations = transitConfirmations;
+
+      const rpSnapshot = calculateRulingPlanets({
+        context: "NATAL",
+        dob: chartObj.dob,
+        tob: chartObj.tob,
+        tz: chartObj.tz ?? 5.5,
+        lat: chartObj.lat ?? 28.6139,
+        lon: chartObj.lon ?? 77.209,
+      });
+      const rulingPlanetsConfirmations = evaluateAllRulingPlanetsConfirmations({
+        rpSnapshot,
+        dashaActivations,
+        transitConfirmations,
+      });
+      (predictiveEvidence as any).rulingPlanetsSnapshot = rpSnapshot;
+      (predictiveEvidence as any).rulingPlanetsConfirmations = rulingPlanetsConfirmations;
+
+      const predictiveSynthesis = resolveAllPredictiveConflicts({
+        eventPromises,
+        dashaActivations,
+        transitConfirmations,
+        rulingPlanetsConfirmations,
+        rpSnapshot,
+      });
+      (predictiveEvidence as any).predictiveSynthesis = predictiveSynthesis;
     } catch {
       // Gracefully omit if birth dates cannot be parsed
     }
@@ -1677,6 +1721,10 @@ export function runKPEngine(rawInput: unknown): KPEngineResult {
     predictiveEvidence,
     eventPromises,
     dashaActivations,
+    transitConfirmations,
+    rulingPlanetsConfirmations: (predictiveEvidence as any)?.rulingPlanetsConfirmations,
+    rulingPlanetsSnapshot: (predictiveEvidence as any)?.rulingPlanetsSnapshot,
+    predictiveSynthesis: (predictiveEvidence as any)?.predictiveSynthesis,
   };
 }
 

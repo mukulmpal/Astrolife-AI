@@ -181,7 +181,7 @@ export const PLANET_EMOJI: Record<PlanetName, string> = {
   Pluto:   '♇',
 };
 
-// BPHS Transit rules: good/bad houses from lagna/moon
+// Classical transit rules: good/bad houses from lagna/moon
 export const TR_RULES: Partial<Record<PlanetName, { good: number[]; bad: number[] }>> = {
   Sun:     { good: [3,6,10,11],         bad: [1,2,4,5,8,9,12] },
   Moon:    { good: [1,3,6,7,10,11],     bad: [2,4,5,8,9,12] },
@@ -455,7 +455,7 @@ export function getNakshatra(lon: number): string {
 function getTrNote(planet: PlanetName, house: number, type: 'good' | 'bad'): string {
   if (type === 'good') {
     const note = TR_GOOD_NOTES[planet]?.[house];
-    return note ? note + ' — BPHS favorable transit.' : `${planet} in H${house} — favorable period. Traditional remedies strengthen results.`;
+    return note ? note + ' — classical favorable transit.' : `${planet} in H${house} — favorable period. Traditional remedies strengthen results.`;
   }
   const note = TR_BAD_NOTES[planet]?.[house];
   return note ?? `${planet} in H${house} — Vedic caution advised. Patience and discipline reduce obstacles.`;
@@ -726,7 +726,7 @@ export function runTransitEngine(
     const rules = TR_RULES[planet];
     let effect: TransitPlanetResult['effect'] = 'neutral';
     let effectLabel = '~ Neutral';
-    let note = 'No BPHS rule applies directly to this planet.';
+    let note = 'No classical rule applies directly to this planet.';
 
     if (rules) {
       if (rules.good.includes(house)) {

@@ -14,6 +14,9 @@ import { validateChartData } from "@/lib/validation/chart";
 import { createClient } from "@/lib/supabase/server";
 import { getPalmistrySession } from "@/lib/palmistry/storage";
 import type { PalmRuleReport } from "@/lib/palmistry/types";
+import { runKPEngine } from "@/lib/astro-engine/kp";
+import { buildEvidenceFirstReport } from "@/lib/report/evidence-first-report";
+import { buildEvidenceFirstPdf } from "@/lib/report/evidence-first-pdf";
 
 export const maxDuration = 60; // Vercel Pro: 60s — set in vercel.json too
 export const dynamic = "force-dynamic";
@@ -107,7 +110,7 @@ export async function POST(request: NextRequest) {
     const body = parsed.data;
     const { chart, options } = body;
     const safeOptions = normalizeReportOptions(options ?? {});
-    const access = await getServerFeatureAccess(safeOptions.type === "basic" ? "basic_kundli" : "reports");
+    const access = await getServerFeatureAccess(safeOptions.type === "basic" || safeOptions.type === "evidence-first" ? "basic_kundli" : "reports");
     if (!access.allowed) {
       monitor.warn("premium.blocked", {
         feature: access.feature,
@@ -119,6 +122,36 @@ export async function POST(request: NextRequest) {
         premiumBlockedResponse(access),
         { status: access.authenticated ? 402 : 401 },
       );
+    }
+
+    // ── Dedicated Pure Deterministic Evidence-First PDF Pipeline ─────────────
+    if (safeOptions.type === "evidence-first") {
+      const kp = runKPEngine(chart);
+      const payload = buildEvidenceFirstReport(chart, kp);
+      const pdfBuffer = await buildEvidenceFirstPdf(payload, {
+        subjectName: chart.name || "Astrological Subject",
+      });
+
+      const safeName = (chart.name || "Report")
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .trim()
+        .replace(/\s+/g, "-");
+
+      monitor.info("report_pdf.evidence_first.generated", {
+        feature: "evidence_first_report",
+        tier: access.tier,
+        reportId: payload.reportId,
+      });
+
+      return new NextResponse(Buffer.from(pdfBuffer), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="AstroLife-Evidence-Report-${safeName}.pdf"`,
+          "Cache-Control": "no-store",
+          "X-AstroLife-Report-Template": "evidence-first-classical-v1",
+        },
+      });
     }
 
     if (safeOptions.type === "elite" && access.enforced && access.tier !== "elite") {

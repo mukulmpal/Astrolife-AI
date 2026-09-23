@@ -64,7 +64,7 @@ import { buildReportIntelligence, type NarrativeBlock } from "./report-intellige
 
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
-export type ReportType = "basic" | "premium" | "elite" | "full" | "kundli" | "remedy" | "medical" | "destiny";
+export type ReportType = "basic" | "premium" | "elite" | "full" | "kundli" | "remedy" | "medical" | "destiny" | "evidence-first";
 export interface ReportOptions {
   type: ReportType;
   palette?: ReportPalette;
@@ -157,7 +157,7 @@ function isReportCover(value: unknown): value is ReportCover {
 }
 
 export function normalizeReportOptions(options?: Partial<ReportOptions>): NormalizedReportOptions {
-  const validTypes: ReportOptions["type"][] = ["basic", "premium", "elite", "full", "kundli", "remedy", "medical", "destiny"];
+  const validTypes: ReportOptions["type"][] = ["basic", "premium", "elite", "full", "kundli", "remedy", "medical", "destiny", "evidence-first"];
   const type = options?.type && validTypes.includes(options.type) ? options.type : "full";
   return {
     type,
@@ -680,6 +680,7 @@ function reportEditionLabel(type: ReportType): string {
     remedy: "Remedy",
     medical: "Health & Vitality",
     destiny: "Destiny",
+    "evidence-first": "Evidence-First Classical",
   };
   return labels[type] ?? "Premium";
 }
@@ -1109,6 +1110,7 @@ function page4TOC(type: ReportType, include: {
     remedy: "Remedy Guidance",
     medical: "Health Guidance",
     destiny: "Timing Engines",
+    "evidence-first": "Classical Evidence Synthesis",
   };
   const renderRows = (rows: typeof strategicRows, start: number) =>
     rows.map((row, index) => `<div class="toc-row"><span class="num">${start + index}</span><div><div class="title">${esc(row.title)}</div><div class="meta">${esc(row.meta)}</div></div><div></div><span class="pg">Section</span></div>`).join("");

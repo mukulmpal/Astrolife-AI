@@ -1,6 +1,6 @@
 // ============================================================
 // LAL KITAB KNOWLEDGE BASE v3.0
-// Source: RTF reference + Lal Kitab research
+// Source: Classical Vedic research
 // Planet × House rules, Combinations, Home Omens, Rin, Takkar
 // ============================================================
 

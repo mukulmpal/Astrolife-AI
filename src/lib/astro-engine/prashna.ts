@@ -203,8 +203,8 @@ function computeSaham(
   return { name: def.name, house: sahamHouse, sign: RASHIS[sahamSignNum], meaning: def.meaning, favorable, note };
 }
 
-// ── Prashna Marga Rules ────────────────────────────────────────────────────────
-// Classical Prashna Marga interpretations applied to the horary chart
+// ── Classical Horary Rules ────────────────────────────────────────────────────────
+// Classical horary interpretations applied to the horary chart
 
 function getPrashnaMargas(
   moonHouse: number,
@@ -218,7 +218,7 @@ function getPrashnaMargas(
 ): string[] {
   const margas: string[] = [];
 
-  // 1. Void of Course Moon — classical Prashna Marga Rule 1
+  // 1. Void of Course Moon — classical horary Rule 1
   if (moonVoidOfCourse) {
     margas.push("⚠️ PRASHNA MARGA RULE: Moon is Void of Course — making no aspect before leaving its sign. Classical rule: the matter comes to nothing ('nothing will come of it'). Strong indication to wait.");
   }
@@ -250,7 +250,7 @@ function getPrashnaMargas(
     margas.push(`✅ PRASHNA MARGA: Lagna lord in H${lagnaLordHouse} — the matter becomes public and visible. If positive factors dominate, result comes with social acknowledgment.`);
   }
 
-  // 7. Moon in 8th — serious Prashna Marga warning
+  // 7. Moon in 8th — serious classical horary warning
   if (moonHouse === 8) {
     margas.push("🔴 PRASHNA MARGA: Moon in H8 of Prashna chart — classical rule: hidden obstacles, fear, or obstruction in the matter. Proceed only after careful analysis and remedies.");
   }
@@ -430,16 +430,16 @@ export function calculatePrashna(question: string, topic: PrashnaTopic, lat: num
   // ── NEW: Void of Course Moon ──────────────────────────────────────────────
   if (moonVoidOfCourse) {
     score -= 3;
-    negativeFactors.push("Moon is Void of Course — classical 'no result' indicator (Prashna Marga)");
+    negativeFactors.push("Moon is Void of Course — classical 'no result' indicator ");
     scoreBreakdown.push({ label: "Moon VOC", points: -3, note: "Moon makes no aspect before leaving sign — strongest single negative in horary." });
   } else if (moonApplyingTo) {
     const isBeneficApply = ["Jupiter","Venus","Mercury"].includes(moonApplyingTo);
     const applyPts = isBeneficApply ? 2 : -1;
     if (isBeneficApply) {
-      positiveFactors.push(`Moon applying to ${moonApplyingTo} (benefic) — favorable Prashna Marga indicator`);
+      positiveFactors.push(`Moon applying to ${moonApplyingTo} (benefic) — favorable classical horary indicator`);
       scoreBreakdown.push({ label: "Moon applying", points: applyPts, note: `Moon's next aspect is to benefic ${moonApplyingTo} — classical positive indicator.` });
     } else {
-      negativeFactors.push(`Moon applying to ${moonApplyingTo} (malefic) — classical Prashna Marga warning`);
+      negativeFactors.push(`Moon applying to ${moonApplyingTo} (malefic) — classical horary warning`);
       scoreBreakdown.push({ label: "Moon applying", points: applyPts, note: `Moon's next aspect is to malefic ${moonApplyingTo} — obstruction or delay likely.` });
     }
     score += applyPts;
@@ -456,7 +456,7 @@ export function calculatePrashna(question: string, topic: PrashnaTopic, lat: num
     scoreBreakdown.push({ label: "Saham", points: -1, note: saham.note });
   }
 
-  // ── NEW: Prashna Marga classical rules ────────────────────────────────────
+  // ── NEW: Classical horary rules ────────────────────────────────────────────
   const prashnaMargas = getPrashnaMargas(
     moonHouse, lagnaLordHouse, lagnaNum,
     moonApplyingTo, moonVoidOfCourse, moonVelocity,

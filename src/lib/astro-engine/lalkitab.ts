@@ -641,7 +641,7 @@ const HOME_ENV_DESC: Record<string,string> = {
   "copper items":
     "Ghar mein taamba ya copper ki cheezein — jaise bartan, moorti, ya decor — ka hona Surya ya Mangal ki urja se juda hai. Copper ek conductor hai — jo bhi urja ghar mein hai use amplify karta hai. Agar chart mein yeh graha strong hai to copper ki cheezein bahut shubh hoti hain; dushman ghar mein ho to inhe avoid ya replace karna achha hota hai.",
   "copper/brass utensils":
-    "Rasoi ya dining area mein taamba ya peetal ke bartan ka hona ek purani aur powerful Lal Kitab nishani hai. Yeh bartan ek taraf ghar ki sampannata ko darshate hain, to doosri taraf is graha ki fire energy ko ghar ke center mein rakhte hain. Inhe saaf rakhna bahut zaroori hai — maile ya tute bartan negative urja amplify karte hain.",
+    "Rasoi ya dining area mein taamba ya peetal ke bartan ka hona ek purani aur classical Vedic nishani hai. Yeh bartan ek taraf ghar ki sampannata ko darshate hain, to doosri taraf is graha ki fire energy ko ghar ke center mein rakhte hain. Inhe saaf rakhna bahut zaroori hai — maile ya tute bartan negative urja amplify karte hain.",
   "family authority space":
     "Ghar mein ek aisa area jo clearly 'family head' ya bade ka sthan hai — jaise special chair, table ya corner — is graha ka ghar ke andar authority ka sanket hai. Yeh space ghar ke decision-making aur power dynamics ko reflect karta hai. Is area ka saadar hona ghar mein peace rakhta hai.",
   "bright entrance":
@@ -693,7 +693,7 @@ const HOME_ENV_DESC: Record<string,string> = {
   "property dispute":
     "Ghar ya zameen ke baare mein koi ongoing legal ya family dispute Mangal ke 4th house mein hone ka classic prabhav hai. Yeh sirf ek legal matter nahi — yeh ghar ki peace aur maa ke saath rishte ko bhi prabhavit karta hai. Jitna jaldi sambhav ho dispute resolve karna — chahe compromise se hi sahi — is dasha mein sabse best upaya hai.",
   "broken wall":
-    "Ghar ki koi bhi deewar mein daraad, toot-phoot ya lamba crack bahut important Lal Kitab sanket hai. Yeh ghar ke vaasion ke beech rishton mein toot aur career mein rukawat ka prateek hai. Isko tarant theek karana chahiye — gach, plaster ya paint se cover kar lena ek immediate step hai jo ghar ki urja ko seal karta hai.",
+    "Ghar ki koi bhi deewar mein daraad, toot-phoot ya lamba crack bahut important classical sanket hai. Yeh ghar ke vaasion ke beech rishton mein toot aur career mein rukawat ka prateek hai. Isko tarant theek karana chahiye — gach, plaster ya paint se cover kar lena ek immediate step hai jo ghar ki urja ko seal karta hai.",
   "property/land objects":
     "Ghar ke saath attached land — garden, parking, boundary — ki condition ghar ki property energy ko darshata hai. Well-maintained land positive wealth energy laati hai, jabki neglected ya disputed land career aur money mein problems ka sanket deti hai. Land ki niyamit care aur boundary maintenance important hai.",
   "soft doorway":
@@ -997,7 +997,7 @@ export function calculateLalKitab(
         id: `generic_${p1.toLowerCase()}_${p2.toLowerCase()}_h${house}`,
         planets: [p1, p2],
         title: `${p1} + ${p2} in House ${house}`,
-        prediction: `${p1} aur ${p2} ek hi Lal Kitab ghar mein baithkar H${house} ke phal ko milate hain. Yeh combination strong tab maana jayega jab dono grahon ki state, pakka/dushman ghar aur takkar relation bhi same direction mein signal dein.`,
+        prediction: `${p1} aur ${p2} ek hi classical ghar mein baithkar H${house} ke phal ko milate hain. Yeh combination strong tab maana jayega jab dono grahon ki state, pakka/dushman ghar aur takkar relation bhi same direction mein signal dein.`,
         psychology: `Native ke andar ${p1} ki pravritti aur ${p2} ki pravritti ek saath react karti hain; isliye decisions mein mixed behaviour, sudden reaction ya double strength dikh sakti hai.`,
         risks: ["mixed results if one planet is mandi", "confusion if planets are mutual enemies", "wrong remedy can disturb the better planet"],
         strengths: ["double activation of one life area", "faster results when both planets are supportive", "clear nimit from that house"],
@@ -1109,7 +1109,7 @@ export function calculateLalKitab(
     health:
       `Health reading H1, H6, H8 aur H12 se dekhi gayi. ${varshRows.filter(row => [1,6,8,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Major health warning loud nahi"}; sleep, digestion, stress aur chronic patterns par early correction rakhein.`,
     remedy:
-      `Remedy rule simple hai: Varshphal sirf timing batata hai, daan ka final decision natal Lal Kitab condition se hoga. Supportive grah ki core vastu daan avoid; challenged grah ki vastu controlled tareeke se, bina fear ke.`,
+      `Remedy rule simple hai: Varshphal sirf timing batata hai, daan ka final decision natal classical condition se hoga. Supportive grah ki core vastu daan avoid; challenged grah ki vastu controlled tareeke se, bina fear ke.`,
   };
 
   const varshphal: LKVarshphal = {
@@ -1124,10 +1124,10 @@ export function calculateLalKitab(
     chartRows: varshRows,
     annualPrediction,
     summary: shubhPlanets.length
-      ? `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${shubhPlanets.join(", ")} shubh phal de sakte hain.${cautionPlanets.length ? ` ${cautionPlanets.join(", ")} se savdhaan rahein.` : ""}`
+      ? `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${shubhPlanets.join(", ")} shubh phal de sakte hain.${cautionPlanets.length ? ` ${cautionPlanets.join(", ")} se savdhaan rahein.` : ""}`
       : cautionPlanets.length
-        ? `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${cautionPlanets.join(", ")} se savdhaan rahein. Upaya chart-specific rakhein.`
-        : `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak balanced hai — koi bada shubh ya ashubh pattern loud nahi.`,
+        ? `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${cautionPlanets.join(", ")} se savdhaan rahein. Upaya chart-specific rakhein.`
+        : `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak balanced hai — koi bada shubh ya ashubh pattern loud nahi.`,
   };
 
   // ── Summary ───────────────────────────────────────────

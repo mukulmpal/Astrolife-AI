@@ -1,6 +1,6 @@
 /**
  * AstroLife – 9-Month Marriage Window Scanner
- * Scans next 9 months, evaluating all K.N. Rao parameters per month
+ * Scans next 9 months, evaluating all timing parameters per month
  * Changes tracked: Antardasha change, Jupiter sign change
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -193,8 +193,8 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
   const natalMarsSign  = chart.planets.Mars?.sign  ?? "";
   const natalMarsHouse = chart.planets.Mars?.house ?? 0;
 
-  // Vivah Saham — K.N. Rao formula: (LL_longitude + 7L_longitude) mod 360
-  // This is the correct formula from K.N. Rao's book page 18.
+  // Vivah Saham — classical formula: (LL_longitude + 7L_longitude) mod 360
+  // This is the correct formula from classical methodology.
   // NOT the classical Arabic lot formula (Venus − 7thCusp + Lagna).
   let vivahSahamSign = "";
   const lagnaLordLon      = chart.planets[lagnaLord]?.lon     ?? 0;
@@ -259,7 +259,7 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
     const mdVargottama = mdLordD9Sign !== "" && (chart.planets[mahadasha]?.sign === mdLordD9Sign);
     const adVargottama = adLordD9Sign !== "" && (chart.planets[antardasha]?.sign === adLordD9Sign);
 
-    // Build full K.N. Rao input
+    // Build full timing input
     const input: MarriageTimingInput = {
       language: "hinglish",
       d1LagnaSign,
@@ -321,7 +321,7 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
     const activeParam = Object.values(result.parameters).filter(p => p.isActive);
 
     // Thresholds calibrated to binary count/8 × 100 scoring
-    // 6/8=75, 5/8=63, 4/8=50, 3/8=38 → align with K.N. Rao research
+    // 6/8=75, 5/8=63, 4/8=50, 3/8=38 → align with classical research
     let verdict: MonthlyMarriageWindow["verdict"] = "weak";
     if      (result.timingScore >= 75) verdict = "very_strong";
     else if (result.timingScore >= 63) verdict = "strong";
@@ -389,7 +389,7 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
   const strongestMonth = bestWindow?.month ?? windows[0]?.month ?? "";
 
   let overallOutlook = "Stable period — no major timing shifts in next 9 months.";
-  if (peakScore >= 75)       overallOutlook = `Strong marriage window in ${strongestMonth} (${peakScore}/100 · K.N. Rao threshold met). Plan ahead.`;
+  if (peakScore >= 75)       overallOutlook = `Strong marriage window in ${strongestMonth} (${peakScore}/100 · timing threshold met). Plan ahead.`;
   else if (peakScore >= 63)  overallOutlook = `Good windows present. Best in ${strongestMonth} (${peakScore}/100).`;
   else if (peakScore >= 50)  overallOutlook = `Moderate windows emerge. Best in ${strongestMonth} (${peakScore}/100).`;
   else if (peakScore >= 38)  overallOutlook = `Possible windows. Watch ${strongestMonth} for relationship decisions.`;

@@ -6,11 +6,6 @@
  * the manifestation of an event whose natal promise and Dasha activation have
  * been evaluated, strictly following classical Krishnamurti Paddhati principles.
  *
- * Classical Reference:
- * - Prof. K.S. Krishnamurti, KP Reader 3: "Predictive Stellar Astrology",
- *   pp. 62–70, 115–118, 471–475.
- * - KP Reader 4: "Marriage, Children and Twin Births", pp. 41–48.
- *
  * Mandatory Engine Principles:
  * 1. Pipeline Sovereignty:
  *    Natal Promise → Dasha Hierarchy (5 Levels) → Transit Evidence → Transit Star → Transit Sub → Timing State.
@@ -379,9 +374,9 @@ export function evaluateTransitPoint(
 
   const sourceRefs: TransitSourceReference[] = [
     {
-      book: "KP Reader 3: Predictive Stellar Astrology",
+      book: "Classical KP Transit Rules",
       section: "Transit (Gochara) Principles",
-      pages: "pp. 62–70, 471–475",
+      pages: "",
       epistemologicalStatus: "Verified",
     },
   ];

@@ -300,7 +300,7 @@ function getMuhurtaYogas(weekday: string, nakshatra: string): string[] {
   return yogas;
 }
 
-function calculateSunWindow(date: Date, lat?: number, lon?: number, tz = 5.5) {
+export function calculateSunWindow(date: Date, lat?: number, lon?: number, tz = 5.5) {
   let effectiveLat = lat;
   let effectiveLon = lon;
   let assumed = false;

@@ -1,5 +1,5 @@
 // ── AstroLife Palmistry AI Engine ─────────────────────────────
-// Classical (K.N. Rao / Samudrika Shastra) palm analysis from an
+// Classical palmistry analysis from an
 // uploaded image, structured for a premium report UI.
 
 export const PALM_LINES = [
@@ -233,7 +233,7 @@ export function buildPalmistryPrompt(birth?: BirthContext): string {
       ? `\nThe seeker's birth details (use ONLY to enrich the "AI Palm + Birth Chart Correlation" advanced insight; do not fabricate a full kundli): name=${birth.name || "-"}, dob=${birth.dob || "-"}, tob=${birth.tob || "-"}, place=${birth.city || "-"}.`
       : "";
 
-  return `You are AstroLife's AI Palm Intelligence Engine — a world-class palmistry researcher, Samudrika Shastra expert, behavioral psychology analyst, product-grade report writer, and computer vision interpreter.
+  return `You are AstroLife's AI Palm Intelligence Engine — a world-class palmistry researcher, classical palmistry expert, behavioral psychology analyst, product-grade report writer, and computer vision interpreter.
 
 You will be shown a photograph of a human palm. Analyse the lines, mounts, fingers, and overall hand shape that you can actually observe. Where a feature is unclear in the image, infer the most probable reading and lower its confidence accordingly — never refuse.
 

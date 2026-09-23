@@ -1,6 +1,6 @@
 import { buildAntarDasha, type ChartData } from "./calculations";
 
-// ── Lal Kitab Amrit — Planet × House upays (Hindi) ─────────────────────
+// ── Classical Vedic — Planet × House upays (Hindi) ─────────────────────
 const LK_AMRIT_DATA: Record<string, Record<number, { upay: string[] }>> = {
   Jupiter: {
     1:  { upay: ["संतों और भिक्षुओं को कपड़े दान करें और उन्हें भोजन खिलाने की भी व्यवस्था करें।", "धार्मिक स्थानों पर बुध, शुक्र और शनि से संबंधित वस्तुयें दान करें।", "यदि शनि 5वें घर में स्थित है, तो घर का निर्माण न करें।", "यदि शनि 9वें भाव में स्थित है, तो शनि से संबंधित कोई भी मशीनरी न खरीदें।", "अपने भाग्य पर विश्वास रखें और कोई भी दान, मदद न लें।"] },

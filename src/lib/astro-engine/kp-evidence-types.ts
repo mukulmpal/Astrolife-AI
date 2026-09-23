@@ -120,25 +120,34 @@ export interface KPEventPromiseResult {
   canonicalSource: string;
 
   primaryCusp: number;
+  cuspSign?: string;
   cuspLord: KPPlanet;
-  primaryCuspStarLord: KPPlanet;
-  primaryCuspSubLord: KPPlanet;
+  primaryCuspStarLord?: KPPlanet;
+  primaryCuspSubLord?: KPPlanet;
   cuspSubLord?: KPPlanet; // convenience alias
+  starLord?: KPPlanet; // convenience alias
+  subLord?: KPPlanet; // convenience alias
+  subLordSignifications?: number[];
+  subLordGrade?: SignificationStrength;
+  matchedSupportingHouses?: number[];
+  matchedFacilitatingHouses?: number[];
+  matchedDetrimentHouses?: number[];
+  matchedBarrierHouses?: number[];
 
   status: EventPromiseStatus;
   verdict?: EventPromiseStatus;
   significationStrength: SignificationStrength;
 
-  signifiedHouses: number[];
-  supportingHousesMatched: number[];
-  facilitatingHousesMatched: number[];
-  detrimentHousesMatched: number[];
-  barrierHousesMatched: number[];
+  signifiedHouses?: number[];
+  supportingHousesMatched?: number[];
+  facilitatingHousesMatched?: number[];
+  detrimentHousesMatched?: number[];
+  barrierHousesMatched?: number[];
 
   evidenceDetails: SignificationDetail[];
 
-  summary: string;
-  evidenceChain: string[];
+  summary?: string;
+  evidenceChain?: string[];
 }
 
 export interface KPPredictiveEvidence {

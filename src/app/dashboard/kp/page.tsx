@@ -18,6 +18,11 @@ import {
 } from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { useLanguage } from "@/lib/language-context";
+import { buildEvidenceFirstReport } from "@/lib/report/evidence-first-report";
+import { buildEvidenceDrawerViewModel, buildBoundaryPresentation } from "@/lib/report/explainability";
+import { EvidenceDrawer } from "@/components/report/EvidenceDrawer";
+import { BoundaryPresentation } from "@/components/report/BoundaryPresentation";
+import { downloadReportAsPDF } from "@/lib/report-html-generator";
 import "@/app/dashboard/kp/kp.css";
 
 function VerdictBadge({ value }: { value: SignificatorSet["verdict"] }) {
@@ -88,12 +93,33 @@ function HouseLordGrid({ lords }: { lords: Record<number, string> }) {
 export default function KPPage() {
   const { chart, loading, hasUserChart } = useUserChart();
   const { tp, ts, tn } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"table" | "cusps" | "events" | "forecast" | "lords" | "guide">("events");
+  const [activeTab, setActiveTab] = useState<"evidence" | "table" | "cusps" | "events" | "forecast" | "lords" | "guide">("evidence");
   const [activeEventId, setActiveEventId] = useState<string>("career");
+  const [selectedTopicId, setSelectedTopicId] = useState<string>("KP-RULE-MARRIAGE-01");
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   const result: KPEngineResult = useMemo(() => {
     return runKPEngine(chart);
   }, [chart]);
+
+  const evidenceReport = useMemo(() => {
+    if (!chart || !result) return null;
+    return buildEvidenceFirstReport(chart, result);
+  }, [chart, result]);
+
+  const handleDownloadEvidencePdf = async () => {
+    if (!chart) return;
+    setIsDownloadingPdf(true);
+    try {
+      await downloadReportAsPDF(chart, { type: "evidence-first" });
+    } catch (err) {
+      console.error("Failed to download Evidence-First PDF:", err);
+      alert("Error generating Evidence-First PDF. Please try again.");
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
+
   const marriageKP = useMemo(() => buildMarriageKPIntelligence(result), [result]);
   const kpVargaValidation = useMemo(() => {
     if (!chart?.planets) return [];
@@ -139,6 +165,7 @@ export default function KPPage() {
     result.significators[0];
 
   const tabs = [
+    { id: "evidence", label: "⚖️ Evidence & Synthesis" },
     { id: "table", label: "📋 Star · Sub Table" },
     { id: "cusps", label: "🏛 KP Cusps" },
     { id: "events", label: "🎯 KP Events" },
@@ -240,6 +267,166 @@ export default function KPPage() {
           </button>
         ))}
       </section>
+
+      {activeTab === "evidence" && evidenceReport && (
+        <section className="kp-card" style={{ padding: "28px" }}>
+          {/* Header & Download CTA */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "24px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "20px" }}>
+            <div>
+              <span style={{ color: "#38bdf8", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 900 }}>
+                ⚖️ Krishnamurti Paddhati · Frozen Evidence Foundation
+              </span>
+              <h2 style={{ fontSize: "28px", color: "#ffffff", margin: "6px 0 8px" }}>
+                Evidence-First Classical Synthesis &amp; Verification
+              </h2>
+              <p style={{ color: "rgba(232, 227, 240, 0.7)", maxWidth: "700px", fontSize: "13px", lineHeight: 1.6, margin: 0 }}>
+                Deterministic evaluation directly consuming <code style={{ color: "#38bdf8" }}>KPPredictiveEvidenceContract</code>. Every conclusion is bound to verifiable evidence nodes, rule-specific precedence relations (REL-01–REL-10), and classical source citations (*KP Readers I–VI*). Zero scores, zero probability tiers.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleDownloadEvidencePdf}
+              disabled={isDownloadingPdf}
+              style={{
+                background: "linear-gradient(135deg, #0284c7, #0369a1)",
+                border: "1px solid #38bdf8",
+                borderRadius: "12px",
+                padding: "12px 24px",
+                color: "#ffffff",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: isDownloadingPdf ? "not-allowed" : "pointer",
+                opacity: isDownloadingPdf ? 0.7 : 1,
+                boxShadow: "0 4px 18px rgba(2, 132, 199, 0.35)",
+              }}
+            >
+              {isDownloadingPdf ? "⏳ Generating PDF…" : "📥 Download Evidence PDF (Instant)"}
+            </button>
+          </div>
+
+          {/* Topic Selector Tabs */}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "22px" }}>
+            {evidenceReport.sections.map((sec) => {
+              const isSelected = sec.topicId === selectedTopicId;
+              const isPending = sec.uncertainty.referencePending;
+              return (
+                <button
+                  type="button"
+                  key={sec.topicId}
+                  onClick={() => setSelectedTopicId(sec.topicId)}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: "999px",
+                    border: `1px solid ${isSelected ? (isPending ? "#f59e0b" : "#38bdf8") : "rgba(255,255,255,0.1)"}`,
+                    background: isSelected ? (isPending ? "rgba(245, 158, 11, 0.18)" : "rgba(56, 189, 248, 0.16)") : "rgba(255,255,255,0.04)",
+                    color: isSelected ? (isPending ? "#fbbf24" : "#38bdf8") : "#cbd5e1",
+                    fontWeight: isSelected ? 700 : 500,
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {isPending ? "⚠️ " : ""}{sec.eventName}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Section Detail */}
+          {(() => {
+            const sec = evidenceReport.sections.find((s) => s.topicId === selectedTopicId) || evidenceReport.sections[0];
+            if (!sec) return null;
+            const drawerViewModel = buildEvidenceDrawerViewModel(sec);
+
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                {/* Epistemic Safeguard Banner for Reference_Pending */}
+                {sec.uncertainty.referencePending && (
+                  <div
+                    style={{
+                      border: "1px solid #f59e0b",
+                      background: "rgba(245, 158, 11, 0.12)",
+                      borderRadius: "14px",
+                      padding: "16px 20px",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fbbf24", fontWeight: 700, fontSize: "13px", marginBottom: "6px" }}>
+                      <span>⚠️ EPISTEMIC SAFEGUARD: EVALUATION_PENDING</span>
+                    </div>
+                    <p style={{ color: "#fef3c7", fontSize: "12px", lineHeight: 1.5, margin: 0 }}>
+                      {sec.uncertainty.limitations.find((l) => /withheld|precedence|attested|speculative/i.test(l)) ||
+                        "Classical KP literature lacks attested conflict precedence for modern speculative financial markets. Precedence resolution is deliberately withheld."}
+                    </p>
+                  </div>
+                )}
+
+                {/* Synthesis Header Banner */}
+                <div
+                  style={{
+                    background: "rgba(15, 23, 42, 0.75)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "16px",
+                    padding: "20px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                  }}
+                >
+                  <div>
+                    <span style={{ fontSize: "11px", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                      Evaluated Life Topic ({sec.topicId})
+                    </span>
+                    <h3 style={{ fontSize: "20px", color: "#ffffff", fontWeight: 700, margin: "2px 0 0" }}>
+                      {sec.eventName}
+                    </h3>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                    <span
+                      style={{
+                        padding: "5px 12px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontFamily: "monospace",
+                        fontWeight: 700,
+                        background: sec.uncertainty.referencePending ? "rgba(245, 158, 11, 0.2)" : "rgba(56, 189, 248, 0.2)",
+                        color: sec.uncertainty.referencePending ? "#fbbf24" : "#38bdf8",
+                        border: `1px solid ${sec.uncertainty.referencePending ? "#f59e0b" : "#38bdf8"}`,
+                      }}
+                    >
+                      [ {sec.synthesis.state} ]
+                    </span>
+                    <span
+                      style={{
+                        padding: "5px 12px",
+                        borderRadius: "8px",
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        background: "rgba(255,255,255,0.06)",
+                        color: "#94a3b8",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      Manifestation: {sec.synthesis.manifestationType}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progressive Disclosure Evidence Drawer */}
+                <EvidenceDrawer viewModel={drawerViewModel} defaultLevel="casual" />
+
+                {/* Explicit Boundaries */}
+                <div style={{ marginTop: "10px" }}>
+                  <BoundaryPresentation
+                    boundaries={buildBoundaryPresentation(sec)}
+                  />
+                </div>
+              </div>
+            );
+          })()}
+        </section>
+      )}
 
       {activeTab === "table" && (
         <section className="kp-card">

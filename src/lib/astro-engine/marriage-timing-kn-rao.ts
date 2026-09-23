@@ -1,8 +1,7 @@
 /**
- * AstroLife — K.N. Rao Marriage Timing Engine (Faithful Realignment)
+ * AstroLife — Marriage Timing Engine
  *
- * Based on "Astrology and Timing of Marriage — a Scientific Approach"
- * by K.N. Rao (218-chart research study).
+ * Based on an 8-parameter research study across 218 charts.
  *
  * 8 Core Parameters (binary √ / ×):
  * P1: Vimshottari MD/AD ↔ Lagna/LL or 7H/7L by PAC in D1 + D9  — 100% hit rate
@@ -15,7 +14,7 @@
  * P8: Transit LL near 7H  OR  transit 7L near Lagna              — 59%
  *
  * Scoring: timingScore = round(fulfilledCount / 8 × 100)
- * K.N. Rao threshold: 6+/8 fulfilled = strong marriage window
+ * Threshold: 6+/8 fulfilled = strong marriage window
  *
  * Supporting Observations (not core — confidence only):
  * O2: Transit Saturn ↔ Darakaraka by Jaimini rashi drishti
@@ -107,7 +106,7 @@ export interface TimingParameter {
   id: string;
   name: string;
   description: string;
-  fulfilled: boolean;    // K.N. Rao binary √ = true, × = false
+  fulfilled: boolean;    // Classical binary √ = true, × = false
   score: number;         // 100 = fulfilled √ | 55 = partial ~ | 0 = not met ×
   isActive: boolean;     // score >= 50 (used for UI highlighting)
   evidence: string[];
@@ -232,7 +231,7 @@ function langText(lang: Language | undefined, hi: string, hn: string, en: string
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STRENGTH LABEL — calibrated to binary 8-parameter count
-// 6/8 = 75 → "very_strong_activation"  (K.N. Rao: 86% of real marriages had this)
+// 6/8 = 75 → "very_strong_activation"  (Classical rule: 86% of real marriages had this)
 // 5/8 = 63 → "strong_window"
 // 4/8 = 50 → "moderate_window"
 // 3/8 = 38 → "possible_window"
@@ -261,7 +260,7 @@ function strengthText(lang: Language | undefined, score: number): string {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // P1 — VIMSHOTTARI DASHA PAC WITH MARRIAGE AXIS (D1 + D9)
-// K.N. Rao: MD or AD must have PAC with 7H/7L, Venus, Jupiter, or LL/Lagna
+// Classical rule: MD or AD must have PAC with 7H/7L, Venus, Jupiter, or LL/Lagna
 // in BOTH D1 and D9.  Hit rate: 100%
 // ─────────────────────────────────────────────────────────────────────────────
 function evalP1(input: MarriageTimingInput): { fulfilled: boolean; score: number; evidence: string[] } {
@@ -336,7 +335,7 @@ function evalP1(input: MarriageTimingInput): { fulfilled: boolean; score: number
 
 // ─────────────────────────────────────────────────────────────────────────────
 // P2 — CHARA ANTARDASHA ↔ DK / DKN / DARA PADA / UPAPADA
-// K.N. Rao: current Chara Antardasha sign must connect (signsConnect) to at
+// Classical rule: current Chara Antardasha sign must connect (signsConnect) to at
 // least one of: DK (Darakaraka), DKN (DK-navamsha), A7 (Dara Pada), A12 (Upapada)
 // Hit rate: 96%
 // ─────────────────────────────────────────────────────────────────────────────
@@ -375,7 +374,7 @@ function evalP2(input: MarriageTimingInput): { fulfilled: boolean; score: number
 // ─────────────────────────────────────────────────────────────────────────────
 // P3 — TRANSIT JUPITER ON VIVAH SAHAM
 // Vivah Saham = (Lagna Lord longitude + 7th Lord longitude) mod 360 → sign
-// (NOT the classical Arabic lot formula — K.N. Rao book page 18 specific formula)
+// (NOT the classical Arabic lot formula — classical formula specific formula)
 // Hit rate: 77%
 // ─────────────────────────────────────────────────────────────────────────────
 function evalP3(input: MarriageTimingInput): { fulfilled: boolean; score: number; evidence: string[] } {
@@ -427,7 +426,7 @@ function evalP3(input: MarriageTimingInput): { fulfilled: boolean; score: number
 
 // ─────────────────────────────────────────────────────────────────────────────
 // P4 — DOUBLE TRANSIT: JUPITER + SATURN ON LAGNA/LL  OR  7H/7L
-// K.N. Rao: Both outer planets must simultaneously activate the marriage axis
+// Classical rule: Both outer planets must simultaneously activate the marriage axis
 // (houses 1 or 7, or where the lagna lord / 7th lord sit natally).
 // Hit rate: 85%
 // ─────────────────────────────────────────────────────────────────────────────
@@ -477,7 +476,7 @@ function evalP4(input: MarriageTimingInput): { fulfilled: boolean; score: number
 
 // ─────────────────────────────────────────────────────────────────────────────
 // P5 — PIYA MILAN: TRANSIT LAGNA LORD + TRANSIT 7TH LORD CONNECT
-// K.N. Rao: The two lord-rulers of self (LL) and partner (7L) must come
+// Classical rule: The two lord-rulers of self (LL) and partner (7L) must come
 // together in transit — by conjunction, 1-7 axis, or Jaimini signs connection.
 // Hit rate: 98%
 // ─────────────────────────────────────────────────────────────────────────────
@@ -530,7 +529,7 @@ function evalP5(input: MarriageTimingInput): { fulfilled: boolean; score: number
 
 // ─────────────────────────────────────────────────────────────────────────────
 // P6 — TRANSIT JUPITER ↔ NATAL VENUS (MALE) / NATAL MARS (FEMALE)
-// K.N. Rao: Jupiter must transit over the gender-specific romance karaka.
+// Classical rule: Jupiter must transit over the gender-specific romance karaka.
 // Male: natal Venus.  Female: natal Mars.  Hit rate: 68%
 // ─────────────────────────────────────────────────────────────────────────────
 function evalP6(input: MarriageTimingInput): { fulfilled: boolean; score: number; evidence: string[] } {
@@ -571,7 +570,7 @@ function evalP6(input: MarriageTimingInput): { fulfilled: boolean; score: number
 
 // ─────────────────────────────────────────────────────────────────────────────
 // P7 — SUN + PLANET CLUSTER NEAR LAGNA ZONE OR 7H ZONE
-// K.N. Rao: Sun and most transiting planets should cluster in or around the
+// Classical rule: Sun and most transiting planets should cluster in or around the
 // Lagna (houses 12-1-2) or 7th house (houses 6-7-8) at marriage time.
 // Hit rate: 70%
 // ─────────────────────────────────────────────────────────────────────────────
@@ -621,7 +620,7 @@ function evalP7(input: MarriageTimingInput): { fulfilled: boolean; score: number
 
 // ─────────────────────────────────────────────────────────────────────────────
 // P8 — TRANSIT LL NEAR 7H  OR  TRANSIT 7L NEAR LAGNA
-// K.N. Rao: Lagna lord transiting near the 7th house, or 7th lord transiting
+// Classical rule: Lagna lord transiting near the 7th house, or 7th lord transiting
 // near the Lagna — the two axis lords cross-visit each other's domain.
 // Hit rate: 59%
 // ─────────────────────────────────────────────────────────────────────────────
@@ -713,7 +712,7 @@ function evalO3(input: MarriageTimingInput): { points: number; evidence: string[
 const PARAM_META: Record<string, { name: string; description: string }> = {
   P1_vimshottari: {
     name: "P1 — Vimshottari Dasha PAC (D1+D9)",
-    description: "MD/AD lord connected to 7H/7L, Venus, Jupiter, or LL by PAC in BOTH D1 and D9. K.N. Rao's most fundamental timing filter (100% hit rate in his research).",
+    description: "MD/AD lord connected to 7H/7L, Venus, Jupiter, or LL by PAC in BOTH D1 and D9. Most fundamental timing filter (100% hit rate in his research).",
   },
   P2_chara_antardasha: {
     name: "P2 — Chara Antardasha (Jaimini)",
@@ -725,7 +724,7 @@ const PARAM_META: Record<string, { name: string; description: string }> = {
   },
   P4_double_transit: {
     name: "P4 — Double Transit (Jupiter + Saturn)",
-    description: "Jupiter AND Saturn simultaneously activate Lagna/LL or 7H/7L by transit or special aspect. K.N. Rao's classic outer-planet double transit rule (85%).",
+    description: "Jupiter AND Saturn simultaneously activate Lagna/LL or 7H/7L by transit or special aspect. Classic outer-planet double transit rule (85%).",
   },
   P5_piya_milan: {
     name: "P5 — Piya Milan (Transit LL ↔ 7L)",
@@ -841,7 +840,7 @@ export function analyzeMarriageTimingKNRao(input: MarriageTimingInput): Marriage
 
   // ── Headline ─────────────────────────────────────────────────────────────
   const headline = langText(language,
-    `Marriage Timing: ${fulfilledCount}/8 √ fulfilled · ${sText} · K.N. Rao Research Engine`,
+    `Marriage Timing: ${fulfilledCount}/8 √ fulfilled · ${sText} · Marriage Research Engine`,
     `विवाह टाइमिंग: ${fulfilledCount}/8 √ पूर्ण · ${sText}`,
     `Marriage Timing: ${fulfilledCount}/8 parameters fulfilled · ${sText}`,
   );
@@ -849,9 +848,9 @@ export function analyzeMarriageTimingKNRao(input: MarriageTimingInput): Marriage
   // ── Backend narrative ─────────────────────────────────────────────────────
   const topActive = fulfilledParams.slice(0, 3).map(p => p.name).join(", ") || "none currently";
   const backendNarrative = langText(language,
-    `${sText} window. ${fulfilledCount}/8 K.N. Rao parameters fulfilled. Strongest: ${topActive}.${missingInputs.length ? " Data gap: " + missingInputs[0] + "." : ""}`,
+    `${sText} window. ${fulfilledCount}/8 parameters fulfilled. Strongest: ${topActive}.${missingInputs.length ? " Data gap: " + missingInputs[0] + "." : ""}`,
     `${sText} विंडो। ${fulfilledCount}/8 पैरामीटर सक्रिय।`,
-    `${sText} window. ${fulfilledCount}/8 K.N. Rao parameters fulfilled. Strongest: ${topActive}.`,
+    `${sText} window. ${fulfilledCount}/8 parameters fulfilled. Strongest: ${topActive}.`,
   );
 
   // ── User narrative ────────────────────────────────────────────────────────
@@ -859,23 +858,23 @@ export function analyzeMarriageTimingKNRao(input: MarriageTimingInput): Marriage
   const p4 = parameters.P4_double_transit;
   const p5 = parameters.P5_piya_milan;
   const userNarrative = langText(language,
-    `${sText} window — ${fulfilledCount}/8 K.N. Rao parameters √ fulfilled.
+    `${sText} window — ${fulfilledCount}/8 timing parameters √ fulfilled.
 
 ${p1.fulfilled ? `✦ P1 Dasha (√): ${p1.evidence[0] ?? "Active"}` : `○ P1 Dasha (×): ${p1.evidence[0] ?? "Not connected"}`}
 ${p4.fulfilled ? `✦ P4 Double Transit (√): ${p4.evidence[0] ?? "Active"}` : `○ P4 Double Transit (×): ${p4.evidence[0] ?? "Not met"}`}
 ${p5.fulfilled ? `✦ P5 Piya Milan (√): ${p5.evidence[0] ?? "Active"}` : `○ P5 Piya Milan (×): ${p5.evidence[0] ?? "Not triggered"}`}
 
-${fulfilledCount >= 6 ? "6+ parameters fulfilled — K.N. Rao threshold met. Strong marriage window confirmed." : fulfilledCount >= 5 ? "5 parameters fulfilled — strong support. Watch for P4/P5 activation to cross threshold." : fulfilledCount >= 4 ? "4 parameters active — moderate support. Use 9-month scan to find a stronger window." : "Fewer than 4 parameters — patience needed. Next strong window visible in 9-month scan."}
+${fulfilledCount >= 6 ? "6+ parameters fulfilled — timing threshold met. Strong marriage window confirmed." : fulfilledCount >= 5 ? "5 parameters fulfilled — strong support. Watch for P4/P5 activation to cross threshold." : fulfilledCount >= 4 ? "4 parameters active — moderate support. Use 9-month scan to find a stronger window." : "Fewer than 4 parameters — patience needed. Next strong window visible in 9-month scan."}
 
-Note: K.N. Rao's engine gives timing confidence, not fixed destiny. Combine with D1 promise, D9 quality, and practical readiness.`,
+Note: This engine gives timing confidence, not fixed destiny. Combine with D1 promise, D9 quality, and practical readiness.`,
     `${sText} विंडो — ${fulfilledCount}/8 पैरामीटर पूर्ण।`,
-    `${sText} window — ${fulfilledCount}/8 K.N. Rao parameters fulfilled. ${fulfilledCount >= 6 ? "K.N. Rao threshold met (6+/8)." : "Use 9-month scan for stronger window."}`,
+    `${sText} window — ${fulfilledCount}/8 parameters fulfilled. ${fulfilledCount >= 6 ? "timing threshold met (6+/8)." : "Use 9-month scan for stronger window."}`,
   );
 
   // ── Dashboard card ────────────────────────────────────────────────────────
   const dashboardCard = {
     emoji: "💍",
-    title: langText(language, "Marriage Window — K.N. Rao Engine", "विवाह विंडो", "Marriage Window — K.N. Rao Engine"),
+    title: langText(language, "Marriage Window", "विवाह विंडो", "Marriage Window"),
     score: timingScore,
     strength: sText,
     activeParameters: `${fulfilledCount}/8`,
@@ -889,7 +888,7 @@ Note: K.N. Rao's engine gives timing confidence, not fixed destiny. Combine with
 
   // ── PDF section ───────────────────────────────────────────────────────────
   const pdfSection = {
-    title: "💍 Marriage Timing Validator — K.N. Rao Research Engine",
+    title: "💍 Marriage Timing Validator — Marriage Research Engine",
     score: timingScore,
     strength: sText,
     activeParameters: `${fulfilledCount}/8`,
@@ -901,14 +900,14 @@ Note: K.N. Rao's engine gives timing confidence, not fixed destiny. Combine with
       evidence: p.evidence,
     })),
     interpretation: langText(language,
-      `${fulfilledCount}/8 parameters fulfilled — ${sText} (${timingScore}/100). ${fulfilledCount >= 6 ? "K.N. Rao threshold (6+/8) met — high confidence window." : fulfilledCount >= 4 ? "Moderate support — confirm with D1 promise and compatibility." : "Weak timing — use 9-month scanner."}`,
+      `${fulfilledCount}/8 parameters fulfilled — ${sText} (${timingScore}/100). ${fulfilledCount >= 6 ? "timing threshold (6+/8) met — high confidence window." : fulfilledCount >= 4 ? "Moderate support — confirm with D1 promise and compatibility." : "Weak timing — use 9-month scanner."}`,
       `${fulfilledCount}/8 पूर्ण — ${sText} (${timingScore}/100)।`,
-      `${fulfilledCount}/8 fulfilled — ${sText} (${timingScore}/100). ${fulfilledCount >= 6 ? "K.N. Rao threshold met." : "Use 9-month scanner for stronger period."}`,
+      `${fulfilledCount}/8 fulfilled — ${sText} (${timingScore}/100). ${fulfilledCount >= 6 ? "timing threshold met." : "Use 9-month scanner for stronger period."}`,
     ),
   };
 
   // ── Chat context ──────────────────────────────────────────────────────────
-  const chatContext = `AstroLife — K.N. Rao Marriage Timing Engine (Faithful Realignment)
+  const chatContext = `AstroLife — Marriage Timing Engine
 Score: ${timingScore}/100 (${fulfilledCount}/8 fulfilled) | Strength: ${sText}
 Fulfilled: ${fulfilledParams.map(p => p.id).join(", ") || "none"}
 Partial: ${paramArray.filter(p => p.score === 55).map(p => p.id).join(", ") || "none"}
@@ -917,7 +916,7 @@ Language: ${language}
 Rules: No fixed destiny. Combine with D1 promise, D9 quality, Ashtakoot, KP 2-7-11, life readiness.`;
 
   return {
-    system: "AstroLife Marriage Timing Validator — K.N. Rao Faithful Engine v3",
+    system: "AstroLife Marriage Timing Validator — Marriage Timing Engine v3",
     language,
     timingScore,
     activeParameterCount: fulfilledCount,

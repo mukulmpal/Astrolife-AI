@@ -373,10 +373,10 @@ export function buildMarriageIntelligenceV2(params: {
     : 50;
 
   return {
-    title: "Marriage Readiness Engine - K.N. Rao Timing + Divisional + KP",
+    title: "Marriage Readiness Engine - Timing + Divisional + KP",
     overallScore,
     label: labelFromScore(overallScore),
-    narrative: `Marriage Readiness Engine separates judgement into K.N. Rao timing parameters, divisional delivery, KP validation and support periods. This prevents one method from becoming a confusing final verdict. ${knRaoTiming ? `K.N. Rao timing shows ${knRaoTiming.strengthLabel} with ${knRaoTiming.activeParameterCount}/8 parameters active. ` : ""}The current combined signal is ${labelText(labelFromScore(overallScore))}.`,
+    narrative: `Marriage Readiness Engine separates judgement into timing parameters, divisional delivery, KP validation and support periods. This prevents one method from becoming a confusing final verdict. ${knRaoTiming ? `Classical timing shows ${knRaoTiming.strengthLabel} with ${knRaoTiming.activeParameterCount}/8 parameters active. ` : ""}The current combined signal is ${labelText(labelFromScore(overallScore))}.`,
 
     // === K.N. RAO TIMING (NEW SECTION) ===
     knRaoTiming,

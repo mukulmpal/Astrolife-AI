@@ -85,6 +85,11 @@ const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; 
     { group: "Life Areas (8)", color: "#facc15", engines: ["Career","Wealth","Relationship","Health","Family","Travel","Spirituality","Education"] },
     { group: "Synthesis", color: "#fb923c", engines: ["Remedies","Closing Reading","Engine Ledger"] },
   ],
+  "evidence-first": [
+    { group: "Classical KP Foundation", color: "#38bdf8", engines: ["Placidus Cusps", "Significator Strengths", "Cusp Sub Lord Promise", "Dasha Hierarchy"] },
+    { group: "Verification & Precedence", color: "#c084fc", engines: ["Precedence Relations REL-01–REL-10", "Conflict Resolution", "Transit Confirmation", "Ruling Planets"] },
+    { group: "Evidentiary Synthesis", color: "#34d399", engines: ["Five-Part Grounded Narrative", "Lossless Provenance Registry", "Audit Hashes", "Ethical Safeguards"] },
+  ],
 };
 
 const PAGE_COUNT: Record<ReportOptions["type"], string> = {
@@ -96,6 +101,7 @@ const PAGE_COUNT: Record<ReportOptions["type"], string> = {
   remedy:  "20 pages",
   medical: "22+ pages",
   destiny: "47 pages",
+  "evidence-first": "6 pages",
 };
 
 const ENGINE_COUNT: Record<ReportOptions["type"], number> = {
@@ -107,6 +113,7 @@ const ENGINE_COUNT: Record<ReportOptions["type"], number> = {
   remedy:  10,
   medical: 9,
   destiny: 17,
+  "evidence-first": 14,
 };
 
 // Astrology loading messages — cycles while PDF generates
@@ -162,6 +169,7 @@ const REPORT_EDITION_LABEL: Record<ReportOptions["type"], string> = {
   remedy: "remedy edition",
   medical: "health edition",
   destiny: "destiny edition",
+  "evidence-first": "evidence-first classical edition",
 };
 
 
@@ -259,6 +267,20 @@ export default function ReportPage() {
     } catch (error) {
       console.error("PDF generation error:", error);
       alert("Error generating PDF. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownloadEvidenceFirstPDF = async () => {
+    setIsGenerating(true);
+    try {
+      await downloadReportAsPDF(chart, {
+        type: "evidence-first",
+      });
+    } catch (error) {
+      console.error("Evidence-First PDF generation error:", error);
+      alert("Error generating Evidence-First PDF. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -422,6 +444,38 @@ export default function ReportPage() {
                 );
               })}
             </div>
+          </div>
+        </div>
+
+        {/* Evidence-First Classical Report Card */}
+        <div className="rep-section" style={{ border: "1px solid #38bdf8", background: "linear-gradient(180deg, #0b1528 0%, #060d1b 100%)", position: "relative", overflow: "hidden" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "14px" }}>
+            <div>
+              <span className="rep-badge" style={{ background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.4)", color: "#38bdf8", marginBottom: "8px" }}>
+                ✦ PREDICTIVE INTELLIGENCE · FROZEN FOUNDATION
+              </span>
+              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "24px", fontWeight: 700, color: "#ffffff", margin: "6px 0 4px" }}>
+                Evidence-First Classical Synthesis Report
+              </h2>
+              <p style={{ fontSize: "13px", color: "#cbd5e1", maxWidth: "600px", lineHeight: 1.5, margin: 0 }}>
+                Deterministic, source-grounded report strictly adhering to Krishnamurti Paddhati (KP Readers I–VI). Every assertion is anchored to verified evidence nodes, precedence relations, and reader citations with 0% fabricated scoring or probability meters.
+              </p>
+            </div>
+            <button
+              className="rep-btn primary"
+              style={{ background: "linear-gradient(135deg,#0284c7,#0369a1)", borderColor: "#38bdf8", color: "#ffffff", whiteSpace: "nowrap" }}
+              onClick={handleDownloadEvidenceFirstPDF}
+              disabled={isGenerating}
+            >
+              {isGenerating ? "⏳ Generating…" : "📥 Download Evidence-First PDF (Instant)"}
+            </button>
+          </div>
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", fontSize: "11px", color: "#94a3b8", borderTop: "1px solid #1e293b", paddingTop: "10px" }}>
+            <span>✓ 5 Life Topics (Marriage, Property, Career, Travel, Speculation)</span>
+            <span>✓ 5-Part Grounded Narrative</span>
+            <span>✓ Lossless Provenance &amp; Node IDs</span>
+            <span>✓ Epistemic Safeguards (Reference_Pending)</span>
+            <span>✓ Pure Server Generation (&lt; 100ms)</span>
           </div>
         </div>
 

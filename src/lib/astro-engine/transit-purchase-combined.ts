@@ -190,7 +190,7 @@ export function generateCombinedTransitPurchaseGuidance(
     strongestWarning,
     strongestWarningReason,
     methodNote:
-      "This combines Moon-first standard Gochar transit purchase timing with Lal Kitab object/gift grammar. It is not Lal Kitab 35-sala chakra, Lal Kitab varshphal, or monthly phal.",
+      "This combines Moon-first standard Gochar transit purchase timing with Lal Kitab object/gift grammar. It is not 35-sala chakra, Varshphal, or monthly phal.",
     sadeSatiZone,
     transit,
     lalKitab,
@@ -199,7 +199,7 @@ export function generateCombinedTransitPurchaseGuidance(
     favourable,
     summary:
       overall === "AVOID"
-        ? "Overall: AVOID. Gochar timing and Lal Kitab object signals show strong caution."
+        ? "Overall: AVOID. Gochar timing and classical object signals show strong caution."
         : overall === "WAIT"
           ? "Overall: WAIT. Delay non-essential purchases and re-check documents."
           : overall === "BUY_CAREFULLY"

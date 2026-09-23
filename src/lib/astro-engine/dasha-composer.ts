@@ -165,20 +165,20 @@ export function composeLKParagraph(
 ): string {
   const rs = RASHI_SIG[sign];
   const signNote = rs
-    ? ` The ${rs.element} nature of ${sign} adds a ${rs.keywords[0]} and ${rs.keywords[1] ?? rs.keywords[0]} quality to how Lal Kitab reads this placement.`
+    ? ` The ${rs.element} nature of ${sign} adds a ${rs.keywords[0]} and ${rs.keywords[1] ?? rs.keywords[0]} quality to how classical astrology reads this placement.`
     : "";
 
   if (!lkRule) {
-    return `From a Lal Kitab perspective, ${planet} in the ${ord(house)} house over ${yrs} years calls for sincere observance of ethical conduct, respect for elders and family, and consistent upay practices.${signNote} The native is advised to maintain clarity in financial dealings and honour commitments in personal relationships throughout this period.`;
+    return `From a classical perspective, ${planet} in the ${ord(house)} house over ${yrs} years calls for sincere observance of ethical conduct, respect for elders and family, and consistent upay practices.${signNote} The native is advised to maintain clarity in financial dealings and honour commitments in personal relationships throughout this period.`;
   }
 
   return (
-    `From a Lal Kitab perspective, ${planet} placed in the ${ord(house)} house carries the following karmic significance during this ${yrs}-year period: ${lkRule.core}${signNote} ` +
+    `From a classical perspective, ${planet} placed in the ${ord(house)} house carries the following karmic significance during this ${yrs}-year period: ${lkRule.core}${signNote} ` +
     `In terms of wealth, livelihood and financial karma, the period indicates: ${lkRule.money} ` +
     `The marriage and partnership themes that are likely to surface are: ${lkRule.marriage} ` +
     `Family karmas highlighted during this Mahadasha include: ${lkRule.family} ` +
     `The physical home environment indicators associated with this planetary placement are: ${lkRule.homeEnvironment.join(", ")}. ` +
-    `To bring the energy of this Mahadasha into balance, Lal Kitab prescribes the following upay: ${lkRule.remedies.join("; ")}.`
+    `To bring the energy of this Mahadasha into balance, Classical astrology prescribes the following upay: ${lkRule.remedies.join("; ")}.`
   );
 }
 
@@ -217,7 +217,7 @@ export function composePsychOmenParagraph(
   if (homeOmen) {
     para +=
       `During ${planet} Mahadasha, watch for the following environmental signs around your home and daily life: ${homeOmen.signs.join(", ")}. ` +
-      `Lal Kitab reads these indicators as a signal of ${homeOmen.meaning.toLowerCase()} ` +
+      `Classical astrology reads these indicators as a signal of ${homeOmen.meaning.toLowerCase()} ` +
       `Corrective actions to restore balance: ${homeOmen.correction.join("; ")}. `;
   }
 
@@ -275,7 +275,7 @@ export function composeUpcomingMDParagraph(
 
   if (lkRule) {
     para +=
-      `From a Lal Kitab perspective, this placement indicates: ${lkRule.core} ` +
+      `From a classical perspective, this placement indicates: ${lkRule.core} ` +
       `Financial karma: ${lkRule.money} ` +
       `To align with this period's energy, the following upay are recommended: ${lkRule.remedies.join("; ")}.`;
   }

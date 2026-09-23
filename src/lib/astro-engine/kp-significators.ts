@@ -2,7 +2,7 @@
  * ============================================================================
  * ASTROLIFE — KP 4-FOLD SIGNIFICATOR & NODE AGENT ENGINE (PHASE 2I-B)
  * ============================================================================
- * Pure, deterministic implementation of classical Krishnamurti 4-Fold
+ * Pure, deterministic implementation of classical KP 4-Fold
  * House Significators and Rahu/Ketu Node Representation.
  * Completely free of arbitrary numeric scores.
  * ============================================================================
@@ -125,7 +125,7 @@ export function extractNodeRepresentations(
 }
 
 /**
- * Derives the classical Krishnamurti 4-Fold Significators for all 12 houses:
+ * Derives the classical KP 4-Fold Significators for all 12 houses:
  * Grade 1 (Level A): Planet in the Star of an Occupant of House H
  * Grade 2 (Level B): Occupant of House H
  * Grade 3 (Level C): Planet in the Star of the Lord of House H
