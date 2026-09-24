@@ -396,7 +396,9 @@ export async function POST(req: NextRequest) {
       existingPrompt: existingSystemPrompt,
       palmSessionId,
       userId: body.userId ?? null,
-      includeRawEngineContext: false,
+      includeRawEngineContext: true,
+      kundliContext: chartContext,
+      transitContext: transitContext,
     });
 
     // Try Gemini first, fallback to Groq, then use graceful offline astrology answer.

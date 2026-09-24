@@ -598,7 +598,9 @@ export function formatChartContext(chart: ChartData): string {
       const data = chart.planets[planet];
       if (!data) return null;
       const retro = data.retrograde ? " (Retrograde)" : "";
-      return `${planet}: ${data.sign} H${data.house}${retro}`;
+      const dignity = data.dignity ? ` [${data.dignity}]` : "";
+      const nak = data.nakshatra ? ` in ${data.nakshatra}` : "";
+      return `${planet}: ${data.sign} H${data.house}${nak}${dignity}${retro}`;
     })
     .filter(Boolean)
     .join(", ");
@@ -608,7 +610,7 @@ export function formatChartContext(chart: ChartData): string {
     ? `${activeDasha.planet} Mahadasha ${activeDasha.start.getFullYear()}-${activeDasha.end.getFullYear()}`
     : "Unknown";
 
-  return `Name: ${chart.name}, DOB: ${chart.dob}, TOB: ${chart.tob}, City: ${chart.city}, Ascendant: ${chart.lagnaRashi}, ${planetSummary}, Active Dasha: ${dashaLabel}`;
+  return `Name: ${chart.name}, DOB: ${chart.dob}, TOB: ${chart.tob}, City: ${chart.city}, Ascendant: ${chart.lagnaRashi} (${chart.lagnaLon.toFixed(1)}°), Placements: ${planetSummary}, Active Dasha: ${dashaLabel}`;
 }
 
 export function useUserChart() {
