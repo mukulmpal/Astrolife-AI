@@ -126,32 +126,37 @@ export async function POST(request: NextRequest) {
 
     // ── Dedicated Pure Deterministic Evidence-First PDF Pipeline ─────────────
     if (safeOptions.type === "evidence-first") {
-      const kp = runKPEngine(chart);
-      const payload = buildEvidenceFirstReport(chart, kp);
-      const pdfBuffer = await buildEvidenceFirstPdf(payload, {
-        subjectName: chart.name || "Astrological Subject",
-      });
+      try {
+        const kp = runKPEngine(chart);
+        const payload = buildEvidenceFirstReport(chart, kp);
+        const pdfBuffer = await buildEvidenceFirstPdf(payload, {
+          subjectName: chart.name || "Astrological Subject",
+        });
 
-      const safeName = (chart.name || "Report")
-        .replace(/[^a-zA-Z0-9 ]/g, "")
-        .trim()
-        .replace(/\s+/g, "-");
+        const safeName = (chart.name || "Report")
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .trim()
+          .replace(/\s+/g, "-");
 
-      monitor.info("report_pdf.evidence_first.generated", {
-        feature: "evidence_first_report",
-        tier: access.tier,
-        reportId: payload.reportId,
-      });
+        monitor.info("report_pdf.evidence_first.generated", {
+          feature: "evidence_first_report",
+          tier: access.tier,
+          reportId: payload.reportId,
+        });
 
-      return new NextResponse(Buffer.from(pdfBuffer), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="AstroLife-Evidence-Report-${safeName}.pdf"`,
-          "Cache-Control": "no-store",
-          "X-AstroLife-Report-Template": "evidence-first-classical-v1",
-        },
-      });
+        return new NextResponse(Buffer.from(pdfBuffer), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="AstroLife-Evidence-Report-${safeName}.pdf"`,
+            "Cache-Control": "no-store",
+            "X-AstroLife-Report-Template": "evidence-first-classical-v1",
+          },
+        });
+      } catch (pdfErr) {
+        monitor.warn("report_pdf.evidence_first.fallback_to_html", { error: String(pdfErr) });
+        // Fallback to standard Puppeteer Chromium generator below
+      }
     }
 
     if (safeOptions.type === "elite" && access.enforced && access.tier !== "elite") {

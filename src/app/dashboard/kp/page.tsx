@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useUserChart } from "@/lib/user-chart";
 import {
   KP_PLANET_COLORS,
@@ -97,7 +98,6 @@ export default function KPPage() {
   const [activeTab, setActiveTab] = useState<"evidence" | "table" | "cusps" | "events" | "forecast" | "lords" | "guide">("evidence");
   const [activeEventId, setActiveEventId] = useState<string>("career");
   const [selectedTopicId, setSelectedTopicId] = useState<string>("KP-RULE-MARRIAGE-01");
-  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   const result: KPEngineResult = useMemo(() => {
     return runKPEngine(chart);
@@ -124,19 +124,6 @@ export default function KPPage() {
     if (!chart || !result) return null;
     return buildEvidenceFirstReport(chart, result);
   }, [chart, result]);
-
-  const handleDownloadEvidencePdf = async () => {
-    if (!chart) return;
-    setIsDownloadingPdf(true);
-    try {
-      await downloadReportAsPDF(chart, { type: "evidence-first" });
-    } catch (err) {
-      console.error("Failed to download Evidence-First PDF:", err);
-      alert("Error generating Evidence-First PDF. Please try again.");
-    } finally {
-      setIsDownloadingPdf(false);
-    }
-  };
 
   const marriageKP = useMemo(() => buildMarriageKPIntelligence(result), [result]);
   const kpVargaValidation = useMemo(() => {
@@ -307,25 +294,27 @@ export default function KPPage() {
                 Deterministic evaluation directly consuming <code style={{ color: "#38bdf8" }}>KPPredictiveEvidenceContract</code>. Every conclusion is bound to verifiable evidence nodes, rule-specific precedence relations (REL-01–REL-10), and classical source citations (*KP Readers I–VI*). Zero scores, zero probability tiers.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleDownloadEvidencePdf}
-              disabled={isDownloadingPdf}
+            <Link
+              href="/dashboard/report?type=evidence-first"
               style={{
                 background: "linear-gradient(135deg, #0284c7, #0369a1)",
                 border: "1px solid #38bdf8",
                 borderRadius: "12px",
-                padding: "12px 24px",
+                padding: "12px 20px",
                 color: "#ffffff",
                 fontWeight: 700,
-                fontSize: "14px",
-                cursor: isDownloadingPdf ? "not-allowed" : "pointer",
-                opacity: isDownloadingPdf ? 0.7 : 1,
+                fontSize: "13.5px",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
                 boxShadow: "0 4px 18px rgba(2, 132, 199, 0.35)",
+                whiteSpace: "nowrap",
               }}
             >
-              {isDownloadingPdf ? "⏳ Generating PDF…" : "📥 Download Evidence PDF (Instant)"}
-            </button>
+              <span>📜 Open in Full Report Center</span>
+              <span>→</span>
+            </Link>
           </div>
 
           {/* Topic Selector Tabs */}

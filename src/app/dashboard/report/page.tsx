@@ -146,7 +146,7 @@ const LOADING_STEPS = [
 ];
 
 const REPORT_PLANS: Array<{
-  type: "basic" | "premium" | "elite";
+  type: ReportOptions["type"];
   tier: SubscriptionTier;
   label: string;
   desc: string;
@@ -154,6 +154,7 @@ const REPORT_PLANS: Array<{
   { type: "basic", tier: "free", label: "Free Basic PDF", desc: "Starter Kundli snapshot with basic chart intelligence." },
   { type: "premium", tier: "premium", label: "Premium Full PDF", desc: "Complete astrology intelligence report for serious users." },
   { type: "elite", tier: "elite", label: "Elite Intelligence PDF", desc: "Luxury dossier with fusion, family and advanced synthesis positioning." },
+  { type: "evidence-first", tier: "free", label: "KP Evidence Edition", desc: "Krishnamurti Paddhati, 5 ruling planets & dasha evidence." },
 ];
 
 const TIER_RANK: Record<SubscriptionTier, number> = { free: 0, premium: 1, elite: 2 };
@@ -185,11 +186,21 @@ export default function ReportPage() {
   const [latestPalmSessionId, setLatestPalmSessionId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const requested = params.get("type") as ReportOptions["type"] | null;
+      if (requested && requested in ENGINE_MAP) {
+        setReportType(requested);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (fullAccess) return;
 
     const loadTier = async () => {
       const { data } = await supabase.auth.getUser();
-      if (!data.user) return;
+      if (!data?.user) return;
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -199,7 +210,6 @@ export default function ReportPage() {
 
       setSubscriptionTier(normalizeTier(profile?.subscription_tier, data.user.email));
     };
-
 
     loadTier();
   }, [fullAccess, supabase]);

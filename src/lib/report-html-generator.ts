@@ -43,6 +43,7 @@ import { calculateVastu } from "./astro-engine/vastu";
 import { calculateSarvatobhadra } from "./astro-engine/sarvatobhadra";
 import { calculateKarakas, calculateArudhas, calculateCharaDasha } from "./astro-engine/jaimini";
 import { calculateKpReport } from "./astro-engine/kp";
+import { calculateRulingPlanets } from "./astro-engine/kp-ruling-planets";
 import { calculateSpecialLagnas } from "./astro-engine/special-lagnas";
 import { buildMarriageIntelligenceV2 } from "./astro-engine/marriage-intelligence-v2";
 import { scanMarriageWindows, type MonthlyMarriageWindow } from "./astro-engine/marriage-window-scanner";
@@ -4132,43 +4133,106 @@ function pageKP(chart: ChartData): string {
   const events = Array.isArray(kp.significators) ? kp.significators : [];
   const cusps = Array.isArray(kp.cusps) ? kp.cusps : [];
   const rows = Array.isArray(kp.rows) ? kp.rows : [];
-  const topEvents = events.slice().sort((a: any, b: any) => Number(b.score ?? 0) - Number(a.score ?? 0)).slice(0,6);
+  const topEvents = events.slice().sort((a: any, b: any) => Number(b.score ?? 0) - Number(a.score ?? 0)).slice(0, 6);
   const dashaPath = kp.input?.dashaPath ?? "—";
+
+  let rpSnapshot = null;
+  if (chart.dob && chart.tob) {
+    try {
+      rpSnapshot = calculateRulingPlanets({
+        context: "NATAL",
+        dob: chart.dob,
+        tob: chart.tob,
+        tz: chart.tz ?? 5.5,
+        lat: chart.lat ?? 28.6139,
+        lon: chart.lon ?? 77.2090,
+      });
+    } catch {
+      rpSnapshot = null;
+    }
+  }
+
+  const core = rpSnapshot?.coreRulingPlanets;
+  const secondary = rpSnapshot?.secondaryRulingPlanets;
+  const nodeReps = rpSnapshot?.nodeRepresentations || [];
+
   return `<section class="page dense">
-    ${pageRail("Krishnamurti Paddhati · Sub-Lord Timing", "KP")}
-    <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
-      <div class="section-title" style="margin-bottom:14px;">
+    ${pageRail("Krishnamurti Paddhati · Sub-Lord Timing & Ruling Planets", "KP")}
+    <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title" style="margin-bottom:10px;">
         <span class="section-num" style="color:var(--violet);">KP</span>
-        <h2>Krishnamurti Paddhati</h2>
+        <h2>Krishnamurti Paddhati &amp; Ruling Planets</h2>
       </div>
-      <div class="body-s" style="margin-bottom:16px;max-width:620px;color:var(--ivory-dim);">
-        KP reads each house through cusp sub-lord and star-lord. Dasha activation confirms timing. Active dasha: <span style="color:var(--gold);">${esc(String(dashaPath))}</span>
+      <div class="body-s" style="margin-bottom:12px;max-width:640px;color:var(--ivory-dim);font-size:10.5px;line-height:1.5;">
+        Classical KP sub-lord timing, Placidus bhava cusps, and the 5 Master Ruling Planets governing the calculation moment. Active Dasha: <span style="color:var(--gold);font-weight:700;">${esc(String(dashaPath))}</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-        <div class="card" style="padding:12px;">
-          <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Event Possibility Index</div>
-          ${topEvents.length ? topEvents.map((e: any) => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line);font-size:11px;">
+
+      ${core ? `
+      <div class="card" style="padding:10px 12px;margin-bottom:10px;background:rgba(212,175,55,0.04);border:1px solid rgba(212,175,55,0.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span class="kicker" style="color:var(--gold);margin:0;">5 Classical Ruling Planets (Master Corroboration)</span>
+          <span class="body-s mono" style="font-size:9px;color:var(--gold-dim);">Sunrise: ${esc(rpSnapshot?.dayLordInfo?.astronomicalSunriseLocal ?? "Local")}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;">
+          <div style="padding:6px 4px;background:var(--surface);border-radius:4px;">
+            <div style="font-size:8px;color:var(--ivory-dim);text-transform:uppercase;">Asc Star</div>
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-top:2px;">${esc(String(core.ascendantStarLord))}</div>
+            <div style="font-size:8px;color:var(--ivory-mute);">${esc(String(rpSnapshot?.ascendant?.nakshatra ?? ""))}</div>
+          </div>
+          <div style="padding:6px 4px;background:var(--surface);border-radius:4px;">
+            <div style="font-size:8px;color:var(--ivory-dim);text-transform:uppercase;">Asc Sign</div>
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-top:2px;">${esc(String(core.ascendantSignLord))}</div>
+            <div style="font-size:8px;color:var(--ivory-mute);">${esc(String(rpSnapshot?.ascendant?.sign ?? ""))}</div>
+          </div>
+          <div style="padding:6px 4px;background:var(--surface);border-radius:4px;">
+            <div style="font-size:8px;color:var(--ivory-dim);text-transform:uppercase;">Moon Star</div>
+            <div style="font-size:12px;font-weight:700;color:var(--saffron);margin-top:2px;">${esc(String(core.moonStarLord))}</div>
+            <div style="font-size:8px;color:var(--ivory-mute);">${esc(String(rpSnapshot?.moon?.nakshatra ?? ""))}</div>
+          </div>
+          <div style="padding:6px 4px;background:var(--surface);border-radius:4px;">
+            <div style="font-size:8px;color:var(--ivory-dim);text-transform:uppercase;">Moon Sign</div>
+            <div style="font-size:12px;font-weight:700;color:var(--saffron);margin-top:2px;">${esc(String(core.moonSignLord))}</div>
+            <div style="font-size:8px;color:var(--ivory-mute);">${esc(String(rpSnapshot?.moon?.sign ?? ""))}</div>
+          </div>
+          <div style="padding:6px 4px;background:var(--surface);border-radius:4px;">
+            <div style="font-size:8px;color:var(--ivory-dim);text-transform:uppercase;">Day Lord</div>
+            <div style="font-size:12px;font-weight:700;color:var(--jade);margin-top:2px;">${esc(String(core.dayLord))}</div>
+            <div style="font-size:8px;color:var(--ivory-mute);">${esc(String(rpSnapshot?.dayLordInfo?.weekdayName ?? ""))}</div>
+          </div>
+        </div>
+        ${nodeReps.length ? `
+        <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;font-size:9.5px;color:var(--ivory-dim);">
+          <div>${nodeReps.map((n: any) => `<span><strong style="color:var(--gold);">${n.node}:</strong> Reps [${(n.representedCoreRPs || []).join(", ") || "Sign " + n.signLord}]</span>`).join(" · ")}</div>
+          <div><strong style="color:var(--violet);">Sub-Lords:</strong> Asc Sub ${esc(String(secondary?.ascendantSubLord ?? "—"))} · Moon Sub ${esc(String(secondary?.moonSubLord ?? "—"))}</div>
+        </div>` : ""}
+      </div>` : ""}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="card" style="padding:10px;">
+          <div class="kicker" style="margin-bottom:6px;color:var(--gold);">Event Possibility &amp; Signification</div>
+          ${topEvents.length ? topEvents.map((e: any) => `<div style="display:flex;justify-content:space-between;padding:3.5px 0;border-bottom:1px solid var(--line);font-size:10px;">
             <span style="color:var(--ivory);">${esc(String(e.label ?? e.topic ?? "Event"))}</span>
             <span style="color:var(--gold-bright);font-weight:700;" class="mono">${e.score ?? "—"}%</span>
-          </div>`).join("") : `<div class="body-s" style="color:var(--ivory-dim);">Connect dasha data for event timing.</div>`}
+          </div>`).join("") : `<div class="body-s" style="color:var(--ivory-dim);font-size:10px;">Connect dasha data for event timing.</div>`}
         </div>
-        <div class="card" style="padding:12px;">
-          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Star &amp; Sub Lords</div>
-          ${rows.slice(0,9).map((r: any) => `<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:4px 0;border-bottom:1px solid var(--line);font-size:10px;">
+        <div class="card" style="padding:10px;">
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Grahas · Star &amp; Sub Lords</div>
+          ${rows.slice(0,9).map((r: any) => `<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:3.5px 0;border-bottom:1px solid var(--line);font-size:9.5px;">
             <span style="color:var(--gold);">${esc(String(r.name ?? ""))}</span>
             <span style="color:var(--ivory-dim);">★ ${esc(String(r.starLord ?? ""))}</span>
             <span style="color:var(--ivory-dim);">Sub ${esc(String(r.subLord ?? ""))}</span>
-          </div>`).join("") || `<div class="body-s" style="color:var(--ivory-dim);">KP planet table not available.</div>`}
+          </div>`).join("") || `<div class="body-s" style="color:var(--ivory-dim);font-size:10px;">KP planet table not available.</div>`}
         </div>
       </div>
-      <div class="card" style="padding:12px;">
-        <div class="kicker" style="margin-bottom:8px;color:var(--jade);">House Cusps · Sub Lord</div>
-        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:10px;">
-          ${cusps.slice(0,12).map((c: any) => `<div style="padding:5px;background:var(--surface);border-radius:3px;text-align:center;">
-            <div style="color:var(--gold-dim);font-size:8px;margin-bottom:2px;">H${c.house ?? "—"}</div>
-            <div style="color:var(--ivory);font-size:9px;">${esc(String(c.sign ?? ""))}</div>
-            <div style="color:var(--saffron);font-size:8px;" class="mono">${esc(String(c.subLord ?? ""))}</div>
-          </div>`).join("") || `<div class="body-s" style="color:var(--ivory-dim);">Exact KP cusps not connected.</div>`}
+
+      <div class="card" style="padding:10px;">
+        <div class="kicker" style="margin-bottom:6px;color:var(--jade);">12 House Cusps (Placidus) · Exact Sub-Lords</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:9.5px;">
+          ${cusps.slice(0,12).map((c: any) => `<div style="padding:4px 3px;background:var(--surface);border-radius:3px;text-align:center;">
+            <div style="color:var(--gold-dim);font-size:8px;margin-bottom:1px;">H${c.house ?? "—"}</div>
+            <div style="color:var(--ivory);font-size:8.5px;">${esc(String(c.sign ?? ""))}</div>
+            <div style="color:var(--saffron);font-size:8px;font-weight:700;" class="mono">${esc(String(c.subLord ?? ""))}</div>
+          </div>`).join("") || `<div class="body-s" style="color:var(--ivory-dim);font-size:10px;">Exact KP cusps not connected.</div>`}
         </div>
       </div>
     </div>
