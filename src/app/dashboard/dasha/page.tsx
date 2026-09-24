@@ -14,6 +14,10 @@ import {
   formatDaysRemaining,
   type DashaPeriod,
   type DashaLord,
+} from "@/lib/astro-engine/dasha";
+import { runKPEngine } from "@/lib/astro-engine/kp";
+import { buildCurrentDashaHierarchyEvidence } from "@/lib/astro-engine/kp-dasha-evidence";
+import { KPDashaEvidenceTree } from "@/components/dasha/KPDashaEvidenceTree";
 import { useLanguage } from "@/lib/language-context";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { EngineGuidanceGrid, EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
@@ -168,6 +172,17 @@ export default function DashaPage() {
     : dashaTree?.current.mahadasha;
   const selectedPeriod = selectedMDPeriod ? { md: selectedMDPeriod, antardashas: getAntardashas(selectedMDPeriod) } : null;
 
+  const dashaEvidence = useMemo(() => {
+    if (!chart || !chart.dob || !chart.tob) return null;
+    try {
+      const kpResult = runKPEngine(chart);
+      return buildCurrentDashaHierarchyEvidence(chart, kpResult.predictiveEvidence);
+    } catch (err) {
+      console.error("[DashaPage] Failed to build Dasha hierarchy evidence:", err);
+      return null;
+    }
+  }, [chart]);
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ background: "#05020f" }}>
@@ -282,6 +297,13 @@ export default function DashaPage() {
                 </p>
               </div>
             </div>
+          </section>
+        )}
+
+        {/* KP Dasha House Signification & Event Unlocking Tree */}
+        {dashaEvidence && (
+          <section>
+            <KPDashaEvidenceTree evidence={dashaEvidence} tp={tp} />
           </section>
         )}
 
