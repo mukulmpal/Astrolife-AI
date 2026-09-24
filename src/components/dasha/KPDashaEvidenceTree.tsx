@@ -13,16 +13,19 @@ interface KPDashaEvidenceTreeProps {
 export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidenceTreeProps) {
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
 
-  const { hierarchy, eventEvidence } = evidence;
+  const { hierarchy, eventEvidenceByRule } = evidence;
   const levels = [
-    { label: "Mahadasha (Primary)", data: hierarchy.mahadasha, tag: "Level 1" },
-    { label: "Antardasha (Operating)", data: hierarchy.antardasha, tag: "Level 2" },
-    { label: "Pratyantardasha (Trigger)", data: hierarchy.pratyantardasha, tag: "Level 3" },
-    { label: "Sookshmadasha (Sub-Trigger)", data: hierarchy.sookshma, tag: "Level 4" },
-    { label: "Pranadasha (Micro-Pulse)", data: hierarchy.prana, tag: "Level 5" },
-  ];
+    { label: "Mahadasha (Primary)", data: hierarchy?.mahadasha, tag: "Level 1" },
+    { label: "Antardasha (Operating)", data: hierarchy?.antardasha, tag: "Level 2" },
+    { label: "Pratyantardasha (Trigger)", data: hierarchy?.pratyantardasha, tag: "Level 3" },
+    { label: "Sookshmadasha (Sub-Trigger)", data: hierarchy?.sookshma, tag: "Level 4" },
+    { label: "Pranadasha (Micro-Pulse)", data: hierarchy?.prana, tag: "Level 5" },
+  ].filter((lvl) => Boolean(lvl.data));
 
-  const categoryEvents = eventEvidence.slice(0, 8); // Top active event combinations
+  const categoryEvents = Object.values(eventEvidenceByRule || {})
+    .map((r) => r.levels?.antardasha ?? r.levels?.mahadasha)
+    .filter(Boolean)
+    .slice(0, 8);
 
   return (
     <div
@@ -177,8 +180,11 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
           >
             {categoryEvents.map((ev, i) => {
               const isExpanded = expandedEvent === ev.ruleId;
-              const hasSupporting = ev.supportingHousesMatched.length > 0;
-              const hasDetriment = ev.detrimentHousesMatched.length > 0;
+              const supporting = ev.supportingHousesMatched || [];
+              const detriment = ev.detrimentHousesMatched || [];
+              const signified = ev.signifiedHouses || [];
+              const hasSupporting = supporting.length > 0;
+              const hasDetriment = detriment.length > 0;
 
               return (
                 <div
@@ -218,7 +224,7 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                           gap: "3px",
                         }}
                       >
-                        <CheckCircle2 size={10} /> Supports: {ev.supportingHousesMatched.map((h) => `H${h}`).join(", ")}
+                        <CheckCircle2 size={10} /> Supports: {supporting.map((h) => `H${h}`).join(", ")}
                       </span>
                     )}
 
@@ -234,7 +240,7 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                           gap: "3px",
                         }}
                       >
-                        <ShieldAlert size={10} /> Detriment: {ev.detrimentHousesMatched.map((h) => `H${h}`).join(", ")}
+                        <ShieldAlert size={10} /> Detriment: {detriment.map((h) => `H${h}`).join(", ")}
                       </span>
                     )}
                   </div>
@@ -254,7 +260,7 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                         <strong>Lord:</strong> {tp(ev.planet)} ({ev.dashaLevel})
                       </div>
                       <div style={{ marginTop: "4px" }}>
-                        <strong>Signified Houses:</strong> {ev.signifiedHouses.map((h) => `H${h}`).join(", ")}
+                        <strong>Signified Houses:</strong> {signified.length > 0 ? signified.map((h) => `H${h}`).join(", ") : "None"}
                       </div>
                       <div style={{ marginTop: "4px", color: "#787190", fontSize: "10px" }}>
                         Canonical Source: {ev.canonicalSource}

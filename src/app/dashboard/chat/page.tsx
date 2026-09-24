@@ -276,34 +276,40 @@ export default function ChatPage() {
 
   useEffect(() => {
     const loadPlan = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (!data?.user) {
+          setUsageStatus(getAiUsageStatus(null));
+          setUsageReady(true);
+          return;
+        }
+
+        const isElite = (data.user.email && isEliteEmail(data.user.email)) ||
+          (data.user as any).app_metadata?.subscription_tier === "elite" ||
+          (data.user as any).user_metadata?.subscription_tier === "elite";
+
+        if (isElite) {
+          setSubscriptionTier("elite");
+          setUsageStatus(getAiUsageStatus("elite"));
+          setUsageReady(true);
+          return;
+        }
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("subscription_tier")
+          .eq("id", data.user.id)
+          .maybeSingle();
+
+        const tier = typeof profile?.subscription_tier === "string" ? profile.subscription_tier : null;
+        setSubscriptionTier(tier);
+        setUsageStatus(await getAccountAiUsageStatus(tier));
+        setUsageReady(true);
+      } catch (err) {
+        console.warn("Auth check deferred in chat loadPlan:", err);
         setUsageStatus(getAiUsageStatus(null));
         setUsageReady(true);
-        return;
       }
-
-      const isElite = (data.user.email && isEliteEmail(data.user.email)) ||
-        (data.user as any).app_metadata?.subscription_tier === "elite" ||
-        (data.user as any).user_metadata?.subscription_tier === "elite";
-
-      if (isElite) {
-        setSubscriptionTier("elite");
-        setUsageStatus(getAiUsageStatus("elite"));
-        setUsageReady(true);
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("subscription_tier")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      const tier = typeof profile?.subscription_tier === "string" ? profile.subscription_tier : null;
-      setSubscriptionTier(tier);
-      setUsageStatus(await getAccountAiUsageStatus(tier));
-      setUsageReady(true);
     };
 
 

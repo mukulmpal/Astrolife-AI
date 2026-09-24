@@ -377,3 +377,4 @@ export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanets
     </div>
   );
 }
+

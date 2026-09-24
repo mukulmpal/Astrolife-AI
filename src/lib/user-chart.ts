@@ -571,25 +571,49 @@ export async function selectSavedChart(chartId: string): Promise<ChartData | nul
   }
 }
 
-async function loadPrimaryChartFromAccount(): Promise<ChartData | null> {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+let activePrimaryChartPromise: Promise<ChartData | null> | null = null;
 
-  const { data, error } = await supabase
-    .from("charts")
-    .select("chart_json,name,dob,tob,city,lat,lon")
-    .eq("user_id", user.id)
-    .eq("is_primary", true)
-    .maybeSingle();
-
-  if (error || !data) return null;
-  if (data.chart_json && isStoredChart(data.chart_json)) {
-    return reviveChartDates(data.chart_json);
+async function loadPrimaryChartFromAccount(existingUser?: any): Promise<ChartData | null> {
+  if (activePrimaryChartPromise) {
+    return activePrimaryChartPromise;
   }
 
-  const birth = getChartRowBirth(data);
-  return birth ? buildChart(birth) : null;
+  activePrimaryChartPromise = (async () => {
+    try {
+      const supabase = createClient();
+      let user = existingUser;
+      if (!user) {
+        try {
+          const res = await supabase.auth.getUser();
+          user = res.data?.user;
+        } catch (err) {
+          return null;
+        }
+      }
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from("charts")
+        .select("chart_json,name,dob,tob,city,lat,lon")
+        .eq("user_id", user.id)
+        .eq("is_primary", true)
+        .maybeSingle();
+
+      if (error || !data) return null;
+      if (data.chart_json && isStoredChart(data.chart_json)) {
+        return reviveChartDates(data.chart_json);
+      }
+
+      const birth = getChartRowBirth(data);
+      return birth ? buildChart(birth) : null;
+    } catch {
+      return null;
+    } finally {
+      activePrimaryChartPromise = null;
+    }
+  })();
+
+  return activePrimaryChartPromise;
 }
 
 export function formatChartContext(chart: ChartData): string {
@@ -628,8 +652,14 @@ export function useUserChart() {
     const loadChart = async () => {
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        const accountChart = await loadPrimaryChartFromAccount();
+        let user = null;
+        try {
+          const authRes = await supabase.auth.getUser();
+          user = authRes.data?.user ?? null;
+        } catch {
+          // Fallback to anonymous/cached state if lock is held
+        }
+        const accountChart = await loadPrimaryChartFromAccount(user);
         if (accountChart) {
           saveCurrentChart(accountChart);
           if (!cancelled) {

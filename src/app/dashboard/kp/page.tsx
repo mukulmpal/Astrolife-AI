@@ -18,6 +18,7 @@ import {
 } from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { useLanguage } from "@/lib/language-context";
+import { buildEvidenceFirstReport } from "@/lib/report/evidence-first-report";
 import { buildEvidenceDrawerViewModel } from "@/lib/report/explainability";
 import { EvidenceDrawer } from "@/components/report/EvidenceDrawer";
 import { downloadReportAsPDF } from "@/lib/report-html-generator";
