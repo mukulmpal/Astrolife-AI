@@ -13,15 +13,38 @@ export interface Agent {
   exampleQuestions: string[];
 }
 
-const chartContext = (chart: ChartData): string => `
+const RASHI_LORDS: Record<string, string> = {
+  Aries: "Mars",
+  Taurus: "Venus",
+  Gemini: "Mercury",
+  Cancer: "Moon",
+  Leo: "Sun",
+  Virgo: "Mercury",
+  Libra: "Venus",
+  Scorpio: "Mars",
+  Sagittarius: "Jupiter",
+  Capricorn: "Saturn",
+  Aquarius: "Saturn",
+  Pisces: "Jupiter",
+};
+
+const chartContext = (chart: ChartData): string => {
+  const lagnaLord = RASHI_LORDS[chart.lagnaRashi] ?? (chart.lagnaNum !== undefined ? Object.values(RASHI_LORDS)[chart.lagnaNum] : "Unknown");
+  const goodDignityCount = Object.values(chart.planets).filter((p) => {
+    const d = p.dignity || "";
+    return d.includes("Exalt") || d.includes("Own") || d.includes("Moolatrikona") || d.includes("Great Friend") || d.includes("Friend");
+  }).length;
+
+  return `
 User's Birth Chart:
 - Name: ${chart.name}
 - Birth: ${chart.dob} at ${chart.tob} in ${chart.city}
-- Ascendant: ${chart.lagnaRashi} (Lagna Lord: ${Object.entries(chart.planets).find(([, p]) => p.sign === chart.lagnaRashi)?.[0] || 'Unknown'})
+- Ascendant: ${chart.lagnaRashi} (Lagna Lord: ${lagnaLord})
 - Moon Sign: ${chart.planets.Moon?.sign || 'Unknown'} (${chart.planets.Moon?.nakshatra || 'Unknown'})
 - Sun Sign: ${chart.planets.Sun?.sign || 'Unknown'}
-- Chart Strength: ${Object.values(chart.planets).filter(p => p.dignity?.includes('Sva')).length}/9 planets in good dignity
+- Chart Strength: ${goodDignityCount}/9 planets in good dignity
 `;
+};
 
 export const AGENTS: Record<AgentType, Agent> = {
   lalkitab: {

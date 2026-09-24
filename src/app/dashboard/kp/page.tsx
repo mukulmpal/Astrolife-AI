@@ -21,6 +21,8 @@ import { useLanguage } from "@/lib/language-context";
 import { buildEvidenceDrawerViewModel } from "@/lib/report/explainability";
 import { EvidenceDrawer } from "@/components/report/EvidenceDrawer";
 import { downloadReportAsPDF } from "@/lib/report-html-generator";
+import { calculateRulingPlanets } from "@/lib/astro-engine/kp-ruling-planets";
+import { KPRulingPlanetsCard } from "@/components/kp/KPRulingPlanetsCard";
 import "@/app/dashboard/kp/kp.css";
 
 function VerdictBadge({ value }: { value: SignificatorSet["verdict"] }) {
@@ -98,6 +100,23 @@ export default function KPPage() {
 
   const result: KPEngineResult = useMemo(() => {
     return runKPEngine(chart);
+  }, [chart]);
+
+  const rulingPlanets = useMemo(() => {
+    if (!chart?.dob || !chart?.tob) return null;
+    try {
+      return calculateRulingPlanets({
+        context: "NATAL",
+        dob: chart.dob,
+        tob: chart.tob,
+        tz: chart.tz ?? 5.5,
+        lat: chart.lat ?? 28.6139,
+        lon: chart.lon ?? 77.2090,
+      });
+    } catch (e) {
+      console.error("[KPPage] Failed to calculate Ruling Planets:", e);
+      return null;
+    }
   }, [chart]);
 
   const evidenceReport = useMemo(() => {
@@ -190,6 +209,12 @@ export default function KPPage() {
           <em>{result.strongestEvent?.score ?? 0}%</em>
         </div>
       </section>
+
+      {rulingPlanets && (
+        <section style={{ maxWidth: 1120, margin: "0 auto 20px" }}>
+          <KPRulingPlanetsCard snapshot={rulingPlanets} tp={tp} />
+        </section>
+      )}
 
       <section className="kp-logic-note">
         <div>
