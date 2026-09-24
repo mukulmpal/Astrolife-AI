@@ -13,7 +13,16 @@ interface KPRulingPlanetsCardProps {
 export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanetsCardProps) {
   const [showDetails, setShowDetails] = useState(false);
 
-  const { core, secondary, nodeChains, dayLordProvenance, ascendant, moon } = snapshot;
+  if (!snapshot) return null;
+
+  const core = snapshot.coreRulingPlanets;
+  const secondary = snapshot.secondaryRulingPlanets;
+  const nodeRepresentations = snapshot.nodeRepresentations || [];
+  const dayLordInfo = snapshot.dayLordInfo;
+  const ascendant = snapshot.ascendant;
+  const moon = snapshot.moon;
+
+  if (!core || !ascendant || !moon) return null;
 
   const coreList = [
     {
@@ -48,7 +57,7 @@ export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanets
       role: "Day Lord (Vara)",
       planet: core.dayLord,
       symbol: "☼",
-      desc: `${dayLordProvenance.weekdayName} (Sunrise)`,
+      desc: `${dayLordInfo?.weekdayName ?? ""} (Sunrise)`,
       level: "Solar Chronos",
     },
   ];
@@ -269,8 +278,8 @@ export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanets
                 }}
               >
                 <span style={{ color: "#998fb3" }}>Ascendant Sub-Lord:</span>
-                <strong style={{ color: KP_PLANET_COLORS[secondary.ascendantSubLord] ?? "#fff" }}>
-                  {tp(secondary.ascendantSubLord)}
+                <strong style={{ color: KP_PLANET_COLORS[secondary?.ascendantSubLord ?? ""] ?? "#fff" }}>
+                  {tp(secondary?.ascendantSubLord ?? "")}
                 </strong>
               </div>
 
@@ -284,8 +293,8 @@ export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanets
                 }}
               >
                 <span style={{ color: "#998fb3" }}>Moon Sub-Lord:</span>
-                <strong style={{ color: KP_PLANET_COLORS[secondary.moonSubLord] ?? "#fff" }}>
-                  {tp(secondary.moonSubLord)}
+                <strong style={{ color: KP_PLANET_COLORS[secondary?.moonSubLord ?? ""] ?? "#fff" }}>
+                  {tp(secondary?.moonSubLord ?? "")}
                 </strong>
               </div>
             </div>
@@ -317,9 +326,12 @@ export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanets
 
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "12px" }}>
               {(["Rahu", "Ketu"] as const).map((node) => {
-                const chain = nodeChains[node];
+                const chain = nodeRepresentations.find((r) => r.node === node);
+                if (!chain) return null;
                 const nodeColor = KP_PLANET_COLORS[node] ?? "#fff";
-                const isRepresenting = chain.representedCoreRPs.length > 0;
+                const representedCore = chain.representedCoreRPs || [];
+                const isRepresenting = representedCore.length > 0;
+                const conjoined = chain.conjoinedPlanets || [];
 
                 return (
                   <div
@@ -340,14 +352,14 @@ export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanets
                         }}
                       >
                         {isRepresenting
-                          ? `Represents: ${chain.representedCoreRPs.map((p) => tp(p)).join(", ")}`
+                          ? `Represents: ${representedCore.map((p) => tp(p)).join(", ")}`
                           : "Sign Lord: " + tp(chain.signLord)}
                       </span>
                     </div>
                     <div style={{ fontSize: "11px", color: "#8a81a3" }}>
                       Sign: {tp(chain.signLord)} · Conjoined:{" "}
-                      {chain.conjoinedPlanets.length > 0
-                        ? chain.conjoinedPlanets.map((p) => tp(p)).join(", ")
+                      {conjoined.length > 0
+                        ? conjoined.map((p) => tp(p)).join(", ")
                         : "None"}
                     </div>
                   </div>
@@ -371,7 +383,7 @@ export function KPRulingPlanetsCard({ snapshot, tp = (n) => n }: KPRulingPlanets
       >
         <Info size={12} />
         <span>
-          Astronomical Sunrise: {dayLordProvenance.astronomicalSunriseLocal} · Day Lord calculated strictly from sunrise-to-sunrise (Non-Veto Corroborator).
+          Astronomical Sunrise: {dayLordInfo?.astronomicalSunriseLocal ?? "N/A"} · Day Lord calculated strictly from sunrise-to-sunrise (Non-Veto Corroborator).
         </span>
       </div>
     </div>
