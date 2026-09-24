@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateSpecialLagnas, type SpecialLagnaItem } from "@/lib/astro-engine/special-lagnas";
 
@@ -44,7 +43,6 @@ export default function SpecialLagnasPage() {
           <h1>Preparing Arudha & Prosperity Lagnas...</h1>
           <p>Your primary chart is loading. Special Lagna engine will sync automatically.</p>
         </section>
-        <MobileBottomNav />
       </main>
     );
   }
@@ -113,8 +111,6 @@ export default function SpecialLagnasPage() {
           HL shows wealth instinct, GL shows authority, and SL shows prosperity grace.
         </p>
       </section>
-
-      <MobileBottomNav />
 
       <style jsx>{`
         .sl-page {

@@ -2,7 +2,6 @@
 import { useMemo, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateSarvatobhadra } from "@/lib/astro-engine/sarvatobhadra";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 import "@/app/dashboard/shared.css";
 
@@ -34,7 +33,6 @@ export default function SarvatobhadraPage() {
     return (
       <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
         <EngineStateCard title="🔯 Sarvatobhadra Chakra" loading={loading} loadingText="Mapping nakshatra grid..." emptyText="Complete onboarding to view chakra." />
-        <MobileBottomNav />
       </main>
     );
   }
@@ -499,8 +497,6 @@ export default function SarvatobhadraPage() {
         )}
 
       </div>
-
-      <MobileBottomNav />
     </main>
   );
 }

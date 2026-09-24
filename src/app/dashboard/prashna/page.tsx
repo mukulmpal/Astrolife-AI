@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { calculatePrashna, type PrashnaResult, type PrashnaTopic } from "@/lib/astro-engine/prashna";
 import NorthIndianChart from "@/components/north-indian-chart";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 const PRASHNA_SIGNS = [
   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
@@ -370,8 +369,6 @@ export default function PrashnaPage() {
           </>
         )}
       </div>
-
-      <MobileBottomNav />
     </main>
   );
 }

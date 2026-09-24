@@ -13,7 +13,6 @@ import {
 import { TransitBase } from "@/lib/astro-engine/transits";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 import "@/app/dashboard/shared.css";
 
@@ -68,7 +67,6 @@ export default function EventRadarPage() {
             emptyText="Generate your kundli first to unlock Event Radar."
           />
         </div>
-        <MobileBottomNav />
       </main>
     );
   }
@@ -250,8 +248,6 @@ export default function EventRadarPage() {
           </article>
         </section>
       </div>
-
-      <MobileBottomNav />
     </main>
   );
 }

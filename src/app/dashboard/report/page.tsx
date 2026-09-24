@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
 import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type ReportCover } from "@/lib/report-html-generator";
-import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { AstroLoadingScreen } from "@/components/AstroLoadingScreen";
 import { createClient } from "@/lib/supabase/client";
 import { isBillingEnforced, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
@@ -229,7 +227,6 @@ export default function ReportPage() {
         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center", paddingTop: "40px" }}>
           <div style={{ fontSize: "20px", fontWeight: "700" }}>Loading your chart...</div>
         </div>
-        <MobileBottomNav />
       </main>
     );
   }
@@ -243,7 +240,6 @@ export default function ReportPage() {
           <p style={{ color: "#a79fbd", fontSize: 14, marginBottom: 24 }}>Generate your kundli first to build a full integrated report.</p>
           <a href="/dashboard" style={{ background: "#c8a030", color: "#060410", padding: "12px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>Generate My Kundli</a>
         </div>
-        <MobileBottomNav />
       </main>
     );
   }
@@ -527,7 +523,6 @@ export default function ReportPage() {
         </div>
 
       </div>
-      <MobileBottomNav />
     </main>
   );
 }

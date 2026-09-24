@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { calculateTransitReport, TransitBase } from "@/lib/astro-engine/transits";
 import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
@@ -61,9 +61,11 @@ function toDateInputValue(d: Date) {
 
 export default function TransitPage() {
   const { tp, ts } = useLanguage();
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "ripple" ? "ripple" : "overview";
   const [base, setBase] = useState<TransitBase>("moon");
   const [selectedDate, setSelectedDate] = useState<Date>(() => startOfDay(new Date()));
-  const [pageTab, setPageTab] = useState<"overview" | "chart" | "ripple">("overview");
+  const [pageTab, setPageTab] = useState<"overview" | "chart" | "ripple">(initialTab);
   const { chart: userChart, loading, hasUserChart } = useUserChart();
 
   const transitChart = useMemo(() => {
@@ -101,7 +103,6 @@ export default function TransitPage() {
             emptyText="Please complete onboarding to unlock transit analysis."
           />
         </div>
-        <MobileBottomNav />
       </main>
     );
   }
@@ -346,8 +347,6 @@ export default function TransitPage() {
           </>
         )}
       </div>
-
-      <MobileBottomNav />
     </main>
   );
 }

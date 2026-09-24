@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EducationTooltip } from "@/components/education-tooltip";
 import {
   listSavedCharts,
@@ -198,8 +197,6 @@ export default function HistoryPage() {
           ))}
         </div>
       )}
-
-      <MobileBottomNav />
     </main>
   );
 }

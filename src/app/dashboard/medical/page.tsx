@@ -4,7 +4,6 @@ import { EngineIntro } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateMedical, NAKSHATRA_DISEASE_BOOK, SIGN_DISEASE } from "@/lib/astro-engine/medical";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 
 const DOSHA_COLOR: Record<string, string> = { Pitta: "#ef4444", Kapha: "#22c55e", Vata: "#60a5fa" };
@@ -25,7 +24,6 @@ export default function MedicalPage() {
     return (
       <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
         <EngineStateCard title="Health & Vitality" loading={loading} loadingText="Analyzing vitality patterns..." emptyText="Complete onboarding to view analysis." />
-        <MobileBottomNav />
       </main>
     );
   }
@@ -307,8 +305,6 @@ export default function MedicalPage() {
           ⚕️ This analysis is based on Dr. S. Krishna Kumar&apos;s Medical Astrology (classical Vedic text). All scores and patterns are awareness indicators only. No content here should replace professional medical evaluation, diagnosis, or treatment. The authors disclaim all medical liability.
         </div>
       </div>
-
-      <MobileBottomNav />
     </main>
   );
 }

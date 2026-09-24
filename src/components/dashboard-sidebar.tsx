@@ -51,7 +51,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Dasha", href: "/dashboard/dasha", Icon: Timer },
       { label: "Transits", href: "/dashboard/transits", Icon: Globe },
-      { label: "Transit Ripple", href: "/dashboard/transit-ripple", Icon: Activity },
+      { label: "Transit Ripple", href: "/dashboard/transits?tab=ripple", Icon: Activity },
       { label: "Event Radar", href: "/dashboard/event-radar", Icon: Radar },
       { label: "KP", href: "/dashboard/kp", Icon: Target },
       { label: "Prashna", href: "/dashboard/prashna", Icon: HelpCircle },

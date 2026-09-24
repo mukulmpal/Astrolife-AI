@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { PremiumFeature } from "@/components/premium-feature";
 import { calculateTransitReport } from "@/lib/astro-engine/transits";
@@ -88,7 +87,6 @@ export default function TransitPurchasePage() {
             emptyText="Generate your kundli first to unlock purchase guidance."
           />
         </div>
-        <MobileBottomNav />
       </main>
     );
   }
@@ -360,8 +358,6 @@ export default function TransitPurchasePage() {
         )}
       </div>
       </PremiumFeature>
-
-      <MobileBottomNav />
     </main>
   );
 }

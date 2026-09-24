@@ -10,7 +10,6 @@ import {
   isPlanet,
   type Planet,
 } from "@/lib/astro-intelligence/phase-1-remedies/complete-remedy-intelligence-engine";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EngineStateCard } from "@/components/engine-state-card";
 
 const PRIORITY_COLOR: Record<RemedyCard["priority"], string> = {
@@ -93,7 +92,6 @@ export default function RemedyPage() {
     return (
       <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
         <EngineStateCard title="💊 Remedy Engine" loading={loading} loadingText="Calculating remedies..." emptyText="Complete onboarding to view remedies." />
-        <MobileBottomNav />
       </main>
     );
   }
@@ -408,8 +406,6 @@ export default function RemedyPage() {
           💡 Remedies are spiritual guidance tools. Results vary per individual karma and sincere practice. Consult an experienced astrologer for personalized guidance before wearing gems.
         </div>
       </div>
-
-      <MobileBottomNav />
     </main>
   );
 }

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function TransitsRippleRedirectPage() {
-  redirect("/dashboard/transits");
+  redirect("/dashboard/transits?tab=ripple");
 }

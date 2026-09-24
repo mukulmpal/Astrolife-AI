@@ -14,8 +14,6 @@ import {
   formatDaysRemaining,
   type DashaPeriod,
   type DashaLord,
-} from "@/lib/astro-engine/dasha";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { useLanguage } from "@/lib/language-context";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { EngineGuidanceGrid, EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
@@ -336,7 +334,6 @@ export default function DashaPage() {
         </section>
 
       </div>
-      <MobileBottomNav />
     </EngineShell>
   );
 }

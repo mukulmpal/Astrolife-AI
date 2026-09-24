@@ -18,10 +18,8 @@ import {
 } from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { useLanguage } from "@/lib/language-context";
-import { buildEvidenceFirstReport } from "@/lib/report/evidence-first-report";
-import { buildEvidenceDrawerViewModel, buildBoundaryPresentation } from "@/lib/report/explainability";
+import { buildEvidenceDrawerViewModel } from "@/lib/report/explainability";
 import { EvidenceDrawer } from "@/components/report/EvidenceDrawer";
-import { BoundaryPresentation } from "@/components/report/BoundaryPresentation";
 import { downloadReportAsPDF } from "@/lib/report-html-generator";
 import "@/app/dashboard/kp/kp.css";
 
@@ -415,13 +413,6 @@ export default function KPPage() {
 
                 {/* Progressive Disclosure Evidence Drawer */}
                 <EvidenceDrawer viewModel={drawerViewModel} defaultLevel="casual" />
-
-                {/* Explicit Boundaries */}
-                <div style={{ marginTop: "10px" }}>
-                  <BoundaryPresentation
-                    boundaries={buildBoundaryPresentation(sec)}
-                  />
-                </div>
               </div>
             );
           })()}

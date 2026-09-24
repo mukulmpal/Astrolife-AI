@@ -1,0 +1,439 @@
+diff --git a/src/app/dashboard/dasha/page.tsx b/src/app/dashboard/dasha/page.tsx
+index d4be051..7195d22 100644
+--- a/src/app/dashboard/dasha/page.tsx
++++ b/src/app/dashboard/dasha/page.tsx
+@@ -14,8 +14,6 @@ import {
+   formatDaysRemaining,
+   type DashaPeriod,
+   type DashaLord,
+-} from "@/lib/astro-engine/dasha";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { useLanguage } from "@/lib/language-context";
+ import { EngineEmptyState } from "@/components/engine/engine-intro";
+ import { EngineGuidanceGrid, EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
+@@ -336,7 +334,6 @@ export default function DashaPage() {
+         </section>
+ 
+       </div>
+-      <MobileBottomNav />
+     </EngineShell>
+   );
+ }
+diff --git a/src/app/dashboard/event-radar/page.tsx b/src/app/dashboard/event-radar/page.tsx
+index e55d9b5..0dc2d80 100644
+--- a/src/app/dashboard/event-radar/page.tsx
++++ b/src/app/dashboard/event-radar/page.tsx
+@@ -13,7 +13,6 @@ import {
+ import { TransitBase } from "@/lib/astro-engine/transits";
+ import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
+ import { useUserChart } from "@/lib/user-chart";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { EngineStateCard } from "@/components/engine-state-card";
+ import "@/app/dashboard/shared.css";
+ 
+@@ -68,7 +67,6 @@ export default function EventRadarPage() {
+             emptyText="Generate your kundli first to unlock Event Radar."
+           />
+         </div>
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -250,8 +248,6 @@ export default function EventRadarPage() {
+           </article>
+         </section>
+       </div>
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/history/page.tsx b/src/app/dashboard/history/page.tsx
+index cd0c388..0f4cd02 100644
+--- a/src/app/dashboard/history/page.tsx
++++ b/src/app/dashboard/history/page.tsx
+@@ -2,7 +2,6 @@
+ 
+ import { useCallback, useEffect, useState } from "react";
+ import { useRouter } from "next/navigation";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { EducationTooltip } from "@/components/education-tooltip";
+ import {
+   listSavedCharts,
+@@ -198,8 +197,6 @@ export default function HistoryPage() {
+           ))}
+         </div>
+       )}
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/kp/page.tsx b/src/app/dashboard/kp/page.tsx
+index 4d62a9f..5b43571 100644
+--- a/src/app/dashboard/kp/page.tsx
++++ b/src/app/dashboard/kp/page.tsx
+@@ -18,10 +18,8 @@ import {
+ } from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
+ import { EngineStateCard } from "@/components/engine-state-card";
+ import { useLanguage } from "@/lib/language-context";
+-import { buildEvidenceFirstReport } from "@/lib/report/evidence-first-report";
+-import { buildEvidenceDrawerViewModel, buildBoundaryPresentation } from "@/lib/report/explainability";
++import { buildEvidenceDrawerViewModel } from "@/lib/report/explainability";
+ import { EvidenceDrawer } from "@/components/report/EvidenceDrawer";
+-import { BoundaryPresentation } from "@/components/report/BoundaryPresentation";
+ import { downloadReportAsPDF } from "@/lib/report-html-generator";
+ import "@/app/dashboard/kp/kp.css";
+ 
+@@ -415,13 +413,6 @@ export default function KPPage() {
+ 
+                 {/* Progressive Disclosure Evidence Drawer */}
+                 <EvidenceDrawer viewModel={drawerViewModel} defaultLevel="casual" />
+-
+-                {/* Explicit Boundaries */}
+-                <div style={{ marginTop: "10px" }}>
+-                  <BoundaryPresentation
+-                    boundaries={buildBoundaryPresentation(sec)}
+-                  />
+-                </div>
+               </div>
+             );
+           })()}
+diff --git a/src/app/dashboard/medical/page.tsx b/src/app/dashboard/medical/page.tsx
+index 378c56f..0bac8ba 100644
+--- a/src/app/dashboard/medical/page.tsx
++++ b/src/app/dashboard/medical/page.tsx
+@@ -4,7 +4,6 @@ import { EngineIntro } from "@/components/engine/engine-intro";
+ import { engineIntros } from "@/data/engine-intros";
+ import { useUserChart } from "@/lib/user-chart";
+ import { calculateMedical, NAKSHATRA_DISEASE_BOOK, SIGN_DISEASE } from "@/lib/astro-engine/medical";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { EngineStateCard } from "@/components/engine-state-card";
+ 
+ const DOSHA_COLOR: Record<string, string> = { Pitta: "#ef4444", Kapha: "#22c55e", Vata: "#60a5fa" };
+@@ -25,7 +24,6 @@ export default function MedicalPage() {
+     return (
+       <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
+         <EngineStateCard title="Health & Vitality" loading={loading} loadingText="Analyzing vitality patterns..." emptyText="Complete onboarding to view analysis." />
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -307,8 +305,6 @@ export default function MedicalPage() {
+           ⚕️ This analysis is based on Dr. S. Krishna Kumar&apos;s Medical Astrology (classical Vedic text). All scores and patterns are awareness indicators only. No content here should replace professional medical evaluation, diagnosis, or treatment. The authors disclaim all medical liability.
+         </div>
+       </div>
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/numerology/page.tsx b/src/app/dashboard/numerology/page.tsx
+index 7fbcc95..072ba30 100644
+--- a/src/app/dashboard/numerology/page.tsx
++++ b/src/app/dashboard/numerology/page.tsx
+@@ -5,7 +5,6 @@ import { EngineEmptyState } from "@/components/engine/engine-intro";
+ import { EngineHeader, EngineShell } from "@/components/engine/EngineShell";
+ import { calculateNumerology, analyzeNumber, suggestATMPins, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry, type DigitAnalysis, type CompatScore } from "@/lib/astro-engine/numerology";
+ import { useUserChart } from "@/lib/user-chart";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import "@/app/dashboard/shared.css";
+ 
+ // ── Helpers ───────────────────────────────────────────────────────────────────
+@@ -692,7 +691,6 @@ export default function NumerologyPage() {
+         )}
+ 
+       </div>
+-      <MobileBottomNav />
+     </EngineShell>
+   );
+ }
+diff --git a/src/app/dashboard/prashna/page.tsx b/src/app/dashboard/prashna/page.tsx
+index 37f23f0..8b9c3a0 100644
+--- a/src/app/dashboard/prashna/page.tsx
++++ b/src/app/dashboard/prashna/page.tsx
+@@ -2,7 +2,6 @@
+ import { useEffect, useState } from "react";
+ import { calculatePrashna, type PrashnaResult, type PrashnaTopic } from "@/lib/astro-engine/prashna";
+ import NorthIndianChart from "@/components/north-indian-chart";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ 
+ const PRASHNA_SIGNS = [
+   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+@@ -370,8 +369,6 @@ export default function PrashnaPage() {
+           </>
+         )}
+       </div>
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/remedy/page.tsx b/src/app/dashboard/remedy/page.tsx
+index 8e17bcb..8768627 100644
+--- a/src/app/dashboard/remedy/page.tsx
++++ b/src/app/dashboard/remedy/page.tsx
+@@ -10,7 +10,6 @@ import {
+   isPlanet,
+   type Planet,
+ } from "@/lib/astro-intelligence/phase-1-remedies/complete-remedy-intelligence-engine";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { EngineStateCard } from "@/components/engine-state-card";
+ 
+ const PRIORITY_COLOR: Record<RemedyCard["priority"], string> = {
+@@ -93,7 +92,6 @@ export default function RemedyPage() {
+     return (
+       <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
+         <EngineStateCard title="💊 Remedy Engine" loading={loading} loadingText="Calculating remedies..." emptyText="Complete onboarding to view remedies." />
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -408,8 +406,6 @@ export default function RemedyPage() {
+           💡 Remedies are spiritual guidance tools. Results vary per individual karma and sincere practice. Consult an experienced astrologer for personalized guidance before wearing gems.
+         </div>
+       </div>
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/report/page.tsx b/src/app/dashboard/report/page.tsx
+index 49c3d9f..b8a95f3 100644
+--- a/src/app/dashboard/report/page.tsx
++++ b/src/app/dashboard/report/page.tsx
+@@ -2,8 +2,6 @@
+ import { useEffect, useState } from "react";
+ import { useUserChart } from "@/lib/user-chart";
+ import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type ReportCover } from "@/lib/report-html-generator";
+-import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { AstroLoadingScreen } from "@/components/AstroLoadingScreen";
+ import { createClient } from "@/lib/supabase/client";
+ import { isBillingEnforced, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
+@@ -229,7 +227,6 @@ export default function ReportPage() {
+         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center", paddingTop: "40px" }}>
+           <div style={{ fontSize: "20px", fontWeight: "700" }}>Loading your chart...</div>
+         </div>
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -243,7 +240,6 @@ export default function ReportPage() {
+           <p style={{ color: "#a79fbd", fontSize: 14, marginBottom: 24 }}>Generate your kundli first to build a full integrated report.</p>
+           <a href="/dashboard" style={{ background: "#c8a030", color: "#060410", padding: "12px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>Generate My Kundli</a>
+         </div>
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -527,7 +523,6 @@ export default function ReportPage() {
+         </div>
+ 
+       </div>
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/sarvatobhadra/page.tsx b/src/app/dashboard/sarvatobhadra/page.tsx
+index 860568d..8970559 100644
+--- a/src/app/dashboard/sarvatobhadra/page.tsx
++++ b/src/app/dashboard/sarvatobhadra/page.tsx
+@@ -2,7 +2,6 @@
+ import { useMemo, useState } from "react";
+ import { useUserChart } from "@/lib/user-chart";
+ import { calculateSarvatobhadra } from "@/lib/astro-engine/sarvatobhadra";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { EngineStateCard } from "@/components/engine-state-card";
+ import "@/app/dashboard/shared.css";
+ 
+@@ -34,7 +33,6 @@ export default function SarvatobhadraPage() {
+     return (
+       <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
+         <EngineStateCard title="🔯 Sarvatobhadra Chakra" loading={loading} loadingText="Mapping nakshatra grid..." emptyText="Complete onboarding to view chakra." />
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -499,8 +497,6 @@ export default function SarvatobhadraPage() {
+         )}
+ 
+       </div>
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/shadbala/page.tsx b/src/app/dashboard/shadbala/page.tsx
+index dd8d28b..ad6ec99 100644
+--- a/src/app/dashboard/shadbala/page.tsx
++++ b/src/app/dashboard/shadbala/page.tsx
+@@ -75,7 +75,10 @@ export default function ShadbalaPage() {
+     );
+   }
+ 
+-  const result = calculateShadbala(chart.planets as never);
++  const [hourStr, minStr] = (birth.tob || "12:00").split(":");
++  const parsedHour = parseInt(hourStr, 10) + (parseInt(minStr, 10) || 0) / 60;
++  const birthHourLocal = Number.isFinite(parsedHour) ? parsedHour : 12;
++  const result = calculateShadbala(chart.planets as never, birthHourLocal);
+ 
+   return (
+     <EngineShell>
+diff --git a/src/app/dashboard/special-lagnas/page.tsx b/src/app/dashboard/special-lagnas/page.tsx
+index 6a64d8a..3723f2c 100644
+--- a/src/app/dashboard/special-lagnas/page.tsx
++++ b/src/app/dashboard/special-lagnas/page.tsx
+@@ -1,7 +1,6 @@
+ "use client";
+ 
+ import { useMemo } from "react";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { useUserChart } from "@/lib/user-chart";
+ import { calculateSpecialLagnas, type SpecialLagnaItem } from "@/lib/astro-engine/special-lagnas";
+ 
+@@ -44,7 +43,6 @@ export default function SpecialLagnasPage() {
+           <h1>Preparing Arudha & Prosperity Lagnas...</h1>
+           <p>Your primary chart is loading. Special Lagna engine will sync automatically.</p>
+         </section>
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -114,8 +112,6 @@ export default function SpecialLagnasPage() {
+         </p>
+       </section>
+ 
+-      <MobileBottomNav />
+-
+       <style jsx>{`
+         .sl-page {
+           min-height: 100vh;
+diff --git a/src/app/dashboard/transit-purchase/page.tsx b/src/app/dashboard/transit-purchase/page.tsx
+index 911c4ab..a2181f6 100644
+--- a/src/app/dashboard/transit-purchase/page.tsx
++++ b/src/app/dashboard/transit-purchase/page.tsx
+@@ -1,7 +1,6 @@
+ "use client";
+ 
+ import { useMemo, useState } from "react";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { EngineStateCard } from "@/components/engine-state-card";
+ import { PremiumFeature } from "@/components/premium-feature";
+ import { calculateTransitReport } from "@/lib/astro-engine/transits";
+@@ -88,7 +87,6 @@ export default function TransitPurchasePage() {
+             emptyText="Generate your kundli first to unlock purchase guidance."
+           />
+         </div>
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -360,8 +358,6 @@ export default function TransitPurchasePage() {
+         )}
+       </div>
+       </PremiumFeature>
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/transit-ripple/page.tsx b/src/app/dashboard/transit-ripple/page.tsx
+index 961b1a4..6dd5756 100644
+--- a/src/app/dashboard/transit-ripple/page.tsx
++++ b/src/app/dashboard/transit-ripple/page.tsx
+@@ -1,5 +1,5 @@
+ import { redirect } from "next/navigation";
+ 
+ export default function LegacyTransitRippleRedirect() {
+-  redirect("/dashboard/transits/ripple");
++  redirect("/dashboard/transits?tab=ripple");
+ }
+diff --git a/src/app/dashboard/transits/page.tsx b/src/app/dashboard/transits/page.tsx
+index 150de10..761dfb9 100644
+--- a/src/app/dashboard/transits/page.tsx
++++ b/src/app/dashboard/transits/page.tsx
+@@ -2,11 +2,11 @@
+ 
+ import dynamic from "next/dynamic";
+ import { useMemo, useState } from "react";
++import { useSearchParams } from "next/navigation";
+ import { calculateTransitReport, TransitBase } from "@/lib/astro-engine/transits";
+ import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
+ import { useUserChart } from "@/lib/user-chart";
+ import NorthIndianChart from "@/components/north-indian-chart";
+-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+ import { EngineStateCard } from "@/components/engine-state-card";
+ import { useLanguage } from "@/lib/language-context";
+ import "@/app/dashboard/shared.css";
+@@ -61,9 +61,11 @@ function toDateInputValue(d: Date) {
+ 
+ export default function TransitPage() {
+   const { tp, ts } = useLanguage();
++  const searchParams = useSearchParams();
++  const initialTab = searchParams.get("tab") === "ripple" ? "ripple" : "overview";
+   const [base, setBase] = useState<TransitBase>("moon");
+   const [selectedDate, setSelectedDate] = useState<Date>(() => startOfDay(new Date()));
+-  const [pageTab, setPageTab] = useState<"overview" | "chart" | "ripple">("overview");
++  const [pageTab, setPageTab] = useState<"overview" | "chart" | "ripple">(initialTab);
+   const { chart: userChart, loading, hasUserChart } = useUserChart();
+ 
+   const transitChart = useMemo(() => {
+@@ -101,7 +103,6 @@ export default function TransitPage() {
+             emptyText="Please complete onboarding to unlock transit analysis."
+           />
+         </div>
+-        <MobileBottomNav />
+       </main>
+     );
+   }
+@@ -346,8 +347,6 @@ export default function TransitPage() {
+           </>
+         )}
+       </div>
+-
+-      <MobileBottomNav />
+     </main>
+   );
+ }
+diff --git a/src/app/dashboard/transits/ripple/page.tsx b/src/app/dashboard/transits/ripple/page.tsx
+index fdf757c..dcac766 100644
+--- a/src/app/dashboard/transits/ripple/page.tsx
++++ b/src/app/dashboard/transits/ripple/page.tsx
+@@ -1,5 +1,5 @@
+ import { redirect } from "next/navigation";
+ 
+ export default function TransitsRippleRedirectPage() {
+-  redirect("/dashboard/transits");
++  redirect("/dashboard/transits?tab=ripple");
+ }
+diff --git a/src/components/dashboard-sidebar.tsx b/src/components/dashboard-sidebar.tsx
+index bbee83c..377176b 100644
+--- a/src/components/dashboard-sidebar.tsx
++++ b/src/components/dashboard-sidebar.tsx
+@@ -51,7 +51,7 @@ const NAV_GROUPS: NavGroup[] = [
+     items: [
+       { label: "Dasha", href: "/dashboard/dasha", Icon: Timer },
+       { label: "Transits", href: "/dashboard/transits", Icon: Globe },
+-      { label: "Transit Ripple", href: "/dashboard/transit-ripple", Icon: Activity },
++      { label: "Transit Ripple", href: "/dashboard/transits?tab=ripple", Icon: Activity },
+       { label: "Event Radar", href: "/dashboard/event-radar", Icon: Radar },
+       { label: "KP", href: "/dashboard/kp", Icon: Target },
+       { label: "Prashna", href: "/dashboard/prashna", Icon: HelpCircle },
+diff --git a/src/lib/astro-engine/dasha.ts b/src/lib/astro-engine/dasha.ts
+index ca12dfa..dfc454b 100644
+--- a/src/lib/astro-engine/dasha.ts
++++ b/src/lib/astro-engine/dasha.ts
+@@ -132,9 +132,10 @@ function makePeriod(
+   const isActive = now >= startMs && now < endMs;
+   const durationDays = (endMs - startMs) / 86400000;
+   const daysRemaining = isActive ? Math.max(0, Math.ceil((endMs - now) / 86400000)) : 0;
+-  const progressPercent = isActive
+-    ? Math.min(100, ((now - startMs) / (endMs - startMs)) * 100)
++  const rawProgress = isActive
++    ? Math.min(100, Math.max(0, ((now - startMs) / (endMs - startMs)) * 100))
+     : now >= endMs ? 100 : 0;
++  const progressPercent = Math.round(rawProgress * 10000) / 10000;
+   return {
+     lord, level, isActive, durationDays, daysRemaining, progressPercent,
+     startDate: new Date(startMs),

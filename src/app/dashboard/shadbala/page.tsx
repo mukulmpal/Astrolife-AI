@@ -75,7 +75,10 @@ export default function ShadbalaPage() {
     );
   }
 
-  const result = calculateShadbala(chart.planets as never);
+  const [hourStr, minStr] = (birth.tob || "12:00").split(":");
+  const parsedHour = parseInt(hourStr, 10) + (parseInt(minStr, 10) || 0) / 60;
+  const birthHourLocal = Number.isFinite(parsedHour) ? parsedHour : 12;
+  const result = calculateShadbala(chart.planets as never, birthHourLocal);
 
   return (
     <EngineShell>

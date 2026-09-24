@@ -132,9 +132,10 @@ function makePeriod(
   const isActive = now >= startMs && now < endMs;
   const durationDays = (endMs - startMs) / 86400000;
   const daysRemaining = isActive ? Math.max(0, Math.ceil((endMs - now) / 86400000)) : 0;
-  const progressPercent = isActive
-    ? Math.min(100, ((now - startMs) / (endMs - startMs)) * 100)
+  const rawProgress = isActive
+    ? Math.min(100, Math.max(0, ((now - startMs) / (endMs - startMs)) * 100))
     : now >= endMs ? 100 : 0;
+  const progressPercent = Math.round(rawProgress * 10000) / 10000;
   return {
     lord, level, isActive, durationDays, daysRemaining, progressPercent,
     startDate: new Date(startMs),
