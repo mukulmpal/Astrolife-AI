@@ -1,0 +1,30 @@
+{
+  "publicId": "33734392",
+  "wikipediaSlug": "Abhishek_Kapoor",
+  "wikipediaId": "Q4667468",
+  "name": "Abhishek Kapoor",
+  "fullName": "Abhishek Kapoor",
+  "profileSummary": "Abhishek Kapoor is an Indian film director, former actor, writer and producer who works in Hindi cinema. He is known for his work in the musical drama Rock On!! (2008), the buddy sports drama Kai Po Che! (2013), the musical romantic drama Fitoor (2016), the romantic disaster film Kedarnath (2018) and the social romantic drama Chandigarh Kare Aashiqui (2021), earning nominations for the Filmfare Award for Best Director for Rock On!! and Kai Po Che!.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Abhishek_Kapoor_at_Esha_Deol%27s_sangeet_ceremony_16.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhishek_Kapoor",
+  "dateOfBirth": "1971-08-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film director",
+    "screenwriter",
+    "actor"
+  ],
+  "qid": "Q4667468",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T12:14:09.665Z"
+}

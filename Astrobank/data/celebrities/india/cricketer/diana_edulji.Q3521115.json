@@ -1,0 +1,28 @@
+{
+  "publicId": "72466c62",
+  "wikipediaSlug": "Diana_Edulji",
+  "wikipediaId": "Q3521115",
+  "name": "Diana Edulji",
+  "fullName": "Diana Edulji",
+  "profileSummary": "Diana Edulji is an Indian former cricketer. Born in Mumbai to a Parsi family, she was drawn to sports at an early age. She grew up playing cricket with a tennis ball in the railway colony where she lived. She then went on to play basketball and table tennis at the junior national level, before switching to cricket. At a cricket camp hosted by former Test cricketer Lala Amarnath, she honed her skills. Women's cricket was becoming more popular in India at the time. Diana went on to play for the Railways and then the Indian national cricket team where she was a successful slow left-arm orthodox bowler. She played her first series in 1975. In 1978 she was made the captain of the team. She remains the third highest wicket-taker in Tests.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Diana_Edulji",
+  "dateOfBirth": "1956-01-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3521115",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T11:02:32.678Z"
+}

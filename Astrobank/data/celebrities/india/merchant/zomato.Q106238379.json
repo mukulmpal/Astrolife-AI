@@ -1,0 +1,27 @@
+{
+  "publicId": "ff2b1b58",
+  "wikipediaSlug": "Deepinder_Goyal",
+  "wikipediaId": "Q106238379",
+  "name": "Zomato",
+  "fullName": "Zomato",
+  "profileSummary": "Zomato is an Indian online food ordering and delivery service owned by Eternal Limited. Created in 2008 by Deepinder Goyal and Pankaj Chaddah, it began as a restaurant aggregator, providing menu information, user reviews, and recommendations, and expanding to more than 20 countries by 2015. In 2015, Zomato entered the food delivery market in India, which soon after became its core business.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Zomato",
+  "dateOfBirth": "1985-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "1",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "merchant",
+    "chief executive officer"
+  ],
+  "qid": "Q106238379",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:36:30.905Z"
+}

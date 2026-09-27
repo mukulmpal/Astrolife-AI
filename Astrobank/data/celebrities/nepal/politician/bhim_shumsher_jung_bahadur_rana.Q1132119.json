@@ -1,0 +1,28 @@
+{
+  "publicId": "64d00d04",
+  "wikipediaSlug": "Bhim_Shumsher_Jung_Bahadur_Rana",
+  "wikipediaId": "Q1132119",
+  "name": "Bhim Shumsher Jung Bahadur Rana",
+  "fullName": "Bhim Shumsher Jung Bahadur Rana",
+  "profileSummary": "Bhim Shumsher Jung Bahadur Rana ruled Nepal from 26 November 1929 until his death on 1 September 1932. He was born on 16 April 1865.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Prime_Minister_Bhim_Shamsher_2_%28cropped%29.png/330px-Prime_Minister_Bhim_Shamsher_2_%28cropped%29.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhim_Shumsher_Jung_Bahadur_Rana",
+  "dateOfBirth": "1865-04-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.691111",
+  "birthCoordinatesLng": "85.315833",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q1132119",
+  "birthPlace": "Thapathali Durbar",
+  "fetchedAt": "2026-04-07T16:55:13.247Z"
+}

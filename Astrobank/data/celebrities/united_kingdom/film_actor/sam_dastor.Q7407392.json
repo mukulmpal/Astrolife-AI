@@ -1,0 +1,27 @@
+{
+  "publicId": "0ddddcfc",
+  "wikipediaSlug": "Sam_Dastor",
+  "wikipediaId": "Q7407392",
+  "name": "Sam Dastor",
+  "fullName": "Sam Dastor",
+  "profileSummary": "Sam Dastor is an Indian-born British actor best known for his appearances in British television series.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sam_Dastor",
+  "dateOfBirth": "1941-10-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "11",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "television actor"
+  ],
+  "qid": "Q7407392",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T02:07:56.873Z"
+}

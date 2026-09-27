@@ -1,0 +1,27 @@
+{
+  "publicId": "b38e3111",
+  "wikipediaSlug": "Anita_Rani",
+  "wikipediaId": "Q4765621",
+  "name": "Anita Rani",
+  "fullName": "Anita Rani",
+  "profileSummary": "Anita Rani Nazran, better known as Anita Rani, is a British radio and television presenter.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anita_Rani_%28cropped%29.jpg/330px-Anita_Rani_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anita_Rani",
+  "dateOfBirth": "1977-10-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "53.794",
+  "birthCoordinatesLng": "-1.751",
+  "moonSign": "1",
+  "sunSign": "6",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist",
+    "television presenter"
+  ],
+  "qid": "Q4765621",
+  "birthPlace": "Bradford",
+  "fetchedAt": "2026-04-08T00:22:11.425Z"
+}

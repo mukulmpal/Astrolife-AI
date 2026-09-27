@@ -1,0 +1,31 @@
+{
+  "publicId": "c9bbb03c",
+  "wikipediaSlug": "Chiranjeevi",
+  "wikipediaId": "Q313243",
+  "name": "Chiranjeevi",
+  "fullName": "Chiranjeevi",
+  "profileSummary": "Konidela Chiranjeevi is an Indian actor, philanthropist and former politician known for his work in Telugu cinema. Known as Mega Star, he is widely regarded as one of the most successful and influential actors in the history of Indian cinema. He is also celebrated as one of the finest dancers in Indian cinema. He has received numerous honours, including the Padma Bhushan in 2006 and the Padma Vibhushan in 2024 from the Government of India, as well as the IFFI Indian Film Personality of the Year Award in 2022. His other accolades include the Raghupathi Venkaiah Award, three Nandi Awards, and nine Filmfare Awards South, including the Lifetime Achievement Award and the Honorary Award. In 2013, CNN-IBN recognized him as one of \"the men who changed the face of the Indian Cinema\". In 2024, he was honoured with a Guinness World Record as the most prolific actor-dancer in the Indian film industry.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Chiranjeevi_at_ANR_Awards_2024_%28cropped%29.jpg/330px-Chiranjeevi_at_ANR_Awards_2024_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chiranjeevi",
+  "dateOfBirth": "1955-08-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.416669444",
+  "birthCoordinatesLng": "81.6",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "politician",
+    "film producer",
+    "film actor"
+  ],
+  "qid": "Q313243",
+  "birthPlace": "Mogalthur",
+  "fetchedAt": "2026-04-07T16:00:06.798Z"
+}

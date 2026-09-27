@@ -1,0 +1,28 @@
+{
+  "publicId": "c6296733",
+  "wikipediaSlug": "Yogi_Adityanath",
+  "wikipediaId": "Q4683097",
+  "name": "Yogi Adityanath",
+  "fullName": "Yogi Adityanath",
+  "profileSummary": "Yogi Adityanath is an Indian Hindu monk and politician. A member of the Bharatiya Janata Party, Adityanath has served as the chief minister of Uttar Pradesh since 2017. He is the state's longest-serving chief minister and the first to hold the office for two consecutive terms.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Yogiji_in_2023.jpg/330px-Yogiji_in_2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Yogi_Adityanath",
+  "dateOfBirth": "1972-06-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "29.933333333",
+  "birthCoordinatesLng": "78.433333333",
+  "moonSign": "11",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "monk",
+    "Christian minister"
+  ],
+  "qid": "Q4683097",
+  "birthPlace": "Panchur",
+  "fetchedAt": "2026-04-07T16:16:15.031Z"
+}

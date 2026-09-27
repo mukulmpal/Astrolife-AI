@@ -1,0 +1,28 @@
+{
+  "publicId": "5f6b94a1",
+  "wikipediaSlug": "Ambar_Roy",
+  "wikipediaId": "Q3527789",
+  "name": "Ambar Roy",
+  "fullName": "Ambar Roy",
+  "profileSummary": "Ambar Khirid Roy was an Indian cricketer who played in four Test matches in 1969.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ambar_Roy",
+  "dateOfBirth": "1945-06-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527789",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T10:50:09.434Z"
+}

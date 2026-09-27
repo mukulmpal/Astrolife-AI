@@ -1,0 +1,28 @@
+{
+  "publicId": "02bea117",
+  "wikipediaSlug": "Asha_Sobhana",
+  "wikipediaId": "Q125295749",
+  "name": "Asha Sobhana",
+  "fullName": "Asha Sobhana",
+  "profileSummary": "Asha Sobhana is an Indian cricketer who plays for Kerala women's cricket team in domestic cricket and for UP Warriorz in the Women's Premier League. She is an all-rounder, who is a right-handed batter and a leg break bowler.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Asha_Sobhana",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q125295749",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T11:03:00.756Z"
+}

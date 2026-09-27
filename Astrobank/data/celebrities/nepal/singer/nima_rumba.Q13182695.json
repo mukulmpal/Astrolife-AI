@@ -1,0 +1,28 @@
+{
+  "publicId": "bccd6b3b",
+  "wikipediaSlug": "Nima_Rumba",
+  "wikipediaId": "Q13182695",
+  "name": "Nima Rumba",
+  "fullName": "Nima Rumba",
+  "profileSummary": "Nima Rumba is a singer, lyricist, musician, and actor from Nepal. Some of his popular songs are Block Hill, Huri Bataas, Samjhera Ti din Haru, Aau Aauna, and Preeti Basyo.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Nima_Rumba_in_Tamang_Sonam_Lochhar_2018_DC.jpg/330px-Nima_Rumba_in_Tamang_Sonam_Lochhar_2018_DC.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nima_Rumba",
+  "dateOfBirth": "1901-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.23",
+  "birthCoordinatesLng": "84.72",
+  "moonSign": "1",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "actor",
+    "musician"
+  ],
+  "qid": "Q13182695",
+  "birthPlace": "Subarnapur",
+  "fetchedAt": "2026-04-07T16:48:26.432Z"
+}

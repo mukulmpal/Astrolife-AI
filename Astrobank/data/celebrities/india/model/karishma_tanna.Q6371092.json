@@ -1,0 +1,31 @@
+{
+  "publicId": "e914a9f5",
+  "wikipediaSlug": "Karishma_Tanna",
+  "wikipediaId": "Q6371092",
+  "name": "Karishma Tanna",
+  "fullName": "Karishma Tanna",
+  "profileSummary": "Karishma K. Tanna is an Indian actress and model who predominantly works in Hindi films and television shows. She made her television debut with Kyunki Saas Bhi Kabhi Bahu Thi in 2001. She is well known for her roles in Paalkhi, Naagin 3 and Qayamat Ki Raat. She was a contestant on the reality show Bigg Boss 8 in 2014, where she emerged as the 1st runner-up. In 2020, she participated in Fear Factor: Khatron Ke Khiladi 10 and emerged as the winner.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Karishma_Tanna_at_an_event_in_Pali_Hill.jpg/330px-Karishma_Tanna_at_an_event_in_Pali_Hill.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Karishma_Tanna",
+  "dateOfBirth": "1983-12-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor",
+    "television actor",
+    "television presenter"
+  ],
+  "qid": "Q6371092",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:45.466Z"
+}

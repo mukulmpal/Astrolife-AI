@@ -108,7 +108,7 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310 }: Prop
       role="img"
       aria-label="North Indian birth chart"
     >
-      <rect width={S} height={S} fill="#08051a" rx="8" />
+      <rect width={S} height={S} fill="#FAF7F2" rx="8" />
       <rect x={0} y={0} width={S} height={S} fill="none" stroke="#3a3260" strokeWidth="1.5" rx="8" />
 
       <line x1={0} y1={0} x2={S} y2={S} {...ls} />

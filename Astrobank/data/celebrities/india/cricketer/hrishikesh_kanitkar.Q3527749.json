@@ -1,0 +1,28 @@
+{
+  "publicId": "d7f0310c",
+  "wikipediaSlug": "Hrishikesh_Kanitkar",
+  "wikipediaId": "Q3527749",
+  "name": "Hrishikesh Kanitkar",
+  "fullName": "Hrishikesh Kanitkar",
+  "profileSummary": "Hrishikesh Hemant Kanitkar is a former Indian cricketer, who briefly played Tests and ODIs.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hrishikesh_Kanitkar",
+  "dateOfBirth": "1974-11-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527749",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T10:56:44.039Z"
+}

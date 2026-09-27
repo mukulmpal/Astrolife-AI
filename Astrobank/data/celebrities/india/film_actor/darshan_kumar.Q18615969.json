@@ -1,0 +1,28 @@
+{
+  "publicId": "7cd886e9",
+  "wikipediaSlug": "Darshan_Kumar",
+  "wikipediaId": "Q18615969",
+  "name": "Darshan Kumar",
+  "fullName": "Darshan Kumar",
+  "profileSummary": "Darshan Kumar Gandas is an Indian actor who works in Hindi films. He is known for his roles in Mary Kom (2014), NH10 (2015), and The Kashmir Files (2022).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Darshan_at_61st_Filmfare_Awards.jpg/330px-Darshan_at_61st_Filmfare_Awards.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Darshan_Kumar",
+  "dateOfBirth": "1986-08-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor"
+  ],
+  "qid": "Q18615969",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T12:17:16.882Z"
+}

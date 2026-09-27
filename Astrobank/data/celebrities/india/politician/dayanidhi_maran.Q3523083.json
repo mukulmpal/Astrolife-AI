@@ -1,0 +1,26 @@
+{
+  "publicId": "20102dc4",
+  "wikipediaSlug": "Dayanidhi_Maran",
+  "wikipediaId": "Q3523083",
+  "name": "Dayanidhi Maran",
+  "fullName": "Dayanidhi Maran",
+  "profileSummary": "Dayanidhi Murasoli Maran is an Indian politician and one of the prominent members of Dravida Munnetra Kazhagam party. He was elected four times as a Member of Parliament to Lok Sabha from Chennai Central constituency during the 2004 general elections, 2009 general elections, 2019 general elections and 2024 elections.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Dayanidhi_Maran.jpg/330px-Dayanidhi_Maran.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dayanidhi_Maran",
+  "dateOfBirth": "1966-12-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "11",
+  "birthCoordinatesLng": "79",
+  "moonSign": "5",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q3523083",
+  "birthPlace": "Tamil Nadu",
+  "fetchedAt": "2026-04-07T16:21:30.655Z"
+}

@@ -1,0 +1,29 @@
+{
+  "publicId": "aa56cabb",
+  "wikipediaSlug": "Ali_Asgar_(actor)",
+  "wikipediaId": "Q4724667",
+  "name": "Ali Asgar (actor)",
+  "fullName": "Ali Asgar (actor)",
+  "profileSummary": "Ali Asgar is an Indian actor and stand-up comedian. He has appeared in many Indian TV serials and movies. Asgar appeared as Kamal Agarwal in Star Plus TV show Kahaani Ghar Ghar Ki. He also appeared in SAB TV's show F.I.R. as Inspector Raj Aryan. He is commonly known for his role in Colors TV show Comedy Nights with Kapil as Dadi.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Ali_Asgar_attend_the_press_conference_of_their_show_The_Drama_Company.jpg/330px-Ali_Asgar_attend_the_press_conference_of_their_show_The_Drama_Company.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ali_Asgar_(actor)",
+  "dateOfBirth": "1970-12-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "12",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "television actor",
+    "stand-up comedian"
+  ],
+  "qid": "Q4724667",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:54.783Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "9d3ebd06",
+  "wikipediaSlug": "Harry_Bhandari",
+  "wikipediaId": "Q58333654",
+  "name": "Harry Bhandari",
+  "fullName": "Harry Bhandari",
+  "profileSummary": "Harry Bhandari is a Nepalese-born American politician and educator. A member of the Democratic Party, he has served as a member of the Maryland House of Delegates from the eighth district since 2019. Bhandari is the first Nepali American elected to a state legislature in the United States.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Harry_Bhandari_%2854339921925%29.jpg/330px-Harry_Bhandari_%2854339921925%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Harry_Bhandari",
+  "dateOfBirth": "1977-10-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "1",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q58333654",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-08T02:07:01.888Z"
+}

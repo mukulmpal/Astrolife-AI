@@ -1,0 +1,27 @@
+{
+  "publicId": "71e141a8",
+  "wikipediaSlug": "Agha_Shahid_Ali",
+  "wikipediaId": "Q4692327",
+  "name": "Agha Shahid Ali",
+  "fullName": "Agha Shahid Ali",
+  "profileSummary": "Agha Shahid Ali Qizilbash was an Indian-American poet. Born in New Delhi into a Shia Muslim family from Kashmir, Ali lived between India and the United States before permanently moving to the United States in his mid-twenties, where he became affiliated with the literary movement known as New Formalism in American poetry. His collections include A Walk Through the Yellow Pages, The Half-Inch Himalayas, A Nostalgist's Map of America, The Country Without a Post Office, and Rooms Are Never Finished, the latter a finalist for the National Book Award in 2001.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f9/AghaShahidAliPic.gif",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Agha_Shahid_Ali",
+  "dateOfBirth": "1949-02-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": "12",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "literary critic",
+    "poet"
+  ],
+  "qid": "Q4692327",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-08T01:18:12.755Z"
+}

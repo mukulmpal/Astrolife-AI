@@ -520,16 +520,16 @@ function GemstonePageContent() {
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
         .gem-page {
-          --bg: #060410;
-          --bg-2: #0a0720;
-          --card: #0d0a22;
-          --border: #1c1840;
+          --bg: #FAF7F2;
+          --bg-2: #FAF7F2;
+          --card: #FFFFFF;
+          --border: #FFFFFF;
           --border-2: #261f50;
           --gold: #c8a030;
           --gold-soft: #e8c060;
-          --cream: #f0e8d0;
-          --cream-soft: #c8c0a8;
-          --muted: #605890;
+          --cream: #1A1A1A;
+          --cream-soft: #4A4238;
+          --muted: #6B635B;
           position: relative;
           min-height: 100vh;
           overflow: hidden;
@@ -688,7 +688,7 @@ function GemstonePageContent() {
           gap: 26px;
           align-items: center;
           border: 1px solid var(--border);
-          background: linear-gradient(135deg, #0f0c28, #1a1040);
+          background: linear-gradient(135deg, #FFFFFF, #1a1040);
           backdrop-filter: blur(18px);
           border-radius: 20px;
           padding: 24px;
@@ -881,7 +881,7 @@ function GemstonePageContent() {
 
         .gem-tabs button.active {
           color: var(--cream-soft);
-          background: #1c1840;
+          background: #FFFFFF;
           border-color: rgba(200, 160, 48, 0.18);
         }
 

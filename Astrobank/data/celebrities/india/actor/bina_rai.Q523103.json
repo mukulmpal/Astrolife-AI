@@ -1,0 +1,27 @@
+{
+  "publicId": "76cd8bca",
+  "wikipediaSlug": "Bina_Rai",
+  "wikipediaId": "Q523103",
+  "name": "Bina Rai",
+  "fullName": "Bina Rai",
+  "profileSummary": "Bina Rai, sometimes referred to as Beena Rai, was an Indian actress, primarily of the black and white era of Hindi cinema. She is most known for her roles in classics such as Anarkali (1953), Ghunghat (1960) and Taj Mahal (1963), and won the Filmfare Award for Best Actress for her performance in Ghunghat.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Bina_Rai.png/330px-Bina_Rai.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bina_Rai",
+  "dateOfBirth": "1931-06-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.549722222",
+  "birthCoordinatesLng": "74.343611111",
+  "moonSign": "10",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q523103",
+  "birthPlace": "Lahore",
+  "fetchedAt": "2026-04-07T16:33:57.921Z"
+}

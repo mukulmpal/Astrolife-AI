@@ -1,0 +1,27 @@
+{
+  "publicId": "ab5c52f6",
+  "wikipediaSlug": "Gunjan_Saxena",
+  "wikipediaId": "Q97999879",
+  "name": "Gunjan Saxena",
+  "fullName": "Gunjan Saxena",
+  "profileSummary": "Gunjan Saxena is an Indian Air Force officer and former helicopter pilot. She joined the IAF in 1994 and is a 1999 Kargil War veteran. She is the first woman to fly in a combat zone during the Kargil War. One of her main roles during the Kargil War was to evacuate the wounded from Kargil, transport supplies, and assist in surveillance. She would go on to be part of operations to evacuate over 900 troops, both injured and deceased, from Kargil. In 2004, after serving as a pilot for eight years, her career as a helicopter pilot ended; permanent commissions for women were not available during her time.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gunjan_Saxena",
+  "dateOfBirth": "1975-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.847",
+  "birthCoordinatesLng": "80.947",
+  "moonSign": "4",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "aircraft pilot",
+    "military officer"
+  ],
+  "qid": "Q97999879",
+  "birthPlace": "Lucknow",
+  "fetchedAt": "2026-04-07T16:34:01.199Z"
+}

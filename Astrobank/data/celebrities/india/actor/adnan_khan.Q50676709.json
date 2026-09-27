@@ -1,0 +1,29 @@
+{
+  "publicId": "177b4951",
+  "wikipediaSlug": "Adnan_Khan",
+  "wikipediaId": "Q50676709",
+  "name": "Adnan Khan",
+  "fullName": "Adnan Khan",
+  "profileSummary": "Adnan Khan is an Indian actor who appears in Hindi Films and Hindi TV series and Web series. He is best known for his role as Mawlawi Kabeer Ahmed in Zee TV's drama series Ishq Subhan Allah and Viaan Raghuvanshi in Sony Entertainment Television's Katha Ankahee.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Adnan_khan_in_2023.jpg/330px-Adnan_khan_in_2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Adnan_Khan",
+  "dateOfBirth": "1988-12-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30",
+  "birthCoordinatesLng": "71",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q50676709",
+  "birthPlace": "Pakistan",
+  "fetchedAt": "2026-04-07T12:14:07.582Z"
+}

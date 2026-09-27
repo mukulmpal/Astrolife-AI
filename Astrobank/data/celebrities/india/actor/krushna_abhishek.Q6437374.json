@@ -1,0 +1,29 @@
+{
+  "publicId": "74e8cebf",
+  "wikipediaSlug": "Krushna_Abhishek",
+  "wikipediaId": "Q6437374",
+  "name": "Krushna Abhishek",
+  "fullName": "Krushna Abhishek",
+  "profileSummary": "Abhishek Sharma, known professionally as Krushna Abhishek, is an Indian actor, comedian, and television host. He is known for his humorous work in comedy shows on Indian television such as Comedy Circus, Comedy Nights Bachao, The Kapil Sharma Show, The Great Indian Kapil Show and Laughter Chefs – Unlimited Entertainment. He gained fame as a comedian after participating in several seasons of the Comedy Circus show on Sony TV. He also appeared in dance reality shows, including Nach Baliye 3 (2007) and Jhalak Dikhhla Jaa 4 (2010). His dance moves are inspired by his maternal uncle Govinda.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Krushna_Abhishek_2024.jpg/330px-Krushna_Abhishek_2024.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Krushna_Abhishek",
+  "dateOfBirth": "1983-05-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q6437374",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:51.037Z"
+}

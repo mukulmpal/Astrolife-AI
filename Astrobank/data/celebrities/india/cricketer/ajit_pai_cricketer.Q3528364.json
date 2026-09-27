@@ -1,0 +1,28 @@
+{
+  "publicId": "ba80a59a",
+  "wikipediaSlug": "Ajit_Pai_(cricketer)",
+  "wikipediaId": "Q3528364",
+  "name": "Ajit Pai (cricketer)",
+  "fullName": "Ajit Pai (cricketer)",
+  "profileSummary": "Ajit Manohar Pai is a former Indian cricketer who played in one Test match in 1969.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajit_Pai_(cricketer)",
+  "dateOfBirth": "1945-04-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3528364",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:50:08.567Z"
+}

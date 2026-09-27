@@ -1,0 +1,28 @@
+{
+  "publicId": "9fb2ae80",
+  "wikipediaSlug": "Bidur_Prasad_Sapkota",
+  "wikipediaId": "Q17017465",
+  "name": "Bidur Prasad Sapkota",
+  "fullName": "Bidur Prasad Sapkota",
+  "profileSummary": "Bidur Prasad Sapkota was a Nepalese politician, belonging to the Communist Party of Nepal. In 2013, he won the Kavre–4 seat in the 2nd Nepalese Constituent Assembly with total votes of 16, 754. He died on 20 February 2025, at the age of 59.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bidur_Prasad_Sapkota.jpg/330px-Bidur_Prasad_Sapkota.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bidur_Prasad_Sapkota",
+  "dateOfBirth": "1959-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.616666666",
+  "birthCoordinatesLng": "85.55",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q17017465",
+  "birthPlace": "Kavrepalanchok District",
+  "fetchedAt": "2026-04-07T16:52:52.395Z"
+}

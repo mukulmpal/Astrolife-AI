@@ -1,0 +1,28 @@
+{
+  "publicId": "474d448e",
+  "wikipediaSlug": "Pradeep_Khadka",
+  "wikipediaId": "Q54854343",
+  "name": "Pradeep Khadka",
+  "fullName": "Pradeep Khadka",
+  "profileSummary": "Pradeep Khadka is a Nepalese actor, model, screenwriter, and filmmaker. He is considered one of the prominent actors in the Nepalese film industry.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Holi_Kathamandu_2019_%2848294914922%29.jpg/330px-Holi_Kathamandu_2019_%2848294914922%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Pradeep_Khadka",
+  "dateOfBirth": "1991-03-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.666666666",
+  "birthCoordinatesLng": "85.316666666",
+  "moonSign": "9",
+  "sunSign": "11",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "model",
+    "actor"
+  ],
+  "qid": "Q54854343",
+  "birthPlace": "Lalitpur District",
+  "fetchedAt": "2026-04-07T16:43:23.810Z"
+}

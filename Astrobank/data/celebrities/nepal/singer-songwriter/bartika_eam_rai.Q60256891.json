@@ -1,0 +1,27 @@
+{
+  "publicId": "7891720d",
+  "wikipediaSlug": "Bartika_Eam_Rai",
+  "wikipediaId": "Q60256891",
+  "name": "Bartika Eam Rai",
+  "fullName": "Bartika Eam Rai",
+  "profileSummary": "Bartika Eam Rai is a Nepalese born-American singer-songwriter based in New York City.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bartika_Eam_Rai.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bartika_Eam_Rai",
+  "dateOfBirth": "1991-04-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.6833",
+  "birthCoordinatesLng": "85.3333",
+  "moonSign": "6",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer-songwriter",
+    "poet"
+  ],
+  "qid": "Q60256891",
+  "birthPlace": "Lalitpur",
+  "fetchedAt": "2026-04-07T16:47:19.477Z"
+}

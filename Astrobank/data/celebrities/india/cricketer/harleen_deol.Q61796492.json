@@ -1,0 +1,28 @@
+{
+  "publicId": "3f84b388",
+  "wikipediaSlug": "Harleen_Deol",
+  "wikipediaId": "Q61796492",
+  "name": "Harleen Deol",
+  "fullName": "Harleen Deol",
+  "profileSummary": "Harleen Kaur Deol is an Indian international cricketer. She plays for the Indian women's national team as a right-handed batter who occasionally bowls right-arm leg spin. Deol represents Himachal Pradesh in domestic cricket and UP Warriorz in the Women's Premier League. She was part of the Indian team that won the 2025 Women's Cricket World Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Harleen_Deol_in_2025.jpeg/330px-Harleen_Deol_in_2025.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Harleen_Deol",
+  "dateOfBirth": "1998-06-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.736388888",
+  "birthCoordinatesLng": "76.788333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q61796492",
+  "birthPlace": "Chandigarh",
+  "fetchedAt": "2026-04-07T11:03:11.696Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "256e61e1",
+  "wikipediaSlug": "Mamata_Kanojia",
+  "wikipediaId": "Q6745465",
+  "name": "Mamata Kanojia",
+  "fullName": "Mamata Kanojia",
+  "profileSummary": "Mamata Kanojia is an Indian former cricketer who has played for the India national women's cricket team. She has played seven One Day Internationals and four Twenty20 Internationals. She comes from Hyderabad.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mamata_Kanojia",
+  "dateOfBirth": "1984-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6745465",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T11:03:28.113Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "2c2c18fc",
+  "wikipediaSlug": "Ajay_Ratra",
+  "wikipediaId": "Q3528551",
+  "name": "Ajay Ratra",
+  "fullName": "Ajay Ratra",
+  "profileSummary": "Ajay Ratra is a former Indian cricketer. He is a right-handed batsman and wicketkeeper. He made his ODI debut on 19 Jan 2002 against England. He is appointed by the BCCI as the National Selector of the Indian Men's Cricket team in September 2024.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajay_Ratra",
+  "dateOfBirth": "1981-12-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.41124",
+  "birthCoordinatesLng": "77.31316",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3528551",
+  "birthPlace": "Faridabad",
+  "fetchedAt": "2026-04-07T10:56:18.730Z"
+}

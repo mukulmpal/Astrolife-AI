@@ -1,0 +1,27 @@
+{
+  "publicId": "002bc141",
+  "wikipediaSlug": "Khagendra_Lamichhane",
+  "wikipediaId": "Q25620685",
+  "name": "Khagendra Lamichhane",
+  "fullName": "Khagendra Lamichhane",
+  "profileSummary": "Khagendra Lamichhane is a Nepalese theater actor, writer, and director. He is best known for his work in movies such as Talakjung vs Tulke and Pashupati Prasad. He entered the acting field in 1999. He has directed five plays, mostly staged at national and international theatre festivals. As a writer, he has published three books.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Khagendra_Lamichhane.jpg/330px-Khagendra_Lamichhane.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Khagendra_Lamichhane",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.09944444",
+  "birthCoordinatesLng": "83.87166667",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "screenwriter"
+  ],
+  "qid": "Q25620685",
+  "birthPlace": "Putalibazar",
+  "fetchedAt": "2026-04-07T16:43:26.136Z"
+}

@@ -18,16 +18,16 @@ function PsychRadar({ vals, colors }: { vals: number[]; colors: string[] }) {
   }));
   return (
     <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{maxWidth:200,display:"block",margin:"0 auto"}}>
-      <rect width={S} height={S} fill="#08051a" rx="8"/>
+      <rect width={S} height={S} fill="#FAF7F2" rx="8"/>
       {[.25,.5,.75,1].map(f=>(
-        <polygon key={f} fill="none" stroke="#1c1840" strokeWidth="0.5"
+        <polygon key={f} fill="none" stroke="#FFFFFF" strokeWidth="0.5"
           points={Array.from({length:n},(_,i)=>`${cx+R*f*Math.cos(i/n*2*Math.PI-Math.PI/2)},${cy+R*f*Math.sin(i/n*2*Math.PI-Math.PI/2)}`).join(" ")}/>
       ))}
       {Array.from({length:n},(_,i)=>(
         <line key={i} x1={cx} y1={cy}
           x2={cx+R*Math.cos(i/n*2*Math.PI-Math.PI/2)}
           y2={cy+R*Math.sin(i/n*2*Math.PI-Math.PI/2)}
-          stroke="#1c1840" strokeWidth="0.5"/>
+          stroke="#FFFFFF" strokeWidth="0.5"/>
       ))}
       <polygon fill="rgba(236,72,153,0.15)" stroke="#ec4899" strokeWidth="1.5"
         points={pts.map(p=>`${p.x},${p.y}`).join(" ")}/>
@@ -83,8 +83,8 @@ export default function PsychPage() {
         <div className="header-orb"/>
         <div style={{position:"relative",zIndex:1}}>
           <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#ec4899",marginBottom:6}}>🧠 Psychology Analysis</div>
-          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{birth.name}</div>
-          <div style={{fontSize:13,color:"#605890",marginTop:4}}>
+          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#1A1A1A"}}>{birth.name}</div>
+          <div style={{fontSize:13,color:"#6B635B",marginTop:4}}>
             {new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city}
           </div>
         </div>
@@ -114,11 +114,11 @@ export default function PsychPage() {
               <PsychRadar vals={P.radarVals} colors={radarColors}/>
               <div style={{flex:1,minWidth:200}}>
                 <div style={{fontSize:10,letterSpacing:"2px",textTransform:"uppercase",color:"#ec4899",marginBottom:8}}>Dominant Pattern</div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:28,fontWeight:600,color:"#f0e8d0",marginBottom:10}}>{P.name}</div>
-                <div style={{fontSize:13,color:"#c8c0a8",lineHeight:1.85,marginBottom:14}}>{P.desc}</div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:28,fontWeight:600,color:"#1A1A1A",marginBottom:10}}>{P.name}</div>
+                <div style={{fontSize:13,color:"#4A4238",lineHeight:1.85,marginBottom:14}}>{P.desc}</div>
                 <div style={{padding:"10px 14px",background:"rgba(167,139,250,0.06)",border:"1px solid rgba(167,139,250,0.2)",borderRadius:10}}>
                   <div style={{fontSize:10,color:"#a78bfa",fontWeight:600,letterSpacing:"1px",textTransform:"uppercase",marginBottom:4}}>Shadow Work</div>
-                  <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7}}>{P.shadow}</div>
+                  <div style={{fontSize:12,color:"#4A4238",lineHeight:1.7}}>{P.shadow}</div>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function PsychPage() {
               <div className="card-tag">✦ Dominant Functions</div>
               <div className="card-title serif">Use These Strengths</div>
               {(result.dominantFunctions.length ? result.dominantFunctions : ["No single function dominates; build one stable habit first."]).map((line,i)=>(
-                <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.dominantFunctions.length-1?"none":"1px solid #1c1840"}}>
+                <div key={i} style={{fontSize:12,color:"#4A4238",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.dominantFunctions.length-1?"none":"1px solid #FFFFFF"}}>
                   {line}
                 </div>
               ))}
@@ -151,10 +151,10 @@ export default function PsychPage() {
               <div className="card-tag">✦ Risk Flags</div>
               <div className="card-title serif">Watch Before Reacting</div>
               {(result.riskFlags.length ? result.riskFlags : [{title:"No major psychological risk flag",detail:"Current profile is workable with ordinary self-awareness.",severity:"low" as const}]).map(flag=>(
-                <div key={flag.title} style={{padding:"7px 0",borderBottom:"1px solid #1c1840"}}>
+                <div key={flag.title} style={{padding:"7px 0",borderBottom:"1px solid #FFFFFF"}}>
                   <span className={`badge ${flag.severity==="high"?"badge-red":flag.severity==="medium"?"badge-gold":"badge-green"}`}>{flag.severity}</span>
-                  <div style={{fontSize:12,fontWeight:600,color:"#f0e8d0",marginTop:6}}>{flag.title}</div>
-                  <div style={{fontSize:11,color:"#605890",lineHeight:1.6}}>{flag.detail}</div>
+                  <div style={{fontSize:12,fontWeight:600,color:"#1A1A1A",marginTop:6}}>{flag.title}</div>
+                  <div style={{fontSize:11,color:"#6B635B",lineHeight:1.6}}>{flag.detail}</div>
                 </div>
               ))}
             </div>
@@ -165,11 +165,11 @@ export default function PsychPage() {
             <div className="card-tag">✦ Psychological Strength Overview</div>
             <div className="card-title serif">All 9 Functions</div>
             {result.planets.map(p=>(
-              <div key={p.planet} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid #1c1840"}}>
+              <div key={p.planet} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid #FFFFFF"}}>
                 <span style={{fontSize:18,width:24,color:p.color}}>{p.icon}</span>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:12,fontWeight:500,color:"#c8c0a8"}}>{p.planet} — {p.func}</div>
-                  <div style={{fontSize:10,color:"#605890"}}>{p.trait}</div>
+                  <div style={{fontSize:12,fontWeight:500,color:"#4A4238"}}>{p.planet} — {p.func}</div>
+                  <div style={{fontSize:10,color:"#6B635B"}}>{p.trait}</div>
                 </div>
                 <div style={{width:80}}>
                   <div className="bar-track">
@@ -190,13 +190,13 @@ export default function PsychPage() {
         <div className="grid-auto">
           {result.planets.map(p=>(
             <div key={p.planet} className="card"
-              style={{cursor:"pointer",borderColor:expanded===p.planet?"rgba(236,72,153,0.35)":"#1c1840"}}
+              style={{cursor:"pointer",borderColor:expanded===p.planet?"rgba(236,72,153,0.35)":"#FFFFFF"}}
               onClick={()=>setExpanded(expanded===p.planet?null:p.planet)}>
               <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:10}}>
                 <div style={{display:"flex",alignItems:"center",gap:10}}>
                   <span style={{fontSize:22,color:p.color}}>{p.icon}</span>
                   <div>
-                    <div style={{fontSize:14,fontWeight:600,color:"#f0e8d0"}}>{p.planet}</div>
+                    <div style={{fontSize:14,fontWeight:600,color:"#1A1A1A"}}>{p.planet}</div>
                     <div style={{fontSize:10,color:"#ec4899",marginTop:2}}>{p.func}</div>
                   </div>
                 </div>
@@ -207,15 +207,15 @@ export default function PsychPage() {
               <div className="bar-track" style={{marginBottom:10}}>
                 <div className="bar-fill" style={{width:`${p.strength}%`,background:p.statusColor}}/>
               </div>
-              <div style={{fontSize:11,color:"#605890",marginBottom:8}}>{p.trait} · H{p.house} {p.sign}{p.retrograde?" · (R)":""}</div>
-              <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7}}>
+              <div style={{fontSize:11,color:"#6B635B",marginBottom:8}}>{p.trait} · H{p.house} {p.sign}{p.retrograde?" · (R)":""}</div>
+              <div style={{fontSize:12,color:"#4A4238",lineHeight:1.7}}>
                 {p.status==="Strong"?p.strong:p.status==="Weak/Blocked"?p.weak:p.cog}
               </div>
               {expanded===p.planet && (
-                <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid #1c1840"}}>
+                <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid #FFFFFF"}}>
                   <div style={{fontSize:11,color:"#22c55e",marginBottom:6}}>✦ Strength: {p.strong}</div>
                   <div style={{fontSize:11,color:"#ef4444",marginBottom:6}}>⚠️ Shadow: {p.weak}</div>
-                  <div style={{fontSize:11,color:"#605890"}}>🧠 Function: {p.cog}</div>
+                  <div style={{fontSize:11,color:"#6B635B"}}>🧠 Function: {p.cog}</div>
                 </div>
               )}
             </div>
@@ -231,7 +231,7 @@ export default function PsychPage() {
               <div className="card-tag">✦ Stabilizers</div>
               <div className="card-title serif">Daily Nervous System Support</div>
               {result.stabilizers.map((line,i)=>(
-                <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.stabilizers.length-1?"none":"1px solid #1c1840"}}>
+                <div key={i} style={{fontSize:12,color:"#4A4238",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.stabilizers.length-1?"none":"1px solid #FFFFFF"}}>
                   {line}
                 </div>
               ))}
@@ -240,7 +240,7 @@ export default function PsychPage() {
               <div className="card-tag">✦ Growth Plan</div>
               <div className="card-title serif">Specific Work</div>
               {result.growthPlan.map((line,i)=>(
-                <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.growthPlan.length-1?"none":"1px solid #1c1840"}}>
+                <div key={i} style={{fontSize:12,color:"#4A4238",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.growthPlan.length-1?"none":"1px solid #FFFFFF"}}>
                   {line}
                 </div>
               ))}
@@ -262,14 +262,14 @@ export default function PsychPage() {
               <div key={g.planet} className="card" style={{borderColor:`${g.c}22`}}>
                 <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                   <span style={{fontSize:20,color:g.c}}>{g.icon}</span>
-                  <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:"#f0e8d0"}}>{g.title}</div>
+                  <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:"#1A1A1A"}}>{g.title}</div>
                   {planet && (
                     <span className={`badge ${planet.status==="Strong"?"badge-green":planet.status==="Weak/Blocked"?"badge-red":"badge-gold"}`} style={{marginLeft:"auto"}}>
                       {planet.strength}%
                     </span>
                   )}
                 </div>
-                <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75}}>{g.desc}</div>
+                <div style={{fontSize:12,color:"#4A4238",lineHeight:1.75}}>{g.desc}</div>
               </div>
             );
           })}

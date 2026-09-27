@@ -1,0 +1,26 @@
+{
+  "publicId": "657dcff8",
+  "wikipediaSlug": "Ahir_Shah",
+  "wikipediaId": "Q42290619",
+  "name": "Ahir Shah",
+  "fullName": "Ahir Shah",
+  "profileSummary": "Ahir Shah is a British comedian. He was nominated for the Edinburgh Comedy Award at the Edinburgh Festival Fringe in 2017 and 2018, and won the award in 2023. Before that he was a finalist in the 2008 So You Think You're Funny? competition for new acts. Shah has been called \"one of his generation's most eloquent comic voices\".",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ahir_Shah_at_the_2025_Edinburgh_Festival_Fringe-6_%28cropped%29.jpg/330px-Ahir_Shah_at_the_2025_Edinburgh_Festival_Fringe-6_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ahir_Shah",
+  "dateOfBirth": "1990-12-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.507222222",
+  "birthCoordinatesLng": "-0.1275",
+  "moonSign": "1",
+  "sunSign": "9",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "comedian"
+  ],
+  "qid": "Q42290619",
+  "birthPlace": "London",
+  "fetchedAt": "2026-04-08T00:22:02.148Z"
+}

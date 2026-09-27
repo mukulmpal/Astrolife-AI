@@ -1,0 +1,28 @@
+{
+  "publicId": "fd07ffd2",
+  "wikipediaSlug": "Bharat_Bhushan",
+  "wikipediaId": "Q4901101",
+  "name": "Bharat Bhushan",
+  "fullName": "Bharat Bhushan",
+  "profileSummary": "Bharatbhushan Gupta, better known as Bharat Bhushan was an Indian actor in Hindi language films, scriptwriter and producer. He was born in Meerut, and brought up in Aligarh, Uttar Pradesh.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Bharat_Bhushan.jpg/330px-Bharat_Bhushan.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bharat_Bhushan",
+  "dateOfBirth": "1920-06-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.98",
+  "birthCoordinatesLng": "77.706388888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q4901101",
+  "birthPlace": "Meerut",
+  "fetchedAt": "2026-04-07T15:59:54.161Z"
+}

@@ -1,0 +1,29 @@
+{
+  "publicId": "1cbb96b7",
+  "wikipediaSlug": "Anupam_Kher",
+  "wikipediaId": "Q560163",
+  "name": "Anupam Kher",
+  "fullName": "Anupam Kher",
+  "profileSummary": "Anupam Kher is an Indian actor, director and producer who works primarily in Hindi cinema. In a career spanning over four decades, he has acted in more than 540 films. A veteran of Indian cinema, Kher is recipient of two National Film Awards and eight Filmfare Awards for his acting performances. Government of India awarded him the Padma Shri in 2004 and the Padma Bhushan in 2016 for his contribution to Indian cinema and arts.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Anupam_Kher_at_56th_IFFI.jpg/330px-Anupam_Kher_at_56th_IFFI.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anupam_Kher",
+  "dateOfBirth": "1955-03-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.103333333",
+  "birthCoordinatesLng": "77.172222222",
+  "moonSign": "5",
+  "sunSign": "11",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film producer",
+    "film director",
+    "stage actor"
+  ],
+  "qid": "Q560163",
+  "birthPlace": "Shimla",
+  "fetchedAt": "2026-04-07T16:25:28.413Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "0aed1ac3",
+  "wikipediaSlug": "Sudha_Bhuchar",
+  "wikipediaId": "Q28341349",
+  "name": "Sudha Bhuchar",
+  "fullName": "Sudha Bhuchar",
+  "profileSummary": "Sudha Bhuchar is a Tanzanian-born British Asian actor, playwright, and co-founder of the Tamasha Theatre Company. She is best known for Tamasha's Balti Kings (1999), A Fine Balance (2005), The Trouble with Asian Men (2005), and My Name Is... (2014) as well as numerous screenplays for television and film. Bhuchar's playwriting and producing work focuses on the stories of British Asians with the goal of attracting culturally and ethnically diverse audiences. She has been called \"one of Britain's most successful artistic theatre directors and well-established actors\" by Asian Culture Vulture online magazine.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sudha_Bhuchar",
+  "dateOfBirth": "1960-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-5.066666666",
+  "birthCoordinatesLng": "39.1",
+  "moonSign": "10",
+  "sunSign": "9",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "screenwriter",
+    "playwright"
+  ],
+  "qid": "Q28341349",
+  "birthPlace": "Tanga",
+  "fetchedAt": "2026-04-08T02:08:18.296Z"
+}

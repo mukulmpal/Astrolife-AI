@@ -1,0 +1,29 @@
+{
+  "publicId": "0b81005d",
+  "wikipediaSlug": "Om_Puri",
+  "wikipediaId": "Q80309",
+  "name": "Om Puri",
+  "fullName": "Om Puri",
+  "profileSummary": "Om Prakash Puri was an Indian actor who appeared in mainstream commercial Hindi films as well as English, Punjabi, Kannada, Telugu, Malayalam, Bengali, Gujarati, Urdu, and Marathi films, as well as independent and art films and also starred in several international cinema. He is widely regarded as one of the finest actors in world cinema. He won two National Film Awards for Best Actor, two Filmfare Awards and India's fourth highest civilian award Padma Shri in 1990. In 2004, he was made an honorary Officer of the Order of the British Empire.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/OmPuriSept10TIFF.jpg/330px-OmPuriSept10TIFF.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Om_Puri",
+  "dateOfBirth": "1949-10-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.378611111",
+  "birthCoordinatesLng": "76.7725",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "television actor"
+  ],
+  "qid": "Q80309",
+  "birthPlace": "Ambala",
+  "fetchedAt": "2026-04-07T11:29:48.924Z"
+}

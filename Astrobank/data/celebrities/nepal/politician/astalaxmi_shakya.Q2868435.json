@@ -1,0 +1,28 @@
+{
+  "publicId": "124275f1",
+  "wikipediaSlug": "Astalaxmi_Shakya",
+  "wikipediaId": "Q2868435",
+  "name": "Astalaxmi Shakya",
+  "fullName": "Astalaxmi Shakya",
+  "profileSummary": "Astalaxmi Shakya is a Nepalese politician and former Chief Minister of Bagmati Province. She is first woman chief minister of Nepal. Governor Bishnu Prasad Prasain appointed Shakya as the chief minister as per Article 168 (1) of the Constitution of Nepal after she was unanimously elected parliamentary party leader of the CPN (UML) on 18 August 2021, following the resignation of outgoing chief minister Dormani Poudel, as both the parliamentary party leader and chief minister. On 9 March 2023 she was chosen as a candidate in the 2023 Nepalese vice presidential election from Communist Party of Nepal (UML).",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Astalaxmi_Shakya",
+  "dateOfBirth": "1953-10-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q2868435",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:52:46.823Z"
+}

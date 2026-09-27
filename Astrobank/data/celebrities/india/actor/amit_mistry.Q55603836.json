@@ -1,0 +1,28 @@
+{
+  "publicId": "7599c4cb",
+  "wikipediaSlug": "Amit_Mistry",
+  "wikipediaId": "Q55603836",
+  "name": "Amit Mistry",
+  "fullName": "Amit Mistry",
+  "profileSummary": "Amit Mistry was an Indian actor drama, film and television actor. He had appeared in a number of tele serials, drama as well as films. He is mostly known for his appearance in Tenali rama, A Gentleman and Saat Phero Ki Hera Pherie.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amit_Mistry",
+  "dateOfBirth": "1974-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "12",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor",
+    "stage actor"
+  ],
+  "qid": "Q55603836",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:25:05.625Z"
+}

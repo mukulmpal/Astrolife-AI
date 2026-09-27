@@ -1,0 +1,27 @@
+{
+  "publicId": "acd30c5a",
+  "wikipediaSlug": "Robert_Herjavec",
+  "wikipediaId": "Q324370",
+  "name": "Robert Herjavec",
+  "fullName": "Robert Herjavec",
+  "profileSummary": "Robert Herjavec is a Canadian businessman, investor, and television personality.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/RobertHerjavec2023.jpg/330px-RobertHerjavec2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Robert_Herjavec",
+  "dateOfBirth": "1963-09-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "46.308055555",
+  "birthCoordinatesLng": "16.337777777",
+  "moonSign": "4",
+  "sunSign": "5",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film producer",
+    "businessperson"
+  ],
+  "qid": "Q324370",
+  "birthPlace": "Varaždin",
+  "fetchedAt": "2026-04-07T16:36:23.398Z"
+}

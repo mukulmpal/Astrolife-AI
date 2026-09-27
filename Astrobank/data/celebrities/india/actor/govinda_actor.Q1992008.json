@@ -1,0 +1,31 @@
+{
+  "publicId": "40b13643",
+  "wikipediaSlug": "Govinda_(actor)",
+  "wikipediaId": "Q1992008",
+  "name": "Govinda (actor)",
+  "fullName": "Govinda (actor)",
+  "profileSummary": "Govinda Arun Ahuja, is an Indian actor-turned-politician, who has appeared in more than 120 Hindi-language films. A leading actor throughout 1990s, Govinda is known for his slapstick performances and dancing skills. He has received 12 Filmfare Award nominations and won two Filmfare Special Awards and one Filmfare Award for Best Comedian.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Govinda_still11.jpg/330px-Govinda_still11.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Govinda_(actor)",
+  "dateOfBirth": "1963-12-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "politician",
+    "screenwriter",
+    "film producer"
+  ],
+  "qid": "Q1992008",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T11:29:34.339Z"
+}

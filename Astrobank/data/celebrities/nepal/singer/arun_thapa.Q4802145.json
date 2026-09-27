@@ -1,0 +1,26 @@
+{
+  "publicId": "cbfc1f9e",
+  "wikipediaSlug": "Arun_Thapa",
+  "wikipediaId": "Q4802145",
+  "name": "Arun Thapa",
+  "fullName": "Arun Thapa",
+  "profileSummary": "Arun Thapa Magar was a Nepali singer and songwriter. In 2003, according to an international poll conducted by BBC, more than half-a million people from 165 countries voted his composition Reetu haruma timi hariyali basant , his most famous romantic song, as the seventh in the world's top 10 most popular songs of all time.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Arun_Thapa.png/330px-Arun_Thapa.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arun_Thapa",
+  "dateOfBirth": "1952-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q4802145",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T16:47:05.664Z"
+}

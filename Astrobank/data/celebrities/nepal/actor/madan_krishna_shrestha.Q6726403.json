@@ -1,0 +1,27 @@
+{
+  "publicId": "d9b9c454",
+  "wikipediaSlug": "Madan_Krishna_Shrestha",
+  "wikipediaId": "Q6726403",
+  "name": "Madan Krishna Shrestha",
+  "fullName": "Madan Krishna Shrestha",
+  "profileSummary": "Madan Krishna Shrestha is a Nepali actor, comedian, writer, singer, song writer, composer, director and producer. He is one of the most successful and respected comedians in the Nepali entertainment industry and was the most popular stage performer of his time.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Madan_Krishna_Shrestha.png/330px-Madan_Krishna_Shrestha.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Madan_Krishna_Shrestha",
+  "dateOfBirth": "1950-04-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "1",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director"
+  ],
+  "qid": "Q6726403",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:45.624Z"
+}

@@ -1,0 +1,29 @@
+{
+  "publicId": "7a290940",
+  "wikipediaSlug": "Nargis",
+  "wikipediaId": "Q159169",
+  "name": "Nargis",
+  "fullName": "Nargis",
+  "profileSummary": "Nargis Dutt, known mononymously as Nargis, was an Indian actress and politician who worked in Hindi cinema. Regarded as one of the greatest actresses in the history of Hindi cinema, Nargis often portrayed sophisticated and independent women in a range of genres, from screwball comedy to literary drama. She was among the highest paid actresses of the 1950s and 1960s.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Nargis%2C_Best_Actress_for_Raat_Aur_Din.jpg/330px-Nargis%2C_Best_Actress_for_Raat_Aur_Din.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nargis",
+  "dateOfBirth": "1929-06-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": "11",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "screenwriter",
+    "politician",
+    "actor"
+  ],
+  "qid": "Q159169",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T16:34:34.656Z"
+}

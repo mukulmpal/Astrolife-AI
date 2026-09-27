@@ -56,6 +56,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "KP", href: "/dashboard/kp", Icon: Target },
       { label: "Prashna", href: "/dashboard/prashna", Icon: HelpCircle },
       { label: "Panchang", href: "/dashboard/panchang", Icon: Calendar },
+      { label: "Muhurat", href: "/dashboard/muhurat", Icon: Sparkles },
       { label: "Transit Purchase", href: "/dashboard/transit-purchase", Icon: ShoppingBag },
     ],
   },
@@ -105,7 +106,8 @@ export function DashboardSidebar() {
     const checkStatus = async () => {
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user ?? null;
         if (user) {
           const { isEliteEmail, isAdminUser } = await import("@/lib/access");
           if (isAdminUser(user.email)) {

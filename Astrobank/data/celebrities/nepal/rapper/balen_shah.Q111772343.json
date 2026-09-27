@@ -1,0 +1,30 @@
+{
+  "publicId": "f20514a1",
+  "wikipediaSlug": "Balen_Shah",
+  "wikipediaId": "Q111772343",
+  "name": "Balen Shah",
+  "fullName": "Balen Shah",
+  "profileSummary": "Balendra Shah, popularly known as Balen, is a Nepalese politician, structural engineer, and rapper who is the prime minister of Nepal since 2026. He assumed the office following his party's landslide victory in the 2026 Nepalese general election. At age 35, he is the world's youngest serving state leader. He previously served as the 15th mayor of Kathmandu from 2022 to 2026, the first independent candidate to hold the office.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/The_official_portrait_of_Balendra_Shah%2C_the_Prime_Minister_of_Federal_Democratic_Republic_of_Nepal.png/330px-The_official_portrait_of_Balendra_Shah%2C_the_Prime_Minister_of_Federal_Democratic_Republic_of_Nepal.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Balen_Shah",
+  "dateOfBirth": "1990-04-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "rapper",
+    "politician",
+    "structural engineer"
+  ],
+  "qid": "Q111772343",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:54:57.547Z"
+}

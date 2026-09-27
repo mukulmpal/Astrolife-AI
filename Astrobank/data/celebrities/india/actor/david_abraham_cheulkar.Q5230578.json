@@ -1,0 +1,30 @@
+{
+  "publicId": "ed246c2c",
+  "wikipediaSlug": "David_Abraham_Cheulkar",
+  "wikipediaId": "Q5230578",
+  "name": "David Abraham Cheulkar",
+  "fullName": "David Abraham Cheulkar",
+  "profileSummary": "David Abraham Cheulkar, popularly known as David, was an Indian Hindi film actor. In a career spanning four decades, he played mostly character roles, starting with the 1941 film Naya Sansar, and went on to act in over 110 films, including memorable films such as Gol Maal (1979), Baton Baton Mein (1979) and Boot Polish (1954), for which he was awarded the 1955 Filmfare Best Supporting Actor Award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cb/David_Abraham_Cheulkar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/David_Abraham_Cheulkar",
+  "dateOfBirth": "1909-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.18",
+  "birthCoordinatesLng": "72.963333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "assistant director",
+    "film actor"
+  ],
+  "qid": "Q5230578",
+  "birthPlace": "Thane",
+  "fetchedAt": "2026-04-07T12:17:26.304Z"
+}

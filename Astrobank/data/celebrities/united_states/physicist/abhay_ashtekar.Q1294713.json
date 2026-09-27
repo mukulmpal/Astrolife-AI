@@ -1,0 +1,27 @@
+{
+  "publicId": "d801ca1d",
+  "wikipediaSlug": "Abhay_Ashtekar",
+  "wikipediaId": "Q1294713",
+  "name": "Abhay Ashtekar",
+  "fullName": "Abhay Ashtekar",
+  "profileSummary": "Abhay Ashtekar is an Indian American theoretical physicist known for his work on general relativity, quantum gravity, and cosmology. He is Atherton Professor, Evan Pugh University Professor, and the Eberly Chair in Physics Emeritus at Pennsylvania State University. He also holds Distinguished Visiting Chair appointments at the Perimeter Institute for Theoretical Physics in Canada and the Raman Research Institute in India.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhay_Ashtekar",
+  "dateOfBirth": "1949-07-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.7",
+  "birthCoordinatesLng": "74.233333333",
+  "moonSign": "7",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "physicist",
+    "university teacher"
+  ],
+  "qid": "Q1294713",
+  "birthPlace": "Kolhapur",
+  "fetchedAt": "2026-04-08T00:00:27.472Z"
+}

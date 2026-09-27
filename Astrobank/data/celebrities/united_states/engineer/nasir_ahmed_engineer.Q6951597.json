@@ -1,0 +1,26 @@
+{
+  "publicId": "03216ecf",
+  "wikipediaSlug": "Nasir_Ahmed_(engineer)",
+  "wikipediaId": "Q6951597",
+  "name": "Nasir Ahmed (engineer)",
+  "fullName": "Nasir Ahmed (engineer)",
+  "profileSummary": "Nasir Ahmed is an American electrical engineer and computer scientist. He is Professor Emeritus of Electrical and Computer Engineering at University of New Mexico (UNM). He is best known for inventing the discrete cosine transform (DCT) in the early 1970s. The DCT is the most widely used data compression transformation, the basis for most digital media standards and commonly used in digital signal processing. He also described the discrete sine transform (DST), which is related to the DCT.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Nasir_Ahmed.png/330px-Nasir_Ahmed.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nasir_Ahmed_(engineer)",
+  "dateOfBirth": "1940-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "engineer"
+  ],
+  "qid": "Q6951597",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-08T01:18:28.154Z"
+}

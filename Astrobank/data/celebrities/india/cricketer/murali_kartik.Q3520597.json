@@ -1,0 +1,28 @@
+{
+  "publicId": "ffc5a6d7",
+  "wikipediaSlug": "Murali_Kartik",
+  "wikipediaId": "Q3520597",
+  "name": "Murali Kartik",
+  "fullName": "Murali Kartik",
+  "profileSummary": "Murali Kartik is an Indian cricket commentator and former cricketer who sporadically represented the national team from 2000 to 2007. He was a slow left-arm orthodox bowler. He was not selected for international matches during his prime years due to the presence of Anil Kumble and Harbhajan Singh in the Indian squad. A left-handed batsman who had some success with the bat at first-class level with 21 half-centuries, Murli was not able to repeat such performances at international level.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Murali_kartik_bowling.jpg/330px-Murali_kartik_bowling.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Murali_Kartik",
+  "dateOfBirth": "1976-09-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3520597",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T10:58:13.694Z"
+}

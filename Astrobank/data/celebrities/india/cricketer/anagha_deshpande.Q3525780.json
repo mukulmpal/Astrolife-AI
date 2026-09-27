@@ -1,0 +1,28 @@
+{
+  "publicId": "4de55019",
+  "wikipediaSlug": "Anagha_Deshpande",
+  "wikipediaId": "Q3525780",
+  "name": "Anagha Deshpande",
+  "fullName": "Anagha Deshpande",
+  "profileSummary": "Anagha Deshpande is a cricketer who has played in 20 women's One Day Internationals and seven Twenty20 internationals for India. She has played for India Blue Women, India Under-21s Women, and India Women cricket teams. She was born at Solapur in Maharashtra.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anagha_Deshpande",
+  "dateOfBirth": "1985-11-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.670277777",
+  "birthCoordinatesLng": "75.901111111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3525780",
+  "birthPlace": "Solapur",
+  "fetchedAt": "2026-04-07T11:02:46.248Z"
+}

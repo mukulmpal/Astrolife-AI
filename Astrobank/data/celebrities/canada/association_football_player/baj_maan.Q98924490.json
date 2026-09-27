@@ -1,0 +1,26 @@
+{
+  "publicId": "68a08b23",
+  "wikipediaSlug": "Baj_Maan",
+  "wikipediaId": "Q98924490",
+  "name": "Baj Maan",
+  "fullName": "Baj Maan",
+  "profileSummary": "Baj Maan is a Canadian professional soccer player who plays as a goalkeeper.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Baj_Maan%2C_goalkeeper%2C_Forge_FC.jpg/330px-Baj_Maan%2C_goalkeeper%2C_Forge_FC.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Baj_Maan",
+  "dateOfBirth": "2000-07-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "43.683333333",
+  "birthCoordinatesLng": "-79.766666666",
+  "moonSign": "8",
+  "sunSign": "3",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "association football player"
+  ],
+  "qid": "Q98924490",
+  "birthPlace": "Brampton",
+  "fetchedAt": "2026-04-08T00:52:22.241Z"
+}

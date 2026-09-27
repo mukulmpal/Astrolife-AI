@@ -1,0 +1,26 @@
+{
+  "publicId": "672fd341",
+  "wikipediaSlug": "Priya_Sigdel",
+  "wikipediaId": "Q51756966",
+  "name": "Priya Sigdel",
+  "fullName": "Priya Sigdel",
+  "profileSummary": "Priya Sigdel is a Nepali activist and beauty pageant titleholder who won the title of Miss Nepal Earth 2018.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Priya_Sigdel",
+  "dateOfBirth": "1995-12-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "3",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model"
+  ],
+  "qid": "Q51756966",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:45:28.398Z"
+}

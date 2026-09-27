@@ -127,7 +127,7 @@ export function MobileBottomNav() {
             border-radius: 0;
             background:
               radial-gradient(circle at 80% -10%, color-mix(in srgb, var(--app-gold, #c8a030) 12%, transparent), transparent 34%),
-              var(--app-bg, #060410);
+              var(--app-bg, #FAF7F2);
             box-shadow: none;
             transform: translateY(20px);
             opacity: 0;
@@ -148,7 +148,7 @@ export function MobileBottomNav() {
             justify-content: space-between;
             gap: 12px;
             padding: 4px 2px 16px;
-            border-bottom: 1px solid color-mix(in srgb, var(--app-gold, #c8a030) 18%, var(--app-border, #1c1840));
+            border-bottom: 1px solid color-mix(in srgb, var(--app-gold, #c8a030) 18%, var(--app-border, #FFFFFF));
           }
 
           .mobile-more-kicker {
@@ -162,7 +162,7 @@ export function MobileBottomNav() {
             margin-top: 4px;
             font-size: 24px;
             font-weight: 700;
-            color: var(--app-fg, #f0e8d0);
+            color: var(--app-fg, #1A1A1A);
             line-height: 1.1;
             font-family: "Cormorant Garamond", Georgia, serif;
           }
@@ -171,9 +171,9 @@ export function MobileBottomNav() {
             width: 42px;
             height: 42px;
             border-radius: 10px;
-            border: 1px solid var(--app-border, #1c1840);
-            background: var(--app-card-alt, #0a0720);
-            color: var(--app-fg, #f0e8d0);
+            border: 1px solid var(--app-border, #FFFFFF);
+            background: var(--app-card-alt, #FAF7F2);
+            color: var(--app-fg, #1A1A1A);
             font-size: 14px;
           }
 
@@ -195,10 +195,10 @@ export function MobileBottomNav() {
             gap: 7px;
             min-height: 72px;
             padding: 12px 8px;
-            border: 1px solid var(--app-border, #1c1840);
+            border: 1px solid var(--app-border, #FFFFFF);
             border-radius: 14px;
-            background: var(--app-card-alt, #0a0720);
-            color: var(--app-soft, #c8c0a8);
+            background: var(--app-card-alt, #FAF7F2);
+            color: var(--app-soft, #4A4238);
             text-decoration: none;
             font-size: 12px;
             font-weight: 600;
@@ -209,7 +209,7 @@ export function MobileBottomNav() {
           .mobile-more-item.active {
             color: var(--app-gold, #c8a030);
             border-color: color-mix(in srgb, var(--app-gold, #c8a030) 35%, transparent);
-            background: color-mix(in srgb, var(--app-gold, #c8a030) 12%, var(--app-card-alt, #0a0720));
+            background: color-mix(in srgb, var(--app-gold, #c8a030) 12%, var(--app-card-alt, #FAF7F2));
           }
 
           .mobile-more-icon {
@@ -233,8 +233,8 @@ export function MobileBottomNav() {
             left: 10px;
             right: 10px;
             bottom: 10px;
-            background: color-mix(in srgb, var(--app-card-alt, #0a0720) 96%, transparent);
-            border: 1px solid var(--app-border, #1c1840);
+            background: color-mix(in srgb, var(--app-card-alt, #FAF7F2) 96%, transparent);
+            border: 1px solid var(--app-border, #FFFFFF);
             border-radius: 14px;
             padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
             backdrop-filter: blur(10px);
@@ -246,7 +246,7 @@ export function MobileBottomNav() {
             appearance: none;
             -webkit-appearance: none;
             text-decoration: none;
-            color: var(--app-soft, #605890);
+            color: var(--app-soft, #6B635B);
             display: flex;
             width: 100%;
             height: 46px;

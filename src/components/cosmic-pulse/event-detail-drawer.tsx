@@ -444,7 +444,7 @@ export const EventDetailDrawer: React.FC<EventDetailDrawerProps> = ({
             className="px-4 py-2 rounded-lg font-semibold transition-colors"
             style={{
               background: "var(--app-gold)",
-              color: "var(--al-primary-on, #060410)",
+              color: "var(--al-primary-on, #FAF7F2)",
             }}
           >
             Done

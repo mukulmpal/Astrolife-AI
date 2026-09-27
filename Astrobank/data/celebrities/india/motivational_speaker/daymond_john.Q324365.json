@@ -1,0 +1,29 @@
+{
+  "publicId": "34c578e3",
+  "wikipediaSlug": "Daymond_John",
+  "wikipediaId": "Q324365",
+  "name": "Daymond John",
+  "fullName": "Daymond John",
+  "profileSummary": "Daymond Garfield John is an American businessman, investor, and television personality. He is an investor on the ABC reality television series Shark Tank. He is the founder, president, and chief executive officer of FUBU, and is the founder of The Shark Group.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/DaymondJohn2023b.jpg/330px-DaymondJohn2023b.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Daymond_John",
+  "dateOfBirth": "1969-02-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "40.650833333",
+  "birthCoordinatesLng": "-73.949722222",
+  "moonSign": "2",
+  "sunSign": "11",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "motivational speaker",
+    "businessperson",
+    "television presenter",
+    "fashion designer"
+  ],
+  "qid": "Q324365",
+  "birthPlace": "Brooklyn",
+  "fetchedAt": "2026-04-07T16:36:22.645Z"
+}

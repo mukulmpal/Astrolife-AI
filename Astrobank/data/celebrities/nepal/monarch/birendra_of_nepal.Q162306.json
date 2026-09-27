@@ -1,0 +1,28 @@
+{
+  "publicId": "aa784b89",
+  "wikipediaSlug": "Birendra_of_Nepal",
+  "wikipediaId": "Q162306",
+  "name": "Birendra of Nepal",
+  "fullName": "Birendra of Nepal",
+  "profileSummary": "Birendra Bir Bikram Shah Dev was King of Nepal from 1972 until his assassination in the 2001 Nepalese royal massacre.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Birendra_Bir_Bikram_Shah_c._1967_%28restoration%29.jpg/330px-Birendra_Bir_Bikram_Shah_c._1967_%28restoration%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Birendra_of_Nepal",
+  "dateOfBirth": "1945-12-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "monarch"
+  ],
+  "qid": "Q162306",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:54:56.822Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "3eb7d123",
+  "wikipediaSlug": "Deepa_Marathe",
+  "wikipediaId": "Q5250468",
+  "name": "Deepa Marathe",
+  "fullName": "Deepa Marathe",
+  "profileSummary": "Deepa Madhukar Marathe is an Indian former cricket all-rounder who played domestically for Air India, Railways and internationally for the India women's national team.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepa_Marathe",
+  "dateOfBirth": "1972-11-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.93",
+  "birthCoordinatesLng": "73.9",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5250468",
+  "birthPlace": "Wai",
+  "fetchedAt": "2026-04-07T11:02:57.098Z"
+}

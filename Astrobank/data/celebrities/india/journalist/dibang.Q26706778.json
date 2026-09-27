@@ -1,0 +1,28 @@
+{
+  "publicId": "6c50c6ef",
+  "wikipediaSlug": "Dibang",
+  "wikipediaId": "Q26706778",
+  "name": "Dibang",
+  "fullName": "Dibang",
+  "profileSummary": "Dibang is a senior news anchor former host of daily prime-time show 'Jan Man' and weekly show 'Press Conference' on the Hindi news channel ABP News. A member of debate panels of the channel, he is rated among the best Hindi anchors in the industry today.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dibang",
+  "dateOfBirth": "1901-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.06",
+  "birthCoordinatesLng": "93.37",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist"
+  ],
+  "qid": "Q26706778",
+  "birthPlace": "Arunachal Pradesh",
+  "fetchedAt": "2026-04-07T12:19:07.582Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "c0d36944",
+  "wikipediaSlug": "Adam_Patel,_Baron_Patel_of_Blackburn",
+  "wikipediaId": "Q350603",
+  "name": "Adam Patel, Baron Patel of Blackburn",
+  "fullName": "Adam Patel, Baron Patel of Blackburn",
+  "profileSummary": "Adam Hafejee Patel, Baron Patel of Blackburn was a British businessman and Labour member of the House of Lords.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Lord_Patel_of_Blackburn_2012.jpg/330px-Lord_Patel_of_Blackburn_2012.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Adam_Patel%2C_Baron_Patel_of_Blackburn",
+  "dateOfBirth": "1940-06-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.22",
+  "birthCoordinatesLng": "72.655",
+  "moonSign": "3",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "businessperson"
+  ],
+  "qid": "Q350603",
+  "birthPlace": "Gujarat",
+  "fetchedAt": "2026-04-08T00:22:02.860Z"
+}

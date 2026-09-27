@@ -1,0 +1,315 @@
+{
+  "planets": [
+    {
+      "id": "Sun",
+      "name": "Sun",
+      "rasi": 8,
+      "totalDegree": 228.73069133802346,
+      "rasiDegree": 18.730691338023462,
+      "latitude": -0.00008687484539903866,
+      "distance": 0,
+      "speed": 1.015072858643806,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Moon",
+      "name": "Moon",
+      "rasi": 9,
+      "totalDegree": 254.7648476395292,
+      "rasiDegree": 14.764847639529194,
+      "latitude": -3.911057967613642,
+      "distance": 0,
+      "speed": 12.03834280038948,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Mercury",
+      "name": "Mercury",
+      "rasi": 9,
+      "totalDegree": 240.62557043294623,
+      "rasiDegree": 0.6255704329462333,
+      "latitude": -2.0492282561857307,
+      "distance": 0,
+      "speed": 1.5341653136402196,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Venus",
+      "name": "Venus",
+      "rasi": 8,
+      "totalDegree": 230.60685607227958,
+      "rasiDegree": 20.606856072279584,
+      "latitude": 0.0050365637559870525,
+      "distance": 0,
+      "speed": 1.2578582145583936,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Mars",
+      "name": "Mars",
+      "rasi": 7,
+      "totalDegree": 206.27064624614957,
+      "rasiDegree": 26.270646246149568,
+      "latitude": 0.28617311872037315,
+      "distance": 0,
+      "speed": 0.6860451075142102,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Jupiter",
+      "name": "Jupiter",
+      "rasi": 7,
+      "totalDegree": 192.10506984439735,
+      "rasiDegree": 12.105069844397349,
+      "latitude": 1.0868529290892806,
+      "distance": 0,
+      "speed": 0.19496925867368214,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Saturn",
+      "name": "Saturn",
+      "rasi": 1,
+      "totalDegree": 7.935177876032867,
+      "rasiDegree": 7.935177876032867,
+      "latitude": -2.663049371743421,
+      "distance": 0,
+      "speed": -0.05029103673153121,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Uranus",
+      "name": "Uranus",
+      "rasi": 10,
+      "totalDegree": 270.3882587593023,
+      "rasiDegree": 0.38825875930228904,
+      "latitude": -0.49095254082186346,
+      "distance": 0,
+      "speed": 0.04757598072312069,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Neptune",
+      "name": "Neptune",
+      "rasi": 3,
+      "totalDegree": 88.64060444598556,
+      "rasiDegree": 28.64060444598556,
+      "latitude": -0.6500508694165066,
+      "distance": 0,
+      "speed": -0.020226433044212677,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Pluto",
+      "name": "Pluto",
+      "rasi": 3,
+      "totalDegree": 64.71037610270508,
+      "rasiDegree": 4.710376102705084,
+      "latitude": -6.799970249172272,
+      "distance": 0,
+      "speed": -0.018978720203058647,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Rahu",
+      "name": "Rahu",
+      "rasi": 1,
+      "totalDegree": 26.618459492039165,
+      "rasiDegree": 26.618459492039165,
+      "latitude": 0,
+      "distance": 0,
+      "speed": -0.06406704363613532,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "Ketu",
+      "name": "Ketu",
+      "rasi": 7,
+      "totalDegree": 206.61845949203916,
+      "rasiDegree": 26.618459492039165,
+      "latitude": 0,
+      "distance": 0,
+      "speed": -0.06406704363613532,
+      "houseNumber": 0,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "101",
+      "name": "Asc",
+      "rasi": 10,
+      "totalDegree": 299.6940381888844,
+      "rasiDegree": 29.694038188884406,
+      "latitude": 0,
+      "distance": 0,
+      "speed": 0,
+      "houseNumber": 1,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "200",
+      "name": "Dhuma",
+      "rasi": 0,
+      "totalDegree": 2.064024671323466,
+      "rasiDegree": 2.064024671323466,
+      "houseNumber": 3,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "201",
+      "name": "Vyatipata",
+      "rasi": 11,
+      "totalDegree": 357.93597532867653,
+      "rasiDegree": 27.935975328676534,
+      "houseNumber": 3,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "202",
+      "name": "Parivesha",
+      "rasi": 5,
+      "totalDegree": 177.93597532867648,
+      "rasiDegree": 27.935975328676477,
+      "houseNumber": 9,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "203",
+      "name": "Chapa",
+      "rasi": 6,
+      "totalDegree": 182.06402467132352,
+      "rasiDegree": 2.064024671323523,
+      "houseNumber": 9,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "204",
+      "name": "Upaketu",
+      "rasi": 6,
+      "totalDegree": 198.73069133802352,
+      "rasiDegree": 18.73069133802352,
+      "houseNumber": 10,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    },
+    {
+      "id": "205",
+      "name": "Gulika",
+      "rasi": 0,
+      "totalDegree": 0,
+      "rasiDegree": 0,
+      "houseNumber": 3,
+      "lagnaValues": {
+        "rasi": 10,
+        "rasiDegree": 29.694038188884406,
+        "lagnaDegree": 299.6940381888844
+      }
+    }
+  ],
+  "lagna": {
+    "longitude": 296.23576584713004,
+    "houses": [
+      296.23576584713004,
+      334.504218539105,
+      8.8781543202014,
+      37.24520626991427,
+      62.12763322558181,
+      87.07595412906824,
+      116.23576584713004,
+      154.50421853910495,
+      188.8781543202014,
+      217.24520626991426,
+      242.1276332255818,
+      267.07595412906824
+    ]
+  },
+  "calculatedAt": "2026-04-07T11:04:05.119Z",
+  "metadata": {
+    "dateOfBirth": "1910-12-04",
+    "birthTime": "12:00:00",
+    "lat": 22.296908333,
+    "lng": 70.798363888,
+    "tz": 5.5
+  }
+}

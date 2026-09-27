@@ -1,0 +1,32 @@
+{
+  "publicId": "adf53dc5",
+  "wikipediaSlug": "Ayushmann_Khurrana",
+  "wikipediaId": "Q4831843",
+  "name": "Ayushmann Khurrana",
+  "fullName": "Ayushmann Khurrana",
+  "profileSummary": "Ayushmann Khurrana is an Indian actor and singer who works in Hindi films. Known for his portrayals of ordinary men often battling social norms, he is the recipient of several awards, including a National Film Award and four Filmfare Awards. He has appeared in Forbes India's Celebrity 100 list of 2013 and 2019, and Time named him one of the 100 most influential people in the world in 2020.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ayushmann_Khurrana",
+  "dateOfBirth": "1984-09-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.736388888",
+  "birthCoordinatesLng": "76.788333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "singer",
+    "video jockey",
+    "television presenter",
+    "television actor"
+  ],
+  "qid": "Q4831843",
+  "birthPlace": "Chandigarh",
+  "fetchedAt": "2026-04-07T16:00:03.302Z"
+}

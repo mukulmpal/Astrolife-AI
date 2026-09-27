@@ -1,0 +1,31 @@
+{
+  "publicId": "e232d899",
+  "wikipediaSlug": "Amar_Bose",
+  "wikipediaId": "Q454696",
+  "name": "Amar Bose",
+  "fullName": "Amar Bose",
+  "profileSummary": "Amar Gopal Bose was an American entrepreneur and academic. An electrical engineer and sound engineer, he was a professor at the Massachusetts Institute of Technology for over 45 years. He was also the founder and chairman of Bose Corporation.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f9/Amar_Bose_india_times.jpg/330px-Amar_Bose_india_times.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amar_Bose",
+  "dateOfBirth": "1929-11-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "39.952777777",
+  "birthCoordinatesLng": "-75.163611111",
+  "moonSign": "7",
+  "sunSign": "7",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "audio engineer",
+    "entrepreneur",
+    "teacher",
+    "businessperson",
+    "engineer",
+    "inventor"
+  ],
+  "qid": "Q454696",
+  "birthPlace": "Philadelphia",
+  "fetchedAt": "2026-04-08T00:00:14.620Z"
+}

@@ -1,0 +1,31 @@
+{
+  "publicId": "f3625b0e",
+  "wikipediaSlug": "Ikka_Singh",
+  "wikipediaId": "Q21285560",
+  "name": "Ikka Singh",
+  "fullName": "Ikka Singh",
+  "profileSummary": "Ankit Singh Patyal, better known by his stage names Ikka and Ikka Singh, is an Indian rapper and lyricist.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Ikka_and_Raftaar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ikka_Singh",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "record producer",
+    "rapper",
+    "lyricist"
+  ],
+  "qid": "Q21285560",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T12:14:47.989Z"
+}

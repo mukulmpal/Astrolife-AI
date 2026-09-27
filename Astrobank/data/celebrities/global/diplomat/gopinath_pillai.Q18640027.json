@@ -1,0 +1,27 @@
+{
+  "publicId": "36ca45a4",
+  "wikipediaSlug": "Gopinath_Pillai",
+  "wikipediaId": "Q18640027",
+  "name": "Gopinath Pillai",
+  "fullName": "Gopinath Pillai",
+  "profileSummary": "Gopinath Pillai is a Singaporean diplomat and businessman who served as an ambassador-at-large at the Ministry of Foreign Affairs.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Padmashree_Gopinathan_Pillai.jpg/330px-Padmashree_Gopinathan_Pillai.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gopinath_Pillai",
+  "dateOfBirth": "1937-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "1.3",
+  "birthCoordinatesLng": "103.8",
+  "moonSign": "5",
+  "sunSign": "9",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "diplomat",
+    "businessperson"
+  ],
+  "qid": "Q18640027",
+  "birthPlace": "Singapore",
+  "fetchedAt": "2026-04-08T02:08:40.252Z"
+}

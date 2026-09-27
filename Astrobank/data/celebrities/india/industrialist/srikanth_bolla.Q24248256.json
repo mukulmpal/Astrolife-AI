@@ -1,0 +1,26 @@
+{
+  "publicId": "a1d4b34f",
+  "wikipediaSlug": "Srikanth_Bolla",
+  "wikipediaId": "Q24248256",
+  "name": "Srikanth Bolla",
+  "fullName": "Srikanth Bolla",
+  "profileSummary": "Srikanth Bolla is an Indian industrialist and the founder of Bollant Industries. He was the first visually impaired student in Management Science at the Sloan School of Management of Massachusetts Institute of Technology.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Srikanth_Bolla",
+  "dateOfBirth": "1991-07-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.166666666",
+  "birthCoordinatesLng": "81.133333333",
+  "moonSign": "1",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "industrialist"
+  ],
+  "qid": "Q24248256",
+  "birthPlace": "Machilipatnam",
+  "fetchedAt": "2026-04-07T16:36:33.391Z"
+}

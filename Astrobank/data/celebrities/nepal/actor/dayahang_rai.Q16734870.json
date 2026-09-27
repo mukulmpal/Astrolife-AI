@@ -1,0 +1,29 @@
+{
+  "publicId": "7a416cc9",
+  "wikipediaSlug": "Dayahang_Rai",
+  "wikipediaId": "Q16734870",
+  "name": "Dayahang Rai",
+  "fullName": "Dayahang Rai",
+  "profileSummary": "Dayahang Rai is a Nepalese actor, director, and playwright. He is one of the most popular actor of Nepal. He has starred in over 50 films and is one of the leading contemporary actors of Nepal. He has received various accolades throughout his acting career. Dayahang is a theatrical actor who made the jump to Nepali cinemas.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Dayahang_Rai_at_ITF.jpg/330px-Dayahang_Rai_at_ITF.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dayahang_Rai",
+  "dateOfBirth": "1980-04-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.1725",
+  "birthCoordinatesLng": "87.048055555",
+  "moonSign": "12",
+  "sunSign": "12",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director",
+    "playwright",
+    "television actor"
+  ],
+  "qid": "Q16734870",
+  "birthPlace": "Bhojpur District",
+  "fetchedAt": "2026-04-07T16:43:25.617Z"
+}

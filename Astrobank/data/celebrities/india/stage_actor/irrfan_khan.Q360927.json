@@ -1,0 +1,31 @@
+{
+  "publicId": "6b4708d4",
+  "wikipediaSlug": "Irrfan_Khan",
+  "wikipediaId": "Q360927",
+  "name": "Irrfan Khan",
+  "fullName": "Irrfan Khan",
+  "profileSummary": "Irrfan Khan was an Indian actor who worked in Indian cinema as well as British and American films. Widely regarded as one of the finest actors in world cinema, Khan's career spanned over 30 years and earned him numerous accolades, including a National Film Award, an Asian Film Award, and six Filmfare Awards. In 2011, he was awarded the Padma Shri, India's fourth highest civilian honour. In 2021, he was posthumously awarded the Filmfare Lifetime Achievement Award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Irrfan_Khan_Profile.jpg/330px-Irrfan_Khan_Profile.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Irrfan_Khan",
+  "dateOfBirth": "1967-01-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.166666666",
+  "birthCoordinatesLng": "75.783333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "stage actor",
+    "film actor",
+    "television actor",
+    "actor"
+  ],
+  "qid": "Q360927",
+  "birthPlace": "Tonk",
+  "fetchedAt": "2026-04-07T12:17:35.683Z"
+}

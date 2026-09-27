@@ -1,0 +1,27 @@
+{
+  "publicId": "0d033dfd",
+  "wikipediaSlug": "Jay_Chaudhry",
+  "wikipediaId": "Q69873545",
+  "name": "Jay Chaudhry",
+  "fullName": "Jay Chaudhry",
+  "profileSummary": "Jay Chaudhry is an Indian-American technology entrepreneur and the CEO and founder of cloud security company Zscaler.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Jay_Chaudhry.png/330px-Jay_Chaudhry.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jay_Chaudhry",
+  "dateOfBirth": "1955-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.476111111",
+  "birthCoordinatesLng": "76.270277777",
+  "moonSign": "12",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "business executive",
+    "entrepreneur"
+  ],
+  "qid": "Q69873545",
+  "birthPlace": "Una district",
+  "fetchedAt": "2026-04-08T02:04:00.360Z"
+}

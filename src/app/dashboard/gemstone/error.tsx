@@ -9,14 +9,14 @@ export default function GemstoneError({
   return (
     <main style={{
       minHeight: "100vh",
-      background: "#060410",
+      background: "#FAF7F2",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       gap: 20,
       fontFamily: "system-ui, sans-serif",
-      color: "#c8c0a8",
+      color: "#4A4238",
       padding: 32,
       textAlign: "center",
     }}>
@@ -29,7 +29,7 @@ export default function GemstoneError({
         placeItems: "center",
         fontSize: 24,
       }}>✦</div>
-      <h1 style={{ margin: 0, color: "#f0e8d0", fontSize: 26, fontWeight: 600 }}>
+      <h1 style={{ margin: 0, color: "#1A1A1A", fontSize: 26, fontWeight: 600 }}>
         Gemstone Engine Unavailable
       </h1>
       <p style={{ maxWidth: 480, lineHeight: 1.7, margin: 0, color: "#a09880" }}>

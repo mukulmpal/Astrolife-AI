@@ -56,9 +56,9 @@ export default function AKVPage() {
         <div className="header-orb"/>
         <div style={{position:"relative",zIndex:1,flex:1}}>
           <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#c8a030",marginBottom:6}}>📊 AKV Analysis</div>
-          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{birth.name}</div>
-          <div style={{fontSize:13,color:"#605890",marginTop:4}}>Classical Ashtakavarga · {result.sarvaTotal} total bindus</div>
-          <div style={{fontSize:12,color:"#c8c0a8",marginTop:10,lineHeight:1.8,maxWidth:480}}>{result.lifeSummary}</div>
+          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#1A1A1A"}}>{birth.name}</div>
+          <div style={{fontSize:13,color:"#6B635B",marginTop:4}}>Classical Ashtakavarga · {result.sarvaTotal} total bindus</div>
+          <div style={{fontSize:12,color:"#4A4238",marginTop:10,lineHeight:1.8,maxWidth:480}}>{result.lifeSummary}</div>
         </div>
         <div style={{display:"flex",gap:12,flexWrap:"wrap",position:"relative",zIndex:1}}>
           <div className="hstat">
@@ -89,19 +89,19 @@ export default function AKVPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
           <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 12, padding: 14 }}>
             <div style={{ fontSize: 11, color: "#22c55e", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Push Here</div>
-            <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
               Houses H{result.strongest.map(i => i + 1).join(", H")} have better natural support. Start important actions through these life areas when possible.
             </p>
           </div>
           <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: 14 }}>
             <div style={{ fontSize: 11, color: "#ef4444", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Plan Carefully</div>
-            <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
               Houses H{result.weakest.map(i => i + 1).join(", H")} need better timing, patience and remedies. Avoid expecting effortless results there.
             </p>
           </div>
           <div style={{ background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: 12, padding: 14 }}>
             <div style={{ fontSize: 11, color: "#60a5fa", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>How To Use</div>
-            <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
               Treat Ashtakavarga as a delivery map. High bindu houses deliver transits more smoothly; low bindu houses need preparation before major moves.
             </p>
           </div>
@@ -129,7 +129,7 @@ export default function AKVPage() {
           <div className="card" style={{marginBottom:16}}>
             <div className="card-tag">✦ Your Cosmic Life Map</div>
             <div className="card-title serif">Where Fate Works For You</div>
-            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8,marginBottom:16}}>
+            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.8,marginBottom:16}}>
               Ashtakavarga maps which life areas have the strongest cosmic backing — not just right now, but across your entire lifetime.
               Houses with high bindus attract results naturally; low-bindu houses need extra effort, timing, and remedies.
             </div>
@@ -141,8 +141,8 @@ export default function AKVPage() {
                   return (
                     <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
                       <div>
-                        <div style={{fontSize:13,fontWeight:600,color:"#f0e8d0"}}>H{h.house} — {h.name}</div>
-                        <div style={{fontSize:10,color:"#605890",fontStyle:"italic"}}>{h.theme}</div>
+                        <div style={{fontSize:13,fontWeight:600,color:"#1A1A1A"}}>H{h.house} — {h.name}</div>
+                        <div style={{fontSize:10,color:"#6B635B",fontStyle:"italic"}}>{h.theme}</div>
                       </div>
                       <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:24,fontWeight:700,color:"#22c55e"}}>{h.score}</div>
                     </div>
@@ -156,8 +156,8 @@ export default function AKVPage() {
                   return (
                     <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
                       <div>
-                        <div style={{fontSize:13,fontWeight:600,color:"#f0e8d0"}}>H{h.house} — {h.name}</div>
-                        <div style={{fontSize:10,color:"#605890",fontStyle:"italic"}}>{h.theme}</div>
+                        <div style={{fontSize:13,fontWeight:600,color:"#1A1A1A"}}>H{h.house} — {h.name}</div>
+                        <div style={{fontSize:10,color:"#6B635B",fontStyle:"italic"}}>{h.theme}</div>
                       </div>
                       <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:24,fontWeight:700,color:"#ef4444"}}>{h.score}</div>
                     </div>
@@ -184,14 +184,14 @@ export default function AKVPage() {
                       <span style={{fontSize:22,color:p.color,flexShrink:0}}>{p.icon}</span>
                       <div style={{flex:1}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
-                          <div style={{fontSize:14,fontWeight:600,color:"#f0e8d0"}}>{tp(p.planet)} <span style={{fontSize:10,color:"#605890",fontWeight:400}}>— {p.desc}</span></div>
+                          <div style={{fontSize:14,fontWeight:600,color:"#1A1A1A"}}>{tp(p.planet)} <span style={{fontSize:10,color:"#6B635B",fontWeight:400}}>— {p.desc}</span></div>
                           <div style={{display:"flex",gap:6,alignItems:"center"}}>
                             <span style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,fontWeight:700,color:p.gradeColor}}>{p.total}/{p.max}</span>
                             <span className={`badge ${p.grade==="Strong"?"badge-green":p.grade==="Average"?"badge-gold":"badge-red"}`}>{p.grade}</span>
                           </div>
                         </div>
-                        <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,marginBottom:6}}>{ins.totalInsight}</div>
-                        <div style={{fontSize:11,color:"#60a5fa",lineHeight:1.7,borderTop:"1px solid #1c1840",paddingTop:6}}>{ins.topHouseInsight}</div>
+                        <div style={{fontSize:12,color:"#4A4238",lineHeight:1.75,marginBottom:6}}>{ins.totalInsight}</div>
+                        <div style={{fontSize:11,color:"#60a5fa",lineHeight:1.7,borderTop:"1px solid #FFFFFF",paddingTop:6}}>{ins.topHouseInsight}</div>
                         {ins.weakHouses.length>0 && (
                           <div style={{fontSize:10,color:"#ef4444",marginTop:4}}>
                             Low contribution: H{ins.weakHouses.join(", H")} — avoid forcing results in those areas during weak periods
@@ -209,7 +209,7 @@ export default function AKVPage() {
           <div className="card">
             <div className="card-tag">✦ Transit Delivery Summary</div>
             <div className="card-title serif">Best & Sensitive Houses for Transit Results</div>
-            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8,marginBottom:14}}>
+            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.8,marginBottom:14}}>
               When planets transit through your chart, houses with high Sodhya Pinda scores deliver results more readily.
               Low-score zones are sensitive — major transits there need extra preparation and remedies.
             </div>
@@ -218,9 +218,9 @@ export default function AKVPage() {
                 <div style={{fontSize:12,color:"#22c55e",fontWeight:700,marginBottom:8}}>Best Delivery Zones</div>
                 {result.bestTransitHouses.map(h=>(
                   <div key={h.house} style={{marginBottom:8,padding:10,background:"rgba(34,197,94,0.04)",border:"1px solid rgba(34,197,94,0.12)",borderRadius:10}}>
-                    <div style={{fontSize:13,fontWeight:600,color:"#f0e8d0"}}>H{h.house} — {h.name}</div>
+                    <div style={{fontSize:13,fontWeight:600,color:"#1A1A1A"}}>H{h.house} — {h.name}</div>
                     <div style={{fontSize:10,color:"#22c55e"}}>{h.grade} · Score {h.score}</div>
-                    <div style={{fontSize:11,color:"#c8c0a8",marginTop:4,lineHeight:1.6}}>{h.guidance}</div>
+                    <div style={{fontSize:11,color:"#4A4238",marginTop:4,lineHeight:1.6}}>{h.guidance}</div>
                   </div>
                 ))}
               </div>
@@ -228,9 +228,9 @@ export default function AKVPage() {
                 <div style={{fontSize:12,color:"#ef4444",fontWeight:700,marginBottom:8}}>Sensitive Transit Zones</div>
                 {result.sensitiveTransitHouses.map(h=>(
                   <div key={h.house} style={{marginBottom:8,padding:10,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.12)",borderRadius:10}}>
-                    <div style={{fontSize:13,fontWeight:600,color:"#f0e8d0"}}>H{h.house} — {h.name}</div>
+                    <div style={{fontSize:13,fontWeight:600,color:"#1A1A1A"}}>H{h.house} — {h.name}</div>
                     <div style={{fontSize:10,color:"#ef4444"}}>{h.grade} · Score {h.score}</div>
-                    <div style={{fontSize:11,color:"#c8c0a8",marginTop:4,lineHeight:1.6}}>{h.guidance}</div>
+                    <div style={{fontSize:11,color:"#4A4238",marginTop:4,lineHeight:1.6}}>{h.guidance}</div>
                   </div>
                 ))}
               </div>
@@ -245,7 +245,7 @@ export default function AKVPage() {
           <div className="card" style={{marginBottom:16}}>
             <div className="card-tag">✦ Sarvashtakavarga — All 12 Houses</div>
             <div className="card-title serif">Total Bindu Scores</div>
-            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8,marginBottom:14}}>
+            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.8,marginBottom:14}}>
               Sarvashtakavarga is the sum of all 7 planets&apos; contributions to each house. A house scoring 28+ bindus is considered strong
               (fate works naturally there); 25–27 is average; below 25 needs extra effort and remedies to produce results.
               The classical standard total is 337 bindus across all 12 houses.
@@ -255,7 +255,7 @@ export default function AKVPage() {
                 <div key={i} style={{background:`${v>=28?"rgba(34,197,94":v>=25?"rgba(200,160,48":"rgba(239,68,68"},0.08)`,
                   border:`1px solid ${v>=28?"rgba(34,197,94":v>=25?"rgba(200,160,48":"rgba(239,68,68"},0.25)`,
                   borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
-                  <div style={{fontSize:10,color:"#605890",marginBottom:4}}>H{i+1}</div>
+                  <div style={{fontSize:10,color:"#6B635B",marginBottom:4}}>H{i+1}</div>
                   <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:28,fontWeight:700,
                     color:v>=28?"#22c55e":v>=25?"#c8a030":"#ef4444",lineHeight:1}}>{v}</div>
                   <div style={{fontSize:9,color:v>=28?"#22c55e":v>=25?"#c8a030":"#ef4444",marginTop:4}}>
@@ -269,24 +269,24 @@ export default function AKVPage() {
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
                 <thead>
                   <tr>
-                    <th style={{color:"#3a3060",padding:"0 8px 12px",textAlign:"left",fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase"}}>Planet</th>
+                    <th style={{color:"#6B635B",padding:"0 8px 12px",textAlign:"left",fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase"}}>Planet</th>
                     {Array.from({length:12},(_,i)=>(
-                      <th key={i} style={{color:"#3a3060",padding:"0 4px 12px",textAlign:"center",fontSize:10}}>H{i+1}</th>
+                      <th key={i} style={{color:"#6B635B",padding:"0 4px 12px",textAlign:"center",fontSize:10}}>H{i+1}</th>
                     ))}
-                    <th style={{color:"#3a3060",padding:"0 8px 12px",textAlign:"center",fontSize:10}}>Total</th>
+                    <th style={{color:"#6B635B",padding:"0 8px 12px",textAlign:"center",fontSize:10}}>Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {result.planets.map(p=>(
                     <tr key={p.planet}>
-                      <td style={{padding:"8px",borderBottom:"1px solid #1c1840"}}>
+                      <td style={{padding:"8px",borderBottom:"1px solid #FFFFFF"}}>
                         <span style={{color:p.color,marginRight:6}}>{p.icon}</span>
-                        <span style={{color:"#c8c0a8",fontWeight:500}}>{tp(p.planet)}</span>
+                        <span style={{color:"#4A4238",fontWeight:500}}>{tp(p.planet)}</span>
                       </td>
                       {p.bindus.map((b,i)=>(
-                        <td key={i} style={{padding:"8px 4px",borderBottom:"1px solid #1c1840",textAlign:"center",color:binduColor(b),fontWeight:b>=5?600:400}}>{b}</td>
+                        <td key={i} style={{padding:"8px 4px",borderBottom:"1px solid #FFFFFF",textAlign:"center",color:binduColor(b),fontWeight:b>=5?600:400}}>{b}</td>
                       ))}
-                      <td style={{padding:"8px",borderBottom:"1px solid #1c1840",textAlign:"center",
+                      <td style={{padding:"8px",borderBottom:"1px solid #FFFFFF",textAlign:"center",
                         fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:p.gradeColor}}>{p.total}</td>
                     </tr>
                   ))}
@@ -317,27 +317,27 @@ export default function AKVPage() {
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
                     <span style={{fontSize:22,color:p.color}}>{p.icon}</span>
                     <div>
-                      <div style={{fontSize:14,fontWeight:600,color:"#f0e8d0"}}>{tp(p.planet)}</div>
-                      <div style={{fontSize:10,color:"#605890"}}>{p.desc}</div>
+                      <div style={{fontSize:14,fontWeight:600,color:"#1A1A1A"}}>{tp(p.planet)}</div>
+                      <div style={{fontSize:10,color:"#6B635B"}}>{p.desc}</div>
                     </div>
                   </div>
                   <div style={{textAlign:"right"}}>
                     <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:28,fontWeight:700,color:p.gradeColor,lineHeight:1}}>{p.total}</div>
-                    <div style={{fontSize:10,color:"#605890"}}>/ {p.max} · {p.pct}%</div>
+                    <div style={{fontSize:10,color:"#6B635B"}}>/ {p.max} · {p.pct}%</div>
                   </div>
                 </div>
                 <div className="bar-track" style={{marginBottom:10}}>
                   <div className="bar-fill" style={{width:`${p.pct}%`,background:p.gradeColor}}/>
                 </div>
-                <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,marginBottom:8}}>{ins?.totalInsight}</div>
+                <div style={{fontSize:12,color:"#4A4238",lineHeight:1.75,marginBottom:8}}>{ins?.totalInsight}</div>
                 {ins && (
-                  <div style={{fontSize:11,color:"#60a5fa",lineHeight:1.7,borderTop:"1px solid #1c1840",paddingTop:8,marginBottom:8}}>{ins.topHouseInsight}</div>
+                  <div style={{fontSize:11,color:"#60a5fa",lineHeight:1.7,borderTop:"1px solid #FFFFFF",paddingTop:8,marginBottom:8}}>{ins.topHouseInsight}</div>
                 )}
                 <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:3}}>
                   {p.bindus.map((b,i)=>(
                     <div key={i} style={{textAlign:"center",padding:"4px 2px",borderRadius:6,
-                      background:`rgba(255,255,255,0.03)`,border:"1px solid #1c1840"}}>
-                      <div style={{fontSize:8,color:"#3a3060"}}>H{i+1}</div>
+                      background:`rgba(255,255,255,0.03)`,border:"1px solid #FFFFFF"}}>
+                      <div style={{fontSize:8,color:"#6B635B"}}>H{i+1}</div>
                       <div style={{fontSize:13,fontWeight:600,color:binduColor(b)}}>{b}</div>
                     </div>
                   ))}
@@ -359,7 +359,7 @@ export default function AKVPage() {
           <div className="card" style={{marginBottom:16}}>
             <div className="card-tag">✦ House-by-House Analysis</div>
             <div className="card-title serif">What Each House Score Means</div>
-            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8,marginBottom:4}}>
+            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.8,marginBottom:4}}>
               Each house score tells you how much cosmic support that life area receives. 28+ bindus = strong (fate cooperates);
               25–27 = average (effort brings results); below 25 = sensitive (requires planning, timing, and remedies).
               These scores are fixed by birth — use them as a lifetime navigation map, not a temporary weather forecast.
@@ -370,9 +370,9 @@ export default function AKVPage() {
               <div key={h.house} className="card" style={{borderColor:`${h.color}33`}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
                   <div>
-                    <div style={{fontSize:10,color:"#605890",marginBottom:3}}>House {h.house}</div>
-                    <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:"#f0e8d0"}}>{h.name}</div>
-                    <div style={{fontSize:10,color:"#605890",marginTop:2,fontStyle:"italic"}}>{h.theme}</div>
+                    <div style={{fontSize:10,color:"#6B635B",marginBottom:3}}>House {h.house}</div>
+                    <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:"#1A1A1A"}}>{h.name}</div>
+                    <div style={{fontSize:10,color:"#6B635B",marginTop:2,fontStyle:"italic"}}>{h.theme}</div>
                   </div>
                   <div style={{textAlign:"right"}}>
                     <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:32,fontWeight:700,color:h.color,lineHeight:1}}>{h.score}</div>
@@ -384,9 +384,9 @@ export default function AKVPage() {
                 <div className="bar-track" style={{marginBottom:10}}>
                   <div className="bar-fill" style={{width:`${(h.score/36)*100}%`,background:h.color}}/>
                 </div>
-                <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,marginBottom:8}}>{h.interp}</div>
+                <div style={{fontSize:12,color:"#4A4238",lineHeight:1.75,marginBottom:8}}>{h.interp}</div>
                 {h.topPlanets.length>0&&(
-                  <div style={{fontSize:10,color:"#605890"}}>Top contributors: {h.topPlanets.join(", ")}</div>
+                  <div style={{fontSize:10,color:"#6B635B"}}>Top contributors: {h.topPlanets.join(", ")}</div>
                 )}
               </div>
             ))}
@@ -400,7 +400,7 @@ export default function AKVPage() {
           <div className="card" style={{marginBottom:16}}>
             <div className="card-tag">✦ Sodhya Pinda</div>
             <div className="card-title serif">Transit Delivery Strength</div>
-            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.8,marginBottom:14}}>
+            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.8,marginBottom:14}}>
               Sodhya Pinda refines Sarvashtakavarga by weighting each house&apos;s bindus against rashi-level planetary dignity.
               A planet transiting its own sign, exaltation, or friendly sign in your chart activates that house more powerfully.
               Use this as your transit delivery map: high-score zones can give smoother results when activated by dasha and gochar;
@@ -411,8 +411,8 @@ export default function AKVPage() {
                 <div key={h.house} className="card" style={{borderColor:`${h.color}44`,background:`${h.color}0d`}}>
                   <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"flex-start"}}>
                     <div>
-                      <div style={{fontSize:10,color:"#605890",marginBottom:3}}>H{h.house} · {h.sign}</div>
-                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:17,fontWeight:600,color:"#f0e8d0"}}>{h.name}</div>
+                      <div style={{fontSize:10,color:"#6B635B",marginBottom:3}}>H{h.house} · {h.sign}</div>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:17,fontWeight:600,color:"#1A1A1A"}}>{h.name}</div>
                     </div>
                     <div style={{textAlign:"right"}}>
                       <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:31,fontWeight:700,color:h.color,lineHeight:1}}>{h.score}</div>
@@ -422,8 +422,8 @@ export default function AKVPage() {
                   <div className="bar-track" style={{margin:"12px 0 10px"}}>
                     <div className="bar-fill" style={{width:`${Math.min(100,(h.score/40)*100)}%`,background:h.color}}/>
                   </div>
-                  <div style={{fontSize:11,color:"#605890",marginBottom:6}}>SAV bindus: {h.bindus}</div>
-                  <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7}}>{h.guidance}</div>
+                  <div style={{fontSize:11,color:"#6B635B",marginBottom:6}}>SAV bindus: {h.bindus}</div>
+                  <div style={{fontSize:12,color:"#4A4238",lineHeight:1.7}}>{h.guidance}</div>
                 </div>
               ))}
             </div>
@@ -437,7 +437,7 @@ export default function AKVPage() {
           <div className="card" style={{marginBottom:16}}>
             <div className="card-tag">✦ Classical Foundation</div>
             <div className="card-title serif">What is Ashtakavarga?</div>
-            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.9}}>
+            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.9}}>
               Ashtakavarga (Sanskrit: अष्टकवर्ग) means &quot;group of eight.&quot; It is one of the most sophisticated predictive tools
               in Jyotisha, first described in the Brihat Parashara Hora Shastra. Each of the 7 planets casts &quot;bindus&quot; (benefic points)
               into the 12 houses from its own position and the positions of the other 6 planets plus the Lagna (ascendant) —
@@ -459,7 +459,7 @@ export default function AKVPage() {
                   <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,fontWeight:700,color:row.color,flexShrink:0,width:90}}>{row.range}</div>
                   <div>
                     <div style={{fontSize:12,fontWeight:600,color:row.color,marginBottom:3}}>{row.grade}</div>
-                    <div style={{fontSize:11,color:"#c8c0a8",lineHeight:1.7}}>{row.meaning}</div>
+                    <div style={{fontSize:11,color:"#4A4238",lineHeight:1.7}}>{row.meaning}</div>
                   </div>
                 </div>
               ))}
@@ -477,9 +477,9 @@ export default function AKVPage() {
                 {q:"Where are my spiritual strengths?",a:"H9 (dharma/fortune) and H12 (liberation) bindus point to spirituality and fortune. High H9 = blessings come through right action."},
                 {q:"How do I use Sodhya Pinda?",a:"When a major planet (Jupiter, Saturn) is transiting a house, check its Sodhya score. Excellent/Good scores = results are more likely to manifest during this transit."},
               ].map((item,i)=>(
-                <div key={i} style={{padding:12,borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid #1c1840"}}>
+                <div key={i} style={{padding:12,borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid #FFFFFF"}}>
                   <div style={{fontSize:12,fontWeight:600,color:"#c8a030",marginBottom:4}}>{item.q}</div>
-                  <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75}}>{item.a}</div>
+                  <div style={{fontSize:12,color:"#4A4238",lineHeight:1.75}}>{item.a}</div>
                 </div>
               ))}
             </div>
@@ -488,7 +488,7 @@ export default function AKVPage() {
           <div className="card">
             <div className="card-tag">✦ Important Context</div>
             <div className="card-title serif">AKV Is One Layer of the Chart</div>
-            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.9}}>
+            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.9}}>
               Ashtakavarga shows the cosmic baseline — the level of universal support a house has received at birth.
               It does not override other factors: a strong Dasha lord can activate even a weak house, and a malefic transit
               can disturb a strong house temporarily. The most accurate predictions combine AKV with Dasha/Antardasha periods,

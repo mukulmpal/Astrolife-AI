@@ -1,0 +1,28 @@
+{
+  "publicId": "5bfebb7a",
+  "wikipediaSlug": "Ishan_Kishan",
+  "wikipediaId": "Q21621705",
+  "name": "Ishan Kishan",
+  "fullName": "Ishan Kishan",
+  "profileSummary": "Ishan Kishan is an Indian International cricketer who plays for the Indian national cricket team as a wicket-keeper batsman in all formats of this game. He made his international debut in March 2021 against England. He captains Jharkhand in domestic cricket and Sunrisers Hyderabad in Indian Premier League.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Ishan_Kishan.jpg/330px-Ishan_Kishan.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ishan_Kishan",
+  "dateOfBirth": "1998-07-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.61",
+  "birthCoordinatesLng": "85.141388888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q21621705",
+  "birthPlace": "Patna",
+  "fetchedAt": "2026-04-07T10:57:47.662Z"
+}

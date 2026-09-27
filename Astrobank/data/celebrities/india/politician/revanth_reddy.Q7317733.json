@@ -1,0 +1,26 @@
+{
+  "publicId": "a4e47727",
+  "wikipediaSlug": "Revanth_Reddy",
+  "wikipediaId": "Q7317733",
+  "name": "Revanth Reddy",
+  "fullName": "Revanth Reddy",
+  "profileSummary": "Anumula Revanth Reddy is an Indian \npolitician who is serving as the second and current Chief Minister of Telangana. He is also the minister for Municipal Administration and Urban Development, General Administration, Law & Order. As a member of the Indian National Congress, he is the current Member of the Legislative Assembly for Kodangal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Portrait_of_Telangana_CM_Revanth_Reddy.png/330px-Portrait_of_Telangana_CM_Revanth_Reddy.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Revanth_Reddy",
+  "dateOfBirth": "1969-11-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.46",
+  "birthCoordinatesLng": "77.56",
+  "moonSign": "7",
+  "sunSign": "7",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q7317733",
+  "birthPlace": "Mahabubnagar district",
+  "fetchedAt": "2026-04-07T16:16:17.234Z"
+}

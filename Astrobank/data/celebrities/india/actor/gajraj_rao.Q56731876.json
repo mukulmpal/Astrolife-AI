@@ -1,0 +1,28 @@
+{
+  "publicId": "31651873",
+  "wikipediaSlug": "Gajraj_Rao",
+  "wikipediaId": "Q56731876",
+  "name": "Gajraj Rao",
+  "fullName": "Gajraj Rao",
+  "profileSummary": "Gajraj Rao is an Indian actor who appears predominantly in Hindi films. He is widely known for his performance in the comedy-drama film Badhaai Ho for which he won the Filmfare Award for Best Supporting Actor.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Gajraj_Rao_in_February_2020.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gajraj_Rao",
+  "dateOfBirth": "1971-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.843055555",
+  "birthCoordinatesLng": "73.714444444",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q56731876",
+  "birthPlace": "Dungarpur",
+  "fetchedAt": "2026-04-07T12:17:37.098Z"
+}

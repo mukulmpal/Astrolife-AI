@@ -1,0 +1,28 @@
+{
+  "publicId": "1f743de3",
+  "wikipediaSlug": "Amay_Khurasiya",
+  "wikipediaId": "Q3528283",
+  "name": "Amay Khurasiya",
+  "fullName": "Amay Khurasiya",
+  "profileSummary": "Amay Khurasiya is a former Indian cricketer. He played as a left-handed batsman and a slow left-arm bowler. Currently, he is the kerala cricket team coach.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amay_Khurasiya",
+  "dateOfBirth": "1972-05-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.166666666",
+  "birthCoordinatesLng": "79.933333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3528283",
+  "birthPlace": "Jabalpur",
+  "fetchedAt": "2026-04-07T10:56:16.779Z"
+}

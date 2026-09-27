@@ -1,0 +1,27 @@
+{
+  "publicId": "e2e783ac",
+  "wikipediaSlug": "Gautam_Adani",
+  "wikipediaId": "Q5527865",
+  "name": "Gautam Adani",
+  "fullName": "Gautam Adani",
+  "profileSummary": "Gautam Shantilal Adani is an Indian billionaire businessman who is the founder and chairman of the Adani Group, a multinational conglomerate involved in port development and operations in India. As of March 2026, Adani is ranked as the second richest person in India and 31st in the world, with a net worth of $56.3 billion. In 2022, Time magazine included him in the 100 most influential people in the world.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Gautam_Adani.jpg/330px-Gautam_Adani.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gautam_Adani",
+  "dateOfBirth": "1962-06-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.021944444",
+  "birthCoordinatesLng": "72.579722222",
+  "moonSign": "11",
+  "sunSign": "3",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson",
+    "business executive"
+  ],
+  "qid": "Q5527865",
+  "birthPlace": "Ahmedabad",
+  "fetchedAt": "2026-04-08T02:06:09.147Z"
+}

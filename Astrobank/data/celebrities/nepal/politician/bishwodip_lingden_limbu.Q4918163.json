@@ -1,0 +1,28 @@
+{
+  "publicId": "02089daa",
+  "wikipediaSlug": "Bishwodip_Lingden_Limbu",
+  "wikipediaId": "Q4918163",
+  "name": "Bishwodip Lingden Limbu",
+  "fullName": "Bishwodip Lingden Limbu",
+  "profileSummary": "Bishwodip Lingden Limbu is a Nepalese politician, belonging to the Nepali Congress. In the 2008 Nepalese Constituent Assembly election, he won the Jhapa-7 seat in the Constituent Assembly election with 16099 votes defeating his nearest rival KP Sharma Oli.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bishwodip_Lingden_Limbu",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4918163",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:53:39.948Z"
+}

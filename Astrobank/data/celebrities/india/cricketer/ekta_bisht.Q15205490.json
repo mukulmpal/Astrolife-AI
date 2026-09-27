@@ -1,0 +1,28 @@
+{
+  "publicId": "c84181a7",
+  "wikipediaSlug": "Ekta_Bisht",
+  "wikipediaId": "Q15205490",
+  "name": "Ekta Bisht",
+  "fullName": "Ekta Bisht",
+  "profileSummary": "Ekta Bisht is an Indian cricketer. She plays as a slow left-arm orthodox bowler. She was India's first international woman cricketer from Uttarakhand. She was also the first cricketer for India to take a hat-trick in a Women's Twenty20 International match.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Ekta-bisht.jpg/330px-Ekta-bisht.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ekta_Bisht",
+  "dateOfBirth": "1986-02-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "29.62",
+  "birthCoordinatesLng": "79.67",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q15205490",
+  "birthPlace": "Almora",
+  "fetchedAt": "2026-04-07T11:02:54.869Z"
+}

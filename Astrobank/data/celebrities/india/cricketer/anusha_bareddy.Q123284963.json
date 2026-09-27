@@ -1,0 +1,28 @@
+{
+  "publicId": "ec47f5dc",
+  "wikipediaSlug": "Anusha_Bareddy",
+  "wikipediaId": "Q123284963",
+  "name": "Anusha Bareddy",
+  "fullName": "Anusha Bareddy",
+  "profileSummary": "Anusha Bareddy is an Indian cricketer who currently plays for Andhra. She plays as a slow left-arm orthodox bowler.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anusha_Bareddy",
+  "dateOfBirth": "2003-06-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "14.683333333",
+  "birthCoordinatesLng": "77.6",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q123284963",
+  "birthPlace": "Ananthapuram",
+  "fetchedAt": "2026-04-07T11:02:55.804Z"
+}

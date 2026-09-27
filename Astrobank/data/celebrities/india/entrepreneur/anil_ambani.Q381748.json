@@ -1,0 +1,29 @@
+{
+  "publicId": "cda18999",
+  "wikipediaSlug": "Anil_Ambani",
+  "wikipediaId": "Q381748",
+  "name": "Anil Ambani",
+  "fullName": "Anil Ambani",
+  "profileSummary": "Anil Dhirubhai Ambani is an Indian businessman, chairman, and managing director of Reliance Group. The Reliance Group was created in July 2006 following a demerger from Reliance Industries Limited. He led several listed corporations, including Reliance Capital, Reliance Infrastructure, Reliance Power, and Reliance Communications. Anil's net worth is estimated at $1 Billion as of 26 June 2025.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Anil_Ambani%2C_2012_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anil_Ambani",
+  "dateOfBirth": "1959-06-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "1",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "entrepreneur",
+    "chief executive officer",
+    "chairperson",
+    "politician"
+  ],
+  "qid": "Q381748",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T02:04:46.529Z"
+}

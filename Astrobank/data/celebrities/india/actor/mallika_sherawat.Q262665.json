@@ -1,0 +1,31 @@
+{
+  "publicId": "2ac47d9f",
+  "wikipediaSlug": "Mallika_Sherawat",
+  "wikipediaId": "Q262665",
+  "name": "Mallika Sherawat",
+  "fullName": "Mallika Sherawat",
+  "profileSummary": "Reema Lamba, better known by the stage name Mallika Sherawat, is an Indian actress who predominantly works in Hindi language films. Known for her bold onscreen portrayal in films like Khwahish (2003) and Murder (2004), Sherawat has established herself as a sex symbol in Bollywood. She is also known for appearing in several popular item numbers.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Mallika_Sherawat_Cannes_2014_2.jpg/330px-Mallika_Sherawat_Cannes_2014_2.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mallika_Sherawat",
+  "dateOfBirth": "1976-10-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.9",
+  "birthCoordinatesLng": "76.566666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "film actor",
+    "television actor"
+  ],
+  "qid": "Q262665",
+  "birthPlace": "Rohtak",
+  "fetchedAt": "2026-04-07T12:15:13.809Z"
+}

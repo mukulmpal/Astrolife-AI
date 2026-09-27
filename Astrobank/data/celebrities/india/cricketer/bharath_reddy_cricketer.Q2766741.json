@@ -1,0 +1,28 @@
+{
+  "publicId": "bde32825",
+  "wikipediaSlug": "Bharath_Reddy_(cricketer)",
+  "wikipediaId": "Q2766741",
+  "name": "Bharath Reddy (cricketer)",
+  "fullName": "Bharath Reddy (cricketer)",
+  "profileSummary": "Bharath Reddy is a former Indian international cricketer.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bharath_Reddy_(cricketer)",
+  "dateOfBirth": "1954-11-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q2766741",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T10:56:40.994Z"
+}

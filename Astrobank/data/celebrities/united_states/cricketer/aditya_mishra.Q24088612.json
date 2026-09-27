@@ -1,0 +1,26 @@
+{
+  "publicId": "81f68de9",
+  "wikipediaSlug": "Aditya_Mishra",
+  "wikipediaId": "Q24088612",
+  "name": "Aditya Mishra",
+  "fullName": "Aditya Mishra",
+  "profileSummary": "Aditya Mishra is an Indian-born American cricketer who represents and played for the United States national cricket team. He was named vice-captain of 2012 ICC World Twenty20 Qualifier. He retired aged 31 with five List A and 8 Twenty20 to his name.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aditya_Mishra",
+  "dateOfBirth": "1981-06-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": "6",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q24088612",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-08T00:00:10.710Z"
+}

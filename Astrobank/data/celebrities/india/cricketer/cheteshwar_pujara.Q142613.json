@@ -1,0 +1,28 @@
+{
+  "publicId": "4a58616c",
+  "wikipediaSlug": "Cheteshwar_Pujara",
+  "wikipediaId": "Q142613",
+  "name": "Cheteshwar Pujara",
+  "fullName": "Cheteshwar Pujara",
+  "profileSummary": "Cheteshwar Arvind Pujara is a former Indian cricketer who represented the Indian national team for over thirteen years. Pujara played for Saurashtra in Indian domestic cricket and for Sussex Cricket club in English County Championship. A specialist in first-class cricket throughout his career, Pujara was known for his disciplined and patient batting style which made him an integral part of the Indian Test team for over a decade. He played in over 100 Test matches for India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Cheteshwar_Pujara.jpg/330px-Cheteshwar_Pujara.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Cheteshwar_Pujara",
+  "dateOfBirth": "1988-01-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.296908333",
+  "birthCoordinatesLng": "70.798363888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q142613",
+  "birthPlace": "Rajkot",
+  "fetchedAt": "2026-04-07T10:56:45.932Z"
+}

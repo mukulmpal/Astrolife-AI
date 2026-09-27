@@ -1,0 +1,28 @@
+{
+  "publicId": "039aa008",
+  "wikipediaSlug": "Deepak_Hooda",
+  "wikipediaId": "Q18637468",
+  "name": "Deepak Hooda",
+  "fullName": "Deepak Hooda",
+  "profileSummary": "Deepak Jagbir Hooda is an Indian international cricketer who has represented his country in One Day International and Twenty20 International cricket. Domestically he plays for Rajasthan and has appeared in the Indian Premier League for several teams, most recently Chennai Super Kings. He is an all-rounder who bats right-handed and bowls right-arm off break. He made his international debut for India in February 2022.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepak_Hooda",
+  "dateOfBirth": "1995-04-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.9",
+  "birthCoordinatesLng": "76.566666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q18637468",
+  "birthPlace": "Rohtak",
+  "fetchedAt": "2026-04-07T10:57:46.982Z"
+}

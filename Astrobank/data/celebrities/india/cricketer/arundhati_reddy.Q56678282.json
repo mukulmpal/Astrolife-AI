@@ -1,0 +1,28 @@
+{
+  "publicId": "03e0b2ea",
+  "wikipediaSlug": "Arundhati_Reddy",
+  "wikipediaId": "Q56678282",
+  "name": "Arundhati Reddy",
+  "fullName": "Arundhati Reddy",
+  "profileSummary": "Arundhati Reddy is an Indian international cricketer. She plays for the women's national cricket team as a right-arm medium-fast bowler. She represents Railways in domestic cricket and Royal Challengers Bengaluru in the Women's Premier League. Reddy was part of the Indian team that won the 2025 Women's Cricket World Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/84/Arundhati_Reddy_in_2025.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arundhati_Reddy",
+  "dateOfBirth": "1997-10-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.361666666",
+  "birthCoordinatesLng": "78.474722222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q56678282",
+  "birthPlace": "Hyderabad",
+  "fetchedAt": "2026-04-07T11:02:40.899Z"
+}

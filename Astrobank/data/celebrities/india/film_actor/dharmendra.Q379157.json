@@ -1,0 +1,32 @@
+{
+  "publicId": "427443a8",
+  "wikipediaSlug": "Dharmendra",
+  "wikipediaId": "Q379157",
+  "name": "Dharmendra",
+  "fullName": "Dharmendra",
+  "profileSummary": "Dharmendra was an Indian actor, producer and politician, primarily known for his work in Hindi films. He is regarded as one of the greatest and most commercially successful actors in the history of Indian cinema. In a career spanning 65 years, he worked in over 300 films, holding the record for starring in the highest number of hit films in Hindi cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Shri_Dharmendra_Deol_on_April_04%2C_2012.jpg/330px-Shri_Dharmendra_Deol_on_April_04%2C_2012.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dharmendra",
+  "dateOfBirth": "1935-12-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.67",
+  "birthCoordinatesLng": "76.27",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "film producer",
+    "politician",
+    "television actor"
+  ],
+  "qid": "Q379157",
+  "birthPlace": "Nasrali",
+  "fetchedAt": "2026-04-07T16:00:04.037Z"
+}

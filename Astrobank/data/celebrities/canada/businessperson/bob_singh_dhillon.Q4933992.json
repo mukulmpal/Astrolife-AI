@@ -1,0 +1,26 @@
+{
+  "publicId": "7be154e8",
+  "wikipediaSlug": "Bob_Singh_Dhillon",
+  "wikipediaId": "Q4933992",
+  "name": "Bob Singh Dhillon",
+  "fullName": "Bob Singh Dhillon",
+  "profileSummary": "Navjeet Singh \"Bob\" Dhillon is a Canadian property owner and businessman. He is the founder and CEO of Mainstreet Equity Corp, headquartered in Calgary.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bob_Singh_Dhillon",
+  "dateOfBirth": "1965-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "34.690166666",
+  "birthCoordinatesLng": "135.195444444",
+  "moonSign": "9",
+  "sunSign": "9",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q4933992",
+  "birthPlace": "Kobe",
+  "fetchedAt": "2026-04-08T00:52:27.107Z"
+}

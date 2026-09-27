@@ -1,0 +1,29 @@
+{
+  "publicId": "87e72594",
+  "wikipediaSlug": "Ruby_Rana",
+  "wikipediaId": "Q7376370",
+  "name": "Ruby Rana",
+  "fullName": "Ruby Rana",
+  "profileSummary": "Ruby Rana is a Nepalese model, actress and beauty pageant title holder. She was crowned the first ever Miss Nepal in 1994. She competed for the Miss Nepal title after winning the title of Miss Birgunj in 1994. She has also acted in two Nepalese films and was the judge of the first season of Mega Model, a modeling-based reality show.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Rubi_Rana_01.jpg/330px-Rubi_Rana_01.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ruby_Rana",
+  "dateOfBirth": "1972-09-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "11",
+  "sunSign": "6",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "Miss Nepal",
+    "model",
+    "beauty pageant contestant",
+    "actor"
+  ],
+  "qid": "Q7376370",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:45:13.234Z"
+}

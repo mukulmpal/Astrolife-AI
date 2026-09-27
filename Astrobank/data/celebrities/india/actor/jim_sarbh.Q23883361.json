@@ -1,0 +1,28 @@
+{
+  "publicId": "e0b8416e",
+  "wikipediaSlug": "Jim_Sarbh",
+  "wikipediaId": "Q23883361",
+  "name": "Jim Sarbh",
+  "fullName": "Jim Sarbh",
+  "profileSummary": "Jim Sarbh is an Indian actor known for his work in films and stage productions. He has received several awards including a Filmfare OTT Award, and an IIFA Award with a nomination for an International Emmy Award. Additionally, he has directed and acted in numerous theatre productions in India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Jim_Sarah.png/330px-Jim_Sarah.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jim_Sarbh",
+  "dateOfBirth": "1987-08-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q23883361",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:17:38.935Z"
+}

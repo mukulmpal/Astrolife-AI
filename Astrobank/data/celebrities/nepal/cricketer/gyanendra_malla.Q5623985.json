@@ -1,0 +1,26 @@
+{
+  "publicId": "d1384e0a",
+  "wikipediaSlug": "Gyanendra_Malla",
+  "wikipediaId": "Q5623985",
+  "name": "Gyanendra Malla",
+  "fullName": "Gyanendra Malla",
+  "profileSummary": "Gyanendra Malla is a Nepalese politician, cricket coach and former captain of the Nepal national cricket team, currently serving as head coach of Nepal A team. He was a right-handed batsman and an occasional wicket-keeper. He made his debut against Namibia in March 2006. He was one of the cricketers who played in Nepal's first One Day International (ODI) match, against the Netherlands, in August 2018.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Gyanendra_Malla.JPG/330px-Gyanendra_Malla.JPG",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gyanendra_Malla",
+  "dateOfBirth": "1990-09-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "4",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5623985",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-07T16:50:11.601Z"
+}

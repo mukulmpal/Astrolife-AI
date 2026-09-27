@@ -1,0 +1,28 @@
+{
+  "publicId": "abb124e3",
+  "wikipediaSlug": "Gagan_Khoda",
+  "wikipediaId": "Q3520439",
+  "name": "Gagan Khoda",
+  "fullName": "Gagan Khoda",
+  "profileSummary": "Gagan Khoda is an Indian former cricketer. He played two One Day Internationals in 1998. Despite scoring 89 runs in one of those two innings, he never made it to the Indian team after those two matches.He is from Meena community.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gagan_Khoda",
+  "dateOfBirth": "1974-10-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.572777777",
+  "birthCoordinatesLng": "73.838888888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3520439",
+  "birthPlace": "Rajasthan",
+  "fetchedAt": "2026-04-07T10:56:45.442Z"
+}

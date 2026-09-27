@@ -1,0 +1,28 @@
+{
+  "publicId": "37259109",
+  "wikipediaSlug": "Dhiraj_Rai",
+  "wikipediaId": "Q16728540",
+  "name": "Dhiraj Rai",
+  "fullName": "Dhiraj Rai",
+  "profileSummary": "Dhiraj Rai is a singer, musician and songwriter from Khotang, Nepal. Rai's first recorded song is Luki Luki.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dhiraj_Rai",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "lyricist",
+    "songwriter",
+    "singer"
+  ],
+  "qid": "Q16728540",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-07T16:47:18.699Z"
+}

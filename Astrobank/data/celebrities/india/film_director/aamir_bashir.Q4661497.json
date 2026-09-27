@@ -1,0 +1,28 @@
+{
+  "publicId": "2909a116",
+  "wikipediaSlug": "Aamir_Bashir",
+  "wikipediaId": "Q4661497",
+  "name": "Aamir Bashir",
+  "fullName": "Aamir Bashir",
+  "profileSummary": "Aamir Bashir is an Indian actor, film producer, and director who works in Hindi films. He is best known for his role in the thriller film, A Wednesday, which earned him a Screen Award nomination for Best Actor in a Supporting Role.\nFor his directorial debut film Harud, he won the National Film Award for Best Urdu Feature Film at the 60th National Film Awards.\nHe is also known for his work in several other film productions.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Aamir_Bashir.jpg/330px-Aamir_Bashir.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aamir_Bashir",
+  "dateOfBirth": "2000-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "34",
+  "birthCoordinatesLng": "76.5",
+  "moonSign": "7",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film director",
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q4661497",
+  "birthPlace": "Jammu and Kashmir",
+  "fetchedAt": "2026-04-07T16:25:15.403Z"
+}

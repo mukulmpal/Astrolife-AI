@@ -1,0 +1,30 @@
+{
+  "publicId": "5a4bb31a",
+  "wikipediaSlug": "Amarjeet_Sohi",
+  "wikipediaId": "Q4740296",
+  "name": "Amarjeet Sohi",
+  "fullName": "Amarjeet Sohi",
+  "profileSummary": "Amarjeet Sohi is a Canadian politician who was the minister of infrastructure and communities, and from 2018 to 2019 as the minister of natural resources. Sohi previously sat as a Liberal member of Parliament (MP) and served in the federal Cabinet from 2015 to 2018. He served as the 36th mayor of Edmonton from 2021 to 2025.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Mayor_Amarjeet_Sohi_%2851632696240%29_%283x4_crop%29.jpg/330px-Mayor_Amarjeet_Sohi_%2851632696240%29_%283x4_crop%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amarjeet_Sohi",
+  "dateOfBirth": "1964-03-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.23",
+  "birthCoordinatesLng": "75.83",
+  "moonSign": "9",
+  "sunSign": "11",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "bus driver",
+    "actor",
+    "council member",
+    "playwright"
+  ],
+  "qid": "Q4740296",
+  "birthPlace": "Sangrur district",
+  "fetchedAt": "2026-04-08T00:52:20.462Z"
+}

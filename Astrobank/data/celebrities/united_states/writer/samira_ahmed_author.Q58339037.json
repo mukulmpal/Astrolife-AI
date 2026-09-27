@@ -1,0 +1,28 @@
+{
+  "publicId": "4b97bdbd",
+  "wikipediaSlug": "Samira_Ahmed_(author)",
+  "wikipediaId": "Q58339037",
+  "name": "Samira Ahmed (author)",
+  "fullName": "Samira Ahmed (author)",
+  "profileSummary": "Samira Ahmed is an American author of young adult fiction, poetry, and non-fiction, best known for her New York Times best selling novels Love, Hate & Other Filters and Internment.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Samira_Ahmed_2025.jpg/330px-Samira_Ahmed_2025.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Samira_Ahmed_(author)",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "writer",
+    "teacher",
+    "poet"
+  ],
+  "qid": "Q58339037",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T01:18:16.301Z"
+}

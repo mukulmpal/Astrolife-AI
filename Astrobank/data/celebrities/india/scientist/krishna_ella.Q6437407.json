@@ -1,0 +1,27 @@
+{
+  "publicId": "67b39800",
+  "wikipediaSlug": "Krishna_Ella",
+  "wikipediaId": "Q6437407",
+  "name": "Krishna Ella",
+  "fullName": "Krishna Ella",
+  "profileSummary": "Krishna Ella is an Indian scientist and entrepreneur. He is the co-founder and Executive Chairman of Bharat Biotech, a biotechnology company known for developing Covaxin, India's first indigenous COVID-19 vaccine, in collaboration with the Indian Council of Medical Research (ICMR). Bharat Biotech was also involved in the development of ROTAVAC, a vaccine against rotavirus, in collaboration with Department of Biotechnology (DBT), Government of India, and international partners, including the Rotavirus Vaccine Development Program (RVDP) of PATH and the National Institutes of Health (NIH), USA; and Typbar TCV, a typhoid conjugate vaccine.\nElla worked as a research faculty member at the Medical University of South Carolina in Charleston after earning his Ph.D. from the University of Wisconsin–Madison. In 2022, Ella and his wife, Suchitra Ella, received the Padma Bhushan, India's third-highest civilian award, for their contributions to trade and industry.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Krishna_Murthy_Ella.jpg/330px-Krishna_Murthy_Ella.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Krishna_Ella",
+  "dateOfBirth": "1969-03-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.18333333",
+  "birthCoordinatesLng": "79.63333333",
+  "moonSign": "8",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "scientist",
+    "entrepreneur"
+  ],
+  "qid": "Q6437407",
+  "birthPlace": "Tiruttani",
+  "fetchedAt": "2026-04-08T02:05:07.456Z"
+}

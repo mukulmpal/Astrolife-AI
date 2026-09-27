@@ -1,0 +1,27 @@
+{
+  "publicId": "40063a60",
+  "wikipediaSlug": "Biddu",
+  "wikipediaId": "Q4904074",
+  "name": "Biddu",
+  "fullName": "Biddu",
+  "profileSummary": "Biddu Appaiah, known mononymously as Biddu, is an Indian-British singer-songwriter, composer, and music producer who composed and produced many worldwide hit records during a career spanning five decades. Considered one of the pioneers of disco, Euro disco, and Indian pop, he has sold millions of records worldwide, and has received an Ivor Novello award for his work. He has been ranked at number 34 on NME's \"The 50 Greatest Producers Ever\" list.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Biddu_1994_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Biddu",
+  "dateOfBirth": "1944-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "record producer",
+    "songwriter"
+  ],
+  "qid": "Q4904074",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-08T02:08:04.706Z"
+}

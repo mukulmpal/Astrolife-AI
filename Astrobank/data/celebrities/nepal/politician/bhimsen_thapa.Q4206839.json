@@ -1,0 +1,28 @@
+{
+  "publicId": "1ec78351",
+  "wikipediaSlug": "Bhimsen_Thapa",
+  "wikipediaId": "Q4206839",
+  "name": "Bhimsen Thapa",
+  "fullName": "Bhimsen Thapa",
+  "profileSummary": "Bhimsen Thapa was a Nepalese statesman who served as the Mukhtiyar and de facto ruler of Nepal from 1806 to 1837. He is widely known as the first and the longest-serving prime minister of Nepal. He was inducted into the \"National heroes of Nepal\" by King Mahendra Bir Bikram Shah.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bhimsen_Thapa_sitting.jpg/330px-Bhimsen_Thapa_sitting.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhimsen_Thapa",
+  "dateOfBirth": "1775-08-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.283333333",
+  "birthCoordinatesLng": "84.683333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4206839",
+  "birthPlace": "Gorkha District",
+  "fetchedAt": "2026-04-07T16:55:12.551Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "16becb61",
+  "wikipediaSlug": "Basir_Ahamad",
+  "wikipediaId": "Q113171867",
+  "name": "Basir Ahamad",
+  "fullName": "Basir Ahamad",
+  "profileSummary": "Basir Ahamad is a Nepalese international cricketer who bowls slow left-arm orthodox and bats left-handed. He represents the Nepal national cricket team in One Day Internationals (ODIs) and Twenty20 Internationals (T20Is).",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Basir_Ahamad",
+  "dateOfBirth": "2003-09-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "12",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q113171867",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:50:20.813Z"
+}

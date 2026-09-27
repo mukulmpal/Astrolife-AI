@@ -1,0 +1,28 @@
+{
+  "publicId": "edfad6b2",
+  "wikipediaSlug": "Lopamudra_Bhattacharji",
+  "wikipediaId": "Q12988600",
+  "name": "Lopamudra Bhattacharji",
+  "fullName": "Lopamudra Bhattacharji",
+  "profileSummary": "Lopamudra Bhattacharji is a former Test and One Day International cricketer who represented the India national women's team. She played one Test and 15 ODIs for India as a medium-pace bowler.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Lopamudra_Bhattacharji",
+  "dateOfBirth": "1960-01-31",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q12988600",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T11:03:29.602Z"
+}

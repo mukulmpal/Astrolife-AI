@@ -1,0 +1,33 @@
+{
+  "publicId": "21a0a7e0",
+  "wikipediaSlug": "Balraj_Sahni",
+  "wikipediaId": "Q805511",
+  "name": "Balraj Sahni",
+  "fullName": "Balraj Sahni",
+  "profileSummary": "Balraj Sahni was an Indian film and stage actor, who is best known for Dharti Ke Lal (1946), Hum Log (1951), Do Bigha Zameen (1953), Chhoti Bahen (1959), Kabuliwala (1961), Waqt (1965) and Garm Hava (1973). He was the brother of Bhisham Sahni, the Hindi writer, playwright, and actor. He won a Filmfare Special Award for outstanding contribution to Indian films in 1970.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Balraj_Sahni_in_1941.png/330px-Balraj_Sahni_in_1941.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Balraj_Sahni",
+  "dateOfBirth": "1913-05-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "33.6007",
+  "birthCoordinatesLng": "73.0679",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "stage actor",
+    "film actor",
+    "autobiographer",
+    "screenwriter",
+    "writer",
+    "film director"
+  ],
+  "qid": "Q805511",
+  "birthPlace": "Rawalpindi",
+  "fetchedAt": "2026-04-07T12:17:13.085Z"
+}

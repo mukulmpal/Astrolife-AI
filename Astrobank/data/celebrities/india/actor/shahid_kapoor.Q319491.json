@@ -1,0 +1,31 @@
+{
+  "publicId": "d9ea8afb",
+  "wikipediaSlug": "Shahid_Kapoor",
+  "wikipediaId": "Q319491",
+  "name": "Shahid Kapoor",
+  "fullName": "Shahid Kapoor",
+  "profileSummary": "Shahid Kapoor is an Indian actor who works in Hindi films. Initially recognised for portraying romantic roles, he has since taken on parts in action films and thrillers. One of the highest-paid Indian actors and has featured in Forbes India's Celebrity 100 list since 2012. Kapoor is the recipient of several awards, including three Filmfare Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Shahid_Kapoor_at_Bloody_Daddy_launch_%28cropped%29.jpg/330px-Shahid_Kapoor_at_Bloody_Daddy_launch_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shahid_Kapoor",
+  "dateOfBirth": "1981-02-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "dancer",
+    "model",
+    "film actor"
+  ],
+  "qid": "Q319491",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T12:19:10.049Z"
+}

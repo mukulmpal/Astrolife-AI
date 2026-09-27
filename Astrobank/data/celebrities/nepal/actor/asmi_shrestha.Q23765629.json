@@ -1,0 +1,27 @@
+{
+  "publicId": "b9f78cdf",
+  "wikipediaSlug": "Asmi_Shrestha",
+  "wikipediaId": "Q23765629",
+  "name": "Asmi Shrestha",
+  "fullName": "Asmi Shrestha",
+  "profileSummary": "Asmi Shrestha is a Nepali model and beauty pageant titleholder who won the 2016 Miss Nepal pageant. She represented Nepal at the Miss World 2016 competition.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Asmi_Shrestha",
+  "dateOfBirth": "1993-06-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "7",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q23765629",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:40:40.825Z"
+}

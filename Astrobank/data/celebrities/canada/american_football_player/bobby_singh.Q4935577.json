@@ -1,0 +1,27 @@
+{
+  "publicId": "f1b79037",
+  "wikipediaSlug": "Bobby_Singh",
+  "wikipediaId": "Q4935577",
+  "name": "Bobby Singh",
+  "fullName": "Bobby Singh",
+  "profileSummary": "Bobby Singh is a retired professional American and Canadian football guard. He was drafted by the Calgary Stampeders in the first round of the 1999 CFL draft. Singh has the distinction of being the only player in football history to have won an XFL Championship, a Super Bowl, and a Grey Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Bobby_Singh.jpg/330px-Bobby_Singh.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bobby_Singh",
+  "dateOfBirth": "1975-11-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-18",
+  "birthCoordinatesLng": "178",
+  "moonSign": "3",
+  "sunSign": "8",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "American football player",
+    "Canadian football player"
+  ],
+  "qid": "Q4935577",
+  "birthPlace": "Fiji",
+  "fetchedAt": "2026-04-08T00:52:11.061Z"
+}

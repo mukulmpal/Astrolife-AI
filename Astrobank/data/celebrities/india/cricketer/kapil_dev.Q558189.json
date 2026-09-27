@@ -1,0 +1,31 @@
+{
+  "publicId": "cbea0c72",
+  "wikipediaSlug": "Kapil_Dev",
+  "wikipediaId": "Q558189",
+  "name": "Kapil Dev",
+  "fullName": "Kapil Dev",
+  "profileSummary": "Kapildev Ramlal Nikhanj is an Indian former cricket team captain. Regarded as one of the greatest all-rounders in the history of cricket, he was a fast-medium bowler and a hard-hitting middle-order batsman. Dev is the only player in the history of cricket to have taken more than 400 wickets and scored more than 5,000 runs in Test cricket.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Kapil_Dev_at_Equation_sports_auction_%283x4_cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kapil_Dev",
+  "dateOfBirth": "1959-01-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.736388888",
+  "birthCoordinatesLng": "76.788333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "film actor",
+    "coach",
+    "actor"
+  ],
+  "qid": "Q558189",
+  "birthPlace": "Chandigarh",
+  "fetchedAt": "2026-04-07T11:29:44.844Z"
+}

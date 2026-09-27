@@ -1,0 +1,28 @@
+{
+  "publicId": "86f9dc5f",
+  "wikipediaSlug": "Kalyani_Dhokarikar",
+  "wikipediaId": "Q6354958",
+  "name": "Kalyani Dhokarikar",
+  "fullName": "Kalyani Dhokarikar",
+  "profileSummary": "Kalyani Dhokarikar, also known as Kalyani Umbrani, is an Indian former international cricketer. She represented India as an all-rounder, batting right-handed and bowling right-arm fast-medium. During her 18 year cricketing career, she represented India in eight One Day Internationals and one Test match, between 1995 and 2000.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Kalyani_Dhokarikar.jpg/330px-Kalyani_Dhokarikar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kalyani_Dhokarikar",
+  "dateOfBirth": "1971-05-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "21.149722222",
+  "birthCoordinatesLng": "79.080555555",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6354958",
+  "birthPlace": "Nagpur",
+  "fetchedAt": "2026-04-07T11:03:25.251Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "b638fc35",
+  "wikipediaSlug": "Deepak_Chahar",
+  "wikipediaId": "Q5250490",
+  "name": "Deepak Chahar",
+  "fullName": "Deepak Chahar",
+  "profileSummary": "Deepak Chahar is an Indian international cricketer. He is a right-arm medium pace swing bowler, who plays for Rajasthan in domestic cricket and Mumbai Indians in the Indian Premier League. He was a part of the Indian squad which won the 2018 Asia Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Deepak_Chahar.jpg/330px-Deepak_Chahar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepak_Chahar",
+  "dateOfBirth": "1972-08-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.18",
+  "birthCoordinatesLng": "78.02",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5250490",
+  "birthPlace": "Agra",
+  "fetchedAt": "2026-04-07T10:57:36.135Z"
+}

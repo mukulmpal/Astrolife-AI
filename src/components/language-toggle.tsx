@@ -40,7 +40,7 @@ export function LanguageToggle() {
       background: active
         ? "linear-gradient(135deg, #c8a030, #a06820)"
         : "transparent",
-      color: active ? "#08051a" : "#605890",
+      color: active ? "#FAF7F2" : "#6B635B",
     }) as const;
 
   if (!mounted) {

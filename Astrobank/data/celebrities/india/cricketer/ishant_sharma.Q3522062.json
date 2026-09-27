@@ -1,0 +1,28 @@
+{
+  "publicId": "5e82a6c2",
+  "wikipediaSlug": "Ishant_Sharma",
+  "wikipediaId": "Q3522062",
+  "name": "Ishant Sharma",
+  "fullName": "Ishant Sharma",
+  "profileSummary": "Ishant Sharma is an Indian cricketer who has represented India in Tests, ODIs and T20Is. He is a 6 ft 4 in tall right-arm fast-medium bowler. In 2011, he became the fifth youngest player to take 100 Test wickets. While often considered a \"rhythm\" bowler, prioritizing accuracy, he still is one of the fastest Indian bowlers having bowled in excess of 150 km/h on several occasions. In 2020, Indian government has awarded him the Arjuna Award to recognize his outstanding achievement in cricket. Sharma was a member of the Indian team that won the 2013 ICC Champions Trophy.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Ishant_Sharma_4.jpg/330px-Ishant_Sharma_4.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ishant_Sharma",
+  "dateOfBirth": "1988-09-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3522062",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T10:57:23.024Z"
+}

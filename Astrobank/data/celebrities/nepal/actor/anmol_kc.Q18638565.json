@@ -1,0 +1,27 @@
+{
+  "publicId": "f2c47d0d",
+  "wikipediaSlug": "Anmol_K.C.",
+  "wikipediaId": "Q18638565",
+  "name": "Anmol K.C.",
+  "fullName": "Anmol K.C.",
+  "profileSummary": "Anmol K.C. is a Nepalese actor and film producer known for his work in contemporary commercial Nepali cinema. He is the son of filmmaker and actor Bhuwan KC and actress Sushmita Bomjan.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Anmol_KC.png/330px-Anmol_KC.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anmol_K.C.",
+  "dateOfBirth": "1994-03-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "7",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer"
+  ],
+  "qid": "Q18638565",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:15.335Z"
+}

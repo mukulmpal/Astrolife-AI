@@ -1,0 +1,28 @@
+{
+  "publicId": "bfc14418",
+  "wikipediaSlug": "Amita_Sharma",
+  "wikipediaId": "Q3525902",
+  "name": "Amita Sharma",
+  "fullName": "Amita Sharma",
+  "profileSummary": "Amita Sharma is an Indian former cricketer and current chairperson of the selection panel of the India women's cricket team. She had played primarily as a right-arm medium-fast bowler. She appeared in five Test matches, 116 One Day Internationals and 41 Twenty20 Internationals for India from 2002 till 2014. She played domestic cricket for Railways, Assam and Delhi.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Amita_Sharma_%2810_March_2009%2C_Sydney%29.jpg/330px-Amita_Sharma_%2810_March_2009%2C_Sydney%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amita_Sharma",
+  "dateOfBirth": "1982-09-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3525902",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T11:02:25.994Z"
+}

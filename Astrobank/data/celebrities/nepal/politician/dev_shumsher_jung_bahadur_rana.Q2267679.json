@@ -1,0 +1,28 @@
+{
+  "publicId": "0da9437a",
+  "wikipediaSlug": "Dev_Shumsher_Jung_Bahadur_Rana",
+  "wikipediaId": "Q2267679",
+  "name": "Dev Shumsher Jung Bahadur Rana",
+  "fullName": "Dev Shumsher Jung Bahadur Rana",
+  "profileSummary": "Sri Maharaja, Dev Shumsher Jung Bahadur Rana was the Prime Minister of Nepal for 114 days in 1901. He was also the King of Lamjung and Kaski.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Dev_Shumsher_Jung_Bahadur_Rana_%28cropped%29.png/330px-Dev_Shumsher_Jung_Bahadur_Rana_%28cropped%29.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dev_Shumsher_Jung_Bahadur_Rana",
+  "dateOfBirth": "1862-07-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q2267679",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:55:15.139Z"
+}

@@ -13,80 +13,113 @@ interface CosmicPulseCardProps {
 
 export const CosmicPulseCard: React.FC<CosmicPulseCardProps> = ({ pulse }) => {
   const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"alert" | "timing" | "balance" | "remedy">("alert");
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border shadow-xl p-5 sm:p-6 mb-6 transition-colors duration-300"
+      className="card mb-6 transition-all duration-300"
       style={{
-        background: "linear-gradient(135deg, var(--app-card), var(--app-card-alt))",
-        borderColor: "var(--app-border-strong)",
+        background: "var(--app-card, #FFFFFF)",
+        border: "1px solid var(--app-border, rgba(184,134,11,0.2))",
+        borderRadius: "16px",
+        padding: "24px",
       }}
     >
-      {/* Background Subtle Radial Orb for Luxury Vedic Feel */}
-      <div
-        className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none opacity-15 blur-3xl -mr-20 -mt-20"
-        style={{ background: "radial-gradient(circle, var(--app-gold) 0%, var(--al-violet, #7c3aed) 50%, transparent 80%)" }}
-      />
-
       {/* Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
-          <div
-            className="text-[10px] tracking-[2px] uppercase font-bold flex items-center gap-1.5"
-            style={{ color: "var(--app-gold)" }}
-          >
-            <span>✦</span> Cosmic Pulse Intelligence
+          <div className="card-tag" style={{ color: "var(--app-gold, #c8a030)" }}>
+            ✦ Cosmic Pulse Intelligence
           </div>
           <h2
             className="text-xl sm:text-2xl font-serif font-bold tracking-tight mt-0.5"
-            style={{ color: "var(--app-fg)" }}
+            style={{ color: "var(--app-fg, #1A1A1A)" }}
           >
             Personal Planetary Radar
           </h2>
         </div>
-        <div
-          className="text-[11px] px-3 py-1 rounded-full flex items-center gap-1.5 border"
-          style={{
-            background: "var(--app-card-alt)",
-            borderColor: "var(--app-border)",
-            color: "var(--app-soft)",
-          }}
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Vedic Shastra Live</span>
+        <div className="flex items-center gap-2">
+          <div
+            className="text-[11px] px-3 py-1 rounded-full flex items-center gap-1.5 border font-mono"
+            style={{
+              background: "var(--app-card-alt, #09071a)",
+              borderColor: "var(--app-border, rgba(184,134,11,0.2))",
+              color: "var(--app-soft, #4A4238)",
+            }}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Vedic Shastra Live</span>
+          </div>
         </div>
       </div>
 
-      {/* Status Badges */}
-      <PulseStatus
-        dominantTrigger={pulse.dominantTrigger}
-        dashaMilestone={pulse.dashaMilestone}
-      />
+      {/* Status Bar */}
+      <div className="mb-4">
+        <PulseStatus
+          dominantTrigger={pulse.dominantTrigger}
+          dashaMilestone={pulse.dashaMilestone}
+        />
+      </div>
 
-      {/* Dominant Alert Section */}
-      <PulseAlert
-        trigger={pulse.dominantTrigger}
-        onOpenEvidence={() => setIsEvidenceOpen((prev) => !prev)}
-        isEvidenceOpen={isEvidenceOpen}
-      />
+      {/* Clean Tabs (LalKitab / Yoga Engine Style) */}
+      <div className="tabs" style={{ marginBottom: 18 }}>
+        <button
+          onClick={() => setActiveTab("alert")}
+          className={`tab ${activeTab === "alert" ? "active" : ""}`}
+        >
+          ⚡ Dominant Aspect
+        </button>
+        <button
+          onClick={() => setActiveTab("timing")}
+          className={`tab ${activeTab === "timing" ? "active" : ""}`}
+        >
+          ⏱️ Shubh Timing
+        </button>
+        <button
+          onClick={() => setActiveTab("balance")}
+          className={`tab ${activeTab === "balance" ? "active" : ""}`}
+        >
+          🌙 Moon & Tara Bala
+        </button>
+        <button
+          onClick={() => setActiveTab("remedy")}
+          className={`tab ${activeTab === "remedy" ? "active" : ""}`}
+        >
+          🪔 Vedic Upaya
+        </button>
+      </div>
 
-      {/* Micro-Timing Row (Action vs Avoidance Windows) */}
-      <PulseTiming timing={pulse.microTiming} />
+      {/* Tab Panels */}
+      <div className="pt-1">
+        {activeTab === "alert" && (
+          <PulseAlert
+            trigger={pulse.dominantTrigger}
+            onOpenEvidence={() => setIsEvidenceOpen((prev) => !prev)}
+            isEvidenceOpen={isEvidenceOpen}
+          />
+        )}
 
-      {/* Personal Modifiers (Tara Bala & Chandra Bala) */}
-      <PulseBalance
-        taraBala={pulse.taraBala}
-        chandraBala={pulse.chandraBala}
-      />
+        {activeTab === "timing" && (
+          <PulseTiming timing={pulse.microTiming} />
+        )}
 
-      {/* Practical Alignment & Upaya */}
-      <PulseRemedy
-        behavioralReset={pulse.microRemedy.behavioralReset}
-        traditionalUpaya={pulse.microRemedy.traditionalUpaya}
-        durationMinutes={pulse.microRemedy.durationMinutes}
-      />
+        {activeTab === "balance" && (
+          <PulseBalance
+            taraBala={pulse.taraBala}
+            chandraBala={pulse.chandraBala}
+          />
+        )}
 
-      {/* Collapsible Evidence & Vedic Learning Drawer ("Kyu aur Kaise") */}
+        {activeTab === "remedy" && (
+          <PulseRemedy
+            behavioralReset={pulse.microRemedy.behavioralReset}
+            traditionalUpaya={pulse.microRemedy.traditionalUpaya}
+            durationMinutes={pulse.microRemedy.durationMinutes}
+          />
+        )}
+      </div>
+
+      {/* Collapsible Evidence & Vedic Learning Drawer */}
       <PulseEvidenceDrawer
         trigger={pulse.dominantTrigger}
         taraBala={pulse.taraBala}

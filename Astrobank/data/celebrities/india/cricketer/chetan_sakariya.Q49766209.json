@@ -1,0 +1,28 @@
+{
+  "publicId": "7feb2188",
+  "wikipediaSlug": "Chetan_Sakariya",
+  "wikipediaId": "Q49766209",
+  "name": "Chetan Sakariya",
+  "fullName": "Chetan Sakariya",
+  "profileSummary": "Chetan Sakariya is an Indian international cricketer who has played for Indian cricket team, and currently plays for Saurashtra in domestic cricket. He made his international debut for the India cricket team in July 2021.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chetan_Sakariya",
+  "dateOfBirth": "1998-08-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "21.73",
+  "birthCoordinatesLng": "72.07",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q49766209",
+  "birthPlace": "Vartej",
+  "fetchedAt": "2026-04-07T10:57:59.891Z"
+}

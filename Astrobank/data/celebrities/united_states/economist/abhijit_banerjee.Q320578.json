@@ -1,0 +1,27 @@
+{
+  "publicId": "fb3670ac",
+  "wikipediaSlug": "Abhijit_Banerjee",
+  "wikipediaId": "Q320578",
+  "name": "Abhijit Banerjee",
+  "fullName": "Abhijit Banerjee",
+  "profileSummary": "Abhijit Vinayak Banerjee is an Indian American economist who is currently the Ford Foundation International Professor of Economics at the Massachusetts Institute of Technology. He is co-founder and co-director of the Abdul Latif Jameel Poverty Action Lab (J-PAL), an MIT based global research center promoting the use of scientific evidence to inform poverty alleviation strategies. In 2019, Banerjee shared the Nobel Memorial Prize in Economic Sciences with Esther Duflo and Michael Kremer, \"for their experimental approach to alleviating global poverty.\" He and Esther Duflo are married, and became the sixth married couple to jointly win a Nobel or Nobel Memorial Prize.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Abhijit_Banerjee_at_the_2025_Jaipur_Literature_Festival.jpg/330px-Abhijit_Banerjee_at_the_2025_Jaipur_Literature_Festival.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhijit_Banerjee",
+  "dateOfBirth": "1961-02-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "1",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "economist",
+    "university teacher"
+  ],
+  "qid": "Q320578",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T00:00:11.718Z"
+}

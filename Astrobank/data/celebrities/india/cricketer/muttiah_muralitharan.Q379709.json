@@ -1,0 +1,28 @@
+{
+  "publicId": "621de973",
+  "wikipediaSlug": "Muttiah_Muralitharan",
+  "wikipediaId": "Q379709",
+  "name": "Muttiah Muralitharan",
+  "fullName": "Muttiah Muralitharan",
+  "profileSummary": "Deshabandu Muttiah Muralitharan is a Sri Lankan cricket coach, businessman and former professional cricketer. Averaging over six wickets per Test match, he is widely regarded as one of the greatest players in the history of the sport. He is the only bowler to take 800 Test wickets and more than 530 One Day International (ODI) wickets. As of 2026, he has taken more wickets in international cricket than any other bowler. Muralitharan was a part of the Sri Lankan team that won the 1996 Cricket World Cup and the team which was joint-winners with India of the 2002 ICC Champions Trophy.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Photograph_of_Muttiah_Muralitharan.jpg/330px-Photograph_of_Muttiah_Muralitharan.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Muttiah_Muralitharan",
+  "dateOfBirth": "1972-04-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "7.293055555",
+  "birthCoordinatesLng": "80.635",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q379709",
+  "birthPlace": "Kandy",
+  "fetchedAt": "2026-04-07T12:19:23.505Z"
+}

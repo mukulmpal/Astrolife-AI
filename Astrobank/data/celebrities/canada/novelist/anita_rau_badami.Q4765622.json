@@ -1,0 +1,28 @@
+{
+  "publicId": "7ef37df4",
+  "wikipediaSlug": "Anita_Rau_Badami",
+  "wikipediaId": "Q4765622",
+  "name": "Anita Rau Badami",
+  "fullName": "Anita Rau Badami",
+  "profileSummary": "Anita Rau Badami is a Canadian writer of Indian descent.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anita_Rau_Badami",
+  "dateOfBirth": "1961-09-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.249166666",
+  "birthCoordinatesLng": "84.882777777",
+  "moonSign": "12",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "novelist",
+    "writer",
+    "journalist"
+  ],
+  "qid": "Q4765622",
+  "birthPlace": "Rourkela",
+  "fetchedAt": "2026-04-08T00:52:19.756Z"
+}

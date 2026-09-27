@@ -1,0 +1,29 @@
+{
+  "publicId": "398f28aa",
+  "wikipediaSlug": "Gautam_Gambhir",
+  "wikipediaId": "Q2721515",
+  "name": "Gautam Gambhir",
+  "fullName": "Gautam Gambhir",
+  "profileSummary": "Gautam Gambhir is a former international cricketer, former politician, and philanthropist who is the current head coach of the Indian cricket team. He played for India in all formats of the game between 2003 and 2016. He was a member of the 17th Lok Sabha from 2019 to 2024 representing East Delhi constituency from the Bharatiya Janata Party. He received the Padma Shri from the Government of India in 2019, the fourth highest civilian award in India. According to Indian Express he is the 74th most powerful person in India and the most powerful Indian Sportsman in 2026.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Padma_Shri_Gautam_Gambhir_%28cropped%29.jpg/330px-Padma_Shri_Gautam_Gambhir_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gautam_Gambhir",
+  "dateOfBirth": "1981-10-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "politician"
+  ],
+  "qid": "Q2721515",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T10:57:21.392Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "8bae9dc0",
+  "wikipediaSlug": "Pankaj_Patel",
+  "wikipediaId": "Q7131291",
+  "name": "Pankaj Patel",
+  "fullName": "Pankaj Patel",
+  "profileSummary": "Pankaj Ramanbhai Patel is an Indian billionaire businessman, and the chairman of Zydus Lifesciences, the fifth largest pharmaceutical company in India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/83/Pankaj_R._Patel_receiving_Padma_Bhushan_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Pankaj_Patel",
+  "dateOfBirth": "1951-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.3593",
+  "birthCoordinatesLng": "72.9005",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q7131291",
+  "birthPlace": "Bhadran",
+  "fetchedAt": "2026-04-08T02:06:21.862Z"
+}

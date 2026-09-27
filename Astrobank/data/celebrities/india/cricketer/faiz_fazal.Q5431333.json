@@ -1,0 +1,28 @@
+{
+  "publicId": "28b73089",
+  "wikipediaSlug": "Faiz_Fazal",
+  "wikipediaId": "Q5431333",
+  "name": "Faiz Fazal",
+  "fullName": "Faiz Fazal",
+  "profileSummary": "Faiz Yakub Fazal is an Indian former cricketer who played for Vidarbha in India, and Lisburn Cricket Club in Northern Ireland. He has previously played for Central Zone, India Red, India Under-19s, Railways, and Rajasthan Royals. He was a left-handed opening batsman.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Faiz_Fazal",
+  "dateOfBirth": "1985-09-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "21.149722222",
+  "birthCoordinatesLng": "79.080555555",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5431333",
+  "birthPlace": "Nagpur",
+  "fetchedAt": "2026-04-07T10:56:44.726Z"
+}

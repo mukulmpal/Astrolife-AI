@@ -1,0 +1,28 @@
+{
+  "publicId": "4736188a",
+  "wikipediaSlug": "Amit_Varma_(actor)",
+  "wikipediaId": "Q4746889",
+  "name": "Amit Varma (actor)",
+  "fullName": "Amit Varma (actor)",
+  "profileSummary": "Amit Varma is an Indian television actor, best known for his role as Vishwamitra Kelkar on the television show Hotel Kingston on Star One. He has also acted in the film Kismat Konnection.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amit_Varma_(actor)",
+  "dateOfBirth": "1978-10-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "8",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "television actor"
+  ],
+  "qid": "Q4746889",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:56.434Z"
+}

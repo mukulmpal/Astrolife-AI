@@ -1,0 +1,26 @@
+{
+  "publicId": "6d4aff2c",
+  "wikipediaSlug": "Ashwin_Sood",
+  "wikipediaId": "Q4806196",
+  "name": "Ashwin Sood",
+  "fullName": "Ashwin Sood",
+  "profileSummary": "Ashwin Sood is an English–born Canadian musician and drummer. He is best known for his musical association with his ex-wife Sarah McLachlan.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashwin_Sood",
+  "dateOfBirth": "1967-09-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "52.48",
+  "birthCoordinatesLng": "-1.9025",
+  "moonSign": "2",
+  "sunSign": "6",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "drummer"
+  ],
+  "qid": "Q4806196",
+  "birthPlace": "Birmingham",
+  "fetchedAt": "2026-04-08T00:52:09.608Z"
+}

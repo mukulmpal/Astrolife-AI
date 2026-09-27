@@ -1,0 +1,32 @@
+{
+  "publicId": "a1f6bf06",
+  "wikipediaSlug": "Kedar_Ghimire",
+  "wikipediaId": "Q17517127",
+  "name": "Kedar Ghimire",
+  "fullName": "Kedar Ghimire",
+  "profileSummary": "Kedar Prasad Ghimire is a Nepalese actor known for his work in the Nepali entertainment industry. He is widely famous and commonly known as Magne Budo from his hit TV Nepali sitcom Meri Bassai and Chakka Panja series. He is one of the most popular and highest grossing actors of Nepal.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kedar_Ghimire",
+  "dateOfBirth": "1975-05-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "9",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer",
+    "singer",
+    "screenwriter",
+    "television actor",
+    "film actor",
+    "television writer"
+  ],
+  "qid": "Q17517127",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-07T16:43:10.193Z"
+}

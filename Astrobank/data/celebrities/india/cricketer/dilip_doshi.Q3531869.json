@@ -1,0 +1,28 @@
+{
+  "publicId": "3a48b47e",
+  "wikipediaSlug": "Dilip_Doshi",
+  "wikipediaId": "Q3531869",
+  "name": "Dilip Doshi",
+  "fullName": "Dilip Doshi",
+  "profileSummary": "Dilip Rasiklal Doshi was an Indian cricketer from Bengal though his origin goes back to Gujarat. He played in 33 Test matches and 15 One Day Internationals from 1979 to 1983.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dilip_Doshi",
+  "dateOfBirth": "1947-12-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.296908333",
+  "birthCoordinatesLng": "70.798363888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3531869",
+  "birthPlace": "Rajkot",
+  "fetchedAt": "2026-04-07T10:56:46.774Z"
+}

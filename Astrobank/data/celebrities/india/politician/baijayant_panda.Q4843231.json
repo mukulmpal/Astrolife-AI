@@ -1,0 +1,26 @@
+{
+  "publicId": "a69faf13",
+  "wikipediaSlug": "Baijayant_Panda",
+  "wikipediaId": "Q4843231",
+  "name": "Baijayant Panda",
+  "fullName": "Baijayant Panda",
+  "profileSummary": "Baijayant \"Jay\" Panda is an Indian politician. He is the national vice president and spokesperson of the Bharatiya Janata Party (BJP). He was a Member of Parliament in the 15th and 16th Lok Sabha from Kendrapara. He was also a Member of Parliament in the Rajya Sabha for two terms from 2000 to 2009.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Baijayant_Panda",
+  "dateOfBirth": "1964-01-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "20.45",
+  "birthCoordinatesLng": "85.866666666",
+  "moonSign": "8",
+  "sunSign": "9",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4843231",
+  "birthPlace": "Cuttack",
+  "fetchedAt": "2026-04-07T16:20:27.730Z"
+}

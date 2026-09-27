@@ -1,0 +1,28 @@
+{
+  "publicId": "031e83d6",
+  "wikipediaSlug": "Abey_Kuruvilla",
+  "wikipediaId": "Q3520560",
+  "name": "Abey Kuruvilla",
+  "fullName": "Abey Kuruvilla",
+  "profileSummary": "Abey Kuruvilla is an Indian former cricketer and general manager of Board of Control for Cricket in India (BCCI). He played as a bowler in mid-1990s for Indian cricket team. He was a selector of BCCI.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abey_Kuruvilla",
+  "dateOfBirth": "1968-08-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "9.3",
+  "birthCoordinatesLng": "76.53333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3520560",
+  "birthPlace": "Mannar",
+  "fetchedAt": "2026-04-07T10:56:29.360Z"
+}

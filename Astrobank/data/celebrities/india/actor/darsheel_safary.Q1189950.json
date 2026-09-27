@@ -1,0 +1,28 @@
+{
+  "publicId": "289262bc",
+  "wikipediaSlug": "Darsheel_Safary",
+  "wikipediaId": "Q1189950",
+  "name": "Darsheel Safary",
+  "fullName": "Darsheel Safary",
+  "profileSummary": "Darsheel Safary is an Indian actor who appears in Hindi, Gujarati films and television. Safary made his film debut with the leading role of a dyslexic student in Aamir Khan's directorial debut, the critically acclaimed drama Taare Zameen Par (2007), for which he won the Filmfare critic's Award for Best Actor.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Darsheel_Safary_Mumbai_Juniorthon_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Darsheel_Safary",
+  "dateOfBirth": "1997-03-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q1189950",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T11:29:30.252Z"
+}

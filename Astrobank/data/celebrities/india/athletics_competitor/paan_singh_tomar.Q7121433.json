@@ -1,0 +1,28 @@
+{
+  "publicId": "de6f3e5a",
+  "wikipediaSlug": "Paan_Singh_Tomar",
+  "wikipediaId": "Q7121433",
+  "name": "Paan Singh Tomar",
+  "fullName": "Paan Singh Tomar",
+  "profileSummary": "Subedar Paan Singh Tomar was an Indian soldier, athlete, and rebel (Baaghi).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/07/Paan_Singh_Tomar.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Paan_Singh_Tomar",
+  "dateOfBirth": "1932-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.5622",
+  "birthCoordinatesLng": "78.7911",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "athletics competitor"
+  ],
+  "qid": "Q7121433",
+  "birthPlace": "Bhind",
+  "fetchedAt": "2026-04-07T11:30:01.956Z"
+}

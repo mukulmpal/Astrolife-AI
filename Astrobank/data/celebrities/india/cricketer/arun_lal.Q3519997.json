@@ -1,0 +1,28 @@
+{
+  "publicId": "5c56d9f0",
+  "wikipediaSlug": "Arun_Lal",
+  "wikipediaId": "Q3519997",
+  "name": "Arun Lal",
+  "fullName": "Arun Lal",
+  "profileSummary": "Jagdishlal Arun Lal is a retired Indian cricketer, and a cricket commentator. He played for India, as a right-handed batsman, between 1982 and 1989 was a gritty player.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Arun_Lal.jpg/330px-Arun_Lal.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arun_Lal",
+  "dateOfBirth": "1956-08-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.838888888",
+  "birthCoordinatesLng": "78.776944444",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3519997",
+  "birthPlace": "Moradabad",
+  "fetchedAt": "2026-04-07T10:56:18.290Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "f12a49a3",
+  "wikipediaSlug": "Tenzing_Norgay_Trainor",
+  "wikipediaId": "Q16942080",
+  "name": "Tenzing Norgay Trainor",
+  "fullName": "Tenzing Norgay Trainor",
+  "profileSummary": "Tenzing Norgay Trainor is an American actor. He gained notability for his role as Parker Rooney on the Disney Channel television show Liv and Maddie (2013–2017) and the voice of Jin in the animated adventure film Abominable (2019) and its follow-up Abominable and the Invisible City (2022–2023). He also appeared in TV shows including Good Luck Charlie, The Jadagrace Show, and Stevie TV.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Tenzing_Norgay_Trainor",
+  "dateOfBirth": "2001-09-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.124444444",
+  "birthCoordinatesLng": "-80.249444444",
+  "moonSign": "12",
+  "sunSign": "5",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "television actor"
+  ],
+  "qid": "Q16942080",
+  "birthPlace": "Plantation",
+  "fetchedAt": "2026-04-08T02:07:17.349Z"
+}

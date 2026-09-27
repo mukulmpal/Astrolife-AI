@@ -1,0 +1,26 @@
+{
+  "publicId": "b4a7da89",
+  "wikipediaSlug": "Bidhu_Jha",
+  "wikipediaId": "Q4904164",
+  "name": "Bidhu Jha",
+  "fullName": "Bidhu Jha",
+  "profileSummary": "Bidhu Shekhar Jha is a Canadian politician in Manitoba, Canada. He was a member of the Legislative Assembly of Manitoba from 2003 to 2016, representing the Winnipeg division of Radisson as a member of the New Democratic Party.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Bidhu_Shekhar_Jha.webp/330px-Bidhu_Shekhar_Jha.webp.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bidhu_Jha",
+  "dateOfBirth": "1942-08-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "24.48",
+  "birthCoordinatesLng": "86.7",
+  "moonSign": "1",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4904164",
+  "birthPlace": "Deoghar",
+  "fetchedAt": "2026-04-08T00:52:21.122Z"
+}

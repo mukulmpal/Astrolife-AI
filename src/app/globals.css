@@ -9,99 +9,43 @@
    Swap by setting <body class="theme-*"> on the server/client.
    ============================================================ */
 
-/* ── Midnight (default · Thursday · Jupiter) ─────────────── */
+/* ── Standardized Warm Cream Parchment Palette (All Days & Defaults) ── */
 :root,
-body.theme-midnight {
-  --al-bg:          #0A0E1F;
-  --al-bg-2:        #0E1428;
-  --al-surface:     #11162E;
-  --al-surface-2:   #161D38;
-  --al-line:        rgba(201,169,97,0.18);
-  --al-line-strong: rgba(201,169,97,0.35);
-  --al-gold:        #C9A961;
-  --al-gold-bright: #D9BE7B;
-  --al-gold-dim:    #8C7440;
-  --al-saffron:     #E8923C;
-  --al-violet:      #8B7BC4;
+body.theme-midnight,
+body.theme-saffron,
+body.theme-ivory,
+body.theme-maroon,
+body.theme-forest,
+body.theme-twilight {
+  --al-bg:          #FAF7F2;
+  --al-bg-2:        #F5EFE3;
+  --al-surface:     #FFFFFF;
+  --al-surface-2:   #FAF5EB;
+  --al-line:        rgba(184,134,11,0.22);
+  --al-line-strong: rgba(184,134,11,0.40);
+  --al-gold:        #B8860B;
+  --al-gold-bright: #D4AF37;
+  --al-gold-dim:    #8C6508;
+  --al-saffron:     #D97706;
+  --al-violet:      #8C6508;
   --al-crimson:     #C9555F;
-  --al-jade:        #6FB58A;
-  --al-ivory:       #F4EFE6;
-  --al-ivory-dim:   #C8C1B0;
-  --al-ivory-mute:  #8A8474;
-  --al-cream:       #F2ECDF;
-  --al-cream-dark:  #1A1F3A;
-  --al-text:        var(--al-ivory);
-  --al-text-dim:    var(--al-ivory-dim);
-  --al-text-mute:   var(--al-ivory-mute);
+  --al-jade:        #0f6b36;
+  --al-ivory:       #1A1A1A;
+  --al-ivory-dim:   #3D3834;
+  --al-ivory-mute:  #6B635B;
+  --al-cream:       #FAF7F2;
+  --al-cream-dark:  #FAF5EB;
+  --al-text:        #1A1A1A;
+  --al-text-dim:    #3D3834;
+  --al-text-mute:   #6B635B;
   --al-primary:     var(--al-gold);
   --al-primary-strong: var(--al-gold-bright);
-  --al-primary-on:  var(--al-bg);
+  --al-primary-on:  #FFFFFF;
   --al-success:     var(--al-jade);
   --al-warning:     var(--al-saffron);
   --al-danger:      var(--al-crimson);
-  /* graha of the day metadata */
-  --al-day-graha:   "Jupiter";
-  --al-day-glyph:   "♃";
-}
-
-/* ── Saffron (Sunday · Surya · Sun) ──────────────────────── */
-body.theme-saffron {
-  --al-bg:#1A0F0A; --al-bg-2:#221308; --al-surface:#2A180C; --al-surface-2:#321D10;
-  --al-line:rgba(232,146,60,0.22); --al-line-strong:rgba(232,146,60,0.42);
-  --al-gold:#E8923C; --al-gold-bright:#F4A85A; --al-gold-dim:#94591F;
-  --al-saffron:#F4A85A; --al-violet:#C99F6B;
-  --al-ivory:#FAEFE0; --al-ivory-dim:#D9C5A8; --al-ivory-mute:#9B8366;
-  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
-  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
-  --al-day-graha: "Sun"; --al-day-glyph: "☉";
-}
-
-/* ── Ivory (Monday · Chandra · Moon + Friday · Shukra · Venus) */
-body.theme-ivory {
-  --al-bg:#F2ECDF; --al-bg-2:#EAE3D2; --al-surface:#ECE5D3; --al-surface-2:#E3DAC4;
-  --al-line:rgba(26,31,58,0.14); --al-line-strong:rgba(26,31,58,0.30);
-  --al-gold:#735821; --al-gold-bright:#5E4314; --al-gold-dim:#6A5528;
-  --al-saffron:#E8923C; --al-violet:#6B5B8C; --al-crimson:#C9555F; --al-jade:#4A8A62;
-  --al-ivory:#1A1F3A; --al-ivory-dim:#334155; --al-ivory-mute:#4B5563;
-  --al-text:#1A1F3A; --al-text-dim:#334155; --al-text-mute:#4B5563;
-  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:#fffdf8;
-  --al-day-graha: "Moon / Venus"; --al-day-glyph: "☽";
-}
-
-/* ── Maroon (Tuesday · Mangal · Mars) ────────────────────── */
-body.theme-maroon {
-  --al-bg:#1A080C; --al-bg-2:#220B10; --al-surface:#2A0F15; --al-surface-2:#34141C;
-  --al-line:rgba(212,166,86,0.18); --al-line-strong:rgba(212,166,86,0.36);
-  --al-gold:#D4A656; --al-gold-bright:#EAC275; --al-gold-dim:#8E6F39;
-  --al-saffron:#E8923C; --al-violet:#B07B8C;
-  --al-ivory:#F4ECD8; --al-ivory-dim:#CFC3A6; --al-ivory-mute:#8A7E66;
-  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
-  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
-  --al-day-graha: "Mars"; --al-day-glyph: "♂";
-}
-
-/* ── Forest (Wednesday · Budha · Mercury) ────────────────── */
-body.theme-forest {
-  --al-bg:#0A1812; --al-bg-2:#0F2118; --al-surface:#122A1F; --al-surface-2:#163424;
-  --al-line:rgba(201,169,97,0.16); --al-line-strong:rgba(201,169,97,0.32);
-  --al-gold:#C9A961; --al-gold-bright:#E3C97A; --al-gold-dim:#8C7440;
-  --al-saffron:#E8C46A; --al-violet:#6FB58A;
-  --al-ivory:#F0EBDE; --al-ivory-dim:#BFB89F; --al-ivory-mute:#7C7765;
-  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
-  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
-  --al-day-graha: "Mercury"; --al-day-glyph: "☿";
-}
-
-/* ── Twilight (Saturday · Shani · Saturn) ────────────────── */
-body.theme-twilight {
-  --al-bg:#0A081C; --al-bg-2:#100D26; --al-surface:#171234; --al-surface-2:#1F1947;
-  --al-line:rgba(183,148,244,0.16); --al-line-strong:rgba(183,148,244,0.34);
-  --al-gold:#E8A24E; --al-gold-bright:#F6C572; --al-gold-dim:#A0712E;
-  --al-saffron:#E8A24E; --al-violet:#B794F4; --al-crimson:#F092D0;
-  --al-ivory:#F4EFE6; --al-ivory-dim:#D2CBE0; --al-ivory-mute:#8E87A6;
-  --al-text:var(--al-ivory); --al-text-dim:var(--al-ivory-dim); --al-text-mute:var(--al-ivory-mute);
-  --al-primary:var(--al-gold); --al-primary-strong:var(--al-gold-bright); --al-primary-on:var(--al-bg);
-  --al-day-graha: "Saturn"; --al-day-glyph: "♄";
+  --al-day-graha:   "Chandra / Shukra";
+  --al-day-glyph:   "☽";
 }
 
 /* ── Shared typography & spacing tokens (palette-independent) */
@@ -262,48 +206,27 @@ body.theme-maroon, body.theme-forest, body.theme-twilight {
   --font-mono: "SFMono-Regular", "Cascadia Code", monospace;
 }
 
-html[data-landing-theme="saffron"] {
-  --background: #0c0804;
-  --foreground: #fdf0d8;
-  --app-bg: #0c0804;
-  --app-fg: #fdf0d8;
-  --app-card: #130a04;
-  --app-border: #2a1808;
-  --app-muted: #806040;
-  --app-accent: #8b3a10;
-  --app-gold: #c87820;
-  --app-gold-strong: #ffd080;
-  --app-primary-on: #0c0804;
-  --app-soft: #c8a878;
-  --app-muted-deep: #4a2a12;
-  --app-card-alt: #1c1008;
-  --app-border-strong: #3a2210;
-  --chart-bg: #100803;
-  --chart-line: #6b421d;
-  --chart-line-soft: #3f2410;
-  --chart-label: #b0804a;
-}
-
+html[data-landing-theme="saffron"],
 html[data-theme-mode="light"] {
-  --background: #f7f4ea;
-  --foreground: #2f2745;
-  --app-bg: #f7f4ea;
-  --app-fg: #2f2745;
-  --app-card: #fffdf8;
-  --app-border: #dfd3bf;
-  --app-muted: #7b6a55;
-  --app-accent: #795548;
-  --app-gold: #b98524;
-  --app-gold-strong: #6f4c14;
-  --app-primary-on: #fffdf8;
-  --app-soft: #5f523f;
-  --app-muted-deep: #9b8b76;
-  --app-card-alt: #fff9ee;
-  --app-border-strong: #c8b899;
-  --chart-bg: #fff9ee;
-  --chart-line: #c9ad7a;
-  --chart-line-soft: #dfcfb0;
-  --chart-label: #8b7357;
+  --background: #FAF7F2;
+  --foreground: #1A1A1A;
+  --app-bg: #FAF7F2;
+  --app-fg: #1A1A1A;
+  --app-card: #FFFFFF;
+  --app-border: rgba(184, 134, 11, 0.22);
+  --app-muted: #6B635B;
+  --app-accent: #8C6508;
+  --app-gold: #B8860B;
+  --app-gold-strong: #D4AF37;
+  --app-primary-on: #FFFFFF;
+  --app-soft: #3D3834;
+  --app-muted-deep: #FAF5EB;
+  --app-card-alt: #FAF5EB;
+  --app-border-strong: rgba(184, 134, 11, 0.38);
+  --chart-bg: #FFFFFF;
+  --chart-line: #B8860B;
+  --chart-line-soft: rgba(184, 134, 11, 0.25);
+  --chart-label: #6B635B;
 }
 
 body {

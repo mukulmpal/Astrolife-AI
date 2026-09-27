@@ -1,0 +1,29 @@
+{
+  "publicId": "5c5b3400",
+  "wikipediaSlug": "Haji_Mastan",
+  "wikipediaId": "Q5639905",
+  "name": "Haji Mastan",
+  "fullName": "Haji Mastan",
+  "profileSummary": "Haji Mastan was an organised crime gang leader, originally from Tamil Nadu and based in Mumbai. He was one of the infamous trio of mafia gang leaders in Mumbai for over two decades from the 1960s to the early 1980s, along with Karim Lala leader of the Pathan gang in Bombay and Madras, and Varadarajan Mudaliar, another famous gang leader from Tamil Nadu in South India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/64/Haji_Mastan_Mirza.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Haji_Mastan",
+  "dateOfBirth": "1926-03-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "9.368238888",
+  "birthCoordinatesLng": "78.950311111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film producer",
+    "politician"
+  ],
+  "qid": "Q5639905",
+  "birthPlace": "Panaikulam",
+  "fetchedAt": "2026-04-07T11:29:46.466Z"
+}

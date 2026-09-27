@@ -1,0 +1,33 @@
+{
+  "publicId": "8c85fae4",
+  "wikipediaSlug": "Padma_Lakshmi",
+  "wikipediaId": "Q464835",
+  "name": "Padma Lakshmi",
+  "fullName": "Padma Lakshmi",
+  "profileSummary": "Padma Parvati Lakshmi is an American television host, model, author, entrepreneur, and activist. She rose to prominence by hosting the Bravo cooking competition program Top Chef (2006–2023). Lakshmi is the creator, host, and executive producer of the docuseries Taste the Nation with Padma Lakshmi, which premiered in 2020 on Hulu. For her work with these two series, as an executive producer and as a host, she has received 16 Primetime Emmy Award nominations.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Padma_Lakshmi_%282017%29_05.jpg/330px-Padma_Lakshmi_%282017%29_05.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Padma_Lakshmi",
+  "dateOfBirth": "1970-09-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": "5",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television presenter",
+    "model",
+    "television actor",
+    "writer",
+    "activist",
+    "philanthropist",
+    "television producer"
+  ],
+  "qid": "Q464835",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-08T02:08:53.305Z"
+}

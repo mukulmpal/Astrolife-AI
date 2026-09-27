@@ -1,0 +1,28 @@
+{
+  "publicId": "b458df14",
+  "wikipediaSlug": "Nitish_Rana",
+  "wikipediaId": "Q20745110",
+  "name": "Nitish Rana",
+  "fullName": "Nitish Rana",
+  "profileSummary": "Nitish Rana is an Indian cricketer who represented the national team in One Day International and Twenty20 International cricket in 2021. He is a left-handed batsman and an off spin bowler. In the Indian Premier League (IPL), he has played for the Mumbai Indians, Kolkata Knight Riders and was acquired by the Rajasthan Royals ahead of the 2025 IPL season. In November 2018, he was appointed captain of Delhi cricket team, succeeding former captain Gautam Gambhir. He also captained Kolkata Knight Riders during the IPL 2023 season in place of regular captain Shreyas Iyer who was out with an injury.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nitish_Rana",
+  "dateOfBirth": "1993-12-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q20745110",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T10:58:24.550Z"
+}

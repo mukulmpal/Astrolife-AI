@@ -1,0 +1,28 @@
+{
+  "publicId": "d8f8b0d4",
+  "wikipediaSlug": "Arshad_Ayub",
+  "wikipediaId": "Q3521044",
+  "name": "Arshad Ayub",
+  "fullName": "Arshad Ayub",
+  "profileSummary": "Arshad Ayub is a former Indian cricketer who played in 13 Test matches and 32 One Day Internationals from 1987 to 1997. In January 2010, he became the manager for the Indian Cricket team for the series held in Bangladesh and for the world cup 2015 in Australia. He is the former president of the Hyderabad Cricket Association. He was a part of the Indian squad which won the 1988 Asia Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arshad_Ayub",
+  "dateOfBirth": "1958-08-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.361666666",
+  "birthCoordinatesLng": "78.474722222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3521044",
+  "birthPlace": "Hyderabad",
+  "fetchedAt": "2026-04-07T10:56:08.479Z"
+}

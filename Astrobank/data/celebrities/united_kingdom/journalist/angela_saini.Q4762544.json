@@ -1,0 +1,28 @@
+{
+  "publicId": "f32c806e",
+  "wikipediaSlug": "Angela_Saini",
+  "wikipediaId": "Q4762544",
+  "name": "Angela Saini",
+  "fullName": "Angela Saini",
+  "profileSummary": "Angela Saini is a British science journalist, broadcaster and the author of books, of which the fourth, The Patriarchs: The Origins of Inequality, was published in 2023 and was a finalist for that year's George Orwell Prize for Political Writing. Saini has worked as a reporter and presenter for the BBC and has written for a number of publications, including The Guardian, New Scientist, and Wired UK. She has also produced and presented several radio and television documentaries, including a BBC Radio 4 documentary on biofuels and a BBC World Service documentary on the impact of climate change on Indian agriculture. Saini's writing and reporting focus on how science interacts with society, especially on how it affects marginalized groups, and she has been acclaimed for her work by a diverse range of organizations and institutions.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Angela_Saini_photo.jpeg/330px-Angela_Saini_photo.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Angela_Saini",
+  "dateOfBirth": "1980-10-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.507222222",
+  "birthCoordinatesLng": "-0.1275",
+  "moonSign": "1",
+  "sunSign": "7",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist",
+    "writer",
+    "television journalist"
+  ],
+  "qid": "Q4762544",
+  "birthPlace": "London",
+  "fetchedAt": "2026-04-08T00:22:00.727Z"
+}

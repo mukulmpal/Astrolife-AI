@@ -1,0 +1,27 @@
+{
+  "publicId": "2c2532ec",
+  "wikipediaSlug": "Sunil_Mittal",
+  "wikipediaId": "Q1301476",
+  "name": "Sunil Mittal",
+  "fullName": "Sunil Mittal",
+  "profileSummary": "Sunil Bharti Mittal is an Indian billionaire industrialist and philanthropist. He is the founder and chairman of Bharti Enterprises.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Sunil_Mittal.jpg/330px-Sunil_Mittal.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sunil_Mittal",
+  "dateOfBirth": "1957-10-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.908333333",
+  "birthCoordinatesLng": "75.848611111",
+  "moonSign": "7",
+  "sunSign": "7",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "entrepreneur",
+    "businessperson"
+  ],
+  "qid": "Q1301476",
+  "birthPlace": "Ludhiana",
+  "fetchedAt": "2026-04-08T02:06:19.736Z"
+}

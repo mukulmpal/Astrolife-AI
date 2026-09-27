@@ -1,0 +1,29 @@
+{
+  "publicId": "d2675f09",
+  "wikipediaSlug": "Barsaman_Pun",
+  "wikipediaId": "Q15427968",
+  "name": "Barsaman Pun",
+  "fullName": "Barsaman Pun",
+  "profileSummary": "Barsaman Pun, also known by his nom de guerre Ananta, is a Nepali communist politician and former Minister for Energy, Water Resources and Irrigation.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/%E0%A4%93%E0%A4%A8%E0%A4%B8%E0%A4%B0%E0%A5%80_%E0%A4%98%E0%A4%B0%E0%A5%8D%E0%A4%A4%E0%A4%BF%E0%A4%AE%E0%A4%97%E0%A4%B0_%E0%A4%AA%E0%A4%A4%E0%A4%BF%E0%A4%B8%E0%A4%81%E0%A4%97.jpg/330px-%E0%A4%93%E0%A4%A8%E0%A4%B8%E0%A4%B0%E0%A5%80_%E0%A4%98%E0%A4%B0%E0%A5%8D%E0%A4%A4%E0%A4%BF%E0%A4%AE%E0%A4%97%E0%A4%B0_%E0%A4%AA%E0%A4%A4%E0%A4%BF%E0%A4%B8%E0%A4%81%E0%A4%97.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Barsaman_Pun",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.41",
+  "birthCoordinatesLng": "82.55",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "military personnel"
+  ],
+  "qid": "Q15427968",
+  "birthPlace": "Jankot",
+  "fetchedAt": "2026-04-07T16:53:01.132Z"
+}

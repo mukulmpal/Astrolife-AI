@@ -1,0 +1,28 @@
+{
+  "publicId": "6f799829",
+  "wikipediaSlug": "Avesh_Khan",
+  "wikipediaId": "Q20744906",
+  "name": "Avesh Khan",
+  "fullName": "Avesh Khan",
+  "profileSummary": "Avesh Khan is an Indian international cricketer. He made his international debut in February 2022 against West Indies and was part of India's squad for the 2016 U19 World Cup. A right-arm fast-medium bowler, he is known for bowling at speeds of around 145 km/h, with a recorded maximum of 149 km/h. He plays for Madhya Pradesh in domestic cricket and Lucknow Super Giants in the Indian Premier League.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Avesh_Khan",
+  "dateOfBirth": "1996-12-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.718611111",
+  "birthCoordinatesLng": "75.855",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q20744906",
+  "birthPlace": "Indore",
+  "fetchedAt": "2026-04-07T10:57:57.924Z"
+}

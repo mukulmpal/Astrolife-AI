@@ -1,0 +1,28 @@
+{
+  "publicId": "0d43d7cd",
+  "wikipediaSlug": "Deepika_Padukone",
+  "wikipediaId": "Q159178",
+  "name": "Deepika Padukone",
+  "fullName": "Deepika Padukone",
+  "profileSummary": "Deepika Prakash Padukone is an Indian actress who works predominantly in Hindi films. Her accolades include three Filmfare Awards. Time named her one of the 100 most influential people in the world in 2018 and awarded her the Time100 Impact Award in 2022.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Deepika_Padukone_2025_%281%29.png/330px-Deepika_Padukone_2025_%281%29.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepika_Padukone",
+  "dateOfBirth": "1986-01-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "55.676111111",
+  "birthCoordinatesLng": "12.568888888",
+  "moonSign": "7",
+  "sunSign": "9",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "film actor"
+  ],
+  "qid": "Q159178",
+  "birthPlace": "Copenhagen",
+  "fetchedAt": "2026-04-07T16:33:58.902Z"
+}

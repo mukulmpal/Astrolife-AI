@@ -1,0 +1,26 @@
+{
+  "publicId": "136c0800",
+  "wikipediaSlug": "Muna_Thapa_Magar",
+  "wikipediaId": "Q19573114",
+  "name": "Muna Thapa Magar",
+  "fullName": "Muna Thapa Magar",
+  "profileSummary": "Muna Thapa Magar is a Nepali folk singer from Manakamana-9, Gorkha. She was born in the village Siling Lamchhapa, Manakamana Village Development Committee, Gorkha district.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Muna_Thapa_Magar.png/330px-Muna_Thapa_Magar.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Muna_Thapa_Magar",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.9",
+  "birthCoordinatesLng": "84.583333333",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q19573114",
+  "birthPlace": "Manakamana Temple",
+  "fetchedAt": "2026-04-07T16:48:29.327Z"
+}

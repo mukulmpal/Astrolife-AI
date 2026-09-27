@@ -1,0 +1,28 @@
+{
+  "publicId": "8239b43d",
+  "wikipediaSlug": "Anil_Kumar_Jha",
+  "wikipediaId": "Q4764658",
+  "name": "Anil Kumar Jha",
+  "fullName": "Anil Kumar Jha",
+  "profileSummary": "Anil Kumar Jha is a Nepalese politician from Rautahat District belonging to Nepali Congress.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Anil_kumar_jha.jpg/330px-Anil_kumar_jha.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anil_Kumar_Jha",
+  "dateOfBirth": "1964-03-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.83",
+  "birthCoordinatesLng": "85.33",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4764658",
+  "birthPlace": "Matsari",
+  "fetchedAt": "2026-04-07T16:53:04.759Z"
+}

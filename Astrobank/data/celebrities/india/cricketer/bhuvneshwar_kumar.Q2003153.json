@@ -1,0 +1,29 @@
+{
+  "publicId": "750198c9",
+  "wikipediaSlug": "Bhuvneshwar_Kumar",
+  "wikipediaId": "Q2003153",
+  "name": "Bhuvneshwar Kumar",
+  "fullName": "Bhuvneshwar Kumar",
+  "profileSummary": "Bhuvneshwar Kumar Singh is an Indian cricketer who has played for the Indian cricket team in all three formats of the game. He plays for Royal Challengers Bangalore in the Indian Premier League and Uttar Pradesh in domestic cricket. A right-arm medium bowler, he is known for his ability to effectively swing the ball both ways at will. Kumar was a member of the India team that won the 2013 ICC Champions Trophy. He is the first bowler to win the IPL Purple Cap in two consecutive seasons.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Bhuvneshwar_kumar_With_Rashid_Zirak_%28Bhuvneshwar_Kumar_cropped%29.jpg/330px-Bhuvneshwar_kumar_With_Rashid_Zirak_%28Bhuvneshwar_Kumar_cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhuvneshwar_Kumar",
+  "dateOfBirth": "1990-02-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.98",
+  "birthCoordinatesLng": "77.706388888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "businessperson"
+  ],
+  "qid": "Q2003153",
+  "birthPlace": "Meerut",
+  "fetchedAt": "2026-04-07T10:57:57.470Z"
+}

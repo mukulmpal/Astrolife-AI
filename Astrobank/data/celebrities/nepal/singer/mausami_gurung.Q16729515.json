@@ -1,0 +1,26 @@
+{
+  "publicId": "378c8993",
+  "wikipediaSlug": "Mausami_Gurung",
+  "wikipediaId": "Q16729515",
+  "name": "Mausami Gurung",
+  "fullName": "Mausami Gurung",
+  "profileSummary": "Mausami Gurung, is a singer and songwriter from Nepal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Mausami_Gurung_and_Deepak_Limbu_in_Sydney_2011.jpg/330px-Mausami_Gurung_and_Deepak_Limbu_in_Sydney_2011.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mausami_Gurung",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q16729515",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T16:48:09.808Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "acbe2d24",
+  "wikipediaSlug": "Jemimah_Rodrigues",
+  "wikipediaId": "Q42898219",
+  "name": "Jemimah Rodrigues",
+  "fullName": "Jemimah Rodrigues",
+  "profileSummary": "Jemimah Jessica Rodrigues is an Indian international cricketer who plays for the India women's national team as a middle-order batter. She was part of the squad that won the 2025 Women's Cricket World Cup, the Women's Asia Cup in 2022, the gold medal at the 2022 Asian Games and the silver medal at the 2022 Commonwealth Games.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Jemimah_Rodrigues_in_2025.jpeg/330px-Jemimah_Rodrigues_in_2025.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jemimah_Rodrigues",
+  "dateOfBirth": "2000-09-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q42898219",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T11:03:16.859Z"
+}

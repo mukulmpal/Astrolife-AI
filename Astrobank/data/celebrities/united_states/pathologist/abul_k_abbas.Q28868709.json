@@ -1,0 +1,29 @@
+{
+  "publicId": "29f70588",
+  "wikipediaSlug": "Abul_K._Abbas",
+  "wikipediaId": "Q28868709",
+  "name": "Abul K. Abbas",
+  "fullName": "Abul K. Abbas",
+  "profileSummary": " Abul K. Abbas is an Indian born-American pathologist at University of California San Francisco where he is Distinguished Professor in Pathology and former chair of its Department of Pathology. \nHe is senior editor of the pathology reference book Robbins and Cotran Pathologic Basis of Disease along with Vinay Kumar, as well as Basic Immunology, and Cellular & Molecular Immunology. He was editor for Immunity from 1993 to 1996, and continues to serve as a member of the editorial board. He was one of the inaugural co-editors of the Annual Review of Pathology: Mechanisms of Disease for issues from 2006 to 2020.\nHe has published nearly 200 scientific papers.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abul_K._Abbas",
+  "dateOfBirth": "1944-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "pathologist",
+    "immunologist",
+    "scientist",
+    "university teacher"
+  ],
+  "qid": "Q28868709",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-08T01:18:11.029Z"
+}

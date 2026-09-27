@@ -1,0 +1,36 @@
+{
+  "publicId": "9187d1c2",
+  "wikipediaSlug": "Farhan_Akhtar",
+  "wikipediaId": "Q590853",
+  "name": "Farhan Akhtar",
+  "fullName": "Farhan Akhtar",
+  "profileSummary": "Farhan Akhtar is an Indian actor, filmmaker and singer who works in Hindi films. Born to screenwriters Javed Akhtar and Honey Irani, he established the production company Excel Entertainment, along with Ritesh Sidhwani, in 1999.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/FarhanAkhtar.jpg/330px-FarhanAkhtar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Farhan_Akhtar",
+  "dateOfBirth": "1974-01-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director",
+    "film producer",
+    "screenwriter",
+    "singer",
+    "lyricist",
+    "songwriter",
+    "film actor",
+    "television presenter"
+  ],
+  "qid": "Q590853",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:17:23.501Z"
+}

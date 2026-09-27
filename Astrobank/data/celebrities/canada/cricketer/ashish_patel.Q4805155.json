@@ -1,0 +1,26 @@
+{
+  "publicId": "81763db0",
+  "wikipediaSlug": "Ashish_Patel",
+  "wikipediaId": "Q4805155",
+  "name": "Ashish Patel",
+  "fullName": "Ashish Patel",
+  "profileSummary": "Ashish Patel is a Canadian cricketer. A medium-pacer, he took his place in the team given the absence of several players for the 2002 ICC Americas Championship, followed by a strong performance in the 2002 ICC Six Nations Challenge in Namibia.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashish_Patel",
+  "dateOfBirth": "1975-07-31",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "52",
+  "birthCoordinatesLng": "-72",
+  "moonSign": "1",
+  "sunSign": "4",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4805155",
+  "birthPlace": "Quebec",
+  "fetchedAt": "2026-04-08T00:52:06.477Z"
+}

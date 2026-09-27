@@ -1,0 +1,28 @@
+{
+  "publicId": "13d81502",
+  "wikipediaSlug": "Abhijit_Gangopadhyay",
+  "wikipediaId": "Q111662687",
+  "name": "Abhijit Gangopadhyay",
+  "fullName": "Abhijit Gangopadhyay",
+  "profileSummary": "Abhijit Gangopadhyay is an Indian politician and former judge of the Calcutta High Court.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhijit_Gangopadhyay",
+  "dateOfBirth": "1962-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "7",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "judge",
+    "lawyer",
+    "politician"
+  ],
+  "qid": "Q111662687",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:19:51.880Z"
+}

@@ -1,0 +1,30 @@
+{
+  "publicId": "4577bf38",
+  "wikipediaSlug": "Araniko",
+  "wikipediaId": "Q626019",
+  "name": "Araniko",
+  "fullName": "Araniko",
+  "profileSummary": "Aniko, Anige or Araniko was one of the key figures in the arts of Nepal and the Yuan dynasty of China, and the artistic exchanges in these areas. He was born in Kathmandu Valley during the reign of Abhaya Malla. He is known for building the White Stupa at the Miaoying Temple in Beijing. During the reign of Jayabhimadeva, he was sent on a project to build a golden stupa in Tibet, where he also initiated into monkhood. From Tibet, he was sent further to northern China to work in the court of the emperor Kublai Khan, the founder of the Yuan dynasty, where he brought the trans-Himalayan artistic tradition to China. Araniko led a team of 80 artists to China proper and Tibet to make a number of pagoda-style buildings. In his later life, he renounced monkhood and started a family.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Statue_of_Araniko_in_Miaoying_Temple.jpg/330px-Statue_of_Araniko_in_Miaoying_Temple.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Araniko",
+  "dateOfBirth": "1244-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.703944444",
+  "birthCoordinatesLng": "85.308583333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "architect",
+    "painter",
+    "astronomer"
+  ],
+  "qid": "Q626019",
+  "birthPlace": "Kathmandu Valley",
+  "fetchedAt": "2026-04-07T16:54:58.586Z"
+}

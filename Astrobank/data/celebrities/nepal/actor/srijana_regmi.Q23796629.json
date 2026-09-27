@@ -1,0 +1,28 @@
+{
+  "publicId": "6a21e9e7",
+  "wikipediaSlug": "Srijana_Regmi",
+  "wikipediaId": "Q23796629",
+  "name": "Srijana Regmi",
+  "fullName": "Srijana Regmi",
+  "profileSummary": "Srijana Regmi is a Nepalese singer-songwriter, model, and actress. \nShe was a top-five finalist at the Miss Nepal 2016 beauty pageant and represented Nepal at the Miss Grand International 2014.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Shrijana_Regmi.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Srijana_Regmi",
+  "dateOfBirth": "1992-12-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.366666666",
+  "birthCoordinatesLng": "87.216666666",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "beauty pageant contestant"
+  ],
+  "qid": "Q23796629",
+  "birthPlace": "Sankhuwasabha District",
+  "fetchedAt": "2026-04-07T16:45:32.381Z"
+}

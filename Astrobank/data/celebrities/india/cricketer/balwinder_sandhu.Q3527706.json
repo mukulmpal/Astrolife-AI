@@ -1,0 +1,28 @@
+{
+  "publicId": "aac5e8ad",
+  "wikipediaSlug": "Balwinder_Sandhu",
+  "wikipediaId": "Q3527706",
+  "name": "Balwinder Sandhu",
+  "fullName": "Balwinder Sandhu",
+  "profileSummary": "Balwinder Singh Sandhu is a former Indian international cricketer. He represented India in eight Tests and twenty-two One Day Internationals (ODIs) matches as a medium pace bowler who could swing the ball both ways and was a useful lower order batsman. Sandhu was a member of the Indian team that won the 1983 Cricket World Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Balwinder_Sandhu",
+  "dateOfBirth": "1956-08-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527706",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:55:57.601Z"
+}

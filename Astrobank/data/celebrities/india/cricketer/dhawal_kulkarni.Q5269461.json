@@ -1,0 +1,28 @@
+{
+  "publicId": "91044793",
+  "wikipediaSlug": "Dhawal_Kulkarni",
+  "wikipediaId": "Q5269461",
+  "name": "Dhawal Kulkarni",
+  "fullName": "Dhawal Kulkarni",
+  "profileSummary": "Dhawal Sunil Kulkarni is an Indian former cricketer. He was a right arm medium-pace bowler and right-handed lower order batsman.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dhawal_Kulkarni",
+  "dateOfBirth": "1988-12-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5269461",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:57:20.554Z"
+}

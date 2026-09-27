@@ -1,0 +1,28 @@
+{
+  "publicId": "e4e9678d",
+  "wikipediaSlug": "Mukesh_Ambani",
+  "wikipediaId": "Q298547",
+  "name": "Mukesh Ambani",
+  "fullName": "Mukesh Ambani",
+  "profileSummary": "Mukesh Dhirubhai Ambani is an Indian businessman. He is the chairman and managing director of Reliance Industries, the largest public company in India by market capitalisation in 2025. As of December 2025, he is the richest person in Asia and the 16th richest in the world, with a net worth of US$112.8 billion. He has attracted fame due to his growth and wealth, and criticism for being a plutocrat, and reports of market manipulation, political corruption, cronyism, and exploitation.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/69/Mukesh_Ambani.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mukesh_Ambani",
+  "dateOfBirth": "1957-04-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.8",
+  "birthCoordinatesLng": "45.033333333",
+  "moonSign": "9",
+  "sunSign": "1",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "entrepreneur",
+    "businessperson",
+    "graphic designer"
+  ],
+  "qid": "Q298547",
+  "birthPlace": "Aden",
+  "fetchedAt": "2026-04-08T02:06:12.527Z"
+}

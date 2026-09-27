@@ -1,0 +1,29 @@
+{
+  "publicId": "45934353",
+  "wikipediaSlug": "Nabin_K_Bhattarai",
+  "wikipediaId": "Q6956917",
+  "name": "Nabin K Bhattarai",
+  "fullName": "Nabin K Bhattarai",
+  "profileSummary": "Nabin K Bhattarai is a Nepali singer, songwriter, and composer known for his work in Nepalese music industry.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nabin_K_Bhattarai",
+  "dateOfBirth": "1974-03-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "8",
+  "sunSign": "11",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "composer",
+    "lyricist",
+    "songwriter"
+  ],
+  "qid": "Q6956917",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:48:30.814Z"
+}

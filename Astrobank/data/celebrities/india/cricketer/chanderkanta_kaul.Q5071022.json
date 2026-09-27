@@ -1,0 +1,28 @@
+{
+  "publicId": "bb7b1f7f",
+  "wikipediaSlug": "Chanderkanta_Kaul",
+  "wikipediaId": "Q5071022",
+  "name": "Chanderkanta Kaul",
+  "fullName": "Chanderkanta Kaul",
+  "profileSummary": "Chanderkanta Kaul is an Indian former cricketer who played as a right-handed batter. She appeared in 5 Test matches and 31 One Day Internationals for India between 1993 and 2000, and captained them in 1 Test and 4 ODIs. She played domestic cricket for Middlesex in 2001 as well as in 2007 and 2008.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chanderkanta_Kaul",
+  "dateOfBirth": "1971-01-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.325555555",
+  "birthCoordinatesLng": "75.579166666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5071022",
+  "birthPlace": "Jalandhar",
+  "fetchedAt": "2026-04-07T11:02:42.673Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "230f5a2b",
+  "wikipediaSlug": "Baqa_Jilani",
+  "wikipediaId": "Q4857762",
+  "name": "Baqa Jilani",
+  "fullName": "Baqa Jilani",
+  "profileSummary": "Mohammad Baqa Khan Jilani was a bowler who represented India in Test cricket.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Baqa_Jilani",
+  "dateOfBirth": "1911-07-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4857762",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T10:50:55.909Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "7122272e",
+  "wikipediaSlug": "Kiran_Chetry",
+  "wikipediaId": "Q166178",
+  "name": "Kiran Chetry",
+  "fullName": "Kiran Chetry",
+  "profileSummary": "Kiran Carrie Chetry is a Nepalese American former television broadcast journalist who, until 2011, was a cable news anchor for CNN's American Morning. From 2001 to 2007 she reported—and then anchored—cable news at Fox News.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Kiran_Chetry.jpg/330px-Kiran_Chetry.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kiran_Chetry",
+  "dateOfBirth": "1974-08-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "8",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "news presenter",
+    "journalist"
+  ],
+  "qid": "Q166178",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-08T02:07:03.320Z"
+}

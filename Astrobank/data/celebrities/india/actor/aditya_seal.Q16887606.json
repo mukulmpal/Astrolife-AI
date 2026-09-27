@@ -1,0 +1,28 @@
+{
+  "publicId": "f12f15b2",
+  "wikipediaSlug": "Aditya_Seal",
+  "wikipediaId": "Q16887606",
+  "name": "Aditya Seal",
+  "fullName": "Aditya Seal",
+  "profileSummary": "Aditya Seal is an Indian actor who predominantly works in Hindi films and series. He made his film debut as a teenager with the erotic film Ek Chhotisi Love Story (2002), opposite Manisha Koirala. As an adult, he starred in the romantic drama film Tum Bin II (2016) and had a supporting role in the teen film Student of the Year 2 (2019). He has since starred in the streaming series Fittrat (2019) and The Empire (2021), and the film Khel Khel Mein (2024).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Aditya_promoting_Tum_Bin_2_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aditya_Seal",
+  "dateOfBirth": "1988-03-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": "2",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "model"
+  ],
+  "qid": "Q16887606",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T16:25:09.727Z"
+}

@@ -23,13 +23,13 @@ function SignupLoading() {
               <polygon points="0,6 5,-3 -5,-3" fill="none" stroke="currentColor" strokeWidth="0.7" />
               <circle r="1.9" fill="#f4d03f" />
             </svg>
-            <span className="font-serif text-2xl font-bold" style={{ color: '#f0e8d0' }}>
+            <span className="font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
               AstroLife
             </span>
           </div>
         </div>
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold mb-2" style={{ color: '#f0e8d0' }}>
+          <h1 className="font-serif text-3xl font-bold mb-2" style={{ color: '#1A1A1A' }}>
             Loading...
           </h1>
         </div>

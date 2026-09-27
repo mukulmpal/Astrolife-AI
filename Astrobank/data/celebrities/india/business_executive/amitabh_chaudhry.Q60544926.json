@@ -1,0 +1,27 @@
+{
+  "publicId": "8bb9db22",
+  "wikipediaSlug": "Amitabh_Chaudhry",
+  "wikipediaId": "Q60544926",
+  "name": "Amitabh Chaudhry",
+  "fullName": "Amitabh Chaudhry",
+  "profileSummary": "Amitabh Chaudhry is an Indian businessman, and the managing director (MD) and chief executive officer (CEO) of Axis Bank, the third largest private sector bank in India. He joined Axis in January 2019, after heading HDFC Life Insurance for nine years.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amitabh_Chaudhry",
+  "dateOfBirth": "1965-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "29.801666666",
+  "birthCoordinatesLng": "76.396666666",
+  "moonSign": "9",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "business executive",
+    "banker"
+  ],
+  "qid": "Q60544926",
+  "birthPlace": "Kaithal",
+  "fetchedAt": "2026-04-08T02:05:08.172Z"
+}

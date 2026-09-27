@@ -1,0 +1,26 @@
+{
+  "publicId": "6ac38c32",
+  "wikipediaSlug": "Ashish_Bagai",
+  "wikipediaId": "Q3530751",
+  "name": "Ashish Bagai",
+  "fullName": "Ashish Bagai",
+  "profileSummary": "Ashish Bagai is an Indian-born former cricketer and captain of the Canada national cricket team. He was a right-handed batsman who specialised as a wicket-keeper.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashish_Bagai",
+  "dateOfBirth": "1982-01-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": "10",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3530751",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-08T00:52:18.990Z"
+}

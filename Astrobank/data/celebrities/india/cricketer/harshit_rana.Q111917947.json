@@ -1,0 +1,28 @@
+{
+  "publicId": "5b135a2b",
+  "wikipediaSlug": "Harshit_Rana",
+  "wikipediaId": "Q111917947",
+  "name": "Harshit Rana",
+  "fullName": "Harshit Rana",
+  "profileSummary": "Harshit Pradeep Rana is an Indian international cricketer. He plays for Delhi in domestic cricket and Kolkata Knight Riders in the Indian Premier League. Rana was a member of the Indian squad which won the 2025 ICC Champions Trophy and the 2025 Asia Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Harshit_Rana",
+  "dateOfBirth": "2001-12-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q111917947",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T10:58:07.247Z"
+}

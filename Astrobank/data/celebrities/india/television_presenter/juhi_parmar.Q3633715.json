@@ -1,0 +1,32 @@
+{
+  "publicId": "f90724ae",
+  "wikipediaSlug": "Juhi_Parmar",
+  "wikipediaId": "Q3633715",
+  "name": "Juhi Parmar",
+  "fullName": "Juhi Parmar",
+  "profileSummary": "Juhi Parmar is an Indian anchor, actress, presenter, singer and dancer predominantly known for her work in Hindi television industry. She gained recognition for her portrayal as Kumkum in the long-running soap opera Kumkum – Ek Pyara Sa Bandhan (2002–2009) and that of Devi Sandhya and Devi Chhaya in Karmaphal Daata Shani. She then won the reality show Bigg Boss 5 (2011–12).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Juhi_parmar_at_vikas%27s_wedding.jpg/330px-Juhi_parmar_at_vikas%27s_wedding.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Juhi_Parmar",
+  "dateOfBirth": "1980-12-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.182777777",
+  "birthCoordinatesLng": "75.777222222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "television presenter",
+    "actor",
+    "news presenter",
+    "model",
+    "television actor"
+  ],
+  "qid": "Q3633715",
+  "birthPlace": "Ujjain",
+  "fetchedAt": "2026-04-07T12:19:22.037Z"
+}

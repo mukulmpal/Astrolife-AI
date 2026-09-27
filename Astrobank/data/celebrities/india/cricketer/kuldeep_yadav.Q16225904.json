@@ -1,0 +1,28 @@
+{
+  "publicId": "b223f216",
+  "wikipediaSlug": "Kuldeep_Yadav",
+  "wikipediaId": "Q16225904",
+  "name": "Kuldeep Yadav",
+  "fullName": "Kuldeep Yadav",
+  "profileSummary": "Kuldeep Yadav is an Indian international cricketer. A left-arm unorthodox spinner, he plays for Uttar Pradesh in domestic cricket and Delhi Capitals in the Indian Premier League. He was a member of the Indian team that won the 2024 and 2026 T20 World Cups and the 2025 Champions Trophy.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Kuldeep_Yadav_in_PMO_New_Delhi.jpg/330px-Kuldeep_Yadav_in_PMO_New_Delhi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kuldeep_Yadav",
+  "dateOfBirth": "1994-12-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.4725",
+  "birthCoordinatesLng": "80.331111111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q16225904",
+  "birthPlace": "Kanpur",
+  "fetchedAt": "2026-04-07T10:58:10.261Z"
+}

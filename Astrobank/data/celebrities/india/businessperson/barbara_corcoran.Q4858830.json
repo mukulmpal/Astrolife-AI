@@ -1,0 +1,28 @@
+{
+  "publicId": "76428310",
+  "wikipediaSlug": "Barbara_Corcoran",
+  "wikipediaId": "Q4858830",
+  "name": "Barbara Corcoran",
+  "fullName": "Barbara Corcoran",
+  "profileSummary": "Barbara Ann Corcoran is an American businesswoman, investor, syndicated columnist, and television personality. She founded the Corcoran Group, a real estate brokerage in New York City, which she sold to NRT for $66 million in 2001 and shortly thereafter exited the company. One of the show's original \"Shark\" investors, Corcoran has appeared in all 15 seasons of ABC's Shark Tank to date. As of January 2023, she has made 130 deals on the show, the largest being a $350,000 investment for 40% of Coverplay.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/BarbaraCorcoran2023.jpg/330px-BarbaraCorcoran2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Barbara_Corcoran",
+  "dateOfBirth": "1949-03-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "40.82972",
+  "birthCoordinatesLng": "-73.97389",
+  "moonSign": "3",
+  "sunSign": "11",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson",
+    "journalist",
+    "television producer"
+  ],
+  "qid": "Q4858830",
+  "birthPlace": "Edgewater",
+  "fetchedAt": "2026-04-07T16:36:29.698Z"
+}

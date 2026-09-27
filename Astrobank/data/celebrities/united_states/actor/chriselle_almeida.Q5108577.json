@@ -1,0 +1,28 @@
+{
+  "publicId": "29ce9a5a",
+  "wikipediaSlug": "Chriselle_Almeida",
+  "wikipediaId": "Q5108577",
+  "name": "Chriselle Almeida",
+  "fullName": "Chriselle Almeida",
+  "profileSummary": "Chriselle Almeida is an Indian actress.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Chriselle_Almeida.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chriselle_Almeida",
+  "dateOfBirth": "1980-12-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "6",
+  "sunSign": "8",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor",
+    "film director"
+  ],
+  "qid": "Q5108577",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T01:18:13.485Z"
+}

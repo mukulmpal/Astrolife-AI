@@ -1,0 +1,28 @@
+{
+  "publicId": "733d639f",
+  "wikipediaSlug": "Fowzieh_Khalili",
+  "wikipediaId": "Q5476489",
+  "name": "Fowzieh Khalili",
+  "fullName": "Fowzieh Khalili",
+  "profileSummary": "Fowzieh Khalili is a former Test and One Day International cricketer who played as a wicket-keeper and represented India at the international level and Tamil Nadu at the domestic league level.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Fowzieh_Khalili",
+  "dateOfBirth": "1958-10-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5476489",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T11:03:10.845Z"
+}

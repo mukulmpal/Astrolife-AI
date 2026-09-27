@@ -1,0 +1,28 @@
+{
+  "publicId": "f1a54cca",
+  "wikipediaSlug": "Abhishek_Sharma",
+  "wikipediaId": "Q19803999",
+  "name": "Abhishek Sharma",
+  "fullName": "Abhishek Sharma",
+  "profileSummary": "Abhishek Sharma is an Indian international cricketer. He plays for the India national team, as a left-handed opening batter and occasional left-arm orthodox spinner. He represents Punjab in domestic cricket and Sunrisers Hyderabad in the Indian Premier League. Sharma became the number one ranked men's T20I batter in 2025, achieving the highest-ever men's rating points in the format's history.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhishek_Sharma",
+  "dateOfBirth": "2000-09-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.626917",
+  "birthCoordinatesLng": "74.87704",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q19803999",
+  "birthPlace": "Amritsar",
+  "fetchedAt": "2026-04-07T10:57:56.786Z"
+}

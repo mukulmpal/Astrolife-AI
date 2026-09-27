@@ -1,0 +1,28 @@
+{
+  "publicId": "c9bbcf62",
+  "wikipediaSlug": "Amruta_Khanvilkar",
+  "wikipediaId": "Q4748736",
+  "name": "Amruta Khanvilkar",
+  "fullName": "Amruta Khanvilkar",
+  "profileSummary": "Amruta Khanvilkar is an Indian film, television, theatre actress and producer who works primarily in Marathi and Hindi films. She is one of the highest-paid actresses in Marathi cinema and has received several accolades, including a Maharashtra State Film Award, a Zee Chitra Gaurav Puraskar, and three Maharashtracha Favourite Kon awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Amruta_khanvilkar_in_2022.jpg/330px-Amruta_khanvilkar_in_2022.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amruta_Khanvilkar",
+  "dateOfBirth": "1984-11-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q4748736",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T12:18:14.792Z"
+}

@@ -1,0 +1,29 @@
+{
+  "publicId": "171fcac5",
+  "wikipediaSlug": "Gyanendra_of_Nepal",
+  "wikipediaId": "Q201327",
+  "name": "Gyanendra of Nepal",
+  "fullName": "Gyanendra of Nepal",
+  "profileSummary": "Gyanendra Bir Bikram Shah Dev is a Nepalese businessman who reigned as the last king of Nepal. He reigned from 1950 to 1951 and again from 2001 to 2008, when the Kingdom of Nepal was abolished and a republic declared.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Gyanendra_01.jpg/330px-Gyanendra_01.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gyanendra_of_Nepal",
+  "dateOfBirth": "1947-07-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "regent",
+    "politician"
+  ],
+  "qid": "Q201327",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:55:14.471Z"
+}

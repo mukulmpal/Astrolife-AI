@@ -1,0 +1,27 @@
+{
+  "publicId": "0d249ac6",
+  "wikipediaSlug": "Agha_(actor)",
+  "wikipediaId": "Q4692309",
+  "name": "Agha (actor)",
+  "fullName": "Agha (actor)",
+  "profileSummary": "Agha was an Indian actor of Bollywood films. He was known for comic roles and modeled himself on Bob Hope's style of acting. He appeared in over 300 Hindi films in his career between 1935 and 1986. His son, Jalal Agha, also became an actor, mostly known for the song Mehbooba Mehbooba in Sholay (1975).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/16/Agha.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Agha_(actor)",
+  "dateOfBirth": "1914-03-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": "10",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer"
+  ],
+  "qid": "Q4692309",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T16:25:16.902Z"
+}

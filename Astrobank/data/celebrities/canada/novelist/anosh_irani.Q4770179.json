@@ -1,0 +1,26 @@
+{
+  "publicId": "f0b92ae7",
+  "wikipediaSlug": "Anosh_Irani",
+  "wikipediaId": "Q4770179",
+  "name": "Anosh Irani",
+  "fullName": "Anosh Irani",
+  "profileSummary": "Anosh Irani is an Indo-Canadian novelist and playwright, born and raised in Mumbai.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Anosh_Irani_signature.jpg/330px-Anosh_Irani_signature.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anosh_Irani",
+  "dateOfBirth": "1974-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "12",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "novelist"
+  ],
+  "qid": "Q4770179",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T00:52:10.364Z"
+}

@@ -1,0 +1,31 @@
+{
+  "publicId": "debebcfb",
+  "wikipediaSlug": "Rishi_Kapoor",
+  "wikipediaId": "Q258820",
+  "name": "Rishi Kapoor",
+  "fullName": "Rishi Kapoor",
+  "profileSummary": "Rishi Kapoor was an Indian actor, film director, and producer who worked in Hindi films. In a career spanning five decades, he established himself through a diverse range of roles in Hindi cinema. Kapoor was the recipient of several accolades, including a National Film Award and four Filmfare Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Rishi_Kapoor_in_2016.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Rishi_Kapoor",
+  "dateOfBirth": "1952-09-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director",
+    "film producer",
+    "film actor"
+  ],
+  "qid": "Q258820",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T11:29:58.257Z"
+}

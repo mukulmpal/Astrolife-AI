@@ -1,0 +1,28 @@
+{
+  "publicId": "f8c5b9b6",
+  "wikipediaSlug": "Sarina_Maskey",
+  "wikipediaId": "Q7424091",
+  "name": "Sarina Maskey",
+  "fullName": "Sarina Maskey",
+  "profileSummary": "Sarina Maskey is a Nepalese fashion model and beauty pageant titleholder. She was crowned Miss Nepal International 2011 and represented Nepal in Miss International 2011.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sarina_Maskey",
+  "dateOfBirth": "1987-05-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "2",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "presenter",
+    "model",
+    "beauty pageant contestant"
+  ],
+  "qid": "Q7424091",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:45:20.482Z"
+}

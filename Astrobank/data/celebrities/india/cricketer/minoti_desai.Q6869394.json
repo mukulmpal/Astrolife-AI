@@ -1,0 +1,28 @@
+{
+  "publicId": "0a16de1f",
+  "wikipediaSlug": "Minoti_Desai",
+  "wikipediaId": "Q6869394",
+  "name": "Minoti Desai",
+  "fullName": "Minoti Desai",
+  "profileSummary": "Minoti Desai is a former Test and One Day International cricketer who represented India. She is a left-handed batsman and bowls left-arm orthodox. She has only played one Test and one ODI for India, both against England in June 1986.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Minoti_Desai",
+  "dateOfBirth": "1968-03-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.718611111",
+  "birthCoordinatesLng": "75.855",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6869394",
+  "birthPlace": "Indore",
+  "fetchedAt": "2026-04-07T11:00:57.583Z"
+}

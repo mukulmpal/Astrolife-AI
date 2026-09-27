@@ -1,0 +1,26 @@
+{
+  "publicId": "ac3b1e44",
+  "wikipediaSlug": "Sabin_Rai",
+  "wikipediaId": "Q7396105",
+  "name": "Sabin Rai",
+  "fullName": "Sabin Rai",
+  "profileSummary": "Sabin Rai is a Nepalese singer and composer. He made his debut in music industry by album Sataha (2003), featuring the hit single \"Komal Tyo Timro\". In 2011, seeking to evolve his musical expression, Rai formed Sabin Rai and The Pharaoh. Also known as the Bryan Adams of Nepal because of his voice.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sabin_Rai",
+  "dateOfBirth": "1974-02-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.816666666",
+  "birthCoordinatesLng": "87.266666666",
+  "moonSign": "3",
+  "sunSign": "10",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q7396105",
+  "birthPlace": "Dharan",
+  "fetchedAt": "2026-04-07T16:48:12.072Z"
+}

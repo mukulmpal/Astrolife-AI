@@ -1,0 +1,27 @@
+{
+  "publicId": "baacd19d",
+  "wikipediaSlug": "Vahni_Capildeo",
+  "wikipediaId": "Q7908660",
+  "name": "Vahni Capildeo",
+  "fullName": "Vahni Capildeo",
+  "profileSummary": "Vahni Anthony Ezekiel Capildeo is a Trinidad and Tobago-born British writer, and a member of the extended Capildeo family that has produced notable Trinidadian politicians and writers.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Vahni_Capildeo_for_the_Jhalak_Prize_Award_2022.jpg/330px-Vahni_Capildeo_for_the_Jhalak_Prize_Award_2022.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Vahni_Capildeo",
+  "dateOfBirth": "1973-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "10.666666666",
+  "birthCoordinatesLng": "-61.516666666",
+  "moonSign": "8",
+  "sunSign": "9",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "poet",
+    "writer"
+  ],
+  "qid": "Q7908660",
+  "birthPlace": "Port of Spain",
+  "fetchedAt": "2026-04-08T02:08:10.305Z"
+}

@@ -1,0 +1,29 @@
+{
+  "publicId": "70f5c77a",
+  "wikipediaSlug": "Daniel_Lubetzky",
+  "wikipediaId": "Q5217973",
+  "name": "Daniel Lubetzky",
+  "fullName": "Daniel Lubetzky",
+  "profileSummary": "Daniel Lubetzky is a Mexican and American billionaire businessman, philanthropist, and author. He is the founder of Kind LLC, an American snack food company he founded in 2004. He has also appeared in several seasons of the business reality television series Shark Tank.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Daniel_Lubetzky_%28April_14%2C_2015%29_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Daniel_Lubetzky",
+  "dateOfBirth": "1968-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.353773",
+  "birthCoordinatesLng": "-99.13589",
+  "moonSign": "10",
+  "sunSign": "9",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "social entrepreneur",
+    "writer",
+    "activist",
+    "businessperson"
+  ],
+  "qid": "Q5217973",
+  "birthPlace": "Mexico City",
+  "fetchedAt": "2026-04-07T16:36:21.889Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "77106552",
+  "wikipediaSlug": "Krishna_Malla",
+  "wikipediaId": "Q100550378",
+  "name": "Krishna Malla",
+  "fullName": "Krishna Malla",
+  "profileSummary": "Krishna Malla is a Nepalese film actor, film producer and film director. He is known for Gaajal (2001), Gothalo (1996) and Basudev (1984). His first theater act was Pahad Chichyairahecha.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Krishna_Malla.jpg/330px-Krishna_Malla.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Krishna_Malla",
+  "dateOfBirth": "1956-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "5",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "screenwriter"
+  ],
+  "qid": "Q100550378",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:43:44.106Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "3c935981",
+  "wikipediaSlug": "Sarita_Choudhury",
+  "wikipediaId": "Q445995",
+  "name": "Sarita Choudhury",
+  "fullName": "Sarita Choudhury",
+  "profileSummary": "Sarita Catherine Louise Choudhury is a British actress who has appeared in film and on television. Choudhury made her screen debut starring in the romantic drama film Mississippi Masala (1991). She later appeared in numerous American and international film productions, including A Perfect Murder (1998), Spike Lee's She Hate Me (2004), Lady in the Water (2006), Midnight's Children (2012), and The Green Knight (2021).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Sarita_Choudhury_in_2009.jpg/330px-Sarita_Choudhury_in_2009.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sarita_Choudhury",
+  "dateOfBirth": "1966-08-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.47",
+  "birthCoordinatesLng": "0.009",
+  "moonSign": "5",
+  "sunSign": "5",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "television actor",
+    "film actor",
+    "stage actor"
+  ],
+  "qid": "Q445995",
+  "birthPlace": "Blackheath",
+  "fetchedAt": "2026-04-08T02:08:21.980Z"
+}

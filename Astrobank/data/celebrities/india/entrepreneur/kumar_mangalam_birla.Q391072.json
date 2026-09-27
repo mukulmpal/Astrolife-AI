@@ -1,0 +1,29 @@
+{
+  "publicId": "8bc6eecf",
+  "wikipediaSlug": "Kumar_Mangalam_Birla",
+  "wikipediaId": "Q391072",
+  "name": "Kumar Mangalam Birla",
+  "fullName": "Kumar Mangalam Birla",
+  "profileSummary": "Kumar Mangalam Birla is an Indian billionaire businessman. He is the chairman of the Aditya Birla Group, one of the largest conglomerates in India. He is the chancellor of the Birla Institute of Technology & Science, Pilani and former chairman of Indian Institute of Management Ahmedabad. In 2023, Birla received the Padma Bhushan, the third highest civilian honour in India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Kumar_Mangalam_Birla.jpg/330px-Kumar_Mangalam_Birla.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kumar_Mangalam_Birla",
+  "dateOfBirth": "1967-06-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "5",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "entrepreneur",
+    "business magnate",
+    "accountant",
+    "chief executive officer"
+  ],
+  "qid": "Q391072",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T02:06:10.699Z"
+}

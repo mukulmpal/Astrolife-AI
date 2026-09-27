@@ -96,15 +96,15 @@ export default function AdminPage() {
   if (authorized === false) {
     return (
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <div style={{ background: "#0d0a22", border: "1px solid #2a2050", borderRadius: 20, padding: 36, textAlign: "center", maxWidth: 440 }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid #2a2050", borderRadius: 20, padding: 36, textAlign: "center", maxWidth: 440 }}>
           <ShieldAlert size={48} style={{ color: "#ef4444", margin: "0 auto 16px" }} />
-          <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 28, color: "#f0e8d0", marginBottom: 8 }}>
+          <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 28, color: "#1A1A1A", marginBottom: 8 }}>
             Access Restricted
           </h2>
           <p style={{ color: "#8078a8", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
             Yeh area keval AstroLife Administrator accounts ke liye reserved hai.
           </p>
-          <Link href="/dashboard" style={{ display: "inline-block", background: "linear-gradient(135deg,#c8a030,#a07820)", color: "#060410", padding: "10px 22px", borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+          <Link href="/dashboard" style={{ display: "inline-block", background: "linear-gradient(135deg,#c8a030,#a07820)", color: "#FAF7F2", padding: "10px 22px", borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
             Return to Dashboard
           </Link>
         </div>
@@ -126,14 +126,14 @@ export default function AdminPage() {
   };
 
   return (
-    <div style={{ padding: "32px 28px", maxWidth: 1200, margin: "0 auto", color: "#f0e8d0" }}>
+    <div style={{ padding: "32px 28px", maxWidth: 1200, margin: "0 auto", color: "#1A1A1A" }}>
       {/* HEADER */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16, marginBottom: 30 }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#c8a030", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>
             <Shield size={14} /> AstroLife Command Center
           </div>
-          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 34, fontWeight: 600, color: "#f0e8d0" }}>
+          <h1 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 34, fontWeight: 600, color: "#1A1A1A" }}>
             User Role & Tier Management
           </h1>
           <p style={{ color: "#706898", fontSize: 13, marginTop: 4 }}>
@@ -150,7 +150,7 @@ export default function AdminPage() {
             gap: 8,
             padding: "10px 18px",
             borderRadius: 10,
-            background: "#0d0a22",
+            background: "#FFFFFF",
             border: "1px solid #2a2050",
             color: "#c8a030",
             fontSize: 13,
@@ -187,27 +187,27 @@ export default function AdminPage() {
 
       {/* STATS */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 28 }}>
-        <div style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 16, padding: "20px 24px" }}>
-          <div style={{ fontSize: 11, color: "#605890", textTransform: "uppercase", letterSpacing: 1.5 }}>Total Registered</div>
-          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#f0e8d0", marginTop: 4 }}>{stats.total}</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid #FFFFFF", borderRadius: 16, padding: "20px 24px" }}>
+          <div style={{ fontSize: 11, color: "#6B635B", textTransform: "uppercase", letterSpacing: 1.5 }}>Total Registered</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>{stats.total}</div>
         </div>
-        <div style={{ background: "#0d0a22", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: "20px 24px" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: "20px 24px" }}>
           <div style={{ fontSize: 11, color: "#c084fc", textTransform: "uppercase", letterSpacing: 1.5 }}>Elite VIP Members</div>
           <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#c084fc", marginTop: 4 }}>{stats.elite}</div>
         </div>
-        <div style={{ background: "#0d0a22", border: "1px solid rgba(200,160,48,0.25)", borderRadius: 16, padding: "20px 24px" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid rgba(200,160,48,0.25)", borderRadius: 16, padding: "20px 24px" }}>
           <div style={{ fontSize: 11, color: "#c8a030", textTransform: "uppercase", letterSpacing: 1.5 }}>Premium Users</div>
           <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#c8a030", marginTop: 4 }}>{stats.premium}</div>
         </div>
-        <div style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 16, padding: "20px 24px" }}>
-          <div style={{ fontSize: 11, color: "#605890", textTransform: "uppercase", letterSpacing: 1.5 }}>Free Tier</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid #FFFFFF", borderRadius: 16, padding: "20px 24px" }}>
+          <div style={{ fontSize: 11, color: "#6B635B", textTransform: "uppercase", letterSpacing: 1.5 }}>Free Tier</div>
           <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#8078a8", marginTop: 4 }}>{stats.free}</div>
         </div>
       </div>
 
       {/* SEARCH BAR */}
       <div style={{ position: "relative", marginBottom: 20 }}>
-        <Search size={16} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "#605890" }} />
+        <Search size={16} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "#6B635B" }} />
         <input
           type="text"
           placeholder="Search seekers by email or name..."
@@ -215,11 +215,11 @@ export default function AdminPage() {
           onChange={(e) => setSearch(e.target.value)}
           style={{
             width: "100%",
-            background: "#0a0720",
-            border: "1px solid #1c1840",
+            background: "#FAF7F2",
+            border: "1px solid #FFFFFF",
             borderRadius: 12,
             padding: "12px 16px 12px 44px",
-            color: "#f0e8d0",
+            color: "#1A1A1A",
             fontSize: 14,
             outline: "none",
           }}
@@ -227,10 +227,10 @@ export default function AdminPage() {
       </div>
 
       {/* TABLE */}
-      <div style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 16, overflowX: "auto" }}>
+      <div style={{ background: "#FFFFFF", border: "1px solid #FFFFFF", borderRadius: 16, overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid #1c1840", background: "rgba(10,7,32,0.6)", color: "#605890", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.2 }}>
+            <tr style={{ borderBottom: "1px solid #FFFFFF", background: "rgba(10,7,32,0.6)", color: "#6B635B", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.2 }}>
               <th style={{ padding: "16px 20px" }}>Seeker</th>
               <th style={{ padding: "16px 20px" }}>Current Tier</th>
               <th style={{ padding: "16px 20px" }}>Expiration</th>
@@ -241,13 +241,13 @@ export default function AdminPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#605890" }}>
+                <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#6B635B" }}>
                   Loading seekers data from Supabase...
                 </td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#605890" }}>
+                <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#6B635B" }}>
                   No users found matching &quot;{search}&quot;.
                 </td>
               </tr>
@@ -258,8 +258,8 @@ export default function AdminPage() {
                 return (
                   <tr key={u.id} style={{ borderBottom: "1px solid #161234", transition: "background 0.2s" }}>
                     <td style={{ padding: "16px 20px" }}>
-                      <div style={{ fontWeight: 600, color: "#f0e8d0" }}>{u.name}</div>
-                      <div style={{ fontSize: 12, color: "#605890", marginTop: 2 }}>{u.email}</div>
+                      <div style={{ fontWeight: 600, color: "#1A1A1A" }}>{u.name}</div>
+                      <div style={{ fontSize: 12, color: "#6B635B", marginTop: 2 }}>{u.email}</div>
                     </td>
 
                     <td style={{ padding: "16px 20px" }}>
@@ -310,7 +310,7 @@ export default function AdminPage() {
                         : "—"}
                     </td>
 
-                    <td style={{ padding: "16px 20px", color: "#605890", fontSize: 12 }}>
+                    <td style={{ padding: "16px 20px", color: "#6B635B", fontSize: 12 }}>
                       {new Date(u.created_at).toLocaleDateString("en-IN", {
                         year: "numeric",
                         month: "short",
@@ -328,7 +328,7 @@ export default function AdminPage() {
                             borderRadius: 8,
                             fontSize: 11,
                             fontWeight: 500,
-                            background: "#0a0720",
+                            background: "#FAF7F2",
                             border: "1px solid #221c48",
                             color: tier === "free" ? "#443c68" : "#8078a8",
                             cursor: tier === "free" || isUpdating ? "default" : "pointer",
@@ -344,7 +344,7 @@ export default function AdminPage() {
                             borderRadius: 8,
                             fontSize: 11,
                             fontWeight: 600,
-                            background: tier === "premium" ? "rgba(200,160,48,0.1)" : "#0a0720",
+                            background: tier === "premium" ? "rgba(200,160,48,0.1)" : "#FAF7F2",
                             border: "1px solid rgba(200,160,48,0.3)",
                             color: "#c8a030",
                             cursor: tier === "premium" || isUpdating ? "default" : "pointer",

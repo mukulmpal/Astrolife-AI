@@ -1,0 +1,28 @@
+{
+  "publicId": "337cd2b0",
+  "wikipediaSlug": "Akash_Khurana",
+  "wikipediaId": "Q13634088",
+  "name": "Akash Khurana",
+  "fullName": "Akash Khurana",
+  "profileSummary": "Akash Khurana is an Indian actor, screenwriter, director, author, theatre artist and entrepreneur.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Waiting_for_Godot_in_Doon_School.jpg/330px-Waiting_for_Godot_in_Doon_School.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Akash_Khurana",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "screenwriter",
+    "actor",
+    "entrepreneur"
+  ],
+  "qid": "Q13634088",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:25:33.210Z"
+}

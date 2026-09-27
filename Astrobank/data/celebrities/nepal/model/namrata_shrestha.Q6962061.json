@@ -1,0 +1,27 @@
+{
+  "publicId": "db2aa717",
+  "wikipediaSlug": "Namrata_Shrestha",
+  "wikipediaId": "Q6962061",
+  "name": "Namrata Shrestha",
+  "fullName": "Namrata Shrestha",
+  "profileSummary": "Namrata Shrestha is a Nepalese actress and model.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Namrata_Shrestha.JPG/330px-Namrata_Shrestha.JPG",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Namrata_Shrestha",
+  "dateOfBirth": "1986-06-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.816666666",
+  "birthCoordinatesLng": "87.266666666",
+  "moonSign": "5",
+  "sunSign": "2",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor"
+  ],
+  "qid": "Q6962061",
+  "birthPlace": "Dharan",
+  "fetchedAt": "2026-04-07T16:45:04.850Z"
+}

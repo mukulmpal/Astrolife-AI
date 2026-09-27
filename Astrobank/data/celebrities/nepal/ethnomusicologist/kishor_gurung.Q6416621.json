@@ -1,0 +1,27 @@
+{
+  "publicId": "076d918e",
+  "wikipediaSlug": "Kishor_Gurung",
+  "wikipediaId": "Q6416621",
+  "name": "Kishor Gurung",
+  "fullName": "Kishor Gurung",
+  "profileSummary": "Kishor Gurung is a Nepalese guitarist and ethnomusicologist.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kishor_Gurung",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "ethnomusicologist",
+    "musicologist"
+  ],
+  "qid": "Q6416621",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:47:41.028Z"
+}

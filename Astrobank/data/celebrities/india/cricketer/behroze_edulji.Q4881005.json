@@ -1,0 +1,28 @@
+{
+  "publicId": "b7095e4f",
+  "wikipediaSlug": "Behroze_Edulji",
+  "wikipediaId": "Q4881005",
+  "name": "Behroze Edulji",
+  "fullName": "Behroze Edulji",
+  "profileSummary": "Behroze Edulji is a former Test cricketer who represented India. Her sister Diana Edulji is also a former Indian Test cricketer.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Behroze_Edulji",
+  "dateOfBirth": "1950-04-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4881005",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:59:56.693Z"
+}

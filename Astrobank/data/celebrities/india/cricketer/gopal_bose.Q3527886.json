@@ -1,0 +1,28 @@
+{
+  "publicId": "8a1911d3",
+  "wikipediaSlug": "Gopal_Bose",
+  "wikipediaId": "Q3527886",
+  "name": "Gopal Bose",
+  "fullName": "Gopal Bose",
+  "profileSummary": "Gopal Bose was an Indian cricketer. He played domestic cricket for Bengal and played one One Day International for India against England in 1974.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gopal_Bose",
+  "dateOfBirth": "1947-05-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527886",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T10:56:35.005Z"
+}

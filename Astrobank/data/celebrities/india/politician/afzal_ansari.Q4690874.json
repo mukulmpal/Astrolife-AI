@@ -1,0 +1,26 @@
+{
+  "publicId": "86764e55",
+  "wikipediaSlug": "Afzal_Ansari",
+  "wikipediaId": "Q4690874",
+  "name": "Afzal Ansari",
+  "fullName": "Afzal Ansari",
+  "profileSummary": "Afzal Ansari is an Indian politician of the Samajwadi Party and the incumbent Member of Parliament (MP) of India for Ghazipur constituency, Uttar Pradesh, having won the Lok Sabha election from the constituency in 2024. He has been MLA for five consecutive term and MP for three.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Afzal_Ansari.jpg/330px-Afzal_Ansari.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Afzal_Ansari",
+  "dateOfBirth": "1953-08-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.583333333",
+  "birthCoordinatesLng": "83.566666666",
+  "moonSign": "6",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4690874",
+  "birthPlace": "Ghazipur",
+  "fetchedAt": "2026-04-07T16:19:41.024Z"
+}

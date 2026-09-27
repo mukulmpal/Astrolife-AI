@@ -1,0 +1,26 @@
+{
+  "publicId": "0fa5076c",
+  "wikipediaSlug": "Abhishek_Banerjee_(politician)",
+  "wikipediaId": "Q4667463",
+  "name": "Abhishek Banerjee (politician)",
+  "fullName": "Abhishek Banerjee (politician)",
+  "profileSummary": "Abhishek Banerjee is an Indian politician who has been a Member of Parliament for Diamond Harbour, West Bengal, since 2014 and President of Trinamool Youth Congress since 2011.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Abhishek_Banerjee_Photo.jpg/330px-Abhishek_Banerjee_Photo.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhishek_Banerjee_(politician)",
+  "dateOfBirth": "1987-11-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5136",
+  "birthCoordinatesLng": "88.3484",
+  "moonSign": "2",
+  "sunSign": "7",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4667463",
+  "birthPlace": "Nava Nalanda High School",
+  "fetchedAt": "2026-04-07T16:19:41.469Z"
+}

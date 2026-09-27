@@ -1,0 +1,27 @@
+{
+  "publicId": "0aa701b8",
+  "wikipediaSlug": "Karan_Bilimoria,_Baron_Bilimoria",
+  "wikipediaId": "Q949084",
+  "name": "Karan Bilimoria, Baron Bilimoria",
+  "fullName": "Karan Bilimoria, Baron Bilimoria",
+  "profileSummary": "Karan Faridoon Bilimoria, Baron Bilimoria, is a British Indian businessman, member of the House of Lords, and former Chancellor of the University of Birmingham.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Karan_Bilimoria_Horasis_India_Meeting_2015.jpg/330px-Karan_Bilimoria_Horasis_India_Meeting_2015.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Karan_Bilimoria%2C_Baron_Bilimoria",
+  "dateOfBirth": "1961-11-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.361666666",
+  "birthCoordinatesLng": "78.474722222",
+  "moonSign": "3",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "businessperson"
+  ],
+  "qid": "Q949084",
+  "birthPlace": "Hyderabad",
+  "fetchedAt": "2026-04-08T02:08:05.201Z"
+}

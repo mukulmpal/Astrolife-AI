@@ -1,0 +1,27 @@
+{
+  "publicId": "51f1f555",
+  "wikipediaSlug": "Bacchu_Kailash",
+  "wikipediaId": "Q19680859",
+  "name": "Bacchu Kailash",
+  "fullName": "Bacchu Kailash",
+  "profileSummary": "Kailash Bahadur Basnet, better known as Bachchu Kailash is a singer, composer and lyricist of Nepali Music. He displayed virtuoso with his songwriting skills in which his lyrics often provoked a subject from a different perspective and highly poetic form; adding with his unique tenor voice made him highly popular.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bacchu_Kailash",
+  "dateOfBirth": "1938-07-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "5",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "composer"
+  ],
+  "qid": "Q19680859",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:47:53.299Z"
+}

@@ -1,0 +1,30 @@
+{
+  "publicId": "65d8a9bf",
+  "wikipediaSlug": "Amrinder_Gill",
+  "wikipediaId": "Q4748646",
+  "name": "Amrinder Gill",
+  "fullName": "Amrinder Gill",
+  "profileSummary": "Amrinder Singh Gill is an Indian actor, singer, songwriter and film producer who makes Punjabi-language films and music. He has been nominated for twenty-four PTC Punjabi Film Awards, winning seven including three for Best Actor, and two for Best Playback singer and has been nominated for five Filmfare Awards, winning two for Best Actor and Best Playback singer, among other accolades.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Director_Simerjit_Singh_%28cropped%29.jpg/330px-Director_Simerjit_Singh_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amrinder_Gill",
+  "dateOfBirth": "1976-05-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.626917",
+  "birthCoordinatesLng": "74.87704",
+  "moonSign": "6",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "singer",
+    "film actor",
+    "film producer",
+    "film director"
+  ],
+  "qid": "Q4748646",
+  "birthPlace": "Amritsar",
+  "fetchedAt": "2026-04-07T16:25:27.933Z"
+}

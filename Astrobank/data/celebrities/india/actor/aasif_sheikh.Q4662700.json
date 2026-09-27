@@ -1,0 +1,27 @@
+{
+  "publicId": "f0f55620",
+  "wikipediaSlug": "Aasif_Sheikh",
+  "wikipediaId": "Q4662700",
+  "name": "Aasif Sheikh",
+  "fullName": "Aasif Sheikh",
+  "profileSummary": "Aasif Sheikh is an Indian film, stage, and television actor. He played the role of Prince Ajay Singh in Hum Log, India's first daily soap opera. He has appeared in numerous Bollywood films and TV serials and is well known for his roles in series like Yes Boss, which ran from 1999 to 2009, and the sitcom Bhabiji Ghar Par Hain!, one of the longest running Indian comedy sitcoms.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Aasif_Sheikh.jpg/330px-Aasif_Sheikh.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aasif_Sheikh",
+  "dateOfBirth": "1960-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "10",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q4662700",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:53.326Z"
+}

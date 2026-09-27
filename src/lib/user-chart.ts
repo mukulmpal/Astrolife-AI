@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { createClient } from "@/lib/supabase/client";
+import { ChartContext, useChartEngine } from "@/context/ChartContext";
+export { useChartEngine };
 
 export interface BirthDetails {
   name: string;
@@ -31,7 +33,7 @@ const CHART_STORAGE_KEY = "currentChart";
 // engine pages never crash on a missing chart. It is NEVER shown to the user —
 // it carries no real person's name and `birth` always defaults to EMPTY_BIRTH,
 // so every page's empty-state guard fires until the user's real chart loads.
-const PLACEHOLDER_BIRTH: BirthDetails = {
+export const PLACEHOLDER_BIRTH: BirthDetails = {
   name: "",
   dob: "2000-01-01",
   tob: "12:00",
@@ -39,14 +41,14 @@ const PLACEHOLDER_BIRTH: BirthDetails = {
   tz: 5.5,
 };
 
-const EMPTY_BIRTH: BirthDetails = {
+export const EMPTY_BIRTH: BirthDetails = {
   name: "",
   dob: "",
   tob: "",
   city: "",
 };
 
-function buildChart(birth: BirthDetails): ChartData {
+export function buildChart(birth: BirthDetails): ChartData {
   return calculateChart(
     birth.name,
     birth.dob,
@@ -69,7 +71,7 @@ function isStoredChart(value: unknown): value is ChartData {
     && Array.isArray(chart.dashas);
 }
 
-function getBirthFromChart(chart: ChartData): BirthDetails {
+export function getBirthFromChart(chart: ChartData): BirthDetails {
   return {
     name: chart.name,
     dob: chart.dob,
@@ -101,7 +103,7 @@ function serializeChart(chart: ChartData) {
   return JSON.parse(JSON.stringify(chart)) as Record<string, unknown>;
 }
 
-function getProfileBirth(profile: Record<string, unknown> | null): BirthDetails | null {
+export function getProfileBirth(profile: Record<string, unknown> | null): BirthDetails | null {
   if (!profile) return null;
   const name = typeof profile.name === "string" ? profile.name : "";
   const dob = typeof profile.dob === "string" ? profile.dob : "";
@@ -222,7 +224,7 @@ export function clearCurrentChart() {
   window.localStorage.removeItem(CHART_STORAGE_KEY);
 }
 
-function loadCurrentChartFromDevice(): ChartData | null {
+export function loadCurrentChartFromDevice(): ChartData | null {
   if (typeof window === "undefined") return null;
   const stored = window.localStorage.getItem(CHART_STORAGE_KEY);
   if (!stored) return null;
@@ -573,7 +575,7 @@ export async function selectSavedChart(chartId: string): Promise<ChartData | nul
 
 let activePrimaryChartPromise: Promise<ChartData | null> | null = null;
 
-async function loadPrimaryChartFromAccount(existingUser?: any): Promise<ChartData | null> {
+export async function loadPrimaryChartFromAccount(existingUser?: any): Promise<ChartData | null> {
   if (activePrimaryChartPromise) {
     return activePrimaryChartPromise;
   }
@@ -638,15 +640,18 @@ export function formatChartContext(chart: ChartData): string {
 }
 
 export function useUserChart() {
-  // birth starts BLANK so empty-state guards fire until a real chart loads.
-  // chart starts as a valid demo *structure* only to keep pages crash-safe;
-  // it is never surfaced because hasUserChart stays false until real data.
+  const context = useContext(ChartContext);
+
+  // Standalone fallback state if invoked outside of ChartProvider
   const [birth, setBirth] = useState<BirthDetails>(EMPTY_BIRTH);
   const [chart, setChart] = useState<ChartData>(() => buildChart(PLACEHOLDER_BIRTH));
   const [hasUserChart, setHasUserChart] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!context);
 
   useEffect(() => {
+    // If mounted inside ChartProvider, global state is already managed and loaded
+    if (context) return;
+
     let cancelled = false;
 
     const loadChart = async () => {
@@ -735,7 +740,11 @@ export function useUserChart() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [context]);
+
+  if (context) {
+    return context;
+  }
 
   return { birth, chart, loading, hasUserChart, isDemoChart: !hasUserChart };
 }

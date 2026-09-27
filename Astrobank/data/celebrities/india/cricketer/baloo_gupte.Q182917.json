@@ -1,0 +1,28 @@
+{
+  "publicId": "997764fc",
+  "wikipediaSlug": "Baloo_Gupte",
+  "wikipediaId": "Q182917",
+  "name": "Baloo Gupte",
+  "fullName": "Baloo Gupte",
+  "profileSummary": "Balkrishna Pandharinath \"Baloo\" Gupte was an Indian cricketer. He was a leg-spinner.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Baloo_Gupte",
+  "dateOfBirth": "1934-08-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q182917",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:50:03.717Z"
+}

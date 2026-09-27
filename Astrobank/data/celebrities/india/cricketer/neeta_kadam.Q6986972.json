@@ -1,0 +1,28 @@
+{
+  "publicId": "e31b560f",
+  "wikipediaSlug": "Neeta_Kadam",
+  "wikipediaId": "Q6986972",
+  "name": "Neeta Kadam",
+  "fullName": "Neeta Kadam",
+  "profileSummary": "Neeta Kadam is a former Test and One Day International cricketer who represented India. She is a right-hand batter who played one Test and two ODIs.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Neeta_Kadam",
+  "dateOfBirth": "1961-12-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6986972",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T11:00:33.679Z"
+}

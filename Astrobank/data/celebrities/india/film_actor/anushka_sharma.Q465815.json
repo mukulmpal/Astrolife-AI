@@ -1,0 +1,29 @@
+{
+  "publicId": "6b346495",
+  "wikipediaSlug": "Anushka_Sharma",
+  "wikipediaId": "Q465815",
+  "name": "Anushka Sharma",
+  "fullName": "Anushka Sharma",
+  "profileSummary": "Anushka Sharma is a former Indian actress & producer who works in Hindi films. She has won many awards including Filmfare Awards and IIFA Awards. Sharma has appeared in Forbes India's Celebrity 100 in the 2010s and was featured by Forbes Asia in their 30 Under 30 list of 2018.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Anushka_Sharma_promoting_Zero.jpg/330px-Anushka_Sharma_promoting_Zero.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anushka_Sharma",
+  "dateOfBirth": "1988-05-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.799166666",
+  "birthCoordinatesLng": "82.204444444",
+  "moonSign": "7",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "fashion model",
+    "film producer",
+    "actor"
+  ],
+  "qid": "Q465815",
+  "birthPlace": "Ayodhya",
+  "fetchedAt": "2026-04-07T16:33:49.821Z"
+}

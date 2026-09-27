@@ -1,0 +1,28 @@
+{
+  "publicId": "217b31ba",
+  "wikipediaSlug": "Melina_Manandhar",
+  "wikipediaId": "Q6812434",
+  "name": "Melina Manandhar",
+  "fullName": "Melina Manandhar",
+  "profileSummary": "Melina Manandhar is a Nepalese actress, model and producer. She has acted in films, telefilms, television serials and music videos in Nepali and Newar languages.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Melina_Manandhar",
+  "dateOfBirth": "1977-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "1",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "film actor"
+  ],
+  "qid": "Q6812434",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:47.522Z"
+}

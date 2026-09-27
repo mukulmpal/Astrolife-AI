@@ -94,7 +94,7 @@ export default function TransitPurchasePage() {
   return (
     <main className="tp-wrap">
       <style>{`
-        .tp-wrap{min-height:100vh;background:#060410;color:#f0e8d0;padding:30px 22px 110px;font-family:Outfit,system-ui,sans-serif}
+        .tp-wrap{min-height:100vh;background:#FAF7F2;color:#1A1A1A;padding:30px 22px 110px;font-family:Outfit,system-ui,sans-serif}
         .tp-shell{max-width:1120px;margin:0 auto;display:grid;gap:16px}
         .tp-hero{background:linear-gradient(135deg,#100c2a,#1a123f);border:1px solid rgba(200,160,48,.18);border-radius:18px;padding:22px}
         .tp-row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -103,10 +103,10 @@ export default function TransitPurchasePage() {
         .tp-sub{font-size:13px;color:#9b92c8;margin-top:6px;line-height:1.6}
         .tp-btn{border:1px solid rgba(200,160,48,.35);background:rgba(200,160,48,.12);color:#e8cf8b;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
         .tp-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-        .tp-card{background:#0d0a22;border:1px solid #221d45;border-radius:16px;padding:18px}
+        .tp-card{background:#FFFFFF;border:1px solid #221d45;border-radius:16px;padding:18px}
         .span-12{grid-column:span 12}.span-7{grid-column:span 7}.span-5{grid-column:span 5}.span-6{grid-column:span 6}
         .tp-h{font-family:'Cormorant Garamond',serif;font-size:24px;margin-bottom:8px}
-        .tp-p{font-size:13px;color:#b8b0d8;line-height:1.7}
+        .tp-p{font-size:13px;color:#6B635B;line-height:1.7}
         .tp-badge{display:inline-flex;border:1px solid;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.08em}
         .tp-list{display:grid;gap:10px;margin-top:12px}
         .tp-item{background:#09061d;border:1px solid #261f4c;border-radius:12px;padding:12px}
@@ -114,7 +114,7 @@ export default function TransitPurchasePage() {
         .tp-muted{font-size:12px;color:#8e84b8;line-height:1.6}
         .tp-chip{font-size:11px;color:#c8a030;border:1px solid rgba(200,160,48,.25);padding:4px 8px;border-radius:999px}
         .tp-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-        .tp-tab{display:flex;align-items:center;gap:7px;border:1px solid #2a2350;background:#0b0820;color:#b8b0d8;border-radius:12px;padding:8px 13px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+        .tp-tab{display:flex;align-items:center;gap:7px;border:1px solid #2a2350;background:#0b0820;color:#6B635B;border-radius:12px;padding:8px 13px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
         .tp-tab:hover{border-color:rgba(200,160,48,.4);color:#e8cf8b}
         .tp-tab.active{background:rgba(200,160,48,.14);border-color:rgba(200,160,48,.6);color:#e8cf8b}
         .tp-tab .glyph{font-size:16px;line-height:1}

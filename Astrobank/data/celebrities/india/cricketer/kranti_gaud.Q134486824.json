@@ -1,0 +1,28 @@
+{
+  "publicId": "582dbb4e",
+  "wikipediaSlug": "Kranti_Gaud",
+  "wikipediaId": "Q134486824",
+  "name": "Kranti Gaud",
+  "fullName": "Kranti Gaud",
+  "profileSummary": "Kranti Gaud is an Indian international cricketer. She represents Madhya Pradesh in domestic cricket and UP Warriorz in the Women's Premier League. Gaud was a part of the Indian team that won the 2025 Women's Cricket World Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Kranti_Gaud.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kranti_Gaud",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q134486824",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T11:00:25.779Z"
+}

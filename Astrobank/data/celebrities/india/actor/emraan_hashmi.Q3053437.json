@@ -1,0 +1,28 @@
+{
+  "publicId": "53225d98",
+  "wikipediaSlug": "Emraan_Hashmi",
+  "wikipediaId": "Q3053437",
+  "name": "Emraan Hashmi",
+  "fullName": "Emraan Hashmi",
+  "profileSummary": "Syed Emraan Anwar Hashmi is an Indian film actor, who appears in Hindi films. Initially known for performing bold scenes, Hashmi has since portrayed strong roles in films. One of the most unconventional actors of India, Hashmi has received four Filmfare Award nominations.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Emraan_Filmfare_Magazine_Launch.jpg/330px-Emraan_Filmfare_Magazine_Launch.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Emraan_Hashmi",
+  "dateOfBirth": "1979-03-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q3053437",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:17:24.271Z"
+}

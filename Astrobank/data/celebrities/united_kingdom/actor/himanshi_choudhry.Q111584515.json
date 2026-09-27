@@ -1,0 +1,26 @@
+{
+  "publicId": "c5e1df9a",
+  "wikipediaSlug": "Himanshi_Choudhry",
+  "wikipediaId": "Q111584515",
+  "name": "Himanshi Choudhry",
+  "fullName": "Himanshi Choudhry",
+  "profileSummary": "Himanshi Choudhry is a British actress. She is known for playing Sheetal Dhanrajgir in Tu Aashiqui and Sudha Dhawan in Inside Edge.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Himanshi_Choudhry",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "53.466666666",
+  "birthCoordinatesLng": "-2.233333333",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q111584515",
+  "birthPlace": "Manchester",
+  "fetchedAt": "2026-04-08T02:08:08.764Z"
+}

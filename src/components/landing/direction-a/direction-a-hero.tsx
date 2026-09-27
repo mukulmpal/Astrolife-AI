@@ -101,7 +101,7 @@ export function DirectionAHero() {
           <div
             className="dira-reveal dira-reveal-4 in rounded-2xl p-8"
             style={{
-              background: 'linear-gradient(135deg, #1c1840 0%, #0d0a22 100%)',
+              background: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 100%)',
               border: '1px solid #2d2860',
               boxShadow: '0 20px 60px -14px rgba(200, 160, 48, 0.25)',
             }}
@@ -110,7 +110,7 @@ export function DirectionAHero() {
               <div className="mb-2 text-11px font-semibold uppercase tracking-widest" style={{ color: '#c8a030' }}>
                 ✦ Get Started Free
               </div>
-              <h3 className="font-serif text-2xl font-600" style={{ color: '#f0e8d0' }}>
+              <h3 className="font-serif text-2xl font-600" style={{ color: '#1A1A1A' }}>
                 Your Kundli
               </h3>
               <p className="mt-2 text-sm" style={{ color: '#a79fbd' }}>

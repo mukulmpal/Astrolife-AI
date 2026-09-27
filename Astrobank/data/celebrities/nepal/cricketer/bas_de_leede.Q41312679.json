@@ -1,0 +1,26 @@
+{
+  "publicId": "908d817d",
+  "wikipediaSlug": "Bas_de_Leede",
+  "wikipediaId": "Q41312679",
+  "name": "Bas de Leede",
+  "fullName": "Bas de Leede",
+  "profileSummary": "Bastiaan Franciscus Wilhelmus de Leede is a Dutch cricketer. He comes from a cricketing family and his father, Tim de Leede, too played for the Netherlands, in 29 One Day Internationals (ODIs).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/1_02_Bas_de_Leede.jpg/330px-1_02_Bas_de_Leede.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bas_de_Leede",
+  "dateOfBirth": "1999-11-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "52.0439",
+  "birthCoordinatesLng": "4.3978",
+  "moonSign": "10",
+  "sunSign": "7",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q41312679",
+  "birthPlace": "Nootdorp",
+  "fetchedAt": "2026-04-07T16:51:47.863Z"
+}

@@ -477,9 +477,9 @@ function DashboardContent() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth}
-        body{background:#060410;color:#f0e8d0;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        body{background:#FAF7F2;color:#1A1A1A;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
         .serif{font-family:'Cormorant Garamond',Georgia,serif}
-        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#060410}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#FAF7F2}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
         /* MAIN */
@@ -488,49 +488,49 @@ function DashboardContent() {
         /* TOPBAR */
         .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px}
         .greeting-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:6px}
-        .greeting-h{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#f0e8d0;line-height:1.1}
+        .greeting-h{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#1A1A1A;line-height:1.1}
         .greeting-h em{font-style:italic;color:#c8a030}
-        .greeting-sub{font-size:13px;color:#605890;margin-top:4px}
+        .greeting-sub{font-size:13px;color:#6B635B;margin-top:4px}
         .topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
-        .date-chip{background:#0d0a22;border:1px solid #1c1840;border-radius:10px;padding:10px 16px;text-align:right}
-        .date-day{font-size:11px;color:#605890;letter-spacing:1px}
-        .date-full{font-size:13px;color:#c8c0a8;margin-top:2px}
-        .notif-btn{width:40px;height:40px;border-radius:10px;background:#0d0a22;border:1px solid #1c1840;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:18px}
+        .date-chip{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:10px;padding:10px 16px;text-align:right}
+        .date-day{font-size:11px;color:#6B635B;letter-spacing:1px}
+        .date-full{font-size:13px;color:#4A4238;margin-top:2px}
+        .notif-btn{width:40px;height:40px;border-radius:10px;background:#FFFFFF;border:1px solid #FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:18px}
         .notif-btn:hover{border-color:rgba(200,160,48,0.3)}
 
         /* TABS */
-        .tabs{display:flex;gap:4px;margin-bottom:28px;background:#0a0720;border:1px solid #1c1840;border-radius:12px;padding:4px;width:fit-content}
-        .tab{padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#605890;border:none;background:none;font-family:'Outfit',sans-serif}
-        .tab.active{background:#1c1840;color:#c8c0a8}
+        .tabs{display:flex;gap:4px;margin-bottom:28px;background:#FAF7F2;border:1px solid #FFFFFF;border-radius:12px;padding:4px;width:fit-content}
+        .tab{padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#6B635B;border:none;background:none;font-family:'Outfit',sans-serif}
+        .tab.active{background:#FFFFFF;color:#4A4238}
 
         /* STATS */
         .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-        .stat-card{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:20px;transition:border-color 0.3s}
+        .stat-card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:20px;transition:border-color 0.3s}
         .stat-card:hover{border-color:rgba(200,160,48,0.2)}
         .stat-icon{font-size:24px;margin-bottom:12px}
         .stat-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#c8a030;line-height:1;margin-bottom:4px}
-        .stat-lbl{font-size:12px;color:#605890}
+        .stat-lbl{font-size:12px;color:#6B635B}
         .stat-change{font-size:11px;color:#1d9e75;margin-top:6px}
 
         /* GRID */
         .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
 
         /* CARDS */
-        .card{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:24px;transition:border-color 0.3s}
+        .card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:24px;transition:border-color 0.3s}
         .card:hover{border-color:rgba(200,160,48,0.15)}
-        .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0;margin-bottom:16px}
-        .card-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#605890;margin-bottom:8px}
+        .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1A1A1A;margin-bottom:16px}
+        .card-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B635B;margin-bottom:8px}
 
         /* QUICK ACTIONS */
         .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-        .action-btn{padding:16px;border-radius:12px;border:1px solid #1c1840;background:#0a0720;cursor:pointer;transition:all 0.25s;text-align:left;text-decoration:none;display:block}
-        .action-btn:hover{transform:translateY(-3px);border-color:rgba(200,160,48,0.25);background:#0f0c28}
+        .action-btn{padding:16px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;cursor:pointer;transition:all 0.25s;text-align:left;text-decoration:none;display:block}
+        .action-btn:hover{transform:translateY(-3px);border-color:rgba(200,160,48,0.25);background:#FFFFFF}
         .action-btn-icon{font-size:24px;margin-bottom:10px}
-        .action-btn-label{font-size:13px;font-weight:500;color:#c8c0a8;margin-bottom:3px}
-        .action-btn-desc{font-size:11px;color:#605890}
+        .action-btn-label{font-size:13px;font-weight:500;color:#4A4238;margin-bottom:3px}
+        .action-btn-desc{font-size:11px;color:#6B635B}
 
         /* INSIGHTS */
-        .insight{padding:16px;border-radius:12px;border:1px solid #1c1840;background:#0a0720;margin-bottom:10px;transition:border-color 0.2s}
+        .insight{padding:16px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;margin-bottom:10px;transition:border-color 0.2s}
         .insight:last-child{margin-bottom:0}
         .insight:hover{border-color:rgba(200,160,48,0.2)}
         .insight.urgent{border-color:rgba(200,160,48,0.25);background:rgba(200,160,48,0.03)}
@@ -538,36 +538,36 @@ function DashboardContent() {
         .insight-icon{font-size:18px}
         .insight-tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#c8a030;font-weight:500}
         .insight-urgent-dot{width:6px;height:6px;border-radius:50%;background:#c8a030;margin-left:auto;animation:blink 2s infinite}
-        .insight-text{font-size:13px;color:#c8c0a8;line-height:1.7}
+        .insight-text{font-size:13px;color:#4A4238;line-height:1.7}
 
         /* PLANETS */
-        .planet-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1c1840}
+        .planet-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #FFFFFF}
         .planet-row:last-child{border-bottom:none}
         .energy-pill{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(200,160,48,0.1);border:1px solid rgba(200,160,48,0.15);color:#c8a030}
 
         /* TODAY CARD */
-        .today-card{background:linear-gradient(135deg,#0f0c28,#1a1040);border:1px solid rgba(200,160,48,0.2);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden}
+        .today-card{background:linear-gradient(135deg,#FFFFFF,#1a1040);border:1px solid rgba(200,160,48,0.2);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden}
         .today-orb{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(200,160,48,0.08) 0%,transparent 70%);right:-40px;top:-40px;pointer-events:none}
         .today-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:10px}
-        .today-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#f0e8d0;margin-bottom:8px}
-        .today-text{font-size:14px;color:#c8c0a8;line-height:1.8;max-width:600px}
+        .today-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
+        .today-text{font-size:14px;color:#4A4238;line-height:1.8;max-width:600px}
         .today-score{position:absolute;right:24px;bottom:24px;text-align:center}
         .score-n{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;color:#c8a030;line-height:1}
-        .score-l{font-size:11px;color:#605890;letter-spacing:1px}
+        .score-l{font-size:11px;color:#6B635B;letter-spacing:1px}
         .today-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-        .today-summary-card{display:block;text-decoration:none;background:#0d0a22;border:1px solid #1c1840;border-radius:12px;padding:14px 16px;transition:all 0.2s}
+        .today-summary-card{display:block;text-decoration:none;background:#FFFFFF;border:1px solid #FFFFFF;border-radius:12px;padding:14px 16px;transition:all 0.2s}
         .today-summary-card:hover{transform:translateY(-2px);border-color:rgba(200,160,48,0.25)}
-        .today-summary-k{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#605890;margin-bottom:6px}
-        .today-summary-v{font-size:14px;color:#f0e8d0;line-height:1.5}
+        .today-summary-k{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;margin-bottom:6px}
+        .today-summary-v{font-size:14px;color:#1A1A1A;line-height:1.5}
         .today-summary-hint{font-size:11px;color:#c8a030;margin-top:8px}
 
         /* UPGRADE */
         .upgrade{background:linear-gradient(135deg,rgba(60,40,128,0.4),rgba(200,160,48,0.1));border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-        .upgrade-btn{background:linear-gradient(135deg,#c8a030,#a07820);color:#060410;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;white-space:nowrap;text-decoration:none}
+        .upgrade-btn{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;white-space:nowrap;text-decoration:none}
         .upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,160,48,0.3)}
         .db-health{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.18);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
         .db-health-title{font-size:13px;color:#fdba74;font-weight:600;margin-bottom:4px}
-        .db-health-text{font-size:12px;color:#c8c0a8;line-height:1.7}
+        .db-health-text{font-size:12px;color:#4A4238;line-height:1.7}
         .db-health-tags{display:flex;gap:6px;flex-wrap:wrap}
         .db-health-tag{font-size:10px;color:#fdba74;border:1px solid rgba(249,115,22,0.25);background:rgba(249,115,22,0.08);border-radius:999px;padding:3px 8px}
         .mobile-nav{display:none}
@@ -598,9 +598,9 @@ function DashboardContent() {
           .card{padding:18px}
           .planet-row{gap:8px}
           .energy-pill{padding:2px 8px}
-          .mobile-nav{display:flex;gap:4px;position:fixed;left:10px;right:10px;bottom:10px;overflow-x:auto;background:rgba(10,7,32,0.96);border:1px solid #1c1840;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120;scrollbar-width:none}
+          .mobile-nav{display:flex;gap:4px;position:fixed;left:10px;right:10px;bottom:10px;overflow-x:auto;background:rgba(10,7,32,0.96);border:1px solid #FFFFFF;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120;scrollbar-width:none}
           .mobile-nav::-webkit-scrollbar{display:none}
-          .mobile-nav-item{text-decoration:none;color:#605890;display:flex;flex:0 0 58px;min-height:44px;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:10px}
+          .mobile-nav-item{text-decoration:none;color:#6B635B;display:flex;flex:0 0 58px;min-height:44px;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:10px}
           .mobile-nav-item.active{color:#c8a030;background:rgba(200,160,48,0.1)}
           .mobile-nav-icon{font-size:16px;line-height:1}
           .mobile-nav-label{font-size:9px;letter-spacing:0.2px}
@@ -773,9 +773,9 @@ function DashboardContent() {
               {planetCards.map((p,i) => (
                 <div key={i} className="planet-row">
                   <span style={{fontSize:18,width:28,color:p.col}}>{p.icon}</span>
-                  <span style={{flex:1,fontSize:13,color:"#c8c0a8"}}>{p.name}</span>
-                  <span style={{fontSize:13,color:"#f0e8d0"}}>{p.sign}</span>
-                  <span style={{fontSize:11,color:"#605890",width:32,textAlign:"right"}}>{p.house}</span>
+                  <span style={{flex:1,fontSize:13,color:"#4A4238"}}>{p.name}</span>
+                  <span style={{fontSize:13,color:"#1A1A1A"}}>{p.sign}</span>
+                  <span style={{fontSize:11,color:"#6B635B",width:32,textAlign:"right"}}>{p.house}</span>
                   <span className="energy-pill">{p.energy}</span>
                 </div>
               ))}
@@ -786,7 +786,7 @@ function DashboardContent() {
           {plan === "ELITE" ? (
             <div className="upgrade" style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.15), rgba(200,160,48,0.15))", borderColor: "rgba(168,85,247,0.35)" }}>
               <div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:"#f0e8d0",marginBottom:4}}>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:"#1A1A1A",marginBottom:4}}>
                   ✦ AstroLife Elite Universe Active
                 </div>
                 <div style={{fontSize:13,color:"#c084fc"}}>
@@ -800,10 +800,10 @@ function DashboardContent() {
           ) : (
             <div className="upgrade">
               <div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,color:"#f0e8d0",marginBottom:4}}>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,color:"#1A1A1A",marginBottom:4}}>
                   Unlock Your Full Cosmic Blueprint ✦
                 </div>
-                <div style={{fontSize:13,color:"#605890"}}>
+                <div style={{fontSize:13,color:"#6B635B"}}>
                   Upgrade to access all 25+ engines, 30+ modules, unlimited AI chat, and destiny timeline.
                 </div>
               </div>
@@ -855,40 +855,40 @@ function DashboardContent() {
             <div className="card-title serif">Generate or Update Your Chart</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16 }}>
               <div>
-                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Full Name</label>
-                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%", transition: "border-color 0.2s" }}
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#6B635B", display: "block", marginBottom: 8 }}>Full Name</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #FFFFFF", borderRadius: 10, outline: "none", fontSize: 13, color: "#1A1A1A", fontFamily: "Outfit,sans-serif", width: "100%", transition: "border-color 0.2s" }}
                   placeholder="Enter your name"
                   value={chartForm.name}
                   onChange={e=>setChartForm(f=>({...f,name:e.target.value}))}
                   onFocus={e => e.currentTarget.style.borderColor = "#c8a030"}
-                  onBlur={e => e.currentTarget.style.borderColor = "#1c1840"}/>
+                  onBlur={e => e.currentTarget.style.borderColor = "#FFFFFF"}/>
               </div>
               <div>
-                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Date of Birth</label>
-                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%", colorScheme: "dark" }}
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#6B635B", display: "block", marginBottom: 8 }}>Date of Birth</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #FFFFFF", borderRadius: 10, outline: "none", fontSize: 13, color: "#1A1A1A", fontFamily: "Outfit,sans-serif", width: "100%", colorScheme: "dark" }}
                   type="date"
                   value={chartForm.dob}
                   max={new Date().toISOString().split("T")[0]}
                   onChange={e=>setChartForm(f=>({...f,dob:e.target.value}))}/>
               </div>
               <div>
-                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Time of Birth</label>
-                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%", colorScheme: "dark" }}
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#6B635B", display: "block", marginBottom: 8 }}>Time of Birth</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #FFFFFF", borderRadius: 10, outline: "none", fontSize: 13, color: "#1A1A1A", fontFamily: "Outfit,sans-serif", width: "100%", colorScheme: "dark" }}
                   type="time"
                   value={chartForm.tob}
                   onChange={e=>setChartForm(f=>({...f,tob:e.target.value}))}/>
               </div>
               <div style={{ position: "relative" }}>
-                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", display: "block", marginBottom: 8 }}>Birth City</label>
-                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #1c1840", borderRadius: 10, outline: "none", fontSize: 13, color: "#f0e8d0", fontFamily: "Outfit,sans-serif", width: "100%" }}
+                <label style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#6B635B", display: "block", marginBottom: 8 }}>Birth City</label>
+                <input style={{ height: 44, padding: "0 14px", background: "rgba(255,255,255,0.03)", border: "1px solid #FFFFFF", borderRadius: 10, outline: "none", fontSize: 13, color: "#1A1A1A", fontFamily: "Outfit,sans-serif", width: "100%" }}
                   placeholder="Search city..."
                   value={citySearch}
                   onChange={e=>{setCitySearch(e.target.value);setChartForm(f=>({...f,city:""}));setShowCities(true);}}
                   onFocus={()=>setShowCities(true)}/>
                 {showCities && citySearch.length>0 && filteredCities.length>0 && (
-                  <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#0f0c28", border: "1px solid #261f50", borderRadius: 10, zIndex: 20, maxHeight: 160, overflowY: "auto" }}>
+                  <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#FFFFFF", border: "1px solid #261f50", borderRadius: 10, zIndex: 20, maxHeight: 160, overflowY: "auto" }}>
                     {filteredCities.map(c=>(
-                      <div key={c} style={{ padding: "11px 14px", fontSize: 13, color: "#c8c0a8", cursor: "pointer", transition: "background 0.15s" }}
+                      <div key={c} style={{ padding: "11px 14px", fontSize: 13, color: "#4A4238", cursor: "pointer", transition: "background 0.15s" }}
                         onClick={()=>{setChartForm(f=>({...f,city:c}));setCitySearch(c);setShowCities(false);}}
                         onMouseEnter={e => e.currentTarget.style.background = "rgba(200,160,48,0.08)"}
                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
@@ -899,7 +899,7 @@ function DashboardContent() {
                 )}
               </div>
             </div>
-            <button style={{ width: "100%", marginTop: 20, padding: 16, background: "linear-gradient(135deg,#c8a030,#3c2880cc)", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600, color: "#060410", cursor: "pointer", transition: "all 0.25s", fontFamily: "Outfit,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+            <button style={{ width: "100%", marginTop: 20, padding: 16, background: "linear-gradient(135deg,#c8a030,#3c2880cc)", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600, color: "#FAF7F2", cursor: "pointer", transition: "all 0.25s", fontFamily: "Outfit,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
               onClick={handleGenerateChart}
               disabled={!chartForm.name||!chartForm.dob||!chartForm.tob||!chartForm.city||chartLoading}
               onMouseEnter={e => !chartLoading && (e.currentTarget.style.transform = "translateY(-2px)")}
@@ -1044,7 +1044,7 @@ function DashboardContent() {
 
 function DashboardLoading() {
   return (
-    <div style={{ minHeight: '100vh', background: '#060410', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: '#FAF7F2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: '#c8a030', fontSize: 18 }}>Loading your cosmic command center...</div>
     </div>
   );

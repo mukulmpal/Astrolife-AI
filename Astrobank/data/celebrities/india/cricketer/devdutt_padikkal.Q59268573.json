@@ -1,0 +1,28 @@
+{
+  "publicId": "395d7dbe",
+  "wikipediaSlug": "Devdutt_Padikkal",
+  "wikipediaId": "Q59268573",
+  "name": "Devdutt Padikkal",
+  "fullName": "Devdutt Padikkal",
+  "profileSummary": "Devdutt Padikkal is an Indian cricketer. He made his international debut in July 2021 in a T20I against Sri Lanka and test debut in March 2024 against England. He plays for Karnataka in domestic cricket and Royal Challengers Bangalore in the Indian Premier League.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Devdutt_Paddikal_%28cropped%29.jpg/330px-Devdutt_Paddikal_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Devdutt_Padikkal",
+  "dateOfBirth": "2000-07-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "10.7321",
+  "birthCoordinatesLng": "76.0274",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q59268573",
+  "birthPlace": "Edapal",
+  "fetchedAt": "2026-04-07T10:57:55.960Z"
+}

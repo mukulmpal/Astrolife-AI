@@ -1,0 +1,29 @@
+{
+  "publicId": "206d6a71",
+  "wikipediaSlug": "Ajith_Kumar",
+  "wikipediaId": "Q339896",
+  "name": "Ajith Kumar",
+  "fullName": "Ajith Kumar",
+  "profileSummary": "Ajith Kumar Subramaniam is an Indian actor who works predominantly in Tamil cinema. To date, he has starred in over 63 films, and won four Vijay Awards, three Cinema Express Awards, three Filmfare Awards South and three Tamil Nadu State Film Awards. In addition to his acting career, Ajith is an occasional racing driver and participated in the MRF Racing series (2010) and having competed in circuits around India in places such as Mumbai, Chennai and Delhi. He is one among very few Indians to race in the international arena and in Formula championships. Based on the annual earnings of Indian celebrities, he was included in the Forbes India Celebrity 100 list three times.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Ajith_Kumar_at_Irungattukottai_Race_Track.jpg/330px-Ajith_Kumar_at_Irungattukottai_Race_Track.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajith_Kumar",
+  "dateOfBirth": "1971-05-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.45",
+  "birthCoordinatesLng": "78.5",
+  "moonSign": "4",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "screenwriter",
+    "racing automobile driver"
+  ],
+  "qid": "Q339896",
+  "birthPlace": "Secunderabad",
+  "fetchedAt": "2026-04-07T16:25:31.795Z"
+}

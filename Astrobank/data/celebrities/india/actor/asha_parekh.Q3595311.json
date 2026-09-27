@@ -1,0 +1,29 @@
+{
+  "publicId": "3ede747a",
+  "wikipediaSlug": "Asha_Parekh",
+  "wikipediaId": "Q3595311",
+  "name": "Asha Parekh",
+  "fullName": "Asha Parekh",
+  "profileSummary": "Asha Parekh is an Indian actress, film director and producer who has worked in more than 85 films in a career that has spanned over 40 years. In 1992, she was honoured with the Padma Shri by the Government of India for her contribution to the field of cinema and was honoured with Dadasaheb Phalke Award in 2020.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Asha_Parekh.jpg/330px-Asha_Parekh.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Asha_Parekh",
+  "dateOfBirth": "1942-10-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": "3",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "television producer",
+    "television director"
+  ],
+  "qid": "Q3595311",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T16:33:48.880Z"
+}

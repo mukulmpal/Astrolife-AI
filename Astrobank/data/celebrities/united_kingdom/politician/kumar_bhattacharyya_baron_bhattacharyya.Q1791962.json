@@ -1,0 +1,27 @@
+{
+  "publicId": "2e22dc9e",
+  "wikipediaSlug": "Kumar_Bhattacharyya,_Baron_Bhattacharyya",
+  "wikipediaId": "Q1791962",
+  "name": "Kumar Bhattacharyya, Baron Bhattacharyya",
+  "fullName": "Kumar Bhattacharyya, Baron Bhattacharyya",
+  "profileSummary": "Sushanta Kumar Bhattacharyya, Baron Bhattacharyya, was a British-Indian engineer, educator and government advisor. In 1980, he became Professor of Manufacturing Systems at the University of Warwick and founded the Warwick Manufacturing Group. In 2004, he was made a life peer and became a member of the House of Lords.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Official_portrait_of_Lord_Bhattacharyya_crop_2.jpg/330px-Official_portrait_of_Lord_Bhattacharyya_crop_2.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kumar_Bhattacharyya%2C_Baron_Bhattacharyya",
+  "dateOfBirth": "1940-06-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.728888888",
+  "birthCoordinatesLng": "90.394444444",
+  "moonSign": "2",
+  "sunSign": "2",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "engineer"
+  ],
+  "qid": "Q1791962",
+  "birthPlace": "Dhaka",
+  "fetchedAt": "2026-04-08T02:07:58.283Z"
+}

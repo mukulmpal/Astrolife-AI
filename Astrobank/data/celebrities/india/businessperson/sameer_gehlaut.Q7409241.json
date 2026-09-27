@@ -1,0 +1,26 @@
+{
+  "publicId": "a7e5b4eb",
+  "wikipediaSlug": "Sameer_Gehlaut",
+  "wikipediaId": "Q7409241",
+  "name": "Sameer Gehlaut",
+  "fullName": "Sameer Gehlaut",
+  "profileSummary": "Sameer Gehlaut is an Indian businessman. He is the founder and chairman of the Indiabulls Group, a financial services conglomerate.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Chairman_web1.jpg/330px-Chairman_web1.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sameer_Gehlaut",
+  "dateOfBirth": "1974-03-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.9",
+  "birthCoordinatesLng": "76.566666666",
+  "moonSign": "3",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q7409241",
+  "birthPlace": "Rohtak",
+  "fetchedAt": "2026-04-08T02:05:05.955Z"
+}

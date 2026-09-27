@@ -1,0 +1,30 @@
+{
+  "publicId": "d1872304",
+  "wikipediaSlug": "Manoj_Bajpayee",
+  "wikipediaId": "Q158533",
+  "name": "Manoj Bajpayee",
+  "fullName": "Manoj Bajpayee",
+  "profileSummary": "Manoj Bajpayee, also transliterated as Manoj Bajpai, is an Indian actor who predominantly works in Hindi cinema. He has appeared in over 70 films. A prolific actor of Indian cinema, he is the recipient of numerous accolades including four National Film Awards, four Filmfare Awards, and two Asia Pacific Screen Awards. In 2019, he was awarded the Padma Shri by the Government of India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Manoj_Bajpai_at_52nd_IFFI.jpg/330px-Manoj_Bajpai_at_52nd_IFFI.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Manoj_Bajpayee",
+  "dateOfBirth": "1969-04-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.108",
+  "birthCoordinatesLng": "84.464",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "stage actor",
+    "film actor",
+    "television actor"
+  ],
+  "qid": "Q158533",
+  "birthPlace": "Narkatiaganj",
+  "fetchedAt": "2026-04-07T12:17:41.749Z"
+}

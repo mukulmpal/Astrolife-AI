@@ -1,0 +1,33 @@
+{
+  "publicId": "420964ae",
+  "wikipediaSlug": "Anurag_Kashyap",
+  "wikipediaId": "Q2839609",
+  "name": "Anurag Kashyap",
+  "fullName": "Anurag Kashyap",
+  "profileSummary": "Anurag Kashyap is an Indian filmmaker and actor known for his works in Hindi cinema. He is the recipient of four Filmfare Awards. The Government of France made him a Knight of the Order of Arts and Letters in 2013.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Anurag_Kashyap_02.jpg/330px-Anurag_Kashyap_02.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anurag_Kashyap",
+  "dateOfBirth": "1972-09-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.761111111",
+  "birthCoordinatesLng": "83.366666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film director",
+    "film producer",
+    "actor",
+    "screenwriter",
+    "film editor",
+    "businessperson"
+  ],
+  "qid": "Q2839609",
+  "birthPlace": "Gorakhpur",
+  "fetchedAt": "2026-04-07T12:14:25.221Z"
+}

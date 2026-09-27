@@ -1,0 +1,34 @@
+{
+  "publicId": "45d0d687",
+  "wikipediaSlug": "Pooja_Bhatt",
+  "wikipediaId": "Q786469",
+  "name": "Pooja Bhatt",
+  "fullName": "Pooja Bhatt",
+  "profileSummary": "Pooja Bhatt is an Indian actress, director, and filmmaker who works in Hindi films. She established herself as one of the leading actresses of the 1990s and is the recipient of several accolades, including two National Film Awards and one Filmfare Award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Pooja_Bhatt_grace_the_press_meet_of_the_film_Cabaret_at_JW_Marriott_Juhu_%282%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Pooja_Bhatt",
+  "dateOfBirth": "1972-02-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer",
+    "film director",
+    "film actor",
+    "film editor",
+    "screenwriter",
+    "model"
+  ],
+  "qid": "Q786469",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:55.443Z"
+}

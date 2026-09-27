@@ -1,0 +1,26 @@
+{
+  "publicId": "6ab9c0a1",
+  "wikipediaSlug": "Babar_Hayat",
+  "wikipediaId": "Q15966602",
+  "name": "Babar Hayat",
+  "fullName": "Babar Hayat",
+  "profileSummary": "Babar Hayat is a Pakistani-born Hong Kong cricketer, who plays for the Hong Kong cricket team. He is a right-handed batsman and a former captain of the national team.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Babar_Hayat",
+  "dateOfBirth": "1992-01-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "33.766666666",
+  "birthCoordinatesLng": "72.366666666",
+  "moonSign": "9",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q15966602",
+  "birthPlace": "Attock",
+  "fetchedAt": "2026-04-07T16:51:46.913Z"
+}

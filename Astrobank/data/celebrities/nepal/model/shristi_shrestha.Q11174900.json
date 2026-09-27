@@ -1,0 +1,28 @@
+{
+  "publicId": "28d739e4",
+  "wikipediaSlug": "Shristi_Shrestha",
+  "wikipediaId": "Q11174900",
+  "name": "Shristi Shrestha",
+  "fullName": "Shristi Shrestha",
+  "profileSummary": "Shristi Shrestha is a Nepalese actress, model and beauty pageant titleholder who the winner of the Miss Nepal 2012 pageant.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Shristi_Shrestha_02_%28cropped%29.jpg/330px-Shristi_Shrestha_02_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shristi_Shrestha",
+  "dateOfBirth": "1981-10-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.938055555",
+  "birthCoordinatesLng": "84.406944444",
+  "moonSign": "3",
+  "sunSign": "7",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "beauty pageant contestant",
+    "film actor"
+  ],
+  "qid": "Q11174900",
+  "birthPlace": "Bandipur",
+  "fetchedAt": "2026-04-07T16:45:19.773Z"
+}

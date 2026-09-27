@@ -1,0 +1,28 @@
+{
+  "publicId": "379fa066",
+  "wikipediaSlug": "M._K._Stalin",
+  "wikipediaId": "Q983475",
+  "name": "M. K. Stalin",
+  "fullName": "M. K. Stalin",
+  "profileSummary": "Muthuvel Karunanidhi Stalin is an Indian politician who has served as the eighth Chief Minister of Tamil Nadu since 2021. He became president of Dravida Munnetra Kazhagam (DMK) on 28 August 2018, after serving as the party's working president from January 2017 to August 2018.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/The_Chief_Minister_of_Tamil_Nadu%2C_Thiru_MK_Stalin.jpg/330px-The_Chief_Minister_of_Tamil_Nadu%2C_Thiru_MK_Stalin.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/M._K._Stalin",
+  "dateOfBirth": "1953-03-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": "5",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "actor",
+    "film producer"
+  ],
+  "qid": "Q983475",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T16:36:46.374Z"
+}

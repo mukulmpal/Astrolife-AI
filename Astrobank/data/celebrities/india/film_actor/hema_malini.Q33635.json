@@ -1,0 +1,32 @@
+{
+  "publicId": "74d22996",
+  "wikipediaSlug": "Hema_Malini",
+  "wikipediaId": "Q33635",
+  "name": "Hema Malini",
+  "fullName": "Hema Malini",
+  "profileSummary": "Hema Malini Dharmendra Deol is an Indian actress, director, producer, and politician who is currently serving as a member of the Lok Sabha from the Bharatiya Janata Party (BJP), representing Mathura constituency since 2014. She was a member of the Rajya Sabha from Karnataka from 2011 to 2012, subsequent to her nomination to that chamber from 2003 to 2009 as a member of the BJP. Primarily known for her work in Hindi films, she has starred in both comic and dramatic roles, and is one of the most popular and successful leading actresses of mainstream Hindi cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/39/Hema_Malini%27s_75th_birthday_celebration.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hema_Malini",
+  "dateOfBirth": "1948-10-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "10.64777778",
+  "birthCoordinatesLng": "79.27111111",
+  "moonSign": "12",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "film producer",
+    "dancer",
+    "television actor",
+    "politician",
+    "television producer"
+  ],
+  "qid": "Q33635",
+  "birthPlace": "Ammankudi",
+  "fetchedAt": "2026-04-07T16:33:58.433Z"
+}

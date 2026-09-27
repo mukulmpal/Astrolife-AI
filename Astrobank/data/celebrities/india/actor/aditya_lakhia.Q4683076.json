@@ -1,0 +1,27 @@
+{
+  "publicId": "ceba0812",
+  "wikipediaSlug": "Aditya_Lakhia",
+  "wikipediaId": "Q4683076",
+  "name": "Aditya Lakhia",
+  "fullName": "Aditya Lakhia",
+  "profileSummary": "Aditya Lakhia is an Indian character actor. He did his schooling from Mayo College, Ajmer and graduation from St. Xavier's College, Ahmedabad. He began his acting career in 1988 playing small roles and worked as an assistant director in Akele Hum Akele Tum. The character of Kachra in the movie Lagaan remains one of his most memorable performances. He is working in various supporting roles.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aditya_Lakhia",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q4683076",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:25:32.504Z"
+}

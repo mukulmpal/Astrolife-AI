@@ -1,0 +1,32 @@
+{
+  "publicId": "e9233ef0",
+  "wikipediaSlug": "Gippy_Grewal",
+  "wikipediaId": "Q5564076",
+  "name": "Gippy Grewal",
+  "fullName": "Gippy Grewal",
+  "profileSummary": "Rupinder Singh \"Gippy\" Grewal is an Indian actor, singer, film director and producer whose works span over Punjabi and Hindi film industry.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Gippy_Grewal_grace_the_premiere_of_Jatt_Nuu_Chudail_Takri_%28Cropped%29.jpg/330px-Gippy_Grewal_grace_the_premiere_of_Jatt_Nuu_Chudail_Takri_%28Cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gippy_Grewal",
+  "dateOfBirth": "1983-01-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.766666666",
+  "birthCoordinatesLng": "75.466666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "singer",
+    "film producer",
+    "film director",
+    "screenwriter"
+  ],
+  "qid": "Q5564076",
+  "birthPlace": "Punjab",
+  "fetchedAt": "2026-04-07T12:19:11.327Z"
+}

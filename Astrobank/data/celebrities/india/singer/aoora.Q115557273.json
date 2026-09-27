@@ -1,0 +1,29 @@
+{
+  "publicId": "eeb8e23c",
+  "wikipediaSlug": "Aoora",
+  "wikipediaId": "Q115557273",
+  "name": "Aoora",
+  "fullName": "Aoora",
+  "profileSummary": "Park Min-jun (Korean: 박민준), better known by his stage name Aoora, is a South Korean rapper, singer, songwriter and composer. He was a member of the K-pop group AA that debuted in 2011.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aoora",
+  "dateOfBirth": "1986-01-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "disc jockey"
+  ],
+  "qid": "Q115557273",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T12:18:43.962Z"
+}

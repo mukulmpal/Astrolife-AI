@@ -1,0 +1,29 @@
+{
+  "publicId": "cce8f296",
+  "wikipediaSlug": "Karam_Rajpal",
+  "wikipediaId": "Q16734900",
+  "name": "Karam Rajpal",
+  "fullName": "Karam Rajpal",
+  "profileSummary": "Karam Rajpal is an Indian actor who primarily works in Hindi television. Rajpal is best known for his portrayal of Sameer Atwal and Ameer Atwal in Nadaan Parindey Ghar Aaja, Shivam Shrivastav in Mere Angne Mein, Mann Sisodia in Manmohini and Dr. Rajneesh Raghuvanshi in Qayaamat Se Qayaamat Tak.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Karam_Rajpal",
+  "dateOfBirth": "1991-05-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.908333333",
+  "birthCoordinatesLng": "75.848611111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q16734900",
+  "birthPlace": "Ludhiana",
+  "fetchedAt": "2026-04-07T12:19:22.798Z"
+}

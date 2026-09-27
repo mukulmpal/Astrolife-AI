@@ -1,0 +1,28 @@
+{
+  "publicId": "8b3d816d",
+  "wikipediaSlug": "Jyotsna_Patel",
+  "wikipediaId": "Q6319482",
+  "name": "Jyotsna Patel",
+  "fullName": "Jyotsna Patel",
+  "profileSummary": "Jyotsna Patel is a former Test cricketer who represented India. She was born in Indore, Madhya Pradesh, and played two Test matches for India.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jyotsna_Patel",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.718611111",
+  "birthCoordinatesLng": "75.855",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6319482",
+  "birthPlace": "Indore",
+  "fetchedAt": "2026-04-07T11:00:23.636Z"
+}

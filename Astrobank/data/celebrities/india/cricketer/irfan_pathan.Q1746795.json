@@ -1,0 +1,29 @@
+{
+  "publicId": "93f6abb4",
+  "wikipediaSlug": "Irfan_Pathan",
+  "wikipediaId": "Q1746795",
+  "name": "Irfan Pathan",
+  "fullName": "Irfan Pathan",
+  "profileSummary": "Irfan Pathan is an Indian cricket commentator, analyst and former player. He was a bowling all-rounder and member of the Indian cricket team that won the inaugural 2007 ICC Twenty20 World Cup and 2013 ICC Champions Trophy.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Irfan_Pathan72.jpg/330px-Irfan_Pathan72.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Irfan_Pathan",
+  "dateOfBirth": "1984-10-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.3",
+  "birthCoordinatesLng": "73.2",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "film actor"
+  ],
+  "qid": "Q1746795",
+  "birthPlace": "Vadodara",
+  "fetchedAt": "2026-04-07T10:57:48.360Z"
+}

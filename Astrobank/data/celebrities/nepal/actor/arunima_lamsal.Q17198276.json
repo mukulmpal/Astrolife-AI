@@ -1,0 +1,27 @@
+{
+  "publicId": "5080fbf9",
+  "wikipediaSlug": "Arunima_Lamsal",
+  "wikipediaId": "Q17198276",
+  "name": "Arunima Lamsal",
+  "fullName": "Arunima Lamsal",
+  "profileSummary": "Arunima Lamsal is a Nepalese American actress.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arunima_Lamsal",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.483333333",
+  "birthCoordinatesLng": "87.283333333",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q17198276",
+  "birthPlace": "Biratnagar",
+  "fetchedAt": "2026-04-07T16:43:34.979Z"
+}

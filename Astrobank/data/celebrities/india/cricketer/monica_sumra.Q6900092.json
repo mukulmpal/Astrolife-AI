@@ -1,0 +1,28 @@
+{
+  "publicId": "961ca2c3",
+  "wikipediaSlug": "Monica_Sumra",
+  "wikipediaId": "Q6900092",
+  "name": "Monica Sumra",
+  "fullName": "Monica Sumra",
+  "profileSummary": "Monica Sumra is an Indian former cricketer who played as a right-handed batter and occasional wicket-keeper. She appeared in three Test matches, 14 One Day Internationals and one Twenty20 International for India between 2004 and 2006. She played domestic cricket for Jharkhand, Railways and Mumbai.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Monica_Sumra",
+  "dateOfBirth": "1980-10-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6900092",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T11:00:32.982Z"
+}

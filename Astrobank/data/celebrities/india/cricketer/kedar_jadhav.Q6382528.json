@@ -1,0 +1,28 @@
+{
+  "publicId": "7be92cda",
+  "wikipediaSlug": "Kedar_Jadhav",
+  "wikipediaId": "Q6382528",
+  "name": "Kedar Jadhav",
+  "fullName": "Kedar Jadhav",
+  "profileSummary": "Kedar Mahadev Jadhav is an Indian politician and former cricketer who played for the India national cricket team. He played for Maharashtra in domestic cricket. He was a right hand batter, who occasionally kept wickets and bowled right-arm-offspin.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kedar_Jadhav",
+  "dateOfBirth": "1985-03-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6382528",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T10:58:07.960Z"
+}

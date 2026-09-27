@@ -1,0 +1,26 @@
+{
+  "publicId": "79594f21",
+  "wikipediaSlug": "Ananta_Nayak",
+  "wikipediaId": "Q4751440",
+  "name": "Ananta Nayak",
+  "fullName": "Ananta Nayak",
+  "profileSummary": "Ananta Nayak is an Indian politician who is a member of the 18th Lok Sabha of India. He represents the Keonjhar constituency of Odisha and is a member of the Bharatiya Janata Party (BJP).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Ananta_Nayak_MP_2024.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ananta_Nayak",
+  "dateOfBirth": "1969-05-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "21.633333333",
+  "birthCoordinatesLng": "85.583333333",
+  "moonSign": "7",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4751440",
+  "birthPlace": "Kendujhar",
+  "fetchedAt": "2026-04-07T16:19:42.963Z"
+}

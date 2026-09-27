@@ -1,0 +1,29 @@
+{
+  "publicId": "8dc0c4e0",
+  "wikipediaSlug": "Sikander_Lalani",
+  "wikipediaId": "Q23023458",
+  "name": "Sikander Lalani",
+  "fullName": "Sikander Lalani",
+  "profileSummary": "Sikander Lalani is a businessman, MD at Roofings Group entrepreneur, industrialist, and former histopathologist in Uganda. He is reported to be one of the wealthiest individuals in Uganda.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sikander_Lalani",
+  "dateOfBirth": "1944-10-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "0.30166667",
+  "birthCoordinatesLng": "32.585",
+  "moonSign": "1",
+  "sunSign": "6",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "physician",
+    "businessperson",
+    "entrepreneur",
+    "industrialist"
+  ],
+  "qid": "Q23023458",
+  "birthPlace": "Nsambya Hospital",
+  "fetchedAt": "2026-04-08T02:09:00.423Z"
+}

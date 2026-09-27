@@ -1,0 +1,28 @@
+{
+  "publicId": "6ae74ada",
+  "wikipediaSlug": "Abhijit_Kale",
+  "wikipediaId": "Q3528904",
+  "name": "Abhijit Kale",
+  "fullName": "Abhijit Kale",
+  "profileSummary": "Abhijit Vasant Kale is a former Indian cricketer. He was a right-handed batsman and a right-arm offbreak bowler who played a single One-Day International match and never appeared in Tests.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhijit_Kale",
+  "dateOfBirth": "1973-07-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.083333333",
+  "birthCoordinatesLng": "74.733333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3528904",
+  "birthPlace": "Ahilyanagar",
+  "fetchedAt": "2026-04-07T10:56:19.462Z"
+}

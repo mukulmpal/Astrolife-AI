@@ -1,0 +1,28 @@
+{
+  "publicId": "c8db421c",
+  "wikipediaSlug": "Amit_Bhandari",
+  "wikipediaId": "Q3527976",
+  "name": "Amit Bhandari",
+  "fullName": "Amit Bhandari",
+  "profileSummary": "Amit Bhandari is an Indian cricketer. Having made a unforgettable debut in 2000, his performances in the 2001–02 season kept him within striking distance of being re-selected.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amit_Bhandari",
+  "dateOfBirth": "1978-10-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527976",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T10:56:30.079Z"
+}

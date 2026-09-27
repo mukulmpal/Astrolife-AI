@@ -1,0 +1,31 @@
+{
+  "publicId": "15959608",
+  "wikipediaSlug": "Neena_Gupta",
+  "wikipediaId": "Q6986875",
+  "name": "Neena Gupta",
+  "fullName": "Neena Gupta",
+  "profileSummary": "Neena Gupta is an Indian actress and television director who works in Hindi films and other language films alongside TV series. Gupta has received several awards including three National Film Awards, a Filmfare Award and two Filmfare OTT Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Neena_Gupta.jpg/330px-Neena_Gupta.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Neena_Gupta",
+  "dateOfBirth": "1959-06-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": "1",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film director",
+    "actor",
+    "film producer",
+    "television director",
+    "television actor",
+    "television producer"
+  ],
+  "qid": "Q6986875",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T16:34:36.816Z"
+}

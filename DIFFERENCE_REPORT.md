@@ -1,6 +1,6 @@
 # AstroLife Calculation Benchmark — Difference Report
 
-**Run:** 2026-09-23T19:25:16.301Z
+**Run:** 2026-09-26T18:59:03.762Z
 **Engine:** AstroLife Calculation Engine (calculations.ts) v3.0.0-moshier
 **Reference Source:** Swiss Ephemeris v2.10.03 (DE431) [BASELINE PENDING]
 

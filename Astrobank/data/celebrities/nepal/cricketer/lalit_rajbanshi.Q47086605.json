@@ -1,0 +1,26 @@
+{
+  "publicId": "a1c3baf1",
+  "wikipediaSlug": "Lalit_Rajbanshi",
+  "wikipediaId": "Q47086605",
+  "name": "Lalit Rajbanshi",
+  "fullName": "Lalit Rajbanshi",
+  "profileSummary": "Lalit Narayan Rajbanshi is a Nepalese cricketer. He made his List A debut for Nepal against Zimbabwe in the 2018 Cricket World Cup Qualifier on 4 March 2018.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Lalit_Rajbanshi",
+  "dateOfBirth": "1999-02-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "4",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q47086605",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-07T16:50:24.718Z"
+}

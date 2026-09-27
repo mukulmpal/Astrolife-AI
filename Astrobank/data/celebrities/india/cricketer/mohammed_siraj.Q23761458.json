@@ -1,0 +1,28 @@
+{
+  "publicId": "b7ec1ab0",
+  "wikipediaSlug": "Mohammed_Siraj",
+  "wikipediaId": "Q23761458",
+  "name": "Mohammed Siraj",
+  "fullName": "Mohammed Siraj",
+  "profileSummary": "Mohammed Siraj is an Indian international cricketer who plays as a right-arm fast bowler for the India national team. He plays for Gujarat Titans in the Indian Premier League and Hyderabad in domestic cricket. He was a part of the squad which won the 2023 Asia Cup and was the Player of the Match in the final. Siraj was also a member of the team that won the 2024 and 2026 T20 World Cups. He is also an honorary Deputy Superintendent of Police in Hyderabad.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Prime_Minister_Of_Bharat_Shri_Narendra_Damodardas_Modi_with_Mohammad_Siraj_%28cropped%29.jpg/330px-Prime_Minister_Of_Bharat_Shri_Narendra_Damodardas_Modi_with_Mohammad_Siraj_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mohammed_Siraj",
+  "dateOfBirth": "1994-03-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.361666666",
+  "birthCoordinatesLng": "78.474722222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q23761458",
+  "birthPlace": "Hyderabad",
+  "fetchedAt": "2026-04-07T10:58:25.762Z"
+}

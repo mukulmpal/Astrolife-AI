@@ -1,0 +1,30 @@
+{
+  "publicId": "dda937ff",
+  "wikipediaSlug": "Kashmera_Shah",
+  "wikipediaId": "Q6374451",
+  "name": "Kashmera Shah",
+  "fullName": "Kashmera Shah",
+  "profileSummary": "Kashmera Shah is an Indian-American actress known for her work in Hindi and Marathi films. She was also a contestant on the reality shows Bigg Boss 1, Nach Baliye 3 and Fear Factor: Khatron Ke Khiladi 4.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Kashmira_shah_colors_indian_telly_awards.jpg/330px-Kashmira_shah_colors_indian_telly_awards.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kashmera_Shah",
+  "dateOfBirth": "1970-12-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "film director"
+  ],
+  "qid": "Q6374451",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:14:38.825Z"
+}

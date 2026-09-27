@@ -1,0 +1,28 @@
+{
+  "publicId": "86780e42",
+  "wikipediaSlug": "Amanjot_Kaur",
+  "wikipediaId": "Q116417448",
+  "name": "Amanjot Kaur",
+  "fullName": "Amanjot Kaur",
+  "profileSummary": "Amanjot Kaur is an Indian cricketer who currently plays for Punjab. She plays as a right-arm medium bowler and right-handed batter.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Amanjot_Kaur.jpg/330px-Amanjot_Kaur.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amanjot_Kaur",
+  "dateOfBirth": "2000-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q116417448",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T11:02:26.970Z"
+}

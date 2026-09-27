@@ -1,0 +1,28 @@
+{
+  "publicId": "ce8ffd23",
+  "wikipediaSlug": "Jaydev_Unadkat",
+  "wikipediaId": "Q6167758",
+  "name": "Jaydev Unadkat",
+  "fullName": "Jaydev Unadkat",
+  "profileSummary": "Jaydev Dipakbhai Unadkat is an Indian professional cricketer who has played for the Indian national team. He plays for Saurashtra and Sussex in domestic cricket. He represented India in the Under-19 Cricket World Cup in 2010. In March 2020, Unadkat became the first player to have captained Saurashtra to the Ranji Trophy title. In December 2022, Unadkat returned to the Test XI after 12 years.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/2_09_Jaydev_Unadkat_1.jpg/330px-2_09_Jaydev_Unadkat_1.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jaydev_Unadkat",
+  "dateOfBirth": "1992-10-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.783505555",
+  "birthCoordinatesLng": "74.566441666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6167758",
+  "birthPlace": "Jaysingpur",
+  "fetchedAt": "2026-04-07T10:57:46.265Z"
+}

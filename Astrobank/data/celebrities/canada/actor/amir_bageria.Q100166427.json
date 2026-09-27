@@ -1,0 +1,26 @@
+{
+  "publicId": "614ea980",
+  "wikipediaSlug": "Amir_Bageria",
+  "wikipediaId": "Q100166427",
+  "name": "Amir Bageria",
+  "fullName": "Amir Bageria",
+  "profileSummary": "Amir Rathaur-Bageria is a Canadian actor who began his career as a child actor. He is known for his television roles in Degrassi: Next Class and Grand Army.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amir_Bageria",
+  "dateOfBirth": "2000-10-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "43.6",
+  "birthCoordinatesLng": "-79.65",
+  "moonSign": "6",
+  "sunSign": "7",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q100166427",
+  "birthPlace": "Mississauga",
+  "fetchedAt": "2026-04-08T00:52:27.766Z"
+}

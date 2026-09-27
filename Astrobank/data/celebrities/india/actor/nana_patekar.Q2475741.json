@@ -1,0 +1,29 @@
+{
+  "publicId": "06932f30",
+  "wikipediaSlug": "Nana_Patekar",
+  "wikipediaId": "Q2475741",
+  "name": "Nana Patekar",
+  "fullName": "Nana Patekar",
+  "profileSummary": "Vishwanath Patekar, better known as Nana Patekar, is an Indian actor, film maker, mainly working in Hindi and Marathi cinema. Widely regarded as one of the greatest and most influential actors in Indian Cinema, Patekar is recipient of three National Film Awards, four Filmfare Awards, two Maharashtra State Film Awards and Filmfare Awards Marathi respectively for his acting performances. He was bestowed with the Padma Shri award in 2013 for his contribution in cinema and arts.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Nana_Patekar_2025.jpg/330px-Nana_Patekar_2025.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nana_Patekar",
+  "dateOfBirth": "1951-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.33",
+  "birthCoordinatesLng": "72.96",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director"
+  ],
+  "qid": "Q2475741",
+  "birthPlace": "Murud",
+  "fetchedAt": "2026-04-07T11:29:57.731Z"
+}

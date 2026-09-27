@@ -1,0 +1,27 @@
+{
+  "publicId": "7bf6fb1c",
+  "wikipediaSlug": "Dilip_Rayamajhi",
+  "wikipediaId": "Q13182275",
+  "name": "Dilip Rayamajhi",
+  "fullName": "Dilip Rayamajhi",
+  "profileSummary": "Dilip Rayamajhi is a Nepalese film actor, producer and choreographer.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Dilip_Rayamajhi4.JPG/330px-Dilip_Rayamajhi4.JPG",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dilip_Rayamajhi",
+  "dateOfBirth": "1976-05-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "4",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "choreographer",
+    "actor"
+  ],
+  "qid": "Q13182275",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:14.757Z"
+}

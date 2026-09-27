@@ -41,34 +41,31 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border shadow-xl p-5 sm:p-6 mb-6 transition-colors duration-300"
+      className="card mb-6 transition-all duration-300"
       style={{
-        background: "linear-gradient(135deg, var(--app-card), var(--app-card-alt))",
-        borderColor: "var(--app-border-strong)",
+        background: "var(--app-card, #FFFFFF)",
+        border: "1px solid var(--app-border, #FFFFFF)",
+        borderRadius: "16px",
+        padding: "24px",
       }}
     >
-      {/* Background Subtle Radial Glow */}
-      <div
-        className="absolute top-0 left-1/3 w-80 h-80 rounded-full pointer-events-none opacity-15 blur-3xl"
-        style={{ background: "radial-gradient(circle, var(--al-violet, #38bdf8) 0%, var(--app-gold) 50%, transparent 80%)" }}
-      />
 
       {/* Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div>
           <div
-            className="text-[10px] tracking-[2px] uppercase font-bold flex items-center gap-1.5 font-mono"
-            style={{ color: "var(--app-gold)" }}
+            className="card-tag font-semibold"
+            style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: "var(--app-gold, #f5c842)", marginBottom: "4px" }}
           >
-            <span>✦</span> Cosmic Radar · Multi-Horizon Forecasting
+            ✦ Cosmic Radar · Multi-Horizon Forecasting
           </div>
-          <h2
-            className="text-xl sm:text-2xl font-serif font-bold tracking-tight mt-0.5"
-            style={{ color: "var(--app-fg)" }}
+          <div
+            className="card-title serif"
+            style={{ fontSize: "20px", fontWeight: 600, color: "var(--app-fg, #ffffff)", marginBottom: "4px" }}
           >
             Predictive Planetary & Dasha Horizon
-          </h2>
-          <p className="text-xs mt-1 max-w-xl" style={{ color: "var(--app-muted)" }}>
+          </div>
+          <p className="text-xs max-w-xl" style={{ color: "var(--app-muted, #94a3b8)", fontSize: "12px", lineHeight: "1.5" }}>
             Continuous root-finding ephemeris scan identifying exact planetary culminations, retrograde passes, and dasha transitions.
           </p>
         </div>
@@ -94,7 +91,7 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
             className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
             style={{
               background: activeHorizon === "now" ? "var(--app-gold)" : "var(--app-card)",
-              color: activeHorizon === "now" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
+              color: activeHorizon === "now" ? "var(--al-primary-on, #FAF7F2)" : "var(--app-muted)",
               borderColor: activeHorizon === "now" ? "var(--app-gold)" : "var(--app-border)",
             }}
           >
@@ -115,7 +112,7 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
             className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
             style={{
               background: activeHorizon === "next30" ? "var(--app-gold)" : "var(--app-card)",
-              color: activeHorizon === "next30" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
+              color: activeHorizon === "next30" ? "var(--al-primary-on, #FAF7F2)" : "var(--app-muted)",
               borderColor: activeHorizon === "next30" ? "var(--app-gold)" : "var(--app-border)",
             }}
           >
@@ -136,7 +133,7 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
             className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
             style={{
               background: activeHorizon === "next90" ? "var(--app-gold)" : "var(--app-card)",
-              color: activeHorizon === "next90" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
+              color: activeHorizon === "next90" ? "var(--al-primary-on, #FAF7F2)" : "var(--app-muted)",
               borderColor: activeHorizon === "next90" ? "var(--app-gold)" : "var(--app-border)",
             }}
           >

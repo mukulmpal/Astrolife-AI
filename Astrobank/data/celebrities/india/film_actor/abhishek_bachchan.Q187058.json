@@ -1,0 +1,29 @@
+{
+  "publicId": "cfcd4fdb",
+  "wikipediaSlug": "Abhishek_Bachchan",
+  "wikipediaId": "Q187058",
+  "name": "Abhishek Bachchan",
+  "fullName": "Abhishek Bachchan",
+  "profileSummary": "Abhishek Amitabh Bachchan is an Indian actor and film producer known for his work in Hindi films. Part of the Bachchan family, he is the son of actors Amitabh Bachchan and Jaya Bachchan. From 2012 to 2016, Bachchan appeared in Forbes India's Celebrity 100 list, based on his income and popularity.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Abhishek_Bachchan_promoting_Be_Happy.jpg/330px-Abhishek_Bachchan_promoting_Be_Happy.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhishek_Bachchan",
+  "dateOfBirth": "1976-02-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "12",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film producer",
+    "television presenter",
+    "voice actor"
+  ],
+  "qid": "Q187058",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:43.941Z"
+}

@@ -1,0 +1,33 @@
+{
+  "publicId": "52c69719",
+  "wikipediaSlug": "R._Madhavan",
+  "wikipediaId": "Q729982",
+  "name": "R. Madhavan",
+  "fullName": "R. Madhavan",
+  "profileSummary": "Ranganathan Madhavan is an Indian actor, screenwriter, film producer, and film director who predominantly works in Tamil and Hindi cinema. Madhavan has appeared in over 70 films, he has won one National Film Award, five Filmfare Awards South, two Tamil Nadu State Film Awards, and five SIIMA Awards. He was awarded Padma Shri by Government of India in 2026 in field of Art. Since September 2023, Madhavan is the President of FTII, Pune.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Madhavan_Saala_Khadoos_2_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/R._Madhavan",
+  "dateOfBirth": "1970-06-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "86.183333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television presenter",
+    "film producer",
+    "screenwriter",
+    "film actor",
+    "television actor"
+  ],
+  "qid": "Q729982",
+  "birthPlace": "Jamshedpur",
+  "fetchedAt": "2026-04-07T12:19:21.310Z"
+}

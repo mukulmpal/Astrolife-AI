@@ -1,0 +1,27 @@
+{
+  "publicId": "f0df40fb",
+  "wikipediaSlug": "Nathan_Clarke_(actor)",
+  "wikipediaId": "Q20974097",
+  "name": "Nathan Clarke (actor)",
+  "fullName": "Nathan Clarke (actor)",
+  "profileSummary": "\n\nNathan Clarke is a British actor. He trained at East 15 Acting School.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nathan_Clarke_(actor)",
+  "dateOfBirth": "1989-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.75",
+  "birthCoordinatesLng": "0.583333333",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "voice actor"
+  ],
+  "qid": "Q20974097",
+  "birthPlace": "Essex",
+  "fetchedAt": "2026-04-08T02:08:09.578Z"
+}

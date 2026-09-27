@@ -1,0 +1,28 @@
+{
+  "publicId": "8a1fe0f8",
+  "wikipediaSlug": "Bam_Dev_Gautam",
+  "wikipediaId": "Q2881717",
+  "name": "Bam Dev Gautam",
+  "fullName": "Bam Dev Gautam",
+  "profileSummary": "Bam Dev Gautam is a Nepalese politician and the former Home Minister and Deputy Prime Minister of Nepal. Currently the senior leader of Nepali Communist Party, Gautam is a former Senior vice Chairman of Communist Party of Nepal. He is currently a member of the National Assembly nominated by the President.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Bamdev_Gautam_2015_%28cropped%29.jpg/330px-Bamdev_Gautam_2015_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bam_Dev_Gautam",
+  "dateOfBirth": "1944-07-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.083333333",
+  "birthCoordinatesLng": "82.833333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q2881717",
+  "birthPlace": "Pyuthan District",
+  "fetchedAt": "2026-04-07T16:52:48.238Z"
+}

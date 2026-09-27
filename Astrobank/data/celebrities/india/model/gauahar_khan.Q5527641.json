@@ -1,0 +1,29 @@
+{
+  "publicId": "4305b705",
+  "wikipediaSlug": "Gauahar_Khan",
+  "wikipediaId": "Q5527641",
+  "name": "Gauahar Khan",
+  "fullName": "Gauahar Khan",
+  "profileSummary": "Gauahar Khan is an Indian actress, model and beauty pageant titleholder. She started her career as a model and participated in the Femina Miss India contest in 2002. She was the winner of Bigg Boss season 7 in 2013. Gauhar also appeared in Hindi films and television.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Gauahar_Khan_spotted_at_the_3rd_Anniversary_celebration.jpg/330px-Gauahar_Khan_spotted_at_the_3rd_Anniversary_celebration.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gauahar_Khan",
+  "dateOfBirth": "1981-08-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor"
+  ],
+  "qid": "Q5527641",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T12:18:57.552Z"
+}

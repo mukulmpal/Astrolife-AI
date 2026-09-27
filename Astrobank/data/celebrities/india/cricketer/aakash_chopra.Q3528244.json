@@ -1,0 +1,29 @@
+{
+  "publicId": "55055897",
+  "wikipediaSlug": "Aakash_Chopra",
+  "wikipediaId": "Q3528244",
+  "name": "Aakash Chopra",
+  "fullName": "Aakash Chopra",
+  "profileSummary": "Aakash Chopra is a cricket commentator, YouTuber and former cricketer who briefly played for the Indian cricket team from late 2003 to late 2004.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aakash_Chopra",
+  "dateOfBirth": "1977-09-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.18",
+  "birthCoordinatesLng": "78.02",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "television producer"
+  ],
+  "qid": "Q3528244",
+  "birthPlace": "Agra",
+  "fetchedAt": "2026-04-07T10:50:34.342Z"
+}

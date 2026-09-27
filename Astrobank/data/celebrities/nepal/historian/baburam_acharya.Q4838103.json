@@ -1,0 +1,28 @@
+{
+  "publicId": "74d7cf13",
+  "wikipediaSlug": "Baburam_Acharya",
+  "wikipediaId": "Q4838103",
+  "name": "Baburam Acharya",
+  "fullName": "Baburam Acharya",
+  "profileSummary": "Baburam Acharya was a Nepalese historian and literary scholar. He is known as the historian laureate of Nepal. The four part biography of King Prithivi Narayan Shah, founder of Modern Nepal is a key series of work he created. He is known for the study of ancient Nepalese inscriptions.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Baburam_Acharya.jpg/330px-Baburam_Acharya.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Baburam_Acharya",
+  "dateOfBirth": "1888-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "historian"
+  ],
+  "qid": "Q4838103",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:55:02.098Z"
+}

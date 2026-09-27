@@ -1,0 +1,26 @@
+{
+  "publicId": "8e8cf696",
+  "wikipediaSlug": "Vikrant_Bhargava",
+  "wikipediaId": "Q7929609",
+  "name": "Vikrant Bhargava",
+  "fullName": "Vikrant Bhargava",
+  "profileSummary": "Vikrant Bhargava is an Indian-born British businessman, and the co-founder and former marketing director of online casino operator PartyGaming.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Vikrant_Bhargava",
+  "dateOfBirth": "1972-12-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.915",
+  "birthCoordinatesLng": "75.82",
+  "moonSign": "12",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q7929609",
+  "birthPlace": "Jaipur",
+  "fetchedAt": "2026-04-08T02:08:17.114Z"
+}

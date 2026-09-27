@@ -1,0 +1,27 @@
+{
+  "publicId": "a6821102",
+  "wikipediaSlug": "Akshay_Anand",
+  "wikipediaId": "Q4701802",
+  "name": "Akshay Anand",
+  "fullName": "Akshay Anand",
+  "profileSummary": "John Gardner, known professionally as Akshay Anand is an Indian actor who appears mainly in Hindi films and television.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Akshay_Anand",
+  "dateOfBirth": "1957-01-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": "10",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director"
+  ],
+  "qid": "Q4701802",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T16:25:09.001Z"
+}

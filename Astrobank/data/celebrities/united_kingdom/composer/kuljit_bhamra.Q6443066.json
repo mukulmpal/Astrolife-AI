@@ -1,0 +1,28 @@
+{
+  "publicId": "1fe1de92",
+  "wikipediaSlug": "Kuljit_Bhamra",
+  "wikipediaId": "Q6443066",
+  "name": "Kuljit Bhamra",
+  "fullName": "Kuljit Bhamra",
+  "profileSummary": "Kuljit Bhamra MBE is a British composer, record producer and musician whose main instrument is the tabla. He is best known as one of the record producers who pioneered the British Bhangra sound and for his many collaborations with musicians from different genres and continents. He was appointed MBE in the Queen's Birthday Honours 2009 with the citation \"For services to Bhangra and British Asian Music\".",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Kuljit_Bhamra.jpg/330px-Kuljit_Bhamra.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kuljit_Bhamra",
+  "dateOfBirth": "1959-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-1.286388888",
+  "birthCoordinatesLng": "36.817222222",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "composer",
+    "record producer",
+    "musician"
+  ],
+  "qid": "Q6443066",
+  "birthPlace": "Nairobi",
+  "fetchedAt": "2026-04-08T02:08:06.587Z"
+}

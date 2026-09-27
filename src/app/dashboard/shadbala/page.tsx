@@ -27,11 +27,11 @@ function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
   return (
     <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{maxWidth:180,display:"block",margin:"0 auto"}}>
       {[0.25,0.5,0.75,1].map(r=>(
-        <polygon key={r} points={gridPoints(R*r)} fill="none" stroke="#1c1840" strokeWidth="0.5"/>
+        <polygon key={r} points={gridPoints(R*r)} fill="none" stroke="#FFFFFF" strokeWidth="0.5"/>
       ))}
       {data.map((_,i)=>{
         const angle=(Math.PI*2*i)/N-Math.PI/2;
-        return <line key={i} x1={cx} y1={cy} x2={cx+R*Math.cos(angle)} y2={cy+R*Math.sin(angle)} stroke="#1c1840" strokeWidth="0.5"/>;
+        return <line key={i} x1={cx} y1={cy} x2={cx+R*Math.cos(angle)} y2={cy+R*Math.sin(angle)} stroke="#FFFFFF" strokeWidth="0.5"/>;
       })}
       <polygon points={points.map(p=>`${p.x},${p.y}`).join(" ")} fill={`${planet.color}25`} stroke={planet.color} strokeWidth="1.5"/>
       <path d={dataPath} fill="none"/>
@@ -41,7 +41,7 @@ function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
         const ly=cy+(R+14)*Math.sin(angle);
         return (
           <text key={i} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-            fontSize="7" fill="#605890" fontFamily="Outfit">
+            fontSize="7" fill="#6B635B" fontFamily="Outfit">
             {d.label}
           </text>
         );
@@ -83,41 +83,41 @@ export default function ShadbalaPage() {
   return (
     <EngineShell>
       <style>{`
-        .header-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#f0e8d0}
-        .header-meta{font-size:13px;color:#605890;margin-top:4px}
+        .header-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#1A1A1A}
+        .header-meta{font-size:13px;color:#6B635B;margin-top:4px}
         .header-stats{display:flex;gap:12px;flex-wrap:wrap}
         .planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
-        .planet-card{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:20px;cursor:pointer;transition:all 0.25s}
+        .planet-card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:20px;cursor:pointer;transition:all 0.25s}
         .planet-card:hover{transform:translateY(-2px);border-color:rgba(200,160,48,0.2)}
         .planet-card.expanded{border-color:rgba(200,160,48,0.35)}
         .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
         .card-left{display:flex;align-items:center;gap:10px}
         .planet-icon{font-size:24px}
-        .planet-name{font-size:15px;font-weight:600;color:#f0e8d0}
-        .planet-pos{font-size:11px;color:#605890;margin-top:2px}
+        .planet-name{font-size:15px;font-weight:600;color:#1A1A1A}
+        .planet-pos{font-size:11px;color:#6B635B;margin-top:2px}
         .planet-pct{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;line-height:1}
         .planet-grade{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:2px;text-align:right}
         .bar-wrap{margin-bottom:14px}
         .bala-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
-        .bala-item{background:#0a0720;border:1px solid #1c1840;border-radius:8px;padding:8px;text-align:center}
+        .bala-item{background:#FAF7F2;border:1px solid #FFFFFF;border-radius:8px;padding:8px;text-align:center}
         .bala-val{font-size:16px;font-weight:600;font-family:'Cormorant Garamond',serif;line-height:1;margin-bottom:2px}
-        .bala-lbl{font-size:9px;color:#605890;letter-spacing:0.5px}
-        .bala-max{font-size:8px;color:#3a3060}
+        .bala-lbl{font-size:9px;color:#6B635B;letter-spacing:0.5px}
+        .bala-max{font-size:8px;color:#6B635B}
         .radar-wrap{margin-bottom:14px}
-        .expanded-content{border-top:1px solid #1c1840;margin-top:14px;padding-top:14px}
-        .bala-detail{margin-bottom:12px;padding:12px;background:#0a0720;border:1px solid #1c1840;border-radius:10px}
+        .expanded-content{border-top:1px solid #FFFFFF;margin-top:14px;padding-top:14px}
+        .bala-detail{margin-bottom:12px;padding:12px;background:#FAF7F2;border:1px solid #FFFFFF;border-radius:10px}
         .bala-detail-title{font-size:11px;font-weight:600;color:#c8a030;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-        .bala-detail-txt{font-size:12px;color:#c8c0a8;line-height:1.7}
-        .bala-def{font-size:11px;color:#3a3060;line-height:1.6;margin-top:6px;padding-top:6px;border-top:1px solid #1c1840}
+        .bala-detail-txt{font-size:12px;color:#4A4238;line-height:1.7}
+        .bala-def{font-size:11px;color:#6B635B;line-height:1.6;margin-top:6px;padding-top:6px;border-top:1px solid #FFFFFF}
         .sb-table{width:100%;border-collapse:collapse}
-        .sb-table th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#3a3060;padding:0 12px 14px;text-align:center;font-weight:400}
+        .sb-table th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;padding:0 12px 14px;text-align:center;font-weight:400}
         .sb-table th:first-child{text-align:left}
-        .sb-table td{padding:12px;border-bottom:1px solid #1c1840;font-size:13px;text-align:center;vertical-align:middle}
+        .sb-table td{padding:12px;border-bottom:1px solid #FFFFFF;font-size:13px;text-align:center;vertical-align:middle}
         .sb-table tr:last-child td{border-bottom:none}
         .sb-table td:first-child{text-align:left}
-        .bala-explain{background:#0d0a22;border:1px solid #1c1840;border-radius:16px;padding:24px;margin-bottom:16px}
-        .bala-explain-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#f0e8d0;margin-bottom:12px}
-        .bala-explain-text{font-size:13px;color:#c8c0a8;line-height:1.85}
+        .bala-explain{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:24px;margin-bottom:16px}
+        .bala-explain-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1A1A1A;margin-bottom:12px}
+        .bala-explain-text{font-size:13px;color:#4A4238;line-height:1.85}
         @media(max-width:768px){.planet-grid{grid-template-columns:1fr}}
       `}</style>
 
@@ -146,7 +146,7 @@ export default function ShadbalaPage() {
         <div className="header-card">
           <div className="header-orb"/>
           <div style={{position:"relative",zIndex:1}}>
-            <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#605890",marginBottom:6}}>✦ Shadbala Analysis</div>
+            <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#6B635B",marginBottom:6}}>✦ Shadbala Analysis</div>
             <div className="header-name serif">{birth.name}</div>
             <div className="header-meta">
               {new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city}
@@ -171,7 +171,7 @@ export default function ShadbalaPage() {
         {/* SUMMARY */}
         <div className="summary-strip" style={{ lineHeight: 1.8 }}>
           <div style={{ marginBottom: 8 }}>✦ {result.summary}</div>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#c8c0a8" }}>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#4A4238" }}>
             <li>Strongest: {result.strongest} — reliable for initiatives aligned with that graha.</li>
             <li>Weakest: {result.weakest} — expect friction until dasha or remedies support it.</li>
             <li>Chart average {result.avgStrength}% — open planet cards for per-bala breakdown.</li>
@@ -184,19 +184,19 @@ export default function ShadbalaPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
             <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 12, padding: 14 }}>
               <div style={{ fontSize: 11, color: "#22c55e", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Use More</div>
-              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
                 {result.strongest} is the most reliable planet in this chart. Its significations can carry decisions with better consistency.
               </p>
             </div>
             <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: 14 }}>
               <div style={{ fontSize: 11, color: "#ef4444", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Support First</div>
-              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
                 {result.weakest} needs support. Do not rely on its themes blindly during weak dasha, harsh transit or rushed decisions.
               </p>
             </div>
             <div style={{ background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: 12, padding: 14 }}>
               <div style={{ fontSize: 11, color: "#60a5fa", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>How To Use</div>
-              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
                 Shadbala is a reliability score, not a prediction by itself. Combine it with dasha and transit before choosing timing.
               </p>
             </div>
@@ -263,14 +263,14 @@ export default function ShadbalaPage() {
                 </div>
 
                 {/* OVERALL TEXT */}
-                <div style={{fontSize:12,color:"#605890",lineHeight:1.7}}>{p.overallTxt}</div>
+                <div style={{fontSize:12,color:"#6B635B",lineHeight:1.7}}>{p.overallTxt}</div>
 
                 {/* EXPANDED */}
                 {expanded===p.planet && (
                   <div className="expanded-content">
                     {/* Radar */}
                     <div className="radar-wrap">
-                      <div style={{fontSize:10,letterSpacing:"2px",textTransform:"uppercase",color:"#605890",marginBottom:8,textAlign:"center"}}>Strength Radar</div>
+                      <div style={{fontSize:10,letterSpacing:"2px",textTransform:"uppercase",color:"#6B635B",marginBottom:8,textAlign:"center"}}>Strength Radar</div>
                       <RadarChart planet={p}/>
                     </div>
 
@@ -301,8 +301,8 @@ export default function ShadbalaPage() {
 
         {/* ── TABLE TAB ── */}
         {activeTab==="table" && (
-          <div style={{background:"#0d0a22",border:"1px solid #1c1840",borderRadius:16,padding:24,overflowX:"auto"}}>
-            <div style={{fontSize:9,letterSpacing:"2px",textTransform:"uppercase",color:"#605890",marginBottom:16}}>✦ Shadbala Comparison — All 7 Planets</div>
+          <div style={{background:"#FFFFFF",border:"1px solid #FFFFFF",borderRadius:16,padding:24,overflowX:"auto"}}>
+            <div style={{fontSize:9,letterSpacing:"2px",textTransform:"uppercase",color:"#6B635B",marginBottom:16}}>✦ Shadbala Comparison — All 7 Planets</div>
             <table className="sb-table">
               <thead>
                 <tr>
@@ -318,7 +318,7 @@ export default function ShadbalaPage() {
                   <tr key={p.planet}>
                     <td>
                       <span style={{color:p.color,fontSize:18,marginRight:8}}>{p.icon}</span>
-                      <span style={{fontWeight:500,color:"#c8c0a8"}}>{p.planet}</span>
+                      <span style={{fontWeight:500,color:"#4A4238"}}>{p.planet}</span>
                       {p.retrograde&&<span style={{fontSize:9,color:"#f97316",marginLeft:4,fontWeight:600}}>(R)</span>}
                     </td>
                     {[p.sthanaBala,p.digBala,p.kalaBala,p.cheshtaBala,p.naisargika,p.drikBala].map((v,i)=>{
@@ -327,10 +327,10 @@ export default function ShadbalaPage() {
                       const c=pct>=0.7?"#c8a030":pct>=0.5?"#1d9e75":pct>=0.35?"#60a5fa":"#ef4444";
                       return <td key={i} style={{color:c,fontWeight:600}}>{v}</td>;
                     })}
-                    <td style={{color:"#f0e8d0",fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600}}>{p.total}</td>
+                    <td style={{color:"#1A1A1A",fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600}}>{p.total}</td>
                     <td>
                       <div style={{display:"flex",alignItems:"center",gap:6}}>
-                        <div style={{width:60,height:4,background:"#1c1840",borderRadius:2,overflow:"hidden"}}>
+                        <div style={{width:60,height:4,background:"#FFFFFF",borderRadius:2,overflow:"hidden"}}>
                           <div style={{width:`${p.percentage}%`,height:"100%",background:p.gradeColor,borderRadius:2}}/>
                         </div>
                         <span style={{fontSize:12,color:p.gradeColor}}>{p.percentage}%</span>

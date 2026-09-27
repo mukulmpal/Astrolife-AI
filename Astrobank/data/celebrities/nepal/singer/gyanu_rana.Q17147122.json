@@ -1,0 +1,26 @@
+{
+  "publicId": "aab46b23",
+  "wikipediaSlug": "Gyanu_Rana",
+  "wikipediaId": "Q17147122",
+  "name": "Gyanu Rana",
+  "fullName": "Gyanu Rana",
+  "profileSummary": "Gyanu Rana is a singer and a reality show judge, born in Batulechaur, Pokhara, Nepal. She wrote and sang popular Nepali songs like \"Siri Ma Siri Ni Kanchha\" and \"Manchhe Ko Maya Yaha\" with Narayan Gopal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Gyanu_Rana.jpg/330px-Gyanu_Rana.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gyanu_Rana",
+  "dateOfBirth": "1949-10-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71516",
+  "birthCoordinatesLng": "85.31005",
+  "moonSign": "11",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q17147122",
+  "birthPlace": "Thamel",
+  "fetchedAt": "2026-04-07T16:47:37.893Z"
+}

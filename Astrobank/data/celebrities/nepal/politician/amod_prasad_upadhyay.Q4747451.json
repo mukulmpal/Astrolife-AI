@@ -1,0 +1,28 @@
+{
+  "publicId": "11d00874",
+  "wikipediaSlug": "Amod_Prasad_Upadhyay",
+  "wikipediaId": "Q4747451",
+  "name": "Amod Prasad Upadhyay",
+  "fullName": "Amod Prasad Upadhyay",
+  "profileSummary": "Amod Prasad Upadhyay was a Nepalese social worker and politician.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Amod_Upadhyay.jpg/330px-Amod_Upadhyay.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amod_Prasad_Upadhyay",
+  "dateOfBirth": "1936-03-29",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.483333333",
+  "birthCoordinatesLng": "87.283333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4747451",
+  "birthPlace": "Biratnagar",
+  "fetchedAt": "2026-04-07T16:52:46.087Z"
+}

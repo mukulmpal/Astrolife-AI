@@ -1,0 +1,32 @@
+{
+  "publicId": "74e1e7b2",
+  "wikipediaSlug": "Dilip_Kumar",
+  "wikipediaId": "Q377789",
+  "name": "Dilip Kumar",
+  "fullName": "Dilip Kumar",
+  "profileSummary": "﻿\nMuhammad Yusuf Khan, known professionally as Dilip Kumar, was an Indian actor, writer and film producer best known for his work in Hindi cinema. Credited with pioneering method acting in cinema, he dominated Hindi cinema from the 1950s throughout the 1960s and is widely regarded as one of the greatest actors in the history of Indian Cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Dilip_Kumar_2006.jpg/330px-Dilip_Kumar_2006.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dilip_Kumar",
+  "dateOfBirth": "1922-12-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "34.014444444",
+  "birthCoordinatesLng": "71.5675",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "film producer",
+    "screenwriter",
+    "politician"
+  ],
+  "qid": "Q377789",
+  "birthPlace": "Peshawar",
+  "fetchedAt": "2026-04-07T16:00:08.182Z"
+}

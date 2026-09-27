@@ -1,0 +1,27 @@
+{
+  "publicId": "28700300",
+  "wikipediaSlug": "Anita_Anand_(journalist)",
+  "wikipediaId": "Q4765493",
+  "name": "Anita Anand (journalist)",
+  "fullName": "Anita Anand (journalist)",
+  "profileSummary": "Anita Anand is a British radio and television presenter, journalist, and author.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Anita_anand_crop.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anita_Anand_(journalist)",
+  "dateOfBirth": "1972-04-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.507222222",
+  "birthCoordinatesLng": "-0.1275",
+  "moonSign": "7",
+  "sunSign": "1",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist",
+    "broadcaster"
+  ],
+  "qid": "Q4765493",
+  "birthPlace": "London",
+  "fetchedAt": "2026-04-08T00:22:01.425Z"
+}

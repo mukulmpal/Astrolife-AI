@@ -1,0 +1,28 @@
+{
+  "publicId": "31f53908",
+  "wikipediaSlug": "Ashok_Gandotra",
+  "wikipediaId": "Q3528570",
+  "name": "Ashok Gandotra",
+  "fullName": "Ashok Gandotra",
+  "profileSummary": "Ashok Gandotra is a former Indian cricketer who played in two Test matches in 1969.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashok_Gandotra",
+  "dateOfBirth": "1948-11-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-22.911111111",
+  "birthCoordinatesLng": "-43.205555555",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3528570",
+  "birthPlace": "Rio de Janeiro",
+  "fetchedAt": "2026-04-07T10:50:31.576Z"
+}

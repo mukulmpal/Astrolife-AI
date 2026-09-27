@@ -1,0 +1,30 @@
+{
+  "publicId": "dc005acc",
+  "wikipediaSlug": "Haarsh_Limbachiyaa",
+  "wikipediaId": "Q94131316",
+  "name": "Haarsh Limbachiyaa",
+  "fullName": "Haarsh Limbachiyaa",
+  "profileSummary": "Hemant Kumar \"Harsh\" Limbachiya is an Indian screenwriter, producer, and television host. He has written for the shows Comedy Circus Ke Tansen, Comedy Nights Bachao, and Comedy Nights Live. He also wrote dialogues for the film PM Narendra Modi and lyrics for the title-track of the film Malang. He has created, produced, and hosted television shows like Khatra Khatra Khatra and Hum Tum Aur Quarantine, along with his wife Bharti Singh.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Haarsh_Limbachiyaa_in_2021.jpg/330px-Haarsh_Limbachiyaa_in_2021.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Haarsh_Limbachiyaa",
+  "dateOfBirth": "1987-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "screenwriter",
+    "television producer",
+    "television presenter"
+  ],
+  "qid": "Q94131316",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:52.228Z"
+}

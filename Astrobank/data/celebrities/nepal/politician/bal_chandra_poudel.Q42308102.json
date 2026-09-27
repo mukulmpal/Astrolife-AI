@@ -1,0 +1,28 @@
+{
+  "publicId": "e8bdaec1",
+  "wikipediaSlug": "Bal_Chandra_Poudel",
+  "wikipediaId": "Q42308102",
+  "name": "Bal Chandra Poudel",
+  "fullName": "Bal Chandra Poudel",
+  "profileSummary": "Bal Chandra Poudel is a Nepali Politician from the Nepali Congress party. He was Party President for the district of Rasuwa for several decades.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bal_Chandra_Poudel",
+  "dateOfBirth": "1961-06-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.983333333",
+  "birthCoordinatesLng": "85.183333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q42308102",
+  "birthPlace": "Laharepauwa",
+  "fetchedAt": "2026-04-07T16:53:02.537Z"
+}

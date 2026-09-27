@@ -1,0 +1,30 @@
+{
+  "publicId": "4f13932d",
+  "wikipediaSlug": "Karishma_Manandhar",
+  "wikipediaId": "Q7452406",
+  "name": "Karishma Manandhar",
+  "fullName": "Karishma Manandhar",
+  "profileSummary": "Karishma Manandhar is a Nepalese actress and producer who has predominantly worked in Nepali-language films.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Karishma_Manandhar",
+  "dateOfBirth": "1974-06-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.6833",
+  "birthCoordinatesLng": "85.3333",
+  "moonSign": "10",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "social activist",
+    "writer",
+    "film producer"
+  ],
+  "qid": "Q7452406",
+  "birthPlace": "Lalitpur",
+  "fetchedAt": "2026-04-07T16:43:32.867Z"
+}

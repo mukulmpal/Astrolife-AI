@@ -289,7 +289,7 @@ function priorityColor(p: string): { bg: string; text: string } {
   if (p === "critical") return { bg: "rgba(239,68,68,0.1)", text: "#f87171" };
   if (p === "high") return { bg: "rgba(249,115,22,0.1)", text: "#fb923c" };
   if (p === "medium") return { bg: "rgba(234,179,8,0.1)", text: "#fbbf24" };
-  return { bg: "rgba(96,88,144,0.15)", text: "#8f86ad" };
+  return { bg: "rgba(96,88,144,0.15)", text: "#6B635B" };
 }
 
 type RoomPlacementResult = {
@@ -451,19 +451,19 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
                   {zone.score}
                 </span>
               </div>
-              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 15, fontWeight: 600, color: "#f0e8d0", marginBottom: 4 }}>
+              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>
                 {zone.name}
               </div>
-              <div style={{ fontSize: 11, color: "#605890", marginBottom: 6 }}>
+              <div style={{ fontSize: 11, color: "#6B635B", marginBottom: 6 }}>
                 {zone.planet} · {"element" in zone ? (zone as {element?: string}).element : ""}
               </div>
-              <div style={{ fontSize: 11, color: "#8f86ad", marginBottom: 8 }}>{zone.domain}</div>
+              <div style={{ fontSize: 11, color: "#6B635B", marginBottom: 8 }}>{zone.domain}</div>
               {zone.planets.length > 0 && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 8 }}>
                   {zone.planets.map(p => <span key={p} className="planet-pill">{p}</span>)}
                 </div>
               )}
-              <div style={{ fontSize: 11, color: "#605890" }}>Ideal: {zone.roomIdeal}</div>
+              <div style={{ fontSize: 11, color: "#6B635B" }}>Ideal: {zone.roomIdeal}</div>
               <div style={{ fontSize: 11, color: "#c8a030", marginTop: 4 }}>↺ {zone.remedy}</div>
             </div>
           ))}
@@ -474,7 +474,7 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
       {zoneTab === "psych" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {result.psychBridge.map((item, i) => (
-            <div key={i} className="card" style={{ padding: 16, fontSize: 13, color: "#c8c0a8", lineHeight: 1.7 }}>
+            <div key={i} className="card" style={{ padding: 16, fontSize: 13, color: "#4A4238", lineHeight: 1.7 }}>
               {item}
             </div>
           ))}
@@ -485,7 +485,7 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
       {zoneTab === "transit" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {result.transitAlerts.length === 0 && (
-            <p style={{ fontSize: 13, color: "#605890" }}>No active transit alerts.</p>
+            <p style={{ fontSize: 13, color: "#6B635B" }}>No active transit alerts.</p>
           )}
           {result.transitAlerts.map((alert, i) => (
             <div
@@ -498,11 +498,11 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
                 <span style={{ fontWeight: 700, color: alert.positive ? "#4ade80" : "#f87171" }}>{alert.planet}</span>
-                <span style={{ color: "#605890" }}>→</span>
-                <span style={{ color: "#c8c0a8" }}>{alert.zone}</span>
+                <span style={{ color: "#6B635B" }}>→</span>
+                <span style={{ color: "#4A4238" }}>{alert.zone}</span>
                 <span className="badge-gold" style={{ marginLeft: "auto" }}>{alert.domain}</span>
               </div>
-              <p style={{ fontSize: 13, color: "#8f86ad", lineHeight: 1.65, marginBottom: 6 }}>{alert.effect}</p>
+              <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.65, marginBottom: 6 }}>{alert.effect}</p>
               <p style={{ fontSize: 12, color: "#c8a030" }}>↺ Remedy: {alert.remedy}</p>
             </div>
           ))}
@@ -514,11 +514,11 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 12 }}>
           {result.roomGuide.map((room) => (
             <div key={room.room} className="card" style={{ padding: 16 }}>
-              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, fontWeight: 600, color: "#f0e8d0", marginBottom: 4 }}>
+              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>
                 {room.room}
               </div>
               <div style={{ fontSize: 13, color: "#c8a030", marginBottom: 6 }}>{room.idealDir}</div>
-              <div style={{ fontSize: 13, color: "#8f86ad", lineHeight: 1.6 }}>{room.reason}</div>
+              <div style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6 }}>{room.reason}</div>
             </div>
           ))}
         </div>
@@ -722,14 +722,14 @@ export default function VastuDashboardPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
               <div>
                 <div className="card-tag">Chart Link</div>
-                <div style={{ fontSize: 13, color: "#8f86ad", marginTop: 4, lineHeight: 1.6 }}>{chartLoadMessage}</div>
+                <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4, lineHeight: 1.6 }}>{chartLoadMessage}</div>
               </div>
               <button
                 onClick={refreshChart}
                 style={{
                   flexShrink: 0, padding: "8px 16px", borderRadius: 20,
                   border: "1px solid rgba(255,255,255,0.12)", background: "transparent",
-                  color: "#c8c0a8", fontSize: 13, cursor: "pointer", fontFamily: "Outfit,sans-serif",
+                  color: "#4A4238", fontSize: 13, cursor: "pointer", fontFamily: "Outfit,sans-serif",
                 }}
               >
                 Refresh Chart
@@ -744,7 +744,7 @@ export default function VastuDashboardPage() {
                 ].map(item => (
                   <div key={item.label} style={{ background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "10px 14px" }}>
                     <div className="card-tag">{item.label}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e8d0", marginTop: 4 }}>{item.value}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", marginTop: 4 }}>{item.value}</div>
                   </div>
                 ))}
               </div>
@@ -781,13 +781,13 @@ export default function VastuDashboardPage() {
                 },
               ].map(field => (
                 <label key={field.label} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <span style={{ fontSize: 12, color: "#605890" }}>{field.label}</span>
+                  <span style={{ fontSize: 12, color: "#6B635B" }}>{field.label}</span>
                   <select
                     value={field.value}
                     onChange={e => field.onChange(e.target.value)}
                     style={{
-                      borderRadius: 12, border: "1px solid #1c1840",
-                      background: "rgba(0,0,0,0.3)", color: "#f0e8d0",
+                      borderRadius: 12, border: "1px solid #FFFFFF",
+                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
                       padding: "10px 14px", fontSize: 13, outline: "none", width: "100%",
                     }}
                   >
@@ -805,15 +805,15 @@ export default function VastuDashboardPage() {
                 { label: "Width (Hasta units, optional)", value: widthHasta, onChange: setWidthHasta, placeholder: "e.g. 7" },
               ].map(field => (
                 <label key={field.label} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <span style={{ fontSize: 12, color: "#605890" }}>{field.label}</span>
+                  <span style={{ fontSize: 12, color: "#6B635B" }}>{field.label}</span>
                   <input
                     value={field.value}
                     onChange={e => field.onChange(e.target.value)}
                     placeholder={field.placeholder}
                     inputMode="decimal"
                     style={{
-                      borderRadius: 12, border: "1px solid #1c1840",
-                      background: "rgba(0,0,0,0.3)", color: "#f0e8d0",
+                      borderRadius: 12, border: "1px solid #FFFFFF",
+                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
                       padding: "10px 14px", fontSize: 13, outline: "none", width: "100%",
                     }}
                   />
@@ -834,9 +834,9 @@ export default function VastuDashboardPage() {
                   key={item.label}
                   style={{
                     display: "flex", alignItems: "center", gap: 10,
-                    borderRadius: 12, border: "1px solid #1c1840",
+                    borderRadius: 12, border: "1px solid #FFFFFF",
                     background: "rgba(0,0,0,0.2)", padding: "12px 14px",
-                    fontSize: 13, color: "#c8c0a8", cursor: "pointer",
+                    fontSize: 13, color: "#4A4238", cursor: "pointer",
                   }}
                 >
                   <input
@@ -874,7 +874,7 @@ export default function VastuDashboardPage() {
                   key={room.id}
                   style={{
                     display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto",
-                    gap: 10, borderRadius: 12, border: "1px solid #1c1840",
+                    gap: 10, borderRadius: 12, border: "1px solid #FFFFFF",
                     background: "rgba(0,0,0,0.2)", padding: 12,
                   }}
                 >
@@ -883,8 +883,8 @@ export default function VastuDashboardPage() {
                     onChange={e => updateRoom(room.id, { name: e.target.value })}
                     placeholder="Room name"
                     style={{
-                      borderRadius: 10, border: "1px solid #1c1840",
-                      background: "rgba(0,0,0,0.3)", color: "#f0e8d0",
+                      borderRadius: 10, border: "1px solid #FFFFFF",
+                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   />
@@ -892,8 +892,8 @@ export default function VastuDashboardPage() {
                     value={room.type}
                     onChange={e => updateRoom(room.id, { type: e.target.value })}
                     style={{
-                      borderRadius: 10, border: "1px solid #1c1840",
-                      background: "rgba(0,0,0,0.3)", color: "#f0e8d0",
+                      borderRadius: 10, border: "1px solid #FFFFFF",
+                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   >
@@ -903,8 +903,8 @@ export default function VastuDashboardPage() {
                     value={room.direction}
                     onChange={e => updateRoom(room.id, { direction: e.target.value as Direction })}
                     style={{
-                      borderRadius: 10, border: "1px solid #1c1840",
-                      background: "rgba(0,0,0,0.3)", color: "#f0e8d0",
+                      borderRadius: 10, border: "1px solid #FFFFFF",
+                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   >
@@ -928,7 +928,7 @@ export default function VastuDashboardPage() {
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 12 }}>
                 <div>
                   <div className="card-tag">Room Placement Intelligence</div>
-                  <div style={{ fontSize: 13, color: "#8f86ad", marginTop: 4 }}>
+                  <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
                     Direction-by-direction placement score before final chart-linked analysis.
                   </div>
                 </div>
@@ -936,11 +936,11 @@ export default function VastuDashboardPage() {
                   <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 700, color: zoneScoreColor(roomPlacementOverall) }}>
                     {roomPlacementScorecard.length ? roomPlacementOverall : "--"}
                   </div>
-                  <div style={{ fontSize: 10, color: "#605890", textTransform: "uppercase", letterSpacing: 1 }}>Room Score</div>
+                  <div style={{ fontSize: 10, color: "#6B635B", textTransform: "uppercase", letterSpacing: 1 }}>Room Score</div>
                 </div>
               </div>
               {roomPlacementScorecard.length === 0 ? (
-                <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.7 }}>
+                <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.7 }}>
                   Select directions for rooms to see placement scoring.
                 </div>
               ) : (
@@ -948,14 +948,14 @@ export default function VastuDashboardPage() {
                   {roomPlacementScorecard.map((room) => (
                     <div key={`${room.type}-${room.direction}-${room.name}`} style={{ borderRadius: 11, border: `1px solid ${room.placement.color}33`, background: "rgba(0,0,0,0.22)", padding: 12 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", marginBottom: 6 }}>
-                        <div style={{ fontSize: 13, color: "#f0e8d0", fontWeight: 700 }}>{room.name}</div>
+                        <div style={{ fontSize: 13, color: "#1A1A1A", fontWeight: 700 }}>{room.name}</div>
                         <span className="badge" style={{ background: `${room.placement.color}18`, color: room.placement.color, border: `1px solid ${room.placement.color}44`, flexShrink: 0 }}>
                           {room.placement.score}
                         </span>
                       </div>
                       <div style={{ fontSize: 12, color: room.placement.color, fontWeight: 700, marginBottom: 5 }}>{room.placement.status}</div>
-                      <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.6 }}>{room.placement.verdict}</div>
-                      <div style={{ fontSize: 11, color: "#8f86ad", lineHeight: 1.55, marginTop: 6 }}>{room.placement.recommendation}</div>
+                      <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.6 }}>{room.placement.verdict}</div>
+                      <div style={{ fontSize: 11, color: "#6B635B", lineHeight: 1.55, marginTop: 6 }}>{room.placement.recommendation}</div>
                     </div>
                   ))}
                 </div>
@@ -968,7 +968,7 @@ export default function VastuDashboardPage() {
               style={{
                 marginTop: 20, padding: "12px 28px", borderRadius: 24,
                 background: "linear-gradient(135deg,#c8a030,#a07820)",
-                color: "#060410", border: "none", fontSize: 14, fontWeight: 700,
+                color: "#FAF7F2", border: "none", fontSize: 14, fontWeight: 700,
                 cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1,
                 fontFamily: "Outfit,sans-serif",
               }}
@@ -998,7 +998,7 @@ export default function VastuDashboardPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
                   <div style={{ flex: 1 }}>
                     <EngineSectionTitle eyebrow={`Engine ${result.engineVersion || ""}`} title="Analysis Summary" />
-                    <p style={{ fontSize: 14, color: "#c8c0a8", lineHeight: 1.75, marginTop: 8 }}>
+                    <p style={{ fontSize: 14, color: "#4A4238", lineHeight: 1.75, marginTop: 8 }}>
                       {result.summary || "Analysis complete."}
                     </p>
                   </div>
@@ -1008,7 +1008,7 @@ export default function VastuDashboardPage() {
                     style={{
                       flexShrink: 0, padding: "10px 22px", borderRadius: 24,
                       background: "linear-gradient(135deg,#c8a030,#a07820)",
-                      color: "#060410", border: "none", fontSize: 13, fontWeight: 700,
+                      color: "#FAF7F2", border: "none", fontSize: 13, fontWeight: 700,
                       cursor: pdfLoading ? "not-allowed" : "pointer", opacity: pdfLoading ? 0.6 : 1,
                       fontFamily: "Outfit,sans-serif",
                     }}
@@ -1036,11 +1036,11 @@ export default function VastuDashboardPage() {
                   <div className="card" style={{ borderColor: "rgba(34,197,94,0.2)" }}>
                     <div className="card-title serif" style={{ color: "#4ade80" }}>✅ Strengths ({strengths.length})</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {strengths.length === 0 && <p style={{ fontSize: 13, color: "#605890" }}>No major strengths detected.</p>}
+                      {strengths.length === 0 && <p style={{ fontSize: 13, color: "#6B635B" }}>No major strengths detected.</p>}
                       {strengths.map((item, i) => (
                         <div key={i} className="card" style={{ padding: 14 }}>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e8d0", marginBottom: 4 }}>{item.title}</div>
-                          <div style={{ fontSize: 13, color: "#8f86ad", lineHeight: 1.6, marginBottom: 6 }}>{item.explanation}</div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>{item.title}</div>
+                          <div style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, marginBottom: 6 }}>{item.explanation}</div>
                           <div style={{ fontSize: 11, color: "#4ade80" }}>Score: {item.score}/10</div>
                         </div>
                       ))}
@@ -1050,19 +1050,19 @@ export default function VastuDashboardPage() {
                   <div className="card" style={{ borderColor: "rgba(239,68,68,0.2)" }}>
                     <div className="card-title serif" style={{ color: "#f87171" }}>⚠️ Defects ({defects.length})</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {defects.length === 0 && <p style={{ fontSize: 13, color: "#605890" }}>No major defects detected.</p>}
+                      {defects.length === 0 && <p style={{ fontSize: 13, color: "#6B635B" }}>No major defects detected.</p>}
                       {defects.map((item, i) => {
                         const sc = severityColor(item.severity);
                         return (
                           <div key={i} className="card" style={{ padding: 14 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-                              <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e8d0" }}>{item.title}</div>
+                              <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A" }}>{item.title}</div>
                               <span className="badge" style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.text}33`, flexShrink: 0 }}>{item.severity}/10</span>
                             </div>
-                            <div style={{ fontSize: 13, color: "#8f86ad", lineHeight: 1.6, marginBottom: item.remedies.length > 0 ? 8 : 0 }}>{item.explanation}</div>
+                            <div style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, marginBottom: item.remedies.length > 0 ? 8 : 0 }}>{item.explanation}</div>
                             {item.remedies.length > 0 && (
                               <ul style={{ paddingLeft: 18, margin: 0 }}>
-                                {item.remedies.map((r, ri) => <li key={ri} style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.7 }}>{r}</li>)}
+                                {item.remedies.map((r, ri) => <li key={ri} style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.7 }}>{r}</li>)}
                               </ul>
                             )}
                           </div>
@@ -1083,13 +1083,13 @@ export default function VastuDashboardPage() {
                       return (
                         <div key={i} className="card" style={{ padding: 14 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                            <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e8d0" }}>{item.title}</div>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A" }}>{item.title}</div>
                             <span className="badge" style={{ background: pc.bg, color: pc.text, border: `1px solid ${pc.text}33`, flexShrink: 0, textTransform: "capitalize" }}>{item.priority}</span>
                           </div>
                           <div className="card-tag" style={{ marginBottom: 4 }}>{item.system}</div>
                           {item.requiresKundli && <div style={{ fontSize: 11, color: "#c8a030", marginBottom: 6 }}>Kundli validation required</div>}
                           <ul style={{ paddingLeft: 18, margin: 0 }}>
-                            {item.steps.map((step, si) => <li key={si} style={{ fontSize: 12, color: "#8f86ad", lineHeight: 1.7 }}>{step}</li>)}
+                            {item.steps.map((step, si) => <li key={si} style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.7 }}>{step}</li>)}
                           </ul>
                         </div>
                       );
@@ -1102,7 +1102,7 @@ export default function VastuDashboardPage() {
               {result.correctionPlan && (
                 <div className="card" style={{ marginBottom: 20 }}>
                   <div className="card-title serif">📅 30 / 60 / 90 Day Correction Plan</div>
-                  <p style={{ fontSize: 13, color: "#605890", marginBottom: 16 }}>
+                  <p style={{ fontSize: 13, color: "#6B635B", marginBottom: 16 }}>
                     Phased action plan — start with physical corrections, not symbolic remedies.
                   </p>
                   <div className="grid-3">
@@ -1115,7 +1115,7 @@ export default function VastuDashboardPage() {
                         <div style={{ fontSize: 13, fontWeight: 700, color: col.color, marginBottom: 12 }}>{col.label}</div>
                         <ol style={{ paddingLeft: 18, margin: 0 }}>
                           {col.items.map((item, i) => (
-                            <li key={i} style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7 }}>{item}</li>
+                            <li key={i} style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7 }}>{item}</li>
                           ))}
                         </ol>
                       </div>
@@ -1128,7 +1128,7 @@ export default function VastuDashboardPage() {
               {result.mindMakan && (
                 <div className="card" style={{ marginBottom: 20 }}>
                   <div className="card-title serif">🧘 Mind + Makan Energy Loop</div>
-                  <p style={{ fontSize: 13, color: "#605890", marginBottom: 16 }}>
+                  <p style={{ fontSize: 13, color: "#6B635B", marginBottom: 16 }}>
                     House affects mind. Mind affects house. Five layers of correction.
                   </p>
                   <div className="tabs">
@@ -1140,11 +1140,11 @@ export default function VastuDashboardPage() {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
                     {(result.mindMakan[mindMakanTab] || []).map((item, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, borderRadius: 10, border: "1px solid #1c1840", background: "rgba(0,0,0,0.18)", padding: 12 }}>
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, borderRadius: 10, border: "1px solid #FFFFFF", background: "rgba(0,0,0,0.18)", padding: 12 }}>
                         <span style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(200,160,48,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#c8a030", flexShrink: 0 }}>
                           {i + 1}
                         </span>
-                        <span style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7 }}>{item}</span>
+                        <span style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7 }}>{item}</span>
                       </div>
                     ))}
                   </div>
@@ -1155,12 +1155,12 @@ export default function VastuDashboardPage() {
               {result.vastuPurushaHealth && result.vastuPurushaHealth.observations.length > 1 && (
                 <div className="card" style={{ marginBottom: 20 }}>
                   <div className="card-title serif">🙏 Vastu Purusha — Symbolic Health Map</div>
-                  <p style={{ fontSize: 13, color: "#605890", marginBottom: 12 }}>
+                  <p style={{ fontSize: 13, color: "#6B635B", marginBottom: 12 }}>
                     Symbolic mapping of zones to body areas. Use as guidance, not medical advice.
                   </p>
                   {result.vastuPurushaHealth.affectedZones.length > 0 && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
-                      <span style={{ fontSize: 12, color: "#605890" }}>Affected zones:</span>
+                      <span style={{ fontSize: 12, color: "#6B635B" }}>Affected zones:</span>
                       {result.vastuPurushaHealth.affectedZones.map(zone => (
                         <span key={zone} className="badge badge-gold">{zone}</span>
                       ))}
@@ -1168,7 +1168,7 @@ export default function VastuDashboardPage() {
                   )}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {result.vastuPurushaHealth.observations.map((obs, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, borderRadius: 10, border: "1px solid #1c1840", background: "rgba(0,0,0,0.18)", padding: 12, fontSize: 13, color: "#8f86ad" }}>
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, borderRadius: 10, border: "1px solid #FFFFFF", background: "rgba(0,0,0,0.18)", padding: 12, fontSize: 13, color: "#6B635B" }}>
                         <span style={{ color: "#c8a030", flexShrink: 0 }}>→</span>
                         {obs}
                       </div>
@@ -1220,9 +1220,9 @@ export default function VastuDashboardPage() {
                             <span className="card-tag">{zone.dir}</span>
                             <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 700, color: zoneScoreColor(zone.score) }}>{zone.score}</span>
                           </div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e8d0", marginBottom: 2 }}>{zone.name}</div>
-                          <div style={{ fontSize: 11, color: "#605890", marginBottom: 6 }}>{zone.planet} · {zone.status}</div>
-                          <div style={{ fontSize: 11, color: "#8f86ad", marginBottom: 6 }}>{zone.domain}</div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", marginBottom: 2 }}>{zone.name}</div>
+                          <div style={{ fontSize: 11, color: "#6B635B", marginBottom: 6 }}>{zone.planet} · {zone.status}</div>
+                          <div style={{ fontSize: 11, color: "#6B635B", marginBottom: 6 }}>{zone.domain}</div>
                           {zone.planets.length > 0 && (
                             <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 6 }}>
                               {zone.planets.map(p => <span key={p} className="planet-pill">{p}</span>)}
@@ -1238,7 +1238,7 @@ export default function VastuDashboardPage() {
                     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
                       <div className="card-tag" style={{ marginBottom: 4 }}>Psychology Bridge — Planet-Zone Insights</div>
                       {result.zoneAnalysis.psychBridge.map((insight, i) => (
-                        <div key={i} className="card" style={{ padding: 14, fontSize: 13, color: "#c8c0a8", lineHeight: 1.7 }}>{insight}</div>
+                        <div key={i} className="card" style={{ padding: 14, fontSize: 13, color: "#4A4238", lineHeight: 1.7 }}>{insight}</div>
                       ))}
                     </div>
                   )}
@@ -1247,7 +1247,7 @@ export default function VastuDashboardPage() {
                     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
                       <div className="card-tag" style={{ marginBottom: 4 }}>Transit Alerts — Planet Zone Effects</div>
                       {result.zoneAnalysis.transitAlerts.length === 0 && (
-                        <p style={{ fontSize: 13, color: "#605890" }}>No significant transit alerts for this chart.</p>
+                        <p style={{ fontSize: 13, color: "#6B635B" }}>No significant transit alerts for this chart.</p>
                       )}
                       {result.zoneAnalysis.transitAlerts.map((alert, i) => (
                         <div
@@ -1257,13 +1257,13 @@ export default function VastuDashboardPage() {
                         >
                           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
                             <span style={{ fontWeight: 700, color: alert.positive ? "#4ade80" : "#f87171" }}>{alert.planet}</span>
-                            <span style={{ color: "#605890" }}>→</span>
-                            <span style={{ color: "#c8c0a8" }}>{alert.zone}</span>
+                            <span style={{ color: "#6B635B" }}>→</span>
+                            <span style={{ color: "#4A4238" }}>{alert.zone}</span>
                             <span className={`badge ${alert.positive ? "badge-green" : "badge-red"}`} style={{ marginLeft: "auto" }}>
                               {alert.positive ? "Benefic" : "Malefic"}
                             </span>
                           </div>
-                          <p style={{ fontSize: 13, color: "#8f86ad", lineHeight: 1.6, marginBottom: 4 }}>{alert.effect}</p>
+                          <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, marginBottom: 4 }}>{alert.effect}</p>
                           <p style={{ fontSize: 12, color: "#c8a030" }}>↺ Remedy: {alert.remedy}</p>
                         </div>
                       ))}
@@ -1273,7 +1273,7 @@ export default function VastuDashboardPage() {
               ) : (
                 <div className="card">
                   <div className="card-title serif">16-Zone MahaVastu Analysis</div>
-                  <p style={{ fontSize: 13, color: "#605890", lineHeight: 1.7 }}>
+                  <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.7 }}>
                     This section requires your Kundli with full planet house positions. Generate your Kundli,
                     then return here and click <strong>Refresh Chart</strong>. Planet positions will activate the zone analysis automatically.
                   </p>

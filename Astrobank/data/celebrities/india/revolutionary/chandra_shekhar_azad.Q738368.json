@@ -1,0 +1,29 @@
+{
+  "publicId": "677db02e",
+  "wikipediaSlug": "Chandra_Shekhar_Azad",
+  "wikipediaId": "Q738368",
+  "name": "Chandra Shekhar Azad",
+  "fullName": "Chandra Shekhar Azad",
+  "profileSummary": "Chandra Shekhar Sitaram Tiwari, popularly known as Chandra Shekhar Azad, was an Indian revolutionary who reorganised the Hindustan Republican Association (HRA) under its new name of Hindustan Socialist Republican Association (HSRA) after the death of its founder, Ram Prasad Bismil, and three other prominent party leaders, Roshan Singh, Rajendra Nath Lahiri and Ashfaqulla Khan. He hailed from Bardarka village in Unnao district of United Provinces and his parents were Sitaram Tiwari and Jagrani Devi. He often used the pseudonym \"Balraj\" while signing pamphlets issued as the commander-in-chief of the HSRA.Bhagat Singh, Sukhdev Thapar and Shivaram Rajguru worked closely with him as his pupil.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Chandrasekhar_Azad.jpg/330px-Chandrasekhar_Azad.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chandra_Shekhar_Azad",
+  "dateOfBirth": "1906-07-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.530555555",
+  "birthCoordinatesLng": "74.328333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "revolutionary",
+    "freedom fighter"
+  ],
+  "qid": "Q738368",
+  "birthPlace": "Bhavra",
+  "fetchedAt": "2026-04-07T11:29:31.403Z"
+}

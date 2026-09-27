@@ -1,0 +1,30 @@
+{
+  "publicId": "bc2d15ee",
+  "wikipediaSlug": "Abhiman_Singh_Basnet",
+  "wikipediaId": "Q4667409",
+  "name": "Abhiman Singh Basnet",
+  "fullName": "Abhiman Singh Basnet",
+  "profileSummary": "Abhiman Singh Basnyat was the first Commander-in-Chief of unified Nepal. Abhiman Singh became the first Commander in Chief after General Kalu Pande died during his second attempt to capture Kirtipur.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Abhiman_Singh_Basnyat.jpg/330px-Abhiman_Singh_Basnyat.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhiman_Singh_Basnet",
+  "dateOfBirth": "1744-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "military officer",
+    "minister"
+  ],
+  "qid": "Q4667409",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:55:01.219Z"
+}

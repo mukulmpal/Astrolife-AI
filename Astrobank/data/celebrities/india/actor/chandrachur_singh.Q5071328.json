@@ -1,0 +1,28 @@
+{
+  "publicId": "ee494c68",
+  "wikipediaSlug": "Chandrachur_Singh",
+  "wikipediaId": "Q5071328",
+  "name": "Chandrachur Singh",
+  "fullName": "Chandrachur Singh",
+  "profileSummary": "Chandrachur Singh is an Indian actor, who mainly works in Hindi cinema. He is the recipient of a Filmfare Award, in addition to receiving nomination for an IIFA Award and a Screen Award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Chandrachur_Singh.jpg/330px-Chandrachur_Singh.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chandrachur_Singh",
+  "dateOfBirth": "1968-10-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q5071328",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T12:17:16.143Z"
+}

@@ -1,0 +1,33 @@
+{
+  "publicId": "5dea593d",
+  "wikipediaSlug": "Deepak_Raj_Giri",
+  "wikipediaId": "Q19679095",
+  "name": "Deepak Raj Giri",
+  "fullName": "Deepak Raj Giri",
+  "profileSummary": "Deepak Raj Giri is a Nepalese actor, comedian, screenwriter, director, and producer known for his lead role in hugely popular Nepali satire sitcom Tito Satya and highest grossing film series in Nepal, Chakka Panja series. He is one of the most successful and is the highest-grossing actor of Nepali cinema with his films grossing a total of NPR 100cr+ in lifetime..",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Deepak_Raj_Giri.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepak_Raj_Giri",
+  "dateOfBirth": "1969-04-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.683333333",
+  "birthCoordinatesLng": "85.183333333",
+  "moonSign": "11",
+  "sunSign": "12",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film producer",
+    "television director",
+    "comedian",
+    "film director",
+    "screenwriter",
+    "television presenter",
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q19679095",
+  "birthPlace": "Thankot",
+  "fetchedAt": "2026-04-07T16:43:34.419Z"
+}

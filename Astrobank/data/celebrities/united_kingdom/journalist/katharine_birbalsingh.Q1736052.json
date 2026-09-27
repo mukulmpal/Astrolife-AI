@@ -1,0 +1,27 @@
+{
+  "publicId": "44f1e700",
+  "wikipediaSlug": "Katharine_Birbalsingh",
+  "wikipediaId": "Q1736052",
+  "name": "Katharine Birbalsingh",
+  "fullName": "Katharine Birbalsingh",
+  "profileSummary": "Katharine Moana Birbalsingh is a headteacher and education reform advocate who is the founder and head teacher of Michaela Community School, a free school established in 2014 in Wembley Park, London.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Katharine_Birbalsingh_government_portrait.jpg/330px-Katharine_Birbalsingh_government_portrait.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Katharine_Birbalsingh",
+  "dateOfBirth": "1973-09-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-41.2",
+  "birthCoordinatesLng": "174",
+  "moonSign": "1",
+  "sunSign": "5",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist",
+    "teacher"
+  ],
+  "qid": "Q1736052",
+  "birthPlace": "New Zealand",
+  "fetchedAt": "2026-04-08T02:07:54.765Z"
+}

@@ -1,0 +1,31 @@
+{
+  "publicId": "060dce66",
+  "wikipediaSlug": "Dev_(Bengali_actor)",
+  "wikipediaId": "Q5266378",
+  "name": "Dev (Bengali actor)",
+  "fullName": "Dev (Bengali actor)",
+  "profileSummary": "Deepak Adhikari, known by his stage name Dev, is an Indian actor, producer, singer and screenwriter, known for his works in Bengali cinema and more recently, a politician. He has also been a Member of Parliament in the Lok Sabha representing Ghatal since 2014, as a candidate from the All India Trinamool Congress party. He owns the production house Dev Entertainment Ventures.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Dev_at_the_Suro_Bharati_Sangeet_Kala_Kendra_annual_ceremony_in_2026.jpg/330px-Dev_at_the_Suro_Bharati_Sangeet_Kala_Kendra_annual_ceremony_in_2026.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dev_(Bengali_actor)",
+  "dateOfBirth": "1982-12-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.566666666",
+  "birthCoordinatesLng": "88.366666666",
+  "moonSign": "12",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "actor",
+    "film producer",
+    "entertainer",
+    "singer",
+    "screenwriter"
+  ],
+  "qid": "Q5266378",
+  "birthPlace": "West Bengal",
+  "fetchedAt": "2026-04-07T16:21:29.920Z"
+}

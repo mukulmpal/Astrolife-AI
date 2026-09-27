@@ -1,0 +1,28 @@
+{
+  "publicId": "8c56ed42",
+  "wikipediaSlug": "Eknath_Solkar",
+  "wikipediaId": "Q3049628",
+  "name": "Eknath Solkar",
+  "fullName": "Eknath Solkar",
+  "profileSummary": "Eknath Dhondu Solkar was an Indian all-round cricketer who played 27 Test matches and seven One Day Internationals for his country. He was born in Bombay, and died of heart attack in the same city at the age of 57. A specialist close-in fielder, he was regarded as one of the greatest fielders in the world during his playing days. His catches per match ratio is one of the best in Test cricket.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2a/Eknath_Solkar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Eknath_Solkar",
+  "dateOfBirth": "1948-03-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3049628",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:56:30.515Z"
+}

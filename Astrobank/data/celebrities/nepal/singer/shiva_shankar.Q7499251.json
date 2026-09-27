@@ -1,0 +1,28 @@
+{
+  "publicId": "e97efcd8",
+  "wikipediaSlug": "Shiva_Shankar",
+  "wikipediaId": "Q7499251",
+  "name": "Shiva Shankar",
+  "fullName": "Shiva Shankar",
+  "profileSummary": "Shiva Shankar Manandhar was a singer, music composer of Nepali songs and the chief actor in the first Nepali movie, Aama. For nearly a half century beginning from 1950 to late 1990, his name has probably been mentioned more often in books, journals, lectures and conversations about Nepalese music than any other musicians.. He is considered as the most versatile music composer of Nepal and his music style was followed by several contemporary musicians.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4d/Shivashankar1.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shiva_Shankar",
+  "dateOfBirth": "1932-02-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "5",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "film actor",
+    "composer"
+  ],
+  "qid": "Q7499251",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:48:32.820Z"
+}

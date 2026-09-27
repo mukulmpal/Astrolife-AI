@@ -1,0 +1,26 @@
+{
+  "publicId": "fdfa685a",
+  "wikipediaSlug": "Harish_Fabiani",
+  "wikipediaId": "Q5657871",
+  "name": "Harish Fabiani",
+  "fullName": "Harish Fabiani",
+  "profileSummary": "Harish Fabiani is a Madrid-based Non-Resident Indian (NRI) businessman.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Harish_Fabiani",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q5657871",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-08T02:09:09.927Z"
+}

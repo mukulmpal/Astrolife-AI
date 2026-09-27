@@ -1,0 +1,26 @@
+{
+  "publicId": "279e01cd",
+  "wikipediaSlug": "Nitish_Kumar",
+  "wikipediaId": "Q122304",
+  "name": "Nitish Kumar",
+  "fullName": "Nitish Kumar",
+  "profileSummary": "Nitish Kumar is an Indian politician from the state of Bihar who is currently serving as the Chief Minister of Bihar since 2015, having previously held the office from 2005 to 2014 and briefly in 2000. The national president of the Janata Dal (United), he is Bihar's longest-serving chief minister, holding the post for 10 terms.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Nitish_Kumar_addressing_at_55th_anniversary_of_Vishwa_Shanti_Stupa_establishment_in_Rajgir_%28cropped%29.jpg/330px-Nitish_Kumar_addressing_at_55th_anniversary_of_Vishwa_Shanti_Stupa_establishment_in_Rajgir_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nitish_Kumar",
+  "dateOfBirth": "1951-03-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.4667",
+  "birthCoordinatesLng": "85.5167",
+  "moonSign": "8",
+  "sunSign": "11",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q122304",
+  "birthPlace": "Bakhtiarpur",
+  "fetchedAt": "2026-04-07T16:36:57.499Z"
+}

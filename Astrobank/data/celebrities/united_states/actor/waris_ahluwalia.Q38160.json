@@ -1,0 +1,30 @@
+{
+  "publicId": "a3442d84",
+  "wikipediaSlug": "Waris_Ahluwalia",
+  "wikipediaId": "Q38160",
+  "name": "Waris Ahluwalia",
+  "fullName": "Waris Ahluwalia",
+  "profileSummary": "Waris Singh Ahluwalia is an Indian-American designer and actor based in New York City. His company, House of Waris, has collaborated with a number of other designers and artists throughout the years. House of Waris came into being after the owners of Maxfield's in Los Angeles noticed Ahluwalia's elaborate diamond rings and placed an order, which sold out.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Nmacc-20230401-Waris_Ahluwalia.jpg/330px-Nmacc-20230401-Waris_Ahluwalia.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Waris_Ahluwalia",
+  "dateOfBirth": "1975-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.626917",
+  "birthCoordinatesLng": "74.87704",
+  "moonSign": "4",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "designer",
+    "television actor",
+    "film actor",
+    "screenwriter"
+  ],
+  "qid": "Q38160",
+  "birthPlace": "Amritsar",
+  "fetchedAt": "2026-04-08T01:18:31.326Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "2b8633f1",
+  "wikipediaSlug": "Gouher_Sultana",
+  "wikipediaId": "Q3527128",
+  "name": "Gouher Sultana",
+  "fullName": "Gouher Sultana",
+  "profileSummary": "Gouher Sultana is an Indian former cricketer. Sultana was born in Hyderabad. She has played international cricket for India's Under-21 women's team, and the India national women's cricket team, mainly as a left-arm orthodox spin bowler.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Gouher_Sultana_%2810_March_2009%2C_Sydney%29.jpg/330px-Gouher_Sultana_%2810_March_2009%2C_Sydney%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gouher_Sultana",
+  "dateOfBirth": "1988-03-31",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.361666666",
+  "birthCoordinatesLng": "78.474722222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527128",
+  "birthPlace": "Hyderabad",
+  "fetchedAt": "2026-04-07T11:03:09.235Z"
+}

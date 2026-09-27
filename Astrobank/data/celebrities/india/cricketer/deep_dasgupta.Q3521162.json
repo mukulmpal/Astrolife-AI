@@ -1,0 +1,28 @@
+{
+  "publicId": "9cd34fc7",
+  "wikipediaSlug": "Deep_Dasgupta",
+  "wikipediaId": "Q3521162",
+  "name": "Deep Dasgupta",
+  "fullName": "Deep Dasgupta",
+  "profileSummary": "Deep Dasgupta is a former Indian cricketer who played in eight Test matches and five One Day Internationals between 2001 and 2006 as the national wicketkeeper and was later replaced by Ajay Ratra. He is now a Hindi and English commentator.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deep_Dasgupta",
+  "dateOfBirth": "1977-06-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3521162",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T10:56:34.296Z"
+}

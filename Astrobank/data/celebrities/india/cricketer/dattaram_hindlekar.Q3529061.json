@@ -1,0 +1,28 @@
+{
+  "publicId": "f5cdffd0",
+  "wikipediaSlug": "Dattaram_Hindlekar",
+  "wikipediaId": "Q3529061",
+  "name": "Dattaram Hindlekar",
+  "fullName": "Dattaram Hindlekar",
+  "profileSummary": "Dattaram Dharmaji Hindlekar was a cricketer who kept wicket for India in Test cricket.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dattaram_Hindlekar",
+  "dateOfBirth": "1909-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3529061",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:50:59.907Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "57256e23",
+  "wikipediaSlug": "Arthur_Gunn",
+  "wikipediaId": "Q91143353",
+  "name": "Arthur Gunn",
+  "fullName": "Arthur Gunn",
+  "profileSummary": "Dibesh Pokharel, known by his stage name Arthur Gunn, is a Nepalese-born American singer-songwriter from Wichita, Kansas, who came to national attention in 2020 as the runner-up finalist on the eighteenth season of the singing reality show American Idol. He started singing in 2014 and is known for his \"textured, sandpapery\" vocals. He released his eight-song debut album, Grahan, in early 2018. He released another album, KHOJ, in 2019 with singles including \"Ma,\" \"Khoj\" and \"Karnali .\"",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arthur_Gunn",
+  "dateOfBirth": "1997-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer-songwriter",
+    "singer"
+  ],
+  "qid": "Q91143353",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-08T02:07:06.832Z"
+}

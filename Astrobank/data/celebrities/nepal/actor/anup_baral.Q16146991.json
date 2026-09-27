@@ -1,0 +1,27 @@
+{
+  "publicId": "d62940ea",
+  "wikipediaSlug": "Anup_Baral",
+  "wikipediaId": "Q16146991",
+  "name": "Anup Baral",
+  "fullName": "Anup Baral",
+  "profileSummary": "Anup Baral is a Nepalese actor, writer, and director.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anup_Baral",
+  "dateOfBirth": "1968-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.209722222",
+  "birthCoordinatesLng": "83.985277777",
+  "moonSign": "10",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director"
+  ],
+  "qid": "Q16146991",
+  "birthPlace": "Pokhara",
+  "fetchedAt": "2026-04-07T16:43:32.132Z"
+}

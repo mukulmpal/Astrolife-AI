@@ -1,0 +1,27 @@
+{
+  "publicId": "68465090",
+  "wikipediaSlug": "Niruta_Singh",
+  "wikipediaId": "Q7040121",
+  "name": "Niruta Singh",
+  "fullName": "Niruta Singh",
+  "profileSummary": "Niruta Singh is an Indian actress, model and singer known for her work in Nepali cinema. She became a household name through her diverse roles and was the top actress of 90s and 2000s. She received wide acclaim for her performance in the 2001 film Darpan Chhaya, which became the highest-grossing film of all time in the Nepali film industry.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Niruta-Singh-14.jpg/330px-Niruta-Singh-14.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Niruta_Singh",
+  "dateOfBirth": "1977-08-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.0375",
+  "birthCoordinatesLng": "88.263055555",
+  "moonSign": "3",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q7040121",
+  "birthPlace": "Darjeeling",
+  "fetchedAt": "2026-04-07T16:43:59.911Z"
+}

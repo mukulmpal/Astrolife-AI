@@ -233,7 +233,7 @@ export default function ReportPage() {
 
   if (loading || !chart) {
     return (
-      <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
+      <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "30px 22px 110px", color: "#1A1A1A" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center", paddingTop: "40px" }}>
           <div style={{ fontSize: "20px", fontWeight: "700" }}>Loading your chart...</div>
         </div>
@@ -243,12 +243,12 @@ export default function ReportPage() {
 
   if (!hasUserChart) {
     return (
-      <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
+      <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "30px 22px 110px", color: "#1A1A1A" }}>
         <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center", paddingTop: "60px" }}>
           <div style={{ fontSize: 56, opacity: 0.3, marginBottom: 16 }}>📄</div>
           <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "Cormorant Garamond,serif", marginBottom: 10 }}>Your chart is needed</div>
           <p style={{ color: "#a79fbd", fontSize: 14, marginBottom: 24 }}>Generate your kundli first to build a full integrated report.</p>
-          <a href="/dashboard" style={{ background: "#c8a030", color: "#060410", padding: "12px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>Generate My Kundli</a>
+          <a href="/dashboard" style={{ background: "#c8a030", color: "#FAF7F2", padding: "12px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>Generate My Kundli</a>
         </div>
       </main>
     );
@@ -308,37 +308,37 @@ export default function ReportPage() {
   const selectedLocked = enforced && TIER_RANK[subscriptionTier] < TIER_RANK[selectedPlan.tier];
 
   return (
-    <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0", position: "relative" }}>
+    <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "30px 22px 110px", color: "#1A1A1A", position: "relative" }}>
       <style>{`
         @keyframes spin-slow { to { transform: rotate(360deg); } }
         @keyframes pulse-glow { 0%,100% { opacity:0.7; } 50% { opacity:1; } }
         @keyframes slide-up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         @keyframes ripple { 0% { transform:scale(1);opacity:0.6; } 100% { transform:scale(2.2);opacity:0; } }
-        .rep-hero { font-family:"Cormorant Garamond",serif; font-size:38px; font-weight:700; margin-bottom:6px; }
-        .rep-section { background:#0d0a22; border:1px solid #1c1840; border-radius:14px; padding:22px; margin-bottom:18px; }
-        .rep-title { font-size:13px; font-weight:800; color:#c8a030; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.12em; }
+        .rep-hero { font-family:"Cormorant Garamond",serif; font-size:38px; font-weight:700; margin-bottom:6px; color:#1A1A1A; }
+        .rep-section { background:#FFFFFF; border:1px solid rgba(184,134,11,0.2); border-radius:14px; padding:22px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,0.03); }
+        .rep-title { font-size:13px; font-weight:800; color:#B8860B; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.12em; }
         .rep-tabs { display:flex; gap:8px; flex-wrap:wrap; }
-        .rep-tab { padding:10px 18px; border:1px solid #1c1840; border-radius:8px; background:#0a0720; color:#b8b0d8; cursor:pointer; font-size:13px; font-weight:600; transition:all 0.18s; }
-        .rep-tab.active { border-color:#c8a030; background:rgba(200,160,48,0.14); color:#c8a030; }
-        .rep-tab:hover:not(.active) { border-color:rgba(200,160,48,0.4); }
+        .rep-tab { padding:10px 18px; border:1px solid rgba(184,134,11,0.25); border-radius:8px; background:#FAF7F2; color:#1A1A1A; cursor:pointer; font-size:13px; font-weight:600; transition:all 0.18s; }
+        .rep-tab.active { border-color:#B8860B; background:rgba(184,134,11,0.12); color:#B8860B; }
+        .rep-tab:hover:not(.active) { border-color:rgba(184,134,11,0.5); }
         .rep-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; }
-        .rep-btn { padding:13px 20px; border:1px solid #1c1840; border-radius:10px; background:#08051a; color:#f0e8d0; cursor:pointer; transition:all 0.2s; font-weight:600; font-size:14px; }
-        .rep-btn:hover { border-color:#c8a030; background:rgba(200,160,48,0.05); }
+        .rep-btn { padding:13px 20px; border:1px solid rgba(184,134,11,0.3); border-radius:10px; background:#FFFFFF; color:#1A1A1A; cursor:pointer; transition:all 0.2s; font-weight:600; font-size:14px; }
+        .rep-btn:hover { border-color:#B8860B; background:rgba(184,134,11,0.08); }
         .rep-btn:disabled { opacity:0.5; cursor:not-allowed; }
-        .rep-btn.primary { background:linear-gradient(135deg,#c8a030,#a07828); color:#060410; border-color:#c8a030; font-size:15px; font-weight:800; padding:16px 32px; }
-        .rep-btn.primary:hover:not(:disabled) { background:linear-gradient(135deg,#d4b040,#b08838); transform:translateY(-1px); box-shadow:0 6px 24px rgba(200,160,48,0.3); }
+        .rep-btn.primary { background:linear-gradient(135deg,#B8860B,#996515); color:#FFFFFF; border-color:#B8860B; font-size:15px; font-weight:800; padding:16px 32px; }
+        .rep-btn.primary:hover:not(:disabled) { background:linear-gradient(135deg,#D4AF37,#B8860B); transform:translateY(-1px); box-shadow:0 6px 24px rgba(184,134,11,0.3); }
         .rep-engine-group { margin-bottom:14px; }
         .rep-engine-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:6px; }
         .rep-engine-pills { display:flex; flex-wrap:wrap; gap:5px; }
         .rep-engine-pill { font-size:10px; padding:3px 8px; border-radius:999px; font-weight:600; }
-        .seg-btn { display:flex; align-items:center; gap:7px; padding:8px 14px; border:1px solid #1c1840; border-radius:8px; background:#08051a; color:#b8b0d8; cursor:pointer; font-size:13px; font-weight:500; transition:all 0.18s; }
-        .seg-btn:hover { border-color:rgba(200,160,48,0.5); }
+        .seg-btn { display:flex; align-items:center; gap:7px; padding:8px 14px; border:1px solid rgba(184,134,11,0.2); border-radius:8px; background:#FAF7F2; color:#1A1A1A; cursor:pointer; font-size:13px; font-weight:500; transition:all 0.18s; }
+        .seg-btn:hover { border-color:rgba(184,134,11,0.5); }
         .seg-group { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
         .seg-swatch { width:13px; height:13px; border-radius:50%; flex-shrink:0; }
-        .cover-desc { font-size:11px; color:#605890; margin-top:2px; }
+        .cover-desc { font-size:11px; color:#6B635B; margin-top:2px; }
         .rep-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
-        .rep-share-btn { padding:12px 10px; border:1px solid #1c1840; border-radius:8px; background:#08051a; color:#f0e8d0; cursor:pointer; font-weight:600; font-size:12px; transition:all 0.2s; text-align:center; }
-        .rep-share-btn:hover { border-color:#c8a030; }
+        .rep-share-btn { padding:12px 10px; border:1px solid rgba(184,134,11,0.2); border-radius:8px; background:#FFFFFF; color:#1A1A1A; cursor:pointer; font-weight:600; font-size:12px; transition:all 0.2s; text-align:center; }
+        .rep-share-btn:hover { border-color:#B8860B; }
         /* gen-overlay replaced by AstroLoadingScreen component */
         @media(max-width:600px) { .rep-hero { font-size:28px; } .rep-btn.primary { width:100%; } }
       `}</style>
@@ -356,18 +356,18 @@ export default function ReportPage() {
         {/* Hero */}
         <div style={{ marginBottom: "28px" }}>
           <div className="rep-hero">📄 Cosmic Blueprint Report</div>
-          <div style={{ fontSize: "14px", color: "#b8b0d8", marginBottom: "14px" }}>
-            {chart.name && <span style={{ color: "#c8a030", fontWeight: 700 }}>{chart.name} · </span>}
+          <div style={{ fontSize: "14px", color: "#6B635B", marginBottom: "14px" }}>
+            {chart.name && <span style={{ color: "#B8860B", fontWeight: 700 }}>{chart.name} · </span>}
             {chart.lagnaRashi} Lagna · {chart.planets.Moon?.sign} Moon · {chart.planets.Moon?.nakshatra} Nakshatra
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            <span className="rep-badge" style={{ background: "rgba(200,160,48,0.12)", border: "1px solid rgba(200,160,48,0.3)", color: "#c8a030" }}>
+            <span className="rep-badge" style={{ background: "rgba(184,134,11,0.12)", border: "1px solid rgba(184,134,11,0.3)", color: "#B8860B" }}>
               ✦ {ENGINE_COUNT[reportType]} engines
             </span>
-            <span className="rep-badge" style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.25)", color: "#60a5fa" }}>
+            <span className="rep-badge" style={{ background: "rgba(37,99,235,0.1)", border: "1px solid rgba(37,99,235,0.25)", color: "#2563EB" }}>
               📄 {PAGE_COUNT[reportType]}
             </span>
-            <span className="rep-badge" style={{ background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399" }}>
+            <span className="rep-badge" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#059669" }}>
               ⚡ Server rendered
             </span>
           </div>
@@ -383,14 +383,14 @@ export default function ReportPage() {
               <button key={plan.type} className={`rep-tab ${reportType === plan.type ? "active" : ""}`} onClick={() => setReportType(plan.type)}>
                 {locked ? "🔒 " : ""}{plan.label}
                 <span style={{ marginLeft: "6px", fontSize: "10px", opacity: 0.7 }}>({PAGE_COUNT[plan.type]})</span>
-                <div style={{ marginTop: 5, fontSize: 11, color: reportType === plan.type ? "#d8c47a" : "#605890", maxWidth: 190, lineHeight: 1.4 }}>
+                <div style={{ marginTop: 5, fontSize: 11, color: reportType === plan.type ? "#B8860B" : "#6B635B", maxWidth: 190, lineHeight: 1.4 }}>
                   {plan.desc}
                 </div>
               </button>
               );
             })}
           </div>
-          <div style={{ marginTop: 12, fontSize: 12, color: selectedLocked ? "#fca5a5" : "#86efac" }}>
+          <div style={{ marginTop: 12, fontSize: 12, color: selectedLocked ? "#DC2626" : "#059669" }}>
             Current access: {subscriptionTier.toUpperCase()} · {selectedLocked ? `${selectedPlan.label} is locked` : `${selectedPlan.label} is available`}
           </div>
         </div>
@@ -399,7 +399,7 @@ export default function ReportPage() {
         <div className="rep-section">
           <div className="rep-title">
             Engines Included
-            <span style={{ marginLeft: "8px", fontSize: "11px", color: "#605890", textTransform: "none", letterSpacing: 0 }}>
+            <span style={{ marginLeft: "8px", fontSize: "11px", color: "#6B635B", textTransform: "none", letterSpacing: 0 }}>
               {totalEngines} active engines · {pageCount}
             </span>
           </div>
@@ -443,7 +443,7 @@ export default function ReportPage() {
                 const isActive = cover === opt.value;
                 return (
                   <button key={opt.value} className="seg-btn" onClick={() => setCover(opt.value)}
-                    style={{ borderColor: isActive ? "#c8a030" : undefined, background: isActive ? "rgba(200,160,48,0.15)" : undefined, color: isActive ? "#c8a030" : undefined, flexDirection: "column", alignItems: "flex-start", gap: "2px" }}>
+                    style={{ borderColor: isActive ? "#B8860B" : undefined, background: isActive ? "rgba(184,134,11,0.12)" : undefined, color: isActive ? "#B8860B" : undefined, flexDirection: "column", alignItems: "flex-start", gap: "2px" }}>
                     <span style={{ fontWeight: 600 }}>{opt.label}</span>
                     <span className="cover-desc">{opt.desc}</span>
                   </button>
@@ -454,29 +454,29 @@ export default function ReportPage() {
         </div>
 
         {/* Evidence-First Classical Report Card */}
-        <div className="rep-section" style={{ border: "1px solid #38bdf8", background: "linear-gradient(180deg, #0b1528 0%, #060d1b 100%)", position: "relative", overflow: "hidden" }}>
+        <div className="rep-section" style={{ border: "1px solid rgba(184,134,11,0.3)", background: "#FFFFFF", position: "relative", overflow: "hidden" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "14px" }}>
             <div>
-              <span className="rep-badge" style={{ background: "rgba(56,189,248,0.15)", border: "1px solid rgba(56,189,248,0.4)", color: "#38bdf8", marginBottom: "8px" }}>
+              <span className="rep-badge" style={{ background: "rgba(184,134,11,0.15)", border: "1px solid rgba(184,134,11,0.4)", color: "#B8860B", marginBottom: "8px" }}>
                 ✦ PREDICTIVE INTELLIGENCE · FROZEN FOUNDATION
               </span>
-              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "24px", fontWeight: 700, color: "#ffffff", margin: "6px 0 4px" }}>
+              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "24px", fontWeight: 700, color: "#1A1A1A", margin: "6px 0 4px" }}>
                 Evidence-First Classical Synthesis Report
               </h2>
-              <p style={{ fontSize: "13px", color: "#cbd5e1", maxWidth: "600px", lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: "13px", color: "#6B635B", maxWidth: "600px", lineHeight: 1.5, margin: 0 }}>
                 Deterministic, source-grounded report strictly adhering to Krishnamurti Paddhati (KP Readers I–VI). Every assertion is anchored to verified evidence nodes, precedence relations, and reader citations with 0% fabricated scoring or probability meters.
               </p>
             </div>
             <button
               className="rep-btn primary"
-              style={{ background: "linear-gradient(135deg,#0284c7,#0369a1)", borderColor: "#38bdf8", color: "#ffffff", whiteSpace: "nowrap" }}
+              style={{ background: "linear-gradient(135deg,#B8860B,#996515)", borderColor: "#B8860B", color: "#ffffff", whiteSpace: "nowrap" }}
               onClick={handleDownloadEvidenceFirstPDF}
               disabled={isGenerating}
             >
               {isGenerating ? "⏳ Generating…" : "📥 Download Evidence-First PDF (Instant)"}
             </button>
           </div>
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", fontSize: "11px", color: "#94a3b8", borderTop: "1px solid #1e293b", paddingTop: "10px" }}>
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", fontSize: "11px", color: "#6B635B", borderTop: "1px solid rgba(184,134,11,0.15)", paddingTop: "10px" }}>
             <span>✓ 5 Life Topics (Marriage, Property, Career, Travel, Speculation)</span>
             <span>✓ 5-Part Grounded Narrative</span>
             <span>✓ Lossless Provenance &amp; Node IDs</span>
@@ -487,17 +487,17 @@ export default function ReportPage() {
 
         {/* Download CTA */}
         <div className="rep-section" style={{ textAlign: "center", padding: "32px 24px" }}>
-          <div style={{ fontSize: "13px", color: "#605890", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700 }}>
+          <div style={{ fontSize: "13px", color: "#6B635B", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700 }}>
             Ready to generate
           </div>
-          <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "24px", color: "#f0e8d0", marginBottom: "6px" }}>
+          <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "24px", color: "#1A1A1A", marginBottom: "6px" }}>
             {chart.name || "Your"} · {reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report
           </div>
-          <div style={{ fontSize: "12px", color: "#605890", marginBottom: "24px" }}>
+          <div style={{ fontSize: "12px", color: "#6B635B", marginBottom: "24px" }}>
             {totalEngines} engines · {pageCount} · {palette} palette · {COVER_OPTIONS.find(c => c.value === cover)?.label}
           </div>
           {reportType === "elite" && (
-            <div style={{ fontSize: "12px", color: latestPalmSessionId ? "#86efac" : "#facc15", marginBottom: "16px" }}>
+            <div style={{ fontSize: "12px", color: latestPalmSessionId ? "#059669" : "#B8860B", marginBottom: "16px" }}>
               {latestPalmSessionId
                 ? "Latest saved palm scan will be fused inside the Elite PDF."
                 : "No saved palm scan found. Elite PDF will show a palm-fusion missing-context page."}
@@ -506,7 +506,7 @@ export default function ReportPage() {
           <button className="rep-btn primary" onClick={handleDownloadPDF} disabled={isGenerating}>
             {isGenerating ? "⏳ Generating…" : selectedLocked ? `🔒 Upgrade for ${selectedPlan.label}` : `📥 Download ${selectedPlan.label}`}
           </button>
-          <div style={{ fontSize: "11px", color: "#453f70", marginTop: "10px" }}>
+          <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "10px" }}>
             Server-rendered via Puppeteer · downloads automatically · all {totalEngines} engines run fresh for your chart
           </div>
         </div>
@@ -524,7 +524,7 @@ export default function ReportPage() {
             ].map((s) => (
               <button key={s.id} className="rep-share-btn"
                 onClick={() => handleShare(s.id as Parameters<typeof handleShare>[0])}
-                style={{ background: s.id === "copy" && copied ? "#22c55e22" : undefined, borderColor: s.id === "copy" && copied ? "#22c55e" : undefined }}>
+                style={{ background: s.id === "copy" && copied ? "rgba(16,185,129,0.12)" : undefined, borderColor: s.id === "copy" && copied ? "#059669" : undefined, color: "#1A1A1A" }}>
                 <div style={{ fontSize: "18px", marginBottom: "4px" }}>{s.icon}</div>
                 {s.label}
               </button>

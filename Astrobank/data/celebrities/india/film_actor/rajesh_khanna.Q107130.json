@@ -1,0 +1,32 @@
+{
+  "publicId": "d1351bc2",
+  "wikipediaSlug": "Rajesh_Khanna",
+  "wikipediaId": "Q107130",
+  "name": "Rajesh Khanna",
+  "fullName": "Rajesh Khanna",
+  "profileSummary": "Rajesh Khanna was an Indian actor, film producer and politician who worked in Hindi films. Regarded as one of the greatest and most successful actor in the history of Indian cinema, he is considered the first Superstar of Hindi cinema. His accolades include five Filmfare Awards, and in 2013, he was posthumously awarded the Padma Bhushan, India's third highest civilian honour.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Rajesh_Khanna_2013_stamp_of_India_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Rajesh_Khanna",
+  "dateOfBirth": "1942-12-29",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.626917",
+  "birthCoordinatesLng": "74.87704",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "politician",
+    "film producer",
+    "singer",
+    "television actor"
+  ],
+  "qid": "Q107130",
+  "birthPlace": "Amritsar",
+  "fetchedAt": "2026-04-07T11:29:59.447Z"
+}

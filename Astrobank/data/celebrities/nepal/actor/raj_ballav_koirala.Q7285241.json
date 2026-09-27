@@ -1,0 +1,27 @@
+{
+  "publicId": "1d88a329",
+  "wikipediaSlug": "Raj_Ballav_Koirala",
+  "wikipediaId": "Q7285241",
+  "name": "Raj Ballav Koirala",
+  "fullName": "Raj Ballav Koirala",
+  "profileSummary": "Raj Ballav Koirala is a Nepalese film actor.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Raj2.jpg/330px-Raj2.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Raj_Ballav_Koirala",
+  "dateOfBirth": "1982-08-31",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.209722222",
+  "birthCoordinatesLng": "83.985277777",
+  "moonSign": "10",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q7285241",
+  "birthPlace": "Pokhara",
+  "fetchedAt": "2026-04-07T16:43:44.925Z"
+}

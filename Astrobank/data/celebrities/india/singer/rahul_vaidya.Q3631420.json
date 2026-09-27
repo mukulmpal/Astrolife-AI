@@ -1,0 +1,28 @@
+{
+  "publicId": "e0915118",
+  "wikipediaSlug": "Rahul_Vaidya",
+  "wikipediaId": "Q3631420",
+  "name": "Rahul Vaidya",
+  "fullName": "Rahul Vaidya",
+  "profileSummary": "Rahul Krushna Vaidya is an Indian singer and music composer. He started his career with the reality show Indian Idol 1 in which he became 2nd runner up. He has also participated in Bigg Boss 14 and was crowned as the 1st runner up. He also participated in Fear Factor: Khatron Ke Khiladi 11 and became a finalist.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Rahul_Vaidya_at_the_Bigg_Boss_Finale.jpg/330px-Rahul_Vaidya_at_the_Bigg_Boss_Finale.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Rahul_Vaidya",
+  "dateOfBirth": "1987-09-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "21.149722222",
+  "birthCoordinatesLng": "79.080555555",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q3631420",
+  "birthPlace": "Nagpur",
+  "fetchedAt": "2026-04-07T12:14:48.724Z"
+}

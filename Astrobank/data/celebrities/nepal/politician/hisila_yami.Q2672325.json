@@ -1,0 +1,29 @@
+{
+  "publicId": "ea785ada",
+  "wikipediaSlug": "Hisila_Yami",
+  "wikipediaId": "Q2672325",
+  "name": "Hisila Yami",
+  "fullName": "Hisila Yami",
+  "profileSummary": "Hisila Yami, also known by her nom de guerre Parvati, is a Nepalese politician belonging to Pragatisheel Loktantrik Party and architect. She was a deputy chairman of Nepal Socialist Party and a former president of the All Nepal Women's Association (Revolutionary).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Hisila_Yami_in_New_Delhi.jpg/330px-Hisila_Yami_in_New_Delhi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hisila_Yami",
+  "dateOfBirth": "1959-06-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "architect"
+  ],
+  "qid": "Q2672325",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:53:56.542Z"
+}

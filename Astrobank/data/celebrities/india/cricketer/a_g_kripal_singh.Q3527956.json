@@ -1,0 +1,28 @@
+{
+  "publicId": "6b98e34b",
+  "wikipediaSlug": "A._G._Kripal_Singh",
+  "wikipediaId": "Q3527956",
+  "name": "A. G. Kripal Singh",
+  "fullName": "A. G. Kripal Singh",
+  "profileSummary": "Amritsar Govindsingh Kripal Singh was an Indian Test cricketer.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/63/AG_Kripal_Singh.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/A._G._Kripal_Singh",
+  "dateOfBirth": "1933-08-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527956",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T10:50:16.974Z"
+}

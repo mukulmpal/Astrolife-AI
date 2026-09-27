@@ -1,0 +1,26 @@
+{
+  "publicId": "49d840f3",
+  "wikipediaSlug": "Atul_Garg",
+  "wikipediaId": "Q29467315",
+  "name": "Atul Garg",
+  "fullName": "Atul Garg",
+  "profileSummary": "Atul Garg is an Indian politician from Ghaziabad who is currently serving as Member of Parliament, Lok Sabha. He was a Minister of State in the Government of Uttar Pradesh. He was a Member of the Uttar Pradesh Legislative Assembly, representing the Ghaziabad Assembly constituency.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Atul_Garg",
+  "dateOfBirth": "1957-08-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.416666666",
+  "moonSign": "5",
+  "sunSign": "5",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q29467315",
+  "birthPlace": "Ghaziabad",
+  "fetchedAt": "2026-04-07T16:20:26.290Z"
+}

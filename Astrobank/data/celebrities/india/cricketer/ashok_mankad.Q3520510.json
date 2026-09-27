@@ -1,0 +1,28 @@
+{
+  "publicId": "a2cf85b1",
+  "wikipediaSlug": "Ashok_Mankad",
+  "wikipediaId": "Q3520510",
+  "name": "Ashok Mankad",
+  "fullName": "Ashok Mankad",
+  "profileSummary": "Ashok Mulvantrai Mankad was an Indian cricketer. A right-handed batsman, he played for India in 22 Test matches.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashok_Mankad",
+  "dateOfBirth": "1946-10-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3520510",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:55:56.612Z"
+}

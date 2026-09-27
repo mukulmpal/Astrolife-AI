@@ -1,0 +1,31 @@
+{
+  "publicId": "aea971bb",
+  "wikipediaSlug": "Manoj_Kumar",
+  "wikipediaId": "Q2341602",
+  "name": "Manoj Kumar",
+  "fullName": "Manoj Kumar",
+  "profileSummary": "Harikrishan Giri Goswami, professionally known as Manoj Kumar, was an Indian actor, director, screenwriter, lyricist and editor who worked in Hindi cinema. He is regarded as one of the greatest and most accomplished actors of Indian cinema. He is noted for his acting in patriotism-themed films. In a career spanning over four decades, he worked in 55 films.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Manoj_Kumar_close_up.jpg/330px-Manoj_Kumar_close_up.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Manoj_Kumar",
+  "dateOfBirth": "1937-07-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "34.15",
+  "birthCoordinatesLng": "73.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "screenwriter",
+    "film editor"
+  ],
+  "qid": "Q2341602",
+  "birthPlace": "Abbottabad",
+  "fetchedAt": "2026-04-07T11:29:49.634Z"
+}

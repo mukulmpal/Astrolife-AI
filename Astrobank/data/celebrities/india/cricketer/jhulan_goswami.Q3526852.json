@@ -1,0 +1,28 @@
+{
+  "publicId": "53d9f785",
+  "wikipediaSlug": "Jhulan_Goswami",
+  "wikipediaId": "Q3526852",
+  "name": "Jhulan Goswami",
+  "fullName": "Jhulan Goswami",
+  "profileSummary": "Jhulan Goswami is an Indian former cricketer. She played for the India women's national cricket team from 2002 to 2022.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Jhulan_Goswami_%2810_March_2009%2C_Sydney%29.jpg/330px-Jhulan_Goswami_%2810_March_2009%2C_Sydney%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jhulan_Goswami",
+  "dateOfBirth": "1983-11-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.4",
+  "birthCoordinatesLng": "88.5",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3526852",
+  "birthPlace": "Nadia district",
+  "fetchedAt": "2026-04-07T11:03:14.610Z"
+}

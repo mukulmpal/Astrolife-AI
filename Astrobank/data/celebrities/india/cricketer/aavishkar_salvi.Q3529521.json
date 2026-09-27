@@ -1,0 +1,28 @@
+{
+  "publicId": "53a032c1",
+  "wikipediaSlug": "Aavishkar_Salvi",
+  "wikipediaId": "Q3529521",
+  "name": "Aavishkar Salvi",
+  "fullName": "Aavishkar Salvi",
+  "profileSummary": "Aavishkar Madhav Salvi is a former Indian cricketer. He played a right-arm medium-pace bowler and right-handed batsman. In first-class cricket, he played for Mumbai. His last match for Mumbai was in 2013. He also played for Delhi Daredevils in the IPL.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aavishkar_Salvi",
+  "dateOfBirth": "1981-10-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3529521",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:55:58.213Z"
+}

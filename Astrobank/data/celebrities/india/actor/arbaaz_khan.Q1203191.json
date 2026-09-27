@@ -1,0 +1,30 @@
+{
+  "publicId": "7819f741",
+  "wikipediaSlug": "Arbaaz_Khan",
+  "wikipediaId": "Q1203191",
+  "name": "Arbaaz Khan",
+  "fullName": "Arbaaz Khan",
+  "profileSummary": "Arbaaz Salim Khan is an Indian actor and film producer who primarily works in Hindi cinema, in addition to Telugu, Urdu and Malayalam cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Arbaaz_Khan_at_his_birthday_bash_at_Su_Casa.jpg/330px-Arbaaz_Khan_at_his_birthday_bash_at_Su_Casa.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arbaaz_Khan",
+  "dateOfBirth": "1967-08-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer",
+    "film director"
+  ],
+  "qid": "Q1203191",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:17.144Z"
+}

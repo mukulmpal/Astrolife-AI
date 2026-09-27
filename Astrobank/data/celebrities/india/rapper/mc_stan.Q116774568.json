@@ -1,0 +1,32 @@
+{
+  "publicId": "e7020387",
+  "wikipediaSlug": "MC_Stan",
+  "wikipediaId": "Q116774568",
+  "name": "MC Stan",
+  "fullName": "MC Stan",
+  "profileSummary": "Altaf Sheikh, known professionally as MC STAN, is an Indian rapper, lyricist, music producer, and composer who was the winner of the sixteenth season of Bigg Boss in 2023. He is known for his work in the Hindi hip-hop and trap music scene.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/MC_STAN.jpg/330px-MC_STAN.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/MC_Stan",
+  "dateOfBirth": "1999-08-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "rapper",
+    "singer",
+    "composer",
+    "record producer",
+    "lyricist"
+  ],
+  "qid": "Q116774568",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T12:18:58.954Z"
+}

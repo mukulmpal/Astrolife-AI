@@ -1,0 +1,28 @@
+{
+  "publicId": "b0c07de1",
+  "wikipediaSlug": "Abhinav_Mukund",
+  "wikipediaId": "Q4667439",
+  "name": "Abhinav Mukund",
+  "fullName": "Abhinav Mukund",
+  "profileSummary": "Abhinav Mukund is an Indian Former cricketer who plays domestic cricket for Tamil Nadu. He has played for India in seven Test matches. He has captained Tamil Nadu and India A on several occasions. He was a member of Chennai Super Kings and Royal Challengers Bangalore in the IPL.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Abhinav_Mukund.jpg/330px-Abhinav_Mukund.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhinav_Mukund",
+  "dateOfBirth": "1990-01-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4667439",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T10:50:18.602Z"
+}

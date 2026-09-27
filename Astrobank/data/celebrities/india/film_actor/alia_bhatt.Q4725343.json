@@ -1,0 +1,28 @@
+{
+  "publicId": "b0e2ea8d",
+  "wikipediaSlug": "Alia_Bhatt",
+  "wikipediaId": "Q4725343",
+  "name": "Alia Bhatt",
+  "fullName": "Alia Bhatt",
+  "profileSummary": "Alia Bhatt is a British actress of Indian descent who predominantly works in Hindi films. Known for her portrayals of women in challenging circumstances, she has received several accolades, including a National Film Award and seven Filmfare Awards. She is one of India's highest-paid actresses. Time awarded her with the Time100 Impact Award in 2022 and named her one of the 100 most influential people in the world in 2024.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Alia_Bhatt_at_Berlinale_2022_Ausschnitt.jpg/330px-Alia_Bhatt_at_Berlinale_2022_Ausschnitt.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Alia_Bhatt",
+  "dateOfBirth": "1993-03-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "9",
+  "sunSign": "12",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "singer",
+    "model"
+  ],
+  "qid": "Q4725343",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:33:48.396Z"
+}

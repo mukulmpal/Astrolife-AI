@@ -1,0 +1,27 @@
+{
+  "publicId": "99bace8f",
+  "wikipediaSlug": "Anurag_Thakur",
+  "wikipediaId": "Q4777895",
+  "name": "Anurag Thakur",
+  "fullName": "Anurag Thakur",
+  "profileSummary": "Captain Anurag Singh Thakur is an Indian politician from the Bharatiya Janata Party and a Member of Parliament in the Lok Sabha from Hamirpur, Himachal Pradesh. He was former Minister of Sports, Youth Affairs and Minister of Information and Broadcasting in the Second Modi ministry. His father, Prem Kumar Dhumal was a former Chief Minister of Himachal Pradesh.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/76/Shri_Anurag_Singh_Thakur_in_July_2021.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anurag_Thakur",
+  "dateOfBirth": "1974-10-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.68",
+  "birthCoordinatesLng": "76.52",
+  "moonSign": "10",
+  "sunSign": "7",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "cricketer"
+  ],
+  "qid": "Q4777895",
+  "birthPlace": "Hamirpur",
+  "fetchedAt": "2026-04-07T16:19:41.931Z"
+}

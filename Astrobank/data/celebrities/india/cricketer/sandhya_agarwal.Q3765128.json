@@ -1,0 +1,28 @@
+{
+  "publicId": "b5934341",
+  "wikipediaSlug": "Sandhya_Agarwal",
+  "wikipediaId": "Q3765128",
+  "name": "Sandhya Agarwal",
+  "fullName": "Sandhya Agarwal",
+  "profileSummary": "Sandhya Agarwal is an Indian former cricketer and former captain of the India women's cricket team. She hails from Indore in Madhya Pradesh.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sandhya_Agarwal",
+  "dateOfBirth": "1963-05-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.718611111",
+  "birthCoordinatesLng": "75.855",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3765128",
+  "birthPlace": "Indore",
+  "fetchedAt": "2026-04-07T11:00:56.838Z"
+}

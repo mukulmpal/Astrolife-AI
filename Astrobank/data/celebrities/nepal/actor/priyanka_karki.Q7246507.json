@@ -1,0 +1,28 @@
+{
+  "publicId": "331c5e8e",
+  "wikipediaSlug": "Priyanka_Karki",
+  "wikipediaId": "Q7246507",
+  "name": "Priyanka Karki",
+  "fullName": "Priyanka Karki",
+  "profileSummary": "Priyanka Karki is a Nepali film actress, model, director, writer and the winner of the Miss Teen Nepal 2005 pageant.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Priyanka_Karki_winning_INFA_Most_Popular_Actor_%28Female%29_2014.jpg/330px-Priyanka_Karki_winning_INFA_Most_Popular_Actor_%28Female%29_2014.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Priyanka_Karki",
+  "dateOfBirth": "1987-02-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "11",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "singer"
+  ],
+  "qid": "Q7246507",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:06.221Z"
+}

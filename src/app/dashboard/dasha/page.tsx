@@ -46,27 +46,27 @@ function ActiveCard({
   return (
     <div
       className="rounded-2xl p-4 flex flex-col gap-2"
-      style={{ background: color + "18", border: `1px solid ${color}55` }}
+      style={{ background: "#FFFFFF", border: `1px solid ${color}55`, boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}
     >
-      <p className="text-xs uppercase tracking-widest" style={{ color: color + "cc" }}>
+      <p className="text-xs uppercase tracking-widest font-bold" style={{ color: color }}>
         {label}
       </p>
       <div className="flex items-center gap-2">
         <span className="text-2xl">{LORD_ICON[period.lord]}</span>
         <div>
-          <p className="text-xl font-bold text-white">{tp(period.lord)}</p>
-          {sub && <p className="text-xs text-white/50">{sub}</p>}
+          <p className="text-xl font-bold text-[#1A1A1A]">{tp(period.lord)}</p>
+          {sub && <p className="text-xs text-[#6B635B]">{sub}</p>}
         </div>
       </div>
-      <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+      <div className="w-full h-1.5 rounded-full bg-[#FAF7F2] overflow-hidden border border-amber-900/10">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${period.progressPercent}%`, background: color }}
         />
       </div>
-      <div className="flex justify-between text-xs text-white/50">
+      <div className="flex justify-between text-xs text-[#6B635B]">
         <span>{formatDashaDate(period.startDate)}</span>
-        <span style={{ color }}>{formatDaysRemaining(period.daysRemaining)}</span>
+        <span className="font-bold" style={{ color }}>{formatDaysRemaining(period.daysRemaining)}</span>
         <span>{formatDashaDate(period.endDate)}</span>
       </div>
     </div>
@@ -82,28 +82,28 @@ function TimelineRow({ period, onClick, selected, tp }: { period: DashaPeriod; o
       onClick={onClick}
       className="w-full text-left rounded-xl p-3 flex items-center gap-3 transition-all"
       style={{
-        background: selected ? color + "22" : isPast ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.04)",
-        border: `1px solid ${selected ? color + "66" : "rgba(255,255,255,0.08)"}`,
-        opacity: isPast ? 0.5 : 1,
+        background: selected ? "rgba(184,134,11,0.12)" : "#FFFFFF",
+        border: `1px solid ${selected ? color : "rgba(184,134,11,0.2)"}`,
+        opacity: isPast ? 0.6 : 1,
       }}
     >
       <span className="text-xl w-7 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-white text-sm">{tp(period.lord)} Mahadasha</span>
+          <span className="font-semibold text-[#1A1A1A] text-sm">{tp(period.lord)} Mahadasha</span>
           {period.isActive && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
-              style={{ background: color + "33", color }}>ACTIVE</span>
+              style={{ background: color + "22", color }}>ACTIVE</span>
           )}
         </div>
-        <p className="text-xs text-white/40 mt-0.5">
+        <p className="text-xs text-[#6B635B] mt-0.5">
           {formatDashaDate(period.startDate)} — {formatDashaDate(period.endDate)} · {LORD_YEARS_DESC[period.lord]}
         </p>
       </div>
       {period.isActive && (
         <div className="text-right">
           <p className="text-xs font-bold" style={{ color }}>{pct(period)}%</p>
-          <p className="text-[10px] text-white/40">{formatDaysRemaining(period.daysRemaining)}</p>
+          <p className="text-[10px] text-[#6B635B]">{formatDaysRemaining(period.daysRemaining)}</p>
         </div>
       )}
     </button>
@@ -118,15 +118,15 @@ function AntarRow({ period, tp }: { period: DashaPeriod; tp: (n: string) => stri
     <div
       className="flex items-center gap-3 rounded-lg px-3 py-2"
       style={{
-        background: period.isActive ? color + "18" : "transparent",
-        border: `1px solid ${period.isActive ? color + "44" : "rgba(255,255,255,0.06)"}`,
-        opacity: isPast ? 0.45 : 1,
+        background: period.isActive ? "rgba(184,134,11,0.1)" : "#FFFFFF",
+        border: `1px solid ${period.isActive ? color : "rgba(184,134,11,0.15)"}`,
+        opacity: isPast ? 0.55 : 1,
       }}
     >
       <span className="text-base w-5 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-white/90">{tp(period.lord)}</span>
-        <p className="text-[11px] text-white/40">
+        <span className="text-sm font-medium text-[#1A1A1A]">{tp(period.lord)}</span>
+        <p className="text-[11px] text-[#6B635B]">
           {formatDashaDate(period.startDate)} — {formatDashaDate(period.endDate)}
         </p>
       </div>
@@ -185,8 +185,8 @@ export default function DashaPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ background: "#05020f" }}>
-        <p className="text-slate-300 animate-pulse">Loading Dasha...</p>
+      <main className="min-h-screen flex items-center justify-center" style={{ background: "#FAF7F2" }}>
+        <p className="text-[#6B635B] animate-pulse">Loading Dasha...</p>
       </main>
     );
   }
@@ -276,7 +276,7 @@ export default function DashaPage() {
             className="rounded-2xl p-4"
             style={{
               background: navtara.nature === "malefic" ? "rgba(239,68,68,0.08)" :
-                          navtara.nature === "highly_benefic" ? "rgba(234,179,8,0.10)" :
+                          navtara.nature === "highly_benefic" ? "rgba(234,179,8,0.12)" :
                           "rgba(34,197,94,0.08)",
               border: `1px solid ${navtara.nature === "malefic" ? "rgba(239,68,68,0.3)" :
                                     navtara.nature === "highly_benefic" ? "rgba(234,179,8,0.4)" :
@@ -286,13 +286,13 @@ export default function DashaPage() {
             <div className="flex items-start gap-3">
               <span className="text-3xl">{navtara.icon}</span>
               <div>
-                <p className="text-xs uppercase tracking-widest text-white/50">Today&apos;s Navtara</p>
-                <p className="text-lg font-bold text-white mt-0.5">
+                <p className="text-xs uppercase tracking-widest text-[#6B635B] font-bold">Today&apos;s Navtara</p>
+                <p className="text-lg font-bold text-[#1A1A1A] mt-0.5">
                   {navtara.taraName} Tara #{navtara.taraNum}
-                  <span className="ml-2 text-sm font-normal text-white/50">— {navtara.meaning}</span>
+                  <span className="ml-2 text-sm font-normal text-[#6B635B]">— {navtara.meaning}</span>
                 </p>
-                <p className="text-sm text-white/70 mt-1">{navtara.advice}</p>
-                <p className="text-xs text-white/35 mt-1">
+                <p className="text-sm text-[#1A1A1A] mt-1">{navtara.advice}</p>
+                <p className="text-xs text-[#6B635B] mt-1">
                   {navtara.janmaNakshatra} → {navtara.todayNakshatra} · Cycle {navtara.cycleNumber}
                 </p>
               </div>
@@ -308,8 +308,8 @@ export default function DashaPage() {
         )}
 
         {/* Mahadasha Timeline */}
-        <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-          <p className="text-xs uppercase tracking-widest text-white/40 mb-3">120-Year Mahadasha Timeline</p>
+        <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
+          <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold mb-3">120-Year Mahadasha Timeline</p>
           <div className="flex flex-col gap-2">
             {dashaTree.timeline.map((period, i) => (
               <TimelineRow
@@ -325,11 +325,11 @@ export default function DashaPage() {
 
         {/* Antardasha for selected / current MD */}
         {selectedPeriod && (
-          <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-            <p className="text-xs uppercase tracking-widest text-white/40 mb-1">
+          <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
+            <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold mb-1">
               Antardashas in {tp(selectedPeriod.md.lord)} Mahadasha
             </p>
-            <p className="text-xs text-white/30 mb-3">
+            <p className="text-xs text-[#6B635B] mb-3">
               {formatDashaDate(selectedPeriod.md.startDate)} — {formatDashaDate(selectedPeriod.md.endDate)}
             </p>
             <div className="flex flex-col gap-1.5">
@@ -341,11 +341,11 @@ export default function DashaPage() {
         )}
 
         {/* Pratyantardasha for current AD */}
-        <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-          <p className="text-xs uppercase tracking-widest text-white/40 mb-1">
+        <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
+          <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold mb-1">
             Pratyantardashas · {tp(current.antardasha.lord)} {t("dasha.antardasha")}
           </p>
-          <p className="text-xs text-white/30 mb-3">
+          <p className="text-xs text-[#6B635B] mb-3">
             {formatDashaDate(current.antardasha.startDate)} — {formatDashaDate(current.antardasha.endDate)}
           </p>
           <div className="flex flex-col gap-1.5">

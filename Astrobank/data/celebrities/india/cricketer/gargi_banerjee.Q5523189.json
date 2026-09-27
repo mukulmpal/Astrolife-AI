@@ -1,0 +1,28 @@
+{
+  "publicId": "18daec33",
+  "wikipediaSlug": "Gargi_Banerjee",
+  "wikipediaId": "Q5523189",
+  "name": "Gargi Banerjee",
+  "fullName": "Gargi Banerjee",
+  "profileSummary": "Gargi Banerjee is a former Test and One Day International cricketer who represented India. She made her international debut at the age of 16 at the Eden Gardens in a match against England in the 1978 World Cup and played for West Bengal in India's domestic league prior to her international appearance.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gargi_Banerjee",
+  "dateOfBirth": "1968-07-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5523189",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T11:03:02.416Z"
+}

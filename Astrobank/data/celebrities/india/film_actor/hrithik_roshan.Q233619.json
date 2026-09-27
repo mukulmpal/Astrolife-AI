@@ -1,0 +1,30 @@
+{
+  "publicId": "e1d67540",
+  "wikipediaSlug": "Hrithik_Roshan",
+  "wikipediaId": "Q233619",
+  "name": "Hrithik Roshan",
+  "fullName": "Hrithik Roshan",
+  "profileSummary": "Hritik Rakesh Nagrath, known professionally as Hrithik Roshan, is an Indian actor and producer who works in Hindi cinema. Referred as the millenial superstar, he has portrayed a variety of characters and is known for his dancing skills. One of the highest-paid actors in India, he has won many awards, including six Filmfare Awards, of which four were for Best Actor. Starting from 2012, he has appeared in Forbes India's Celebrity 100 several times based on his income and popularity.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/92/Hrithik_Roshan_in_2024_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hrithik_Roshan",
+  "dateOfBirth": "1974-01-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "dancer",
+    "actor"
+  ],
+  "qid": "Q233619",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:17:37.609Z"
+}

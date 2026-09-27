@@ -1,0 +1,26 @@
+{
+  "publicId": "7e3ef208",
+  "wikipediaSlug": "Luna_Luitel",
+  "wikipediaId": "Q136031827",
+  "name": "Luna Luitel",
+  "fullName": "Luna Luitel",
+  "profileSummary": "Luna Luitel is a Nepalese beauty pageant titleholder who was crowned Miss Nepal World 2025. She will represent Nepal at the upcoming Miss World 2026 competition. Born in Nepal, she moved to Australia where she did her higher education. She is a certified scuba diver.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Luna_Luitel_Miss_Nepal_World_2025_%28cropped%29.jpg/330px-Luna_Luitel_Miss_Nepal_World_2025_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Luna_Luitel",
+  "dateOfBirth": "1999-03-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "5",
+  "sunSign": "11",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model"
+  ],
+  "qid": "Q136031827",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:45:02.271Z"
+}

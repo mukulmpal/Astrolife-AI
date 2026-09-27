@@ -103,7 +103,7 @@ export function EngineEmptyState({
           className="rounded-lg border-none px-6 py-3 text-sm font-semibold"
           style={{
             background: 'var(--app-gold)',
-            color: 'var(--app-primary-on, #060410)',
+            color: 'var(--app-primary-on, #FAF7F2)',
           }}
         >
           Create My Kundli

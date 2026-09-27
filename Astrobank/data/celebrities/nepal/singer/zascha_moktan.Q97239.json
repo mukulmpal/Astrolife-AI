@@ -1,0 +1,26 @@
+{
+  "publicId": "e8c0286a",
+  "wikipediaSlug": "Zascha_Moktan",
+  "wikipediaId": "Q97239",
+  "name": "Zascha Moktan",
+  "fullName": "Zascha Moktan",
+  "profileSummary": "Zascha Moktan is a Nepalese-German singer, pianist and guitarist.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Zascha_Moktan",
+  "dateOfBirth": "1981-12-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": "1",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q97239",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T16:48:10.542Z"
+}

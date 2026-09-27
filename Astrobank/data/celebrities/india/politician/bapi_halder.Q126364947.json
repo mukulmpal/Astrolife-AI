@@ -1,0 +1,26 @@
+{
+  "publicId": "92725012",
+  "wikipediaSlug": "Bapi_Halder",
+  "wikipediaId": "Q126364947",
+  "name": "Bapi Halder",
+  "fullName": "Bapi Halder",
+  "profileSummary": "Bapi Halder is an Indian politician and the elected candidate for Lok Sabha from Mathurapur Lok Sabha constituency. He is a member of the All India Trinamool Congress.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bapi_Halder",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q126364947",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:21:04.711Z"
+}

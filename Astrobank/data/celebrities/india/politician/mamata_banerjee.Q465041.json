@@ -1,0 +1,28 @@
+{
+  "publicId": "d5587308",
+  "wikipediaSlug": "Mamata_Banerjee",
+  "wikipediaId": "Q465041",
+  "name": "Mamata Banerjee",
+  "fullName": "Mamata Banerjee",
+  "profileSummary": "Mamata Banerjee is an Indian politician and lawyer who is currently serving as the chief minister of West Bengal since 20 May 2011; she is the first woman to hold the office. The founder and president of the All India Trinamool Congress, she previously served as a Union Cabinet Minister and is also the current leader of the house in West Bengal's Legislative Assembly.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Official_portrait_of_Mamata_Banerjee.jpg/330px-Official_portrait_of_Mamata_Banerjee.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mamata_Banerjee",
+  "dateOfBirth": "1955-01-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": "2",
+  "sunSign": "9",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "painter",
+    "poet"
+  ],
+  "qid": "Q465041",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T16:36:50.249Z"
+}

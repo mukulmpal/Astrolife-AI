@@ -1,0 +1,27 @@
+{
+  "publicId": "174a8d52",
+  "wikipediaSlug": "Krishnaswami_Alladi",
+  "wikipediaId": "Q18763803",
+  "name": "Krishnaswami Alladi",
+  "fullName": "Krishnaswami Alladi",
+  "profileSummary": "Krishnaswami Alladi is an Indian-American mathematician who specializes in number theory. He works as a professor of mathematics at the University of Florida, and was chair of the mathematics department there from 1998 to 2008. He is also the editor-in-chief of The Ramanujan Journal, which he founded in 1997.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Krishnaswami_Alladi",
+  "dateOfBirth": "1955-10-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "8.4875",
+  "birthCoordinatesLng": "76.9525",
+  "moonSign": "2",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "mathematician",
+    "university teacher"
+  ],
+  "qid": "Q18763803",
+  "birthPlace": "Thiruvananthapuram",
+  "fetchedAt": "2026-04-08T01:18:29.897Z"
+}

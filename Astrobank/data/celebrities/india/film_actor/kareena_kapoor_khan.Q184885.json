@@ -1,0 +1,28 @@
+{
+  "publicId": "11a0efc9",
+  "wikipediaSlug": "Kareena_Kapoor_Khan",
+  "wikipediaId": "Q184885",
+  "name": "Kareena Kapoor Khan",
+  "fullName": "Kareena Kapoor Khan",
+  "profileSummary": "Kareena Kapoor Khan is an Indian actress. She has been known for her leading roles in Hindi cinema since 2000. Kapoor is the recipient of several awards, including six Filmfare Awards, and as of 2024, is one of Hindi cinema's highest-paid actresses.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/29/Kareena_Kapoor_Khan_in_2023_%281%29_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kareena_Kapoor_Khan",
+  "dateOfBirth": "1980-09-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "10",
+  "sunSign": "6",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "model",
+    "dancer"
+  ],
+  "qid": "Q184885",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:34:00.274Z"
+}

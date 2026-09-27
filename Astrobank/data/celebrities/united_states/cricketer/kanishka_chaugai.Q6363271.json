@@ -1,0 +1,26 @@
+{
+  "publicId": "69605a97",
+  "wikipediaSlug": "Kanishka_Chaugai",
+  "wikipediaId": "Q6363271",
+  "name": "Kanishka Chaugai",
+  "fullName": "Kanishka Chaugai",
+  "profileSummary": "Kanishka Chaugai is a Nepalese-born American cricketer, who currently plays for Minor League Cricket team Hollywood Master Blasters in American domestic tournaments. A right-handed batsman and right-arm medium pace bowler, he previously represented for the Nepal national cricket team in 2004.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kanishka_Chaugai",
+  "dateOfBirth": "1986-01-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "3",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6363271",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-08T02:07:00.407Z"
+}

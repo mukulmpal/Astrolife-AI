@@ -1,0 +1,26 @@
+{
+  "publicId": "8accf12a",
+  "wikipediaSlug": "Arjun_Ram_Meghwal",
+  "wikipediaId": "Q4791582",
+  "name": "Arjun Ram Meghwal",
+  "fullName": "Arjun Ram Meghwal",
+  "profileSummary": "Arjun Ram Meghwal is an Indian politician who is serving as the 34th Minister of Law and Justice since 2024.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Shri_Arjun_Ram_Meghwal.jpg/330px-Shri_Arjun_Ram_Meghwal.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arjun_Ram_Meghwal",
+  "dateOfBirth": "1954-12-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.018055555",
+  "birthCoordinatesLng": "73.316944444",
+  "moonSign": "1",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4791582",
+  "birthPlace": "Bikaner",
+  "fetchedAt": "2026-04-07T16:20:26.797Z"
+}

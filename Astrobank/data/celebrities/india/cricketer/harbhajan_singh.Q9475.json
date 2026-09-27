@@ -1,0 +1,30 @@
+{
+  "publicId": "c18efec2",
+  "wikipediaSlug": "Harbhajan_Singh",
+  "wikipediaId": "Q9475",
+  "name": "Harbhajan Singh",
+  "fullName": "Harbhajan Singh",
+  "profileSummary": "Harbhajan Singh, also known by the nickname Bhajji, is a former Indian cricketer. He later became a politician, serving as a Member of Parliament in Rajya Sabha. He is also a film actor, a television celebrity, and a cricket commentator.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Shri_Harbhajan_Singh_2015.jpg/330px-Shri_Harbhajan_Singh_2015.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Harbhajan_Singh",
+  "dateOfBirth": "1980-07-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.325555555",
+  "birthCoordinatesLng": "75.579166666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "politician",
+    "actor"
+  ],
+  "qid": "Q9475",
+  "birthPlace": "Jalandhar",
+  "fetchedAt": "2026-04-07T10:57:45.018Z"
+}

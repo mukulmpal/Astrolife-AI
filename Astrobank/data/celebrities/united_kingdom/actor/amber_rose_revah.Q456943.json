@@ -1,0 +1,27 @@
+{
+  "publicId": "5057330a",
+  "wikipediaSlug": "Amber_Rose_Revah",
+  "wikipediaId": "Q456943",
+  "name": "Amber Rose Revah",
+  "fullName": "Amber Rose Revah",
+  "profileSummary": "Amber Rose Revah is a British actress and writer. She is known for playing Dinah Madani in Marvel's The Punisher.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amber_Rose_Revah",
+  "dateOfBirth": "1986-06-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.507222222",
+  "birthCoordinatesLng": "-0.1275",
+  "moonSign": "10",
+  "sunSign": "3",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q456943",
+  "birthPlace": "London",
+  "fetchedAt": "2026-04-08T00:21:58.837Z"
+}

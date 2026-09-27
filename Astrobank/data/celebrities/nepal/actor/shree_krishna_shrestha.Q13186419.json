@@ -1,0 +1,27 @@
+{
+  "publicId": "9c71b08d",
+  "wikipediaSlug": "Shree_Krishna_Shrestha",
+  "wikipediaId": "Q13186419",
+  "name": "Shree Krishna Shrestha",
+  "fullName": "Shree Krishna Shrestha",
+  "profileSummary": "Shree Krishna Shrestha was a Nepalese actor and producer known for his work in Nepali cinema. He was widely renowned for his talents as an actor, dancer and during his acting career, he was one of the highest paid actors in Nepali cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Shree_Krishna_Shrestha_in_a_2000_Nepali_film_Gorkhali.png/330px-Shree_Krishna_Shrestha_in_a_2000_Nepali_film_Gorkhali.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shree_Krishna_Shrestha",
+  "dateOfBirth": "1967-04-29",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "9",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q13186419",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:15.831Z"
+}

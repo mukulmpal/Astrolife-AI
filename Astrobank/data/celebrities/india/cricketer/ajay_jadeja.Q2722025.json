@@ -1,0 +1,28 @@
+{
+  "publicId": "bc615159",
+  "wikipediaSlug": "Ajay_Jadeja",
+  "wikipediaId": "Q2722025",
+  "name": "Ajay Jadeja",
+  "fullName": "Ajay Jadeja",
+  "profileSummary": "Ajaysinhji \"Ajay\" Jadeja is an Indian former professional cricketer and crown prince of the Jamnagar royal family. He was a regular member of the Indian cricket team in the One Day International (ODI) format between 1992 and 2000. He played fifteen Test matches and 196 ODIs for India. He also occasionally captained the India national cricket team, and was popular for his flamboyant style of play and charisma. He was part of the Indian squad which won the 1995 Asia Cup. In 2023, Jadeja worked with the Afghanistan cricket team as the team mentor in their World Cup campaign.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Ajay_jadega.jpg/330px-Ajay_jadega.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajay_Jadeja",
+  "dateOfBirth": "1971-02-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.47",
+  "birthCoordinatesLng": "70.07",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q2722025",
+  "birthPlace": "Jamnagar",
+  "fetchedAt": "2026-04-07T10:55:54.960Z"
+}

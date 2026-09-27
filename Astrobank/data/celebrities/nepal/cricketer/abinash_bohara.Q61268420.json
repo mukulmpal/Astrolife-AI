@@ -1,0 +1,26 @@
+{
+  "publicId": "97501fb0",
+  "wikipediaSlug": "Abinash_Bohara",
+  "wikipediaId": "Q61268420",
+  "name": "Abinash Bohara",
+  "fullName": "Abinash Bohara",
+  "profileSummary": "Abinash Bohara is a Nepalese cricketer. He is a right-handed batsman who bowls right arm medium fast.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abinash_Bohara",
+  "dateOfBirth": "1997-07-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.366667",
+  "birthCoordinatesLng": "82.166667",
+  "moonSign": "2",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q61268420",
+  "birthPlace": "Salyan District",
+  "fetchedAt": "2026-04-07T16:51:27.119Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "2c18e13d",
+  "wikipediaSlug": "Kartik_Aaryan",
+  "wikipediaId": "Q6373552",
+  "name": "Kartik Aaryan",
+  "fullName": "Kartik Aaryan",
+  "profileSummary": "Kartik Aaryan is an Indian actor who primarily works in Hindi cinema. He appeared in Forbes India's Celebrity 100 list in 2019, and his accolades include a Filmfare Award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Kartik_Aaryan_in_2025_at_23rd_Zee_Cine_Awards_2025.jpg/330px-Kartik_Aaryan_in_2025_at_23rd_Zee_Cine_Awards_2025.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kartik_Aaryan",
+  "dateOfBirth": "1990-11-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.2125",
+  "birthCoordinatesLng": "78.1775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q6373552",
+  "birthPlace": "Gwalior",
+  "fetchedAt": "2026-04-07T11:29:47.960Z"
+}

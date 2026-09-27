@@ -1,0 +1,30 @@
+{
+  "publicId": "375e1e39",
+  "wikipediaSlug": "Anand_Kumar",
+  "wikipediaId": "Q3532582",
+  "name": "Anand Kumar",
+  "fullName": "Anand Kumar",
+  "profileSummary": "Anand Kumar is an Indian mathematics educator, best known for his Super 30 program, which he started in Patna, Bihar in 2002. He is known for coaching underprivileged students for JEE–Main and JEE–Advanced, the entrance examinations for the Indian Institutes of Technology (IITs). Kumar was named in Time magazine's list of Best of Asia 2010. In 2023, he was awarded the Padma Shri, the country's fourth highest civilian award by the Government of India for his contributions in the fields of literature and education.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/AnandKumarJI1.jpg/330px-AnandKumarJI1.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anand_Kumar",
+  "dateOfBirth": "1973-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.61",
+  "birthCoordinatesLng": "85.141388888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "mathematician",
+    "journalist",
+    "writer"
+  ],
+  "qid": "Q3532582",
+  "birthPlace": "Patna",
+  "fetchedAt": "2026-04-07T16:00:04.963Z"
+}

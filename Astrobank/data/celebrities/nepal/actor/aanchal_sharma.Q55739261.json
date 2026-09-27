@@ -1,0 +1,27 @@
+{
+  "publicId": "c334a0bc",
+  "wikipediaSlug": "Aanchal_Sharma",
+  "wikipediaId": "Q55739261",
+  "name": "Aanchal Sharma",
+  "fullName": "Aanchal Sharma",
+  "profileSummary": "Aanchal Sharma is a Nepalese film actress. She made her acting debut in the film Nai Nabhannu La 4 (2016). In 2018, she appeared in Shatru Gate (2018) and Johny Gentleman. She was also featured in the Hindi music video \"Teri Meri Dastaan\".",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Aanchal_Sharma_%28cropped%29_1.jpg/330px-Aanchal_Sharma_%28cropped%29_1.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aanchal_Sharma",
+  "dateOfBirth": "1998-03-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "8",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q55739261",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:23.419Z"
+}

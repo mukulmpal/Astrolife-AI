@@ -1,0 +1,26 @@
+{
+  "publicId": "c2bcf2ca",
+  "wikipediaSlug": "Seturam_Shrestha",
+  "wikipediaId": "Q7456979",
+  "name": "Seturam Shrestha",
+  "fullName": "Seturam Shrestha",
+  "profileSummary": "Seturam Shrestha (1891-1941) was a Nepalese musician, singer and composer. He was an important figure in the development of modern music in Nepal at the beginning of the 20th century, and has been hailed as an Ustad. In addition to songs of love, Seturam sang songs with messages of social reform.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Seturam_shrestha.jpg/330px-Seturam_shrestha.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Seturam_Shrestha",
+  "dateOfBirth": "1891-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.7075",
+  "birthCoordinatesLng": "85.312222222",
+  "moonSign": "5",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q7456979",
+  "birthPlace": "Asan",
+  "fetchedAt": "2026-04-07T16:48:18.839Z"
+}

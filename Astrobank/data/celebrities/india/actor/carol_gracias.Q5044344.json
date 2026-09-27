@@ -1,0 +1,29 @@
+{
+  "publicId": "8e00f2df",
+  "wikipediaSlug": "Carol_Gracias",
+  "wikipediaId": "Q5044344",
+  "name": "Carol Gracias",
+  "fullName": "Carol Gracias",
+  "profileSummary": "Carol Gracias is an Indian super model. She is a past winner of the coveted India's L'Oréal/Elite Look of the Year title. In 2006, she participated and became the runner-up in the reality show Bigg Boss 1.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Carol_Gracias_at_Nokia_APP_party_04.jpg/330px-Carol_Gracias_at_Nokia_APP_party_04.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Carol_Gracias",
+  "dateOfBirth": "1978-12-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q5044344",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:18.040Z"
+}

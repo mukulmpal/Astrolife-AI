@@ -1,0 +1,27 @@
+{
+  "publicId": "174a0ec8",
+  "wikipediaSlug": "Dichen_Lachman",
+  "wikipediaId": "Q242204",
+  "name": "Dichen Lachman",
+  "fullName": "Dichen Lachman",
+  "profileSummary": "Dichen Lachman is an Australian and Tibetan actress and model. She is best known for her roles as Katya Kinski in the soap opera Neighbours (2005–2007), Sierra in Joss Whedon's science fiction drama series Dollhouse (2009–2010), and Ms. Casey in Severance (2022–present).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/DichenLachman-byPhilipRomano.jpg/330px-DichenLachman-byPhilipRomano.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dichen_Lachman",
+  "dateOfBirth": "1982-02-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "10",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q242204",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:11.267Z"
+}

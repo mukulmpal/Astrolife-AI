@@ -1,0 +1,28 @@
+{
+  "publicId": "a83f4efa",
+  "wikipediaSlug": "Diana_David",
+  "wikipediaId": "Q5271138",
+  "name": "Diana David",
+  "fullName": "Diana David",
+  "profileSummary": "Diana Pilli David is a cricketer who represents India. She is a right hand batswoman and bowls right-arm off-breaks. She has played six ODIs, taking eight wickets.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Diana_David",
+  "dateOfBirth": "1985-03-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "15.82",
+  "birthCoordinatesLng": "80.35",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5271138",
+  "birthPlace": "Chirala",
+  "fetchedAt": "2026-04-07T11:02:57.974Z"
+}

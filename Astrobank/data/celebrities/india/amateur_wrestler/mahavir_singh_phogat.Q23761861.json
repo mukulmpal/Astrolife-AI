@@ -1,0 +1,29 @@
+{
+  "publicId": "014911c1",
+  "wikipediaSlug": "Mahavir_Singh_Phogat",
+  "wikipediaId": "Q23761861",
+  "name": "Mahavir Singh Phogat",
+  "fullName": "Mahavir Singh Phogat",
+  "profileSummary": "Mahavir Singh Phogat is an Indian amateur wrestler, senior Olympics coach and politician. He is the trainer and father of the Phogat sisters. The Hindi biographical film Dangal is loosely based on his life.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Mahavir_Singh_Phogat_at_the_special_screening_of_%E2%80%98Dangal%E2%80%99.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mahavir_Singh_Phogat",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.7833",
+  "birthCoordinatesLng": "76.1333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "amateur wrestler",
+    "coach"
+  ],
+  "qid": "Q23761861",
+  "birthPlace": "Bhiwani district",
+  "fetchedAt": "2026-04-07T11:30:01.268Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "c39f2a63",
+  "wikipediaSlug": "Bharat_Agnihotri",
+  "wikipediaId": "Q4901094",
+  "name": "Bharat Agnihotri",
+  "fullName": "Bharat Agnihotri",
+  "profileSummary": "Bharat Agnihotri is a Canadian politician and a former member of the Legislative Assembly of Alberta. He represented the constituency of Edmonton-Ellerslie, sitting as a Liberal. He was elected in the 2004 election, but was defeated in the 2008 election.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bharat_Agnihotri",
+  "dateOfBirth": "1953-04-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": "10",
+  "sunSign": "12",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4901094",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-08T00:52:05.748Z"
+}

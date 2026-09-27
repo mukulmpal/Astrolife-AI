@@ -1,0 +1,27 @@
+{
+  "publicId": "a810f641",
+  "wikipediaSlug": "Nisha_Adhikari",
+  "wikipediaId": "Q7040240",
+  "name": "Nisha Adhikari",
+  "fullName": "Nisha Adhikari",
+  "profileSummary": "Nisha Adhikari Malla is a Nepalese film actress and model.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Nisha_Adhikari_in_Sonoma_2016_-_Stierch_04.jpg/330px-Nisha_Adhikari_in_Sonoma_2016_-_Stierch_04.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nisha_Adhikari",
+  "dateOfBirth": "1986-10-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "6",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q7040240",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:05.434Z"
+}

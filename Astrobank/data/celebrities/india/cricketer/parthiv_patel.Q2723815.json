@@ -1,0 +1,28 @@
+{
+  "publicId": "32514708",
+  "wikipediaSlug": "Parthiv_Patel",
+  "wikipediaId": "Q2723815",
+  "name": "Parthiv Patel",
+  "fullName": "Parthiv Patel",
+  "profileSummary": "Parthiv Ajay Patel is a former Indian professional cricketer, wicketkeeper-batsman, who played for the Indian national cricket team. He is a left-handed batsman and played for Gujarat in domestic cricket. Having lost a finger at the age of 6, he initially found it hard to keep wickets, but after enough practice, he got used to it. When Patel played for the Indian team in 2002, he became the youngest wicket-keeper to represent a country in Tests. He was a part of the Indian squad which won the 2016 Asia Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Parthiv_Patel.jpg/330px-Parthiv_Patel.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Parthiv_Patel",
+  "dateOfBirth": "1985-03-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.021944444",
+  "birthCoordinatesLng": "72.579722222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q2723815",
+  "birthPlace": "Ahmedabad",
+  "fetchedAt": "2026-04-07T10:58:12.991Z"
+}

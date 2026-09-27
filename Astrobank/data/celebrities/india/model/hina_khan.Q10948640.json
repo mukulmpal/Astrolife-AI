@@ -1,0 +1,30 @@
+{
+  "publicId": "04eee45d",
+  "wikipediaSlug": "Hina_Khan",
+  "wikipediaId": "Q10948640",
+  "name": "Hina Khan",
+  "fullName": "Hina Khan",
+  "profileSummary": "Hina Khan is an Indian actress who appears in Hindi and Punjabi films and television. Khan is noted for her versatility across genres—from family dramas and reality shows to psychological thrillers. One of the highest-paid television actresses in India, she is a recipient of several accolades including three ITA Awards, three Indian Telly Awards and seven Gold Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/73/Hina_Khan_walk_the_ramp_at_Lakme_Fashion_Week_2023_%28cropped%29_2.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hina_Khan",
+  "dateOfBirth": "1987-10-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "34.091111111",
+  "birthCoordinatesLng": "74.806111111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q10948640",
+  "birthPlace": "Srinagar",
+  "fetchedAt": "2026-04-07T12:19:11.797Z"
+}

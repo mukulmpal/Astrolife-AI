@@ -1,0 +1,29 @@
+{
+  "publicId": "b66fdd34",
+  "wikipediaSlug": "Diljit_Dosanjh",
+  "wikipediaId": "Q5276830",
+  "name": "Diljit Dosanjh",
+  "fullName": "Diljit Dosanjh",
+  "profileSummary": "Diljit Dosanjh is an Indian singer, actor and film producer who works in Punjabi and Hindi cinema. Dosanjh entered the Social 50 chart by Billboard in 2020. He has been featured in various music charts, including the Canadian Albums Chart, the UK Asian chart by Official Charts Company and the New Zealand Hot Singles. His films, including Jatt & Juliet 2, Sajjan Singh Rangroot, Honsla Rakh and Jatt & Juliet 3 are among the highest grossing Punjabi films in history.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Diljit_Dosanjh.jpg/330px-Diljit_Dosanjh.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Diljit_Dosanjh",
+  "dateOfBirth": "1984-01-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.1706977",
+  "birthCoordinatesLng": "75.8353239",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "singer"
+  ],
+  "qid": "Q5276830",
+  "birthPlace": "Dosanjh Kalan",
+  "fetchedAt": "2026-04-07T12:17:27.486Z"
+}

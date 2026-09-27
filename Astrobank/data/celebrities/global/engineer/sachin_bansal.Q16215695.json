@@ -1,0 +1,28 @@
+{
+  "publicId": "6934fe5c",
+  "wikipediaSlug": "Sachin_Bansal",
+  "wikipediaId": "Q16215695",
+  "name": "Sachin Bansal",
+  "fullName": "Sachin Bansal",
+  "profileSummary": "Sachin Bansal is an Indian entrepreneur. He is best known as the founder of Flipkart During his over 11 year career at Flipkart, Bansal was CEO and chairman. In 2018, Bansal exited Flipkart following the Walmart deal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Sachin_Bansal_SB.jpg/330px-Sachin_Bansal_SB.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sachin_Bansal",
+  "dateOfBirth": "1981-08-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.736388888",
+  "birthCoordinatesLng": "76.788333333",
+  "moonSign": "6",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "engineer",
+    "entrepreneur",
+    "computer scientist"
+  ],
+  "qid": "Q16215695",
+  "birthPlace": "Chandigarh",
+  "fetchedAt": "2026-04-08T02:03:58.559Z"
+}

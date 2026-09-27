@@ -1,0 +1,30 @@
+{
+  "publicId": "30c361ce",
+  "wikipediaSlug": "Arpan_Thapa",
+  "wikipediaId": "Q21932018",
+  "name": "Arpan Thapa",
+  "fullName": "Arpan Thapa",
+  "profileSummary": "Arpan Thapa is a Nepalese actor, director, and scriptwriter.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Bir_Bikram_%28ARPAN_THAPA%29.jpg/330px-Bir_Bikram_%28ARPAN_THAPA%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arpan_Thapa",
+  "dateOfBirth": "1979-11-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "7",
+  "sunSign": "8",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "film director",
+    "writer",
+    "screenwriter"
+  ],
+  "qid": "Q21932018",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:22.309Z"
+}

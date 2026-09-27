@@ -1,0 +1,26 @@
+{
+  "publicId": "064eb815",
+  "wikipediaSlug": "William_Nanda_Bissell",
+  "wikipediaId": "Q62088395",
+  "name": "William Nanda Bissell",
+  "fullName": "William Nanda Bissell",
+  "profileSummary": "William Nanda Bissell an Indian businessman and the chairman of Fabindia. Until 2018, Bissell served as the managing director of the company.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/William_Nanda_Bissell",
+  "dateOfBirth": "1966-06-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": "11",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q62088395",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-08T02:04:46.085Z"
+}

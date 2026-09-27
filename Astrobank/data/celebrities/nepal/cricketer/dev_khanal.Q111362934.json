@@ -1,0 +1,26 @@
+{
+  "publicId": "b7bd375f",
+  "wikipediaSlug": "Dev_Khanal",
+  "wikipediaId": "Q111362934",
+  "name": "Dev Khanal",
+  "fullName": "Dev Khanal",
+  "profileSummary": "Dev Khanal is a Nepalese cricketer and former captain of the Nepal national under-19 cricket team.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Dev-khanal-dk_%28cropped%29.jpg/330px-Dev-khanal-dk_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dev_Khanal",
+  "dateOfBirth": "2005-05-29",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "10",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q111362934",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:50:20.142Z"
+}

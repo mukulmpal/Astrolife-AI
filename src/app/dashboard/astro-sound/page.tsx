@@ -1086,7 +1086,7 @@ export default function AstroSoundPage() {
 
       <style jsx global>{`
         body {
-          background: #05020f;
+          background: #FAF7F2;
         }
 
         .as-shell {
@@ -1096,7 +1096,7 @@ export default function AstroSoundPage() {
           background:
             radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 30%),
             radial-gradient(circle at top right, rgba(245, 197, 66, 0.14), transparent 28%),
-            #05020f;
+            #FAF7F2;
           font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 

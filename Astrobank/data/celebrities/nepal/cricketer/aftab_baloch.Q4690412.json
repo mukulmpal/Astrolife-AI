@@ -1,0 +1,26 @@
+{
+  "publicId": "c1e861f5",
+  "wikipediaSlug": "Aftab_Baloch",
+  "wikipediaId": "Q4690412",
+  "name": "Aftab Baloch",
+  "fullName": "Aftab Baloch",
+  "profileSummary": "Aftab Baloch was a Pakistani cricketer.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aftab_Baloch",
+  "dateOfBirth": "1953-04-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "24.86",
+  "birthCoordinatesLng": "67.01",
+  "moonSign": "7",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4690412",
+  "birthPlace": "Karachi",
+  "fetchedAt": "2026-04-07T16:51:28.363Z"
+}

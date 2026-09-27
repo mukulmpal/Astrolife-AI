@@ -1,0 +1,31 @@
+{
+  "publicId": "e125554b",
+  "wikipediaSlug": "Agam_Darshi",
+  "wikipediaId": "Q514903",
+  "name": "Agam Darshi",
+  "fullName": "Agam Darshi",
+  "profileSummary": "Agam Darshi is a British-born Canadian actress best known for her role as Kate Freelander in the science fiction series Sanctuary.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Agam_Darshi.jpg/330px-Agam_Darshi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Agam_Darshi",
+  "dateOfBirth": "1987-12-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "52.48",
+  "birthCoordinatesLng": "-1.9025",
+  "moonSign": "10",
+  "sunSign": "9",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "film director",
+    "television actor",
+    "director",
+    "visual artist"
+  ],
+  "qid": "Q514903",
+  "birthPlace": "Birmingham",
+  "fetchedAt": "2026-04-08T00:52:08.903Z"
+}

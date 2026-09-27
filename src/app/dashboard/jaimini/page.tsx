@@ -122,7 +122,7 @@ export default function JaiminiPage() {
   if (loading) {
     return (
       <div className="page" style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"60vh"}}>
-        <p style={{color:"#605890"}}>Loading Jaimini...</p>
+        <p style={{color:"#6B635B"}}>Loading Jaimini...</p>
       </div>
     );
   }
@@ -130,7 +130,7 @@ export default function JaiminiPage() {
   if (!chart || !jaimini) {
     return (
       <div className="page" style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"60vh"}}>
-        <p style={{color:"#605890"}}>Birth chart required for Jaimini analysis.</p>
+        <p style={{color:"#6B635B"}}>Birth chart required for Jaimini analysis.</p>
       </div>
     );
   }
@@ -159,10 +159,10 @@ export default function JaiminiPage() {
             <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#c8a030", marginBottom: 6 }}>
               Executive summary
             </div>
-            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, color: "#f0e8d0" }}>
+            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, color: "#1A1A1A" }}>
               {birth.name || chart.name}
             </div>
-            <div style={{ fontSize: 13, color: "#605890", marginTop: 4 }}>
+            <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
               Lagna {chart.lagnaRashi}
               {ak ? ` · Atmakaraka ${ak.planet} in ${ak.sign}` : ""}
               {jaimini.currentDasha ? ` · Chara Dasha ${jaimini.currentDasha.sign}` : ""}
@@ -171,7 +171,7 @@ export default function JaiminiPage() {
         </div>
 
         <div className="summary-strip" style={{ lineHeight: 1.8 }}>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#c8c0a8" }}>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#4A4238" }}>
             <li>Chara Karakas rank planets by degree — the Atmakaraka shows soul-level purpose.</li>
             <li>Arudha Padas reveal how others perceive your career, marriage, and status houses.</li>
             <li>Chara Dasha times events by sign periods; pair with D1 transits for dating windows.</li>
@@ -182,23 +182,23 @@ export default function JaiminiPage() {
           <div className="card-tag">Plain-English Guidance</div>
           <div className="card-title serif">How To Use This Jaimini Reading</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
-            <div style={{ border: "1px solid #1c1840", borderRadius: 12, padding: 14, background: "rgba(255,255,255,0.025)" }}>
+            <div style={{ border: "1px solid #FFFFFF", borderRadius: 12, padding: 14, background: "rgba(255,255,255,0.025)" }}>
               <div style={{ fontSize: 11, color: "#c8a030", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Soul Role</div>
-              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
                 {ak ? `${ak.planet} as Atmakaraka shows the central life lesson: ${ak.meaning}` : "Atmakaraka shows the soul lesson once chart data is available."}
               </p>
             </div>
-            <div style={{ border: "1px solid #1c1840", borderRadius: 12, padding: 14, background: "rgba(255,255,255,0.025)" }}>
+            <div style={{ border: "1px solid #FFFFFF", borderRadius: 12, padding: 14, background: "rgba(255,255,255,0.025)" }}>
               <div style={{ fontSize: 11, color: "#c8a030", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Current Phase</div>
-              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
                 {jaimini.currentDasha
                   ? `${jaimini.currentDasha.sign} Chara Dasha is active. Watch decisions, public visibility, relationship themes and career movement connected to this sign.`
                   : "Current Chara Dasha shows which sign is steering life events right now."}
               </p>
             </div>
-            <div style={{ border: "1px solid #1c1840", borderRadius: 12, padding: 14, background: "rgba(255,255,255,0.025)" }}>
+            <div style={{ border: "1px solid #FFFFFF", borderRadius: 12, padding: 14, background: "rgba(255,255,255,0.025)" }}>
               <div style={{ fontSize: 11, color: "#c8a030", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>What To Do</div>
-              <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: 0 }}>
                 Use Jaimini for identity, visibility, marriage image and life-direction timing. Confirm exact outcomes with D1, D9, Dasha and transits before acting.
               </p>
             </div>

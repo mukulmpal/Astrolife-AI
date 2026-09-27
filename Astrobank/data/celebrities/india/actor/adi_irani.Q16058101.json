@@ -1,0 +1,28 @@
+{
+  "publicId": "eab6e6b4",
+  "wikipediaSlug": "Adi_Irani",
+  "wikipediaId": "Q16058101",
+  "name": "Adi Irani",
+  "fullName": "Adi Irani",
+  "profileSummary": "Adi Irani is an Indian actor who has worked in Bollywood films. He also did the role of V. P. Menon in 2013 TV show Pradhanmantri. He is brother of director-producer Indra Kumar and Bollywood actress Aruna Irani. He has also acted in TV serials like Yahaaan Main Ghar Ghar Kheli, Ssshhhh...Phir Koi Hai.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Adi_Irani",
+  "dateOfBirth": "1939-10-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "2",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor",
+    "film director"
+  ],
+  "qid": "Q16058101",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:56.906Z"
+}

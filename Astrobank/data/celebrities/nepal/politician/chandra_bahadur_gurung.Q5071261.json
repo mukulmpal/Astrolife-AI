@@ -1,0 +1,28 @@
+{
+  "publicId": "eebb8d8b",
+  "wikipediaSlug": "Chandra_Bahadur_Gurung",
+  "wikipediaId": "Q5071261",
+  "name": "Chandra Bahadur Gurung",
+  "fullName": "Chandra Bahadur Gurung",
+  "profileSummary": "Chandra Bahadur Gurung is a Nepalese politician, belonging to the Communist Party of Nepal. In the 2008 Constituent Assembly election he was elected from the Mustang-1 constituency, winning 2456 votes.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chandra_Bahadur_Gurung",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q5071261",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:53:41.426Z"
+}

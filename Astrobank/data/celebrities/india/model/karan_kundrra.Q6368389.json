@@ -1,0 +1,30 @@
+{
+  "publicId": "356c57da",
+  "wikipediaSlug": "Karan_Kundrra",
+  "wikipediaId": "Q6368389",
+  "name": "Karan Kundrra",
+  "fullName": "Karan Kundrra",
+  "profileSummary": "Karan Kundrra is an Indian actor who works in Hindi-language television and films. One of the highest-paid television actors in India, he made his acting debut with Ekta Kapoor's popular television show Kitani Mohabbat Hai (2009).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Karan_Kundrra_at_Bollywood_Hungama_Style_Icons_Awards_2023.jpg/330px-Karan_Kundrra_at_Bollywood_Hungama_Style_Icons_Awards_2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Karan_Kundrra",
+  "dateOfBirth": "1984-10-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.325555555",
+  "birthCoordinatesLng": "75.579166666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q6368389",
+  "birthPlace": "Jalandhar",
+  "fetchedAt": "2026-04-07T12:19:08.503Z"
+}

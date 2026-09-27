@@ -52,7 +52,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
     const toY = (score: number) => T + plotH - (clamp(score, 0, 100) / 100) * plotH;
 
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#08051a";
+    ctx.fillStyle = "#FAF7F2";
     ctx.fillRect(0, 0, W, H);
 
     ctx.save();
@@ -131,7 +131,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
       ctx.fillStyle = isPeak ? "#22c55e" : isLow ? "#ef4444" : point.color;
       ctx.fill();
       ctx.lineWidth = isPeak || isLow ? 3 : 1.5;
-      ctx.strokeStyle = "#f0e8d0";
+      ctx.strokeStyle = "#1A1A1A";
       ctx.stroke();
     });
 
@@ -151,7 +151,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
       ctx.font = "bold 13px Outfit, sans-serif";
       const textW = ctx.measureText(label).width + 24;
       const x = clamp(point.x - textW / 2, L + 4, L + chartW - textW - 4);
-      ctx.fillStyle = "rgba(8,5,26,0.88)";
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.strokeStyle = `${color}88`;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
@@ -182,7 +182,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
       ctx.fillStyle = band.color;
       ctx.font = `bold ${compact ? 12 : 13}px Outfit, sans-serif`;
       ctx.fillText(`${mdShort}/${adShort}`, labelX, 30);
-      ctx.fillStyle = "#8f82c8";
+      ctx.fillStyle = "#6B635B";
       ctx.font = `${compact ? 10 : 11}px Outfit, sans-serif`;
       ctx.fillText(`(${band.start.getFullYear()}-${band.end.getFullYear()})`, labelX, 49);
       ctx.restore();
@@ -190,13 +190,13 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
 
     scoreTicks.forEach((score) => {
       const y = toY(score);
-      ctx.fillStyle = "#8f82c8";
+      ctx.fillStyle = "#6B635B";
       ctx.font = "10.5px Outfit, sans-serif";
       ctx.textAlign = "right";
       ctx.fillText(`${score}%`, L - 12, y + 4);
     });
 
-    ctx.strokeStyle = "rgba(96,88,144,0.28)";
+    ctx.strokeStyle = "rgba(184,134,11,0.22)";
     ctx.beginPath();
     ctx.moveTo(L, axisTop);
     ctx.lineTo(L + chartW, axisTop);
@@ -206,7 +206,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
     const endYear = selectedMd.end.getFullYear();
     for (let year = startYear; year <= endYear; year += 1) {
       const x = toX(new Date(year, 0, 1));
-      ctx.strokeStyle = "rgba(200,192,168,0.28)";
+      ctx.strokeStyle = "rgba(184,134,11,0.22)";
       ctx.beginPath();
       ctx.moveTo(x, axisTop);
       ctx.lineTo(x, axisTop + 18);
@@ -225,12 +225,12 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
       ctx.font = "bold 13px Outfit, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(String(band.start.getFullYear()), x, axisTop + 50);
-      ctx.fillStyle = "#8f82c8";
+      ctx.fillStyle = "#6B635B";
       ctx.font = "11px Outfit, sans-serif";
       ctx.fillText(`${PLANET_SHORT[selectedMd.planet] ?? selectedMd.planet}/${PLANET_SHORT[band.adPlanet] ?? band.adPlanet}`, x, axisTop + 66);
     });
 
-    ctx.fillStyle = "#8f82c8";
+    ctx.fillStyle = "#6B635B";
     ctx.font = "12px Outfit, sans-serif";
     ctx.textAlign = "left";
     ctx.fillText("Score trend line · same scale as AD intelligence", L, H - 14);
@@ -241,7 +241,7 @@ function AntardashaFlowCanvas({ selectedMd, adResult }: { selectedMd: DashaBand;
   }, [selectedMd, adResult]);
 
   return (
-    <div style={{width:"100%",borderRadius:8,background:"#08051a",border:"1px solid #1c1840",padding:14,overflowX:"auto"}}>
+    <div style={{width:"100%",borderRadius:8,background:"#FFFFFF",border:"1px solid rgba(184,134,11,0.22)",padding:14,overflowX:"auto",boxShadow:"0 4px 20px rgba(184,134,11,0.05)"}}>
       <canvas
         ref={canvasRef}
         width={1600}
@@ -278,7 +278,7 @@ export default function DestinyPage() {
     const ctx = canvas.getContext("2d"); if(!ctx) return;
     const W=canvas.width, H=canvas.height;
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle="#08051a"; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="#FAF7F2"; ctx.fillRect(0,0,W,H);
 
     const maxAge=90, L=48, R=16, T=16, B=32;
     const chartW=W-L-R, chartH=H-T-B;
@@ -288,7 +288,7 @@ export default function DestinyPage() {
     [20,30,40,50,60,70,80,90].forEach(v=>{
       const y=T+chartH-(v/100*chartH);
       ctx.beginPath(); ctx.moveTo(L,y); ctx.lineTo(W-R,y); ctx.stroke();
-      ctx.fillStyle="#3a3060"; ctx.font="9px Outfit,sans-serif";
+      ctx.fillStyle="#6B635B"; ctx.font="9px Outfit,sans-serif";
       ctx.textAlign="right"; ctx.fillText(v+"%",L-4,y+3);
     });
     [0,10,20,30,40,50,60,70,80,90].forEach(a=>{
@@ -296,7 +296,7 @@ export default function DestinyPage() {
       const baseYear = result.points[0]?.year;
       const axisYear = result.points.find((point) => point.age === a)?.year ?? (typeof baseYear === "number" ? baseYear + a : a);
       ctx.beginPath(); ctx.moveTo(x,T); ctx.lineTo(x,T+chartH); ctx.stroke();
-      ctx.fillStyle="#3a3060"; ctx.font="9px Outfit,sans-serif";
+      ctx.fillStyle="#6B635B"; ctx.font="9px Outfit,sans-serif";
       ctx.textAlign="center";
       ctx.fillText(String(axisYear),x,H-4);
     });
@@ -374,8 +374,8 @@ export default function DestinyPage() {
         <div className="header-orb"/>
         <div style={{position:"relative",zIndex:1}}>
           <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#c8a030",marginBottom:6}}>📈 Destiny Analysis</div>
-          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#f0e8d0"}}>{birth.name}</div>
-          <div style={{fontSize:13,color:"#605890",marginTop:4}}>Age {result.currentAge} · {result.currentDasha} Mahadasha · Score {result.currentScore}%</div>
+          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#1A1A1A"}}>{birth.name}</div>
+          <div style={{fontSize:13,color:"#6B635B",marginTop:4}}>Age {result.currentAge} · {result.currentDasha} Mahadasha · Score {result.currentScore}%</div>
         </div>
         <div style={{display:"flex",gap:12,flexWrap:"wrap",position:"relative",zIndex:1}}>
           <div className="hstat">
@@ -410,7 +410,7 @@ export default function DestinyPage() {
             <div className="card-title serif">Your Life Score Timeline</div>
             <canvas ref={canvasRef} width={760} height={300}
               style={{width:"100%",height:"auto",borderRadius:8}}/>
-            <div style={{display:"flex",gap:16,marginTop:12,flexWrap:"wrap",fontSize:11,color:"#605890"}}>
+            <div style={{display:"flex",gap:16,marginTop:12,flexWrap:"wrap",fontSize:11,color:"#6B635B"}}>
               <span style={{color:"#c8a030"}}>━ Life Score</span>
               <span style={{color:"#22c55e"}}>━ Current Age</span>
               <span>Colored bands = Mahadasha periods</span>
@@ -425,10 +425,10 @@ export default function DestinyPage() {
               <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:36,fontWeight:700,color:"#c8a030",lineHeight:1,marginBottom:4}}>
                 {result.peak?.score}%
               </div>
-              <div style={{fontSize:13,color:"#605890"}}>
+              <div style={{fontSize:13,color:"#6B635B"}}>
                 {result.peak?.start.getFullYear()} – {result.peak?.end.getFullYear()}
               </div>
-              <div style={{fontSize:12,color:"#c8c0a8",marginTop:8,lineHeight:1.7}}>
+              <div style={{fontSize:12,color:"#4A4238",marginTop:8,lineHeight:1.7}}>
                 This is your highest scoring Mahadasha period. Maximum energy, opportunities, and life force are available. Plan important milestones in this window.
               </div>
             </div>
@@ -438,10 +438,10 @@ export default function DestinyPage() {
               <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:36,fontWeight:700,color:"#ef4444",lineHeight:1,marginBottom:4}}>
                 {result.challenge?.score}%
               </div>
-              <div style={{fontSize:13,color:"#605890"}}>
+              <div style={{fontSize:13,color:"#6B635B"}}>
                 {result.challenge?.start.getFullYear()} – {result.challenge?.end.getFullYear()}
               </div>
-              <div style={{fontSize:12,color:"#c8c0a8",marginTop:8,lineHeight:1.7}}>
+              <div style={{fontSize:12,color:"#4A4238",marginTop:8,lineHeight:1.7}}>
                 This period requires extra patience and preparation. Focus on inner work, remedies, and building foundations rather than expecting quick results.
               </div>
             </div>
@@ -458,7 +458,7 @@ export default function DestinyPage() {
                 <div className="card-tag">✦ {d.role} Driver</div>
                 <div className="card-title serif">{d.planet}</div>
                 <span className={`badge ${d.tone==="support"?"badge-green":d.tone==="caution"?"badge-red":"badge-gold"}`}>{d.tone}</span>
-                <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,marginTop:10}}>{d.message}</div>
+                <div style={{fontSize:12,color:"#4A4238",lineHeight:1.75,marginTop:10}}>{d.message}</div>
               </div>
             ))}
           </div>
@@ -467,11 +467,11 @@ export default function DestinyPage() {
             <div className="card-tag">✦ Next 5 Years</div>
             <div className="card-title serif">Milestone Watch</div>
             {result.nextMilestones.map(m=>(
-              <div key={`${m.year}-${m.age}`} style={{display:"flex",gap:12,alignItems:"center",padding:"9px 0",borderBottom:"1px solid #1c1840"}}>
+              <div key={`${m.year}-${m.age}`} style={{display:"flex",gap:12,alignItems:"center",padding:"9px 0",borderBottom:"1px solid #FFFFFF"}}>
                 <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,fontWeight:700,color:m.trend==="rise"?"#22c55e":m.trend==="dip"?"#ef4444":"#c8a030",width:48}}>{m.score}</div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:12,fontWeight:600,color:"#f0e8d0"}}>Age {m.age} · {m.year} · {m.trend}</div>
-                  <div style={{fontSize:11,color:"#605890",lineHeight:1.6}}>{m.message}</div>
+                  <div style={{fontSize:12,fontWeight:600,color:"#1A1A1A"}}>Age {m.age} · {m.year} · {m.trend}</div>
+                  <div style={{fontSize:11,color:"#6B635B",lineHeight:1.6}}>{m.message}</div>
                 </div>
               </div>
             ))}
@@ -481,7 +481,7 @@ export default function DestinyPage() {
             <div className="card-tag">✦ Action Plan</div>
             <div className="card-title serif">Current Dasha Guidance</div>
             {result.actionPlan.map((line,i)=>(
-              <div key={i} style={{fontSize:12,color:"#c8c0a8",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.actionPlan.length-1?"none":"1px solid #1c1840"}}>
+              <div key={i} style={{fontSize:12,color:"#4A4238",lineHeight:1.75,padding:"7px 0",borderBottom:i===result.actionPlan.length-1?"none":"1px solid #FFFFFF"}}>
                 {i+1}. {line}
               </div>
             ))}
@@ -496,7 +496,7 @@ export default function DestinyPage() {
             {result.areas.map(a=>(
               <div key={a.name} className="card" style={{borderColor:`${a.color}33`,textAlign:"center"}}>
                 <div style={{fontSize:32,marginBottom:8}}>{a.icon}</div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:"#f0e8d0",marginBottom:8}}>{a.name}</div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:"#1A1A1A",marginBottom:8}}>{a.name}</div>
                 <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:44,fontWeight:700,color:a.color,lineHeight:1,marginBottom:4}}>
                   {a.score}
                 </div>
@@ -515,11 +515,11 @@ export default function DestinyPage() {
             <div className="card-tag">✦ Life Areas Interpretation</div>
             <div className="card-title serif">What Each Score Means</div>
             {result.areas.map(a=>(
-              <div key={a.name} style={{padding:"10px 0",borderBottom:"1px solid #1c1840",display:"flex",gap:12,alignItems:"center"}}>
+              <div key={a.name} style={{padding:"10px 0",borderBottom:"1px solid rgba(184,134,11,0.18)",display:"flex",gap:12,alignItems:"center"}}>
                 <span style={{fontSize:20,width:28}}>{a.icon}</span>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:13,fontWeight:500,color:"#f0e8d0",marginBottom:2}}>{a.name}</div>
-                  <div style={{fontSize:11,color:"#605890"}}>
+                  <div style={{fontSize:14,fontWeight:600,color:"#1A1A1A",marginBottom:2}}>{a.name}</div>
+                  <div style={{fontSize:12,color:"#6B635B"}}>
                     {a.status==="Strong"
                       ? `${a.name} is strongly supported. Current dasha activates this area positively.`
                       : a.status==="Average"
@@ -541,11 +541,11 @@ export default function DestinyPage() {
             <div>
               <div className="card-tag">✦ Mahadasha - Antardasha Destiny Chart</div>
               <div className="card-title serif">Life Periods Scored</div>
-              <div style={{fontSize:12,color:"#605890",lineHeight:1.6}}>
+              <div style={{fontSize:13,color:"#6B635B",lineHeight:1.6}}>
                 View the full Mahadasha map, then open any MD to see its Antardasha sequence with start year, end year and confidence score.
               </div>
             </div>
-            <div style={{display:"flex",gap:8,background:"#08051a",border:"1px solid #1c1840",borderRadius:8,padding:4}}>
+            <div style={{display:"flex",gap:8,background:"#F5EFE3",border:"1px solid rgba(184,134,11,0.22)",borderRadius:8,padding:4}}>
               <button className={`tab ${dashaView==="md"?"active":""}`} style={{padding:"8px 12px"}} onClick={()=>setDashaView("md")}>MD Chart</button>
               <button className={`tab ${dashaView==="ad"?"active":""}`} style={{padding:"8px 12px"}} onClick={()=>setDashaView("ad")}>MD - AD Chart</button>
             </div>
@@ -564,28 +564,28 @@ export default function DestinyPage() {
                       width:"100%",
                       textAlign:"left",
                       cursor:"pointer",
-                      borderColor:isSelected?`${b.color}88`:isNow?`${b.color}55`:"#1c1840",
+                      borderColor:isSelected?`${b.color}88`:isNow?`${b.color}55`:"rgba(184,134,11,0.22)",
                       background:isSelected?`${b.color}12`:undefined,
                     }}
                     onClick={()=>{ setSelectedMdIndex(i); setDashaView("ad"); }}
                   >
-                    <div style={{width:8,height:8,borderRadius:"50%",background:isNow?b.color:"#1c1840",flexShrink:0,
+                    <div style={{width:8,height:8,borderRadius:"50%",background:isNow?b.color:"rgba(184,134,11,0.22)",flexShrink:0,
                       boxShadow:isNow?`0 0 8px ${b.color}88`:"none"}}/>
                     <span style={{fontSize:13,fontWeight:600,color:b.color,width:24}}>{PLANET_SHORT[b.planet] ?? b.planet.slice(0,2)}</span>
                     <div style={{flex:1}}>
-                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600,color:isNow?b.color:"#c8c0a8"}}>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,fontWeight:600,color:isNow?b.color:"#1A1A1A"}}>
                         {b.planet} Mahadasha
                       </div>
-                      <div style={{fontSize:11,color:"#605890"}}>
+                      <div style={{fontSize:12,color:"#6B635B"}}>
                         Age {Math.round(b.startAge)} - {Math.round(b.endAge)} · {formatPeriodDate(b.start)} - {formatPeriodDate(b.end)}
                       </div>
-                      <div style={{fontSize:10,color:"#8f82c8",marginTop:3}}>
+                      <div style={{fontSize:11,color:"#B8860B",marginTop:3,fontWeight:600}}>
                         Click to open {b.planet} MD antardasha chart
                       </div>
                     </div>
                     <div style={{textAlign:"right"}}>
                       <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,fontWeight:700,
-                        color:b.score>=70?"#22c55e":b.score>=50?"#c8a030":"#ef4444"}}>{b.score}%</div>
+                        color:b.score>=70?"#22c55e":b.score>=50?"#B8860B":"#ef4444"}}>{b.score}%</div>
                       {isNow&&<div style={{fontSize:10,color:"#22c55e",fontWeight:600}}>ACTIVE</div>}
                     </div>
                   </button>
@@ -610,13 +610,13 @@ export default function DestinyPage() {
               </div>
 
               <div style={{display:"flex",flexDirection:"column",gap:14}}>
-                <div style={{background:"#08051a",border:"1px solid #1c1840",borderRadius:8,padding:14,overflow:"hidden"}}>
+                <div style={{background:"#FFFFFF",border:"1px solid rgba(184,134,11,0.22)",borderRadius:12,padding:16,boxShadow:"0 4px 20px rgba(184,134,11,0.05)"}}>
                   <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",marginBottom:12}}>
                     <div>
-                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,fontWeight:700,color:selectedMd.color}}>
+                      <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,fontWeight:700,color:selectedMd.color}}>
                         {selectedMd.planet} Mahadasha Antardasha Flow
                       </div>
-                      <div style={{fontSize:11,color:"#605890"}}>
+                      <div style={{fontSize:12,color:"#6B635B"}}>
                         {formatPeriodDate(selectedMd.start)} - {formatPeriodDate(selectedMd.end)} · {adResult.bands.length} sub-periods
                       </div>
                     </div>
@@ -627,12 +627,12 @@ export default function DestinyPage() {
                   <AntardashaFlowCanvas selectedMd={selectedMd} adResult={adResult} />
                 </div>
 
-                <div className="card" style={{padding:14}}>
+                <div className="card" style={{padding:16}}>
                   <div className="card-tag">✦ AD Intelligence</div>
-                  <div className="card-title serif" style={{fontSize:20}}>{adResult.mdPlanet} MD</div>
-                  <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7,marginBottom:12}}>{adResult.summary}</div>
+                  <div className="card-title serif" style={{fontSize:22}}>{adResult.mdPlanet} MD</div>
+                  <div style={{fontSize:14,color:"#3D3834",lineHeight:1.7,marginBottom:12}}>{adResult.summary}</div>
                   {adResult.actionPlan.slice(0,3).map((line,i)=>(
-                    <div key={i} style={{fontSize:11,color:"#8f82c8",lineHeight:1.65,padding:"7px 0",borderTop:"1px solid #1c1840"}}>
+                    <div key={i} style={{fontSize:13,color:"#3D3834",lineHeight:1.65,padding:"8px 0",borderTop:"1px solid rgba(184,134,11,0.18)"}}>
                       {i+1}. {line}
                     </div>
                   ))}
@@ -652,10 +652,10 @@ export default function DestinyPage() {
                 ];
 
                 return (
-                  <div className="card" style={{padding:14}}>
+                  <div className="card" style={{padding:16}}>
                     <div className="card-tag">✦ Navtara Map</div>
-                    <div className="card-title serif" style={{fontSize:20}}>Which Planet Is Which Tara?</div>
-                    <div style={{fontSize:12,color:"#605890",lineHeight:1.6,marginBottom:12}}>
+                    <div className="card-title serif" style={{fontSize:22}}>Which Planet Is Which Tara?</div>
+                    <div style={{fontSize:13,color:"#6B635B",lineHeight:1.6,marginBottom:12}}>
                       This shows how the Antardasha planets behave from your birth Moon nakshatra. Kshema and Sampat support stability and resources; Janma is personal and intense; Vipat, Pratyari and Vadha need more caution.
                     </div>
                     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:10}}>
@@ -669,17 +669,17 @@ export default function DestinyPage() {
                             key={`${selectedMd.planet}-${taraName}-navtara`}
                             style={{
                               border:"1px solid",
-                              borderColor:isSupport?"rgba(34,197,94,0.26)":isCaution?"rgba(239,68,68,0.26)":"rgba(200,160,48,0.24)",
-                              background:isSupport?"rgba(34,197,94,0.06)":isCaution?"rgba(239,68,68,0.06)":"rgba(200,160,48,0.06)",
-                              borderRadius:8,
-                              padding:10,
+                              borderColor:isSupport?"rgba(34,197,94,0.3)":isCaution?"rgba(239,68,68,0.3)":"rgba(184,134,11,0.3)",
+                              background:isSupport?"rgba(34,197,94,0.06)":isCaution?"rgba(239,68,68,0.06)":"rgba(184,134,11,0.06)",
+                              borderRadius:10,
+                              padding:12,
                             }}
                           >
                             <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",marginBottom:6}}>
-                              <div style={{fontSize:12,fontWeight:800,color:sample?.navtara?.color ?? "#c8a030"}}>
+                              <div style={{fontSize:13,fontWeight:800,color:sample?.navtara?.color ?? "#B8860B"}}>
                                 {sample?.navtara?.icon ?? "✦"} {taraName}
                               </div>
-                              <span style={{fontSize:10,color:isSupport?"#22c55e":isCaution?"#ef4444":"#c8a030",fontWeight:800}}>
+                              <span style={{fontSize:10,color:isSupport?"#0f6b36":isCaution?"#b91c1c":"#B8860B",fontWeight:800}}>
                                 {isSupport ? "Support" : isCaution ? "Caution" : "Intense"}
                               </span>
                             </div>
@@ -687,14 +687,14 @@ export default function DestinyPage() {
                               {items.map((item) => (
                                 <span
                                   key={`${item.adPlanet}-${item.start.toISOString()}-${taraName}`}
-                                  style={{fontSize:11,fontWeight:700,color:item.color,background:"rgba(8,5,26,0.72)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"4px 7px"}}
+                                  style={{fontSize:11,fontWeight:700,color:item.color,background:"#FFFFFF",border:"1px solid rgba(184,134,11,0.22)",borderRadius:999,padding:"4px 8px"}}
                                   title={`${selectedMd.planet}/${item.adPlanet}: ${formatPeriodDate(item.start)} - ${formatPeriodDate(item.end)}`}
                                 >
                                   {item.adPlanet}
                                 </span>
                               ))}
                             </div>
-                            <div style={{fontSize:10,color:"#8f82c8",lineHeight:1.5,marginTop:8}}>
+                            <div style={{fontSize:11,color:"#6B635B",lineHeight:1.5,marginTop:8}}>
                               {sample?.navtara?.quality ?? "Tara quality unavailable"}
                             </div>
                           </div>
@@ -709,30 +709,30 @@ export default function DestinyPage() {
                 {adResult.bands.map((band)=> {
                   const isCurrent=band.start<=new Date() && new Date()<band.end;
                   return (
-                    <div key={`${band.adPlanet}-${band.start.toISOString()}-card`} className="card" style={{padding:12,borderColor:isCurrent?`${band.color}88`:"#1c1840"}}>
+                    <div key={`${band.adPlanet}-${band.start.toISOString()}-card`} className="card" style={{padding:14,borderColor:isCurrent?`${band.color}88`:"rgba(184,134,11,0.22)"}}>
                       <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",marginBottom:8}}>
                         <div>
-                          <div style={{fontSize:10,color:"#605890",textTransform:"uppercase",letterSpacing:1}}>
+                          <div style={{fontSize:11,color:"#6B635B",textTransform:"uppercase",letterSpacing:1,fontWeight:700}}>
                             {selectedMd.planet} / {band.adPlanet}
                           </div>
-                          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,fontWeight:700,color:band.color}}>
+                          <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,fontWeight:700,color:band.color}}>
                             {band.adPlanet} Antardasha
                           </div>
                         </div>
-                        <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:700,color:band.score>=70?"#22c55e":band.score>=50?"#c8a030":"#ef4444"}}>
+                        <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:700,color:band.score>=70?"#0f6b36":band.score>=50?"#B8860B":"#b91c1c"}}>
                           {band.score}
                         </div>
                       </div>
-                      <div style={{fontSize:11,color:"#605890",marginBottom:8}}>
+                      <div style={{fontSize:12,color:"#6B635B",marginBottom:8}}>
                         {formatPeriodDate(band.start)} - {formatPeriodDate(band.end)} · {band.yrs} yrs
                       </div>
                       <div className="bar-track" style={{marginBottom:8}}>
                         <div className="bar-fill" style={{width:`${band.score}%`,background:band.color}}/>
                       </div>
-                      <div style={{fontSize:11,color:"#c8c0a8",lineHeight:1.6}}>
+                      <div style={{fontSize:12,color:"#3D3834",lineHeight:1.6}}>
                         {band.navtara?.icon} {band.navtara?.taraName} · {band.functionalRole}
                       </div>
-                      {isCurrent && <div style={{fontSize:10,color:"#22c55e",fontWeight:700,marginTop:8}}>ACTIVE NOW</div>}
+                      {isCurrent && <div style={{fontSize:11,color:"#0f6b36",fontWeight:700,marginTop:8}}>ACTIVE NOW</div>}
                     </div>
                   );
                 })}

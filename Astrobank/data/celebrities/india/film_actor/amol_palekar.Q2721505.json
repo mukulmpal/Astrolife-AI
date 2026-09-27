@@ -1,0 +1,30 @@
+{
+  "publicId": "7e123385",
+  "wikipediaSlug": "Amol_Palekar",
+  "wikipediaId": "Q2721505",
+  "name": "Amol Palekar",
+  "fullName": "Amol Palekar",
+  "profileSummary": "Amol Palekar is an Indian actor, director, and producer of Hindi and Marathi cinema. He is also a painter and an author. Palekar was part of the faction in Hindi cinema that popularised 'middle cinema'. His most popular works include Chhoti Si Baat (1975), Chitchor (1976), Bhumika (1977), Baaton Baaton Mein (1979), and Gol Maal (1979).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Amol_Palekar_-_Kolkata_2016-02-04_0749.JPG/330px-Amol_Palekar_-_Kolkata_2016-02-04_0749.JPG",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amol_Palekar",
+  "dateOfBirth": "1944-11-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "11",
+  "sunSign": "8",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "film producer",
+    "screenwriter",
+    "television actor"
+  ],
+  "qid": "Q2721505",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:46.181Z"
+}

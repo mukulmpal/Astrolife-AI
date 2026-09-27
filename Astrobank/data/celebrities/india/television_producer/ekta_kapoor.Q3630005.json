@@ -1,0 +1,31 @@
+{
+  "publicId": "658263e0",
+  "wikipediaSlug": "Ekta_Kapoor",
+  "wikipediaId": "Q3630005",
+  "name": "Ekta Kapoor",
+  "fullName": "Ekta Kapoor",
+  "profileSummary": "Ekta Kapoor is an Indian television and film producer, known for her work in Hindi television and Bollywood cinema. She is the founder of Balaji Telefilms Limited, where she serves as joint managing director and creative head.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Ekta_Kapoor_in_2025.jpg/330px-Ekta_Kapoor_in_2025.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ekta_Kapoor",
+  "dateOfBirth": "1975-06-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "television producer",
+    "film producer",
+    "television actor",
+    "television writer"
+  ],
+  "qid": "Q3630005",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:56.948Z"
+}

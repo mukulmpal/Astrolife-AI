@@ -1,0 +1,28 @@
+{
+  "publicId": "43b17040",
+  "wikipediaSlug": "Jasprit_Bumrah",
+  "wikipediaId": "Q16227998",
+  "name": "Jasprit Bumrah",
+  "fullName": "Jasprit Bumrah",
+  "profileSummary": "Jasprit Jasbirsingh Bumrah is an Indian cricketer who plays for the Indian national team in all three formats of the game and has captained India in Tests and T20Is. He is widely regarded as the greatest fast bowler of his generation. Bumrah became the first bowler to reach the No. 1 position in the ICC Men's Player Rankings across all three formats and the first Indian bowler to take 100 wickets in Tests, One Day Internationals, and Twenty20 Internationals. He represents Gujarat in domestic cricket and the Mumbai Indians in the Indian Premier League (IPL).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Jasprit_Bumrah_in_PMO_New_Delhi.jpg/330px-Jasprit_Bumrah_in_PMO_New_Delhi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jasprit_Bumrah",
+  "dateOfBirth": "1993-12-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.021944444",
+  "birthCoordinatesLng": "72.579722222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q16227998",
+  "birthPlace": "Ahmedabad",
+  "fetchedAt": "2026-04-07T10:57:21.850Z"
+}

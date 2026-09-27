@@ -1,0 +1,28 @@
+{
+  "publicId": "5775fee5",
+  "wikipediaSlug": "Amshuverma",
+  "wikipediaId": "Q2844526",
+  "name": "Amshuverma",
+  "fullName": "Amshuverma",
+  "profileSummary": "Amshuverma or Amshu Verma was a king of Nepal from around 605–621 CE. Initially a feudal lord, he rose to the position of Mahasamanta in about 598 CE when Shivadeva I of the Licchavi dynasty was the ruling monarch and by 604, Shivadeva was reduced to a mere figurehead. He is considered to have died in 621 AD and was succeeded by Udaydeva, the son of Shivadeva I.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/37/Amshuverma.JPG",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amshuverma",
+  "dateOfBirth": "0600-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q2844526",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:54:59.704Z"
+}

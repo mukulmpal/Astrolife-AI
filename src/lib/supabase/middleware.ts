@@ -20,7 +20,28 @@ function getSafeNextPath(value: string | null) {
 }
 
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Never intercept API routes with auth checks in middleware
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
+
+  const hasAuthCookie = request.cookies.getAll().some(
+    (c) => c.name.includes("auth-token") || c.name.startsWith("sb-")
+  );
+
+  if (!hasAuthCookie) {
+    if (isProtectedPath(pathname) || isBillingGatedPath(pathname)) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+      return NextResponse.redirect(url);
+    }
+    return response;
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,11 +62,19 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  if (hasAuthCookie) {
+    try {
+      const timeoutPromise = new Promise<{ data: { user: null } }>((resolve) =>
+        setTimeout(() => resolve({ data: { user: null } }), 3000)
+      );
+      const userRes = await Promise.race([supabase.auth.getUser(), timeoutPromise]);
+      user = userRes.data.user;
+    } catch {
+      user = null;
+    }
+  }
 
-  const pathname = request.nextUrl.pathname;
   const billingEnforced = isBillingEnforced();
 
   if (billingEnforced && isBillingGatedPath(pathname)) {

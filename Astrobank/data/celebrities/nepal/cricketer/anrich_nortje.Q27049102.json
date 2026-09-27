@@ -1,0 +1,26 @@
+{
+  "publicId": "8aac09d8",
+  "wikipediaSlug": "Anrich_Nortje",
+  "wikipediaId": "Q27049102",
+  "name": "Anrich Nortje",
+  "fullName": "Anrich Nortje",
+  "profileSummary": "Anrich Arno Nortje is a South African cricketer. He made his international debut for the South Africa cricket team in March 2019. In July 2020, Nortje was named the newcomer of the year at Cricket South Africa's annual awards ceremony.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anrich_Nortje",
+  "dateOfBirth": "1993-11-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-33.75",
+  "birthCoordinatesLng": "25.4",
+  "moonSign": "9",
+  "sunSign": "8",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q27049102",
+  "birthPlace": "Uitenhage",
+  "fetchedAt": "2026-04-07T16:51:25.123Z"
+}

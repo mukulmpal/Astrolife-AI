@@ -310,7 +310,7 @@ export function PalmistryAnalyzer() {
       import("html2canvas"),
       import("jspdf"),
     ]);
-    const canvas = await html2canvas(reportRef.current, { backgroundColor: "#060410", scale: 2 });
+    const canvas = await html2canvas(reportRef.current, { backgroundColor: "#FAF7F2", scale: 2 });
     const img = canvas.toDataURL("image/png");
     const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [canvas.width, canvas.height] });
     pdf.addImage(img, "PNG", 0, 0, canvas.width, canvas.height);

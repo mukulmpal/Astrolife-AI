@@ -1,0 +1,27 @@
+{
+  "publicId": "ba47d7e0",
+  "wikipediaSlug": "Sonie_Rajbhandari",
+  "wikipediaId": "Q23883481",
+  "name": "Sonie Rajbhandari",
+  "fullName": "Sonie Rajbhandari",
+  "profileSummary": "Sonie Rajbhandari is a Nepalese model and beauty pageant titleholder. She was crowned Miss Nepal International 2014 in 2014. Sonie graduated from Kathmandu University School of Management, with a major in Business Management.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sonie_Rajbhandari",
+  "dateOfBirth": "1989-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.209722222",
+  "birthCoordinatesLng": "83.985277777",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "beauty pageant contestant"
+  ],
+  "qid": "Q23883481",
+  "birthPlace": "Pokhara",
+  "fetchedAt": "2026-04-07T16:45:17.378Z"
+}

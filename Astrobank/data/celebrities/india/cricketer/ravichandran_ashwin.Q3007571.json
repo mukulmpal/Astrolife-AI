@@ -1,0 +1,28 @@
+{
+  "publicId": "85c9f77f",
+  "wikipediaSlug": "Ravichandran_Ashwin",
+  "wikipediaId": "Q3007571",
+  "name": "Ravichandran Ashwin",
+  "fullName": "Ravichandran Ashwin",
+  "profileSummary": "Ravichandran Ashwin is an Indian cricketer. He is a right-arm off spin bowler and a lower order batter. Widely regarded as one of the most prolific spinners of all time, he represented the Indian cricket team and was part of the Indian team that won the 2011 Cricket World Cup and the 2013 Champions Trophy. He represented Tamil Nadu and South Zone in domestic cricket.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/The_Minister_of_State_for_Youth_Affairs_and_Sports_%28Independent_Charge%29%2C_Shri_Sarbananda_Sonowal_conferring_the_Arjuna_Award_on_cricketer_Ravichandran_Ashwin%2C_in_New_Delhi_on_July_31%2C_2015_cropped.jpg/330px-thumbnail.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ravichandran_Ashwin",
+  "dateOfBirth": "1986-09-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3007571",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T10:58:21.735Z"
+}

@@ -1,0 +1,30 @@
+{
+  "publicId": "07826ec1",
+  "wikipediaSlug": "Arzu_Rana_Deuba",
+  "wikipediaId": "Q4802770",
+  "name": "Arzu Rana Deuba",
+  "fullName": "Arzu Rana Deuba",
+  "profileSummary": "Arzu Rana Deuba is a Nepali politician, who previously served as the Minister of Foreign Affairs. She served as the Chairperson of the Parliamentary Committee on Agriculture, Cooperatives and Natural Resources from August 2023 to July 2024.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Arzu_Rana_Deuba_summit_address_%28profile%29.jpg/330px-Arzu_Rana_Deuba_summit_address_%28profile%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arzu_Rana_Deuba",
+  "dateOfBirth": "1962-01-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.6833",
+  "birthCoordinatesLng": "85.3333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "social worker",
+    "activist"
+  ],
+  "qid": "Q4802770",
+  "birthPlace": "Lalitpur",
+  "fetchedAt": "2026-04-07T16:52:51.183Z"
+}

@@ -1,0 +1,33 @@
+{
+  "publicId": "21abc22c",
+  "wikipediaSlug": "Guru_Dutt",
+  "wikipediaId": "Q149136",
+  "name": "Guru Dutt",
+  "fullName": "Guru Dutt",
+  "profileSummary": "Guru Dutt was an Indian film actor, director, producer, choreographer, and writer. He is regarded as one of the greatest filmmakers of Indian cinema. He was heavily influenced by Alfred Hitchcock in his initial films and later was compared with Orson Welles due to his works getting a legitimate amount of prominence amongst the cinephiles.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Guru_Dutt_2025_stamp.jpg/330px-Guru_Dutt_2025_stamp.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Guru_Dutt",
+  "dateOfBirth": "1925-07-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "film producer",
+    "choreographer",
+    "screenwriter",
+    "film editor"
+  ],
+  "qid": "Q149136",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T11:29:32.114Z"
+}

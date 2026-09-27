@@ -1,0 +1,26 @@
+{
+  "publicId": "4bb64589",
+  "wikipediaSlug": "Vinod_Khosla",
+  "wikipediaId": "Q738005",
+  "name": "Vinod Khosla",
+  "fullName": "Vinod Khosla",
+  "profileSummary": "Vinod Khosla is an American billionaire businessman and venture capitalist, though he rejects that title and calls himself a venture assistant used on helping entrepreneurs. He is a co-founder of Sun Microsystems and the founder of Khosla Ventures. Khosla made his wealth from early venture capital investments in areas such as networking, software, and alternative energy technologies. He is considered one of the most successful and influential venture capitalists.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/2024-03-14_SXSW_Vinod-Khosla_08741.jpg/330px-2024-03-14_SXSW_Vinod-Khosla_08741.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Vinod_Khosla",
+  "dateOfBirth": "1955-01-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": "12",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q738005",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-08T02:03:50.161Z"
+}

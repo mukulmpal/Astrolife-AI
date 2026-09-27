@@ -1,0 +1,28 @@
+{
+  "publicId": "8b789e5c",
+  "wikipediaSlug": "Adi_Shankar",
+  "wikipediaId": "Q16223951",
+  "name": "Adi Shankar",
+  "fullName": "Adi Shankar",
+  "profileSummary": "Aditya Shankar is an Indian and American film producer, screenwriter, film director, television program creator, television showrunner, and occasional actor.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Adi_Shankar_cropped.jpg/330px-Adi_Shankar_cropped.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Adi_Shankar",
+  "dateOfBirth": "1985-01-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": "4",
+  "sunSign": "9",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film producer",
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q16223951",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-08T00:00:21.550Z"
+}

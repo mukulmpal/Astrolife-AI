@@ -1,0 +1,31 @@
+{
+  "publicId": "4af21854",
+  "wikipediaSlug": "Jackie_Shroff",
+  "wikipediaId": "Q560178",
+  "name": "Jackie Shroff",
+  "fullName": "Jackie Shroff",
+  "profileSummary": "Jaikishan Kakubhai Saraf, known by his screen name Jackie Shroff, is an Indian actor and former model who primarily works in the Hindi film industry. In a career spanning over four decades, he has appeared in 250 films in multiple languages. He has received several accolades including four Filmfare Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/JackieShroff.jpg/330px-JackieShroff.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jackie_Shroff",
+  "dateOfBirth": "1957-02-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "model",
+    "film producer",
+    "actor"
+  ],
+  "qid": "Q560178",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:17:28.808Z"
+}

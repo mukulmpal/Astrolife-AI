@@ -1,0 +1,28 @@
+{
+  "publicId": "0bce2478",
+  "wikipediaSlug": "Sumi_Khadka",
+  "wikipediaId": "Q7637094",
+  "name": "Sumi Khadka",
+  "fullName": "Sumi Khadka",
+  "profileSummary": "Sumi Khadka is a Nepalese actress and beauty pageant titleholder. She was crowned Miss Nepal 1995.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sumi_Khadka",
+  "dateOfBirth": "1973-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "8",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "beauty pageant contestant"
+  ],
+  "qid": "Q7637094",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:45:27.162Z"
+}

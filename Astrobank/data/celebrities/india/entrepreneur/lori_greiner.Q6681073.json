@@ -1,0 +1,31 @@
+{
+  "publicId": "7829793b",
+  "wikipediaSlug": "Lori_Greiner",
+  "wikipediaId": "Q6681073",
+  "name": "Lori Greiner",
+  "fullName": "Lori Greiner",
+  "profileSummary": "Lori Greiner is an American television personality and entrepreneur. She is known for her QVC show Clever & Unique Creations (2000–present), for which she has been called the \"Queen of QVC\" and additionally being an investor on the reality series Shark Tank (2012–present) on ABC. She has hundreds of inventions and holds over 120 patents. She is the president and founder of For Your Ease Only, Inc.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/LoriGrenier2023.jpg/330px-LoriGrenier2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Lori_Greiner",
+  "dateOfBirth": "1969-12-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "41.881944444",
+  "birthCoordinatesLng": "-87.627777777",
+  "moonSign": "8",
+  "sunSign": "8",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "entrepreneur",
+    "inventor",
+    "investor",
+    "writer",
+    "playwright",
+    "socialite"
+  ],
+  "qid": "Q6681073",
+  "birthPlace": "Chicago",
+  "fetchedAt": "2026-04-07T16:36:17.232Z"
+}

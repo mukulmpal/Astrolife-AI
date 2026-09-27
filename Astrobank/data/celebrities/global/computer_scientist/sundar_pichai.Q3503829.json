@@ -1,0 +1,28 @@
+{
+  "publicId": "224ae629",
+  "wikipediaSlug": "Sundar_Pichai",
+  "wikipediaId": "Q3503829",
+  "name": "Sundar Pichai",
+  "fullName": "Sundar Pichai",
+  "profileSummary": "Pichai Sundararajan, better known as Sundar Pichai, is an Indian–American business executive who has been the CEO of Google since 2015 and the CEO of its parent company Alphabet Inc. since 2019.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Sundar_Pichai_-_2023_%28cropped%29.jpg/330px-Sundar_Pichai_-_2023_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sundar_Pichai",
+  "dateOfBirth": "1972-06-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "9.919661111",
+  "birthCoordinatesLng": "78.119394444",
+  "moonSign": "2",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "computer scientist",
+    "executive",
+    "chief executive officer"
+  ],
+  "qid": "Q3503829",
+  "birthPlace": "Madurai",
+  "fetchedAt": "2026-04-08T02:03:59.680Z"
+}

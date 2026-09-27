@@ -1,0 +1,32 @@
+{
+  "publicId": "edce36a2",
+  "wikipediaSlug": "Annu_Kapoor",
+  "wikipediaId": "Q4769639",
+  "name": "Annu Kapoor",
+  "fullName": "Annu Kapoor",
+  "profileSummary": "Annu Kapoor is an Indian actor, singer, director, radio disc jockey, and television presenter who has appeared in over a hundred films, as well as television series. His career has spanned over 45 years as an actor, producer, director and singer. Besides acting, he also does a Radio show, named Suhaana Safar With Annu Kapoor which is broadcast on 92.7 Big FM. He has won numerous awards in his career, including two National Film Awards, one Filmfare Award and two Indian Television Academy Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Annu_Kapoor.jpg/330px-Annu_Kapoor.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Annu_Kapoor",
+  "dateOfBirth": "1956-02-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.25",
+  "birthCoordinatesLng": "77.416666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "television actor",
+    "film director",
+    "television presenter"
+  ],
+  "qid": "Q4769639",
+  "birthPlace": "Bhopal",
+  "fetchedAt": "2026-04-07T12:17:12.352Z"
+}

@@ -57,7 +57,7 @@ function ScoreRing({ score, max, color }: { score: number; max: number; color: s
   const r = 36, circ = 2 * Math.PI * r;
   return (
     <svg width={88} height={88} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={44} cy={44} r={r} fill="none" stroke="#1c1840" strokeWidth={7} />
+      <circle cx={44} cy={44} r={r} fill="none" stroke="rgba(184,134,11,0.2)" strokeWidth={7} />
       <circle cx={44} cy={44} r={r} fill="none" stroke={color} strokeWidth={7}
         strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
         strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease" }} />
@@ -70,7 +70,7 @@ function MiniRing({ score, max, color, size = 52 }: { score: number; max: number
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#1c1840" strokeWidth={4} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(184,134,11,0.2)" strokeWidth={4} />
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={4}
           strokeDasharray={circ} strokeDashoffset={circ * (1 - score / max)}
           strokeLinecap="round" />
@@ -88,34 +88,34 @@ function KootCard({ k }: { k: KootScore }) {
   const [open, setOpen] = useState(false);
   return (
     <div onClick={() => setOpen(o => !o)} style={{
-      background: "#0d0b24", border: `1px solid ${open ? k.color + "55" : "#1c1840"}`,
+      background: "#FFFFFF", border: `1px solid ${open ? k.color + "55" : "#FFFFFF"}`,
       borderRadius: 12, padding: "14px 16px", cursor: "pointer", transition: "border-color 0.2s",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <MiniRing score={k.points} max={k.maxPoints} color={k.color} />
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, fontWeight: 600, color: "#f0e8d0" }}>{k.name}</span>
-            <span style={{ fontSize: 11, color: "#605890" }}>{k.hindiName}</span>
+            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, fontWeight: 600, color: "#1A1A1A" }}>{k.name}</span>
+            <span style={{ fontSize: 11, color: "#6B635B" }}>{k.hindiName}</span>
             {k.hasDosha && (
               <span style={{ fontSize: 9, fontWeight: 700, background: "rgba(239,68,68,0.15)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 4, padding: "1px 6px" }}>DOSHA</span>
             )}
           </div>
-          <div style={{ fontSize: 11, color: "#605890" }}>{k.meaning}</div>
+          <div style={{ fontSize: 11, color: "#6B635B" }}>{k.meaning}</div>
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 10, color: "#3a3060", fontWeight: 600 }}>{k.points}/{k.maxPoints}</div>
+          <div style={{ fontSize: 10, color: "#6B635B", fontWeight: 600 }}>{k.points}/{k.maxPoints}</div>
           <span style={{
             fontSize: 9, fontWeight: 600, padding: "2px 8px", borderRadius: 10,
             background: k.status === "Excellent" ? "rgba(34,197,94,0.12)" : k.status === "Good" ? "rgba(200,160,48,0.12)" : k.status === "Average" ? "rgba(249,115,22,0.12)" : "rgba(239,68,68,0.12)",
             color: k.color, border: `1px solid ${k.color}33`,
           }}>{k.status}</span>
         </div>
-        <span style={{ fontSize: 10, color: "#3a3060", marginLeft: 4 }}>{open ? "▲" : "▼"}</span>
+        <span style={{ fontSize: 10, color: "#6B635B", marginLeft: 4 }}>{open ? "▲" : "▼"}</span>
       </div>
       {open && (
-        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #1c1840" }}>
-          <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.8, marginBottom: k.hasDosha ? 10 : 0 }}>{k.detail}</div>
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #FFFFFF" }}>
+          <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.8, marginBottom: k.hasDosha ? 10 : 0 }}>{k.detail}</div>
           {k.hasDosha && (
             <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, padding: "8px 12px", fontSize: 11, color: "#ef4444" }}>
               ⚠️ {k.doshaText}
@@ -143,7 +143,7 @@ function PersonForm({
   label, color, value, onChange,
 }: { label: string; color: string; value: PersonInput; onChange: (v: PersonInput) => void }) {
   return (
-    <div style={{ background: "#0d0b24", border: `1px solid ${color}33`, borderRadius: 14, padding: "18px 20px" }}>
+    <div style={{ background: "#FFFFFF", border: `1px solid ${color}33`, borderRadius: 14, padding: "18px 20px" }}>
       <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color, marginBottom: 12 }}>{label}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <input
@@ -151,32 +151,32 @@ function PersonForm({
           value={value.name}
           onChange={e => onChange({ ...value, name: e.target.value })}
           style={{
-            background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 14px",
-            color: "#f0e8d0", fontSize: 13, outline: "none", width: "100%", fontFamily: "Outfit,sans-serif",
+            background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 8, padding: "10px 14px",
+            color: "#1A1A1A", fontSize: 13, outline: "none", width: "100%", fontFamily: "Outfit,sans-serif",
           }}
         />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <div>
-            <div style={{ fontSize: 10, color: "#605890", marginBottom: 4, letterSpacing: "1px" }}>JANMA NAKSHATRA</div>
+            <div style={{ fontSize: 10, color: "#6B635B", marginBottom: 4, letterSpacing: "1px" }}>JANMA NAKSHATRA</div>
             <select
               value={value.nakIdx}
               onChange={e => onChange({ ...value, nakIdx: Number(e.target.value) })}
               style={{
-                background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px",
-                color: "#f0e8d0", fontSize: 12, width: "100%", outline: "none", fontFamily: "Outfit,sans-serif",
+                background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 8, padding: "10px 12px",
+                color: "#1A1A1A", fontSize: 12, width: "100%", outline: "none", fontFamily: "Outfit,sans-serif",
               }}
             >
               {NAKSHATRAS_27.map((n, i) => <option key={i} value={i}>{n}</option>)}
             </select>
           </div>
           <div>
-            <div style={{ fontSize: 10, color: "#605890", marginBottom: 4, letterSpacing: "1px" }}>JANMA RASHI</div>
+            <div style={{ fontSize: 10, color: "#6B635B", marginBottom: 4, letterSpacing: "1px" }}>JANMA RASHI</div>
             <select
               value={value.rashiIdx}
               onChange={e => onChange({ ...value, rashiIdx: Number(e.target.value) })}
               style={{
-                background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px",
-                color: "#f0e8d0", fontSize: 12, width: "100%", outline: "none", fontFamily: "Outfit,sans-serif",
+                background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 8, padding: "10px 12px",
+                color: "#1A1A1A", fontSize: 12, width: "100%", outline: "none", fontFamily: "Outfit,sans-serif",
               }}
             >
               {RASHIS_12.map((r, i) => <option key={i} value={i}>{r}</option>)}
@@ -288,7 +288,7 @@ function PartnerFullChartForm({
           borderRadius: 10,
           padding: "11px 14px",
           background: "linear-gradient(135deg,#c8a030,#a06820)",
-          color: "#08051a",
+          color: "#FAF7F2",
           fontWeight: 800,
           cursor: "pointer",
         }}
@@ -308,13 +308,13 @@ function LayerCard({ title, icon, score, paragraph, color }: {
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 12 }}>
         <MiniRing score={score} max={100} color={color} size={56} />
         <div>
-          <div style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#605890", marginBottom: 2 }}>{icon} {title}</div>
+          <div style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#6B635B", marginBottom: 2 }}>{icon} {title}</div>
           <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 700, color }}>
             {score >= 76 ? "Supportive" : score >= 58 ? "Mixed Supportive" : score >= 40 ? "Needs Patience" : "Needs Careful Handling"}
           </div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9 }}>{paragraph}</div>
+      <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9 }}>{paragraph}</div>
     </div>
   );
 }
@@ -327,7 +327,7 @@ function ScoreBar({ label, value, color }: { label: string; value: number | null
         <span>{label}</span>
         <strong style={{ color }}>{value === null ? "N/A" : `${score}/100`}</strong>
       </div>
-      <div style={{ height: 7, borderRadius: 999, background: "#17122f", overflow: "hidden", border: "1px solid #1c1840" }}>
+      <div style={{ height: 7, borderRadius: 999, background: "#17122f", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)" }}>
         <div style={{ width: `${Math.max(0, Math.min(100, score))}%`, height: "100%", background: color, borderRadius: 999 }} />
       </div>
     </div>
@@ -348,7 +348,7 @@ function CoupleMarsBalanceCard({ compatibility }: { compatibility: ManglikCompat
       <div className="card" style={{ borderColor: "rgba(200,160,48,.22)" }}>
         <div className="card-tag">Couple Mars Balance</div>
         <div className="card-title serif">Partner full chart needed</div>
-        <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9 }}>
+        <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9 }}>
           Fill partner DOB, birth time and city above, then generate partner chart. After that AstroLife compares both Mars patterns:
           severity, structural overlap, Paap balance and conflict expression.
         </div>
@@ -371,7 +371,7 @@ function CoupleMarsBalanceCard({ compatibility }: { compatibility: ManglikCompat
         </div>
         <div>
           <div className="card-title serif" style={{ marginBottom: 6, textTransform: "capitalize" }}>{labelText}</div>
-          <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.8 }}>
+          <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.8 }}>
             Severity delta: {compatibility.severityDelta}/100. Structural overlap: {compatibility.structuralOverlapScore}/100.
             Traditional Paap difference: {compatibility.traditionalPaapBalance.difference}.
           </div>
@@ -379,19 +379,19 @@ function CoupleMarsBalanceCard({ compatibility }: { compatibility: ManglikCompat
       </div>
       <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
         {compatibility.interpretation.map((line) => (
-          <div key={line} style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.8 }}>• {line}</div>
+          <div key={line} style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.8 }}>• {line}</div>
         ))}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginTop: 16 }}>
         <div style={{ border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: 12, background: "rgba(255,255,255,.025)" }}>
-          <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#605890", marginBottom: 6 }}>Expression Fit</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, color: "#f0e8d0", textTransform: "capitalize" }}>
+          <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#6B635B", marginBottom: 6 }}>Expression Fit</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, color: "#1A1A1A", textTransform: "capitalize" }}>
             {compatibility.expressionCompatibility.label.replaceAll("_", " ")}
           </div>
           <div style={{ fontSize: 12, color: "#a79fbd", lineHeight: 1.7, marginTop: 6 }}>{compatibility.expressionCompatibility.interpretation}</div>
         </div>
         <div style={{ border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: 12, background: "rgba(255,255,255,.025)" }}>
-          <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#605890", marginBottom: 6 }}>Timing Overlap</div>
+          <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#6B635B", marginBottom: 6 }}>Timing Overlap</div>
           <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, color: compatibility.timingOverlap.score >= 70 ? "#22c55e" : compatibility.timingOverlap.score >= 55 ? "#c8a030" : "#ef4444", textTransform: "capitalize" }}>
             {compatibility.timingOverlap.label.replaceAll("_", " ")}
           </div>
@@ -399,12 +399,12 @@ function CoupleMarsBalanceCard({ compatibility }: { compatibility: ManglikCompat
         </div>
       </div>
       <div style={{ marginTop: 16 }}>
-        <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#605890", marginBottom: 8 }}>Partner Domain Compatibility</div>
+        <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#6B635B", marginBottom: 8 }}>Partner Domain Compatibility</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           {compatibility.domainCompatibility.slice(0, 4).map((domain) => (
             <div key={domain.domain} style={{ border: "1px solid rgba(200,160,48,.18)", borderRadius: 12, padding: 11, background: "rgba(200,160,48,.04)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", marginBottom: 6 }}>
-                <strong style={{ color: "#f0e8d0", fontSize: 12 }}>{domain.domain}</strong>
+                <strong style={{ color: "#1A1A1A", fontSize: 12 }}>{domain.domain}</strong>
                 <span style={{ color: domain.score >= 75 ? "#22c55e" : domain.score >= 58 ? "#c8a030" : "#ef4444", fontSize: 12, fontWeight: 700 }}>{domain.score}</span>
               </div>
               <div style={{ fontSize: 11, color: "#a79fbd", lineHeight: 1.6 }}>{domain.interpretation}</div>
@@ -413,14 +413,14 @@ function CoupleMarsBalanceCard({ compatibility }: { compatibility: ManglikCompat
         </div>
       </div>
       <div style={{ marginTop: 16 }}>
-        <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#605890", marginBottom: 8 }}>Couple Remedy Strategy</div>
+        <div style={{ fontSize: 10, letterSpacing: "1.6px", textTransform: "uppercase", color: "#6B635B", marginBottom: 8 }}>Couple Remedy Strategy</div>
         <div style={{ display: "grid", gap: 8 }}>
           {compatibility.remedyStrategy.slice(0, 4).map((line) => (
-            <div key={line} style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.7 }}>• {line}</div>
+            <div key={line} style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.7 }}>• {line}</div>
           ))}
         </div>
       </div>
-      <div style={{ marginTop: 14, fontSize: 11, color: "#605890", lineHeight: 1.7 }}>
+      <div style={{ marginTop: 14, fontSize: 11, color: "#6B635B", lineHeight: 1.7 }}>
         {compatibility.disclaimer}
       </div>
     </div>
@@ -432,10 +432,10 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
     return (
       <div className="card" style={{ textAlign: "center", padding: 32 }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>Ma</div>
-        <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>
+        <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>
           Birth Chart Required
         </div>
-        <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.7 }}>
           Mangal Dosha Intelligence needs your generated Kundli. Generate or load a saved chart first.
         </div>
       </div>
@@ -457,18 +457,18 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
                 <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 25, lineHeight: 1, fontWeight: 700, color }}>
                   {result.scores.natalSeverity}
                 </div>
-                <div style={{ fontSize: 9, color: "#605890" }}>/100</div>
+                <div style={{ fontSize: 9, color: "#6B635B" }}>/100</div>
               </div>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#605890", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#6B635B", marginBottom: 6 }}>
               Mars Relationship Intelligence
             </div>
-            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 700, color: "#f0e8d0", marginBottom: 8 }}>
+            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 700, color: "#1A1A1A", marginBottom: 8 }}>
               {result.severityLabel}
             </div>
-            <div style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.8 }}>{insight.summary}</div>
+            <div style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.8 }}>{insight.summary}</div>
           </div>
         </div>
       </div>
@@ -489,8 +489,8 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
         <div className="card">
           <div className="card-tag">Interpretation</div>
           <div className="card-title serif">{result.marsExpression.replaceAll("_", " ")}</div>
-          <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9, marginBottom: 12 }}>
-            Functional nature: <strong style={{ color: "#f0e8d0" }}>{result.functionalNature.label.replaceAll("_", " ")}</strong>.{" "}
+          <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9, marginBottom: 12 }}>
+            Functional nature: <strong style={{ color: "#1A1A1A" }}>{result.functionalNature.label.replaceAll("_", " ")}</strong>.{" "}
             {result.functionalNature.explanation}
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -508,11 +508,11 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
           <div className="card-tag">Engine Health</div>
           <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
             <ScoreBar label="Data Quality" value={result.dataQualityScore} color="#60a5fa" />
-            <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.7 }}>
-              Status: <strong style={{ color: "#f0e8d0" }}>{result.calculationStatus}</strong> · Confidence:{" "}
-              <strong style={{ color: "#f0e8d0" }}>{result.scoreConfidence}</strong>
+            <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.7 }}>
+              Status: <strong style={{ color: "#1A1A1A" }}>{result.calculationStatus}</strong> · Confidence:{" "}
+              <strong style={{ color: "#1A1A1A" }}>{result.scoreConfidence}</strong>
             </div>
-            <div style={{ fontSize: 11, color: "#605890", lineHeight: 1.6 }}>
+            <div style={{ fontSize: 11, color: "#6B635B", lineHeight: 1.6 }}>
               {result.engineVersion} · {result.rulePackVersion} · {result.scoreModelVersion}
             </div>
           </div>
@@ -520,7 +520,7 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
         <div className="card">
           <div className="card-tag">Traditional Depth</div>
           <div className="card-title serif">{result.traditionalConcentration.label}</div>
-          <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.8 }}>{result.traditionalConcentration.modernInterpretation}</div>
+          <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.8 }}>{result.traditionalConcentration.modernInterpretation}</div>
           {result.cancellationFactors.length > 0 && (
             <div style={{ display: "grid", gap: 7, marginTop: 10 }}>
               {result.cancellationFactors.slice(0, 3).map((factor) => (
@@ -532,7 +532,7 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
         <div className="card" style={{ borderColor: result.gemstoneSafety.status === "not_recommended" ? "rgba(239,68,68,.32)" : "rgba(200,160,48,.28)" }}>
           <div className="card-tag">Gemstone Safety</div>
           <div className="card-title serif">{result.gemstoneSafety.title}</div>
-          <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.8 }}>{result.gemstoneSafety.reasoning[0]}</div>
+          <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.8 }}>{result.gemstoneSafety.reasoning[0]}</div>
           <div style={{ fontSize: 11, color: "#efb0b0", lineHeight: 1.6, marginTop: 8 }}>{result.gemstoneSafety.caution}</div>
         </div>
       </div>
@@ -541,11 +541,11 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
         <div className="card-tag">Evidence</div>
         <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
           {insight.keyEvidence.length === 0 ? (
-            <div style={{ fontSize: 12, color: "#605890" }}>No major affliction/protection evidence was triggered beyond structural scoring.</div>
+            <div style={{ fontSize: 12, color: "#6B635B" }}>No major affliction/protection evidence was triggered beyond structural scoring.</div>
           ) : insight.keyEvidence.map((item) => (
-            <div key={item.ruleId} style={{ borderBottom: "1px solid #1c1840", paddingBottom: 10 }}>
+            <div key={item.ruleId} style={{ borderBottom: "1px solid #FFFFFF", paddingBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 4 }}>
-                <strong style={{ color: "#f0e8d0", fontSize: 13 }}>{item.title}</strong>
+                <strong style={{ color: "#1A1A1A", fontSize: 13 }}>{item.title}</strong>
                 <span style={{ color: item.effect === "decrease" ? "#22c55e" : "#f97316", fontSize: 12 }}>
                   {item.effect === "decrease" ? "-" : "+"}{Math.abs(item.points)}
                 </span>
@@ -560,7 +560,7 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
         <div className="card-tag">Marriage Use</div>
         <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
           {insight.productGuidance.map((item) => (
-            <div key={item} style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.8 }}>• {item}</div>
+            <div key={item} style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.8 }}>• {item}</div>
           ))}
         </div>
       </div>
@@ -571,7 +571,7 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
           {result.remedies.map((remedy) => (
             <div key={`${remedy.category}-${remedy.title}`} style={{ border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: 12, background: "rgba(255,255,255,.025)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
-                <strong style={{ color: "#f0e8d0", fontSize: 12 }}>{remedy.title}</strong>
+                <strong style={{ color: "#1A1A1A", fontSize: 12 }}>{remedy.title}</strong>
                 <span style={{ color: remedy.priority === "primary" ? "#22c55e" : "#c8a030", fontSize: 10, textTransform: "uppercase" }}>{remedy.priority}</span>
               </div>
               <div style={{ fontSize: 11, color: "#a79fbd", lineHeight: 1.65 }}>{remedy.instruction}</div>
@@ -587,7 +587,7 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
 
       <CoupleMarsBalanceCard compatibility={compatibility} />
 
-      <div style={{ fontSize: 11, color: "#605890", lineHeight: 1.7, textAlign: "center" }}>
+      <div style={{ fontSize: 11, color: "#6B635B", lineHeight: 1.7, textAlign: "center" }}>
         {result.safetyNotes[0]} {result.safetyNotes[1]}
       </div>
     </div>
@@ -1125,7 +1125,7 @@ function RelationshipStoryPanel({
                 </div>
                 <span style={{ color: item.value >= 75 ? "var(--engine-green)" : item.value >= 58 ? "var(--engine-gold-strong)" : "#c2410c", fontSize: 12, fontWeight: 800 }}>{labelForScore(item.value)}</span>
               </div>
-              <div style={{ height: 8, borderRadius: 999, background: "#17122f", overflow: "hidden", border: "1px solid #1c1840", marginBottom: 8 }}>
+              <div style={{ height: 8, borderRadius: 999, background: "#17122f", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)", marginBottom: 8 }}>
                 <div style={{ width: `${item.value}%`, height: "100%", background: item.value >= 75 ? "var(--engine-green)" : item.value >= 58 ? "var(--engine-gold-strong)" : "#c2410c" }} />
               </div>
               <div style={{ fontSize: 11, color: "var(--engine-muted)", lineHeight: 1.55 }}>{item.note}</div>
@@ -1328,7 +1328,7 @@ export default function KundaliMilanPage() {
                 alignItems: "center", justifyContent: "center",
               }}>
                 <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 700, color: colorForLabel(relResult.marriageLabel), lineHeight: 1 }}>{relResult.marriageScore}</div>
-                <div style={{ fontSize: 9, color: "#605890" }}>/ 100</div>
+                <div style={{ fontSize: 9, color: "#6B635B" }}>/ 100</div>
               </div>
             </div>
             <div style={{ flex: 1 }}>
@@ -1426,7 +1426,7 @@ export default function KundaliMilanPage() {
 
       {/* ── NARRATIVE STRIP ── */}
       {mode === "profile" && relResult && (
-        <div className="summary-strip" style={{ marginBottom: 16, color: "#c8c0a8" }}>
+        <div className="summary-strip" style={{ marginBottom: 16, color: "#4A4238" }}>
           {relResult.marriageNarrative}
         </div>
       )}
@@ -1446,7 +1446,7 @@ export default function KundaliMilanPage() {
             onClick={calculate}
             style={{
               width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: "pointer",
-              background: "linear-gradient(135deg,#c8a030,#a06820)", color: "#08051a",
+              background: "linear-gradient(135deg,#c8a030,#a06820)", color: "#FAF7F2",
               fontFamily: "Cormorant Garamond,serif", fontSize: 16, fontWeight: 700,
               letterSpacing: "1px", marginBottom: 18,
             }}
@@ -1534,9 +1534,9 @@ export default function KundaliMilanPage() {
           )}
           <div className="card" style={{ borderColor: "rgba(200,160,48,0.2)" }}>
             <div className="card-tag">💊 Remedies & Guidance</div>
-            <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9 }}>{relResult.safeRelationshipRemedies}</div>
+            <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9 }}>{relResult.safeRelationshipRemedies}</div>
           </div>
-          <div style={{ fontSize: 11, color: "#3a3060", textAlign: "center", padding: "8px 16px", background: "rgba(200,160,48,0.04)", borderRadius: 8, border: "1px solid #1c1840" }}>
+          <div style={{ fontSize: 11, color: "#6B635B", textAlign: "center", padding: "8px 16px", background: "rgba(200,160,48,0.04)", borderRadius: 8, border: "1px solid rgba(184,134,11,0.2)" }}>
             {relResult.safetyBoundary}
           </div>
         </div>
@@ -1544,8 +1544,8 @@ export default function KundaliMilanPage() {
       {mode === "profile" && activeTab === "marriage" && !relResult && (
         <div className="card" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>💍</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>Generate Your Chart First</div>
-          <div style={{ fontSize: 12, color: "#605890" }}>Marriage Intelligence requires your birth chart. Complete onboarding to see your relationship profile.</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>Generate Your Chart First</div>
+          <div style={{ fontSize: 12, color: "#6B635B" }}>Marriage Intelligence requires your birth chart. Complete onboarding to see your relationship profile.</div>
         </div>
       )}
 
@@ -1560,18 +1560,18 @@ export default function KundaliMilanPage() {
                 <ScoreRing score={milanResult.totalScore} max={36} color={milanResult.verdictColor} />
                 <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                   <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 700, color: milanResult.verdictColor, lineHeight: 1 }}>{milanResult.totalScore}</div>
-                  <div style={{ fontSize: 9, color: "#605890" }}>out of 36</div>
+                  <div style={{ fontSize: 9, color: "#6B635B" }}>out of 36</div>
                 </div>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#605890", marginBottom: 4 }}>Ashtakoot Result</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 600, color: "#f0e8d0", marginBottom: 6 }}>
+                <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#6B635B", marginBottom: 4 }}>Ashtakoot Result</div>
+                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 600, color: "#1A1A1A", marginBottom: 6 }}>
                   {milanResult.person1Name} <span style={{ color: "#e879f9" }}>💑</span> {milanResult.person2Name}
                 </div>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${milanResult.verdictColor}18`, border: `1px solid ${milanResult.verdictColor}44`, borderRadius: 8, padding: "4px 12px" }}>
                   <span style={{ fontSize: 14 }}>{milanResult.verdictIcon}</span>
                   <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 15, fontWeight: 700, color: milanResult.verdictColor }}>{milanResult.verdict}</span>
-                  <span style={{ fontSize: 11, color: "#605890" }}>· {milanResult.percentage}%</span>
+                  <span style={{ fontSize: 11, color: "#6B635B" }}>· {milanResult.percentage}%</span>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 12 }}>
@@ -1580,7 +1580,7 @@ export default function KundaliMilanPage() {
               </div>
             </div>
           </div>
-          <div className="summary-strip" style={{ marginBottom: 8, borderColor: `${milanResult.verdictColor}44`, color: "#c8c0a8" }}>
+          <div className="summary-strip" style={{ marginBottom: 8, borderColor: `${milanResult.verdictColor}44`, color: "#4A4238" }}>
             {milanResult.verdictIcon} {milanResult.recommendation}
           </div>
           {/* Score bar */}
@@ -1591,7 +1591,7 @@ export default function KundaliMilanPage() {
                 <div key={k.name} style={{ flex: k.maxPoints, height: 6, background: k.color, borderRadius: 3, opacity: k.points === 0 ? 0.2 : 0.85 }} title={`${k.name}: ${k.points}/${k.maxPoints}`} />
               ))}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#3a3060", marginTop: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#6B635B", marginTop: 4 }}>
               <span>Varna</span><span>Vashya</span><span>Tara</span><span>Yoni</span><span>Maitri</span><span>Gana</span><span>Bhakut</span><span>Nadi</span>
             </div>
           </div>
@@ -1601,8 +1601,8 @@ export default function KundaliMilanPage() {
       {mode === "match" && activeTab === "koots" && !milanResult && (
         <div className="card" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>💑</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>Enter Partner Details Above</div>
-          <div style={{ fontSize: 12, color: "#605890" }}>Fill both Nakshatra and Rashi forms, then run Quick Ashtakoot to calculate 36-point compatibility.</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>Enter Partner Details Above</div>
+          <div style={{ fontSize: 12, color: "#6B635B" }}>Fill both Nakshatra and Rashi forms, then run Quick Ashtakoot to calculate 36-point compatibility.</div>
         </div>
       )}
 
@@ -1637,17 +1637,17 @@ export default function KundaliMilanPage() {
             paragraph={relResult.layers.kpChildrenValidation.paragraph}
             color={colorForLabel(relResult.layers.kpChildrenValidation.label)}
           />
-          <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9, padding: "12px 16px", background: "#0d0b24", borderRadius: 10, border: "1px solid #1c1840" }}>
+          <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9, padding: "12px 16px", background: "#FFFFFF", borderRadius: 10, border: "1px solid rgba(184,134,11,0.2)" }}>
             Family indicators are traditional timing and temperament signals, not a medical fertility assessment.
           </div>
           {milanResult && (
             <div className="card">
               <div className="card-tag">✦ Psychological Compatibility</div>
               <div className="card-title serif">Scientific Meaning of Ashtakoot</div>
-              <div style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.9, marginBottom: 16 }}>
+              <div style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.9, marginBottom: 16 }}>
                 {milanResult.psychologicalInsight}
               </div>
-              <div style={{ borderTop: "1px solid #1c1840", paddingTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ borderTop: "1px solid #FFFFFF", paddingTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
                   { koot:"Varna", psych:"Value System & Spiritual Hierarchy", desc:"Compatibility of life values, ambitions, and spiritual orientation." },
                   { koot:"Vashya", psych:"Control Dynamics", desc:"Natural attraction and dominance balance in daily life." },
@@ -1658,11 +1658,11 @@ export default function KundaliMilanPage() {
                   { koot:"Bhakut", psych:"Emotional Direction", desc:"Emotional energy flow toward or away from each other." },
                   { koot:"Nadi", psych:"Biological Compatibility", desc:"DNA-level compatibility, health factors in offspring." },
                 ].map(item => (
-                  <div key={item.koot} style={{ display: "flex", gap: 12, paddingBottom: 10, borderBottom: "1px solid #1c1840" }}>
+                  <div key={item.koot} style={{ display: "flex", gap: 12, paddingBottom: 10, borderBottom: "1px solid #FFFFFF" }}>
                     <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 13, fontWeight: 600, color: "#c8a030", minWidth: 90 }}>{item.koot}</div>
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#f0e8d0", marginBottom: 2 }}>{item.psych}</div>
-                      <div style={{ fontSize: 11, color: "#605890", lineHeight: 1.7 }}>{item.desc}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#1A1A1A", marginBottom: 2 }}>{item.psych}</div>
+                      <div style={{ fontSize: 11, color: "#6B635B", lineHeight: 1.7 }}>{item.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -1712,8 +1712,8 @@ export default function KundaliMilanPage() {
       {mode === "profile" && activeTab === "psychology" && !relResult && (
         <div className="card" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>🧠</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>Chart Required</div>
-          <div style={{ fontSize: 12, color: "#605890" }}>Complete onboarding to see your relationship psychology analysis based on Moon, Venus, Mars, and Saturn placements.</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>Chart Required</div>
+          <div style={{ fontSize: 12, color: "#6B635B" }}>Complete onboarding to see your relationship psychology analysis based on Moon, Venus, Mars, and Saturn placements.</div>
         </div>
       )}
 
@@ -1725,7 +1725,7 @@ export default function KundaliMilanPage() {
             <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 20 }}>
               <MiniRing score={relResult.childrenScore} max={100} color={colorForLabel(relResult.layers.childrenAwareness.label)} size={64} />
               <div>
-                <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#605890", marginBottom: 4 }}>Family & Children Indicators</div>
+                <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#6B635B", marginBottom: 4 }}>Family & Children Indicators</div>
                 <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 700, color: colorForLabel(relResult.layers.childrenAwareness.label) }}>
                   {relResult.childrenScore >= 76 ? "Supportive Indications" : relResult.childrenScore >= 58 ? "Mixed Support" : "Needs Patience & Faith"}
                 </div>
@@ -1746,7 +1746,7 @@ export default function KundaliMilanPage() {
             paragraph={relResult.layers.kpChildrenValidation.paragraph}
             color={colorForLabel(relResult.layers.kpChildrenValidation.label)}
           />
-          <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9, padding: "12px 16px", background: "#0d0b24", borderRadius: 10, border: "1px solid #1c1840" }}>
+          <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9, padding: "12px 16px", background: "#FFFFFF", borderRadius: 10, border: "1px solid rgba(184,134,11,0.2)" }}>
             {relResult.childrenNarrative}
           </div>
         </div>
@@ -1754,8 +1754,8 @@ export default function KundaliMilanPage() {
       {mode === "profile" && activeTab === "children" && !relResult && (
         <div className="card" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>👶</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>Chart Required</div>
-          <div style={{ fontSize: 12, color: "#605890" }}>Complete onboarding to see children awareness based on 5th house, Jupiter, and KP significators.</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>Chart Required</div>
+          <div style={{ fontSize: 12, color: "#6B635B" }}>Complete onboarding to see children awareness based on 5th house, Jupiter, and KP significators.</div>
         </div>
       )}
 
@@ -1778,7 +1778,7 @@ export default function KundaliMilanPage() {
           />
           <div className="card">
             <div className="card-tag">ℹ️ About KP System</div>
-            <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9 }}>
+            <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9 }}>
               Krishnamurti Paddhati (KP) validates events by checking if relevant house significators (planets ruling, occupying, or sub-lord of cusps) support the event. For marriage, houses 2-7-11 must be connected. For children, houses 2-5-11 are checked. This provides a scientific cross-validation layer beyond traditional Parashari analysis.
             </div>
           </div>
@@ -1787,8 +1787,8 @@ export default function KundaliMilanPage() {
       {mode === "profile" && activeTab === "kp" && !relResult && (
         <div className="card" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔬</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>Chart Required</div>
-          <div style={{ fontSize: 12, color: "#605890" }}>KP Validation requires your birth chart data.</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>Chart Required</div>
+          <div style={{ fontSize: 12, color: "#6B635B" }}>KP Validation requires your birth chart data.</div>
         </div>
       )}
 
@@ -1805,7 +1805,7 @@ export default function KundaliMilanPage() {
           <div className="card">
             <div className="card-tag">📅 Dasha Context</div>
             <div className="card-title serif">Current Mahadasha & Marriage Windows</div>
-            <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.9 }}>
+            <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.9 }}>
               Marriage events typically manifest during the dashas of planets connected to houses 2, 7, and 11 — especially Venus, Jupiter, Rahu (for unconventional), and the 7th lord. The current dasha period influences your relationship readiness, timing of proposals, and marriage manifestation windows.
             </div>
             {chart && (
@@ -1848,8 +1848,8 @@ export default function KundaliMilanPage() {
       {mode === "profile" && activeTab === "timing" && !relResult && (
         <div className="card" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>⏱️</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>Chart Required</div>
-          <div style={{ fontSize: 12, color: "#605890" }}>Timing analysis requires your birth chart and active dasha data.</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>Chart Required</div>
+          <div style={{ fontSize: 12, color: "#6B635B" }}>Timing analysis requires your birth chart and active dasha data.</div>
         </div>
       )}
 
@@ -1864,21 +1864,21 @@ export default function KundaliMilanPage() {
               <div className="card" style={{ textAlign: "center", padding: 32, borderColor: "rgba(34,197,94,0.3)" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
                 <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 600, color: "#22c55e", marginBottom: 8 }}>No Ashtakoot Doshas Detected</div>
-                <div style={{ fontSize: 13, color: "#605890" }}>The quick 8-koot check is free of major Nadi, Bhakoot, Gana or Tara dosha flags.</div>
+                <div style={{ fontSize: 13, color: "#6B635B" }}>The quick 8-koot check is free of major Nadi, Bhakoot, Gana or Tara dosha flags.</div>
               </div>
             ) : (
               <>
                 <div className="card" style={{ borderColor: "rgba(239,68,68,0.3)" }}>
                   <div className="card-tag" style={{ color: "#ef4444" }}>Ashtakoot Doshas</div>
                   <div className="card-title serif">{milanResult.doshas.length} Dosha{milanResult.doshas.length > 1 ? "s" : ""} Found</div>
-                  <div style={{ fontSize: 12, color: "#605890", lineHeight: 1.8, marginBottom: 14 }}>
+                  <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.8, marginBottom: 14 }}>
                     Doshas are compatibility stresses, not curses. Final judgement needs cancellation checks and D1/D9 validation.
                   </div>
                   {milanResult.koots.filter(k => k.hasDosha).map(k => (
                     <div key={k.name} style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
                       <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 15, fontWeight: 600, color: "#ef4444", marginBottom: 4 }}>{k.name} Dosha</div>
-                      <div style={{ fontSize: 12, color: "#c8c0a8", marginBottom: 8 }}>{k.doshaText}</div>
-                      <div style={{ fontSize: 11, color: "#605890" }}>{k.detail}</div>
+                      <div style={{ fontSize: 12, color: "#4A4238", marginBottom: 8 }}>{k.doshaText}</div>
+                      <div style={{ fontSize: 11, color: "#6B635B" }}>{k.detail}</div>
                     </div>
                   ))}
                 </div>
@@ -1886,9 +1886,9 @@ export default function KundaliMilanPage() {
                   <div className="card-tag">Dosha Remedies</div>
                   <div className="card-title serif">Traditional Remedies</div>
                   {milanResult.koots.filter(k => k.hasDosha).map(k => (
-                    <div key={k.name} style={{ paddingBottom: 12, marginBottom: 12, borderBottom: "1px solid #1c1840" }}>
+                    <div key={k.name} style={{ paddingBottom: 12, marginBottom: 12, borderBottom: "1px solid #FFFFFF" }}>
                       <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 14, fontWeight: 600, color: "#c8a030", marginBottom: 6 }}>{k.name} Dosha Remedy</div>
-                      <div style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.8 }}>
+                      <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.8 }}>
                         {k.name === "Nadi" && "Use Nadi Dosha cancellation checks first. If still active, prefer Shiva worship, Mahamrityunjaya japa and family-level guidance from a qualified jyotishi."}
                         {k.name === "Bhakut" && "Bhakoot Dosha may reduce when rashi lords are friendly or other chart factors support the match. Validate with D1, D9 and family adjustment indicators."}
                         {k.name === "Gana" && "Gana Dosha is mainly temperament friction. Calm communication, family respect and shared routines matter more than fear-based remedies."}
@@ -1905,8 +1905,8 @@ export default function KundaliMilanPage() {
       {mode === "match" && activeTab === "doshas" && !mangalInsight && !milanResult && (
         <div className="card" style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>!</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#f0e8d0", marginBottom: 8 }}>Dosha analysis is not calculated</div>
-          <div style={{ fontSize: 12, color: "#605890" }}>Run Quick Ashtakoot or add full charts to see Ashtakoot and Mangal Dosha evidence.</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, color: "#1A1A1A", marginBottom: 8 }}>Dosha analysis is not calculated</div>
+          <div style={{ fontSize: 12, color: "#6B635B" }}>Run Quick Ashtakoot or add full charts to see Ashtakoot and Mangal Dosha evidence.</div>
         </div>
       )}
 

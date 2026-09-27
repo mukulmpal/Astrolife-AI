@@ -1,0 +1,29 @@
+{
+  "publicId": "5dbd0e86",
+  "wikipediaSlug": "Hari_Harilela",
+  "wikipediaId": "Q5657135",
+  "name": "Hari Harilela",
+  "fullName": "Hari Harilela",
+  "profileSummary": "Hari Naroomal Harilela, was a Hong Kong Indian businessman, hotelier and philanthropist and the founder and chairman of the Harilela Group. The group runs businesses ranging from hotel and real estate investment to import and export trading. He was often dubbed the richest Indian in Hong Kong.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c6/Hari_Naroomal_Harilela.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hari_Harilela",
+  "dateOfBirth": "1922-08-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.379166666",
+  "birthCoordinatesLng": "68.368333333",
+  "moonSign": "11",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson",
+    "justice of the peace",
+    "philanthropist",
+    "hotel manager"
+  ],
+  "qid": "Q5657135",
+  "birthPlace": "Hyderabad",
+  "fetchedAt": "2026-04-08T02:09:06.446Z"
+}

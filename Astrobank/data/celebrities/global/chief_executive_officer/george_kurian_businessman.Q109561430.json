@@ -1,0 +1,26 @@
+{
+  "publicId": "71505eb8",
+  "wikipediaSlug": "George_Kurian_(businessman)",
+  "wikipediaId": "Q109561430",
+  "name": "George Kurian (businessman)",
+  "fullName": "George Kurian (businessman)",
+  "profileSummary": "George Kurian is an American business executive. He is the current chief executive officer and a member of the board of NetApp. Prior to this, he was the executive vice president of product operations at NetApp.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/George_Kurian_(businessman)",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "10",
+  "birthCoordinatesLng": "76.3",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "chief executive officer"
+  ],
+  "qid": "Q109561430",
+  "birthPlace": "Kerala",
+  "fetchedAt": "2026-04-08T02:03:49.476Z"
+}

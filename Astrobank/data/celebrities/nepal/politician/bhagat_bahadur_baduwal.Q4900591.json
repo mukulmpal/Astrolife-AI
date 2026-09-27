@@ -1,0 +1,28 @@
+{
+  "publicId": "c342c598",
+  "wikipediaSlug": "Bhagat_Bahadur_Baduwal",
+  "wikipediaId": "Q4900591",
+  "name": "Bhagat Bahadur Baduwal",
+  "fullName": "Bhagat Bahadur Baduwal",
+  "profileSummary": "Bhagat Bahadur Baduwal is a Nepalese politician, belonging to the Progressive Campaign, Nepal. In the 2008 Constituent Assembly election he was elected from the Kailali-2 constituency, winning 21219 votes.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhagat_Bahadur_Baduwal",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4900591",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:53:30.834Z"
+}

@@ -1,0 +1,30 @@
+{
+  "publicId": "456f9cc8",
+  "wikipediaSlug": "Naseeruddin_Shah",
+  "wikipediaId": "Q469945",
+  "name": "Naseeruddin Shah",
+  "fullName": "Naseeruddin Shah",
+  "profileSummary": "Naseeruddin Shah is an Indian actor who works primarily in Hindi films. He was notable in Indian parallel cinema and has starred in various international productions. He has won numerous awards in his career, including three National Film Awards, three Filmfare Awards and the Volpi Cup for Best Actor at the Venice Film Festival. The Government of India honoured him with the Padma Shri and the Padma Bhushan awards for his contributions to Indian cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Naseeruddin_Shah_at_IFP_Season_9.jpg/330px-Naseeruddin_Shah_at_IFP_Season_9.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Naseeruddin_Shah",
+  "dateOfBirth": "1950-07-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.92",
+  "birthCoordinatesLng": "81.2",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "stage actor",
+    "film actor",
+    "film director"
+  ],
+  "qid": "Q469945",
+  "birthPlace": "Barabanki",
+  "fetchedAt": "2026-04-07T11:29:57.292Z"
+}

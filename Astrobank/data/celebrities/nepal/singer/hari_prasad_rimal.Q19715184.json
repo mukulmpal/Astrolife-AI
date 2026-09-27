@@ -1,0 +1,29 @@
+{
+  "publicId": "ac09d319",
+  "wikipediaSlug": "Hari_Prasad_Rimal",
+  "wikipediaId": "Q19715184",
+  "name": "Hari Prasad Rimal",
+  "fullName": "Hari Prasad Rimal",
+  "profileSummary": "Hari Prasad Rimal sometimes known as the \"father of Nepali Radio drama\" was a Nepalese actor, singer and film director. He is known for being the first person to sing on Radio Nepal and he has acted on Nepal's first film Aama.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hari_Prasad_Rimal",
+  "dateOfBirth": "1925-09-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.6833",
+  "birthCoordinatesLng": "85.3333",
+  "moonSign": "6",
+  "sunSign": "6",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "actor",
+    "film director",
+    "television actor"
+  ],
+  "qid": "Q19715184",
+  "birthPlace": "Lalitpur",
+  "fetchedAt": "2026-04-07T16:43:33.352Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "b35b7c5c",
+  "wikipediaSlug": "Bardiya",
+  "wikipediaId": "Q242267",
+  "name": "Bardiya",
+  "fullName": "Bardiya",
+  "profileSummary": "Bardiya or Smerdis, also named as Tanyoxarces by Ctesias, was a son of Cyrus the Great and the younger brother of Cambyses II, both Persian kings. There are sharply divided views on his life. Bardiya either ruled the Achaemenid Empire for a few months in 522 BCE, or was impersonated by a magus called Gaumata, whose name is given by Ctesias as Sphendadates, until he was toppled by Darius the Great.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Gaumata_portrait_on_the_Behistun_inscription.jpg/330px-Gaumata_portrait_on_the_Behistun_inscription.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bardiya",
+  "dateOfBirth": "http://www.wikidata.org/.well-known/genid/04029ce61b954bbc6b89336e2ecf646e",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.2",
+  "birthCoordinatesLng": "53.179444444",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "sovereign"
+  ],
+  "qid": "Q242267",
+  "birthPlace": "Pasargadae",
+  "fetchedAt": "2026-04-07T16:40:38.237Z"
+}

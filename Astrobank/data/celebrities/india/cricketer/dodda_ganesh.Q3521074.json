@@ -1,0 +1,28 @@
+{
+  "publicId": "8c06b9ed",
+  "wikipediaSlug": "Dodda_Ganesh",
+  "wikipediaId": "Q3521074",
+  "name": "Dodda Ganesh",
+  "fullName": "Dodda Ganesh",
+  "profileSummary": "Dodda Narasiah Ganesh is a former Indian cricketer who played in 4 Tests and one ODI in 1997. He was a right-arm seam bowler and lower-order batsman.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dodda_Ganesh",
+  "dateOfBirth": "1973-06-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3521074",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T10:56:43.347Z"
+}

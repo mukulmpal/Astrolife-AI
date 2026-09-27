@@ -1,0 +1,29 @@
+{
+  "publicId": "f9110a27",
+  "wikipediaSlug": "Jyotirmoy_Dey",
+  "wikipediaId": "Q6319465",
+  "name": "Jyotirmoy Dey",
+  "fullName": "Jyotirmoy Dey",
+  "profileSummary": "Jyotirmoy Dey, also known as Jyotendra Dey, Commander J, and J Dey, was an Indian journalist, crime and investigations editor for Mid-Day and an expert on the Mumbai underworld. He was shot to death by motorcycle-borne sharpshooters on 11 June 2011.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Jyotirmoy_Dey.jpg/330px-Jyotirmoy_Dey.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jyotirmoy_Dey",
+  "dateOfBirth": "1955-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist",
+    "author"
+  ],
+  "qid": "Q6319465",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:44.954Z"
+}

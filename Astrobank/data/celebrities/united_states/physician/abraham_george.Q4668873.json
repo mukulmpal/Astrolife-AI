@@ -1,0 +1,26 @@
+{
+  "publicId": "2e3f1e9b",
+  "wikipediaSlug": "Abraham_George",
+  "wikipediaId": "Q4668873",
+  "name": "Abraham George",
+  "fullName": "Abraham George",
+  "profileSummary": "Abraham M. George is an Indian American businessman, academic, author, and philanthropist. He is the founder of The George Foundation and Shanti Bhavan, a residential school for children from socioeconomically disadvantaged backgrounds in India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Dr._Abraham_George.jpg/330px-Dr._Abraham_George.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abraham_George",
+  "dateOfBirth": "1946-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "8.4875",
+  "birthCoordinatesLng": "76.9525",
+  "moonSign": "8",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "physician"
+  ],
+  "qid": "Q4668873",
+  "birthPlace": "Thiruvananthapuram",
+  "fetchedAt": "2026-04-08T01:18:29.204Z"
+}

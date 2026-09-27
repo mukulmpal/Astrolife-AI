@@ -1,0 +1,28 @@
+{
+  "publicId": "27c503f5",
+  "wikipediaSlug": "Priyanka_Roy",
+  "wikipediaId": "Q3525800",
+  "name": "Priyanka Roy",
+  "fullName": "Priyanka Roy",
+  "profileSummary": "Priyanka Roy is an Indian cricketer.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Priyanka_Roy.jpg/330px-Priyanka_Roy.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Priyanka_Roy",
+  "dateOfBirth": "1988-03-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3525800",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T11:03:30.578Z"
+}

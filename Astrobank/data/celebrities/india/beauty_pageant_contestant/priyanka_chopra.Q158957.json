@@ -1,0 +1,33 @@
+{
+  "publicId": "9d4bd849",
+  "wikipediaSlug": "Priyanka_Chopra",
+  "wikipediaId": "Q158957",
+  "name": "Priyanka Chopra",
+  "fullName": "Priyanka Chopra",
+  "profileSummary": "Priyanka Chopra Jonas is an Indian actress and film producer. The winner of the Miss World 2000 pageant, she is India's highest-paid actress and her accolades include two National Film Awards and five Filmfare Awards. In 2016, the Government of India honoured her with the Padma Shri, and Time named her one of the 100 most influential people in the world. Forbes listed her among the World's 100 Most Powerful Women, and in 2022, she was named in the BBC 100 Women list.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/45/Priyanka_Chopra_at_Bulgary_launch%2C_2024_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Priyanka_Chopra",
+  "dateOfBirth": "1982-07-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "86.183333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "beauty pageant contestant",
+    "film actor",
+    "fashion model",
+    "singer",
+    "film producer",
+    "model"
+  ],
+  "qid": "Q158957",
+  "birthPlace": "Jamshedpur",
+  "fetchedAt": "2026-04-07T12:19:20.524Z"
+}

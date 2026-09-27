@@ -1,0 +1,28 @@
+{
+  "publicId": "7b4c7e1e",
+  "wikipediaSlug": "Jaya_Sharma",
+  "wikipediaId": "Q6167425",
+  "name": "Jaya Sharma",
+  "fullName": "Jaya Sharma",
+  "profileSummary": "Jaya Sharma is an Indian former cricketer who played as a left-handed batter. She appeared in one Test match, 77 One Day Internationals and one Twenty20 International for India between 2002 and 2008, including playing at the 2005 World Cup. She played domestic cricket for Delhi, Railways and Rajasthan.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jaya_Sharma",
+  "dateOfBirth": "1980-09-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.416666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6167425",
+  "birthPlace": "Ghaziabad",
+  "fetchedAt": "2026-04-07T11:03:12.411Z"
+}

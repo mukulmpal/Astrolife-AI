@@ -1,0 +1,26 @@
+{
+  "publicId": "4588f9bd",
+  "wikipediaSlug": "Neil_Basu",
+  "wikipediaId": "Q76874768",
+  "name": "Neil Basu",
+  "fullName": "Neil Basu",
+  "profileSummary": "Anil Kanti \"Neil\" Basu is a former senior British police officer.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f6/National_Policing_Board_2019_%28Basu_and_Owens_cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Neil_Basu",
+  "dateOfBirth": "1968-06-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "52.8066",
+  "birthCoordinatesLng": "-2.1171",
+  "moonSign": "9",
+  "sunSign": "2",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "police officer"
+  ],
+  "qid": "Q76874768",
+  "birthPlace": "Stafford",
+  "fetchedAt": "2026-04-08T02:08:19.737Z"
+}

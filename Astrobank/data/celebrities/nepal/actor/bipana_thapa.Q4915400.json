@@ -1,0 +1,27 @@
+{
+  "publicId": "5013cd61",
+  "wikipediaSlug": "Bipana_Thapa",
+  "wikipediaId": "Q4915400",
+  "name": "Bipana Thapa",
+  "fullName": "Bipana Thapa",
+  "profileSummary": "Bipana Thapa is a Nepalese actress. Bipana had been active in Nepali film industry until she got married in 2008 to Ashutosh Bhardwoj.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bipana_Thapa",
+  "dateOfBirth": "1977-08-29",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "11",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q4915400",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:12.293Z"
+}

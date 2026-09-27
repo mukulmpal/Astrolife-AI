@@ -1,0 +1,29 @@
+{
+  "publicId": "043da072",
+  "wikipediaSlug": "Dipika_Kakar",
+  "wikipediaId": "Q12068128",
+  "name": "Dipika Kakar",
+  "fullName": "Dipika Kakar",
+  "profileSummary": "Dipika Kakar Ibrahim, is an Indian actress who works in Hindi television. She is known for playing Simar in Sasural Simar Ka and Sonakshi in Kahaan Hum Kahaan Tum. She participated in the reality show Bigg Boss 12 and emerged as the winner in 2018. She also participated in Nach Baliye 8 finishing at 4th place.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/98/Dipika_Kakar_at_the_25th_SOL_Lions_Gold_Awards_2018_%2814%29_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dipika_Kakar",
+  "dateOfBirth": "1986-08-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q12068128",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T12:18:58.040Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "1622f9ca",
+  "wikipediaSlug": "Bhumi_Pednekar",
+  "wikipediaId": "Q19664326",
+  "name": "Bhumi Pednekar",
+  "fullName": "Bhumi Pednekar",
+  "profileSummary": "Bhumi Satish Pednekar(Hindi pronunciation: [bʱuːmɪ peːɖneːkər] born 18 July 1989) is an Indian actress who works in Hindi films. Known for her portrayals of headstrong small-town women, she is the recipient of several awards, including three Filmfare Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Bhumi_Pednekar_promoting_Thank_You_For_Coming.jpg/330px-Bhumi_Pednekar_promoting_Thank_You_For_Coming.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhumi_Pednekar",
+  "dateOfBirth": "1989-07-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "9",
+  "sunSign": "4",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "climate activist"
+  ],
+  "qid": "Q19664326",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:33:51.600Z"
+}

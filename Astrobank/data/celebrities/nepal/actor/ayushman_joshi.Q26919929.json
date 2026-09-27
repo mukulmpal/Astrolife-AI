@@ -1,0 +1,27 @@
+{
+  "publicId": "6f36deb2",
+  "wikipediaSlug": "Ayushman_Joshi",
+  "wikipediaId": "Q26919929",
+  "name": "Ayushman Joshi",
+  "fullName": "Ayushman Joshi",
+  "profileSummary": "Ayushman Desraj Shrestha Joshi is a Nepalese Model/TV host turned Actor.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Ayushman_DS_Joshi.jpg/330px-Ayushman_DS_Joshi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ayushman_Joshi",
+  "dateOfBirth": "1992-12-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q26919929",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:22.856Z"
+}

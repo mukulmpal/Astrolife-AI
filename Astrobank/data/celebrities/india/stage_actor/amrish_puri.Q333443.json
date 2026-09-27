@@ -1,0 +1,28 @@
+{
+  "publicId": "11a461f6",
+  "wikipediaSlug": "Amrish_Puri",
+  "wikipediaId": "Q333443",
+  "name": "Amrish Puri",
+  "fullName": "Amrish Puri",
+  "profileSummary": "Amrish Puri was an Indian actor, who was one of the most notable and important figures in Indian cinema and theatre. He acted in more than 450 films, and established himself as one of the greatest and iconic actors in Indian cinema. Puri was known for his acting versatility but his villainous roles earned him more recognition. His dominating screen presence and distinctive deep voice made him stand out amongst other actors of his generation. Puri also worked in art cinema. He won three Filmfare Awards for Best Supporting Actor in eight nominations. He also holds most Filmfare Award for Best Villain nominations.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Amrish_Puri.jpg/330px-Amrish_Puri.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amrish_Puri",
+  "dateOfBirth": "1932-06-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.325555555",
+  "birthCoordinatesLng": "75.579166666",
+  "moonSign": "10",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "stage actor",
+    "film actor",
+    "actor"
+  ],
+  "qid": "Q333443",
+  "birthPlace": "Jalandhar",
+  "fetchedAt": "2026-04-07T16:25:19.207Z"
+}

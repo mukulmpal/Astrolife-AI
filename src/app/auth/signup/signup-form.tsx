@@ -23,14 +23,14 @@ export default function SignupForm() {
               <polygon points="0,6 5,-3 -5,-3" fill="none" stroke="currentColor" strokeWidth="0.7" />
               <circle r="1.9" fill="#f4d03f" />
             </svg>
-            <span className="font-serif text-2xl font-bold" style={{ color: '#f0e8d0' }}>
+            <span className="font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
               AstroLife
             </span>
           </div>
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold mb-2" style={{ color: '#f0e8d0' }}>
+          <h1 className="font-serif text-3xl font-bold mb-2" style={{ color: '#1A1A1A' }}>
             Create Account
           </h1>
           <p style={{ color: '#a79fbd' }}>
@@ -44,13 +44,13 @@ export default function SignupForm() {
             className="w-full py-3 rounded-lg font-semibold text-sm transition-transform hover:scale-[1.02]"
             style={{
               background: 'linear-gradient(180deg, #f4d03f, #c8a030)',
-              color: '#060410',
+              color: '#FAF7F2',
             }}
           >
             Continue with Google
           </button>
 
-          <div className="rounded-lg p-3 text-sm leading-relaxed" style={{ background: 'rgba(200,160,48,0.08)', color: '#c8c0a8', border: '1px solid rgba(200,160,48,0.18)' }}>
+          <div className="rounded-lg p-3 text-sm leading-relaxed" style={{ background: 'rgba(200,160,48,0.08)', color: '#4A4238', border: '1px solid rgba(200,160,48,0.18)' }}>
             Phone login is disabled. We only support Google auth to keep user accounts, onboarding, and saved charts consistent.
           </div>
 

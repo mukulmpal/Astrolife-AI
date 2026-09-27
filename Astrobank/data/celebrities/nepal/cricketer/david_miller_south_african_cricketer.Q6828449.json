@@ -1,0 +1,26 @@
+{
+  "publicId": "23eec904",
+  "wikipediaSlug": "David_Miller_(South_African_cricketer)",
+  "wikipediaId": "Q6828449",
+  "name": "David Miller (South African cricketer)",
+  "fullName": "David Miller (South African cricketer)",
+  "profileSummary": "David Andrew Miller is a South African professional cricketer. He currently plays for South African national team in limited overs cricket. He is an aggressive left-handed middle order batsman and an occasional wicket-keeper. He holds the record for the second fastest T20I century among full member ICC nations, and the fastest against full member opposition, achieving the milestone in 35 deliveries.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/DAVID_MILLER_%2815704846295%29.jpg/330px-DAVID_MILLER_%2815704846295%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/David_Miller_(South_African_cricketer)",
+  "dateOfBirth": "1989-06-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-29.6009",
+  "birthCoordinatesLng": "30.3796",
+  "moonSign": "5",
+  "sunSign": "2",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6828449",
+  "birthPlace": "Pietermaritzburg",
+  "fetchedAt": "2026-04-07T16:51:46.446Z"
+}

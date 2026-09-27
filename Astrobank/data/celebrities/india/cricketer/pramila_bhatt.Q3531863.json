@@ -1,0 +1,28 @@
+{
+  "publicId": "d12d3918",
+  "wikipediaSlug": "Pramila_Bhatt",
+  "wikipediaId": "Q3531863",
+  "name": "Pramila Bhatt",
+  "fullName": "Pramila Bhatt",
+  "profileSummary": "Pramila Korikar-Bhatt is an Indian former cricketer.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Pramila_Bhatt",
+  "dateOfBirth": "1969-09-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3531863",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T11:03:32.073Z"
+}

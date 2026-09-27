@@ -107,7 +107,7 @@ export default function HistoryPage() {
             onClick={handleSaveChart}
             style={{
               background: "#c8a030",
-              color: "#060410",
+              color: "#FAF7F2",
               border: "none",
               borderRadius: 6,
               padding: "10px 16px",
@@ -136,10 +136,10 @@ export default function HistoryPage() {
           <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#c8a030", marginBottom: 6 }}>
             Understanding your chart
           </div>
-          <p style={{ fontSize: 12, lineHeight: 1.8, color: "#b8b0d8", margin: 0 }}>
+          <p style={{ fontSize: 12, lineHeight: 1.8, color: "#6B635B", margin: 0 }}>
             Your birth chart is a snapshot of planetary positions at your exact birth moment — 9 planets across 12 houses and 27 nakshatras.
           </p>
-          <ul style={{ fontSize: 12, color: "#b8b0d8", margin: "12px 0 0 20px" }}>
+          <ul style={{ fontSize: 12, color: "#6B635B", margin: "12px 0 0 20px" }}>
             <li><strong>Kundali:</strong> Core planetary positions</li>
             <li><strong>Yogas:</strong> Auspicious combinations (e.g. <EducationTooltip term="yoga">Gaja Kesari</EducationTooltip>)</li>
             <li><strong>Dasha:</strong> Current life period (<EducationTooltip term="dasha">what is Dasha?</EducationTooltip>)</li>
@@ -147,14 +147,14 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      <h3 className="serif" style={{ marginBottom: 16, color: "#f0e8d0" }}>
+      <h3 className="serif" style={{ marginBottom: 16, color: "#1A1A1A" }}>
         Saved charts ({charts.length})
       </h3>
 
       {loading ? (
-        <p style={{ textAlign: "center", color: "#b8b0d8", padding: 40 }}>Loading charts…</p>
+        <p style={{ textAlign: "center", color: "#6B635B", padding: 40 }}>Loading charts…</p>
       ) : charts.length === 0 ? (
-        <div style={{ textAlign: "center", color: "#b8b0d8", padding: 40, background: "rgba(200,160,48,0.05)", borderRadius: 8 }}>
+        <div style={{ textAlign: "center", color: "#6B635B", padding: 40, background: "rgba(200,160,48,0.05)", borderRadius: 8 }}>
           No saved charts yet. Save your current chart to build a family library.
         </div>
       ) : (
@@ -167,8 +167,8 @@ export default function HistoryPage() {
               disabled={switchingId === c.id}
               style={{
                 textAlign: "left",
-                background: "#0d0a22",
-                border: `1px solid ${c.isPrimary ? "rgba(200,160,48,0.45)" : "#1c1840"}`,
+                background: "#FFFFFF",
+                border: `1px solid ${c.isPrimary ? "rgba(200,160,48,0.45)" : "#FFFFFF"}`,
                 borderRadius: 12,
                 padding: 16,
                 cursor: switchingId === c.id ? "wait" : "pointer",
@@ -183,14 +183,14 @@ export default function HistoryPage() {
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 12, color: "#b8b0d8" }}>
+              <div style={{ fontSize: 12, color: "#6B635B" }}>
                 {c.dob} at {c.tob}
                 <br />
                 {c.city}
                 <br />
                 {new Date(c.createdAt).toLocaleDateString()}
               </div>
-              <div style={{ fontSize: 11, color: "#605890", marginTop: 10 }}>
+              <div style={{ fontSize: 11, color: "#6B635B", marginTop: 10 }}>
                 {switchingId === c.id ? "Loading…" : "Tap to set as primary chart"}
               </div>
             </button>

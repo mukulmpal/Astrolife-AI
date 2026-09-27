@@ -1,0 +1,27 @@
+{
+  "publicId": "5827bed7",
+  "wikipediaSlug": "Sahana_Bajracharya",
+  "wikipediaId": "Q7399456",
+  "name": "Sahana Bajracharya",
+  "fullName": "Sahana Bajracharya",
+  "profileSummary": "Sahana Bajracharya is a Nepalese actress, TV host, model and beauty pageant titleholder who was crowned Miss Nepal Earth 2010. She was also the host of Mega Model Season 2, the local version of America's Next Top Model. She was the first woman to be on TNM Magazine. She also hosted the TV show Namaste on NTV plus.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Sahana_Bajracharya_%40Model_Events.jpg/330px-Sahana_Bajracharya_%40Model_Events.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sahana_Bajracharya",
+  "dateOfBirth": "1986-08-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6",
+  "birthCoordinatesLng": "81.633333333",
+  "moonSign": "8",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "beauty pageant contestant"
+  ],
+  "qid": "Q7399456",
+  "birthPlace": "Surkhet District",
+  "fetchedAt": "2026-04-07T16:45:18.118Z"
+}

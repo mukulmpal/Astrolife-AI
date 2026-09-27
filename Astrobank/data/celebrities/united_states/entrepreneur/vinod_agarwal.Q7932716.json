@@ -1,0 +1,27 @@
+{
+  "publicId": "884df57f",
+  "wikipediaSlug": "Vinod_Agarwal",
+  "wikipediaId": "Q7932716",
+  "name": "Vinod Agarwal",
+  "fullName": "Vinod Agarwal",
+  "profileSummary": "Vinod K. Agarwal was an Indian-American businessman and scientist. He was a professor at McGill University in Montreal, Quebec, Canada from 1978 to 1992. He then founded LogicVision, which he took public in October 2001, as the first technology IPO following the terrorist attacks earlier that year. Agarwal left LogicVision in 2005 to start SemIndia, a semiconductor company based in India.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Vinod_Agarwal",
+  "dateOfBirth": "1955-06-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": "8",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "entrepreneur",
+    "singer"
+  ],
+  "qid": "Q7932716",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-08T01:18:25.889Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "8ca0481d",
+  "wikipediaSlug": "Beas_Sarkar",
+  "wikipediaId": "Q4876822",
+  "name": "Beas Sarkar",
+  "fullName": "Beas Sarkar",
+  "profileSummary": "Beas Sarkar is a One Day International cricketer who represents India. She represents Bengal Women in India's domestic league. She is a right-hand batsman and bowls right-arm medium fast and has played one ODI.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Beas_Sarkar",
+  "dateOfBirth": "1979-12-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4876822",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T11:02:30.121Z"
+}

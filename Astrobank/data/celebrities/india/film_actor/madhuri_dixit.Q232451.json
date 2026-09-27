@@ -1,0 +1,28 @@
+{
+  "publicId": "adeabb39",
+  "wikipediaSlug": "Madhuri_Dixit",
+  "wikipediaId": "Q232451",
+  "name": "Madhuri Dixit",
+  "fullName": "Madhuri Dixit",
+  "profileSummary": "Madhuri Dixit Nene is an Indian actress and television personality. She has appeared in over 70 Hindi films, attaining nationwide stardom that influenced Indian popular culture. Noted by critics for her performances and dancing abilities, Dixit was credited for singularly paralleling her male contemporaries by leading star vehicles in a male-dominated industry. Her accolades include six Filmfare Awards from a record 17 nominations. In 2008, the Government of India awarded her with Padma Shri, the fourth-highest civilian honour of the country.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Madhuri_Dixit_in_November_2022.jpg/330px-Madhuri_Dixit_in_November_2022.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Madhuri_Dixit",
+  "dateOfBirth": "1967-05-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "4",
+  "sunSign": "2",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "dancer",
+    "actor"
+  ],
+  "qid": "Q232451",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:34:10.581Z"
+}

@@ -1,0 +1,33 @@
+{
+  "publicId": "03d353b5",
+  "wikipediaSlug": "Dev_Anand",
+  "wikipediaId": "Q320115",
+  "name": "Dev Anand",
+  "fullName": "Dev Anand",
+  "profileSummary": "Dev Anand was an Indian actor, writer, director and producer known for his work in Hindi cinema. He is considered as one of the greatest and most successful actors in the history of Indian cinema. Through a career that spanned over six decades, he worked in more than 100 films. Anand is a recipient of four Filmfare Awards, including two for Best Actor. The Government of India honoured him with Padma Bhushan, Indian third highest civilian honour in 2001 and with Dadasaheb Phalke Award in 2002.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Dev_Anand_interacting_with_the_Press_at_the_36th_International_Film_Festival_of_India_%E2%80%93_2005_in_Panaji%2C_Goa_on_November_26%2C_2005.jpg/330px-Dev_Anand_interacting_with_the_Press_at_the_36th_International_Film_Festival_of_India_%E2%80%93_2005_in_Panaji%2C_Goa_on_November_26%2C_2005.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dev_Anand",
+  "dateOfBirth": "1923-09-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "32.25",
+  "birthCoordinatesLng": "74.9",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "film producer",
+    "screenwriter",
+    "actor",
+    "writer"
+  ],
+  "qid": "Q320115",
+  "birthPlace": "Shakargarh Tehsil",
+  "fetchedAt": "2026-04-07T16:00:07.734Z"
+}

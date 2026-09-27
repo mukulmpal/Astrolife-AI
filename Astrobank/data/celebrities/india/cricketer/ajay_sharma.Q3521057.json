@@ -1,0 +1,28 @@
+{
+  "publicId": "80f9e4cd",
+  "wikipediaSlug": "Ajay_Sharma",
+  "wikipediaId": "Q3521057",
+  "name": "Ajay Sharma",
+  "fullName": "Ajay Sharma",
+  "profileSummary": "Ajay Kumar Sharma is a former Indian cricketer.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajay_Sharma",
+  "dateOfBirth": "1964-04-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3521057",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T10:56:06.334Z"
+}

@@ -1,0 +1,31 @@
+{
+  "publicId": "a26272de",
+  "wikipediaSlug": "Akshay_Kumar",
+  "wikipediaId": "Q233748",
+  "name": "Akshay Kumar",
+  "fullName": "Akshay Kumar",
+  "profileSummary": "Akshay Hari Om Bhatia, known professionally as Akshay Kumar, is an Indian actor and film producer working in Hindi cinema. Referred to in the media as \"Khiladi Kumar\", through his career spanning over 30 years, Kumar has appeared in over 150 films and has won several awards, including two National Film Awards and two Filmfare Awards. He received the Padma Shri, India's fourth-highest civilian honour, from the Government of India in 2009. Kumar is one of the most prolific actors in Indian cinema. Forbes included Kumar in their lists of both highest-paid celebrities and highest-paid actors in the world from 2015 to 2020. Between 2019 and 2020, he was the only Indian on both lists.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Akshay_Kumar_National_Award_for_Padman_%28cropped%29.jpg/330px-Akshay_Kumar_National_Award_for_Padman_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Akshay_Kumar",
+  "dateOfBirth": "1967-09-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": "7",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film producer",
+    "voice actor",
+    "martial artist",
+    "actor",
+    "stunt performer"
+  ],
+  "qid": "Q233748",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T16:24:42.964Z"
+}

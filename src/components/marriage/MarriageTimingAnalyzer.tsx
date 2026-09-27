@@ -51,7 +51,7 @@ function scoreColor(s: number) {
   if (s >= 63) return "#c8a030";   // 5/8
   if (s >= 50) return "#f97316";   // 4/8
   if (s >= 38) return "#60a5fa";   // 3/8
-  return "#605890";
+  return "#6B635B";
 }
 
 function verdictColor(v: string) {
@@ -59,7 +59,7 @@ function verdictColor(v: string) {
   if (v === "strong")      return "#c8a030";
   if (v === "moderate")    return "#f97316";
   if (v === "possible")    return "#60a5fa";
-  return "#605890";
+  return "#6B635B";
 }
 
 function strengthDisplay(label: string) {
@@ -187,7 +187,7 @@ function mangalTimingAdjustment(insight: MangalDoshaInsight | null) {
       adjustment: 0,
       score: 50,
       label: "Mars readiness not calculated",
-      color: "#8f86ad",
+      color: "#6B635B",
       notes: ["Generate a valid birth chart to add Mangal Dosha timing context."],
     };
   }
@@ -295,7 +295,7 @@ function ScoreRing({ score, size = 88 }: { score: number; size?: number }) {
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#1c1840" strokeWidth={6} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#FFFFFF" strokeWidth={6} />
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={6}
           strokeDasharray={circ} strokeDashoffset={circ * (1 - score / 100)}
           strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
@@ -304,7 +304,7 @@ function ScoreRing({ score, size = 88 }: { score: number; size?: number }) {
         alignItems:"center", justifyContent:"center" }}>
         <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:size*0.27,
           fontWeight:700, color, lineHeight:1 }}>{score}</div>
-        <div style={{ fontSize:size*0.11, color:"#605890" }}>/ 100</div>
+        <div style={{ fontSize:size*0.11, color:"#6B635B" }}>/ 100</div>
       </div>
     </div>
   );
@@ -313,7 +313,7 @@ function ScoreRing({ score, size = 88 }: { score: number; size?: number }) {
 // ── Mini Score Bar ────────────────────────────────────────────
 function ScoreBar({ score, color }: { score: number; color: string }) {
   return (
-    <div style={{ flex:1, height:6, background:"#1c1840", borderRadius:3, overflow:"hidden" }}>
+    <div style={{ flex:1, height:6, background:"#FFFFFF", borderRadius:3, overflow:"hidden" }}>
       <div style={{ width:`${score}%`, height:"100%", background:color, borderRadius:3,
         transition:"width 0.8s ease" }} />
     </div>
@@ -713,7 +713,7 @@ export function MarriageTimingAnalyzer() {
       <div className="empty">
         <div className="empty-icon">💍</div>
         <div className="empty-text">Birth Chart Required</div>
-        <p style={{ fontSize:13, color:"#605890" }}>Generate your kundli first to see K.N. Rao marriage timing analysis.</p>
+        <p style={{ fontSize:13, color:"#6B635B" }}>Generate your kundli first to see K.N. Rao marriage timing analysis.</p>
       </div>
     );
   }
@@ -751,7 +751,7 @@ export function MarriageTimingAnalyzer() {
           ) : result ? (
             <ScoreRing score={score} />
           ) : (
-            <div style={{ width:88, height:88, borderRadius:"50%", border:"2px dashed #1c1840",
+            <div style={{ width:88, height:88, borderRadius:"50%", border:"2px dashed #FFFFFF",
               display:"flex", alignItems:"center", justifyContent:"center" }}>
               <span style={{ fontSize:32 }}>💍</span>
             </div>
@@ -760,7 +760,7 @@ export function MarriageTimingAnalyzer() {
           <div style={{ flex:1 }}>
             <div className="page-tag" style={{ marginBottom:4 }}>💍 K.N. RAO MARRIAGE TIMING ENGINE</div>
             <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:20, fontWeight:600,
-              color:"#f0e8d0", marginBottom:6 }}>
+              color: "#1A1A1A", marginBottom:6 }}>
               {chart.name}&apos;s Commitment Readiness Analysis
             </div>
             {result && !loading && (
@@ -774,7 +774,7 @@ export function MarriageTimingAnalyzer() {
               </div>
             )}
             {loading && (
-              <div style={{ fontSize:12, color:"#605890" }}>Analyzing K.N. Rao parameters...</div>
+              <div style={{ fontSize:12, color:"#6B635B" }}>Analyzing K.N. Rao parameters...</div>
             )}
           </div>
 
@@ -804,7 +804,7 @@ export function MarriageTimingAnalyzer() {
       {/* ── PARAMS CHIP STRIP ───────────────────────────────── */}
       {params && (
         <div className="summary-strip" style={{ marginBottom:16, fontSize:12, lineHeight:2 }}>
-          <span style={{ color:"#605890", marginRight:6 }}>Chart auto-linked:</span>
+          <span style={{ color:"#6B635B", marginRight:6 }}>Chart auto-linked:</span>
           <span className="planet-pill" style={{ marginRight:6 }}>MD: {params.mahadasha}</span>
           <span className="planet-pill" style={{ marginRight:6 }}>AD: {params.antardasha}</span>
           <span className="planet-pill" style={{ marginRight:6 }}>D1-7L: {params.d1SeventhLord}</span>
@@ -823,12 +823,12 @@ export function MarriageTimingAnalyzer() {
         <div className="card-title serif" style={{ marginBottom: 10 }}>
           Optional partner compatibility
         </div>
-        <p style={{ fontSize: 12, color: "#605890", marginBottom: 12, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 12, color: "#6B635B", marginBottom: 12, lineHeight: 1.6 }}>
           Add a partner birth chart or pick a saved chart to score Ashtakoot (36-point) compatibility in commitment windows.
         </p>
         {savedCharts.length > 0 && (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 10, color: "#605890", marginBottom: 6, letterSpacing: 1 }}>SAVED CHART</div>
+            <div style={{ fontSize: 10, color: "#6B635B", marginBottom: 6, letterSpacing: 1 }}>SAVED CHART</div>
             <select
               value={partnerSavedId}
               onChange={(e) => {
@@ -838,11 +838,11 @@ export function MarriageTimingAnalyzer() {
               }}
               style={{
                 width: "100%",
-                background: "#08051a",
-                border: "1px solid #1c1840",
+                background: "#FAF7F2",
+                border: "1px solid rgba(184,134,11,0.2)",
                 borderRadius: 8,
                 padding: "10px 12px",
-                color: "#f0e8d0",
+                color: "#1A1A1A",
                 fontSize: 12,
               }}
             >
@@ -861,19 +861,19 @@ export function MarriageTimingAnalyzer() {
             value={partnerForm.name}
             onChange={(e) => setPartnerForm((f) => ({ ...f, name: e.target.value }))}
             className="pr-input"
-            style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px", color: "#f0e8d0", fontSize: 12 }}
+            style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 8, padding: "10px 12px", color: "#1A1A1A", fontSize: 12 }}
           />
           <input
             type="date"
             value={partnerForm.dob}
             onChange={(e) => setPartnerForm((f) => ({ ...f, dob: e.target.value }))}
-            style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px", color: "#f0e8d0", fontSize: 12 }}
+            style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 8, padding: "10px 12px", color: "#1A1A1A", fontSize: 12 }}
           />
           <input
             type="time"
             value={partnerForm.tob}
             onChange={(e) => setPartnerForm((f) => ({ ...f, tob: e.target.value }))}
-            style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 12px", color: "#f0e8d0", fontSize: 12 }}
+            style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 8, padding: "10px 12px", color: "#1A1A1A", fontSize: 12 }}
           />
         </div>
         <div style={{ marginBottom: 10 }}>
@@ -913,7 +913,7 @@ export function MarriageTimingAnalyzer() {
             <div style={{ fontSize: 13, fontWeight: 700, color: partnerMilan.verdictColor }}>
               {partnerMilan.totalScore}/{partnerMilan.maxScore} Guna · {partnerMilan.verdict}
             </div>
-            <p style={{ fontSize: 12, color: "#c8c0a8", marginTop: 6, lineHeight: 1.6 }}>{partnerMilan.recommendation}</p>
+            <p style={{ fontSize: 12, color: "#4A4238", marginTop: 6, lineHeight: 1.6 }}>{partnerMilan.recommendation}</p>
           </div>
         )}
         {partnerReadiness && (
@@ -976,7 +976,7 @@ export function MarriageTimingAnalyzer() {
                       color:scoreColor(score), marginBottom:6 }}>
                       {strengthDisplay(strength)} Readiness
                     </div>
-                    <div style={{ fontSize:13, color:"#c8c0a8", lineHeight:1.8 }}>
+                    <div style={{ fontSize:13, color:"#4A4238", lineHeight:1.8 }}>
                       {result.formats?.dashboardCard?.brief}
                     </div>
                     <div style={{ display:"flex", gap:8, marginTop:12, flexWrap:"wrap" }}>
@@ -1008,7 +1008,7 @@ export function MarriageTimingAnalyzer() {
                     <div className="card-title serif" style={{ color:mangalTiming.color, marginBottom:6 }}>
                       {mangalTiming.label}
                     </div>
-                    <div style={{ fontSize:12, color:"#c8c0a8", lineHeight:1.7 }}>
+                    <div style={{ fontSize:12, color:"#4A4238", lineHeight:1.7 }}>
                       K.N. Rao timing remains the base score. This Mars layer adjusts commitment readiness by reading
                       Mangal severity, protection, activation and constructive potential.
                     </div>
@@ -1022,15 +1022,15 @@ export function MarriageTimingAnalyzer() {
                     { label:"Activation", val:mangalInsight ? `${mangalInsight.result.scores.activation}/100` : "—" },
                     { label:"Timing Delta", val:`${mangalTiming.adjustment >= 0 ? "+" : ""}${mangalTiming.adjustment}` },
                   ].map(item => (
-                    <div key={item.label} style={{ padding:"8px 10px", borderRadius:8, border:"1px solid #1c1840", background:"rgba(255,255,255,0.02)" }}>
-                      <div style={{ fontSize:10, color:"#605890", textTransform:"uppercase", letterSpacing:1 }}>{item.label}</div>
-                      <div style={{ fontSize:14, color:"#f0e8d0", fontWeight:700, marginTop:3 }}>{item.val}</div>
+                    <div key={item.label} style={{ padding:"8px 10px", borderRadius:8, border: "1px solid rgba(184,134,11,0.2)", background:"rgba(255,255,255,0.02)" }}>
+                      <div style={{ fontSize:10, color:"#6B635B", textTransform:"uppercase", letterSpacing:1 }}>{item.label}</div>
+                      <div style={{ fontSize:14, color: "#1A1A1A", fontWeight:700, marginTop:3 }}>{item.val}</div>
                     </div>
                   ))}
                 </div>
                 <div style={{ marginTop:12, display:"grid", gap:6 }}>
                   {mangalTiming.notes.map(note => (
-                    <div key={note} style={{ fontSize:11, color:"#8f86ad", lineHeight:1.55 }}>• {note}</div>
+                    <div key={note} style={{ fontSize:11, color:"#6B635B", lineHeight:1.55 }}>• {note}</div>
                   ))}
                 </div>
               </div>
@@ -1042,7 +1042,7 @@ export function MarriageTimingAnalyzer() {
                   <div className="card-title serif" style={{ marginBottom:4 }}>
                     {active}/8 Fulfilled — {active >= 6 ? "K.N. Rao Threshold Met ✦" : active >= 4 ? "Moderate Support" : "Below Threshold"}
                   </div>
-                  <div style={{ fontSize:11, color:"#605890", marginBottom:14 }}>
+                  <div style={{ fontSize:11, color:"#6B635B", marginBottom:14 }}>
                     √ = fulfilled (binary) · ~ = partial · × = not met · 6+/8 = strong commitment-support period per K.N. Rao research
                   </div>
                   <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -1050,8 +1050,8 @@ export function MarriageTimingAnalyzer() {
                       const isFulfilled = p.fulfilled === true;
                       const isPartial   = !isFulfilled && p.score >= 50;
                       const badge = isFulfilled ? "√" : isPartial ? "~" : "×";
-                      const badgeCol = isFulfilled ? "#22c55e" : isPartial ? "#f97316" : "#3a3060";
-                      const borderCol = isFulfilled ? "rgba(34,197,94,0.3)" : isPartial ? "rgba(249,115,22,0.2)" : "#1c1840";
+                      const badgeCol = isFulfilled ? "#22c55e" : isPartial ? "#f97316" : "#6B635B";
+                      const borderCol = isFulfilled ? "rgba(34,197,94,0.3)" : isPartial ? "rgba(249,115,22,0.2)" : "#FFFFFF";
                       const bg = isFulfilled ? "rgba(34,197,94,0.04)" : isPartial ? "rgba(249,115,22,0.03)" : "transparent";
                       return (
                         <div key={p.id} style={{ padding:"12px 16px", borderRadius:10,
@@ -1064,12 +1064,12 @@ export function MarriageTimingAnalyzer() {
                             {badge}
                           </div>
                           <div style={{ flex:1 }}>
-                            <div style={{ fontSize:13, fontWeight:600, color:"#f0e8d0", marginBottom:2 }}>
+                            <div style={{ fontSize:13, fontWeight:600, color: "#1A1A1A", marginBottom:2 }}>
                               {p.name}
                             </div>
-                            <div style={{ fontSize:11, color:"#605890" }}>{p.description}</div>
+                            <div style={{ fontSize:11, color:"#6B635B" }}>{p.description}</div>
                             {p.evidence?.length > 0 && (
-                              <div style={{ fontSize:11, color: isFulfilled ? "#86efac" : isPartial ? "#fb923c" : "#605890",
+                              <div style={{ fontSize:11, color: isFulfilled ? "#86efac" : isPartial ? "#fb923c" : "#6B635B",
                                 marginTop:4, lineHeight:1.5 }}>
                                 {p.evidence[0]}
                               </div>
@@ -1099,7 +1099,7 @@ export function MarriageTimingAnalyzer() {
                   <div className="card-title serif" style={{ marginBottom:6 }}>
                     Supporting Observations — {bonusActive}/{bonusTotal} active
                   </div>
-                  <div style={{ fontSize:11, color:"#605890", marginBottom:14, lineHeight:1.6 }}>
+                  <div style={{ fontSize:11, color:"#6B635B", marginBottom:14, lineHeight:1.6 }}>
                     O2 and O3 are supporting observations from K.N. Rao&apos;s framework — not core parameters.
                     They add a small confidence nudge (+{bonusScore}) to the core {score}/100.
                     Adjusted: <strong style={{ color:scoreColor(adjustedScore) }}>{adjustedScore}/100</strong>.
@@ -1107,25 +1107,25 @@ export function MarriageTimingAnalyzer() {
                   <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                     {bonusLayers.map(b => (
                       <div key={b.id} style={{ padding:"12px 16px", borderRadius:10,
-                        border:`1px solid ${b.isActive ? "rgba(56,189,248,0.35)" : "#1c1840"}`,
+                        border:`1px solid ${b.isActive ? "rgba(56,189,248,0.35)" : "#FFFFFF"}`,
                         background: b.isActive ? "rgba(56,189,248,0.05)" : "transparent" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                           <div style={{ width:8, height:8, borderRadius:"50%", flexShrink:0,
-                            background: b.isActive ? "#38bdf8" : "#1c1840",
+                            background: b.isActive ? "#38bdf8" : "#FFFFFF",
                             boxShadow: b.isActive ? "0 0 8px rgba(56,189,248,0.5)" : "none" }} />
                           <div style={{ flex:1 }}>
-                            <div style={{ fontSize:13, fontWeight:600, color:"#f0e8d0" }}>{b.name}</div>
-                            <div style={{ fontSize:11, color:"#605890" }}>{b.rule}</div>
+                            <div style={{ fontSize:13, fontWeight:600, color: "#1A1A1A" }}>{b.name}</div>
+                            <div style={{ fontSize:11, color:"#6B635B" }}>{b.rule}</div>
                           </div>
                           <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:2, minWidth:60 }}>
                             <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:16, fontWeight:700,
-                              color: b.isActive ? "#38bdf8" : "#3a3060" }}>+{b.points}<span style={{ fontSize:10, color:"#605890" }}>/{b.maxBonus}</span></div>
+                              color: b.isActive ? "#38bdf8" : "#6B635B" }}>+{b.points}<span style={{ fontSize:10, color:"#6B635B" }}>/{b.maxBonus}</span></div>
                             {b.isActive && <div style={{ fontSize:9, color:"#38bdf8", letterSpacing:1, fontWeight:700 }}>✓ ACTIVE</div>}
                           </div>
                         </div>
                         {b.isActive && b.evidence.length > 0 && (
-                          <div style={{ marginTop:8, paddingTop:8, borderTop:"1px solid #1c1840",
-                            fontSize:11, color:"#c8c0a8", lineHeight:1.6 }}>
+                          <div style={{ marginTop:8, paddingTop:8, borderTop:"1px solid #FFFFFF",
+                            fontSize:11, color:"#4A4238", lineHeight:1.6 }}>
                             {b.evidence[0]}
                           </div>
                         )}
@@ -1137,7 +1137,7 @@ export function MarriageTimingAnalyzer() {
 
               {/* Safety Note */}
               <div style={{ padding:"12px 16px", borderRadius:10, background:"rgba(0,0,0,0.2)",
-                border:"1px solid #1c1840", fontSize:11, color:"#3a3060", textAlign:"center" }}>
+                border: "1px solid rgba(184,134,11,0.2)", fontSize:11, color: "#6B635B", textAlign:"center" }}>
                 ⚠️ No fixed destiny predictions. K.N. Rao framework is for timing confidence, not certainty.
                 Combine with D1 promise, D9 quality, Ashtakoot compatibility and practical readiness.
               </div>
@@ -1153,10 +1153,10 @@ export function MarriageTimingAnalyzer() {
           {(scanning || (!scanResult && !error)) && (
             <div className="card" style={{ textAlign:"center", padding:40 }}>
               <div style={{ fontSize:32, color:"#c8a030", marginBottom:12 }}>📅</div>
-              <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, color:"#f0e8d0", marginBottom:8 }}>
+              <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, color: "#1A1A1A", marginBottom:8 }}>
                 Scanning 9 Months...
               </div>
-              <div style={{ fontSize:12, color:"#605890" }}>
+              <div style={{ fontSize:12, color:"#6B635B" }}>
                 Calculating antardasha + transit positions for each month
               </div>
             </div>
@@ -1167,7 +1167,7 @@ export function MarriageTimingAnalyzer() {
               {/* Outlook Banner */}
               <div className="summary-strip" style={{
                 borderColor:`${scoreColor(scanResult.peakScore)}44`,
-                color:"#c8c0a8" }}>
+                color:"#4A4238" }}>
                 🔭 {scanResult.overallOutlook}
               </div>
 
@@ -1196,11 +1196,11 @@ export function MarriageTimingAnalyzer() {
                         )}
                       </div>
                       {highlightedFusionWindow.window.activeParams.length > 0 && (
-                        <div style={{ marginTop:10, fontSize:12, color:"#605890" }}>
+                        <div style={{ marginTop:10, fontSize:12, color:"#6B635B" }}>
                           Active: {highlightedFusionWindow.window.activeParams.join(" · ")}
                         </div>
                       )}
-                      <div style={{ marginTop:10, fontSize:12, color:"#c8c0a8", lineHeight:1.7 }}>
+                      <div style={{ marginTop:10, fontSize:12, color:"#4A4238", lineHeight:1.7 }}>
                         {commitmentUseCase(highlightedFusionWindow.window)} {partnerFusionNote(partnerMilan, partnerReadiness)}
                       </div>
                     </div>
@@ -1213,7 +1213,7 @@ export function MarriageTimingAnalyzer() {
                 <div className="card-title serif" style={{ marginBottom:6 }}>
                   Partner-Fusion Commitment Planner
                 </div>
-                <div style={{ fontSize:12, color:"#605890", marginBottom:14, lineHeight:1.6 }}>
+                <div style={{ fontSize:12, color:"#6B635B", marginBottom:14, lineHeight:1.6 }}>
                   These are not fixed wedding dates. Ranking combines timing strength, partner compatibility and Mangal readiness.
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -1230,31 +1230,31 @@ export function MarriageTimingAnalyzer() {
                         <div key={`top-window-${w.date}`} style={{ padding:"14px 16px", borderRadius:12, border:`1px solid ${col}33`, background:"rgba(0,0,0,0.18)" }}>
                           <div style={{ display:"flex", justifyContent:"space-between", gap:12, alignItems:"flex-start", marginBottom:8 }}>
                             <div>
-                              <div style={{ fontSize:12, color:"#605890", marginBottom:2 }}>#{index + 1}</div>
-                              <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, fontWeight:700, color:"#f0e8d0" }}>{w.month}</div>
+                              <div style={{ fontSize:12, color:"#6B635B", marginBottom:2 }}>#{index + 1}</div>
+                              <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, fontWeight:700, color: "#1A1A1A" }}>{w.month}</div>
                             </div>
                             <span className="badge" style={{ background:`${col}18`, color:col, border:`1px solid ${col}44` }}>
                               {fusedScore}/100
                             </span>
                           </div>
-                          <div style={{ fontSize:12, color:"#c8c0a8", lineHeight:1.65, marginBottom:10 }}>{commitmentUseCase(w)}</div>
-                          <div style={{ fontSize:11, color:partnerMilan ? partnerMilan.verdictColor : "#8f86ad", lineHeight:1.6, marginBottom:10 }}>
+                          <div style={{ fontSize:12, color:"#4A4238", lineHeight:1.65, marginBottom:10 }}>{commitmentUseCase(w)}</div>
+                          <div style={{ fontSize:11, color:partnerMilan ? partnerMilan.verdictColor : "#6B635B", lineHeight:1.6, marginBottom:10 }}>
                             {partnerFusionNote(partnerMilan, partnerReadiness)}
                             {partnerMilan && ` Partner-fusion adjustment: ${compatibilityDelta >= 0 ? "+" : ""}${compatibilityDelta} points.`}
                             {` Mars readiness adjustment: ${marsDelta >= 0 ? "+" : ""}${marsDelta} points.`}
                           </div>
                           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:8, marginBottom:10 }}>
                             {commitmentBreakdown(w, partnerMilan).map(item => (
-                              <div key={item.label} style={{ padding:"8px 10px", borderRadius:8, border:"1px solid #1c1840", background:"rgba(255,255,255,0.02)" }}>
-                                <div style={{ fontSize:10, color:"#605890", textTransform:"uppercase", letterSpacing:1 }}>{item.label}</div>
-                                <div style={{ fontSize:13, color:item.placeholder ? "#8f86ad" : scoreColor(item.value), fontWeight:700, marginTop:3 }}>
+                              <div key={item.label} style={{ padding:"8px 10px", borderRadius:8, border: "1px solid rgba(184,134,11,0.2)", background:"rgba(255,255,255,0.02)" }}>
+                                <div style={{ fontSize:10, color:"#6B635B", textTransform:"uppercase", letterSpacing:1 }}>{item.label}</div>
+                                <div style={{ fontSize:13, color:item.placeholder ? "#6B635B" : scoreColor(item.value), fontWeight:700, marginTop:3 }}>
                                   {item.placeholder ? "Add partner chart" : `${item.value}/100`}
                                 </div>
-                                {!item.placeholder && <div style={{ fontSize:10, color:"#605890" }}>{item.note} active signals</div>}
+                                {!item.placeholder && <div style={{ fontSize:10, color:"#6B635B" }}>{item.note} active signals</div>}
                               </div>
                             ))}
                           </div>
-                          <div style={{ fontSize:11, color:"#8f86ad", lineHeight:1.6 }}>{commitmentCaution(w)}</div>
+                          <div style={{ fontSize:11, color:"#6B635B", lineHeight:1.6 }}>{commitmentCaution(w)}</div>
                         </div>
                       );
                     })}
@@ -1286,7 +1286,7 @@ export function MarriageTimingAnalyzer() {
                         <span style={{ fontSize:18 }}>✦</span>
                         <div>
                           <div style={{ fontSize:13, fontWeight:600, color:"#e879f9" }}>Antardasha Change</div>
-                          <div style={{ fontSize:11, color:"#605890" }}>{m} — new sub-period energy activates</div>
+                          <div style={{ fontSize:11, color:"#6B635B" }}>{m} — new sub-period energy activates</div>
                         </div>
                       </div>
                     ))}
@@ -1297,7 +1297,7 @@ export function MarriageTimingAnalyzer() {
                         <span style={{ fontSize:18 }}>♃</span>
                         <div>
                           <div style={{ fontSize:13, fontWeight:600, color:"#eab308" }}>Jupiter Sign Change</div>
-                          <div style={{ fontSize:11, color:"#605890" }}>{m} — Jupiter enters new sign, marriage house changes</div>
+                          <div style={{ fontSize:11, color:"#6B635B" }}>{m} — Jupiter enters new sign, marriage house changes</div>
                         </div>
                       </div>
                     ))}
@@ -1316,7 +1316,7 @@ export function MarriageTimingAnalyzer() {
                     borderColor:`${scoreColor(s.val)}33` }}>
                     <div className="idx-n" style={{ color:scoreColor(s.val) }}>{s.val}</div>
                     <div className="idx-l">{s.label}</div>
-                    <div style={{ fontSize:10, color:"#605890", marginTop:4 }}>{s.sub}</div>
+                    <div style={{ fontSize:10, color:"#6B635B", marginTop:4 }}>{s.sub}</div>
                   </div>
                 ))}
               </div>
@@ -1352,7 +1352,7 @@ export function MarriageTimingAnalyzer() {
                   </span>
                   <span className="badge badge-purple">{active}/8 √ Fulfilled</span>
                 </div>
-                <p style={{ fontSize:14, lineHeight:2.1, color:"#c8c0a8", whiteSpace:"pre-line" }}>
+                <p style={{ fontSize:14, lineHeight:2.1, color:"#4A4238", whiteSpace:"pre-line" }}>
                   {result.userFacingNarrative}
                 </p>
               </div>
@@ -1365,7 +1365,7 @@ export function MarriageTimingAnalyzer() {
                   {result.backendJson.strongestEvidence.map((ev: string, i: number) => (
                     <div key={i} style={{ padding:"10px 14px", borderRadius:8, marginBottom:8,
                       background:"rgba(200,160,48,0.05)", border:"1px solid rgba(200,160,48,0.2)",
-                      fontSize:12, color:"#c8c0a8", lineHeight:1.7 }}>
+                      fontSize:12, color:"#4A4238", lineHeight:1.7 }}>
                       <span style={{ color:"#c8a030", fontWeight:700 }}>✦ </span>{ev}
                     </div>
                   ))}
@@ -1397,7 +1397,7 @@ export function MarriageTimingAnalyzer() {
                   </span>
                   <span className="badge badge-purple">{active}/8 √ Fulfilled</span>
                 </div>
-                <p style={{ fontSize:13, lineHeight:1.9, color:"#c8c0a8" }}>
+                <p style={{ fontSize:13, lineHeight:1.9, color:"#4A4238" }}>
                   {result.formats?.pdfSection?.narrative}
                 </p>
               </div>
@@ -1411,15 +1411,15 @@ export function MarriageTimingAnalyzer() {
                     const isFulfilled = p.score === 100;
                     const isPartial   = p.score === 55;
                     const badge = isFulfilled ? "√" : isPartial ? "~" : "×";
-                    const badgeCol = isFulfilled ? "#22c55e" : isPartial ? "#f97316" : "#3a3060";
+                    const badgeCol = isFulfilled ? "#22c55e" : isPartial ? "#f97316" : "#6B635B";
                     return (
                     <div key={i} style={{ padding:"16px 18px", borderRadius:12,
                       background: isFulfilled ? "rgba(34,197,94,0.04)" : isPartial ? "rgba(249,115,22,0.03)" : "rgba(0,0,0,0.15)",
-                      border:`1px solid ${isFulfilled ? "rgba(34,197,94,0.25)" : isPartial ? "rgba(249,115,22,0.2)" : "#1c1840"}` }}>
+                      border:`1px solid ${isFulfilled ? "rgba(34,197,94,0.25)" : isPartial ? "rgba(249,115,22,0.2)" : "#FFFFFF"}` }}>
                       <div style={{ display:"flex", justifyContent:"space-between",
                         alignItems:"center", marginBottom:10 }}>
                         <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:16,
-                          fontWeight:600, color:"#f0e8d0" }}>{p.name}</div>
+                          fontWeight:600, color: "#1A1A1A" }}>{p.name}</div>
                         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                           <div style={{ background:`${badgeCol}22`, padding:"4px 14px", borderRadius:6,
                             fontSize:22, fontFamily:"monospace", color: badgeCol, fontWeight:700 }}>
@@ -1428,7 +1428,7 @@ export function MarriageTimingAnalyzer() {
                           {isFulfilled && <span className="badge badge-gold">FULFILLED</span>}
                         </div>
                       </div>
-                      <p style={{ fontSize:12, color:"#605890", lineHeight:1.8, margin:0 }}>
+                      <p style={{ fontSize:12, color:"#6B635B", lineHeight:1.8, margin:0 }}>
                         {p.explanation}
                       </p>
                     </div>
@@ -1441,7 +1441,7 @@ export function MarriageTimingAnalyzer() {
               <div className="card">
                 <div className="card-tag">✦ EXPERT INTERPRETATION</div>
                 <div className="card-title serif" style={{ marginBottom:12 }}>Reading Summary</div>
-                <p style={{ fontSize:13, lineHeight:1.9, color:"#c8c0a8" }}>
+                <p style={{ fontSize:13, lineHeight:1.9, color:"#4A4238" }}>
                   {result.formats?.pdfSection?.interpretation}
                 </p>
               </div>
@@ -1451,17 +1451,17 @@ export function MarriageTimingAnalyzer() {
                 <div className="card">
                   <div className="card-tag">📅 9-MONTH OUTLOOK</div>
                   <div className="card-title serif" style={{ marginBottom:12 }}>Future Readiness Preview</div>
-                  <p style={{ fontSize:13, color:"#c8c0a8", marginBottom:14, lineHeight:1.8 }}>
+                  <p style={{ fontSize:13, color:"#4A4238", marginBottom:14, lineHeight:1.8 }}>
                     {scanResult.overallOutlook}
                   </p>
                   <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                     {scanResult.windows.map(w => (
                       <div key={w.date} style={{ display:"flex", alignItems:"center", gap:12,
                         padding:"8px 12px", borderRadius:8,
-                        border:`1px solid ${w.isBest ? "rgba(200,160,48,0.4)" : "#1c1840"}`,
+                        border:`1px solid ${w.isBest ? "rgba(200,160,48,0.4)" : "#FFFFFF"}`,
                         background: w.isBest ? "rgba(200,160,48,0.04)" : "transparent" }}>
                         <div style={{ width:48, fontSize:11, fontWeight:600,
-                          color: w.isBest ? "#c8a030" : "#605890" }}>
+                          color: w.isBest ? "#c8a030" : "#6B635B" }}>
                           {w.isBest ? "⭐ BEST" : w.month.split(" ")[0].slice(0,3)}
                         </div>
                         <div style={{ flex:1 }}>
@@ -1469,7 +1469,7 @@ export function MarriageTimingAnalyzer() {
                         </div>
                         <div style={{ width:36, textAlign:"right", fontSize:13, fontWeight:700,
                           color:verdictColor(w.verdict) }}>{w.score}</div>
-                        <div style={{ fontSize:11, color:"#605890", minWidth:100 }}>{w.month}</div>
+                        <div style={{ fontSize:11, color:"#6B635B", minWidth:100 }}>{w.month}</div>
                       </div>
                     ))}
                   </div>
@@ -1478,8 +1478,8 @@ export function MarriageTimingAnalyzer() {
 
               {/* Safety Boundary */}
               <div style={{ padding:"14px 18px", borderRadius:10, background:"rgba(0,0,0,0.2)",
-                border:"1px solid #1c1840", fontSize:12, color:"#3a3060", lineHeight:1.8 }}>
-                ⚠️ <strong style={{ color:"#605890" }}>Safety Boundary:</strong>&nbsp;
+                border: "1px solid rgba(184,134,11,0.2)", fontSize:12, color: "#6B635B", lineHeight:1.8 }}>
+                ⚠️ <strong style={{ color:"#6B635B" }}>Safety Boundary:</strong>&nbsp;
                 {result.overallIntegration?.safetyBoundary ??
                   "No death, widowhood, infertility, divorce certainty or guaranteed negative event prediction. This engine gives timing confidence layers only. Combine with D1 marriage promise, D9 quality, Ashtakoot, KP 2-7-11 and real-life readiness for complete picture."}
               </div>
@@ -1508,10 +1508,10 @@ function LoadingCard({ name }: { name: string }) {
   return (
     <div className="card" style={{ textAlign:"center", padding:48 }}>
       <div style={{ fontSize:40, marginBottom:16, color:"#c8a030" }}>✦</div>
-      <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, color:"#f0e8d0", marginBottom:8 }}>
+      <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, color: "#1A1A1A", marginBottom:8 }}>
         Analyzing K.N. Rao Parameters...
       </div>
-      <div style={{ fontSize:12, color:"#605890" }}>
+      <div style={{ fontSize:12, color:"#6B635B" }}>
         Evaluating 8 timing parameters for {name}
       </div>
     </div>
@@ -1526,7 +1526,7 @@ function MonthRow({ w }: { w: MonthlyMarriageWindow }) {
   return (
     <div onClick={() => setOpen(o => !o)} style={{
       padding:"12px 16px", borderRadius:10, cursor:"pointer",
-      border:`1px solid ${w.isBest ? "rgba(200,160,48,0.5)" : "#1c1840"}`,
+      border:`1px solid ${w.isBest ? "rgba(200,160,48,0.5)" : "#FFFFFF"}`,
       background: w.isBest
         ? "linear-gradient(135deg,rgba(200,160,48,0.08),rgba(232,121,249,0.04))"
         : open ? "rgba(255,255,255,0.02)" : "transparent",
@@ -1538,9 +1538,9 @@ function MonthRow({ w }: { w: MonthlyMarriageWindow }) {
           <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:2 }}>
             {w.isBest && <span style={{ fontSize:14 }}>⭐</span>}
             <span style={{ fontSize:13, fontWeight:600,
-              color: w.isBest ? "#c8a030" : "#f0e8d0" }}>{w.month}</span>
+              color: w.isBest ? "#B8860B" : "#1A1A1A" }}>{w.month}</span>
           </div>
-          <div style={{ fontSize:10, color:"#605890" }}>MD:{w.mahadasha} · AD:{w.antardasha}</div>
+          <div style={{ fontSize:10, color:"#6B635B" }}>MD:{w.mahadasha} · AD:{w.antardasha}</div>
         </div>
 
         {/* Score bar */}
@@ -1566,19 +1566,19 @@ function MonthRow({ w }: { w: MonthlyMarriageWindow }) {
           {w.jupiterSignChanged    && <span className="badge badge-gold"   style={{ fontSize:8 }}>♃↑</span>}
         </div>
 
-        <span style={{ fontSize:10, color:"#3a3060" }}>{open ? "▲" : "▼"}</span>
+        <span style={{ fontSize:10, color: "#6B635B" }}>{open ? "▲" : "▼"}</span>
       </div>
 
       {open && (
-        <div style={{ marginTop:12, paddingTop:12, borderTop:"1px solid #1c1840",
+        <div style={{ marginTop:12, paddingTop:12, borderTop:"1px solid #FFFFFF",
           display:"flex", flexDirection:"column", gap:8 }}>
-          <div style={{ fontSize:11, color:"#c8c0a8" }}>
-            <strong style={{ color:"#605890" }}>Key Factor:</strong> {w.keyFactor}
+          <div style={{ fontSize:11, color:"#4A4238" }}>
+            <strong style={{ color:"#6B635B" }}>Key Factor:</strong> {w.keyFactor}
           </div>
           <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-            <span style={{ fontSize:11, color:"#605890" }}>♄ {w.transitSaturnSign} H{w.transitSaturnHouse}</span>
-            <span style={{ fontSize:11, color:"#605890" }}>♃ {w.transitJupiterSign} H{w.transitJupiterHouse}</span>
-            <span style={{ fontSize:11, color:"#605890" }}>{w.activeParameterCount}/8 params active</span>
+            <span style={{ fontSize:11, color:"#6B635B" }}>♄ {w.transitSaturnSign} H{w.transitSaturnHouse}</span>
+            <span style={{ fontSize:11, color:"#6B635B" }}>♃ {w.transitJupiterSign} H{w.transitJupiterHouse}</span>
+            <span style={{ fontSize:11, color:"#6B635B" }}>{w.activeParameterCount}/8 params active</span>
             {w.bonusActiveCount > 0 && (
               <span style={{ fontSize:11, color:"#38bdf8" }}>
                 +{w.bonusActiveCount} bonus → adj {w.adjustedScore}
@@ -1594,7 +1594,7 @@ function MonthRow({ w }: { w: MonthlyMarriageWindow }) {
           {/* Full 8 core parameters for this month */}
           {w.parameters.length > 0 && (
             <div style={{ marginTop:6 }}>
-              <div style={{ fontSize:9, color:"#605890", letterSpacing:1.2, marginBottom:6, fontWeight:700 }}>
+              <div style={{ fontSize:9, color:"#6B635B", letterSpacing:1.2, marginBottom:6, fontWeight:700 }}>
                 8 CORE PARAMETERS — {w.month}
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
@@ -1604,13 +1604,13 @@ function MonthRow({ w }: { w: MonthlyMarriageWindow }) {
                       <span style={{ width:7, height:7, borderRadius:"50%", flexShrink:0,
                         background: p.isActive ? "#c8a030" : "#262050",
                         boxShadow: p.isActive ? "0 0 6px rgba(200,160,48,0.5)" : "none" }} />
-                      <span style={{ fontSize:10, color: p.isActive ? "#f0e8d0" : "#8079a8", minWidth:130, flexShrink:0 }}>{p.name}</span>
-                      <div style={{ flex:1 }}><ScoreBar score={p.score} color={p.isActive ? "#c8a030" : "#3a3060"} /></div>
+                      <span style={{ fontSize:10, color: p.isActive ? "#1A1A1A" : "#8079a8", minWidth:130, flexShrink:0 }}>{p.name}</span>
+                      <div style={{ flex:1 }}><ScoreBar score={p.score} color={p.isActive ? "#c8a030" : "#6B635B"} /></div>
                       <span style={{ fontSize:11, fontWeight:700, minWidth:22, textAlign:"right",
-                        color: p.isActive ? "#c8a030" : "#3a3060" }}>{p.score}</span>
+                        color: p.isActive ? "#c8a030" : "#6B635B" }}>{p.score}</span>
                     </div>
                     {p.evidence?.length > 0 && (
-                      <div style={{ fontSize:9.5, color:"#605890", marginLeft:15, marginTop:2, lineHeight:1.4 }}>
+                      <div style={{ fontSize:9.5, color:"#6B635B", marginLeft:15, marginTop:2, lineHeight:1.4 }}>
                         {p.evidence.slice(0, 3).map((e, idx) => (
                           <div key={idx}>{e}</div>
                         ))}
@@ -1633,12 +1633,12 @@ function MonthRow({ w }: { w: MonthlyMarriageWindow }) {
                   <div key={b.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ width:7, height:7, borderRadius:"50%", flexShrink:0,
                       background: b.isActive ? "#38bdf8" : "#262050" }} />
-                    <span style={{ fontSize:10, color: b.isActive ? "#f0e8d0" : "#8079a8", minWidth:130, flexShrink:0 }}>{b.name}</span>
+                    <span style={{ fontSize:10, color: b.isActive ? "#1A1A1A" : "#8079a8", minWidth:130, flexShrink:0 }}>{b.name}</span>
                     <div style={{ flex:1 }}>
-                      <ScoreBar score={b.maxBonus ? (b.points / b.maxBonus) * 100 : 0} color={b.isActive ? "#38bdf8" : "#3a3060"} />
+                      <ScoreBar score={b.maxBonus ? (b.points / b.maxBonus) * 100 : 0} color={b.isActive ? "#38bdf8" : "#6B635B"} />
                     </div>
                     <span style={{ fontSize:11, fontWeight:700, minWidth:30, textAlign:"right",
-                      color: b.isActive ? "#38bdf8" : "#3a3060" }}>+{b.points}/{b.maxBonus}</span>
+                      color: b.isActive ? "#38bdf8" : "#6B635B" }}>+{b.points}/{b.maxBonus}</span>
                   </div>
                 ))}
               </div>

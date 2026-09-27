@@ -1,0 +1,30 @@
+{
+  "publicId": "e1331d3e",
+  "wikipediaSlug": "Baburam_Bhattarai",
+  "wikipediaId": "Q57816",
+  "name": "Baburam Bhattarai",
+  "fullName": "Baburam Bhattarai",
+  "profileSummary": "Baburam Bhattarai, also known by his nom de guerre Laaldhwoj, is a Nepalese politician and architect who served as the 36th prime minister of Nepal from 2011 to 2013. He currently as leader of the Pragatisheel Loktantrik Party.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Baburam_Bhattarai%2C_official_portrait.jpg/330px-Baburam_Bhattarai%2C_official_portrait.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Baburam_Bhattarai",
+  "dateOfBirth": "1954-06-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.03",
+  "birthCoordinatesLng": "84.55",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "writer",
+    "engineer"
+  ],
+  "qid": "Q57816",
+  "birthPlace": "Khoplang",
+  "fetchedAt": "2026-04-07T16:54:59.019Z"
+}

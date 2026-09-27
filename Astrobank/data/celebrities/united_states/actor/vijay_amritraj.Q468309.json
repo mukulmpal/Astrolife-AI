@@ -1,0 +1,30 @@
+{
+  "publicId": "e8889013",
+  "wikipediaSlug": "Vijay_Amritraj",
+  "wikipediaId": "Q468309",
+  "name": "Vijay Amritraj",
+  "fullName": "Vijay Amritraj",
+  "profileSummary": "Vijay Amritraj is an Indian retired professional tennis player, sports commentator and actor from Madras. He was awarded the Padma Shri, in 1983, and the Padma Bhushan in 2026. In 2022, he was honored for his contributions to tennis in London by the International Tennis Hall of Fame and International Tennis Federation. On July 20, 2024 he was inducted into the International Tennis Hall of Fame in Newport, Rhode Island.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/The_former_Tennis_player%2C_Shri_Vijay_Amritraj_calling_on_the_Minister_of_State_for_Youth_Affairs_and_Sports_%28IC%29%2C_Water_Resources%2C_River_Development_and_Ganga_Rejuvenation%2C_Shri_Vijay_Goel%2C_in_New_Delhi_on_April_11%2C_2017_%28cropped%29.jpg/330px-thumbnail.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Vijay_Amritraj",
+  "dateOfBirth": "1953-12-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": "12",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "tennis player",
+    "sports journalist",
+    "tennis coach",
+    "film actor"
+  ],
+  "qid": "Q468309",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-08T01:18:26.621Z"
+}

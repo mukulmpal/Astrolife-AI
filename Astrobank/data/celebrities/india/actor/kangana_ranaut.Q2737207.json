@@ -1,0 +1,27 @@
+{
+  "publicId": "816d20b7",
+  "wikipediaSlug": "Kangana_Ranaut",
+  "wikipediaId": "Q2737207",
+  "name": "Kangana Ranaut",
+  "fullName": "Kangana Ranaut",
+  "profileSummary": "Kangna Amardeep Ranaut is an Indian actress, filmmaker, and politician serving as a Member of Parliament, Lok Sabha from Mandi since June 2024. Known for her portrayals of strong-willed, unconventional women in female-led Hindi films, she is the recipient of several awards, including four National Film Awards and four Filmfare Awards, and has featured six times in Forbes India's Celebrity 100 list. In 2020, the Government of India honoured her with the Padma Shri, the country's fourth-highest civilian award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Kangana_Ranaut_at_Ira_Khan%27s_wedding_reception_%28cropped%29.jpg/330px-Kangana_Ranaut_at_Ira_Khan%27s_wedding_reception_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kangana_Ranaut",
+  "dateOfBirth": "1986-03-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.709388888",
+  "birthCoordinatesLng": "76.931694444",
+  "moonSign": "5",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director"
+  ],
+  "qid": "Q2737207",
+  "birthPlace": "Mandi district",
+  "fetchedAt": "2026-04-07T16:34:24.538Z"
+}

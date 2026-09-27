@@ -1,0 +1,26 @@
+{
+  "publicId": "eccd1273",
+  "wikipediaSlug": "Daud_Ali",
+  "wikipediaId": "Q16150063",
+  "name": "Daud Ali",
+  "fullName": "Daud Ali",
+  "profileSummary": "Daud Ali is an American historian of Indian descent, born in Calcutta, India. He is currently associate professor of South Asian history at the University of Pennsylvania and the editor of the Journal of the Royal Asiatic Society. He is a scholar focusing on Pre-Mughal South Asia.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Daud_Ali",
+  "dateOfBirth": "1964-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": "4",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "historian"
+  ],
+  "qid": "Q16150063",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-08T01:18:25.178Z"
+}

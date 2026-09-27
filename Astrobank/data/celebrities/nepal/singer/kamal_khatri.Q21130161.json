@@ -1,0 +1,26 @@
+{
+  "publicId": "daf439a5",
+  "wikipediaSlug": "Kamal_Khatri",
+  "wikipediaId": "Q21130161",
+  "name": "Kamal Khatri",
+  "fullName": "Kamal Khatri",
+  "profileSummary": "Kamal Khatri is a Nepali singer, songwriter and composer. His career began in the adhunik (modern) song competition on Radio Nepal in 2005. He is known as one of the best adhunik (modern) pop singers of Nepal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Kamal_khatri_Nepali_Singer.jpg/330px-Kamal_khatri_Nepali_Singer.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kamal_Khatri",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.416666666",
+  "birthCoordinatesLng": "85.033333333",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q21130161",
+  "birthPlace": "Hetauda",
+  "fetchedAt": "2026-04-07T16:47:34.032Z"
+}

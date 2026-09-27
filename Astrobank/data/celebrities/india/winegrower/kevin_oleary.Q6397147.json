@@ -1,0 +1,32 @@
+{
+  "publicId": "0be6f575",
+  "wikipediaSlug": "Kevin_O'Leary",
+  "wikipediaId": "Q6397147",
+  "name": "Kevin O'Leary",
+  "fullName": "Kevin O'Leary",
+  "profileSummary": "Terrence Thomas Kevin O'Leary, also known as Mr. Wonderful, is a Canadian businessman, television personality and actor. From 2004 to 2014, he appeared on various Canadian television shows, including the business news program The Lang and O'Leary Exchange as well as reality show Dragons' Den. O'Leary hosted Discovery Channel's Project Earth in 2008 and has appeared on Shark Tank, the American version of Dragons' Den, since 2009. He made his feature film debut as Milton Rockwell in Josh Safdie's Marty Supreme (2025).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/KevinOLeary2023.jpg/330px-KevinOLeary2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kevin_O'Leary",
+  "dateOfBirth": "1954-07-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "45.5033426",
+  "birthCoordinatesLng": "-73.5868411",
+  "moonSign": "7",
+  "sunSign": "3",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "winegrower",
+    "journalist",
+    "financier",
+    "photographer",
+    "businessperson",
+    "television producer",
+    "television personality"
+  ],
+  "qid": "Q6397147",
+  "birthPlace": "Montreal",
+  "fetchedAt": "2026-04-07T16:36:19.486Z"
+}

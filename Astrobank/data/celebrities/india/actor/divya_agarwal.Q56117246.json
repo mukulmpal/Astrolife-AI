@@ -1,0 +1,28 @@
+{
+  "publicId": "b221a62b",
+  "wikipediaSlug": "Divya_Agarwal",
+  "wikipediaId": "Q56117246",
+  "name": "Divya Agarwal",
+  "fullName": "Divya Agarwal",
+  "profileSummary": "Divya Agarwal is an Indian actress, model and dancer known for participating in several reality shows. She is the runner-up of MTV Splitsvilla 10 and winner of Ace of Space 1, Bigg Boss OTT 1. She made her acting debut with the horror web series Ragini MMS: Returns 2.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Divya_Agarwal_in_2023.jpg/330px-Divya_Agarwal_in_2023.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Divya_Agarwal",
+  "dateOfBirth": "1992-12-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.03",
+  "birthCoordinatesLng": "73.01",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q56117246",
+  "birthPlace": "Navi Mumbai",
+  "fetchedAt": "2026-04-07T12:19:09.034Z"
+}

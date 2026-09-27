@@ -34,114 +34,100 @@ export const PulseAlert: React.FC<PulseAlertProps> = ({
     .join(" · ");
 
   return (
-    <div className="py-4 space-y-3">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <div className="flex items-center gap-2.5">
-          <span className="text-2xl font-serif font-bold tracking-wide" style={{ color: "var(--app-fg)" }}>
+    <div className="py-2 space-y-4">
+      {/* Top Main Planet Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border"
+        style={{ background: "var(--app-card-alt, #09071a)", borderColor: "var(--app-border, #FFFFFF)" }}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-xl font-serif font-semibold tracking-wide" style={{ color: "var(--app-fg, #ffffff)" }}>
             {planetPair}
           </span>
           <span
-            className="text-xs uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded border"
+            className="text-[13px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full border font-mono"
             style={{
-              background: "color-mix(in srgb, var(--app-gold) 12%, transparent)",
-              borderColor: "color-mix(in srgb, var(--app-gold) 25%, transparent)",
-              color: "var(--app-gold)",
+              background: "rgba(245,200,66,0.15)",
+              borderColor: "rgba(245,200,66,0.35)",
+              color: "var(--app-gold, #f5c842)",
             }}
           >
             {trigger.evidence.aspectType.replace(/Pratikool/gi, "Pattern")}
           </span>
         </div>
-        <div className="text-xs" style={{ color: "var(--app-muted)" }}>
-          Orb distance: <span className="font-mono font-bold" style={{ color: "var(--app-fg)" }}>{orbStr}</span>
-        </div>
-      </div>
-
-      <div className="text-base font-medium leading-relaxed" style={{ color: "var(--app-fg)" }}>
-        {trigger.headline}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs">
-        {trigger.activatedHouses && trigger.activatedHouses.length > 0 && (
-          <div>
-            <span style={{ color: "var(--app-muted)" }}>Activated Houses:</span>{" "}
-            <span className="font-mono" style={{ color: "var(--app-soft)" }}>
-              {trigger.activatedHouses.map((h) => `H${h}`).join(" ↔ ")}
+        <div className="flex items-center gap-3 text-xs">
+          <span style={{ color: "var(--app-muted, #94a3b8)" }}>
+            Orb: <strong className="font-mono" style={{ color: "var(--app-fg, #ffffff)" }}>{orbStr}</strong>
+          </span>
+          {trigger.lifeAreas.length > 0 && (
+            <span className="px-2.5 py-0.5 rounded border text-[13px] font-semibold"
+              style={{ background: "rgba(245,200,66,0.1)", borderColor: "rgba(245,200,66,0.3)", color: "var(--app-gold, #f5c842)" }}
+            >
+              {lifeAreasFormatted}
             </span>
-          </div>
-        )}
-        {trigger.lifeAreas.length > 0 && (
-          <div>
-            <span style={{ color: "var(--app-muted)" }}>Focus Domain:</span>{" "}
-            <span style={{ color: "var(--app-gold)" }}>{lifeAreasFormatted}</span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {trigger.supportingSignals && trigger.supportingSignals.length > 0 && (
-        <div
-          className="rounded-xl p-2.5 border"
-          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
-        >
-          <div
-            className="text-[10px] font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-1.5"
-            style={{ color: "var(--app-muted)" }}
-          >
-            <span>✦</span> Supporting Signals (Trigger Fusion):
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {trigger.supportingSignals.map((signal, idx) => (
-              <span
-                key={idx}
-                className="text-[11px] px-2 py-0.5 rounded-md border"
-                style={{
-                  background: "color-mix(in srgb, var(--app-border) 40%, transparent)",
-                  borderColor: "var(--app-border)",
-                  color: "var(--app-soft)",
-                }}
-              >
-                • {signal}
-              </span>
-            ))}
-          </div>
+      {/* Main Core Headline - Lal Kitab / Yoga style highlight callout */}
+      <div
+        className="p-4 rounded-xl border text-[13px] leading-relaxed"
+        style={{
+          background: "linear-gradient(135deg, rgba(245,200,66,0.08), transparent)",
+          borderColor: "rgba(245,200,66,0.25)",
+          color: "var(--app-fg, #ffffff)",
+        }}
+      >
+        <div className="text-[12px] uppercase font-mono tracking-wider font-semibold mb-1" style={{ color: "var(--app-gold, #f5c842)" }}>
+          ✦ Celestial Impact
         </div>
-      )}
+        <div className="text-[13px] font-medium" style={{ color: "var(--app-fg, #ffffff)", lineHeight: "1.6" }}>
+          {trigger.headline}
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+      {/* 2-Column Action vs Precaution Cards (Like Yoga remedies / impact) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <div
-          className="rounded-xl p-3 text-xs leading-relaxed border"
-          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+          className="rounded-xl p-4 text-xs leading-relaxed border"
+          style={{ background: "var(--app-card-alt, #09071a)", borderColor: "rgba(34,197,94,0.3)" }}
         >
-          <div className="flex items-center gap-1.5 text-emerald-500 font-semibold mb-1">
+          <div className="flex items-center gap-1.5 text-emerald-400 font-semibold mb-1.5 text-xs font-mono uppercase tracking-wider">
             <span>✓</span> Action Strategy
           </div>
-          <div style={{ color: "var(--app-soft)" }}>{trigger.action}</div>
+          <div style={{ color: "var(--app-soft, #cbd5e1)", lineHeight: "1.6" }}>{trigger.action}</div>
         </div>
 
         {trigger.precaution && (
           <div
-            className="rounded-xl p-3 text-xs leading-relaxed border"
-            style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+            className="rounded-xl p-4 text-xs leading-relaxed border"
+            style={{ background: "var(--app-card-alt, #09071a)", borderColor: "rgba(245,158,11,0.3)" }}
           >
-            <div className="flex items-center gap-1.5 text-amber-500 font-semibold mb-1">
+            <div className="flex items-center gap-1.5 text-amber-400 font-semibold mb-1.5 text-xs font-mono uppercase tracking-wider">
               <span>⚠</span> Conscious Precaution
             </div>
-            <div style={{ color: "var(--app-soft)" }}>{trigger.precaution}</div>
+            <div style={{ color: "var(--app-soft, #cbd5e1)", lineHeight: "1.6" }}>{trigger.precaution}</div>
           </div>
         )}
       </div>
 
-      <div className="pt-2 flex justify-start">
+      {/* Collapsible Evidence Trigger Button */}
+      <div className="pt-1 flex items-center justify-between flex-wrap gap-2">
+        {trigger.activatedHouses && trigger.activatedHouses.length > 0 && (
+          <div className="text-xs" style={{ color: "var(--app-muted, #94a3b8)" }}>
+            Activated Houses: <span className="font-mono text-[#ffffff] font-semibold">{trigger.activatedHouses.map((h) => `H${h}`).join(" ↔ ")}</span>
+          </div>
+        )}
         <button
           type="button"
           onClick={onOpenEvidence}
-          className="group inline-flex items-center gap-2 text-xs font-semibold transition-all py-1.5 px-3 rounded-lg border"
+          className="inline-flex items-center gap-2 text-xs font-semibold py-1.5 px-3.5 rounded-lg border transition-all"
           style={{
-            background: "color-mix(in srgb, var(--app-gold) 10%, transparent)",
-            borderColor: "color-mix(in srgb, var(--app-gold) 28%, transparent)",
-            color: "var(--app-gold)",
+            background: "rgba(245,200,66,0.12)",
+            borderColor: "rgba(245,200,66,0.3)",
+            color: "var(--app-gold, #f5c842)",
           }}
         >
-          <span>{isEvidenceOpen ? "▲ Close Evidence & Shastra" : "▼ Why is this active? (Astronomical & Shastra Evidence)"}</span>
+          <span>{isEvidenceOpen ? "▲ Hide Shastric Proofs" : "▼ Shastric Proof & Evidence"}</span>
         </button>
       </div>
     </div>

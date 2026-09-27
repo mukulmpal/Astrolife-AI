@@ -1,0 +1,26 @@
+{
+  "publicId": "39c7268c",
+  "wikipediaSlug": "Tansen",
+  "wikipediaId": "Q469894",
+  "name": "Tansen",
+  "fullName": "Tansen",
+  "profileSummary": "Rāmtanu Panday, popularly referred to as Mian Tānsen, or Sangeet Samrāt, was a Hindustani classical musician. Born into a Hindu Gaur Brahmin family in Gwalior, he learnt and perfected his art in the northwest region of modern Madhya Pradesh. He got his first break as musician and composer in the court of Raja Man Singh Tomar of Gwalior and spent most of his adult life in the court and patronage of the Hindu king of Rewa, Raja Ramchandra Singh Baghel, where Tānsen's musical abilities and studies gained widespread fame. This reputation brought him to the attention of the Mughal Emperor Akbar. In 1562, at about the age of 60, Tānsen joined Akbar's court, and his performances became the subject of many court historians.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Tansen_of_Gwalior._%2811.8x6.7cm%29_Mughal._1585-90._National_Museum%2C_New_Delhi..jpg/330px-Tansen_of_Gwalior._%2811.8x6.7cm%29_Mughal._1585-90._National_Museum%2C_New_Delhi..jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Tansen",
+  "dateOfBirth": "1493-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.2125",
+  "birthCoordinatesLng": "78.1775",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "composer"
+  ],
+  "qid": "Q469894",
+  "birthPlace": "Gwalior",
+  "fetchedAt": "2026-04-07T16:45:31.653Z"
+}

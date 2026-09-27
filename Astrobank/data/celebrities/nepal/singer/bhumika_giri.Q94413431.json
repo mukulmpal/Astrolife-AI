@@ -1,0 +1,26 @@
+{
+  "publicId": "eb899d40",
+  "wikipediaSlug": "Bhumika_Giri",
+  "wikipediaId": "Q94413431",
+  "name": "Bhumika Giri",
+  "fullName": "Bhumika Giri",
+  "profileSummary": "Bhumika Giri is a Nepalese folk singer. She is popularly known as Stage Queen because of her stage performances. As of July 2016, Giri has recorded over 300 songs.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhumika_Giri",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "82.266666666",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q94413431",
+  "birthPlace": "Dang District",
+  "fetchedAt": "2026-04-07T16:47:25.458Z"
+}

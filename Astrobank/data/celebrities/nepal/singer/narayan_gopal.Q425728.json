@@ -1,0 +1,28 @@
+{
+  "publicId": "aaba2e98",
+  "wikipediaSlug": "Narayan_Gopal",
+  "wikipediaId": "Q425728",
+  "name": "Narayan Gopal",
+  "fullName": "Narayan Gopal",
+  "profileSummary": "Narayan Gopal Gurubacharya, known professionally as Narayan Gopal and N. Gopal was a popular singer and composer of Nepali music. Regarded as one of the most significant cultural icons in Nepal, he is referred to as \"Swar Samrat\" in Nepal. He also sang in Nepal Bhasa.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Narayan_Gopal.jpg/330px-Narayan_Gopal.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Narayan_Gopal",
+  "dateOfBirth": "1939-10-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "2",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "singer-songwriter",
+    "composer"
+  ],
+  "qid": "Q425728",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:48:30.076Z"
+}

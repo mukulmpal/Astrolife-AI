@@ -1,0 +1,28 @@
+{
+  "publicId": "01b6034e",
+  "wikipediaSlug": "Lissy_Samuel",
+  "wikipediaId": "Q6559267",
+  "name": "Lissy Samuel",
+  "fullName": "Lissy Samuel",
+  "profileSummary": "Lissy Samuel is a former Indian cricketer who represented India in ODI cricket. She played a solitary One Day International in 1995. She is a right-hand batter and bowls right-arm medium fast.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Lissy_Samuel",
+  "dateOfBirth": "1967-12-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6559267",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T11:03:17.737Z"
+}

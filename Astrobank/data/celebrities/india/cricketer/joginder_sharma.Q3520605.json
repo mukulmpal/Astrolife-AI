@@ -1,0 +1,28 @@
+{
+  "publicId": "1f3e1bee",
+  "wikipediaSlug": "Joginder_Sharma",
+  "wikipediaId": "Q3520605",
+  "name": "Joginder Sharma",
+  "fullName": "Joginder Sharma",
+  "profileSummary": "DSP Joginder Sharma is an Indian police officer and former professional cricketer who currently serves as a DSP of police in the Haryana Police. He has made sporadic appearances for the Indian cricket team. He also played for Chennai Super Kings from 2008 to 2012. He was a member of the Indian team that won the 2007 inaugural ICC T20 World Cup, where in the final, he took the winning wicket of Misbah-ul-Haq. During his time with Chennai in the IPL, he was a part of the team that won the 2010 and 2011 tournaments.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Joginder_Sharma",
+  "dateOfBirth": "1983-10-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.9",
+  "birthCoordinatesLng": "76.566666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3520605",
+  "birthPlace": "Rohtak",
+  "fetchedAt": "2026-04-07T10:57:45.755Z"
+}

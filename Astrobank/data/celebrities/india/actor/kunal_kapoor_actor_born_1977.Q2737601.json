@@ -1,0 +1,30 @@
+{
+  "publicId": "c9041d77",
+  "wikipediaSlug": "Kunal_Kapoor_(actor,_born_1977)",
+  "wikipediaId": "Q2737601",
+  "name": "Kunal Kapoor (actor, born 1977)",
+  "fullName": "Kunal Kapoor (actor, born 1977)",
+  "profileSummary": "Kunal Kishore Kapoor, professionally known as Kunal Kapoor, is an Indian actor who works predominantly in Hindi films. Kapoor is a recipient of several accolades including a Stardust Award and an Asiavision Award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Kunal_Kapoor_snapped_at_the_Ketto_event.jpg/330px-Kunal_Kapoor_snapped_at_the_Ketto_event.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kunal_Kapoor_(actor%2C_born_1977)",
+  "dateOfBirth": "1975-10-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "screenwriter"
+  ],
+  "qid": "Q2737601",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:17:38.282Z"
+}

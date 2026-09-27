@@ -1,0 +1,26 @@
+{
+  "publicId": "4c383fde",
+  "wikipediaSlug": "Anna_Sharma",
+  "wikipediaId": "Q21064259",
+  "name": "Anna Sharma",
+  "fullName": "Anna Sharma",
+  "profileSummary": "Annapurna Sharma, known professionally as Anna Sharma, is a Nepalese film actress who debuted in the Nepali film industry with the 2014 romantic drama Jerryy. She gained early recognition for her performance alongside Anmol K.C., and the film was both a critical and commercial success.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Anna_Sharma.jpg/330px-Anna_Sharma.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anna_Sharma",
+  "dateOfBirth": "1995-05-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "12",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q21064259",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:21.320Z"
+}

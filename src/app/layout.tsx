@@ -51,7 +51,7 @@ const preferencesScript = `
     const theme = localStorage.getItem("chatThemeMode");
     const landingTheme = localStorage.getItem("landingTheme");
     const safeLanguage = ["hindi", "english", "hinglish"].includes(language || "") ? language : "hinglish";
-    const safeTheme = ["dark", "light"].includes(theme || "") ? theme : "dark";
+    const safeTheme = theme === "dark" ? "dark" : "light"; // default to light for JyothishAI theme
     const safeLandingTheme = ["indigo", "saffron"].includes(landingTheme || "") ? landingTheme : "indigo";
     document.documentElement.dataset.languageMode = safeLanguage;
     document.documentElement.dataset.themeMode = safeTheme;
@@ -63,11 +63,15 @@ const preferencesScript = `
     // ── Vedic day-based palette ──────────────────────────────
     // Each weekday maps to its ruling graha's palette.
     // User can pin a preference via localStorage("astroTheme");
-    // otherwise the day rotates automatically.
+    // default is set to ivory (JyothishAI warm pearl ivory & gold theme).
     const PALETTES = ["saffron","ivory","maroon","forest","midnight","ivory","twilight"];
     const VALID = new Set(PALETTES);
     const pinned = localStorage.getItem("astroTheme");
-    const palette = (pinned && VALID.has(pinned)) ? pinned : PALETTES[new Date().getDay()];
+    const palette = (pinned && VALID.has(pinned) && pinned !== "midnight" && pinned !== "saffron") ? pinned : "ivory";
+    try { 
+      localStorage.setItem("astroTheme", palette);
+      localStorage.setItem("chatThemeMode", "light");
+    } catch {}
     // Remove any previous theme class and apply the new one
     document.body.classList.forEach(c => { if (c.startsWith("theme-")) document.body.classList.remove(c); });
     document.body.classList.add("theme-" + palette);
@@ -82,8 +86,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
-      <body className={`${inter.variable} ${cormorant.variable} min-h-full flex flex-col`} suppressHydrationWarning>
+    <html lang="en" className="h-full antialiased" data-theme-mode="light" suppressHydrationWarning>
+      <body className={`${inter.variable} ${cormorant.variable} min-h-full flex flex-col theme-ivory`} data-theme-mode="light" suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: preferencesScript }} />
         <ThemeProvider>
           {children}

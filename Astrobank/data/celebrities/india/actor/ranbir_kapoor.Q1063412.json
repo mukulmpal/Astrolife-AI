@@ -1,0 +1,32 @@
+{
+  "publicId": "ade70d3f",
+  "wikipediaSlug": "Ranbir_Kapoor",
+  "wikipediaId": "Q1063412",
+  "name": "Ranbir Kapoor",
+  "fullName": "Ranbir Kapoor",
+  "profileSummary": "Ranbir Kapoor is an Indian actor who works in Hindi-language films. He has received several accolades, including seven Filmfare Awards, and is known for his work across a range of film genres. Kapoor has featured in Forbes India’s Celebrity 100 list and is regarded as one of the prominent actors in contemporary Hindi cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Ranbir_Kapoor_snapped_at_Kalina_airport.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ranbir_Kapoor",
+  "dateOfBirth": "1982-09-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "model",
+    "film producer",
+    "screenwriter"
+  ],
+  "qid": "Q1063412",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T11:29:58.977Z"
+}

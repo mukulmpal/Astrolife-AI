@@ -1,0 +1,27 @@
+{
+  "publicId": "22b3f647",
+  "wikipediaSlug": "Bhakta_Raj_Acharya",
+  "wikipediaId": "Q13184221",
+  "name": "Bhakta Raj Acharya",
+  "fullName": "Bhakta Raj Acharya",
+  "profileSummary": "Bhakta Raj Acharya, commonly referred to as Bhajan Shiromani, was a Nepali singer and music-composer, widely known as one of the greatest singers of all time in Nepal. He was born in Kurule Tenupa Dhankuta, Nepal and raised in Kalimpong, India. He moved to Nepal in the 1970s during the flight of Darjeeling singers to Nepal. Acharya's career started in 1973 after he won a gold medal in an All Nepal Song Competition held by Radio Nepal. His career spanned until 1986. He recorded 450 songs and composed about 25–30 songs.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhakta_Raj_Acharya",
+  "dateOfBirth": "1942-10-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.97388889",
+  "birthCoordinatesLng": "87.34333333",
+  "moonSign": "3",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "composer",
+    "singer"
+  ],
+  "qid": "Q13184221",
+  "birthPlace": "Dhankuta",
+  "fetchedAt": "2026-04-07T16:47:37.115Z"
+}

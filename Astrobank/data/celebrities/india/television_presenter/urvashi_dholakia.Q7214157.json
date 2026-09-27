@@ -1,0 +1,30 @@
+{
+  "publicId": "b0b9c8f9",
+  "wikipediaSlug": "Urvashi_Dholakia",
+  "wikipediaId": "Q7214157",
+  "name": "Urvashi Dholakia",
+  "fullName": "Urvashi Dholakia",
+  "profileSummary": "Urvashi Dholakia is an Indian television actress. She is best known for her role of Komolika in the long running television series Kasautii Zindagii Kay, for which she won the Indian Telly Award for Best Actress in a Negative Role and the ITA Award for Best Actress in a Negative Role five times, and for winning the reality television show Bigg Boss 6.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/64/Urvashi_Dholakia_in_2025.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Urvashi_Dholakia",
+  "dateOfBirth": "1978-07-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "television presenter",
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q7214157",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T12:15:16.833Z"
+}

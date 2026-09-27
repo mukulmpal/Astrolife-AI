@@ -1,0 +1,28 @@
+{
+  "publicId": "9e4c36b7",
+  "wikipediaSlug": "Ajit_Agarkar",
+  "wikipediaId": "Q3520013",
+  "name": "Ajit Agarkar",
+  "fullName": "Ajit Agarkar",
+  "profileSummary": "Ajit Bhalchandra Agarkar is a former Indian cricketer and commentator. He was considered a bowling all-rounder. He is known for his fast bowling skills, particularly his pace and ability to take wickets. He is the third highest wicket-taker for India in One Day Internationals (ODIs). He has been the current chairman of the BCCI selection committee since 4 July 2023. He has represented India in more than 200 international matches across all three formats of the game.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/74/AjitAgarkar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajit_Agarkar",
+  "dateOfBirth": "1977-12-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3520013",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:57:20.090Z"
+}

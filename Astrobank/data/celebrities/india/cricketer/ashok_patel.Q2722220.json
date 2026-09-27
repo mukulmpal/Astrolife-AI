@@ -1,0 +1,28 @@
+{
+  "publicId": "7a253f06",
+  "wikipediaSlug": "Ashok_Patel",
+  "wikipediaId": "Q2722220",
+  "name": "Ashok Patel",
+  "fullName": "Ashok Patel",
+  "profileSummary": "Ashok Kurjibhai Patel is a former Indian cricketer. He played domestic cricket for Saurashtra and played eight One Day Internationals for India in 1984–85. He is currently the coach of the Gujarat State Cricket Team. He is also currently the coach in CricMax, NJ.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashok_Patel",
+  "dateOfBirth": "1957-03-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "21.77445",
+  "birthCoordinatesLng": "72.1525",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q2722220",
+  "birthPlace": "Bhavnagar",
+  "fetchedAt": "2026-04-07T10:56:17.640Z"
+}

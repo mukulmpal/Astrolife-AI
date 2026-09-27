@@ -1,0 +1,31 @@
+{
+  "publicId": "dc5a5670",
+  "wikipediaSlug": "Amitabh_Bachchan",
+  "wikipediaId": "Q9570",
+  "name": "Amitabh Bachchan",
+  "fullName": "Amitabh Bachchan",
+  "profileSummary": "Amitabh Bachchan is an Indian actor who works in Hindi cinema. Widely considered one of the greatest, most accomplished and commercially successful actors in the history of Indian cinema, he has starred in over 200 films. Bachchan has been called as the Shahenshah of Bollywood, Sadi ke Mahanayak, Bollywood's Star of the Millennium, or simply Big B. His dominance in the Indian film industry during the 1970s–80s led the French director François Truffaut to describe it as a \"one-man industry\". He is a recipient of several accolades including seven National Film Awards and seventeen Filmfare Awards & one South Filmfare award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Indian_actor_Amitabh_Bachchan.jpg/330px-Indian_actor_Amitabh_Bachchan.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amitabh_Bachchan",
+  "dateOfBirth": "1942-10-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.45",
+  "birthCoordinatesLng": "81.85",
+  "moonSign": "7",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film producer",
+    "singer",
+    "television actor",
+    "actor",
+    "writer"
+  ],
+  "qid": "Q9570",
+  "birthPlace": "Prayagraj",
+  "fetchedAt": "2026-04-07T16:25:19.742Z"
+}

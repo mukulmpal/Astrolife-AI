@@ -1,0 +1,29 @@
+{
+  "publicId": "1f134348",
+  "wikipediaSlug": "Bobby_Deol",
+  "wikipediaId": "Q48619",
+  "name": "Bobby Deol",
+  "fullName": "Bobby Deol",
+  "profileSummary": "Vijay Singh \"Bobby\" Deol is an Indian actor who primarily works in Hindi cinema. He has also appeared in Tamil and Telugu films. A member of the Deol family, he is the younger son of actor Dharmendra and the younger brother of actor Sunny Deol.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Lord_Bobby_2024.jpg/330px-Lord_Bobby_2024.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bobby_Deol",
+  "dateOfBirth": "1969-01-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "animator"
+  ],
+  "qid": "Q48619",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:00:02.861Z"
+}

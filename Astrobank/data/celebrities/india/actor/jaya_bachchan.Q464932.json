@@ -1,0 +1,28 @@
+{
+  "publicId": "4d23aff1",
+  "wikipediaSlug": "Jaya_Bachchan",
+  "wikipediaId": "Q464932",
+  "name": "Jaya Bachchan",
+  "fullName": "Jaya Bachchan",
+  "profileSummary": "Jaya Amitabh Bachchan is an Indian actress and politician. \nShe is regarded as one of the greatest actresses of Hindi cinema. She is serving as member of the parliament in the Rajya Sabha from the Samajwadi Party since 2004. Having worked in Hindi films and Bengali films, she is noted for reinforcing a natural style of acting in both mainstream and arthouse cinema. A recipient of several accolades, she has won ten Filmfare Awards, including a Lifetime Achievement Award and Padma Shri, the fourth-highest civilian honour awarded by the Government of India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Jaya_Bachchan_2024.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jaya_Bachchan",
+  "dateOfBirth": "1948-04-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.166666666",
+  "birthCoordinatesLng": "79.933333333",
+  "moonSign": "12",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "politician",
+    "film actor"
+  ],
+  "qid": "Q464932",
+  "birthPlace": "Jabalpur",
+  "fetchedAt": "2026-04-07T16:34:01.694Z"
+}

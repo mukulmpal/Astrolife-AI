@@ -1,0 +1,30 @@
+{
+  "publicId": "4d004c3f",
+  "wikipediaSlug": "Mangal_Pandey",
+  "wikipediaId": "Q382027",
+  "name": "Mangal Pandey",
+  "fullName": "Mangal Pandey",
+  "profileSummary": "Mangal Pandey was an Indian soldier who played a key role in the events that led to the Indian Rebellion of 1857, which resulted in the dissolution of the East India Company and the beginning of the British Raj through the Government of India Act 1858. He was a sepoy in the 34th Regiment of the Bengal Native Infantry. In 1984, the Republic of India issued a postage stamp in his memory. His life and actions have also been portrayed in several Indian cinematic productions.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Mangal_Pandey_1984_stamp_of_India.jpg/330px-Mangal_Pandey_1984_stamp_of_India.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mangal_Pandey",
+  "dateOfBirth": "1827-07-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.7625",
+  "birthCoordinatesLng": "84.151944444",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "military personnel",
+    "resistance fighter",
+    "freedom fighter"
+  ],
+  "qid": "Q382027",
+  "birthPlace": "Ballia",
+  "fetchedAt": "2026-04-07T11:29:50.338Z"
+}

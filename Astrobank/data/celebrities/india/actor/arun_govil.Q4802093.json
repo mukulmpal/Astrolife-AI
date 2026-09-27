@@ -1,0 +1,27 @@
+{
+  "publicId": "984a070c",
+  "wikipediaSlug": "Arun_Govil",
+  "wikipediaId": "Q4802093",
+  "name": "Arun Govil",
+  "fullName": "Arun Govil",
+  "profileSummary": "Arun Govil is an Indian actor and politician from the Bharatiya Janata Party. He is best known for portraying Lord Rama in the Ramayan TV series and reprising his role as Lord Rama in the 1993 animated film, Ramayana: The Legend of Prince Rama. He also appeared in films like Paheli (1977), Sawan Ko Aane Do (1979), Saanch Ko Aanch Nahin (1979), Jiyo To Aise Jiyo (1981), Himmatwala (1983), Dilwaala (1986), and Govinda Govinda (1994). He is currently serving as a Member of Parliament, Lok Sabha to Meerut Lok Sabha constituency from June 2024.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Arun_Govil.jpg/330px-Arun_Govil.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arun_Govil",
+  "dateOfBirth": "1958-01-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.98",
+  "birthCoordinatesLng": "77.706388888",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "politician"
+  ],
+  "qid": "Q4802093",
+  "birthPlace": "Meerut",
+  "fetchedAt": "2026-04-07T16:20:03.486Z"
+}

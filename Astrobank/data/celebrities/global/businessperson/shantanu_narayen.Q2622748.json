@@ -1,0 +1,27 @@
+{
+  "publicId": "aed88bd4",
+  "wikipediaSlug": "Shantanu_Narayen",
+  "wikipediaId": "Q2622748",
+  "name": "Shantanu Narayen",
+  "fullName": "Shantanu Narayen",
+  "profileSummary": "Shantanu Narayen is an American business executive who has been the chairman, president, and chief executive officer (CEO) of Adobe Inc. since December 2007. Before this, he was the company's president and chief operating officer since 2005.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Shantanu_Narayen_-_the_CEO_of_Adobe_Inc.jpg/330px-Shantanu_Narayen_-_the_CEO_of_Adobe_Inc.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shantanu_Narayen",
+  "dateOfBirth": "1963-05-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "17.361666666",
+  "birthCoordinatesLng": "78.474722222",
+  "moonSign": "4",
+  "sunSign": "1",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson",
+    "computer scientist"
+  ],
+  "qid": "Q2622748",
+  "birthPlace": "Hyderabad",
+  "fetchedAt": "2026-04-08T02:03:50.842Z"
+}

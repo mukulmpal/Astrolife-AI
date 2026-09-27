@@ -1,0 +1,28 @@
+{
+  "publicId": "9692563d",
+  "wikipediaSlug": "Ashok_Kumar_(British_politician)",
+  "wikipediaId": "Q4805749",
+  "name": "Ashok Kumar (British politician)",
+  "fullName": "Ashok Kumar (British politician)",
+  "profileSummary": "Ashok Kumar was a British Labour politician who served as Member of Parliament (MP) for Middlesbrough South and East Cleveland from 1997 until his sudden death shortly before the 2010 general election.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e5/Ashok_Kumar_MP.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashok_Kumar_(British_politician)",
+  "dateOfBirth": "1956-05-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.85",
+  "birthCoordinatesLng": "80.91",
+  "moonSign": "9",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "engineer",
+    "politician",
+    "mathematician"
+  ],
+  "qid": "Q4805749",
+  "birthPlace": "Uttar Pradesh",
+  "fetchedAt": "2026-04-08T00:22:09.463Z"
+}

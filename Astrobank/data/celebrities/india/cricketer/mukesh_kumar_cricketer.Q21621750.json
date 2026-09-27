@@ -1,0 +1,28 @@
+{
+  "publicId": "0a36b9b5",
+  "wikipediaSlug": "Mukesh_Kumar_(cricketer)",
+  "wikipediaId": "Q21621750",
+  "name": "Mukesh Kumar (cricketer)",
+  "fullName": "Mukesh Kumar (cricketer)",
+  "profileSummary": "Mukesh Kumar is an Indian international cricketer. Mukesh plays as right fast bowler for the India national cricket team in international cricket, for the Delhi Capitals in the Indian Premier League and for Bengal in domestic cricket and for Mohun Bagan in CAB first division and for Sobisco Smashers Malda in Bengal Pro T20 League. He made his Test debut in July 2023, playing for India against West Indies.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mukesh_Kumar_(cricketer)",
+  "dateOfBirth": "1993-10-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.5675",
+  "birthCoordinatesLng": "88.37",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q21621750",
+  "birthPlace": "Kolkata",
+  "fetchedAt": "2026-04-07T10:58:23.204Z"
+}

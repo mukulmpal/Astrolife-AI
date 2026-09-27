@@ -1,0 +1,27 @@
+{
+  "publicId": "30c3dfc2",
+  "wikipediaSlug": "Amber_Gurung",
+  "wikipediaId": "Q4741248",
+  "name": "Amber Gurung",
+  "fullName": "Amber Gurung",
+  "profileSummary": "Shree Amber Gurung was a Nepalese composer, singer, and lyricist. He composed Nepal's national anthem, \"Sayaun Thunga Phulka\".",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Amberrr.jpg/330px-Amberrr.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amber_Gurung",
+  "dateOfBirth": "1938-02-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.0375",
+  "birthCoordinatesLng": "88.263055555",
+  "moonSign": "9",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "composer",
+    "music director"
+  ],
+  "qid": "Q4741248",
+  "birthPlace": "Darjeeling",
+  "fetchedAt": "2026-04-07T16:47:23.605Z"
+}

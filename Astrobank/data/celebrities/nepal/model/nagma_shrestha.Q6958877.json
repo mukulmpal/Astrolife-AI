@@ -1,0 +1,27 @@
+{
+  "publicId": "66446342",
+  "wikipediaSlug": "Nagma_Shrestha",
+  "wikipediaId": "Q6958877",
+  "name": "Nagma Shrestha",
+  "fullName": "Nagma Shrestha",
+  "profileSummary": "Nagma Shrestha is a Nepalese beauty pageant titleholder, television presenter and the first Miss Universe Nepal, crowned in 2017.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nagma_Shrestha",
+  "dateOfBirth": "1991-11-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "9",
+  "sunSign": "7",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "beauty pageant contestant"
+  ],
+  "qid": "Q6958877",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:45:06.336Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "f516cc9f",
+  "wikipediaSlug": "Chandeshwor_Jha",
+  "wikipediaId": "Q16730289",
+  "name": "Chandeshwor Jha",
+  "fullName": "Chandeshwor Jha",
+  "profileSummary": "Chandeshwor Jha is a Nepali politician from Mohattori. He is a permanent resident of Jaleshwor Municipality Ward 7.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chandeshwor_Jha",
+  "dateOfBirth": "1959-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.65",
+  "birthCoordinatesLng": "85.8",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q16730289",
+  "birthPlace": "Jaleshwar",
+  "fetchedAt": "2026-04-07T16:53:05.509Z"
+}

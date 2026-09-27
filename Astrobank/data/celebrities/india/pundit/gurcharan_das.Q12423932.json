@@ -1,0 +1,28 @@
+{
+  "publicId": "5ec10606",
+  "wikipediaSlug": "Gurcharan_Das",
+  "wikipediaId": "Q12423932",
+  "name": "Gurcharan Das",
+  "fullName": "Gurcharan Das",
+  "profileSummary": "Gurcharan Das is an Indian author who wrote a trilogy based on the classical Indian goals of the ideal life.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Speaking_podium_latest.jpg/330px-Speaking_podium_latest.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gurcharan_Das",
+  "dateOfBirth": "1943-10-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.418",
+  "birthCoordinatesLng": "73.079",
+  "moonSign": "8",
+  "sunSign": "6",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "pundit",
+    "writer",
+    "businessperson"
+  ],
+  "qid": "Q12423932",
+  "birthPlace": "Faisalabad",
+  "fetchedAt": "2026-04-08T02:05:09.615Z"
+}

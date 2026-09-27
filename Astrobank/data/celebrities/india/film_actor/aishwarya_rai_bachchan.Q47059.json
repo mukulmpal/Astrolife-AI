@@ -1,0 +1,29 @@
+{
+  "publicId": "a06e3ff8",
+  "wikipediaSlug": "Aishwarya_Rai_Bachchan",
+  "wikipediaId": "Q47059",
+  "name": "Aishwarya Rai Bachchan",
+  "fullName": "Aishwarya Rai Bachchan",
+  "profileSummary": "Aishwarya Rai Bachchan is an Indian actress who is primarily known for her work in Hindi films. Rai won the Miss World 1994 pageant and later established herself as one of the most-popular and influential celebrities in India. She has received numerous accolades for her acting, including two Filmfare Awards. In 2004, Time magazine named her one of the 100 most influential people in the world. In 2009, the Government of India honoured her with the Padma Shri and in 2012, the Government of France awarded her with the Order of Arts and Letters. From the late 1990s, she has often been called \"the most beautiful woman in the world\".",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Aishwarya_Rai_Cannes_2017.jpg/330px-Aishwarya_Rai_Cannes_2017.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aishwarya_Rai_Bachchan",
+  "dateOfBirth": "1973-11-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.871666666",
+  "birthCoordinatesLng": "74.8425",
+  "moonSign": "9",
+  "sunSign": "7",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "model",
+    "beauty pageant contestant",
+    "actor"
+  ],
+  "qid": "Q47059",
+  "birthPlace": "Mangaluru",
+  "fetchedAt": "2026-04-07T16:33:49.351Z"
+}

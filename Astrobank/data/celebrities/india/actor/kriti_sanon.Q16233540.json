@@ -1,0 +1,29 @@
+{
+  "publicId": "36dc9195",
+  "wikipediaSlug": "Kriti_Sanon",
+  "wikipediaId": "Q16233540",
+  "name": "Kriti Sanon",
+  "fullName": "Kriti Sanon",
+  "profileSummary": "Kriti Sanon is an Indian actress who primarily works in Hindi films. She is a recipient of several accolades including a National Film Award and two Filmfare Awards. Sanon was featured in Forbes India's Celebrity 100 list of 2019.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Kriti_Sanon_at_Adipurush_pre_release_event_%282%29_%28cropped%29.jpg/330px-Kriti_Sanon_at_Adipurush_pre_release_event_%282%29_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kriti_Sanon",
+  "dateOfBirth": "1990-07-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": "6",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "singer",
+    "film actor"
+  ],
+  "qid": "Q16233540",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T16:34:39.806Z"
+}

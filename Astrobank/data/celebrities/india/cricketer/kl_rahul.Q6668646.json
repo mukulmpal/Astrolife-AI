@@ -1,0 +1,28 @@
+{
+  "publicId": "2f9b39e5",
+  "wikipediaSlug": "KL_Rahul",
+  "wikipediaId": "Q6668646",
+  "name": "KL Rahul",
+  "fullName": "KL Rahul",
+  "profileSummary": "Kannaur Lokesh Rahul is an Indian international cricketer. He plays for the Indian national team as a right-handed wicket-keeper batter. Rahul represents Karnataka in domestic cricket and Delhi Capitals in the Indian Premier League.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/69/KL_Rahul_at_Femina_Miss_India_2018_Grand_Finale_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/KL_Rahul",
+  "dateOfBirth": "1992-04-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6668646",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T10:58:11.124Z"
+}

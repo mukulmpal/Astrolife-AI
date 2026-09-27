@@ -1,0 +1,28 @@
+{
+  "publicId": "ce9cbd77",
+  "wikipediaSlug": "Arati_Vaidya",
+  "wikipediaId": "Q4784428",
+  "name": "Arati Vaidya",
+  "fullName": "Arati Vaidya",
+  "profileSummary": "Arati Vaidya is an Indian former cricketer who played as a left-handed batter. She appeared in three Test matches and six One Day Internationals for India from 1995 until 1999. She played domestic cricket for Maharashtra, Railways and Mumbai.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arati_Vaidya",
+  "dateOfBirth": "1970-07-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4784428",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T11:02:41.358Z"
+}

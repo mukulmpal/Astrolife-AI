@@ -1,0 +1,28 @@
+{
+  "publicId": "718c2433",
+  "wikipediaSlug": "Ali_Fazal",
+  "wikipediaId": "Q4724794",
+  "name": "Ali Fazal",
+  "fullName": "Ali Fazal",
+  "profileSummary": "Ali Fazal is an Indian actor who works primarily in Hindi films and television series. He made his screen debut with a small role in the film The Other End of the Line (2008) before appearing in the television miniseries Bollywood Hero (2009).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ali_Fazal_graces_the_World_Premiere_of_%E2%80%98Victoria_and_Abdul%E2%80%99.jpg/330px-Ali_Fazal_graces_the_World_Premiere_of_%E2%80%98Victoria_and_Abdul%E2%80%99.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ali_Fazal",
+  "dateOfBirth": "1986-10-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "11",
+  "sunSign": "6",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor",
+    "stage actor"
+  ],
+  "qid": "Q4724794",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:55.248Z"
+}

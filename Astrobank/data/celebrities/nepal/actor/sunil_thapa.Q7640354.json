@@ -1,0 +1,27 @@
+{
+  "publicId": "d04e174d",
+  "wikipediaSlug": "Sunil_Thapa",
+  "wikipediaId": "Q7640354",
+  "name": "Sunil Thapa",
+  "fullName": "Sunil Thapa",
+  "profileSummary": "Sunil Thapa was a Nepalese actor who appeared in Nepali, Bollywood and Bhojpuri films. He began his career with the Bollywood film Ek Duuje Ke Liye. He later appeared in notable productions including Mary Kom (2014), in which he played boxing coach Narjit Singh, and the web series The Family Man 3.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Sunil_Thapa.jpg/330px-Sunil_Thapa.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Sunil_Thapa",
+  "dateOfBirth": "1957-05-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "10",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q7640354",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:08.071Z"
+}

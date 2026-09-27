@@ -1,0 +1,28 @@
+{
+  "publicId": "2cc9328b",
+  "wikipediaSlug": "Devika_Vaidya",
+  "wikipediaId": "Q23770460",
+  "name": "Devika Vaidya",
+  "fullName": "Devika Vaidya",
+  "profileSummary": "Devika Vaidya is an Indian cricketer who plays for Maharashtra in domestic matches and the India women's national team.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Devika_Vaidya",
+  "dateOfBirth": "1997-07-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.521111111",
+  "birthCoordinatesLng": "73.855277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q23770460",
+  "birthPlace": "Pune",
+  "fetchedAt": "2026-04-07T11:02:42.125Z"
+}

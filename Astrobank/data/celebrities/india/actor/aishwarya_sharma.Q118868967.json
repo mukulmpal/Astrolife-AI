@@ -1,0 +1,28 @@
+{
+  "publicId": "1274a53e",
+  "wikipediaSlug": "Aishwarya_Sharma",
+  "wikipediaId": "Q118868967",
+  "name": "Aishwarya Sharma",
+  "fullName": "Aishwarya Sharma",
+  "profileSummary": "Aishwarya Sharma is an Indian actress and classical dancer known for her work in Hindi television shows. She is best known for her portrayal of Patralekha \"Pakhi\" Mohitepatil in Star Plus's romantic drama Ghum Hai Kisikey Pyaar Meiin. In 2023, she participated in the reality shows Fear Factor: Khatron Ke Khiladi 13 and Bigg Boss 17.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Actress_Aishwarya_Sharma_in_2025.jpg/330px-Actress_Aishwarya_Sharma_in_2025.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aishwarya_Sharma",
+  "dateOfBirth": "1992-12-08",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.182777777",
+  "birthCoordinatesLng": "75.777222222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q118868967",
+  "birthPlace": "Ujjain",
+  "fetchedAt": "2026-04-07T12:18:26.483Z"
+}

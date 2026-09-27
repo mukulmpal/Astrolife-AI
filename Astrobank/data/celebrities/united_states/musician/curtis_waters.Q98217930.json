@@ -1,0 +1,26 @@
+{
+  "publicId": "cb20a9fd",
+  "wikipediaSlug": "Curtis_Waters",
+  "wikipediaId": "Q98217930",
+  "name": "Curtis Waters",
+  "fullName": "Curtis Waters",
+  "profileSummary": "Abhinav Bastakoti, known by his stage name Curtis Waters, is a Canadian-American musician, rapper, singer and songwriter. He is known for his 2020 debut single \"Stunnin'\". He is the first Nepal-born musician to attain international success.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Curtis_Waters",
+  "dateOfBirth": "1999-12-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "7",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "musician"
+  ],
+  "qid": "Q98217930",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-08T02:07:04.013Z"
+}

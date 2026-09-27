@@ -1,0 +1,26 @@
+{
+  "publicId": "11928550",
+  "wikipediaSlug": "Shiv_Nadar",
+  "wikipediaId": "Q3522726",
+  "name": "Shiv Nadar",
+  "fullName": "Shiv Nadar",
+  "profileSummary": "Shiv Nadar is an Indian billionaire businessman and philanthropist. He is the founder and chairman of HCL Technologies, and is chairman of the Shiv Nadar Foundation. Nadar founded HCL in 1976 and transformed the IT hardware company into an IT enterprise over the next three decades.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Shiv_Nadar.png/330px-Shiv_Nadar.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shiv_Nadar",
+  "dateOfBirth": "1945-07-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "8.783333333",
+  "birthCoordinatesLng": "78.133333333",
+  "moonSign": "5",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q3522726",
+  "birthPlace": "Thoothukudi",
+  "fetchedAt": "2026-04-08T02:06:20.465Z"
+}

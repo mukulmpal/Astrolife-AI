@@ -1,0 +1,27 @@
+{
+  "publicId": "a2df5f0a",
+  "wikipediaSlug": "Tina_Ambani",
+  "wikipediaId": "Q2721694",
+  "name": "Tina Ambani",
+  "fullName": "Tina Ambani",
+  "profileSummary": "Tina Ambani is an Indian former actress. She is married to Anil Ambani, chairman of Reliance Group.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Tina_ambani.jpg/330px-Tina_ambani.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Tina_Ambani",
+  "dateOfBirth": "1957-02-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "3",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q2721694",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T02:04:53.419Z"
+}

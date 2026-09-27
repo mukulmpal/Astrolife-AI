@@ -1,0 +1,28 @@
+{
+  "publicId": "9c677695",
+  "wikipediaSlug": "Kashvee_Gautam",
+  "wikipediaId": "Q133842847",
+  "name": "Kashvee Gautam",
+  "fullName": "Kashvee Gautam",
+  "profileSummary": "Kashvee Gautam is an Indian cricketer who represents the national team. She plays for Gujarat Giants in the Women's Premier League and for Chandigarh in domestic cricket.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kashvee_Gautam",
+  "dateOfBirth": "2003-04-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q133842847",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T11:03:26.792Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "a70fc4a2",
+  "wikipediaSlug": "Padmini_Kolhapure",
+  "wikipediaId": "Q3595902",
+  "name": "Padmini Kolhapure",
+  "fullName": "Padmini Kolhapure",
+  "profileSummary": "Padmini Kolhapure is an Indian actress and singer, who primarily works in Hindi and Marathi films. Kolhapure is considered as one of the leading actress of the 80s. In a career spanning over four decades, she has worked in over 75 films and has received several accolades including three Filmfare Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/PadminiKolhapure.jpg/330px-PadminiKolhapure.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Padmini_Kolhapure",
+  "dateOfBirth": "1965-11-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "18.97",
+  "birthCoordinatesLng": "72.82",
+  "moonSign": "10",
+  "sunSign": "7",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "singer"
+  ],
+  "qid": "Q3595902",
+  "birthPlace": "Maharashtra",
+  "fetchedAt": "2026-04-07T16:34:33.213Z"
+}

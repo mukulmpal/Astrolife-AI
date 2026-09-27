@@ -1,0 +1,28 @@
+{
+  "publicId": "c4aef9cf",
+  "wikipediaSlug": "Akash_Deep",
+  "wikipediaId": "Q62004095",
+  "name": "Akash Deep",
+  "fullName": "Akash Deep",
+  "profileSummary": "Akash Deep is an Indian international cricketer. He plays as a right arm fast bowler and right handed lower order batter for the Indian team in test cricket. He represents Bengal in domestic cricket and Kolkata Knight Riders in the Indian Premier League.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Akash_Deep",
+  "dateOfBirth": "1996-12-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "24.87",
+  "birthCoordinatesLng": "84.18",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q62004095",
+  "birthPlace": "Dehri",
+  "fetchedAt": "2026-04-07T10:50:45.109Z"
+}

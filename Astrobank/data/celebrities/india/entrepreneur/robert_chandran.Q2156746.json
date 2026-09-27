@@ -1,0 +1,26 @@
+{
+  "publicId": "7844a70c",
+  "wikipediaSlug": "Robert_Chandran",
+  "wikipediaId": "Q2156746",
+  "name": "Robert Chandran",
+  "fullName": "Robert Chandran",
+  "profileSummary": "Robert Viswanathan Chandran was an Indian-born Singaporean business executive, and the founder and CEO of the Chemoil company.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Robert_Chandran",
+  "dateOfBirth": "1950-05-31",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "8",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "entrepreneur"
+  ],
+  "qid": "Q2156746",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T02:04:52.731Z"
+}

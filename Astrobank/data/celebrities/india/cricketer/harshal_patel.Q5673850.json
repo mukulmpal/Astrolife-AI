@@ -1,0 +1,28 @@
+{
+  "publicId": "1f023e7a",
+  "wikipediaSlug": "Harshal_Patel",
+  "wikipediaId": "Q5673850",
+  "name": "Harshal Patel",
+  "fullName": "Harshal Patel",
+  "profileSummary": "Harshal Patel is an Indian cricketer who has played for the country's national team in Twenty20 internationals (T20I). A right-arm medium pace bowler who bats right-handed, Patel made his T20I debut against New Zealand on 19 November 2021. Patel has played for Gujarat and Haryana in domestic competitions. Currently, he is playing for Sunrisers Hyderabad in the Indian Premier League. He has also played for Royal Challengers Bangalore, Punjab Kings and Delhi Capitals in the Indian Premier League.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Harshal_Patel",
+  "dateOfBirth": "1990-11-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.98",
+  "birthCoordinatesLng": "72.38",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5673850",
+  "birthPlace": "Sanand",
+  "fetchedAt": "2026-04-07T10:57:59.097Z"
+}

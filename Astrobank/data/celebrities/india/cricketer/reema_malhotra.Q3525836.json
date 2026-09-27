@@ -1,0 +1,28 @@
+{
+  "publicId": "3813a5aa",
+  "wikipediaSlug": "Reema_Malhotra",
+  "wikipediaId": "Q3525836",
+  "name": "Reema Malhotra",
+  "fullName": "Reema Malhotra",
+  "profileSummary": "Reema Malhotra is an Indian former cricketer who played as a right-handed batter and right-arm leg break bowler. She appeared in one Test match, 41 One Day Internationals and 22 Twenty20 Internationals for India between 2003 and 2013. She played domestic cricket for Delhi, Railways and Assam.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Reema_Malhotra",
+  "dateOfBirth": "1980-10-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3525836",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T11:03:31.587Z"
+}

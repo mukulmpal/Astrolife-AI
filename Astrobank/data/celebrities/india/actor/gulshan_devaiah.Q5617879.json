@@ -1,0 +1,29 @@
+{
+  "publicId": "4123ef96",
+  "wikipediaSlug": "Gulshan_Devaiah",
+  "wikipediaId": "Q5617879",
+  "name": "Gulshan Devaiah",
+  "fullName": "Gulshan Devaiah",
+  "profileSummary": "Gulshan Devaiah is an Indian actor who primarily appears in Hindi films. He is known for his roles in Shaitan, Hate Story and Hunterrr. His performance in Shaitan was critically praised and earned him a nomination for Filmfare Award for Best Male Debut. He has starred in web series such as Afsos, Duranga, Dahaad,Guns & Gulaabs and Bad Cops.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Gulshan_Devaiya_at_Chandon%27s_party_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gulshan_Devaiah",
+  "dateOfBirth": "1978-05-28",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director"
+  ],
+  "qid": "Q5617879",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T12:17:40.777Z"
+}

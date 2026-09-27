@@ -1,0 +1,29 @@
+{
+  "publicId": "2b981540",
+  "wikipediaSlug": "Meena_Kumari",
+  "wikipediaId": "Q465848",
+  "name": "Meena Kumari",
+  "fullName": "Meena Kumari",
+  "profileSummary": "Meena Kumari was an Indian actress and poet, who worked in Hindi films. Known as \"The Tragedy Queen\", she is regarded among the finest and greatest actresses in the history of Indian cinema. In a career spanning 33 years, from child actress to adult, Kumari starred in over 90 films.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Meena_Kumariji.jpg/330px-Meena_Kumariji.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Meena_Kumari",
+  "dateOfBirth": "1933-08-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.017980555",
+  "birthCoordinatesLng": "72.844763888",
+  "moonSign": "8",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "poet",
+    "costume designer",
+    "singer"
+  ],
+  "qid": "Q465848",
+  "birthPlace": "Dadar",
+  "fetchedAt": "2026-04-07T16:34:23.330Z"
+}

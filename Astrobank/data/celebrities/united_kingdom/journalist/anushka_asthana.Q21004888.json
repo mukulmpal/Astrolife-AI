@@ -1,0 +1,27 @@
+{
+  "publicId": "792064fa",
+  "wikipediaSlug": "Anushka_Asthana",
+  "wikipediaId": "Q21004888",
+  "name": "Anushka Asthana",
+  "fullName": "Anushka Asthana",
+  "profileSummary": "Anushka Asthana is a British journalist, television presenter and author. She is the US editor for Channel 4 News, having previously been the deputy Political Editor of ITV News.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anushka_Asthana",
+  "dateOfBirth": "1980-03-31",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "53.5809",
+  "birthCoordinatesLng": "-0.6502",
+  "moonSign": "6",
+  "sunSign": "12",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist",
+    "news presenter"
+  ],
+  "qid": "Q21004888",
+  "birthPlace": "Scunthorpe",
+  "fetchedAt": "2026-04-08T00:22:15.843Z"
+}

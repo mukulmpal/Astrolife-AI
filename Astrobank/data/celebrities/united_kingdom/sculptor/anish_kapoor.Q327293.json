@@ -1,0 +1,33 @@
+{
+  "publicId": "5ce40f76",
+  "wikipediaSlug": "Anish_Kapoor",
+  "wikipediaId": "Q327293",
+  "name": "Anish Kapoor",
+  "fullName": "Anish Kapoor",
+  "profileSummary": "Sir Anish Mikhail Kapoor is a British sculptor specializing in installation art and conceptual art. Born in Mumbai, Kapoor attended the all-boys Indian boarding school The Doon School, before moving to the United Kingdom to begin his art training at Hornsey College of Art and, later, Chelsea School of Art and Design.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Anish_Kapoor_2017.jpg/330px-Anish_Kapoor_2017.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anish_Kapoor",
+  "dateOfBirth": "1954-03-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "3",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "sculptor",
+    "visual artist",
+    "painter",
+    "architect",
+    "scenographer",
+    "draftsperson",
+    "jewelry designer",
+    "artist"
+  ],
+  "qid": "Q327293",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T00:22:03.357Z"
+}

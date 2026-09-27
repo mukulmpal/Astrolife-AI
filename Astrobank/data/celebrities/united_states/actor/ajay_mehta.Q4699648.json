@@ -1,0 +1,27 @@
+{
+  "publicId": "9d17d713",
+  "wikipediaSlug": "Ajay_Mehta",
+  "wikipediaId": "Q4699648",
+  "name": "Ajay Mehta",
+  "fullName": "Ajay Mehta",
+  "profileSummary": "Ajay Mehta is an Indian actor based in North America, known for his deep baritone voice.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajay_Mehta",
+  "dateOfBirth": "1938-07-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": "6",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor"
+  ],
+  "qid": "Q4699648",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-08T00:00:09.969Z"
+}

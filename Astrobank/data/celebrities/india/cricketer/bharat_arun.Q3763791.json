@@ -1,0 +1,28 @@
+{
+  "publicId": "208fa5f7",
+  "wikipediaSlug": "Bharat_Arun",
+  "wikipediaId": "Q3763791",
+  "name": "Bharat Arun",
+  "fullName": "Bharat Arun",
+  "profileSummary": "Bharat Arun, is a former Indian Test cricketer and bowling coach for the India national cricket team, and the current bowling coach for the Lucknow Super Giants. Previously, he was served as a bowling coach of Kolkata Knight Riders for 4 IPL seasons.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bharat_Arun",
+  "dateOfBirth": "1962-12-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.516666666",
+  "birthCoordinatesLng": "80.616666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3763791",
+  "birthPlace": "Vijayawada",
+  "fetchedAt": "2026-04-07T10:56:09.439Z"
+}

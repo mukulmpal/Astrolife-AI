@@ -1,0 +1,28 @@
+{
+  "publicId": "f08557a1",
+  "wikipediaSlug": "Deepak_Dobriyal",
+  "wikipediaId": "Q3633940",
+  "name": "Deepak Dobriyal",
+  "fullName": "Deepak Dobriyal",
+  "profileSummary": "Deepak Dobriyal is an Indian actor known for his work in several films and theatre productions. He is a recipient of several awards including a Filmfare Award, a Filmfare Award Marathi and a Maharashtra State Film Award.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Deepak_Dobriyal_in_2013.jpg/330px-Deepak_Dobriyal_in_2013.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepak_Dobriyal",
+  "dateOfBirth": "1975-09-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.15",
+  "birthCoordinatesLng": "78.775277777",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q3633940",
+  "birthPlace": "Pauri",
+  "fetchedAt": "2026-04-07T12:17:27.022Z"
+}

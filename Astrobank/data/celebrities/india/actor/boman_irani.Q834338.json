@@ -1,0 +1,33 @@
+{
+  "publicId": "b47a2522",
+  "wikipediaSlug": "Boman_Irani",
+  "wikipediaId": "Q834338",
+  "name": "Boman Irani",
+  "fullName": "Boman Irani",
+  "profileSummary": "Boman Irani is an Indian actor and comedian who worked primarily in Hindi-language films. He has featured in over 100 films, and is the recipient of a Filmfare Award and two IIFA Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/IIFA_2017_Green_Carpet_%2836349841166%29_%28cropped%29.jpg/330px-IIFA_2017_Green_Carpet_%2836349841166%29_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Boman_Irani",
+  "dateOfBirth": "1959-12-02",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "voice actor",
+    "photographer",
+    "film actor",
+    "television actor",
+    "film director"
+  ],
+  "qid": "Q834338",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:17:00.695Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "3f805a5b",
+  "wikipediaSlug": "Aliza_Vellani",
+  "wikipediaId": "Q4727568",
+  "name": "Aliza Vellani",
+  "fullName": "Aliza Vellani",
+  "profileSummary": "Aliza Vellani is a Canadian film and television actress based in British Columbia. Vellani is most recently known for her role as Rani Singh in the Netflix series, Sweet Tooth. Her other credits include Layla Siddiqui on CBC's series Little Mosque on the Prairie, Marcy in the CW series iZombie and Sandeep in the revival season of the Fox series The X-Files.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Aliza_Vellani_Photo_1.jpg/330px-Aliza_Vellani_Photo_1.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aliza_Vellani",
+  "dateOfBirth": "1991-10-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "49.260833333",
+  "birthCoordinatesLng": "-123.113888888",
+  "moonSign": "4",
+  "sunSign": "7",
+  "lagnaSignText": "4",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q4727568",
+  "birthPlace": "Vancouver",
+  "fetchedAt": "2026-04-08T00:52:18.326Z"
+}

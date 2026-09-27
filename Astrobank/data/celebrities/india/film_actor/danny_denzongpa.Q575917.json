@@ -1,0 +1,30 @@
+{
+  "publicId": "04aadb38",
+  "wikipediaSlug": "Danny_Denzongpa",
+  "wikipediaId": "Q575917",
+  "name": "Danny Denzongpa",
+  "fullName": "Danny Denzongpa",
+  "profileSummary": "Danny Denzongpa is an Indian actor, playback singer, film director, and liquor baron of Sikkimese descent. His film career was primarily in Hindi, but also occasionally in Bengali, Nepali, and Tamil films. In a career spanning five decades, has acted in over 190 films since 1971. In 2003, Denzongpa was awarded the Padma Shri, India's fourth-highest civilian honour.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Danny_Denzongpa2_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Danny_Denzongpa",
+  "dateOfBirth": "1948-02-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.33",
+  "birthCoordinatesLng": "88.62",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "television actor"
+  ],
+  "qid": "Q575917",
+  "birthPlace": "Gangtok",
+  "fetchedAt": "2026-04-07T12:17:25.548Z"
+}

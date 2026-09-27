@@ -1,0 +1,28 @@
+{
+  "publicId": "42d1361d",
+  "wikipediaSlug": "Amrita_Shinde",
+  "wikipediaId": "Q4748683",
+  "name": "Amrita Shinde",
+  "fullName": "Amrita Shinde",
+  "profileSummary": "Amrita Shinde is an Indian former cricketer who played as an all-rounder, batting right-handed and bowling right-arm leg break. She appeared in one Test match and five One Day Internationals for India in 2002. She played domestic cricket for Maharashtra and Air India.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Amrita_Shinde.jpg/330px-Amrita_Shinde.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amrita_Shinde",
+  "dateOfBirth": "1975-07-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.7",
+  "birthCoordinatesLng": "74.233333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4748683",
+  "birthPlace": "Kolhapur",
+  "fetchedAt": "2026-04-07T10:59:53.718Z"
+}

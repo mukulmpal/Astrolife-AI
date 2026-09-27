@@ -1,0 +1,28 @@
+{
+  "publicId": "aadbfaa1",
+  "wikipediaSlug": "Deepak_Shodhan",
+  "wikipediaId": "Q3527716",
+  "name": "Deepak Shodhan",
+  "fullName": "Deepak Shodhan",
+  "profileSummary": "Roshan Harshadlal \"Deepak\" Shodhan was an Indian Test cricketer.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepak_Shodhan",
+  "dateOfBirth": "1928-10-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.021944444",
+  "birthCoordinatesLng": "72.579722222",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527716",
+  "birthPlace": "Ahmedabad",
+  "fetchedAt": "2026-04-07T10:50:57.829Z"
+}

@@ -1,0 +1,32 @@
+{
+  "publicId": "b4efa771",
+  "wikipediaSlug": "Dhanush",
+  "wikipediaId": "Q331050",
+  "name": "Dhanush",
+  "fullName": "Dhanush",
+  "profileSummary": "Venkatesh Prabhu Kasthuri Raja, known professionally as Dhanush, is an Indian actor, filmmaker, lyricist and playback singer who works primarily in Tamil films, as well as few Hindi and Telugu films. Having starred in 50 films over his career, his accolades include four National Film Awards, two Tamil Nadu State Film Awards, fourteen SIIMA Awards, eight Filmfare Awards South and a Filmfare Award. One of the highest paid actors in Tamil cinema, he has been included in the Forbes India Celebrity 100 list six times.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Dhanush_at_the_%E2%80%98Asuran%E2%80%99_Success_Meet_%28cropped%29.jpg/330px-Dhanush_at_the_%E2%80%98Asuran%E2%80%99_Success_Meet_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dhanush",
+  "dateOfBirth": "1983-02-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film producer",
+    "screenwriter",
+    "playback singer",
+    "film director"
+  ],
+  "qid": "Q331050",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T11:29:30.730Z"
+}

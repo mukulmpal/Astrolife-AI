@@ -1,0 +1,28 @@
+{
+  "publicId": "461ce79a",
+  "wikipediaSlug": "Chandrakant_Pandit",
+  "wikipediaId": "Q5071368",
+  "name": "Chandrakant Pandit",
+  "fullName": "Chandrakant Pandit",
+  "profileSummary": "Chandrakant Sitaram Pandit, nicknamed \"Chandu\", is a former Indian cricketer who played in five Test matches and 36 One Day Internationals from 1986 to 1992. He was a wicket-keeper batsman. He made his Test debut against England at Headingley, Leeds on 19 June 1986, in the same match England wicket-keeper, Bruce French made his Test debut. Eventually India won the series 2–0.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chandrakant_Pandit",
+  "dateOfBirth": "1961-09-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q5071368",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:56:32.132Z"
+}

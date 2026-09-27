@@ -1,0 +1,28 @@
+{
+  "publicId": "e1516d90",
+  "wikipediaSlug": "Akbar",
+  "wikipediaId": "Q8597",
+  "name": "Akbar",
+  "fullName": "Akbar",
+  "profileSummary": "Akbar, also known as Akbar the Great, was the third Mughal emperor, who reigned from 1556 to 1605. Akbar succeeded his father, Humayun, under a regent, Bairam Khan, who helped the young emperor expand and consolidate Mughal domains in the Indian subcontinent. He is generally considered one of the greatest emperors in Indian history and led a successful campaign to unify the various kingdoms of Hindūstān or India proper.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Govardhan._Akbar_With_Lion_and_Calf_ca._1630%2C_Metmuseum_%28cropped%29.jpg/330px-Govardhan._Akbar_With_Lion_and_Calf_ca._1630%2C_Metmuseum_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Akbar",
+  "dateOfBirth": "1542-10-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.36361111",
+  "birthCoordinatesLng": "69.73388889",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "monarch"
+  ],
+  "qid": "Q8597",
+  "birthPlace": "Umarkot Fort",
+  "fetchedAt": "2026-04-07T15:59:54.688Z"
+}

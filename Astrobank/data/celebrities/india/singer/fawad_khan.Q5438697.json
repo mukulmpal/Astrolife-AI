@@ -1,0 +1,32 @@
+{
+  "publicId": "05a22531",
+  "wikipediaSlug": "Fawad_Khan",
+  "wikipediaId": "Q5438697",
+  "name": "Fawad Khan",
+  "fullName": "Fawad Khan",
+  "profileSummary": "Fawad Afzal Khan is a Pakistani actor, producer, screenwriter, songwriter and singer known for his work in films and Urdu television. Khan is a recipient of several accolades, including a Filmfare Award, two Lux Style Awards, and six Hum Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Fawad_khan_at_grazia_young_faishon_awards.jpg/330px-Fawad_khan_at_grazia_young_faishon_awards.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Fawad_Khan",
+  "dateOfBirth": "1981-11-29",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.549722222",
+  "birthCoordinatesLng": "74.343611111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "actor",
+    "model",
+    "screenwriter",
+    "television actor"
+  ],
+  "qid": "Q5438697",
+  "birthPlace": "Lahore",
+  "fetchedAt": "2026-04-07T12:17:24.746Z"
+}

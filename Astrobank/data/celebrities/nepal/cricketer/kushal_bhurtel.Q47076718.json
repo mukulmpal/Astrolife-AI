@@ -1,0 +1,26 @@
+{
+  "publicId": "ca3894af",
+  "wikipediaSlug": "Kushal_Bhurtel",
+  "wikipediaId": "Q47076718",
+  "name": "Kushal Bhurtel",
+  "fullName": "Kushal Bhurtel",
+  "profileSummary": "Kushal Bhurtel is a Nepalese cricketer. He has played international cricket for Nepal since 2021 in both One Day Internationals and Twenty20 Internationals. He began his international career as an opening batter, but in recent years has also become an important spin bowler in Nepal's team.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Kushal-bhurtel.jpg/330px-Kushal-bhurtel.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kushal_Bhurtel",
+  "dateOfBirth": "1997-01-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "3",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q47076718",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-07T16:50:23.975Z"
+}

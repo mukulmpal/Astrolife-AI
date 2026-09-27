@@ -115,7 +115,7 @@ export default function SavedChartsPage() {
         <button
           type="button"
           onClick={() => router.push("/dashboard/kundli")}
-          style={{ background: "#c8a030", color: "#060410", border: 0, borderRadius: 8, padding: "10px 14px", fontWeight: 700, cursor: "pointer" }}
+          style={{ background: "#c8a030", color: "#FAF7F2", border: 0, borderRadius: 8, padding: "10px 14px", fontWeight: 700, cursor: "pointer" }}
         >
           Generate New Chart
         </button>
@@ -123,7 +123,7 @@ export default function SavedChartsPage() {
           type="button"
           onClick={loadCharts}
           disabled={loading}
-          style={{ background: "#0d0a22", color: "#f0e8d0", border: "1px solid #1c1840", borderRadius: 8, padding: "10px 14px", fontWeight: 700, cursor: "pointer" }}
+          style={{ background: "#FFFFFF", color: "#f0e8d0", border: "1px solid #FFFFFF", borderRadius: 8, padding: "10px 14px", fontWeight: 700, cursor: "pointer" }}
         >
           {loading ? "Loading..." : "Refresh"}
         </button>
@@ -149,13 +149,13 @@ export default function SavedChartsPage() {
             <article
               key={chart.id}
               style={{
-                background: "#0d0a22",
-                border: "1px solid #1c1840",
+                background: "#FFFFFF",
+                border: "1px solid #FFFFFF",
                 borderRadius: 14,
                 padding: 18,
               }}
             >
-              <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#605890", marginBottom: 6 }}>
+              <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#6B635B", marginBottom: 6 }}>
                 {chart.gender || "Birth Chart"}
               </div>
               <h2 className="serif" style={{ fontSize: 24, color: "#f0e8d0", marginBottom: 8 }}>{chart.name}</h2>
@@ -173,7 +173,7 @@ export default function SavedChartsPage() {
                   type="button"
                   disabled={workingId === chart.id}
                   onClick={() => handleUseChart(chart.id)}
-                  style={{ background: "#c8a030", color: "#060410", border: 0, borderRadius: 8, padding: "9px 12px", fontWeight: 700, cursor: "pointer" }}
+                  style={{ background: "#c8a030", color: "#FAF7F2", border: 0, borderRadius: 8, padding: "9px 12px", fontWeight: 700, cursor: "pointer" }}
                 >
                   {workingId === chart.id ? "Opening..." : "Open / Use Chart"}
                 </button>

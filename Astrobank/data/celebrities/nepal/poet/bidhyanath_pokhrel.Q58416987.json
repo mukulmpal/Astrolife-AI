@@ -1,0 +1,29 @@
+{
+  "publicId": "027151e1",
+  "wikipediaSlug": "Bidhyanath_Pokhrel",
+  "wikipediaId": "Q58416987",
+  "name": "Bidhyanath Pokhrel",
+  "fullName": "Bidhyanath Pokhrel",
+  "profileSummary": "Bidhyanath Pokhrel was a Nepali poet and politician. He was an anti-Rana democratic politician. He took charge of the Dhankuta Front during the 1951 democratic revolution of Nepal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Bidhya_Nath_Pokhrel_%2830569913467%29.jpg/330px-Bidhya_Nath_Pokhrel_%2830569913467%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bidhyanath_Pokhrel",
+  "dateOfBirth": "1918-06-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.97388889",
+  "birthCoordinatesLng": "87.34333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "poet",
+    "politician"
+  ],
+  "qid": "Q58416987",
+  "birthPlace": "Dhankuta",
+  "fetchedAt": "2026-04-07T16:53:13.738Z"
+}

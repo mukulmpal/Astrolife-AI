@@ -1,0 +1,30 @@
+{
+  "publicId": "9e3c123b",
+  "wikipediaSlug": "Raveena_Tandon",
+  "wikipediaId": "Q2001803",
+  "name": "Raveena Tandon",
+  "fullName": "Raveena Tandon",
+  "profileSummary": "Raveena Tandon is an Indian actress primarily known for her work in Hindi films. Considered as one of the leading actresses of the 1990s, Tandon is a recipient of several awards, including a National Film Award, two Filmfare Awards and a Filmfare OTT Award. In 2023, she was awarded the Padma Shri, the fourth highest Indian civilian honour.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Raveena_Tandon_at_IFFI_2021.jpg/330px-Raveena_Tandon_at_IFFI_2021.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Raveena_Tandon",
+  "dateOfBirth": "1974-10-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor",
+    "film producer"
+  ],
+  "qid": "Q2001803",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:56.275Z"
+}

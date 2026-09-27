@@ -1,0 +1,28 @@
+{
+  "publicId": "8f5aa724",
+  "wikipediaSlug": "Manimala_Singhal",
+  "wikipediaId": "Q6749767",
+  "name": "Manimala Singhal",
+  "fullName": "Manimala Singhal",
+  "profileSummary": "Manimala Singhal is a former Test and One Day International cricketer who represented India. She is a right hand batsman and wicket-keeper. She has played six Tests and six ODIs.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Manimala_Singhal",
+  "dateOfBirth": "1965-04-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6749767",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T11:00:38.795Z"
+}

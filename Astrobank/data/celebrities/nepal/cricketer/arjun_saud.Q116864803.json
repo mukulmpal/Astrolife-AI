@@ -1,0 +1,26 @@
+{
+  "publicId": "e44ad19d",
+  "wikipediaSlug": "Arjun_Saud",
+  "wikipediaId": "Q116864803",
+  "name": "Arjun Saud",
+  "fullName": "Arjun Saud",
+  "profileSummary": "Arjun Saud is a Nepalese cricketer. A right-handed wicket-keeper batsman, Saud was named in Nepal's Twenty20 International (T20I) squad in August 2022, for their series against Kenya. He made his T20I debut on 28 August 2022, against Kenya.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arjun_Saud",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q116864803",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:51:41.436Z"
+}

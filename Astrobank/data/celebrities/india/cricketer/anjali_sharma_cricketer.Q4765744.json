@@ -1,0 +1,28 @@
+{
+  "publicId": "32e9d9db",
+  "wikipediaSlug": "Anjali_Sharma_(cricketer)",
+  "wikipediaId": "Q4765744",
+  "name": "Anjali Sharma (cricketer)",
+  "fullName": "Anjali Sharma (cricketer)",
+  "profileSummary": "Anjali Sharma is a former One Day International cricketer who represented India. She played three One Day Internationals for India, all of them in January 1978, and took two wickets, with a best bowling of 1/32.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anjali_Sharma_(cricketer)",
+  "dateOfBirth": "1956-12-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.613888888",
+  "birthCoordinatesLng": "77.208888888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4765744",
+  "birthPlace": "New Delhi",
+  "fetchedAt": "2026-04-07T11:02:32.175Z"
+}

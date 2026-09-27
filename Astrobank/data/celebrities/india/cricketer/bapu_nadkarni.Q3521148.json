@@ -1,0 +1,28 @@
+{
+  "publicId": "81d8f122",
+  "wikipediaSlug": "Bapu_Nadkarni",
+  "wikipediaId": "Q3521148",
+  "name": "Bapu Nadkarni",
+  "fullName": "Bapu Nadkarni",
+  "profileSummary": "Rameshchandra Gangaram \"Bapu\" Nadkarni was an Indian international cricketer, mainly known for being an economical bowler. The chances of scoring against him was either nil, or negligible.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bapu_Nadkarni",
+  "dateOfBirth": "1933-04-04",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "20",
+  "birthCoordinatesLng": "73.783333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3521148",
+  "birthPlace": "Nashik",
+  "fetchedAt": "2026-04-07T10:50:42.688Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "9c83cf8e",
+  "wikipediaSlug": "Ramani_Ayer",
+  "wikipediaId": "Q7288961",
+  "name": "Ramani Ayer",
+  "fullName": "Ramani Ayer",
+  "profileSummary": "Ramani Ayer is an Indian-American business executive, and the CEO and chairman of The Hartford from 1997 to 2009.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ramani_Ayer",
+  "dateOfBirth": "1947-05-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "10",
+  "birthCoordinatesLng": "76.3",
+  "moonSign": "5",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "businessperson"
+  ],
+  "qid": "Q7288961",
+  "birthPlace": "Kerala",
+  "fetchedAt": "2026-04-08T02:04:55.451Z"
+}

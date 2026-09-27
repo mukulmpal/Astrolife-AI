@@ -139,7 +139,7 @@ export default function PanchangPage() {
       style={{
         padding: "32px 24px 110px",
         background:
-          "radial-gradient(circle at top left, rgba(14,165,233,0.14), transparent 32%), radial-gradient(circle at top right, rgba(250,204,21,0.09), transparent 30%), #05020f",
+          "radial-gradient(circle at top left, rgba(14,165,233,0.14), transparent 32%), radial-gradient(circle at top right, rgba(250,204,21,0.09), transparent 30%), #FAF7F2",
       }}
     >
       <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%" }} className="flex flex-col gap-6">

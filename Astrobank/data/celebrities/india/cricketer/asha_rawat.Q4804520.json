@@ -1,0 +1,28 @@
+{
+  "publicId": "3f905cb2",
+  "wikipediaSlug": "Asha_Rawat",
+  "wikipediaId": "Q4804520",
+  "name": "Asha Rawat",
+  "fullName": "Asha Rawat",
+  "profileSummary": "Asha Rawat is an Indian former cricketer who played as a right-handed batter. She appeared in one Test match and 20 One Day Internationals for India from 2005 to 2008. She played domestic cricket for Delhi and Railways.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Asha_Rawat",
+  "dateOfBirth": "1982-02-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4804520",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T11:02:34.394Z"
+}

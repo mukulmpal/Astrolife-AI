@@ -1,0 +1,26 @@
+{
+  "publicId": "f3ccdf47",
+  "wikipediaSlug": "Lujendra_Ojha",
+  "wikipediaId": "Q22097018",
+  "name": "Lujendra Ojha",
+  "fullName": "Lujendra Ojha",
+  "profileSummary": "Lujendra Ojha is an American planetary scientist. He, as an undergraduate under the direction of planetary geologist Alfred McEwen, discovered compelling evidence that water on Mars includes current, seasonal, surface liquid brine flows. He is currently an assistant professor of planetary science at Rutgers University. He has also played in a heavy metal band, Gorkha.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Lujendra_Ojha",
+  "dateOfBirth": "1990-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "scientist"
+  ],
+  "qid": "Q22097018",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-08T02:07:01.122Z"
+}

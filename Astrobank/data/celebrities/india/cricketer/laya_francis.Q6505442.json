@@ -1,0 +1,28 @@
+{
+  "publicId": "b99135fc",
+  "wikipediaSlug": "Laya_Francis",
+  "wikipediaId": "Q6505442",
+  "name": "Laya Francis",
+  "fullName": "Laya Francis",
+  "profileSummary": "Laya Francis is an Indian former cricketer who played as a right-arm medium-fast bowler for the India women's national cricket team. She appeared in four Test matches and 11 One Day Internationals for India between 1993 and 1995. She played domestic cricket for Railways.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Laya_Francis",
+  "dateOfBirth": "1963-03-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6505442",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T11:03:01.674Z"
+}

@@ -1,0 +1,26 @@
+{
+  "publicId": "58ce30fb",
+  "wikipediaSlug": "Pradeepta_Adhikari",
+  "wikipediaId": "Q64009491",
+  "name": "Pradeepta Adhikari",
+  "fullName": "Pradeepta Adhikari",
+  "profileSummary": "Pradeepta Adhikari is a Nepalese model and beauty pageant winner who was crowned Miss Universe Nepal 2019.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Pradeepta_Adhikari",
+  "dateOfBirth": "1996-06-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "9",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model"
+  ],
+  "qid": "Q64009491",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:45:30.125Z"
+}

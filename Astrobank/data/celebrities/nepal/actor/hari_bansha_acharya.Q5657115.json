@@ -1,0 +1,30 @@
+{
+  "publicId": "d17f77a0",
+  "wikipediaSlug": "Hari_Bansha_Acharya",
+  "wikipediaId": "Q5657115",
+  "name": "Hari Bansha Acharya",
+  "fullName": "Hari Bansha Acharya",
+  "profileSummary": "Hari Bansha Acharya is a Nepalese actor, comedian, director, singer and writer.Hari Bansha Acharya, widely revered and regarded as the greatest comic comedian of all time in Nepalese Tele and movie industry, is known for his method acting. He is one half of the comedy duo MaHa Jodi along with fellow artist Madan Krishna Shrestha. He is known for his performance as Arjun in the 1997 patriotic drama film Balidaan. His performance in the series Madan Bahadur Hari Bahadur as \"Hari Bahadur\" is well recognized. He also wrote and performed in the film Shatru Gatey.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Hari_Bansha_Acharya.png/330px-Hari_Bansha_Acharya.png",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hari_Bansha_Acharya",
+  "dateOfBirth": "1934-11-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "10",
+  "sunSign": "7",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "comedian",
+    "autobiographer",
+    "film director",
+    "screenwriter"
+  ],
+  "qid": "Q5657115",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:13.356Z"
+}

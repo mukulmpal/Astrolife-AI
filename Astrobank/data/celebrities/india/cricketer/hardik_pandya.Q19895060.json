@@ -1,0 +1,28 @@
+{
+  "publicId": "73d7a6ab",
+  "wikipediaSlug": "Hardik_Pandya",
+  "wikipediaId": "Q19895060",
+  "name": "Hardik Pandya",
+  "fullName": "Hardik Pandya",
+  "profileSummary": "Hardik Himanshu Pandya is an Indian international cricketer who plays for the Indian cricket team. He is an all-rounder who is a right-handed middle order batsman and fast-medium bowler. He is considered one of the best all-rounders in the world in white-ball cricket. Pandya is the first fast-bowling all-rounder in T20Is to complete 1,000 runs and 100 wickets. He captains Mumbai Indians in the Indian Premier League and occasionally plays for Baroda in domestic cricket. He has captained the Indian team in white-ball cricket and was the vice captain of the team that won the 2024 T20 World Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Hardik_Pandya_in_PMO_New_Delhi.jpg/330px-Hardik_Pandya_in_PMO_New_Delhi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Hardik_Pandya",
+  "dateOfBirth": "1993-10-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "21.205",
+  "birthCoordinatesLng": "72.84",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q19895060",
+  "birthPlace": "Surat",
+  "fetchedAt": "2026-04-07T10:57:36.595Z"
+}

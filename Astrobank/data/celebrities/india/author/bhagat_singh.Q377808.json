@@ -1,0 +1,30 @@
+{
+  "publicId": "362382a8",
+  "wikipediaSlug": "Bhagat_Singh",
+  "wikipediaId": "Q377808",
+  "name": "Bhagat Singh",
+  "fullName": "Bhagat Singh",
+  "profileSummary": "Bhagat Singh was an Indian anti-colonial revolutionary who participated in the mistaken murder of a junior British police officer in December 1928 in what was intended to be retaliation for the death of an Indian nationalist. He later took part in a largely symbolic bombing of the Central Legislative Assembly in Delhi and a hunger strike in jail, which—on the back of sympathetic coverage in Indian-owned newspapers—turned him into a household name in the Punjab region, and, after his execution at age 23, a martyr and folk hero in Northern India. Borrowing ideas from Bolshevism and anarchism, the charismatic Bhagat Singh electrified a growing militancy in India in the 1930s and prompted urgent introspection within the Indian National Congress's nonviolent, and eventually successful, campaign for India's independence.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Lahore_conspiracy_case_poster_9th_Oct_193o_jindal_sunam_12x9_copy_%28cropped%29.jpg/330px-Lahore_conspiracy_case_poster_9th_Oct_193o_jindal_sunam_12x9_copy_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bhagat_Singh",
+  "dateOfBirth": "1907-09-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.24",
+  "birthCoordinatesLng": "73.18",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "author",
+    "freedom fighter",
+    "revolutionary"
+  ],
+  "qid": "Q377808",
+  "birthPlace": "Banga",
+  "fetchedAt": "2026-04-07T16:00:05.663Z"
+}

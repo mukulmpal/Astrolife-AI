@@ -1,0 +1,28 @@
+{
+  "publicId": "ad2eb4c3",
+  "wikipediaSlug": "Ajit_Pai",
+  "wikipediaId": "Q4699790",
+  "name": "Ajit Pai",
+  "fullName": "Ajit Pai",
+  "profileSummary": "Ajit Varadaraj Pai is an American lawyer who served as chairman of the Federal Communications Commission (FCC) from 2017 to 2021. He became a partner at the private-equity firm Searchlight Capital in April 2021. He became the president and chief executive officer (CEO) of CTIA on April 1, 2025.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Ajit_Pai_portrait_2018.jpg/330px-Ajit_Pai_portrait_2018.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajit_Pai",
+  "dateOfBirth": "1973-01-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "42.886388888",
+  "birthCoordinatesLng": "-78.878055555",
+  "moonSign": "12",
+  "sunSign": "9",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "lawyer",
+    "commissioner",
+    "chairperson"
+  ],
+  "qid": "Q4699790",
+  "birthPlace": "Buffalo",
+  "fetchedAt": "2026-04-08T00:00:25.357Z"
+}

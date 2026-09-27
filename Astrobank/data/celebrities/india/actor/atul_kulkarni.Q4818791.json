@@ -1,0 +1,30 @@
+{
+  "publicId": "c69f6c06",
+  "wikipediaSlug": "Atul_Kulkarni",
+  "wikipediaId": "Q4818791",
+  "name": "Atul Kulkarni",
+  "fullName": "Atul Kulkarni",
+  "profileSummary": "Atul Kulkarni is an Indian actor, producer and screenwriter who works in Hindi, Marathi, Kannada, Malayalam, Tamil, Telugu and English language films. Kulkarni won the National Award for the Best Supporting Actor for the films Hey Ram and Chandni Bar. He is also the president of Quest, a research-action organization concentrating on enhancing quality of education. He left his study in engineering at College of Engineering, Pune while he was in his first year. He is known for his performances in films like Hey Ram, Chandni Bar, Rang De Basanti (2006), Natarang (2010) among others. He has also written the screenplay of Laal Singh Chadda,\nthe official remake of Forrest Gump.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Atul_Kulkarni_graces_the_screening_of_Sonata.jpg/330px-Atul_Kulkarni_graces_the_screening_of_Sonata.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Atul_Kulkarni",
+  "dateOfBirth": "1965-09-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "15.856944444",
+  "birthCoordinatesLng": "74.504444444",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "writer",
+    "film producer"
+  ],
+  "qid": "Q4818791",
+  "birthPlace": "Belgaum",
+  "fetchedAt": "2026-04-07T12:17:13.825Z"
+}

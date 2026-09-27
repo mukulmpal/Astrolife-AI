@@ -1,0 +1,29 @@
+{
+  "publicId": "128fdc8e",
+  "wikipediaSlug": "Bedanand_Jha",
+  "wikipediaId": "Q4878986",
+  "name": "Bedanand Jha",
+  "fullName": "Bedanand Jha",
+  "profileSummary": "Bedananda Jha was a Nepalese politician. In 1951 he founded the Nepal Terai Congress, seeking autonomy for the Terai region. Later he became an important politician during the panchayat period. He was a cabinet minister at several times. Jha was also chairman of the Back to the Village National Campaign and ambassador to India.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bedanand_Jha",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician",
+    "diplomat"
+  ],
+  "qid": "Q4878986",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:53:23.691Z"
+}

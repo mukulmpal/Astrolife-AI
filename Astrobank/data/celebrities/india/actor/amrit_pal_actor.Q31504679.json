@@ -1,0 +1,29 @@
+{
+  "publicId": "04cc63eb",
+  "wikipediaSlug": "Amrit_Pal_(actor)",
+  "wikipediaId": "Q31504679",
+  "name": "Amrit Pal (actor)",
+  "fullName": "Amrit Pal (actor)",
+  "profileSummary": "\n\nAmrit Pal was an Indian actor. He died in Malad, Mumbai on 19 June 2017, aged 76.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amrit_Pal_(actor)",
+  "dateOfBirth": "1941-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "10",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor",
+    "film director",
+    "film actor"
+  ],
+  "qid": "Q31504679",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:25:33.930Z"
+}

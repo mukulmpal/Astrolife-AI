@@ -1,0 +1,32 @@
+{
+  "publicId": "5283a9cc",
+  "wikipediaSlug": "Neer_Shah",
+  "wikipediaId": "Q6986918",
+  "name": "Neer Shah",
+  "fullName": "Neer Shah",
+  "profileSummary": "Neer Bikram Shah, also known as Nir Shah, is a Nepalese film actor, director, producer, poet, songwriter, and businessman. He is considered one of the leading actors in Nepali cinema history and an actor with multiple identities. He is related to the royal family of Nepal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Neer_Shah.jpg/330px-Neer_Shah.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Neer_Shah",
+  "dateOfBirth": "1960-07-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "8",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "poet",
+    "film director",
+    "businessperson",
+    "actor",
+    "lyricist",
+    "songwriter",
+    "screenwriter"
+  ],
+  "qid": "Q6986918",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:54.444Z"
+}

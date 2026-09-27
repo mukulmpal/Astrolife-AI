@@ -1,0 +1,28 @@
+{
+  "publicId": "50c5b1f8",
+  "wikipediaSlug": "Gauri_Malla",
+  "wikipediaId": "Q5527772",
+  "name": "Gauri Malla",
+  "fullName": "Gauri Malla",
+  "profileSummary": "Gauri Malla is a Nepalese actress. In 2002, she was awarded Nepal's \"Motion Picture Award\" for best leading female. In 2003, she won the \"Best Supporting Actress Award\" at the first ever Lux Film Awards in Nepal. She is one of the Judge of Dancing with stars season 1 Nepal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Gauri_Malla.jpg/330px-Gauri_Malla.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gauri_Malla",
+  "dateOfBirth": "1987-09-13",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "2",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q5527772",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:12.870Z"
+}

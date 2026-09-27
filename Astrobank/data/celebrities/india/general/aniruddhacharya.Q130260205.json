@@ -1,0 +1,26 @@
+{
+  "publicId": "2a57d7a2",
+  "wikipediaSlug": "Aniruddhacharya",
+  "wikipediaId": "Q130260205",
+  "name": "Aniruddhacharya",
+  "fullName": "Aniruddhacharya",
+  "profileSummary": "Aniruddhacharya, is an Indian Hindu religious orator and self-styled guru known for his controversial remarks.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aniruddhacharya",
+  "dateOfBirth": "1989-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [],
+  "qid": "Q130260205",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T12:14:28.506Z"
+}

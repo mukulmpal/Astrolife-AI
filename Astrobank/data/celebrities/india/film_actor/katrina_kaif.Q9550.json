@@ -1,0 +1,27 @@
+{
+  "publicId": "598f27a4",
+  "wikipediaSlug": "Katrina_Kaif",
+  "wikipediaId": "Q9550",
+  "name": "Katrina Kaif",
+  "fullName": "Katrina Kaif",
+  "profileSummary": "Katrina Kaif is a British actress and businesswoman who works in Hindi-language films. One of India's highest-paid actresses, her accolades include four Screen Awards and four Zee Cine Awards, alongside three Filmfare Awards nominations. Although critical reception to her acting has varied, she is noted for her roles in action films and her dancing ability.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Katrina_Kaif_at_the_Bharat_audio_launch.jpg/330px-Katrina_Kaif_at_the_Bharat_audio_launch.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Katrina_Kaif",
+  "dateOfBirth": "1983-07-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.280068253",
+  "birthCoordinatesLng": "114.160327229",
+  "moonSign": "6",
+  "sunSign": "3",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "model"
+  ],
+  "qid": "Q9550",
+  "birthPlace": "British Hong Kong",
+  "fetchedAt": "2026-04-07T16:34:22.814Z"
+}

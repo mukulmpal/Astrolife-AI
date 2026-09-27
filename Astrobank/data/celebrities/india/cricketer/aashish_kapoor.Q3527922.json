@@ -1,0 +1,28 @@
+{
+  "publicId": "d7f9927a",
+  "wikipediaSlug": "Aashish_Kapoor",
+  "wikipediaId": "Q3527922",
+  "name": "Aashish Kapoor",
+  "fullName": "Aashish Kapoor",
+  "profileSummary": "Aashish Rakesh Kapoor is a former Indian cricketer who played in four Test matches and 17 One Day Internationals from 1994 to 2000. A right-arm off spinner and right-handed lower-order batsman, he was a member of the 1996 Cricket World Cup squad. He was a part of the Indian squad which won the 1995 Asia Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aashish_Kapoor",
+  "dateOfBirth": "1971-03-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3527922",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T10:55:58.654Z"
+}

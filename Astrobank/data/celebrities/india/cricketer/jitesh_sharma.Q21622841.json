@@ -1,0 +1,28 @@
+{
+  "publicId": "b2766a0f",
+  "wikipediaSlug": "Jitesh_Sharma",
+  "wikipediaId": "Q21622841",
+  "name": "Jitesh Sharma",
+  "fullName": "Jitesh Sharma",
+  "profileSummary": "Jitesh Mohan Sharma is an Indian international cricketer who plays as a wicket-keeper-batter. He represents Vidarbha in domestic cricket and Royal Challengers Bengaluru in the Indian Premier League. Jitesh was a member of the Indian team that won the 2025 Asia Cup and medalled gold at the 2022 Asian Games.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jitesh_Sharma",
+  "dateOfBirth": "1993-10-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "20.933333333",
+  "birthCoordinatesLng": "77.75",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q21622841",
+  "birthPlace": "Amravati",
+  "fetchedAt": "2026-04-07T10:57:44.564Z"
+}

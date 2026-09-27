@@ -1,0 +1,30 @@
+{
+  "publicId": "f6ef0940",
+  "wikipediaSlug": "Abdul_Hafeez_Kardar",
+  "wikipediaId": "Q2047162",
+  "name": "Abdul Hafeez Kardar",
+  "fullName": "Abdul Hafeez Kardar",
+  "profileSummary": "Abdul Hafeez Kardar PP, HI was a Pakistani cricketer, politician, and diplomat. He was the first captain of the Pakistan cricket team and one of only three players to have played Test cricket for both India and Pakistan. Known as \"The Skipper,\" Kardar led the Pakistan cricket team in its first 23 Test matches, spanning from 1952 to 1958, and later became the nation's foremost cricket administrator.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/85/Abdul_Hafeez_Kardar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abdul_Hafeez_Kardar",
+  "dateOfBirth": "1925-01-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "31.549722222",
+  "birthCoordinatesLng": "74.343611111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "diplomat",
+    "politician"
+  ],
+  "qid": "Q2047162",
+  "birthPlace": "Lahore",
+  "fetchedAt": "2026-04-07T10:50:32.164Z"
+}

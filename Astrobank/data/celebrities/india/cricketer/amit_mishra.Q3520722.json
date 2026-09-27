@@ -1,0 +1,28 @@
+{
+  "publicId": "cbb660c2",
+  "wikipediaSlug": "Amit_Mishra",
+  "wikipediaId": "Q3520722",
+  "name": "Amit Mishra",
+  "fullName": "Amit Mishra",
+  "profileSummary": "Amit Mishra is a former Indian cricketer. He is a right-arm leg-break bowler and right-handed tail-ender batsman. He plays for Haryana in the domestic Ranji Trophy and for the T20 franchise Lucknow Super Giants in the Indian Premier League. He has represented India in Test, ODIs and T20s. Mishra was a member of the Indian team that won the 2013 ICC Champions Trophy.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Amit_Mishra.jpg/330px-Amit_Mishra.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amit_Mishra",
+  "dateOfBirth": "1982-11-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3520722",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T10:57:22.564Z"
+}

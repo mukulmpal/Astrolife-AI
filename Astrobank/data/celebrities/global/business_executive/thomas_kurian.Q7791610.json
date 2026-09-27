@@ -1,0 +1,26 @@
+{
+  "publicId": "2a239a1c",
+  "wikipediaSlug": "Thomas_Kurian",
+  "wikipediaId": "Q7791610",
+  "name": "Thomas Kurian",
+  "fullName": "Thomas Kurian",
+  "profileSummary": "Thomas Kurian is an Indian-American business executive and Chief Executive Officer of Google Cloud since 2019. In 2024, Gold House recognized him as one of the most impactful Asians due to his extensive experience in the areas of leadership, engineering and enterprise relations.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Thomas_Kurian_Google_Cloud_CEO_2022_%28cropped%29.jpg/330px-Thomas_Kurian_Google_Cloud_CEO_2022_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Thomas_Kurian",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "9.591666666",
+  "birthCoordinatesLng": "76.522222222",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "business executive"
+  ],
+  "qid": "Q7791610",
+  "birthPlace": "Kottayam",
+  "fetchedAt": "2026-04-08T02:04:02.773Z"
+}

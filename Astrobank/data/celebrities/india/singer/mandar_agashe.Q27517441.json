@@ -1,0 +1,31 @@
+{
+  "publicId": "e92ec04d",
+  "wikipediaSlug": "Mandar_Agashe",
+  "wikipediaId": "Q27517441",
+  "name": "Mandar Agashe",
+  "fullName": "Mandar Agashe",
+  "profileSummary": "Mandar Dnyaneshwar Agashe is an Indian businessman, music director, and former musician. He founded Sarvatra Technologies in 2000, and has served as the company's managing director since its inception.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Mandar-Agashe-official-portrait-2021-cropped.jpg/330px-Mandar-Agashe-official-portrait-2021-cropped.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mandar_Agashe",
+  "dateOfBirth": "1969-05-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "5",
+  "sunSign": "2",
+  "lagnaSignText": "5",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "musician",
+    "composer",
+    "lyricist",
+    "record producer",
+    "merchant"
+  ],
+  "qid": "Q27517441",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T02:04:54.763Z"
+}

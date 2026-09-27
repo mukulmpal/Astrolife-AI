@@ -1,0 +1,28 @@
+{
+  "publicId": "eb09c080",
+  "wikipediaSlug": "Rahul_Dravid",
+  "wikipediaId": "Q470772",
+  "name": "Rahul Dravid",
+  "fullName": "Rahul Dravid",
+  "profileSummary": "Rahul Sharad Dravid is an Indian former cricket player, ex-captain and ex-head coach of the Indian national cricket team. Known for his outstanding batting technique, Dravid scored 24,177 runs in international cricket and is widely regarded as one of the greatest batsmen in the history of cricket. He is colloquially known as Mr. Dependable and often referred to as The Wall. He won the 2002 ICC Champions Trophy as a member of the Indian team and guided the Indian team to victory in the 2024 ICC Men's T20 World Cup as the head coach.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Rahul_Dravid_in_2024.jpg/330px-Rahul_Dravid_in_2024.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Rahul_Dravid",
+  "dateOfBirth": "1973-01-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.718611111",
+  "birthCoordinatesLng": "75.855",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q470772",
+  "birthPlace": "Indore",
+  "fetchedAt": "2026-04-07T10:58:19.910Z"
+}

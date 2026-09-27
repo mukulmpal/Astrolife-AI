@@ -1,0 +1,26 @@
+{
+  "publicId": "f76c4d69",
+  "wikipediaSlug": "Babina_Bhattarai",
+  "wikipediaId": "Q124396920",
+  "name": "Babina Bhattarai",
+  "fullName": "Babina Bhattarai",
+  "profileSummary": "Babina Bhattrai is a Nepalese singer and composer known for her work in the Nepali and Indian music industries. She made her debut with the song Hasauchhau Timrai Marji in 2014. In 2023, she came up with the song Bala Panko Teej.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Babina_bhattarai.jpg/330px-Babina_bhattarai.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Babina_Bhattarai",
+  "dateOfBirth": "1990-09-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.666666666",
+  "birthCoordinatesLng": "87.5",
+  "moonSign": "5",
+  "sunSign": "6",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q124396920",
+  "birthPlace": "Morang District",
+  "fetchedAt": "2026-04-07T16:47:26.171Z"
+}

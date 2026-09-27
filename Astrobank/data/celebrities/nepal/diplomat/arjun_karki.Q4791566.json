@@ -1,0 +1,27 @@
+{
+  "publicId": "1dd171aa",
+  "wikipediaSlug": "Arjun_Karki",
+  "wikipediaId": "Q4791566",
+  "name": "Arjun Karki",
+  "fullName": "Arjun Karki",
+  "profileSummary": "Arjun Kumar Karki is a Nepali development practitioner who served as the Ambassador of Nepal to the United States from 2015 to 2021. As the residential ambassador of Nepal to the US, he also served as the non-residential ambassador to Panama, Costa Rica, Mexico, El Salvador, Honduras, and Guatemala",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Dr._Arjun_K_Karki.jpg/330px-Dr._Arjun_K_Karki.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arjun_Karki",
+  "dateOfBirth": "1963-07-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.366666666",
+  "birthCoordinatesLng": "87.216666666",
+  "moonSign": "4",
+  "sunSign": "4",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "diplomat",
+    "actor"
+  ],
+  "qid": "Q4791566",
+  "birthPlace": "Sankhuwasabha District",
+  "fetchedAt": "2026-04-07T16:43:24.651Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "8f90a175",
+  "wikipediaSlug": "Jiwan_Luitel",
+  "wikipediaId": "Q15711896",
+  "name": "Jiwan Luitel",
+  "fullName": "Jiwan Luitel",
+  "profileSummary": "Jiwan Luitel is a Nepalese actor and beauty pageant titleholder who won Mr. Nepal 2002.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jiwan_Luitel",
+  "dateOfBirth": "1981-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "7",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model"
+  ],
+  "qid": "Q15711896",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:43:36.737Z"
+}

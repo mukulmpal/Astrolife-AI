@@ -1,0 +1,28 @@
+{
+  "publicId": "d4376c03",
+  "wikipediaSlug": "Archana_Das",
+  "wikipediaId": "Q16728389",
+  "name": "Archana Das",
+  "fullName": "Archana Das",
+  "profileSummary": "Archana Das is an Indian cricketer. She represented India from Cricket Association of Bengal and played in 11 Women's One Day International and 23 Women's Twenty20 International matches for the India women's cricket team between 2012 and 2014. In domestic cricket, she played for Bengal women’s cricket team from 2009-2012, Indian Railways from 2012-2015 and Sikkim women's cricket team from 2018-2020.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Archana_Das",
+  "dateOfBirth": "1988-07-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q16728389",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T11:02:58.749Z"
+}

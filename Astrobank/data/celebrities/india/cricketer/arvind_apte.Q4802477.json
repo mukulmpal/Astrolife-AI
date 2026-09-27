@@ -1,0 +1,28 @@
+{
+  "publicId": "41696055",
+  "wikipediaSlug": "Arvind_Apte",
+  "wikipediaId": "Q4802477",
+  "name": "Arvind Apte",
+  "fullName": "Arvind Apte",
+  "profileSummary": "Arvindrao Laxmanrao Apte was an Indian cricketer who played in one Test in 1959 against England at Leeds. His brother Madhav Apte was also a cricketer.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arvind_Apte",
+  "dateOfBirth": "1934-10-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4802477",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T10:50:55.415Z"
+}

@@ -1,0 +1,31 @@
+{
+  "publicId": "c5a09036",
+  "wikipediaSlug": "Nischal_Basnet",
+  "wikipediaId": "Q16198160",
+  "name": "Nischal Basnet",
+  "fullName": "Nischal Basnet",
+  "profileSummary": "Nischal Basnet is a Nepalese director, writer, actor, and playback singer who predominantly works in Nepali cinema. Considered as one of the best directors of Nepali cinema, he is widely acclaimed for \"revolutionizing Nepali cinema\" through his realistic, dark, and comic depiction of social problems prevalent in Nepal on the celluloid screen. Basnet has directed three feature films: Loot (2012), Talakjung vs Tulke (2014), and Loot 2 (2017). He has acted in the films Kabaddi (2014), Dui Rupaiyan (2017), Prasad (2018), Dimag Kharab (2023), and Behuli From Meghauli (2024)",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Nischal_Basnet_%283x4_cropped%29.jpg/330px-Nischal_Basnet_%283x4_cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nischal_Basnet",
+  "dateOfBirth": "1980-01-17",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": "9",
+  "sunSign": "10",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "actor",
+    "film director",
+    "screenwriter",
+    "film producer",
+    "film actor"
+  ],
+  "qid": "Q16198160",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:43:17.201Z"
+}

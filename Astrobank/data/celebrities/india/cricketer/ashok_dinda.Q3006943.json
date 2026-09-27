@@ -1,0 +1,29 @@
+{
+  "publicId": "76a4d695",
+  "wikipediaSlug": "Ashok_Dinda",
+  "wikipediaId": "Q3006943",
+  "name": "Ashok Dinda",
+  "fullName": "Ashok Dinda",
+  "profileSummary": "Ashok Dinda is a former Indian cricketer and politician from Medinipur, West Bengal. He is a member of the West Bengal Legislative Assembly representing the Bharatiya Janata Party from the Moyna Assembly constituency. He played cricket for Bengal and Goa in the Ranji Trophy and for many Indian Premier League sides. He retired from all forms of cricket on 2 February 2021. He was a part of the Indian squad which won the 2010 Asia Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashok_Dinda",
+  "dateOfBirth": "1984-03-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.433333333",
+  "birthCoordinatesLng": "87.333333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer",
+    "politician"
+  ],
+  "qid": "Q3006943",
+  "birthPlace": "Medinipur",
+  "fetchedAt": "2026-04-07T10:57:55.381Z"
+}

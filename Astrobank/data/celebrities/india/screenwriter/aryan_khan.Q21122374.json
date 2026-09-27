@@ -1,0 +1,30 @@
+{
+  "publicId": "dd9768a5",
+  "wikipediaSlug": "Aryan_Khan",
+  "wikipediaId": "Q21122374",
+  "name": "Aryan Khan",
+  "fullName": "Aryan Khan",
+  "profileSummary": "Aryan Khan is an Indian entrepreneur and filmmaker. After graduating from the University of Southern California, he co-founded the company SLAB Ventures in 2022, under which he launched a luxury lifestyle and beverage brand named D'YAVOL. He is the oldest son of Shah Rukh Khan and Gauri Khan.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Aryan_Khan_at_the_launch_of_Netflix_Slate_2025_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aryan_Khan",
+  "dateOfBirth": "1997-11-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "screenwriter",
+    "entrepreneur",
+    "film director"
+  ],
+  "qid": "Q21122374",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:18:24.350Z"
+}

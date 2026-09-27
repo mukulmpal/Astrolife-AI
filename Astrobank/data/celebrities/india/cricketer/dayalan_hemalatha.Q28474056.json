@@ -1,0 +1,28 @@
+{
+  "publicId": "2987400b",
+  "wikipediaSlug": "Dayalan_Hemalatha",
+  "wikipediaId": "Q28474056",
+  "name": "Dayalan Hemalatha",
+  "fullName": "Dayalan Hemalatha",
+  "profileSummary": "Dayalan Hemalatha is an Indian cricketer. She is a right-handed batter and bowls right-arm off-break. She plays domestic cricket for Railways, and has previously played for Tamil Nadu and South Zone.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dayalan_Hemalatha",
+  "dateOfBirth": "1994-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q28474056",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-07T11:02:33.415Z"
+}

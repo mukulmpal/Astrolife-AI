@@ -1,0 +1,38 @@
+{
+  "publicId": "3c239d29",
+  "wikipediaSlug": "Kamal_Haasan",
+  "wikipediaId": "Q381477",
+  "name": "Kamal Haasan",
+  "fullName": "Kamal Haasan",
+  "profileSummary": "Kamal Haasan is an Indian filmmaker and politician, currently serving as a Member of Parliament, Rajya Sabha for Tamil Nadu. He is an actor, director, producer, screenwriter, playback singer and lyricist who works primarily in Tamil cinema. He has also worked as an assistant director, choreographer, editor, make-up artist, narrator, television host, and a distributor of films. He founded a magazine, Maiam, which he edited, and has written over 100 poems and some books. He has made over 250 films in Tamil, Telugu, Malayalam, Hindi, Kannada and Bengali. He was given the Kalaimamani in 1978, the Padma Shri in 1990, the Padma Bhushan in 2014, and the Order of Arts and Letters (Chevalier) by the Government of France in 2016. He was invited by the Academy of Motion Picture Arts and Sciences in 2025 to become a member of its actors' branch.\"",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Kamal_Haasan_at_2023_San_Diego_Comic-Con_International_by_Gage_Skidmore%2C_005_%28cropped%29.jpg/330px-Kamal_Haasan_at_2023_San_Diego_Comic-Con_International_by_Gage_Skidmore%2C_005_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kamal_Haasan",
+  "dateOfBirth": "1954-11-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "9.54633",
+  "birthCoordinatesLng": "78.5907",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer",
+    "screenwriter",
+    "film director",
+    "choreographer",
+    "singer",
+    "lyricist",
+    "philanthropist",
+    "composer",
+    "film actor",
+    "recording artist"
+  ],
+  "qid": "Q381477",
+  "birthPlace": "Paramakudi",
+  "fetchedAt": "2026-04-07T12:17:41.319Z"
+}

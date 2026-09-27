@@ -1,0 +1,28 @@
+{
+  "publicId": "878e4311",
+  "wikipediaSlug": "Ajay_Bhatt",
+  "wikipediaId": "Q2671553",
+  "name": "Ajay Bhatt",
+  "fullName": "Ajay Bhatt",
+  "profileSummary": "Ajay V. Bhatt is an Indian-American computer architect who produced several widely used technologies, including USB, Platform Power Management architecture, and various other chipsets.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Ajay_Bhatt_at_Intel_ISEF.jpg/330px-Ajay_Bhatt_at_Intel_ISEF.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajay_Bhatt",
+  "dateOfBirth": "1957-09-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.3",
+  "birthCoordinatesLng": "73.2",
+  "moonSign": "10",
+  "sunSign": "5",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "inventor",
+    "computer scientist",
+    "engineer"
+  ],
+  "qid": "Q2671553",
+  "birthPlace": "Vadodara",
+  "fetchedAt": "2026-04-08T00:00:26.041Z"
+}

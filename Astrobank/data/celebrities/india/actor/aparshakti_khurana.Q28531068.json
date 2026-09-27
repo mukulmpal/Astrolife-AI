@@ -1,0 +1,30 @@
+{
+  "publicId": "9ab07914",
+  "wikipediaSlug": "Aparshakti_Khurana",
+  "wikipediaId": "Q28531068",
+  "name": "Aparshakti Khurana",
+  "fullName": "Aparshakti Khurana",
+  "profileSummary": "Aparshakti Khurana is an Indian actor known for his supporting roles in the films Dangal (2016), Stree (2018), Pati Patni Aur Woh (2019), and Stree 2 (2024), as well as for his starring role in the drama series Jubilee (2023). He is the younger brother of actor Ayushmann Khurrana.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Aparshakti_Khurana_at_Zee_Cine_Awards_2024.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aparshakti_Khurana",
+  "dateOfBirth": "1987-11-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "30.736388888",
+  "birthCoordinatesLng": "76.788333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "radio personality",
+    "television actor"
+  ],
+  "qid": "Q28531068",
+  "birthPlace": "Chandigarh",
+  "fetchedAt": "2026-04-07T12:17:04.648Z"
+}

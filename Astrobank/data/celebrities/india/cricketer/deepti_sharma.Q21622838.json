@@ -1,0 +1,28 @@
+{
+  "publicId": "3c95bf71",
+  "wikipediaSlug": "Deepti_Sharma",
+  "wikipediaId": "Q21622838",
+  "name": "Deepti Sharma",
+  "fullName": "Deepti Sharma",
+  "profileSummary": "Deepti Bhagwan Sharma is an Indian international cricketer. She is an all-rounder who bats left-handed and bowls right-arm off break. She represents Uttar Pradesh in domestic cricket and plays for UP Warriorz in the Women's Premier League. Sharma was part of the team that won the 2025 Women's Cricket World Cup, 2022 Women's Asia Cup, and gold medal in the 2022 Asian Games.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Deepti_Sharma_in_2025.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Deepti_Sharma",
+  "dateOfBirth": "1997-08-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.18",
+  "birthCoordinatesLng": "78.02",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q21622838",
+  "birthPlace": "Agra",
+  "fetchedAt": "2026-04-07T11:02:43.709Z"
+}

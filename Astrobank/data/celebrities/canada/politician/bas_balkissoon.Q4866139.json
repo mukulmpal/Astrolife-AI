@@ -1,0 +1,26 @@
+{
+  "publicId": "2086a1da",
+  "wikipediaSlug": "Bas_Balkissoon",
+  "wikipediaId": "Q4866139",
+  "name": "Bas Balkissoon",
+  "fullName": "Bas Balkissoon",
+  "profileSummary": "Bas Balkissoon is a former politician in Ontario, Canada. He was a Liberal member of the Legislative Assembly of Ontario from 2005 to 2016 who represented the riding of Scarborough—Rouge River. From 1988 to 1997 he was a municipal councillor in Scarborough and from 1998 to 2005 he was a councillor in the amalgamated city of Toronto.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/BasBalkissoon_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Bas_Balkissoon",
+  "dateOfBirth": "1952-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "10.666666666",
+  "birthCoordinatesLng": "-61.516666666",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "7",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q4866139",
+  "birthPlace": "Trinidad and Tobago",
+  "fetchedAt": "2026-04-08T00:52:08.179Z"
+}

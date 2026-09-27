@@ -43,14 +43,14 @@ export function EducationTooltip({ term, children }: { term: string; children: R
         >
           <div
             style={{
-              background: "#0d0a22",
+              background: "#FFFFFF",
               border: "2px solid #c8a030",
               borderRadius: "12px",
               padding: "24px",
               maxWidth: "600px",
               maxHeight: "80vh",
               overflowY: "auto",
-              color: "#f0e8d0",
+              color: "#1A1A1A",
               fontSize: "14px",
             }}
             onClick={(e) => e.stopPropagation()}
@@ -60,7 +60,7 @@ export function EducationTooltip({ term, children }: { term: string; children: R
                 <h2 style={{ fontSize: "20px", fontWeight: "700", margin: "0 0 4px 0", color: "#c8a030" }}>
                   {education.name}
                 </h2>
-                <div style={{ fontSize: "11px", color: "#b8b0d8", textTransform: "uppercase", letterSpacing: "1px" }}>
+                <div style={{ fontSize: "11px", color: "#6B635B", textTransform: "uppercase", letterSpacing: "1px" }}>
                   {education.category} • {education.difficulty}
                 </div>
               </div>
@@ -69,7 +69,7 @@ export function EducationTooltip({ term, children }: { term: string; children: R
                 style={{
                   background: "none",
                   border: "none",
-                  color: "#b8b0d8",
+                  color: "#6B635B",
                   fontSize: "20px",
                   cursor: "pointer",
                 }}
@@ -108,7 +108,7 @@ export function EducationTooltip({ term, children }: { term: string; children: R
                 background: "#c8a030",
                 border: "none",
                 borderRadius: "6px",
-                color: "#060410",
+                color: "#FAF7F2",
                 fontWeight: "700",
                 cursor: "pointer",
               }}

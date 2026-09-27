@@ -1,0 +1,28 @@
+{
+  "publicId": "b2134b5a",
+  "wikipediaSlug": "Amit_Sadh",
+  "wikipediaId": "Q4746871",
+  "name": "Amit Sadh",
+  "fullName": "Amit Sadh",
+  "profileSummary": "Amit Sadh is an Indian actor who is known for his work in several films and television productions. He is best known for his performances in films like Kai Po Che! (2013), Sultan (2016) and Gold (2018). In recent years, he has become well-known for his roles in web series. He played Inspector Kabir Sawant in three seasons of Breathe streaming on Amazon Prime Video. He won the Filmfare OTT Award for Best Supporting Actor in a Drama Series.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Amit_Sadh_Indian_actor.jpg/330px-Amit_Sadh_Indian_actor.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amit_Sadh",
+  "dateOfBirth": "1979-06-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "52.48",
+  "birthCoordinatesLng": "-1.9025",
+  "moonSign": "6",
+  "sunSign": "2",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film actor",
+    "television actor"
+  ],
+  "qid": "Q4746871",
+  "birthPlace": "Birmingham",
+  "fetchedAt": "2026-04-07T16:25:18.473Z"
+}

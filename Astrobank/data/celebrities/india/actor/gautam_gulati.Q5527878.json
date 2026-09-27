@@ -1,0 +1,30 @@
+{
+  "publicId": "095b4e8d",
+  "wikipediaSlug": "Gautam_Gulati",
+  "wikipediaId": "Q5527878",
+  "name": "Gautam Gulati",
+  "fullName": "Gautam Gulati",
+  "profileSummary": "Gautam Gulati is an Indian film and television actor known for his roles in Tujh Sang Preet Lagayi Sajna, Pyaar Kii Ye Ek Kahaani and Diya Aur Baati Hum. In 2014, he participated in the reality show Bigg Boss 8 and emerged as the winner. He appeared in Rakesh Mehta's short film Darpok, which was screened at the 67th Cannes Film Festival, and in Siddhartha-The Buddha where he played the role of Devadutta. He played Indian cricketer Ravi Shastri in Mohammad Azharuddin's biopic Azhar. His next project was Behen Hogi Teri, where he played the role of Rahul. In 2019 he portrayed the role of a RAW Agent in Operation Cobra, a web series on Eros Now.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Gautam_Gulati_at_Babubhai_Kanchwala_and_Dr._Aasshna_Kanchwala%E2%80%99s_Eid_celebrations_2023_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Gautam_Gulati",
+  "dateOfBirth": "1984-11-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "television actor"
+  ],
+  "qid": "Q5527878",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T12:19:10.608Z"
+}

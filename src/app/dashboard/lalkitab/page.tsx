@@ -163,7 +163,7 @@ function LalKitabHouseChart({
       <div className="varsh-col-title" style={{color:"#c8a030"}}>{subtitle}</div>
       <div className="lk-chart-title serif">{title}</div>
       <svg viewBox={`0 0 ${size} ${size}`} width="100%" className="lk-chart" role="img" aria-label={title}>
-        <rect width={size} height={size} fill="#08051a" rx="8" />
+        <rect width={size} height={size} fill="#FAF7F2" rx="8" />
         <rect x="0" y="0" width={size} height={size} fill="none" stroke="#3a3260" strokeWidth="1.5" rx="8" />
         <line x1="0" y1="0" x2={size} y2={size} stroke="#2a2250" />
         <line x1={size} y1="0" x2="0" y2={size} stroke="#2a2250" />
@@ -269,7 +269,7 @@ export default function LalKitabPage() {
   return (
     <>
       <style>{`
-        .header-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#f0e8d0}
+        .header-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#1A1A1A}
         .header-stats{display:flex;gap:12px;flex-wrap:wrap}
         .pitra-alert{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px}
         .pitra-icon{font-size:24px;flex-shrink:0}
@@ -279,8 +279,8 @@ export default function LalKitabPage() {
         .kismat-icon{font-size:32px}
         .kismat-content{flex:1}
         .kismat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:4px}
-        .kismat-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#f0e8d0;margin-bottom:4px}
-        .kismat-interp{font-size:13px;color:#c8c0a8;line-height:1.6}
+        .kismat-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#1A1A1A;margin-bottom:4px}
+        .kismat-interp{font-size:13px;color:#4A4238;line-height:1.6}
         .kismat-score{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#f59e0b;line-height:1}
         .planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
         .planet-card{border-radius:14px;padding:18px;cursor:pointer;transition:all 0.25s;border:1px solid}
@@ -288,13 +288,13 @@ export default function LalKitabPage() {
         .planet-card.pakka:hover{border-color:rgba(34,197,94,0.4);transform:translateY(-2px)}
         .planet-card.dushman{background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.2)}
         .planet-card.dushman:hover{border-color:rgba(239,68,68,0.4);transform:translateY(-2px)}
-        .planet-card.sadharan{background:#0d0a22;border-color:rgba(245,158,11,0.2)}
+        .planet-card.sadharan{background:#FFFFFF;border-color:rgba(245,158,11,0.2)}
         .planet-card.sadharan:hover{border-color:rgba(245,158,11,0.4);transform:translateY(-2px)}
         .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
         .card-left{display:flex;align-items:center;gap:10px}
         .p-icon{font-size:22px}
-        .p-name{font-size:15px;font-weight:600;color:#f0e8d0}
-        .p-pos{font-size:11px;color:#605890;margin-top:2px}
+        .p-name{font-size:15px;font-weight:600;color:#1A1A1A}
+        .p-pos{font-size:11px;color:#6B635B;margin-top:2px}
         .card-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
         .status-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid}
         .score-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700}
@@ -304,18 +304,18 @@ export default function LalKitabPage() {
         .retro-badge{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:#fdba74;margin-bottom:8px;line-height:1.6}
         .conflict-badge{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:#fca5a5;margin-bottom:8px;line-height:1.6}
         .friend-badge{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:#86efac;margin-bottom:8px;line-height:1.6}
-        .nishani-txt{font-size:13px;color:#c8c0a8;line-height:1.8;margin-bottom:10px}
+        .nishani-txt{font-size:13px;color:#4A4238;line-height:1.8;margin-bottom:10px}
         .tags-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
         .tag{font-size:10px;padding:3px 10px;border-radius:20px;white-space:nowrap}
         .tag-age{background:rgba(200,160,48,0.1);border:1px solid rgba(200,160,48,0.2);color:#c8a030}
         .tag-rin{background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);color:#2dd4bf}
         .tag-retro{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);color:#f97316}
         .domain-tabs{display:flex;gap:4px;flex-wrap:wrap;margin:12px 0 8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px}
-        .dtab{font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#605890;cursor:pointer;transition:all 0.2s}
+        .dtab{font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#6B635B;cursor:pointer;transition:all 0.2s}
         .dtab.active{background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.3);color:#fbbf24}
-        .domain-txt{font-size:13px;color:#c8c0a8;line-height:1.8;margin-bottom:8px}
+        .domain-txt{font-size:13px;color:#4A4238;line-height:1.8;margin-bottom:8px}
         .home-env-list{display:flex;flex-direction:column;gap:4px;margin:6px 0}
-        .home-env-item{font-size:12px;color:#c8c0a8;padding:4px 8px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid rgba(245,158,11,0.3)}
+        .home-env-item{font-size:12px;color:#4A4238;padding:4px 8px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid rgba(245,158,11,0.3)}
         .remedies-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
         .remedy-item{font-size:12px;color:#f97316;padding:4px 8px;background:rgba(249,115,22,0.05);border-radius:6px;border-left:2px solid rgba(249,115,22,0.3)}
         .takkar-card{border-radius:14px;padding:18px;margin-bottom:12px;transition:border-color 0.2s;border:1px solid}
@@ -326,28 +326,28 @@ export default function LalKitabPage() {
         .takkar-card.complex{background:rgba(245,158,11,0.04);border-color:rgba(245,158,11,0.2)}
         .takkar-card.complex:hover{border-color:rgba(245,158,11,0.35)}
         .takkar-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:6px}
-        .takkar-house{font-size:11px;color:#605890;margin-bottom:8px}
-        .takkar-effect{font-size:13px;color:#c8c0a8;line-height:1.7;margin-bottom:10px}
+        .takkar-house{font-size:11px;color:#6B635B;margin-bottom:8px}
+        .takkar-effect{font-size:13px;color:#4A4238;line-height:1.7;margin-bottom:10px}
         .takkar-upaya{font-size:12px;color:#f97316;padding:8px 10px;background:rgba(249,115,22,0.05);border-radius:8px;border:1px solid rgba(249,115,22,0.15)}
         .rin-card{background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.2);border-radius:14px;padding:18px;margin-bottom:12px}
         .rin-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#fdba74;margin-bottom:6px}
-        .rin-desc{font-size:13px;color:#c8c0a8;line-height:1.7;margin-bottom:8px}
+        .rin-desc{font-size:13px;color:#4A4238;line-height:1.7;margin-bottom:8px}
         .rin-upaya{font-size:12px;color:#f97316;padding:8px 10px;background:rgba(249,115,22,0.05);border-radius:8px;border:1px solid rgba(249,115,22,0.15)}
         .ages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
         .age-card{border-radius:14px;padding:18px;text-align:center;border:1px solid;transition:all 0.2s}
         .age-card:hover{transform:translateY(-3px)}
         .combo-card{background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.2);border-radius:14px;padding:20px;margin-bottom:14px}
         .combo-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#c4b5fd;margin-bottom:6px}
-        .combo-pred{font-size:13px;color:#c8c0a8;line-height:1.8;margin-bottom:10px}
+        .combo-pred{font-size:13px;color:#4A4238;line-height:1.8;margin-bottom:10px}
         .combo-psych{font-size:12px;color:#a78bfa;padding:8px 10px;background:rgba(167,139,250,0.05);border-radius:8px;border:1px solid rgba(167,139,250,0.15);margin-bottom:10px}
         .combo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-        .combo-col-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#605890;margin-bottom:6px}
-        .combo-list-item{font-size:12px;color:#c8c0a8;padding:3px 0;padding-left:10px;border-left:2px solid;line-height:1.5}
+        .combo-col-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;margin-bottom:6px}
+        .combo-list-item{font-size:12px;color:#4A4238;padding:3px 0;padding-left:10px;border-left:2px solid;line-height:1.5}
         .combo-remedies{margin-top:8px}
         .varsh-card{background:linear-gradient(135deg,rgba(96,165,250,0.06),rgba(167,139,250,0.04));border:1px solid rgba(96,165,250,0.25);border-radius:16px;padding:24px}
         .varsh-year{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;color:#60a5fa;line-height:1}
         .varsh-lagna{font-size:13px;color:#93c5fd;margin:6px 0 16px}
-        .varsh-summary{font-size:14px;color:#c8c0a8;line-height:1.9;margin-bottom:16px}
+        .varsh-summary{font-size:14px;color:#4A4238;line-height:1.9;margin-bottom:16px}
         .varsh-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
         .varsh-col{border-radius:10px;padding:14px}
         .varsh-col.shubh{background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.2)}
@@ -356,12 +356,12 @@ export default function LalKitabPage() {
         .varsh-planet{font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
         .varsh-planet:last-child{border-bottom:none}
         .safety-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;margin-bottom:14px}
-        .safety-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:#f0e8d0;margin-bottom:8px}
-        .safety-text{font-size:13px;color:#c8c0a8;line-height:1.8}
+        .safety-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
+        .safety-text{font-size:13px;color:#4A4238;line-height:1.8}
         .support-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:14px}
         .support-card{border-radius:12px;padding:14px;border:1px solid;background:rgba(13,10,34,0.7)}
         .support-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
-        .support-name{font-size:14px;font-weight:700;color:#f0e8d0}
+        .support-name{font-size:14px;font-weight:700;color:#1A1A1A}
         .support-score{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;line-height:1}
         .safety-pill{font-size:10px;font-weight:700;border-radius:20px;padding:3px 9px;border:1px solid;text-transform:uppercase;letter-spacing:.4px}
         .indicator-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
@@ -370,23 +370,23 @@ export default function LalKitabPage() {
         .protocol-item{font-size:12px;color:#d8cfb8;line-height:1.6;padding:8px 10px;border-radius:8px;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.12)}
         .lk-gochar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}
         .lk-chart-card{background:rgba(13,10,34,0.7);border:1px solid rgba(96,165,250,0.18);border-radius:14px;padding:16px}
-        .lk-chart-title{font-size:20px;font-weight:700;color:#f0e8d0;margin-bottom:8px}
+        .lk-chart-title{font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:8px}
         .lk-chart{max-width:300px;display:block;margin:8px auto 0}
         .lk-time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
         .lk-time-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px}
         .lk-time-stat{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:#f4df9d;line-height:1;margin-bottom:6px}
         .lk-mini-list{display:grid;gap:8px;margin-top:12px}
-        .lk-mini-item{font-size:12px;color:#c8c0a8;line-height:1.65;padding:9px 11px;border-radius:9px;background:rgba(9,6,29,0.8);border:1px solid rgba(38,31,76,0.9)}
+        .lk-mini-item{font-size:12px;color:#4A4238;line-height:1.65;padding:9px 11px;border-radius:9px;background:rgba(9,6,29,0.8);border:1px solid rgba(38,31,76,0.9)}
         .lk-remedy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
         .lk-remedy-card{border-radius:14px;padding:15px;background:rgba(9,6,29,0.78);border:1px solid rgba(38,31,76,0.9)}
-        .lk-remedy-title{font-size:15px;font-weight:800;color:#f0e8d0;margin-bottom:7px}
-        .lk-remedy-text{font-size:12px;color:#c8c0a8;line-height:1.75}
+        .lk-remedy-title{font-size:15px;font-weight:800;color:#1A1A1A;margin-bottom:7px}
+        .lk-remedy-text{font-size:12px;color:#4A4238;line-height:1.75}
         .lk-vastu-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
         .lk-vastu{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#d8cfb8}
         .lk-vastu.can{border-color:rgba(34,197,94,0.28);background:rgba(34,197,94,0.08);color:#86efac}
         .lk-vastu.no{border-color:rgba(239,68,68,0.28);background:rgba(239,68,68,0.08);color:#fca5a5}
         .lk-vastu.soft{border-color:rgba(245,158,11,0.28);background:rgba(245,158,11,0.08);color:#fcd34d}
-        .detail-note{font-size:13px;color:#c8c0a8;line-height:1.85;padding:13px 16px;border-radius:12px;background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.15);margin-bottom:14px}
+        .detail-note{font-size:13px;color:#4A4238;line-height:1.85;padding:13px 16px;border-radius:12px;background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.15);margin-bottom:14px}
         .lk-table-wrap{overflow-x:auto;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.03);margin-bottom:14px}
         .lk-table{width:100%;border-collapse:collapse;min-width:780px}
         .lk-table th{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:#c8a030;text-align:left;padding:12px 14px;border-bottom:1px solid rgba(200,160,48,0.2);background:rgba(200,160,48,0.06)}
@@ -396,18 +396,18 @@ export default function LalKitabPage() {
         .bm-malefic{color:#ef4444;font-weight:800}
         .bm-mixed{color:#f59e0b;font-weight:800}
         .yes-no{font-size:12px;font-weight:800}
-        .yes-no.yes{color:#f59e0b}.yes-no.no{color:#605890}
+        .yes-no.yes{color:#f59e0b}.yes-no.no{color:#6B635B}
         .prediction-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
         .prediction-card{background:rgba(9,6,29,0.78);border:1px solid rgba(38,31,76,0.9);border-radius:14px;padding:14px}
         .prediction-title{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#c8a030;margin-bottom:8px}
-        .prediction-text{font-size:13px;color:#c8c0a8;line-height:1.8}
+        .prediction-text{font-size:13px;color:#4A4238;line-height:1.8}
         .lk-report-block{background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin-bottom:14px}
-        .lk-report-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#f0e8d0;margin-bottom:10px}
-        .lk-report-p{font-size:14px;color:#c8c0a8;line-height:1.95;margin-bottom:10px}
+        .lk-report-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#1A1A1A;margin-bottom:10px}
+        .lk-report-p{font-size:14px;color:#4A4238;line-height:1.95;margin-bottom:10px}
         .lk-bullet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}
         .lk-scroll-panel{background:rgba(255,255,255,0.035);border:1px solid rgba(200,160,48,0.18);border-radius:14px;padding:14px;margin-bottom:16px}
         .lk-scroll-row{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:thin}
-        .lk-scroll-btn{white-space:nowrap;border:1px solid rgba(255,255,255,0.1);background:#08051a;color:#c8c0a8;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:750;cursor:pointer}
+        .lk-scroll-btn{white-space:nowrap;border:1px solid rgba(255,255,255,0.1);background:#FAF7F2;color:#4A4238;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:750;cursor:pointer}
         .lk-scroll-btn.active{border-color:#c8a030;background:rgba(200,160,48,0.15);color:#f4df9d}
         .lk-scroll-meta{font-size:12px;color:#8f86b8;line-height:1.6;margin-top:4px}
         @media(max-width:768px){.planet-grid{grid-template-columns:1fr}.combo-grid{grid-template-columns:1fr}.varsh-grid{grid-template-columns:1fr}}
@@ -426,7 +426,7 @@ export default function LalKitabPage() {
           <div style={{position:"relative",zIndex:1}}>
             <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#ef4444",marginBottom:6}}>📕 Lal Kitab</div>
             <div className="header-name serif">{birth.name}</div>
-            <div style={{fontSize:13,color:"#605890",marginTop:4}}>
+            <div style={{fontSize:13,color:"#6B635B",marginTop:4}}>
               {new Date(birth.dob).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})} · {birth.tob} · {birth.city} · Age {currentAge}
             </div>
           </div>
@@ -465,7 +465,7 @@ export default function LalKitabPage() {
             <div className="kismat-score serif" style={{color: scoreColor(result.kismat.score)}}>
               {result.kismat.score}
             </div>
-            <div style={{fontSize:10,color:"#605890",textAlign:"center",marginTop:2}}>/ 95</div>
+            <div style={{fontSize:10,color:"#6B635B",textAlign:"center",marginTop:2}}>/ 95</div>
           </div>
         </div>
 
@@ -597,7 +597,7 @@ export default function LalKitabPage() {
                         <div className="domain-txt">{p.nishani}</div>
                         {p.homeEnv.length > 0 && (
                           <div style={{marginBottom:8}}>
-                            <div style={{fontSize:10,letterSpacing:"1px",textTransform:"uppercase",color:"#605890",marginBottom:4}}>Ghar ke Sanket</div>
+                            <div style={{fontSize:10,letterSpacing:"1px",textTransform:"uppercase",color:"#6B635B",marginBottom:4}}>Ghar ke Sanket</div>
                             <div className="home-env-list">
                               {p.homeEnv.map((s,i) => <div key={i} className="home-env-item">{s}</div>)}
                             </div>
@@ -616,7 +616,7 @@ export default function LalKitabPage() {
                         {p.neverDonate.length > 0 && (
                           <div style={{marginTop:10,padding:"12px 14px",background:"rgba(239,68,68,0.05)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:8}}>
                             <div style={{fontSize:10,color:"#ef4444",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:6}}>⚠️ Yeh Daan Na Karein — Savdhani</div>
-                            <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.7,marginBottom:8}}>
+                            <div style={{fontSize:12,color:"#4A4238",lineHeight:1.7,marginBottom:8}}>
                               Jab tak {p.planet} aapke liye anukool chal raha hai, yeh cheezein daan karne se is grah ki shakti kamzor pad sakti hai:
                             </div>
                             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
@@ -633,45 +633,45 @@ export default function LalKitabPage() {
 
                     {domainTab === "career" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#605890",marginBottom:8}}>Karya Kshetra · Career</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Karya Kshetra · Career</div>
                         <div className="domain-txt">{p.career}</div>
                       </div>
                     )}
 
                     {domainTab === "money" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#605890",marginBottom:8}}>Dhan · Money</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Dhan · Money</div>
                         <div className="domain-txt" style={{color:"#fcd34d"}}>{p.money}</div>
                       </div>
                     )}
 
                     {domainTab === "marriage" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#605890",marginBottom:8}}>Vivah · Marriage</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Vivah · Marriage</div>
                         <div className="domain-txt" style={{color:"#f9a8d4"}}>{p.marriage}</div>
                       </div>
                     )}
 
                     {domainTab === "health" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#605890",marginBottom:8}}>Swasthya · Health</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Swasthya · Health</div>
                         <div className="domain-txt" style={{color:"#86efac"}}>{p.health}</div>
                       </div>
                     )}
 
                     {domainTab === "psychology" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#605890",marginBottom:8}}>Mansik Swaroop · Psychology</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Mansik Swaroop · Psychology</div>
                         <div className="domain-txt" style={{color:"#c4b5fd"}}>{p.psychology}</div>
                       </div>
                     )}
 
-                    <div style={{fontSize:11,color:"#3a3060",marginTop:10,textAlign:"right"}}>Click to collapse ↑</div>
+                    <div style={{fontSize:11,color:"#6B635B",marginTop:10,textAlign:"right"}}>Click to collapse ↑</div>
                   </div>
                 )}
 
                 {expanded !== p.planet && (
-                  <div style={{fontSize:11,color:"#3a3060",marginTop:4,textAlign:"right"}}>
+                  <div style={{fontSize:11,color:"#6B635B",marginTop:4,textAlign:"right"}}>
                     Click for details ↓
                   </div>
                 )}
@@ -704,7 +704,7 @@ export default function LalKitabPage() {
                   {result.coreAccuracy.map((row) => (
                     <tr key={row.planet}>
                       <td style={{fontWeight:800,color:LK_COLORS[row.planet]}}>{row.planet}</td>
-                      <td>{row.signShort}<br /><span style={{fontSize:11,color:"#605890"}}>{row.sign}</span></td>
+                      <td>{row.signShort}<br /><span style={{fontSize:11,color:"#6B635B"}}>{row.sign}</span></td>
                       <td>H{row.house}</td>
                       <td>{row.position.replaceAll("_", " ")}</td>
                       <td><span className={`yes-no ${row.soya ? "yes" : "no"}`}>{row.soya ? "Yes" : "No"}</span></td>
@@ -738,7 +738,7 @@ export default function LalKitabPage() {
             {result.takkars.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">✅</div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#c8c0a8"}}>Koi bada Takkar nahi</div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#4A4238"}}>Koi bada Takkar nahi</div>
                 <div style={{fontSize:13,marginTop:8}}>Same-house enemy clash nahi mila. Ab judgement planet condition aur varshphal timing se hoga.</div>
               </div>
             ) : (
@@ -771,13 +771,13 @@ export default function LalKitabPage() {
         {/* ── RIN TAB ── */}
         {activeTab === "rin" && (
           <div>
-            <div style={{background:"rgba(249,115,22,0.05)",border:"1px solid rgba(249,115,22,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+            <div style={{background:"rgba(249,115,22,0.05)",border:"1px solid rgba(249,115,22,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
               📕 <strong style={{color:"#f97316"}}>Rin Siddhant</strong> — Lal Kitab mein kuch planets ka specific houses mein hona pichle janam ka karz darshata hai. Yeh karmic debt tab tak hata nahi jab tak upaya na ho.
             </div>
             {result.rins.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">🙏</div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#c8c0a8"}}>Koi bada Rin Dosha nahi</div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#4A4238"}}>Koi bada Rin Dosha nahi</div>
               </div>
             ) : (
               result.rins.map((r, i) => (
@@ -794,7 +794,7 @@ export default function LalKitabPage() {
         {/* ── AGES TAB ── */}
         {activeTab === "ages" && (
           <div>
-            <div style={{background:"rgba(200,160,48,0.05)",border:"1px solid rgba(200,160,48,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+            <div style={{background:"rgba(200,160,48,0.05)",border:"1px solid rgba(200,160,48,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
               ⏰ Lal Kitab mein har planet ek specific age pe activate hota hai. Iska matlab sirf ek event nahi hota; us age ke aas paas grah ke house, state, rin, family signal, career/money/health theme aur upaya ki need zyada clearly saamne aati hai. Active Now ka matlab hai abhi us grah ka nimit aur phal zyada dhyan se dekhna chahiye.
             </div>
             <div className="ages-grid">
@@ -809,14 +809,14 @@ export default function LalKitabPage() {
                     <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:28,fontWeight:700,color:col,lineHeight:1,margin:"6px 0"}}>
                       Age {p.actAge}
                     </div>
-                    <div style={{fontSize:11,color:"#605890",marginBottom:6}}>~{p.actYear}</div>
+                    <div style={{fontSize:11,color:"#6B635B",marginBottom:6}}>~{p.actYear}</div>
                     <div style={{fontSize:11,fontWeight:600,color:col}}>
                       {p.isActNow ? "⚡ Active Now!" : p.isPast ? "✓ Activated" : "→ Upcoming"}
                     </div>
                     <div style={{marginTop:8,fontSize:11,color:scoreColor(p.score),fontWeight:600}}>
                       Score: {p.score}/95
                     </div>
-                    <div style={{marginTop:8,fontSize:11,color:"#c8c0a8",lineHeight:1.5}}>
+                    <div style={{marginTop:8,fontSize:11,color:"#4A4238",lineHeight:1.5}}>
                       H{p.house} · {p.status === "pakka" ? "supportive house" : p.status === "dushman" ? "challenge house" : "mixed house"} · {p.state}
                     </div>
                   </div>
@@ -829,13 +829,13 @@ export default function LalKitabPage() {
         {/* ── COMBOS TAB ── */}
         {activeTab === "combos" && (
           <div>
-            <div style={{background:"rgba(167,139,250,0.05)",border:"1px solid rgba(167,139,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+            <div style={{background:"rgba(167,139,250,0.05)",border:"1px solid rgba(167,139,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
               🔮 <strong style={{color:"#a78bfa"}}>Graha Yoga</strong> — Lal Kitab combo tab same-house combinations ko dikhata hai. Agar do grah ek hi ghar mein hain aur classical rule available hai to detailed yoga aayega; agar rule specific nahi hai to ab generic same-house reading bhi show hogi, taaki important combinations hide na hon.
             </div>
             {result.combinations.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">🔮</div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#c8c0a8"}}>Same-house Combo nahi mila</div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#4A4238"}}>Same-house Combo nahi mila</div>
                 <div style={{fontSize:13,marginTop:8}}>Is chart mein koi do grah ek hi Lal Kitab ghar mein strong conjunction nahi bana rahe. Reading ab individual planets, takkar, rin, varshphal aur ghar ke sanket se hogi.</div>
               </div>
             ) : (
@@ -860,7 +860,7 @@ export default function LalKitabPage() {
                       </div>
                     </div>
                     <div className="combo-remedies">
-                      <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#605890",marginBottom:6}}>Upaya</div>
+                      <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:6}}>Upaya</div>
                       <div className="remedies-list">
                         {c.remedies.map((r,j) => (
                           <div key={j} className="remedy-item">{r}</div>
@@ -877,7 +877,7 @@ export default function LalKitabPage() {
         {/* ── VARSHPHAL TAB ── */}
         {activeTab === "varshphal" && (
           <div>
-            <div style={{background:"rgba(96,165,250,0.05)",border:"1px solid rgba(96,165,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+            <div style={{background:"rgba(96,165,250,0.05)",border:"1px solid rgba(96,165,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
               📅 <strong style={{color:"#60a5fa"}}>Varshphal</strong> — Lal Kitab mein har saal lagna ek ghar aage khisak jaata hai. Is saal ka lagna aur grahon ki position se varshik phal nikala jaata hai.
             </div>
             <div className="varsh-card">
@@ -888,7 +888,7 @@ export default function LalKitabPage() {
                     Period: {result.varshphal.periodLabel}
                     <br />
                     Varsh Lagna: {result.varshphal.lagnaSign}
-                    <span style={{marginLeft:8,fontSize:11,color:"#605890"}}>
+                    <span style={{marginLeft:8,fontSize:11,color:"#6B635B"}}>
                       (Shift: +{result.varshphal.yearShift} ghar)
                     </span>
                   </div>
@@ -941,7 +941,7 @@ export default function LalKitabPage() {
                         <td style={{fontWeight:800,color:LK_COLORS[row.planet]}}>{row.planet}</td>
                         <td>H{row.natalHouse}</td>
                         <td>H{row.varshHouse}</td>
-                        <td>{row.signShort}<br /><span style={{fontSize:11,color:"#605890"}}>{row.sign}</span></td>
+                        <td>{row.signShort}<br /><span style={{fontSize:11,color:"#6B635B"}}>{row.sign}</span></td>
                         <td><span className={`yes-no ${row.soya ? "yes" : "no"}`}>{row.soya ? "Yes" : "No"}</span></td>
                         <td><span className={`yes-no ${row.kismatJaganewala ? "yes" : "no"}`}>{row.kismatJaganewala ? "Yes" : "No"}</span></td>
                         <td>
@@ -959,7 +959,7 @@ export default function LalKitabPage() {
                 <div className="varsh-col shubh">
                   <div className="varsh-col-title" style={{color:"#22c55e"}}>✨ Shubh Graha (Is Saal)</div>
                   {result.varshphal.shubhPlanets.length === 0
-                    ? <div style={{fontSize:13,color:"#605890"}}>Koi vishesh shubh grah nahi</div>
+                    ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh shubh grah nahi</div>
                     : result.varshphal.shubhPlanets.map((pl,i) => (
                         <div key={i} className="varsh-planet" style={{color:"#86efac"}}>{pl}</div>
                       ))
@@ -968,7 +968,7 @@ export default function LalKitabPage() {
                 <div className="varsh-col caution">
                   <div className="varsh-col-title" style={{color:"#ef4444"}}>⚠️ Savdhani (Is Saal)</div>
                   {result.varshphal.cautionPlanets.length === 0
-                    ? <div style={{fontSize:13,color:"#605890"}}>Koi vishesh savdhani nahi</div>
+                    ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh savdhani nahi</div>
                     : result.varshphal.cautionPlanets.map((pl,i) => (
                         <div key={i} className="varsh-planet" style={{color:"#fca5a5"}}>{pl}</div>
                       ))
@@ -982,7 +982,7 @@ export default function LalKitabPage() {
         {/* ── LK GOCHAR TAB ── */}
         {activeTab === "lkgochar" && (
           <div>
-            <div style={{background:"rgba(200,160,48,0.06)",border:"1px solid rgba(200,160,48,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+            <div style={{background:"rgba(200,160,48,0.06)",border:"1px solid rgba(200,160,48,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
               📕 <strong style={{color:"#c8a030"}}>LK Gochar</strong> — Yeh normal transit/gochar nahi hai. Yeh Lal Kitab ka time-reading layer hai: natal condition, 35-sala chakra, varshphal aur monthly phal ko ek saath read karta hai.
             </div>
 
@@ -1222,7 +1222,7 @@ export default function LalKitabPage() {
         {/* ── GHAR TAB ── */}
         {activeTab === "ghar" && (
           <div>
-            <div style={{background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#c8c0a8",lineHeight:1.8}}>
+            <div style={{background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
               🏠 <strong style={{color:"#22c55e"}}>Ghar Ke Sanket</strong> — Lal Kitab mein ghar ke har hisse ka ek khaas grah se sambandh hota hai. Jis ghar mein grah hain, us zone ki cheezein aur halat seedhe us grah ke results ko prabhavit karti hain.
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
@@ -1241,8 +1241,8 @@ export default function LalKitabPage() {
                           {h.house}
                         </div>
                         <div>
-                          <div style={{fontSize:12,fontWeight:600,color:"#f0e8d0"}}>House {h.house}</div>
-                          <div style={{fontSize:10,color:"#605890",marginTop:1}}>{h.zone}</div>
+                          <div style={{fontSize:12,fontWeight:600,color:"#1A1A1A"}}>House {h.house}</div>
+                          <div style={{fontSize:10,color:"#6B635B",marginTop:1}}>{h.zone}</div>
                         </div>
                       </div>
                       {occupied && (
@@ -1256,7 +1256,7 @@ export default function LalKitabPage() {
                     <div style={{fontSize:12,color:"#a78bfa",marginBottom:8,fontStyle:"italic"}}>{h.meaning}</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
                       {h.signs.map((s,i) => (
-                        <span key={i} style={{fontSize:11,padding:"3px 9px",borderRadius:20,background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.18)",color:"#c8c0a8"}}>
+                        <span key={i} style={{fontSize:11,padding:"3px 9px",borderRadius:20,background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.18)",color:"#4A4238"}}>
                           {s}
                         </span>
                       ))}
@@ -1306,14 +1306,14 @@ export default function LalKitabPage() {
                       <div className="support-top">
                         <div>
                           <div className="support-name">{p.planet} · H{p.house}</div>
-                          <div style={{fontSize:10,color:"#605890",marginTop:2}}>
+                          <div style={{fontSize:10,color:"#6B635B",marginTop:2}}>
                             {p.isPakkaHouse ? "Pakka house" : p.isSupportiveHouse ? "Supportive house" : p.isChallengeHouse ? "Challenge house" : "Neutral house"}
                           </div>
                         </div>
                         <div className="support-score" style={{color}}>{p.score}</div>
                       </div>
                       <span className="safety-pill" style={{color,background:`${color}12`,borderColor:`${color}44`}}>{label}</span>
-                      <div style={{fontSize:12,color:"#c8c0a8",lineHeight:1.65,marginTop:9}}>{p.explanation}</div>
+                      <div style={{fontSize:12,color:"#4A4238",lineHeight:1.65,marginTop:9}}>{p.explanation}</div>
                     </div>
                   );
                 })}

@@ -1,0 +1,30 @@
+{
+  "publicId": "fca2f044",
+  "wikipediaSlug": "Adil_Ray",
+  "wikipediaId": "Q4682812",
+  "name": "Adil Ray",
+  "fullName": "Adil Ray",
+  "profileSummary": "Adil Ray is a British actor, comedian and radio/television presenter. Ray is best known as the creator, co-writer and star of the long-running BBC One scripted comedy series Citizen Khan (2012–2016), and as a presenter on ITV's Good Morning Britain and on various BBC radio stations. He played the role of Sadiq Nawaz in the Channel 4 drama series Ackley Bridge, and also had major roles in Channel 5 drama series The Inheritance, ITV period drama series Beecham House, and in feature films Blithe Sprit, Arthur's Whisky, and Picture This. Since 2021, he has presented the revival of the British game show Lingo.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Adil_Ray_by_Ian_Wallman_00018.jpg/330px-Adil_Ray_by_Ian_Wallman_00018.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Adil_Ray",
+  "dateOfBirth": "1974-04-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "52.48",
+  "birthCoordinatesLng": "-1.9025",
+  "moonSign": "3",
+  "sunSign": "1",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "comedian",
+    "screenwriter",
+    "stand-up comedian",
+    "television presenter",
+    "television actor"
+  ],
+  "qid": "Q4682812",
+  "birthPlace": "Birmingham",
+  "fetchedAt": "2026-04-08T00:22:10.172Z"
+}

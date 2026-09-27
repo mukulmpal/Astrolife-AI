@@ -1,0 +1,28 @@
+{
+  "publicId": "2f9ee23c",
+  "wikipediaSlug": "Arjun_Rampal",
+  "wikipediaId": "Q442668",
+  "name": "Arjun Rampal",
+  "fullName": "Arjun Rampal",
+  "profileSummary": "Arjun Rampal is an Indian actor and model who mainly works in Hindi films. He has starred in more than 40 films. Described as a versatile actor by the media, Rampal has received several awards including the National Film Award for Best Supporting Actor and the Filmfare Award for Best Supporting Actor for his performance in Rock On!!.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Arjun_Rampal_is_the_new_Gillette_brand_ambassador.jpg/330px-Arjun_Rampal_is_the_new_Gillette_brand_ambassador.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arjun_Rampal",
+  "dateOfBirth": "1972-11-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.166666666",
+  "birthCoordinatesLng": "79.933333333",
+  "moonSign": "4",
+  "sunSign": "8",
+  "lagnaSignText": "11",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "model",
+    "film producer"
+  ],
+  "qid": "Q442668",
+  "birthPlace": "Jabalpur",
+  "fetchedAt": "2026-04-07T16:25:20.223Z"
+}

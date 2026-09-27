@@ -1,0 +1,27 @@
+{
+  "publicId": "9f578e01",
+  "wikipediaSlug": "Roma_Agrawal",
+  "wikipediaId": "Q41338105",
+  "name": "Roma Agrawal",
+  "fullName": "Roma Agrawal",
+  "profileSummary": "Roma Agrawal is an Indian-British chartered structural engineer based in London. She has worked on several major engineering projects, including the Shard. Agrawal is also an author and a diversity campaigner, championing women in engineering.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Roma_Agrawal_at_the_Nasa_Goddard_Centre_%28cropped%29.jpg/330px-Roma_Agrawal_at_the_Nasa_Goddard_Centre_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Roma_Agrawal",
+  "dateOfBirth": "1983-03-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "6",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "structural engineer",
+    "civil engineer"
+  ],
+  "qid": "Q41338105",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-08T01:18:14.873Z"
+}

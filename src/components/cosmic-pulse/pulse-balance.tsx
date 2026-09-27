@@ -14,79 +14,79 @@ export const PulseBalance: React.FC<PulseBalanceProps> = ({
   const isTaraCaution = taraBala.quality === "caution";
 
   return (
-    <div className="pt-3 border-t" style={{ borderColor: "var(--app-border)" }}>
-      <div className="flex items-center justify-between mb-2">
+    <div className="pt-1">
+      <div className="flex items-center justify-between mb-3">
         <div
-          className="text-[10px] uppercase tracking-wider font-semibold"
-          style={{ color: "var(--app-muted)" }}
+          className="text-[10px] uppercase tracking-wider font-semibold font-mono"
+          style={{ color: "var(--app-muted, #94a3b8)" }}
         >
           Personal Modifiers · Nativity Filter
         </div>
-        <div className="text-[10px] italic" style={{ color: "var(--app-muted)" }}>
+        <div className="text-[10px] italic" style={{ color: "var(--app-muted, #94a3b8)" }}>
           Filters macro transit through your birth Moon
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Tara Bala */}
         <div
-          className="rounded-xl p-3 border"
-          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+          className="rounded-xl p-4 border"
+          style={{ background: "var(--app-card-alt, #09071a)", borderColor: "var(--app-border, #FFFFFF)" }}
         >
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-semibold" style={{ color: "var(--app-fg)" }}>
-              {taraBala.name} Tara (T#{taraBala.number})
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold" style={{ color: "var(--app-fg, #ffffff)" }}>
+              {taraBala.name} Tara <span className="text-xs font-mono font-normal" style={{ color: "var(--app-muted, #94a3b8)" }}>(T#{taraBala.number})</span>
             </span>
             <span
-              className={`text-[10px] font-medium px-2 py-0.5 rounded ${
+              className={`text-[10px] font-medium font-mono uppercase px-2.5 py-0.5 rounded-full ${
                 isTaraSupportive
-                  ? "text-emerald-500 bg-emerald-500/10 border border-emerald-500/25"
+                  ? "text-emerald-400 bg-emerald-500/15 border border-emerald-500/35"
                   : isTaraCaution
-                  ? "text-amber-500 bg-amber-500/10 border border-amber-500/25"
-                  : "text-sky-400 bg-sky-500/10 border border-sky-500/25"
+                  ? "text-amber-400 bg-amber-500/15 border border-amber-500/35"
+                  : "text-sky-400 bg-sky-500/15 border border-sky-500/35"
               }`}
             >
               {isTaraSupportive ? "Supportive" : isTaraCaution ? "Cautionary" : "Neutral"}
             </span>
           </div>
-          <div className="text-[11px] leading-snug" style={{ color: "var(--app-soft)" }}>
+          <div className="text-xs leading-relaxed" style={{ color: "var(--app-soft, #cbd5e1)", lineHeight: "1.6" }}>
             {taraBala.guidance}
           </div>
-          <div className="text-[10px] mt-1.5 font-mono" style={{ color: "var(--app-muted)" }}>
-            {taraBala.birthNakshatra} (Birth) → {taraBala.transitNakshatra} (Transit)
+          <div className="text-[11px] mt-2.5 font-mono font-semibold" style={{ color: "var(--app-gold, #f5c842)" }}>
+            ✦ {taraBala.birthNakshatra} (Birth) → {taraBala.transitNakshatra} (Transit)
           </div>
         </div>
 
         {/* Chandra Bala */}
         <div
-          className="rounded-xl p-3 border"
-          style={{ background: "var(--app-card-alt)", borderColor: "var(--app-border)" }}
+          className="rounded-xl p-4 border"
+          style={{ background: "var(--app-card-alt, #09071a)", borderColor: "var(--app-border, #FFFFFF)" }}
         >
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-semibold" style={{ color: "var(--app-fg)" }}>
-              Chandra Bala ({chandraBala.houseFromNatalMoon}th House)
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold" style={{ color: "var(--app-fg, #ffffff)" }}>
+              Chandra Bala <span className="text-xs font-mono font-normal" style={{ color: "var(--app-muted, #94a3b8)" }}>({chandraBala.houseFromNatalMoon}th House)</span>
             </span>
             <span
-              className={`text-[10px] font-medium px-2 py-0.5 rounded ${
+              className={`text-[10px] font-medium font-mono uppercase px-2.5 py-0.5 rounded-full ${
                 chandraBala.isAshtamaChandra
-                  ? "text-rose-500 bg-rose-500/10 border border-rose-500/25"
+                  ? "text-rose-400 bg-rose-500/15 border border-rose-500/35"
                   : chandraBala.isSupportive
-                  ? "text-emerald-500 bg-emerald-500/10 border border-emerald-500/25"
-                  : "text-amber-500 bg-amber-500/10 border border-amber-500/25"
+                  ? "text-emerald-400 bg-emerald-500/15 border border-emerald-500/35"
+                  : "text-amber-400 bg-amber-500/15 border border-amber-500/35"
               }`}
             >
               {chandraBala.isAshtamaChandra
-                ? "Ashtama Chandra (Rest)"
+                ? "Ashtama (Rest)"
                 : chandraBala.isSupportive
                 ? "Supportive"
-                : "Gentle Handling"}
+                : "Mindful"}
             </span>
           </div>
-          <div className="text-[11px] leading-snug" style={{ color: "var(--app-soft)" }}>
+          <div className="text-xs leading-relaxed" style={{ color: "var(--app-soft, #cbd5e1)", lineHeight: "1.6" }}>
             {chandraBala.guidance}
           </div>
-          <div className="text-[10px] mt-1.5 font-mono" style={{ color: "var(--app-muted)" }}>
-            Moon in {chandraBala.transitMoonSign} from Natal {chandraBala.natalMoonSign}
+          <div className="text-[11px] mt-2.5 font-mono font-semibold" style={{ color: "var(--app-gold, #f5c842)" }}>
+            ✦ Transit in {chandraBala.transitMoonSign} from Natal {chandraBala.natalMoonSign}
           </div>
         </div>
       </div>

@@ -1,0 +1,27 @@
+{
+  "publicId": "1b14598b",
+  "wikipediaSlug": "Alibhai_Mulla_Jeevanjee",
+  "wikipediaId": "Q4725647",
+  "name": "Alibhai Mulla Jeevanjee",
+  "fullName": "Alibhai Mulla Jeevanjee",
+  "profileSummary": "Alibhai Mulla Jeevanjee was an Indian-born Kenyan merchant, politician and philanthropist. He was amongst the first and most influential Indian settlers in Kenya, amassing significant wealth and becoming a leader of Kenya's Indian community.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Alibhai_Mulla_Jeevanjee.JPG/330px-Alibhai_Mulla_Jeevanjee.JPG",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Alibhai_Mulla_Jeevanjee",
+  "dateOfBirth": "1856-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "24.86",
+  "birthCoordinatesLng": "67.01",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "merchant",
+    "politician"
+  ],
+  "qid": "Q4725647",
+  "birthPlace": "Karachi",
+  "fetchedAt": "2026-04-08T02:08:54.465Z"
+}

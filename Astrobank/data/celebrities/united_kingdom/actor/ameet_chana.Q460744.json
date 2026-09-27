@@ -1,0 +1,27 @@
+{
+  "publicId": "22a082a0",
+  "wikipediaSlug": "Ameet_Chana",
+  "wikipediaId": "Q460744",
+  "name": "Ameet Chana",
+  "fullName": "Ameet Chana",
+  "profileSummary": "Ameet Chana is a British-Indian actor and producer. His most notable roles include playing Tony in the film Bend It Like Beckham (2002), and Adi Ferreira in EastEnders (2003–2005).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Ameet_Chana_in_2015.jpg/330px-Ameet_Chana_in_2015.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ameet_Chana",
+  "dateOfBirth": "1975-09-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.336111111",
+  "birthCoordinatesLng": "-0.2675",
+  "moonSign": "8",
+  "sunSign": "5",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q460744",
+  "birthPlace": "Epsom",
+  "fetchedAt": "2026-04-08T00:22:15.158Z"
+}

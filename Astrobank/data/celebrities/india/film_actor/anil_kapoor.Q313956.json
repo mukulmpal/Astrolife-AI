@@ -1,0 +1,32 @@
+{
+  "publicId": "ba237486",
+  "wikipediaSlug": "Anil_Kapoor",
+  "wikipediaId": "Q313956",
+  "name": "Anil Kapoor",
+  "fullName": "Anil Kapoor",
+  "profileSummary": "Anil Surinder Kapoor is an Indian actor and producer who works primarily in Hindi films, in addition to Indian television and international films. In a career spanning over 40 years as an actor and since 2005 as a producer, Kapoor has appeared in more than 100 films. He has received several accolades, including two National Film Awards and seven Filmfare Awards.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Anil_Kapoor_1.jpeg/330px-Anil_Kapoor_1.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anil_Kapoor",
+  "dateOfBirth": "1959-12-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film producer",
+    "actor",
+    "screenwriter",
+    "producer"
+  ],
+  "qid": "Q313956",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:00:01.531Z"
+}

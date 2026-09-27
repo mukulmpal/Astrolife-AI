@@ -1,0 +1,28 @@
+{
+  "publicId": "17ef5104",
+  "wikipediaSlug": "Babita_Mandlik",
+  "wikipediaId": "Q4837938",
+  "name": "Babita Mandlik",
+  "fullName": "Babita Mandlik",
+  "profileSummary": "Babita Mandlik is an Indian cricketer who plays as a right-handed batter. She appeared in \n3 One Day International and 2 Twenty20 Internationals for India from 2003 to 2010. She has played state cricket for Madhya Pradesh, Railways and Delhi.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Babita_Mandlik",
+  "dateOfBirth": "1981-07-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.8",
+  "birthCoordinatesLng": "83",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4837938",
+  "birthPlace": "India",
+  "fetchedAt": "2026-04-07T11:02:29.407Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "5add8dca",
+  "wikipediaSlug": "Abhay_Deol",
+  "wikipediaId": "Q511589",
+  "name": "Abhay Deol",
+  "fullName": "Abhay Deol",
+  "profileSummary": "Abhay Deol is an Indian actor who predominantly works in Hindi films. Born in the Deol family, he made his screen debut with Imtiaz Ali's romantic comedy Socha Na Tha (2005). Deol was praised for his performances in the independent films Manorama Six Feet Under (2007) and Oye Lucky! Lucky Oye! (2008). His breakthrough came in 2009 with a starring role in Anurag Kashyap's black comedy Dev.D, a modern-day adaptation of Devdas.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Abhay_Deol_in_2021.jpg/330px-Abhay_Deol_in_2021.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Abhay_Deol",
+  "dateOfBirth": "1976-03-15",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "5",
+  "sunSign": "12",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer",
+    "writer"
+  ],
+  "qid": "Q511589",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:24:45.195Z"
+}

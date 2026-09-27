@@ -1,0 +1,27 @@
+{
+  "publicId": "700ff754",
+  "wikipediaSlug": "Jal_Shah",
+  "wikipediaId": "Q6125806",
+  "name": "Jal Shah",
+  "fullName": "Jal Shah",
+  "profileSummary": "Jal Shah is a Nepali actress. She started her film career with Avatar (1996) when she was 13 years old. She was one of the top actress in Nepali movies from 90s to mid 2000s She went on to act in more than three dozen films. Her last film was Krodh (2006).",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jal_Shah",
+  "dateOfBirth": "1975-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": "4",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor"
+  ],
+  "qid": "Q6125806",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-07T16:43:09.361Z"
+}

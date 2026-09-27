@@ -1,0 +1,30 @@
+{
+  "publicId": "6a7b8e82",
+  "wikipediaSlug": "Rajendra_Kumar",
+  "wikipediaId": "Q3632712",
+  "name": "Rajendra Kumar",
+  "fullName": "Rajendra Kumar",
+  "profileSummary": "Rajendra Kumar was an Indian actor who starred in Bollywood films. Starting his career in 1949, he worked in more than 80 films in a career spanning over four decades. Kumar is considered as one of the greatest and most successful actors in Indian cinema. He was popularly known as the Jubilee Kumar during the 1960s, when he consecutively starred in several commercially successful films.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/12/Rajendra_Kumar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Rajendra_Kumar",
+  "dateOfBirth": "1929-07-20",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "32.5",
+  "birthCoordinatesLng": "74.533333333",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film producer",
+    "film director"
+  ],
+  "qid": "Q3632712",
+  "birthPlace": "Sialkot",
+  "fetchedAt": "2026-04-07T11:30:00.128Z"
+}

@@ -1,0 +1,33 @@
+{
+  "publicId": "a056870a",
+  "wikipediaSlug": "Anoushka_Shankar",
+  "wikipediaId": "Q259379",
+  "name": "Anoushka Shankar",
+  "fullName": "Anoushka Shankar",
+  "profileSummary": "Anoushka Hemangini Shankar is a British-American sitar player and musician of Indian origin, as well as an occasional writer and actress. She performs across multiple genres and styles—classical and contemporary, acoustic and electronic. In addition to releasing seven solo studio albums beginning with Anoushka (1998), she has also worked alongside a wide variety of musicians, including Karsh Kale on the full-length collaboration Breathing Under Water (2007) and her father Ravi Shankar. She has received fourteen Grammy Awards nominations and was the first musician of Indian origin to perform live and to serve as a presenter at the ceremony.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Anoushka_Shankar_-3623.jpg/330px-Anoushka_Shankar_-3623.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anoushka_Shankar",
+  "dateOfBirth": "1981-06-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.507222222",
+  "birthCoordinatesLng": "-0.1275",
+  "moonSign": "5",
+  "sunSign": "2",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "composer",
+    "songwriter",
+    "actor",
+    "writer",
+    "sitarist",
+    "singer",
+    "recording artist",
+    "singer-songwriter"
+  ],
+  "qid": "Q259379",
+  "birthPlace": "London",
+  "fetchedAt": "2026-04-08T00:21:58.140Z"
+}

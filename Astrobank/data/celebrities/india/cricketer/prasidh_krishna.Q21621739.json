@@ -1,0 +1,28 @@
+{
+  "publicId": "1636058d",
+  "wikipediaSlug": "Prasidh_Krishna",
+  "wikipediaId": "Q21621739",
+  "name": "Prasidh Krishna",
+  "fullName": "Prasidh Krishna",
+  "profileSummary": "Muralikrishna Prasidh Krishna is an Indian international cricketer. He plays for the Indian national cricket team, as a right-arm fast-medium bowler. He represents Karnataka in domestic cricket and Gujarat Titans in the Indian Premier League. He was a part of the Indian squad which won the 2023 Asia Cup and were runners-up in the 2023 Cricket World Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Prasidh_Krishna",
+  "dateOfBirth": "1996-02-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q21621739",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T10:58:25.236Z"
+}

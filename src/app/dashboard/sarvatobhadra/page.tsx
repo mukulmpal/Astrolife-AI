@@ -31,7 +31,7 @@ export default function SarvatobhadraPage() {
 
   if (loading || !result) {
     return (
-      <main style={{ minHeight: "100vh", background: "#060410", padding: "30px 22px 110px", color: "#f0e8d0" }}>
+      <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "30px 22px 110px", color: "#1A1A1A" }}>
         <EngineStateCard title="🔯 Sarvatobhadra Chakra" loading={loading} loadingText="Mapping nakshatra grid..." emptyText="Complete onboarding to view chakra." />
       </main>
     );
@@ -43,18 +43,18 @@ export default function SarvatobhadraPage() {
   return (
     <main className="page" style={{ minHeight: "100vh", paddingBottom: 110 }}>
       <style>{`
-        .svb-card { background: #0d0a22; border: 1px solid #1c1840; border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
-        .svb-row { font-size: 12px; color: #b8b0d8; margin-bottom: 6px; display: flex; gap: 8px; line-height: 1.55; }
-        .svb-row strong { color: #f0e8d0; min-width: 80px; flex-shrink: 0; }
-        .tab-btn { padding: 7px 13px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid #1c1840; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .svb-card { background: #FFFFFF; border: 1px solid #FFFFFF; border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+        .svb-row { font-size: 12px; color: #6B635B; margin-bottom: 6px; display: flex; gap: 8px; line-height: 1.55; }
+        .svb-row strong { color: #1A1A1A; min-width: 80px; flex-shrink: 0; }
+        .tab-btn { padding: 7px 13px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid #FFFFFF; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
         .tab-btn.active { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.4); color: #06b6d4; }
         .tab-btn:not(.active) { background: transparent; color: #8880a8; }
         .planet-tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 10px; font-size: 10px; margin: 1px; border: 1px solid; }
         .alert-header { padding: 14px 16px; cursor: pointer; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-        .alert-body { padding: 0 16px 16px; border-top: 1px solid #1c1840; padding-top: 14px; }
+        .alert-body { padding: 0 16px 16px; border-top: 1px solid #FFFFFF; padding-top: 14px; }
         .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px; opacity: 0.7; }
         .zone-cell { padding: 6px 8px; border-radius: 6px; font-size: 10px; }
-        .knowledge-box { background: rgba(6,182,212,0.06); border: 1px solid rgba(6,182,212,0.15); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 12px; color: #b8b0d8; line-height: 1.7; }
+        .knowledge-box { background: rgba(6,182,212,0.06); border: 1px solid rgba(6,182,212,0.15); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 12px; color: #6B635B; line-height: 1.7; }
         .remedy-box { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.18); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #86efac; line-height: 1.7; }
         .caution-box { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.18); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #fca5a5; line-height: 1.7; margin-bottom: 8px; }
       `}</style>
@@ -72,17 +72,17 @@ export default function SarvatobhadraPage() {
             <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#06b6d4", marginBottom: 6 }}>
               Executive summary
             </div>
-            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600, color: "#f0e8d0" }}>
+            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600, color: "#1A1A1A" }}>
               Period: {result.currentPeriodAssessment}
             </div>
-            <div style={{ fontSize: 12, color: "#b8b0d8", marginTop: 8, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 12, color: "#6B635B", marginTop: 8, lineHeight: 1.7 }}>
               {result.currentPeriodReason}
             </div>
           </div>
         </div>
 
         <div className="summary-strip" style={{ marginBottom: 16, lineHeight: 1.8 }}>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#c8c0a8" }}>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#4A4238" }}>
             <li>Janma nakshatra {result.birthNakshatra} anchors the grid — transits vedha this row first.</li>
             <li>Benefic vedha supports travel and launches; malefic vedha favors caution and remedies.</li>
             <li>Check active alerts before scheduling surgery, property, or confrontation-heavy meetings.</li>
@@ -101,13 +101,13 @@ export default function SarvatobhadraPage() {
                   : "Caution zone. Handle sensitive work slowly and avoid forcing risky commitments."}
             </div>
             <div className="knowledge-box" style={{ marginBottom: 0 }}>
-              <strong style={{ color: "#f0e8d0" }}>What is being hit:</strong><br />
+              <strong style={{ color: "#1A1A1A" }}>What is being hit:</strong><br />
               {result.vedhaAlerts.length
                 ? `${result.vedhaAlerts.length} transit vedha signal(s) are active on your nakshatra grid.`
                 : "No major vedha alert is active, so the day is comparatively stable."}
             </div>
             <div className="knowledge-box" style={{ marginBottom: 0 }}>
-              <strong style={{ color: "#f0e8d0" }}>Best use:</strong><br />
+              <strong style={{ color: "#1A1A1A" }}>Best use:</strong><br />
               Use this engine as a day-quality filter before timing travel, surgery, property, confrontation, or high-stakes meetings.
             </div>
           </div>
@@ -124,7 +124,7 @@ export default function SarvatobhadraPage() {
               </div>
             </div>
           </div>
-          <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.7" }}>{result.currentPeriodReason}</div>
+          <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.7" }}>{result.currentPeriodReason}</div>
         </div>
 
         {/* Summary grid */}
@@ -134,7 +134,7 @@ export default function SarvatobhadraPage() {
             { label: "Active Vedha Alerts", value: String(result.vedhaAlerts.length), sub: result.vedhaAlerts.length === 0 ? "All clear" : "Transit impacts", color: result.vedhaAlerts.length > 0 ? "#ef4444" : "#22c55e" },
             { label: "Natal in Sensitive", value: String(result.natalInSensitive.length), sub: "permanent activations", color: "#60a5fa" },
           ].map(({ label, value, sub, color }) => (
-            <div key={label} style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: "10px", padding: "12px 14px" }}>
+            <div key={label} style={{ background: "#FFFFFF", border: "1px solid #FFFFFF", borderRadius: "10px", padding: "12px 14px" }}>
               <div style={{ fontSize: "10px", color: "#8880a8", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: "4px" }}>{label}</div>
               <div style={{ fontSize: "18px", fontWeight: 700, color }}>{value}</div>
               <div style={{ fontSize: "10px", color: "#8880a8" }}>{sub}</div>
@@ -217,7 +217,7 @@ export default function SarvatobhadraPage() {
                           <div className="section-title" style={{ color: alertColor }}>
                             {isPos ? "✨ What This Means For You" : "⚠️ What This Means For You"}
                           </div>
-                          <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.75", background: `${alertColor}06`, border: `1px solid ${alertColor}18`, borderRadius: "8px", padding: "10px 12px" }}>
+                          <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.75", background: `${alertColor}06`, border: `1px solid ${alertColor}18`, borderRadius: "8px", padding: "10px 12px" }}>
                             {alert.vedhaInterp.prediction}
                           </div>
                         </div>
@@ -268,8 +268,8 @@ export default function SarvatobhadraPage() {
                 <div>
                   <div style={{ fontSize: "13px", color: "#c8a030", fontWeight: 700, marginBottom: "4px" }}>{nak.trait}</div>
                   <div style={{ fontSize: "11px", color: "#8880a8", lineHeight: "1.6" }}>
-                    Ruling Lord: <strong style={{ color: "#f0e8d0" }}>{nak.lord}</strong> &nbsp;·&nbsp;
-                    Devata: <strong style={{ color: "#f0e8d0" }}>{nak.devata}</strong>
+                    Ruling Lord: <strong style={{ color: "#1A1A1A" }}>{nak.lord}</strong> &nbsp;·&nbsp;
+                    Devata: <strong style={{ color: "#1A1A1A" }}>{nak.devata}</strong>
                   </div>
                 </div>
               </div>
@@ -292,8 +292,8 @@ export default function SarvatobhadraPage() {
             {/* Domain */}
             <div className="svb-card" style={{ padding: "16px" }}>
               <div className="section-title" style={{ color: "#c8a030" }}>Life Domain</div>
-              <div style={{ fontSize: "13px", color: "#f0e8d0", marginBottom: "10px" }}>{nak.domain}</div>
-              <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.75", background: "rgba(200,160,48,0.05)", border: "1px solid rgba(200,160,48,0.1)", borderRadius: "8px", padding: "10px 12px" }}>
+              <div style={{ fontSize: "13px", color: "#1A1A1A", marginBottom: "10px" }}>{nak.domain}</div>
+              <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.75", background: "rgba(200,160,48,0.05)", border: "1px solid rgba(200,160,48,0.1)", borderRadius: "8px", padding: "10px 12px" }}>
                 {nak.trait}. Your birth nakshatra is the cosmic frequency you were born into — it colors everything: your emotional responses, your deepest desires, your instinctive reactions, and the themes that recur throughout your life. Any planet transiting this nakshatra directly activates your core programming.
               </div>
             </div>
@@ -301,7 +301,7 @@ export default function SarvatobhadraPage() {
             {/* Health note */}
             <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "10px", padding: "14px 16px", marginBottom: "12px" }}>
               <div style={{ fontWeight: 700, fontSize: "12px", color: "#fca5a5", marginBottom: "6px" }}>🏥 Health Pattern — {result.birthNakshatra}</div>
-              <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.7" }}>{nak.healthNote} When malefic planets transit your janma nakshatra, these body areas and health patterns are at higher risk.</div>
+              <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.7" }}>{nak.healthNote} When malefic planets transit your janma nakshatra, these body areas and health patterns are at higher risk.</div>
             </div>
 
             {/* Sensitive zone ring */}
@@ -359,7 +359,7 @@ export default function SarvatobhadraPage() {
                     </div>
                   </div>
                   <div style={{ fontSize: "11px", color: "#8880a8", marginBottom: "8px" }}>{n.zoneDesc}</div>
-                  <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.7", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "7px", padding: "9px 11px" }}>
+                  <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.7", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "7px", padding: "9px 11px" }}>
                     {n.meaning}
                   </div>
                 </div>
@@ -378,9 +378,9 @@ export default function SarvatobhadraPage() {
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
-                    <tr style={{ background: "#0a0820" }}>
+                    <tr style={{ background: "#FFFFFF" }}>
                       {["#", "Nakshatra", "Zone", "Lord", "Nature", "Natal", "Transit Today"].map(h => (
-                        <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontSize: "10px", fontWeight: 700, color: "#8880a8", textTransform: "uppercase", letterSpacing: "0.5px", borderBottom: "1px solid #1c1840" }}>{h}</th>
+                        <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontSize: "10px", fontWeight: 700, color: "#8880a8", textTransform: "uppercase", letterSpacing: "0.5px", borderBottom: "1px solid #FFFFFF" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -395,9 +395,9 @@ export default function SarvatobhadraPage() {
                       const nkData = (typeof nk === 'string') ? (result.birthNakshatraData && row.index === result.janmaIndex ? result.birthNakshatraData : null) : null;
                       void nkData;
                       return (
-                        <tr key={row.index} style={{ background: isJanma ? "rgba(200,160,48,0.07)" : isVedha ? "rgba(239,68,68,0.04)" : "transparent", borderBottom: "1px solid #1c1840" }}>
+                        <tr key={row.index} style={{ background: isJanma ? "rgba(200,160,48,0.07)" : isVedha ? "rgba(239,68,68,0.04)" : "transparent", borderBottom: "1px solid #FFFFFF" }}>
                           <td style={{ padding: "7px 10px", fontSize: "11px", color: "#8880a8" }}>{row.index + 1}</td>
-                          <td style={{ padding: "7px 10px", fontSize: "12px", fontWeight: isJanma ? 700 : isVedha ? 600 : 400, color: isJanma ? "#c8a030" : isVedha ? "#ef4444" : "#f0e8d0" }}>
+                          <td style={{ padding: "7px 10px", fontSize: "12px", fontWeight: isJanma ? 700 : isVedha ? 600 : 400, color: isJanma ? "#c8a030" : isVedha ? "#ef4444" : "#1A1A1A" }}>
                             {isJanma ? "⭐ " : isVedha ? "⚠️ " : ""}{row.nakName}
                           </td>
                           <td style={{ padding: "7px 10px", fontSize: "10px", color: isJanma ? "#c8a030" : isVedha ? "#f97316" : "#4a4870" }}>
@@ -440,9 +440,9 @@ export default function SarvatobhadraPage() {
               <div style={{ fontWeight: 700, fontSize: "15px", color: "#06b6d4", marginBottom: "12px", fontFamily: "'Cormorant Garamond', serif" }}>
                 What is the Sarvatobhadra Chakra?
               </div>
-              <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.85" }}>
+              <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.85" }}>
                 <p style={{ marginBottom: "10px" }}>
-                  <strong style={{ color: "#f0e8d0" }}>Sarvatobhadra Chakra</strong> (SBC) is one of the most sophisticated transit analysis systems in classical Vedic astrology, described in ancient Muhurta texts including Muhurta Chintamani and Muhurta Ganapati. The word itself means <em style={{ color: "#c8a030" }}>&quot;auspicious in all directions&quot;</em> — and the chakra maps cosmic influences across all 27 nakshatras.
+                  <strong style={{ color: "#1A1A1A" }}>Sarvatobhadra Chakra</strong> (SBC) is one of the most sophisticated transit analysis systems in classical Vedic astrology, described in ancient Muhurta texts including Muhurta Chintamani and Muhurta Ganapati. The word itself means <em style={{ color: "#c8a030" }}>&quot;auspicious in all directions&quot;</em> — and the chakra maps cosmic influences across all 27 nakshatras.
                 </p>
                 <p style={{ marginBottom: "10px" }}>
                   Unlike Western transit analysis which tracks planets through zodiac signs, SBC works at the nakshatra level — the 27 lunar mansions that divide the sky into equal 13°20&apos; segments. Each nakshatra carries a specific divine frequency, ruling planet, and life domain.
@@ -471,14 +471,14 @@ export default function SarvatobhadraPage() {
                     <div style={{ fontWeight: 700, fontSize: "12px", color: z.color }}>{z.name}</div>
                     <div style={{ fontSize: "10px", color: "#8880a8" }}>{z.pos}</div>
                   </div>
-                  <div style={{ fontSize: "11px", color: "#b8b0d8", lineHeight: "1.6" }}>{z.meaning}</div>
+                  <div style={{ fontSize: "11px", color: "#6B635B", lineHeight: "1.6" }}>{z.meaning}</div>
                 </div>
               ))}
             </div>
 
             <div className="svb-card" style={{ padding: "18px" }}>
               <div style={{ fontWeight: 700, fontSize: "14px", color: "#a855f7", marginBottom: "12px" }}>How to Use This Page Daily</div>
-              <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.85" }}>
+              <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.85" }}>
                 {[
                   ["Check alerts daily", "The Moon moves one nakshatra per day — your emotional weather changes daily based on whether the Moon is in your sensitive zones."],
                   ["Watch for Saturn + Rahu janma vedha", "These are the most serious transits in Vedic astrology. When either planet directly transits your janma nakshatra, engage remedies proactively."],
@@ -487,8 +487,8 @@ export default function SarvatobhadraPage() {
                   ["Remedies are proportional", "Use the severity and duration of each alert to calibrate your remedy intensity. A 2-day Moon vedha needs light practice. A 40-day Saturn janma vedha requires consistent daily remedies."],
                 ].map(([title, desc]) => (
                   <div key={String(title)} style={{ marginBottom: "10px" }}>
-                    <strong style={{ color: "#f0e8d0" }}>• {title}:</strong>
-                    <span style={{ color: "#b8b0d8", marginLeft: "6px" }}>{String(desc)}</span>
+                    <strong style={{ color: "#1A1A1A" }}>• {title}:</strong>
+                    <span style={{ color: "#6B635B", marginLeft: "6px" }}>{String(desc)}</span>
                   </div>
                 ))}
               </div>

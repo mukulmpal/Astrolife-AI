@@ -1,0 +1,31 @@
+{
+  "publicId": "b0a8ad51",
+  "wikipediaSlug": "Aamir_Khan",
+  "wikipediaId": "Q9557",
+  "name": "Aamir Khan",
+  "fullName": "Aamir Khan",
+  "profileSummary": "Aamir Hussain Khan is an Indian actor, filmmaker, and television personality who works in Hindi films. Referred to as \"Mr. Perfectionist\" in the media, through his career spanning over 30 years, Khan has established himself as one of the most notable actors of Indian cinema. Khan is the recipient of numerous awards, including nine Filmfare Awards, four National Film Awards, and an AACTA Award. He was honoured by the Government of India with the Padma Shri in 2003 and the Padma Bhushan in 2010, and received an honorary title from the Government of China in 2017.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Aamir_Khan_at_the_success_bash_of_Secret_Superstar.jpg/330px-Aamir_Khan_at_the_success_bash_of_Secret_Superstar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aamir_Khan",
+  "dateOfBirth": "1965-03-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "4",
+  "sunSign": "12",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film actor",
+    "film director",
+    "film producer",
+    "screenwriter",
+    "television presenter",
+    "producer"
+  ],
+  "qid": "Q9557",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:25:06.915Z"
+}

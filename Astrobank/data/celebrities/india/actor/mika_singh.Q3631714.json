@@ -1,0 +1,29 @@
+{
+  "publicId": "8c288502",
+  "wikipediaSlug": "Mika_Singh",
+  "wikipediaId": "Q3631714",
+  "name": "Mika Singh",
+  "fullName": "Mika Singh",
+  "profileSummary": "Amrik \"Mika\" Singh is an Indian singer, rapper, musician and actor. His songs include \"Bas Ek King\", \"Mauja Hi Mauja\", \"Ibn-e-Batuta\" (Ishqiya), \"Dhanno\" (Housefull), \"Dhinka Chika\" (Ready) and \"Chinta Ta Chita\". He has released several solo albums and appeared on reality shows. His song \"Sawan Main Lag Gayi Aag\" was remixed by U.S based singer Pinky Paras.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Mika_Singh_2025.jpg/330px-Mika_Singh_2025.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Mika_Singh",
+  "dateOfBirth": "1977-06-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.61",
+  "birthCoordinatesLng": "85.141388888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "singer"
+  ],
+  "qid": "Q3631714",
+  "birthPlace": "Patna",
+  "fetchedAt": "2026-04-07T12:15:03.750Z"
+}

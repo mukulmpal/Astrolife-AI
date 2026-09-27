@@ -116,18 +116,18 @@ export default function PrashnaPage() {
   };
 
   return (
-    <main style={{ minHeight: "100vh", background: "#060410", padding: "24px 18px 110px", color: "#f0e8d0" }}>
+    <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "24px 18px 110px", color: "#1A1A1A" }}>
       <style>{`
-        .pr-card { background: #0d0a22; border: 1px solid #1c1840; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+        .pr-card { background: #FFFFFF; border: 1px solid #FFFFFF; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
         .pr-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #8880a8; margin-bottom: 6px; }
-        .pr-input, .pr-select { width: 100%; background: #08051a; border: 1px solid #1c1840; border-radius: 8px; padding: 10px 12px; color: #f0e8d0; font-family: inherit; font-size: 13px; }
+        .pr-input, .pr-select { width: 100%; background: #FAF7F2; border: 1px solid #FFFFFF; border-radius: 8px; padding: 10px 12px; color: #1A1A1A; font-family: inherit; font-size: 13px; }
         .pr-input:focus, .pr-select:focus { outline: none; border-color: rgba(168,85,247,0.5); }
-        .pr-btn { width: 100%; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; padding: 12px; color: #f0e8d0; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px; }
+        .pr-btn { width: 100%; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; padding: 12px; color: #1A1A1A; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px; }
         .pr-ghost-btn { background: transparent; border: 1px solid rgba(168,85,247,.35); color: #c4b5fd; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
         .pr-city-list { display: grid; gap: 6px; margin-top: 8px; }
         .pr-city-item { text-align: left; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); color: #d8d0ef; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 12px; }
-        .pr-row { font-size: 12px; color: #b8b0d8; margin-bottom: 5px; display: flex; gap: 8px; }
-        .pr-row strong { color: #f0e8d0; min-width: 90px; flex-shrink: 0; }
+        .pr-row { font-size: 12px; color: #6B635B; margin-bottom: 5px; display: flex; gap: 8px; }
+        .pr-row strong { color: #1A1A1A; min-width: 90px; flex-shrink: 0; }
         .factor-item { font-size: 11px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
         .planet-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; margin: 2px; border: 1px solid; }
       `}</style>
@@ -233,7 +233,7 @@ export default function PrashnaPage() {
             </div>
           )}
 
-          <div style={{ background: "rgba(168,85,247,0.07)", border: "1px solid rgba(168,85,247,0.18)", borderRadius: "8px", padding: "9px 11px", fontSize: "11px", color: "#b8b0d8", lineHeight: 1.6, marginBottom: "12px" }}>
+          <div style={{ background: "rgba(168,85,247,0.07)", border: "1px solid rgba(168,85,247,0.18)", borderRadius: "8px", padding: "9px 11px", fontSize: "11px", color: "#6B635B", lineHeight: 1.6, marginBottom: "12px" }}>
             Prashna is judged for the place where the question is asked. City search keeps the experience clean; coordinates stay available only for advanced correction.
           </div>
 
@@ -253,7 +253,7 @@ export default function PrashnaPage() {
                   style={{
                     padding: "8px 14px",
                     borderRadius: 8,
-                    border: resultTab === tab ? "1px solid rgba(168,85,247,0.5)" : "1px solid #1c1840",
+                    border: resultTab === tab ? "1px solid rgba(168,85,247,0.5)" : "1px solid #FFFFFF",
                     background: resultTab === tab ? "rgba(168,85,247,0.15)" : "transparent",
                     color: resultTab === tab ? "#e9d5ff" : "#8880a8",
                     fontWeight: 700,
@@ -273,7 +273,7 @@ export default function PrashnaPage() {
                     ? `Prashna Lagna · ${result.lagnaRashi}`
                     : `Chandra Lagna · ${result.moonSign}`}
                 </div>
-                <p style={{ margin: 0, maxWidth: 520, textAlign: "center", fontSize: 12, color: "#b8b0d8", lineHeight: 1.7 }}>
+                <p style={{ margin: 0, maxWidth: 520, textAlign: "center", fontSize: 12, color: "#6B635B", lineHeight: 1.7 }}>
                   {resultTab === "lagnaChart"
                     ? "Use this chart for event outcome, visible circumstances, and whether the matter can manifest."
                     : "Use this chart for the questioner's mind, emotional pressure, clarity, and how the situation feels internally."}
@@ -286,7 +286,7 @@ export default function PrashnaPage() {
             <div style={{ background: `${result.color}11`, border: `2px solid ${result.color}55`, borderRadius: "14px", padding: "20px", marginBottom: "12px", textAlign: "center" }}>
               <div style={{ fontSize: "36px", marginBottom: "8px" }}>{result.icon}</div>
               <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "22px", fontWeight: 700, color: result.color, marginBottom: "8px" }}>{result.title}</div>
-              <div style={{ fontSize: "13px", color: "#b8b0d8", lineHeight: "1.7", marginBottom: "12px" }}>{result.detail}</div>
+              <div style={{ fontSize: "13px", color: "#6B635B", lineHeight: "1.7", marginBottom: "12px" }}>{result.detail}</div>
               <div style={{ display: "inline-block", background: `${result.color}22`, borderRadius: "20px", padding: "4px 16px", fontSize: "13px", fontWeight: 700, color: result.color }}>
                 Score: {result.score > 0 ? "+" : ""}{result.score} · Confidence: {result.confidence}
               </div>
@@ -319,8 +319,8 @@ export default function PrashnaPage() {
             <div className="pr-card">
               <div style={{ fontWeight: 700, fontSize: "13px", color: "#c8a030", marginBottom: "10px" }}>🧮 Score Breakdown</div>
               {result.scoreBreakdown.map((item, i) => (
-                <div key={`${item.label}-${i}`} className="factor-item" style={{ color: item.points > 0 ? "#86efac" : item.points < 0 ? "#fca5a5" : "#b8b0d8" }}>
-                  <strong style={{ color: "#f0e8d0" }}>{item.label}</strong> {item.points > 0 ? "+" : ""}{item.points}: {item.note}
+                <div key={`${item.label}-${i}`} className="factor-item" style={{ color: item.points > 0 ? "#86efac" : item.points < 0 ? "#fca5a5" : "#6B635B" }}>
+                  <strong style={{ color: "#1A1A1A" }}>{item.label}</strong> {item.points > 0 ? "+" : ""}{item.points}: {item.note}
                 </div>
               ))}
             </div>
@@ -356,12 +356,12 @@ export default function PrashnaPage() {
             {/* Practical advice */}
             <div style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "10px", padding: "14px 16px" }}>
               <div style={{ fontWeight: 700, fontSize: "13px", color: "#a855f7", marginBottom: "8px" }}>💡 Practical Advice</div>
-              <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.75" }}>{result.practicalAdvice}</div>
+              <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.75" }}>{result.practicalAdvice}</div>
               <div style={{ fontWeight: 700, fontSize: "12px", color: "#c4b5fd", marginTop: "12px", marginBottom: "6px" }}>Timing Window</div>
-              <div style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.75" }}>{result.timingWindow}</div>
+              <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.75" }}>{result.timingWindow}</div>
               <div style={{ fontWeight: 700, fontSize: "12px", color: "#c4b5fd", marginTop: "12px", marginBottom: "6px" }}>Decision Protocol</div>
               {result.decisionProtocol.map((line, i) => (
-                <div key={i} style={{ fontSize: "12px", color: "#b8b0d8", lineHeight: "1.65", padding: "3px 0" }}>{i + 1}. {line}</div>
+                <div key={i} style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.65", padding: "3px 0" }}>{i + 1}. {line}</div>
               ))}
             </div>
           </>

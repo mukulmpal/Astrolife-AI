@@ -1,0 +1,28 @@
+{
+  "publicId": "00c6b904",
+  "wikipediaSlug": "Balbhadra_Kunwar",
+  "wikipediaId": "Q3634063",
+  "name": "Balbhadra Kunwar",
+  "fullName": "Balbhadra Kunwar",
+  "profileSummary": "Balbhadra Kunwar was a Gorkhali military General, Commander and administrator in the Sikh Empire and the Kingdom of Nepal. He was highly praised for his military skill for the defence of Nalapani fort in the Anglo-Nepalese War (1814–1816). He was a captain in the Nepalese military and was tasked as commander to protect the forts of Dehradun.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Balbhadra_Kunwar.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Balbhadra_Kunwar",
+  "dateOfBirth": "1789-01-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28",
+  "birthCoordinatesLng": "84",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "military leader"
+  ],
+  "qid": "Q3634063",
+  "birthPlace": "Nepal",
+  "fetchedAt": "2026-04-07T16:54:54.804Z"
+}

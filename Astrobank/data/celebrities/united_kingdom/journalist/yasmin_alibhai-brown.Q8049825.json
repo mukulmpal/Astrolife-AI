@@ -1,0 +1,29 @@
+{
+  "publicId": "41eb36b4",
+  "wikipediaSlug": "Yasmin_Alibhai-Brown",
+  "wikipediaId": "Q8049825",
+  "name": "Yasmin Alibhai-Brown",
+  "fullName": "Yasmin Alibhai-Brown",
+  "profileSummary": "Yasmin Alibhai-Brown is a British journalist and author. A columnist for The i Paper and the Evening Standard, she is a commentator on immigration, diversity, and multiculturalism issues.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Yasmin_Alibhai-Brown_%283x4_cropped%29.jpg/330px-Yasmin_Alibhai-Brown_%283x4_cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Yasmin_Alibhai-Brown",
+  "dateOfBirth": "1949-12-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "0.313611111",
+  "birthCoordinatesLng": "32.581111111",
+  "moonSign": "4",
+  "sunSign": "8",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "journalist",
+    "broadcaster",
+    "writer",
+    "columnist"
+  ],
+  "qid": "Q8049825",
+  "birthPlace": "Kampala",
+  "fetchedAt": "2026-04-08T02:08:08.034Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "fa859c87",
+  "wikipediaSlug": "Dhruv_Jurel",
+  "wikipediaId": "Q104766914",
+  "name": "Dhruv Jurel",
+  "fullName": "Dhruv Jurel",
+  "profileSummary": "Dhruv Chand Jurel is an Indian international cricketer. He is a right-handed batter and wicket-keeper. Jurel represents Uttar Pradesh in domestic cricket and Rajasthan Royals in the Indian Premier League. He was the Indian U19 team's vice-captain at the 2020 U19 Cricket World Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dhruv_Jurel",
+  "dateOfBirth": "2001-01-21",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q104766914",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T10:58:06.449Z"
+}

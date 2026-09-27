@@ -1,0 +1,27 @@
+{
+  "publicId": "f1146a40",
+  "wikipediaSlug": "Amjad_Khan_(actor)",
+  "wikipediaId": "Q46392",
+  "name": "Amjad Khan (actor)",
+  "fullName": "Amjad Khan (actor)",
+  "profileSummary": "Amjad Khan was an Indian actor and film director. He worked in over 132 films in a career spanning nearly twenty years. He was the son of the actor Jayant. He gained popularity for villainous roles in mostly Hindi films, the most famous among his enacted roles being Gabbar Singh in the 1975 film Sholay and of Dilawar in Muqaddar Ka Sikandar (1978).",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/27/AmjadKhan.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Amjad_Khan_(actor)",
+  "dateOfBirth": "1940-11-12",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": "12",
+  "sunSign": "7",
+  "lagnaSignText": "10",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "film director"
+  ],
+  "qid": "Q46392",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T16:25:07.420Z"
+}

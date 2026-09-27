@@ -1,0 +1,27 @@
+{
+  "publicId": "f28bc293",
+  "wikipediaSlug": "Nati_Kaji",
+  "wikipediaId": "Q16257968",
+  "name": "Nati Kaji",
+  "fullName": "Nati Kaji",
+  "profileSummary": "Amrit Lal Shrestha, better known as Nati Kaji, was a Nepali singer and songwriter. Kaji was a prominent music director and singer of his time having composed and sung such evergreen songs as Nepali Hami.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Nati_Kaji",
+  "dateOfBirth": "1925-12-25",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.666666666",
+  "birthCoordinatesLng": "85.316666666",
+  "moonSign": "1",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer",
+    "songwriter"
+  ],
+  "qid": "Q16257968",
+  "birthPlace": "Lalitpur District",
+  "fetchedAt": "2026-04-07T16:48:28.180Z"
+}

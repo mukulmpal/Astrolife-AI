@@ -1,0 +1,31 @@
+{
+  "publicId": "8c78e35a",
+  "wikipediaSlug": "Arshad_Warsi",
+  "wikipediaId": "Q704859",
+  "name": "Arshad Warsi",
+  "fullName": "Arshad Warsi",
+  "profileSummary": "Arshad Warsi is an Indian actor who appears in Hindi films. He is the recipient of several awards including a Filmfare Award from five nominations and is noted for acting in varied film genres.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Arshad-Warsi.jpg/330px-Arshad-Warsi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Arshad_Warsi",
+  "dateOfBirth": "1968-04-19",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "singer",
+    "film producer",
+    "film actor"
+  ],
+  "qid": "Q704859",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T12:16:59.905Z"
+}

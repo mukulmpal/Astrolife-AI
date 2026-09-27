@@ -1,0 +1,28 @@
+{
+  "publicId": "bd2a38ec",
+  "wikipediaSlug": "Atul_Bedade",
+  "wikipediaId": "Q2722186",
+  "name": "Atul Bedade",
+  "fullName": "Atul Bedade",
+  "profileSummary": "Atul Chandrakant Bedade is a former Indian cricketer. He played domestic cricket for Baroda and represented India in 13 One Day Internationals, making his debut versus UAE at Sharjah in 1994.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Atul_Bedade",
+  "dateOfBirth": "1966-06-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q2722186",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:55:55.554Z"
+}

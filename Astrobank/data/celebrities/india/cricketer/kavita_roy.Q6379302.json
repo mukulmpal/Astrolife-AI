@@ -1,0 +1,28 @@
+{
+  "publicId": "b6036ec1",
+  "wikipediaSlug": "Kavita_Roy",
+  "wikipediaId": "Q6379302",
+  "name": "Kavita Roy",
+  "fullName": "Kavita Roy",
+  "profileSummary": "Kavita Roy is a former One Day International (ODI) cricketer who has represented India. Her debut match for India was also her only international match. She is a right-hand batsman and bowls right-arm medium pace.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kavita_Roy",
+  "dateOfBirth": "1980-04-10",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.68",
+  "birthCoordinatesLng": "85.22",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q6379302",
+  "birthPlace": "Hajipur",
+  "fetchedAt": "2026-04-07T11:03:26.012Z"
+}

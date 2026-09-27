@@ -1,0 +1,29 @@
+{
+  "publicId": "5789f565",
+  "wikipediaSlug": "Shakira_Caine",
+  "wikipediaId": "Q6337248",
+  "name": "Shakira Caine",
+  "fullName": "Shakira Caine",
+  "profileSummary": "Shakira, Lady Caine is a Guyanese-British former actress, fashion model and beauty pageant titleholder who competed at Miss World 1967, where she was second runner-up. She is married to English actor Michael Caine.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Shakira_Caine_Allan_Warren.jpg/330px-Shakira_Caine_Allan_Warren.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shakira_Caine",
+  "dateOfBirth": "1947-02-23",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "6.36667",
+  "birthCoordinatesLng": "-58.0667",
+  "moonSign": "12",
+  "sunSign": "11",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "beauty pageant contestant",
+    "film actor"
+  ],
+  "qid": "Q6337248",
+  "birthPlace": "St. Cuthbert's Mission",
+  "fetchedAt": "2026-04-08T02:08:20.488Z"
+}

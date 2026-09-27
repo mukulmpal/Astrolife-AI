@@ -1,0 +1,31 @@
+{
+  "publicId": "5be198b0",
+  "wikipediaSlug": "Ghalib",
+  "wikipediaId": "Q107000",
+  "name": "Ghalib",
+  "fullName": "Ghalib",
+  "profileSummary": "Mirza Asadullah Beg Khan, commonly known as Mirza Ghalib, was an Indian poet and letter writer of the Mughal Empire. Writing in Persian and Urdu during the final years of the Mughal Empire and the rise of British colonial rule, his poetry often addressed themes of love, loss, philosophy, the human condition, and socio-political disturbances with a depth and complexity that influenced the literary traditions of his time. His ghazals, noted for their intricate imagery and layered meanings, form a significant part of Urdu literature. He spent most of his life in poverty.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Mirza_Ghalib_photograph_3.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ghalib",
+  "dateOfBirth": "1797-12-27",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "poet",
+    "writer",
+    "prose writer",
+    "historian"
+  ],
+  "qid": "Q107000",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T11:29:47.178Z"
+}

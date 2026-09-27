@@ -1,0 +1,31 @@
+{
+  "publicId": "cecaf909",
+  "wikipediaSlug": "Jaya_Prada",
+  "wikipediaId": "Q3518383",
+  "name": "Jaya Prada",
+  "fullName": "Jaya Prada",
+  "profileSummary": "Jaya Prada Nahata is an Indian actress and politician known for her works in Telugu cinema and Hindi cinema as well as in Tamil films in late '70s, '80s and early '90s and '20s. Jayaprada is the recipient of three Filmfare Awards South and has starred in many Telugu and Hindi films along with several Kannada, Tamil, Malayalam, Bengali and Marathi films. She left the film industry at the peak of her career, as she joined the Telugu Desam Party (TDP) in 1994 and entered politics. She was a Member of Parliament (MP) from Rampur, Uttar Pradesh from 2004 to 2014.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Jaya_Prada_graces_Perfect_Pati_TV_serial_launch_%2803%29.jpg/330px-Jaya_Prada_graces_Perfect_Pati_TV_serial_launch_%2803%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Jaya_Prada",
+  "dateOfBirth": "1962-04-03",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "16.983333333",
+  "birthCoordinatesLng": "81.783333333",
+  "moonSign": "11",
+  "sunSign": "12",
+  "lagnaSignText": "3",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "politician",
+    "film actor",
+    "screenwriter",
+    "film producer",
+    "television actor"
+  ],
+  "qid": "Q3518383",
+  "birthPlace": "Rajahmundry",
+  "fetchedAt": "2026-04-07T16:34:25.026Z"
+}

@@ -1,0 +1,27 @@
+{
+  "publicId": "09aef9bf",
+  "wikipediaSlug": "Rishma_Gurung",
+  "wikipediaId": "Q22278070",
+  "name": "Rishma Gurung",
+  "fullName": "Rishma Gurung",
+  "profileSummary": "Rishma Gurung is a Nepalese actress and model who debuted in the film Kabaddi in 2013. She acted in the Kabaddi sequel movie Kabaddi Kabaddi in 2015.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Rishma_Gurung.jpg/330px-Rishma_Gurung.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Rishma_Gurung",
+  "dateOfBirth": "1991-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.209722222",
+  "birthCoordinatesLng": "83.985277777",
+  "moonSign": "3",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "model",
+    "actor"
+  ],
+  "qid": "Q22278070",
+  "birthPlace": "Pokhara",
+  "fetchedAt": "2026-04-07T16:43:22.116Z"
+}

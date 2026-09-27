@@ -1,0 +1,28 @@
+{
+  "publicId": "397f2ede",
+  "wikipediaSlug": "Ganesh_Man_Singh",
+  "wikipediaId": "Q3429358",
+  "name": "Ganesh Man Singh",
+  "fullName": "Ganesh Man Singh",
+  "profileSummary": "Ganesh Man Singh was a Nepali politician who was leader of the 1990 Nepalese revolution. He is considered the Father of Democracy and the Iron-man of Nepali politics by many. He joined Praja Parishad to protest against the autocratic rule of the Ranas.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Ganesh_man_singh_1993.jpg/330px-Ganesh_man_singh_1993.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ganesh_Man_Singh",
+  "dateOfBirth": "1915-11-09",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.71",
+  "birthCoordinatesLng": "85.32",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "politician"
+  ],
+  "qid": "Q3429358",
+  "birthPlace": "Kathmandu",
+  "fetchedAt": "2026-04-07T16:52:47.541Z"
+}

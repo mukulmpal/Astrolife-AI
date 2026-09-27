@@ -1,0 +1,26 @@
+{
+  "publicId": "251f1221",
+  "wikipediaSlug": "Anil_Mandal",
+  "wikipediaId": "Q4764661",
+  "name": "Anil Mandal",
+  "fullName": "Anil Mandal",
+  "profileSummary": "Anil Kumar Mandal is a Nepalese cricketer. Mandal is a right-handed opening batsman. He made his debut for Nepal against USA in February 2010.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Anil_Mandal.JPG/330px-Anil_Mandal.JPG",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Anil_Mandal",
+  "dateOfBirth": "1991-02-05",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.712222222",
+  "birthCoordinatesLng": "85.921666666",
+  "moonSign": "7",
+  "sunSign": "10",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q4764661",
+  "birthPlace": "Janakpurdham",
+  "fetchedAt": "2026-04-07T16:51:25.810Z"
+}

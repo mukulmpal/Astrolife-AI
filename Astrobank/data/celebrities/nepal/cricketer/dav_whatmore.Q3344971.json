@@ -1,0 +1,26 @@
+{
+  "publicId": "f978b85d",
+  "wikipediaSlug": "Dav_Whatmore",
+  "wikipediaId": "Q3344971",
+  "name": "Dav Whatmore",
+  "fullName": "Dav Whatmore",
+  "profileSummary": "Davenell Frederick Whatmore is a Sri Lanka born Australian cricket coach and former cricketer.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Farid_with_Dav_cropped.jpg/330px-Farid_with_Dav_cropped.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dav_Whatmore",
+  "dateOfBirth": "1954-03-16",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "6.926666666",
+  "birthCoordinatesLng": "79.860555555",
+  "moonSign": "4",
+  "sunSign": "12",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3344971",
+  "birthPlace": "Colombo",
+  "fetchedAt": "2026-04-07T16:51:44.692Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "ece8f781",
+  "wikipediaSlug": "Chaitanya_Mahaprabhu",
+  "wikipediaId": "Q870262",
+  "name": "Chaitanya Mahaprabhu",
+  "fullName": "Chaitanya Mahaprabhu",
+  "profileSummary": "Chaitanya Mahaprabhu, born Vishvambhara Mishra, was an Indian Hindu saint from Bengal and the founder of Gaudiya Vaishnavism. Chaitanya Mahaprabhu's mode of worshipping Krishna with bhajan-kirtan and dance influenced Vaishnavism in Bengal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Chaitanya_Mahaprabhu_in_Dhameswar_Mahaprabhu_temple_6.jpg/330px-Chaitanya_Mahaprabhu_in_Dhameswar_Mahaprabhu_temple_6.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Chaitanya_Mahaprabhu",
+  "dateOfBirth": "1486-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.408822222",
+  "birthCoordinatesLng": "88.365736111",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "sannyasi"
+  ],
+  "qid": "Q870262",
+  "birthPlace": "Nabadwip",
+  "fetchedAt": "2026-04-07T11:29:29.542Z"
+}

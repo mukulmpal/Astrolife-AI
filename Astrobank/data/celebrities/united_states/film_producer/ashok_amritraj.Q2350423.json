@@ -1,0 +1,27 @@
+{
+  "publicId": "cc5a0191",
+  "wikipediaSlug": "Ashok_Amritraj",
+  "wikipediaId": "Q2350423",
+  "name": "Ashok Amritraj",
+  "fullName": "Ashok Amritraj",
+  "profileSummary": "Ashok Amritraj is an Indian-American athlete and film producer. He is chairman and CEO of the Hyde Park Entertainment Group and was formerly CEO of National Geographic Films. He played tennis professionally in his youth, one of the Indians in the top levels of the sport.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Ashok_Amritraj_%282008%29.jpg/330px-Ashok_Amritraj_%282008%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashok_Amritraj",
+  "dateOfBirth": "1956-02-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "13.0825",
+  "birthCoordinatesLng": "80.275",
+  "moonSign": "3",
+  "sunSign": "11",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film producer",
+    "tennis player"
+  ],
+  "qid": "Q2350423",
+  "birthPlace": "Chennai",
+  "fetchedAt": "2026-04-08T01:18:27.428Z"
+}

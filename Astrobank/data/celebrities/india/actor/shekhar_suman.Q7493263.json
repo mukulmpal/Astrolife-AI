@@ -1,0 +1,30 @@
+{
+  "publicId": "caf39939",
+  "wikipediaSlug": "Shekhar_Suman",
+  "wikipediaId": "Q7493263",
+  "name": "Shekhar Suman",
+  "fullName": "Shekhar Suman",
+  "profileSummary": "Shekhar Suman is an Indian actor, anchor, producer, director, and singer working in the Hindi cinema.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Shekhar-Suman.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Shekhar_Suman",
+  "dateOfBirth": "1960-06-14",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.61",
+  "birthCoordinatesLng": "85.141388888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor",
+    "film director"
+  ],
+  "qid": "Q7493263",
+  "birthPlace": "Patna",
+  "fetchedAt": "2026-04-07T12:19:20.053Z"
+}

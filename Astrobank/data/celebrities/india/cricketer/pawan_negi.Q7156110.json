@@ -1,0 +1,28 @@
+{
+  "publicId": "0692d537",
+  "wikipediaSlug": "Pawan_Negi",
+  "wikipediaId": "Q7156110",
+  "name": "Pawan Negi",
+  "fullName": "Pawan Negi",
+  "profileSummary": "Pawan Negi is an Indian cricketer. He is a slow left-arm orthodox bowler. He was born in Uttarakhand. He was a part of the Indian squad which won the 2016 Asia Cup.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Pawan_Negi",
+  "dateOfBirth": "1993-01-06",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.666666666",
+  "birthCoordinatesLng": "77.216666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q7156110",
+  "birthPlace": "Delhi",
+  "fetchedAt": "2026-04-07T10:58:24.108Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "cbeefffd",
+  "wikipediaSlug": "Farokh_Engineer",
+  "wikipediaId": "Q3521503",
+  "name": "Farokh Engineer",
+  "fullName": "Farokh Engineer",
+  "profileSummary": "Farokh Maneksha Engineer is an Indian former cricketer. He was a wicket-keeper-batsman, usually an opening batsman, who represented India in 46 Test matches from 1961 to 1975. In first-class cricket, he played for Bombay from 1959/60 to 1974/75, for West Zone from 1961/62 to 1974/75, and for Lancashire County Cricket Club from 1968 to 1976. He was the first-choice wicket-keeper for the Rest of the World team which toured England in 1970 and Australia in 1971–72. Engineer is the first Man of the Match for India in the Men's Cricket World Cup because of his performance against East Africa in the 1975 Cricket World Cup.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/30/Farokh_Autograph.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Farokh_Engineer",
+  "dateOfBirth": "1938-02-22",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "19.075833333",
+  "birthCoordinatesLng": "72.8775",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "cricketer"
+  ],
+  "qid": "Q3521503",
+  "birthPlace": "Mumbai",
+  "fetchedAt": "2026-04-07T10:56:30.962Z"
+}

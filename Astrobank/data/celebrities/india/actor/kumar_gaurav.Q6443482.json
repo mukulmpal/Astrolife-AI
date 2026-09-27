@@ -1,0 +1,29 @@
+{
+  "publicId": "03f2dccb",
+  "wikipediaSlug": "Kumar_Gaurav",
+  "wikipediaId": "Q6443482",
+  "name": "Kumar Gaurav",
+  "fullName": "Kumar Gaurav",
+  "profileSummary": "Kumar Gaurav is an Indian businessman and former actor who worked in Hindi cinema. Son of late actor late Rajendra Kumar, Gaurav has appeared in several films such as Love Story, Teri Kasam, Star, Naam and Kaante.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/KumarGaurav.jpg/330px-KumarGaurav.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Kumar_Gaurav",
+  "dateOfBirth": "1960-07-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "26.847",
+  "birthCoordinatesLng": "80.947",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q6443482",
+  "birthPlace": "Lucknow",
+  "fetchedAt": "2026-04-07T11:29:44.146Z"
+}

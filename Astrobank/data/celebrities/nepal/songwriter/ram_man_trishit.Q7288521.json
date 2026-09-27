@@ -1,0 +1,27 @@
+{
+  "publicId": "a6dd1df4",
+  "wikipediaSlug": "Ram_Man_Trishit",
+  "wikipediaId": "Q7288521",
+  "name": "Ram Man Trishit",
+  "fullName": "Ram Man Trishit",
+  "profileSummary": "Ram Man Shrestha \"Trishit\" was a highly reputed lyricist of Nepali songs.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Ram_Man_Trishit",
+  "dateOfBirth": "1941-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "28.6139",
+  "birthCoordinatesLng": "77.209",
+  "moonSign": "10",
+  "sunSign": "9",
+  "lagnaSignText": "12",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "songwriter",
+    "singer"
+  ],
+  "qid": "Q7288521",
+  "birthPlace": null,
+  "fetchedAt": "2026-04-07T16:48:31.640Z"
+}

@@ -1,0 +1,28 @@
+{
+  "publicId": "bbd5a539",
+  "wikipediaSlug": "Dave_Baksh",
+  "wikipediaId": "Q459220",
+  "name": "Dave Baksh",
+  "fullName": "Dave Baksh",
+  "profileSummary": "Dave Baksh also known by his stage name Dave Brownsound, is a Canadian musician best known as the lead guitarist of rock band Sum 41. Baksh quit Sum 41 in 2006 to pursue his own career in his heavy metal/reggae project Brown Brigade. He rejoined Sum 41 in 2015 and has released three subsequent studio albums with the band. He also played guitar for Organ Thieves, with two of his fellow Brown Brigade members and currently plays with the Canadian deathpunk four-piece Black Cat Attack. In 2019, Baksh co-founded the merchandise company Loud & Immortal.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/2023_Rock_im_Park_-_Sum_41_-_Dave_Baksh_-_by_2eight_-_ZSC3177_%28cropped%29.jpg/330px-2023_Rock_im_Park_-_Sum_41_-_Dave_Baksh_-_by_2eight_-_ZSC3177_%28cropped%29.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Dave_Baksh",
+  "dateOfBirth": "1980-07-26",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "43.670277777",
+  "birthCoordinatesLng": "-79.386666666",
+  "moonSign": "9",
+  "sunSign": "4",
+  "lagnaSignText": "2",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "musician",
+    "singer",
+    "guitarist"
+  ],
+  "qid": "Q459220",
+  "birthPlace": "Toronto",
+  "fetchedAt": "2026-04-08T00:52:05.066Z"
+}

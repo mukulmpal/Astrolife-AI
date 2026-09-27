@@ -1,0 +1,29 @@
+{
+  "publicId": "c22a884f",
+  "wikipediaSlug": "Akbar_Khan_(director)",
+  "wikipediaId": "Q4700426",
+  "name": "Akbar Khan (director)",
+  "fullName": "Akbar Khan (director)",
+  "profileSummary": "Akbar Khan is an Indian actor, screenwriter, film producer and director. He is the youngest brother of the Indian actors, producers, editors and directors, Feroz Khan and Sanjay Khan.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/With_Akbar_Khan.jpg/330px-With_Akbar_Khan.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Akbar_Khan_(director)",
+  "dateOfBirth": "1949-07-07",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "12.9791198",
+  "birthCoordinatesLng": "77.5912997",
+  "moonSign": "8",
+  "sunSign": "3",
+  "lagnaSignText": "6",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "film director",
+    "film actor",
+    "screenwriter",
+    "film producer"
+  ],
+  "qid": "Q4700426",
+  "birthPlace": "Bengaluru",
+  "fetchedAt": "2026-04-07T16:25:17.648Z"
+}

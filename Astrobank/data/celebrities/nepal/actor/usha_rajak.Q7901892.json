@@ -1,0 +1,28 @@
+{
+  "publicId": "ada6c4fc",
+  "wikipediaSlug": "Usha_Rajak",
+  "wikipediaId": "Q7901892",
+  "name": "Usha Rajak",
+  "fullName": "Usha Rajak",
+  "profileSummary": "Usha Rajak is a Nepalese actress, model, pastry chef and Nepal's representative for World Miss University 2006. Rajak also won the title of Mrs Nepal International 2021.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Usha_Rajak",
+  "dateOfBirth": "1985-10-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "27.6833",
+  "birthCoordinatesLng": "85.3333",
+  "moonSign": "8",
+  "sunSign": "7",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "model",
+    "beauty pageant contestant"
+  ],
+  "qid": "Q7901892",
+  "birthPlace": "Lalitpur",
+  "fetchedAt": "2026-04-07T16:43:22.858Z"
+}

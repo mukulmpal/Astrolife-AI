@@ -56,14 +56,14 @@ function HarmonyRing({ score }: { score: number }) {
   return (
     <div style={{ position: "relative", width: 128, height: 128 }}>
       <svg width={128} height={128} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={64} cy={64} r={r} fill="none" stroke="#1c1840" strokeWidth={8} />
+        <circle cx={64} cy={64} r={r} fill="none" stroke="rgba(184,134,11,0.2)" strokeWidth={8} />
         <circle cx={64} cy={64} r={r} fill="none" stroke={color} strokeWidth={8}
           strokeDasharray={circ} strokeDashoffset={circ * (1 - score / 100)}
           strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
       </svg>
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 34, fontWeight: 700, color, lineHeight: 1 }}>{score}</span>
-        <span style={{ fontSize: 10, color: "#605890", marginTop: 2 }}>Harmony</span>
+        <span style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>Harmony</span>
       </div>
     </div>
   );
@@ -84,7 +84,7 @@ function MemberD1Chart({ chart, label, color }: { chart: ChartData; label: strin
   });
 
   return (
-    <div style={{ background: "#0d0a22", border: `1px solid ${color}33`, borderRadius: 14, padding: "18px 20px" }}>
+    <div style={{ background: "#FFFFFF", border: `1px solid ${color}33`, borderRadius: 14, padding: "18px 20px" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: 1.6, textTransform: "uppercase", color, marginBottom: 4 }}>
@@ -92,16 +92,16 @@ function MemberD1Chart({ chart, label, color }: { chart: ChartData; label: strin
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
-            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, color: "#f0e8d0" }}>{label}</span>
+            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, color: "#1A1A1A" }}>{label}</span>
           </div>
         </div>
         <div style={{ textAlign: "right", background: "rgba(200,160,48,0.06)", border: "1px solid rgba(200,160,48,0.14)", borderRadius: 10, padding: "8px 10px" }}>
-          <div style={{ fontSize: 9, color: "#605890", letterSpacing: 1.2, textTransform: "uppercase" }}>Lagna</div>
+          <div style={{ fontSize: 9, color: "#6B635B", letterSpacing: 1.2, textTransform: "uppercase" }}>Lagna</div>
           <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 700, color: "#c8a030", lineHeight: 1.15 }}>{chart.lagnaRashi}</div>
         </div>
       </div>
 
-      <div style={{ background: "#08051a", border: "1px solid #1c1840", borderRadius: 12, padding: "12px 10px" }}>
+      <div style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12, padding: "12px 10px" }}>
         <NorthIndianChart lagnaNum={chart.lagnaNum} planets={planets} size={300} />
       </div>
 
@@ -119,16 +119,16 @@ function MemberD1Chart({ chart, label, color }: { chart: ChartData; label: strin
                 gap: 8,
                 alignItems: "center",
                 fontSize: 11,
-                color: "#c8c0a8",
+                color: "#4A4238",
                 padding: "6px 8px",
                 borderRadius: 8,
                 background: row.house === 1 ? "rgba(200,160,48,0.08)" : "rgba(255,255,255,0.025)",
                 border: row.house === 1 ? "1px solid rgba(200,160,48,0.18)" : "1px solid rgba(255,255,255,0.04)",
               }}
             >
-              <span style={{ color: row.house === 1 ? "#c8a030" : "#605890", fontWeight: 700 }}>H{row.house}</span>
+              <span style={{ color: row.house === 1 ? "#c8a030" : "#6B635B", fontWeight: 700 }}>H{row.house}</span>
               <span>{row.rashi}</span>
-              <span style={{ color: row.occupants.length ? "#f0e8d0" : "#605890" }}>
+              <span style={{ color: row.occupants.length ? "#1A1A1A" : "#6B635B" }}>
                 {row.occupants.length ? row.occupants.map((p) => PLANET_SYM[p]).join(", ") : "—"}
               </span>
             </div>
@@ -151,33 +151,33 @@ function PatternCard({ p, expanded, onToggle }: { p: FamilyPatternResult; expand
 
   return (
     <div onClick={onToggle} style={{
-      background: "#0d0a22", border: `1px solid ${expanded ? color + "55" : "#1c1840"}`,
+      background: "#FFFFFF", border: `1px solid ${expanded ? color + "55" : "#FFFFFF"}`,
       borderRadius: 14, padding: "18px 20px", cursor: "pointer", transition: "all 0.2s",
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 12, justifyContent: "space-between" }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 17, fontWeight: 600, color: "#f0e8d0" }}>{p.title}</span>
+            <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 17, fontWeight: 600, color: "#1A1A1A" }}>{p.title}</span>
             <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: rc.bg, color: rc.color, border: `1px solid ${rc.color}40` }}>
               {p.riskLevel.toUpperCase()}
             </span>
           </div>
-          <div style={{ height: 4, background: "#1c1840", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ height: 4, background: "#FFFFFF", borderRadius: 2, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${p.score}%`, background: color, borderRadius: 2, transition: "width 0.8s ease" }} />
           </div>
-          <div style={{ fontSize: 11, color: "#605890", marginTop: 5 }}>Pattern strength: {p.score}/100</div>
+          <div style={{ fontSize: 11, color: "#6B635B", marginTop: 5 }}>Pattern strength: {p.score}/100</div>
         </div>
-        <span style={{ color: "#605890", fontSize: 14, flexShrink: 0, marginTop: 4 }}>{expanded ? "▲" : "▼"}</span>
+        <span style={{ color: "#6B635B", fontSize: 14, flexShrink: 0, marginTop: 4 }}>{expanded ? "▲" : "▼"}</span>
       </div>
 
       {expanded && (
-        <div style={{ marginTop: 16, borderTop: "1px solid #1c1840", paddingTop: 16, animation: "fadeUp 0.2s ease" }}>
-          <p style={{ fontSize: 13, color: "#c8c0a8", lineHeight: 1.75, marginBottom: 12 }}>{p.paragraph}</p>
+        <div style={{ marginTop: 16, borderTop: "1px solid rgba(184,134,11,0.15)", paddingTop: 16, animation: "fadeUp 0.2s ease" }}>
+          <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.75, marginBottom: 12 }}>{p.paragraph}</p>
           {p.indicators.length > 0 && (
             <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 10, color, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Key Indicators</div>
               {p.indicators.map((ind, i) => (
-                <div key={i} style={{ fontSize: 12, color: "#c8c0a8", padding: "3px 0", display: "flex", gap: 6 }}>
+                <div key={i} style={{ fontSize: 12, color: "#4A4238", padding: "3px 0", display: "flex", gap: 6 }}>
                   <span style={{ color, flexShrink: 0 }}>◆</span>{ind}
                 </div>
               ))}
@@ -187,7 +187,7 @@ function PatternCard({ p, expanded, onToggle }: { p: FamilyPatternResult; expand
             <div style={{ background: "rgba(249,115,22,0.05)", border: "1px solid rgba(249,115,22,0.15)", borderRadius: 8, padding: "10px 12px" }}>
               <div style={{ fontSize: 10, color: "#f97316", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Safe Remedies</div>
               {p.safeRemedies.map((r, i) => (
-                <div key={i} style={{ fontSize: 12, color: "#c8c0a8", padding: "2px 0" }}>› {r}</div>
+                <div key={i} style={{ fontSize: 12, color: "#4A4238", padding: "2px 0" }}>› {r}</div>
               ))}
             </div>
           )}
@@ -203,25 +203,25 @@ function KsdCard({ name, result }: { name: string; result: KaalSarpResult }) {
   const color = result.severity === "full" ? "#8b5cf6" : "#a78bfa";
   return (
     <div onClick={() => setOpen(o => !o)} style={{
-      background: "#0d0a22", border: `1px solid ${open ? "#8b5cf655" : "#1c1840"}`,
+      background: "#FFFFFF", border: `1px solid ${open ? "#8b5cf655" : "#FFFFFF"}`,
       borderRadius: 12, padding: "14px 16px", cursor: "pointer",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 20 }}>🐍</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e8d0", fontFamily: "Cormorant Garamond,serif" }}>{name}</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", fontFamily: "Cormorant Garamond,serif" }}>{name}</div>
           <div style={{ fontSize: 12, color }}>
             {result.type} Kaal Sarp Yoga — {result.severity === "full" ? "Purna" : "Ardh"} · Rahu H{result.rahuHouse} / Ketu H{result.ketuHouse}
           </div>
         </div>
-        <span style={{ color: "#605890" }}>{open ? "▲" : "▼"}</span>
+        <span style={{ color: "#6B635B" }}>{open ? "▲" : "▼"}</span>
       </div>
       {open && (
-        <div style={{ marginTop: 12, borderTop: "1px solid #1c1840", paddingTop: 12 }}>
-          <p style={{ fontSize: 12, color: "#c8c0a8", lineHeight: 1.7, marginBottom: 10 }}>{result.description}</p>
+        <div style={{ marginTop: 12, borderTop: "1px solid rgba(184,134,11,0.15)", paddingTop: 12 }}>
+          <p style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.7, marginBottom: 10 }}>{result.description}</p>
           {result.familyImpact && <p style={{ fontSize: 12, color: "#a78bfa", marginBottom: 10 }}>{result.familyImpact}</p>}
           {result.planetsOutside && (
-            <div style={{ fontSize: 11, color: "#605890", marginBottom: 8 }}>
+            <div style={{ fontSize: 11, color: "#6B635B", marginBottom: 8 }}>
               Planets outside arc: {result.planetsOutside.map(p => PLANET_SYM[p] || p).join(", ")}
             </div>
           )}
@@ -229,7 +229,7 @@ function KsdCard({ name, result }: { name: string; result: KaalSarpResult }) {
             <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 8, padding: "8px 10px" }}>
               <div style={{ fontSize: 10, color: "#8b5cf6", fontWeight: 600, marginBottom: 5, letterSpacing: 1 }}>REMEDIES</div>
               {result.remedies.map((r, i) => (
-                <div key={i} style={{ fontSize: 12, color: "#c8c0a8", padding: "2px 0" }}>› {r}</div>
+                <div key={i} style={{ fontSize: 12, color: "#4A4238", padding: "2px 0" }}>› {r}</div>
               ))}
             </div>
           )}
@@ -327,11 +327,11 @@ export default function FamilySynastryPage() {
   }
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#08061a", border: "1px solid #1c1840", borderRadius: 8,
-    padding: "8px 12px", color: "#f0e8d0", fontSize: 13, fontFamily: "Outfit,sans-serif", outline: "none",
+    width: "100%", background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 8,
+    padding: "8px 12px", color: "#1A1A1A", fontSize: 13, fontFamily: "Outfit,sans-serif", outline: "none",
   };
   const labelStyle: React.CSSProperties = {
-    fontSize: 10, color: "#605890", letterSpacing: 1, textTransform: "uppercase" as const,
+    fontSize: 10, color: "#6B635B", letterSpacing: 1, textTransform: "uppercase" as const,
     marginBottom: 4, display: "block",
   };
 
@@ -353,8 +353,8 @@ export default function FamilySynastryPage() {
         @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         input:focus,select:focus{border-color:rgba(200,160,48,0.4)!important;outline:none}
         /* override CityAutocomplete to match dark theme */
-        .city-wrap input{background:#08061a!important;border:1px solid #1c1840!important;border-radius:8px!important;padding:8px 12px!important;color:#f0e8d0!important;font-size:13px!important;font-family:Outfit,sans-serif!important;outline:none!important;width:100%!important}
-        .city-wrap label{font-size:10px;color:#605890;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;display:block}
+        .city-wrap input{background:#FAF7F2!important;border:1px solid #FFFFFF!important;border-radius:8px!important;padding:8px 12px!important;color:#1A1A1A!important;font-size:13px!important;font-family:Outfit,sans-serif!important;outline:none!important;width:100%!important}
+        .city-wrap label{font-size:10px;color:#6B635B;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;display:block}
         .city-wrap>div>label{display:none}
       `}</style>
 
@@ -370,11 +370,11 @@ export default function FamilySynastryPage() {
         <div style={{ background: "rgba(200,160,48,0.06)", border: "1px solid rgba(200,160,48,0.2)", borderRadius: 12, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 22 }}>☀️</span>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e8d0" }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>
               {selfChart.name}
               <span style={{ fontSize: 11, color: "#c8a030", fontWeight: 400, marginLeft: 8 }}>(Self — auto-loaded)</span>
             </div>
-            <div style={{ fontSize: 11, color: "#605890" }}>
+            <div style={{ fontSize: 11, color: "#6B635B" }}>
               {selfChart.dob} · {selfChart.tob} · {selfChart.city} · Lagna: {selfChart.lagnaRashi}
             </div>
           </div>
@@ -397,10 +397,10 @@ export default function FamilySynastryPage() {
           </div>
 
           {memberForms.map((f, i) => (
-            <div key={i} style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 14, padding: "18px 20px", marginBottom: 12 }}>
+            <div key={i} style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 14, padding: "18px 20px", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
                 <span style={{ fontSize: 18 }}>{ROLE_ICONS[f.role] || "⭐"}</span>
-                <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, color: "#f0e8d0" }}>
+                <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 16, color: "#1A1A1A" }}>
                   Member {i + 1}
                 </span>
                 {f.cityResult && (
@@ -409,7 +409,7 @@ export default function FamilySynastryPage() {
                 {memberForms.length > 1 && (
                   <button
                     onClick={() => setMemberForms(p => p.filter((_, idx) => idx !== i))}
-                    style={{ marginLeft: "auto", fontSize: 11, color: "#605890", background: "none", border: "none", cursor: "pointer" }}
+                    style={{ marginLeft: "auto", fontSize: 11, color: "#6B635B", background: "none", border: "none", cursor: "pointer" }}
                   >
                     ✕ Remove
                   </button>
@@ -457,7 +457,7 @@ export default function FamilySynastryPage() {
           disabled={loading}
           style={{
             width: "100%", padding: "14px",
-            background: loading ? "#0d0a22" : "linear-gradient(135deg,#1a1040,#2a1860)",
+            background: loading ? "#FFFFFF" : "linear-gradient(135deg,#B8860B,#996515)",
             border: "1px solid rgba(200,160,48,0.3)", borderRadius: 12,
             color: "#c8a030", fontFamily: "Cormorant Garamond,serif", fontSize: 18,
             fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
@@ -481,7 +481,7 @@ export default function FamilySynastryPage() {
               <div className="header-orb" />
               <div style={{ flex: 1 }}>
                 <div className="page-tag">Family Harmony Score</div>
-                <p style={{ fontSize: 13, color: "#605890", maxWidth: 500, lineHeight: 1.65, marginTop: 6 }}>
+                <p style={{ fontSize: 13, color: "#6B635B", maxWidth: 500, lineHeight: 1.65, marginTop: 6 }}>
                   {result.analysis.narrative}
                 </p>
                 {/* Member chips */}
@@ -502,7 +502,7 @@ export default function FamilySynastryPage() {
                 <span style={{ fontSize: 22 }}>🐍</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#a78bfa", marginBottom: 2 }}>Kaal Sarp Dosha Detected</div>
-                  <div style={{ fontSize: 12, color: "#605890" }}>
+                  <div style={{ fontSize: 12, color: "#6B635B" }}>
                     {ksdAffected.map(r => `${memberLabel(r.member)}: ${r.result.type} (${r.result.severity})`).join(" · ")}
                   </div>
                 </div>
@@ -535,15 +535,15 @@ export default function FamilySynastryPage() {
                   />
                 ))}
                 {/* Quick comparison strip */}
-                <div style={{ background: "#0d0a22", border: "1px solid #1c1840", borderRadius: 14, padding: "18px 20px" }}>
-                  <div style={{ fontSize: 11, color: "#605890", letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>Planet-wise House Comparison</div>
+                <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 14, padding: "18px 20px" }}>
+                  <div style={{ fontSize: 11, color: "#6B635B", letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>Planet-wise House Comparison</div>
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                       <thead>
                         <tr>
-                          <th style={{ textAlign: "left", color: "#605890", padding: "6px 10px", borderBottom: "1px solid #1c1840" }}>Planet</th>
+                          <th style={{ textAlign: "left", color: "#6B635B", padding: "6px 10px", borderBottom: "1px solid rgba(184,134,11,0.15)" }}>Planet</th>
                           {result.members.map(({ member, color }) => (
-                            <th key={member.id} style={{ color, padding: "6px 10px", borderBottom: "1px solid #1c1840", fontWeight: 600 }}>
+                            <th key={member.id} style={{ color, padding: "6px 10px", borderBottom: "1px solid rgba(184,134,11,0.15)", fontWeight: 600 }}>
                               {member.name || member.role}
                             </th>
                           ))}
@@ -551,16 +551,16 @@ export default function FamilySynastryPage() {
                       </thead>
                       <tbody>
                         {PLANET_LIST.map(p => (
-                          <tr key={p} style={{ borderBottom: "1px solid #1c1840" }}>
+                          <tr key={p} style={{ borderBottom: "1px solid rgba(184,134,11,0.15)" }}>
                             <td style={{ padding: "6px 10px", color: PLANET_COL[p], fontWeight: 600 }}>
                               {PLANET_SYM[p]} {p}
                             </td>
                             {result.members.map(({ member, chart, color }) => {
                               const pd = chart.planets[p];
                               return (
-                                <td key={member.id} style={{ padding: "6px 10px", color: "#c8c0a8", textAlign: "center" }}>
+                                <td key={member.id} style={{ padding: "6px 10px", color: "#4A4238", textAlign: "center" }}>
                                   <span style={{ color }}>H{pd?.house ?? "?"}</span>
-                                  <span style={{ color: "#605890", marginLeft: 4, fontSize: 11 }}>{pd?.sign?.slice(0,3) ?? ""}</span>
+                                  <span style={{ color: "#6B635B", marginLeft: 4, fontSize: 11 }}>{pd?.sign?.slice(0,3) ?? ""}</span>
                                 </td>
                               );
                             })}
@@ -598,11 +598,11 @@ export default function FamilySynastryPage() {
                   <div className="empty">
                     <div className="empty-icon">🌿</div>
                     <div className="empty-text">No Kaal Sarp Dosha</div>
-                    <p style={{ fontSize: 13, color: "#605890" }}>None of the family members&apos; charts show Kaal Sarp Yoga.</p>
+                    <p style={{ fontSize: 13, color: "#6B635B" }}>None of the family members&apos; charts show Kaal Sarp Yoga.</p>
                   </div>
                 ) : (
                   <>
-                    <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: 10, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#c8c0a8", lineHeight: 1.7 }}>
+                    <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: 10, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#4A4238", lineHeight: 1.7 }}>
                       Kaal Sarp Yoga ka arth failure nahi hai — bahut mahaan log iske saath paida hue hain (Sachin Tendulkar, Jawaharlal Nehru). Iska arth hai Rahu-Ketu axis par karmic lesson extra intense hai. Fear se nahi, awareness se isko samjhein.
                     </div>
                     <div style={{ display: "grid", gap: 12 }}>
@@ -616,7 +616,7 @@ export default function FamilySynastryPage() {
             )}
 
             {/* Safety boundary */}
-            <div style={{ marginTop: 32, padding: "14px 18px", background: "rgba(200,160,48,0.04)", border: "1px solid rgba(200,160,48,0.1)", borderRadius: 10, fontSize: 12, color: "#605890", lineHeight: 1.7 }}>
+            <div style={{ marginTop: 32, padding: "14px 18px", background: "rgba(200,160,48,0.04)", border: "1px solid rgba(200,160,48,0.1)", borderRadius: 10, fontSize: 12, color: "#6B635B", lineHeight: 1.7 }}>
               ⚠️ Ye analysis symbolic aur awareness-based hai. Isko fixed destiny, medical/legal verdict, ya fear prediction ki tarah use nahi karna chahiye. Real concerns me qualified professional ki advice zaroor lein.
             </div>
           </div>

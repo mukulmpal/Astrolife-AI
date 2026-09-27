@@ -10,7 +10,7 @@ const PLANS = [
     price: "₹0",
     period: "forever",
     highlight: false,
-    color: "#605890",
+    color: "#6B635B",
     features: [
       "Basic Kundli Chart",
       "5 AI Questions / month",
@@ -174,7 +174,7 @@ export default function UpgradePage() {
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@400;500;600&display=swap');
           *{margin:0;padding:0;box-sizing:border-box}
-          body{background:#060410;font-family:'Outfit',sans-serif;color:#f0e8d0}
+          body{background:#FAF7F2;font-family:'Outfit',sans-serif;color:#1A1A1A}
           @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
           @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(200,160,48,0.3)}50%{box-shadow:0 0 50px rgba(200,160,48,0.7)}}
         `}</style>
@@ -183,13 +183,13 @@ export default function UpgradePage() {
             <div style={{ width:100, height:100, borderRadius:"50%", background:"linear-gradient(135deg,#3c2880,#c8a030)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:48, margin:"0 auto 32px", animation:"pulse 2s infinite" }}>
               ✦
             </div>
-            <div style={{ fontFamily:"Cormorant Garamond, serif", fontSize:36, fontWeight:600, color:"#f0e8d0", marginBottom:12 }}>
+            <div style={{ fontFamily:"Cormorant Garamond, serif", fontSize:36, fontWeight:600, color:"#1A1A1A", marginBottom:12 }}>
               Welcome to <em style={{color:"#c8a030"}}>Premium!</em>
             </div>
-            <div style={{ fontSize:15, color:"#605890", marginBottom:8 }}>
+            <div style={{ fontSize:15, color:"#6B635B", marginBottom:8 }}>
               Payment successful. Your cosmic universe is unlocked.
             </div>
-            <div style={{ fontSize:13, color:"#3a3060" }}>Redirecting to dashboard...</div>
+            <div style={{ fontSize:13, color:"#6B635B" }}>Redirecting to dashboard...</div>
           </div>
         </div>
       </>
@@ -201,67 +201,67 @@ export default function UpgradePage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        body{background:#060410;color:#f0e8d0;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        body{background:#FAF7F2;color:#1A1A1A;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
         .serif{font-family:'Cormorant Garamond',Georgia,serif}
-        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#060410}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#FAF7F2}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
 
         .page{max-width:1100px;margin:0 auto;padding:48px 32px}
 
         /* HEADER */
         .page-tag{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#c8a030;margin-bottom:12px;text-align:center}
-        .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,48px,56px);font-weight:600;color:#f0e8d0;text-align:center;line-height:1.1;margin-bottom:14px}
+        .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,48px,56px);font-weight:600;color:#1A1A1A;text-align:center;line-height:1.1;margin-bottom:14px}
         .page-title em{font-style:italic;color:#c8a030}
-        .page-sub{font-size:16px;color:#605890;text-align:center;margin-bottom:60px;line-height:1.7}
+        .page-sub{font-size:16px;color:#6B635B;text-align:center;margin-bottom:60px;line-height:1.7}
 
         /* PLANS GRID */
         .plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:60px}
 
         /* PLAN CARD */
-        .plan{background:#0d0a22;border:1px solid #1c1840;border-radius:20px;padding:36px 32px;position:relative;transition:transform 0.3s,border-color 0.3s}
+        .plan{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:20px;padding:36px 32px;position:relative;transition:transform 0.3s,border-color 0.3s}
         .plan:hover{transform:translateY(-4px)}
-        .plan.highlight{border-color:rgba(200,160,48,0.4);background:linear-gradient(160deg,rgba(200,160,48,0.05),#0d0a22)}
-        .popular-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#c8a030,#a07820);color:#060410;font-size:10px;font-weight:700;padding:5px 16px;border-radius:100px;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap}
-        .plan-tier{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#605890;margin-bottom:14px}
-        .plan-price{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:#f0e8d0;line-height:1;margin-bottom:4px}
-        .plan-period{font-size:14px;color:#605890;margin-bottom:28px}
-        .plan-divider{height:1px;background:#1c1840;margin-bottom:24px}
+        .plan.highlight{border-color:rgba(200,160,48,0.4);background:linear-gradient(160deg,rgba(200,160,48,0.05),#FFFFFF)}
+        .popular-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;font-size:10px;font-weight:700;padding:5px 16px;border-radius:100px;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap}
+        .plan-tier{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6B635B;margin-bottom:14px}
+        .plan-price{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:#1A1A1A;line-height:1;margin-bottom:4px}
+        .plan-period{font-size:14px;color:#6B635B;margin-bottom:28px}
+        .plan-divider{height:1px;background:#FFFFFF;margin-bottom:24px}
         .plan-features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
-        .plan-feature{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#c8c0a8;line-height:1.5}
+        .plan-feature{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#4A4238;line-height:1.5}
         .feat-dot{color:#c8a030;font-size:10px;margin-top:3px;flex-shrink:0}
         .plan-btn{width:100%;padding:15px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.25s;font-family:'Outfit',sans-serif;border:none;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px}
-        .btn-gold{background:linear-gradient(135deg,#c8a030,#a07820);color:#060410}
+        .btn-gold{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2}
         .btn-gold:hover:not(:disabled){box-shadow:0 10px 28px rgba(200,160,48,0.4);transform:translateY(-2px);filter:brightness(1.08)}
-        .btn-outline{background:transparent;border:1px solid #1c1840 !important;color:#605890;cursor:default}
+        .btn-outline{background:transparent;border:1px solid #FFFFFF !important;color:#6B635B;cursor:default}
         .btn-purple{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff}
         .btn-purple:hover:not(:disabled){box-shadow:0 10px 28px rgba(168,85,247,0.3);transform:translateY(-2px)}
         .plan-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none !important}
 
         /* FEATURES COMPARISON */
-        .compare{background:#0d0a22;border:1px solid #1c1840;border-radius:20px;padding:36px;margin-bottom:40px}
-        .compare-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:#f0e8d0;margin-bottom:24px}
-        .compare-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px;padding:12px 0;border-bottom:1px solid #1c1840;align-items:center;font-size:13px}
+        .compare{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:20px;padding:36px;margin-bottom:40px}
+        .compare-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:#1A1A1A;margin-bottom:24px}
+        .compare-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px;padding:12px 0;border-bottom:1px solid #FFFFFF;align-items:center;font-size:13px}
         .compare-row:last-child{border-bottom:none}
-        .compare-header{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#3a3060;padding-bottom:16px;border-bottom:1px solid #1c1840}
-        .compare-feature{color:#605890}
+        .compare-header{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;padding-bottom:16px;border-bottom:1px solid #FFFFFF}
+        .compare-feature{color:#6B635B}
         .check-yes{color:#c8a030;font-size:16px;text-align:center}
-        .check-no{color:#3a3060;font-size:16px;text-align:center}
+        .check-no{color:#6B635B;font-size:16px;text-align:center}
 
         /* FAQ */
         .faq{margin-bottom:40px}
-        .faq-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#f0e8d0;margin-bottom:24px;text-align:center}
-        .faq-item{background:#0d0a22;border:1px solid #1c1840;border-radius:12px;padding:20px 24px;margin-bottom:10px}
-        .faq-q{font-size:14px;font-weight:500;color:#c8c0a8;margin-bottom:8px}
-        .faq-a{font-size:13px;color:#605890;line-height:1.7}
+        .faq-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#1A1A1A;margin-bottom:24px;text-align:center}
+        .faq-item{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:12px;padding:20px 24px;margin-bottom:10px}
+        .faq-q{font-size:14px;font-weight:500;color:#4A4238;margin-bottom:8px}
+        .faq-a{font-size:13px;color:#6B635B;line-height:1.7}
 
         /* GUARANTEE */
         .guarantee{text-align:center;padding:32px;background:rgba(200,160,48,0.04);border:1px solid rgba(200,160,48,0.15);border-radius:16px;margin-bottom:40px}
         .guarantee-icon{font-size:40px;margin-bottom:12px}
-        .guarantee-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:#f0e8d0;margin-bottom:8px}
-        .guarantee-text{font-size:13px;color:#605890;line-height:1.7}
+        .guarantee-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:#1A1A1A;margin-bottom:8px}
+        .guarantee-text{font-size:13px;color:#6B635B;line-height:1.7}
         .value-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:-24px 0 44px}
-        .value-card{background:#0d0a22;border:1px solid #1c1840;border-radius:14px;padding:14px 16px}
-        .value-k{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#605890;margin-bottom:6px}
-        .value-v{font-size:13px;color:#c8c0a8;line-height:1.5}
+        .value-card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:14px;padding:14px 16px}
+        .value-k{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#6B635B;margin-bottom:6px}
+        .value-v{font-size:13px;color:#4A4238;line-height:1.5}
         .status-banner{margin:0 auto 20px;max-width:780px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);padding:10px 14px;border-radius:10px;color:#fcd34d;font-size:13px}
         .mobile-cta{display:none}
 

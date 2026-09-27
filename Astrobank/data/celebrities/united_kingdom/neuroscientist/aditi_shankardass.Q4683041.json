@@ -1,0 +1,27 @@
+{
+  "publicId": "a34c8d74",
+  "wikipediaSlug": "Aditi_Shankardass",
+  "wikipediaId": "Q4683041",
+  "name": "Aditi Shankardass",
+  "fullName": "Aditi Shankardass",
+  "profileSummary": "Aditi Shankardass is a British neuroscientist.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Aditi_Shankardass",
+  "dateOfBirth": "1970-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "51.507222222",
+  "birthCoordinatesLng": "-0.1275",
+  "moonSign": "6",
+  "sunSign": "9",
+  "lagnaSignText": "8",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "neuroscientist",
+    "singer"
+  ],
+  "qid": "Q4683041",
+  "birthPlace": "London",
+  "fetchedAt": "2026-04-08T00:21:59.571Z"
+}

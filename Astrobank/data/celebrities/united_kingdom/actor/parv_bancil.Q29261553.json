@@ -1,0 +1,28 @@
+{
+  "publicId": "69b10a1b",
+  "wikipediaSlug": "Parv_Bancil",
+  "wikipediaId": "Q29261553",
+  "name": "Parv Bancil",
+  "fullName": "Parv Bancil",
+  "profileSummary": "Parv Bancil was a British-Asian playwright and actor.",
+  "profileImageUrl": null,
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Parv_Bancil",
+  "dateOfBirth": "1967-03-30",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "-3.334883333",
+  "birthCoordinatesLng": "37.340380555",
+  "moonSign": "8",
+  "sunSign": "12",
+  "lagnaSignText": "1",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "writer",
+    "television presenter"
+  ],
+  "qid": "Q29261553",
+  "birthPlace": "Moshi",
+  "fetchedAt": "2026-04-08T02:08:19.019Z"
+}

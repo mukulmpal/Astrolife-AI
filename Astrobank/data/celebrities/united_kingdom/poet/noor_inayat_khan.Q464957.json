@@ -1,0 +1,30 @@
+{
+  "publicId": "4e056e0d",
+  "wikipediaSlug": "Noor_Inayat_Khan",
+  "wikipediaId": "Q464957",
+  "name": "Noor Inayat Khan",
+  "fullName": "Noor Inayat Khan",
+  "profileSummary": "Noor-un-Nisa Inayat Khan, GC, also known as Nora Inayat-Khan and Nora Baker, was a British agent in France in the Second World War who served in the Special Operations Executive (SOE). The purpose of SOE was to conduct espionage, sabotage, and reconnaissance in countries occupied by the Axis powers, especially those occupied by Nazi Germany.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Noor_Inayat_Khan.jpeg/330px-Noor_Inayat_Khan.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Noor_Inayat_Khan",
+  "dateOfBirth": "1914-01-01",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "55.750555555",
+  "birthCoordinatesLng": "37.6175",
+  "moonSign": "11",
+  "sunSign": "9",
+  "lagnaSignText": "9",
+  "planetaryCombinationIndex": null,
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "poet",
+    "writer",
+    "children's writer",
+    "resistance fighter",
+    "SOE agent"
+  ],
+  "qid": "Q464957",
+  "birthPlace": "Moscow",
+  "fetchedAt": "2026-04-08T02:07:54.074Z"
+}

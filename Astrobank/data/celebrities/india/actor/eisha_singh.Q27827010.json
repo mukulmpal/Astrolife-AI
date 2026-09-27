@@ -1,0 +1,29 @@
+{
+  "publicId": "fb712636",
+  "wikipediaSlug": "Eisha_Singh",
+  "wikipediaId": "Q27827010",
+  "name": "Eisha Singh",
+  "fullName": "Eisha Singh",
+  "profileSummary": "Eisha Singh is an Indian actress who works in Hindi television. She made her debut with Colors TV's soap drama Ishq Ka Rang Safed in 2015. She has since starred in the romantic dramas Ishq Subhan Allah and Sirf Tum. In 2024, she participated in Bigg Boss 18, finishing 6th place.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Eisha_Singh.jpeg/330px-Eisha_Singh.jpeg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Eisha_Singh",
+  "dateOfBirth": "1998-12-24",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "23.25",
+  "birthCoordinatesLng": "77.416666666",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor",
+    "television actor"
+  ],
+  "qid": "Q27827010",
+  "birthPlace": "Bhopal",
+  "fetchedAt": "2026-04-07T12:15:11.033Z"
+}

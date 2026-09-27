@@ -1,0 +1,28 @@
+{
+  "publicId": "f566f478",
+  "wikipediaSlug": "Johnny_Walker_(actor)",
+  "wikipediaId": "Q3182985",
+  "name": "Johnny Walker (actor)",
+  "fullName": "Johnny Walker (actor)",
+  "profileSummary": "Badruddin Jamaluddin Kazi, professionally known as Johnny Walker, was an Indian actor and comedian who acted in around 300 films. He was best known for his humorous roles in Indian films, notably being typecast as a hapless drunkard.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/86/Actor_Johnny_Walker.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Johnny_Walker_(actor)",
+  "dateOfBirth": "1926-11-11",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "22.718611111",
+  "birthCoordinatesLng": "75.855",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "actor"
+  ],
+  "qid": "Q3182985",
+  "birthPlace": "Indore",
+  "fetchedAt": "2026-04-07T12:17:29.521Z"
+}

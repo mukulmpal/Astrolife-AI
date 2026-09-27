@@ -1,0 +1,28 @@
+{
+  "publicId": "94de4d48",
+  "wikipediaSlug": "Daler_Mehndi",
+  "wikipediaId": "Q464185",
+  "name": "Daler Mehndi",
+  "fullName": "Daler Mehndi",
+  "profileSummary": "Daler Singh, better known as Daler Mehndi, is an Indian singer, songwriter, author, and record producer. He has helped to make Bhangra popular worldwide, as well as Indian pop music independent of Bollywood music. He is known for his dance songs, turban, and long flowing robes.",
+  "profileImageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/76/Daler_Mehndi.jpg",
+  "wikipediaUrl": "https://en.wikipedia.org/wiki/Daler_Mehndi",
+  "dateOfBirth": "1967-08-18",
+  "birthTime": "12:00:00",
+  "birthCoordinatesLat": "25.61",
+  "birthCoordinatesLng": "85.141388888",
+  "moonSign": null,
+  "sunSign": null,
+  "lagnaSignText": null,
+  "planetaryCombinationIndex": [
+    "Manual_Sync_Required"
+  ],
+  "dataSource": "wikipedia_crawler",
+  "isVerified": false,
+  "categories": [
+    "singer"
+  ],
+  "qid": "Q464185",
+  "birthPlace": "Patna",
+  "fetchedAt": "2026-04-07T12:18:25.730Z"
+}
