@@ -30,11 +30,11 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
   return (
     <div
       style={{
-        background: "radial-gradient(ellipse at top right, rgba(96, 165, 250, 0.08), transparent 60%), #0c0922",
-        border: "1px solid rgba(96, 165, 250, 0.25)",
+        background: "#FFFFFF",
+        border: "1px solid rgba(184, 134, 11, 0.2)",
         borderRadius: "20px",
         padding: "24px",
-        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.4)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
       }}
     >
       {/* Header */}
@@ -45,11 +45,11 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
             alignItems: "center",
             gap: "6px",
             padding: "4px 10px",
-            background: "rgba(96, 165, 250, 0.12)",
+            background: "rgba(184, 134, 11, 0.12)",
             borderRadius: "20px",
             fontSize: "11px",
             fontWeight: 600,
-            color: "#60a5fa",
+            color: "#B8860B",
             letterSpacing: "0.5px",
             marginBottom: "8px",
           }}
@@ -61,7 +61,7 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
           style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
             fontSize: "24px",
-            color: "#f5eedd",
+            color: "#1A1A1A",
             fontWeight: 700,
             margin: 0,
           }}
@@ -70,7 +70,7 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
         </h2>
         <p
           style={{
-            color: "#998fb3",
+            color: "#6B635B",
             fontSize: "12.5px",
             marginTop: "4px",
             lineHeight: 1.5,
@@ -91,13 +91,13 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
         }}
       >
         {levels.map(({ label, data, tag }, idx) => {
-          const color = KP_PLANET_COLORS[data.planet] ?? "#f5eedd";
+          const color = KP_PLANET_COLORS[data.planet] ?? "#B8860B";
           return (
             <div
               key={idx}
               style={{
-                background: "rgba(255, 255, 255, 0.025)",
-                border: "1px solid rgba(255, 255, 255, 0.08)",
+                background: "#FAF7F2",
+                border: "1px solid rgba(184, 134, 11, 0.15)",
                 borderRadius: "12px",
                 padding: "14px",
                 display: "flex",
@@ -111,12 +111,12 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                     display: "flex",
                     justifyContent: "space-between",
                     fontSize: "10.5px",
-                    color: "#83799f",
+                    color: "#6B635B",
                     fontWeight: 600,
                   }}
                 >
                   <span>{label}</span>
-                  <span style={{ color: "#60a5fa" }}>{tag}</span>
+                  <span style={{ color: "#B8860B" }}>{tag}</span>
                 </div>
 
                 <div style={{ margin: "8px 0 4px" }}>
@@ -125,9 +125,9 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                   </span>
                 </div>
 
-                <div style={{ fontSize: "11px", color: "#b8b0d0", marginBottom: "8px" }}>
+                <div style={{ fontSize: "11px", color: "#6B635B", marginBottom: "8px" }}>
                   Signifies Houses:{" "}
-                  <strong style={{ color: "#f5a623" }}>
+                  <strong style={{ color: "#B8860B" }}>
                     {data.signifiedHouses.length > 0
                       ? data.signifiedHouses.map((h) => `H${h}`).join(", ")
                       : "None"}
@@ -138,15 +138,15 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
               <div
                 style={{
                   fontSize: "10px",
-                  color: "#94a3b8",
-                  borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                  color: "#6B635B",
+                  borderTop: "1px solid rgba(184, 134, 11, 0.12)",
                   paddingTop: "6px",
                   display: "flex",
                   justifyContent: "space-between",
                 }}
               >
                 <span>Strength:</span>
-                <span style={{ color: "#4ade80", fontWeight: 600 }}>{data.significationStrength}</span>
+                <span style={{ color: "#15803d", fontWeight: 600 }}>{data.significationStrength}</span>
               </div>
             </div>
           );
@@ -160,14 +160,14 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
             style={{
               fontSize: "13px",
               fontWeight: 600,
-              color: "#e2daf0",
+              color: "#1A1A1A",
               display: "flex",
               alignItems: "center",
               gap: "6px",
               marginBottom: "12px",
             }}
           >
-            <Layers size={14} color="#f5a623" />
+            <Layers size={14} color="#B8860B" />
             <span>Active Life Event Signification Matches</span>
           </div>
 
@@ -190,8 +190,8 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                 <div
                   key={i}
                   style={{
-                    background: "rgba(0, 0, 0, 0.25)",
-                    border: "1px solid rgba(255, 255, 255, 0.06)",
+                    background: "#FAF7F2",
+                    border: "1px solid rgba(184, 134, 11, 0.15)",
                     borderRadius: "10px",
                     padding: "12px 14px",
                     cursor: "pointer",
@@ -207,21 +207,22 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                       marginBottom: "6px",
                     }}
                   >
-                    <strong style={{ fontSize: "12.5px", color: "#f5eedd" }}>{ev.ruleName}</strong>
-                    {isExpanded ? <ChevronUp size={14} color="#8a81a3" /> : <ChevronDown size={14} color="#8a81a3" />}
+                    <strong style={{ fontSize: "12.5px", color: "#1A1A1A" }}>{ev.ruleName}</strong>
+                    {isExpanded ? <ChevronUp size={14} color="#8C827A" /> : <ChevronDown size={14} color="#8C827A" />}
                   </div>
 
                   <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", fontSize: "10.5px" }}>
                     {hasSupporting && (
                       <span
                         style={{
-                          background: "rgba(74, 222, 128, 0.1)",
-                          color: "#4ade80",
+                          background: "rgba(34, 197, 94, 0.12)",
+                          color: "#15803d",
                           padding: "2px 6px",
                           borderRadius: "4px",
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "3px",
+                          fontWeight: 500,
                         }}
                       >
                         <CheckCircle2 size={10} /> Supports: {supporting.map((h) => `H${h}`).join(", ")}
@@ -231,13 +232,14 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                     {hasDetriment && (
                       <span
                         style={{
-                          background: "rgba(239, 68, 68, 0.1)",
-                          color: "#f87171",
+                          background: "rgba(239, 68, 68, 0.12)",
+                          color: "#b91c1c",
                           padding: "2px 6px",
                           borderRadius: "4px",
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "3px",
+                          fontWeight: 500,
                         }}
                       >
                         <ShieldAlert size={10} /> Detriment: {detriment.map((h) => `H${h}`).join(", ")}
@@ -250,19 +252,19 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                       style={{
                         marginTop: "10px",
                         paddingTop: "10px",
-                        borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                        borderTop: "1px solid rgba(184, 134, 11, 0.12)",
                         fontSize: "11px",
-                        color: "#9890b0",
+                        color: "#6B635B",
                         lineHeight: 1.5,
                       }}
                     >
                       <div>
-                        <strong>Lord:</strong> {tp(ev.planet)} ({ev.dashaLevel})
+                        <strong style={{ color: "#1A1A1A" }}>Lord:</strong> {tp(ev.planet)} ({ev.dashaLevel})
                       </div>
                       <div style={{ marginTop: "4px" }}>
-                        <strong>Signified Houses:</strong> {signified.length > 0 ? signified.map((h) => `H${h}`).join(", ") : "None"}
+                        <strong style={{ color: "#1A1A1A" }}>Signified Houses:</strong> {signified.length > 0 ? signified.map((h) => `H${h}`).join(", ") : "None"}
                       </div>
-                      <div style={{ marginTop: "4px", color: "#787190", fontSize: "10px" }}>
+                      <div style={{ marginTop: "4px", color: "#8C827A", fontSize: "10px" }}>
                         Canonical Source: {ev.canonicalSource}
                       </div>
                     </div>

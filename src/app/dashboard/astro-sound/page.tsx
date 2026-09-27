@@ -1092,33 +1092,30 @@ export default function AstroSoundPage() {
         .as-shell {
           min-height: 100vh;
           padding: 28px;
-          color: #f8f2ff;
-          background:
-            radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 30%),
-            radial-gradient(circle at top right, rgba(245, 197, 66, 0.14), transparent 28%),
-            #FAF7F2;
+          color: #1A1A1A;
+          background: #FAF7F2;
           font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         .as-hero {
           max-width: 1200px;
           margin: 0 auto 22px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 8px;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          border-radius: 16px;
           padding: 30px;
-          background: rgba(255, 255, 255, 0.06);
+          background: #FFFFFF;
           display: grid;
           grid-template-columns: 1fr 220px;
           gap: 24px;
           align-items: center;
-          backdrop-filter: blur(18px);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
         .as-kicker {
-          color: #f5c542;
+          color: #B8860B;
           text-transform: uppercase;
           letter-spacing: 0.13em;
-          font-weight: 900;
+          font-weight: 700;
           font-size: 12px;
           margin-bottom: 10px;
         }
@@ -1128,19 +1125,20 @@ export default function AstroSoundPage() {
           font-size: clamp(38px, 6vw, 74px);
           line-height: 0.92;
           letter-spacing: 0;
+          color: #1A1A1A;
         }
 
         .as-hero p {
           max-width: 760px;
-          color: rgba(248, 242, 255, 0.7);
-          font-size: 17px;
+          color: #6B635B;
+          font-size: 16px;
           line-height: 1.65;
           margin: 0;
         }
 
         .as-safe-note {
           margin-top: 10px;
-          color: rgba(245, 197, 66, 0.76);
+          color: #8C6D1F;
           font-size: 12px;
           line-height: 1.5;
         }
@@ -1148,16 +1146,13 @@ export default function AstroSoundPage() {
         .as-orb {
           width: 190px;
           height: 190px;
-          border-radius: 8px;
+          border-radius: 16px;
           display: grid;
           place-items: center;
           justify-self: end;
-          background:
-            radial-gradient(circle at 35% 30%, rgba(245, 197, 66, 0.9), transparent 22%),
-            radial-gradient(circle at 70% 75%, rgba(124, 58, 237, 0.9), transparent 34%),
-            rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          box-shadow: 0 24px 70px rgba(124, 58, 237, 0.26);
+          background: radial-gradient(circle at 35% 30%, rgba(184, 134, 11, 0.15), transparent 50%), #FAF7F2;
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          box-shadow: 0 8px 24px rgba(184, 134, 11, 0.1);
           text-align: center;
         }
 
@@ -1167,12 +1162,12 @@ export default function AstroSoundPage() {
 
         .as-orb strong {
           font-size: 42px;
-          color: #f5c542;
+          color: #B8860B;
         }
 
         .as-orb em {
           font-style: normal;
-          color: rgba(255, 255, 255, 0.68);
+          color: #6B635B;
           font-size: 12px;
         }
 
@@ -1188,22 +1183,23 @@ export default function AstroSoundPage() {
         .as-panel,
         .as-result,
         .as-roadmap {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.06);
-          border-radius: 8px;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FFFFFF;
+          border-radius: 16px;
           padding: 22px;
-          backdrop-filter: blur(18px);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
         .as-panel-head h2,
         .as-roadmap h2 {
           margin: 0 0 6px;
           font-size: 22px;
+          color: #1A1A1A;
         }
 
         .as-panel-head p {
           margin: 0 0 18px;
-          color: rgba(255, 255, 255, 0.58);
+          color: #6B635B;
           font-size: 13px;
           line-height: 1.5;
         }
@@ -1214,8 +1210,8 @@ export default function AstroSoundPage() {
 
         .as-control label {
           display: block;
-          color: rgba(255, 255, 255, 0.72);
-          font-weight: 800;
+          color: #1A1A1A;
+          font-weight: 700;
           font-size: 13px;
           margin-bottom: 10px;
         }
@@ -1235,14 +1231,21 @@ export default function AstroSoundPage() {
         .as-mode-list button,
         .as-actions button,
         .as-mini-btn {
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.06);
-          color: #f8f2ff;
-          border-radius: 15px;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FAF7F2;
+          color: #1A1A1A;
+          border-radius: 12px;
           padding: 11px 12px;
           cursor: pointer;
-          font-weight: 800;
+          font-weight: 600;
           text-align: left;
+          transition: all 0.15s;
+        }
+
+        .as-chip-grid button:hover,
+        .as-segment button:hover,
+        .as-mode-list button:hover {
+          border-color: #B8860B;
         }
 
         .as-chip-grid button span {
@@ -1253,23 +1256,25 @@ export default function AstroSoundPage() {
         .as-segment button.active,
         .as-mode-list button.active,
         .as-tabs button.active {
-          background: linear-gradient(135deg, rgba(245, 197, 66, 0.22), rgba(124, 58, 237, 0.15));
-          border-color: rgba(245, 197, 66, 0.42);
-          color: #f5c542;
+          background: linear-gradient(135deg, #B8860B, #996515);
+          border-color: #B8860B;
+          color: #FFFFFF;
+          box-shadow: 0 2px 8px rgba(184, 134, 11, 0.25);
         }
 
         .as-control select {
           width: 100%;
-          border-radius: 15px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.08);
-          color: white;
+          border-radius: 12px;
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          background: #FFFFFF;
+          color: #1A1A1A;
           padding: 13px;
           outline: none;
         }
 
         .as-control option {
-          background: #100625;
+          background: #FFFFFF;
+          color: #1A1A1A;
         }
 
         .as-segment {
@@ -1293,29 +1298,29 @@ export default function AstroSoundPage() {
         }
 
         .as-mode-list span {
-          color: rgba(255, 255, 255, 0.54);
+          color: #6B635B;
           font-size: 12px;
           font-weight: 500;
         }
 
-
         .as-how-card {
           margin-top: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.045);
-          border-radius: 22px;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FAF7F2;
+          border-radius: 16px;
           padding: 16px;
         }
 
         .as-how-card h3 {
           margin: 0 0 8px;
-          color: #f5c542;
+          color: #B8860B;
           font-size: 16px;
+          font-weight: 700;
         }
 
         .as-how-card p {
           margin: 0 0 13px;
-          color: rgba(255, 255, 255, 0.62);
+          color: #6B635B;
           line-height: 1.55;
           font-size: 12.5px;
         }
@@ -1330,9 +1335,9 @@ export default function AstroSoundPage() {
           grid-template-columns: 28px 1fr;
           gap: 8px 10px;
           align-items: start;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.04);
-          border-radius: 14px;
+          border: 1px solid rgba(184, 134, 11, 0.15);
+          background: #FFFFFF;
+          border-radius: 12px;
           padding: 10px;
         }
 
@@ -1341,21 +1346,21 @@ export default function AstroSoundPage() {
           height: 26px;
           display: grid;
           place-items: center;
-          border-radius: 10px;
-          background: rgba(245, 197, 66, 0.18);
-          color: #f5c542;
+          border-radius: 8px;
+          background: rgba(184, 134, 11, 0.15);
+          color: #B8860B;
           font-size: 12px;
         }
 
         .as-how-list span {
-          color: white;
-          font-weight: 900;
+          color: #1A1A1A;
+          font-weight: 700;
           font-size: 12.5px;
         }
 
         .as-how-list em {
           grid-column: 2;
-          color: rgba(255, 255, 255, 0.55);
+          color: #6B635B;
           font-style: normal;
           line-height: 1.45;
           font-size: 11.5px;
@@ -1367,20 +1372,20 @@ export default function AstroSoundPage() {
           gap: 16px;
           align-items: center;
           margin: 18px 0;
-          border: 1px solid rgba(245, 197, 66, 0.16);
-          background: rgba(245, 197, 66, 0.07);
-          border-radius: 22px;
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          background: #FAF5EB;
+          border-radius: 16px;
           padding: 16px;
         }
 
         .as-calc-card strong {
-          color: #f5c542;
+          color: #B8860B;
           font-size: 14px;
         }
 
         .as-calc-card p {
           margin: 7px 0 0;
-          color: rgba(255, 255, 255, 0.62);
+          color: #6B635B;
           line-height: 1.55;
           font-size: 12.5px;
         }
@@ -1395,13 +1400,13 @@ export default function AstroSoundPage() {
 
         .as-calc-pills span,
         .as-empty-badges span {
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.07);
-          color: rgba(255, 255, 255, 0.76);
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FFFFFF;
+          color: #6B635B;
           border-radius: 999px;
           padding: 7px 10px;
           font-size: 11px;
-          font-weight: 800;
+          font-weight: 600;
         }
 
         .as-empty-badges {
@@ -1418,11 +1423,11 @@ export default function AstroSoundPage() {
           border: 0;
           border-radius: 999px;
           padding: 15px 18px;
-          background: linear-gradient(135deg, #f5c542, #ff9f1c);
-          color: #140b00;
-          font-weight: 950;
+          background: linear-gradient(135deg, #B8860B, #996515);
+          color: #FFFFFF;
+          font-weight: 700;
           cursor: pointer;
-          box-shadow: 0 14px 36px rgba(245, 197, 66, 0.22);
+          box-shadow: 0 8px 24px rgba(184, 134, 11, 0.25);
         }
 
         .as-empty {
@@ -1430,7 +1435,7 @@ export default function AstroSoundPage() {
           display: grid;
           place-items: center;
           text-align: center;
-          color: rgba(255, 255, 255, 0.68);
+          color: #6B635B;
         }
 
         .as-empty div {
@@ -1439,7 +1444,7 @@ export default function AstroSoundPage() {
         }
 
         .as-empty h2 {
-          color: white;
+          color: #1A1A1A;
           margin: 0 0 8px;
           font-size: 28px;
         }
@@ -1456,25 +1461,26 @@ export default function AstroSoundPage() {
           gap: 18px;
           align-items: start;
           padding-bottom: 18px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          border-bottom: 1px solid rgba(184, 134, 11, 0.18);
         }
 
         .as-primary h2 {
           margin: 0 0 10px;
           font-size: 42px;
           letter-spacing: -0.04em;
+          color: #1A1A1A;
         }
 
         .as-primary p {
           margin: 0;
-          color: rgba(255, 255, 255, 0.68);
+          color: #6B635B;
           line-height: 1.65;
         }
 
         .as-score-card {
-          border-radius: 24px;
-          background: rgba(245, 197, 66, 0.13);
-          border: 1px solid rgba(245, 197, 66, 0.26);
+          border-radius: 16px;
+          background: #FAF5EB;
+          border: 1px solid rgba(184, 134, 11, 0.25);
           padding: 18px;
           text-align: center;
         }
@@ -1482,13 +1488,13 @@ export default function AstroSoundPage() {
         .as-score-card strong {
           display: block;
           font-size: 44px;
-          color: #f5c542;
+          color: #B8860B;
         }
 
         .as-score-card span {
-          color: rgba(255, 255, 255, 0.7);
+          color: #6B635B;
           font-size: 12px;
-          font-weight: 800;
+          font-weight: 700;
         }
 
         .as-meta-grid {
@@ -1500,33 +1506,30 @@ export default function AstroSoundPage() {
 
         .as-meta-grid div,
         .as-alt-card {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 18px;
+          border: 1px solid rgba(184, 134, 11, 0.18);
+          background: #FAF7F2;
+          border-radius: 14px;
           padding: 14px;
         }
 
         .as-meta-grid span,
         .as-alt-card span {
           display: block;
-          color: rgba(255, 255, 255, 0.5);
+          color: #6B635B;
           font-size: 11px;
           margin-bottom: 5px;
         }
 
         .as-meta-grid strong,
         .as-alt-card strong {
-          color: white;
+          color: #1A1A1A;
         }
-
 
         .as-listen-card {
           margin: 18px 0;
-          border: 1px solid rgba(245, 197, 66, 0.22);
-          background:
-            radial-gradient(circle at top left, rgba(245, 197, 66, 0.15), transparent 34%),
-            rgba(255, 255, 255, 0.06);
-          border-radius: 24px;
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          background: #FAF5EB;
+          border-radius: 16px;
           padding: 18px;
           display: grid;
           grid-template-columns: 1fr auto;
@@ -1537,12 +1540,12 @@ export default function AstroSoundPage() {
         .as-listen-card h3 {
           margin: 0 0 8px;
           font-size: 22px;
-          color: #ffffff;
+          color: #1A1A1A;
         }
 
         .as-listen-card p {
           margin: 0;
-          color: rgba(255, 255, 255, 0.64);
+          color: #6B635B;
           line-height: 1.6;
           font-size: 13px;
         }
@@ -1563,10 +1566,10 @@ export default function AstroSoundPage() {
           text-align: center;
           border-radius: 999px;
           padding: 10px 13px;
-          font-weight: 900;
-          color: #140b00;
-          background: linear-gradient(135deg, #f5c542, #ff9f1c);
-          box-shadow: 0 10px 24px rgba(245, 197, 66, 0.16);
+          font-weight: 700;
+          color: #FFFFFF;
+          background: linear-gradient(135deg, #B8860B, #996515);
+          box-shadow: 0 4px 16px rgba(184, 134, 11, 0.25);
         }
 
         .as-seven-day {
@@ -1577,29 +1580,29 @@ export default function AstroSoundPage() {
         }
 
         .as-seven-day div {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 16px;
+          border: 1px solid rgba(184, 134, 11, 0.18);
+          background: #FAF7F2;
+          border-radius: 14px;
           padding: 12px;
         }
 
         .as-seven-day strong {
           display: inline-flex;
-          color: #f5c542;
+          color: #B8860B;
           font-size: 12px;
           margin-bottom: 6px;
         }
 
         .as-seven-day span {
           display: block;
-          color: #ffffff;
-          font-weight: 900;
+          color: #1A1A1A;
+          font-weight: 700;
           margin-bottom: 6px;
         }
 
         .as-seven-day p {
           margin: 0;
-          color: rgba(255, 255, 255, 0.62);
+          color: #6B635B;
           line-height: 1.5;
           font-size: 12px;
         }
@@ -1612,38 +1615,38 @@ export default function AstroSoundPage() {
         }
 
         .as-tabs button {
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.06);
-          color: white;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FAF7F2;
+          color: #6B635B;
           border-radius: 999px;
           padding: 9px 13px;
           cursor: pointer;
-          font-weight: 800;
+          font-weight: 600;
         }
 
         .as-card {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 22px;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FAF7F2;
+          border-radius: 16px;
           padding: 18px;
         }
 
         .as-card h3 {
           margin: 0 0 10px;
-          color: #f5c542;
+          color: #B8860B;
+          font-weight: 700;
         }
 
         .as-card ul {
           margin: 0 0 14px;
           padding-left: 20px;
-          color: rgba(255, 255, 255, 0.75);
+          color: #4A4238;
           line-height: 1.7;
         }
 
         .as-card p {
-          color: rgba(255, 255, 255, 0.72);
+          color: #6B635B;
         }
-
 
         .as-timing-grid {
           display: grid;
@@ -1653,32 +1656,32 @@ export default function AstroSoundPage() {
         }
 
         .as-timing-grid div {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 18px;
+          border: 1px solid rgba(184, 134, 11, 0.18);
+          background: #FAF7F2;
+          border-radius: 14px;
           padding: 14px;
         }
 
         .as-timing-grid span {
           display: block;
-          color: rgba(255, 255, 255, 0.5);
+          color: #6B635B;
           font-size: 11px;
           text-transform: uppercase;
           letter-spacing: 0.08em;
-          font-weight: 900;
+          font-weight: 700;
           margin-bottom: 6px;
         }
 
         .as-timing-grid strong {
           display: block;
-          color: #f5c542;
+          color: #B8860B;
           font-size: 18px;
           margin-bottom: 7px;
         }
 
         .as-timing-grid p {
           margin: 0;
-          color: rgba(255, 255, 255, 0.62);
+          color: #6B635B;
           line-height: 1.5;
           font-size: 12px;
         }
@@ -1693,26 +1696,27 @@ export default function AstroSoundPage() {
           justify-content: space-between;
           margin-bottom: 5px;
           text-transform: capitalize;
+          color: #1A1A1A;
         }
 
         .as-progress {
           height: 9px;
           border-radius: 999px;
           overflow: hidden;
-          background: rgba(255, 255, 255, 0.08);
+          background: #E8E2D8;
         }
 
         .as-progress span {
           display: block;
           height: 100%;
-          background: linear-gradient(90deg, #f5c542, #8b5cf6);
+          background: linear-gradient(90deg, #B8860B, #996515);
           border-radius: inherit;
         }
 
         .as-section-title {
           margin: 18px 0 10px;
-          color: #f5c542;
-          font-weight: 900;
+          color: #B8860B;
+          font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.12em;
           font-size: 12px;
@@ -1726,7 +1730,7 @@ export default function AstroSoundPage() {
 
         .as-alt-card p {
           margin: 8px 0 0;
-          color: rgba(255, 255, 255, 0.56);
+          color: #6B635B;
           font-size: 12px;
         }
 
@@ -1744,9 +1748,9 @@ export default function AstroSoundPage() {
 
         .as-inline-notice {
           margin-top: 10px;
-          border: 1px solid rgba(245, 197, 66, 0.3);
-          background: rgba(245, 197, 66, 0.12);
-          color: #f7dd95;
+          border: 1px solid rgba(184, 134, 11, 0.3);
+          background: #FAF5EB;
+          color: #8C6D1F;
           border-radius: 10px;
           padding: 9px 12px;
           font-size: 12px;
@@ -1764,30 +1768,29 @@ export default function AstroSoundPage() {
         }
 
         .as-road-grid div {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 18px;
+          border: 1px solid rgba(184, 134, 11, 0.18);
+          border-radius: 14px;
           padding: 14px;
-          background: rgba(255, 255, 255, 0.05);
+          background: #FAF7F2;
         }
 
         .as-road-grid strong {
-          color: #f5c542;
+          color: #B8860B;
         }
 
         .as-road-grid p {
-          color: rgba(255, 255, 255, 0.64);
+          color: #6B635B;
           line-height: 1.55;
           margin: 7px 0 0;
           font-size: 13px;
         }
 
-
         .as-music-references {
           margin-top: 18px;
           padding: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 24px;
-          background: rgba(255, 255, 255, 0.055);
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          border-radius: 16px;
+          background: #FAF7F2;
         }
 
         .as-music-tabs {
@@ -1798,10 +1801,10 @@ export default function AstroSoundPage() {
         }
 
         .as-music-tabs button {
-          border: 1px solid rgba(255, 255, 255, 0.14);
+          border: 1px solid rgba(184, 134, 11, 0.2);
           border-radius: 999px;
-          background: rgba(255, 255, 255, 0.06);
-          color: inherit;
+          background: #FFFFFF;
+          color: #6B635B;
           padding: 9px 12px;
           cursor: pointer;
           font-size: 0.82rem;
@@ -1811,8 +1814,10 @@ export default function AstroSoundPage() {
         }
 
         .as-music-tabs button.active {
-          border-color: rgba(245, 197, 107, 0.75);
-          background: rgba(245, 197, 107, 0.16);
+          border-color: #B8860B;
+          background: rgba(184, 134, 11, 0.15);
+          color: #B8860B;
+          font-weight: 600;
         }
 
         .as-music-list {
@@ -1825,25 +1830,26 @@ export default function AstroSoundPage() {
           justify-content: space-between;
           gap: 14px;
           padding: 14px;
-          border-radius: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(0, 0, 0, 0.16);
+          border-radius: 14px;
+          border: 1px solid rgba(184, 134, 11, 0.18);
+          background: #FFFFFF;
         }
 
         .as-music-card strong {
           display: block;
           margin-bottom: 5px;
+          color: #1A1A1A;
         }
 
         .as-music-card p {
           margin: 0 0 6px;
-          opacity: 0.78;
+          color: #6B635B;
           font-size: 0.86rem;
         }
 
         .as-music-card small {
           display: block;
-          opacity: 0.68;
+          color: #8C827A;
           line-height: 1.45;
         }
 
@@ -1855,18 +1861,19 @@ export default function AstroSoundPage() {
         }
 
         .as-music-actions a {
-          border: 1px solid rgba(255, 255, 255, 0.14);
+          border: 1px solid rgba(184, 134, 11, 0.2);
           border-radius: 999px;
           padding: 7px 10px;
-          color: inherit;
+          color: #B8860B;
           text-decoration: none;
-          background: rgba(255, 255, 255, 0.07);
+          background: #FAF7F2;
           font-size: 0.78rem;
+          font-weight: 500;
         }
 
         .as-music-actions a:hover {
-          border-color: rgba(245, 197, 107, 0.7);
-          background: rgba(245, 197, 107, 0.13);
+          border-color: #B8860B;
+          background: rgba(184, 134, 11, 0.12);
         }
 
         .as-confidence {
@@ -1875,27 +1882,33 @@ export default function AstroSoundPage() {
           padding: 5px 9px;
           font-size: 0.72rem;
           text-transform: capitalize;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FAF7F2;
         }
 
         .as-confidence-high {
-          border-color: rgba(83, 224, 160, 0.55);
+          border-color: rgba(34, 197, 94, 0.4);
+          color: #15803d;
+          background: rgba(34, 197, 94, 0.1);
         }
 
         .as-confidence-medium {
-          border-color: rgba(245, 197, 107, 0.65);
+          border-color: rgba(184, 134, 11, 0.4);
+          color: #B8860B;
+          background: rgba(184, 134, 11, 0.1);
         }
 
         .as-confidence-low {
-          border-color: rgba(255, 255, 255, 0.18);
+          border-color: rgba(140, 130, 122, 0.3);
+          color: #8C827A;
+          background: rgba(140, 130, 122, 0.1);
         }
 
         .as-empty-music {
           padding: 14px;
-          border-radius: 18px;
-          border: 1px dashed rgba(255, 255, 255, 0.16);
-          opacity: 0.72;
+          border-radius: 14px;
+          border: 1px dashed rgba(184, 134, 11, 0.25);
+          color: #6B635B;
         }
 
         @media (max-width: 980px) {
@@ -1973,7 +1986,7 @@ export default function AstroSoundPage() {
             letter-spacing: 0;
           }
         }
-      `}</style>
+`}</style>
     </EngineShell>
   );
 }

@@ -92,10 +92,10 @@ export default function SouthIndianChart({
         width: size,
         height: size,
         position: "relative",
-        background: "#080614",
-        border: "1.5px solid #d4af37",
+        background: "#FFFFFF",
+        border: "1.5px solid rgba(184, 134, 11, 0.35)",
         borderRadius: "8px",
-        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.6)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
         userSelect: "none",
         overflow: "hidden",
@@ -108,7 +108,7 @@ export default function SouthIndianChart({
         style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}
       >
         {/* Outer boundary */}
-        <rect x={0} y={0} width={size} height={size} fill="none" stroke="#d4af37" strokeWidth="2" />
+        <rect x={0} y={0} width={size} height={size} fill="none" stroke="#B8860B" strokeWidth="2" />
 
         {/* Grid lines */}
         {[1, 2, 3].map((i) => (
@@ -118,7 +118,7 @@ export default function SouthIndianChart({
               y1={0}
               x2={i * cellSize}
               y2={size}
-              stroke="rgba(212, 175, 55, 0.4)"
+              stroke="rgba(184, 134, 11, 0.25)"
               strokeWidth="1"
             />
             <line
@@ -126,7 +126,7 @@ export default function SouthIndianChart({
               y1={i * cellSize}
               x2={size}
               y2={i * cellSize}
-              stroke="rgba(212, 175, 55, 0.4)"
+              stroke="rgba(184, 134, 11, 0.25)"
               strokeWidth="1"
             />
           </React.Fragment>
@@ -138,8 +138,8 @@ export default function SouthIndianChart({
           y={cellSize}
           width={cellSize * 2}
           height={cellSize * 2}
-          fill="#0c0922"
-          stroke="#d4af37"
+          fill="#FAF7F2"
+          stroke="#B8860B"
           strokeWidth="1.5"
         />
 
@@ -148,7 +148,7 @@ export default function SouthIndianChart({
           x={size / 2}
           y={size / 2 - 8}
           textAnchor="middle"
-          fill="#f5eedd"
+          fill="#1A1A1A"
           fontSize={size > 300 ? 14 : 12}
           fontWeight="700"
           fontFamily="'Cormorant Garamond', Georgia, serif"
@@ -159,7 +159,7 @@ export default function SouthIndianChart({
           x={size / 2}
           y={size / 2 + 12}
           textAnchor="middle"
-          fill="#d4af37"
+          fill="#B8860B"
           fontSize={size > 300 ? 10.5 : 9}
           letterSpacing="1px"
           style={{ textTransform: "uppercase" }}
@@ -189,7 +189,7 @@ export default function SouthIndianChart({
               flexDirection: "column",
               justifyContent: "space-between",
               boxSizing: "border-box",
-              background: isLagna ? "rgba(212, 175, 55, 0.08)" : "transparent",
+              background: isLagna ? "rgba(184, 134, 11, 0.1)" : "transparent",
             }}
           >
             {/* Box Header: Sign Name & House Badge */}
@@ -204,7 +204,7 @@ export default function SouthIndianChart({
             >
               <span
                 style={{
-                  color: isLagna ? "#f5a623" : "#7d7595",
+                  color: isLagna ? "#B8860B" : "#6B635B",
                   fontWeight: isLagna ? 700 : 500,
                   fontSize: "8.5px",
                 }}
@@ -215,7 +215,7 @@ export default function SouthIndianChart({
               <span
                 style={{
                   fontSize: "8.5px",
-                  color: isLagna ? "#f5a623" : "rgba(255, 255, 255, 0.35)",
+                  color: isLagna ? "#B8860B" : "#8C827A",
                   fontWeight: 600,
                 }}
               >
@@ -230,8 +230,8 @@ export default function SouthIndianChart({
                   alignSelf: "flex-start",
                   fontSize: "9px",
                   fontWeight: 700,
-                  color: "#080614",
-                  background: "#d4af37",
+                  color: "#FFFFFF",
+                  background: "#B8860B",
                   padding: "1px 4px",
                   borderRadius: "3px",
                   letterSpacing: "0.5px",

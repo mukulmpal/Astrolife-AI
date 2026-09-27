@@ -13,7 +13,7 @@ import {
   History, Star, HeartHandshake, Heart, HelpCircle, Hash,
   Hand, LogOut, type LucideIcon,
   Archive, Radar, Globe, ShoppingBag, Sunrise, Activity,
-  Shield,
+  Shield, Database,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
@@ -32,6 +32,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Dashboard", href: "/dashboard",        Icon: LayoutDashboard },
       { label: "My Kundli", href: "/dashboard/kundli", Icon: CircleDot       },
+      { label: "Astro Bank", href: "/dashboard/astro-bank", Icon: Database   },
       { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot },
       { label: "Predictions", href: "/dashboard/destiny", Icon: TrendingUp },
       { label: "Report", href: "/dashboard/report", Icon: FileText },

@@ -172,64 +172,64 @@ export default function DivisionalPage() {
     <div className="page">
       <style>{`
         .dv-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-        .dv-tab{padding:8px 16px;border-radius:10px;border:1px solid #FFFFFF;background:transparent;color:#6B635B;cursor:pointer;font-size:14px;font-weight:500;transition:all 0.2s;text-align:center}
-        .dv-tab.active{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 15%,transparent);color:var(--tc)}
+        .dv-tab{padding:8px 16px;border-radius:10px;border:1px solid rgba(184,134,11,0.2);background:#FAF7F2;color:#6B635B;cursor:pointer;font-size:14px;font-weight:500;transition:all 0.2s;text-align:center}
+        .dv-tab.active{border-color:#B8860B;background:rgba(184,134,11,0.15);color:#B8860B;font-weight:700}
         .dv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
         @media(max-width:640px){.dv-grid{grid-template-columns:1fr}}
-        .dv-card{background:#FFFFFF;border:1px solid #1f1a42;border-radius:16px;padding:18px}
-        .dv-card-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6B635B;margin-bottom:10px}
-        .dv-planet-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #1a1740}
+        .dv-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.2);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .dv-card-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#B8860B;margin-bottom:10px;font-weight:600}
+        .dv-planet-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(184,134,11,0.12)}
         .dv-badge{font-size:9px;padding:2px 7px;border-radius:6px;border:1px solid}
-        .dv-insight{padding:8px 0;border-bottom:1px solid #1a1740;font-size:14px;color:#4A4238;line-height:1.75;display:flex;gap:8px}
+        .dv-insight{padding:8px 0;border-bottom:1px solid rgba(184,134,11,0.12);font-size:14px;color:#4A4238;line-height:1.75;display:flex;gap:8px}
         .dv-finding{border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid}
         .dv-stat-row{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
-        .dv-stat{text-align:center;background:rgba(0,0,0,0.2);border-radius:12px;padding:12px 16px;border:1px solid rgba(168,85,247,0.15);min-width:90px}
-        .dv-stat-n{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#a855f7;line-height:1}
+        .dv-stat{text-align:center;background:#FAF7F2;border-radius:12px;padding:12px 16px;border:1px solid rgba(184,134,11,0.2);min-width:90px}
+        .dv-stat-n{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#B8860B;line-height:1}
         .dv-stat-l{font-size:10px;color:#6B635B;margin-top:4px;letter-spacing:0.5px}
         .dv-marriage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
-        .dv-marriage-card{background:rgba(13,10,34,0.82);border:1px solid rgba(236,72,153,0.2);border-radius:14px;padding:15px}
-        .dv-marriage-score{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;line-height:1;color:#ec4899}
+        .dv-marriage-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:14px;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,0.03)}
+        .dv-marriage-score{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;line-height:1;color:#B8860B}
         .dv-marriage-title{font-size:14px;font-weight:800;color:#1A1A1A;margin:6px 0}
         .dv-marriage-text{font-size:12px;color:#4A4238;line-height:1.7}
-        .dv-marriage-chip{display:inline-flex;margin-top:8px;border:1px solid rgba(200,160,48,.25);border-radius:999px;padding:4px 9px;font-size:10px;color:#d8c47a}
-        .dv-shodash{background:#FFFFFF;border:1px solid rgba(200,160,48,0.16);border-radius:16px;padding:16px;margin-bottom:16px}
+        .dv-marriage-chip{display:inline-flex;margin-top:8px;border:1px solid rgba(184,134,11,0.25);background:#FAF7F2;border-radius:999px;padding:4px 9px;font-size:10px;color:#B8860B}
+        .dv-shodash{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .dv-shodash-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
         .dv-shodash-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#1A1A1A}
-        .dv-shodash-sub{font-size:12px;color:#8f86b7;line-height:1.65;margin-top:4px}
+        .dv-shodash-sub{font-size:12px;color:#6B635B;line-height:1.65;margin-top:4px}
         .dv-shodash-grid{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:10px;overflow-x:auto;padding-bottom:4px}
-        .dv-shodash-card{background:rgba(8,5,26,0.82);border:1px solid rgba(255,255,255,0.08);border-radius:13px;padding:13px;min-height:178px}
+        .dv-shodash-card{background:#FAF7F2;border:1px solid rgba(184,134,11,0.18);border-radius:13px;padding:13px;min-height:178px}
         .dv-shodash-top{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}
-        .dv-shodash-key{font-size:12px;font-weight:900;color:#c8a030}
-        .dv-shodash-score{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:800;color:#ec4899;line-height:1}
+        .dv-shodash-key{font-size:12px;font-weight:900;color:#B8860B}
+        .dv-shodash-score{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:800;color:#B8860B;line-height:1}
         .dv-shodash-card h3{font-size:14px;color:#1A1A1A;margin:0 0 5px}
         .dv-shodash-card p{font-size:12px;color:#4A4238;line-height:1.65;margin:0}
-        .dv-shodash-domain{font-size:10px;color:#8f86b7;line-height:1.4;margin-bottom:8px}
-        .dv-universal{background:linear-gradient(135deg,rgba(16,12,42,.96),rgba(10,7,28,.96));border:1px solid rgba(200,160,48,.22);border-radius:18px;padding:18px;margin-bottom:16px}
+        .dv-shodash-domain{font-size:10px;color:#6B635B;line-height:1.4;margin-bottom:8px}
+        .dv-universal{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .dv-universal-head{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:14px}
-        .dv-universal-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:6px;font-weight:800}
+        .dv-universal-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#B8860B;margin-bottom:6px;font-weight:800}
         .dv-universal-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:800;color:#1A1A1A}
         .dv-universal-text{font-size:13px;color:#4A4238;line-height:1.8;margin-top:7px}
-        .dv-universal-score{text-align:center;border:1px solid rgba(236,72,153,.25);border-radius:16px;padding:12px 16px;background:rgba(236,72,153,.08);min-width:130px}
-        .dv-universal-score strong{display:block;font-family:'Cormorant Garamond',serif;font-size:38px;line-height:1;color:#f0abfc}
-        .dv-universal-score span{font-size:10px;color:#d8c47a;text-transform:uppercase;letter-spacing:.12em}
+        .dv-universal-score{text-align:center;border:1px solid rgba(184,134,11,0.3);border-radius:16px;padding:12px 16px;background:#FAF5EB;min-width:130px}
+        .dv-universal-score strong{display:block;font-family:'Cormorant Garamond',serif;font-size:38px;line-height:1;color:#B8860B}
+        .dv-universal-score span{font-size:10px;color:#8C6D1F;text-transform:uppercase;letter-spacing:.12em}
         .dv-universal-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
-        .dv-universal-card{background:rgba(8,5,26,.82);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px;cursor:pointer;text-align:left}
-        .dv-universal-card.active{border-color:rgba(200,160,48,.55);background:rgba(200,160,48,.08)}
+        .dv-universal-card{background:#FAF7F2;border:1px solid rgba(184,134,11,0.18);border-radius:14px;padding:13px;cursor:pointer;text-align:left}
+        .dv-universal-card.active{border-color:#B8860B;background:rgba(184,134,11,0.12)}
         .dv-universal-card-top{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;align-items:center}
-        .dv-universal-card b{font-size:12px;color:#c8a030}
+        .dv-universal-card b{font-size:12px;color:#B8860B}
         .dv-universal-card strong{font-size:22px;color:#1A1A1A}
         .dv-universal-card h3{font-size:13px;color:#1A1A1A;margin:0 0 5px}
-        .dv-universal-card p{font-size:11px;color:#9e95c8;line-height:1.55;margin:0}
-        .dv-current-reading{background:rgba(8,5,26,.78);border:1px solid rgba(200,160,48,.18);border-radius:16px;padding:16px;margin-bottom:16px}
+        .dv-universal-card p{font-size:11px;color:#6B635B;line-height:1.55;margin:0}
+        .dv-current-reading{background:#FAF5EB;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:16px;margin-bottom:16px}
         .dv-current-reading h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:#1A1A1A;margin:0 0 8px}
         .dv-current-reading p{font-size:13px;color:#4A4238;line-height:1.85;margin:0 0 12px}
-        .dv-current-reading ul{display:grid;gap:7px;margin:0;padding-left:18px;color:#a99fd0;font-size:12px;line-height:1.7}
+        .dv-current-reading ul{display:grid;gap:7px;margin:0;padding-left:18px;color:#4A4238;font-size:12px;line-height:1.7}
         .dv-decision-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
-        .dv-decision-card{background:#FFFFFF;border:1px solid rgba(168,85,247,.16);border-radius:14px;padding:14px}
-        .dv-decision-card b{display:block;font-size:11px;color:#c8a030;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+        .dv-decision-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.2);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.02)}
+        .dv-decision-card b{display:block;font-size:11px;color:#B8860B;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
         .dv-decision-card p{font-size:12px;color:#4A4238;line-height:1.7;margin:0}
         .dv-growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-        .dv-growth-box{background:#FFFFFF;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
+        .dv-growth-box{background:#FFFFFF;border:1px solid rgba(184,134,11,0.2);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.02)}
         .dv-growth-box h3{font-size:14px;color:#1A1A1A;margin:0 0 8px}
         .dv-growth-box p{font-size:12px;color:#6B635B;line-height:1.75;margin:0}
         @media(max-width:920px){.dv-universal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dv-universal-head,.dv-growth-grid,.dv-decision-grid{grid-template-columns:1fr}}
@@ -423,9 +423,9 @@ export default function DivisionalPage() {
           <MiniChart chart={current}/>
           <div style={{marginTop:12,padding:"8px 12px",background:color+"0d",border:`1px solid ${color}22`,borderRadius:8}}>
             <div style={{fontSize:10,color:color,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>Purpose</div>
-            <div style={{fontSize:12,color:"#b0a8c8",lineHeight:1.7}}>{current.purpose}</div>
+            <div style={{fontSize:12,color:"#6B635B",lineHeight:1.7}}>{current.purpose}</div>
           </div>
-          <div style={{marginTop:8,padding:"8px 12px",background:"rgba(255,255,255,0.02)",borderRadius:8,border:"1px solid #1f1a42"}}>
+          <div style={{marginTop:8,padding:"8px 12px",background:"#FAF7F2",borderRadius:8,border:"1px solid rgba(184,134,11,0.18)"}}>
             <div style={{fontSize:10,color:"#6B635B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>{current.key} Lagna</div>
             <div style={{fontSize:15,color:"#1A1A1A",fontWeight:600}}>{current.lagna}</div>
           </div>
@@ -496,7 +496,7 @@ export default function DivisionalPage() {
           const strong = d.planets.filter(p=>p.dignity==="Exalted"||p.dignity==="Own");
           const deb    = d.planets.filter(p=>p.dignity==="Debilitated");
           return (
-            <div key={d.key} style={{padding:"10px 0",borderBottom:"1px solid #1a1740",display:"flex",alignItems:"flex-start",gap:10,cursor:"pointer"}}
+            <div key={d.key} style={{padding:"10px 0",borderBottom:"1px solid rgba(184,134,11,0.12)",display:"flex",alignItems:"flex-start",gap:10,cursor:"pointer"}}
               onClick={()=>setActiveChart(d.key)}>
               <span style={{fontSize:18,width:26,flexShrink:0}}>{m?.icon}</span>
               <div style={{flex:1}}>
@@ -505,7 +505,7 @@ export default function DivisionalPage() {
                   <span style={{fontSize:11,color:"#6B635B"}}>{d.name}</span>
                   <span style={{fontSize:11,color:"#6B635B",marginLeft:"auto"}}>Lagna: {d.lagna}</span>
                 </div>
-                <div style={{fontSize:11,color:"#8b80bf"}}>
+                <div style={{fontSize:11,color:"#6B635B"}}>
                   {strong.length>0&&<span style={{color:"#22c55e",marginRight:8}}>✓ {strong.map(p=>p.planet).join(", ")} strong</span>}
                   {deb.length>0&&<span style={{color:"#ef4444"}}>⚠ {deb.map(p=>p.planet).join(", ")} weak</span>}
                   {strong.length===0&&deb.length===0&&<span>Balanced positions</span>}
