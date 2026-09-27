@@ -839,13 +839,13 @@ html[data-theme-mode="light"] .dash-sidebar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--engine-violet, #3c2880), var(--engine-gold, #c8a030));
+  background: linear-gradient(135deg, #D4AF37, #B8860B);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 13px;
-  color: var(--app-primary-on, #1A1A1A);
+  color: #FFFFFF;
   font-weight: 600;
   flex-shrink: 0;
 }

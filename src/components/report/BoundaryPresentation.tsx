@@ -58,14 +58,13 @@ export function BoundaryPresentation({ boundaries }: BoundaryPresentationProps) 
           </div>
         </div>
 
-        {/* 3. What AstroLife Does NOT Claim */}
-        <div className="bg-slate-900/60 border border-indigo-500/20 rounded-xl p-4 flex flex-col justify-between">
+        <div className="bg-[#FAF5EB] border border-[rgba(184,134,11,0.22)] rounded-xl p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-3 text-indigo-400">
+            <div className="flex items-center gap-2 mb-3 text-[#B8860B]">
               <ShieldCheck className="w-4 h-4" />
               <h4 className="text-xs font-bold uppercase tracking-wider">What We Do NOT Claim</h4>
             </div>
-            <ul className="text-xs text-slate-400 space-y-2 list-disc list-inside">
+            <ul className="text-xs text-[#6B635B] space-y-2 list-disc list-inside">
               {boundaries.whatAstroLifeIsNotClaiming.map((item, idx) => (
                 <li key={`not-${idx}`} className="leading-relaxed">
                   {item}

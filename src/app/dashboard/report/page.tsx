@@ -5,6 +5,7 @@ import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type Repor
 import { AstroLoadingScreen } from "@/components/AstroLoadingScreen";
 import { createClient } from "@/lib/supabase/client";
 import { isBillingEnforced, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
+import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
 
 const PALETTE_OPTIONS: { value: ReportPalette; label: string; bg: string; gold: string }[] = [
   { value: "midnight", label: "Midnight",  bg: "#0A0E1F", gold: "#C9A961" },

@@ -86,8 +86,8 @@ export function EvidenceDrawer({
             onClick={() => setActiveTab("technical")}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               activeTab === "technical"
-                ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-[rgba(200,160,48,0.15)] text-[#B8860B] border border-[rgba(200,160,48,0.3)]"
+                : "text-[#6B635B] hover:text-[#1A1A1A]"
             }`}
           >
             Technical (L3)
@@ -141,11 +141,11 @@ export function EvidenceDrawer({
               </p>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-400">
+            <div className="bg-[#FAF5EB] border border-[rgba(184,134,11,0.22)] rounded-xl p-3.5 space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#B8860B]">
                 Dasha Activation Window
               </span>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-[#1A1A1A] leading-relaxed">
                 {viewModel.curious.dashaEvidence}
               </p>
             </div>
@@ -188,25 +188,25 @@ export function EvidenceDrawer({
       {activeTab === "technical" && (
         <div className="space-y-4 animate-fadeIn">
           {/* Metadata Bar */}
-          <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+          <div className="bg-[#FAF5EB] border border-[rgba(184,134,11,0.22)] rounded-xl p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[rgba(184,134,11,0.18)] pb-3">
               <div className="flex items-center gap-2">
-                <Code2 className="w-4 h-4 text-indigo-400" />
-                <span className="text-xs font-mono text-slate-300">
+                <Code2 className="w-4 h-4 text-[#B8860B]" />
+                <span className="text-xs font-mono text-[#1A1A1A]">
                   Contract v{viewModel.technical.contractVersion}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-slate-400">
+                <span className="text-[11px] font-mono text-[#6B635B]">
                   {viewModel.technical.auditHash}
                 </span>
                 <button
                   onClick={handleCopyAuditHash}
-                  className="p-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition flex items-center gap-1"
+                  className="p-1 bg-[#FFFFFF] hover:bg-[#FAF7F2] border border-[rgba(184,134,11,0.22)] text-[#1A1A1A] rounded text-xs transition flex items-center gap-1"
                   title="Copy Audit Hash"
                 >
                   {isCopied ? (
-                    <Check className="w-3 h-3 text-emerald-400" />
+                    <Check className="w-3 h-3 text-emerald-600" />
                   ) : (
                     <Copy className="w-3 h-3" />
                   )}
@@ -215,12 +215,12 @@ export function EvidenceDrawer({
             </div>
 
             <div className="text-xs space-y-1.5">
-              <span className="font-semibold text-slate-400 block">Applied Precedence Relations:</span>
+              <span className="font-semibold text-[#6B635B] block">Applied Precedence Relations:</span>
               <div className="flex flex-wrap gap-1.5">
                 {viewModel.technical.appliedRelations.map((rel) => (
                   <span
                     key={rel}
-                    className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-mono text-[11px]"
+                    className="px-2 py-0.5 rounded bg-[rgba(200,160,48,0.12)] border border-[rgba(200,160,48,0.25)] text-[#B8860B] font-mono text-[11px]"
                   >
                     {rel}
                   </span>

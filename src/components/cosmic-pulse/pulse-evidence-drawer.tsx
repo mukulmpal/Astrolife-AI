@@ -422,7 +422,7 @@ export const PulseEvidenceDrawer: React.FC<PulseEvidenceDrawerProps> = ({
                     <span style={{ color: "var(--app-soft)" }}>{concept.howItWorks}</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-400">Kyu Zaroori Hai (Psychological Impact): </span>
+                    <span className="font-semibold" style={{ color: "var(--app-gold)" }}>Kyu Zaroori Hai (Psychological Impact): </span>
                     <span style={{ color: "var(--app-soft)" }}>{concept.whyItMatters}</span>
                   </div>
                   <div className="text-[10px] font-mono pt-1" style={{ color: "var(--app-muted)" }}>

@@ -66,16 +66,16 @@ export function EvidenceChainNavigator({ chains }: EvidenceChainNavigatorProps) 
             </div>
 
             {/* Step 3: Rule */}
-            <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-3 flex flex-col justify-between">
+            <div className="bg-[#FAF5EB] border border-[rgba(184,134,11,0.22)] rounded-lg p-3 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold mb-1">
-                  <Bookmark className="w-3.5 h-3.5 text-indigo-400" />
+                <div className="flex items-center gap-1.5 text-xs text-[#6B635B] font-semibold mb-1">
+                  <Bookmark className="w-3.5 h-3.5 text-[#B8860B]" />
                   <span>3. Rule</span>
                 </div>
-                <p className="text-xs font-mono font-medium text-indigo-300">
+                <p className="text-xs font-mono font-medium text-[#B8860B]">
                   {chain.steps[2].identifier}
                 </p>
-                <p className="text-[11px] text-slate-300 line-clamp-2 mt-1">
+                <p className="text-[11px] text-[#1A1A1A] line-clamp-2 mt-1">
                   {chain.steps[2].label}
                 </p>
               </div>

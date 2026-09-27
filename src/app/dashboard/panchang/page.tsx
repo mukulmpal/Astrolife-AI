@@ -226,8 +226,8 @@ export default function PanchangPage() {
             <p className="text-2xl font-bold text-white mt-1">{panchang.rahuKaal.start} – {panchang.rahuKaal.end}</p>
             <p className="text-xs text-white/40 mt-1">Avoid important work in this window</p>
           </div>
-          <div className="rounded-2xl p-4" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.3)" }}>
-            <p className="text-xs uppercase tracking-widest text-purple-400">Gulika Kaal</p>
+          <div className="rounded-2xl p-4" style={{ background: "rgba(184,134,11,0.08)", border: "1px solid rgba(184,134,11,0.25)" }}>
+            <p className="text-xs uppercase tracking-widest text-[#B8860B]">Gulika Kaal</p>
             <p className="text-2xl font-bold text-white mt-1">{panchang.gulikaKaal.start} – {panchang.gulikaKaal.end}</p>
             <p className="text-xs text-white/40 mt-1">Inauspicious — avoid new starts</p>
           </div>
@@ -285,7 +285,7 @@ export default function PanchangPage() {
             </div>
             {/* Night */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              <p className="text-xs uppercase tracking-widest text-indigo-300 mb-3">Night · Sunset to Sunrise</p>
+              <p className="text-xs uppercase tracking-widest text-[#6B635B] mb-3">Night · Sunset to Sunrise</p>
               <div className="flex flex-col gap-1.5">
                 {panchang.chaughadiaNight.map((w, i) => {
                   const qColor = w.quality === "Auspicious" ? "#22c55e" : w.quality === "Mixed" ? "#94a3b8" : w.quality === "Caution" ? "#f59e0b" : "#ef4444";

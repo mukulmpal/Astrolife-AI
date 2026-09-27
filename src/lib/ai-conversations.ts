@@ -32,7 +32,7 @@ export async function listConversations(): Promise<SavedConversation[]> {
 
     if (error || !data) return [];
 
-    return data.map((item) => ({
+    return data.map((item: any) => ({
       id: String(item.id),
       agentId: String(item.agent_id ?? "general"),
       title: String(item.title ?? "AstroLife chat"),
@@ -112,7 +112,7 @@ export async function loadConversationMessages(conversationId: string): Promise<
 
     if (error || !data) return [];
 
-    return data.map((item) => ({
+    return data.map((item: any) => ({
       role: item.role === "assistant" || item.role === "system" ? item.role : "user",
       content: String(item.content),
       model: typeof item.model === "string" ? item.model : null,

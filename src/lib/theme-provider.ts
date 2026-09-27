@@ -5,13 +5,13 @@
  */
 
 export const DAY_THEMES = {
-  0: 'theme-ivory',
-  1: 'theme-ivory',
-  2: 'theme-ivory',
-  3: 'theme-ivory',
-  4: 'theme-ivory',
-  5: 'theme-ivory',
-  6: 'theme-ivory',
+  0: 'theme-saffron',   // Sunday - Surya (Sun)
+  1: 'theme-ivory',     // Monday - Chandra (Moon)
+  2: 'theme-maroon',    // Tuesday - Mangal (Mars)
+  3: 'theme-forest',    // Wednesday - Budha (Mercury)
+  4: 'theme-midnight',  // Thursday - Guru (Jupiter)
+  5: 'theme-ivory',     // Friday - Shukra (Venus)
+  6: 'theme-twilight',  // Saturday - Shani (Saturn)
 } as const;
 
 export const DAY_NAMES = {
@@ -25,19 +25,38 @@ export const DAY_NAMES = {
 } as const;
 
 export const GRAHA_INFO = {
-  'theme-saffron': { graha: 'Ivory Parchment', glyph: '✦', day: 'Permanent Warm Theme' },
-  'theme-ivory': { graha: 'Ivory Parchment', glyph: '✦', day: 'Permanent Warm Theme' },
-  'theme-maroon': { graha: 'Ivory Parchment', glyph: '✦', day: 'Permanent Warm Theme' },
-  'theme-forest': { graha: 'Ivory Parchment', glyph: '✦', day: 'Permanent Warm Theme' },
-  'theme-midnight': { graha: 'Ivory Parchment', glyph: '✦', day: 'Permanent Warm Theme' },
-  'theme-twilight': { graha: 'Ivory Parchment', glyph: '✦', day: 'Permanent Warm Theme' },
+  'theme-saffron': { graha: 'Sun', glyph: '☉', day: 'Sunday' },
+  'theme-ivory': { graha: 'Moon / Venus', glyph: '☽', day: 'Monday / Friday' },
+  'theme-maroon': { graha: 'Mars', glyph: '♂', day: 'Tuesday' },
+  'theme-forest': { graha: 'Mercury', glyph: '☿', day: 'Wednesday' },
+  'theme-midnight': { graha: 'Jupiter', glyph: '♃', day: 'Thursday' },
+  'theme-twilight': { graha: 'Saturn', glyph: '♄', day: 'Saturday' },
 } as const;
 
 /**
- * Permanently locked to Warm Cream Parchment (theme-ivory)
+ * Get current theme based on IST time
+ * IST = UTC+5:30
  */
 export function getCurrentTheme(): (typeof DAY_THEMES)[keyof typeof DAY_THEMES] {
-  return 'theme-ivory';
+  if (typeof window !== 'undefined') {
+    try {
+      const pinned = window.localStorage.getItem('astroTheme');
+      if (pinned) {
+        const full = pinned.startsWith('theme-') ? pinned : `theme-${pinned}`;
+        if (Object.values(DAY_THEMES).includes(full as any)) {
+          return full as (typeof DAY_THEMES)[keyof typeof DAY_THEMES];
+        }
+      }
+    } catch {}
+  }
+
+  const now = new Date();
+
+  // Convert to IST (UTC+5:30)
+  const istTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const day = istTime.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+  return DAY_THEMES[day as keyof typeof DAY_THEMES];
 }
 
 /**

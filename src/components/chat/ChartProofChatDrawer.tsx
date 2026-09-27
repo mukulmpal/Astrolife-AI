@@ -108,7 +108,7 @@ export function ChartProofChatDrawer({
       id: "welcome",
       role: "assistant",
       content: activeChart
-        ? `Namaste **${activeChart.name}**! Main aapka context-aware Vedic Assistant hoon. Aapke **${activeChart.lagnaRashi} Lagna** aur active **${activeChart.dashas.find((d) => d.active)?.planet ?? "Dasha"} Mahadasha** ke verified shastric math ke saath main aapke career, vivah, dhan aur timing ke har question ka uttar classical evidence ke saath dunga. Poochiye!`
+        ? `Namaste **${activeChart.name}**! Main aapka context-aware Vedic Assistant hoon. Aapke **${activeChart.lagnaRashi} Lagna** aur active **${activeChart.dashas.find((d: any) => d.active)?.planet ?? "Dasha"} Mahadasha** ke verified shastric math ke saath main aapke career, vivah, dhan aur timing ke har question ka uttar classical evidence ke saath dunga. Poochiye!`
         : `Namaste! Main AstroLife ka Classical Proof-Backed AI Assistant hoon. Apne janma kundli se juda koi bhi prashna poochein, har prediction ka shastric proof dekhein.`,
       agent: "AstroLife AI",
       emoji: "✦",
@@ -216,7 +216,7 @@ export function ChartProofChatDrawer({
       } ${className}`}
     >
       {/* Top Header */}
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#FFFFFF] bg-[#0d0a26]/90">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(184,134,11,0.22)] bg-[#FAF7F2]">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[rgba(200,160,48,0.12)] border border-[rgba(200,160,48,0.3)] flex items-center justify-center text-lg">
             {selectedAgent.emoji}
@@ -224,11 +224,11 @@ export function ChartProofChatDrawer({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm tracking-wide text-[#1A1A1A]">{selectedAgent.name}</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(34,197,94,0.15)] text-[#22c55e] border border-[rgba(34,197,94,0.3)] font-mono">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(34,197,94,0.15)] text-[#15803d] border border-[rgba(34,197,94,0.3)] font-mono">
                 Proof-Engine Active
               </span>
             </div>
-            <div className="text-[11px] text-[#8a80b0]">
+            <div className="text-[11px] text-[#6B635B]">
               {activeChart ? `Grounded in ${activeChart.name}'s Chart` : "Classical Vedic Engine"}
             </div>
           </div>
@@ -248,7 +248,7 @@ export function ChartProofChatDrawer({
       </div>
 
       {/* Agent Selector Bar */}
-      <div className="flex items-center gap-1.5 px-4 py-2 border-b border-[#FFFFFF] bg-[#FAF7F2] overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-1.5 px-4 py-2 border-b border-[rgba(184,134,11,0.22)] bg-[#FAF7F2] overflow-x-auto no-scrollbar">
         {AGENTS.map((agent) => (
           <button
             key={agent.id}
@@ -256,7 +256,7 @@ export function ChartProofChatDrawer({
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               selectedAgentId === agent.id
                 ? "bg-[rgba(200,160,48,0.18)] text-[#c8a030] border border-[rgba(200,160,48,0.35)] shadow-[0_0_12px_rgba(200,160,48,0.15)]"
-                : "bg-transparent text-[#6B635B] hover:text-[#4A4238] hover:bg-[#141032]"
+                : "bg-transparent text-[#6B635B] hover:text-[#1A1A1A] hover:bg-[#FAF5EB]"
             }`}
           >
             <span>{agent.emoji}</span>
@@ -266,7 +266,7 @@ export function ChartProofChatDrawer({
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm font-sans">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm font-sans bg-[#FAF7F2]">
         {messages.map((m) => (
           <div
             key={m.id}
@@ -275,13 +275,13 @@ export function ChartProofChatDrawer({
             <div
               className={`max-w-[88%] rounded-2xl px-4 py-3 leading-relaxed ${
                 m.role === "user"
-                  ? "bg-gradient-to-r from-[#2a1e60] to-[#1e1548] text-[#f5f0e6] border border-[#3c2a80]"
-                  : "bg-[#0f0c2a] text-[#ded6c4] border border-[#1e1948]"
+                  ? "bg-[#FAF5EB] text-[#1A1A1A] border border-[rgba(184,134,11,0.3)] shadow-sm"
+                  : "bg-[#FFFFFF] text-[#1A1A1A] border border-[rgba(184,134,11,0.2)] shadow-sm"
               }`}
             >
               {/* Agent Tag for Assistant */}
               {m.role === "assistant" && (
-                <div className="flex items-center justify-between gap-3 mb-2 pb-1.5 border-b border-[#FFFFFF] text-[11px] text-[#8a80b0]">
+                <div className="flex items-center justify-between gap-3 mb-2 pb-1.5 border-b border-[rgba(184,134,11,0.18)] text-[11px] text-[#6B635B]">
                   <span className="flex items-center gap-1 font-semibold text-[#c8a030]">
                     <span>{m.emoji || "✦"}</span> {m.agent || "AstroLife AI"}
                   </span>
@@ -301,7 +301,7 @@ export function ChartProofChatDrawer({
                 <div className="mt-3.5 pt-2.5 border-t border-[rgba(200,160,48,0.2)]">
                   <button
                     onClick={() => toggleProof(m.id)}
-                    className="flex items-center justify-between w-full text-left py-1 text-xs font-semibold text-[#c8a030] hover:text-[#ffd666] transition-colors"
+                    className="flex items-center justify-between w-full text-left py-1 text-xs font-semibold text-[#c8a030] hover:text-[#996f18] transition-colors"
                   >
                     <span className="flex items-center gap-1.5">
                       <span>📜</span>
@@ -313,8 +313,8 @@ export function ChartProofChatDrawer({
                   </button>
 
                   {expandedProofIds[m.id] && (
-                    <div className="mt-2 p-3 rounded-xl bg-[#070517] border border-[rgba(200,160,48,0.2)] text-[12px] text-[#4A4238] font-mono leading-relaxed space-y-2 whitespace-pre-line">
-                      <div className="text-[10px] uppercase tracking-wider text-[#a78bfa] font-bold">
+                    <div className="mt-2 p-3 rounded-xl bg-[#FAF5EB] border border-[rgba(200,160,48,0.22)] text-[12px] text-[#1A1A1A] font-mono leading-relaxed space-y-2 whitespace-pre-line">
+                      <div className="text-[10px] uppercase tracking-wider text-[#B8860B] font-bold">
                         ✦ Classical Sthiti & Rule Verification:
                       </div>
                       <div>{m.proofDrawer}</div>
@@ -323,14 +323,14 @@ export function ChartProofChatDrawer({
                 </div>
               )}
             </div>
-            <span className="text-[10px] text-[#554d77] mt-1 px-1">
+            <span className="text-[10px] text-[#6B635B] mt-1 px-1">
               {m.timestamp.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
         ))}
 
         {loading && (
-          <div className="flex items-center gap-2 text-xs text-[#c8a030] bg-[#0f0c2a] border border-[#1e1948] rounded-xl px-4 py-2.5 w-fit">
+          <div className="flex items-center gap-2 text-xs text-[#c8a030] bg-[#FFFFFF] border border-[rgba(184,134,11,0.22)] rounded-xl px-4 py-2.5 w-fit">
             <span className="animate-spin text-sm">🔯</span>
             <span>Parsing planetary degrees & calculating proof trail...</span>
           </div>
@@ -339,7 +339,7 @@ export function ChartProofChatDrawer({
       </div>
 
       {/* Suggestion Chips */}
-      <div className="px-4 py-2 bg-[#FAF7F2] border-t border-[#FFFFFF] flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <div className="px-4 py-2 bg-[#FAF7F2] border-t border-[rgba(184,134,11,0.18)] flex items-center gap-2 overflow-x-auto no-scrollbar">
         <span className="text-[10px] uppercase tracking-wider text-[#6B635B] whitespace-nowrap">
           Quick Prompts:
         </span>
@@ -348,7 +348,7 @@ export function ChartProofChatDrawer({
             key={idx}
             onClick={() => handleSend(s)}
             disabled={loading}
-            className="text-[11px] px-2.5 py-1 rounded-full bg-[#120e30] border border-[#221c50] text-[#a098c4] hover:text-[#c8a030] hover:border-[rgba(200,160,48,0.3)] transition-colors whitespace-nowrap disabled:opacity-50"
+            className="text-[11px] px-2.5 py-1 rounded-full bg-[#FFFFFF] border border-[rgba(184,134,11,0.22)] text-[#6B635B] hover:text-[#c8a030] hover:border-[rgba(200,160,48,0.4)] transition-colors whitespace-nowrap disabled:opacity-50"
           >
             ✦ {s}
           </button>
@@ -356,7 +356,7 @@ export function ChartProofChatDrawer({
       </div>
 
       {/* Input Form */}
-      <div className="p-3 border-t border-[#FFFFFF] bg-[#0d0a26]">
+      <div className="p-3 border-t border-[rgba(184,134,11,0.18)] bg-[#FAF7F2]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -370,17 +370,17 @@ export function ChartProofChatDrawer({
             onChange={(e) => setInput(e.target.value)}
             placeholder={`Ask ${selectedAgent.name} about your chart with classical proof...`}
             disabled={loading}
-            className="flex-1 bg-[#070518] border border-[#221c50] focus:border-[#c8a030] rounded-xl px-4 py-2.5 text-xs text-[#1A1A1A] placeholder-[#554d77] outline-none transition-colors"
+            className="flex-1 bg-[#FFFFFF] border border-[rgba(184,134,11,0.22)] focus:border-[#c8a030] rounded-xl px-4 py-2.5 text-xs text-[#1A1A1A] placeholder-[#6B635B] outline-none transition-colors"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#c8a030] to-[#996f18] text-[#FAF7F2] font-semibold text-xs transition-all hover:opacity-95 hover:shadow-[0_0_15px_rgba(200,160,48,0.3)] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#c8a030] to-[#996f18] text-[#FFFFFF] font-semibold text-xs transition-all hover:opacity-95 hover:shadow-[0_0_15px_rgba(200,160,48,0.3)] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Ask AI
           </button>
         </form>
-        <div className="text-[10px] text-center text-[#554d77] mt-1.5">
+        <div className="text-[10px] text-center text-[#6B635B] mt-1.5">
           Classical Parashara & KP Rule Engine · Zero Manufactured Odds · NASA Ephemeris Verified
         </div>
       </div>

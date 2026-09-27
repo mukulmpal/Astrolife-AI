@@ -302,33 +302,33 @@ export function evaluateDateMuhurat(
   let isPersonalized = false;
   if (natalMoonNakshatra) {
     try {
-      const tara = getNavtara(natalMoonNakshatra, nakName);
+      const tara = getNavtara(natalMoonNakshatra as any, nakName as any);
       isPersonalized = true;
 
-      if (tara.type === "good") {
+      if (tara.nature === "benefic" || (tara as any).type === "good") {
         score += 15;
         criteria.push({
           factor: "Navtara",
-          name: `${tara.name} Tara`,
+          name: `${tara.taraName} Tara`,
           status: "pass",
-          detail: `Personal lunar transit aligns as ${tara.name} (${tara.desc}). Peak personal harmony.`,
+          detail: `Personal lunar transit aligns as ${tara.taraName} (${tara.meaning}). Peak personal harmony.`,
           citation: "Personalized Jaimini Tara Bala Framework",
         });
-      } else if (tara.type === "bad") {
+      } else if (tara.nature === "malefic" || (tara as any).type === "bad") {
         score -= 20;
         criteria.push({
           factor: "Navtara",
-          name: `${tara.name} Tara`,
+          name: `${tara.taraName} Tara`,
           status: "fail",
-          detail: `Personal transit falls in ${tara.name} (${tara.desc}). Increased probability of obstacles.`,
+          detail: `Personal transit falls in ${tara.taraName} (${tara.meaning}). Increased probability of obstacles.`,
           citation: "Personalized Tara Bala Guard",
         });
       } else {
         criteria.push({
           factor: "Navtara",
-          name: `${tara.name} Tara`,
+          name: `${tara.taraName} Tara`,
           status: "caution",
-          detail: `Personal transit is ${tara.name}: balanced and routine energy.`,
+          detail: `Personal transit is ${tara.taraName}: balanced and routine energy.`,
           citation: "Personalized Navtara",
         });
       }

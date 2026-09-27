@@ -426,13 +426,13 @@ export function MarriageTimingAnalyzer() {
     if (!chart || !hasUserChart) return null;
 
     // Dasha
-    const mahadasha  = chart.dashas.find(d => d.active)?.planet ?? "Venus";
-    const antardasha = chart.antardasha.find(d => d.active)?.planet ?? "Saturn";
+    const mahadasha  = chart.dashas.find((d: any) => d.active)?.planet ?? "Venus";
+    const antardasha = chart.antardasha.find((d: any) => d.active)?.planet ?? "Saturn";
 
     // D1 natal
     const lagnaSign    = chart.lagnaRashi;
     const lagnaLord    = SIGN_LORDS[lagnaSign] ?? "Mars";
-    const h7Sign       = chart.houseCusps.find(h => h.house === 7)?.sign ?? "Libra";
+    const h7Sign       = chart.houseCusps.find((h: any) => h.house === 7)?.sign ?? "Libra";
     const d1SeventhLord= SIGN_LORDS[h7Sign] ?? "Venus";
 
     // D9 computed
@@ -479,17 +479,17 @@ export function MarriageTimingAnalyzer() {
     const natalMoonHouse = chart.planets.Moon?.house ?? 0;
 
     // D1 dasha-link helpers (P1)
-    const h2Sign  = chart.houseCusps.find(h => h.house === 2)?.sign  ?? "";
-    const h11Sign = chart.houseCusps.find(h => h.house === 11)?.sign ?? "";
+    const h2Sign  = chart.houseCusps.find((h: any) => h.house === 2)?.sign  ?? "";
+    const h11Sign = chart.houseCusps.find((h: any) => h.house === 11)?.sign ?? "";
     const d1SecondLord   = h2Sign  ? (SIGN_LORDS[h2Sign]  ?? "") : "";
     const d1EleventhLord = h11Sign ? (SIGN_LORDS[h11Sign] ?? "") : "";
     const planetsInSeventh = Object.entries(chart.planets)
-      .filter(([, p]) => p?.house === 7)
+      .filter(([, p]: [string, any]) => p?.house === 7)
       .map(([name]) => name);
 
     // Full natal placements (for P1 connection web)
     const natalPlanets: Record<string, { house: number; sign: string; nakshatraLord: string }> = {};
-    for (const [name, p] of Object.entries(chart.planets)) {
+    for (const [name, p] of Object.entries(chart.planets) as [string, any][]) {
       if (p) natalPlanets[name] = { house: p.house, sign: p.sign, nakshatraLord: p.nakshatraLord };
     }
 

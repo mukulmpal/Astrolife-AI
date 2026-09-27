@@ -162,7 +162,7 @@ export default function SouthIndianChart({
           fill="#d4af37"
           fontSize={size > 300 ? 10.5 : 9}
           letterSpacing="1px"
-          textTransform="uppercase"
+          style={{ textTransform: "uppercase" }}
         >
           {centerSubtitle}
         </text>

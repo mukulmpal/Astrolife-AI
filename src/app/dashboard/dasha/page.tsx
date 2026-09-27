@@ -176,6 +176,7 @@ export default function DashaPage() {
     if (!chart || !chart.dob || !chart.tob) return null;
     try {
       const kpResult = runKPEngine(chart);
+      if (!kpResult?.predictiveEvidence) return null;
       return buildCurrentDashaHierarchyEvidence(chart, kpResult.predictiveEvidence);
     } catch (err) {
       console.error("[DashaPage] Failed to build Dasha hierarchy evidence:", err);

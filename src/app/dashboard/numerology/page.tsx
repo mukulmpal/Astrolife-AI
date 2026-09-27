@@ -318,10 +318,10 @@ export default function NumerologyPage() {
         {(activePinnacle || activeChallenge) && (
           <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {activePinnacle && (
-              <div className="rounded-2xl p-4" style={{ background: "rgba(99,102,241,0.10)", border: "1px solid rgba(99,102,241,0.35)" }}>
-                <p className="text-xs uppercase tracking-widest text-indigo-300 mb-2">Active Pinnacle</p>
+              <div className="rounded-2xl p-4" style={{ background: "rgba(184,134,11,0.08)", border: "1px solid rgba(184,134,11,0.25)" }}>
+                <p className="text-xs uppercase tracking-widest text-[#B8860B] mb-2">Active Pinnacle</p>
                 <div className="flex items-center gap-3">
-                  <span className="text-4xl font-bold text-indigo-300" style={{ fontFamily: "Cormorant Garamond, serif" }}>{activePinnacle.number}</span>
+                  <span className="text-4xl font-bold text-[#B8860B]" style={{ fontFamily: "Cormorant Garamond, serif" }}>{activePinnacle.number}</span>
                   <div>
                     <p className="font-semibold text-white">{activePinnacle.theme}</p>
                     <p className="text-xs text-white/50 mt-0.5">Ages {activePinnacle.ageFrom}–{activePinnacle.ageTo ?? "∞"}</p>

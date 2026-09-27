@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useContext } from "react";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
+export type { ChartData };
 import { createClient } from "@/lib/supabase/client";
 import { ChartContext, useChartEngine } from "@/context/ChartContext";
 export { useChartEngine };
@@ -354,7 +355,7 @@ export async function saveAdditionalChart(chart: ChartData): Promise<SaveChartRe
       .eq("user_id", user.id);
 
     const duplicate = (existing ?? []).some(
-      (row) => chartBirthKey({
+      (row: any) => chartBirthKey({
         name: String(row.name),
         dob: String(row.dob),
         tob: String(row.tob),
@@ -463,7 +464,7 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
 
     if (error || !data) return [];
 
-    const primaryCharts = data.map((item) => ({
+    const primaryCharts = data.map((item: any) => ({
       id: String(item.id),
       name: String(item.name),
       dob: String(item.dob),
@@ -474,7 +475,7 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
       createdAt: String(item.created_at),
     }));
 
-    const existingKeys = new Set(primaryCharts.map((item) => chartBirthKey(item)));
+    const existingKeys = new Set(primaryCharts.map((item: any) => chartBirthKey(item)));
     const { data: legacyData } = await supabase
       .from("user_charts")
       .select("id,name,dob,tob,city,created_at,is_default")
@@ -482,7 +483,7 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
       .order("created_at", { ascending: false });
 
     const legacyCharts = (legacyData ?? [])
-      .map((item) => ({
+      .map((item: any) => ({
         id: `legacy:${String(item.id)}`,
         name: String(item.name),
         dob: String(item.dob),
@@ -492,7 +493,7 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
         isPrimary: Boolean(item.is_default),
         createdAt: String(item.created_at),
       }))
-      .filter((item) => !existingKeys.has(chartBirthKey(item)));
+      .filter((item: any) => !existingKeys.has(chartBirthKey(item)));
 
     const { data: savedData } = await supabase
       .from("saved_charts")
@@ -500,9 +501,9 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    const nextKeys = new Set([...existingKeys, ...legacyCharts.map((item) => chartBirthKey(item))]);
+    const nextKeys = new Set([...existingKeys, ...legacyCharts.map((item: any) => chartBirthKey(item))]);
     const savedCharts = (savedData ?? [])
-      .map((item) => ({
+      .map((item: any) => ({
         id: `saved:${String(item.id)}`,
         name: String(item.name),
         dob: String(item.birth_date),
@@ -512,7 +513,7 @@ export async function listSavedCharts(): Promise<SavedChartSummary[]> {
         isPrimary: false,
         createdAt: String(item.created_at),
       }))
-      .filter((item) => !nextKeys.has(chartBirthKey(item)));
+      .filter((item: any) => !nextKeys.has(chartBirthKey(item)));
 
     return [...primaryCharts, ...legacyCharts, ...savedCharts];
   } catch (error) {

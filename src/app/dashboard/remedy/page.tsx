@@ -69,7 +69,7 @@ export default function RemedyPage() {
       .filter(isPlanet)
       .slice(0, 3);
     const planetNakshatras = Object.fromEntries(
-      Object.entries(chart.planets)
+      (Object.entries(chart.planets) as [string, any][])
         .filter(([planet, data]) => isPlanet(planet) && typeof data?.nakshatra === "string")
         .map(([planet, data]) => [planet, data.nakshatra])
     );

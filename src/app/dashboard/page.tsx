@@ -358,8 +358,8 @@ function DashboardContent() {
   const dateStr  = time.toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" });
   const destiny = calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob, chart.lagnaNum ?? 0);
   const psychology = calculatePsychology(chart.planets as never);
-  const activeDasha = chart.dashas?.find((entry) => entry.active) || chart.dashas?.[0] || fallbackDasha;
-  const activeAntardasha = chart.antardasha?.find((entry) => entry.active) || chart.antardasha?.[0] || null;
+  const activeDasha = chart.dashas?.find((entry: any) => entry.active) || chart.dashas?.[0] || fallbackDasha;
+  const activeAntardasha = chart.antardasha?.find((entry: any) => entry.active) || chart.antardasha?.[0] || null;
   const strongestArea = [...(destiny.areas ?? [])].sort((a, b) => b.score - a.score)[0] || fallbackArea;
   const weakestArea = [...(destiny.areas ?? [])].sort((a, b) => a.score - b.score)[0] || fallbackArea;
   const plan = profile?.subscription_tier && profile.subscription_tier !== "free"

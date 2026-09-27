@@ -137,24 +137,24 @@ export default function CityAutocomplete({
       )}
 
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-2 max-h-72 w-full overflow-auto rounded-2xl border border-white/10 bg-[#100b25] p-2 shadow-2xl">
+        <div className="absolute z-50 mt-2 max-h-72 w-full overflow-auto rounded-2xl border border-[rgba(184,134,11,0.22)] bg-[#FFFFFF] p-2 shadow-2xl">
           {results.map((city) => (
             <button
               key={city.geonameId}
               type="button"
               onClick={() => selectCity(city)}
-              className="block w-full rounded-xl px-3 py-3 text-left hover:bg-white/10"
+              className="block w-full rounded-xl px-3 py-3 text-left hover:bg-[#FAF5EB] transition-colors"
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-semibold text-white">
+                <span className="text-sm font-semibold text-[#1A1A1A]">
                   {city.displayName}
                 </span>
-                <span className="rounded-full bg-amber-300/10 px-2 py-1 text-xs text-amber-200">
+                <span className="rounded-full bg-[rgba(200,160,48,0.12)] px-2 py-1 text-xs text-[#B8860B] border border-[rgba(200,160,48,0.22)]">
                   {city.countryCode}
                 </span>
               </div>
 
-              <div className="mt-1 text-xs text-white/45">
+              <div className="mt-1 text-xs text-[#6B635B]">
                 {city.latitude.toFixed(4)}, {city.longitude.toFixed(4)}
                 {city.timezone ? ` · ${city.timezone}` : ""}
               </div>

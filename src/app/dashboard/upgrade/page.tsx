@@ -232,8 +232,8 @@ export default function UpgradePage() {
         .btn-gold{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2}
         .btn-gold:hover:not(:disabled){box-shadow:0 10px 28px rgba(200,160,48,0.4);transform:translateY(-2px);filter:brightness(1.08)}
         .btn-outline{background:transparent;border:1px solid #FFFFFF !important;color:#6B635B;cursor:default}
-        .btn-purple{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff}
-        .btn-purple:hover:not(:disabled){box-shadow:0 10px 28px rgba(168,85,247,0.3);transform:translateY(-2px)}
+        .btn-purple{background:linear-gradient(135deg,#B8860B,#8C6508);color:#fff}
+        .btn-purple:hover:not(:disabled){box-shadow:0 10px 28px rgba(184,134,11,0.3);transform:translateY(-2px)}
         .plan-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none !important}
 
         /* FEATURES COMPARISON */

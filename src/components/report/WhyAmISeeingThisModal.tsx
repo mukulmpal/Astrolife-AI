@@ -75,11 +75,11 @@ export function WhyAmISeeingThisModal({
             </div>
 
             {/* Layer 2: Dasha Timing */}
-            <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-lg flex items-start gap-3">
-              <Clock className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+            <div className="p-3 bg-[#FAF5EB] border border-[rgba(184,134,11,0.22)] rounded-lg flex items-start gap-3">
+              <Clock className="w-4 h-4 text-[#B8860B] flex-shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-slate-300 block mb-0.5">Dasha Period Window</span>
-                <p className="text-slate-400">{model.causalChain.dashaContext}</p>
+                <span className="font-semibold text-[#1A1A1A] block mb-0.5">Dasha Period Window</span>
+                <p className="text-[#6B635B]">{model.causalChain.dashaContext}</p>
               </div>
             </div>
 

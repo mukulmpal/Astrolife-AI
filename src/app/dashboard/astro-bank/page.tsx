@@ -114,7 +114,7 @@ export default function AstroBankPage() {
   // Unique countries with count
   const countryList = useMemo(() => {
     const map = new Map<string, number>();
-    (astroBank as AstroBankEntry[]).forEach((p) => {
+    ((astroBank as unknown) as AstroBankEntry[]).forEach((p) => {
       const c = (p as any).country;
       if (c) map.set(c, (map.get(c) || 0) + 1);
     });
@@ -127,7 +127,7 @@ export default function AstroBankPage() {
   const categoryList = useMemo(() => {
     if (!country) return [];
     const map = new Map<string, number>();
-    (astroBank as AstroBankEntry[]).forEach((p) => {
+    ((astroBank as unknown) as AstroBankEntry[]).forEach((p) => {
       if ((p as any).country === country) {
         map.set(p.category, (map.get(p.category) || 0) + 1);
       }
@@ -140,7 +140,7 @@ export default function AstroBankPage() {
   // Filtered personalities (only when both country & category selected)
   const filtered = useMemo(() => {
     if (!country || !category) return [];
-    return (astroBank as AstroBankEntry[]).filter((p) => {
+    return ((astroBank as unknown) as AstroBankEntry[]).filter((p) => {
       const matchesCountry = (p as any).country === country;
       const matchesCategory = p.category === category;
       const matchesSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
