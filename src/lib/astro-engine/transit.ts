@@ -714,8 +714,8 @@ export function runTransitEngine(
   const curPos = computePlanets(jdNow);
   const retro  = computeRetro(jdNow);
   const retroMap = retro as Partial<Record<PlanetName, boolean>>;
-
-  const baseRashi = base === 'lagna' ? natal.lagR : Math.floor(natal.planets.Moon.lon / 30);
+  const moonLon = natal.planets.Moon?.lon ?? ((natal.planets.Moon?.rashi ?? 0) * 30);
+  const baseRashi = base === 'lagna' ? natal.lagR : Math.floor(moonLon / 30);
 
   const planetResults: TransitPlanetResult[] = PLANETS.map(planet => {
     const tLon  = curPos[planet] ?? 0;
@@ -755,7 +755,7 @@ export function runTransitEngine(
     };
   });
 
-  const sadeSati = analyzeSadeSati(curPos.Saturn, natal.planets.Moon.lon, natal.lagR);
+  const sadeSati = analyzeSadeSati(curPos.Saturn, moonLon, natal.lagR);
   const zoneAlerts = buildZoneAlerts(curPos, natal);
   const upcomingIngresses = computeUpcomingIngresses(jdNow, tz, natal.lagR);
   const degreeConjunctions = computeDegreeConjunctions(jdNow, natal);

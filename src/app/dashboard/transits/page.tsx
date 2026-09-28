@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { calculateTransitReport, TransitBase } from "@/lib/astro-engine/transits";
-import { normalizeChartForTransit } from "@/lib/astro-engine/chart-normalize";
+import { normalizeChartForTransit, toRashi } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
 import { EngineStateCard } from "@/components/engine-state-card";
@@ -82,12 +82,20 @@ export default function TransitPage() {
     if (!userChart || !report) return null;
     const lagnaNum =
       base === "lagna"
-        ? userChart.lagnaNum
-        : Math.floor(((userChart.planets.Moon?.lon ?? 0) % 360) / 30) % 12;
+        ? (typeof userChart.lagnaNum === "number" ? userChart.lagnaNum : toRashi(userChart.lagnaRashi))
+        : (userChart.planets?.Moon?.signNum ?? Math.floor(((userChart.planets?.Moon?.lon ?? 0) % 360) / 30) % 12);
 
-    const planets: Record<string, { house: number; retrograde: boolean }> = {};
+    const planets: Record<
+      string,
+      { house: number; retrograde: boolean; signNum: number; rashi: number }
+    > = {};
     for (const p of report.planets) {
-      planets[p.planet] = { house: p.houseFromBase, retrograde: p.retrograde };
+      planets[p.planet] = {
+        house: p.houseFromBase,
+        signNum: p.rashi,
+        rashi: p.rashi,
+        retrograde: p.retrograde,
+      };
     }
     return { lagnaNum, planets };
   }, [userChart, report, base]);
