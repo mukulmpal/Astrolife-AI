@@ -566,10 +566,10 @@ function DashboardContent() {
         .upgrade-btn{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;white-space:nowrap;text-decoration:none}
         .upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,160,48,0.3)}
         .db-health{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.18);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
-        .db-health-title{font-size:13px;color:#fdba74;font-weight:600;margin-bottom:4px}
+        .db-health-title{font-size:13px;color:#C2410C;font-weight:700;margin-bottom:4px}
         .db-health-text{font-size:12px;color:#4A4238;line-height:1.7}
         .db-health-tags{display:flex;gap:6px;flex-wrap:wrap}
-        .db-health-tag{font-size:10px;color:#fdba74;border:1px solid rgba(249,115,22,0.25);background:rgba(249,115,22,0.08);border-radius:999px;padding:3px 8px}
+        .db-health-tag{font-size:10px;color:#C2410C;font-weight:600;border:1px solid rgba(194,65,12,0.25);background:rgba(194,65,12,0.08);border-radius:999px;padding:3px 8px}
         .mobile-nav{display:none}
 
         @media(max-width:1024px){

@@ -171,14 +171,15 @@ export default function AdminPage() {
             zIndex: 9999,
             padding: "12px 20px",
             borderRadius: 12,
-            background: toast.type === "success" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
-            border: `1px solid ${toast.type === "success" ? "#22c55e" : "#ef4444"}`,
-            color: toast.type === "success" ? "#86efac" : "#fca5a5",
+            background: toast.type === "success" ? "rgba(21,128,61,0.08)" : "rgba(220,38,38,0.08)",
+            border: `1px solid ${toast.type === "success" ? "rgba(21,128,61,0.3)" : "rgba(220,38,38,0.3)"}`,
+            color: toast.type === "success" ? "#15803D" : "#DC2626",
             fontSize: 13,
+            fontWeight: 600,
             display: "flex",
             alignItems: "center",
             gap: 8,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
           }}
         >
           <CheckCircle2 size={16} /> {toast.message}
@@ -187,21 +188,21 @@ export default function AdminPage() {
 
       {/* STATS */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 28 }}>
-        <div style={{ background: "#FFFFFF", border: "1px solid #FFFFFF", borderRadius: 16, padding: "20px 24px" }}>
-          <div style={{ fontSize: 11, color: "#6B635B", textTransform: "uppercase", letterSpacing: 1.5 }}>Total Registered</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.22)", borderRadius: 16, padding: "20px 24px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: 11, color: "#6B635B", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 600 }}>Total Registered</div>
           <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>{stats.total}</div>
         </div>
-        <div style={{ background: "#FFFFFF", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: "20px 24px" }}>
-          <div style={{ fontSize: 11, color: "#c084fc", textTransform: "uppercase", letterSpacing: 1.5 }}>Elite VIP Members</div>
-          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#c084fc", marginTop: 4 }}>{stats.elite}</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid rgba(124, 58, 237, 0.25)", borderRadius: 16, padding: "20px 24px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: 11, color: "#7C3AED", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 600 }}>Elite VIP Members</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#7C3AED", marginTop: 4 }}>{stats.elite}</div>
         </div>
-        <div style={{ background: "#FFFFFF", border: "1px solid rgba(200,160,48,0.25)", borderRadius: 16, padding: "20px 24px" }}>
-          <div style={{ fontSize: 11, color: "#c8a030", textTransform: "uppercase", letterSpacing: 1.5 }}>Premium Users</div>
-          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#c8a030", marginTop: 4 }}>{stats.premium}</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.25)", borderRadius: 16, padding: "20px 24px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: 11, color: "#8A6008", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 600 }}>Premium Users</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#8A6008", marginTop: 4 }}>{stats.premium}</div>
         </div>
-        <div style={{ background: "#FFFFFF", border: "1px solid #FFFFFF", borderRadius: 16, padding: "20px 24px" }}>
-          <div style={{ fontSize: 11, color: "#6B635B", textTransform: "uppercase", letterSpacing: 1.5 }}>Free Tier</div>
-          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#8078a8", marginTop: 4 }}>{stats.free}</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.22)", borderRadius: 16, padding: "20px 24px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+          <div style={{ fontSize: 11, color: "#6B635B", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 600 }}>Free Tier</div>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 32, fontWeight: 700, color: "#4A4238", marginTop: 4 }}>{stats.free}</div>
         </div>
       </div>
 
@@ -216,7 +217,7 @@ export default function AdminPage() {
           style={{
             width: "100%",
             background: "#FAF7F2",
-            border: "1px solid #FFFFFF",
+            border: "1px solid rgba(184, 134, 11, 0.22)",
             borderRadius: 12,
             padding: "12px 16px 12px 44px",
             color: "#1A1A1A",
@@ -227,10 +228,10 @@ export default function AdminPage() {
       </div>
 
       {/* TABLE */}
-      <div style={{ background: "#FFFFFF", border: "1px solid #FFFFFF", borderRadius: 16, overflowX: "auto" }}>
+      <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.22)", borderRadius: 16, overflowX: "auto", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid #FFFFFF", background: "rgba(10,7,32,0.6)", color: "#6B635B", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.2 }}>
+            <tr style={{ borderBottom: "1px solid rgba(184, 134, 11, 0.18)", background: "#FAF7F2", color: "#6B635B", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }}>
               <th style={{ padding: "16px 20px" }}>Seeker</th>
               <th style={{ padding: "16px 20px" }}>Current Tier</th>
               <th style={{ padding: "16px 20px" }}>Expiration</th>
@@ -256,7 +257,7 @@ export default function AdminPage() {
                 const isUpdating = updatingId === u.id;
                 const tier = u.subscription_tier.toLowerCase();
                 return (
-                  <tr key={u.id} style={{ borderBottom: "1px solid #161234", transition: "background 0.2s" }}>
+                  <tr key={u.id} style={{ borderBottom: "1px solid rgba(184, 134, 11, 0.12)", transition: "background 0.2s" }}>
                     <td style={{ padding: "16px 20px" }}>
                       <div style={{ fontWeight: 600, color: "#1A1A1A" }}>{u.name}</div>
                       <div style={{ fontSize: 12, color: "#6B635B", marginTop: 2 }}>{u.email}</div>
@@ -276,22 +277,22 @@ export default function AdminPage() {
                           textTransform: "uppercase",
                           background:
                             tier === "elite"
-                              ? "rgba(168,85,247,0.15)"
+                              ? "rgba(124,58,237,0.12)"
                               : tier === "premium"
-                              ? "rgba(200,160,48,0.15)"
-                              : "rgba(100,100,130,0.15)",
+                              ? "rgba(184,134,11,0.12)"
+                              : "rgba(107,99,91,0.12)",
                           color:
                             tier === "elite"
-                              ? "#c084fc"
+                              ? "#7C3AED"
                               : tier === "premium"
-                              ? "#c8a030"
-                              : "#8078a8",
+                              ? "#8A6008"
+                              : "#4A4238",
                           border: `1px solid ${
                             tier === "elite"
-                              ? "rgba(168,85,247,0.3)"
+                              ? "rgba(124,58,237,0.3)"
                               : tier === "premium"
-                              ? "rgba(200,160,48,0.3)"
-                              : "rgba(100,100,130,0.2)"
+                              ? "rgba(184,134,11,0.3)"
+                              : "rgba(107,99,91,0.25)"
                           }`,
                         }}
                       >
@@ -300,7 +301,7 @@ export default function AdminPage() {
                       </span>
                     </td>
 
-                    <td style={{ padding: "16px 20px", color: "#8078a8", fontSize: 12 }}>
+                    <td style={{ padding: "16px 20px", color: "#4A4238", fontSize: 12 }}>
                       {u.subscription_expires_at
                         ? new Date(u.subscription_expires_at).toLocaleDateString("en-IN", {
                             year: "numeric",
@@ -327,10 +328,10 @@ export default function AdminPage() {
                             padding: "6px 10px",
                             borderRadius: 8,
                             fontSize: 11,
-                            fontWeight: 500,
+                            fontWeight: 600,
                             background: "#FAF7F2",
-                            border: "1px solid #221c48",
-                            color: tier === "free" ? "#443c68" : "#8078a8",
+                            border: "1px solid rgba(184, 134, 11, 0.25)",
+                            color: tier === "free" ? "#A8A29E" : "#4A4238",
                             cursor: tier === "free" || isUpdating ? "default" : "pointer",
                           }}
                         >
@@ -344,9 +345,9 @@ export default function AdminPage() {
                             borderRadius: 8,
                             fontSize: 11,
                             fontWeight: 600,
-                            background: tier === "premium" ? "rgba(200,160,48,0.1)" : "#FAF7F2",
-                            border: "1px solid rgba(200,160,48,0.3)",
-                            color: "#c8a030",
+                            background: tier === "premium" ? "rgba(184,134,11,0.14)" : "#FAF7F2",
+                            border: "1px solid rgba(184,134,11,0.35)",
+                            color: "#8A6008",
                             cursor: tier === "premium" || isUpdating ? "default" : "pointer",
                           }}
                         >

@@ -295,12 +295,12 @@ function PartnerFullChartForm({
         </div>
       </div>
       {error && (
-        <div style={{ marginTop: 12, color: "#fca5a5", fontSize: 12, lineHeight: 1.7 }}>
+        <div style={{ marginTop: 12, color: "#DC2626", fontSize: 12, lineHeight: 1.7, fontWeight: 500 }}>
           {error}
         </div>
       )}
       {partnerChart && (
-        <div style={{ marginTop: 12, color: "#86efac", fontSize: 12, lineHeight: 1.7 }}>
+        <div style={{ marginTop: 12, color: "#15803D", fontSize: 12, lineHeight: 1.7, fontWeight: 500 }}>
           Partner chart generated: {partnerChart.lagnaRashi} Lagna, {partnerChart.planets.Moon?.sign} Moon.
         </div>
       )}

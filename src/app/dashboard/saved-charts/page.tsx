@@ -129,17 +129,17 @@ export default function SavedChartsPage() {
         </button>
       </div>
 
-      {message && <div className="summary-strip" style={{ marginBottom: 12, color: "#86efac" }}>{message}</div>}
-      {error && <div className="summary-strip" style={{ marginBottom: 12, color: "#fca5a5", borderColor: "rgba(239,68,68,.35)" }}>{error}</div>}
+      {message && <div className="summary-strip" style={{ marginBottom: 12, color: "#15803D", borderColor: "rgba(21,128,61,0.25)" }}>{message}</div>}
+      {error && <div className="summary-strip" style={{ marginBottom: 12, color: "#DC2626", borderColor: "rgba(220,38,38,0.25)" }}>{error}</div>}
 
       {loading ? (
         <div className="header-card">
-          <p style={{ color: "#b8b0d8" }}>Loading saved charts...</p>
+          <p style={{ color: "#6B635B" }}>Loading saved charts...</p>
         </div>
       ) : charts.length === 0 ? (
         <div className="header-card">
           <h2 className="serif" style={{ marginBottom: 8 }}>No saved charts yet</h2>
-          <p style={{ color: "#b8b0d8", lineHeight: 1.7 }}>
+          <p style={{ color: "#6B635B", lineHeight: 1.7 }}>
             Generate a Kundli, then press Save Chart. Your saved charts will appear here.
           </p>
         </div>
@@ -150,16 +150,17 @@ export default function SavedChartsPage() {
               key={chart.id}
               style={{
                 background: "#FFFFFF",
-                border: "1px solid #FFFFFF",
+                border: "1px solid rgba(184, 134, 11, 0.22)",
                 borderRadius: 14,
                 padding: 18,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
               }}
             >
-              <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#6B635B", marginBottom: 6 }}>
+              <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#6B635B", marginBottom: 6, fontWeight: 600 }}>
                 {chart.gender || "Birth Chart"}
               </div>
               <h2 className="serif" style={{ fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>{chart.name}</h2>
-              <div style={{ color: "#b8b0d8", fontSize: 13, lineHeight: 1.8, marginBottom: 14 }}>
+              <div style={{ color: "#4A4238", fontSize: 13, lineHeight: 1.8, marginBottom: 14 }}>
                 DOB: {chart.birth_date}<br />
                 TOB: {chart.birth_time.slice(0, 5)}<br />
                 Place: {chart.birth_place}<br />
@@ -173,7 +174,7 @@ export default function SavedChartsPage() {
                   type="button"
                   disabled={workingId === chart.id}
                   onClick={() => handleUseChart(chart.id)}
-                  style={{ background: "#c8a030", color: "#FAF7F2", border: 0, borderRadius: 8, padding: "9px 12px", fontWeight: 700, cursor: "pointer" }}
+                  style={{ background: "#B8860B", color: "#FFFFFF", border: 0, borderRadius: 8, padding: "9px 12px", fontWeight: 700, cursor: "pointer" }}
                 >
                   {workingId === chart.id ? "Opening..." : "Open / Use Chart"}
                 </button>
@@ -181,7 +182,7 @@ export default function SavedChartsPage() {
                   type="button"
                   disabled={workingId === chart.id}
                   onClick={() => handleDelete(chart.id)}
-                  style={{ background: "rgba(239,68,68,.1)", color: "#fca5a5", border: "1px solid rgba(239,68,68,.25)", borderRadius: 8, padding: "9px 12px", fontWeight: 700, cursor: "pointer" }}
+                  style={{ background: "rgba(220,38,38,0.06)", color: "#DC2626", border: "1px solid rgba(220,38,38,0.22)", borderRadius: 8, padding: "9px 12px", fontWeight: 700, cursor: "pointer" }}
                 >
                   Delete
                 </button>
