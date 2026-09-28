@@ -72,6 +72,7 @@ export default function KundliPage() {
   const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("overview");
   const [showForm, setShowForm] = useState(true);
+  const [showLibrary, setShowLibrary] = useState(false);
   const [yogaSearch, setYogaSearch] = useState("");
   const [yogaFilter, setYogaFilter] = useState<"all" | "benefic" | "dosha" | "rare">("all");
   const [userTier, setUserTier] = useState<PlanTier>(() => isFullAccessEnabled() ? "elite" : "free");
@@ -413,17 +414,25 @@ export default function KundliPage() {
           Moshier / NASA Ephemeris · Lahiri Chitrapaksha · 120 Yogas · Classical Shastric Proofs
         </p>
 
-        {/* ACTIVE KUNDLI ACTIONS */}
+        {/* SAVED CHARTS LIBRARY DRAWER */}
         <div className="card" style={{ marginBottom: 24 }}>
-          <div className="library-top" style={{ marginBottom: 0 }}>
+          <div className="library-top" style={{ marginBottom: showLibrary ? 14 : 0 }}>
             <div>
-              <div className="card-tag">✦ Active Kundli</div>
-              <div className="card-title serif" style={{ marginBottom: 0 }}>
-                {chart?.name ? `${chart.name}'s Chart` : "Kundli Profile"}
-              </div>
+              <div className="card-tag">✦ Saved Charts & Database</div>
+              <div className="card-title serif" style={{ marginBottom: 0 }}>Chart Library</div>
               <div className="library-sub">{saveStatus}</div>
             </div>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+              <button
+                className="btn-save"
+                onClick={() => setShowLibrary(!showLibrary)}
+                style={{
+                  borderColor: showLibrary ? "rgba(200,160,48,0.4)" : "rgba(200,160,48,0.2)",
+                  background: showLibrary ? "rgba(200,160,48,0.1)" : "transparent",
+                }}
+              >
+                {showLibrary ? "▲ Hide Saved Charts" : `▼ Saved Charts (${savedCharts.length})`}
+              </button>
               <button
                 className="btn-save"
                 onClick={() => setShowForm(!showForm)}
@@ -439,6 +448,43 @@ export default function KundliPage() {
               </button>
             </div>
           </div>
+
+          {showLibrary && (
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(184, 134, 11, 0.2)" }}>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginBottom: 12 }}>
+                📁 My Saved Charts ({savedCharts.length})
+              </div>
+              {savedCharts.length > 0 ? (
+                <div className="library-list">
+                  {savedCharts.map((saved) => (
+                    <button
+                      key={saved.id}
+                      className={`library-card ${saved.isPrimary ? "primary" : ""}`}
+                      onClick={() => handleSelectSavedChart(saved.id)}
+                      disabled={libraryLoading}
+                    >
+                      <div className="library-name">{saved.name}</div>
+                      <div className="library-meta">
+                        {new Date(saved.dob).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}{" "}
+                        · {saved.tob}
+                        <br />
+                        {saved.city}
+                      </div>
+                      {saved.isPrimary && <span className="library-pill">Primary</span>}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="library-sub">
+                  No saved charts found yet. Generate a chart to save it to your account!
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* INPUT FORM */}
