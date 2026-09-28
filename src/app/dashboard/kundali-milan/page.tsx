@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import "@/app/dashboard/shared.css";
 import { PremiumFeature } from "@/components/premium-feature";
@@ -49,6 +49,33 @@ function ianaToUtcOffset(timezone: string | null, dob: string, tob: string): num
   } catch {
     return 5.5;
   }
+}
+
+function getMoonNakshatraIndex(nakName?: string, lon?: number): number {
+  if (typeof lon === "number" && !isNaN(lon)) {
+    const idx = Math.floor((((lon % 360) + 360) % 360) / (360 / 27));
+    if (idx >= 0 && idx < 27) return idx;
+  }
+  if (!nakName) return 0;
+  const clean = nakName.toLowerCase().replace(/pada/g, "").trim();
+  const found = NAKSHATRAS_27.findIndex((n) => {
+    const nl = n.toLowerCase();
+    return nl === clean || nl.startsWith(clean) || clean.startsWith(nl);
+  });
+  return found >= 0 ? found : 0;
+}
+
+function getMoonRashiIndex(signNum?: number, signName?: string): number {
+  if (typeof signNum === "number" && signNum >= 0 && signNum < 12) {
+    return signNum;
+  }
+  if (!signName) return 0;
+  const sLower = signName.toLowerCase();
+  const english = ["aries","taurus","gemini","cancer","leo","virgo","libra","scorpio","sagittarius","capricorn","aquarius","pisces"];
+  const engIdx = english.indexOf(sLower);
+  if (engIdx >= 0) return engIdx;
+  const rashiIdx = RASHIS_12.findIndex((r) => r.toLowerCase() === sLower);
+  return rashiIdx >= 0 ? rashiIdx : 0;
 }
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -209,7 +236,7 @@ function PartnerFullChartForm({
     <div className="card" style={{ marginBottom: 16, borderColor: partnerChart ? "rgba(34,197,94,.28)" : "rgba(200,160,48,.18)" }}>
       <div className="card-tag">Partner Full Chart</div>
       <div className="card-title serif">Activate True Couple Mars Balance</div>
-      <div style={{ fontSize: 12, color: "#a79fbd", lineHeight: 1.8, marginBottom: 14 }}>
+      <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.8, marginBottom: 14 }}>
         Ashtakoot needs only Nakshatra and Rashi. Mangal Dosha comparison needs the partner&apos;s full DOB, time and city.
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 12 }}>
@@ -234,7 +261,6 @@ function PartnerFullChartForm({
               dob: event.target.value,
               tz: selectedCity ? ianaToUtcOffset(selectedCity.timezone, event.target.value, form.tob) : form.tz,
             })}
-            style={{ colorScheme: "dark" }}
           />
         </div>
         <div>
@@ -248,7 +274,6 @@ function PartnerFullChartForm({
               tob: event.target.value,
               tz: selectedCity ? ianaToUtcOffset(selectedCity.timezone, form.dob, event.target.value) : form.tz,
             })}
-            style={{ colorScheme: "dark" }}
           />
         </div>
         <div>
@@ -323,11 +348,11 @@ function ScoreBar({ label, value, color }: { label: string; value: number | null
   const score = value ?? 0;
   return (
     <div style={{ display: "grid", gap: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 11, color: "#a79fbd" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 11, color: "#6B635B" }}>
         <span>{label}</span>
         <strong style={{ color }}>{value === null ? "N/A" : `${score}/100`}</strong>
       </div>
-      <div style={{ height: 7, borderRadius: 999, background: "#E8E2D8", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)" }}>
+      <div style={{ height: 7, borderRadius: 999, background: "rgba(184,134,11,0.12)", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)" }}>
         <div style={{ width: `${Math.max(0, Math.min(100, score))}%`, height: "100%", background: color, borderRadius: 999 }} />
       </div>
     </div>
@@ -550,7 +575,7 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
                   {item.effect === "decrease" ? "-" : "+"}{Math.abs(item.points)}
                 </span>
               </div>
-              <div style={{ fontSize: 12, color: "#a79fbd", lineHeight: 1.7 }}>{item.explanation}</div>
+              <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.7 }}>{item.explanation}</div>
             </div>
           ))}
         </div>
@@ -569,12 +594,12 @@ function MangalDoshaPanel({ insight, compatibility }: { insight: MangalDoshaInsi
         <div className="card-tag">Remedy Matrix</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 10, marginTop: 12 }}>
           {result.remedies.map((remedy) => (
-            <div key={`${remedy.category}-${remedy.title}`} style={{ border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: 12, background: "rgba(255,255,255,.025)" }}>
+            <div key={`${remedy.category}-${remedy.title}`} style={{ border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12, padding: 12, background: "#FAF7F2" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
                 <strong style={{ color: "#1A1A1A", fontSize: 12 }}>{remedy.title}</strong>
                 <span style={{ color: remedy.priority === "primary" ? "#22c55e" : "#c8a030", fontSize: 10, textTransform: "uppercase" }}>{remedy.priority}</span>
               </div>
-              <div style={{ fontSize: 11, color: "#a79fbd", lineHeight: 1.65 }}>{remedy.instruction}</div>
+              <div style={{ fontSize: 11, color: "#6B635B", lineHeight: 1.65 }}>{remedy.instruction}</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
                 {[remedy.category, remedy.costBand, remedy.effortLevel, remedy.requiresExpert ? "expert" : "self"].filter(Boolean).map((tag) => (
                   <span key={String(tag)} style={{ fontSize: 10, color: "#c8a030", border: "1px solid rgba(200,160,48,.2)", borderRadius: 999, padding: "3px 7px" }}>{String(tag).replaceAll("_", " ")}</span>
@@ -1117,7 +1142,7 @@ function RelationshipStoryPanel({
         <div className="card-tag">Year-Based Relationship Timeline</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
           {timeline.map((item) => (
-            <div key={`${item.stage}-${item.title}`} style={{ border: "1px solid var(--engine-border)", borderRadius: 12, padding: 12, background: "rgba(255,255,255,.02)" }}>
+            <div key={`${item.stage}-${item.title}`} style={{ border: "1px solid var(--engine-border)", borderRadius: 12, padding: 12, background: "#FAF7F2" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", marginBottom: 8 }}>
                 <div>
                   <strong style={{ color: "var(--engine-fg)", fontSize: 13 }}>{item.stage}</strong>
@@ -1125,7 +1150,7 @@ function RelationshipStoryPanel({
                 </div>
                 <span style={{ color: item.value >= 75 ? "var(--engine-green)" : item.value >= 58 ? "var(--engine-gold-strong)" : "#c2410c", fontSize: 12, fontWeight: 800 }}>{labelForScore(item.value)}</span>
               </div>
-              <div style={{ height: 8, borderRadius: 999, background: "#E8E2D8", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)", marginBottom: 8 }}>
+              <div style={{ height: 8, borderRadius: 999, background: "rgba(184,134,11,0.12)", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)", marginBottom: 8 }}>
                 <div style={{ width: `${item.value}%`, height: "100%", background: item.value >= 75 ? "var(--engine-green)" : item.value >= 58 ? "var(--engine-gold-strong)" : "#c2410c" }} />
               </div>
               <div style={{ fontSize: 11, color: "var(--engine-muted)", lineHeight: 1.55 }}>{item.note}</div>
@@ -1182,15 +1207,44 @@ export default function KundaliMilanPage() {
   const { t, lang } = useLanguage();
 
   // Ashtakoot inputs
-  const [p1, setP1] = useState<PersonInput>({ name: "", nakIdx: 0, rashiIdx: 0 });
+  const [p1, setP1] = useState<PersonInput>(() => {
+    if (chart?.planets?.Moon) {
+      const m = chart.planets.Moon;
+      return {
+        name: chart.name || "Self",
+        nakIdx: getMoonNakshatraIndex(m.nakshatra, m.lon),
+        rashiIdx: getMoonRashiIndex(m.signNum, m.sign),
+      };
+    }
+    return { name: "", nakIdx: 0, rashiIdx: 0 };
+  });
   const [p2, setP2] = useState<PersonInput>({ name: "", nakIdx: 0, rashiIdx: 0 });
   const [partnerBirth, setPartnerBirth] = useState<PartnerBirthForm>({ name: "", dob: "", tob: "", city: "", lat: null, lon: null, tz: null });
   const [partnerCity, setPartnerCity] = useState<CitySearchResult | null>(null);
   const [partnerChart, setPartnerChart] = useState<ChartData | null>(null);
   const [partnerError, setPartnerError] = useState("");
   const [milanResult, setMilanResult] = useState<MilanResult | null>(null);
-  const [activeTab, setActiveTab] = useState<TabKey>("marriage");
-  const [mode, setMode] = useState<PageMode>("profile");
+  const [activeTab, setActiveTab] = useState<TabKey>("koots");
+  const [mode, setMode] = useState<PageMode>("match");
+
+  const lastChartRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (chart?.planets?.Moon) {
+      const chartKey = `${chart.name || ""}-${chart.dob || ""}-${chart.tob || ""}`;
+      if (lastChartRef.current !== chartKey) {
+        lastChartRef.current = chartKey;
+        const m = chart.planets.Moon;
+        const nakIdx = getMoonNakshatraIndex(m.nakshatra, m.lon);
+        const rashiIdx = getMoonRashiIndex(m.signNum, m.sign);
+        setP1(prev => ({
+          name: prev.name && prev.name !== "Self" && prev.name !== "You" ? prev.name : (chart.name || "Self"),
+          nakIdx,
+          rashiIdx,
+        }));
+      }
+    }
+  }, [chart]);
 
   // Relationship Intelligence from native chart
   const relResult: RelationshipResult | null = useMemo(() => {
@@ -1308,11 +1362,11 @@ export default function KundaliMilanPage() {
       <PremiumFeature feature="Kundali Milan">
 
       <div className="tabs" style={{ marginBottom: 18 }}>
-        <button className={`tab ${mode === "profile" ? "active" : ""}`} onClick={() => switchMode("profile")}>
-          My Marriage Profile
-        </button>
         <button className={`tab ${mode === "match" ? "active" : ""}`} onClick={() => switchMode("match")}>
           Match Two Kundlis
+        </button>
+        <button className={`tab ${mode === "profile" ? "active" : ""}`} onClick={() => switchMode("profile")}>
+          My Marriage Profile
         </button>
       </div>
 
@@ -1438,8 +1492,18 @@ export default function KundaliMilanPage() {
             Quick Match uses Moon sign and Nakshatra only. Full Relationship Intelligence requires both complete birth charts.
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14, marginBottom: 16 }}>
-            <PersonForm label="Person A Quick Ashtakoot" color="#c8a030" value={p1} onChange={setP1} />
-            <PersonForm label="Person B Quick Ashtakoot" color="#e879f9" value={p2} onChange={setP2} />
+            <PersonForm
+              label={chart?.planets?.Moon ? `Person 1 (${chart.name || "Your Chart"} · Auto-filled)` : "Person 1 (Self / You)"}
+              color="#c8a030"
+              value={p1}
+              onChange={setP1}
+            />
+            <PersonForm
+              label="Person 2 (Partner)"
+              color="#e879f9"
+              value={p2}
+              onChange={setP2}
+            />
           </div>
 
           <button
