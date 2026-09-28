@@ -12,7 +12,7 @@ import {
   Leaf, Users, FileText, Zap, Calendar, BookOpen,
   History, Star, HeartHandshake, Heart, HelpCircle, Hash,
   Hand, LogOut, type LucideIcon,
-  Archive, Radar, Globe, ShoppingBag, Sunrise, Activity,
+  Radar, Globe, ShoppingBag, Sunrise, Activity,
   Shield, Database,
 } from "lucide-react";
 
@@ -36,7 +36,6 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot },
       { label: "Predictions", href: "/dashboard/destiny", Icon: TrendingUp },
       { label: "Report", href: "/dashboard/report", Icon: FileText },
-      { label: "Saved Charts", href: "/dashboard/saved-charts", Icon: Archive },
     ],
   },
   {

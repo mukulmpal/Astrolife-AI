@@ -6,7 +6,6 @@ import Link from "next/link";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type PlanTier } from "@/lib/astro-engine/yogas";
 import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart, buildChart, type BirthDetails, saveCurrentChart, useChartEngine } from "@/lib/user-chart";
-import astroBank from "@/data/astroBank.json";
 import NorthIndianChart from "@/components/north-indian-chart";
 import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
@@ -73,8 +72,6 @@ export default function KundliPage() {
   const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("overview");
   const [showForm, setShowForm] = useState(true);
-  const [showLibrary, setShowLibrary] = useState(false);
-  const [libraryTab, setLibraryTab] = useState<"saved" | "astrobank">("saved");
   const [yogaSearch, setYogaSearch] = useState("");
   const [yogaFilter, setYogaFilter] = useState<"all" | "benefic" | "dosha" | "rare">("all");
   const [userTier, setUserTier] = useState<PlanTier>(() => isFullAccessEnabled() ? "elite" : "free");
@@ -186,24 +183,6 @@ export default function KundliPage() {
     }
   }, [userTier, chart]);
 
-  const downloadPDF = async () => {
-    const element = document.querySelector(".page") as HTMLElement;
-    if (!element) return;
-    try {
-      const html2canvas = (await import("html2canvas")).default;
-      const { jsPDF } = await import("jspdf");
-      const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#FAF7F2" });
-      const imgData = canvas.toDataURL("image/jpeg", 0.9);
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${chart?.name || "Astrolife"}_Kundli.pdf`);
-    } catch (e) {
-      console.error("PDF generation failed", e);
-    }
-  };
-
   const refreshSavedCharts = async () => {
     setLibraryLoading(true);
     setSavedCharts(await listSavedCharts());
@@ -228,30 +207,6 @@ export default function KundliPage() {
       setShowForm(false);
     }
   }, [primaryChart, chartLoading, hasUserChart, chart]);
-
-  const handleSelectCelebrity = (person: (typeof astroBank)[0]) => {
-    const birth: BirthDetails = {
-      name: person.name,
-      dob: person.birthDate,
-      // Ensure HH:mm format (strip seconds) for calculateChart validation
-      tob: person.birthTime ? person.birthTime.slice(0,5) : "12:00",
-      city: person.birthPlace ?? "Delhi",
-      // Fallback coordinates if not provided – use 0,0 (near Gulf of Guinea) which works with calculateChart
-      lat: person.latitude ?? 0,
-      lon: person.longitude ?? 0,
-      tz: person.tz ?? undefined,
-    };
-    try {
-      const newChart = buildChart(birth);
-      setChartData(newChart);
-      saveCurrentChart(newChart);
-      applyChart(newChart);
-      setSaveStatus(`${person.name}'s Kundli loaded.`);
-      setShowForm(false);
-    } catch (err) {
-      console.error("Failed to load celebrity chart:", err);
-    }
-  };
 
   const handleSelectSavedChart = async (chartId: string) => {
     setLibraryLoading(true);
@@ -458,25 +413,17 @@ export default function KundliPage() {
           Moshier / NASA Ephemeris · Lahiri Chitrapaksha · 120 Yogas · Classical Shastric Proofs
         </p>
 
-        {/* SAVED CHARTS LIBRARY DRAWER */}
+        {/* ACTIVE KUNDLI ACTIONS */}
         <div className="card" style={{ marginBottom: 24 }}>
-          <div className="library-top" style={{ marginBottom: showLibrary ? 14 : 0 }}>
+          <div className="library-top" style={{ marginBottom: 0 }}>
             <div>
-              <div className="card-tag">✦ Saved Charts & Database</div>
-              <div className="card-title serif" style={{ marginBottom: 0 }}>Chart Library</div>
+              <div className="card-tag">✦ Active Kundli</div>
+              <div className="card-title serif" style={{ marginBottom: 0 }}>
+                {chart?.name ? `${chart.name}'s Chart` : "Kundli Profile"}
+              </div>
               <div className="library-sub">{saveStatus}</div>
             </div>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
-              <button
-                className="btn-save"
-                onClick={() => setShowLibrary(!showLibrary)}
-                style={{
-                  borderColor: showLibrary ? "rgba(200,160,48,0.4)" : "rgba(200,160,48,0.2)",
-                  background: showLibrary ? "rgba(200,160,48,0.1)" : "transparent",
-                }}
-              >
-                {showLibrary ? "▲ Hide Library" : "▼ Open Library"}
-              </button>
               <button
                 className="btn-save"
                 onClick={() => setShowForm(!showForm)}
@@ -487,160 +434,11 @@ export default function KundliPage() {
               >
                 {showForm ? "✕ Close Form" : "✦ New Chart"}
               </button>
-              <button
-                className="btn-save"
-                onClick={downloadPDF}
-                style={{ color: "#22c55e", borderColor: "rgba(34,197,94,0.3)" }}
-              >
-                ↓ Download PDF
-              </button>
               <button className="btn-save" onClick={refreshSavedCharts} disabled={libraryLoading}>
                 {libraryLoading ? "⟳ Loading..." : "↻ Refresh"}
               </button>
             </div>
           </div>
-          {showLibrary && (
-            <>
-          {/* Library Tab Switcher */}
-          <div style={{ display: "flex", gap: "6px", marginBottom: "14px", borderBottom: "1px solid rgba(184, 134, 11, 0.2)", paddingBottom: "10px" }}>
-            <button
-              onClick={() => setLibraryTab("saved")}
-              style={{
-                padding: "6px 14px",
-                borderRadius: "8px",
-                fontSize: "12px",
-                fontWeight: 600,
-                cursor: "pointer",
-                border: libraryTab === "saved" ? "1px solid rgba(184, 134, 11, 0.45)" : "1px solid rgba(184, 134, 11, 0.2)",
-                background: libraryTab === "saved" ? "rgba(184, 134, 11, 0.15)" : "#FAF8F5",
-                color: libraryTab === "saved" ? "#B8860B" : "#6B635B",
-                fontFamily: "Outfit, sans-serif",
-                transition: "all 0.2s",
-              }}
-            >
-              📁 My Saved Charts ({savedCharts.length})
-            </button>
-            <button
-              onClick={() => setLibraryTab("astrobank")}
-              style={{
-                padding: "6px 14px",
-                borderRadius: "8px",
-                fontSize: "12px",
-                fontWeight: 600,
-                cursor: "pointer",
-                border: libraryTab === "astrobank" ? "1px solid rgba(184, 134, 11, 0.45)" : "1px solid rgba(184, 134, 11, 0.2)",
-                background: libraryTab === "astrobank" ? "rgba(184, 134, 11, 0.15)" : "#FAF8F5",
-                color: libraryTab === "astrobank" ? "#B8860B" : "#6B635B",
-                fontFamily: "Outfit, sans-serif",
-                transition: "all 0.2s",
-              }}
-            >
-              🌟 Famous Personalities / AstroBank ({astroBank.length})
-            </button>
-          </div>
-
-          {libraryTab === "saved" ? (
-            savedCharts.length > 0 ? (
-              <div className="library-list">
-                {savedCharts.map((saved) => (
-                  <button
-                    key={saved.id}
-                    className={`library-card ${saved.isPrimary ? "primary" : ""}`}
-                    onClick={() => handleSelectSavedChart(saved.id)}
-                    disabled={libraryLoading}
-                  >
-                    <div className="library-name">{saved.name}</div>
-                    <div className="library-meta">
-                      {new Date(saved.dob).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}{" "}
-                      · {saved.tob}
-                      <br />
-                      {saved.city}
-                    </div>
-                    {saved.isPrimary && <span className="library-pill">Primary</span>}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="library-sub">
-                No account charts loaded yet. Generate a chart to save it permanently, or click any famous personality in AstroBank!
-              </div>
-            )
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", padding: "12px 16px", borderRadius: "12px", background: "rgba(184, 134, 11, 0.06)", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
-                <div>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A" }}>
-                    🌟 Explore AstroBank by Country & Category
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#6B635B" }}>
-                    Navigate all 1,155+ celebrities organized step-by-step (Country → Category → Personalities).
-                  </div>
-                </div>
-                <a
-                  href="/dashboard/astro-bank"
-                  style={{
-                    padding: "8px 16px",
-                    borderRadius: "10px",
-                    background: "linear-gradient(135deg, #B8860B, #D4AF37)",
-                    color: "#FFFFFF",
-                    fontWeight: 700,
-                    fontSize: "12px",
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    boxShadow: "0 4px 12px rgba(184, 134, 11, 0.2)",
-                  }}
-                >
-                  Open Full AstroBank Portal →
-                </a>
-              </div>
-
-              <div className="library-list" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "14px" }}>
-                {astroBank.slice(0, 18).map((person, idx) => {
-                  const isCurrent = chart?.name === person.name;
-                  return (
-                    <button
-                      key={`${person.name}-${idx}`}
-                      className={`library-card ${isCurrent ? "primary" : ""}`}
-                      onClick={() => handleSelectCelebrity(person)}
-                      style={{ padding: "16px", borderRadius: "14px" }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                        <div className="library-name" style={{ fontSize: "15px", fontWeight: 700 }}>{person.name}</div>
-                        <span style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "999px", background: "rgba(184, 134, 11, 0.12)", color: "#B8860B", textTransform: "capitalize", fontWeight: 600 }}>
-                          {person.category?.replace(/_/g, " ")}
-                        </span>
-                      </div>
-                      <div className="library-meta" style={{ fontSize: "12px", lineHeight: "1.5", color: "#6B635B" }}>
-                        📅 {person.birthDate} · ⏰ {person.birthTime?.slice(0, 5)}
-                        <br />
-                        📍 {person.birthPlace}
-                      </div>
-                      <div style={{ marginTop: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        {isCurrent ? (
-                          <span className="library-pill" style={{ background: "rgba(34,139,34,0.12)", color: "#1E7E34", borderColor: "rgba(34,139,34,0.3)" }}>
-                            Active Kundli
-                          </span>
-                        ) : (
-                          <span className="library-pill">Click to Open Kundli →</span>
-                        )}
-                        <span style={{ fontSize: "11px", color: "#6B635B", textTransform: "capitalize" }}>
-                          {person.country}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          </>
-        )}
         </div>
 
         {/* INPUT FORM */}
