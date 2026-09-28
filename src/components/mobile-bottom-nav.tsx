@@ -35,6 +35,7 @@ const ENGINE_ITEMS = [
   { icon: "💊", label: "Remedy", href: "/dashboard/remedy" },
   { icon: "🔯", label: "Sarvatobhadra", href: "/dashboard/sarvatobhadra" },
   { icon: "🏠", label: "Vastu", href: "/dashboard/vastu" },
+  { icon: "🏦", label: "Astro Bank", href: "/dashboard/astro-bank" },
   { icon: "📄", label: "Report", href: "/dashboard/report" },
   { icon: "🤖", label: "Chat", href: "/dashboard/chat" },
   { icon: "💎", label: "Upgrade", href: "/dashboard/upgrade" },

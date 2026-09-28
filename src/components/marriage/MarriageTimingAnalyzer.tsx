@@ -1136,7 +1136,7 @@ export function MarriageTimingAnalyzer() {
               )}
 
               {/* Safety Note */}
-              <div style={{ padding:"12px 16px", borderRadius:10, background:"rgba(0,0,0,0.2)",
+              <div style={{ padding:"12px 16px", borderRadius:10, background: "#FAF7F2",
                 border: "1px solid rgba(184,134,11,0.2)", fontSize:11, color: "#6B635B", textAlign:"center" }}>
                 ⚠️ No fixed destiny predictions. K.N. Rao framework is for timing confidence, not certainty.
                 Combine with D1 promise, D9 quality, Ashtakoot compatibility and practical readiness.
@@ -1227,7 +1227,7 @@ export function MarriageTimingAnalyzer() {
                     .map(({ window: w, fusedScore, compatibilityDelta, marsDelta }, index) => {
                       const col = scoreColor(fusedScore);
                       return (
-                        <div key={`top-window-${w.date}`} style={{ padding:"14px 16px", borderRadius:12, border:`1px solid ${col}33`, background:"rgba(0,0,0,0.18)" }}>
+                        <div key={`top-window-${w.date}`} style={{ padding:"14px 16px", borderRadius:12, border:`1px solid ${col}33`, background: "#FAF7F2" }}>
                           <div style={{ display:"flex", justifyContent:"space-between", gap:12, alignItems:"flex-start", marginBottom:8 }}>
                             <div>
                               <div style={{ fontSize:12, color:"#6B635B", marginBottom:2 }}>#{index + 1}</div>
@@ -1477,7 +1477,7 @@ export function MarriageTimingAnalyzer() {
               )}
 
               {/* Safety Boundary */}
-              <div style={{ padding:"14px 18px", borderRadius:10, background:"rgba(0,0,0,0.2)",
+              <div style={{ padding:"14px 18px", borderRadius:10, background: "#FAF7F2",
                 border: "1px solid rgba(184,134,11,0.2)", fontSize:12, color: "#6B635B", lineHeight:1.8 }}>
                 ⚠️ <strong style={{ color:"#6B635B" }}>Safety Boundary:</strong>&nbsp;
                 {result.overallIntegration?.safetyBoundary ??

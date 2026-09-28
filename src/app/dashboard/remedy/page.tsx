@@ -147,7 +147,7 @@ export default function RemedyPage() {
 
         {/* Active Dasha Banner */}
         <div style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: "10px", padding: "12px 16px", marginBottom: "18px", fontSize: "13px" }}>
-          <span style={{ color: "#c4b5fd", fontWeight: 600 }}>⏰ Active Dasha:</span>
+          <span style={{ color: "#B8860B", fontWeight: 600 }}>⏰ Active Dasha:</span>
           <span style={{ color: "#1A1A1A", marginLeft: "8px" }}>{result.dashaActive} Mahadasha</span>
           {result.antardashaActive && result.antardashaActive !== result.dashaActive && (
             <span style={{ color: "#8880a8", marginLeft: "8px" }}>→ {result.antardashaActive} Antardasha</span>
@@ -176,7 +176,7 @@ export default function RemedyPage() {
           </div>
           <div style={{ display: "grid", gap: 10 }}>
             {personalizedPlan.map((card) => (
-              <div key={`personalized-${card.planet}`} style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div key={`personalized-${card.planet}`} style={{ padding: "10px 12px", borderRadius: 9, background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.15)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", marginBottom: 5 }}>
                   <strong style={{ fontSize: 13, color: "#1A1A1A" }}>{PLANET_EMOJI[card.planet]} {card.planet}</strong>
                   <span style={{ fontSize: 11, color: "#5eead4", fontWeight: 800 }}>{card.personalizationScore}/100</span>
@@ -218,12 +218,12 @@ export default function RemedyPage() {
             <div className="phase-card" style={{ background: "rgba(139,92,246,0.08)", borderColor: "rgba(139,92,246,0.25)" }}>
               <span className="phase-pill">Complete safety filter</span>
               <div className="phase-title">Dasha Remedy Timing</div>
-              <div style={{ fontSize: "13px", color: "#c4b5fd", marginBottom: "8px" }}>
+              <div style={{ fontSize: "13px", color: "#B8860B", marginBottom: "8px" }}>
                 {phase1Timing.activePeriod} · Primary planet: {phase1Timing.primaryPlanet}
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
                 {phase1Timing.priorityPlanets.map((planet) => (
-                  <span key={planet} className="rem-pill" style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.28)", color: "#c4b5fd" }}>
+                  <span key={planet} className="rem-pill" style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.28)", color: "#B8860B" }}>
                     {PLANET_EMOJI[planet]} {planet}
                   </span>
                 ))}

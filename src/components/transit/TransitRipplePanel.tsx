@@ -412,7 +412,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div style={statBox}>
       <p style={muted}>{label}</p>
-      <strong style={{ color: "#fff" }}>{value}</strong>
+      <strong style={{ color: "#1A1A1A" }}>{value}</strong>
     </div>
   );
 }
@@ -420,9 +420,8 @@ function Stat({ label, value }: { label: string; value: string }) {
 const pageShell: CSSProperties = {
   minHeight: "100vh",
   padding: "32px",
-  background:
-    "radial-gradient(circle at top left, rgba(250,204,21,0.16), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,0.18), transparent 36%), #070711",
-  color: "white",
+  background: "#FAF7F2",
+  color: "#1A1A1A",
 };
 
 const heroCard: CSSProperties = {
@@ -430,13 +429,13 @@ const heroCard: CSSProperties = {
   margin: "0 auto",
   padding: 28,
   borderRadius: 24,
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.06)",
-  boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
+  border: "1px solid rgba(184, 134, 11, 0.22)",
+  background: "#FFFFFF",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
 };
 
 const eyebrow: CSSProperties = {
-  color: "#facc15",
+  color: "#B8860B",
   textTransform: "uppercase",
   letterSpacing: 1.6,
   fontSize: 12,
@@ -451,7 +450,7 @@ const title: CSSProperties = {
 
 const subtitle: CSSProperties = {
   maxWidth: 760,
-  color: "rgba(255,255,255,0.72)",
+  color: "#6B635B",
   lineHeight: 1.75,
 };
 
@@ -460,8 +459,8 @@ const button: CSSProperties = {
   padding: "13px 18px",
   borderRadius: 14,
   border: "none",
-  background: "#facc15",
-  color: "#111",
+  background: "#B8860B",
+  color: "#FFFFFF",
   fontWeight: 800,
 };
 
@@ -474,7 +473,7 @@ const contextPanel: CSSProperties = {
 
 const helperText: CSSProperties = {
   marginTop: 10,
-  color: "rgba(255,255,255,0.58)",
+  color: "#6B635B",
   fontSize: 13,
 };
 
@@ -497,19 +496,19 @@ const contentGrid: CSSProperties = {
 const card: CSSProperties = {
   padding: 24,
   borderRadius: 22,
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.055)",
+  border: "1px solid rgba(184, 134, 11, 0.22)",
+  background: "#FFFFFF",
 };
 
 const miniCard: CSSProperties = {
   padding: 16,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(0,0,0,0.28)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const sectionLabel: CSSProperties = {
-  color: "#facc15",
+  color: "#B8860B",
   textTransform: "uppercase",
   letterSpacing: 1.4,
   fontSize: 12,
@@ -530,7 +529,7 @@ const statsGrid: CSSProperties = {
 const statBox: CSSProperties = {
   padding: 14,
   borderRadius: 16,
-  background: "rgba(0,0,0,0.25)",
+  background: "#FAF7F2", border: "1px solid rgba(184, 134, 11, 0.14)",
 };
 
 const stack: CSSProperties = {
@@ -555,30 +554,30 @@ const pill: CSSProperties = {
   borderRadius: 999,
   padding: "4px 9px",
   background: "rgba(250,204,21,0.12)",
-  color: "#fde68a",
+  color: "#B8860B",
   fontSize: 12,
   fontWeight: 700,
 };
 
 const muted: CSSProperties = {
-  color: "rgba(255,255,255,0.58)",
+  color: "#6B635B",
   margin: "4px 0",
 };
 
 const smallCaps: CSSProperties = {
-  color: "rgba(255,255,255,0.44)",
+  color: "#8C827A",
   textTransform: "uppercase",
   letterSpacing: 1,
   fontSize: 11,
 };
 
 const paragraph: CSSProperties = {
-  color: "rgba(255,255,255,0.74)",
+  color: "#6B635B",
   lineHeight: 1.7,
 };
 
 const paragraphPre: CSSProperties = {
-  color: "rgba(255,255,255,0.78)",
+  color: "#1A1A1A",
   lineHeight: 1.85,
   whiteSpace: "pre-wrap",
 };
@@ -588,7 +587,7 @@ const remedyItem: CSSProperties = {
   borderRadius: 14,
   background: "rgba(250,204,21,0.08)",
   border: "1px solid rgba(250,204,21,0.12)",
-  color: "rgba(255,255,255,0.82)",
+  color: "#1A1A1A",
 };
 
 const forecastItem: CSSProperties = {
@@ -596,16 +595,16 @@ const forecastItem: CSSProperties = {
   borderRadius: 16,
   background: "rgba(34,197,94,0.08)",
   border: "1px solid rgba(34,197,94,0.16)",
-  color: "rgba(255,255,255,0.84)",
+  color: "#1A1A1A",
   lineHeight: 1.8,
 };
 
 const windowPill: CSSProperties = {
   padding: "8px 10px",
   borderRadius: 12,
-  background: "rgba(255,255,255,0.055)",
-  border: "1px solid rgba(255,255,255,0.08)",
-  color: "rgba(255,255,255,0.72)",
+  background: "#FAF7F2",
+  border: "1px solid rgba(184, 134, 11, 0.15)",
+  color: "#6B635B",
   fontSize: 12,
   lineHeight: 1.5,
 };
@@ -627,7 +626,7 @@ function calendarCell(score: number): CSSProperties {
     display: "grid",
     gap: 3,
     alignContent: "center",
-    color: "rgba(255,255,255,0.84)",
+    color: "#1A1A1A",
     fontSize: 12,
   };
 }

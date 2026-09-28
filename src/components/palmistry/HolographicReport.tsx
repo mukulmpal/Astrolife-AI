@@ -94,14 +94,14 @@ function HoloScanner({ report, preview }: HolographicReportProps) {
           <motion.button
             key={prediction.id}
             type="button"
-            className={`absolute z-30 hidden w-44 rounded-2xl border border-cyan-300/20 bg-black/45 p-3 text-left backdrop-blur-xl lg:block ${slots[i]}`}
+            className={`absolute z-30 hidden w-44 rounded-2xl border border-cyan-300/20 bg-[#FAF7F2] p-3 text-left backdrop-blur-xl lg:block ${slots[i]}`}
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.7 + i * 0.08 }}
           >
             <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-200/55">{prediction.title}</div>
             <div className="mt-1 text-3xl font-light text-cyan-100">{prediction.strength}%</div>
-            <p className="mt-1 text-xs leading-relaxed text-white/50">{prediction.summary}</p>
+            <p className="mt-1 text-xs leading-relaxed text-[#6B635B]">{prediction.summary}</p>
           </motion.button>
         );
       })}
@@ -126,7 +126,7 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
             <h1 className="mt-5 bg-gradient-to-r from-cyan-200 via-white to-violet-200 bg-clip-text font-serif text-5xl font-light tracking-[0.06em] text-transparent sm:text-6xl">
               Spatial Palm Intelligence
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">{report.finalIntelligenceScore.summary}</p>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#6B635B]">{report.finalIntelligenceScore.summary}</p>
           </div>
           <div className="grid grid-cols-3 gap-3 lg:w-[420px]">
             {[
@@ -134,9 +134,9 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
               ["Confidence", report.finalIntelligenceScore.confidence],
               ["Alignment", report.palmKundliCorrelation.alignmentScore],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl border border-cyan-300/18 bg-black/35 p-4 text-center">
+              <div key={label} className="rounded-2xl border border-cyan-300/18 bg-[#FAF7F2] p-4 text-center">
                 <div className="text-3xl font-light text-cyan-100">{value}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-white/35">{label}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[#8C827A]">{label}</div>
               </div>
             ))}
           </div>
@@ -154,8 +154,8 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
                   <Icon className="text-cyan-200" size={18} />
                   <span className="text-2xl font-light text-cyan-100">{section.score}</span>
                 </div>
-                <h3 className="mt-3 font-serif text-xl text-white">{section.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/52">{section.interpretation}</p>
+                <h3 className="mt-3 font-serif text-xl text-[#1A1A1A]">{section.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#6B635B]">{section.interpretation}</p>
               </HoloCard>
             );
           })}
@@ -171,7 +171,7 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
                 key={line.id}
                 type="button"
                 onClick={() => setSelectedLine(line.id)}
-                className={`rounded-full border px-3 py-2 text-xs transition ${selectedLine === line.id ? "border-cyan-300/60 bg-cyan-300/15" : "border-white/10 bg-white/[0.03]"}`}
+                className={`rounded-full border px-3 py-2 text-xs transition ${selectedLine === line.id ? "border-cyan-300/60 bg-cyan-300/15" : "border-[rgba(184,134,11,0.18)] bg-[#FAF7F2]"}`}
                 style={{ color: line.color }}
               >
                 {line.name} · {line.confidence}%
@@ -180,9 +180,9 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
           </div>
           <AnimatePresence mode="wait">
             {selected && (
-              <motion.div key={selected.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+              <motion.div key={selected.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-5 rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4">
                 <h3 className="font-serif text-2xl" style={{ color: selected.color }}>{selected.name}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/58">{selected.detail || selected.summary}</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">{selected.detail || selected.summary}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -194,7 +194,7 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
             {report.advancedInsights.slice(0, 8).map((insight) => (
               <div key={insight.title} className="rounded-2xl border border-violet-300/15 bg-violet-300/[0.06] p-3">
                 <h4 className="text-sm font-semibold text-violet-100">{insight.title}</h4>
-                <p className="mt-1 text-xs leading-relaxed text-white/45">{insight.body}</p>
+                <p className="mt-1 text-xs leading-relaxed text-[#6B635B]">{insight.body}</p>
               </div>
             ))}
           </div>
@@ -208,13 +208,13 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
               <h3 className="text-sm font-semibold text-cyan-100">{mount.name.replace("Mount of ", "")}</h3>
               <b className="text-2xl font-light text-cyan-200">{mount.score}</b>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-white/48">{mount.summary || mount.keywords}</p>
+            <p className="mt-2 text-xs leading-relaxed text-[#6B635B]">{mount.summary || mount.keywords}</p>
           </HoloCard>
         ))}
       </div>
 
-      <div className="rounded-[2rem] border border-white/10 bg-white/[0.02] p-5 text-center">
-        <p className="text-xs leading-relaxed text-white/38">{report.meta.disclaimer}</p>
+      <div className="rounded-[2rem] border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-5 text-center">
+        <p className="text-xs leading-relaxed text-[#8C827A]">{report.meta.disclaimer}</p>
       </div>
     </div>
   );

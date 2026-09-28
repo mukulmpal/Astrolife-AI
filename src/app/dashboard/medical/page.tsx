@@ -106,7 +106,7 @@ export default function MedicalPage() {
             {/* Birth nakshatra */}
             {result.birthNakshatraData && (
               <div style={{ background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
-                <div style={{ fontWeight: 700, fontSize: "13px", color: "#c4b5fd", marginBottom: "8px" }}>⭐ Birth Nakshatra — {result.birthNakshatra}</div>
+                <div style={{ fontWeight: 700, fontSize: "13px", color: "#B8860B", marginBottom: "8px" }}>⭐ Birth Nakshatra — {result.birthNakshatra}</div>
                 <div className="med-row"><strong>Tendency:</strong> {result.birthNakshatraData.disease}</div>
                 <div className="med-row"><strong>Body zone:</strong> {result.birthNakshatraData.body}</div>
                 <div className="med-row"><strong>Note:</strong> {result.birthNakshatraData.note}</div>
@@ -227,7 +227,7 @@ export default function MedicalPage() {
                     </div>
                   </div>
                   <div className="med-section">
-                    <div className="med-section-title" style={{ color: "#c4b5fd" }}>Nakshatra Pattern</div>
+                    <div className="med-section-title" style={{ color: "#B8860B" }}>Nakshatra Pattern</div>
                     <div className="med-row"><strong>Tendency:</strong> {card.nakshatraDisease}</div>
                     <div className="med-row"><strong>Body zone:</strong> {card.nakshatraBody}</div>
                     <div className="med-row"><strong>Boil zone:</strong> {card.boilZone}</div>

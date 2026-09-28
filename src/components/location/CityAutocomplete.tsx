@@ -107,7 +107,7 @@ export default function CityAutocomplete({
 
   return (
     <div ref={boxRef} className="relative w-full">
-      <label className="mb-2 block text-sm font-medium text-white/80">
+      <label className="mb-2 block text-sm font-medium text-[#1A1A1A]">
         {label}
       </label>
 
@@ -125,15 +125,15 @@ export default function CityAutocomplete({
         }}
         onFocus={() => results.length > 0 && setOpen(true)}
         placeholder={placeholder}
-        className="w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-amber-300/60"
+        className="w-full rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] px-4 py-3 text-sm text-[#1A1A1A] outline-none placeholder:text-[#8C827A] focus:border-[#B8860B]"
       />
 
       {loading && (
-        <p className="mt-2 text-xs text-white/45">Searching cities...</p>
+        <p className="mt-2 text-xs text-[#6B635B]">Searching cities...</p>
       )}
 
       {errorText && (
-        <p className="mt-2 text-xs text-red-300">{errorText}</p>
+        <p className="mt-2 text-xs text-red-600">{errorText}</p>
       )}
 
       {open && results.length > 0 && (
@@ -164,9 +164,9 @@ export default function CityAutocomplete({
       )}
 
       {value && (
-        <div className="mt-3 rounded-2xl border border-amber-300/15 bg-amber-300/5 p-3 text-xs text-white/65">
+        <div className="mt-3 rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FAF5EB] p-3 text-xs text-[#6B635B]">
           <div>
-            Selected: <span className="font-semibold text-amber-200">{value.displayName}</span>
+            Selected: <span className="font-semibold text-[#B8860B]">{value.displayName}</span>
           </div>
           <div className="mt-1">
             Coordinates: {value.latitude}, {value.longitude}

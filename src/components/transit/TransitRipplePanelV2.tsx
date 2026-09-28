@@ -126,7 +126,7 @@ function TransitRippleChart({ planetList }: { planetList: PlanetTimelineList }) 
       <p style={{ ...paragraph, marginBottom: 14 }}>
         Each row is one planet. Larger pulses mean stronger monthly influence. Hover any pulse to see sign, nakshatra, houses and date window.
       </p>
-      <div style={{ overflowX: "auto", borderRadius: 18, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.26)" }}>
+      <div style={{ overflowX: "auto", borderRadius: 18, border: "1px solid rgba(184,134,11,0.2)", background: "#FAF7F2" }}>
         <svg width={chartWidth} height={chartHeight} role="img" aria-label="Monthly transit ripple chart">
           <defs>
             <filter id="rippleGlow" x="-60%" y="-60%" width="220%" height="220%">
@@ -141,8 +141,8 @@ function TransitRippleChart({ planetList }: { planetList: PlanetTimelineList }) 
             const x = xForTime(tick.time);
             return (
               <g key={`${tick.label}-${index}`}>
-                <line x1={x} y1={topPad - 16} x2={x} y2={chartHeight - bottomPad + 4} stroke="rgba(255,255,255,0.08)" />
-                <text x={x} y={24} textAnchor="middle" fill="rgba(255,255,255,0.55)" fontSize="11">{tick.label}</text>
+                <line x1={x} y1={topPad - 16} x2={x} y2={chartHeight - bottomPad + 4} stroke="rgba(184,134,11,0.15)" />
+                <text x={x} y={24} textAnchor="middle" fill="#6B635B" fontSize="11">{tick.label}</text>
               </g>
             );
           })}
@@ -152,7 +152,7 @@ function TransitRippleChart({ planetList }: { planetList: PlanetTimelineList }) 
             return (
               <g key={planet.planet}>
                 <text x={20} y={y + 4} fill={color} fontSize="13" fontWeight="700">{planet.planet}</text>
-                <line x1={leftPad} y1={y} x2={chartWidth - rightPad} y2={y} stroke="rgba(255,255,255,0.1)" />
+                <line x1={leftPad} y1={y} x2={chartWidth - rightPad} y2={y} stroke="rgba(184,134,11,0.15)" />
                 {planet.windows.map((window, index) => {
                   const start = new Date(window.startDate).getTime();
                   const end = new Date(window.endDate).getTime();
@@ -186,7 +186,7 @@ function TransitRippleChart({ planetList }: { planetList: PlanetTimelineList }) 
       <div style={{ ...legendGrid, marginTop: 14 }}>
         <div style={legendItem}><span style={{ ...legendDot, background: "#f97316" }} />Large pulse: strongest planet influence</div>
         <div style={legendItem}><span style={{ ...legendDot, background: "#94a3b8" }} />Line length: transit stay in sign/nakshatra window</div>
-        <div style={legendItem}><span style={{ ...legendDot, background: "#facc15" }} />Use planet tab for detailed proof</div>
+        <div style={legendItem}><span style={{ ...legendDot, background: "#B8860B" }} />Use planet tab for detailed proof</div>
       </div>
     </section>
   );
@@ -360,7 +360,7 @@ export function TransitRipplePanelV2() {
                       }}
                     >
                       <div style={{ fontSize: 14, fontWeight: 700 }}>{planet.planet}</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+                      <div style={{ fontSize: 12, color: "#6B635B" }}>
                         {planet.score} · {scoreLabel(planet.score)}
                       </div>
                     </button>
@@ -370,7 +370,7 @@ export function TransitRipplePanelV2() {
                   <p style={legendLabel}>Score Scale</p>
                   <div style={legendGrid}>
                     <div style={legendItem}><span style={{ ...legendDot, background: "#f97316" }} />Peak (80–100)</div>
-                    <div style={legendItem}><span style={{ ...legendDot, background: "#facc15" }} />Strong (65–79)</div>
+                    <div style={legendItem}><span style={{ ...legendDot, background: "#B8860B" }} />Strong (65–79)</div>
                     <div style={legendItem}><span style={{ ...legendDot, background: "#a78bfa" }} />Moderate (45–64)</div>
                     <div style={legendItem}><span style={{ ...legendDot, background: "#94a3b8" }} />Supportive (25–44)</div>
                     <div style={legendItem}><span style={{ ...legendDot, background: "#64748b" }} />Background (&lt;25)</div>
@@ -418,7 +418,7 @@ export function TransitRipplePanelV2() {
                   <h2 style={h2}>Dasha-Active Status</h2>
                   <div style={infoBox}>
                     <p style={paragraph}>
-                      <strong style={{ color: "#facc15" }}>⚠️ This planet is tied to the current Mahadasha or Antardasha.</strong> Its transit becomes LOUDER and more visible. Watch for concrete results and real-world manifestations. This is not background noise—this is active karma working.
+                      <strong style={{ color: "#B8860B" }}>⚠️ This planet is tied to the current Mahadasha or Antardasha.</strong> Its transit becomes LOUDER and more visible. Watch for concrete results and real-world manifestations. This is not background noise—this is active karma working.
                     </p>
                   </div>
                 </section>
@@ -456,7 +456,7 @@ export function TransitRipplePanelV2() {
                       return (
                         <div key={house} style={houseCard(PLANET_COLORS[activePlanet.planet])}>
                           <strong style={{ fontSize: 18 }}>H{house}</strong>
-                          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>{houseNames[house]}</p>
+                          <p style={{ fontSize: 12, color: "#6B635B" }}>{houseNames[house]}</p>
                         </div>
                       );
                     })}
@@ -625,7 +625,7 @@ export function TransitRipplePanelV2() {
 
                         <div style={nakshatraContent}>
                           <p style={muted}>
-                            <strong style={{ color: "rgba(255,255,255,0.8)" }}>Essence:</strong> {nak.essence}
+                            <strong style={{ color: "#1A1A1A" }}>Essence:</strong> {nak.essence}
                           </p>
                           <p style={muted}>
                             <strong style={{ color: "#a3e635" }}>Gift:</strong> {nak.gift}
@@ -634,12 +634,12 @@ export function TransitRipplePanelV2() {
                             <strong style={{ color: "#f87171" }}>Shadow:</strong> {nak.shadow}
                           </p>
                           <p style={{ ...muted, marginTop: 8, padding: "8px 12px", background: "rgba(250,204,21,0.1)", borderRadius: 8 }}>
-                            <strong style={{ color: "#facc15" }}>💡 Remedy:</strong> {nak.remedyTone}
+                            <strong style={{ color: "#B8860B" }}>💡 Remedy:</strong> {nak.remedyTone}
                           </p>
                         </div>
 
                         {nak.planets.length > 0 && (
-                          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(184,134,11,0.15)" }}>
                             <p style={smallCaps}>Planets here:</p>
                             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
                               {nak.planets.map(planet => (
@@ -671,7 +671,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div style={statBox}>
       <p style={muted}>{label}</p>
-      <strong style={{ color: "#fff" }}>{value}</strong>
+      <strong style={{ color: "#1A1A1A" }}>{value}</strong>
     </div>
   );
 }
@@ -697,8 +697,8 @@ function scoreLabelColor(score: number): string {
 const pageShell: CSSProperties = {
   minHeight: "100vh",
   padding: "32px",
-  background: "radial-gradient(circle at top left, rgba(250,204,21,0.16), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,0.18), transparent 36%), #070711",
-  color: "white",
+  background: "#FAF7F2",
+  color: "#1A1A1A",
 };
 
 const heroCard: CSSProperties = {
@@ -706,13 +706,13 @@ const heroCard: CSSProperties = {
   margin: "0 auto",
   padding: 28,
   borderRadius: 24,
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.06)",
-  boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
+  border: "1px solid rgba(184, 134, 11, 0.22)",
+  background: "#FFFFFF",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
 };
 
 const eyebrow: CSSProperties = {
-  color: "#facc15",
+  color: "#B8860B",
   textTransform: "uppercase",
   letterSpacing: 1.6,
   fontSize: 12,
@@ -720,7 +720,7 @@ const eyebrow: CSSProperties = {
 };
 
 const title: CSSProperties = { fontSize: 46, lineHeight: 1.05, margin: "8px 0 12px" };
-const subtitle: CSSProperties = { maxWidth: 760, color: "rgba(255,255,255,0.72)", lineHeight: 1.75 };
+const subtitle: CSSProperties = { maxWidth: 760, color: "#6B635B", lineHeight: 1.75 };
 
 const contextPanel: CSSProperties = {
   display: "grid",
@@ -734,8 +734,8 @@ const button: CSSProperties = {
   padding: "13px 18px",
   borderRadius: 14,
   border: "none",
-  background: "#facc15",
-  color: "#111",
+  background: "#B8860B",
+  color: "#FFFFFF",
   fontWeight: 800,
   cursor: "pointer",
 };
@@ -759,12 +759,12 @@ const contentGrid: CSSProperties = {
 const card: CSSProperties = {
   padding: 24,
   borderRadius: 22,
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.055)",
+  border: "1px solid rgba(184, 134, 11, 0.22)",
+  background: "#FFFFFF",
 };
 
 const sectionLabel: CSSProperties = {
-  color: "#facc15",
+  color: "#B8860B",
   textTransform: "uppercase",
   letterSpacing: 1.4,
   fontSize: 12,
@@ -782,7 +782,7 @@ const statGrid: CSSProperties = {
 const statBox: CSSProperties = {
   padding: 14,
   borderRadius: 16,
-  background: "rgba(0,0,0,0.25)",
+  background: "#FAF7F2", border: "1px solid rgba(184, 134, 11, 0.14)",
 };
 
 const planetTabs: CSSProperties = {
@@ -794,9 +794,9 @@ const planetTabs: CSSProperties = {
 const planetTabButton = (isActive: boolean, color: string): CSSProperties => ({
   padding: "14px 12px",
   borderRadius: 14,
-  border: isActive ? `2px solid ${color}` : "1px solid rgba(255,255,255,0.2)",
-  background: isActive ? `${color}18` : "rgba(0,0,0,0.25)",
-  color: isActive ? color : "rgba(255,255,255,0.7)",
+  border: isActive ? `2px solid ${color}` : "1px solid rgba(184, 134, 11, 0.2)",
+  background: isActive ? `${color}18` : "#FAF7F2",
+  color: isActive ? color : "#6B635B",
   cursor: "pointer",
   textAlign: "center",
   transition: "all 0.2s",
@@ -809,35 +809,35 @@ const pill: CSSProperties = {
   borderRadius: 999,
   padding: "4px 9px",
   background: "rgba(250,204,21,0.12)",
-  color: "#fde68a",
+  color: "#B8860B",
   fontSize: 12,
   fontWeight: 700,
 };
 
-const muted: CSSProperties = { color: "rgba(255,255,255,0.58)", margin: "4px 0" };
-const smallCaps: CSSProperties = { color: "rgba(255,255,255,0.44)", textTransform: "uppercase", letterSpacing: 1, fontSize: 11 };
-const paragraph: CSSProperties = { color: "rgba(255,255,255,0.74)", lineHeight: 1.7 };
-const paragraphPre: CSSProperties = { color: "rgba(255,255,255,0.78)", lineHeight: 1.85, whiteSpace: "pre-wrap" };
+const muted: CSSProperties = { color: "#6B635B", margin: "4px 0" };
+const smallCaps: CSSProperties = { color: "#8C827A", textTransform: "uppercase", letterSpacing: 1, fontSize: 11 };
+const paragraph: CSSProperties = { color: "#6B635B", lineHeight: 1.7 };
+const paragraphPre: CSSProperties = { color: "#1A1A1A", lineHeight: 1.85, whiteSpace: "pre-wrap" };
 
 const windowCard: CSSProperties = {
   padding: 16,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(0,0,0,0.28)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const hitCard: CSSProperties = {
   padding: 16,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(0,0,0,0.28)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const infoBox: CSSProperties = {
   padding: 16,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(0,0,0,0.28)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const houseGrid: CSSProperties = {
@@ -872,14 +872,14 @@ const eventGrid: CSSProperties = {
 const eventCard: CSSProperties = {
   padding: 16,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(0,0,0,0.28)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const tabsContainer: CSSProperties = {
   display: "flex",
   gap: 8,
-  borderBottom: "1px solid rgba(255,255,255,0.12)",
+  borderBottom: "1px solid rgba(184, 134, 11, 0.2)",
   paddingBottom: 0,
 };
 
@@ -887,9 +887,9 @@ const tabButton = (isActive: boolean): CSSProperties => ({
   padding: "14px 20px",
   background: isActive ? "#facc15" : "transparent",
   border: "none",
-  color: isActive ? "#111" : "rgba(255,255,255,0.6)",
+  color: isActive ? "#FFFFFF" : "#6B635B",
   cursor: "pointer",
-  borderBottom: isActive ? "3px solid #facc15" : "none",
+  borderBottom: isActive ? "3px solid #996515" : "none",
   transition: "all 0.2s",
   marginBottom: "-1px",
 });
@@ -898,14 +898,14 @@ const legendBox: CSSProperties = {
   marginTop: 20,
   padding: 16,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(0,0,0,0.28)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const legendLabel: CSSProperties = {
   ...smallCaps,
   marginBottom: 12,
-  color: "#facc15",
+  color: "#B8860B",
 };
 
 const legendGrid: CSSProperties = {
@@ -919,7 +919,7 @@ const legendItem: CSSProperties = {
   alignItems: "center",
   gap: 8,
   fontSize: 13,
-  color: "rgba(255,255,255,0.7)",
+  color: "#6B635B",
 };
 
 const legendDot: CSSProperties = {
@@ -938,8 +938,8 @@ const houseActivationGrid: CSSProperties = {
 const houseActivationCard: CSSProperties = {
   padding: 16,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(0,0,0,0.28)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const nakshatraGrid: CSSProperties = {
@@ -951,8 +951,8 @@ const nakshatraGrid: CSSProperties = {
 const nakshatraCard: CSSProperties = {
   padding: 18,
   borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(0,0,0,0.35)",
+  border: "1px solid rgba(184, 134, 11, 0.16)",
+  background: "#FAF7F2",
 };
 
 const nakshatraContent: CSSProperties = {

@@ -966,6 +966,6 @@ main,
   color: #6B635B !important;
 }
 
-:is(.bg-[#FAF7F2], .bg-[#FFFFFF], .bg-[#FAF7F2], .bg-[#FAF7F2], .bg-[#FFFFFF], .bg-[#1a1040]) {
+:is(.bg-[#1a1040], .bg-[#0c0a1f], .bg-[#070711]) {
   background: #FAF7F2 !important;
 }

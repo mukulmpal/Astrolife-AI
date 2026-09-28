@@ -92,14 +92,14 @@ export function PalmistryFeedback({
   }
 
   return (
-    <div className="rounded-2xl border border-amber-500/20 bg-zinc-950/80 p-5">
+    <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-5">
       <h3 className="text-lg font-semibold text-amber-200">Improve This Palmistry Engine</h3>
-      <p className="mt-1 text-sm text-zinc-400">
+      <p className="mt-1 text-sm text-[#6B635B]">
         Your feedback helps AstroLife reduce weak rules and improve accuracy.
       </p>
 
       <div className="mt-5">
-        <label className="text-sm font-medium text-zinc-200">Accuracy Rating</label>
+        <label className="text-sm font-medium text-[#1A1A1A]">Accuracy Rating</label>
         <div className="mt-2 flex gap-2">
           {[1, 2, 3, 4, 5].map((value) => (
             <button
@@ -109,7 +109,7 @@ export function PalmistryFeedback({
               className={`h-10 w-10 rounded-full border text-sm font-semibold ${
                 rating === value
                   ? "border-amber-300 bg-amber-300 text-black"
-                  : "border-zinc-700 bg-black text-zinc-300"
+                  : "border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] text-[#3D3834]"
               }`}
             >
               {value}
@@ -138,7 +138,7 @@ export function PalmistryFeedback({
         value={feedback}
         onChange={(event) => setFeedback(event.target.value)}
         placeholder="Tell us what felt true or wrong..."
-        className="mt-5 min-h-24 w-full rounded-xl border border-zinc-800 bg-black p-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-amber-400/60"
+        className="mt-5 min-h-24 w-full rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3 text-sm text-[#1A1A1A] outline-none placeholder:text-[#8C827A] focus:border-amber-400/60"
       />
 
       <button
@@ -170,7 +170,7 @@ function SectionPicker({
 }) {
   return (
     <div className="mt-5">
-      <p className="text-sm font-medium text-zinc-200">{title}</p>
+      <p className="text-sm font-medium text-[#1A1A1A]">{title}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {sections.map((section) => (
           <button
@@ -178,7 +178,7 @@ function SectionPicker({
             type="button"
             onClick={() => onToggle(section)}
             className={`rounded-full border px-3 py-1 text-xs ${
-              selected.includes(section) ? selectedClassName : "border-zinc-700 text-zinc-300"
+              selected.includes(section) ? selectedClassName : "border-[rgba(184,134,11,0.2)] text-[#3D3834]"
             }`}
           >
             {SECTION_LABELS[section] ?? section}

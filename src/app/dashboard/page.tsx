@@ -546,7 +546,7 @@ function DashboardContent() {
         .energy-pill{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(200,160,48,0.1);border:1px solid rgba(200,160,48,0.15);color:#c8a030}
 
         /* TODAY CARD */
-        .today-card{background:linear-gradient(135deg,#FFFFFF,#1a1040);border:1px solid rgba(200,160,48,0.2);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden}
+        .today-card{background:linear-gradient(135deg,#FFFFFF,#FAF5EB);border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden}
         .today-orb{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(200,160,48,0.08) 0%,transparent 70%);right:-40px;top:-40px;pointer-events:none}
         .today-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:10px}
         .today-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
@@ -562,7 +562,7 @@ function DashboardContent() {
         .today-summary-hint{font-size:11px;color:#c8a030;margin-top:8px}
 
         /* UPGRADE */
-        .upgrade{background:linear-gradient(135deg,rgba(60,40,128,0.4),rgba(200,160,48,0.1));border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+        .upgrade{background:linear-gradient(135deg,#FAF5EB,#FFFFFF);border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
         .upgrade-btn{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;white-space:nowrap;text-decoration:none}
         .upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,160,48,0.3)}
         .db-health{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.18);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
@@ -789,11 +789,11 @@ function DashboardContent() {
                 <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:"#1A1A1A",marginBottom:4}}>
                   ✦ AstroLife Elite Universe Active
                 </div>
-                <div style={{fontSize:13,color:"#c084fc"}}>
+                <div style={{fontSize:13,color:"#6B635B"}}>
                   All 25+ astrology engines, unlimited AI questions, luxury dossiers, and VIP intelligence unlocked.
                 </div>
               </div>
-              <div style={{ padding: "8px 18px", borderRadius: 10, background: "linear-gradient(135deg,#a855f7,#7c3aed)", color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>
+              <div style={{ padding: "8px 18px", borderRadius: 10, background: "linear-gradient(135deg,#B8860B,#996515)", color: "#FFFFFF", fontSize: 12, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>
                 ✦ Elite Member
               </div>
             </div>

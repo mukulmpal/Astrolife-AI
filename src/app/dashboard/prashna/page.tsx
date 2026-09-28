@@ -123,7 +123,7 @@ export default function PrashnaPage() {
         .pr-input, .pr-select { width: 100%; background: #FAF7F2; border: 1px solid #FFFFFF; border-radius: 8px; padding: 10px 12px; color: #1A1A1A; font-family: inherit; font-size: 13px; }
         .pr-input:focus, .pr-select:focus { outline: none; border-color: rgba(168,85,247,0.5); }
         .pr-btn { width: 100%; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; padding: 12px; color: #1A1A1A; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px; }
-        .pr-ghost-btn { background: transparent; border: 1px solid rgba(168,85,247,.35); color: #c4b5fd; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .pr-ghost-btn { background: transparent; border: 1px solid rgba(184,134,11,0.3); color: #B8860B; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
         .pr-city-list { display: grid; gap: 6px; margin-top: 8px; }
         .pr-city-item { text-align: left; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); color: #d8d0ef; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 12px; }
         .pr-row { font-size: 12px; color: #6B635B; margin-bottom: 5px; display: flex; gap: 8px; }
@@ -268,7 +268,7 @@ export default function PrashnaPage() {
 
             {resultTab === "lagnaChart" || resultTab === "moonChart" ? (
               <div className="pr-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-                <div style={{ fontWeight: 700, fontSize: 13, color: "#c4b5fd" }}>
+                <div style={{ fontWeight: 700, fontSize: 13, color: "#B8860B" }}>
                   {resultTab === "lagnaChart"
                     ? `Prashna Lagna · ${result.lagnaRashi}`
                     : `Chandra Lagna · ${result.moonSign}`}
@@ -343,7 +343,7 @@ export default function PrashnaPage() {
 
             {/* Planet positions */}
             <div className="pr-card">
-              <div style={{ fontWeight: 700, fontSize: "13px", color: "#c4b5fd", marginBottom: "10px" }}>🪐 Prashna Planet Positions</div>
+              <div style={{ fontWeight: 700, fontSize: "13px", color: "#B8860B", marginBottom: "10px" }}>🪐 Prashna Planet Positions</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                 {Object.entries(result.planetPositions).map(([p, pd]) => (
                   <span key={p} className="planet-pill" style={{ background: `${pd.color}11`, borderColor: `${pd.color}33`, color: pd.color }}>
@@ -357,9 +357,9 @@ export default function PrashnaPage() {
             <div style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "10px", padding: "14px 16px" }}>
               <div style={{ fontWeight: 700, fontSize: "13px", color: "#a855f7", marginBottom: "8px" }}>💡 Practical Advice</div>
               <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.75" }}>{result.practicalAdvice}</div>
-              <div style={{ fontWeight: 700, fontSize: "12px", color: "#c4b5fd", marginTop: "12px", marginBottom: "6px" }}>Timing Window</div>
+              <div style={{ fontWeight: 700, fontSize: "12px", color: "#B8860B", marginTop: "12px", marginBottom: "6px" }}>Timing Window</div>
               <div style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.75" }}>{result.timingWindow}</div>
-              <div style={{ fontWeight: 700, fontSize: "12px", color: "#c4b5fd", marginTop: "12px", marginBottom: "6px" }}>Decision Protocol</div>
+              <div style={{ fontWeight: 700, fontSize: "12px", color: "#B8860B", marginTop: "12px", marginBottom: "6px" }}>Decision Protocol</div>
               {result.decisionProtocol.map((line, i) => (
                 <div key={i} style={{ fontSize: "12px", color: "#6B635B", lineHeight: "1.65", padding: "3px 0" }}>{i + 1}. {line}</div>
               ))}

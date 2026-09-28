@@ -327,7 +327,7 @@ function ScoreBar({ label, value, color }: { label: string; value: number | null
         <span>{label}</span>
         <strong style={{ color }}>{value === null ? "N/A" : `${score}/100`}</strong>
       </div>
-      <div style={{ height: 7, borderRadius: 999, background: "#17122f", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)" }}>
+      <div style={{ height: 7, borderRadius: 999, background: "#E8E2D8", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)" }}>
         <div style={{ width: `${Math.max(0, Math.min(100, score))}%`, height: "100%", background: color, borderRadius: 999 }} />
       </div>
     </div>
@@ -1125,7 +1125,7 @@ function RelationshipStoryPanel({
                 </div>
                 <span style={{ color: item.value >= 75 ? "var(--engine-green)" : item.value >= 58 ? "var(--engine-gold-strong)" : "#c2410c", fontSize: 12, fontWeight: 800 }}>{labelForScore(item.value)}</span>
               </div>
-              <div style={{ height: 8, borderRadius: 999, background: "#17122f", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)", marginBottom: 8 }}>
+              <div style={{ height: 8, borderRadius: 999, background: "#E8E2D8", overflow: "hidden", border: "1px solid rgba(184,134,11,0.2)", marginBottom: 8 }}>
                 <div style={{ width: `${item.value}%`, height: "100%", background: item.value >= 75 ? "var(--engine-green)" : item.value >= 58 ? "var(--engine-gold-strong)" : "#c2410c" }} />
               </div>
               <div style={{ fontSize: 11, color: "var(--engine-muted)", lineHeight: 1.55 }}>{item.note}</div>

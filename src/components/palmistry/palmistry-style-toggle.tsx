@@ -17,7 +17,7 @@ export function PalmistryStyleToggle({ value, onChange }: { value: PalmReportSty
           type="button"
           onClick={() => onChange(style.id)}
           className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
-            value === style.id ? "border-[#c8a030]/60 bg-[#c8a030]/15 text-[#e6c869]" : "border-white/10 bg-white/[0.03] text-white/55 hover:text-white"
+            value === style.id ? "border-[#c8a030]/60 bg-[#c8a030]/15 text-[#e6c869]" : "border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] text-[#6B635B] hover:text-[#1A1A1A]"
           }`}
         >
           {style.label}

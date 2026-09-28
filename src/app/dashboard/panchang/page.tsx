@@ -48,10 +48,10 @@ const NAVTARA_REMEDY: Record<string, { remedy: string[]; bestFor: string; avoid:
 
 function InfoCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-      <p className="text-xs uppercase tracking-wide text-white/40">{label}</p>
-      <p className="text-xl font-semibold mt-1 text-white">{value}</p>
-      {sub && <p className="text-xs mt-1" style={{ color: accent ?? "rgba(255,255,255,0.45)" }}>{sub}</p>}
+    <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FFFFFF] shadow-sm p-4">
+      <p className="text-xs uppercase tracking-wide text-[#6B635B]">{label}</p>
+      <p className="text-xl font-semibold mt-1 text-[#1A1A1A]">{value}</p>
+      {sub && <p className="text-xs mt-1" style={{ color: accent ?? "#6B635B" }}>{sub}</p>}
     </div>
   );
 }
@@ -64,13 +64,13 @@ function RemedyCard({ title, icon, remedies, color, tag }: {
       <div className="flex items-center gap-2">
         <span className="text-xl">{icon}</span>
         <div>
-          <p className="font-semibold text-white text-sm">{title}</p>
+          <p className="font-semibold text-[#1A1A1A] text-sm">{title}</p>
           {tag && <p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color }}>{tag}</p>}
         </div>
       </div>
       <ul className="flex flex-col gap-1.5">
         {remedies.map((r, i) => (
-          <li key={i} className="text-sm text-white/75 flex gap-2">
+          <li key={i} className="text-sm text-[#4A4238] flex gap-2">
             <span style={{ color }} className="mt-0.5 shrink-0">✦</span>
             <span>{r}</span>
           </li>
@@ -135,7 +135,7 @@ export default function PanchangPage() {
 
   return (
     <main
-      className="min-h-screen text-white"
+      className="min-h-screen text-[#1A1A1A] pb-20"
       style={{
         padding: "32px 24px 110px",
         background:
@@ -148,18 +148,18 @@ export default function PanchangPage() {
         <section>
           <p className="text-xs uppercase tracking-[0.2em] text-sky-300">Panchang Engine</p>
           <h1 className="text-3xl font-bold mt-1">Daily Panchang</h1>
-          <p className="text-white/50 text-sm mt-1">{panchang.weekday}, {panchang.date}</p>
+          <p className="text-[#6B635B] text-sm mt-1">{panchang.weekday}, {panchang.date}</p>
           <div className="flex flex-wrap gap-2 items-center mt-4">
             <button
               type="button"
-              className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white/80"
+              className="rounded-lg border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] px-3 py-2 text-sm text-[#6B635B] hover:text-[#1A1A1A]"
               onClick={() => setSelectedMoment((d) => shiftDays(d, -1))}
             >
               ← Prev day
             </button>
             <input
               type="date"
-              className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+              className="rounded-lg border border-[rgba(184,134,11,0.22)] bg-[#FFFFFF] px-3 py-2 text-sm text-[#1A1A1A] outline-none focus:border-[#B8860B]"
               value={toDateInputValue(selectedMoment)}
               onChange={(e) => {
                 if (!e.target.value) return;
@@ -173,7 +173,7 @@ export default function PanchangPage() {
             />
             <input
               type="time"
-              className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+              className="rounded-lg border border-[rgba(184,134,11,0.22)] bg-[#FFFFFF] px-3 py-2 text-sm text-[#1A1A1A] outline-none focus:border-[#B8860B]"
               value={toTimeInputValue(selectedMoment)}
               onChange={(e) => {
                 const [hh, mm] = e.target.value.split(":").map(Number);
@@ -186,7 +186,7 @@ export default function PanchangPage() {
             />
             <button
               type="button"
-              className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white/80"
+              className="rounded-lg border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] px-3 py-2 text-sm text-[#6B635B] hover:text-[#1A1A1A]"
               onClick={() => setSelectedMoment((d) => shiftDays(d, 1))}
             >
               Next day →
@@ -223,18 +223,18 @@ export default function PanchangPage() {
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)" }}>
             <p className="text-xs uppercase tracking-widest text-red-400">Rahu Kaal</p>
-            <p className="text-2xl font-bold text-white mt-1">{panchang.rahuKaal.start} – {panchang.rahuKaal.end}</p>
-            <p className="text-xs text-white/40 mt-1">Avoid important work in this window</p>
+            <p className="text-2xl font-bold text-[#1A1A1A] mt-1">{panchang.rahuKaal.start} – {panchang.rahuKaal.end}</p>
+            <p className="text-xs text-[#6B635B] mt-1">Avoid important work in this window</p>
           </div>
           <div className="rounded-2xl p-4" style={{ background: "rgba(184,134,11,0.08)", border: "1px solid rgba(184,134,11,0.25)" }}>
             <p className="text-xs uppercase tracking-widest text-[#B8860B]">Gulika Kaal</p>
-            <p className="text-2xl font-bold text-white mt-1">{panchang.gulikaKaal.start} – {panchang.gulikaKaal.end}</p>
-            <p className="text-xs text-white/40 mt-1">Inauspicious — avoid new starts</p>
+            <p className="text-2xl font-bold text-[#1A1A1A] mt-1">{panchang.gulikaKaal.start} – {panchang.gulikaKaal.end}</p>
+            <p className="text-xs text-[#6B635B] mt-1">Inauspicious — avoid new starts</p>
           </div>
           <div className="rounded-2xl p-4" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)" }}>
             <p className="text-xs uppercase tracking-widest text-amber-300">Yamaganda</p>
-            <p className="text-2xl font-bold text-white mt-1">{panchang.yamaganda.start} – {panchang.yamaganda.end}</p>
-            <p className="text-xs text-white/40 mt-1">Avoid risky or irreversible decisions</p>
+            <p className="text-2xl font-bold text-[#1A1A1A] mt-1">{panchang.yamaganda.start} – {panchang.yamaganda.end}</p>
+            <p className="text-xs text-[#6B635B] mt-1">Avoid risky or irreversible decisions</p>
           </div>
         </section>
 
@@ -249,16 +249,16 @@ export default function PanchangPage() {
                 </span>
               ))}
             </div>
-            <p className="text-xs text-white/50 mt-2">These rare Vara + Nakshatra combinations make today especially powerful for auspicious work.</p>
+            <p className="text-xs text-[#6B635B] mt-2">These rare Vara + Nakshatra combinations make today especially powerful for auspicious work.</p>
           </section>
         )}
 
         {/* Chaughadia */}
         <section>
-          <p className="text-xs uppercase tracking-widest text-white/35 mb-3">Chaughadia Muhurta</p>
+          <p className="text-xs uppercase tracking-widest text-[#8C827A] mb-3">Chaughadia Muhurta</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Day */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-4">
               <p className="text-xs uppercase tracking-widest text-amber-300 mb-3">Day · Sunrise to Sunset</p>
               <div className="flex flex-col gap-1.5">
                 {panchang.chaughadiaDay.map((w, i) => {
@@ -272,10 +272,10 @@ export default function PanchangPage() {
                       <div className="w-1.5 h-8 rounded-full shrink-0" style={{ background: qColor }} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm text-white">{w.name}</span>
+                          <span className="font-semibold text-sm text-[#1A1A1A]">{w.name}</span>
                           {w.isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
                         </div>
-                        <p className="text-[11px] text-white/40">{w.start} – {w.end}</p>
+                        <p className="text-[11px] text-[#6B635B]">{w.start} – {w.end}</p>
                       </div>
                       <span className="text-[10px] text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
                     </div>
@@ -284,7 +284,7 @@ export default function PanchangPage() {
               </div>
             </div>
             {/* Night */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-4">
               <p className="text-xs uppercase tracking-widest text-[#6B635B] mb-3">Night · Sunset to Sunrise</p>
               <div className="flex flex-col gap-1.5">
                 {panchang.chaughadiaNight.map((w, i) => {
@@ -298,10 +298,10 @@ export default function PanchangPage() {
                       <div className="w-1.5 h-8 rounded-full shrink-0" style={{ background: qColor }} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm text-white">{w.name}</span>
+                          <span className="font-semibold text-sm text-[#1A1A1A]">{w.name}</span>
                           {w.isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
                         </div>
-                        <p className="text-[11px] text-white/40">{w.start} – {w.end}</p>
+                        <p className="text-[11px] text-[#6B635B]">{w.start} – {w.end}</p>
                       </div>
                       <span className="text-[10px] text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
                     </div>
@@ -316,8 +316,8 @@ export default function PanchangPage() {
               <div className="mt-3 rounded-xl p-3 flex gap-3 items-start" style={{ background: qColor + "14", border: `1px solid ${qColor}40` }}>
                 <span className="text-2xl">⏰</span>
                 <div>
-                  <p className="font-semibold text-white text-sm">Current: {panchang.currentChaughadia.name} ({panchang.currentChaughadia.start} – {panchang.currentChaughadia.end})</p>
-                  <p className="text-sm text-white/60 mt-0.5">{panchang.currentChaughadia.guidance}</p>
+                  <p className="font-semibold text-[#1A1A1A] text-sm">Current: {panchang.currentChaughadia.name} ({panchang.currentChaughadia.start} – {panchang.currentChaughadia.end})</p>
+                  <p className="text-sm text-[#4A4238] mt-0.5">{panchang.currentChaughadia.guidance}</p>
                 </div>
               </div>
             );
@@ -336,12 +336,12 @@ export default function PanchangPage() {
             <div className="flex items-start gap-4">
               <span className="text-4xl">{navtara.icon}</span>
               <div className="flex-1">
-                <p className="text-xl font-bold text-white">
+                <p className="text-xl font-bold text-[#1A1A1A]">
                   {navtara.taraName} Tara #{navtara.taraNum}
-                  <span className="ml-2 text-sm font-normal text-white/50">— {navtara.meaning}</span>
+                  <span className="ml-2 text-sm font-normal text-[#6B635B]">— {navtara.meaning}</span>
                 </p>
-                <p className="text-sm text-white/70 mt-1">{navtara.advice}</p>
-                <div className="flex gap-4 mt-2 text-xs text-white/35">
+                <p className="text-sm text-[#4A4238] mt-1">{navtara.advice}</p>
+                <div className="flex gap-4 mt-2 text-xs text-[#8C827A]">
                   <span>Birth: {navtara.janmaNakshatra}</span>
                   <span>Today: {navtara.todayNakshatra}</span>
                   <span>Cycle {navtara.cycleNumber}</span>
@@ -359,7 +359,7 @@ export default function PanchangPage() {
 
         {/* Remedy Cards */}
         <section>
-          <p className="text-xs uppercase tracking-widest text-white/35 mb-3">Today&apos;s Remedies</p>
+          <p className="text-xs uppercase tracking-widest text-[#8C827A] mb-3">Today&apos;s Remedies</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 
             {/* Navtara remedy */}
@@ -401,10 +401,10 @@ export default function PanchangPage() {
         {/* Tithi guidance */}
         {tithiGuide && (
           <section className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-            <p className="text-xs uppercase tracking-widest text-white/35 mb-2">Tithi Guidance — {tithiKey}</p>
+            <p className="text-xs uppercase tracking-widest text-[#8C827A] mb-2">Tithi Guidance — {tithiKey}</p>
             <div className="grid sm:grid-cols-3 gap-3 text-sm">
               <div>
-                <p className="text-white/40 text-xs mb-1">Nature</p>
+                <p className="text-[#6B635B] text-xs mb-1">Nature</p>
                 <p className="font-semibold" style={{
                   color: tithiGuide.nature === "Auspicious" ? "#22c55e" :
                          tithiGuide.nature === "Sensitive" ? "#ef4444" :
@@ -412,15 +412,15 @@ export default function PanchangPage() {
                 }}>{tithiGuide.nature}</p>
               </div>
               <div>
-                <p className="text-white/40 text-xs mb-1">Good For</p>
-                <p className="text-white/80">{tithiGuide.goodFor.join(", ")}</p>
+                <p className="text-[#6B635B] text-xs mb-1">Good For</p>
+                <p className="text-[#1A1A1A]">{tithiGuide.goodFor.join(", ")}</p>
               </div>
               <div>
-                <p className="text-white/40 text-xs mb-1">Avoid</p>
-                <p className="text-white/80">{tithiGuide.avoid.join(", ")}</p>
+                <p className="text-[#6B635B] text-xs mb-1">Avoid</p>
+                <p className="text-[#1A1A1A]">{tithiGuide.avoid.join(", ")}</p>
               </div>
             </div>
-            <p className="text-sm text-white/55 leading-relaxed mt-3">{tithiGuide.explanation}</p>
+            <p className="text-sm text-[#6B635B] leading-relaxed mt-3">{tithiGuide.explanation}</p>
           </section>
         )}
 
@@ -428,13 +428,13 @@ export default function PanchangPage() {
           <div className="rounded-2xl p-4" style={{ background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.22)" }}>
             <p className="text-xs uppercase tracking-widest text-emerald-300 mb-2">Aaj Shubh Karya</p>
             {panchang.shubhKarya.map((item) => (
-              <p key={item} className="text-sm text-white/75 leading-relaxed">✦ {item}</p>
+              <p key={item} className="text-sm text-[#4A4238] leading-relaxed">✦ {item}</p>
             ))}
           </div>
           <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.22)" }}>
             <p className="text-xs uppercase tracking-widest text-red-300 mb-2">Aaj Avoid / Saavdhani</p>
             {panchang.avoidKarya.map((item) => (
-              <p key={item} className="text-sm text-white/75 leading-relaxed">✦ {item}</p>
+              <p key={item} className="text-sm text-[#4A4238] leading-relaxed">✦ {item}</p>
             ))}
           </div>
         </section>
@@ -444,7 +444,7 @@ export default function PanchangPage() {
           <section className="rounded-2xl p-4" style={{ background: "rgba(14,165,233,0.07)", border: "1px solid rgba(14,165,233,0.2)" }}>
             <p className="text-xs uppercase tracking-widest text-sky-400 mb-2">Special Notes</p>
             {panchang.notes.map((note, i) => (
-              <p key={i} className="text-sm text-white/75 leading-relaxed">✦ {note}</p>
+              <p key={i} className="text-sm text-[#4A4238] leading-relaxed">✦ {note}</p>
             ))}
           </section>
         )}

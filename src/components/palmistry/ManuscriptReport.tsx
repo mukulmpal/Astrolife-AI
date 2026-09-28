@@ -80,11 +80,11 @@ export function ManuscriptReport({ report, preview }: ManuscriptReportProps) {
             </div>
             <p className="mt-8 text-center text-[10px] uppercase tracking-[0.45em] text-[#e6c869]/70">AstroLife Manuscript</p>
             <h1 className="mt-5 text-center font-serif text-5xl leading-none text-[#f5e7b8] sm:text-6xl">The Map of You</h1>
-            <p className="mx-auto mt-5 max-w-md text-center text-sm leading-relaxed text-amber-100/55">
+            <p className="mx-auto mt-5 max-w-md text-center text-sm leading-relaxed text-[#1A1A1A]/55">
               A luxury palm intelligence manuscript translating visible hand patterns into personality, love, wealth, timing and inner-growth themes.
             </p>
 
-            <div className="mx-auto mt-10 max-w-sm overflow-hidden rounded-[40%] border border-[#c8a030]/35 bg-black/30 shadow-[0_0_45px_rgba(200,160,48,.2)]">
+            <div className="mx-auto mt-10 max-w-sm overflow-hidden rounded-[40%] border border-[#c8a030]/35 bg-[#FAF7F2] shadow-[0_0_45px_rgba(200,160,48,.2)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={preview} alt="Your palm" className="aspect-[4/5] h-full w-full object-cover sepia-[.35] saturate-[.85]" />
             </div>
@@ -95,9 +95,9 @@ export function ManuscriptReport({ report, preview }: ManuscriptReportProps) {
                 ["Confidence", report.finalIntelligenceScore.confidence],
                 ["Kundli Align", report.palmKundliCorrelation.alignmentScore],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-2xl border border-[#c8a030]/20 bg-black/25 p-4 text-center">
+                <div key={label} className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-4 text-center">
                   <div className="font-serif text-3xl text-[#e6c869]">{value}</div>
-                  <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-amber-100/45">{label}</div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#1A1A1A]/45">{label}</div>
                 </div>
               ))}
             </div>
@@ -165,12 +165,12 @@ export function ManuscriptReport({ report, preview }: ManuscriptReportProps) {
             <ChapterTitle kicker="Chapter Three" title="Royal Guidance" />
             <div className="space-y-4">
               {report.predictions.map((prediction) => (
-                <div key={prediction.id} className="rounded-2xl border border-[#c8a030]/20 bg-black/25 p-4">
+                <div key={prediction.id} className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="font-serif text-xl text-[#f5e7b8]">{prediction.title}</h3>
                     <b className="font-serif text-2xl text-[#e6c869]">{prediction.strength}</b>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-amber-100/60">{prediction.summary}</p>
+                  <p className="mt-2 text-sm leading-6 text-[#1A1A1A]/60">{prediction.summary}</p>
                 </div>
               ))}
             </div>
@@ -183,7 +183,7 @@ export function ManuscriptReport({ report, preview }: ManuscriptReportProps) {
               <ShieldCheck className="text-emerald-300" />
               <h3 className="font-serif text-2xl text-[#f5e7b8]">Palm + Kundli</h3>
             </div>
-            <p className="mt-4 text-sm leading-7 text-amber-100/60">{report.palmKundliCorrelation.summary}</p>
+            <p className="mt-4 text-sm leading-7 text-[#1A1A1A]/60">{report.palmKundliCorrelation.summary}</p>
             <div className="mt-5 font-serif text-5xl text-[#e6c869]">{report.palmKundliCorrelation.alignmentScore}</div>
           </DarkPage>
 
@@ -207,7 +207,7 @@ export function ManuscriptReport({ report, preview }: ManuscriptReportProps) {
             </div>
             <div className="mt-4 space-y-3">
               {report.growthPlan.slice(0, 4).map((item, i) => (
-                <div key={item} className="flex gap-3 text-sm leading-6 text-amber-100/65">
+                <div key={item} className="flex gap-3 text-sm leading-6 text-[#1A1A1A]/65">
                   <span className="font-serif text-[#e6c869]">{i + 1}</span>
                   <span>{item}</span>
                 </div>
@@ -216,9 +216,9 @@ export function ManuscriptReport({ report, preview }: ManuscriptReportProps) {
           </DarkPage>
         </div>
 
-        <div className="mt-5 rounded-[2rem] border border-[#c8a030]/20 bg-black/25 p-5 text-center">
+        <div className="mt-5 rounded-[2rem] border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-5 text-center">
           <BookOpen className="mx-auto text-[#e6c869]" size={18} />
-          <p className="mt-3 text-xs leading-relaxed text-amber-100/45">{report.meta.disclaimer}</p>
+          <p className="mt-3 text-xs leading-relaxed text-[#1A1A1A]/45">{report.meta.disclaimer}</p>
         </div>
       </div>
     </div>

@@ -57,7 +57,7 @@ export function PalmistrySaveButton({
   }
 
   return (
-    <div className="rounded-2xl border border-amber-500/20 bg-black/30 p-4">
+    <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-4">
       <button
         type="button"
         onClick={handleSave}

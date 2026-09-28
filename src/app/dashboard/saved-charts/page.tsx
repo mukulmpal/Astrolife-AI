@@ -123,7 +123,7 @@ export default function SavedChartsPage() {
           type="button"
           onClick={loadCharts}
           disabled={loading}
-          style={{ background: "#FFFFFF", color: "#f0e8d0", border: "1px solid #FFFFFF", borderRadius: 8, padding: "10px 14px", fontWeight: 700, cursor: "pointer" }}
+          style={{ background: "#B8860B", color: "#FFFFFF", border: "1px solid #B8860B", borderRadius: 8, padding: "10px 14px", fontWeight: 700, cursor: "pointer" }}
         >
           {loading ? "Loading..." : "Refresh"}
         </button>
@@ -158,7 +158,7 @@ export default function SavedChartsPage() {
               <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#6B635B", marginBottom: 6 }}>
                 {chart.gender || "Birth Chart"}
               </div>
-              <h2 className="serif" style={{ fontSize: 24, color: "#f0e8d0", marginBottom: 8 }}>{chart.name}</h2>
+              <h2 className="serif" style={{ fontSize: 24, color: "#1A1A1A", marginBottom: 8 }}>{chart.name}</h2>
               <div style={{ color: "#b8b0d8", fontSize: 13, lineHeight: 1.8, marginBottom: 14 }}>
                 DOB: {chart.birth_date}<br />
                 TOB: {chart.birth_time.slice(0, 5)}<br />

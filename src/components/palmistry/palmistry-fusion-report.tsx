@@ -39,20 +39,20 @@ export function PalmistryFusionReport({
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cyan-100">
             <Sparkles size={13} /> AstroLife Fusion
           </div>
-          <h3 className="mt-3 font-serif text-3xl text-white">{report.title}</h3>
-          <p className="mt-2 max-w-4xl text-sm leading-relaxed text-white/62">{report.executiveSummary}</p>
+          <h3 className="mt-3 font-serif text-3xl text-[#1A1A1A]">{report.title}</h3>
+          <p className="mt-2 max-w-4xl text-sm leading-relaxed text-[#4A4238]">{report.executiveSummary}</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white/62 lg:max-w-sm">
+        <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4 text-sm text-[#4A4238] lg:max-w-sm">
           <div className="text-[10px] uppercase tracking-[0.2em] text-cyan-100/70">Fusion Summary</div>
           <p className="mt-2 leading-relaxed">{fusion.overallSummary}</p>
         </div>
       </div>
 
       {fusion.missingContext.length > 0 ? (
-        <div className="flex gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-amber-100/78">
+        <div className="flex gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-[#1A1A1A]/78">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" />
           <div>
-            <div className="font-semibold text-amber-100">Missing context</div>
+            <div className="font-semibold text-[#1A1A1A]">Missing context</div>
             <p className="mt-1">Connect {fusion.missingContext.join(", ")} to unlock stronger Palm + Kundli + Dasha + Numerology alignment.</p>
           </div>
         </div>

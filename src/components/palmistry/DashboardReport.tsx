@@ -72,7 +72,7 @@ function GlassCard({
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay }}
       whileHover={hover ? { y: -3 } : undefined}
-      className={`relative rounded-2xl border border-[#c8a030]/20 bg-gradient-to-b from-white/[0.04] to-white/[0.01] backdrop-blur-md shadow-[0_8px_40px_-12px_rgba(0,0,0,0.7)] transition-shadow hover:border-[#c8a030]/45 hover:shadow-[0_0_30px_-6px_rgba(200,160,48,0.35)] ${className}`}
+      className={`relative rounded-2xl border border-[rgba(184,134,11,0.2)] bg-gradient-to-b from-[#FFFFFF] to-[#FAF7F2] backdrop-blur-md shadow-[0_8px_40px_-12px_rgba(0,0,0,0.7)] transition-shadow hover:border-[#c8a030]/45 hover:shadow-[0_0_30px_-6px_rgba(200,160,48,0.35)] ${className}`}
     >
       {children}
     </motion.div>
@@ -99,7 +99,7 @@ function RadialScore({ label, value, delay = 0 }: { label: string; value: number
           {value}
         </div>
       </div>
-      <span className="text-center text-xs font-medium text-white/60">{label}</span>
+      <span className="text-center text-xs font-medium text-[#4A4238]">{label}</span>
     </div>
   );
 }
@@ -108,7 +108,7 @@ function MetricBar({ label, value, delay = 0 }: { label: string; value: number; 
   return (
     <div>
       <div className="mb-1 flex justify-between text-xs">
-        <span className="text-white/70">{label}</span>
+        <span className="text-[#3D3834]">{label}</span>
         <span className="font-semibold text-[#e6c869]">{value}%</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -129,22 +129,22 @@ function IntelligenceCard({ section, delay = 0 }: { section: PalmistryReport["in
     <GlassCard className="p-4" delay={delay}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">Intelligence Module</div>
-          <h4 className="mt-1 text-base font-bold text-white/90">{section.title}</h4>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8C827A]">Intelligence Module</div>
+          <h4 className="mt-1 text-base font-bold text-[#1A1A1A]">{section.title}</h4>
         </div>
         <div className="rounded-2xl border border-[#c8a030]/25 bg-[#c8a030]/10 px-3 py-2 text-center">
           <div className="font-serif text-2xl font-bold leading-none text-[#e6c869]">{section.score}</div>
-          <div className="mt-1 text-[9px] uppercase tracking-wider text-white/40">{section.confidence}% conf</div>
+          <div className="mt-1 text-[9px] uppercase tracking-wider text-[#8C827A]">{section.confidence}% conf</div>
         </div>
       </div>
-      <p className="mt-3 text-xs leading-relaxed text-white/60"><b className="text-white/80">Reasoning:</b> {section.reasoning}</p>
-      <p className="mt-2 text-xs leading-relaxed text-white/60"><b className="text-white/80">Interpretation:</b> {section.interpretation}</p>
+      <p className="mt-3 text-xs leading-relaxed text-[#4A4238]"><b className="text-[#1A1A1A]">Reasoning:</b> {section.reasoning}</p>
+      <p className="mt-2 text-xs leading-relaxed text-[#4A4238]"><b className="text-[#1A1A1A]">Interpretation:</b> {section.interpretation}</p>
       <p className="mt-2 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-2 text-xs leading-relaxed text-emerald-100/80">
         {section.recommendation}
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {section.signals.slice(0, 5).map((signal) => (
-          <span key={signal} className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] text-white/50">{signal}</span>
+          <span key={signal} className="rounded-full border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] px-2 py-0.5 text-[10px] text-[#6B635B]">{signal}</span>
         ))}
       </div>
     </GlassCard>
@@ -159,7 +159,7 @@ function LineAccordion({ report }: { report: PalmistryReport }) {
       {report.lines.map((l) => {
         const isOpen = open === l.id;
         return (
-          <div key={l.id} className="overflow-hidden rounded-xl border border-[#c8a030]/15 bg-white/[0.02]">
+          <div key={l.id} className="overflow-hidden rounded-xl border border-[#c8a030]/15 bg-[#FAF7F2]">
             <button
               type="button"
               onClick={() => setOpen(isOpen ? null : l.id)}
@@ -167,17 +167,17 @@ function LineAccordion({ report }: { report: PalmistryReport }) {
             >
               <span className="flex items-center gap-2.5">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ background: l.color, boxShadow: `0 0 8px ${l.color}` }} />
-                <span className="text-sm font-semibold text-white/90">{l.name}</span>
-                <span className="text-xs text-white/40">{l.sanskrit}</span>
+                <span className="text-sm font-semibold text-[#1A1A1A]">{l.name}</span>
+                <span className="text-xs text-[#8C827A]">{l.sanskrit}</span>
               </span>
               <span className="flex items-center gap-3">
                 <span className="text-xs font-medium text-[#e6c869]">{l.confidence}%</span>
-                <ChevronDown size={16} className={`text-white/50 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                <ChevronDown size={16} className={`text-[#6B635B] transition-transform ${isOpen ? "rotate-180" : ""}`} />
               </span>
             </button>
             {isOpen && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28 }}>
-                <p className="px-4 pb-4 text-sm leading-relaxed text-white/65">{l.detail || l.summary}</p>
+                <p className="px-4 pb-4 text-sm leading-relaxed text-[#4A4238]">{l.detail || l.summary}</p>
               </motion.div>
             )}
           </div>
@@ -211,17 +211,17 @@ function PalmReportHeader({ report }: { report: PalmistryReport }) {
       <div className="relative grid gap-5 p-5 sm:p-6 lg:grid-cols-[1fr_auto]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(200,160,48,0.18),transparent_38%),radial-gradient(circle_at_90%_30%,rgba(45,212,191,0.10),transparent_32%)]" />
         <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#c8a030]/30 bg-black/35 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#e6c869]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(184,134,11,0.22)] bg-[#FAF7F2] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#e6c869]">
             <Sparkles size={12} /> Powered by AstroLife Advanced AI Engine
           </div>
-          <h2 className="mt-4 font-serif text-4xl font-light tracking-[0.08em] text-white sm:text-5xl lg:text-6xl">
+          <h2 className="mt-4 font-serif text-4xl font-light tracking-[0.08em] text-[#1A1A1A] sm:text-5xl lg:text-6xl">
             AI Palm Reading Report
           </h2>
           <p className="mt-2 text-sm uppercase tracking-[0.28em] text-[#e6c869]/80">Your Hand. Your Story.</p>
           <div className="mt-5 flex flex-wrap gap-2">
             <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-200">Verified AI Scan</span>
             <span className="rounded-full border border-[#c8a030]/25 bg-[#c8a030]/10 px-3 py-1 text-xs font-semibold text-[#e6c869]">{report.meta.hand} hand</span>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/55">Image quality: {report.meta.imageQuality}</span>
+            <span className="rounded-full border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] px-3 py-1 text-xs text-[#6B635B]">Image quality: {report.meta.imageQuality}</span>
           </div>
         </div>
 
@@ -231,9 +231,9 @@ function PalmReportHeader({ report }: { report: PalmistryReport }) {
             ["Generated", date],
             ["Scan Confidence", `${report.finalIntelligenceScore.confidence}%`],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-white/10 bg-black/35 p-4">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-white/35">{label}</div>
-              <div className="mt-1 text-sm font-semibold text-white/80">{value}</div>
+            <div key={label} className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[#8C827A]">{label}</div>
+              <div className="mt-1 text-sm font-semibold text-[#1A1A1A]">{value}</div>
             </div>
           ))}
         </div>
@@ -251,7 +251,7 @@ function IntelligenceModeBar({
 }) {
   return (
     <GlassCard className="p-3" delay={0.04} hover={false}>
-      <div className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.3em] text-white/35">Choose Intelligence Mode</div>
+      <div className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.3em] text-[#8C827A]">Choose Intelligence Mode</div>
       <div className="grid gap-3 md:grid-cols-4">
         {MODE_DEFS.map(({ id, title, icon: Icon, desc }) => {
           const active = mode === id;
@@ -263,12 +263,12 @@ function IntelligenceModeBar({
               className={`rounded-2xl border p-4 text-left transition ${
                 active
                   ? "border-[#c8a030]/55 bg-[#c8a030]/15 shadow-[0_0_36px_rgba(200,160,48,0.16)]"
-                  : "border-white/10 bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.05]"
+                  : "border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] hover:border-[rgba(184,134,11,0.22)] hover:bg-[#FAF7F2]"
               }`}
             >
-              <Icon size={18} className={active ? "text-[#e6c869]" : "text-white/45"} />
-              <div className="mt-3 font-serif text-lg text-white/90">{title}</div>
-              <p className="mt-1 text-xs leading-relaxed text-white/45">{desc}</p>
+              <Icon size={18} className={active ? "text-[#e6c869]" : "text-[#6B635B]"} />
+              <div className="mt-3 font-serif text-lg text-[#1A1A1A]">{title}</div>
+              <p className="mt-1 text-xs leading-relaxed text-[#6B635B]">{desc}</p>
             </button>
           );
         })}
@@ -295,9 +295,9 @@ function CommandPalmScanner({ report, preview }: { report: PalmistryReport; prev
   ];
 
   return (
-    <div className="relative min-h-[680px] overflow-hidden rounded-[2rem] border border-[#c8a030]/20 bg-[radial-gradient(circle_at_50%_40%,rgba(23,143,190,0.18),transparent_46%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))] p-4 shadow-[0_0_100px_rgba(33,150,243,0.10)]">
+    <div className="relative min-h-[680px] overflow-hidden rounded-[2rem] border border-[rgba(184,134,11,0.2)] bg-[radial-gradient(circle_at_50%_40%,rgba(23,143,190,0.18),transparent_46%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))] p-4 shadow-[0_0_100px_rgba(33,150,243,0.10)]">
       <div className="pointer-events-none absolute inset-0 opacity-25" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)", backgroundSize: "42px 42px" }} />
-      <div className="absolute left-1/2 top-5 z-20 -translate-x-1/2 rounded-full border border-cyan-300/30 bg-black/60 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-100 backdrop-blur">
+      <div className="absolute left-1/2 top-5 z-20 -translate-x-1/2 rounded-full border border-cyan-300/30 bg-[#FAF7F2] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-100 backdrop-blur">
         <ScanLine size={13} className="mr-2 inline" /> Palm Scan Complete
       </div>
 
@@ -342,11 +342,11 @@ function CommandPalmScanner({ report, preview }: { report: PalmistryReport; prev
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 + i * 0.06 }}
-          className={`absolute z-30 hidden w-40 rounded-2xl border border-white/12 bg-black/55 p-3 text-left backdrop-blur-xl xl:block ${calloutSlots[i]}`}
+          className={`absolute z-30 hidden w-40 rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3 text-left backdrop-blur-xl xl:block ${calloutSlots[i]}`}
         >
-          <div className="text-[10px] uppercase tracking-[0.15em] text-white/45">{mount.name}</div>
+          <div className="text-[10px] uppercase tracking-[0.15em] text-[#6B635B]">{mount.name}</div>
           <div className="mt-1 text-2xl font-bold text-cyan-200">{mount.score}%</div>
-          <p className="mt-1 text-[10px] leading-relaxed text-white/55">{mount.keywords}</p>
+          <p className="mt-1 text-[10px] leading-relaxed text-[#6B635B]">{mount.keywords}</p>
         </motion.div>
       ))}
     </div>
@@ -363,10 +363,10 @@ function ScoreStrip({ report }: { report: PalmistryReport }) {
           <GlassCard key={score.label} className="p-4" delay={i * 0.04}>
             <div className="flex items-center justify-between">
               <Icon size={17} style={{ color: tone }} />
-              <span className="text-[10px] uppercase tracking-[0.18em] text-white/35">/100</span>
+              <span className="text-[10px] uppercase tracking-[0.18em] text-[#8C827A]">/100</span>
             </div>
             <div className="mt-3 font-serif text-4xl font-light" style={{ color: tone }}>{score.value}</div>
-            <div className="mt-1 text-sm text-white/75">{score.label}</div>
+            <div className="mt-1 text-sm text-[#1A1A1A]/75">{score.label}</div>
             <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
               <motion.div
                 className="h-full rounded-full"
@@ -409,11 +409,11 @@ function AskPalmPanel({ report }: { report: PalmistryReport }) {
     <GlassCard className="p-5" hover={false}>
       <div className="flex items-center gap-3">
         <MessageCircle className="text-cyan-200" size={18} />
-        <h3 className="font-serif text-2xl font-bold text-white">Ask Your Palm</h3>
+        <h3 className="font-serif text-2xl font-bold text-[#1A1A1A]">Ask Your Palm</h3>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {questions.map((q) => (
-          <button key={q} type="button" onClick={() => setQuestion(q)} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white/60 hover:text-white">
+          <button key={q} type="button" onClick={() => setQuestion(q)} className="rounded-full border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] px-3 py-2 text-xs text-[#4A4238] hover:text-[#1A1A1A]">
             {q}
           </button>
         ))}
@@ -421,7 +421,7 @@ function AskPalmPanel({ report }: { report: PalmistryReport }) {
       <input
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
-        className="mt-4 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40"
+        className="mt-4 w-full rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] px-4 py-3 text-sm text-[#1A1A1A] outline-none focus:border-cyan-300/40"
       />
       <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm leading-relaxed text-cyan-50/80">{answer}</div>
     </GlassCard>
@@ -440,16 +440,16 @@ function PalmEvolutionPanel({ report }: { report: PalmistryReport }) {
     <GlassCard className="p-5" hover={false}>
       <div className="flex items-center gap-3">
         <RefreshCcw className="text-emerald-300" size={18} />
-        <h3 className="font-serif text-2xl font-bold text-white">Palm Evolution</h3>
+        <h3 className="font-serif text-2xl font-bold text-[#1A1A1A]">Palm Evolution</h3>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-white/55">
+      <p className="mt-3 text-sm leading-relaxed text-[#6B635B]">
         Snapshot comparison is ready in the product grammar: future scans can track confidence, stress, communication and career markers over time.
       </p>
       {improvements.map(([label, raw]) => {
         const delta = Math.max(-20, Math.min(24, Number(raw)));
         return (
-          <div key={label} className="mt-4 flex justify-between rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-sm">
-            <span className="text-white/70">{label}</span>
+          <div key={label} className="mt-4 flex justify-between rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3 text-sm">
+            <span className="text-[#3D3834]">{label}</span>
             <b className={delta >= 0 ? "text-emerald-300" : "text-amber-300"}>{delta >= 0 ? "+" : ""}{delta}%</b>
           </div>
         );
@@ -485,9 +485,9 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
             <div className="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#e6c869]">
               <Layers3 size={13} /> Palm Overview
             </div>
-            <h3 className="font-serif text-lg font-bold text-white">Overall Impression</h3>
-            <p className="mt-1 text-sm font-medium text-white/80">{report.overallImpression.headline}</p>
-            <p className="mt-2 text-sm leading-relaxed text-white/60">{report.overallImpression.summary}</p>
+            <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">Overall Impression</h3>
+            <p className="mt-1 text-sm font-medium text-[#1A1A1A]">{report.overallImpression.headline}</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">{report.overallImpression.summary}</p>
             <div className="mt-4 space-y-3">
               {report.overallImpression.metrics.map((m, i) => (
                 <MetricBar key={m.label} label={m.label} value={m.value} delay={i * 0.1} />
@@ -499,17 +499,17 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
             <div className="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#e6c869]">
               <Brain size={13} /> Finger Intelligence
             </div>
-            <h3 className="font-serif text-lg font-bold text-white">Willpower & Skill Map</h3>
+            <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">Willpower & Skill Map</h3>
             <div className="mt-3 space-y-3">
               {report.fingers.map((f) => (
-                <div key={f.id} className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-                  <div className="text-sm font-semibold text-white/85">{f.name}</div>
+                <div key={f.id} className="rounded-xl border border-white/5 bg-[#FAF7F2] p-3">
+                  <div className="text-sm font-semibold text-[#1A1A1A]">{f.name}</div>
                   <div className="mt-1 flex flex-wrap gap-1.5">
                     {f.keywords.map((k) => (
                       <span key={k} className="rounded-full bg-[#c8a030]/10 px-2 py-0.5 text-[10px] text-[#e6c869]">{k}</span>
                     ))}
                   </div>
-                  {f.summary && <p className="mt-1.5 text-xs leading-relaxed text-white/55">{f.summary}</p>}
+                  {f.summary && <p className="mt-1.5 text-xs leading-relaxed text-[#6B635B]">{f.summary}</p>}
                 </div>
               ))}
             </div>
@@ -523,11 +523,11 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
               {report.lines.map((line) => (
                 <div key={line.id}>
                   <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-2 text-white/70">
+                    <span className="flex items-center gap-2 text-[#3D3834]">
                       <span className="h-2 w-2 rounded-full" style={{ background: line.color, boxShadow: `0 0 8px ${line.color}` }} />
                       {line.name}
                     </span>
-                    <span className="font-semibold text-white/80">{line.confidence}%</span>
+                    <span className="font-semibold text-[#1A1A1A]">{line.confidence}%</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
                     <motion.div
@@ -547,7 +547,7 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
 
         <div className="space-y-4">
           <CommandPalmScanner preview={preview} report={report} />
-          <p className="text-center text-[11px] text-white/40">
+          <p className="text-center text-[11px] text-[#8C827A]">
             Spatial palm map uses detected geometry first, AI coordinates second, and calibrated fallback only when needed.
           </p>
         </div>
@@ -556,14 +556,14 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
           {visiblePredictions.map((p, i) => (
             <GlassCard key={p.id} className="p-4" delay={i * 0.08}>
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-white/90">{p.title}</h4>
+                <h4 className="text-sm font-bold text-[#1A1A1A]">{p.title}</h4>
                 <span className="text-xs font-semibold text-[#e6c869]">{p.strength}%</span>
               </div>
               <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
                 <motion.div className="h-full rounded-full bg-gradient-to-r from-[#c8a030] to-[#e6c869]"
                   initial={{ width: 0 }} whileInView={{ width: `${p.strength}%` }} viewport={{ once: true }} transition={{ duration: 0.8 }} />
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-white/60">{p.summary}</p>
+              <p className="mt-2 text-xs leading-relaxed text-[#4A4238]">{p.summary}</p>
               {p.opportunities.length > 0 && (
                 <p className="mt-2 text-[11px] text-emerald-300/80"><b>Opportunities:</b> {p.opportunities.join(", ")}</p>
               )}
@@ -580,7 +580,7 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
             <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-200">
               <ShieldCheck size={13} /> AI Insight
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-white/65">{report.finalIntelligenceScore.summary}</p>
+            <p className="mt-3 text-sm leading-relaxed text-[#4A4238]">{report.finalIntelligenceScore.summary}</p>
           </GlassCard>
         </div>
       </div>
@@ -589,16 +589,16 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
         <GlassCard className="p-5" hover={false}>
           <div className="flex items-center gap-3">
             <TimerReset className="text-[#e6c869]" size={18} />
-            <h3 className="font-serif text-2xl font-bold text-white">Interactive Timeline</h3>
+            <h3 className="font-serif text-2xl font-bold text-[#1A1A1A]">Interactive Timeline</h3>
           </div>
           <div className="mt-5 space-y-3">
             {report.timeline.map((phase) => (
-              <div key={phase.range} className="rounded-2xl border border-white/10 bg-white/[0.035] p-3">
+              <div key={phase.range} className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3">
                 <div className="flex items-center justify-between gap-3">
                   <b className="text-sm text-[#e6c869]">{phase.range}</b>
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-white/35">{phase.title}</span>
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-[#8C827A]">{phase.title}</span>
                 </div>
-                <p className="mt-2 text-xs leading-relaxed text-white/55">{phase.summary}</p>
+                <p className="mt-2 text-xs leading-relaxed text-[#6B635B]">{phase.summary}</p>
               </div>
             ))}
           </div>
@@ -610,19 +610,19 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
         <GlassCard className="p-5 lg:col-span-2" hover={false}>
           <div className="flex items-center gap-3">
             <Compass className="text-cyan-200" size={18} />
-            <h3 className="font-serif text-2xl font-bold text-white">Palm vs Kundli Intelligence</h3>
+            <h3 className="font-serif text-2xl font-bold text-[#1A1A1A]">Palm vs Kundli Intelligence</h3>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {report.palmKundliCorrelation.matches.slice(0, 3).map((match, i) => (
               <div key={match} className="rounded-2xl border border-cyan-300/15 bg-cyan-300/10 p-4">
                 <h4 className="text-sm font-semibold text-cyan-100">Alignment {i + 1}</h4>
-                <p className="mt-3 text-sm leading-relaxed text-white/60">{match}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#4A4238]">{match}</p>
               </div>
             ))}
             {report.palmKundliCorrelation.matches.length === 0 && (
               <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/10 p-4 md:col-span-3">
                 <h4 className="text-sm font-semibold text-cyan-100">{report.palmKundliCorrelation.alignmentScore}% Alignment</h4>
-                <p className="mt-3 text-sm leading-relaxed text-white/60">{report.palmKundliCorrelation.summary}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#4A4238]">{report.palmKundliCorrelation.summary}</p>
               </div>
             )}
           </div>
@@ -631,12 +631,12 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
         <GlassCard className="p-5" hover={false}>
           <div className="flex items-center gap-3">
             <Music2 className="text-[#e6c869]" size={18} />
-            <h3 className="font-serif text-2xl font-bold text-white">AstroSound</h3>
+            <h3 className="font-serif text-2xl font-bold text-[#1A1A1A]">AstroSound</h3>
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-white/55">
+          <p className="mt-3 text-sm leading-relaxed text-[#6B635B]">
             {report.astroSoundRecommendations[0]?.reason || "Personalized sound recommendations are generated from palm stress, creativity and emotional indicators."}
           </p>
-          <div className="mt-5 h-16 rounded-2xl border border-[#c8a030]/20 bg-[repeating-linear-gradient(90deg,rgba(245,190,80,.2)_0_2px,transparent_2px_12px)]" />
+          <div className="mt-5 h-16 rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[repeating-linear-gradient(90deg,rgba(245,190,80,.2)_0_2px,transparent_2px_12px)]" />
           <div className="mt-3 flex flex-wrap gap-1.5">
             {(report.astroSoundRecommendations[0]?.ragas ?? []).slice(0, 4).map((raga) => (
               <span key={raga} className="rounded-full border border-[#c8a030]/25 bg-[#c8a030]/10 px-2.5 py-1 text-xs text-[#e6c869]">{raga}</span>
@@ -649,17 +649,17 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <GlassCard className="p-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <div className="flex h-32 w-32 shrink-0 items-center justify-center rounded-[2rem] border border-[#c8a030]/30 bg-[#c8a030]/10">
+            <div className="flex h-32 w-32 shrink-0 items-center justify-center rounded-[2rem] border border-[rgba(184,134,11,0.22)] bg-[#c8a030]/10">
               <div className="text-center">
                 <div className="font-serif text-5xl font-bold leading-none text-[#e6c869]">{report.finalIntelligenceScore.score}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/45">{report.finalIntelligenceScore.confidence}% confidence</div>
+                <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[#6B635B]">{report.finalIntelligenceScore.confidence}% confidence</div>
               </div>
             </div>
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c869]">Final AI Intelligence Score</div>
-              <h3 className="mt-2 font-serif text-2xl font-bold text-white">Human Intelligence Engine</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/60">{report.finalIntelligenceScore.summary}</p>
-              <p className="mt-3 text-xs leading-relaxed text-white/40">
+              <h3 className="mt-2 font-serif text-2xl font-bold text-[#1A1A1A]">Human Intelligence Engine</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">{report.finalIntelligenceScore.summary}</p>
+              <p className="mt-3 text-xs leading-relaxed text-[#8C827A]">
                 Pattern-recognition score based on visible geometry, line clarity, mount strength, finger indicators and behavioral intelligence mapping.
               </p>
             </div>
@@ -670,8 +670,8 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c869]">Palm Geometry Profile</div>
-              <h3 className="mt-2 font-serif text-2xl font-bold text-white">{report.palmGeometry.handType}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/60">{report.palmGeometry.reasoning}</p>
+              <h3 className="mt-2 font-serif text-2xl font-bold text-[#1A1A1A]">{report.palmGeometry.handType}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">{report.palmGeometry.reasoning}</p>
             </div>
             <span className="rounded-full border border-[#c8a030]/25 bg-[#c8a030]/10 px-3 py-1 text-xs font-semibold text-[#e6c869]">
               {report.palmGeometry.confidence}% confidence
@@ -685,9 +685,9 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
               ["Palm Width", report.palmGeometry.palmWidth],
               ["Palm Length", report.palmGeometry.palmLength],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-xl border border-white/8 bg-white/[0.03] p-3">
-                <div className="text-[10px] uppercase tracking-wider text-white/35">{label}</div>
-                <div className="mt-1 text-sm font-medium text-white/80">{value}</div>
+              <div key={label} className="rounded-xl border border-white/8 bg-[#FAF7F2] p-3">
+                <div className="text-[10px] uppercase tracking-wider text-[#8C827A]">{label}</div>
+                <div className="mt-1 text-sm font-medium text-[#1A1A1A]">{value}</div>
               </div>
             ))}
           </div>
@@ -716,10 +716,10 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
           {report.timeline.map((t, i) => (
             <motion.div key={t.range} className="relative"
               initial={{ opacity: 0, x: -12 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-              <span className="absolute -left-[31px] top-1 h-3.5 w-3.5 rounded-full border-2 border-[#c8a030] bg-black shadow-[0_0_10px_rgba(200,160,48,0.6)]" />
+              <span className="absolute -left-[31px] top-1 h-3.5 w-3.5 rounded-full border-2 border-[#c8a030] bg-[#FAF7F2] shadow-[0_0_10px_rgba(200,160,48,0.6)]" />
               <div className="text-sm font-bold text-[#e6c869]">{t.range}</div>
-              {t.title && <div className="text-sm font-medium text-white/85">{t.title}</div>}
-              <p className="mt-0.5 text-sm leading-relaxed text-white/55">{t.summary}</p>
+              {t.title && <div className="text-sm font-medium text-[#1A1A1A]">{t.title}</div>}
+              <p className="mt-0.5 text-sm leading-relaxed text-[#6B635B]">{t.summary}</p>
             </motion.div>
           ))}
         </div>
@@ -736,7 +736,7 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
           { label: "Lucky Career Fields", items: report.luck.careerFields },
         ].map((l, i) => (
           <GlassCard key={l.label} className="p-4" delay={i * 0.06}>
-            <div className="text-xs font-semibold uppercase tracking-wider text-white/45">{l.label}</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-[#6B635B]">{l.label}</div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {l.items.map((it) => (
                 <span key={it} className="rounded-full border border-[#c8a030]/25 bg-[#c8a030]/10 px-2.5 py-1 text-xs font-medium text-[#e6c869]">{it}</span>
@@ -760,21 +760,21 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
         <GlassCard className="p-5">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c869]">Palm + Kundli</div>
           <div className="mt-3 flex items-center justify-between gap-4">
-            <h3 className="font-serif text-xl font-bold text-white">Correlation Engine</h3>
+            <h3 className="font-serif text-xl font-bold text-[#1A1A1A]">Correlation Engine</h3>
             <span className="rounded-2xl border border-[#c8a030]/25 bg-[#c8a030]/10 px-3 py-2 font-serif text-2xl font-bold text-[#e6c869]">
               {report.palmKundliCorrelation.alignmentScore}
             </span>
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-white/60">{report.palmKundliCorrelation.summary}</p>
+          <p className="mt-3 text-sm leading-relaxed text-[#4A4238]">{report.palmKundliCorrelation.summary}</p>
         </GlassCard>
 
         <GlassCard className="p-5">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c869]">AstroSound</div>
-          <h3 className="mt-3 font-serif text-xl font-bold text-white">Personal Sound Profile</h3>
+          <h3 className="mt-3 font-serif text-xl font-bold text-[#1A1A1A]">Personal Sound Profile</h3>
           <div className="mt-4 space-y-2">
             {report.astroSoundRecommendations.slice(0, 2).map((item) => (
-              <div key={item.title} className="rounded-xl border border-white/8 bg-white/[0.03] p-2">
-                <div className="text-xs font-semibold text-white/85">{item.title}</div>
+              <div key={item.title} className="rounded-xl border border-white/8 bg-[#FAF7F2] p-2">
+                <div className="text-xs font-semibold text-[#1A1A1A]">{item.title}</div>
                 <div className="mt-1 flex flex-wrap gap-1">
                   {item.ragas.slice(0, 3).map((raga) => <span key={raga} className="rounded-full bg-[#c8a030]/10 px-2 py-0.5 text-[9px] text-[#e6c869]">{raga}</span>)}
                 </div>
@@ -785,10 +785,10 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
 
         <GlassCard className="p-5">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c869]">AI Growth Plan</div>
-          <h3 className="mt-3 font-serif text-xl font-bold text-white">Next 30 Days</h3>
+          <h3 className="mt-3 font-serif text-xl font-bold text-[#1A1A1A]">Next 30 Days</h3>
           <div className="mt-3 space-y-2">
             {report.growthPlan.slice(0, 3).map((item, i) => (
-              <div key={item} className="flex gap-2 text-xs text-white/65">
+              <div key={item} className="flex gap-2 text-xs text-[#4A4238]">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#c8a030]/15 text-[9px] font-bold text-[#e6c869]">{i + 1}</span>
                 <span>{item}</span>
               </div>
@@ -806,9 +806,9 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
               <GlassCard key={a.title} className="p-4" delay={i * 0.05}>
                 <div className="flex items-center gap-2">
                   <Sparkles size={14} className="text-[#e6c869]" />
-                  <h4 className="text-sm font-bold text-white/90">{a.title}</h4>
+                  <h4 className="text-sm font-bold text-[#1A1A1A]">{a.title}</h4>
                 </div>
-                <p className="mt-2 text-xs leading-relaxed text-white/60">{a.body}</p>
+                <p className="mt-2 text-xs leading-relaxed text-[#4A4238]">{a.body}</p>
               </GlassCard>
             ))}
           </div>
@@ -816,8 +816,8 @@ export function DashboardReport({ report, preview }: DashboardReportProps) {
       )}
 
       {/* disclaimer */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-center">
-        <p className="text-[11px] leading-relaxed text-white/40">{report.meta.disclaimer}</p>
+      <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4 text-center">
+        <p className="text-[11px] leading-relaxed text-[#8C827A]">{report.meta.disclaimer}</p>
       </div>
     </div>
   );

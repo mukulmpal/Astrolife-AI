@@ -40,13 +40,13 @@ export function PalmistryHistoryList({ userId }: { userId?: string | null }) {
     void loadHistory();
   }, [userId]);
 
-  if (loading) return <p className="text-sm text-zinc-400">Loading palm reports...</p>;
+  if (loading) return <p className="text-sm text-[#6B635B]">Loading palm reports...</p>;
   if (error) return <p className="text-sm text-red-300">{error}</p>;
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-zinc-800 bg-black/40 p-5">
-        <p className="text-sm text-zinc-400">No palmistry reports saved yet.</p>
+      <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-5">
+        <p className="text-sm text-[#6B635B]">No palmistry reports saved yet.</p>
       </div>
     );
   }
@@ -57,26 +57,26 @@ export function PalmistryHistoryList({ userId }: { userId?: string | null }) {
         <a
           key={item.id}
           href={`/dashboard/palmistry/${item.id}`}
-          className="rounded-2xl border border-white/10 bg-zinc-950/80 p-5 transition hover:border-amber-400/40"
+          className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-5 transition hover:border-amber-400/40"
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.25em] text-amber-300/70">
                 {item.report_style} · {item.user_tier}
               </p>
-              <h3 className="mt-2 text-lg font-semibold capitalize text-amber-100">{item.hand_side} palm report</h3>
+              <h3 className="mt-2 text-lg font-semibold capitalize text-[#1A1A1A]">{item.hand_side} palm report</h3>
             </div>
-            <p className="text-xs text-zinc-500">{new Date(item.created_at).toLocaleDateString()}</p>
+            <p className="text-xs text-[#8C827A]">{new Date(item.created_at).toLocaleDateString()}</p>
           </div>
 
-          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-zinc-400">
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-[#6B635B]">
             {item.summary ?? "Saved AstroLife palmistry report"}
           </p>
 
           {item.top_categories?.length ? (
             <div className="mt-4 flex flex-wrap gap-2">
               {item.top_categories.slice(0, 6).map((category) => (
-                <span key={category} className="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-xs text-amber-100">
+                <span key={category} className="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-xs text-[#1A1A1A]">
                   {category}
                 </span>
               ))}

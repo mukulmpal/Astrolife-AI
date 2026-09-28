@@ -38,7 +38,7 @@ function Panel({
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`rounded-2xl border border-slate-300/12 bg-[#071018]/78 p-6 shadow-[0_22px_70px_rgba(0,0,0,.28)] backdrop-blur-md ${className}`}
+      className={`rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-6 shadow-[0_22px_70px_rgba(0,0,0,.28)] backdrop-blur-md ${className}`}
     >
       {children}
     </motion.div>
@@ -47,10 +47,10 @@ function Panel({
 
 function Kpi({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-slate-300/12 bg-white/[0.035] p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</div>
-      <div className="mt-2 font-serif text-4xl font-light text-white">{value}</div>
-      {sub && <p className="mt-2 text-xs leading-relaxed text-slate-400">{sub}</p>}
+    <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6B635B]">{label}</div>
+      <div className="mt-2 font-serif text-4xl font-light text-[#1A1A1A]">{value}</div>
+      {sub && <p className="mt-2 text-xs leading-relaxed text-[#6B635B]">{sub}</p>}
     </div>
   );
 }
@@ -84,21 +84,21 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
   }));
 
   return (
-    <div className="mt-8 space-y-6 text-slate-100">
+    <div className="mt-8 space-y-6 text-[#1A1A1A]">
       <Panel className="overflow-hidden p-0">
         <div className="relative grid gap-6 p-6 lg:grid-cols-[1.25fr_0.75fr] lg:p-8">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(96,165,250,.14),transparent_36%),radial-gradient(circle_at_85%_40%,rgba(200,160,48,.10),transparent_32%)]" />
           <div className="relative">
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-300/15 bg-white/[0.04] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-300">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.26em] text-[#3D3834]">
               <FileText size={13} /> Executive Insight Report
             </div>
-            <h1 className="mt-5 font-serif text-5xl font-light tracking-[0.03em] text-white">Palm Intelligence Memo</h1>
-            <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-200">{report.overallImpression.headline}</p>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400">{report.overallImpression.summary}</p>
+            <h1 className="mt-5 font-serif text-5xl font-light tracking-[0.03em] text-[#1A1A1A]">Palm Intelligence Memo</h1>
+            <p className="mt-4 max-w-3xl text-lg leading-relaxed text-[#1A1A1A]">{report.overallImpression.headline}</p>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[#6B635B]">{report.overallImpression.summary}</p>
             <div className="mt-5 flex flex-wrap gap-2 text-[11px]">
-              <span className="rounded-full border border-slate-300/15 bg-white/[0.04] px-3 py-1 text-slate-300">{report.meta.hand} hand</span>
-              <span className="rounded-full border border-slate-300/15 bg-white/[0.04] px-3 py-1 text-slate-300">image: {report.meta.imageQuality}</span>
-              <span className="rounded-full border border-slate-300/15 bg-white/[0.04] px-3 py-1 text-slate-300">{report.palmGeometry.handType}</span>
+              <span className="rounded-full border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] px-3 py-1 text-[#3D3834]">{report.meta.hand} hand</span>
+              <span className="rounded-full border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] px-3 py-1 text-[#3D3834]">image: {report.meta.imageQuality}</span>
+              <span className="rounded-full border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] px-3 py-1 text-[#3D3834]">{report.palmGeometry.handType}</span>
             </div>
           </div>
           <div className="relative grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
@@ -120,8 +120,8 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
           return (
             <Panel key={String(label)} className="p-5">
               <MetricIcon className="text-[#e6c869]" size={20} />
-              <div className="mt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">{String(label)} Index</div>
-              <div className="mt-2 font-serif text-5xl font-light text-white">{String(value)}</div>
+              <div className="mt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6B635B]">{String(label)} Index</div>
+              <div className="mt-2 font-serif text-5xl font-light text-[#1A1A1A]">{String(value)}</div>
               <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
                 <motion.div className="h-full rounded-full bg-[#e6c869]" initial={{ width: 0 }} whileInView={{ width: `${Number(value)}%` }} viewport={{ once: true }} transition={{ duration: 0.9 }} />
               </div>
@@ -133,7 +133,7 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
       <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
         <Panel>
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c869]">Palm Evidence</div>
-          <div className="mt-4 aspect-[4/5] overflow-hidden rounded-2xl border border-slate-300/12 bg-black">
+          <div className="mt-4 aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview} alt="Your palm" className="h-full w-full object-cover" />
           </div>
@@ -144,9 +144,9 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
               ["Thumb Angle", report.palmGeometry.thumbAngle],
               ["Geometry Conf.", `${report.palmGeometry.confidence}%`],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-xl border border-slate-300/12 bg-white/[0.035] p-3">
+              <div key={label} className="rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3">
                 <div className="text-slate-500">{label}</div>
-                <div className="mt-1 font-semibold text-slate-200">{value}</div>
+                <div className="mt-1 font-semibold text-[#1A1A1A]">{value}</div>
               </div>
             ))}
           </div>
@@ -155,7 +155,7 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
         <div className="space-y-6">
           {/* ── KPI bar (overall impression metrics) ── */}
           <Panel>
-            <h2 className="mb-6 flex items-center gap-2 text-lg font-bold text-white"><TrendingUp size={18} className="text-[#e6c869]" /> Key Performance Indicators</h2>
+            <h2 className="mb-6 flex items-center gap-2 text-lg font-bold text-[#1A1A1A]"><TrendingUp size={18} className="text-[#e6c869]" /> Key Performance Indicators</h2>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={metricsData}>
@@ -174,7 +174,7 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
       {/* ── KPI bar (overall impression metrics) ── */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel>
-          <h2 className="mb-6 text-lg font-bold text-white">Capability Scoreboard</h2>
+          <h2 className="mb-6 text-lg font-bold text-[#1A1A1A]">Capability Scoreboard</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={scoreboardData} outerRadius="72%">
@@ -189,7 +189,7 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
         </Panel>
 
         <Panel>
-          <h2 className="mb-6 text-lg font-bold text-white">Prediction Strength Distribution</h2>
+          <h2 className="mb-6 text-lg font-bold text-[#1A1A1A]">Prediction Strength Distribution</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={predictionData} layout="vertical" margin={{ left: 10 }}>
@@ -207,7 +207,7 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
       {/* ── Mount strengths + Intelligence module trend ── */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel>
-          <h2 className="mb-6 text-lg font-bold text-white">Planetary Mount Strengths</h2>
+          <h2 className="mb-6 text-lg font-bold text-[#1A1A1A]">Planetary Mount Strengths</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={mountData}>
@@ -222,7 +222,7 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
         </Panel>
 
         <Panel>
-          <h2 className="mb-6 text-lg font-bold text-white">Intelligence Modules — Score vs Confidence</h2>
+          <h2 className="mb-6 text-lg font-bold text-[#1A1A1A]">Intelligence Modules — Score vs Confidence</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={moduleData}>
@@ -242,7 +242,7 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
       {/* ── Palm geometry profile ── */}
       <Panel>
         <div className="flex items-start justify-between gap-4">
-          <h2 className="text-lg font-bold text-white">Palm Geometry Profile</h2>
+          <h2 className="text-lg font-bold text-[#1A1A1A]">Palm Geometry Profile</h2>
           <span className="rounded-full border border-[#c8a030]/25 bg-[#c8a030]/10 px-3 py-1 text-xs font-semibold text-[#e6c869]">
             {report.palmGeometry.confidence}% confidence
           </span>
@@ -256,9 +256,9 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
             ["Palm Width", report.palmGeometry.palmWidth],
             ["Palm Length", report.palmGeometry.palmLength],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <div className="text-[10px] uppercase tracking-wider text-white/35">{label}</div>
-              <div className="mt-1 text-sm font-medium text-white/85">{value}</div>
+            <div key={label} className="rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4">
+              <div className="text-[10px] uppercase tracking-wider text-[#8C827A]">{label}</div>
+              <div className="mt-1 text-sm font-medium text-[#1A1A1A]">{value}</div>
             </div>
           ))}
         </div>
@@ -266,10 +266,10 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
 
       {/* ── Intelligence modules table ── */}
       <Panel className="overflow-x-auto">
-        <h2 className="mb-6 text-lg font-bold text-white">Intelligence Modules — Detailed Analysis</h2>
+        <h2 className="mb-6 text-lg font-bold text-[#1A1A1A]">Intelligence Modules — Detailed Analysis</h2>
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#c8a030]/20">
+            <tr className="border-b border-[rgba(184,134,11,0.2)]">
               <th className="pb-3 text-left font-semibold text-[#e6c869]">Module</th>
               <th className="hidden pb-3 text-left font-semibold text-[#e6c869] md:table-cell">Interpretation</th>
               <th className="pb-3 text-right font-semibold text-[#e6c869]">Score</th>
@@ -278,13 +278,13 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
           </thead>
           <tbody>
             {report.intelligenceSections.map((s) => (
-              <tr key={s.id} className="border-b border-white/5 align-top transition hover:bg-white/[0.02]">
-                <td className="py-3 pr-3 font-medium text-white/85">{s.title}</td>
-                <td className="hidden max-w-md py-3 pr-3 text-xs leading-relaxed text-white/55 md:table-cell">{s.interpretation}</td>
+              <tr key={s.id} className="border-b border-white/5 align-top transition hover:bg-[#FAF7F2]">
+                <td className="py-3 pr-3 font-medium text-[#1A1A1A]">{s.title}</td>
+                <td className="hidden max-w-md py-3 pr-3 text-xs leading-relaxed text-[#6B635B] md:table-cell">{s.interpretation}</td>
                 <td className="py-3 text-right">
-                  <span className="inline-block rounded-full border border-[#c8a030]/30 bg-[#c8a030]/10 px-3 py-1 text-xs font-semibold text-[#e6c869]">{s.score}</span>
+                  <span className="inline-block rounded-full border border-[rgba(184,134,11,0.22)] bg-[#c8a030]/10 px-3 py-1 text-xs font-semibold text-[#e6c869]">{s.score}</span>
                 </td>
-                <td className="py-3 text-right text-xs text-white/40">{s.confidence}%</td>
+                <td className="py-3 text-right text-xs text-[#8C827A]">{s.confidence}%</td>
               </tr>
             ))}
           </tbody>
@@ -295,12 +295,12 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel>
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-bold text-white">Palm + Kundli Correlation</h2>
+            <h2 className="text-lg font-bold text-[#1A1A1A]">Palm + Kundli Correlation</h2>
             <span className="rounded-2xl border border-[#c8a030]/25 bg-[#c8a030]/10 px-3 py-2 font-serif text-2xl font-bold text-[#e6c869]">
               {report.palmKundliCorrelation.alignmentScore}
             </span>
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-white/60">{report.palmKundliCorrelation.summary}</p>
+          <p className="mt-3 text-sm leading-relaxed text-[#4A4238]">{report.palmKundliCorrelation.summary}</p>
           {report.palmKundliCorrelation.matches.length > 0 && (
             <ul className="mt-4 space-y-1.5">
               {report.palmKundliCorrelation.matches.map((m) => (
@@ -311,12 +311,12 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
         </Panel>
 
         <Panel>
-          <h2 className="mb-4 text-lg font-bold text-white">Strategic Recommendations</h2>
+          <h2 className="mb-4 text-lg font-bold text-[#1A1A1A]">Strategic Recommendations</h2>
           <div className="space-y-3">
             {report.growthPlan.slice(0, 5).map((item, i) => (
-              <div key={item} className="flex gap-3 rounded-xl border border-[#c8a030]/15 bg-white/[0.03] p-3">
+              <div key={item} className="flex gap-3 rounded-xl border border-[#c8a030]/15 bg-[#FAF7F2] p-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#c8a030]/15 text-[10px] font-bold text-[#e6c869]">{i + 1}</span>
-                <p className="text-sm leading-relaxed text-white/70">{item}</p>
+                <p className="text-sm leading-relaxed text-[#3D3834]">{item}</p>
               </div>
             ))}
           </div>
@@ -324,8 +324,8 @@ export function ExecutiveReport({ report, preview }: ExecutiveReportProps) {
       </div>
 
       {/* ── Footer ── */}
-      <div className="border-t border-white/10 pt-6 text-center">
-        <p className="text-xs text-white/40">{report.meta.disclaimer}</p>
+      <div className="border-t border-[rgba(184,134,11,0.18)] pt-6 text-center">
+        <p className="text-xs text-[#8C827A]">{report.meta.disclaimer}</p>
       </div>
     </div>
   );

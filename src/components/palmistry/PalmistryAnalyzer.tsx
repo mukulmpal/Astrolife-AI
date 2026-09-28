@@ -37,7 +37,7 @@ function GlassCard({
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay }}
       whileHover={{ y: -3 }}
-      className={`relative rounded-2xl border border-[#c8a030]/20 bg-gradient-to-b from-white/[0.04] to-white/[0.01] backdrop-blur-md shadow-[0_8px_40px_-12px_rgba(0,0,0,0.7)] transition-shadow hover:border-[#c8a030]/45 hover:shadow-[0_0_30px_-6px_rgba(200,160,48,0.35)] ${className}`}
+      className={`relative rounded-2xl border border-[#c8a030]/20 bg-gradient-to-b from-[#FFFFFF] to-[#FAF7F2] backdrop-blur-md shadow-[0_8px_40px_-12px_rgba(0,0,0,0.7)] transition-shadow hover:border-[#c8a030]/45 hover:shadow-[0_0_30px_-6px_rgba(200,160,48,0.35)] ${className}`}
     >
       {children}
     </motion.div>
@@ -162,7 +162,7 @@ function PalmScanner({
               </span>
               <span className="text-xs text-[#e6c869]">{lineById.get(hover)!.confidence}% confidence</span>
             </div>
-            <p className="mt-1 text-xs leading-relaxed text-white/70">{lineById.get(hover)!.summary}</p>
+            <p className="mt-1 text-xs leading-relaxed text-[#3D3834]">{lineById.get(hover)!.summary}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -328,7 +328,7 @@ export function PalmistryAnalyzer() {
   }, [report]);
 
   return (
-    <div className="text-white">
+    <div className="text-[#1A1A1A]">
       {/* ── Full-screen loading overlay (replaces blank screen during analysis) ── */}
       <PalmLoadingScreen visible={scanning} preview={preview} />
 
@@ -350,7 +350,7 @@ export function PalmistryAnalyzer() {
         <h1 className="mt-4 bg-gradient-to-b from-[#f5e7b8] to-[#c8a030] bg-clip-text font-serif text-4xl font-bold text-transparent drop-shadow-[0_2px_20px_rgba(200,160,48,0.3)] sm:text-5xl">
           AI Palm Reading Report
         </h1>
-        <p className="mt-2 text-sm tracking-wide text-white/50">Your Hand. Your Story.</p>
+        <p className="mt-2 text-sm tracking-wide text-[#6B635B]">Your Hand. Your Story.</p>
 
         {report && (
           <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -383,8 +383,8 @@ export function PalmistryAnalyzer() {
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#c8a030]/10">
                   <Hand className="text-[#e6c869]" size={30} />
                 </div>
-                <span className="text-base font-semibold text-white/90">Apni hatheli ki photo upload karein</span>
-                <span className="flex items-center gap-1.5 text-xs text-white/45">
+                <span className="text-base font-semibold text-[#1A1A1A]">Apni hatheli ki photo upload karein</span>
+                <span className="flex items-center gap-1.5 text-xs text-[#6B635B]">
                   <Upload size={12} /> JPG / PNG · Max {MAX_MB}MB · achhi roshni mein khinchi hui photo
                 </span>
               </button>
@@ -396,7 +396,7 @@ export function PalmistryAnalyzer() {
                     <button
                       type="button"
                       onClick={() => { setPreview(null); setDataUrl(null); }}
-                      className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border border-[#c8a030]/40 bg-black/80 text-white/70 hover:text-white"
+                      className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border border-[#c8a030]/40 bg-black/80 text-[#3D3834] hover:text-[#1A1A1A]"
                     >
                       <X size={15} />
                     </button>
@@ -404,7 +404,7 @@ export function PalmistryAnalyzer() {
                 </div>
                 <div className="text-center md:text-left">
                   <h3 className="font-serif text-2xl font-bold text-[#e6c869]">Ready to scan</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">
+                  <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">
                     AstroLife AI aapki hatheli ki lines, mounts aur fingers ko classical palmistry
                     (Samudrika Shastra + K.N. Rao) ke hisaab se analyze karega.
                   </p>

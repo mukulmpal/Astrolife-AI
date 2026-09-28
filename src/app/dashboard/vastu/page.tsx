@@ -787,7 +787,7 @@ export default function VastuDashboardPage() {
                     onChange={e => field.onChange(e.target.value)}
                     style={{
                       borderRadius: 12, border: "1px solid #FFFFFF",
-                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
+                      background: "#FAF7F2", color: "#1A1A1A",
                       padding: "10px 14px", fontSize: 13, outline: "none", width: "100%",
                     }}
                   >
@@ -813,7 +813,7 @@ export default function VastuDashboardPage() {
                     inputMode="decimal"
                     style={{
                       borderRadius: 12, border: "1px solid #FFFFFF",
-                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
+                      background: "#FAF7F2", color: "#1A1A1A",
                       padding: "10px 14px", fontSize: 13, outline: "none", width: "100%",
                     }}
                   />
@@ -835,7 +835,7 @@ export default function VastuDashboardPage() {
                   style={{
                     display: "flex", alignItems: "center", gap: 10,
                     borderRadius: 12, border: "1px solid #FFFFFF",
-                    background: "rgba(0,0,0,0.2)", padding: "12px 14px",
+                    background: "#FAF7F2", padding: "12px 14px",
                     fontSize: 13, color: "#4A4238", cursor: "pointer",
                   }}
                 >
@@ -875,7 +875,7 @@ export default function VastuDashboardPage() {
                   style={{
                     display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto",
                     gap: 10, borderRadius: 12, border: "1px solid #FFFFFF",
-                    background: "rgba(0,0,0,0.2)", padding: 12,
+                    background: "#FAF7F2", padding: 12,
                   }}
                 >
                   <input
@@ -884,7 +884,7 @@ export default function VastuDashboardPage() {
                     placeholder="Room name"
                     style={{
                       borderRadius: 10, border: "1px solid #FFFFFF",
-                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
+                      background: "#FAF7F2", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   />
@@ -893,7 +893,7 @@ export default function VastuDashboardPage() {
                     onChange={e => updateRoom(room.id, { type: e.target.value })}
                     style={{
                       borderRadius: 10, border: "1px solid #FFFFFF",
-                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
+                      background: "#FAF7F2", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   >
@@ -904,7 +904,7 @@ export default function VastuDashboardPage() {
                     onChange={e => updateRoom(room.id, { direction: e.target.value as Direction })}
                     style={{
                       borderRadius: 10, border: "1px solid #FFFFFF",
-                      background: "rgba(0,0,0,0.3)", color: "#1A1A1A",
+                      background: "#FAF7F2", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   >
@@ -946,7 +946,7 @@ export default function VastuDashboardPage() {
               ) : (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 10 }}>
                   {roomPlacementScorecard.map((room) => (
-                    <div key={`${room.type}-${room.direction}-${room.name}`} style={{ borderRadius: 11, border: `1px solid ${room.placement.color}33`, background: "rgba(0,0,0,0.22)", padding: 12 }}>
+                    <div key={`${room.type}-${room.direction}-${room.name}`} style={{ borderRadius: 11, border: `1px solid ${room.placement.color}33`, background: "#FAF7F2", padding: 12 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", marginBottom: 6 }}>
                         <div style={{ fontSize: 13, color: "#1A1A1A", fontWeight: 700 }}>{room.name}</div>
                         <span className="badge" style={{ background: `${room.placement.color}18`, color: room.placement.color, border: `1px solid ${room.placement.color}44`, flexShrink: 0 }}>
@@ -1140,7 +1140,7 @@ export default function VastuDashboardPage() {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
                     {(result.mindMakan[mindMakanTab] || []).map((item, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, borderRadius: 10, border: "1px solid #FFFFFF", background: "rgba(0,0,0,0.18)", padding: 12 }}>
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, borderRadius: 10, border: "1px solid rgba(184, 134, 11, 0.2)", background: "#FAF7F2", padding: 12 }}>
                         <span style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(200,160,48,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#c8a030", flexShrink: 0 }}>
                           {i + 1}
                         </span>
@@ -1168,7 +1168,7 @@ export default function VastuDashboardPage() {
                   )}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {result.vastuPurushaHealth.observations.map((obs, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, borderRadius: 10, border: "1px solid #FFFFFF", background: "rgba(0,0,0,0.18)", padding: 12, fontSize: 13, color: "#6B635B" }}>
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, borderRadius: 10, border: "1px solid rgba(184, 134, 11, 0.2)", background: "#FAF7F2", padding: 12, fontSize: 13, color: "#6B635B" }}>
                         <span style={{ color: "#c8a030", flexShrink: 0 }}>→</span>
                         {obs}
                       </div>

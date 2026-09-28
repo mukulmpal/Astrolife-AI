@@ -57,14 +57,14 @@ export function ManualPalmistryWorkbench() {
   };
 
   return (
-    <section className="mt-8 space-y-5 rounded-3xl border border-[#c8a030]/20 bg-[radial-gradient(circle_at_70%_0%,rgba(200,160,48,0.12),transparent_34%),rgba(0,0,0,0.28)] p-5">
+    <section className="mt-8 space-y-5 rounded-3xl border border-[rgba(184,134,11,0.2)] bg-[radial-gradient(circle_at_70%_0%,rgba(200,160,48,0.12),transparent_34%),rgba(0,0,0,0.28)] p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#c8a030]/25 bg-[#c8a030]/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-[#e6c869]">
             <BookOpen size={13} /> Phase 0 + 1 Rule Engine
           </div>
-          <h2 className="mt-3 font-serif text-3xl text-white">Manual Feature Confirmation Report</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/55">
+          <h2 className="mt-3 font-serif text-3xl text-[#1A1A1A]">Manual Feature Confirmation Report</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#6B635B]">
             Hybrid book-backed palmistry: structured features, multi-sign matching, confidence scoring, source IDs and safety guardrails.
           </p>
         </div>
@@ -126,31 +126,31 @@ export function ManualPalmistryWorkbench() {
 
 function VisionConfidenceCard({ vision }: { vision: PalmVisionResult }) {
   return (
-    <div className="rounded-2xl border border-[#c8a030]/20 bg-black/30 p-4">
+    <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-4">
       <div className="text-xs uppercase tracking-[0.18em] text-[#e6c869]/75">AI Vision Confidence</div>
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <div className="text-lg font-semibold text-white">{Math.round(vision.imageQuality.score * 100)}%</div>
-          <div className="text-[10px] text-white/45">Quality</div>
+        <div className="rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3">
+          <div className="text-lg font-semibold text-[#1A1A1A]">{Math.round(vision.imageQuality.score * 100)}%</div>
+          <div className="text-[10px] text-[#6B635B]">Quality</div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <div className="text-lg font-semibold text-white">{vision.imageQuality.canAnalyze ? "Yes" : "No"}</div>
-          <div className="text-[10px] text-white/45">Analyze</div>
+        <div className="rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3">
+          <div className="text-lg font-semibold text-[#1A1A1A]">{vision.imageQuality.canAnalyze ? "Yes" : "No"}</div>
+          <div className="text-[10px] text-[#6B635B]">Analyze</div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <div className="text-lg font-semibold text-white">{vision.imageQuality.canAnalyzeFingerprints ? "Yes" : "No"}</div>
-          <div className="text-[10px] text-white/45">Prints</div>
+        <div className="rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3">
+          <div className="text-lg font-semibold text-[#1A1A1A]">{vision.imageQuality.canAnalyzeFingerprints ? "Yes" : "No"}</div>
+          <div className="text-[10px] text-[#6B635B]">Prints</div>
         </div>
       </div>
       {[...vision.imageQuality.issues, ...vision.warnings].length > 0 && (
         <div className="mt-3 space-y-1">
           {[...vision.imageQuality.issues, ...vision.warnings].slice(0, 4).map((item) => (
-            <p key={item} className="rounded-lg bg-[#c8a030]/10 px-3 py-2 text-xs text-white/60">{item}</p>
+            <p key={item} className="rounded-lg bg-[#c8a030]/10 px-3 py-2 text-xs text-[#4A4238]">{item}</p>
           ))}
         </div>
       )}
       {vision.uncertainFeatures.length > 0 && (
-        <p className="mt-3 text-xs text-white/45">Uncertain: {vision.uncertainFeatures.slice(0, 6).join(", ")}</p>
+        <p className="mt-3 text-xs text-[#6B635B]">Uncertain: {vision.uncertainFeatures.slice(0, 6).join(", ")}</p>
       )}
     </div>
   );

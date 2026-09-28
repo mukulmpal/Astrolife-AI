@@ -337,7 +337,7 @@ export default function LalKitabPage() {
         .age-card{border-radius:14px;padding:18px;text-align:center;border:1px solid;transition:all 0.2s}
         .age-card:hover{transform:translateY(-3px)}
         .combo-card{background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.2);border-radius:14px;padding:20px;margin-bottom:14px}
-        .combo-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#c4b5fd;margin-bottom:6px}
+        .combo-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color: #1A1A1A;margin-bottom:6px}
         .combo-pred{font-size:13px;color:#4A4238;line-height:1.8;margin-bottom:10px}
         .combo-psych{font-size:12px;color:#a78bfa;padding:8px 10px;background:rgba(167,139,250,0.05);border-radius:8px;border:1px solid rgba(167,139,250,0.15);margin-bottom:10px}
         .combo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
@@ -662,7 +662,7 @@ export default function LalKitabPage() {
                     {domainTab === "psychology" && (
                       <div style={{paddingTop:4}}>
                         <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Mansik Swaroop · Psychology</div>
-                        <div className="domain-txt" style={{color:"#c4b5fd"}}>{p.psychology}</div>
+                        <div className="domain-txt" style={{color: "#6B635B"}}>{p.psychology}</div>
                       </div>
                     )}
 

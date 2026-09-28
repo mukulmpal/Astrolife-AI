@@ -688,12 +688,12 @@ function GemstonePageContent() {
           gap: 26px;
           align-items: center;
           border: 1px solid var(--border);
-          background: linear-gradient(135deg, #FFFFFF, #1a1040);
+          background: linear-gradient(135deg, #FFFFFF, #FAF5EB);
           backdrop-filter: blur(18px);
           border-radius: 20px;
           padding: 24px;
           overflow: hidden;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
         .gem-glow {

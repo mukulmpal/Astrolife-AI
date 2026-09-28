@@ -121,14 +121,14 @@ export default function YogasPage() {
         .page-sub{font-size:14px;color:var(--app-soft,#6B635B);margin-top:6px;margin-bottom:28px}
 
         /* SCORE CARD */
-        .score-card{background:linear-gradient(135deg,var(--app-card,#FFFFFF),var(--app-card-alt,#1a1040));border:1px solid var(--app-border,rgba(200,160,48,0.25));border-radius:20px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;position:relative;overflow:hidden}
+        .score-card{background:linear-gradient(135deg,var(--app-card,#FFFFFF),var(--app-card-alt,#FAF5EB));border:1px solid var(--app-border,rgba(200,160,48,0.25));border-radius:20px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;position:relative;overflow:hidden}
         .score-orb{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(200,160,48,0.08) 0%,transparent 70%);right:-60px;top:-60px;pointer-events:none}
         .score-left{position:relative;z-index:1}
         .score-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--app-soft,#6B635B);margin-bottom:8px}
         .score-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--app-fg,#1A1A1A);margin-bottom:4px}
         .score-meta{font-size:13px;color:var(--app-soft,#6B635B)}
         .score-right{display:flex;gap:20px;align-items:center;flex-wrap:wrap;position:relative;z-index:1}
-        .score-stat{text-align:center;background:var(--app-card-alt,rgba(0,0,0,0.2));border-radius:14px;padding:16px 20px;border:1px solid var(--app-border,rgba(200,160,48,0.1))}
+        .score-stat{text-align:center;background:var(--app-card-alt,#FAF7F2);border-radius:14px;padding:16px 20px;border:1px solid var(--app-border,rgba(200,160,48,0.1))}
         .score-n{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;color:var(--al-gold,#c8a030);line-height:1}
         .score-l{font-size:11px;color:var(--app-soft,#6B635B);margin-top:4px;letter-spacing:0.5px}
         .score-rating{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--al-gold,#e8c060);margin-top:4px}

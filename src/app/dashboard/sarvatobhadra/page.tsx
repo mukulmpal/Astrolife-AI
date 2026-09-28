@@ -248,7 +248,7 @@ export default function SarvatobhadraPage() {
             )}
 
             {/* Tip about Moon */}
-            <div style={{ background: "rgba(192,132,252,0.06)", border: "1px solid rgba(192,132,252,0.2)", borderRadius: "8px", padding: "10px 14px", marginTop: "8px", fontSize: "11px", color: "#c4b5fd", lineHeight: "1.6" }}>
+            <div style={{ background: "rgba(184,134,11,0.08)", border: "1px solid rgba(184,134,11,0.2)", borderRadius: "8px", padding: "10px 14px", marginTop: "8px", fontSize: "11px", color: "#B8860B", lineHeight: "1.6" }}>
               💡 <strong>Daily Tip:</strong> The Moon transits one nakshatra every ~24 hours. Come back daily to check if the Moon is creating a vedha on your sensitive zones — even a 1-day Moon vedha can shift the emotional weather significantly.
             </div>
           </>
@@ -278,10 +278,10 @@ export default function SarvatobhadraPage() {
                 {[
                   ["Nature", nak.nature, nak.nature === "Deva" ? "#22c55e" : nak.nature === "Manava" ? "#f59e0b" : "#ef4444"],
                   ["Quality", nak.quality, "#60a5fa"],
-                  ["Symbol", nak.symbol, "#c4b5fd"],
+                  ["Symbol", nak.symbol, "#B8860B"],
                   ["Body Zone", nak.body, "#f97316"],
                 ].map(([k, v, c]) => (
-                  <div key={String(k)} style={{ background: "rgba(0,0,0,0.2)", borderRadius: "8px", padding: "8px 10px" }}>
+                  <div key={String(k)} style={{ background: "#FAF7F2", borderRadius: "8px", padding: "8px 10px" }}>
                     <div style={{ fontSize: "10px", color: "#8880a8", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "3px" }}>{k}</div>
                     <div style={{ fontSize: "12px", fontWeight: 600, color: String(c) }}>{String(v)}</div>
                   </div>

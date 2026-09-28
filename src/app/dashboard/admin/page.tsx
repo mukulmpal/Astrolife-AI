@@ -360,9 +360,9 @@ export default function AdminPage() {
                             borderRadius: 8,
                             fontSize: 11,
                             fontWeight: 700,
-                            background: "linear-gradient(135deg,#a855f7,#7c3aed)",
+                            background: "linear-gradient(135deg,#B8860B,#996515)",
                             border: "none",
-                            color: "#fff",
+                            color: "#FFFFFF",
                             cursor: tier === "elite" || isUpdating ? "default" : "pointer",
                             opacity: tier === "elite" ? 0.4 : 1,
                           }}

@@ -37,7 +37,7 @@ export function PalmistryShareButton({ sessionId, userId }: PalmistryShareButton
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 p-4 print:hidden">
+    <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4 print:hidden">
       <button
         type="button"
         onClick={createShareLink}
@@ -46,7 +46,7 @@ export function PalmistryShareButton({ sessionId, userId }: PalmistryShareButton
       >
         {loading ? "Creating Link..." : "Create Shareable Report Link"}
       </button>
-      {shareUrl ? <p className="mt-3 break-all text-xs text-amber-100">Copied: {shareUrl}</p> : null}
+      {shareUrl ? <p className="mt-3 break-all text-xs text-[#1A1A1A]">Copied: {shareUrl}</p> : null}
       {error ? <p className="mt-3 text-xs text-red-300">{error}</p> : null}
     </div>
   );

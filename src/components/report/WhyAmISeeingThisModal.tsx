@@ -18,20 +18,20 @@ export function WhyAmISeeingThisModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-[#FFFFFF] border border-[rgba(184,134,11,0.22)] rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-start justify-between border-b border-[rgba(184,134,11,0.15)] pb-4">
           <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-cyan-400" />
+            <HelpCircle className="w-5 h-5 text-[#B8860B]" />
             <div>
-              <h3 className="text-base font-bold text-white">Why am I seeing this?</h3>
-              <p className="text-xs text-slate-400">{model.topicName}</p>
+              <h3 className="text-base font-bold text-[#1A1A1A]">Why am I seeing this?</h3>
+              <p className="text-xs text-[#6B635B]">{model.topicName}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+            className="text-[#6B635B] hover:text-[#1A1A1A] p-1 rounded-lg hover:bg-[#FAF7F2] transition"
             aria-label="Close explanation"
           >
             <X className="w-5 h-5" />
@@ -49,28 +49,28 @@ export function WhyAmISeeingThisModal({
         )}
 
         {/* Primary Observation */}
-        <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-1.5">
-          <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+        <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-xl p-4 space-y-1.5">
+          <span className="text-[11px] uppercase tracking-wider text-[#6B635B] font-bold">
             Primary Deterministic Finding
           </span>
-          <p className="text-sm text-slate-200 leading-relaxed font-medium">
+          <p className="text-sm text-[#1A1A1A] leading-relaxed font-medium">
             {model.primaryFinding}
           </p>
         </div>
 
         {/* Multi-Layer Causal Evidence Chain */}
         <div className="space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B635B]">
             Underlying Causal Evidence Layers
           </h4>
 
           <div className="space-y-2 text-xs">
             {/* Layer 1: Cuspal Sub-Lord */}
-            <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-lg flex items-start gap-3">
-              <Layers className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+            <div className="p-3 bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-lg flex items-start gap-3">
+              <Layers className="w-4 h-4 text-[#B8860B] flex-shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-slate-300 block mb-0.5">Natal Cusp Sub-Lord</span>
-                <p className="text-slate-400">{model.causalChain.primaryCuspSubLordEvidence}</p>
+                <span className="font-semibold text-[#6B635B] block mb-0.5">Natal Cusp Sub-Lord</span>
+                <p className="text-[#6B635B]">{model.causalChain.primaryCuspSubLordEvidence}</p>
               </div>
             </div>
 
@@ -84,26 +84,26 @@ export function WhyAmISeeingThisModal({
             </div>
 
             {/* Layer 3: Transit Trigger */}
-            <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-lg flex items-start gap-3">
+            <div className="p-3 bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-lg flex items-start gap-3">
               <Compass className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-slate-300 block mb-0.5">Transit Corroboration</span>
-                <p className="text-slate-400">{model.causalChain.transitContext}</p>
+                <span className="font-semibold text-[#6B635B] block mb-0.5">Transit Corroboration</span>
+                <p className="text-[#6B635B]">{model.causalChain.transitContext}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Synthesis Rationale */}
-        <div className="bg-slate-950/40 border border-slate-800 rounded-xl p-4 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+        <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-xl p-4 space-y-2">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#6B635B]">
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             <span>Precedence & Synthesis Resolution</span>
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
+          <p className="text-xs text-[#6B635B] leading-relaxed">
             {model.plainLanguageExplanation}
           </p>
-          <p className="text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
+          <p className="text-[11px] text-[#6B635B] pt-1 border-t border-[rgba(184,134,11,0.15)]">
             {model.relationSummary}
           </p>
         </div>
@@ -112,7 +112,7 @@ export function WhyAmISeeingThisModal({
         <div className="flex justify-end pt-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white rounded-lg transition"
+            className="px-4 py-2 bg-[#B8860B] hover:bg-[#996515] text-xs font-semibold text-white rounded-lg transition"
           >
             Understood
           </button>

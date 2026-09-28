@@ -30,9 +30,9 @@ export const DEFAULT_MANUAL_FEATURES: PalmAnalyzeInput["features"] = {
 
 function SelectField<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: T[]; onChange: (value: T) => void }) {
   return (
-    <label className="grid gap-1 text-xs text-white/55">
+    <label className="grid gap-1 text-xs text-[#6B635B]">
       <span>{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value as T)} className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white outline-none">
+      <select value={value} onChange={(e) => onChange(e.target.value as T)} className="rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] px-3 py-2 text-[#1A1A1A] outline-none">
         {options.map((option) => <option key={option} value={option}>{option}</option>)}
       </select>
     </label>
@@ -63,7 +63,7 @@ export function PalmFeatureForm({
   onFeatures: (value: PalmAnalyzeInput["features"]) => void;
 }) {
   return (
-    <div className="grid gap-4 rounded-2xl border border-[#c8a030]/20 bg-black/30 p-4 md:grid-cols-2">
+    <div className="grid gap-4 rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-4 md:grid-cols-2">
       <SelectField label="Hand side" value={handSide} options={["right", "left", "both", "unknown"]} onChange={onHandSide} />
       <SelectField label="Dominant hand" value={dominantHand} options={["right", "left", "unknown"]} onChange={onDominantHand} />
       <div className="grid gap-1"><SelectField label="Palm shape" value={features.palm.shape} options={["rectangular", "square", "conic", "spatulate", "mixed", "unknown"]} onChange={(shape) => onFeatures({ ...features, palm: { ...features.palm, shape } })} /><FieldConfidence path="palm.shape" confidence={featureConfidence} /></div>
