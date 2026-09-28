@@ -29,15 +29,15 @@ const LK_ABBR: Record<string, string> = {
   Ketu: "Ke",
 };
 const LK_COLORS: Record<string, string> = {
-  Sun: "#f97316",
-  Moon: "#c084fc",
-  Mars: "#ef4444",
-  Mercury: "#22c55e",
-  Jupiter: "#f59e0b",
-  Venus: "#ec4899",
-  Saturn: "#60a5fa",
-  Rahu: "#a78bfa",
-  Ketu: "#fb7185",
+  Sun: "#C2410C",
+  Moon: "#7C3AED",
+  Mars: "#DC2626",
+  Mercury: "#15803D",
+  Jupiter: "#B45309",
+  Venus: "#BE185D",
+  Saturn: "#1D4ED8",
+  Rahu: "#6D28D9",
+  Ketu: "#BE123C",
 };
 
 function buildAdvancedPlacements(planets: Record<string, { house?: number }>): PlanetPlacement[] {
@@ -160,17 +160,17 @@ function LalKitabHouseChart({
 
   return (
     <div className="lk-chart-card">
-      <div className="varsh-col-title" style={{color:"#c8a030"}}>{subtitle}</div>
+      <div className="varsh-col-title" style={{color:"#8A6008"}}>{subtitle}</div>
       <div className="lk-chart-title serif">{title}</div>
       <svg viewBox={`0 0 ${size} ${size}`} width="100%" className="lk-chart" role="img" aria-label={title}>
         <rect width={size} height={size} fill="#FAF7F2" rx="8" />
-        <rect x="0" y="0" width={size} height={size} fill="none" stroke="#3a3260" strokeWidth="1.5" rx="8" />
-        <line x1="0" y1="0" x2={size} y2={size} stroke="#2a2250" />
-        <line x1={size} y1="0" x2="0" y2={size} stroke="#2a2250" />
-        <line x1={half} y1="0" x2={size} y2={half} stroke="#2a2250" />
-        <line x1={size} y1={half} x2={half} y2={size} stroke="#2a2250" />
-        <line x1={half} y1={size} x2="0" y2={half} stroke="#2a2250" />
-        <line x1="0" y1={half} x2={half} y2="0" stroke="#2a2250" />
+        <rect x="0" y="0" width={size} height={size} fill="none" stroke="rgba(184, 134, 11, 0.35)" strokeWidth="1.5" rx="8" />
+        <line x1="0" y1="0" x2={size} y2={size} stroke="rgba(184, 134, 11, 0.22)" />
+        <line x1={size} y1="0" x2="0" y2={size} stroke="rgba(184, 134, 11, 0.22)" />
+        <line x1={half} y1="0" x2={size} y2={half} stroke="rgba(184, 134, 11, 0.22)" />
+        <line x1={size} y1={half} x2={half} y2={size} stroke="rgba(184, 134, 11, 0.22)" />
+        <line x1={half} y1={size} x2="0" y2={half} stroke="rgba(184, 134, 11, 0.22)" />
+        <line x1="0" y1={half} x2={half} y2="0" stroke="rgba(184, 134, 11, 0.22)" />
         {houses.map(({ h, lx, ly }) => {
           const here = byHouse[h] ?? [];
           const highlighted = activeHouse === h;
@@ -178,13 +178,13 @@ function LalKitabHouseChart({
           return (
             <g key={h}>
               {highlighted && (
-                <circle cx={lx} cy={ly + 6} r="24" fill="rgba(200,160,48,.1)" stroke="rgba(200,160,48,.45)" />
+                <circle cx={lx} cy={ly + 6} r="24" fill="rgba(184,134,11,.12)" stroke="rgba(184,134,11,.55)" />
               )}
-              <text x={lx} y={ly - 8} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={highlighted ? "#d4af37" : "#4a4070"} fontWeight={highlighted ? "700" : "400"}>
+              <text x={lx} y={ly - 8} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={highlighted ? "#B8860B" : "#6B635B"} fontWeight={highlighted ? "700" : "600"}>
                 H{h}
               </text>
               {signNumber !== null && (
-                <text x={lx + 20} y={ly - 8} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#c8a030" fontWeight="800">
+                <text x={lx + 20} y={ly - 8} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#B8860B" fontWeight="800">
                   {signNumber}
                 </text>
               )}
@@ -216,10 +216,19 @@ export default function LalKitabPage() {
   // The real render is gated behind the hasUserChart guard below, so this
   // placeholder is never shown to the user.
   const safeDob = birth.dob || "2000-01-01";
-  const result = calculateLalKitab(chart.planets as never, safeDob, (chart as never as { lagnaNum?: number }).lagnaNum ?? 0);
   const lkTargetDate = useMemo(
     () => buildLKTargetDate(safeDob, lkYearOffset, lkMonthIndex),
     [safeDob, lkYearOffset, lkMonthIndex],
+  );
+  const result = useMemo(
+    () =>
+      calculateLalKitab(
+        chart.planets as never,
+        safeDob,
+        (chart as never as { lagnaNum?: number }).lagnaNum ?? 0,
+        lkTargetDate,
+      ),
+    [chart.planets, safeDob, chart, lkTargetDate],
   );
   const timeResult = calculateLalKitabTimeEngine({
     dob: safeDob,
@@ -273,143 +282,143 @@ export default function LalKitabPage() {
         .header-stats{display:flex;gap:12px;flex-wrap:wrap}
         .pitra-alert{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px}
         .pitra-icon{font-size:24px;flex-shrink:0}
-        .pitra-text{font-size:13px;color:#fdba74;line-height:1.7}
-        .pitra-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#f97316;margin-bottom:4px}
-        .kismat-bar{background:linear-gradient(135deg,rgba(200,160,48,0.12),rgba(245,158,11,0.06));border:1px solid rgba(200,160,48,0.3);border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px}
+        .pitra-text{font-size:13px;color:#7C2D12;line-height:1.7;font-weight:500}
+        .pitra-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:#C2410C;margin-bottom:4px}
+        .kismat-bar{background:#FFFFFF;border:1px solid rgba(184,134,11,0.25);border-radius:16px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .kismat-icon{font-size:32px}
         .kismat-content{flex:1}
-        .kismat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:4px}
-        .kismat-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#1A1A1A;margin-bottom:4px}
+        .kismat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#B8860B;margin-bottom:4px;font-weight:700}
+        .kismat-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:4px}
         .kismat-interp{font-size:13px;color:#4A4238;line-height:1.6}
-        .kismat-score{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#f59e0b;line-height:1}
+        .kismat-score{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#B8860B;line-height:1}
         .planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
-        .planet-card{border-radius:14px;padding:18px;cursor:pointer;transition:all 0.25s;border:1px solid}
-        .planet-card.pakka{background:rgba(34,197,94,0.04);border-color:rgba(34,197,94,0.2)}
-        .planet-card.pakka:hover{border-color:rgba(34,197,94,0.4);transform:translateY(-2px)}
-        .planet-card.dushman{background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.2)}
-        .planet-card.dushman:hover{border-color:rgba(239,68,68,0.4);transform:translateY(-2px)}
-        .planet-card.sadharan{background:#FFFFFF;border-color:rgba(245,158,11,0.2)}
-        .planet-card.sadharan:hover{border-color:rgba(245,158,11,0.4);transform:translateY(-2px)}
+        .planet-card{border-radius:16px;padding:18px;cursor:pointer;transition:all 0.25s;border:1px solid;background:#FFFFFF;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .planet-card.pakka{background:#FFFFFF;border-color:rgba(34,197,94,0.35)}
+        .planet-card.pakka:hover{border-color:rgba(34,197,94,0.6);transform:translateY(-2px)}
+        .planet-card.dushman{background:#FFFFFF;border-color:rgba(239,68,68,0.35)}
+        .planet-card.dushman:hover{border-color:rgba(239,68,68,0.6);transform:translateY(-2px)}
+        .planet-card.sadharan{background:#FFFFFF;border-color:rgba(184,134,11,0.25)}
+        .planet-card.sadharan:hover{border-color:rgba(184,134,11,0.5);transform:translateY(-2px)}
         .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
         .card-left{display:flex;align-items:center;gap:10px}
         .p-icon{font-size:22px}
-        .p-name{font-size:15px;font-weight:600;color:#1A1A1A}
-        .p-pos{font-size:11px;color:#6B635B;margin-top:2px}
+        .p-name{font-size:15px;font-weight:700;color:#1A1A1A}
+        .p-pos{font-size:11px;color:#6B635B;margin-top:2px;font-weight:500}
         .card-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
         .status-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid}
         .score-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700}
-        .score-bar-wrap{width:60px;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+        .score-bar-wrap{width:60px;height:4px;background:#E8E2D8;border-radius:2px;overflow:hidden}
         .score-bar{height:100%;border-radius:2px;transition:width 0.4s}
         .state-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
-        .retro-badge{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:#fdba74;margin-bottom:8px;line-height:1.6}
-        .conflict-badge{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:#fca5a5;margin-bottom:8px;line-height:1.6}
-        .friend-badge{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:#86efac;margin-bottom:8px;line-height:1.6}
+        .retro-badge{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:6px 10px;font-size:11px;color:#B45309;margin-bottom:8px;line-height:1.6;font-weight:500}
+        .conflict-badge{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:6px 10px;font-size:11px;color:#B91C1C;margin-bottom:8px;line-height:1.6;font-weight:500}
+        .friend-badge{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;padding:6px 10px;font-size:11px;color:#15803D;margin-bottom:8px;line-height:1.6;font-weight:500}
         .nishani-txt{font-size:13px;color:#4A4238;line-height:1.8;margin-bottom:10px}
         .tags-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-        .tag{font-size:10px;padding:3px 10px;border-radius:20px;white-space:nowrap}
-        .tag-age{background:rgba(200,160,48,0.1);border:1px solid rgba(200,160,48,0.2);color:#c8a030}
-        .tag-rin{background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);color:#2dd4bf}
-        .tag-retro{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);color:#f97316}
-        .domain-tabs{display:flex;gap:4px;flex-wrap:wrap;margin:12px 0 8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px}
-        .dtab{font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#6B635B;cursor:pointer;transition:all 0.2s}
-        .dtab.active{background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.3);color:#fbbf24}
+        .tag{font-size:10px;padding:3px 10px;border-radius:20px;white-space:nowrap;font-weight:600}
+        .tag-age{background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.25);color:#8A6008}
+        .tag-rin{background:rgba(20,184,166,0.09);border:1px solid rgba(20,184,166,0.25);color:#0F766E}
+        .tag-retro{background:rgba(249,115,22,0.09);border:1px solid rgba(249,115,22,0.25);color:#C2410C}
+        .domain-tabs{display:flex;gap:4px;flex-wrap:wrap;margin:12px 0 8px;border-top:1px solid rgba(0,0,0,0.06);padding-top:12px}
+        .dtab{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid rgba(0,0,0,0.1);background:transparent;color:#6B635B;cursor:pointer;transition:all 0.2s}
+        .dtab.active{background:rgba(184,134,11,0.14);border-color:#B8860B;color:#B8860B;font-weight:700}
         .domain-txt{font-size:13px;color:#4A4238;line-height:1.8;margin-bottom:8px}
         .home-env-list{display:flex;flex-direction:column;gap:4px;margin:6px 0}
-        .home-env-item{font-size:12px;color:#4A4238;padding:4px 8px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid rgba(245,158,11,0.3)}
+        .home-env-item{font-size:12px;color:#4A4238;padding:5px 9px;background:#FAF7F2;border-radius:6px;border-left:3px solid #B8860B}
         .remedies-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-        .remedy-item{font-size:12px;color:#f97316;padding:4px 8px;background:rgba(249,115,22,0.05);border-radius:6px;border-left:2px solid rgba(249,115,22,0.3)}
-        .takkar-card{border-radius:14px;padding:18px;margin-bottom:12px;transition:border-color 0.2s;border:1px solid}
-        .takkar-card.enemy{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.2)}
-        .takkar-card.enemy:hover{border-color:rgba(239,68,68,0.4)}
-        .takkar-card.support{background:rgba(34,197,94,0.04);border-color:rgba(34,197,94,0.2)}
-        .takkar-card.support:hover{border-color:rgba(34,197,94,0.35)}
-        .takkar-card.complex{background:rgba(245,158,11,0.04);border-color:rgba(245,158,11,0.2)}
-        .takkar-card.complex:hover{border-color:rgba(245,158,11,0.35)}
-        .takkar-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:6px}
-        .takkar-house{font-size:11px;color:#6B635B;margin-bottom:8px}
+        .remedy-item{font-size:12px;color:#C2410C;padding:5px 9px;background:rgba(249,115,22,0.06);border-radius:6px;border-left:3px solid #EA580C;font-weight:500}
+        .takkar-card{border-radius:16px;padding:18px;margin-bottom:12px;transition:border-color 0.2s;border:1px solid;background:#FFFFFF;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+        .takkar-card.enemy{background:#FFFFFF;border-color:rgba(239,68,68,0.25)}
+        .takkar-card.enemy:hover{border-color:rgba(239,68,68,0.5)}
+        .takkar-card.support{background:#FFFFFF;border-color:rgba(34,197,94,0.25)}
+        .takkar-card.support:hover{border-color:rgba(34,197,94,0.5)}
+        .takkar-card.complex{background:#FFFFFF;border-color:rgba(245,158,11,0.25)}
+        .takkar-card.complex:hover{border-color:rgba(245,158,11,0.5)}
+        .takkar-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;margin-bottom:6px}
+        .takkar-house{font-size:11px;color:#6B635B;margin-bottom:8px;font-weight:600}
         .takkar-effect{font-size:13px;color:#4A4238;line-height:1.7;margin-bottom:10px}
-        .takkar-upaya{font-size:12px;color:#f97316;padding:8px 10px;background:rgba(249,115,22,0.05);border-radius:8px;border:1px solid rgba(249,115,22,0.15)}
-        .rin-card{background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.2);border-radius:14px;padding:18px;margin-bottom:12px}
-        .rin-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#fdba74;margin-bottom:6px}
+        .takkar-upaya{font-size:12px;color:#C2410C;padding:8px 10px;background:rgba(249,115,22,0.06);border-radius:8px;border:1px solid rgba(249,115,22,0.2);font-weight:500}
+        .rin-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+        .rin-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:#C2410C;margin-bottom:6px}
         .rin-desc{font-size:13px;color:#4A4238;line-height:1.7;margin-bottom:8px}
-        .rin-upaya{font-size:12px;color:#f97316;padding:8px 10px;background:rgba(249,115,22,0.05);border-radius:8px;border:1px solid rgba(249,115,22,0.15)}
+        .rin-upaya{font-size:12px;color:#B45309;padding:8px 10px;background:rgba(245,158,11,0.07);border-radius:8px;border:1px solid rgba(245,158,11,0.2);font-weight:500}
         .ages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-        .age-card{border-radius:14px;padding:18px;text-align:center;border:1px solid;transition:all 0.2s}
+        .age-card{border-radius:16px;padding:18px;text-align:center;border:1px solid;transition:all 0.2s;background:#FFFFFF;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
         .age-card:hover{transform:translateY(-3px)}
-        .combo-card{background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.2);border-radius:14px;padding:20px;margin-bottom:14px}
-        .combo-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color: #1A1A1A;margin-bottom:6px}
+        .combo-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .combo-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:6px}
         .combo-pred{font-size:13px;color:#4A4238;line-height:1.8;margin-bottom:10px}
-        .combo-psych{font-size:12px;color:#a78bfa;padding:8px 10px;background:rgba(167,139,250,0.05);border-radius:8px;border:1px solid rgba(167,139,250,0.15);margin-bottom:10px}
+        .combo-psych{font-size:12px;color:#6D28D9;padding:8px 10px;background:rgba(124,58,237,0.06);border-radius:8px;border:1px solid rgba(124,58,237,0.2);margin-bottom:10px;font-weight:500}
         .combo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-        .combo-col-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;margin-bottom:6px}
-        .combo-list-item{font-size:12px;color:#4A4238;padding:3px 0;padding-left:10px;border-left:2px solid;line-height:1.5}
+        .combo-col-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;margin-bottom:6px;font-weight:700}
+        .combo-list-item{font-size:12px;color:#4A4238;padding:4px 0;padding-left:10px;border-left:3px solid;line-height:1.5;font-weight:500}
         .combo-remedies{margin-top:8px}
-        .varsh-card{background:linear-gradient(135deg,rgba(96,165,250,0.06),rgba(167,139,250,0.04));border:1px solid rgba(96,165,250,0.25);border-radius:16px;padding:24px}
-        .varsh-year{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;color:#60a5fa;line-height:1}
-        .varsh-lagna{font-size:13px;color:#93c5fd;margin:6px 0 16px}
+        .varsh-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.25);border-radius:18px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .varsh-year{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;color:#B8860B;line-height:1}
+        .varsh-lagna{font-size:13px;color:#1E3A8A;margin:6px 0 16px;font-weight:600}
         .varsh-summary{font-size:14px;color:#4A4238;line-height:1.9;margin-bottom:16px}
         .varsh-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-        .varsh-col{border-radius:10px;padding:14px}
-        .varsh-col.shubh{background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.2)}
-        .varsh-col.caution{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2)}
-        .varsh-col-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-        .varsh-planet{font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+        .varsh-col{border-radius:12px;padding:16px;border:1px solid}
+        .varsh-col.shubh{background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.25)}
+        .varsh-col.caution{background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.25)}
+        .varsh-col-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:700}
+        .varsh-planet{font-size:13px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-weight:600}
         .varsh-planet:last-child{border-bottom:none}
-        .safety-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;margin-bottom:14px}
-        .safety-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
+        .safety-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .safety-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:8px}
         .safety-text{font-size:13px;color:#4A4238;line-height:1.8}
         .support-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:14px}
-        .support-card{border-radius:12px;padding:14px;border:1px solid;background:rgba(13,10,34,0.7)}
+        .support-card{border-radius:14px;padding:16px;border:1px solid rgba(184,134,11,0.2);background:#FAF7F2}
         .support-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
         .support-name{font-size:14px;font-weight:700;color:#1A1A1A}
         .support-score{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;line-height:1}
         .safety-pill{font-size:10px;font-weight:700;border-radius:20px;padding:3px 9px;border:1px solid;text-transform:uppercase;letter-spacing:.4px}
         .indicator-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
-        .indicator-card{background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.18);border-radius:12px;padding:14px}
+        .indicator-card{background:#FAF7F2;border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:14px}
         .protocol-list{display:grid;gap:7px;margin-top:10px}
-        .protocol-item{font-size:12px;color:#d8cfb8;line-height:1.6;padding:8px 10px;border-radius:8px;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.12)}
+        .protocol-item{font-size:12px;color:#15803D;line-height:1.6;padding:8px 10px;border-radius:8px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.22);font-weight:500}
         .lk-gochar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}
-        .lk-chart-card{background:rgba(13,10,34,0.7);border:1px solid rgba(96,165,250,0.18);border-radius:14px;padding:16px}
+        .lk-chart-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .lk-chart-title{font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:8px}
         .lk-chart{max-width:300px;display:block;margin:8px auto 0}
         .lk-time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
-        .lk-time-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px}
-        .lk-time-stat{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:#f4df9d;line-height:1;margin-bottom:6px}
+        .lk-time-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .lk-time-stat{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:#1A1A1A;line-height:1;margin-bottom:6px}
         .lk-mini-list{display:grid;gap:8px;margin-top:12px}
-        .lk-mini-item{font-size:12px;color:#4A4238;line-height:1.65;padding:9px 11px;border-radius:9px;background:rgba(9,6,29,0.8);border:1px solid rgba(38,31,76,0.9)}
+        .lk-mini-item{font-size:13px;color:#1A1A1A;line-height:1.65;padding:10px 14px;border-radius:10px;background:#FAF7F2;border:1px solid rgba(184,134,11,0.18);font-weight:500}
         .lk-remedy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
-        .lk-remedy-card{border-radius:14px;padding:15px;background:rgba(9,6,29,0.78);border:1px solid rgba(38,31,76,0.9)}
+        .lk-remedy-card{border-radius:16px;padding:18px;background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);box-shadow:0 4px 15px rgba(0,0,0,0.03)}
         .lk-remedy-title{font-size:15px;font-weight:800;color:#1A1A1A;margin-bottom:7px}
-        .lk-remedy-text{font-size:12px;color:#4A4238;line-height:1.75}
+        .lk-remedy-text{font-size:13px;color:#4A4238;line-height:1.75}
         .lk-vastu-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-        .lk-vastu{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#d8cfb8}
-        .lk-vastu.can{border-color:rgba(34,197,94,0.28);background:rgba(34,197,94,0.08);color:#86efac}
-        .lk-vastu.no{border-color:rgba(239,68,68,0.28);background:rgba(239,68,68,0.08);color:#fca5a5}
-        .lk-vastu.soft{border-color:rgba(245,158,11,0.28);background:rgba(245,158,11,0.08);color:#fcd34d}
-        .detail-note{font-size:13px;color:#4A4238;line-height:1.85;padding:13px 16px;border-radius:12px;background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.15);margin-bottom:14px}
-        .lk-table-wrap{overflow-x:auto;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.03);margin-bottom:14px}
+        .lk-vastu{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid rgba(184,134,11,0.2);background:#FAF7F2;color:#4A4238;font-weight:500}
+        .lk-vastu.can{border-color:rgba(34,197,94,0.35);background:rgba(34,197,94,0.09);color:#15803D;font-weight:600}
+        .lk-vastu.no{border-color:rgba(239,68,68,0.35);background:rgba(239,68,68,0.09);color:#DC2626;font-weight:600}
+        .lk-vastu.soft{border-color:rgba(245,158,11,0.35);background:rgba(245,158,11,0.09);color:#B45309;font-weight:600}
+        .detail-note{font-size:13px;color:#4A4238;line-height:1.85;padding:14px 18px;border-radius:14px;background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.22);margin-bottom:14px}
+        .lk-table-wrap{overflow-x:auto;border:1px solid rgba(184,134,11,0.22);border-radius:16px;background:#FFFFFF;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .lk-table{width:100%;border-collapse:collapse;min-width:780px}
-        .lk-table th{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:#c8a030;text-align:left;padding:12px 14px;border-bottom:1px solid rgba(200,160,48,0.2);background:rgba(200,160,48,0.06)}
-        .lk-table td{font-size:13px;color:#d8cfb8;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);vertical-align:top}
+        .lk-table th{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:#8A6008;text-align:left;padding:12px 14px;border-bottom:1px solid rgba(184,134,11,0.2);background:rgba(184,134,11,0.08);font-weight:700}
+        .lk-table td{font-size:13px;color:#1A1A1A;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,0.06);vertical-align:top;font-weight:500}
         .lk-table tr:last-child td{border-bottom:none}
-        .bm-benefic{color:#22c55e;font-weight:800}
-        .bm-malefic{color:#ef4444;font-weight:800}
-        .bm-mixed{color:#f59e0b;font-weight:800}
+        .bm-benefic{color:#15803D;font-weight:800}
+        .bm-malefic{color:#DC2626;font-weight:800}
+        .bm-mixed{color:#B45309;font-weight:800}
         .yes-no{font-size:12px;font-weight:800}
-        .yes-no.yes{color:#f59e0b}.yes-no.no{color:#6B635B}
+        .yes-no.yes{color:#15803D}.yes-no.no{color:#6B635B}
         .prediction-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
-        .prediction-card{background:rgba(9,6,29,0.78);border:1px solid rgba(38,31,76,0.9);border-radius:14px;padding:14px}
-        .prediction-title{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#c8a030;margin-bottom:8px}
-        .prediction-text{font-size:13px;color:#4A4238;line-height:1.8}
-        .lk-report-block{background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin-bottom:14px}
+        .prediction-card{background:#FAF7F2;border:1px solid rgba(184,134,11,0.2);border-radius:14px;padding:16px}
+        .prediction-title{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#8A6008;margin-bottom:8px;font-weight:700}
+        .prediction-text{font-size:13px;color:#1A1A1A;line-height:1.7}
+        .lk-report-block{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .lk-report-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#1A1A1A;margin-bottom:10px}
         .lk-report-p{font-size:14px;color:#4A4238;line-height:1.95;margin-bottom:10px}
         .lk-bullet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}
-        .lk-scroll-panel{background:rgba(255,255,255,0.035);border:1px solid rgba(200,160,48,0.18);border-radius:14px;padding:14px;margin-bottom:16px}
+        .lk-scroll-panel{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .lk-scroll-row{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:thin}
-        .lk-scroll-btn{white-space:nowrap;border:1px solid rgba(255,255,255,0.1);background:#FAF7F2;color:#4A4238;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:750;cursor:pointer}
-        .lk-scroll-btn.active{border-color:#c8a030;background:rgba(200,160,48,0.15);color:#f4df9d}
-        .lk-scroll-meta{font-size:12px;color:#8f86b8;line-height:1.6;margin-top:4px}
+        .lk-scroll-btn{white-space:nowrap;border:1px solid rgba(184,134,11,0.25);background:#FAF7F2;color:#4A4238;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+        .lk-scroll-btn.active{border-color:#B8860B;background:rgba(184,134,11,0.15);color:#8A6008}
+        .lk-scroll-meta{font-size:12px;color:#6B635B;line-height:1.6;margin-top:6px}
         @media(max-width:768px){.planet-grid{grid-template-columns:1fr}.combo-grid{grid-template-columns:1fr}.varsh-grid{grid-template-columns:1fr}}
         @media(max-width:900px){.lk-gochar-grid,.lk-time-grid{grid-template-columns:1fr}}
       `}</style>
@@ -608,20 +617,20 @@ export default function LalKitabPage() {
                           {p.upaya}
                         </div>
                         {p.rin && (
-                          <div style={{marginTop:10,padding:"10px 12px",background:"rgba(20,184,166,0.05)",border:"1px solid rgba(20,184,166,0.15)",borderRadius:8,fontSize:12,color:"#2dd4bf",lineHeight:1.7}}>
-                            <div style={{fontSize:10,color:"#0d9488",fontWeight:600,letterSpacing:"1px",textTransform:"uppercase",marginBottom:4}}>Rin Siddhant</div>
+                          <div style={{marginTop:10,padding:"10px 12px",background:"rgba(20,184,166,0.08)",border:"1px solid rgba(20,184,166,0.25)",borderRadius:8,fontSize:12,color:"#0F766E",lineHeight:1.7,fontWeight:500}}>
+                            <div style={{fontSize:10,color:"#0F766E",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:4}}>Rin Siddhant</div>
                             {p.rin}
                           </div>
                         )}
                         {p.neverDonate.length > 0 && (
-                          <div style={{marginTop:10,padding:"12px 14px",background:"rgba(239,68,68,0.05)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:8}}>
-                            <div style={{fontSize:10,color:"#ef4444",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:6}}>⚠️ Yeh Daan Na Karein — Savdhani</div>
+                          <div style={{marginTop:10,padding:"12px 14px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.25)",borderRadius:8}}>
+                            <div style={{fontSize:10,color:"#DC2626",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",marginBottom:6}}>⚠️ Yeh Daan Na Karein — Savdhani</div>
                             <div style={{fontSize:12,color:"#4A4238",lineHeight:1.7,marginBottom:8}}>
                               Jab tak {p.planet} aapke liye anukool chal raha hai, yeh cheezein daan karne se is grah ki shakti kamzor pad sakti hai:
                             </div>
                             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
                               {p.neverDonate.map((item,i) => (
-                                <span key={i} style={{fontSize:11,padding:"3px 10px",borderRadius:20,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#fca5a5"}}>
+                                <span key={i} style={{fontSize:11,padding:"3px 10px",borderRadius:20,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.3)",color:"#DC2626",fontWeight:600}}>
                                   🚫 {item}
                                 </span>
                               ))}
@@ -633,29 +642,29 @@ export default function LalKitabPage() {
 
                     {domainTab === "career" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Karya Kshetra · Career</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8,fontWeight:700}}>Karya Kshetra · Career</div>
                         <div className="domain-txt">{p.career}</div>
                       </div>
                     )}
 
                     {domainTab === "money" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Dhan · Money</div>
-                        <div className="domain-txt" style={{color:"#fcd34d"}}>{p.money}</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8,fontWeight:700}}>Dhan · Money</div>
+                        <div className="domain-txt" style={{color:"#B45309",fontWeight:500}}>{p.money}</div>
                       </div>
                     )}
 
                     {domainTab === "marriage" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Vivah · Marriage</div>
-                        <div className="domain-txt" style={{color:"#f9a8d4"}}>{p.marriage}</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8,fontWeight:700}}>Vivah · Marriage</div>
+                        <div className="domain-txt" style={{color:"#BE185D",fontWeight:500}}>{p.marriage}</div>
                       </div>
                     )}
 
                     {domainTab === "health" && (
                       <div style={{paddingTop:4}}>
-                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8}}>Swasthya · Health</div>
-                        <div className="domain-txt" style={{color:"#86efac"}}>{p.health}</div>
+                        <div style={{fontSize:10,letterSpacing:"1.5px",textTransform:"uppercase",color:"#6B635B",marginBottom:8,fontWeight:700}}>Swasthya · Health</div>
+                        <div className="domain-txt" style={{color:"#15803D",fontWeight:500}}>{p.health}</div>
                       </div>
                     )}
 
@@ -745,7 +754,7 @@ export default function LalKitabPage() {
               result.takkars.map((t, i) => (
                 <div key={i} className={`takkar-card ${t.kind}`}>
                   <div className="takkar-title serif" style={{
-                    color: t.kind === "enemy" ? "#fca5a5" : t.kind === "support" ? "#86efac" : "#fcd34d"
+                    color: t.kind === "enemy" ? "#DC2626" : t.kind === "support" ? "#15803D" : "#B45309"
                   }}>
                     {t.icons[0]} {t.p1} {t.kind === "support" ? "🤝" : "⚔️"} {t.icons[1]} {t.p2}
                   </div>
@@ -799,10 +808,10 @@ export default function LalKitabPage() {
             </div>
             <div className="ages-grid">
               {result.planets.map(p => {
-                const col = p.isActNow ? "#f59e0b" : p.isPast ? "#22c55e" : "#60a5fa";
+                const col = p.isActNow ? "#B45309" : p.isPast ? "#15803D" : "#1D4ED8";
                 return (
                   <div key={p.planet} className="age-card" style={{
-                    background:`${col}11`, borderColor:`${col}44`
+                    background:`${col}12`, borderColor:`${col}44`
                   }}>
                     <div style={{fontSize:24,marginBottom:6,color:p.color}}>{p.icon}</div>
                     <div style={{fontSize:14,fontWeight:600,color:p.color}}>{p.planet}</div>
@@ -847,15 +856,15 @@ export default function LalKitabPage() {
                     <div className="combo-psych">🧠 {c.psychology}</div>
                     <div className="combo-grid">
                       <div>
-                        <div className="combo-col-title" style={{color:"#22c55e"}}>Shakti (Strengths)</div>
+                        <div className="combo-col-title" style={{color:"#15803D"}}>Shakti (Strengths)</div>
                         {c.strengths.map((s,j) => (
-                          <div key={j} className="combo-list-item" style={{borderColor:"rgba(34,197,94,0.3)",color:"#86efac"}}>{s}</div>
+                          <div key={j} className="combo-list-item" style={{borderColor:"#15803D",color:"#15803D"}}>{s}</div>
                         ))}
                       </div>
                       <div>
-                        <div className="combo-col-title" style={{color:"#ef4444"}}>Jokhim (Risks)</div>
+                        <div className="combo-col-title" style={{color:"#DC2626"}}>Jokhim (Risks)</div>
                         {c.risks.map((r,j) => (
-                          <div key={j} className="combo-list-item" style={{borderColor:"rgba(239,68,68,0.3)",color:"#fca5a5"}}>{r}</div>
+                          <div key={j} className="combo-list-item" style={{borderColor:"#DC2626",color:"#DC2626"}}>{r}</div>
                         ))}
                       </div>
                     </div>
@@ -957,20 +966,20 @@ export default function LalKitabPage() {
               </div>
               <div className="varsh-grid">
                 <div className="varsh-col shubh">
-                  <div className="varsh-col-title" style={{color:"#22c55e"}}>✨ Shubh Graha (Is Saal)</div>
+                  <div className="varsh-col-title" style={{color:"#15803D"}}>✨ Shubh Graha (Is Saal)</div>
                   {result.varshphal.shubhPlanets.length === 0
                     ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh shubh grah nahi</div>
                     : result.varshphal.shubhPlanets.map((pl,i) => (
-                        <div key={i} className="varsh-planet" style={{color:"#86efac"}}>{pl}</div>
+                        <div key={i} className="varsh-planet" style={{color:"#15803D"}}>{pl}</div>
                       ))
                   }
                 </div>
                 <div className="varsh-col caution">
-                  <div className="varsh-col-title" style={{color:"#ef4444"}}>⚠️ Savdhani (Is Saal)</div>
+                  <div className="varsh-col-title" style={{color:"#DC2626"}}>⚠️ Savdhani (Is Saal)</div>
                   {result.varshphal.cautionPlanets.length === 0
                     ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh savdhani nahi</div>
                     : result.varshphal.cautionPlanets.map((pl,i) => (
-                        <div key={i} className="varsh-planet" style={{color:"#fca5a5"}}>{pl}</div>
+                        <div key={i} className="varsh-planet" style={{color:"#DC2626"}}>{pl}</div>
                       ))
                   }
                 </div>
@@ -982,12 +991,12 @@ export default function LalKitabPage() {
         {/* ── LK GOCHAR TAB ── */}
         {activeTab === "lkgochar" && (
           <div>
-            <div style={{background:"rgba(200,160,48,0.06)",border:"1px solid rgba(200,160,48,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
-              📕 <strong style={{color:"#c8a030"}}>LK Gochar</strong> — Yeh normal transit/gochar nahi hai. Yeh Lal Kitab ka time-reading layer hai: natal condition, 35-sala chakra, varshphal aur monthly phal ko ek saath read karta hai.
+            <div style={{background:"rgba(184,134,11,0.06)",border:"1px solid rgba(184,134,11,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
+              📕 <strong style={{color:"#8A6008"}}>LK Gochar</strong> — Yeh normal transit/gochar nahi hai. Yeh Lal Kitab ka time-reading layer hai: natal condition, 35-sala chakra, varshphal aur monthly phal ko ek saath read karta hai.
             </div>
 
             <div className="lk-scroll-panel">
-              <div className="varsh-col-title" style={{color:"#c8a030"}}>Year Scroll</div>
+              <div className="varsh-col-title" style={{color:"#8A6008"}}>Year Scroll</div>
               <div className="lk-scroll-row" aria-label="Select Lal Kitab Varshphal year">
                 {[-3, -2, -1, 0, 1, 2, 3, 4, 5].map((offset) => (
                   <button
@@ -1003,7 +1012,7 @@ export default function LalKitabPage() {
                   </button>
                 ))}
               </div>
-              <div className="varsh-col-title" style={{color:"#60a5fa",marginTop:8}}>Monthly Phal Scroll</div>
+              <div className="varsh-col-title" style={{color:"#1D4ED8",marginTop:8}}>Monthly Phal Scroll</div>
               <div className="lk-scroll-row" aria-label="Select month inside selected Lal Kitab Varshphal year">
                 {Array.from({length: 12}, (_, index) => (
                   <button
@@ -1023,19 +1032,19 @@ export default function LalKitabPage() {
 
             <div className="lk-time-grid">
               <div className="lk-time-card">
-                <div className="varsh-col-title" style={{color:"#c8a030"}}>Running Age</div>
+                <div className="varsh-col-title" style={{color:"#8A6008"}}>Running Age</div>
                 <div className="lk-time-stat">{timeResult.age.runningAge}</div>
                 <div className="safety-text">
                   Completed age {timeResult.age.completedAge}. 35-sala cycle {timeResult.age.cycleNumber}, year {timeResult.age.cycleYear}.
                 </div>
               </div>
               <div className="lk-time-card">
-                <div className="varsh-col-title" style={{color:"#60a5fa"}}>35-Sala Active House</div>
+                <div className="varsh-col-title" style={{color:"#1D4ED8"}}>35-Sala Active House</div>
                 <div className="lk-time-stat">H{timeResult.thirtyFiveYearChakra.activeHouse}</div>
                 <div className="safety-text">{timeResult.thirtyFiveYearChakra.prediction}</div>
               </div>
               <div className="lk-time-card">
-                <div className="varsh-col-title" style={{color:"#22c55e"}}>Reading Mode</div>
+                <div className="varsh-col-title" style={{color:"#15803D"}}>Reading Mode</div>
                 <div className="lk-time-stat" style={{fontSize:26}}>Pure LK</div>
                 <div className="safety-text">{timeResult.accuracyStatus}</div>
               </div>
@@ -1107,7 +1116,7 @@ export default function LalKitabPage() {
 
             <div className="varsh-grid">
               <div className="varsh-col shubh">
-                <div className="varsh-col-title" style={{color:"#22c55e"}}>Varshphal Reading</div>
+                <div className="varsh-col-title" style={{color:"#15803D"}}>Varshphal Reading</div>
                 <div className="safety-text" style={{fontSize:14,lineHeight:1.95}}>{timeResult.varshphal.prediction}</div>
                 <div className="lk-mini-list">
                   <div className="lk-mini-item">Shubh: {timeResult.varshphal.shubhPlanets.length ? timeResult.varshphal.shubhPlanets.join(", ") : "No strong shubh marker"}</div>
@@ -1115,7 +1124,7 @@ export default function LalKitabPage() {
                 </div>
               </div>
               <div className="varsh-col caution">
-                <div className="varsh-col-title" style={{color:"#f59e0b"}}>Monthly Phal</div>
+                <div className="varsh-col-title" style={{color:"#B45309"}}>Monthly Phal</div>
                 <div className="safety-text" style={{fontSize:14,lineHeight:1.95}}>{timeResult.monthlyPhal.prediction}</div>
                 <div className="lk-mini-list">
                   <div className="lk-mini-item">{timeResult.monthlyPhal.actionLine}</div>
@@ -1150,14 +1159,14 @@ export default function LalKitabPage() {
               </div>
             </div>
 
-            <div className="safety-card" style={{marginTop:14,background:"rgba(34,197,94,0.04)",borderColor:"rgba(34,197,94,0.18)"}}>
+            <div className="safety-card" style={{marginTop:14,background:"#FFFFFF",borderColor:"rgba(184,134,11,0.22)"}}>
               <div className="safety-title">Daan & Remedy Decision</div>
               <div className="safety-text">
                 Lal Kitab mein daan planet-wise aur condition-wise hota hai. Jo grah 6/8/12, mandi ya dushman zone mein active ho uski vastu ka controlled daan kiya ja sakta hai. Jo grah nek, pakka ya supportive ho uski core vastu ka daan avoid rakhein; uske liye seva, discipline aur achha conduct better remedy hai.
               </div>
               <div className="lk-remedy-grid">
                 {timeResult.remedyGuidance.map((guidance) => {
-                  const color = guidance.decision === "daan_allowed" ? "#22c55e" : guidance.decision === "daan_avoid" ? "#ef4444" : "#f59e0b";
+                  const color = guidance.decision === "daan_allowed" ? "#15803D" : guidance.decision === "daan_avoid" ? "#DC2626" : "#B45309";
                   return (
                       <div key={`${guidance.planet}-${guidance.natalHouse}`} className="lk-remedy-card" style={{borderColor:`${color}44`}}>
                         <div className="lk-remedy-title">{guidance.title} · H{guidance.natalHouse || "-"}</div>
@@ -1165,7 +1174,7 @@ export default function LalKitabPage() {
                         <div className="lk-remedy-text" style={{marginTop:8}}>{guidance.detailedExplanation}</div>
                         {guidance.canDonate.length > 0 && (
                         <>
-                          <div className="varsh-col-title" style={{color:"#22c55e",marginTop:10}}>Daan kar sakte hain</div>
+                          <div className="varsh-col-title" style={{color:"#15803D",marginTop:10}}>Daan kar sakte hain</div>
                           <div className="lk-vastu-row">
                             {guidance.canDonate.map((item) => <span key={item} className="lk-vastu can">{item}</span>)}
                           </div>
@@ -1173,7 +1182,7 @@ export default function LalKitabPage() {
                       )}
                       {guidance.doNotDonate.length > 0 && (
                         <>
-                          <div className="varsh-col-title" style={{color:"#ef4444",marginTop:10}}>Daan nahi karna</div>
+                          <div className="varsh-col-title" style={{color:"#DC2626",marginTop:10}}>Daan nahi karna</div>
                           <div className="lk-vastu-row">
                             {guidance.doNotDonate.map((item) => <span key={item} className="lk-vastu no">{item}</span>)}
                           </div>
@@ -1181,7 +1190,7 @@ export default function LalKitabPage() {
                       )}
                       {guidance.preferredCorrection.length > 0 && (
                         <>
-                          <div className="varsh-col-title" style={{color:"#f59e0b",marginTop:10}}>Safe correction</div>
+                          <div className="varsh-col-title" style={{color:"#B45309",marginTop:10}}>Safe correction</div>
                           <div className="lk-vastu-row">
                             {guidance.preferredCorrection.map((item) => <span key={item} className="lk-vastu soft">{item}</span>)}
                           </div>
@@ -1189,7 +1198,7 @@ export default function LalKitabPage() {
                       )}
                       {guidance.nimit.length > 0 && (
                         <>
-                          <div className="varsh-col-title" style={{color:"#60a5fa",marginTop:10}}>Nimit watch</div>
+                          <div className="varsh-col-title" style={{color:"#1D4ED8",marginTop:10}}>Nimit watch</div>
                           <div className="lk-vastu-row">
                             {guidance.nimit.map((item) => <span key={item} className="lk-vastu">{item}</span>)}
                           </div>
@@ -1197,7 +1206,7 @@ export default function LalKitabPage() {
                       )}
                       {guidance.protocol.length > 0 && (
                         <>
-                          <div className="varsh-col-title" style={{color:"#c8a030",marginTop:10}}>Protocol</div>
+                          <div className="varsh-col-title" style={{color:"#8A6008",marginTop:10}}>Protocol</div>
                           <div className="lk-mini-list">
                             {guidance.protocol.map((item) => <div key={item} className="lk-mini-item">{item}</div>)}
                           </div>
@@ -1205,7 +1214,7 @@ export default function LalKitabPage() {
                       )}
                       {guidance.avoidMistakes.length > 0 && (
                         <>
-                          <div className="varsh-col-title" style={{color:"#ef4444",marginTop:10}}>Avoid mistakes</div>
+                          <div className="varsh-col-title" style={{color:"#DC2626",marginTop:10}}>Avoid mistakes</div>
                           <div className="lk-mini-list">
                             {guidance.avoidMistakes.map((item) => <div key={item} className="lk-mini-item">{item}</div>)}
                           </div>
@@ -1222,8 +1231,8 @@ export default function LalKitabPage() {
         {/* ── GHAR TAB ── */}
         {activeTab === "ghar" && (
           <div>
-            <div style={{background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
-              🏠 <strong style={{color:"#22c55e"}}>Ghar Ke Sanket</strong> — Lal Kitab mein ghar ke har hisse ka ek khaas grah se sambandh hota hai. Jis ghar mein grah hain, us zone ki cheezein aur halat seedhe us grah ke results ko prabhavit karti hain.
+            <div style={{background:"rgba(21,128,61,0.06)",border:"1px solid rgba(21,128,61,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
+              🏠 <strong style={{color:"#15803D"}}>Ghar Ke Sanket</strong> — Lal Kitab mein ghar ke har hisse ka ek khaas grah se sambandh hota hai. Jis ghar mein grah hain, us zone ki cheezein aur halat seedhe us grah ke results ko prabhavit karti hain.
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
               {result.houseOmens.map(h => {
@@ -1231,13 +1240,14 @@ export default function LalKitabPage() {
                 return (
                   <div key={h.house} style={{
                     borderRadius:14,padding:"16px 18px",
-                    background: occupied ? "rgba(34,197,94,0.04)" : "rgba(255,255,255,0.02)",
-                    border: `1px solid ${occupied ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.06)"}`,
+                    background: "#FFFFFF",
+                    border: `1px solid ${occupied ? "rgba(21,128,61,0.35)" : "rgba(184,134,11,0.22)"}`,
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.02)",
                     transition:"border-color 0.2s"
                   }}>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
                       <div style={{display:"flex",alignItems:"center",gap:10}}>
-                        <div style={{width:32,height:32,borderRadius:8,background:"rgba(200,160,48,0.1)",border:"1px solid rgba(200,160,48,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#c8a030"}}>
+                        <div style={{width:32,height:32,borderRadius:8,background:"rgba(184,134,11,0.1)",border:"1px solid rgba(184,134,11,0.25)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#8A6008"}}>
                           {h.house}
                         </div>
                         <div>
@@ -1253,16 +1263,16 @@ export default function LalKitabPage() {
                         </div>
                       )}
                     </div>
-                    <div style={{fontSize:12,color:"#a78bfa",marginBottom:8,fontStyle:"italic"}}>{h.meaning}</div>
+                    <div style={{fontSize:12,color:"#6D28D9",marginBottom:8,fontStyle:"italic",fontWeight:500}}>{h.meaning}</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
                       {h.signs.map((s,i) => (
-                        <span key={i} style={{fontSize:11,padding:"3px 9px",borderRadius:20,background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.18)",color:"#4A4238"}}>
+                        <span key={i} style={{fontSize:11,padding:"3px 9px",borderRadius:20,background:"rgba(184,134,11,0.08)",border:"1px solid rgba(184,134,11,0.22)",color:"#4A4238",fontWeight:500}}>
                           {s}
                         </span>
                       ))}
                     </div>
                     {occupied && (
-                      <div style={{marginTop:10,fontSize:11,color:"#22c55e",padding:"6px 8px",background:"rgba(34,197,94,0.05)",borderRadius:6}}>
+                      <div style={{marginTop:10,fontSize:11,color:"#15803D",padding:"6px 8px",background:"rgba(34,197,94,0.08)",borderRadius:6,fontWeight:600}}>
                         ⚡ {h.planets.join(" + ")} yahan hai — is zone ki cheezein seedha prabhavit hoti hain
                       </div>
                     )}
@@ -1276,15 +1286,15 @@ export default function LalKitabPage() {
         {/* ── SAFETY TAB ── */}
         {activeTab === "safety" && (
           <div>
-            <div className="safety-card" style={{background:"rgba(96,165,250,0.05)",borderColor:"rgba(96,165,250,0.18)"}}>
+            <div className="safety-card" style={{background:"#FFFFFF",borderColor:"rgba(184,134,11,0.25)"}}>
               <div className="safety-title">Advanced Lal Kitab Safety Layer</div>
               <div className="safety-text">{advancedResult.narrative}</div>
-              <div style={{fontSize:11,color:"#60a5fa",marginTop:10}}>{advancedResult.system}</div>
+              <div style={{fontSize:12,color:"#1D4ED8",marginTop:10,fontWeight:600}}>{advancedResult.system}</div>
             </div>
 
             {advancedResult.kismatKaGrah && (
-              <div className="safety-card" style={{background:"rgba(200,160,48,0.06)",borderColor:"rgba(200,160,48,0.24)"}}>
-                <div style={{fontSize:10,letterSpacing:"2px",textTransform:"uppercase",color:"#c8a030",marginBottom:5}}>Safe Kismat Ka Grah</div>
+              <div className="safety-card" style={{background:"#FFFFFF",borderColor:"rgba(184,134,11,0.25)"}}>
+                <div style={{fontSize:10,letterSpacing:"2px",textTransform:"uppercase",color:"#8A6008",marginBottom:5,fontWeight:700}}>Safe Kismat Ka Grah</div>
                 <div className="safety-title">
                   {advancedResult.kismatKaGrah.planet} · House {advancedResult.kismatKaGrah.house} · Score {advancedResult.kismatKaGrah.finalScore}
                 </div>
@@ -1299,14 +1309,14 @@ export default function LalKitabPage() {
               </div>
               <div className="support-grid">
                 {advancedResult.planetSupport.map((p) => {
-                  const color = p.status === "supportive" ? "#22c55e" : p.status === "mixed_supportive" ? "#f59e0b" : "#ef4444";
+                  const color = p.status === "supportive" ? "#15803D" : p.status === "mixed_supportive" ? "#B45309" : "#DC2626";
                   const label = p.status === "supportive" ? "Supportive" : p.status === "mixed_supportive" ? "Mixed" : "Careful";
                   return (
                     <div key={p.planet} className="support-card" style={{borderColor:`${color}44`}}>
                       <div className="support-top">
                         <div>
                           <div className="support-name">{p.planet} · H{p.house}</div>
-                          <div style={{fontSize:10,color:"#6B635B",marginTop:2}}>
+                          <div style={{fontSize:11,color:"#6B635B",marginTop:2,fontWeight:500}}>
                             {p.isPakkaHouse ? "Pakka house" : p.isSupportiveHouse ? "Supportive house" : p.isChallengeHouse ? "Challenge house" : "Neutral house"}
                           </div>
                         </div>
@@ -1329,11 +1339,11 @@ export default function LalKitabPage() {
                   {advancedResult.lifeAreaIndicators.map((indicator) => (
                     <div key={indicator.id} className="indicator-card">
                       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,marginBottom:8}}>
-                        <div style={{fontSize:13,fontWeight:700,color:"#fdba74",textTransform:"capitalize"}}>
+                        <div style={{fontSize:13,fontWeight:700,color:"#C2410C",textTransform:"capitalize"}}>
                           {indicator.category.replaceAll("_", " ")}
                         </div>
                         <span className="safety-pill" style={{
-                          color: indicator.sensitivity === "sensitive" ? "#ef4444" : "#f59e0b",
+                          color: indicator.sensitivity === "sensitive" ? "#DC2626" : "#B45309",
                           background:"rgba(249,115,22,0.08)",
                           borderColor:"rgba(249,115,22,0.25)"
                         }}>
@@ -1347,21 +1357,21 @@ export default function LalKitabPage() {
               )}
             </div>
 
-            <div className="safety-card" style={{background:"rgba(34,197,94,0.04)",borderColor:"rgba(34,197,94,0.18)"}}>
+            <div className="safety-card" style={{background:"#FFFFFF",borderColor:"rgba(34,197,94,0.25)"}}>
               <div className="safety-title">{advancedResult.remedySafety.title}</div>
               <div className="safety-text">{advancedResult.remedySafety.priority}</div>
               <div className="safety-text" style={{marginTop:8}}>{advancedResult.remedySafety.safestPractices}</div>
-              <div className="safety-text" style={{marginTop:8,color:"#fcd34d"}}>{advancedResult.remedySafety.donationGuidance}</div>
-              <div className="safety-text" style={{marginTop:8,color:"#fca5a5"}}>{advancedResult.remedySafety.highCaution}</div>
+              <div className="safety-text" style={{marginTop:8,color:"#B45309",fontWeight:500}}>{advancedResult.remedySafety.donationGuidance}</div>
+              <div className="safety-text" style={{marginTop:8,color:"#DC2626",fontWeight:500}}>{advancedResult.remedySafety.highCaution}</div>
 
               {advancedResult.remedySafety.neverDonateGuidance.map((guidance) => (
-                <div key={guidance.planet} style={{marginTop:14,padding:"12px 14px",background:"rgba(239,68,68,0.05)",border:"1px solid rgba(239,68,68,0.18)",borderRadius:10}}>
-                  <div style={{fontSize:12,fontWeight:700,color:"#fca5a5",marginBottom:7}}>
+                <div key={guidance.planet} style={{marginTop:14,padding:"12px 14px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.22)",borderRadius:10}}>
+                  <div style={{fontSize:12,fontWeight:700,color:"#DC2626",marginBottom:7}}>
                     Never donate casually: {guidance.planet} items
                   </div>
                   <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:8}}>
                     {guidance.items.map((item) => (
-                      <span key={item} className="safety-pill" style={{color:"#fca5a5",background:"rgba(239,68,68,0.08)",borderColor:"rgba(239,68,68,0.25)"}}>
+                      <span key={item} className="safety-pill" style={{color:"#DC2626",background:"rgba(239,68,68,0.08)",borderColor:"rgba(239,68,68,0.3)"}}>
                         {item}
                       </span>
                     ))}
@@ -1374,7 +1384,7 @@ export default function LalKitabPage() {
             <div className="safety-card">
               <div className="safety-title">{advancedResult.remedySafety.fortyThreeDayProtocol.title}</div>
               <div className="safety-text">{advancedResult.remedySafety.fortyThreeDayProtocol.description}</div>
-              <div className="safety-text" style={{marginTop:8,color:"#93c5fd"}}>{advancedResult.remedySafety.fortyThreeDayProtocol.userGuidance}</div>
+              <div className="safety-text" style={{marginTop:8,color:"#1D4ED8",fontWeight:500}}>{advancedResult.remedySafety.fortyThreeDayProtocol.userGuidance}</div>
               <div className="protocol-list">
                 {advancedResult.remedySafety.fortyThreeDayProtocol.rules.map((rule) => (
                   <div key={rule} className="protocol-item">{rule}</div>

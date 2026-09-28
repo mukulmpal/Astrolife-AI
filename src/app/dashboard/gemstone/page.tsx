@@ -90,11 +90,11 @@ const PLANET_HEX: Record<string, string> = {
 };
 
 const STATUS_HEX: Record<GemStatus, string> = {
-  highly_recommended: "#22c55e",
-  recommended: "#3b82f6",
-  supportive: "#f59e0b",
-  use_carefully: "#f97316",
-  avoid: "#ef4444",
+  highly_recommended: "#15803D",
+  recommended: "#1D4ED8",
+  supportive: "#B45309",
+  use_carefully: "#C2410C",
+  avoid: "#DC2626",
 };
 
 const STATUS_LABEL: Record<GemStatus, string> = {
@@ -218,7 +218,7 @@ function AnalysisTab({ gem }: { gem: GemstoneReportItem }) {
           {gem.scoreComponents.map((sc) => (
             <div key={sc.label}>
               <span>{sc.label}</span>
-              <strong style={{ color: sc.points >= 0 ? "#22c55e" : "#ef4444" }}>
+              <strong style={{ color: sc.points >= 0 ? "#15803D" : "#DC2626" }}>
                 {sc.points >= 0 ? "+" : ""}{sc.points}
               </strong>
             </div>
@@ -521,12 +521,12 @@ function GemstonePageContent() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
         .gem-page {
           --bg: #FAF7F2;
-          --bg-2: #FAF7F2;
+          --bg-2: #F3EFE6;
           --card: #FFFFFF;
-          --border: #FFFFFF;
-          --border-2: #261f50;
-          --gold: #c8a030;
-          --gold-soft: #e8c060;
+          --border: rgba(184, 134, 11, 0.22);
+          --border-2: rgba(184, 134, 11, 0.35);
+          --gold: #B8860B;
+          --gold-soft: #8A6008;
           --cream: #1A1A1A;
           --cream-soft: #4A4238;
           --muted: #6B635B;
@@ -535,7 +535,7 @@ function GemstonePageContent() {
           overflow: hidden;
           padding: 26px 22px 96px;
           color: var(--cream);
-          background: radial-gradient(circle at 20% -10%, rgba(60, 40, 128, 0.16), transparent 40%), var(--bg);
+          background: #FAF7F2;
           font-family: "Outfit", sans-serif;
         }
 
@@ -550,7 +550,7 @@ function GemstonePageContent() {
           position: absolute;
           border-radius: 999px;
           filter: blur(52px);
-          opacity: 0.23;
+          opacity: 0.12;
         }
 
         .gem-orb.one {
@@ -558,7 +558,7 @@ function GemstonePageContent() {
           height: 520px;
           left: -180px;
           top: -160px;
-          background: rgba(60, 40, 128, 0.22);
+          background: rgba(184, 134, 11, 0.15);
         }
 
         .gem-orb.two {
@@ -566,7 +566,7 @@ function GemstonePageContent() {
           height: 460px;
           right: -150px;
           bottom: -150px;
-          background: rgba(200, 160, 48, 0.14);
+          background: rgba(200, 160, 48, 0.12);
         }
 
         .gem-stars {
@@ -574,7 +574,7 @@ function GemstonePageContent() {
           inset: 0;
           width: 100%;
           height: 100%;
-          opacity: 0.32;
+          opacity: 0.2;
         }
 
         .gem-header,
@@ -612,35 +612,35 @@ function GemstonePageContent() {
           border-radius: 9px;
           display: grid;
           place-items: center;
-          background: linear-gradient(135deg, #3c2880, var(--gold));
-          color: var(--cream);
+          background: linear-gradient(135deg, #B8860B, #8A6008);
+          color: #FFFFFF;
           font-size: 14px;
-          box-shadow: 0 0 20px rgba(200, 160, 48, 0.22);
+          box-shadow: 0 2px 10px rgba(184, 134, 11, 0.2);
         }
 
         .gem-logo-name {
           font-family: "Cormorant Garamond", serif;
           font-size: 22px;
-          font-weight: 600;
-          background: linear-gradient(135deg, var(--gold), #f0d898);
-          -webkit-background-clip: text;
-          color: transparent;
+          font-weight: 700;
+          color: #1A1A1A;
         }
 
         .gem-nav-btn {
           text-decoration: none;
-          border: 1px solid rgba(200, 160, 48, 0.45);
-          color: var(--gold-soft);
+          border: 1px solid rgba(184, 134, 11, 0.35);
+          color: #8A6008;
+          background: #FFFFFF;
           border-radius: 10px;
           padding: 9px 14px;
           font-size: 13px;
+          font-weight: 600;
           transition: all 0.2s;
         }
 
         .gem-nav-btn:hover {
-          background: rgba(200, 160, 48, 0.12);
-          border-color: var(--gold);
-          color: var(--cream);
+          background: rgba(184, 134, 11, 0.1);
+          border-color: #B8860B;
+          color: #1A1A1A;
         }
 
         .gem-header {
@@ -651,15 +651,15 @@ function GemstonePageContent() {
         .gem-header span {
           display: inline-flex;
           margin-bottom: 10px;
-          border: 1px solid rgba(200, 160, 48, 0.28);
-          background: rgba(200, 160, 48, 0.1);
-          color: var(--gold-soft);
+          border: 1px solid rgba(184, 134, 11, 0.3);
+          background: rgba(184, 134, 11, 0.08);
+          color: #8A6008;
           border-radius: 999px;
           padding: 8px 15px;
           text-transform: uppercase;
           letter-spacing: 0.13em;
           font-size: 10px;
-          font-weight: 600;
+          font-weight: 700;
         }
 
         .gem-header h1 {
@@ -668,17 +668,15 @@ function GemstonePageContent() {
           font-size: clamp(38px, 6.4vw, 66px);
           letter-spacing: -0.03em;
           line-height: 1;
-          background: linear-gradient(135deg, var(--cream), var(--gold), #f0d898);
-          -webkit-background-clip: text;
-          color: transparent;
+          color: #1A1A1A;
         }
 
         .gem-header p {
           max-width: 820px;
           margin: 14px auto 0;
-          color: var(--cream-soft);
+          color: #4A4238;
           line-height: 1.78;
-          font-size: 13px;
+          font-size: 13.5px;
         }
 
         .gem-hero-card {
@@ -687,9 +685,8 @@ function GemstonePageContent() {
           grid-template-columns: 150px 1fr;
           gap: 26px;
           align-items: center;
-          border: 1px solid var(--border);
-          background: linear-gradient(135deg, #FFFFFF, #FAF5EB);
-          backdrop-filter: blur(18px);
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          background: #FFFFFF;
           border-radius: 20px;
           padding: 24px;
           overflow: hidden;
@@ -704,7 +701,7 @@ function GemstonePageContent() {
           height: 240px;
           border-radius: 999px;
           filter: blur(58px);
-          opacity: 0.14;
+          opacity: 0.12;
         }
 
         .gem-hero-card > svg {
@@ -733,7 +730,7 @@ function GemstonePageContent() {
           font-size: 10px;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          font-weight: 600;
+          font-weight: 700;
           border: 1px solid transparent;
         }
 
@@ -746,7 +743,7 @@ function GemstonePageContent() {
         .gem-score div {
           width: 110px;
           height: 7px;
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(184, 134, 11, 0.15);
           border-radius: 999px;
         }
 
@@ -757,8 +754,9 @@ function GemstonePageContent() {
         }
 
         .gem-score strong {
-          color: var(--cream-soft);
+          color: #1A1A1A;
           font-size: 12px;
+          font-weight: 700;
         }
 
         .gem-hero-card h2 {
@@ -766,11 +764,15 @@ function GemstonePageContent() {
           font-family: "Cormorant Garamond", serif;
           font-size: 34px;
           letter-spacing: -0.04em;
+          color: #1A1A1A;
+          font-weight: 700;
         }
 
         .gem-alt {
-          color: var(--muted);
+          color: #6B635B;
           margin: 8px 0 14px;
+          font-size: 13.5px;
+          font-weight: 500;
         }
 
         .gem-meta-grid {
@@ -781,24 +783,25 @@ function GemstonePageContent() {
         }
 
         .gem-meta-pill {
-          border: 1px solid var(--border);
-          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: #FAF7F2;
           border-radius: 12px;
           padding: 10px;
         }
 
         .gem-meta-pill span {
           display: block;
-          color: var(--muted);
+          color: #6B635B;
           font-size: 10px;
           text-transform: uppercase;
-          font-weight: 500;
+          font-weight: 600;
           margin-bottom: 5px;
         }
 
         .gem-meta-pill strong {
-          color: var(--gold-soft);
+          color: #1A1A1A;
           font-size: 13px;
+          font-weight: 700;
         }
 
         .gem-reason,
@@ -806,8 +809,9 @@ function GemstonePageContent() {
         .gem-panel li,
         .gem-card-reason,
         .gem-avoid-list p {
-          color: var(--cream-soft);
+          color: #4A4238;
           line-height: 1.65;
+          font-size: 13.5px;
         }
 
         .gem-foundation-grid {
@@ -821,35 +825,34 @@ function GemstonePageContent() {
         }
 
         .gem-foundation-grid div {
-          border: 1px solid rgba(255,255,255,0.09);
-          background:
-            radial-gradient(circle at top left, rgba(245,197,66,0.10), transparent 34%),
-            rgba(255,255,255,0.055);
-          border-radius: 22px;
-          padding: 16px;
-          backdrop-filter: blur(16px);
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: #FFFFFF;
+          border-radius: 16px;
+          padding: 18px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
         .gem-foundation-grid span {
           display: block;
-          color: rgba(255,255,255,0.48);
+          color: #6B635B;
           font-size: 11px;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          font-weight: 950;
+          font-weight: 700;
           margin-bottom: 7px;
         }
 
         .gem-foundation-grid strong {
           display: block;
-          color: #f5c542;
+          color: #B8860B;
           font-size: 20px;
+          font-weight: 700;
           margin-bottom: 7px;
         }
 
         .gem-foundation-grid p {
           margin: 0;
-          color: rgba(255,255,255,0.62);
+          color: #4A4238;
           line-height: 1.55;
           font-size: 13px;
         }
@@ -859,30 +862,37 @@ function GemstonePageContent() {
           gap: 8px;
           margin-top: 20px;
           margin-bottom: 16px;
-          padding: 4px;
-          border: 1px solid var(--border);
+          padding: 6px;
+          border: 1px solid rgba(184, 134, 11, 0.22);
           border-radius: 12px;
-          background: var(--bg-2);
+          background: #FFFFFF;
           overflow-x: auto;
         }
 
         .gem-tabs button {
           border: 1px solid transparent;
           background: transparent;
-          color: var(--muted);
+          color: #6B635B;
           border-radius: 9px;
           padding: 9px 14px;
-          font-weight: 500;
+          font-weight: 600;
           cursor: pointer;
           white-space: nowrap;
           font-size: 13px;
           font-family: "Outfit", sans-serif;
+          transition: all 0.2s;
+        }
+
+        .gem-tabs button:hover {
+          color: #1A1A1A;
+          background: rgba(184, 134, 11, 0.08);
         }
 
         .gem-tabs button.active {
-          color: var(--cream-soft);
-          background: #FFFFFF;
-          border-color: rgba(200, 160, 48, 0.18);
+          color: #B8860B;
+          background: rgba(184, 134, 11, 0.14);
+          border-color: rgba(184, 134, 11, 0.35);
+          font-weight: 700;
         }
 
         .gem-grid-two {
@@ -899,24 +909,25 @@ function GemstonePageContent() {
 
         .gem-panel,
         .gem-secondary-card {
-          border: 1px solid var(--border);
-          background: var(--card);
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: #FFFFFF;
           border-radius: 16px;
           padding: 18px;
-          backdrop-filter: blur(16px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
         .gem-panel.caution {
-          border-color: rgba(200, 160, 48, 0.2);
-          background: rgba(200, 160, 48, 0.06);
+          border-color: rgba(220, 38, 38, 0.25);
+          background: rgba(220, 38, 38, 0.03);
         }
 
         .gem-panel h3,
         .gem-secondary-card h3 {
           margin: 0 0 12px;
-          color: var(--gold-soft);
+          color: #1A1A1A;
           font-family: "Cormorant Garamond", serif;
           font-size: 22px;
+          font-weight: 700;
         }
 
         .gem-table {
@@ -928,16 +939,18 @@ function GemstonePageContent() {
           display: flex;
           justify-content: space-between;
           gap: 18px;
-          border-bottom: 1px solid var(--border);
+          border-bottom: 1px solid rgba(184, 134, 11, 0.12);
           padding-bottom: 9px;
         }
 
         .gem-table span {
-          color: var(--muted);
+          color: #4A4238;
+          font-size: 13px;
         }
 
         .gem-table strong {
           text-align: right;
+          font-size: 13px;
         }
 
         .gem-secondary-grid {
@@ -954,15 +967,16 @@ function GemstonePageContent() {
         }
 
         .gem-secondary-card span {
-          color: var(--muted);
+          color: #6B635B;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           font-size: 10px;
-          font-weight: 600;
+          font-weight: 700;
         }
 
         .gem-secondary-card p {
           margin: 6px 0;
+          color: #4A4238;
         }
 
         .gem-avoid-list {
@@ -984,24 +998,26 @@ function GemstonePageContent() {
           place-items: center;
           flex: 0 0 auto;
           border-radius: 999px;
-          background: rgba(200, 160, 48, 0.12);
-          color: var(--gold-soft);
+          background: rgba(184, 134, 11, 0.12);
+          color: #8A6008;
           font-size: 22px;
         }
 
         .gem-avoid-row span {
-          color: var(--gold-soft);
+          color: #6B635B;
           font-size: 12px;
+          font-weight: 600;
         }
 
         .gem-avoid-row strong {
-          color: var(--cream);
+          color: #1A1A1A;
           font-size: 14px;
+          font-weight: 700;
         }
 
         .gem-avoid-row p {
           margin: 6px 0 0;
-          color: var(--cream-soft);
+          color: #4A4238;
           font-size: 13px;
           line-height: 1.55;
         }
@@ -1019,18 +1035,18 @@ function GemstonePageContent() {
         }
 
         .gem-finding-mild {
-          border-color: #f59e0b;
-          background: rgba(245, 158, 11, 0.06);
+          border-color: #B45309;
+          background: #FEF3C7;
         }
 
         .gem-finding-moderate {
-          border-color: #f97316;
-          background: rgba(249, 115, 22, 0.06);
+          border-color: #C2410C;
+          background: #FFEDD5;
         }
 
         .gem-finding-strong {
-          border-color: #ef4444;
-          background: rgba(239, 68, 68, 0.06);
+          border-color: #DC2626;
+          background: #FEE2E2;
         }
 
         .gem-finding-header {
@@ -1043,28 +1059,30 @@ function GemstonePageContent() {
         }
 
         .gem-finding-header strong {
-          color: var(--cream);
+          color: #1A1A1A;
           font-size: 14px;
+          font-weight: 700;
         }
 
         .gem-finding-header span {
-          color: var(--muted);
+          color: #6B635B;
           font-size: 12px;
+          font-weight: 600;
         }
 
         .gem-finding p {
           margin: 0;
-          color: var(--cream-soft);
+          color: #4A4238;
           font-size: 13px;
           line-height: 1.6;
         }
 
         .gem-empty {
-          border: 1px solid var(--border);
-          background: var(--card);
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: #FFFFFF;
           border-radius: 14px;
           padding: 18px;
-          color: var(--cream-soft);
+          color: #4A4238;
         }
 
         @media (max-width: 860px) {

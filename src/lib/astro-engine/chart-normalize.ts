@@ -12,7 +12,6 @@ type PlanetLike = {
   siderealLongitude?: number;
   rashi?: number | string;
   sign?: number | string;
-  signNum?: number | string;
   signIndex?: number | string;
   rashiIndex?: number | string;
   zodiacSign?: number | string;
@@ -24,64 +23,15 @@ type PlanetLike = {
   isRetrograde?: boolean;
 };
 
-const RASHI_MAP: Record<string, number> = {
-  // English
-  aries: 0,
-  taurus: 1,
-  gemini: 2,
-  cancer: 3,
-  leo: 4,
-  virgo: 5,
-  libra: 6,
-  scorpio: 7,
-  sagittarius: 8,
-  capricorn: 9,
-  aquarius: 10,
-  pisces: 11,
-  // Sanskrit / Hindi
-  mesha: 0,
-  mesh: 0,
-  vrishabha: 1,
-  vrishabh: 1,
-  mithuna: 2,
-  mithun: 2,
-  karka: 3,
-  kark: 3,
-  simha: 4,
-  singh: 4,
-  kanya: 5,
-  tula: 6,
-  vrishchika: 7,
-  vrishchik: 7,
-  vrischika: 7,
-  dhanu: 8,
-  makara: 9,
-  makar: 9,
-  kumbha: 10,
-  kumbh: 10,
-  meena: 11,
-  meen: 11,
-};
-
 function mod(n: number, m: number) {
   return ((n % m) + m) % m;
 }
 
 export function toRashi(value: unknown): number {
   if (typeof value === "number" && Number.isFinite(value)) {
-    if (value >= 0 && value <= 11) return Math.floor(value);
-    if (value >= 1 && value <= 12) return Math.floor(value) - 1;
+    if (value >= 0 && value <= 11) return value;
+    if (value >= 1 && value <= 12) return value - 1;
     return Math.floor(mod(value, 360) / 30);
-  }
-  if (typeof value === "string") {
-    const clean = value.trim().toLowerCase();
-    if (clean in RASHI_MAP) {
-      return RASHI_MAP[clean];
-    }
-    const num = Number(clean);
-    if (!Number.isNaN(num) && Number.isFinite(num)) {
-      return toRashi(num);
-    }
   }
   return 0;
 }
@@ -107,25 +57,15 @@ export function normalizeChartForTransit(rawChartInput: unknown) {
   const lagna = raw.lagna as GenericRecord | undefined;
   const houses = raw.houses as Array<GenericRecord> | undefined;
   const lagnaRaw =
-    raw.lagnaNum ??
     raw.lagR ??
-    raw.lagnaRashiNum ??
-    raw.ascendantNum ??
     raw.lagnaRashi ??
     raw.ascendantRashi ??
-    raw.lagnaLon ??
     asc?.rashi ??
-    asc?.signNum ??
     asc?.sign ??
-    asc?.lon ??
     lagna?.rashi ??
-    lagna?.signNum ??
     lagna?.sign ??
-    lagna?.lon ??
     houses?.[0]?.rashi ??
-    houses?.[0]?.signNum ??
     houses?.[1]?.rashi ??
-    houses?.[1]?.signNum ??
     0;
   const lagR = toRashi(lagnaRaw);
 
@@ -139,15 +79,7 @@ export function normalizeChartForTransit(rawChartInput: unknown) {
       data.absoluteDegree ??
       data.siderealLongitude ??
       0;
-    const rashi = toRashi(
-      data.signNum ??
-      data.rashi ??
-      data.sign ??
-      data.signIndex ??
-      data.rashiIndex ??
-      data.zodiacSign ??
-      longitude
-    );
+    const rashi = toRashi(data.rashi ?? data.sign ?? data.signIndex ?? data.rashiIndex ?? data.zodiacSign ?? longitude);
     const house =
       typeof data.house === "number" && Number.isFinite(data.house)
         ? data.house >= 1 && data.house <= 12
@@ -172,4 +104,3 @@ export function normalizeChartForTransit(rawChartInput: unknown) {
     planets,
   };
 }
-
