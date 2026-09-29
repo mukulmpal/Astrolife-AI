@@ -131,6 +131,28 @@ export default function MedicalPage() {
     }
   }, [targetDateStr]);
 
+  const adjustDate = (days: number) => {
+    try {
+      const current = new Date(`${targetDateStr}T12:00:00`);
+      current.setDate(current.getDate() + days);
+      setTargetDateStr(current.toISOString().split("T")[0]);
+    } catch {
+      const now = new Date();
+      setTargetDateStr(now.toISOString().split("T")[0]);
+    }
+  };
+
+  const adjustMonth = (months: number) => {
+    try {
+      const current = new Date(`${targetDateStr}T12:00:00`);
+      current.setMonth(current.getMonth() + months);
+      setTargetDateStr(current.toISOString().split("T")[0]);
+    } catch {
+      const now = new Date();
+      setTargetDateStr(now.toISOString().split("T")[0]);
+    }
+  };
+
   // Ensure non-admin users always evaluate the current moment and self
   const effectiveTargetDate = hasAdvancedAccess ? parsedTargetDate : new Date();
   const effectiveMember: FamilyMemberKey = hasAdvancedAccess ? selectedMember : "Self";
@@ -283,6 +305,26 @@ export default function MedicalPage() {
               </div>
 
               <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                {/* -1 Month */}
+                <button
+                  className="tab-btn"
+                  onClick={() => adjustMonth(-1)}
+                  title="Previous Month (-30 Days)"
+                  style={{ padding: "5px 9px", fontSize: "11px", fontWeight: 700 }}
+                >
+                  ⏮ -1M
+                </button>
+
+                {/* -1 Day Arrow */}
+                <button
+                  className="tab-btn"
+                  onClick={() => adjustDate(-1)}
+                  title="Previous Day (-1 Day)"
+                  style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  ◀ Day
+                </button>
+
                 <input
                   type="date"
                   value={targetDateStr}
@@ -300,42 +342,34 @@ export default function MedicalPage() {
                     cursor: "pointer"
                   }}
                 />
+
+                {/* +1 Day Arrow */}
+                <button
+                  className="tab-btn"
+                  onClick={() => adjustDate(1)}
+                  title="Next Day (+1 Day)"
+                  style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  Day ▶
+                </button>
+
+                {/* +1 Month */}
+                <button
+                  className="tab-btn"
+                  onClick={() => adjustMonth(1)}
+                  title="Next Month (+30 Days)"
+                  style={{ padding: "5px 9px", fontSize: "11px", fontWeight: 700 }}
+                >
+                  +1M ⏭
+                </button>
+
+                {/* Today */}
                 <button
                   className="tab-btn"
                   onClick={() => setTargetDateStr(new Date().toISOString().split("T")[0])}
-                  style={{ padding: "4px 8px", fontSize: "11px" }}
+                  style={{ padding: "5px 10px", fontSize: "11px", fontWeight: 600, background: "rgba(184,134,11,0.1)", color: "#8A6008", borderColor: "rgba(184,134,11,0.35)" }}
                 >
-                  Today
-                </button>
-                <button
-                  className="tab-btn"
-                  onClick={() => {
-                    setSelectedMember("Father");
-                    setTargetDateStr("2026-09-14");
-                  }}
-                  style={{ padding: "4px 8px", fontSize: "11px" }}
-                >
-                  14 Sep 2026 (Father Accident)
-                </button>
-                <button
-                  className="tab-btn"
-                  onClick={() => {
-                    setSelectedMember("Father");
-                    setTargetDateStr("2026-09-15");
-                  }}
-                  style={{ padding: "4px 8px", fontSize: "11px" }}
-                >
-                  15 Sep 2026 (Father Hemorrhage / ICU)
-                </button>
-                <button
-                  className="tab-btn"
-                  onClick={() => {
-                    setSelectedMember("Mother");
-                    setTargetDateStr("2026-10-25");
-                  }}
-                  style={{ padding: "4px 8px", fontSize: "11px" }}
-                >
-                  25 Oct 2026 (Mother UTI / Roga)
+                  🔄 Today
                 </button>
               </div>
             </div>
