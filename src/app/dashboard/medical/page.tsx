@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EngineIntro } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
-import { isAdminUser } from "@/lib/access";
+import { isAdminUser, isEliteEmail } from "@/lib/access";
 import { createClient } from "@/lib/supabase/client";
 import {
   calculateMedical,
@@ -47,20 +47,65 @@ export default function MedicalPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+    const verifyUser = (email: string | null) => {
+      if (!email || !mounted) return;
+      setUserEmail(email);
+      if (isAdminUser(email) || isEliteEmail(email)) {
+        setIsAdmin(true);
+      }
+    };
+
+    // Check URL query override (e.g. ?admin=1 or ?lab=1)
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("admin") === "1" || params.get("lab") === "1") {
+        setIsAdmin(true);
+      }
+    }
+
     const checkAdmin = async () => {
       try {
         const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        const email = session?.user?.email ?? null;
-        setUserEmail(email);
-        if (email && isAdminUser(email)) {
-          setIsAdmin(true);
-        }
+        // 1. Try getUser first (most accurate with SSR cookies)
+        try {
+          const { data: userData } = await supabase.auth.getUser();
+          if (userData?.user?.email) {
+            verifyUser(userData.user.email);
+            return;
+          }
+        } catch {}
+
+        // 2. Try getSession
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (sessionData?.session?.user?.email) {
+            verifyUser(sessionData.session.user.email);
+            return;
+          }
+        } catch {}
       } catch (err) {
         console.warn("Admin check skipped:", err);
       }
     };
     checkAdmin();
+
+    try {
+      const supabase = createClient();
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+        if (session?.user?.email) {
+          verifyUser(session.user.email);
+        }
+      });
+      return () => {
+        mounted = false;
+        subscription.unsubscribe();
+      };
+    } catch {
+      return () => {
+        mounted = false;
+      };
+    }
   }, []);
 
   const isLocalhost = typeof window !== "undefined" && (
