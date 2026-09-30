@@ -30,12 +30,12 @@ export default function DashboardError({
         style={{
           maxWidth: "540px",
           width: "100%",
-          background: "#FFFFFF",
+          background: "#0c0a1f",
           border: "1px solid rgba(239, 68, 68, 0.25)",
           borderRadius: "16px",
           padding: "32px 24px",
           textAlign: "center",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.06)",
+          boxShadow: "0 12px 36px rgba(0, 0, 0, 0.5)",
         }}
       >
         <div
@@ -44,7 +44,7 @@ export default function DashboardError({
             height: "56px",
             borderRadius: "50%",
             background: "rgba(239, 68, 68, 0.12)",
-            color: "#dc2626",
+            color: "#f87171",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -58,7 +58,7 @@ export default function DashboardError({
           style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
             fontSize: "24px",
-            color: "#1A1A1A",
+            color: "#f4eedf",
             fontWeight: 700,
             marginBottom: "8px",
           }}
@@ -68,7 +68,7 @@ export default function DashboardError({
 
         <p
           style={{
-            color: "#6B635B",
+            color: "#9890b8",
             fontSize: "13px",
             lineHeight: "1.6",
             marginBottom: "20px",
@@ -81,12 +81,12 @@ export default function DashboardError({
         {error.message && (
           <div
             style={{
-              background: "#FAF7F2",
-              border: "1px solid rgba(184, 134, 11, 0.2)",
+              background: "rgba(0, 0, 0, 0.35)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               borderRadius: "8px",
               padding: "10px 14px",
               fontSize: "12px",
-              color: "#B8860B",
+              color: "#e2b340",
               fontFamily: "monospace",
               textAlign: "left",
               marginBottom: "24px",
@@ -106,8 +106,8 @@ export default function DashboardError({
               gap: "8px",
               padding: "10px 20px",
               borderRadius: "10px",
-              background: "#B8860B",
-              color: "#FFFFFF",
+              background: "#d4af37",
+              color: "#080413",
               fontWeight: 600,
               fontSize: "13px",
               cursor: "pointer",
@@ -127,12 +127,12 @@ export default function DashboardError({
               gap: "8px",
               padding: "10px 18px",
               borderRadius: "10px",
-              background: "#FAF7F2",
-              color: "#1A1A1A",
+              background: "rgba(255, 255, 255, 0.07)",
+              color: "#f4eedf",
               fontWeight: 500,
               fontSize: "13px",
               textDecoration: "none",
-              border: "1px solid rgba(184, 134, 11, 0.2)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
             }}
           >
             <Home size={16} />

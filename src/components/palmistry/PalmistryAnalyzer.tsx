@@ -328,7 +328,7 @@ export function PalmistryAnalyzer() {
   }, [report]);
 
   return (
-    <div className="text-[#1A1A1A]">
+    <div className="text-white">
       {/* ── Full-screen loading overlay (replaces blank screen during analysis) ── */}
       <PalmLoadingScreen visible={scanning} preview={preview} />
 
@@ -396,7 +396,7 @@ export function PalmistryAnalyzer() {
                     <button
                       type="button"
                       onClick={() => { setPreview(null); setDataUrl(null); }}
-                      className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border border-[#c8a030]/40 bg-black/80 text-[#3D3834] hover:text-[#1A1A1A]"
+                      className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border border-[#c8a030]/40 bg-black/80 text-[#3D3834] hover:text-white"
                     >
                       <X size={15} />
                     </button>

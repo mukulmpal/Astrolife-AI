@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
+import { calculateChart, type ChartData, NAK } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type PlanTier } from "@/lib/astro-engine/yogas";
 import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart, buildChart, type BirthDetails, saveCurrentChart, useChartEngine } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
@@ -21,6 +21,34 @@ import { buildMangalDoshaInsight, type MangalDoshaInsight } from "@/lib/astro-en
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
 const PCOL = ["#d97706","#b8860b","#dc2626","#15803d","#d97706","#db2777","#2563eb","#854d0e","#e11d48"];
+
+export function formatDMS(lon: number): string {
+  const norm = ((lon % 30) + 30) % 30;
+  const deg = Math.floor(norm);
+  const minFloat = (norm - deg) * 60;
+  let min = Math.floor(minFloat);
+  let sec = Math.round((minFloat - min) * 60);
+  if (sec >= 60) {
+    sec = 0;
+    min += 1;
+  }
+  return `${deg}° ${String(min).padStart(2, "0")}' ${String(sec).padStart(2, "0")}"`;
+}
+
+export function checkCombustion(planet: string, pLon: number, sunLon: number, isRetro: boolean): boolean {
+  if (planet === "Sun" || planet === "Rahu" || planet === "Ketu") return false;
+  const diff = Math.abs(pLon - sunLon) % 360;
+  const dist = diff > 180 ? 360 - diff : diff;
+  const limits: Record<string, number> = {
+    Moon: 12,
+    Mars: 17,
+    Mercury: isRetro ? 12 : 14,
+    Jupiter: 11,
+    Venus: isRetro ? 8 : 10,
+    Saturn: 15,
+  };
+  return dist <= (limits[planet] || 10);
+}
 
 function ianaToUtcOffset(timezone: string | null, dob: string, tob: string): number {
   if (!timezone) return 5.5;
@@ -315,6 +343,47 @@ export default function KundliPage() {
 
   const activeMD = chart?.dashas.find((d) => d.active);
   const activeAD = chart?.antardasha.find((d) => d.active);
+
+  const charaKarakas = useMemo(() => {
+    if (!chart?.planets) return {} as Record<string, string>;
+    const karakaNames = [
+      "Atmakaraka (AK)",
+      "Amatyakaraka (AmK)",
+      "Bhratrikaraka (BK)",
+      "Matrikaraka (MK)",
+      "Pitrikaraka (PiK)",
+      "Jnatikaraka (GK)",
+      "Darakaraka (DK)",
+    ];
+    // 7 classical planets (Sun to Saturn)
+    const seven = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]
+      .map((name) => {
+        const pd = chart.planets[name];
+        const lonWithinSign = pd ? ((pd.lon % 30) + 30) % 30 : 0;
+        return { name, lonWithinSign };
+      })
+      .sort((a, b) => b.lonWithinSign - a.lonWithinSign);
+
+    const map: Record<string, string> = {};
+    seven.forEach((p, idx) => {
+      map[p.name] = karakaNames[idx] || "—";
+    });
+    map["Rahu"] = "Chaya Graha (North Node)";
+    map["Ketu"] = "Moksha Karaka (South Node)";
+    return map;
+  }, [chart]);
+
+  const lagnaInfo = useMemo(() => {
+    if (!chart) return null;
+    const norm = ((chart.lagnaLon % 360) + 360) % 360;
+    const nakIdx = Math.floor(norm / (360 / 27));
+    const pada = Math.floor((norm % (360 / 27)) / (360 / 108)) + 1;
+    return {
+      nakshatra: NAK[nakIdx] || "—",
+      pada,
+      dms: formatDMS(chart.lagnaLon),
+    };
+  }, [chart]);
 
   return (
     <>
@@ -782,6 +851,143 @@ export default function KundliPage() {
                       </div>
                       <span className="text-xs font-bold text-[#B8860B]">Open Chat →</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* ── CLASSICAL NAVAGRAHA STHITI TABLE (VEDIC DEGREES & NAKSHATRAS) ── */}
+                <div className="card">
+                  <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                    <div>
+                      <div className="card-tag">✦ Classical Planetary Longitudes (ग्रह स्थिति चक्र)</div>
+                      <div className="card-title serif mb-0">Vedic Navagraha Sthiti &amp; Degrees</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+                        Chitra Paksha Lahiri (DMS)
+                      </span>
+                      <span className="text-xs px-2.5 py-1 rounded-full bg-[#FAF8F5] text-[#4A4238] border border-[rgba(184,134,11,0.2)] font-semibold">
+                        Whole Sign Houses
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-[#6B635B] mb-4 leading-relaxed">
+                    Exact Parashari longitudes, degrees (° &apos; &quot;), nakshatras, padas, Jaimini Chara Karakas, and classical dignities calculated as per Chitra Paksha Lahiri Ayanamsha (matches AstroSage &amp; Jagannatha Hora).
+                  </p>
+
+                  <div className="overflow-x-auto">
+                    <table className="ptable">
+                      <thead>
+                        <tr>
+                          <th>Planet / Point</th>
+                          <th>Motion / State</th>
+                          <th>Rashi (Sign)</th>
+                          <th>Longitude (DMS)</th>
+                          <th>House (Bhava)</th>
+                          <th>Nakshatra &amp; Pada</th>
+                          <th>Dignity (Avastha)</th>
+                          <th>Chara Karaka</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* 1. Lagna (Ascendant) */}
+                        {lagnaInfo && (
+                          <tr style={{ background: "rgba(184, 134, 11, 0.05)" }}>
+                            <td>
+                              <span style={{ marginRight: 8, fontSize: 13, fontWeight: 700 }}>🌅</span>
+                              <strong style={{ color: "#B8860B" }}>Lagna (Ascendant)</strong>
+                            </td>
+                            <td>
+                              <span className="dpill" style={{ color: "#B8860B", background: "rgba(184,134,11,0.12)" }}>
+                                Direct (D)
+                              </span>
+                            </td>
+                            <td style={{ color: "#1A1A1A", fontWeight: 700 }}>{ts(chart.lagnaRashi)}</td>
+                            <td style={{ color: "#B8860B", fontWeight: 700, fontFamily: "monospace" }}>
+                              {lagnaInfo.dms}
+                            </td>
+                            <td style={{ color: "#1A1A1A", fontWeight: 700 }}>H1 (Tanu)</td>
+                            <td style={{ color: "#1A1A1A", fontWeight: 600 }}>{tn(lagnaInfo.nakshatra)}</td>
+                            <td style={{ color: "#3D3834" }}>Pada {lagnaInfo.pada}</td>
+                            <td>
+                              <span className="dpill" style={{ color: "#B8860B" }}>
+                                Ascendant Horizon
+                              </span>
+                            </td>
+                            <td>
+                              <span className="text-xs font-semibold text-[#6B635B]">Tanu (Self)</span>
+                            </td>
+                          </tr>
+                        )}
+
+                        {/* 2. Navagrahas */}
+                        {PLS.map((p, i) => {
+                          const pl = chart.planets[p];
+                          if (!pl) return null;
+                          const sunLon = chart.planets["Sun"]?.lon ?? 0;
+                          const isCombust = checkCombustion(p, pl.lon, sunLon, pl.retrograde);
+                          const dms = formatDMS(pl.lon);
+                          const karaka = charaKarakas[p] || "—";
+
+                          return (
+                            <tr key={i}>
+                              <td>
+                                <span style={{ color: PCOL[i], marginRight: 8, fontSize: 13, fontWeight: 700 }}>
+                                  {PEMO[i]}
+                                </span>
+                                <span style={{ color: "#1A1A1A", fontWeight: 700 }}>{tp(p)}</span>
+                              </td>
+                              <td>
+                                {pl.retrograde ? (
+                                  <span className="retro" style={{ color: "#D97706", fontWeight: 700 }}>
+                                    Retrograde (R)
+                                  </span>
+                                ) : isCombust ? (
+                                  <span
+                                    style={{
+                                      fontSize: 11,
+                                      color: "#DC2626",
+                                      background: "rgba(220,38,38,0.08)",
+                                      border: "1px solid rgba(220,38,38,0.25)",
+                                      borderRadius: 4,
+                                      padding: "1px 5px",
+                                      fontWeight: 700,
+                                    }}
+                                  >
+                                    Combust (C)
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: 12, color: "#6B635B" }}>Direct (D)</span>
+                                )}
+                              </td>
+                              <td style={{ color: "#1A1A1A", fontWeight: 600 }}>{ts(pl.sign)}</td>
+                              <td style={{ color: "#1A1A1A", fontWeight: 600, fontFamily: "monospace" }}>
+                                {dms}
+                              </td>
+                              <td style={{ color: "#3D3834", fontWeight: 600 }}>House {pl.house}</td>
+                              <td style={{ color: "#1A1A1A", fontSize: 13, fontWeight: 600 }}>
+                                {tn(pl.nakshatra)} · P{pl.pada}
+                              </td>
+                              <td>
+                                <span className="dpill" style={{ color: dignityColor(pl.dignity) }}>
+                                  {pl.dignity || "—"}
+                                </span>
+                              </td>
+                              <td>
+                                <span
+                                  style={{
+                                    fontSize: 11.5,
+                                    fontWeight: karaka.startsWith("Atmakaraka") ? 700 : 500,
+                                    color: karaka.startsWith("Atmakaraka") ? "#B8860B" : "#4A4238",
+                                  }}
+                                >
+                                  {karaka}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>

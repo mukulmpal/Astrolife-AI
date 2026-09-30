@@ -7,8 +7,9 @@ export default function TransitsLayout({ children }: { children: ReactNode }) {
     <div
       style={{
         minHeight: "100vh",
-        background: "#FAF7F2",
-        color: "#1A1A1A",
+        background:
+          "radial-gradient(circle at top left, rgba(250,204,21,0.10), transparent 30%), #070711",
+        color: "white",
       }}
     >
       {children}

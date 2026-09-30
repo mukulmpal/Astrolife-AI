@@ -32,7 +32,7 @@ export function PalmistryTuningDashboard({
         </p>
       </div>
 
-      <div className="mt-8 rounded-2xl border border-[rgba(184,134,11,0.22)] bg-[#FFFFFF] p-5">
+      <div className="mt-8 rounded-2xl border border-amber-400/20 bg-black/40 p-5">
         <h2 className="text-xl font-bold text-[#1A1A1A]">
           How to apply safely
         </h2>
@@ -89,7 +89,7 @@ export function PalmistryTuningDashboard({
                       {item.reason}
                     </p>
 
-                    <pre className="mt-3 overflow-x-auto rounded-xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-3 text-xs text-[#1A1A1A]">
+                    <pre className="mt-3 overflow-x-auto rounded-xl border border-[rgba(184,134,11,0.18)] bg-black p-3 text-xs text-[#1A1A1A]">
                       {item.overrideSnippet}
                     </pre>
                   </td>
@@ -132,7 +132,7 @@ export function PalmistryTuningDashboard({
         </div>
 
         {suggestions.length === 0 ? (
-          <div className="mt-8 rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-5">
+          <div className="mt-8 rounded-2xl border border-[rgba(184,134,11,0.18)] bg-black/40 p-5">
             <p className="text-sm text-[#6B635B]">
               No tuning suggestions yet. Collect more feedback first.
             </p>

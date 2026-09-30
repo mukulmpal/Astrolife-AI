@@ -1,9 +1,13 @@
 // ══════════════════════════════════════════════════════════════
 // ASTROLIFE — Transit Engine V1
 // src/lib/astro-engine/transit.ts
-// Full Gochar Engine — VSOP87 + ELP2000 + Lahiri Ayanamsha
-// Meeus Astronomical Algorithms Ch.25–36
+// Full Gochar Engine — Canonical Moshier + Saha Lahiri Ayanamsha
 // ══════════════════════════════════════════════════════════════
+
+import {
+  computePlanets as computeCanonicalPlanets,
+  lahiri as canonicalLahiri,
+} from "./calculations";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -241,8 +245,7 @@ export function getJD(date: string, time: string, tz: number): number {
 // ── Lahiri Ayanamsha ──────────────────────────────────────────
 
 export function lahiri(jd: number): number {
-  const T = (jd - 2451545.0) / 36525;
-  return 23.85045 + 1.3972 * T + 0.00013 * T * T;
+  return canonicalLahiri(jd);
 }
 
 // ── Equation of Center ────────────────────────────────────────
@@ -269,6 +272,7 @@ export function computePlanets(jd: number): RawPlanetPositions {
   const T3 = T2 * T;
   const ay = lahiri(jd);
   const s = (l: number) => md(l - ay, 360); // tropical → sidereal
+  const canonical = computeCanonicalPlanets(jd);
 
   // ── SUN (Meeus Ch.25) ────────────────────────────────────
   const g  = n(357.52911 + 35999.05029 * T - 0.0001537 * T2);
@@ -412,15 +416,15 @@ export function computePlanets(jd: number): RawPlanetPositions {
   const Rplu = 39.543 * (1 - eplu * Math.cos(r(Mplu)));
 
   return {
-    Sun:     s(sunTrop),
-    Moon:    s(moonTrop),
-    Mercury: s(h2g(merL, Rmer, earthL, Re)),
-    Venus:   s(h2g(venL, Rven, earthL, Re)),
-    Mars:    s(h2g(marL, Rmar, earthL, Re)),
-    Jupiter: s(h2g(jupL, Rjup, earthL, Re)),
-    Saturn:  s(h2g(satL, Rsat, earthL, Re)),
-    Rahu:    s(rahuTrop),
-    Ketu:    s(n(rahuTrop + 180)),
+    Sun:     canonical.Sun,
+    Moon:    canonical.Moon,
+    Mercury: canonical.Mercury,
+    Venus:   canonical.Venus,
+    Mars:    canonical.Mars,
+    Jupiter: canonical.Jupiter,
+    Saturn:  canonical.Saturn,
+    Rahu:    canonical.Rahu,
+    Ketu:    canonical.Ketu,
     Uranus:  s(h2g(uraL, Rura, earthL, Re)),
     Neptune: s(h2g(nepL, Rnep, earthL, Re)),
     Pluto:   s(h2g(pluL, Rplu, earthL, Re)),

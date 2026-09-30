@@ -15,7 +15,7 @@ export default function PalmistryPage() {
     <div className="page">
       <PremiumFeature feature="AI Palmistry">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex rounded-2xl border border-[rgba(184,134,11,0.22)] bg-[#FFFFFF] p-1">
+          <div className="inline-flex rounded-2xl border border-amber-400/20 bg-black/30 p-1">
             {[
               { id: "scan", label: "AI Palm Scan" },
               { id: "workbench", label: "Intelligence Workbench" },
@@ -26,8 +26,8 @@ export default function PalmistryPage() {
                 onClick={() => setMode(item.id as typeof mode)}
                 className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
                   mode === item.id
-                    ? "bg-[#B8860B] text-white"
-                    : "text-[#6B635B] hover:text-[#1A1A1A] hover:bg-[#FAF7F2]"
+                    ? "bg-amber-400 text-black"
+                    : "text-amber-100 hover:bg-amber-400/10"
                 }`}
               >
                 {item.label}
@@ -36,7 +36,7 @@ export default function PalmistryPage() {
           </div>
           <Link
             href="/dashboard/palmistry/history"
-            className="rounded-xl border border-[rgba(184,134,11,0.25)] px-4 py-3 text-sm font-semibold text-[#1A1A1A] hover:bg-[#FAF5EB]"
+            className="rounded-xl border border-amber-400/30 px-4 py-3 text-sm font-semibold text-amber-100 hover:bg-amber-400/10"
           >
             View Palm History
           </Link>

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
+import { calculateChart, type ChartData, NAK } from "@/lib/astro-engine/calculations";
 import { calculateDestiny } from "@/lib/astro-engine/destiny";
 import { calculatePsychology } from "@/lib/astro-engine/psychology";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
@@ -371,32 +371,57 @@ function DashboardContent() {
     : `${plan} plan active`;
   const dbReady = isSupabaseReady(dbHealth);
   const pendingDbTables = dbHealth.filter((item) => item.status !== "ready");
-  const planetCards = [
-    { name:"Sun", icon:"Su", col:"#f97316" },
-    { name:"Moon", icon:"Mo", col:"#c084fc" },
-    { name:"Mars", icon:"Ma", col:"#ef4444" },
-    { name:"Mercury", icon:"Me", col:"#22c55e" },
-    { name:"Jupiter", icon:"Ju", col:"#f59e0b" },
-    { name:"Venus", icon:"Ve", col:"#ec4899" },
-    { name:"Saturn", icon:"Sa", col:"#60a5fa" },
-    { name:"Rahu", icon:"Ra", col:"#a78bfa" },
-  ].map((planet) => {
-    const details = chart.planets?.[planet.name];
-    const dignity = details?.dignity ?? "";
-    const houseNum = typeof details?.house === "number" ? details.house : 1;
-    const energy = dignity.includes("Exalted") || dignity.includes("Own")
-      ? "Strong"
-      : [6, 8, 12].includes(houseNum)
-      ? "Intense"
-      : "Active";
+  const lagnaNorm = ((chart.lagnaLon % 360) + 360) % 360;
+  const lagnaDeg = Math.floor(lagnaNorm % 30);
+  const lagnaMin = Math.floor(((lagnaNorm % 30) - lagnaDeg) * 60);
+  const lagnaNakIdx = Math.floor(lagnaNorm / (360 / 27));
+  const lagnaPada = Math.floor((lagnaNorm % (360 / 27)) / (360 / 108)) + 1;
 
-    return {
-      ...planet,
-      sign: details?.sign ?? "Unknown",
-      house: `${houseNum}th`,
-      energy,
-    };
-  });
+  const lagnaCard = {
+    name: "Lagna (Ascendant)",
+    icon: "🌅",
+    col: "#b8860b",
+    sign: chart.lagnaRashi || "—",
+    degree: `${lagnaDeg}° ${String(lagnaMin).padStart(2, "0")}'`,
+    nakshatra: `${NAK[lagnaNakIdx] || "—"} P${lagnaPada}`,
+    house: "H1",
+    retrograde: false,
+    energy: "Ascendant",
+  };
+
+  const planetCards = [
+    lagnaCard,
+    ...[
+      { name: "Sun", icon: "Su", col: "#f97316" },
+      { name: "Moon", icon: "Mo", col: "#c084fc" },
+      { name: "Mars", icon: "Ma", col: "#ef4444" },
+      { name: "Mercury", icon: "Me", col: "#22c55e" },
+      { name: "Jupiter", icon: "Ju", col: "#f59e0b" },
+      { name: "Venus", icon: "Ve", col: "#ec4899" },
+      { name: "Saturn", icon: "Sa", col: "#60a5fa" },
+      { name: "Rahu", icon: "Ra", col: "#a78bfa" },
+      { name: "Ketu", icon: "Ke", col: "#e11d48" },
+    ].map((planet) => {
+      const details = chart.planets?.[planet.name];
+      const dignity = details?.dignity ?? "";
+      const houseNum = typeof details?.house === "number" ? details.house : 1;
+      const energy = dignity
+        ? dignity.split(" ")[0]
+        : [6, 8, 12].includes(houseNum)
+        ? "Intense"
+        : "Active";
+
+      return {
+        ...planet,
+        sign: details?.sign ?? "—",
+        degree: details ? `${details.degree}° ${String(details.minutes).padStart(2, "0")}'` : "—",
+        nakshatra: details ? `${details.nakshatra} P${details.pada}` : "—",
+        house: `H${houseNum}`,
+        retrograde: details?.retrograde ?? false,
+        energy,
+      };
+    }),
+  ];
   const insights = [
     {
       tag: `${activeDasha.planet} Mahadasha`,
@@ -767,15 +792,47 @@ function DashboardContent() {
           </div>
 
           <div className="card" style={{ marginBottom: 24 }}>
-            <div className="card-tag">✦ Planetary Positions</div>
-            <div className="card-title serif">Your current cosmic blueprint</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 32px"}}>
-              {planetCards.map((p,i) => (
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <div>
+                <div className="card-tag">✦ Planetary Degrees &amp; Nakshatras</div>
+                <div className="card-title serif mb-0">Your Natal Graha Sthiti Snapshot</div>
+              </div>
+              <Link
+                href="/dashboard/kundli"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#c8a030",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "6px 12px",
+                  borderRadius: 8,
+                  background: "rgba(200, 160, 48, 0.1)",
+                  border: "1px solid rgba(200, 160, 48, 0.2)",
+                }}
+              >
+                <span>Full Vedic Kundli &amp; Vargas</span>
+                <span>→</span>
+              </Link>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 32px" }}>
+              {planetCards.map((p, i) => (
                 <div key={i} className="planet-row">
-                  <span style={{fontSize:18,width:28,color:p.col}}>{p.icon}</span>
-                  <span style={{flex:1,fontSize:13,color:"#4A4238"}}>{p.name}</span>
-                  <span style={{fontSize:13,color:"#1A1A1A"}}>{p.sign}</span>
-                  <span style={{fontSize:11,color:"#6B635B",width:32,textAlign:"right"}}>{p.house}</span>
+                  <span style={{ fontSize: 13, width: 28, fontWeight: 700, color: p.col }}>{p.icon}</span>
+                  <span style={{ flex: "1 1 120px", fontSize: 13, color: "#4A4238", fontWeight: 600 }}>
+                    {p.name}
+                    {p.retrograde && <span style={{ color: "#f97316", fontSize: 10, marginLeft: 4, fontWeight: 700 }}>(R)</span>}
+                  </span>
+                  <span style={{ fontSize: 12.5, color: "#1A1A1A", fontWeight: 600, minWidth: 70 }}>{p.sign}</span>
+                  <span style={{ fontSize: 12, color: "#c8a030", fontFamily: "monospace", fontWeight: 700, minWidth: 65, textAlign: "right" }}>
+                    {p.degree}
+                  </span>
+                  <span style={{ fontSize: 11, color: "#6B635B", minWidth: 90, textAlign: "right" }}>
+                    {p.nakshatra}
+                  </span>
+                  <span style={{ fontSize: 11, color: "#6B635B", width: 28, textAlign: "right" }}>{p.house}</span>
                   <span className="energy-pill">{p.energy}</span>
                 </div>
               ))}

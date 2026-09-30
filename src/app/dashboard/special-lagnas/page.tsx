@@ -115,6 +115,11 @@ export default function SpecialLagnasPage() {
       <style jsx>{`
         .sl-page {
           min-height: 100vh;
+          color: #f4eedf;
+          background:
+            radial-gradient(circle at top left, rgba(212, 175, 55, 0.16), transparent 32%),
+            radial-gradient(circle at top right, rgba(34, 197, 94, 0.1), transparent 30%),
+            #080413;
           color: #1A1A1A;
           background: #FAF7F2;
           padding: 32px 24px 110px;
@@ -140,9 +145,12 @@ export default function SpecialLagnasPage() {
         .sl-summary > div,
         .sl-card,
         .sl-note {
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.055);
           border: 1px solid rgba(184, 134, 11, 0.2);
           background: #FFFFFF;
           border-radius: 22px;
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
@@ -155,6 +163,7 @@ export default function SpecialLagnasPage() {
         .sl-summary span,
         .sl-card-top span,
         .sl-hero-stat span {
+          color: #d4af37;
           color: #B8860B;
           text-transform: uppercase;
           letter-spacing: 0.14em;
@@ -173,6 +182,7 @@ export default function SpecialLagnasPage() {
         .sl-hero p,
         .sl-note p,
         .sl-card p {
+          color: rgba(244, 238, 223, 0.68);
           color: #6B635B;
           line-height: 1.7;
           font-size: 14px;
@@ -188,11 +198,13 @@ export default function SpecialLagnasPage() {
         .sl-hero-stat strong,
         .sl-summary strong {
           font-size: 34px;
+          color: #fff7d8;
           color: #1A1A1A;
           font-family: var(--font-cinzel), 'Cinzel', serif;
         }
 
         .sl-hero-stat em {
+          color: rgba(244, 238, 223, 0.55);
           color: #6B635B;
           font-style: normal;
         }
@@ -209,6 +221,7 @@ export default function SpecialLagnasPage() {
 
         .sl-summary p {
           margin: 4px 0 0;
+          color: rgba(244, 238, 223, 0.55);
           color: #6B635B;
           font-size: 13px;
         }
@@ -249,6 +262,7 @@ export default function SpecialLagnasPage() {
         }
 
         .sl-card-top strong {
+          color: #d4af37;
           color: #B8860B;
           font-size: 18px;
         }
@@ -261,10 +275,13 @@ export default function SpecialLagnasPage() {
         }
 
         .sl-meta em {
+          border: 1px solid rgba(212, 175, 55, 0.2);
+          background: rgba(212, 175, 55, 0.08);
           border: 1px solid rgba(184, 134, 11, 0.25);
           background: rgba(184, 134, 11, 0.1);
           border-radius: 999px;
           padding: 4px 8px;
+          color: #efd487;
           color: #B8860B;
           font-style: normal;
           font-size: 11px;
@@ -272,6 +289,7 @@ export default function SpecialLagnasPage() {
         }
 
         .sl-meaning {
+          color: #fff7d8 !important;
           color: #1A1A1A !important;
           font-weight: 700;
         }
@@ -279,6 +297,7 @@ export default function SpecialLagnasPage() {
         ul {
           margin: 12px 0 0;
           padding-left: 18px;
+          color: rgba(244, 238, 223, 0.72);
           color: #4A4238;
           line-height: 1.65;
           font-size: 13px;
@@ -290,6 +309,7 @@ export default function SpecialLagnasPage() {
         }
 
         .sl-note strong {
+          color: #d4af37;
           color: #B8860B;
         }
 

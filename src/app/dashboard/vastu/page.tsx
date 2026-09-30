@@ -1140,7 +1140,7 @@ export default function VastuDashboardPage() {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
                     {(result.mindMakan[mindMakanTab] || []).map((item, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, borderRadius: 10, border: "1px solid rgba(184, 134, 11, 0.2)", background: "#FAF7F2", padding: 12 }}>
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, borderRadius: 10, border: "1px solid #FFFFFF", background: "rgba(0,0,0,0.18)", padding: 12 }}>
                         <span style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(200,160,48,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#c8a030", flexShrink: 0 }}>
                           {i + 1}
                         </span>
@@ -1168,7 +1168,7 @@ export default function VastuDashboardPage() {
                   )}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {result.vastuPurushaHealth.observations.map((obs, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, borderRadius: 10, border: "1px solid rgba(184, 134, 11, 0.2)", background: "#FAF7F2", padding: 12, fontSize: 13, color: "#6B635B" }}>
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, borderRadius: 10, border: "1px solid #FFFFFF", background: "rgba(0,0,0,0.18)", padding: 12, fontSize: 13, color: "#6B635B" }}>
                         <span style={{ color: "#c8a030", flexShrink: 0 }}>→</span>
                         {obs}
                       </div>

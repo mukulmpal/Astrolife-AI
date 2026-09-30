@@ -31,7 +31,7 @@ export const PulseBalance: React.FC<PulseBalanceProps> = ({
         {/* Tara Bala */}
         <div
           className="rounded-xl p-4 border"
-          style={{ background: "var(--app-card-alt, #09071a)", borderColor: "var(--app-border, #FFFFFF)" }}
+          style={{ background: "var(--app-card-alt, #09071a)", borderColor: "var(--app-border, #1c1840)" }}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold" style={{ color: "var(--app-fg, #ffffff)" }}>
@@ -60,7 +60,7 @@ export const PulseBalance: React.FC<PulseBalanceProps> = ({
         {/* Chandra Bala */}
         <div
           className="rounded-xl p-4 border"
-          style={{ background: "var(--app-card-alt, #09071a)", borderColor: "var(--app-border, #FFFFFF)" }}
+          style={{ background: "var(--app-card-alt, #09071a)", borderColor: "var(--app-border, #1c1840)" }}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold" style={{ color: "var(--app-fg, #ffffff)" }}>

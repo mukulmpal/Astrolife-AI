@@ -104,13 +104,21 @@ const YOGAS = [
   "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti",
 ];
 
-const KARANAS = [
+const CHARA_KARANAS = [
   "Bava", "Balava", "Kaulava", "Taitila", "Garija", "Vanija", "Vishti",
-  "Bava", "Balava", "Kaulava", "Taitila", "Garija", "Vanija", "Vishti",
-  "Bava", "Balava", "Kaulava", "Taitila", "Garija", "Vanija", "Vishti",
-  "Bava", "Balava", "Kaulava", "Taitila", "Garija", "Vanija", "Vishti",
-  "Shakuni", "Chatushpada", "Naga", "Kimstughna",
 ];
+
+export function getKaranaName(karanaIdx: number): string {
+  const idx = mod(karanaIdx, 60);
+  if (idx === 0) return "Kimstughna";
+  if (idx >= 1 && idx <= 56) return CHARA_KARANAS[(idx - 1) % 7];
+  if (idx === 57) return "Shakuni";
+  if (idx === 58) return "Chatushpada";
+  if (idx === 59) return "Naga";
+  return "Kimstughna";
+}
+
+export const KARANAS: string[] = Array.from({ length: 60 }, (_, i) => getKaranaName(i));
 
 const HORA_ORDER: Record<string, string[]> = {
   Sunday: ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"],
@@ -472,13 +480,28 @@ export function calculatePanchang(date = new Date(), tz = 5.5, location?: { lat?
   const yoga = YOGAS[yogaIdx];
 
   const karanaIdx = Math.floor(moonSun / 6);
-  const karana = KARANAS[mod(karanaIdx, KARANAS.length)];
+  const karana = getKaranaName(karanaIdx);
   const weekday = weekdayName(date);
   const { sunrise, sunset, assumed } = calculateSunWindow(date, location?.lat, location?.lon, tz);
   const varaLord = VARA_LORD[weekday] ?? "Sun";
   const horaOrder = HORA_ORDER[weekday] ?? HORA_ORDER.Sunday;
-  const currentHour = Math.floor(mod((date.getTime() + tz * 60 * 60 * 1000) / 3600000, 24));
-  const horaIndex = currentHour % horaOrder.length;
+  const sunriseDec = timeToDecimal(sunrise);
+  const sunsetDec = timeToDecimal(sunset);
+  const currentDec = mod((date.getTime() + tz * 60 * 60 * 1000) / 3600000, 24);
+  const daylight = mod(sunsetDec - sunriseDec, 24);
+  const nightlen = 24 - daylight;
+  let horaSlot = 0;
+  if (currentDec >= sunriseDec && currentDec < sunsetDec) {
+    const elapsed = currentDec - sunriseDec;
+    horaSlot = Math.floor(elapsed / (daylight / 12));
+  } else if (currentDec >= sunsetDec) {
+    const elapsed = currentDec - sunsetDec;
+    horaSlot = 12 + Math.floor(elapsed / (nightlen / 12));
+  } else {
+    const elapsed = currentDec + (24 - sunsetDec);
+    horaSlot = 12 + Math.floor(elapsed / (nightlen / 12));
+  }
+  const horaIndex = mod(horaSlot, horaOrder.length);
   const currentHoraLord = horaOrder[horaIndex];
   const nextHoraLord = horaOrder[(horaIndex + 1) % horaOrder.length];
   const tithiBase = tithiLabel;

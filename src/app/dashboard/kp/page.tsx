@@ -282,23 +282,23 @@ export default function KPPage() {
       {activeTab === "evidence" && evidenceReport && (
         <section className="kp-card" style={{ padding: "28px" }}>
           {/* Header & Download CTA */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "24px", borderBottom: "1px solid rgba(184, 134, 11, 0.15)", paddingBottom: "20px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "24px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "20px" }}>
             <div>
-              <span style={{ color: "#B8860B", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 900 }}>
+              <span style={{ color: "#38bdf8", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 900 }}>
                 ⚖️ Krishnamurti Paddhati · Frozen Evidence Foundation
               </span>
-              <h2 style={{ fontSize: "28px", color: "#1A1A1A", margin: "6px 0 8px" }}>
+              <h2 style={{ fontSize: "28px", color: "#ffffff", margin: "6px 0 8px" }}>
                 Evidence-First Classical Synthesis &amp; Verification
               </h2>
-              <p style={{ color: "#6B635B", maxWidth: "700px", fontSize: "13px", lineHeight: 1.6, margin: 0 }}>
-                Deterministic evaluation directly consuming <code style={{ color: "#B8860B" }}>KPPredictiveEvidenceContract</code>. Every conclusion is bound to verifiable evidence nodes, rule-specific precedence relations (REL-01–REL-10), and classical source citations (*KP Readers I–VI*). Zero scores, zero probability tiers.
+              <p style={{ color: "rgba(232, 227, 240, 0.7)", maxWidth: "700px", fontSize: "13px", lineHeight: 1.6, margin: 0 }}>
+                Deterministic evaluation directly consuming <code style={{ color: "#38bdf8" }}>KPPredictiveEvidenceContract</code>. Every conclusion is bound to verifiable evidence nodes, rule-specific precedence relations (REL-01–REL-10), and classical source citations (*KP Readers I–VI*). Zero scores, zero probability tiers.
               </p>
             </div>
             <Link
               href="/dashboard/report?type=evidence-first"
               style={{
-                background: "linear-gradient(135deg, #B8860B, #996515)",
-                border: "1px solid rgba(184, 134, 11, 0.4)",
+                background: "linear-gradient(135deg, #0284c7, #0369a1)",
+                border: "1px solid #38bdf8",
                 borderRadius: "12px",
                 padding: "12px 20px",
                 color: "#ffffff",
@@ -308,7 +308,7 @@ export default function KPPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "8px",
-                boxShadow: "0 4px 18px rgba(184, 134, 11, 0.25)",
+                boxShadow: "0 4px 18px rgba(2, 132, 199, 0.35)",
                 whiteSpace: "nowrap",
               }}
             >
@@ -330,9 +330,9 @@ export default function KPPage() {
                   style={{
                     padding: "8px 16px",
                     borderRadius: "999px",
-                    border: `1px solid ${isSelected ? (isPending ? "#B8860B" : "#B8860B") : "rgba(184, 134, 11, 0.2)"}`,
-                    background: isSelected ? (isPending ? "rgba(184, 134, 11, 0.18)" : "rgba(184, 134, 11, 0.15)") : "#FAF7F2",
-                    color: isSelected ? (isPending ? "#B8860B" : "#B8860B") : "#6B635B",
+                    border: `1px solid ${isSelected ? (isPending ? "#f59e0b" : "#38bdf8") : "rgba(255,255,255,0.1)"}`,
+                    background: isSelected ? (isPending ? "rgba(245, 158, 11, 0.18)" : "rgba(56, 189, 248, 0.16)") : "rgba(255,255,255,0.04)",
+                    color: isSelected ? (isPending ? "#fbbf24" : "#38bdf8") : "#cbd5e1",
                     fontWeight: isSelected ? 700 : 500,
                     fontSize: "13px",
                     cursor: "pointer",
@@ -357,16 +357,16 @@ export default function KPPage() {
                 {sec.uncertainty.referencePending && (
                   <div
                     style={{
-                      border: "1px solid #B8860B",
-                      background: "rgba(184, 134, 11, 0.12)",
+                      border: "1px solid #f59e0b",
+                      background: "rgba(245, 158, 11, 0.12)",
                       borderRadius: "14px",
                       padding: "16px 20px",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#B8860B", fontWeight: 700, fontSize: "13px", marginBottom: "6px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fbbf24", fontWeight: 700, fontSize: "13px", marginBottom: "6px" }}>
                       <span>⚠️ EPISTEMIC SAFEGUARD: EVALUATION_PENDING</span>
                     </div>
-                    <p style={{ color: "#6B635B", fontSize: "12px", lineHeight: 1.5, margin: 0 }}>
+                    <p style={{ color: "#fef3c7", fontSize: "12px", lineHeight: 1.5, margin: 0 }}>
                       {sec.uncertainty.limitations.find((l) => /withheld|precedence|attested|speculative/i.test(l)) ||
                         "Classical KP literature lacks attested conflict precedence for modern speculative financial markets. Precedence resolution is deliberately withheld."}
                     </p>
@@ -376,8 +376,8 @@ export default function KPPage() {
                 {/* Synthesis Header Banner */}
                 <div
                   style={{
-                    background: "#FAF7F2",
-                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                    background: "rgba(15, 23, 42, 0.75)",
+                    border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: "16px",
                     padding: "20px",
                     display: "flex",
@@ -388,10 +388,10 @@ export default function KPPage() {
                   }}
                 >
                   <div>
-                    <span style={{ fontSize: "11px", color: "#6B635B", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                    <span style={{ fontSize: "11px", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                       Evaluated Life Topic ({sec.topicId})
                     </span>
-                    <h3 style={{ fontSize: "20px", color: "#1A1A1A", fontWeight: 700, margin: "2px 0 0" }}>
+                    <h3 style={{ fontSize: "20px", color: "#ffffff", fontWeight: 700, margin: "2px 0 0" }}>
                       {sec.eventName}
                     </h3>
                   </div>

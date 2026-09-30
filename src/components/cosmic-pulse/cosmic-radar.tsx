@@ -43,8 +43,8 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
     <div
       className="card mb-6 transition-all duration-300"
       style={{
-        background: "var(--app-card, #FFFFFF)",
-        border: "1px solid var(--app-border, #FFFFFF)",
+        background: "var(--app-card, #0d0a22)",
+        border: "1px solid var(--app-border, #1c1840)",
         borderRadius: "16px",
         padding: "24px",
       }}
@@ -91,7 +91,7 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
             className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
             style={{
               background: activeHorizon === "now" ? "var(--app-gold)" : "var(--app-card)",
-              color: activeHorizon === "now" ? "var(--al-primary-on, #FAF7F2)" : "var(--app-muted)",
+              color: activeHorizon === "now" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
               borderColor: activeHorizon === "now" ? "var(--app-gold)" : "var(--app-border)",
             }}
           >
@@ -112,7 +112,7 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
             className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
             style={{
               background: activeHorizon === "next30" ? "var(--app-gold)" : "var(--app-card)",
-              color: activeHorizon === "next30" ? "var(--al-primary-on, #FAF7F2)" : "var(--app-muted)",
+              color: activeHorizon === "next30" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
               borderColor: activeHorizon === "next30" ? "var(--app-gold)" : "var(--app-border)",
             }}
           >
@@ -133,7 +133,7 @@ export const CosmicRadar: React.FC<CosmicRadarProps> = ({
             className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 border"
             style={{
               background: activeHorizon === "next90" ? "var(--app-gold)" : "var(--app-card)",
-              color: activeHorizon === "next90" ? "var(--al-primary-on, #FAF7F2)" : "var(--app-muted)",
+              color: activeHorizon === "next90" ? "var(--al-primary-on, #060410)" : "var(--app-muted)",
               borderColor: activeHorizon === "next90" ? "var(--app-gold)" : "var(--app-border)",
             }}
           >

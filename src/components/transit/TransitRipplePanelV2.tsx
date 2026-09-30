@@ -697,8 +697,8 @@ function scoreLabelColor(score: number): string {
 const pageShell: CSSProperties = {
   minHeight: "100vh",
   padding: "32px",
-  background: "#FAF7F2",
-  color: "#1A1A1A",
+  background: "radial-gradient(circle at top left, rgba(250,204,21,0.16), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,0.18), transparent 36%), #070711",
+  color: "white",
 };
 
 const heroCard: CSSProperties = {

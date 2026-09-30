@@ -609,19 +609,19 @@ export default function NumerologyPage() {
                 />
                 <button
                   onClick={checkMobile}
-                  className="px-5 py-3 rounded-xl text-sm font-semibold text-sky-700 transition-all"
+                  className="px-5 py-3 rounded-xl text-sm font-semibold text-sky-300 transition-all"
                   style={{ background: "rgba(14,165,233,0.15)", border: "1px solid rgba(14,165,233,0.35)" }}
                 >
                   Analyse
                 </button>
               </div>
-              {mobileError && <p className="text-xs text-red-500 mt-2">{mobileError}</p>}
+              {mobileError && <p className="text-xs text-red-400 mt-2">{mobileError}</p>}
               {mobileResult && <NumberResult analysis={mobileResult} context="Mobile Number" />}
             </div>
 
             {/* Vehicle Number */}
             <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-5">
-              <p className="text-xs uppercase tracking-widest text-emerald-800 font-semibold mb-3">🚗 Vehicle Number Checker</p>
+              <p className="text-xs uppercase tracking-widest text-emerald-300 mb-3">🚗 Vehicle Number Checker</p>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -633,7 +633,7 @@ export default function NumerologyPage() {
                 />
                 <button
                   onClick={checkVehicle}
-                  className="px-5 py-3 rounded-xl text-sm font-semibold text-emerald-800 transition-all"
+                  className="px-5 py-3 rounded-xl text-sm font-semibold text-emerald-300 transition-all"
                   style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.35)" }}
                 >
                   Analyse

@@ -182,7 +182,7 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
             {selected && (
               <motion.div key={selected.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-5 rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-4">
                 <h3 className="font-serif text-2xl" style={{ color: selected.color }}>{selected.name}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">{selected.detail || selected.summary}</p>
+                <p className="mt-2 text-sm leading-relaxed text-white/58">{selected.detail || selected.summary}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -208,7 +208,7 @@ export function HolographicReport({ report, preview }: HolographicReportProps) {
               <h3 className="text-sm font-semibold text-cyan-100">{mount.name.replace("Mount of ", "")}</h3>
               <b className="text-2xl font-light text-cyan-200">{mount.score}</b>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-[#6B635B]">{mount.summary || mount.keywords}</p>
+            <p className="mt-2 text-xs leading-relaxed text-white/48">{mount.summary || mount.keywords}</p>
           </HoloCard>
         ))}
       </div>
