@@ -45,7 +45,7 @@ export function AajKaTaraCard({ chart, compact = false }: AajKaTaraCardProps) {
     const { paryaya, paryayaIntensity } = getParyayaByPosition(countedPos);
 
     const isConcern = [3, 5, 7].includes(taraNum);
-    const isBirth = countedPos === 1;
+    const isJanma = taraNum === 1;
     const isSupport27 = countedPos === 27;
 
     return {
@@ -58,7 +58,7 @@ export function AajKaTaraCard({ chart, compact = false }: AajKaTaraCardProps) {
       paryaya,
       paryayaIntensity,
       isConcern,
-      isBirth,
+      isJanma,
       isSupport27,
     };
   }, [chart]);
@@ -75,7 +75,7 @@ export function AajKaTaraCard({ chart, compact = false }: AajKaTaraCardProps) {
     paryaya,
     paryayaIntensity,
     isConcern,
-    isBirth,
+    isJanma,
     isSupport27,
   } = dailyTaraInfo;
 
@@ -149,7 +149,7 @@ Check your chart at https://astrolife-ai.vercel.app/dashboard/dasha`;
       className={`rounded-3xl border transition-all p-5 shadow-sm relative overflow-hidden ${
         isConcern
           ? "bg-gradient-to-br from-red-50/50 via-white to-amber-50/30 border-red-500/25"
-          : isBirth
+          : isJanma
           ? "bg-gradient-to-br from-amber-50/60 via-white to-yellow-50/30 border-amber-500/30"
           : "bg-gradient-to-br from-emerald-50/50 via-white to-sky-50/30 border-emerald-500/25"
       }`}
@@ -167,7 +167,7 @@ Check your chart at https://astrolife-ai.vercel.app/dashboard/dasha`;
                 className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                   isConcern
                     ? "bg-red-500/15 text-red-700"
-                    : isBirth
+                    : isJanma
                     ? "bg-amber-500/15 text-amber-700"
                     : "bg-emerald-500/15 text-emerald-700"
                 }`}

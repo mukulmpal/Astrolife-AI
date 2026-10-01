@@ -13,14 +13,9 @@ import {
 import { resolveNakshatraCoordinate } from "@/lib/astro-engine/ayanamsa-config";
 import type { NakshatraData } from "@/lib/astro-engine/nakshatra-data";
 import {
-  Calendar,
   Sparkles,
   ShieldAlert,
   CheckCircle2,
-  Clock,
-  Info,
-  Filter,
-  ArrowRight,
 } from "lucide-react";
 
 export interface PersonalTaraDay {

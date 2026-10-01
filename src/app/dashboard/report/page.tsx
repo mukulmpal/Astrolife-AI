@@ -1,7 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
-import { downloadReportAsPDF, type ReportOptions, type ReportPalette, type ReportCover } from "@/lib/report-html-generator";
+import {
+  downloadReportAsPDF,
+  generateReportHTML,
+  type ReportOptions,
+  type ReportPalette,
+  type ReportCover,
+} from "@/lib/report-html-generator";
 import { AstroLoadingScreen } from "@/components/AstroLoadingScreen";
 import { createClient } from "@/lib/supabase/client";
 import { isBillingEnforced, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
@@ -23,13 +29,13 @@ const COVER_OPTIONS: { value: ReportCover; label: string; desc: string }[] = [
 // Engines per report type
 const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; engines: string[] }[]> = {
   basic: [
-    { group: "Free Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
+    { group: "Free Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra", "Navtara Core"] },
     { group: "Starter Intelligence", color: "#34d399", engines: ["Destiny Snapshot", "AstroLife Scores", "Basic Yogas", "AI Advisor", "Engine Ledger"] },
   ],
   premium: [
     { group: "Report Intelligence V4", color: "#c084fc", engines: ["Destiny Snapshot","Deep Personalization","Action Blueprint Pages","Life Mission","Personality Deep Dive","Karmic Blueprint","AI Advisor"] },
     { group: "Opportunity Blueprint", color: "#34d399", engines: ["Wealth Intelligence","Career Intelligence","Foreign Connection","Event Radar Strategy","Ranked Remedies"] },
-    { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
+    { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra", "Navtara Master Engine", "27th Shield Star"] },
     { group: "Per-Planet (9)", color: "#a78bfa", engines: ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] },
     { group: "Per-House (12)", color: "#60a5fa", engines: ["Bhava 1–4","Bhava 5–8","Bhava 9–12"] },
     { group: "Strength & Charts", color: "#34d399", engines: ["Shadbala","Ashtakavarga","Divisional Charts","Yogas","Doshas"] },
@@ -39,12 +45,12 @@ const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; 
     { group: "Synthesis", color: "#fb923c", engines: ["Vastu","Astro Sound","Gemstone","Remedies","Closing Reading"] },
   ],
   elite: [
-    { group: "Everything in Premium", color: "#C9A961", engines: ["Full Kundli Intelligence", "All Timing Engines", "All Remedy Engines"] },
+    { group: "Everything in Premium", color: "#C9A961", engines: ["Full Kundli Intelligence", "All Timing Engines", "All Remedy Engines", "Navtara Master Engine", "27th Shield Star"] },
     { group: "Elite Intelligence", color: "#c084fc", engines: ["Palmistry Fusion", "AI Life Story", "Family Karma", "Relationship Intel", "Marriage Intelligence"] },
     { group: "Luxury Export", color: "#60a5fa", engines: ["Advanced PDF Layout", "Personal Operating System", "Real Astrologer Page", "Priority Report Quality"] },
   ],
   full: [
-    { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra"] },
+    { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot", "Star Map", "Planetary Dashboard", "Nakshatra", "Navtara Master Engine", "27th Shield Star"] },
     { group: "Per-Planet (9)", color: "#a78bfa", engines: ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] },
     { group: "Per-House (12)", color: "#60a5fa", engines: ["Bhava 1–4","Bhava 5–8","Bhava 9–12"] },
     { group: "Strength & Charts", color: "#34d399", engines: ["Shadbala","Ashtakavarga","Divisional Charts","Yogas","Doshas"] },
@@ -56,7 +62,7 @@ const ENGINE_MAP: Record<ReportOptions["type"], { group: string; color: string; 
     { group: "Synthesis", color: "#fb923c", engines: ["Remedies","Closing Reading","Engine Ledger"] },
   ],
   kundli: [
-    { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot","Star Map","Planetary Dashboard","Nakshatra"] },
+    { group: "Foundation", color: "#C9A961", engines: ["Birth Snapshot","Star Map","Planetary Dashboard","Nakshatra", "Navtara Master Engine", "27th Shield Star"] },
     { group: "Per-Planet (9)", color: "#a78bfa", engines: ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"] },
     { group: "Per-House (12)", color: "#60a5fa", engines: ["All 12 Bhavas"] },
     { group: "Charts", color: "#34d399", engines: ["Shadbala","Ashtakavarga","Divisional Charts","Yogas","Doshas"] },
@@ -254,6 +260,28 @@ export default function ReportPage() {
       </main>
     );
   }
+
+  const handlePreviewHTML = () => {
+    try {
+      const html = generateReportHTML(chart, {
+        type: reportType,
+        palette,
+        cover,
+        palmistrySessionId: reportType === "elite" ? latestPalmSessionId ?? undefined : undefined,
+      });
+      const win = window.open("", "_blank");
+      if (win) {
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+      } else {
+        alert("Popup blocked by browser. Please allow popups to view report preview.");
+      }
+    } catch (err) {
+      console.error("Preview generation error:", err);
+      alert("Error generating preview. Please try again.");
+    }
+  };
 
   const handleDownloadPDF = async () => {
     const plan = REPORT_PLANS.find((item) => item.type === reportType);
@@ -504,10 +532,33 @@ export default function ReportPage() {
                 : "No saved palm scan found. Elite PDF will show a palm-fusion missing-context page."}
             </div>
           )}
-          <button className="rep-btn primary" onClick={handleDownloadPDF} disabled={isGenerating}>
-            {isGenerating ? "⏳ Generating…" : selectedLocked ? `🔒 Upgrade for ${selectedPlan.label}` : `📥 Download ${selectedPlan.label}`}
-          </button>
-          <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "10px" }}>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+            <button
+              type="button"
+              className="rep-btn secondary"
+              onClick={handlePreviewHTML}
+              disabled={isGenerating}
+              style={{
+                background: "#FAF7F2",
+                border: "1px solid rgba(184,134,11,0.35)",
+                color: "#1A1A1A",
+                fontWeight: 600,
+                padding: "12px 22px",
+                borderRadius: "10px",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <span>👁️</span>
+              <span>Instant HTML Preview</span>
+            </button>
+            <button className="rep-btn primary" onClick={handleDownloadPDF} disabled={isGenerating}>
+              {isGenerating ? "⏳ Generating…" : selectedLocked ? `🔒 Upgrade for ${selectedPlan.label}` : `📥 Download ${selectedPlan.label}`}
+            </button>
+          </div>
+          <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "12px" }}>
             Server-rendered via Puppeteer · downloads automatically · all {totalEngines} engines run fresh for your chart
           </div>
         </div>

@@ -16,6 +16,10 @@ import { calculateShadbala } from "../astro-engine/shadbala";
 import { calculateMedical } from "../astro-engine/medical";
 import { calculateNumerology } from "../astro-engine/numerology";
 import { buildNatalChartFromAnyChart, generateGemstoneReport } from "../astro-engine/gemstone";
+import { calculateSpecialLagnas } from "../astro-engine/special-lagnas";
+import { calculateVastu } from "../astro-engine/vastu";
+import { calculateSarvatobhadra } from "../astro-engine/sarvatobhadra";
+import { scanMarriageWindows } from "../astro-engine/marriage-window-scanner";
 import type { DashaLord } from "../astro-engine/dasha";
 
 /**
@@ -351,6 +355,90 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
 - Protocol: 15–20 minutes evening or early morning listening in calm posture.`);
   } catch (err) {
     console.warn("[MasterAstroContext] Astro Sound error:", err);
+  }
+
+  // ── 13. SPECIAL LAGNAS & WEALTH PADAS ─────────────────────────────────────────
+  try {
+    const spl = calculateSpecialLagnas(chart);
+    const hl = spl.sunriseItems.find((i) => i.key === "HL");
+    const gl = spl.sunriseItems.find((i) => i.key === "GL");
+    const sl = spl.sreeLagna;
+    const a2 = spl.arudhaItems.find((i) => i.key === "A2");
+    const a7 = spl.arudhaItems.find((i) => i.key === "A7");
+    const a10 = spl.arudhaItems.find((i) => i.key === "A10");
+
+    sections.push(`### 13. SPECIAL LAGNAS & WEALTH PADAS (PROSPERITY & POWER)
+- Hora Lagna (HL — Wealth & Material Inflow): ${hl?.sign || "N/A"} (${hl?.degreeText || ""}) in H${hl?.house || "N/A"} · Lord: ${hl?.lord || "N/A"}
+  ✦ Meaning: ${hl?.meaning || ""}
+- Ghati Lagna (GL — Power, Authority & Public Command): ${gl?.sign || "N/A"} (${gl?.degreeText || ""}) in H${gl?.house || "N/A"} · Lord: ${gl?.lord || "N/A"}
+  ✦ Meaning: ${gl?.meaning || ""}
+- Sree Lagna (SL — Lakshmi Blessings & Prosperity Channel): ${sl?.sign || "N/A"} in H${sl?.house || "N/A"} · Lord: ${sl?.lord || "N/A"}
+- Financial & Career Arudha Padas:
+  ✦ Dhana Pada (A2 — Visible Wealth & Speech): ${a2?.sign || "N/A"} in H${a2?.house || "N/A"}
+  ✦ Dara Pada (A7 — Business Alliances & Public Partners): ${a7?.sign || "N/A"} in H${a7?.house || "N/A"}
+  ✦ Karma Pada (A10 — Career Fame & Professional Authority): ${a10?.sign || "N/A"} in H${a10?.house || "N/A"}
+- Special Lagna Synthesis: ${spl.summary}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Special Lagnas error:", err);
+  }
+
+  // ── 14. ASTRO-VASTU (16-ZONE SPATIAL ENERGETICS & REMEDIES) ───────────────────
+  try {
+    const activeMD = chart.dashas?.find((d) => d.active)?.planet;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vastu = calculateVastu(chart.planets as any, activeMD);
+
+    const strongNames = vastu.strongZones.map((z) => `${z.dir} (${z.name}, ${z.score}pts)`).join(", ") || "None";
+    const weakNames = vastu.weakZones.map((z) => `${z.dir} (${z.name}, ${z.score}pts)`).join(", ") || "None";
+    const keyRemedies = vastu.weakZones.slice(0, 3).map((z) => `${z.dir} (${z.domain}): ${z.remedy}`).join("\n  ✦ ");
+    const psych = vastu.psychBridge.slice(0, 2).join(" ");
+
+    sections.push(`### 14. ASTRO-VASTU (16-ZONE SPATIAL ENERGETICS & LIVING REMEDIES)
+- Overall Home/Workspace Vastu Score: ${vastu.overallScore}/100
+- Strongest Zones (Effortless Flow): ${strongNames}
+- Vulnerable / Blocked Zones (Requiring Remedial Attention): ${weakNames}
+- Priority Spatial Corrections:
+  ✦ ${keyRemedies || "Keep North and East clutter-free; place light water elements in Ishanya (NE)."}
+- Astro-Vastu Psychological Link: ${psych}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Astro-Vastu error:", err);
+  }
+
+  // ── 15. SARVATOBHADRA CHAKRA & GOCHAR VEDHA ──────────────────────────────────
+  try {
+    const svb = calculateSarvatobhadra(chart);
+
+    const sensitiveInfo = svb.natalInSensitive.length > 0
+      ? svb.natalInSensitive.map((s) => `${s.planet} in ${s.zoneName} (${s.nakshatra}) — ${s.meaning}`).join("\n  ✦ ")
+      : "No natal planets in extreme friction zones.";
+
+    const vedhaAlerts = svb.vedhaAlerts.slice(0, 4).map((a) => `${a.planet} in ${a.nakshatra} (${a.zoneName}): ${a.description}`).join("\n  ✦ ");
+
+    sections.push(`### 15. SARVATOBHADRA CHAKRA & TRANSIT VEDHA INTELLIGENCE
+- Birth Star & Index: ${svb.birthNakshatra} (Index #${svb.birthNakshatraIndex + 1})
+- Current Transit Gochar Assessment: ${svb.currentPeriodAssessment} — ${svb.currentPeriodReason}
+- Transit Vedha Balance: ${svb.beneficVedhaCount} Benefic vs ${svb.maleficVedhaCount} Malefic Vedha hits
+- Sensitive Natal Zones Active:
+  ✦ ${sensitiveInfo}
+${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Sarvatobhadra error:", err);
+  }
+
+  // ── 16. KN RAO MARRIAGE TIMING & RESEARCH ENGINE ──────────────────────────────
+  try {
+    const marriageScan = scanMarriageWindows(chart);
+    const bestWin = marriageScan.bestWindow;
+    const outlook = marriageScan.overallOutlook;
+
+    sections.push(`### 16. KN RAO 8-PARAMETER MARRIAGE & RELATIONSHIP TIMING
+- Research Study Model: 8 Core Parameters (Vimshottari PAC in D1/D9, Chara Dasha DK/UL, Double Transit Jupiter+Saturn on 1/7 axis, Vivah Saham, Piya Milan connection)
+- Overall Timing Outlook: ${outlook}
+- Peak Marriage Timing Score: ${marriageScan.peakScore}/100 across 9-month horizon
+- Best Marriage Window: ${bestWin ? `${bestWin.month} (Score: ${bestWin.adjustedScore}/100, ${bestWin.verdict.toUpperCase()}) — ${bestWin.keyFactor}` : "Scanning ongoing"}
+- Double Transit Status: ${bestWin?.activeParams.includes("P4: Double transit Jupiter + Saturn") ? "Jupiter & Saturn double transit confirms active relationship manifestation." : "Double transit preparing alignment in upcoming months."}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] KN Rao Marriage Timing error:", err);
   }
 
   return `\n══════════════════════════════════════════════════════════════════════

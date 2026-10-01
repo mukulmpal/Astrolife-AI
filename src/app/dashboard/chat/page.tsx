@@ -42,6 +42,10 @@ const SOURCE_LINKS: Record<string, string> = {
   "Transit/Gochar": "/dashboard/transits",
   "Daily Feed": "/dashboard/panchang",
   "Palmistry Report": "/dashboard/palmistry/history",
+  "Special Lagnas": "/dashboard/special-lagnas",
+  "Astro-Vastu": "/dashboard/vastu",
+  "Sarvatobhadra": "/dashboard/sarvatobhadra",
+  "Marriage Timing": "/dashboard/marriage-timing",
 };
 
 const AGENTS = [

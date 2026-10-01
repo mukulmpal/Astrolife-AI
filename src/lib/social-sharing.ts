@@ -42,9 +42,39 @@ export function generateShareMessage(chart: ChartData, engine: string): ShareMes
       url: chartUrl,
       hashtags: ["marriage", "compatibility", "love", "astrology", "soulmate"],
     },
+    navtara: {
+      title: `My Navtara & 27th Star Shield Blueprint on AstroLife`,
+      text: `Just calculated my Navtara Blueprint! 🕉️ Janma Nakshatra ${chart.planets.Moon?.nakshatra} with my 27th Protector Star Raksha Kavach. Discover your cosmic protection star:`,
+      url: chartUrl,
+      hashtags: ["navtara", "nakshatra", "vedicastrology", "astrolife", "kundli"],
+    },
+    report: {
+      title: `My Cosmic Blueprint Report on AstroLife`,
+      text: `Generated my comprehensive Vedic Cosmic Blueprint on AstroLife! 📄 Covering Navtara Intelligence, KP System, Lal Kitab, and authentic classical remedies. Explore your blueprint:`,
+      url: chartUrl,
+      hashtags: ["astrolife", "vedicastrology", "cosmicblueprint", "kundli"],
+    },
+    basic: {
+      title: `My Cosmic Blueprint Report on AstroLife`,
+      text: `Generated my Vedic Astrology Report on AstroLife! 🔯 ${chart.lagnaRashi} Lagna · ${chart.planets.Moon?.sign} Moon · ${chart.planets.Moon?.nakshatra} Nakshatra. Check yours:`,
+      url: chartUrl,
+      hashtags: ["astrolife", "vedicastrology", "kundli"],
+    },
+    premium: {
+      title: `My Premium Cosmic Blueprint on AstroLife`,
+      text: `Generated my 91-page Premium Cosmic Blueprint! 📄 Complete Navtara 3-layer audit, KP sub lords, 27th Star Shield and classical remedies:`,
+      url: chartUrl,
+      hashtags: ["astrolife", "vedicastrology", "cosmicblueprint"],
+    },
+    elite: {
+      title: `My Elite Cosmic Dossier on AstroLife`,
+      text: `Generated my luxury Elite Cosmic Dossier on AstroLife! 💎 Multi-engine synthesis with Palmistry fusion & 27th Star protection:`,
+      url: chartUrl,
+      hashtags: ["astrolife", "luxuryastrology", "vedic"],
+    },
   };
 
-  return messages[engine] || messages.kundli;
+  return messages[engine] || messages.report || messages.kundli;
 }
 
 export function shareToWhatsApp(message: ShareMessage) {
