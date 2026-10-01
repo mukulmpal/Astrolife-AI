@@ -21,6 +21,7 @@ import {
 import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import { PalmistryAiChatBanner } from "@/components/palmistry/palmistry-ai-chat-banner";
+import { buildMasterAstroContext } from "@/lib/ai-chat/master-astro-context";
 
 interface Message {
   role: "user" | "assistant";
@@ -33,6 +34,11 @@ type LanguageMode = "hindi" | "english" | "hinglish";
 
 const SOURCE_LINKS: Record<string, string> = {
   "Natal Chart": "/dashboard/kundli",
+  "Navtara Master Engine": "/dashboard/dasha",
+  "KP System (Placidus)": "/dashboard/kp",
+  "Lal Kitab System": "/dashboard/lalkitab",
+  "Jaimini Sutras": "/dashboard/jaimini",
+  "Ashtakavarga Matrix": "/dashboard/ashtakavarga",
   "Transit/Gochar": "/dashboard/transits",
   "Daily Feed": "/dashboard/panchang",
   "Palmistry Report": "/dashboard/palmistry/history",
@@ -52,13 +58,13 @@ const AGENTS = [
 ];
 
 const SUGGESTED = [
-  "What does my Saturn placement mean?",
-  "When will I get married?",
-  "What career suits my chart?",
-  "Tell me about my Rahu-Ketu axis",
-  "What are my wealth yogas?",
-  "What remedies do I need?",
-  "Which raga suits my chart today?",
+  "Meri dasha ka Navtara Tara-Bala aur 3-layer pattern kya hai?",
+  "Lal Kitab ke hisaab se mera Kismat Jagane Wala Grah kaun sa hai?",
+  "KP System me mera Career (10th cusp) sub lord kya promise karta hai?",
+  "Jaimini ke anusar mera Atmakaraka aur Upapada Lagna kya batata hai?",
+  "Meri kundli ke sabse shubh Yogas aur Ashtakavarga bindus kya hain?",
+  "Ayurveda ke hisaab se meri Tri-Dosha prakriti aur Snan Aushadhi kya hai?",
+  "Numerology ke anusar mera Life Path number aur Personal Year guidance?",
   "Suggest a sound remedy for sleep and calm mind?",
 ];
 const MOBILE_NAV = [
@@ -213,6 +219,16 @@ export default function ChatPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { chart, hasUserChart } = useUserChart();
+  const masterAstroContext = useMemo(() => {
+    if (!chart || !hasUserChart) return "";
+    try {
+      return buildMasterAstroContext(chart);
+    } catch (error) {
+      console.warn("Master astro context calculation failed:", error);
+      return "";
+    }
+  }, [chart, hasUserChart]);
+
   const transitContext = useMemo(() => {
     if (!chart || !hasUserChart) return "";
 
@@ -383,6 +399,7 @@ export default function ChatPage() {
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           agentId: activeAgent.id,
           chartContext: formatChartContext(chart),
+          masterAstroContext,
           transitContext: transitContext,
           dailyFeedContext,
           languageMode,

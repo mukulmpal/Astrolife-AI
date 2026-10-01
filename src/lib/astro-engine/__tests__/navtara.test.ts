@@ -76,7 +76,7 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
       planets: {
         Moon: { longitude: 115.0, rashi: "Cancer", house: 9, isRetrograde: false }, // Ashlesha
         Rahu: { longitude: 195.0, rashi: "Libra", house: 12, isRetrograde: false }, // Swati (Rahu NL)
-      },
+      } as any,
       houseCusps: [],
       houseSystem: "degree-equal-bhava",
       dashas: [{ planet: "Rahu", start: new Date("2016-01-01"), end: new Date("2034-01-01"), yrs: 18, active: true }],
@@ -134,7 +134,7 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
         Sun: { longitude: 230.51, rashi: "Scorpio", house: 10, isRetrograde: false }, // Jyeshtha #18
         Mars: { longitude: 236.07, rashi: "Scorpio", house: 10, isRetrograde: false }, // Jyeshtha #18
         Mercury: { longitude: 215.21, rashi: "Scorpio", house: 10, isRetrograde: false }, // Anuradha #17
-      },
+      } as any,
       houseCusps: [],
       houseSystem: "degree-equal-bhava",
       dashas: [{ planet: "Mars", start: new Date("2020-01-01"), end: new Date("2027-01-01"), yrs: 7, active: true }],

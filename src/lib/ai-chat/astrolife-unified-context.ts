@@ -14,6 +14,7 @@ type BuildUnifiedAstroLifeChatPromptInput = {
   dashaContext?: unknown;
   transitContext?: unknown;
   numerologyContext?: unknown;
+  masterAstroContext?: string;
 };
 
 function compactJson(value: unknown, maxChars = 6000) {
@@ -41,15 +42,16 @@ ${text}
 }
 
 const UNIFIED_CHAT_SAFETY = `
-UNIFIED ASTROLIFE AI CHAT SAFETY
+UNIFIED ASTROLIFE AI CHAT SAFETY & SYNTHESIS DIRECTIVES
 
-- Use all engine context as interpretive guidance, not certainty.
+- MULTI-ENGINE SYNTHESIS: Seamlessly weave evidence from Navtara (Janma star, 27th shield star, 3-layer dasha audit), KP System (cusp sub lords, 4-fold significators), Lal Kitab (kismat planet, pakka/dushman ghar, active debts/rins), Jaimini (Atmakaraka, Amatyakaraka, Arudha Lagna), Yogas, Ashtakavarga bindus, Shadbala, Ayurveda (Tridosha/Agni/Ojas), and Numerology.
+- EVIDENCE-GROUNDED REASONING: Cite specific classical planetary placements and engine results with clarity and authority.
+- Tone: Premium Hinglish, compassionate, deeply perceptive, dignified, and encouraging. Use ✦ bullets and structured sections.
+- Use all engine context as interpretive guidance, not fatalistic certainty.
 - Do not predict death, death age, fatal events, or irreversible outcomes.
-- Do not diagnose disease from astrology, palmistry, nails, palm colour, or any line.
+- Do not diagnose medical diseases; use vitality, lifestyle, and Ayurvedic dosha balance wording, and recommend qualified professional medical consultation for symptoms.
 - Do not guarantee marriage, divorce, childbirth, wealth, fame, job, business success, visa, travel, or foreign settlement.
-- If systems disagree, say "mixed signals" and explain softly.
-- When palmistry, Kundli, Dasha, Transit, and Numerology agree, confidence can be higher but still not guaranteed.
-- For health-related questions, use vitality/lifestyle wording only and recommend qualified professional consultation for symptoms.
+- If systems provide differing nuances, present them as complementary layers (e.g. "Vedic baseline shows X, while KP cusp fine-tunes timing with Y, and Navtara tara-bala reveals the underlying psychological comfort").
 `;
 
 export async function buildUnifiedAstroLifeChatPrompt({
@@ -61,6 +63,7 @@ export async function buildUnifiedAstroLifeChatPrompt({
   dashaContext,
   transitContext,
   numerologyContext,
+  masterAstroContext,
 }: BuildUnifiedAstroLifeChatPromptInput) {
   const palmistryContext = await buildPalmistryChatContext({
     palmSessionId,
@@ -82,6 +85,8 @@ export async function buildUnifiedAstroLifeChatPrompt({
 
   return `
 ${existingPrompt}
+
+${masterAstroContext ? `\n${masterAstroContext}\n` : ""}
 
 ${optionalRawEngineContext}
 
