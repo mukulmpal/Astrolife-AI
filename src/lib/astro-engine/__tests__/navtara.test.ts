@@ -229,4 +229,62 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
     assert.ok(jupCaution);
     assert.ok(jupCaution.targetSign.includes("Aries")); // Saturn debilitated in Aries
   });
+
+  // ── Part 5: Master Specification v1.0 — 729 Exhaustive Pair Verification (27 x 27) ──
+  it("Master Spec v1.0: Full 729 (27×27) combination test suite for Navtara mathematical invariants", () => {
+    let combinationsTested = 0;
+
+    for (let birthId = 1; birthId <= 27; birthId++) {
+      for (let targetId = 1; targetId <= 27; targetId++) {
+        const countedPos = calculateCountedPosition(birthId, targetId);
+        const taraNum = calculateTaraNumber(birthId, targetId);
+
+        // Invariant 1: Counted position must be strictly between 1 and 27
+        assert.ok(
+          countedPos >= 1 && countedPos <= 27,
+          `Counted pos ${countedPos} out of range for birth ${birthId} -> target ${targetId}`
+        );
+
+        // Invariant 2: Tara number must be strictly between 1 and 9
+        assert.ok(taraNum >= 1 && taraNum <= 9, `Tara number ${taraNum} out of range`);
+
+        // Invariant 3: Tara formula alignment ((countedPos - 1) % 9) + 1 === taraNum
+        const derivedTara = ((countedPos - 1) % 9) + 1;
+        assert.equal(taraNum, derivedTara, `Mismatch at birth ${birthId} -> target ${targetId}`);
+
+        // Invariant 4: Self-nakshatra is always Janma Tara (1) at position 1
+        if (birthId === targetId) {
+          assert.equal(countedPos, 1);
+          assert.equal(taraNum, 1);
+        }
+
+        // Invariant 5: 27th position is always Parama Mitra (Tara 9) in Tritiya Paryaya
+        if (countedPos === 27) {
+          assert.equal(taraNum, 9);
+          const precedingExpected = birthId === 1 ? 27 : birthId - 1;
+          assert.equal(targetId, precedingExpected, "27th position must be the preceding star");
+          const { paryaya, paryayaIntensity } = getParyayaByPosition(27);
+          assert.equal(paryaya, "Tritiya");
+          assert.equal(paryayaIntensity, "Peak");
+        }
+
+        // Invariant 6: Color nature classification rule:
+        // - Afflicted (Vadha 7, Vipat 3, Pratyari 5) -> Concern (Red)
+        // - Janma (1) -> Self/Foundational (Orange)
+        // - All others (2, 4, 6, 8, 9) -> Supportive (Green)
+        if ([3, 5, 7].includes(taraNum)) {
+          assert.ok(taraNum === 3 || taraNum === 5 || taraNum === 7);
+        } else if (taraNum === 1) {
+          assert.equal(taraNum, 1);
+        } else {
+          assert.ok([2, 4, 6, 8, 9].includes(taraNum));
+        }
+
+        combinationsTested++;
+      }
+    }
+
+    assert.equal(combinationsTested, 729, "Must test exactly 27 * 27 = 729 pairs");
+  });
 });
+

@@ -562,6 +562,7 @@ export function NavtaraIntelligenceView({
             activeMD={activeMD}
             activeAD={activeAD}
             tp={tp}
+            chart={chart}
           />
         ) : (
           /* View Mode 2: Matrix Grid Table */

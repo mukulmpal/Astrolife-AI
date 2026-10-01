@@ -7,6 +7,8 @@ import { calculateTransitReport, TransitBase } from "@/lib/astro-engine/transits
 import { normalizeChartForTransit, toRashi } from "@/lib/astro-engine/chart-normalize";
 import { useUserChart } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
+import { NakshatraChakraWheel } from "@/components/dasha/NakshatraChakraWheel";
+import { runNavtaraIntelligence } from "@/lib/astro-engine/navtara-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
@@ -66,7 +68,18 @@ export default function TransitPage() {
   const [base, setBase] = useState<TransitBase>("moon");
   const [selectedDate, setSelectedDate] = useState<Date>(() => startOfDay(new Date()));
   const [pageTab, setPageTab] = useState<"overview" | "chart" | "ripple">(initialTab);
+  const [chartStyle, setChartStyle] = useState<"kundli" | "navtara">("kundli");
   const { chart: userChart, loading, hasUserChart } = useUserChart();
+
+  const navtaraIntel = useMemo(() => {
+    if (!userChart) return null;
+    try {
+      return runNavtaraIntelligence(userChart);
+    } catch (e) {
+      console.warn("Failed to build Navtara for transit page:", e);
+      return null;
+    }
+  }, [userChart]);
 
   const transitChart = useMemo(() => {
     if (!userChart) return null;
@@ -222,22 +235,63 @@ export default function TransitPage() {
         ) : pageTab === "chart" ? (
           <section className="tr-card span-12">
             <div className="tr-row" style={{ marginBottom: 12 }}>
-              <h2 className="tr-h">Transit Chart</h2>
-              <div className="tr-switch">
-                <button type="button" className={`tr-btn ${base === "moon" ? "active" : ""}`} onClick={() => setBase("moon")}>
-                  Moon base · default
-                </button>
-                <button type="button" className={`tr-btn ${base === "lagna" ? "active" : ""}`} onClick={() => setBase("lagna")}>
-                  Lagna base
-                </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="tr-h">Transit Chart</h2>
+                <div className="tr-switch">
+                  <button
+                    type="button"
+                    className={`tr-btn ${chartStyle === "kundli" ? "active" : ""}`}
+                    onClick={() => setChartStyle("kundli")}
+                  >
+                    North Indian Kundli
+                  </button>
+                  <button
+                    type="button"
+                    className={`tr-btn ${chartStyle === "navtara" ? "active" : ""}`}
+                    onClick={() => setChartStyle("navtara")}
+                  >
+                    27-Nakshatra Navtara Chakra
+                  </button>
+                </div>
               </div>
+
+              {chartStyle === "kundli" && (
+                <div className="tr-switch">
+                  <button type="button" className={`tr-btn ${base === "moon" ? "active" : ""}`} onClick={() => setBase("moon")}>
+                    Moon base · default
+                  </button>
+                  <button type="button" className={`tr-btn ${base === "lagna" ? "active" : ""}`} onClick={() => setBase("lagna")}>
+                    Lagna base
+                  </button>
+                </div>
+              )}
             </div>
-            <p className="tr-p" style={{ marginBottom: 16 }}>
-              {BASE_COPY[base].detail} Planets below are shown in houses from your {base === "lagna" ? "ascendant" : "Moon sign"}.
-            </p>
-            {chartView && (
-              <div className="tr-chart-wrap">
-                <NorthIndianChart lagnaNum={chartView.lagnaNum} planets={chartView.planets} size={340} />
+
+            {chartStyle === "kundli" ? (
+              <>
+                <p className="tr-p" style={{ marginBottom: 16 }}>
+                  {BASE_COPY[base].detail} Planets below are shown in houses from your {base === "lagna" ? "ascendant" : "Moon sign"}.
+                </p>
+                {chartView && (
+                  <div className="tr-chart-wrap">
+                    <NorthIndianChart lagnaNum={chartView.lagnaNum} planets={chartView.planets} size={340} />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="py-2">
+                <p className="tr-p" style={{ marginBottom: 16 }}>
+                  Live Gochar Transits mapped directly over your 27-Nakshatra Navtara Chakra. Color signs identify: 🔴 Red (Vadha 7, Vipat 3, Pratyari 5), 🟠 Orange (Janma 1, 10, 19), 🟢 Green (Sampat 2, Kshema 4, Sadhaka 6, Mitra 8, Parama Mitra 9).
+                </p>
+                {navtaraIntel && userChart && (
+                  <NakshatraChakraWheel
+                    intel={navtaraIntel}
+                    tp={tp}
+                    chart={userChart}
+                    initialMode="GOCHAR"
+                    transitDate={selectedDate}
+                  />
+                )}
               </div>
             )}
           </section>
