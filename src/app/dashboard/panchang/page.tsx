@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import { useUserChart } from "@/lib/user-chart";
 import { buildDashaTreeFromChart, getNavtara, LORD_COLOR, LORD_ICON, type DashaLord } from "@/lib/astro-engine/dasha";
@@ -341,13 +342,21 @@ export default function PanchangPage() {
                   <span className="ml-2 text-sm font-normal text-[#6B635B]">— {navtara.meaning}</span>
                 </p>
                 <p className="text-sm text-[#4A4238] mt-1">{navtara.advice}</p>
-                <div className="flex gap-4 mt-2 text-xs text-[#8C827A]">
-                  <span>Birth: {navtara.janmaNakshatra}</span>
-                  <span>Today: {navtara.todayNakshatra}</span>
-                  <span>Cycle {navtara.cycleNumber}</span>
+                <div className="flex flex-wrap items-center justify-between gap-3 mt-3 pt-3 border-t border-[rgba(184,134,11,0.15)]">
+                  <div className="flex gap-4 text-xs text-[#8C827A]">
+                    <span>Birth: {navtara.janmaNakshatra}</span>
+                    <span>Today: {navtara.todayNakshatra}</span>
+                    <span>Cycle {navtara.cycleNumber}</span>
+                  </div>
+                  <Link
+                    href="/dashboard/dasha"
+                    className="text-xs font-bold text-[#B8860B] hover:text-[#996D09] flex items-center gap-1 transition-all"
+                  >
+                    <span>View 27-Star Navtara Chakra Wheel →</span>
+                  </Link>
                 </div>
               </div>
-              <span className="text-xs px-2 py-1 rounded-full font-semibold"
+              <span className="text-xs px-2 py-1 rounded-full font-semibold shrink-0"
                 style={{ background: navtaraColor + "25", color: navtaraColor }}>
                 {navtara.nature === "highly_benefic" ? "Highly Benefic" :
                  navtara.nature === "benefic" ? "Benefic" :

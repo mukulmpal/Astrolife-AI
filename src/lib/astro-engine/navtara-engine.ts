@@ -184,6 +184,8 @@ export interface DashaAuditLayer {
   paryayaIntensity: ParyayaIntensity;
   isConcern: boolean; // 3, 5, or 7
   boundaryAlert?: BoundaryAlert;
+  depth: number;
+  basis: "CANONICAL" | "CANONICAL_SOURCE" | "EXPERIMENTAL_EXTENSION";
 }
 
 export type DashaAuditPattern =
@@ -447,6 +449,8 @@ export function auditDashaNavtara(
     paryayaIntensity: mdParyayaInfo.paryayaIntensity,
     isConcern: isMDConcern,
     boundaryAlert: mdCoord.boundary.isNearBoundary ? mdCoord.boundary : undefined,
+    depth: 1,
+    basis: "CANONICAL",
   });
 
   ruleTraces.push({
@@ -488,6 +492,8 @@ export function auditDashaNavtara(
       paryayaIntensity: nlParyayaInfo.paryayaIntensity,
       isConcern: isNLConcern,
       boundaryAlert: nlCoord.boundary.isNearBoundary ? nlCoord.boundary : undefined,
+      depth: 2,
+      basis: "CANONICAL_SOURCE",
     });
 
     ruleTraces.push({
@@ -522,13 +528,15 @@ export function auditDashaNavtara(
       paryayaIntensity: nl2ParyayaInfo.paryayaIntensity,
       isConcern: isNL2Concern,
       boundaryAlert: nl2Coord.boundary.isNearBoundary ? nl2Coord.boundary : undefined,
+      depth: 3,
+      basis: "EXPERIMENTAL_EXTENSION",
     });
 
     ruleTraces.push({
       ruleId: "NVT-R003",
       basis: "SOURCE_DERIVED",
       title: "Tertiary Star Lord (Triple Strike Verification)",
-      evidence: `NL's Star Lord ${nlOfNlLord} is distinct from ${nlLord} and occupies ${nl2Nak.name}. Tara #${nl2TaraNum} (${nl2Tara.name}).`,
+      evidence: `NL's Star Lord ${nlOfNlLord} is distinct from ${nlLord} and occupies ${nl2Nak.name}. Tara #${nl2TaraNum} (${nl2Tara.name}). Marked Depth 3 (Experimental Extension).`,
       sourceCitation: "Practical lecture transcript: Multi-tier star lordship evaluation for critical life transitions.",
     });
   }

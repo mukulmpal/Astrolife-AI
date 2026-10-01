@@ -87,7 +87,11 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
     assert.equal(audit.pattern, "DOUBLE_CONCERN", "Pattern must be DOUBLE_CONCERN when both are Vadha");
     assert.equal(audit.patternSeverity, "Concern");
     assert.equal(audit.layers[0].tara.name, "Vadha");
+    assert.equal(audit.layers[0].depth, 1);
+    assert.equal(audit.layers[0].basis, "CANONICAL");
     assert.equal(audit.layers[1].tara.name, "Vadha");
+    assert.equal(audit.layers[1].depth, 2);
+    assert.equal(audit.layers[1].basis, "CANONICAL_SOURCE");
     // Layer 3 should be skipped since Rahu's NL is Rahu (no redundant 3rd layer)
     assert.equal(audit.layers.length, 2, "3rd layer must be omitted when NL === NL's Lord");
   });
@@ -150,7 +154,7 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
   });
 
   // ── Case 5: Boundary Sensitivity & Proximity Detection ────────────────────
-  it("Case 5 — Boundary Proximity: Detects planets within 15' threshold", () => {
+  it("Case 5 — Boundary Proximity: Detects planets within 15' threshold and classifies severity", () => {
     // 13.333333° is the exact boundary between Ashwini and Bharani
     // Place a planet 5 arcminutes before the border: 13.333333° - (5/60)° = 13.25°
     const nearBoundaryLon = 13.333333 - 5 / 60;
@@ -159,7 +163,18 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
     const boundary = evaluateBoundaryProximity(nearBoundaryLon, jd, 15);
     assert.equal(boundary.isNearBoundary, true, "Must flag near-boundary for 5' distance");
     assert.ok(boundary.distanceArcMin <= 5.1 && boundary.distanceArcMin >= 4.9);
-    assert.ok(boundary.alertText?.includes("Boundary Sensitivity"));
+    assert.equal(boundary.severity, "HIGH", "Must mark HIGH severity when Ayanamsa shift alters star");
+    assert.equal(boundary.classificationChanged, true);
+    assert.ok(boundary.alertText?.includes("[HIGH SENSITIVITY]"));
+
+    // Test a position near boundary that does NOT shift Nakshatra between Lahiri and KP
+    // Place planet at 13.333333 + 12/60 = 13.533333° (firmly Bharani in both)
+    const lowBoundaryLon = 13.333333 + 12 / 60;
+    const lowBoundary = evaluateBoundaryProximity(lowBoundaryLon, jd, 15);
+    assert.equal(lowBoundary.isNearBoundary, true, "Must flag near-boundary within 15'");
+    assert.equal(lowBoundary.severity, "LOW", "Must mark LOW severity when star does not change");
+    assert.equal(lowBoundary.classificationChanged, false);
+    assert.ok(lowBoundary.alertText?.includes("[LOW / INFORMATIONAL]"));
   });
 
   // ── Mathematical Integrity & Absence of Arbitrary Multipliers ─────────────

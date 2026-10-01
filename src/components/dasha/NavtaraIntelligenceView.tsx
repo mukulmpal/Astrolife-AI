@@ -18,6 +18,7 @@ import {
   type DashaTransitWindow,
 } from "@/lib/astro-engine/transit-trigger";
 import type { SupportedAyanamsha } from "@/lib/astro-engine/ayanamsa-config";
+import { NakshatraChakraWheel } from "@/components/dasha/NakshatraChakraWheel";
 import {
   Shield,
   Sparkles,
@@ -31,6 +32,11 @@ import {
   Sliders,
   Layers,
   Feather,
+  Share2,
+  Copy,
+  Check,
+  PieChart,
+  Grid,
 } from "lucide-react";
 
 interface NavtaraIntelligenceViewProps {
@@ -48,12 +54,14 @@ export function NavtaraIntelligenceView({
 }: NavtaraIntelligenceViewProps) {
   const [selectedAyanamsa, setSelectedAyanamsa] =
     useState<SupportedAyanamsha>("Lahiri_Chitrapaksha");
+  const [viewMode, setViewMode] = useState<"WHEEL" | "GRID">("WHEEL");
   const [activeParyayaTab, setActiveParyayaTab] = useState<
     "ALL" | "PRATHAMA" | "DVITIYA" | "TRITIYA"
   >("ALL");
   const [showRuleTraces, setShowRuleTraces] = useState<boolean>(false);
   const [selectedChakraItem, setSelectedChakraItem] =
     useState<NavtaraMatrixItem | null>(null);
+  const [copiedRemedy, setCopiedRemedy] = useState<boolean>(false);
 
   // Compute Full Navtara Intelligence reactively based on chosen Ayanamsa
   const intel: FullNavtaraIntelligence = useMemo(() => {
@@ -201,11 +209,20 @@ export function NavtaraIntelligenceView({
             <AlertTriangle className="w-4 h-4 text-amber-600" />
             <span>Nakshatra Boundary Sensitivity Detected</span>
           </div>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             {intel.boundaryAlerts.map((b, idx) => (
-              <p key={idx} className="text-xs text-[#5C3D00] leading-relaxed">
-                • {b.alertText}
-              </p>
+              <div key={idx} className="flex items-start gap-2 text-xs text-[#5C3D00] leading-relaxed">
+                <span
+                  className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 uppercase tracking-wide ${
+                    b.severity === "HIGH"
+                      ? "bg-red-500/15 text-red-700 border border-red-500/30"
+                      : "bg-amber-500/15 text-amber-800 border border-amber-500/30"
+                  }`}
+                >
+                  {b.severity === "HIGH" ? "Ayanamsa Shift (HIGH)" : "Boundary Cusp (LOW)"}
+                </span>
+                <span>{b.alertText}</span>
+              </div>
             ))}
           </div>
         </section>
@@ -264,9 +281,16 @@ export function NavtaraIntelligenceView({
                   }}
                 >
                   <div className="flex items-center justify-between text-xs">
-                    <span className="uppercase tracking-widest font-bold text-[#6B635B]">
-                      Layer {idx + 1}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="uppercase tracking-widest font-bold text-[#6B635B]">
+                        Layer {idx + 1}
+                      </span>
+                      {layer.depth === 3 && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-700">
+                          Depth 3 · Experimental
+                        </span>
+                      )}
+                    </div>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         isDanger
@@ -440,9 +464,9 @@ export function NavtaraIntelligenceView({
         </div>
       </section>
 
-      {/* ── Interactive 3 Paryaya Chakra Table ── */}
+      {/* ── Interactive 3 Paryaya Chakra Section (Wheel & Grid) ── */}
       <section className="rounded-3xl border border-amber-900/15 bg-white p-6 shadow-sm flex flex-col gap-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-900/10 pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amber-900/10 pb-4">
           <div>
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-[#B8860B]" />
@@ -455,164 +479,228 @@ export function NavtaraIntelligenceView({
             </h3>
           </div>
 
-          {/* Paryaya Filter Tabs */}
-          <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-amber-900/10">
-            <button
-              onClick={() => setActiveParyayaTab("ALL")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeParyayaTab === "ALL"
-                  ? "bg-[#B8860B] text-white"
-                  : "text-[#6B635B] hover:text-[#1A1A1A]"
-              }`}
-            >
-              All 27 Stars
-            </button>
-            <button
-              onClick={() => setActiveParyayaTab("PRATHAMA")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeParyayaTab === "PRATHAMA"
-                  ? "bg-[#B8860B] text-white"
-                  : "text-[#6B635B] hover:text-[#1A1A1A]"
-              }`}
-            >
-              Prathama (1-9)
-            </button>
-            <button
-              onClick={() => setActiveParyayaTab("DVITIYA")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeParyayaTab === "DVITIYA"
-                  ? "bg-[#B8860B] text-white"
-                  : "text-[#6B635B] hover:text-[#1A1A1A]"
-              }`}
-            >
-              Dvitiya (10-18)
-            </button>
-            <button
-              onClick={() => setActiveParyayaTab("TRITIYA")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeParyayaTab === "TRITIYA"
-                  ? "bg-[#B8860B] text-white"
-                  : "text-[#6B635B] hover:text-[#1A1A1A]"
-              }`}
-            >
-              Tritiya (19-27)
-            </button>
+          {/* View Mode Toggle & Paryaya Filter Tabs */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* View Mode Switcher */}
+            <div className="flex items-center bg-[#FAF7F2] p-1 rounded-2xl border border-amber-900/10">
+              <button
+                onClick={() => setViewMode("WHEEL")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  viewMode === "WHEEL"
+                    ? "bg-[#B8860B] text-white shadow-sm"
+                    : "text-[#6B635B] hover:text-[#1A1A1A]"
+                }`}
+              >
+                <PieChart className="w-3.5 h-3.5" />
+                <span>Radial Chakra Wheel</span>
+              </button>
+              <button
+                onClick={() => setViewMode("GRID")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  viewMode === "GRID"
+                    ? "bg-[#B8860B] text-white shadow-sm"
+                    : "text-[#6B635B] hover:text-[#1A1A1A]"
+                }`}
+              >
+                <Grid className="w-3.5 h-3.5" />
+                <span>Matrix Grid</span>
+              </button>
+            </div>
+
+            {/* Paryaya Filter Tabs (shown when Grid is active) */}
+            {viewMode === "GRID" && (
+              <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-amber-900/10">
+                <button
+                  onClick={() => setActiveParyayaTab("ALL")}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    activeParyayaTab === "ALL"
+                      ? "bg-[#B8860B] text-white"
+                      : "text-[#6B635B] hover:text-[#1A1A1A]"
+                  }`}
+                >
+                  All 27
+                </button>
+                <button
+                  onClick={() => setActiveParyayaTab("PRATHAMA")}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    activeParyayaTab === "PRATHAMA"
+                      ? "bg-[#B8860B] text-white"
+                      : "text-[#6B635B] hover:text-[#1A1A1A]"
+                  }`}
+                >
+                  P1 (1-9)
+                </button>
+                <button
+                  onClick={() => setActiveParyayaTab("DVITIYA")}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    activeParyayaTab === "DVITIYA"
+                      ? "bg-[#B8860B] text-white"
+                      : "text-[#6B635B] hover:text-[#1A1A1A]"
+                  }`}
+                >
+                  P2 (10-18)
+                </button>
+                <button
+                  onClick={() => setActiveParyayaTab("TRITIYA")}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    activeParyayaTab === "TRITIYA"
+                      ? "bg-[#B8860B] text-white"
+                      : "text-[#6B635B] hover:text-[#1A1A1A]"
+                  }`}
+                >
+                  P3 (19-27)
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Chakra Table Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {displayedChakra.map((item) => {
-            const isBirth = item.isBirthStar;
-            const isSupport = item.isSupportStar;
-            const isConcern = [3, 5, 7].includes(item.taraNum);
-            const isSelected = selectedChakraItem?.targetNakshatra.id === item.targetNakshatra.id;
+        {/* View Mode 1: Interactive SVG Radial Chakra Wheel */}
+        {viewMode === "WHEEL" ? (
+          <NakshatraChakraWheel
+            intel={intel}
+            activeMD={activeMD}
+            activeAD={activeAD}
+            tp={tp}
+          />
+        ) : (
+          /* View Mode 2: Matrix Grid Table */
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {displayedChakra.map((item) => {
+                const isBirth = item.isBirthStar;
+                const isSupport = item.isSupportStar;
+                const isConcern = [3, 5, 7].includes(item.taraNum);
+                const isSelected =
+                  selectedChakraItem?.targetNakshatra.id === item.targetNakshatra.id;
 
-            return (
-              <button
-                key={item.targetNakshatra.id}
-                onClick={() =>
-                  setSelectedChakraItem((prev) =>
-                    prev?.targetNakshatra.id === item.targetNakshatra.id ? null : item
-                  )
-                }
-                className="text-left rounded-2xl p-3.5 flex flex-col justify-between gap-2.5 transition-all relative overflow-hidden"
-                style={{
-                  background: isSelected
-                    ? "rgba(184, 134, 11, 0.12)"
-                    : isConcern
-                    ? "rgba(239, 68, 68, 0.03)"
-                    : "#FFFFFF",
-                  border: `1px solid ${
-                    isSelected
-                      ? "#B8860B"
-                      : isConcern
-                      ? "rgba(239, 68, 68, 0.2)"
-                      : "rgba(184, 134, 11, 0.18)"
-                  }`,
-                }}
-              >
+                return (
+                  <button
+                    key={item.targetNakshatra.id}
+                    onClick={() =>
+                      setSelectedChakraItem((prev) =>
+                        prev?.targetNakshatra.id === item.targetNakshatra.id ? null : item
+                      )
+                    }
+                    className="text-left rounded-2xl p-3.5 flex flex-col justify-between gap-2.5 transition-all relative overflow-hidden"
+                    style={{
+                      background: isSelected
+                        ? "rgba(184, 134, 11, 0.12)"
+                        : isConcern
+                        ? "rgba(239, 68, 68, 0.03)"
+                        : "#FFFFFF",
+                      border: `1px solid ${
+                        isSelected
+                          ? "#B8860B"
+                          : isConcern
+                          ? "rgba(239, 68, 68, 0.2)"
+                          : "rgba(184, 134, 11, 0.18)"
+                      }`,
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-[#6B635B]">
+                        Pos #{item.countedPosition}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {isBirth && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-blue-700">
+                            JANMA
+                          </span>
+                        )}
+                        {isSupport && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700">
+                            27TH SHIELD
+                          </span>
+                        )}
+                        <span
+                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                            item.paryayaIntensity === "Peak"
+                              ? "bg-purple-500/15 text-purple-700"
+                              : item.paryayaIntensity === "Moderate"
+                              ? "bg-amber-500/15 text-amber-700"
+                              : "bg-slate-500/15 text-slate-700"
+                          }`}
+                        >
+                          {item.paryayaIntensity}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-bold text-[#1A1A1A] flex items-center justify-between">
+                        <span>{item.targetNakshatra.name}</span>
+                        <span className="text-xs font-semibold text-[#6B635B]">
+                          {tp(item.targetNakshatra.lord)}
+                        </span>
+                      </p>
+                      <p className="text-xs font-semibold text-[#B8860B] mt-0.5 flex items-center gap-1">
+                        <span>{item.tara.icon}</span>
+                        <span>
+                          {item.tara.name} (Tara #{item.taraNum})
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-[#6B635B] pt-1.5 border-t border-amber-900/10">
+                      <span>{item.targetNakshatra.tattva} Tattva</span>
+                      <span className="italic">{item.tara.category}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Detailed Drawer for Clicked Star in Grid */}
+            {selectedChakraItem && (
+              <div className="rounded-2xl bg-[#FAF7F2] p-5 border border-amber-900/20 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-[#6B635B]">
-                    Pos #{item.countedPosition}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {isBirth && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-blue-700">
-                        JANMA
-                      </span>
-                    )}
-                    {isSupport && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700">
-                        27TH SHIELD
-                      </span>
-                    )}
-                    <span
-                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                        item.paryayaIntensity === "Peak"
-                          ? "bg-purple-500/15 text-purple-700"
-                          : item.paryayaIntensity === "Moderate"
-                          ? "bg-amber-500/15 text-amber-700"
-                          : "bg-slate-500/15 text-slate-700"
-                      }`}
-                    >
-                      {item.paryayaIntensity}
+                  <h4 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
+                    <span>{selectedChakraItem.targetNakshatra.name} Nakshatra</span>
+                    <span className="text-xs font-normal text-[#6B635B]">
+                      (Counted Pos #{selectedChakraItem.countedPosition} · {selectedChakraItem.paryaya}{" "}
+                      Paryaya)
                     </span>
+                  </h4>
+                  <button
+                    onClick={() => setSelectedChakraItem(null)}
+                    className="text-xs font-bold text-[#6B635B] hover:text-[#1A1A1A]"
+                  >
+                    Close ✕
+                  </button>
+                </div>
+                <p className="text-xs text-[#1A1A1A] leading-relaxed">
+                  <strong>Tara Quality:</strong> {selectedChakraItem.tara.signification} —{" "}
+                  {selectedChakraItem.tara.practicalAdvice}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-[#6B635B]">
+                  <div>
+                    Devta:{" "}
+                    <strong className="text-[#1A1A1A]">
+                      {selectedChakraItem.targetNakshatra.devta}
+                    </strong>
+                  </div>
+                  <div>
+                    Animal:{" "}
+                    <strong className="text-[#1A1A1A]">
+                      {selectedChakraItem.targetNakshatra.animal}
+                    </strong>
+                  </div>
+                  <div>
+                    Bird:{" "}
+                    <strong className="text-[#1A1A1A]">
+                      {selectedChakraItem.targetNakshatra.bird}
+                    </strong>
+                  </div>
+                  <div>
+                    Tree:{" "}
+                    <strong className="text-[#1A1A1A]">
+                      {selectedChakraItem.targetNakshatra.tree}
+                    </strong>
                   </div>
                 </div>
-
-                <div>
-                  <p className="text-sm font-bold text-[#1A1A1A] flex items-center justify-between">
-                    <span>{item.targetNakshatra.name}</span>
-                    <span className="text-xs font-semibold text-[#6B635B]">
-                      {tp(item.targetNakshatra.lord)}
-                    </span>
-                  </p>
-                  <p className="text-xs font-semibold text-[#B8860B] mt-0.5 flex items-center gap-1">
-                    <span>{item.tara.icon}</span>
-                    <span>
-                      {item.tara.name} (Tara #{item.taraNum})
-                    </span>
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] text-[#6B635B] pt-1.5 border-t border-amber-900/10">
-                  <span>{item.targetNakshatra.tattva} Tattva</span>
-                  <span className="italic">{item.tara.category}</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Detailed Drawer for Clicked Star */}
-        {selectedChakraItem && (
-          <div className="rounded-2xl bg-[#FAF7F2] p-5 border border-amber-900/20 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
-                <span>{selectedChakraItem.targetNakshatra.name} Nakshatra</span>
-                <span className="text-xs font-normal text-[#6B635B]">
-                  (Counted Pos #{selectedChakraItem.countedPosition} · {selectedChakraItem.paryaya}{" "}
-                  Paryaya)
-                </span>
-              </h4>
-              <button
-                onClick={() => setSelectedChakraItem(null)}
-                className="text-xs font-bold text-[#6B635B] hover:text-[#1A1A1A]"
-              >
-                Close ✕
-              </button>
-            </div>
-            <p className="text-xs text-[#1A1A1A] leading-relaxed">
-              <strong>Tara Quality:</strong> {selectedChakraItem.tara.signification} —{" "}
-              {selectedChakraItem.tara.practicalAdvice}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-[#6B635B]">
-              <div>Devta: <strong className="text-[#1A1A1A]">{selectedChakraItem.targetNakshatra.devta}</strong></div>
-              <div>Animal: <strong className="text-[#1A1A1A]">{selectedChakraItem.targetNakshatra.animal}</strong></div>
-              <div>Bird: <strong className="text-[#1A1A1A]">{selectedChakraItem.targetNakshatra.bird}</strong></div>
-              <div>Tree: <strong className="text-[#1A1A1A]">{selectedChakraItem.targetNakshatra.tree}</strong></div>
-            </div>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -673,15 +761,63 @@ export function NavtaraIntelligenceView({
         {/* Card 6: Classical Rashi-Tattva Remedies */}
         {activeRemedy && (
           <div className="rounded-3xl border border-amber-900/15 bg-white p-6 shadow-sm flex flex-col gap-4">
-            <div className="flex items-center gap-2 border-b border-amber-900/10 pb-3">
-              <Flame className="w-5 h-5 text-[#B8860B]" />
-              <div>
-                <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">
-                  Rashi-Tattva Remedial Protocol
-                </p>
-                <h4 className="text-lg font-bold text-[#1A1A1A]">
-                  Tattva Vector: {activeRemedy.tattvaVector.sanskritName}
-                </h4>
+            <div className="flex items-center justify-between border-b border-amber-900/10 pb-3 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-[#B8860B]" />
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">
+                    Rashi-Tattva Remedial Protocol
+                  </p>
+                  <h4 className="text-lg font-bold text-[#1A1A1A]">
+                    Tattva Vector: {activeRemedy.tattvaVector.sanskritName}
+                  </h4>
+                </div>
+              </div>
+
+              {/* Share & Copy Buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => {
+                    const text = `✦ AstroLife Navtara Remedial Protocol ✦\nNative: ${chart.name || "Seeker"} · Janma: ${intel.birthNakshatra.name} (Pada ${intel.birthPada})\nActive Dasha: ${tp(audit?.activeMahadasha ?? activeRemedy.planet)} Mahadasha\nTattva Vector: ${activeRemedy.tattvaVector.sanskritName} (${activeRemedy.tattva})\nElemental Action: ${activeRemedy.tattvaVector.elementalAction}\nDirective: ${activeRemedy.harmonizationGuidance}\n${activeRemedy.specificPrescription ? `Prescription: ${activeRemedy.specificPrescription.substances.join(", ")} (${activeRemedy.specificPrescription.timingAndVessel})\n` : ""}27th Support Shield: ${intel.supportStarShield.nakshatra.name} (${intel.supportStarShield.anchors.devta})\nExplore: https://astrolife-ai.vercel.app/dashboard/dasha`;
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(text);
+                      setCopiedRemedy(true);
+                      setTimeout(() => setCopiedRemedy(false), 2500);
+                    }
+                    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                    window.open(waUrl, "_blank");
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#FAF7F2] border border-amber-900/15 text-[#4A4238] hover:text-[#1A1A1A] hover:bg-white transition-all shadow-sm"
+                  title="Share on WhatsApp"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-[#B8860B]" />
+                  <span>WhatsApp</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    const text = `✦ AstroLife Navtara Remedial Protocol ✦\nNative: ${chart.name || "Seeker"} · Janma: ${intel.birthNakshatra.name} (Pada ${intel.birthPada})\nActive Dasha: ${tp(audit?.activeMahadasha ?? activeRemedy.planet)} Mahadasha\nTattva Vector: ${activeRemedy.tattvaVector.sanskritName} (${activeRemedy.tattva})\nElemental Action: ${activeRemedy.tattvaVector.elementalAction}\nDirective: ${activeRemedy.harmonizationGuidance}\n${activeRemedy.specificPrescription ? `Prescription: ${activeRemedy.specificPrescription.substances.join(", ")} (${activeRemedy.specificPrescription.timingAndVessel})\n` : ""}27th Support Shield: ${intel.supportStarShield.nakshatra.name} (${intel.supportStarShield.anchors.devta})\nExplore: https://astrolife-ai.vercel.app/dashboard/dasha`;
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(text);
+                      setCopiedRemedy(true);
+                      setTimeout(() => setCopiedRemedy(false), 2500);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-[#FAF7F2] border border-amber-900/15 text-[#4A4238] hover:text-[#1A1A1A] transition-all shadow-sm"
+                  title="Copy protocol text"
+                >
+                  {copiedRemedy ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-[#6B635B]" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
 

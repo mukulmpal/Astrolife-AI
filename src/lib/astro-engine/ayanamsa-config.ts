@@ -25,6 +25,8 @@ export interface BoundaryAlert {
   lahiriNakshatra: NakshatraData;
   kpNakshatra: NakshatraData;
   shiftsAyanamsa: boolean;
+  classificationChanged: boolean;
+  severity: "HIGH" | "LOW";
   alertText?: string;
 }
 
@@ -95,13 +97,15 @@ export function evaluateBoundaryProximity(
 
   const isNearBoundary = distanceArcMin <= thresholdArcMin;
   const shiftsAyanamsa = lahiriNak.id !== kpNak.id;
+  const classificationChanged = shiftsAyanamsa;
+  const severity: "HIGH" | "LOW" = shiftsAyanamsa ? "HIGH" : "LOW";
 
   let alertText: string | undefined;
   if (isNearBoundary) {
     if (shiftsAyanamsa) {
-      alertText = `Boundary Sensitivity: Degree is within ${distanceArcMin.toFixed(1)}' of the star boundary. In Lahiri it falls in ${lahiriNak.name} (${lahiriNak.lord}), while in KP Ayanamsha it shifts to ${kpNak.name} (${kpNak.lord}).`;
+      alertText = `[HIGH SENSITIVITY] Degree is within ${distanceArcMin.toFixed(1)}' of the star boundary. In Lahiri it falls in ${lahiriNak.name} (${lahiriNak.lord}), while in KP Ayanamsha it shifts to ${kpNak.name} (${kpNak.lord}). Dasha calculations and Tara classifications diverge across systems.`;
     } else {
-      alertText = `Boundary Sensitivity: Position is within ${distanceArcMin.toFixed(1)}' of the cusp edge, but remains in ${lahiriNak.name} in both Lahiri and KP frames.`;
+      alertText = `[LOW / INFORMATIONAL] Position is within ${distanceArcMin.toFixed(1)}' of the boundary cusp, but remains in ${lahiriNak.name} in both Lahiri and KP frames.`;
     }
   }
 
@@ -112,6 +116,8 @@ export function evaluateBoundaryProximity(
     lahiriNakshatra: lahiriNak,
     kpNakshatra: kpNak,
     shiftsAyanamsa,
+    classificationChanged,
+    severity,
     alertText,
   };
 }

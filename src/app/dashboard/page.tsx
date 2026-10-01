@@ -17,6 +17,7 @@ import { isEliteEmail } from "@/lib/access";
 import { calculateCosmicPulse } from "@/lib/astro-engine/cosmic-pulse";
 import { buildRadarHorizons } from "@/lib/astro-engine/cosmic-pulse/forecast";
 import { CosmicPulseCard, CosmicRadar } from "@/components/cosmic-pulse";
+import { AajKaTaraCard } from "@/components/dasha/AajKaTaraCard";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -737,6 +738,11 @@ function DashboardContent() {
           {/* COSMIC PULSE INTELLIGENCE CARD */}
           <CosmicPulseCard pulse={dailyFeed.cosmicPulse} />
 
+          {/* AAJ KA TARA DAILY HOOK CARD */}
+          <div style={{ marginBottom: 24 }}>
+            <AajKaTaraCard chart={chart} />
+          </div>
+
           {/* COSMIC RADAR MULTI-HORIZON FORECAST */}
           <CosmicRadar horizons={dailyFeed.cosmicRadarHorizons} />
 
@@ -748,7 +754,7 @@ function DashboardContent() {
               </div>
               <div className="today-summary-hint">Open Transit Calculations →</div>
             </Link>
-            <Link href="/dashboard/dashas" className="today-summary-card">
+            <Link href="/dashboard/dasha" className="today-summary-card">
               <div className="today-summary-k">Dasha Cycle</div>
               <div className="today-summary-v">
                 Active {activeDasha.planet} MD {activeAntardasha ? `· ${activeAntardasha.planet} AD` : ""}.
