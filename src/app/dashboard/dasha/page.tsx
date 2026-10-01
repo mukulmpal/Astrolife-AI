@@ -22,7 +22,23 @@ import { useLanguage } from "@/lib/language-context";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { EngineGuidanceGrid, EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
 import { NavtaraIntelligenceView } from "@/components/dasha/NavtaraIntelligenceView";
+import {
+  runNavtaraIntelligence,
+  calculateTaraNumber,
+  getPlanetLon,
+  CLASSICAL_TARAS,
+} from "@/lib/astro-engine/navtara-engine";
+import { resolveNakshatraCoordinate } from "@/lib/astro-engine/ayanamsa-config";
 import "@/app/dashboard/shared.css";
+
+export interface TaraRowInfo {
+  taraNum: number;
+  taraName: string;
+  isAfflicted: boolean;
+  isJanma: boolean;
+  isSupportive: boolean;
+  starName: string;
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -74,7 +90,19 @@ function ActiveCard({
   );
 }
 
-function TimelineRow({ period, onClick, selected, tp }: { period: DashaPeriod; onClick: () => void; selected: boolean; tp: (n: string) => string }) {
+function TimelineRow({
+  period,
+  onClick,
+  selected,
+  tp,
+  taraInfo,
+}: {
+  period: DashaPeriod;
+  onClick: () => void;
+  selected: boolean;
+  tp: (n: string) => string;
+  taraInfo?: TaraRowInfo;
+}) {
   const color = LORD_COLOR[period.lord];
   const now = new Date();
   const isPast = period.endDate < now;
@@ -90,11 +118,30 @@ function TimelineRow({ period, onClick, selected, tp }: { period: DashaPeriod; o
     >
       <span className="text-xl w-7 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold text-[#1A1A1A] text-sm">{tp(period.lord)} Mahadasha</span>
           {period.isActive && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
-              style={{ background: color + "22", color }}>ACTIVE</span>
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+              style={{ background: color + "22", color }}
+            >
+              ACTIVE
+            </span>
+          )}
+          {taraInfo && (
+            <span
+              className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
+                taraInfo.isAfflicted
+                  ? "bg-red-500/15 text-red-700 border border-red-500/30"
+                  : taraInfo.isJanma
+                  ? "bg-orange-500/15 text-orange-700 border border-orange-500/30"
+                  : "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30"
+              }`}
+              title={`Lord in ${taraInfo.starName} · Tara #${taraInfo.taraNum} ${taraInfo.taraName}`}
+            >
+              <span>{taraInfo.isAfflicted ? "🔴" : taraInfo.isJanma ? "🟠" : "🟢"}</span>
+              <span>T{taraInfo.taraNum} {taraInfo.taraName}</span>
+            </span>
           )}
         </div>
         <p className="text-xs text-[#6B635B] mt-0.5">
@@ -111,7 +158,15 @@ function TimelineRow({ period, onClick, selected, tp }: { period: DashaPeriod; o
   );
 }
 
-function AntarRow({ period, tp }: { period: DashaPeriod; tp: (n: string) => string }) {
+function AntarRow({
+  period,
+  tp,
+  taraInfo,
+}: {
+  period: DashaPeriod;
+  tp: (n: string) => string;
+  taraInfo?: TaraRowInfo;
+}) {
   const color = LORD_COLOR[period.lord];
   const now = new Date();
   const isPast = period.endDate < now;
@@ -126,7 +181,24 @@ function AntarRow({ period, tp }: { period: DashaPeriod; tp: (n: string) => stri
     >
       <span className="text-base w-5 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-[#1A1A1A]">{tp(period.lord)}</span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-medium text-[#1A1A1A]">{tp(period.lord)}</span>
+          {taraInfo && (
+            <span
+              className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
+                taraInfo.isAfflicted
+                  ? "bg-red-500/15 text-red-700 border border-red-500/30"
+                  : taraInfo.isJanma
+                  ? "bg-orange-500/15 text-orange-700 border border-orange-500/30"
+                  : "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30"
+              }`}
+              title={`Lord in ${taraInfo.starName} · Tara #${taraInfo.taraNum} ${taraInfo.taraName}`}
+            >
+              <span>{taraInfo.isAfflicted ? "🔴" : taraInfo.isJanma ? "🟠" : "🟢"}</span>
+              <span>T{taraInfo.taraNum} {taraInfo.taraName}</span>
+            </span>
+          )}
+        </div>
         <p className="text-[11px] text-[#6B635B]">
           {formatDashaDate(period.startDate)} — {formatDashaDate(period.endDate)}
         </p>
@@ -161,6 +233,32 @@ export default function DashaPage() {
       }),
     [chart]
   );
+
+  const planetTaraMap = useMemo(() => {
+    const map = new Map<string, TaraRowInfo>();
+    if (!chart?.planets) return map;
+    try {
+      const intel = runNavtaraIntelligence(chart);
+      const birthId = intel.birthNakshatra.id;
+      for (const [pName, pData] of Object.entries(chart.planets)) {
+        const lon = getPlanetLon(pData);
+        const coord = resolveNakshatraCoordinate(lon, chart.jd, intel.selectedAyanamsa);
+        const taraNum = calculateTaraNumber(birthId, coord.nakshatra.id);
+        const tara = CLASSICAL_TARAS[taraNum];
+        map.set(pName, {
+          taraNum,
+          taraName: tara.name,
+          isAfflicted: [3, 5, 7].includes(taraNum),
+          isJanma: taraNum === 1,
+          isSupportive: [2, 4, 6, 8, 9].includes(taraNum),
+          starName: coord.nakshatra.name,
+        });
+      }
+    } catch (err) {
+      console.warn("[DashaPage] Failed to build planetTaraMap:", err);
+    }
+    return map;
+  }, [chart]);
 
   const navtara = useMemo(() => {
     if (!dashaTree) return null;
@@ -341,7 +439,14 @@ export default function DashaPage() {
 
             {/* Mahadasha Timeline */}
             <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
-              <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold mb-3">120-Year Mahadasha Timeline</p>
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">120-Year Mahadasha Timeline</p>
+                <div className="flex items-center gap-2 text-[10px] text-[#6B635B] font-medium flex-wrap">
+                  <span className="flex items-center gap-1">🟢 Supportive (2,4,6,8,9)</span>
+                  <span className="flex items-center gap-1">🟠 Janma (1)</span>
+                  <span className="flex items-center gap-1">🔴 Caution (3,5,7)</span>
+                </div>
+              </div>
               <div className="flex flex-col gap-2">
                 {dashaTree.timeline.map((period, i) => (
                   <TimelineRow
@@ -350,6 +455,7 @@ export default function DashaPage() {
                     selected={selectedMD === period.lord && dashaTree.timeline.indexOf(period) === dashaTree.timeline.findIndex(p => p.lord === period.lord)}
                     onClick={() => setSelectedMD(prev => prev === period.lord ? null : period.lord)}
                     tp={tp}
+                    taraInfo={planetTaraMap.get(period.lord)}
                   />
                 ))}
               </div>
@@ -358,15 +464,27 @@ export default function DashaPage() {
             {/* Antardasha for selected / current MD */}
             {selectedPeriod && (
               <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
-                <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold mb-1">
-                  Antardashas in {tp(selectedPeriod.md.lord)} Mahadasha
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                  <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">
+                    Antardashas in {tp(selectedPeriod.md.lord)} Mahadasha
+                  </p>
+                  {planetTaraMap.get(selectedPeriod.md.lord) && (
+                    <span className="text-[10px] font-bold text-[#6B635B]">
+                      MD Lord in {planetTaraMap.get(selectedPeriod.md.lord)?.starName} (T{planetTaraMap.get(selectedPeriod.md.lord)?.taraNum} {planetTaraMap.get(selectedPeriod.md.lord)?.taraName})
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-[#6B635B] mb-3">
                   {formatDashaDate(selectedPeriod.md.startDate)} — {formatDashaDate(selectedPeriod.md.endDate)}
                 </p>
                 <div className="flex flex-col gap-1.5">
                   {selectedPeriod.antardashas.map((ad, i) => (
-                    <AntarRow key={i} period={ad} tp={tp} />
+                    <AntarRow
+                      key={i}
+                      period={ad}
+                      tp={tp}
+                      taraInfo={planetTaraMap.get(ad.lord)}
+                    />
                   ))}
                 </div>
               </section>

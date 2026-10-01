@@ -58,6 +58,7 @@ import { calculateDestiny } from "./astro-engine/destiny";
 import { normalizeChartForTransit } from "./astro-engine/chart-normalize";
 import { calculateTransitReport } from "./astro-engine/transits";
 import { calculateEventRadarReport } from "./astro-engine/event-radar";
+import { runNavtaraIntelligence } from "./astro-engine/navtara-engine";
 import { createAstroPalmFusion } from "./palmistry/fusion/astro-palm-fusion";
 import type { AstroLifeFusionContext, AstroPalmFusionOutput, FusionInsight } from "./palmistry/fusion/fusion-types";
 import type { PalmRuleReport } from "./palmistry/types";
@@ -3179,6 +3180,120 @@ function pageNakshatra(chart: ChartData): string {
   </section>`;
 }
 
+// ── Navtara & 27th Support Star Raksha Kavach ─────────────────────────────
+function pageNavtaraAndShield(chart: ChartData): string {
+  try {
+    const intel = runNavtaraIntelligence(chart);
+    const shield = intel.supportStarShield;
+    const quality = intel.qualityProfile;
+    const audit = intel.dashaAudit;
+
+    const patternBadgeColor =
+      audit?.patternSeverity === "Concern"
+        ? "var(--crimson)"
+        : audit?.pattern === "SAVED_BY_ONE"
+        ? "var(--saffron)"
+        : "var(--jade)";
+
+    return `<section class="page dense">
+      ${pageRail("Navtara Intelligence & 27th Shield Star", "15")}
+      <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div class="section-title" style="margin-bottom:8px;">
+          <span class="section-num">13</span>
+          <h2>Navtara Intelligence &amp; 27th Shield Star</h2>
+        </div>
+
+        <!-- 27th Support Star Raksha Kavach Card -->
+        <div class="card gold-edge" style="padding:16px;background:rgba(201,169,97,0.06);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div>
+              <div class="kicker" style="color:var(--gold);margin-bottom:2px;">Permanent Raksha Kavach (Protector Star)</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold-bright);font-weight:700;">
+                ${esc(shield.nakshatra.name)} Nakshatra · Tara #9 Parama Mitra
+              </div>
+            </div>
+            <span class="badge" style="background:rgba(34,197,94,0.15);color:var(--jade);border:1px solid rgba(34,197,94,0.4);font-size:10px;padding:3px 8px;">
+              Shield Position #27
+            </span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
+            <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Sacred Flora</div>
+              <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.tree)}</div>
+            </div>
+            <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Sacred Fauna</div>
+              <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.animal)} / ${esc(shield.anchors.bird)}</div>
+            </div>
+            <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Deity</div>
+              <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.devta)}</div>
+            </div>
+            <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Sacred Symbol</div>
+              <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.symbol)}</div>
+            </div>
+          </div>
+
+          <div class="body-s" style="color:var(--ivory-mute);font-size:11px;line-height:1.5;font-style:italic;">
+            ${esc(shield.historicalExample)}
+          </div>
+        </div>
+
+        <!-- Two Column: Quality Profile & 3-Layer Dasha Audit -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <!-- Quality Profile -->
+          <div class="card" style="padding:14px;">
+            <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">Innate Internal Temperament</div>
+            <div style="font-size:16px;font-weight:700;color:var(--ivory-bright);margin-bottom:6px;">
+              ${esc(quality.temperamentTitle)}
+            </div>
+            <div class="body-s" style="line-height:1.55;color:var(--ivory-mute);margin-bottom:8px;">
+              Channels the foundational energy of preceding star lord <strong>${esc(quality.channellingLord)}</strong>.
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">
+              ${quality.coreTraits.map(t => `<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--surface);border:1px solid var(--line);color:var(--gold);">${esc(t)}</span>`).join("")}
+            </div>
+          </div>
+
+          <!-- Active Dasha Qualification Audit -->
+          <div class="card" style="padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div class="kicker" style="color:var(--violet);margin-bottom:0;">Dasha Navtara Audit</div>
+              ${audit ? `<span class="badge" style="font-size:9px;color:${patternBadgeColor};border-color:${patternBadgeColor};">${esc(audit.pattern)}</span>` : ""}
+            </div>
+            ${audit ? `
+              <div style="font-size:14px;font-weight:700;color:var(--ivory-bright);margin-bottom:4px;">
+                ${esc(audit.activeMahadasha)} Mahadasha ${audit.activeAntardasha ? `· ${esc(audit.activeAntardasha)} AD` : ""}
+              </div>
+              <div class="body-s" style="font-size:11px;line-height:1.5;color:var(--ivory-mute);margin-bottom:8px;">
+                ${esc(audit.patternDescription)}
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                ${audit.layers.map((l, idx) => `
+                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;padding:3px 6px;background:var(--surface);border-radius:4px;">
+                    <span>Layer ${idx + 1}: ${esc(l.planet)} in ${esc(l.nakshatra.name)}</span>
+                    <span style="font-weight:700;color:${l.isConcern ? 'var(--crimson)' : 'var(--jade)'};">T${l.tara.taraNum} ${esc(l.tara.name)}</span>
+                  </div>
+                `).join("")}
+              </div>
+            ` : `<div class="body-s">Active dasha audit unavailable.</div>`}
+          </div>
+        </div>
+
+        <div class="body-s" style="padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:6px;color:var(--ivory-mute);font-size:10.5px;line-height:1.5;">
+          <strong>Navtara Classical Rule:</strong> The 27 nakshatras unfold in 3 evolutionary cycles (Prathama, Dvitiya, Tritiya). In accordance with the Parashari transmission, when Mahadasha planets or transiting grahas activate auspicious Taras (2 Sampat, 4 Kshema, 6 Sadhaka, 8 Mitra, 9 Parama Mitra), life outcomes manifest fruitfully. Protective flora, fauna and deity contemplation neutralize afflicted Tara windows.
+        </div>
+      </div>
+      ${pageFoot("astrolife · cosmic blueprint", "Navtara")}
+    </section>`;
+  } catch (err) {
+    console.error("Failed to render pageNavtaraAndShield:", err);
+    return "";
+  }
+}
+
 // ============================================================
 // PHASE 2 — Per-Planet & Per-House Deep Dives
 // ============================================================
@@ -5089,6 +5204,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.lalkitab   ? safe(() => pageLalKitabTimingAndRemedy(chart), "Lal Kitab Timing & Remedy") : "",
     include.lalkitab   ? safe(() => pageLalKitabPlanetDomains(chart), "Lal Kitab Planet Domains") : "",
     include.nakshatra  ? safe(() => pageNakshatra(chart),   "Nakshatra")       : "",
+    include.nakshatra  ? safe(() => pageNavtaraAndShield(chart), "Navtara & 27th Shield Star") : "",
     ...lifeAreaPages,
     include.health     ? safe(() => pageHealth(chart),      "Health")          : "",
     include.psychology ? safe(() => pagePsychology(chart),  "Psychology")      : "",
