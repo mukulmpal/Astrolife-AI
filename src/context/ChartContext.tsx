@@ -16,6 +16,7 @@ import {
   clearCurrentChart,
 } from "@/lib/user-chart";
 import { createClient } from "@/lib/supabase/client";
+import { isEliteEmail, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
 
 export interface ChartContextValue {
   birth: BirthDetails;
@@ -23,6 +24,8 @@ export interface ChartContextValue {
   loading: boolean;
   hasUserChart: boolean;
   isDemoChart: boolean;
+  userTier: SubscriptionTier;
+  isElite: boolean;
   refreshChart: () => Promise<void>;
   setChartData: (newChart: ChartData) => void;
 }
@@ -34,6 +37,8 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
   const [chart, setChart] = useState<ChartData>(() => buildChart(PLACEHOLDER_BIRTH));
   const [hasUserChart, setHasUserChart] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userTier, setUserTier] = useState<SubscriptionTier>(() => (isFullAccessEnabled() ? "elite" : "free"));
+  const [isElite, setIsElite] = useState<boolean>(() => isFullAccessEnabled());
 
   const loadChart = useCallback(async () => {
     try {
@@ -45,6 +50,34 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
       } catch {
         // Fallback to anonymous/cached state if lock is held
       }
+
+      // ── Resolve user tier globally ──
+      let resolvedTier: SubscriptionTier = isFullAccessEnabled() ? "elite" : "free";
+      let resolvedElite = isFullAccessEnabled();
+
+      if (user) {
+        const userIsElite =
+          (user.email && isEliteEmail(user.email)) ||
+          (user as any).app_metadata?.subscription_tier === "elite" ||
+          (user as any).user_metadata?.subscription_tier === "elite";
+
+        if (userIsElite) {
+          resolvedTier = "elite";
+          resolvedElite = true;
+        } else {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("name,dob,tob,city,lat,lon,tz,subscription_tier")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          resolvedTier = normalizeTier(profile?.subscription_tier, user.email);
+          resolvedElite = resolvedTier === "elite";
+        }
+      }
+
+      setUserTier(resolvedTier);
+      setIsElite(resolvedElite);
 
       const accountChart = await loadPrimaryChartFromAccount(user);
       if (accountChart) {
@@ -124,9 +157,11 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
     loading,
     hasUserChart,
     isDemoChart: !hasUserChart,
+    userTier,
+    isElite,
     refreshChart: loadChart,
     setChartData,
-  }), [birth, chart, loading, hasUserChart, loadChart, setChartData]);
+  }), [birth, chart, loading, hasUserChart, userTier, isElite, loadChart, setChartData]);
 
   return <ChartContext.Provider value={value}>{children}</ChartContext.Provider>;
 }
@@ -137,4 +172,13 @@ export function useChartEngine(): ChartContextValue {
     throw new Error("useChartEngine must be used within a ChartProvider");
   }
   return context;
+}
+
+export function useUserTier(): { userTier: SubscriptionTier; isElite: boolean } {
+  const context = useContext(ChartContext);
+  if (!context) {
+    const full = isFullAccessEnabled();
+    return { userTier: full ? "elite" : "free", isElite: full };
+  }
+  return { userTier: context.userTier, isElite: context.isElite };
 }

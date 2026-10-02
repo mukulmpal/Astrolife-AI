@@ -1,9 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type YogaCategory, type PlanTier } from "@/lib/astro-engine/yogas";
 import { useUserChart } from "@/lib/user-chart";
-import { isFullAccessEnabled, isEliteEmail, normalizeTier } from "@/lib/access";
-import { createClient } from "@/lib/supabase/client";
+import { useUserTier } from "@/context/ChartContext";
 import { EngineHeader, EngineShell, EngineTrustPanel } from "@/components/engine/EngineShell";
 import { useLanguage } from "@/lib/language-context";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
@@ -17,74 +16,33 @@ const PLANET_ABBR: Record<string, string> = {
 
 export default function YogasPage() {
   const { birth, chart } = useUserChart();
+  const { userTier: contextTier } = useUserTier();
+  const userTier = (contextTier ?? "free") as PlanTier;
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all"|"present"|"doshas">("present");
   const [activeCategory, setActiveCategory] = useState<YogaCategory|"All">("All");
   const [expandedYoga, setExpandedYoga] = useState<string|null>(null);
-  const [userTier, setUserTier] = useState<PlanTier>(() => isFullAccessEnabled() ? "elite" : "free");
-  const [tierLoaded, setTierLoaded] = useState(false);
 
-  useEffect(() => {
-    if (isFullAccessEnabled()) {
-      setUserTier("elite");
-      setTierLoaded(true);
-      return;
+  const yogas = useMemo<YogaResult[]>(() => {
+    if (!chart?.planets) return [];
+    try {
+      return detectYogas(chart.planets as never, chart.lagnaNum, userTier);
+    } catch (e) {
+      console.error(e);
+      return [];
     }
+  }, [chart?.planets, chart?.lagnaNum, userTier]);
 
-    const loadTier = async () => {
-      try {
-        const supabase = createClient();
-        const { data } = await supabase.auth.getUser();
-        const user = data.user;
-        if (!user) {
-          setTierLoaded(true);
-          return;
-        }
-
-        const isElite = (user.email && isEliteEmail(user.email)) ||
-          (user as any).app_metadata?.subscription_tier === "elite" ||
-          (user as any).user_metadata?.subscription_tier === "elite";
-
-        if (isElite) {
-          setUserTier("elite");
-          setTierLoaded(true);
-          return;
-        }
-
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("subscription_tier")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        const effective = normalizeTier(profile?.subscription_tier, user.email);
-        setUserTier(effective as PlanTier);
-      } catch (err) {
-        console.warn("Failed to load user tier in yogas page:", err);
-      } finally {
-        setTierLoaded(true);
-      }
-    };
-
-    loadTier();
-  }, []);
+  const present = useMemo(() => yogas.filter((y) => y.present && !y.isDosha), [yogas]);
+  const doshas = useMemo(() => yogas.filter((y) => y.present && y.isDosha), [yogas]);
+  const all = useMemo(() => yogas.filter((y) => !y.isDosha), [yogas]);
+  const score = useMemo(() => calculateYogaScore(present), [present]);
 
   // Early return: empty state if no chart
   if (!birth.name || !chart?.planets) {
     const intro = engineIntros['yogas'];
     return <EngineEmptyState engineName={intro.title} whatItAnalyzes={intro.whatItAnalyzes} />;
   }
-  let yogas: YogaResult[] = [];
-  try {
-    yogas = detectYogas(chart.planets as never, chart.lagnaNum, userTier);
-  } catch(e) {
-    console.error(e);
-  }
-
-  const present  = yogas.filter(y=>y.present&&!y.isDosha);
-  const doshas   = yogas.filter(y=>y.present&&y.isDosha);
-  const all      = yogas.filter(y=>!y.isDosha);
-  const score = calculateYogaScore(present);
 
   const displayList = activeTab==="doshas" ? doshas :
                       activeTab==="present" ? present : all;

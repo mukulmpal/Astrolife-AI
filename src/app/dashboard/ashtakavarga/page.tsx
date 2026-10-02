@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import "@/app/dashboard/shared.css";
 import { calculateAshtakavarga } from "@/lib/astro-engine/ashtakavarga";
@@ -16,7 +16,12 @@ export default function AKVPage() {
   const binduColor = (v:number) =>
     v>=5?"#22c55e":v>=4?"#c8a030":v>=3?"#60a5fa":v>=1?"#f97316":"#ef4444";
 
-  if (!hasUserChart || !birth.name || !chart) {
+  const result = useMemo(() => {
+    if (!chart?.planets) return null;
+    return calculateAshtakavarga(chart.planets as never, chart.lagnaNum);
+  }, [chart?.planets, chart?.lagnaNum]);
+
+  if (!hasUserChart || !birth.name || !chart || !result) {
     return (
       <EngineEmptyState
         engineName="Ashtakavarga"
@@ -25,8 +30,6 @@ export default function AKVPage() {
       />
     );
   }
-
-  const result = calculateAshtakavarga(chart.planets as never, chart.lagnaNum);
 
   return (
     <EngineShell>

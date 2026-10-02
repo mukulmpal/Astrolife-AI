@@ -103,41 +103,9 @@ export default function KundliPage() {
   const [showLibrary, setShowLibrary] = useState(false);
   const [yogaSearch, setYogaSearch] = useState("");
   const [yogaFilter, setYogaFilter] = useState<"all" | "benefic" | "dosha" | "rare">("all");
-  const [userTier, setUserTier] = useState<PlanTier>(() => isFullAccessEnabled() ? "elite" : "free");
-  const { setChartData } = useChartEngine();
+  const { userTier: contextTier, setChartData } = useChartEngine();
+  const userTier = (contextTier ?? "free") as PlanTier;
   const { chart: primaryChart, loading: chartLoading, hasUserChart } = useUserChart();
-
-  useEffect(() => {
-    if (isFullAccessEnabled()) {
-      setUserTier("elite");
-      return;
-    }
-    const loadTier = async () => {
-      try {
-        const supabase = createClient();
-        const { data } = await supabase.auth.getUser();
-        const user = data.user;
-        if (!user) return;
-        const isElite = (user.email && isEliteEmail(user.email)) ||
-          (user as Record<string, unknown>).app_metadata && ((user as Record<string, unknown>).app_metadata as Record<string, unknown>).subscription_tier === "elite" ||
-          (user as Record<string, unknown>).user_metadata && ((user as Record<string, unknown>).user_metadata as Record<string, unknown>).subscription_tier === "elite";
-        if (isElite) {
-          setUserTier("elite");
-          return;
-        }
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("subscription_tier")
-          .eq("id", user.id)
-          .maybeSingle();
-        const effective = normalizeTier(profile?.subscription_tier, user.email);
-        setUserTier(effective as PlanTier);
-      } catch (err) {
-        console.warn("Failed to load user tier in kundli page:", err);
-      }
-    };
-    loadTier();
-  }, []);
 
   const saveChartToLibrary = async (data: ChartData) => {
     const supabase = createClient();

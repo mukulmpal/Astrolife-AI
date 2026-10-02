@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChartProofChatDrawer } from "@/components/chat/ChartProofChatDrawer";
-import astroBank from "@/data/astroBank.json";
 import { buildChart, type BirthDetails, saveCurrentChart, useChartEngine } from "@/lib/user-chart";
 import type { ChartData } from "@/lib/astro-engine/calculations";
 
@@ -109,44 +108,48 @@ export default function AstroBankPage() {
   const [search, setSearch] = useState<string>("");
   const [chatDrawerChart, setChatDrawerChart] = useState<ChartData | null>(null);
 
-  // ── Derived data ──────────────────────────────────────────────
+  const [meta, setMeta] = useState<{
+    countries: Array<{ name: string; count: number }>;
+    categoriesByCountry: Record<string, Array<{ name: string; count: number }>>;
+  } | null>(null);
+  const [personalities, setPersonalities] = useState<AstroBankEntry[]>([]);
+  const [loadingList, setLoadingList] = useState(false);
 
-  // Unique countries with count
-  const countryList = useMemo(() => {
-    const map = new Map<string, number>();
-    ((astroBank as unknown) as AstroBankEntry[]).forEach((p) => {
-      const c = (p as any).country;
-      if (c) map.set(c, (map.get(c) || 0) + 1);
-    });
-    return Array.from(map.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count); // most entries first
+  // Fetch metadata once on mount
+  useEffect(() => {
+    fetch("/api/astro-bank?type=meta")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.ok && json.data) setMeta(json.data);
+      })
+      .catch((err) => console.error("Failed to load astro bank meta:", err));
   }, []);
 
-  // Categories within selected country, with count
-  const categoryList = useMemo(() => {
-    if (!country) return [];
-    const map = new Map<string, number>();
-    ((astroBank as unknown) as AstroBankEntry[]).forEach((p) => {
-      if ((p as any).country === country) {
-        map.set(p.category, (map.get(p.category) || 0) + 1);
-      }
-    });
-    return Array.from(map.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [country]);
+  const countryList = meta?.countries ?? [];
+  const categoryList = (country && meta?.categoriesByCountry[country]) ?? [];
 
-  // Filtered personalities (only when both country & category selected)
-  const filtered = useMemo(() => {
-    if (!country || !category) return [];
-    return ((astroBank as unknown) as AstroBankEntry[]).filter((p) => {
-      const matchesCountry = (p as any).country === country;
-      const matchesCategory = p.category === category;
-      const matchesSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
-      return matchesCountry && matchesCategory && matchesSearch;
+  // Fetch filtered personalities on demand
+  useEffect(() => {
+    if (!country || !category) {
+      setPersonalities([]);
+      return;
+    }
+    setLoadingList(true);
+    const params = new URLSearchParams({
+      country,
+      category,
+      ...(search ? { search } : {}),
     });
-  }, [search, category, country]);
+    fetch(`/api/astro-bank?${params.toString()}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.ok && json.data) setPersonalities(json.data);
+      })
+      .catch((err) => console.error("Failed to load personalities:", err))
+      .finally(() => setLoadingList(false));
+  }, [country, category, search]);
+
+  const filtered = personalities;
 
   // ── Handlers ──────────────────────────────────────────────────
 
@@ -339,50 +342,56 @@ export default function AstroBankPage() {
               className="px-4 py-2.5 rounded-xl bg-[#FFFFFF] border border-[rgba(184,134,11,0.25)] focus:border-[#B8860B] text-sm text-[#1A1A1A] placeholder-[#6B635B] outline-none w-72 shadow-sm"
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-            {filtered.map((person) => (
-              <div
-                key={person.name}
-                onClick={() => handleOpenKundli(person)}
-                className="group cursor-pointer rounded-2xl border border-[rgba(184,134,11,0.22)] hover:border-[rgba(184,134,11,0.45)] bg-[#FFFFFF] hover:bg-[#FAF8F5] transition-all overflow-hidden shadow-sm"
-                style={{ transition: "all 0.25s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-              >
-                {/* Card body */}
-                <div className="p-6">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="text-lg font-semibold text-[#1A1A1A] group-hover:text-[#B8860B] transition-colors" style={{ fontFamily: "Cormorant Garamond, serif" }}>
-                      {person.name}
+          {loadingList ? (
+            <div className="p-12 text-center text-[#B8860B] animate-pulse font-medium">
+              Loading personalities from AstroBank…
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+              {filtered.map((person) => (
+                <div
+                  key={person.name}
+                  onClick={() => handleOpenKundli(person)}
+                  className="group cursor-pointer rounded-2xl border border-[rgba(184,134,11,0.22)] hover:border-[rgba(184,134,11,0.45)] bg-[#FFFFFF] hover:bg-[#FAF8F5] transition-all overflow-hidden shadow-sm"
+                  style={{ transition: "all 0.25s" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                >
+                  {/* Card body */}
+                  <div className="p-6">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="text-lg font-semibold text-[#1A1A1A] group-hover:text-[#B8860B] transition-colors" style={{ fontFamily: "Cormorant Garamond, serif" }}>
+                        {person.name}
+                      </div>
+                      <span className="text-[10px] uppercase font-mono px-2.5 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] flex-shrink-0 font-bold">
+                        {formatDisplayName(person.category)}
+                      </span>
                     </div>
-                    <span className="text-[10px] uppercase font-mono px-2.5 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] flex-shrink-0 font-bold">
-                      {formatDisplayName(person.category)}
+
+                    <div className="flex items-center gap-4 text-sm text-[#3D3834] mt-3 font-medium">
+                      <span>📅 {person.birthDate}</span>
+                      <span>⏰ {person.birthTime}</span>
+                    </div>
+                    <div className="text-sm text-[#6B635B] mt-2 font-medium">📍 {person.birthPlace}</div>
+                  </div>
+
+                  {/* Card footer */}
+                  <div className="px-6 py-4 border-t border-[rgba(184,134,11,0.18)] flex items-center justify-between gap-3 bg-[#FAF8F5]">
+                    <span className="text-sm font-semibold text-[#B8860B] group-hover:underline flex items-center gap-1.5">
+                      <span>🔯 Open Full Kundli</span>
+                      <span>→</span>
                     </span>
+                    <button
+                      onClick={(e) => handleOpenChat(e, person)}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[rgba(184,134,11,0.25)] text-[#1A1A1A] hover:text-[#B8860B] hover:border-[#B8860B] transition-colors font-bold shadow-sm"
+                    >
+                      💬 Ask AI
+                    </button>
                   </div>
-
-                  <div className="flex items-center gap-4 text-sm text-[#3D3834] mt-3 font-medium">
-                    <span>📅 {person.birthDate}</span>
-                    <span>⏰ {person.birthTime}</span>
-                  </div>
-                  <div className="text-sm text-[#6B635B] mt-2 font-medium">📍 {person.birthPlace}</div>
                 </div>
-
-                {/* Card footer */}
-                <div className="px-6 py-4 border-t border-[rgba(184,134,11,0.18)] flex items-center justify-between gap-3 bg-[#FAF8F5]">
-                  <span className="text-sm font-semibold text-[#B8860B] group-hover:underline flex items-center gap-1.5">
-                    <span>🔯 Open Full Kundli</span>
-                    <span>→</span>
-                  </span>
-                  <button
-                    onClick={(e) => handleOpenChat(e, person)}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[rgba(184,134,11,0.25)] text-[#1A1A1A] hover:text-[#B8860B] hover:border-[#B8860B] transition-colors font-bold shadow-sm"
-                  >
-                    💬 Ask AI
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </>
       )}
 

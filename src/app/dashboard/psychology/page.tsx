@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { EngineIntro, EngineEmptyState } from "@/components/engine/engine-intro";
 import { engineIntros } from "@/data/engine-intros";
 import "@/app/dashboard/shared.css";
@@ -46,9 +46,18 @@ export default function PsychPage() {
   const [expanded, setExpanded] = useState<string|null>(null);
   const { birth, chart } = useUserChart();
   const { t } = useLanguage();
-  const result = calculatePsychology(chart.planets as never);
-  const P = result.pattern;
 
+  const result = useMemo(() => {
+    if (!chart?.planets) return null;
+    return calculatePsychology(chart.planets as never);
+  }, [chart?.planets]);
+
+  if (!birth.name || !result) {
+    const intro = engineIntros['psychology'];
+    return <EngineEmptyState engineName={intro.title} whatItAnalyzes={intro.whatItAnalyzes} />;
+  }
+
+  const P = result.pattern;
   const radarColors = ["#ef4444","#a78bfa","#f59e0b","#22c55e","#f59e0b","#ec4899"];
 
   const idxCards = [
@@ -59,11 +68,6 @@ export default function PsychPage() {
 
   const strongCount = result.planets.filter(p=>p.status==="Strong").length;
   const weakCount   = result.planets.filter(p=>p.status==="Weak/Blocked").length;
-
-  if (!birth.name) {
-    const intro = engineIntros['psychology'];
-    return <EngineEmptyState engineName={intro.title} whatItAnalyzes={intro.whatItAnalyzes} />;
-  }
 
   return (
     <div className="page">

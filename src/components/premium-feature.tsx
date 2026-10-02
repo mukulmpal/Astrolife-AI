@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { isBillingEnforced, isEliteEmail, isFullAccessEnabled, normalizeTier } from "@/lib/access";
+import { isBillingEnforced, isFullAccessEnabled } from "@/lib/access";
+import { useUserTier } from "@/context/ChartContext";
 
 type PremiumFeatureProps = {
   children: React.ReactNode;
@@ -11,48 +10,17 @@ type PremiumFeatureProps = {
 };
 
 export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
-  const [supabase] = useState(() => createClient());
-  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const { userTier } = useUserTier();
   const fullAccess = isFullAccessEnabled();
-
-  useEffect(() => {
-    if (fullAccess) return;
-
-    const loadTier = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) return;
-
-      const isElite = (data.user.email && isEliteEmail(data.user.email)) ||
-        (data.user as any).app_metadata?.subscription_tier === "elite" ||
-        (data.user as any).user_metadata?.subscription_tier === "elite";
-
-      if (isElite) {
-        setSubscriptionTier("elite");
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("subscription_tier")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      setSubscriptionTier(normalizeTier(profile?.subscription_tier, data.user.email));
-    };
-
-    loadTier();
-  }, [fullAccess, supabase]);
-
 
   if (fullAccess) {
     return <>{children}</>;
   }
 
   const enforced = isBillingEnforced();
-  const currentTier = normalizeTier(subscriptionTier);
-  const isPremium = currentTier !== "free";
+  const isPremium = userTier !== "free";
   const isLocked = enforced && !isPremium;
-  const planLabel = currentTier.toUpperCase();
+  const planLabel = userTier.toUpperCase();
 
   return (
     <>

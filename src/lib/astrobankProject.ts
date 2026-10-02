@@ -6,7 +6,7 @@ import path from 'path';
  * Expected location: <project_root>/src/data/astro-data-bank-main/astroBank.json
  */
 export async function fetchProjectAstroBank() {
-  const filePath = path.join(process.cwd(), 'src', 'data', 'astro-data-bank-main', 'astroBank.json');
+  const filePath = path.join(process.cwd(), 'src', 'data', 'astroBank.json');
   try {
     const raw = await fs.readFile(filePath, 'utf8');
     return JSON.parse(raw);

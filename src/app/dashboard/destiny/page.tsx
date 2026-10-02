@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import "@/app/dashboard/shared.css";
 import { calculateADDestiny, calculateDestiny } from "@/lib/astro-engine/destiny";
 import type { ADDestinyBand, AntardashaDestinyResult, DashaBand } from "@/lib/astro-engine/destiny";
@@ -258,19 +258,31 @@ export default function DestinyPage() {
   const [dashaView, setDashaView] = useState<"md"|"ad">("md");
   const [selectedMdIndex, setSelectedMdIndex] = useState(0);
   const { birth, chart, hasUserChart } = useUserChart();
-  const { t } = useLanguage();
-  const result = calculateDestiny(chart.planets as never, chart.dashas, birth.dob, chart.lagnaNum ?? 0);
-  const selectedMd = result.bands[selectedMdIndex] ?? result.bands.find((band) => band.startAge <= result.currentAge && result.currentAge < band.endAge) ?? result.bands[0];
-  const adResult = selectedMd
-    ? calculateADDestiny(
-        selectedMd.planet,
-        selectedMd.start,
-        selectedMd.end,
-        (selectedMd.end.getTime() - selectedMd.start.getTime()) / (365.25 * 24 * 3600 * 1000),
-        chart.planets as never,
-        chart.lagnaNum ?? 0,
-      )
-    : null;
+  const result = useMemo(() => {
+    if (!chart?.planets || !chart?.dashas) return null;
+    return calculateDestiny(chart.planets as never, chart.dashas, birth.dob, chart.lagnaNum ?? 0);
+  }, [chart?.planets, chart?.dashas, birth.dob, chart?.lagnaNum]);
+
+  const selectedMd = useMemo(() => {
+    if (!result) return null;
+    return (
+      result.bands[selectedMdIndex] ??
+      result.bands.find((band) => band.startAge <= result.currentAge && result.currentAge < band.endAge) ??
+      result.bands[0]
+    );
+  }, [result, selectedMdIndex]);
+
+  const adResult = useMemo(() => {
+    if (!selectedMd || !chart?.planets) return null;
+    return calculateADDestiny(
+      selectedMd.planet,
+      selectedMd.start,
+      selectedMd.end,
+      (selectedMd.end.getTime() - selectedMd.start.getTime()) / (365.25 * 24 * 3600 * 1000),
+      chart.planets as never,
+      chart.lagnaNum ?? 0,
+    );
+  }, [selectedMd, chart?.planets, chart?.lagnaNum]);
 
   // Draw canvas curve
   useEffect(() => {
@@ -352,7 +364,7 @@ export default function DestinyPage() {
     }
   }, [result]);
 
-  if (!hasUserChart || !birth.name) {
+  if (!hasUserChart || !birth.name || !result) {
     return (
       <EngineEmptyState
         engineName="Destiny Timeline"

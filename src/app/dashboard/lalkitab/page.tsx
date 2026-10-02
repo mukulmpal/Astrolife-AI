@@ -230,18 +230,29 @@ export default function LalKitabPage() {
       ),
     [chart.planets, safeDob, chart, lkTargetDate],
   );
-  const timeResult = calculateLalKitabTimeEngine({
-    dob: safeDob,
-    planets: chart.planets,
-    lagnaNum: (chart as never as { lagnaNum?: number }).lagnaNum ?? 0,
-    targetDate: lkTargetDate,
-  });
+  const timeResult = useMemo(
+    () =>
+      calculateLalKitabTimeEngine({
+        dob: safeDob,
+        planets: chart.planets,
+        lagnaNum: (chart as never as { lagnaNum?: number }).lagnaNum ?? 0,
+        targetDate: lkTargetDate,
+      }),
+    [safeDob, chart.planets, chart, lkTargetDate],
+  );
   const natalLagnaIndex = (chart as never as { lagnaNum?: number }).lagnaNum ?? 0;
-  const natalChart = buildShiftedPlanets(chart.planets, 0);
-  const varshChart = buildShiftedPlanets(chart.planets, timeResult.varshphal.yearShift);
-  const monthlyChart = buildShiftedPlanets(
-    chart.planets,
-    timeResult.varshphal.yearShift + timeResult.monthlyPhal.monthIndex,
+  const natalChart = useMemo(() => buildShiftedPlanets(chart.planets, 0), [chart.planets]);
+  const varshChart = useMemo(
+    () => buildShiftedPlanets(chart.planets, timeResult.varshphal.yearShift),
+    [chart.planets, timeResult.varshphal.yearShift],
+  );
+  const monthlyChart = useMemo(
+    () =>
+      buildShiftedPlanets(
+        chart.planets,
+        timeResult.varshphal.yearShift + timeResult.monthlyPhal.monthIndex,
+      ),
+    [chart.planets, timeResult.varshphal.yearShift, timeResult.monthlyPhal.monthIndex],
   );
 
   const pakkaCount   = result.planets.filter(p => p.status === "pakka").length;

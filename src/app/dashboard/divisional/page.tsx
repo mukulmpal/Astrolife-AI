@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import "@/app/dashboard/shared.css";
 import {
@@ -142,21 +142,28 @@ function MiniChart({ chart }: { chart: DivChart }) {
 export default function DivisionalPage() {
   const [activeChart, setActiveChart] = useState("D9");
   const { birth, chart, hasUserChart } = useUserChart();
-  const { t } = useLanguage();
+  const divs = useMemo(() => {
+    if (!chart?.planets) return [];
+    return calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
+  }, [chart?.planets, chart?.lagnaNum, chart?.lagnaLon]);
 
-  const divs     = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
-  const current  = divs.find(d=>d.key===activeChart) || divs[0];
-  const analysis = getChartAnalysis(current);
-  const findings = getSpecialFindings(divs);
-  const color    = CHART_COLORS[current.key] ?? "#a855f7";
-  const meta     = CHART_META[current.key];
-  const universal = analyzeUniversalShodashaVarga({
-    language: "hinglish",
-    birthTimeConfidence: 86,
-    charts: divs,
-    dasha: extractDashaInput(chart),
-  });
-  const currentUniversal = universal.sections.find((section) => section.chart === current.key);
+  const findings = useMemo(() => (divs.length ? getSpecialFindings(divs) : []), [divs]);
+
+  const universal = useMemo(() => {
+    if (!divs.length || !chart) return null;
+    return analyzeUniversalShodashaVarga({
+      language: "hinglish",
+      birthTimeConfidence: 86,
+      charts: divs,
+      dasha: extractDashaInput(chart),
+    });
+  }, [divs, chart]);
+
+  const current = useMemo(() => divs.find(d => d.key === activeChart) || divs[0], [divs, activeChart]);
+  const analysis = useMemo(() => current ? getChartAnalysis(current) : null, [current]);
+  const color = current ? CHART_COLORS[current.key] ?? "#a855f7" : "#a855f7";
+  const meta = current ? CHART_META[current.key] : null;
+  const currentUniversal = useMemo(() => universal?.sections.find((section) => section.chart === current?.key), [universal, current?.key]);
 
   if (!hasUserChart || !birth.name) {
     return (

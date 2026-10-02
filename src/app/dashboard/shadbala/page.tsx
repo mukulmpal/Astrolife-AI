@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import "@/app/dashboard/shared.css";
 import { calculateShadbala, getShadbalaRadar, type ShadbalaPlanet } from "@/lib/astro-engine/shadbala";
@@ -65,7 +65,15 @@ export default function ShadbalaPage() {
     { key:"drikBala",    label:"Drik",   max:8  },
   ];
 
-  if (!hasUserChart || !birth.name || !chart) {
+  const result = useMemo(() => {
+    if (!chart?.planets) return null;
+    const [hourStr, minStr] = (birth.tob || "12:00").split(":");
+    const parsedHour = parseInt(hourStr, 10) + (parseInt(minStr, 10) || 0) / 60;
+    const birthHourLocal = Number.isFinite(parsedHour) ? parsedHour : 12;
+    return calculateShadbala(chart.planets as never, birthHourLocal);
+  }, [chart?.planets, birth.tob]);
+
+  if (!hasUserChart || !birth.name || !chart || !result) {
     return (
       <EngineEmptyState
         engineName="Shadbala"
@@ -74,11 +82,6 @@ export default function ShadbalaPage() {
       />
     );
   }
-
-  const [hourStr, minStr] = (birth.tob || "12:00").split(":");
-  const parsedHour = parseInt(hourStr, 10) + (parseInt(minStr, 10) || 0) / 60;
-  const birthHourLocal = Number.isFinite(parsedHour) ? parsedHour : 12;
-  const result = calculateShadbala(chart.planets as never, birthHourLocal);
 
   return (
     <EngineShell>
