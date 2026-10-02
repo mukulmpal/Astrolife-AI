@@ -4,7 +4,7 @@ import { useEffect, useState, useContext } from "react";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 export type { ChartData };
 import { createClient } from "@/lib/supabase/client";
-import { ChartContext, useChartEngine } from "@/context/ChartContext";
+import { ChartContext, useChartEngine, type ChartContextValue } from "@/context/ChartContext";
 export { useChartEngine };
 
 export interface BirthDetails {
@@ -640,112 +640,30 @@ export function formatChartContext(chart: ChartData): string {
   return `Name: ${chart.name}, DOB: ${chart.dob}, TOB: ${chart.tob}, City: ${chart.city}, Ascendant: ${chart.lagnaRashi} (${chart.lagnaLon.toFixed(1)}°), Placements: ${planetSummary}, Active Dasha: ${dashaLabel}`;
 }
 
-export function useUserChart() {
+let defaultFallbackChart: ChartData | null = null;
+function getDefaultPlaceholderChart(): ChartData {
+  if (!defaultFallbackChart) {
+    defaultFallbackChart = buildChart(PLACEHOLDER_BIRTH);
+  }
+  return defaultFallbackChart;
+}
+
+export function useUserChart(): ChartContextValue {
   const context = useContext(ChartContext);
-
-  // Standalone fallback state if invoked outside of ChartProvider
-  const [birth, setBirth] = useState<BirthDetails>(EMPTY_BIRTH);
-  const [chart, setChart] = useState<ChartData>(() => buildChart(PLACEHOLDER_BIRTH));
-  const [hasUserChart, setHasUserChart] = useState(false);
-  const [loading, setLoading] = useState(!context);
-
-  useEffect(() => {
-    // If mounted inside ChartProvider, global state is already managed and loaded
-    if (context) return;
-
-    let cancelled = false;
-
-    const loadChart = async () => {
-      try {
-        const supabase = createClient();
-        let user = null;
-        try {
-          const authRes = await supabase.auth.getUser();
-          user = authRes.data?.user ?? null;
-        } catch {
-          // Fallback to anonymous/cached state if lock is held
-        }
-        const accountChart = await loadPrimaryChartFromAccount(user);
-        if (accountChart) {
-          saveCurrentChart(accountChart);
-          if (!cancelled) {
-            setBirth(getBirthFromChart(accountChart));
-            setChart(accountChart);
-            setHasUserChart(true);
-            setLoading(false);
-          }
-          return;
-        }
-
-        if (user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("name,dob,tob,city,lat,lon,tz")
-            .eq("id", user.id)
-            .maybeSingle();
-
-          const profileBirth = getProfileBirth(profile);
-          if (profileBirth) {
-            const nextChart = buildChart(profileBirth);
-            await saveChartToAccount(nextChart, { replacePrimary: true });
-            if (!cancelled) {
-              setBirth(profileBirth);
-              setChart(nextChart);
-              setHasUserChart(true);
-              setLoading(false);
-            }
-            return;
-          }
-
-          const deviceChart = loadCurrentChartFromDevice();
-          if (deviceChart) {
-            await saveChartToAccount(deviceChart, { replacePrimary: true });
-            if (!cancelled) {
-              setBirth(getBirthFromChart(deviceChart));
-              setChart(deviceChart);
-              setHasUserChart(true);
-              setLoading(false);
-            }
-            return;
-          }
-
-          clearCurrentChart();
-          if (!cancelled) {
-            setHasUserChart(false);
-            setLoading(false);
-          }
-          return;
-        }
-
-        const storedChart = loadCurrentChartFromDevice();
-        if (storedChart) {
-          if (!cancelled) {
-            setBirth(getBirthFromChart(storedChart));
-            setChart(storedChart);
-            setHasUserChart(true);
-            setLoading(false);
-          }
-          return;
-        }
-      } catch (error) {
-        console.error("User chart load error:", error);
-      }
-
-      if (!cancelled) {
-        setHasUserChart(false);
-        setLoading(false);
-      }
-    };
-
-    loadChart();
-    return () => {
-      cancelled = true;
-    };
-  }, [context]);
-
   if (context) {
     return context;
   }
 
-  return { birth, chart, loading, hasUserChart, isDemoChart: !hasUserChart };
+  // Graceful static fallback if invoked outside of ChartProvider (e.g. in tests)
+  return {
+    birth: EMPTY_BIRTH,
+    chart: getDefaultPlaceholderChart(),
+    loading: false,
+    hasUserChart: false,
+    isDemoChart: true,
+    userTier: "free",
+    isElite: false,
+    refreshChart: async () => {},
+    setChartData: () => {},
+  };
 }

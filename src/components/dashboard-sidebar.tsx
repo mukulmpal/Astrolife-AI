@@ -18,6 +18,7 @@ import {
 
 import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
+import { useUserTier } from "@/context/ChartContext";
 
 type NavItem = { label: string; href: string; Icon: LucideIcon };
 type NavGroup = { label: string; items: NavItem[] };
@@ -98,40 +99,26 @@ export function DashboardSidebar() {
   const router = useRouter();
   const { birth } = useUserChart();
   const userName = birth.name?.split(" ")[0] || "Seeker";
-  const [isElite, setIsElite] = useState(false);
+  const { isElite } = useUserTier();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const checkStatus = async () => {
+    let cancelled = false;
+    const checkAdmin = async () => {
       try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user ?? null;
-        if (user) {
-          const { isEliteEmail, isAdminUser } = await import("@/lib/access");
+        if (user?.email && !cancelled) {
+          const { isAdminUser } = await import("@/lib/access");
           if (isAdminUser(user.email)) {
             setIsAdmin(true);
-          }
-          if (
-            (user.email && isEliteEmail(user.email)) ||
-            (user as any).app_metadata?.subscription_tier === "elite" ||
-            (user as any).user_metadata?.subscription_tier === "elite"
-          ) {
-            setIsElite(true);
-            return;
-          }
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("subscription_tier")
-            .eq("id", user.id)
-            .maybeSingle();
-          if (profile?.subscription_tier === "elite") {
-            setIsElite(true);
           }
         }
       } catch {}
     };
-    checkStatus();
+    checkAdmin();
+    return () => { cancelled = true; };
   }, []);
 
 

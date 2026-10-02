@@ -142,12 +142,11 @@ export default function TransitPage() {
   return (
     <main className="tr-wrap">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap');
-        .tr-wrap{min-height:100vh;background:#FAF7F2;color:#1A1A1A;padding:30px 22px 110px;font-family:'Outfit',sans-serif}
+        .tr-wrap{min-height:100vh;background:#FAF7F2;color:#1A1A1A;padding:30px 22px 110px;font-family:var(--font-outfit),'Outfit',sans-serif}
         .tr-shell{max-width:1120px;margin:0 auto;display:grid;gap:16px}
         .tr-hero{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:18px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .tr-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#B8860B;margin-bottom:8px;font-weight:700}
-        .tr-title{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1.1;color:#1A1A1A}
+        .tr-title{font-family:var(--font-cormorant),'Cormorant Garamond',serif;font-size:34px;line-height:1.1;color:#1A1A1A}
         .tr-sub{font-size:13px;color:#6B635B;margin-top:6px}
         .tr-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
         .tr-switch{display:flex;gap:8px;flex-wrap:wrap}

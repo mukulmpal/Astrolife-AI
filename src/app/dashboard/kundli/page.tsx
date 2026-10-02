@@ -84,28 +84,55 @@ export default function KundliPage() {
     tz: null as number | null,
   });
   const [selectedCity, setSelectedCity] = useState<CitySearchResult | null>(null);
-  const [chart, setChart] = useState<ChartData | null>(null);
-  const [divCharts, setDivCharts] = useState<DivChart[]>([]);
-  const [yogas, setYogas] = useState<YogaResult[]>([]);
-  const [yogaScore, setYogaScore] = useState<{ total: number; rating: string; rareCount: number }>({
-    total: 0,
-    rating: "",
-    rareCount: 0,
-  });
-  const [shadbala, setShadbala] = useState<ShadbalaResult | null>(null);
-  const [mangalDosha, setMangalDosha] = useState<MangalDoshaInsight | null>(null);
+  const { userTier: contextTier, setChartData } = useChartEngine();
+  const userTier = (contextTier ?? "free") as PlanTier;
+  const { chart: primaryChart, loading: chartLoading, hasUserChart } = useUserChart();
+  const [chart, setChart] = useState<ChartData | null>(() => (hasUserChart && primaryChart) ? primaryChart : null);
   const [loading, setLoading] = useState(false);
   const [libraryLoading, setLibraryLoading] = useState(false);
   const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
   const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("overview");
-  const [showForm, setShowForm] = useState(true);
+  const [showForm, setShowForm] = useState(() => !(hasUserChart && primaryChart));
   const [showLibrary, setShowLibrary] = useState(false);
   const [yogaSearch, setYogaSearch] = useState("");
   const [yogaFilter, setYogaFilter] = useState<"all" | "benefic" | "dosha" | "rare">("all");
-  const { userTier: contextTier, setChartData } = useChartEngine();
-  const userTier = (contextTier ?? "free") as PlanTier;
-  const { chart: primaryChart, loading: chartLoading, hasUserChart } = useUserChart();
+
+  const yogas = useMemo(() => {
+    if (!chart?.planets) return [];
+    return detectYogas(chart.planets as never, chart.lagnaNum, userTier);
+  }, [chart, userTier]);
+
+  const yogaScore = useMemo(() => {
+    const present = yogas.filter((y) => y.present && !y.isDosha);
+    return calculateYogaScore(present);
+  }, [yogas]);
+
+  const divCharts = useMemo(() => {
+    if (!chart?.planets) return [];
+    return calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
+  }, [chart]);
+
+  const shadbala = useMemo(() => {
+    if (!chart?.planets) return null;
+    try {
+      const birthHour = parseInt(chart.tob.split(":")[0], 10) || 12;
+      return calculateShadbala(chart.planets as never, birthHour);
+    } catch (err) {
+      console.warn("Shadbala calculation error:", err);
+      return null;
+    }
+  }, [chart]);
+
+  const mangalDosha = useMemo(() => {
+    if (!chart?.planets) return null;
+    try {
+      return buildMangalDoshaInsight(chart);
+    } catch (err) {
+      console.warn("Mangal dosha calculation error:", err);
+      return null;
+    }
+  }, [chart]);
 
   const saveChartToLibrary = async (data: ChartData) => {
     const supabase = createClient();
@@ -144,41 +171,10 @@ export default function KundliPage() {
     return true;
   };
 
-  const applyChart = (data: ChartData, tier: PlanTier = userTier) => {
+  const applyChart = (data: ChartData) => {
     setChart(data);
     setActiveTab("overview");
-    const allYogas = detectYogas(data.planets as never, data.lagnaNum, tier);
-    setYogas(allYogas);
-    const present = allYogas.filter((y) => y.present && !y.isDosha);
-    setYogaScore(calculateYogaScore(present));
-    setDivCharts(calculateDivisional(data.planets as never, data.lagnaNum, data.lagnaLon));
-
-    // Calculate Shadbala
-    try {
-      const birthHour = parseInt(data.tob.split(":")[0], 10) || 12;
-      const sb = calculateShadbala(data.planets as never, birthHour);
-      setShadbala(sb);
-    } catch (err) {
-      console.warn("Shadbala calculation error:", err);
-    }
-
-    // Calculate Mangal Dosha
-    try {
-      const mdInsight = buildMangalDoshaInsight(data);
-      setMangalDosha(mdInsight);
-    } catch (err) {
-      console.warn("Mangal dosha calculation error:", err);
-    }
   };
-
-  useEffect(() => {
-    if (chart?.planets) {
-      const allYogas = detectYogas(chart.planets as never, chart.lagnaNum, userTier);
-      setYogas(allYogas);
-      const present = allYogas.filter((y) => y.present && !y.isDosha);
-      setYogaScore(calculateYogaScore(present));
-    }
-  }, [userTier, chart]);
 
   const refreshSavedCharts = async () => {
     setLibraryLoading(true);
@@ -356,10 +352,9 @@ export default function KundliPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        body{background:var(--app-bg, #FAF8F5);color:var(--app-fg, #1A1A1A);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
-        .serif{font-family:'Cormorant Garamond',Georgia,serif}
+        body{background:var(--app-bg, #FAF8F5);color:var(--app-fg, #1A1A1A);font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
         ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--app-bg, #FAF8F5)}::-webkit-scrollbar-thumb{background:var(--app-gold, #B8860B);border-radius:2px}
         .page{max-width:1200px;margin:0 auto;padding:32px}
         .page-tag{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--app-gold, #B8860B);margin-bottom:8px;font-weight:700}

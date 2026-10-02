@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { LanguageProvider } from "@/lib/language-context";
@@ -9,7 +8,6 @@ import { LanguageToggle } from "@/components/language-toggle";
 import "@/app/dashboard/shared.css";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   return (
     <LanguageProvider>
       <ChartProvider>
@@ -25,7 +23,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <LanguageToggle />
             </div>
             <div
-              key={pathname}
               className="dash-page-container"
               style={{ minHeight: "100vh" }}
             >

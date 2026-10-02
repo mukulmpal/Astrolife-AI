@@ -32,11 +32,23 @@ export interface ChartContextValue {
 
 export const ChartContext = createContext<ChartContextValue | null>(null);
 
+let cachedDefaultChart: ChartData | null = null;
+function getStaticPlaceholderChart(): ChartData {
+  if (!cachedDefaultChart) {
+    cachedDefaultChart = buildChart(PLACEHOLDER_BIRTH);
+  }
+  return cachedDefaultChart;
+}
+
 export function ChartProvider({ children }: { children: React.ReactNode }) {
-  const [birth, setBirth] = useState<BirthDetails>(EMPTY_BIRTH);
-  const [chart, setChart] = useState<ChartData>(() => buildChart(PLACEHOLDER_BIRTH));
-  const [hasUserChart, setHasUserChart] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // Synchronous optimistic read from device cache (localStorage)
+  const initialChart = typeof window !== "undefined" ? loadCurrentChartFromDevice() : null;
+  const [birth, setBirth] = useState<BirthDetails>(() =>
+    initialChart ? getBirthFromChart(initialChart) : EMPTY_BIRTH
+  );
+  const [chart, setChart] = useState<ChartData>(() => initialChart ?? getStaticPlaceholderChart());
+  const [hasUserChart, setHasUserChart] = useState<boolean>(() => Boolean(initialChart));
+  const [loading, setLoading] = useState<boolean>(() => !initialChart);
   const [userTier, setUserTier] = useState<SubscriptionTier>(() => (isFullAccessEnabled() ? "elite" : "free"));
   const [isElite, setIsElite] = useState<boolean>(() => isFullAccessEnabled());
 
@@ -79,17 +91,17 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
       setUserTier(resolvedTier);
       setIsElite(resolvedElite);
 
-      const accountChart = await loadPrimaryChartFromAccount(user);
-      if (accountChart) {
-        saveCurrentChart(accountChart);
-        setBirth(getBirthFromChart(accountChart));
-        setChart(accountChart);
-        setHasUserChart(true);
-        setLoading(false);
-        return;
-      }
-
       if (user) {
+        const accountChart = await loadPrimaryChartFromAccount(user);
+        if (accountChart) {
+          saveCurrentChart(accountChart);
+          setBirth(getBirthFromChart(accountChart));
+          setChart(accountChart);
+          setHasUserChart(true);
+          setLoading(false);
+          return;
+        }
+
         const { data: profile } = await supabase
           .from("profiles")
           .select("name,dob,tob,city,lat,lon,tz")
@@ -123,6 +135,7 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // Non-logged-in user
       const storedChart = loadCurrentChartFromDevice();
       if (storedChart) {
         setBirth(getBirthFromChart(storedChart));

@@ -163,10 +163,9 @@ export default function Onboarding() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        body{background:var(--app-bg);color:var(--app-fg);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
-        .serif{font-family:'Cormorant Garamond',Georgia,serif}
+        body{background:var(--app-bg);color:var(--app-fg);font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
 
         .page{--onboard-bg:var(--app-bg,#FAF7F2);--onboard-fg:var(--app-fg,#1A1A1A);--onboard-card:var(--app-card,#FFFFFF);--onboard-card-alt:var(--app-card-alt,#FFFFFF);--onboard-border:var(--app-border,#FFFFFF);--onboard-border-strong:var(--app-border-strong,#261f50);--onboard-muted:var(--app-muted,#6B635B);--onboard-muted-deep:var(--app-muted-deep,#6B635B);--onboard-accent:var(--app-accent,#3c2880);--onboard-gold:var(--app-gold,#c8a030);--onboard-gold-strong:var(--app-gold-strong,#f0d898);--onboard-soft:var(--app-soft,#4A4238);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:var(--onboard-bg);color:var(--onboard-fg);color-scheme:dark}
         html[data-theme-mode="light"] .page{color-scheme:light}

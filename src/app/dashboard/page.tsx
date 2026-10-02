@@ -338,7 +338,9 @@ function DashboardContent() {
     };
 
     loadDashboardState();
-    checkSupabaseHealth().then(setDbHealth);
+    const healthTimer = setTimeout(() => {
+      checkSupabaseHealth().then(setDbHealth).catch(() => {});
+    }, 2500);
 
     // If we auto-built a chart from URL params, persist it to the account
     // (logged-in users) and strip the params so a refresh stays clean.
@@ -350,15 +352,24 @@ function DashboardContent() {
     }
 
     const interval = setInterval(() => setTime(new Date()), 60000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(healthTimer);
+      clearInterval(interval);
+    };
   }, [supabase, autoChart]);
 
   const userName = user?.user_metadata?.full_name?.split(" ")[0] || birth.name?.split(" ")[0] || "Seeker";
   const greeting = time.getHours() < 12 ? "Shubh Prabhat" : time.getHours() < 17 ? "Namaste" : "Shubh Sandhya";
   const dayName  = time.toLocaleDateString("en-IN", { weekday:"long" });
   const dateStr  = time.toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" });
-  const destiny = calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob, chart.lagnaNum ?? 0);
-  const psychology = calculatePsychology(chart.planets as never);
+  const destiny = useMemo(
+    () => calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob, chart.lagnaNum ?? 0),
+    [chart, birth.dob]
+  );
+  const psychology = useMemo(
+    () => calculatePsychology(chart.planets as never),
+    [chart]
+  );
   const activeDasha = chart.dashas?.find((entry: any) => entry.active) || chart.dashas?.[0] || fallbackDasha;
   const activeAntardasha = chart.antardasha?.find((entry: any) => entry.active) || chart.antardasha?.[0] || null;
   const strongestArea = [...(destiny.areas ?? [])].sort((a, b) => b.score - a.score)[0] || fallbackArea;
@@ -372,58 +383,62 @@ function DashboardContent() {
     : `${plan} plan active`;
   const dbReady = isSupabaseReady(dbHealth);
   const pendingDbTables = dbHealth.filter((item) => item.status !== "ready");
-  const lagnaNorm = ((chart.lagnaLon % 360) + 360) % 360;
-  const lagnaDeg = Math.floor(lagnaNorm % 30);
-  const lagnaMin = Math.floor(((lagnaNorm % 30) - lagnaDeg) * 60);
-  const lagnaNakIdx = Math.floor(lagnaNorm / (360 / 27));
-  const lagnaPada = Math.floor((lagnaNorm % (360 / 27)) / (360 / 108)) + 1;
 
-  const lagnaCard = {
-    name: "Lagna (Ascendant)",
-    icon: "🌅",
-    col: "#b8860b",
-    sign: chart.lagnaRashi || "—",
-    degree: `${lagnaDeg}° ${String(lagnaMin).padStart(2, "0")}'`,
-    nakshatra: `${NAK[lagnaNakIdx] || "—"} P${lagnaPada}`,
-    house: "H1",
-    retrograde: false,
-    energy: "Ascendant",
-  };
+  const planetCards = useMemo(() => {
+    const lagnaNorm = ((chart.lagnaLon % 360) + 360) % 360;
+    const lagnaDeg = Math.floor(lagnaNorm % 30);
+    const lagnaMin = Math.floor(((lagnaNorm % 30) - lagnaDeg) * 60);
+    const lagnaNakIdx = Math.floor(lagnaNorm / (360 / 27));
+    const lagnaPada = Math.floor((lagnaNorm % (360 / 27)) / (360 / 108)) + 1;
 
-  const planetCards = [
-    lagnaCard,
-    ...[
-      { name: "Sun", icon: "Su", col: "#f97316" },
-      { name: "Moon", icon: "Mo", col: "#c084fc" },
-      { name: "Mars", icon: "Ma", col: "#ef4444" },
-      { name: "Mercury", icon: "Me", col: "#22c55e" },
-      { name: "Jupiter", icon: "Ju", col: "#f59e0b" },
-      { name: "Venus", icon: "Ve", col: "#ec4899" },
-      { name: "Saturn", icon: "Sa", col: "#60a5fa" },
-      { name: "Rahu", icon: "Ra", col: "#a78bfa" },
-      { name: "Ketu", icon: "Ke", col: "#e11d48" },
-    ].map((planet) => {
-      const details = chart.planets?.[planet.name];
-      const dignity = details?.dignity ?? "";
-      const houseNum = typeof details?.house === "number" ? details.house : 1;
-      const energy = dignity
-        ? dignity.split(" ")[0]
-        : [6, 8, 12].includes(houseNum)
-        ? "Intense"
-        : "Active";
+    const lagnaCard = {
+      name: "Lagna (Ascendant)",
+      icon: "🌅",
+      col: "#b8860b",
+      sign: chart.lagnaRashi || "—",
+      degree: `${lagnaDeg}° ${String(lagnaMin).padStart(2, "0")}'`,
+      nakshatra: `${NAK[lagnaNakIdx] || "—"} P${lagnaPada}`,
+      house: "H1",
+      retrograde: false,
+      energy: "Ascendant",
+    };
 
-      return {
-        ...planet,
-        sign: details?.sign ?? "—",
-        degree: details ? `${details.degree}° ${String(details.minutes).padStart(2, "0")}'` : "—",
-        nakshatra: details ? `${details.nakshatra} P${details.pada}` : "—",
-        house: `H${houseNum}`,
-        retrograde: details?.retrograde ?? false,
-        energy,
-      };
-    }),
-  ];
-  const insights = [
+    return [
+      lagnaCard,
+      ...[
+        { name: "Sun", icon: "Su", col: "#f97316" },
+        { name: "Moon", icon: "Mo", col: "#c084fc" },
+        { name: "Mars", icon: "Ma", col: "#ef4444" },
+        { name: "Mercury", icon: "Me", col: "#22c55e" },
+        { name: "Jupiter", icon: "Ju", col: "#f59e0b" },
+        { name: "Venus", icon: "Ve", col: "#ec4899" },
+        { name: "Saturn", icon: "Sa", col: "#60a5fa" },
+        { name: "Rahu", icon: "Ra", col: "#a78bfa" },
+        { name: "Ketu", icon: "Ke", col: "#e11d48" },
+      ].map((planet) => {
+        const details = chart.planets?.[planet.name];
+        const dignity = details?.dignity ?? "";
+        const houseNum = typeof details?.house === "number" ? details.house : 1;
+        const energy = dignity
+          ? dignity.split(" ")[0]
+          : [6, 8, 12].includes(houseNum)
+          ? "Intense"
+          : "Active";
+
+        return {
+          ...planet,
+          sign: details?.sign ?? "—",
+          degree: details ? `${details.degree}° ${String(details.minutes).padStart(2, "0")}'` : "—",
+          nakshatra: details ? `${details.nakshatra} P${details.pada}` : "—",
+          house: `H${houseNum}`,
+          retrograde: details?.retrograde ?? false,
+          energy,
+        };
+      }),
+    ];
+  }, [chart]);
+
+  const insights = useMemo(() => [
     {
       tag: `${activeDasha.planet} Mahadasha`,
       text: `${activeDasha.planet} is your active karmic teacher right now. This is a phase for focused work in ${weakestArea.name.toLowerCase()} and steady discipline in ${strongestArea.name.toLowerCase()}.`,
@@ -442,7 +457,7 @@ function DashboardContent() {
       icon: strongestArea.icon,
       urgent: false,
     },
-  ];
+  ], [activeDasha.planet, weakestArea.name, strongestArea.name, strongestArea.icon, destiny.currentScore, psychology.pattern.name, psychology.summary, psychology.pattern.anxietyIdx]);
   const dailyFeed = useMemo(() => {
     const transitChart = normalizeChartForTransit(chart as unknown);
     const today = new Date();
@@ -500,11 +515,10 @@ function DashboardContent() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth}
-        body{background:#FAF7F2;color:#1A1A1A;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
-        .serif{font-family:'Cormorant Garamond',Georgia,serif}
+        body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#FAF7F2}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 

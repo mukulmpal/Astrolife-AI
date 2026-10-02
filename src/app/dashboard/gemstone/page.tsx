@@ -518,7 +518,6 @@ function GemstonePageContent() {
       </section>
 
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
         .gem-page {
           --bg: #FAF7F2;
           --bg-2: #F3EFE6;
