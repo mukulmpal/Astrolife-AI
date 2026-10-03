@@ -440,7 +440,8 @@ export function evaluateGulika(
   lat: number,
   lon: number,
   ayanamsha: number,
-  candidateLagnaLon: number
+  candidateLagnaLon: number,
+  tz = 5.5
 ): GulikaValidationResult {
   const weekday = sunInfo.astrologicalWeekday;
   const mult = sunInfo.isDayBirth
@@ -460,9 +461,8 @@ export function evaluateGulika(
   const gM = Math.floor((gulikaDec - gH) * 60);
   const gulikaTime = `${String(gH).padStart(2, "0")}:${String(gM).padStart(2, "0")}`;
 
-  const [yr, mo, dy] = dateStr.split("-").map(Number);
-  const gulikaJD = getJD(yr, mo, dy, gulikaDec);
-  const gulikaLon = computeLagna(gulikaJD, lat, lon, ayanamsha);
+  const gulikaJD = getJD(dateStr, gulikaTime, tz);
+  const gulikaLon = computeLagna(gulikaJD, lat, lon);
 
   const gulikaSignIdx = Math.floor(gulikaLon / 30);
   const candSignIdx = Math.floor(candidateLagnaLon / 30);
@@ -1165,7 +1165,8 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           lat,
           lon,
           kpAyanamsha,
-          chart.lagnaLon
+          chart.lagnaLon,
+          tz
         );
 
         // 8. Tattva Validation (5 Elements Palas Cycle, Pages 66-68)
