@@ -39,3 +39,30 @@ if (fs.existsSync(tailwindNodeFile)) {
     console.log("[patch-deps] @tailwindcss/node already patched or calls not found.");
   }
 }
+
+// 3. Patch @tailwindcss/postcss DEBUG under Node 25
+const tailwindPostcssFile = path.resolve(__dirname, "../node_modules/@tailwindcss/postcss/dist/index.js");
+if (fs.existsSync(tailwindPostcssFile)) {
+  let content = fs.readFileSync(tailwindPostcssFile, "utf8");
+  if (content.includes("var p=x.env.DEBUG")) {
+    content = content.replace("var p=x.env.DEBUG", "var p=x?.env?.DEBUG||false");
+    fs.writeFileSync(tailwindPostcssFile, content, "utf8");
+    console.log("[patch-deps] Successfully patched x.env.DEBUG in @tailwindcss/postcss.");
+  }
+}
+
+// 4. Patch enhanced-resolve ExportsFieldPlugin processExportsField under Node 25
+const exportsFieldPluginFile = path.resolve(__dirname, "../node_modules/enhanced-resolve/lib/ExportsFieldPlugin.js");
+if (fs.existsSync(exportsFieldPluginFile)) {
+  let content = fs.readFileSync(exportsFieldPluginFile, "utf8");
+  if (content.includes("processExportsField(exportsField)") && !content.includes("_getFn")) {
+    content = content.replace("processExportsField(exportsField)", "_getFn()(exportsField)");
+    content = content.replace(
+      'const { processExportsField } = require("./util/entrypoints");',
+      'const { processExportsField } = require("./util/entrypoints");\nconst _getFn = () => typeof processExportsField === "function" ? processExportsField : (require("./util/entrypoints").processExportsField || require("./util/entrypoints").default?.processExportsField || (() => [[], null]));'
+    );
+    fs.writeFileSync(exportsFieldPluginFile, content, "utf8");
+    console.log("[patch-deps] Successfully patched ExportsFieldPlugin.js in enhanced-resolve.");
+  }
+}
+

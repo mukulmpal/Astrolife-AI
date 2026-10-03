@@ -626,19 +626,31 @@ export function computeUpcomingIngresses(
 
   slowPlanets.forEach(planet => {
     const curR = Math.floor(curPos[planet] / 30);
-    // Search up to 400 days
-    for (let d = 1; d <= 400; d++) {
+    // Coarse scan in 5-day intervals, then refine to exact day
+    for (let d = 5; d <= 400; d += 5) {
       const futPos = computePlanets(jdNow + d);
       const futR   = Math.floor(futPos[planet] / 30);
       if (futR !== curR) {
-        const futDate = new Date(Date.now() + d * 86400000);
-        const houseFromLagna = ((futR - lagR + 12) % 12) + 1;
+        // Refine to exact single day within the 5-day window
+        let exactDay = d;
+        for (let step = d - 4; step <= d; step++) {
+          const stepPos = computePlanets(jdNow + step);
+          const stepR = Math.floor(stepPos[planet] / 30);
+          if (stepR !== curR) {
+            exactDay = step;
+            break;
+          }
+        }
+        const exactPos = computePlanets(jdNow + exactDay);
+        const exactR = Math.floor(exactPos[planet] / 30);
+        const futDate = new Date(Date.now() + exactDay * 86400000);
+        const houseFromLagna = ((exactR - lagR + 12) % 12) + 1;
         results.push({
           planet,
           fromRashi: curR,
-          toRashi: futR,
-          toRashiName: `${RASHIS_EN[futR]} (H${houseFromLagna})`,
-          daysAway: d,
+          toRashi: exactR,
+          toRashiName: `${RASHIS_EN[exactR]} (H${houseFromLagna})`,
+          daysAway: exactDay,
           approxDate: futDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
         });
         break;
@@ -659,14 +671,25 @@ export function computeDegreeConjunctions(
   const natalPlanets: PlanetName[] = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
   const results: DegreeConjunction[] = [];
 
-  slowTransits.forEach(tp => {
-    natalPlanets.forEach(np => {
-      const natalLon = natal.planets[np]?.lon;
-      if (natalLon === undefined) return;
+  const activeNatal: Array<{ planet: PlanetName; lon: number }> = [];
+  natalPlanets.forEach(np => {
+    const natalLon = natal.planets[np]?.lon;
+    if (natalLon !== undefined) activeNatal.push({ planet: np, lon: natalLon });
+  });
+  if (activeNatal.length === 0) return [];
 
+  // Pre-calculate daily positions for the 60-day window ONCE instead of 36 times
+  const dailyPos: Record<string, number>[] = new Array(61);
+  for (let d = 0; d <= 60; d++) {
+    dailyPos[d] = computePlanets(jdNow + d);
+  }
+
+  slowTransits.forEach(tp => {
+    activeNatal.forEach(({ planet: np, lon: natalLon }) => {
       for (let d = 0; d <= 60; d++) {
-        const pos  = computePlanets(jdNow + d);
+        const pos  = dailyPos[d];
         const tLon = pos[tp];
+        if (tLon === undefined) continue;
         let orb    = Math.abs(tLon - natalLon);
         if (orb > 180) orb = 360 - orb;
         if (orb <= 2) {
@@ -707,10 +730,17 @@ function buildSummary(
 
 // ── Master Run Function ───────────────────────────────────────
 
+export interface TransitEngineOptions {
+  includeIngresses?: boolean;
+  includeConjunctions?: boolean;
+  sharedConjunctions?: DegreeConjunction[];
+}
+
 export function runTransitEngine(
   natal: NatalChartInput,
   base: TransitBase = 'lagna',
   dateStr?: string,
+  options?: TransitEngineOptions,
 ): TransitEngineResult {
   const tz     = natal.tz ?? 5.5;
   const today  = dateStr ?? new Date().toISOString().split('T')[0];
@@ -761,8 +791,16 @@ export function runTransitEngine(
 
   const sadeSati = analyzeSadeSati(curPos.Saturn, moonLon, natal.lagR);
   const zoneAlerts = buildZoneAlerts(curPos, natal);
-  const upcomingIngresses = computeUpcomingIngresses(jdNow, tz, natal.lagR);
-  const degreeConjunctions = computeDegreeConjunctions(jdNow, natal);
+  // Ingresses only computed when explicitly requested (e.g. detailed report generation)
+  const upcomingIngresses = options?.includeIngresses !== false && options?.includeIngresses === true
+    ? computeUpcomingIngresses(jdNow, tz, natal.lagR)
+    : [];
+  // Conjunctions can be provided from a shared scan or computed using 61-day precomputed positions
+  const degreeConjunctions = options?.sharedConjunctions
+    ? options.sharedConjunctions
+    : options?.includeConjunctions === false
+      ? []
+      : computeDegreeConjunctions(jdNow, natal);
   const summary = buildSummary(planetResults, sadeSati, base);
 
   return {

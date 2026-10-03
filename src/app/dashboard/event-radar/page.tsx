@@ -89,10 +89,13 @@ export default function EventRadarPage() {
   return (
     <main className="er-wrap">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+        .er-wrap{min-height:100vh;background:#FAF7F2;color:#1A1A1A;padding:30px 22px 110px;font-family:'Outfit',sans-serif}
         .er-wrap{min-height:100vh;background:#FAF7F2;color:#1A1A1A;padding:30px 22px 110px;font-family:var(--font-outfit),'Outfit',sans-serif}
         .er-shell{max-width:1120px;margin:0 auto;display:grid;gap:16px}
         .er-hero{background:linear-gradient(135deg,#120d30,#1a1140);border:1px solid rgba(200,160,48,.18);border-radius:18px;padding:22px}
         .er-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:8px}
+        .er-title{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1.1}
         .er-title{font-family:var(--font-cormorant),'Cormorant Garamond',serif;font-size:34px;line-height:1.1}
         .er-sub{font-size:13px;color:#8b80bf;margin-top:6px}
         .er-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}

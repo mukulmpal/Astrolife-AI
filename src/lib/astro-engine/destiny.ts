@@ -481,15 +481,17 @@ function driverMessage(planet: string, role: DestinyDriver["role"], pd?: PD,
   return `${base} Results improve through steady effort rather than shortcuts.`;
 }
 
-function buildAD(mdPlanet: string, mdStart: Date, mdYrs: number): DashaEntry[] {
+function buildAD(mdPlanet: string, mdStart: Date | string, mdYrs: number): DashaEntry[] {
   const mi  = DO.indexOf(mdPlanet);
+  const startObj = mdStart instanceof Date ? mdStart : new Date(mdStart);
+  const safeStart = isNaN(startObj.getTime()) ? new Date() : startObj;
   const seq: DashaEntry[] = [];
-  let cur   = new Date(mdStart);
+  let cur   = new Date(safeStart.getTime());
   const now = new Date();
   for (let i = 0; i < 9; i++) {
     const pi  = mdf(mi + i, 9);
     const p   = DO[pi];
-    const yrs = mdYrs * DY[p] / 120;
+    const yrs = (mdYrs || 1) * DY[p] / 120;
     const end = new Date(cur.getTime() + yrs * 365.25 * 24 * 3600 * 1000);
     seq.push({ planet:p, start:new Date(cur), end, yrs, active:cur<=now&&now<end });
     cur = new Date(end);
@@ -509,33 +511,41 @@ export function calculateDestiny(
   d9Signs?:     Record<string, number>   // optional: planet→D9 sign 0-11
 ): DestinyResult {
 
-  const dobDate   = new Date(dob);
+  const safeDob   = dob && !isNaN(new Date(dob).getTime()) ? dob : "2000-01-01";
+  const dobDate   = new Date(safeDob);
   const birthYear = dobDate.getFullYear();
   const now       = new Date();
   const maxAge    = 90;
 
+  // Sanitize and normalize dashas
+  const normalizedDashas: DashaEntry[] = (Array.isArray(dashas) ? dashas : []).map(d => ({
+    ...d,
+    start: d.start instanceof Date ? d.start : new Date(d.start),
+    end: d.end instanceof Date ? d.end : new Date(d.end),
+  })).filter(d => !isNaN(d.start.getTime()) && !isNaN(d.end.getTime()));
+
   // Janma Nakshatra from Moon's longitude
-  const moonLon  = planets.Moon?.lon ?? 0;
+  const moonLon  = planets?.Moon?.lon ?? 0;
   const janmaNak = lonToNak(moonLon);
 
   // Pre-compute Navtara for all 9 planets
   const navtaraMap: Record<string, NavtaraInfo> = {};
   PLS.forEach(p => {
-    const pd = planets[p];
+    const pd = planets?.[p];
     if (pd) navtaraMap[p] = getNavtara(lonToNak(pd.lon), janmaNak);
   });
 
   // Pre-compute full score for each planet (cached — doesn't change over time)
   const scoreBreakdowns: Record<string, PlanetScore> = {};
   PLS.forEach(p => {
-    const pd = planets[p];
+    const pd = planets?.[p];
     if (pd) scoreBreakdowns[p] = scorePlanet(p, pd, planets, lagnaNum, shadbalaPct, bindus, d9Signs);
   });
 
   // Score a year — uses cached planet scores + Navtara
   function scoreYear(year: number): number {
     const d        = new Date(year, 6, 1);
-    const activeMD = dashas.find(s => s.start <= d && s.end > d);
+    const activeMD = normalizedDashas.find(s => s.start <= d && s.end > d);
     if (!activeMD) return 50;
 
     const adSeq    = buildAD(activeMD.planet, activeMD.start, activeMD.yrs);
@@ -571,7 +581,7 @@ export function calculateDestiny(
   for (let a = 0; a <= maxAge; a++) {
     const year = birthYear + a;
     const d    = new Date(year, 6, 1);
-    const md2  = dashas.find(s => s.start <= d && s.end > d);
+    const md2  = normalizedDashas.find(s => s.start <= d && s.end > d);
     points.push({
       age: a, year,
       score:   scoreYear(year),
@@ -584,7 +594,7 @@ export function calculateDestiny(
   const pColor: Record<string,string> = {};
   PLS.forEach((p,i) => { pColor[p] = PCOL[i]; });
 
-  const bands: DashaBand[] = dashas.map(d => {
+  const bands: DashaBand[] = normalizedDashas.map(d => {
     const sAge  = (d.start.getTime() - dobDate.getTime()) / (365.25 * 24 * 3600 * 1000);
     const eAge  = Math.min((d.end.getTime() - dobDate.getTime()) / (365.25 * 24 * 3600 * 1000), maxAge);
     const score = scoreYear(d.start.getFullYear() + 1);
@@ -603,11 +613,39 @@ export function calculateDestiny(
     };
   }).filter(b => b.endAge > 0 && b.startAge < maxAge);
 
-  const peak      = [...bands].sort((a,b) => b.score - a.score)[0];
-  const challenge = [...bands].sort((a,b) => a.score - b.score)[0];
+  const fallbackBand: DashaBand = {
+    planet: "Jupiter",
+    start: new Date(birthYear, 0, 1),
+    end: new Date(birthYear + 16, 0, 1),
+    startAge: 0,
+    endAge: 16,
+    score: 50,
+    color: "#c8a030",
+    functionalRole: "Benefic",
+    scoreBreakdown: {
+      total: 50,
+      functionalRole: "Benefic",
+      ruledHouses: [],
+      combusted: false,
+      combustPenalty: 0,
+      inboundScore: 0,
+      vargottama: false,
+      d9Exalted: false,
+      bindus: null,
+    },
+  };
+
+  const peak      = [...bands].sort((a,b) => b.score - a.score)[0] || fallbackBand;
+  const challenge = [...bands].sort((a,b) => a.score - b.score)[0] || fallbackBand;
 
   // Area scores (also Navtara-aware)
-  const activeMD = dashas.find(s => s.start <= now && s.end > now) || dashas[0];
+  const activeMD = normalizedDashas.find(s => s.start <= now && s.end > now) || normalizedDashas[0] || {
+    planet: "Jupiter",
+    start: new Date(birthYear, 0, 1),
+    end: new Date(birthYear + 16, 0, 1),
+    yrs: 16,
+    active: true,
+  };
 
   function areaScore(houses: number[]): number {
     let s = 50;
@@ -720,11 +758,12 @@ export function calculateDestiny(
     ...aspectNotes,
   ].filter(Boolean);
 
+  const peakYearStr = peak.start instanceof Date ? `${peak.start.getFullYear()}–${peak.end.getFullYear()}` : "";
   const summary =
-    `Peak: ${peak?.planet} MD (${peak?.start.getFullYear()}–${peak?.end.getFullYear()}) ` +
-    `score ${peak?.score}% [${peak?.functionalRole}] ` +
-    `[${navtaraMap[peak?.planet]?.icon ?? ""} ${navtaraMap[peak?.planet]?.taraName ?? ""}]. ` +
-    `Toughest: ${challenge?.planet} MD [${challenge?.functionalRole}]. ` +
+    `Peak: ${peak.planet} MD ${peakYearStr ? `(${peakYearStr}) ` : ""}` +
+    `score ${peak.score}% [${peak.functionalRole}] ` +
+    `[${navtaraMap[peak.planet]?.icon ?? ""} ${navtaraMap[peak.planet]?.taraName ?? ""}]. ` +
+    `Toughest: ${challenge.planet} MD [${challenge.functionalRole}]. ` +
     `Current: ${currentScore}% — ${activeMD.planet} MD [${mdSB?.functionalRole ?? ""}].`;
 
   return {
@@ -742,8 +781,8 @@ export function calculateDestiny(
 
 export function calculateADDestiny(
   mdPlanet:     string,
-  mdStart:      Date,
-  mdEnd:        Date,
+  mdStart:      Date | string,
+  mdEnd:        Date | string,
   mdYrs:        number,
   planets:      Record<string, PD>,
   lagnaNum:     number,
@@ -752,19 +791,24 @@ export function calculateADDestiny(
   d9Signs?:     Record<string, number>
 ): AntardashaDestinyResult {
 
-  const now      = new Date();
-  const janmaNak = lonToNak(planets.Moon?.lon ?? 0);
+  const now       = new Date();
+  const startObj  = mdStart instanceof Date ? mdStart : new Date(mdStart);
+  const endObj    = mdEnd instanceof Date ? mdEnd : new Date(mdEnd);
+  const safeStart = isNaN(startObj.getTime()) ? new Date() : startObj;
+  const safeEnd   = isNaN(endObj.getTime()) ? new Date(safeStart.getTime() + (mdYrs || 1) * 365.25 * 24 * 3600 * 1000) : endObj;
+  const safeYrs   = mdYrs && mdYrs > 0 ? mdYrs : Math.max(1, (safeEnd.getTime() - safeStart.getTime()) / (365.25 * 24 * 3600 * 1000));
+  const janmaNak  = lonToNak(planets?.Moon?.lon ?? 0);
 
   const navtaraMap: Record<string, NavtaraInfo> = {};
   PLS.forEach(p => {
-    const pd = planets[p];
+    const pd = planets?.[p];
     if (pd) navtaraMap[p] = getNavtara(lonToNak(pd.lon), janmaNak);
   });
 
   // Full score for every planet
   const scoreBreakdowns: Record<string, PlanetScore> = {};
   PLS.forEach(p => {
-    const pd = planets[p];
+    const pd = planets?.[p];
     if (pd) scoreBreakdowns[p] = scorePlanet(p, pd, planets, lagnaNum, shadbalaPct, bindus, d9Signs);
   });
 
@@ -772,7 +816,7 @@ export function calculateADDestiny(
   const mdTara     = navtaraMap[mdPlanet];
   const mdBaseScore = mdSB ? mdSB.total + Math.round((mdTara?.modifier ?? 0) * 0.6) : 50;
 
-  const adSeq = buildAD(mdPlanet, mdStart, mdYrs);
+  const adSeq = buildAD(mdPlanet, safeStart, safeYrs);
   const pColor: Record<string,string> = {};
   PLS.forEach((p,i) => { pColor[p] = PCOL[i]; });
 
@@ -797,12 +841,12 @@ export function calculateADDestiny(
 
   // Monthly resolution curve
   const points: ADDestinyPoint[] = [];
-  const mdDurMs   = mdEnd.getTime() - mdStart.getTime();
+  const mdDurMs   = Math.max(1, safeEnd.getTime() - safeStart.getTime());
   const totalMos  = Math.ceil(mdDurMs / (30.4375 * 24 * 3600 * 1000));
 
   for (let m = 0; m <= totalMos; m++) {
-    const date     = new Date(mdStart.getTime() + m * 30.4375 * 24 * 3600 * 1000);
-    if (date > mdEnd) break;
+    const date     = new Date(safeStart.getTime() + m * 30.4375 * 24 * 3600 * 1000);
+    if (date > safeEnd) break;
     const activeAD = adSeq.find(s => s.start <= date && s.end > date);
     const adP      = activeAD?.planet ?? adSeq[adSeq.length - 1]?.planet ?? mdPlanet;
     const base     = scoreAD(adP);

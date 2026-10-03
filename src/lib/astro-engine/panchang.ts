@@ -386,8 +386,19 @@ function getEndTime(
   fallback = "Next day"
 ) {
   const startJd = getJD(dateString, "12:00", tz);
-  let previousOffset = 0;
-  for (let offset = 0.25; offset <= 48; offset += 0.25) {
+  const p0 = computePlanets(startJd);
+  const currentVal = selector(p0.Sun, p0.Moon);
+  const targetVal = (currentIndex + 1) * size;
+  let remDeg = targetVal - currentVal;
+  while (remDeg < 0) remDeg += 360;
+  while (remDeg >= 360) remDeg -= 360;
+
+  // Maximum conservative velocity: 0.75 deg/hr is well above Moon perigee peak
+  const safeMinHours = Math.max(0, Math.floor((remDeg / 0.75) - 0.75));
+
+  let previousOffset = safeMinHours;
+  const stepSize = 0.75;
+  for (let offset = safeMinHours + stepSize; offset <= 48; offset += stepSize) {
     const jd = startJd + offset / 24;
     const planets = computePlanets(jd);
     const nextIndex = Math.floor(selector(planets.Sun, planets.Moon) / size);
@@ -455,7 +466,16 @@ function yogaGuidance(yoga: string): PanchangGuidance {
   };
 }
 
-export function calculatePanchang(date = new Date(), tz = 5.5, location?: { lat?: number; lon?: number }): PanchangResult {
+export interface PanchangOptions {
+  includeEndTimes?: boolean;
+}
+
+export function calculatePanchang(
+  date = new Date(),
+  tz = 5.5,
+  location?: { lat?: number; lon?: number },
+  options: PanchangOptions = { includeEndTimes: true }
+): PanchangResult {
   const yyyyMmDd = dateStringAtTimezone(date, tz);
   const jd = getJD(yyyyMmDd, "12:00", tz);
   const planets = computePlanets(jd);
@@ -513,10 +533,11 @@ export function calculatePanchang(date = new Date(), tz = 5.5, location?: { lat?
   const yamaganda = daylightWindow("Yamaganda", weekday, YAMAGANDA_SLOT, sunrise, sunset, "Sensitive", "Avoid risky or irreversible decisions.");
   const noon = (timeToDecimal(sunrise) + timeToDecimal(sunset)) / 2;
   const abhijitMuhurta = formatWindow("Abhijit Muhurta", noon - 24 / 60, noon + 24 / 60, "Auspicious", "Good fallback muhurta for many important tasks when other factors are not harsh.");
-  const tithiEnd = getEndTime(yyyyMmDd, tz, tithiIndex, 12, (sun, moon) => mod(moon - sun, 360));
-  const nakshatraEnd = getEndTime(yyyyMmDd, tz, nakIdx, 360 / 27, (_sun, moon) => mod(moon, 360));
-  const yogaEnd = getEndTime(yyyyMmDd, tz, yogaIdx, 360 / 27, (sun, moon) => mod(sun + moon, 360));
-  const karanaEnd = getEndTime(yyyyMmDd, tz, karanaIdx, 6, (sun, moon) => mod(moon - sun, 360));
+  const includeEndTimes = options.includeEndTimes !== false;
+  const tithiEnd = includeEndTimes ? getEndTime(yyyyMmDd, tz, tithiIndex, 12, (sun, moon) => mod(moon - sun, 360)) : "—";
+  const nakshatraEnd = includeEndTimes ? getEndTime(yyyyMmDd, tz, nakIdx, 360 / 27, (_sun, moon) => mod(moon, 360)) : "—";
+  const yogaEnd = includeEndTimes ? getEndTime(yyyyMmDd, tz, yogaIdx, 360 / 27, (sun, moon) => mod(sun + moon, 360)) : "—";
+  const karanaEnd = includeEndTimes ? getEndTime(yyyyMmDd, tz, karanaIdx, 6, (sun, moon) => mod(moon - sun, 360)) : "—";
   const { day: chaughadiaDay, night: chaughadiaNight, current: currentChaughadia } = buildChaughadia(weekday, sunrise, sunset, date, tz);
   const muhurtaYogas = getMuhurtaYogas(weekday, nakshatra);
   const shubhKarya = Array.from(new Set([...tithiGuide.goodFor, ...nakGuide.goodFor, ...yogaGuide.goodFor])).slice(0, 6);

@@ -362,14 +362,17 @@ function DashboardContent() {
   const greeting = time.getHours() < 12 ? "Shubh Prabhat" : time.getHours() < 17 ? "Namaste" : "Shubh Sandhya";
   const dayName  = time.toLocaleDateString("en-IN", { weekday:"long" });
   const dateStr  = time.toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" });
+
   const destiny = useMemo(
     () => calculateDestiny(chart.planets as never, chart.dashas ?? [], birth.dob, chart.lagnaNum ?? 0),
     [chart, birth.dob]
   );
+
   const psychology = useMemo(
     () => calculatePsychology(chart.planets as never),
     [chart]
   );
+
   const activeDasha = chart.dashas?.find((entry: any) => entry.active) || chart.dashas?.[0] || fallbackDasha;
   const activeAntardasha = chart.antardasha?.find((entry: any) => entry.active) || chart.antardasha?.[0] || null;
   const strongestArea = [...(destiny.areas ?? [])].sort((a, b) => b.score - a.score)[0] || fallbackArea;
@@ -515,8 +518,11 @@ function DashboardContent() {
   return (
     <>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth}
+        body{background:#FAF7F2;color:#1A1A1A;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        .serif{font-family:'Cormorant Garamond',Georgia,serif}
         body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
         .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#FAF7F2}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}

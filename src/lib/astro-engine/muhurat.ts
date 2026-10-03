@@ -153,7 +153,7 @@ export function evaluateDateMuhurat(
   location = { lat: 28.6139, lon: 77.2090 },
   natalMoonNakshatra?: string
 ): MuhuratWindow {
-  const panchang = calculatePanchang(date, tz, location);
+  const panchang = calculatePanchang(date, tz, location, { includeEndTimes: false });
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, "0");
   const dd = String(date.getDate()).padStart(2, "0");

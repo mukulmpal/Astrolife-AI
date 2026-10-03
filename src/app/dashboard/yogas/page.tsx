@@ -64,7 +64,10 @@ export default function YogasPage() {
   return (
     <>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        body{background:var(--app-bg,#FAF7F2);color:var(--app-fg,#1A1A1A);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        .serif{font-family:'Cormorant Garamond',Georgia,serif}
         body{background:var(--app-bg,#FAF7F2);color:var(--app-fg,#1A1A1A);font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
         .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--app-bg,#FAF7F2)}::-webkit-scrollbar-thumb{background:var(--al-gold,#c8a030);border-radius:2px}
@@ -225,7 +228,7 @@ export default function YogasPage() {
             </div>
 
             {/* UPGRADE BANNER */}
-            {tierLoaded && userTier === "free" && yogas.some(y=>y.locked) && (
+            {userTier === "free" && yogas.some(y=>y.locked) && (
               <div className="upgrade">
                 <div>
                   <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,color:"#1A1A1A",marginBottom:4}}>

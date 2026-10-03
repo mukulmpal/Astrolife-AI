@@ -86,6 +86,7 @@ export interface TransitReport {
   areaScores: TransitAreaScore[];
   summary: string;
   aiContext: string;
+  degreeConjunctions?: any[];
 }
 
 const PLANETS = CORE_PLANETS as PlanetName[];
@@ -203,12 +204,18 @@ export function calculateTransitReport(params: {
   chart: NatalChartForTransit;
   date?: Date;
   base?: TransitBase;
+  includeConjunctions?: boolean;
+  sharedConjunctions?: any[];
 }): TransitReport {
   const date = params.date ?? new Date();
   const base = params.base ?? "lagna";
   const { input: coreInput, missingLongitudePlanets } = buildCoreInput(params.chart);
   const dateStr = date.toISOString().split("T")[0];
-  const core = runTransitEngine(coreInput, base, dateStr);
+  const core = runTransitEngine(coreInput, base, dateStr, {
+    includeIngresses: false,
+    includeConjunctions: params.includeConjunctions,
+    sharedConjunctions: params.sharedConjunctions,
+  });
   const baseLabel = base === "lagna" ? "Lagna" : "Moon";
 
   const planets: TransitPlanetResult[] = core.planets.map((p) => {
@@ -291,6 +298,7 @@ export function calculateTransitReport(params: {
     alerts,
     areaScores: scores,
     summary: core.summary,
+    degreeConjunctions: core.degreeConjunctions,
   };
 
   const report: TransitReport = {

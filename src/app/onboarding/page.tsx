@@ -163,7 +163,10 @@ export default function Onboarding() {
   return (
     <>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        body{background:var(--app-bg);color:var(--app-fg);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        .serif{font-family:'Cormorant Garamond',Georgia,serif}
         body{background:var(--app-bg);color:var(--app-fg);font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
         .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
 

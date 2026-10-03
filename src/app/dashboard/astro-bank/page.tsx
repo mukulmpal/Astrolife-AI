@@ -126,7 +126,7 @@ export default function AstroBankPage() {
   }, []);
 
   const countryList = meta?.countries ?? [];
-  const categoryList = (country && meta?.categoriesByCountry[country]) ?? [];
+  const categoryList = (country && meta ? meta.categoriesByCountry[country] : undefined) ?? [];
 
   // Fetch filtered personalities on demand
   useEffect(() => {

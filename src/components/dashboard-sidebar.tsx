@@ -118,7 +118,9 @@ export function DashboardSidebar() {
       } catch {}
     };
     checkAdmin();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
 

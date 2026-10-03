@@ -142,6 +142,7 @@ function MiniChart({ chart }: { chart: DivChart }) {
 export default function DivisionalPage() {
   const [activeChart, setActiveChart] = useState("D9");
   const { birth, chart, hasUserChart } = useUserChart();
+  const { t } = useLanguage();
   const divs = useMemo(() => {
     if (!chart?.planets) return [];
     return calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
@@ -165,7 +166,7 @@ export default function DivisionalPage() {
   const meta = current ? CHART_META[current.key] : null;
   const currentUniversal = useMemo(() => universal?.sections.find((section) => section.chart === current?.key), [universal, current?.key]);
 
-  if (!hasUserChart || !birth.name) {
+  if (!hasUserChart || !birth.name || !current || !analysis || !universal) {
     return (
       <EngineEmptyState
         engineName="Divisional Charts"

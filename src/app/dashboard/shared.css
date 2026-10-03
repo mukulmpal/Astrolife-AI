@@ -1,5 +1,7 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
+body{background:var(--app-bg,#FAF7F2);color:var(--app-fg,#1A1A1A);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Cormorant Garamond',Georgia,serif}
 body{background:var(--app-bg,#FAF7F2);color:var(--app-fg,#1A1A1A);font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
 .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
 ::-webkit-scrollbar{width:3px}
