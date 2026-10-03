@@ -1,11 +1,59 @@
 'use client';
 
+import { useState } from 'react';
 import { CelestialInstrument, FolioMarker, OrnamentDivider, StarField, useReveal } from './celestial';
 
 const TINT = (pct: number) =>
   `color-mix(in srgb, var(--al-surface) ${pct}%, transparent)`;
 const GOLD_TINT = (pct: number) =>
   `color-mix(in srgb, var(--al-gold) ${pct}%, transparent)`;
+
+function useAudioPreview() {
+  const [playing, setPlaying] = useState(false);
+
+  const playTone = () => {
+    if (typeof window === 'undefined' || playing) return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(432, ctx.currentTime);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(528, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.14, ctx.currentTime + 0.6);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.8);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start();
+      osc2.start();
+      setPlaying(true);
+
+      setTimeout(() => {
+        try {
+          osc1.stop();
+          osc2.stop();
+          ctx.close();
+        } catch (_) {}
+        setPlaying(false);
+      }, 4000);
+    } catch (e) {
+      console.error(e);
+      setPlaying(false);
+    }
+  };
+
+  return { playing, playTone };
+}
 
 /* ============================ I · PROBLEM ============================ */
 export function DirectionAProblem() {
@@ -45,44 +93,420 @@ export function DirectionAProblem() {
 /* ========================== II · COMPLETE SYSTEM ===================== */
 export function DirectionAFeatures() {
   const ref = useReveal();
-  const features = [
-    { t: 'Sidereal precision', d: 'Lahiri ayanāṁśa, validated against Drik Panchang. Charts true to a single degree.' },
-    { t: 'Vimśottarī timing', d: 'Daśā to the very day — you learn when, not merely what.' },
-    { t: 'Reasoning AI', d: 'Every word is drawn from your chart and cited. No borrowed clichés.' },
-    { t: 'Six systems, one lens', d: 'Parāśarī, KP, Lāl Kitāb, Nāḍī, Jaimini and Vāstu, cross-read for you.' },
-    { t: 'Compatibility', d: 'Aṣṭakūṭa, Maṅglik and Nāḍī doṣa, explained in plain language.' },
-    { t: 'Gentle remedies', d: 'Household-scale upāya. No fear, no expensive pūjā.' },
-  ];
+  const { playing, playTone } = useAudioPreview();
+
   return (
-    <section id="features" ref={ref} className="dira-reveal relative overflow-hidden px-6 py-24 md:px-10"
+    <section id="features" ref={ref} className="dira-reveal relative overflow-hidden px-6 py-28 md:px-10"
       style={{ background: TINT(35) }}>
       <StarField count={50} opacity={0.4} />
-      <div className="relative mx-auto grid max-w-6xl gap-16 lg:grid-cols-1 lg:items-center">
-        {/* content: the catalogue */}
+      <div className="relative mx-auto max-w-6xl space-y-20">
+        
+        {/* SECTION HEADER */}
         <div>
-          <FolioMarker numeral="II" label="Complete System" />
+          <FolioMarker numeral="II" label="The Complete Vedic Ecosystem" />
           <h2 className="dira-display-sm mb-4" style={{ color: 'var(--al-ivory)' }}>
-            25+ engines.
-            <span className="italic" style={{ color: 'var(--al-gold-bright)' }}> One AI.</span>
+            25+ specialized engines.
+            <span className="italic" style={{ color: 'var(--al-gold-bright)' }}> One Unified OS.</span>
           </h2>
-          <p className="mb-10 text-sm" style={{ color: 'var(--al-ivory-mute)' }}>
-            <span style={{ color: 'var(--al-gold)' }}>25+ astrology engines</span> &middot;{' '}
-            <span style={{ color: 'var(--al-gold)' }}>30+ modules</span> &middot; one unified AI Vedic operating system.
+          <p className="max-w-3xl text-sm md:text-base leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+            Beyond simple sun signs and fear-based predictions. AstroLife unifies ancient astronomical shastras,
+            Ayurvedic medicine, and Indian classical sound theory with sub-arcsecond Swiss Ephemeris computing.
           </p>
-          <div className="grid gap-x-10 gap-y-7 sm:grid-cols-2">
-            {features.map((f, i) => (
-              <div key={f.t} className="border-t pt-4" style={{ borderColor: 'var(--al-line)' }}>
-                <div className="mb-1 flex items-baseline gap-3">
-                  <span className="font-mono text-xs" style={{ color: 'var(--al-gold)' }}>
-                    {String(i + 1).padStart(2, '0')}
+        </div>
+
+        {/* TIER 1: THE 5 HERO / VIRAL WOW ENGINES */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
+              style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)', border: '1px solid var(--al-line-strong)' }}>
+              Tier 1 · Flagship Breakthroughs
+            </span>
+            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+              Core Predictive & Therapeutic Engines
+            </span>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-2">
+            
+            {/* 1. DESTINY CURVE */}
+            <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
+              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl">📈</span>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
+                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                    0–90 Yrs Life Curve
                   </span>
-                  <span className="font-serif text-lg" style={{ color: 'var(--al-ivory)' }}>{f.t}</span>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>{f.d}</p>
+                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                  Interactive Destiny Curve
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                  Never wonder when your golden phase begins. The Destiny Engine plots a continuous 90-year score curve
+                  across career, wealth, and life momentum — tracking your exact peak windows, antardasha shifts, and seasons for cautious patience.
+                </p>
+              </div>
+
+              {/* Mini visual mockup */}
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
+                <div className="flex justify-between text-xs" style={{ color: 'var(--al-gold-bright)' }}>
+                  <span>Age 20: Foundation (62)</span>
+                  <span className="font-bold">★ Age 34: Peak Golden Era (96)</span>
+                  <span>Age 52: Wealth (89)</span>
+                </div>
+                <div className="relative mt-3 h-10 w-full overflow-hidden rounded">
+                  <svg className="h-full w-full" viewBox="0 0 400 60" preserveAspectRatio="none">
+                    <path d="M 0 50 Q 80 45, 140 25 T 240 10 T 320 18 T 400 35" fill="none" stroke="var(--al-gold-bright)" strokeWidth="2.5" />
+                    <circle cx="240" cy="10" r="4.5" fill="var(--al-gold-bright)" />
+                  </svg>
+                </div>
+                <div className="mt-2 flex justify-between text-9px uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+                  <span>Rahu MD · Career Focus</span>
+                  <span>Jupiter MD · Zenith Growth</span>
+                  <span>Saturn MD · Legacy Stability</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. MEDICAL ASTROLOGY */}
+            <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
+              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl">🩺</span>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
+                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                    Charaka & Parashari Shastra
+                  </span>
+                </div>
+                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                  Medical Kundli & Astro-Chikitsa
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                  Preventive healthcare rooted in classical Ayurveda. Cross-verifies your 6th house (Roga), 8th house (Ayushya),
+                  and Nakshatra organ rulers with planetary affiliations to compute your Tridosha constitution and detect transit medical vulnerabilities before symptoms arise.
+                </p>
+              </div>
+
+              {/* Mini visual mockup */}
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
+                <div className="flex items-center justify-between text-xs font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                  <span>Constitutional Tridosha Breakdown</span>
+                  <span className="text-9px font-normal px-2 py-0.5 rounded" style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)' }}>Vata-Pitta Dominant</span>
+                </div>
+                <div className="mt-3 space-y-2">
+                  <div>
+                    <div className="flex justify-between text-10px" style={{ color: 'var(--al-ivory-dim)' }}>
+                      <span>Vata (Air/Nerve)</span>
+                      <span>46%</span>
+                    </div>
+                    <div className="mt-1 h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: '46%', background: '#60a5fa' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-10px" style={{ color: 'var(--al-ivory-dim)' }}>
+                      <span>Pitta (Fire/Metabolic Agni)</span>
+                      <span>36%</span>
+                    </div>
+                    <div className="mt-1 h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: '36%', background: '#f59e0b' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-10px" style={{ color: 'var(--al-ivory-dim)' }}>
+                      <span>Kapha (Earth/Fluid)</span>
+                      <span>18%</span>
+                    </div>
+                    <div className="mt-1 h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: '18%', background: '#10b981' }} />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 text-9px uppercase tracking-wider flex items-center gap-1.5" style={{ color: 'var(--al-gold-bright)' }}>
+                  <span>✦ Early Warning:</span>
+                  <span style={{ color: 'var(--al-ivory-dim)' }}>Saturn transit activating 6th lord · Guard nervous system and lower spine</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. ASTROSOUND THERAPY */}
+            <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
+              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl">🎵</span>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
+                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                    Raaga & Hz Science
+                  </span>
+                </div>
+                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                  AstroSound & Dasha Frequency Therapy
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                  Planets are acoustic vibrations. AstroLife maps your active Mahadasha, Antardasha, and Praharas to specific
+                  Indian Classical Raagas (Bhairav, Yaman, Darbari) and peer-reviewed Solfeggio frequencies (432Hz, 528Hz) to dissolve restlessness, deepen restorative sleep, and tune your bio-field.
+                </p>
+              </div>
+
+              {/* Interactive Audio Button */}
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                      Jupiter-Mahadasha Harmony Tone
+                    </div>
+                    <div className="text-10px" style={{ color: 'var(--al-ivory-dim)' }}>
+                      432 Hz Healing Fundamental + 528 Hz Solfeggio Resonance
+                    </div>
+                  </div>
+                  <button
+                    onClick={playTone}
+                    disabled={playing}
+                    className="flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-75 flex-shrink-0"
+                    style={{
+                      background: 'linear-gradient(180deg, var(--al-gold-bright), var(--al-gold))',
+                      color: 'var(--al-bg)',
+                    }}
+                  >
+                    {playing ? 'Playing 4s tone...' : '▶ Listen (4s Tone)'}
+                  </button>
+                </div>
+                {playing && (
+                  <div className="mt-3 flex items-center justify-center gap-1.5">
+                    {[16, 28, 20, 32, 18, 26, 14, 22].map((h, idx) => (
+                      <span
+                        key={idx}
+                        className="w-1 rounded-full animate-pulse"
+                        style={{
+                          height: `${h}px`,
+                          background: 'var(--al-gold-bright)',
+                          animationDelay: `${idx * 0.1}s`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 4. AI PALMISTRY VISION SCANNER */}
+            <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
+              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl">✋</span>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
+                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                    Computer Vision AI
+                  </span>
+                </div>
+                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                  AI Palmistry Vision Scanner
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                  Snap a photo of your palm. Our computer-vision neural network automatically detects and traces
+                  6 primary lines (Heart, Head, Life, Fate, Sun, Mercury) and 8 Mounts — fusing your physical hand lines with your astrological Kundli to confirm birth-time accuracy.
+                </p>
+              </div>
+
+              {/* Mini visual mockup */}
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold" style={{ color: 'var(--al-ivory)' }}>Computer Vision Pipeline</span>
+                  <span className="text-9px font-mono" style={{ color: 'var(--al-gold-bright)' }}>98.2% Line Trace Confidence</span>
+                </div>
+                <div className="mt-2.5 grid grid-cols-3 gap-2 text-center text-10px">
+                  <div className="rounded p-2" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                    <div className="font-semibold" style={{ color: '#ef4444' }}>Heart Line</div>
+                    <div className="text-9px" style={{ color: 'var(--al-ivory-dim)' }}>Deep & Balanced</div>
+                  </div>
+                  <div className="rounded p-2" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                    <div className="font-semibold" style={{ color: '#60a5fa' }}>Head Line</div>
+                    <div className="text-9px" style={{ color: 'var(--al-ivory-dim)' }}>Curved Creative</div>
+                  </div>
+                  <div className="rounded p-2" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                    <div className="font-semibold" style={{ color: '#c8a030' }}>Fate Line</div>
+                    <div className="text-9px" style={{ color: 'var(--al-ivory-dim)' }}>Rises at Age 28</div>
+                  </div>
+                </div>
+                <div className="mt-2.5 text-9px text-center uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+                  Fused with 10th House Sun-Mercury Budhaditya Yoga
+                </div>
+              </div>
+            </div>
+
+            {/* 5. TRANSIT RIPPLE ENGINE (Full-width card) */}
+            <div className="lg:col-span-2 flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
+              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl">🌊</span>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
+                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                    Multi-House Shockwave Engine
+                  </span>
+                </div>
+                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                  Planetary Transit Ripple Engine
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed max-w-4xl" style={{ color: 'var(--al-ivory-dim)' }}>
+                  Major planetary transits never act in isolation. When slow-moving cosmic giants (Saturn, Jupiter, Rahu, Ketu) enter a new rashi,
+                  their drishti (aspects) and resonance trigger 4 interconnected houses simultaneously. The Transit Ripple Engine computes these simultaneous ripples across career, wealth, partnerships, and inner mental peace.
+                </p>
+              </div>
+
+              {/* Ripple Diagram */}
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
+                <div className="text-xs font-semibold mb-3" style={{ color: 'var(--al-gold-bright)' }}>
+                  Live Transit Propagation Example (Saturn in Pisces):
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs">
+                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                    <div className="font-semibold text-sm" style={{ color: 'var(--al-ivory)' }}>Epicenter (House 1)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>Saturn in Pisces conjunct Lagna: Redefining personal identity, discipline & physical stamina.</div>
+                  </div>
+                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                    <div className="font-semibold text-sm" style={{ color: 'var(--al-gold)' }}>Ripple A (House 3)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>3rd Drishti on Taurus: Courage, business initiative, communication & contractual shifts.</div>
+                  </div>
+                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                    <div className="font-semibold text-sm" style={{ color: 'var(--al-gold)' }}>Ripple B (House 7)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>7th Drishti on Virgo: Serious marriage tests, long-term business partnerships & legal pacts.</div>
+                  </div>
+                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                    <div className="font-semibold text-sm" style={{ color: 'var(--al-gold)' }}>Ripple C (House 10)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>10th Drishti on Sagittarius: Culmination of professional karma, promotion or status change.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* TIER 2: DECISION & LIFE INTELLIGENCE SUITE */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
+              style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)', border: '1px solid var(--al-line-strong)' }}>
+              Tier 2 · Practical Life Solutions
+            </span>
+            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+              Relationship Timing, Space & Name Resonance
+            </span>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: '💍',
+                title: 'K.N. Rao Marriage Window Scanner',
+                badge: 'Double-Transit Sutra',
+                desc: 'Identifies the precise 12-month marriage timing window through Jupiter and Saturn mutual aspects on the 7th house and lagna, combined with 36-point Ashtakoota & Nadi Dosha cancellation.'
+              },
+              {
+                icon: '🔢',
+                title: 'Vedic & Pythagorean Numerology',
+                badge: 'Name Vibration',
+                desc: 'Life Path, Soul Urge, and Destiny Number calculations with Lo-Shu Grid analysis. Optimizes personal and business name spellings for harmonic frequency alignment with your planetary chart.'
+              },
+              {
+                icon: '⏱️',
+                title: '30-Day Precision Muhurat Scanner',
+                badge: 'Auspicious Timing',
+                desc: 'Automated 30-day shastra scanner for Vivah, Griha Pravesh, Startup Registration, and Major Investments — pre-calculating Chaughadia, Abhijit, Hora, and eliminating Rahu Kaal pitfalls.'
+              },
+              {
+                icon: '🏛️',
+                title: '16-Zone Astro-Vastu Directional Engine',
+                badge: 'Spatial Alignment',
+                desc: 'Maps the 16 Vastu directions of your home or workplace to your planetary strengths. Detects directional blockages without costly architectural demolition, providing subtle element remedies.'
+              },
+              {
+                icon: '🧠',
+                title: 'Jungian Astro-Psychology & Shadow Work',
+                badge: 'Subconscious Mind',
+                desc: 'Bridges Swiss psychoanalyst Carl Jung with ancient Jyotish. Analyzes elemental temperament, shadow archetypes, and subconscious karmic blind spots for authentic psychological growth.'
+              },
+            ].map((card) => (
+              <div key={card.title} className="rounded-xl p-6 transition-all duration-300 hover:border-gold"
+                style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl">{card.icon}</span>
+                  <span className="font-mono text-9px uppercase tracking-wider px-2 py-0.5 rounded"
+                    style={{ background: GOLD_TINT(12), color: 'var(--al-gold)' }}>
+                    {card.badge}
+                  </span>
+                </div>
+                <h4 className="mt-4 font-serif text-lg font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                  {card.title}
+                </h4>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                  {card.desc}
+                </p>
               </div>
             ))}
           </div>
         </div>
+
+        {/* TIER 3: THE CLASSICAL VEDIC SUPERCOMPUTER */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
+              style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)', border: '1px solid var(--al-line-strong)' }}>
+              Tier 3 · Classical Shastra Supercomputer
+            </span>
+            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+              Deep Mathematical & Epistemological Architecture
+            </span>
+          </div>
+
+          <div className="grid gap-px overflow-hidden rounded-xl sm:grid-cols-2 lg:grid-cols-3"
+            style={{ border: '1px solid var(--al-line)', background: 'var(--al-line)' }}>
+            {[
+              {
+                num: '01',
+                title: 'Krishnamurti Paddhati (KP System)',
+                desc: 'Placidus cusp calculations, 249 sub-lord divisions, 4-step ruling planets, and significators for precise event confirmation.'
+              },
+              {
+                num: '02',
+                title: 'Lal Kitab Farman & Household Upaya',
+                desc: 'Identifies sleeping houses, blind planets, ancestral debts (Pitra Rin), and zero-cost, non-commercial household remedies.'
+              },
+              {
+                num: '03',
+                title: 'Jaimini Sutras & Chara Karakas',
+                desc: 'Atmakaraka soul purpose, Arudha Lagna public illusion, Upapada relationship karma, and Karakamsha spiritual path.'
+              },
+              {
+                num: '04',
+                title: '300+ Vedic Yogas & 6-Fold Shadbala',
+                desc: 'Automatic detection of Raja, Dhana, Gajakesari, and Viparita yogas with Sthana, Dik, Kaala, and Chesta mathematical bala scores.'
+              },
+              {
+                num: '05',
+                title: '81-Square Sarvatobhadra Chakra',
+                desc: 'Classical Sarvatobhadra Nakshatra Vedha matrix, mapping Front, Right, Left, and Diagonal planetary aspects for critical timings.'
+              },
+              {
+                num: '06',
+                title: 'AstroBank Research Archive (4,000+ Cases)',
+                desc: 'Over 4,000 verified historical charts of scientists, world leaders, and celebrities to validate every planetary rule empirically.'
+              },
+            ].map((sys) => (
+              <div key={sys.title} className="p-6" style={{ background: 'var(--al-bg)' }}>
+                <span className="font-mono text-xs" style={{ color: 'var(--al-gold)' }}>{sys.num}</span>
+                <div className="mt-1 font-serif text-base font-semibold" style={{ color: 'var(--al-ivory)' }}>{sys.title}</div>
+                <p className="mt-1.5 text-xs leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>{sys.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   );

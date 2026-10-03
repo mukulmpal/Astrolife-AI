@@ -55,20 +55,20 @@ export function BirthDetailsForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-2 block text-sm font-medium uppercase tracking-wider" style={{ color: '#c8a030' }}>
-          Name
+        <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#8C6508' }}>
+          Full Name
         </label>
         <input
           type="text"
           name="name"
           value={formData.name}
           onChange={handleChange}
-          placeholder="Your full name"
+          placeholder="e.g. Aarav Sharma"
           disabled={loading}
-          className="w-full rounded-lg border px-4 py-3 text-sm disabled:opacity-50"
+          className="w-full rounded-lg border px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#B8860B]/40 disabled:opacity-50"
           style={{
-            borderColor: '#FFFFFF',
-            background: '#FFFFFF',
+            borderColor: 'rgba(184, 134, 11, 0.35)',
+            background: '#FAF7F2',
             color: '#1A1A1A',
           }}
         />
@@ -76,7 +76,7 @@ export function BirthDetailsForm() {
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-2 block text-sm font-medium uppercase tracking-wider" style={{ color: '#c8a030' }}>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#8C6508' }}>
             Date of Birth
           </label>
           <input
@@ -85,17 +85,17 @@ export function BirthDetailsForm() {
             value={formData.dob}
             onChange={handleChange}
             disabled={loading}
-            className="w-full rounded-lg border px-4 py-3 text-sm disabled:opacity-50"
+            className="w-full rounded-lg border px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#B8860B]/40 disabled:opacity-50"
             style={{
-              borderColor: '#FFFFFF',
-              background: '#FFFFFF',
+              borderColor: 'rgba(184, 134, 11, 0.35)',
+              background: '#FAF7F2',
               color: '#1A1A1A',
             }}
           />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-medium uppercase tracking-wider" style={{ color: '#c8a030' }}>
-            Time (IST)
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#8C6508' }}>
+            Time (Local)
           </label>
           <input
             type="time"
@@ -103,10 +103,10 @@ export function BirthDetailsForm() {
             value={formData.time}
             onChange={handleChange}
             disabled={loading}
-            className="w-full rounded-lg border px-4 py-3 text-sm disabled:opacity-50"
+            className="w-full rounded-lg border px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#B8860B]/40 disabled:opacity-50"
             style={{
-              borderColor: '#FFFFFF',
-              background: '#FFFFFF',
+              borderColor: 'rgba(184, 134, 11, 0.35)',
+              background: '#FAF7F2',
               color: '#1A1A1A',
             }}
           />
@@ -114,27 +114,27 @@ export function BirthDetailsForm() {
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium uppercase tracking-wider" style={{ color: '#c8a030' }}>
-          City, Country
+        <label className="mb-2 block text-xs font-semibold uppercase tracking-wider" style={{ color: '#8C6508' }}>
+          Birth Place (City, Country)
         </label>
         <input
           type="text"
           name="city"
           value={formData.city}
           onChange={handleChange}
-          placeholder="e.g., Mumbai, India"
+          placeholder="e.g. Mumbai, India or London, UK"
           disabled={loading}
-          className="w-full rounded-lg border px-4 py-3 text-sm disabled:opacity-50"
+          className="w-full rounded-lg border px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#B8860B]/40 disabled:opacity-50"
           style={{
-            borderColor: '#FFFFFF',
-            background: '#FFFFFF',
+            borderColor: 'rgba(184, 134, 11, 0.35)',
+            background: '#FAF7F2',
             color: '#1A1A1A',
           }}
         />
       </div>
 
       {error && (
-        <div className="rounded-lg p-3 text-sm" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5' }}>
+        <div className="rounded-lg p-3 text-sm" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#dc2626' }}>
           {error}
         </div>
       )}
@@ -142,17 +142,27 @@ export function BirthDetailsForm() {
       <button
         type="submit"
         disabled={loading}
-        className="mt-6 w-full cursor-pointer rounded-lg py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.02] disabled:opacity-50"
+        className="mt-6 w-full cursor-pointer rounded-lg py-3.5 text-sm font-bold tracking-wide shadow-md transition-all hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
         style={{
-          background: 'linear-gradient(180deg, #f4d03f, #c8a030)',
-          color: '#FAF7F2',
+          background: 'linear-gradient(180deg, #D4AF37 0%, #B8860B 100%)',
+          color: '#1A1A1A',
+          boxShadow: '0 8px 24px -6px rgba(184, 134, 11, 0.45)',
         }}
       >
-        {loading ? 'Getting you started...' : 'Generate My Free Kundli →'}
+        {loading ? 'Calculating Kundli...' : 'Generate My Free Kundli →'}
       </button>
 
-      <p className="text-center text-10px uppercase tracking-wider" style={{ color: '#8880a8' }}>
-        ✓ Free forever · No card required · Encrypted
+      <button
+        type="button"
+        onClick={() => router.push('/dashboard?sample=true')}
+        className="mt-3 block w-full text-center text-xs font-serif italic transition-opacity hover:opacity-80"
+        style={{ color: '#8C6508' }}
+      >
+        ✦ Or explore with a live sample chart (Destiny + Sound + Health) →
+      </button>
+
+      <p className="mt-3 text-center text-10px uppercase tracking-wider" style={{ color: '#6B635B' }}>
+        ✓ 100% Free · No Card Required · Swiss Ephemeris Precision
       </p>
     </form>
   );

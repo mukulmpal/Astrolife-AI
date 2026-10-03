@@ -24,7 +24,7 @@ export function DirectionAHero() {
             </p>
 
             <div className="dira-reveal dira-reveal-1 in mb-7 flex">
-              <span className="dira-rule-label">Vedic · Decoded by AI</span>
+              <span className="dira-rule-label">✦ AI Vedic Intelligence OS · 25+ Engines</span>
             </div>
 
             <h1 className="dira-display dira-reveal dira-reveal-2 in" style={{ color: 'var(--al-ivory)' }}>
@@ -39,55 +39,55 @@ export function DirectionAHero() {
               className="dira-reveal dira-reveal-3 in max-w-xl text-base leading-relaxed md:text-lg"
               style={{ color: 'var(--al-ivory-dim)' }}
             >
-              A kundli is not a chart — it is your life&rsquo;s operating system. Career timing, the patterns
-              of love, karmic knots, and the precise hour the universe turns in your favour.
+              A kundli is not a chart — it is your life&rsquo;s operating system. 90-year destiny curves,
+              planetary sound therapy, medical ayurvedic blueprints, and the precise hour the universe turns in your favour.
             </p>
 
             {/* Features */}
-            <div className="dira-reveal dira-reveal-4 in mt-12 space-y-4">
+            <div className="dira-reveal dira-reveal-4 in mt-10 space-y-4">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 text-2xl">✦</div>
+                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>📈</div>
                 <div>
-                  <div className="font-semibold" style={{ color: 'var(--al-gold-bright)' }}>25+ Vedic Engines</div>
-                  <p className="text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Yogas, Dasha, Shadbala, KP, Lal Kitab, Vastu, and more</p>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: 'var(--al-gold-bright)' }}>90-Year Destiny Curve & Transit Ripple</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Visual life score trajectory, career golden windows & multi-house ripple shocks</p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 text-2xl">⊙</div>
+                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🩺</div>
                 <div>
-                  <div className="font-semibold" style={{ color: 'var(--al-gold-bright)' }}>Sidereal Precision</div>
-                  <p className="text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Lahiri ayanamsa • Validated against Drik Panchang</p>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: 'var(--al-gold-bright)' }}>Medical Kundli & Dasha Sound Therapy</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Nakshatra organ mapping, Tridosha balance & Indian Classical Raagas for active dashas</p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 text-2xl">🤖</div>
+                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>◈</div>
                 <div>
-                  <div className="font-semibold" style={{ color: 'var(--al-gold-bright)' }}>AI Astrologer</div>
-                  <p className="text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Every answer cited from your chart • No borrowed clichés</p>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: 'var(--al-gold-bright)' }}>Sub-Arcsecond Sidereal Precision & AI</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Swiss Ephemeris 0.01° accuracy • Every answer cited from classical Shastra</p>
                 </div>
               </div>
             </div>
 
             {/* Trust Strip */}
             <div
-              className="dira-reveal dira-reveal-5 in mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-lg sm:grid-cols-3"
+              className="dira-reveal dira-reveal-5 in mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-lg sm:grid-cols-3"
               style={{ border: '1px solid var(--al-line)', background: 'var(--al-line)' }}
             >
               {[
                 { k: '40,000+', v: 'charts cast' },
-                { k: '4.9★', v: '2.1k reviews' },
-                { k: '1°', v: 'sidereal accuracy' },
+                { k: '4.9★', v: 'verified reviews' },
+                { k: '0.01°', v: 'Swiss precision' },
               ].map((s) => (
                 <div
                   key={s.v}
-                  className="px-3 py-4"
+                  className="px-3 py-3"
                   style={{ background: 'var(--al-bg)' }}
                 >
                   <div className="font-serif text-lg" style={{ color: 'var(--al-gold-bright)' }}>
                     {s.k}
                   </div>
                   <div
-                    className="mt-1 text-9px uppercase tracking-widest"
+                    className="mt-0.5 text-9px uppercase tracking-widest"
                     style={{ color: 'var(--al-ivory-mute)' }}
                   >
                     {s.v}
@@ -99,22 +99,22 @@ export function DirectionAHero() {
 
           {/* RIGHT COLUMN - Form */}
           <div
-            className="dira-reveal dira-reveal-4 in rounded-2xl p-8"
+            className="dira-reveal dira-reveal-4 in rounded-2xl p-7 md:p-8"
             style={{
-              background: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 100%)',
-              border: '1px solid #2d2860',
-              boxShadow: '0 20px 60px -14px rgba(200, 160, 48, 0.25)',
+              background: '#FFFFFF',
+              border: '1px solid rgba(184, 134, 11, 0.35)',
+              boxShadow: '0 20px 60px -14px rgba(184, 134, 11, 0.25)',
             }}
           >
-            <div className="mb-6">
-              <div className="mb-2 text-11px font-semibold uppercase tracking-widest" style={{ color: '#c8a030' }}>
+            <div className="mb-5">
+              <div className="mb-1 text-10px font-bold uppercase tracking-widest" style={{ color: '#8C6508' }}>
                 ✦ Get Started Free
               </div>
-              <h3 className="font-serif text-2xl font-600" style={{ color: '#1A1A1A' }}>
-                Your Kundli
+              <h3 className="font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
+                Cast Your Kundli
               </h3>
-              <p className="mt-2 text-sm" style={{ color: '#a79fbd' }}>
-                In thirty seconds, no account needed.
+              <p className="mt-1 text-xs" style={{ color: '#6B635B' }}>
+                Instant calculation • Zero account needed
               </p>
             </div>
 
