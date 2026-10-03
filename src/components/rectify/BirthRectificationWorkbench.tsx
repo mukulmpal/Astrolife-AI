@@ -1070,6 +1070,51 @@ export function BirthRectificationWorkbench() {
                       {result.bestCandidate.evidenceMatrix.lifeEvents.details}
                     </p>
                   </div>
+
+                  {/* Row 7: Pala Harmonics (3P mod 7 & 4P mod 9) */}
+                  {result.bestCandidate.evidenceMatrix.palaHarmonics && (
+                    <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#1A1A1A]">Pala Harmonics (63-Grid)</span>
+                        <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.palaHarmonics.weekdayMatched && result.bestCandidate.evidenceMatrix.palaHarmonics.starGroupMatched ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
+                          {result.bestCandidate.evidenceMatrix.palaHarmonics.weekdayMatched && result.bestCandidate.evidenceMatrix.palaHarmonics.starGroupMatched ? "✓ Synchronized" : "Harmonizing"} (+{result.bestCandidate.evidenceMatrix.palaHarmonics.score} pts)
+                        </span>
+                      </div>
+                      <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                        {result.bestCandidate.evidenceMatrix.palaHarmonics.details}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Row 8: Navamsa-Dwadasamsa Gender (16'40'') */}
+                  {result.bestCandidate.evidenceMatrix.ndGender && (
+                    <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#1A1A1A]">N-D Gender Point</span>
+                        <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.ndGender.matched ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+                          {result.bestCandidate.evidenceMatrix.ndGender.matched ? "✓ Verified" : "Contradicted"} (+{result.bestCandidate.evidenceMatrix.ndGender.score} pts)
+                        </span>
+                      </div>
+                      <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                        {result.bestCandidate.evidenceMatrix.ndGender.details}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Row 9: Sun-Star to Ascendant (Chapter XIV) */}
+                  {result.bestCandidate.evidenceMatrix.sunStarAscendant && (
+                    <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#1A1A1A]">Solar Quarter Check</span>
+                        <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.sunStarAscendant.matched ? "bg-emerald-100 text-emerald-800" : "bg-stone-100 text-stone-700"}`}>
+                          {result.bestCandidate.evidenceMatrix.sunStarAscendant.matched ? "✓ Corroborated" : "Deviates"} (+{result.bestCandidate.evidenceMatrix.sunStarAscendant.score} pts)
+                        </span>
+                      </div>
+                      <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                        {result.bestCandidate.evidenceMatrix.sunStarAscendant.details}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Audit Trace Drawer */}

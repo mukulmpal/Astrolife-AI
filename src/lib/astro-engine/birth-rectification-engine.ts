@@ -125,6 +125,39 @@ export interface TattvaValidationResult {
   audit: string;
 }
 
+export interface PalaHarmonicsResult {
+  weekdayMatched: boolean;
+  starGroupMatched: boolean;
+  computedWeekdayNumber: number;
+  expectedWeekdayNumber: number;
+  computedStarGroup: number;
+  expectedStarGroup: number;
+  offsetFrom63GridPalas: number;
+  score: number;
+  audit: string;
+}
+
+export interface NDGenderResult {
+  ndPointNumber: number;
+  ndSign: string;
+  ndGender: "male" | "female";
+  nativeGender?: "male" | "female" | "other";
+  matched: boolean;
+  score: number;
+  audit: string;
+}
+
+export interface SunStarAscendantResult {
+  quarter: 1 | 2 | 3 | 4;
+  period: "day" | "night";
+  sunNakshatraNumber: number;
+  expectedStarOffsets: number[];
+  ascendantNakshatraNumber: number;
+  matched: boolean;
+  score: number;
+  audit: string;
+}
+
 export interface BTREvidenceMatrix {
   kpThreeLevel: {
     passed: boolean;
@@ -162,6 +195,26 @@ export interface BTREvidenceMatrix {
   tattva: {
     tattvaName: string;
     tattvaElement: string;
+    matched: boolean;
+    score: number;
+    details: string;
+  };
+  palaHarmonics?: {
+    weekdayMatched: boolean;
+    starGroupMatched: boolean;
+    score: number;
+    details: string;
+  };
+  ndGender?: {
+    ndPointNumber: number;
+    ndGender: string;
+    matched: boolean;
+    score: number;
+    details: string;
+  };
+  sunStarAscendant?: {
+    quarter: number;
+    period: string;
     matched: boolean;
     score: number;
     details: string;
@@ -458,44 +511,77 @@ export function evaluateGulika(
   };
 }
 
-// ── Tattva Engine (Five Element Palas Cycle) ──────────────────────────────────
-// Kshiti = 15 palas, Apa = 30 palas, Teja = 45 palas, Marut = 60 palas, Vyoma = 75 palas
-// Total cycle = 225 palas (90 min)
+// ── Tattva Engine (Exact R.K. Das Weekday Permutations, Pages 66-68) ────────
+// Each weekday collection has a unique canonical order of the 5 tattvas totaling 225 palas.
+const WEEKDAY_TATTVA_SEQUENCES: Record<
+  string,
+  Array<{ name: string; element: "earth" | "water" | "fire" | "air" | "ether"; duration: number }>
+> = {
+  Sunday: [
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+    { name: "Marut (Air)", element: "air", duration: 60 },
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+    { name: "Apa (Water)", element: "water", duration: 30 },
+  ],
+  Monday: [
+    { name: "Apa (Water)", element: "water", duration: 30 },
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+    { name: "Marut (Air)", element: "air", duration: 60 },
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+  ],
+  Tuesday: [
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+    { name: "Apa (Water)", element: "water", duration: 30 },
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+    { name: "Marut (Air)", element: "air", duration: 60 },
+  ],
+  Wednesday: [
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+    { name: "Apa (Water)", element: "water", duration: 30 },
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+    { name: "Marut (Air)", element: "air", duration: 60 },
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+  ],
+  Thursday: [
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+    { name: "Marut (Air)", element: "air", duration: 60 },
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+    { name: "Apa (Water)", element: "water", duration: 30 },
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+  ],
+  Friday: [
+    { name: "Apa (Water)", element: "water", duration: 30 },
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+    { name: "Marut (Air)", element: "air", duration: 60 },
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+  ],
+  Saturday: [
+    { name: "Marut (Air)", element: "air", duration: 60 },
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+    { name: "Apa (Water)", element: "water", duration: 30 },
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+  ],
+};
+
 export function evaluateTattva(
   elapsedPalas: number,
   weekday: string,
   lagnaRashi: string
 ): TattvaValidationResult {
   const cyclePalas = ((elapsedPalas % 225) + 225) % 225;
-
-  const STARTING_ELEMENT: Record<string, "fire" | "water" | "earth" | "ether" | "air"> = {
-    Sunday: "fire",
-    Monday: "water",
-    Tuesday: "fire",
-    Wednesday: "earth",
-    Thursday: "ether",
-    Friday: "water",
-    Saturday: "air",
-  };
-
-  const ELEMENT_ORDER: Array<{ name: string; element: "earth" | "water" | "fire" | "air" | "ether"; duration: number }> = [
-    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
-    { name: "Apa (Water)", element: "water", duration: 30 },
-    { name: "Teja (Fire)", element: "fire", duration: 45 },
-    { name: "Marut (Air)", element: "air", duration: 60 },
-    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
-  ];
-
-  const startElem = STARTING_ELEMENT[weekday] ?? "fire";
-  const startIdx = ELEMENT_ORDER.findIndex((e) => e.element === startElem);
+  const seq = WEEKDAY_TATTVA_SEQUENCES[weekday] ?? WEEKDAY_TATTVA_SEQUENCES.Sunday;
 
   let acc = 0;
-  let active = ELEMENT_ORDER[0];
-  for (let i = 0; i < 5; i++) {
-    const cur = ELEMENT_ORDER[(startIdx + i) % 5];
-    acc += cur.duration;
+  let active = seq[0];
+  for (const item of seq) {
+    acc += item.duration;
     if (cyclePalas <= acc) {
-      active = cur;
+      active = item;
       break;
     }
   }
@@ -510,6 +596,163 @@ export function evaluateTattva(
     matched,
     score,
     audit: `Active Tattva: ${active.name} (${active.element.toUpperCase()}). Lagna Element: ${lagnaElem.toUpperCase()}`,
+  };
+}
+
+// ── Pala Harmonics: 3P mod 7 & 4P mod 9 Dual Verification (Chapter XI, p. 73-75) ──
+// Mathematical property: LCM(7, 9) = 63 palas. A true astrological moment of birth
+// must align with both the weekday count and star group count.
+export function evaluatePalaHarmonics(
+  elapsedPalas: number,
+  weekdayName: string,
+  moonNakshatraNumber: number // 1 to 27
+): PalaHarmonicsResult {
+  const WEEKDAY_NUMBERS: Record<string, number> = {
+    Sunday: 1, Monday: 2, Tuesday: 3, Wednesday: 4, Thursday: 5, Friday: 6, Saturday: 7,
+  };
+  const expWeekdayNum = WEEKDAY_NUMBERS[weekdayName] ?? 1;
+  const expStarGroup = ((moonNakshatraNumber - 1) % 9) + 1;
+
+  // Formula 1: Weekday = (3 * P) mod 7
+  const rw = ((3 * elapsedPalas) % 7 + 7) % 7;
+  const calcWeekdayNum = rw === 0 ? 7 : Math.ceil(rw);
+  const weekdayMatched = calcWeekdayNum === expWeekdayNum;
+
+  // Formula 2: Star Group = (4 * P) mod 9
+  const rs = ((4 * elapsedPalas) % 9 + 9) % 9;
+  const calcStarGroup = rs === 0 ? 9 : Math.ceil(rs);
+  const starGroupMatched = calcStarGroup === expStarGroup;
+
+  // 63-Pala Grid proximity (LCM of 7 and 9 is 63)
+  const rem63 = ((elapsedPalas % 63) + 63) % 63;
+  const offsetFrom63GridPalas = Math.min(rem63, 63 - rem63);
+
+  let score = 0;
+  if (weekdayMatched) score += 3;
+  if (starGroupMatched) score += 3;
+  if (weekdayMatched && starGroupMatched) score += 2; // bonus convergence
+
+  return {
+    weekdayMatched,
+    starGroupMatched,
+    computedWeekdayNumber: calcWeekdayNum,
+    expectedWeekdayNumber: expWeekdayNum,
+    computedStarGroup: calcStarGroup,
+    expectedStarGroup: expStarGroup,
+    offsetFrom63GridPalas: Math.round(offsetFrom63GridPalas * 10) / 10,
+    score,
+    audit: `Palas ${elapsedPalas.toFixed(1)}: Weekday (3P mod 7) = ${calcWeekdayNum} (Exp: ${expWeekdayNum} ${weekdayName}), StarGroup (4P mod 9) = ${calcStarGroup} (Exp: ${expStarGroup}). 63-Grid offset: ${offsetFrom63GridPalas.toFixed(1)}p.`,
+  };
+}
+
+// ── Navamsa-Dwadasamsa (N-D) 16'40'' Gender Alternation (Chapter VI & pp. 116-117) ──
+// Each sign of 30° is divided into 108 N-D points of 16'40'' each (~66.6 seconds of rotation).
+export function evaluateNDGender(
+  lagnaLon: number,
+  nativeGender?: "male" | "female" | "other"
+): NDGenderResult {
+  const normLon = ((lagnaLon % 360) + 360) % 360;
+  const signIdx = Math.floor(normLon / 30);
+  const degInSign = normLon % 30;
+
+  // Odd signs: Aries (0), Gemini (2), Leo (4), Libra (6), Sagittarius (8), Aquarius (10)
+  const isOddSign = signIdx % 2 === 0;
+
+  const ndArc = 30 / 108; // 16'40'' = 0.2777777778°
+  const ndPoint = Math.min(108, Math.max(1, Math.floor(degInSign / ndArc) + 1));
+  const isOddPoint = ndPoint % 2 !== 0;
+
+  // In odd signs, odd N-D is Male, even N-D is Female.
+  // In even signs, odd N-D is Female, even N-D is Male (Page 43-44).
+  const ndGender: "male" | "female" = isOddSign
+    ? (isOddPoint ? "male" : "female")
+    : (isOddPoint ? "female" : "male");
+
+  let matched = true;
+  let score = 2;
+  if (nativeGender && (nativeGender === "male" || nativeGender === "female")) {
+    matched = ndGender === nativeGender;
+    score = matched ? 3 : 0;
+  }
+
+  return {
+    ndPointNumber: ndPoint,
+    ndSign: RASHIS[signIdx],
+    ndGender,
+    nativeGender,
+    matched,
+    score,
+    audit: `Lagna in ${RASHIS[signIdx]} ${degInSign.toFixed(2)}° falls in N-D Point #${ndPoint} (${ndGender.toUpperCase()}). Native gender: ${nativeGender?.toUpperCase() || "UNSPECIFIED"}.`,
+  };
+}
+
+// ── Sun's Nakshatra to Ascendant 4-Quarter Rule (Chapter XIV, pp. 85-88) ───────
+export function evaluateSunStarToAscendant(
+  sunLon: number,
+  ascLon: number,
+  isDayBirth: boolean,
+  sunInfo: ReturnType<typeof computeSunrisePalas>
+): SunStarAscendantResult {
+  const sunNak = getNak(sunLon);
+  const ascNak = getNak(ascLon);
+
+  const totalQuarterDuration = isDayBirth
+    ? sunInfo.dayDurationHours / 4
+    : sunInfo.nightDurationHours / 4;
+
+  const elapsedHours = sunInfo.elapsedSeconds / 3600;
+  let q: 1 | 2 | 3 | 4 = 1;
+  if (isDayBirth) {
+    if (elapsedHours < totalQuarterDuration) q = 1;
+    else if (elapsedHours < 2 * totalQuarterDuration) q = 2;
+    else if (elapsedHours < 3 * totalQuarterDuration) q = 3;
+    else q = 4;
+  } else {
+    const nightElapsedHours = Math.max(0, elapsedHours - sunInfo.dayDurationHours);
+    if (nightElapsedHours < totalQuarterDuration) q = 1;
+    else if (nightElapsedHours < 2 * totalQuarterDuration) q = 2;
+    else if (nightElapsedHours < 3 * totalQuarterDuration) q = 3;
+    else q = 4;
+  }
+
+  // Chapter XIV Rule Table (Page 88):
+  // Daytime offsets from Sun star:
+  // Q1: [1, 3], Q2: [3, 5], Q3: [5, 7], Q4: [12, 15]
+  // Nighttime offsets from Sun star:
+  // Q1: [17, 19], Q2: [21, 23], Q3: [23, 24], Q4: [25, 27]
+  const EXPECTED_OFFSETS: Record<"day" | "night", Record<1 | 2 | 3 | 4, number[]>> = {
+    day: {
+      1: [1, 3],
+      2: [3, 5],
+      3: [5, 7],
+      4: [12, 15],
+    },
+    night: {
+      1: [17, 19],
+      2: [21, 23],
+      3: [23, 24],
+      4: [25, 27],
+    },
+  };
+
+  const period = isDayBirth ? "day" : "night";
+  const validOffsets = EXPECTED_OFFSETS[period][q];
+
+  const offset = ((ascNak.idx - sunNak.idx + 27) % 27) + 1;
+  const directMatch = validOffsets.includes(offset);
+  const softMatch = validOffsets.some((v) => Math.abs(v - offset) <= 1);
+  const matched = directMatch || softMatch;
+  const score = directMatch ? 3 : softMatch ? 2 : 0;
+
+  return {
+    quarter: q,
+    period,
+    sunNakshatraNumber: sunNak.idx + 1,
+    expectedStarOffsets: validOffsets,
+    ascendantNakshatraNumber: ascNak.idx + 1,
+    matched,
+    score,
+    audit: `${period.toUpperCase()} Q${q}: Sun in ${sunNak.name} (#${sunNak.idx + 1}), Ascendant in ${ascNak.name} (#${ascNak.idx + 1}, offset +${offset}). Expected [${validOffsets.join(", ")}]. ${matched ? "Corroborated." : "Deviates."}`,
   };
 }
 
@@ -925,40 +1168,61 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           chart.lagnaLon
         );
 
-        // 8. Tattva Validation (5 Elements Palas Cycle)
+        // 8. Tattva Validation (5 Elements Palas Cycle, Pages 66-68)
         const tattvaRes = evaluateTattva(
           sunInfo.elapsedPalas,
           sunInfo.astrologicalWeekday,
           chart.lagnaRashi
         );
 
-        // 9. Classical Kunda Algorithm (Prashna Marga)
+        // 9. Pala Harmonics (3P mod 7 & 4P mod 9 Dual Check + 63-Grid)
+        const palaHarmonics = evaluatePalaHarmonics(
+          sunInfo.elapsedPalas,
+          sunInfo.astrologicalWeekday,
+          moonNak.idx + 1
+        );
+
+        // 10. Navamsa-Dwadasamsa (N-D) 16'40'' Gender Check
+        const ndGender = evaluateNDGender(chart.lagnaLon, input.gender);
+
+        // 11. Sun's Nakshatra to Ascendant (Chapter XIV 4-Quarter Rule)
+        const sunStarAsc = evaluateSunStarToAscendant(
+          chart.planets.Sun.lon,
+          chart.lagnaLon,
+          sunInfo.isDayBirth,
+          sunInfo
+        );
+
+        // 12. Classical Kunda Algorithm (Prashna Marga)
         const kunda = calculateKunda(chart.lagnaLon);
         const kundaMatch = kunda.kundaLord === moonNak.lord;
 
-        // 10. Palm Compatibility
+        // 13. Palm Compatibility
         const palmScore = scorePalmCompatibility(
           input.palmFeatures,
           chart.lagnaRashi,
           chart
         );
 
-        // 11. Multi-Family Auditable Scoring (Spec Section 29)
+        // 14. Multi-Family Auditable Scoring (Spec Section 29 + R.K. Das Canon)
         // Primary: KP 3-Level (0-30), Rule of Origin (0-20), Life Events (0-30)
-        // Secondary: Pranapada (0-10), Gulika (0-5)
-        // Supporting: Tattva (0-2), Kunda (0-3), Palm (0-10)
-        // Max Raw Score: 30 + 20 + 30 + 10 + 5 + 2 + 3 + 10 = 110 points
+        // Secondary: Pranapada (0-10), Gulika (0-5), Pala Harmonics (0-8)
+        // Supporting: ND Gender (0-3), Sun-Star Asc (0-3), Tattva (0-2), Kunda (0-3), Palm (0-10)
+        // Max Raw Score: 30 + 20 + 30 + 10 + 5 + 8 + 3 + 3 + 2 + 3 + 10 = 124 points
         const rawScore =
           kpThreeLevel.score +
           originRes.score +
           (avgEventScore * 0.3) +
           pranapadaRes.score +
           gulikaRes.score +
+          palaHarmonics.score +
+          ndGender.score +
+          sunStarAsc.score +
           tattvaRes.score +
           (kundaMatch ? 3 : 0) +
           (palmScore * 0.1);
 
-        const totalConfidence = Math.max(0, Math.min(100, Math.round((rawScore / 110) * 100)));
+        const totalConfidence = Math.max(0, Math.min(100, Math.round((rawScore / 124) * 100)));
 
         const deg = Math.floor(chart.lagnaLon % 30);
         const mins = Math.floor(((chart.lagnaLon % 30) - deg) * 60);
@@ -1004,6 +1268,26 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
             score: tattvaRes.score,
             details: tattvaRes.audit,
           },
+          palaHarmonics: {
+            weekdayMatched: palaHarmonics.weekdayMatched,
+            starGroupMatched: palaHarmonics.starGroupMatched,
+            score: palaHarmonics.score,
+            details: palaHarmonics.audit,
+          },
+          ndGender: {
+            ndPointNumber: ndGender.ndPointNumber,
+            ndGender: ndGender.ndGender,
+            matched: ndGender.matched,
+            score: ndGender.score,
+            details: ndGender.audit,
+          },
+          sunStarAscendant: {
+            quarter: sunStarAsc.quarter,
+            period: sunStarAsc.period,
+            matched: sunStarAsc.matched,
+            score: sunStarAsc.score,
+            details: sunStarAsc.audit,
+          },
           kunda: {
             passed: kundaMatch,
             kundaNakshatra: kunda.kundaNakshatra,
@@ -1027,8 +1311,11 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           `Time: ${timeStr} · Elapsed Palas: ${sunInfo.elapsedPalas.toFixed(1)} (${sunInfo.astrologicalWeekday})`,
           `KP 3-Level: ${kpThreeLevel.supported ? "PASS" : "PARTIAL"} (+${kpThreeLevel.score} pts)`,
           `Rule of Origin: ${originRes.originValidated ? "VALID" : "UNCONFIRMED"} (+${originRes.score} pts)`,
-          `Pranapada: error ${pranapadaRes.errorDeg}° (${pranapadaRes.passed ? "PASS" : "HIGH DEVIATION"}) (+${pranapadaRes.score} pts)`,
+          `Pranapada: error ${pranapadaRes.errorDeg}° (${pranapadaRes.passed ? "PASS" : "DEVIATION"}) (+${pranapadaRes.score} pts)`,
+          `Pala Harmonics: 3P mod 7 => ${palaHarmonics.computedWeekdayNumber}, 4P mod 9 => ${palaHarmonics.computedStarGroup} (+${palaHarmonics.score} pts)`,
+          `N-D Gender: Point #${ndGender.ndPointNumber} (${ndGender.ndGender.toUpperCase()}) ${ndGender.matched ? "MATCH" : "MISMATCH"} (+${ndGender.score} pts)`,
           `Gulika: ${gulikaRes.matched ? gulikaRes.matchType : "NO DIRECT ALIGNMENT"} (+${gulikaRes.score} pts)`,
+          `Sun-Star Asc: Q${sunStarAsc.quarter} ${sunStarAsc.period} (${sunStarAsc.matched ? "PASS" : "DEVIATION"}) (+${sunStarAsc.score} pts)`,
           `Milestones: ${matchedEventCount}/${input.events.length} matched (+${Math.round(avgEventScore * 0.3)} pts)`,
         ];
 
