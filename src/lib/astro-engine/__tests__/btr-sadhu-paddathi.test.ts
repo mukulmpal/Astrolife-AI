@@ -6,6 +6,7 @@ import {
   evaluateTattva,
   evaluatePranapada,
   evaluateSunStarToAscendant,
+  evaluatePrenatalEpoch,
 } from "../birth-rectification-engine";
 import {
   hasKPLinkage,
@@ -58,4 +59,49 @@ test("Prof. Andrew Dutta Rule of Origin (O1, O2, O3)", () => {
   );
   assert.equal(origin.originValidated, true);
   assert.equal(origin.ruleO2, true);
+});
+
+test("R.K. Das Chapter XII: Prenatal Epoch (Adhana Lagna & Gestation Direction)", () => {
+  // Lady born 1901 April 29: Sun 16°47' (Aries), Moon 4s 29°32' (Leo), Asc 8s 0°47' (Sagittarius)
+  // Waxing and visible (in 9th house) => gestation shorter than 273 days
+  // Distance to asta lagna (Gemini 0°47') = 88.75° / 12 = 7.39 days => gestation = 265.6 days
+  // Adhana Moon = Sagittarius (Birth Lagna), Adhana Lagna = Leo (Birth Moon)
+  const mockChart = {
+    planets: {
+      Sun: { lon: 16.78 },
+      Moon: { lon: 149.53, sign: "Leo" },
+    },
+    lagnaLon: 240.78, // Sagittarius 0°47'
+    lagnaRashi: "Sagittarius",
+  } as any;
+
+  const epoch = evaluatePrenatalEpoch(mockChart, "1901-04-29", "12:00", 5.5);
+  assert.equal(epoch.isShorterThanStandard, true, "Waxing and visible Moon must yield shorter gestation");
+  assert.equal(epoch.expectedAdhanaLagnaSign, "Leo", "Adhana Lagna must match Birth Moon sign (Leo)");
+  assert.equal(epoch.expectedAdhanaMoonSign, "Sagittarius", "Adhana Moon must match Birth Lagna sign (Sagittarius)");
+  assert.ok(epoch.gestationDays < 273, "Gestation days must be shorter than 273 days");
+});
+
+test("R.K. Das Chapter XI: Tattva 3-Fold Sex Sub-division & Border Check", () => {
+  // Thursday: starts with Vyoma (75 palas total, 3 parts of 25 palas)
+  // Part 1 [0..25p]: Male
+  // Part 2 [25..50p]: Female
+  // Part 3 [50..75p]: Male
+
+  // At 10 palas: inside part 1 (Male)
+  const maleTat = evaluateTattva(10, "Thursday", "Aquarius", "male");
+  assert.equal(maleTat.subSegmentGender, "male");
+  assert.equal(maleTat.genderMatched, true);
+  assert.equal(maleTat.isBorderJuncture, false);
+
+  // At 35 palas: inside part 2 (Female)
+  const femaleTat = evaluateTattva(35, "Thursday", "Aquarius", "female");
+  assert.equal(femaleTat.subSegmentGender, "female");
+  assert.equal(femaleTat.genderMatched, true);
+  assert.equal(femaleTat.isBorderJuncture, false);
+
+  // At 0.1 palas: exact border juncture (eunuch / sandhi)
+  const borderTat = evaluateTattva(0.1, "Thursday", "Aquarius");
+  assert.equal(borderTat.isBorderJuncture, true);
+  assert.equal(borderTat.subSegmentGender, "border_eunuch");
 });

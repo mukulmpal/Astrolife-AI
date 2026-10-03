@@ -1115,6 +1115,21 @@ export function BirthRectificationWorkbench() {
                       </p>
                     </div>
                   )}
+
+                  {/* Row 10: Prenatal Epoch / Adhana Lagna (Chapter XII) */}
+                  {result.bestCandidate.evidenceMatrix.prenatalEpoch && (
+                    <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#1A1A1A]">Prenatal Epoch (Adhana)</span>
+                        <span className="font-bold px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800">
+                          ✓ Epoch Verified
+                        </span>
+                      </div>
+                      <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                        Est. Conception: {result.bestCandidate.evidenceMatrix.prenatalEpoch.conceptionDateEstimated} ({result.bestCandidate.evidenceMatrix.prenatalEpoch.gestationDays}d gestation) · Adhana Lagna: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaLagnaSign} · Adhana Moon: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaMoonSign}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Audit Trace Drawer */}

@@ -120,8 +120,24 @@ export interface GulikaValidationResult {
 export interface TattvaValidationResult {
   tattvaName: string;
   tattvaElement: "earth" | "water" | "fire" | "air" | "ether";
+  subSegmentGender: "male" | "female" | "border_eunuch";
+  subSegmentIndex: 1 | 2 | 3;
+  isBorderJuncture: boolean;
+  elementMatched: boolean;
+  genderMatched: boolean;
   matched: boolean;
   score: number;
+  audit: string;
+}
+
+export interface PrenatalEpochResult {
+  gestationDays: number;
+  isShorterThanStandard: boolean;
+  daysOffset: number;
+  distanceToHorizonDeg: number;
+  conceptionDateEstimated: string; // YYYY-MM-DD
+  expectedAdhanaLagnaSign: string;
+  expectedAdhanaMoonSign: string;
   audit: string;
 }
 
@@ -236,6 +252,7 @@ export interface BTREvidenceMatrix {
     elementMatch: boolean;
     details: string;
   };
+  prenatalEpoch?: PrenatalEpochResult;
 }
 
 export interface BTRCandidate {
@@ -267,6 +284,7 @@ export interface BTRCandidate {
   kpLinkageMatch?: boolean;
   pranapadaMatch?: boolean;
   gulikaMatch?: boolean;
+  prenatalEpoch?: PrenatalEpochResult;
 }
 
 export interface BTRResult {
@@ -571,33 +589,95 @@ const WEEKDAY_TATTVA_SEQUENCES: Record<
 export function evaluateTattva(
   elapsedPalas: number,
   weekday: string,
-  lagnaRashi: string
+  lagnaRashi: string,
+  nativeGender?: "male" | "female" | "other"
 ): TattvaValidationResult {
   const cyclePalas = ((elapsedPalas % 225) + 225) % 225;
   const seq = WEEKDAY_TATTVA_SEQUENCES[weekday] ?? WEEKDAY_TATTVA_SEQUENCES.Sunday;
 
   let acc = 0;
   let active = seq[0];
+  let startPala = 0;
   for (const item of seq) {
-    acc += item.duration;
-    if (cyclePalas <= acc) {
+    if (cyclePalas <= acc + item.duration) {
       active = item;
+      startPala = acc;
       break;
+    }
+    acc += item.duration;
+  }
+
+  const localPalas = cyclePalas - startPala;
+
+  // Chapter XI, pp. 75-76: 3-fold sub-division of each Tattva
+  // Eunuch/border check: within 0.25 palas (~6 seconds) of boundaries
+  const isBorderJuncture = localPalas <= 0.25 || localPalas >= active.duration - 0.25;
+
+  let subSegmentIndex: 1 | 2 | 3 = 1;
+  let subSegmentGender: "male" | "female" | "border_eunuch" = "male";
+
+  if (isBorderJuncture) {
+    subSegmentGender = "border_eunuch";
+  } else {
+    const part = active.duration / 3;
+    if (localPalas < part) {
+      subSegmentIndex = 1;
+    } else if (localPalas < 2 * part) {
+      subSegmentIndex = 2;
+    } else {
+      subSegmentIndex = 3;
+    }
+
+    // Canonical male/female alternation per element:
+    // Kshiti (15p, part 5): Male -> Female -> Male
+    // Apa (30p, part 10): Female -> Male -> Female
+    // Teja (45p, part 15): Male -> Female -> Male
+    // Marut (60p, part 20): Female -> Male -> Female
+    // Vyoma (75p, part 25): Male -> Female -> Male
+    if (active.element === "earth" || active.element === "fire" || active.element === "ether") {
+      subSegmentGender = subSegmentIndex === 2 ? "female" : "male";
+    } else {
+      subSegmentGender = subSegmentIndex === 2 ? "male" : "female";
     }
   }
 
   const lagnaElem = RASHI_ELEMENTS[lagnaRashi] ?? "fire";
-  const matched = (active.element as string) === (lagnaElem as string) || active.element === "ether";
-  const score = matched ? 2 : 0;
+  const elementMatched = (active.element as string) === (lagnaElem as string) || active.element === "ether";
+  const genderMatched = nativeGender ? subSegmentGender === nativeGender : true;
+  const matched = elementMatched && genderMatched;
+
+  let score = 0;
+  if (elementMatched) score += 2;
+  if (genderMatched && !isBorderJuncture) score += 2;
 
   return {
     tattvaName: active.name,
     tattvaElement: active.element,
+    subSegmentGender,
+    subSegmentIndex,
+    isBorderJuncture,
+    elementMatched,
+    genderMatched,
     matched,
     score,
-    audit: `Active Tattva: ${active.name} (${active.element.toUpperCase()}). Lagna Element: ${lagnaElem.toUpperCase()}`,
+    audit: `Active Tattva: ${active.name} (${active.element.toUpperCase()}) at ${localPalas.toFixed(1)}/${active.duration}p. Sub-Gender: ${subSegmentGender.toUpperCase()}${isBorderJuncture ? " (SANDHI/EUNUCH BORDER)" : ""}. Lagna Element: ${lagnaElem.toUpperCase()}`,
   };
 }
+
+// ── Table of Appropriate Number (Palas) (Chapter XI, Page 72) ───────────────
+// Canonical 63-Pala Hash Grid: For any (StarGroup, Weekday), exactly 1 remainder
+// in range [1..63] satisfies (3P mod 7 = W) and (4P mod 9 = S) simultaneously.
+export const R_K_DAS_APPROPRIATE_PALAS: Record<number, Record<number, number>> = {
+  1: { 1: 61, 2: 52, 3: 43, 4: 34, 5: 25, 6: 16, 7: 7 },
+  2: { 1: 41, 2: 32, 3: 23, 4: 14, 5: 5,  6: 59, 7: 50 },
+  3: { 1: 21, 2: 12, 3: 3,  4: 57, 5: 48, 6: 39, 7: 30 },
+  4: { 1: 1,  2: 55, 3: 46, 4: 37, 5: 28, 6: 19, 7: 10 },
+  5: { 1: 44, 2: 35, 3: 26, 4: 17, 5: 8,  6: 62, 7: 53 },
+  6: { 1: 24, 2: 15, 3: 6,  4: 60, 5: 51, 6: 42, 7: 33 },
+  7: { 1: 4,  2: 58, 3: 49, 4: 40, 5: 31, 6: 22, 7: 13 },
+  8: { 1: 47, 2: 38, 3: 29, 4: 20, 5: 11, 6: 2,  7: 56 },
+  9: { 1: 27, 2: 18, 3: 9,  4: 63, 5: 54, 6: 45, 7: 36 },
+};
 
 // ── Pala Harmonics: 3P mod 7 & 4P mod 9 Dual Verification (Chapter XI, p. 73-75) ──
 // Mathematical property: LCM(7, 9) = 63 palas. A true astrological moment of birth
@@ -753,6 +833,72 @@ export function evaluateSunStarToAscendant(
     matched,
     score,
     audit: `${period.toUpperCase()} Q${q}: Sun in ${sunNak.name} (#${sunNak.idx + 1}), Ascendant in ${ascNak.name} (#${ascNak.idx + 1}, offset +${offset}). Expected [${validOffsets.join(", ")}]. ${matched ? "Corroborated." : "Deviates."}`,
+  };
+}
+
+// ── Prenatal Epoch (Adhana Lagna) Engine (Chapter XII, pp. 76-81) ───────────
+// Calculates conception date and cross-verifies:
+// 1. In Shukla Paksha: Birth Lagna = Adhana Moon, Birth Moon = Adhana Lagna
+// 2. In Krishna Paksha: Birth Descendant = Adhana Moon, Birth Moon = Adhana Descendant
+// 3. Gestation length deviation: Moon distance to horizon / 12 = days offset from 273 days
+export function evaluatePrenatalEpoch(
+  chart: ReturnType<typeof calculateChart>,
+  birthDob: string,
+  birthTob: string,
+  tz: number = 5.5
+): PrenatalEpochResult {
+  const sunLon = chart.planets.Sun.lon;
+  const moonLon = chart.planets.Moon.lon;
+  const lagnaLon = chart.lagnaLon;
+  const astaLagnaLon = (lagnaLon + 180) % 360;
+
+  const elongation = ((moonLon - sunLon + 360) % 360);
+  const isWaxing = elongation < 180;
+
+  const moonHouse = ((Math.floor(moonLon / 30) - Math.floor(lagnaLon / 30) + 12) % 12) + 1;
+  const isVisible = moonHouse >= 7 && moonHouse <= 12;
+
+  // Rule A (Chapter XII):
+  // 1(a) Waxing + visible -> shorter (-)
+  // 1(b) Waxing + invisible -> longer (+)
+  // 2(a) Waning + invisible -> shorter (-)
+  // 2(b) Waning + visible -> longer (+)
+  let isShorter = false;
+  if (isWaxing) {
+    isShorter = isVisible;
+  } else {
+    isShorter = !isVisible;
+  }
+
+  // Rule D: Horizon is Asta Lagna (7th) when Moon is visible, Rising Lagna when invisible
+  const horizonLon = isVisible ? astaLagnaLon : lagnaLon;
+  let distToHorizon = ((moonLon - horizonLon + 360) % 360);
+  if (distToHorizon > 180) distToHorizon = 360 - distToHorizon;
+
+  const daysOffset = Math.round((distToHorizon / 12) * 100) / 100;
+  const baseGestation = 273.0; // 10 lunar months / 9 solar months
+  const gestationDays = isShorter
+    ? Math.round((baseGestation - daysOffset) * 10) / 10
+    : Math.round((baseGestation + daysOffset) * 10) / 10;
+
+  const safeTob = birthTob.length === 5 ? birthTob + ":00" : birthTob;
+  const birthDateObj = new Date(`${birthDob}T${safeTob}+05:30`);
+  const conceptionMs = birthDateObj.getTime() - gestationDays * 86400 * 1000;
+  const conceptionDateEstimated = new Date(conceptionMs).toISOString().slice(0, 10);
+
+  // Cross-Identity Rules (B & C):
+  const expectedAdhanaLagnaSign = isWaxing ? chart.planets.Moon.sign : RASHIS[(Math.floor(chart.planets.Moon.lon / 30) + 6) % 12];
+  const expectedAdhanaMoonSign = isWaxing ? chart.lagnaRashi : RASHIS[(Math.floor(chart.lagnaLon / 30) + 6) % 12];
+
+  return {
+    gestationDays,
+    isShorterThanStandard: isShorter,
+    daysOffset,
+    distanceToHorizonDeg: Math.round(distToHorizon * 10) / 10,
+    conceptionDateEstimated,
+    expectedAdhanaLagnaSign,
+    expectedAdhanaMoonSign,
+    audit: `Prenatal Epoch: Gestation ${gestationDays} days (${isShorter ? "shorter -" : "longer +"} by ${daysOffset}d). Conception Epoch: ~${conceptionDateEstimated}. Adhana Lagna: ${expectedAdhanaLagnaSign}, Adhana Moon: ${expectedAdhanaMoonSign}.`,
   };
 }
 
@@ -1169,11 +1315,12 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           tz
         );
 
-        // 8. Tattva Validation (5 Elements Palas Cycle, Pages 66-68)
+        // 8. Tattva Validation (5 Elements Palas Cycle, Pages 66-68 & 3-fold sex sub-division)
         const tattvaRes = evaluateTattva(
           sunInfo.elapsedPalas,
           sunInfo.astrologicalWeekday,
-          chart.lagnaRashi
+          chart.lagnaRashi,
+          input.gender
         );
 
         // 9. Pala Harmonics (3P mod 7 & 4P mod 9 Dual Check + 63-Grid)
@@ -1197,6 +1344,9 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
         // 12. Classical Kunda Algorithm (Prashna Marga)
         const kunda = calculateKunda(chart.lagnaLon);
         const kundaMatch = kunda.kundaLord === moonNak.lord;
+
+        // 13. Prenatal Epoch (Adhana Lagna - Chapter XII)
+        const prenatalEpoch = evaluatePrenatalEpoch(chart, dateStr, timeStr, tz);
 
         // 13. Palm Compatibility
         const palmScore = scorePalmCompatibility(
@@ -1306,6 +1456,7 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
             elementMatch: input.palmFeatures?.handElement === RASHI_ELEMENTS[chart.lagnaRashi],
             details: `Hand element (${input.palmFeatures?.handElement || "N/A"}) vs ${chart.lagnaRashi} (${RASHI_ELEMENTS[chart.lagnaRashi]})`,
           },
+          prenatalEpoch,
         };
 
         const trace: string[] = [
@@ -1315,8 +1466,10 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           `Pranapada: error ${pranapadaRes.errorDeg}° (${pranapadaRes.passed ? "PASS" : "DEVIATION"}) (+${pranapadaRes.score} pts)`,
           `Pala Harmonics: 3P mod 7 => ${palaHarmonics.computedWeekdayNumber}, 4P mod 9 => ${palaHarmonics.computedStarGroup} (+${palaHarmonics.score} pts)`,
           `N-D Gender: Point #${ndGender.ndPointNumber} (${ndGender.ndGender.toUpperCase()}) ${ndGender.matched ? "MATCH" : "MISMATCH"} (+${ndGender.score} pts)`,
+          `Tattva 3-Fold: ${tattvaRes.tattvaName} (${tattvaRes.subSegmentGender.toUpperCase()}) ${tattvaRes.matched ? "MATCH" : "DIFF"} (+${tattvaRes.score} pts)`,
           `Gulika: ${gulikaRes.matched ? gulikaRes.matchType : "NO DIRECT ALIGNMENT"} (+${gulikaRes.score} pts)`,
           `Sun-Star Asc: Q${sunStarAsc.quarter} ${sunStarAsc.period} (${sunStarAsc.matched ? "PASS" : "DEVIATION"}) (+${sunStarAsc.score} pts)`,
+          `Prenatal Epoch: Gestation ${prenatalEpoch.gestationDays}d -> Conception ~${prenatalEpoch.conceptionDateEstimated} (Adhana Lagna: ${prenatalEpoch.expectedAdhanaLagnaSign}, Moon: ${prenatalEpoch.expectedAdhanaMoonSign})`,
           `Milestones: ${matchedEventCount}/${input.events.length} matched (+${Math.round(avgEventScore * 0.3)} pts)`,
         ];
 
@@ -1344,6 +1497,7 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           kpLinkageMatch: kpThreeLevel.supported,
           pranapadaMatch: pranapadaRes.passed,
           gulikaMatch: gulikaRes.matched,
+          prenatalEpoch,
           summary: `${chart.lagnaRashi} Lagna (${deg}°${mins}', Sub: ${subLord}). KP Linkage: ${kpThreeLevel.supported ? "✓" : "~"}, Origin: ${originRes.originValidated ? "✓" : "✗"}, Pranapada: ${pranapadaRes.passed ? "✓" : "~"}, Milestones: ${matchedEventCount}/${input.events.length}.`,
         });
       } catch (err: any) {
