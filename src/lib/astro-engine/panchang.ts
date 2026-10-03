@@ -476,8 +476,10 @@ export function calculatePanchang(
   location?: { lat?: number; lon?: number },
   options: PanchangOptions = { includeEndTimes: true }
 ): PanchangResult {
-  const yyyyMmDd = dateStringAtTimezone(date, tz);
-  const jd = getJD(yyyyMmDd, "12:00", tz);
+  const safeTz = typeof tz === "number" && Number.isFinite(tz) && tz >= -12 && tz <= 14 ? tz : 5.5;
+  tz = safeTz;
+  const yyyyMmDd = dateStringAtTimezone(date, safeTz);
+  const jd = getJD(yyyyMmDd, "12:00", safeTz);
   const planets = computePlanets(jd);
 
   const sunLon = planets.Sun;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { PanchangStrip } from './panchang-strip';
 
 interface DirectionANavProps {
   onSignIn?: () => void;
@@ -19,14 +20,15 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-30 transition-all duration-500"
+      className="fixed inset-x-0 top-0 z-30 transition-all duration-500 shadow-xs"
       style={{
-        background: solid ? 'color-mix(in srgb, var(--al-bg) 78%, transparent)' : 'transparent',
+        background: solid ? 'color-mix(in srgb, var(--al-bg) 92%, transparent)' : '#FAF5EB',
         backdropFilter: solid ? 'blur(16px)' : 'none',
-        borderBottom: `1px solid ${solid ? 'var(--al-line)' : 'transparent'}`,
+        borderBottom: `1px solid ${solid ? 'var(--al-line)' : 'rgba(184, 134, 11, 0.25)'}`,
       }}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
+      <PanchangStrip />
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5 md:px-10">
         <a href="#top" className="flex items-center gap-3">
           <svg width="26" height="26" viewBox="-12 -12 24 24" style={{ color: 'var(--al-gold)' }}>
             <circle r="10.5" stroke="currentColor" strokeWidth="0.7" fill="none" />

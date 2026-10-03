@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 /* ------------------------------------------------------------------ */
 /*  Scroll reveal — adds `.in` when the element enters the viewport.   */
 /* ------------------------------------------------------------------ */
-export function useReveal<T extends HTMLElement = HTMLDivElement>(threshold = 0.18) {
+export function useReveal<T extends HTMLElement = HTMLDivElement>(threshold = 0.02) {
   const ref = useRef<T>(null);
   useEffect(() => {
     const el = ref.current;
@@ -17,7 +17,7 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(threshold = 0.
           io.disconnect();
         }
       },
-      { threshold },
+      { threshold, rootMargin: '150px 0px 0px 0px' },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -189,7 +189,7 @@ export function CelestialInstrument({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Aurora — slow drifting radial colour wash.                         */
+/*  Aurora — gentle, pre-diffused ambient glow (zero blur overhead).   */
 /* ------------------------------------------------------------------ */
 export function Aurora() {
   return (
@@ -197,27 +197,25 @@ export function Aurora() {
       <div
         className="pointer-events-none absolute"
         style={{
-          top: '-30%',
-          right: '-20%',
-          width: '70vw',
-          height: '70vw',
+          top: '-20%',
+          right: '-15%',
+          width: '65vw',
+          height: '65vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, color-mix(in srgb, var(--al-gold) 22%, transparent), transparent 60%)',
-          filter: 'blur(40px)',
-          animation: 'dira-float 14s ease-in-out infinite',
+          background: 'radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(184, 134, 11, 0.04) 45%, transparent 70%)',
+          willChange: 'transform',
         }}
       />
       <div
         className="pointer-events-none absolute"
         style={{
-          bottom: '-30%',
-          left: '-20%',
-          width: '60vw',
-          height: '60vw',
+          bottom: '-20%',
+          left: '-15%',
+          width: '55vw',
+          height: '55vw',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, color-mix(in srgb, var(--al-accent) 18%, transparent), transparent 60%)',
-          filter: 'blur(50px)',
-          animation: 'dira-float 18s ease-in-out infinite reverse',
+          background: 'radial-gradient(circle, rgba(217, 119, 6, 0.10) 0%, rgba(217, 119, 6, 0.03) 40%, transparent 65%)',
+          willChange: 'transform',
         }}
       />
     </>
@@ -225,9 +223,9 @@ export function Aurora() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  StarField — deterministic, twinkling.                              */
+/*  StarField — lightweight, deterministic celestial particle field.  */
 /* ------------------------------------------------------------------ */
-export function StarField({ count = 90, opacity = 0.7 }: { count?: number; opacity?: number }) {
+export function StarField({ count = 60, opacity = 0.6 }: { count?: number; opacity?: number }) {
   const stars = useMemo(() => {
     // deterministic pseudo-random so SSR === client
     let seed = 7;
@@ -235,13 +233,12 @@ export function StarField({ count = 90, opacity = 0.7 }: { count?: number; opaci
       seed = (seed * 9301 + 49297) % 233280;
       return seed / 233280;
     };
-    return Array.from({ length: count }).map(() => ({
-      x: rnd() * 100,
-      y: rnd() * 100,
-      r: rnd() * 1.3 + 0.25,
-      o: rnd() * 0.6 + 0.2,
-      dur: rnd() * 4 + 2.5,
-      delay: rnd() * 5,
+    const maxCount = Math.min(count, 45);
+    return Array.from({ length: maxCount }).map(() => ({
+      x: Math.round(rnd() * 1000) / 10,
+      y: Math.round(rnd() * 1000) / 10,
+      r: Math.round((rnd() * 1.0 + 0.3) * 10) / 10,
+      o: Math.round((rnd() * 0.45 + 0.2) * 10) / 10,
     }));
   }, [count]);
 
@@ -258,9 +255,8 @@ export function StarField({ count = 90, opacity = 0.7 }: { count?: number; opaci
           cx={`${s.x}%`}
           cy={`${s.y}%`}
           r={s.r}
-          fill="#fff"
+          fill="#B8860B"
           opacity={s.o}
-          style={{ animation: `dira-twinkle ${s.dur}s ease-in-out ${s.delay}s infinite` }}
         />
       ))}
     </svg>

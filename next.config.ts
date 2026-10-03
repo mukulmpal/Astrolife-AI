@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  compress: false,
+  serverExternalPackages: ["pdfkit", "puppeteer-core", "@sparticuz/chromium", "@sparticuz/chromium-min"],
   turbopack: {
     root: path.resolve(__dirname),
   },

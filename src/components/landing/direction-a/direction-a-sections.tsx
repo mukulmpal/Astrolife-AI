@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { CelestialInstrument, FolioMarker, OrnamentDivider, StarField, useReveal } from './celestial';
+import { useState, useEffect } from 'react';
+import { CelestialInstrument, FolioMarker, OrnamentDivider } from './celestial';
 
 const TINT = (pct: number) =>
   `color-mix(in srgb, var(--al-surface) ${pct}%, transparent)`;
@@ -67,14 +67,13 @@ function useAudioPreview() {
 
 /* ============================ I · PROBLEM ============================ */
 export function DirectionAProblem() {
-  const ref = useReveal();
   const items = [
     { g: '☉', t: 'Sun-sign horoscopes', d: 'One of twelve scripts, handed to a billion people. Comfort, not truth.' },
     { g: '☄', t: 'Fear as a business model', d: '“Saturn will ruin you.” Dread sells subscriptions; it does not prepare you.' },
     { g: '☷', t: 'Reports no one reads', d: 'Forty-eight pages of Sanskrit jargon, and not one thing you can act on by Monday.' },
   ];
   return (
-    <section ref={ref} className="dira-reveal relative px-6 py-24 md:px-10" style={{ background: 'var(--al-bg)' }}>
+    <section className="relative px-6 py-24 md:px-10" style={{ background: 'var(--al-bg)' }}>
       <div className="mx-auto max-w-5xl">
         <FolioMarker numeral="I" label="The Problem" />
         <h2 className="dira-display-sm max-w-2xl" style={{ color: 'var(--al-ivory)' }}>
@@ -100,15 +99,217 @@ export function DirectionAProblem() {
   );
 }
 
+/* ====================== ASTRO-DATA DEFINITIONS ====================== */
+const DESTINY_ANCHORS = [
+  { age: 0, score: 45, dasha: 'Mars-Rahu', title: 'Foundational Roots', desc: 'Early childhood vitality, physical growth & maternal emotional anchoring.' },
+  { age: 10, score: 58, dasha: 'Mars-Mercury', title: 'Cognitive Awakening', desc: 'Schooling, curiosity surge, foundational skill acquisition & peer bonds.' },
+  { age: 18, score: 72, dasha: 'Jupiter-Jupiter', title: 'Higher Calling & Vidya', desc: 'Entry into Jupiter Mahadasha. University learning, philosophy & calling exploration.' },
+  { age: 24, score: 78, dasha: 'Jupiter-Saturn', title: 'First Career Ascent', desc: 'Early enterprise launch, building craft reputation & first serious leadership ambitions.' },
+  { age: 28, score: 54, dasha: 'Jupiter-Saturn', title: '⚡ Saturn Return Pivot', desc: 'Pruning fragile ventures, karmic testing, structuring long-term discipline and emotional resilience.' },
+  { age: 34, score: 82, dasha: 'Jupiter-Venus', title: 'Strategic Partnerships', desc: 'Creative surge, alliance formations, marital stability & rapid network elevation.' },
+  { age: 38, score: 94, dasha: 'Jupiter-Sun', title: '★ Golden Zenith Peak', desc: 'Jupiter Mahadasha + Sun Antardasha in 10th house. Peak career elevation, public recognition & executive authority.' },
+  { age: 44, score: 76, dasha: 'Saturn-Saturn', title: 'Executive Stewardship', desc: 'Transition into Saturn Mahadasha. Heavy organizational duty, institutional scaling & systemic focus.' },
+  { age: 50, score: 71, dasha: 'Saturn-Mercury', title: 'Mid-Life Restructuring', desc: 'Refining operational paradigms, strategic pivots, balancing stamina with long-term vision.' },
+  { age: 58, score: 89, dasha: 'Mercury-Venus', title: '💎 Dhana Expansion Harvest', desc: '2nd & 11th house synergy. Major multi-asset compounding, legacy harvest & high security.' },
+  { age: 68, score: 76, dasha: 'Mercury-Mars', title: 'Advisory Mentorship', desc: 'Senior advisory roles, transmission of expertise, philanthropic initiatives & wisdom sharing.' },
+  { age: 78, score: 82, dasha: 'Ketu-Jupiter', title: 'Spiritual Awakening', desc: 'Ketu Mahadasha inward turn. Philosophical peace, meditation & timeless clarity.' },
+  { age: 90, score: 70, dasha: 'Ketu-Venus', title: 'Moksha Serenity', desc: 'Complete karmic resolution, spiritual liberation and transcendent contentment.' },
+];
+
+function getDestinyAtAge(age: number) {
+  const clamped = Math.max(0, Math.min(90, age));
+  let lower = DESTINY_ANCHORS[0];
+  let upper = DESTINY_ANCHORS[DESTINY_ANCHORS.length - 1];
+
+  for (let i = 0; i < DESTINY_ANCHORS.length - 1; i++) {
+    if (clamped >= DESTINY_ANCHORS[i].age && clamped <= DESTINY_ANCHORS[i + 1].age) {
+      lower = DESTINY_ANCHORS[i];
+      upper = DESTINY_ANCHORS[i + 1];
+      break;
+    }
+  }
+
+  const span = upper.age - lower.age;
+  const ratio = span === 0 ? 0 : (clamped - lower.age) / span;
+  const score = Math.round(lower.score + (upper.score - lower.score) * ratio);
+
+  // SVG coordinates: width = 540, x from 30 to 520 (span 490)
+  const cursorX = Math.round(30 + (clamped / 90) * 490);
+  // height = 160, y from 145 (score 0) to 20 (score 100), span = 125
+  const cursorY = Math.round(145 - (score / 100) * 125);
+
+  const activeAnchor = ratio > 0.5 ? upper : lower;
+
+  return {
+    age: clamped,
+    score,
+    dasha: activeAnchor.dasha,
+    title: activeAnchor.title,
+    desc: activeAnchor.desc,
+    cursorX,
+    cursorY,
+  };
+}
+
+const TRANSIT_DATA = {
+  saturn: {
+    name: 'Saturn in Pisces (Karmic Restructuring)',
+    cycle: '30-Month Shani Cycle',
+    tagline: 'Karmic foundation-testing across self, initiative, partnerships & duty',
+    houses: [
+      {
+        tag: 'Epicenter · House 1 (Pisces)',
+        title: 'Lagna Restructuring',
+        desc: 'Saturn transit through your 1st house. Demands radical physical discipline, strips away false vanity, and anchors self-identity.',
+        impact: 'High Gravity',
+      },
+      {
+        tag: 'Ripple A · House 3 (Taurus)',
+        title: '3rd Drishti on Initiative',
+        desc: '3rd house aspect compels bold entrepreneurial decisions, renegotiated contracts, and fearless strategic communication.',
+        impact: 'Action Vector',
+      },
+      {
+        tag: 'Ripple B · House 7 (Virgo)',
+        title: '7th Drishti on Alliances',
+        desc: 'Direct aspect onto 7th house. Tests business partnerships and marital bonds; dissolves superficial ties while cementing loyal alliances.',
+        impact: 'Karmic Mirror',
+      },
+      {
+        tag: 'Ripple C · House 10 (Sagittarius)',
+        title: '10th Drishti on Profession',
+        desc: 'Aspect onto 10th house of karma. Professional culmination, executive scrutiny, promotion earned through steady resilience.',
+        impact: 'Culmination',
+      },
+    ],
+  },
+  jupiter: {
+    name: 'Jupiter in Taurus / Gemini (Dharma Expansion)',
+    cycle: '12-Month Guru Cycle',
+    tagline: 'Expansive trikona blessings multiplying wealth, relationships & wisdom',
+    houses: [
+      {
+        tag: 'Epicenter · House 3 (Taurus)',
+        title: 'Enterprise & Innovation',
+        desc: 'Jupiter transit illuminates intellectual ventures, creative publishing, sibling alliances, and profitable commercial initiatives.',
+        impact: 'Expansion',
+      },
+      {
+        tag: 'Ripple A · House 7 (Virgo)',
+        title: '5th Drishti on Marital Harmony',
+        desc: 'Benefic 5th trine aspect blesses marital prospects, resolves relationship friction, and attracts ethical business collaborators.',
+        impact: 'Golden Trine',
+      },
+      {
+        tag: 'Ripple B · House 9 (Scorpio)',
+        title: '7th Drishti on Higher Wisdom',
+        desc: 'Direct aspect onto Bhagya Bhava. Foreign travels, mentor blessings, spiritual initiation, and sudden unearned fortune.',
+        impact: 'Bhagya Udaya',
+      },
+      {
+        tag: 'Ripple C · House 11 (Pisces)',
+        title: '9th Drishti on Financial Gains',
+        desc: '9th trine aspect into 11th Labha house. Acceleration of large financial gains, expansive high-trust network, and wish-fulfillment.',
+        impact: 'Liquid Dhana',
+      },
+    ],
+  },
+  rahu: {
+    name: 'Rahu in Pisces / Ketu in Virgo (Nodal Metamorphosis)',
+    cycle: '18-Month Nodal Axis',
+    tagline: 'Karmic axis shift sparking visionary hunger and spiritual detachment',
+    houses: [
+      {
+        tag: 'Epicenter · House 1 / 7 Axis',
+        title: 'Identity vs Relationship Shift',
+        desc: 'Rahu in 1st triggers intense desire for self-reinvention; Ketu in 7th sheds past co-dependent patterns to foster sovereign intimacy.',
+        impact: 'Metamorphosis',
+      },
+      {
+        tag: 'Ripple A · House 5 (Cancer)',
+        title: '5th Drishti on Creative Genius',
+        desc: 'Rahu 5th aspect unlocks unconventional artistic intuition, speculative breakthroughs, and unorthodox algorithmic problem-solving.',
+        impact: 'Genius Surge',
+      },
+      {
+        tag: 'Ripple B · House 9 (Scorpio)',
+        title: '9th Drishti on Occult Research',
+        desc: 'Rahu 9th aspect sparks fascination with esoteric sciences, foreign knowledge, and disruptive non-traditional paradigms.',
+        impact: 'Esoteric Shift',
+      },
+      {
+        tag: 'Ripple C · House 11 (Capricorn)',
+        title: 'Ketu 5th Trine on Networks',
+        desc: 'Ketu aspect purifies your social circle, filtering out transactional acquaintances and focusing only on soul-aligned mission partners.',
+        impact: 'Network Clarity',
+      },
+    ],
+  },
+};
+
+const PRAHARS = [
+  {
+    key: 'bhairav',
+    prahar: 'Pratham Prahar · Dawn (04:00 – 07:00)',
+    name: 'Raag Bhairav',
+    mood: 'Dawn awakening, cognitive clarity & Surya solar vitality',
+    hours: [4, 5, 6],
+    spotify: 'https://open.spotify.com/search/Raag%20Bhairav',
+    youtube: 'https://www.youtube.com/results?search_query=Raag+Bhairav+Indian+Classical',
+  },
+  {
+    key: 'sarang',
+    prahar: 'Madhyahna Prahar · Midday (10:00 – 16:00)',
+    name: 'Raag Brindavani Sarang',
+    mood: 'Midday equilibrium, sustained focus & metabolic Pitta balance',
+    hours: [10, 11, 12, 13, 14, 15],
+    spotify: 'https://open.spotify.com/search/Raag%20Brindavani%20Sarang',
+    youtube: 'https://www.youtube.com/results?search_query=Raag+Brindavani+Sarang+Classical',
+  },
+  {
+    key: 'yaman',
+    prahar: 'Sandhya Prahar · Twilight (16:00 – 19:00)',
+    name: 'Raag Yaman',
+    mood: 'Twilight calmness, emotional warmth & Venus-Jupiter harmony',
+    hours: [16, 17, 18],
+    spotify: 'https://open.spotify.com/search/Raag%20Yaman',
+    youtube: 'https://www.youtube.com/results?search_query=Raag+Yaman+Indian+Classical',
+  },
+  {
+    key: 'darbari',
+    prahar: 'Nishitha Prahar · Midnight (22:00 – 04:00)',
+    name: 'Raag Darbari Kanada',
+    mood: 'Midnight stillness, deep restorative sleep & Saturn grounding',
+    hours: [22, 23, 0, 1, 2, 3],
+    spotify: 'https://open.spotify.com/search/Raag%20Darbari%20Kanada',
+    youtube: 'https://www.youtube.com/results?search_query=Raag+Darbari+Kanada+Classical',
+  },
+];
+
 /* ========================== II · COMPLETE SYSTEM ===================== */
 export function DirectionAFeatures() {
-  const ref = useReveal();
   const { playing, playTone } = useAudioPreview();
 
-  // Interactive Destiny Curve selected milestone
-  const [destinyEra, setDestinyEra] = useState<'pivot' | 'zenith' | 'wealth'>('zenith');
+  // 1. Interactive Destiny Curve: continuous scrub Age (0 to 90)
+  const [scrubAge, setScrubAge] = useState<number>(38);
+  const currentDestiny = getDestinyAtAge(scrubAge);
 
-  // Interactive AI Palmistry Scanner line selection & scan animation state
+  // 2. Interactive Planetary Transit Ripple Engine
+  const [activeTransit, setActiveTransit] = useState<'saturn' | 'jupiter' | 'rahu'>('saturn');
+
+  // 3. AstroSound: Auto-detect local hour and active Prahar
+  const [currentHour, setCurrentHour] = useState<number>(() => new Date().getHours());
+  useEffect(() => {
+    setCurrentHour(new Date().getHours());
+    const interval = setInterval(() => setCurrentHour(new Date().getHours()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const activePraharObj =
+    PRAHARS.find((p) => p.hours.includes(currentHour)) ||
+    (currentHour >= 7 && currentHour < 10 ? PRAHARS[0] : PRAHARS[2]);
+
+  // 4. Interactive AI Palmistry Scanner line selection & scan animation state
   const [palmLine, setPalmLine] = useState<'heart' | 'head' | 'life' | 'fate'>('fate');
   const [isScanningPalm, setIsScanningPalm] = useState(false);
 
@@ -119,7 +320,7 @@ export function DirectionAFeatures() {
     }, 1200);
   };
 
-  // Interactive Card Active Tabs for Tier 2 (keyed by card id)
+  // 5. Interactive Card Active Tabs for Tier 2 (keyed by card id)
   const [tier2Tabs, setTier2Tabs] = useState<Record<string, number>>({
     marriage: 0,
     yogas: 0,
@@ -133,10 +334,12 @@ export function DirectionAFeatures() {
     setTier2Tabs((prev) => ({ ...prev, [cardId]: tabIndex }));
   };
 
+  const isDashaActive = (min: number, max: number) =>
+    scrubAge >= min && (scrubAge < max || (max === 90 && scrubAge <= 90));
+
   return (
-    <section id="features" ref={ref} className="dira-reveal relative overflow-hidden px-6 py-28 md:px-10"
+    <section id="features" className="relative overflow-hidden px-6 py-24 md:px-10"
       style={{ background: 'var(--al-bg)' }}>
-      <StarField count={50} opacity={0.4} />
       <div className="relative mx-auto max-w-6xl space-y-20">
         
         {/* SECTION HEADER */}
@@ -174,42 +377,47 @@ export function DirectionAFeatures() {
                   <span className="text-3xl">📈</span>
                   <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
                     style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
-                    0–90 Yrs Life Curve
+                    0–90 Yrs Continuous Scrubber
                   </span>
                 </div>
                 <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
                   Interactive Destiny Curve
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: '#3D3834' }}>
-                  Never wonder when your golden phase begins. The Destiny Engine plots a continuous 90-year score curve
-                  across career, wealth, and life momentum — tracking your exact peak windows, antardasha shifts, and seasons for cautious patience.
+                  Never wonder when your golden phase begins. Drag the timeline cursor along the 90-year life curve
+                  to reveal your dynamic score, active Vimshottari Dasha, and the exact planetary forces guiding each chapter.
                 </p>
               </div>
 
-              {/* Real SVG Graph Snap */}
+              {/* Draggable & Scrubbable Graph Canvas */}
               <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
                 {/* Milestone Buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
-                  <span className="font-mono text-9px uppercase tracking-wider font-bold" style={{ color: '#8C6508' }}>
-                    Select Life Milestone Snap:
-                  </span>
-                  <div className="flex gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-9px uppercase tracking-wider font-bold" style={{ color: '#8C6508' }}>
+                      Scrub 90-Yr Timeline:
+                    </span>
+                    <span className="rounded-full px-2 py-0.5 font-mono text-10px font-bold" style={{ background: '#FFFFFF', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.3)' }}>
+                      Age {currentDestiny.age}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
                     <button
                       type="button"
-                      onClick={() => setDestinyEra('pivot')}
-                      className={`cursor-pointer rounded px-2.5 py-1 text-10px font-medium transition-colors ${
-                        destinyEra === 'pivot'
-                          ? 'bg-[#B8860B]/15 text-[#785404] border border-[#B8860B] font-bold'
+                      onClick={() => setScrubAge(28)}
+                      className={`cursor-pointer rounded px-2 py-1 text-9px font-medium transition-colors ${
+                        scrubAge === 28
+                          ? 'bg-[#d97706]/15 text-[#92400e] border border-[#d97706] font-bold'
                           : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
                       }`}
                     >
-                      Age 28 Pivot
+                      ⚡ Age 28 Pivot
                     </button>
                     <button
                       type="button"
-                      onClick={() => setDestinyEra('zenith')}
-                      className={`cursor-pointer rounded px-2.5 py-1 text-10px font-medium transition-colors ${
-                        destinyEra === 'zenith'
+                      onClick={() => setScrubAge(38)}
+                      className={`cursor-pointer rounded px-2 py-1 text-9px font-medium transition-colors ${
+                        scrubAge === 38
                           ? 'bg-[#B8860B]/20 text-[#785404] border border-[#B8860B] font-bold shadow-sm'
                           : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
                       }`}
@@ -218,19 +426,30 @@ export function DirectionAFeatures() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setDestinyEra('wealth')}
-                      className={`cursor-pointer rounded px-2.5 py-1 text-10px font-medium transition-colors ${
-                        destinyEra === 'wealth'
+                      onClick={() => setScrubAge(58)}
+                      className={`cursor-pointer rounded px-2 py-1 text-9px font-medium transition-colors ${
+                        scrubAge === 58
                           ? 'bg-[#059669]/15 text-[#065f46] border border-[#059669] font-bold'
                           : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
                       }`}
                     >
-                      Age 58 Wealth
+                      💎 Age 58 Wealth
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScrubAge(78)}
+                      className={`cursor-pointer rounded px-2 py-1 text-9px font-medium transition-colors ${
+                        scrubAge === 78
+                          ? 'bg-[#7c3aed]/15 text-[#6d28d9] border border-[#7c3aed] font-bold'
+                          : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
+                      }`}
+                    >
+                      🕉️ Age 78 Moksha
                     </button>
                   </div>
                 </div>
 
-                {/* SVG Graph Canvas */}
+                {/* SVG Graph Canvas with Dynamic Cursor Tracker */}
                 <div className="relative mt-3 h-36 w-full overflow-hidden">
                   <svg className="h-full w-full" viewBox="0 0 540 160" preserveAspectRatio="none">
                     <defs>
@@ -273,23 +492,63 @@ export function DirectionAFeatures() {
                       strokeWidth="3.2"
                     />
 
-                    {/* Milestone 1: Age 28 Pivot */}
-                    <circle cx="215" cy="116" r={destinyEra === 'pivot' ? 6 : 4} fill="#d97706" stroke="#FFFFFF" strokeWidth="1.5" />
-                    {destinyEra === 'pivot' && (
-                      <circle cx="215" cy="116" r="10" fill="none" stroke="#d97706" strokeWidth="1.5" strokeDasharray="2 2" className="animate-pulse" />
-                    )}
+                    {/* Milestone Reference Anchors */}
+                    <circle cx="215" cy="116" r="4" fill="#d97706" opacity="0.6" />
+                    <circle cx="290" cy="22" r="4.5" fill="#B8860B" opacity="0.6" />
+                    <circle cx="455" cy="42" r="4" fill="#059669" opacity="0.6" />
 
-                    {/* Milestone 2: Age 38 Zenith Peak */}
-                    <circle cx="290" cy="22" r={destinyEra === 'zenith' ? 7 : 5} fill="#B8860B" stroke="#FFFFFF" strokeWidth="2" />
-                    {destinyEra === 'zenith' && (
-                      <circle cx="290" cy="22" r="12" fill="none" stroke="#B8860B" strokeWidth="1.8" strokeDasharray="3 3" className="animate-spin" />
-                    )}
+                    {/* Dynamic Vertical Tracker Line */}
+                    <line
+                      x1={currentDestiny.cursorX}
+                      y1="16"
+                      x2={currentDestiny.cursorX}
+                      y2="145"
+                      stroke="#B8860B"
+                      strokeWidth="1.6"
+                      strokeDasharray="3 3"
+                    />
 
-                    {/* Milestone 3: Age 58 Wealth */}
-                    <circle cx="455" cy="42" r={destinyEra === 'wealth' ? 6 : 4} fill="#059669" stroke="#FFFFFF" strokeWidth="1.5" />
-                    {destinyEra === 'wealth' && (
-                      <circle cx="455" cy="42" r="10" fill="none" stroke="#059669" strokeWidth="1.5" strokeDasharray="2 2" className="animate-pulse" />
-                    )}
+                    {/* Glowing Live Tracker Node */}
+                    <circle
+                      cx={currentDestiny.cursorX}
+                      cy={currentDestiny.cursorY}
+                      r="6.5"
+                      fill="#B8860B"
+                      stroke="#FFFFFF"
+                      strokeWidth="2.5"
+                    />
+                    <circle
+                      cx={currentDestiny.cursorX}
+                      cy={currentDestiny.cursorY}
+                      r="11"
+                      fill="none"
+                      stroke="#B8860B"
+                      strokeWidth="1.5"
+                      strokeDasharray="2 2"
+                      className="animate-pulse"
+                    />
+
+                    {/* Floating Value Tag */}
+                    <rect
+                      x={Math.max(10, Math.min(450, currentDestiny.cursorX - 42))}
+                      y={Math.max(4, currentDestiny.cursorY - 22)}
+                      width="84"
+                      height="16"
+                      rx="4"
+                      fill="#1A1A1A"
+                      opacity="0.92"
+                    />
+                    <text
+                      x={Math.max(10, Math.min(450, currentDestiny.cursorX - 42)) + 42}
+                      y={Math.max(4, currentDestiny.cursorY - 22) + 11}
+                      textAnchor="middle"
+                      fill="#D4AF37"
+                      fontSize="9"
+                      fontFamily="monospace"
+                      fontWeight="bold"
+                    >
+                      Age {currentDestiny.age} · {currentDestiny.score} Pts
+                    </text>
 
                     {/* X-Axis Baseline and Age Markers */}
                     <line x1="30" y1="145" x2="520" y2="145" stroke="rgba(184, 134, 11, 0.35)" strokeWidth="1" />
@@ -303,35 +562,68 @@ export function DirectionAFeatures() {
                   </svg>
                 </div>
 
-                {/* Milestone Detail Banner */}
-                <div className="mt-3 rounded-lg p-3 text-xs transition-all" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
-                  {destinyEra === 'pivot' && (
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[#92400e]">
-                      <span className="font-bold">⚡ Age 28 (Score 54 · Saturn Return):</span>
-                      <span className="text-11px text-[#3D3834]">Dismantling fragile ventures, karmic testing, structuring long-term discipline.</span>
-                    </div>
-                  )}
-                  {destinyEra === 'zenith' && (
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[#785404]">
-                      <span className="font-bold">★ Age 38 (Score 94 · Zenith Peak):</span>
-                      <span className="text-11px text-[#3D3834]">Jupiter Mahadasha + Sun Antardasha in 10th house. Peak career elevation & recognition.</span>
-                    </div>
-                  )}
-                  {destinyEra === 'wealth' && (
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[#065f46]">
-                      <span className="font-bold">💎 Age 58 (Score 88 · Dhana Expansion):</span>
-                      <span className="text-11px text-[#3D3834]">2nd & 11th house synergy. Major asset compounding, legacy stability & peace.</span>
-                    </div>
-                  )}
+                {/* Draggable HTML Range Slider Input */}
+                <div className="mt-3.5 px-2">
+                  <div className="flex items-center justify-between text-9px font-mono text-[#6B635B] mb-1">
+                    <span>Birth (0 Yrs)</span>
+                    <span className="font-bold text-[#8C6508]">← Drag or scrub to explore any age →</span>
+                    <span>Longevity (90 Yrs)</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="90"
+                    value={scrubAge}
+                    onChange={(e) => setScrubAge(Number(e.target.value))}
+                    className="w-full cursor-ew-resize accent-[#B8860B] h-2 rounded-lg bg-[#E5DEC9]"
+                    aria-label="Scrub Destiny Curve Age"
+                  />
                 </div>
 
-                {/* Mahadasha Track Ribbon */}
-                <div className="mt-2.5 grid grid-cols-5 text-center text-9px uppercase font-mono tracking-wider text-[#3D3834] gap-1">
-                  <div className="rounded py-1 bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]">0–16 Mars</div>
-                  <div className="rounded py-1 bg-[#B8860B]/15 border border-[#B8860B]/40 text-[#785404] font-bold">16–34 Jupiter</div>
-                  <div className="rounded py-1 bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]">34–53 Saturn</div>
-                  <div className="rounded py-1 bg-[#059669]/15 border border-[#059669]/30 text-[#065f46] font-semibold">53–70 Mercury</div>
-                  <div className="rounded py-1 bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]">70–90 Ketu</div>
+                {/* Real-time Dynamic Guidance Card */}
+                <div className="mt-3.5 rounded-lg p-3 text-xs transition-all" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b pb-2 mb-2" style={{ borderColor: 'rgba(184, 134, 11, 0.15)' }}>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm" style={{ color: '#1A1A1A' }}>
+                        Age {currentDestiny.age} Horizon
+                      </span>
+                      <span className="rounded px-2 py-0.5 text-9px font-mono font-bold"
+                        style={{
+                          background: currentDestiny.score >= 85 ? 'rgba(184, 134, 11, 0.15)' : currentDestiny.score >= 75 ? 'rgba(5, 150, 105, 0.15)' : currentDestiny.score >= 65 ? 'rgba(37, 99, 235, 0.15)' : 'rgba(217, 119, 6, 0.15)',
+                          color: currentDestiny.score >= 85 ? '#785404' : currentDestiny.score >= 75 ? '#065f46' : currentDestiny.score >= 65 ? '#1e40af' : '#92400e',
+                          border: `1px solid ${currentDestiny.score >= 85 ? '#B8860B' : currentDestiny.score >= 75 ? '#059669' : currentDestiny.score >= 65 ? '#2563EB' : '#D97706'}`,
+                        }}>
+                        Score {currentDestiny.score} / 100 · {currentDestiny.score >= 85 ? '★ Zenith Auspicious Window' : currentDestiny.score >= 75 ? 'High Momentum Period' : currentDestiny.score >= 65 ? 'Consolidation Phase' : '⚡ Karmic Testing & Pivot'}
+                      </span>
+                    </div>
+                    <div className="font-mono text-10px text-[#8C6508]">
+                      Active: <span className="font-bold text-[#1A1A1A]">{currentDestiny.dasha} Dasha</span>
+                    </div>
+                  </div>
+
+                  <div className="text-11px leading-relaxed" style={{ color: '#3D3834' }}>
+                    <span className="font-bold text-[#1A1A1A]">{currentDestiny.title}: </span>
+                    {currentDestiny.desc}
+                  </div>
+                </div>
+
+                {/* Mahadasha Track Ribbon (Highlights matching scrubbed age) */}
+                <div className="mt-2.5 grid grid-cols-5 text-center text-9px uppercase font-mono tracking-wider gap-1">
+                  <div className={`rounded py-1 transition-colors ${isDashaActive(0, 16) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                    0–16 Mars
+                  </div>
+                  <div className={`rounded py-1 transition-colors ${isDashaActive(16, 34) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                    16–34 Jupiter
+                  </div>
+                  <div className={`rounded py-1 transition-colors ${isDashaActive(34, 53) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                    34–53 Saturn
+                  </div>
+                  <div className={`rounded py-1 transition-colors ${isDashaActive(53, 70) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                    53–70 Mercury
+                  </div>
+                  <div className={`rounded py-1 transition-colors ${isDashaActive(70, 90) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                    70–90 Ketu
+                  </div>
                 </div>
               </div>
             </div>
@@ -437,89 +729,72 @@ export function DirectionAFeatures() {
 
               {/* Curated Classical Engine Raagas with Real Links */}
               <div className="mt-6 rounded-xl p-4 border space-y-3" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
-                <div className="flex items-center justify-between text-xs font-bold" style={{ color: '#1A1A1A' }}>
-                  <span>Classical Raagas Mapped from Engine</span>
-                  <span className="text-9px font-mono text-[#8C6508]">Prahar & Mood Attunement</span>
+                {/* Live Circadian Timing Banner */}
+                <div className="rounded-lg p-2.5 flex items-center justify-between text-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#059669] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#059669]"></span>
+                    </span>
+                    <span className="font-mono text-9px uppercase tracking-wider font-bold" style={{ color: '#8C6508' }}>
+                      ● Active Now for Local Time ({String(currentHour).padStart(2, '0')}:00):
+                    </span>
+                    <span className="text-10px font-semibold" style={{ color: '#1A1A1A' }}>
+                      {activePraharObj.prahar}
+                    </span>
+                  </div>
+                  <span className="hidden sm:inline font-mono text-9px text-[#059669] font-bold">
+                    Suggested: {activePraharObj.name}
+                  </span>
                 </div>
 
                 <div className="grid gap-2 text-xs">
-                  {/* Raag 1 */}
-                  <div className="rounded-lg p-3 flex items-center justify-between shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.2)' }}>
-                    <div>
-                      <div className="font-bold text-11px" style={{ color: '#1A1A1A' }}>Raag Yaman (Sandhya Prahar)</div>
-                      <div className="text-9px text-[#5C5248]">Twilight calmness, emotional warmth & Venus-Jupiter harmony</div>
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <a
-                        href="https://open.spotify.com/search/Raag%20Yaman"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#1DB954]/12 text-[#15803d] border border-[#1DB954]/30 hover:bg-[#1DB954]/25 transition-colors"
+                  {PRAHARS.map((p) => {
+                    const isNow = p.key === activePraharObj.key;
+                    return (
+                      <div
+                        key={p.key}
+                        className={`rounded-lg p-3 flex items-center justify-between shadow-xs transition-all ${
+                          isNow ? 'bg-[#FFFDF5] border-2 border-[#B8860B]' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]'
+                        }`}
                       >
-                        Spotify ↗
-                      </a>
-                      <a
-                        href="https://www.youtube.com/results?search_query=Raag+Yaman+Indian+Classical"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#FF0000]/12 text-[#b91c1c] border border-[#FF0000]/30 hover:bg-[#FF0000]/25 transition-colors"
-                      >
-                        YouTube ↗
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Raag 2 */}
-                  <div className="rounded-lg p-3 flex items-center justify-between shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.2)' }}>
-                    <div>
-                      <div className="font-bold text-11px" style={{ color: '#1A1A1A' }}>Raag Bhairav (Pratham Prahar)</div>
-                      <div className="text-9px text-[#5C5248]">Dawn awakening, mental clarity & Surya solar vitality</div>
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <a
-                        href="https://open.spotify.com/search/Raag%20Bhairav"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#1DB954]/12 text-[#15803d] border border-[#1DB954]/30 hover:bg-[#1DB954]/25 transition-colors"
-                      >
-                        Spotify ↗
-                      </a>
-                      <a
-                        href="https://www.youtube.com/results?search_query=Raag+Bhairav+Indian+Classical"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#FF0000]/12 text-[#b91c1c] border border-[#FF0000]/30 hover:bg-[#FF0000]/25 transition-colors"
-                      >
-                        YouTube ↗
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Raag 3 */}
-                  <div className="rounded-lg p-3 flex items-center justify-between shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.2)' }}>
-                    <div>
-                      <div className="font-bold text-11px" style={{ color: '#1A1A1A' }}>Raag Darbari Kanada (Nishitha Prahar)</div>
-                      <div className="text-9px text-[#5C5248]">Midnight stillness, deep restorative sleep & Saturn grounding</div>
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <a
-                        href="https://open.spotify.com/search/Raag%20Darbari%20Kanada"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#1DB954]/12 text-[#15803d] border border-[#1DB954]/30 hover:bg-[#1DB954]/25 transition-colors"
-                      >
-                        Spotify ↗
-                      </a>
-                      <a
-                        href="https://www.youtube.com/results?search_query=Raag+Darbari+Kanada+Classical"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#FF0000]/12 text-[#b91c1c] border border-[#FF0000]/30 hover:bg-[#FF0000]/25 transition-colors"
-                      >
-                        YouTube ↗
-                      </a>
-                    </div>
-                  </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-11px" style={{ color: '#1A1A1A' }}>
+                              {p.name}
+                            </span>
+                            <span className="text-9px font-mono text-[#8C6508]">
+                              ({p.prahar.split('·')[0].trim()})
+                            </span>
+                            {isNow && (
+                              <span className="rounded-full px-2 py-0.5 text-8px font-mono font-bold uppercase tracking-wider bg-[#059669]/15 text-[#065f46] border border-[#059669]">
+                                ● Active Now
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-9px text-[#5C5248] mt-0.5">{p.mood}</div>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <a
+                            href={p.spotify}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="rounded px-2.5 py-1 text-9px font-bold bg-[#1DB954]/12 text-[#15803d] border border-[#1DB954]/30 hover:bg-[#1DB954]/25 transition-colors"
+                          >
+                            Spotify ↗
+                          </a>
+                          <a
+                            href={p.youtube}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="rounded px-2.5 py-1 text-9px font-bold bg-[#FF0000]/12 text-[#b91c1c] border border-[#FF0000]/30 hover:bg-[#FF0000]/25 transition-colors"
+                          >
+                            YouTube ↗
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Acoustic Tanpura Drone Test */}
@@ -743,32 +1018,96 @@ export function DirectionAFeatures() {
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed max-w-4xl" style={{ color: '#3D3834' }}>
                   Major planetary transits never act in isolation. When slow-moving cosmic giants (Saturn, Jupiter, Rahu, Ketu) enter a new rashi,
-                  their drishti (aspects) and resonance trigger 4 interconnected houses simultaneously. The Transit Ripple Engine computes these simultaneous ripples across career, wealth, partnerships, and inner mental peace.
+                  their drishti (aspects) and resonance trigger 4 interconnected houses simultaneously. Click below to simulate how each cosmic transit propagates its shockwave.
                 </p>
               </div>
 
-              {/* Ripple Diagram */}
+              {/* Interactive Transit Selector & Ripple Propagation Canvas */}
               <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
-                <div className="text-xs font-bold mb-3" style={{ color: '#8C6508' }}>
-                  Live Transit Propagation Example (Saturn in Pisces):
+                {/* Transit Buttons */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-9px uppercase tracking-wider font-bold" style={{ color: '#8C6508' }}>
+                      Select Transit Shockwave:
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTransit('saturn')}
+                      className={`cursor-pointer rounded px-3 py-1 text-10px font-medium transition-colors ${
+                        activeTransit === 'saturn'
+                          ? 'bg-[#B8860B]/20 text-[#785404] border border-[#B8860B] font-bold shadow-xs'
+                          : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
+                      }`}
+                    >
+                      🪐 Saturn in Pisces
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTransit('jupiter')}
+                      className={`cursor-pointer rounded px-3 py-1 text-10px font-medium transition-colors ${
+                        activeTransit === 'jupiter'
+                          ? 'bg-[#059669]/15 text-[#065f46] border border-[#059669] font-bold shadow-xs'
+                          : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
+                      }`}
+                    >
+                      🌟 Jupiter in Taurus
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTransit('rahu')}
+                      className={`cursor-pointer rounded px-3 py-1 text-10px font-medium transition-colors ${
+                        activeTransit === 'rahu'
+                          ? 'bg-[#7c3aed]/15 text-[#6d28d9] border border-[#7c3aed] font-bold shadow-xs'
+                          : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
+                      }`}
+                    >
+                      ⚡ Rahu-Ketu Axis
+                    </button>
+                  </div>
                 </div>
+
+                {/* Active Transit Header Tag */}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="font-bold text-xs" style={{ color: '#1A1A1A' }}>
+                    ✦ Active Simulation: {TRANSIT_DATA[activeTransit].name}
+                  </div>
+                  <span className="font-mono text-9px uppercase px-2 py-0.5 rounded font-bold"
+                    style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
+                    {TRANSIT_DATA[activeTransit].cycle}
+                  </span>
+                </div>
+                <div className="text-10px text-[#5C5248] mt-0.5 mb-3">
+                  {TRANSIT_DATA[activeTransit].tagline}
+                </div>
+
+                {/* 4 Multi-House Shockwave Cards */}
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs">
-                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
-                    <div className="font-bold text-sm" style={{ color: '#1A1A1A' }}>Epicenter (House 1)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>Saturn in Pisces conjunct Lagna: Redefining personal identity, discipline & physical stamina.</div>
-                  </div>
-                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
-                    <div className="font-bold text-sm" style={{ color: '#8C6508' }}>Ripple A (House 3)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>3rd Drishti on Taurus: Courage, business initiative, communication & contractual shifts.</div>
-                  </div>
-                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
-                    <div className="font-bold text-sm" style={{ color: '#8C6508' }}>Ripple B (House 7)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>7th Drishti on Virgo: Serious marriage tests, long-term business partnerships & legal pacts.</div>
-                  </div>
-                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
-                    <div className="font-bold text-sm" style={{ color: '#8C6508' }}>Ripple C (House 10)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>10th Drishti on Sagittarius: Culmination of professional karma, promotion or status change.</div>
-                  </div>
+                  {TRANSIT_DATA[activeTransit].houses.map((h, i) => (
+                    <div
+                      key={h.tag}
+                      className={`rounded-lg p-3.5 shadow-xs transition-all ${
+                        i === 0 ? 'bg-[#FFFDF5] border-2 border-[#B8860B]' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.25)]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-mono text-9px uppercase tracking-wider font-bold"
+                          style={{ color: i === 0 ? '#B8860B' : '#8C6508' }}>
+                          {h.tag}
+                        </span>
+                        <span className="text-8px font-mono px-1.5 py-0.5 rounded font-semibold bg-[#FAF5EB] text-[#5C5248]">
+                          {h.impact}
+                        </span>
+                      </div>
+                      <div className="font-bold text-sm mt-1" style={{ color: '#1A1A1A' }}>
+                        {h.title}
+                      </div>
+                      <div className="text-10px mt-1.5 leading-relaxed" style={{ color: '#3D3834' }}>
+                        {h.desc}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -974,45 +1313,185 @@ export function DirectionAFeatures() {
 
 /* ====================== III · A SPECIMEN READING ==================== */
 export function DirectionAInsights() {
-  const ref = useReveal();
+  const [viewMode, setViewMode] = useState<'conversational' | 'shastra'>('conversational');
+
   const msgs = [
     { who: 'you', t: 'Should I take the offer in Berlin?' },
-    { who: 'ai', t: 'You are in Jupiter mahādaśā, Saturn antardaśā — a season that rewards patience over speed. The move is sound, but its fruit ripens in 18–24 months. If you can hold steady, go. If you need fast returns, wait for Mercury in April.' },
+    {
+      who: 'ai',
+      t: 'You are in Jupiter mahādaśā, Saturn antardaśā — a season that rewards patience over speed. The move is sound, but its fruit ripens in 18–24 months. If you can hold steady, go. If you need fast returns, wait for Mercury in April.',
+    },
     { who: 'you', t: 'When does Venus reach my seventh house?' },
-    { who: 'ai', t: 'October 19, 14:22 IST. Watch the following three days — someone returns to your life unbidden.' },
+    {
+      who: 'ai',
+      t: 'October 19, 14:22 IST. Watch the following three days — someone returns to your life unbidden.',
+    },
   ];
+
   return (
-    <section ref={ref} className="dira-reveal relative px-6 py-24 md:px-10" style={{ background: 'var(--al-bg)' }}>
+    <section className="relative px-6 py-24 md:px-10" style={{ background: 'var(--al-bg)' }}>
       <div className="mx-auto max-w-3xl">
         <FolioMarker numeral="III" label="A Specimen Reading" />
-        <h2 className="dira-display-sm mb-10" style={{ color: 'var(--al-ivory)' }}>
-          It answers from <span className="italic" style={{ color: 'var(--al-gold-bright)' }}>your</span> chart.
+        <h2 className="dira-display-sm mb-4" style={{ color: '#1A1A1A' }}>
+          It answers from <span className="italic" style={{ color: '#8C6508' }}>your</span> chart.
         </h2>
-        <div className="overflow-hidden rounded-2xl"
-          style={{ border: '1px solid var(--al-line-strong)', background: TINT(60), boxShadow: 'var(--al-shadow-lg)' }}>
-          <div className="flex items-center gap-3 border-b px-5 py-4" style={{ borderColor: 'var(--al-line)' }}>
-            <span className="h-8 w-8 rounded-full"
-              style={{ background: 'radial-gradient(circle at 32% 30%, var(--al-gold-bright), var(--al-gold))' }} />
-            <div>
-              <div className="text-sm font-semibold" style={{ color: 'var(--al-ivory)' }}>AstroLife</div>
-              <div className="text-9px uppercase tracking-widest" style={{ color: 'var(--al-accent)' }}>
-                ● reading your chart
-              </div>
-            </div>
-          </div>
-          <div className="space-y-3 p-5">
-            {msgs.map((m, i) => (
-              <div key={i} className="flex" style={{ justifyContent: m.who === 'you' ? 'flex-end' : 'flex-start' }}>
-                <div className="max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed"
-                  style={{
-                    background: m.who === 'you' ? GOLD_TINT(14) : 'var(--al-surface)',
-                    border: `1px solid ${m.who === 'you' ? 'var(--al-line-strong)' : 'var(--al-line)'}`,
-                    color: m.who === 'you' ? 'var(--al-gold-bright)' : 'var(--al-ivory-dim)',
-                  }}>
-                  {m.t}
+        <p className="mb-8 text-sm md:text-base leading-relaxed" style={{ color: '#3D3834' }}>
+          No canned horoscopes or generic AI filler. Toggle to Classical Shastra Proof to see the exact Sanskrit sutras,
+          ephemeris coordinates, and KP sub-lord mathematics calculating each answer.
+        </p>
+
+        <div className="overflow-hidden rounded-2xl shadow-md border"
+          style={{ borderColor: 'rgba(184, 134, 11, 0.35)', background: '#FFFFFF' }}>
+          {/* Reading Header with View Mode Switcher */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-3.5"
+            style={{ borderColor: 'rgba(184, 134, 11, 0.2)', background: '#FAF7F2' }}>
+            <div className="flex items-center gap-3">
+              <span className="h-7 w-7 rounded-full flex items-center justify-center text-xs shadow-xs"
+                style={{ background: 'linear-gradient(135deg, #D4AF37, #B8860B)', color: '#FFFFFF' }}>
+                ✦
+              </span>
+              <div>
+                <div className="text-sm font-bold" style={{ color: '#1A1A1A' }}>AstroLife AI Engine</div>
+                <div className="text-9px font-mono uppercase tracking-wider flex items-center gap-1.5" style={{ color: '#059669' }}>
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#059669] animate-pulse" />
+                  Live Natal Chart Active · Lahiri Ayanamsha
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Shastra vs Conversational Toggle */}
+            <div className="flex rounded-lg p-0.5 border" style={{ borderColor: 'rgba(184, 134, 11, 0.3)', background: '#FAF5EB' }}>
+              <button
+                type="button"
+                onClick={() => setViewMode('conversational')}
+                className={`cursor-pointer rounded px-3 py-1 text-10px font-medium transition-all ${
+                  viewMode === 'conversational'
+                    ? 'bg-[#FFFFFF] text-[#1A1A1A] font-bold shadow-xs'
+                    : 'text-[#6B635B] hover:text-[#1A1A1A]'
+                }`}
+              >
+                💬 Conversational
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('shastra')}
+                className={`cursor-pointer rounded px-3 py-1 text-10px font-medium transition-all ${
+                  viewMode === 'shastra'
+                    ? 'bg-[#B8860B] text-[#FFFFFF] font-bold shadow-xs'
+                    : 'text-[#6B635B] hover:text-[#1A1A1A]'
+                }`}
+              >
+                📜 Classical Shastra Proof
+              </button>
+            </div>
+          </div>
+
+          {/* Reading Content */}
+          <div className="space-y-4 p-5 md:p-6" style={{ background: '#FFFFFF' }}>
+            {viewMode === 'conversational' ? (
+              // Conversational View
+              msgs.map((m, i) => (
+                <div key={i} className="flex" style={{ justifyContent: m.who === 'you' ? 'flex-end' : 'flex-start' }}>
+                  <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed"
+                    style={{
+                      background: m.who === 'you' ? '#FAF5EB' : '#FAF7F2',
+                      border: `1px solid ${m.who === 'you' ? 'rgba(184, 134, 11, 0.4)' : 'rgba(184, 134, 11, 0.2)'}`,
+                      color: m.who === 'you' ? '#785404' : '#2A2623',
+                    }}>
+                    {m.who === 'you' ? (
+                      <span className="font-medium text-xs sm:text-sm">{m.t}</span>
+                    ) : (
+                      <div>
+                        <span className="font-mono text-9px uppercase tracking-wider block mb-1 text-[#8C6508] font-bold">
+                          AstroLife Synthesizer:
+                        </span>
+                        <span className="text-xs sm:text-sm">{m.t}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              // Classical Shastra Proof View
+              <div className="space-y-5">
+                {/* Proof Item 1 */}
+                <div className="rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.3)', background: '#FAF7F2' }}>
+                  <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                    <span className="font-bold text-xs" style={{ color: '#1A1A1A' }}>
+                      Query 1: “Should I take the offer in Berlin?”
+                    </span>
+                    <span className="font-mono text-9px uppercase px-2 py-0.5 rounded font-bold"
+                      style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.3)' }}>
+                      Dasha & KP Proof
+                    </span>
+                  </div>
+
+                  <div className="mt-3 space-y-2 text-xs leading-relaxed" style={{ color: '#3D3834' }}>
+                    <div className="rounded p-2.5 bg-[#FFFFFF] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                      <div className="font-mono text-9px uppercase font-bold text-[#8C6508] mb-0.5">
+                        1. Brihat Parashara Hora Shastra (BPHS) · Ch. 42 (Guru-Shani Phala)
+                      </div>
+                      <p className="italic text-[#1A1A1A] font-serif text-11px">
+                        “Guru-Sani sambandhe vilambena phalam drishyate; navame sthite videsha gamanat...”
+                      </p>
+                      <p className="mt-1 text-10px text-[#5C5248]">
+                        Classical Translation: Saturn Antardasha under Jupiter Mahadasha operates with gestational delay. Relocation across the 9th/10th axis stabilizes durably only after 18–24 months of groundwork.
+                      </p>
+                    </div>
+
+                    <div className="rounded p-2.5 bg-[#FFFFFF] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                      <div className="font-mono text-9px uppercase font-bold text-[#8C6508] mb-0.5">
+                        2. Krishnamurti Paddhati (KP 249 Sub-Lord Rule)
+                      </div>
+                      <p className="text-10px text-[#1A1A1A]">
+                        10th Cusp Sub-Lord is <span className="font-bold">Saturn</span>, situated in Star of <span className="font-bold">Sun</span> (Uttarashadha). Sun rules 9th house (foreign relocation). Signifies houses <span className="font-mono font-bold text-[#059669]">2, 6, 9, 10, 11</span> — affirmative for international professional elevation, but requires steadfast endurance before Mercury Antardasha unlocks liquidity.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Proof Item 2 */}
+                <div className="rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.3)', background: '#FAF7F2' }}>
+                  <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                    <span className="font-bold text-xs" style={{ color: '#1A1A1A' }}>
+                      Query 2: “When does Venus reach my seventh house?”
+                    </span>
+                    <span className="font-mono text-9px uppercase px-2 py-0.5 rounded font-bold"
+                      style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.3)' }}>
+                      Swiss Ephemeris & Gochara
+                    </span>
+                  </div>
+
+                  <div className="mt-3 space-y-2 text-xs leading-relaxed" style={{ color: '#3D3834' }}>
+                    <div className="rounded p-2.5 bg-[#FFFFFF] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                      <div className="font-mono text-9px uppercase font-bold text-[#8C6508] mb-0.5">
+                        1. Sub-Arcsecond Planetary Coordinate
+                      </div>
+                      <p className="font-mono text-10px text-[#1A1A1A]">
+                        Venus ingress into 7th Rashi (Libra / Tula): <span className="font-bold text-[#8C6508]">Oct 19, 14:22:18 IST</span> at exactly 14°22'04&quot;. (Lahiri Ayanamsha: 24°13'42&quot;).
+                      </p>
+                    </div>
+
+                    <div className="rounded p-2.5 bg-[#FFFFFF] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                      <div className="font-mono text-9px uppercase font-bold text-[#8C6508] mb-0.5">
+                        2. Phaladeepika · Ch. 14 (Gocharaphala) & Kakshya Timing
+                      </div>
+                      <p className="italic text-[#1A1A1A] font-serif text-11px">
+                        “Shukre saptame sthite purva sambandha punaragamanam...”
+                      </p>
+                      <p className="mt-1 text-10px text-[#5C5248]">
+                        Transiting Venus crosses natal 7th cusp Kakshya with 6 benefic Ashtakavarga Bindus. Activates unexpected reconnection from past relationships, legal reconciliations, and contract signings within a 72-hour window.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-9px uppercase tracking-wider font-mono text-[#059669] pt-1">
+                  <span>✓ 100% Deterministic Shastra Grounding</span>
+                  <span>Zero LLM Hallucination</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1022,7 +1501,6 @@ export function DirectionAInsights() {
 
 /* ========================== IV · HOW IT WORKS ======================= */
 export function DirectionAHowItWorks() {
-  const ref = useReveal();
   const steps = [
     { t: 'Give your birth', d: 'Date, time and place. Thirty seconds, no account.' },
     { t: 'Receive your kundli', d: 'D-1, D-9 and current daśā — yours to keep, forever, no card.' },
@@ -1030,7 +1508,7 @@ export function DirectionAHowItWorks() {
     { t: 'Go deeper when ready', d: 'Premium opens KP, Lāl Kitāb, family karma and the printed Blueprint.' },
   ];
   return (
-    <section id="how" ref={ref} className="dira-reveal relative px-6 py-24 md:px-10" style={{ background: TINT(35) }}>
+    <section id="how" className="relative px-6 py-24 md:px-10" style={{ background: TINT(35) }}>
       <div className="mx-auto max-w-4xl">
         <FolioMarker numeral="IV" label="The Passage" />
         <h2 className="dira-display-sm mb-12" style={{ color: 'var(--al-ivory)' }}>
@@ -1055,7 +1533,6 @@ export function DirectionAHowItWorks() {
 
 /* ============================== V · PRICING ========================= */
 export function DirectionAPricing() {
-  const ref = useReveal();
   const plans = [
     { tier: 'Free', price: '₹0', note: 'Begin here', primary: false,
       bullets: ['Full Vedic chart (D-1, D-9)', '10 AI questions / month', 'Today’s daśā teaser', 'Daily one-line forecast'],
@@ -1068,7 +1545,7 @@ export function DirectionAPricing() {
       cta: 'Go Elite' },
   ];
   return (
-    <section id="pricing" ref={ref} className="dira-reveal relative px-6 py-24 md:px-10" style={{ background: 'var(--al-bg)' }}>
+    <section id="pricing" className="relative px-6 py-24 md:px-10" style={{ background: 'var(--al-bg)' }}>
       <div className="mx-auto max-w-5xl">
         <div className="text-center">
           <FolioMarker numeral="V" label="The Subscription" />
@@ -1127,14 +1604,13 @@ export function DirectionAPricing() {
 
 /* ============================= VI · VOICES ========================== */
 export function DirectionATestimonials() {
-  const ref = useReveal();
   const quotes = [
     { q: 'It named my Saturn return to the week. I have since deleted three other apps.', n: 'Priya S.', r: 'Product Manager · Bengaluru' },
     { q: 'The remedies felt gentle, never gimmicky. I trust it precisely because it does not try too hard.', n: 'Arjun M.', r: 'Founder · Mumbai' },
     { q: 'I am a scientist and a sceptic. The reasoning it shows beside each prediction is what won me.', n: 'Kavya R.', r: 'Doctor · Delhi' },
   ];
   return (
-    <section id="testimonials" ref={ref} className="dira-reveal relative px-6 py-24 md:px-10" style={{ background: TINT(35) }}>
+    <section id="testimonials" className="relative px-6 py-24 md:px-10" style={{ background: TINT(35) }}>
       <div className="mx-auto max-w-5xl">
         <div className="text-center">
           <FolioMarker numeral="VI" label="Testimonials" />
@@ -1164,11 +1640,9 @@ export function DirectionATestimonials() {
 
 /* ============================ CLOSING CTA =========================== */
 export function DirectionAClosing({ onGetStarted }: { onGetStarted?: () => void }) {
-  const ref = useReveal();
   return (
-    <section ref={ref} className="dira-reveal dira-grain relative overflow-hidden px-6 py-28 text-center md:px-10"
+    <section className="relative overflow-hidden px-6 py-28 text-center md:px-10"
       style={{ background: 'var(--al-bg)' }}>
-      <StarField count={70} opacity={0.6} />
       <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ opacity: 0.4 }}>
         <CelestialInstrument size={520} style={{ maxWidth: '90vw', maxHeight: '90vw' }} />
       </div>

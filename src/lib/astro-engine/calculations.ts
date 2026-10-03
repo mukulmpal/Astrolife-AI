@@ -266,7 +266,7 @@ export function convertLongitudeBetweenAyanamshas(
 }
 
 // ── Nakshatra lookup ──────────────────────────────────────────
-function getNak(lon: number) {
+export function getNak(lon: number) {
   const i    = Math.floor(md(lon, 360) / (360 / 27));
   const pada = Math.floor((md(lon, 360) % (360 / 27)) / (360 / 108)) + 1;
   return { name: NAK[i], lord: NLRD[i], pada, idx: i };
@@ -472,6 +472,7 @@ export const CITY_COORDS: Record<string, { lat: number; lon: number; tz: number 
   "Delhi":           { lat: 28.6139, lon: 77.2090, tz: 5.5 },
   "New Delhi":       { lat: 28.6139, lon: 77.2090, tz: 5.5 },
   "Bangalore":       { lat: 12.9716, lon: 77.5946, tz: 5.5 },
+  "Bengaluru":       { lat: 12.9716, lon: 77.5946, tz: 5.5 },
   "Chennai":         { lat: 13.0827, lon: 80.2707, tz: 5.5 },
   "Kolkata":         { lat: 22.5726, lon: 88.3639, tz: 5.5 },
   "Hyderabad":       { lat: 17.3850, lon: 78.4867, tz: 5.5 },
@@ -493,6 +494,11 @@ export const CITY_COORDS: Record<string, { lat: number; lon: number; tz: number 
   "Mysuru":          { lat: 12.2958, lon: 76.6394, tz: 5.5 },
   "Coimbatore":      { lat: 11.0168, lon: 76.9558, tz: 5.5 },
   "Visakhapatnam":   { lat: 17.6868, lon: 83.2185, tz: 5.5 },
+  "London":          { lat: 51.5074, lon: -0.1278, tz: 0.0 },
+  "New York":        { lat: 40.7128, lon: -74.0060, tz: -5.0 },
+  "San Francisco":   { lat: 37.7749, lon: -122.4194, tz: -8.0 },
+  "Dubai":           { lat: 25.2048, lon: 55.2708, tz: 4.0 },
+  "Singapore":       { lat: 1.3521, lon: 103.8198, tz: 8.0 },
 };
 
 function resolveChartLocation(
@@ -507,6 +513,23 @@ function resolveChartLocation(
       lat: customLat !== undefined ? assertFiniteRange(customLat, "Latitude", -90, 90) : cityCoords.lat,
       lon: customLon !== undefined ? assertFiniteRange(customLon, "Longitude", -180, 180) : cityCoords.lon,
       tz: customTz !== undefined ? assertFiniteRange(customTz, "Timezone", -12, 14) : cityCoords.tz,
+    };
+  }
+
+  // Case-insensitive / prefix / partial lookup (e.g. "delhi", "bengaluru", "Mumbai, India")
+  const cleanCity = (city || "").trim().toLowerCase();
+  const prefixMatch = cleanCity.split(',')[0].trim();
+  const matchedKey = Object.keys(CITY_COORDS).find((k) => {
+    const lk = k.toLowerCase();
+    return cleanCity === lk || prefixMatch === lk || cleanCity.startsWith(lk);
+  });
+
+  if (matchedKey && CITY_COORDS[matchedKey]) {
+    const matchedCoords = CITY_COORDS[matchedKey];
+    return {
+      lat: customLat !== undefined ? assertFiniteRange(customLat, "Latitude", -90, 90) : matchedCoords.lat,
+      lon: customLon !== undefined ? assertFiniteRange(customLon, "Longitude", -180, 180) : matchedCoords.lon,
+      tz: customTz !== undefined ? assertFiniteRange(customTz, "Timezone", -12, 14) : matchedCoords.tz,
     };
   }
 
@@ -530,6 +553,16 @@ function resolveChartLocation(
       lat: assertFiniteRange(customLat, "Latitude", -90, 90),
       lon: assertFiniteRange(customLon, "Longitude", -180, 180),
       tz: assertFiniteRange(resolvedTz, "Timezone", -12, 14),
+    };
+  }
+
+  // Safe fallback if city is empty or not yet provided
+  if (!city || city.trim() === "") {
+    const fallback = CITY_COORDS["New Delhi"];
+    return {
+      lat: fallback.lat,
+      lon: fallback.lon,
+      tz: fallback.tz,
     };
   }
 

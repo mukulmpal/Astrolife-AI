@@ -34,12 +34,20 @@ export default function PalmistryPage() {
               </button>
             ))}
           </div>
-          <Link
-            href="/dashboard/palmistry/history"
-            className="rounded-xl border border-amber-400/30 px-4 py-3 text-sm font-semibold text-amber-100 hover:bg-amber-400/10"
-          >
-            View Palm History
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/rectify"
+              className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-400/20"
+            >
+              Rectify Unknown Birth Time
+            </Link>
+            <Link
+              href="/dashboard/palmistry/history"
+              className="rounded-xl border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-100 hover:bg-amber-400/10"
+            >
+              View Palm History
+            </Link>
+          </div>
         </div>
 
         {(() => {

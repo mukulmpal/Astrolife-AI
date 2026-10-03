@@ -89,6 +89,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Numerology", href: "/dashboard/numerology", Icon: Hash },
       { label: "Palmistry", href: "/dashboard/palmistry", Icon: Hand },
+      { label: "Birth Rectification", href: "/dashboard/rectify", Icon: Timer },
       { label: "History", href: "/dashboard/history", Icon: History },
     ],
   },
