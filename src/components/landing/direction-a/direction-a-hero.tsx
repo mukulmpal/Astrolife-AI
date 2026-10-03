@@ -6,7 +6,7 @@ import { BirthDetailsForm } from './birth-form';
 export function DirectionAHero() {
   return (
     <section
-      className="dira-grain relative flex min-h-[100svh] items-center overflow-hidden px-6 pt-28 pb-16 md:px-10"
+      className="dira-grain relative flex min-h-[100svh] items-center overflow-hidden px-6 pt-28 pb-24 md:px-10 lg:pb-28"
       style={{ background: 'var(--al-bg)' }}
     >
       <StarField count={110} opacity={0.7} />
@@ -48,21 +48,21 @@ export function DirectionAHero() {
               <div className="flex gap-4">
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>📈</div>
                 <div>
-                  <div className="font-semibold text-sm md:text-base" style={{ color: 'var(--al-gold-bright)' }}>90-Year Destiny Curve & Transit Ripple</div>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>90-Year Destiny Curve & Transit Ripple</div>
                   <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Visual life score trajectory, career golden windows & multi-house ripple shocks</p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🩺</div>
                 <div>
-                  <div className="font-semibold text-sm md:text-base" style={{ color: 'var(--al-gold-bright)' }}>Medical Kundli & Dasha Sound Therapy</div>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Medical Kundli & Dasha Sound Therapy</div>
                   <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Nakshatra organ mapping, Tridosha balance & Indian Classical Raagas for active dashas</p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>◈</div>
                 <div>
-                  <div className="font-semibold text-sm md:text-base" style={{ color: 'var(--al-gold-bright)' }}>Sub-Arcsecond Sidereal Precision & AI</div>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Sub-Arcsecond Sidereal Precision & AI</div>
                   <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Swiss Ephemeris 0.01° accuracy • Every answer cited from classical Shastra</p>
                 </div>
               </div>
@@ -71,7 +71,7 @@ export function DirectionAHero() {
             {/* Trust Strip */}
             <div
               className="dira-reveal dira-reveal-5 in mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-lg sm:grid-cols-3"
-              style={{ border: '1px solid var(--al-line)', background: 'var(--al-line)' }}
+              style={{ border: '1px solid rgba(184, 134, 11, 0.3)', background: 'rgba(184, 134, 11, 0.2)' }}
             >
               {[
                 { k: '40,000+', v: 'charts cast' },
@@ -80,15 +80,15 @@ export function DirectionAHero() {
               ].map((s) => (
                 <div
                   key={s.v}
-                  className="px-3 py-3"
-                  style={{ background: 'var(--al-bg)' }}
+                  className="px-3.5 py-3"
+                  style={{ background: '#FFFFFF' }}
                 >
-                  <div className="font-serif text-lg" style={{ color: 'var(--al-gold-bright)' }}>
+                  <div className="font-serif text-lg font-bold" style={{ color: '#8C6508' }}>
                     {s.k}
                   </div>
                   <div
-                    className="mt-0.5 text-9px uppercase tracking-widest"
-                    style={{ color: 'var(--al-ivory-mute)' }}
+                    className="mt-0.5 text-9px uppercase tracking-widest font-semibold"
+                    style={{ color: '#6B635B' }}
                   >
                     {s.v}
                   </div>
@@ -123,16 +123,16 @@ export function DirectionAHero() {
         </div>
       </div>
 
-      {/* scroll cue */}
-      <div className="absolute bottom-7 left-1/2 z-10 -translate-x-1/2" aria-hidden>
+      {/* scroll cue - cleanly positioned and hidden on smaller viewports to prevent overlap */}
+      <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 hidden -translate-x-1/2 xl:flex" aria-hidden>
         <div
-          className="flex flex-col items-center gap-2 text-9px uppercase tracking-[0.3em]"
-          style={{ color: 'var(--al-ivory-mute)' }}
+          className="flex flex-col items-center gap-1 text-9px uppercase tracking-[0.3em] font-medium"
+          style={{ color: '#8C6508' }}
         >
           Scroll
           <span
-            className="block h-9 w-px dira-float"
-            style={{ background: 'linear-gradient(var(--al-gold), transparent)' }}
+            className="block h-6 w-px dira-float"
+            style={{ background: 'linear-gradient(#B8860B, transparent)' }}
           />
         </div>
       </div>

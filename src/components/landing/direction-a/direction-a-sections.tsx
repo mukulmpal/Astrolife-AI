@@ -108,6 +108,17 @@ export function DirectionAFeatures() {
   // Interactive Destiny Curve selected milestone
   const [destinyEra, setDestinyEra] = useState<'pivot' | 'zenith' | 'wealth'>('zenith');
 
+  // Interactive AI Palmistry Scanner line selection & scan animation state
+  const [palmLine, setPalmLine] = useState<'heart' | 'head' | 'life' | 'fate'>('fate');
+  const [isScanningPalm, setIsScanningPalm] = useState(false);
+
+  const triggerPalmScan = () => {
+    setIsScanningPalm(true);
+    setTimeout(() => {
+      setIsScanningPalm(false);
+    }, 1200);
+  };
+
   // Interactive Card Active Tabs for Tier 2 (keyed by card id)
   const [tier2Tabs, setTier2Tabs] = useState<Record<string, number>>({
     marriage: 0,
@@ -124,18 +135,18 @@ export function DirectionAFeatures() {
 
   return (
     <section id="features" ref={ref} className="dira-reveal relative overflow-hidden px-6 py-28 md:px-10"
-      style={{ background: TINT(35) }}>
+      style={{ background: 'var(--al-bg)' }}>
       <StarField count={50} opacity={0.4} />
       <div className="relative mx-auto max-w-6xl space-y-20">
         
         {/* SECTION HEADER */}
         <div>
           <FolioMarker numeral="II" label="The Complete Vedic Ecosystem" />
-          <h2 className="dira-display-sm mb-4" style={{ color: 'var(--al-ivory)' }}>
+          <h2 className="dira-display-sm mb-4" style={{ color: '#1A1A1A' }}>
             25+ specialized engines.
-            <span className="italic" style={{ color: 'var(--al-gold-bright)' }}> One Unified OS.</span>
+            <span className="italic" style={{ color: '#8C6508' }}> One Unified OS.</span>
           </h2>
-          <p className="max-w-3xl text-sm md:text-base leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+          <p className="max-w-3xl text-sm md:text-base leading-relaxed" style={{ color: '#3D3834' }}>
             Beyond simple sun signs and fear-based predictions. AstroLife unifies ancient astronomical shastras,
             Ayurvedic medicine, and Indian classical sound theory with sub-arcsecond Swiss Ephemeris precision.
           </p>
@@ -145,10 +156,10 @@ export function DirectionAFeatures() {
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
-              style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)', border: '1px solid var(--al-line-strong)' }}>
+              style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.4)' }}>
               Tier 1 · Flagship Breakthroughs
             </span>
-            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: '#6B635B' }}>
               Core Predictive & Therapeutic Engines
             </span>
           </div>
@@ -157,39 +168,39 @@ export function DirectionAFeatures() {
             
             {/* 1. DESTINY CURVE */}
             <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
-              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 4px 20px -4px rgba(184, 134, 11, 0.12)' }}>
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">📈</span>
-                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
-                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
+                    style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
                     0–90 Yrs Life Curve
                   </span>
                 </div>
-                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
                   Interactive Destiny Curve
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: '#3D3834' }}>
                   Never wonder when your golden phase begins. The Destiny Engine plots a continuous 90-year score curve
                   across career, wealth, and life momentum — tracking your exact peak windows, antardasha shifts, and seasons for cautious patience.
                 </p>
               </div>
 
               {/* Real SVG Graph Snap */}
-              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
                 {/* Milestone Buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b" style={{ borderColor: 'var(--al-line)' }}>
-                  <span className="font-mono text-9px uppercase tracking-wider" style={{ color: 'var(--al-ivory-mute)' }}>
-                    Life Milestone Snap:
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                  <span className="font-mono text-9px uppercase tracking-wider font-bold" style={{ color: '#8C6508' }}>
+                    Select Life Milestone Snap:
                   </span>
                   <div className="flex gap-1.5">
                     <button
                       type="button"
                       onClick={() => setDestinyEra('pivot')}
-                      className={`cursor-pointer rounded px-2 py-0.5 text-10px font-medium transition-colors ${
+                      className={`cursor-pointer rounded px-2.5 py-1 text-10px font-medium transition-colors ${
                         destinyEra === 'pivot'
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                          : 'text-neutral-400 hover:text-white'
+                          ? 'bg-[#B8860B]/15 text-[#785404] border border-[#B8860B] font-bold'
+                          : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
                       }`}
                     >
                       Age 28 Pivot
@@ -197,10 +208,10 @@ export function DirectionAFeatures() {
                     <button
                       type="button"
                       onClick={() => setDestinyEra('zenith')}
-                      className={`cursor-pointer rounded px-2 py-0.5 text-10px font-medium transition-colors ${
+                      className={`cursor-pointer rounded px-2.5 py-1 text-10px font-medium transition-colors ${
                         destinyEra === 'zenith'
-                          ? 'bg-amber-400/30 text-amber-200 border border-amber-400/60 font-semibold'
-                          : 'text-neutral-400 hover:text-white'
+                          ? 'bg-[#B8860B]/20 text-[#785404] border border-[#B8860B] font-bold shadow-sm'
+                          : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
                       }`}
                     >
                       ★ Age 38 Zenith
@@ -208,10 +219,10 @@ export function DirectionAFeatures() {
                     <button
                       type="button"
                       onClick={() => setDestinyEra('wealth')}
-                      className={`cursor-pointer rounded px-2 py-0.5 text-10px font-medium transition-colors ${
+                      className={`cursor-pointer rounded px-2.5 py-1 text-10px font-medium transition-colors ${
                         destinyEra === 'wealth'
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : 'text-neutral-400 hover:text-white'
+                          ? 'bg-[#059669]/15 text-[#065f46] border border-[#059669] font-bold'
+                          : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
                       }`}
                     >
                       Age 58 Wealth
@@ -224,29 +235,29 @@ export function DirectionAFeatures() {
                   <svg className="h-full w-full" viewBox="0 0 540 160" preserveAspectRatio="none">
                     <defs>
                       <linearGradient id="destinyArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--al-gold)" stopOpacity="0.32" />
-                        <stop offset="100%" stopColor="var(--al-gold)" stopOpacity="0.0" />
+                        <stop offset="0%" stopColor="#B8860B" stopOpacity="0.22" />
+                        <stop offset="100%" stopColor="#B8860B" stopOpacity="0.0" />
                       </linearGradient>
                       <linearGradient id="curveLine" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#94a3b8" />
-                        <stop offset="35%" stopColor="#f59e0b" />
-                        <stop offset="55%" stopColor="var(--al-gold-bright)" />
-                        <stop offset="85%" stopColor="#10b981" />
-                        <stop offset="100%" stopColor="#94a3b8" />
+                        <stop offset="0%" stopColor="#64748b" />
+                        <stop offset="35%" stopColor="#d97706" />
+                        <stop offset="55%" stopColor="#B8860B" />
+                        <stop offset="85%" stopColor="#059669" />
+                        <stop offset="100%" stopColor="#64748b" />
                       </linearGradient>
                     </defs>
 
                     {/* Horizontal Score Gridlines */}
-                    <line x1="30" y1="20" x2="520" y2="20" stroke="rgba(255,255,255,0.07)" strokeDasharray="3 3" />
-                    <line x1="30" y1="55" x2="520" y2="55" stroke="rgba(255,255,255,0.07)" strokeDasharray="3 3" />
-                    <line x1="30" y1="90" x2="520" y2="90" stroke="rgba(255,255,255,0.07)" strokeDasharray="3 3" />
-                    <line x1="30" y1="125" x2="520" y2="125" stroke="rgba(255,255,255,0.07)" strokeDasharray="3 3" />
+                    <line x1="30" y1="20" x2="520" y2="20" stroke="rgba(184, 134, 11, 0.22)" strokeDasharray="3 3" />
+                    <line x1="30" y1="55" x2="520" y2="55" stroke="rgba(184, 134, 11, 0.22)" strokeDasharray="3 3" />
+                    <line x1="30" y1="90" x2="520" y2="90" stroke="rgba(184, 134, 11, 0.22)" strokeDasharray="3 3" />
+                    <line x1="30" y1="125" x2="520" y2="125" stroke="rgba(184, 134, 11, 0.22)" strokeDasharray="3 3" />
 
                     {/* Y-Axis Score Labels */}
-                    <text x="5" y="24" fill="#94a3b8" fontSize="9" fontFamily="monospace">100</text>
-                    <text x="10" y="59" fill="#64748b" fontSize="9" fontFamily="monospace">75</text>
-                    <text x="10" y="94" fill="#64748b" fontSize="9" fontFamily="monospace">50</text>
-                    <text x="10" y="129" fill="#475569" fontSize="9" fontFamily="monospace">25</text>
+                    <text x="5" y="24" fill="#8C6508" fontSize="10" fontFamily="monospace" fontWeight="bold">100</text>
+                    <text x="10" y="59" fill="#6B635B" fontSize="9" fontFamily="monospace">75</text>
+                    <text x="10" y="94" fill="#6B635B" fontSize="9" fontFamily="monospace">50</text>
+                    <text x="10" y="129" fill="#6B635B" fontSize="9" fontFamily="monospace">25</text>
 
                     {/* Gradient Area Fill */}
                     <path
@@ -259,101 +270,101 @@ export function DirectionAFeatures() {
                       d="M 30 115 C 75 105, 110 80, 150 68 C 175 60, 195 110, 215 116 C 245 124, 260 26, 290 22 C 325 18, 350 82, 380 78 C 410 74, 430 38, 455 42 C 485 46, 505 70, 520 74"
                       fill="none"
                       stroke="url(#curveLine)"
-                      strokeWidth="2.8"
+                      strokeWidth="3.2"
                     />
 
                     {/* Milestone 1: Age 28 Pivot */}
-                    <circle cx="215" cy="116" r={destinyEra === 'pivot' ? 6 : 4} fill="#f59e0b" stroke="#000" strokeWidth="1.5" />
+                    <circle cx="215" cy="116" r={destinyEra === 'pivot' ? 6 : 4} fill="#d97706" stroke="#FFFFFF" strokeWidth="1.5" />
                     {destinyEra === 'pivot' && (
-                      <circle cx="215" cy="116" r="10" fill="none" stroke="#f59e0b" strokeWidth="1" strokeDasharray="2 2" className="animate-pulse" />
+                      <circle cx="215" cy="116" r="10" fill="none" stroke="#d97706" strokeWidth="1.5" strokeDasharray="2 2" className="animate-pulse" />
                     )}
 
                     {/* Milestone 2: Age 38 Zenith Peak */}
-                    <circle cx="290" cy="22" r={destinyEra === 'zenith' ? 7 : 5} fill="var(--al-gold-bright)" stroke="#000" strokeWidth="2" />
+                    <circle cx="290" cy="22" r={destinyEra === 'zenith' ? 7 : 5} fill="#B8860B" stroke="#FFFFFF" strokeWidth="2" />
                     {destinyEra === 'zenith' && (
-                      <circle cx="290" cy="22" r="12" fill="none" stroke="var(--al-gold-bright)" strokeWidth="1.5" strokeDasharray="3 3" className="animate-spin" />
+                      <circle cx="290" cy="22" r="12" fill="none" stroke="#B8860B" strokeWidth="1.8" strokeDasharray="3 3" className="animate-spin" />
                     )}
 
                     {/* Milestone 3: Age 58 Wealth */}
-                    <circle cx="455" cy="42" r={destinyEra === 'wealth' ? 6 : 4} fill="#10b981" stroke="#000" strokeWidth="1.5" />
+                    <circle cx="455" cy="42" r={destinyEra === 'wealth' ? 6 : 4} fill="#059669" stroke="#FFFFFF" strokeWidth="1.5" />
                     {destinyEra === 'wealth' && (
-                      <circle cx="455" cy="42" r="10" fill="none" stroke="#10b981" strokeWidth="1" strokeDasharray="2 2" className="animate-pulse" />
+                      <circle cx="455" cy="42" r="10" fill="none" stroke="#059669" strokeWidth="1.5" strokeDasharray="2 2" className="animate-pulse" />
                     )}
 
                     {/* X-Axis Baseline and Age Markers */}
-                    <line x1="30" y1="145" x2="520" y2="145" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                    <text x="30" y="156" fill="#94a3b8" fontSize="8" fontFamily="monospace">Age 0</text>
-                    <text x="135" y="156" fill="#94a3b8" fontSize="8" fontFamily="monospace">Age 18</text>
-                    <text x="205" y="156" fill="#f59e0b" fontSize="8" fontFamily="monospace" fontWeight="bold">Age 28</text>
-                    <text x="278" y="156" fill="var(--al-gold-bright)" fontSize="8" fontFamily="monospace" fontWeight="bold">★ Age 38</text>
-                    <text x="368" y="156" fill="#94a3b8" fontSize="8" fontFamily="monospace">Age 48</text>
-                    <text x="445" y="156" fill="#10b981" fontSize="8" fontFamily="monospace" fontWeight="bold">Age 58</text>
-                    <text x="505" y="156" fill="#94a3b8" fontSize="8" fontFamily="monospace">Age 90</text>
+                    <line x1="30" y1="145" x2="520" y2="145" stroke="rgba(184, 134, 11, 0.35)" strokeWidth="1" />
+                    <text x="30" y="156" fill="#6B635B" fontSize="9" fontFamily="monospace">Age 0</text>
+                    <text x="135" y="156" fill="#6B635B" fontSize="9" fontFamily="monospace">Age 18</text>
+                    <text x="205" y="156" fill="#d97706" fontSize="9" fontFamily="monospace" fontWeight="bold">Age 28</text>
+                    <text x="278" y="156" fill="#8C6508" fontSize="9" fontFamily="monospace" fontWeight="bold">★ Age 38</text>
+                    <text x="368" y="156" fill="#6B635B" fontSize="9" fontFamily="monospace">Age 48</text>
+                    <text x="445" y="156" fill="#059669" fontSize="9" fontFamily="monospace" fontWeight="bold">Age 58</text>
+                    <text x="505" y="156" fill="#6B635B" fontSize="9" fontFamily="monospace">Age 90</text>
                   </svg>
                 </div>
 
                 {/* Milestone Detail Banner */}
-                <div className="mt-3 rounded-lg p-2.5 text-xs transition-all" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                <div className="mt-3 rounded-lg p-3 text-xs transition-all" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
                   {destinyEra === 'pivot' && (
-                    <div className="flex items-center justify-between text-amber-300">
-                      <span className="font-semibold">⚡ Age 28 (Score 54 · Saturn Return):</span>
-                      <span className="text-10px text-neutral-300">Dismantling fragile ventures, karmic testing, structuring long-term discipline.</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[#92400e]">
+                      <span className="font-bold">⚡ Age 28 (Score 54 · Saturn Return):</span>
+                      <span className="text-11px text-[#3D3834]">Dismantling fragile ventures, karmic testing, structuring long-term discipline.</span>
                     </div>
                   )}
                   {destinyEra === 'zenith' && (
-                    <div className="flex items-center justify-between" style={{ color: 'var(--al-gold-bright)' }}>
-                      <span className="font-semibold">★ Age 38 (Score 94 · Zenith Peak):</span>
-                      <span className="text-10px text-neutral-300">Jupiter Mahadasha + Sun Antardasha in 10th house. Peak career elevation & recognition.</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[#785404]">
+                      <span className="font-bold">★ Age 38 (Score 94 · Zenith Peak):</span>
+                      <span className="text-11px text-[#3D3834]">Jupiter Mahadasha + Sun Antardasha in 10th house. Peak career elevation & recognition.</span>
                     </div>
                   )}
                   {destinyEra === 'wealth' && (
-                    <div className="flex items-center justify-between text-emerald-300">
-                      <span className="font-semibold">💎 Age 58 (Score 88 · Dhana Expansion):</span>
-                      <span className="text-10px text-neutral-300">2nd & 11th house synergy. Major asset compounding, legacy stability, peace.</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[#065f46]">
+                      <span className="font-bold">💎 Age 58 (Score 88 · Dhana Expansion):</span>
+                      <span className="text-11px text-[#3D3834]">2nd & 11th house synergy. Major asset compounding, legacy stability & peace.</span>
                     </div>
                   )}
                 </div>
 
                 {/* Mahadasha Track Ribbon */}
-                <div className="mt-2.5 grid grid-cols-5 text-center text-9px uppercase font-mono tracking-wider text-neutral-400 gap-1">
-                  <div className="rounded py-1 bg-white/5 border border-white/5">0–16 Mars</div>
-                  <div className="rounded py-1 bg-amber-500/10 border border-amber-500/20 text-amber-300 font-semibold">16–34 Jupiter</div>
-                  <div className="rounded py-1 bg-white/5 border border-white/5">34–53 Saturn</div>
-                  <div className="rounded py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">53–70 Mercury</div>
-                  <div className="rounded py-1 bg-white/5 border border-white/5">70–90 Ketu</div>
+                <div className="mt-2.5 grid grid-cols-5 text-center text-9px uppercase font-mono tracking-wider text-[#3D3834] gap-1">
+                  <div className="rounded py-1 bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]">0–16 Mars</div>
+                  <div className="rounded py-1 bg-[#B8860B]/15 border border-[#B8860B]/40 text-[#785404] font-bold">16–34 Jupiter</div>
+                  <div className="rounded py-1 bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]">34–53 Saturn</div>
+                  <div className="rounded py-1 bg-[#059669]/15 border border-[#059669]/30 text-[#065f46] font-semibold">53–70 Mercury</div>
+                  <div className="rounded py-1 bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]">70–90 Ketu</div>
                 </div>
               </div>
             </div>
 
             {/* 2. MEDICAL ASTROLOGY */}
             <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
-              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 4px 20px -4px rgba(184, 134, 11, 0.12)' }}>
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">🩺</span>
-                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
-                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
+                    style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
                     Charaka & Parashari Shastra
                   </span>
                 </div>
-                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
                   Medical Kundli & Astro-Chikitsa
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: '#3D3834' }}>
                   Preventive lifestyle intelligence rooted in classical Ayurveda. Cross-verifies your 6th house (Roga), 8th house (Ayushya),
                   and Nakshatra organ rulers with planetary affiliations to compute your Tridosha constitution and detect transit medical vulnerabilities before symptoms arise.
                 </p>
               </div>
 
               {/* Explicit Legal & Medical Disclaimer Callout */}
-              <div className="mt-5 rounded-xl p-3 border text-xs" style={{ borderColor: 'rgba(234, 179, 8, 0.4)', background: 'rgba(234, 179, 8, 0.08)' }}>
+              <div className="mt-5 rounded-xl p-3.5 border text-xs" style={{ borderColor: 'rgba(184, 134, 11, 0.45)', background: '#FFFDF5' }}>
                 <div className="flex items-start gap-2.5">
                   <span className="text-base flex-shrink-0">⚠️</span>
                   <div className="space-y-0.5">
-                    <span className="font-mono text-9px uppercase tracking-wider font-bold block" style={{ color: 'var(--al-gold-bright)' }}>
+                    <span className="font-mono text-10px uppercase tracking-wider font-bold block" style={{ color: '#8C6508' }}>
                       Spiritual & Informational Wellness Notice
                     </span>
-                    <p className="text-11px leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                    <p className="text-11px leading-relaxed" style={{ color: '#3D3834' }}>
                       For informational and spiritual purposes only. Not a substitute for professional medical advice, clinical diagnosis, or medical treatment.
                       Tridosha and Nakshatra organ mapping are classical Ayurvedic and astrological concepts, not clinical proof. Always consult a licensed medical physician.
                     </p>
@@ -362,86 +373,88 @@ export function DirectionAFeatures() {
               </div>
 
               {/* Constitutional Tridosha Breakdown */}
-              <div className="mt-4 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
-                <div className="flex items-center justify-between text-xs font-semibold" style={{ color: 'var(--al-ivory)' }}>
+              <div className="mt-4 rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
+                <div className="flex items-center justify-between text-xs font-bold" style={{ color: '#1A1A1A' }}>
                   <span>Constitutional Tridosha Breakdown</span>
-                  <span className="text-9px font-normal px-2 py-0.5 rounded" style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)' }}>Vata-Pitta Dominant</span>
+                  <span className="text-9px font-semibold px-2 py-0.5 rounded" style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
+                    Vata-Pitta Dominant
+                  </span>
                 </div>
                 <div className="mt-3 space-y-2">
                   <div>
-                    <div className="flex justify-between text-10px" style={{ color: 'var(--al-ivory-dim)' }}>
+                    <div className="flex justify-between text-10px font-medium" style={{ color: '#1A1A1A' }}>
                       <span>Vata (Air / Nervous System)</span>
-                      <span>46%</span>
+                      <span className="font-bold">46%</span>
                     </div>
-                    <div className="mt-1 h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: '46%', background: '#60a5fa' }} />
+                    <div className="mt-1 h-2 w-full rounded-full bg-[#E5DEC9] overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: '46%', background: '#2563EB' }} />
                     </div>
                   </div>
                   <div>
-                    <div className="flex justify-between text-10px" style={{ color: 'var(--al-ivory-dim)' }}>
+                    <div className="flex justify-between text-10px font-medium" style={{ color: '#1A1A1A' }}>
                       <span>Pitta (Fire / Metabolic Agni)</span>
-                      <span>36%</span>
+                      <span className="font-bold">36%</span>
                     </div>
-                    <div className="mt-1 h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: '36%', background: '#f59e0b' }} />
+                    <div className="mt-1 h-2 w-full rounded-full bg-[#E5DEC9] overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: '36%', background: '#D97706' }} />
                     </div>
                   </div>
                   <div>
-                    <div className="flex justify-between text-10px" style={{ color: 'var(--al-ivory-dim)' }}>
+                    <div className="flex justify-between text-10px font-medium" style={{ color: '#1A1A1A' }}>
                       <span>Kapha (Earth / Fluid Lubrication)</span>
-                      <span>18%</span>
+                      <span className="font-bold">18%</span>
                     </div>
-                    <div className="mt-1 h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: '18%', background: '#10b981' }} />
+                    <div className="mt-1 h-2 w-full rounded-full bg-[#E5DEC9] overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: '18%', background: '#059669' }} />
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 text-9px uppercase tracking-wider flex items-center gap-1.5" style={{ color: 'var(--al-gold-bright)' }}>
-                  <span>✦ Early Advisory:</span>
-                  <span style={{ color: 'var(--al-ivory-dim)' }}>Saturn transit activating 6th lord · Astrological advisory: prioritize lumbar spine ergonomics & nervous recovery</span>
+                <div className="mt-3 text-9px uppercase tracking-wider flex items-center gap-1.5 font-medium" style={{ color: '#8C6508' }}>
+                  <span className="font-bold">✦ Early Advisory:</span>
+                  <span style={{ color: '#3D3834' }}>Saturn transit activating 6th lord · Astrological advisory: prioritize lumbar spine ergonomics & nervous recovery</span>
                 </div>
               </div>
             </div>
 
             {/* 3. ASTROSOUND THERAPY */}
             <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
-              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 4px 20px -4px rgba(184, 134, 11, 0.12)' }}>
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">🎵</span>
-                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
-                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
+                    style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
                     Raagas & Circadian Prahar
                   </span>
                 </div>
-                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
                   AstroSound & Circadian Raaga Therapy
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: '#3D3834' }}>
                   In Indian classical shastra, melody scales (Raagas) are attuned to the 8 diurnal Prahar cycles and the 9 emotional Rasas. AstroLife correlates your active Vimshottari Mahadasha and Antardasha with authentic Raagas to cultivate emotional balance, cognitive focus, and restorative sleep.
                 </p>
               </div>
 
               {/* Curated Classical Engine Raagas with Real Links */}
-              <div className="mt-6 rounded-xl p-4 border space-y-3" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
-                <div className="flex items-center justify-between text-xs font-semibold" style={{ color: 'var(--al-ivory)' }}>
+              <div className="mt-6 rounded-xl p-4 border space-y-3" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
+                <div className="flex items-center justify-between text-xs font-bold" style={{ color: '#1A1A1A' }}>
                   <span>Classical Raagas Mapped from Engine</span>
-                  <span className="text-9px font-mono text-amber-300">Prahar & Mood Attunement</span>
+                  <span className="text-9px font-mono text-[#8C6508]">Prahar & Mood Attunement</span>
                 </div>
 
                 <div className="grid gap-2 text-xs">
                   {/* Raag 1 */}
-                  <div className="rounded-lg p-2.5 flex items-center justify-between" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                  <div className="rounded-lg p-3 flex items-center justify-between shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.2)' }}>
                     <div>
-                      <div className="font-semibold text-11px" style={{ color: 'var(--al-ivory)' }}>Raag Yaman (Sandhya Prahar)</div>
-                      <div className="text-9px text-neutral-400">Twilight calmness, emotional warmth & Venus-Jupiter harmony</div>
+                      <div className="font-bold text-11px" style={{ color: '#1A1A1A' }}>Raag Yaman (Sandhya Prahar)</div>
+                      <div className="text-9px text-[#5C5248]">Twilight calmness, emotional warmth & Venus-Jupiter harmony</div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
                       <a
                         href="https://open.spotify.com/search/Raag%20Yaman"
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded px-2 py-1 text-9px font-medium bg-[#1DB954]/15 text-[#1DB954] hover:bg-[#1DB954]/25 transition-colors"
+                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#1DB954]/12 text-[#15803d] border border-[#1DB954]/30 hover:bg-[#1DB954]/25 transition-colors"
                       >
                         Spotify ↗
                       </a>
@@ -449,7 +462,7 @@ export function DirectionAFeatures() {
                         href="https://www.youtube.com/results?search_query=Raag+Yaman+Indian+Classical"
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded px-2 py-1 text-9px font-medium bg-[#FF0000]/15 text-[#FF5555] hover:bg-[#FF0000]/25 transition-colors"
+                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#FF0000]/12 text-[#b91c1c] border border-[#FF0000]/30 hover:bg-[#FF0000]/25 transition-colors"
                       >
                         YouTube ↗
                       </a>
@@ -457,17 +470,17 @@ export function DirectionAFeatures() {
                   </div>
 
                   {/* Raag 2 */}
-                  <div className="rounded-lg p-2.5 flex items-center justify-between" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                  <div className="rounded-lg p-3 flex items-center justify-between shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.2)' }}>
                     <div>
-                      <div className="font-semibold text-11px" style={{ color: 'var(--al-ivory)' }}>Raag Bhairav (Pratham Prahar)</div>
-                      <div className="text-9px text-neutral-400">Dawn awakening, mental clarity & Surya solar vitality</div>
+                      <div className="font-bold text-11px" style={{ color: '#1A1A1A' }}>Raag Bhairav (Pratham Prahar)</div>
+                      <div className="text-9px text-[#5C5248]">Dawn awakening, mental clarity & Surya solar vitality</div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
                       <a
                         href="https://open.spotify.com/search/Raag%20Bhairav"
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded px-2 py-1 text-9px font-medium bg-[#1DB954]/15 text-[#1DB954] hover:bg-[#1DB954]/25 transition-colors"
+                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#1DB954]/12 text-[#15803d] border border-[#1DB954]/30 hover:bg-[#1DB954]/25 transition-colors"
                       >
                         Spotify ↗
                       </a>
@@ -475,7 +488,7 @@ export function DirectionAFeatures() {
                         href="https://www.youtube.com/results?search_query=Raag+Bhairav+Indian+Classical"
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded px-2 py-1 text-9px font-medium bg-[#FF0000]/15 text-[#FF5555] hover:bg-[#FF0000]/25 transition-colors"
+                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#FF0000]/12 text-[#b91c1c] border border-[#FF0000]/30 hover:bg-[#FF0000]/25 transition-colors"
                       >
                         YouTube ↗
                       </a>
@@ -483,17 +496,17 @@ export function DirectionAFeatures() {
                   </div>
 
                   {/* Raag 3 */}
-                  <div className="rounded-lg p-2.5 flex items-center justify-between" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                  <div className="rounded-lg p-3 flex items-center justify-between shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.2)' }}>
                     <div>
-                      <div className="font-semibold text-11px" style={{ color: 'var(--al-ivory)' }}>Raag Darbari Kanada (Nishitha Prahar)</div>
-                      <div className="text-9px text-neutral-400">Midnight stillness, deep restorative sleep & Saturn grounding</div>
+                      <div className="font-bold text-11px" style={{ color: '#1A1A1A' }}>Raag Darbari Kanada (Nishitha Prahar)</div>
+                      <div className="text-9px text-[#5C5248]">Midnight stillness, deep restorative sleep & Saturn grounding</div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
                       <a
                         href="https://open.spotify.com/search/Raag%20Darbari%20Kanada"
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded px-2 py-1 text-9px font-medium bg-[#1DB954]/15 text-[#1DB954] hover:bg-[#1DB954]/25 transition-colors"
+                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#1DB954]/12 text-[#15803d] border border-[#1DB954]/30 hover:bg-[#1DB954]/25 transition-colors"
                       >
                         Spotify ↗
                       </a>
@@ -501,7 +514,7 @@ export function DirectionAFeatures() {
                         href="https://www.youtube.com/results?search_query=Raag+Darbari+Kanada+Classical"
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded px-2 py-1 text-9px font-medium bg-[#FF0000]/15 text-[#FF5555] hover:bg-[#FF0000]/25 transition-colors"
+                        className="rounded px-2.5 py-1 text-9px font-bold bg-[#FF0000]/12 text-[#b91c1c] border border-[#FF0000]/30 hover:bg-[#FF0000]/25 transition-colors"
                       >
                         YouTube ↗
                       </a>
@@ -510,22 +523,22 @@ export function DirectionAFeatures() {
                 </div>
 
                 {/* Acoustic Tanpura Drone Test */}
-                <div className="pt-2 border-t flex items-center justify-between" style={{ borderColor: 'var(--al-line)' }}>
+                <div className="pt-2 border-t flex items-center justify-between" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
                   <div>
-                    <div className="text-11px font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                    <div className="text-11px font-bold" style={{ color: '#1A1A1A' }}>
                       Acoustic Tanpura Harmonic Drone
                     </div>
-                    <div className="text-9px text-neutral-400">
+                    <div className="text-9px text-[#5C5248]">
                       Sa-Pa Meditative Tuning (C#3 / G#3 Natural Harmonics)
                     </div>
                   </div>
                   <button
                     onClick={playTone}
                     disabled={playing}
-                    className="flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-75 flex-shrink-0"
+                    className="flex cursor-pointer items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold transition-all hover:scale-105 active:scale-95 disabled:opacity-75 flex-shrink-0 shadow-sm"
                     style={{
-                      background: 'linear-gradient(180deg, var(--al-gold-bright), var(--al-gold))',
-                      color: 'var(--al-bg)',
+                      background: 'linear-gradient(180deg, #D4AF37, #B8860B)',
+                      color: '#FFFFFF',
                     }}
                   >
                     {playing ? 'Playing Tanpura (5s)...' : '▶ Listen (Tanpura Drone)'}
@@ -534,93 +547,227 @@ export function DirectionAFeatures() {
               </div>
             </div>
 
-            {/* 4. AI PALMISTRY VISION SCANNER */}
+            {/* 4. AI PALMISTRY VISION SCANNER - WITH INTERACTIVE HAND SVG & SPECIMEN REPORT */}
             <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
-              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 4px 20px -4px rgba(184, 134, 11, 0.12)' }}>
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">✋</span>
-                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
-                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
+                    style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
                     Experimental Research Feature
                   </span>
                 </div>
-                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
                   AI Palmistry Vision Scanner
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: '#3D3834' }}>
                   Snap a photo of your palm. Our computer-vision neural pipeline traces key anatomical landmarks and contour line vectors (Heart, Head, Life, and Fate lines). Fuses physical line signatures with your natal chart for experimental cross-verification with birth chart indications (exploratory research, not deterministic fortune prediction).
                 </p>
               </div>
 
-              {/* Mini visual mockup */}
-              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-semibold" style={{ color: 'var(--al-ivory)' }}>MediaPipe Contour Pipeline</span>
-                  <span className="text-9px font-mono text-amber-300">21 Landmark Points</span>
+              {/* Interactive Palm Diagram & Live Specimen Box */}
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
+                {/* Line Selector Buttons */}
+                <div className="flex flex-wrap items-center justify-between gap-1.5 pb-3 border-b" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                  <div className="flex flex-wrap gap-1">
+                    {[
+                      { key: 'heart', label: '❤️ Heart Line', color: '#DC2626' },
+                      { key: 'head', label: '🧠 Head Line', color: '#2563EB' },
+                      { key: 'life', label: '🌿 Life Line', color: '#059669' },
+                      { key: 'fate', label: '⚡ Fate Line', color: '#B8860B' },
+                    ].map((item) => (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => setPalmLine(item.key as any)}
+                        className={`cursor-pointer rounded px-2 py-1 text-9px font-bold transition-all ${
+                          palmLine === item.key
+                            ? 'bg-[#FFFFFF] border-2 shadow-xs'
+                            : 'bg-[#FAF5EB] text-[#5C5248] border border-[rgba(184,134,11,0.2)] hover:text-[#1A1A1A]'
+                        }`}
+                        style={{
+                          borderColor: palmLine === item.key ? item.color : undefined,
+                          color: palmLine === item.key ? item.color : undefined,
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={triggerPalmScan}
+                    className="cursor-pointer rounded-full px-2.5 py-1 text-9px font-bold transition-all hover:scale-105 active:scale-95"
+                    style={{
+                      background: isScanningPalm ? '#059669' : 'linear-gradient(180deg, #D4AF37, #B8860B)',
+                      color: '#FFFFFF',
+                    }}
+                  >
+                    {isScanningPalm ? 'Scanning...' : '▶ Simulate Scan'}
+                  </button>
                 </div>
-                <div className="mt-2.5 grid grid-cols-3 gap-2 text-center text-10px">
-                  <div className="rounded p-2" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
-                    <div className="font-semibold" style={{ color: '#ef4444' }}>Heart Line</div>
-                    <div className="text-9px" style={{ color: 'var(--al-ivory-dim)' }}>Curved & Deep</div>
-                  </div>
-                  <div className="rounded p-2" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
-                    <div className="font-semibold" style={{ color: '#60a5fa' }}>Head Line</div>
-                    <div className="text-9px" style={{ color: 'var(--al-ivory-dim)' }}>Analytical Focus</div>
-                  </div>
-                  <div className="rounded p-2" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
-                    <div className="font-semibold" style={{ color: '#c8a030' }}>Fate Line</div>
-                    <div className="text-9px" style={{ color: 'var(--al-ivory-dim)' }}>Ascends Age 28</div>
-                  </div>
+
+                {/* Hand Palm SVG Illustration */}
+                <div className="relative mt-3 h-44 w-full flex items-center justify-center overflow-hidden rounded-lg bg-[#FAF5EB] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                  <svg className="h-full max-w-[280px]" viewBox="0 0 320 220" fill="none">
+                    {/* Hand Palm Silhouette */}
+                    <path
+                      d="M 60 190 C 50 160, 52 110, 65 95 C 68 85, 78 40, 85 45 C 92 50, 95 85, 105 85 C 112 55, 120 20, 130 22 C 140 25, 142 80, 150 80 C 158 50, 170 15, 182 18 C 192 20, 190 80, 200 85 C 208 55, 220 35, 230 40 C 238 45, 230 95, 235 110 C 248 135, 255 170, 240 195 C 220 215, 100 215, 60 190 Z"
+                      fill="#FFFFFF"
+                      stroke="rgba(184, 134, 11, 0.45)"
+                      strokeWidth="2"
+                    />
+
+                    {/* MediaPipe 21 Landmark Keypoints */}
+                    {[
+                      [65, 190], [150, 205], [240, 195], // wrist
+                      [70, 135], [78, 90], [85, 45], // thumb
+                      [105, 110], [112, 75], [120, 45], [130, 22], // index
+                      [150, 110], [158, 70], [170, 40], [182, 18], // middle
+                      [190, 115], [198, 75], [208, 50], [220, 35], // ring
+                      [225, 125], [232, 95], [238, 70], // pinky
+                    ].map(([cx, cy], idx) => (
+                      <circle
+                        key={idx}
+                        cx={cx}
+                        cy={cy}
+                        r={isScanningPalm ? 3.5 : 2}
+                        fill="#B8860B"
+                        opacity={isScanningPalm ? 0.9 : 0.4}
+                        className={isScanningPalm ? 'animate-ping' : ''}
+                      />
+                    ))}
+
+                    {/* 1. Heart Line */}
+                    <path
+                      d="M 85 92 C 120 88, 175 92, 225 65"
+                      fill="none"
+                      stroke="#DC2626"
+                      strokeWidth={palmLine === 'heart' ? 4 : 1.8}
+                      strokeOpacity={palmLine === 'heart' ? 1 : 0.4}
+                      strokeLinecap="round"
+                    />
+
+                    {/* 2. Head Line */}
+                    <path
+                      d="M 95 115 C 140 118, 185 130, 230 148"
+                      fill="none"
+                      stroke="#2563EB"
+                      strokeWidth={palmLine === 'head' ? 4 : 1.8}
+                      strokeOpacity={palmLine === 'head' ? 1 : 0.4}
+                      strokeLinecap="round"
+                    />
+
+                    {/* 3. Life Line */}
+                    <path
+                      d="M 95 115 C 115 140, 125 175, 115 198"
+                      fill="none"
+                      stroke="#059669"
+                      strokeWidth={palmLine === 'life' ? 4 : 1.8}
+                      strokeOpacity={palmLine === 'life' ? 1 : 0.4}
+                      strokeLinecap="round"
+                    />
+
+                    {/* 4. Fate Line */}
+                    <path
+                      d="M 152 200 C 154 155, 158 110, 155 70"
+                      fill="none"
+                      stroke="#B8860B"
+                      strokeWidth={palmLine === 'fate' ? 4.5 : 2}
+                      strokeOpacity={palmLine === 'fate' ? 1 : 0.4}
+                      strokeLinecap="round"
+                    />
+
+                    {/* Active Line Indicator Ring */}
+                    {palmLine === 'heart' && <circle cx="155" cy="89" r="6" fill="none" stroke="#DC2626" strokeWidth="2" className="animate-pulse" />}
+                    {palmLine === 'head' && <circle cx="165" cy="124" r="6" fill="none" stroke="#2563EB" strokeWidth="2" className="animate-pulse" />}
+                    {palmLine === 'life' && <circle cx="118" cy="155" r="6" fill="none" stroke="#059669" strokeWidth="2" className="animate-pulse" />}
+                    {palmLine === 'fate' && <circle cx="156" cy="135" r="7" fill="none" stroke="#B8860B" strokeWidth="2.5" className="animate-pulse" />}
+
+                    {/* Scanning Beam Animation */}
+                    {isScanningPalm && (
+                      <line x1="40" y1="20" x2="280" y2="20" stroke="#059669" strokeWidth="3" opacity="0.8">
+                        <animate attributeName="y1" values="20;200;20" dur="1.2s" repeatCount="indefinite" />
+                        <animate attributeName="y2" values="20;200;20" dur="1.2s" repeatCount="indefinite" />
+                      </line>
+                    )}
+                  </svg>
                 </div>
-                <div className="mt-2.5 flex items-center justify-between text-9px uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
-                  <span>Cross-verified with 10th House Sun-Mercury</span>
-                  <span className="text-emerald-400 font-mono">🔒 Zero Biometric Retention</span>
+
+                {/* Live Specimen Report Card */}
+                <div className="mt-3 rounded-lg p-3 text-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                  <div className="flex items-center justify-between font-bold mb-1">
+                    <span style={{
+                      color: palmLine === 'heart' ? '#DC2626' : palmLine === 'head' ? '#2563EB' : palmLine === 'life' ? '#059669' : '#8C6508'
+                    }}>
+                      ✦ Live Analysis: {palmLine === 'heart' ? 'Heart Line (Emotional Depth)' : palmLine === 'head' ? 'Head Line (Intellect & Focus)' : palmLine === 'life' ? 'Life Line (Vitality Arch)' : 'Fate Line (Saturn Karma Track)'}
+                    </span>
+                    <span className="font-mono text-9px text-[#059669]">21 Landmark Nodes</span>
+                  </div>
+
+                  <p className="text-11px leading-relaxed text-[#3D3834]">
+                    {palmLine === 'heart' && 'Deep curved contour terminating near Jupiter mount — indicates high emotional discernment, loyalty in long-term relationships, and heart chakra alignment.'}
+                    {palmLine === 'head' && 'Long unbroken path inclining toward upper Moon mount — confirms exceptional analytical clarity, strategic architecture capabilities, and creative problem-solving.'}
+                    {palmLine === 'life' && 'Broad continuous arc encircling robust Venus mount — reflects sturdy constitutional stamina, rapid physiological recuperation, and steady immune resistance.'}
+                    {palmLine === 'fate' && 'Sharp vertical ascent originating at Age 28 (wrist to Saturn mount) — confirms career autonomy milestone in late 20s, accelerating into prime leadership during Saturn Antardasha.'}
+                  </p>
+
+                  <div className="mt-2 pt-2 border-t flex flex-wrap items-center justify-between text-9px uppercase tracking-wider font-semibold" style={{ borderColor: 'rgba(184, 134, 11, 0.15)' }}>
+                    <span style={{ color: '#8C6508' }}>
+                      {palmLine === 'heart' && 'Fused with 4th House Chandra & Venusian balance'}
+                      {palmLine === 'head' && 'Fused with 10th House Budhaditya Yoga'}
+                      {palmLine === 'life' && 'Fused with Lagna Lord strength & 8th House'}
+                      {palmLine === 'fate' && 'Fused with 10th Lord Saturn Dasha timing'}
+                    </span>
+                    <span className="text-[#059669] font-mono">🔒 Zero Biometric Retention</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* 5. TRANSIT RIPPLE ENGINE (Full-width card) */}
             <div className="lg:col-span-2 flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
-              style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line-strong)', boxShadow: 'var(--al-shadow-lg)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 4px 20px -4px rgba(184, 134, 11, 0.12)' }}>
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">🌊</span>
-                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider"
-                    style={{ background: GOLD_TINT(15), color: 'var(--al-gold)' }}>
+                  <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
+                    style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
                     Multi-House Shockwave Engine
                   </span>
                 </div>
-                <h3 className="mt-5 font-serif text-2xl font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
                   Planetary Transit Ripple Engine
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed max-w-4xl" style={{ color: 'var(--al-ivory-dim)' }}>
+                <p className="mt-2 text-sm leading-relaxed max-w-4xl" style={{ color: '#3D3834' }}>
                   Major planetary transits never act in isolation. When slow-moving cosmic giants (Saturn, Jupiter, Rahu, Ketu) enter a new rashi,
                   their drishti (aspects) and resonance trigger 4 interconnected houses simultaneously. The Transit Ripple Engine computes these simultaneous ripples across career, wealth, partnerships, and inner mental peace.
                 </p>
               </div>
 
               {/* Ripple Diagram */}
-              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'var(--al-line)', background: TINT(40) }}>
-                <div className="text-xs font-semibold mb-3" style={{ color: 'var(--al-gold-bright)' }}>
+              <div className="mt-6 rounded-xl p-4 border" style={{ borderColor: 'rgba(184, 134, 11, 0.25)', background: '#FAF7F2' }}>
+                <div className="text-xs font-bold mb-3" style={{ color: '#8C6508' }}>
                   Live Transit Propagation Example (Saturn in Pisces):
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs">
-                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
-                    <div className="font-semibold text-sm" style={{ color: 'var(--al-ivory)' }}>Epicenter (House 1)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>Saturn in Pisces conjunct Lagna: Redefining personal identity, discipline & physical stamina.</div>
+                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
+                    <div className="font-bold text-sm" style={{ color: '#1A1A1A' }}>Epicenter (House 1)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>Saturn in Pisces conjunct Lagna: Redefining personal identity, discipline & physical stamina.</div>
                   </div>
-                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
-                    <div className="font-semibold text-sm" style={{ color: 'var(--al-gold)' }}>Ripple A (House 3)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>3rd Drishti on Taurus: Courage, business initiative, communication & contractual shifts.</div>
+                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
+                    <div className="font-bold text-sm" style={{ color: '#8C6508' }}>Ripple A (House 3)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>3rd Drishti on Taurus: Courage, business initiative, communication & contractual shifts.</div>
                   </div>
-                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
-                    <div className="font-semibold text-sm" style={{ color: 'var(--al-gold)' }}>Ripple B (House 7)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>7th Drishti on Virgo: Serious marriage tests, long-term business partnerships & legal pacts.</div>
+                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
+                    <div className="font-bold text-sm" style={{ color: '#8C6508' }}>Ripple B (House 7)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>7th Drishti on Virgo: Serious marriage tests, long-term business partnerships & legal pacts.</div>
                   </div>
-                  <div className="rounded-lg p-3" style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
-                    <div className="font-semibold text-sm" style={{ color: 'var(--al-gold)' }}>Ripple C (House 10)</div>
-                    <div className="text-10px mt-1 leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>10th Drishti on Sagittarius: Culmination of professional karma, promotion or status change.</div>
+                  <div className="rounded-lg p-3.5 shadow-xs" style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
+                    <div className="font-bold text-sm" style={{ color: '#8C6508' }}>Ripple C (House 10)</div>
+                    <div className="text-10px mt-1 leading-relaxed" style={{ color: '#3D3834' }}>10th Drishti on Sagittarius: Culmination of professional karma, promotion or status change.</div>
                   </div>
                 </div>
               </div>
@@ -633,10 +780,10 @@ export function DirectionAFeatures() {
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
-              style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)', border: '1px solid var(--al-line-strong)' }}>
+              style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.4)' }}>
               Tier 2 · Practical Life Solutions
             </span>
-            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: '#6B635B' }}>
               6 Interactive Decision Engines
             </span>
           </div>
@@ -651,7 +798,7 @@ export function DirectionAFeatures() {
                 desc: 'Identifies the precise 12-month marriage timing window through Jupiter and Saturn mutual aspects on the 7th house and lagna, combined with 36-point Ashtakoota & Nadi Dosha cancellation.',
                 tabs: ['Double-Transit Sutra', '36-Point Ashtakoota'],
                 previews: [
-                  'Both Saturn & Jupiter must aspect 7th house or 7th lord simultaneously for marriage manifestion.',
+                  'Both Saturn & Jupiter must aspect 7th house or 7th lord simultaneously for marriage manifestation.',
                   'Ashtakoota 36 Guna Milan with automatic cancellation rules for Nadi Dosha & Bhakoot.',
                 ],
               },
@@ -718,44 +865,44 @@ export function DirectionAFeatures() {
             ].map((card) => {
               const activeIdx = tier2Tabs[card.id] || 0;
               return (
-                <div key={card.id} className="flex flex-col justify-between rounded-xl p-6 transition-all duration-300 hover:border-gold"
-                  style={{ background: 'var(--al-bg)', border: '1px solid var(--al-line)' }}>
+                <div key={card.id} className="flex flex-col justify-between rounded-xl p-6 transition-all duration-300 hover:border-[#B8860B]"
+                  style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.25)', boxShadow: '0 4px 16px -2px rgba(184, 134, 11, 0.1)' }}>
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-2xl">{card.icon}</span>
-                      <span className="font-mono text-9px uppercase tracking-wider px-2 py-0.5 rounded"
-                        style={{ background: GOLD_TINT(12), color: 'var(--al-gold)' }}>
+                      <span className="font-mono text-9px uppercase tracking-wider px-2.5 py-0.5 rounded font-semibold"
+                        style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.2)' }}>
                         {card.badge}
                       </span>
                     </div>
-                    <h4 className="mt-4 font-serif text-lg font-semibold" style={{ color: 'var(--al-ivory)' }}>
+                    <h4 className="mt-4 font-serif text-lg font-bold" style={{ color: '#1A1A1A' }}>
                       {card.title}
                     </h4>
-                    <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
+                    <p className="mt-2 text-xs leading-relaxed" style={{ color: '#3D3834' }}>
                       {card.desc}
                     </p>
                   </div>
 
                   {/* Interactive Tab Chips & Live Preview Box */}
-                  <div className="mt-4 pt-3 border-t" style={{ borderColor: 'var(--al-line)' }}>
+                  <div className="mt-4 pt-3 border-t" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
                     <div className="flex gap-1.5 mb-2">
                       {card.tabs.map((tab, idx) => (
                         <button
                           key={tab}
                           type="button"
                           onClick={() => setCardTab(card.id, idx)}
-                          className={`cursor-pointer rounded px-2 py-0.5 text-9px font-mono transition-colors ${
+                          className={`cursor-pointer rounded px-2.5 py-1 text-9px font-mono transition-colors ${
                             activeIdx === idx
-                              ? 'bg-amber-400/25 text-amber-200 border border-amber-400/50 font-semibold'
-                              : 'text-neutral-400 bg-white/5 hover:text-white border border-transparent'
+                              ? 'bg-[#B8860B]/16 text-[#785404] border border-[#B8860B] font-bold'
+                              : 'text-[#6B635B] bg-[#FAF5EB] hover:text-[#1A1A1A] border border-[rgba(184,134,11,0.2)]'
                           }`}
                         >
                           {tab}
                         </button>
                       ))}
                     </div>
-                    <div className="rounded p-2 text-10px leading-relaxed" style={{ background: TINT(30), color: 'var(--al-ivory-dim)' }}>
-                      <span className="text-amber-300 font-mono text-9px block mb-0.5">✦ Live Engine Logic:</span>
+                    <div className="rounded p-2.5 text-10px leading-relaxed border" style={{ background: '#FAF7F2', borderColor: 'rgba(184, 134, 11, 0.2)', color: '#2A2623' }}>
+                      <span className="text-[#8C6508] font-mono text-9px font-bold block mb-0.5">✦ Live Engine Logic:</span>
                       {card.previews[activeIdx]}
                     </div>
                   </div>
@@ -769,16 +916,16 @@ export function DirectionAFeatures() {
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
-              style={{ background: GOLD_TINT(20), color: 'var(--al-gold-bright)', border: '1px solid var(--al-line-strong)' }}>
+              style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.4)' }}>
               Tier 3 · Classical Shastra Supercomputer
             </span>
-            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--al-ivory-mute)' }}>
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: '#6B635B' }}>
               Deep Mathematical & Epistemological Architecture
             </span>
           </div>
 
           <div className="grid gap-px overflow-hidden rounded-xl sm:grid-cols-2 lg:grid-cols-3"
-            style={{ border: '1px solid var(--al-line)', background: 'var(--al-line)' }}>
+            style={{ border: '1px solid rgba(184, 134, 11, 0.3)', background: 'rgba(184, 134, 11, 0.2)' }}>
             {[
               {
                 num: '01',
@@ -811,10 +958,10 @@ export function DirectionAFeatures() {
                 desc: 'Classical Sarvatobhadra Nakshatra Vedha matrix alongside our research archive of 4,000+ verified historical charts.'
               },
             ].map((sys) => (
-              <div key={sys.title} className="p-6" style={{ background: 'var(--al-bg)' }}>
-                <span className="font-mono text-xs" style={{ color: 'var(--al-gold)' }}>{sys.num}</span>
-                <div className="mt-1 font-serif text-base font-semibold" style={{ color: 'var(--al-ivory)' }}>{sys.title}</div>
-                <p className="mt-1.5 text-xs leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>{sys.desc}</p>
+              <div key={sys.title} className="p-6" style={{ background: '#FFFFFF' }}>
+                <span className="font-mono text-xs font-bold" style={{ color: '#8C6508' }}>{sys.num}</span>
+                <div className="mt-1 font-serif text-base font-bold" style={{ color: '#1A1A1A' }}>{sys.title}</div>
+                <p className="mt-1.5 text-xs leading-relaxed" style={{ color: '#3D3834' }}>{sys.desc}</p>
               </div>
             ))}
           </div>
