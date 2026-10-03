@@ -311,7 +311,7 @@ export function DirectionBTestimonials() {
 
 export function DirectionBFaq() {
   const faqs = [
-    { q: "How accurate are AstroLife kundlis?", a: "We use sidereal (Lahiri ayanamsa) calculations validated against Drik Panchang. Birth time accurate to a minute gives a chart accurate to 1°." },
+    { q: "How accurate are AstroLife kundlis?", a: "We use sidereal (Lahiri ayanamsa) calculations validated against high-precision Vedic astronomical ephemeris. Birth time accurate to a minute gives a chart accurate to 1°." },
     { q: "Is my birth data private?", a: "End-to-end encrypted on our servers, never shared. You can delete your chart and conversations at any time." },
     { q: "What's in the free plan?", a: "Your full Vedic birth chart, 10 AI questions per month, and a teaser of your current Dasha — enough to know if Astrolife is for you." },
     { q: "Can I cancel anytime?", a: "Yes. Premium and Elite both cancel in one tap inside Settings. No retention emails, no calls." },

@@ -28,16 +28,16 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
       }}
     >
       <PanchangStrip />
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5 md:px-10">
-        <a href="#top" className="flex items-center gap-3">
-          <svg width="26" height="26" viewBox="-12 -12 24 24" style={{ color: 'var(--al-gold)' }}>
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3 md:px-10">
+        <a href="#top" className="flex items-center gap-2 sm:gap-3">
+          <svg width="24" height="24" viewBox="-12 -12 24 24" style={{ color: 'var(--al-gold)' }} className="sm:w-[26px] sm:h-[26px]">
             <circle r="10.5" stroke="currentColor" strokeWidth="0.7" fill="none" />
             <polygon points="0,-6 5,3 -5,3" fill="none" stroke="currentColor" strokeWidth="0.7" />
             <polygon points="0,6 5,-3 -5,-3" fill="none" stroke="currentColor" strokeWidth="0.7" />
             <circle r="1.9" fill="var(--al-accent)" />
           </svg>
           <span
-            className="font-serif text-lg font-medium uppercase"
+            className="font-serif text-base sm:text-lg font-medium uppercase"
             style={{ color: 'var(--al-ivory)', letterSpacing: '0.18em' }}
           >
             AstroLife
@@ -66,7 +66,7 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <a
             href="/login"
             onClick={(event) => {
@@ -81,13 +81,13 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
           </a>
           <button
             onClick={onGetStarted}
-            className="cursor-pointer rounded-full px-5 py-2 text-xs font-semibold tracking-wide transition-transform duration-300 hover:scale-105"
+            className="cursor-pointer rounded-full px-3.5 py-1.5 sm:px-5 sm:py-2 text-xs font-semibold tracking-wide transition-transform duration-300 hover:scale-105 active:scale-95"
             style={{
               background: 'linear-gradient(180deg, var(--al-gold-bright), var(--al-gold))',
               color: 'var(--al-bg)',
             }}
           >
-            Generate Free Kundli
+            <span className="hidden sm:inline">Generate </span>Free Kundli
           </button>
         </div>
       </div>

@@ -608,20 +608,20 @@ export function DirectionAFeatures() {
                 </div>
 
                 {/* Mahadasha Track Ribbon (Highlights matching scrubbed age) */}
-                <div className="mt-2.5 grid grid-cols-5 text-center text-9px uppercase font-mono tracking-wider gap-1">
-                  <div className={`rounded py-1 transition-colors ${isDashaActive(0, 16) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                <div className="mt-2.5 grid grid-cols-5 text-center text-8px sm:text-9px uppercase font-mono tracking-wider gap-1">
+                  <div className={`rounded py-1 px-0.5 transition-colors ${isDashaActive(0, 16) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
                     0–16 Mars
                   </div>
-                  <div className={`rounded py-1 transition-colors ${isDashaActive(16, 34) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                  <div className={`rounded py-1 px-0.5 transition-colors ${isDashaActive(16, 34) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
                     16–34 Jupiter
                   </div>
-                  <div className={`rounded py-1 transition-colors ${isDashaActive(34, 53) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                  <div className={`rounded py-1 px-0.5 transition-colors ${isDashaActive(34, 53) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
                     34–53 Saturn
                   </div>
-                  <div className={`rounded py-1 transition-colors ${isDashaActive(53, 70) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                  <div className={`rounded py-1 px-0.5 transition-colors ${isDashaActive(53, 70) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
                     53–70 Mercury
                   </div>
-                  <div className={`rounded py-1 transition-colors ${isDashaActive(70, 90) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
+                  <div className={`rounded py-1 px-0.5 transition-colors ${isDashaActive(70, 90) ? 'bg-[#B8860B]/20 border border-[#B8860B] text-[#785404] font-bold shadow-xs' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)] text-[#3D3834]'}`}>
                     70–90 Ketu
                   </div>
                 </div>
@@ -754,7 +754,7 @@ export function DirectionAFeatures() {
                     return (
                       <div
                         key={p.key}
-                        className={`rounded-lg p-3 flex items-center justify-between shadow-xs transition-all ${
+                        className={`rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs transition-all ${
                           isNow ? 'bg-[#FFFDF5] border-2 border-[#B8860B]' : 'bg-[#FFFFFF] border border-[rgba(184,134,11,0.2)]'
                         }`}
                       >
@@ -1224,7 +1224,7 @@ export function DirectionAFeatures() {
 
                   {/* Interactive Tab Chips & Live Preview Box */}
                   <div className="mt-4 pt-3 border-t" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
-                    <div className="flex gap-1.5 mb-2">
+                    <div className="flex flex-wrap gap-1.5 mb-2">
                       {card.tabs.map((tab, idx) => (
                         <button
                           key={tab}
@@ -1274,7 +1274,7 @@ export function DirectionAFeatures() {
               {
                 num: '02',
                 title: 'Daily Panchang & Microsecond Boundaries',
-                desc: 'High-precision Drik Siddhanta calculations for Tithi, Vara, Nakshatra, Yoga, and Karana, with exact sunrise, sunset, and twilight transitions.'
+                desc: 'High-precision Vedic Ganita Siddhanta calculations for Tithi, Vara, Nakshatra, Yoga, and Karana, with exact sunrise, sunset, and twilight transitions.'
               },
               {
                 num: '03',
@@ -1556,12 +1556,11 @@ export function DirectionAPricing() {
         <div className="grid gap-6 md:grid-cols-3 md:items-start">
           {plans.map((p) => (
             <div key={p.tier}
-              className="relative flex flex-col rounded-2xl p-7 transition-transform duration-300 hover:-translate-y-1"
+              className={`relative flex flex-col rounded-2xl p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1 ${p.primary ? 'md:scale-[1.03]' : ''}`}
               style={{
                 background: p.primary ? TINT(85) : TINT(45),
                 border: `1px solid ${p.primary ? 'var(--al-line-strong)' : 'var(--al-line)'}`,
                 boxShadow: p.primary ? 'var(--al-shadow-lg)' : 'none',
-                transform: p.primary ? 'scale(1.03)' : undefined,
               }}>
               {p.primary && (
                 <span className="absolute right-6 top-6 rounded-full px-3 py-1 text-8px font-semibold uppercase tracking-widest"
@@ -1702,9 +1701,9 @@ export function DirectionAFooter() {
   return (
     <footer className="border-t px-6 py-16 md:px-10" style={{ borderColor: 'var(--al-line)', background: TINT(35) }}>
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(4,1fr)]">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-[1.4fr_repeat(4,1fr)] md:gap-12">
           {/* brand */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <div className="mb-4 flex items-center gap-3">
               <svg width="24" height="24" viewBox="-12 -12 24 24" style={{ color: 'var(--al-gold)' }}>
                 <circle r="10.5" stroke="currentColor" strokeWidth="0.7" fill="none" />

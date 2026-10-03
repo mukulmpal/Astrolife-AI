@@ -1467,5 +1467,23 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .dira-reveal, .dira-reveal.in { opacity: 1 !important; animation: none !important; }
-  [class*="dira-spin"], .dira-float { animation: none !important; }
+  [class*="dira-spin"], .dira-float, .panchang-ticker-track { animation: none !important; }
+}
+
+/* Panchang smooth marquee ticker */
+@keyframes panchangTicker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.panchang-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: panchangTicker 26s linear infinite;
+  will-change: transform;
+}
+
+.panchang-ticker-track:hover,
+.panchang-ticker-track:active {
+  animation-play-state: paused;
 }

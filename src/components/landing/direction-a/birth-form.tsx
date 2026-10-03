@@ -326,7 +326,7 @@ export function BirthDetailsForm() {
 
           {/* North Indian Diamond Kundli SVG Graphic */}
           <div className="my-2.5 flex items-center justify-center">
-            <svg width="200" height="200" viewBox="0 0 240 240" className="drop-shadow-xs">
+            <svg viewBox="0 0 240 240" className="w-full max-w-[210px] aspect-square drop-shadow-xs">
               {/* Outer boundary */}
               <rect x="0" y="0" width="240" height="240" fill="#FFFFFF" stroke="#B8860B" strokeWidth="1.8" />
               {/* Diagonals */}
@@ -484,9 +484,9 @@ export function BirthDetailsForm() {
           <button
             type="button"
             onClick={handleWhatsAppShare}
-            className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded py-1.5 text-10px font-bold transition-all hover:bg-[#25D366]/20 border"
+            className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded py-1.5 text-10px font-bold transition-all hover:bg-[#25D366]/20 border cursor-pointer"
             style={{
-              background: '#25D366]/12',
+              background: 'rgba(37, 211, 102, 0.12)',
               borderColor: 'rgba(37, 211, 102, 0.4)',
               color: '#0f766e',
             }}

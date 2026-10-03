@@ -115,7 +115,7 @@ export function DirectionBSampleBlueprint() {
 
 export function DirectionBFeatures() {
   const features = [
-    { glyph: '♈', title: 'Sidereal precision', body: 'Lahiri ayanamsa, Drik Panchang validated. Charts to 1° of accuracy.' },
+    { glyph: '♈', title: 'Sidereal precision', body: 'Lahiri ayanamsa, Vedic astronomical ephemeris. Charts to 1° of accuracy.' },
     { glyph: '♉', title: 'AI conversations', body: 'Ask anything. Get answers that cite your chart, not horoscope clichés.' },
     { glyph: '♊', title: 'Dasha timing', body: 'Vimshottari to the day. Know when, not just what.' },
     { glyph: '♋', title: 'Lal Kitab remedies', body: 'Gentle, practical, household-scale. No expensive pujas.' },
