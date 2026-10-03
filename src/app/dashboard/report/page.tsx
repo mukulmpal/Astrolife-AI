@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
+import { useUserTier } from "@/context/ChartContext";
 import {
   downloadReportAsPDF,
   generateReportHTML,
@@ -181,10 +182,11 @@ const REPORT_EDITION_LABEL: Record<ReportOptions["type"], string> = {
 
 export default function ReportPage() {
   const { chart, loading, hasUserChart } = useUserChart();
+  const { userTier: cachedTier } = useUserTier();
   const fullAccess = isFullAccessEnabled();
   const enforced = isBillingEnforced();
   const [supabase] = useState(() => createClient());
-  const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>(() => fullAccess ? "elite" : "free");
+  const subscriptionTier = fullAccess ? "elite" : (cachedTier ?? "free");
   const [reportType, setReportType]   = useState<ReportOptions["type"]>("basic");
   const [palette, setPalette]         = useState<ReportPalette>("midnight");
   const [cover, setCover]             = useState<ReportCover>("wheel");
@@ -201,25 +203,6 @@ export default function ReportPage() {
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (fullAccess) return;
-
-    const loadTier = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data?.user) return;
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("subscription_tier")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      setSubscriptionTier(normalizeTier(profile?.subscription_tier, data.user.email));
-    };
-
-    loadTier();
-  }, [fullAccess, supabase]);
 
   useEffect(() => {
     const loadLatestPalmSession = async () => {
