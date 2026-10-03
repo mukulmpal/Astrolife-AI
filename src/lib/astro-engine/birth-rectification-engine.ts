@@ -30,7 +30,16 @@ export type BTREventCategory =
   | "far_travel"
   | "sibling_milestone"
   | "home_loss"
-  | "asset_purchase";
+  | "asset_purchase"
+  | "child_birth"
+  | "accident_surgery"
+  | "vehicle_purchase"
+  | "education_exam"
+  | "foreign_visa"
+  | "business_launch"
+  | "financial_windfall"
+  | "parent_milestone"
+  | "legal_dispute";
 
 export interface BTREvent {
   title: string;
@@ -212,6 +221,60 @@ const EVENT_SIGNIFICATIONS: Record<
     maleficHouses: [],
     keyPlanets: ["Mars", "Venus", "Saturn", "Jupiter"],
     description: "Property acquisition through 4th and 2nd houses",
+  },
+  child_birth: {
+    beneficHouses: [5, 2, 11],
+    maleficHouses: [],
+    keyPlanets: ["Jupiter", "Venus", "Moon"],
+    description: "Childbirth / parenthood via 5th house and Jupiter",
+  },
+  accident_surgery: {
+    beneficHouses: [],
+    maleficHouses: [8, 6, 1],
+    keyPlanets: ["Mars", "Ketu", "Saturn"],
+    description: "Sudden accident, surgery or physical trauma via 8th/6th houses",
+  },
+  vehicle_purchase: {
+    beneficHouses: [4, 11, 2],
+    maleficHouses: [],
+    keyPlanets: ["Venus", "Mars"],
+    description: "Vehicle purchase via 4th house and Venus (Vahanakaraka)",
+  },
+  education_exam: {
+    beneficHouses: [5, 9, 10, 1],
+    maleficHouses: [],
+    keyPlanets: ["Jupiter", "Mercury", "Sun"],
+    description: "Major academic exam clearance, degree or certification",
+  },
+  foreign_visa: {
+    beneficHouses: [9, 12, 3],
+    maleficHouses: [],
+    keyPlanets: ["Rahu", "Moon", "Saturn"],
+    description: "Foreign visa approval, PR, or overseas settlement",
+  },
+  business_launch: {
+    beneficHouses: [7, 3, 10, 11],
+    maleficHouses: [],
+    keyPlanets: ["Mercury", "Mars", "Sun"],
+    description: "Independent business or startup launch via 7th & 3rd houses",
+  },
+  financial_windfall: {
+    beneficHouses: [11, 2, 8],
+    maleficHouses: [],
+    keyPlanets: ["Jupiter", "Venus", "Rahu"],
+    description: "Sudden financial gain, inheritance or major bonus",
+  },
+  parent_milestone: {
+    beneficHouses: [9, 4, 10],
+    maleficHouses: [8, 12],
+    keyPlanets: ["Sun", "Moon", "Saturn"],
+    description: "Major parental milestone or life event via 9th/4th houses",
+  },
+  legal_dispute: {
+    beneficHouses: [11, 6],
+    maleficHouses: [8, 12],
+    keyPlanets: ["Saturn", "Mars", "Rahu"],
+    description: "Legal dispute, lawsuit or court case resolution",
   },
 };
 

@@ -86,6 +86,8 @@ const preferencesScript = `
 })();
 `;
 
+import Script from "next/script";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -94,7 +96,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased" data-theme-mode="light" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: preferencesScript }} />
+        <Script
+          id="theme-preferences"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: preferencesScript }}
+        />
       </head>
       <body className={`${inter.variable} ${cormorant.variable} ${outfit.variable} min-h-full flex flex-col theme-ivory`} data-theme-mode="light" suppressHydrationWarning>
         <ThemeProvider>
