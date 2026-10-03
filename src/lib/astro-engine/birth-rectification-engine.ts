@@ -16,8 +16,17 @@ import {
   getNak,
   RASHIS,
 } from "./calculations";
-import { getSubLord } from "./kp";
-import { computeKPAyanamsha } from "./placidus";
+import {
+  getSubLord,
+  getStarLord,
+  hasKPLinkage,
+  evaluateRuleOfOrigin,
+  evaluateKPThreeLevelLinkage,
+  type RuleOfOriginResult,
+  type KPThreeLevelLinkageResult,
+} from "./kp";
+import { computeKPAyanamsha, computePlacidusCusps } from "./placidus";
+import { calculateSunWindow } from "./panchang";
 
 export type BTREventCategory =
   | "career_start"
@@ -84,6 +93,98 @@ export interface EventMatchDetail {
   reason: string;
 }
 
+export interface PranapadaResult {
+  passed: boolean;
+  score: number;
+  elapsedPalas: number;
+  remainder: number;
+  sunSunriseAmsa: number;
+  pranapadaAmsa: number;
+  ascAmsa: number;
+  errorDeg: number;
+  deltaCorrectionSeconds: number;
+  audit: string;
+}
+
+export interface GulikaValidationResult {
+  gulikaTime: string;
+  gulikaLon: number;
+  gulikaSign: string;
+  gulikaNavamsa: string;
+  matched: boolean;
+  matchType: "SAME_SIGN" | "TRINE_RASHI" | "NAVAMSA_MATCH" | "SEVENTH_HOUSE" | "NONE";
+  score: number;
+  audit: string;
+}
+
+export interface TattvaValidationResult {
+  tattvaName: string;
+  tattvaElement: "earth" | "water" | "fire" | "air" | "ether";
+  matched: boolean;
+  score: number;
+  audit: string;
+}
+
+export interface BTREvidenceMatrix {
+  kpThreeLevel: {
+    passed: boolean;
+    score: number;
+    level1Sign: boolean;
+    level2Star: boolean;
+    level3Sub: boolean;
+    details: string;
+  };
+  ruleOfOrigin: {
+    passed: boolean;
+    ruleO1: boolean;
+    ruleO2: boolean;
+    ruleO3: boolean;
+    score: number;
+    details: string;
+  };
+  pranapada: {
+    passed: boolean;
+    errorDeg: number;
+    pranapadaAmsa: number;
+    ascAmsa: number;
+    deltaCorrectionSeconds: number;
+    score: number;
+    details: string;
+  };
+  gulika: {
+    passed: boolean;
+    matchType: string;
+    gulikaSign: string;
+    gulikaNavamsa: string;
+    score: number;
+    details: string;
+  };
+  tattva: {
+    tattvaName: string;
+    tattvaElement: string;
+    matched: boolean;
+    score: number;
+    details: string;
+  };
+  kunda: {
+    passed: boolean;
+    kundaNakshatra: string;
+    score: number;
+    details: string;
+  };
+  lifeEvents: {
+    matchedCount: number;
+    totalCount: number;
+    score: number;
+    details: string;
+  };
+  palmistry: {
+    score: number;
+    elementMatch: boolean;
+    details: string;
+  };
+}
+
 export interface BTRCandidate {
   date: string;
   time: string;
@@ -103,6 +204,16 @@ export interface BTRCandidate {
   eventMatches: EventMatchDetail[];
   eventMatchScore: number;
   summary: string;
+  rectifiedWindow?: {
+    start: string;
+    end: string;
+  };
+  evidenceMatrix?: BTREvidenceMatrix;
+  methodTrace?: string[];
+  ruleOfOriginMatch?: boolean;
+  kpLinkageMatch?: boolean;
+  pranapadaMatch?: boolean;
+  gulikaMatch?: boolean;
 }
 
 export interface BTRResult {
@@ -111,6 +222,12 @@ export interface BTRResult {
   bestCandidate: BTRCandidate | null;
   topCandidates: BTRCandidate[];
   executionTimeMs: number;
+  evidenceMatrix?: BTREvidenceMatrix;
+  rectifiedWindow?: {
+    start: string;
+    end: string;
+  };
+  confidenceBand?: "HIGH" | "MEDIUM" | "LOW" | "INCONCLUSIVE";
 }
 
 // ── Kunda Algorithm (Prashna Marga) ──────────────────────────────────────────
@@ -127,6 +244,272 @@ export function calculateKunda(lagnaLon: number): {
     kundaLon,
     kundaNakshatra: nak.name,
     kundaLord: nak.lord,
+  };
+}
+
+// ── Sunrise & Astronomical Palas Engine (1 pala = 24 seconds) ────────────────
+export function computeSunrisePalas(
+  dateStr: string,
+  timeStr: string,
+  lat = 28.6139,
+  lon = 77.2090,
+  tz = 5.5
+): {
+  sunriseTime: string;
+  sunsetTime: string;
+  elapsedSeconds: number;
+  elapsedPalas: number;
+  isDayBirth: boolean;
+  dayDurationHours: number;
+  nightDurationHours: number;
+  astrologicalWeekday: string;
+  dayLord: string;
+} {
+  const [h, m, s = 0] = timeStr.split(":").map(Number);
+  const candDecimal = h + m / 60 + s / 3600;
+
+  const dateObj = new Date(dateStr + "T12:00:00Z");
+  const sunWin = calculateSunWindow(dateObj, lat, lon, tz);
+
+  const [srH, srM] = sunWin.sunrise.split(":").map(Number);
+  const [ssH, ssM] = sunWin.sunset.split(":").map(Number);
+  const srDecimal = srH + srM / 60;
+  const ssDecimal = ssH + ssM / 60;
+
+  const isDayBirth = candDecimal >= srDecimal && candDecimal < ssDecimal;
+
+  let elapsedSeconds = 0;
+  let isBeforeSunrise = false;
+  if (candDecimal >= srDecimal) {
+    elapsedSeconds = (candDecimal - srDecimal) * 3600;
+  } else {
+    // Birth before sunrise belongs to previous astrological day
+    isBeforeSunrise = true;
+    elapsedSeconds = (candDecimal + 24 - srDecimal) * 3600;
+  }
+
+  const elapsedPalas = elapsedSeconds / 24;
+
+  let dayDurationHours = ssDecimal - srDecimal;
+  if (dayDurationHours < 0) dayDurationHours += 24;
+  const nightDurationHours = 24 - dayDurationHours;
+
+  const civilDayIdx = dateObj.getUTCDay();
+  const astroDayIdx = isBeforeSunrise ? (civilDayIdx + 6) % 7 : civilDayIdx;
+
+  const WEEKDAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const DAY_LORDS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+
+  return {
+    sunriseTime: sunWin.sunrise,
+    sunsetTime: sunWin.sunset,
+    elapsedSeconds,
+    elapsedPalas,
+    isDayBirth,
+    dayDurationHours,
+    nightDurationHours,
+    astrologicalWeekday: WEEKDAY_NAMES[astroDayIdx],
+    dayLord: DAY_LORDS[astroDayIdx],
+  };
+}
+
+// ── Pranapada Engine (R.K. Das Palas Mode) ───────────────────────────────────
+// Formula: R = P % 15; Pranapada amsa = (S + 2 * R) % 30
+export function evaluatePranapada(
+  elapsedPalas: number,
+  sunLon: number,
+  ascendantLon: number
+): PranapadaResult {
+  const S = ((sunLon % 30) + 30) % 30; // Sun amsa (0 - 30°)
+  const R = ((elapsedPalas % 15) + 15) % 15; // P mod 15
+  const pranapadaAmsa = ((S + 2 * R) % 30 + 30) % 30;
+  const ascAmsa = ((ascendantLon % 30) + 30) % 30;
+
+  const diff = Math.abs(pranapadaAmsa - ascAmsa);
+  const errorDeg = Math.min(diff, 30 - diff);
+
+  // Correction search [-10 to +10 palas, step 0.1 pala = 2.4 sec]
+  let bestDeltaPalas = 0;
+  let minSearchError = errorDeg;
+  for (let dP = -10; dP <= 10; dP += 0.1) {
+    const pTest = elapsedPalas + dP;
+    const rTest = ((pTest % 15) + 15) % 15;
+    const ppTest = ((S + 2 * rTest) % 30 + 30) % 30;
+    const d = Math.abs(ppTest - ascAmsa);
+    const err = Math.min(d, 30 - d);
+    if (err < minSearchError) {
+      minSearchError = err;
+      bestDeltaPalas = dP;
+    }
+  }
+
+  const passed = errorDeg <= 2.5;
+  const score = errorDeg <= 1.0 ? 10 : errorDeg <= 2.5 ? 7 : errorDeg <= 5.0 ? 4 : 1;
+
+  return {
+    passed,
+    score,
+    elapsedPalas: Math.round(elapsedPalas * 10) / 10,
+    remainder: Math.round(R * 100) / 100,
+    sunSunriseAmsa: Math.round(S * 100) / 100,
+    pranapadaAmsa: Math.round(pranapadaAmsa * 100) / 100,
+    ascAmsa: Math.round(ascAmsa * 100) / 100,
+    errorDeg: Math.round(errorDeg * 100) / 100,
+    deltaCorrectionSeconds: Math.round(bestDeltaPalas * 24),
+    audit: `Pranapada amsa: ${pranapadaAmsa.toFixed(2)}°, Ascendant amsa: ${ascAmsa.toFixed(2)}° (Deviation: ${errorDeg.toFixed(2)}°)`,
+  };
+}
+
+// ── Gulika Engine (Classical 8-Fold Day/Night Division) ───────────────────────
+const GULIKA_DAY_MULTIPLIERS: Record<string, number> = {
+  Sunday: 0.875,
+  Monday: 0.750,
+  Tuesday: 0.625,
+  Wednesday: 0.500,
+  Thursday: 0.375,
+  Friday: 0.250,
+  Saturday: 0.125,
+};
+
+const GULIKA_NIGHT_MULTIPLIERS: Record<string, number> = {
+  Sunday: 0.375,
+  Monday: 0.250,
+  Tuesday: 0.125,
+  Wednesday: 0.875,
+  Thursday: 0.750,
+  Friday: 0.625,
+  Saturday: 0.500,
+};
+
+export function evaluateGulika(
+  dateStr: string,
+  sunInfo: ReturnType<typeof computeSunrisePalas>,
+  lat: number,
+  lon: number,
+  ayanamsha: number,
+  candidateLagnaLon: number
+): GulikaValidationResult {
+  const weekday = sunInfo.astrologicalWeekday;
+  const mult = sunInfo.isDayBirth
+    ? (GULIKA_DAY_MULTIPLIERS[weekday] ?? 0.5)
+    : (GULIKA_NIGHT_MULTIPLIERS[weekday] ?? 0.5);
+
+  const [srH, srM] = sunInfo.sunriseTime.split(":").map(Number);
+  const [ssH, ssM] = sunInfo.sunsetTime.split(":").map(Number);
+  const srDec = srH + srM / 60;
+  const ssDec = ssH + ssM / 60;
+
+  const gulikaDec = sunInfo.isDayBirth
+    ? (srDec + sunInfo.dayDurationHours * mult) % 24
+    : (ssDec + sunInfo.nightDurationHours * mult) % 24;
+
+  const gH = Math.floor(gulikaDec);
+  const gM = Math.floor((gulikaDec - gH) * 60);
+  const gulikaTime = `${String(gH).padStart(2, "0")}:${String(gM).padStart(2, "0")}`;
+
+  const [yr, mo, dy] = dateStr.split("-").map(Number);
+  const gulikaJD = getJD(yr, mo, dy, gulikaDec);
+  const gulikaLon = computeLagna(gulikaJD, lat, lon, ayanamsha);
+
+  const gulikaSignIdx = Math.floor(gulikaLon / 30);
+  const candSignIdx = Math.floor(candidateLagnaLon / 30);
+
+  const gulikaSign = RASHIS[gulikaSignIdx];
+  const candSign = RASHIS[candSignIdx];
+
+  const gulikaNavIdx = Math.floor(((gulikaLon % 30) / (30 / 9)));
+  const candNavIdx = Math.floor(((candidateLagnaLon % 30) / (30 / 9)));
+  const gulikaNavamsa = RASHIS[(gulikaSignIdx * 9 + gulikaNavIdx) % 12];
+  const candNavamsa = RASHIS[(candSignIdx * 9 + candNavIdx) % 12];
+
+  let matched = false;
+  let matchType: GulikaValidationResult["matchType"] = "NONE";
+  let score = 1;
+
+  const diffSigns = (gulikaSignIdx - candSignIdx + 12) % 12;
+
+  if (diffSigns === 0) {
+    matched = true;
+    matchType = "SAME_SIGN";
+    score = 5;
+  } else if (diffSigns === 4 || diffSigns === 8) {
+    matched = true;
+    matchType = "TRINE_RASHI";
+    score = 4;
+  } else if (diffSigns === 6) {
+    matched = true;
+    matchType = "SEVENTH_HOUSE";
+    score = 3;
+  } else if (gulikaNavamsa === candNavamsa) {
+    matched = true;
+    matchType = "NAVAMSA_MATCH";
+    score = 4;
+  }
+
+  return {
+    gulikaTime,
+    gulikaLon: Math.round(gulikaLon * 100) / 100,
+    gulikaSign,
+    gulikaNavamsa,
+    matched,
+    matchType,
+    score,
+    audit: `Gulika at ${gulikaTime} in ${gulikaSign} (Navamsa: ${gulikaNavamsa}). ${matched ? `Matches Lagna (${candSign}) via ${matchType}` : `No direct sign alignment with Lagna (${candSign})`}`,
+  };
+}
+
+// ── Tattva Engine (Five Element Palas Cycle) ──────────────────────────────────
+// Kshiti = 15 palas, Apa = 30 palas, Teja = 45 palas, Marut = 60 palas, Vyoma = 75 palas
+// Total cycle = 225 palas (90 min)
+export function evaluateTattva(
+  elapsedPalas: number,
+  weekday: string,
+  lagnaRashi: string
+): TattvaValidationResult {
+  const cyclePalas = ((elapsedPalas % 225) + 225) % 225;
+
+  const STARTING_ELEMENT: Record<string, "fire" | "water" | "earth" | "ether" | "air"> = {
+    Sunday: "fire",
+    Monday: "water",
+    Tuesday: "fire",
+    Wednesday: "earth",
+    Thursday: "ether",
+    Friday: "water",
+    Saturday: "air",
+  };
+
+  const ELEMENT_ORDER: Array<{ name: string; element: "earth" | "water" | "fire" | "air" | "ether"; duration: number }> = [
+    { name: "Kshiti (Earth)", element: "earth", duration: 15 },
+    { name: "Apa (Water)", element: "water", duration: 30 },
+    { name: "Teja (Fire)", element: "fire", duration: 45 },
+    { name: "Marut (Air)", element: "air", duration: 60 },
+    { name: "Vyoma (Ether)", element: "ether", duration: 75 },
+  ];
+
+  const startElem = STARTING_ELEMENT[weekday] ?? "fire";
+  const startIdx = ELEMENT_ORDER.findIndex((e) => e.element === startElem);
+
+  let acc = 0;
+  let active = ELEMENT_ORDER[0];
+  for (let i = 0; i < 5; i++) {
+    const cur = ELEMENT_ORDER[(startIdx + i) % 5];
+    acc += cur.duration;
+    if (cyclePalas <= acc) {
+      active = cur;
+      break;
+    }
+  }
+
+  const lagnaElem = RASHI_ELEMENTS[lagnaRashi] ?? "fire";
+  const matched = (active.element as string) === (lagnaElem as string) || active.element === "ether";
+  const score = matched ? 2 : 0;
+
+  return {
+    tattvaName: active.name,
+    tattvaElement: active.element,
+    matched,
+    score,
+    audit: `Active Tattva: ${active.name} (${active.element.toUpperCase()}). Lagna Element: ${lagnaElem.toUpperCase()}`,
   };
 }
 
@@ -460,6 +843,10 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
   const startMinOfDay = startH * 60 + startM;
   const endMinOfDay = endH * 60 + endM;
 
+  const lat = input.lat ?? 28.6139;
+  const lon = input.lon ?? 77.2090;
+  const tz = input.tz ?? 5.5;
+
   const candidates: BTRCandidate[] = [];
 
   // Iterate across candidate dates
@@ -481,7 +868,10 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           input.city
         );
 
-        // 1. Evaluate Life Events
+        // 1. Sunrise & Palas Time Normalization
+        const sunInfo = computeSunrisePalas(dateStr, timeStr, lat, lon, tz);
+
+        // 2. Evaluate Life Events against Dasha
         const eventResults = input.events.map((e) =>
           evaluateEventAgainstDasha(e, chart)
         );
@@ -490,36 +880,157 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           Math.max(1, eventResults.length);
         const matchedEventCount = eventResults.filter((e) => e.matched).length;
 
-        // 2. Evaluate Kunda (Prashna Marga)
-        const kunda = calculateKunda(chart.lagnaLon);
+        // 3. Evaluate Placidus Cusps & KP Sub-Lords
+        const kpAyanamsha = computeKPAyanamsha(chart.jd);
+        const placidusCusps = computePlacidusCusps(chart.jd, lat, lon, kpAyanamsha);
+        const cusp1 = placidusCusps[0];
+        const cusp9 = placidusCusps[8];
+
+        const subLord = cusp1?.subLord ?? getSubLord(chart.lagnaLon);
+        const starLord = cusp1?.starLord ?? (getNak(chart.lagnaLon).lord as any);
+        const signLord = SIGN_LORDS[chart.lagnaRashi] ?? "Mars";
+
+        // 4. KP Rule of Origin (1st Cusp to 9th Cusp)
+        const originRes = evaluateRuleOfOrigin(
+          { starLord, subLord, signLord },
+          { starLord: cusp9?.starLord ?? "Sun", subLord: cusp9?.subLord ?? "Jupiter" }
+        );
+
+        // 5. KP Three-Level Linkage (Candidate Lagna vs Ruling Planets)
         const moonNak = getNak(chart.planets.Moon.lon);
-        // Kunda match if same lord or same nakshatra (trine / trikona)
+        const moonSignLord = SIGN_LORDS[chart.planets.Moon.sign] ?? "Moon";
+        const rpSignLords = [sunInfo.dayLord, moonSignLord];
+        const rpStarLords = [moonNak.lord, starLord];
+        const rpSubLords = [subLord, getSubLord(chart.planets.Moon.lon)];
+
+        const kpThreeLevel = evaluateKPThreeLevelLinkage(
+          { signLord, starLord, subLord },
+          { signLords: rpSignLords, starLords: rpStarLords, subLords: rpSubLords }
+        );
+
+        // 6. Pranapada Validation (R.K. Das Palas Mode)
+        const pranapadaRes = evaluatePranapada(
+          sunInfo.elapsedPalas,
+          chart.planets.Sun.lon,
+          chart.lagnaLon
+        );
+
+        // 7. Gulika Validation (Classical 8-Fold Division)
+        const gulikaRes = evaluateGulika(
+          dateStr,
+          sunInfo,
+          lat,
+          lon,
+          kpAyanamsha,
+          chart.lagnaLon
+        );
+
+        // 8. Tattva Validation (5 Elements Palas Cycle)
+        const tattvaRes = evaluateTattva(
+          sunInfo.elapsedPalas,
+          sunInfo.astrologicalWeekday,
+          chart.lagnaRashi
+        );
+
+        // 9. Classical Kunda Algorithm (Prashna Marga)
+        const kunda = calculateKunda(chart.lagnaLon);
         const kundaMatch = kunda.kundaLord === moonNak.lord;
 
-        // 3. Evaluate KP Lagna Sub-Lord
-        const kpAyanamsha = computeKPAyanamsha(chart.jd);
-        const subLord = getSubLord(chart.lagnaLon);
-        const starLord = getNak(chart.lagnaLon).lord;
-
-        // 4. Palm Compatibility
+        // 10. Palm Compatibility
         const palmScore = scorePalmCompatibility(
           input.palmFeatures,
           chart.lagnaRashi,
           chart
         );
 
-        // 5. Total Cumulative Confidence Score
-        // Weightings: Events = 50%, Kunda = 20%, Palm = 20%, KP Sub-Lord = 10%
-        let totalConfidence =
-          avgEventScore * 0.5 +
-          (kundaMatch ? 20 : 5) +
-          palmScore * 0.2 +
-          (matchedEventCount === input.events.length ? 10 : 0);
+        // 11. Multi-Family Auditable Scoring (Spec Section 29)
+        // Primary: KP 3-Level (0-30), Rule of Origin (0-20), Life Events (0-30)
+        // Secondary: Pranapada (0-10), Gulika (0-5)
+        // Supporting: Tattva (0-2), Kunda (0-3), Palm (0-10)
+        // Max Raw Score: 30 + 20 + 30 + 10 + 5 + 2 + 3 + 10 = 110 points
+        const rawScore =
+          kpThreeLevel.score +
+          originRes.score +
+          (avgEventScore * 0.3) +
+          pranapadaRes.score +
+          gulikaRes.score +
+          tattvaRes.score +
+          (kundaMatch ? 3 : 0) +
+          (palmScore * 0.1);
 
-        totalConfidence = Math.max(0, Math.min(100, Math.round(totalConfidence)));
+        const totalConfidence = Math.max(0, Math.min(100, Math.round((rawScore / 110) * 100)));
 
         const deg = Math.floor(chart.lagnaLon % 30);
         const mins = Math.floor(((chart.lagnaLon % 30) - deg) * 60);
+
+        const evidenceMatrix: BTREvidenceMatrix = {
+          kpThreeLevel: {
+            passed: kpThreeLevel.supported,
+            score: kpThreeLevel.score,
+            level1Sign: kpThreeLevel.level1Match,
+            level2Star: kpThreeLevel.level2Match,
+            level3Sub: kpThreeLevel.level3Match,
+            details: kpThreeLevel.auditTrail.join("; ") || "KP Three-Level Linkage Evaluated",
+          },
+          ruleOfOrigin: {
+            passed: originRes.originValidated,
+            ruleO1: originRes.ruleO1,
+            ruleO2: originRes.ruleO2,
+            ruleO3: originRes.ruleO3,
+            score: originRes.score,
+            details: originRes.auditTrail.join("; ") || "Origin validated against 9th Cusp",
+          },
+          pranapada: {
+            passed: pranapadaRes.passed,
+            errorDeg: pranapadaRes.errorDeg,
+            pranapadaAmsa: pranapadaRes.pranapadaAmsa,
+            ascAmsa: pranapadaRes.ascAmsa,
+            deltaCorrectionSeconds: pranapadaRes.deltaCorrectionSeconds,
+            score: pranapadaRes.score,
+            details: pranapadaRes.audit,
+          },
+          gulika: {
+            passed: gulikaRes.matched,
+            matchType: gulikaRes.matchType,
+            gulikaSign: gulikaRes.gulikaSign,
+            gulikaNavamsa: gulikaRes.gulikaNavamsa,
+            score: gulikaRes.score,
+            details: gulikaRes.audit,
+          },
+          tattva: {
+            tattvaName: tattvaRes.tattvaName,
+            tattvaElement: tattvaRes.tattvaElement,
+            matched: tattvaRes.matched,
+            score: tattvaRes.score,
+            details: tattvaRes.audit,
+          },
+          kunda: {
+            passed: kundaMatch,
+            kundaNakshatra: kunda.kundaNakshatra,
+            score: kundaMatch ? 3 : 0,
+            details: `Kunda ${kunda.kundaNakshatra} (${kunda.kundaLord}). Moon ${moonNak.name} (${moonNak.lord}).`,
+          },
+          lifeEvents: {
+            matchedCount: matchedEventCount,
+            totalCount: input.events.length,
+            score: Math.round(avgEventScore * 0.3),
+            details: `Matched ${matchedEventCount}/${input.events.length} life milestones via active Dasha`,
+          },
+          palmistry: {
+            score: Math.round(palmScore * 0.1),
+            elementMatch: input.palmFeatures?.handElement === RASHI_ELEMENTS[chart.lagnaRashi],
+            details: `Hand element (${input.palmFeatures?.handElement || "N/A"}) vs ${chart.lagnaRashi} (${RASHI_ELEMENTS[chart.lagnaRashi]})`,
+          },
+        };
+
+        const trace: string[] = [
+          `Time: ${timeStr} · Elapsed Palas: ${sunInfo.elapsedPalas.toFixed(1)} (${sunInfo.astrologicalWeekday})`,
+          `KP 3-Level: ${kpThreeLevel.supported ? "PASS" : "PARTIAL"} (+${kpThreeLevel.score} pts)`,
+          `Rule of Origin: ${originRes.originValidated ? "VALID" : "UNCONFIRMED"} (+${originRes.score} pts)`,
+          `Pranapada: error ${pranapadaRes.errorDeg}° (${pranapadaRes.passed ? "PASS" : "HIGH DEVIATION"}) (+${pranapadaRes.score} pts)`,
+          `Gulika: ${gulikaRes.matched ? gulikaRes.matchType : "NO DIRECT ALIGNMENT"} (+${gulikaRes.score} pts)`,
+          `Milestones: ${matchedEventCount}/${input.events.length} matched (+${Math.round(avgEventScore * 0.3)} pts)`,
+        ];
 
         candidates.push({
           date: dateStr,
@@ -539,7 +1050,13 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           palmCompatibilityScore: palmScore,
           eventMatches: eventResults,
           eventMatchScore: Math.round(avgEventScore),
-          summary: `${chart.lagnaRashi} Lagna (${deg}°${mins}') with Moon in ${chart.planets.Moon.sign} (${chart.planets.Moon.nakshatra}). Matches ${matchedEventCount}/${input.events.length} life milestones. ${kundaMatch ? "Kunda verified." : ""}`,
+          evidenceMatrix,
+          methodTrace: trace,
+          ruleOfOriginMatch: originRes.originValidated,
+          kpLinkageMatch: kpThreeLevel.supported,
+          pranapadaMatch: pranapadaRes.passed,
+          gulikaMatch: gulikaRes.matched,
+          summary: `${chart.lagnaRashi} Lagna (${deg}°${mins}', Sub: ${subLord}). KP Linkage: ${kpThreeLevel.supported ? "✓" : "~"}, Origin: ${originRes.originValidated ? "✓" : "✗"}, Pranapada: ${pranapadaRes.passed ? "✓" : "~"}, Milestones: ${matchedEventCount}/${input.events.length}.`,
         });
       } catch (err: any) {
         if (candidates.length === 0) console.error("CANDIDATE EVAL ERROR:", err?.message || err);
@@ -552,11 +1069,45 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
   // Sort by highest confidence descending
   candidates.sort((a, b) => b.confidence - a.confidence);
 
+  const best = candidates[0] || null;
+
+  // Compute Rectified Window (Interval estimation per Spec Section 32)
+  let rectifiedWindow: { start: string; end: string } | undefined = undefined;
+  if (best) {
+    const [bH, bM] = best.time.split(":").map(Number);
+    const bMinutes = bH * 60 + bM;
+    const startM = Math.max(0, bMinutes - 2);
+    const endM = Math.min(24 * 60 - 1, bMinutes + 2);
+    const sH = Math.floor(startM / 60);
+    const sMin = startM % 60;
+    const eH = Math.floor(endM / 60);
+    const eMin = endM % 60;
+
+    rectifiedWindow = {
+      start: `${String(sH).padStart(2, "0")}:${String(sMin).padStart(2, "0")}`,
+      end: `${String(eH).padStart(2, "0")}:${String(eMin).padStart(2, "0")}`,
+    };
+    best.rectifiedWindow = rectifiedWindow;
+  }
+
+  const confidenceBand: "HIGH" | "MEDIUM" | "LOW" | "INCONCLUSIVE" = !best
+    ? "INCONCLUSIVE"
+    : best.confidence >= 78
+    ? "HIGH"
+    : best.confidence >= 60
+    ? "MEDIUM"
+    : best.confidence >= 40
+    ? "LOW"
+    : "INCONCLUSIVE";
+
   return {
-    engineVersion: "1.0.0-astrolife-btr",
+    engineVersion: "2.0.0-astrolife-btr-research",
     totalCandidatesEvaluated: candidates.length,
-    bestCandidate: candidates[0] || null,
+    bestCandidate: best,
     topCandidates: candidates.slice(0, 5),
     executionTimeMs: Date.now() - startTime,
+    evidenceMatrix: best?.evidenceMatrix,
+    rectifiedWindow,
+    confidenceBand,
   };
 }

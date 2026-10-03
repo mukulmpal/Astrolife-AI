@@ -746,3 +746,256 @@ export function evaluateAllRulingPlanetsConfirmations(params: {
 
   return results;
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// KP THREE-LEVEL LINKAGE & RULE OF ORIGIN ENGINES (FOR BTR & PRASHNA)
+// ══════════════════════════════════════════════════════════════════════════════
+
+export interface KPLinkageContext {
+  planetPositions?: Record<
+    string,
+    {
+      sign?: string;
+      signLord?: string;
+      starLord?: string;
+      subLord?: string;
+    }
+  >;
+}
+
+export interface KPLinkageResult {
+  linked: boolean;
+  linkType: "EXACT" | "MUTUAL_SUB" | "MUTUAL_STAR" | "MUTUAL_SIGN" | "THIRD_PLANET" | "NONE";
+  detail: string;
+}
+
+/**
+ * Evaluates whether two planets have an established astrological linkage
+ * in Krishnamurti Paddhati (Identity, Mutual Sub, Mutual Star, Mutual Sign, or Third Planet).
+ */
+export function hasKPLinkage(
+  a: string,
+  b: string,
+  context?: KPLinkageContext
+): KPLinkageResult {
+  if (!a || !b) {
+    return { linked: false, linkType: "NONE", detail: "Invalid planet inputs" };
+  }
+
+  if (a.toLowerCase() === b.toLowerCase()) {
+    return {
+      linked: true,
+      linkType: "EXACT",
+      detail: `${a} is identical to ${b}`,
+    };
+  }
+
+  if (context?.planetPositions) {
+    const pA = context.planetPositions[a];
+    const pB = context.planetPositions[b];
+
+    // 1. Mutual Sub
+    if ((pA?.subLord && pA.subLord.toLowerCase() === b.toLowerCase()) ||
+        (pB?.subLord && pB.subLord.toLowerCase() === a.toLowerCase())) {
+      return {
+        linked: true,
+        linkType: "MUTUAL_SUB",
+        detail: `${a} and ${b} share Sub-Lord linkage (${pA?.subLord || pB?.subLord})`,
+      };
+    }
+
+    // 2. Mutual Star (Constellation)
+    if ((pA?.starLord && pA.starLord.toLowerCase() === b.toLowerCase()) ||
+        (pB?.starLord && pB.starLord.toLowerCase() === a.toLowerCase())) {
+      return {
+        linked: true,
+        linkType: "MUTUAL_STAR",
+        detail: `${a} and ${b} share Star-Lord linkage (${pA?.starLord || pB?.starLord})`,
+      };
+    }
+
+    // 3. Mutual Sign Lord
+    if ((pA?.signLord && pA.signLord.toLowerCase() === b.toLowerCase()) ||
+        (pB?.signLord && pB.signLord.toLowerCase() === a.toLowerCase())) {
+      return {
+        linked: true,
+        linkType: "MUTUAL_SIGN",
+        detail: `${a} and ${b} share Sign-Lord linkage (${pA?.signLord || pB?.signLord})`,
+      };
+    }
+
+    // 4. Connected through a third planet (common Star or Sub lord)
+    if (pA && pB) {
+      if (pA.starLord && pB.starLord && pA.starLord.toLowerCase() === pB.starLord.toLowerCase()) {
+        return {
+          linked: true,
+          linkType: "THIRD_PLANET",
+          detail: `${a} and ${b} both deposit in Star of ${pA.starLord}`,
+        };
+      }
+      if (pA.subLord && pB.subLord && pA.subLord.toLowerCase() === pB.subLord.toLowerCase()) {
+        return {
+          linked: true,
+          linkType: "THIRD_PLANET",
+          detail: `${a} and ${b} both deposit in Sub of ${pA.subLord}`,
+        };
+      }
+    }
+  }
+
+  return {
+    linked: false,
+    linkType: "NONE",
+    detail: `No direct KP linkage found between ${a} and ${b}`,
+  };
+}
+
+export interface RuleOfOriginResult {
+  originValidated: boolean;
+  ruleO1: boolean;
+  ruleO2: boolean;
+  ruleO3: boolean;
+  score: number; // 0 - 20 points
+  lagnaStarLord: string;
+  lagnaSubLord: string;
+  cusp9StarLord: string;
+  cusp9SubLord: string;
+  auditTrail: string[];
+}
+
+/**
+ * Evaluates the classical KP Rule of Origin (Rules O1, O2, O3)
+ * connecting the 1st Cusp (Lagna) with the 9th Cusp (Dharma / Father / Descent).
+ */
+export function evaluateRuleOfOrigin(
+  cusp1: { starLord: string; subLord: string; signLord?: string },
+  cusp9: { starLord: string; subLord: string; signLord?: string },
+  context?: KPLinkageContext
+): RuleOfOriginResult {
+  const audit: string[] = [];
+
+  const lStar = cusp1.starLord;
+  const lSub = cusp1.subLord;
+  const c9Star = cusp9.starLord;
+  const c9Sub = cusp9.subLord;
+
+  // Rule O1: Lagna Star Lord == 9th Star Lord OR 9th Sub Lord
+  const ruleO1 =
+    lStar.toLowerCase() === c9Star.toLowerCase() ||
+    lStar.toLowerCase() === c9Sub.toLowerCase();
+  if (ruleO1) {
+    audit.push(`Rule O1 Passed: Lagna Star Lord (${lStar}) connects to 9th Cusp (${c9Star}/${c9Sub})`);
+  }
+
+  // Rule O2: Lagna Sub Lord == 9th Star Lord OR 9th Sub Lord
+  const ruleO2 =
+    lSub.toLowerCase() === c9Star.toLowerCase() ||
+    lSub.toLowerCase() === c9Sub.toLowerCase();
+  if (ruleO2) {
+    audit.push(`Rule O2 Passed: Lagna Sub Lord (${lSub}) connects to 9th Cusp (${c9Star}/${c9Sub})`);
+  }
+
+  // Rule O3: Third-planet linkage between Lagna lords and 9th cusp lords
+  const linkStar = hasKPLinkage(lStar, c9Sub, context);
+  const linkSub = hasKPLinkage(lSub, c9Sub, context);
+  const ruleO3 = linkStar.linked || linkSub.linked;
+  if (ruleO3) {
+    audit.push(`Rule O3 Passed: Inter-cuspal linkage (${linkStar.linked ? linkStar.detail : linkSub.detail})`);
+  }
+
+  let score = 0;
+  if (ruleO1) score += 10;
+  if (ruleO2) score += 8;
+  if (ruleO3 && !ruleO1 && !ruleO2) score += 5;
+
+  const originValidated = ruleO1 || ruleO2 || ruleO3;
+
+  return {
+    originValidated,
+    ruleO1,
+    ruleO2,
+    ruleO3,
+    score: Math.min(20, score),
+    lagnaStarLord: lStar,
+    lagnaSubLord: lSub,
+    cusp9StarLord: c9Star,
+    cusp9SubLord: c9Sub,
+    auditTrail: audit,
+  };
+}
+
+export interface KPThreeLevelLinkageResult {
+  supported: boolean;
+  score: number; // 0 to 30 points
+  level1Match: boolean;
+  level2Match: boolean;
+  level3Match: boolean;
+  levelMatches: {
+    level1: { candidate: string; rp: string[]; matched: boolean };
+    level2: { candidate: string; rp: string[]; matched: boolean };
+    level3: { candidate: string; rp: string[]; matched: boolean };
+  };
+  auditTrail: string[];
+}
+
+/**
+ * Evaluates KP 3-Level Linkage between Candidate Lagna (Sign, Star, Sub)
+ * and active Ruling Planets (RP).
+ */
+export function evaluateKPThreeLevelLinkage(
+  candidateLagna: { signLord: string; starLord: string; subLord: string },
+  rulingPlanets: {
+    signLords: string[];
+    starLords: string[];
+    subLords: string[];
+  },
+  context?: KPLinkageContext
+): KPThreeLevelLinkageResult {
+  const audit: string[] = [];
+
+  // Level 1: Sign Lord
+  const l1Matches = rulingPlanets.signLords.some(
+    (rp) => hasKPLinkage(candidateLagna.signLord, rp, context).linked
+  );
+  if (l1Matches) {
+    audit.push(`Level 1 (Sign) Linked: Lagna Sign Lord ${candidateLagna.signLord} connects to RPs [${rulingPlanets.signLords.join(", ")}]`);
+  }
+
+  // Level 2: Star Lord
+  const l2Matches = rulingPlanets.starLords.some(
+    (rp) => hasKPLinkage(candidateLagna.starLord, rp, context).linked
+  );
+  if (l2Matches) {
+    audit.push(`Level 2 (Star) Linked: Lagna Star Lord ${candidateLagna.starLord} connects to RPs [${rulingPlanets.starLords.join(", ")}]`);
+  }
+
+  // Level 3: Sub Lord (High precision indicator)
+  const l3Matches = rulingPlanets.subLords.some(
+    (rp) => hasKPLinkage(candidateLagna.subLord, rp, context).linked
+  );
+  if (l3Matches) {
+    audit.push(`Level 3 (Sub) Linked: Lagna Sub Lord ${candidateLagna.subLord} connects to RPs [${rulingPlanets.subLords.join(", ")}]`);
+  }
+
+  let score = 0;
+  if (l1Matches) score += 8;
+  if (l2Matches) score += 10;
+  if (l3Matches) score += 12;
+
+  const supported = (l1Matches && l2Matches) || (l2Matches && l3Matches) || (l1Matches && l3Matches);
+
+  return {
+    supported,
+    score,
+    level1Match: l1Matches,
+    level2Match: l2Matches,
+    level3Match: l3Matches,
+    levelMatches: {
+      level1: { candidate: candidateLagna.signLord, rp: rulingPlanets.signLords, matched: l1Matches },
+      level2: { candidate: candidateLagna.starLord, rp: rulingPlanets.starLords, matched: l2Matches },
+      level3: { candidate: candidateLagna.subLord, rp: rulingPlanets.subLords, matched: l3Matches },
+    },
+    auditTrail: audit,
+  };
+}
+

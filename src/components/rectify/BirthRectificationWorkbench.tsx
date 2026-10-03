@@ -18,6 +18,9 @@ import {
   Upload,
   X,
   Camera,
+  ShieldCheck,
+  FileText,
+  ChevronDown,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUserChart } from "@/lib/user-chart";
@@ -129,6 +132,7 @@ export function BirthRectificationWorkbench() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<BTRResult | null>(null);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [showAuditTrace, setShowAuditTrace] = useState(false);
 
   const addEvent = (category: BTREventCategory, label: string) => {
     setEvents((prev) => [
@@ -797,23 +801,51 @@ export function BirthRectificationWorkbench() {
               style={{ borderColor: "rgba(184, 134, 11, 0.2)" }}
             >
               <div>
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-xs font-bold uppercase tracking-wider"
-                  style={{
-                    background: "rgba(184, 134, 11, 0.12)",
-                    borderColor: "rgba(184, 134, 11, 0.3)",
-                    color: "#8C6508",
-                  }}
-                >
-                  <Award size={14} /> Highest Confidence Match · {result.bestCandidate.confidence}%
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-xs font-bold uppercase tracking-wider"
+                    style={{
+                      background: "rgba(184, 134, 11, 0.12)",
+                      borderColor: "rgba(184, 134, 11, 0.3)",
+                      color: "#8C6508",
+                    }}
+                  >
+                    <Award size={14} /> Highest Confidence Match · {result.bestCandidate.confidence}%
+                  </span>
+
+                  {result.confidenceBand && (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold uppercase"
+                      style={{
+                        background: result.confidenceBand === "HIGH" ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)",
+                        borderColor: result.confidenceBand === "HIGH" ? "#10B981" : "#F59E0B",
+                        color: result.confidenceBand === "HIGH" ? "#047857" : "#B45309",
+                      }}
+                    >
+                      <ShieldCheck size={13} /> {result.confidenceBand} Confidence
+                    </span>
+                  )}
+
+                  {result.rectifiedWindow && (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold font-mono"
+                      style={{
+                        background: "#FFFFFF",
+                        borderColor: "rgba(184, 134, 11, 0.3)",
+                        color: "#6B635B",
+                      }}
+                    >
+                      <Clock size={13} className="text-[#8C6508]" /> Window: {result.rectifiedWindow.start} – {result.rectifiedWindow.end}
+                    </span>
+                  )}
+                </div>
 
                 <h3 className="mt-3 font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#1A1A1A]">
                   {result.bestCandidate.date} at {result.bestCandidate.time}
                 </h3>
 
                 <p className="mt-2 text-sm text-[#6B635B]">
-                  Evaluated {result.totalCandidatesEvaluated} candidate timestamps in {result.executionTimeMs}ms
+                  Evaluated {result.totalCandidatesEvaluated} candidate timestamps across KP, Pranapada, Gulika & Dasha in {result.executionTimeMs}ms
                 </p>
               </div>
 
@@ -926,6 +958,131 @@ export function BirthRectificationWorkbench() {
                 </span>
               </div>
             </div>
+
+            {/* Classical Auditable Evidence Matrix (Spec Section 41) */}
+            {result.bestCandidate.evidenceMatrix && (
+              <div
+                className="mt-8 rounded-xl border p-5"
+                style={{
+                  background: "#FFFFFF",
+                  borderColor: "rgba(184, 134, 11, 0.25)",
+                }}
+              >
+                <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "rgba(184, 134, 11, 0.15)" }}>
+                  <div>
+                    <h4 className="font-serif text-lg font-bold text-[#1A1A1A] flex items-center gap-2">
+                      <ShieldCheck size={18} className="text-[#B8860B]" /> Multi-Family Auditable Evidence Matrix
+                    </h4>
+                    <p className="text-xs text-[#6B635B]">
+                      Cross-corroboration across independent mathematical, KP, and classical Parashari rules.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAuditTrace(!showAuditTrace)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-semibold transition"
+                    style={{
+                      background: "#FAF5EB",
+                      borderColor: "rgba(184, 134, 11, 0.3)",
+                      color: "#8C6508",
+                    }}
+                  >
+                    <FileText size={13} /> {showAuditTrace ? "Hide Audit Trace" : "View Audit Trace"}
+                    <ChevronDown size={13} className={`transition-transform ${showAuditTrace ? "rotate-180" : ""}`} />
+                  </button>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {/* Row 1: KP 3-Level */}
+                  <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#1A1A1A]">KP 3-Level Linkage</span>
+                      <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.kpThreeLevel.passed ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
+                        {result.bestCandidate.evidenceMatrix.kpThreeLevel.passed ? "✓ Passed" : "Partial"} (+{result.bestCandidate.evidenceMatrix.kpThreeLevel.score} pts)
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                      {result.bestCandidate.evidenceMatrix.kpThreeLevel.details}
+                    </p>
+                  </div>
+
+                  {/* Row 2: Rule of Origin */}
+                  <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#1A1A1A]">Rule of Origin (1st-9th)</span>
+                      <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.ruleOfOrigin.passed ? "bg-emerald-100 text-emerald-800" : "bg-stone-100 text-stone-700"}`}>
+                        {result.bestCandidate.evidenceMatrix.ruleOfOrigin.passed ? "✓ Validated" : "Unlinked"} (+{result.bestCandidate.evidenceMatrix.ruleOfOrigin.score} pts)
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                      {result.bestCandidate.evidenceMatrix.ruleOfOrigin.details}
+                    </p>
+                  </div>
+
+                  {/* Row 3: Pranapada */}
+                  <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#1A1A1A]">Pranapada (R.K. Das)</span>
+                      <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.pranapada.passed ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
+                        {result.bestCandidate.evidenceMatrix.pranapada.passed ? "✓ Strong" : "Deviation"} (+{result.bestCandidate.evidenceMatrix.pranapada.score} pts)
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                      {result.bestCandidate.evidenceMatrix.pranapada.details} · Shift: {result.bestCandidate.evidenceMatrix.pranapada.deltaCorrectionSeconds}s
+                    </p>
+                  </div>
+
+                  {/* Row 4: Gulika */}
+                  <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#1A1A1A]">Gulika Division</span>
+                      <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.gulika.passed ? "bg-emerald-100 text-emerald-800" : "bg-stone-100 text-stone-700"}`}>
+                        {result.bestCandidate.evidenceMatrix.gulika.passed ? `✓ ${result.bestCandidate.evidenceMatrix.gulika.matchType}` : "No match"} (+{result.bestCandidate.evidenceMatrix.gulika.score} pts)
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                      {result.bestCandidate.evidenceMatrix.gulika.details}
+                    </p>
+                  </div>
+
+                  {/* Row 5: Tattva */}
+                  <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#1A1A1A]">Tattva Palas Cycle</span>
+                      <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${result.bestCandidate.evidenceMatrix.tattva.matched ? "bg-emerald-100 text-emerald-800" : "bg-stone-100 text-stone-700"}`}>
+                        {result.bestCandidate.evidenceMatrix.tattva.matched ? "✓ Harmonized" : "Neutral"} (+{result.bestCandidate.evidenceMatrix.tattva.score} pts)
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                      {result.bestCandidate.evidenceMatrix.tattva.details}
+                    </p>
+                  </div>
+
+                  {/* Row 6: Life Milestones */}
+                  <div className="rounded-lg border p-3" style={{ background: "#FAF8F5", borderColor: "rgba(184, 134, 11, 0.18)" }}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#1A1A1A]">Milestone Correlation</span>
+                      <span className="font-bold px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800">
+                        {result.bestCandidate.evidenceMatrix.lifeEvents.matchedCount}/{result.bestCandidate.evidenceMatrix.lifeEvents.totalCount} Matched (+{result.bestCandidate.evidenceMatrix.lifeEvents.score} pts)
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                      {result.bestCandidate.evidenceMatrix.lifeEvents.details}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Audit Trace Drawer */}
+                {showAuditTrace && result.bestCandidate.methodTrace && (
+                  <div className="mt-4 rounded-lg bg-stone-900 p-4 text-xs font-mono text-emerald-400 space-y-1">
+                    <p className="text-stone-400 font-bold mb-2">// ── AstroLife BTR Engine Auditable Trace ──</p>
+                    {result.bestCandidate.methodTrace.map((line, idx) => (
+                      <p key={idx}>{line}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Event Timeline Breakdown */}
             <div
