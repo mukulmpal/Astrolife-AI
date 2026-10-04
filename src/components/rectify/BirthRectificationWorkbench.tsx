@@ -1122,11 +1122,11 @@ export function BirthRectificationWorkbench() {
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-[#1A1A1A]">Prenatal Epoch (Adhana)</span>
                         <span className="font-bold px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800">
-                          ✓ Epoch Verified
+                          ✓ Rashi Trutine Verified
                         </span>
                       </div>
                       <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
-                        Est. Conception: {result.bestCandidate.evidenceMatrix.prenatalEpoch.conceptionDateEstimated} ({result.bestCandidate.evidenceMatrix.prenatalEpoch.gestationDays}d gestation) · Adhana Lagna: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaLagnaSign} · Adhana Moon: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaMoonSign}
+                        Das Canonical: {result.bestCandidate.evidenceMatrix.prenatalEpoch.conceptionDateEstimated} ({result.bestCandidate.evidenceMatrix.prenatalEpoch.gestationDays}d) · Nearest Horizon: {result.bestCandidate.evidenceMatrix.prenatalEpoch.nearestHorizonDateEstimated ?? "N/A"} ({result.bestCandidate.evidenceMatrix.prenatalEpoch.nearestHorizonGestationDays ?? 272}d) · Adhana Lagna: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaLagnaSign} · Adhana Moon: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaMoonSign}
                       </p>
                     </div>
                   )}

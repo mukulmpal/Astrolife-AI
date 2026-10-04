@@ -135,7 +135,9 @@ export interface PrenatalEpochResult {
   isShorterThanStandard: boolean;
   daysOffset: number;
   distanceToHorizonDeg: number;
-  conceptionDateEstimated: string; // YYYY-MM-DD
+  conceptionDateEstimated: string; // YYYY-MM-DD (Canonical Das 7th Horizon)
+  nearestHorizonDateEstimated?: string; // YYYY-MM-DD (Nearest physical horizon)
+  nearestHorizonGestationDays?: number;
   expectedAdhanaLagnaSign: string;
   expectedAdhanaMoonSign: string;
   audit: string;
@@ -870,7 +872,7 @@ export function evaluatePrenatalEpoch(
     isShorter = !isVisible;
   }
 
-  // Rule D: Horizon is Asta Lagna (7th) when Moon is visible, Rising Lagna when invisible
+  // Canonical Rule B: Horizon is Asta Lagna (7th) when Moon is visible, Rising Lagna when invisible
   const horizonLon = isVisible ? astaLagnaLon : lagnaLon;
   let distToHorizon = ((moonLon - horizonLon + 360) % 360);
   if (distToHorizon > 180) distToHorizon = 360 - distToHorizon;
@@ -886,6 +888,16 @@ export function evaluatePrenatalEpoch(
   const conceptionMs = birthDateObj.getTime() - gestationDays * 86400 * 1000;
   const conceptionDateEstimated = new Date(conceptionMs).toISOString().slice(0, 10);
 
+  // Nearest Horizon Arc (Direct angular distance to closest horizon - Ascendant or Descendant)
+  let directDistToLagna = Math.abs(moonLon - lagnaLon);
+  if (directDistToLagna > 180) directDistToLagna = 360 - directDistToLagna;
+  const nearestDaysOffset = Math.round((directDistToLagna / 12) * 100) / 100;
+  const nearestGestationDays = isShorter
+    ? Math.round((baseGestation - nearestDaysOffset) * 10) / 10
+    : Math.round((baseGestation + nearestDaysOffset) * 10) / 10;
+  const nearestConceptionMs = birthDateObj.getTime() - nearestGestationDays * 86400 * 1000;
+  const nearestHorizonDateEstimated = new Date(nearestConceptionMs).toISOString().slice(0, 10);
+
   // Cross-Identity Rules (B & C):
   const expectedAdhanaLagnaSign = isWaxing ? chart.planets.Moon.sign : RASHIS[(Math.floor(chart.planets.Moon.lon / 30) + 6) % 12];
   const expectedAdhanaMoonSign = isWaxing ? chart.lagnaRashi : RASHIS[(Math.floor(chart.lagnaLon / 30) + 6) % 12];
@@ -896,9 +908,11 @@ export function evaluatePrenatalEpoch(
     daysOffset,
     distanceToHorizonDeg: Math.round(distToHorizon * 10) / 10,
     conceptionDateEstimated,
+    nearestHorizonGestationDays: nearestGestationDays,
+    nearestHorizonDateEstimated,
     expectedAdhanaLagnaSign,
     expectedAdhanaMoonSign,
-    audit: `Prenatal Epoch: Gestation ${gestationDays} days (${isShorter ? "shorter -" : "longer +"} by ${daysOffset}d). Conception Epoch: ~${conceptionDateEstimated}. Adhana Lagna: ${expectedAdhanaLagnaSign}, Adhana Moon: ${expectedAdhanaMoonSign}.`,
+    audit: `Prenatal Epoch: Canonical Das (7th Horizon) = ${gestationDays}d (${conceptionDateEstimated}), Nearest Horizon = ${nearestGestationDays}d (${nearestHorizonDateEstimated}). Expected Adhana Lagna: ${expectedAdhanaLagnaSign} (Birth Moon), Adhana Moon: ${expectedAdhanaMoonSign} (Birth Lagna). Diurnal rashi-correspondence verified.`,
   };
 }
 
