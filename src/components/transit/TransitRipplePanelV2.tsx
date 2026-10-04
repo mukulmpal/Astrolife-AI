@@ -83,7 +83,7 @@ export function chartToNatal(chart: ChartData | null): NatalInput {
 }
 
 export function TransitRipplePanelV2() {
-  const { chart, hasUserChart, loading: chartLoading } = useUserChart();
+  const { chart, hasUserChart } = useUserChart();
 
   // Navigation & selection state
   const [activeTab, setActiveTab] = useState<"radar" | "story" | "timeline">("radar");
@@ -118,22 +118,42 @@ export function TransitRipplePanelV2() {
   const isToday = scanDate === formatIsoDate(new Date());
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10 flex flex-col gap-6 font-sans">
+    <div className="w-full flex flex-col gap-6 font-sans">
       {/* 1. Page Header & Live Status */}
-      <header className="bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFE3] dark:from-[#181614] dark:via-[#141211] dark:to-[#0F0E0D] border border-[#B8860B]/30 rounded-3xl p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#B8860B]/15 pb-4 mb-4">
+      <header
+        className="rounded-2xl p-5 sm:p-7 transition-all"
+        style={{
+          background: "#FFFFFF",
+          border: "1px solid rgba(184, 134, 11, 0.28)",
+          boxShadow: "0 4px 20px -4px rgba(184, 134, 11, 0.12)",
+        }}
+      >
+        <div
+          className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4"
+          style={{ borderBottom: "1px solid rgba(184, 134, 11, 0.2)" }}
+        >
           <div className="flex items-center gap-3">
             <span className="text-3xl">🌟</span>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-3xl font-serif font-bold text-[#2D241E] dark:text-[#F7F2E8] tracking-tight">
+                <h1
+                  className="font-serif text-xl sm:text-3xl font-bold tracking-tight"
+                  style={{ color: "#1A1A1A" }}
+                >
                   Interactive Transit Ripple
                 </h1>
-                <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                <span
+                  className="font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                  style={{
+                    background: "#FAF5EB",
+                    color: "#8C6508",
+                    border: "1px solid rgba(184, 134, 11, 0.25)",
+                  }}
+                >
                   v2.0 Active
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-[#70645B] dark:text-[#ABA396] mt-0.5">
+              <p className="text-xs sm:text-sm text-[#5C5248] mt-0.5">
                 {language === "hinglish"
                   ? "पाराशरी दृष्टि ओवरलैप × विंशोत्तरी दशा का मौसम × आज का नवतारा"
                   : "Parashari Aspect Resonance × Mahadasha × Antardasha × Daily Navatara"}
@@ -146,25 +166,37 @@ export function TransitRipplePanelV2() {
             <button
               type="button"
               onClick={() => handleJumpDays(0)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                isToday
-                  ? "bg-amber-600 text-white border-amber-600 shadow-sm"
-                  : "bg-white/80 dark:bg-[#201D1A] text-[#6B635B] dark:text-[#A8A29E] border-[#B8860B]/20 hover:border-[#B8860B]/40"
-              }`}
+              style={{
+                background: isToday ? "#FFFFFF" : "#FAF5EB",
+                borderColor: isToday ? "#B8860B" : "rgba(184, 134, 11, 0.22)",
+                color: isToday ? "#8C6508" : "#5C5248",
+                boxShadow: isToday ? "0 2px 6px rgba(184, 134, 11, 0.18)" : "none",
+              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all"
             >
               Today (आज)
             </button>
             <button
               type="button"
               onClick={() => handleJumpDays(7)}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/80 dark:bg-[#201D1A] text-[#6B635B] dark:text-[#A8A29E] border border-[#B8860B]/20 hover:border-[#B8860B]/40 transition-all"
+              style={{
+                background: "#FAF5EB",
+                borderColor: "rgba(184, 134, 11, 0.22)",
+                color: "#5C5248",
+              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold border hover:border-[#B8860B] transition-all"
             >
               +7 Days
             </button>
             <button
               type="button"
               onClick={() => handleJumpDays(30)}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/80 dark:bg-[#201D1A] text-[#6B635B] dark:text-[#A8A29E] border border-[#B8860B]/20 hover:border-[#B8860B]/40 transition-all"
+              style={{
+                background: "#FAF5EB",
+                borderColor: "rgba(184, 134, 11, 0.22)",
+                color: "#5C5248",
+              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold border hover:border-[#B8860B] transition-all"
             >
               +30 Days
             </button>
@@ -172,33 +204,66 @@ export function TransitRipplePanelV2() {
               type="date"
               value={scanDate}
               onChange={(e) => e.target.value && setScanDate(e.target.value)}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/90 dark:bg-[#201D1A] text-[#2D241E] dark:text-[#F3EDE2] border border-[#B8860B]/30 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              style={{
+                background: "#FAF7F2",
+                borderColor: "rgba(184, 134, 11, 0.3)",
+                color: "#1A1A1A",
+              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-medium border focus:outline-none focus:ring-1 focus:ring-[#B8860B]"
             />
           </div>
         </div>
 
         {/* Chart Context Pill Row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#5C4F46] dark:text-[#BDB6AA]">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="flex items-center gap-1.5 bg-[#FAF7F2] dark:bg-[#1E1C1A] px-3 py-1 rounded-xl border border-[#B8860B]/20">
-              <span className="text-amber-600 font-bold">👤 Chart:</span>
-              <strong className="text-[#2D241E] dark:text-[#F3EDE2]">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#5C5248]">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl"
+              style={{
+                background: "#FAF7F2",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+              }}
+            >
+              <span className="text-[#8C6508] font-bold">👤 Chart:</span>
+              <strong className="text-[#1A1A1A]">
                 {chart?.name || (hasUserChart ? "User Birth Chart" : "Demo Chart (Delhi)")}
               </strong>
             </span>
-            <span className="flex items-center gap-1.5 bg-[#FAF7F2] dark:bg-[#1E1C1A] px-3 py-1 rounded-xl border border-[#B8860B]/20">
-              <span className="text-amber-600 font-bold">🏛️ Lagna:</span>
-              <strong>{natalInput.lagnaSignName || `Sign ${natalInput.lagnaSign}`}</strong>
+            <span
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl"
+              style={{
+                background: "#FAF7F2",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+              }}
+            >
+              <span className="text-[#8C6508] font-bold">🏛️ Lagna:</span>
+              <strong className="text-[#1A1A1A]">
+                {natalInput.lagnaSignName || `Sign ${natalInput.lagnaSign}`}
+              </strong>
             </span>
-            <span className="flex items-center gap-1.5 bg-[#FAF7F2] dark:bg-[#1E1C1A] px-3 py-1 rounded-xl border border-[#B8860B]/20">
-              <span className="text-amber-600 font-bold">⭐ Janma Tara:</span>
-              <strong>Nakshatra #{natalInput.moonNakshatra + 1}</strong>
+            <span
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl"
+              style={{
+                background: "#FAF7F2",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+              }}
+            >
+              <span className="text-[#8C6508] font-bold">⭐ Janma Star:</span>
+              <strong className="text-[#1A1A1A]">
+                Nakshatra #{natalInput.moonNakshatra + 1}
+              </strong>
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+          <div
+            className="flex items-center gap-2 px-3 py-1 rounded-xl"
+            style={{
+              background: "#FFFDF5",
+              border: "1px solid rgba(15, 107, 54, 0.25)",
+            }}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#0F6B36] animate-pulse" />
+            <span className="font-semibold text-[#0F6B36]">
               Instant Auto-Calculated (0ms wait)
             </span>
           </div>
@@ -206,15 +271,24 @@ export function TransitRipplePanelV2() {
       </header>
 
       {/* 2. Mobile-Friendly 3-Tab Navigator */}
-      <div className="flex items-center justify-center sm:justify-start gap-2 bg-[#F3ECE0] dark:bg-[#1A1816] p-1.5 rounded-2xl border border-[#B8860B]/25">
+      <div
+        className="flex items-center justify-center sm:justify-start gap-1.5 p-1 rounded-xl"
+        style={{
+          background: "#FAF5EB",
+          border: "1px solid rgba(184, 134, 11, 0.25)",
+        }}
+      >
         <button
           type="button"
           onClick={() => setActiveTab("radar")}
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-            activeTab === "radar"
-              ? "bg-amber-600 text-white shadow-md"
-              : "text-[#6B635B] dark:text-[#A8A29E] hover:text-[#2D241E] hover:bg-white/40"
-          }`}
+          style={{
+            background: activeTab === "radar" ? "#FFFFFF" : "transparent",
+            borderColor: activeTab === "radar" ? "#B8860B" : "transparent",
+            color: activeTab === "radar" ? "#8C6508" : "#5C5248",
+            boxShadow:
+              activeTab === "radar" ? "0 2px 6px rgba(184, 134, 11, 0.18)" : "none",
+          }}
+          className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold border transition-all"
         >
           <span>🧭</span>
           <span>{language === "hinglish" ? "रडार (Kundli Radar)" : "Ripple Radar"}</span>
@@ -223,24 +297,36 @@ export function TransitRipplePanelV2() {
         <button
           type="button"
           onClick={() => setActiveTab("story")}
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-            activeTab === "story"
-              ? "bg-amber-600 text-white shadow-md"
-              : "text-[#6B635B] dark:text-[#A8A29E] hover:text-[#2D241E] hover:bg-white/40"
-          }`}
+          style={{
+            background: activeTab === "story" ? "#FFFFFF" : "transparent",
+            borderColor: activeTab === "story" ? "#B8860B" : "transparent",
+            color: activeTab === "story" ? "#8C6508" : "#5C5248",
+            boxShadow:
+              activeTab === "story" ? "0 2px 6px rgba(184, 134, 11, 0.18)" : "none",
+          }}
+          className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold border transition-all"
         >
           <span>📜</span>
-          <span>{language === "hinglish" ? "कथा व मार्गदर्शन (Story & Guidance)" : "Story & Guidance"}</span>
+          <span>
+            {language === "hinglish"
+              ? "कथा व मार्गदर्शन (Story & Guidance)"
+              : "Story & Guidance"}
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("timeline")}
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-            activeTab === "timeline"
-              ? "bg-amber-600 text-white shadow-md"
-              : "text-[#6B635B] dark:text-[#A8A29E] hover:text-[#2D241E] hover:bg-white/40"
-          }`}
+          style={{
+            background: activeTab === "timeline" ? "#FFFFFF" : "transparent",
+            borderColor: activeTab === "timeline" ? "#B8860B" : "transparent",
+            color: activeTab === "timeline" ? "#8C6508" : "#5C5248",
+            boxShadow:
+              activeTab === "timeline"
+                ? "0 2px 6px rgba(184, 134, 11, 0.18)"
+                : "none",
+          }}
+          className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold border transition-all"
         >
           <span>📅</span>
           <span>30d Timeline</span>
@@ -267,8 +353,14 @@ export function TransitRipplePanelV2() {
             />
 
             {/* Quick Summary card underneath Radar */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-xs text-[#5C4F46] dark:text-[#D5CDBF] leading-relaxed">
-              <strong className="text-amber-900 dark:text-amber-300">
+            <div
+              className="p-4 rounded-xl text-xs text-[#5C5248] leading-relaxed"
+              style={{
+                background: "#FFFDF5",
+                border: "1px solid rgba(184, 134, 11, 0.25)",
+              }}
+            >
+              <strong className="text-[#8C6508]">
                 {language === "hinglish" ? "💡 रडार टिप:" : "💡 Radar Tip:"}
               </strong>{" "}
               {language === "hinglish"
@@ -304,19 +396,40 @@ export function TransitRipplePanelV2() {
 
       {/* Mode C: 30-Day Timeline Tab */}
       {activeTab === "timeline" && (
-        <div className="w-full bg-[#FAF7F2] dark:bg-[#141211] border border-[#B8860B]/25 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#B8860B]/15 pb-4">
+        <div
+          className="w-full rounded-2xl p-6 flex flex-col gap-6"
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid rgba(184, 134, 11, 0.28)",
+            boxShadow: "0 4px 20px -4px rgba(184, 134, 11, 0.12)",
+          }}
+        >
+          <div
+            className="flex flex-wrap items-center justify-between gap-3 pb-4"
+            style={{ borderBottom: "1px solid rgba(184, 134, 11, 0.2)" }}
+          >
             <div>
-              <h3 className="text-lg font-serif font-bold text-[#2D241E] dark:text-[#F3EDE2]">
+              <h3
+                className="font-serif text-lg font-bold"
+                style={{ color: "#1A1A1A" }}
+              >
                 {language === "hinglish"
                   ? "मासिक गोचर प्रवाह एवं दृष्टियां"
                   : "30-Day Planetary Transit Windows"}
               </h3>
-              <p className="text-xs text-[#70645B] dark:text-[#A8A29E] mt-0.5">
-                Current planetary signs, speeds, and direct Parashari target houses for {scanDate}
+              <p className="text-xs text-[#6B635B] mt-0.5">
+                Current planetary signs, speeds, and direct Parashari target houses for{" "}
+                {scanDate}
               </p>
             </div>
-            <div className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-500/10 px-3 py-1 rounded-xl border border-amber-500/20">
+            <div
+              className="text-xs font-mono font-bold px-3 py-1 rounded-xl"
+              style={{
+                background: "#FAF5EB",
+                color: "#8C6508",
+                border: "1px solid rgba(184, 134, 11, 0.25)",
+              }}
+            >
               Swiss Ephemeris Sidereal Lahiri
             </div>
           </div>
@@ -325,7 +438,10 @@ export function TransitRipplePanelV2() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead>
-                <tr className="border-b border-[#B8860B]/20 text-[#8C827A] dark:text-[#9B9288] uppercase text-[10px] tracking-wider">
+                <tr
+                  className="font-mono text-[10px] uppercase tracking-wider text-[#8C6508]"
+                  style={{ borderBottom: "1px solid rgba(184, 134, 11, 0.2)" }}
+                >
                   <th className="py-2.5 px-3">Planet</th>
                   <th className="py-2.5 px-3">Sign</th>
                   <th className="py-2.5 px-3">House (from Lagna)</th>
@@ -334,7 +450,7 @@ export function TransitRipplePanelV2() {
                   <th className="py-2.5 px-3">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#B8860B]/10 text-[#3D332C] dark:text-[#DDD6CB]">
+              <tbody className="divide-y divide-[#B8860B]/10 text-[#3D3834]">
                 {Object.values(report.transitPositions).map((pos) => {
                   const hits = report.allDrishtiHits.filter(
                     (h) => h.planet === pos.planet
@@ -348,27 +464,50 @@ export function TransitRipplePanelV2() {
                         setActiveTab("radar");
                       }}
                       className={`cursor-pointer transition-colors ${
-                        isSel
-                          ? "bg-amber-500/15 font-bold"
-                          : "hover:bg-[#B8860B]/5"
+                        isSel ? "bg-[#FFFDF5] font-bold" : "hover:bg-[#FAF7F2]"
                       }`}
                     >
                       <td className="py-3 px-3 flex items-center gap-2">
-                        <span>{pos.planet === "Saturn" ? "🪐" : pos.planet === "Jupiter" ? "🌟" : pos.planet === "Rahu" ? "⚡" : pos.planet === "Ketu" ? "🔥" : pos.planet === "Mars" ? "🔴" : pos.planet === "Sun" ? "☀️" : pos.planet === "Venus" ? "✨" : pos.planet === "Mercury" ? "🌿" : "🌙"}</span>
-                        <span>{pos.planet}</span>
+                        <span>
+                          {pos.planet === "Saturn"
+                            ? "🪐"
+                            : pos.planet === "Jupiter"
+                            ? "🌟"
+                            : pos.planet === "Rahu"
+                            ? "⚡"
+                            : pos.planet === "Ketu"
+                            ? "🔥"
+                            : pos.planet === "Mars"
+                            ? "🔴"
+                            : pos.planet === "Sun"
+                            ? "☀️"
+                            : pos.planet === "Venus"
+                            ? "✨"
+                            : pos.planet === "Mercury"
+                            ? "🌿"
+                            : "🌙"}
+                        </span>
+                        <span className="text-[#1A1A1A]">{pos.planet}</span>
                         {pos.isRetrograde && (
-                          <span className="text-[10px] text-rose-500 font-bold">
+                          <span className="text-[10px] text-[#C9555F] font-bold font-mono">
                             [Rx]
                           </span>
                         )}
                       </td>
                       <td className="py-3 px-3">{pos.signName}</td>
                       <td className="py-3 px-3">
-                        <span className="px-2 py-0.5 rounded bg-[#B8860B]/15 text-[#996515] dark:text-amber-300 font-bold">
+                        <span
+                          className="px-2 py-0.5 rounded font-bold"
+                          style={{
+                            background: "#FAF5EB",
+                            color: "#8C6508",
+                            border: "1px solid rgba(184, 134, 11, 0.2)",
+                          }}
+                        >
                           House {pos.house}
                         </span>
                       </td>
-                      <td className="py-3 px-3 font-mono">
+                      <td className="py-3 px-3 font-mono text-[#5C5248]">
                         {pos.longitude.toFixed(2)}°
                       </td>
                       <td className="py-3 px-3">
@@ -376,7 +515,12 @@ export function TransitRipplePanelV2() {
                           {hits.map((hit) => (
                             <span
                               key={hit.targetHouse}
-                              className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-800 dark:text-amber-200"
+                              className="px-1.5 py-0.5 rounded text-[10px] font-semibold"
+                              style={{
+                                background: "#FAF5EB",
+                                color: "#8C6508",
+                                border: "1px solid rgba(184, 134, 11, 0.2)",
+                              }}
                             >
                               H{hit.targetHouse} ({hit.aspectRule.name})
                             </span>
@@ -391,7 +535,11 @@ export function TransitRipplePanelV2() {
                             setSelectedPlanet(pos.planet);
                             setActiveTab("radar");
                           }}
-                          className="px-2.5 py-1 rounded-lg text-xs bg-amber-600 text-white font-medium hover:bg-amber-700"
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+                          style={{
+                            background: "linear-gradient(180deg, #D4AF37, #B8860B)",
+                            color: "#FFFFFF",
+                          }}
                         >
                           View Radar
                         </button>

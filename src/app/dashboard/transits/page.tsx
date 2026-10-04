@@ -129,145 +129,322 @@ export default function TransitPage() {
     return { lagnaNum, planets };
   }, [userChart, report, base]);
 
-  // If user selected Ripple 2.0 tab, render TransitRipplePanelV2 directly
-  if (pageTab === "ripple") {
-    return (
-      <main className="tr-wrap">
-        <div className="tr-shell">
-          <section className="tr-hero">
-            <div className="tabs" style={{ marginTop: 8 }}>
-              {(["overview", "chart", "ripple"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={`tab ${pageTab === tab ? "active" : ""}`}
-                  onClick={() => setPageTab(tab)}
-                >
-                  {tab === "overview" ? "Daily Overview" : tab === "chart" ? "Moon/Lagna Chart" : "Interactive Ripple 2.0"}
-                </button>
-              ))}
-            </div>
-          </section>
-          <TransitRipplePanelV2 />
-        </div>
-      </main>
-    );
-  }
-
-  if (loading || !hasUserChart || !report) {
-    return (
-      <main className="tr-wrap">
-        <div className="tr-shell">
-          <EngineStateCard
-            title="Transit Engine"
-            loading={loading}
-            loadingText="Loading your current Gochar..."
-            emptyText="Please complete onboarding to unlock transit analysis."
-          />
-        </div>
-      </main>
-    );
-  }
-
-  const areaScores = Array.isArray(report.areaScores) ? report.areaScores : [];
+  const areaScores = Array.isArray(report?.areaScores) ? report.areaScores : [];
   const topArea = [...areaScores].sort((a, b) => b.score - a.score)[0] ?? {
     area: "balance",
     score: 50,
     summary: "Keep actions steady today.",
   };
-  const alerts = Array.isArray(report.alerts) ? report.alerts : [];
+  const alerts = Array.isArray(report?.alerts) ? report.alerts : [];
   const caution = alerts.filter((a) => a.severity === "high" || a.severity === "medium");
   const opportunities = alerts.filter((a) => a.type === "opportunity");
-  const planets = Array.isArray(report.planets) ? report.planets : [];
+  const planets = Array.isArray(report?.planets) ? report.planets : [];
 
   return (
     <main className="tr-wrap">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap');
-        .tr-wrap{min-height:100vh;background:#FAF7F2;color:#1A1A1A;padding:30px 22px 110px;font-family:'Outfit',sans-serif}
-        .tr-wrap{min-height:100vh;background:#FAF7F2;color:#1A1A1A;padding:30px 22px 110px;font-family:var(--font-outfit),'Outfit',sans-serif}
-        .tr-shell{max-width:1120px;margin:0 auto;display:grid;gap:16px}
-        .tr-hero{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:18px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
-        .tr-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#B8860B;margin-bottom:8px;font-weight:700}
-        .tr-title{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1.1;color:#1A1A1A}
-        .tr-title{font-family:var(--font-cormorant),'Cormorant Garamond',serif;font-size:34px;line-height:1.1;color:#1A1A1A}
-        .tr-sub{font-size:13px;color:#6B635B;margin-top:6px}
-        .tr-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-        .tr-switch{display:flex;gap:8px;flex-wrap:wrap}
-        .tr-btn{padding:8px 14px;border-radius:10px;border:1px solid rgba(184,134,11,0.2);background:#FFFFFF;color:#6B635B;cursor:pointer}
-        .tr-btn.active{border-color:#B8860B;background:rgba(184,134,11,0.15);color:#B8860B;font-weight:700}
-        .tr-base-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-        .tr-base-card{text-align:left;padding:13px 14px;border-radius:14px;border:1px solid rgba(184,134,11,0.2);background:#FFFFFF;color:#6B635B;cursor:pointer}
-        .tr-base-card.active{border-color:#B8860B;background:rgba(184,134,11,0.11);color:#1A1A1A}
-        .tr-base-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:800;color:inherit}
-        .tr-base-tag{font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:#B8860B}
-        .tr-base-copy{margin:7px 0 0;font-size:12px;line-height:1.55;color:#6B635B}
-        .tr-base-card.active .tr-base-copy{color:#4A4238}
-        .tr-date{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-        .tr-date input{background:#FFFFFF;border:1px solid rgba(184,134,11,0.2);border-radius:8px;color:#1A1A1A;padding:8px 10px;font-size:13px}
-        .tr-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-        .tr-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.2);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
-        .span-8{grid-column:span 8}.span-4{grid-column:span 4}.span-12{grid-column:span 12}
-        .tr-h{font-family:'Cormorant Garamond',serif;font-size:24px;color:#1A1A1A}
-        .tr-p{font-size:13px;color:#6B635B;line-height:1.7}
-        .tr-pill{font-size:11px;color:#B8860B;border:1px solid rgba(184,134,11,0.25);background:#FAF7F2;padding:4px 10px;border-radius:999px}
-        .tr-alerts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
-        .tr-alert{background:#FAF7F2;border:1px solid rgba(184,134,11,0.18);border-radius:12px;padding:12px}
-        .tr-alert h4{font-size:13px;margin-bottom:6px;color:#1A1A1A}
-        .tr-alert p{font-size:12px;color:#6B635B;line-height:1.6}
-        .tr-areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-        .tr-area{background:#FAF7F2;border:1px solid rgba(184,134,11,0.18);border-radius:12px;padding:12px}
-        .tr-area-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-        .tr-bar{height:6px;border-radius:999px;background:#E8E2D8;overflow:hidden}
-        .tr-fill{height:100%;background:linear-gradient(90deg,#B8860B,#996515)}
-        .tr-planets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-        .tr-planet{background:#FAF7F2;border:1px solid rgba(184,134,11,0.18);border-radius:12px;padding:12px}
-        .tr-muted{color:#6B635B;font-size:12px}
-        .tr-chart-wrap{display:flex;justify-content:center;padding:12px 0}
-        @media(max-width:1024px){.span-8,.span-4{grid-column:span 12}.tr-planets,.tr-areas{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:640px){.tr-wrap{padding:20px 14px 98px}.tr-title{font-size:28px}.tr-areas,.tr-planets,.tr-alerts,.tr-base-grid{grid-template-columns:1fr}}
+        .tr-wrap {
+          min-height: 100vh;
+          background: var(--al-bg, #FAF7F2);
+          color: var(--al-text, #1A1A1A);
+          padding: 24px 16px 90px;
+          font-family: var(--font-outfit), 'Outfit', sans-serif;
+        }
+        .tr-shell {
+          max-width: 1140px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+        .tr-hero {
+          background: #FFFFFF;
+          border: 1px solid rgba(184, 134, 11, 0.28);
+          border-radius: 16px;
+          padding: 20px;
+          box-shadow: 0 4px 20px -4px rgba(184, 134, 11, 0.12);
+        }
+        .tr-kicker {
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #8C6508;
+          margin-bottom: 8px;
+          font-weight: 700;
+          font-family: monospace;
+        }
+        .tr-title {
+          font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+          font-size: 32px;
+          line-height: 1.1;
+          color: #1A1A1A;
+          font-weight: 700;
+        }
+        .tr-sub {
+          font-size: 13px;
+          color: #5C5248;
+          margin-top: 6px;
+        }
+        .tr-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .tr-switch {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .tr-btn {
+          padding: 7px 13px;
+          border-radius: 10px;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: #FAF5EB;
+          color: #5C5248;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 600;
+          transition: all 0.15s ease;
+        }
+        .tr-btn.active {
+          border-color: #B8860B;
+          background: #FFFFFF;
+          color: #8C6508;
+          font-weight: 700;
+          box-shadow: 0 2px 6px rgba(184, 134, 11, 0.15);
+        }
+        .tr-base-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .tr-base-card {
+          text-align: left;
+          padding: 13px 14px;
+          border-radius: 12px;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          background: #FAF7F2;
+          color: #5C5248;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .tr-base-card.active {
+          border-color: #B8860B;
+          background: #FFFDF5;
+          color: #1A1A1A;
+          box-shadow: 0 2px 6px rgba(184, 134, 11, 0.12);
+        }
+        .tr-base-title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          font-size: 13px;
+          font-weight: 800;
+          color: inherit;
+        }
+        .tr-base-tag {
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.9px;
+          color: #8C6508;
+          font-family: monospace;
+          font-weight: 700;
+        }
+        .tr-base-copy {
+          margin: 7px 0 0;
+          font-size: 12px;
+          line-height: 1.55;
+          color: #5C5248;
+        }
+        .tr-base-card.active .tr-base-copy {
+          color: #3D3834;
+        }
+        .tr-date {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .tr-date input {
+          background: #FAF7F2;
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          border-radius: 8px;
+          color: #1A1A1A;
+          padding: 7px 10px;
+          font-size: 12px;
+        }
+        .tr-grid {
+          display: grid;
+          grid-template-columns: repeat(12, 1fr);
+          gap: 14px;
+        }
+        .tr-card {
+          background: #FFFFFF;
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          border-radius: 16px;
+          padding: 18px;
+          box-shadow: 0 4px 20px -4px rgba(184, 134, 11, 0.12);
+        }
+        .span-8 { grid-column: span 8; }
+        .span-4 { grid-column: span 4; }
+        .span-12 { grid-column: span 12; }
+        .tr-h {
+          font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+          font-size: 22px;
+          color: #1A1A1A;
+          font-weight: 700;
+        }
+        .tr-p {
+          font-size: 13px;
+          color: #3D3834;
+          line-height: 1.7;
+        }
+        .tr-pill {
+          font-size: 10px;
+          color: #8C6508;
+          border: 1px solid rgba(184, 134, 11, 0.25);
+          background: #FAF5EB;
+          padding: 3px 8px;
+          border-radius: 999px;
+          font-weight: bold;
+          font-family: monospace;
+        }
+        .tr-alerts {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 10px;
+        }
+        .tr-alert {
+          background: #FAF7F2;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          border-radius: 12px;
+          padding: 12px;
+        }
+        .tr-alert h4 {
+          font-size: 13px;
+          margin-bottom: 6px;
+          color: #1A1A1A;
+          font-weight: 700;
+        }
+        .tr-alert p {
+          font-size: 12px;
+          color: #5C5248;
+          line-height: 1.6;
+        }
+        .tr-areas {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .tr-area {
+          background: #FAF7F2;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          border-radius: 12px;
+          padding: 12px;
+        }
+        .tr-area-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+        .tr-bar {
+          height: 6px;
+          border-radius: 999px;
+          background: #E8E2D8;
+          overflow: hidden;
+        }
+        .tr-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #B8860B, #D4AF37);
+        }
+        .tr-planets {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .tr-planet {
+          background: #FAF7F2;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          border-radius: 12px;
+          padding: 12px;
+        }
+        .tr-muted {
+          color: #6B635B;
+          font-size: 12px;
+        }
+        .tr-chart-wrap {
+          display: flex;
+          justify-content: center;
+          padding: 12px 0;
+        }
+        @media (max-width: 1024px) {
+          .span-8, .span-4 { grid-column: span 12; }
+          .tr-planets, .tr-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 640px) {
+          .tr-wrap { padding: 16px 12px 80px; }
+          .tr-title { font-size: 26px; }
+          .tr-areas, .tr-planets, .tr-alerts, .tr-base-grid { grid-template-columns: 1fr; }
+        }
       `}</style>
 
       <div className="tr-shell">
-        <section className="tr-hero">
-          <div className="tr-row">
+        {/* Top Unified Gochar Nav Bar */}
+        <section
+          className="rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 transition-all"
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid rgba(184, 134, 11, 0.28)",
+            boxShadow: "0 4px 20px -4px rgba(184, 134, 11, 0.12)",
+          }}
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl">🪐</span>
             <div>
-              <div className="tr-kicker">Live Gochar</div>
-              <h1 className="tr-title">Moon-First Transit Engine</h1>
-              <p className="tr-sub">
-                {selectedDate.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })} · {BASE_COPY[base].label}
-              </p>
-            </div>
-            <div className="tr-date">
-              <button type="button" className="tr-btn" onClick={() => setSelectedDate((d) => shiftDays(d, -1))}>
-                ← Prev
-              </button>
-              <input
-                type="date"
-                value={toDateInputValue(selectedDate)}
-                onChange={(e) => {
-                  if (!e.target.value) return;
-                  setSelectedDate(startOfDay(new Date(`${e.target.value}T12:00:00`)));
-                }}
-              />
-              <button type="button" className="tr-btn" onClick={() => setSelectedDate((d) => shiftDays(d, 1))}>
-                Next →
-              </button>
-              <button type="button" className="tr-btn" onClick={() => setSelectedDate(startOfDay(new Date()))}>
-                Now
-              </button>
+              <div
+                className="font-serif text-lg sm:text-xl font-bold"
+                style={{ color: "#1A1A1A" }}
+              >
+                Vedic Gochar & Transit Intelligence
+              </div>
+              <div
+                className="font-mono text-[9px] uppercase tracking-wider font-bold"
+                style={{ color: "#8C6508" }}
+              >
+                Swiss Ephemeris 0.01° Sidereal Lahiri
+              </div>
             </div>
           </div>
 
-          <div className="tabs" style={{ marginTop: 16 }}>
+          <div
+            className="flex items-center p-1 rounded-xl text-xs"
+            style={{
+              background: "#FAF5EB",
+              border: "1px solid rgba(184, 134, 11, 0.25)",
+            }}
+          >
             {(["overview", "chart", "ripple"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
-                className={`tab ${pageTab === tab ? "active" : ""}`}
+                className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
+                  pageTab === tab
+                    ? "bg-[#FFFFFF] text-[#8C6508] font-bold shadow-xs border border-[#B8860B]"
+                    : "text-[#6B635B] hover:text-[#1A1A1A]"
+                }`}
                 onClick={() => setPageTab(tab)}
               >
-                {tab === "overview" ? "Daily Overview" : tab === "chart" ? "Moon/Lagna Chart" : "Interactive Ripple 2.0"}
+                {tab === "overview"
+                  ? "Daily Overview"
+                  : tab === "chart"
+                  ? "Moon/Lagna Chart"
+                  : "Interactive Ripple 2.0"}
               </button>
             ))}
           </div>
@@ -275,6 +452,13 @@ export default function TransitPage() {
 
         {pageTab === "ripple" ? (
           <TransitRipplePanelV2 />
+        ) : loading || !hasUserChart || !report ? (
+          <EngineStateCard
+            title="Transit Engine"
+            loading={loading}
+            loadingText="Loading your current Gochar..."
+            emptyText="Please complete onboarding to unlock transit analysis."
+          />
         ) : pageTab === "chart" ? (
           <section className="tr-card span-12">
             <div className="tr-row" style={{ marginBottom: 12 }}>
@@ -300,10 +484,18 @@ export default function TransitPage() {
 
               {chartStyle === "kundli" && (
                 <div className="tr-switch">
-                  <button type="button" className={`tr-btn ${base === "moon" ? "active" : ""}`} onClick={() => setBase("moon")}>
+                  <button
+                    type="button"
+                    className={`tr-btn ${base === "moon" ? "active" : ""}`}
+                    onClick={() => setBase("moon")}
+                  >
                     Moon base · default
                   </button>
-                  <button type="button" className={`tr-btn ${base === "lagna" ? "active" : ""}`} onClick={() => setBase("lagna")}>
+                  <button
+                    type="button"
+                    className={`tr-btn ${base === "lagna" ? "active" : ""}`}
+                    onClick={() => setBase("lagna")}
+                  >
                     Lagna base
                   </button>
                 </div>
@@ -317,7 +509,11 @@ export default function TransitPage() {
                 </p>
                 {chartView && (
                   <div className="tr-chart-wrap">
-                    <NorthIndianChart lagnaNum={chartView.lagnaNum} planets={chartView.planets} size={340} />
+                    <NorthIndianChart
+                      lagnaNum={chartView.lagnaNum}
+                      planets={chartView.planets}
+                      size={340}
+                    />
                   </div>
                 )}
               </>
@@ -340,6 +536,54 @@ export default function TransitPage() {
           </section>
         ) : (
           <>
+            <section className="tr-hero">
+              <div className="tr-row">
+                <div>
+                  <div className="tr-kicker">Live Gochar</div>
+                  <h1 className="tr-title">Moon-First Transit Engine</h1>
+                  <p className="tr-sub">
+                    {selectedDate.toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}{" "}
+                    · {BASE_COPY[base].label}
+                  </p>
+                </div>
+                <div className="tr-date">
+                  <button
+                    type="button"
+                    className="tr-btn"
+                    onClick={() => setSelectedDate((d) => shiftDays(d, -1))}
+                  >
+                    ← Prev
+                  </button>
+                  <input
+                    type="date"
+                    value={toDateInputValue(selectedDate)}
+                    onChange={(e) => {
+                      if (!e.target.value) return;
+                      setSelectedDate(startOfDay(new Date(`${e.target.value}T12:00:00`)));
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="tr-btn"
+                    onClick={() => setSelectedDate((d) => shiftDays(d, 1))}
+                  >
+                    Next →
+                  </button>
+                  <button
+                    type="button"
+                    className="tr-btn"
+                    onClick={() => setSelectedDate(startOfDay(new Date()))}
+                  >
+                    Now
+                  </button>
+                </div>
+              </div>
+            </section>
+
             <section className="tr-hero" style={{ padding: 16 }}>
               <div className="tr-base-grid">
                 {(["moon", "lagna"] as const).map((nextBase) => (
@@ -363,7 +607,9 @@ export default function TransitPage() {
               <article className="tr-card span-8">
                 <h2 className="tr-h">Best window: {topArea.area}</h2>
                 <p className="tr-p">{report.summary}</p>
-                <p className="tr-muted" style={{ marginTop: 10 }}>{BASE_COPY[base].bestFor}</p>
+                <p className="tr-muted" style={{ marginTop: 10 }}>
+                  {BASE_COPY[base].bestFor}
+                </p>
               </article>
               <article className="tr-card span-4">
                 <h3 className="tr-h">{report.baseLabel}</h3>
@@ -439,7 +685,9 @@ export default function TransitPage() {
                         H{p.houseFromBase} from {p.baseLabel}
                       </p>
                       {p.natalHitPlanets.length > 0 && (
-                        <p className="tr-muted">Activates: {p.natalHitPlanets.join(", ")}</p>
+                        <p className="tr-muted">
+                          Activates: {p.natalHitPlanets.join(", ")}
+                        </p>
                       )}
                       <p className="tr-p" style={{ marginTop: 6 }}>
                         {p.note}
