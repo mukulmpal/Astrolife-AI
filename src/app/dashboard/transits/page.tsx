@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { calculateTransitReport, TransitBase } from "@/lib/astro-engine/transits";
 import { normalizeChartForTransit, toRashi } from "@/lib/astro-engine/chart-normalize";
@@ -64,12 +64,28 @@ function toDateInputValue(d: Date) {
 export default function TransitPage() {
   const { tp, ts } = useLanguage();
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get("tab") === "ripple" ? "ripple" : "overview";
+  const initialTab =
+    searchParams.get("tab") === "overview"
+      ? "overview"
+      : searchParams.get("tab") === "chart"
+      ? "chart"
+      : "ripple";
   const [base, setBase] = useState<TransitBase>("moon");
   const [selectedDate, setSelectedDate] = useState<Date>(() => startOfDay(new Date()));
   const [pageTab, setPageTab] = useState<"overview" | "chart" | "ripple">(initialTab);
   const [chartStyle, setChartStyle] = useState<"kundli" | "navtara">("kundli");
   const { chart: userChart, loading, hasUserChart } = useUserChart();
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "overview") {
+      setPageTab("overview");
+    } else if (tabParam === "chart") {
+      setPageTab("chart");
+    } else if (tabParam === "ripple") {
+      setPageTab("ripple");
+    }
+  }, [searchParams]);
 
   const navtaraIntel = useMemo(() => {
     if (!userChart) return null;
@@ -112,6 +128,31 @@ export default function TransitPage() {
     }
     return { lagnaNum, planets };
   }, [userChart, report, base]);
+
+  // If user selected Ripple 2.0 tab, render TransitRipplePanelV2 directly
+  if (pageTab === "ripple") {
+    return (
+      <main className="tr-wrap">
+        <div className="tr-shell">
+          <section className="tr-hero">
+            <div className="tabs" style={{ marginTop: 8 }}>
+              {(["overview", "chart", "ripple"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={`tab ${pageTab === tab ? "active" : ""}`}
+                  onClick={() => setPageTab(tab)}
+                >
+                  {tab === "overview" ? "Daily Overview" : tab === "chart" ? "Moon/Lagna Chart" : "Interactive Ripple 2.0"}
+                </button>
+              ))}
+            </div>
+          </section>
+          <TransitRipplePanelV2 />
+        </div>
+      </main>
+    );
+  }
 
   if (loading || !hasUserChart || !report) {
     return (
