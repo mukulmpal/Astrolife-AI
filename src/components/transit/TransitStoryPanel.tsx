@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import type { ChapterNarrative } from "@/lib/astro-engine/transit-ripple/types";
+import type { RichChapterNarrative } from "@/lib/astro-engine/transit-ripple/adapter";
 
 export interface TransitStoryPanelProps {
   narrative: ChapterNarrative;
@@ -18,6 +19,11 @@ export function TransitStoryPanel({
   selectedHouse,
   onSelectHouse,
 }: TransitStoryPanelProps) {
+  const [showShastraProof, setShowShastraProof] = useState<boolean>(false);
+
+  // Cast safely to access rich fields
+  const rich = narrative as unknown as RichChapterNarrative;
+
   const {
     chapterTitle,
     dashaGocharFusion,
@@ -25,7 +31,6 @@ export function TransitStoryPanel({
     activeAntardasha,
     isDashaLordActiveInTransit,
     focalHouseNumber,
-    focalHouseName,
     houseImpacts,
     defensiveCautions,
     offensiveOpportunities,
@@ -33,31 +38,39 @@ export function TransitStoryPanel({
     sattvicUpaya,
   } = narrative;
 
-  const {
-    dailyTransitMoon,
-    mahadashaTara,
-    antardashaTara,
-    triangulation,
-  } = navataraIntelligence;
+  const todayPulse = rich.todayPulse;
+  const focalHotspotStory = rich.focalHotspotStory;
+  const domainCautions = rich.domainCautions;
+  const domainActions = rich.domainActions;
+  const shastraProof = rich.shastraProof;
+
+  const { dailyTransitMoon } = navataraIntelligence;
 
   // Filter house impacts if user clicked a specific house
   const displayedImpacts = selectedHouse
     ? houseImpacts.filter((imp) => imp.house === selectedHouse)
     : houseImpacts;
 
+  // Split narrative into paragraphs for clean editorial rendering
+  const storyParagraphs = (dashaGocharFusion || "")
+    .split("\n\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
   return (
     <div className="w-full flex flex-col gap-6 text-[#1A1A1A] font-sans">
-      {/* 1. Header Banner & Language Toggle */}
+      {/* 1. Header Banner, Today's Pulse & Language Toggle */}
       <div
-        className="rounded-2xl p-5 sm:p-7 transition-all"
+        className="rounded-2xl p-5 sm:p-7 transition-all flex flex-col gap-4"
         style={{
           background: "#FFFFFF",
           border: "1px solid rgba(184, 134, 11, 0.28)",
           boxShadow: "0 4px 20px -4px rgba(184, 134, 11, 0.12)",
         }}
       >
+        {/* Top Bar with Language Switcher */}
         <div
-          className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4"
+          className="flex flex-wrap items-center justify-between gap-4 pb-3"
           style={{ borderBottom: "1px solid rgba(184, 134, 11, 0.2)" }}
         >
           <div className="flex items-center gap-2.5">
@@ -67,8 +80,8 @@ export function TransitStoryPanel({
               style={{ color: "#8C6508" }}
             >
               {language === "hinglish"
-                ? "दैनिक गोचर एवं दशा-नवतारा कथा"
-                : "Daily Transit, Dasha & Navatara Chapter"}
+                ? "दैनिक गोचर एवं जीवन मार्गदर्शन"
+                : "Daily Transit & Life Counsel"}
             </span>
           </div>
 
@@ -105,6 +118,39 @@ export function TransitStoryPanel({
           </div>
         </div>
 
+        {/* Triple Clock Visual Indicator Ribbon: Today's Pulse */}
+        {todayPulse && (
+          <div
+            className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl shadow-xs"
+            style={{
+              background: "#FFFDF5",
+              border: "1px solid rgba(184, 134, 11, 0.3)",
+            }}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">🌅</span>
+              <div>
+                <div className="text-xs font-bold text-[#1A1A1A]">
+                  {todayPulse.scanDate} · {todayPulse.taraName} Tara (🌙 {todayPulse.moonNakshatra})
+                </div>
+                <div className="text-[11px] text-[#8C6508] font-semibold mt-0.5">
+                  {todayPulse.headline}
+                </div>
+              </div>
+            </div>
+            <span
+              className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded"
+              style={{
+                background: "#FAF5EB",
+                color: "#8C6508",
+                border: "1px solid rgba(184, 134, 11, 0.25)",
+              }}
+            >
+              {todayPulse.seasonTag}
+            </span>
+          </div>
+        )}
+
         {/* Chapter Title */}
         <h2
           className="font-serif text-xl sm:text-2xl font-bold leading-snug"
@@ -114,7 +160,7 @@ export function TransitStoryPanel({
         </h2>
 
         {/* Active Dasha Chips */}
-        <div className="flex flex-wrap items-center gap-2.5 mt-4">
+        <div className="flex flex-wrap items-center gap-2.5">
           <div
             className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold"
             style={{
@@ -157,9 +203,9 @@ export function TransitStoryPanel({
           )}
         </div>
 
-        {/* Dasha x Gochar Fusion Story */}
+        {/* Dasha x Gochar Fusion Story in Descriptive Paragraphs */}
         <div
-          className="mt-4 p-4 sm:p-5 rounded-xl text-xs sm:text-sm leading-relaxed"
+          className="p-4 sm:p-5 rounded-xl text-xs sm:text-sm leading-relaxed space-y-3"
           style={{
             background: "#FFFDF5",
             border: "1px solid rgba(184, 134, 11, 0.22)",
@@ -167,272 +213,67 @@ export function TransitStoryPanel({
             color: "#3D3834",
           }}
         >
-          <div className="font-semibold text-[#1A1A1A] mb-1">
-            {language === "hinglish" ? "✦ मुख्य पारगमन तालमेल" : "✦ Primary Cosmic Rhythm"}
+          <div className="font-semibold text-[#1A1A1A]">
+            {language === "hinglish"
+              ? "✦ आपका वर्तमान अध्याय (Life Phase Counsel)"
+              : "✦ Your Current Life Chapter"}
           </div>
-          {dashaGocharFusion}
+          {storyParagraphs.map((para, pIdx) => (
+            <p key={pIdx} className="leading-relaxed">
+              {para}
+            </p>
+          ))}
         </div>
       </div>
 
-      {/* 2. Tri-Layer Navatara Intelligence (Mahadasha x Antardasha x Gochara) */}
+      {/* 2. Primary Focal Hotspot (Dynamic & Deeply Explaining the House) */}
       <div
-        className="rounded-2xl p-5 sm:p-6 flex flex-col gap-5 transition-all"
+        className="rounded-2xl p-5 sm:p-6 transition-all"
         style={{
           background: "#FFFFFF",
-          border: "1px solid rgba(184, 134, 11, 0.28)",
+          border: "1px solid rgba(184, 134, 11, 0.32)",
           boxShadow: "0 4px 20px -4px rgba(184, 134, 11, 0.12)",
-        }}
-      >
-        <div
-          className="flex flex-wrap items-center justify-between gap-3 pb-3"
-          style={{ borderBottom: "1px solid rgba(184, 134, 11, 0.2)" }}
-        >
-          <div className="flex items-center gap-2.5">
-            <span className="text-xl">⭐</span>
-            <div>
-              <h3
-                className="font-serif text-base sm:text-lg font-bold"
-                style={{ color: "#1A1A1A" }}
-              >
-                {language === "hinglish"
-                  ? "त्रि-स्तरीय नवतारा विश्लेषण (Tri-Layer Navatara)"
-                  : "Tri-Layer Dasha × Navatara Intelligence"}
-              </h3>
-              <p className="text-xs text-[#6B635B] mt-0.5">
-                {language === "hinglish"
-                  ? `जन्म नक्षत्र (${dailyTransitMoon.birthNakshatra}) से महादशा, अंतर्दशा एवं दैनिक गोचर का समन्वय`
-                  : `Tara evaluation from Birth Star (${dailyTransitMoon.birthNakshatra}) across MD, AD & Transit`}
-              </p>
-            </div>
-          </div>
-          <span
-            className="font-mono text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full"
-            style={{
-              background: "#FAF5EB",
-              color: "#8C6508",
-              border: "1px solid rgba(184, 134, 11, 0.25)",
-            }}
-          >
-            Classical 9-Tara Audit
-          </span>
-        </div>
-
-        {/* 3-Pillar Cards: Mahadasha Lord, Antardasha Lord, Today's Transit Moon */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          {/* Pillar 1: Mahadasha Tara */}
-          <div
-            className="p-4 rounded-xl flex flex-col justify-between"
-            style={{
-              background: "#FAF7F2",
-              border: "1px solid rgba(184, 134, 11, 0.22)",
-            }}
-          >
-            <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1.5 text-[#6B635B]">
-                <span>👑 महादशा तारा</span>
-                <span
-                  className="font-mono text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded"
-                  style={{
-                    background:
-                      mahadashaTara.category === "favourable"
-                        ? "rgba(15, 107, 54, 0.12)"
-                        : mahadashaTara.category === "caution"
-                        ? "rgba(201, 85, 95, 0.12)"
-                        : "rgba(184, 134, 11, 0.12)",
-                    color:
-                      mahadashaTara.category === "favourable"
-                        ? "#0F6B36"
-                        : mahadashaTara.category === "caution"
-                        ? "#9E2A36"
-                        : "#8C6508",
-                    border: `1px solid ${
-                      mahadashaTara.category === "favourable"
-                        ? "rgba(15, 107, 54, 0.25)"
-                        : mahadashaTara.category === "caution"
-                        ? "rgba(201, 85, 95, 0.25)"
-                        : "rgba(184, 134, 11, 0.25)"
-                    }`,
-                  }}
-                >
-                  {mahadashaTara.category}
-                </span>
-              </div>
-              <h4 className="text-sm sm:text-base font-bold text-[#1A1A1A]">
-                {mahadashaTara.lord} · {mahadashaTara.taraName}
-              </h4>
-              <p className="text-xs text-[#5C5248] mt-1">
-                नक्षत्र: {mahadashaTara.nakshatraName} (तारा #{mahadashaTara.taraNumber})
-              </p>
-            </div>
-            <div
-              className="mt-3 text-xs font-bold pt-2 text-[#8C6508]"
-              style={{ borderTop: "1px solid rgba(184, 134, 11, 0.15)" }}
-            >
-              {mahadashaTara.statusTag}
-            </div>
-          </div>
-
-          {/* Pillar 2: Antardasha Tara */}
-          {antardashaTara && (
-            <div
-              className="p-4 rounded-xl flex flex-col justify-between"
-              style={{
-                background: "#FAF7F2",
-                border: "1px solid rgba(184, 134, 11, 0.22)",
-              }}
-            >
-              <div>
-                <div className="flex items-center justify-between text-xs font-semibold mb-1.5 text-[#6B635B]">
-                  <span>⏱️ अंतर्दशा तारा</span>
-                  <span
-                    className="font-mono text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded"
-                    style={{
-                      background:
-                        antardashaTara.category === "favourable"
-                          ? "rgba(15, 107, 54, 0.12)"
-                          : antardashaTara.category === "caution"
-                          ? "rgba(201, 85, 95, 0.12)"
-                          : "rgba(184, 134, 11, 0.12)",
-                      color:
-                        antardashaTara.category === "favourable"
-                          ? "#0F6B36"
-                          : antardashaTara.category === "caution"
-                          ? "#9E2A36"
-                          : "#8C6508",
-                      border: `1px solid ${
-                        antardashaTara.category === "favourable"
-                          ? "rgba(15, 107, 54, 0.25)"
-                          : antardashaTara.category === "caution"
-                          ? "rgba(201, 85, 95, 0.25)"
-                          : "rgba(184, 134, 11, 0.25)"
-                      }`,
-                    }}
-                  >
-                    {antardashaTara.category}
-                  </span>
-                </div>
-                <h4 className="text-sm sm:text-base font-bold text-[#1A1A1A]">
-                  {antardashaTara.lord} · {antardashaTara.taraName}
-                </h4>
-                <p className="text-xs text-[#5C5248] mt-1">
-                  नक्षत्र: {antardashaTara.nakshatraName} (तारा #{antardashaTara.taraNumber})
-                </p>
-              </div>
-              <div
-                className="mt-3 text-xs font-bold pt-2 text-[#8C6508]"
-                style={{ borderTop: "1px solid rgba(184, 134, 11, 0.15)" }}
-              >
-                {antardashaTara.statusTag}
-              </div>
-            </div>
-          )}
-
-          {/* Pillar 3: Daily Transit Moon Tara */}
-          <div
-            className="p-4 rounded-xl flex flex-col justify-between"
-            style={{
-              background: "#FAF5EB",
-              border: "1px solid rgba(184, 134, 11, 0.22)",
-            }}
-          >
-            <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1.5 text-[#6B635B]">
-                <span>🌙 आज का गोचर तारा</span>
-                <span
-                  className="font-mono text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded"
-                  style={{
-                    background:
-                      dailyTransitMoon.category === "favourable"
-                        ? "rgba(15, 107, 54, 0.12)"
-                        : dailyTransitMoon.category === "caution"
-                        ? "rgba(201, 85, 95, 0.12)"
-                        : "rgba(184, 134, 11, 0.12)",
-                    color:
-                      dailyTransitMoon.category === "favourable"
-                        ? "#0F6B36"
-                        : dailyTransitMoon.category === "caution"
-                        ? "#9E2A36"
-                        : "#8C6508",
-                    border: `1px solid ${
-                      dailyTransitMoon.category === "favourable"
-                        ? "rgba(15, 107, 54, 0.25)"
-                        : dailyTransitMoon.category === "caution"
-                        ? "rgba(201, 85, 95, 0.25)"
-                        : "rgba(184, 134, 11, 0.25)"
-                    }`,
-                  }}
-                >
-                  {dailyTransitMoon.category}
-                </span>
-              </div>
-              <h4 className="text-sm sm:text-base font-bold text-[#1A1A1A]">
-                Moon in {dailyTransitMoon.taraName}
-              </h4>
-              <p className="text-xs text-[#5C5248] mt-1">
-                चंद्र नक्षत्र: {dailyTransitMoon.transitingMoonNakshatra}
-              </p>
-            </div>
-            <div
-              className="mt-3 text-xs font-bold pt-2 text-[#8C6508]"
-              style={{ borderTop: "1px solid rgba(184, 134, 11, 0.15)" }}
-            >
-              Tara #{dailyTransitMoon.taraNumber} Frequency
-            </div>
-          </div>
-        </div>
-
-        {/* Triangulation Synthesis Banner */}
-        <div
-          className="p-4 sm:p-5 rounded-xl shadow-xs"
-          style={{
-            background: "#FFFDF5",
-            border: "1px solid rgba(184, 134, 11, 0.3)",
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <span className="text-xl mt-0.5">🔮</span>
-            <div>
-              <h4 className="text-xs sm:text-sm font-bold text-[#1A1A1A]">
-                {triangulation.headline}
-              </h4>
-              <p className="text-xs sm:text-sm mt-1 text-[#3D3834] leading-relaxed">
-                {triangulation.synthesisStory}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Focal Hotspot Highlight */}
-      <div
-        className="rounded-2xl p-4 sm:p-5 shadow-xs transition-all"
-        style={{
-          background: "#FFFDF5",
-          border: "1px solid rgba(184, 134, 11, 0.35)",
         }}
       >
         <div className="flex items-start gap-3">
           <span className="text-2xl mt-0.5">⚡</span>
-          <div>
-            <h4 className="text-sm sm:text-base font-bold text-[#1A1A1A]">
-              {language === "hinglish"
-                ? `सर्वाधिक सक्रिय केंद्र: भाव ${focalHouseNumber} (${focalHouseName})`
-                : `Primary Focal Hotspot: House ${focalHouseNumber} (${focalHouseName})`}
-            </h4>
-            <p className="text-xs sm:text-sm mt-1 text-[#3D3834] leading-relaxed">
-              {language === "hinglish"
-                ? `इस भाव पर ग्रहों की दृष्टियों और गोचर का सर्वाधिक दबाव है। जीवन के इस क्षेत्र में आज व इस सप्ताह अप्रत्याशित निर्णय, वार्ताएं या महत्वपूर्ण घटनाक्रम सामने आ सकते हैं।`
-                : `This house is receiving heavy planetary aspects and transit intersection. Decisions, negotiations, and shifts connected to this domain will carry disproportionate weight.`}
+          <div className="w-full">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+              <h4 className="font-serif text-base sm:text-lg font-bold text-[#1A1A1A]">
+                {focalHotspotStory?.title || `Focal Hotspot: House ${focalHouseNumber}`}
+              </h4>
+              <span
+                className="font-mono text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded"
+                style={{
+                  background: "#FAF5EB",
+                  color: "#8C6508",
+                  border: "1px solid rgba(184, 134, 11, 0.25)",
+                }}
+              >
+                House #{focalHouseNumber}
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-[#3D3834] leading-relaxed">
+              {focalHotspotStory?.paragraph}
             </p>
+            {focalHotspotStory?.whyItMatters && (
+              <div
+                className="mt-2.5 pt-2 text-[11px] sm:text-xs font-medium text-[#8C6508]"
+                style={{ borderTop: "1px solid rgba(184, 134, 11, 0.15)" }}
+              >
+                <strong>✦ {language === "hinglish" ? "यह क्यों महत्वपूर्ण है:" : "Why this matters:"}</strong>{" "}
+                {focalHotspotStory.whyItMatters}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 4. Strategic Guidance: 🛡️ Cautions vs 🚀 Opportunities */}
+      {/* 3. 5-Domain Strategic Guidance: 🛡️ Cautions vs 🚀 Opportunities */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* 🛡️ Defensive Cautions */}
+        {/* 🛡️ Defensive Cautions (Domain-Specific Paragraphs) */}
         <div
-          className="rounded-2xl p-5 sm:p-6 transition-all"
+          className="rounded-2xl p-5 sm:p-6 transition-all flex flex-col gap-3.5"
           style={{
             background: "#FFFFFF",
             border: "1px solid rgba(201, 85, 95, 0.35)",
@@ -440,34 +281,53 @@ export function TransitStoryPanel({
           }}
         >
           <div
-            className="flex items-center gap-2.5 mb-3.5 pb-2.5"
+            className="flex items-center gap-2.5 pb-2.5"
             style={{ borderBottom: "1px solid rgba(201, 85, 95, 0.2)" }}
           >
             <span className="text-xl">🛡️</span>
             <h3 className="font-serif text-base font-bold" style={{ color: "#9E2A36" }}>
               {language === "hinglish"
-                ? "कहाँ संभलना है (Defensive Cautions)"
+                ? "कहाँ संभलना है (Where to Exercise Caution)"
                 : "Where to Exercise Caution"}
             </h3>
           </div>
-          <ul className="space-y-2.5">
-            {defensiveCautions.map((caution, idx) => (
-              <li
-                key={idx}
-                className="flex items-start gap-2.5 text-xs sm:text-sm leading-relaxed text-[#3D3834]"
-              >
-                <span className="font-bold text-base leading-none mt-0.5" style={{ color: "#9E2A36" }}>
-                  •
-                </span>
-                <span>{caution}</span>
-              </li>
-            ))}
-          </ul>
+
+          <div className="space-y-3">
+            {domainCautions && domainCautions.length > 0
+              ? domainCautions.map((dc) => (
+                  <div
+                    key={dc.domain}
+                    className="p-3 rounded-xl text-xs sm:text-sm leading-relaxed"
+                    style={{
+                      background: "#FAF7F2",
+                      border: "1px solid rgba(201, 85, 95, 0.2)",
+                    }}
+                  >
+                    <div className="font-bold text-[#9E2A36] mb-1 flex items-center gap-1.5">
+                      <span>{dc.icon}</span>
+                      <span>{dc.domainName}</span>
+                    </div>
+                    <p className="text-[#3D3834]">{dc.paragraph}</p>
+                  </div>
+                ))
+              : defensiveCautions.map((caution, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl text-xs sm:text-sm leading-relaxed"
+                    style={{
+                      background: "#FAF7F2",
+                      border: "1px solid rgba(201, 85, 95, 0.2)",
+                    }}
+                  >
+                    <p className="text-[#3D3834]">{caution}</p>
+                  </div>
+                ))}
+          </div>
         </div>
 
-        {/* 🚀 Offensive Opportunities */}
+        {/* 🚀 Offensive Opportunities (Domain-Specific Action Steps) */}
         <div
-          className="rounded-2xl p-5 sm:p-6 transition-all"
+          className="rounded-2xl p-5 sm:p-6 transition-all flex flex-col gap-3.5"
           style={{
             background: "#FFFFFF",
             border: "1px solid rgba(15, 107, 54, 0.35)",
@@ -475,7 +335,7 @@ export function TransitStoryPanel({
           }}
         >
           <div
-            className="flex items-center gap-2.5 mb-3.5 pb-2.5"
+            className="flex items-center gap-2.5 pb-2.5"
             style={{ borderBottom: "1px solid rgba(15, 107, 54, 0.2)" }}
           >
             <span className="text-xl">🚀</span>
@@ -485,23 +345,42 @@ export function TransitStoryPanel({
                 : "Where to Take Decisive Action"}
             </h3>
           </div>
-          <ul className="space-y-2.5">
-            {offensiveOpportunities.map((opp, idx) => (
-              <li
-                key={idx}
-                className="flex items-start gap-2.5 text-xs sm:text-sm leading-relaxed text-[#3D3834]"
-              >
-                <span className="font-bold text-base leading-none mt-0.5" style={{ color: "#0F6B36" }}>
-                  •
-                </span>
-                <span>{opp}</span>
-              </li>
-            ))}
-          </ul>
+
+          <div className="space-y-3">
+            {domainActions && domainActions.length > 0
+              ? domainActions.map((da) => (
+                  <div
+                    key={da.domain}
+                    className="p-3 rounded-xl text-xs sm:text-sm leading-relaxed"
+                    style={{
+                      background: "#FAF7F2",
+                      border: "1px solid rgba(15, 107, 54, 0.2)",
+                    }}
+                  >
+                    <div className="font-bold text-[#0F6B36] mb-1 flex items-center gap-1.5">
+                      <span>{da.icon}</span>
+                      <span>{da.domainName}</span>
+                    </div>
+                    <p className="text-[#3D3834]">{da.paragraph}</p>
+                  </div>
+                ))
+              : offensiveOpportunities.map((opp, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl text-xs sm:text-sm leading-relaxed"
+                    style={{
+                      background: "#FAF7F2",
+                      border: "1px solid rgba(15, 107, 54, 0.2)",
+                    }}
+                  >
+                    <p className="text-[#3D3834]">{opp}</p>
+                  </div>
+                ))}
+          </div>
         </div>
       </div>
 
-      {/* 5. House-by-House Impacts */}
+      {/* 4. House-by-House Impacts */}
       <div
         className="rounded-2xl p-5 sm:p-6 transition-all"
         style={{
@@ -521,7 +400,7 @@ export function TransitStoryPanel({
               style={{ color: "#1A1A1A" }}
             >
               {language === "hinglish"
-                ? "प्रभावित भावों का विश्लेषण (House Impacts)"
+                ? "प्रभावित भावों का विश्लेषण (Activated Houses)"
                 : "Activated Houses Breakdown"}
             </h3>
           </div>
@@ -593,7 +472,7 @@ export function TransitStoryPanel({
         </div>
       </div>
 
-      {/* 6. Sattvic Upaya (Lifestyle Karma Alignment) */}
+      {/* 5. Planet × House Specific Sattvic Upaya */}
       <div
         className="rounded-2xl p-5 sm:p-6 transition-all"
         style={{
@@ -631,6 +510,80 @@ export function TransitStoryPanel({
             </div>
           ))}
         </div>
+      </div>
+
+      {/* 6. Technical Transparency: Shastra Proof Accordion (Behind the Scenes Calculations) */}
+      {shastraProof && (
+        <div
+          className="rounded-2xl p-4 sm:p-5 transition-all"
+          style={{
+            background: "#FAF7F2",
+            border: "1px solid rgba(184, 134, 11, 0.25)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setShowShastraProof(!showShastraProof)}
+            className="w-full flex items-center justify-between text-xs font-bold transition-all text-[#8C6508]"
+          >
+            <span className="flex items-center gap-2">
+              <span>👁️</span>
+              <span>
+                {language === "hinglish"
+                  ? "शास्त्रीय गणना एवं प्रामाणिकता (Shastra Proof & Calculation)"
+                  : "Vedic Mathematical Proof & Calculation Trail"}
+              </span>
+            </span>
+            <span className="text-sm font-mono">{showShastraProof ? "▲ Hide" : "▼ Expand"}</span>
+          </button>
+
+          {showShastraProof && (
+            <div
+              className="mt-3.5 pt-3 space-y-2 text-xs font-mono text-[#5C5248]"
+              style={{ borderTop: "1px solid rgba(184, 134, 11, 0.15)" }}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <span>Direct Epicenter:</span>
+                <span className="font-bold text-[#1A1A1A]">
+                  {shastraProof.epicenter.planet} in House {shastraProof.epicenter.house} (
+                  {shastraProof.epicenter.signName} at {shastraProof.epicenter.degrees.toFixed(2)}°)
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <span>Active Dasha Cycle:</span>
+                <span className="font-bold text-[#1A1A1A]">
+                  Mahadasha {shastraProof.activeMahadasha} × Antardasha {shastraProof.activeAntardasha}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <span>Aspect Target Vectors:</span>
+                <span className="font-bold text-[#1A1A1A]">
+                  {shastraProof.aspectRays.map((r) => `H${r.targetHouse} (${r.rule})`).join(", ")}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <span>Navatara Vector:</span>
+                <span className="font-bold text-[#1A1A1A]">
+                  {shastraProof.navataraCalculation}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 7. Responsible Life Guidance Disclaimer */}
+      <div
+        className="rounded-xl p-3.5 text-[11px] text-[#6B635B] leading-relaxed text-center"
+        style={{
+          background: "#FAF5EB",
+          border: "1px solid rgba(184, 134, 11, 0.2)",
+        }}
+      >
+        ✦{" "}
+        {language === "hinglish"
+          ? "यह विश्लेषण आपकी जन्म कुंडली और वर्तमान ग्रह-स्थितियों पर आधारित मानसिक और आचरण-संबंधी मार्गदर्शन है। यह कोई निश्चित भविष्यवाणी नहीं है। जीवन के अहम फैसले हमेशा अपने विवेक और वास्तविक परिस्थितियों के अनुसार लें।"
+          : "This briefing provides reflective behavioral and strategic guidance based on your natal chart and planetary positions. It is not deterministic fortune-telling. Exercise grounded personal discernment in all major life decisions."}
       </div>
     </div>
   );
