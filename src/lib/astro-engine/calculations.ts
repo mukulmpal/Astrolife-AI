@@ -151,13 +151,16 @@ function assertValidDateParts(date: string): [number, number, number] {
   return [y, m, d];
 }
 
-function assertValidTimeParts(time: string): [number, number] {
-  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) {
-    throw new Error("Birth time must use HH:mm 24-hour format.");
+function assertValidTimeParts(time: string): [number, number, number] {
+  if (!/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(time)) {
+    throw new Error("Birth time must use HH:mm or HH:mm:ss 24-hour format.");
   }
 
-  const [h, mn] = time.split(":").map(Number);
-  return [h, mn];
+  const parts = time.split(":").map(Number);
+  const h = parts[0];
+  const mn = parts[1];
+  const sec = parts[2] ?? 0;
+  return [h, mn, sec];
 }
 
 function assertFiniteRange(value: number, label: string, min: number, max: number): number {
@@ -169,9 +172,9 @@ function assertFiniteRange(value: number, label: string, min: number, max: numbe
 
 export function getJD(date: string, time: string, tz: number): number {
   const [y, m, d] = assertValidDateParts(date);
-  const [h, mn] = assertValidTimeParts(time);
+  const [h, mn, sec] = assertValidTimeParts(time);
   assertFiniteRange(tz, "Timezone", -12, 14);
-  const utH = h + mn / 60 - tz;
+  const utH = h + mn / 60 + sec / 3600 - tz;
   const a = Math.floor((14 - m) / 12);
   const yr = y + 4800 - a;
   const mo = m + 12 * a - 3;

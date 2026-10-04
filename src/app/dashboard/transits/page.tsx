@@ -226,7 +226,7 @@ export default function TransitPage() {
                 className={`tab ${pageTab === tab ? "active" : ""}`}
                 onClick={() => setPageTab(tab)}
               >
-                {tab === "overview" ? "Daily Overview" : tab === "chart" ? "Moon/Lagna Chart" : "Monthly Ripple"}
+                {tab === "overview" ? "Daily Overview" : tab === "chart" ? "Moon/Lagna Chart" : "Interactive Ripple 2.0"}
               </button>
             ))}
           </div>

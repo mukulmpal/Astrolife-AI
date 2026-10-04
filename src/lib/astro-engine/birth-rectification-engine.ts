@@ -1258,10 +1258,14 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
     const dateStr = curDate.toISOString().slice(0, 10);
 
     // Iterate across candidate times
-    for (let m = startMinOfDay; m <= endMinOfDay; m += step) {
-      const h = Math.floor(m / 60);
-      const min = m % 60;
-      const timeStr = `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+    for (let m = startMinOfDay; m <= endMinOfDay + 0.0001; m += step) {
+      const totalSeconds = Math.round(m * 60);
+      const h = Math.floor(totalSeconds / 3600);
+      const min = Math.floor((totalSeconds % 3600) / 60);
+      const sec = totalSeconds % 60;
+      const timeStr = sec > 0
+        ? `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`
+        : `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
 
       try {
         const chart = calculateChart(

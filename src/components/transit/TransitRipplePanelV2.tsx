@@ -1,962 +1,409 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { CSSProperties } from "react";
-import { useUserChart } from "@/lib/user-chart";
-import {
-  buildMonthlyTransitRipplePayloadFromChart,
-  type MonthlyTransitRipplePayloadResult,
-} from "@/lib/astro-engine/transit-ripple-v4";
-import { NAKSHATRA_KNOWLEDGE } from "@/lib/astro-engine/transit-knowledge-base";
+import React, { useMemo, useState } from "react";
+import { useUserChart, type ChartData } from "@/lib/user-chart";
+import { generateTransitRippleReport } from "@/lib/astro-engine/transit-ripple";
+import type {
+  NatalInput,
+  TransitPlanet,
+  TransitRippleResult,
+} from "@/lib/astro-engine/transit-ripple/types";
+import { RippleRadar } from "./RippleRadar";
+import { TransitStoryPanel } from "./TransitStoryPanel";
 
-type TabType = "planets" | "lifeAreas";
-
-type TransitRippleReport = {
-  planetTimelines?: Array<{
-    planet: string;
-    score: number;
-    dashaActive: boolean;
-    role: string;
-    action: string;
-    current: string;
-    ending: string;
-    signChanged: boolean;
-    nakshatraChanged: boolean;
-    narrative: string;
-    windows: Array<{
-      startDate: string;
-      endDate: string;
-      days: number;
-      sign: string;
-      nakshatra: string;
-      speed: string;
-      houseFromAscendant: number;
-      houseFromMoon: number;
-    }>;
-  }>;
-  topActivationHouses?: Array<{
-    house: number;
-    score: number;
-    area: string;
-  }>;
-  transitHits?: Array<{
-    date: string;
-    transitPlanet: string;
-    natalName: string;
-    natalKind: string;
-    natalHouse: number;
-    aspect: string;
-    orb: number;
-    score: number;
-    meaning: string;
-  }>;
-  eventScores?: Array<{
-    key: string;
-    label: string;
-    score: number;
-    status: string;
-    reason: string;
-  }>;
-  peakWindows?: Array<{
-    category: string;
-    peakDate: string;
-    score: number;
-    reason: string;
-    prediction: string;
-  }>;
+const DEFAULT_NATAL_INPUT: NatalInput = {
+  birthDate: "1990-08-15",
+  birthTime: "14:30",
+  timezone: "+05:30",
+  latitude: 28.6139,
+  longitude: 77.209,
+  lagnaSign: 7, // Scorpio (Vrishchika)
+  lagnaSignName: "Scorpio",
+  moonLongitude: 220.4,
+  moonNakshatra: 16, // Anuradha
+  activeMahadasha: "Jupiter",
+  activeAntardasha: "Saturn",
 };
 
-const PLANET_COLORS: Record<string, string> = {
-  Sun: "#f97316",
-  Moon: "#94a3b8",
-  Mars: "#ef4444",
-  Mercury: "#06b6d4",
-  Jupiter: "#eab308",
-  Venus: "#ec4899",
-  Saturn: "#8b5cf6",
-  Rahu: "#a855f7",
-  Ketu: "#64748b",
-};
+function formatIsoDate(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
-const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-
-type PlanetTimelineList = NonNullable<TransitRippleReport["planetTimelines"]>;
-
-function TransitRippleChart({ planetList }: { planetList: PlanetTimelineList }) {
-  const allWindows = planetList.flatMap((planet) =>
-    planet.windows.map((window) => ({
-      planet: planet.planet,
-      planetScore: planet.score,
-      ...window,
-    }))
-  );
-
-  if (allWindows.length === 0) {
-    return (
-      <section style={card}>
-        <p style={sectionLabel}>Monthly Ripple Map</p>
-        <h2 style={h2}>Transit Flow</h2>
-        <p style={paragraph}>No transit windows available yet.</p>
-      </section>
-    );
+export function chartToNatal(chart: ChartData | null): NatalInput {
+  if (!chart || !chart.planets?.Moon) {
+    return DEFAULT_NATAL_INPUT;
   }
 
-  const dayMs = 24 * 60 * 60 * 1000;
-  const minTime = Math.min(...allWindows.map((window) => new Date(window.startDate).getTime()));
-  const maxTime = Math.max(...allWindows.map((window) => new Date(window.endDate).getTime()));
-  const spanDays = Math.max(1, Math.ceil((maxTime - minTime) / dayMs));
-  const chartWidth = Math.max(760, spanDays * 26);
-  const rowHeight = 56;
-  const topPad = 42;
-  const leftPad = 92;
-  const rightPad = 34;
-  const bottomPad = 38;
-  const chartHeight = topPad + planetList.length * rowHeight + bottomPad;
-  const plotWidth = chartWidth - leftPad - rightPad;
-  const xForTime = (time: number) => leftPad + ((time - minTime) / Math.max(dayMs, maxTime - minTime)) * plotWidth;
-  const weekTicks = Array.from({ length: Math.ceil(spanDays / 7) + 1 }, (_, index) => {
-    const time = minTime + index * 7 * dayMs;
-    return { time: Math.min(time, maxTime), label: new Date(Math.min(time, maxTime)).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) };
-  });
+  const lagnaSign = typeof chart.lagnaNum === "number" ? chart.lagnaNum : 0;
+  const moonLon = chart.planets.Moon.lon ?? 0;
+  const nakIdx = Math.floor(moonLon / (360 / 27)) % 27;
 
-  return (
-    <section style={card}>
-      <p style={sectionLabel}>Monthly Ripple Map</p>
-      <h2 style={h2}>All Planet Transits in One Month</h2>
-      <p style={{ ...paragraph, marginBottom: 14 }}>
-        Each row is one planet. Larger pulses mean stronger monthly influence. Hover any pulse to see sign, nakshatra, houses and date window.
-      </p>
-      <div style={{ overflowX: "auto", borderRadius: 18, border: "1px solid rgba(184,134,11,0.2)", background: "#FAF7F2" }}>
-        <svg width={chartWidth} height={chartHeight} role="img" aria-label="Monthly transit ripple chart">
-          <defs>
-            <filter id="rippleGlow" x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="3.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          {weekTicks.map((tick, index) => {
-            const x = xForTime(tick.time);
-            return (
-              <g key={`${tick.label}-${index}`}>
-                <line x1={x} y1={topPad - 16} x2={x} y2={chartHeight - bottomPad + 4} stroke="rgba(184,134,11,0.15)" />
-                <text x={x} y={24} textAnchor="middle" fill="#6B635B" fontSize="11">{tick.label}</text>
-              </g>
-            );
-          })}
-          {planetList.map((planet, rowIndex) => {
-            const y = topPad + rowIndex * rowHeight + rowHeight / 2;
-            const color = PLANET_COLORS[planet.planet] || "#94a3b8";
-            return (
-              <g key={planet.planet}>
-                <text x={20} y={y + 4} fill={color} fontSize="13" fontWeight="700">{planet.planet}</text>
-                <line x1={leftPad} y1={y} x2={chartWidth - rightPad} y2={y} stroke="rgba(184,134,11,0.15)" />
-                {planet.windows.map((window, index) => {
-                  const start = new Date(window.startDate).getTime();
-                  const end = new Date(window.endDate).getTime();
-                  const cx = xForTime(start + (end - start) / 2);
-                  const segmentWidth = Math.max(18, Math.abs(xForTime(end) - xForTime(start)));
-                  const radius = Math.max(7, Math.min(17, 6 + planet.score / 8));
-                  return (
-                    <g key={`${planet.planet}-${window.startDate}-${index}`}>
-                      <line
-                        x1={Math.max(leftPad, cx - segmentWidth / 2)}
-                        x2={Math.min(chartWidth - rightPad, cx + segmentWidth / 2)}
-                        y1={y}
-                        y2={y}
-                        stroke={color}
-                        strokeWidth="5"
-                        strokeLinecap="round"
-                        opacity="0.28"
-                      />
-                      <circle cx={cx} cy={y} r={radius + 8} fill="none" stroke={color} opacity="0.14" />
-                      <circle cx={cx} cy={y} r={radius} fill={color} opacity="0.82" filter="url(#rippleGlow)">
-                        <title>{`${planet.planet}: ${window.startDate} to ${window.endDate} · ${window.sign}/${window.nakshatra} · Asc H${window.houseFromAscendant}, Moon H${window.houseFromMoon} · ${planet.score}/100`}</title>
-                      </circle>
-                    </g>
-                  );
-                })}
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-      <div style={{ ...legendGrid, marginTop: 14 }}>
-        <div style={legendItem}><span style={{ ...legendDot, background: "#f97316" }} />Large pulse: strongest planet influence</div>
-        <div style={legendItem}><span style={{ ...legendDot, background: "#94a3b8" }} />Line length: transit stay in sign/nakshatra window</div>
-        <div style={legendItem}><span style={{ ...legendDot, background: "#B8860B" }} />Use planet tab for detailed proof</div>
-      </div>
-    </section>
-  );
+  const nowMs = Date.now();
+  let activeMD = "Jupiter";
+  if (Array.isArray(chart.dashas)) {
+    const md = chart.dashas.find((d) => {
+      const s = new Date(d.start).getTime();
+      const e = new Date(d.end).getTime();
+      return nowMs >= s && nowMs <= e;
+    });
+    if (md) activeMD = md.planet;
+  }
+
+  let activeAD = "Saturn";
+  if (Array.isArray(chart.antardasha)) {
+    const ad = chart.antardasha.find((a) => {
+      const s = new Date(a.start).getTime();
+      const e = new Date(a.end).getTime();
+      return nowMs >= s && nowMs <= e;
+    });
+    if (ad) activeAD = ad.planet;
+  }
+
+  return {
+    birthDate: chart.dob || "1990-08-15",
+    birthTime: chart.tob || "14:30",
+    timezone:
+      typeof chart.tz === "number"
+        ? chart.tz >= 0
+          ? `+${chart.tz}`
+          : `${chart.tz}`
+        : "+05:30",
+    latitude: chart.lat || 28.6139,
+    longitude: chart.lon || 77.209,
+    lagnaSign,
+    lagnaSignName: chart.lagnaRashi || undefined,
+    moonLongitude: moonLon,
+    moonNakshatra: nakIdx,
+    activeMahadasha: activeMD,
+    activeAntardasha: activeAD,
+  };
 }
 
 export function TransitRipplePanelV2() {
-  const { chart, loading: chartLoading, hasUserChart } = useUserChart();
-  const [loading, setLoading] = useState(false);
-  const [report, setReport] = useState<TransitRippleReport | null>(null);
-  const [error, setError] = useState("");
-  const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>("planets");
+  const { chart, hasUserChart, loading: chartLoading } = useUserChart();
 
-  const payloadResult = useMemo<MonthlyTransitRipplePayloadResult | null>(() => {
-    if (!hasUserChart || !chart) return null;
-    try {
-      return buildMonthlyTransitRipplePayloadFromChart(chart, 30);
-    } catch {
-      return null;
-    }
-  }, [chart, hasUserChart]);
+  // Navigation & selection state
+  const [activeTab, setActiveTab] = useState<"radar" | "story" | "timeline">("radar");
+  const [selectedPlanet, setSelectedPlanet] = useState<TransitPlanet>("Saturn");
+  const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
+  const [language, setLanguage] = useState<"hinglish" | "english">("hinglish");
+  const [scanDate, setScanDate] = useState<string>(() => formatIsoDate(new Date()));
 
-  const payloadMeta = payloadResult?.meta ?? null;
+  // Convert chart to natal input
+  const natalInput = useMemo<NatalInput>(() => {
+    return chartToNatal(chart);
+  }, [chart]);
 
-  async function generateTransit() {
-    if (!payloadResult) {
-      setError("Save or load your birth chart first.");
-      return;
-    }
+  // Instant zero-waiting-time Transit Ripple calculation
+  const report = useMemo<TransitRippleResult>(() => {
+    return generateTransitRippleReport(
+      natalInput,
+      scanDate,
+      language,
+      selectedPlanet,
+      "5_7_9"
+    );
+  }, [natalInput, scanDate, language, selectedPlanet]);
 
-    setLoading(true);
-    setError("");
-    setReport(null);
-    setSelectedPlanet(null);
+  // Quick date jump helpers
+  const handleJumpDays = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    setScanDate(formatIsoDate(d));
+  };
 
-    try {
-      const res = await fetch("/api/astro/transit-ripple", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payloadResult.payload),
-      });
-
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || "API failed");
-      setReport(data.report);
-      const firstPlanet = data.report.planetTimelines?.[0]?.planet;
-      setSelectedPlanet(firstPlanet || null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const activePlanet = report?.planetTimelines?.find(p => p.planet === selectedPlanet);
-  const planetList = report?.planetTimelines?.sort((a, b) => PLANET_ORDER.indexOf(a.planet) - PLANET_ORDER.indexOf(b.planet)) || [];
-
-  const upcomingPatterns = activePlanet?.windows.slice(0, 3) || [];
-  const activatedHouses = activePlanet?.windows.map(w => w.houseFromAscendant) || [];
-  const uniqueHouses = Array.from(new Set(activatedHouses)).sort((a, b) => a - b);
-
-  const relevantHits = report?.transitHits?.filter(h => h.transitPlanet === selectedPlanet).slice(0, 8) || [];
-  const relevantEvents = report?.eventScores?.filter(() =>
-    report.transitHits?.some(h => h.transitPlanet === selectedPlanet)
-  ).slice(0, 5) || [];
-
-  // === EXTRACT NAKSHATRAS ===
-  const nakshatraData = useMemo(() => {
-    const naksMap: Record<string, { lord: string; essence: string; gift: string; shadow: string; remedyTone: string; planets: string[]; score: number }> = {};
-
-    report?.planetTimelines?.forEach(timeline => {
-      timeline.windows.forEach(window => {
-        if (!naksMap[window.nakshatra]) {
-          const kb = NAKSHATRA_KNOWLEDGE[window.nakshatra];
-          naksMap[window.nakshatra] = {
-            lord: kb?.lord || "Unknown",
-            essence: kb?.essence || "",
-            gift: kb?.gift || "",
-            shadow: kb?.shadow || "",
-            remedyTone: kb?.remedyTone || "",
-            planets: [],
-            score: 0,
-          };
-        }
-        if (!naksMap[window.nakshatra].planets.includes(timeline.planet)) {
-          naksMap[window.nakshatra].planets.push(timeline.planet);
-        }
-      });
-    });
-
-    // Calculate scores for each nakshatra
-    report?.transitHits?.forEach(hit => {
-      const nakshatraKey = Object.keys(naksMap).find(nak => naksMap[nak].planets.includes(hit.transitPlanet));
-      if (nakshatraKey) {
-        naksMap[nakshatraKey].score += hit.score * 0.15;
-      }
-    });
-
-    return Object.entries(naksMap).map(([name, data]) => ({
-      name,
-      ...data,
-      score: Math.min(100, Math.round(data.score + (data.planets.length * 8))),
-    })).sort((a, b) => b.score - a.score);
-  }, [report]);
+  const isToday = scanDate === formatIsoDate(new Date());
 
   return (
-    <section style={pageShell}>
-      <div style={heroCard}>
-        <p style={eyebrow}>AstroLife Transit Engine</p>
-        <h1 style={title}>Transit Ripple — World Class</h1>
-        <p style={subtitle}>
-          Monthly scan of 9 planets. De-duplicated closest natal hits. Differentiated life areas. Per-planet formal view with upcoming patterns shown first.
-        </p>
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10 flex flex-col gap-6 font-sans">
+      {/* 1. Page Header & Live Status */}
+      <header className="bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFE3] dark:from-[#181614] dark:via-[#141211] dark:to-[#0F0E0D] border border-[#B8860B]/30 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#B8860B]/15 pb-4 mb-4">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🌟</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-3xl font-serif font-bold text-[#2D241E] dark:text-[#F7F2E8] tracking-tight">
+                  Interactive Transit Ripple
+                </h1>
+                <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                  v2.0 Active
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-[#70645B] dark:text-[#ABA396] mt-0.5">
+                {language === "hinglish"
+                  ? "पाराशरी दृष्टि ओवरलैप × विंशोत्तरी दशा का मौसम × आज का नवतारा"
+                  : "Parashari Aspect Resonance × Mahadasha × Antardasha × Daily Navatara"}
+              </p>
+            </div>
+          </div>
 
-        <div style={contextPanel}>
-          <Stat label="Chart" value={payloadMeta?.chartName ?? (chartLoading ? "Loading..." : "Not connected")} />
-          <Stat label="Window" value={payloadResult ? `${payloadResult.payload.startDate} to ${payloadResult.payload.endDate}` : "Waiting"} />
-          <Stat label="Planets" value={payloadMeta ? String(payloadMeta.planetsScanned.length) : "—"} />
+          {/* Quick Date Jumper & Date Picker */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleJumpDays(0)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                isToday
+                  ? "bg-amber-600 text-white border-amber-600 shadow-sm"
+                  : "bg-white/80 dark:bg-[#201D1A] text-[#6B635B] dark:text-[#A8A29E] border-[#B8860B]/20 hover:border-[#B8860B]/40"
+              }`}
+            >
+              Today (आज)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleJumpDays(7)}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/80 dark:bg-[#201D1A] text-[#6B635B] dark:text-[#A8A29E] border border-[#B8860B]/20 hover:border-[#B8860B]/40 transition-all"
+            >
+              +7 Days
+            </button>
+            <button
+              type="button"
+              onClick={() => handleJumpDays(30)}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/80 dark:bg-[#201D1A] text-[#6B635B] dark:text-[#A8A29E] border border-[#B8860B]/20 hover:border-[#B8860B]/40 transition-all"
+            >
+              +30 Days
+            </button>
+            <input
+              type="date"
+              value={scanDate}
+              onChange={(e) => e.target.value && setScanDate(e.target.value)}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/90 dark:bg-[#201D1A] text-[#2D241E] dark:text-[#F3EDE2] border border-[#B8860B]/30 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+          </div>
         </div>
+
+        {/* Chart Context Pill Row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#5C4F46] dark:text-[#BDB6AA]">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center gap-1.5 bg-[#FAF7F2] dark:bg-[#1E1C1A] px-3 py-1 rounded-xl border border-[#B8860B]/20">
+              <span className="text-amber-600 font-bold">👤 Chart:</span>
+              <strong className="text-[#2D241E] dark:text-[#F3EDE2]">
+                {chart?.name || (hasUserChart ? "User Birth Chart" : "Demo Chart (Delhi)")}
+              </strong>
+            </span>
+            <span className="flex items-center gap-1.5 bg-[#FAF7F2] dark:bg-[#1E1C1A] px-3 py-1 rounded-xl border border-[#B8860B]/20">
+              <span className="text-amber-600 font-bold">🏛️ Lagna:</span>
+              <strong>{natalInput.lagnaSignName || `Sign ${natalInput.lagnaSign}`}</strong>
+            </span>
+            <span className="flex items-center gap-1.5 bg-[#FAF7F2] dark:bg-[#1E1C1A] px-3 py-1 rounded-xl border border-[#B8860B]/20">
+              <span className="text-amber-600 font-bold">⭐ Janma Tara:</span>
+              <strong>Nakshatra #{natalInput.moonNakshatra + 1}</strong>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+              Instant Auto-Calculated (0ms wait)
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. Mobile-Friendly 3-Tab Navigator */}
+      <div className="flex items-center justify-center sm:justify-start gap-2 bg-[#F3ECE0] dark:bg-[#1A1816] p-1.5 rounded-2xl border border-[#B8860B]/25">
+        <button
+          type="button"
+          onClick={() => setActiveTab("radar")}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === "radar"
+              ? "bg-amber-600 text-white shadow-md"
+              : "text-[#6B635B] dark:text-[#A8A29E] hover:text-[#2D241E] hover:bg-white/40"
+          }`}
+        >
+          <span>🧭</span>
+          <span>{language === "hinglish" ? "रडार (Kundli Radar)" : "Ripple Radar"}</span>
+        </button>
 
         <button
           type="button"
-          onClick={generateTransit}
-          disabled={loading || chartLoading || !payloadResult}
-          style={{
-            ...button,
-            opacity: loading || chartLoading || !payloadResult ? 0.65 : 1,
-            cursor: loading || chartLoading || !payloadResult ? "not-allowed" : "pointer",
-          }}
+          onClick={() => setActiveTab("story")}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === "story"
+              ? "bg-amber-600 text-white shadow-md"
+              : "text-[#6B635B] dark:text-[#A8A29E] hover:text-[#2D241E] hover:bg-white/40"
+          }`}
         >
-          {loading ? "Generating..." : "Generate Transit Report"}
+          <span>📜</span>
+          <span>{language === "hinglish" ? "कथा व मार्गदर्शन (Story & Guidance)" : "Story & Guidance"}</span>
         </button>
 
-        {error && <pre style={errorBox}>{error}</pre>}
+        <button
+          type="button"
+          onClick={() => setActiveTab("timeline")}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === "timeline"
+              ? "bg-amber-600 text-white shadow-md"
+              : "text-[#6B635B] dark:text-[#A8A29E] hover:text-[#2D241E] hover:bg-white/40"
+          }`}
+        >
+          <span>📅</span>
+          <span>30d Timeline</span>
+        </button>
       </div>
 
-      {report && planetList.length > 0 ? (
-        <div style={contentGrid}>
-          {/* === TOP-LEVEL TABS === */}
-          <section style={card}>
-            <div style={tabsContainer}>
-              {(["planets", "lifeAreas"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  style={tabButton(activeTab === tab)}
-                >
-                  <span style={{ fontSize: 15, fontWeight: 700, textTransform: "capitalize" }}>
-                    {tab === "planets" ? "Planet Transits" : "Life Areas"}
-                  </span>
-                </button>
-              ))}
+      {/* 3. Main Views */}
+      {/* Mode A: Radar Tab (Desktop shows Radar + Story in responsive grid, Mobile shows pure Radar) */}
+      {activeTab === "radar" && (
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="lg:col-span-6 w-full flex flex-col gap-4">
+            <RippleRadar
+              lagnaSign={natalInput.lagnaSign}
+              lagnaSignName={natalInput.lagnaSignName}
+              transitPositions={report.transitPositions}
+              selectedPlanet={selectedPlanet}
+              onSelectPlanet={(p) => setSelectedPlanet(p)}
+              selectedHouse={selectedHouse}
+              onSelectHouse={(h) => setSelectedHouse(h)}
+              houseClusters={report.houseClusters}
+              hotspotHouses={report.hotspotHouses}
+              drishtiHitsForSelected={report.selectedPlanetRipples.drishtiHits}
+              language={language}
+            />
+
+            {/* Quick Summary card underneath Radar */}
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-xs text-[#5C4F46] dark:text-[#D5CDBF] leading-relaxed">
+              <strong className="text-amber-900 dark:text-amber-300">
+                {language === "hinglish" ? "💡 रडार टिप:" : "💡 Radar Tip:"}
+              </strong>{" "}
+              {language === "hinglish"
+                ? `ऊपर किसी भी ग्रह (जैसे शनि 🪐 या गुरु 🌟) पर क्लिक करके उसकी दृष्टि रेखाएं (Drishti Rays) देखें। रेखाएं जिस भाव पर आपस में टकराती हैं, वह भाव '⚡ हॉटस्पॉट' बन जाता है।`
+                : `Tap any planet button above to inspect its cosmic aspect rays. Houses where 2 or more rays intersect turn into active '⚡ Hotspots' requiring focused awareness.`}
             </div>
-          </section>
+          </div>
 
-          {/* === PLANETS TAB === */}
-          {activeTab === "planets" && (
-            <>
-              <TransitRippleChart planetList={planetList} />
-
-              <section style={card}>
-                <p style={sectionLabel}>Planet Timelines</p>
-                <h2 style={h2}>Select a Planet to Explore</h2>
-                <div style={planetTabs}>
-                  {planetList.map((planet) => (
-                    <button
-                      key={planet.planet}
-                      onClick={() => setSelectedPlanet(planet.planet)}
-                      style={{
-                        ...planetTabButton(planet.planet === selectedPlanet, PLANET_COLORS[planet.planet]),
-                      }}
-                    >
-                      <div style={{ fontSize: 14, fontWeight: 700 }}>{planet.planet}</div>
-                      <div style={{ fontSize: 12, color: "#6B635B" }}>
-                        {planet.score} · {scoreLabel(planet.score)}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <div style={legendBox}>
-                  <p style={legendLabel}>Score Scale</p>
-                  <div style={legendGrid}>
-                    <div style={legendItem}><span style={{ ...legendDot, background: "#f97316" }} />Peak (80–100)</div>
-                    <div style={legendItem}><span style={{ ...legendDot, background: "#B8860B" }} />Strong (65–79)</div>
-                    <div style={legendItem}><span style={{ ...legendDot, background: "#a78bfa" }} />Moderate (45–64)</div>
-                    <div style={legendItem}><span style={{ ...legendDot, background: "#94a3b8" }} />Supportive (25–44)</div>
-                    <div style={legendItem}><span style={{ ...legendDot, background: "#64748b" }} />Background (&lt;25)</div>
-                  </div>
-                </div>
-              </section>
-
-              {/* === PER-PLANET FORMAL VIEW === */}
-              {activePlanet && (
-                <>
-                  {/* Header */}
-                  <section style={card}>
-                    <p style={sectionLabel}>Current Transit</p>
-                    <h2 style={h2}>{activePlanet.planet}</h2>
-                    <div style={statGrid}>
-                      <Stat label="Score" value={`${activePlanet.score}/100 · ${scoreLabel(activePlanet.score)}`} />
-                      <Stat label="Status" value={activePlanet.dashaActive ? "🔥 Dasha Active" : "Neutral Period"} />
-                      <Stat label="Position" value={`${activePlanet.current}`} />
-                      <Stat label="Ending" value={`${activePlanet.ending}`} />
-                      <Stat label="Sign Change" value={activePlanet.signChanged ? "Yes" : "No"} />
-                      <Stat label="Nakshatra Change" value={activePlanet.nakshatraChanged ? "Yes" : "No"} />
-                    </div>
-                  </section>
-
-              {/* Role & Action */}
-              <section style={card}>
-                <p style={sectionLabel}>Planet Nature</p>
-                <h2 style={h2}>Role & Action</h2>
-                <div style={stack}>
-                  <div style={infoBox}>
-                    <strong style={{ color: PLANET_COLORS[activePlanet.planet] }}>Role</strong>
-                    <p style={paragraph}>{activePlanet.role}</p>
-                  </div>
-                  <div style={infoBox}>
-                    <strong style={{ color: PLANET_COLORS[activePlanet.planet] }}>Best Response</strong>
-                    <p style={paragraph}>{activePlanet.action}</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* Dasha Status */}
-              {activePlanet.dashaActive && (
-                <section style={card}>
-                  <p style={sectionLabel}>Active Period</p>
-                  <h2 style={h2}>Dasha-Active Status</h2>
-                  <div style={infoBox}>
-                    <p style={paragraph}>
-                      <strong style={{ color: "#B8860B" }}>⚠️ This planet is tied to the current Mahadasha or Antardasha.</strong> Its transit becomes LOUDER and more visible. Watch for concrete results and real-world manifestations. This is not background noise—this is active karma working.
-                    </p>
-                  </div>
-                </section>
-              )}
-
-              {/* Upcoming 3 Patterns (Latest First) */}
-              <section style={card}>
-                <p style={sectionLabel}>Upcoming Patterns</p>
-                <h2 style={h2}>Next 3 Windows</h2>
-                <div style={stack}>
-                  {upcomingPatterns.map((window, idx) => (
-                    <div key={`${window.startDate}-${idx}`} style={windowCard}>
-                      <div style={rowBetween}>
-                        <strong>{window.startDate} to {window.endDate}</strong>
-                        <span style={pill}>{window.days} days</span>
-                      </div>
-                      <p style={muted}>{window.sign} / {window.nakshatra} — {window.speed}</p>
-                      <p style={smallCaps}>House {window.houseFromAscendant} (Asc) · House {window.houseFromMoon} (Moon)</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* Houses Activated */}
-              {uniqueHouses.length > 0 && (
-                <section style={card}>
-                  <p style={sectionLabel}>Houses Activated</p>
-                  <h2 style={h2}>Field of Effect</h2>
-                  <div style={houseGrid}>
-                    {uniqueHouses.map((house) => {
-                      const houseNames: Record<number, string> = {
-                        1: "Self", 2: "Wealth", 3: "Courage", 4: "Home", 5: "Creativity", 6: "Health",
-                        7: "Partnerships", 8: "Secrets", 9: "Dharma", 10: "Career", 11: "Gains", 12: "Release",
-                      };
-                      return (
-                        <div key={house} style={houseCard(PLANET_COLORS[activePlanet.planet])}>
-                          <strong style={{ fontSize: 18 }}>H{house}</strong>
-                          <p style={{ fontSize: 12, color: "#6B635B" }}>{houseNames[house]}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
-
-              {/* Closest Natal Hits (Deduplicated) */}
-              {relevantHits.length > 0 && (
-                <section style={card}>
-                  <p style={sectionLabel}>Technical Proof</p>
-                  <h2 style={h2}>Closest Natal Hits</h2>
-                  <div style={hitGrid}>
-                    {relevantHits.map((hit, idx) => (
-                      <div key={`${hit.date}-${hit.aspect}-${idx}`} style={hitCard}>
-                        <div style={rowBetween}>
-                          <strong>{hit.transitPlanet} → {hit.natalName}</strong>
-                          <span style={{ ...pill, background: `${scoreLabelColor(hit.score)}22`, border: `1px solid ${scoreLabelColor(hit.score)}55`, color: scoreLabelColor(hit.score) }}>
-                            {hit.score} · {scoreLabel(hit.score)}
-                          </span>
-                        </div>
-                        <p style={smallCaps}>{hit.date} · {hit.aspect} · {hit.orb}° · H{hit.natalHouse}</p>
-                        <p style={paragraph}>{hit.meaning}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Life Areas with This Planet */}
-              {relevantEvents.length > 0 && (
-                <section style={card}>
-                  <p style={sectionLabel}>Life Areas</p>
-                  <h2 style={h2}>{activePlanet.planet} in Your Life</h2>
-                  <div style={eventGrid}>
-                    {relevantEvents.map((event) => (
-                      <div key={event.key} style={eventCard}>
-                        <div style={rowBetween}>
-                          <strong>{event.label}</strong>
-                          <span style={{ ...pill, background: `${scoreLabelColor(event.score)}22`, border: `1px solid ${scoreLabelColor(event.score)}55`, color: scoreLabelColor(event.score) }}>
-                            {event.score} · {scoreLabel(event.score)}
-                          </span>
-                        </div>
-                        <p style={{ ...smallCaps, color: scoreLabelColor(event.score) }}>{event.status}</p>
-                        <p style={paragraph}>{event.reason}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-                  {/* Narrative */}
-                  <section style={card}>
-                    <p style={sectionLabel}>Deep Narrative</p>
-                    <h2 style={h2}>Monthly Story</h2>
-                    <p style={paragraphPre}>{activePlanet.narrative}</p>
-                  </section>
-                </>
-              )}
-            </>
-          )}
-
-          {/* === LIFE AREAS TAB === */}
-          {activeTab === "lifeAreas" && (
-            <>
-              <section style={card}>
-                <p style={sectionLabel}>House Activations</p>
-                <h2 style={h2}>Life Areas Affected This Month</h2>
-                <p style={{ ...paragraph, marginBottom: 16 }}>
-                  Below are the houses receiving transit activations, ranked by total impact score. Higher scores indicate stronger planetary influence in that life area.
-                </p>
-                <div style={houseActivationGrid}>
-                  {report?.topActivationHouses?.map((house) => {
-                    const houseNames: Record<number, string> = {
-                      1: "Self", 2: "Wealth", 3: "Courage", 4: "Home", 5: "Creativity", 6: "Health",
-                      7: "Partnerships", 8: "Secrets", 9: "Dharma", 10: "Career", 11: "Gains", 12: "Release",
-                    };
-                    const houseDescriptions: Record<number, string> = {
-                      1: "Identity, appearance, self-perception",
-                      2: "Finance, family, speech",
-                      3: "Siblings, courage, communication",
-                      4: "Home, mother, emotions, foundation",
-                      5: "Children, creativity, intellect",
-                      6: "Health, enemies, debts, service",
-                      7: "Partnerships, contracts, clients",
-                      8: "Inheritance, secrets, transformation",
-                      9: "Higher learning, luck, dharma",
-                      10: "Career, status, public image",
-                      11: "Gains, friendships, networks",
-                      12: "Spirituality, release, losses",
-                    };
-                    return (
-                      <div key={house.house} style={houseActivationCard}>
-                        <div style={rowBetween}>
-                          <div>
-                            <strong style={{ fontSize: 18 }}>House {house.house}</strong>
-                            <p style={{ ...smallCaps, marginTop: 4 }}>{houseNames[house.house]}</p>
-                          </div>
-                          <div style={{ textAlign: "right" }}>
-                            <span style={{ ...pill, fontSize: 13, fontWeight: 800, background: `${scoreLabelColor(house.score / 5)}22`, border: `1px solid ${scoreLabelColor(house.score / 5)}55`, color: scoreLabelColor(house.score / 5) }}>
-                              {house.score}
-                            </span>
-                          </div>
-                        </div>
-                        <p style={{ ...paragraph, marginTop: 8 }}>{houseDescriptions[house.house]}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div style={infoBox}>
-                  <p style={muted}>💡 Impact Scores reflect the cumulative weight of all transit hits to each house across the month, combining primary and secondary influences.</p>
-                </div>
-              </section>
-
-              {/* Life Areas Overview */}
-              {report?.eventScores && report.eventScores.length > 0 && (
-                <section style={card}>
-                  <p style={sectionLabel}>Life Area Scores</p>
-                  <h2 style={h2}>Overall Influence by Category</h2>
-                  <div style={eventGrid}>
-                    {report.eventScores.map((event) => (
-                      <div key={event.key} style={eventCard}>
-                        <div style={rowBetween}>
-                          <strong>{event.label}</strong>
-                          <span style={{ ...pill, background: `${scoreLabelColor(event.score)}22`, border: `1px solid ${scoreLabelColor(event.score)}55`, color: scoreLabelColor(event.score) }}>
-                            {event.score}
-                          </span>
-                        </div>
-                        <p style={{ ...smallCaps, color: scoreLabelColor(event.score), marginTop: 6 }}>{event.status}</p>
-                        <p style={paragraph}>{event.reason}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-
-          {/* === NAKSHATRA SECTION INSIDE LIFE AREAS === */}
-          {activeTab === "lifeAreas" && (
-            <>
-              <section style={card}>
-                <p style={sectionLabel}>Lunar Mansions</p>
-                <h2 style={h2}>Nakshatras Being Transited</h2>
-                <p style={{ ...paragraph, marginBottom: 20 }}>
-                  Below are the lunar mansions (nakshatras) that are receiving transit activations this month. Each nakshatra has a ruling planet lord and carries distinct qualities.
-                </p>
-
-                {nakshatraData.length > 0 ? (
-                  <div style={nakshatraGrid}>
-                    {nakshatraData.map((nak) => (
-                      <div key={nak.name} style={nakshatraCard}>
-                        <div style={rowBetween}>
-                          <div>
-                            <strong style={{ fontSize: 18 }}>{nak.name}</strong>
-                            <p style={{ ...smallCaps, marginTop: 4, color: PLANET_COLORS[nak.lord] || "rgba(255,255,255,0.6)" }}>
-                              Lord: {nak.lord}
-                            </p>
-                          </div>
-                          <div style={{ textAlign: "right" }}>
-                            <span style={{ ...pill, fontSize: 13, fontWeight: 800, background: `${scoreLabelColor(nak.score)}22`, border: `1px solid ${scoreLabelColor(nak.score)}55`, color: scoreLabelColor(nak.score) }}>
-                              {nak.score}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div style={nakshatraContent}>
-                          <p style={muted}>
-                            <strong style={{ color: "#1A1A1A" }}>Essence:</strong> {nak.essence}
-                          </p>
-                          <p style={muted}>
-                            <strong style={{ color: "#a3e635" }}>Gift:</strong> {nak.gift}
-                          </p>
-                          <p style={muted}>
-                            <strong style={{ color: "#f87171" }}>Shadow:</strong> {nak.shadow}
-                          </p>
-                          <p style={{ ...muted, marginTop: 8, padding: "8px 12px", background: "rgba(250,204,21,0.1)", borderRadius: 8 }}>
-                            <strong style={{ color: "#B8860B" }}>💡 Remedy:</strong> {nak.remedyTone}
-                          </p>
-                        </div>
-
-                        {nak.planets.length > 0 && (
-                          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(184,134,11,0.15)" }}>
-                            <p style={smallCaps}>Planets here:</p>
-                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
-                              {nak.planets.map(planet => (
-                                <span key={planet} style={{ ...pill, background: `${PLANET_COLORS[planet]}22`, border: `1px solid ${PLANET_COLORS[planet]}55`, color: PLANET_COLORS[planet] }}>
-                                  {planet}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={infoBox}>
-                    <p style={paragraph}>No nakshatras activated this month yet. Generate a transit report to see lunar mansion activations.</p>
-                  </div>
-                )}
-              </section>
-            </>
-          )}
+          <div className="lg:col-span-6 w-full">
+            <TransitStoryPanel
+              narrative={report.narrative}
+              language={language}
+              onLanguageChange={(l) => setLanguage(l)}
+              selectedHouse={selectedHouse}
+              onSelectHouse={(h) => setSelectedHouse(h)}
+            />
+          </div>
         </div>
-      ) : null}
-    </section>
-  );
-}
+      )}
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={statBox}>
-      <p style={muted}>{label}</p>
-      <strong style={{ color: "#1A1A1A" }}>{value}</strong>
+      {/* Mode B: Full Story Panel Tab */}
+      {activeTab === "story" && (
+        <div className="w-full max-w-4xl mx-auto">
+          <TransitStoryPanel
+            narrative={report.narrative}
+            language={language}
+            onLanguageChange={(l) => setLanguage(l)}
+            selectedHouse={selectedHouse}
+            onSelectHouse={(h) => setSelectedHouse(h)}
+          />
+        </div>
+      )}
+
+      {/* Mode C: 30-Day Timeline Tab */}
+      {activeTab === "timeline" && (
+        <div className="w-full bg-[#FAF7F2] dark:bg-[#141211] border border-[#B8860B]/25 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#B8860B]/15 pb-4">
+            <div>
+              <h3 className="text-lg font-serif font-bold text-[#2D241E] dark:text-[#F3EDE2]">
+                {language === "hinglish"
+                  ? "मासिक गोचर प्रवाह एवं दृष्टियां"
+                  : "30-Day Planetary Transit Windows"}
+              </h3>
+              <p className="text-xs text-[#70645B] dark:text-[#A8A29E] mt-0.5">
+                Current planetary signs, speeds, and direct Parashari target houses for {scanDate}
+              </p>
+            </div>
+            <div className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-500/10 px-3 py-1 rounded-xl border border-amber-500/20">
+              Swiss Ephemeris Sidereal Lahiri
+            </div>
+          </div>
+
+          {/* Planetary Position Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs sm:text-sm">
+              <thead>
+                <tr className="border-b border-[#B8860B]/20 text-[#8C827A] dark:text-[#9B9288] uppercase text-[10px] tracking-wider">
+                  <th className="py-2.5 px-3">Planet</th>
+                  <th className="py-2.5 px-3">Sign</th>
+                  <th className="py-2.5 px-3">House (from Lagna)</th>
+                  <th className="py-2.5 px-3">Longitude</th>
+                  <th className="py-2.5 px-3">Drishti Target Houses</th>
+                  <th className="py-2.5 px-3">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#B8860B]/10 text-[#3D332C] dark:text-[#DDD6CB]">
+                {Object.values(report.transitPositions).map((pos) => {
+                  const hits = report.allDrishtiHits.filter(
+                    (h) => h.planet === pos.planet
+                  );
+                  const isSel = pos.planet === selectedPlanet;
+                  return (
+                    <tr
+                      key={pos.planet}
+                      onClick={() => {
+                        setSelectedPlanet(pos.planet);
+                        setActiveTab("radar");
+                      }}
+                      className={`cursor-pointer transition-colors ${
+                        isSel
+                          ? "bg-amber-500/15 font-bold"
+                          : "hover:bg-[#B8860B]/5"
+                      }`}
+                    >
+                      <td className="py-3 px-3 flex items-center gap-2">
+                        <span>{pos.planet === "Saturn" ? "🪐" : pos.planet === "Jupiter" ? "🌟" : pos.planet === "Rahu" ? "⚡" : pos.planet === "Ketu" ? "🔥" : pos.planet === "Mars" ? "🔴" : pos.planet === "Sun" ? "☀️" : pos.planet === "Venus" ? "✨" : pos.planet === "Mercury" ? "🌿" : "🌙"}</span>
+                        <span>{pos.planet}</span>
+                        {pos.isRetrograde && (
+                          <span className="text-[10px] text-rose-500 font-bold">
+                            [Rx]
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3">{pos.signName}</td>
+                      <td className="py-3 px-3">
+                        <span className="px-2 py-0.5 rounded bg-[#B8860B]/15 text-[#996515] dark:text-amber-300 font-bold">
+                          House {pos.house}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 font-mono">
+                        {pos.longitude.toFixed(2)}°
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="flex flex-wrap gap-1">
+                          {hits.map((hit) => (
+                            <span
+                              key={hit.targetHouse}
+                              className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-800 dark:text-amber-200"
+                            >
+                              H{hit.targetHouse} ({hit.aspectRule.name})
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="py-3 px-3">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPlanet(pos.planet);
+                            setActiveTab("radar");
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-xs bg-amber-600 text-white font-medium hover:bg-amber-700"
+                        >
+                          View Radar
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-function scoreLabel(score: number): string {
-  if (score >= 80) return "Peak";
-  if (score >= 65) return "Strong";
-  if (score >= 45) return "Moderate";
-  if (score >= 25) return "Supportive";
-  return "Background";
-}
-
-function scoreLabelColor(score: number): string {
-  if (score >= 80) return "#f97316";
-  if (score >= 65) return "#facc15";
-  if (score >= 45) return "#a78bfa";
-  if (score >= 25) return "#94a3b8";
-  return "#64748b";
-}
-
-// ===== STYLES =====
-
-const pageShell: CSSProperties = {
-  minHeight: "100vh",
-  padding: "32px",
-  background: "radial-gradient(circle at top left, rgba(250,204,21,0.16), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,0.18), transparent 36%), #070711",
-  color: "white",
-};
-
-const heroCard: CSSProperties = {
-  maxWidth: 1120,
-  margin: "0 auto",
-  padding: 28,
-  borderRadius: 24,
-  border: "1px solid rgba(184, 134, 11, 0.22)",
-  background: "#FFFFFF",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-};
-
-const eyebrow: CSSProperties = {
-  color: "#B8860B",
-  textTransform: "uppercase",
-  letterSpacing: 1.6,
-  fontSize: 12,
-  fontWeight: 700,
-};
-
-const title: CSSProperties = { fontSize: 46, lineHeight: 1.05, margin: "8px 0 12px" };
-const subtitle: CSSProperties = { maxWidth: 760, color: "#6B635B", lineHeight: 1.75 };
-
-const contextPanel: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-  gap: 12,
-  marginTop: 20,
-};
-
-const button: CSSProperties = {
-  marginTop: 22,
-  padding: "13px 18px",
-  borderRadius: 14,
-  border: "none",
-  background: "#B8860B",
-  color: "#FFFFFF",
-  fontWeight: 800,
-  cursor: "pointer",
-};
-
-const errorBox: CSSProperties = {
-  marginTop: 18,
-  padding: 16,
-  borderRadius: 14,
-  background: "rgba(127,29,29,0.7)",
-  color: "#fecaca",
-  whiteSpace: "pre-wrap",
-};
-
-const contentGrid: CSSProperties = {
-  maxWidth: 1120,
-  margin: "24px auto 0",
-  display: "grid",
-  gap: 20,
-};
-
-const card: CSSProperties = {
-  padding: 24,
-  borderRadius: 22,
-  border: "1px solid rgba(184, 134, 11, 0.22)",
-  background: "#FFFFFF",
-};
-
-const sectionLabel: CSSProperties = {
-  color: "#B8860B",
-  textTransform: "uppercase",
-  letterSpacing: 1.4,
-  fontSize: 12,
-  fontWeight: 700,
-};
-
-const h2: CSSProperties = { fontSize: 26, margin: "6px 0 16px" };
-
-const statGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-  gap: 12,
-};
-
-const statBox: CSSProperties = {
-  padding: 14,
-  borderRadius: 16,
-  background: "#FAF7F2", border: "1px solid rgba(184, 134, 11, 0.14)",
-};
-
-const planetTabs: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-  gap: 12,
-};
-
-const planetTabButton = (isActive: boolean, color: string): CSSProperties => ({
-  padding: "14px 12px",
-  borderRadius: 14,
-  border: isActive ? `2px solid ${color}` : "1px solid rgba(184, 134, 11, 0.2)",
-  background: isActive ? `${color}18` : "#FAF7F2",
-  color: isActive ? color : "#6B635B",
-  cursor: "pointer",
-  textAlign: "center",
-  transition: "all 0.2s",
-});
-
-const stack: CSSProperties = { display: "grid", gap: 12 };
-const rowBetween: CSSProperties = { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" };
-
-const pill: CSSProperties = {
-  borderRadius: 999,
-  padding: "4px 9px",
-  background: "rgba(250,204,21,0.12)",
-  color: "#B8860B",
-  fontSize: 12,
-  fontWeight: 700,
-};
-
-const muted: CSSProperties = { color: "#6B635B", margin: "4px 0" };
-const smallCaps: CSSProperties = { color: "#8C827A", textTransform: "uppercase", letterSpacing: 1, fontSize: 11 };
-const paragraph: CSSProperties = { color: "#6B635B", lineHeight: 1.7 };
-const paragraphPre: CSSProperties = { color: "#1A1A1A", lineHeight: 1.85, whiteSpace: "pre-wrap" };
-
-const windowCard: CSSProperties = {
-  padding: 16,
-  borderRadius: 16,
-  border: "1px solid rgba(184, 134, 11, 0.16)",
-  background: "#FAF7F2",
-};
-
-const hitCard: CSSProperties = {
-  padding: 16,
-  borderRadius: 16,
-  border: "1px solid rgba(184, 134, 11, 0.16)",
-  background: "#FAF7F2",
-};
-
-const infoBox: CSSProperties = {
-  padding: 16,
-  borderRadius: 16,
-  border: "1px solid rgba(184, 134, 11, 0.16)",
-  background: "#FAF7F2",
-};
-
-const houseGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))",
-  gap: 12,
-};
-
-const houseCard = (color: string): CSSProperties => ({
-  padding: 16,
-  borderRadius: 14,
-  border: `1px solid ${color}44`,
-  background: `${color}18`,
-  textAlign: "center",
-  display: "grid",
-  gap: 6,
-  alignContent: "center",
-});
-
-const hitGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-  gap: 12,
-};
-
-const eventGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-  gap: 12,
-};
-
-const eventCard: CSSProperties = {
-  padding: 16,
-  borderRadius: 16,
-  border: "1px solid rgba(184, 134, 11, 0.16)",
-  background: "#FAF7F2",
-};
-
-const tabsContainer: CSSProperties = {
-  display: "flex",
-  gap: 8,
-  borderBottom: "1px solid rgba(184, 134, 11, 0.2)",
-  paddingBottom: 0,
-};
-
-const tabButton = (isActive: boolean): CSSProperties => ({
-  padding: "14px 20px",
-  background: isActive ? "#facc15" : "transparent",
-  border: "none",
-  color: isActive ? "#FFFFFF" : "#6B635B",
-  cursor: "pointer",
-  borderBottom: isActive ? "3px solid #996515" : "none",
-  transition: "all 0.2s",
-  marginBottom: "-1px",
-});
-
-const legendBox: CSSProperties = {
-  marginTop: 20,
-  padding: 16,
-  borderRadius: 16,
-  border: "1px solid rgba(184, 134, 11, 0.16)",
-  background: "#FAF7F2",
-};
-
-const legendLabel: CSSProperties = {
-  ...smallCaps,
-  marginBottom: 12,
-  color: "#B8860B",
-};
-
-const legendGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-  gap: 12,
-};
-
-const legendItem: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  fontSize: 13,
-  color: "#6B635B",
-};
-
-const legendDot: CSSProperties = {
-  width: 10,
-  height: 10,
-  borderRadius: "50%",
-  flexShrink: 0,
-};
-
-const houseActivationGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-  gap: 12,
-};
-
-const houseActivationCard: CSSProperties = {
-  padding: 16,
-  borderRadius: 16,
-  border: "1px solid rgba(184, 134, 11, 0.16)",
-  background: "#FAF7F2",
-};
-
-const nakshatraGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-  gap: 16,
-};
-
-const nakshatraCard: CSSProperties = {
-  padding: 18,
-  borderRadius: 16,
-  border: "1px solid rgba(184, 134, 11, 0.16)",
-  background: "#FAF7F2",
-};
-
-const nakshatraContent: CSSProperties = {
-  marginTop: 12,
-  display: "grid",
-  gap: 8,
-};
