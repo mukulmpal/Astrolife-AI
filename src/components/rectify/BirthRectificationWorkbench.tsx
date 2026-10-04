@@ -21,6 +21,7 @@ import {
   ShieldCheck,
   FileText,
   ChevronDown,
+  Download,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUserChart } from "@/lib/user-chart";
@@ -248,6 +249,46 @@ export function BirthRectificationWorkbench() {
     setTimeout(() => {
       router.push("/dashboard/kundli");
     }, 1200);
+  };
+
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
+  const handleDownloadPdfDossier = async () => {
+    if (!result?.bestCandidate) return;
+    setIsDownloadingPdf(true);
+    try {
+      const res = await fetch("/api/astro/rectify/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          candidate: result.bestCandidate,
+          input: {
+            name,
+            city,
+            gender,
+            events,
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to generate BTR PDF dossier.");
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `AstroLife-BTR-Certificate-${name.replace(/[^a-zA-Z0-9_-]/g, "_") || "Subject"}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to download PDF.");
+    } finally {
+      setIsDownloadingPdf(false);
+    }
   };
 
   return (
@@ -849,7 +890,30 @@ export function BirthRectificationWorkbench() {
                 </p>
               </div>
 
-              <div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleDownloadPdfDossier}
+                  disabled={isDownloadingPdf}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold border transition hover:bg-stone-50"
+                  style={{
+                    borderColor: "rgba(184, 134, 11, 0.4)",
+                    color: "#8C6508",
+                    background: "#FFFFFF",
+                  }}
+                  title="Download Audit-Grade BTR PDF Dossier & Certificate"
+                >
+                  {isDownloadingPdf ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" /> Generating Dossier…
+                    </>
+                  ) : (
+                    <>
+                      <Download size={16} /> Download BTR Dossier (PDF)
+                    </>
+                  )}
+                </button>
+
                 <button
                   type="button"
                   onClick={() => handleSaveBestCandidate(result.bestCandidate!)}
@@ -1122,10 +1186,12 @@ export function BirthRectificationWorkbench() {
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-[#1A1A1A]">Prenatal Epoch (Adhana)</span>
                         <span className="font-bold px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800">
+                          ✓ Epoch Verified
                           ✓ Rashi Trutine Verified
                         </span>
                       </div>
                       <p className="mt-1.5 text-[11px] text-[#6B635B] leading-relaxed">
+                        Est. Conception: {result.bestCandidate.evidenceMatrix.prenatalEpoch.conceptionDateEstimated} ({result.bestCandidate.evidenceMatrix.prenatalEpoch.gestationDays}d gestation) · Adhana Lagna: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaLagnaSign} · Adhana Moon: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaMoonSign}
                         Das Canonical: {result.bestCandidate.evidenceMatrix.prenatalEpoch.conceptionDateEstimated} ({result.bestCandidate.evidenceMatrix.prenatalEpoch.gestationDays}d) · Nearest Horizon: {result.bestCandidate.evidenceMatrix.prenatalEpoch.nearestHorizonDateEstimated ?? "N/A"} ({result.bestCandidate.evidenceMatrix.prenatalEpoch.nearestHorizonGestationDays ?? 272}d) · Adhana Lagna: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaLagnaSign} · Adhana Moon: {result.bestCandidate.evidenceMatrix.prenatalEpoch.expectedAdhanaMoonSign}
                       </p>
                     </div>
