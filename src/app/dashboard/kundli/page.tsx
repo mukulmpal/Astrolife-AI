@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { calculateChart, type ChartData, NAK } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type PlanTier } from "@/lib/astro-engine/yogas";
-import { listSavedCharts, saveChartToAccount, selectSavedChart, type SavedChartSummary, useUserChart, buildChart, type BirthDetails, saveCurrentChart, useChartEngine } from "@/lib/user-chart";
+import { listSavedCharts, saveChartToAccount, selectSavedChart, deleteSavedChart, type SavedChartSummary, useUserChart, buildChart, type BirthDetails, saveCurrentChart, useChartEngine } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
 import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
@@ -17,6 +17,9 @@ import { DailyPanchangWidget } from "@/components/panchang/DailyPanchangWidget";
 import { ChartProofChatDrawer } from "@/components/chat/ChartProofChatDrawer";
 import { calculateShadbala, type ShadbalaResult } from "@/lib/astro-engine/shadbala";
 import { buildMangalDoshaInsight, type MangalDoshaInsight } from "@/lib/astro-engine/mangal-dosha-adapter";
+import EditChartModal from "@/components/charts/EditChartModal";
+import DeleteChartModal from "@/components/charts/DeleteChartModal";
+import { Edit2, Trash2 } from "lucide-react";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -95,6 +98,9 @@ export default function KundliPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showForm, setShowForm] = useState(() => !(hasUserChart && primaryChart));
   const [showLibrary, setShowLibrary] = useState(false);
+  const [editingSavedChart, setEditingSavedChart] = useState<SavedChartSummary | null>(null);
+  const [deletingSavedChart, setDeletingSavedChart] = useState<SavedChartSummary | null>(null);
+  const [isDeletingSavedChart, setIsDeletingSavedChart] = useState(false);
   const [yogaSearch, setYogaSearch] = useState("");
   const [yogaFilter, setYogaFilter] = useState<"all" | "benefic" | "dosha" | "rare">("all");
 
@@ -194,24 +200,61 @@ export default function KundliPage() {
 
   useEffect(() => {
     if (chartLoading || !hasUserChart || !primaryChart) return;
-    if (!chart || chart.name !== primaryChart.name) {
+    if (!chart || (primaryChart && primaryChart.name !== chart.name && primaryChart.dob !== chart.dob)) {
       applyChart(primaryChart);
       setSaveStatus(`${primaryChart.name}'s chart loaded.`);
       setShowForm(false);
     }
-  }, [primaryChart, chartLoading, hasUserChart, chart]);
+  }, [primaryChart, chartLoading, hasUserChart]);
 
   const handleSelectSavedChart = async (chartId: string) => {
     setLibraryLoading(true);
-    const nextChart = await selectSavedChart(chartId);
-    if (nextChart) {
-      applyChart(nextChart);
-      setSaveStatus("Primary chart switched.");
-      setSavedCharts(await listSavedCharts());
-    } else {
-      setSaveStatus("Chart library is not available yet. Apply Supabase schema to enable switching.");
+    try {
+      const nextChart = await selectSavedChart(chartId);
+      if (nextChart) {
+        setChartData(nextChart);
+        saveCurrentChart(nextChart);
+        applyChart(nextChart);
+        setSaveStatus(`${nextChart.name}'s chart loaded.`);
+        setSavedCharts(await listSavedCharts());
+      } else {
+        setSaveStatus("Could not open selected chart.");
+      }
+    } catch (err) {
+      setSaveStatus("Chart selection failed.");
+    } finally {
+      setLibraryLoading(false);
     }
-    setLibraryLoading(false);
+  };
+
+  const handleConfirmDeleteSaved = async () => {
+    if (!deletingSavedChart) return;
+    setIsDeletingSavedChart(true);
+    try {
+      const res = await deleteSavedChart(deletingSavedChart.id);
+      if (!res.ok) throw new Error(res.error || "Failed to delete chart");
+      setSaveStatus(`"${deletingSavedChart.name}"'s chart has been deleted.`);
+      await refreshSavedCharts();
+      setDeletingSavedChart(null);
+    } catch (err) {
+      setSaveStatus(err instanceof Error ? err.message : "Failed to delete chart.");
+    } finally {
+      setIsDeletingSavedChart(false);
+    }
+  };
+
+  const handleSavedChartEdited = async (updatedChart: ChartData) => {
+    setSaveStatus(`Chart for "${updatedChart.name}" has been updated.`);
+    await refreshSavedCharts();
+    if (
+      chart &&
+      (chart.name.toLowerCase() === updatedChart.name.toLowerCase() ||
+        chart.name.toLowerCase() === editingSavedChart?.name.toLowerCase())
+    ) {
+      applyChart(updatedChart);
+      setChartData(updatedChart);
+      saveCurrentChart(updatedChart);
+    }
   };
 
   const handleGenerate = async () => {
@@ -228,10 +271,12 @@ export default function KundliPage() {
         form.lon ?? undefined,
         form.tz ?? undefined,
       );
-      await saveChartToAccount(data);
+      setChartData(data);
+      saveCurrentChart(data);
       applyChart(data);
       setSaveStatus("Chart generated. Use Save Chart to store it in your account library.");
       setShowForm(false);
+      void saveChartToAccount(data, { replacePrimary: true });
       await fetch("/api/charts/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -491,27 +536,143 @@ export default function KundliPage() {
               </div>
               {savedCharts.length > 0 ? (
                 <div className="library-list">
-                  {savedCharts.map((saved) => (
-                    <button
-                      key={saved.id}
-                      className={`library-card ${saved.isPrimary ? "primary" : ""}`}
-                      onClick={() => handleSelectSavedChart(saved.id)}
-                      disabled={libraryLoading}
-                    >
-                      <div className="library-name">{saved.name}</div>
-                      <div className="library-meta">
-                        {new Date(saved.dob).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}{" "}
-                        · {saved.tob}
-                        <br />
-                        {saved.city}
+                  {savedCharts.map((saved) => {
+                    const isActive =
+                      chart &&
+                      chart.name.toLowerCase() === saved.name.toLowerCase() &&
+                      chart.dob === saved.dob;
+
+                    return (
+                      <div
+                        key={saved.id}
+                        className={`library-card ${saved.isPrimary ? "primary" : ""}`}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          border: isActive ? "2px solid rgba(184, 134, 11, 0.6)" : undefined,
+                          background: isActive ? "rgba(184, 134, 11, 0.06)" : undefined,
+                        }}
+                      >
+                        <div
+                          onClick={() => handleSelectSavedChart(saved.id)}
+                          style={{ cursor: "pointer", marginBottom: 12 }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              marginBottom: 4,
+                            }}
+                          >
+                            <div className="library-name" style={{ margin: 0 }}>
+                              {saved.name}
+                            </div>
+                            {isActive && (
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  color: "#B8860B",
+                                  background: "rgba(184, 134, 11, 0.15)",
+                                  padding: "2px 7px",
+                                  borderRadius: 12,
+                                  border: "1px solid rgba(184, 134, 11, 0.3)",
+                                }}
+                              >
+                                ✦ Active
+                              </span>
+                            )}
+                          </div>
+                          <div className="library-meta">
+                            {new Date(saved.dob).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}{" "}
+                            · {saved.tob}
+                            <br />
+                            {saved.city}
+                          </div>
+                          {saved.isPrimary && <span className="library-pill">Primary</span>}
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 6,
+                            borderTop: "1px solid rgba(184, 134, 11, 0.15)",
+                            paddingTop: 10,
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleSelectSavedChart(saved.id)}
+                            disabled={libraryLoading}
+                            style={{
+                              flex: 1,
+                              background: isActive ? "#B8860B" : "#c8a030",
+                              color: "#FFFFFF",
+                              border: 0,
+                              borderRadius: 6,
+                              padding: "6px 10px",
+                              fontWeight: 700,
+                              fontSize: "12px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {isActive ? "Viewing" : "Open"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingSavedChart(saved);
+                            }}
+                            title="Edit Chart"
+                            style={{
+                              background: "#FFFFFF",
+                              border: "1px solid rgba(184, 134, 11, 0.25)",
+                              borderRadius: 6,
+                              padding: "6px 10px",
+                              fontSize: "12px",
+                              color: "#4A4238",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            <Edit2 size={13} color="#B8860B" />
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingSavedChart(saved);
+                            }}
+                            title="Delete Chart"
+                            style={{
+                              background: "rgba(220, 38, 38, 0.05)",
+                              border: "1px solid rgba(220, 38, 38, 0.2)",
+                              borderRadius: 6,
+                              padding: "6px 10px",
+                              fontSize: "12px",
+                              color: "#DC2626",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       </div>
-                      {saved.isPrimary && <span className="library-pill">Primary</span>}
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="library-sub">
@@ -1450,6 +1611,23 @@ export default function KundliPage() {
           </>
         )}
       </div>
+
+      {/* Edit Saved Chart Modal */}
+      <EditChartModal
+        isOpen={Boolean(editingSavedChart)}
+        chart={editingSavedChart}
+        onClose={() => setEditingSavedChart(null)}
+        onSaved={handleSavedChartEdited}
+      />
+
+      {/* Delete Saved Chart Modal */}
+      <DeleteChartModal
+        isOpen={Boolean(deletingSavedChart)}
+        chartName={deletingSavedChart?.name || ""}
+        onClose={() => setDeletingSavedChart(null)}
+        onConfirm={handleConfirmDeleteSaved}
+        isDeleting={isDeletingSavedChart}
+      />
     </>
   );
 }

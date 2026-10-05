@@ -20,6 +20,7 @@ import { calculateSpecialLagnas } from "../astro-engine/special-lagnas";
 import { calculateVastu } from "../astro-engine/vastu";
 import { calculateSarvatobhadra } from "../astro-engine/sarvatobhadra";
 import { scanMarriageWindows } from "../astro-engine/marriage-window-scanner";
+import { calculateLineageKarma } from "../astro-engine/lineage-karma";
 import type { DashaLord } from "../astro-engine/dasha";
 
 /**
@@ -439,6 +440,60 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
 - Double Transit Status: ${bestWin?.activeParams.includes("P4: Double transit Jupiter + Saturn") ? "Jupiter & Saturn double transit confirms active relationship manifestation." : "Double transit preparing alignment in upcoming months."}`);
   } catch (err) {
     console.warn("[MasterAstroContext] KN Rao Marriage Timing error:", err);
+  }
+
+  // ── 17. LINEAGE KARMA, PITRU INTELLIGENCE & KULA DEVATA ─────────────────────
+  try {
+    const lineage = calculateLineageKarma(chart, { nativeName: chart.name || "Seeker", btrConfidence: "High" });
+    const obstaclesActive = lineage.obstacles
+      .filter((o) => o.active)
+      .map((o) => `${o.domain} [${o.severity}]: ${o.humanExperienceText}`)
+      .join("\n  ✦ ") || "No severe lineage blockages detected.";
+
+    sections.push(`### 17. LINEAGE KARMA, PITRU INTELLIGENCE & KULA DEVATA (7-LAYER SYNTHESIS)
+- Executive Lineage Summary: "${lineage.executiveSummary.oneSentenceSummary}"
+- Core Ancestral Theme: ${lineage.executiveSummary.coreLineageTheme}
+- Ancestral Gate Status: ${lineage.ancestralGatePassed ? "PASSED (Valid lineage evidence)" : "GATED (General interpretation)"}
+- Kula Devata (The Roots / Family Foundation):
+  ✦ Guardian Deity: ${lineage.kulaDevata.suggestedDeity.traditionalMaleName} / ${lineage.kulaDevata.suggestedDeity.traditionalFemaleName}
+  ✦ Connection Status: ${lineage.kulaDevata.connectionStatus} — ${lineage.kulaDevata.rootsGuidance}
+  ✦ Simple Offering: ${lineage.kulaDevata.simplePranamOffering}
+- Ishta Devata (The Wings / Soul's Personal Guide):
+  ✦ Soul Deity: ${lineage.ishtaDevata.suggestedDeity.deityName} (Atmakaraka ${lineage.ishtaDevata.atmakarakaPlanet} in Karakamsa D9 ${lineage.ishtaDevata.karakamsaSign})
+  ✦ Dhyana Mantra: ${lineage.ishtaDevata.soulDhyanaMantra}
+- Arroyo Elemental Ancestral Analysis:
+  ✦ Saturn's Blocked Element: ${lineage.elemental.saturnElement} — ${lineage.elemental.saturnBlockageTheme}
+  ✦ Balance: ${lineage.elemental.selfExpressiveCount} Self-Expressive (Fire/Air) vs ${lineage.elemental.selfRepressiveCount} Self-Repressive (Earth/Water)
+  ✦ Water Houses (4-8-12): Learned in H4 (${lineage.elemental.waterHousesTrilogy.fourthHouseLearned}), Carried in H8 (${lineage.elemental.waterHousesTrilogy.eighthHouseCarried}), Release in H12 (${lineage.elemental.waterHousesTrilogy.twelfthHouseRelease})
+- Nodal Lineage Mapping (Dr. Prem Kumar Sharma):
+  ✦ Rahu (Paternal Grandfather / Dada): H${lineage.nodalLineage.rahuPaternalGrandfather.house} (${lineage.nodalLineage.rahuPaternalGrandfather.sign})
+  ✦ Ketu (Maternal Grandfather / Nana): H${lineage.nodalLineage.ketuMaternalGrandfather.house} (${lineage.nodalLineage.ketuMaternalGrandfather.sign})
+  ✦ Gandamoola: ${lineage.nodalLineage.gandamoola.isGandamoola ? `Active in ${lineage.nodalLineage.gandamoola.nakshatra} P${lineage.nodalLineage.gandamoola.pada}` : "None"}
+- Somatic Energy Field (Mr. A & Polarity Therapy):
+  ✦ Sensitive System: ${lineage.somatic.vulnerableOrganSystem}
+  ✦ Restoration: ${lineage.somatic.restorativeSomaticPractice}
+- Real-Life Obstacle Diagnostics:
+  ✦ ${obstaclesActive}
+- Positive Ancestral Gifts (Pitru Anugraha):
+  ✦ ${lineage.anugraha.inheritedGifts.join("; ") || "General ancestral resilience"}
+- AstroLife Remedy Intelligence (v2.2 Production Standard):
+  ✦ Top Essential Practice 1: ${lineage.remedyIntelligence?.topEssentialPractices?.[0]?.title || "Family history dialogue"} (${lineage.remedyIntelligence?.topEssentialPractices?.[0]?.oneLinePurpose || ""})
+  ✦ Top Essential Practice 2: ${lineage.remedyIntelligence?.topEssentialPractices?.[1]?.title || "Pitru Tarpan"} (${lineage.remedyIntelligence?.topEssentialPractices?.[1]?.oneLinePurpose || ""})
+  ✦ Top Essential Practice 3: ${lineage.remedyIntelligence?.topEssentialPractices?.[2]?.title || "Financial Clarity"} (${lineage.remedyIntelligence?.topEssentialPractices?.[2]?.oneLinePurpose || ""})
+  ✦ Gemstone Contraindication: ${lineage.remedyIntelligence?.gemstoneEligibility?.reason || "Strictly gated"}
+  ✦ 30-Day Self-Observation: ${lineage.remedyIntelligence?.thirtyDayAuditGuide?.questions?.[0] || "Reflect on family peace"}
+- Vedic Computational Antahkarana (PVR Rao Model):
+  ✦ CPU (Ahamkara / I-ness): ${lineage.antahkarana?.ahamkara.cpuSignificator || "Atmakaraka"} | Tripod: ${lineage.antahkarana?.ahamkara.tripod.sthoolaLagna || ""}, ${lineage.antahkarana?.ahamkara.tripod.sookshmaMoon || ""}
+  ✦ Memory/Cache (Chitta): Subconscious impressions in ${lineage.antahkarana?.chitta.subconsciousRootVargas.join(", ") || "D60, D45, D30"}
+  ✦ ALU/Logic (Buddhi): ${lineage.antahkarana?.buddhi.aluController || "AmK + Jupiter"} (Transmitter: ${lineage.antahkarana?.buddhi.transmitter || "Mercury"})
+  ✦ I/O Controller (Manas): ${lineage.antahkarana?.manas.ioController || "Moon + Mercury"}
+- PVR Tarpana & Karma Release Mechanism:
+  ✦ Homam vs Tarpana: Homam burns personal past-life karma; Tarpana washes inherited ancestral debts (Rina).
+  ✦ Internal Genetics: Ancestors are present inside as karmic predispositions. Tarpana releases this internal conditioning.
+  ✦ Jivat-Pitruk: Living father does NOT prevent son/grandson from performing Tarpana for ancestor debts.
+- Language Rule: When presenting to native, strictly follow Language Style Guide v2.1 (no fear, no curses, practical empowerment, 4-tier remedy hierarchy).`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Lineage Karma error:", err);
   }
 
   return `\n══════════════════════════════════════════════════════════════════════

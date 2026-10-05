@@ -278,7 +278,7 @@ function DashboardContent() {
   // render — BEFORE useUserChart's mount-effect runs — so the dashboard and
   // every engine immediately use the real chart, never the sample.
   const [autoChart] = useState(autoCalculateFromUrl);
-  const { birth, chart, hasUserChart, loading: chartLoading2 } = useUserChart();
+  const { birth, chart, hasUserChart, loading: chartLoading2, setChartData } = useUserChart();
 
   // No real chart yet and nothing being auto-built → send the user straight
   // to the chart generator instead of showing any sample data.
@@ -299,7 +299,9 @@ function DashboardContent() {
     await new Promise(r=>setTimeout(r,600));
     try {
       const newChart = calculateChart(chartForm.name,chartForm.dob,chartForm.tob,chartForm.city);
-      await saveChartToAccount(newChart);
+      setChartData(newChart);
+      saveCurrentChart(newChart);
+      void saveChartToAccount(newChart, { replacePrimary: true });
       setChartForm(EMPTY_CHART_FORM);
       setActiveTab("overview");
     } catch(e){ console.error(e); }

@@ -215,14 +215,27 @@ function stripSavedChartId(chartId: string) {
   return chartId.replace(/^saved:/, "");
 }
 
+export const CHART_STORAGE_EVENT = "astrolife:chart-updated";
+export const CHART_CLEARED_EVENT = "astrolife:chart-cleared";
+
 export function saveCurrentChart(chart: ChartData) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chart));
+  try {
+    window.localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chart));
+    window.dispatchEvent(new CustomEvent(CHART_STORAGE_EVENT, { detail: chart }));
+  } catch (err) {
+    console.warn("Could not save chart to device storage:", err);
+  }
 }
 
 export function clearCurrentChart() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(CHART_STORAGE_KEY);
+  try {
+    window.localStorage.removeItem(CHART_STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent(CHART_CLEARED_EVENT));
+  } catch (err) {
+    console.warn("Could not clear chart from device storage:", err);
+  }
 }
 
 export function loadCurrentChartFromDevice(): ChartData | null {
@@ -571,6 +584,185 @@ export async function selectSavedChart(chartId: string): Promise<ChartData | nul
   } catch (error) {
     console.warn("Chart switch skipped:", error);
     return null;
+  }
+}
+
+export function ianaToUtcOffset(timezone: string | null, dob: string, tob: string): number {
+  if (!timezone) return 5.5;
+
+  try {
+    const date = new Date(`${dob || "2000-01-01"}T${tob || "12:00"}:00Z`);
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: timezone,
+      timeZoneName: "shortOffset",
+    }).formatToParts(date);
+    const tzPart = parts.find((p) => p.type === "timeZoneName")?.value || "";
+    const match = tzPart.match(/GMT([+-])(\d+)(?::(\d+))?/);
+    if (!match) return 5.5;
+    const sign = match[1] === "+" ? 1 : -1;
+    const hours = parseInt(match[2], 10);
+    const mins = match[3] ? parseInt(match[3], 10) : 0;
+    return sign * (hours + mins / 60);
+  } catch {
+    return 5.5;
+  }
+}
+
+export async function deleteSavedChart(chartId: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (savedChartId(chartId)) {
+      const id = stripSavedChartId(chartId);
+      const res = await fetch(`/api/charts/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        return { ok: false, error: payload?.error ?? "Failed to delete chart" };
+      }
+      return { ok: true };
+    }
+
+    if (legacyChartId(chartId)) {
+      if (!user) return { ok: false, error: "Unauthorized" };
+      const id = stripLegacyChartId(chartId);
+      const { error } = await supabase
+        .from("user_charts")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+      if (error) return { ok: false, error: error.message };
+      return { ok: true };
+    }
+
+    if (!user) return { ok: false, error: "Unauthorized" };
+    const { error } = await supabase
+      .from("charts")
+      .delete()
+      .eq("id", chartId)
+      .eq("user_id", user.id);
+    if (error) return { ok: false, error: error.message };
+
+    await supabase.from("saved_charts").delete().eq("id", chartId).eq("user_id", user.id);
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Failed to delete chart" };
+  }
+}
+
+export type UpdateChartInput = {
+  name: string;
+  dob: string;
+  tob: string;
+  city: string;
+  lat?: number | null;
+  lon?: number | null;
+  tz?: number | null;
+  gender?: string | null;
+};
+
+export async function updateSavedChart(
+  chartId: string,
+  input: UpdateChartInput
+): Promise<{ ok: boolean; chart?: ChartData; error?: string }> {
+  try {
+    const newChart = calculateChart(
+      input.name,
+      input.dob,
+      input.tob,
+      input.city,
+      input.lat ?? undefined,
+      input.lon ?? undefined,
+      input.tz ?? undefined
+    );
+
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (savedChartId(chartId)) {
+      const id = stripSavedChartId(chartId);
+      const res = await fetch(`/api/charts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: input.name,
+          gender: input.gender ?? null,
+          birth_date: input.dob,
+          birth_time: input.tob,
+          birth_place: input.city,
+          latitude: input.lat ?? null,
+          longitude: input.lon ?? null,
+          timezone: input.tz !== null && input.tz !== undefined ? String(input.tz) : null,
+          chart_payload: newChart,
+        }),
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        return { ok: false, error: payload?.error ?? "Failed to update chart" };
+      }
+      return { ok: true, chart: newChart };
+    }
+
+    if (legacyChartId(chartId)) {
+      if (!user) return { ok: false, error: "Unauthorized" };
+      const id = stripLegacyChartId(chartId);
+      const { error } = await supabase
+        .from("user_charts")
+        .update({
+          name: input.name,
+          dob: input.dob,
+          tob: input.tob,
+          city: input.city,
+          latitude: input.lat ?? null,
+          longitude: input.lon ?? null,
+          tz: input.tz ?? null,
+          chart_data: newChart,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .eq("user_id", user.id);
+      if (error) return { ok: false, error: error.message };
+      return { ok: true, chart: newChart };
+    }
+
+    if (!user) return { ok: false, error: "Unauthorized" };
+    const { error } = await supabase
+      .from("charts")
+      .update({
+        name: input.name,
+        dob: input.dob,
+        tob: input.tob,
+        city: input.city,
+        lat: input.lat ?? null,
+        lon: input.lon ?? null,
+        chart_json: serializeChart(newChart),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", chartId)
+      .eq("user_id", user.id);
+
+    if (error) return { ok: false, error: error.message };
+
+    await supabase
+      .from("saved_charts")
+      .update({
+        name: input.name,
+        gender: input.gender ?? null,
+        birth_date: input.dob,
+        birth_time: input.tob,
+        birth_place: input.city,
+        latitude: input.lat ?? null,
+        longitude: input.lon ?? null,
+        timezone: input.tz !== null && input.tz !== undefined ? String(input.tz) : null,
+        chart_payload: newChart,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", chartId)
+      .eq("user_id", user.id);
+
+    return { ok: true, chart: newChart };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Failed to update chart" };
   }
 }
 

@@ -52,6 +52,57 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
   const [userTier, setUserTier] = useState<SubscriptionTier>(() => (isFullAccessEnabled() ? "elite" : "free"));
   const [isElite, setIsElite] = useState<boolean>(() => isFullAccessEnabled());
 
+  // ── Reactive synchronizer: Catch instant chart switch events across components ──
+  useEffect(() => {
+    const handleChartUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<ChartData>;
+      const nextChart = customEvent.detail;
+      if (nextChart && nextChart.planets) {
+        setBirth(getBirthFromChart(nextChart));
+        setChart(nextChart);
+        setHasUserChart(true);
+        setLoading(false);
+      }
+    };
+
+    const handleChartCleared = () => {
+      setBirth(EMPTY_BIRTH);
+      setChart(getStaticPlaceholderChart());
+      setHasUserChart(false);
+      setLoading(false);
+    };
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "currentChart") {
+        if (!e.newValue) {
+          handleChartCleared();
+        } else {
+          try {
+            const parsed = JSON.parse(e.newValue);
+            if (parsed && parsed.planets) {
+              const revived = loadCurrentChartFromDevice();
+              if (revived) {
+                setBirth(getBirthFromChart(revived));
+                setChart(revived);
+                setHasUserChart(true);
+                setLoading(false);
+              }
+            }
+          } catch {}
+        }
+      }
+    };
+
+    window.addEventListener("astrolife:chart-updated", handleChartUpdated);
+    window.addEventListener("astrolife:chart-cleared", handleChartCleared);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("astrolife:chart-updated", handleChartUpdated);
+      window.removeEventListener("astrolife:chart-cleared", handleChartCleared);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
+
   const loadChart = useCallback(async () => {
     try {
       const supabase = createClient();
@@ -92,6 +143,16 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
       setIsElite(resolvedElite);
 
       if (user) {
+        // If device storage already has a user-selected chart, preserve it
+        const deviceChart = loadCurrentChartFromDevice();
+        if (deviceChart && deviceChart.planets && deviceChart.name) {
+          setBirth(getBirthFromChart(deviceChart));
+          setChart(deviceChart);
+          setHasUserChart(true);
+          setLoading(false);
+          return;
+        }
+
         const accountChart = await loadPrimaryChartFromAccount(user);
         if (accountChart) {
           saveCurrentChart(accountChart);
@@ -119,7 +180,6 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        const deviceChart = loadCurrentChartFromDevice();
         if (deviceChart) {
           await saveChartToAccount(deviceChart, { replacePrimary: true });
           setBirth(getBirthFromChart(deviceChart));
