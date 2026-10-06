@@ -1,0 +1,842 @@
+/**
+ * ============================================================================
+ * ASTROLIFE — HEALTH & ASTRO-MEDICAL INTELLIGENCE ENGINE CONSTANTS
+ * ============================================================================
+ * Foundational Knowledge Graph:
+ * - Transcript-verified planetary anatomical & pathological associations
+ * - 12 Houses Health Matrix (distinguishing 6/8/12 affliction vs 1/5/11 recovery)
+ * - Ayurvedic Dosha mappings
+ * - Traditional 5th Cusp Treatment Modality symbolism
+ * - Curated non-invasive remedies library (Karmic charity, Dinacharya, Mantras)
+ * ============================================================================
+ */
+
+import type { KPPlanet } from "../kp";
+import type {
+  DoshaType,
+  HealthDomain,
+  HealthRemedy,
+  RemedyType,
+  SixteenDayRemedyProtocol,
+  SpecialTranscriptGuideline,
+} from "./types";
+
+export interface PlanetaryMedicalProfile {
+  planet: KPPlanet;
+  rulingOrgans: string[];
+  associatedDomains: HealthDomain[];
+  primaryDosha: DoshaType;
+  traditionalPathologies: string[];
+  transcriptNotes: string;
+}
+
+export const PLANETARY_MEDICAL_DICTIONARY: Record<KPPlanet, PlanetaryMedicalProfile> = {
+  Sun: {
+    planet: "Sun",
+    rulingOrgans: ["Heart", "Skeletal structure/Bones", "Right eye", "Digestive fire (Jatharagni)", "Spinal column"],
+    associatedDomains: ["cardiovascular", "musculoskeletal", "digestive", "ophthalmology"],
+    primaryDosha: "Pitta",
+    traditionalPathologies: [
+      "Acidity and bile reflux",
+      "Calcium deficiency / Bone fragility",
+      "Cardiac strain and arterial tension",
+      "Right-eye vision irritation",
+      "Premature hair thinning / scalp heat",
+    ],
+    transcriptNotes: "Sun governs the cosmic Prana, skeletal calcium, heart rhythm, and digestive fire. Afflictions manifest as Pitta acidity and bone-marrow or eye sensitivity.",
+  },
+  Moon: {
+    planet: "Moon",
+    rulingOrgans: ["Fluid balance/Plasma", "Left eye", "Lungs/Mucous membranes", "Breasts", "Lymphatic circulation", "Mind/Psyche"],
+    associatedDomains: ["respiratory", "cardiovascular", "ophthalmology", "mental_emotional"],
+    primaryDosha: "Kapha",
+    traditionalPathologies: [
+      "Fluid retention / Edema",
+      "Kapha congestion, colds, respiratory phlegm",
+      "Blood pressure fluctuations (in conjunction with Mars)",
+      "Left-eye vision sensitivity",
+      "Sleep disturbances, insomnia, psychosomatic anxiety",
+    ],
+    transcriptNotes: "Moon controls fluids, Kapha balance, psychological calm, and blood pressure rhythm when intersecting with Mars.",
+  },
+  Mars: {
+    planet: "Mars",
+    rulingOrgans: ["Blood / Hemoglobin", "Bone marrow", "Muscular tissue", "Head/Cranium", "Bile", "Vascular pressure"],
+    associatedDomains: ["hematological", "musculoskeletal", "cardiovascular"],
+    primaryDosha: "Pitta",
+    traditionalPathologies: [
+      "Acute inflammation and fevers",
+      "Blood dyscrasias, anemia or sudden hemorrhages",
+      "Muscular tears, sports injuries, burns",
+      "Surgical intervention requirements",
+      "Hypertensive surges",
+    ],
+    transcriptNotes: "Mars is the natural karaka for blood, acute inflammation, accidents, cuts, wounds, and surgical operations.",
+  },
+  Mercury: {
+    planet: "Mercury",
+    rulingOrgans: ["Bronchial tree / Lungs", "Nervous coordination", "Skin epidermis", "Tongue / Speech apparatus", "Tonsils", "Brain cortex"],
+    associatedDomains: ["respiratory", "neurological", "dermatological", "mental_emotional"],
+    primaryDosha: "Tridosha",
+    traditionalPathologies: [
+      "Respiratory hypersensitivity, asthma, bronchitis, tonsillitis",
+      "Cutaneous allergies, dermatitis, eczema rashes (with Venus)",
+      "Nervous tremor, sensory motor imbalances, speech impediments",
+      "Opportunistic infections (with Rahu, e.g. TB/pulmonary issues)",
+    ],
+    transcriptNotes: "Mercury acts as the master mediator between mind and nervous transmission, governing respiratory tracts, allergies, and skin reflex.",
+  },
+  Jupiter: {
+    planet: "Jupiter",
+    rulingOrgans: ["Liver", "Gallbladder", "Pancreatic fat enzymes", "Arterial system", "Ears/Hearing", "Cellular tissue expansion"],
+    associatedDomains: ["digestive", "metabolic", "cardiovascular"],
+    primaryDosha: "Kapha",
+    traditionalPathologies: [
+      "Fatty liver, hepatic congestion, jaundice",
+      "Dyslipidemia, high cholesterol, metabolic sluggishness",
+      "Abnormal cellular growth, benign/malignant hyperplasia (with Rahu/Mars)",
+      "Obesity and glucose intolerance",
+      "Gallbladder sludge or stones",
+    ],
+    transcriptNotes: "Jupiter governs liver metabolism, cholesterol, adipose tissue, and uncontrolled cellular growth patterns.",
+  },
+  Venus: {
+    planet: "Venus",
+    rulingOrgans: ["Kidneys", "Pancreas (Insulin)", "Dermal texture", "Reproductive system / Hormones", "Retinal microvasculature"],
+    associatedDomains: ["renal_urinary", "metabolic", "dermatological", "reproductive", "ophthalmology"],
+    primaryDosha: "Kapha",
+    traditionalPathologies: [
+      "Renal filtration stress, chronic kidney disease, dialysis pattern (with Mars/Rahu)",
+      "Kidney stones / Nephrolithiasis (with Saturn)",
+      "Diabetes mellitus / Glucose dysregulation",
+      "Dermatological allergies, eruptions, aesthetic skin issues",
+      "Reproductive hormonal imbalances",
+    ],
+    transcriptNotes: "Venus rules kidney filtration, pancreatic insulin balance, sweet secretions, skin glow, and reproductive physiology.",
+  },
+  Saturn: {
+    planet: "Saturn",
+    rulingOrgans: ["Joints / Cartilage", "Large intestine / Colon", "Legs / Knees", "Teeth", "Structural bones", "Gas conduits"],
+    associatedDomains: ["musculoskeletal", "digestive", "neurological"],
+    primaryDosha: "Vata",
+    traditionalPathologies: [
+      "Vata blockages, joint degeneration, arthritis, stiffness",
+      "Chronic obstipation, severe constipation, flatulence",
+      "Prolonged / degenerative ailments, delayed healing",
+      "Calculi formation (kidney/gall stones with Venus/Jupiter)",
+      "Nervous system paralysis/blockage (with Mercury and Mars)",
+    ],
+    transcriptNotes: "Saturn is the primary significator of chronic obstruction, Vata coldness, arthritis, delayed convalescence, and deep tissue blockages.",
+  },
+  Rahu: {
+    planet: "Rahu",
+    rulingOrgans: ["Immune system / T-cells", "Respiratory oxygen exchange", "Subtle toxic pathways", "Nerve sheaths"],
+    associatedDomains: ["respiratory", "neurological", "hematological"],
+    primaryDosha: "Vata",
+    traditionalPathologies: [
+      "Atypical, elusive or undiagnosed medical complaints",
+      "Severe viral, parasitic, or opportunistic infections",
+      "Respiratory hypoxia, sudden drop in oxygen levels",
+      "Systemic toxic accumulations / autoimmune confusion",
+      "Phobias, severe insomnia, panic reactions",
+    ],
+    transcriptNotes: "Rahu governs anomalous pathogens, viral epidemics, oxygen deficiency, diagnostic confusion, and foreign bio-toxins.",
+  },
+  Ketu: {
+    planet: "Ketu",
+    rulingOrgans: ["Spinal column", "Urinary bladder neck", "Microscopic vessels", "Atrophied tissue"],
+    associatedDomains: ["musculoskeletal", "renal_urinary", "neurological"],
+    primaryDosha: "Pitta",
+    traditionalPathologies: [
+      "Vertebral column compression, spinal nerve impingement",
+      "Cysts, fibrous lumps, atypical growths",
+      "Urinary retention / bladder sphincter spasms",
+      "Tissue atrophy, shrinking, sudden surgical excisions",
+      "Mysterious allergic insect/chemical reactions",
+    ],
+    transcriptNotes: "Ketu is a headless, acute Mars-like cutter, signifying spinal columns, fibrous cysts, surgical interventions, and tissue shrinkage.",
+  },
+};
+
+export interface HouseHealthRole {
+  house: number;
+  label: string;
+  medicalFunction: string;
+  isAfflictionHouse: boolean;
+  isRecoveryHouse: boolean;
+  transcriptSignificance: string;
+}
+
+export const HOUSE_HEALTH_MATRIX: Record<number, HouseHealthRole> = {
+  1: {
+    house: 1,
+    label: "Physical Constitution & Vitality",
+    medicalFunction: "Overall vitality, immune resilience, biological stamina, body stamina",
+    isAfflictionHouse: false,
+    isRecoveryHouse: true,
+    transcriptSignificance: "The 1st cusp sub-lord determines general physical resistance and baseline immunity.",
+  },
+  2: {
+    house: 2,
+    label: "Facial Anatomy & Dietary Fuel",
+    medicalFunction: "Oral intake, throat, speech, teeth, facial sensory organs",
+    isAfflictionHouse: false,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Maraka house context; rules nutrition intake, voice box, and oral health.",
+  },
+  3: {
+    house: 3,
+    label: "Upper Respiratory & Physical Effort",
+    medicalFunction: "Shoulders, arms, upper bronchial tract, stamina during exertion",
+    isAfflictionHouse: false,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Movement and breathing mechanics; 12th from 4th (chest/lungs).",
+  },
+  4: {
+    house: 4,
+    label: "Thoracic Cavity & Emotional Seat",
+    medicalFunction: "Chest, lung parenchyma, pericardium, cardiac ease, domestic resting space",
+    isAfflictionHouse: false,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Chest health and foundational psychological shelter.",
+  },
+  5: {
+    house: 5,
+    label: "Cure, Relief & Cellular Regeneration",
+    medicalFunction: "12th from 6th: Negation and cure of disease; therapeutic vitality; recuperation",
+    isAfflictionHouse: false,
+    isRecoveryHouse: true,
+    transcriptSignificance: "Key recovery pillar in KP. Signifying 5th promises relief from acute disease symptoms.",
+  },
+  6: {
+    house: 6,
+    label: "Acute Disease & Pathogenic Vulnerability",
+    medicalFunction: "Illness manifestation, bacterial/viral onset, clinical treatment necessity",
+    isAfflictionHouse: true,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Primary disease house in KP. 6th CSL identifies the biological organ under stress.",
+  },
+  7: {
+    house: 7,
+    label: "Reproductive Balance & Maraka Point",
+    medicalFunction: "Pelvic cavity, secondary sexual organs, equilibrium of internal fluids",
+    isAfflictionHouse: false,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Maraka house context; complements 1st house balance.",
+  },
+  8: {
+    house: 8,
+    label: "Chronicity, Crisis & Surgical Intervention",
+    medicalFunction: "Prolonged suffering, acute medical emergencies, degenerative complications, surgeries",
+    isAfflictionHouse: true,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Chronic ailments, prolonged hospitalization, surgeries, and serious diagnostic crises.",
+  },
+  9: {
+    house: 9,
+    label: "Restorative Fortune & Cellular Dharma",
+    medicalFunction: "Hips, thighs, cellular repair grace, spiritual equanimity",
+    isAfflictionHouse: false,
+    isRecoveryHouse: false,
+    transcriptSignificance: "General supportive luck and restorative guidance.",
+  },
+  10: {
+    house: 10,
+    label: "Therapeutic Action & Professional Care",
+    medicalFunction: "Knees, professional medical interventions, clinical treatment protocol compliance",
+    isAfflictionHouse: false,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Engagement with medical professionals and active treatment discipline.",
+  },
+  11: {
+    house: 11,
+    label: "Complete Convalescence & Discharge",
+    medicalFunction: "12th from 12th: Discharge from hospital; 6th from 6th: Victory over disease; full health gain",
+    isAfflictionHouse: false,
+    isRecoveryHouse: true,
+    transcriptSignificance: "Primary KP recovery pillar. Signification of 11 indicates release from hospital and regaining wellness.",
+  },
+  12: {
+    house: 12,
+    label: "Hospital Confinement & Vital Depletion",
+    medicalFunction: "Bed-rest, inpatient hospitalization, medical expenditure, physical exhaustion",
+    isAfflictionHouse: true,
+    isRecoveryHouse: false,
+    transcriptSignificance: "Isolation, hospital confinement, depletion of vitality, and intensive care context.",
+  },
+};
+
+export const TRADITIONAL_TREATMENT_MODALITIES: Record<KPPlanet, { modality: string; rationale: string }> = {
+  Jupiter: {
+    modality: "Allopathy / Evidence-Based Clinical Medicine",
+    rationale: "Jupiter represents organized institutions, accredited physicians, and standardized pharmaceutical therapies.",
+  },
+  Mercury: {
+    modality: "Homeopathy / Micro-Dose Integrative Therapeutics",
+    rationale: "Mercury represents subtle dynamic remedies, intellectual dilution protocols, and nervous system rebalancing.",
+  },
+  Rahu: {
+    modality: "Ayurveda / Botanical Detoxification & Rasayana",
+    rationale: "Rahu governs root botanicals, deep cellular detox, and ancient non-conventional therapeutic formulations.",
+  },
+  Moon: {
+    modality: "Hydration Therapy / Hydrotherapy / Liquid Nutrition",
+    rationale: "Moon rules bodily fluids, mothering nursing care, soothing broths, and convalescent rest.",
+  },
+  Sun: {
+    modality: "Heliotherapy, Surya Chikitsa & Vital Metabolic Regulation",
+    rationale: "Sun represents solar energy, natural circadian rhythm restoration, and metabolic fire revitalization.",
+  },
+  Mars: {
+    modality: "Surgical / Physiotherapy / Acute Interventional Care",
+    rationale: "Mars represents mechanical structural adjustments, surgical excision, and physical rehabilitation.",
+  },
+  Venus: {
+    modality: "Naturopathy, Herbology & Cellular Regeneration",
+    rationale: "Venus governs organic plant remedies, soothing oil therapies, and rejuvenating self-care.",
+  },
+  Saturn: {
+    modality: "Unani Medicine & Long-Term Constitutional Regimen",
+    rationale: "Saturn rules ancient classical Unani herbal balms, bone setting, and patient, disciplined recovery.",
+  },
+  Ketu: {
+    modality: "Yoga, Pranayama, Acupressure & Pranic Healing",
+    rationale: "Ketu represents spinal energy channels (Nadis), deep meditative breathwork, and esoteric pressure points.",
+  },
+};
+
+export const PLANETARY_SAFE_REMEDIES: Record<KPPlanet, HealthRemedy[]> = {
+  Sun: [
+    {
+      id: "REM-SUN-CHARITY-01",
+      title: "Nutritional & Eye-Care Dana for the Underprivileged",
+      type: "karmic_charity",
+      planet: "Sun",
+      doshaAffinity: "Pitta",
+      description: "Support medical eye camps, donate reading glasses, or distribute nourishing warm meals to underprivileged elders.",
+      actionableSteps: [
+        "Sponsor cataract or vision checkup camps for vulnerable elders.",
+        "Donate fresh fruits or nutritious wheat/grain meals to a community shelter on Sunday mornings.",
+      ],
+      traditionalRationale: "Sun rules vision, skeletal vitality, and royalty; humble charitable giving cools excessive solar heat and earns health merit.",
+      safetyNote: "Charitable service is 100% safe, socially positive, and psychologically grounding.",
+    },
+    {
+      id: "REM-SUN-LIFESTYLE-01",
+      title: "Circadian Solar Alignment & Hydration",
+      type: "ayurvedic_lifestyle",
+      planet: "Sun",
+      doshaAffinity: "Pitta",
+      description: "Gentle morning sun exposure (15 minutes before 8 AM) combined with alkaline, cooling hydration to balance digestive fire.",
+      actionableSteps: [
+        "Soak in early gentle sunlight for 10-15 minutes while doing gentle deep breathing.",
+        "Avoid overly spicy or deeply fried foods during peak afternoon heat.",
+      ],
+      traditionalRationale: "Sun governs Prana and vitamin D synthesis; morning light harmonizes pituitary and melatonin cycles.",
+      safetyNote: "Never gaze directly into strong midday sun. Follow dermatological guidance for sun exposure.",
+    },
+    {
+      id: "REM-SUN-MANTRA-01",
+      title: "Surya Gayatri & Gayatri Mantra Contemplation",
+      type: "mantra_meditation",
+      planet: "Sun",
+      doshaAffinity: "Pitta",
+      description: "Chanting the Gayatri Mantra or Surya Beej mantra (ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः) 11 or 108 times at dawn.",
+      actionableSteps: [
+        "Sit facing East in a quiet ventilated room.",
+        "Recite with steady, calming rhythm to settle mental agitation and build inner vitality.",
+      ],
+      traditionalRationale: "Acoustic resonance enhances vagal tone and cultivates mental fortitude against physical fatigue.",
+      safetyNote: "Pure mental sound vibration; completely safe.",
+    },
+  ],
+  Moon: [
+    {
+      id: "REM-MOON-CHARITY-01",
+      title: "Clean Drinking Water & Convalescent Nursing Support",
+      type: "karmic_charity",
+      planet: "Moon",
+      doshaAffinity: "Kapha",
+      description: "Donate water filters, clean drinking water tanks, or assist nursing care for maternal healthcare facilities.",
+      actionableSteps: [
+        "Distribute clean drinking water or donate towards water filtration systems in underserved clinics.",
+        "Provide milk, warm soup, or essentials to orphanages or nursing homes on Mondays.",
+      ],
+      traditionalRationale: "Moon rules fluids, mothers, and emotional sustenance; providing hydration balances somatic water retention.",
+      safetyNote: "Safe and meritorious community action.",
+    },
+    {
+      id: "REM-MOON-LIFESTYLE-01",
+      title: "Sleep Hygiene & Kapha Respiratory Balance",
+      type: "ayurvedic_lifestyle",
+      planet: "Moon",
+      doshaAffinity: "Kapha",
+      description: "Establish a strict 10 PM sleep schedule, sip warm ginger-tulsi tea, and avoid cold refrigerated fluids after sunset.",
+      actionableSteps: [
+        "Power down digital screens at least 45 minutes before bedtime.",
+        "Practice 10 minutes of gentle sheetali / anulom vilom breathing before sleep.",
+      ],
+      traditionalRationale: "Moon rules the circadian sleep-wake axis and respiratory mucus; warm fluids prevent Kapha stagnation.",
+      safetyNote: "Non-invasive lifestyle optimization.",
+    },
+    {
+      id: "REM-MOON-MANTRA-01",
+      title: "Chandra Shanti & Mental Serenity Dhyan",
+      type: "mantra_meditation",
+      planet: "Moon",
+      doshaAffinity: "Kapha",
+      description: "Mental recitation of 'ॐ सों सोमाय नमः' or 'ॐ नमः शिवाय' under gentle moonlight or before sleep.",
+      actionableSteps: [
+        "Dedicate 10 minutes to silent breath-focused mindfulness.",
+        "Observe thoughts without judgment to stabilize BP and emotional fluctuations.",
+      ],
+      traditionalRationale: "Reduces autonomic arousal and stabilizes parasympathetic tone.",
+      safetyNote: "Gentle meditation with zero adverse effects.",
+    },
+  ],
+  Mars: [
+    {
+      id: "REM-MARS-CHARITY-01",
+      title: "Blood Donation & Trauma Care Philanthropy",
+      type: "karmic_charity",
+      planet: "Mars",
+      doshaAffinity: "Pitta",
+      description: "Voluntary blood donation (if medically fit) or financial aid to emergency trauma/burns recovery wards.",
+      actionableSteps: [
+        "Donate blood at a certified blood bank once every 6 months if clinical criteria permit.",
+        "Donate medicines, surgical bandages, or burn-relief ointments to charitable casualty wards.",
+      ],
+      traditionalRationale: "Mars rules blood, cuts, and acute intervention; voluntarily offering blood or wound aid resolves aggressive Martian tension.",
+      safetyNote: "Only donate blood after hemoglobin and medical eligibility verification by medical personnel.",
+    },
+    {
+      id: "REM-MARS-LIFESTYLE-01",
+      title: "Controlled Muscular Release & Cooling Diet",
+      type: "ayurvedic_lifestyle",
+      planet: "Mars",
+      doshaAffinity: "Pitta",
+      description: "Channel high metabolic fire into structured resistance training, followed by cooling aloe vera or coconut water hydration.",
+      actionableSteps: [
+        "Engage in moderate physical exercise 4 days a week to vent muscular tension.",
+        "Incorporate coriander, cucumber, and pomegranate into the diet to pacify Pitta inflammation.",
+      ],
+      traditionalRationale: "Mars rules muscle and blood flow; constructive physical exertion prevents internal vascular hypertension.",
+      safetyNote: "Consult a physiotherapist before intense lifting if joint or back pain exists.",
+    },
+    {
+      id: "REM-MARS-MANTRA-01",
+      title: "Hanuman Chalisa & Mangal Shanti Recitation",
+      type: "mantra_meditation",
+      planet: "Mars",
+      doshaAffinity: "Pitta",
+      description: "Recitation of Sri Hanuman Chalisa with devotion, cultivating fearlessness and physical vitality.",
+      actionableSteps: [
+        "Chant or listen to the Hanuman Chalisa on Tuesday mornings or evenings.",
+        "Focus on the verses praising strength, health, and liberation from disease ('नासे रोग हरे सब पीरा').",
+      ],
+      traditionalRationale: "Hanuman is the archetypal protector against physical danger, weakness, and planetary affliction.",
+      safetyNote: "Safe spiritual practice.",
+    },
+  ],
+  Mercury: [
+    {
+      id: "REM-MERC-CHARITY-01",
+      title: "Green Fodder for Cows & Support for Speech-Impaired Children",
+      type: "karmic_charity",
+      planet: "Mercury",
+      doshaAffinity: "Tridosha",
+      description: "Feed fresh green fodder (Palak/Grass) to cows (Gaushala) and support schools for children with speech/neuro-divergence.",
+      actionableSteps: [
+        "Offer fresh green leafy grass or spinach to cows on Wednesday mornings.",
+        "Contribute notebooks, books, or speech therapy tools to special education centers.",
+      ],
+      traditionalRationale: "Mercury rules chlorophyll (green vegetables), nerves, intellect, and speech; nourishing green life calms neural reactivity.",
+      safetyNote: "Safe, compassionate animal welfare.",
+    },
+    {
+      id: "REM-MERC-LIFESTYLE-01",
+      title: "Respiratory Hygiene & Digital Detox",
+      type: "ayurvedic_lifestyle",
+      planet: "Mercury",
+      doshaAffinity: "Tridosha",
+      description: "Steam inhalation with tulsi leaves for respiratory cleansing and daily 1-hour screen-free quiet reading time.",
+      actionableSteps: [
+        "Incorporate regular gentle saline nasal hygiene or clean steam inhalation during change of seasons.",
+        "Apply virgin coconut or neem oil topically to dry skin patches to support skin barrier integrity.",
+      ],
+      traditionalRationale: "Protects both the respiratory bronchial mucosa and the dermal epidermal layer ruled by Mercury.",
+      safetyNote: "Ensure steam water is at a safe, non-scalding temperature.",
+    },
+    {
+      id: "REM-MERC-MANTRA-01",
+      title: "Budha Gayatri & Vishnu Sahasranama",
+      type: "mantra_meditation",
+      planet: "Mercury",
+      doshaAffinity: "Tridosha",
+      description: "Listening to or chanting Sri Vishnu Sahasranama or Budha Beeja mantra (ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः).",
+      actionableSteps: [
+        "Listen to Vishnu Sahasranama in a calm setting to calm frantic overthinking and nervous tension.",
+      ],
+      traditionalRationale: "Harmonizes brain waves, improves intellectual focus, and relieves neuromuscular stress.",
+      safetyNote: "Completely safe relaxation method.",
+    },
+  ],
+  Jupiter: [
+    {
+      id: "REM-JUP-CHARITY-01",
+      title: "Donation of Medicines & Food to Hospitalized Patients",
+      type: "karmic_charity",
+      planet: "Jupiter",
+      doshaAffinity: "Kapha",
+      description: "Support medical bills or donate medicines to financially challenged patients in public hospitals.",
+      actionableSteps: [
+        "Identify a verified medical relief fund or hospital pharmacy and sponsor patient prescriptions.",
+        "Distribute yellow fruits (papaya, bananas, oranges) to underprivileged hospital attendees on Thursdays.",
+      ],
+      traditionalRationale: "Jupiter represents divine grace, health restoration (Jeeva Karaka), and doctors; funding healing honors Jupiter's benevolence.",
+      safetyNote: "Universal karmic virtue.",
+    },
+    {
+      id: "REM-JUP-LIFESTYLE-01",
+      title: "Hepatic Protection & Anti-Inflammatory Fasting",
+      type: "ayurvedic_lifestyle",
+      planet: "Jupiter",
+      doshaAffinity: "Kapha",
+      description: "Avoid refined sugars and heavy greasy foods; practice light intermittent fasting or early light dinners.",
+      actionableSteps: [
+        "Incorporate turmeric (curcumin) with a pinch of black pepper in warm water for liver detoxification.",
+        "Engage in brisk 30-minute daily walking to stimulate lipid metabolism and prevent fatty liver accumulation.",
+      ],
+      traditionalRationale: "Protects the liver, bile duct, and cholesterol balance governed by Jupiter.",
+      safetyNote: "Do not undertake severe prolonged fasting without doctor or dietician supervision if diabetic.",
+    },
+    {
+      id: "REM-JUP-MANTRA-01",
+      title: "Brihaspati Stotram & Guru Kripa Meditation",
+      type: "mantra_meditation",
+      planet: "Jupiter",
+      doshaAffinity: "Kapha",
+      description: "Chanting 'ॐ बृं बृहस्पतये नमः' or meditating on one's teachers/healers with reverence.",
+      actionableSteps: [
+        "Chant 108 times on Thursday mornings with a calm heart, praying for overall biological harmony and wisdom.",
+      ],
+      traditionalRationale: "Cultivates optimism, boosts immune cellular resilience, and dispels depressive pessimism.",
+      safetyNote: "Beneficial mindfulness practice.",
+    },
+  ],
+  Venus: [
+    {
+      id: "REM-VEN-CHARITY-01",
+      title: "Support for Dialysis Patients & Women's Health Clinics",
+      type: "karmic_charity",
+      planet: "Venus",
+      doshaAffinity: "Kapha",
+      description: "Contribute to kidney foundation dialysis funds, donate sanitary kits, or support women's health screening.",
+      actionableSteps: [
+        "Donate to dialysis care funds assisting patients with chronic kidney failure.",
+        "Support charitable maternity and women's health clinics with medical supplies on Fridays.",
+      ],
+      traditionalRationale: "Venus governs renal filtration and reproductive organs; helping patients with kidney/hormonal care mitigates adverse planetary signatures.",
+      safetyNote: "Direct social impact.",
+    },
+    {
+      id: "REM-VEN-LIFESTYLE-01",
+      title: "Renal Hydration Discipline & Sugar Moderation",
+      type: "ayurvedic_lifestyle",
+      planet: "Venus",
+      doshaAffinity: "Kapha",
+      description: "Drink adequate pure water, avoid artificial sweeteners and excessive refined sugars, and consume barley water or coconut water.",
+      actionableSteps: [
+        "Maintain 2.5 to 3 liters of clean water intake daily (unless on medical fluid restriction).",
+        "Sip freshly prepared unsalted barley water weekly to flush the renal tubules naturally.",
+      ],
+      traditionalRationale: "Venus rules kidney clearance and pancreatic insulin sensitivity; flushing kidneys prevents calculi and toxic stagnation.",
+      safetyNote: "Patients diagnosed with advanced CKD or heart failure must follow their nephrologist's fluid restriction limits.",
+    },
+    {
+      id: "REM-VEN-MANTRA-01",
+      title: "Shukra Kavacham & Mahalakshmi Dhyan",
+      type: "mantra_meditation",
+      planet: "Venus",
+      doshaAffinity: "Kapha",
+      description: "Chanting 'ॐ शुं शुक्राय नमः' or listening to Sri Suktam for holistic vitality, skin radiance, and endocrine balance.",
+      actionableSteps: [
+        "Recite 108 times on Friday mornings in clean white attire.",
+      ],
+      traditionalRationale: "Cultivates hormonal balance, aesthetic harmony, and cellular rejuvenation (Ojas).",
+      safetyNote: "Safe sound therapy.",
+    },
+  ],
+  Saturn: [
+    {
+      id: "REM-SAT-CHARITY-01",
+      title: "Support for Orthopedic Relief, Sanitation Workers & Disabled Elders",
+      type: "karmic_charity",
+      planet: "Saturn",
+      doshaAffinity: "Vata",
+      description: "Donate crutches, walking sticks, wheelchairs, or warm blankets to physically challenged elders or sanitation workers.",
+      actionableSteps: [
+        "Provide sturdy footwear or walking aids to underprivileged elders or daily-wage workers.",
+        "Distribute black sesame, mustard oil, or warm hearty meals to homeless individuals on Saturdays.",
+      ],
+      traditionalRationale: "Saturn represents laborers, disabled persons, bones, and joints; serving them directly alleviates chronic pain signatures.",
+      safetyNote: "Highly meritorious and dignified social support.",
+    },
+    {
+      id: "REM-SAT-LIFESTYLE-01",
+      title: "Abhyanga (Warm Oil Massage) & Vata-Pacifying Warm Nutrition",
+      type: "ayurvedic_lifestyle",
+      planet: "Saturn",
+      doshaAffinity: "Vata",
+      description: "Gentle self-massage of knees and lower back with warm sesame oil before a warm shower; consuming warm, cooked, grounding meals.",
+      actionableSteps: [
+        "Massage warm sesame or mahanarayan oil into stiff joints 3 nights a week.",
+        "Drink warm water infused with a pinch of ajwain (carom seeds) to alleviate intestinal gas and constipation.",
+      ],
+      traditionalRationale: "Saturn rules chronic coldness, dry joints, and trapped Vata; warm oil lubricates cartilage and pacifies dry Vata.",
+      safetyNote: "Test oil on small skin patch first. Avoid massage over open wounds or acute fractures.",
+    },
+    {
+      id: "REM-SAT-MANTRA-01",
+      title: "Maha Mrityunjaya Mantra & Shani Gayatri",
+      type: "mantra_meditation",
+      planet: "Saturn",
+      doshaAffinity: "Vata",
+      description: "Daily recitation of the Maha Mrityunjaya Mantra (108 times) to neutralize chronic dread, pain, and degenerative decline.",
+      actionableSteps: [
+        "Sit in a warm, quiet room facing North or East.",
+        "Recite with steady focus: 'ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् | उर्वारुकमिव बन्धनान्मृत्योर्मुक्षीय माऽमृतात् ||'",
+      ],
+      traditionalRationale: "The supreme restorative Vedic chant for longevity, fearlessness, pain reduction, and cellular regeneration.",
+      safetyNote: "World-renowned sacred practice.",
+    },
+  ],
+  Rahu: [
+    {
+      id: "REM-RAHU-CHARITY-01",
+      title: "Feeding Stray Animals & Support for Undiagnosed/Leprosy Centers",
+      type: "karmic_charity",
+      planet: "Rahu",
+      doshaAffinity: "Vata",
+      description: "Feed stray dogs, birds, or fish regularly, and assist organizations working with rare/infectious diseases.",
+      actionableSteps: [
+        "Feed street dogs with healthy food or fresh milk daily or on Wednesday/Saturday evenings.",
+        "Donate blankets, disinfectants, or antifungal medicines to shelters.",
+      ],
+      traditionalRationale: "Rahu represents marginalized life forms, stray animals, and mysterious pathogens; feeding strays dispels psychic and toxic anxiety.",
+      safetyNote: "Always maintain safe distance and hygiene when interacting with community animals.",
+    },
+    {
+      id: "REM-RAHU-LIFESTYLE-01",
+      title: "Pranayama for Blood Oxygenation & Toxin Avoidance",
+      type: "ayurvedic_lifestyle",
+      planet: "Rahu",
+      doshaAffinity: "Vata",
+      description: "Deep diaphragmatic breathing, consuming fresh organic foods, and avoiding stale/processed/fermented leftover meals.",
+      actionableSteps: [
+        "Practice 15 minutes of Anulom-Vilom (Alternate Nostril Breathing) to maximize alveolar oxygenation.",
+        "Strictly avoid junk food, alcohol, and stale refrigerated food that harbor fungal toxins.",
+      ],
+      traditionalRationale: "Rahu governs oxygen depletion and exotic microbial toxins; fresh food and conscious breathing purify cellular bio-energy.",
+      safetyNote: "Do not strain lungs; breathe smoothly and naturally.",
+    },
+    {
+      id: "REM-RAHU-MANTRA-01",
+      title: "Durga Saptashati Shlokas & Rahu Beeja Mantra",
+      type: "mantra_meditation",
+      planet: "Rahu",
+      doshaAffinity: "Vata",
+      description: "Chanting 'ॐ भ्रां भ्रीं भ्रौं सः राहवे नमः' or reciting the Durga Kavacham for psychic protection and immunity.",
+      actionableSteps: [
+        "Recite during evening twilight to calm nocturnal panic and somatic restlessness.",
+      ],
+      traditionalRationale: "Goddess Durga reigns over Mahamaya and shields against unseen pathogens, psychic illusions, and chronic phobias.",
+      safetyNote: "Safe spiritual sanctuary.",
+    },
+  ],
+  Ketu: [
+    {
+      id: "REM-KETU-CHARITY-01",
+      title: "Support for Monasteries, Spiritual Seekers & Animal Rescue",
+      type: "karmic_charity",
+      planet: "Ketu",
+      doshaAffinity: "Pitta",
+      description: "Provide shelter, food, or medical aid to injured stray dogs or donate to ashrams/meditation retreats.",
+      actionableSteps: [
+        "Feed multi-colored (spotted) stray dogs with warm chapati or nutritious food.",
+        "Donate warm blankets, mats, or mosquito nets to hermits, monks, or hospice workers.",
+      ],
+      traditionalRationale: "Ketu represents detachment, spine, and mendicants; selfless service dissolves deep karmic knots affecting the nervous and spinal axis.",
+      safetyNote: "Completely safe humanitarian charity.",
+    },
+    {
+      id: "REM-KETU-LIFESTYLE-01",
+      title: "Spinal Health Yoga & Pranic Grounding",
+      type: "ayurvedic_lifestyle",
+      planet: "Ketu",
+      doshaAffinity: "Pitta",
+      description: "Gentle spinal mobility asanas (Cat-Cow, Bhujangasana, gentle spinal twists) and consuming alkaline herbal teas.",
+      actionableSteps: [
+        "Perform 15 minutes of gentle spinal decompressive stretching every morning.",
+        "Drink herbal infusion of fenugreek or coriander seeds to support urinary tract comfort.",
+      ],
+      traditionalRationale: "Ketu rules the spinal cord (Sushumna) and urinary sphincters; spinal decompression releases dormant neuro-muscular impingement.",
+      safetyNote: "Avoid jerky spinal twists if you have an active herniated disc; consult a qualified yoga therapist.",
+    },
+    {
+      id: "REM-KETU-MANTRA-01",
+      title: "Ganesha Atharvashirsha & Ketu Beeja Mantra",
+      type: "mantra_meditation",
+      planet: "Ketu",
+      doshaAffinity: "Pitta",
+      description: "Recitation of Sri Ganesha Atharvashirsha or 'ॐ कें केतवे नमः' for mental clarity, spinal equilibrium, and release of blocked prana.",
+      actionableSteps: [
+        "Chant on Tuesday or Thursday mornings with steady contemplation on Lord Ganesha, the remover of somatic blockages.",
+      ],
+      traditionalRationale: "Lord Ganesha governs the Muladhara chakra where Ketu's energy is rooted; chanting grounds erratic nervous impulses.",
+      safetyNote: "Gentle, uplifting sound practice.",
+    },
+  ],
+};
+
+export const SIXTEEN_DAY_REMEDY_PROTOCOLS: Record<KPPlanet, SixteenDayRemedyProtocol> = {
+  Sun: {
+    planet: "Sun",
+    clothColor: "Orange (संतरी)",
+    material: "1 चम्मच साबुत गेहूं या दलिया (1 tsp wheat or broken wheat)",
+    packetCount: 16,
+    burnMethod: "गैस पर स्टील की चाय छानने वाली छलनी (Steel tea strainer) में रखकर जलाएं",
+    disposalDestination: "Kitchen Sink",
+    disposalDetails: "जली हुई सामग्री को किचन सिंक में नल के पानी के साथ बहा दें",
+    recommendedTiming: "Morning (प्रातः काल)",
+    strictFoodAvoidance: "दोपहर में गेहूं की चपाती/गेहूं की चीजें न खाएं (Avoid wheat chapati during midday)",
+    specialConditionNotes: "यदि समस्या तीव्र हो तो प्रातः एवं सायं दोनों समय कर सकते हैं।",
+  },
+  Moon: {
+    planet: "Moon",
+    clothColor: "White (सफेद)",
+    material: "1 चम्मच साबुत चावल (1 tsp whole raw rice)",
+    packetCount: 16,
+    burnMethod: "स्टील की चाय छलनी में रखकर गैस पर जलाएं",
+    disposalDestination: "Kitchen Sink",
+    disposalDetails: "कांच के गिलास में थोड़ा कच्चा दूध लेकर उसमें जली हुई सामग्री मिलाएं, फिर किचन सिंक में बहा दें",
+    recommendedTiming: "Night before sleep (सोने से ठीक पहले)",
+    strictFoodAvoidance: "रात के समय दूध पीने से सख्त परहेज़ करें (Do not drink milk at night)",
+    specialConditionNotes: "मानसिक अशांति, अत्यधिक चिंता या कफ-प्रकोप के समय विशेष लाभकारी।",
+  },
+  Mars: {
+    planet: "Mars",
+    clothColor: "कपड़े की आवश्यकता नहीं (No cloth required)",
+    material: "साबुत सूखी लाल मिर्च (Whole dry red chili - पीसी हुई नहीं)",
+    packetCount: 16,
+    burnMethod: "प्रत्यक्ष गैस पर या छलनी में रखकर जलाएं",
+    disposalDestination: "Kitchen Sink",
+    disposalDetails: "जली हुई लाल मिर्च को किचन सिंक में पानी के साथ बहाएं",
+    recommendedTiming: "Morning & Evening (प्रातः एवं सायं)",
+    strictFoodAvoidance: "तीखा भोजन, अत्यधिक लाल मिर्च और लाल रंग के कपड़े पहनने से परहेज़ करें",
+    specialConditionNotes: "यदि शारीरिक दर्द या रक्तचाप की समस्या तीव्र हो तो दिन में दो बार करें।",
+  },
+  Mercury: {
+    planet: "Mercury",
+    clothColor: "Green (हरा)",
+    material: "1 चम्मच साबुत हरी मूंग दाल + 2 साबुत हरी इलायची",
+    packetCount: 16,
+    burnMethod: "स्टील की चाय छलनी में रखकर गैस पर जलाएं",
+    disposalDestination: "Kitchen Sink",
+    disposalDetails: "जली हुई सामग्री को किचन सिंक में नल के पानी के साथ बहा दें",
+    recommendedTiming: "Morning & Evening (प्रातः एवं सायं)",
+    strictFoodAvoidance: "हरी सब्जियां और मूंग की दाल खाने से परहेज़ करें (Avoid green vegetables & moong dal)",
+    specialConditionNotes: "श्वसन नली, एलर्जी या नसों की संवेदनशीलता के लिए अत्यंत प्रभावी।",
+  },
+  Venus: {
+    planet: "Venus",
+    clothColor: "Turquoise / फिरोजी सिल्क (Silk)",
+    material: "1 चम्मच सफेद चिरी / सरगम (1 tsp White Chiri)",
+    packetCount: 16,
+    burnMethod: "स्टील की चाय छलनी में रखकर गैस पर जलाएं",
+    disposalDestination: "Kitchen Sink",
+    disposalDetails: "कांच की कटोरी में थोड़ा सा दही लेकर उसमें जली हुई चिरी मिलाएं और किचन सिंक में बहाएं",
+    recommendedTiming: "Morning (प्रातः काल)",
+    strictFoodAvoidance: "अत्यधिक मीठा और प्रसंस्कृत शर्करा से परहेज़ करें",
+    specialConditionNotes: "किडनी, मूत्र मार्ग एवं स्किन एलर्जी से संबंधित प्रवृत्तियों में अनुशंसित।",
+  },
+  Saturn: {
+    planet: "Saturn",
+    clothColor: "Black (काला)",
+    material: "साबुत काली उड़द की दाल + थोड़ा सरसों का तेल (शरीर/जोड़ों पर हल्की मालिश करके बची हुई दाल)",
+    packetCount: 16,
+    burnMethod: "स्टील की चाय छलनी में रखकर गैस पर जलाएं",
+    disposalDestination: "Toilet Flush",
+    disposalDetails: "सख्त नियम: जली हुई सामग्री को सीधे TOILET में डालकर FLUSH करें (किचन सिंक में भूलकर भी न डालें)",
+    recommendedTiming: "Evening (सायंकाल सूर्यास्त के समय)",
+    strictFoodAvoidance: "काली उड़द की दाल और तली-भुनी बासी चीजों के सेवन से सख्त परहेज़ करें",
+    specialConditionNotes: "शनि कचरे व रुकावट का कारक है, इसलिए विसर्जन केवल टॉयलेट फ्लश में ही शास्त्रसम्मत है।",
+  },
+  Rahu: {
+    planet: "Rahu",
+    clothColor: "Grey / Silver / Smoky (धूमिल/स्लेटी)",
+    material: "1 चम्मच चाय पत्ती (Tea leaves)",
+    packetCount: 16,
+    burnMethod: "स्टील की चाय छलनी में रखकर गैस पर जलाएं",
+    disposalDestination: "Toilet Flush",
+    disposalDetails: "सख्त नियम: जली हुई सामग्री को सीधे TOILET में डालकर FLUSH करें (किचन सिंक में कभी नहीं)",
+    recommendedTiming: "Morning & Evening (प्रातः एवं सायं)",
+    strictFoodAvoidance: "चाय, कॉफी एवं नशीले पदार्थों के सेवन से पूरी तरह बचें",
+    specialConditionNotes: "गंभीर संक्रमण में: आधा चम्मच चाय पत्ती + आधा चम्मच कॉफी पाउडर लें। अति-गंभीर स्थिति में टॉयलेट को एसिड से साफ करें।",
+  },
+  Ketu: {
+    planet: "Ketu",
+    clothColor: "Dark Brown (गहरा भूरा)",
+    material: "1 इंच आमचूर की सूखी स्टिक + आधा चम्मच कुल्थी दाल (Horse Gram)",
+    packetCount: 16,
+    burnMethod: "स्टील की चाय छलनी में रखकर गैस पर जलाएं",
+    disposalDestination: "Toilet Flush",
+    disposalDetails: "सख्त नियम: जली हुई सामग्री को सीधे TOILET में डालकर FLUSH करें (किचन सिंक में नहीं)",
+    recommendedTiming: "Evening 7:00 PM – 8:00 PM",
+    strictFoodAvoidance: "खट्टी चीजें (नींबू, इमली, आमचूर, चाट, सिरका) खाने से सख्त परहेज़ करें",
+    specialConditionNotes: "रीढ़ की हड्डी, नसों के संकुचन, गांठ या रसौली (cysts) की पारंपरिक शांति हेतु।",
+  },
+  Jupiter: {
+    planet: "Jupiter",
+    clothColor: "Yellow (पीला)",
+    material: "1 चम्मच चने की दाल + चुटकी भर हल्दी",
+    packetCount: 16,
+    burnMethod: "स्टील की चाय छलनी में रखकर गैस पर जलाएं",
+    disposalDestination: "Kitchen Sink",
+    disposalDetails: "जली हुई सामग्री को किचन सिंक में स्वच्छ जल के साथ बहा दें",
+    recommendedTiming: "Morning (प्रातः काल)",
+    strictFoodAvoidance: "अत्यधिक गरिष्ठ, वसायुक्त और बासी भोजन से परहेज़ करें",
+    specialConditionNotes: "लीवर, वसा संतुलन और अवांछित कोशिकीय वृद्धि की प्रवृत्तियों को शांत करने हेतु।",
+  },
+};
+
+export const SPECIAL_TRANSCRIPT_RULES: SpecialTranscriptGuideline[] = [
+  {
+    id: "RULE-SAT-RAHU-1ST-HOUSE",
+    title: "1st House Saturn / Rahu: Celebration & Energy Protection Rule",
+    condition: "Saturn or Rahu placed in or dominating the 1st House (Lagna)",
+    traditionalRule: "Achievement पर कभी भी लाउड सेलिब्रेशन, डीजे या ढोल-नगाड़े न बजाएं। भारी उत्सवों में तुरंत तीव्र नज़र (Evil eye) और आंतरिक दबाव (Mental pressure) उत्पन्न होता है।",
+    actionableAdvice: "सफलता या प्रगति को शांत, विनम्र और व्यक्तिगत रखें। सार्वजनिक दिखावे और अत्यधिक शोर-शराबे वाले आयोजनों से स्वयं को बचाकर रखें।",
+  },
+  {
+    id: "RULE-MOON-6TH-INJECTION",
+    title: "6th House Moon: Parenteral / Injection Sensitivity Rule",
+    condition: "Moon placed in the 6th House or functioning as 6th Cusp Sub-Lord",
+    traditionalRule: "6th भाव का चन्द्रमा इंजेक्शन, सुई या पैरेंट्रल दवाओं से तीव्र एलर्जी, घबराहट या सिस्टमिक रिएक्शन की संभावना बनाता है।",
+    actionableAdvice: "किसी भी नई दवा या इंजेक्शन के समय डॉक्टर को दवा एलर्जी या हाइपरसेंसिटिविटी की पूर्व जानकारी दें। जहां संभव हो, ओरल सिरप/तरल दवाएं अधिक अनुकूल रहती हैं।",
+  },
+  {
+    id: "RULE-OCULAR-2ND-12TH",
+    title: "Ocular Health: Right Eye vs. Left Eye Spatial Rule",
+    condition: "Affliction involving 2nd House or 12th House with Sun / Moon",
+    traditionalRule: "2nd House = दाहिनी आँख (Right Eye, Sun affinity); 12th House = बाईं आँख (Left Eye, Moon affinity)।",
+    actionableAdvice: "यदि 2nd भाव पीड़ित हो तो दाहिनी आँख के विज़न और रेटिना का विशेष ध्यान रखें; 12th भाव प्रभावित हो तो बाईं आँख व जल-संतुलन की जांच कराएं।",
+  },
+  {
+    id: "RULE-MEDICAL-ASTRO-SEVA",
+    title: "Sacred Seva Rule: Zero Commercialization of Health Astrology",
+    condition: "Universal ethical guideline across all medical consultations",
+    traditionalRule: "Medical Astrology का कभी व्यापार या व्यावसायिक शुल्क नहीं लेना चाहिए — यह विशुद्ध रूप से लोक-कल्याण, सेवा और ईश्वरीय पुण्य का कार्य है।",
+    actionableAdvice: "AstroLife का यह मॉड्यूल पूरी तरह निःशुल्क, निष्पक्ष और सेवा-भाव से संचालित है। इसे केवल एक मार्गदर्शक के रूप में लें, मुख्य निर्णय हमेशा रजिस्टर्ड डॉक्टर से ही लें।",
+  },
+];

@@ -91,15 +91,11 @@ export function calculateClassicalNodalLineage(chart: ChartData): NodalLineagePr
   const ketuD1Sign = ketu?.sign || "Capricorn";
   
   // Approximate or retrieve D9 signs
-  const rahuD9Sign = chart.navamsha?.planets?.Rahu?.sign || rahuD1Sign; // fallback
-  const ketuD9Sign = chart.navamsha?.planets?.Ketu?.sign || ketuD1Sign;
+  const rahuD9Sign = chart.planets?.Rahu?.navamsha || (chart as any).navamsha?.planets?.Rahu?.sign || rahuD1Sign;
+  const ketuD9Sign = chart.planets?.Ketu?.navamsha || (chart as any).navamsha?.planets?.Ketu?.sign || ketuD1Sign;
   
-  const isRahuVargottama = chart.navamsha?.planets?.Rahu?.sign 
-    ? chart.navamsha.planets.Rahu.sign === rahuD1Sign
-    : false;
-  const isKetuVargottama = chart.navamsha?.planets?.Ketu?.sign
-    ? chart.navamsha.planets.Ketu.sign === ketuD1Sign
-    : false;
+  const isRahuVargottama = Boolean(rahuD9Sign && rahuD9Sign === rahuD1Sign);
+  const isKetuVargottama = Boolean(ketuD9Sign && ketuD9Sign === ketuD1Sign);
 
   // 3. Kendra-Trikona Yogakaraka Status for Nodes
   const rahuH = rahu?.house || 2;

@@ -94,7 +94,7 @@ export function generateRemedyIntelligence(
     preference?: UserRemedyPreference;
   }
 ): RemedyIntelligenceResult {
-  const name = options?.nativeName || chart?.name || "मुकुल";
+  const name = options?.nativeName || chart?.name || "Seeker";
   const preference = options?.preference || "All";
 
   const allRemedies: RemedyItem[] = [];
@@ -275,9 +275,10 @@ export function generateRemedyIntelligence(
   });
 
   // ── 8. SPECIALIZED GATED CONTRAINDICATION: GEMSTONES ──────────────────────
+  const ketuH = chart?.planets?.Ketu?.house;
   let isGemstoneEligible = false;
   let gemReason =
-    "कुंडली में राहु 2वें भाव और केतु 8वें भाव में हैं। केवल नोडल प्लेसमेंट देखकर गोमेद (Hessonite) या लहसुनिया (Cat's Eye) पहनना हानिकारक हो सकता है। जब तक ग्रह का शुभ स्वाम्य और दशा पूर्ण रूप से अनुकूल न हो, कोई रत्न न पहनें। वर्तमान में व्यावहारिक और पारंपरिक अभ्यास 100% पर्याप्त हैं।";
+    `कुंडली में राहु ${rahuH ? `${rahuH}वें` : ""} भाव और केतु ${ketuH ? `${ketuH}वें` : ""} भाव में स्थित हैं। केवल नोडल प्लेसमेंट देखकर गोमेद (Hessonite) या लहसुनिया (Cat's Eye) पहनना हानिकारक हो सकता है। जब तक ग्रह का शुभ स्वाम्य और दशा पूर्ण रूप से अनुकूल न हो, कोई रत्न न पहनें। वर्तमान में व्यावहारिक और पारंपरिक अभ्यास 100% सुरक्षित और पर्याप्त हैं।`;
 
   // Filter based on User Preference
   let filteredRemedies = [...allRemedies];

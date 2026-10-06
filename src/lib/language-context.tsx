@@ -59,6 +59,7 @@ const TRANSLATIONS: Record<string, Record<Language, string>> = {
   "milan.groom_label": { english: "Groom's Birth Details", hindi: "👨 वर की जन्म पत्रिका", hinglish: "👨 Ladke ki Janam Patrika" },
   "milan.bride_label": { english: "Bride's Birth Details", hindi: "👩 कन्या की जन्म पत्रिका", hinglish: "👩 Ladki ki Janam Patrika" },
   "milan.calculate_btn": { english: "Analyse Quick Ashtakoot", hindi: "त्वरित अष्टकूट विश्लेषण करें", hinglish: "Quick Ashtakoot Analyse Karein" },
+  "milan.tab_master": { english: "👑 Master Report", hindi: "👑 मास्टर विवाह रिपोर्ट", hinglish: "👑 Master Report" },
   "milan.tab_marriage": { english: "Overview", hindi: "सारांश", hinglish: "Overview" },
   "milan.tab_koots": { english: "Overview", hindi: "सारांश", hinglish: "Overview" },
   "milan.tab_psychology": { english: "Compatibility", hindi: "अनुकूलता", hinglish: "Compatibility" },

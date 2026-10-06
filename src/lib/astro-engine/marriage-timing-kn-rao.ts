@@ -57,12 +57,13 @@ export interface MarriageTimingInput {
   antardashaVargottama?: boolean;
 
   // ── Transits ──────────────────────────────────────────────────────────────
-  transitSaturn?: { sign: string; house: number };
-  transitJupiter?: { sign: string; house: number };
+  transitSaturn?: { sign: string; house: number; retrograde?: boolean; lon?: number };
+  transitJupiter?: { sign: string; house: number; retrograde?: boolean; lon?: number };
   transitVenus?: { sign: string; house: number };         // kept for compatibility
   transitLagnaLord?: { sign: string; house: number };
   transitSeventhLord?: { sign: string; house: number };
   transitPlanetHouses?: Record<string, number>;           // P7: planet→house from natal lagna
+  transitMoon?: { sign: string; house: number };          // O1: wedding day Moon transit
 
   // ── Natal references ──────────────────────────────────────────────────────
   natalAscendant?: string;
@@ -73,8 +74,11 @@ export interface MarriageTimingInput {
   natalMarsHouse?: number;         // P6 female
   natalJupiterSign?: string;
   natalJupiterHouse?: number;
-  natalMoonSign?: string;          // compatibility
+  natalMoonSign?: string;          // compatibility & O1
   natalMoonHouse?: number;         // compatibility
+  natalRahuSign?: string;          // O1 RK axis
+  natalKetuSign?: string;          // O1 RK axis
+  karakamshaSign?: string;         // O1 Karakamsha Lagna
 
   // ── D1 dasha helpers (P1) ─────────────────────────────────────────────────
   d1SecondLord?: string;
@@ -219,6 +223,30 @@ function aspects(
     planet === "Saturn"  ? [3, 10] :
     planet === "Mars"    ? [4, 8] : [];
   return [7, ...special].some(a => ((fromHouse + a - 2) % 12) + 1 === targetHouse);
+}
+
+/**
+ * Classical K.N. Rao Retrograde & Sandhi Transit Rule:
+ * When a transiting planet is retrograde (Vakri) or at sign sandhi (0°-2°),
+ * it casts its aspects and effects not only from its occupied sign/house,
+ * but ALSO from the preceding sign/house (Proven in K.N. Rao cases 3, 6, 9, 15, 20, 25, 28, 41, 47, 50).
+ */
+function getTransitPositions(p?: { sign: string; house: number; retrograde?: boolean; lon?: number }): Array<{ sign: string; house: number; isSandhiOrRetro: boolean }> {
+  if (!p || !p.sign) return [];
+  const res: Array<{ sign: string; house: number; isSandhiOrRetro: boolean }> = [
+    { sign: p.sign, house: p.house, isSandhiOrRetro: false }
+  ];
+  const sIdx = SIGN_IDX[p.sign];
+  const isRetro = p.retrograde === true;
+  const isSandhi = p.lon !== undefined && (p.lon % 30 < 2.0 || p.lon % 30 > 28.5);
+  if (isRetro || isSandhi) {
+    if (sIdx !== undefined && p.house > 0) {
+      const precSign = SIGNS[(sIdx - 1 + 12) % 12];
+      const precHouse = ((p.house - 2 + 12) % 12) + 1;
+      res.push({ sign: precSign, house: precHouse, isSandhiOrRetro: true });
+    }
+  }
+  return res;
 }
 
 function clamp(n: number): number { return Math.max(0, Math.min(100, n)); }
@@ -380,47 +408,46 @@ function evalP2(input: MarriageTimingInput): { fulfilled: boolean; score: number
 function evalP3(input: MarriageTimingInput): { fulfilled: boolean; score: number; evidence: string[] } {
   const ev: string[] = [];
   const vs  = input.vivahSahamSign ?? "";
-  const jS  = input.transitJupiter?.sign ?? "";
-  const jH  = input.transitJupiter?.house ?? 0;
+  const jPositions = getTransitPositions(input.transitJupiter);
 
   if (!vs) {
     ev.push("Vivah Saham not computed — ensure scanner uses (LL_lon + 7L_lon) % 360 formula");
     return { fulfilled: false, score: 0, evidence: ev };
   }
-  if (!jS) {
+  if (jPositions.length === 0) {
     ev.push(`Vivah Saham in ${vs}; Jupiter transit data unavailable`);
     return { fulfilled: false, score: 0, evidence: ev };
   }
 
-  // Direct conjunction: Jupiter in same sign as Vivah Saham
-  if (jS === vs) {
-    ev.push(`Transit Jupiter conjunct Vivah Saham in ${vs} — direct marriage Saham activation`);
-    return { fulfilled: true, score: 100, evidence: ev };
+  // Check direct conjunction in any active transit position (direct or retro/sandhi)
+  for (const pos of jPositions) {
+    if (pos.sign === vs) {
+      ev.push(`Transit Jupiter ${pos.isSandhiOrRetro ? "(acting from preceding sign via retro/sandhi) " : ""}conjunct Vivah Saham in ${vs} — direct marriage Saham activation`);
+      return { fulfilled: true, score: 100, evidence: ev };
+    }
   }
 
-  // Jupiter's special aspects (5th/7th/9th) hitting Vivah Saham sign
-  if (jH > 0) {
+  // Check aspects
+  for (const pos of jPositions) {
     const vsIdx = SIGN_IDX[vs] ?? -1;
-    const jIdx  = SIGN_IDX[jS] ?? -1;
+    const jIdx  = SIGN_IDX[pos.sign] ?? -1;
     if (vsIdx >= 0 && jIdx >= 0) {
-      // Check if Jupiter (at jIdx) aspects sign vsIdx via 5th/7th/9th
       const asp5 = SIGNS[(jIdx + 4) % 12];
       const asp7 = SIGNS[(jIdx + 6) % 12];
       const asp9 = SIGNS[(jIdx + 8) % 12];
       if (vs === asp5 || vs === asp7 || vs === asp9) {
-        ev.push(`Transit Jupiter (${jS}) aspects Vivah Saham ${vs} — Saham partially activated`);
+        ev.push(`Transit Jupiter in ${pos.sign}${pos.isSandhiOrRetro ? " (retrograde/sandhi influence)" : ""} aspects Vivah Saham ${vs} — Saham partially activated`);
         return { fulfilled: false, score: 55, evidence: ev };
       }
-      // Also check Jaimini rashi drishti connection
-      const c = signsConnect(jS, vs);
+      const c = signsConnect(pos.sign, vs);
       if (c.ok) {
-        ev.push(`Transit Jupiter (${jS}) connects to Vivah Saham ${vs} via ${c.how}`);
+        ev.push(`Transit Jupiter (${pos.sign}${pos.isSandhiOrRetro ? " retro/sandhi" : ""}) connects to Vivah Saham ${vs} via ${c.how}`);
         return { fulfilled: false, score: 55, evidence: ev };
       }
     }
   }
 
-  ev.push(`Transit Jupiter in ${jS} — Vivah Saham ${vs} not activated this period`);
+  ev.push(`Transit Jupiter in ${input.transitJupiter?.sign ?? "—"} — Vivah Saham ${vs} not activated this period`);
   return { fulfilled: false, score: 0, evidence: ev };
 }
 
@@ -432,13 +459,13 @@ function evalP3(input: MarriageTimingInput): { fulfilled: boolean; score: number
 // ─────────────────────────────────────────────────────────────────────────────
 function evalP4(input: MarriageTimingInput): { fulfilled: boolean; score: number; evidence: string[] } {
   const ev: string[] = [];
-  const jH  = input.transitJupiter?.house ?? 0;
-  const sH  = input.transitSaturn?.house  ?? 0;
+  const jPositions = getTransitPositions(input.transitJupiter);
+  const sPositions = getTransitPositions(input.transitSaturn);
   const np  = input.natalPlanets ?? {};
   const LL  = input.d1LagnaLord    ?? "";
   const d17L = input.d1SeventhLord ?? "";
 
-  if (!jH || !sH) {
+  if (jPositions.length === 0 || sPositions.length === 0) {
     ev.push("Jupiter or Saturn transit data missing — P4 cannot be evaluated");
     return { fulfilled: false, score: 0, evidence: ev };
   }
@@ -447,22 +474,33 @@ function evalP4(input: MarriageTimingInput): { fulfilled: boolean; score: number
   const llNatalH = np[LL]?.house  ?? 0;
   const slNatalH = np[d17L]?.house ?? 0;
 
-  function activatesAxis(planet: "Jupiter"|"Saturn", trHouse: number): { ok: boolean; what: string } {
-    if (aspects(planet, trHouse, 1)) return { ok: true, what: `H1 (Lagna)` };
-    if (aspects(planet, trHouse, 7)) return { ok: true, what: `H7 (7th house)` };
-    if (llNatalH > 0 && aspects(planet, trHouse, llNatalH)) return { ok: true, what: `H${llNatalH} (${LL}'s house)` };
-    if (slNatalH > 0 && aspects(planet, trHouse, slNatalH)) return { ok: true, what: `H${slNatalH} (${d17L}'s house)` };
-    return { ok: false, what: "" };
+  function activatesAxis(planet: "Jupiter"|"Saturn", pos: { sign: string; house: number; isSandhiOrRetro: boolean }): { ok: boolean; what: string; note: string } {
+    const trHouse = pos.house;
+    const note = pos.isSandhiOrRetro ? ` (acting from H${trHouse} / ${pos.sign} via retro/sandhi)` : ` (H${trHouse})`;
+    if (aspects(planet, trHouse, 1)) return { ok: true, what: `H1 (Lagna)`, note };
+    if (aspects(planet, trHouse, 7)) return { ok: true, what: `H7 (7th house)`, note };
+    if (llNatalH > 0 && aspects(planet, trHouse, llNatalH)) return { ok: true, what: `H${llNatalH} (${LL}'s house)`, note };
+    if (slNatalH > 0 && aspects(planet, trHouse, slNatalH)) return { ok: true, what: `H${slNatalH} (${d17L}'s house)`, note };
+    return { ok: false, what: "", note: "" };
   }
 
-  const jAct = activatesAxis("Jupiter", jH);
-  const sAct = activatesAxis("Saturn",  sH);
+  let jAct = { ok: false, what: "", note: "" };
+  for (const pos of jPositions) {
+    const act = activatesAxis("Jupiter", pos);
+    if (act.ok) { jAct = act; break; }
+  }
 
-  if (jAct.ok) ev.push(`Jupiter (H${jH}) activates ${jAct.what}`);
-  else ev.push(`Jupiter (H${jH}) — not activating marriage axis`);
+  let sAct = { ok: false, what: "", note: "" };
+  for (const pos of sPositions) {
+    const act = activatesAxis("Saturn", pos);
+    if (act.ok) { sAct = act; break; }
+  }
 
-  if (sAct.ok) ev.push(`Saturn (H${sH}) activates ${sAct.what}`);
-  else ev.push(`Saturn (H${sH}) — not activating marriage axis`);
+  if (jAct.ok) ev.push(`Jupiter${jAct.note} activates ${jAct.what}`);
+  else ev.push(`Jupiter (H${input.transitJupiter?.house}) — not activating marriage axis`);
+
+  if (sAct.ok) ev.push(`Saturn${sAct.note} activates ${sAct.what}`);
+  else ev.push(`Saturn (H${input.transitSaturn?.house}) — not activating marriage axis`);
 
   if (jAct.ok && sAct.ok) {
     ev.push("DOUBLE TRANSIT COMPLETE — Jupiter + Saturn both activate marriage axis simultaneously");
@@ -534,10 +572,9 @@ function evalP5(input: MarriageTimingInput): { fulfilled: boolean; score: number
 // ─────────────────────────────────────────────────────────────────────────────
 function evalP6(input: MarriageTimingInput): { fulfilled: boolean; score: number; evidence: string[] } {
   const ev: string[] = [];
-  const jS = input.transitJupiter?.sign  ?? "";
-  const jH = input.transitJupiter?.house ?? 0;
+  const jPositions = getTransitPositions(input.transitJupiter);
 
-  if (!jS) {
+  if (jPositions.length === 0) {
     ev.push("Jupiter transit data unavailable — P6 cannot be evaluated");
     return { fulfilled: false, score: 0, evidence: ev };
   }
@@ -553,18 +590,22 @@ function evalP6(input: MarriageTimingInput): { fulfilled: boolean; score: number
   }
 
   // Direct conjunction: Jupiter in same sign as natal Venus/Mars
-  if (targetSign && jS === targetSign) {
-    ev.push(`Transit Jupiter conjunct ${karaka} in ${targetSign} — romance karaka directly activated`);
-    return { fulfilled: true, score: 100, evidence: ev };
+  for (const pos of jPositions) {
+    if (targetSign && pos.sign === targetSign) {
+      ev.push(`Transit Jupiter ${pos.isSandhiOrRetro ? "(acting from preceding sign via retro/sandhi) " : ""}conjunct ${karaka} in ${targetSign} — romance karaka directly activated`);
+      return { fulfilled: true, score: 100, evidence: ev };
+    }
   }
 
   // Jupiter's special aspects (5th/7th/9th) on natal Venus/Mars house
-  if (jH > 0 && targetHouse > 0 && aspects("Jupiter", jH, targetHouse)) {
-    ev.push(`Transit Jupiter (H${jH}) aspects ${karaka} (H${targetHouse}) — karaka aspected`);
-    return { fulfilled: false, score: 55, evidence: ev };
+  for (const pos of jPositions) {
+    if (pos.house > 0 && targetHouse > 0 && aspects("Jupiter", pos.house, targetHouse)) {
+      ev.push(`Transit Jupiter (H${pos.house}${pos.isSandhiOrRetro ? " retro/sandhi" : ""}) aspects ${karaka} (H${targetHouse}) — karaka aspected`);
+      return { fulfilled: false, score: 55, evidence: ev };
+    }
   }
 
-  ev.push(`Transit Jupiter (${jS} H${jH}) not activating ${karaka}${targetSign ? ` in ${targetSign}` : ""}`);
+  ev.push(`Transit Jupiter (${input.transitJupiter?.sign} H${input.transitJupiter?.house}) not activating ${karaka}${targetSign ? ` in ${targetSign}` : ""}`);
   return { fulfilled: false, score: 0, evidence: ev };
 }
 
@@ -660,6 +701,58 @@ function evalP8(input: MarriageTimingInput): { fulfilled: boolean; score: number
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// O1 — ROLE OF MOON ON MARRIAGE DAY
+// Classical rule: Transiting Moon on marriage day connects to natal Moon
+// (Janma Rashi), RK axis, Karakamsha (KL), Darakaraka Navamsha (DKN), or transit LL/7L.
+// ─────────────────────────────────────────────────────────────────────────────
+function evalO1(input: MarriageTimingInput): { points: number; evidence: string[] } {
+  const ev: string[] = [];
+  const tMoon = input.transitMoon;
+
+  if (!tMoon?.sign) {
+    ev.push("Transit Moon data not provided (evaluated for exact wedding muhurat day)");
+    return { points: 0, evidence: ev };
+  }
+
+  const tmS = tMoon.sign;
+  const natalMoon = input.natalMoonSign ?? "";
+  const rkSigns = [input.natalRahuSign, input.natalKetuSign].filter(Boolean) as string[];
+  const kl = input.karakamshaSign ?? "";
+  const dkn = input.darakarakaNavamsha ?? "";
+  const tLLSign = input.transitLagnaLord?.sign ?? "";
+  const t7LSign = input.transitSeventhLord?.sign ?? "";
+
+  let hits = 0;
+  if (natalMoon && tmS === natalMoon) {
+    hits++;
+    ev.push(`Transit Moon in ${tmS} over Janma Rashi (natal Moon) — supreme classical wedding trigger`);
+  }
+  if (rkSigns.includes(tmS)) {
+    hits++;
+    ev.push(`Transit Moon in ${tmS} aligns with natal Rahu-Ketu karmic axis`);
+  }
+  if (kl && tmS === kl) {
+    hits++;
+    ev.push(`Transit Moon in ${tmS} over Karakamsha Lagna (${kl})`);
+  }
+  if (dkn && tmS === dkn) {
+    hits++;
+    ev.push(`Transit Moon in ${tmS} over Darakaraka Navamsha sign (${dkn})`);
+  }
+  if ((tLLSign && tmS === tLLSign) || (t7LSign && tmS === t7LSign)) {
+    hits++;
+    const which = tmS === tLLSign ? "transit Lagna Lord" : "transit 7th Lord";
+    ev.push(`Transit Moon in ${tmS} conjoined with ${which}`);
+  }
+
+  if (hits === 0) {
+    ev.push(`Transit Moon in ${tmS} — not activating primary Janma/RK/KL/DKN/LL-7L wedding triggers`);
+  }
+
+  return { points: hits > 0 ? 1 : 0, evidence: ev };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // O2 — SATURN ↔ DARAKARAKA (Jaimini rashi drishti)
 // ─────────────────────────────────────────────────────────────────────────────
 function evalO2(input: MarriageTimingInput): { points: number; evidence: string[] } {
@@ -745,6 +838,11 @@ const PARAM_META: Record<string, { name: string; description: string }> = {
 };
 
 const OBS_META: Record<string, { name: string; rule: string; maxBonus: number }> = {
+  O1_moon_day: {
+    name: "O1 — Wedding Day Moon Transit",
+    rule: "Transiting Moon on marriage day connects to natal Moon (Janma Rashi), RK axis, Karakamsha (KL), Darakaraka Navamsha (DKN), or transit LL/7L.",
+    maxBonus: 1,
+  },
   O2_saturn_dk: {
     name: "O2 — Saturn ↔ Darakaraka",
     rule: "Transit Saturn connects to Darakaraka sign by Jaimini rashi drishti — Saturn formalises spouse karaka.",
@@ -799,9 +897,19 @@ export function analyzeMarriageTimingKNRao(input: MarriageTimingInput): Marriage
   const sText           = strengthText(language, timingScore);
 
   // ── Observations ─────────────────────────────────────────────────────────
+  const o1 = evalO1(input);
   const o2 = evalO2(input);
   const o3 = evalO3(input);
   const bonusLayers: BonusLayer[] = [
+    {
+      id: "O1_moon_day",
+      name: OBS_META.O1_moon_day.name,
+      rule: OBS_META.O1_moon_day.rule,
+      points: o1.points,
+      maxBonus: OBS_META.O1_moon_day.maxBonus,
+      isActive: o1.points > 0,
+      evidence: o1.evidence,
+    },
     {
       id: "O2_saturn_dk",
       name: OBS_META.O2_saturn_dk.name,
@@ -821,8 +929,8 @@ export function analyzeMarriageTimingKNRao(input: MarriageTimingInput): Marriage
       evidence: o3.evidence,
     },
   ];
-  const bonusRaw         = o2.points + o3.points;
-  const bonusScore       = Math.min(4, bonusRaw);   // max +4 nudge
+  const bonusRaw         = o1.points + o2.points + o3.points;
+  const bonusScore       = Math.min(5, bonusRaw);   // max +5 nudge
   const bonusActiveCount = bonusLayers.filter(b => b.isActive).length;
   const bonusTotalCount  = bonusLayers.length;
   const adjustedScore    = clamp(Math.round(timingScore + bonusScore));
@@ -950,4 +1058,133 @@ Rules: No fixed destiny. Combine with D1 promise, D9 quality, Ashtakoot, KP 2-7-
     pdfSection,
     chatContext,
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONDITIONAL DASHAS (Research from Shri K.N. Rao)
+// Conditional Dashas apply when specific astrological conditions are met in
+// the birth chart, often providing razor-sharp event timing.
+// ─────────────────────────────────────────────────────────────────────────────
+export interface ConditionalDashaDetection {
+  dashaName: string;
+  cycleYears: number;
+  isApplicable: boolean;
+  conditionDescription: string;
+  researchRule: string;
+}
+
+export function detectConditionalDashas(chart: {
+  lagnaRashi: string;
+  lagnaLon?: number;
+  planets: Record<string, { house: number; sign: string; lon?: number }>;
+  d9LagnaSign?: string;
+}): ConditionalDashaDetection[] {
+  const SIGNS_LIST = [
+    "Aries","Taurus","Gemini","Cancer","Leo","Virgo",
+    "Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces",
+  ];
+  const SIGN_LORDS_MAP: Record<string, string> = {
+    Aries:"Mars", Taurus:"Venus", Gemini:"Mercury", Cancer:"Moon",
+    Leo:"Sun",   Virgo:"Mercury", Libra:"Venus",   Scorpio:"Mars",
+    Sagittarius:"Jupiter", Capricorn:"Saturn", Aquarius:"Saturn", Pisces:"Jupiter",
+  };
+
+  const lSign = chart.lagnaRashi;
+  const lIdx = SIGNS_LIST.indexOf(lSign);
+  const ll = SIGN_LORDS_MAP[lSign] ?? "";
+  const s7Sign = SIGNS_LIST[(lIdx + 6) % 12];
+  const l7 = SIGN_LORDS_MAP[s7Sign] ?? "";
+  const s10Sign = SIGNS_LIST[(lIdx + 9) % 12];
+  const l10 = SIGN_LORDS_MAP[s10Sign] ?? "";
+
+  const llHouse = chart.planets[ll]?.house ?? 0;
+  const l7House = chart.planets[l7]?.house ?? 0;
+  const l10House = chart.planets[l10]?.house ?? 0;
+  const sunHouse = chart.planets.Sun?.house ?? 0;
+
+  // D9 Lagna
+  const lagnaLon = chart.lagnaLon ?? 0;
+  const d9Num = Math.floor((lagnaLon % 360) / (360 / 108)) % 12;
+  const d9Lagna = chart.d9LagnaSign ?? SIGNS_LIST[d9Num] ?? "";
+
+  // Hora & Paksha calculation
+  const degInSign = lagnaLon % 30;
+  const isOddSign = lIdx % 2 === 0;
+  const horaLord = isOddSign
+    ? (degInSign < 15 ? "Sun" : "Moon")
+    : (degInSign < 15 ? "Moon" : "Sun");
+
+  const sunLon = chart.planets.Sun?.lon ?? 0;
+  const moonLon = chart.planets.Moon?.lon ?? 0;
+  const tithiDiff = (moonLon - sunLon + 360) % 360;
+  const isKrishnaPaksha = tithiDiff >= 180;
+
+  // 1. Dwisaptati Sama (72 years)
+  // LL in 7H OR 7L in Lagna OR (LL in Lagna && 7L in 7H)
+  const dwisaptatiMet = (llHouse === 7) || (l7House === 1) || (llHouse === 1 && l7House === 7);
+
+  // 2. Chatursheeti Sama (84 years)
+  // 10th Lord in 10th House
+  const chatursheetiMet = (l10House === 10);
+
+  // 3. Dwadashottari (112 years)
+  // D9 Lagna = Taurus or Libra
+  const dwadashottariMet = (d9Lagna === "Taurus" || d9Lagna === "Libra");
+
+  // 4. Shodashottari (116 years)
+  // Moon hora in Krishna Paksha OR Sun hora in Shukla Paksha
+  const shodashottariMet = (horaLord === "Moon" && isKrishnaPaksha) || (horaLord === "Sun" && !isKrishnaPaksha);
+
+  // 5. Shasti Hayani (60 years)
+  // Sun in Lagna (1st house)
+  const shastiHayaniMet = (sunHouse === 1);
+
+  // 6. Shatabdika (100 years)
+  // Vargottama Lagna
+  const shatabdikaMet = (lSign === d9Lagna);
+
+  return [
+    {
+      dashaName: "Dwisaptati Sama Dasha (72 yrs)",
+      cycleYears: 72,
+      isApplicable: dwisaptatiMet,
+      conditionDescription: `Lagna Lord (${ll} in H${llHouse}) in 7H or 7th Lord (${l7} in H${l7House}) in Lagna`,
+      researchRule: "K.N. Rao Research: Applied to charts where LL is in 7H or 7L in 1H. Check 2H/2L, 7H/7L in D1 & D9.",
+    },
+    {
+      dashaName: "Chatursheeti Sama Dasha (84 yrs)",
+      cycleYears: 84,
+      isApplicable: chatursheetiMet,
+      conditionDescription: `10th Lord (${l10} in H${l10House}) placed in 10th House`,
+      researchRule: "K.N. Rao Research: Applied when 10L sits in 10H. Marriage timing triggers through 4H/4L & 7H/7L in D1, and 1H/7H/5H/11H in D9.",
+    },
+    {
+      dashaName: "Dwadashottari Dasha (112 yrs)",
+      cycleYears: 112,
+      isApplicable: dwadashottariMet,
+      conditionDescription: `Navamsha (D9) Lagna is Taurus or Libra (${d9Lagna})`,
+      researchRule: "Applicable when Navamsha Lagna is ruled by Venus (Taurus or Libra).",
+    },
+    {
+      dashaName: "Shodashottari Dasha (116 yrs)",
+      cycleYears: 116,
+      isApplicable: shodashottariMet,
+      conditionDescription: `Lagna in ${horaLord} Hora during ${isKrishnaPaksha ? "Krishna" : "Shukla"} Paksha`,
+      researchRule: "Applicable in Moon hora (dark fortnight) or Sun hora (bright fortnight). Tested across ~50% of eligible charts.",
+    },
+    {
+      dashaName: "Shasti Hayani Dasha (60 yrs)",
+      cycleYears: 60,
+      isApplicable: shastiHayaniMet,
+      conditionDescription: `Sun placed in 1st House (Lagna in H${sunHouse})`,
+      researchRule: "Applicable when Sun occupies the natal ascendant. 2H and 10H of divisional charts produce the marriage event.",
+    },
+    {
+      dashaName: "Shatabdika Dasha (100 yrs)",
+      cycleYears: 100,
+      isApplicable: shatabdikaMet,
+      conditionDescription: `Vargottama Lagna (D1 ${lSign} === D9 ${d9Lagna})`,
+      researchRule: "Applicable when natal Lagna is Vargottama.",
+    },
+  ];
 }

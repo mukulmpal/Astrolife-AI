@@ -127,7 +127,7 @@ export function calculateKulaAndIshtaDevata(chart: ChartData): {
   }
 
   // Karakamsa Sign: The sign occupied by Atmakaraka in Navamsha (D9)
-  const akD9Sign = chart.navamsha?.planets?.[akPlanet]?.sign || chart.planets?.[akPlanet]?.sign || "Aries";
+  const akD9Sign = chart.planets?.[akPlanet]?.navamsha || (chart as any).navamsha?.planets?.[akPlanet]?.sign || chart.planets?.[akPlanet]?.sign || "Aries";
 
   // 12th from Karakamsa (Jivanmuktamsa)
   const signOrder = [
@@ -141,12 +141,11 @@ export function calculateKulaAndIshtaDevata(chart: ChartData): {
 
   // Check if any planet sits in the 12th from Karakamsa in D9
   let ishtaPlanet = twelfthLord;
-  if (chart.navamsha?.planets) {
-    for (const [pName, pObj] of Object.entries(chart.navamsha.planets)) {
-      if (pObj?.sign === twelfthSign && classicalPlanets.includes(pName)) {
-        ishtaPlanet = pName;
-        break;
-      }
+  for (const pName of classicalPlanets) {
+    const navSign = chart.planets?.[pName]?.navamsha || (chart as any).navamsha?.planets?.[pName]?.sign;
+    if (navSign === twelfthSign) {
+      ishtaPlanet = pName;
+      break;
     }
   }
 

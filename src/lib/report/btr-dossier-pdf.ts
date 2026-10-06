@@ -36,8 +36,8 @@ export async function buildBTRDossierPdf(
   options: BTRDossierOptions = {}
 ): Promise<Buffer> {
   const fontFile = resolveAvailableFont();
-  const subjectName = options.subjectName || input.name || "Mukul";
-  const city = options.city || input.city || "Delhi, India";
+  const subjectName = options.subjectName || input.name || "Seeker";
+  const city = options.city || input.city || "As Recorded";
   const dateStr = candidate.date;
   const timeStr = candidate.time;
   const auditDate = options.fixedTimestamp || new Date().toISOString().slice(0, 10);

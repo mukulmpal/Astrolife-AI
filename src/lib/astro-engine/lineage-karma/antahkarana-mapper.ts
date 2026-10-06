@@ -20,6 +20,15 @@
 import type { ChartData } from "../calculations";
 import type { AntahkaranaProfile, PvrTarpanaProfile } from "./types";
 
+function uniqueCarriers(carriers: string[]): string[] {
+  const seen = new Set<string>();
+  return carriers.filter((c) => {
+    if (seen.has(c)) return false;
+    seen.add(c);
+    return true;
+  });
+}
+
 export function calculateAntahkarana(chart: ChartData): {
   antahkarana: AntahkaranaProfile;
   pvrTarpana: PvrTarpanaProfile;
@@ -30,7 +39,7 @@ export function calculateAntahkarana(chart: ChartData): {
   const sevenPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]
     .map((name) => {
       const p = planets[name];
-      const longitude = p?.longitude ?? 0;
+      const longitude = (p as any)?.lon ?? (p as any)?.longitude ?? 0;
       const degInSign = longitude % 30;
       return { name, degInSign, p };
     })
@@ -39,13 +48,13 @@ export function calculateAntahkarana(chart: ChartData): {
   const atmakaraka = sevenPlanets[0]?.name || "Sun";
   const amatyakaraka = sevenPlanets[1]?.name || "Jupiter";
 
-  const lagnaSign = chart.ascendant?.sign || "Leo";
-  const moonSign = planets.Moon?.sign || "Cancer";
-  const moonHouse = planets.Moon?.house || 12;
-  const sunSign = planets.Sun?.sign || "Taurus";
-  const sunHouse = planets.Sun?.house || 10;
-  const jupHouse = planets.Jupiter?.house || 3;
-  const mercHouse = planets.Mercury?.house || 9;
+  const lagnaSign = chart.lagnaRashi || (chart as any).ascendant?.sign || "Aries";
+  const moonSign = planets.Moon?.sign || "Moon";
+  const moonHouse = planets.Moon?.house || 1;
+  const sunSign = planets.Sun?.sign || "Sun";
+  const sunHouse = planets.Sun?.house || 1;
+  const jupHouse = planets.Jupiter?.house || 1;
+  const mercHouse = planets.Mercury?.house || 1;
 
   // ── ANTAHKARANA PROFILE ───────────────────────────────────────────────────
   const antahkarana: AntahkaranaProfile = {
@@ -88,7 +97,7 @@ export function calculateAntahkarana(chart: ChartData): {
         layer: "Ahamkara_CPU",
         vedicConcept: "अहंकार (Sense of 'I')",
         computerAnalogy: "Central Processing Unit (CPU)",
-        planetaryCarriers: [atmakaraka, "Sun", "Lagna"],
+        planetaryCarriers: uniqueCarriers([atmakaraka, "Sun", "Lagna"]),
         vargaLevel: "D1, D9 (Navamsha)",
         functionalRole: "समस्त क्रियाओं और अनुभवों का समन्वय और 'मैं' का आभास कराना।",
         sadhanaPurificationNote: "अहंकार को पूरी तरह समाप्त करने के बजाय ईश्वर के सेवक के रूप में पुनःपरिभाषित करना।",
@@ -106,7 +115,7 @@ export function calculateAntahkarana(chart: ChartData): {
         layer: "Buddhi_ALU",
         vedicConcept: "बुद्धि (Discriminative Intellect)",
         computerAnalogy: "Arithmetic & Logic Unit (ALU)",
-        planetaryCarriers: [amatyakaraka, "Jupiter"],
+        planetaryCarriers: uniqueCarriers([amatyakaraka, "Jupiter"]),
         vargaLevel: "D1, D24 (Siddhamsha)",
         functionalRole: "चित्त से प्राप्त जानकारी का विश्लेषण कर उचित निर्णय लेना।",
         sadhanaPurificationNote: "सात्विक चिंतन और ज्ञान योग के द्वारा विवेक को शुद्ध रखना।",

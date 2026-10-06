@@ -13,7 +13,7 @@ import {
   History, Star, HeartHandshake, Heart, HelpCircle, Hash,
   Hand, LogOut, type LucideIcon,
   Radar, Globe, ShoppingBag, Sunrise,
-  Shield, Database,
+  Shield, Database, Dna,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
@@ -75,6 +75,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Wellness & Remedies",
     items: [
+      { label: "Lineage Karma", href: "/dashboard/lineage-karma", Icon: Dna },
       { label: "Psychology", href: "/dashboard/psychology", Icon: Brain },
       { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus },
       { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem },

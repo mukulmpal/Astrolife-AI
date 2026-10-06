@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import "@/app/dashboard/shared.css";
 import { PremiumFeature } from "@/components/premium-feature";
-import { useUserChart } from "@/lib/user-chart";
+import { useUserChart, listSavedCharts, loadSavedChart, type SavedChartSummary } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
@@ -22,6 +22,11 @@ import {
   type MangalDoshaInsight,
 } from "@/lib/astro-engine/mangal-dosha-adapter";
 import type { MangalDoshaResult, ManglikCompatibilityResult } from "@/lib/astro-engine/mangal-dosha";
+import {
+  generateMasterMarriageReport,
+  type MasterMarriageReport,
+} from "@/lib/astro-engine/master-marriage-report";
+import MasterMarriageReportPanel from "@/components/marriage/MasterMarriageReportPanel";
 
 // ── HOUSE LORDS (Aries=Mars ... Pisces=Jupiter) ──────────────
 const SIGN_LORDS: Record<string, Planet> = {
@@ -223,6 +228,9 @@ function PartnerFullChartForm({
   onFormChange,
   onCityChange,
   onGenerate,
+  onSave,
+  isSaving,
+  saveSuccess,
 }: {
   form: PartnerBirthForm;
   selectedCity: CitySearchResult | null;
@@ -231,6 +239,9 @@ function PartnerFullChartForm({
   onFormChange: (next: PartnerBirthForm) => void;
   onCityChange: (city: CitySearchResult | null) => void;
   onGenerate: () => void;
+  onSave?: () => void;
+  isSaving?: boolean;
+  saveSuccess?: boolean;
 }) {
   return (
     <div className="card" style={{ marginBottom: 16, borderColor: partnerChart ? "rgba(34,197,94,.28)" : "rgba(200,160,48,.18)" }}>
@@ -304,22 +315,44 @@ function PartnerFullChartForm({
           Partner chart generated: {partnerChart.lagnaRashi} Lagna, {partnerChart.planets.Moon?.sign} Moon.
         </div>
       )}
-      <button
-        type="button"
-        onClick={onGenerate}
-        style={{
-          marginTop: 14,
-          border: 0,
-          borderRadius: 10,
-          padding: "11px 14px",
-          background: "linear-gradient(135deg,#c8a030,#a06820)",
-          color: "#FAF7F2",
-          fontWeight: 800,
-          cursor: "pointer",
-        }}
-      >
-        Generate Partner Chart
-      </button>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+        <button
+          type="button"
+          onClick={onGenerate}
+          style={{
+            border: 0,
+            borderRadius: 10,
+            padding: "11px 18px",
+            background: "linear-gradient(135deg,#c8a030,#a06820)",
+            color: "#FAF7F2",
+            fontWeight: 800,
+            cursor: "pointer",
+          }}
+        >
+          Generate Partner Chart
+        </button>
+        {partnerChart && onSave && (
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={isSaving}
+            style={{
+              border: `1px solid ${saveSuccess ? "#22c55e" : "rgba(184,134,11,0.3)"}`,
+              borderRadius: 10,
+              padding: "11px 18px",
+              background: saveSuccess ? "rgba(34,197,94,0.15)" : "#FFFFFF",
+              color: saveSuccess ? "#15803d" : "#B8860B",
+              fontWeight: 800,
+              cursor: isSaving ? "wait" : "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            {saveSuccess ? "✓ कुंडली सेव हो गई!" : isSaving ? "सेव हो रहा है..." : "💾 इस साथी की कुंडली को सेव करें"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -661,7 +694,7 @@ function chartToRelInput(chart: { planets: Record<string, { house: number; sign:
 }
 
 // ── Main Page ─────────────────────────────────────────────────
-type TabKey = "marriage" | "mars" | "koots" | "psychology" | "children" | "kp" | "timing" | "doshas";
+type TabKey = "master" | "marriage" | "mars" | "koots" | "psychology" | "children" | "kp" | "timing" | "doshas";
 type PageMode = "profile" | "match";
 
 function MissingDataCard({
@@ -1224,33 +1257,65 @@ export default function KundaliMilanPage() {
   const [partnerChart, setPartnerChart] = useState<ChartData | null>(null);
   const [partnerError, setPartnerError] = useState("");
   const [milanResult, setMilanResult] = useState<MilanResult | null>(null);
-  const [activeTab, setActiveTab] = useState<TabKey>("koots");
+  const [activeTab, setActiveTab] = useState<TabKey>("master");
   const [mode, setMode] = useState<PageMode>("match");
+  const [targetWeddingDate, setTargetWeddingDate] = useState<string>("2027-01-24");
+  const [sampleLoadedChart1, setSampleLoadedChart1] = useState<ChartData | null>(null);
 
+  // Saved Charts & Auto-Selection states
+  const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
+  const [person1SavedId, setPerson1SavedId] = useState<string>("");
+  const [person2SavedId, setPerson2SavedId] = useState<string>("");
+  const [savingPartner, setSavingPartner] = useState(false);
+  const [savedPartnerSuccess, setSavedPartnerSuccess] = useState(false);
+
+  const effectiveChart1 = chart || sampleLoadedChart1;
   const lastChartRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (chart?.planets?.Moon) {
-      const chartKey = `${chart.name || ""}-${chart.dob || ""}-${chart.tob || ""}`;
+    let mounted = true;
+    async function loadSaved() {
+      try {
+        const list = await listSavedCharts();
+        const localStr = typeof window !== "undefined" ? localStorage.getItem("astrolife_milan_saved_charts") : null;
+        const localList: SavedChartSummary[] = localStr ? JSON.parse(localStr) : [];
+        const combined = [...list];
+        for (const loc of localList) {
+          if (!combined.some(c => c.name === loc.name && c.dob === loc.dob)) {
+            combined.push(loc);
+          }
+        }
+        if (mounted) setSavedCharts(combined);
+      } catch (e) {
+        console.warn("Could not load saved charts in kundali-milan:", e);
+      }
+    }
+    loadSaved();
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    if (effectiveChart1?.planets?.Moon) {
+      const chartKey = `${effectiveChart1.name || ""}-${effectiveChart1.dob || ""}-${effectiveChart1.tob || ""}`;
       if (lastChartRef.current !== chartKey) {
         lastChartRef.current = chartKey;
-        const m = chart.planets.Moon;
+        const m = effectiveChart1.planets.Moon;
         const nakIdx = getMoonNakshatraIndex(m.nakshatra, m.lon);
         const rashiIdx = getMoonRashiIndex(m.signNum, m.sign);
         setP1(prev => ({
-          name: prev.name && prev.name !== "Self" && prev.name !== "You" ? prev.name : (chart.name || "Self"),
+          name: prev.name && prev.name !== "Self" && prev.name !== "You" ? prev.name : (effectiveChart1.name || "Self"),
           nakIdx,
           rashiIdx,
         }));
       }
     }
-  }, [chart]);
+  }, [effectiveChart1]);
 
   // Relationship Intelligence from native chart
   const relResult: RelationshipResult | null = useMemo(() => {
-    if (!chart) return null;
+    if (!effectiveChart1) return null;
     try {
-      const input = chartToRelInput(chart as Parameters<typeof chartToRelInput>[0]);
+      const input = chartToRelInput(effectiveChart1 as Parameters<typeof chartToRelInput>[0]);
       input.language = lang;
       // If ashtakoot calculated, feed it in
       if (milanResult) {
@@ -1263,25 +1328,255 @@ export default function KundaliMilanPage() {
       }
       return analyzeRelationshipIntelligence(input);
     } catch { return null; }
-  }, [chart, milanResult, lang]);
+  }, [effectiveChart1, milanResult, lang]);
 
   const mangalInsight = useMemo(() => {
-    if (!chart) return null;
+    if (!effectiveChart1) return null;
     try {
-      return buildMangalDoshaInsight(chart);
+      return buildMangalDoshaInsight(effectiveChart1);
     } catch {
       return null;
     }
-  }, [chart]);
+  }, [effectiveChart1]);
 
   const mangalCompatibility = useMemo(() => {
-    if (!chart || !partnerChart) return null;
+    if (!effectiveChart1 || !partnerChart) return null;
     try {
-      return compareMangalDoshaCharts(chart, partnerChart);
+      return compareMangalDoshaCharts(effectiveChart1, partnerChart);
     } catch {
       return null;
     }
-  }, [chart, partnerChart]);
+  }, [effectiveChart1, partnerChart]);
+
+  const masterReport: MasterMarriageReport | null = useMemo(() => {
+    if (!effectiveChart1 || !partnerChart) return null;
+    try {
+      return generateMasterMarriageReport(effectiveChart1, partnerChart, {
+        partner1Name: effectiveChart1.name || "Partner 1",
+        partner2Name: partnerChart.name || "Partner 2",
+        targetWeddingDate,
+      });
+    } catch (err) {
+      console.error("Master report generation error:", err);
+      return null;
+    }
+  }, [effectiveChart1, partnerChart, targetWeddingDate]);
+
+  function loadMukulManishaSample() {
+    try {
+      const mukul = calculateChart("Mukul Pal", "1999-10-09", "05:40", "New Delhi", 28.6139, 77.2090, 5.5);
+      const manisha = calculateChart("Manisha", "1998-09-03", "19:40", "Roorkee", 29.8543, 77.8880, 5.5);
+      setSampleLoadedChart1(mukul);
+      setPartnerChart(manisha);
+      setPartnerBirth({
+        name: "Manisha",
+        dob: "1998-09-03",
+        tob: "19:40",
+        city: "Roorkee, Uttarakhand, India",
+        lat: 29.8543,
+        lon: 77.8880,
+        tz: 5.5,
+      });
+      setPartnerCity({
+        geonameId: 1258849,
+        name: "Roorkee",
+        asciiName: "Roorkee",
+        countryCode: "IN",
+        admin1: "Uttarakhand",
+        latitude: 29.8543,
+        longitude: 77.8880,
+        timezone: "Asia/Kolkata",
+        population: 250000,
+        displayName: "Roorkee, Uttarakhand, India",
+      });
+      const r = calculateMilan(
+        "Mukul Pal", 11, 4,
+        "Manisha", 10, 4
+      );
+      setMilanResult(r);
+      setP1({ name: "Mukul Pal", nakIdx: 11, rashiIdx: 4 });
+      setP2({ name: "Manisha", nakIdx: 10, rashiIdx: 4 });
+      setMode("match");
+      setActiveTab("master");
+    } catch (e) {
+      console.error("Failed to load sample:", e);
+    }
+  }
+
+  async function handleSelectPerson1(chartId: string) {
+    setPerson1SavedId(chartId);
+    if (!chartId) return;
+
+    if (chartId === "self" && chart) {
+      setSampleLoadedChart1(null);
+      const m = chart.planets.Moon;
+      const nakIdx = getMoonNakshatraIndex(m?.nakshatra, m?.lon);
+      const rashiIdx = getMoonRashiIndex(m?.signNum, m?.sign);
+      setP1({
+        name: chart.name || "Self",
+        nakIdx,
+        rashiIdx,
+      });
+      if (partnerChart) {
+        const pm = partnerChart.planets.Moon;
+        const pnakIdx = getMoonNakshatraIndex(pm?.nakshatra, pm?.lon);
+        const prashiIdx = getMoonRashiIndex(pm?.signNum, pm?.sign);
+        setMilanResult(calculateMilan(chart.name || "Self", nakIdx, rashiIdx, partnerChart.name, pnakIdx, prashiIdx));
+        setActiveTab("master");
+      }
+      return;
+    }
+
+    let loaded: ChartData | null = null;
+    if (chartId.startsWith("local:")) {
+      const localStr = typeof window !== "undefined" ? localStorage.getItem("astrolife_milan_saved_charts") : null;
+      const localList: (SavedChartSummary & { fullChart?: ChartData })[] = localStr ? JSON.parse(localStr) : [];
+      const item = localList.find(x => x.id === chartId);
+      if (item?.fullChart) loaded = item.fullChart;
+      else if (item) loaded = calculateChart(item.name, item.dob, item.tob, item.city);
+    } else {
+      loaded = await loadSavedChart(chartId);
+    }
+
+    if (!loaded) {
+      const meta = savedCharts.find(c => c.id === chartId);
+      if (meta) loaded = calculateChart(meta.name, meta.dob, meta.tob, meta.city);
+    }
+
+    if (loaded) {
+      setSampleLoadedChart1(loaded);
+      const m = loaded.planets.Moon;
+      const nakIdx = getMoonNakshatraIndex(m?.nakshatra, m?.lon);
+      const rashiIdx = getMoonRashiIndex(m?.signNum, m?.sign);
+      setP1({
+        name: loaded.name,
+        nakIdx,
+        rashiIdx,
+      });
+
+      if (partnerChart) {
+        const pm = partnerChart.planets.Moon;
+        const pnakIdx = getMoonNakshatraIndex(pm?.nakshatra, pm?.lon);
+        const prashiIdx = getMoonRashiIndex(pm?.signNum, pm?.sign);
+        setMilanResult(calculateMilan(loaded.name, nakIdx, rashiIdx, partnerChart.name, pnakIdx, prashiIdx));
+        setActiveTab("master");
+      }
+    }
+  }
+
+  async function handleSelectPerson2(chartId: string) {
+    setPerson2SavedId(chartId);
+    if (!chartId) {
+      setPartnerChart(null);
+      return;
+    }
+
+    let loaded: ChartData | null = null;
+    if (chartId.startsWith("local:")) {
+      const localStr = typeof window !== "undefined" ? localStorage.getItem("astrolife_milan_saved_charts") : null;
+      const localList: (SavedChartSummary & { fullChart?: ChartData })[] = localStr ? JSON.parse(localStr) : [];
+      const item = localList.find(x => x.id === chartId);
+      if (item?.fullChart) loaded = item.fullChart;
+      else if (item) loaded = calculateChart(item.name, item.dob, item.tob, item.city);
+    } else {
+      loaded = await loadSavedChart(chartId);
+    }
+
+    if (!loaded) {
+      const meta = savedCharts.find(c => c.id === chartId);
+      if (meta) loaded = calculateChart(meta.name, meta.dob, meta.tob, meta.city);
+    }
+
+    if (loaded) {
+      setPartnerChart(loaded);
+      setPartnerBirth({
+        name: loaded.name,
+        dob: loaded.dob,
+        tob: loaded.tob,
+        city: loaded.city,
+        lat: loaded.lat,
+        lon: loaded.lon,
+        tz: loaded.tz,
+      });
+      const m = loaded.planets.Moon;
+      const nakIdx = getMoonNakshatraIndex(m?.nakshatra, m?.lon);
+      const rashiIdx = getMoonRashiIndex(m?.signNum, m?.sign);
+      setP2({
+        name: loaded.name,
+        nakIdx,
+        rashiIdx,
+      });
+
+      const p1Source = effectiveChart1;
+      if (p1Source) {
+        const p1m = p1Source.planets.Moon;
+        const p1nakIdx = getMoonNakshatraIndex(p1m?.nakshatra, p1m?.lon);
+        const p1rashiIdx = getMoonRashiIndex(p1m?.signNum, p1m?.sign);
+        setMilanResult(calculateMilan(p1Source.name || "Person 1", p1nakIdx, p1rashiIdx, loaded.name, nakIdx, rashiIdx));
+        setActiveTab("master");
+      }
+    }
+  }
+
+  async function handleSavePartnerChart() {
+    if (!partnerChart) return;
+    setSavingPartner(true);
+    try {
+      try {
+        await fetch("/api/charts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: partnerChart.name,
+            birth_date: partnerChart.dob,
+            birth_time: partnerChart.tob,
+            birth_place: partnerChart.city,
+            latitude: partnerChart.lat,
+            longitude: partnerChart.lon,
+            timezone: String(partnerChart.tz),
+            chart_payload: partnerChart,
+          }),
+        });
+      } catch {
+        // ignore network error
+      }
+
+      const localStr = typeof window !== "undefined" ? localStorage.getItem("astrolife_milan_saved_charts") : null;
+      const localList: (SavedChartSummary & { fullChart?: ChartData })[] = localStr ? JSON.parse(localStr) : [];
+      const newEntry: SavedChartSummary & { fullChart?: ChartData } = {
+        id: `local:${Date.now()}`,
+        name: partnerChart.name,
+        dob: partnerChart.dob,
+        tob: partnerChart.tob,
+        city: partnerChart.city,
+        chartType: "partner",
+        isPrimary: false,
+        createdAt: new Date().toISOString(),
+        fullChart: partnerChart,
+      };
+      const filtered = localList.filter(x => !(x.name === newEntry.name && x.dob === newEntry.dob));
+      filtered.unshift(newEntry);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("astrolife_milan_saved_charts", JSON.stringify(filtered));
+      }
+
+      const updatedList = await listSavedCharts();
+      const combined = [...updatedList];
+      for (const loc of filtered) {
+        if (!combined.some(c => c.name === loc.name && c.dob === loc.dob)) {
+          combined.push(loc);
+        }
+      }
+      setSavedCharts(combined);
+      setPerson2SavedId(newEntry.id);
+      setSavedPartnerSuccess(true);
+      setTimeout(() => setSavedPartnerSuccess(false), 3000);
+    } catch (err) {
+      console.error("Save partner chart error:", err);
+    } finally {
+      setSavingPartner(false);
+    }
+  }
 
   function calculate() {
     const r = calculateMilan(
@@ -1310,7 +1605,7 @@ export default function KundaliMilanPage() {
         partnerBirth.tz ?? undefined,
       );
       setPartnerChart(nextChart);
-      setActiveTab("doshas");
+      setActiveTab("master");
     } catch (error) {
       setPartnerError(error instanceof Error ? error.message : "Could not generate partner chart.");
     }
@@ -1331,6 +1626,7 @@ export default function KundaliMilanPage() {
     ["timing", t("milan.tab_timing")],
   ];
   const matchTabs: [TabKey, string][] = [
+    ["master", t("milan.tab_master", "👑 Master Report")],
     ["koots", t("milan.tab_koots")],
     ["psychology", t("milan.tab_psychology")],
     ["timing", t("milan.tab_timing")],
@@ -1339,19 +1635,20 @@ export default function KundaliMilanPage() {
   const visibleTabs = mode === "profile" ? profileTabs : matchTabs;
   const hasQuickMatch = Boolean(milanResult);
   const hasPartnerFullChart = Boolean(partnerChart);
-  const hasCoupleResult = hasQuickMatch || hasPartnerFullChart;
+  const hasCoupleResult = hasQuickMatch || hasPartnerFullChart || Boolean(masterReport);
   const coupleScoreParts = [
     milanResult?.percentage,
     mangalCompatibility?.balanceScore,
+    masterReport?.ashtakoot.percentage,
   ].filter((score): score is number => typeof score === "number");
   const coupleScore = coupleScoreParts.length > 0
     ? Math.round(coupleScoreParts.reduce((sum, score) => sum + score, 0) / coupleScoreParts.length)
     : null;
-  const dataConfidence = hasQuickMatch && hasPartnerFullChart ? "High" : hasPartnerFullChart ? "Medium" : hasQuickMatch ? "Quick Match Only" : "Not Ready";
+  const dataConfidence = hasPartnerFullChart ? "High (Full Master Dossier Ready)" : hasQuickMatch ? "Quick Match Only" : "Not Ready";
 
   function switchMode(nextMode: PageMode) {
     setMode(nextMode);
-    setActiveTab(nextMode === "profile" ? "marriage" : "koots");
+    setActiveTab(nextMode === "profile" ? "marriage" : "master");
   }
 
   return (
@@ -1488,9 +1785,152 @@ export default function KundaliMilanPage() {
       {/* ── ASHTAKOOT INPUT CARDS ── */}
       {mode === "match" && (
         <>
-          <div className="summary-strip" style={{ marginBottom: 14 }}>
-            Quick Match uses Moon sign and Nakshatra only. Full Relationship Intelligence requires both complete birth charts.
+          <div className="summary-strip" style={{ marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+            <span>त्वरित मिलान हेतु चंद्र राशि व नक्षत्र; समेकित मास्टर विवाह रिपोर्ट हेतु दोनों जन्म कुंडलियां आवश्यक हैं।</span>
+            <button
+              type="button"
+              onClick={loadMukulManishaSample}
+              style={{
+                background: "linear-gradient(135deg, #B8860B, #8B6508)",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: 8,
+                padding: "8px 16px",
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(184,134,11,0.25)",
+              }}
+            >
+              ⚡ त्वरित लोड: मुकुल एवं मनीषा (Sample 24 Jan 2027)
+            </button>
           </div>
+          {/* ── SAVED KUNDLIS FAST PICKER ── */}
+          <div
+            className="card"
+            style={{
+              background: "linear-gradient(135deg, #FFFDF8 0%, #FAF5EB 100%)",
+              border: "1.5px solid rgba(184,134,11,0.35)",
+              borderRadius: 16,
+              padding: "20px 24px",
+              marginBottom: 16,
+              boxShadow: "0 4px 15px rgba(184,134,11,0.06)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 22 }}>📂</span>
+                <div>
+                  <div className="card-tag" style={{ margin: 0 }}>सेव की गई कुंडलियां (Saved Profiles)</div>
+                  <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 700, color: "#1A1A1A" }}>
+                    सेव की गई कुंडली से 1-क्लिक मिलान करें
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                {person1SavedId && person2SavedId && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#059669", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 6, padding: "4px 10px" }}>
+                    ✓ दोनों कुंडलियां सक्रिय
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={loadMukulManishaSample}
+                  style={{
+                    background: "rgba(184,134,11,0.12)",
+                    border: "1px solid rgba(184,134,11,0.35)",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#B8860B",
+                    cursor: "pointer",
+                  }}
+                >
+                  ⚡ मुकुल & मनीषा सैंपल
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+              {/* Person 1 Selector */}
+              <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: 12, padding: "14px 16px" }}>
+                <label style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", color: "#B8860B", display: "block", marginBottom: 6 }}>
+                  👨 वर (Person 1 / स्वयं)
+                </label>
+                <select
+                  value={person1SavedId}
+                  onChange={(e) => handleSelectPerson1(e.target.value)}
+                  style={{
+                    width: "100%",
+                    background: "#FAF7F2",
+                    border: "1px solid rgba(184,134,11,0.3)",
+                    borderRadius: 8,
+                    padding: "10px 12px",
+                    color: "#1A1A1A",
+                    fontSize: 13,
+                    outline: "none",
+                    fontFamily: "Outfit,sans-serif",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="">— कुंडली चुनें (या नीचे फॉर्म भरें) —</option>
+                  {chart && (
+                    <option value="self">
+                      ★ आपकी मुख्य प्रोफाइल ({chart.name || "Self"} · {chart.dob})
+                    </option>
+                  )}
+                  {savedCharts.map((sc) => (
+                    <option key={sc.id} value={sc.id}>
+                      {sc.name} ({sc.dob} · {sc.city})
+                    </option>
+                  ))}
+                </select>
+                {effectiveChart1 && (
+                  <div style={{ fontSize: 11, color: "#6B635B", marginTop: 6 }}>
+                    सक्रिय: <strong>{effectiveChart1.name}</strong> ({effectiveChart1.lagnaRashi} लग्न, {effectiveChart1.planets.Moon?.sign} चंद्र)
+                  </div>
+                )}
+              </div>
+
+              {/* Person 2 Selector */}
+              <div style={{ background: "#FFFFFF", border: "1px solid rgba(232,121,249,0.35)", borderRadius: 12, padding: "14px 16px" }}>
+                <label style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", color: "#a855f7", display: "block", marginBottom: 6 }}>
+                  👩 कन्या (Person 2 / जीवनसाथी)
+                </label>
+                <select
+                  value={person2SavedId}
+                  onChange={(e) => handleSelectPerson2(e.target.value)}
+                  style={{
+                    width: "100%",
+                    background: "#FAF7F2",
+                    border: "1px solid rgba(232,121,249,0.4)",
+                    borderRadius: 8,
+                    padding: "10px 12px",
+                    color: "#1A1A1A",
+                    fontSize: 13,
+                    outline: "none",
+                    fontFamily: "Outfit,sans-serif",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="">— सेव की गई कुंडली चुनें (या नीचे फॉर्म भरें) —</option>
+                  {savedCharts.map((sc) => (
+                    <option key={sc.id} value={sc.id}>
+                      {sc.name} ({sc.dob} · {sc.city})
+                    </option>
+                  ))}
+                </select>
+                {partnerChart && (
+                  <div style={{ fontSize: 11, color: "#6B635B", marginTop: 6 }}>
+                    सक्रिय: <strong>{partnerChart.name}</strong> ({partnerChart.lagnaRashi} लग्न, {partnerChart.planets.Moon?.sign} चंद्र)
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14, marginBottom: 16 }}>
             <PersonForm
               label={chart?.planets?.Moon ? `Person 1 (${chart.name || "Your Chart"} · Auto-filled)` : "Person 1 (Self / You)"}
@@ -1526,6 +1966,9 @@ export default function KundaliMilanPage() {
             onFormChange={setPartnerBirth}
             onCityChange={setPartnerCity}
             onGenerate={generatePartnerChart}
+            onSave={handleSavePartnerChart}
+            isSaving={savingPartner}
+            saveSuccess={savedPartnerSuccess}
           />
 
           <div className="card" style={{ marginBottom: 16 }}>
@@ -1564,6 +2007,48 @@ export default function KundaliMilanPage() {
           <button key={t} className={`tab ${activeTab === t ? "active" : ""}`} onClick={() => setActiveTab(t)}>{l}</button>
         ))}
       </div>
+
+      {/* ══════════════════════ MASTER MARRIAGE REPORT TAB ══════════════════════ */}
+      {mode === "match" && activeTab === "master" && (
+        masterReport ? (
+          <MasterMarriageReportPanel
+            report={masterReport}
+            onSelectDate={(date) => {
+              setTargetWeddingDate(date);
+            }}
+          />
+        ) : (
+          <div className="card" style={{ textAlign: "center", padding: 36, border: "2px dashed rgba(184,134,11,0.3)" }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>👑</div>
+            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 700, color: "#1A1A1A", marginBottom: 8 }}>
+              मास्टर विवाह रिपोर्ट हेतु दोनों जन्म कुंडलियां आवश्यक हैं
+            </div>
+            <div style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.8, maxWidth: 640, margin: "0 auto 20px" }}>
+              समेकित महा-रिपोर्ट में अष्टकूट (36-गुण परिहार सहित), मंगल पाप साम्यता (6 vs 6), D9 नवांश 4-स्तंभ (पंचम-नवम त्रिकोण), KP 7th CSL, पुनर्भु योग (शनि-चंद्र गुरु दृष्टि) एवं 24 जनवरी 2027 के.एन. राव डबल गोचर का सटीक मिलान किया जाता है।
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+              <button
+                onClick={loadMukulManishaSample}
+                style={{
+                  background: "linear-gradient(135deg, #B8860B, #8B6508)",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "12px 24px",
+                  color: "#FFFFFF",
+                  fontFamily: "Cormorant Garamond,serif",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(184,134,11,0.25)",
+                }}
+              >
+                ⚡ त्वरित लोड करें: मुकुल एवं मनीषा (24 Jan 2027)
+              </button>
+            </div>
+          </div>
+        )
+      )}
 
       {/* ══════════════════════ MANGAL DOSHA TAB ══════════════════════ */}
       {activeTab === "mars" && (

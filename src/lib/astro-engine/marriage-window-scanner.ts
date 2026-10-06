@@ -171,7 +171,7 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
 
   // ── Jaimini / bonus layer inputs — all static (natal), computed once ──
   let charaDashaSign = "", charaAntardashaSign = "", darakarakaSign = "", darakarakaNavamsha = "";
-  let daraPadaSign = "", upapadaSign = "", upapadaLord = "";
+  let daraPadaSign = "", upapadaSign = "", upapadaLord = "", karakamshaSign = "";
   try {
     const jai = buildJaiminiChart(chart);
     charaDashaSign      = jai.currentDasha?.sign ?? "";
@@ -180,6 +180,10 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
     if (dk) {
       darakarakaSign     = (dk as any).sign;
       darakarakaNavamsha = chart.planets[(dk as any).planet]?.navamsha ?? "";
+    }
+    const ak = jai.karakas.find((k: any) => k.role === "AK");
+    if (ak) {
+      karakamshaSign = chart.planets[(ak as any).planet]?.navamsha ?? "";
     }
     daraPadaSign = jai.arudhas.find((a: any) => a.house === 7)?.sign  ?? "";
     upapadaSign  = jai.arudhas.find((a: any) => a.house === 12)?.sign ?? "";
@@ -228,15 +232,24 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
     let transitOk = false;
     let saturnSign = "", jupiterSign = "", venusSign = "";
     let saturnHouse = 0, jupiterHouse = 0, venusHouse = 0;
+    let saturnRetro = false, jupiterRetro = false;
+    let saturnLon = 0, jupiterLon = 0;
+    let moonSign = "", moonHouse = 0;
     let lagnaLordTrSign = "", seventhLordTrSign = "";
     let lagnaLordTrHouse = 0, seventhLordTrHouse = 0;
     const transitPlanetHousesMap: Record<string, number> = {};
 
     try {
       const tc = calculateChart("window_scan", date, time, chart.city, chart.lat, chart.lon, chart.tz);
-      saturnSign  = tc.planets.Saturn?.sign  ?? "";
-      jupiterSign = tc.planets.Jupiter?.sign ?? "";
-      venusSign   = tc.planets.Venus?.sign   ?? "";
+      saturnSign   = tc.planets.Saturn?.sign  ?? "";
+      jupiterSign  = tc.planets.Jupiter?.sign ?? "";
+      venusSign    = tc.planets.Venus?.sign   ?? "";
+      saturnRetro  = tc.planets.Saturn?.retrograde ?? false;
+      jupiterRetro = tc.planets.Jupiter?.retrograde ?? false;
+      saturnLon    = tc.planets.Saturn?.lon ?? 0;
+      jupiterLon   = tc.planets.Jupiter?.lon ?? 0;
+      moonSign     = tc.planets.Moon?.sign ?? "";
+      moonHouse    = moonSign ? houseFrom(d1LagnaSign, moonSign) : 0;
       saturnHouse  = saturnSign  ? houseFrom(d1LagnaSign, saturnSign)  : 0;
       jupiterHouse = jupiterSign ? houseFrom(d1LagnaSign, jupiterSign) : 0;
       venusHouse   = venusSign   ? houseFrom(d1LagnaSign, venusSign)   : 0;
@@ -282,12 +295,13 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
       currentMahadasha:  mahadasha,
       currentAntardasha: antardasha,
       ...(transitOk ? {
-        transitSaturn:        { sign: saturnSign,        house: saturnHouse },
-        transitJupiter:       { sign: jupiterSign,       house: jupiterHouse },
-        transitVenus:         { sign: venusSign,         house: venusHouse },
-        transitLagnaLord:     { sign: lagnaLordTrSign,   house: lagnaLordTrHouse },
+        transitSaturn:        { sign: saturnSign, house: saturnHouse, retrograde: saturnRetro, lon: saturnLon },
+        transitJupiter:       { sign: jupiterSign, house: jupiterHouse, retrograde: jupiterRetro, lon: jupiterLon },
+        transitVenus:         { sign: venusSign, house: venusHouse },
+        transitLagnaLord:     { sign: lagnaLordTrSign, house: lagnaLordTrHouse },
         transitSeventhLord:   { sign: seventhLordTrSign, house: seventhLordTrHouse },
         transitPlanetHouses:  transitPlanetHousesMap,
+        transitMoon:          moonSign ? { sign: moonSign, house: moonHouse } : undefined,
       } : {}),
       natalAscendant:    d1LagnaSign,
       natalSeventhSign:  h7Sign,
@@ -299,6 +313,9 @@ export function scanMarriageWindows(chart: ChartData): MarriageWindowScanResult 
       natalJupiterHouse,
       natalMoonSign,
       natalMoonHouse,
+      natalRahuSign:     chart.planets.Rahu?.sign,
+      natalKetuSign:     chart.planets.Ketu?.sign,
+      karakamshaSign,
       d1SecondLord,
       d1EleventhLord,
       planetsInSeventh,

@@ -14,6 +14,14 @@ import {
   scanFutureHealthWindows,
   type FamilyMemberKey,
 } from "@/lib/astro-engine/medical";
+import { runKPEngine, type KPPlanet } from "@/lib/astro-engine/kp";
+import {
+  runMedicalEngine,
+  SIXTEEN_DAY_REMEDY_PROTOCOLS,
+  SPECIAL_TRANSCRIPT_RULES,
+  TRADITIONAL_TREATMENT_MODALITIES,
+  MEDICAL_CASEBOOK,
+} from "@/lib/astro-engine/health";
 import { EngineStateCard } from "@/components/engine-state-card";
 
 /**
@@ -34,13 +42,15 @@ const PLANET_EMOJI: Record<string, string> = {
   Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke"
 };
 
-type Tab = "overview" | "family" | "ayurveda" | "timeline" | "combos" | "planets" | "nakshatra" | "signs";
+type Tab = "overview" | "dasha_remedies" | "family" | "ayurveda" | "timeline" | "combos" | "planets" | "nakshatra" | "signs";
 
 export default function MedicalPage() {
   const { chart, loading, hasUserChart } = useUserChart();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [selectedMember, setSelectedMember] = useState<FamilyMemberKey>("Self");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [selectedRemedyPlanet, setSelectedRemedyPlanet] = useState<KPPlanet | null>(null);
+  const [showAllCases, setShowAllCases] = useState(false);
 
   // Admin authentication state
   const [isAdmin, setIsAdmin] = useState(false);
@@ -161,6 +171,20 @@ export default function MedicalPage() {
     () => (chart && hasUserChart ? calculateMedical(chart, effectiveTargetDate) : null),
     [chart, hasUserChart, effectiveTargetDate]
   );
+
+  const kpHealth = useMemo(() => {
+    if (!chart || !hasUserChart) return null;
+    try {
+      const kpRes = runKPEngine(chart);
+      if (kpRes?.predictiveEvidence) {
+        return runMedicalEngine(kpRes.predictiveEvidence, { asOfDate: targetDateStr });
+      }
+      return null;
+    } catch (err) {
+      console.warn("KP Health Engine calculation error:", err);
+      return null;
+    }
+  }, [chart, hasUserChart, targetDateStr]);
 
   // Compute family scan for currently selected member & target date
   const familyScan = useMemo(() => {
@@ -388,6 +412,7 @@ export default function MedicalPage() {
         <div style={{ display: "flex", gap: "6px", marginBottom: "18px", flexWrap: "wrap" }}>
           {([
             ["overview", "Overview"],
+            ["dasha_remedies", "⏳ Dasha & 16-Day Remedies"],
             ...(hasAdvancedAccess ? [["family", `Family Health (${selectedMember})`]] : []),
             ["ayurveda", "Ayurveda & Tridosha"],
             ...(hasAdvancedAccess ? [["timeline", "Future Windows"]] : []),
@@ -735,6 +760,430 @@ export default function MedicalPage() {
               ))}
             </div>
           </>
+        )}
+
+        {/* ── DASHA & 16-DAY REMEDIES TAB (Second Tab) ── */}
+        {activeTab === "dasha_remedies" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {/* 1. SACRED SEVA & CLINICAL POLICY BANNER */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(21,128,61,0.08) 0%, rgba(184,134,11,0.08) 100%)",
+              border: "1px solid rgba(21,128,61,0.3)",
+              borderRadius: "14px",
+              padding: "16px 20px",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.02)"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "8px" }}>
+                <div>
+                  <div style={{ fontSize: "15px", fontWeight: 700, color: "#15803D", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>🕊️</span>
+                    <span>Medical Astrology Seva Niti (विशुद्ध पुण्य एवं सेवा संकल्प)</span>
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#4A4238", marginTop: "5px", lineHeight: "1.6" }}>
+                    <strong>शास्त्र वचन:</strong> Medical Astrology का कभी कोई व्यापार या शुल्क नहीं लेना चाहिए — यह विशुद्ध रूप से लोक-कल्याण, सेवा और ईश्वरीय पुण्य का कार्य है।
+                  </div>
+                </div>
+                <span className="tag" style={{ background: "rgba(21,128,61,0.15)", color: "#15803D", fontWeight: 700, padding: "5px 12px", borderRadius: "20px" }}>
+                  100% FREE SEVA
+                </span>
+              </div>
+              <div style={{ marginTop: "10px", fontSize: "11px", color: "#6B635B", borderTop: "1px solid rgba(21,128,61,0.15)", paddingTop: "8px" }}>
+                ⚠️ <strong>Clinical Notice:</strong> यह पारंपरिक ज्योतिषीय प्रवृत्तियों का अध्ययन है, पैथोलॉजिकल डायग्नोसिस नहीं। किसी भी रोग या लक्षण में पंजीकृत डॉक्टर (Medical Specialist) से तुरंत परामर्श लें।
+              </div>
+            </div>
+
+            {/* 2. RUNNING DASHA HEALTH VECTOR */}
+            {kpHealth ? (
+              <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
+                  <div>
+                    <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A" }}>
+                      🎯 वर्तमान दशा स्वास्थ्य प्रभाव (Running Health Timing)
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#6B635B", marginTop: "3px" }}>
+                      महादशा: <strong style={{ color: "#B8860B" }}>{kpHealth.dashaHealth.mahadasha}</strong> · अंतर्दशा: <strong style={{ color: "#B8860B" }}>{kpHealth.dashaHealth.antardasha}</strong>
+                      {kpHealth.dashaHealth.pratyantar && (
+                        <span> · प्रत्यंतर्दशा: <strong style={{ color: "#B8860B" }}>{kpHealth.dashaHealth.pratyantar}</strong></span>
+                      )}
+                    </div>
+                  </div>
+
+                  <span className="tag" style={{
+                    padding: "6px 14px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    borderRadius: "20px",
+                    background: kpHealth.dashaHealth.phaseNature === "Recovery_Dominant" ? "rgba(21,128,61,0.15)" : kpHealth.dashaHealth.phaseNature === "High_Stress_Watch" ? "rgba(220,38,38,0.15)" : "rgba(180,83,9,0.15)",
+                    color: kpHealth.dashaHealth.phaseNature === "Recovery_Dominant" ? "#15803D" : kpHealth.dashaHealth.phaseNature === "High_Stress_Watch" ? "#DC2626" : "#B45309",
+                    border: `1px solid ${kpHealth.dashaHealth.phaseNature === "Recovery_Dominant" ? "rgba(21,128,61,0.3)" : kpHealth.dashaHealth.phaseNature === "High_Stress_Watch" ? "rgba(220,38,38,0.3)" : "rgba(180,83,9,0.3)"}`
+                  }}>
+                    {kpHealth.dashaHealth.phaseNature.replace(/_/g, " ").toUpperCase()}
+                  </span>
+                </div>
+
+                {/* 3 Pillars Summary Grid */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", margin: "14px 0" }}>
+                  <div style={{ background: "rgba(184,134,11,0.06)", padding: "12px 14px", borderRadius: "10px", border: "1px solid rgba(184,134,11,0.2)" }}>
+                    <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>सक्रिय अंग एवं तंत्र (Active Focus)</div>
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A", marginTop: "4px" }}>
+                      {kpHealth.dashaHealth.activeBodySystems.join(", ") || "General Vitality"}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "2px" }}>
+                      प्राथमिक प्रभाव: {kpHealth.dashaHealth.activeDomains.join(" · ")}
+                    </div>
+                  </div>
+
+                  <div style={{ background: "rgba(21,128,61,0.06)", padding: "12px 14px", borderRadius: "10px", border: "1px solid rgba(21,128,61,0.2)" }}>
+                    <div style={{ fontSize: "11px", color: "#15803D", fontWeight: 700 }}>आरोग्य एवं रिकवरी क्षमता (Recovery)</div>
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A", marginTop: "4px" }}>
+                      {kpHealth.scorecard.recoveryResilience}/100 ({kpHealth.recoveryAnalysis.potential})
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "2px" }}>
+                      5th/11th भाव समर्थन: {kpHealth.recoveryAnalysis.supportiveHouses.map(h => `H${h}`).join(", ") || "Moderate"}
+                    </div>
+                  </div>
+
+                  <div style={{ background: "rgba(29,78,216,0.06)", padding: "12px 14px", borderRadius: "10px", border: "1px solid rgba(29,78,216,0.2)" }}>
+                    <div style={{ fontSize: "11px", color: "#1D4ED8", fontWeight: 700 }}>आयुर्वेदिक त्रिदोष स्थिति (Dosha)</div>
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A", marginTop: "4px" }}>
+                      {kpHealth.dashaHealth.doshaTendency} प्रवृत्ति
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "2px" }}>
+                      पैटर्न शक्ति: {kpHealth.scorecard.repetitionConfidence.replace(/_/g, " ")}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Upcoming Transition / Arogya Window */}
+                {kpHealth.dashaHealth.upcomingTransition && (
+                  <div style={{
+                    background: kpHealth.dashaHealth.upcomingTransition.isRecoveryWindow ? "rgba(21,128,61,0.06)" : "#FAF7F2",
+                    border: `1px solid ${kpHealth.dashaHealth.upcomingTransition.isRecoveryWindow ? "rgba(21,128,61,0.3)" : "rgba(184,134,11,0.25)"}`,
+                    borderRadius: "10px",
+                    padding: "12px 14px",
+                    marginTop: "10px"
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: "12px", fontWeight: 700, color: kpHealth.dashaHealth.upcomingTransition.isRecoveryWindow ? "#15803D" : "#8A6008" }}>
+                        🌅 आगामी परिवर्तन (Arogya Window / Next Phase):
+                      </span>
+                      <span style={{ fontSize: "11px", color: "#6B635B" }}>
+                        प्रारंभ: {kpHealth.dashaHealth.upcomingTransition.startDate}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#4A4238", marginTop: "4px", lineHeight: "1.5" }}>
+                      {kpHealth.dashaHealth.upcomingTransition.expectedShift}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {/* 3. 16-DAY REMEDY PROTOCOL (Guru Ji's Exact Formula) */}
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
+                <div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A" }}>
+                    🔥 16-दिवसीय सिद्ध पुड़िया अनुष्ठान (Guru Ji's 16-Day Protocol)
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#6B635B", marginTop: "2px" }}>
+                    दशा-स्वामी ग्रह की 16 पुड़िया बनाएं · स्टील छलनी पर गैस चूल्हे पर जलाएं · सिंक या टॉयलेट में बहाएं
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <button
+                    onClick={() => setSelectedRemedyPlanet(null)}
+                    style={{
+                      padding: "5px 12px",
+                      borderRadius: "8px",
+                      fontSize: "11px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      border: "1px solid rgba(184,134,11,0.3)",
+                      background: selectedRemedyPlanet === null ? "#B8860B" : "#FAF7F2",
+                      color: selectedRemedyPlanet === null ? "#FFFFFF" : "#4A4238"
+                    }}
+                  >
+                    🎯 Active Dasha
+                  </button>
+                </div>
+              </div>
+
+              {/* Planet Selector Quick Pills */}
+              <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "10px", marginBottom: "14px" }}>
+                {(["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"] as KPPlanet[]).map((p) => {
+                  const isActive = (selectedRemedyPlanet || kpHealth?.dashaHealth.antardasha || "Rahu") === p;
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => setSelectedRemedyPlanet(p)}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: "20px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        border: `1px solid ${isActive ? "#B8860B" : "rgba(184,134,11,0.2)"}`,
+                        background: isActive ? "rgba(184,134,11,0.12)" : "#FFFFFF",
+                        color: isActive ? "#B8860B" : "#4A4238",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Protocol Card for Selected Planet */}
+              {(() => {
+                const targetPlanet = (selectedRemedyPlanet || kpHealth?.dashaHealth.antardasha || "Rahu") as KPPlanet;
+                const proto = SIXTEEN_DAY_REMEDY_PROTOCOLS[targetPlanet];
+                if (!proto) return null;
+                const isFlush = proto.disposalDestination === "Toilet Flush";
+
+                return (
+                  <div style={{
+                    border: `1px solid ${isFlush ? "rgba(220,38,38,0.3)" : "rgba(21,128,61,0.3)"}`,
+                    background: isFlush ? "rgba(220,38,38,0.03)" : "rgba(21,128,61,0.03)",
+                    borderRadius: "12px",
+                    padding: "16px"
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "6px" }}>
+                      <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A" }}>
+                        ✨ {proto.planet} के लिए 16-दिवसीय स्वास्थ्य निवारण विधि
+                      </div>
+                      <span className="tag" style={{
+                        background: isFlush ? "rgba(220,38,38,0.15)" : "rgba(21,128,61,0.15)",
+                        color: isFlush ? "#DC2626" : "#15803D",
+                        fontWeight: 700,
+                        padding: "5px 12px",
+                        borderRadius: "20px"
+                      }}>
+                        {isFlush ? "🚨 TOILET ME FLUSH (सख्त नियम)" : "💧 KITCHEN SINK ME DISPOSE"}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px" }}>
+                      <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
+                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>1. कपड़े का रंग एवं पुड़िया</div>
+                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.clothColor}</div>
+                        <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "2px" }}>कुल पुड़िया: <strong>16 पुड़िया</strong> बनानी हैं</div>
+                      </div>
+
+                      <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
+                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>2. आवश्यक सामग्री</div>
+                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.material}</div>
+                        <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "2px" }}>प्रत्येक पुड़िया में इतनी मात्रा रखें</div>
+                      </div>
+
+                      <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
+                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>3. जलाने का तरीका</div>
+                        <div style={{ fontSize: "12px", color: "#1A1A1A", marginTop: "2px", lineHeight: "1.4" }}>{proto.burnMethod}</div>
+                      </div>
+
+                      <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
+                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>4. अनुशंसित समय</div>
+                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.recommendedTiming}</div>
+                      </div>
+                    </div>
+
+                    {/* Disposal Destination & Food Avoidance */}
+                    <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                      <div style={{ background: isFlush ? "rgba(220,38,38,0.08)" : "rgba(21,128,61,0.08)", padding: "12px", borderRadius: "8px", border: `1px solid ${isFlush ? "rgba(220,38,38,0.25)" : "rgba(21,128,61,0.25)"}` }}>
+                        <div style={{ fontSize: "11px", fontWeight: 700, color: isFlush ? "#DC2626" : "#15803D" }}>
+                          🌊 विसर्जन विधि (Disposal Method):
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#1A1A1A", marginTop: "4px", lineHeight: "1.5" }}>
+                          {proto.disposalDetails}
+                        </div>
+                      </div>
+
+                      <div style={{ background: "rgba(180,83,9,0.08)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(180,83,9,0.25)" }}>
+                        <div style={{ fontSize: "11px", fontWeight: 700, color: "#B45309" }}>
+                          🍽️ 16 दिनों तक सख्त खान-पान परहेज़:
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#1A1A1A", marginTop: "4px", lineHeight: "1.5" }}>
+                          {proto.strictFoodAvoidance}
+                        </div>
+                      </div>
+                    </div>
+
+                    {proto.specialConditionNotes && (
+                      <div style={{ marginTop: "10px", fontSize: "11px", color: "#6B635B", fontStyle: "italic" }}>
+                        💡 <strong>विशेष निर्देश:</strong> {proto.specialConditionNotes}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* 4. SPECIAL TRANSCRIPT RULES & WARNINGS */}
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginBottom: "12px" }}>
+                🛡️ गुरुजी के विशेष नियम एवं सावधानियां (Special Transcript Guidelines)
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
+                {SPECIAL_TRANSCRIPT_RULES.map((rule) => (
+                  <div key={rule.id} style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: "10px", padding: "14px" }}>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginBottom: "4px" }}>
+                      {rule.title}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 600, marginBottom: "6px" }}>
+                      शर्त: {rule.condition}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.5", marginBottom: "6px" }}>
+                      <strong>पारंपरिक नियम:</strong> {rule.traditionalRule}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#15803D", lineHeight: "1.4", background: "rgba(21,128,61,0.06)", padding: "6px 8px", borderRadius: "6px" }}>
+                      ✓ {rule.actionableAdvice}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 5. 5TH HOUSE TREATMENT MODALITY GUIDANCE */}
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginBottom: "6px" }}>
+                🌿 5वें भाव के अनुसार पारंपरिक चिकित्सा शैली (5th House Treatment Modality)
+              </div>
+              <div style={{ fontSize: "12px", color: "#6B635B", marginBottom: "14px" }}>
+                KP सिद्धांत: 5वां भाव रोग (6th) का व्यय (12th from 6th = रोगमुक्ति) है। 5वें CSL का नक्षत्र स्वामी सर्वोत्तम उपचार पद्धति का प्रतीक दर्शाता है:
+              </div>
+
+              {/* Personalized 5th House Cure Modality Banner */}
+              {kpHealth?.personalCureModality && (
+                <div style={{
+                  background: "linear-gradient(135deg, rgba(21,128,61,0.08) 0%, rgba(184,134,11,0.08) 100%)",
+                  border: "1.5px solid rgba(21,128,61,0.35)",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  marginBottom: "16px"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "8px" }}>
+                    <div>
+                      <div style={{ fontSize: "11px", fontWeight: 700, color: "#15803D", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                        ✨ आपकी व्यक्तिगत कुंडली अनुसार उपचार शैली (Personalized Healing Path)
+                      </div>
+                      <div style={{ fontSize: "16px", fontWeight: 800, color: "#1A1A1A", marginTop: "4px" }}>
+                        {kpHealth.personalCureModality.recommendedModality}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      <span className="tag" style={{ background: "rgba(21,128,61,0.15)", color: "#15803D", border: "1px solid rgba(21,128,61,0.3)" }}>
+                        5th CSL: {kpHealth.personalCureModality.cusp5CSL}
+                      </span>
+                      <span className="tag" style={{ background: "rgba(184,134,11,0.15)", color: "#8A6008", border: "1px solid rgba(184,134,11,0.3)" }}>
+                        नक्षत्र स्वामी: {kpHealth.personalCureModality.cslStarLord}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: "12px", color: "#3A352F", marginTop: "8px", lineHeight: "1.5" }}>
+                    <strong>कारण (Rationale):</strong> {kpHealth.personalCureModality.rationale}
+                  </div>
+
+                  {kpHealth.personalCureModality.specialCaution && (
+                    <div style={{
+                      marginTop: "10px",
+                      background: "rgba(220,38,38,0.08)",
+                      border: "1px solid rgba(220,38,38,0.25)",
+                      borderRadius: "8px",
+                      padding: "8px 12px",
+                      fontSize: "12px",
+                      color: "#DC2626",
+                      lineHeight: "1.4"
+                    }}>
+                      ⚠️ {kpHealth.personalCureModality.specialCaution}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div style={{ fontSize: "11px", fontWeight: 700, color: "#8A6008", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
+                सभी 9 ग्रहों के अनुसार शास्त्रीय उपचार विधाएं (Reference Table):
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "10px" }}>
+                {Object.entries(TRADITIONAL_TREATMENT_MODALITIES).map(([planet, mod]) => {
+                  const isUserActive = kpHealth?.personalCureModality?.cslStarLord === planet;
+                  return (
+                    <div key={planet} style={{
+                      background: isUserActive ? "rgba(21,128,61,0.06)" : "#FAF7F2",
+                      border: `1px solid ${isUserActive ? "rgba(21,128,61,0.4)" : "rgba(184,134,11,0.18)"}`,
+                      borderRadius: "8px",
+                      padding: "10px",
+                      boxShadow: isUserActive ? "0 0 0 2px rgba(21,128,61,0.15)" : undefined,
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ fontSize: "12px", fontWeight: 700, color: isUserActive ? "#15803D" : "#8A6008" }}>
+                          {planet} {isUserActive && "★ आपकी कुंडली"}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{mod.modality}</div>
+                      <div style={{ fontSize: "10px", color: "#6B635B", marginTop: "3px", lineHeight: "1.4" }}>{mod.rationale}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 6. VERIFIED CLASSROOM CASEBOOK (20 Ground-Truth Cases) */}
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <div>
+                  <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A" }}>
+                    📚 लाइव क्लासरूम केस स्टडीज़ (20 Ground-Truth Casebook)
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#6B635B", marginTop: "2px" }}>
+                    गुरुजी की लाइव क्लास में हल किए गए वास्तविक स्वास्थ्य एवं उपचार केस
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowAllCases(!showAllCases)}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "8px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    border: "1px solid rgba(184,134,11,0.3)",
+                    background: "#FAF7F2",
+                    color: "#8A6008"
+                  }}
+                >
+                  {showAllCases ? "कम देखें ▲" : `सभी 20 केस देखें (${MEDICAL_CASEBOOK.length}) ▼`}
+                </button>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "10px" }}>
+                {(showAllCases ? MEDICAL_CASEBOOK : MEDICAL_CASEBOOK.slice(0, 4)).map((c) => (
+                  <div key={c.id} style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: "10px", padding: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                      <span className="tag" style={{ background: "rgba(184,134,11,0.12)", color: "#8A6008", fontSize: "10px", fontWeight: 700 }}>
+                        {c.id}
+                      </span>
+                      <span style={{ fontSize: "10px", color: "#15803D", fontWeight: 700 }}>
+                        ग्रह: {c.chartSignifiers.primaryPlanets.join(" + ")}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "4px" }}>
+                      {c.title}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#4A4238", marginTop: "4px", lineHeight: "1.4" }}>
+                      {c.teacherInterpretation}
+                    </div>
+                    {c.remedySymbolism && (
+                      <div style={{ fontSize: "11px", color: "#15803D", marginTop: "6px", background: "rgba(21,128,61,0.06)", padding: "4px 8px", borderRadius: "6px" }}>
+                        🌿 <strong>उपाय:</strong> {c.remedySymbolism}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
 
         {/* ── TIMELINE TAB (Add-on 2: Future Windows) ── */}

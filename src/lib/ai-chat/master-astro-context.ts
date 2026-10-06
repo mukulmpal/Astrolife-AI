@@ -21,6 +21,8 @@ import { calculateVastu } from "../astro-engine/vastu";
 import { calculateSarvatobhadra } from "../astro-engine/sarvatobhadra";
 import { scanMarriageWindows } from "../astro-engine/marriage-window-scanner";
 import { calculateLineageKarma } from "../astro-engine/lineage-karma";
+import { evaluateMarriageIntelligence } from "../astro-engine/marriage-intelligence";
+import { detectConditionalDashas } from "../astro-engine/marriage-timing-kn-rao";
 import type { DashaLord } from "../astro-engine/dasha";
 
 /**
@@ -494,6 +496,60 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
 - Language Rule: When presenting to native, strictly follow Language Style Guide v2.1 (no fear, no curses, practical empowerment, 4-tier remedy hierarchy).`);
   } catch (err) {
     console.warn("[MasterAstroContext] Lineage Karma error:", err);
+  }
+
+  // ── 18. KP MARRIAGE INTELLIGENCE, D9 NAVAMSHA & REMEDIAL BLUEPRINT ──────────
+  try {
+    const mi = evaluateMarriageIntelligence(chart);
+    const remediesStr = mi.remedies
+      .slice(0, 4)
+      .map((r) => `✦ ${r.title} [${r.category}]: ${r.procedure}`)
+      .join("\n  ");
+
+    const condDashas = detectConditionalDashas(chart);
+    const applicableDashas = condDashas.filter((d) => d.isApplicable);
+    const dashasStr = applicableDashas.length > 0
+      ? applicableDashas.map((d) => `✦ ${d.dashaName}: ${d.conditionDescription} (${d.researchRule})`).join("\n  ")
+      : "✦ Standard Vimshottari Dasha remains the primary sovereign timing clock (no conditional overrides).";
+
+    sections.push(`### 18. KP MARRIAGE INTELLIGENCE, D9 NAVAMSHA & PROVEN REMEDIES
+- 7th Cusp Sub-Lord (${mi.meetingContext.sourceStarLord} Star in H${mi.meetingContext.starLordHouse}):
+  ✦ Meeting Circumstances: ${mi.meetingContext.circumstance}
+  ✦ Spouse Nature: ${mi.meetingContext.partnerNature}
+  ${mi.meetingContext.caution ? `✦ Caution: ${mi.meetingContext.caution}` : ""}
+- 7th Rashi Post-Marriage Manifestation (${mi.rashiImpact.signName}):
+  ✦ Life Domain: ${mi.rashiImpact.lifeDomainActivated}
+  ✦ Behavioral Dynamic: ${mi.rashiImpact.behavioralDynamics}
+- D9 Navamsha 4-Pillar Health Audit (Lagna: ${mi.d9Audit.d9LagnaSign}):
+  ✦ H1 (Mindset): ${mi.d9Audit.pillars.h1NativeMindset.interpretation} [Severity: ${mi.d9Audit.pillars.h1NativeMindset.severity}]
+  ✦ H4 (Domestic Peace): ${mi.d9Audit.pillars.h4MaritalPeace.interpretation} [Severity: ${mi.d9Audit.pillars.h4MaritalPeace.severity}]
+  ✦ H7 (Spouse Stability): ${mi.d9Audit.pillars.h7SpouseNature.interpretation} [Severity: ${mi.d9Audit.pillars.h7SpouseNature.severity}]
+  ✦ H12 (Bedroom Bliss): ${mi.d9Audit.pillars.h12BedroomBliss.interpretation} [Index: ${mi.d9Audit.bedroomBlissStatus}]
+- Punarbu / Punarphoo Yoga Audit (Dr. Veluchamy Research 2022):
+  ✦ Status: ${mi.punarbuYoga.detected ? `ACTIVE [Severity: ${mi.punarbuYoga.severity}]` : "CLEAN (No Punarbu Yoga)"}
+  ✦ Conditions: ${mi.punarbuYoga.conditions.join("; ") || "None"}
+  ✦ Neutralization / Cancelled: ${mi.punarbuYoga.isCancelled ? `YES (${mi.punarbuYoga.cancellationFactors.join(", ")})` : "No cancellation"}
+  ✦ Manifestation: ${mi.punarbuYoga.effects}
+- Separative Influences Audit (Sun, Saturn, Rahu, Ketu, 12L):
+  ✦ Total Separative Score: ${mi.separativeAudit.totalSeparativeScore}
+  ✦ Interpretation: ${mi.separativeAudit.interpretation}
+  ✦ 7th Lord Affliction: ${mi.separativeAudit.seventhLordAfflicted ? mi.separativeAudit.seventhLordSeparators.join(", ") : "Protected"}
+- Barren Signs & Spouse Direction:
+  ✦ Barren Placements: ${mi.barrenAudit.barrenPlacements.join(", ") || "None"} (${mi.barrenAudit.interpretation})
+  ✦ Spouse Direction: ${mi.marriageDirection.primaryDirectionHindi} (${mi.marriageDirection.rationale})
+- D1 ➔ D9 Cross-Mapping Manifestation:
+  ✦ Friction Zones: ${mi.d1ToD9Mapping.trikInD9.map((t) => `D1 H${t.d1House} in D9 H${t.d9House}`).join(", ")}
+  ✦ Prosperity Zones: ${mi.d1ToD9Mapping.wealthInD9.map((w) => `D1 H${w.d1House} in D9 H${w.d9House}`).join(", ")}
+- Conditional Dashas (K.N. Rao Research):
+  ${dashasStr}
+- Special Dynamics:
+  ✦ Dual/Second Marriage Potential: ${mi.dualMarriage.notes}
+  ✦ Renunciation/Sanyas/Denial Status: ${mi.sanyasDenial.interpretation}
+  ✦ Intimacy/Orientation Vector: ${mi.intimacyAudit.interpretation} (Astro-Vastu: ${mi.intimacyAudit.vastuZone})
+- Recommended Practical Remedies:
+  ${remediesStr}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Marriage Intelligence error:", err);
   }
 
   return `\n══════════════════════════════════════════════════════════════════════
