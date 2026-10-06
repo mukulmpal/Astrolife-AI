@@ -1603,10 +1603,10 @@ export default function KundaliMilanPage() {
   const hasQuickMatch = Boolean(milanResult);
   const hasPartnerFullChart = Boolean(partnerChart);
   const hasCoupleResult = hasQuickMatch || hasPartnerFullChart || Boolean(masterReport);
+  const ashtakootPct = masterReport?.ashtakoot.percentage ?? milanResult?.percentage;
   const coupleScoreParts = [
-    milanResult?.percentage,
+    ashtakootPct,
     mangalCompatibility?.balanceScore,
-    masterReport?.ashtakoot.percentage,
   ].filter((score): score is number => typeof score === "number");
   const coupleScore = coupleScoreParts.length > 0
     ? Math.round(coupleScoreParts.reduce((sum, score) => sum + score, 0) / coupleScoreParts.length)
