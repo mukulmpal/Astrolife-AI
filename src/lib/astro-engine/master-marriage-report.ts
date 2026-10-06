@@ -16,7 +16,7 @@
  * ============================================================================
  */
 
-import { type ChartData } from "./calculations";
+import { calculateChart, type ChartData } from "./calculations";
 import { calculateMilan, type MilanResult, type KootScore } from "./kundali-milan";
 import {
   evaluateMarriageIntelligence,
@@ -201,6 +201,98 @@ function getD9LagnaSign(lon: number): string {
   return SIGNS_LIST[d9SignNum];
 }
 
+// ── Dynamic Transit & Aspect Helpers ─────────────────────────────────────────
+
+function getSaturnAspectSigns(sign: string): string[] {
+  const idx = SIGNS_LIST.indexOf(sign);
+  if (idx < 0) return [];
+  return [sign, SIGNS_LIST[(idx + 2) % 12], SIGNS_LIST[(idx + 6) % 12], SIGNS_LIST[(idx + 9) % 12]];
+}
+
+function getJupiterAspectSigns(sign: string): string[] {
+  const idx = SIGNS_LIST.indexOf(sign);
+  if (idx < 0) return [];
+  return [sign, SIGNS_LIST[(idx + 4) % 12], SIGNS_LIST[(idx + 6) % 12], SIGNS_LIST[(idx + 8) % 12]];
+}
+
+function get7thSign(sign: string): string {
+  const idx = SIGNS_LIST.indexOf(sign);
+  if (idx < 0) return "";
+  return SIGNS_LIST[(idx + 6) % 12];
+}
+
+function evaluateDynamicWeddingTiming(
+  chart1: ChartData,
+  chart2: ChartData,
+  targetDate: string
+) {
+  let transitSaturnSign = "Pisces";
+  let transitJupiterSign = "Leo";
+  let transitJupiterRetro = false;
+  let transitMoonSign = "Leo";
+  let transitMoonNak = "Magha";
+
+  try {
+    const tChart = calculateChart(
+      "Transit",
+      targetDate,
+      "12:00",
+      chart1.city || "New Delhi",
+      chart1.lat ?? 28.6139,
+      chart1.lon ?? 77.2090,
+      chart1.tz ?? 5.5
+    );
+    if (tChart?.planets) {
+      transitSaturnSign = tChart.planets.Saturn?.sign || transitSaturnSign;
+      transitJupiterSign = tChart.planets.Jupiter?.sign || transitJupiterSign;
+      transitJupiterRetro = Boolean(tChart.planets.Jupiter?.retrograde);
+      transitMoonSign = tChart.planets.Moon?.sign || transitMoonSign;
+      transitMoonNak = tChart.planets.Moon?.nakshatra || transitMoonNak;
+    }
+  } catch (err) {
+    console.warn("Could not calculate transit chart for date:", targetDate, err);
+  }
+
+  const saturnInfluencedSigns = getSaturnAspectSigns(transitSaturnSign);
+  const jupiterInfluencedSigns = getJupiterAspectSigns(transitJupiterSign);
+
+  const targets1 = [chart1.lagnaRashi, get7thSign(chart1.lagnaRashi)];
+  const targets2 = [chart2.lagnaRashi, get7thSign(chart2.lagnaRashi)];
+
+  const saturnHits1 = targets1.some((s) => saturnInfluencedSigns.includes(s));
+  const jupiterHits1 = targets1.some((s) => jupiterInfluencedSigns.includes(s));
+  const saturnHits2 = targets2.some((s) => saturnInfluencedSigns.includes(s));
+  const jupiterHits2 = targets2.some((s) => jupiterInfluencedSigns.includes(s));
+
+  const doubleTransitP4 = (saturnHits1 && jupiterHits1) || (saturnHits2 && jupiterHits2);
+
+  let score = 55;
+  if (doubleTransitP4) score += 30;
+  else if (saturnHits1 || jupiterHits1 || saturnHits2 || jupiterHits2) score += 15;
+
+  const isMoonAuspicious =
+    transitMoonSign === chart1.planets.Moon?.sign ||
+    transitMoonSign === chart2.planets.Moon?.sign ||
+    transitMoonSign === get7thSign(chart1.lagnaRashi) ||
+    transitMoonSign === get7thSign(chart2.lagnaRashi);
+
+  if (isMoonAuspicious) score += 10;
+
+  const moonTransitRoleO1 = `${targetDate} को गोचर चंद्रमा ${transitMoonSign} राशि (${transitMoonNak} नक्षत्र) में संचरण करेगा, जो जन्म कुंडलियों के लग्न/सप्तम अक्ष पर प्रभाव डालता है।`;
+
+  const timingVerdict = doubleTransitP4
+    ? `${targetDate} को के.एन. राव डबल ट्रांजिट (शनि ${transitSaturnSign} एवं गुरु ${transitJupiterSign}${transitJupiterRetro ? " वक्री" : ""}) परिपक्व है। यह विवाह हेतु शास्त्रसम्मत अनुकूल कालखंड है।`
+    : `${targetDate} को गोचर प्रभाव मध्यम है। गुरु (${transitJupiterSign}) व शनि (${transitSaturnSign}) का प्रभाव सक्रिय है; इस तिथि पर परिहार एवं शुभ मुहूर्त का चयन कर विवाह संपन्न किया जा सकता है।`;
+
+  return {
+    targetWeddingDate: targetDate,
+    isDoubleTransitActive: doubleTransitP4,
+    timingScore: Math.min(100, score),
+    moonTransitRoleO1,
+    timingVerdict,
+  };
+}
+
 // ── Master Report Builder ────────────────────────────────────────────────────
 
 export function generateMasterMarriageReport(
@@ -214,11 +306,17 @@ export function generateMasterMarriageReport(
     targetWeddingDate?: string; // YYYY-MM-DD
   }
 ): MasterMarriageReport {
-  const p1Name = options?.partner1Name || "Partner 1";
-  const p2Name = options?.partner2Name || "Partner 2";
+  const p1Name = options?.partner1Name || chart1.name || "Partner 1";
+  const p2Name = options?.partner2Name || chart2.name || "Partner 2";
   const p1Gender = options?.partner1Gender || "male";
   const p2Gender = options?.partner2Gender || "female";
-  const weddingDate = options?.targetWeddingDate || "2027-01-24";
+  
+  const defaultFutureDate = () => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 6);
+    return d.toISOString().split("T")[0];
+  };
+  const weddingDate = options?.targetWeddingDate || defaultFutureDate();
 
   // ── Partner Summaries ───────────────────────────────────────────────────────
   const p1MoonLon = chart1.planets.Moon?.lon ?? 0;
@@ -266,17 +364,24 @@ export function generateMasterMarriageReport(
   const milanRaw: MilanResult = calculateMilan(p1Name, p1NakIdx, p1RashiIdx, p2Name, p2NakIdx, p2RashiIdx);
   const pariharas: string[] = [];
 
+  const p1MoonSign = chart1.planets.Moon?.sign || RASHI_NAMES[p1RashiIdx];
+  const p2MoonSign = chart2.planets.Moon?.sign || RASHI_NAMES[p2RashiIdx];
+  const p1MoonNak = chart1.planets.Moon?.nakshatra || NAKSHATRA_NAMES[p1NakIdx];
+  const p2MoonNak = chart2.planets.Moon?.nakshatra || NAKSHATRA_NAMES[p2NakIdx];
+
   // Check Bhakoot Parihara for Eka Rashi (Same Rashi, Different Nakshatras)
   if (p1RashiIdx === p2RashiIdx) {
     if (p1NakIdx !== p2NakIdx) {
-      pariharas.push("भकूट दोष परिहार (Bhakoot Parihara): दोनों की एक ही चंद्र राशि (सिंह) है किंतु नक्षत्र भिन्न हैं (पूर्वा व उत्तरा फाल्गुनी), जिससे भकूट दोष पूर्णतः निरस्त होकर पूर्ण 7 अंक प्राप्त होते हैं।");
+      pariharas.push(`भकूट दोष परिहार (Bhakoot Parihara): दोनों की एक ही चंद्र राशि (${p1MoonSign}) है किंतु जन्म नक्षत्र भिन्न हैं (${p1MoonNak} एवं ${p2MoonNak}), जिससे भकूट दोष निरस्त होकर शुभ फल प्राप्त होता है।`);
     }
   }
 
   // Check Nadi Dosha status
   const nadiKoot = milanRaw.koots.find(k => k.name === "Nadi");
   if (nadiKoot && !nadiKoot.hasDosha) {
-    pariharas.push("नाड़ी दोष रहित (Nadi Dosha Free): दोनों की नाड़ियां भिन्न (आदि एवं मध्य) हैं, अतः स्वास्थ्य, दीर्घायु व कुल वृद्धि हेतु पूर्ण 8/8 अंक प्राप्त हैं।");
+    pariharas.push(`नाड़ी दोष रहित (Nadi Dosha Free): दोनों की नाड़ियां परस्पर अनुकूल हैं, जिससे स्वास्थ्य, दीर्घायु व कुल वृद्धि हेतु पूर्ण ${nadiKoot.points}/${nadiKoot.maxPoints} अंक प्राप्त हैं।`);
+  } else if (nadiKoot && nadiKoot.hasDosha) {
+    pariharas.push(`नाड़ी दोष विचार: नाड़ी दोष दृष्टिगत है, जिसके निवारण हेतु शास्त्रीय महामृत्युंजय जप एवं सुवर्ण/गौ दान की अनुशंसा की जाती है।`);
   }
 
   const ashtakootScore = milanRaw.totalScore;
@@ -308,21 +413,26 @@ export function generateMasterMarriageReport(
     mangalComparison = null;
   }
 
-  const p1Paap = mangalComparison?.traditionalPaapBalance?.personA ?? 6;
-  const p2Paap = mangalComparison?.traditionalPaapBalance?.personB ?? 6;
+  const p1Paap = mangalComparison?.traditionalPaapBalance?.personA ?? 0;
+  const p2Paap = mangalComparison?.traditionalPaapBalance?.personB ?? 0;
   const paapDiff = Math.abs(p1Paap - p2Paap);
   const isMangalBalanced = paapDiff <= 2;
+
+  const p1MarsSign = chart1.planets.Mars?.sign || "";
+  const p1MarsHouse = chart1.planets.Mars?.house ?? 1;
+  const p2MarsSign = chart2.planets.Mars?.sign || "";
+  const p2MarsHouse = chart2.planets.Mars?.house ?? 1;
 
   const mangalSamyam: MasterMarriageReport["mangalSamyam"] = {
     isBalanced: isMangalBalanced,
     paapDifference: paapDiff,
     partner1Paap: p1Paap,
     partner2Paap: p2Paap,
-    balanceLevel: isMangalBalanced ? "पूर्ण साम्यता (Perfect Balance)" : "संतुलन आवश्यक",
+    balanceLevel: isMangalBalanced ? "पूर्ण साम्यता (Harmonious Balance)" : "साम्यता संतुलन विचारणीय",
     verdict: isMangalBalanced
-      ? "दोनों कुंडलियों में मांगलिक पाप साम्यता (6 vs 6 अंक) पूर्णतः समान है। मंगल का परस्पर दोष स्वतः निष्प्रभावी हो चुका है।"
-      : `मंगल दोष में ${paapDiff} अंकों का अंतर है, जिसे विशिष्ट शांति उपायों से संतुलित किया जा सकता है।`,
-    details: `${p1Name} (12वें भाव मंगल) एवं ${p2Name} (10वें भाव स्वगृही मंगल / चंद्र से 4H) का उग्र प्रभाव एक-दूसरे को संतुलित करता है।`,
+      ? `दोनों कुंडलियों में मांगलिक पाप साम्यता (${p1Paap} vs ${p2Paap} अंक) संतुलित है। मंगल का परस्पर प्रभाव सामंजस्यपूर्ण और दोष-मुक्त है।`
+      : `मंगल दोष में ${paapDiff} अंकों का अंतर है (${p1Paap} vs ${p2Paap}), जिसे विशिष्ट शांति उपायों और समझदारी से संतुलित किया जा सकता है।`,
+    details: `${p1Name} (भाव ${p1MarsHouse} ${p1MarsSign} मंगल) एवं ${p2Name} (भाव ${p2MarsHouse} ${p2MarsSign} मंगल) की ऊर्जा स्थिति परस्पर सामंजस्य स्थापित करती है।`,
   };
 
   // ── 3. Marriage Intelligence Engines for Both Partners ───────────────────────
@@ -335,17 +445,26 @@ export function generateMasterMarriageReport(
   const d9Diff = ((d9Idx2 - d9Idx1 + 12) % 12);
 
   let axisRel = "समानधर्मी संबंध";
-  let axisExpl = "दोनों नवांश कुंडलियां परस्पर सकारात्मक ऊर्जा का आदान-प्रदान कर रही हैं।";
+  let axisExpl = `${p1D9Lagna} और ${p2D9Lagna} नवांश परस्पर सकारात्मक ऊर्जा का आदान-प्रदान करते हैं।`;
 
   if (d9Diff === 0) {
-    axisRel = "एक नवांश लग्न (1-1 अक्ष)";
-    axisExpl = "समान नवांश लग्न होने से दोनों की आंतरिक जीवन मूल्य व आध्यात्मिक सोच एक समान रहेगी।";
+    axisRel = "1-1 सम-नवांश लग्न (Unity Alignment)";
+    axisExpl = `दोनों का नवांश लग्न ${p1D9Lagna} होने से आंतरिक जीवन मूल्य, लक्ष्य और आध्यात्मिक सोच में एकात्मता रहेगी।`;
   } else if (d9Diff === 4 || d9Diff === 8) {
-    axisRel = "5-9 वायु त्रिकोण संबंध (Air Trine Resonance)";
-    axisExpl = `मिथुन (${p1D9Lagna}) और कुंभ (${p2D9Lagna}) परस्पर 5-9 नवपंचम त्रिकोण बनाते हैं। यह बौद्धिक सामंजस्य, बिना कहे एक-दूसरे की बात समझ लेना और मानसिक शांति का सर्वोच्च योग है।`;
+    axisRel = "5-9 नवपंचम त्रिकोण संबंध (Trine Resonance)";
+    axisExpl = `${p1D9Lagna} और ${p2D9Lagna} परस्पर 5-9 नवपंचम त्रिकोण बनाते हैं। यह बौद्धिक सामंजस्य, सहज समझ और वैवाहिक सौहार्द का सर्वोत्तम शास्त्रीय योग है।`;
   } else if (d9Diff === 6) {
-    axisRel = "1-7 परस्पर पूरक अक्ष";
-    axisExpl = "दोनों एक-दूसरे के प्राकृतिक पूरक हैं, जो जीवन के रिक्त स्थानों को पूर्ण करते हैं।";
+    axisRel = "1-7 परस्पर पूरक अक्ष (Complementary Axis)";
+    axisExpl = `${p1D9Lagna} और ${p2D9Lagna} परस्पर 1-7 अक्ष पर हैं, जो एक-दूसरे के व्यक्तित्व को पूर्णता और संतुलन प्रदान करते हैं।`;
+  } else if (d9Diff === 2 || d9Diff === 10) {
+    axisRel = "3-11 उपचय लाभ संबंध (Mutual Growth Axis)";
+    axisExpl = `${p1D9Lagna} और ${p2D9Lagna} परस्पर 3-11 अक्ष पर हैं, जो विवाह के उपरांत आर्थिक समृद्धि, उद्यम और सामाजिक प्रतिष्ठा में वृद्धि करते हैं।`;
+  } else if (d9Diff === 3 || d9Diff === 9) {
+    axisRel = "4-10 केंद्र संबंध (Kendra Stability)";
+    axisExpl = `${p1D9Lagna} और ${p2D9Lagna} परस्पर केंद्र संबंध में हैं, जो दांपत्य जीवन में कर्तव्यनिष्ठा और गृहस्थ सुख की नींव को सुदृढ़ बनाते हैं।`;
+  } else {
+    axisRel = "समन्वयात्मक संबंध (Adaptive Dynamics)";
+    axisExpl = `${p1D9Lagna} और ${p2D9Lagna} का नवांश समन्वय दोनों के स्वभाव में परिपक्वता और आपसी समायोजन की प्रेरणा देता है।`;
   }
 
   const h12Status1 = mi1.d9Audit.bedroomBlissStatus;
@@ -356,61 +475,84 @@ export function generateMasterMarriageReport(
       ? "harmonious"
       : "strained";
 
+  const p1H12D9Sign = SIGNS_LIST[(d9Idx1 + 11) % 12];
+  const p2H12D9Sign = SIGNS_LIST[(d9Idx2 + 11) % 12];
+
   const d9NavamshaCrossAudit: MasterMarriageReport["d9NavamshaCrossAudit"] = {
     partner1D9Lagna: p1D9Lagna,
     partner2D9Lagna: p2D9Lagna,
     axisRelation: axisRel,
     axisExplanation: axisExpl,
     bedroomBlissIndex: overallH12,
-    h12Report: "दोनों कुंडलियों के D9 नवांश के 12वें भाव (वृषभ एवं मकर) शुद्ध एवं क्रूर ग्रहों के घातक प्रभाव से मुक्त हैं। दांपत्य व शयन सुख निर्विघ्न रहेगा।",
-    mentalResonance: `H1 स्तर पर ${p1Name} (संतुलित विचार) तथा ${p2Name} (वर्गोत्तम लग्न कुंभ) में भावनात्मक स्थिरता है।`,
-    domesticPeace: "चौथे भाव (H4) पर कोई मारक अंगारक या अशांतिकारी योग नहीं है; पारिवारिक वातावरण सुसंस्कृत रहेगा।",
+    h12Report: overallH12 === "harmonious"
+      ? `दोनों कुंडलियों के D9 नवांश के 12वें भाव (${p1H12D9Sign} एवं ${p2H12D9Sign}) शुभ प्रभाव में हैं। दांपत्य व शयन सुख में सकारात्मकता रहेगी।`
+      : `D9 नवांश के 12वें भाव (${p1H12D9Sign} व ${p2H12D9Sign}) में संतुलन बनाए रखने हेतु आपसी संवेदनशीलता और सामंजस्य आवश्यक है।`,
+    mentalResonance: `D1 एवं D9 लग्न समन्वय से ${p1Name} (${chart1.lagnaRashi} / ${p1D9Lagna}) तथा ${p2Name} (${chart2.lagnaRashi} / ${p2D9Lagna}) में भावनात्मक व व्यावहारिक संतुलन रहेगा।`,
+    domesticPeace: "चतुर्थ भाव (H4) पर कोई मारक अंगारक योग नहीं है; पारिवारिक वातावरण सुसंस्कृत और शांतिपूर्ण रहेगा।",
     verdict: "D9 नवांश के चारों स्तंभ (1, 4, 7, 12) विवाह की दीर्घकालिक स्थिरता और आंतरिक सुख की पुष्टि करते हैं।",
   };
 
   // ── 5. KP 7th Cuspal Sub-Lord Dynamics ───────────────────────────────────────
+  const p1StarLord = mi1.meetingContext.sourceStarLord || chart1.planets.Venus?.nakshatraLord || "शुक्र";
+  const p1House = mi1.meetingContext.starLordHouse || 7;
+  const p2StarLord = mi2.meetingContext.sourceStarLord || chart2.planets.Jupiter?.nakshatraLord || "बृहस्पति";
+  const p2House = mi2.meetingContext.starLordHouse || 7;
+
   const kpDynamics: MasterMarriageReport["kpDynamics"] = {
     partner1: {
-      csl: mi1.meetingContext.sourceStarLord ? `${chart1.houseCusps.find(h => h.house === 7)?.sign || "Venus"} Sub-Lord` : "Venus",
-      starLord: mi1.meetingContext.sourceStarLord,
-      house: mi1.meetingContext.starLordHouse,
-      circumstance: mi1.meetingContext.circumstance,
+      csl: `${chart1.houseCusps?.find(h => h.house === 7)?.sign || chart1.lagnaRashi} 7th CSL`,
+      starLord: p1StarLord,
+      house: p1House,
+      circumstance: mi1.meetingContext.circumstance || "पारिवारिक व सामाजिक सहयोग द्वारा परिचय",
       postMarriageDomain: `${mi1.rashiImpact.signName} (House 7) — ${mi1.rashiImpact.lifeDomainActivated}`,
       caution: mi1.meetingContext.caution,
     },
     partner2: {
-      csl: mi2.meetingContext.sourceStarLord ? `${chart2.houseCusps.find(h => h.house === 7)?.sign || "Sun"} Sub-Lord` : "Sun",
-      starLord: mi2.meetingContext.sourceStarLord,
-      house: mi2.meetingContext.starLordHouse,
-      circumstance: mi2.meetingContext.circumstance,
+      csl: `${chart2.houseCusps?.find(h => h.house === 7)?.sign || chart2.lagnaRashi} 7th CSL`,
+      starLord: p2StarLord,
+      house: p2House,
+      circumstance: mi2.meetingContext.circumstance || "पारिवारिक व सामाजिक सहयोग द्वारा परिचय",
       postMarriageDomain: `${mi2.rashiImpact.signName} (House 7) — ${mi2.rashiImpact.lifeDomainActivated}`,
       caution: mi2.meetingContext.caution,
     },
-    synthesis: `${p1Name} का 7th CSL मंगल के नक्षत्र (H12) में होने से विवाह अपने मूल गृह-क्षेत्र से दूर या अन्य राज्य/विदेश से जुड़ता है। वहीं ${p2Name} का 7th CSL बुध के नक्षत्र (H9) में होने से विवाह होते ही दोनों का प्रचंड भाग्योदय सुनिश्चित होता है।`,
+    synthesis: `${p1Name} के 7th CSL के नक्षत्र स्वामी (${p1StarLord} - भाव ${p1House}) तथा ${p2Name} के 7th CSL (${p2StarLord} - भाव ${p2House}) वैवाहिक बंधन व सामाजिक सम्मान को सुदृढ़ आधार प्रदान करते हैं।`,
   };
 
   // ── 6. Punarbu / Punarphoo Yoga Audit ───────────────────────────────────────
+  const punarbuDetected = mi1.punarbuYoga.detected || mi2.punarbuYoga.detected;
+  const punarbuWho = mi1.punarbuYoga.detected && mi2.punarbuYoga.detected
+    ? "दोनों"
+    : mi1.punarbuYoga.detected ? p1Name : p2Name;
+  const punarbuCancelled = mi1.punarbuYoga.isCancelled || mi2.punarbuYoga.isCancelled || !punarbuDetected;
+  const cancellationReason = mi1.punarbuYoga.cancellationFactors.concat(mi2.punarbuYoga.cancellationFactors).filter(Boolean).join(", ") ||
+    (punarbuDetected ? "शुभ ग्रहों (बृहस्पति/शुक्र) के प्रभाव से यह योग नियंत्रित है।" : "कोई पुनर्भू दोष विद्यमान नहीं है।");
+
   const punarbuAudit: MasterMarriageReport["punarbuAudit"] = {
     partner1Detected: mi1.punarbuYoga.detected,
     partner2Detected: mi2.punarbuYoga.detected,
-    isCancelled: mi2.punarbuYoga.isCancelled,
-    cancellationReason: mi2.punarbuYoga.cancellationFactors.join(", ") || "देवगुरु बृहस्पति की 5वीं अमृत दृष्टि शनि देव पर होने से यह योग निष्प्रभावी है।",
-    psychologicalImpact: mi2.punarbuYoga.detected
-      ? "कन्या की कुंडली में शनि-चंद्र का 1-7 अक्षीय संबंध होने से मन में विवाह को लेकर क्षणिक संशय या तारीख बदलने की चिंता आ सकती है, किंतु गुरु की दृष्टि के कारण यह पूरी तरह सुरक्षित है।"
-      : "कोई पुनर्भू योग सक्रिय नहीं है।",
-    remedy: "सोमवार और शनिवार को भगवान शिव का दुग्धाभिषेक करें तथा चांदी के गिलास से जल पिएं।",
+    isCancelled: punarbuCancelled,
+    cancellationReason,
+    psychologicalImpact: punarbuDetected
+      ? `${punarbuWho} की कुंडली में शनि-चंद्र के प्रभाव से विवाह से पूर्व क्षणिक संशय या तारीख व निर्णय में गहन विचार-विमर्श हो सकता है, किंतु शुभ ग्रहों की दृष्टि से संबंध पूर्णतः सुरक्षित है।`
+      : "कुंडलियों में कोई गंभीर पुनर्भू दोष सक्रिय नहीं है; निर्णय प्रक्रिया स्वाभाविक और स्पष्ट रहेगी।",
+    remedy: punarbuDetected
+      ? "सोमवार और शनिवार को भगवान शिव का दुग्धाभिषेक करें तथा शुद्ध चांदी के पात्र से जल ग्रहण करें।"
+      : "नियमित कुलदेवता व इष्टदेव की आराधना से दांपत्य में सुख-शांति बनी रहेगी।",
   };
 
   // ── 7. Separative Influences & Geographic Directions ────────────────────────
+  const hasBarren = mi1.barrenAudit.barrenPlacements.length > 0 || mi2.barrenAudit.barrenPlacements.length > 0;
+  const barrenAlert = hasBarren
+    ? `${p1Name} एवं ${p2Name} की कुंडलियों में कुछ ग्रह विश्लेषणात्मक व तार्किक राशियों में हैं, जो व्यावहारिकता प्रदान करते हैं; कुल वृद्धि के सामान्य शुभ योग हैं।`
+    : "कोई प्रतिकूल बांझ राशि दोष नहीं है; संतान व कुल वृद्धि के अनुकूल योग हैं।";
+
   const separativeAndDirections: MasterMarriageReport["separativeAndDirections"] = {
     partner1SeparativeScore: mi1.separativeAudit.totalSeparativeScore,
     partner2SeparativeScore: mi2.separativeAudit.totalSeparativeScore,
-    barrenSignAlert: mi1.barrenAudit.barrenPlacements.length > 0
-      ? `मुकुल की कुंडली में लग्न (कन्या) व शुक्र (मिथुन) विश्लेषणात्मक राशियों में हैं, जो तार्किक सोच देते हैं।`
-      : "कोई बांझ राशि दोष नहीं है।",
-    directionPartner1Seeking: `${mi1.marriageDirection.primaryDirectionHindi} (जन्म शुक्र से 7वां धनु)`,
-    directionPartner2Seeking: `${mi2.marriageDirection.primaryDirectionHindi} (जन्म शुक्र से 7वां वृषभ)`,
-    geographicAlignment: "दोनों के जन्म एवं निवास स्थल की दिशाएं एक-दूसरे के शास्त्रीय दिशा-वेक्टर्स (पूर्व एवं दक्षिण/उत्तर) से पूर्णतः मेल खाती हैं।",
+    barrenSignAlert: barrenAlert,
+    directionPartner1Seeking: `${mi1.marriageDirection.primaryDirectionHindi} (${mi1.marriageDirection.primaryDirection})`,
+    directionPartner2Seeking: `${mi2.marriageDirection.primaryDirectionHindi} (${mi2.marriageDirection.primaryDirection})`,
+    geographicAlignment: `दोनों के जन्म एवं निवास स्थल की दिशाएं (${mi1.marriageDirection.primaryDirectionHindi} एवं ${mi2.marriageDirection.primaryDirectionHindi}) शास्त्रीय दिशा-सिद्धांत से अनुकूल सामंजस्य दर्शाती हैं।`,
   };
 
   // ── 8. D1 to D9 Cross-Mapping ───────────────────────────────────────────────
@@ -419,21 +561,23 @@ export function generateMasterMarriageReport(
     partner1Prosperity: mi1.d1ToD9Mapping.wealthInD9.map(w => w.growthDomain),
     partner2Friction: mi2.d1ToD9Mapping.trikInD9.map(t => t.frictionDomain),
     partner2Prosperity: mi2.d1ToD9Mapping.wealthInD9.map(w => w.growthDomain),
-    summary: "D1 के 2रे और 11वें भाव की राशियां D9 के शुभ कोणों में बैठकर विवाह के बाद स्थायी धन लाभ, संयुक्त निवेश और सामाजिक प्रतिष्ठा में भारी वृद्धि कराती हैं।",
+    summary: "D1 के धन, कुटुम्ब एवं लाभ भावों की राशियां D9 के शुभ कोणों में संरेखित होकर विवाह उपरांत आर्थिक स्थिरता, संयुक्त उन्नति और सामाजिक प्रतिष्ठा को संबल देती हैं।",
   };
 
-  // ── 9. Timing & Muhurat (24 January 2027) ───────────────────────────────────
+  // ── 9. Timing & Muhurat (Dynamic Transit Evaluation) ─────────────────────────
   const cond1 = detectConditionalDashas(chart1);
   const cond2 = detectConditionalDashas(chart2);
 
+  const dynamicTiming = evaluateDynamicWeddingTiming(chart1, chart2, weddingDate);
+
   const timingAndMuhurat: MasterMarriageReport["timingAndMuhurat"] = {
     targetWeddingDate: weddingDate,
-    isDoubleTransitActive: true,
-    timingScore: 88,
-    moonTransitRoleO1: "24 जनवरी 2027 को गोचर चंद्रमा सिंह राशि में संचरण करेगा—जो कि वर और कन्या दोनों की जन्म राशि (Janma Rashi) तथा कन्या का 7वां भाव है। यह विवाह का परम मांगलिक ट्रिगर है।",
+    isDoubleTransitActive: dynamicTiming.isDoubleTransitActive,
+    timingScore: dynamicTiming.timingScore,
+    moonTransitRoleO1: dynamicTiming.moonTransitRoleO1,
     conditionalDashasPartner1: cond1.filter(d => d.isApplicable),
     conditionalDashasPartner2: cond2.filter(d => d.isApplicable),
-    timingVerdict: "24 जनवरी 2027 को डबल ट्रांजिट (शनि मीन 7H में, वक्री गुरु 11H कर्क से 9वीं अमृत दृष्टि 7H पर) पूरी तरह परिपक्व है। इस तारीख को बदलना अनुचित होगा; यह विवाह हेतु शास्त्रसम्मत सर्वश्रेष्ठ कालखंड है।",
+    timingVerdict: dynamicTiming.timingVerdict,
   };
 
   // ── 10. Practical Remedies ──────────────────────────────────────────────────
@@ -441,37 +585,37 @@ export function generateMasterMarriageReport(
     {
       category: "Universal",
       title: "शिवालय दुग्धाभिषेक (Lord Shiva Jalabhisheka)",
-      procedure: "दोनों पक्ष सोमवार के दिन किसी प्रतिष्ठित मंदिर में जाकर शिवलिंग पर कच्चा दूध और शुद्ध जल अर्पित करें। 'ॐ नमः शिवाय' का 108 बार जाप करें।",
+      procedure: "दोनों पक्ष सोमवार के दिन किसी प्रतिष्ठित शिवालय में जाकर शिवलिंग पर कच्चा दूध व शुद्ध जल अर्पित करें और 'ॐ नमः शिवाय' का 108 बार जाप करें।",
       caution: "घर के मंदिर में कभी भी प्राण-प्रतिष्ठित शिवलिंग न रखें।",
-      astrologicalRationale: "भगवान शिव और माता पार्वती का आशीर्वाद 7वें भाव के सभी सूक्ष्म दोषों का शमन करता है।",
+      astrologicalRationale: "भगवान शिव और माता पार्वती का आशीर्वाद 7वें भाव के सभी सूक्ष्म दोषों का शमन कर अखंड सौभाग्य प्रदान करता है।",
     },
     {
       category: "Moon",
-      title: "शुद्ध चांदी का गिलास (Lunar Fortitude & Stress Relief)",
-      procedure: `कन्या (${p2Name}) प्रतिदिन शुद्ध चांदी के गिलास से जल या दूध का सेवन करें।`,
-      astrologicalRationale: "शनि-चंद्र के संशय को समाप्त कर मानसिक शांति और आत्मविश्वास को सुदृढ़ करता है।",
+      title: "शुद्ध चांदी का पात्र (Lunar Fortitude & Mental Peace)",
+      procedure: `प्रतिदिन शुद्ध चांदी के गिलास अथवा पात्र से जल या दूध का सेवन करें।`,
+      astrologicalRationale: "चंद्रमा और शनि के प्रभाव को संतुलित कर मानसिक शांति, सौहार्द और भावनात्मक स्थिरता को सुदृढ़ करता है।",
     },
     {
       category: "Venus",
       title: "पश्चिम-दक्षिण-पश्चिम (WSW) पुष्प वास्तु उपाय",
-      procedure: "घर के WSW कोने में रंग-बिरंगे सुगंधित फूलों का सुंदर चित्र लगाएं और वहां सुगंधित इत्र रखें।",
+      procedure: "शयनकक्ष या घर के WSW कोने में हल्के सुगंधित ताजे पुष्प अथवा उनका सुंदर चित्र रखें और हल्की सुगंध का प्रयोग करें।",
       astrologicalRationale: "शुक्र के आकर्षण, प्रेम और वैवाहिक सौहार्द को चिरस्थायी बनाता है।",
     },
     {
       category: "Separative",
       title: "ईशान कोण (North-East) जल पात्र स्थापन",
-      procedure: "घर के ईशान कोण को पूर्णतः स्वच्छ रखें और वहां तांबे या पीतल के पात्र में ताजा जल रखें।",
-      astrologicalRationale: "सूर्य व राहु-केतु के अलगावकारी प्रभाव को शांत कर गृहस्थी में शीतलता प्रदान करता है।",
+      procedure: "घर के ईशान कोण को पूर्णतः स्वच्छ व हल्का रखें तथा वहां तांबे या पीतल के पात्र में ताजा जल स्थापित करें।",
+      astrologicalRationale: "सूर्य व राहु-केतु के उग्र प्रभावों को शांत कर गृहस्थी में शीतलता एवं ईश्वरीय कृपा का संचार करता है।",
     },
   ];
 
   // ── Executive Summaries ─────────────────────────────────────────────────────
-  const weddingDateStr = timingAudit.targetWeddingDate || "विवाह तिथि";
-  const nadiStatus = ashtakootData.nadiScore === 8 ? "शून्य" : "न्यूनतम";
+  const weddingDateStr = weddingDate || "प्रस्तावित विवाह तिथि";
+  const nadiStatus = nadiKoot && !nadiKoot.hasDosha ? "शून्य" : "न्यूनतम / परिहार समर्थित";
 
-  const executiveSummaryHindi = `${p1Name} और ${p2Name} का अष्टकूट मिलान 36 में से ${ashtakootScore} गुण (${ashtakootTier}) है, जिसमें नाड़ी दोष ${nadiStatus} है और भकूट स्थिति का विश्लेषण सम्मिलित है। मांगलिक स्तर पर ${mangalAudit.partner1Paap} vs ${mangalAudit.partner2Paap} अंक की ${mangalAudit.verdict} है। नवांश (D9) में दोनों के लग्न ${d9CrossAudit.axisRelation} संबंध में स्थित हैं तथा 12वां भाव स्तर ${d9CrossAudit.bedroomBlissIndex} है। ${weddingDateStr} का गोचर संबंध को अनुकूलता प्रदान करता है। यह विवाह प्रत्येक दृष्टिकोण से अत्यंत शुभ और मंगलकारी है।`;
+  const executiveSummaryHindi = `${p1Name} और ${p2Name} का अष्टकूट मिलान 36 में से ${ashtakootScore} गुण (${tierTitleHindi}) है, जिसमें नाड़ी दोष ${nadiStatus} है। मांगलिक स्तर पर ${p1Paap} vs ${p2Paap} अंक की ${mangalSamyam.balanceLevel} है। नवांश (D9) में दोनों के लग्न ${axisRel} में स्थित हैं तथा 12वां भाव शयन-सुख स्तर ${overallH12 === "harmonious" ? "अनुकूल" : "सामान्य"} है। ${weddingDateStr} पर गोचर व दशा का प्रभाव संबंध को सकारात्मक संबल प्रदान करता है।`;
 
-  const executiveSummaryEnglish = `${p1Name} and ${p2Name} possess an Ashtakoot compatibility of ${ashtakootScore} / 36 Gunas (${ashtakootTier}) with ${ashtakootData.nadiScore === 8 ? "zero" : "minimal"} Nadi dosha. The Manglik paap balance is ${mangalAudit.partner1Paap} vs ${mangalAudit.partner2Paap} (${mangalAudit.verdict}). In the D9 Navamsha, their ascendants form an auspicious ${d9CrossAudit.axisRelation} alignment with ${d9CrossAudit.bedroomBlissIndex} 12th houses. The transit alignment around ${weddingDateStr} supports spiritual compatibility and lasting harmony.`;
+  const executiveSummaryEnglish = `${p1Name} and ${p2Name} possess an Ashtakoot compatibility of ${ashtakootScore} / 36 Gunas (${tierTitleHindi}) with ${nadiKoot && !nadiKoot.hasDosha ? "zero" : "remedied"} Nadi dosha. The Manglik paap balance is ${p1Paap} vs ${p2Paap} (${mangalSamyam.balanceLevel}). In the D9 Navamsha, their ascendants form an auspicious ${axisRel} alignment with ${overallH12} 12th house dynamics. The transit alignment around ${weddingDateStr} supports long-term harmony and mutual prosperity.`;
 
   return {
     id: `MMR-${Date.now()}`,

@@ -1259,8 +1259,12 @@ export default function KundaliMilanPage() {
   const [milanResult, setMilanResult] = useState<MilanResult | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>("master");
   const [mode, setMode] = useState<PageMode>("match");
-  const [targetWeddingDate, setTargetWeddingDate] = useState<string>("2027-01-24");
-  const [sampleLoadedChart1, setSampleLoadedChart1] = useState<ChartData | null>(null);
+  const [targetWeddingDate, setTargetWeddingDate] = useState<string>(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 6);
+    return d.toISOString().split("T")[0];
+  });
+  const [selectedChart1, setSelectedChart1] = useState<ChartData | null>(null);
 
   // Saved Charts & Auto-Selection states
   const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
@@ -1269,7 +1273,8 @@ export default function KundaliMilanPage() {
   const [savingPartner, setSavingPartner] = useState(false);
   const [savedPartnerSuccess, setSavedPartnerSuccess] = useState(false);
 
-  const effectiveChart1 = chart || sampleLoadedChart1;
+  // If user selected a specific saved chart for Person 1, use that; otherwise fall back to active profile (chart)
+  const effectiveChart1 = selectedChart1 || (person1SavedId === "self" || !person1SavedId ? chart : null);
   const lastChartRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -1362,53 +1367,15 @@ export default function KundaliMilanPage() {
     }
   }, [effectiveChart1, partnerChart, targetWeddingDate]);
 
-  function loadMukulManishaSample() {
-    try {
-      const mukul = calculateChart("Mukul Pal", "1999-10-09", "05:40", "New Delhi", 28.6139, 77.2090, 5.5);
-      const manisha = calculateChart("Manisha", "1998-09-03", "19:40", "Roorkee", 29.8543, 77.8880, 5.5);
-      setSampleLoadedChart1(mukul);
-      setPartnerChart(manisha);
-      setPartnerBirth({
-        name: "Manisha",
-        dob: "1998-09-03",
-        tob: "19:40",
-        city: "Roorkee, Uttarakhand, India",
-        lat: 29.8543,
-        lon: 77.8880,
-        tz: 5.5,
-      });
-      setPartnerCity({
-        geonameId: 1258849,
-        name: "Roorkee",
-        asciiName: "Roorkee",
-        countryCode: "IN",
-        admin1: "Uttarakhand",
-        latitude: 29.8543,
-        longitude: 77.8880,
-        timezone: "Asia/Kolkata",
-        population: 250000,
-        displayName: "Roorkee, Uttarakhand, India",
-      });
-      const r = calculateMilan(
-        "Mukul Pal", 11, 4,
-        "Manisha", 10, 4
-      );
-      setMilanResult(r);
-      setP1({ name: "Mukul Pal", nakIdx: 11, rashiIdx: 4 });
-      setP2({ name: "Manisha", nakIdx: 10, rashiIdx: 4 });
-      setMode("match");
-      setActiveTab("master");
-    } catch (e) {
-      console.error("Failed to load sample:", e);
-    }
-  }
-
   async function handleSelectPerson1(chartId: string) {
     setPerson1SavedId(chartId);
-    if (!chartId) return;
+    if (!chartId) {
+      setSelectedChart1(null);
+      return;
+    }
 
     if (chartId === "self" && chart) {
-      setSampleLoadedChart1(null);
+      setSelectedChart1(null);
       const m = chart.planets.Moon;
       const nakIdx = getMoonNakshatraIndex(m?.nakshatra, m?.lon);
       const rashiIdx = getMoonRashiIndex(m?.signNum, m?.sign);
@@ -1444,7 +1411,7 @@ export default function KundaliMilanPage() {
     }
 
     if (loaded) {
-      setSampleLoadedChart1(loaded);
+      setSelectedChart1(loaded);
       const m = loaded.planets.Moon;
       const nakIdx = getMoonNakshatraIndex(m?.nakshatra, m?.lon);
       const rashiIdx = getMoonRashiIndex(m?.signNum, m?.sign);
@@ -1785,25 +1752,8 @@ export default function KundaliMilanPage() {
       {/* ── ASHTAKOOT INPUT CARDS ── */}
       {mode === "match" && (
         <>
-          <div className="summary-strip" style={{ marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+          <div className="summary-strip" style={{ marginBottom: 14 }}>
             <span>त्वरित मिलान हेतु चंद्र राशि व नक्षत्र; समेकित मास्टर विवाह रिपोर्ट हेतु दोनों जन्म कुंडलियां आवश्यक हैं।</span>
-            <button
-              type="button"
-              onClick={loadMukulManishaSample}
-              style={{
-                background: "linear-gradient(135deg, #B8860B, #8B6508)",
-                color: "#FFFFFF",
-                border: "none",
-                borderRadius: 8,
-                padding: "8px 16px",
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(184,134,11,0.25)",
-              }}
-            >
-              ⚡ त्वरित लोड: मुकुल एवं मनीषा (Sample 24 Jan 2027)
-            </button>
           </div>
           {/* ── SAVED KUNDLIS FAST PICKER ── */}
           <div
@@ -1834,22 +1784,6 @@ export default function KundaliMilanPage() {
                     ✓ दोनों कुंडलियां सक्रिय
                   </span>
                 )}
-                <button
-                  type="button"
-                  onClick={loadMukulManishaSample}
-                  style={{
-                    background: "rgba(184,134,11,0.12)",
-                    border: "1px solid rgba(184,134,11,0.35)",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#B8860B",
-                    cursor: "pointer",
-                  }}
-                >
-                  ⚡ मुकुल & मनीषा सैंपल
-                </button>
               </div>
             </div>
 
@@ -2024,27 +1958,11 @@ export default function KundaliMilanPage() {
               मास्टर विवाह रिपोर्ट हेतु दोनों जन्म कुंडलियां आवश्यक हैं
             </div>
             <div style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.8, maxWidth: 640, margin: "0 auto 20px" }}>
-              समेकित महा-रिपोर्ट में अष्टकूट (36-गुण परिहार सहित), मंगल पाप साम्यता (6 vs 6), D9 नवांश 4-स्तंभ (पंचम-नवम त्रिकोण), KP 7th CSL, पुनर्भु योग (शनि-चंद्र गुरु दृष्टि) एवं 24 जनवरी 2027 के.एन. राव डबल गोचर का सटीक मिलान किया जाता है।
+              समेकित महा-रिपोर्ट में अष्टकूट (36-गुण परिहार सहित), मंगल पाप साम्यता (Paap Samyatha), D9 नवांश 4-स्तंभ विश्लेषण, KP 7th CSL, पुनर्भू योग शोध एवं के.एन. राव डबल गोचर का सटीक मिलान किया जाता है।
             </div>
 
-            <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-              <button
-                onClick={loadMukulManishaSample}
-                style={{
-                  background: "linear-gradient(135deg, #B8860B, #8B6508)",
-                  border: "none",
-                  borderRadius: 10,
-                  padding: "12px 24px",
-                  color: "#FFFFFF",
-                  fontFamily: "Cormorant Garamond,serif",
-                  fontSize: 16,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  boxShadow: "0 4px 12px rgba(184,134,11,0.25)",
-                }}
-              >
-                ⚡ त्वरित लोड करें: मुकुल एवं मनीषा (24 Jan 2027)
-              </button>
+            <div style={{ fontSize: 13, color: "#B8860B", fontWeight: 700, background: "rgba(184,134,11,0.08)", border: "1px solid rgba(184,134,11,0.25)", borderRadius: 10, padding: "12px 20px", display: "inline-block" }}>
+              👉 ऊपर दिए गए <strong>"📂 सेव की गई कुंडलियां"</strong> से वर और कन्या दोनों की प्रोफाइल चुनें, या नीचे पार्टनर का जन्म विवरण दर्ज करें।
             </div>
           </div>
         )

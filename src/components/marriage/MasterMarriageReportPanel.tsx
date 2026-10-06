@@ -242,7 +242,7 @@ export default function MasterMarriageReportPanel({
 
               <div style={{ textAlign: "center", background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "8px 14px", minWidth: 90 }}>
                 <div style={{ fontSize: 15, fontWeight: 800, color: "#16a34a" }}>डबल गोचर</div>
-                <div style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>24 Jan 2027</div>
+                <div style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>{timingAndMuhurat.targetWeddingDate || "गोचर तिथि"}</div>
               </div>
             </div>
           </div>
@@ -258,7 +258,7 @@ export default function MasterMarriageReportPanel({
           { id: "d9", label: "💎 D9 नवांश चार-स्तंभ" },
           { id: "kp", label: "🧭 KP सब-लॉर्ड & मिलन" },
           { id: "punarbu", label: "🛡️ पुनर्भु योग शोध" },
-          { id: "timing", label: "⏳ विवाह समय (24 Jan vs April)" },
+          { id: "timing", label: "⏳ विवाह समय निर्धारण (K.N. Rao)" },
           { id: "remedies", label: "🌿 वैदिक व वास्तु उपाय" },
         ].map(tab => (
           <button
@@ -658,7 +658,7 @@ export default function MasterMarriageReportPanel({
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 6: K.N. RAO MARRIAGE TIMING & 24 JAN 2027 AUDIT
+          SECTION 6: K.N. RAO MARRIAGE TIMING & TRANSIT AUDIT
       ══════════════════════════════════════════════════════════════════════ */}
       {(selectedSection === "all" || selectedSection === "timing") && (
         <div className="card" style={{ borderColor: "rgba(200,160,48,0.35)", background: "#FFFFFF" }}>
@@ -666,94 +666,63 @@ export default function MasterMarriageReportPanel({
             <div>
               <div className="card-tag">स्तंभ 6 · के.एन. राव 8-पैरामीटर विवाह समय निर्धारण</div>
               <h2 className="card-title serif" style={{ margin: 0, fontSize: 24 }}>
-                24 जनवरी 2027 विवाह मुहूर्त बनाम अप्रैल 2027 सूक्ष्म परीक्षण
+                विवाह समय एवं गोचर मुहूर्त परीक्षण
               </h2>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#059669", background: "rgba(16,185,129,0.12)", padding: "4px 12px", borderRadius: 8, border: "1px solid rgba(16,185,129,0.3)" }}>
-              डबल गोचर सक्रिय (स्कोर: {timingAndMuhurat.timingScore}/100)
+            <div style={{ fontSize: 13, fontWeight: 800, color: timingAndMuhurat.isDoubleTransitActive ? "#059669" : "#B8860B", background: timingAndMuhurat.isDoubleTransitActive ? "rgba(16,185,129,0.12)" : "rgba(184,134,11,0.12)", padding: "4px 12px", borderRadius: 8, border: `1px solid ${timingAndMuhurat.isDoubleTransitActive ? "rgba(16,185,129,0.3)" : "rgba(184,134,11,0.3)"}` }}>
+              {timingAndMuhurat.isDoubleTransitActive ? "डबल गोचर सक्रिय ✓" : "गोचर सामान्य"} (स्कोर: {timingAndMuhurat.timingScore}/100)
             </div>
           </div>
 
-          {/* Date Selector / Toggle in UI */}
-          <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#B8860B" }}>तारीख परीक्षण:</span>
-            <button
-              onClick={() => {
-                setTargetDate("2027-01-24");
-                onSelectDate?.("2027-01-24");
+          {/* Date Selector / Input in UI */}
+          <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#B8860B" }}>📅 प्रस्तावित विवाह तिथि चुनें:</span>
+            <input
+              type="date"
+              value={targetDate}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setTargetDate(e.target.value);
+                  onSelectDate?.(e.target.value);
+                }
               }}
               style={{
-                padding: "6px 14px",
+                padding: "8px 14px",
                 borderRadius: 8,
-                fontSize: 12,
-                fontWeight: 700,
-                border: targetDate === "2027-01-24" ? "1px solid #059669" : "1px solid rgba(184,134,11,0.2)",
-                background: targetDate === "2027-01-24" ? "#059669" : "#FFFFFF",
-                color: targetDate === "2027-01-24" ? "#FFFFFF" : "#1A1A1A",
+                border: "1px solid rgba(184,134,11,0.35)",
+                background: "#FFFFFF",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#1A1A1A",
+                outline: "none",
                 cursor: "pointer",
+                fontFamily: "Outfit,sans-serif",
               }}
-            >
-              24 जनवरी 2027 (नियत तिथि - अनुशंसित)
-            </button>
-            <button
-              onClick={() => {
-                setTargetDate("2027-04-18");
-                onSelectDate?.("2027-04-18");
-              }}
-              style={{
-                padding: "6px 14px",
-                borderRadius: 8,
-                fontSize: 12,
-                fontWeight: 700,
-                border: targetDate === "2027-04-18" ? "1px solid #3b82f6" : "1px solid rgba(184,134,11,0.2)",
-                background: targetDate === "2027-04-18" ? "#3b82f6" : "#FFFFFF",
-                color: targetDate === "2027-04-18" ? "#FFFFFF" : "#1A1A1A",
-                cursor: "pointer",
-              }}
-            >
-              अप्रैल 2027 (वैकल्पिक विंडो)
-            </button>
+            />
+            <span style={{ fontSize: 12, color: "#6B635B" }}>
+              (किसी भी तारीख का चयन करें, सिस्टम तुरंत के.एन. राव डबल गोचर व चंद्र स्थिति का पुनर्मूल्यांकन करेगा)
+            </span>
           </div>
 
           <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.8, marginBottom: 16 }}>
-            श्री के.एन. राव (Bharatiya Vidya Bhavan) की 218 कुंडलियों की प्रामाणिक शोध के अनुसार, विवाह केवल तभी घटित होता है जब <strong>बृहस्पति (गुरु)</strong> और <strong>शनि</strong> का दोहरा गोचर (Double Transit - P4) लग्न, लग्नेश, सप्तम भाव अथवा सप्तमेश को सक्रिय करे।
+            श्री के.एन. राव (Bharatiya Vidya Bhavan) के 218 कुंडलियों के शोध के अनुसार, विवाह का समय निर्धारण <strong>बृहस्पति (गुरु)</strong> और <strong>शनि</strong> के दोहरे गोचर (Double Transit - P4) से सुनिश्चित होता है—जब दोनों ग्रह वर या कन्या के लग्न, लग्नेश, सप्तम भाव अथवा सप्तमेश से संबंध (PAC) बनाते हैं।
           </p>
 
-          {/* Timing Parameters Comparison Table */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, marginBottom: 16 }}>
-            {/* 24 Jan 2027 Box */}
-            <div style={{ background: "#FAF7F2", border: "2px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "16px 18px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: "#059669", textTransform: "uppercase" }}>
-                  24 जनवरी 2027 (रविवार)
-                </span>
-                <span style={{ fontSize: 10, fontWeight: 700, background: "rgba(16,185,129,0.15)", color: "#059669", padding: "2px 8px", borderRadius: 4 }}>
-                  अत्यंत शुभ (Verified)
-                </span>
-              </div>
-              <div style={{ display: "grid", gap: 6, fontSize: 12, color: "#1A1A1A", lineHeight: 1.6 }}>
-                <div>• <strong>P4 (डबल गोचर):</strong> शनि (मीन/कुम्भ) 7वें भाव पर दृष्टि + गुरु (कर्क/सिंह संधि) की अमृत दृष्टि लग्न/7वें भाव पर।</div>
-                <div>• <strong>O1 (चंद्र गोचर):</strong> {timingAndMuhurat.moonTransitRoleO1}</div>
-                <div>• <strong>P5 (पिया मिलन):</strong> लग्नेश एवं सप्तमेश का गोचरीय सम्बंध परिपूर्ण।</div>
-                <div>• <strong>ज्योतिषीय परामर्श:</strong> तारीख बदलने की कोई आवश्यकता नहीं है। यह तिथि दोनों कुंडलियों में गोचर व दशा दोनों से 100% समर्थित है।</div>
-              </div>
+          {/* Timing Parameters Comparison Card */}
+          <div style={{ background: "#FAF7F2", border: `2px solid ${timingAndMuhurat.isDoubleTransitActive ? "rgba(16,185,129,0.35)" : "rgba(184,134,11,0.3)"}`, borderRadius: 12, padding: "16px 18px", marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: timingAndMuhurat.isDoubleTransitActive ? "#059669" : "#B8860B" }}>
+                परीक्षण तिथि: {timingAndMuhurat.targetWeddingDate}
+              </span>
+              <span style={{ fontSize: 11, fontWeight: 700, background: timingAndMuhurat.isDoubleTransitActive ? "rgba(16,185,129,0.15)" : "rgba(184,134,11,0.15)", color: timingAndMuhurat.isDoubleTransitActive ? "#059669" : "#B8860B", padding: "3px 10px", borderRadius: 6 }}>
+                {timingAndMuhurat.isDoubleTransitActive ? "डबल गोचर परिपक्व (Auspicious Window)" : "सामान्य कालखंड (Remedies Applicable)"}
+              </span>
             </div>
-
-            {/* April 2027 Box */}
-            <div style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12, padding: "16px 18px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", textTransform: "uppercase" }}>
-                  अप्रैल 2027 (वैकल्पिक विंडो)
-                </span>
-                <span style={{ fontSize: 10, fontWeight: 700, background: "rgba(184,134,11,0.15)", color: "#B8860B", padding: "2px 8px", borderRadius: 4 }}>
-                  मान्य किंतु ऐच्छिक
-                </span>
-              </div>
-              <div style={{ display: "grid", gap: 6, fontSize: 12, color: "#4A4238", lineHeight: 1.6 }}>
-                <div>• <strong>P4 (डबल गोचर):</strong> गुरु और शनि का प्रभाव बना रहेगा।</div>
-                <div>• <strong>दशा:</strong> महादशा व अंतर्दशा का अनुकूल प्रभाव जारी रहेगा।</div>
-                <div>• <strong>अंतर:</strong> अप्रैल में जाने का कारण ज्योतिषीय दोष नहीं हो सकता; यदि परिवार की व्यवस्था या सामाजिक कारण हों तो जाया जा सकता है, अन्यथा 24 जनवरी स्वतः श्रेष्ठ है।</div>
-              </div>
+            <div style={{ display: "grid", gap: 8, fontSize: 12, color: "#1A1A1A", lineHeight: 1.7 }}>
+              <div>• <strong>P4 (डबल गोचर स्थिति):</strong> {timingAndMuhurat.timingVerdict}</div>
+              <div>• <strong>O1 (चंद्र गोचर भूमिका):</strong> {timingAndMuhurat.moonTransitRoleO1}</div>
+              <div>• <strong>P5 (पिया मिलन & लग्नेश-सप्तमेश):</strong> चयनित तिथि पर लग्नेश एवं सप्तमेश के गोचर संबंध का परीक्षण सक्रिय है।</div>
+              <div>• <strong>दशा-गोचर समन्वय:</strong> यदि महादशा/अंतर्दशा 2, 7, 11 भावों को सक्रिय कर रही हो, तो यह तिथि विवाह हेतु अत्यंत अनुकूल सिद्ध होगी।</div>
             </div>
           </div>
 
