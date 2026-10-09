@@ -7,7 +7,8 @@ import {
   MASTER_PLANET_REGISTRY,
   evaluateCorePlanetRemedy,
   getMoonSharingGuide,
-  evaluateConjunctionInHouse
+  evaluateConjunctionInHouse,
+  resolveContextualRemedies
 } from "../core-planet-remedies";
 import {
   evaluatePropertyTiming,
@@ -196,5 +197,157 @@ describe("Property Timing & Saturn 7th House Growth Predictor (Sachidanand Ji Be
     assert.ok(dossier);
     assert.strictEqual(dossier.isBenchmarkChart, true);
     assert.strictEqual(dossier.lagnaSignName, "Gemini");
+  });
+});
+
+describe("Contextual Life-Domain Remedy Engine & 3-Tier Activation", () => {
+  const testChart: ChartData = {
+    name: "AstroLife Context Test Chart",
+    dob: "1988-08-15",
+    tob: "14:30",
+    city: "Jaipur",
+    lat: 26.91,
+    lon: 75.78,
+    tz: 5.5,
+    jd: 2447389.5,
+    lagnaRashi: "Scorpio",
+    lagnaLon: 220.0,
+    lagnaNum: 8,
+    houses: [] as any,
+    ayanamsha: "Lahiri" as any,
+    planets: {
+      Sun: { name: "Sun", sign: "Leo", house: 10, degree: 1, minutes: 0, nakshatra: "Magha", pada: 1, dignity: "Own" } as any,
+      Moon: { name: "Moon", sign: "Virgo", house: 11, degree: 15, minutes: 0, nakshatra: "Hasta", pada: 2, dignity: "Neutral" } as any,
+      Mars: { name: "Mars", sign: "Pisces", house: 5, degree: 10, minutes: 0, nakshatra: "Uttarabhadrapada", pada: 3, dignity: "Neutral" } as any,
+      Mercury: { name: "Mercury", sign: "Leo", house: 10, degree: 20, minutes: 0, nakshatra: "Purvaphalguni", pada: 1, dignity: "Neutral" } as any,
+      Jupiter: { name: "Jupiter", sign: "Taurus", house: 7, degree: 5, minutes: 0, nakshatra: "Krittika", pada: 4, dignity: "Enemy" } as any,
+      Venus: { name: "Venus", sign: "Gemini", house: 8, degree: 12, minutes: 0, nakshatra: "Ardra", pada: 2, dignity: "Enemy" } as any,
+      Saturn: { name: "Saturn", sign: "Sagittarius", house: 2, degree: 3, minutes: 0, nakshatra: "Mula", pada: 1, dignity: "Neutral" } as any,
+      Rahu: { name: "Rahu", sign: "Aquarius", house: 4, degree: 18, minutes: 0, nakshatra: "Shatabhisha", pada: 4, dignity: "Neutral" } as any,
+      Ketu: { name: "Ketu", sign: "Leo", house: 10, degree: 18, minutes: 0, nakshatra: "Purvaphalguni", pada: 2, dignity: "Neutral" } as any
+    },
+    dashas: [{ planet: "Jupiter", active: true, start: new Date("2021-01-01"), end: new Date("2037-01-01") }] as any,
+    antardasha: [{ planet: "Saturn", active: true, start: new Date("2023-01-01"), end: new Date("2026-01-01") }] as any
+  };
+
+  it("resolves Active Dasha context with Jupiter & Saturn and checks Diamond prohibition", () => {
+    const res = resolveContextualRemedies("dasha", testChart);
+    assert.ok(res);
+    assert.strictEqual(res.context, "dasha");
+    assert.strictEqual(res.activatedPlanets.length, 2);
+    assert.strictEqual(res.activatedPlanets[0].planet, "Jupiter");
+    assert.strictEqual(res.activatedPlanets[1].planet, "Saturn");
+
+    // Diamond prohibition warning for Jupiter dasha
+    const diamondWarn = res.strictWarnings.some((w) => w.includes("Heera (Diamond)"));
+    assert.strictEqual(diamondWarn, true);
+
+    // Jupiter Sthan Hani special formula
+    const jupiterFormula = res.specialFormulas.find((f) => f.title.includes("Sthan Hani"));
+    assert.ok(jupiterFormula);
+    assert.ok(jupiterFormula.esotericSecretHinglish.includes("Tehsildar"));
+  });
+
+  it("resolves Property context with Mars, 4th Lord, 11th Lord and Triangle Copper Potli", () => {
+    const res = resolveContextualRemedies("property", testChart);
+    assert.ok(res);
+    assert.strictEqual(res.context, "property");
+    
+    // Check Mars and 4th house formulas
+    const marsFormula = res.specialFormulas.find((f) => f.title.includes("Triangle Copper Piece Potli"));
+    assert.ok(marsFormula);
+    assert.ok(marsFormula.itemsRequired.includes("Taambe ka tikona tukda"));
+
+    const vastuTotka = res.specialFormulas.find((f) => f.title.includes("Astro-Vastu ENE"));
+    assert.ok(vastuTotka);
+
+    const ketuRoofRule = res.specialFormulas.find((f) => f.title.includes("4th House Ketu Roof Flag"));
+    assert.ok(ketuRoofRule);
+  });
+
+  it("resolves Marriage context with Venus, Mars, 7th Lord, and Kitchen Sink Curd Totka", () => {
+    const res = resolveContextualRemedies("marriage", testChart);
+    assert.ok(res);
+    assert.strictEqual(res.context, "marriage");
+
+    const curdTotka = res.specialFormulas.find((f) => f.title.includes("Kitchen Sink Curd Totka"));
+    assert.ok(curdTotka);
+    assert.ok(curdTotka.exactDosage.includes("2 spoons morning + 2 spoons night"));
+
+    const moonSanctuary = res.specialFormulas.find((f) => f.title.includes("Moon Psychological Heart-Sharing"));
+    assert.ok(moonSanctuary);
+  });
+
+  it("resolves Career context with Saturn, Mercury, Black Umbrella and Parrot Seva", () => {
+    const res = resolveContextualRemedies("career", testChart);
+    assert.ok(res);
+    assert.strictEqual(res.context, "career");
+
+    const umbrellaTotka = res.specialFormulas.find((f) => f.title.includes("Black Umbrella"));
+    assert.ok(umbrellaTotka);
+
+    const parrotTotka = res.specialFormulas.find((f) => f.title.includes("Parrot Freedom"));
+    assert.ok(parrotTotka);
+  });
+
+  it("resolves Health context with Ketu 7 Bananas and Sunset Lemons Jal-Pravah", () => {
+    const res = resolveContextualRemedies("health", testChart);
+    assert.ok(res);
+    assert.strictEqual(res.context, "health");
+
+    const bananaMiracle = res.specialFormulas.find((f) => f.title.includes("7 Ripe Bananas"));
+    assert.ok(bananaMiracle);
+    assert.ok(bananaMiracle.expectedResultHinglish.includes("1 ghante"));
+
+    const sunsetLemons = res.specialFormulas.find((f) => f.title.includes("Sunset Godhuli Vela Lemons"));
+    assert.ok(sunsetLemons);
+  });
+
+  it("resolves Emergency context identifying Venus in 8th house as needing mitigation without gemstone", () => {
+    const res = resolveContextualRemedies("emergency", testChart);
+    assert.ok(res);
+    assert.strictEqual(res.context, "emergency");
+    assert.ok(res.activatedPlanets.some((p) => p.planet === "Venus"));
+    assert.ok(res.specialFormulas.some((f) => f.title.includes("NEVER WEAR GEMSTONE")));
+  });
+
+  it("verifies all newly added micro-gems in MASTER_PLANET_REGISTRY", () => {
+    // 1. Mars Triangle Copper
+    const marsPotli = MASTER_PLANET_REGISTRY.Mars.afflictedCharity.find((c) => c.item.includes("Triangle Copper Piece"));
+    assert.ok(marsPotli);
+
+    // 2. Mercury Parrot & Kinnar
+    const parrotCharity = MASTER_PLANET_REGISTRY.Mercury.afflictedCharity.find((c) => c.item.includes("Parrot Seva"));
+    assert.ok(parrotCharity);
+    const kinnarCharity = MASTER_PLANET_REGISTRY.Mercury.afflictedCharity.find((c) => c.item.includes("Kinnar Seva"));
+    assert.ok(kinnarCharity);
+
+    // 3. Venus Kitchen Sink Curd
+    const venusMitigation = MASTER_PLANET_REGISTRY.Venus.afflictedMitigationHinglish.find((m) => m.includes("Kitchen Sink Curd Totka"));
+    assert.ok(venusMitigation);
+
+    // 4. Saturn Umbrella & Barefoot
+    const saturnUmbrella = MASTER_PLANET_REGISTRY.Saturn.afflictedCharity.find((c) => c.item.includes("Black Umbrella"));
+    assert.ok(saturnUmbrella);
+    const saturnBarefoot = MASTER_PLANET_REGISTRY.Saturn.afflictedMitigationHinglish.find((m) => m.includes("Barefoot Mountain Walk"));
+    assert.ok(saturnBarefoot);
+
+    // 5. Rahu Dehleez & 4 Brooms
+    const rahuDehleez = MASTER_PLANET_REGISTRY.Rahu.afflictedCharity.find((c) => c.item.includes("Dehleez"));
+    assert.ok(rahuDehleez);
+    const rahuBrooms = MASTER_PLANET_REGISTRY.Rahu.afflictedCharity.find((c) => c.item.includes("4 Brooms"));
+    assert.ok(rahuBrooms);
+
+    // 6. Ketu Sunset Lemons & 4th Roof Flag
+    const ketuLemons = MASTER_PLANET_REGISTRY.Ketu.afflictedCharity.find((c) => c.item.includes("Sunset Godhuli Vela"));
+    assert.ok(ketuLemons);
+    const ketuRoofRule = MASTER_PLANET_REGISTRY.Ketu.afflictedMitigationHinglish.find((m) => m.includes("4th House Ketu Roof Flag"));
+    assert.ok(ketuRoofRule);
+
+    // 7. Jupiter Nose & Sthan Hani
+    const jupiterNose = MASTER_PLANET_REGISTRY.Jupiter.favorableActionsHinglish.find((a) => a.includes("Nose Wisdom Connection"));
+    assert.ok(jupiterNose);
+    const jupiterSthanHani = MASTER_PLANET_REGISTRY.Jupiter.favorableActionsHinglish.find((a) => a.includes("Sthan Hani Kare Jiva"));
+    assert.ok(jupiterSthanHani);
   });
 });

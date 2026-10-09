@@ -88,6 +88,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     favorableActionsHinglish: [
       "Subah taambe ke lote me jal lekar Gayatri Mantra bolte hue Surya Dev ko Arghya arpit karein.",
       "Raat ko taambe ke bartan me paani rakhein aur subah thoda gud khakar wahi paani piyein.",
+      "Surya 7th House Aspect Rule: Surya 3rd house me baithkar 9th house ko dekhta hai to advisory/teaching me vishva-prasiddhi deta hai; 10th me baithkar 4th ko dekhta hai to swadesh aur jan-samarthan me kirti deta hai.",
       "Purva (East) disha me Shri Ram ji ki nitya aarti ya puja karein.",
       "Pitaji ke charan sparsh karke ashirwad lein aur unka aadar karein.",
       "Apne aacharan (character) ko hamesha nishkalank rakhein; Surya naitikta ka prateek hai."
@@ -236,6 +237,15 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     afflictedStoneWarning: "BHULKAR BHI MOONGA NA PEHNE agar Mangal neech ka ho ya 6/8 bhav me peedit ho, krodh aur accident bhadak jayenge!",
     afflictedCharity: [
       {
+        item: "Mars Triangle Copper Piece Potli (तांबे का तिकोना टुकड़ा Upay)",
+        quantity: "1 kg Lal Masoor Dal + Sabut Lal Mirch + Pure Triangle Copper Piece (तांबे का तिकोना टुकड़ा) + Lal Sindoor + Shuddh Shehad (Honey) in Red Cloth",
+        day: "Tuesday (Mangalvar)",
+        timing: "Morning to afternoon",
+        targetRecipient: "Disposal vehicle according to house element (Tattva Trikona)",
+        place: "Fire: Mandir/Bhatti | Earth: Zameen me dabayein | Air: Peepal par taangein | Water: Behta jal",
+        esotericReason: "Transcript verbatim formula: Taambe ka tikona piece, sabut lal mirch, masoor daal aur shehad ko laal kapde me baandh kar trikona ke anusaar sthapit/pravahit karne se Mangal ka bhandaar shant ho jata hai aur property v police disputes khatam hote hain."
+      },
+      {
         item: "Red Lentils (Lal Masoor Dal) in Earthen Pot (Mitti ka Ghada)",
         quantity: "1.25 kg Lal Masoor Dal mitti ke patra me",
         day: "Tuesday (Mangalvar)",
@@ -261,6 +271,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
       "Never consume non-vegetarian food or liquor on Tuesdays"
     ],
     afflictedMitigationHinglish: [
+      "Mars Potli Upay: 1kg lal masoor dal + sabut lal mirch + taambe ka tikona tukda + sindoor + shehad lal kapde me bandhkar bhav ke tatva (Agni/Prithvi/Vayu/Jal) ke anusaar dispose karein.",
       "Hanuman ji ko sindoor aur chameli ka tel chadhayein.",
       "Mitti ke ghade me 1.25 kg masoor daal bhar kar behte jal me pravahit karein ya mitti me dabayein.",
       "Gusse par niyantran ke liye thande paani se chehra dhoyein aur pranayama karein."
@@ -306,6 +317,24 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     afflictedStoneWarning: "PANNA (EMERALD) BHULKAR BHI NA PEHNE agar Budh peedit ho; galat decision aur trading me sarva-naash ho sakta hai!",
     afflictedCharity: [
       {
+        item: "Parrot Seva & Forest Release (तोता सेवा v मुक्ति Upay)",
+        quantity: "1 green parrot fed for 7 days then released into wild forest",
+        day: "Wednesday to Wednesday",
+        timing: "Wednesday morning purchase -> 7 days feed (green guava & red chilli) -> next Wednesday morning release",
+        targetRecipient: "Dense green forest / open sky canopy",
+        place: "Dense forest or large sanctuary canopy",
+        esotericReason: "Transcript verbatim formula: 'Budhwar ko tota layein, 7 din hari mirch aur amrood khilayein, agle Budhwar jungle me azaad karein' — trading, vyapaar aur dimaag ke saare bandhan 100% khul jaate hain."
+      },
+      {
+        item: "Kinnar Seva with Agra Petha & Green Dress",
+        quantity: "1 Green dress/suit + 1 kg Green Agra Petha sweet + ₹500 dakshina",
+        day: "Wednesday",
+        timing: "Daytime before sunset",
+        targetRecipient: "Kinnar (transgenders)",
+        place: "Direct donation with humble folded hands",
+        esotericReason: "Transcript secret: Kinnar Budha ke sakshat prateek hain; unko hara petha aur vastra dekar ashirwad lena Budh ke klesh ko shubh gyan aur dhan me badalta hai."
+      },
+      {
         item: "Green fodder / Spinach (Hari Ghaas ya Palak)",
         quantity: "5kg to 10kg green palak",
         day: "Wednesday (Budhvar)",
@@ -331,6 +360,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
       "Never keep broken electronics, torn books, or cluttered desks at home"
     ],
     afflictedMitigationHinglish: [
+      "Bird Feeding Test (चिड़ियों को दाना Secret): Peedit Budh me chidiya 7-10 din tak daana nahi chhooegi; nitya daana daalte rahein, 10-12 din me jaise hi khana shuru karegi, Budh ka klesh hat jayega.",
       "Fitkari (alum) se nitya subah daant saaf karein.",
       "Taambe ke gol sikke me chhed karke behte paani me bahayein agar Budha 8 ya 12 me ho.",
       "Gaushala me gayon ko hari palak ya hara ghaas khilayein."
@@ -366,6 +396,9 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     favorableColours: ["Bright Golden Yellow", "Saffron Yellow (Kesar)", "Turmeric Gold"],
     favorableFoods: ["Chana Dal (Bengal gram)", "Besan Ladoo", "Pure Desi Cow Ghee", "Raw Turmeric (Haldi)", "Saffron (Kesar)"],
     favorableActionsHinglish: [
+      "Nose Wisdom Connection: 'Jupiter is your nose' — naak ko roz subah shuddh taaze paani se saaf karein; badi naak gehre gyaan ka prateek hai.",
+      "Sthan Hani Kare Jiva Rule: Jupiter shuru ke 1-2 saal klesh aur pariksha leta hai, purane galat tareeqon ko saaf karwata hai (Tehsildar case study), phir 1-2 saal baad sab kuch 100% shuddh sona bana deta hai. 100% purity, zero bribes, zero shortcuts.",
+      "Jupiter + Rahu Combination: Online guru, internet se gyaan lena aur prasaar karna, ek shabd pakad kar poori pustak likh dene ki kshamta.",
       "Subah mathe aur naabhi par Kesar ya Haldi ka tilak lagayein.",
       "Sadguru, santon aur shishyaon ka aadar karein; nitya dharmik granthon ka adhyayan karein.",
       "Brihaspati stotra ya Om Gram Greem Grom Sah Gurave Namah ka jaap karein.",
@@ -373,7 +406,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
       "Dharma aur naitikta par adig rahein; jhuti gawahi ya be-imaani na karein."
     ],
     powerUpMantra: "Om Gram Greem Grom Sah Gurave Namah / Om Brihaspataye Namah",
-    afflictedStoneWarning: "BHULKAR BHI PUKHRAJ NA PEHNE agar Guru neech ka ho ya 6, 8, 12 me ho; sthan haani kare jeeva ka prabhav badh jayega!",
+    afflictedStoneWarning: "BHULKAR BHI PUKHRAJ NA PEHNE agar Guru neech ka ho ya 6, 8, 12 me ho! SPECIAL STRICT WARNING: Jupiter dasha chalte samay HEERA (DIAMOND) BHULKAR BHI NA PEHNEIN (Dev-Guru Brihaspati vs Daitya-Guru Shukracharya shatruta se aarthik barbaadi aati hai)!",
     afflictedCharity: [
       {
         item: "Chana Dal, Haldi Gaanth & Yellow Cloth",
@@ -396,6 +429,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     ],
     avoidColours: ["Dull faded dirty yellow", "Gloomy grey"],
     avoidHabits: [
+      "Never wear Diamond (Heera) during Jupiter Mahadasha or Antardasha!",
       "Never disrespect teachers, Gurus, father or elderly mentors",
       "Never eat non-vegetarian food or consume alcohol in North-East direction",
       "Avoid false promises or religious hypocrisy"
@@ -471,6 +505,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
       "Avoid extra-marital indulgence or degrading sexual conduct"
     ],
     afflictedMitigationHinglish: [
+      "Kitchen Sink Curd Totka (रसोई सिंक दही उपाय): Roz subah 2 chamach dahi aur raat ko 2 chamach dahi kitchen ke sink me daalkar paani baha dein. Kitchen Agni (Fire) hai aur sink Jal (Water) — dahi Agni-Jal ke takraav ko shaant karta hai aur South-East vastu dosha mitata hai.",
       "Langar me 6 kg aaloo daan karein Friday ke din.",
       "Bhimseni kapoor mandir me daan karein ya ghar me subah-shaam kapoor jalayein.",
       "Safed gay ko chawal aur dahi khilayein."
@@ -506,6 +541,8 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     favorableColours: ["Royal Navy Blue", "Charcoal Black", "Deep Slate Blue"],
     favorableFoods: ["Black Sesame (Kala Til)", "Urad Dal (Black gram)", "Mustard Greens (Sarson ka Saag)", "Almonds"],
     favorableActionsHinglish: [
+      "Gas-Pressure-Explosion Cycle: Shani dasha aate hi shareer me gas/vata badhta hai, ghutno aur tangon me dard hota hai. Pressure banta hai, phir fat-ta hai aur 11th house ke phal barsate hain.",
+      "Kachhua Analogy: Shani kachhua hai — slow and steady wins the race. Hadhbadi me short-term faisla kabhi na karein.",
       "Neeche kaam karne wale workers, sweepers, drivers aur laborers ko izzat aur samay par paisa dein.",
       "Nitya Hanuman Chalisa ya Shani Chalisa ka path karein.",
       "Apne jeevan me kada anushasan, samay ki pabandi aur kadi mehnat layein.",
@@ -515,6 +552,24 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     powerUpMantra: "Om Sham Shanaischaraya Namah / Om Pram Preem Prom Sah Shanaischaraya Namah",
     afflictedStoneWarning: "NEELAM BHULKAR BHI NA PEHNE! Peedit Shani par Neelam pehanna shareer me paralysis, dhar-pakad aur barbaadi laa sakta hai!",
     afflictedCharity: [
+      {
+        item: "Black Umbrella / Canopy to Roadside Vendor (काली छतरी दान)",
+        quantity: "1 large heavy black umbrella or shade canopy",
+        day: "Saturday (Shanivar)",
+        timing: "Afternoon during harsh sun",
+        targetRecipient: "Poor roadside vegetable/fruit vendor or manual laborer working in scorching heat",
+        place: "Roadside / Sabzi Mandi street",
+        esotericReason: "Transcript verbatim formula: Dhoop me tap rahe mehnatkash ko kali chhatri ya chhaya dena Shani Dev ko turant prasanna karta hai aur klesh door karta hai."
+      },
+      {
+        item: "Old Leather Shoes Donation (पुराने जूते दान)",
+        quantity: "1 pair usable clean old leather shoes",
+        day: "Saturday",
+        timing: "Sunset to evening",
+        targetRecipient: "Barefoot laborer, sweeper or homeless person",
+        place: "Outdoor street / Slum",
+        esotericReason: "Purane joote daan karne se Shani ke pairon ka bojh, bhatkav aur danda shaant hota hai."
+      },
       {
         item: "Sarson ka Tel (Mustard Oil) Chhaya Daan",
         quantity: "1 steel/iron bowl with mustard oil (chehra dekh kar daan karein)",
@@ -541,6 +596,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
       "Avoid procrastination, deceit, laziness, or breaking the law"
     ],
     afflictedMitigationHinglish: [
+      "Barefoot Mountain Walk: Shanivar ko tangon par sarson ka tel mal kar pahad ya kachhe unche raste par nange pair chalein (leg strain Shani ki tapasya hai).",
       "Sarson ke tel ka chhaya daan karein Saturday shaam ko.",
       "Safai karamchari (sweepers) ko thoda paisa ya khana aadar se dein.",
       "Kutte (especially black dogs) ko roti par sarson ka tel lagakar khilayein."
@@ -576,6 +632,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     favorableColours: ["Electric Smoky Grey", "Midnight Navy Blue", "Charcoal Steel"],
     favorableFoods: ["Barley (Jau)", "Coconut water", "Rock salt (Sendha Namak)", "Light sattvik soups"],
     favorableActionsHinglish: [
+      "Focus Tools: Use camera (symbol of focus), metal wind chime in West, or dart board to channel Rahu's obsessive energy into laser focus.",
       "Cutting-edge technology, AI, coding, research ya global export-import me focus karein.",
       "Durga Saptashati ya Argala Stotra ka niyamit path karein.",
       "Bhairav chalisa ya Om Bhram Bhreem Bhrom Sah Rahave Namah ka jaap karein.",
@@ -585,6 +642,24 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     powerUpMantra: "Om Bhram Bhreem Bhrom Sah Rahave Namah / Om Rahave Namah",
     afflictedStoneWarning: "BHULKAR BHI GOMED NA PEHNE agar Rahu dushit ho; dimaag me bhram, police case aur aatm-hatya ke vichar laa sakta hai!",
     afflictedCharity: [
+      {
+        item: "Temple Entrance Threshold (Dehleez) Cleaning Upay",
+        quantity: "1 yellow handkerchief (Peela rumaal)",
+        day: "Saturday or Wednesday",
+        timing: "Early morning sunrise",
+        targetRecipient: "Temple / Gurudwara Entrance Threshold",
+        place: "Mandir / Gurudwara main gate dehleez",
+        esotericReason: "Transcript verbatim miracle: Mandir ki dehleez ko peele rumaal se saaf karein, apna matha dehleez par takein (Sar = Rahu), aur us rumaal ko jeb me rakhein — Rahu ka vish amrit me badal jata hai."
+      },
+      {
+        item: "4 Brooms (Jhadu) to Municipal Sweeper",
+        quantity: "4 new soft/bamboo brooms",
+        day: "Saturday during Rahu Nakshatra (Ardra, Swati, Shatabhisha)",
+        timing: "Morning",
+        targetRecipient: "Road sweeper / Safai karamchari",
+        place: "Local street",
+        esotericReason: "Transcript formula: Char jhadu Rahu ke chaaro dishaon ke dhuen aur kachre ko baha deti hain."
+      },
       {
         item: "Raw Charcoal (Koyla) / Barley (Jau) / Radish (Mooli)",
         quantity: "4 kg Raw coal or 1 kg Jau (Barley)",
@@ -611,6 +686,10 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
       "Never hoard broken electronic junk, obsolete wires, or non-functional remotes"
     ],
     afflictedMitigationHinglish: [
+      "Temple Dehleez Seva: Mandir ki dehleez peele rumaal se saaf karke matha tekein aur rumaal pocket me rakhein.",
+      "Roz raat ko haldi wala doodh (turmeric milk) piyein (Guru-Rahu balance).",
+      "Intercaste Marriage Awareness: Venus+Rahu, Mars+Rahu ya 7th/8th house link intercaste vivah ki taraf aakarshit karta hai.",
+      "12th House Rahu Infrastructure Wealth: Highway ya naye public project ke paas zameen se achanak multi-crore dhan-labh ka dhyan rakhein.",
       "Ghar ka farsh khud jhadoo lagakar saaf karein; safai karne se Rahu shant hota hai.",
       "South-West kon me sona band karein agar Rahu peeda de raha ho.",
       "Kachha koyla (raw coal) behte paani me jal-pravah karein."
@@ -665,6 +744,24 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         esotericReason: "Transcript verbatim formula: '7 bananas lene hain aur Ganesh ji ko arpit kar do, chamatkari upay hai, 1 ghante me result aate hain!' Ketu ke klesh ko Ganesha turant har lete hain."
       },
       {
+        item: "Sunset Godhuli Vela Lemons & Imli Jal-Pravah (गोधूलि वेla जल प्रवाह)",
+        quantity: "7 Lemons (Nimboo) + 1 packet dry tamarind (Imli) in brown cloth",
+        day: "Tuesday or Thursday",
+        timing: "Sunset (Godhuli Vela) strictly before complete dark",
+        targetRecipient: "Clean flowing river or water canal",
+        place: "Flowing natural river",
+        esotericReason: "Transcript verbatim formula: 'Nimboo aur imli pure Ketu hain; sunset se pehle inko behte jal me pravahit karne se Ketu ka dushprabhav jal me vileen ho jata hai.'"
+      },
+      {
+        item: "Fish Feeding with Black & White Sesame Balls (मछली सेवा)",
+        quantity: "Aate ke pede with mixed black & white til",
+        day: "Any morning",
+        timing: "Morning sunrise",
+        targetRecipient: "Fishes in natural pond or river",
+        place: "Natural water reservoir",
+        esotericReason: "Machhliyo ko til aur aata khilana Ketu ke bandhan ko mukt karta hai."
+      },
+      {
         item: "Black & White Blanket (Do-ranga Kambal)",
         quantity: "1 Black & White checkered woolen blanket",
         day: "Tuesday or Saturday",
@@ -682,6 +779,8 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     ],
     afflictedMitigationHinglish: [
       "7 ripe bananas Ganesha mandir me arpit karein (1 ghante me raahat milti hai).",
+      "Sunset Godhuli Vela Upay: 7 nimboo + 1 packet imli bhoore kapde me bandhkar sunset se pehle behte jal me pravahit karein.",
+      "4th House Ketu Roof Flag Rule: Agar Ketu 4th house me ho to chhat par lamba tiranga/jhanda na lagayein, sirf chhota safed dhwaja lagayein.",
       "Khatti cheezein (Nimboo, Imli, Khattai) khana turant band karein.",
       "Ghar me silayi (stitching), gardening, yoga ya astrology seekhna shuru karein taaki Ketu ki energy creative route pakad le."
     ]
@@ -996,4 +1095,539 @@ export function evaluateConjunctionInHouse(
     narrativeHinglish: `Is bhav me ek se adhik grah virajman hain. Classical aur transcript niyam ke anusar, pehle kleshkarak grah (${malefic}) ka daan v shanti karke bhav ke prabhav ko nirmal kiya jata hai, taaki shubh grahon ki urja mukt ho sake.`,
     strictWarning: "Dono grahon ka ek saath ratna na dharan karein bina nakshtra v sub-lord check kiye."
   };
+}
+
+/**
+ * Contextual Life-Domain Remedy Architecture (The 3-Tier Dynamic Activation System)
+ * Derived verbatim from the Classical Master Lecture Transcript:
+ * "Kundli me 50 rajyog ho ya 50 dur-yog, kaam wahi karega jo planet Dasha/Antardasha me active hai ya jis House ka trigger chala hai!"
+ */
+export type LifeDomainContext =
+  | "dasha"
+  | "property"
+  | "marriage"
+  | "career"
+  | "health"
+  | "emergency";
+
+export interface ContextualPlanetItem {
+  planet: PlanetId;
+  roleHinglish: string;
+  isFavorable: boolean;
+  placementSummary: string;
+  recommendationType: "PowerUp_Gemstone_Favorable" | "Mitigate_Charity_Afflicted";
+  primaryHeadline: string;
+  evaluation: EvaluatedCorePlanetRemedy;
+}
+
+export interface ContextualSpecialFormula {
+  title: string;
+  badge: string;
+  esotericSecretHinglish: string;
+  itemsRequired: string[];
+  exactDosage: string;
+  timing: string;
+  expectedResultHinglish: string;
+}
+
+export interface ContextualRemedyResponse {
+  context: LifeDomainContext;
+  titleHinglish: string;
+  subtitleHinglish: string;
+  primaryRationaleHinglish: string;
+  signifiedHouses: number[];
+  activatedPlanets: ContextualPlanetItem[];
+  specialFormulas: ContextualSpecialFormula[];
+  strictWarnings: string[];
+  safePractices: string[];
+}
+
+const RASHI_LORDS: PlanetId[] = [
+  "Mars",    // 1 Aries
+  "Venus",   // 2 Taurus
+  "Mercury", // 3 Gemini
+  "Moon",    // 4 Cancer
+  "Sun",     // 5 Leo
+  "Mercury", // 6 Virgo
+  "Venus",   // 7 Libra
+  "Mars",    // 8 Scorpio
+  "Jupiter", // 9 Sagittarius
+  "Saturn",  // 10 Capricorn
+  "Saturn",  // 11 Aquarius
+  "Jupiter"  // 12 Pisces
+];
+
+export function getHouseLord(chart: ChartData | null | undefined, houseNo: number): PlanetId {
+  const lagnaNum = chart?.lagnaNum || 1;
+  const rashiIdx = ((lagnaNum + houseNo - 2) % 12);
+  return RASHI_LORDS[rashiIdx] || "Sun";
+}
+
+export function resolveContextualRemedies(
+  context: LifeDomainContext,
+  chart: ChartData | null | undefined
+): ContextualRemedyResponse | null {
+  if (!chart || !chart.planets) return null;
+
+  const activeMD = chart?.dashas?.find((d) => d.active) ?? chart?.dashas?.[0];
+  const activeAD = chart?.antardasha?.find((a) => a.active);
+  const mdPlanet = (activeMD?.planet || "Jupiter") as PlanetId;
+  const adPlanet = (activeAD?.planet || "Saturn") as PlanetId;
+
+  // 1. TIER 1: ACTIVE DASHA & ANTARDASHA (Current Life Engine)
+  if (context === "dasha") {
+    const planetsToEval: { planet: PlanetId; role: string }[] = [
+      { planet: mdPlanet, role: "Active Mahadasha Adhipati (Pradhan Fal-Data)" }
+    ];
+    if (adPlanet !== mdPlanet) {
+      planetsToEval.push({ planet: adPlanet, role: "Active Antardasha Adhipati (Karmic Executor)" });
+    }
+
+    const activatedPlanets: ContextualPlanetItem[] = [];
+    const strictWarnings: string[] = [];
+    const safePractices: string[] = [];
+    const specialFormulas: ContextualSpecialFormula[] = [];
+
+    planetsToEval.forEach(({ planet, role }) => {
+      const evalResult = evaluateCorePlanetRemedy(planet, chart);
+      if (evalResult) {
+        activatedPlanets.push({
+          planet,
+          roleHinglish: role,
+          isFavorable: evalResult.isFavorable,
+          placementSummary: evalResult.placementSummary,
+          recommendationType: evalResult.recommendationType,
+          primaryHeadline: evalResult.primaryHeadline,
+          evaluation: evalResult
+        });
+        if (!evalResult.isFavorable) {
+          strictWarnings.push(evalResult.gemstoneAdvice.strictWarning);
+        }
+        evalResult.habitsToAdoptHinglish.forEach((h) => safePractices.push(h));
+      }
+    });
+
+    // Jupiter Dasha Diamond Prohibition check
+    if (mdPlanet === "Jupiter" || adPlanet === "Jupiter") {
+      strictWarnings.push("Guru Dasha Vishesh Chetavani: Heera (Diamond) bhulkar bhi na pehnein; Dev-Guru aur Daitya-Guru ka takraav dhandha aur dhan barbad karta hai!");
+      specialFormulas.push({
+        title: "Jupiter Sthan Hani Gold Conversion Cycle",
+        badge: "Guru Master Rule",
+        esotericSecretHinglish: "Guru pehle 1-2 saal purane kooda-karkat aur galat tariko ko hatata hai (Tehsildar case study), phir sab kuch 100% shuddh sona bana deta hai. Zero bribes, zero shortcuts, 100% purity.",
+        itemsRequired: ["Kesar/Haldi tilak", "Pure taaza paani", "Nose hygiene"],
+        exactDosage: "Roz subah naak ko taaze paani se saaf karein aur mathe par kesar tilak lagayein",
+        timing: "Every morning after bath",
+        expectedResultHinglish: "Decision making tez hoti hai aur log aapse salah lene aane lagte hain."
+      });
+    }
+
+    // Saturn Dasha Gas-Pressure check
+    if (mdPlanet === "Saturn" || adPlanet === "Saturn") {
+      specialFormulas.push({
+        title: "Shani Gas-Pressure-Explosion Tapasya",
+        badge: "Shani Cycle",
+        esotericSecretHinglish: "Shani dasha aate hi gas/vata badhta hai, tangon me dard hota hai. Pressure ban kar phattega aur 11th sign ke fruits milenge. Shanivar ko nange pair pahad par chalna Shani ki tapasya hai.",
+        itemsRequired: ["Sarson ka tel", "Nange pair walk", "Black umbrella"],
+        exactDosage: "Shanivar ko pairon par sarson tel mal kar pahad/kachhe unche raste par chalein",
+        timing: "Saturday evening",
+        expectedResultHinglish: "Legs aur joint pain ghatta hai aur professional roadblocks door hote hain."
+      });
+    }
+
+    return {
+      context: "dasha",
+      titleHinglish: "⏰ Active Dasha & Antardasha Priority Dossier",
+      subtitleHinglish: `Mahadasha: ${mdPlanet} · Antardasha: ${adPlanet}`,
+      primaryRationaleHinglish: "Transcript niyam: 'Chart me 50 rajyog ho ya 50 dosh, fal wahi deta hai jo Dasha aur Antardasha me active hai!' Abhi inhi do grahon ka prabhav aapke vartaman jeevan par 70% chal raha hai.",
+      signifiedHouses: [
+        chart.planets[mdPlanet]?.house || 1,
+        chart.planets[adPlanet]?.house || 1
+      ],
+      activatedPlanets,
+      specialFormulas,
+      strictWarnings,
+      safePractices
+    };
+  }
+
+  // 2. TIER 2: PROPERTY & LAND DOMAIN
+  if (context === "property") {
+    const h4Lord = getHouseLord(chart, 4);
+    const h11Lord = getHouseLord(chart, 11);
+    const planetsToEval: { planet: PlanetId; role: string }[] = [
+      { planet: "Mars", role: "Bhumi & Zameen Karaka (Natural Real Estate Lord)" },
+      { planet: h4Lord, role: `4th House Lord (${h4Lord} - Makaan & Griha Sthan)` },
+      { planet: h11Lord, role: `11th House Lord (${h11Lord} - Sampatti Labh & Possession)` }
+    ];
+
+    const uniquePlanets = Array.from(new Set(planetsToEval.map((p) => p.planet)));
+    const activatedPlanets: ContextualPlanetItem[] = [];
+    const strictWarnings: string[] = [];
+    const safePractices: string[] = [];
+
+    uniquePlanets.forEach((pName) => {
+      const match = planetsToEval.find((x) => x.planet === pName);
+      const evalResult = evaluateCorePlanetRemedy(pName, chart);
+      if (evalResult && match) {
+        activatedPlanets.push({
+          planet: pName,
+          roleHinglish: match.role,
+          isFavorable: evalResult.isFavorable,
+          placementSummary: evalResult.placementSummary,
+          recommendationType: evalResult.recommendationType,
+          primaryHeadline: evalResult.primaryHeadline,
+          evaluation: evalResult
+        });
+        if (!evalResult.isFavorable) {
+          strictWarnings.push(evalResult.gemstoneAdvice.strictWarning);
+        }
+      }
+    });
+
+    const specialFormulas: ContextualSpecialFormula[] = [
+      {
+        title: "Mars Triangle Copper Piece Potli (तांबे का तिकोना टुकड़ा Upay)",
+        badge: "Property Dispute Breaker",
+        esotericSecretHinglish: "Transcript verbatim formula: Taambe ka tikona tukda, 1kg lal masoor dal, sabut lal mirch, lal sindoor aur pure honey ko lal kapde me bandhkar bhav ke tattva ke anusaar sthapit ya pravahit karein. Mangal ka klesh shant hota hai aur registry safal hoti hai.",
+        itemsRequired: ["Taambe ka tikona tukda", "1kg Lal Masoor Dal", "Sabut Lal Mirch", "Lal Sindoor", "Shuddh Shehad", "Lal Vastra"],
+        exactDosage: "1 potli tied securely on Tuesday",
+        timing: "Tuesday morning to afternoon",
+        expectedResultHinglish: "Zameen, plot ya flat ke vivaad aur kagazi rukawat 40 din me door hoti hai."
+      },
+      {
+        title: "Astro-Vastu ENE Property Activation Totka",
+        badge: "Vastu Energy Anchor",
+        esotericSecretHinglish: "8th sub-lord ke nakshatra lord ke item ko ghar ke 11th zone (East-North-East) me orange cloth me sthapit karein. Is se blocked property deals khul jaati hain.",
+        itemsRequired: ["Orange cloth", "Wheat (Gehun) / Sub-lord item", "Copper vessel"],
+        exactDosage: "Place in ENE corner of the house",
+        timing: "Sunday or Thursday morning",
+        expectedResultHinglish: "Khareeddar (Buyer) tezi se aate hain aur token amount lock hota hai."
+      },
+      {
+        title: "4th House Ketu Roof Flag Rule",
+        badge: "Strict Warning",
+        esotericSecretHinglish: "Transcript verbatim secret: Agar Ketu 4th house me ho to chhat par tiranga ya lamba flag na lagayein (yeh ghar ki shanti kaat-ta hai), sirf chhota safed dhwaja lagayein.",
+        itemsRequired: ["Small white flag"],
+        exactDosage: "1 small white flag",
+        timing: "Thursday morning",
+        expectedResultHinglish: "Ghar me achanak hone wali ashanti aur chori/dhan haani rukti hai."
+      }
+    ];
+
+    safePractices.push("Property khareedne ke liye dasha me 4-11-12 yog check karein (12th house investment outlay hai).");
+    safePractices.push("Property bechne ke liye dasha me 3-7-10-5 yog check karein (3rd house 12th from 4th hokar zameen chhudata hai).");
+
+    return {
+      context: "property",
+      titleHinglish: "🏠 Property, Land & Real Estate Activation Dossier",
+      subtitleHinglish: `Bhumi Karaka: Mars · 4th Lord: ${h4Lord} · 11th Lord: ${h11Lord}`,
+      primaryRationaleHinglish: "Makaan ya zameen lene me 4th house (makaan), 11th house (labh) aur 12th house (nivesh/investment) ka sakriya hona zaroori hai. Mangal zameen ka sakshat swami hai.",
+      signifiedHouses: [4, 11, 12, 3, 7, 10],
+      activatedPlanets,
+      specialFormulas,
+      strictWarnings,
+      safePractices
+    };
+  }
+
+  // 3. TIER 2: MARRIAGE & RELATIONSHIPS
+  if (context === "marriage") {
+    const h7Lord = getHouseLord(chart, 7);
+    const planetsToEval: { planet: PlanetId; role: string }[] = [
+      { planet: "Venus", role: "Dampatya, Prem & Patni Karaka (Natural Relationship Lord)" },
+      { planet: "Mars", role: "Husband Karaka (in Female chart) & Manglik Energy" },
+      { planet: h7Lord, role: `7th House Lord (${h7Lord} - Vivah & Saathi Sthan)` },
+      { planet: "Rahu", role: "Unconventional Desire & Intercaste Indicator" }
+    ];
+
+    const uniquePlanets = Array.from(new Set(planetsToEval.map((p) => p.planet)));
+    const activatedPlanets: ContextualPlanetItem[] = [];
+    const strictWarnings: string[] = [];
+    const safePractices: string[] = [];
+
+    uniquePlanets.forEach((pName) => {
+      const match = planetsToEval.find((x) => x.planet === pName);
+      const evalResult = evaluateCorePlanetRemedy(pName, chart);
+      if (evalResult && match) {
+        activatedPlanets.push({
+          planet: pName,
+          roleHinglish: match.role,
+          isFavorable: evalResult.isFavorable,
+          placementSummary: evalResult.placementSummary,
+          recommendationType: evalResult.recommendationType,
+          primaryHeadline: evalResult.primaryHeadline,
+          evaluation: evalResult
+        });
+        if (!evalResult.isFavorable) {
+          strictWarnings.push(evalResult.gemstoneAdvice.strictWarning);
+        }
+      }
+    });
+
+    const specialFormulas: ContextualSpecialFormula[] = [
+      {
+        title: "Venus South-East Kitchen Sink Curd Totka (रसोई सिंक दही उपाय)",
+        badge: "Marital Harmony Healer",
+        esotericSecretHinglish: "Transcript verbatim formula: Kitchen Agni (Fire) hai aur sink Jal (Water) hai. Roz subah 2 chamach dahi aur raat ko 2 chamach dahi kitchen ke sink me daalkar paani baha dein. Dahi Agni-Jal ke takraav ko shaant karta hai aur South-East vastu dosha mitata hai.",
+        itemsRequired: ["Fresh white curd (Dahi)", "Water tap"],
+        exactDosage: "2 spoons morning + 2 spoons night down kitchen sink",
+        timing: "Daily morning and night",
+        expectedResultHinglish: "Pati-patni ke beech ka roz-roz ka klesh aur chirchiraapan shaant hota hai."
+      },
+      {
+        title: "Moon Psychological Heart-Sharing Sanctuary Map",
+        badge: "Emotional Healing",
+        esotericSecretHinglish: "Chandra jis bhav me baitha hai, wahi aapke dil ki surakshit jagah hai. 7th house Chandra wale ko saathi ke aage dil kholna chahiye, 4th house wale ko mata ji ke aage, aur 12th house wale ko kewal Shiva ya ekant dhyan me.",
+        itemsRequired: ["Silver glass milk", "Safe emotional confidant"],
+        exactDosage: "Daily emotional journaling or discussion with authorized confidant",
+        timing: "Evening moonrise",
+        expectedResultHinglish: "Depression aur emotional exhaustion se mukti milti hai."
+      },
+      {
+        title: "6 kg Potatoes in Religious Langar",
+        badge: "Venus Affliction Neutralizer",
+        esotericSecretHinglish: "Agar Shukra 6th house me ho ya neech ka ho, to Heera kabhi na pehnein. Shukravar ko 6 kg kachhe aaloo kisi dharmik langar me daan karein.",
+        itemsRequired: ["6 kg raw potatoes (Aloo)", "2 kg curd"],
+        exactDosage: "6 kg raw potatoes on Friday",
+        timing: "Friday morning to noon",
+        expectedResultHinglish: "Rishto me talaq aur aarthik barbaadi ke yog talte hain."
+      }
+    ];
+
+    strictWarnings.push("Shukra peedit ho to Heera ya Opal bhulkar bhi na pehnein; rishte jal kar bhasm ho sakte hain!");
+    safePractices.push("Jeevan saathi ka nitya samman karein; stri ke khush rehne se hi Shukra amrit barsata hai.");
+
+    return {
+      context: "marriage",
+      titleHinglish: "💍 Marriage, Love & Relationship Alignment Dossier",
+      subtitleHinglish: `Shukra: Venus · Mangal: Mars · 7th Lord: ${h7Lord}`,
+      primaryRationaleHinglish: "Dampatya jeevan me 7th house (saathi), Shukra (prem) aur Chandra (manasik shanti) ka mahatvapoorna role hai. Peedit Shukra me ratna pehanna aag me ghee daalne jaisa hota hai.",
+      signifiedHouses: [7, 2, 4, 12],
+      activatedPlanets,
+      specialFormulas,
+      strictWarnings,
+      safePractices
+    };
+  }
+
+  // 4. TIER 2: CAREER & PROFESSIONAL KARMA
+  if (context === "career") {
+    const h10Lord = getHouseLord(chart, 10);
+    const h11Lord = getHouseLord(chart, 11);
+    const planetsToEval: { planet: PlanetId; role: string }[] = [
+      { planet: "Saturn", role: "Karma, Hard Work & Profession Karaka" },
+      { planet: "Mercury", role: "Buddhi, Business, Accounts & Communication Karaka" },
+      { planet: h10Lord, role: `10th House Lord (${h10Lord} - Karma & Status Sthan)` },
+      { planet: h11Lord, role: `11th House Lord (${h11Lord} - Labh & Career Ambition)` }
+    ];
+
+    const uniquePlanets = Array.from(new Set(planetsToEval.map((p) => p.planet)));
+    const activatedPlanets: ContextualPlanetItem[] = [];
+    const strictWarnings: string[] = [];
+    const safePractices: string[] = [];
+
+    uniquePlanets.forEach((pName) => {
+      const match = planetsToEval.find((x) => x.planet === pName);
+      const evalResult = evaluateCorePlanetRemedy(pName, chart);
+      if (evalResult && match) {
+        activatedPlanets.push({
+          planet: pName,
+          roleHinglish: match.role,
+          isFavorable: evalResult.isFavorable,
+          placementSummary: evalResult.placementSummary,
+          recommendationType: evalResult.recommendationType,
+          primaryHeadline: evalResult.primaryHeadline,
+          evaluation: evalResult
+        });
+        if (!evalResult.isFavorable) {
+          strictWarnings.push(evalResult.gemstoneAdvice.strictWarning);
+        }
+      }
+    });
+
+    const specialFormulas: ContextualSpecialFormula[] = [
+      {
+        title: "Saturn 7th House Growth Radar (Transcript Benchmark)",
+        badge: "Career Elevation",
+        esotericSecretHinglish: "Transcript verbatim formula: Transit Saturn jahan baithta hai, uske theek 7th house ka status badhata hai! 8th Shani = 2nd house dhan status; 9th Shani = 3rd house media status; 10th Shani = 4th house big mansion status.",
+        itemsRequired: ["Shani discipline", "Respect for blue collar workers"],
+        exactDosage: "Analyze your 2.5-year transit window",
+        timing: "Current 2.5-year cycle",
+        expectedResultHinglish: "Career me sthir unchiyan aur authority praapt hoti hai."
+      },
+      {
+        title: "Black Umbrella & Shade to Poor Roadside Vendors",
+        badge: "Saturn Kripa Upay",
+        esotericSecretHinglish: "Dhoop me tap rahe sadak ke sabzi/phal vendor ko badi kali chhatri ya shade bhent karein. Shani Dev atyant prasanna hote hain aur career stagnation door hoti hai.",
+        itemsRequired: ["1 Large Black Umbrella"],
+        exactDosage: "1 black umbrella on Saturday afternoon",
+        timing: "Saturday harsh afternoon sun",
+        expectedResultHinglish: "Office politics aur bosses ki taraf se aane wali badhayein shant hoti hain."
+      },
+      {
+        title: "Mercury Parrot Freedom & Kinnar Seva (तोता सेवा v किन्नर आशीर्वाद)",
+        badge: "Business & Trading Breakthrough",
+        esotericSecretHinglish: "Transcript verbatim formula: Budhwar ko tota layein, 7 din hari mirch aur amrood khilayein, agle Budhwar jungle me uda dein. Kinnar ko hara suit aur Agra Petha dekar ashirwad lein.",
+        itemsRequired: ["Green parrot (fed 7 days)", "Green dress", "1 kg Agra petha", "₹500 dakshina"],
+        exactDosage: "1 week feeding then free release in forest",
+        timing: "Wednesday to Wednesday",
+        expectedResultHinglish: "Trading, finance aur client negotiation me bandhe hue raaste turant khul jaate hain."
+      }
+    ];
+
+    safePractices.push("Neeche kaam karne wale workers aur safai karamchariyon ko hamesha samay par paisa dein.");
+    safePractices.push("Bird Feeding Test: Peedit Budh me chidiya 7-10 din tak daana nahi chhooegi; nitya daana daalte rahein, 10-12 din me jaise hi khana shuru karegi, vyapaar badhne lagega.");
+
+    return {
+      context: "career",
+      titleHinglish: "💼 Career, Business & Karmic Elevation Dossier",
+      subtitleHinglish: `Karma Karaka: Saturn · Trade Karaka: Mercury · 10th Lord: ${h10Lord}`,
+      primaryRationaleHinglish: "Profession aur vyapaar me Shani (mehnat v nyay) aur Budh (buddhi v marketing) ka santulan anivarya hai. Neech grahon ka ratna pehanne se career me achanak firing ya suspension ka darr hota hai.",
+      signifiedHouses: [10, 11, 2, 6],
+      activatedPlanets,
+      specialFormulas,
+      strictWarnings,
+      safePractices
+    };
+  }
+
+  // 5. TIER 2: HEALTH & CRISIS MITIGATION
+  if (context === "health") {
+    const h6Lord = getHouseLord(chart, 6);
+    const h8Lord = getHouseLord(chart, 8);
+    const planetsToEval: { planet: PlanetId; role: string }[] = [
+      { planet: h6Lord, role: `6th House Lord (${h6Lord} - Roga & Acute Disease Sthan)` },
+      { planet: h8Lord, role: `8th House Lord (${h8Lord} - Chronic Ailment & Longevity Sthan)` },
+      { planet: "Sun", role: "Surya Dev (Atma-Bala, Bones & Vital Life Fire)" },
+      { planet: "Ketu", role: "Ketu Dev (Phantom, Undiagnosable & Nerve Issues)" }
+    ];
+
+    const uniquePlanets = Array.from(new Set(planetsToEval.map((p) => p.planet)));
+    const activatedPlanets: ContextualPlanetItem[] = [];
+    const strictWarnings: string[] = [];
+    const safePractices: string[] = [];
+
+    uniquePlanets.forEach((pName) => {
+      const match = planetsToEval.find((x) => x.planet === pName);
+      const evalResult = evaluateCorePlanetRemedy(pName, chart);
+      if (evalResult && match) {
+        activatedPlanets.push({
+          planet: pName,
+          roleHinglish: match.role,
+          isFavorable: evalResult.isFavorable,
+          placementSummary: evalResult.placementSummary,
+          recommendationType: evalResult.recommendationType,
+          primaryHeadline: evalResult.primaryHeadline,
+          evaluation: evalResult
+        });
+        if (!evalResult.isFavorable) {
+          strictWarnings.push(evalResult.gemstoneAdvice.strictWarning);
+        }
+      }
+    });
+
+    const specialFormulas: ContextualSpecialFormula[] = [
+      {
+        title: "Ketu 7 Ripe Bananas to Lord Ganesha (1 Ghante Me Raahat)",
+        badge: "Emergency Relief Miracle",
+        esotericSecretHinglish: "Transcript verbatim formula: '7 bananas lene hain aur Ganesh ji ko arpit kar do, chamatkari upay hai, 1 ghante me result aate hain!' Ketu ke phantom dard, klesh aur achanak sankat ko Ganesha turant har lete hain.",
+        itemsRequired: ["7 Ripe Yellow Bananas (सात पके केले)"],
+        exactDosage: "7 bananas offered at Ganesha Sanctuary",
+        timing: "Tuesday, Thursday or any emergency moment",
+        expectedResultHinglish: "1 ghante me mansik tanaav aur sharirik peeda me aashcharyajanak kami aati hai."
+      },
+      {
+        title: "Sunset Godhuli Vela Lemons & Imli Jal-Pravah",
+        badge: "Chronic Sickness Cleanser",
+        esotericSecretHinglish: "Transcript verbatim formula: 7 nimboo + 1 packet imli bhoore kapde me bandhkar sunset se theek pehle behte jal me pravahit karein. Khatti cheezein Ketu hain, inka jal-pravah roga-shrap ko baha deta hai.",
+        itemsRequired: ["7 Lemons", "1 packet dry tamarind (Imli)", "Brown cloth"],
+        exactDosage: "Flow into clean running water",
+        timing: "Sunset (Godhuli Vela) strictly before nightfall",
+        expectedResultHinglish: "Purani na theek hone wali bimariyo me medical report sudharna shuru hoti hai."
+      },
+      {
+        title: "Sun Copper Lota Water & Hospital Medicines Daan",
+        badge: "Vitality Armor",
+        esotericSecretHinglish: "Raat ko taambe ke lote me paani rakhein aur subah gud khakar piyein. Sunday ko sarkari hospital me beemar mareezo ko dawai daan karein.",
+        itemsRequired: ["Copper lota", "Gud (Jaggery)", "Medicines for needy"],
+        exactDosage: "Daily morning drink + Sunday medicine charity",
+        timing: "Every morning + Sunday daytime",
+        expectedResultHinglish: "Jatharagni tez hoti hai, heart-vitality badhti hai aur immunity majboot hoti hai."
+      }
+    ];
+
+    strictWarnings.push("6th ya 8th house ke lords ka ratna bhulkar bhi na pehnein; roga aur operation ka darr badh jayega!");
+    safePractices.push("Ketu peedit ho to nimboo aur imli khana turant band karein; sour foods Ketu ko bhadkaate hain.");
+
+    return {
+      context: "health",
+      titleHinglish: "🩺 Health, Longevity & Disease Neutralization Dossier",
+      subtitleHinglish: `6th Lord: ${h6Lord} · 8th Lord: ${h8Lord} · Vitality: Sun`,
+      primaryRationaleHinglish: "Sharir me bimari 6th aur 8th house ke aktiv hone se aati hai. Yahan ratna pehanna ghatak hota hai; kewal daan, aushadhi daan, aur niyamit mantra se hi sharir ki raksha hoti hai.",
+      signifiedHouses: [6, 8, 1, 12],
+      activatedPlanets,
+      specialFormulas,
+      strictWarnings,
+      safePractices
+    };
+  }
+
+  // 6. TIER 3: CRITICAL KARMIC EMERGENCY (Debilitated & Dushtana Planets)
+  if (context === "emergency") {
+    const allPlanets: PlanetId[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    const afflictedPlanets: ContextualPlanetItem[] = [];
+    const strictWarnings: string[] = [];
+    const safePractices: string[] = [];
+
+    allPlanets.forEach((pName) => {
+      const pData = chart.planets[pName];
+      if (!pData) return;
+      const isDushtana = [6, 8, 12].includes(pData.house);
+      const isDebilitated = pData.dignity?.toLowerCase().includes("debilitat");
+      if (isDushtana || isDebilitated) {
+        const evalResult = evaluateCorePlanetRemedy(pName, chart);
+        if (evalResult && !evalResult.isFavorable) {
+          afflictedPlanets.push({
+            planet: pName,
+            roleHinglish: isDebilitated ? "Neech Grah (Severely Debilitated)" : `Trik Bhav Me Sthit (${pData.house}th House)`,
+            isFavorable: false,
+            placementSummary: evalResult.placementSummary,
+            recommendationType: "Mitigate_Charity_Afflicted",
+            primaryHeadline: evalResult.primaryHeadline,
+            evaluation: evalResult
+          });
+          strictWarnings.push(evalResult.gemstoneAdvice.strictWarning);
+        }
+      }
+    });
+
+    const specialFormulas: ContextualSpecialFormula[] = [
+      {
+        title: "Golden Emergency Rule: NEVER WEAR GEMSTONE",
+        badge: "Strict Shastra Law",
+        esotericSecretHinglish: "Transcript verbatim principle: Jo grah dushit, neech ya 6/8/12 me fasa hai, uska stone pehanna aag me ghee daalne jaisa hai! Aise grah ko shant karne ke liye kewal daan, jal pravah aur seva karein.",
+        itemsRequired: ["Strict restraint from gemstones"],
+        exactDosage: "Zero gemstone usage for afflicted planets",
+        timing: "Lifelong or dasha duration",
+        expectedResultHinglish: "Dhar-pakad, police cases, sudden hospitalisation aur bankruptcies se bachaav hota hai."
+      }
+    ];
+
+    safePractices.push("In peedit grahon ke rangon ke kapde dasha me pehanna band karein.");
+    safePractices.push("In grahon ki vastuon ka behte jal me pravah karein ya mandir/langar me daan karein.");
+
+    return {
+      context: "emergency",
+      titleHinglish: "⚡ Critical Karmic Repair Dossier (Peedit Grah)",
+      subtitleHinglish: `${afflictedPlanets.length} grah aapki kundli me vishesh daan aur shaanti maang rahe hain`,
+      primaryRationaleHinglish: "Yeh grah aapki kundli me neech ya dukh-sthan (6, 8, 12) me sthit hain. Bhale hi inki dasha abhi na chal rahi ho, background me inka dushprabhav rehta hai. Inka ratna bhulkar bhi na pehnein!",
+      signifiedHouses: [6, 8, 12],
+      activatedPlanets: afflictedPlanets,
+      specialFormulas,
+      strictWarnings,
+      safePractices
+    };
+  }
+
+  return null;
 }

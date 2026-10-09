@@ -24,7 +24,7 @@ import { scanMarriageWindows } from "../astro-engine/marriage-window-scanner";
 import { calculateLineageKarma } from "../astro-engine/lineage-karma";
 import { evaluateMarriageIntelligence } from "../astro-engine/marriage-intelligence";
 import { detectConditionalDashas } from "../astro-engine/marriage-timing-kn-rao";
-import { evaluateCorePlanetRemedy, getMoonSharingGuide } from "../astro-engine/core-planet-remedies";
+import { evaluateCorePlanetRemedy, getMoonSharingGuide, resolveContextualRemedies } from "../astro-engine/core-planet-remedies";
 import { buildMasterTransitRadarDossier } from "../astro-engine/property-transit-predictor";
 import type { DashaLord } from "../astro-engine/dasha";
 
@@ -579,6 +579,14 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
       ? transitRadar.bnnTransitConjunctions.map((b) => `✦ Shani + Natal ${b.natalPlanet} in ${b.transitSignName} (H${b.houseNumber}): ${b.esotericMeaningHinglish}`).join("\n  ")
       : "✦ No direct natal planet conjunction in transit Aquarius sign.";
 
+    const dashaContext = resolveContextualRemedies("dasha", chart);
+    const dashaFormulasStr = dashaContext?.specialFormulas.length
+      ? dashaContext.specialFormulas.map((f) => `✦ ${f.title}: ${f.exactDosage} (${f.timing}) — ${f.expectedResultHinglish}`).join("\n  ")
+      : "✦ Standard dasha regimen.";
+    const dashaWarningsStr = dashaContext?.strictWarnings.length
+      ? dashaContext.strictWarnings.join("; ")
+      : "No contraindication alerts.";
+
     sections.push(`### 19. CORE PLANET REMEDIES, SATURN 7TH HOUSE GROWTH RADAR & PROPERTY PREDICTOR
 - Active Dasha Planet (${mdPlanet}):
   ✦ Dignity Status: ${coreRemedy?.isFavorable ? "FAVORABLE (Power-Up / Gemstone Allowed)" : "AFFLICTED / DUSHTANA (Mitigation / NEVER Wear Gemstone!)"}
@@ -586,6 +594,9 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
   ✦ Gemstone Ruling: ${coreRemedy?.gemstoneAdvice.canWearStone ? `Wear ${coreRemedy.gemstoneAdvice.stoneDetails?.name} on ${coreRemedy.gemstoneAdvice.stoneDetails?.finger} (${coreRemedy.gemstoneAdvice.stoneDetails?.metal})` : "NEVER WEAR GEMSTONE (Charity & Mantra Japa only!)"}
   ✦ Elemental Disposal Vehicle: ${coreRemedy?.elementalDisposalRule.actionTitleHinglish} (${coreRemedy?.elementalDisposalRule.trikonaName}) — ${coreRemedy?.elementalDisposalRule.actionExplanationHinglish}
   ✦ Charity Dosages: ${coreRemedy?.charityFormulas.map((c) => `${c.item} [${c.quantity}] on ${c.day} to ${c.targetRecipient}`).join("; ") || "None (Favorable planet — do japa and arghya)"}
+- Contextual Dasha Special Formulas & Prohibitions:
+  ${dashaFormulasStr}
+  ✦ Strict Warnings: ${dashaWarningsStr}
 - Moon Psychological Heart-Sharing Sanctuary (Moon in H${moonH} ${moonSign}):
   ✦ Designated Confidant: ${moonGuide.confidantTitleHinglish}
   ✦ Emotional Principle: ${moonGuide.narrativeHinglish}

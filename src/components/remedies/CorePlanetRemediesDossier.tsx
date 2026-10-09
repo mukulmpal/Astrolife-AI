@@ -12,9 +12,11 @@ import {
   evaluateCorePlanetRemedy,
   getMoonSharingGuide,
   evaluateConjunctionInHouse,
+  resolveContextualRemedies,
   type PlanetId,
   type EvaluatedCorePlanetRemedy,
-  type MoonSharingGuidance
+  type MoonSharingGuidance,
+  type ContextualRemedyResponse
 } from "@/lib/astro-engine/core-planet-remedies";
 import {
   buildMasterTransitRadarDossier,
@@ -36,7 +38,11 @@ import {
   AlertTriangle,
   Clock,
   CheckCircle2,
-  Gift
+  Gift,
+  Heart,
+  Briefcase,
+  Activity,
+  Zap
 } from "lucide-react";
 
 interface CorePlanetRemediesDossierProps {
@@ -44,12 +50,182 @@ interface CorePlanetRemediesDossierProps {
   compact?: boolean;
 }
 
+function ContextualDomainCard({ response }: { response: ContextualRemedyResponse | null }) {
+  if (!response) return null;
+  return (
+    <div>
+      {/* Primary Narrative & Rationale Banner */}
+      <div
+        style={{
+          borderRadius: 16,
+          background: "linear-gradient(135deg, #FFFDF8 0%, #FDF8EE 100%)",
+          border: "1px solid rgba(200, 160, 48, 0.4)",
+          padding: 22,
+          marginBottom: 20,
+          boxShadow: "0 4px 18px rgba(184, 134, 11, 0.06)"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 10 }}>
+          <h3 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#1F2937", fontFamily: "serif" }}>
+            {response.titleHinglish}
+          </h3>
+          <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 20, background: "rgba(200, 160, 48, 0.15)", color: "#875C06", border: "1px solid rgba(200, 160, 48, 0.3)" }}>
+            {response.subtitleHinglish}
+          </span>
+        </div>
+        <p style={{ fontSize: 14, color: "#4B5563", lineHeight: 1.7, margin: 0 }}>
+          {response.primaryRationaleHinglish}
+        </p>
+      </div>
+
+      {/* Activated Planets Section */}
+      <div style={{ marginBottom: 24 }}>
+        <h4 style={{ fontSize: 14, fontWeight: 800, color: "#875C06", letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>
+          ✦ Activated Planets &amp; Bhava Sthiti ({response.activatedPlanets.length} Grah Sakriya)
+        </h4>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 14 }}>
+          {response.activatedPlanets.map((item) => (
+            <div
+              key={item.planet}
+              style={{
+                borderRadius: 14,
+                background: "#FFFFFF",
+                border: item.isFavorable ? "1px solid rgba(34, 197, 94, 0.35)" : "1px solid rgba(239, 68, 68, 0.35)",
+                padding: 16,
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.03)"
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <strong style={{ fontSize: 15, color: "#111827" }}>
+                  {item.planet} · <span style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>{item.roleHinglish}</span>
+                </strong>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: "2px 8px",
+                    borderRadius: 12,
+                    background: item.isFavorable ? "rgba(34, 197, 94, 0.15)" : "rgba(239, 68, 68, 0.15)",
+                    color: item.isFavorable ? "#059669" : "#DC2626"
+                  }}
+                >
+                  {item.isFavorable ? "✦ Shubh (Power-Up)" : "⚠️ Peedit (Mitigate)"}
+                </span>
+              </div>
+              <div style={{ fontSize: 12.5, color: "#4B5563", marginBottom: 8, lineHeight: 1.5 }}>
+                {item.placementSummary}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: item.isFavorable ? "#065F46" : "#991B1B",
+                  background: item.isFavorable ? "rgba(34, 197, 94, 0.08)" : "rgba(239, 68, 68, 0.08)",
+                  padding: "6px 10px",
+                  borderRadius: 6
+                }}
+              >
+                {item.isFavorable
+                  ? `✓ Ratna: ${item.evaluation.gemstoneAdvice.stoneDetails?.name || "Supportive Stone"}`
+                  : `⛔ ${item.evaluation.gemstoneAdvice.strictWarning}`}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Special Classical Secret Formulas Grid */}
+      {response.specialFormulas.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <h4 style={{ fontSize: 14, fontWeight: 800, color: "#1F2937", letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+            <Flame size={16} color="#DC2626" />
+            <span>Transcript Classical Secret Formulas &amp; Micro-Totke</span>
+          </h4>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
+            {response.specialFormulas.map((f, idx) => (
+              <div
+                key={idx}
+                style={{
+                  borderRadius: 14,
+                  background: "#FFFFFF",
+                  border: "1px solid rgba(200, 160, 48, 0.35)",
+                  padding: 18,
+                  boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)"
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                  <h5 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#111827" }}>{f.title}</h5>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: "rgba(200, 160, 48, 0.15)", color: "#875C06" }}>
+                    {f.badge}
+                  </span>
+                </div>
+                <p style={{ fontSize: 13, color: "#4B5563", lineHeight: 1.6, marginBottom: 10 }}>
+                  {f.esotericSecretHinglish}
+                </p>
+                <div style={{ background: "rgba(200, 160, 48, 0.06)", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#374151", marginBottom: 8, lineHeight: 1.5 }}>
+                  <div><strong>Samagri (Items):</strong> {f.itemsRequired.join(", ")}</div>
+                  <div><strong>Nirdharit Matra:</strong> {f.exactDosage}</div>
+                  <div><strong>Samay / Muhurat:</strong> {f.timing}</div>
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#059669" }}>
+                  ✦ Anubhoot Parinam: {f.expectedResultHinglish}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Warnings & Safe Practices */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+        {response.strictWarnings.length > 0 && (
+          <div style={{ borderRadius: 12, background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.3)", padding: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, color: "#DC2626", fontWeight: 700, fontSize: 12 }}>
+              <AlertTriangle size={15} />
+              <span>STRICT WARNINGS (Kya Nahi Karna)</span>
+            </div>
+            {response.strictWarnings.map((w, i) => (
+              <div key={i} style={{ fontSize: 12, color: "#7F1D1D", lineHeight: 1.5, marginBottom: 4 }}>
+                • {w}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {response.safePractices.length > 0 && (
+          <div style={{ borderRadius: 12, background: "rgba(34, 197, 94, 0.06)", border: "1px solid rgba(34, 197, 94, 0.3)", padding: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, color: "#059669", fontWeight: 700, fontSize: 12 }}>
+              <CheckCircle2 size={15} />
+              <span>SAFE PRACTICES (Shubh Karmic Upay)</span>
+            </div>
+            {response.safePractices.map((p, i) => (
+              <div key={i} style={{ fontSize: 12, color: "#065F46", lineHeight: 1.5, marginBottom: 4 }}>
+                • {p}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function CorePlanetRemediesDossier({
   chart,
   compact = false
 }: CorePlanetRemediesDossierProps) {
   const [activeTab, setActiveTab] = useState<
-    "core_dasha" | "saturn_growth" | "property_radar" | "moon_sanctuary" | "bnn_conjunctions" | "all_9_planets"
+    | "core_dasha"
+    | "property_domain"
+    | "marriage_domain"
+    | "career_domain"
+    | "health_domain"
+    | "emergency_domain"
+    | "saturn_growth"
+    | "property_radar"
+    | "moon_sanctuary"
+    | "bnn_conjunctions"
+    | "all_9_planets"
   >("core_dasha");
   const [expanded, setExpanded] = useState(!compact);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetId>("Sun");
@@ -70,14 +246,21 @@ export function CorePlanetRemediesDossier({
     return evaluateCorePlanetRemedy(selectedPlanet, chart);
   }, [selectedPlanet, chart]);
 
-  // 4. Moon Sharing Guidance
+  // 4. Contextual Life-Domain Remedy Resolutions
+  const contextualProperty = useMemo(() => resolveContextualRemedies("property", chart), [chart]);
+  const contextualMarriage = useMemo(() => resolveContextualRemedies("marriage", chart), [chart]);
+  const contextualCareer = useMemo(() => resolveContextualRemedies("career", chart), [chart]);
+  const contextualHealth = useMemo(() => resolveContextualRemedies("health", chart), [chart]);
+  const contextualEmergency = useMemo(() => resolveContextualRemedies("emergency", chart), [chart]);
+
+  // 5. Moon Sharing Guidance
   const moonHouse = chart?.planets?.Moon?.house || 4;
   const moonSign = chart?.planets?.Moon?.sign || "Cancer";
   const moonGuide: MoonSharingGuidance = useMemo(() => {
     return getMoonSharingGuide(moonHouse, moonSign);
   }, [moonHouse, moonSign]);
 
-  // 5. Master Transit Radar Report
+  // 6. Master Transit Radar Report
   const transitRadar: MasterTransitRadarReport | null = useMemo(() => {
     return buildMasterTransitRadarDossier(chart);
   }, [chart]);
@@ -218,11 +401,117 @@ export function CorePlanetRemediesDossier({
             borderBottom: activeTab === "core_dasha" ? "3px solid #875C06" : "3px solid transparent",
             display: "flex",
             alignItems: "center",
-            gap: 6
+            gap: 6,
+            whiteSpace: "nowrap"
           }}
         >
           <Award size={15} color={activeTab === "core_dasha" ? "#875C06" : "#6B635B"} />
-          <span>1. Dasha Grah Shaktikaran</span>
+          <span>1. Active Dasha &amp; Antardasha</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("property_domain")}
+          style={{
+            padding: "10px 16px",
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 700,
+            color: activeTab === "property_domain" ? "#875C06" : "#6B635B",
+            borderBottom: activeTab === "property_domain" ? "3px solid #875C06" : "3px solid transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap"
+          }}
+        >
+          <Home size={15} color={activeTab === "property_domain" ? "#875C06" : "#6B635B"} />
+          <span>2. Property &amp; Land</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("marriage_domain")}
+          style={{
+            padding: "10px 16px",
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 700,
+            color: activeTab === "marriage_domain" ? "#875C06" : "#6B635B",
+            borderBottom: activeTab === "marriage_domain" ? "3px solid #875C06" : "3px solid transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap"
+          }}
+        >
+          <Heart size={15} color={activeTab === "marriage_domain" ? "#875C06" : "#6B635B"} />
+          <span>3. Marriage &amp; Love</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("career_domain")}
+          style={{
+            padding: "10px 16px",
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 700,
+            color: activeTab === "career_domain" ? "#875C06" : "#6B635B",
+            borderBottom: activeTab === "career_domain" ? "3px solid #875C06" : "3px solid transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap"
+          }}
+        >
+          <Briefcase size={15} color={activeTab === "career_domain" ? "#875C06" : "#6B635B"} />
+          <span>4. Career &amp; Karma</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("health_domain")}
+          style={{
+            padding: "10px 16px",
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 700,
+            color: activeTab === "health_domain" ? "#875C06" : "#6B635B",
+            borderBottom: activeTab === "health_domain" ? "3px solid #875C06" : "3px solid transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap"
+          }}
+        >
+          <Activity size={15} color={activeTab === "health_domain" ? "#875C06" : "#6B635B"} />
+          <span>5. Health &amp; Crisis</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("emergency_domain")}
+          style={{
+            padding: "10px 16px",
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 700,
+            color: activeTab === "emergency_domain" ? "#DC2626" : "#6B635B",
+            borderBottom: activeTab === "emergency_domain" ? "3px solid #DC2626" : "3px solid transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap"
+          }}
+        >
+          <Zap size={15} color={activeTab === "emergency_domain" ? "#DC2626" : "#6B635B"} />
+          <span>6. Karmic Repair (Peedit)</span>
         </button>
 
         <button
@@ -238,11 +527,12 @@ export function CorePlanetRemediesDossier({
             borderBottom: activeTab === "saturn_growth" ? "3px solid #875C06" : "3px solid transparent",
             display: "flex",
             alignItems: "center",
-            gap: 6
+            gap: 6,
+            whiteSpace: "nowrap"
           }}
         >
           <TrendingUp size={15} color={activeTab === "saturn_growth" ? "#875C06" : "#6B635B"} />
-          <span>2. Shani 7th Bhav Growth Radar</span>
+          <span>7. Shani 7th Bhav Radar</span>
         </button>
 
         <button
@@ -258,11 +548,12 @@ export function CorePlanetRemediesDossier({
             borderBottom: activeTab === "property_radar" ? "3px solid #875C06" : "3px solid transparent",
             display: "flex",
             alignItems: "center",
-            gap: 6
+            gap: 6,
+            whiteSpace: "nowrap"
           }}
         >
-          <Home size={15} color={activeTab === "property_radar" ? "#875C06" : "#6B635B"} />
-          <span>3. Makaan / Property Timing (4-11-12)</span>
+          <Compass size={15} color={activeTab === "property_radar" ? "#875C06" : "#6B635B"} />
+          <span>8. Property Timing 4-11-12</span>
         </button>
 
         <button
@@ -278,11 +569,12 @@ export function CorePlanetRemediesDossier({
             borderBottom: activeTab === "moon_sanctuary" ? "3px solid #875C06" : "3px solid transparent",
             display: "flex",
             alignItems: "center",
-            gap: 6
+            gap: 6,
+            whiteSpace: "nowrap"
           }}
         >
           <HeartHandshake size={15} color={activeTab === "moon_sanctuary" ? "#875C06" : "#6B635B"} />
-          <span>4. Chandra Manovigyan &amp; Dil Ki Baat</span>
+          <span>9. Chandra Sanctuary</span>
         </button>
 
         <button
@@ -298,11 +590,12 @@ export function CorePlanetRemediesDossier({
             borderBottom: activeTab === "bnn_conjunctions" ? "3px solid #875C06" : "3px solid transparent",
             display: "flex",
             alignItems: "center",
-            gap: 6
+            gap: 6,
+            whiteSpace: "nowrap"
           }}
         >
           <Sparkles size={15} color={activeTab === "bnn_conjunctions" ? "#875C06" : "#6B635B"} />
-          <span>5. BNN Gochar Conjunctions</span>
+          <span>10. Conjunctions</span>
         </button>
 
         <button
@@ -318,11 +611,12 @@ export function CorePlanetRemediesDossier({
             borderBottom: activeTab === "all_9_planets" ? "3px solid #875C06" : "3px solid transparent",
             display: "flex",
             alignItems: "center",
-            gap: 6
+            gap: 6,
+            whiteSpace: "nowrap"
           }}
         >
           <BookOpen size={15} color={activeTab === "all_9_planets" ? "#875C06" : "#6B635B"} />
-          <span>6. Sampurna 9 Grah Pustika</span>
+          <span>11. All 9 Planets Registry</span>
         </button>
       </div>
 
@@ -655,6 +949,31 @@ export function CorePlanetRemediesDossier({
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB: PROPERTY DOMAIN */}
+          {activeTab === "property_domain" && (
+            <ContextualDomainCard response={contextualProperty} />
+          )}
+
+          {/* TAB: MARRIAGE DOMAIN */}
+          {activeTab === "marriage_domain" && (
+            <ContextualDomainCard response={contextualMarriage} />
+          )}
+
+          {/* TAB: CAREER DOMAIN */}
+          {activeTab === "career_domain" && (
+            <ContextualDomainCard response={contextualCareer} />
+          )}
+
+          {/* TAB: HEALTH DOMAIN */}
+          {activeTab === "health_domain" && (
+            <ContextualDomainCard response={contextualHealth} />
+          )}
+
+          {/* TAB: EMERGENCY KARMIC REPAIR */}
+          {activeTab === "emergency_domain" && (
+            <ContextualDomainCard response={contextualEmergency} />
           )}
 
           {/* TAB 2: SATURN 7TH HOUSE GROWTH RADAR */}
