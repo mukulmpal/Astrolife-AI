@@ -30,6 +30,8 @@ import {
   type MarriageDirectionResult,
   type D1toD9CrossMapping,
   type MarriageRemedyItem,
+  type Kalpurush7thRashiAnchor,
+  type SeventhHouseOccupantNLAnalysis,
 } from "./marriage-intelligence";
 import {
   analyzeMarriageTimingKNRao,
@@ -82,6 +84,16 @@ export interface MasterMarriageReport {
     verdict: string;
     details: string;
   };
+  kalpurush7thAudit: {
+    partner1: Kalpurush7thRashiAnchor;
+    partner2: Kalpurush7thRashiAnchor;
+    meetingChannelPartner1: string;
+    meetingChannelPartner2: string;
+    maritalBalancePartner1: string;
+    maritalBalancePartner2: string;
+    karmicSynthesisHinglish: string;
+    weddingCharityRemedy?: string;
+  };
   d9NavamshaCrossAudit: {
     partner1D9Lagna: string;
     partner2D9Lagna: string;
@@ -111,6 +123,11 @@ export interface MasterMarriageReport {
       caution?: string;
     };
     synthesis: string;
+  };
+  seventhHouseNakshatraAudit: {
+    partner1: SeventhHouseOccupantNLAnalysis;
+    partner2: SeventhHouseOccupantNLAnalysis;
+    synthesisHinglish: string;
   };
   punarbuAudit: {
     partner1Detected: boolean;
@@ -439,6 +456,24 @@ export function generateMasterMarriageReport(
   const mi1: MarriageIntelligenceReport = evaluateMarriageIntelligence(chart1);
   const mi2: MarriageIntelligenceReport = evaluateMarriageIntelligence(chart2);
 
+  // ── 3B. Kalpurush 7th Rashi (Libra / तुला) Cosmic Marriage Anchor ──────────
+  const k7p1 = mi1.kalpurush7thAnchor;
+  const k7p2 = mi2.kalpurush7thAnchor;
+
+  const charityRemedy =
+    k7p1.venus12thRemedyHinglish || k7p2.venus12thRemedyHinglish || undefined;
+
+  const kalpurush7thAudit: MasterMarriageReport["kalpurush7thAudit"] = {
+    partner1: k7p1,
+    partner2: k7p2,
+    meetingChannelPartner1: `${k7p1.meetingChannelTitleHinglish} (House ${k7p1.d1House})`,
+    meetingChannelPartner2: `${k7p2.meetingChannelTitleHinglish} (House ${k7p2.d1House})`,
+    maritalBalancePartner1: k7p1.maritalBalanceDomainHinglish,
+    maritalBalancePartner2: k7p2.maritalBalanceDomainHinglish,
+    karmicSynthesisHinglish: `${p1Name} की कुंडली में कालपुरुष की ७वीं राशि (तुला) भाव ${k7p1.d1House} में है तथा ${p2Name} में भाव ${k7p2.d1House} में है। यह दोनों के जीवनसाथी प्राप्ति के कर्म और दांपत्य संतुलन के तराजू को सटीक रूप से इंगित करता है।`,
+    weddingCharityRemedy: charityRemedy,
+  };
+
   // ── 4. D9 Navamsha Cross-Audit ───────────────────────────────────────────────
   const d9Idx1 = SIGNS_LIST.indexOf(p1D9Lagna);
   const d9Idx2 = SIGNS_LIST.indexOf(p2D9Lagna);
@@ -516,6 +551,15 @@ export function generateMasterMarriageReport(
       caution: mi2.meetingContext.caution,
     },
     synthesis: `${p1Name} के 7th CSL के नक्षत्र स्वामी (${p1StarLord} - भाव ${p1House}) तथा ${p2Name} के 7th CSL (${p2StarLord} - भाव ${p2House}) वैवाहिक बंधन व सामाजिक सम्मान को सुदृढ़ आधार प्रदान करते हैं।`,
+  };
+
+  // ── 5B. 7th House Occupant Planet's Nakshatra Lord Mapping ─────────────────
+  const sn1 = mi1.seventhHouseOccupantsNL;
+  const sn2 = mi2.seventhHouseOccupantsNL;
+  const seventhHouseNakshatraAudit: MasterMarriageReport["seventhHouseNakshatraAudit"] = {
+    partner1: sn1,
+    partner2: sn2,
+    synthesisHinglish: `${p1Name}: ${sn1.synthesisHinglish} | ${p2Name}: ${sn2.synthesisHinglish}`,
   };
 
   // ── 6. Punarbu / Punarphoo Yoga Audit ───────────────────────────────────────
@@ -609,13 +653,23 @@ export function generateMasterMarriageReport(
     },
   ];
 
+  if (charityRemedy) {
+    practicalRemedies.push({
+      category: "Venus",
+      title: "गरीब विवाह सहयोग दान (12th House Venus Shastra Upay)",
+      procedure: charityRemedy,
+      caution: "अहंकार रहित होकर गुप्त रूप से सहयोग करें।",
+      astrologicalRationale: "गुरुजी के व्याख्यान का सूत्र: 12वें भाव से जुड़े शुक्र/तुला का दान करने से शयन सुख की रक्षा होती है और अनावश्यक खर्च व अस्पताल का भय कटता है।",
+    });
+  }
+
   // ── Executive Summaries ─────────────────────────────────────────────────────
   const weddingDateStr = weddingDate || "प्रस्तावित विवाह तिथि";
   const nadiStatus = nadiKoot && !nadiKoot.hasDosha ? "शून्य" : "न्यूनतम / परिहार समर्थित";
 
-  const executiveSummaryHindi = `${p1Name} और ${p2Name} का अष्टकूट मिलान 36 में से ${ashtakootScore} गुण (${tierTitleHindi}) है, जिसमें नाड़ी दोष ${nadiStatus} है। मांगलिक स्तर पर ${p1Paap} vs ${p2Paap} अंक की ${mangalSamyam.balanceLevel} है। नवांश (D9) में दोनों के लग्न ${axisRel} में स्थित हैं तथा 12वां भाव शयन-सुख स्तर ${overallH12 === "harmonious" ? "अनुकूल" : "सामान्य"} है। ${weddingDateStr} पर गोचर व दशा का प्रभाव संबंध को सकारात्मक संबल प्रदान करता है।`;
+  const executiveSummaryHindi = `${p1Name} और ${p2Name} का अष्टकूट मिलान 36 में से ${ashtakootScore} गुण (${tierTitleHindi}) है, जिसमें नाड़ी दोष ${nadiStatus} है। मांगलिक स्तर पर ${p1Paap} vs ${p2Paap} अंक की ${mangalSamyam.balanceLevel} है। कालपुरुष की ७वीं राशि (तुला) दोनों के दांपत्य संतुलन को भाव ${k7p1.d1House} व ${k7p2.d1House} से जोड़ती है। नवांश (D9) में दोनों के लग्न ${axisRel} में स्थित हैं तथा 12वां भाव शयन-सुख स्तर ${overallH12 === "harmonious" ? "अनुकूल" : "सामान्य"} है। ${weddingDateStr} पर गोचर व दशा का प्रभाव संबंध को सकारात्मक संबल प्रदान करता है।`;
 
-  const executiveSummaryEnglish = `${p1Name} and ${p2Name} possess an Ashtakoot compatibility of ${ashtakootScore} / 36 Gunas (${tierTitleHindi}) with ${nadiKoot && !nadiKoot.hasDosha ? "zero" : "remedied"} Nadi dosha. The Manglik paap balance is ${p1Paap} vs ${p2Paap} (${mangalSamyam.balanceLevel}). In the D9 Navamsha, their ascendants form an auspicious ${axisRel} alignment with ${overallH12} 12th house dynamics. The transit alignment around ${weddingDateStr} supports long-term harmony and mutual prosperity.`;
+  const executiveSummaryEnglish = `${p1Name} and ${p2Name} possess an Ashtakoot compatibility of ${ashtakootScore} / 36 Gunas (${tierTitleHindi}) with ${nadiKoot && !nadiKoot.hasDosha ? "zero" : "remedied"} Nadi dosha. The Manglik paap balance is ${p1Paap} vs ${p2Paap} (${mangalSamyam.balanceLevel}). Kalpurush 7th sign (Libra) aligns with House ${k7p1.d1House} and ${k7p2.d1House}. In the D9 Navamsha, their ascendants form an auspicious ${axisRel} alignment with ${overallH12} 12th house dynamics. The transit alignment around ${weddingDateStr} supports long-term harmony and mutual prosperity.`;
 
   return {
     id: `MMR-${Date.now()}`,
@@ -635,8 +689,10 @@ export function generateMasterMarriageReport(
       pariharas,
     },
     mangalSamyam,
+    kalpurush7thAudit,
     d9NavamshaCrossAudit,
     kpDynamics,
+    seventhHouseNakshatraAudit,
     punarbuAudit,
     separativeAndDirections,
     d1ToD9Mapping,

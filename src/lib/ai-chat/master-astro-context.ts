@@ -6,6 +6,7 @@
 import type { ChartData } from "../astro-engine/calculations";
 import { runNavtaraIntelligence } from "../astro-engine/navtara-engine";
 import { resolvePlanetTattvaRemedy } from "../astro-engine/navtara-remedies";
+import { buildNakshatraRemedyLlmPromptBlock } from "../astro-engine/nakshatra-remedy-engine";
 import { evaluateDashaActivationWindows } from "../astro-engine/transit-trigger";
 import { runKPEngine } from "../astro-engine/kp";
 import { calculateLalKitab } from "../astro-engine/lalkitab";
@@ -132,6 +133,16 @@ ${tattvaRemedyText ? `- Remedial Prescription: ${tattvaRemedyText}` : ""}
 ${triggerWindowsText ? `- Dasha Transit Triggers: ${triggerWindowsText}` : ""}`);
   } catch (err) {
     console.warn("[MasterAstroContext] Navtara error:", err);
+  }
+
+  // ── 2B. AUTHENTIC NAKSHATRA & ELEMENTAL REMEDY INTELLIGENCE ─────────────────
+  try {
+    const nakshatraRemedyBlock = buildNakshatraRemedyLlmPromptBlock(chart);
+    if (nakshatraRemedyBlock) {
+      sections.push(nakshatraRemedyBlock);
+    }
+  } catch (err) {
+    console.warn("[MasterAstroContext] Nakshatra remedy block error:", err);
   }
 
   // ── 3. KP SYSTEM (KRISHNAMURTI PADDHATI) ────────────────────────────────────

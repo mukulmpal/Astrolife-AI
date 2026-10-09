@@ -18,6 +18,7 @@ import { calculateCosmicPulse } from "@/lib/astro-engine/cosmic-pulse";
 import { buildRadarHorizons } from "@/lib/astro-engine/cosmic-pulse/forecast";
 import { CosmicPulseCard, CosmicRadar } from "@/components/cosmic-pulse";
 import { AajKaTaraCard } from "@/components/dasha/AajKaTaraCard";
+import { NakshatraRemedyDossierCard } from "@/components/remedies/NakshatraRemedyDossierCard";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -765,6 +766,9 @@ function DashboardContent() {
             <AajKaTaraCard chart={chart} />
           </div>
 
+          {/* AUTHENTIC NAKSHATRA REMEDY & PERSONALITY DOSSIER CARD */}
+          <NakshatraRemedyDossierCard chart={chart} />
+
           {/* COSMIC RADAR MULTI-HORIZON FORECAST */}
           <CosmicRadar horizons={dailyFeed.cosmicRadarHorizons} />
 
@@ -1054,29 +1058,32 @@ function DashboardContent() {
           )}
 
           {activeTab === "remedies" && (
-          <div className="card" style={{ marginBottom: 24 }}>
-            <div className="card-tag">✦ Daily Personal Feed</div>
-            <div className="card-title serif">Actionables for today</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12 }}>
-              <div className="today-summary-card">
-                <div className="today-summary-k">Panchang</div>
-                <div className="today-summary-v">{dailyFeed.panchang.tithi} · {dailyFeed.panchang.nakshatra} · {dailyFeed.panchang.yoga}</div>
-                <div className="today-summary-hint">Moon {dailyFeed.panchang.moonSign} · {dailyFeed.panchang.paksha} Paksha</div>
-              </div>
-              <div className="today-summary-card">
-                <div className="today-summary-k">Transit Pulse</div>
-                <div className="today-summary-v">Best focus: {dailyFeed.topArea.area}</div>
-                <div className="today-summary-hint">{dailyFeed.oppCount} opportunities · {dailyFeed.cautionCount} cautions</div>
-              </div>
-              <div className="today-summary-card">
-                <div className="today-summary-k">7-Day Radar</div>
-                <div className="today-summary-v">Best day: {dailyFeed.radar.bestDay.label} · Caution: {dailyFeed.radar.cautionDay.label}</div>
-                <div className="today-summary-hint">Transit cycle alignment overview</div>
-              </div>
-              <div className="today-summary-card">
-                <div className="today-summary-k">Remedy</div>
-                <div className="today-summary-v">{dailyFeed.radar.days[0]?.remedy ?? "Keep routine stable and avoid impulsive reactions."}</div>
-                <div className="today-summary-hint"><Link href="/dashboard/event-radar" style={{ color: "#c8a030", textDecoration: "none" }}>Open Event Radar →</Link></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 24 }}>
+            <NakshatraRemedyDossierCard chart={chart} />
+            <div className="card">
+              <div className="card-tag">✦ Daily Personal Feed</div>
+              <div className="card-title serif">Actionables for today</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12 }}>
+                <div className="today-summary-card">
+                  <div className="today-summary-k">Panchang</div>
+                  <div className="today-summary-v">{dailyFeed.panchang.tithi} · {dailyFeed.panchang.nakshatra} · {dailyFeed.panchang.yoga}</div>
+                  <div className="today-summary-hint">Moon {dailyFeed.panchang.moonSign} · {dailyFeed.panchang.paksha} Paksha</div>
+                </div>
+                <div className="today-summary-card">
+                  <div className="today-summary-k">Transit Pulse</div>
+                  <div className="today-summary-v">Best focus: {dailyFeed.topArea.area}</div>
+                  <div className="today-summary-hint">{dailyFeed.oppCount} opportunities · {dailyFeed.cautionCount} cautions</div>
+                </div>
+                <div className="today-summary-card">
+                  <div className="today-summary-k">7-Day Radar</div>
+                  <div className="today-summary-v">Best day: {dailyFeed.radar.bestDay.label} · Caution: {dailyFeed.radar.cautionDay.label}</div>
+                  <div className="today-summary-hint">Transit cycle alignment overview</div>
+                </div>
+                <div className="today-summary-card">
+                  <div className="today-summary-k">Remedy</div>
+                  <div className="today-summary-v">{dailyFeed.radar.days[0]?.remedy ?? "Keep routine stable and avoid impulsive reactions."}</div>
+                  <div className="today-summary-hint"><Link href="/dashboard/event-radar" style={{ color: "#c8a030", textDecoration: "none" }}>Open Event Radar →</Link></div>
+                </div>
               </div>
             </div>
           </div>

@@ -10,6 +10,7 @@ import type {
 } from "@/lib/astro-engine/transit-ripple/types";
 import { RippleRadar } from "./RippleRadar";
 import { TransitStoryPanel } from "./TransitStoryPanel";
+import { TransitShivlingStoryCard } from "./TransitShivlingStoryCard";
 
 const DEFAULT_NATAL_INPUT: NatalInput = {
   birthDate: "1990-08-15",
@@ -86,7 +87,7 @@ export function TransitRipplePanelV2() {
   const { chart, hasUserChart } = useUserChart();
 
   // Navigation & selection state
-  const [activeTab, setActiveTab] = useState<"radar" | "story" | "timeline">("radar");
+  const [activeTab, setActiveTab] = useState<"radar" | "story" | "timeline" | "shivling">("radar");
   const [selectedPlanet, setSelectedPlanet] = useState<TransitPlanet>("Saturn");
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [language, setLanguage] = useState<"hinglish" | "english">("hinglish");
@@ -331,6 +332,28 @@ export function TransitRipplePanelV2() {
           <span>📅</span>
           <span>30d Timeline</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("shivling")}
+          style={{
+            background: activeTab === "shivling" ? "#FFFFFF" : "transparent",
+            borderColor: activeTab === "shivling" ? "#B8860B" : "transparent",
+            color: activeTab === "shivling" ? "#8C6508" : "#5C5248",
+            boxShadow:
+              activeTab === "shivling"
+                ? "0 2px 6px rgba(184, 134, 11, 0.18)"
+                : "none",
+          }}
+          className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold border transition-all"
+        >
+          <span>🕉️</span>
+          <span>
+            {language === "hinglish"
+              ? "शिवलिंग गोचर उपाय (Shivling Upay)"
+              : "Shivling Transit Upay"}
+          </span>
+        </button>
       </div>
 
       {/* 3. Main Views */}
@@ -550,6 +573,16 @@ export function TransitRipplePanelV2() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Mode D: Shivling Gochar Upachara Tab */}
+      {activeTab === "shivling" && (
+        <div className="w-full max-w-4xl mx-auto">
+          <TransitShivlingStoryCard
+            chart={chart}
+            targetDate={new Date(scanDate + "T12:00:00")}
+          />
         </div>
       )}
     </div>

@@ -38,6 +38,41 @@ export interface Rashi7thImpactResult {
   warningOrRemedy?: string;
 }
 
+export interface Kalpurush7thRashiAnchor {
+  signNumber: number; // 7 (Libra / तुला)
+  signName: string;   // "Libra"
+  d1House: number;    // 1 to 12
+  d9House: number;    // 1 to 12
+  d1Occupants: string[];
+  d9Occupants: string[];
+  meetingChannelTitleHinglish: string;
+  meetingChannelNarrativeHinglish: string;
+  maritalBalanceDomainHinglish: string;
+  karmicAnchorAdviceHinglish: string;
+  venus12thRemedyApplicable: boolean;
+  venus12thRemedyHinglish?: string;
+}
+
+export interface SeventhHouseOccupantNLItem {
+  planet: string;
+  isOccupant: boolean; // true if sitting in H7, false if 7th lord fallback
+  planetSign: string;
+  nakshatra: string;
+  nakshatraLord: string;
+  nakshatraLordHouse: number;
+  nakshatraLordSign: string;
+  titleHinglish: string;
+  narrativeHinglish: string;
+  karmicAdviceHinglish: string;
+  remedyHinglish?: string;
+}
+
+export interface SeventhHouseOccupantNLAnalysis {
+  occupants: SeventhHouseOccupantNLItem[];
+  hasOccupants: boolean;
+  synthesisHinglish: string;
+}
+
 export interface D9HouseAffliction {
   house: number;
   sign: string;
@@ -151,6 +186,7 @@ export interface MarriageRemedyItem {
 export interface MarriageIntelligenceReport {
   meetingContext: MeetingContextResult;
   rashiImpact: Rashi7thImpactResult;
+  kalpurush7thAnchor: Kalpurush7thRashiAnchor;
   d9Audit: D9MarriageAuditResult;
   dualMarriage: DualMarriageResult;
   sanyasDenial: SanyasDenialResult;
@@ -159,6 +195,7 @@ export interface MarriageIntelligenceReport {
   separativeAudit: SeparativeInfluenceAudit;
   barrenAudit: BarrenSignsAudit;
   marriageDirection: MarriageDirectionResult;
+  seventhHouseOccupantsNL: SeventhHouseOccupantNLAnalysis;
   d1ToD9Mapping: D1toD9CrossMapping;
   remedies: MarriageRemedyItem[];
   executiveSummary: string;
@@ -290,6 +327,312 @@ const RASHI_7TH_IMPACT_MAP: Record<number, { domain: string; dynamics: string; c
     caution: "Can induce physical lethargy, fatigue, or need for private space/bed rest.",
   },
 };
+
+// ── Kalpurush 7th Rashi (Libra / तुला) Cosmic Marriage Anchor ───────────────
+// Based on oral discourse transcripts:
+// Where the 7th natural zodiac sign (Libra/तुला) sits indicates:
+// 1. Spouse Karmic Meeting Channel (जीवनसाथी किस माध्यम से आएगा)
+// 2. The Scales of Balance (दांपत्य का तराजू किस विषय पर संभलेगा)
+// 3. 12th House Venus/Libra Wedding Charity Remedy (गरीब की शादी का खर्च उठाना)
+
+interface Kalpurush7thMeta {
+  title: string;
+  narrative: string;
+  balanceDomain: string;
+  advice: string;
+}
+
+const KALPURUSH_7TH_HOUSE_MAP: Record<number, Kalpurush7thMeta> = {
+  1: {
+    title: "व्यक्तित्व व प्रत्यक्ष आकर्षण (Direct Self-Chosen Mirror)",
+    narrative: "आपकी लग्न कुंडली में ७वीं राशि (तुला) प्रथम भाव (H1) में है। इसका अर्थ है कि जीवनसाथी आपके व्यक्तित्व के पूरक दर्पण के रूप में सीधे सामने से आएगा। आपसी आकर्षण बहुत स्वाभाविक, स्पष्ट और सम्मोहक होगा।",
+    balanceDomain: "स्वयं की स्वतंत्रता बनाम रिश्ते का समर्पण। तुला तराजू है; अपने अहंकार को परे रखकर पार्टनर को बराबरी का अधिकार देना ही सबसे बड़ा संतुलन है।",
+    advice: "रिश्ते में अपनी पहचान न खोएं, लेकिन हर बड़े फैसले में पार्टनर की राय को खुद के बराबर सम्मान दें।",
+  },
+  2: {
+    title: "पारिवारिक सूत्र, वाणी व भोजन संस्कृति (Family Lineage & Shared Assets)",
+    narrative: "तुला राशि द्वितीय भाव (H2) में होने से जीवनसाथी पारिवारिक आयोजनों, खानदान के संपर्कों, बैंकिंग/फाइनेंस या खान-पान और व्यापारिक महफिलों से जुड़ता है।",
+    balanceDomain: "संयुक्त धन, वाणी की मिठास और परिवार के सदस्यों के बीच संतुलन। यहाँ कड़वी बोली पूरे दांपत्य की नींव हिला सकती है, जबकि मधुर वाणी इसे स्वर्ग बना देती है।",
+    advice: "ससुराल और अपने मायके/परिवार के बीच वित्तीय पारदर्शिता रखें। दोनों मिलकर संयुक्त बचत और सात्विक भोजन की आदत बनाएं।",
+  },
+  3: {
+    title: "सोशल मीडिया, ऑनलाइन मैट्रीमोनी व यात्रा (Digital & Communication Channel)",
+    narrative: "तुला राशि तृतीय भाव (H3) में है। जीवनसाथी डिजिटल प्लेटफॉर्म्स (Shaadi, Matrimony, Social Media), दैनिक कम्यूनिकेशन, छोटी यात्राओं, पड़ोस या भाई-बहनों/दोस्तों के माध्यम से ज़िंदगी में प्रवेश करेगा।",
+    balanceDomain: "रोज़मर्रा की बातचीत और साझा प्रयासों का संतुलन। यदि बातचीत में संवादहीनता (Silence) आ जाए, तो रिश्ते में अनावश्यक ठंडक आ सकती है।",
+    advice: "दिन में चाहे कितनी भी व्यस्तता हो, दिन के अंत में 15 मिनट खुलकर बात करें। संवाद कभी न टूटने दें।",
+  },
+  4: {
+    title: "गृहस्थ शांति, पैतृक स्थान व मातृक आशीर्वाद (Domestic Sanctuary & Roots)",
+    narrative: "तुला राशि चतुर्थ भाव (H4) में है। जीवनसाथी आपके गृहक्षेत्र, पैतृक स्थान, मातृक संपर्कों या घरेलू सुख-शांति के वातावरण से मिलेगा। घर का माहौल उनके आने से पूरी तरह बदल जाता है।",
+    balanceDomain: "माताजी/सास के साथ संबंध और घर के भीतर का शांति-संतुलन। बाहर के काम और घर के भीतर के निजी समय का संतुलन बनाना अनिवार्य होगा।",
+    advice: "घर के उत्तर-पूर्व या दक्षिण-पश्चिम कोने को स्वच्छ रखें। काम का तनाव कभी घर के शयनकक्ष में न लाएं।",
+  },
+  5: {
+    title: "प्रेम संबंध, शिक्षा, कला व पूर्व पुण्य (Romantic Affinity & Creative Sparks)",
+    narrative: "तुला राशि पंचम भाव (H5) में होने से यह प्रबल 'प्रेम विवाह' (Love Marriage) का योग बनाता है। जीवनसाथी कॉलेज, क्रिएटिव प्रोजेक्ट्स, कला/मनोरंजन या बौद्धिक परिचर्चाओं के दौरान दिल से जुड़ता है।",
+    balanceDomain: "रोमांस और व्यावहारिक ज़िम्मेदारियों के बीच संतुलन। शादी के 10 साल बाद भी रिश्ते में वही डेटिंग वाली ताजगी बनाए रखना आवश्यक है।",
+    advice: "एक-दूसरे के शौक़ और रचनात्मक सपनों का सम्मान करें। बच्चों के आने के बाद भी आपसी रोमांस को प्राथमिकता दें।",
+  },
+  6: {
+    title: "कार्यक्षेत्र, सेवा, साझा संघर्ष व अंधा विश्वास (Workplace, Daily Duty & Blind Faith)",
+    narrative: "तुला राशि छठे भाव (H6) में है। जीवनसाथी रोज़गार के स्थल (Daily workplace), किसी सर्विस या साझा संघर्ष के दौरान मिलता है। यहाँ व्याख्यान का 'Blind Faith' (अंधा विश्वास) का नियम लागू होता है।",
+    balanceDomain: "रोज़मर्रा की दिनचर्या, काम का बंटवारा और सेहत का संतुलन। यहाँ छोटी-छोटी गलतियों पर मीन-मेख निकालना या नुक़्ताचीनी करना सबसे बड़ा ज़हर है।",
+    advice: "पार्टनर पर अंधा भरोसा रखें, संशय न करें। रोज़मर्रा के कामों में सहयोग करें और घर में शमी या तुलसी का पौधा लगाएं।",
+  },
+  7: {
+    title: "कालपुरुष का परम प्राकृतिक संरेखण (The Natural Sacred Union)",
+    narrative: "तुला राशि प्राकृतिक रूप से सप्तम भाव (H7) में ही है (मेष लग्न)। यह दांपत्य का सबसे शुद्ध, क्लासिकल और पारंपरिक स्वरूप है। विवाह समाज और परिवार की सहमति से सम्मानजनक ढंग से होता है।",
+    balanceDomain: "परस्पर समानता और 50-50 की साझेदारी। न कोई बड़ा, न कोई छोटा—दोनों रथ के दो बराबर पहिए हैं।",
+    advice: "साझेदारी में किसी तीसरे व्यक्ति को दखल न देने दें। महादेव-पार्वती की युगल उपासना दांपत्य को अमर बनाती है।",
+  },
+  8: {
+    title: "आकस्मिक परिवर्तन, ससुराल का रहस्य व गूढ़ बंधन (Transformative & Deep Karmic Bond)",
+    narrative: "तुला राशि अष्टम भाव (H8) में है। विवाह जीवन में एक अप्रत्याशित मोड़ लेकर आता है। जीवनसाथी किसी बड़े जीवन-परिवर्तन के समय, ससुराल पक्ष के संपर्कों या किसी गोपनीय माध्यम से आता है।",
+    balanceDomain: "भावनात्मक गहराई, ससुराल की अपेक्षाएं और वित्तीय विरासत का संतुलन। मन में कोई गुप्त बात छिपाकर रखना शक की दीवार खड़ी कर सकता है।",
+    advice: "पार्टनर से कभी कोई वित्तीय या भावनात्मक बात न छिपाएं। मंगलवार/शनिवार को मौसमी फलों का दान अष्टम के भय को काटता है।",
+  },
+  9: {
+    title: "तीर्थ, धर्म, उच्च शिक्षा व भाग्योदय (Spiritual Grace & Fortune Awakening)",
+    narrative: "तुला राशि नवम भाव (H9) में है। विवाह होते ही साक्षात 'भाग्योदय' होता है—जैसे घर में लक्ष्मी का आगमन हो। जीवनसाथी किसी तीर्थ यात्रा, धार्मिक आयोजन, उच्च शिक्षा या गुरु के आशीर्वाद से मिलता है।",
+    balanceDomain: "धार्मिक मान्यताओं, जीवन मूल्यों और सांस्कृतिक पृष्ठभूमि का संतुलन। दोनों की सोच में उदारता होनी चाहिए।",
+    advice: "विवाह के बाद जीवनसाथी के साथ पवित्र धामों की यात्रा करें। बुजुर्गों और गुरुजनों का नित्य आशीर्वाद लें।",
+  },
+  10: {
+    title: "प्रोफेशनल प्रतिष्ठा, कॉर्पोरेट नेटवर्क व पॉवर कपल (Power Couple & Public Honor)",
+    narrative: "तुला राशि दशम भाव (H10) में है। जीवनसाथी आपके करियर, कॉर्पोरेट जगत, व्यावसायिक सम्मेलनों या कार्यक्षेत्र की शीर्ष ऊँचाइयों में मिलता है। आप दोनों मिलकर समाज में 'पॉवर कपल' बनते हैं।",
+    balanceDomain: "करियर की महत्वाकांक्षा और दांपत्य जीवन के समय का संतुलन। एक-दूसरे से प्रतिस्पर्धा करने के बजाय एक-दूसरे की सीढ़ी बनें।",
+    advice: "ऑफिस की सफलता का जश्न घर पर मनाएं, लेकिन घर के भीतर पद और ओहदे का रौब कभी न दिखाएं।",
+  },
+  11: {
+    title: "मित्र मंडली, कम्युनिटी व इच्छा पूर्ति (Fulfillment of Desires & Friends Circle)",
+    narrative: "तुला राशि एकादश भाव (H11) में है। जीवनसाथी आपके दोस्तों के ग्रुप, कम्युनिटी इवेंट्स, बड़े भाई-बहनों के संपर्कों या क्लब नेटवर्क से आता है। यह विवाह आपकी सबसे बड़ी दबी इच्छा को पूरा करता है।",
+    balanceDomain: "सामाजिक जीवन और निजी दांपत्य का संतुलन। बहुत ज़्यादा दोस्तों के बीच पार्टनर की उपेक्षा न हो।",
+    advice: "पार्टनर को हमेशा अपना सबसे करीबी दोस्त (Best Friend) बनाकर रखें। जब दोस्ती पक्की होगी, तो विवाह कभी नहीं डगमगाएगा।",
+  },
+  12: {
+    title: "दूरस्थ स्थान, विदेश, त्याग व विवाह दान (Foreign Lands, Spiritual Surrender & Sacred Charity)",
+    narrative: "तुला राशि द्वादश भाव (H12) में है। जीवनसाथी जन्मस्थान से बहुत दूर, विदेश, अन्य प्रांत, या किसी आध्यात्मिक/रिसर्च पृष्ठभूमि से आता है। यहाँ त्याग और निस्वार्थ प्रेम ही सफलता की कुंजी है।",
+    balanceDomain: "शयन सुख, खर्चों और निजी एकांत का संतुलन। यदि यहाँ लालच किया जाए या बातें छिपाई जाएं तो दूरियों का खतरा रहता है।",
+    advice: "गुरुजी का व्याख्यान सूत्र: किसी गरीब बच्ची या बच्चे के विवाह में खुशी से आर्थिक मदद या कन्यादान करें। ऐसा करने से दांपत्य में असीम सुख और समृद्धि स्थिर हो जाती है।",
+  },
+};
+
+export function evaluateKalpurush7thRashiAnchor(chart: ChartData): Kalpurush7thRashiAnchor {
+  const lagnaNum = typeof chart.lagnaNum === "number" ? chart.lagnaNum : 0;
+  const d1House = ((6 - lagnaNum + 12) % 12) + 1;
+
+  const d9LagnaSignNum = getNavamshaSignNum(chart.lagnaLon);
+  const d9House = ((6 - d9LagnaSignNum + 12) % 12) + 1;
+
+  const d1Occupants: string[] = [];
+  if (chart.planets) {
+    Object.entries(chart.planets).forEach(([pName, pData]) => {
+      if (pData && (pData.sign === "Libra" || pData.house === d1House)) {
+        d1Occupants.push(pName);
+      }
+    });
+  }
+
+  const d9Occupants: string[] = [];
+  if (chart.planets) {
+    Object.entries(chart.planets).forEach(([pName, pData]) => {
+      if (pData) {
+        const pD9Sign = getNavamshaSignNum(pData.lon);
+        if (pD9Sign === 6) {
+          d9Occupants.push(pName);
+        }
+      }
+    });
+  }
+
+  const meta = KALPURUSH_7TH_HOUSE_MAP[d1House] || KALPURUSH_7TH_HOUSE_MAP[7];
+
+  const venusData = chart.planets?.Venus;
+  const isVenusIn12 = venusData?.house === 12;
+  const isLibraIn12 = d1House === 12;
+  const venus12thRemedyApplicable = isVenusIn12 || isLibraIn12;
+
+  let venus12thRemedyHinglish: string | undefined = undefined;
+  if (venus12thRemedyApplicable) {
+    venus12thRemedyHinglish =
+      "व्याख्यान का विशेष विवाह सूत्र: आपकी कुंडली में शुक्र/तुला का संबंध १२वें भाव से जुड़ रहा है। नियम यह है कि किसी निर्धन या अनाथ कन्या/बालक के विवाह में यथाशक्ति वस्त्र, राशन या आर्थिक सहयोग करें। ऐसा करने से आपके अपने दांपत्य जीवन के अनावश्यक खर्च, शयन सुख की रुकावटें और अनपेक्षित हानियां पूरी तरह शांत हो जाती हैं।";
+  }
+
+  return {
+    signNumber: 7,
+    signName: "Libra",
+    d1House,
+    d9House,
+    d1Occupants,
+    d9Occupants,
+    meetingChannelTitleHinglish: meta.title,
+    meetingChannelNarrativeHinglish: meta.narrative,
+    maritalBalanceDomainHinglish: meta.balanceDomain,
+    karmicAnchorAdviceHinglish: meta.advice,
+    venus12thRemedyApplicable,
+    venus12thRemedyHinglish,
+  };
+}
+
+// ── 7th House Occupant Planet's Nakshatra Lord Mapping ──────────────────────
+// Based on KP Stellar Astrology & Oral Discourse Transcripts:
+// The planet sitting in the 7th House is the physical vessel/gateway,
+// but its Nakshatra Lord (Star Lord) dictates the actual experiential reality,
+// partner's behavioral trajectory, and which house reaps the karmic fruits of marriage.
+// Includes 6th (Blind faith / Plants), 8th (Fruit donation), 12th (Underprivileged wedding charity).
+
+const SEVENTH_OCCUPANT_NL_HOUSE_MAP: Record<number, {
+  title: string;
+  narrative: string;
+  karmicAdvice: string;
+  remedy?: string;
+}> = {
+  1: {
+    title: "प्रथम भाव (Lagna) — जीवनसाथी व्यक्तित्व का पूरक दर्पण",
+    narrative: "सप्तम भाव में बैठे ग्रह का नक्षत्र स्वामी आपकी कुंडली के प्रथम भाव (लग्न) में बैठा है। इसका अर्थ यह है कि विवाह का पूरा फल आपके अपने व्यक्तित्व, शारीरिक स्वास्थ्य और आत्म-छवि पर आकर पड़ता है। शादी के बाद आपकी पूरी पहचान, दिनचर्या और विचार जीवनसाथी के प्रभाव में ढल जाते हैं। जीवनसाथी आपको अपनी प्राथमिक प्रेरणा मानता है और दोनों का अस्तित्व एक-दूसरे में समाहित हो जाता है।",
+    karmicAdvice: "रिश्ते में अपने व्यक्तिगत स्वाभिमान को बनाए रखें, लेकिन साथी के सकारात्मक सुझावों को सहर्ष स्वीकार करें।",
+  },
+  2: {
+    title: "द्वितीय भाव (Dhana / Kutumb) — धन, कुल वृद्धि व साझा संपत्ति",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी द्वितीय भाव (कुटुंब व धन) में विराजमान है। यह सीधा संकेत है कि विवाह होते ही आपके परिवार का बैंक बैलेंस, अचल संपत्ति और खानदानी प्रतिष्ठा में भारी उछाल आएगा। जीवनसाथी घर की लक्ष्मी/सारथी बनकर आर्थिक निर्णय में मुख्य भागीदार बनता है और वाणी में मधुरता होने पर कुटुंब सदैव एकजुट रहता है।",
+    karmicAdvice: "पारिवारिक मामलों में ससुराल और मायके के बीच वित्तीय पारदर्शिता रखें। दोनों मिलकर संयुक्त बचत करें।",
+  },
+  3: {
+    title: "तृतीय भाव (Sahaja) — पराक्रम, डिजिटल प्लेटफॉर्म व साझा उद्यम",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी तृतीय भाव (पराक्रम व संचार) में स्थित है। विवाह के पश्चात आपकी रोजमर्रा की मेहनत, छोटी यात्राएं, सोशल मीडिया, ऑनलाइन काम और नए उद्यमों की गति कई गुना बढ़ जाती है। जीवनसाथी बेहद व्यावहारिक और कर्मठ होता है, जो हर कठिनाई में आपके कंधे से कंधा मिलाकर मेहनत करता है।",
+    karmicAdvice: "आपसी बातचीत (Communication) को कभी टूटने न दें। दिनभर की बातें शाम को साझा करने से रिश्ता मजबूत बना रहता है।",
+  },
+  4: {
+    title: "चतुर्थ भाव (Sukha) — गृहस्थ शांति, नया मकान व पारिवारिक संबल",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी चतुर्थ भाव (सुख व गृहस्थ) में बैठा है। विवाह का मुख्य फल आपके घर के भीतर की शांति, नए मकान, वाहन और माता के सुख के रूप में प्रकट होता है। जीवनसाथी घर की चारदीवारी को मंदिर जैसा पवित्र और आरामदायक बनाने में अपनी पूरी आत्मा झोंक देता है।",
+    karmicAdvice: "घर के वातावरण को सदा सौम्य रखें। कार्यक्षेत्र का तनाव घर के बेडरूम या ड्रॉइंग रूम में न लाएं।",
+  },
+  5: {
+    title: "पंचम भाव (Purva Punya) — अनन्य प्रेम, बौद्धिक तालमेल व संतान सुख",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी पंचम भाव (संतान, प्रेम व पूर्व पुण्य) में बैठा है। यह दांपत्य में गहरा आत्मिक व रोमांटिक जुड़ाव (Laila-Majnu bond) पैदा करता है। चूंकि पंचम भाव सप्तम से ११वां (पार्टनर का लाभ) होता है, इसलिए शादी के बाद आपके पूर्व जन्म के पुण्य जागते हैं और आपकी उपस्थिति से साथी के जीवन की सबसे बड़ी आकांक्षाएं पूरी होती हैं।",
+    karmicAdvice: "वैवाहिक जीवन के १० वर्ष बीतने के बाद भी वही आरंभिक आदर और रोमांस की ताजगी बनाए रखें। बच्चों के आने पर भी साथी को प्राथमिकता दें।",
+  },
+  6: {
+    title: "छठा भाव (Ripu / Rina / Seva) — कार्यक्षेत्र जुड़ाव, अंधा विश्वास व सेवा",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी छठे भाव में है। ज्योतिष शास्त्र में छठा भाव सप्तम से १२वां (व्यय भाव) होता है। इसका अर्थ है कि साथी से परिचय या जुड़ाव ऑफिस, रोज़गार या किसी सेवा क्षेत्र के माध्यम से होता है। यहाँ सबसे बड़ा खतरा यह होता है कि दोनों में से कोई एक रोज़मर्रा की आदतों में मीन-मेख निकालने लगता है।\\n\\nव्याख्यान का विशेष सूत्र: '६ठे भाव में अंधा विश्वास (Blind Faith) ही दांपत्य को अमर बनाता है।' यदि आप साथी पर पूर्ण विश्वास रखेंगे और शक नहीं करेंगे, तो यह योग अद्भुत सफलता देगा।",
+    karmicAdvice: "रोजमर्रा के घरेलू या वित्तीय मामलों में बाल की खाल न निकालें। साथी की छोटी गलतियों को अनदेखा करें।",
+    remedy: "व्याख्यान का अचूक उपाय: घर या बगीचे में जीवित पेड़-पौधे (विशेषकर शमी, तुलसी या नीम) लगाएं और नित्य उनकी सेवा व सींचन करें। यह छठे भाव के कलह को शांत करता है।",
+  },
+  7: {
+    title: "सप्तम भाव (Kalatra) — साक्षात अटूट समर्पण व पारम्परिक मर्यादा",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी स्वयं सप्तम भाव में ही स्थित है। यह दांपत्य की सबसे शुद्ध, पारंपरिक और मजबूत स्थिति है। विवाह समाज और कुल के सम्मान के साथ होता है। दोनों एक-दूसरे के प्रति पूरी तरह निष्ठावान रहते हैं और रिश्ते में किसी तीसरे व्यक्ति के लिए कोई जगह नहीं होती।",
+    karmicAdvice: "रिश्ते में समानता (50-50 पार्टनरशिप) का भाव रखें। न कोई बड़ा, न कोई छोटा।",
+  },
+  8: {
+    title: "अष्टम भाव (Randhra) — आकस्मिक परिवर्तन, ससुराल का प्रभाव व फल दान",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी अष्टम भाव में चला गया है। यह संकेत देता है कि विवाह जीवन में एक बड़ा अप्रत्याशित मोड़ लेकर आता है। ससुराल पक्ष के साथ गहरे गोपनीय या वित्तीय सम्बंध बनते हैं। कई बार रिश्ते में शुरूआती दौर में अप्रत्याशित रुकावटें या परिवार की ओर से गोपनीय तनाव झेलना पड़ता है।",
+    karmicAdvice: "साथी से कभी कोई वित्तीय या भावनात्मक रहस्य न छिपाएं। पारदर्शिता ही इस सम्बंध की सबसे बड़ी रक्षा ढाल है।",
+    remedy: "व्याख्यान का अचूक उपाय: अष्टम भाव के आकस्मिक झटकों को शांत करने के लिए मंगलवार या शनिवार को मौसमी ताजे मीठे फलों (जैसे सेब, केला, अनार) का जरूरतमंदों या मंदिर में दान करें।",
+  },
+  9: {
+    title: "नवम भाव (Bhagya) — साक्षात भाग्योदय, तीर्थ यात्राएं व लक्ष्मी कृपा",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी नवम भाव (भाग्य व धर्म) में बैठा है। यह विवाह का साक्षात वरदान है—जैसे ही विवाह संपन्न होता है, आपके भाग्य के बंद दरवाजे स्वतः खुल जाते हैं। जीवनसाथी साक्षात लक्ष्मी/नारायण के रूप में कदम रखता है। दोनों मिलकर पवित्र तीर्थों की यात्रा करते हैं और समाज में धर्म-कर्म से यश पाते हैं।",
+    karmicAdvice: "विवाह के बाद जीवनसाथी के साथ धार्मिक यात्राएं करें और माता-पिता व गुरुजनों का नियमित आशीर्वाद लें।",
+  },
+  10: {
+    title: "दशम भाव (Karma) — पॉवर कपल, सामाजिक प्रतिष्ठा व करियर उत्थान",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी दशम भाव (कर्म व पद-प्रतिष्ठा) में स्थित है। विवाह सीधे आपके करियर और सामाजिक रुतबे को नई ऊँचाइयों पर ले जाता है। आप दोनों समाज में एक 'पॉवर कपल' के रूप में जाने जाते हैं। साथी का सहयोग या उसकी पृष्ठभूमि आपके व्यापार या नौकरी में प्रतिष्ठा का बड़ा साधन बनती है।",
+    karmicAdvice: "करियर की सफलता का आनंद घर में लें, लेकिन कार्यक्षेत्र का अहंकार या पद का रौब कभी दांपत्य जीवन के भीतर न लाएं।",
+  },
+  11: {
+    title: "एकादश भाव (Labha) — अनन्य मित्रता, इच्छा पूर्ति व विशाल नेटवर्क",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी एकादश भाव (लाभ व इच्छा पूर्ति) में स्थित है। जीवनसाथी सबसे पहले आपका 'सर्वोत्तम मित्र' (Best Friend) बनकर आता है। विवाह के बाद आपके जीवन की सबसे बड़ी दबी इच्छाएं पूरी होती हैं और बड़े सामाजिक व व्यावसायिक संपर्कों से लाभ मिलता है।",
+    karmicAdvice: "साथी के साथ दोस्ती का भाव सदा जीवित रखें। जब तक आपस में दोस्ताना रहेगा, दांपत्य कभी कमजोर नहीं पड़ सकता।",
+  },
+  12: {
+    title: "द्वादश भाव (Vyaya / Moksha) — दूरस्थ वास, शयन सुख व गरीब विवाह दान",
+    narrative: "सप्तम भाव के ग्रह का नक्षत्र स्वामी द्वादश भाव (विदेश, त्याग व शयन सुख) में बैठा है। इसका शास्त्रीय फल यह है कि यदि विवाह जन्मस्थान से दूर, किसी अन्य प्रांत या विदेश में हो, तो यह अत्यधिक शुभ और सफल रहता है। यदि जन्मस्थान में ही रहें, तो कई बार बेडरूम में दूरियां या काम के सिलसिले में एक-दूसरे से अलग रहने की परिस्थितियां बनती हैं।\\n\\nव्याख्यान का विशेष सूत्र: '१२वें भाव पर कभी अंधा भरोसा मत करो; १२वां भाव दान मांगता है। यदि आप स्वेच्छा से दान नहीं करेंगे, तो वह अस्पताल या अनपेक्षित खर्चों से धन निकाल लेगा।' ",
+    karmicAdvice: "निजी शयनकक्ष को सदा शांत, सुवासित और इलेक्ट्रॉनिक गैजेट्स से मुक्त रखें। साथी के साथ नियमित रूप से परोपकार के कार्य करें।",
+    remedy: "व्याख्यान का अचूक उपाय: किसी गरीब, अनाथ या जरूरतमंद कन्या/बालक के विवाह में आर्थिक सहयोग, वस्त्र या राशन का दान करें। ऐसा करने से १२वें भाव का व्यय शांत होकर दांपत्य में असीम शयन सुख और प्रेम की स्थिरता आ जाती है।",
+  },
+};
+
+export function evaluateSeventhHouseOccupantsNL(
+  chart: ChartData,
+  kpResult?: ReturnType<typeof runKPEngine>
+): SeventhHouseOccupantNLAnalysis {
+  const occupantsList = Object.entries(chart.planets || {})
+    .filter(([_, p]) => p && (p.house === 7 || (kpResult?.rows.find(r => r.name === _ && r.bhavaHouse === 7))))
+    .map(([pName, pData]) => ({ name: pName, data: pData }));
+
+  const hasOccupants = occupantsList.length > 0;
+  const items: SeventhHouseOccupantNLItem[] = [];
+
+  if (hasOccupants) {
+    for (const occ of occupantsList) {
+      const pName = occ.name;
+      const pData = occ.data;
+      const nakshatra = pData.nakshatra || "Ashwini";
+      const nakshatraLord = pData.nakshatraLord || "Ketu";
+
+      const nlKpRow = kpResult?.rows.find(r => r.name === nakshatraLord);
+      const nlPlanetData = chart.planets[nakshatraLord];
+      const nlHouse = nlKpRow?.bhavaHouse || nlPlanetData?.house || 7;
+      const nlSign = nlPlanetData?.sign || "Aries";
+
+      const meta = SEVENTH_OCCUPANT_NL_HOUSE_MAP[nlHouse] || SEVENTH_OCCUPANT_NL_HOUSE_MAP[7];
+
+      items.push({
+        planet: pName,
+        isOccupant: true,
+        planetSign: pData.sign || "Libra",
+        nakshatra,
+        nakshatraLord,
+        nakshatraLordHouse: nlHouse,
+        nakshatraLordSign: nlSign,
+        titleHinglish: `${pName} (${nakshatra} - स्वामी: ${nakshatraLord}) ➔ भाव ${nlHouse}`,
+        narrativeHinglish: meta.narrative,
+        karmicAdviceHinglish: meta.karmicAdvice,
+        remedyHinglish: meta.remedy,
+      });
+    }
+  } else {
+    // Fallback to 7th House Lord (सप्तमेश)
+    const h7CuspSign = chart.houseCusps.find(h => h.house === 7)?.sign || RASHIS[((chart.lagnaNum || 0) + 6) % 12];
+    const lord7Name = SIGN_LORDS[h7CuspSign] || "Venus";
+    const lord7Data = chart.planets[lord7Name];
+
+    const nakshatra = lord7Data?.nakshatra || "Bharani";
+    const nakshatraLord = lord7Data?.nakshatraLord || "Venus";
+
+    const nlKpRow = kpResult?.rows.find(r => r.name === nakshatraLord);
+    const nlPlanetData = chart.planets[nakshatraLord];
+    const nlHouse = nlKpRow?.bhavaHouse || nlPlanetData?.house || 7;
+    const nlSign = nlPlanetData?.sign || "Taurus";
+
+    const meta = SEVENTH_OCCUPANT_NL_HOUSE_MAP[nlHouse] || SEVENTH_OCCUPANT_NL_HOUSE_MAP[7];
+
+    items.push({
+      planet: lord7Name,
+      isOccupant: false,
+      planetSign: lord7Data?.sign || h7CuspSign,
+      nakshatra,
+      nakshatraLord,
+      nakshatraLordHouse: nlHouse,
+      nakshatraLordSign: nlSign,
+      titleHinglish: `सप्तम भाव रिक्त (सप्तमेश ${lord7Name} — ${nakshatra} स्वामी: ${nakshatraLord}) ➔ भाव ${nlHouse}`,
+      narrativeHinglish: `आपकी कुंडली में सप्तम भाव में कोई प्रत्यक्ष ग्रह नहीं बैठा है, अतः वैदिक व के.पी. नियम के अनुसार सप्तमेश (${lord7Name}) के नक्षत्र स्वामी (${nakshatraLord}) की स्थिति देखी जाती है।\\n\\n${meta.narrative}`,
+      karmicAdviceHinglish: meta.karmicAdvice,
+      remedyHinglish: meta.remedy,
+    });
+  }
+
+  const primary = items[0];
+  const synthesisHinglish = hasOccupants
+    ? `सप्तम भाव में स्थित ${items.map(i => i.planet).join(", ")} का नक्षत्र स्वामी (${primary.nakshatraLord}) भाव ${primary.nakshatraLordHouse} में होने से दांपत्य का फल ${primary.titleHinglish} के अनुसार फलीभूत होगा।`
+    : `सप्तम भाव रिक्त होने के कारण सप्तमेश ${primary.planet} के नक्षत्र स्वामी (${primary.nakshatraLord}) की भाव ${primary.nakshatraLordHouse} में स्थिति वैवाहिक जीवन की दिशा तय करेगी।`;
+
+  return {
+    occupants: items,
+    hasOccupants,
+    synthesisHinglish,
+  };
+}
 
 // ── Navamsha (D9) Evaluation Helpers ─────────────────────────────────────────
 
@@ -1055,10 +1398,28 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
     });
   }
 
+  // Kalpurush 7th Rashi (Libra) Cosmic Marriage Anchor
+  const kalpurush7thAnchor = evaluateKalpurush7thRashiAnchor(chart);
+
+  // Venus in 12th House / Libra in 12th Wedding Charity Remedy
+  if (kalpurush7thAnchor.venus12thRemedyApplicable) {
+    remedies.push({
+      category: "Venus",
+      title: "Charity for Poor/Underprivileged Wedding (12th House Venus Shastra Upay)",
+      procedure: "Support or sponsor the wedding expenses, clothes, or rations for a needy/underprivileged boy or girl. Alternatively, contribute to a charitable wedding trust or arrange meals at a marriage ceremony.",
+      caution: "Never hoard wealth or maintain hidden resentments. Freely facilitating another's wedding activates 12th house grace and protects your own marital bond from estrangement.",
+      astrologicalRationale: "In oral discourse transcript, Venus/Libra in 12th demands voluntary marital charity. Giving to another's wedding permanently stabilizes personal bedroom bliss and neutralizes hospital/litigation drains.",
+    });
+  }
+
+  // 7th House Occupant Planet's Nakshatra Lord Evaluation
+  const seventhHouseOccupantsNL = evaluateSeventhHouseOccupantsNL(chart, kpResult);
+
   const executiveSummary = [
     `7th Cusp Sub-Lord is **${cusp7SubLord}**, situated in the Star of **${starLordOfSubLord}** (Bhava ${starLordHouse}).`,
     `**Meeting Circumstances**: ${meetingContext.circumstance}`,
     `**7th Rashi Manifestation**: ${rashiImpact.signName} (House 7) activates **${rashiImpact.lifeDomainActivated}**.`,
+    `**Kalpurush 7th Sign (Libra)**: Anchored in House ${kalpurush7thAnchor.d1House} (${kalpurush7thAnchor.meetingChannelTitleHinglish}).`,
     `**Navamsha D9 Audit**: D9 Lagna is **${d9LagnaSign}**. Bedroom bliss index: **${bedroomStatus}**.`,
     punarbuYoga.detected
       ? `**Punarbu Alert**: ${punarbuYoga.effects}`
@@ -1070,6 +1431,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
   return {
     meetingContext,
     rashiImpact,
+    kalpurush7thAnchor,
     d9Audit,
     dualMarriage,
     sanyasDenial,
@@ -1078,6 +1440,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
     separativeAudit,
     barrenAudit,
     marriageDirection,
+    seventhHouseOccupantsNL,
     d1ToD9Mapping,
     remedies,
     executiveSummary,

@@ -43,7 +43,7 @@ export default function MasterMarriageReportPanel({
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const { couple, ashtakoot, mangalSamyam, d9NavamshaCrossAudit, kpDynamics, punarbuAudit, timingAndMuhurat, practicalRemedies, separativeAndDirections } = report;
+  const { couple, ashtakoot, mangalSamyam, kalpurush7thAudit, d9NavamshaCrossAudit, kpDynamics, seventhHouseNakshatraAudit, punarbuAudit, timingAndMuhurat, practicalRemedies, separativeAndDirections } = report;
 
   return (
     <div className="master-marriage-dossier" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -232,7 +232,7 @@ export default function MasterMarriageReportPanel({
 
               <div style={{ textAlign: "center", background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "8px 14px", minWidth: 90 }}>
                 <div style={{ fontSize: 15, fontWeight: 800, color: "#3b82f6" }}>5-9 त्रिकोण</div>
-                <div style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>नवांश D9 अक्ष</div>
+0                <div style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>नवांश D9 अक्ष</div>
               </div>
 
               <div style={{ textAlign: "center", background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "8px 14px", minWidth: 90 }}>
@@ -255,6 +255,7 @@ export default function MasterMarriageReportPanel({
           { id: "all", label: "📋 सम्पूर्ण रिपोर्ट (All Sections)" },
           { id: "ashtakoot", label: "🌟 36-गुण अष्टकूट" },
           { id: "mangal", label: "🔥 मंगल साम्यता" },
+          { id: "kalpurush", label: "⚖️ ७वीं राशि (तुला) दांपत्य सूत्र" },
           { id: "d9", label: "💎 D9 नवांश चार-स्तंभ" },
           { id: "kp", label: "🧭 KP सब-लॉर्ड & मिलन" },
           { id: "punarbu", label: "🛡️ पुनर्भु योग शोध" },
@@ -442,13 +443,126 @@ export default function MasterMarriageReportPanel({
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
+          SECTION 2B: KALPURUSH 7TH SIGN (LIBRA / तुला) MARRIAGE ANCHOR
+      ══════════════════════════════════════════════════════════════════════ */}
+      {(selectedSection === "all" || selectedSection === "kalpurush") && kalpurush7thAudit && (
+        <div className="card" style={{ borderColor: "rgba(184,134,11,0.35)", background: "linear-gradient(145deg, #FFFFFF 0%, #FFFDF8 100%)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+            <div>
+              <div className="card-tag" style={{ color: "#875C06" }}>कालपुरुष दांपत्य सूत्र · मौखिक व्याख्यान रहस्य</div>
+              <h2 className="card-title serif" style={{ margin: 0, fontSize: 24, color: "#1A1A1A" }}>
+                ⚖️ कालपुरुष की ७वीं राशि (तुला) — जीवनसाथी प्राप्ति व दांपत्य संतुलन
+              </h2>
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#875C06", background: "rgba(184,134,11,0.12)", padding: "4px 14px", borderRadius: 8, border: "1px solid rgba(184,134,11,0.3)" }}>
+              D1 &amp; D9 तुला संरेखण
+            </div>
+          </div>
+
+          <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.8, marginBottom: 18 }}>
+            कालपुरुष प्राकृतिक चक्र में <strong>७वीं राशि तुला (Libra)</strong> शुक्र की मूल राशि है, जो समस्त जगत में विवाह, जीवनसाथी और साझेदारी की जन्मजात अधिष्ठात्री है। व्याख्यान के अनुसार, आपकी जन्म कुंडली में ७ नंबर (तुला) जिस भाव में बैठती है, वह यह तय करती है कि <em>जीवनसाथी किस माध्यम से आएगा</em>, और <em>दांपत्य जीवन का तराजू किस विषय पर साधना होगा</em>।
+          </p>
+
+          {/* Dual Partner Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 18, marginBottom: 20 }}>
+            {/* Partner 1 Card */}
+            <div style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.25)", borderRadius: 14, padding: "18px 20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>
+                  वर ({couple.partner1.name}) — तुला भाव {kalpurush7thAudit.partner1.d1House}
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#6B635B", background: "#FFFFFF", padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(184,134,11,0.2)" }}>
+                  D9 में भाव {kalpurush7thAudit.partner1.d9House}
+                </span>
+              </div>
+              
+              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 700, color: "#1A1A1A", marginBottom: 6 }}>
+                {kalpurush7thAudit.partner1.meetingChannelTitleHinglish}
+              </div>
+              
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: "0 0 10px 0" }}>
+                {kalpurush7thAudit.partner1.meetingChannelNarrativeHinglish}
+              </p>
+
+              <div style={{ padding: "10px 12px", borderRadius: 8, background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.18)", marginBottom: 8 }}>
+                <strong style={{ fontSize: 12, color: "#875C06" }}>⚖️ दांपत्य संतुलन का तराजू:</strong>
+                <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#5C5248", lineHeight: 1.6 }}>
+                  {kalpurush7thAudit.partner1.maritalBalanceDomainHinglish}
+                </p>
+              </div>
+
+              <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.5 }}>
+                <strong>💡 जीवन सूत्र:</strong> {kalpurush7thAudit.partner1.karmicAnchorAdviceHinglish}
+              </div>
+            </div>
+
+            {/* Partner 2 Card */}
+            <div style={{ background: "#FAF7F2", border: "1px solid rgba(232,121,249,0.35)", borderRadius: 14, padding: "18px 20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#a855f7", textTransform: "uppercase", letterSpacing: "1px" }}>
+                  कन्या ({couple.partner2.name}) — तुला भाव {kalpurush7thAudit.partner2.d1House}
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#6B635B", background: "#FFFFFF", padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(232,121,249,0.3)" }}>
+                  D9 में भाव {kalpurush7thAudit.partner2.d9House}
+                </span>
+              </div>
+              
+              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 700, color: "#1A1A1A", marginBottom: 6 }}>
+                {kalpurush7thAudit.partner2.meetingChannelTitleHinglish}
+              </div>
+              
+              <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7, margin: "0 0 10px 0" }}>
+                {kalpurush7thAudit.partner2.meetingChannelNarrativeHinglish}
+              </p>
+
+              <div style={{ padding: "10px 12px", borderRadius: 8, background: "#FFFFFF", border: "1px solid rgba(232,121,249,0.25)", marginBottom: 8 }}>
+                <strong style={{ fontSize: 12, color: "#a855f7" }}>⚖️ दांपत्य संतुलन का तराजू:</strong>
+                <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#5C5248", lineHeight: 1.6 }}>
+                  {kalpurush7thAudit.partner2.maritalBalanceDomainHinglish}
+                </p>
+              </div>
+
+              <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.5 }}>
+                <strong>💡 जीवन सूत्र:</strong> {kalpurush7thAudit.partner2.karmicAnchorAdviceHinglish}
+              </div>
+            </div>
+          </div>
+
+          {/* Special 12th House Venus Wedding Charity Box if applicable */}
+          {kalpurush7thAudit.weddingCharityRemedy && (
+            <div
+              style={{
+                background: "linear-gradient(135deg, rgba(200,160,48,0.12), rgba(200,160,48,0.22))",
+                border: "2px solid rgba(200,160,48,0.45)",
+                borderRadius: 14,
+                padding: "16px 20px",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 12,
+              }}
+            >
+              <span style={{ fontSize: 24, flexShrink: 0 }}>🎁</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#875C06", marginBottom: 4 }}>
+                  व्याख्यान का विशेष विवाह सूत्र: गरीब विवाह सहयोग (12th House Venus Charity)
+                </div>
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#382D20" }}>
+                  {kalpurush7thAudit.weddingCharityRemedy}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
           SECTION 3: D9 NAVAMSHA 4-PILLAR CROSS-AUDIT
       ══════════════════════════════════════════════════════════════════════ */}
       {(selectedSection === "all" || selectedSection === "d9") && (
         <div className="card" style={{ borderColor: "rgba(59,130,246,0.25)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
             <div>
-              <div className="card-tag" style={{ color: "#3b82f6" }}>स्तंभ 3 · नवांश D9 सूक्ष्म मिलान</div>
+              <div className="card-tag" style={{ color: "#3b82f6" }}>स्तंभ 3 · नवांश D9 सूक्ष्म मिलान (बीज बनाम फल)</div>
               <h2 className="card-title serif" style={{ margin: 0, fontSize: 24 }}>
                 D9 नवांश कुंडली 4-स्तंभ एवं शयन सुख (H12) विश्लेषण
               </h2>
@@ -458,8 +572,8 @@ export default function MasterMarriageReportPanel({
             </div>
           </div>
 
-          <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.8, marginBottom: 16 }}>
-            लग्न कुंडली (D1) शारीरिक और सांसारिक स्थिति दर्शाती है, जबकि नवांश कुंडली (D9) आत्मा का आंतरिक स्वभाव और विवाह का वास्तविक यथार्थ दर्शाती है। वर का नवांश लग्न <strong>{d9NavamshaCrossAudit.partner1D9Lagna} (Gemini)</strong> और कन्या का नवांश लग्न <strong>{d9NavamshaCrossAudit.partner2D9Lagna} (Aquarius)</strong> है — दोनों वायु तत्व की राशियां होकर <strong>5-9 त्रिकोण (Air Trine)</strong> बनाती हैं।
+          <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.8, marginBottom: 16 }}>
+            शास्त्रीय मान्यता है कि <strong>लग्न कुंडली (D1) केवल वृक्ष (Seed/Tree)</strong> है, जबकि <strong>नवांश (D9) उसका वास्तविक फल (Fruit)</strong> है। बहुत से लोग D1 में अच्छे ग्रह देखकर संतुष्ट हो जाते हैं, लेकिन विवाह के बाद का आंतरिक सुख, मानसिक लय और शयन सुख पूरी तरह D9 के ४ स्तंभों (H1, H4, H7, H12) पर टिका होता है। वर का नवांश लग्न <strong>{d9NavamshaCrossAudit.partner1D9Lagna}</strong> और कन्या का <strong>{d9NavamshaCrossAudit.partner2D9Lagna}</strong> है — दोनों मिलकर <strong>{d9NavamshaCrossAudit.axisRelation}</strong> का निर्माण करते हैं।
           </p>
 
           {/* 4 Pillars Grid */}
@@ -517,6 +631,27 @@ export default function MasterMarriageReportPanel({
             </div>
           </div>
 
+          {/* Transcript Specific D9 Affliction Highlights */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12, marginTop: 14, marginBottom: 14 }}>
+            <div style={{ background: "#FFFDF5", border: "1px solid rgba(184,134,11,0.25)", borderRadius: 10, padding: "12px 14px" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#875C06", marginBottom: 3 }}>
+                💥 H4 गृह सुख ("एटम बम" मंगल-राहु परीक्षण):
+              </div>
+              <p style={{ margin: 0, fontSize: 11.5, color: "#4A3E2C", lineHeight: 1.5 }}>
+                व्याख्यान के अनुसार D9 के चौथे भाव में मंगल-राहु की युति गृहस्थी में विस्फोटक गुस्सा ('एटम बम') लाती है। चतुर्थ भाव शांत रहने पर घर में कभी उग्र टकराव नहीं होता।
+              </p>
+            </div>
+
+            <div style={{ background: "#FFFDF5", border: "1px solid rgba(184,134,11,0.25)", borderRadius: 10, padding: "12px 14px" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#875C06", marginBottom: 3 }}>
+                🛏️ H12 शयन सुख (सूर्य/मंगल/केतु दूरी परीक्षण):
+              </div>
+              <p style={{ margin: 0, fontSize: 11.5, color: "#4A3E2C", lineHeight: 1.5 }}>
+                D9 के १२वें भाव में सूर्य, मंगल या केतु होने पर अलग सोने या बेडरूम दूरी का रिस्क रहता है। यहाँ शुभ ग्रह होने से दांपत्य में शारीरिक व आत्मिक एकांत सुखद रहता है।
+              </p>
+            </div>
+          </div>
+
           <div style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.2)", borderRadius: 10, padding: "12px 16px", fontSize: 12, color: "#1e3a8a", lineHeight: 1.7 }}>
             <strong>विशेष नवांश संकेत:</strong> मकर नवांश में सूर्य+गुरु की उपस्थिति आध्यात्मिक व सैद्धांतिक परिपक्वता देती है। व्यक्तिगत मतभेदों में तर्क-वितर्क के स्थान पर परस्पर संवेदनशीलता बनाए रखना दांपत्य सुख को अमृतमय बनाएगा।
           </div>
@@ -530,59 +665,139 @@ export default function MasterMarriageReportPanel({
         <div className="card" style={{ borderColor: "rgba(168,85,247,0.25)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
             <div>
-              <div className="card-tag" style={{ color: "#a855f7" }}>स्तंभ 4 · के.पी. सब-लॉर्ड एवं मिलन संदर्भ</div>
+              <div className="card-tag" style={{ color: "#a855f7" }}>स्तंभ 4 · के.पी. सब-लॉर्ड एवं सप्तम भाव नक्षत्र स्वामी</div>
               <h2 className="card-title serif" style={{ margin: 0, fontSize: 24 }}>
-                7th Cuspal Sub-Lord (CSL) & विवाह उपरांत भाग्योदय
+                7th CSL एवं सप्तम भाव में स्थित ग्रह का नक्षत्र स्वामी
               </h2>
             </div>
             <div style={{ fontSize: 12, fontWeight: 700, color: "#6B635B", background: "#FAF7F2", padding: "4px 10px", borderRadius: 8, border: "1px solid rgba(184,134,11,0.2)" }}>
-              2-7-11 एवं 9-12 संयोजन
+              मिलन माध्यम + कर्म फल प्रकटीकरण
             </div>
           </div>
 
-          <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.8, marginBottom: 16 }}>
-            के.पी. ज्योतिष (Krishnamurti Paddhati) के नियमानुसार 7वें भाव का सब-लॉर्ड बताता है कि जीवनसाथी कहाँ मिलेगा, मिलन की पृष्ठभूमि क्या होगी, और विवाह के पश्चात जीवन के किस क्षेत्र का विस्तार होगा।
+          <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.8, marginBottom: 16 }}>
+            वैदिक व के.पी. ज्योतिष के सूक्ष्म व्याख्यान के अनुसार विवाह के दो प्रमुख आयाम होते हैं: <strong>(1) 7वें भाव का सब-लॉर्ड</strong> बताता है कि रिश्ता ज़िंदगी में किस माध्यम से प्रवेश करेगा, जबकि <strong>(2) सप्तम भाव में प्रत्यक्ष बैठे ग्रह का नक्षत्र स्वामी</strong> (या भाव रिक्त होने पर सप्तमेश का नक्षत्र स्वामी) तय करता है कि विवाह के बाद आपका वास्तविक जीवन अनुभव कैसा रहेगा और दांपत्य का कर्म किस भाव में जाकर खुलेगा।
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 16 }}>
-            {/* Groom KP CSL */}
-            <div style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12, padding: "16px 18px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase", marginBottom: 4 }}>
-                वर ({couple.partner1.name}) — 7th CSL
-              </div>
-              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
-                CSL: {kpDynamics.partner1.csl} (नक्षत्र स्वामी: {kpDynamics.partner1.starLord})
-              </div>
-              <div style={{ fontSize: 12, color: "#6B635B", marginBottom: 8 }}>
-                सक्रिय भाव: <strong>{kpDynamics.partner1.house}वां भाव (द्वादश - विदेश / अन्य राज्य / एकांत)</strong>
-              </div>
-              <div style={{ fontSize: 12, color: "#B8860B", lineHeight: 1.6, marginBottom: 8 }}>
-                <strong>मिलन की परिस्थिति:</strong> {kpDynamics.partner1.circumstance}
-              </div>
-              <div style={{ fontSize: 12, color: "#B8860B", fontWeight: 600 }}>
-                <strong>विवाह उपरांत प्रभाव:</strong> {kpDynamics.partner1.postMarriageDomain}
-              </div>
+          {/* ── PART A: 7TH CSL MEETING CONTEXT ── */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#a855f7", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span>🚪</span> भाग क: 7th Cusp Sub-Lord — मिलन की परिस्थिति व प्रस्ताव का माध्यम (Alliance Entry Door)
             </div>
 
-            {/* Bride KP CSL */}
-            <div style={{ background: "#FAF7F2", border: "1px solid rgba(232,121,249,0.3)", borderRadius: 12, padding: "16px 18px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", marginBottom: 4 }}>
-                कन्या ({couple.partner2.name}) — 7th CSL
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+              {/* Groom KP CSL */}
+              <div style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12, padding: "16px 18px" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase", marginBottom: 4 }}>
+                  वर ({couple.partner1.name}) — 7th CSL
+                </div>
+                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
+                  CSL: {kpDynamics.partner1.csl} (नक्षत्र स्वामी: {kpDynamics.partner1.starLord})
+                </div>
+                <div style={{ fontSize: 12, color: "#6B635B", marginBottom: 8 }}>
+                  सक्रिय भाव: <strong>{kpDynamics.partner1.house}वां भाव</strong>
+                </div>
+                <div style={{ fontSize: 12, color: "#B8860B", lineHeight: 1.6, marginBottom: 8 }}>
+                  <strong>मिलन की परिस्थिति:</strong> {kpDynamics.partner1.circumstance}
+                </div>
+                <div style={{ fontSize: 12, color: "#B8860B", fontWeight: 600 }}>
+                  <strong>विवाह उपरांत प्रभाव:</strong> {kpDynamics.partner1.postMarriageDomain}
+                </div>
               </div>
-              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
-                CSL: {kpDynamics.partner2.csl} (नक्षत्र स्वामी: {kpDynamics.partner2.starLord})
-              </div>
-              <div style={{ fontSize: 12, color: "#6B635B", marginBottom: 8 }}>
-                सक्रिय भाव: <strong>{kpDynamics.partner2.house}वां भाव (नवम - भाग्योदय / धर्म / उच्च प्रतिष्ठा)</strong>
-              </div>
-              <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.6, marginBottom: 8 }}>
-                <strong>मिलन की परिस्थिति:</strong> {kpDynamics.partner2.circumstance}
-              </div>
-              <div style={{ fontSize: 12, color: "#a855f7", fontWeight: 600 }}>
-                <strong>विवाह उपरांत प्रभाव:</strong> {kpDynamics.partner2.postMarriageDomain}
+
+              {/* Bride KP CSL */}
+              <div style={{ background: "#FAF7F2", border: "1px solid rgba(232,121,249,0.3)", borderRadius: 12, padding: "16px 18px" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", marginBottom: 4 }}>
+                  कन्या ({couple.partner2.name}) — 7th CSL
+                </div>
+                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
+                  CSL: {kpDynamics.partner2.csl} (नक्षत्र स्वामी: {kpDynamics.partner2.starLord})
+                </div>
+                <div style={{ fontSize: 12, color: "#6B635B", marginBottom: 8 }}>
+                  सक्रिय भाव: <strong>{kpDynamics.partner2.house}वां भाव</strong>
+                </div>
+                <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.6, marginBottom: 8 }}>
+                  <strong>मिलन की परिस्थिति:</strong> {kpDynamics.partner2.circumstance}
+                </div>
+                <div style={{ fontSize: 12, color: "#a855f7", fontWeight: 600 }}>
+                  <strong>विवाह उपरांत प्रभाव:</strong> {kpDynamics.partner2.postMarriageDomain}
+                </div>
               </div>
             </div>
           </div>
+
+          {/* ── PART B: 7TH OCCUPANT PLANET'S NAKSHATRA LORD MAPPING ── */}
+          {seventhHouseNakshatraAudit && (
+            <div style={{ marginTop: 10, marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#875C06", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                <span>✨</span> भाग ख: सप्तम भाव के ग्रह का नक्षत्र स्वामी — वैवाहिक कर्म फल व आंतरिक अनुभव (Karmic Fruition House)
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+                {/* Groom 7th Occupant NL */}
+                <div style={{ background: "#FFFDF9", border: "1px solid rgba(184,134,11,0.3)", borderRadius: 12, padding: "16px 18px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", textTransform: "uppercase" }}>
+                      वर ({couple.partner1.name})
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 700, background: "rgba(184,134,11,0.12)", color: "#B8860B", padding: "2px 8px", borderRadius: 6 }}>
+                      {seventhHouseNakshatraAudit.partner1.hasOccupants ? "सप्तम भाव में प्रत्यक्ष ग्रह" : "सप्तमेश फल (रिक्त भाव)"}
+                    </span>
+                  </div>
+
+                  {seventhHouseNakshatraAudit.partner1.occupants.map((occ, idx) => (
+                    <div key={idx} style={{ marginBottom: 14 }}>
+                      <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
+                        {occ.titleHinglish}
+                      </div>
+                      <p style={{ fontSize: 12.5, color: "#4A4238", lineHeight: 1.7, margin: "0 0 8px 0" }}>
+                        {occ.narrativeHinglish}
+                      </p>
+                      <div style={{ fontSize: 11.5, color: "#6B635B", lineHeight: 1.5, marginBottom: 6 }}>
+                        <strong>💡 जीवन सूत्र:</strong> {occ.karmicAdviceHinglish}
+                      </div>
+                      {occ.remedyHinglish && (
+                        <div style={{ background: "rgba(200,160,48,0.12)", border: "1px solid rgba(200,160,48,0.35)", borderRadius: 8, padding: "8px 10px", fontSize: 11.5, color: "#875C06", lineHeight: 1.5 }}>
+                          <strong>🌿 व्याख्यान का उपाय:</strong> {occ.remedyHinglish}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bride 7th Occupant NL */}
+                <div style={{ background: "#FFFDF9", border: "1px solid rgba(232,121,249,0.35)", borderRadius: 12, padding: "16px 18px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#a855f7", textTransform: "uppercase" }}>
+                      कन्या ({couple.partner2.name})
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 700, background: "rgba(232,121,249,0.15)", color: "#a855f7", padding: "2px 8px", borderRadius: 6 }}>
+                      {seventhHouseNakshatraAudit.partner2.hasOccupants ? "सप्तम भाव में प्रत्यक्ष ग्रह" : "सप्तमेश फल (रिक्त भाव)"}
+                    </span>
+                  </div>
+
+                  {seventhHouseNakshatraAudit.partner2.occupants.map((occ, idx) => (
+                    <div key={idx} style={{ marginBottom: 14 }}>
+                      <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
+                        {occ.titleHinglish}
+                      </div>
+                      <p style={{ fontSize: 12.5, color: "#4A4238", lineHeight: 1.7, margin: "0 0 8px 0" }}>
+                        {occ.narrativeHinglish}
+                      </p>
+                      <div style={{ fontSize: 11.5, color: "#6B635B", lineHeight: 1.5, marginBottom: 6 }}>
+                        <strong>💡 जीवन सूत्र:</strong> {occ.karmicAdviceHinglish}
+                      </div>
+                      {occ.remedyHinglish && (
+                        <div style={{ background: "rgba(200,160,48,0.12)", border: "1px solid rgba(200,160,48,0.35)", borderRadius: 8, padding: "8px 10px", fontSize: 11.5, color: "#875C06", lineHeight: 1.5 }}>
+                          <strong>🌿 व्याख्यान का उपाय:</strong> {occ.remedyHinglish}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "12px 16px", fontSize: 12, color: "#4A4238", lineHeight: 1.7 }}>
             <strong>KP समेकित निष्कर्ष:</strong> {kpDynamics.synthesis}
