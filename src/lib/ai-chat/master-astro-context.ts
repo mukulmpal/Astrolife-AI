@@ -24,6 +24,8 @@ import { scanMarriageWindows } from "../astro-engine/marriage-window-scanner";
 import { calculateLineageKarma } from "../astro-engine/lineage-karma";
 import { evaluateMarriageIntelligence } from "../astro-engine/marriage-intelligence";
 import { detectConditionalDashas } from "../astro-engine/marriage-timing-kn-rao";
+import { evaluateCorePlanetRemedy, getMoonSharingGuide } from "../astro-engine/core-planet-remedies";
+import { buildMasterTransitRadarDossier } from "../astro-engine/property-transit-predictor";
 import type { DashaLord } from "../astro-engine/dasha";
 
 /**
@@ -561,6 +563,44 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
   ${remediesStr}`);
   } catch (err) {
     console.warn("[MasterAstroContext] Marriage Intelligence error:", err);
+  }
+
+  // ── 19. CORE PLANET REMEDIES, SATURN 7TH HOUSE GROWTH RADAR & PROPERTY PREDICTOR ───
+  try {
+    const activeMD = chart.dashas?.find((d) => d.active) ?? chart.dashas?.[0];
+    const mdPlanet = activeMD?.planet || "Jupiter";
+    const coreRemedy = evaluateCorePlanetRemedy(mdPlanet, chart);
+    const moonH = chart.planets.Moon?.house || 4;
+    const moonSign = chart.planets.Moon?.sign || "Cancer";
+    const moonGuide = getMoonSharingGuide(moonH, moonSign);
+    const transitRadar = buildMasterTransitRadarDossier(chart);
+
+    const bnnStr = transitRadar?.bnnTransitConjunctions.length
+      ? transitRadar.bnnTransitConjunctions.map((b) => `✦ Shani + Natal ${b.natalPlanet} in ${b.transitSignName} (H${b.houseNumber}): ${b.esotericMeaningHinglish}`).join("\n  ")
+      : "✦ No direct natal planet conjunction in transit Aquarius sign.";
+
+    sections.push(`### 19. CORE PLANET REMEDIES, SATURN 7TH HOUSE GROWTH RADAR & PROPERTY PREDICTOR
+- Active Dasha Planet (${mdPlanet}):
+  ✦ Dignity Status: ${coreRemedy?.isFavorable ? "FAVORABLE (Power-Up / Gemstone Allowed)" : "AFFLICTED / DUSHTANA (Mitigation / NEVER Wear Gemstone!)"}
+  ✦ Recommendation: ${coreRemedy?.primaryHeadline}
+  ✦ Gemstone Ruling: ${coreRemedy?.gemstoneAdvice.canWearStone ? `Wear ${coreRemedy.gemstoneAdvice.stoneDetails?.name} on ${coreRemedy.gemstoneAdvice.stoneDetails?.finger} (${coreRemedy.gemstoneAdvice.stoneDetails?.metal})` : "NEVER WEAR GEMSTONE (Charity & Mantra Japa only!)"}
+  ✦ Elemental Disposal Vehicle: ${coreRemedy?.elementalDisposalRule.actionTitleHinglish} (${coreRemedy?.elementalDisposalRule.trikonaName}) — ${coreRemedy?.elementalDisposalRule.actionExplanationHinglish}
+  ✦ Charity Dosages: ${coreRemedy?.charityFormulas.map((c) => `${c.item} [${c.quantity}] on ${c.day} to ${c.targetRecipient}`).join("; ") || "None (Favorable planet — do japa and arghya)"}
+- Moon Psychological Heart-Sharing Sanctuary (Moon in H${moonH} ${moonSign}):
+  ✦ Designated Confidant: ${moonGuide.confidantTitleHinglish}
+  ✦ Emotional Principle: ${moonGuide.narrativeHinglish}
+  ✦ Warning: ${moonGuide.warningHinglish}
+- Saturn 7th House Growth Radar (Transit Shani):
+  ✦ Past 2.5y (Shani in Makara H${transitRadar?.pastCycle.saturnTransitHouse}): Elevated H${transitRadar?.pastCycle.elevatedGrowthHouse} (${transitRadar?.pastCycle.growthThemeHinglish})
+  ✦ Current 2.5y (Shani in Kumbha H${transitRadar?.currentCycle.saturnTransitHouse}): Elevated H${transitRadar?.currentCycle.elevatedGrowthHouse} (${transitRadar?.currentCycle.growthThemeHinglish})
+  ✦ Next 2.5y (Shani in Meena H${transitRadar?.futureCycle.saturnTransitHouse}): Elevated H${transitRadar?.futureCycle.elevatedGrowthHouse} (${transitRadar?.futureCycle.growthThemeHinglish})
+- BNN Transit Conjunctions in Aquarius:
+  ${bnnStr}
+- Property Timing Predictor:
+  ✦ Status: ${transitRadar?.propertyForecast.headlineHinglish} [${transitRadar?.propertyForecast.timingStatus}]
+  ✦ Script Rationale: ${transitRadar?.propertyForecast.verbatimRationaleHinglish}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Core Planet Remedies error:", err);
   }
 
   return `\n══════════════════════════════════════════════════════════════════════

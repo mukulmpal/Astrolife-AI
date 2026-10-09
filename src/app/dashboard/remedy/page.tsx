@@ -11,6 +11,7 @@ import {
   type Planet,
 } from "@/lib/astro-intelligence/phase-1-remedies/complete-remedy-intelligence-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemediesDossier";
 
 const PRIORITY_COLOR: Record<RemedyCard["priority"], string> = {
   "dasha-active": "#7C3AED",
@@ -157,6 +158,11 @@ export default function RemedyPage() {
             <span style={{ color: "#6B635B", marginLeft: "8px" }}>→ {result.pratyantardashaActive} Pratyantar</span>
           )}
           <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "4px" }}>Dasha-active planets need priority attention — results are amplified now.</div>
+        </div>
+
+        {/* AUTHENTIC CORE PLANET REMEDIES, SATURN GROWTH RADAR & PROPERTY DOSSIER */}
+        <div style={{ marginBottom: 24 }}>
+          <CorePlanetRemediesDossier chart={chart} />
         </div>
 
         {/* Summary bar */}

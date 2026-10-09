@@ -19,6 +19,7 @@ import { buildRadarHorizons } from "@/lib/astro-engine/cosmic-pulse/forecast";
 import { CosmicPulseCard, CosmicRadar } from "@/components/cosmic-pulse";
 import { AajKaTaraCard } from "@/components/dasha/AajKaTaraCard";
 import { NakshatraRemedyDossierCard } from "@/components/remedies/NakshatraRemedyDossierCard";
+import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemediesDossier";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -766,6 +767,9 @@ function DashboardContent() {
             <AajKaTaraCard chart={chart} />
           </div>
 
+          {/* AUTHENTIC CORE PLANET REMEDIES, SATURN GROWTH & PROPERTY TIMING DOSSIER */}
+          <CorePlanetRemediesDossier chart={chart} />
+
           {/* AUTHENTIC NAKSHATRA REMEDY & PERSONALITY DOSSIER CARD */}
           <NakshatraRemedyDossierCard chart={chart} />
 
@@ -1059,6 +1063,7 @@ function DashboardContent() {
 
           {activeTab === "remedies" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 24 }}>
+            <CorePlanetRemediesDossier chart={chart} />
             <NakshatraRemedyDossierCard chart={chart} />
             <div className="card">
               <div className="card-tag">✦ Daily Personal Feed</div>
