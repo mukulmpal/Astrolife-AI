@@ -172,101 +172,127 @@ function MentorNarrativeCard({
       {isOpen && (
         <div className="mt-6 space-y-6 pt-6 border-t border-[rgba(184,134,11,0.2)]">
           {/* Opening Narrative Quote */}
-          <div className="p-4.5 rounded-2xl bg-white border border-[rgba(184,134,11,0.25)] relative">
-            <span className="text-4xl text-[#B8860B]/30 absolute -top-3 left-4 font-serif leading-none select-none">
+          <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.25)] relative shadow-sm">
+            <span className="text-5xl text-[#B8860B]/30 absolute -top-4 left-4 font-serif leading-none select-none">
               “
             </span>
-            <p className="text-sm sm:text-base text-[#1A1A1A] leading-relaxed italic pl-6 font-serif">
-              {narrative.storyIntro}
-            </p>
+            <div className="pl-6 space-y-2.5">
+              {narrative.storyIntro.split("\n\n").map((para, idx) => (
+                <p key={idx} className="text-sm sm:text-base text-[#1A1A1A] leading-relaxed italic font-serif">
+                  {para}
+                </p>
+              ))}
+            </div>
           </div>
 
           {/* 4 Story Chapters Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Chapter 1: AL */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">🎭</span>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
+                  <span className="text-xl">🎭</span>
                   <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
                     अध्याय 1: दुनिया का चश्मा और आपका मुखौटा (आरूढ़ लग्न)
                   </h4>
                 </div>
-                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
-                  {narrative.publicImageStory}
-                </p>
+                <div className="space-y-3">
+                  {narrative.publicImageStory.split("\n\n").map((para, idx) => (
+                    <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                      {para}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Chapter 2: Indu Lagna */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">🪙</span>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
+                  <span className="text-xl">🪙</span>
                   <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
                     अध्याय 2: कुबेर का गुप्त तिजोरी-कक्ष (इंदु लग्न)
                   </h4>
                 </div>
-                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
-                  {narrative.kuberWealthStory}
-                </p>
+                <div className="space-y-3">
+                  {narrative.kuberWealthStory.split("\n\n").map((para, idx) => (
+                    <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                      {para}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Chapter 3: HL & GL */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">👑</span>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
+                  <span className="text-xl">👑</span>
                   <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
                     अध्याय 3: दौलत की गति और सत्ता की कुर्सी (होरा एवं घटी)
                   </h4>
                 </div>
-                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
-                  {narrative.powerAndAuthorityStory}
-                </p>
+                <div className="space-y-3">
+                  {narrative.powerAndAuthorityStory.split("\n\n").map((para, idx) => (
+                    <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                      {para}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Chapter 4: AL-UL */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">💍</span>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
+                  <span className="text-xl">💍</span>
                   <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
                     अध्याय 4: बाहर की शान बनाम कमरे की सच्चाई (दाम्पत्य सच)
                   </h4>
                 </div>
-                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
-                  {narrative.marriageAndSanctuaryStory}
-                </p>
+                <div className="space-y-3">
+                  {narrative.marriageAndSanctuaryStory.split("\n\n").map((para, idx) => (
+                    <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                      {para}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Chapter 5: Paka Lagna */}
-          <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)]">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-lg">💡</span>
+          <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] shadow-sm">
+            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
+              <span className="text-xl">💡</span>
               <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
                 अध्याय 5: बुद्धि और संकल्प का वास्तविक ठिकाना (पाक लग्न)
               </h4>
             </div>
-            <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
-              {narrative.pakaLagnaStory}
-            </p>
+            <div className="space-y-3">
+              {narrative.pakaLagnaStory.split("\n\n").map((para, idx) => (
+                <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                  {para}
+                </p>
+              ))}
+            </div>
           </div>
 
           {/* Concluding Sacred Synthesis */}
-          <div className="p-4.5 rounded-2xl bg-[#FAF5EB] border border-[#B8860B]/30 flex items-start gap-3">
-            <span className="text-2xl mt-0.5 shrink-0">📜</span>
-            <div>
-              <h4 className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-1">
+          <div className="p-5 rounded-2xl bg-[#FAF5EB] border border-[#B8860B]/35 flex items-start gap-3.5 shadow-sm">
+            <span className="text-3xl mt-0.5 shrink-0">📜</span>
+            <div className="space-y-2">
+              <h4 className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
                 मार्गदर्शक का अंतिम निष्कर्ष (Sacred Mentor Synthesis)
               </h4>
-              <p className="text-xs sm:text-sm text-[#1A1A1A] leading-relaxed font-serif">
-                {narrative.mentorSynthesis}
-              </p>
+              {narrative.mentorSynthesis.split("\n\n").map((para, idx) => (
+                <p key={idx} className="text-xs sm:text-sm text-[#1A1A1A] leading-relaxed font-serif">
+                  {para}
+                </p>
+              ))}
             </div>
           </div>
         </div>
