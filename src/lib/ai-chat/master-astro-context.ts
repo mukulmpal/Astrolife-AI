@@ -238,9 +238,14 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
 
     const gk = jaimini.gkAnalysis;
     const bk = jaimini.bkAnalysis;
+    const bkSub = jaimini.bkSubconscious;
+    const mk = jaimini.mkEducation;
+    const pk = jaimini.pkPurvaPunya;
+    const lm = jaimini.loveMarriageAnalysis;
     const dk = jaimini.dkAnalysis;
     const akAmk = jaimini.akAmkAnalysis;
     const kk = jaimini.karakamsha;
+    const dl = jaimini.currentDashaLagna;
     const retro = jaimini.retrogradeActivation;
 
     const afflictedPlanetsStr = gk.afflictedPlanets
@@ -257,9 +262,15 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
       ? retro.map((r) => `${r.planet} (H${r.houseFromLagna}): ${r.guidance}`).join("\n  ✦ ")
       : "No retrograde planets requiring activation.";
 
+    const dashaLagnaStr = dl
+      ? `Active Dasha Lagna (${dl.dashaSign}):\n  ✦ AK in H${dl.akAnalysis.house} (${dl.akAnalysis.status}): ${dl.akAnalysis.verdict}\n  ✦ AmK in H${dl.amkAnalysis.house} (${dl.amkAnalysis.status}): ${dl.amkAnalysis.verdict}\n  ✦ GK in H${dl.gkAnalysis.house}: ${dl.gkAnalysis.warning}\n  ✦ DK in H${dl.dkAnalysis.house}: ${dl.dkAnalysis.verdict}`
+      : "Dasha Lagna: Pending";
+
     sections.push(`### 5. JAIMINI SUTRAS & CHARA DASHA (LAYER 4 SYSTEM — DO NOT MIX FORMULAS WITH VEDIC/KP)
 - Chara Karakas (Degree-Wise Hierarchy, Rahu/Ketu Strictly Excluded):
   ✦ ${karakasSummary}
+- Dynamic Dasha Lagna (5th Pillar of Jaimini — Rotating Active Dasha as Lagna):
+  ✦ ${dashaLagnaStr}
 - Karakamsha Kundali (D9 Navamsha Base: AK ${kk.akPlanet} in ${kk.d9Sign} establishes Karakamsha Lagna; D1 natal planets remain in natal signs):
   ✦ Soul Essence: ${kk.staticAnalysis.soulPurpose}
   ✦ Wealth Source (H2 from Karakamsha): ${kk.staticAnalysis.wealthSource}
@@ -271,8 +282,28 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
   ✦ GK Drishti on Planets: ${afflictedPlanetsStr}
   ✦ Adjacent Sign Rule Protection: ${adjacentProtectedStr} (Protected from GK aspect)
   ✦ Prescribed Upay (Remedies): ${gk.remedies.join(" | ")}
+  ✦ ⛔ STRICT GEMSTONE WARNING: NEVER wear the gemstone of GK (${gk.gkPlanet})! It inflates disease, debt, and lawsuits.
   ✦ GK Active Alert: ${gk.isCurrentDashaAfflicted ? "⚠️ YES — CURRENT CHARA DASHA ACTIVATES GK KARMIC TESTING!" : "No active GK dasha"}
-${bk.isBkProblemActive ? `- Bhratrikaraka (BK) Affliction Alert:\n  ✦ ${bk.warning}\n` : ""}- Darakaraka (DK — Spouse & Marriage Timing):
+- BK Subconscious Mind & Repeated Failure Skill Mastery:
+  ✦ BK Planet: ${bkSub.bkPlanet} in House ${bkSub.bkHouseFromLagna} (${bkSub.bkSign})
+  ✦ Subconscious Drive: ${bkSub.subconsciousDrive}
+  ✦ Initial Failure Testing Zone: ${bkSub.failureTestZone}
+  ✦ Ultimate Mastery Skill: ${bkSub.masterySkill}
+- MK Education Stream & Parental Nature:
+  ✦ MK Planet: ${mk.mkPlanet} in House ${mk.mkHouseFromLagna} (${mk.mkSign})
+  ✦ Education Stream: ${mk.educationStream}
+  ✦ Parental Nature: ${mk.parentalNature}
+  ✦ Mental Peace Source: ${mk.mentalPeaceSource}
+- PK Purva Punya & Progeny Blessing:
+  ✦ PK Planet: ${pk.pkPlanet} in House ${pk.pkHouseFromLagna} (${pk.pkSign})
+  ✦ Past Life Good Karma: ${pk.purvaPunyaStatus}
+  ✦ Intellect Style: ${pk.intellectQuality}
+  ✦ Progeny Blessing & Nature: ${pk.progenyBlessing} (Timing Signs: ${pk.progenyTimingSigns.join(", ")})
+- Love Marriage Indicator (Bhavat Bhavam: 5th from 7th = 11th House):
+  ✦ Status: ${lm.isLoveMarriageIndicated ? "❤️ Love / Romance Driven Marriage Indicated" : "Traditional / Arranged Family Alignment"}
+  ✦ Verdict: ${lm.verdict}
+  ${lm.evidence.length > 0 ? `✦ Evidence: ${lm.evidence.join(" | ")}` : ""}
+- Darakaraka (DK — Spouse & Marriage Timing):
   ✦ DK Planet: ${dk.dkPlanet} in ${dk.dkSign}
   ✦ Spouse Archetype: ${dk.spousePersona} (Key Traits: ${dk.spouseTraits.join(", ")})
   ${dk.hasDkObstacle ? `✦ ⚠️ ${dk.dkObstacleWarning}\n  ` : ""}✦ Marriage Timing Windows: ${dk.marriageTimingSigns.join(", ")} Chara Dashas

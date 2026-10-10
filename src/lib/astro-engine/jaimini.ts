@@ -218,6 +218,93 @@ export interface RetrogradePlanetInfo {
   guidance: string;
 }
 
+// ── Dasha Lagna (Dynamic 5th Pillar) ──────────────────────────────────────────
+export interface DashaLagnaHouse {
+  house: number;
+  sign: string;
+  signNum: number;
+  planets: string[];
+  karakas: string[];
+}
+
+export interface DashaLagnaAnalysis {
+  dashaSign: string;
+  dashaSignNum: number;
+  years: number;
+  startDate?: Date;
+  endDate?: Date;
+  isActive: boolean;
+  houses: DashaLagnaHouse[];
+  akAnalysis: {
+    house: number;
+    sign: string;
+    status: "Peak Elevation & Status (1/10/11)" | "Downfall & Vulnerability (8/12)" | "Steady Foundation";
+    verdict: string;
+  };
+  amkAnalysis: {
+    house: number;
+    sign: string;
+    status: "Major Wealth Surge & Boom (1/2/10/11)" | "Career Agony & Stagnation (6/8/12)" | "Steady Growth";
+    verdict: string;
+  };
+  gkAnalysis: {
+    house: number;
+    sign: string;
+    targetArea: string;
+    warning: string;
+  };
+  dkAnalysis: {
+    house: number;
+    sign: string;
+    isMarriageWindow: boolean;
+    verdict: string;
+  };
+  summary: string;
+}
+
+// ── BK Subconscious Mind & Repeated Failure Skill Mastery ─────────────────────
+export interface BkSubconsciousAnalysis {
+  bkPlanet: string;
+  bkSign: string;
+  bkHouseFromLagna: number;
+  subconsciousDrive: string;
+  failureTestZone: string;
+  masterySkill: string;
+  transcriptRule: string;
+}
+
+// ── MK Education Stream & Parental Nature ─────────────────────────────────────
+export interface MkEducationAnalysis {
+  mkPlanet: string;
+  mkSign: string;
+  mkHouseFromLagna: number;
+  educationStream: string;
+  parentalNature: string;
+  domesticSanctuary: string;
+  mentalPeaceSource: string;
+  transcriptRule: string;
+}
+
+// ── PK Purva Punya & Progeny Blessing ─────────────────────────────────────────
+export interface PkPurvaPunyaAnalysis {
+  pkPlanet: string;
+  pkSign: string;
+  pkHouseFromLagna: number;
+  purvaPunyaStatus: string;
+  intellectQuality: string;
+  progenyBlessing: string;
+  progenyTimingSigns: string[];
+  transcriptRule: string;
+}
+
+// ── Love Marriage Indicator (Bhavat Bhavam: 5th from 7th = 11th) ──────────────
+export interface LoveMarriageAnalysis {
+  isLoveMarriageIndicated: boolean;
+  bhavatBhavamRule: string;
+  evidence: string[];
+  verdict: string;
+}
+
 export interface JaiminiResult {
   karakas: Karaka[];
   arudhas: ArudhaPada[];
@@ -232,8 +319,14 @@ export interface JaiminiResult {
   direction: "Savya" | "Apasavya";
   directionReason: string;
   karakamsha: KarakamshaKundali;
+  currentDashaLagna: DashaLagnaAnalysis | null;
+  allDashaLagnas: DashaLagnaAnalysis[];
   gkAnalysis: GkAnalysis;
   bkAnalysis: BkAnalysis;
+  bkSubconscious: BkSubconsciousAnalysis;
+  mkEducation: MkEducationAnalysis;
+  pkPurvaPunya: PkPurvaPunyaAnalysis;
+  loveMarriageAnalysis: LoveMarriageAnalysis;
   dkAnalysis: DkAnalysis;
   akAmkAnalysis: AkAmkAnalysis;
   retrogradeActivation: RetrogradePlanetInfo[];
@@ -350,40 +443,242 @@ export const GK_PLANET_DISEASES: Record<string, string[]> = {
 
 export const GK_PLANET_REMEDIES: Record<string, string[]> = {
   Sun: [
-    "Sunday ko needy logon ko gehun (wheat) ka daan karein.",
+    "Sunday ko needy logon ko gehun (wheat) aur jaggery ka daan karein.",
     "Gareeb mareezon ko dawaiyon (medicines) me madad karein.",
+    "Sarkari contracts ya political connection ka kabhi ghamand na karein — litigation se bachein.",
     "Daily morning Surya Gayatri mantra ya Aditya Hridaya Stotra ka paath karein.",
   ],
   Moon: [
+    "Insomnia aur overthinking se bachne ke liye emotional hokar koi deal ya financial faisla na karein.",
     "Gareeb parivaaron ko annadaan (free food) bhent karein.",
     "Mata (mother) ki nitya seva karein aur unka aashirwad lein.",
     "Chandi ke bartan se paani piyein; shivling par kachha doodh arpit karein.",
   ],
   Mars: [
+    "Gym workout & physical weights: Sharir Mangal hai, machine Mangal hai. Exercising uses Mars's quota so it stops causing debts/accidents ('Play with the planet before it plays with you').",
     "North-East (Ishan kon) me Panchmukhi Hanuman ji ki photo/murti sthapit karein aur nitya darshan karein.",
-    "Daily exercise ya gym join karein — physical energy ko canalize karein.",
-    "Mangalwar ko Hanuman Chalisa ka paath aur laal masoor daal daan karein.",
+    "Mangalwar ko Hanuman mandir me seva karein aur laal masoor daal daan karein.",
+    "Karz (debt) se mukti ke liye physical discipline aur workout ko daily routine banayein.",
   ],
   Mercury: [
-    "Parindey (birds) ko nitya hari moong daal daalein.",
-    "Green parrot (tota) ki seva karein ya pinjre se azaad karein.",
+    "Raat ko hari sabut moong daal paani me bhigo kar subah pakshiyon (tote/birds) ko daalein.",
+    "Parrot (tote) ko pinjre se azaad karein ya unki nitya seva karein.",
     "Ganesh ji ko durva arpit karein aur gay ko hara chara khilayein.",
+    "Important documents ki legal checking aur double-verification karein.",
   ],
   Jupiter: [
     "Brihaspativar (Thursday) ko chana daal aur haldi mandir me daan karein.",
     "Guruon, shikshakon aur buzurgon ka hridaya se aadar-samman karein.",
     "Bina loan liye honest, transparent decisions lein — shortcut se bachein.",
+    "Liver aur metabolic health ke liye ayurvedic detox apnayein.",
   ],
   Venus: [
-    "Kitchen sink me thoda sa dahi (curd) regular bahayein — Shukra dosh shant hota hai.",
-    "Gareebon me aloo (potato) ka langar ya bhojan batein.",
-    "Mandir ya suhagin striyon ko itra (perfume) ya safed vastra daan karein.",
+    "Kitchen sink me subah aur raat ko thoda sa dahi (curd) daalkar paani baha dein — Shukra dosh shant hota hai.",
+    "Khud perfume/deo bilkul use na karein, doston ko perfume bhent (gift/donate) karein! Naap-tol kar scale par baat karein.",
+    "Gaumata ko nitya hara chara khilayein aur dahi ka sevan kam karein.",
+    "Female friends ke sath financial transactions me extra clarity aur paperwork rakhein.",
   ],
   Saturn: [
-    "Kali sabut urad daal + sarson tel ka daan lagatar 16-17 din karein.",
-    "Gareeb labour, safai karmachariyon aur physically challenged logon ki seva karein.",
-    "Gas aur joint pain ke liye ayurvedic Vata-shamak aahar aur routine apnayein.",
+    "Chai-Chhalni Urad Daal Remedy: 2-3 katori kali sabut urad daal par sarson tel lagayein. Steel ki chai ki chhalni me 1 spoon daalkar gas flame par poori tarah jalaayein (ash banayein) aur toilet me flush karein — 16-17 din lagatar subah aur shaam karein. Joint pain aur kidney stone me zabardast rahat milti hai.",
+    "Gareeb labour, safai karmachariyon aur physically challenged logon ko gulab jamun/mithai khilayein.",
+    "Apne joote (shoes) hamesha saaf, polished aur well-kept rakhein.",
+    "Saturday ko kali daal aur sarson tel ka daan karein.",
   ],
+};
+
+export const GEMSTONE_WARNING_FOR_GK = "ABSOLUTE PROHIBITION: Never wear the gemstone of your Gnatikaraka (GK)! Wearing a stone empowers the planet, and empowering GK inflates diseases, lawsuits, rivalries, and debts. For GK, strictly use donations, physical canalization, and seva.";
+
+export const FLOWING_WATER_REMEDY_FOR_MOON = "NATURAL FLOWING WATER VORTEX: If Moon is your AmK or AK, sit by natural flowing water bodies (rivers, waterfalls, natural springs) for 2 to 3 hours. As taught in the transcript, this activates Chandra's wealth vortex and triggers an inflow of wealth and contracts ('aandhi ki tarah paisa aana') for the next 6 months!";
+
+// ── BK Subconscious Drives Knowledge Base ─────────────────────────────────────
+export const BK_SUBCONSCIOUS_DRIVES: Record<number, {
+  drive: string;
+  failureTestZone: string;
+  masterySkill: string;
+  transcriptRule: string;
+}> = {
+  1: {
+    drive: "Self-identity, personal endurance, physical vitality and self-made authority.",
+    failureTestZone: "Initial struggles with self-confidence, identity confusion, and solo endeavors.",
+    masterySkill: "Development of formidable personal magnetism, unshakeable stamina, and solo leadership mastery.",
+    transcriptRule: "Subconscious mind is obsessed with proving self-worth; initial identity failures forge ultimate personal power.",
+  },
+  2: {
+    drive: "Wealth accumulation, family legacy, oral persuasion, and resource defense.",
+    failureTestZone: "Early financial instability, family asset disputes, and vocal miscommunication.",
+    masterySkill: "Hypnotic vocal influence, master wealth curation, and legendary financial resilience.",
+    transcriptRule: "Subconscious mind constantly worries about security; financial struggles teach legendary wealth mastery.",
+  },
+  3: {
+    drive: "Marketing outreach, digital media, writing, and hands-on technical craftsmanship.",
+    failureTestZone: "Initial marketing flops, sibling rivalries, and failed creative launches.",
+    masterySkill: "Virtuoso communication, unmatched marketing prowess, and brilliant technical skill.",
+    transcriptRule: "Subconscious mind lives in 3rd house; repeated efforts and failures build world-class marketable skill.",
+  },
+  4: {
+    drive: "Real estate acquisition, domestic sanctuary, vehicles, and inner emotional anchorage.",
+    failureTestZone: "Domestic unrest, property purchase delays, and emotional turbulence with maternal ties.",
+    masterySkill: "Empire of landed property, tranquil inner stability, and mastery over domestic logistics.",
+    transcriptRule: "Subconscious mind seeks emotional roots; overcoming early domestic chaos builds solid property empires.",
+  },
+  5: {
+    drive: "Intellectual counsel, creative problem-solving, progeny leadership, and mentoring.",
+    failureTestZone: "Speculative investments backfiring, advisory rejection, and creative blocks.",
+    masterySkill: "Genius strategic foresight, master advisor status, and transformative creative output.",
+    transcriptRule: "Subconscious mind revolves around genius solutions; early advisory setbacks create supreme wisdom.",
+  },
+  6: {
+    drive: "Conflict resolution, legal/medical defense, organizational service, and dispute mastery.",
+    failureTestZone: "Exhausting rivalries, workplace litigation, and chronic daily grind fatigue.",
+    masterySkill: "Unbeatable dispute strategist, medical/legal arbitrator, and master of overcoming adversaries.",
+    transcriptRule: "Subconscious mind constantly battles obstacles; repeated conflicts build an invincible problem solver.",
+  },
+  7: {
+    drive: "Bilateral partnerships, commercial contracts, public diplomacy, and spouse synergy.",
+    failureTestZone: "Partnership betrayals, contractual misunderstandings, and public misjudgments.",
+    masterySkill: "Master negotiator, international alliance architect, and consummate diplomatic dealmaker.",
+    transcriptRule: "Subconscious mind seeks public alliances; initial contractual friction builds negotiation genius.",
+  },
+  8: {
+    drive: "Esoteric sciences, forensic research, crisis turnaround, and deep psychological truths.",
+    failureTestZone: "Sudden rug-pulls, acute existential crises, and traumatic hidden disruptions.",
+    masterySkill: "Crisis turnaround magician, master of occult/unseen depths, and indestructible psychological grit.",
+    transcriptRule: "Subconscious mind probes the unknown; surviving deep crises transforms the native into an alchemist.",
+  },
+  9: {
+    drive: "Higher philosophical doctrine, spiritual dissemination, publishing, and mentoring disciples.",
+    failureTestZone: "Disillusionment with dogma, mentor friction, and foreign academic hurdles.",
+    masterySkill: "Supreme philosophical preceptor, celebrated author, and inspiring spiritual beacon.",
+    transcriptRule: "Subconscious mind thirsts for dharma; early spiritual disillusionment sparks authentic enlightenment.",
+  },
+  10: {
+    drive: "Corporate zenith, governmental authority, public reputation, and worldly duty execution.",
+    failureTestZone: "Lack of recognition, corporate politics, and early career promotions denied.",
+    masterySkill: "Dominant executive authority, flawless administration, and legendary career legacy.",
+    transcriptRule: "Subconscious mind dreams of the throne; overcoming unfair politics builds an untouchable executive leader.",
+  },
+  11: {
+    drive: "Ecosystem scaling, mega network communities, collective social influence, and desire fulfillment.",
+    failureTestZone: "Group politics, broken promises by syndicate partners, and sudden gain interruptions.",
+    masterySkill: "Architect of massive community platforms, master of venture scale, and multi-stream wealth creator.",
+    transcriptRule: "Subconscious mind thrives on scale; initial community betrayals teach the secrets of massive networks.",
+  },
+  12: {
+    drive: "Transcendent liberation, foreign offshore frontiers, spiritual retreats, and subconscious clearing.",
+    failureTestZone: "Isolation, financial leakages overseas, and sleep/anxiety struggles.",
+    masterySkill: "Global bridge builder, master of detachment, spiritual sanctuary creator, and foreign trade authority.",
+    transcriptRule: "Subconscious mind lives in foreign/spiritual realms; early alienation blossoms into sublime freedom.",
+  },
+};
+
+// ── MK Education Streams & Parental Nature Knowledge Base ─────────────────────
+export const MK_EDUCATION_STREAMS: Record<string, {
+  stream: string;
+  parentalNature: string;
+  domesticSanctuary: string;
+  mentalPeaceSource: string;
+  transcriptRule: string;
+}> = {
+  Sun: {
+    stream: "Medicine, Public Administration, Political Science, Surgery, Governance, Constitutional Law",
+    parentalNature: "Parents are dignified, disciplined, status-oriented, with father having a dominant role.",
+    domesticSanctuary: "Orderly, regal, spotless, values family honor and public reputation.",
+    mentalPeaceSource: "Living with absolute self-respect, moral integrity, and father's blessings.",
+    transcriptRule: "MK Sun establishes education in administration/medicine and parental heritage rooted in dignity.",
+  },
+  Moon: {
+    stream: "Psychology, Nursing, Hospitality, Marine Sciences, Fine Arts, Dairy & FMCG Logistics",
+    parentalNature: "Parents are deeply caring, empathetic, home-loving, with mother playing the central nurturing role.",
+    domesticSanctuary: "Emotional haven, fluid atmosphere, near water or lush plants, welcoming to guests.",
+    mentalPeaceSource: "Emotional harmony, maternal blessings, and quiet retreats near natural water bodies.",
+    transcriptRule: "MK Moon shapes education around human care/psychology and derives peace from mother and water.",
+  },
+  Mars: {
+    stream: "Mechanical & Civil Engineering, Real Estate, Defense/Police Academies, Sports Medicine, Architecture",
+    parentalNature: "Parents are energetic, action-driven, assertive, and enforce strict physical discipline.",
+    domesticSanctuary: "Active, dynamic, equipped with workout tools, machinery, or architectural models.",
+    mentalPeaceSource: "Rigorous daily physical exercise, dynamic sports, and clearing all debts.",
+    transcriptRule: "MK Mars directs education into technical/engineering fields and brings mental peace through action.",
+  },
+  Mercury: {
+    stream: "Commerce, Chartered Accountancy (CA), Software/IT, Journalism, Mass Communication, Data Analytics",
+    parentalNature: "Parents are intellectual, communicative, business-minded, and maintain a friendly dynamic.",
+    domesticSanctuary: "Lively, filled with books, documents, digital devices, and witty conversations.",
+    mentalPeaceSource: "Reading books, writing, intellectual debates, and organizing analytical data.",
+    transcriptRule: "MK Mercury orients education towards commerce/IT and finds domestic peace in books and study.",
+  },
+  Jupiter: {
+    stream: "Philosophy, Law & Judiciary, Higher Academics, Banking & Economics, Traditional Sanskrit/Vedic Theology",
+    parentalNature: "Parents are spiritual, deeply dharmic, respected educators, who instill high ethical morals.",
+    domesticSanctuary: "Sacred sanctuary with temple space, altar, sacred texts, and peaceful scholarly vibration.",
+    mentalPeaceSource: "Satsang, spiritual study, mentoring others, and receiving guru's holy blessings.",
+    transcriptRule: "MK Jupiter drives education in law/philosophy and makes home a sacred temple of wisdom.",
+  },
+  Venus: {
+    stream: "Architecture, Interior Design, Fashion & Styling, Media/Cinema, Luxury Hospitality, Visual Arts",
+    parentalNature: "Parents are refined, affectionate, artistic, with strong aesthetic taste and social grace.",
+    domesticSanctuary: "Aesthetic masterclass, beautifully decorated, subtle fragrance, elegant ambiance.",
+    mentalPeaceSource: "Aesthetic harmony, creative musical arts, luxury comforts, and peaceful romantic bonds.",
+    transcriptRule: "MK Venus shapes education in luxury arts/design and brings deep inner peace through beauty.",
+  },
+  Saturn: {
+    stream: "Law, Labor Relations, Structural Engineering, Geology, Mining, Civil Administration, Ancient History",
+    parentalNature: "Parents are hardworking, humble, resilient, having endured hardship with stoic perseverance.",
+    domesticSanctuary: "Minimalist, quiet, orderly, grounded, free from flashy superficial distractions.",
+    mentalPeaceSource: "Unwavering self-discipline, fulfilling hard duties, and solitude in nature.",
+    transcriptRule: "MK Saturn channels education into law/heavy structures and produces peace through disciplined labor.",
+  },
+};
+
+// ── PK Purva Punya & Progeny Knowledge Base ───────────────────────────────────
+export const PK_PURVA_PUNYA_TRAITS: Record<string, {
+  goodKarmaManifestation: string;
+  intellectStyle: string;
+  progenyNature: string;
+  transcriptRule: string;
+}> = {
+  Sun: {
+    goodKarmaManifestation: "Inherited royal authority, moral clarity, and natural social dignity without struggle.",
+    intellectStyle: "Executive, decisive, strategic visionary with natural command over systems.",
+    progenyNature: "Dignified, ambitious, status-conscious children who bring high honor to the family lineage.",
+    transcriptRule: "PK Sun manifests past-life dharmic leadership into innate brilliance and celebrated progeny.",
+  },
+  Moon: {
+    goodKarmaManifestation: "Inherited public affection, emotional intuition, and widespread social goodwill.",
+    intellectStyle: "Deeply intuitive, empathetic, creative imagination with swift associative memory.",
+    progenyNature: "Gentle, compassionate, artistic children who share a deep emotional bond with parents.",
+    transcriptRule: "PK Moon reflects past-life compassionate service, granting creative intellect and loving children.",
+  },
+  Mars: {
+    goodKarmaManifestation: "Inherited courage, physical invincibility, and swift technical execution.",
+    intellectStyle: "Sharp, incisive, logic-driven, rapid problem solver with tactical brilliance.",
+    progenyNature: "Energetic, courageous, athletic, sports-loving children with strong physical vitality.",
+    transcriptRule: "PK Mars reflects past-life bravery, providing sharp logic and action-oriented progeny.",
+  },
+  Mercury: {
+    goodKarmaManifestation: "Inherited commercial shrewdness, verbal mastery, and intellectual agility.",
+    intellectStyle: "Multi-disciplinary genius, analytical wit, rapid calculation, and encyclopedic curiosity.",
+    progenyNature: "Super-intelligent, witty, academically stellar children with high adaptability.",
+    transcriptRule: "PK Mercury proves past-life intellectual merit, yielding brilliant brain power and sharp kids.",
+  },
+  Jupiter: {
+    goodKarmaManifestation: "Inherited spiritual wisdom, divine protection, and effortless advisory respect.",
+    intellectStyle: "Philosophical depth, 'Granth Kanth' memorization capacity, and holistic problem-solving.",
+    progenyNature: "Dharmic, virtuous, obedient, academically revered children who carry forward sacred traditions.",
+    transcriptRule: "PK Jupiter is supreme Purva Punya: pristine intellect and deeply blessed, successful children.",
+  },
+  Venus: {
+    goodKarmaManifestation: "Inherited refined prosperity, artistic elegance, and magnetic charm.",
+    intellectStyle: "Sophisticated aesthetic discernment, diplomatic finesse, and cultured creative expression.",
+    progenyNature: "Charming, artistic, affectionate, graceful children who bring joy and prosperity into the home.",
+    transcriptRule: "PK Venus manifests past-life harmony into creative brilliance and loving, flourishing progeny.",
+  },
+  Saturn: {
+    goodKarmaManifestation: "Inherited karmic endurance, philosophical maturity, and resilience against worldly illusions.",
+    intellectStyle: "Pragmatic, methodical, deep long-term thinker with supreme structural patience.",
+    progenyNature: "Serious, responsible, disciplined, duty-bound children who mature early and support parents.",
+    transcriptRule: "PK Saturn shows past-life perseverance, granting profound realistic intellect and mature progeny.",
+  },
 };
 
 // ── DK Spouse Persona Knowledge Base ──────────────────────────────────────────
@@ -891,6 +1186,15 @@ export function calculateCharaDashaAD(
 
 // ── Karakamsha Kundali (D9 Navamsha Base — Transcript Correct Method) ─────────
 
+export function getPlanetsInD1Sign(chart: ChartData, sNum: number): string[] {
+  const normalized = md(sNum, 12);
+  return ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].filter(p => {
+    const data = chart.planets[p];
+    if (!data) return false;
+    return Math.floor(md(data.lon, 360) / 30) === normalized;
+  });
+}
+
 export function calculateKarakamsha(
   chart: ChartData,
   karakas: Karaka[]
@@ -908,14 +1212,7 @@ export function calculateKarakamsha(
 
   // STEP 4 & 5: D1 chart planets remain in their natal signs!
   // Houses 1 to 12 are counted from Karakamsha Lagna (d9SignNum)
-  function planetsInD1Sign(sNum: number): string[] {
-    const normalized = md(sNum, 12);
-    return ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].filter(p => {
-      const data = chart.planets[p];
-      if (!data) return false;
-      return Math.floor(md(data.lon, 360) / 30) === normalized;
-    });
-  }
+  const planetsInD1Sign = (sNum: number) => getPlanetsInD1Sign(chart, sNum);
 
   const THEMES: Record<number, { theme: string; significance: string }> = {
     1:  { theme: "Soul Character & Atma Swabhava", significance: "Inherent spiritual identity, physical vitality, self-respect and willpower" },
@@ -1288,8 +1585,8 @@ export function evaluateAkAmkAnalysis(
   const DUAL_SIGNS = [2, 5, 8, 11];
   const isAkInDual = DUAL_SIGNS.includes(ak.signNum);
   const isAmkInDual = DUAL_SIGNS.includes(amk.signNum);
-  const isAkRetro = Boolean(chart.planets[ak.planet]?.isRetrograde);
-  const isAmkRetro = Boolean(chart.planets[amk.planet]?.isRetrograde);
+  const isAkRetro = Boolean(chart.planets[ak.planet]?.retrograde || (chart.planets[ak.planet] as any)?.isRetrograde);
+  const isAmkRetro = Boolean(chart.planets[amk.planet]?.retrograde || (chart.planets[amk.planet] as any)?.isRetrograde);
   const isSupremeTeacherYoga = isAkInDual && isAmkInDual && isAkRetro && isAmkRetro && !isGkAspectingRajayoga;
 
   const isRajayoga = (isConjunct || isMutualAspect) && isAuspiciousHouse;
@@ -1354,7 +1651,7 @@ export function evaluateRetrogrades(chart: ChartData): RetrogradePlanetInfo[] {
 
   for (const p of GRAHA) {
     const data = chart.planets[p];
-    if (data?.isRetrograde) {
+    if (data?.retrograde || (data as any)?.isRetrograde) {
       const pSignNum = Math.floor(md(data.lon, 360) / 30);
       const pHouse = md(pSignNum - lagnaNum, 12) + 1;
       results.push({
@@ -1621,6 +1918,252 @@ export function calculateArgala(chart: ChartData): ArgalaEntry[] {
   });
 }
 
+// ── Dynamic Dasha Lagna Explorer (5th Pillar of Jaimini) ───────────────────────
+
+export function calculateDashaLagna(
+  dashaSignNum: number,
+  chart: ChartData,
+  karakas: Karaka[],
+  periodInfo?: { years?: number; startDate?: Date; endDate?: Date; isActive?: boolean }
+): DashaLagnaAnalysis {
+  const normDashaSign = md(dashaSignNum, 12);
+  const dashaSign = RASHIS[normDashaSign];
+
+  const ak = karakas.find(k => k.role === "AK") ?? karakas[0];
+  const amk = karakas.find(k => k.role === "AmK") ?? karakas[1];
+  const gk = karakas.find(k => k.role === "GK") ?? karakas[5];
+  const dk = karakas.find(k => k.role === "DK") ?? karakas[6];
+
+  // 12 houses counted from Dasha Sign as Lagna
+  const houses: DashaLagnaHouse[] = Array.from({ length: 12 }, (_, i) => {
+    const h = i + 1;
+    const signNum = md(normDashaSign + i, 12);
+    const occupants = getPlanetsInD1Sign(chart, signNum);
+    const occupantsKarakas = karakas
+      .filter(k => k.signNum === signNum)
+      .map(k => `${k.role} (${k.planet})`);
+
+    return {
+      house: h,
+      sign: RASHIS[signNum],
+      signNum,
+      planets: occupants,
+      karakas: occupantsKarakas,
+    };
+  });
+
+  // AK from Dasha Lagna
+  const akHouse = md(ak.signNum - normDashaSign, 12) + 1;
+  let akStatus: DashaLagnaAnalysis["akAnalysis"]["status"];
+  let akVerdict: string;
+
+  if ([1, 10, 11].includes(akHouse)) {
+    akStatus = "Peak Elevation & Status (1/10/11)";
+    akVerdict = `Supreme Elevation: Atmakaraka (${ak.planet}) sits in House ${akHouse} from this Dasha Lagna. The transcript confirms: when AK is in 1, 10, or 11 from the running Dasha, the native experiences royal dignity, supreme career elevation, social status boom, and unshakeable authority.`;
+  } else if ([8, 12].includes(akHouse)) {
+    akStatus = "Downfall & Vulnerability (8/12)";
+    akVerdict = `Karmic Testing & Vulnerability: Atmakaraka (${ak.planet}) sits in House ${akHouse} from this Dasha Lagna ('Girte hain log'). Indicates loss of position, health vulnerability, ego deflation, or unmerited accusations. Maintain low profile, avoid arrogance, and focus on spiritual surrender.`;
+  } else {
+    akStatus = "Steady Foundation";
+    akVerdict = `Steady Soul Evolution: Atmakaraka (${ak.planet}) occupies House ${akHouse} from this Dasha Lagna. Progress is stable, measured, and focused on building core character foundations.`;
+  }
+
+  // AmK from Dasha Lagna
+  const amkHouse = md(amk.signNum - normDashaSign, 12) + 1;
+  let amkStatus: DashaLagnaAnalysis["amkAnalysis"]["status"];
+  let amkVerdict: string;
+
+  if ([1, 2, 10, 11].includes(amkHouse)) {
+    amkStatus = "Major Wealth Surge & Boom (1/2/10/11)";
+    amkVerdict = `Wealth Vortex & Financial Boom: Amatyakaraka (${amk.planet}) sits in House ${amkHouse} from this Dasha Lagna ('Aandhi ki tarah paisa'). Extraordinary career momentum, high-value asset creation, lucrative client wins, and strong professional expansion.`;
+  } else if ([6, 8, 12].includes(amkHouse)) {
+    amkStatus = "Career Agony & Stagnation (6/8/12)";
+    amkVerdict = `Vocational Friction & Fatigue: Amatyakaraka (${amk.planet}) is trapped in House ${amkHouse} from this Dasha Lagna. Native faces unrewarded toil, delayed receivables, corporate roadblocks, or professional dissatisfaction. Avoid hasty job changes or speculative financial bets.`;
+  } else {
+    amkStatus = "Steady Growth";
+    amkVerdict = `Moderate Career Flow: Amatyakaraka (${amk.planet}) sits in House ${amkHouse} from this Dasha Lagna. Regular income and systematic career execution without extreme volatility.`;
+  }
+
+  // GK from Dasha Lagna
+  const gkHouse = md(gk.signNum - normDashaSign, 12) + 1;
+  const gkTarget = GK_HOUSE_PROBLEMS[gkHouse] ?? "Obstacles and testing zone";
+  const gkWarning = `Dasha Trouble Battlefield: Gnatikaraka (${gk.planet}) lands in House ${gkHouse} from Dasha Lagna. During this entire dasha, the primary friction, health drain, debt, or adversary attack will target ${gkHouse}th house affairs: ${gkTarget}. Never wear ${gk.planet}'s gemstone! Apply specific charity and remediation immediately.`;
+
+  // DK from Dasha Lagna
+  const dkHouse = md(dk.signNum - normDashaSign, 12) + 1;
+  const isMarriageWindow = [1, 7].includes(dkHouse) || normDashaSign === dk.signNum || doesSignAspect(normDashaSign, dk.signNum);
+  const dkVerdict = isMarriageWindow
+    ? `Prime Marriage & Partnership Window: Darakaraka (${dk.planet}) connects with House ${dkHouse} / marital axis of this Dasha Lagna. Exceptional period for engagement, marriage solemnization, or high-synergy commercial joint venture.`
+    : `Darakaraka (${dk.planet}) is in House ${dkHouse} from this Dasha Lagna. Relationship matters remain secondary to vocational/individual priorities during this timeframe.`;
+
+  const summary = `Dasha Lagna in ${dashaSign}: AK (${ak.planet}) in H${akHouse} (${akStatus}), AmK (${amk.planet}) in H${amkHouse} (${amkStatus}), GK (${gk.planet}) troubling H${gkHouse}, and DK (${dk.planet}) in H${dkHouse} (${isMarriageWindow ? "Marriage Active" : "Neutral"}).`;
+
+  return {
+    dashaSign,
+    dashaSignNum: normDashaSign,
+    years: periodInfo?.years ?? 0,
+    startDate: periodInfo?.startDate,
+    endDate: periodInfo?.endDate,
+    isActive: Boolean(periodInfo?.isActive),
+    houses,
+    akAnalysis: { house: akHouse, sign: RASHIS[ak.signNum], status: akStatus, verdict: akVerdict },
+    amkAnalysis: { house: amkHouse, sign: RASHIS[amk.signNum], status: amkStatus, verdict: amkVerdict },
+    gkAnalysis: { house: gkHouse, sign: RASHIS[gk.signNum], targetArea: gkTarget, warning: gkWarning },
+    dkAnalysis: { house: dkHouse, sign: RASHIS[dk.signNum], isMarriageWindow, verdict: dkVerdict },
+    summary,
+  };
+}
+
+// ── BK Subconscious Mind & Repeated Failure Skill Mastery ─────────────────────
+
+export function evaluateBkSubconscious(
+  chart: ChartData,
+  karakas: Karaka[]
+): BkSubconsciousAnalysis {
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+  const bk = karakas.find(k => k.role === "BK") ?? karakas[2];
+  const bkHouse = md(bk.signNum - lagnaNum, 12) + 1;
+
+  const data = BK_SUBCONSCIOUS_DRIVES[bkHouse] ?? {
+    drive: "Self-reliance and persistent efforts in house affairs.",
+    failureTestZone: "Initial struggles and repeated trials.",
+    masterySkill: "Elite mastery built through relentless determination.",
+    transcriptRule: "Subconscious mind achieves mastery through repeated efforts.",
+  };
+
+  return {
+    bkPlanet: bk.planet,
+    bkSign: bk.sign,
+    bkHouseFromLagna: bkHouse,
+    subconsciousDrive: data.drive,
+    failureTestZone: data.failureTestZone,
+    masterySkill: data.masterySkill,
+    transcriptRule: data.transcriptRule,
+  };
+}
+
+// ── MK Education Stream & Parental Nature ─────────────────────────────────────
+
+export function evaluateMkEducation(
+  chart: ChartData,
+  karakas: Karaka[]
+): MkEducationAnalysis {
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+  const mk = karakas.find(k => k.role === "MK") ?? karakas[3];
+  const mkHouse = md(mk.signNum - lagnaNum, 12) + 1;
+
+  const data = MK_EDUCATION_STREAMS[mk.planet] ?? {
+    stream: "General academics, administration, and humanities",
+    parentalNature: "Supportive, traditional, and value-oriented parents.",
+    domesticSanctuary: "Peaceful and grounded home sanctuary.",
+    mentalPeaceSource: "Honest living and harmonious family ties.",
+    transcriptRule: "MK planet determines academic stream and maternal roots.",
+  };
+
+  return {
+    mkPlanet: mk.planet,
+    mkSign: mk.sign,
+    mkHouseFromLagna: mkHouse,
+    educationStream: data.stream,
+    parentalNature: data.parentalNature,
+    domesticSanctuary: data.domesticSanctuary,
+    mentalPeaceSource: data.mentalPeaceSource,
+    transcriptRule: data.transcriptRule,
+  };
+}
+
+// ── PK Purva Punya & Progeny Blessing ─────────────────────────────────────────
+
+export function evaluatePkPurvaPunya(
+  chart: ChartData,
+  karakas: Karaka[]
+): PkPurvaPunyaAnalysis {
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+  const pk = karakas.find(k => k.role === "PK") ?? karakas[4];
+  const pkHouse = md(pk.signNum - lagnaNum, 12) + 1;
+
+  const data = PK_PURVA_PUNYA_TRAITS[pk.planet] ?? {
+    goodKarmaManifestation: "Inherited mental clarity and dharmic support.",
+    intellectStyle: "Creative problem solver with intuitive insight.",
+    progenyNature: "Dharmic and blessed progeny.",
+    transcriptRule: "PK reflects past-life merit and child blessings.",
+  };
+
+  const h5SignNum = md(lagnaNum + 4, 12);
+  const aspectingSigns = JAIMINI_ASPECTS[pk.signNum] ?? [];
+  const progenySignsSet = new Set([
+    pk.sign,
+    RASHIS[h5SignNum],
+    ...aspectingSigns.map(s => RASHIS[s]),
+  ]);
+  const progenyTimingSigns = Array.from(progenySignsSet);
+
+  return {
+    pkPlanet: pk.planet,
+    pkSign: pk.sign,
+    pkHouseFromLagna: pkHouse,
+    purvaPunyaStatus: data.goodKarmaManifestation,
+    intellectQuality: data.intellectStyle,
+    progenyBlessing: data.progenyNature,
+    progenyTimingSigns,
+    transcriptRule: data.transcriptRule,
+  };
+}
+
+// ── Love Marriage Indicator (Bhavat Bhavam: 5th from 7th = 11th) ──────────────
+
+export function evaluateLoveMarriage(
+  chart: ChartData,
+  karakas: Karaka[]
+): LoveMarriageAnalysis {
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+  const dk = karakas.find(k => k.role === "DK") ?? karakas[6];
+  const pk = karakas.find(k => k.role === "PK") ?? karakas[4];
+  const h11SignNum = md(lagnaNum + 10, 12);
+  const h11Sign = RASHIS[h11SignNum];
+
+  const evidence: string[] = [];
+
+  // Check DK in 11th house or aspecting 11th house
+  if (dk.signNum === h11SignNum) {
+    evidence.push(`Darakaraka (${dk.planet}) occupies House 11 (${h11Sign}) — direct connection between spouse karaka and the romance-from-partner house (5th from 7th).`);
+  } else if (doesSignAspect(dk.signNum, h11SignNum) && !isAdjacentSign(dk.signNum, h11SignNum)) {
+    evidence.push(`Darakaraka (${dk.planet} in ${dk.sign}) casts Jaimini Rashi Drishti on House 11 (${h11Sign}) — romantic partnership activation.`);
+  }
+
+  // Check Venus (natural karaka of love/marriage)
+  const venusData = chart.planets["Venus"];
+  if (venusData) {
+    const venusSignNum = Math.floor(md(venusData.lon, 360) / 30);
+    if (venusSignNum === h11SignNum) {
+      evidence.push(`Venus occupies House 11 (${h11Sign}) — natural karaka of love placed in 5th from 7th creates strong mutual attraction.`);
+    } else if (doesSignAspect(venusSignNum, h11SignNum) && !isAdjacentSign(venusSignNum, h11SignNum)) {
+      evidence.push(`Venus in ${RASHIS[venusSignNum]} casts Jaimini aspect on House 11 (${h11Sign}) — romantic inclination towards partner.`);
+    }
+  }
+
+  // Check PK (5th lord / romance / purva punya karaka)
+  if (pk.signNum === h11SignNum) {
+    evidence.push(`Putrakaraka (${pk.planet}) sits in House 11 (${h11Sign}) — past-life merit manifests through love / friend-circle union.`);
+  } else if (doesSignAspect(pk.signNum, h11SignNum) && !isAdjacentSign(pk.signNum, h11SignNum)) {
+    evidence.push(`Putrakaraka (${pk.planet} in ${pk.sign}) aspects House 11 (${h11Sign}) — heart-driven selection of partner.`);
+  }
+
+  const isLoveMarriageIndicated = evidence.length > 0;
+  const bhavatBhavamRule = "7th house represents marriage and legal partner. 5th house represents romance, affection, and personal choice. Bhavat Bhavam principle: The 5th house from the 7th house is the 11th house. When DK (spouse karaka), Venus, or PK aspects or occupies the 11th house, love marriage, romantic courtship, or marriage from friendship circle is strongly triggered.";
+
+  const verdict = isLoveMarriageIndicated
+    ? `Strong Love Marriage / Romance Alignment: 11th house (${h11Sign}, 5th from 7th) is activated by Jaimini karakas. The partner is destined to enter your life through personal romantic bonding, friendship circles, or mutual intellectual affinity rather than purely arranged avenues.`
+    : `Traditional / Family-Aligned Marriage: 11th house (${h11Sign}) does not receive direct Jaimini aspect from DK, Venus, or PK. Partnership manifests with dignity through traditional family introductions, parental blessings, and structured social alignment.`;
+
+  return {
+    isLoveMarriageIndicated,
+    bhavatBhavamRule,
+    evidence,
+    verdict,
+  };
+}
+
 // ── Master Function (Layer 4 Foundation) ──────────────────────────────────────
 
 export function buildJaiminiChart(chart: ChartData): JaiminiResult {
@@ -1645,9 +2188,19 @@ export function buildJaiminiChart(chart: ChartData): JaiminiResult {
   const gkAnalysis = evaluateGkAnalysis(chart, karakas, charaDasha);
   const gkKaraka = karakas.find(k => k.role === "GK") ?? karakas[5];
   const bkAnalysis = evaluateBkAnalysis(chart, karakas, gkKaraka);
+  const bkSubconscious = evaluateBkSubconscious(chart, karakas);
+  const mkEducation = evaluateMkEducation(chart, karakas);
+  const pkPurvaPunya = evaluatePkPurvaPunya(chart, karakas);
+  const loveMarriageAnalysis = evaluateLoveMarriage(chart, karakas);
   const dkAnalysis = evaluateDkAnalysis(chart, karakas, charaDasha);
   const akAmkAnalysis = evaluateAkAmkAnalysis(chart, karakas, charaDasha);
   const retrogradeActivation = evaluateRetrogrades(chart);
+
+  // Dynamic Dasha Lagna (5th Pillar)
+  const allDashaLagnas = charaDasha.map(p => calculateDashaLagna(p.signNum, chart, karakas, p));
+  const currentDashaLagna = currentDasha
+    ? calculateDashaLagna(currentDasha.signNum, chart, karakas, currentDasha)
+    : (allDashaLagnas[0] ?? null);
 
   return {
     karakas,
@@ -1663,8 +2216,14 @@ export function buildJaiminiChart(chart: ChartData): JaiminiResult {
     direction,
     directionReason,
     karakamsha,
+    currentDashaLagna,
+    allDashaLagnas,
     gkAnalysis,
     bkAnalysis,
+    bkSubconscious,
+    mkEducation,
+    pkPurvaPunya,
+    loveMarriageAnalysis,
     dkAnalysis,
     akAmkAnalysis,
     retrogradeActivation,

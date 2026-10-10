@@ -16,9 +16,16 @@ import {
   evaluateDkAnalysis,
   evaluateAkAmkAnalysis,
   evaluateRetrogrades,
+  calculateDashaLagna,
+  evaluateBkSubconscious,
+  evaluateMkEducation,
+  evaluatePkPurvaPunya,
+  evaluateLoveMarriage,
   buildJaiminiChart,
   GK_HOUSE_PROBLEMS,
   GK_PLANET_REMEDIES,
+  GEMSTONE_WARNING_FOR_GK,
+  FLOWING_WATER_REMEDY_FOR_MOON,
   DK_SPOUSE_PERSONAS,
   AK_SOUL_ATTRIBUTES,
   AK_HOUSE_SPHERES,
@@ -375,4 +382,171 @@ test("RULE N: AK Planet-Specific Physical & Personality Clues", () => {
   assert.ok(AK_SOUL_ATTRIBUTES.Saturn.traits.some(t => t.includes("Extreme punctuality")));
   assert.ok(AK_SOUL_ATTRIBUTES.Saturn.traits.some(t => t.includes("kachhue ki tarah slow but steady")));
 });
+
+test("RULE O: Dynamic Dasha Lagna Explorer (5th Pillar of Jaimini)", () => {
+  // Aries Lagna (0)
+  // AK: Sun in Leo (sign 4, deg 28) -> from Aries is H5
+  // AmK: Moon in Taurus (sign 1, deg 25)
+  // GK: Saturn in Scorpio (sign 7, deg 10)
+  // DK: Venus in Libra (sign 6, deg 4)
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 4, degreeInSign: 28.0 },
+    Moon: { rashiIndex: 1, degreeInSign: 25.0 },
+    Mars: { rashiIndex: 2, degreeInSign: 20.0 },
+    Mercury: { rashiIndex: 3, degreeInSign: 15.0 },
+    Jupiter: { rashiIndex: 5, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 7, degreeInSign: 10.0 },
+    Venus: { rashiIndex: 6, degreeInSign: 4.0 },
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  assert.ok(jaimini.allDashaLagnas.length === 12);
+  assert.ok(jaimini.currentDashaLagna !== null);
+
+  // Test Scorpio Dasha Lagna (sign 7):
+  // Dasha Lagna = Scorpio (7)
+  // AK Sun in Leo (4) -> House from Scorpio: (4 - 7 + 12) % 12 + 1 = 9 + 1 = 10th house!
+  // AK in 10th -> Peak Elevation & Status (1/10/11)
+  const scorpioDashaLagna = calculateDashaLagna(7, chart, jaimini.karakas);
+  assert.equal(scorpioDashaLagna.dashaSign, "Scorpio");
+  assert.equal(scorpioDashaLagna.akAnalysis.house, 10);
+  assert.equal(scorpioDashaLagna.akAnalysis.status, "Peak Elevation & Status (1/10/11)");
+  assert.ok(scorpioDashaLagna.akAnalysis.verdict.includes("Supreme Elevation"));
+
+  // AmK Moon in Taurus (1) -> House from Scorpio: (1 - 7 + 12) % 12 + 1 = 7th house (Steady Growth)
+  assert.equal(scorpioDashaLagna.amkAnalysis.house, 7);
+
+  // GK Saturn in Scorpio (7) -> House from Scorpio: 1st house!
+  assert.equal(scorpioDashaLagna.gkAnalysis.house, 1);
+  assert.ok(scorpioDashaLagna.gkAnalysis.warning.includes("Dasha Trouble Battlefield"));
+
+  // DK Venus in Libra (6) -> House from Scorpio: 12th house
+  assert.equal(scorpioDashaLagna.dkAnalysis.house, 12);
+
+  // Test Virgo Dasha Lagna (sign 5):
+  // AK Sun in Leo (4) -> House from Virgo: (4 - 5 + 12) % 12 + 1 = 12th house!
+  // AK in 12th -> Downfall & Vulnerability (8/12)
+  const virgoDashaLagna = calculateDashaLagna(5, chart, jaimini.karakas);
+  assert.equal(virgoDashaLagna.akAnalysis.house, 12);
+  assert.equal(virgoDashaLagna.akAnalysis.status, "Downfall & Vulnerability (8/12)");
+  assert.ok(virgoDashaLagna.akAnalysis.verdict.includes("Girte hain log"));
+
+  // AmK Moon in Taurus (1) -> House from Virgo: (1 - 5 + 12) % 12 + 1 = 9th house
+  assert.equal(virgoDashaLagna.amkAnalysis.house, 9);
+});
+
+test("RULE P: BK Subconscious Mind & Repeated Failure Skill Mastery", () => {
+  // Aries Lagna (0)
+  // Mars is BK (3rd highest degree) placed in Gemini (sign 2, House 3 from Lagna)
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 28.0 },     // AK
+    Moon: { rashiIndex: 1, degreeInSign: 25.0 },    // AmK
+    Mars: { rashiIndex: 2, degreeInSign: 20.0 },    // BK in House 3
+    Jupiter: { rashiIndex: 3, degreeInSign: 15.0 }, // MK
+    Mercury: { rashiIndex: 4, degreeInSign: 12.0 }, // PK
+    Saturn: { rashiIndex: 5, degreeInSign: 8.0 },   // GK
+    Venus: { rashiIndex: 6, degreeInSign: 4.0 },    // DK
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const bk = jaimini.bkSubconscious;
+
+  assert.equal(bk.bkPlanet, "Mars");
+  assert.equal(bk.bkHouseFromLagna, 3);
+  assert.ok(bk.subconsciousDrive.includes("Marketing outreach"));
+  assert.ok(bk.failureTestZone.includes("Initial marketing flops"));
+  assert.ok(bk.masterySkill.includes("Virtuoso communication"));
+  assert.ok(bk.transcriptRule.includes("Subconscious mind lives in 3rd house"));
+});
+
+test("RULE Q: MK Education Stream & Parental Nature", () => {
+  // Aries Lagna (0)
+  // Mars as MK -> Engineering, Technical, Strict Parents
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 28.0 },     // AK
+    Moon: { rashiIndex: 1, degreeInSign: 25.0 },    // AmK
+    Jupiter: { rashiIndex: 2, degreeInSign: 20.0 }, // BK
+    Mars: { rashiIndex: 3, degreeInSign: 15.0 },    // MK (Mars)
+    Mercury: { rashiIndex: 4, degreeInSign: 12.0 }, // PK
+    Saturn: { rashiIndex: 5, degreeInSign: 8.0 },   // GK
+    Venus: { rashiIndex: 6, degreeInSign: 4.0 },    // DK
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const mk = jaimini.mkEducation;
+
+  assert.equal(mk.mkPlanet, "Mars");
+  assert.ok(mk.educationStream.includes("Mechanical & Civil Engineering"));
+  assert.ok(mk.parentalNature.includes("strict physical discipline"));
+  assert.ok(mk.mentalPeaceSource.includes("physical exercise"));
+});
+
+test("RULE R: PK Purva Punya & Progeny Blessing", () => {
+  // Aries Lagna (0)
+  // Jupiter as PK -> Supreme Purva Punya, Granth Kanth, Blessed Progeny
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 28.0 },     // AK
+    Moon: { rashiIndex: 1, degreeInSign: 25.0 },    // AmK
+    Mars: { rashiIndex: 2, degreeInSign: 20.0 },    // BK
+    Mercury: { rashiIndex: 3, degreeInSign: 18.0 }, // MK
+    Jupiter: { rashiIndex: 4, degreeInSign: 15.0 }, // PK in Leo (4)
+    Saturn: { rashiIndex: 5, degreeInSign: 8.0 },   // GK
+    Venus: { rashiIndex: 6, degreeInSign: 4.0 },    // DK
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const pk = jaimini.pkPurvaPunya;
+
+  assert.equal(pk.pkPlanet, "Jupiter");
+  assert.ok(pk.intellectQuality.includes("Granth Kanth"));
+  assert.ok(pk.progenyBlessing.includes("Dharmic, virtuous"));
+  assert.ok(pk.progenyTimingSigns.includes("Leo"));
+});
+
+test("RULE S: Love Marriage Indicator (Bhavat Bhavam: 5th from 7th = 11th)", () => {
+  // Aries Lagna (0) -> 7th house is Libra (6). 5th from 7th is 11th house = Aquarius (10).
+  // If DK Venus sits in Aquarius (10), love marriage is indicated!
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 28.0 },
+    Moon: { rashiIndex: 1, degreeInSign: 25.0 },
+    Mars: { rashiIndex: 2, degreeInSign: 20.0 },
+    Jupiter: { rashiIndex: 3, degreeInSign: 18.0 },
+    Mercury: { rashiIndex: 4, degreeInSign: 15.0 },
+    Saturn: { rashiIndex: 5, degreeInSign: 8.0 },
+    Venus: { rashiIndex: 10, degreeInSign: 4.0 }, // DK in House 11 (Aquarius)
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const lm = jaimini.loveMarriageAnalysis;
+
+  assert.equal(lm.isLoveMarriageIndicated, true);
+  assert.ok(lm.evidence.some(e => e.includes("Darakaraka")));
+  assert.ok(lm.verdict.includes("Love Marriage"));
+  assert.ok(lm.bhavatBhavamRule.includes("5th house from the 7th house is the 11th house"));
+});
+
+test("RULE T: Transcript Specific Remedies & Absolute GK Gemstone Ban", () => {
+  // Saturn GK chai-chhalni urad dal remedy
+  assert.ok(GK_PLANET_REMEDIES.Saturn.some(r => r.includes("Chai-Chhalni Urad Daal Remedy")));
+  assert.ok(GK_PLANET_REMEDIES.Saturn.some(r => r.includes("16-17 din")));
+
+  // Mars GK gym weights remedy
+  assert.ok(GK_PLANET_REMEDIES.Mars.some(r => r.includes("Sharir Mangal hai, machine Mangal hai")));
+
+  // Venus GK curd in sink & perfume donation
+  assert.ok(GK_PLANET_REMEDIES.Venus.some(r => r.includes("Kitchen sink me subah aur raat ko thoda sa dahi")));
+  assert.ok(GK_PLANET_REMEDIES.Venus.some(r => r.includes("Khud perfume/deo bilkul use na karein")));
+
+  // Mercury GK birds moong dal
+  assert.ok(GK_PLANET_REMEDIES.Mercury.some(r => r.includes("pakshiyon (tote/birds) ko daalein")));
+
+  // Moon AmK / AK flowing water vortex
+  assert.ok(FLOWING_WATER_REMEDY_FOR_MOON.includes("natural flowing water bodies"));
+  assert.ok(FLOWING_WATER_REMEDY_FOR_MOON.includes("6 months"));
+
+  // Absolute gemstone prohibition
+  assert.ok(GEMSTONE_WARNING_FOR_GK.includes("ABSOLUTE PROHIBITION"));
+  assert.ok(GEMSTONE_WARNING_FOR_GK.includes("Never wear the gemstone of your Gnatikaraka (GK)"));
+});
+
 

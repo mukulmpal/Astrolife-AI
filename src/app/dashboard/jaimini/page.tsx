@@ -5,11 +5,15 @@ import { useUserChart } from "@/lib/user-chart";
 import {
   buildJaiminiChart,
   calculateCharaDashaAD,
+  calculateDashaLagna,
   RASHI_ICONS,
+  RASHIS,
   SIGN_COLOR,
   KARAKA_ICONS,
   formatCharaDate,
   formatCharaDaysRemaining,
+  GEMSTONE_WARNING_FOR_GK,
+  FLOWING_WATER_REMEDY_FOR_MOON,
   type Karaka,
   type ArudhaPada,
   type CharaDashaPeriod,
@@ -20,6 +24,11 @@ import {
   type DkAnalysis,
   type AkAmkAnalysis,
   type RetrogradePlanetInfo,
+  type DashaLagnaAnalysis,
+  type BkSubconsciousAnalysis,
+  type MkEducationAnalysis,
+  type PkPurvaPunyaAnalysis,
+  type LoveMarriageAnalysis,
 } from "@/lib/astro-engine/jaimini";
 import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
@@ -229,13 +238,29 @@ const ASPECT_MAP: Record<number, number[]> = {
   8:  [2, 5, 11], 9:  [1, 4, 7],  10: [0, 3, 6],  11: [2, 5, 8],
 };
 
+const TABS = [
+  { key: "karakas",     label: "👑 Karakas & Karakamsha" },
+  { key: "dasha_lagna", label: "🎯 Dasha Lagna (5th Pillar)" },
+  { key: "rajayoga",    label: "👑 AK-AmK & Life Focus" },
+  { key: "gk_radar",    label: "⚡ GK Problem Radar" },
+  { key: "dk_marriage", label: "💍 DK Marriage & Spouse" },
+  { key: "bk_mk_pk",    label: "🧠 BK/MK/PK Life Pillars" },
+  { key: "dasha",       label: "⏳ Chara Dasha (Exact)" },
+  { key: "retro",       label: "🔥 Retrograde Activation" },
+  { key: "aspects",     label: "👁️ Rashi Drishti" },
+  { key: "arudhas",     label: "🏛️ Arudha Padas" },
+] as const;
+
+type JaiminiTabKey = (typeof TABS)[number]["key"];
+
 // ── Main Page Component ───────────────────────────────────────────────────────
 
 export default function JaiminiPage() {
   const { birth, chart, loading, hasUserChart } = useUserChart();
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"karakas" | "gk_radar" | "dk_marriage" | "dasha" | "retro" | "aspects" | "arudhas">("karakas");
+  const [activeTab, setActiveTab] = useState<JaiminiTabKey>("karakas");
   const [selectedDashaIndex, setSelectedDashaIndex] = useState<number | null>(null);
+  const [selectedDashaLagnaSign, setSelectedDashaLagnaSign] = useState<number | null>(null);
 
   const jaimini = useMemo(() => {
     if (!chart || !hasUserChart) return null;
@@ -253,6 +278,29 @@ export default function JaiminiPage() {
     return calculateCharaDashaAD(period, chart);
   }, [chart, jaimini, selectedDashaIndex]);
 
+  const ak = jaimini ? jaimini.karakas.find((k) => k.role === "AK") : undefined;
+  const amk = jaimini ? jaimini.karakas.find((k) => k.role === "AmK") : undefined;
+  const gk = jaimini?.gkAnalysis;
+  const bk = jaimini?.bkAnalysis;
+  const bkSub = jaimini?.bkSubconscious;
+  const mk = jaimini?.mkEducation;
+  const pk = jaimini?.pkPurvaPunya;
+  const lm = jaimini?.loveMarriageAnalysis;
+  const dk = jaimini?.dkAnalysis;
+  const akAmk = jaimini?.akAmkAnalysis;
+  const kk = jaimini?.karakamsha;
+  const retro = jaimini?.retrogradeActivation ?? [];
+
+  const currentDashaSignNum = jaimini?.currentDasha?.signNum ?? 0;
+  const activeDashaLagnaSign = selectedDashaLagnaSign !== null ? selectedDashaLagnaSign : currentDashaSignNum;
+  const activeDashaLagna = useMemo(() => {
+    if (!jaimini || !chart) return null;
+    return (
+      jaimini.allDashaLagnas.find((dl) => dl.dashaSignNum === activeDashaLagnaSign) ??
+      calculateDashaLagna(activeDashaLagnaSign, chart, jaimini.karakas)
+    );
+  }, [jaimini, chart, activeDashaLagnaSign]);
+
   if (loading) {
     return (
       <div className="page flex items-center justify-center min-h-[60vh]">
@@ -261,7 +309,7 @@ export default function JaiminiPage() {
     );
   }
 
-  if (!chart || !jaimini) {
+  if (!chart || !jaimini || !gk || !bk || !bkSub || !mk || !pk || !lm || !dk || !akAmk || !kk) {
     return (
       <div className="page flex items-center justify-center min-h-[60vh]">
         <p className="text-[#6B635B]">Birth chart required for Jaimini analysis.</p>
@@ -269,24 +317,7 @@ export default function JaiminiPage() {
     );
   }
 
-  const tabs = [
-    { key: "karakas",     label: "👑 Karakas & Karakamsha" },
-    { key: "rajayoga",    label: "👑 AK-AmK & Life Focus" },
-    { key: "gk_radar",    label: "⚡ GK Problem Radar" },
-    { key: "dk_marriage", label: "💍 DK Marriage & Spouse" },
-    { key: "dasha",       label: "⏳ Chara Dasha (Exact)" },
-    { key: "retro",       label: "🔥 Retrograde Activation" },
-    { key: "aspects",     label: "👁️ Rashi Drishti" },
-    { key: "arudhas",     label: "🏛️ Arudha Padas" },
-  ] as const;
-
-  const ak = jaimini.karakas.find((k) => k.role === "AK");
-  const gk = jaimini.gkAnalysis;
-  const bk = jaimini.bkAnalysis;
-  const dk = jaimini.dkAnalysis;
-  const akAmk = jaimini.akAmkAnalysis;
-  const kk = jaimini.karakamsha;
-  const retro = jaimini.retrogradeActivation;
+  const tabs = TABS;
 
   return (
     <div className="page">
@@ -557,6 +588,268 @@ export default function JaiminiPage() {
           </div>
         )}
 
+        {/* ── TAB: Dasha Lagna Explorer (5th Pillar) ───────────────────────── */}
+        {activeTab === "dasha_lagna" && activeDashaLagna && (
+          <div className="flex flex-col gap-6">
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FAF7F2] p-5 shadow-sm">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                <span className="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                  🎯 दशा लग्न तकनीक · Jaimini 5th Pillar
+                </span>
+                <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                  Active Dasha Sign as Lagna
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-[#1A1A1A] mt-1">
+                Dynamic Dasha Lagna Explorer: {activeDashaLagna.dashaSign} Lagna
+              </h3>
+              <p className="text-sm text-[#6B635B] mt-1 leading-relaxed">
+                Transcript Secret: In Jaimini, whenever a sign runs in Chara Dasha, rotate that sign to House 1 (Lagna).
+                Where your AK, AmK, GK, and DK fall from this temporary throne tells the absolute truth of that chapter:
+                peak status vs fall, wealth surge vs career agony, and exact testing grounds.
+              </p>
+
+              {/* Sign Selector Bar */}
+              <div className="mt-4 pt-3 border-t border-[rgba(184,134,11,0.18)]">
+                <p className="text-xs uppercase tracking-wider font-bold text-[#8C827A] mb-2.5">
+                  Select Any Dasha Sign to Rotate Lagna:
+                </p>
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                  {RASHIS.map((rName, rIdx) => {
+                    const isSelected = activeDashaLagnaSign === rIdx;
+                    const isCurrentDasha = jaimini.currentDasha?.signNum === rIdx;
+                    return (
+                      <button
+                        key={rIdx}
+                        onClick={() => setSelectedDashaLagnaSign(rIdx)}
+                        className={`p-2 rounded-xl text-xs font-bold flex items-center justify-between border transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-gradient-to-r from-[#B8860B] to-[#996515] text-white border-[#B8860B] shadow-sm"
+                            : "bg-white text-[#4A4238] border-[rgba(184,134,11,0.2)] hover:border-[#B8860B]"
+                        }`}
+                      >
+                        <span className="flex items-center gap-1.5 truncate">
+                          <span>{RASHI_ICONS[rIdx]}</span>
+                          <span className="truncate">{rName}</span>
+                        </span>
+                        {isCurrentDasha && (
+                          <span
+                            className={`text-[9px] px-1 py-0.2 rounded font-extrabold ${
+                              isSelected ? "bg-white/30 text-white" : "bg-amber-100 text-amber-800"
+                            }`}
+                          >
+                            NOW
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+
+            {/* 4 Primary Pillar Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Pillar 1: AK Status */}
+              <div
+                className="rounded-2xl p-5 border flex flex-col justify-between"
+                style={{
+                  background:
+                    activeDashaLagna.akAnalysis.status.includes("Peak")
+                      ? "#F0FDF4"
+                      : activeDashaLagna.akAnalysis.status.includes("Downfall")
+                      ? "#FEF2F2"
+                      : "#FFFFFF",
+                  borderColor:
+                    activeDashaLagna.akAnalysis.status.includes("Peak")
+                      ? "#BBF7D0"
+                      : activeDashaLagna.akAnalysis.status.includes("Downfall")
+                      ? "#FECACA"
+                      : "rgba(184, 134, 11, 0.25)",
+                }}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                      👑 Atmakaraka ({ak?.planet}) from Dasha Lagna
+                    </span>
+                    <span
+                      className="text-xs px-2.5 py-0.5 rounded-full font-bold"
+                      style={{
+                        background: activeDashaLagna.akAnalysis.status.includes("Peak")
+                          ? "#DCFCE7"
+                          : activeDashaLagna.akAnalysis.status.includes("Downfall")
+                          ? "#FEE2E2"
+                          : "#FAF5EB",
+                        color: activeDashaLagna.akAnalysis.status.includes("Peak")
+                          ? "#166534"
+                          : activeDashaLagna.akAnalysis.status.includes("Downfall")
+                          ? "#991B1B"
+                          : "#B8860B",
+                      }}
+                    >
+                      House {activeDashaLagna.akAnalysis.house} · {activeDashaLagna.akAnalysis.status}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-[#1A1A1A] mt-1">
+                    {activeDashaLagna.akAnalysis.status.includes("Peak")
+                      ? "Supreme Elevation & Royal Status Chapter"
+                      : activeDashaLagna.akAnalysis.status.includes("Downfall")
+                      ? "Karmic Vulnerability & Caution Chapter"
+                      : "Steady Character Foundation Chapter"}
+                  </h4>
+                  <p className="text-xs text-[#4A4238] mt-2 leading-relaxed">
+                    {activeDashaLagna.akAnalysis.verdict}
+                  </p>
+                </div>
+              </div>
+
+              {/* Pillar 2: AmK Wealth Surge */}
+              <div
+                className="rounded-2xl p-5 border flex flex-col justify-between"
+                style={{
+                  background:
+                    activeDashaLagna.amkAnalysis.status.includes("Surge")
+                      ? "#F0FDF4"
+                      : activeDashaLagna.amkAnalysis.status.includes("Agony")
+                      ? "#FFFBEB"
+                      : "#FFFFFF",
+                  borderColor:
+                    activeDashaLagna.amkAnalysis.status.includes("Surge")
+                      ? "#BBF7D0"
+                      : activeDashaLagna.amkAnalysis.status.includes("Agony")
+                      ? "#FDE68A"
+                      : "rgba(184, 134, 11, 0.25)",
+                }}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                      💼 Amatyakaraka ({amk?.planet}) from Dasha Lagna
+                    </span>
+                    <span
+                      className="text-xs px-2.5 py-0.5 rounded-full font-bold"
+                      style={{
+                        background: activeDashaLagna.amkAnalysis.status.includes("Surge")
+                          ? "#DCFCE7"
+                          : activeDashaLagna.amkAnalysis.status.includes("Agony")
+                          ? "#FEF3C7"
+                          : "#FAF5EB",
+                        color: activeDashaLagna.amkAnalysis.status.includes("Surge")
+                          ? "#166534"
+                          : activeDashaLagna.amkAnalysis.status.includes("Agony")
+                          ? "#92400E"
+                          : "#B8860B",
+                      }}
+                    >
+                      House {activeDashaLagna.amkAnalysis.house} · {activeDashaLagna.amkAnalysis.status}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-[#1A1A1A] mt-1">
+                    {activeDashaLagna.amkAnalysis.status.includes("Surge")
+                      ? "Golden Wealth Vortex & Lucrative Expansion"
+                      : activeDashaLagna.amkAnalysis.status.includes("Agony")
+                      ? "Vocational Stagnation & Hard Toil"
+                      : "Systematic Career Progression"}
+                  </h4>
+                  <p className="text-xs text-[#4A4238] mt-2 leading-relaxed">
+                    {activeDashaLagna.amkAnalysis.verdict}
+                  </p>
+                </div>
+              </div>
+
+              {/* Pillar 3: GK Trouble Battlefield */}
+              <div className="rounded-2xl p-5 border border-red-200 bg-red-50/40 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-red-800">
+                      ⚡ Gnatikaraka ({gk.gkPlanet}) Trouble Zone
+                    </span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-red-100 text-red-800">
+                      House {activeDashaLagna.gkAnalysis.house} from Dasha Lagna
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-red-950 mt-1">
+                    Friction Target: {activeDashaLagna.gkAnalysis.targetArea}
+                  </h4>
+                  <p className="text-xs text-red-900 mt-2 leading-relaxed">
+                    {activeDashaLagna.gkAnalysis.warning}
+                  </p>
+                </div>
+              </div>
+
+              {/* Pillar 4: DK Marriage Window */}
+              <div className="rounded-2xl p-5 border border-pink-200 bg-pink-50/40 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-pink-800">
+                      💍 Darakaraka ({dk.dkPlanet}) Marriage Axis
+                    </span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-pink-100 text-pink-800">
+                      House {activeDashaLagna.dkAnalysis.house} from Dasha Lagna
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-pink-950 mt-1">
+                    {activeDashaLagna.dkAnalysis.isMarriageWindow
+                      ? "✓ High-Probability Marriage Window Active"
+                      : "Relationship Status Quo"}
+                  </h4>
+                  <p className="text-xs text-pink-900 mt-2 leading-relaxed">
+                    {activeDashaLagna.dkAnalysis.verdict}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 12 House Grid from Selected Dasha Lagna */}
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs uppercase tracking-widest font-semibold text-[#8C827A]">
+                  12 Houses from Dasha Lagna ({activeDashaLagna.dashaSign})
+                </p>
+                <span className="text-xs text-[#6B635B]">
+                  Natal planets mapped onto rotated Dasha coordinates
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                {activeDashaLagna.houses.map((h) => {
+                  const hasPlanets = h.planets.length > 0;
+                  const hasKarakas = h.karakas.length > 0;
+                  return (
+                    <div
+                      key={h.house}
+                      className="p-3 rounded-xl border text-xs flex flex-col justify-between"
+                      style={{
+                        background: hasPlanets ? "rgba(184, 134, 11, 0.06)" : "#FAF7F2",
+                        borderColor: hasPlanets ? "rgba(184, 134, 11, 0.35)" : "rgba(184, 134, 11, 0.15)",
+                      }}
+                    >
+                      <div className="flex items-center justify-between font-bold text-[#1A1A1A]">
+                        <span>H{h.house} · {h.sign}</span>
+                        <span>{RASHI_ICONS[h.signNum]}</span>
+                      </div>
+                      <div className="mt-2 pt-1 border-t border-[rgba(184,134,11,0.12)]">
+                        {hasPlanets ? (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-[#1A1A1A]">{h.planets.join(", ")}</span>
+                            {hasKarakas && (
+                              <span className="text-[10px] text-[#B8860B] font-semibold">
+                                {h.karakas.join(", ")}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-[#8C827A]">Vacant</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        )}
+
         {/* ── TAB 2: GK Problem Radar ──────────────────────────────────────── */}
         {activeTab === "gk_radar" && (
           <div className="flex flex-col gap-5">
@@ -677,6 +970,36 @@ export default function JaiminiPage() {
               )}
             </section>
 
+            {/* Absolute Gemstone Prohibition Alert */}
+            <section className="rounded-2xl border-2 border-red-500 bg-red-100/90 p-4.5 shadow-sm">
+              <div className="flex items-center gap-2.5 text-red-900 font-extrabold text-sm uppercase tracking-wide">
+                <span className="text-xl">⛔</span>
+                <span>ABSOLUTE PROHIBITION: NEVER WEAR GK GEMSTONE!</span>
+              </div>
+              <p className="text-xs text-red-950 mt-1.5 leading-relaxed font-medium">
+                {GEMSTONE_WARNING_FOR_GK}
+              </p>
+              <div className="mt-2.5 p-2.5 rounded-xl bg-red-200/60 text-xs text-red-900">
+                <strong>Transcript Mandate:</strong> Wearing the stone of {gk.gkPlanet} directly empowers disease, litigation, debts, and enemies. For {gk.gkPlanet}, strictly perform charity, selfless service, and physical canalization — NEVER wear its stone.
+              </div>
+            </section>
+
+            {/* Moon Natural Flowing Water Remedy if Moon is AK or AmK */}
+            {(ak?.planet === "Moon" || amk?.planet === "Moon") && (
+              <section className="rounded-2xl border-2 border-cyan-400 bg-cyan-50/80 p-4.5 shadow-sm">
+                <div className="flex items-center gap-2.5 text-cyan-950 font-bold text-sm">
+                  <span className="text-xl">🌊</span>
+                  <span>NATURAL FLOWING WATER VORTEX (TRANSCRIPT SECRET)</span>
+                </div>
+                <p className="text-xs text-cyan-900 mt-1.5 leading-relaxed">
+                  {FLOWING_WATER_REMEDY_FOR_MOON}
+                </p>
+                <div className="mt-2 p-2 rounded-lg bg-cyan-100/80 text-[11px] text-cyan-950 font-medium">
+                  Sit quietly for 2-3 hours near running natural river water, waterfalls, or springs. It recharges Chandra&apos;s wealth frequency and opens financial floodgates for the next 6 months!
+                </div>
+              </section>
+            )}
+
             {/* Prescribed Remedies from Transcript */}
             <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FAF7F2] p-5">
               <div className="flex items-center gap-2 mb-3">
@@ -776,6 +1099,171 @@ export default function JaiminiPage() {
 
                 <div className="mt-4 p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] text-xs text-[#4A4238]">
                   <strong>Focus on Antardasha:</strong> Mahadasha opens the window; the specific Antardasha of DK&apos;s sign or 7th lord pinpoints the exact wedding timing.
+                </div>
+              </div>
+            </div>
+
+            {/* Love Marriage Indicator (Bhavat Bhavam: 5th from 7th = 11th) */}
+            <section className="rounded-2xl border border-pink-300 bg-gradient-to-r from-pink-50/70 via-rose-50/50 to-pink-50/70 p-5 shadow-sm">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                <span className="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-pink-100 text-pink-900 border border-pink-300">
+                  ❤️ Love Marriage Indicator · Bhavat Bhavam (5th from 7th = 11th)
+                </span>
+                <span
+                  className="text-xs px-2.5 py-0.5 rounded-full font-bold"
+                  style={{
+                    background: lm.isLoveMarriageIndicated ? "#DCFCE7" : "#FAF5EB",
+                    color: lm.isLoveMarriageIndicated ? "#166534" : "#6B635B",
+                  }}
+                >
+                  {lm.isLoveMarriageIndicated ? "✓ Love / Chosen Marriage Indicated" : "Traditional Family Alignment"}
+                </span>
+              </div>
+              <h4 className="text-base font-bold text-[#1A1A1A] mt-1">
+                {lm.verdict}
+              </h4>
+              <p className="text-xs text-[#6B635B] mt-2 leading-relaxed">
+                {lm.bhavatBhavamRule}
+              </p>
+              {lm.evidence.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-pink-200/80 flex flex-col gap-1.5">
+                  <p className="text-xs font-bold text-pink-950">Active Astrological Evidence:</p>
+                  {lm.evidence.map((ev, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs text-pink-900">
+                      <span className="text-pink-600 font-bold shrink-0">✦</span>
+                      <span>{ev}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+
+        {/* ── TAB: BK / MK / PK Life Pillars ──────────────────────────────── */}
+        {activeTab === "bk_mk_pk" && (
+          <div className="flex flex-col gap-6">
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FAF7F2] p-5 shadow-sm">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                <span className="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                  🧠 BK, MK &amp; PK Life Pillars · Transcript Teachings
+                </span>
+                <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                  Subconscious Mind · Education · Purva Punya
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-[#1A1A1A] mt-1">
+                Subconscious Skill Mastery, Academic Streams &amp; Past Karma Blessings
+              </h3>
+              <p className="text-sm text-[#6B635B] mt-1 leading-relaxed">
+                As detailed in the 2-day workshop: BK unlocks the subconscious mind and the area where repeated trials forge supreme worldly mastery; MK reveals your natural academic stream and parental sanctuary; PK radiates your past-life good karma (purva punya), intellectual style, and progeny blessings.
+              </p>
+            </section>
+
+            {/* 3 Main Pillar Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Card 1: BK Subconscious Mind */}
+              <div className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                      🛡️ Bhratrikaraka ({bkSub.bkPlanet})
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                      House {bkSub.bkHouseFromLagna} · {bkSub.bkSign}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-[#1A1A1A]">
+                    Subconscious Drive &amp; Repeated Failure to Mastery
+                  </h4>
+                  <div className="my-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed">
+                    <strong>Transcript Law:</strong> &ldquo;{bkSub.transcriptRule}&rdquo;
+                  </div>
+                  <div className="flex flex-col gap-2 mt-3 text-xs">
+                    <div>
+                      <strong className="text-[#8C827A] uppercase text-[10px] tracking-wider block">Internal Fixation / Drive:</strong>
+                      <p className="text-[#1A1A1A] mt-0.5">{bkSub.subconsciousDrive}</p>
+                    </div>
+                    <div>
+                      <strong className="text-red-700 uppercase text-[10px] tracking-wider block">Initial Failure Testing Zone:</strong>
+                      <p className="text-[#4A4238] mt-0.5">{bkSub.failureTestZone}</p>
+                    </div>
+                    <div>
+                      <strong className="text-emerald-700 uppercase text-[10px] tracking-wider block">Forged Superpower / Mastery Skill:</strong>
+                      <p className="text-[#1A1A1A] font-semibold mt-0.5">{bkSub.masterySkill}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: MK Education Stream & Parental Heritage */}
+              <div className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                      🏡 Matrikaraka ({mk.mkPlanet})
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                      House {mk.mkHouseFromLagna} · {mk.mkSign}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-[#1A1A1A]">
+                    Education Stream &amp; Domestic Roots
+                  </h4>
+                  <div className="my-2.5 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-950 leading-relaxed">
+                    <strong>Transcript Law:</strong> &ldquo;{mk.transcriptRule}&rdquo;
+                  </div>
+                  <div className="flex flex-col gap-2 mt-3 text-xs">
+                    <div>
+                      <strong className="text-[#8C827A] uppercase text-[10px] tracking-wider block">Natural Academic Stream:</strong>
+                      <p className="text-[#1A1A1A] font-semibold mt-0.5">{mk.educationStream}</p>
+                    </div>
+                    <div>
+                      <strong className="text-[#8C827A] uppercase text-[10px] tracking-wider block">Parents&apos; Demeanor &amp; Heritage:</strong>
+                      <p className="text-[#4A4238] mt-0.5">{mk.parentalNature}</p>
+                    </div>
+                    <div>
+                      <strong className="text-emerald-700 uppercase text-[10px] tracking-wider block">Source of Deep Mental Peace:</strong>
+                      <p className="text-[#1A1A1A] mt-0.5">{mk.mentalPeaceSource}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3: PK Purva Punya & Progeny Blessing */}
+              <div className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                      💡 Putrakaraka ({pk.pkPlanet})
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                      House {pk.pkHouseFromLagna} · {pk.pkSign}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-[#1A1A1A]">
+                    Purva Punya, Intellect &amp; Progeny
+                  </h4>
+                  <div className="my-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 leading-relaxed">
+                    <strong>Transcript Law:</strong> &ldquo;{pk.transcriptRule}&rdquo;
+                  </div>
+                  <div className="flex flex-col gap-2 mt-3 text-xs">
+                    <div>
+                      <strong className="text-emerald-700 uppercase text-[10px] tracking-wider block">Past Life Good Karma (Purva Punya):</strong>
+                      <p className="text-[#1A1A1A] font-semibold mt-0.5">{pk.purvaPunyaStatus}</p>
+                    </div>
+                    <div>
+                      <strong className="text-[#8C827A] uppercase text-[10px] tracking-wider block">Intellectual Style &amp; Cognition:</strong>
+                      <p className="text-[#4A4238] mt-0.5">{pk.intellectQuality}</p>
+                    </div>
+                    <div>
+                      <strong className="text-[#8C827A] uppercase text-[10px] tracking-wider block">Progeny Nature &amp; Blessing:</strong>
+                      <p className="text-[#1A1A1A] mt-0.5">{pk.progenyBlessing}</p>
+                      <p className="text-[11px] text-[#B8860B] font-medium mt-1">
+                        Timing Signs: {pk.progenyTimingSigns.join(", ")} Chara Dashas
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
