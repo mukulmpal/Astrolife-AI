@@ -73,12 +73,12 @@ export interface ArgalaEntry {
   interpretation: string;
 }
 
-// ── NEW: Karakamsha Kundali Types ─────────────────────────────────────────────
+// ── Karakamsha Kundali (D9 Navamsha Base) ─────────────────────────────────────
 export interface KarakamshaHouse {
   house: number; // 1 to 12 from Karakamsha Lagna
   sign: string;
   signNum: number;
-  planets: string[];
+  planets: string[]; // D1 natal planets occupying this sign
   theme: string;
   significance: string;
 }
@@ -87,7 +87,11 @@ export interface KarakamshaKundali {
   akPlanet: string;
   akSign: string;
   akSignNum: number;
+  d9Sign: string;
+  d9SignNum: number;
   karakamshaLagna: string;
+  karakamshaLagnaNum: number;
+  method: string;
   houses: KarakamshaHouse[];
   staticAnalysis: {
     soulPurpose: string;
@@ -99,23 +103,55 @@ export interface KarakamshaKundali {
   };
 }
 
-// ── NEW: GK (Gnatikaraka) Analysis ────────────────────────────────────────────
+// ── GK (Gnatikaraka) Analysis ─────────────────────────────────────────────────
+export interface GkAfflictedPlanet {
+  planet: string;
+  sign: string;
+  signNum: number;
+  houseFromLagna: number;
+  isAdjacentProtected: boolean;
+  effect: string;
+}
+
+export interface GkAfflictedHouse {
+  house: number;
+  sign: string;
+  signNum: number;
+  effect: string;
+}
+
 export interface GkAnalysis {
   gkPlanet: string;
   gkSign: string;
   gkSignNum: number;
   degreeInSign: number;
   gkHouseFromLagna: number;
+  isGkLagnaLord: boolean;
+  gkLagnaLordDiagnosis?: string;
   houseProblem: string;
   diseases: string[];
   remedies: string[];
+  afflictedPlanets: GkAfflictedPlanet[];
+  afflictedHouses: GkAfflictedHouse[];
   timingDashaSigns: string[];
   isCurrentDashaAfflicted: boolean;
   activeDashaWarning?: string;
   crossVerificationNote: string;
 }
 
-// ── NEW: DK (Darakaraka) Analysis ────────────────────────────────────────────
+// ── BK (Bhratrikaraka) Problem Radar ──────────────────────────────────────────
+export interface BkAnalysis {
+  bkPlanet: string;
+  bkSign: string;
+  bkSignNum: number;
+  bkHouseFromLagna: number;
+  isInDusthana: boolean; // 6, 8, 12
+  isAfflictedByGk: boolean;
+  isBkProblemActive: boolean;
+  warning?: string;
+}
+
+// ── DK (Darakaraka) Analysis ─────────────────────────────────────────────────
 export interface DkAnalysis {
   dkPlanet: string;
   dkSign: string;
@@ -124,12 +160,14 @@ export interface DkAnalysis {
   dkHouseFromLagna: number;
   spousePersona: string;
   spouseTraits: string[];
+  hasDkObstacle: boolean;
+  dkObstacleWarning?: string;
   marriageTimingSigns: string[];
   isCurrentDashaMarriageWindow: boolean;
   marriageTimingNote: string;
 }
 
-// ── NEW: AK & AmK Analysis ────────────────────────────────────────────────────
+// ── AK & AmK Analysis ─────────────────────────────────────────────────────────
 export interface AkAmkAnalysis {
   akPlanet: string;
   akSign: string;
@@ -147,6 +185,20 @@ export interface AkAmkAnalysis {
   amkCareerField: string;
   amkGrowthTimingSigns: string[];
   isCurrentDashaAmk: boolean;
+  isRajayoga: boolean;
+  isGkAspectingRajayoga: boolean;
+  rajayogaTier: "Pinnacle Unblemished" | "Afflicted" | "None";
+  rajayogaDescription: string;
+}
+
+// ── Retrograde Planet Activation ──────────────────────────────────────────────
+export interface RetrogradePlanetInfo {
+  planet: string;
+  sign: string;
+  signNum: number;
+  houseFromLagna: number;
+  activationStatus: "Requires Activation";
+  guidance: string;
 }
 
 export interface JaiminiResult {
@@ -164,8 +216,10 @@ export interface JaiminiResult {
   directionReason: string;
   karakamsha: KarakamshaKundali;
   gkAnalysis: GkAnalysis;
+  bkAnalysis: BkAnalysis;
   dkAnalysis: DkAnalysis;
   akAmkAnalysis: AkAmkAnalysis;
+  retrogradeActivation: RetrogradePlanetInfo[];
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -227,18 +281,18 @@ export const JAIMINI_LORD: Record<number, string> = {
 
 // Rashi Drishti — movable ↔ fixed (minus adjacent), dual ↔ all duals
 export const JAIMINI_ASPECTS: Record<number, number[]> = {
-  0:  [4, 7, 10],   // Aries → Leo, Scorpio, Aquarius (skips Taurus)
-  1:  [3, 6, 9],    // Taurus → Cancer, Libra, Capricorn (skips Aries)
-  2:  [5, 8, 11],   // Gemini → Virgo, Sagittarius, Pisces
-  3:  [1, 7, 10],   // Cancer → Taurus, Scorpio, Aquarius (skips Leo)
-  4:  [0, 6, 9],    // Leo → Aries, Libra, Capricorn (skips Cancer)
-  5:  [2, 8, 11],   // Virgo → Gemini, Sagittarius, Pisces
-  6:  [1, 4, 10],   // Libra → Taurus, Leo, Aquarius (skips Scorpio)
-  7:  [0, 3, 9],    // Scorpio → Aries, Cancer, Capricorn (skips Libra)
-  8:  [2, 5, 11],   // Sagittarius → Gemini, Virgo, Pisces
-  9:  [1, 4, 7],    // Capricorn → Taurus, Leo, Scorpio (skips Aquarius)
-  10: [0, 3, 6],    // Aquarius → Aries, Cancer, Libra (skips Capricorn)
-  11: [2, 5, 8],    // Pisces → Gemini, Virgo, Sagittarius
+  0:  [4, 7, 10],   // Aries (movable) → Leo, Scorpio, Aquarius (skips adjacent Taurus)
+  1:  [3, 6, 9],    // Taurus (fixed) → Cancer, Libra, Capricorn (skips adjacent Aries)
+  2:  [5, 8, 11],   // Gemini (dual) → Virgo, Sagittarius, Pisces
+  3:  [1, 7, 10],   // Cancer (movable) → Taurus, Scorpio, Aquarius (skips adjacent Leo)
+  4:  [0, 6, 9],    // Leo (fixed) → Aries, Libra, Capricorn (skips adjacent Cancer)
+  5:  [2, 8, 11],   // Virgo (dual) → Gemini, Sagittarius, Pisces
+  6:  [1, 4, 10],   // Libra (movable) → Taurus, Leo, Aquarius (skips adjacent Scorpio)
+  7:  [0, 3, 9],    // Scorpio (fixed) → Aries, Cancer, Capricorn (skips adjacent Libra)
+  8:  [2, 5, 11],   // Sagittarius (dual) → Gemini, Virgo, Pisces
+  9:  [1, 4, 7],    // Capricorn (movable) → Taurus, Leo, Scorpio (skips adjacent Aquarius)
+  10: [0, 3, 6],    // Aquarius (fixed) → Aries, Cancer, Libra (skips adjacent Capricorn)
+  11: [2, 5, 8],    // Pisces (dual) → Gemini, Virgo, Sagittarius
 };
 
 export const SIGN_COLOR: Record<number, string> = {
@@ -248,12 +302,10 @@ export const SIGN_COLOR: Record<number, string> = {
 };
 
 // Savya (Direct/Clockwise) and Apasavya (Reverse/Anti-Clockwise) Signs
-// Savya: 1, 2, 3, 7, 8, 9 (0-indexed: 0, 1, 2, 6, 7, 8)
-// Apasavya: 4, 5, 6, 10, 11, 12 (0-indexed: 3, 4, 5, 9, 10, 11)
-export const SAVYA_SIGNS = [0, 1, 2, 6, 7, 8];
-export const APASAVYA_SIGNS = [3, 4, 5, 9, 10, 11];
+export const SAVYA_SIGNS = [0, 1, 2, 6, 7, 8]; // Aries, Taurus, Gemini, Libra, Scorpio, Sagittarius
+export const APASAVYA_SIGNS = [3, 4, 5, 9, 10, 11]; // Cancer, Leo, Virgo, Capricorn, Aquarius, Pisces
 
-// ── GK Knowledge Base (From Transcript) ───────────────────────────────────────
+// ── GK Knowledge Base ─────────────────────────────────────────────────────────
 export const GK_HOUSE_PROBLEMS: Record<number, string> = {
   1: "Bimariyan, physical stamina drops, health and vitality issues (Tan-bhav affliction)",
   2: "Paisa jo save kiya wo bhi nikal dega — accumulated wealth & family savings drain",
@@ -320,8 +372,8 @@ export const GK_PLANET_REMEDIES: Record<string, string[]> = {
 // ── DK Spouse Persona Knowledge Base ──────────────────────────────────────────
 export const DK_SPOUSE_PERSONAS: Record<string, { persona: string; traits: string[] }> = {
   Sun: {
-    persona: "Authoritative, dignified, and status-conscious partner with royal demeanor",
-    traits: ["Natural leadership", "High self-respect & integrity", "Connected to administration/governance", "Expects dignity and respect"],
+    persona: "Authoritative, dignified, status-conscious partner with royal demeanor and strong family background",
+    traits: ["High self-respect & integrity", "Connected to administration/governance", "Expects dignity and respect", "Proud and status-conscious"],
   },
   Moon: {
     persona: "Deeply emotional, gentle, caring, and nurturing life partner",
@@ -332,20 +384,20 @@ export const DK_SPOUSE_PERSONAS: Record<string, { persona: string; traits: strin
     traits: ["Active & sports/fitness oriented", "Decisive & action-driven", "Interest in land/property", "Strong, direct communication"],
   },
   Mercury: {
-    persona: "Youthful, intelligent, witty, and highly communicative spouse",
-    traits: ["Analytical & quick-witted", "Business/commercial acumen", "Great conversationalist", "Adaptable & social"],
+    persona: "Youthful, intelligent, witty, excellent management skills, and online work orientation",
+    traits: ["Analytical & quick-witted", "Business/management skills", "Great conversationalist", "Online and modern communication work"],
   },
   Jupiter: {
-    persona: "Spiritual, wise, knowledgeable advisor and dharmic partner",
-    traits: ["Natural teacher & solution provider", "Respects traditions & dharma", "Mature wisdom & sound counsel", "Fond of books and sacred studies"],
+    persona: "Spiritual, wise, knowledgeable advisor, health-conscious, and traditional dharmic partner",
+    traits: ["Natural teacher & solution provider", "Respects traditions & dharma", "Mature wisdom & sound counsel", "Fond of sacred studies & health"],
   },
   Venus: {
     persona: "Graceful, luxury-loving, artistic, and aesthetic life partner",
     traits: ["Sophisticated aesthetic sense", "Values financial abundance & luxury", "Charming & romantic nature", "Brings beauty & harmony to home"],
   },
   Saturn: {
-    persona: "Disciplined, grounded, hardworking, mature, and duty-bound spouse",
-    traits: ["Strong work ethic", "Patient and realistic mindset", "Loyal and dependable", "Supports through life hardships"],
+    persona: "Disciplined, grounded, hardworking, mature, honest, punctual, and duty-bound spouse",
+    traits: ["Strong work ethic", "Patient and realistic mindset", "Punctual & honest", "Supports through life hardships"],
   },
 };
 
@@ -387,10 +439,14 @@ function md(n: number, m: number): number {
   return ((n % m) + m) % m;
 }
 
+// Navamsha (D9) Sign Number: 108 navamshas across 360° (each is 3°20' = 3.333333°)
+export function getNavamshaSignNum(lon: number): number {
+  return Math.floor(md(lon, 360) / (360 / 108)) % 12;
+}
+
 // ── Chara Karakas (Degree-Wise, Strictly Excludes Rahu/Ketu) ───────────────────
 
 export function calculateKarakas(planets: ChartData["planets"]): Karaka[] {
-  // Strictly 7 planets per classical Jaimini & lecture transcript
   const GRAHA = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
   const sorted = GRAHA
     .filter(p => planets[p])
@@ -470,7 +526,12 @@ export function doesSignAspect(fromSign: number, toSign: number): boolean {
   return JAIMINI_ASPECTS[fromSign]?.includes(toSign) ?? false;
 }
 
-// ── Chara Dasha Direction & Years ─────────────────────────────────────────────
+export function isAdjacentSign(signA: number, signB: number): boolean {
+  const diff = Math.abs(signA - signB);
+  return diff === 1 || diff === 11;
+}
+
+// ── Chara Dasha Direction & Exact Duration ────────────────────────────────────
 
 export function getCharaDashaDirection(lagnaNum: number): {
   direction: "Savya" | "Apasavya";
@@ -478,20 +539,18 @@ export function getCharaDashaDirection(lagnaNum: number): {
   ninthSignNum: number;
   reason: string;
 } {
-  // Classical Jaimini 9th House Confirmation Rule:
-  // For signs [0, 1, 2] (Aries, Taurus, Gemini) -> 9th house is counted forward: L + 8
-  // For signs [3, 4, 5] (Cancer, Leo, Virgo) -> 9th house is counted backward: L - 8
-  // For signs [6, 7, 8] (Libra, Scorpio, Sagittarius) -> 9th house is counted backward: L - 8
-  // For signs [9, 10, 11] (Capricorn, Aquarius, Pisces) -> 9th house is counted forward: L + 8
+  // 9th House Confirmation Rule:
+  // For signs [0, 1, 2, 4, 5, 9, 10, 11] -> 9th sign counted forward: (lagnaNum + 8) % 12
+  // For signs [3, 6, 7, 8] -> 9th sign counted backward: (lagnaNum - 8) % 12
+  // Example from transcript: Virgo (5) -> forward 9th is Taurus (1, Savya) -> Clockwise!
+  // Example: Libra (6) -> backward 9th is Aquarius (10, Apasavya) -> Anti-clockwise!
   let ninthSignNum: number;
-  if ([0, 1, 2, 9, 10, 11].includes(lagnaNum)) {
+  if ([0, 1, 2, 4, 5, 9, 10, 11].includes(lagnaNum)) {
     ninthSignNum = md(lagnaNum + 8, 12);
   } else {
     ninthSignNum = md(lagnaNum - 8, 12);
   }
 
-  // Confirmation rule from lecture:
-  // "Lagna se shuru, 9th house se confirm karo. Agar 9th house Savya hai to Savya, Apasavya hai to Apasavya"
   const isNinthSavya = SAVYA_SIGNS.includes(ninthSignNum);
   const direction: "Savya" | "Apasavya" = isNinthSavya ? "Savya" : "Apasavya";
   const isDirect = direction === "Savya";
@@ -507,23 +566,20 @@ export function charaDashaYears(signNum: number, planets: ChartData["planets"]):
   if (!lordPlanet) return 10;
   const lordSign = Math.floor(md(lordPlanet.lon, 360) / 30);
 
-  // If lord is in the same sign (own sign) -> gets full 12 years
+  // If lord is in the same sign (own sign) -> gets full 12 years (Max: 12)
   if (lordSign === signNum) return 12;
 
-  // Sign Savya vs Apasavya counting rule:
-  // Savya signs: Aries, Taurus, Gemini, Libra, Scorpio, Sagittarius (0, 1, 2, 6, 7, 8)
-  // Apasavya signs: Cancer, Leo, Virgo, Capricorn, Aquarius, Pisces (3, 4, 5, 9, 10, 11)
   const isSavya = SAVYA_SIGNS.includes(signNum);
+  const houseCount = isSavya
+    ? md(lordSign - signNum, 12) + 1
+    : md(signNum - lordSign, 12) + 1;
 
-  if (isSavya) {
-    // Count forward from sign to lord's sign
-    const houseDist = md(lordSign - signNum, 12) + 1;
-    return houseDist === 1 ? 12 : houseDist;
-  } else {
-    // Count reverse from sign to lord's sign
-    const houseDist = md(signNum - lordSign, 12) + 1;
-    return houseDist === 1 ? 12 : houseDist;
-  }
+  // Exact rule from transcript:
+  // "Rashi se uske lord ki position tak count karo, 1 minus kar do. Max 12, Min 1."
+  // Example: Taurus (2), lord in 6th house (Virgo, count 5) -> 5 - 1 = 4 saal!
+  let duration = houseCount - 1;
+  if (duration <= 0) duration = 12;
+  return Math.max(1, Math.min(12, duration));
 }
 
 export function calculateCharaDasha(
@@ -593,7 +649,6 @@ export function calculateCharaDashaAD(
   let cursor = new Date(mdPeriod.startDate);
 
   for (let i = 0; i < 12; i++) {
-    // AD starts from MD sign itself, progresses in Lagna's verified direction
     const adSignNum = isDirect
       ? md(mdPeriod.signNum + i, 12)
       : md(mdPeriod.signNum - i, 12);
@@ -625,18 +680,26 @@ export function calculateCharaDashaAD(
   return ads;
 }
 
-// ── Karakamsha Kundali ────────────────────────────────────────────────────────
+// ── Karakamsha Kundali (D9 Navamsha Base — Transcript Correct Method) ─────────
 
 export function calculateKarakamsha(
   chart: ChartData,
   karakas: Karaka[]
 ): KarakamshaKundali {
   const ak = karakas.find(k => k.role === "AK") ?? karakas[0];
-  const akSignNum = ak.signNum;
-  const akPlanet = ak.planet;
-  const akSign = RASHIS[akSignNum];
+  const akLon = chart.planets[ak.planet]?.lon ?? (ak.signNum * 30 + ak.degreeInSign);
 
-  function planetsInSign(sNum: number): string[] {
+  // STEP 1 & 2: Identify AK planet in D1, then find its D9 (Navamsha) sign
+  const d9SignNum = getNavamshaSignNum(akLon);
+  const d9Sign = RASHIS[d9SignNum];
+
+  // STEP 3: Make the D9 sign of AK the Karakamsha Lagna
+  const karakamshaLagna = d9Sign;
+  const karakamshaLagnaNum = d9SignNum;
+
+  // STEP 4 & 5: D1 chart planets remain in their natal signs!
+  // Houses 1 to 12 are counted from Karakamsha Lagna (d9SignNum)
+  function planetsInD1Sign(sNum: number): string[] {
     const normalized = md(sNum, 12);
     return ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].filter(p => {
       const data = chart.planets[p];
@@ -662,8 +725,8 @@ export function calculateKarakamsha(
 
   const houses: KarakamshaHouse[] = Array.from({ length: 12 }, (_, i) => {
     const h = i + 1;
-    const signNum = md(akSignNum + i, 12);
-    const occupants = planetsInSign(signNum);
+    const signNum = md(karakamshaLagnaNum + i, 12);
+    const occupants = planetsInD1Sign(signNum);
     const meta = THEMES[h];
     return {
       house: h,
@@ -675,8 +738,7 @@ export function calculateKarakamsha(
     };
   });
 
-  // Interpretations based on transcript rules:
-  const akAttr = AK_SOUL_ATTRIBUTES[akPlanet] ?? { quality: "Soul Focus", description: "Spiritual development" };
+  const akAttr = AK_SOUL_ATTRIBUTES[ak.planet] ?? { quality: "Soul Focus", description: "Spiritual development" };
   const h2Planets = houses[1].planets;
   const h7Planets = houses[6].planets;
   const h10Planets = houses[9].planets;
@@ -694,13 +756,17 @@ export function calculateKarakamsha(
     : `Professional authority steered by ${JAIMINI_LORD[houses[9].signNum]} presiding over 10th from Karakamsha.`;
 
   return {
-    akPlanet,
-    akSign,
-    akSignNum,
-    karakamshaLagna: akSign,
+    akPlanet: ak.planet,
+    akSign: ak.sign,
+    akSignNum: ak.signNum,
+    d9Sign,
+    d9SignNum,
+    karakamshaLagna,
+    karakamshaLagnaNum,
+    method: "D9 Navamsha Base (Classical Jaimini Correct)",
     houses,
     staticAnalysis: {
-      soulPurpose: `${akPlanet} as Atmakaraka defines the soul core: ${akAttr.quality}. ${akAttr.description}`,
+      soulPurpose: `${ak.planet} (D9 in ${d9Sign}) establishes Karakamsha Lagna: ${akAttr.quality}. ${akAttr.description}`,
       wealthSource,
       familyNature: `Family foundations and domestic roots governed by ${houses[3].sign} (4th from Karakamsha) with ${houses[3].planets.length ? houses[3].planets.join(", ") : "peaceful vacancy"}.`,
       spousePersona,
@@ -710,7 +776,7 @@ export function calculateKarakamsha(
   };
 }
 
-// ── GK Deep Analysis & Problem Radar ──────────────────────────────────────────
+// ── GK Deep Analysis & Aspect Mapping ─────────────────────────────────────────
 
 export function evaluateGkAnalysis(
   chart: ChartData,
@@ -721,9 +787,83 @@ export function evaluateGkAnalysis(
   const gk = karakas.find(k => k.role === "GK") ?? karakas[5];
   const gkHouse = md(gk.signNum - lagnaNum, 12) + 1;
 
+  // RULE C: GK = Lagna Lord Rule
+  const lagnaLord = JAIMINI_LORD[lagnaNum];
+  const isGkLagnaLord = gk.planet === lagnaLord;
+  let gkLagnaLordDiagnosis: string | undefined;
+  if (isGkLagnaLord) {
+    gkLagnaLordDiagnosis = `CRITICAL: GK IS THE LAGNA LORD (${gk.planet})! In Jaimini, when GK rules Lagna, lifelong vulnerability affects physical health, personal identity, and emotional stamina. Lifelong remediation (mantra and daan) for ${gk.planet} is essential.`;
+  }
+
   const houseProblem = GK_HOUSE_PROBLEMS[gkHouse] ?? "General obstacles and testing period";
   const diseases = GK_PLANET_DISEASES[gk.planet] ?? ["Health vulnerability and fatigue"];
   const remedies = GK_PLANET_REMEDIES[gk.planet] ?? ["Regular prayer and charity on suitable day"];
+
+  // RULE B & I: GK Aspect Analysis (Adjacent Sign Rule & Affected Planets)
+  const GK_PLANET_EFFECTS: Record<string, string> = {
+    Moon: "Mental stress, mood instability, insomnia & emotional vulnerability",
+    Sun: "False allegations, character loss, friction with father or authority",
+    Mars: "Accident risk, high BP, surgical vulnerability, muscular injury",
+    Jupiter: "Liver or metabolic stress, wrong financial decisions, guru friction",
+    Venus: "Financial drain, marital friction, sensory indulgence traps",
+    Saturn: "Career obstacles, worker deception, severe joint/knee pain",
+    Mercury: "Memory lapses, speech confusion, nervous tension",
+  };
+
+  const afflictedPlanets: GkAfflictedPlanet[] = [];
+  const GRAHA = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+
+  for (const p of GRAHA) {
+    if (p === gk.planet || !chart.planets[p]) continue;
+    const pSignNum = Math.floor(md(chart.planets[p].lon, 360) / 30);
+    const pHouse = md(pSignNum - lagnaNum, 12) + 1;
+    const isAdjacent = isAdjacentSign(gk.signNum, pSignNum);
+
+    if (isAdjacent) {
+      // Protected by adjacent sign rule
+      afflictedPlanets.push({
+        planet: p,
+        sign: RASHIS[pSignNum],
+        signNum: pSignNum,
+        houseFromLagna: pHouse,
+        isAdjacentProtected: true,
+        effect: `Protected by Adjacent Sign Rule — GK in ${gk.sign} does not cast aspect on adjacent sign ${RASHIS[pSignNum]}.`,
+      });
+    } else if (doesSignAspect(gk.signNum, pSignNum)) {
+      // Truly aspected by GK
+      afflictedPlanets.push({
+        planet: p,
+        sign: RASHIS[pSignNum],
+        signNum: pSignNum,
+        houseFromLagna: pHouse,
+        isAdjacentProtected: false,
+        effect: GK_PLANET_EFFECTS[p] ?? `Karmic friction and delays regarding ${p} significations`,
+      });
+    }
+  }
+
+  // House Afflictions by GK Rashi Drishti
+  const afflictedHouses: GkAfflictedHouse[] = [];
+  const KEY_HOUSE_NAMES: Record<number, string> = {
+    2: "Wealth & Family Savings (Dhana Bhav) — wealth leakage and speech harshness",
+    4: "Domestic Peace & Mother (Sukha Bhav) — home friction and property disputes",
+    5: "Intellect & Children (Putra Bhav) — wrong investment decisions and progeny concerns",
+    7: "Marriage & Partnerships (Jaya Bhav) — partnership friction and marital strain",
+    10: "Career & Authority (Karma Bhav) — professional allegations and reputation challenges",
+  };
+
+  for (const [hStr, desc] of Object.entries(KEY_HOUSE_NAMES)) {
+    const h = Number(hStr);
+    const houseSignNum = md(lagnaNum + h - 1, 12);
+    if (doesSignAspect(gk.signNum, houseSignNum) && !isAdjacentSign(gk.signNum, houseSignNum)) {
+      afflictedHouses.push({
+        house: h,
+        sign: RASHIS[houseSignNum],
+        signNum: houseSignNum,
+        effect: desc,
+      });
+    }
+  }
 
   // Dasha signs that activate GK: GK's own sign + signs that have Jaimini Rashi Drishti on GK's sign
   const aspectingSigns = JAIMINI_ASPECTS[gk.signNum] ?? [];
@@ -749,13 +889,49 @@ export function evaluateGkAnalysis(
     gkSignNum: gk.signNum,
     degreeInSign: gk.degreeInSign,
     gkHouseFromLagna: gkHouse,
+    isGkLagnaLord,
+    gkLagnaLordDiagnosis,
     houseProblem,
     diseases,
     remedies,
+    afflictedPlanets,
+    afflictedHouses,
     timingDashaSigns,
     isCurrentDashaAfflicted,
     activeDashaWarning,
     crossVerificationNote,
+  };
+}
+
+// ── BK (Bhratrikaraka) Problem Evaluation ──────────────────────────────────────
+
+export function evaluateBkAnalysis(
+  chart: ChartData,
+  karakas: Karaka[],
+  gk: Karaka
+): BkAnalysis {
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+  const bk = karakas.find(k => k.role === "BK") ?? karakas[2];
+  const bkHouse = md(bk.signNum - lagnaNum, 12) + 1;
+
+  const isInDusthana = [6, 8, 12].includes(bkHouse);
+  const isAfflictedByGk = doesSignAspect(gk.signNum, bk.signNum) && !isAdjacentSign(gk.signNum, bk.signNum);
+  const isBkProblemActive = isInDusthana && isAfflictedByGk;
+
+  let warning: string | undefined;
+  if (isBkProblemActive) {
+    warning = `BK AFFLICTION: Bhratrikaraka (${bk.planet}) is placed in House ${bkHouse} from Lagna and receives Jaimini aspect from GK (${gk.planet}). Watch out for sibling disputes, sudden loss of courage/initiative, shoulder/arm strains, and communication failures.`;
+  }
+
+  return {
+    bkPlanet: bk.planet,
+    bkSign: bk.sign,
+    bkSignNum: bk.signNum,
+    bkHouseFromLagna: bkHouse,
+    isInDusthana,
+    isAfflictedByGk,
+    isBkProblemActive,
+    warning,
   };
 }
 
@@ -768,6 +944,7 @@ export function evaluateDkAnalysis(
 ): DkAnalysis {
   const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
   const dk = karakas.find(k => k.role === "DK") ?? karakas[6];
+  const gk = karakas.find(k => k.role === "GK") ?? karakas[5];
   const dkHouse = md(dk.signNum - lagnaNum, 12) + 1;
 
   const personaMeta = DK_SPOUSE_PERSONAS[dk.planet] ?? {
@@ -775,10 +952,22 @@ export function evaluateDkAnalysis(
     traits: ["Devotion", "Partnership mindset", "Patience"],
   };
 
+  // RULE K: DK in 6/12 or aspected by GK -> Marriage Obstacle
+  const isInDusthana = [6, 12].includes(dkHouse);
+  const isAspectedByGk = doesSignAspect(gk.signNum, dk.signNum) && !isAdjacentSign(gk.signNum, dk.signNum);
+  const hasDkObstacle = isInDusthana || isAspectedByGk;
+
+  let dkObstacleWarning: string | undefined;
+  if (hasDkObstacle) {
+    dkObstacleWarning = `DK CAUTION: Darakaraka (${dk.planet}) is in House ${dkHouse} from Lagna ${
+      isAspectedByGk ? `and aspected by GK (${gk.planet})` : ""
+    }. Indicates marital adjustments, delayed commitments, or partner health sensitivity requiring conscious patience and mutual understanding.`;
+  }
+
   // Marriage timing signs in Jaimini Chara Dasha:
   // 1. DK sign
   // 2. 7th house sign from Lagna
-  // 3. Signs aspecting DK or Upapada Lagna (UL)
+  // 3. Signs aspecting DK
   const seventhHouseSignNum = md(lagnaNum + 6, 12);
   const aspectingDkSigns = JAIMINI_ASPECTS[dk.signNum] ?? [];
   const timingSignsSet = new Set([
@@ -805,13 +994,15 @@ export function evaluateDkAnalysis(
     dkHouseFromLagna: dkHouse,
     spousePersona: personaMeta.persona,
     spouseTraits: personaMeta.traits,
+    hasDkObstacle,
+    dkObstacleWarning,
     marriageTimingSigns,
     isCurrentDashaMarriageWindow,
     marriageTimingNote,
   };
 }
 
-// ── AK & AmK Status & Growth Trajectory ────────────────────────────────────────
+// ── AK & AmK Status & Pinnacle Rajayoga Detection ─────────────────────────────
 
 export function evaluateAkAmkAnalysis(
   chart: ChartData,
@@ -821,6 +1012,7 @@ export function evaluateAkAmkAnalysis(
   const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
   const ak = karakas.find(k => k.role === "AK") ?? karakas[0];
   const amk = karakas.find(k => k.role === "AmK") ?? karakas[1];
+  const gk = karakas.find(k => k.role === "GK") ?? karakas[5];
 
   const akHouse = md(ak.signNum - lagnaNum, 12) + 1;
   const amkHouse = md(amk.signNum - lagnaNum, 12) + 1;
@@ -858,6 +1050,29 @@ export function evaluateAkAmkAnalysis(
   const isCurrentDashaAk = Boolean(currentDasha && currentDasha.signNum === ak.signNum);
   const isCurrentDashaAmk = Boolean(currentDasha && currentDasha.signNum === amk.signNum);
 
+  // RULE D: AK + AmK Pinnacle Rajayoga
+  const isConjunct = ak.signNum === amk.signNum;
+  const isMutualAspect = doesSignAspect(ak.signNum, amk.signNum) || doesSignAspect(amk.signNum, ak.signNum);
+  const isAuspiciousHouse = [1, 2, 4, 5, 7, 9, 10, 11].includes(akHouse) && [1, 2, 4, 5, 7, 9, 10, 11].includes(amkHouse);
+
+  const isGkAspectingAk = doesSignAspect(gk.signNum, ak.signNum) && !isAdjacentSign(gk.signNum, ak.signNum);
+  const isGkAspectingAmk = doesSignAspect(gk.signNum, amk.signNum) && !isAdjacentSign(gk.signNum, amk.signNum);
+  const isGkAspectingRajayoga = isGkAspectingAk || isGkAspectingAmk;
+
+  const isRajayoga = (isConjunct || isMutualAspect) && isAuspiciousHouse;
+  let rajayogaTier: AkAmkAnalysis["rajayogaTier"] = "None";
+  let rajayogaDescription = "No AK-AmK Raja Yoga formation.";
+
+  if (isRajayoga) {
+    if (!isGkAspectingRajayoga) {
+      rajayogaTier = "Pinnacle Unblemished";
+      rajayogaDescription = `AK (${ak.planet}) and AmK (${amk.planet}) form a Pinnacle Jaimini Raja Yoga completely unblemished by GK. During their Chara Dashas, authority, high public recognition, and extraordinary financial growth are indicated.`;
+    } else {
+      rajayogaTier = "Afflicted";
+      rajayogaDescription = `AK (${ak.planet}) and AmK (${amk.planet}) form a powerful Raja Yoga, but GK (${gk.planet}) casts an aspect. High achievements will be accompanied by tests, jealousy, and administrative hurdles.`;
+    }
+  }
+
   return {
     akPlanet: ak.planet,
     akSign: ak.sign,
@@ -875,7 +1090,45 @@ export function evaluateAkAmkAnalysis(
     amkCareerField,
     amkGrowthTimingSigns,
     isCurrentDashaAmk,
+    isRajayoga,
+    isGkAspectingRajayoga,
+    rajayogaTier,
+    rajayogaDescription,
   };
+}
+
+// ── Retrograde Activation Evaluation ──────────────────────────────────────────
+
+export function evaluateRetrogrades(chart: ChartData): RetrogradePlanetInfo[] {
+  const lagnaNum = Math.floor(md(chart.lagnaLon, 360) / 30);
+  const RETRO_GUIDANCE: Record<string, string> = {
+    Mercury: "Super intelligent, exceptional analytical depth, but intellect lies dormant until stimulated. Activate through writing, debates, complex analysis, and commerce.",
+    Jupiter: "Vast reservoir of intuitive wisdom and dharmic understanding. Activate by mentoring others, teaching, reading sacred literature, and offering solutions.",
+    Mars: "Extraordinary internal physical energy and courage. Activate through rigorous athletic routine, gym, martial arts, and decisive leadership.",
+    Saturn: "Immense karmic endurance and structural discipline. Activate through strict daily routines, discipline, and selfless service to workers.",
+    Venus: "Refined aesthetic brilliance and artistic potential. Activate through creative arts, music, design, and elevating relationships.",
+  };
+
+  const results: RetrogradePlanetInfo[] = [];
+  const GRAHA = ["Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+
+  for (const p of GRAHA) {
+    const data = chart.planets[p];
+    if (data?.isRetrograde) {
+      const pSignNum = Math.floor(md(data.lon, 360) / 30);
+      const pHouse = md(pSignNum - lagnaNum, 12) + 1;
+      results.push({
+        planet: p,
+        sign: RASHIS[pSignNum],
+        signNum: pSignNum,
+        houseFromLagna: pHouse,
+        activationStatus: "Requires Activation",
+        guidance: RETRO_GUIDANCE[p] ?? "Planet possesses intensified latent power requiring conscious expression.",
+      });
+    }
+  }
+
+  return results;
 }
 
 // ── Special Findings ──────────────────────────────────────────────────────────
@@ -1150,8 +1403,11 @@ export function buildJaiminiChart(chart: ChartData): JaiminiResult {
 
   const karakamsha = calculateKarakamsha(chart, karakas);
   const gkAnalysis = evaluateGkAnalysis(chart, karakas, charaDasha);
+  const gkKaraka = karakas.find(k => k.role === "GK") ?? karakas[5];
+  const bkAnalysis = evaluateBkAnalysis(chart, karakas, gkKaraka);
   const dkAnalysis = evaluateDkAnalysis(chart, karakas, charaDasha);
   const akAmkAnalysis = evaluateAkAmkAnalysis(chart, karakas, charaDasha);
+  const retrogradeActivation = evaluateRetrogrades(chart);
 
   return {
     karakas,
@@ -1168,8 +1424,10 @@ export function buildJaiminiChart(chart: ChartData): JaiminiResult {
     directionReason,
     karakamsha,
     gkAnalysis,
+    bkAnalysis,
     dkAnalysis,
     akAmkAnalysis,
+    retrogradeActivation,
   };
 }
 

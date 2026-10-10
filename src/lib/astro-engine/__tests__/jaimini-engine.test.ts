@@ -5,13 +5,17 @@ import {
   calculateArudhas,
   getJaiminiAspects,
   doesSignAspect,
+  isAdjacentSign,
   calculateCharaDasha,
   getCharaDashaDirection,
   charaDashaYears,
+  getNavamshaSignNum,
   calculateKarakamsha,
   evaluateGkAnalysis,
+  evaluateBkAnalysis,
   evaluateDkAnalysis,
   evaluateAkAmkAnalysis,
+  evaluateRetrogrades,
   buildJaiminiChart,
   GK_HOUSE_PROBLEMS,
   GK_PLANET_REMEDIES,
@@ -23,7 +27,7 @@ import type { ChartData } from "../calculations";
 // Helper to construct mock ChartData
 function createMockChart(
   lagnaRashiIndex: number, // 0 to 11
-  planetPositions: Record<string, { rashiIndex: number; degreeInSign: number }>,
+  planetPositions: Record<string, { rashiIndex: number; degreeInSign: number; isRetrograde?: boolean }>,
   dob: string = "1990-01-01",
   tob: string = "12:00"
 ): ChartData {
@@ -35,7 +39,7 @@ function createMockChart(
     planets[name] = {
       lon,
       speed: 1,
-      isRetrograde: false,
+      isRetrograde: Boolean(pos.isRetrograde),
       house: ((pos.rashiIndex - lagnaRashiIndex + 12) % 12) + 1,
     };
   }
@@ -89,199 +93,213 @@ test("Jaimini: 7 Chara Karakas strictly exclude Rahu & Ketu and rank by degree i
   assert.equal(karakas[6].role, "DK");
   assert.equal(karakas[6].planet, "Jupiter");
 
-  // Verify none are Rahu or Ketu
   assert.ok(!karakas.some(k => k.planet === "Rahu" || k.planet === "Ketu"));
 });
 
-test("Benchmark Test Case: Vikram Mittal ji (AK Sun, GK Mars, Venus remedies)", () => {
+test("RULE A: Karakamsha Kundali (D9 Navamsha Base, D1 Planets as-is)", () => {
+  // AK is Moon at Pisces (sign 11) 24°
+  // 11 * 30 + 24 = 354°. In Navamsha, 354° falls in Aquarius (sign 10).
   const chart = createMockChart(0, {
-    Sun: { rashiIndex: 4, degreeInSign: 28.2 },     // AK Sun
-    Mercury: { rashiIndex: 4, degreeInSign: 24.0 }, // AmK
-    Jupiter: { rashiIndex: 8, degreeInSign: 20.0 }, // BK
-    Moon: { rashiIndex: 3, degreeInSign: 17.5 },    // MK
-    Saturn: { rashiIndex: 9, degreeInSign: 14.1 },   // PK
-    Mars: { rashiIndex: 0, degreeInSign: 8.4 },     // GK Mars (debt, body, property)
-    Venus: { rashiIndex: 1, degreeInSign: 4.2 },    // DK Venus
-  });
-
-  const jaimini = buildJaiminiChart(chart);
-
-  // 1. Verify AK Sun
-  const ak = jaimini.karakas.find(k => k.role === "AK");
-  assert.equal(ak?.planet, "Sun");
-  assert.ok(ak?.notes.includes("character"));
-
-  // 2. Verify GK Mars
-  const gk = jaimini.gkAnalysis;
-  assert.equal(gk.gkPlanet, "Mars");
-  assert.equal(gk.gkHouseFromLagna, 1); // Mars in Aries (Lagna)
-  assert.ok(gk.houseProblem.includes("Bimariyan") || gk.houseProblem.includes("health"));
-
-  // Verify GK Mars Remedies contain North-East Panchmukhi Hanuman & Gym
-  const remediesText = gk.remedies.join(" ");
-  assert.ok(remediesText.includes("Panchmukhi Hanuman"));
-  assert.ok(remediesText.includes("gym"));
-
-  // 3. Verify Venus remedies in knowledge base (kitchen sink curd, perfume donate)
-  const venusRemedies = GK_PLANET_REMEDIES.Venus.join(" ");
-  assert.ok(venusRemedies.includes("dahi"));
-  assert.ok(venusRemedies.includes("sink"));
-  assert.ok(venusRemedies.includes("perfume") || venusRemedies.includes("itra"));
-});
-
-test("Benchmark Test Case: Uday ji (Libra Lagna -> Apasavya 7,6,5,4,3,2,1,12,11,10,9,8; AK Jupiter)", () => {
-  const chart = createMockChart(6, { // 6 = Libra
-    Jupiter: { rashiIndex: 8, degreeInSign: 27.5 }, // AK Jupiter
-    Sun: { rashiIndex: 4, degreeInSign: 24.1 },
-    Mars: { rashiIndex: 0, degreeInSign: 21.0 },
-    Mercury: { rashiIndex: 5, degreeInSign: 16.2 },
-    Moon: { rashiIndex: 3, degreeInSign: 12.0 },
-    Saturn: { rashiIndex: 9, degreeInSign: 8.5 },
-    Venus: { rashiIndex: 6, degreeInSign: 3.1 },
-  });
-
-  // Verify direction calculation for Libra (6)
-  const dirInfo = getCharaDashaDirection(6);
-  assert.equal(dirInfo.direction, "Apasavya");
-  assert.equal(dirInfo.isDirect, false);
-
-  const jaimini = buildJaiminiChart(chart);
-
-  // Verify Chara Dasha sequence: 7, 6, 5, 4, 3, 2, 1, 12, 11, 10, 9, 8
-  // 0-indexed: [6, 5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7]
-  const expectedSigns = [
-    "Libra", "Virgo", "Leo", "Cancer", "Gemini", "Taurus",
-    "Aries", "Pisces", "Aquarius", "Capricorn", "Sagittarius", "Scorpio"
-  ];
-
-  const actualSigns = jaimini.charaDasha.map(d => d.sign);
-  assert.deepEqual(actualSigns, expectedSigns);
-
-  // Verify AK is Jupiter
-  assert.equal(jaimini.karakamsha.akPlanet, "Jupiter");
-  assert.ok(jaimini.karakamsha.staticAnalysis.soulPurpose.includes("Solution Provider") || jaimini.karakamsha.staticAnalysis.soulPurpose.includes("Wisdom"));
-});
-
-test("Chara Dasha Duration: Scorpio lord Mars in 5th gives 5 years", () => {
-  // Scorpio (sign 7). Mars in Pisces (sign 11, which is 5th house from Scorpio).
-  const planets: ChartData["planets"] = {
-    Mars: { lon: 11 * 30 + 10, speed: 1, isRetrograde: false, house: 5 },
-  };
-
-  const years = charaDashaYears(7, planets); // 7 = Scorpio
-  assert.equal(years, 5);
-});
-
-test("Karakamsha Kundali: Correctly sets AK as Lagna and builds 12 houses", () => {
-  const chart = createMockChart(0, {
-    Sun: { rashiIndex: 4, degreeInSign: 26.0 }, // Sun in Leo (sign 4) is AK
-    Moon: { rashiIndex: 3, degreeInSign: 22.0 },
-    Mars: { rashiIndex: 0, degreeInSign: 18.0 },
-    Mercury: { rashiIndex: 5, degreeInSign: 15.0 }, // in Virgo (sign 5) -> 2nd from Karakamsha
-    Jupiter: { rashiIndex: 8, degreeInSign: 12.0 },
-    Venus: { rashiIndex: 10, degreeInSign: 9.0 },   // in Aquarius (sign 10) -> 7th from Karakamsha
-    Saturn: { rashiIndex: 1, degreeInSign: 5.0 },   // in Taurus (sign 1) -> 10th from Karakamsha
+    Moon: { rashiIndex: 11, degreeInSign: 24.0 },   // AK -> D9 is Aquarius (10)
+    Sun: { rashiIndex: 4, degreeInSign: 20.0 },     // Sun in Leo (D1 sign 4)
+    Mercury: { rashiIndex: 5, degreeInSign: 15.0 }, // Mercury in Virgo (D1 sign 5)
+    Mars: { rashiIndex: 0, degreeInSign: 12.0 },
+    Jupiter: { rashiIndex: 8, degreeInSign: 9.0 },
+    Venus: { rashiIndex: 1, degreeInSign: 6.0 },
+    Saturn: { rashiIndex: 9, degreeInSign: 3.0 },
   });
 
   const karakas = calculateKarakas(chart.planets);
   const kk = calculateKarakamsha(chart, karakas);
 
-  assert.equal(kk.akPlanet, "Sun");
-  assert.equal(kk.karakamshaLagna, "Leo");
-  assert.equal(kk.houses.length, 12);
+  assert.equal(kk.akPlanet, "Moon");
+  assert.equal(kk.d9Sign, "Aquarius");
+  assert.equal(kk.karakamshaLagna, "Aquarius");
 
-  // House 1 should be Leo
+  // Karakamsha Lagna is Aquarius (sign 10).
+  // House 1 from Karakamsha: Aquarius (sign 10)
   assert.equal(kk.houses[0].house, 1);
-  assert.equal(kk.houses[0].sign, "Leo");
-  assert.deepEqual(kk.houses[0].planets, ["Sun"]);
+  assert.equal(kk.houses[0].sign, "Aquarius");
 
-  // House 2 should be Virgo (occupant Mercury)
-  assert.equal(kk.houses[1].house, 2);
-  assert.equal(kk.houses[1].sign, "Virgo");
-  assert.deepEqual(kk.houses[1].planets, ["Mercury"]);
-
-  // House 7 should be Aquarius (occupant Venus)
+  // House 7 from Karakamsha: Leo (sign 4). Sun is in Leo in D1!
   assert.equal(kk.houses[6].house, 7);
-  assert.equal(kk.houses[6].sign, "Aquarius");
-  assert.deepEqual(kk.houses[6].planets, ["Venus"]);
+  assert.equal(kk.houses[6].sign, "Leo");
+  assert.deepEqual(kk.houses[6].planets, ["Sun"]); // D1 planet stayed in D1 sign!
 
-  // House 10 should be Taurus (occupant Saturn)
-  assert.equal(kk.houses[9].house, 10);
-  assert.equal(kk.houses[9].sign, "Taurus");
-  assert.deepEqual(kk.houses[9].planets, ["Saturn"]);
-
-  // Verify static interpretation summaries exist
-  assert.ok(kk.staticAnalysis.soulPurpose.length > 0);
-  assert.ok(kk.staticAnalysis.wealthSource.includes("Mercury"));
-  assert.ok(kk.staticAnalysis.spousePersona.includes("Venus"));
-  assert.ok(kk.staticAnalysis.careerDestiny.includes("Saturn"));
+  // House 8 from Karakamsha: Virgo (sign 5). Mercury is in Virgo in D1!
+  assert.equal(kk.houses[7].house, 8);
+  assert.equal(kk.houses[7].sign, "Virgo");
+  assert.deepEqual(kk.houses[7].planets, ["Mercury"]);
 });
 
-test("GK Problem Analysis: House-wise problem and disease diagnosis", () => {
-  // Chart with GK Saturn in 12th house (Pisces for Aries Lagna)
+test("RULE B: GK Adjacent Sign Rule (Adjacent sign protected from GK aspect)", () => {
+  // GK is Saturn in Taurus (sign 1, stable).
+  // Aries (sign 0, movable) is ADJACENT to Taurus (1).
+  // Cancer (sign 3), Libra (sign 6), Capricorn (sign 9) receive aspect.
+  // Aries (0) MUST NOT receive aspect from Taurus (1)!
+  assert.ok(isAdjacentSign(1, 0));
+  assert.ok(!doesSignAspect(1, 0)); // Adjacent sign aspect is false!
+  assert.ok(doesSignAspect(1, 3));  // Cancer is aspected
+  assert.ok(doesSignAspect(1, 6));  // Libra is aspected
+  assert.ok(doesSignAspect(1, 9));  // Capricorn is aspected
+
   const chart = createMockChart(0, {
+    Sun: { rashiIndex: 4, degreeInSign: 28.0 },
+    Moon: { rashiIndex: 0, degreeInSign: 25.0 },     // Moon in Aries (ADJACENT to GK)
+    Mars: { rashiIndex: 6, degreeInSign: 20.0 },     // Mars in Libra (ASPECTED by GK)
+    Mercury: { rashiIndex: 5, degreeInSign: 16.0 },
+    Jupiter: { rashiIndex: 8, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 1, degreeInSign: 8.0 },    // GK Saturn in Taurus (1)
+    Venus: { rashiIndex: 10, degreeInSign: 4.0 },
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const gk = jaimini.gkAnalysis;
+
+  // Moon in Aries should be marked as adjacent protected!
+  const moonAffliction = gk.afflictedPlanets.find(p => p.planet === "Moon");
+  assert.ok(moonAffliction?.isAdjacentProtected);
+
+  // Mars in Libra should be marked as truly aspected
+  const marsAffliction = gk.afflictedPlanets.find(p => p.planet === "Mars");
+  assert.equal(marsAffliction?.isAdjacentProtected, false);
+  assert.ok(marsAffliction?.effect.includes("Accident") || marsAffliction?.effect.includes("BP"));
+});
+
+test("RULE C: GK = Lagna Lord Rule (Whole life problem diagnosis)", () => {
+  // Cancer Lagna (sign 3). Lagna Lord is Moon.
+  // Moon is also GK (2nd lowest degree).
+  const chart = createMockChart(3, { // 3 = Cancer Lagna
     Sun: { rashiIndex: 0, degreeInSign: 28.0 },
-    Moon: { rashiIndex: 1, degreeInSign: 24.0 },
-    Mars: { rashiIndex: 2, degreeInSign: 20.0 },
-    Mercury: { rashiIndex: 3, degreeInSign: 16.0 },
-    Jupiter: { rashiIndex: 4, degreeInSign: 12.0 },
-    Saturn: { rashiIndex: 11, degreeInSign: 8.0 }, // GK in Pisces (12th house from Aries)
+    Mars: { rashiIndex: 1, degreeInSign: 24.0 },
+    Mercury: { rashiIndex: 2, degreeInSign: 20.0 },
+    Jupiter: { rashiIndex: 4, degreeInSign: 16.0 },
+    Saturn: { rashiIndex: 5, degreeInSign: 12.0 },
+    Moon: { rashiIndex: 3, degreeInSign: 8.0 },     // Moon is GK (and Cancer Lagna Lord!)
     Venus: { rashiIndex: 6, degreeInSign: 4.0 },
   });
 
   const jaimini = buildJaiminiChart(chart);
   const gk = jaimini.gkAnalysis;
 
-  assert.equal(gk.gkPlanet, "Saturn");
-  assert.equal(gk.gkHouseFromLagna, 12);
-  assert.ok(gk.houseProblem.includes("Kharcha badhega") || gk.houseProblem.includes("hospital"));
-  assert.ok(gk.diseases.some(d => d.includes("joint pain") || d.includes("Gas")));
-
-  // Verify Saturn remedies contain Kali dal & sarson tel (16-17 din)
-  const saturnRemedies = gk.remedies.join(" ");
-  assert.ok(saturnRemedies.includes("Kali"));
-  assert.ok(saturnRemedies.includes("sarson"));
-  assert.ok(saturnRemedies.includes("16-17 din"));
+  assert.equal(gk.isGkLagnaLord, true);
+  assert.ok(gk.gkLagnaLordDiagnosis?.includes("CRITICAL: GK IS THE LAGNA LORD"));
 });
 
-test("DK Analysis: Evaluates spouse persona and identifies marriage timing signs", () => {
-  // Chart with DK Jupiter in Sagittarius (sign 8)
+test("RULE D: AK + AmK Pinnacle Rajayoga (Conjunction/Aspect in Good Houses unblemished by GK)", () => {
+  const chart = createMockChart(0, { // Aries Lagna
+    Jupiter: { rashiIndex: 8, degreeInSign: 28.0 }, // AK Jupiter in Sag (sign 8, House 9!)
+    Mercury: { rashiIndex: 8, degreeInSign: 25.0 }, // AmK Mercury in Sag (sign 8, House 9!)
+    Sun: { rashiIndex: 4, degreeInSign: 20.0 },
+    Mars: { rashiIndex: 0, degreeInSign: 16.0 },
+    Moon: { rashiIndex: 3, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 1, degreeInSign: 8.0 },   // GK Saturn in Taurus (1)
+    Venus: { rashiIndex: 10, degreeInSign: 4.0 },
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const akAmk = jaimini.akAmkAnalysis;
+
+  assert.equal(akAmk.isRajayoga, true);
+  assert.equal(akAmk.isGkAspectingRajayoga, false);
+  assert.equal(akAmk.rajayogaTier, "Pinnacle Unblemished");
+  assert.ok(akAmk.rajayogaDescription.includes("Pinnacle Jaimini Raja Yoga"));
+});
+
+test("RULE E: Retrograde Planet Activation Guidance", () => {
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 28.0 },
+    Mercury: { rashiIndex: 1, degreeInSign: 24.0, isRetrograde: true }, // Retro Mercury
+    Jupiter: { rashiIndex: 2, degreeInSign: 20.0, isRetrograde: true }, // Retro Jupiter
+    Mars: { rashiIndex: 3, degreeInSign: 16.0 },
+    Moon: { rashiIndex: 4, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 5, degreeInSign: 8.0 },
+    Venus: { rashiIndex: 6, degreeInSign: 4.0 },
+  });
+
+  const retrogrades = evaluateRetrogrades(chart);
+  assert.equal(retrogrades.length, 2);
+
+  const retroMerc = retrogrades.find(r => r.planet === "Mercury");
+  assert.ok(retroMerc?.guidance.includes("Super intelligent"));
+
+  const retroJup = retrogrades.find(r => r.planet === "Jupiter");
+  assert.ok(retroJup?.guidance.includes("Vast reservoir of intuitive wisdom"));
+});
+
+test("RULE F: Chara Dasha Exact Duration (Count - 1, Max 12, Min 1)", () => {
+  // Taurus (sign 1, Savya). Lord Venus is in Virgo (sign 5, count 5).
+  // Duration: 5 - 1 = 4 years! (Matches transcript: "2 se 6 tak = 5 houses, minus_1: 5 - 1 = 4 saal")
+  const planets: ChartData["planets"] = {
+    Venus: { lon: 5 * 30 + 10, speed: 1, isRetrograde: false, house: 5 },
+  };
+  const years = charaDashaYears(1, planets); // 1 = Taurus
+  assert.equal(years, 4);
+
+  // Own sign lord gets full 12 years (Max: 12)
+  const ownSignPlanets: ChartData["planets"] = {
+    Venus: { lon: 1 * 30 + 10, speed: 1, isRetrograde: false, house: 1 },
+  };
+  const ownYears = charaDashaYears(1, ownSignPlanets);
+  assert.equal(ownYears, 12);
+});
+
+test("RULE G: Savya / Apasavya 9th House Confirmation (Virgo Lagna -> Taurus 9th -> Clockwise)", () => {
+  // Virgo is sign 5 (6th sign). Count 9 signs forward: 5 + 8 = 13 % 12 = 1 (Taurus).
+  // Taurus is Savya -> Direction is Clockwise (Savya)!
+  const dir = getCharaDashaDirection(5); // 5 = Virgo
+  assert.equal(dir.direction, "Savya");
+  assert.equal(dir.isDirect, true);
+  assert.equal(dir.ninthSignNum, 1); // Taurus
+});
+
+test("RULE J: BK Problem Evaluation (BK in Dusthana + Aspected by GK)", () => {
+  // Aries Lagna (0). GK is Saturn in Taurus (sign 1).
+  // Taurus (fixed) aspects Cancer (3), Libra (6), Capricorn (9).
+  // Libra (sign 6) is House 7 from Aries.
+  // Cancer (sign 3) is House 4.
+  // Capricorn (sign 9) is House 10.
+  // What if BK Mars is in 6th house (Virgo, sign 5)?
+  // What if GK is Aries (0, movable) which aspects Leo (4), Scorpio (7), Aquarius (10)?
+  // Let GK be in Aries (0).
+  // Scorpio (7, 8th house from Aries!) receives aspect from Aries (0)!
+  // If BK is in Scorpio (7, 8th house from Aries) -> BK is in Dusthana (8th) AND receives aspect from GK (0)!
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 4, degreeInSign: 28.0 },
+    Moon: { rashiIndex: 1, degreeInSign: 24.0 },
+    Mars: { rashiIndex: 7, degreeInSign: 20.0 },     // BK Mars in Scorpio (8th house!)
+    Mercury: { rashiIndex: 2, degreeInSign: 16.0 },
+    Jupiter: { rashiIndex: 3, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 0, degreeInSign: 8.0 },    // GK Saturn in Aries (0, movable)
+    Venus: { rashiIndex: 11, degreeInSign: 4.0 },
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const bk = jaimini.bkAnalysis;
+
+  assert.equal(bk.bkPlanet, "Mars");
+  assert.equal(bk.bkHouseFromLagna, 8);
+  assert.equal(bk.isInDusthana, true);
+  assert.equal(bk.isAfflictedByGk, true);
+  assert.equal(bk.isBkProblemActive, true);
+  assert.ok(bk.warning?.includes("BK AFFLICTION"));
+});
+
+test("RULE K: DK Details (DK in Dusthana or aspected by GK triggers warning)", () => {
+  // Chart where DK Venus is in 12th house (Pisces, sign 11) for Aries Lagna
   const chart = createMockChart(0, {
     Sun: { rashiIndex: 0, degreeInSign: 28.0 },
     Moon: { rashiIndex: 1, degreeInSign: 24.0 },
     Mars: { rashiIndex: 2, degreeInSign: 20.0 },
     Mercury: { rashiIndex: 3, degreeInSign: 16.0 },
-    Saturn: { rashiIndex: 4, degreeInSign: 12.0 },
-    Venus: { rashiIndex: 5, degreeInSign: 8.0 },
-    Jupiter: { rashiIndex: 8, degreeInSign: 4.0 }, // DK Jupiter in Sagittarius
+    Jupiter: { rashiIndex: 4, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 5, degreeInSign: 8.0 },
+    Venus: { rashiIndex: 11, degreeInSign: 4.0 },   // DK in 12th house!
   });
 
   const jaimini = buildJaiminiChart(chart);
   const dk = jaimini.dkAnalysis;
 
-  assert.equal(dk.dkPlanet, "Jupiter");
-  assert.ok(dk.spousePersona.includes("Spiritual") || dk.spousePersona.includes("wise"));
-  assert.ok(dk.spouseTraits.some(t => t.includes("teacher") || t.includes("dharma")));
-  assert.ok(dk.marriageTimingSigns.includes("Sagittarius"));
-});
-
-test("Jaimini Aspects (Rashi Drishti): Sign-based rules adhere strictly to movable/fixed/dual", () => {
-  // Aries (0, movable) aspects Leo (4), Scorpio (7), Aquarius (10) — skips adjacent Taurus (1)
-  assert.ok(doesSignAspect(0, 4));
-  assert.ok(doesSignAspect(0, 7));
-  assert.ok(doesSignAspect(0, 10));
-  assert.ok(!doesSignAspect(0, 1)); // Adjacent Taurus is not aspected
-  assert.ok(!doesSignAspect(0, 2)); // Dual sign Gemini is not aspected
-
-  // Taurus (1, fixed) aspects Cancer (3), Libra (6), Capricorn (9) — skips adjacent Aries (0)
-  assert.ok(doesSignAspect(1, 3));
-  assert.ok(doesSignAspect(1, 6));
-  assert.ok(doesSignAspect(1, 9));
-  assert.ok(!doesSignAspect(1, 0)); // Adjacent Aries is not aspected
-
-  // Gemini (2, dual) aspects Virgo (5), Sagittarius (8), Pisces (11)
-  assert.ok(doesSignAspect(2, 5));
-  assert.ok(doesSignAspect(2, 8));
-  assert.ok(doesSignAspect(2, 11));
-  assert.ok(!doesSignAspect(2, 0)); // Movable Aries is not aspected
+  assert.equal(dk.hasDkObstacle, true);
+  assert.ok(dk.dkObstacleWarning?.includes("DK CAUTION"));
 });

@@ -16,8 +16,10 @@ import {
   type CharaDashaAD,
   type KarakamshaKundali,
   type GkAnalysis,
+  type BkAnalysis,
   type DkAnalysis,
   type AkAmkAnalysis,
+  type RetrogradePlanetInfo,
 } from "@/lib/astro-engine/jaimini";
 import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
@@ -29,6 +31,7 @@ function KarakaCard({ k }: { k: Karaka }) {
   const isAK = k.role === "AK";
   const isGK = k.role === "GK";
   const isDK = k.role === "DK";
+  const isBK = k.role === "BK";
 
   return (
     <div
@@ -40,6 +43,8 @@ function KarakaCard({ k }: { k: Karaka }) {
           ? "rgba(220, 38, 38, 0.05)"
           : isDK
           ? "rgba(236, 72, 153, 0.05)"
+          : isBK
+          ? "rgba(99, 102, 241, 0.05)"
           : "#FFFFFF",
         border: `1px solid ${
           isAK
@@ -48,6 +53,8 @@ function KarakaCard({ k }: { k: Karaka }) {
             ? "rgba(220, 38, 38, 0.35)"
             : isDK
             ? "rgba(236, 72, 153, 0.35)"
+            : isBK
+            ? "rgba(99, 102, 241, 0.3)"
             : "rgba(184, 134, 11, 0.18)"
         }`,
       }}
@@ -227,7 +234,7 @@ const ASPECT_MAP: Record<number, number[]> = {
 export default function JaiminiPage() {
   const { birth, chart, loading, hasUserChart } = useUserChart();
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"karakas" | "gk_radar" | "dk_marriage" | "dasha" | "aspects" | "arudhas">("karakas");
+  const [activeTab, setActiveTab] = useState<"karakas" | "gk_radar" | "dk_marriage" | "dasha" | "retro" | "aspects" | "arudhas">("karakas");
   const [selectedDashaIndex, setSelectedDashaIndex] = useState<number | null>(null);
 
   const jaimini = useMemo(() => {
@@ -266,16 +273,19 @@ export default function JaiminiPage() {
     { key: "karakas",     label: "👑 Karakas & Karakamsha" },
     { key: "gk_radar",    label: "⚡ GK Problem Radar" },
     { key: "dk_marriage", label: "💍 DK Marriage & Spouse" },
-    { key: "dasha",       label: "⏳ Chara Dasha" },
+    { key: "dasha",       label: "⏳ Chara Dasha (Exact)" },
+    { key: "retro",       label: "🔥 Retrograde Activation" },
     { key: "aspects",     label: "👁️ Rashi Drishti" },
     { key: "arudhas",     label: "🏛️ Arudha Padas" },
   ] as const;
 
   const ak = jaimini.karakas.find((k) => k.role === "AK");
   const gk = jaimini.gkAnalysis;
+  const bk = jaimini.bkAnalysis;
   const dk = jaimini.dkAnalysis;
   const akAmk = jaimini.akAmkAnalysis;
   const kk = jaimini.karakamsha;
+  const retro = jaimini.retrogradeActivation;
 
   return (
     <div className="page">
@@ -283,7 +293,7 @@ export default function JaiminiPage() {
         <div className="page-tag">{t("jaimini.page_tag")}</div>
         <h1 className="page-title serif">{t("jaimini.page_title")}</h1>
         <p className="page-sub">
-          Jaimini Sutras — Rashi-based Chara Dasha, degree-wise Karakas, Karakamsha Kundali, and sign aspects (Rashi Drishti).
+          Jaimini Sutras — Karakamsha Kundali (D9 Base), GK Problem Radar, DK Marriage Timing, and Exact Chara Dasha.
         </p>
 
         {/* Executive Summary Card */}
@@ -291,7 +301,7 @@ export default function JaiminiPage() {
           <div className="header-orb" />
           <div style={{ position: "relative", zIndex: 1, flex: 1 }}>
             <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#c8a030", marginBottom: 6 }}>
-              Executive Summary · Layer 4 Jaimini System
+              Executive Summary · Layer 4 Jaimini System (Standalone Verification)
             </div>
             <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, color: "#1A1A1A" }}>
               {birth.name || chart.name}
@@ -299,9 +309,18 @@ export default function JaiminiPage() {
             <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
               Lagna {chart.lagnaRashi} ({jaimini.direction} Sequence)
               {ak ? ` · Atmakaraka ${ak.planet} in ${ak.sign}` : ""}
+              {` · Karakamsha Lagna ${kk.karakamshaLagna} (via D9 ${kk.d9Sign})`}
               {jaimini.currentDasha ? ` · Current Chara Dasha ${jaimini.currentDasha.sign}` : ""}
             </div>
           </div>
+        </div>
+
+        {/* Don't Mix Systems Advisory Banner */}
+        <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3.5 flex items-center gap-3 text-xs text-amber-950">
+          <span className="text-base shrink-0">⚖️</span>
+          <p className="leading-relaxed">
+            <strong>System Purity Rule:</strong> Do not mix Jaimini formulas directly with Vedic/KP/Navtara. Jaimini evaluates soul karmas, Karakamsha, and sign periods as an independent verification layer.
+          </p>
         </div>
 
         {/* Active Chara Dasha Banner */}
@@ -381,16 +400,16 @@ export default function JaiminiPage() {
           </section>
         )}
 
-        {/* Marriage Window Alert if Active Dasha is DK / 7th */}
-        {dk.isCurrentDashaMarriageWindow && (
-          <section className="rounded-2xl border border-pink-300 bg-pink-50 p-4 flex gap-3 items-start">
-            <span className="text-2xl mt-0.5">💍</span>
+        {/* BK Affliction Warning if Active */}
+        {bk.isBkProblemActive && (
+          <section className="rounded-2xl border border-indigo-300 bg-indigo-50/70 p-4 flex gap-3 items-start">
+            <span className="text-2xl mt-0.5">🛡️</span>
             <div>
-              <p className="text-xs uppercase tracking-wider font-bold text-pink-800">
-                Darakaraka Marriage Window Active
+              <p className="text-xs uppercase tracking-wider font-bold text-indigo-900">
+                Bhratrikaraka (BK) Alert
               </p>
-              <p className="text-sm text-pink-950 mt-0.5 leading-relaxed">
-                {dk.marriageTimingNote}
+              <p className="text-sm text-indigo-950 mt-0.5 leading-relaxed">
+                {bk.warning}
               </p>
             </div>
           </section>
@@ -438,25 +457,29 @@ export default function JaiminiPage() {
               </div>
             </section>
 
-            {/* Karakamsha Kundali Section */}
+            {/* Karakamsha Kundali Section (D9 Navamsha Base) */}
             <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-[#B8860B]">
-                    Soul Blueprint Chart
-                  </span>
-                  <h3 className="text-xl font-bold text-[#1A1A1A] mt-0.5">
-                    Karakamsha Kundali (Lagna: {kk.karakamshaLagna} · AK {kk.akPlanet})
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#B8860B]">
+                      Correct Classical Method
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#B8860B]/15 text-[#B8860B]">
+                      D9 Navamsha Base
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-[#1A1A1A] mt-1">
+                    Karakamsha Kundali (Lagna: {kk.karakamshaLagna} · AK {kk.akPlanet} in D9 {kk.d9Sign})
                   </h3>
                 </div>
-                <span className="text-2xl">{RASHI_ICONS[kk.akSignNum]}</span>
+                <span className="text-3xl">{RASHI_ICONS[kk.karakamshaLagnaNum]}</span>
               </div>
 
-              <p className="text-sm text-[#4A4238] leading-relaxed mb-4">
-                In classical Jaimini astrology, the sign occupied by your Atmakaraka (AK) becomes the
-                <strong> Karakamsha Lagna</strong>. This chart reveals the static blueprint of your soul:
-                your true character, innate wealth sources, marriage reality, and karmic destiny.
-              </p>
+              {/* Clarification Box: D1 Planets As-Is */}
+              <div className="mb-4 rounded-xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-3 text-xs text-[#4A4238] leading-relaxed">
+                <strong>Transcript Principle:</strong> Atmakaraka ({kk.akPlanet}) Navamsha (D9) chart me jis rashi ({kk.d9Sign}) me baitha hai, wahi <strong>Karakamsha Lagna</strong> banta hai. D1 birth chart ke planets apni natal rashi me as-is rehte hain — sirf unke bhav Karakamsha Lagna se count hote hain.
+              </div>
 
               {/* Static Analysis Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
@@ -533,7 +556,7 @@ export default function JaiminiPage() {
           </div>
         )}
 
-        {/* ── TAB 2: GK Problem Radar (Sabse Important) ────────────────────── */}
+        {/* ── TAB 2: GK Problem Radar ──────────────────────────────────────── */}
         {activeTab === "gk_radar" && (
           <div className="flex flex-col gap-5">
             <section className="rounded-2xl border-2 border-red-300 bg-red-50/50 p-5 shadow-sm">
@@ -551,6 +574,19 @@ export default function JaiminiPage() {
                 It points directly to where karmic friction, diseases (rog), debts (karz), and opposition (shatru) manifest.
               </p>
             </section>
+
+            {/* RULE C: GK = Lagna Lord Alert */}
+            {gk.isGkLagnaLord && (
+              <section className="rounded-2xl border-2 border-red-500 bg-red-100/80 p-4.5">
+                <div className="flex items-center gap-2 text-red-900 font-bold text-sm">
+                  <span>🚨</span>
+                  <span>CRITICAL RULE: GK IS THE LAGNA LORD</span>
+                </div>
+                <p className="text-xs text-red-950 mt-1.5 leading-relaxed">
+                  {gk.gkLagnaLordDiagnosis}
+                </p>
+              </section>
+            )}
 
             {/* House Impact & Diseases */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -587,6 +623,59 @@ export default function JaiminiPage() {
               </div>
             </div>
 
+            {/* RULE B & I: GK Aspect Impact on Planets & Adjacent Sign Rule */}
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5">
+              <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-1">
+                GK Drishti Impact on Planets & Adjacent Sign Protection
+              </p>
+              <p className="text-xs text-[#6B635B] mb-3">
+                In Jaimini, GK casts Rashi Drishti on planets and houses. Adjacent signs are strictly protected:
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {gk.afflictedPlanets.map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl border text-xs"
+                    style={{
+                      background: p.isAdjacentProtected ? "#F0FDF4" : "#FEF2F2",
+                      borderColor: p.isAdjacentProtected ? "#BBF7D0" : "#FECACA",
+                    }}
+                  >
+                    <div className="flex items-center justify-between font-bold">
+                      <span style={{ color: p.isAdjacentProtected ? "#166534" : "#991B1B" }}>
+                        {p.planet} in {p.sign} (H{p.houseFromLagna})
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold"
+                        style={{
+                          background: p.isAdjacentProtected ? "#DCFCE7" : "#FEE2E2",
+                          color: p.isAdjacentProtected ? "#15803D" : "#B91C1C",
+                        }}
+                      >
+                        {p.isAdjacentProtected ? "🛡️ ADJACENT PROTECTED" : "⚡ GK ASPECTED"}
+                      </span>
+                    </div>
+                    <p className="text-[11px] mt-1" style={{ color: p.isAdjacentProtected ? "#166534" : "#7F1D1D" }}>
+                      {p.effect}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {gk.afflictedHouses.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-[rgba(184,134,11,0.15)]">
+                  <p className="text-xs font-bold text-[#1A1A1A] mb-2">Houses Aspected by GK:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {gk.afflictedHouses.map((h, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg text-xs bg-red-50 text-red-900 border border-red-200">
+                        House {h.house} ({h.sign}): {h.effect}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+
             {/* Prescribed Remedies from Transcript */}
             <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FAF7F2] p-5">
               <div className="flex items-center gap-2 mb-3">
@@ -601,31 +690,6 @@ export default function JaiminiPage() {
                     <span className="font-bold text-[#B8860B] text-sm shrink-0">✦ Step {i + 1}:</span>
                     <p className="text-sm text-[#1A1A1A] leading-relaxed">{rem}</p>
                   </div>
-                ))}
-              </div>
-            </section>
-
-            {/* GK Dasha Activation Timeline */}
-            <section className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FFFFFF] p-5">
-              <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-1">
-                GK Activation Timeline (Chara Dasha Signs)
-              </p>
-              <p className="text-xs text-[#6B635B] mb-3">
-                Watch for hurdles during Chara Dashas of GK&apos;s own sign ({gk.gkSign}) and signs that cast Jaimini Rashi Drishti on it:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {gk.timingDashaSigns.map((s, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 rounded-xl text-xs font-bold border"
-                    style={{
-                      background: s === gk.gkSign ? "#FEE2E2" : "#FEF3C7",
-                      borderColor: s === gk.gkSign ? "#FCA5A5" : "#FDE68A",
-                      color: s === gk.gkSign ? "#991B1B" : "#92400E",
-                    }}
-                  >
-                    {s} {s === gk.gkSign ? "(GK Sign)" : "(Aspecting Sign)"}
-                  </span>
                 ))}
               </div>
             </section>
@@ -651,8 +715,20 @@ export default function JaiminiPage() {
               </p>
             </section>
 
+            {/* RULE K: DK Obstacle Caution */}
+            {dk.hasDkObstacle && (
+              <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
+                <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+                  <span>⚠️</span>
+                  <span>DK Placement Caution</span>
+                </div>
+                <p className="text-xs text-amber-950 mt-1 leading-relaxed">
+                  {dk.dkObstacleWarning}
+                </p>
+              </section>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Spouse Persona */}
               <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FFFFFF] p-5 flex flex-col justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-2">
@@ -677,7 +753,6 @@ export default function JaiminiPage() {
                 </p>
               </div>
 
-              {/* Marriage Timing Windows */}
               <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FFFFFF] p-5 flex flex-col justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-2">
@@ -699,17 +774,35 @@ export default function JaiminiPage() {
                 </div>
 
                 <div className="mt-4 p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] text-xs text-[#4A4238]">
-                  <strong>Practical Tip:</strong> Combine these Chara Dasha windows with Vimshottari Dasha of 7th lord or Venus to pinpoint the exact wedding month.
+                  <strong>Focus on Antardasha:</strong> Mahadasha opens the window; the specific Antardasha of DK&apos;s sign or 7th lord pinpoints the exact wedding timing.
                 </div>
               </div>
             </div>
 
-            {/* AK & AmK Summary Card */}
-            <section className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FFFFFF] p-5">
-              <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-2">
-                👑 Atmakaraka & 💼 Amatyakaraka Status
+            {/* RULE D: AK + AmK Pinnacle Rajayoga Card */}
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                  👑 Atmakaraka & 💼 Amatyakaraka Rajayoga Analysis
+                </p>
+                {akAmk.isRajayoga && (
+                  <span
+                    className="text-xs px-2.5 py-0.5 rounded-full font-bold"
+                    style={{
+                      background: akAmk.rajayogaTier === "Pinnacle Unblemished" ? "#DCFCE7" : "#FEF3C7",
+                      color: akAmk.rajayogaTier === "Pinnacle Unblemished" ? "#166534" : "#92400E",
+                    }}
+                  >
+                    {akAmk.rajayogaTier} Rajayoga
+                  </span>
+                )}
+              </div>
+
+              <p className="text-sm text-[#1A1A1A] leading-relaxed">
+                {akAmk.rajayogaDescription}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                 <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)]">
                   <p className="text-xs font-bold text-[#1A1A1A]">
                     AK: {akAmk.akPlanet} in House {akAmk.akHouseFromLagna} ({akAmk.akSign})
@@ -730,13 +823,13 @@ export default function JaiminiPage() {
           </div>
         )}
 
-        {/* ── TAB 4: Chara Dasha ────────────────────────────────────────────── */}
+        {/* ── TAB 4: Chara Dasha (Exact Duration) ──────────────────────────── */}
         {activeTab === "dasha" && (
           <section className="flex flex-col gap-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <p className="text-xs uppercase tracking-widest text-[#8C827A] font-semibold">
-                  12-Sign Lifetime Chara Dasha
+                  12-Sign Lifetime Chara Dasha (Exact Count - 1 Rule)
                 </p>
                 <p className="text-xs text-[#B8860B] mt-0.5 font-medium">
                   {jaimini.directionReason}
@@ -760,18 +853,62 @@ export default function JaiminiPage() {
             </div>
 
             <div className="mt-2 rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF5EB] p-4 text-xs text-[#4A4238] leading-relaxed">
-              <strong>Calculation Rules:</strong> Each sign period lasts 1–12 years depending on the distance from
-              the sign to its ruling lord. In Savya signs (1, 2, 3, 7, 8, 9), counting is direct; in Apasavya signs
-              (4, 5, 6, 10, 11, 12), counting is reverse. Tap any dasha to reveal all 12 Antardashas.
+              <strong>Transcript Duration Rule:</strong> Rashi se uske lord ki position tak count karein aur 1 minus karein (Max: 12 saal, Min: 1 saal; own sign lord = 12 years). Tap any dasha to reveal all 12 Antardashas for precise event timing.
             </div>
           </section>
         )}
 
-        {/* ── TAB 5: Rashi Drishti (Aspects) ────────────────────────────────── */}
+        {/* ── TAB 5: Retrograde Planet Activation ──────────────────────────── */}
+        {activeTab === "retro" && (
+          <div className="flex flex-col gap-5">
+            <section className="rounded-2xl border border-amber-300 bg-amber-50/50 p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-100 text-amber-800">
+                  🔥 Retrograde Planet Activation — Hanuman-ji Principle
+                </span>
+                <span className="text-2xl">🔥</span>
+              </div>
+              <h3 className="text-xl font-bold text-amber-950 mt-1">
+                Latent High-Level Powers in Your Chart
+              </h3>
+              <p className="text-sm text-amber-900 mt-1 leading-relaxed">
+                As taught in the transcript: Retrograde planets possess immense hidden power, but like Hanuman-ji before his memory was awakened, their potential lies dormant until consciously activated through targeted actions.
+              </p>
+            </section>
+
+            {retro.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {retro.map((r, idx) => (
+                  <div key={idx} className="p-5 rounded-2xl bg-[#FFFFFF] border border-[rgba(184,134,11,0.25)] flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-base text-[#1A1A1A]">
+                          {r.planet} (House {r.houseFromLagna} · {r.sign})
+                        </span>
+                        <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
+                          RETROGRADE
+                        </span>
+                      </div>
+                      <p className="text-sm text-[#4A4238] leading-relaxed mt-2">
+                        {r.guidance}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF7F2] p-6 text-center text-sm text-[#6B635B]">
+                All seven classical planets are in direct motion in this chart. Planetary energies flow naturally without needing dormant reactivation.
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── TAB 6: Rashi Drishti (Aspects) ────────────────────────────────── */}
         {activeTab === "aspects" && (
           <section className="flex flex-col gap-4">
             <p className="text-xs uppercase tracking-widest text-[#8C827A] font-semibold">
-              Jaimini Rashi Drishti — Sign-Based Aspects
+              Jaimini Rashi Drishti — Sign-Based Aspects (Adjacent Signs Excluded)
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {Object.entries(ASPECT_MAP).map(([from, toArr]) => {
@@ -808,7 +945,7 @@ export default function JaiminiPage() {
           </section>
         )}
 
-        {/* ── TAB 6: Arudha Padas ───────────────────────────────────────────── */}
+        {/* ── TAB 7: Arudha Padas ───────────────────────────────────────────── */}
         {activeTab === "arudhas" && (
           <section className="flex flex-col gap-4">
             <p className="text-xs uppercase tracking-widest text-[#8C827A] font-semibold">

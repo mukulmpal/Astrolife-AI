@@ -237,33 +237,54 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
       : "None";
 
     const gk = jaimini.gkAnalysis;
+    const bk = jaimini.bkAnalysis;
     const dk = jaimini.dkAnalysis;
     const akAmk = jaimini.akAmkAnalysis;
     const kk = jaimini.karakamsha;
+    const retro = jaimini.retrogradeActivation;
 
-    sections.push(`### 5. JAIMINI SUTRAS & CHARA DASHA (LAYER 4 SYSTEM)
-- Chara Karakas (Degree-Wise Hierarchy, Rahu/Ketu Excluded):
+    const afflictedPlanetsStr = gk.afflictedPlanets
+      .filter((p) => !p.isAdjacentProtected)
+      .map((p) => `${p.planet} in ${p.sign} (${p.effect})`)
+      .join("; ") || "None";
+
+    const adjacentProtectedStr = gk.afflictedPlanets
+      .filter((p) => p.isAdjacentProtected)
+      .map((p) => `${p.planet} in ${p.sign}`)
+      .join(", ") || "None";
+
+    const retroStr = retro.length > 0
+      ? retro.map((r) => `${r.planet} (H${r.houseFromLagna}): ${r.guidance}`).join("\n  ✦ ")
+      : "No retrograde planets requiring activation.";
+
+    sections.push(`### 5. JAIMINI SUTRAS & CHARA DASHA (LAYER 4 SYSTEM — DO NOT MIX FORMULAS WITH VEDIC/KP)
+- Chara Karakas (Degree-Wise Hierarchy, Rahu/Ketu Strictly Excluded):
   ✦ ${karakasSummary}
-- Karakamsha Kundali (AK ${kk.akPlanet} in ${kk.karakamshaLagna} as Lagna):
+- Karakamsha Kundali (D9 Navamsha Base: AK ${kk.akPlanet} in ${kk.d9Sign} establishes Karakamsha Lagna; D1 natal planets remain in natal signs):
   ✦ Soul Essence: ${kk.staticAnalysis.soulPurpose}
-  ✦ Wealth Source: ${kk.staticAnalysis.wealthSource}
-  ✦ Career Destiny: ${kk.staticAnalysis.careerDestiny}
+  ✦ Wealth Source (H2 from Karakamsha): ${kk.staticAnalysis.wealthSource}
+  ✦ Career Destiny (H10 from Karakamsha): ${kk.staticAnalysis.careerDestiny}
 - Gnatikaraka (GK — Problem, Rog, Karz & Obstacle Radar — SABSE IMPORTANT):
   ✦ GK Planet: ${gk.gkPlanet} in House ${gk.gkHouseFromLagna} (${gk.gkSign})
-  ✦ House Impact: ${gk.houseProblem}
+  ${gk.isGkLagnaLord ? `✦ ⚠️ ${gk.gkLagnaLordDiagnosis}\n  ` : ""}✦ House Testing: ${gk.houseProblem}
   ✦ Disease Tendencies: ${gk.diseases.join(", ")}
+  ✦ GK Drishti on Planets: ${afflictedPlanetsStr}
+  ✦ Adjacent Sign Rule Protection: ${adjacentProtectedStr} (Protected from GK aspect)
   ✦ Prescribed Upay (Remedies): ${gk.remedies.join(" | ")}
   ✦ GK Active Alert: ${gk.isCurrentDashaAfflicted ? "⚠️ YES — CURRENT CHARA DASHA ACTIVATES GK KARMIC TESTING!" : "No active GK dasha"}
-- Darakaraka (DK — Spouse & Marriage Timing):
+${bk.isBkProblemActive ? `- Bhratrikaraka (BK) Affliction Alert:\n  ✦ ${bk.warning}\n` : ""}- Darakaraka (DK — Spouse & Marriage Timing):
   ✦ DK Planet: ${dk.dkPlanet} in ${dk.dkSign}
   ✦ Spouse Archetype: ${dk.spousePersona} (Key Traits: ${dk.spouseTraits.join(", ")})
-  ✦ Marriage Timing Windows: ${dk.marriageTimingSigns.join(", ")} Chara Dashas
-- AK/AmK Status:
+  ${dk.hasDkObstacle ? `✦ ⚠️ ${dk.dkObstacleWarning}\n  ` : ""}✦ Marriage Timing Windows: ${dk.marriageTimingSigns.join(", ")} Chara Dashas
+- AK/AmK Status & Rajayoga:
   ✦ AK (${akAmk.akPlanet} in H${akAmk.akHouseFromLagna}): ${akAmk.akStatus} — Fame Timing: ${akAmk.akFameTimingSigns.join(", ")}
   ✦ AmK (${akAmk.amkPlanet} in H${akAmk.amkHouseFromLagna}): ${akAmk.amkStatus} (${akAmk.amkCareerField}) — Wealth Surge: ${akAmk.amkGrowthTimingSigns.join(", ")}
+  ✦ Rajayoga Status: ${akAmk.rajayogaTier} (${akAmk.rajayogaDescription})
+- Retrograde Planet Potential & Activation (Hanuman-ji Principle):
+  ✦ ${retroStr}
 - Arudha Padas: ${arudhasSummary} (AL = Public Perception, UL = True Marriage Partner)
 - ${charaDashaInfo}
-- Jaimini Raja Yogas: ${jaiminiYogas}`);
+- Focus Note: In Jaimini timing, focus sharply on Antardasha within the active Chara Dasha for exact manifestation windows.`);
   } catch (err) {
     console.warn("[MasterAstroContext] Jaimini error:", err);
   }
