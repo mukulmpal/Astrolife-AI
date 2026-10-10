@@ -5,6 +5,8 @@ import {
   calculateInduLagna,
   calculateArudhaPada,
   calculateSreeLagnaLon,
+  calculateVarnadaLagna,
+  calculatePranapadaLagna,
   evaluateAlUlSynastry,
   evaluateSpecialLagnaRajayogas,
   evaluateDashaActivation,
@@ -12,6 +14,8 @@ import {
   PLANET_RAYS,
   type SpecialLagnaItem,
   type InduLagnaAnalysis,
+  type VarnadaLagnaAnalysis,
+  type PranapadaLagnaAnalysis,
 } from "../special-lagnas";
 import type { ChartData, PlanetData } from "../calculations";
 
@@ -407,6 +411,291 @@ test("Human Storytelling Narrative: Generates rich, personalized mentor story", 
   assert.ok(res.narrative.kuberWealthStory.includes("इंदु लग्न"), "Kuber story must reference Indu Lagna");
   assert.ok(res.narrative.marriageAndSanctuaryStory.includes("उपपद"), "Marriage story must reference Upapada");
   assert.ok(res.narrative.pakaLagnaStory.includes("पाक लग्न"), "Paka story must reference Paka Lagna");
+  assert.ok(res.narrative.varnaAndCareerStory.includes("वर्णद लग्न"), "Varna story must reference Varnada Lagna");
+  assert.ok(res.narrative.varnaAndCareerStory.includes("आजीविका"), "Varna story must discuss sustaining livelihood");
 });
+
+test("Varnada Lagna: Jaimini Upadesha Sutra Calculation & Archetype Classification", () => {
+  // Test Case A: Odd Lagna (Aries=0, lagnaSign=1), Odd HL (Leo=4, hlSign=5)
+  // A = 1, B = 5, both odd -> C = (1 + 5) % 12 = 6. Lagna odd -> count from Aries = 6 (Virgo)
+  const chartOddOdd = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 10 },
+    Jupiter: { rashiIndex: 3, degreeInSign: 15 }, // Cancer
+  });
+  const mockHlOdd: SpecialLagnaItem = {
+    key: "HL",
+    name: "Hora Lagna",
+    shortName: "HL",
+    category: "wealth",
+    sign: "Leo",
+    signNum: 4,
+    house: 5,
+    longitude: 130,
+    degreeText: "10° 00'",
+    lord: "Sun",
+    meaning: "Wealth",
+    interpretation: "",
+    actionPlan: [],
+  };
+
+  const vlOddOdd = calculateVarnadaLagna(chartOddOdd, mockHlOdd);
+  assert.equal(vlOddOdd.sign, "Virgo", "Odd Lagna (1) + Odd HL (5) -> C = 6 -> Virgo");
+  assert.equal(vlOddOdd.varna, "Shudra (Execution & Craftsmanship)", "Virgo is Earth element");
+  assert.equal(vlOddOdd.element, "Earth");
+  // 11th from Virgo (sign 5) is sign 3 (Cancer, 10 ahead mod 12: (5+10)%12 = 3)
+  assert.equal(vlOddOdd.sustainingHouse11thSign, "Cancer");
+  assert.equal(vlOddOdd.isSpiritualOrTeacherBlessing, true, "Jupiter in Cancer blesses sustaining 11th house");
+
+  // Test Case B: Odd Lagna (Aries=0, lagnaSign=1), Even HL (Taurus=1, hlSign=2)
+  // A = 1. HL even -> B = 12 - 2 + 1 = 11.
+  // One odd, one even -> C = |1 - 11| % 12 = 10.
+  // Lagna odd -> count from Aries = 10 (Capricorn)
+  const mockHlEven: SpecialLagnaItem = {
+    ...mockHlOdd,
+    sign: "Taurus",
+    signNum: 1,
+    house: 2,
+    lord: "Venus",
+  };
+  const vlOddEven = calculateVarnadaLagna(chartOddOdd, mockHlEven);
+  assert.equal(vlOddEven.sign, "Capricorn", "Odd Lagna (1) - Even HL (2 -> 11) -> C = 10 -> Capricorn");
+  assert.equal(vlOddEven.varna, "Shudra (Execution & Craftsmanship)");
+
+  // Test Case C: Even Lagna (Taurus=1, lagnaSign=2), Even HL (Taurus=1, hlSign=2)
+  // Lagna even -> A = 12 - 2 + 1 = 11. HL even -> B = 11.
+  // Both even -> C = (11 + 11) % 12 = 22 % 12 = 10.
+  // Lagna even -> count from Pisces = 12 - 10 + 1 = 3 (Gemini)
+  const chartEven = createMockChart(1, {
+    Sun: { rashiIndex: 1, degreeInSign: 10 },
+  });
+  const vlEvenEven = calculateVarnadaLagna(chartEven, mockHlEven);
+  assert.equal(vlEvenEven.sign, "Gemini", "Even Lagna (2) + Even HL (2) -> count backwards from Pisces -> Gemini");
+  assert.equal(vlEvenEven.varna, "Vaishya (Commerce & Trade)");
+  assert.equal(vlEvenEven.element, "Air");
+});
+
+test("Pranapada Lagna: Cellular Vitality and Respiration Anchor", () => {
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 10 },
+    Jupiter: { rashiIndex: 0, degreeInSign: 12 },
+  });
+
+  const pp = calculatePranapadaLagna(10.0, 120.0, chart);
+  assert.ok(pp.sign, "PP must produce a valid sign");
+  assert.ok(pp.house >= 1 && pp.house <= 12, "PP must produce a valid house between 1 and 12");
+  assert.ok(pp.vitalityStatus, "PP must assign vitality status");
+  assert.ok(pp.pranaInterpretation.length > 20, "PP must produce informative prana interpretation");
+});
+
+test("Jaimini Supreme Triple Raja Yoga: Single Planet Aspects JL, HL, and GL", () => {
+  // Setup: Chart where Saturn in Libra (6) aspects:
+  // - Aries (0) via 7th aspect (opposition, diff=6)
+  // - Cancer (3) via 10th aspect (diff=9)
+  // - Sagittarius (8) via 3rd aspect (diff=2)
+  const chart = createMockChart(0, { // JL = Aries (0)
+    Sun: { rashiIndex: 0, degreeInSign: 10 },
+    Saturn: { rashiIndex: 6, degreeInSign: 15 }, // Libra
+  });
+
+  // HL in Cancer (3) [aspect by Saturn 10th], GL in Aries (0) [aspect by Saturn 7th]
+  const hlItem: SpecialLagnaItem = {
+    key: "HL",
+    name: "Hora Lagna",
+    shortName: "HL",
+    category: "wealth",
+    sign: "Cancer",
+    signNum: 3,
+    house: 4,
+    longitude: 105,
+    degreeText: "15° 00'",
+    lord: "Moon",
+    meaning: "Liquid wealth",
+    interpretation: "",
+    actionPlan: [],
+  };
+
+  const glItem: SpecialLagnaItem = {
+    key: "GL",
+    name: "Ghati Lagna",
+    shortName: "GL",
+    category: "power",
+    sign: "Aries",
+    signNum: 0,
+    house: 1,
+    longitude: 15,
+    degreeText: "15° 00'",
+    lord: "Mars",
+    meaning: "Power",
+    interpretation: "",
+    actionPlan: [],
+  };
+
+  const alItem: SpecialLagnaItem = { ...glItem, key: "AL", name: "Arudha Lagna", shortName: "AL" };
+  const a10Item: SpecialLagnaItem = { ...glItem, key: "A10", name: "Rajya Pada", shortName: "A10" };
+  const slItem: SpecialLagnaItem = { ...glItem, key: "SL", name: "Sree Lagna", shortName: "SL" };
+
+  const induLagna: InduLagnaAnalysis = {
+    sign: "Leo",
+    signNum: 4,
+    house: 5,
+    lord: "Sun",
+    degreeText: "10° 00'",
+    lagna9thLord: "Jupiter",
+    lagna9thRays: 10,
+    moon9thLord: "Jupiter",
+    moon9thRays: 10,
+    totalRays: 20,
+    remainder: 8,
+    occupants: [],
+    aspectingPlanets: [],
+    kuberYogaTier: "High Affluence & Prosperity",
+    kuberYogaScore: 80,
+    verdict: "",
+    classicalReference: "",
+    upay: [],
+  };
+
+  const yogas = evaluateSpecialLagnaRajayogas(hlItem, glItem, alItem, a10Item, slItem, induLagna, chart);
+  const tripleYoga = yogas.find((y) => y.name.includes("Triple Raja Yoga"));
+  assert.ok(tripleYoga, "Triple Raja Yoga must be registered in the synthesizer");
+  assert.equal(tripleYoga.isFormed, true, "Saturn connecting JL, HL, and GL must activate Supreme Triple Raja Yoga");
+  assert.equal(tripleYoga.strength, "Supreme");
+});
+
+test("Upapada Special Rules: 2nd from UL, 7th from UL, and UL in 12th from AL", () => {
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 10 },
+    Jupiter: { rashiIndex: 4, degreeInSign: 15 }, // Leo
+    Venus: { rashiIndex: 9, degreeInSign: 20 },   // Capricorn
+  });
+
+  // AL = Aries (0), UL = Pisces (11) -> UL is 12th from AL!
+  const alItem: SpecialLagnaItem = {
+    key: "AL",
+    name: "Arudha Lagna",
+    shortName: "AL",
+    category: "arudha",
+    sign: "Aries",
+    signNum: 0,
+    house: 1,
+    longitude: 15,
+    degreeText: "15° 00'",
+    lord: "Mars",
+    meaning: "Public image",
+    interpretation: "",
+    actionPlan: [],
+  };
+
+  const ulItem: SpecialLagnaItem = {
+    key: "UL",
+    name: "Upapada Lagna",
+    shortName: "UL",
+    category: "arudha",
+    sign: "Pisces",
+    signNum: 11,
+    house: 12,
+    longitude: 345,
+    degreeText: "15° 00'",
+    lord: "Jupiter",
+    meaning: "Marriage reality",
+    interpretation: "",
+    actionPlan: [],
+  };
+
+  const synastry = evaluateAlUlSynastry(alItem, ulItem, chart);
+  assert.equal(synastry.isUlIn12thFromAl, true, "UL in Pisces (11) from AL in Aries (0) is in 12th house (distance 12)");
+  assert.equal(synastry.secondFromUlSign, "Aries", "2nd from Pisces is Aries");
+  assert.equal(synastry.seventhFromUlSign, "Virgo", "7th from Pisces is Virgo");
+  assert.ok(synastry.maritalWealthInsight.length > 10);
+  assert.ok(synastry.spouseNatureInsight.length > 10);
+});
+
+// ==============================================================================
+// ── THE 6 GOLDEN WORKSHOP BENCHMARK TEST SUITE ────────────────────────────────
+// ==============================================================================
+
+test("TC001: Workshop Case Robin Ji (Uttarakhand) — Moon AK, Sun AmK, Saturn GK in 12th", () => {
+  // Robin Ji: Tehri Garhwal, Leo Navamsha Moon AK (25°43'), Sun AmK in 12th, Saturn GK in 12th, Venus DK in 11th
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 11, degreeInSign: 20 },   // 12th house from Aries
+    Moon: { rashiIndex: 4, degreeInSign: 25.7 },  // AK Leo
+    Saturn: { rashiIndex: 11, degreeInSign: 13 }, // GK in 12th house
+    Venus: { rashiIndex: 10, degreeInSign: 7 },   // DK in 11th house
+  });
+
+  const res = calculateSpecialLagnas(chart);
+  assert.ok(res.varnadaLagna, "Varnada Lagna must be calculated");
+  assert.ok(res.pranapadaLagna, "Pranapada Lagna must be calculated");
+  assert.ok(res.narrative.varnaAndCareerStory.length > 50, "Robin Ji narrative must include detailed vocation guidance");
+});
+
+test("TC002: Workshop Case Pooja Ji (Kolkata) — Pisces Lagna, Sun AK, Jupiter AmK in 11th, Moon GK in 12th", () => {
+  // Pooja Ji: Pisces Lagna (11), Sun AK (highest degree), Jupiter AmK in 11th (Capricorn), Moon GK in 12th (Aquarius)
+  const chart = createMockChart(11, { // Pisces
+    Sun: { rashiIndex: 4, degreeInSign: 28 },      // AK
+    Jupiter: { rashiIndex: 9, degreeInSign: 22 },  // 11th house (Capricorn)
+    Moon: { rashiIndex: 10, degreeInSign: 14 },    // 12th house (Aquarius)
+    Mercury: { rashiIndex: 3, degreeInSign: 5 },   // DK
+  });
+
+  const res = calculateSpecialLagnas(chart);
+  assert.equal(res.induLagna.lord, "Moon", "9th from Pisces is Scorpio (Mars=6), 9th from Moon (Aquarius) is Libra (Venus=12), total 18 % 12 = 6 -> Cancer (Moon)");
+  assert.ok(res.induLagna.kuberYogaScore > 0);
+  assert.ok(res.varnadaLagna.varna, "Varnada must assign proper Varna");
+});
+
+test("TC003: Workshop Case Deepak Arya Ji (Ajmer) — Virgo Lagna, Saturn AK, Jupiter AmK, Moon GK", () => {
+  // Deepak Arya Ji: Virgo Lagna (5), Saturn AK, Jupiter AmK (17°), Moon GK (13°), Mercury DK (5°)
+  const chart = createMockChart(5, { // Virgo
+    Saturn: { rashiIndex: 1, degreeInSign: 24 },   // Taurus
+    Jupiter: { rashiIndex: 8, degreeInSign: 17 },  // Sagittarius
+    Moon: { rashiIndex: 4, degreeInSign: 13 },     // Leo
+    Mercury: { rashiIndex: 7, degreeInSign: 5 },   // Scorpio
+  });
+
+  const res = calculateSpecialLagnas(chart);
+  assert.ok(res.rajayogas.length >= 4, "Must synthesize all classical yogas");
+  assert.ok(res.alUlSynastry.verdict, "Must assess persona vs marriage reality");
+});
+
+test("TC004: Workshop Case Harikesh Nath Ji (Assam) — Taurus Lagna, Apasavya Chara Dasha Order", () => {
+  // Harikesh Nath Ji: Taurus Lagna (1), Even sign -> Apasavya Jaimini progression
+  const chart = createMockChart(1, { // Taurus
+    Sun: { rashiIndex: 5, degreeInSign: 6 },
+    Jupiter: { rashiIndex: 4, degreeInSign: 18 },
+    Saturn: { rashiIndex: 9, degreeInSign: 12 },
+  });
+
+  const res = calculateSpecialLagnas(chart);
+  assert.equal(res.bhavaLagna.house >= 1 && res.bhavaLagna.house <= 12, true);
+  assert.ok(res.narrative.publicImageStory.includes("आरूढ़"));
+});
+
+test("TC005: Workshop Case Vikram Mittal Ji — Sun AK (Name & Character), Mars GK (Debts & Body)", () => {
+  // Vikram Mittal Ji: Sun AK, Mars GK
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 27 },   // Aries Exalted Sun AK
+    Mars: { rashiIndex: 7, degreeInSign: 20 },  // Scorpio Mars GK
+    Venus: { rashiIndex: 11, degreeInSign: 15 }, // Pisces Exalted Venus
+  });
+
+  const res = calculateSpecialLagnas(chart);
+  assert.ok(res.varnadaLagna.actionGuidance.length >= 2);
+  assert.ok(res.pranapadaLagna.vitalityStatus);
+});
+
+test("TC006: Workshop Case Sachchidanand Ji (Basti, UP) — Taurus Lagna, Moon 2nd & 9th, Saturn 8th & 9th", () => {
+  // Sachchidanand Ji: Taurus Lagna (1), Moon active in 2nd/9th, Saturn 8th/9th
+  const chart = createMockChart(1, { // Taurus
+    Moon: { rashiIndex: 2, degreeInSign: 12 },   // Gemini (2nd house)
+    Saturn: { rashiIndex: 8, degreeInSign: 14 }, // Sagittarius (8th house)
+    Jupiter: { rashiIndex: 9, degreeInSign: 10 }, // Capricorn (9th house)
+  });
+
+  const res = calculateSpecialLagnas(chart);
+  assert.ok(res.induLagna.verdict, "Indu Lagna verdict populated");
+  assert.ok(res.varnadaLagna.sustainingHouse11thSign, "11th from VL computed");
+});
+
 
 

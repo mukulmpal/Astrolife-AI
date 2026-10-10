@@ -2,9 +2,9 @@ import { computePlanets, getJD, type ChartData, type PlanetData } from "./calcul
 
 export type SpecialLagnaKey =
   | "AL" | "UL" | "A1" | "A2" | "A3" | "A4" | "A5" | "A6" | "A7" | "A8" | "A9" | "A10" | "A11" | "A12"
-  | "HL" | "GL" | "BL" | "SL" | "IL" | "PL";
+  | "HL" | "GL" | "BL" | "SL" | "IL" | "PL" | "VL" | "PP";
 
-export type SpecialLagnaCategory = "wealth" | "power" | "arudha" | "sree" | "sunrise" | "lagna";
+export type SpecialLagnaCategory = "wealth" | "power" | "arudha" | "sree" | "sunrise" | "lagna" | "social" | "vitality";
 
 export interface SpecialLagnaItem {
   key: SpecialLagnaKey;
@@ -59,6 +59,41 @@ export interface AlUlSynastry {
   verdict: string;
   transcriptAdvice: string;
   remedy: string;
+  secondFromUlSign: string;
+  secondFromUlHouse: number;
+  secondFromUlOccupants: string[];
+  seventhFromUlSign: string;
+  seventhFromUlHouse: number;
+  seventhFromUlOccupants: string[];
+  isUlIn12thFromAl: boolean;
+  maritalWealthInsight: string;
+  spouseNatureInsight: string;
+}
+
+export interface VarnadaLagnaAnalysis {
+  sign: string;
+  signNum: number;
+  house: number;
+  lord: string;
+  degreeText: string;
+  varna: "Kshatriya (Leadership & Governance)" | "Brahmin (Knowledge & Healing)" | "Vaishya (Commerce & Trade)" | "Shudra (Execution & Craftsmanship)";
+  element: "Fire" | "Water" | "Air" | "Earth";
+  careerInclination: string;
+  sustainingHouse11thSign: string;
+  sustainingHouse11thHouse: number;
+  sustainingPlanets: string[];
+  isSpiritualOrTeacherBlessing: boolean;
+  actionGuidance: string[];
+}
+
+export interface PranapadaLagnaAnalysis {
+  sign: string;
+  signNum: number;
+  house: number;
+  lord: string;
+  degreeText: string;
+  vitalityStatus: "Robust Life Force" | "Moderate Stamina" | "Sensitive Vitality";
+  pranaInterpretation: string;
 }
 
 export interface SpecialLagnaRajayoga {
@@ -91,6 +126,7 @@ export interface SpecialLagnaNarrative {
   powerAndAuthorityStory: string;
   marriageAndSanctuaryStory: string;
   pakaLagnaStory: string;
+  varnaAndCareerStory: string;
   mentorSynthesis: string;
 }
 
@@ -106,6 +142,8 @@ export interface SpecialLagnaResult {
   horaLagna: SpecialLagnaItem;
   ghatiLagna: SpecialLagnaItem;
   bhavaLagna: SpecialLagnaItem;
+  varnadaLagna: VarnadaLagnaAnalysis;
+  pranapadaLagna: PranapadaLagnaAnalysis;
   rajayogas: SpecialLagnaRajayoga[];
   alUlSynastry: AlUlSynastry;
   activeDashaActivation?: ActiveDashaActivation;
@@ -331,6 +369,24 @@ const META: Record<SpecialLagnaKey, Omit<SpecialLagnaItem, "sign" | "signNum" | 
     meaning: "The Seat of Intelligence — where the Lagna Lord actively deploys conscious will.",
     interpretation: "Paka Lagna is the sign occupied by your Lagna Lord. While Lagna is the seed, Paka Lagna is the fruit — showing where your mental focus, stamina, and life initiatives bear fruit.",
     actionPlan: ["Concentrate career focus on Paka Lagna house affairs.", "Direct willpower consciously rather than drifting.", "Respect the sign lord of Paka Lagna."],
+  },
+  VL: {
+    key: "VL",
+    name: "Varnada Lagna",
+    shortName: "VL",
+    category: "social",
+    meaning: "Jaimini social vocation, socio-economic archetype, and sustaining livelihood.",
+    interpretation: "Varnada Lagna reveals your soul's karmic vocation and social duties in society. The 11th house from Varnada Lagna shows your sustained livelihood and financial longevity.",
+    actionPlan: ["Align professional activities with your Varnada elemental archetype.", "Nurture 11th from VL planets to stabilize lifelong income.", "Balance duty (Dharma) with practical commerce."],
+  },
+  PP: {
+    key: "PP",
+    name: "Pranapada Lagna",
+    shortName: "PP",
+    category: "vitality",
+    meaning: "Vital breath (Prana), cellular stamina, and respiratory life-force anchor.",
+    interpretation: "Moving from sunrise, Pranapada Lagna reflects the rhythm of prana and respiratory vitality entering the physical body at the time of birth.",
+    actionPlan: ["Incorporate daily pranayama and breathwork.", "Protect respiratory and cardiovascular health.", "Respect natural diurnal sleep-wake rhythms."],
   },
 };
 
@@ -620,8 +676,156 @@ export function calculateInduLagna(chart: ChartData): InduLagnaAnalysis {
   };
 }
 
+// ── Varnada Lagna (Jaimini Social Vocation & Livelihood) ───────────────────────
+export function calculateVarnadaLagna(chart: ChartData, hl: SpecialLagnaItem): VarnadaLagnaAnalysis {
+  const lagnaSign = chart.lagnaNum + 1; // 1 to 12
+  const hlSign = hl.signNum + 1; // 1 to 12
+
+  // Step 1: Calculate A
+  let A: number;
+  if (lagnaSign % 2 === 1) {
+    A = lagnaSign; // Odd: count from Aries
+  } else {
+    A = 12 - lagnaSign + 1; // Even: count from Pisces
+  }
+
+  // Step 2: Calculate B
+  let B: number;
+  if (hlSign % 2 === 1) {
+    B = hlSign; // Odd: count from Aries
+  } else {
+    B = 12 - hlSign + 1; // Even: count from Pisces
+  }
+
+  // Step 3: Calculate C
+  let C: number;
+  if ((lagnaSign % 2) === (hlSign % 2)) {
+    C = (A + B) % 12;
+  } else {
+    C = Math.abs(A - B) % 12;
+  }
+  if (C === 0) C = 12;
+
+  // Step 4: Count from Aries or Pisces
+  let vlSign1Based: number;
+  if (lagnaSign % 2 === 1) {
+    vlSign1Based = C; // From Aries
+  } else {
+    vlSign1Based = 12 - C + 1; // From Pisces
+  }
+
+  const vlSignNum = vlSign1Based - 1; // 0-indexed (0=Aries, 1=Taurus...)
+  const vlSign = RASHIS[vlSignNum];
+  const vlHouse = houseFromSign(chart.lagnaNum, vlSignNum);
+  const vlLord = SIGN_LORDS[vlSignNum];
+
+  // Varna & Element Classification
+  let varna: "Kshatriya (Leadership & Governance)" | "Brahmin (Knowledge & Healing)" | "Vaishya (Commerce & Trade)" | "Shudra (Execution & Craftsmanship)";
+  let element: "Fire" | "Water" | "Air" | "Earth";
+  let careerInclination: string;
+
+  if (vlSignNum === 0 || vlSignNum === 4 || vlSignNum === 8) {
+    varna = "Kshatriya (Leadership & Governance)";
+    element = "Fire";
+    careerInclination = "Governance, administration, defense, law enforcement, executive leadership, and policy-making.";
+  } else if (vlSignNum === 3 || vlSignNum === 7 || vlSignNum === 11) {
+    varna = "Brahmin (Knowledge & Healing)";
+    element = "Water";
+    careerInclination = "Knowledge transfer, consulting, spiritual / occult guidance, teaching, research, medicine, and advisory councils.";
+  } else if (vlSignNum === 2 || vlSignNum === 6 || vlSignNum === 10) {
+    varna = "Vaishya (Commerce & Trade)";
+    element = "Air";
+    careerInclination = "Commerce, trade, financial markets, media, networking, entrepreneurship, and commercial partnerships.";
+  } else {
+    varna = "Shudra (Execution & Craftsmanship)";
+    element = "Earth";
+    careerInclination = "Practical execution, technology infrastructure, operations architecture, skilled craftsmanship, and operational service delivery.";
+  }
+
+  // 11th House from Varnada Lagna (sustaining livelihood)
+  const sustainingSignNum = mod(vlSignNum + 10, 12);
+  const sustainingHouse11thSign = RASHIS[sustainingSignNum];
+  const sustainingHouse11thHouse = houseFromSign(chart.lagnaNum, sustainingSignNum);
+  const sustainingPlanets = getPlanetsInSign(chart, sustainingSignNum);
+  const sustainingAspecting = getAspectingPlanets(chart, sustainingSignNum);
+
+  const hasJupiterOrVenus =
+    sustainingPlanets.includes("Jupiter") ||
+    sustainingPlanets.includes("Venus") ||
+    sustainingAspecting.includes("Jupiter") ||
+    sustainingAspecting.includes("Venus");
+
+  const isSpiritualOrTeacherBlessing = Boolean(hasJupiterOrVenus);
+
+  const actionGuidance = [
+    `Honor your innate ${varna} vocation archetype: direct major career decisions toward ${careerInclination}`,
+    isSpiritualOrTeacherBlessing
+      ? "Maharishi Jaimini's Sacred Blessing: Jupiter/Venus directly energizes your 11th house from Varnada Lagna. You possess a natural divine gift as an astrologer, spiritual guide, counselor, or teacher."
+      : `Your sustaining livelihood compounds through ${sustainingHouse11thSign} (House ${sustainingHouse11thHouse}). Align long-term financial streams with these house significations.`,
+    `Remediation of ${vlLord} (Varnada Lagna Lord) stabilizes professional standing and protects against career stagnation.`,
+  ];
+
+  return {
+    sign: vlSign,
+    signNum: vlSignNum,
+    house: vlHouse,
+    lord: vlLord,
+    degreeText: degreeText(vlSignNum * 30 + 15),
+    varna,
+    element,
+    careerInclination,
+    sustainingHouse11thSign,
+    sustainingHouse11thHouse,
+    sustainingPlanets,
+    isSpiritualOrTeacherBlessing,
+    actionGuidance,
+  };
+}
+
+// ── Pranapada Lagna (Life Force & Cellular Stamina) ───────────────────────────
+export function calculatePranapadaLagna(
+  sunAtSunrise: number,
+  minutesSinceSunrise: number,
+  chart: ChartData
+): PranapadaLagnaAnalysis {
+  const ppLon = mod(sunAtSunrise + minutesSinceSunrise * 2.0, 360);
+  const signNum = signFromLon(ppLon);
+  const sign = RASHIS[signNum];
+  const house = houseFromSign(chart.lagnaNum, signNum);
+  const lord = SIGN_LORDS[signNum];
+  const occupants = getPlanetsInSign(chart, signNum);
+
+  const isKendraTrikona = [1, 4, 5, 7, 9, 10].includes(house);
+  const hasBenefics = occupants.some((p) => NATURAL_BENEFICS.includes(p));
+  const hasMalefics = occupants.some((p) => NATURAL_MALEFICS.includes(p));
+
+  let vitalityStatus: "Robust Life Force" | "Moderate Stamina" | "Sensitive Vitality";
+  let pranaInterpretation: string;
+
+  if (isKendraTrikona && !hasMalefics) {
+    vitalityStatus = "Robust Life Force";
+    pranaInterpretation = `Pranapada Lagna sits auspiciously in ${sign} (House ${house}). Your cellular prana is resilient, conferring steady physical endurance and prompt recuperation from stress.`;
+  } else if ([6, 8, 12].includes(house) || (hasMalefics && !hasBenefics)) {
+    vitalityStatus = "Sensitive Vitality";
+    pranaInterpretation = `Pranapada Lagna in ${sign} (House ${house}) reflects sensitive vitality. Respiratory rhythm and stamina fluctuate with fatigue; daily pranayama and regular sleep schedules act as vital shields.`;
+  } else {
+    vitalityStatus = "Moderate Stamina";
+    pranaInterpretation = `Pranapada Lagna in ${sign} (House ${house}) offers adaptable life force. Consistent hydration, light exercise, and conscious breath control keep your stamina peak.`;
+  }
+
+  return {
+    sign,
+    signNum,
+    house,
+    lord,
+    degreeText: degreeText(ppLon),
+    vitalityStatus,
+    pranaInterpretation,
+  };
+}
+
 // ── AL-UL Synastry (Public Persona vs Marriage Reality) ───────────────────────
-export function evaluateAlUlSynastry(al: SpecialLagnaItem, ul: SpecialLagnaItem): AlUlSynastry {
+export function evaluateAlUlSynastry(al: SpecialLagnaItem, ul: SpecialLagnaItem, chart?: ChartData): AlUlSynastry {
   const distance = mod(ul.signNum - al.signNum, 12) + 1;
   let relationship = "";
   let score = 5;
@@ -678,6 +882,36 @@ export function evaluateAlUlSynastry(al: SpecialLagnaItem, ul: SpecialLagnaItem)
     remedy = "Donate yellow sweets or milk on Mondays to Shiva-Parvati temple.";
   }
 
+  // Classical 2nd and 7th from Upapada Lagna
+  const secondSignNum = mod(ul.signNum + 1, 12);
+  const secondFromUlSign = RASHIS[secondSignNum];
+  const secondFromUlHouse = chart ? houseFromSign(chart.lagnaNum, secondSignNum) : secondSignNum + 1;
+  const secondFromUlOccupants = chart ? getPlanetsInSign(chart, secondSignNum) : [];
+
+  const seventhSignNum = mod(ul.signNum + 6, 12);
+  const seventhFromUlSign = RASHIS[seventhSignNum];
+  const seventhFromUlHouse = chart ? houseFromSign(chart.lagnaNum, seventhSignNum) : seventhSignNum + 1;
+  const seventhFromUlOccupants = chart ? getPlanetsInSign(chart, seventhSignNum) : [];
+
+  // Jaimini Special Rule: Upapada in 12th from Arudha Lagna (distance 12 from AL)
+  const isUlIn12thFromAl = mod(ul.signNum - al.signNum, 12) === 11;
+
+  let maritalWealthInsight = `The 2nd from Upapada (${secondFromUlSign}) governs marital stability and wealth sustenance.`;
+  if (secondFromUlOccupants.some((p) => NATURAL_BENEFICS.includes(p))) {
+    maritalWealthInsight += ` Benefic presence (${secondFromUlOccupants.join(", ")}) preserves family wealth, harmony, and lasting marriage fidelity.`;
+  } else if (secondFromUlOccupants.some((p) => NATURAL_MALEFICS.includes(p))) {
+    maritalWealthInsight += ` Malefic presence (${secondFromUlOccupants.join(", ")}) calls for disciplined financial communication between partners.`;
+  } else {
+    maritalWealthInsight += ` Ruled by ${SIGN_LORDS[secondSignNum]}, marital assets compound steadily through planned mutual savings.`;
+  }
+
+  let spouseNatureInsight = `The 7th from Upapada (${seventhFromUlSign}) indicates the spouse's core temperament.`;
+  if (seventhFromUlOccupants.length > 0) {
+    spouseNatureInsight += ` Influenced by ${seventhFromUlOccupants.join(", ")}, reflecting a dynamic, expressive partner.`;
+  } else {
+    spouseNatureInsight += ` Ruled by ${SIGN_LORDS[seventhSignNum]}, pointing to an observant, supportive companion.`;
+  }
+
   return {
     alSign: al.sign,
     alSignNum: al.signNum,
@@ -689,6 +923,15 @@ export function evaluateAlUlSynastry(al: SpecialLagnaItem, ul: SpecialLagnaItem)
     verdict,
     transcriptAdvice,
     remedy,
+    secondFromUlSign,
+    secondFromUlHouse,
+    secondFromUlOccupants,
+    seventhFromUlSign,
+    seventhFromUlHouse,
+    seventhFromUlOccupants,
+    isUlIn12thFromAl,
+    maritalWealthInsight,
+    spouseNatureInsight,
   };
 }
 
@@ -772,6 +1015,41 @@ export function evaluateSpecialLagnaRajayogas(
     isFormed: isSlYogaFormed,
   });
 
+  // 5. Jaimini Supreme Triple Raja Yoga (JL + HL + GL)
+  const aspectingJL = getAspectingPlanets(chart, chart.lagnaNum);
+  const aspectingHL = getAspectingPlanets(chart, hl.signNum);
+  const aspectingGL = getAspectingPlanets(chart, gl.signNum);
+
+  const tripleAspectPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].filter(
+    (p) => aspectingJL.includes(p) && aspectingHL.includes(p) && aspectingGL.includes(p)
+  );
+
+  const occupantsJL = getPlanetsInSign(chart, chart.lagnaNum);
+  const occupantsHL = getPlanetsInSign(chart, hl.signNum);
+  const occupantsGL = getPlanetsInSign(chart, gl.signNum);
+
+  const tripleConnectors = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].filter(
+    (p) =>
+      (aspectingJL.includes(p) || occupantsJL.includes(p)) &&
+      (aspectingHL.includes(p) || occupantsHL.includes(p)) &&
+      (aspectingGL.includes(p) || occupantsGL.includes(p))
+  );
+
+  const isTripleYogaFormed = tripleAspectPlanets.length > 0 || tripleConnectors.length > 0;
+  const keyPlanet = tripleAspectPlanets[0] || tripleConnectors[0];
+
+  yogas.push({
+    name: "Jaimini Supreme Triple Raja Yoga (JL-HL-GL)",
+    sanskritName: "जैमिनी त्रि-लग्न महा-राजयोग",
+    type: "Fame & Authority",
+    strength: "Supreme",
+    description: isTripleYogaFormed
+      ? `Jaimini's Pinnacle Raja Yoga Formed! Planet ${keyPlanet} connects simultaneously with Janma Lagna (${RASHIS[chart.lagnaNum]}), Hora Lagna (${hl.sign}), and Ghati Lagna (${gl.sign}). Classical sutras state: 'The native commands sovereign authority, widespread fame, and immense wealth resembling a king.'`
+      : `Janma Lagna (${RASHIS[chart.lagnaNum]}), Hora Lagna (${hl.sign}), and Ghati Lagna (${gl.sign}) are governed independently. Success unfolds through sustained individual effort across wealth and administrative domains.`,
+    involvedLagnas: ["JL", "HL", "GL"],
+    isFormed: isTripleYogaFormed,
+  });
+
   return yogas;
 }
 
@@ -836,7 +1114,8 @@ export function generateSpecialLagnaNarrative(
   gl: SpecialLagnaItem,
   pl: SpecialLagnaItem,
   synastry: AlUlSynastry,
-  rajayogas: SpecialLagnaRajayoga[]
+  rajayogas: SpecialLagnaRajayoga[],
+  vl?: VarnadaLagnaAnalysis
 ): SpecialLagnaNarrative {
   const lagnaRashi = RASHIS[chart.lagnaNum] ?? chart.lagnaRashi ?? "Aries";
   const lagnaLord = SIGN_LORDS[chart.lagnaNum] ?? "Mars";
@@ -854,7 +1133,11 @@ export function generateSpecialLagnaNarrative(
 
   const pakaLagnaStory = `शास्त्रों में एक अमर श्लोक आता है — 'यत्र लग्नेश्वरो याति, तत्र जीवस्य चेतना।' यानी इंसान का शरीर चाहे जहाँ भी विचरण कर रहा हो, उसकी चेतना और प्राण वहीं वास करते हैं जहाँ उसका लग्नेश जाकर बैठता है। आपका जन्म लग्न तो सिर्फ वह भौतिक गाड़ी है जिसमें आप सवार हैं, लेकिन उस गाड़ी का ड्राइवर, उसकी संपूर्ण इच्छाशक्ति, उसकी 24 घंटे की चिंताएँ और उसकी मानसिक एकाग्रता का ठिकाना 'पाक लग्न' है — और आपकी कुंडली में आपके लग्नेश ${lagnaLord} अपनी यात्रा करके ${pl.sign} राशि (भाव ${pl.house}) में विराजमान हैं।\n\nइसका सीधा, व्यावहारिक अर्थ यह है कि आप अपनी आँखों से दुनिया को चाहे जिस रूप में देखें, लेकिन जब भी जीवन में कोई बड़ा मोड़ आएगा — जब बात आत्म-सम्मान, भविष्य के निर्णय या आंतरिक संतुष्टि की होगी — तो आपकी बुद्धि भाव ${pl.house} के विषयों (${pl.meaning}) की ओर ही मुड़ेगी। जब तक भाव ${pl.house} के कार्य सिद्ध नहीं होते, आपका मन कभी पूरी तरह शांत नहीं बैठ सकता। अपने लग्नेश की इस पुकार को पहचानना ही आपकी आत्म-जागृति का पहला कदम है।`;
 
-  const mentorSynthesis = `संक्षेप में कहें तो मेरे भाई — आपका जन्म लग्न वह ज़मीन है जिस पर आप खड़े हैं, इंदु लग्न आपकी ज़मीन के नीचे दबा हुआ कुबेर का अमृत-कलश है, आरूढ़ लग्न वह विशाल वृक्ष है जिसकी छाया समाज पर पड़ती है, और उपपद लग्न वह घोंसला है जिसमें आपकी आत्मा विश्राम पाती है।\n\nजब एक इंसान अपने इन सभी आयामों को एक साथ समझ लेता है, तो जीवन की सारी उलझनें धूप में कोहरे की तरह छंट जाती हैं। अब आपके पास केवल नक्षत्रों के नाम नहीं, बल्कि अपनी तकदीर को संवारने का पूरा दिशा-निर्देश है।`;
+  const varnaAndCareerStory = vl
+    ? `महर्षि जैमिनी ने एक अत्यंत क्रांतिकारी सत्य उजागर किया था — उन्होंने कहा कि समाज में आपका वास्तविक दायित्व और सम्मान इस बात से तय नहीं होता कि आप किस कुल में पैदा हुए, बल्कि इससे तय होता है कि आपकी आत्मा का 'वर्णद लग्न (VL)' किस तत्व को धारण किए हुए है। आपकी कुंडली में वर्णद लग्न ${vl.sign} राशि (भाव ${vl.house}) में स्थापित हुआ है, जो आपको '${vl.varna}' (${vl.element} तत्व) का स्वरूप प्रदान करता है।\n\nइसका गहरा अर्थ यह है कि आपकी आत्मा की स्वाभाविक कार्यशैली और आंतरिक प्रेरणा '${vl.careerInclination}' की ओर बहती है। जब भी आप इस नैसर्गिक दिशा के विपरीत काम करेंगे, तो आपको थकान और असंतोष महसूस होगा; लेकिन जैसे ही आप अपने इस वर्ण के अनुकूल दायित्व संभालेंगे, आपके काम में एक स्वाभाविक निपुणता और समाज में प्रतिष्ठा प्रकट होगी।\n\nऔर सबसे बड़ी बात — महर्षि जैमिनी ने बताया कि इंसान को जीवनभर पोषण और निरंतर आजीविका कहाँ से प्राप्त होगी, इसका रहस्य वर्णद लग्न से 11वें भाव में छिपा होता है। आपकी कुंडली में यह पोषणकारी भाव ${vl.sustainingHouse11thSign} राशि (भाव ${vl.sustainingHouse11thHouse}) में पड़ता है। ${vl.isSpiritualOrTeacherBlessing ? `यहाँ महर्षि जैमिनी का एक अत्यंत दुर्लभ वरदान उपस्थित है — आपके इस पोषण भाव पर देवगुरु बृहस्पति अथवा दैत्यगुरु शुक्र का पावन प्रभाव है। शास्त्र घोषणा करते हैं कि ऐसा जातक यदि ज्ञान, परामर्श, शिक्षण, अध्यात्म, हीलिंग या ज्योतिष के क्षेत्र में कदम रखता है, तो समाज उसे श्रद्धा से सिर-आंखों पर बिठाता है और धन उसके पीछे-पीछे चला आता है।` : `यह भाव बताता है कि जब भी आप ${vl.sustainingHouse11thSign} के व्यावहारिक गुणों और संपर्कों को सक्रिय करेंगे, आपके जीवन की आर्थिक रीढ़ सदैव मज़बूत और स्थिर बनी रहेगी।`}`
+    : `वर्णद लग्न (VL) आपकी सामाजिक भूमिका और उस कार्यक्षेत्र को उजागर करता है जो जीवनभर आपकी आजीविका को संबल प्रदान करता है।`;
+
+  const mentorSynthesis = `संक्षेप में कहें तो मेरे भाई — आपका जन्म लग्न वह ज़मीन है जिस पर आप खड़े हैं, इंदु लग्न आपकी ज़मीन के नीचे दबा हुआ कुबेर का अमृत-कलश है, वर्णद लग्न वह कर्म-यज्ञ है जो आपको सामाजिक पहचान और अनवरत आजीविका देता है, आरूढ़ लग्न वह विशाल वृक्ष है जिसकी छाया समाज पर पड़ती है, और उपपद लग्न वह घोंसला है जिसमें आपकी आत्मा विश्राम पाती है।\n\nजब एक इंसान अपने इन सभी आयामों को एक साथ समझ लेता है, तो जीवन की सारी उलझनें धूप में कोहरे की तरह छंट जाती हैं। अब आपके पास केवल नक्षत्रों के नाम नहीं, बल्कि अपनी तकदीर को संवारने का पूरा दिशा-निर्देश है।`;
 
   return {
     title: "मार्गदर्शक की ज़ुबानी — आपकी ज़िंदगी का आईना",
@@ -864,6 +1147,7 @@ export function generateSpecialLagnaNarrative(
     powerAndAuthorityStory,
     marriageAndSanctuaryStory,
     pakaLagnaStory,
+    varnaAndCareerStory,
     mentorSynthesis,
   };
 }
@@ -935,9 +1219,23 @@ export function calculateSpecialLagnas(rawChart: ChartData): SpecialLagnaResult 
     lord: SIGN_LORDS[signFromLon(pakaLon)],
   });
 
+  // 6. Varnada Lagna (Jaimini Social Vocation & Sustaining Livelihood)
+  const varnadaLagna = calculateVarnadaLagna(chart, hl);
+  const vlItem = makeItem("VL", varnadaLagna.signNum * 30 + 15, chart, {
+    lord: varnadaLagna.lord,
+    category: "social",
+  });
+
+  // 7. Pranapada Lagna (Life Force & Cellular Stamina)
+  const pranapadaLagna = calculatePranapadaLagna(sunAtSunrise, minutesSinceSunrise, chart);
+  const ppItem = makeItem("PP", pranapadaLagna.signNum * 30 + 15, chart, {
+    lord: pranapadaLagna.lord,
+    category: "vitality",
+  });
+
   // Groupings
   const wealthLagnas = [ilItem, hl, sl];
-  const powerLagnas = [gl, bl, pakaLagna];
+  const powerLagnas = [gl, bl, pakaLagna, vlItem, ppItem];
 
   const items: SpecialLagnaItem[] = [
     ilItem,
@@ -946,23 +1244,25 @@ export function calculateSpecialLagnas(rawChart: ChartData): SpecialLagnaResult 
     sl,
     pakaLagna,
     bl,
+    vlItem,
+    ppItem,
     ...arudhaItems,
   ];
 
-  // 6. Rajayoga Synthesizer
+  // 8. Rajayoga Synthesizer
   const rajayogas = evaluateSpecialLagnaRajayogas(hl, gl, al, a10, sl, induLagna, chart);
 
-  // 7. AL-UL Synastry
-  const alUlSynastry = evaluateAlUlSynastry(al, ul);
+  // 9. AL-UL Synastry
+  const alUlSynastry = evaluateAlUlSynastry(al, ul, chart);
 
-  // 8. Active Dasha Activation
+  // 10. Active Dasha Activation
   const activeDashaActivation = evaluateDashaActivation(chart, items);
 
   const strongestPublicSignal = a10;
-  const summary = `Special Lagnas reveal: Indu Lagna in ${induLagna.sign} (${induLagna.kuberYogaTier}), Hora Lagna (Wealth) in ${hl.sign}, Ghati Lagna (Power) in ${gl.sign}, Sree Lagna in ${sl.sign}, Arudha Lagna (Public Image) in ${al.sign}, and Upapada (Marriage) in ${ul.sign}.`;
+  const summary = `Special Lagnas reveal: Indu Lagna in ${induLagna.sign} (${induLagna.kuberYogaTier}), Hora Lagna (Wealth) in ${hl.sign}, Ghati Lagna (Power) in ${gl.sign}, Sree Lagna in ${sl.sign}, Arudha Lagna (Public Image) in ${al.sign}, Upapada (Marriage) in ${ul.sign}, and Varnada Lagna (${varnadaLagna.varna}) in ${varnadaLagna.sign}.`;
 
-  // 9. Human Storytelling Narrative
-  const narrative = generateSpecialLagnaNarrative(chart, al, ul, induLagna, hl, gl, pakaLagna, alUlSynastry, rajayogas);
+  // 11. Human Storytelling Narrative
+  const narrative = generateSpecialLagnaNarrative(chart, al, ul, induLagna, hl, gl, pakaLagna, alUlSynastry, rajayogas, varnadaLagna);
 
   const aiContext = `${summary} AL-UL relationship is ${alUlSynastry.relationship}. Active Dasha (${activeDashaActivation?.mahadashaLord || "N/A"}) activates: ${activeDashaActivation?.activatedLagnas.map((a) => a.lagnaKey).join(", ") || "background houses"}.`;
 
@@ -978,6 +1278,8 @@ export function calculateSpecialLagnas(rawChart: ChartData): SpecialLagnaResult 
     horaLagna: hl,
     ghatiLagna: gl,
     bhavaLagna: bl,
+    varnadaLagna,
+    pranapadaLagna,
     rajayogas,
     alUlSynastry,
     activeDashaActivation,

@@ -11,6 +11,8 @@ import {
   type SpecialLagnaRajayoga,
   type ActiveDashaActivation,
   type SpecialLagnaNarrative,
+  type VarnadaLagnaAnalysis,
+  type PranapadaLagnaAnalysis,
 } from "@/lib/astro-engine/special-lagnas";
 import "@/app/dashboard/shared.css";
 
@@ -264,20 +266,44 @@ function MentorNarrativeCard({
             </div>
           </div>
 
-          {/* Chapter 5: Paka Lagna */}
-          <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] shadow-sm">
-            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
-              <span className="text-xl">💡</span>
-              <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
-                अध्याय 5: बुद्धि और संकल्प का वास्तविक ठिकाना (पाक लग्न)
-              </h4>
+          {/* Chapters 5 & 6 Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Chapter 5: Paka Lagna */}
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+              <div>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
+                  <span className="text-xl">💡</span>
+                  <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                    अध्याय 5: बुद्धि और संकल्प का वास्तविक ठिकाना (पाक लग्न)
+                  </h4>
+                </div>
+                <div className="space-y-3">
+                  {narrative.pakaLagnaStory.split("\n\n").map((para, idx) => (
+                    <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="space-y-3">
-              {narrative.pakaLagnaStory.split("\n\n").map((para, idx) => (
-                <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
-                  {para}
-                </p>
-              ))}
+
+            {/* Chapter 6: Varnada Lagna */}
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+              <div>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
+                  <span className="text-xl">🏛️</span>
+                  <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                    अध्याय 6: कर्म का सच्चा वर्ण और आपकी आजीविका (वर्णद लग्न)
+                  </h4>
+                </div>
+                <div className="space-y-3">
+                  {narrative.varnaAndCareerStory.split("\n\n").map((para, idx) => (
+                    <p key={idx} className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -786,6 +812,186 @@ export default function SpecialLagnasPage() {
                 <LagnaCard item={result.arudhaItems.find((a) => a.key === "A10") ?? result.arudhaItems[9]} highlight />
               </div>
             </div>
+
+            {/* Jaimini Triple Raja Yoga Banner */}
+            {(() => {
+              const tripleYoga = rajayogas.find((y) => y.name.includes("Triple Raja Yoga"));
+              if (!tripleYoga) return null;
+              return (
+                <div
+                  className="p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  style={{
+                    background: tripleYoga.isFormed ? "linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(184, 134, 11, 0.2))" : "#FFFFFF",
+                    border: `1px solid ${tripleYoga.isFormed ? "rgba(184, 134, 11, 0.6)" : "rgba(184, 134, 11, 0.2)"}`,
+                  }}
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-full bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                        Jaimini Pinnacle Yoga
+                      </span>
+                      <span className="text-xs font-bold text-[#1A1A1A]">
+                        {tripleYoga.sanskritName}
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-serif font-bold text-[#1A1A1A]">
+                      {tripleYoga.name}
+                    </h4>
+                    <p className="text-xs text-[#4A4238] mt-1 max-w-3xl leading-relaxed">
+                      {tripleYoga.description}
+                    </p>
+                  </div>
+                  <span
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 self-start sm:self-center"
+                    style={{
+                      background: tripleYoga.isFormed ? "#B8860B" : "#F3F4F6",
+                      color: tripleYoga.isFormed ? "#FFFFFF" : "#6B7280",
+                    }}
+                  >
+                    {tripleYoga.isFormed ? "👑 SUPREME ROYAL STATUS" : "INDEPENDENT CHARTER"}
+                  </span>
+                </div>
+              );
+            })()}
+
+            {/* Varnada Lagna & Sustaining Career Spotlight */}
+            <section
+              className="rounded-3xl p-6 lg:p-8"
+              style={{
+                background: "linear-gradient(180deg, #FFFFFF 0%, #FFFDF9 100%)",
+                border: "1px solid rgba(184, 134, 11, 0.35)",
+                boxShadow: "0 4px 20px rgba(184, 134, 11, 0.06)",
+              }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[rgba(184,134,11,0.18)]">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#B8860B] px-2.5 py-0.5 rounded-full bg-[#FAF5EB] border border-[#B8860B]/30">
+                      Jaimini Social Vocation · वर्णद लग्न
+                    </span>
+                    <span className="text-xs text-[#8C827A] font-semibold">
+                      Layer 5 Social Role
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-[#1A1A1A] mt-1">
+                    Varnada Lagna (VL) · Soul Vocation Archetype
+                  </h3>
+                </div>
+                <div className="text-left sm:text-right">
+                  <span className="text-2xl">{RASHI_ICONS[result.varnadaLagna.signNum]}</span>
+                  <p className="text-xs font-bold text-[#B8860B]">
+                    {result.varnadaLagna.sign} (House {result.varnadaLagna.house})
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
+                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)]">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase font-extrabold text-[#B8860B]">
+                      Varna &amp; Element
+                    </span>
+                    <span className="text-xs font-bold text-[#1A1A1A]">
+                      {result.varnadaLagna.element} Element
+                    </span>
+                  </div>
+                  <p className="text-base font-bold text-[#1A1A1A]">
+                    {result.varnadaLagna.varna}
+                  </p>
+                  <p className="text-xs text-[#6B635B] mt-2 leading-relaxed">
+                    {result.varnadaLagna.careerInclination}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)]">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase font-extrabold text-[#B8860B]">
+                      11th from VL (Sustaining Livelihood)
+                    </span>
+                    <span className="text-xs font-bold text-[#1A1A1A]">
+                      {result.varnadaLagna.sustainingHouse11thSign} (House {result.varnadaLagna.sustainingHouse11thHouse})
+                    </span>
+                  </div>
+                  {result.varnadaLagna.isSpiritualOrTeacherBlessing ? (
+                    <div className="p-2.5 rounded-xl bg-amber-100/70 border border-amber-300 text-xs font-bold text-amber-900 mb-2">
+                      ✨ Maharishi Jaimini Blessing: Jupiter/Venus aspecting or occupying 11th from VL — natural gift for astrology, counseling, teaching, or spiritual healing!
+                    </div>
+                  ) : (
+                    <p className="text-xs text-[#4A4238] mb-2 leading-relaxed">
+                      Sustaining livelihood is anchored in {result.varnadaLagna.sustainingHouse11thSign}. Lifelong revenue stream builds through these house matters.
+                    </p>
+                  )}
+                  {result.varnadaLagna.sustainingPlanets.length > 0 && (
+                    <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Sustaining Planets: {result.varnadaLagna.sustainingPlanets.join(", ")}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Directives */}
+              <div className="p-4 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)]">
+                <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B] mb-2">
+                  Varnada Professional Alignment Directives
+                </h4>
+                <ul className="space-y-1.5">
+                  {result.varnadaLagna.actionGuidance.map((g, i) => (
+                    <li key={i} className="text-xs text-[#4A4238] flex items-start gap-2 leading-relaxed">
+                      <span className="text-[#B8860B] font-bold">•</span>
+                      <span>{g}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            {/* Pranapada Lagna (Vitality & Prana) Spotlight Card */}
+            <section
+              className="rounded-3xl p-6 lg:p-8"
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid rgba(184, 134, 11, 0.3)",
+                boxShadow: "0 2px 14px rgba(0, 0, 0, 0.03)",
+              }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[rgba(184,134,11,0.18)]">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#B8860B] px-2.5 py-0.5 rounded-full bg-[#FAF5EB] border border-[#B8860B]/30">
+                      Cellular Vitality &amp; Respiration · प्राणपद लग्न
+                    </span>
+                    <span className="text-xs text-[#8C827A] font-semibold">
+                      Layer 6 Prana Indicator
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-[#1A1A1A] mt-1">
+                    Pranapada Lagna (PP) · Life-Force Clock
+                  </h3>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span
+                    className="text-xs font-bold px-3 py-1 rounded-full border"
+                    style={{
+                      background: result.pranapadaLagna.vitalityStatus === "Robust Life Force" ? "#DCFCE7" : result.pranapadaLagna.vitalityStatus === "Moderate Stamina" ? "#FEF3C7" : "#FEE2E2",
+                      borderColor: result.pranapadaLagna.vitalityStatus === "Robust Life Force" ? "#86EFAC" : result.pranapadaLagna.vitalityStatus === "Moderate Stamina" ? "#FCD34D" : "#FCA5A5",
+                      color: result.pranapadaLagna.vitalityStatus === "Robust Life Force" ? "#15803D" : result.pranapadaLagna.vitalityStatus === "Moderate Stamina" ? "#B45309" : "#B91C1C",
+                    }}
+                  >
+                    {result.pranapadaLagna.vitalityStatus}
+                  </span>
+                  <span className="text-xl">{RASHI_ICONS[result.pranapadaLagna.signNum]}</span>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] my-4 text-xs text-[#4A4238] leading-relaxed">
+                <p>
+                  <strong>Sign &amp; House:</strong> {result.pranapadaLagna.sign} (House {result.pranapadaLagna.house}) · Degree: {result.pranapadaLagna.degreeText} · Lord: {result.pranapadaLagna.lord}
+                </p>
+                <p className="mt-2 text-[#1A1A1A]">
+                  {result.pranapadaLagna.pranaInterpretation}
+                </p>
+              </div>
+            </section>
           </div>
         )}
 
@@ -875,6 +1081,53 @@ export default function SpecialLagnasPage() {
                   <strong>Classical Upay:</strong> {alUlSynastry.remedy}
                 </div>
               </div>
+
+              {/* 2nd & 7th from Upapada Deep Dive Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                <div className="p-4 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)]">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#B8860B]">
+                      🪙 2nd from Upapada (Marital Wealth &amp; Longevity)
+                    </span>
+                    <span className="text-xs font-bold text-[#1A1A1A]">
+                      {alUlSynastry.secondFromUlSign} (H{alUlSynastry.secondFromUlHouse})
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#4A4238] mt-1.5 leading-relaxed">
+                    {alUlSynastry.maritalWealthInsight}
+                  </p>
+                  {alUlSynastry.secondFromUlOccupants && alUlSynastry.secondFromUlOccupants.length > 0 && (
+                    <div className="mt-2 text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
+                      Occupants: {alUlSynastry.secondFromUlOccupants.join(", ")}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)]">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#B8860B]">
+                      💍 7th from Upapada (Spouse Core Temperament)
+                    </span>
+                    <span className="text-xs font-bold text-[#1A1A1A]">
+                      {alUlSynastry.seventhFromUlSign} (H{alUlSynastry.seventhFromUlHouse})
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#4A4238] mt-1.5 leading-relaxed">
+                    {alUlSynastry.spouseNatureInsight}
+                  </p>
+                  {alUlSynastry.seventhFromUlOccupants && alUlSynastry.seventhFromUlOccupants.length > 0 && (
+                    <div className="mt-2 text-[11px] font-medium text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-block">
+                      Occupants: {alUlSynastry.seventhFromUlOccupants.join(", ")}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {alUlSynastry.isUlIn12thFromAl && (
+                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 leading-relaxed mb-2">
+                  <strong>Jaimini Sutra Alert (UL in 12th from AL):</strong> Upapada Lagna falls in the 12th house from Arudha Lagna. This indicates a natural instinct to keep marital intimacies private and unadvertised to the public eye.
+                </div>
+              )}
             </section>
 
             {/* 12 Arudha Padas Grid */}
