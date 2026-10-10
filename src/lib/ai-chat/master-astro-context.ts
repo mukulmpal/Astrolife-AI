@@ -211,13 +211,13 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
     console.warn("[MasterAstroContext] Lal Kitab error:", err);
   }
 
-  // ── 5. JAIMINI SYSTEM ───────────────────────────────────────────────────────
+  // ── 5. JAIMINI SUTRAS & CHARA DASHA (LAYER 4) ──────────────────────────────
   try {
     const jaimini = buildJaiminiChart(chart);
 
     const karakasSummary = jaimini.karakas
-      .map((k) => `${k.role} (${k.meaning}): ${k.planet} in ${k.sign} (${k.degreeInSign.toFixed(1)}°)`)
-      .join(" · ");
+      .map((k) => `${k.role}: ${k.planet} in ${k.sign} (${k.degreeInSign.toFixed(1)}°) — ${k.signifies}`)
+      .join("\n  ✦ ");
 
     const arudhasSummary = [
       jaimini.arudhas.find((a) => a.shortName === "AL"),
@@ -229,17 +229,39 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
       .join(" · ");
 
     const charaDashaInfo = jaimini.currentDasha
-      ? `Active Chara Dasha: ${jaimini.currentDasha.sign} (${jaimini.currentDasha.startDate.getFullYear()} - ${jaimini.currentDasha.endDate.getFullYear()})${jaimini.activeAD ? ` · Antardasha: ${jaimini.activeAD.adSign}` : ""}`
+      ? `Active Chara Dasha: ${jaimini.currentDasha.sign} (${jaimini.currentDasha.startDate.getFullYear()} - ${jaimini.currentDasha.endDate.getFullYear()}) [${jaimini.direction} Sequence]${jaimini.activeAD ? ` · Antardasha: ${jaimini.activeAD.adSign}` : ""}`
       : "Chara Dasha: Pending";
 
     const jaiminiYogas = jaimini.rajaYogas.length > 0
       ? jaimini.rajaYogas.map((y) => `${y.name} (${y.strength}): ${y.description}`).join("; ")
       : "None";
 
-    sections.push(`### 5. JAIMINI SUTRAS (CHARA KARAKAS & ARUDHA PADAS)
-- Chara Karakas (Soul & Life Indicators):
+    const gk = jaimini.gkAnalysis;
+    const dk = jaimini.dkAnalysis;
+    const akAmk = jaimini.akAmkAnalysis;
+    const kk = jaimini.karakamsha;
+
+    sections.push(`### 5. JAIMINI SUTRAS & CHARA DASHA (LAYER 4 SYSTEM)
+- Chara Karakas (Degree-Wise Hierarchy, Rahu/Ketu Excluded):
   ✦ ${karakasSummary}
-- Arudha Padas: ${arudhasSummary} (AL = Public Image/Perception, UL = Marriage Reality & Partner)
+- Karakamsha Kundali (AK ${kk.akPlanet} in ${kk.karakamshaLagna} as Lagna):
+  ✦ Soul Essence: ${kk.staticAnalysis.soulPurpose}
+  ✦ Wealth Source: ${kk.staticAnalysis.wealthSource}
+  ✦ Career Destiny: ${kk.staticAnalysis.careerDestiny}
+- Gnatikaraka (GK — Problem, Rog, Karz & Obstacle Radar — SABSE IMPORTANT):
+  ✦ GK Planet: ${gk.gkPlanet} in House ${gk.gkHouseFromLagna} (${gk.gkSign})
+  ✦ House Impact: ${gk.houseProblem}
+  ✦ Disease Tendencies: ${gk.diseases.join(", ")}
+  ✦ Prescribed Upay (Remedies): ${gk.remedies.join(" | ")}
+  ✦ GK Active Alert: ${gk.isCurrentDashaAfflicted ? "⚠️ YES — CURRENT CHARA DASHA ACTIVATES GK KARMIC TESTING!" : "No active GK dasha"}
+- Darakaraka (DK — Spouse & Marriage Timing):
+  ✦ DK Planet: ${dk.dkPlanet} in ${dk.dkSign}
+  ✦ Spouse Archetype: ${dk.spousePersona} (Key Traits: ${dk.spouseTraits.join(", ")})
+  ✦ Marriage Timing Windows: ${dk.marriageTimingSigns.join(", ")} Chara Dashas
+- AK/AmK Status:
+  ✦ AK (${akAmk.akPlanet} in H${akAmk.akHouseFromLagna}): ${akAmk.akStatus} — Fame Timing: ${akAmk.akFameTimingSigns.join(", ")}
+  ✦ AmK (${akAmk.amkPlanet} in H${akAmk.amkHouseFromLagna}): ${akAmk.amkStatus} (${akAmk.amkCareerField}) — Wealth Surge: ${akAmk.amkGrowthTimingSigns.join(", ")}
+- Arudha Padas: ${arudhasSummary} (AL = Public Perception, UL = True Marriage Partner)
 - ${charaDashaInfo}
 - Jaimini Raja Yogas: ${jaiminiYogas}`);
   } catch (err) {
