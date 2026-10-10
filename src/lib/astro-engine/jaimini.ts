@@ -168,6 +168,19 @@ export interface DkAnalysis {
 }
 
 // ── AK & AmK Analysis ─────────────────────────────────────────────────────────
+export interface AkLifeSphere {
+  title: string;
+  focus: string;
+  transcriptRule: string;
+  evolutionArea: string;
+}
+
+export interface AmkWealthChannel {
+  source: string;
+  channel: string;
+  practicalField: string;
+}
+
 export interface AkAmkAnalysis {
   akPlanet: string;
   akSign: string;
@@ -175,6 +188,8 @@ export interface AkAmkAnalysis {
   akHouseFromLagna: number;
   akStatus: "Favorable (1/10/11)" | "Challenging (8/12)" | "Moderate";
   akQuality: string;
+  akPhysicalMentalTraits: string[];
+  akLifeSphere: AkLifeSphere;
   akFameTimingSigns: string[];
   isCurrentDashaAk: boolean;
   amkPlanet: string;
@@ -183,11 +198,13 @@ export interface AkAmkAnalysis {
   amkHouseFromLagna: number;
   amkStatus: "Favorable (1/10/11)" | "Challenging (6/8/12)" | "Moderate";
   amkCareerField: string;
+  amkWealthChannel: AmkWealthChannel;
   amkGrowthTimingSigns: string[];
   isCurrentDashaAmk: boolean;
   isRajayoga: boolean;
   isGkAspectingRajayoga: boolean;
-  rajayogaTier: "Pinnacle Unblemished" | "Afflicted" | "None";
+  isSupremeTeacherYoga: boolean;
+  rajayogaTier: "Supreme Teacher Yoga" | "Pinnacle Unblemished" | "Afflicted" | "None";
   rajayogaDescription: string;
 }
 
@@ -402,34 +419,226 @@ export const DK_SPOUSE_PERSONAS: Record<string, { persona: string; traits: strin
 };
 
 // ── AK Soul Attributes Knowledge Base ─────────────────────────────────────────
-export const AK_SOUL_ATTRIBUTES: Record<string, { quality: string; description: string }> = {
+export const AK_SOUL_ATTRIBUTES: Record<string, { quality: string; description: string; traits: string[] }> = {
   Sun: {
     quality: "Supreme Character, Status & Truth",
     description: "Soul purpose revolves around truth, integrity, authority, father lineage, and social status. Success comes through honour rather than compromise.",
+    traits: [
+      "Chehra pita (father) par jata hai — distinct facial resemblance",
+      "High aukaat & self-respect — compromise or humiliation bilkul bardasht nahi",
+      "Natural royal posture, leadership aura, and uncompromising dignity",
+      "Karmic goal: Upholding family honor and righteous truth",
+    ],
   },
   Moon: {
     quality: "Compassion, Public Connection & Emotional Mastery",
     description: "Soul grows through maternal devotion, public empathy, emotional resilience, mind control, and adaptability.",
+    traits: [
+      "Travel aur water bodies (nadi, samudra) ka vishesh lagav",
+      "Doosron ke liye balidaan (deep personal sacrifice) dene ka swabhava",
+      "Mood swings aur emotional sensitivity — man bada komal hota hai",
+      "Public mass appeal aur logon ko aakarshit karne ki swabhavik shakti",
+    ],
   },
   Mars: {
     quality: "Courage, Physical Energy & Righteous Action",
     description: "Soul evolves through physical courage, defending others, real-estate discipline, and canalizing raw power into dharma.",
+    traits: [
+      "Boundless physical stamina — kabhi na thakne wali endless energy",
+      "Sports, gym, physical fitness aur workout ka junoon",
+      "Jaldi gussa aana par utni hi tezi se shaant ho jana (quick-flare, quick-cool)",
+      "Protective warrior instinct — annyay ke khilaaf turant khada hona",
+    ],
   },
   Mercury: {
     quality: "Intellect, Communication & Commercial Wisdom",
     description: "Soul expresses through intellectual discrimination, truthful speech, literature, business mastery, and friendship.",
+    traits: [
+      "Razor-sharp calculation aur zabardast memory retention",
+      "Meticulous record keeping — purane documents, receipts, papers sambhal kar rakhna",
+      "Bada friend circle — har category ke doston ke sath aasaani se ghul-mil jana",
+      "Multi-tasking intellect — ek sath multiple vishayon par dhyan dena",
+    ],
   },
   Jupiter: {
     quality: "Supreme Wisdom, Teaching & Purity (Solution Provider)",
     description: "Soul is born to advise, mentor, teach, and provide solutions. Never relies on loans or shortcuts; upholds 100% purity and dharmic knowledge.",
+    traits: [
+      "Granth Kanth — shastra, gyaan aur granth naturally kanthasth (memorized) rehte hain",
+      "Ek word pakad kar poori kitaab likhne ki adbhut kshamta",
+      "Badi naak = zyada gyaan (distinctive nose linked to deeper wisdom capacity)",
+      "100% purity — na shortcut leta hai, na loan lena pasand karta hai",
+      "Natural solution provider — log aakar guidance aur salah maangte hain",
+    ],
   },
   Venus: {
     quality: "Refinement, Unconditional Love & Pure Prosperity",
     description: "Soul evolves through aesthetic harmony, relationship devotion, overcoming superficial lust, and cultivating spiritual grace.",
+    traits: [
+      "'Ek hi baat, solid baat' — filtered, sophisticated aur wazandaar speech",
+      "Classy aesthetic sense — har cheez me refined taste aur sundarta chahiye",
+      "True luxury lover — bina kisi vulgarity ke pure standard aur comfort",
+      "Sambandhon me ek-nishtha aur prem ki aatma-dharmik pehchan",
+    ],
   },
   Saturn: {
     quality: "Humility, Duty, Truthful Labour & Patience",
     description: "Soul path is grounded in patience, hard work, serving the downtrodden, and mastering worldly detachment through perseverance.",
+    traits: [
+      "Extreme punctuality — agar 10 baje ka time diya to 9:55 par pahunchega",
+      "Relentless discipline — kachhue ki tarah slow but steady, jeet hamesha iski hoti hai",
+      "Gareeb mazdooron aur safai karmachariyon ke prati aadar aur seva-bhav",
+      "100% imaandari — mehnati aur bina shikayat kiye bojh uthane wala",
+    ],
+  },
+};
+
+// ── AK House Spheres: "Us House Ke Bahar Life Nahi Ja Sakti" ──────────────────
+export const AK_HOUSE_SPHERES: Record<number, {
+  title: string;
+  focus: string;
+  transcriptRule: string;
+  evolutionArea: string;
+}> = {
+  1: {
+    title: "1st House — Tan Bhav (Physical Body, Identity & Self)",
+    focus: "Life revolves entirely around personal vitality, character development, individual identity, and physical self-mastery.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Aapki poori zindagi aapke sharir, aatmavishwas, aur personal identity ke daayre me hi evolve karegi.",
+    evolutionArea: "Physical health, self-realization, personal branding, and moral courage.",
+  },
+  2: {
+    title: "2nd House — Dhana Bhav (Wealth, Speech & Family Lineage)",
+    focus: "Life revolves around family traditions, accumulated savings, vocal expression, and financial preservation.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Poori life parivaar ke sanskar, vani (speech), aur dhan-sanchay (savings) ke ird-gird ghumegi.",
+    evolutionArea: "Vocal integrity, protecting family wealth, nourishing others, and truth in speech.",
+  },
+  3: {
+    title: "3rd House — Sahaja Bhav (Courage, Skills & Self-Effort)",
+    focus: "Life revolves around younger siblings, hands-on craft, communications, digital media, writing, and self-made valor.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Mehnat, communication, bhai-behen, aur naye initiatives lene me hi poori life vyatit hogi.",
+    evolutionArea: "Artistic/technical execution, digital media outreach, self-reliance, and fearless initiative.",
+  },
+  4: {
+    title: "4th House — Sukha Bhav (Mother, Domestic Peace & Property)",
+    focus: "Life revolves around mother, real estate, vehicles, emotional security, and building a peaceful domestic sanctuary.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Ghar, mataji ki seva, zameen-jaydaad, aur man ki shanti hi jeevan ka permanent focal point rahega.",
+    evolutionArea: "Inner emotional tranquility, landed assets, maternal reverence, and heart-centered peace.",
+  },
+  5: {
+    title: "5th House — Putra Bhav (Intellect, Progeny & Past Merits)",
+    focus: "Life revolves around children, deep advisory counsel, creative masterpieces, sharp intellect, and purva punya merits.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Brain power, bachche, guidance dena, aur gyaan ki rachna me hi poori life involve rahegi.",
+    evolutionArea: "Advising disciples, analytical depth, creative legacy, and speculative intelligence.",
+  },
+  6: {
+    title: "6th House — Ari Bhav (Service, Healing & Overcoming Hurdles)",
+    focus: "Life revolves around resolving complex disputes, healthcare, service to society, and overcoming debts or workplace rivals.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Seva, problem-solving, rog-shatru se ladna, aur daily discipline hi aatma ka karmic field rahega.",
+    evolutionArea: "Relentless work ethic, legal arbitration, medical/healing service, and debt mitigation.",
+  },
+  7: {
+    title: "7th House — Jaya Bhav (Marriage, Partner & Public Arena)",
+    focus: "Life revolves around spouse, interpersonal contracts, business partnerships, and diplomacy in public dealings.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Spouse, business partner, aur public dealings ke bahar aapka astitva expand nahi hoga.",
+    evolutionArea: "Marital devotion, commercial alliances, diplomatic negotiations, and public standing.",
+  },
+  8: {
+    title: "8th House — Randhra Bhav (Occult, Transformation & Hidden Depth)",
+    focus: "Life revolves around deep investigative research, sudden transformations, occult sciences, inheritance, and psychological depth.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Rahasyamayi vidya (occult), research, sudden twists, aur deep spiritual cleansing hi life ka path hai.",
+    evolutionArea: "Karmic resilience, esoteric wisdom, crisis turnaround, and ego surrender.",
+  },
+  9: {
+    title: "9th House — Dharma Bhav (Higher Dharma, Guru & Pilgrim Path)",
+    focus: "Life revolves around spiritual preceptors, father, philosophical doctrines, publishing, and righteous mentor guidance.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Guru ka aashirwad, dharma, dharmik yatrayen, aur higher learning hi aapka permanent circle hai.",
+    evolutionArea: "Philosophical truth, upholding family/social ethics, pilgrimage, and spiritual mentorship.",
+  },
+  10: {
+    title: "10th House — Karma Bhav (Career Zenith, Status & Worldly Duty)",
+    focus: "Life revolves around professional authority, executive power, public reputation, and social responsibilities.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Karma, pad-pratishtha (status), sarkari ya corporate authority hi aapki mukhya pehchan banegi.",
+    evolutionArea: "Executive leadership, social legacy, ethical career zenith, and worldly service.",
+  },
+  11: {
+    title: "11th House — Labha Bhav (Aspirations, Networks & Mass Gains)",
+    focus: "Life revolves around large communities, elder siblings, fulfillment of life ambitions, and expanding multiple revenue streams.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Dost, organizations, society ke networks, aur lakshya-prapti me hi poori urja lagegi.",
+    evolutionArea: "Community leadership, scaling wealth ecosystems, social empowerment, and realized aspirations.",
+  },
+  12: {
+    title: "12th House — Moksha Bhav (Detachment, Foreign Lands & Solitude)",
+    focus: "Life revolves around foreign connections, institutions, spiritual seclusion, charitable giving, and transcendental liberation.",
+    transcriptRule: "Us house ke bahar life nahi ja sakti: Videsh (foreign), akelepan me shanti, hospital/charity, aur moksha ke daayre me hi aatma rahegi.",
+    evolutionArea: "Spiritual transcendence, selfless surrender, global foreign horizons, and mental release.",
+  },
+};
+
+// ── AmK House Wealth Channels: "Wahan Se Paisa Aayega" ────────────────────────
+export const AMK_HOUSE_WEALTH_CHANNELS: Record<number, {
+  source: string;
+  channel: string;
+  practicalField: string;
+}> = {
+  1: {
+    source: "Self-Image, Personal Consulting & Direct Brand",
+    channel: "Wealth flows directly through your individual name, physical leadership, personal reputation, and solo consulting.",
+    practicalField: "Founder/CEO, independent consultant, keynote authority, personal brand builder.",
+  },
+  2: {
+    source: "Family Enterprise, Speech, Banking & Food",
+    channel: "Wealth flows through family trade, financial services, vocal expression, food/hospitality, and wealth management.",
+    practicalField: "Banking, investment advisory, family legacy business, vocal/speech teaching, food industry.",
+  },
+  3: {
+    source: "Media, IT, Self-Effort, Writing & Communications",
+    channel: "Wealth flows through digital platforms, publication, skill-based trade, advertising, short-distance travels, and younger colleagues.",
+    practicalField: "Software/IT development, content publishing, digital marketing, journalism, creative craft, sales.",
+  },
+  4: {
+    source: "Real Estate, Land, Vehicles & Educational Infrastructure",
+    channel: "Wealth flows through property development, architectural projects, educational institutions, automobiles, and home comforts.",
+    practicalField: "Real estate builder/agent, interior design, educational institutions, transport/auto trade.",
+  },
+  5: {
+    source: "Advisory, Mentorship, Speculation & Creative Intellect",
+    channel: "Wealth flows through advising clients, stock markets, innovative intellectual property, creative direction, and teaching.",
+    practicalField: "Equity analyst/fund manager, university professor, creative director, high-level consultant.",
+  },
+  6: {
+    source: "Healthcare, Legal Defense, Dispute Resolution & Auditing",
+    channel: "Wealth flows through providing essential services, litigation, medical care, labor management, and debt resolution.",
+    practicalField: "Legal practitioner, doctor/pharmacist, corporate auditor, recovery/arbitration specialist.",
+  },
+  7: {
+    source: "Spouse Network, Commercial Partnerships & Public Contracts",
+    channel: "Wealth flows through marriage alliances, co-founded business partnerships, B2B contracts, and international trade.",
+    practicalField: "Joint ventures, retail/hospitality, foreign commerce, public relations, diplomacy.",
+  },
+  8: {
+    source: "Deep Analytics, Research, Insurance, Mining & Unearned Assets",
+    channel: "Wealth flows through investigative sciences, crisis management, insurance underwriting, inheritances, and occult fields.",
+    practicalField: "Data scientist, forensic investigator, insurance head, mineral/petroleum sector, occultist.",
+  },
+  9: {
+    source: "Higher Education, Publishing, Dharmic Mentorship & Law",
+    channel: "Wealth flows through higher knowledge institutions, legal judiciary, publishing books, spiritual teaching, and long journeys.",
+    practicalField: "High court judge/attorney, book publisher, spiritual author, cross-border university professor.",
+  },
+  10: {
+    source: "Government Contracts, Corporate Executive Zenith & Public Status",
+    channel: "Wealth flows through government patronage, public sector management, commanding large organizations, and administrative power.",
+    practicalField: "Government officer, corporate VP/Managing Director, public policy maker, enterprise leader.",
+  },
+  11: {
+    source: "Mega Networks, Community Platforms & High-Volume Gains",
+    channel: "Wealth flows through large professional networks, community subscriptions, commission royalties, and venture gains.",
+    practicalField: "Tech platform founder, network marketing head, venture capitalist, community director.",
+  },
+  12: {
+    source: "Multinational Corporations (MNCs), Foreign Clients & Healing",
+    channel: "Wealth flows through overseas clients, export-import, MNC employment, remote offshore projects, and wellness sanctuaries.",
+    practicalField: "MNC specialist, export-import trader, offshore contractor, spiritual retreat director.",
   },
 };
 
@@ -1050,7 +1259,22 @@ export function evaluateAkAmkAnalysis(
   const isCurrentDashaAk = Boolean(currentDasha && currentDasha.signNum === ak.signNum);
   const isCurrentDashaAmk = Boolean(currentDasha && currentDasha.signNum === amk.signNum);
 
-  // RULE D: AK + AmK Pinnacle Rajayoga
+  const akLifeSphere = AK_HOUSE_SPHERES[akHouse] ?? {
+    title: `House ${akHouse} Karmic Focus`,
+    focus: "Soul evolution centered in this house domain.",
+    transcriptRule: "Life focus is anchored within this house.",
+    evolutionArea: "Spiritual and worldly lessons.",
+  };
+
+  const amkWealthChannel = AMK_HOUSE_WEALTH_CHANNELS[amkHouse] ?? {
+    source: `House ${amkHouse} Activities`,
+    channel: "Wealth generated through house significations.",
+    practicalField: "Vocational enterprise.",
+  };
+
+  const akPhysicalMentalTraits = AK_SOUL_ATTRIBUTES[ak.planet]?.traits ?? [];
+
+  // RULE D: AK + AmK Pinnacle Rajayoga & Supreme Teacher Yoga
   const isConjunct = ak.signNum === amk.signNum;
   const isMutualAspect = doesSignAspect(ak.signNum, amk.signNum) || doesSignAspect(amk.signNum, ak.signNum);
   const isAuspiciousHouse = [1, 2, 4, 5, 7, 9, 10, 11].includes(akHouse) && [1, 2, 4, 5, 7, 9, 10, 11].includes(amkHouse);
@@ -1059,11 +1283,23 @@ export function evaluateAkAmkAnalysis(
   const isGkAspectingAmk = doesSignAspect(gk.signNum, amk.signNum) && !isAdjacentSign(gk.signNum, amk.signNum);
   const isGkAspectingRajayoga = isGkAspectingAk || isGkAspectingAmk;
 
+  // Transcript Secret: Supreme Teacher / Saraswati Yoga
+  // AK & AmK both in dual signs (Gemini 2, Virgo 5, Sagittarius 8, Pisces 11), both Retrograde, mutual aspect, untouched by GK
+  const DUAL_SIGNS = [2, 5, 8, 11];
+  const isAkInDual = DUAL_SIGNS.includes(ak.signNum);
+  const isAmkInDual = DUAL_SIGNS.includes(amk.signNum);
+  const isAkRetro = Boolean(chart.planets[ak.planet]?.isRetrograde);
+  const isAmkRetro = Boolean(chart.planets[amk.planet]?.isRetrograde);
+  const isSupremeTeacherYoga = isAkInDual && isAmkInDual && isAkRetro && isAmkRetro && !isGkAspectingRajayoga;
+
   const isRajayoga = (isConjunct || isMutualAspect) && isAuspiciousHouse;
   let rajayogaTier: AkAmkAnalysis["rajayogaTier"] = "None";
   let rajayogaDescription = "No AK-AmK Raja Yoga formation.";
 
-  if (isRajayoga) {
+  if (isSupremeTeacherYoga) {
+    rajayogaTier = "Supreme Teacher Yoga";
+    rajayogaDescription = `SUPREME TEACHER / SARASWATI RAJAYOGA (Transcript Secret): AK (${ak.planet}) and AmK (${amk.planet}) are BOTH in Dual Signs (${ak.sign} & ${amk.sign}), BOTH are Retrograde, mutually aspecting, and completely untouched by GK. Transcript declares: 'Aap jaisa teacher/guru koi nahi hoga'. Unmatched encyclopedic depth of knowledge, effortless ability to explain complex truths simply, and immense prosperity earned purely through wisdom and teaching.`;
+  } else if (isRajayoga) {
     if (!isGkAspectingRajayoga) {
       rajayogaTier = "Pinnacle Unblemished";
       rajayogaDescription = `AK (${ak.planet}) and AmK (${amk.planet}) form a Pinnacle Jaimini Raja Yoga completely unblemished by GK. During their Chara Dashas, authority, high public recognition, and extraordinary financial growth are indicated.`;
@@ -1080,6 +1316,8 @@ export function evaluateAkAmkAnalysis(
     akHouseFromLagna: akHouse,
     akStatus,
     akQuality,
+    akPhysicalMentalTraits,
+    akLifeSphere,
     akFameTimingSigns,
     isCurrentDashaAk,
     amkPlanet: amk.planet,
@@ -1088,10 +1326,12 @@ export function evaluateAkAmkAnalysis(
     amkHouseFromLagna: amkHouse,
     amkStatus,
     amkCareerField,
+    amkWealthChannel,
     amkGrowthTimingSigns,
     isCurrentDashaAmk,
-    isRajayoga,
+    isRajayoga: isRajayoga || isSupremeTeacherYoga,
     isGkAspectingRajayoga,
+    isSupremeTeacherYoga,
     rajayogaTier,
     rajayogaDescription,
   };

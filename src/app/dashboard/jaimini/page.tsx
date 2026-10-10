@@ -271,6 +271,7 @@ export default function JaiminiPage() {
 
   const tabs = [
     { key: "karakas",     label: "👑 Karakas & Karakamsha" },
+    { key: "rajayoga",    label: "👑 AK-AmK & Life Focus" },
     { key: "gk_radar",    label: "⚡ GK Problem Radar" },
     { key: "dk_marriage", label: "💍 DK Marriage & Spouse" },
     { key: "dasha",       label: "⏳ Chara Dasha (Exact)" },
@@ -778,16 +779,25 @@ export default function JaiminiPage() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
 
-            {/* RULE D: AK + AmK Pinnacle Rajayoga Card */}
-            <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5">
+        {/* ── TAB: AK-AmK & Life Focus (Transcript Core Rules) ─────────────── */}
+        {activeTab === "rajayoga" && (
+          <div className="flex flex-col gap-6">
+            {/* Header / Intro */}
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FAF7F2] p-5 shadow-sm">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-                <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
-                  👑 Atmakaraka & 💼 Amatyakaraka Rajayoga Analysis
-                </p>
-                {akAmk.isRajayoga && (
+                <span className="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                  👑 Atmakaraka & 💼 Amatyakaraka Architecture
+                </span>
+                {akAmk.isSupremeTeacherYoga ? (
+                  <span className="text-xs px-3 py-1 rounded-full font-bold bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-950 shadow-sm">
+                    🏆 Supreme Guru / Saraswati Yoga
+                  </span>
+                ) : akAmk.isRajayoga ? (
                   <span
-                    className="text-xs px-2.5 py-0.5 rounded-full font-bold"
+                    className="text-xs px-2.5 py-1 rounded-full font-bold"
                     style={{
                       background: akAmk.rajayogaTier === "Pinnacle Unblemished" ? "#DCFCE7" : "#FEF3C7",
                       color: akAmk.rajayogaTier === "Pinnacle Unblemished" ? "#166534" : "#92400E",
@@ -795,31 +805,157 @@ export default function JaiminiPage() {
                   >
                     {akAmk.rajayogaTier} Rajayoga
                   </span>
+                ) : (
+                  <span className="text-xs px-2.5 py-1 rounded-full font-semibold bg-[#E8E2D8] text-[#4A4238]">
+                    Independent Karaka Influences
+                  </span>
+                )}
+              </div>
+              <h3 className="text-xl font-bold text-[#1A1A1A] mt-1">
+                Life Horizon, Wealth Channels & Pinnacle Rajayogas
+              </h3>
+              <p className="text-sm text-[#6B635B] mt-1 leading-relaxed">
+                As revealed in classical Jaimini transcripts: AK sets the non-negotiable boundaries of where your soul must evolve (&quot;us house ke bahar life nahi ja sakti&quot;), while AmK governs the exact house gateway through which wealth, assets, and authority materialize.
+              </p>
+            </section>
+
+            {/* Supreme Teacher Yoga Banner if active */}
+            {akAmk.isSupremeTeacherYoga && (
+              <section className="rounded-2xl border-2 border-amber-400 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-100 p-5 shadow-md">
+                <div className="flex items-center gap-2.5 text-amber-950 font-bold text-base">
+                  <span className="text-2xl">🎓</span>
+                  <span>SUPREME TEACHER / SARASWATI RAJAYOGA DETECTED</span>
+                </div>
+                <p className="text-xs text-amber-900 mt-2 font-medium leading-relaxed">
+                  {akAmk.rajayogaDescription}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-200/70 text-amber-950 font-semibold">
+                    AK in Dual Sign ({akAmk.akSign}) &amp; Retrograde
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-200/70 text-amber-950 font-semibold">
+                    AmK in Dual Sign ({akAmk.amkSign}) &amp; Retrograde
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-semibold">
+                    Shielded from GK Aspect
+                  </span>
+                </div>
+              </section>
+            )}
+
+            {/* Normal Rajayoga Description if active and not Supreme */}
+            {akAmk.isRajayoga && !akAmk.isSupremeTeacherYoga && (
+              <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                    👑 Jaimini Raja Yoga Manifestation
+                  </span>
+                  <span className="text-xs px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">
+                    {akAmk.rajayogaTier}
+                  </span>
+                </div>
+                <p className="text-sm text-[#1A1A1A] leading-relaxed">
+                  {akAmk.rajayogaDescription}
+                </p>
+              </section>
+            )}
+
+            {/* Two Main Cards: AK Life Sphere & AmK Wealth Channel */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Card 1: AK Life Sphere */}
+              <div className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                      👑 Atmakaraka ({akAmk.akPlanet}) · House {akAmk.akHouseFromLagna}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                      {akAmk.akStatus}
+                    </span>
+                  </div>
+                  <h4 className="text-lg font-bold text-[#1A1A1A]">
+                    {akAmk.akLifeSphere.title}
+                  </h4>
+
+                  {/* Transcript quote highlight */}
+                  <div className="my-3 p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 leading-relaxed">
+                    <strong>Transcript Law:</strong> &ldquo;{akAmk.akLifeSphere.transcriptRule}&rdquo;
+                  </div>
+
+                  <p className="text-sm text-[#4A4238] leading-relaxed mb-3">
+                    {akAmk.akLifeSphere.focus}
+                  </p>
+
+                  <div className="text-xs text-[#6B635B] pt-2 border-t border-[rgba(184,134,11,0.15)]">
+                    <strong>Soul Evolution Area:</strong> {akAmk.akLifeSphere.evolutionArea}
+                  </div>
+                </div>
+
+                {/* AK Physical & Mental Personality Clues */}
+                {akAmk.akPhysicalMentalTraits.length > 0 && (
+                  <div className="mt-4 pt-3 border-t border-[rgba(184,134,11,0.15)]">
+                    <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-2">
+                      Practical Traits &amp; Personality Clues ({akAmk.akPlanet}):
+                    </p>
+                    <div className="flex flex-col gap-1.5">
+                      {akAmk.akPhysicalMentalTraits.map((trait, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-xs text-[#1A1A1A]">
+                          <span className="text-[#B8860B] font-bold">✦</span>
+                          <span>{trait}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 
-              <p className="text-sm text-[#1A1A1A] leading-relaxed">
-                {akAmk.rajayogaDescription}
-              </p>
+              {/* Card 2: AmK Wealth Channel */}
+              <div className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FFFFFF] p-5 flex flex-col justify-between shadow-sm">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
+                      💼 Amatyakaraka ({akAmk.amkPlanet}) · House {akAmk.amkHouseFromLagna}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+                      {akAmk.amkStatus}
+                    </span>
+                  </div>
+                  <h4 className="text-lg font-bold text-[#1A1A1A]">
+                    Wealth Gateway: {akAmk.amkWealthChannel.source}
+                  </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)]">
-                  <p className="text-xs font-bold text-[#1A1A1A]">
-                    AK: {akAmk.akPlanet} in House {akAmk.akHouseFromLagna} ({akAmk.akSign})
+                  {/* Transcript quote highlight */}
+                  <div className="my-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-950 leading-relaxed">
+                    <strong>Transcript Law:</strong> &ldquo;AmK jis house me baitha hai, bhagwan ne aapki ajeevika aur wealth generation ka switch wahan jod diya hai.&rdquo;
+                  </div>
+
+                  <p className="text-sm text-[#4A4238] leading-relaxed mb-3">
+                    {akAmk.amkWealthChannel.channel}
                   </p>
-                  <p className="text-xs text-[#6B635B] mt-0.5">Status: <strong className="text-[#B8860B]">{akAmk.akStatus}</strong></p>
-                  <p className="text-xs text-[#4A4238] mt-1">Name & Fame peak in: {akAmk.akFameTimingSigns.join(", ")} Chara Dashas.</p>
+
+                  <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] text-xs text-[#1A1A1A]">
+                    <strong className="text-[#B8860B]">High-Yield Professional Fields:</strong>
+                    <p className="mt-1">{akAmk.amkWealthChannel.practicalField}</p>
+                  </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)]">
-                  <p className="text-xs font-bold text-[#1A1A1A]">
-                    AmK: {akAmk.amkPlanet} in House {akAmk.amkHouseFromLagna} ({akAmk.amkSign})
+                <div className="mt-4 pt-3 border-t border-[rgba(184,134,11,0.15)]">
+                  <p className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-2">
+                    Wealth Surge Timing Windows (Chara Dasha):
                   </p>
-                  <p className="text-xs text-[#6B635B] mt-0.5">Status: <strong className="text-[#B8860B]">{akAmk.amkStatus}</strong></p>
-                  <p className="text-xs text-[#4A4238] mt-1">Career Field: {akAmk.amkCareerField}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {akAmk.amkGrowthTimingSigns.map((s, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30"
+                      >
+                        {s} Dasha
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </section>
+            </div>
           </div>
         )}
 

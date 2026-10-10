@@ -21,6 +21,8 @@ import {
   GK_PLANET_REMEDIES,
   DK_SPOUSE_PERSONAS,
   AK_SOUL_ATTRIBUTES,
+  AK_HOUSE_SPHERES,
+  AMK_HOUSE_WEALTH_CHANNELS,
 } from "../jaimini";
 import type { ChartData } from "../calculations";
 
@@ -303,3 +305,74 @@ test("RULE K: DK Details (DK in Dusthana or aspected by GK triggers warning)", (
   assert.equal(dk.hasDkObstacle, true);
   assert.ok(dk.dkObstacleWarning?.includes("DK CAUTION"));
 });
+
+test("RULE L: AK Life Sphere ('Us House Ke Bahar Life Nahi Ja Sakti') & AmK Wealth Gateway ('Wahan Se Paisa Aayega')", () => {
+  // Aries Lagna (0). AK Jupiter in 5th house (Leo, sign 4). AmK Mercury in 2nd house (Taurus, sign 1).
+  const chart = createMockChart(0, {
+    Jupiter: { rashiIndex: 4, degreeInSign: 28.0 }, // AK in 5th house!
+    Mercury: { rashiIndex: 1, degreeInSign: 24.0 }, // AmK in 2nd house!
+    Sun: { rashiIndex: 0, degreeInSign: 20.0 },
+    Mars: { rashiIndex: 6, degreeInSign: 16.0 },
+    Moon: { rashiIndex: 3, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 8, degreeInSign: 8.0 },
+    Venus: { rashiIndex: 10, degreeInSign: 4.0 },
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const akAmk = jaimini.akAmkAnalysis;
+
+  // Verify AK Life Sphere (House 5: Children, brain, advisory counsel)
+  assert.equal(akAmk.akHouseFromLagna, 5);
+  assert.ok(akAmk.akLifeSphere.title.includes("5th House"));
+  assert.ok(akAmk.akLifeSphere.transcriptRule.includes("Us house ke bahar life nahi ja sakti"));
+  assert.ok(akAmk.akLifeSphere.focus.includes("children"));
+
+  // Verify AmK Wealth Gateway (House 2: Family enterprise, speech, banking, savings)
+  assert.equal(akAmk.amkHouseFromLagna, 2);
+  assert.ok(akAmk.amkWealthChannel.source.includes("Family Enterprise"));
+  assert.ok(akAmk.amkWealthChannel.channel.includes("family trade"));
+  assert.ok(akAmk.amkWealthChannel.practicalField.includes("Banking"));
+});
+
+test("RULE M: Supreme Teacher / Saraswati Rajayoga (AK & AmK in Dual Signs, Both Retro, Mutual Aspect, GK Untouched)", () => {
+  // Dual signs: Gemini (2), Virgo (5), Sagittarius (8), Pisces (11)
+  // Both retrograde! Mutual aspect between dual signs in Jaimini!
+  // GK in sign 0 (Aries - movable, aspects Leo 4, Scorpio 7, Aquarius 10 - NO aspect on dual signs!)
+  const chart = createMockChart(0, { // Aries Lagna
+    Jupiter: { rashiIndex: 8, degreeInSign: 28.0, isRetrograde: true }, // AK Retro Jupiter in Sagittarius (dual)
+    Mercury: { rashiIndex: 2, degreeInSign: 25.0, isRetrograde: true }, // AmK Retro Mercury in Gemini (dual)
+    Sun: { rashiIndex: 4, degreeInSign: 20.0 },
+    Mars: { rashiIndex: 6, degreeInSign: 16.0 },
+    Moon: { rashiIndex: 3, degreeInSign: 12.0 },
+    Saturn: { rashiIndex: 0, degreeInSign: 8.0 },                       // GK Saturn in Aries (movable)
+    Venus: { rashiIndex: 10, degreeInSign: 4.0 },
+  });
+
+  const jaimini = buildJaiminiChart(chart);
+  const akAmk = jaimini.akAmkAnalysis;
+
+  assert.equal(akAmk.isSupremeTeacherYoga, true);
+  assert.equal(akAmk.rajayogaTier, "Supreme Teacher Yoga");
+  assert.ok(akAmk.rajayogaDescription.includes("SUPREME TEACHER / SARASWATI RAJAYOGA"));
+  assert.ok(akAmk.rajayogaDescription.includes("Aap jaisa teacher/guru koi nahi hoga"));
+});
+
+test("RULE N: AK Planet-Specific Physical & Personality Clues", () => {
+  // Test Sun AK traits
+  assert.ok(AK_SOUL_ATTRIBUTES.Sun.traits.some(t => t.includes("Chehra pita")));
+  assert.ok(AK_SOUL_ATTRIBUTES.Sun.traits.some(t => t.includes("aukaat & self-respect")));
+
+  // Test Jupiter AK traits
+  assert.ok(AK_SOUL_ATTRIBUTES.Jupiter.traits.some(t => t.includes("Granth Kanth")));
+  assert.ok(AK_SOUL_ATTRIBUTES.Jupiter.traits.some(t => t.includes("Ek word pakad kar poori kitaab")));
+  assert.ok(AK_SOUL_ATTRIBUTES.Jupiter.traits.some(t => t.includes("Badi naak = zyada gyaan")));
+  assert.ok(AK_SOUL_ATTRIBUTES.Jupiter.traits.some(t => t.includes("100% purity")));
+
+  // Test Venus AK traits
+  assert.ok(AK_SOUL_ATTRIBUTES.Venus.traits.some(t => t.includes("Ek hi baat, solid baat")));
+
+  // Test Saturn AK traits
+  assert.ok(AK_SOUL_ATTRIBUTES.Saturn.traits.some(t => t.includes("Extreme punctuality")));
+  assert.ok(AK_SOUL_ATTRIBUTES.Saturn.traits.some(t => t.includes("kachhue ki tarah slow but steady")));
+});
+
