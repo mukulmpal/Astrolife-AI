@@ -83,6 +83,17 @@ export interface ActiveDashaActivation {
   overallForecast: string;
 }
 
+export interface SpecialLagnaNarrative {
+  title: string;
+  storyIntro: string;
+  publicImageStory: string;
+  kuberWealthStory: string;
+  powerAndAuthorityStory: string;
+  marriageAndSanctuaryStory: string;
+  pakaLagnaStory: string;
+  mentorSynthesis: string;
+}
+
 export interface SpecialLagnaResult {
   items: SpecialLagnaItem[];
   wealthLagnas: SpecialLagnaItem[];
@@ -98,6 +109,7 @@ export interface SpecialLagnaResult {
   rajayogas: SpecialLagnaRajayoga[];
   alUlSynastry: AlUlSynastry;
   activeDashaActivation?: ActiveDashaActivation;
+  narrative: SpecialLagnaNarrative;
   sunriseLocal: string;
   sunAtSunrise: number;
   minutesSinceSunrise: number;
@@ -814,6 +826,48 @@ export function evaluateDashaActivation(
   };
 }
 
+// ── Human Storytelling Narrative Generator ───────────────────────────────────
+export function generateSpecialLagnaNarrative(
+  chart: ChartData,
+  al: SpecialLagnaItem,
+  ul: SpecialLagnaItem,
+  il: InduLagnaAnalysis,
+  hl: SpecialLagnaItem,
+  gl: SpecialLagnaItem,
+  pl: SpecialLagnaItem,
+  synastry: AlUlSynastry,
+  rajayogas: SpecialLagnaRajayoga[]
+): SpecialLagnaNarrative {
+  const lagnaRashi = RASHIS[chart.lagnaNum] ?? chart.lagnaRashi ?? "Aries";
+  const lagnaLord = SIGN_LORDS[chart.lagnaNum] ?? "Mars";
+
+  const storyIntro = `जब आप इस दुनिया में आए, तो ईश्वर ने आपको ${lagnaRashi} लग्न का शरीर दिया — यह आपका मूल भौतिक अस्तित्व और स्वभाव है। लेकिन समाज आपको सीधे आपके भीतरी कक्ष में आकर नहीं देखता; समाज आपको आपकी सामाजिक प्रतिष्ठा और आभा (आरूढ़) के चश्मे से देखता है। वहीं ब्रह्मांडीय ऊर्जा आपको आपके गुप्त धन (इंदु लग्न) और अंतरात्मा के संकल्प (पाक लग्न) से परखती है।`;
+
+  const publicImageStory = `आपका आरूढ़ लग्न (AL) ${al.sign} राशि में भाव ${al.house} पर स्थापित है, जिसके स्वामी ${al.lord} हैं। यह आपकी वह सामाजिक छवि है जो दुनिया के मानसपटल पर अंकित होती है। समाज में लोग आपको भाव ${al.house} के मुख्य गुणों — ${al.meaning} — के अनुरूप एक प्रभावशाली व्यक्तित्व के रूप में देखते हैं। ${al.occupants && al.occupants.length > 0 ? `आरूढ़ पर ${al.occupants.join(", ")} की उपस्थिति आपकी इस सामाजिक प्रतिष्ठा को विशिष्ट चमक प्रदान करती है।` : `आरूढ़ का शांत रहना आपको अनावश्यक सामाजिक दिखावे से मुक्त रखकर वास्तविक कर्म करने की स्वतंत्रता देता है।`}`;
+
+  const kuberWealthStory = `कुबेर का गुप्त तिजोरी-कक्ष (इंदु लग्न): आचार्य वराहमिहिर के सूत्रानुसार आपके लग्न 9वें स्वामी (${il.lagna9thLord}) की ${il.lagna9thRays} किरणें और चंद्र 9वें स्वामी (${il.moon9thLord}) की ${il.moon9thRays} किरणें मिलकर कुल ${il.totalRays} किरणें बनाती हैं। इस गणित से आपका इंदु लग्न ${il.sign} (भाव ${il.house}) में प्रस्फुटित हुआ है। कुबेर योग स्कोर ${il.kuberYogaScore}/100 के साथ आपकी स्थिति '${il.kuberYogaTier}' की है। ${il.occupants.length > 0 ? `यहाँ ${il.occupants.join(", ")} का सान्निध्य यह दर्शाता है कि धन के नए स्रोत ईश्वरीय कृपा से सहज खुलेंगे।` : `यहाँ आपके अपने पुरुषार्थ, धैर्य और सुनियोजित निवेश से स्थायी संपत्ति का निर्माण होगा।`} याद रखें, आपके लिए धन केवल आमदनी नहीं, एक पवित्र प्रवाह है जिसे ${il.lord} की नियमित आराधना से निरंतर सशक्त रखा जा सकता है।`;
+
+  const horaGhatiYoga = rajayogas.find((y) => y.name.includes("Hora-Ghati"));
+  const powerAndAuthorityStory = `दौलत की गति और सत्ता की धुरी: आपकी दैनिक नकद आमदनी और लिक्विड कैशफ्लो की घड़ी 'होरा लग्न (HL)' ${hl.sign} (भाव ${hl.house}) में है, जबकि समाज में नेतृत्व, प्रशासनिक सम्मान और पद-प्रतिष्ठा का 'घटी लग्न (GL)' ${gl.sign} (भाव ${gl.house}) में स्थित है। ${horaGhatiYoga?.isFormed ? `महर्षि पराशर के अनुसार आपकी कुंडली में सर्वोच्च 'होरा-घटी धन-राजयोग' सक्रिय है — इसका अर्थ है कि आपके हाथ में आर्थिक समृद्धि और सामाजिक अधिकार दोनों एक साथ चलेंगे!` : `आपकी कुंडली में धन उपार्जन (HL) और सामाजिक सत्ता (GL) दोनों स्वतंत्र रास्तों से परिपक्व होते हैं, जिससे जीवन के विभिन्न अध्यायों में दोनों का पृथक-पृथक फल प्राप्त होता है।`}`;
+
+  const marriageAndSanctuaryStory = `बाहर की शान बनाम दाम्पत्य का आंतरिक सच: आपका आरूढ़ लग्न (${al.sign}) समाज में आपकी दृश्यमान प्रतिष्ठा है और उपपद लग्न (${ul.sign}, भाव ${ul.house}) आपके वैवाहिक जीवन की अंतरंग सच्चाई है। इन दोनों के बीच ${synastry.distance} भावों की दूरी (${synastry.relationship}) है। ${synastry.distance === 6 || synastry.distance === 8 ? `जैमिनी का गोपनीय परामर्श है कि जब AL और UL में 6/8 (षडाष्टक) का अंतर हो, तो समाज को सब कुछ आदर्श दिखता है, किंतु घर के भीतर वैचारिक भिन्नता या संवाद की कमी रह सकती है। इसका स्वर्णिम नियम यह है कि अपने दांपत्य की बातें कभी किसी तीसरे व्यक्ति से साझा न करें। उपपद स्वामी ${ul.lord} के वार का व्रत और लक्ष्मी साधना इस दूरी को आत्मीय प्रेम में बदल देती है।` : `दोनों के मध्य सौहार्दपूर्ण संबंध यह प्रमाणित करता है कि जैसा आदर और समर्पण समाज को बाहर दिखाई देता है, वैसी ही भावनात्मक शांति और सामंजस्य घर की चारदीवारी के भीतर भी विद्यमान है।`}`;
+
+  const pakaLagnaStory = `पाक लग्न (Paka Lagna) — बुद्धि और संकल्प का वास्तविक ठिकाना: आपका लग्नेश ${lagnaLord} अपनी यात्रा करके ${pl.sign} (भाव ${pl.house}) में विराजमान है। शास्त्र कहते हैं कि 'शरीर कहीं भी विचरण करे, व्यक्ति का मन, प्राण और प्राथमिक चिंताएं 24 घंटे उसी भाव में वास करती हैं जहाँ लग्नेश बैठा हो।' अतः आपके जीवन के सबसे महत्वपूर्ण निर्णय और मानसिक ऊर्जा भाव ${pl.house} (${pl.meaning}) से ही संचालित होंगे।`;
+
+  const mentorSynthesis = `संक्षेप में कहें तो आपका जन्म लग्न आपकी जड़ है, इंदु लग्न आपका भूमिगत खज़ाना, आरूढ़ आपका सामाजिक वृक्ष, और उपपद आपका व्यक्तिगत घोंसला। जब इन सबको एक साथ रखकर देखा जाता है, तो जीवन की दिशा शीशे की तरह साफ़ हो जाती है।`;
+
+  return {
+    title: "मार्गदर्शक की ज़ुबानी — आपकी ज़िंदगी का आईना",
+    storyIntro,
+    publicImageStory,
+    kuberWealthStory,
+    powerAndAuthorityStory,
+    marriageAndSanctuaryStory,
+    pakaLagnaStory,
+    mentorSynthesis,
+  };
+}
+
 // ── Master Function ───────────────────────────────────────────────────────────
 export function calculateSpecialLagnas(rawChart: ChartData): SpecialLagnaResult {
   const tob = rawChart.tob || (rawChart as any).meta?.tob || "12:00";
@@ -907,6 +961,9 @@ export function calculateSpecialLagnas(rawChart: ChartData): SpecialLagnaResult 
   const strongestPublicSignal = a10;
   const summary = `Special Lagnas reveal: Indu Lagna in ${induLagna.sign} (${induLagna.kuberYogaTier}), Hora Lagna (Wealth) in ${hl.sign}, Ghati Lagna (Power) in ${gl.sign}, Sree Lagna in ${sl.sign}, Arudha Lagna (Public Image) in ${al.sign}, and Upapada (Marriage) in ${ul.sign}.`;
 
+  // 9. Human Storytelling Narrative
+  const narrative = generateSpecialLagnaNarrative(chart, al, ul, induLagna, hl, gl, pakaLagna, alUlSynastry, rajayogas);
+
   const aiContext = `${summary} AL-UL relationship is ${alUlSynastry.relationship}. Active Dasha (${activeDashaActivation?.mahadashaLord || "N/A"}) activates: ${activeDashaActivation?.activatedLagnas.map((a) => a.lagnaKey).join(", ") || "background houses"}.`;
 
   return {
@@ -924,6 +981,7 @@ export function calculateSpecialLagnas(rawChart: ChartData): SpecialLagnaResult 
     rajayogas,
     alUlSynastry,
     activeDashaActivation,
+    narrative,
     sunriseLocal,
     sunAtSunrise: Number(sunAtSunrise.toFixed(4)),
     minutesSinceSunrise: Number(minutesSinceSunrise.toFixed(1)),

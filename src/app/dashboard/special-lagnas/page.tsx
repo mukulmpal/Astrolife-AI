@@ -10,6 +10,7 @@ import {
   type AlUlSynastry,
   type SpecialLagnaRajayoga,
   type ActiveDashaActivation,
+  type SpecialLagnaNarrative,
 } from "@/lib/astro-engine/special-lagnas";
 import "@/app/dashboard/shared.css";
 
@@ -113,10 +114,172 @@ function LagnaCard({ item, highlight }: { item: SpecialLagnaItem; highlight?: bo
   );
 }
 
+// ── Mentor Storytelling Walkthrough Card ──────────────────────────────────────
+function MentorNarrativeCard({
+  narrative,
+  isOpen,
+  onToggle,
+}: {
+  narrative: SpecialLagnaNarrative;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <section
+      className="rounded-3xl p-6 lg:p-8 transition-all"
+      style={{
+        background: "linear-gradient(180deg, #FFFFFF 0%, #FAF5EB 100%)",
+        border: "1px solid rgba(184, 134, 11, 0.35)",
+        boxShadow: "0 4px 20px rgba(184, 134, 11, 0.08)",
+      }}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#B8860B] to-[#996515] text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+            🎙️
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#B8860B] px-2.5 py-0.5 rounded-full bg-white border border-[#B8860B]/30">
+                Personalized Storytelling Walkthrough
+              </span>
+              <span className="text-xs text-[#8C827A] font-semibold hidden md:inline">
+                व्यक्तिगत जीवन-दर्शन
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1A1A1A] mt-1">
+              {narrative.title}
+            </h2>
+            <p className="text-xs sm:text-sm text-[#6B635B] mt-0.5">
+              जैसे कोई अनुभवी ज्योतिषी आपके सामने बैठकर, आपकी हथेली और लग्न को देखकर आपकी पूरी ज़िंदगी की कहानी सुना रहा हो...
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={onToggle}
+          className="self-start sm:self-center px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0"
+          style={{
+            background: isOpen ? "#FAF7F2" : "linear-gradient(135deg, #B8860B, #996515)",
+            border: "1px solid rgba(184, 134, 11, 0.4)",
+            color: isOpen ? "#B8860B" : "#FFFFFF",
+          }}
+        >
+          {isOpen ? "▲ संक्षेप करें" : "▼ पूरी कहानी पढ़ें"}
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="mt-6 space-y-6 pt-6 border-t border-[rgba(184,134,11,0.2)]">
+          {/* Opening Narrative Quote */}
+          <div className="p-4.5 rounded-2xl bg-white border border-[rgba(184,134,11,0.25)] relative">
+            <span className="text-4xl text-[#B8860B]/30 absolute -top-3 left-4 font-serif leading-none select-none">
+              “
+            </span>
+            <p className="text-sm sm:text-base text-[#1A1A1A] leading-relaxed italic pl-6 font-serif">
+              {narrative.storyIntro}
+            </p>
+          </div>
+
+          {/* 4 Story Chapters Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Chapter 1: AL */}
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">🎭</span>
+                  <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                    अध्याय 1: दुनिया का चश्मा और आपका मुखौटा (आरूढ़ लग्न)
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                  {narrative.publicImageStory}
+                </p>
+              </div>
+            </div>
+
+            {/* Chapter 2: Indu Lagna */}
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">🪙</span>
+                  <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                    अध्याय 2: कुबेर का गुप्त तिजोरी-कक्ष (इंदु लग्न)
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                  {narrative.kuberWealthStory}
+                </p>
+              </div>
+            </div>
+
+            {/* Chapter 3: HL & GL */}
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">👑</span>
+                  <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                    अध्याय 3: दौलत की गति और सत्ता की कुर्सी (होरा एवं घटी)
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                  {narrative.powerAndAuthorityStory}
+                </p>
+              </div>
+            </div>
+
+            {/* Chapter 4: AL-UL */}
+            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">💍</span>
+                  <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                    अध्याय 4: बाहर की शान बनाम कमरे की सच्चाई (दाम्पत्य सच)
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+                  {narrative.marriageAndSanctuaryStory}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Chapter 5: Paka Lagna */}
+          <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">💡</span>
+              <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                अध्याय 5: बुद्धि और संकल्प का वास्तविक ठिकाना (पाक लग्न)
+              </h4>
+            </div>
+            <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed">
+              {narrative.pakaLagnaStory}
+            </p>
+          </div>
+
+          {/* Concluding Sacred Synthesis */}
+          <div className="p-4.5 rounded-2xl bg-[#FAF5EB] border border-[#B8860B]/30 flex items-start gap-3">
+            <span className="text-2xl mt-0.5 shrink-0">📜</span>
+            <div>
+              <h4 className="text-xs uppercase tracking-wider font-bold text-[#B8860B] mb-1">
+                मार्गदर्शक का अंतिम निष्कर्ष (Sacred Mentor Synthesis)
+              </h4>
+              <p className="text-xs sm:text-sm text-[#1A1A1A] leading-relaxed font-serif">
+                {narrative.mentorSynthesis}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // ── Master Component ──────────────────────────────────────────────────────────
 export default function SpecialLagnasPage() {
   const { chart, loading, hasUserChart } = useUserChart();
   const [activeTab, setActiveTab] = useState<"wealth" | "power" | "arudha" | "rajayoga">("wealth");
+  const [narrativeOpen, setNarrativeOpen] = useState(true);
 
   const result = useMemo(() => (chart && hasUserChart ? calculateSpecialLagnas(chart) : null), [chart, hasUserChart]);
 
@@ -305,6 +468,13 @@ export default function SpecialLagnasPage() {
 
       {/* ── Main Content Container ─────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 lg:px-10 mt-8 space-y-8">
+        {/* Mentor Storytelling Walkthrough */}
+        <MentorNarrativeCard
+          narrative={result.narrative}
+          isOpen={narrativeOpen}
+          onToggle={() => setNarrativeOpen((prev) => !prev)}
+        />
+
         {/* Tab Controls */}
         <div className="flex gap-2.5 flex-wrap">
           {tabs.map((tab) => (

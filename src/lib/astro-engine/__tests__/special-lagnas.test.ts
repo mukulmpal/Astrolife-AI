@@ -388,3 +388,25 @@ test("Active Dasha Activation Radar: Triggers correct Special Lagnas", () => {
   assert.ok(res.activeDashaActivation.mahadashaLord, "Mahadasha lord should exist");
   assert.ok(res.activeDashaActivation.activatedLagnas.length > 0, "At least one lagna should be activated by MD/AD lord");
 });
+
+test("Human Storytelling Narrative: Generates rich, personalized mentor story", () => {
+  const chart = createMockChart(0, {
+    Sun: { rashiIndex: 0, degreeInSign: 10 },
+    Moon: { rashiIndex: 1, degreeInSign: 15 },
+    Mars: { rashiIndex: 4, degreeInSign: 12 },
+    Mercury: { rashiIndex: 2, degreeInSign: 10 },
+    Jupiter: { rashiIndex: 8, degreeInSign: 15 },
+    Venus: { rashiIndex: 3, degreeInSign: 20 },
+    Saturn: { rashiIndex: 10, degreeInSign: 5 },
+  });
+
+  const res = calculateSpecialLagnas(chart);
+  assert.ok(res.narrative, "Narrative object must exist");
+  assert.ok(res.narrative.storyIntro.length > 50, "Intro must be rich");
+  assert.ok(res.narrative.publicImageStory.includes("आरूढ़"), "Public image must reference Arudha");
+  assert.ok(res.narrative.kuberWealthStory.includes("इंदु लग्न"), "Kuber story must reference Indu Lagna");
+  assert.ok(res.narrative.marriageAndSanctuaryStory.includes("उपपद"), "Marriage story must reference Upapada");
+  assert.ok(res.narrative.pakaLagnaStory.includes("पाक लग्न"), "Paka story must reference Paka Lagna");
+});
+
+
