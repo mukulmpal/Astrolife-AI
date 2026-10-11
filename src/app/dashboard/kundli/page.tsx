@@ -19,6 +19,7 @@ import { calculateShadbala, type ShadbalaResult } from "@/lib/astro-engine/shadb
 import { buildMangalDoshaInsight, type MangalDoshaInsight } from "@/lib/astro-engine/mangal-dosha-adapter";
 import EditChartModal from "@/components/charts/EditChartModal";
 import DeleteChartModal from "@/components/charts/DeleteChartModal";
+import MasterKundliDossierPanel from "@/components/charts/MasterKundliDossierPanel";
 import { Edit2, Trash2 } from "lucide-react";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
@@ -836,6 +837,7 @@ export default function KundliPage() {
             <div className="tabs">
               {[
                 { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
+                { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "7 Pillars" },
                 { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
                 { id: "marriage", label: "💍 Love & Marriage (D-9)", badge: "Navamsha" },
                 { id: "timing", label: "⏳ Timing & Dashas", badge: "Vimshottari" },
@@ -981,6 +983,54 @@ export default function KundliPage() {
                   </div>
                 </div>
 
+                {/* ── MASTER 7-PILLAR DOSSIER SPOTLIGHT BANNER ── */}
+                <div
+                  onClick={() => setActiveTab("master_dossier")}
+                  style={{
+                    cursor: "pointer",
+                    background: "linear-gradient(135deg, #FAF8F5 0%, #F5EFE0 50%, #FAF8F5 100%)",
+                    border: "2px solid #C8A030",
+                    borderRadius: 16,
+                    padding: "18px 22px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 16,
+                    flexWrap: "wrap",
+                    boxShadow: "0 6px 20px rgba(200, 160, 48, 0.1)",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    <div style={{ fontSize: 32 }}>📜</div>
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#875C06", fontWeight: 700 }}>
+                        ✦ Vedic &amp; Jaimini Master Blueprint (7 Pillars)
+                      </div>
+                      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 800, color: "#1A1A1A" }}>
+                        संपूर्ण जन्म कुंडली महा-विश्लेषण (जन्म विवरण · ग्रह · राजयोग · चुनौतियाँ · दशा · अचूक उपाय · वर्तमान गोचर)
+                      </div>
+                      <div style={{ fontSize: 13, color: "#6B635B", marginTop: 2 }}>
+                        7-Pillar Classical Dossier: Parashari, Jaimini Karakas, Lal Kitab Remedies &amp; Real-Time Gochar.
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    className="btn-save"
+                    style={{
+                      background: "#875C06",
+                      color: "#FFFFFF",
+                      border: "1px solid #875C06",
+                      fontWeight: 700,
+                      padding: "10px 18px",
+                      borderRadius: 10,
+                      boxShadow: "0 4px 12px rgba(135, 92, 6, 0.25)",
+                    }}
+                  >
+                    View 7-Pillar Master Dossier →
+                  </button>
+                </div>
+
                 {/* ── CLASSICAL NAVAGRAHA STHITI TABLE (VEDIC DEGREES & NAKSHATRAS) ── */}
                 <div className="card">
                   <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
@@ -1117,6 +1167,15 @@ export default function KundliPage() {
                     </table>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════════════ */}
+            {/* 7-PILLAR MASTER KUNDLI DOSSIER                         */}
+            {/* ══════════════════════════════════════════════════════ */}
+            {activeTab === "master_dossier" && (
+              <div className="space-y-6">
+                <MasterKundliDossierPanel chart={chart} />
               </div>
             )}
 
