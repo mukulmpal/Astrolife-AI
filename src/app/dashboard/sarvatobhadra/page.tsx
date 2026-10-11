@@ -2,6 +2,8 @@
 import { useMemo, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateSarvatobhadra } from "@/lib/astro-engine/sarvatobhadra";
+import { calculateSarvatobhadraGrid } from "@/lib/astro-engine/sarvatobhadra-grid";
+import SarvatobhadraChakraInteractive from "@/components/charts/SarvatobhadraChakraInteractive";
 import { EngineStateCard } from "@/components/engine-state-card";
 import "@/app/dashboard/shared.css";
 
@@ -21,12 +23,13 @@ const PERIOD_CONFIG = {
 };
 const INTENSITY_COLOR = { EXTREME: "#DC2626", HIGH: "#C2410C", MEDIUM: "#B45309" };
 
-type Tab = "alerts" | "profile" | "natal" | "grid" | "guide";
+type Tab = "chakra" | "alerts" | "profile" | "natal" | "grid" | "guide";
 
 export default function SarvatobhadraPage() {
   const { chart, loading, hasUserChart } = useUserChart();
   const result = useMemo(() => (chart && hasUserChart ? calculateSarvatobhadra(chart) : null), [chart, hasUserChart]);
-  const [activeTab, setActiveTab] = useState<Tab>("alerts");
+  const gridResult = useMemo(() => (chart && hasUserChart ? calculateSarvatobhadraGrid(chart) : null), [chart, hasUserChart]);
+  const [activeTab, setActiveTab] = useState<Tab>("chakra");
   const [expandedAlert, setExpandedAlert] = useState<number | null>(null);
 
   if (loading || !result) {
@@ -146,10 +149,11 @@ export default function SarvatobhadraPage() {
         {/* Tabs */}
         <div style={{ display: "flex", gap: "6px", marginBottom: "18px", overflowX: "auto", paddingBottom: "2px" }}>
           {([
+            ["chakra",   "🔯 81-Square Chakra"],
             ["alerts",  "⚡ Transit Alerts"],
             ["profile", "⭐ Birth Nakshatra"],
             ["natal",   "🪐 Natal Zones"],
-            ["grid",    "🔯 Full Grid"],
+            ["grid",    "📋 Full List"],
             ["guide",   "📖 How to Read"],
           ] as [Tab, string][]).map(([t, label]) => (
             <button key={t} className={`tab-btn${activeTab === t ? " active" : ""}`} onClick={() => setActiveTab(t)}>
@@ -157,6 +161,13 @@ export default function SarvatobhadraPage() {
             </button>
           ))}
         </div>
+
+        {/* ── 81-SQUARE CHAKRA TAB ── */}
+        {activeTab === "chakra" && gridResult && (
+          <div style={{ marginBottom: 20 }}>
+            <SarvatobhadraChakraInteractive data={gridResult} />
+          </div>
+        )}
 
         {/* ── ALERTS TAB ── */}
         {activeTab === "alerts" && (

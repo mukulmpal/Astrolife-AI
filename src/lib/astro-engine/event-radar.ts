@@ -24,6 +24,23 @@ import { assertEventRadarReportContract } from "./contracts";
     | "caution"
     | "sensitive";
   
+  export interface NavataraInfo {
+    number: number; // 1-9
+    name: string; // Janma, Sampat, Vipat, etc.
+    quality: "Auspicious" | "Caution" | "Neutral" | "Severe";
+    cycle: number; // 1, 2, 3
+    cycleName: string; // Pratyak, Karma, Adhana
+    description: string;
+    guidance: string;
+  }
+
+  export type DecisionWindowType = "Peak Launch" | "Steady Progress" | "Audit & Rest" | "High Caution";
+
+  export interface ActionChecklistItem {
+    action: string;
+    category: "do" | "dont";
+  }
+
   export interface EventRadarDay {
     date: string;
     weekday: string;
@@ -39,6 +56,16 @@ import { assertEventRadarReportContract } from "./contracts";
     advice: string;
     remedy: string;
     aiContext: string;
+    // Classical Vedic & Cognitive additions
+    tara?: NavataraInfo;
+    isChandrashtama: boolean;
+    chandrashtamaDetail?: string;
+    moonNakshatra: string;
+    moonRashi: string;
+    decisionWindow: DecisionWindowType;
+    actionChecklist: ActionChecklistItem[];
+    cognitiveReadiness: number;
+    confidencePct: number;
   }
   
   export interface EventRadarReport {
@@ -255,6 +282,79 @@ import { assertEventRadarReportContract } from "./contracts";
     return `Best upcoming day is ${bestDay.label} for ${bestDay.bestArea}. Most sensitive day is ${cautionDay.label}, especially for ${cautionDay.cautionArea}. Use strong days for action and sensitive days for review, patience and remedies.`;
   }
   
+  const NAKSHATRAS = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
+    "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
+    "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+    "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishtha",
+    "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
+  ];
+
+  const TARA_NAMES = [
+    "Janma", "Sampat", "Vipat", "Kshema", "Pratyari", "Sadhaka", "Vadh", "Mitra", "Parama Mitra"
+  ];
+
+  const TARA_META: Record<string, { quality: "Auspicious" | "Caution" | "Neutral" | "Severe"; description: string; guidance: string }> = {
+    Janma: {
+      quality: "Neutral",
+      description: "Birth Tara · Mind and body vitality. Emotionally sensitive; ideal for personal reflection, meditation and steady routine.",
+      guidance: "Avoid unnecessary friction. Maintain physical equilibrium and hydration.",
+    },
+    Sampat: {
+      quality: "Auspicious",
+      description: "Wealth & Prosperity Tara · Resource accumulation and financial flow. Excellent for contract talks, transactions, and career pitches.",
+      guidance: "Proactively advance commercial commitments and financial planning.",
+    },
+    Vipat: {
+      quality: "Caution",
+      description: "Hazard / Obstacle Tara · Unforeseen delays, communication misfires, or logistical friction. Caution with new contracts.",
+      guidance: "Buffer schedules, verify fine print, and defer irreversible commitments.",
+    },
+    Kshema: {
+      quality: "Auspicious",
+      description: "Well-being & Security Tara · Comfort, recovery, peaceful collaboration, and protective shielding.",
+      guidance: "Consolidate existing gains, nurture key relationships, and execute safely.",
+    },
+    Pratyari: {
+      quality: "Caution",
+      description: "Opposition & Friction Tara · High vulnerability to conflict, adversarial debates, or stubborn pushback.",
+      guidance: "Stay diplomatic, do not escalate disputes, and rely on documented facts.",
+    },
+    Sadhaka: {
+      quality: "Auspicious",
+      description: "Accomplishment & Success Tara · Peak executive execution. Turning strategies into tangible victories.",
+      guidance: "Push ambitious milestones, launch important projects, and take confident action.",
+    },
+    Vadh: {
+      quality: "Severe",
+      description: "Destruction / Vulnerability Tara · Classical danger point. Heavy nervous strain or unexpected derailment risk.",
+      guidance: "Keep profile low, avoid high-stakes risks, and prioritize restoration and remedies.",
+    },
+    Mitra: {
+      quality: "Auspicious",
+      description: "Friendship & Alliance Tara · Warmth, social goodwill, productive negotiations, and mutual support.",
+      guidance: "Network actively, resolve past misunderstandings, and build strategic alliances.",
+    },
+    "Parama Mitra": {
+      quality: "Auspicious",
+      description: "Supreme Benefactor Tara · Deepest cosmic grace, mentorship breakthroughs, and life-changing milestones.",
+      guidance: "Take bold collaborative steps and seek guidance from mentors and seniors.",
+    },
+  };
+
+  function getNatalMoonNakshatraIndex(chart: NatalChartForTransit): number {
+    const moon = chart.planets?.Moon;
+    if (!moon) return 0;
+    if (moon.nakshatra) {
+      const idx = NAKSHATRAS.findIndex(n => n.toLowerCase() === moon.nakshatra?.toLowerCase());
+      if (idx >= 0) return idx;
+    }
+    if (typeof moon.longitude === "number") {
+      return Math.floor(moon.longitude / (360 / 27)) % 27;
+    }
+    return Math.floor((moon.rashi * 30 + 15) / (360 / 27)) % 27;
+  }
+
   export function calculateEventRadarReport(params: {
     chart: NatalChartForTransit;
     startDate?: Date;
@@ -264,6 +364,8 @@ import { assertEventRadarReportContract } from "./contracts";
     const startDate = params.startDate ?? new Date();
     const totalDays = params.days ?? 7;
     const base = params.base ?? "moon";
+    const natalMoonNakIdx = getNatalMoonNakshatraIndex(params.chart);
+    const natalMoonRashiIdx = params.chart.planets?.Moon?.rashi ?? 0;
   
     const radarDays: EventRadarDay[] = [];
   
@@ -291,18 +393,102 @@ import { assertEventRadarReportContract } from "./contracts";
   
       const rawAverage = averageAreaScore(transit.areaScores);
   
-      const overallScore = normalizeOverallScore({
+      const transitMoon = transit.planets.find((p) => p.planet === "Moon");
+      const transitMoonLon = transitMoon?.longitude ?? 0;
+      const transitMoonNakIdx = Math.floor(transitMoonLon / (360 / 27)) % 27;
+      const transitMoonNakName = NAKSHATRAS[transitMoonNakIdx] ?? "Ashwini";
+      const transitMoonRashiName = transitMoon?.rashiName ?? "Aries";
+      const transitMoonRashiIdx = transitMoon?.rashi ?? 0;
+
+      // Navatara computation
+      const taraDiff = ((transitMoonNakIdx - natalMoonNakIdx + 27) % 27) + 1; // 1 to 27
+      const taraCycle = Math.ceil(taraDiff / 9); // 1, 2, or 3
+      const taraPos = ((taraDiff - 1) % 9) + 1; // 1 to 9
+      const taraName = TARA_NAMES[taraPos - 1];
+      const taraMeta = TARA_META[taraName] ?? TARA_META.Janma;
+      const cycleNames = ["", "Pratyak (Immediate)", "Karma (Work/Action)", "Adhana (Spiritual/Essence)"];
+
+      const tara: NavataraInfo = {
+        number: taraPos,
+        name: taraName,
+        quality: taraMeta.quality,
+        cycle: taraCycle,
+        cycleName: cycleNames[taraCycle] ?? "Pratyak",
+        description: taraMeta.description,
+        guidance: taraMeta.guidance,
+      };
+
+      // Chandrashtama detection (8th rashi from natal Moon)
+      const isChandrashtama = transitMoonRashiIdx === ((natalMoonRashiIdx + 7) % 12);
+      const chandrashtamaDetail = isChandrashtama
+        ? "Moon transits your 8th house (Chandrashtama). Classical Phaladeepika Ch. 26 warns of mental restlessness and volatile moods; postpone irreversible contracts, risky investments, or surgical procedures."
+        : undefined;
+
+      let overallScore = normalizeOverallScore({
         rawAverage,
         highAlerts,
         mediumAlerts,
         opportunities: opportunities.length,
         dayIndex: i,
       });
-  
+
+      // Calibrate score with Tara & Chandrashtama
+      if (isChandrashtama) {
+        overallScore = Math.max(22, overallScore - 14);
+      }
+      if (tara.quality === "Auspicious") {
+        overallScore = Math.min(98, overallScore + 6);
+      } else if (tara.quality === "Severe") {
+        overallScore = Math.max(18, overallScore - 12);
+      } else if (tara.quality === "Caution") {
+        overallScore = Math.max(28, overallScore - 6);
+      }
+
+      // Decision Window & Checklist
+      let decisionWindow: DecisionWindowType;
+      if (isChandrashtama || tara.quality === "Severe") {
+        decisionWindow = "High Caution";
+      } else if (tara.quality === "Caution" || overallScore < 46) {
+        decisionWindow = "Audit & Rest";
+      } else if (overallScore >= 70 && tara.quality === "Auspicious") {
+        decisionWindow = "Peak Launch";
+      } else {
+        decisionWindow = "Steady Progress";
+      }
+
+      const actionChecklist: ActionChecklistItem[] = [];
+      if (decisionWindow === "Peak Launch") {
+        actionChecklist.push({ action: `Launch high-leverage milestones in ${transit.areaScores[0]?.area ?? "career"}.`, category: "do" });
+        actionChecklist.push({ action: "Pitch ideas to decision-makers and close binding agreements.", category: "do" });
+        actionChecklist.push({ action: "Do not let indecision delay bold, decisive execution.", category: "dont" });
+      } else if (decisionWindow === "Steady Progress") {
+        actionChecklist.push({ action: "Maintain disciplined cadence on existing projects.", category: "do" });
+        actionChecklist.push({ action: "Hold structured alignment meetings and document decisions.", category: "do" });
+        actionChecklist.push({ action: "Avoid uncalculated speculative gambles.", category: "dont" });
+      } else if (decisionWindow === "Audit & Rest") {
+        actionChecklist.push({ action: "Audit code, review budgets, and clean up technical or mental debt.", category: "do" });
+        actionChecklist.push({ action: "Prioritize nervous system recovery, hydration, and early rest.", category: "do" });
+        actionChecklist.push({ action: "Avoid entering tense negotiations or public arguments.", category: "dont" });
+      } else {
+        actionChecklist.push({ action: "Stick to calm back-office routines and meditative grounding.", category: "do" });
+        actionChecklist.push({ action: "Double-check travel bookings, communications, and numbers.", category: "do" });
+        actionChecklist.push({ action: "Strictly avoid high-stakes contracts, surgeries, or major emotional debates.", category: "dont" });
+      }
+
+      const cognitiveReadiness = Math.round(clamp(
+        overallScore * 0.75 + (tara.quality === "Auspicious" ? 18 : tara.quality === "Severe" ? -22 : isChandrashtama ? -18 : 4),
+        15,
+        99
+      ));
+
+      const confidencePct = Math.round(clamp(94 - i * 0.45, 78, 96));
+
       const bestArea = getBestArea(transit.areaScores);
       const cautionArea = getCautionArea(transit.areaScores);
       const signal = getSignal(overallScore);
-      const advice = getSignalAdvice(signal, bestArea);
+      const advice = isChandrashtama
+        ? `Chandrashtama period: Maintain emotional detachment, avoid confrontations, and focus on steady analytical work.`
+        : getSignalAdvice(signal, bestArea);
       const remedy = getRemedy(signal, cautionAlerts);
       const scoreRationale = buildScoreRationale({
         rawAverage,
@@ -313,6 +499,11 @@ import { assertEventRadarReportContract } from "./contracts";
         bestArea,
         cautionArea,
       });
+
+      if (isChandrashtama) {
+        scoreRationale.unshift("Chandrashtama active: Moon transiting 8th from Janma Rashi, reducing raw cognitive margin.");
+      }
+      scoreRationale.unshift(`Navatara is ${tara.name} (${tara.quality}) in ${tara.cycleName} cycle.`);
   
       const day: EventRadarDay = {
         date: date.toISOString(),
@@ -329,6 +520,15 @@ import { assertEventRadarReportContract } from "./contracts";
         advice,
         remedy,
         aiContext: "",
+        tara,
+        isChandrashtama,
+        chandrashtamaDetail,
+        moonNakshatra: transitMoonNakName,
+        moonRashi: transitMoonRashiName,
+        decisionWindow,
+        actionChecklist,
+        cognitiveReadiness,
+        confidencePct,
       };
   
       day.aiContext = buildDayAiContext(day);

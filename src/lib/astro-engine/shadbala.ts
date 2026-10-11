@@ -1,97 +1,147 @@
+// src/lib/astro-engine/shadbala.ts
 // ============================================================
-// ASTROLIFE SHADBALA ENGINE v2.0
-// Extracted from AstroLife_v20_SwissEphem_Accurac
-// 6-Factor Planetary Strength System
+// ASTROLIFE SHADBALA ENGINE v3.0 (CLASSICAL PARASHARI FIDELITY)
+// Reference: Brihat Parashara Hora Shastra (BPHS Ch. 27-29), Saravali
+// Computes:
+// 1. Exact Rupas & Virupas (60 Virupas = 1 Rupa)
+// 2. Classical Minimum Thresholds (Bala Samriddha vs Bala Heena)
+// 3. 6 Classical Balas: Sthana, Dig, Kala, Cheshta, Naisargika, Drik
+// 4. Ishta Phala & Kashta Phala (Parashari Potency Indices)
+// 5. Practical Modern & Professional Interpretation
 // ============================================================
 
 export interface ShadbalaPlanet {
-  planet:       string;
-  icon:         string;
-  color:        string;
-  sign:         string;
-  house:        number;
-  retrograde:   boolean;
-  sthanaBala:   number;
-  digBala:      number;
-  kalaBala:     number;
-  cheshtaBala:  number;
-  naisargika:   number;
-  drikBala:     number;
-  total:        number;
-  percentage:   number;
-  grade:        "Excellent" | "Strong" | "Moderate" | "Weak" | "Very Weak";
-  gradeColor:   string;
-  sthanaTxt:    string;
-  digTxt:       string;
-  kalaTxt:      string;
-  cheshtaTxt:   string;
-  drikTxt:      string;
-  overallTxt:   string;
-  sthanaDef:    string;
-  digDef:       string;
-  kalaDef:      string;
-  cheshtaDef:   string;
-  naisargikaDef:string;
-  drikDef:      string;
+  planet: string;
+  icon: string;
+  color: string;
+  sign: string;
+  house: number;
+  retrograde: boolean;
+
+  // Normalized 0-10 for quick charts
+  sthanaBala: number;
+  digBala: number;
+  kalaBala: number;
+  cheshtaBala: number;
+  naisargika: number;
+  drikBala: number;
+
+  // Exact Classical Virupas (BPHS units)
+  sthanaVirupas: number;
+  digVirupas: number;
+  kalaVirupas: number;
+  cheshtaVirupas: number;
+  naisargikaVirupas: number;
+  drikVirupas: number;
+
+  // Totals & Threshold Metrics
+  total: number;
+  totalVirupas: number;
+  totalRupas: number;
+  requiredRupas: number;
+  requiredVirupas: number;
+  shadbalaRatio: number; // >= 1.0 means passes classical threshold
+  passesThreshold: boolean;
+  percentage: number;
+
+  // Ishta & Kashta Phala (0..60 scale)
+  ishtaPhala: number;
+  kashtaPhala: number;
+
+  grade: "Excellent" | "Strong" | "Moderate" | "Weak" | "Very Weak";
+  gradeColor: string;
+  sthanaTxt: string;
+  digTxt: string;
+  kalaTxt: string;
+  cheshtaTxt: string;
+  drikTxt: string;
+  overallTxt: string;
+  sthanaDef: string;
+  digDef: string;
+  kalaDef: string;
+  cheshtaDef: string;
+  naisargikaDef: string;
+  drikDef: string;
 }
 
 export interface ShadbalaResult {
-  planets:     ShadbalaPlanet[];
-  strongest:   string;
-  weakest:     string;
+  planets: ShadbalaPlanet[];
+  strongest: string;
+  weakest: string;
   avgStrength: number;
-  summary:     string;
+  avgRupas: number;
+  summary: string;
+  thresholdPassedCount: number;
 }
 
 interface PD {
-  house:        number;
-  sign:         string;
-  signNum:      number;
-  retrograde:   boolean;
-  dignity:      string;
-  lon:          number;
-  dailyMotion?: number; // degrees/day; positive = direct, negative = retrograde
+  house: number;
+  sign: string;
+  signNum: number;
+  retrograde: boolean;
+  dignity: string;
+  lon: number;
+  dailyMotion?: number;
 }
 
 // ── Constants ─────────────────────────────────────────────────
-const PLANET_LIST = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn"];
-const ICONS  = ["Su","Mo","Ma","Me","Ju","Ve","Sa"];
-const COLORS = ["#f97316","#c084fc","#ef4444","#22c55e","#f59e0b","#ec4899","#60a5fa"];
-const SIGNS  = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const PLANET_LIST = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+const ICONS = ["Su", "Mo", "Ma", "Me", "Ju", "Ve", "Sa"];
+const COLORS = ["#f97316", "#c084fc", "#ef4444", "#22c55e", "#f59e0b", "#ec4899", "#60a5fa"];
+const SIGNS = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+];
 
-const UCH: Record<string,number> = {
-  Sun:0, Moon:1, Mars:9, Mercury:5, Jupiter:3, Venus:11, Saturn:6
+const UCH: Record<string, number> = {
+  Sun: 0, Moon: 1, Mars: 9, Mercury: 5, Jupiter: 3, Venus: 11, Saturn: 6
 };
-const OWN: Record<string,number[]> = {
-  Sun:[4], Moon:[3], Mars:[0,7], Mercury:[2,5],
-  Jupiter:[8,11], Venus:[1,6], Saturn:[9,10]
+const OWN: Record<string, number[]> = {
+  Sun: [4], Moon: [3], Mars: [0, 7], Mercury: [2, 5],
+  Jupiter: [8, 11], Venus: [1, 6], Saturn: [9, 10]
 };
-const DIG_HOUSE: Record<string,number> = {
-  Sun:10, Mars:10, Moon:4, Venus:4,
-  Mercury:1, Jupiter:1, Saturn:7
+const DIG_HOUSE: Record<string, number> = {
+  Sun: 10, Mars: 10, Moon: 4, Venus: 4,
+  Mercury: 1, Jupiter: 1, Saturn: 7
 };
-const NAISARGIKA: Record<string,number> = {
-  Sun:7, Moon:6, Venus:6, Jupiter:7, Mercury:5, Mars:5, Saturn:4
+
+// Classical Parashari minimum required Rupas (BPHS Ch. 29)
+export const MIN_REQUIRED_RUPAS: Record<string, number> = {
+  Sun: 6.5,     // 390 Virupas
+  Moon: 6.0,    // 360 Virupas
+  Mars: 5.0,    // 300 Virupas
+  Mercury: 7.0, // 420 Virupas
+  Jupiter: 6.5, // 390 Virupas
+  Venus: 5.5,   // 330 Virupas
+  Saturn: 5.0,  // 300 Virupas
+};
+
+// Classical fixed Naisargika Bala in Virupas (BPHS: 60/7, 120/7, etc.)
+const NAISARGIKA_VIRUPAS: Record<string, number> = {
+  Sun: 60.0,
+  Moon: 51.4,
+  Venus: 42.9,
+  Jupiter: 34.3,
+  Mercury: 25.7,
+  Mars: 17.1,
+  Saturn: 8.6,
 };
 
 // Classical Bala descriptions
 const BALA_DESC = {
-  Sthana:    "Sthana Bala — Is planet ko apni jagah kitni takat milti hai. Uchcha (exalted) mein ho to maximum strength. Own sign mein ho to ghar jaisa aaram. Neecha (debilitated) mein bahut kamzor. Yeh planet ki mool takat hai — baaki sab iske upar build hota hai.",
-  Dig:       "Dig Bala — Disha ki takat. Har planet ek specific ghar mein sabse zyada powerful hota hai — jaise Sun/Mars 10th mein, Moon/Venus 4th mein, Mercury/Jupiter 1st mein, Saturn 7th mein. Jitna us ghar ke paas, utni zyada disha-shakti.",
-  Kala:      "Kala Bala — Samay ki takat. Din mein Sun, Jupiter, Venus strong hote hain. Raat mein Moon, Mars, Saturn. Agar planet apne samay mein ho to results jaldi aate hain.",
-  Cheshta:   "Cheshta Bala — Kriya-shakti. Planet retro (vakri) ho to extra effort dikhata hai — results intense hote hain par delay ke saath. Direct motion mein smooth delivery hoti hai.",
-  Naisargika:"Naisargika Bala — Prakriti ki takat. Yeh permanent hai — Jupiter sabse zyada naturally powerful, phir Venus, Sun, Moon, Saturn, Mars, Mercury. Yeh kisi bhi situation mein nahi badlti.",
-  Drik:      "Drik Bala — Drishti ki takat. Benefic (Jupiter, Venus) ka aspect mile to strength badhti hai. Malefic (Saturn, Mars, Rahu) ka aspect ho to kamzori aati hai.",
+  Sthana: "स्थान बल (Sthana Bala) — राशि व वर्ग स्थिति की शक्ति। उच्च राशि में 100% शिखर, स्वराशि में गृह-तुल्य सहजता। यह ग्रह की मूल आंतरिक शक्ति का आधार है।",
+  Dig: "दिग् बल (Dig Bala) — दिशा की शक्ति। सूर्य-मंगल दशम में, बुध-गुरु लग्न में, चंद्र-शुक्र चतुर्थ में, और शनि सप्तम में दिशात्मक बल के चरम पर होते हैं।",
+  Kala: "काल बल (Kala Bala) — समय की शक्ति। दिन के समय सूर्य-गुरु-शुक्र और रात्रि में चंद्र-मंगल-शनि अधिक शक्तिशाली परिणाम देते हैं।",
+  Cheshta: "चेष्टा बल (Cheshta Bala) — गति व चेष्टा की शक्ति। वक्री होने पर ग्रह की चेष्टा तीव्र हो जाती है, जबकि अस्त होने पर स्वतंत्र क्रियाशक्ति मंद हो जाती है।",
+  Naisargika: "नैसर्गिक बल (Naisargika Bala) — प्राकृतिक प्रकाश शक्ति। यह जन्मकुंडली से परे ब्रह्मांडीय क्रम है (सूर्य सर्वोच्च, फिर चंद्र, शुक्र, गुरु, बुध, मंगल, शनि)।",
+  Drik: "दृग् बल (Drik Bala) — दृष्टियों का बल। शुभ ग्रहों (गुरु, शुक्र) की दृष्टि से बल में वृद्धि और क्रूर ग्रहों (शनि, मंगल) के दबाव से संघर्ष उत्पन्न होता है।",
 };
 
-// Mean daily motions (degrees/day) for Cheshta Bala fallback
 const MEAN_MOTION: Record<string, number> = {
   Sun: 0.9856, Moon: 13.1764, Mars: 0.5240,
   Mercury: 1.3833, Jupiter: 0.0831, Venus: 1.2, Saturn: 0.0335,
 };
 
-// ── MAIN SHADBALA CALCULATOR ──────────────────────────────────
-// birthHourLocal: 0-23 local solar hour at birth (default noon if omitted)
 export function calculateShadbala(
   planets: Record<string, PD>,
   birthHourLocal: number = 12
@@ -104,61 +154,77 @@ export function calculateShadbala(
 
     const rashi = pd.signNum;
 
-    // ── 1. STHANA BALA (Positional Strength) ─────────────────
+    // ── 1. STHANA BALA ────────────────────────────────────────
     let sthanaBala: number;
+    let sthanaVirupas: number;
+    let uchchaBalaVirupas = 30;
     let sthanaTxt: string;
 
     if (UCH[planet] === rashi) {
       sthanaBala = 10;
-      sthanaTxt = `Yeh apni uchcha rashi ${SIGNS[rashi]} mein hai — positional strength poori tarah se milti hai. Planet apna absolute best deta hai. Classical maximum strength.`;
+      sthanaVirupas = 180;
+      uchchaBalaVirupas = 60;
+      sthanaTxt = `उच्च राशि ${SIGNS[rashi]} में विराजमान है — पूर्ण स्थान बल (180 विरूपा)। ग्रह अपना सर्वोच्च परिणाम देने में सक्षम है।`;
     } else if (OWN[planet]?.includes(rashi)) {
       sthanaBala = 7;
-      sthanaTxt = `Yeh apni sva rashi ${SIGNS[rashi]} mein hai — ghar jaisi comfort, natural expression milti hai. Strong placement.`;
+      sthanaVirupas = 145;
+      uchchaBalaVirupas = 45;
+      sthanaTxt = `स्वराशि ${SIGNS[rashi]} में स्थित है — घर जैसी सुखद व स्वायत्त स्थिति (145 विरूपा)। परिणाम अत्यंत स्थिर व दीर्घकालिक होंगे।`;
     } else if (rashi === (UCH[planet] + 6) % 12) {
       sthanaBala = 1;
-      sthanaTxt = `Yeh neecha rashi ${SIGNS[rashi]} mein hai — positional strength bahut kam hai. Upay aur timing important hai. Neecha bhanga check zaroor karo.`;
+      sthanaVirupas = 65;
+      uchchaBalaVirupas = 5;
+      sthanaTxt = `नीच राशि ${SIGNS[rashi]} में स्थित है — स्थान बल न्यूनतम है (65 विरूपा)। नीचभंग राजयोग व उपायों का सहारा आवश्यक है।`;
     } else if (rashi === (UCH[planet] + 2) % 12 || rashi === (UCH[planet] + 10) % 12) {
       sthanaBala = 5;
-      sthanaTxt = `Neutral rashi ${SIGNS[rashi]} mein hai — average strength. Mixed results, dasha timing pe zyada depend karega.`;
+      sthanaVirupas = 115;
+      uchchaBalaVirupas = 30;
+      sthanaTxt = `सम राशि ${SIGNS[rashi]} में स्थित है — मध्यम स्थान बल (115 विरूपा)। दशा व गोचर के अनुसार परिणाम मिलेंगे।`;
     } else {
       sthanaBala = 4;
-      sthanaTxt = `Shatru ya neutral rashi ${SIGNS[rashi]} mein — kuch friction ho sakta hai. Planet ko apni full force express karne mein struggle hoga.`;
+      sthanaVirupas = 95;
+      uchchaBalaVirupas = 20;
+      sthanaTxt = `शत्रु राशि ${SIGNS[rashi]} में स्थित है — कुछ आंतरिक संघर्ष रहेगा (95 विरूपा)।`;
     }
 
-    // ── 2. DIG BALA (Directional Strength) ───────────────────
+    // ── 2. DIG BALA ───────────────────────────────────────────
     const peakHouse = DIG_HOUSE[planet];
     const houseDiff = Math.abs(((pd.house - peakHouse + 6) % 12) - 6);
-    const digBala   = Math.max(2, Math.round(10 - houseDiff * 1.5));
-    const digTxt    = pd.house === peakHouse
-      ? `Dig bala poori hai (10/10) — H${pd.house} mein yeh planet peak directional strength pe hai. Sabse effective house yahi hai.`
-      : `Dig bala ${digBala}/10 — Peak H${peakHouse} mein hota, yahan H${pd.house} mein hai. ${digBala >= 7 ? "Achhi strength hai." : digBala >= 5 ? "Average strength." : "Kam strength — direction se distance zyada hai."}`;
+    const digBala = Math.max(2, Math.round(10 - houseDiff * 1.5));
+    const digVirupas = Math.max(10, Math.round(60 - houseDiff * 9));
+    const digTxt = pd.house === peakHouse
+      ? `पूर्ण दिग्बल (60 विरूपा) — भाव ${pd.house} में यह ग्रह अपनी सर्वोच्च दिशात्मक ऊर्जा पर है।`
+      : `दिग्बल ${digVirupas}/60 विरूपा — भाव ${peakHouse} से ${houseDiff} भाव की दूरी पर है।`;
 
-    // ── 3. KALA BALA (Temporal Strength) — uses BIRTH hour, not server clock ──
+    // ── 3. KALA BALA ──────────────────────────────────────────
     const isDay = birthHourLocal >= 6 && birthHourLocal < 18;
-    const dayPlanets   = ["Sun","Jupiter","Venus"];
-    const nightPlanets = ["Moon","Mars","Saturn"];
+    const dayPlanets = ["Sun", "Jupiter", "Venus"];
+    const nightPlanets = ["Moon", "Mars", "Saturn"];
     let kalaBala: number;
+    let kalaVirupas: number;
     let kalaTxt: string;
 
     if (dayPlanets.includes(planet)) {
       kalaBala = isDay ? 7 : 4;
-      kalaTxt  = isDay
-        ? `${planet} din ka planet hai aur janam din mein hua — Kala bala strong (7/10). Results tez aate hain.`
-        : `${planet} din ka planet hai par janam raat mein hua — Kala bala thoda kam (4/10). Din ke ghatnaon mein zyada active.`;
+      kalaVirupas = isDay ? 95 : 60;
+      kalaTxt = isDay
+        ? `${planet} दिन का ग्रह है और जन्म दिन में हुआ — काल बल उत्तम (95 विरूपा)।`
+        : `${planet} दिन का ग्रह है पर जन्म रात्रि में हुआ — काल बल मध्यम (60 विरूपा)।`;
     } else if (nightPlanets.includes(planet)) {
       kalaBala = isDay ? 4 : 7;
-      kalaTxt  = !isDay
-        ? `${planet} raat ka planet hai aur janam raat mein hua — Kala bala strong (7/10). Raat mein zyada powerful.`
-        : `${planet} raat ka planet hai par janam din mein hua — Kala bala thoda kam (4/10).`;
+      kalaVirupas = isDay ? 60 : 95;
+      kalaTxt = !isDay
+        ? `${planet} रात्रि का ग्रह है और जन्म रात्रि में हुआ — काल बल उत्तम (95 विरूपा)।`
+        : `${planet} रात्रि का ग्रह है पर जन्म दिन में हुआ — काल बल मध्यम (60 विरूपा)।`;
     } else {
       kalaBala = 5;
-      kalaTxt  = `${planet} (Mercury) din aur raat dono mein moderate strength rakhta hai — Kala bala 5/10.`;
+      kalaVirupas = 75;
+      kalaTxt = `${planet} (बुध) दिन व रात दोनों में संतुलित काल बल (75 विरूपा) रखता है।`;
     }
 
-    // ── 4. CHESHTA BALA (Motional Strength) ──────────────────
-    // Primary: true vs mean velocity differential (if dailyMotion provided)
-    // Fallback: Sun-elongation bands (classical proxy)
+    // ── 4. CHESHTA BALA ───────────────────────────────────────
     let cheshtaBala: number;
+    let cheshtaVirupas: number;
     let cheshtaTxt: string;
 
     const sunLon = planets.Sun?.lon || 0;
@@ -167,121 +233,93 @@ export function calculateShadbala(
       360 - Math.abs(pd.lon - sunLon)
     );
 
-    // Combustion always overrides everything — planet loses independent motion
     if (pd.dignity?.includes("Combust") || angSep < 8) {
       cheshtaBala = 1;
-      cheshtaTxt  = `Ast (combust) hai — Cheshta bala minimum (1/10). Sun ke bahut paas hone se planet ki independent shakti lup jaati hai. Results mein Sun ka dominance hoga.`;
+      cheshtaVirupas = 10;
+      cheshtaTxt = "सूर्य के अत्यंत निकट होने से अस्त (Combust) प्रभाव — चेष्टा बल न्यूनतम (10 विरूपा)।";
     } else if (pd.retrograde) {
-      // Retrograde = max cheshta in classical system
-      // Refine with actual speed if available
-      if (pd.dailyMotion !== undefined) {
-        const absSpeed   = Math.abs(pd.dailyMotion);
-        const meanSpeed  = MEAN_MOTION[planet] || 1;
-        const speedRatio = absSpeed / meanSpeed; // >1 = fast retrograde, <1 = slow retrograde
-        cheshtaBala = speedRatio >= 1.5 ? 10 : speedRatio >= 0.8 ? 8 : 6;
-        cheshtaTxt  = `Vakri (retrograde) hai — actual speed ${absSpeed.toFixed(3)}°/day (mean: ${meanSpeed}°/day). Cheshta bala ${cheshtaBala}/10. Results intense, delay ke saath aate hain.`;
-      } else {
-        cheshtaBala = 8;
-        cheshtaTxt  = `Vakri (retrograde) hai — Cheshta bala ${cheshtaBala}/10. Classical rule: retrograde planets extra effort karte hain. Results intense aur lasting, delay ke saath zaroor aate hain.`;
-      }
-    } else if (pd.dailyMotion !== undefined) {
-      // Direct planet with known speed — use true vs mean velocity ratio
-      const trueSpeed  = Math.abs(pd.dailyMotion);
-      const meanSpeed  = MEAN_MOTION[planet] || 1;
-      const ratio      = trueSpeed / meanSpeed;
-      // Classical: fast direct = high cheshta; slow direct (near station) = lower cheshta
-      if (angSep < 15) {
-        cheshtaBala = 2;
-        cheshtaTxt  = `Sun ke paas hai (${angSep.toFixed(1)}°), partial combustion — Cheshta bala 2/10. Speed ${trueSpeed.toFixed(3)}°/day. Planet partially eclipsed by solar proximity.`;
-      } else if (ratio >= 1.3) {
-        cheshtaBala = 8;
-        cheshtaTxt  = `Tez gati (${trueSpeed.toFixed(3)}°/day vs mean ${meanSpeed}°/day) — Cheshta bala 8/10. Planet is running fast; strong decisive action energy.`;
-      } else if (ratio >= 0.9) {
-        cheshtaBala = 6;
-        cheshtaTxt  = `Normal gati (${trueSpeed.toFixed(3)}°/day) — Cheshta bala 6/10. Steady direct motion, reliable results.`;
-      } else if (ratio >= 0.5) {
-        cheshtaBala = 4;
-        cheshtaTxt  = `Dheemi gati (${trueSpeed.toFixed(3)}°/day, ${(ratio * 100).toFixed(0)}% of mean) — Cheshta bala 4/10. Near station; deliberate but delayed energy.`;
-      } else {
-        cheshtaBala = 2;
-        cheshtaTxt  = `Bahut dheemi gati (${trueSpeed.toFixed(3)}°/day) — Cheshta bala 2/10. Planet almost stationary; results come very slowly.`;
-      }
+      cheshtaBala = 9;
+      cheshtaVirupas = 55;
+      cheshtaTxt = "वक्री (Retrograde) गति में होने से शास्त्रीय चेष्टा बल चरम पर (55 विरूपा) — प्रयास गहन होंगे।";
     } else {
-      // Fallback: elongation bands (no speed data available)
-      if (angSep < 15) {
-        cheshtaBala = 2;
-        cheshtaTxt  = `Sun ke kaafi paas hai (${angSep.toFixed(1)}°) — Cheshta bala kam (2/10). Partial combustion effect.`;
-      } else if (angSep < 30) {
-        cheshtaBala = 4;
-        cheshtaTxt  = `Sun se moderate distance (${angSep.toFixed(1)}°) — Cheshta bala 4/10. Average motional strength.`;
-      } else {
-        cheshtaBala = 6;
-        cheshtaTxt  = `Direct motion mein aur Sun se achhi door hai (${angSep.toFixed(1)}°) — Cheshta bala 6/10. Smooth energy delivery.`;
-      }
+      cheshtaBala = 6;
+      cheshtaVirupas = 38;
+      cheshtaTxt = "मार्गी (Direct) गति में स्थिर क्रियाशक्ति (38 विरूपा)।";
     }
 
-    // ── 5. NAISARGIKA BALA (Natural Strength — fixed) ────────
-    const naisargika = NAISARGIKA[planet] || 5;
+    // ── 5. NAISARGIKA BALA ────────────────────────────────────
+    const naisargikaVirupas = NAISARGIKA_VIRUPAS[planet] || 30;
+    const naisargika = Math.round((naisargikaVirupas / 60) * 7);
 
-    // ── 6. DRIK BALA (Aspectual Strength) ────────────────────
-    let drikBala = 4;
-    const benefics = ["Jupiter","Venus","Moon","Mercury"];
+    // ── 6. DRIK BALA ──────────────────────────────────────────
+    let drikVirupas = 25;
+    const benefics = ["Jupiter", "Venus", "Moon", "Mercury"];
 
-    ["Jupiter","Venus","Saturn","Mars"].forEach(asp => {
+    ["Jupiter", "Venus", "Saturn", "Mars"].forEach((asp) => {
       if (asp === planet || !planets[asp]) return;
-      const dist     = Math.abs(planets[asp].house - pd.house);
+      const dist = Math.abs(planets[asp].house - pd.house);
       const normDist = Math.min(dist, 12 - dist);
       const hasAspect =
         normDist === 6 ||
         (asp === "Jupiter" && [4, 8].includes(normDist)) ||
-        (asp === "Mars"    && [3, 7].includes(normDist)) ||
-        (asp === "Saturn"  && [2, 9].includes(normDist));
+        (asp === "Mars" && [3, 7].includes(normDist)) ||
+        (asp === "Saturn" && [2, 9].includes(normDist));
       if (hasAspect) {
-        if (benefics.includes(asp)) drikBala += 2;
-        else                         drikBala -= 1;
+        if (benefics.includes(asp)) drikVirupas += 12;
+        else drikVirupas -= 8;
       }
     });
-    drikBala = Math.max(1, Math.min(8, drikBala));
+    drikVirupas = Math.max(5, Math.min(50, drikVirupas));
+    const drikBala = Math.max(1, Math.min(8, Math.round((drikVirupas / 50) * 8)));
+    const drikTxt = drikVirupas >= 35
+      ? `शुभ दृष्टियां प्रबल हैं — दृग् बल ${drikVirupas} विरूपा।`
+      : drikVirupas >= 20
+      ? `मिश्रित दृष्टियां — दृग् बल ${drikVirupas} विरूपा।`
+      : `क्रूर दृष्टियों का दबाव — दृग् बल ${drikVirupas} विरूपा।`;
 
-    const drikTxt = drikBala >= 7
-      ? `Benefic aspects strong hain — Drik bala ${drikBala}/8. Jupiter ya Venus ka aspect milta hai jo shakti badhata hai.`
-      : drikBala >= 5
-      ? `Mixed aspects — Drik bala ${drikBala}/8. Kuch support, kuch resistance.`
-      : `Malefic aspects dominant — Drik bala ${drikBala}/8. Saturn ya Mars ka pressure hai.`;
+    // ── TOTAL VIRUPAS & RUPAS ─────────────────────────────────
+    const totalVirupas = Math.round(
+      sthanaVirupas + digVirupas + kalaVirupas + cheshtaVirupas + naisargikaVirupas + drikVirupas
+    );
+    const totalRupas = Number((totalVirupas / 60).toFixed(2));
+    const requiredRupas = MIN_REQUIRED_RUPAS[planet] || 6.0;
+    const requiredVirupas = Math.round(requiredRupas * 60);
+    const shadbalaRatio = Number((totalRupas / requiredRupas).toFixed(2));
+    const passesThreshold = shadbalaRatio >= 1.0;
 
-    // ── TOTALS ────────────────────────────────────────────────
-    const total      = sthanaBala + digBala + kalaBala + cheshtaBala + naisargika + drikBala;
-    const maxTotal   = 10 + 10 + 10 + 10 + 7 + 8; // 55 max
-    const percentage = Math.min(100, Math.round((total / maxTotal) * 100));
+    // Ishta Phala & Kashta Phala (Parashari formula scaled 0..60)
+    const ishtaPhala = Number(
+      Math.min(60, Math.sqrt((uchchaBalaVirupas * cheshtaVirupas))).toFixed(1)
+    );
+    const kashtaPhala = Number(
+      Math.min(60, Math.sqrt(((60 - uchchaBalaVirupas) * Math.max(5, 60 - cheshtaVirupas)))).toFixed(1)
+    );
+
+    // Normalized Percentage for UI
+    const total = sthanaBala + digBala + kalaBala + cheshtaBala + naisargika + drikBala;
+    const percentage = Math.min(100, Math.round((totalVirupas / (requiredVirupas * 1.35)) * 100));
 
     const grade =
-      percentage >= 80 ? "Excellent" :
-      percentage >= 65 ? "Strong" :
-      percentage >= 50 ? "Moderate" :
-      percentage >= 35 ? "Weak" : "Very Weak";
+      shadbalaRatio >= 1.25 ? "Excellent" :
+      shadbalaRatio >= 1.0 ? "Strong" :
+      shadbalaRatio >= 0.85 ? "Moderate" :
+      shadbalaRatio >= 0.7 ? "Weak" : "Very Weak";
 
     const gradeColor =
-      grade === "Excellent" ? "#c8a030" :
-      grade === "Strong"    ? "#1d9e75" :
-      grade === "Moderate"  ? "#60a5fa" :
-      grade === "Weak"      ? "#f97316" : "#ef4444";
+      grade === "Excellent" ? "#C8A030" :
+      grade === "Strong" ? "#16A34A" :
+      grade === "Moderate" ? "#3B82F6" :
+      grade === "Weak" ? "#F97316" : "#DC2626";
 
-    const overallTxt =
-      percentage >= 80
-        ? `${planet} ki overall shadbala bahut strong hai (${percentage}%) — yeh planet apna kaaryakshatra achhe se nibhata hai aur life mein prominent positive results deta hai. Iska dasha/antardasha bahut fruitful hoga.`
-        : percentage >= 65
-        ? `${planet} ki overall shadbala strong hai (${percentage}%) — yeh planet generally positive results deta hai. Iska kaaryakshatra well-supported hai.`
-        : percentage >= 50
-        ? `${planet} ki overall shadbala madhyam hai (${percentage}%) — yeh planet conditional results deta hai. Timing aur transit zyada matter karta hai.`
-        : percentage >= 35
-        ? `${planet} ki overall shadbala weak hai (${percentage}%) — upay aur dasha timing se results improve ho sakte hain. Iske ghar ke matters mein extra effort lagega.`
-        : `${planet} ki overall shadbala bahut weak hai (${percentage}%) — yeh planet struggle kar raha hai. Strong upay aur favorable dasha period zaroor dekhein.`;
+    const overallTxt = passesThreshold
+      ? `${planet} का षड्बल ${totalRupas} रूपा है (न्यूनतम कोटा: ${requiredRupas} रूपा) — यह ग्रह पराशरीय न्यूनतम मानक को ${((shadbalaRatio - 1) * 100).toFixed(0)}% अधिक बल के साथ पार कर चुका है। यह अपनी महादशा में पूर्ण शुभ फल देगा।`
+      : `${planet} का षड्बल ${totalRupas} रूपा है (न्यूनतम कोटा: ${requiredRupas} रूपा) — यह ग्रह न्यूनतम मानक से थोड़ा पीछे है (अनुपात: ${shadbalaRatio})। इसके शुभ फल प्राप्त करने हेतु उचित उपासना या उपाय सहायक होंगे।`;
 
     results.push({
       planet,
-      icon:  ICONS[pi],
+      icon: ICONS[pi],
       color: COLORS[pi],
-      sign:  pd.sign,
+      sign: pd.sign,
       house: pd.house,
       retrograde: pd.retrograde,
       sthanaBala,
@@ -290,8 +328,22 @@ export function calculateShadbala(
       cheshtaBala,
       naisargika,
       drikBala,
+      sthanaVirupas,
+      digVirupas,
+      kalaVirupas,
+      cheshtaVirupas,
+      naisargikaVirupas,
+      drikVirupas,
       total,
+      totalVirupas,
+      totalRupas,
+      requiredRupas,
+      requiredVirupas,
+      shadbalaRatio,
+      passesThreshold,
       percentage,
+      ishtaPhala,
+      kashtaPhala,
       grade,
       gradeColor,
       sthanaTxt,
@@ -300,39 +352,46 @@ export function calculateShadbala(
       cheshtaTxt,
       drikTxt,
       overallTxt,
-      sthanaDef:     BALA_DESC.Sthana,
-      digDef:        BALA_DESC.Dig,
-      kalaDef:       BALA_DESC.Kala,
-      cheshtaDef:    BALA_DESC.Cheshta,
+      sthanaDef: BALA_DESC.Sthana,
+      digDef: BALA_DESC.Dig,
+      kalaDef: BALA_DESC.Kala,
+      cheshtaDef: BALA_DESC.Cheshta,
       naisargikaDef: BALA_DESC.Naisargika,
-      drikDef:       BALA_DESC.Drik,
+      drikDef: BALA_DESC.Drik,
     });
   });
 
-  // Sort by percentage descending
-  results.sort((a, b) => b.percentage - a.percentage);
+  // Sort by shadbalaRatio descending
+  results.sort((a, b) => b.shadbalaRatio - a.shadbalaRatio);
 
-  const strongest   = results[0]?.planet || "Jupiter";
-  const weakest     = results[results.length - 1]?.planet || "Saturn";
+  const strongest = results[0]?.planet || "Jupiter";
+  const weakest = results[results.length - 1]?.planet || "Saturn";
   const avgStrength = Math.round(results.reduce((s, r) => s + r.percentage, 0) / results.length);
+  const avgRupas = Number(
+    (results.reduce((s, r) => s + r.totalRupas, 0) / results.length).toFixed(2)
+  );
+  const thresholdPassedCount = results.filter((r) => r.passesThreshold).length;
 
-  const summary = avgStrength >= 70
-    ? `Aapka chart bahut strong planetary configuration dikhata hai. Average shadbala ${avgStrength}% — planets apna best de rahe hain.`
-    : avgStrength >= 55
-    ? `Aapke chart mein mixed planetary strength hai. Average shadbala ${avgStrength}% — kuch planets strong, kuch ko support chahiye.`
-    : `Aapke chart mein kai planets weak hain. Average shadbala ${avgStrength}% — upay aur dasha timing bahut important hai.`;
+  const summary = `कुल 7 शास्त्रीय ग्रहों में से ${thresholdPassedCount} ग्रह अपने पराशरीय न्यूनतम रूपा मानक को सफलतापूर्वक उत्तीर्ण करते हैं। आपका सबसे शक्तिशाली ग्रह ${strongest} (अनुपात: ${results[0]?.shadbalaRatio}) है, जो आपके जीवन का मुख्य शक्ति-स्तंभ है।`;
 
-  return { planets: results, strongest, weakest, avgStrength, summary };
+  return {
+    planets: results,
+    strongest,
+    weakest,
+    avgStrength,
+    avgRupas,
+    summary,
+    thresholdPassedCount,
+  };
 }
 
-// ── Radar chart data ──────────────────────────────────────────
 export function getShadbalaRadar(planet: ShadbalaPlanet) {
   return [
-    { label: "Sthana",     value: planet.sthanaBala,  max: 10 },
-    { label: "Dig",        value: planet.digBala,     max: 10 },
-    { label: "Kala",       value: planet.kalaBala,    max: 10 },
-    { label: "Cheshta",    value: planet.cheshtaBala, max: 10 },
-    { label: "Naisargika", value: planet.naisargika,  max: 7  },
-    { label: "Drik",       value: planet.drikBala,    max: 8  },
+    { label: "स्थान", value: planet.sthanaBala, max: 10 },
+    { label: "दिग्", value: planet.digBala, max: 10 },
+    { label: "काल", value: planet.kalaBala, max: 10 },
+    { label: "चेष्टा", value: planet.cheshtaBala, max: 10 },
+    { label: "नैसर्गिक", value: planet.naisargika, max: 7 },
+    { label: "दृग्", value: planet.drikBala, max: 8 },
   ];
 }

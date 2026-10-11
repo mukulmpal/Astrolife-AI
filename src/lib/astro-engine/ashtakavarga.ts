@@ -57,6 +57,18 @@ export interface AKVPlanet {
     weakHouses: number[];
   }
 
+  export interface ShodhanaPlanetResult {
+    planet: string;
+    icon: string;
+    rawBindus: number[];
+    trikonaBindus: number[];
+    ekadhipatyaBindus: number[];
+    rashiPinda: number;
+    grahaPinda: number;
+    shodhyaPinda: number;
+    classicalSignificance: string;
+  }
+
   export interface AKVResult {
     planets:  AKVPlanet[];
     sarva:    number[];
@@ -64,6 +76,8 @@ export interface AKVPlanet {
     matrix: AKVMatrixRow[];
     houses:   AKVHouse[];
     sodhyaPinda: SodhyaPindaHouse[];
+    shodhanaResults: ShodhanaPlanetResult[];
+    totalShodhyaPinda: number;
     strongest: number[];
     weakest:   number[];
     bestTransitHouses: SodhyaPindaHouse[];
@@ -170,6 +184,89 @@ export interface AKVPlanet {
     Venus:["Mercury","Saturn"],
     Saturn:["Mercury","Venus"],
   };
+
+  const RASHI_GUNAKAS = [7, 10, 8, 4, 10, 5, 7, 8, 9, 5, 11, 12];
+  const GRAHA_GUNAKAS: Record<string, number> = {
+    Sun: 5, Moon: 5, Mars: 8, Mercury: 5, Jupiter: 10, Venus: 7, Saturn: 5
+  };
+
+  const SHODHYA_SIGNIFICANCE: Record<string, string> = {
+    Sun: "Pitri Pinda (BPHS Ch. 73) · Vitality, father's longevity, royal/executive favor, and soul confidence.",
+    Moon: "Matri Pinda · Emotional resilience, psychological equanimity, public goodwill, and maternal grace.",
+    Mars: "Bhratri & Bhumi Pinda · Real estate acquisitions, physical stamina, executive daring, and siblings.",
+    Mercury: "Buddhi Pinda · Business acumen, trade success, neural agility, and communication ingenuity.",
+    Jupiter: "Putra & Daiva Pinda · Divine grace, children's prosperity, financial expansion, and spiritual wisdom.",
+    Venus: "Kalatra Pinda · Marital happiness, vehicle comfort, artistic refinement, and romantic harmony.",
+    Saturn: "Ayur Pinda (Ayurdaya) · Classical longevity determinant, perseverance, and endurance under karmic pressure.",
+  };
+
+  function performTrikonaShodhana(bindus: number[]): number[] {
+    const reduced = [...bindus];
+    const trines = [
+      [0, 4, 8],  // Aries, Leo, Sagittarius (Agni / Fire)
+      [1, 5, 9],  // Taurus, Virgo, Capricorn (Prithvi / Earth)
+      [2, 6, 10], // Gemini, Libra, Aquarius (Vayu / Air)
+      [3, 7, 11], // Cancer, Scorpio, Pisces (Jala / Water)
+    ];
+
+    for (const [s1, s2, s3] of trines) {
+      const minVal = Math.min(reduced[s1], reduced[s2], reduced[s3]);
+      reduced[s1] -= minVal;
+      reduced[s2] -= minVal;
+      reduced[s3] -= minVal;
+    }
+    return reduced;
+  }
+
+  function performEkadhipatyaShodhana(
+    trikonaBindus: number[],
+    planets: Record<string, PD>
+  ): number[] {
+    const reduced = [...trikonaBindus];
+    const dualPairs = [
+      [0, 7],   // Mars: Aries & Scorpio
+      [2, 5],   // Mercury: Gemini & Virgo
+      [8, 11],  // Jupiter: Sagittarius & Pisces
+      [1, 6],   // Venus: Taurus & Libra
+      [9, 10],  // Saturn: Capricorn & Aquarius
+    ];
+
+    const signHasPlanet = (signIdx: number) => {
+      return Object.values(planets).some(p => p.signNum === signIdx);
+    };
+
+    for (const [s1, s2] of dualPairs) {
+      const b1 = reduced[s1];
+      const b2 = reduced[s2];
+      if (b1 === 0 && b2 === 0) continue;
+
+      const p1 = signHasPlanet(s1);
+      const p2 = signHasPlanet(s2);
+
+      if (p1 && p2) {
+        // Both occupied: no reduction
+        continue;
+      } else if (p1 && !p2) {
+        // s1 occupied, s2 vacant
+        reduced[s2] = b2 > b1 ? b1 : 0;
+      } else if (!p1 && p2) {
+        // s2 occupied, s1 vacant
+        reduced[s1] = b1 > b2 ? b2 : 0;
+      } else {
+        // Both vacant
+        if (b1 === b2) {
+          reduced[s1] = 0;
+          reduced[s2] = 0;
+        } else if (b1 > b2) {
+          reduced[s1] = b2;
+        } else {
+          reduced[s2] = b1;
+        }
+      }
+    }
+
+    return reduced;
+  }
 
   function rashiStrength(planet: string, rashiIdx: number) {
     if (rashiIdx === EXALT[planet]) return 2;
@@ -361,6 +458,46 @@ export interface AKVPlanet {
       return { planet:p.planet, topHouse:topIdx+1, topHouseBindus:maxB, topHouseName:houseName, totalInsight, topHouseInsight, weakHouses };
     });
 
+    // ── Classical Shodhana & Shodhya Pinda (BPHS Ch. 66–73) ────────
+    const shodhanaResults: ShodhanaPlanetResult[] = PLS7.map((planet, pi) => {
+      const rawBindus = planetResults[planet].bindus;
+      const trikonaBindus = performTrikonaShodhana(rawBindus);
+      const ekadhipatyaBindus = performEkadhipatyaShodhana(trikonaBindus, planets);
+
+      // Rashi Pinda: sum(ekadhipatya[s] * RASHI_GUNAKAS[s])
+      let rashiPinda = 0;
+      for (let s = 0; s < 12; s++) {
+        rashiPinda += ekadhipatyaBindus[s] * RASHI_GUNAKAS[s];
+      }
+
+      // Graha Pinda: sum(ekadhipatya[p.signNum] * GRAHA_GUNAKAS[p])
+      let grahaPinda = 0;
+      PLS7.forEach((pName) => {
+        const pData = planets[pName];
+        if (pData && typeof pData.signNum === "number") {
+          const signIdx = md(pData.signNum, 12);
+          const gGunaka = GRAHA_GUNAKAS[pName] ?? 5;
+          grahaPinda += ekadhipatyaBindus[signIdx] * gGunaka;
+        }
+      });
+
+      const shodhyaPinda = rashiPinda + grahaPinda;
+
+      return {
+        planet,
+        icon: PEMO7[pi],
+        rawBindus,
+        trikonaBindus,
+        ekadhipatyaBindus,
+        rashiPinda,
+        grahaPinda,
+        shodhyaPinda,
+        classicalSignificance: SHODHYA_SIGNIFICANCE[planet] ?? "Karmic potency index.",
+      };
+    });
+
+    const totalShodhyaPinda = shodhanaResults.reduce((sum, item) => sum + item.shodhyaPinda, 0);
+
     // ── Life-map synthesis ─────────────────────────────────────
     const topLifeAreas  = strongest.map(i => HOUSE_DATA[i+1].name);
     const weakLifeAreas = weakest.map(i => HOUSE_DATA[i+1].name);
@@ -371,5 +508,24 @@ export interface AKVPlanet {
       ? `Your ${sarvaTotal} bindus are near the standard 337, giving moderate cosmic backing. ${topLifeAreas.join(", ")} are your most reliable zones. In ${weakLifeAreas.join(", ")}, consistent effort must compensate for lighter planetary support — remedies and timing help.`
       : `With ${sarvaTotal} bindus (below the standard 337), this chart calls for conscious effort and remedies. ${topLifeAreas.join(", ")} offer the best return on effort. ${weakLifeAreas.join(", ")} require patience, discipline, and targeted remedies to unlock results — but every planet has strong houses that can still produce wins.`;
 
-    return { planets:planetObjs, sarva, sarvaTotal, matrix, houses, sodhyaPinda, strongest, weakest, bestTransitHouses, sensitiveTransitHouses, planetInsights, lifeSummary, topLifeAreas, weakLifeAreas, summary, aiContext };
+    return {
+      planets: planetObjs,
+      sarva,
+      sarvaTotal,
+      matrix,
+      houses,
+      sodhyaPinda,
+      shodhanaResults,
+      totalShodhyaPinda,
+      strongest,
+      weakest,
+      bestTransitHouses,
+      sensitiveTransitHouses,
+      planetInsights,
+      lifeSummary,
+      topLifeAreas,
+      weakLifeAreas,
+      summary,
+      aiContext,
+    };
   }

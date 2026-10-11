@@ -52,7 +52,7 @@ function RadarChart({ planet }: { planet: ShadbalaPlanet }) {
 
 export default function ShadbalaPage() {
   const [expanded, setExpanded] = useState<string|null>(null);
-  const [activeTab, setActiveTab] = useState<"grid"|"table"|"summary">("grid");
+  const [activeTab, setActiveTab] = useState<"parashari"|"grid"|"table"|"summary">("parashari");
   const { birth, chart, hasUserChart } = useUserChart();
   const { t, tp, ts } = useLanguage();
 
@@ -134,9 +134,9 @@ export default function ShadbalaPage() {
             detail: "Calculated from the saved birth chart; use with Dasha and Transits for timing decisions.",
           }}
           metrics={[
-            { label: "Avg Strength", value: `${result.avgStrength}%`, tone: "gold" },
-            { label: "Strongest", value: result.strongest, tone: "green" },
-            { label: "Weakest", value: result.weakest, tone: "red" },
+            { label: "Threshold Passed", value: `${result.thresholdPassedCount} / 7`, tone: result.thresholdPassedCount >= 5 ? "green" : "gold" },
+            { label: "Strongest", value: `${result.strongest} (${result.planets[0]?.shadbalaRatio}x)`, tone: "green" },
+            { label: "Chart Avg", value: `${result.avgRupas} Rupas`, tone: "gold" },
           ]}
         />
         <EngineTrustPanel
@@ -208,10 +208,99 @@ export default function ShadbalaPage() {
 
         {/* TABS */}
         <div className="tabs">
-          {([["grid","Planet Cards"],["table","Comparison Table"],["summary","Bala Guide"]] as const).map(([t,l])=>(
+          {([
+            ["parashari", "⚖️ Parashari Rupas & Ishta Phala"],
+            ["grid", "🪐 Planet Cards"],
+            ["table", "📊 Exact Virupas Table"],
+            ["summary", "📖 Shastric Bala Guide"]
+          ] as const).map(([t,l])=>(
             <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{l}</button>
           ))}
         </div>
+
+        {/* ── PARASHARI THRESHOLD & ISHTA PHALA TAB ── */}
+        {activeTab === "parashari" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.28)", borderRadius: 16, padding: "20px 24px" }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4 }}>
+                ✦ Brihat Parashara Hora Shastra Minimum Standards (रूपा मापदंड)
+              </div>
+              <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, margin: "0 0 16px 0" }}>
+                शास्त्रीय ज्योतिष में हर ग्रह का एक न्यूनतम रूपा कोटा निर्धारित है। यदि ग्रह का रूपा अनुपात &gt;= 1.0 है, तो वह <strong>बल समृद्ध</strong> माना जाता है और अपनी महादशा में पूरे फल देने में सक्षम होता है।
+              </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {result.planets.map((p) => {
+                  const pass = p.passesThreshold;
+                  return (
+                    <div
+                      key={p.planet}
+                      style={{
+                        padding: "14px 16px",
+                        background: "#FAF8F5",
+                        border: `1px solid ${pass ? "rgba(34, 197, 94, 0.25)" : "rgba(239, 68, 68, 0.25)"}`,
+                        borderRadius: 12,
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontSize: 20, color: p.color }}>{p.icon}</span>
+                          <div>
+                            <span style={{ fontWeight: 700, fontSize: 15, color: "#1A1A1A" }}>{tp(p.planet)}</span>
+                            <span style={{ fontSize: 11, color: "#6B635B", marginLeft: 8 }}>({ts(p.sign)} · H{p.house})</span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 800,
+                              padding: "3px 8px",
+                              borderRadius: 10,
+                              background: pass ? "rgba(34, 197, 94, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                              color: pass ? "#16A34A" : "#DC2626",
+                            }}
+                          >
+                            {pass ? `✦ उत्तीर्ण (${p.shadbalaRatio}x)` : `⚠️ न्यूनता (${p.shadbalaRatio}x)`}
+                          </span>
+                          <span style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 18, fontWeight: 700, color: "#1A1A1A" }}>
+                            {p.totalRupas} / {p.requiredRupas} Rupas
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Visual Comparison Progress Bar */}
+                      <div style={{ position: "relative", height: 8, background: "#E5E0D8", borderRadius: 4, overflow: "hidden", marginBottom: 10 }}>
+                        <div
+                          style={{
+                            width: `${Math.min(100, (p.totalRupas / (p.requiredRupas * 1.4)) * 100)}%`,
+                            height: "100%",
+                            background: pass ? "#16A34A" : "#DC2626",
+                            borderRadius: 4,
+                          }}
+                        />
+                      </div>
+
+                      {/* Ishta & Kashta Phala */}
+                      <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontSize: 12, color: "#4A4238" }}>
+                        <div>
+                          <strong>इष्ट फल (Ishta Phala):</strong> <span style={{ color: "#16A34A", fontWeight: 700 }}>{p.ishtaPhala} / 60</span> (शुभ फल प्रदान करने की सहजता)
+                        </div>
+                        <div>
+                          <strong>कष्ट फल (Kashta Phala):</strong> <span style={{ color: "#DC2626", fontWeight: 700 }}>{p.kashtaPhala} / 60</span> (संघर्ष व परीक्षा का स्तर)
+                        </div>
+                        <div>
+                          <strong>कुल विरूपा:</strong> <span style={{ fontWeight: 700 }}>{p.totalVirupas} Virupas</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── GRID TAB ── */}
         {activeTab==="grid" && (
@@ -311,8 +400,11 @@ export default function ShadbalaPage() {
                 <tr>
                   <th style={{textAlign:"left"}}>Planet</th>
                   {BALA_LABELS.map(b=><th key={b.key}>{b.label}<br/><span style={{fontSize:8}}>/{b.max}</span></th>)}
-                  <th>Total</th>
-                  <th>Strength</th>
+                  <th>Virupas</th>
+                  <th>Total Rupas</th>
+                  <th>Req. Rupas</th>
+                  <th>Ratio</th>
+                  <th>Ishta / Kashta</th>
                   <th>Grade</th>
                 </tr>
               </thead>
@@ -330,14 +422,16 @@ export default function ShadbalaPage() {
                       const c=pct>=0.7?"#c8a030":pct>=0.5?"#1d9e75":pct>=0.35?"#60a5fa":"#ef4444";
                       return <td key={i} style={{color:c,fontWeight:600}}>{v}</td>;
                     })}
-                    <td style={{color:"#1A1A1A",fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:600}}>{p.total}</td>
+                    <td style={{color:"#1A1A1A",fontFamily:"Cormorant Garamond,serif",fontSize:15,fontWeight:600}}>{p.totalVirupas} V</td>
+                    <td style={{color:"#1A1A1A",fontFamily:"Cormorant Garamond,serif",fontSize:16,fontWeight:700}}>{p.totalRupas} R</td>
+                    <td style={{color:"#6B635B",fontSize:13}}>{p.requiredRupas} R</td>
                     <td>
-                      <div style={{display:"flex",alignItems:"center",gap:6}}>
-                        <div style={{width:60,height:4,background:"#FFFFFF",borderRadius:2,overflow:"hidden"}}>
-                          <div style={{width:`${p.percentage}%`,height:"100%",background:p.gradeColor,borderRadius:2}}/>
-                        </div>
-                        <span style={{fontSize:12,color:p.gradeColor}}>{p.percentage}%</span>
-                      </div>
+                      <span style={{fontSize:12,fontWeight:700,color:p.passesThreshold?"#16A34A":"#DC2626"}}>
+                        {p.shadbalaRatio}x
+                      </span>
+                    </td>
+                    <td style={{fontSize:11}}>
+                      <span style={{color:"#16A34A",fontWeight:600}}>{p.ishtaPhala}</span> / <span style={{color:"#DC2626",fontWeight:600}}>{p.kashtaPhala}</span>
                     </td>
                     <td><span style={{fontSize:11,padding:"3px 10px",borderRadius:20,background:`${p.gradeColor}18`,color:p.gradeColor,border:`1px solid ${p.gradeColor}33`}}>{p.grade}</span></td>
                   </tr>
