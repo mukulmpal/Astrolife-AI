@@ -46,15 +46,15 @@ export async function getServerAiUsageState(): Promise<ServerUsageState> {
 
     if (!user) {
       return {
-        allowed: !enforced,
+        allowed: true,
         authenticated: false,
         dbAvailable: false,
-        enforced,
+        enforced: false,
         tier: "free",
         used: 0,
         left: limit,
         limit,
-        reason: enforced ? "login_required" : "anonymous_testing",
+        reason: "anonymous_testing",
       };
     }
 
