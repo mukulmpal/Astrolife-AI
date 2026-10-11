@@ -43,8 +43,8 @@ export function chartToNatal(chart: ChartData | null): NatalInput {
   const nakIdx = Math.floor(moonLon / (360 / 27)) % 27;
 
   const nowMs = Date.now();
-  let activeMD = "Jupiter";
-  if (Array.isArray(chart.dashas)) {
+  let activeMD = chart.dashas?.find((d) => d.active)?.planet;
+  if (!activeMD && Array.isArray(chart.dashas)) {
     const md = chart.dashas.find((d) => {
       const s = new Date(d.start).getTime();
       const e = new Date(d.end).getTime();
@@ -52,9 +52,13 @@ export function chartToNatal(chart: ChartData | null): NatalInput {
     });
     if (md) activeMD = md.planet;
   }
+  if (!activeMD && chart.dashas?.[0]) {
+    activeMD = chart.dashas[0].planet;
+  }
+  if (!activeMD) activeMD = "Jupiter";
 
-  let activeAD = "Saturn";
-  if (Array.isArray(chart.antardasha)) {
+  let activeAD = chart.antardasha?.find((a) => a.active)?.planet;
+  if (!activeAD && Array.isArray(chart.antardasha)) {
     const ad = chart.antardasha.find((a) => {
       const s = new Date(a.start).getTime();
       const e = new Date(a.end).getTime();
@@ -62,6 +66,10 @@ export function chartToNatal(chart: ChartData | null): NatalInput {
     });
     if (ad) activeAD = ad.planet;
   }
+  if (!activeAD && chart.antardasha?.[0]) {
+    activeAD = chart.antardasha[0].planet;
+  }
+  if (!activeAD) activeAD = activeMD;
 
   return {
     birthDate: chart.dob || "1990-08-15",
