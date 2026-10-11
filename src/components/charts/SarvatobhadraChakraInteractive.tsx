@@ -548,3 +548,4 @@ export default function SarvatobhadraChakraInteractive({ data }: SarvatobhadraPr
     </div>
   );
 }
+
