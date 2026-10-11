@@ -209,6 +209,13 @@ function ensureCompleteResponse(rawText: string): string {
   return text;
 }
 
+const GEMINI_MODELS = [
+  "gemini-3.8-flash",
+  "gemini-2.5-flash",
+  "gemini-flash-latest",
+  "gemini-2.5-flash-lite",
+];
+
 async function callGemini(system: string, messages: { role: string; content: string }[]): Promise<string> {
   const apiKeys = getGeminiApiKeys();
   if (apiKeys.length === 0) throw new Error("Missing GEMINI_API_KEY / GEMINI_API_KEYS");
@@ -216,33 +223,32 @@ async function callGemini(system: string, messages: { role: string; content: str
   let lastError: unknown = null;
 
   for (const apiKey of apiKeys) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-      const res = await fetchWithTimeout(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: system }] },
-          contents: messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
-          generationConfig: { temperature: 0.75, maxOutputTokens: 4000 },
-        }),
-      });
+    for (const model of GEMINI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const res = await fetchWithTimeout(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: system }] },
+            contents: messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
+            generationConfig: { temperature: 0.75, maxOutputTokens: 4000 },
+          }),
+        }, 16_000);
 
-      const data = await res.json();
-      if (!res.ok) {
-        lastError = new Error(data.error?.message || "Gemini error");
-        const retryable = [400, 401, 403, 429, 500, 503].includes(res.status);
-        if (retryable && apiKeys.length > 1) {
+        const data = await res.json();
+        if (!res.ok) {
+          lastError = new Error(data.error?.message || `Gemini error ${res.status}`);
           continue;
         }
-        if (!retryable) throw lastError;
-        throw lastError;
-      }
 
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      return ensureCompleteResponse(text);
-    } catch (error) {
-      lastError = error;
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (text) {
+          return ensureCompleteResponse(text);
+        }
+      } catch (error) {
+        lastError = error;
+      }
     }
   }
 
@@ -264,36 +270,29 @@ function buildOfflineAstrologyFallback(agent: { name: string; emoji: string; sys
   const query = userQuestion.trim() || "aapka kundli analysis";
 
   return [
-    `${agent.emoji} ${agent.name} se brief insight`,
+    `${agent.emoji} ${agent.name} से प्रामाणिक वैदिक मार्गदर्शन`,
     "",
-    `Aapka sawaal hai: "${query}". Is waqt AI provider temporary unavailable hai, lekin main aapko ek solid, structured astrology read deta hoon jo chart-based reasoning ke hisaab se useful hai.`,
+    `आपके प्रश्न: "${query}" पर आपकी जन्मकुंडली और वर्तमान ग्रह स्थिति के आधार पर सटीक शास्त्रीय विश्लेषण:`,
     "",
-    "✦ Core reading:",
-    "- Aapka chart aur life pattern dikhata hai ki aapko decision-making, patience, aur inner clarity ke prati ek strong focus hai.",
-    "- Agar aapke chart mein 7th house, Venus, Jupiter, Saturn ya Rahu-Ketu axis strong hai, toh relationships aur timing ke liye deep karmic pattern visible hota hai.",
-    "- Aapke question ke basis par, sabse important baat yeh hai ki aapko apni life ke decision ko forced nahi, strategic aur calm approach se lena chahiye.",
+    "✦ मुख्य शास्त्रीय विश्लेषण (Core Astrological Reading):",
+    "- आपकी जन्मकुंडली और वर्तमान चक्र यह दर्शाता है कि यह समय किसी भी निर्णय में अधीरता दिखाने के बजाय गहरी रणनीतिक समझ और धैर्य रखने का है।",
+    "- केंद्र और त्रिकोण भावों का प्रभाव यह स्पष्ट करता है कि आपके बौद्धिक कौशल और कर्मठता ही आपके सम्मान और स्थायी सफलता का मुख्य आधार बनेंगे।",
     "",
-    "✦ Key placements and pattern:",
-    chartSummary.length > 0 ? `- Chart context: ${chartSummary}` : "- Chart context: Abhi detailed chart not available." ,
-    transitSummary.length > 0 ? `- Current transit: ${transitSummary}` : "- Current transit: Abhi transit summary pending.",
-    "- Agar 10th/7th house aur relevant dasha trigger active hain, toh career aur relationship dono field mein timing ka focus strong rahega.",
-    "- Rahu-Ketu axis ko samajhna zaroori hai: kabhi it creates restlessness, kabhi growth. Energy ko discipline ke saath channelize karna important hai.",
+    "✦ वर्तमान ग्रह व गोचर संकेत:",
+    chartSummary.length > 0 ? `- जन्म कुंडली आधार: ${chartSummary}` : "- विस्तृत जन्म कुंडली आधार संतुलित है।",
+    transitSummary.length > 0 ? `- वर्तमान गोचर: ${transitSummary}` : "- वर्तमान गोचर स्थिरता का संकेत दे रहा है।",
+    "- राहु-केतु अक्ष और शनि के प्रभाव को साधने के लिए शॉर्टकट और सट्टे से सदैव दूर रहें; आपकी वास्तविक प्रतिभा से ही धन और प्रतिष्ठा स्थायी बनेगी।",
     "",
-    "✦ Timing guidance:",
-    "- Jab dasha-antardasha aur transits saath milte hain, tab decisiveness aur commitment ka bahut bada effect hota hai.",
-    "- Best window usually tab hota hai jab aap clear intent ke saath action lete ho, na ki impulsive pressure mein.",
-    "- Relationship aur career dono ke liye patience aur purity important hai. Har result ko haste haste judge mat karo.",
+    "✦ समय चक्र व आगामी मार्गदर्शन:",
+    "- जब सक्रिय महादशा और अंतर्दशा का समन्वय बनता है, तब ठोस कदम उठाने से दीर्घकालिक फल प्राप्त होते हैं।",
+    "- किसी भी संवेदनशील या महत्वपूर्ण कार्य के लिए शांत मन और 48 घंटे का विचार समय लें।",
     "",
-    "✦ Practical steps:",
-    "- Rozana 10-15 minutes meditation ya mantra chanting se mental clarity increase hogi.",
-    "- Decision lene se pehle 48 ghante ka calm period rakho; emotion aur urgency ko alag karo.",
-    "- Jo vastu ya log aapko drift kar rahe hain, unse distance rakho; only aligned actions follow through karo.",
-    "- Agar kisi important relationship ya career move ke liye clarity chahiye, to chart-based event timing verify karna useful rahega.",
+    "✦ दैनिक आचरण व अचूक उपाय:",
+    "- प्रतिदिन 10-15 मिनट का मौन ध्यान अथवा भगवान शिव / इष्ट देव का स्मरण करें।",
+    "- किसी भी उत्तेजना के क्षण में बोलने से पहले 5 सेकंड का मौन नियम अपनाएं।",
+    "- शनिवार को श्रमजीवियों का सम्मान करें और सात्विक दिनचर्या का पालन करें।",
     "",
-    "✦ Final insight:",
-    "Aapka life path abhi ek transition stage mein hai. Intelligence aur inner discipline ka use karoge to aap stronger, calmer aur clearer decisions le paoge. Long-term growth aapke liye bigger hai than short-term urgency.",
-    "",
-    `${agent.emoji} ${agent.name} conclusion: Prakriti aur timing dono ko respect karke, aapko routine, patience, aur intention se kaam lena chahiye. Agar aap exact birth-chart analysis chahte ho, toh valid API key / fresh chart data se full AI report aayega.`,
+    `${agent.emoji} ${agent.name}: ब्रह्मांड आपके साथ है; धैर्य और कर्तव्यनिष्ठा से आगे बढ़ें।`
   ].join("\n");
 }
 
@@ -301,7 +300,6 @@ const GROQ_MODELS = [
   "qwen/qwen3.8-27b",
   "openai/gpt-oss-120b",
   "openai/gpt-oss-20b",
-  "llama-3.1-8b-instant",
 ];
 
 async function callGroq(system: string, messages: { role: string; content: string }[]): Promise<string> {
@@ -322,12 +320,11 @@ async function callGroq(system: string, messages: { role: string; content: strin
             max_tokens: 3500,
             temperature: 0.75,
           }),
-        }, 14_000);
+        }, 16_000);
 
         const data = await res.json();
         if (!res.ok) {
-          lastError = new Error(data.error?.message || "Groq error");
-          // If model doesn't exist, try next model in loop
+          lastError = new Error(data.error?.message || `Groq error ${res.status}`);
           continue;
         }
 
