@@ -208,7 +208,7 @@ export default function KundliPage() {
 
   useEffect(() => {
     if (chartLoading || !hasUserChart || !primaryChart) return;
-    if (!chart || (primaryChart && primaryChart.name !== chart.name && primaryChart.dob !== chart.dob)) {
+    if (!chart || primaryChart.name !== chart.name || primaryChart.dob !== chart.dob || primaryChart.tob !== chart.tob) {
       applyChart(primaryChart);
       setSaveStatus(`${primaryChart.name}'s chart loaded.`);
       setShowForm(false);

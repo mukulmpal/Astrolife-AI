@@ -354,17 +354,24 @@ export function calculatePsychology(planets: Record<string, PD>): PsychResult {
     },
     {
       distortion: "Impulsive Reactivity (तात्कालिक आवेश)",
-      planet: "Mars in 12H/1H",
+      planet: pList.find((p) => p.planet === "Mars")?.house ? `Mars in ${pList.find((p) => p.planet === "Mars")?.house}H` : "Mars",
       triggerContext: "नींद की कमी या कार्यभार के समय दूसरों की छोटी गलतियों पर तुरंत तीखी प्रतिक्रिया।",
       cbtReframe: "5-सेकंड का मौन नियम: प्रतिक्रिया देने से पहले 3 गहरी सांसें लें और निर्णय को अगले दिन तक स्थगित रखें।",
     },
   ];
 
   // 5. Circadian Focus Peak
+  const moonHouse = moonP?.house || 1;
+  const marsData = pList.find((p) => p.planet === "Mars");
+  const isNightOwl = moonHouse === 12 || (marsData && marsData.house === 12);
   const circadianPeak = {
-    peakFocusWindow: "रात्रि 10:00 PM से 1:30 AM अथवा प्रातः 5:30 AM से 8:30 AM",
+    peakFocusWindow: isNightOwl
+      ? "रात्रि 10:00 PM से 1:30 AM अथवा प्रातः 5:30 AM से 8:30 AM"
+      : "प्रातः 6:30 AM से 10:00 AM अथवा सायंकाल 4:30 PM से 7:30 PM",
     dopamineResetWindow: "दोपहर 2:00 PM से 4:00 PM (न्यूनतम मानसिक मांग का समय)",
-    cognitiveInsight: "आपकी जन्मकुंडली में चंद्र-मंगल का 12वां भाव और बुध की स्थिति यह दर्शाती है कि जब बाहरी दुनिया सो जाती है, तब आपका संज्ञानात्मक इंजन चरम फोकस पर काम करता है।",
+    cognitiveInsight: isNightOwl
+      ? `आपकी जन्मकुंडली में भाव 12 (एकांत) और बुध की स्थिति यह दर्शाती है कि जब बाहरी दुनिया शांत होती है, तब आपका संज्ञानात्मक इंजन चरम फोकस पर काम करता है।`
+      : `आपकी जन्मकुंडली में चंद्रमा (भाव ${moonHouse}) और बुध (भाव ${mercP?.house || 1}) की स्थिति यह दर्शाती है कि शांत वातावरण में आपका संज्ञानात्मक फोकस अपने चरम पर काम करता है।`,
   };
 
   // 6. Novelistic Storytelling Prose
@@ -374,11 +381,22 @@ export function calculatePsychology(planets: Record<string, PD>): PsychResult {
     `आपका सबसे बड़ा मानसिक वरदान आपका 'एकांत का डीप-वर्क' है। जब आप बाहर के शोर से कटकर अपनी शर्तों पर सिस्टम्स, कोड या रणनीतियों का निर्माण करते हैं, तो आपकी चेतना एक समाधि-तुल्य अवस्था में पहुंच जाती है। बस एक बात का ध्यान रखें: अपने दिमाग को कभी-कभी पूरी तरह खाली होने और विश्राम करने का अधिकार भी दें।`,
   ];
 
+  // 7. Dynamic Cognitive Archetype resolution
+  const faculties = [
+    { name: "Buddhi", score: buddhiScore, label: "Buddhi (Analytical Architecture)", archetype: "The Systems Architect & Analytical Strategist", desc: "गहन तार्किक बुद्धि, स्वतंत्र निर्णय क्षमता और सुव्यवस्थित सिस्टम्स रचने की शक्ति।" },
+    { name: "Ahamkara", score: ahamkaraScore, label: "Ahamkara (Autonomous Self-Respect)", archetype: "The Sovereign Leader & Visionary Pioneer", desc: "अडिग आत्म-सम्मान, स्वाभाविक नेतृत्व गरिमा और अपनी शर्तों पर दुनिया जीतने का तेज।" },
+    { name: "Manas", score: manasScore, label: "Manas (Empathic Intuition)", archetype: "The Intuitive Synthesizer & Empathic Creator", desc: "गहरा अंतर्ज्ञान, संवेगात्मक सूक्ष्मता और जन-मानस की भावनाओं को भांपने की शक्ति।" },
+    { name: "Chitta", score: chittaScore, label: "Chitta (Subconscious Focus)", archetype: "The Deep Contemplative & Transformational Researcher", desc: "गहन एकाग्रता, गूढ़ रहस्यों का अनुसंधान और एकांत में उत्कृष्ट कार्य की सिद्धि।" },
+  ].sort((a, b) => b.score - a.score);
+
+  const topFaculty = faculties[0];
+  const dominantFunctions = faculties.slice(0, 3).map((f) => f.label);
+
   return {
     planets: pList,
     pattern: {
-      name: "The Systems Architect & Intuitive Strategist",
-      desc: "गहन तार्किक बुद्धि, स्वतंत्र आत्म-सम्मान और एकांत में उत्कृष्ट सिस्टम्स रचने की क्षमता।",
+      name: topFaculty.archetype,
+      desc: topFaculty.desc,
       shadow: "अत्यधिक विश्लेषण, भविष्य की अनिश्चितता की गुप्त चिंता और पूर्णतावाद।",
       anxietyIdx: Math.round(100 - manasScore * 0.7),
       karmaLoop: Math.round(chittaScore * 0.8),
@@ -392,11 +410,7 @@ export function calculatePsychology(planets: Record<string, PD>): PsychResult {
         pList.find((p) => p.planet === "Venus")?.strength || 70,
       ],
     },
-    dominantFunctions: [
-      "Buddhi (Analytical Architecture)",
-      "Ahamkara (Autonomous Self-Respect)",
-      "Chitta (Deep Subconscious Focus)",
-    ],
+    dominantFunctions,
     riskFlags: [
       {
         title: "Analysis Paralysis (अति-विश्लेषण)",
@@ -419,7 +433,7 @@ export function calculatePsychology(planets: Record<string, PD>): PsychResult {
       "किसी भी भावनात्मक तनाव की स्थिति में 5 सेकंड का मौन नियम लागू करें।",
       "सप्ताह में एक दिन डिजिटल डिटॉक्स (कम स्क्रीन समय) रखें।",
     ],
-    summary: "आपकी मानसिक संरचना एक असाधारण तार्किक आर्किटेक्ट की है, जिसे केवल अपने आंतरिक आलोचक को शांत करना और विश्राम को समय देना सीखना है।",
+    summary: `आपकी मानसिक संरचना '${topFaculty.archetype}' की है, जिसे अपने आंतरिक आलोचक को शांत कर विश्राम और संतुलन को समय देना सीखना है।`,
     antahkarana,
     trigunas: {
       sattva,

@@ -208,7 +208,7 @@ export default function KPPage() {
         <div>
           <strong>KP Foundation Check</strong>
           <p>
-            Lagna: {result.input.lagR === 5 ? "Virgo" : ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"][result.input.lagR]} ·
+            Lagna: {["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"][result.input.lagR % 12]} ·
             Lagna Degree: {result.input.lagLon.toFixed(2)}°. KP uses Bhava Chalit houses for event judgement.
           </p>
           <em>

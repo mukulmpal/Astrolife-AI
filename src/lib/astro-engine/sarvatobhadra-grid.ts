@@ -351,10 +351,10 @@ function calculateRaysForPlanet(
 export function calculateSarvatobhadraGrid(chart: ChartData): SarvatobhadraGridResult {
   const grid = buildBase9x9Grid();
   const moonData = chart.planets?.Moon;
-  const moonLon = moonData?.lon || 149.2;
-  const birthNakshatra = moonData?.nakshatra || "Uttara Phalguni";
+  const moonLon = typeof moonData?.lon === "number" ? moonData.lon : (chart.lagnaLon || 0);
   const birthNakshatraIndex = Math.floor(((moonLon % 360) + 360) % 360 * 27 / 360);
-  const nativeRashi = moonData?.sign || "Leo";
+  const birthNakshatra = moonData?.nakshatra || "Ashwini";
+  const nativeRashi = moonData?.sign || chart.lagnaRashi || "Aries";
   const nameFirstLetter = (chart.name || "A").trim().charAt(0).toUpperCase();
 
   // 1. Identify Sensitive Points (1, 10, 16, 18, 23, 25, 26, 27 from Janma)
