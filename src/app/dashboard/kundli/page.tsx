@@ -20,6 +20,13 @@ import { buildMangalDoshaInsight, type MangalDoshaInsight } from "@/lib/astro-en
 import EditChartModal from "@/components/charts/EditChartModal";
 import DeleteChartModal from "@/components/charts/DeleteChartModal";
 import MasterKundliDossierPanel from "@/components/charts/MasterKundliDossierPanel";
+import PillarNarrativeCard from "@/components/charts/PillarNarrativeCard";
+import {
+  generateCareerPillarNarrative,
+  generateMarriagePillarNarrative,
+  generateTimingPillarNarrative,
+  generateSpecsPillarNarrative,
+} from "@/lib/astro-engine/pillar-narrative-engine";
 import { Edit2, Trash2 } from "lucide-react";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
@@ -394,6 +401,26 @@ export default function KundliPage() {
       dms: formatDMS(chart.lagnaLon),
     };
   }, [chart]);
+
+  const careerNarrative = useMemo(() => {
+    if (!chart) return null;
+    return generateCareerPillarNarrative(chart, d10, shadbala, charaKarakas);
+  }, [chart, d10, shadbala, charaKarakas]);
+
+  const marriageNarrative = useMemo(() => {
+    if (!chart) return null;
+    return generateMarriagePillarNarrative(chart, d9, mangalDosha, charaKarakas);
+  }, [chart, d9, mangalDosha, charaKarakas]);
+
+  const timingNarrative = useMemo(() => {
+    if (!chart) return null;
+    return generateTimingPillarNarrative(chart, charaKarakas);
+  }, [chart, charaKarakas]);
+
+  const specsNarrative = useMemo(() => {
+    if (!chart) return null;
+    return generateSpecsPillarNarrative(chart, yogas, shadbala);
+  }, [chart, yogas, shadbala]);
 
   return (
     <>
@@ -1184,6 +1211,8 @@ export default function KundliPage() {
             {/* ══════════════════════════════════════════════════════ */}
             {activeTab === "career" && (
               <div className="space-y-6">
+                {careerNarrative && <PillarNarrativeCard narrative={careerNarrative} />}
+
                 <div className="chart-layout">
                   {/* Dasamsha Chart */}
                   <div className="card">
@@ -1275,6 +1304,8 @@ export default function KundliPage() {
             {/* ══════════════════════════════════════════════════════ */}
             {activeTab === "marriage" && (
               <div className="space-y-6">
+                {marriageNarrative && <PillarNarrativeCard narrative={marriageNarrative} />}
+
                 <div className="chart-layout">
                   {/* Navamsha Chart */}
                   <div className="card">
@@ -1384,6 +1415,8 @@ export default function KundliPage() {
             {/* ══════════════════════════════════════════════════════ */}
             {activeTab === "timing" && (
               <div className="space-y-6">
+                {timingNarrative && <PillarNarrativeCard narrative={timingNarrative} />}
+
                 <div className="card">
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <div>
@@ -1448,6 +1481,8 @@ export default function KundliPage() {
             {/* ══════════════════════════════════════════════════════ */}
             {activeTab === "specs" && (
               <div className="space-y-6">
+                {specsNarrative && <PillarNarrativeCard narrative={specsNarrative} />}
+
                 {/* 1. Complete Graha Sthiti Table */}
                 <div className="card">
                   <div className="card-tag">✦ Planetary Degrees & Dignities</div>
