@@ -1,5 +1,6 @@
 // src/lib/astro-engine/gemstone.ts
 // AstroLife Gemstone Engine — chart-normalized, full recommendation engine
+import { evaluateFunctionalDebilityGemstoneGuard } from "./functional-debility-guard";
 
 export type Planet =
   | "Sun"
@@ -881,6 +882,45 @@ export function generateGemstoneReport(chart: NatalChart, rawInput?: unknown): G
       planet,
       reason: `${planet} is functionally sensitive for ${lagna} lagna. Wearing its gemstone without expert guidance may amplify ${getMaleficEffect(planet)}.`,
     }));
+
+  // Functional Debility Engine Integration: Check all planets for debility superpowers
+  for (const pos of chart.planets) {
+    if (pos.dignity === "debilitated" || getDignity(pos.planet, pos.sign) === "debilitated") {
+      const debilityAudit = evaluateFunctionalDebilityGemstoneGuard(pos.planet, pos.sign);
+      if (debilityAudit.hasFunctionalDebility && debilityAudit.profile) {
+        const fatalStone = debilityAudit.profile.fatalGemstone;
+        
+        // Add to avoidGemstones if not already present
+        const alreadyAvoided = avoidGemstones.some((a) => a.planet === pos.planet);
+        if (!alreadyAvoided) {
+          avoidGemstones.push({
+            gemstone: fatalStone,
+            planet: pos.planet,
+            reason: `Functional Debility Alert: ${pos.planet} is debilitated in ${pos.sign}. ${debilityAudit.profile.whyGemstoneIsFatalHinglish}`,
+          });
+        }
+
+        // Add to analysis notes
+        analysisNotes.push(
+          `✦ Functional Debility Preservation: ${pos.planet} in ${pos.sign} gives an innate superpower: "${debilityAudit.profile.functionalSuperpowerHinglish}" DO NOT wear ${fatalStone}. Safe Alternative: ${debilityAudit.profile.safeAlternativeRemedies.stoneOrMetal}.`
+        );
+
+        // If it was somehow recommended as primary or secondary, add strong caution
+        if (primaryGemstone.planet === pos.planet) {
+          primaryGemstone.cautions.unshift(
+            `⚠️ STRICT CONTRAINDICATION: ${debilityAudit.profile.whyGemstoneIsFatalHinglish}`
+          );
+        }
+        for (const sec of secondaryGemstones) {
+          if (sec.planet === pos.planet) {
+            sec.cautions.unshift(
+              `⚠️ STRICT CONTRAINDICATION: ${debilityAudit.profile.whyGemstoneIsFatalHinglish}`
+            );
+          }
+        }
+      }
+    }
+  }
 
   // Lagna lord placement
   const lagnaLordPosition = chart.planets.find((planet) => planet.planet === lagnaLord);

@@ -12,6 +12,7 @@ import {
 } from "@/lib/astro-intelligence/phase-1-remedies/complete-remedy-intelligence-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemediesDossier";
+import { PilgrimageDossierCard } from "@/components/remedies/PilgrimageDossierCard";
 
 const PRIORITY_COLOR: Record<RemedyCard["priority"], string> = {
   "dasha-active": "#7C3AED",
@@ -32,7 +33,7 @@ const PLANET_EMOJI: Record<string, string> = {
 export default function RemedyPage() {
   const { chart, loading, hasUserChart } = useUserChart();
   const result = useMemo(() => (chart && hasUserChart ? calculateRemedies(chart) : null), [chart, hasUserChart]);
-  const [activeTab, setActiveTab] = useState<"all" | "urgent" | "lk" | "phase1">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "urgent" | "lk" | "phase1" | "pilgrimage">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
 
   // Check which contradiction rules are triggered by same-house planet pairs
@@ -100,7 +101,7 @@ export default function RemedyPage() {
   const filtered = result.cards.filter(c => {
     if (activeTab === "urgent") return c.priority === "urgent" || c.priority === "dasha-active";
     if (activeTab === "lk") return c.lkUpay.length > 0;
-    if (activeTab === "phase1") return false;
+    if (activeTab === "phase1" || activeTab === "pilgrimage") return false;
     return true;
   });
   const personalizedPlan = [...result.cards]
@@ -211,10 +212,10 @@ export default function RemedyPage() {
         )}
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: "8px", marginBottom: "18px" }}>
-          {(["all", "urgent", "lk", "phase1"] as const).map(t => (
+        <div style={{ display: "flex", gap: "8px", marginBottom: "18px", flexWrap: "wrap" }}>
+          {(["all", "urgent", "lk", "phase1", "pilgrimage"] as const).map(t => (
             <button key={t} className={`tab-btn${activeTab === t ? " active" : ""}`} onClick={() => setActiveTab(t)}>
-              {t === "all" ? "All Planets" : t === "urgent" ? "Urgent / Dasha" : t === "lk" ? "Lal Kitab Upay" : "Phase 1 Timing"}
+              {t === "all" ? "All Planets" : t === "urgent" ? "Urgent / Dasha" : t === "lk" ? "Lal Kitab Upay" : t === "phase1" ? "Phase 1 Timing" : "🔱 Pilgrimage (12 ज्योतिर्लिंग)"}
             </button>
           ))}
         </div>
@@ -307,8 +308,13 @@ export default function RemedyPage() {
           </div>
         )}
 
+        {/* Pilgrimage Devasthana Tab */}
+        {activeTab === "pilgrimage" && (
+          <PilgrimageDossierCard chart={chart} />
+        )}
+
         {/* Cards */}
-        {activeTab !== "phase1" && filtered.map(card => {
+        {activeTab !== "phase1" && activeTab !== "pilgrimage" && filtered.map(card => {
           const borderColor = PRIORITY_COLOR[card.priority];
           const isOpen = expanded === card.planet;
           return (

@@ -64,18 +64,14 @@ function getD3(lon:number): number {
   const sign = Math.floor(md(lon,360)/30);
   const deg  = md(lon,360) % 30;
   const part = Math.floor(deg/10);
-  const isOdd = sign % 2 === 0;
-  if(isOdd) return md(sign + [0,4,8][part], 12);
-  else       return md(sign + [8,4,0][part], 12);
+  return md(sign + [0,4,8][part], 12);
 }
 
 function getD4(lon:number): number {
   const sign = Math.floor(md(lon,360)/30);
   const deg  = md(lon,360) % 30;
   const part = Math.floor(deg/7.5);
-  const type = sign % 3; // 0=movable,1=fixed,2=dual
-  const offset = type===0 ? 0 : type===1 ? 3 : 6;
-  return md(sign + offset + part*3, 12);
+  return md(sign + part*3, 12);
 }
 
 function getD5(lon:number): number {
@@ -103,9 +99,9 @@ function getD8(lon:number): number {
   const sign = Math.floor(md(lon,360)/30);
   const deg  = md(lon,360) % 30;
   const part = Math.floor(deg/3.75);
-  const type = sign % 3;
-  const offset = type===0 ? 0 : type===1 ? 8 : 4;
-  return md(sign + offset + part, 12);
+  const type = sign % 3; // 0=movable(Aries), 1=fixed(Sagittarius), 2=dual(Leo)
+  const start = type===0 ? 0 : type===1 ? 8 : 4;
+  return md(start + part, 12);
 }
 
 function getD9(lon:number): number {
@@ -116,7 +112,9 @@ function getD10(lon:number): number {
   const sign = Math.floor(md(lon,360)/30);
   const deg  = md(lon,360) % 30;
   const part = Math.floor(deg/3);
-  return md(sign%2===0 ? sign+part : sign+9+part, 12);
+  const isOdd = sign % 2 === 0; // Aries=0 (1st, Odd), Taurus=1 (2nd, Even)...
+  const start = isOdd ? sign : md(sign + 8, 12); // Odd from sign; Even from 9th sign (+8)
+  return md(start + part, 12);
 }
 
 function getD11(lon:number): number {
@@ -146,7 +144,7 @@ function getD20(lon:number): number {
   const sign = Math.floor(md(lon,360)/30);
   const deg  = md(lon,360) % 30;
   const part = Math.floor(deg/1.5);
-  return sign % 2 === 0 ? part % 12 : md(6 + part, 12);
+  return sign % 2 === 0 ? part % 12 : md(8 + part, 12);
 }
 
 function getD24(lon:number): number {
@@ -157,7 +155,12 @@ function getD24(lon:number): number {
 }
 
 function getD27(lon:number): number {
-  return Math.floor(md(lon,360) / (360/27)) % 12;
+  const sign = Math.floor(md(lon,360)/30);
+  const deg  = md(lon,360) % 30;
+  const part = Math.floor(deg / (30/27));
+  const element = sign % 4; // 0=Fire(Aries), 1=Earth(Cancer), 2=Air(Libra), 3=Water(Capricorn)
+  const start = element === 0 ? 0 : element === 1 ? 3 : element === 2 ? 6 : 9;
+  return md(start + part, 12);
 }
 
 function getD30(lon:number): number {
@@ -199,7 +202,7 @@ function getD60(lon:number): number {
   const sign = Math.floor(md(lon,360)/30);
   const deg  = md(lon,360) % 30;
   const part = Math.floor(deg/0.5);
-  return sign % 2 === 0 ? md(sign + part, 12) : md(sign + 8 + part, 12);
+  return md(sign + part, 12);
 }
 
 // ── BUILDER ───────────────────────────────────────────────────────────────────
@@ -851,6 +854,18 @@ export function getSpecialFindings(allCharts: DivChart[]): SpecialFinding[] {
       findings.push({title:"Strong Progeny Yoga",
         detail:"Jupiter is powerful in both D-1 and D-7. Children are blessed with wisdom and success. This also indicates great fortune through creative and intellectual pursuits.",
         type:"positive",charts:["D1","D7"]});
+
+    // D-7 Somatic Reproductive Block (Mercury + Saturn Sterile Affliction)
+    const sat7 = d7.planets.find(p=>p.planet==="Saturn");
+    const merc7 = d7.planets.find(p=>p.planet==="Mercury");
+    if(sat7 && merc7 && (sat7.house===merc7.house || sat7.house===5 || merc7.house===5)) {
+      findings.push({
+        title: "D-7 Somatic Progeny Block (Mercury-Saturn Constriction)",
+        detail: "Mercury and Saturn (sterile/delay planetary combination) afflict the 5th house or Lagna in D-7 Saptamsha. Indicates functional reproductive delays, sperm/ovum viability friction, or hormonal/somatic blocks. Clinical endocrinology/IVF workup is advised alongside targeted planetary remedies.",
+        type: "caution",
+        charts: ["D7"]
+      });
+    }
   }
 
   // Neecha Bhanga Raja Yoga
@@ -862,6 +877,74 @@ export function getSpecialFindings(allCharts: DivChart[]): SpecialFinding[] {
           detail:`${p.planet} is debilitated in D-1 but gains strength in D-9 Navamsha. This Neecha Bhanga Raja Yoga cancels the weakness and converts it into strength, particularly in the soul and dharmic domain. Exceptionally powerful yoga.`,
           type:"positive",charts:["D1","D9"]});
     });
+
+    // Founder's Dilemma: Exalted in D1, Debilitated in D9
+    d1.planets.filter(p=>p.dignity==="Exalted").forEach(p=>{
+      const inD9=d9.planets.find(pp=>pp.planet===p.planet);
+      if(inD9?.dignity==="Debilitated") {
+        const isSun = p.planet === "Sun";
+        findings.push({
+          title: `Founder's Dilemma — ${p.planet} (D1 Exalted / D9 Debilitated)`,
+          detail: isSun
+            ? `Sun is Exalted in D-1 (Imperial vision, social leadership, aggregation of large resources) but Debilitated in D-9 (dependence on investors, equity dilution, institutional compromise). Sarvartha Chintamani notes this combination grants immense wealth and valor through overwhelming capital leverage, provided the native abandons personal ego and leads through institutional diplomacy.`
+            : `${p.planet} is Exalted in D-1 (High public ambition & scale) but Debilitated in D-9 (internal surrender of absolute autonomy; terms of engagement dictated by external stakeholders). Dasha brings massive public visibility alongside strict contractual boundaries.`,
+          type: "caution",
+          charts: ["D1", "D9"]
+        });
+      }
+    });
+
+    // Sarvartha Chintamani standalone Sun in D9 Debilitated
+    const s9 = d9.planets.find(p=>p.planet==="Sun");
+    const s1 = d1.planets.find(p=>p.planet==="Sun");
+    if (s9?.dignity==="Debilitated" && s1?.dignity!=="Exalted") {
+      findings.push({
+        title: "Sarvartha Chintamani Navamsha Sun Clout",
+        detail: "Sun is debilitated in D-9 Navamsha (Libra). According to Sarvartha Chintamani, this bestows immense wealth, strategic valor, and the ability to defeat rivals through financial dominance and distributed alliances rather than brute force.",
+        type: "positive",
+        charts: ["D9"]
+      });
+    }
+  }
+
+  // D10 Career Specifier: Loan to Traders / Margin Broker
+  if(d10) {
+    const k10 = d10.planets.find(p=>p.planet==="Ketu" && p.house===1);
+    if(k10) {
+      findings.push({
+        title: "D10 Ketu in Lagna — Sovereign Autonomous Founder",
+        detail: "Ketu is placed in D10 Ascendant. The native has an innate disdain for corporate hierarchy, bureaucratic reporting, and middle management. Natural archetype is an autonomous founder, specialized principal advisor, or independent sovereign boss.",
+        type: "positive",
+        charts: ["D10"]
+      });
+    }
+
+    const r10 = d10.planets.find(p=>p.planet==="Rahu" && p.house===10);
+    const p6In1 = d10.planets.find(p=>p.house===1 && p.dignity!=="Debilitated");
+    if(r10 && p6In1) {
+      findings.push({
+        title: "D10 Margin Broker / High-Stakes Creditor Signature",
+        detail: "D10 connects 6th-house dynamics (debt, credit, arbitration) to Lagna while Rahu amplifies the 10th house (crowd leverage, speculation). Signature archetype: 'Loan to Traders', margin financier, distressed debt resolution, or financial dispute arbitration.",
+        type: "positive",
+        charts: ["D10"]
+      });
+    }
+  }
+
+  // Bhavartha Ratnakara: Parental Absence / Custody Struggle
+  if(d1) {
+    const p4 = d1.planets.find(p=>p.house===4);
+    const p9 = d1.planets.find(p=>p.house===9);
+    const sun = d1.planets.find(p=>p.planet==="Sun");
+    const sat = d1.planets.find(p=>p.planet==="Saturn");
+    if(sun?.house===9 && (p9?.dignity==="Debilitated" || sat?.house===9 || sat?.house===3)) {
+      findings.push({
+        title: "Bhavartha Ratnakara Parental Vulnerability",
+        detail: "Sun in the 9th house while the 9th lord is afflicted or debilitated triggers classical Bhavartha Ratnakara vulnerability: early absence, distance, or karmic strain with the father.",
+        type: "caution",
+        charts: ["D1"]
+      });
+    }
   }
 
   // D-60 powerful planets

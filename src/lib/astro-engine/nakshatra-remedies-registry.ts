@@ -120,13 +120,13 @@ export const NAKSHATRA_HUMAN_REGISTRY: Record<number, HumanNakshatraGuide> = {
     tattva: "Prithvi",
     archetypeTitle: "Mata Ki Godh (The Loving Nurturer)",
     personalityStoryHinglish:
-      "Rohini prem, sundarta aur vridhhi ka nakshatra hai. Log aapke vyavhar aur aakarshan ki taraf khinche chale aate hain. Aapko prakriti, hariyali aur sansarik sukhon se gehra prem hota hai. Aapke haath me barkat hoti hai.",
+      "Rohini prem, sundarta aur vridhhi ka nakshatra hai. Log aapke vyavhar aur aakarshan ki taraf khinche chale aate hain. Aapko prakriti, hariyali aur sansarik sukhon se gehra prem hota hai. Aapke haath me barkat hoti hai, par Rohini ka 4-11 aksh Moola ke sath chalta hai — jahan Rohini sampatti sanchit karna chahti hai, wahan Moola use anasakt hokar chhodne par majboor karta hai.",
     livingArchetypeStoryHinglish:
       "Bhagwan Chandra ki sabse priya rani Rohini hain. Shri Krishna ka janm bhi Rohini me hua tha, jo prem aur anand ke avatar hain.",
     karmicTrapHinglish:
-      "Maa ki baat ko taall dena, maa se behas karna ya unka man dukhi karna aapke jeevan ki barkat ko rok deta hai.",
+      "Maa ki baat ko taall dena, ya sansarik vastuon aur dhan ko itna zyada jakad lena ki tyag na kar payein. Ye nakshatra Moola ke tyag ke bina asantulit ho jata hai.",
     conductGuardrailHinglish:
-      "Maa ki hamesha aagya maaniye. Ghar ke bagiche me ped-paudhe lagayein aur unhe sookhne na dein.",
+      "Maa ki hamesha aagya maaniye. Ghar ke bagiche me ped-paudhe lagayein aur unhe sookhne na dein. Sanchay ke sath-sath nishkam daan seekhein.",
     primaryRemedyHinglish:
       "Somwar (Monday) ke din desi gay ko apne haath se hara ghaas khilayein. Gay ka aashirwad seedha Chandra ko bal deta hai.",
     secondaryRemedyHinglish:
@@ -382,13 +382,13 @@ export const NAKSHATRA_HUMAN_REGISTRY: Record<number, HumanNakshatraGuide> = {
     tattva: "Vayu",
     archetypeTitle: "Vishwakarma Ki Sundarta (The Architect of Wonders)",
     personalityStoryHinglish:
-      "Mangal ka nakshatra aur Vishwakarma ji ki urja. Aapko sundarta, architecture, design, painting, kavita aur chamak-damak bohot lubhati hai. Aap har jagah perfection chahte hain.",
+      "Mangal ka nakshatra aur Vishwakarma ji ki urja. Aapko sundarta, architecture, design, painting, kavita aur chamak-damak bohot lubhati hai. Jab Chitra lagna me udit ho (jaise aitihasik netao me), to ye 'Mad Men' jaisi nirbheek, aakramak aur poore system ko reset karne wali taaqat deta hai. Aap har jagah perfection chahte hain.",
     livingArchetypeStoryHinglish:
-      "Tvashtar (The Celestial Artisan). Chamakdaar moti jaisi sundarta create karne ki kshamata.",
+      "Tvashtar (The Celestial Artisan). Chamakdaar moti jaisi sundarta create karne ki kshamata aur shashtra-nirmaan ka krodh.",
     karmicTrapHinglish:
-      "Ghar me kooda-karkat aur gandagi jama hone dena. Karigaron ki mehnat ko kam aankna.",
+      "Ghar me kooda-karkat aur gandagi jama hone dena. Apne aakramak perfectionism ke karan doosro par chillana ya karigaron ki mehnat ko kam aankna.",
     conductGuardrailHinglish:
-      "Ghar ko aaine ki tarah saaf rakhein. Kala-karon ki tareef karein.",
+      "Ghar ko aaine ki tarah saaf rakhein. Apne krodh ko srijanatmak nirmaan me badlein; kala-karon ki tareef karein.",
     primaryRemedyHinglish:
       "Tuesday ke din mandir jakar Hanuman ji ke aage sarson ya chameli ke tel ka diya jalayein.",
     secondaryRemedyHinglish:
@@ -397,7 +397,7 @@ export const NAKSHATRA_HUMAN_REGISTRY: Record<number, HumanNakshatraGuide> = {
       "Ghar ki deep cleaning, Hanuman mandir me diya.",
     timingAndMuhuratHinglish: "Tuesday sandhya ke samay.",
     materials: ["Tel ka deepak", "Hanuman mandir pooja"],
-    goldenRuleHinglish: "Ghar ko saaf-suthra rakho aur kalakaron ka aadar karo.",
+    goldenRuleHinglish: "Ghar ko saaf-suthra rakho aur krodh ko shilp-kala me badlo.",
   },
 
   15: {
@@ -513,13 +513,13 @@ export const NAKSHATRA_HUMAN_REGISTRY: Record<number, HumanNakshatraGuide> = {
     tattva: "Agni",
     archetypeTitle: "Jadd Tak Pahunchne Wala Krantikari (The Root Uprooter)",
     personalityStoryHinglish:
-      "Moola matlab Jadd (Roots). Aap kisi bhi samasya ko upar-upar se nahi, balki uski jadd tak jaakar ukhaadna jante hain. Aap fearless aur krantikari vicharon wale hote hain.",
+      "Moola matlab Jadd (Roots). Aap kisi bhi samasya ko upar-upar se nahi, balki uski jadd tak jaakar ukhaadna jante hain. Rohini ke 4-11 aksh par hone ke karan, jahan Rohini har cheez ko bacha kar ikathha karti hai, Moola bojh utaar kar aazadi lata hai. Keetu ke teeno nakshatron (Ashwini, Magha, Mula) me agni aur urja ka santulan bilkul barabar hota hai, jo jatak ko purane bandhan todne ki shakti deta hai.",
     livingArchetypeStoryHinglish:
-      "Nirriti (Goddess of Dissolution and Core Truth). Purani sada-gali cheezon ko khatam karke naya aadhar banana.",
+      "Nirriti (Goddess of Dissolution and Core Truth). Purani sada-gali cheezon ko khatam karke naya adhyatmik aadhar banana.",
     karmicTrapHinglish:
-      "STRICT WARNING: Explosive Rage! Moola wale gusse me aakar bante hue kaam ki jadd hi kaat dete hain.",
+      "STRICT WARNING: Explosive Rage & Sudden Destruction! Moola wale gusse ya achanak virakti me aakar bante hue rishton aur dhan ki jadd hi kaat dete hain.",
     conductGuardrailHinglish:
-      "Gusse par pahaad jaisa niyantran rakhein. Utawle-pan me rishte mat todiye.",
+      "Gusse par pahaad jaisa niyantran rakhein. Utawle-pan me rishte mat todiye. Tyag karein, par vidhwans nahi.",
     primaryRemedyHinglish:
       "Jadon (roots) wale paudhon ki dekhbhal karein — bagwani karein, pedon ki jadd me khad dein aur keede na lagne dein.",
     secondaryRemedyHinglish:

@@ -1876,3 +1876,123 @@ export function getMemorySummary(memory: AstroSoundMemory): {
     },
   };
 }
+
+// ============================================================
+// SANSKRIT MATRIKA CHAKRA & SOUND PHONETIC ENGINE
+// Maps phonemes to 9 planets and detects 12-house activation risks.
+// Based on oral discourse transcripts:
+// "Shabda mein Brahm hai! Adding random letters like 'E' can activate
+// a malefic house (e.g. Saturn in 12th Virgo) and ruin health/career.
+// Whereas auspicious names like 'Devyani' awaken Venusian royal pride."
+// ============================================================
+
+export interface MatrikaVarnaProfile {
+  varnaGroup: string;       // "Swara", "Kavarga", "Chavarga", "Tavarga", "Thavarga", "Pavarga", "Antastha", "Ushma"
+  planet: string;           // Sun, Mars, Venus, Mercury, Jupiter, Saturn, Moon, Rahu/Ketu
+  element: string;          // Agni, Jala, Prithvi, Vayu, Akasha
+  psychologicalQuality: string;
+}
+
+export const MATRIKA_VARNA_MAP: Record<string, MatrikaVarnaProfile> = {
+  // Swara (Vowels) -> Sun
+  A: { varnaGroup: "Swara", planet: "Sun", element: "Agni", psychologicalQuality: "तेज, आत्मबल व जीवन शक्ति" },
+  E: { varnaGroup: "Swara_Dirgha", planet: "Sun", element: "Agni", psychologicalQuality: "अग्नि तत्व का तीव्र विस्तार" },
+  I: { varnaGroup: "Swara", planet: "Sun", element: "Agni", psychologicalQuality: "एकाग्रता व सूक्ष्म दृष्टि" },
+  O: { varnaGroup: "Swara", planet: "Sun", element: "Agni", psychologicalQuality: "प्रभुत्व व प्रभाव" },
+  U: { varnaGroup: "Swara", planet: "Sun", element: "Agni", psychologicalQuality: "दृढ़ता व गहराई" },
+
+  // Kavarga (क ख ग घ ङ) -> Mars
+  K: { varnaGroup: "Kavarga", planet: "Mars", element: "Agni", psychologicalQuality: "पराक्रम, क्रियाशीलता व आक्रामकता" },
+  G: { varnaGroup: "Kavarga", planet: "Mars", element: "Agni", psychologicalQuality: "शारीरिक ऊर्जा व साहस" },
+
+  // Chavarga (च छ ज झ ञ) -> Venus
+  C: { varnaGroup: "Chavarga", planet: "Venus", element: "Jala", psychologicalQuality: "आकर्षण, सौंदर्य व गुरूर (देवयानी तत्व)" },
+  J: { varnaGroup: "Chavarga", planet: "Venus", element: "Jala", psychologicalQuality: "सम्मोहन व सौदेबाजी की कला" },
+
+  // Tavarga (ट ठ ड ढ ण) -> Mercury
+  T: { varnaGroup: "Tavarga", planet: "Mercury", element: "Prithvi", psychologicalQuality: "व्यावहारिक बुद्धि व सूक्ष्म गणना" },
+
+  // Thavarga (त थ द ध न) -> Jupiter
+  D: { varnaGroup: "Thavarga", planet: "Jupiter", element: "Akasha", psychologicalQuality: "गुरु ज्ञान, विस्तार व धर्म (देव)" },
+  N: { varnaGroup: "Thavarga", planet: "Jupiter", element: "Akasha", psychologicalQuality: "नैतिकता व सात्विक समझ" },
+
+  // Pavarga (प फ ब भ म) -> Saturn
+  P: { varnaGroup: "Pavarga", planet: "Saturn", element: "Vayu", psychologicalQuality: "कठोर श्रम, यथार्थवाद व विलंब" },
+  B: { varnaGroup: "Pavarga", planet: "Saturn", element: "Vayu", psychologicalQuality: "धैर्य, सहनशीलता व बोझ उठाने की क्षमता" },
+  M: { varnaGroup: "Pavarga", planet: "Saturn", element: "Vayu", psychologicalQuality: "संयम व गहरी कर्मण्यता" },
+
+  // Antastha (य र ल व) -> Moon
+  Y: { varnaGroup: "Antastha", planet: "Moon", element: "Jala", psychologicalQuality: "भावुकता, संवेदनशीलता व मन की गति" },
+  R: { varnaGroup: "Antastha", planet: "Moon", element: "Agni", psychologicalQuality: "स्फूर्ति व प्रवाह" },
+  L: { varnaGroup: "Antastha", planet: "Moon", element: "Prithvi", psychologicalQuality: "शांति व सौम्यता" },
+  V: { varnaGroup: "Antastha", planet: "Moon", element: "Jala", psychologicalQuality: "तरलता व अनुकूलन" },
+
+  // Ushma (श ष स ह) -> Rahu / Ketu
+  S: { varnaGroup: "Ushma", planet: "Ketu", element: "Agni", psychologicalQuality: "अनानासक्ति, सूक्ष्म शोध व परफेक्शन" },
+  H: { varnaGroup: "Ushma", planet: "Rahu", element: "Vayu", psychologicalQuality: "अकूत भूख, विस्तार व लीक से हटकर सोच" }
+};
+
+export interface NamePhoneticAudit {
+  rawName: string;
+  phonemes: { letter: string; planet: string; group: string }[];
+  activatedPlanets: string[];
+  maleficHouseAlertsHinglish: string[];
+  auspiciousTattvaNotesHinglish: string[];
+  safetyVerdictHinglish: string;
+}
+
+/**
+ * Checks whether a given name or added letter activates a malefic 6, 8, or 12th house,
+ * or safely empowers Yogakaraka and Lagna lords.
+ */
+export function evaluateNamePhoneticResonance(
+  name: string,
+  chart: ChartData | null | undefined
+): NamePhoneticAudit {
+  const clean = (name || "").toUpperCase().replace(/[^A-Z]/g, "");
+  const phonemes: NamePhoneticAudit["phonemes"] = [];
+  const activatedPlanetsSet = new Set<string>();
+
+  for (const ch of clean) {
+    const matched = MATRIKA_VARNA_MAP[ch];
+    if (matched) {
+      phonemes.push({ letter: ch, planet: matched.planet, group: matched.varnaGroup });
+      activatedPlanetsSet.add(matched.planet);
+    }
+  }
+
+  const activatedPlanets = Array.from(activatedPlanetsSet);
+  const alerts: string[] = [];
+  const auspicious: string[] = [];
+
+  if (chart && chart.planets) {
+    for (const pName of activatedPlanets) {
+      const pData = chart.planets[pName];
+      if (!pData) continue;
+
+      if ([6, 8, 12].includes(pData.house)) {
+        alerts.push(
+          `सावधानी: नाम की ध्वनि '${pName}' को जाग्रत कर रही है, जो कुंडली के ${pData.house}वें भाव (${pData.rashi}) में स्थित है। यह अवांछित स्वास्थ्य व्याधि या रुकावट को ट्रिगर कर सकता है (Ritu Case Study)।`
+        );
+      } else if ([1, 5, 9, 10, 11].includes(pData.house)) {
+        auspicious.push(
+          `शुभ प्रभाव: नाम की ध्वनि '${pName}' शुभ भाव ${pData.house} (${pData.rashi}) को बल प्रदान कर रही है (Devyani Model)।`
+        );
+      }
+    }
+  }
+
+  const hasMaleficAlert = alerts.length > 0;
+  const safetyVerdictHinglish = hasMaleficAlert
+    ? "सतर्कता आवश्यक: इस नाम में कुछ ध्वनियां कुंडली के त्रिक भावों (6/8/12) को उत्तेजित कर रही हैं। मनमाने ढंग से अतिरिक्त अक्षर न जोड़ें।"
+    : "सुरक्षित व अनुकूल: नाम की ध्वनियां कुंडली के शुभ केंद्रों व त्रिकोणों के साथ सामंजस्य में हैं।";
+
+  return {
+    rawName: name,
+    phonemes,
+    activatedPlanets,
+    maleficHouseAlertsHinglish: alerts,
+    auspiciousTattvaNotesHinglish: auspicious,
+    safetyVerdictHinglish
+  };
+}

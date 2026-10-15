@@ -16,7 +16,7 @@ import { calculateAshtakavarga } from "../astro-engine/ashtakavarga";
 import { calculateShadbala } from "../astro-engine/shadbala";
 import { calculateMedical } from "../astro-engine/medical";
 import { calculateNumerology } from "../astro-engine/numerology";
-import { buildNatalChartFromAnyChart, generateGemstoneReport } from "../astro-engine/gemstone";
+import { buildNatalChartFromAnyChart, generateGemstoneReport, SIGN_RULERS, type ZodiacSign } from "../astro-engine/gemstone";
 import { calculateSpecialLagnas } from "../astro-engine/special-lagnas";
 import { calculateVastu } from "../astro-engine/vastu";
 import { calculateSarvatobhadra } from "../astro-engine/sarvatobhadra";
@@ -27,6 +27,14 @@ import { detectConditionalDashas } from "../astro-engine/marriage-timing-kn-rao"
 import { evaluateCorePlanetRemedy, getMoonSharingGuide, resolveContextualRemedies } from "../astro-engine/core-planet-remedies";
 import { buildMasterTransitRadarDossier } from "../astro-engine/property-transit-predictor";
 import type { DashaLord } from "../astro-engine/dasha";
+import { evaluateVargaCrossDignity, evaluateExaltedInMKS, evaluateWhoseProblemIsIt } from "../astro-engine/d1-vs-varga-dignity";
+import { evaluateFunctionalDebilityGemstoneGuard, evaluateNadiDebilityPeak } from "../astro-engine/functional-debility-guard";
+import { evaluateKetuSynergy } from "../astro-engine/ketu-synergy-circuit";
+import { evaluateTwelfthHouseIntelligence } from "../astro-engine/twelfth-house-intelligence";
+import { evaluateMoonDispositorHealthTiming } from "../astro-engine/transit-health-timing";
+import { evaluateTradingRisk } from "../astro-engine/trading-risk-guardrail";
+import { evaluateCareerSpecifier } from "../astro-engine/career-specifier";
+import { resolvePilgrimagePrescription } from "../astro-engine/pilgrimage-engine";
 
 /**
  * Builds a comprehensive, unified astrological context from ALL engines.
@@ -690,6 +698,198 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
   } catch (err) {
     console.warn("[MasterAstroContext] Core Planet Remedies error:", err);
   }
+
+  // ── 20. ADVANCED CLINICAL ASTROLOGY, MULTI-VARGA DIGNITY & PRACTICAL GUARDRAILS ──
+  try {
+    const lagnaSign = chart.lagnaRashi || "Aries";
+    const activeMD = chart.dashas?.find((d) => d.active) ?? chart.dashas?.[0];
+    const mdPlanet = activeMD?.planet || "Jupiter";
+
+    // 1. Multi-Varga Cross-Dignity evaluation for Sun, Moon, Venus, Mars, Jupiter, Saturn, Mercury
+    const keyPlanets: ("Sun" | "Moon" | "Mars" | "Mercury" | "Jupiter" | "Venus" | "Saturn")[] = [
+      "Sun",
+      "Moon",
+      "Mars",
+      "Mercury",
+      "Jupiter",
+      "Venus",
+      "Saturn",
+    ];
+    const vargaFindings: string[] = [];
+
+    for (const p of keyPlanets) {
+      const pD1 = chart.planets[p];
+      if (!pD1) continue;
+      const d1Dignity = (pD1.dignity?.charAt(0).toUpperCase() + (pD1.dignity?.slice(1) || "")) as any;
+      const pD9Dignity = ((pD1 as any).d9Dignity || (d1Dignity === "Exalted" ? "Debilitated" : "Neutral")) as any;
+
+      const cross = evaluateVargaCrossDignity({
+        planet: p,
+        d1SignNum: 0,
+        d1House: pD1.house,
+        d1Dignity: d1Dignity || "Neutral",
+        d9SignNum: 0,
+        d9House: 1,
+        d9Dignity: pD9Dignity,
+      });
+
+      if (cross.pattern !== "Harmonious_Balance") {
+        vargaFindings.push(`✦ ${cross.headlineHinglish}: ${cross.visionScopeD1} ➔ ${cross.termsOfEngagementD9} [Strategy: ${cross.dashaStrategyHinglish}]`);
+      }
+    }
+
+    // 2. Functional Debility Gemstone Contraindications
+    const debilityAlerts: string[] = [];
+    for (const p of keyPlanets) {
+      const pD1 = chart.planets[p];
+      if (!pD1) continue;
+      const guard = evaluateFunctionalDebilityGemstoneGuard(p, pD1.sign);
+      if (guard.hasFunctionalDebility && guard.profile) {
+        debilityAlerts.push(
+          `✦ ${p} in ${pD1.sign} (Functional Superpower): ${guard.profile.functionalSuperpowerHinglish} | 🛑 FATAL GEMSTONE: DO NOT WEAR ${guard.profile.fatalGemstone} (${guard.profile.whyGemstoneIsFatalHinglish}) | Safe Alternative: ${guard.profile.safeAlternativeRemedies.stoneOrMetal}`
+        );
+      }
+    }
+
+    // 3. Ketu Conjunction Synergy
+    const ketuPos = chart.planets.Ketu;
+    const ketuSynergies: string[] = [];
+    if (ketuPos) {
+      for (const p of keyPlanets) {
+        const pD1 = chart.planets[p];
+        if (pD1 && pD1.house === ketuPos.house) {
+          const syn = evaluateKetuSynergy(p, pD1.dignity, ketuPos.nakshatra);
+          if (syn.hasKetuConjunction && syn.profile) {
+            ketuSynergies.push(`✦ Ketu + ${p} in H${ketuPos.house} (${syn.profile.titleHinglish}): ${syn.profile.innateMasteryHinglish} | Anti-PR Rule: ${syn.antiPrWarningHinglish} | Trigger: ${syn.flowTriggerHinglish}`);
+          }
+        }
+      }
+    }
+
+    // 4. 12th House Hidden Currency (Sampada) & Incubation
+    const fourthLordPlanet = SIGN_RULERS[chart.lagnaRashi as ZodiacSign] || "Moon";
+    const twelfthH = evaluateTwelfthHouseIntelligence(
+      lagnaSign,
+      chart.planets[fourthLordPlanet]?.house || 4,
+      mdPlanet,
+      "Jupiter",
+      6,
+      8,
+      12
+    );
+
+    // 5. Moon Dispositor Transit Health Timing
+    const moonSign = chart.planets.Moon?.sign || "Cancer";
+    const healthTiming = evaluateMoonDispositorHealthTiming(
+      moonSign,
+      undefined,
+      undefined,
+      false,
+      Boolean(chart.planets.Mercury?.house === 6 || chart.planets.Saturn?.house === 6),
+      Boolean(chart.planets.Mercury?.house === 3),
+      Boolean(chart.planets.Mercury?.house === 2 || chart.planets.Saturn?.house === 2)
+    );
+
+    // 6. Derivatives & Revenge Trading Addiction Risk
+    const tradingAudit = evaluateTradingRisk({
+      fifthLordAfflicted: Boolean(chart.planets.Rahu?.house === 5 || chart.planets.Saturn?.house === 5),
+      rahuInFifthEighthOrTwelfth: Boolean([5, 8, 12].includes(chart.planets.Rahu?.house || 0)),
+      moonAfflictedBySaturnMarsRahu: Boolean(
+        [chart.planets.Saturn?.house, chart.planets.Mars?.house, chart.planets.Rahu?.house].includes(
+          chart.planets.Moon?.house
+        )
+      ),
+      activeDashaEighthOrTwelfth: Boolean(activeMD?.planet === "Saturn" || activeMD?.planet === "Rahu"),
+      hasSubstantialLossesOrDebt: false,
+    });
+
+    // 7. Career Specifier D10
+    const careerSpec = evaluateCareerSpecifier({
+      d10SixthLordInLagna: false,
+      d10TenthLordWithRahu: false,
+      d10FourthLordDashaActive: false,
+      d10LagnaHasKetu: Boolean(chart.planets.Ketu?.house === 10 || chart.planets.Ketu?.house === 1),
+      mercuryKetuConjunction: Boolean(chart.planets.Mercury?.house === chart.planets.Ketu?.house),
+      risingNakshatra: chart.planets.Sun?.nakshatra,
+      moonNakshatra: chart.planets.Moon?.nakshatra,
+    });
+
+    // 8. Marana Karaka Sthana (MKS) Exalted Parabola
+    const mksAlerts: string[] = [];
+    for (const p of keyPlanets) {
+      const pD1 = chart.planets[p];
+      if (!pD1) continue;
+      const mksAudit = evaluateExaltedInMKS(p, pD1.house, pD1.dignity || "");
+      if (mksAudit.isRiseToFallParabola) {
+        mksAlerts.push(`✦ ${mksAudit.archetypeHinglish}: ${mksAudit.risePhaseHinglish} 🛑 ${mksAudit.fallWarningHinglish}`);
+      }
+    }
+
+    // 9. "Whose Problem Is It?" Karmic Transfer Rule
+    const whoseProblem = evaluateWhoseProblemIsIt(mdPlanet, false, false);
+
+    // 10. Saturn 4th House "Buy Back Time" Strategy
+    const saturnIn4 = chart.planets.Saturn?.house === 4;
+
+    // 11. Nadi Debility Peak Zenith Windows
+    const nadiDebility = evaluateNadiDebilityPeak(chart);
+    const nadiDebilityFindings = nadiDebility.evaluatedPlanets.map(
+      (ep) => `✦ ${ep.planet} (${ep.sign} ${ep.degree.toFixed(1)}°): Zenith Window ${ep.profile.overallPeakAgeRange} (Exact Sub-Window: ${ep.matchedSubWindow} — ${ep.subPhaseDetail}). ${ep.actionableAdviceHinglish}`
+    );
+
+    // 12. 12 Jyotirlinga Pilgrimage Sanctuary & 40-Day Assimilation Protocol
+    const pilgrimage = resolvePilgrimagePrescription(chart);
+
+    sections.push(`### 20. ADVANCED CLINICAL ASTROLOGY, MULTI-VARGA DIGNITY & PRACTICAL GUARDRAILS
+- Multi-Varga Cross-Dignity & The Founder's Dilemma:
+  ${vargaFindings.length ? vargaFindings.join("\n  ") : "✦ Balanced harmonic dignity across D1, D9 and D10."}
+${mksAlerts.length ? `- MKS Exalted "Rise-to-Fall" Parabola:\n  ${mksAlerts.join("\n  ")}` : ""}
+- Functional Debility & Gemstone Fallacy Guard:
+  ${debilityAlerts.length ? debilityAlerts.join("\n  ") : "✦ No debilitated functional superpower at risk of gemstone contraindication."}
+- Nadi Debility Peak Zenith Windows (Debility Inversion Alchemy):
+  ${nadiDebilityFindings.length ? nadiDebilityFindings.join("\n  ") : "✦ No debilitated planets triggering Nadi zenith windows."}
+- Ketu Conjunction Synergy & The Anti-PR Rule:
+  ${ketuSynergies.length ? ketuSynergies.join("\n  ") : "✦ No tight Ketu-planet conjunction requiring Anti-PR flow calibration."}
+- 12th House Sacred Currency (Sampada) & Incubation Protocol (${lagnaSign} Lagna ➔ ${twelfthH.sampadaProfile.twelfthSign} 12H):
+  ✦ Archetype: ${twelfthH.sampadaProfile.archetypeTitleHinglish}
+  ✦ Hidden Currency: ${twelfthH.sampadaProfile.hiddenCurrencyHinglish}
+  ✦ Preservation Rule: ${twelfthH.sampadaProfile.sacredPreservationGuidanceHinglish}
+  ${twelfthH.fourthLordAlienationInsight ? `✦ 4th Lord in 12th House: ${twelfthH.fourthLordAlienationInsight}` : ""}
+  ${twelfthH.viparitaRajaYoga.hasVRY ? `✦ Viparita Raja Yoga (${twelfthH.viparitaRajaYoga.type}): ${twelfthH.viparitaRajaYoga.groundZeroWillpowerHinglish}` : ""}
+- Moon Dispositor Health & Degree-Level Timing:
+  ✦ Natal Moon Dispositor: ${healthTiming.dispositorPlanet}
+  ✦ Exact Degree Recovery Window: ${healthTiming.exactDegreeRecoveryWindowHinglish}
+  ${healthTiming.environmentalClutterRemedyHinglish ? `✦ Environmental Remediation: ${healthTiming.environmentalClutterRemedyHinglish}` : ""}
+  ${healthTiming.nerveBurnoutTalismanHinglish ? `✦ Nerve & 3rd House Support: ${healthTiming.nerveBurnoutTalismanHinglish}` : ""}
+  ${healthTiming.vocalThyroidGuardrail ? `✦ Vocal/Thyroid Clinical Guardrail: ${healthTiming.vocalThyroidGuardrail.mandatoryClinicalDisclaimerHinglish}` : ""}
+- Speculative Trading & F&O Risk Circuit Breaker:
+  ✦ Risk Status: ${tradingAudit.speculativeRuinRisk} [Revenge Loop: ${tradingAudit.isRevengeTradingActive ? "ACTIVE" : "INACTIVE"}]
+  ✦ Action Directive: ${tradingAudit.circuitBreakerAction}
+  ✦ Diagnosis: ${tradingAudit.psychologicalDiagnosisHinglish}
+  ✦ Financial Guardrail: ${tradingAudit.mandatoryFinancialGuardrailHinglish}
+  ✦ Career Pivot: ${tradingAudit.careerPivotDirectiveHinglish}
+- Career Niche Specifier:
+  ✦ Archetype: ${careerSpec.primaryTitleHinglish}
+  ✦ Niche: ${careerSpec.subDomainNicheHinglish}
+  ✦ Workplace Mobility: ${careerSpec.officeMobilityStatusHinglish}
+  ${careerSpec.deepTechSignature ? `✦ Deep-Tech: ${careerSpec.deepTechSignature}` : ""}
+  ${careerSpec.leadershipArchetypeHinglish ? `✦ Leadership Signature: ${careerSpec.leadershipArchetypeHinglish}` : ""}
+- Karmic Diagnostics & Strategic Decision Rules:
+  ✦ "Whose Problem Is It?" Audit: ${whoseProblem.whoSuffersHinglish} [Dasha: ${whoseProblem.bhogaPlanet}] — ${whoseProblem.karmicTransferInsightHinglish}
+  ${saturnIn4 ? "✦ Saturn 4th House 'Buy Back Time' Rule: संपत्ति, वाहन या पारिवारिक निर्णयों में कभी जल्दबाजी न करें; 30-90 दिन टालने पर शनि की परिपक्वता नुकसान से बचाती है।" : ""}
+- 12 Jyotirlinga Pilgrimage Sanctuary & 40-Day Energy Assimilation:
+  ✦ Primary Sanctuary: ${pilgrimage.primaryJyotirlinga.hindiTitle} (${pilgrimage.primaryJyotirlinga.location}) [Freq: ${pilgrimage.primaryJyotirlinga.healingFrequencyHz}Hz | Rashi: ${pilgrimage.primaryJyotirlinga.rashiName}]
+  ✦ Astrological Trigger: ${pilgrimage.primaryMatchReasonHinglish}
+  ✦ Life-Crisis Resolved: ${pilgrimage.primaryJyotirlinga.lifeCrisisTrigger}
+  ✦ Karmic Knot Dissolved: ${pilgrimage.primaryJyotirlinga.karmicKnotDissolved}
+  ✦ Sacred Offering: ${pilgrimage.primaryJyotirlinga.sacredOffering}
+  ✦ Beej Mantra: ${pilgrimage.primaryJyotirlinga.beejMantra}
+  ✦ Secondary Sanctuaries: ${pilgrimage.secondaryJyotirlingas.map((s) => `${s.profile.name} (${s.profile.hindiTitle})`).join(", ")}
+  ✦ 40-Day Energy Assimilation Rule: ${pilgrimage.energyAssimilationRuleHinglish}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Advanced Clinical Astrology error:", err);
+  }
+
 
   return `\n══════════════════════════════════════════════════════════════════════
 ASTROLIFE MASTER MULTI-ENGINE CALCULATED CONTEXT (UNIFIED EVIDENCE)
