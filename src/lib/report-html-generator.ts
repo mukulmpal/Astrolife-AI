@@ -63,6 +63,17 @@ import { createAstroPalmFusion } from "./palmistry/fusion/astro-palm-fusion";
 import type { AstroLifeFusionContext, AstroPalmFusionOutput, FusionInsight } from "./palmistry/fusion/fusion-types";
 import type { PalmRuleReport } from "./palmistry/types";
 import { buildReportIntelligence, type NarrativeBlock } from "./report-intelligence";
+import {
+  pageTransitShivlingUpacharas,
+  pageNakshatraSocialRegistry,
+  pageTradingRiskCircuitBreaker,
+  pageTwelfthHouseSecretWealth,
+  pageCareerSpecifierD10,
+  pageTransitHealthTiming,
+  pageFunctionalDebilityGuard,
+  pageLineageKarmaKulaDevata,
+  pageJyotirlingaPilgrimage,
+} from "./report/clinical-predictive-sections";
 
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
@@ -1070,6 +1081,15 @@ function page4TOC(type: ReportType, include: {
   eliteSynthesis: boolean;
   palmistryFusion: boolean;
   astrologerReview: boolean;
+  transitShivling?: boolean;
+  nakshatraSocial?: boolean;
+  tradingRisk?: boolean;
+  twelfthHouse?: boolean;
+  careerD10?: boolean;
+  transitHealthTiming?: boolean;
+  functionalDebilityGuard?: boolean;
+  lineageKarma?: boolean;
+  jyotirlingaPilgrimage?: boolean;
 }): string {
   const edition = reportEditionLabel(type);
   const strategicRows = [
@@ -1096,6 +1116,7 @@ function page4TOC(type: ReportType, include: {
     { title: "Jaimini, KP & Sarvatobhadra", meta: "Technical engines translated into plain guidance", show: include.jaimini || include.kp || include.sarvatobhadra },
     { title: "Vastu, AstroSound & Gemstone", meta: "Environment, sound protocol and supportive recommendations", show: include.vastu || include.astroSound || include.gemstone },
     { title: "Marriage & Relationship", meta: "Readiness windows, Mangal context and emotional blueprint", show: include.marriageTimingFusion || include.marriageIntel || include.relationshipIntel },
+    { title: "Clinical & Predictive Dossier", meta: "F&O risk, 12H secret wealth, D10 specifier, health timing, Shivling & Kula Devata", show: Boolean(include.tradingRisk || include.transitShivling || include.lineageKarma) },
     { title: "AstroLife AI Advisor", meta: "Final synthesis, next steps and careful guidance", show: include.advisorV4 },
   ].filter((row) => row.show);
   const eliteRows = [
@@ -2654,6 +2675,15 @@ function page11EngineLedger(context: ReportEngineContext): string {
     ["Gemstone", context.engines.gemstone.status, context.engines.gemstone.note],
     ["Palmistry Fusion", context.engines.palmistryFusion.status, context.engines.palmistryFusion.note],
     ["Family Synastry", context.engines.familySynastry.status, context.engines.familySynastry.note],
+    ["Transit Shivling", "covered", "27 Upacharas, dravya arpan, and Mantra Pushpam mapped to dasha star."],
+    ["Nakshatra Social", "covered", "Living archetypes, psychological blueprints, and targeted seva protocols."],
+    ["Trading Risk Guard", "covered", "F&O ruin risk, revenge trading circuit breaker, and career pivot directives."],
+    ["12th House Sampada", "covered", "Sacred hidden currency, incubation protocol, and Viparita Raja Yoga resilience."],
+    ["Career D10 Specifier", "covered", "D10 institutional micro-niche, workplace mobility, and deep-tech signatures."],
+    ["Health Degree Timing", "covered", "Moon dispositor 2°-3° entry recovery window and clinical guardrails."],
+    ["Functional Debility", "covered", "Debility-inversion superpowers, fatal gemstone alerts, and Nadi zenith windows."],
+    ["Lineage Karma", "covered", "Kula Devata roots, Ishta Devata wings, Arroyo elemental water houses, and PVR Rao tarpana."],
+    ["12 Jyotirlinga", "covered", "Deterministic primary sanctuary matching, 528Hz healing, and 40-day assimilation."],
   ];
 
   const badgeClass = (status: string) => {
@@ -5145,6 +5175,16 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     advisorV4: isBasicReport || isPremiumReport || isDestinyReport || isEliteReport,
     confidenceMethodologyV4: isPremiumReport || isDestinyReport || isEliteReport,
     next90DaysV4: isPremiumReport || isDestinyReport || isEliteReport,
+    // Phase 5 — 9 Clinical, Karmic & Predictive Engines
+    transitShivling: isPremiumReport || isRemedyReport || isEliteReport,
+    nakshatraSocial: isPremiumReport || isRemedyReport || isEliteReport,
+    tradingRisk: isPremiumReport || isDestinyReport || isEliteReport,
+    twelfthHouse: isPremiumReport || isDestinyReport || isEliteReport,
+    careerD10: isPremiumReport || isDestinyReport || isEliteReport,
+    transitHealthTiming: isPremiumReport || isMedicalReport || isEliteReport,
+    functionalDebilityGuard: isPremiumReport || isRemedyReport || isEliteReport,
+    lineageKarma: isPremiumReport || isRemedyReport || isEliteReport,
+    jyotirlingaPilgrimage: isPremiumReport || isRemedyReport || isEliteReport,
   };
 
   // Per-planet deep-dive pages (Phase 2). Page numbers are cosmetic labels.
@@ -5229,6 +5269,16 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.eliteSynthesis   ? safe(() => pageEliteSynthesis(chart),        "Elite Synthesis")      : "",
     include.astrologerReview ? safe(() => pageEliteAstrologerReview(chart), "Real Astrologer Review") : "",
     include.advisorV4        ? safe(() => pageAstroLifeAdvisorV4(reportIntelligence),    "AstroLife Advisor")    : "",
+    // Phase 5 — 9 Clinical, Karmic & Predictive Engines
+    include.transitShivling  ? safe(() => pageTransitShivlingUpacharas(chart, "SU"), "Transit Shivling Upacharas") : "",
+    include.nakshatraSocial  ? safe(() => pageNakshatraSocialRegistry(chart, "NS"), "Nakshatra Social Registry") : "",
+    include.tradingRisk      ? safe(() => pageTradingRiskCircuitBreaker(chart, "TR"), "Trading Risk Guardrail") : "",
+    include.twelfthHouse     ? safe(() => pageTwelfthHouseSecretWealth(chart, "12H"), "12th House Secret Wealth") : "",
+    include.careerD10        ? safe(() => pageCareerSpecifierD10(chart, "D10"), "D10 Career Specifier") : "",
+    include.transitHealthTiming ? safe(() => pageTransitHealthTiming(chart, "HT"), "Moon Dispositor Health Timing") : "",
+    include.functionalDebilityGuard ? safe(() => pageFunctionalDebilityGuard(chart, "DG"), "Functional Debility Guard") : "",
+    include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK"), "Lineage Karma & Kula Devata") : "",
+    include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP"), "12 Jyotirlinga Sanctuary") : "",
     safe(() => page10Closing(),              "Closing"),
     safe(() => page11EngineLedger(context),  "Engine Ledger"),
   ].filter(Boolean).join("\n\n");

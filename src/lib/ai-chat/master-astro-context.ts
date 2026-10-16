@@ -7,6 +7,7 @@ import type { ChartData } from "../astro-engine/calculations";
 import { runNavtaraIntelligence } from "../astro-engine/navtara-engine";
 import { resolvePlanetTattvaRemedy } from "../astro-engine/navtara-remedies";
 import { buildNakshatraRemedyLlmPromptBlock } from "../astro-engine/nakshatra-remedy-engine";
+import { evaluateTransitNakshatraRemedy } from "../astro-engine/transit-nakshatra-remedies";
 import { evaluateDashaActivationWindows } from "../astro-engine/transit-trigger";
 import { runKPEngine } from "../astro-engine/kp";
 import { calculateLalKitab } from "../astro-engine/lalkitab";
@@ -153,6 +154,42 @@ ${triggerWindowsText ? `- Dasha Transit Triggers: ${triggerWindowsText}` : ""}`)
     }
   } catch (err) {
     console.warn("[MasterAstroContext] Nakshatra remedy block error:", err);
+  }
+
+  // ── 2C. TRANSIT NAKSHATRA & 27 SHIVLING UPACHARAS ENGINE ─────────────────────
+  try {
+    const transitRemedy = evaluateTransitNakshatraRemedy(chart);
+    if (transitRemedy) {
+      const shiv = transitRemedy.shivlingRemedy;
+      const adShiv = transitRemedy.antardashaShivlingRemedy;
+      const takYog = transitRemedy.distanceAnalysis;
+      const belief = transitRemedy.beliefGuidanceHinglish;
+
+      const pRemedies = transitRemedy.house6PlantRemedies.map((r) => `${r.planet}: ${r.plantName} — ${r.careInstructionsHinglish}`).join("; ");
+      const fRemedies = transitRemedy.house8FruitRemedies.map((r) => `${r.planet}: ${r.fruitName} — ${r.donationGuidanceHinglish}`).join("; ");
+      const dRemedies = transitRemedy.house12DonationRemedies.map((r) => `${r.planet} (${r.targetCategory}): ${r.donationTypeHinglish} — ${r.warningHinglish}`).join("; ");
+
+      sections.push(`### 2C. TRANSIT NAKSHATRA & 27 SHIVLING UPACHARAS ENGINE
+- Active Mahadasha Lord (${transitRemedy.activeDashaLord}) Transit Placement:
+  ✦ Transit: ${transitRemedy.transitSign} in Nakshatra #${transitRemedy.transitNakshatraNumber} (${transitRemedy.transitNakshatra})
+  ✦ Navtara from Moon: Tara #${transitRemedy.taraNumber} ${transitRemedy.taraName} (${transitRemedy.taraRelationType}) — ${transitRemedy.taraExplanationHinglish}
+  ✦ Prescribed Shivling Upachara: Upachara #${shiv.upacharaNumber} ${shiv.upacharaName} — ${shiv.hindiTitle}
+  ✦ Sacred Offering: ${shiv.itemOrOffering}
+  ✦ Significance: ${shiv.significanceHinglish}
+  ✦ Procedure: ${shiv.procedureNarrativeHinglish}
+${adShiv ? `- Active Antardasha Lord (${transitRemedy.activeAntardashaLord}) Transit Upachara:
+  ✦ Transit: ${transitRemedy.antardashaTransitSign} in Nakshatra #${transitRemedy.antardashaTransitNakshatraNumber} (${transitRemedy.antardashaTransitNakshatra})
+  ✦ Shivling Upachara: Upachara #${adShiv.upacharaNumber} ${adShiv.upacharaName} (${adShiv.hindiTitle}) — Offering: ${adShiv.itemOrOffering}` : ""}
+${takYog ? `- Dasha-Antardasha Distance & Harmonics:
+  ✦ Mutual Axis: ${takYog.mutualAxis} (${takYog.impactDescriptionHinglish})
+  ✦ Tak Yog (6/8 Alert): ${takYog.isTakYog ? `⚠️ ACTIVE: ${takYog.takYogRemedyHinglish}` : "Clean (No Tak Yog friction)"}` : ""}
+- House 6/8/12 Remedial Regimen:
+  ✦ 6th House Plant Shraddha (Blind Faith): ${belief.house6MessageHinglish} | Placements: ${pRemedies || "None"}
+  ✦ 8th House Fruits & Transformation: ${fRemedies || "None"}
+  ✦ 12th House Strict Parikshan (Never Blindly Believe): ${belief.house12MessageHinglish} | Donations: ${dRemedies || "None"}`);
+    }
+  } catch (err) {
+    console.warn("[MasterAstroContext] Transit Nakshatra Shivling error:", err);
   }
 
   // ── 3. KP SYSTEM (KRISHNAMURTI PADDHATI) ────────────────────────────────────
