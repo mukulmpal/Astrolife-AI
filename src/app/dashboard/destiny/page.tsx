@@ -7,6 +7,7 @@ import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
+import { ClinicalPredictiveDossier } from "@/components/clinical/ClinicalPredictiveDossier";
 
 const PLANET_SHORT: Record<string, string> = {
   Sun: "Su",
@@ -782,6 +783,21 @@ export default function DestinyPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Deep Clinical Predictive Intelligence Dossier ── */}
+      {chart && (
+        <div style={{ marginTop: 32 }}>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 24, fontWeight: 700, color: "#1A1A1A", margin: 0 }}>
+              🧬 Clinical Predictive Intelligence & Karmic Circuitry (नाड़ी सूत्र)
+            </h2>
+            <p style={{ fontSize: 13, color: "#6B635B", margin: "4px 0 0" }}>
+              नाड़ी एवं पराशरी परंपरा के 5 सूक्ष्म गणितीय इंजन: नीच ग्रहों का जेनित काल, D10 कार्यक्षेत्र, आरोग्य तिथि, 12वें भाव की गुप्त संपदा और ट्रेडिंग रिस्क सुरक्षा।
+            </p>
+          </div>
+          <ClinicalPredictiveDossier chart={chart} defaultSection="all" />
         </div>
       )}
       </PremiumFeature>

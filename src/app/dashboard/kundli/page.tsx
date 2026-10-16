@@ -21,6 +21,7 @@ import EditChartModal from "@/components/charts/EditChartModal";
 import DeleteChartModal from "@/components/charts/DeleteChartModal";
 import MasterKundliDossierPanel from "@/components/charts/MasterKundliDossierPanel";
 import PillarNarrativeCard from "@/components/charts/PillarNarrativeCard";
+import { ClinicalPredictiveDossier } from "@/components/clinical/ClinicalPredictiveDossier";
 import {
   generateCareerPillarNarrative,
   generateMarriagePillarNarrative,
@@ -865,6 +866,7 @@ export default function KundliPage() {
               {[
                 { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
                 { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "7 Pillars" },
+                { id: "clinical", label: "🧬 Clinical Intelligence (नाड़ी सूत्र)", badge: "5 Engines" },
                 { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
                 { id: "marriage", label: "💍 Love & Marriage (D-9)", badge: "Navamsha" },
                 { id: "timing", label: "⏳ Timing & Dashas", badge: "Vimshottari" },
@@ -1691,6 +1693,15 @@ export default function KundliPage() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════════════ */}
+            {/* PILLAR: CLINICAL INTELLIGENCE (5 DEEP ENGINES)         */}
+            {/* ══════════════════════════════════════════════════════ */}
+            {activeTab === "clinical" && (
+              <div className="space-y-4">
+                <ClinicalPredictiveDossier chart={chart} defaultSection="all" />
               </div>
             )}
 
