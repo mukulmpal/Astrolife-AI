@@ -11,7 +11,7 @@ import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { createClient } from "@/lib/supabase/client";
-import { calculateDivisional, type DivChart } from "@/lib/astro-engine/divisional";
+import { calculateDivisional, getDashamshaAnalysis, type DivChart } from "@/lib/astro-engine/divisional";
 import { isFullAccessEnabled, isEliteEmail, normalizeTier } from "@/lib/access";
 import { DailyPanchangWidget } from "@/components/panchang/DailyPanchangWidget";
 import { ChartProofChatDrawer } from "@/components/chat/ChartProofChatDrawer";
@@ -357,6 +357,42 @@ export default function KundliPage() {
       res[p.planet] = { house: p.house, retrograde: p.retrograde, signNum: p.signNum };
     });
     return res;
+  }, [d10]);
+
+  const d10Analysis = useMemo(() => {
+    if (!d10) return [];
+    return getDashamshaAnalysis(d10);
+  }, [d10]);
+
+  const d10Meta = useMemo(() => {
+    if (!d10) return null;
+    const SIGNS_LIST = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+    const RASHI_LORDS_LIST = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+    const lagnaLord = RASHI_LORDS_LIST[d10.lagnaNum] || "Mercury";
+    const tenthSignNum = ((d10.lagnaNum + 9) % 12 + 12) % 12;
+    const tenthSign = SIGNS_LIST[tenthSignNum];
+    const tenthLord = RASHI_LORDS_LIST[tenthSignNum] || "Saturn";
+    const tenthPlanets = d10.planets.filter((p) => p.house === 10);
+    const lagnaPlanets = d10.planets.filter((p) => p.house === 1);
+    const secondPlanets = d10.planets.filter((p) => p.house === 2);
+    const eleventhPlanets = d10.planets.filter((p) => p.house === 11);
+    const exaltedPlanets = d10.planets.filter((p) => p.dignity === "Exalted");
+    const ownPlanets = d10.planets.filter((p) => p.dignity === "Own");
+    const tenthLordPlanet = d10.planets.find((p) => p.planet === tenthLord);
+
+    return {
+      lagnaLord,
+      tenthSign,
+      tenthLord,
+      tenthLordHouse: tenthLordPlanet?.house,
+      tenthLordSign: tenthLordPlanet?.sign,
+      tenthPlanets,
+      lagnaPlanets,
+      secondPlanets,
+      eleventhPlanets,
+      exaltedPlanets,
+      ownPlanets,
+    };
   }, [d10]);
 
   const activeMD = chart?.dashas.find((d) => d.active);
@@ -1236,37 +1272,137 @@ export default function KundliPage() {
                       <div className="py-20 text-center text-[#6B635B]">D-10 Not Calculated</div>
                     )}
 
+                    {/* Dynamic D-10 Career Insights */}
                     <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12 }}>
-                      <div style={{ fontSize: 11, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4, fontWeight: 700 }}>
-                        D-10 Career Insight
+                      <div className="flex items-center justify-between mb-2">
+                        <div style={{ fontSize: 11, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 700 }}>
+                          D-10 Micro-Karma Insights (दशांश विश्लेषण)
+                        </div>
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[rgba(184,134,11,0.15)] text-[#B8860B]">
+                          Operational Status
+                        </span>
                       </div>
-                      <div style={{ fontSize: 13.5, color: "#3D3834", lineHeight: 1.7 }}>
-                        {d10?.keyInsight || "Dasamsha chart profession, authority, promotion aur public life me aapke karma sthiti ko darshata hai."}
+                      <div className="space-y-2">
+                        {d10Analysis.length > 0 ? (
+                          d10Analysis.map((insight, idx) => (
+                            <div key={idx} className="flex items-start gap-2 text-xs text-[#3D3834] leading-relaxed">
+                              <span className="text-[#B8860B] font-bold mt-0.5">✦</span>
+                              <span>{insight}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div style={{ fontSize: 13, color: "#3D3834", lineHeight: 1.7 }}>
+                            {d10?.keyInsight || "Dasamsha chart profession, authority, promotion aur public life me aapke karma sthiti ko darshata hai."}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  {/* Career & Wealth Reading Breakdown */}
+                  {/* Career & Wealth Reading Breakdown: D-10 + D-1 Dual Framework */}
                   <div className="space-y-4">
                     <div className="card">
-                      <div className="card-tag">✦ 10th House Karma Analysis</div>
-                      <div className="card-title serif">Professional Alignment</div>
+                      <div className="card-tag">✦ True D-10 vs D-1 Alignment</div>
+                      <div className="card-title serif">Professional Matrix (कर्म विधान)</div>
                       <div className="space-y-3 text-xs text-[#3D3834] leading-relaxed">
-                        <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)]">
-                          <div className="font-bold text-[#1A1A1A] mb-1">
-                            10th House from Lagna: {chart.houseCusps?.[9]?.sign ?? "10th Bhava"}
-                          </div>
-                          <div className="text-[#3D3834]">
-                            Yeh bhav aapke professional reputation, karma kshetra aur leadership potential ko govern karta hai.
-                          </div>
-                        </div>
+                        {/* D-10 Operational Reality Card */}
+                        {d10 && d10Meta && (
+                          <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.3)] shadow-xs">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                                <span className="text-[#B8860B]">⚡</span> D-10 Dasamsha (कार्यक्षेत्र महाफल)
+                              </span>
+                              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[#FAF2DC] text-[#9A6B00]">
+                                Operational Reality
+                              </span>
+                            </div>
+                            
+                            <div className="space-y-2 text-xs">
+                              <div>
+                                <span className="text-[#7D6B58] font-medium">10th House (Karma Kshetra): </span>
+                                <strong className="text-[#1A1A1A]">{d10Meta.tenthSign}</strong>
+                                <span className="text-[#6B635B]"> (Swami: {d10Meta.tenthLord}{d10Meta.tenthLordHouse ? ` in House ${d10Meta.tenthLordHouse}` : ""})</span>
+                                {d10Meta.tenthPlanets.length > 0 && (
+                                  <div className="mt-0.5 text-[#B8860B] font-semibold">
+                                    Occupants: {d10Meta.tenthPlanets.map((p) => `${p.planet}${p.dignity !== "—" ? ` (${p.dignity})` : ""}`).join(", ")}
+                                  </div>
+                                )}
+                              </div>
 
-                        <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)]">
-                          <div className="font-bold text-[#1A1A1A] mb-1">
-                            2nd & 11th Houses (Dhana & Labha)
+                              <div>
+                                <span className="text-[#7D6B58] font-medium">D-10 Lagna & Persona: </span>
+                                <strong className="text-[#1A1A1A]">{d10.lagna}</strong>
+                                <span className="text-[#6B635B]"> (Lagna Lord: {d10Meta.lagnaLord})</span>
+                                {d10Meta.lagnaPlanets.length > 0 && (
+                                  <div className="mt-0.5 text-[#8B6508] font-medium">
+                                    In Lagna: {d10Meta.lagnaPlanets.map((p) => `${p.planet}${p.dignity !== "—" ? ` (${p.dignity})` : ""}`).join(", ")}
+                                  </div>
+                                )}
+                              </div>
+
+                              {(d10Meta.exaltedPlanets.length > 0 || d10Meta.ownPlanets.length > 0) && (
+                                <div className="pt-1">
+                                  <span className="text-[#7D6B58] font-medium">Prominent Dignities: </span>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {d10Meta.exaltedPlanets.map((p) => (
+                                      <span
+                                        key={p.planet}
+                                        className="px-2 py-0.5 rounded text-[11px] bg-[rgba(34,197,94,0.12)] text-[#15803d] font-bold border border-[rgba(34,197,94,0.3)]"
+                                      >
+                                        ★ {p.planet} Exalted in {p.sign} (H{p.house})
+                                      </span>
+                                    ))}
+                                    {d10Meta.ownPlanets.map((p) => (
+                                      <span
+                                        key={p.planet}
+                                        className="px-2 py-0.5 rounded text-[11px] bg-[rgba(184,134,11,0.12)] text-[#9A6B00] font-bold border border-[rgba(184,134,11,0.3)]"
+                                      >
+                                        ● {p.planet} Own Sign ({p.sign})
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              <div>
+                                <span className="text-[#7D6B58] font-medium">Wealth & Cashflow (H2 & H11): </span>
+                                <span className="text-[#3D3834]">
+                                  {d10Meta.eleventhPlanets.length > 0
+                                    ? `11th House: ${d10Meta.eleventhPlanets.map((p) => p.planet).join(", ")} | `
+                                    : ""}
+                                  {d10Meta.secondPlanets.length > 0
+                                    ? `2nd House: ${d10Meta.secondPlanets.map((p) => p.planet).join(", ")}`
+                                    : "Retention governed by 2nd lord"}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-[#3D3834]">
-                            2nd house (Accumulated Wealth) aur 11th house (Regular Cashflow & Gains) aapke financial retention ko shape karte hain.
+                        )}
+
+                        {/* D-1 Natal Foundation Card */}
+                        <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)]">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                              <span className="text-[#B8860B]">🌱</span> D-1 Natal Seed (जन्म कर्म बीज)
+                            </span>
+                            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[rgba(184,134,11,0.1)] text-[#B8860B]">
+                              Innate Potential
+                            </span>
+                          </div>
+                          <div className="text-[#3D3834] space-y-1">
+                            <div>
+                              <span className="text-[#7D6B58]">10th Cusp from Lagna: </span>
+                              <strong>{chart.houseCusps?.[9]?.sign ?? "10th Bhava"}</strong>
+                            </div>
+                            {charaKarakas["Amatyakaraka (AmK)"] && (
+                              <div>
+                                <span className="text-[#7D6B58]">Amatyakaraka (AmK): </span>
+                                <strong>{charaKarakas["Amatyakaraka (AmK)"]}</strong>
+                              </div>
+                            )}
+                            <div className="text-[11.5px] text-[#6B635B] pt-0.5">
+                              D-1 जातक की आंतरिक अभिरुचि, ज्ञान और जीवन दिशा (बीज) तय करता है।
+                            </div>
                           </div>
                         </div>
 

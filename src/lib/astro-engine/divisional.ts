@@ -527,26 +527,89 @@ export function getNavamshaAnalysis(d9: DivChart): string[] {
   return insights;
 }
 
+const D10_RASHI_LORDS = [
+  "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury",
+  "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"
+];
+
 export function getDashamshaAnalysis(d10: DivChart): string[] {
   const insights: string[] = [];
+  const lagnaLord = D10_RASHI_LORDS[d10.lagnaNum] || "Mercury";
+  const lagnaLordPlanet = d10.planets.find(p => p.planet === lagnaLord);
+
+  // 10th House (Karma Kshetra) in D-10
+  const tenthSignNum = md(d10.lagnaNum + 9, 12);
+  const tenthSign = SIGNS[tenthSignNum];
+  const tenthLord = D10_RASHI_LORDS[tenthSignNum] || "Saturn";
+  const tenthLordPlanet = d10.planets.find(p => p.planet === tenthLord);
+  const tenthPlanets = d10.planets.filter(p => p.house === 10);
+  const lagnaPlanets = d10.planets.filter(p => p.house === 1);
+
+  // Key Grahas
   const sun  = d10.planets.find(p=>p.planet==="Sun");
+  const moon = d10.planets.find(p=>p.planet==="Moon");
   const sat  = d10.planets.find(p=>p.planet==="Saturn");
   const jup  = d10.planets.find(p=>p.planet==="Jupiter");
   const merc = d10.planets.find(p=>p.planet==="Mercury");
   const mars = d10.planets.find(p=>p.planet==="Mars");
   const ven  = d10.planets.find(p=>p.planet==="Venus");
+  const rahu = d10.planets.find(p=>p.planet==="Rahu");
+  const ketu = d10.planets.find(p=>p.planet==="Ketu");
+
+  // D-10 Lagnesh Analysis
+  if (lagnaLordPlanet) {
+    if (lagnaLordPlanet.house === 1) {
+      insights.push(`D-10 Lagnesh ${lagnaLord} in 1st House (${d10.lagna}) — High personal command, executive authority, and autonomous reputation in professional life.`);
+    } else if (lagnaLordPlanet.house === 10) {
+      insights.push(`D-10 Lagnesh ${lagnaLord} in 10th House (${tenthSign}) — Natural corporate/public authority. Professional identity directly defines life status.`);
+    } else if ([5, 9].includes(lagnaLordPlanet.house)) {
+      insights.push(`D-10 Lagnesh ${lagnaLord} in ${lagnaLordPlanet.house}th Trikona — Deep intellectual authority, mentorship capability, and creative enterprise expansion.`);
+    } else if (lagnaLordPlanet.house === 11) {
+      insights.push(`D-10 Lagnesh ${lagnaLord} in 11th House — Direct conversion of professional skill into massive financial gains and expansive elite networks.`);
+    }
+  }
+
+  // D-10 10th Lord Analysis
+  if (tenthLordPlanet) {
+    insights.push(`D-10 Karma Lord (${tenthLord}) placed in ${tenthLordPlanet.house}th house (${tenthLordPlanet.sign}${tenthLordPlanet.dignity !== "—" ? `, ${tenthLordPlanet.dignity}` : ""}) — Determines real-world workplace execution, promotions, and organizational standing.`);
+  }
+
+  // D-10 10th House Occupants
+  if (tenthPlanets.length > 0) {
+    insights.push(`10th House in D-10 occupied by ${tenthPlanets.map(p => `${p.planet}${p.dignity !== "—" ? ` (${p.dignity})` : ""}`).join(", ")} — Prime operational driver of your day-to-day career focus.`);
+  }
+
+  // D-10 Lagna Occupants
+  if (lagnaPlanets.length > 0) {
+    insights.push(`D-10 Lagna occupied by ${lagnaPlanets.map(p => `${p.planet}${p.dignity !== "—" ? ` (${p.dignity})` : ""}`).join(", ")} — Shapes workplace personality, negotiation stance, and peer perception.`);
+  }
+
+  // Classical planet strengths
   if(sun?.house===10||sun?.dignity==="Exalted")
-    insights.push("Sun powerful in D-10 — government, authority, leadership. Career recognition is assured and lasting.");
+    insights.push("Sun powerful in D-10 — government, executive authority, apex leadership. Career recognition is assured and lasting.");
   if(sat?.dignity==="Exalted"||sat?.dignity==="Own")
-    insights.push("Strong Saturn in D-10 — service-oriented career. Disciplined rise to lasting recognition.");
-  if(jup?.dignity==="Exalted"||jup?.house===10)
-    insights.push("Jupiter strong in D-10 — teaching, law, finance, or advisory career. Wisdom-based professional success.");
-  if(merc?.dignity==="Exalted"||merc?.house===10)
-    insights.push("Mercury strong in D-10 — business, writing, media, or analytics. Communication is your career superpower.");
+    insights.push("Strong Saturn in D-10 — resilient systems architecture, patient compounding, disciplined rise to sovereign status.");
+  if(jup?.dignity==="Exalted"||jup?.house===10||jup?.house===1)
+    insights.push("Jupiter prominent in D-10 — advisory, consulting, jurisprudence, fintech, or academy. Wisdom-backed public trust.");
+  if(merc?.dignity==="Exalted"||merc?.house===10||merc?.house===11)
+    insights.push("Mercury powerful in D-10 — deep tech, quantitative algorithms, high-volume commerce, analytics, and elite communication.");
   if(mars?.dignity==="Exalted"||mars?.house===10)
-    insights.push("Mars strong in D-10 — engineering, military, surgery, sports, or executive leadership are ideal career paths.");
+    insights.push("Mars strong in D-10 — engineering, technical infrastructure, bold executive execution, crisis management.");
   if(ven?.dignity==="Exalted"||ven?.house===10)
-    insights.push("Venus strong in D-10 — arts, entertainment, luxury brands, beauty, or diplomacy as career. Public appreciation.");
+    insights.push("Venus strong in D-10 — design, luxury, creative media, diplomacy, and client-facing prestige.");
+  if(rahu?.house===10||rahu?.house===11||rahu?.house===2)
+    insights.push("Rahu in prominent D-10 wealth/karma house — exponential scaling through cutting-edge technology, foreign markets, or disruptive business models.");
+  if(ketu?.house===1)
+    insights.push("Ketu in D-10 Lagna — sovereign founder archetype. Desires total creative freedom, rejects micro-management.");
+  if(moon?.house===10||moon?.dignity==="Exalted")
+    insights.push("Moon strong in D-10 — public resonance, mass customer loyalty, and fluid commercial acumen.");
+
+  // Exalted planets in D10
+  const exaltedPlanets = d10.planets.filter(p => p.dignity === "Exalted");
+  if (exaltedPlanets.length > 0) {
+    insights.push(`Exalted in D-10: ${exaltedPlanets.map(p => `${p.planet} in House ${p.house} (${p.sign})`).join(", ")} — Extraordinary breakthrough capacity in this domain.`);
+  }
+
   if(insights.length===0) insights.push("D-10 reveals career dharma. Study the 10th lord and Sun position for professional peak and timing.");
   return insights;
 }

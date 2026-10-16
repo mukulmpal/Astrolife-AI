@@ -110,6 +110,7 @@ export function generateCareerPillarNarrative(
   const lagnaRashi = chart.lagnaRashi || "Aries";
   const moonRashi = p.Moon?.sign || "Aries";
 
+  // D-1 Natal Foundations (Bija - Potential & Karma Seed)
   const tenthLord = getHouseLord(lagnaNum, 10);
   const tenthPlanets = getPlanetsInHouse(chart, 10);
   const secondLord = getHouseLord(lagnaNum, 2);
@@ -120,7 +121,29 @@ export function generateCareerPillarNarrative(
   const amatyakarakaEntry = Object.entries(charaKarakas).find(([_, v]) => v.includes("AmK") || v.includes("Amatya"));
   const amatyakarakaPlanet = amatyakarakaEntry ? amatyakarakaEntry[0] : (chart.lagnaLord || tenthLord);
 
-  const d10Lagna = d10?.lagna || lagnaRashi;
+  // D-10 Dasamsha Operational Reality (Phala - Workplace Status & Execution)
+  const d10LagnaSign = d10?.lagna || lagnaRashi;
+  const d10LagnaNum = typeof d10?.lagnaNum === "number" ? d10.lagnaNum : (((lagnaNum - 1) % 12) + 12) % 12;
+  const d10LagnaLord = RASHI_LORDS[d10LagnaNum] || "Mercury";
+
+  const d10TenthSignIndex = (d10LagnaNum + 9) % 12;
+  const d10TenthSignName = Object.keys(SIGN_NAMES_HINDI)[d10TenthSignIndex] || "Capricorn";
+  const d10TenthLord = RASHI_LORDS[d10TenthSignIndex] || "Saturn";
+
+  const d10PlanetsList = d10?.planets || [];
+  const d10TenthPlanets = d10PlanetsList.filter((pl) => pl.house === 10);
+  const d10LagnaPlanets = d10PlanetsList.filter((pl) => pl.house === 1);
+  const d10SecondPlanets = d10PlanetsList.filter((pl) => pl.house === 2);
+  const d10EleventhPlanets = d10PlanetsList.filter((pl) => pl.house === 11);
+  const d10SixthPlanets = d10PlanetsList.filter((pl) => pl.house === 6);
+
+  const d10Exalted = d10PlanetsList.filter((pl) => pl.dignity === "Exalted");
+  const d10Own = d10PlanetsList.filter((pl) => pl.dignity === "Own");
+  const d10Deb = d10PlanetsList.filter((pl) => pl.dignity === "Debilitated");
+
+  const d10TenthLordPl = d10PlanetsList.find((pl) => pl.planet === d10TenthLord);
+  const d10LagnaLordPl = d10PlanetsList.find((pl) => pl.planet === d10LagnaLord);
+
   const lagnaGem = GEMSTONES_BY_LORD[chart.lagnaLord || "Mercury"] || GEMSTONES_BY_LORD.Mercury;
 
   // Real-time Gochar computation
@@ -170,35 +193,54 @@ export function generateCareerPillarNarrative(
   }
 
   const tenthDescription = tenthPlanets.length > 0
-    ? `दशम भाव में ${tenthPlanets.join(" व ")} देव की उपस्थिति और कर्मेश ${tenthLord} देव का प्रभाव`
-    : `दशम भाव के अधिपति कर्मेश ${tenthLord} देव का प्रभाव`;
+    ? `D-1 दशम भाव में ${tenthPlanets.join(" व ")} और कर्मेश ${tenthLord} देव का प्रभाव`
+    : `D-1 दशम भाव के अधिपति कर्मेश ${tenthLord} देव का प्रभाव`;
 
   const wealthDescription = (secondPlanets.length > 0 || eleventhPlanets.length > 0)
-    ? `द्वितीय भाव में ${secondPlanets.length > 0 ? secondPlanets.join(", ") : secondLord} और एकादश भाव में ${eleventhPlanets.length > 0 ? eleventhPlanets.join(", ") : eleventhLord} का संरेखण`
-    : `द्वितीयेश ${secondLord} (धन) और एकादशेश ${eleventhLord} (लाभ) का परस्पर संबंध`;
+    ? `D-1 द्वितीय भाव में ${secondPlanets.length > 0 ? secondPlanets.join(", ") : secondLord} और एकादश भाव में ${eleventhPlanets.length > 0 ? eleventhPlanets.join(", ") : eleventhLord}`
+    : `D-1 द्वितीयेश ${secondLord} (धन) और एकादशेश ${eleventhLord} (लाभ) का परस्पर संबंध`;
+
+  const d10KeyBadges: string[] = [];
+  if (d10TenthPlanets.length > 0) {
+    d10KeyBadges.push(`10th: ${d10TenthPlanets.map(pl => pl.planet).join(", ")}`);
+  }
+  if (d10LagnaPlanets.length > 0) {
+    d10KeyBadges.push(`Lagna: ${d10LagnaPlanets.map(pl => pl.planet).join(", ")}`);
+  }
+  if (d10Exalted.length > 0) {
+    d10KeyBadges.push(`उच्च: ${d10Exalted.map(pl => `${pl.planet}(${pl.sign})`).join(", ")}`);
+  }
+  const d10HighlightSummary = d10KeyBadges.length > 0 
+    ? `D-10 (${d10LagnaSign} लग्न | ${d10KeyBadges.join(" | ")})`
+    : `D-10 ${d10LagnaSign} लग्न (कर्मेश: ${d10TenthLord})`;
 
   const chapters: PillarChapter[] = [
     {
       chapterNum: 1,
-      title: "प्रथम सोपान: जन्म का कर्म-बीज — दशम भाव, दशमांश (D-10) और आमात्यकारक",
+      title: "प्रथम सोपान: जन्म का कर्म-बीज (D-1) व दशमांश का महाफल (D-10) — आमात्यकारक संरेखण",
       subtitle: "आपकी व्यावसायिक आत्मा की मूल संरचना: स्वायत्त प्रभुत्व, पेशेवर पहचान और नेतृत्व",
       icon: "🏛️",
-      keyHighlight: `${tenthDescription}: दशमांश (D-10) में ${d10Lagna} लग्न के साथ स्वतंत्र पहचान का निर्माण`,
+      keyHighlight: `${tenthDescription} ➔ ${d10HighlightSummary}`,
       paragraphs: [
-        `जब हम ${name} जी की जन्म कुंडली के कर्म क्षेत्र (10th Bhava) और दशमांश चक्र (D-10 Dasamsha) का सूक्ष्म शास्त्रीय परीक्षण करते हैं, तो आपकी व्यावसायिक प्रकृति का मूल आधार स्पष्ट रूप से सामने आता है। आपकी कुंडली में ${tenthDescription} यह सिद्ध करता है कि आपका कार्यक्षेत्र किसी सामान्य, रूटीन बंधन में बंधकर नहीं रह सकता; आपके भीतर अपनी पहचान, बौद्धिक विज़न और स्वायत्त निर्णय लेने की प्रबल भूख है।`,
-        `दशमांश चक्र (D-10) को वैदिक ज्योतिष में 'महाफल' और 'कर्म का सूक्ष्म दर्पण' कहा जाता है। आपके D-10 में ${d10Lagna} लग्न का उदय होना यह दर्शाता है कि आपकी आजीविका और सफलता का मुख्य मार्ग 'कुशल विशेषज्ञता, रणनीतिक योजना और स्वतंत्र उत्तरदायित्व' से जुड़ा हुआ है। जैमिनी ज्योतिष के नियमानुसार आपके आमात्यकारक (Amatyakaraka - AmK) ${amatyakarakaPlanet} देव हैं। आमात्यकारक वह मंत्री है जो कर्म की नाव को पार लगाता है — इसका अर्थ यह है कि आपकी उन्नति किसी की चापलूसी या शॉर्टकट से नहीं, बल्कि आपके गहन ज्ञान, समस्या-निवारण और तकनीकी कौशल से ही सिद्ध होगी।`,
-        `आप जब भी किसी ऐसे प्रोजेक्ट पर काम करते हैं जहाँ आपके अपने निर्णय लेने की पूरी आज़ादी हो, तो आपकी उत्पादकता कई गुना बढ़ जाती है। आपकी व्यावसायिक आत्मा का धर्म ही 'स्वायत्त सृजन' (Autonomous Creation) है।`
+        `वैदिक ज्योतिष में महर्षि पाराशर का स्पष्ट सिद्धांत है कि जन्म कुंडली (D-1) व्यक्ति की आंतरिक अभिरुचि, मानसिक क्षमता और कर्म का 'बीज' (Innate Potential & Karma Seed) दर्शाती है, जबकि दशमांश चक्र (D-10 Dasamsha) कार्यस्थल पर वास्तविक पद, सहकर्मियों की स्वीकृति, पदोन्नति और अधिकार का 'सूक्ष्म महाफल' (Real Execution & Status) निर्धारित करता है।`,
+        `आपकी जन्म कुंडली (D-1) में ${tenthDescription} यह सिद्ध करता है कि आपका कार्यक्षेत्र किसी सामान्य, रूटीन बंधन में बंधकर नहीं रह सकता; आपके भीतर अपनी पहचान, बौद्धिक विज़न और स्वायत्त निर्णय लेने की प्रबल भूख है। वहीं जब हम सूक्ष्म कर्म दर्पण दशमांश चक्र (D-10) का अन्वेषण करते हैं, तो यहाँ ${SIGN_NAMES_HINDI[d10LagnaSign] || d10LagnaSign} लग्न उदित होता है। D-10 का कर्म भाव (10th Bhava) ${SIGN_NAMES_HINDI[d10TenthSignName] || d10TenthSignName} राशि में पड़ता है, जिसके अधिपति ${d10TenthLord} देव हैं${d10TenthLordPl ? ` (जो D-10 के ${d10TenthLordPl.house}वें भाव में ${d10TenthLordPl.sign} राशि में स्थित हैं)` : ""}।`,
+        `${d10TenthPlanets.length > 0 
+          ? `दशमांश के 10वें भाव में ${d10TenthPlanets.map(pl => `${pl.planet} देव${pl.dignity !== "—" ? ` (${pl.dignity})` : ""}`).join(" व ")} की सीधी उपस्थिति दर्शाती है कि आपकी दैनिक पेशेवर जिम्मेदारियों में उच्च रणनीतिक निर्णय, सार्वजनिक प्रभाव और स्वतंत्र अधिकार का बोलबाला रहेगा।` 
+          : `D-10 के कर्मेश ${d10TenthLord} देव की स्थिति यह सिद्ध करती है कि आपके काम को बिना किसी बाहरी दबाव के सीधे परिणामों (Tangible Deliverables) और विशेषज्ञता के आधार पर आंका जाएगा।`} ${d10LagnaPlanets.length > 0 ? `इसके साथ ही, D-10 के लग्न (1st House) में ${d10LagnaPlanets.map(pl => `${pl.planet}${pl.dignity !== "—" ? ` (${pl.dignity})` : ""}`).join(" व ")} का बैठना आपको सहकर्मियों और बाज़ार के बीच एक गंभीर, स्वायत्त और सम्मानित लीडर का कद प्रदान करता है।` : ""} ${d10Exalted.length > 0 ? `विशेष रूप से D-10 में ${d10Exalted.map(pl => `${pl.planet} देव (${pl.sign} में उच्च, ${pl.house}वां भाव)`).join(", ")} की उच्च स्थिति आपके पेशेवर जीवन में एक ऐसा अभूतपूर्व अस्त्र है जो कठिन से कठिन बाज़ार में भी आपको अप्रत्याशित सफलता दिलाएगा।` : ""}`,
+        `जैमिनी ज्योतिष के नियमानुसार आपके आमात्यकारक (Amatyakaraka - AmK) ${amatyakarakaPlanet} देव हैं। आमात्यकारक वह मंत्री है जो कर्म की नाव को पार लगाता है — इसका अर्थ यह है कि आपकी उन्नति किसी की चापलूसी या शॉर्टकट से नहीं, बल्कि आपके गहन ज्ञान, समस्या-निवारण और तकनीकी कौशल से ही सिद्ध होगी।`
       ]
     },
     {
       chapterNum: 2,
-      title: "द्वितीय सोपान: धन व महालाभ का गुप्त तंत्र — द्वितीय (धन) व एकादश (लाभ) भाव",
+      title: "द्वितीय सोपान: धन व महालाभ का गुप्त तंत्र — द्वितीय (धन) व एकादश (लाभ) भाव (D-1 एवं D-10)",
       subtitle: "संचित पूंजी, नियमित नकद प्रवाह और बहु-स्रोतीय वित्तीय विस्तार का योग",
       icon: "💎",
-      keyHighlight: `${wealthDescription}: कौशल और सिस्टम्स के माध्यम से स्थायी संपत्ति का निर्माण`,
+      keyHighlight: `${wealthDescription}${d10EleventhPlanets.length > 0 ? ` + D-10 एकादश: ${d10EleventhPlanets.map(pl => pl.planet).join(", ")}` : ""}: स्थायी संपदा व बहु-स्रोतीय आय`,
       paragraphs: [
-        `करियर केवल काम का नाम नहीं है; उसका दूसरा और अत्यंत महत्वपूर्ण पहलू है — संचित धन (2nd House - Dhana) और नियमित नकद प्रवाह व महालाभ (11th House - Labha)। ${name} जी की कुंडली में ${wealthDescription} यह स्पष्ट करता है कि आपका वित्तीय भाग्य पारंपरिक ढर्रे से कहीं अधिक आपके निजी पुरुषार्थ और आधुनिक अवसरों से समृद्ध होगा।`,
-        `एकादश भाव (लाभ भाव) जीवन में नेटवर्क, बड़े क्लाइंट्स और दीर्घकालिक इच्छाओं की पूर्ति का केंद्र है। आपकी जन्म कुंडली में जब भी लाभेश और कर्मेश का तालमेल बनता है, तो व्यक्ति को 'स्व-अर्जित धन' (Self-Earned High Net Worth) का आनंद प्राप्त होता है। इसका अर्थ यह है कि जीवन के शुरुआती दौर में भले ही संसाधनों का संघर्ष रहा हो, लेकिन जैसे-जैसे आपका काम परिपक्व होगा, आपकी आय कई स्वतंत्र स्रोतों से प्रवाहित होगी।`,
+        `करियर केवल काम का नाम नहीं है; उसका दूसरा और अत्यंत महत्वपूर्ण पहलू है — संचित धन (2nd House - Dhana) और नियमित नकद प्रवाह व महालाभ (11th House - Labha)। ${name} जी की जन्म कुंडली (D-1) में ${wealthDescription} आपके वित्तीय भाग्य के आधार को स्थापित करता है।`,
+        `किंतु वास्तविक कार्यक्षेत्र में आय के स्रोतों और विस्तार की पुष्टि दशमांश चक्र (D-10) के द्वितीय व एकादश भाव से होती है। ${d10EleventhPlanets.length > 0 
+          ? `दशमांश के एकादश भाव (Gains & Network) में ${d10EleventhPlanets.map(pl => `${pl.planet} देव${pl.dignity !== "—" ? ` (${pl.dignity})` : ""}`).join(" व ")} का संरेखण यह सिद्ध करता है कि आपके काम से होने वाली आय किसी एक बंधी-बंधाई तनख्वाह तक सीमित नहीं रहेगी। यह बड़े अनुबंधों (High-ticket contracts), नेटवर्क के विस्तार, परामर्श या डिजिटल/स्केलेबल सिस्टम्स के जरिए बहु-स्रोतीय लाभ (Multiple Revenue Streams) उत्पन्न करेगी।`
+          : `D-10 के लाभ भाव का स्वामी यह स्पष्ट करता है कि आपके पेशेवर कौशल से उत्पन्न होने वाला लाभ समय के साथ लगातार बढ़ेगा और वित्तीय स्वतंत्रता की नींव रखेगा।`} ${d10SecondPlanets.length > 0 ? `वहीं D-10 के द्वितीय भाव (Professional Retention) में ${d10SecondPlanets.map(pl => `${pl.planet}${pl.dignity !== "—" ? ` (${pl.dignity})` : ""}`).join(", ")} की स्थिति सुनिश्चित करती है कि कार्य से अर्जित धन तेजी से बाहर बहने के बजाय उत्पादक परिसंपत्तियों (Productive Assets) में संचित होगा।` : ""}`,
         `हालाँकि, शास्त्रों की एक गंभीर चेतावनी भी है: धन भाव और लाभ भाव के स्वामी को बलवान रखते हुए कभी भी बिना सोचे-समझे सट्टेबाज़ी, अनियंत्रित कर्ज़ या त्वरित अमीर बनने के लोभ में नहीं पड़ना चाहिए। आपका धन वास्तविक 'मूल्य निर्माण' (Value Creation) और ठोस सिस्टम्स से ही स्थायी बनेगा।`
       ]
     },
@@ -255,10 +297,10 @@ export function generateCareerPillarNarrative(
   return {
     pillarKey: "career",
     title: "करियर व महालक्ष्मी विश्लेषण (D-10 Dasamsha Karma)",
-    subtitle: `दशम भाव (${tenthLord}), दशमांश चक्र (${d10Lagna}), आमात्यकारक (${amatyakarakaPlanet}) और आगामी गोचर का संपूर्ण डिकोडिंग`,
+    subtitle: `D-1 कर्मेश (${tenthLord}), D-10 (${d10LagnaSign} लग्न | ${d10TenthSignName} कर्मेश: ${d10TenthLord}), आमात्यकारक (${amatyakarakaPlanet}) का संश्लेषित महाफल`,
     icon: "💼",
     badge: "Karma & Wealth",
-    heroHeadline: `${name} जी के कर्म का आकाशीय विधान: ${lagnaRashi} लग्न, स्वतंत्र बौद्धिक साम्राज्य और आगामी स्वर्णिम विस्तार`,
+    heroHeadline: `${name} जी के कर्म का आकाशीय विधान: D-1 (${lagnaRashi}) बीज से D-10 (${d10LagnaSign}) तक स्वायत्त नेतृत्व और स्वर्णिम विस्तार`,
     chapters,
     upcomingRoadmap,
     actionableDirective: {
