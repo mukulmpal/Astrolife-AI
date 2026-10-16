@@ -2577,8 +2577,10 @@ export function buildRealDivisionalEngineReportSection(input: any): ReportSectio
       paragraphs: [
         universal.overallNarrative,
         "The real Divisional Chart engine was called for this PDF. It calculates the main varga placements from natal planet longitudes and reads D1 promise, varga confirmation, dasha activation and birth-time sensitivity together.",
-        d9 ? `Navamsha D9 Lagna is ${d9.lagna}. ${d9.keyInsight}` : "D9 data could not be resolved.",
-        d10 ? `Dashamsha D10 Lagna is ${d10.lagna}. ${d10.keyInsight}` : "D10 data could not be resolved.",
+        d9 ? `Navamsha (D9) Soul & Marriage Matrix: Lagna is ${d9.lagna}. ${d9Insights[0] || d9.keyInsight}` : "D9 data could not be resolved.",
+        d10 ? `Dashamsha (D10) Profession & Authority Matrix: Lagna is ${d10.lagna}. ${d10Insights[0] || d10.keyInsight}` : "D10 data could not be resolved.",
+        ...(d9Insights[1] ? [d9Insights[1]] : []),
+        ...(d10Insights[1] ? [d10Insights[1]] : []),
         ...universal.strongestAreas.slice(0, 2).map((section) => section.paragraph),
         ...universal.growthAreas.slice(0, 2).map((section) => section.paragraph),
       ],

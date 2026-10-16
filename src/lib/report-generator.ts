@@ -9,7 +9,7 @@ import { calculateShadbala } from "./astro-engine/shadbala";
 import { calculateLalKitab } from "./astro-engine/lalkitab";
 import { calculateNumerology } from "./astro-engine/numerology";
 import { calculateAshtakavarga } from "./astro-engine/ashtakavarga";
-import { calculateDivisional, getRasiAnalysis, getHoraAnalysis, getDrekkanaAnalysis, getSaptamsaAnalysis } from "./astro-engine/divisional";
+import { calculateDivisional, getRasiAnalysis, getHoraAnalysis, getDrekkanaAnalysis, getSaptamsaAnalysis, getNavamshaAnalysis, getDashamshaAnalysis } from "./astro-engine/divisional";
 import { generateGemstoneReportFromChart } from "./astro-engine/gemstone";
 import { calculateKarakas, calculateArudhas, calculateCharaDasha } from "./astro-engine/jaimini";
 import { runTransitEngine } from "./astro-engine/transit";
@@ -2279,6 +2279,8 @@ export async function generateLegacyPDFReport(
         else if (div.key === "D2") analysis = getHoraAnalysis(div as Parameters<typeof getHoraAnalysis>[0]);
         else if (div.key === "D3") analysis = getDrekkanaAnalysis(div as Parameters<typeof getDrekkanaAnalysis>[0]);
         else if (div.key === "D7") analysis = getSaptamsaAnalysis(div as Parameters<typeof getSaptamsaAnalysis>[0]);
+        else if (div.key === "D9") analysis = getNavamshaAnalysis(div as Parameters<typeof getNavamshaAnalysis>[0]);
+        else if (div.key === "D10") analysis = getDashamshaAnalysis(div as Parameters<typeof getDashamshaAnalysis>[0]);
       }, undefined);
 
       if (analysis?.length) {

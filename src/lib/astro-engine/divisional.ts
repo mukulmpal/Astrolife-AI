@@ -505,32 +505,96 @@ export function getAshtamshAnalysis(d8: DivChart): string[] {
   return insights;
 }
 
-export function getNavamshaAnalysis(d9: DivChart): string[] {
-  const insights: string[] = [];
-  const ven  = d9.planets.find(p=>p.planet==="Venus");
-  const jup  = d9.planets.find(p=>p.planet==="Jupiter");
-  const moon = d9.planets.find(p=>p.planet==="Moon");
-  const sun  = d9.planets.find(p=>p.planet==="Sun");
-  const mars = d9.planets.find(p=>p.planet==="Mars");
-  const sat  = d9.planets.find(p=>p.planet==="Saturn");
-  if(ven?.dignity==="Exalted"||ven?.dignity==="Own")
-    insights.push("Venus strong in Navamsha — beautiful, harmonious, supportive spouse. Married life is deeply fulfilling.");
-  if(ven?.dignity==="Debilitated")
-    insights.push("Venus weak in Navamsha — relationship karma requires work. Communication and compromise are essential.");
-  if(jup?.dignity==="Exalted"||jup?.dignity==="Own")
-    insights.push("Jupiter strong in D-9 — wise, spiritual, well-educated spouse. Dharmic and prosperous marriage.");
-  if(moon?.dignity==="Exalted") insights.push("Exalted Moon in D-9 — emotionally rich inner life. Strong dharmic foundation and intuition.");
-  if(sun?.inLagna) insights.push("Sun in D-9 Lagna — authority and leadership in the dharmic path. Father's blessings actively support.");
-  if(mars?.dignity==="Exalted") insights.push("Exalted Mars in D-9 — courageous soul path. Spouse is dynamic and action-oriented.");
-  if(sat?.dignity==="Exalted") insights.push("Exalted Saturn in D-9 — disciplined dharmic path. Karma is repaid honorably. Slow but rich spiritual life.");
-  if(insights.length===0) insights.push("D-9 Navamsha is the soul chart. Analyze Venus and 7th house for spouse and the full dharmic journey.");
-  return insights;
-}
-
-const D10_RASHI_LORDS = [
+const VARGA_RASHI_LORDS = [
   "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury",
   "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"
 ];
+
+export function getNavamshaAnalysis(d9: DivChart): string[] {
+  const insights: string[] = [];
+  const lagnaLord = VARGA_RASHI_LORDS[d9.lagnaNum] || "Venus";
+  const lagnaLordPlanet = d9.planets.find(p => p.planet === lagnaLord);
+
+  // 7th House (Kalatra Bhava) in D-9
+  const seventhSignNum = md(d9.lagnaNum + 6, 12);
+  const seventhSign = SIGNS[seventhSignNum];
+  const seventhLord = VARGA_RASHI_LORDS[seventhSignNum] || "Mars";
+  const seventhLordPlanet = d9.planets.find(p => p.planet === seventhLord);
+  const seventhPlanets = d9.planets.filter(p => p.house === 7);
+  const lagnaPlanets = d9.planets.filter(p => p.house === 1);
+
+  // Key Grahas in D-9
+  const ven  = d9.planets.find(p => p.planet === "Venus");
+  const jup  = d9.planets.find(p => p.planet === "Jupiter");
+  const moon = d9.planets.find(p => p.planet === "Moon");
+  const sun  = d9.planets.find(p => p.planet === "Sun");
+  const mars = d9.planets.find(p => p.planet === "Mars");
+  const sat  = d9.planets.find(p => p.planet === "Saturn");
+  const rahu = d9.planets.find(p => p.planet === "Rahu");
+  const ketu = d9.planets.find(p => p.planet === "Ketu");
+
+  // D-9 7th Lord Placement
+  if (seventhLordPlanet) {
+    insights.push(`D-9 7th Lord (${seventhLord}) in ${seventhLordPlanet.house}th house (${seventhLordPlanet.sign}${seventhLordPlanet.dignity !== "—" ? `, ${seventhLordPlanet.dignity}` : ""}) — governs spouse's temperament, post-marriage fortune, and mutual life stability.`);
+  }
+
+  // D-9 7th House Occupants
+  if (seventhPlanets.length > 0) {
+    insights.push(`7th House in D-9 occupied by ${seventhPlanets.map(p => `${p.planet}${p.dignity !== "—" ? ` (${p.dignity})` : ""}`).join(", ")} — directly shapes partner's visible temperament and daily marital harmony.`);
+  }
+
+  // D-9 Lagnesh Analysis
+  if (lagnaLordPlanet) {
+    insights.push(`D-9 Lagnesh ${lagnaLord} in ${lagnaLordPlanet.house}th house (${d9.lagna} Lagna) — reveals your soul's core values and spiritual growth through union.`);
+  }
+
+  // Venus in D-9 (Karaka of Marriage & Romance)
+  if (ven) {
+    if (ven.dignity === "Exalted" || ven.dignity === "Own") {
+      insights.push(`Venus strong in D-9 (${ven.sign}, House ${ven.house}) — blessed with an affectionate, aesthetically refined, and supportive partner. High emotional fulfillment.`);
+    } else if (ven.dignity === "Debilitated") {
+      insights.push("Venus debilitated in D-9 — relationship expectations need grounded realism. Prioritize mutual understanding over idealistic perfection.");
+    } else {
+      insights.push(`Venus placed in House ${ven.house} (${ven.sign}) in D-9 — channels romantic warmth and marital comfort through this domain.`);
+    }
+  }
+
+  // Jupiter in D-9 (Karaka of Dharma & Partner Wisdom)
+  if (jup) {
+    if (jup.dignity === "Exalted" || jup.dignity === "Own" || [1, 5, 7, 9].includes(jup.house)) {
+      insights.push(`Jupiter auspicious in D-9 (House ${jup.house}, ${jup.sign}) — spouse is ethical, wise, and value-oriented. Marriage brings familial dignity and divine protection.`);
+    } else if (jup.dignity === "Debilitated") {
+      insights.push("Jupiter debilitated in D-9 — conscious respect for partner's philosophical perspectives and family elders strengthens marital longevity.");
+    }
+  }
+
+  // Node & Mars dynamics in D-9 7th
+  if (mars?.house === 7) {
+    insights.push("Mars in 7th House D-9 — dynamic and spirited spouse; brief 5-second pause during heated arguments prevents misunderstandings.");
+  }
+  if (sat?.house === 7) {
+    insights.push("Saturn in 7th House D-9 — highly mature, dependable, and enduring marital bond; blessings compound with patience.");
+  }
+  if (rahu?.house === 7) {
+    insights.push("Rahu in 7th House D-9 — magnetic, unconventional partnership; deep soul growth through cross-cultural or modern horizons.");
+  }
+  if (ketu?.house === 7) {
+    insights.push("Ketu in 7th House D-9 — spiritualized marital contract; partner has strong intuitive inclinations and detachment from superficial vanity.");
+  }
+
+  // Exalted planets in D9
+  const exaltedPlanets = d9.planets.filter(p => p.dignity === "Exalted");
+  if (exaltedPlanets.length > 0) {
+    insights.push(`Exalted in D-9: ${exaltedPlanets.map(p => `${p.planet} in House ${p.house} (${p.sign})`).join(", ")} — powerful soul blessings that uplift destiny after marriage.`);
+  }
+
+  if (insights.length === 0) {
+    insights.push("D-9 Navamsha is the soul chart. Analyze Venus, 7th house, and D-9 Lagna for complete marital harmony.");
+  }
+  return insights;
+}
+
+const D10_RASHI_LORDS = VARGA_RASHI_LORDS;
 
 export function getDashamshaAnalysis(d10: DivChart): string[] {
   const insights: string[] = [];

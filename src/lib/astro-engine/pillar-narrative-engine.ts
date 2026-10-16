@@ -328,10 +328,28 @@ export function generateMarriagePillarNarrative(
   const lagnaNum = chart.lagnaNum || 1;
   const lagnaRashi = chart.lagnaRashi || "Aries";
 
+  // D-1 Natal Foundations (Bija - Marriage Seed)
   const seventhLord = getHouseLord(lagnaNum, 7);
   const seventhPlanets = getPlanetsInHouse(chart, 7);
-  const seventhHouseSign = chart.houseCusps?.[6]?.sign || RASHI_LORDS[(lagnaNum + 5) % 12];
-  const d9Lagna = d9?.lagna || "Taurus";
+  const seventhHouseSign = chart.houseCusps?.[6]?.sign || Object.keys(SIGN_NAMES_HINDI)[(lagnaNum + 5) % 12];
+
+  // D-9 Navamsha Operational Reality (Phala - Marital Core & Spouse Soul)
+  const d9LagnaSign = d9?.lagna || "Taurus";
+  const d9LagnaNum = typeof d9?.lagnaNum === "number" ? d9.lagnaNum : 1;
+  const d9LagnaLord = RASHI_LORDS[d9LagnaNum] || "Venus";
+
+  const d9SeventhSignIndex = (d9LagnaNum + 6) % 12;
+  const d9SeventhSignName = Object.keys(SIGN_NAMES_HINDI)[d9SeventhSignIndex] || "Scorpio";
+  const d9SeventhLord = RASHI_LORDS[d9SeventhSignIndex] || "Mars";
+
+  const d9PlanetsList = d9?.planets || [];
+  const d9SeventhPlanets = d9PlanetsList.filter((pl) => pl.house === 7);
+  const d9LagnaPlanets = d9PlanetsList.filter((pl) => pl.house === 1);
+  const d9Venus = d9PlanetsList.find((pl) => pl.planet === "Venus");
+  const d9Jupiter = d9PlanetsList.find((pl) => pl.planet === "Jupiter");
+  const d9SeventhLordPl = d9PlanetsList.find((pl) => pl.planet === d9SeventhLord);
+  const d9LagnaLordPl = d9PlanetsList.find((pl) => pl.planet === d9LagnaLord);
+  const d9Exalted = d9PlanetsList.filter((pl) => pl.dignity === "Exalted");
 
   const darakarakaEntry = Object.entries(charaKarakas).find(([_, v]) => v.includes("DK") || v.includes("Dara"));
   const darakarakaPlanet = darakarakaEntry ? darakarakaEntry[0] : (chart.planets?.Venus ? "Venus" : seventhLord);
@@ -340,20 +358,36 @@ export function generateMarriagePillarNarrative(
   const marsHouse = p.Mars?.house || 1;
 
   const seventhSummary = seventhPlanets.length > 0
-    ? `सप्तम भाव में ${seventhPlanets.join(" व ")} देव की उपस्थिति और सप्तमेश ${seventhLord} देव का प्रभाव`
-    : `सप्तम भाव में ${SIGN_NAMES_HINDI[seventhHouseSign] || seventhHouseSign} राशि और सप्तमेश ${seventhLord} देव का प्रभाव`;
+    ? `D-1 सप्तम भाव में ${seventhPlanets.join(" व ")} और सप्तमेश ${seventhLord} देव का प्रभाव`
+    : `D-1 सप्तम भाव (${SIGN_NAMES_HINDI[seventhHouseSign] || seventhHouseSign}) और सप्तमेश ${seventhLord} देव का प्रभाव`;
+
+  const d9SummaryParts: string[] = [];
+  if (d9SeventhPlanets.length > 0) {
+    d9SummaryParts.push(`D-9 सप्तम: ${d9SeventhPlanets.map(pl => pl.planet).join(", ")}`);
+  }
+  if (d9Venus) {
+    d9SummaryParts.push(`शुक्र H${d9Venus.house}(${d9Venus.sign})`);
+  }
+  const d9HighlightBadge = d9SummaryParts.length > 0
+    ? `D-9 (${d9LagnaSign} लग्न | ${d9HighlightBadgeText(d9SeventhSignName, d9SeventhLord, d9SummaryParts)})`
+    : `D-9 ${d9LagnaSign} लग्न (सप्तमेश: ${d9SeventhLord})`;
+
+  function d9HighlightBadgeText(sSign: string, sLord: string, parts: string[]) {
+    return `सप्तम: ${sSign}/${sLord} | ${parts.join(" | ")}`;
+  }
 
   const chapters: PillarChapter[] = [
     {
       chapterNum: 1,
-      title: "प्रथम सोपान: जन्म का दांपत्य खाका — सप्तम भाव, नवमांश (D-9) और दाराकारक",
+      title: "प्रथम सोपान: जन्म का दांपत्य बीज (D-1) व नवमांश का आत्मिक फल (D-9) — दाराकारक संरेखण",
       subtitle: "आपके जीवनसाथी का आंतरिक व्यक्तित्व, बौद्धिक तालमेल और आत्मा का गहरा कार्मिक अनुबंध",
       icon: "💍",
-      keyHighlight: `${seventhSummary}: नवमांश (D-9) में ${d9Lagna} लग्न और दाराकारक ${darakarakaPlanet} का प्रभाव`,
+      keyHighlight: `${seventhSummary} ➔ ${d9HighlightBadge}`,
       paragraphs: [
-        `वैदिक ज्योतिष में जन्म कुंडली (D-1) शरीर है, तो नवमांश चक्र (D-9) उस शरीर के भीतर धड़कती हुई अमर आत्मा और जीवनसाथी के साथ जुड़ने वाला सूक्ष्म कार्मिक सूत्र है। ${name} जी की कुंडली में ${seventhSummary} यह स्पष्ट करता है कि आपका दांपत्य जीवन किसी उथले, तात्कालिक आकर्षण पर नहीं, बल्कि मानसिक गहराई, परस्पर सम्मान और आत्मीय वफादारी की बुनियाद पर टिकेगा।`,
-        `नवमांश चक्र (D-9) में ${d9Lagna} लग्न का प्राकट्य यह दर्शाता है कि विवाह के पश्चात आपके भाग्य का एक नया द्वार खुलेगा। आपका जीवनसाथी गरिमामयी, विचारशील और पारिवारिक व्यवस्था को परिपक्वता से संभालने वाला होगा। जैमिनी ज्योतिष में आपके दाराकारक (Darakaraka - DK) ${darakarakaPlanet} देव हैं। दाराकारक ग्रह जीवनसाथी के मूल स्वभाव का आईना है — इसका अर्थ यह है कि आपका साथी सोच और आचरण में गंभीर, सिद्धांतों का पक्का और आपके जीवन का एक अटूट स्तंभ बनेगा।`,
-        `शास्त्र कहते हैं कि ऐसे जातकों का दांपत्य सुख समय के साथ और अधिक प्रगाढ़ व मधुर होता जाता है। समझदारी और संवाद के बल पर आपका दांपत्य एक सुरक्षित किले की तरह मजबूत बना रहेगा।`
+        `वैदिक ज्योतिष में महर्षि पाराशर का अमर सिद्धांत है कि जन्म कुंडली (D-1) शरीर है, तो नवमांश चक्र (D-9) उस शरीर के भीतर धड़कती हुई अमर आत्मा और जीवनसाथी के साथ जुड़ने वाला सूक्ष्म कार्मिक अनुबंध (Soul Destiny) है। ${name} जी की जन्म कुंडली (D-1) में ${seventhSummary} यह सिद्ध करता है कि आपका दांपत्य जीवन किसी उथले, तात्कालिक आकर्षण पर नहीं, बल्कि मानसिक परिपक्वता और परस्पर सम्मान की बुनियाद पर टिकेगा।`,
+        `किंतु दांपत्य की वास्तविक मिठास, साथी के स्वभाव और विवाह के बाद के भाग्य का यथार्थ नवमांश चक्र (D-9) से ही प्रकट होता है। आपके D-9 में ${SIGN_NAMES_HINDI[d9LagnaSign] || d9LagnaSign} लग्न उदित होता है। नवमांश का दांपत्य भाव (7th Bhava) ${SIGN_NAMES_HINDI[d9SeventhSignName] || d9SeventhSignName} राशि में है, जिसके स्वामी ${d9SeventhLord} देव हैं${d9SeventhLordPl ? ` (जो नवमांश के ${d9SeventhLordPl.house}वें भाव में ${d9SeventhLordPl.sign} राशि में स्थित हैं)` : ""}। ${d9SeventhPlanets.length > 0 ? `नवमांश के सप्तम भाव में ${d9SeventhPlanets.map(pl => `${pl.planet} देव${pl.dignity !== "—" ? ` (${pl.dignity})` : ""}`).join(" व ")} की सीधी उपस्थिति यह स्पष्ट करती है कि आपका जीवनसाथी एक विशिष्ट व्यक्तित्व, भावनात्मक गहराई और गृहस्थी को गरिमा से संभालने वाला होगा।` : `नवमांश सप्तमेश ${d9SeventhLord} की स्थिति वैवाहिक जीवन में स्थायित्व और परिपक्व संवाद को सुनिश्चित करती है।`}`,
+        `${d9Venus ? `दांपत्य के प्रधान नैसर्गिक कारक शुक्र देव नवमांश के ${d9Venus.house}वें भाव (${d9Venus.sign}${d9Venus.dignity !== "—" ? `, ${d9Venus.dignity}` : ""}) में स्थित होकर आपके रिश्ते में आत्मीय स्नेह, भावनात्मक समर्पण और सुरुचिपूर्ण वातावरण का सृजन कर रहे हैं।` : ""} ${d9Jupiter ? `साथ ही देवगुरु बृहस्पति का नवमांश के ${d9Jupiter.house}वें भाव में होना दांपत्य को नैतिक बल, परिवार का आशीर्वाद और सामाजिक प्रतिष्ठा प्रदान करता है।` : ""} ${d9Exalted.length > 0 ? `विशेष तथ्य: नवमांश में ${d9Exalted.map(pl => `${pl.planet} (${pl.sign} में उच्च)`).join(", ")} की उपस्थिति विवाह के पश्चात आपके समग्र भाग्योदय की पुष्टि करती है।` : ""}`,
+        `जैमिनी ज्योतिष के नियमानुसार आपके दाराकारक (Darakaraka - DK) ${darakarakaPlanet} देव हैं। दाराकारक ग्रह जीवनसाथी के मूल स्वभाव का दर्पण है — इसका अर्थ यह है कि आपका साथी सोच और आचरण में गंभीर, सिद्धांतों का पक्का और आपके जीवन का एक अटूट संबल बनेगा।`
       ]
     },
     {
@@ -373,7 +407,7 @@ export function generateMarriagePillarNarrative(
         hasManglik
           ? `भाव ${marsHouse} का मंगल वैवाहिक जीवन में किसी अनिष्ट का कारण नहीं बनता, बल्कि यह कभी-कभी अचानक आने वाले गुस्से, अधीरता या काम के तनाव में तीखी प्रतिक्रिया देने की प्रवृत्ति पैदा कर सकता है। यह कोई 'श्राप' नहीं है, बल्कि 'भावनात्मक अनुशासन' की एक साधारण मांग है! जब भी साथी के साथ कोई वैचारिक मतभेद हो, तो उस समय बहस करने के बजाय 5 सेकंड का मौन रख लें; यह साधारण नियम सारे तनाव को शांत कर देगा।`
           : `दांपत्य जीवन में मधुरता बनाए रखने के लिए केवल एक बात का ध्यान रखना होता है कि काम की व्यस्तता और मानसिक थकान का असर व्यक्तिगत संवाद पर न पड़े। साथी के साथ नियमित और प्रेमपूर्ण संवाद आपके रिश्ते को सदा तरोताजा रखेगा।`,
-        `इसके अतिरिक्त, सप्तमेश ${seventhLord} और दाराकारक ${darakarakaPlanet} की शुभ स्थिति दांपत्य की दीर्घायु और सुख की पूर्ण गारंटी देती है।`
+        `इसके अतिरिक्त, D-1 सप्तमेश ${seventhLord}, D-9 सप्तमेश ${d9SeventhLord} और दाराकारक ${darakarakaPlanet} की सम्मिलित शुभता दांपत्य की दीर्घायु और सुख की पूर्ण गारंटी देती है।`
       ]
     },
     {
@@ -429,10 +463,10 @@ export function generateMarriagePillarNarrative(
   return {
     pillarKey: "marriage",
     title: "दांपत्य व नवमांश महा-विश्लेषण (D-9 Navamsha & Manglik)",
-    subtitle: `सप्तम भाव (${seventhLord}), नवमांश लग्न (${d9Lagna}), दाराकारक (${darakarakaPlanet}) और विवाह की सटीक समय-सारणी`,
+    subtitle: `D-1 सप्तमेश (${seventhLord}), D-9 (${d9LagnaSign} लग्न | ${d9SeventhSignName} सप्तमेश: ${d9SeventhLord}), दाराकारक (${darakarakaPlanet}) का संश्लेषित महाफल`,
     icon: "💍",
     badge: "Love & Marriage",
-    heroHeadline: `${name} जी के दांपत्य का आकाशीय विधान: परिपक्व जीवनसाथी, मांगलिक स्पष्टता और आगामी स्वर्णिम विवाह योग`,
+    heroHeadline: `${name} जी के दांपत्य का आकाशीय विधान: D-1 (${lagnaRashi}) से D-9 (${d9LagnaSign}) तक परिपक्व जीवनसाथी और स्वर्णिम विवाह योग`,
     chapters,
     upcomingRoadmap,
     actionableDirective: {
@@ -441,7 +475,7 @@ export function generateMarriagePillarNarrative(
         "शुक्रवार को मां लक्ष्मी की आराधना करें और सफेद पुष्प अथवा इत्र का अर्पण करें (शुक्र देव के दांपत्य आकर्षण को बल देने हेतु)।",
         "क्रोध या उत्तेजना की स्थिति में '5 सेकंड का मौन' रखें — यह सरल नियम हर रिश्ते को अनावश्यक विवादों से सदा सुरक्षित रखता है।",
         "चांदी का एक ठोस चौकोर टुकड़ा अथवा छल्ला धारण करने से मन की चंचलता शांत रहती है और भावनात्मक संतुलन बना रहता है।",
-        `सप्तम भाव के स्वामी ${seventhLord} देव और दाराकारक ${darakarakaPlanet} देव के प्रति कृतज्ञता व्यक्त करें।`
+        `D-1 सप्तमेश ${seventhLord} देव, D-9 सप्तमेश ${d9SeventhLord} देव और दाराकारक ${darakarakaPlanet} देव के प्रति कृतज्ञता व्यक्त करें।`
       ],
       gemstoneOrRemedyNote: "दांपत्य आकर्षण और प्रेम की शुद्धता हेतु ओपल (White Opal) या स्फटिक माला का प्रयोग अत्यंत कल्याणकारी है।"
     }

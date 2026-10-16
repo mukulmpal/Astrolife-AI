@@ -2932,16 +2932,17 @@ function pageDivisional(chart: ChartData): string {
   });
 
   type DC = (typeof divResult)[number];
-  const renderChartMini = (chart_: DC | undefined, title: string): string => {
+  const renderChartMini = (chart_: DC | undefined, title: string, notes: string[] = []): string => {
     if (!chart_) return `<div class="body-s">Data unavailable.</div>`;
     return `<div>
       <div class="kicker" style="margin-bottom:6px;">${title}</div>
       <div class="card" style="padding:14px;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-bright);margin-bottom:4px;">${esc(chart_.lagna)} Lagna</div>
-        <div class="body-s" style="margin-bottom:10px;">${chart_.planets.length} planets placed</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ivory-dim);">
+        <div class="body-s" style="margin-bottom:8px;">${chart_.planets.length} planets placed</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ivory-dim);margin-bottom:8px;">
           ${chart_.planets.map((p) => `<div><span style="color:var(--gold);">${PLANET_ABBR[p.planet] ?? p.planet.slice(0,2)}</span> ${esc(p.sign)} · H${p.house}</div>`).join("")}
         </div>
+        ${notes.slice(0, 2).map((n) => `<div style="font-size:10px;color:var(--ivory-dim);margin-top:3px;line-height:1.4;">✦ ${esc(n)}</div>`).join("")}
       </div>
     </div>`;
   };
@@ -2964,8 +2965,8 @@ function pageDivisional(chart: ChartData): string {
         </div>`).join("")}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
-        ${renderChartMini(d9, "D9 — Navamsa · Soul & Marriage")}
-        ${renderChartMini(d10, "D10 — Dashamsha · Career & Status")}
+        ${renderChartMini(d9, "D9 — Navamsa · Soul & Marriage", d9Notes)}
+        ${renderChartMini(d10, "D10 — Dashamsha · Career & Status", d10Notes)}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div>

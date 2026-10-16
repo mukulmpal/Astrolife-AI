@@ -11,7 +11,7 @@ import { useLanguage } from "@/lib/language-context";
 import CityAutocomplete, { type CitySearchResult } from "@/components/location/CityAutocomplete";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { createClient } from "@/lib/supabase/client";
-import { calculateDivisional, getDashamshaAnalysis, type DivChart } from "@/lib/astro-engine/divisional";
+import { calculateDivisional, getDashamshaAnalysis, getNavamshaAnalysis, type DivChart } from "@/lib/astro-engine/divisional";
 import { isFullAccessEnabled, isEliteEmail, normalizeTier } from "@/lib/access";
 import { DailyPanchangWidget } from "@/components/panchang/DailyPanchangWidget";
 import { ChartProofChatDrawer } from "@/components/chat/ChartProofChatDrawer";
@@ -348,6 +348,42 @@ export default function KundliPage() {
       res[p.planet] = { house: p.house, retrograde: p.retrograde, signNum: p.signNum };
     });
     return res;
+  }, [d9]);
+
+  const d9Analysis = useMemo(() => {
+    if (!d9) return [];
+    return getNavamshaAnalysis(d9);
+  }, [d9]);
+
+  const d9Meta = useMemo(() => {
+    if (!d9) return null;
+    const SIGNS_LIST = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+    const RASHI_LORDS_LIST = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+    const lagnaLord = RASHI_LORDS_LIST[d9.lagnaNum] || "Venus";
+    const seventhSignNum = ((d9.lagnaNum + 6) % 12 + 12) % 12;
+    const seventhSign = SIGNS_LIST[seventhSignNum];
+    const seventhLord = RASHI_LORDS_LIST[seventhSignNum] || "Mars";
+    const seventhPlanets = d9.planets.filter((p) => p.house === 7);
+    const lagnaPlanets = d9.planets.filter((p) => p.house === 1);
+    const venus = d9.planets.find((p) => p.planet === "Venus");
+    const jupiter = d9.planets.find((p) => p.planet === "Jupiter");
+    const exaltedPlanets = d9.planets.filter((p) => p.dignity === "Exalted");
+    const ownPlanets = d9.planets.filter((p) => p.dignity === "Own");
+    const seventhLordPlanet = d9.planets.find((p) => p.planet === seventhLord);
+
+    return {
+      lagnaLord,
+      seventhSign,
+      seventhLord,
+      seventhLordHouse: seventhLordPlanet?.house,
+      seventhLordSign: seventhLordPlanet?.sign,
+      seventhPlanets,
+      lagnaPlanets,
+      venus,
+      jupiter,
+      exaltedPlanets,
+      ownPlanets,
+    };
   }, [d9]);
 
   const d10Planets = useMemo(() => {
@@ -1466,17 +1502,143 @@ export default function KundliPage() {
                     )}
 
                     <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12 }}>
-                      <div style={{ fontSize: 11, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4, fontWeight: 700 }}>
-                        Navamsha Dynamic
+                      <div className="flex items-center justify-between mb-2">
+                        <div style={{ fontSize: 11, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 700 }}>
+                          D-9 Navamsha Marriage Insights (नवमांश विश्लेषण)
+                        </div>
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[rgba(184,134,11,0.15)] text-[#B8860B]">
+                          Soul & Partnership
+                        </span>
                       </div>
-                      <div style={{ fontSize: 13.5, color: "#3D3834", lineHeight: 1.7 }}>
-                        {d9?.keyInsight || "Navamsha D-9 kundli life partner ke qualities, soul connection aur post-marriage harmony ka mool aadhar hai."}
+                      <div className="space-y-2">
+                        {d9Analysis.length > 0 ? (
+                          d9Analysis.map((insight, idx) => (
+                            <div key={idx} className="flex items-start gap-2 text-xs text-[#3D3834] leading-relaxed">
+                              <span className="text-[#B8860B] font-bold mt-0.5">✦</span>
+                              <span>{insight}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div style={{ fontSize: 13, color: "#3D3834", lineHeight: 1.7 }}>
+                            {d9?.keyInsight || "Navamsha D-9 kundli life partner ke qualities, soul connection aur post-marriage harmony ka mool aadhar hai."}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {/* Relationship Karma & Mangal Dosha Card */}
                   <div className="space-y-4">
+                    {/* D-9 Navamsha Partner & Marriage Matrix Card */}
+                    {d9 && d9Meta && (
+                      <div className="card">
+                        <div className="card-tag">✦ True D-9 Navamsha Reality</div>
+                        <div className="card-title serif">Navamsha Matrix (दांपत्य एवं भाग्य फल)</div>
+                        <div className="space-y-3 text-xs text-[#3D3834] leading-relaxed">
+                          <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.3)] shadow-xs">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                                <span className="text-[#B8860B]">⚡</span> D-9 Navamsha (विवाह एवं साथी स्वरूप)
+                              </span>
+                              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[#FAF2DC] text-[#9A6B00]">
+                                Manifested Harmony
+                              </span>
+                            </div>
+
+                            <div className="space-y-2 text-xs">
+                              <div>
+                                <span className="text-[#7D6B58] font-medium">7th House (Partner & Union): </span>
+                                <strong className="text-[#1A1A1A]">{d9Meta.seventhSign}</strong>
+                                <span className="text-[#6B635B]"> (Swami: {d9Meta.seventhLord}{d9Meta.seventhLordHouse ? ` in House ${d9Meta.seventhLordHouse}` : ""})</span>
+                                {d9Meta.seventhPlanets.length > 0 && (
+                                  <div className="mt-0.5 text-[#B8860B] font-semibold">
+                                    Occupants: {d9Meta.seventhPlanets.map((p) => `${p.planet}${p.dignity !== "—" ? ` (${p.dignity})` : ""}`).join(", ")}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div>
+                                <span className="text-[#7D6B58] font-medium">D-9 Lagna & Inner Temperament: </span>
+                                <strong className="text-[#1A1A1A]">{d9.lagna}</strong>
+                                <span className="text-[#6B635B]"> (Lagna Lord: {d9Meta.lagnaLord})</span>
+                                {d9Meta.lagnaPlanets.length > 0 && (
+                                  <div className="mt-0.5 text-[#8B6508] font-medium">
+                                    In Lagna: {d9Meta.lagnaPlanets.map((p) => `${p.planet}${p.dignity !== "—" ? ` (${p.dignity})` : ""}`).join(", ")}
+                                  </div>
+                                )}
+                              </div>
+
+                              {d9Meta.venus && (
+                                <div>
+                                  <span className="text-[#7D6B58] font-medium">Venus in D-9 (Marriage Karaka): </span>
+                                  <strong className="text-[#1A1A1A]">{d9Meta.venus.sign}</strong>
+                                  <span className="text-[#6B635B]"> (House {d9Meta.venus.house}{d9Meta.venus.dignity !== "—" ? `, ${d9Meta.venus.dignity}` : ""})</span>
+                                </div>
+                              )}
+
+                              {d9Meta.jupiter && (
+                                <div>
+                                  <span className="text-[#7D6B58] font-medium">Jupiter in D-9 (Wisdom & Grace): </span>
+                                  <strong className="text-[#1A1A1A]">{d9Meta.jupiter.sign}</strong>
+                                  <span className="text-[#6B635B]"> (House {d9Meta.jupiter.house}{d9Meta.jupiter.dignity !== "—" ? `, ${d9Meta.jupiter.dignity}` : ""})</span>
+                                </div>
+                              )}
+
+                              {(d9Meta.exaltedPlanets.length > 0 || d9Meta.ownPlanets.length > 0) && (
+                                <div className="pt-1">
+                                  <span className="text-[#7D6B58] font-medium">Soul Strengths in D-9: </span>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {d9Meta.exaltedPlanets.map((p) => (
+                                      <span
+                                        key={p.planet}
+                                        className="px-2 py-0.5 rounded text-[11px] bg-[rgba(34,197,94,0.12)] text-[#15803d] font-bold border border-[rgba(34,197,94,0.3)]"
+                                      >
+                                        ★ {p.planet} Exalted in {p.sign} (H{p.house})
+                                      </span>
+                                    ))}
+                                    {d9Meta.ownPlanets.map((p) => (
+                                      <span
+                                        key={p.planet}
+                                        className="px-2 py-0.5 rounded text-[11px] bg-[rgba(184,134,11,0.12)] text-[#9A6B00] font-bold border border-[rgba(184,134,11,0.3)]"
+                                      >
+                                        ● {p.planet} Own Sign ({p.sign})
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* D-1 Natal Seed for Marriage */}
+                          <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)]">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                                <span className="text-[#B8860B]">🌱</span> D-1 Natal Seed (विवाह संबंध बीज)
+                              </span>
+                              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[rgba(184,134,11,0.1)] text-[#B8860B]">
+                                Attraction & Promise
+                              </span>
+                            </div>
+                            <div className="text-[#3D3834] space-y-1">
+                              <div>
+                                <span className="text-[#7D6B58]">7th Cusp from Lagna: </span>
+                                <strong>{chart.houseCusps?.[6]?.sign ?? "7th Bhava"}</strong>
+                              </div>
+                              {charaKarakas["Darakaraka (DK)"] && (
+                                <div>
+                                  <span className="text-[#7D6B58]">Darakaraka (DK): </span>
+                                  <strong>{charaKarakas["Darakaraka (DK)"]}</strong>
+                                </div>
+                              )}
+                              <div className="text-[11.5px] text-[#6B635B] pt-0.5">
+                                D-1 से विवाह की इच्छा, आकर्षण और सांसारिक अनुबंध तय होता है; D-9 से वास्तविक दांपत्य सुख और दीर्घकालिक सामंजस्य फलीभूत होता है।
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     {/* Mangal Dosha Card */}
                     <div className="card">
                       <div className="card-tag">✦ Relationship Intelligence</div>
