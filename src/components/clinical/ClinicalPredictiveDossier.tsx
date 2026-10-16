@@ -59,91 +59,116 @@ export function ClinicalPredictiveDossier({
 
   // ── 1. Calculate All 5 Deep Clinical Engines ─────────────────────────────────
   const clinicalData = useMemo(() => {
-    if (!chart || !chart.planets || !chart.lagnaRashi) return null;
+    if (!chart || !chart.planets) return null;
 
-    const pls = chart.planets;
-    const lagnaSign = chart.lagnaRashi;
-    const activeMD = chart.dashas?.find((d) => d.active)?.planet || "Jupiter";
+    try {
+      const pls = chart.planets || {};
+      const lagnaSign = chart.lagnaRashi || "Scorpio";
+      const lagnaNum = typeof chart.lagnaNum === "number" ? chart.lagnaNum : 7;
+      const lagnaLon = typeof chart.lagnaLon === "number" ? chart.lagnaLon : lagnaNum * 30 + 15;
+      const activeMD = chart.dashas?.find((d) => d.active)?.planet || "Jupiter";
 
-    // 1. Functional Debility & Nadi Zenith
-    const nadiDebility = evaluateNadiDebilityPeak(chart);
-    const debilityGuards = Object.entries(pls).map(([pName, pData]) => {
-      const guard = evaluateFunctionalDebilityGemstoneGuard(pName, pData.sign);
-      return { pName, pData, guard };
-    }).filter((item) => item.guard.hasFunctionalDebility);
+      // 1. Functional Debility & Nadi Zenith
+      const nadiDebility = evaluateNadiDebilityPeak(chart);
+      const debilityGuards = Object.entries(pls)
+        .map(([pName, pData]) => {
+          if (!pData?.sign) return null;
+          const guard = evaluateFunctionalDebilityGemstoneGuard(pName, pData.sign);
+          return { pName, pData, guard };
+        })
+        .filter((item): item is { pName: string; pData: any; guard: any } => Boolean(item && item.guard.hasFunctionalDebility));
 
-    // 2. D10 Career Specifier
-    const d10 = calculateDivisional(chart, 10);
-    const d10LagnaSignNum = d10.ascendantSign; // 0 to 11
-    // Compute 6th lord of D10:
-    const d10SixthSignNum = (d10LagnaSignNum + 5) % 12;
-    const signNames = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
-    const sixthLordPlanet = SIGN_RULERS[signNames[d10SixthSignNum] as ZodiacSign];
-    const sixthLordPosInD10 = d10.planets[sixthLordPlanet];
-    const d10SixthLordInLagna = sixthLordPosInD10?.sign === signNames[d10LagnaSignNum];
-    const d10TenthLordWithRahu = Boolean(d10.planets.Rahu && d10.planets.Saturn && d10.planets.Rahu.sign === d10.planets.Saturn.sign);
-    const mercuryKetuConjunction = Boolean(pls.Mercury && pls.Ketu && pls.Mercury.house === pls.Ketu.house);
+      // 2. D10 Career Specifier
+      const allDiv = calculateDivisional(pls as never, lagnaNum, lagnaLon);
+      const d10 = allDiv.find((c) => c.key === "D10");
+      const d10LagnaNum = typeof d10?.lagnaNum === "number" ? d10.lagnaNum : lagnaNum;
 
-    const careerSpec = evaluateCareerSpecifier({
-      d10SixthLordInLagna,
-      d10TenthLordWithRahu,
-      d10FourthLordDashaActive: false,
-      d10LagnaHasKetu: Boolean(d10.planets.Ketu?.sign === signNames[d10LagnaSignNum]),
-      mercuryKetuConjunction,
-      risingNakshatra: pls.Sun?.nakshatra,
-      moonNakshatra: pls.Moon?.nakshatra
-    });
+      const signNames: ZodiacSign[] = [
+        "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+        "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+      ];
 
-    // 3. Moon Dispositor Solar Health Timing
-    const moonSign = (pls.Moon?.sign || "Taurus") as ZodiacSign;
-    const moonDispositorPlanet = SIGN_RULERS[moonSign] || "Venus";
-    const dispositorData = pls[moonDispositorPlanet];
-    const healthTiming = evaluateMoonDispositorHealthTiming(
-      moonSign,
-      dispositorData?.degree,
-      pls.Sun?.degree,
-      false,
-      Boolean(pls.Mercury?.house === 6 || pls.Saturn?.house === 6),
-      Boolean(pls.Mercury?.house === 3),
-      Boolean(pls.Mercury?.house === 2 || pls.Saturn?.house === 2)
-    );
+      const d10SixthSignNum = (d10LagnaNum + 5) % 12;
+      const sixthSignName = signNames[d10SixthSignNum] || "Aries";
+      const sixthLordPlanet = SIGN_RULERS[sixthSignName] || "Mars";
 
-    // 4. 12th House Sacred Currency (Sampada)
-    const fourthLord = SIGN_RULERS[lagnaSign as ZodiacSign] || "Mars";
-    const twelfthH = evaluateTwelfthHouseIntelligence(
-      lagnaSign,
-      pls[fourthLord]?.house || 4,
-      activeMD,
-      pls.Jupiter?.house || 1,
-      6,
-      8,
-      12
-    );
+      const d10PlanetsList = Array.isArray(d10?.planets) ? d10.planets : [];
+      const sixthLordInD10 = d10PlanetsList.find((p) => p.planet === sixthLordPlanet);
+      const d10SixthLordInLagna = Boolean(sixthLordInD10 && sixthLordInD10.house === 1);
 
-    // 5. Speculative Trading & F&O Circuit Breaker
-    const fifthLordAfflicted = Boolean(pls.Rahu?.house === 5 || pls.Saturn?.house === 5);
-    const rahuInRiskHouse = Boolean([5, 8, 12].includes(pls.Rahu?.house || 0));
-    const moonAfflicted = Boolean(
-      [pls.Saturn?.house, pls.Mars?.house, pls.Rahu?.house].includes(pls.Moon?.house)
-    );
-    const tradingAudit = evaluateTradingRisk({
-      fifthLordAfflicted,
-      rahuInFifthEighthOrTwelfth: rahuInRiskHouse,
-      moonAfflictedBySaturnMarsRahu: moonAfflicted,
-      activeDashaEighthOrTwelfth: Boolean(activeMD === "Saturn" || activeMD === "Rahu"),
-      hasSubstantialLossesOrDebt: false
-    });
+      const rahuInD10 = d10PlanetsList.find((p) => p.planet === "Rahu");
+      const saturnInD10 = d10PlanetsList.find((p) => p.planet === "Saturn");
+      const ketuInD10 = d10PlanetsList.find((p) => p.planet === "Ketu");
 
-    return {
-      nadiDebility,
-      debilityGuards,
-      careerSpec,
-      healthTiming,
-      twelfthH,
-      tradingAudit,
-      lagnaSign,
-      activeMD
-    };
+      const d10TenthLordWithRahu = Boolean(rahuInD10 && saturnInD10 && rahuInD10.house === 10 && saturnInD10.house === 10);
+      const mercuryKetuConjunction = Boolean(pls.Mercury && pls.Ketu && pls.Mercury.house === pls.Ketu.house);
+
+      const careerSpec = evaluateCareerSpecifier({
+        d10SixthLordInLagna,
+        d10TenthLordWithRahu,
+        d10FourthLordDashaActive: false,
+        d10LagnaHasKetu: Boolean(ketuInD10 && ketuInD10.house === 1),
+        mercuryKetuConjunction,
+        risingNakshatra: pls.Sun?.nakshatra,
+        moonNakshatra: pls.Moon?.nakshatra
+      });
+
+      // 3. Moon Dispositor Solar Health Timing
+      const moonSign = (pls.Moon?.sign || "Taurus") as ZodiacSign;
+      const moonDispositorPlanet = SIGN_RULERS[moonSign] || "Venus";
+      const dispositorData = pls[moonDispositorPlanet];
+      const healthTiming = evaluateMoonDispositorHealthTiming(
+        moonSign,
+        dispositorData?.sign,
+        dispositorData?.degree,
+        false,
+        Boolean(pls.Mercury?.house === 6 || pls.Saturn?.house === 6),
+        Boolean(pls.Mercury?.house === 3),
+        Boolean(pls.Mercury?.house === 2 || pls.Saturn?.house === 2)
+      );
+
+      // 4. 12th House Sacred Currency (Sampada)
+      const fourthHouseSignNum = (lagnaNum + 3) % 12;
+      const fourthSignName = signNames[fourthHouseSignNum] || "Aquarius";
+      const fourthLordPlanet = SIGN_RULERS[fourthSignName] || "Saturn";
+      const twelfthH = evaluateTwelfthHouseIntelligence(
+        lagnaSign,
+        pls[fourthLordPlanet]?.house || 4,
+        activeMD,
+        pls.Jupiter?.house || 1,
+        6,
+        8,
+        12
+      );
+
+      // 5. Speculative Trading & F&O Circuit Breaker
+      const fifthLordAfflicted = Boolean(pls.Rahu?.house === 5 || pls.Saturn?.house === 5);
+      const rahuInRiskHouse = Boolean([5, 8, 12].includes(pls.Rahu?.house || 0));
+      const moonAfflicted = Boolean(
+        [pls.Saturn?.house, pls.Mars?.house, pls.Rahu?.house].includes(pls.Moon?.house)
+      );
+      const tradingAudit = evaluateTradingRisk({
+        fifthLordAfflicted,
+        rahuInFifthEighthOrTwelfth: rahuInRiskHouse,
+        moonAfflictedBySaturnMarsRahu: moonAfflicted,
+        activeDashaEighthOrTwelfth: Boolean(activeMD === "Saturn" || activeMD === "Rahu"),
+        hasSubstantialLossesOrDebt: false
+      });
+
+      return {
+        nadiDebility,
+        debilityGuards,
+        careerSpec,
+        healthTiming,
+        twelfthH,
+        tradingAudit,
+        lagnaSign,
+        activeMD
+      };
+    } catch (err) {
+      console.warn("[ClinicalPredictiveDossier] Calculation error caught safely:", err);
+      return null;
+    }
   }, [chart]);
 
   if (!chart || !clinicalData) {
@@ -782,3 +807,4 @@ export function ClinicalPredictiveDossier({
     </div>
   );
 }
+
