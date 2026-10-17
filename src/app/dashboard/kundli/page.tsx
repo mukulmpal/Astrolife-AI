@@ -20,6 +20,7 @@ import { buildMangalDoshaInsight, type MangalDoshaInsight } from "@/lib/astro-en
 import EditChartModal from "@/components/charts/EditChartModal";
 import DeleteChartModal from "@/components/charts/DeleteChartModal";
 import MasterKundliDossierPanel from "@/components/charts/MasterKundliDossierPanel";
+import { MasterPredictiveDossierCard } from "@/components/charts/MasterPredictiveDossierCard";
 import PillarNarrativeCard from "@/components/charts/PillarNarrativeCard";
 import { ClinicalPredictiveDossier } from "@/components/clinical/ClinicalPredictiveDossier";
 import {
@@ -130,6 +131,7 @@ export default function KundliPage() {
   const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
   const [saveStatus, setSaveStatus] = useState("New generated charts become your primary chart.");
   const [activeTab, setActiveTab] = useState("overview");
+  const [dossierViewMode, setDossierViewMode] = useState<"20_pillars" | "story">("20_pillars");
   const [showForm, setShowForm] = useState(() => !(hasUserChart && primaryChart));
   const [showLibrary, setShowLibrary] = useState(false);
   const [editingSavedChart, setEditingSavedChart] = useState<SavedChartSummary | null>(null);
@@ -993,7 +995,7 @@ export default function KundliPage() {
             <div className="tabs">
               {[
                 { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
-                { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "7 Pillars" },
+                { id: "master_dossier", label: "📜 20-सूत्रीय महा-विश्लेषण", badge: "20 Pillars" },
                 { id: "divisional", label: "🧩 16 Varga Charts (षोडशवर्ग)", badge: "D1-D60" },
                 { id: "clinical", label: "🧬 Clinical Intelligence (नाड़ी सूत्र)", badge: "5 Engines" },
                 { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
@@ -1141,52 +1143,9 @@ export default function KundliPage() {
                   </div>
                 </div>
 
-                {/* ── MASTER 7-PILLAR DOSSIER SPOTLIGHT BANNER ── */}
-                <div
-                  onClick={() => setActiveTab("master_dossier")}
-                  style={{
-                    cursor: "pointer",
-                    background: "linear-gradient(135deg, #FAF8F5 0%, #F5EFE0 50%, #FAF8F5 100%)",
-                    border: "2px solid #C8A030",
-                    borderRadius: 16,
-                    padding: "18px 22px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 16,
-                    flexWrap: "wrap",
-                    boxShadow: "0 6px 20px rgba(200, 160, 48, 0.1)",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    <div style={{ fontSize: 32 }}>📜</div>
-                    <div>
-                      <div style={{ fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: "#875C06", fontWeight: 700 }}>
-                        ✦ Vedic &amp; Jaimini Master Blueprint (7 Pillars)
-                      </div>
-                      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 800, color: "#1A1A1A" }}>
-                        संपूर्ण जन्म कुंडली महा-विश्लेषण (जन्म विवरण · ग्रह · राजयोग · चुनौतियाँ · दशा · अचूक उपाय · वर्तमान गोचर)
-                      </div>
-                      <div style={{ fontSize: 13, color: "#6B635B", marginTop: 2 }}>
-                        7-Pillar Classical Dossier: Parashari, Jaimini Karakas, Lal Kitab Remedies &amp; Real-Time Gochar.
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    className="btn-save"
-                    style={{
-                      background: "#875C06",
-                      color: "#FFFFFF",
-                      border: "1px solid #875C06",
-                      fontWeight: 700,
-                      padding: "10px 18px",
-                      borderRadius: 10,
-                      boxShadow: "0 4px 12px rgba(135, 92, 6, 0.25)",
-                    }}
-                  >
-                    View 7-Pillar Master Dossier →
-                  </button>
+                {/* ── 20-PILLAR MASTER PREDICTIVE DOSSIER (LIVE IN-PLACE EMBED) ── */}
+                <div id="master-20-pillar-dossier" className="w-full my-6 scroll-mt-20">
+                  <MasterPredictiveDossierCard chart={chart} defaultCollapsed={false} />
                 </div>
 
                 {/* ── CLASSICAL NAVAGRAHA STHITI TABLE (VEDIC DEGREES & NAKSHATRAS) ── */}
@@ -1329,11 +1288,42 @@ export default function KundliPage() {
             )}
 
             {/* ══════════════════════════════════════════════════════ */}
-            {/* 7-PILLAR MASTER KUNDLI DOSSIER                         */}
+            {/* 20-PILLAR MASTER PREDICTIVE DOSSIER / 7-PILLAR PANEL    */}
             {/* ══════════════════════════════════════════════════════ */}
             {activeTab === "master_dossier" && (
               <div className="space-y-6">
-                <MasterKundliDossierPanel chart={chart} />
+                <div className="flex items-center justify-between bg-stone-900/50 p-2 rounded-2xl border border-amber-500/20 shadow-sm flex-wrap gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setDossierViewMode("20_pillars")}
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                        dossierViewMode === "20_pillars"
+                          ? "bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20 font-bold"
+                          : "text-stone-300 hover:text-white hover:bg-stone-800"
+                      }`}
+                    >
+                      ✦ 20-सूत्रीय संपूर्ण महा-भविष्यवाणी (Master 20 Pillars)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDossierViewMode("story")}
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                        dossierViewMode === "story"
+                          ? "bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20 font-bold"
+                          : "text-stone-300 hover:text-white hover:bg-stone-800"
+                      }`}
+                    >
+                      📜 7-अध्याय जीवन गाथा (Story Chapters)
+                    </button>
+                  </div>
+                </div>
+
+                {dossierViewMode === "20_pillars" ? (
+                  <MasterPredictiveDossierCard chart={chart} />
+                ) : (
+                  <MasterKundliDossierPanel chart={chart} />
+                )}
               </div>
             )}
 
