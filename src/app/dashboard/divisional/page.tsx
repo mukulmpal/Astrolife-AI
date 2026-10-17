@@ -18,13 +18,17 @@ const SIGN_ICONS = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑",
 const md = (x: number, m: number) => ((x % m) + m) % m;
 
 const CHART_COLORS: Record<string, string> = {
-  D1: "#c8a030",
-  D2: "#eab308",
-  D3: "#22c55e",
-  D4: "#10b981",
-  D7: "#ec4899",
-  D9: "#a855f7",
+  D1:  "#c8a030",
+  D2:  "#eab308",
+  D3:  "#22c55e",
+  D4:  "#10b981",
+  D5:  "#14b8a6",
+  D6:  "#f43f5e",
+  D7:  "#ec4899",
+  D8:  "#8b5cf6",
+  D9:  "#a855f7",
   D10: "#f97316",
+  D11: "#0ea5e9",
   D12: "#60a5fa",
   D16: "#06b6d4",
   D20: "#8b5cf6",
@@ -36,23 +40,27 @@ const CHART_COLORS: Record<string, string> = {
   D60: "#d946ef",
 };
 
-const CHART_META: Record<string, { icon: string; domain: string; category: string }> = {
-  D1:  { icon: "🔯", domain: "Physical Life & Identity", category: "Shadvarga" },
-  D2:  { icon: "💰", domain: "Wealth & Finance", category: "Shadvarga" },
-  D3:  { icon: "⚡", domain: "Courage & Siblings", category: "Shadvarga" },
-  D4:  { icon: "🏠", domain: "Property & Home", category: "Saptavarga" },
-  D7:  { icon: "👶", domain: "Children & Creative Legacy", category: "Saptavarga" },
-  D9:  { icon: "💍", domain: "Marriage & Soul Dharma", category: "Shadvarga" },
-  D10: { icon: "💼", domain: "Career & Public Status", category: "Dashavarga" },
-  D12: { icon: "👨‍👩‍👧", domain: "Ancestry & Parents", category: "Shadvarga" },
-  D16: { icon: "🚗", domain: "Vehicles & Peace of Mind", category: "Shodashavarga" },
-  D20: { icon: "🕉️", domain: "Spiritual Path & Sadhana", category: "Shodashavarga" },
-  D24: { icon: "📚", domain: "Higher Learning & Skills", category: "Shodashavarga" },
-  D27: { icon: "🌟", domain: "Soul Strength & Resilience", category: "Shodashavarga" },
-  D30: { icon: "⚠️", domain: "Obstacles & Karma Traps", category: "Shadvarga" },
-  D40: { icon: "☯️", domain: "Maternal Grace & Luck", category: "Shodashavarga" },
-  D45: { icon: "🎭", domain: "Character & Ethical Spine", category: "Shodashavarga" },
-  D60: { icon: "🌀", domain: "Root Past-Life Karma", category: "Shodashavarga" },
+const CHART_META: Record<string, { icon: string; name: string; domain: string; category: string }> = {
+  D1:  { icon: "🔯", name: "Rasi", domain: "Physical Life", category: "Shadvarga" },
+  D2:  { icon: "💰", name: "Hora", domain: "Wealth & Finance", category: "Shadvarga" },
+  D3:  { icon: "⚡", name: "Drekkana", domain: "Courage & Siblings", category: "Shadvarga" },
+  D4:  { icon: "🏠", name: "Chaturthamsha", domain: "Property & Home", category: "Saptavarga" },
+  D5:  { icon: "🙏", name: "Panchamsha", domain: "Past Life Merit", category: "Auxiliary" },
+  D6:  { icon: "🛡️", name: "Shashthamsha", domain: "Health & Immunity", category: "Auxiliary" },
+  D7:  { icon: "👶", name: "Saptamsha", domain: "Children & Legacy", category: "Saptavarga" },
+  D8:  { icon: "🔮", name: "Ashtamsha", domain: "Transformation", category: "Auxiliary" },
+  D9:  { icon: "💍", name: "Navamsha", domain: "Marriage & Soul", category: "Shadvarga" },
+  D10: { icon: "💼", name: "Dasamsha", domain: "Career & Status", category: "Dashavarga" },
+  D11: { icon: "🎯", name: "Rudramsha", domain: "Gains & Income", category: "Auxiliary" },
+  D12: { icon: "👨‍👩‍👧", name: "Dwadashamsha", domain: "Ancestry & Parents", category: "Shadvarga" },
+  D16: { icon: "🚗", name: "Shodashamsha", domain: "Vehicles & Comfort", category: "Shodashavarga" },
+  D20: { icon: "🕉️", name: "Vimshamsha", domain: "Spiritual Path", category: "Shodashavarga" },
+  D24: { icon: "📚", name: "Chaturvimshamsha", domain: "Higher Learning", category: "Shodashavarga" },
+  D27: { icon: "🌟", name: "Saptavimshamsha", domain: "Soul Strength", category: "Shodashavarga" },
+  D30: { icon: "⚠️", name: "Trimshamsha", domain: "Obstacles & Karma", category: "Shadvarga" },
+  D40: { icon: "☯️", name: "Khavedamsha", domain: "Maternal Grace", category: "Shodashavarga" },
+  D45: { icon: "🎭", name: "Akshavedamsha", domain: "Character & Values", category: "Shodashavarga" },
+  D60: { icon: "🌀", name: "Shashtiamsha", domain: "Root Past Karma", category: "Shodashavarga" },
 };
 
 const VARGA_DECISION_GUIDE: Record<string, { judge: string; avoid: string; next: string }> = {
@@ -76,10 +84,25 @@ const VARGA_DECISION_GUIDE: Record<string, { judge: string; avoid: string; next:
     avoid: "Do not predict sudden property deals without dasha and 4th lord transit support.",
     next: "Cross-verify with D1 4th house, Moon, and Venus dignities.",
   },
+  D5: {
+    judge: "Use D5 (Panchamsha) for accumulated past-life spiritual merit, unearned intuition, and creative intelligence.",
+    avoid: "Do not judge daily commercial earnings from D5; it governs dharmic grace and intelligence.",
+    next: "Compare D1 5th house, Jupiter, and 9th house dharmic alignment.",
+  },
+  D6: {
+    judge: "Use D6 (Shashthamsha) for disease resistance, immune resilience, competitive grit, and overcoming litigation or debts.",
+    avoid: "Do not treat malefic presence as medical certainty; strong malefics in D6 grant victory over adversity.",
+    next: "Inspect D1 6th house, Mars, Saturn, and Shadbala health stamina.",
+  },
   D7: {
     judge: "Use D7 (Saptamsha) with D1 5th house, Jupiter, and family context for children or creative legacy.",
     avoid: "Do not convert D7 into medical or fertility certainty.",
     next: "Check Jupiter, 5th lord, dasha activation and supportive family timing.",
+  },
+  D8: {
+    judge: "Use D8 (Ashtamsha) for crisis handling, sudden life transformations, occult depth, and longevity protection.",
+    avoid: "Do not use D8 to generate sudden fear; it reveals transformation thresholds and regenerative capacity.",
+    next: "Correlate with D1 8th house, Saturn, and active transformation dashas.",
   },
   D9: {
     judge: "Use D9 (Navamsha) to verify marriage delivery, soul dharma, spouse partnership and post-30 maturity.",
@@ -90,6 +113,11 @@ const VARGA_DECISION_GUIDE: Record<string, { judge: string; avoid: string; next:
     judge: "Use D10 (Dasamsha) for executive authority, commercial impact, career apex and public prestige.",
     avoid: "Do not judge career only from D10 when D1 10th lord and active dasha suggest a transition.",
     next: "Compare D1 10th house, Sun, Saturn, D10 lagna, and current dasha period.",
+  },
+  D11: {
+    judge: "Use D11 (Rudramsha) for secondary gain streams, monetization scalability, and overcoming obstacles to major financial desires.",
+    avoid: "Do not confuse raw income (D11) with wealth preservation (D2).",
+    next: "Synthesize with D1 11th lord, Jupiter, Mercury, and D10 career status.",
   },
   D12: {
     judge: "Use D12 (Dwadashamsha) for parental karma, ancestral blessings and inherited lineage patterns.",
@@ -253,32 +281,69 @@ export default function DivisionalPage() {
     <div className="page">
       <style>{`
         .dv-tabs {
-          display: flex;
+          display: grid;
+          grid-template-columns: repeat(10, minmax(0, 1fr));
           gap: 8px;
-          flex-wrap: wrap;
-          margin-bottom: 20px;
+          margin-bottom: 22px;
+        }
+        @media (max-width: 1280px) {
+          .dv-tabs {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+          }
+        }
+        @media (max-width: 640px) {
+          .dv-tabs {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+          }
         }
         .dv-tab {
-          padding: 8px 14px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 4px;
           border-radius: 12px;
           border: 1px solid rgba(184,134,11,0.2);
           background: #FAF7F2;
           color: #6B635B;
           cursor: pointer;
-          font-size: 13px;
-          font-weight: 500;
           transition: all 0.2s;
-          text-align: left;
+          text-align: center;
+          min-height: 64px;
+          width: 100%;
+          box-sizing: border-box;
         }
         .dv-tab:hover {
           border-color: #B8860B;
+          background: #FAF5EB;
         }
         .dv-tab.active {
           border-color: #B8860B;
           background: rgba(184,134,11,0.15);
           color: #B8860B;
           font-weight: 700;
-          box-shadow: 0 2px 8px rgba(184,134,11,0.12);
+          box-shadow: 0 2px 8px rgba(184,134,11,0.14);
+        }
+        .dv-tab-icon {
+          font-size: 16px;
+          line-height: 1;
+          margin-bottom: 2px;
+        }
+        .dv-tab-key {
+          font-size: 13px;
+          font-weight: 700;
+          line-height: 1.1;
+        }
+        .dv-tab-domain {
+          font-size: 9.5px;
+          opacity: 0.8;
+          margin-top: 3px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
+          text-align: center;
+          letter-spacing: -0.2px;
         }
         .dv-grid {
           display: grid;
@@ -440,12 +505,11 @@ export default function DivisionalPage() {
                 type="button"
                 className={`dv-tab${isActive ? " active" : ""}`}
                 onClick={() => setActiveChart(d.key)}
+                title={`${d.key} (${d.name}): ${m.domain}`}
               >
-                <div className="flex items-center gap-1.5">
-                  <span>{m.icon}</span>
-                  <span className="font-bold">{d.key}</span>
-                </div>
-                <div style={{ fontSize: 10, opacity: 0.75, marginTop: 2 }}>{m.domain.split("&")[0]}</div>
+                <span className="dv-tab-icon">{m.icon}</span>
+                <span className="dv-tab-key">{d.key}</span>
+                <span className="dv-tab-domain">{m.domain}</span>
               </button>
             );
           })}
@@ -561,7 +625,7 @@ export default function DivisionalPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 mt-4">
             {divs.map((d) => {
               const m = CHART_META[d.key] || { icon: "✦", domain: d.purpose, category: "" };
               const strong = d.planets.filter((p) => p.dignity === "Exalted" || p.dignity === "Own");

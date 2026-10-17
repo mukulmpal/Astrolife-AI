@@ -37,22 +37,26 @@ const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
 const PCOL = ["#d97706","#b8860b","#dc2626","#15803d","#d97706","#db2777","#2563eb","#854d0e","#e11d48"];
 
 const VARGA_CHART_META: Record<string, { icon: string; domain: string }> = {
-  D1: { icon: "🔯", domain: "Physical Life & Identity" },
-  D2: { icon: "💰", domain: "Wealth & Finance" },
-  D3: { icon: "⚡", domain: "Courage & Siblings" },
-  D4: { icon: "🏠", domain: "Property & Home" },
-  D7: { icon: "👶", domain: "Children & Legacy" },
-  D9: { icon: "💍", domain: "Marriage & Soul Destiny" },
-  D10: { icon: "💼", domain: "Career & Public Status" },
+  D1:  { icon: "🔯", domain: "Physical Life" },
+  D2:  { icon: "💰", domain: "Wealth & Finance" },
+  D3:  { icon: "⚡", domain: "Courage & Siblings" },
+  D4:  { icon: "🏠", domain: "Property & Home" },
+  D5:  { icon: "🙏", domain: "Past Life Merit" },
+  D6:  { icon: "🛡️", domain: "Health & Immunity" },
+  D7:  { icon: "👶", domain: "Children & Legacy" },
+  D8:  { icon: "🔮", domain: "Transformation" },
+  D9:  { icon: "💍", domain: "Marriage & Soul" },
+  D10: { icon: "💼", domain: "Career & Status" },
+  D11: { icon: "🎯", domain: "Gains & Income" },
   D12: { icon: "👨‍👩‍👧", domain: "Ancestry & Parents" },
-  D16: { icon: "🚗", domain: "Vehicles & Peace of Mind" },
-  D20: { icon: "🕉️", domain: "Spiritual Path & Sadhana" },
-  D24: { icon: "📚", domain: "Learning & Education" },
-  D27: { icon: "🌟", domain: "Soul Strength & Resilience" },
-  D30: { icon: "⚠️", domain: "Obstacles & Karma Traps" },
-  D40: { icon: "☯️", domain: "Auspiciousness & Luck" },
-  D45: { icon: "🎭", domain: "Character & Ethical Spine" },
-  D60: { icon: "🌀", domain: "Root Past-Life Karma" },
+  D16: { icon: "🚗", domain: "Vehicles & Comfort" },
+  D20: { icon: "🕉️", domain: "Spiritual Path" },
+  D24: { icon: "📚", domain: "Higher Learning" },
+  D27: { icon: "🌟", domain: "Soul Strength" },
+  D30: { icon: "⚠️", domain: "Obstacles & Karma" },
+  D40: { icon: "☯️", domain: "Maternal Grace" },
+  D45: { icon: "🎭", domain: "Character & Values" },
+  D60: { icon: "🌀", domain: "Root Past Karma" },
 };
 
 export function formatDMS(lon: number): string {
@@ -1355,7 +1359,7 @@ export default function KundliPage() {
                   </p>
 
                   {/* Varga Selector Pills */}
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2">
                     {divCharts.map((d) => {
                       const m = VARGA_CHART_META[d.key] || { icon: "✦", domain: d.purpose };
                       const isActive = (currentDiv?.key ?? "D9") === d.key;
@@ -1364,17 +1368,16 @@ export default function KundliPage() {
                           key={d.key}
                           type="button"
                           onClick={() => setSelectedVarga(d.key)}
-                          className={`px-3 py-2 rounded-xl text-left border transition-all text-xs font-medium flex items-center gap-2 ${
+                          title={`${d.key} (${d.name}): ${m.domain}`}
+                          className={`p-2 rounded-xl text-center border transition-all text-xs font-medium flex flex-col items-center justify-center min-h-[58px] ${
                             isActive
                               ? "bg-[rgba(184,134,11,0.15)] border-[#B8860B] text-[#B8860B] font-bold shadow-sm"
                               : "bg-[#FAF7F2] border-[rgba(184,134,11,0.18)] text-[#6B635B] hover:border-[#B8860B]"
                           }`}
                         >
-                          <span className="text-sm">{m.icon}</span>
-                          <div>
-                            <div className="font-bold leading-none">{d.key}</div>
-                            <div className="text-[10px] opacity-75 mt-0.5 leading-tight">{m.domain.split("&")[0]}</div>
-                          </div>
+                          <span className="text-base leading-none mb-1">{m.icon}</span>
+                          <span className="font-bold leading-none text-xs">{d.key}</span>
+                          <span className="text-[9.5px] opacity-80 leading-tight mt-1 truncate w-full text-center">{m.domain}</span>
                         </button>
                       );
                     })}
