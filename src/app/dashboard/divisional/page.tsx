@@ -227,63 +227,176 @@ const VARGA_DESIGNATIONS = [
   { min: 2,  title: "Bhedak (भेदक)", desc: "Distinctive Individuality & Awakening" },
 ];
 
-function MiniChart({ chart }: { chart: DivChart }) {
-  const S = 220;
-  const CELLS = [
-    { hn: 1, cx: S / 2,     cy: S / 4 },
-    { hn: 2, cx: S / 4,     cy: S / 8 },
-    { hn: 3, cx: S / 8,     cy: S / 4 },
-    { hn: 4, cx: S / 4,     cy: S / 2 },
-    { hn: 5, cx: S / 8,     cy: 3 * S / 4 },
-    { hn: 6, cx: S / 4,     cy: 7 * S / 8 },
-    { hn: 7, cx: S / 2,     cy: 3 * S / 4 },
-    { hn: 8, cx: 3 * S / 4, cy: 7 * S / 8 },
-    { hn: 9, cx: 7 * S / 8, cy: 3 * S / 4 },
-    { hn: 10,cx: 3 * S / 4, cy: S / 2 },
-    { hn: 11,cx: 7 * S / 8, cy: S / 4 },
-    { hn: 12,cx: 3 * S / 4, cy: S / 8 },
+const P_ABBR: Record<string, string> = {
+  Sun: "Su",
+  Moon: "Mo",
+  Mars: "Ma",
+  Mercury: "Me",
+  Jupiter: "Ju",
+  Venus: "Ve",
+  Saturn: "Sa",
+  Rahu: "Ra",
+  Ketu: "Ke",
+};
+
+const P_COLORS: Record<string, string> = {
+  Sun: "#d97706",
+  Moon: "#7c3aed",
+  Mars: "#dc2626",
+  Mercury: "#15803d",
+  Jupiter: "#b45309",
+  Venus: "#db2777",
+  Saturn: "#2563eb",
+  Rahu: "#854d0e",
+  Ketu: "#e11d48",
+};
+
+function planetLabelSlots(total: number) {
+  if (total <= 1) return [{ x: 0, y: 0, font: 12 }];
+  if (total === 2) return [{ x: -14, y: 0, font: 10.5 }, { x: 14, y: 0, font: 10.5 }];
+  if (total === 3) return [{ x: -19, y: 0, font: 9.5 }, { x: 0, y: 0, font: 9.5 }, { x: 19, y: 0, font: 9.5 }];
+  if (total === 4) {
+    return [
+      { x: -13, y: -7, font: 9 },
+      { x: 13, y: -7, font: 9 },
+      { x: -13, y: 8, font: 9 },
+      { x: 13, y: 8, font: 9 },
+    ];
+  }
+  if (total === 5) {
+    return [
+      { x: -13, y: -8, font: 8.5 },
+      { x: 13, y: -8, font: 8.5 },
+      { x: -20, y: 8, font: 8.5 },
+      { x: 0, y: 8, font: 8.5 },
+      { x: 20, y: 8, font: 8.5 },
+    ];
+  }
+
+  return Array.from({ length: total }, (_, idx) => {
+    const cols = 3;
+    const rows = Math.ceil(total / cols);
+    const row = Math.floor(idx / cols);
+    const col = idx % cols;
+    const rowCount = row === rows - 1 ? total - row * cols : cols;
+    return {
+      x: (col - (rowCount - 1) / 2) * 18,
+      y: (row - (rows - 1) / 2) * 12,
+      font: total > 7 ? 7.5 : 8,
+    };
+  });
+}
+
+function VargaNorthIndianChart({ chart }: { chart: DivChart }) {
+  const S = 320;
+  const HOUSES = [
+    { hn: 1,  cx: S / 2,     cy: S / 4 },
+    { hn: 2,  cx: S / 4,     cy: S / 8 },
+    { hn: 3,  cx: S / 8,     cy: S / 4 },
+    { hn: 4,  cx: S / 4,     cy: S / 2 },
+    { hn: 5,  cx: S / 8,     cy: (3 * S) / 4 },
+    { hn: 6,  cx: S / 4,     cy: (7 * S) / 8 },
+    { hn: 7,  cx: S / 2,     cy: (3 * S) / 4 },
+    { hn: 8,  cx: (3 * S) / 4, cy: (7 * S) / 8 },
+    { hn: 9,  cx: (7 * S) / 8, cy: (3 * S) / 4 },
+    { hn: 10, cx: (3 * S) / 4, cy: S / 2 },
+    { hn: 11, cx: (7 * S) / 8, cy: S / 4 },
+    { hn: 12, cx: (3 * S) / 4, cy: S / 8 },
   ];
-  const byHouse: Record<number, { icon: string; color: string; retro: boolean }[]> = {};
+
+  const byHouse: Record<number, DivPlanet[]> = {};
   for (let i = 1; i <= 12; i++) byHouse[i] = [];
-  chart.planets.forEach((p) =>
-    byHouse[p.house]?.push({ icon: p.icon, color: p.color, retro: p.retrograde })
-  );
+  chart.planets.forEach((p) => {
+    if (p.house >= 1 && p.house <= 12) {
+      byHouse[p.house].push(p);
+    }
+  });
 
   return (
-    <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{ maxWidth: 220, display: "block", margin: "0 auto" }}>
-      <rect width={S} height={S} fill="#FAF7F2" rx="10" />
-      <rect x={0} y={0} width={S} height={S} fill="none" stroke="rgba(184,134,11,0.3)" strokeWidth="1" rx="10" />
-      <line x1={S / 2} y1={0}     x2={S}     y2={S / 2} stroke="rgba(184,134,11,0.2)" strokeWidth="0.8" />
-      <line x1={S}     y1={S / 2} x2={S / 2} y2={S}     stroke="rgba(184,134,11,0.2)" strokeWidth="0.8" />
-      <line x1={S / 2} y1={S}     x2={0}     y2={S / 2} stroke="rgba(184,134,11,0.2)" strokeWidth="0.8" />
-      <line x1={0}     y1={S / 2} x2={S / 2} y2={0}     stroke="rgba(184,134,11,0.2)" strokeWidth="0.8" />
-      <line x1={0}     y1={0}     x2={S}     y2={S}     stroke="rgba(184,134,11,0.15)" strokeWidth="0.5" />
-      <line x1={S}     y1={0}     x2={0}     y2={S}     stroke="rgba(184,134,11,0.15)" strokeWidth="0.5" />
-      {CELLS.map(({ hn, cx, cy }) => {
+    <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{ maxWidth: 320, display: "block", margin: "0 auto" }}>
+      <rect width={S} height={S} fill="#FFFDF9" rx="12" />
+      <rect x={0} y={0} width={S} height={S} fill="none" stroke="rgba(184,134,11,0.35)" strokeWidth="1.2" rx="12" />
+      {/* Corner diagonals */}
+      <line x1={0} y1={0} x2={S} y2={S} stroke="rgba(184,134,11,0.22)" strokeWidth="0.9" />
+      <line x1={S} y1={0} x2={0} y2={S} stroke="rgba(184,134,11,0.22)" strokeWidth="0.9" />
+      {/* Inner diamond */}
+      <line x1={S / 2} y1={0}     x2={S}     y2={S / 2} stroke="rgba(184,134,11,0.3)" strokeWidth="1" />
+      <line x1={S}     y1={S / 2} x2={S / 2} y2={S}     stroke="rgba(184,134,11,0.3)" strokeWidth="1" />
+      <line x1={S / 2} y1={S}     x2={0}     y2={S / 2} stroke="rgba(184,134,11,0.3)" strokeWidth="1" />
+      <line x1={0}     y1={S / 2} x2={S / 2} y2={0}     stroke="rgba(184,134,11,0.3)" strokeWidth="1" />
+
+      {HOUSES.map(({ hn, cx, cy }) => {
         const rIdx = md(chart.lagnaNum + hn - 1, 12);
-        const isL = hn === 1;
+        const isLagna = hn === 1;
         const here = byHouse[hn] || [];
+        const slots = planetLabelSlots(here.length);
+
         return (
           <g key={hn}>
-            <text x={cx} y={cy - 8} textAnchor="middle" fontSize="7" fill={isL ? "#B8860B" : "#6B635B"}>
+            {/* House Rashi Number */}
+            <text
+              x={cx}
+              y={cy - (isLagna ? 10 : 8)}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={isLagna ? "11" : "10"}
+              fontWeight={isLagna ? "800" : "600"}
+              fill={isLagna ? "#B8860B" : "#78716C"}
+            >
               {rIdx + 1}
             </text>
-            <text x={cx} y={cy + 2} textAnchor="middle" fontSize="9" fill={isL ? "#B8860B" : "#444060"}>
-              {SIGN_ICONS[rIdx]}
-            </text>
-            {here.map((p, pi) => (
+
+            {/* Lagna Badge on 1st House */}
+            {isLagna && (
               <text
-                key={pi}
-                x={cx + (here.length > 1 ? (pi - (here.length - 1) / 2) * 11 : 0)}
-                y={cy + (isL ? 17 : 14)}
+                x={cx}
+                y={cy + 3}
                 textAnchor="middle"
-                fontSize="10"
-                fill={p.color}
+                dominantBaseline="middle"
+                fontSize="8"
+                fill="#B8860B"
+                fontWeight="800"
+                letterSpacing="0.5px"
               >
-                {p.icon}
-                {p.retro ? "ℛ" : ""}
+                Lagna
               </text>
-            ))}
+            )}
+
+            {/* Planets using standard name abbreviations: Su, Mo, Ma, Me, Ju, Ve, Sa, Ra, Ke */}
+            {here.map((p, idx) => {
+              const slot = slots[idx] ?? { x: 0, y: 0, font: 10 };
+              const baseY = cy + (isLagna ? 20 : 15);
+              const abbr = P_ABBR[p.planet] || p.planet.slice(0, 2);
+              const pColor = P_COLORS[p.planet] || p.color || "#1A1A1A";
+
+              return (
+                <g key={`${hn}-${p.planet}-${idx}`}>
+                  <text
+                    x={cx + slot.x}
+                    y={baseY + slot.y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={slot.font}
+                    fontWeight="800"
+                    fill={pColor}
+                  >
+                    {abbr}
+                  </text>
+                  {p.retrograde && (
+                    <text
+                      x={cx + slot.x + (slot.font >= 10 ? 9 : 8)}
+                      y={baseY + slot.y - 4}
+                      textAnchor="middle"
+                      fontSize="6.5"
+                      fill="#ea580c"
+                      fontWeight="800"
+                    >
+                      (R)
+                    </text>
+                  )}
+                </g>
+              );
+            })}
           </g>
         );
       })}
@@ -398,8 +511,8 @@ export default function DivisionalPage() {
         .dv-tabs {
           display: grid;
           grid-template-columns: repeat(10, minmax(0, 1fr));
-          gap: 10px;
-          margin-bottom: 24px;
+          gap: 6px;
+          margin-bottom: 18px;
         }
         @media (max-width: 1280px) {
           .dv-tabs {
@@ -416,15 +529,15 @@ export default function DivisionalPage() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 10px 4px;
-          border-radius: 14px;
+          padding: 6px 3px;
+          border-radius: 10px;
           border: 1px solid rgba(184,134,11,0.22);
           background: #FAF7F2;
           color: #4A4238;
           cursor: pointer;
           transition: all 0.2s;
           text-align: center;
-          min-height: 72px;
+          min-height: 52px;
           width: 100%;
           box-sizing: border-box;
         }
@@ -437,28 +550,128 @@ export default function DivisionalPage() {
           background: rgba(184,134,11,0.16);
           color: #B8860B;
           font-weight: 700;
-          box-shadow: 0 3px 10px rgba(184,134,11,0.16);
+          box-shadow: 0 2px 8px rgba(184,134,11,0.16);
         }
         .dv-tab-icon {
-          font-size: 18px;
+          font-size: 15px;
           line-height: 1;
-          margin-bottom: 3px;
+          margin-bottom: 2px;
         }
         .dv-tab-key {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 700;
           line-height: 1.1;
         }
         .dv-tab-domain {
-          font-size: 11px;
+          font-size: 9.5px;
           opacity: 0.85;
-          margin-top: 3px;
+          margin-top: 1px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           max-width: 100%;
           text-align: center;
           font-weight: 500;
+        }
+
+        /* ── TWO-COLUMN CORE WORKSPACE GRID ── */
+        .dv-grid {
+          display: grid;
+          grid-template-columns: 360px 1fr;
+          gap: 18px;
+          align-items: stretch;
+          margin-bottom: 22px;
+        }
+        @media (max-width: 1024px) {
+          .dv-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        .dv-card {
+          background: #FFFFFF;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          border-radius: 16px;
+          padding: 18px;
+          box-shadow: 0 4px 20px rgba(184, 134, 11, 0.05);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        .dv-card-title {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 18px;
+          font-weight: 700;
+          color: #1A1A1A;
+        }
+        .dv-coord-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 13.5px;
+        }
+        .dv-coord-table th {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.6px;
+          color: #8C6D1F;
+          font-weight: 700;
+          padding: 8px 10px;
+          border-bottom: 1.5px solid rgba(184, 134, 11, 0.2);
+          text-align: left;
+        }
+        .dv-coord-table td {
+          padding: 7px 10px;
+          border-bottom: 1px solid rgba(184, 134, 11, 0.1);
+          color: #2D2825;
+          vertical-align: middle;
+        }
+        .dv-coord-table tr:hover td {
+          background: #FAF5EB;
+        }
+        .dv-stat-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .dv-stat {
+          background: #FAF8F5;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          border-radius: 12px;
+          padding: 8px 14px;
+          text-align: center;
+          min-width: 72px;
+        }
+        .dv-stat-n {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 24px;
+          font-weight: 700;
+          color: #B8860B;
+          line-height: 1;
+        }
+        .dv-stat-l {
+          font-size: 10px;
+          color: #6B635B;
+          margin-top: 3px;
+          letter-spacing: 0.5px;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+        .dv-decision-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-top: 16px;
+        }
+        @media (max-width: 768px) {
+          .dv-decision-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        .dv-decision-card {
+          background: #FFFFFF;
+          border: 1px solid rgba(184, 134, 11, 0.2);
+          border-radius: 14px;
+          padding: 18px 20px;
         }
 
         /* ── IN-PAGE TABS BAR ── */
@@ -528,56 +741,56 @@ export default function DivisionalPage() {
 
       {/* ── HEADER ── */}
       <div className="page-tag">{t("divisional.page_tag") || "Shodashavarga Intelligence"}</div>
-      <h1 className="page-title serif" style={{ fontSize: "28px", color: "#1A1A1A", marginBottom: "8px" }}>
+      <h1 className="page-title serif" style={{ fontSize: "28px", color: "#1A1A1A", marginBottom: "4px" }}>
         16 Varga Kundali Analysis (षोडशवर्ग चक्र)
       </h1>
-      <p className="page-sub" style={{ fontSize: "15px", color: "#5A524C", marginBottom: "20px" }}>
+      <p className="page-sub" style={{ fontSize: "14.5px", color: "#5A524C", marginBottom: "16px" }}>
         {chartName} · Natal D-1 Seed Promise Verified Across 16 Micro-Karma Lenses
       </p>
 
       {/* ── SCOPE & QUICK STATS BAR ── */}
-      <div className="header-card" style={{ marginBottom: 24, padding: "20px 24px" }}>
+      <div className="header-card" style={{ marginBottom: 16, padding: "16px 20px" }}>
         <div className="header-orb" />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 12, letterSpacing: "2px", textTransform: "uppercase", color: "#a855f7", marginBottom: 6, fontWeight: 700 }}>
+        <div style={{ position: "relative", zIndex: 1, minWidth: 260 }}>
+          <div style={{ fontSize: 11, letterSpacing: "1.8px", textTransform: "uppercase", color: "#B8860B", marginBottom: 3, fontWeight: 700 }}>
             ✦ Shodashavarga Scope
           </div>
-          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, fontWeight: 700, color: "#1A1A1A" }}>
+          <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 24, fontWeight: 700, color: "#1A1A1A", lineHeight: 1.15 }}>
             Active Varga: {current.key} ({current.name})
           </div>
-          <div style={{ fontSize: 13.5, color: "#5A524C", marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: "#5A524C", marginTop: 3 }}>
             Natal Lagna: <strong>{chart.lagnaRashi}</strong> · {current.key} Lagna: <strong>{current.lagna}</strong>
             {activeMD && <span> · Active Dasha: <strong>{activeMD.planet} Mahadasha</strong></span>}
           </div>
         </div>
         <div className="dv-stat-row">
-          <div className="dv-stat" style={{ padding: "12px 18px" }}>
-            <div className="dv-stat-n" style={{ fontSize: "22px" }}>{current.lagna}</div>
-            <div className="dv-stat-l" style={{ fontSize: "11px" }}>{current.key} LAGNA</div>
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{ fontSize: "20px" }}>{current.lagna}</div>
+            <div className="dv-stat-l" style={{ fontSize: "9.5px" }}>{current.key} LAGNA</div>
           </div>
-          <div className="dv-stat" style={{ padding: "12px 18px" }}>
-            <div className="dv-stat-n" style={{ fontSize: "22px" }}>{divs.length}</div>
-            <div className="dv-stat-l" style={{ fontSize: "11px" }}>TOTAL VARGAS</div>
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{ fontSize: "20px" }}>{divs.length}</div>
+            <div className="dv-stat-l" style={{ fontSize: "9.5px" }}>TOTAL VARGAS</div>
           </div>
-          <div className="dv-stat" style={{ padding: "12px 18px" }}>
-            <div className="dv-stat-n" style={{ color: "#22c55e", fontSize: "22px" }}>
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{ color: "#16a34a", fontSize: "20px" }}>
               {findings.filter((f) => f.type === "positive").length}
             </div>
-            <div className="dv-stat-l" style={{ fontSize: "11px" }}>STRENGTHS</div>
+            <div className="dv-stat-l" style={{ fontSize: "9.5px" }}>STRENGTHS</div>
           </div>
-          <div className="dv-stat" style={{ padding: "12px 18px" }}>
-            <div className="dv-stat-n" style={{ color: "#ef4444", fontSize: "22px" }}>
+          <div className="dv-stat">
+            <div className="dv-stat-n" style={{ color: "#dc2626", fontSize: "20px" }}>
               {findings.filter((f) => f.type === "caution").length}
             </div>
-            <div className="dv-stat-l" style={{ fontSize: "11px" }}>CAUTIONS</div>
+            <div className="dv-stat-l" style={{ fontSize: "9.5px" }}>CAUTIONS</div>
           </div>
         </div>
       </div>
 
       <PremiumFeature feature="Divisional Charts">
         {/* ── 5 HARMONIC PLANES FILTER ── */}
-        <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#8C6D1F] whitespace-nowrap">
+        <div className="flex items-center gap-1.5 mb-2.5 overflow-x-auto pb-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C6D1F] whitespace-nowrap mr-1">
             Harmonic Plane:
           </span>
           {HARMONIC_PLANES.map((hp) => (
@@ -619,81 +832,207 @@ export default function DivisionalPage() {
 
         {/* ── 2. ACTIVE VARGA CORE WORKSPACE: CHART + PLANET POSITIONS ── */}
         <div className="dv-grid">
-          {/* Left: North Indian Mini Chart */}
-          <div className="dv-card" style={{ borderColor: color + "40" }}>
+          {/* Left: North Indian Name-Based Chart ( Su, Mo, Ma, Me, Ju, Ve, Sa, Ra, Ke ) */}
+          <div className="dv-card" style={{ borderColor: color + "40", padding: "16px 18px" }}>
             <div className="flex items-center justify-between mb-2">
-              <div className="dv-card-title" style={{ color, marginBottom: 0, fontSize: "14px" }}>
+              <div className="dv-card-title" style={{ color, marginBottom: 0, fontSize: "16px" }}>
                 {meta?.icon} {current.key} — {current.name} Chakra
               </div>
-              <span className="text-xs px-3 py-1 rounded-full bg-[#FAF7F2] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
                 {current.lagna} Lagna
               </span>
             </div>
 
-            <MiniChart chart={current} />
+            <VargaNorthIndianChart chart={current} />
 
-            <div style={{ marginTop: 14, padding: "12px 16px", background: color + "0d", border: `1px solid ${color}22`, borderRadius: 12 }}>
+            <div style={{ marginTop: 10, padding: "10px 12px", background: color + "0d", border: `1px solid ${color}22`, borderRadius: 10 }}>
               <div className="flex items-center justify-between mb-1">
-                <div style={{ fontSize: 11, color, letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 700 }}>
+                <div style={{ fontSize: 10.5, color, letterSpacing: "1.2px", textTransform: "uppercase", fontWeight: 700 }}>
                   Domain Focus &amp; Adhidevata
                 </div>
                 {neuroProfile?.deityArchetype && (
-                  <span className="text-xs px-2.5 py-0.5 rounded bg-white text-[#8C6D1F] border border-[rgba(184,134,11,0.2)] font-bold">
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-white text-[#8C6D1F] border border-[rgba(184,134,11,0.2)] font-bold">
                     ⚡ {neuroProfile.deityArchetype.name}
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 13.5, color: "#3D3834", lineHeight: 1.65 }}>
+              <div style={{ fontSize: 13, color: "#3D3834", lineHeight: 1.5 }}>
                 {current.purpose}
               </div>
             </div>
           </div>
 
           {/* Right: Planet Positions Table in Active Varga */}
-          <div className="dv-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="dv-card-title" style={{ marginBottom: 0, fontSize: "14px" }}>
+          <div className="dv-card" style={{ padding: "16px 18px" }}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="dv-card-title" style={{ marginBottom: 0, fontSize: "16px" }}>
                 Planetary Coordinates in {current.key}
               </div>
-              <span className="text-xs text-[#5A524C] font-semibold">
-                {current.planets.filter((p) => p.dignity === "Exalted").length} Exalted · {current.planets.filter((p) => p.dignity === "Own").length} Own
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200 font-bold">
+                  {current.planets.filter((p) => p.dignity === "Exalted").length} Exalted
+                </span>
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 font-bold">
+                  {current.planets.filter((p) => p.dignity === "Own").length} Own
+                </span>
+                {current.planets.filter((p) => p.dignity === "Debilitated").length > 0 && (
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-900 border border-rose-200 font-bold">
+                    {current.planets.filter((p) => p.dignity === "Debilitated").length} Debilitated
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              {current.planets.map((p, i) => (
-                <div key={i} className="dv-planet-row" style={{ padding: "8px 0" }}>
-                  <span style={{ fontSize: 17, color: p.color, width: 24 }}>{p.icon}</span>
-                  <span style={{ flex: 1, fontSize: 14, color: "#1A1A1A", fontWeight: 600 }}>{p.planet}</span>
-                  <span style={{ fontSize: 13.5, color: "#4A4238" }}>{p.sign}</span>
-                  <span style={{ fontSize: 13.5, color: "#5A524C", width: 34, textAlign: "right", fontWeight: 700 }}>
-                    H{p.house}
-                  </span>
-                  {p.dignity !== "—" ? (
-                    <span
-                      className="dv-badge"
-                      style={{
-                        fontSize: "11px",
-                        padding: "3px 8px",
-                        color: p.dignity === "Exalted" ? "#b45309" : p.dignity === "Own" ? "#15803d" : "#b91c1c",
-                        background: p.dignity === "Exalted" ? "rgba(245,158,11,0.12)" : p.dignity === "Own" ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
-                        border: `1px solid ${p.dignity === "Exalted" ? "rgba(245,158,11,0.3)" : p.dignity === "Own" ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
-                      }}
-                    >
-                      {p.dignity}
-                    </span>
-                  ) : (
-                    <span style={{ fontSize: 11, color: "#9ca3af", width: 45, textAlign: "center" }}>—</span>
-                  )}
-                  {p.retrograde && <span style={{ fontSize: 11, color: "#f97316", fontWeight: 700 }}>[R]</span>}
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="dv-coord-table">
+                <thead>
+                  <tr>
+                    <th>Planet</th>
+                    <th>Sign in {current.key}</th>
+                    <th>House</th>
+                    <th>Dignity / Status</th>
+                    <th>Varga Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {current.planets.map((p, i) => {
+                    const isLagnesh = p.planet === d1LagnaLord;
+                    const isKaryesh = p.planet === d1Karyesh;
+                    const isKaraka = p.planet === d1Karaka;
+                    const roleTag = isLagnesh
+                      ? "Lagnesh"
+                      : isKaryesh
+                      ? `Karyesh (H${karyaConfig.house})`
+                      : isKaraka
+                      ? "Karaka"
+                      : "—";
+
+                    return (
+                      <tr key={i}>
+                        <td style={{ fontWeight: 600 }}>
+                          <div className="flex items-center gap-2">
+                            <span
+                              style={{
+                                width: 22,
+                                height: 22,
+                                borderRadius: "50%",
+                                background: (P_COLORS[p.planet] || "#8C6D1F") + "18",
+                                color: P_COLORS[p.planet] || "#8C6D1F",
+                                border: `1px solid ${(P_COLORS[p.planet] || "#8C6D1F")}40`,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: 10.5,
+                                fontWeight: 800,
+                              }}
+                            >
+                              {P_ABBR[p.planet] || p.planet.slice(0, 2)}
+                            </span>
+                            <span style={{ fontSize: 13.5, color: "#1A1A1A" }}>{p.planet}</span>
+                            {p.retrograde && (
+                              <span style={{ fontSize: 11, color: "#ea580c", fontWeight: 700 }} title="Retrograde">
+                                (R)
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ fontSize: 13 }}>{p.sign}</td>
+                        <td>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 700,
+                              padding: "2px 8px",
+                              borderRadius: 6,
+                              background: "#FAF5EB",
+                              color: "#8C6D1F",
+                              border: "1px solid rgba(184,134,11,0.22)",
+                            }}
+                          >
+                            H{p.house}
+                          </span>
+                        </td>
+                        <td>
+                          {p.dignity !== "—" ? (
+                            <span
+                              style={{
+                                fontSize: 11,
+                                fontWeight: 700,
+                                padding: "2px 8px",
+                                borderRadius: 6,
+                                color:
+                                  p.dignity === "Exalted"
+                                    ? "#b45309"
+                                    : p.dignity === "Own"
+                                    ? "#15803d"
+                                    : "#b91c1c",
+                                background:
+                                  p.dignity === "Exalted"
+                                    ? "rgba(245,158,11,0.12)"
+                                    : p.dignity === "Own"
+                                    ? "rgba(34,197,94,0.12)"
+                                    : "rgba(239,68,68,0.12)",
+                                border: `1px solid ${
+                                  p.dignity === "Exalted"
+                                    ? "rgba(245,158,11,0.3)"
+                                    : p.dignity === "Own"
+                                    ? "rgba(34,197,94,0.3)"
+                                    : "rgba(239,68,68,0.3)"
+                                }`,
+                              }}
+                            >
+                              {p.dignity}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: 12, color: "#9ca3af" }}>Neutral</span>
+                          )}
+                        </td>
+                        <td>
+                          {roleTag !== "—" ? (
+                            <span
+                              style={{
+                                fontSize: 11,
+                                fontWeight: 700,
+                                padding: "2px 7px",
+                                borderRadius: 6,
+                                background: isLagnesh ? "rgba(184,134,11,0.1)" : isKaryesh ? "rgba(37,99,235,0.08)" : "rgba(124,58,237,0.08)",
+                                color: isLagnesh ? "#B8860B" : isKaryesh ? "#2563EB" : "#7C3AED",
+                                border: `1px solid ${isLagnesh ? "rgba(184,134,11,0.25)" : isKaryesh ? "rgba(37,99,235,0.2)" : "rgba(124,58,237,0.2)"}`,
+                              }}
+                            >
+                              {roleTag}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: 11, color: "#9ca3af" }}>—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Quick 3-Metric Placement Status Bar */}
+            <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(184,134,11,0.16)", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+              <div style={{ background: "#FAF8F5", borderRadius: 8, padding: "8px 10px", border: "1px solid rgba(184,134,11,0.18)" }}>
+                <div style={{ fontSize: 10, color: "#8C6D1F", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>D1 Lagnesh in {current.key}</div>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A1A1A", marginTop: 2 }}>{d1LagnaLord} in {lagneshVarga.house} ({lagneshVarga.sign})</div>
+              </div>
+              <div style={{ background: "#FAF8F5", borderRadius: 8, padding: "8px 10px", border: "1px solid rgba(184,134,11,0.18)" }}>
+                <div style={{ fontSize: 10, color: "#8C6D1F", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>Karyesh ({karyaConfig.label})</div>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1A1A1A", marginTop: 2 }}>{d1Karyesh} in {karyeshVarga.house} ({karyeshVarga.dignity})</div>
+              </div>
+              <div style={{ background: "#FAF8F5", borderRadius: 8, padding: "8px 10px", border: "1px solid rgba(184,134,11,0.18)" }}>
+                <div style={{ fontSize: 10, color: "#8C6D1F", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>Classical Capacity</div>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#B8860B", marginTop: 2 }}>{vargaTitle.title.split(" ")[0]}</div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* ── 3. WORKSPACE 4-TAB NAVIGATION BAR ── */}
-        <div className="workspace-tabs-bar mt-6">
+        <div className="workspace-tabs-bar mt-5">
           <button
             type="button"
             className={`ws-tab-btn ${activeTab === "shastric" ? "active" : ""}`}
