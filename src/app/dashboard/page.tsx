@@ -533,93 +533,93 @@ function DashboardContent() {
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
         /* MAIN */
-        .main{padding:32px;min-height:100vh}
+        .main{padding:20px 24px 60px;min-height:100vh}
 
         /* TOPBAR */
-        .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px}
-        .greeting-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:6px}
-        .greeting-h{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#1A1A1A;line-height:1.1}
+        .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:14px}
+        .greeting-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:4px}
+        .greeting-h{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#1A1A1A;line-height:1.15}
         .greeting-h em{font-style:italic;color:#c8a030}
-        .greeting-sub{font-size:13px;color:#6B635B;margin-top:4px}
+        .greeting-sub{font-size:13px;color:#6B635B;margin-top:2px}
         .topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
-        .date-chip{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:10px;padding:10px 16px;text-align:right}
+        .date-chip{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:10px;padding:8px 14px;text-align:right}
         .date-day{font-size:11px;color:#6B635B;letter-spacing:1px}
         .date-full{font-size:13px;color:#4A4238;margin-top:2px}
-        .notif-btn{width:40px;height:40px;border-radius:10px;background:#FFFFFF;border:1px solid #FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:18px}
+        .notif-btn{width:38px;height:38px;border-radius:10px;background:#FFFFFF;border:1px solid #FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:17px}
         .notif-btn:hover{border-color:rgba(200,160,48,0.3)}
 
         /* TABS */
-        .tabs{display:flex;gap:4px;margin-bottom:28px;background:#FAF7F2;border:1px solid #FFFFFF;border-radius:12px;padding:4px;width:fit-content}
-        .tab{padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#6B635B;border:none;background:none;font-family:'Outfit',sans-serif}
+        .tabs{display:flex;gap:4px;margin-bottom:16px;background:#FAF7F2;border:1px solid #FFFFFF;border-radius:12px;padding:4px;width:fit-content}
+        .tab{padding:7px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:#6B635B;border:none;background:none;font-family:'Outfit',sans-serif}
         .tab.active{background:#FFFFFF;color:#4A4238}
 
         /* STATS */
-        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-        .stat-card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:20px;transition:border-color 0.3s}
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+        .stat-card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:14px 16px;transition:border-color 0.3s}
         .stat-card:hover{border-color:rgba(200,160,48,0.2)}
-        .stat-icon{font-size:24px;margin-bottom:12px}
-        .stat-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#c8a030;line-height:1;margin-bottom:4px}
+        .stat-icon{font-size:20px;margin-bottom:8px}
+        .stat-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#c8a030;line-height:1;margin-bottom:3px}
         .stat-lbl{font-size:12px;color:#6B635B}
-        .stat-change{font-size:11px;color:#1d9e75;margin-top:6px}
+        .stat-change{font-size:11px;color:#1d9e75;margin-top:4px}
 
         /* GRID */
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 
         /* CARDS */
-        .card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:24px;transition:border-color 0.3s}
+        .card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:16px;padding:18px 20px;transition:border-color 0.3s}
         .card:hover{border-color:rgba(200,160,48,0.15)}
-        .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1A1A1A;margin-bottom:16px}
-        .card-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B635B;margin-bottom:8px}
+        .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1A1A1A;margin-bottom:12px}
+        .card-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B635B;margin-bottom:6px}
 
         /* QUICK ACTIONS */
-        .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-        .action-btn{padding:16px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;cursor:pointer;transition:all 0.25s;text-align:left;text-decoration:none;display:block}
-        .action-btn:hover{transform:translateY(-3px);border-color:rgba(200,160,48,0.25);background:#FFFFFF}
-        .action-btn-icon{font-size:24px;margin-bottom:10px}
-        .action-btn-label{font-size:13px;font-weight:500;color:#4A4238;margin-bottom:3px}
+        .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+        .action-btn{padding:14px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;cursor:pointer;transition:all 0.25s;text-align:left;text-decoration:none;display:block}
+        .action-btn:hover{transform:translateY(-2px);border-color:rgba(200,160,48,0.25);background:#FFFFFF}
+        .action-btn-icon{font-size:22px;margin-bottom:8px}
+        .action-btn-label{font-size:13px;font-weight:500;color:#4A4238;margin-bottom:2px}
         .action-btn-desc{font-size:11px;color:#6B635B}
 
         /* INSIGHTS */
-        .insight{padding:16px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;margin-bottom:10px;transition:border-color 0.2s}
+        .insight{padding:14px 16px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;margin-bottom:8px;transition:border-color 0.2s}
         .insight:last-child{margin-bottom:0}
         .insight:hover{border-color:rgba(200,160,48,0.2)}
         .insight.urgent{border-color:rgba(200,160,48,0.25);background:rgba(200,160,48,0.03)}
-        .insight-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-        .insight-icon{font-size:18px}
+        .insight-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+        .insight-icon{font-size:17px}
         .insight-tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#c8a030;font-weight:500}
         .insight-urgent-dot{width:6px;height:6px;border-radius:50%;background:#c8a030;margin-left:auto;animation:blink 2s infinite}
-        .insight-text{font-size:13px;color:#4A4238;line-height:1.7}
+        .insight-text{font-size:13px;color:#4A4238;line-height:1.6}
 
         /* PLANETS */
-        .planet-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #FFFFFF}
+        .planet-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #FFFFFF}
         .planet-row:last-child{border-bottom:none}
-        .energy-pill{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(200,160,48,0.1);border:1px solid rgba(200,160,48,0.15);color:#c8a030}
+        .energy-pill{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(200,160,48,0.1);border:1px solid rgba(200,160,48,0.15);color:#c8a030}
 
         /* TODAY CARD */
-        .today-card{background:linear-gradient(135deg,#FFFFFF,#FAF5EB);border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden}
+        .today-card{background:linear-gradient(135deg,#FFFFFF,#FAF5EB);border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
         .today-orb{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(200,160,48,0.08) 0%,transparent 70%);right:-40px;top:-40px;pointer-events:none}
-        .today-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:10px}
-        .today-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
-        .today-text{font-size:14px;color:#4A4238;line-height:1.8;max-width:600px}
-        .today-score{position:absolute;right:24px;bottom:24px;text-align:center}
-        .score-n{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;color:#c8a030;line-height:1}
+        .today-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a030;margin-bottom:6px}
+        .today-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#1A1A1A;margin-bottom:6px}
+        .today-text{font-size:13.5px;color:#4A4238;line-height:1.7;max-width:600px}
+        .today-score{position:absolute;right:20px;bottom:20px;text-align:center}
+        .score-n{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;color:#c8a030;line-height:1}
         .score-l{font-size:11px;color:#6B635B;letter-spacing:1px}
-        .today-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-        .today-summary-card{display:block;text-decoration:none;background:#FFFFFF;border:1px solid #FFFFFF;border-radius:12px;padding:14px 16px;transition:all 0.2s}
+        .today-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+        .today-summary-card{display:block;text-decoration:none;background:#FFFFFF;border:1px solid #FFFFFF;border-radius:12px;padding:12px 14px;transition:all 0.2s}
         .today-summary-card:hover{transform:translateY(-2px);border-color:rgba(200,160,48,0.25)}
-        .today-summary-k{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;margin-bottom:6px}
-        .today-summary-v{font-size:14px;color:#1A1A1A;line-height:1.5}
-        .today-summary-hint{font-size:11px;color:#c8a030;margin-top:8px}
+        .today-summary-k{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B635B;margin-bottom:4px}
+        .today-summary-v{font-size:13.5px;color:#1A1A1A;line-height:1.4}
+        .today-summary-hint{font-size:11px;color:#c8a030;margin-top:6px}
 
         /* UPGRADE */
-        .upgrade{background:linear-gradient(135deg,#FAF5EB,#FFFFFF);border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-        .upgrade-btn{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;white-space:nowrap;text-decoration:none}
+        .upgrade{background:linear-gradient(135deg,#FAF5EB,#FFFFFF);border:1px solid rgba(200,160,48,0.25);border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+        .upgrade-btn{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;border:none;border-radius:10px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;white-space:nowrap;text-decoration:none}
         .upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,160,48,0.3)}
-        .db-health{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.18);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
-        .db-health-title{font-size:13px;color:#C2410C;font-weight:700;margin-bottom:4px}
-        .db-health-text{font-size:12px;color:#4A4238;line-height:1.7}
+        .db-health{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.18);border-radius:14px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+        .db-health-title{font-size:13px;color:#C2410C;font-weight:700;margin-bottom:3px}
+        .db-health-text{font-size:12px;color:#4A4238;line-height:1.6}
         .db-health-tags{display:flex;gap:6px;flex-wrap:wrap}
-        .db-health-tag{font-size:10px;color:#C2410C;font-weight:600;border:1px solid rgba(194,65,12,0.25);background:rgba(194,65,12,0.08);border-radius:999px;padding:3px 8px}
+        .db-health-tag{font-size:10px;color:#C2410C;font-weight:600;border:1px solid rgba(194,65,12,0.25);background:rgba(194,65,12,0.08);border-radius:999px;padding:2px 8px}
         .mobile-nav{display:none}
 
         @media(max-width:1024px){
@@ -943,7 +943,7 @@ function DashboardContent() {
 
           {activeTab === "charts" && (
           <>
-          <div className="card" style={{ marginBottom: 24 }}>
+          <div className="card" style={{ marginBottom: 16 }}>
             <div className="card-tag">✦ Chart Generator</div>
             <div className="card-title serif">Generate or Update Your Chart</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16 }}>
@@ -992,7 +992,7 @@ function DashboardContent() {
                 )}
               </div>
             </div>
-            <button style={{ width: "100%", marginTop: 20, padding: 16, background: "linear-gradient(135deg,#c8a030,#3c2880cc)", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600, color: "#FAF7F2", cursor: "pointer", transition: "all 0.25s", fontFamily: "Outfit,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+            <button style={{ width: "100%", marginTop: 16, padding: 14, background: "linear-gradient(135deg,#c8a030,#3c2880cc)", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600, color: "#FAF7F2", cursor: "pointer", transition: "all 0.25s", fontFamily: "Outfit,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
               onClick={handleGenerateChart}
               disabled={!chartForm.name||!chartForm.dob||!chartForm.tob||!chartForm.city||chartLoading}
               onMouseEnter={e => !chartLoading && (e.currentTarget.style.transform = "translateY(-2px)")}
@@ -1001,7 +1001,7 @@ function DashboardContent() {
             </button>
           </div>
 
-          <div className="card" style={{ marginBottom: 24 }}>
+          <div className="card" style={{ marginBottom: 16 }}>
             <div className="card-tag">✦ D1 + D9 Home Charts</div>
             <div className="card-title serif">Lagna Chart and Navamsha with House/Rashi/Planet Placement</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
@@ -1045,7 +1045,7 @@ function DashboardContent() {
           )}
 
           {activeTab === "insights" && (
-          <div className="card" style={{ marginBottom: 24 }}>
+          <div className="card" style={{ marginBottom: 16 }}>
             <div className="card-tag">✦ AI Insights</div>
             <div className="card-title serif">Your cosmic intelligence briefing</div>
             {insights.map((ins,i) => (
@@ -1062,7 +1062,7 @@ function DashboardContent() {
           )}
 
           {activeTab === "remedies" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 24 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 16 }}>
             <CorePlanetRemediesDossier chart={chart} />
             <NakshatraRemedyDossierCard chart={chart} />
             <div className="card">

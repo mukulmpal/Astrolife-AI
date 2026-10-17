@@ -5,16 +5,16 @@
     radial-gradient(circle at top right, rgba(124, 58, 237, 0.18), transparent 30%),
     #FAF7F2;
   color: #1A1A1A;
-  padding: 28px;
-  padding-bottom: 90px;
+  padding: 20px 24px;
+  padding-bottom: 50px;
 }
 
 .kp-header {
   max-width: 1180px;
-  margin: 0 auto 20px;
+  margin: 0 auto 16px;
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: 18px;
+  gap: 14px;
   align-items: stretch;
 }
 
@@ -26,39 +26,40 @@
   border: 1px solid rgba(184, 134, 11, 0.2);
   background: #FFFFFF;
   backdrop-filter: blur(18px);
-  border-radius: 28px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .kp-title-block {
-  padding: 30px;
+  padding: 20px 24px;
 }
 
 .kp-title-block span,
 .kp-section-head span {
   color: #B8860B;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .kp-title-block h1 {
-  margin: 12px 0;
-  font-size: clamp(38px, 54px, 72px);
+  margin: 6px 0 8px;
+  font-size: clamp(26px, 3.2vw, 36px);
   letter-spacing: 0;
-  line-height: 0.95;
+  line-height: 1.1;
 }
 
 .kp-title-block p,
 .kp-card p,
 .kp-note-text {
   color: #6B635B;
-  line-height: 1.75;
+  line-height: 1.55;
+  font-size: 13.5px;
 }
 
 .kp-hero-card {
-  padding: 24px;
+  padding: 16px 20px;
   display: grid;
   align-content: center;
 }
@@ -68,19 +69,19 @@
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .kp-hero-card strong {
-  margin: 10px 0;
-  font-size: 22px;
+  margin: 6px 0;
+  font-size: 20px;
 }
 
 .kp-hero-card em {
   color: #B8860B;
-  font-size: 42px;
+  font-size: 34px;
   font-style: normal;
-  font-weight: 950;
+  font-weight: 800;
 }
 
 .kp-logic-note {
