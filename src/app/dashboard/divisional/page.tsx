@@ -531,8 +531,15 @@ export default function DivisionalPage() {
             <MiniChart chart={current} />
 
             <div style={{ marginTop: 14, padding: "10px 14px", background: color + "0d", border: `1px solid ${color}22`, borderRadius: 10 }}>
-              <div style={{ fontSize: 10, color, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 3, fontWeight: 700 }}>
-                Domain Focus
+              <div className="flex items-center justify-between mb-1">
+                <div style={{ fontSize: 10, color, letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 700 }}>
+                  Domain Focus &amp; Adhidevata
+                </div>
+                {neuroProfile?.deityArchetype && (
+                  <span className="text-[10.5px] px-2 py-0.5 rounded bg-white text-[#8C6D1F] border border-[rgba(184,134,11,0.2)] font-bold">
+                    ⚡ {neuroProfile.deityArchetype.name}
+                  </span>
+                )}
               </div>
               <div style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.65 }}>
                 {current.purpose}
