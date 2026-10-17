@@ -176,3 +176,4 @@ export function VargaNeuroKarmicCards({ profile, className = "" }: VargaNeuroKar
     </div>
   );
 }
+

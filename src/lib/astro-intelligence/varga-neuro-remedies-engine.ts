@@ -173,9 +173,25 @@ export function evaluateVargaNeuroKarmicProfile(
   const paragraphs: string[] = [];
   const keyHighlights: string[] = [];
 
+  const RASHI_LORDS_NAMES: Record<number, string> = {
+    0: "Mangal (Mars)",
+    1: "Shukra (Venus)",
+    2: "Budha (Mercury)",
+    3: "Chandra (Moon)",
+    4: "Surya (Sun)",
+    5: "Budha (Mercury)",
+    6: "Shukra (Venus)",
+    7: "Mangal (Mars)",
+    8: "Guru (Jupiter)",
+    9: "Shani (Saturn)",
+    10: "Shani (Saturn)",
+    11: "Guru (Jupiter)",
+  };
+  const natalLagnesh = RASHI_LORDS_NAMES[natalChart.lagnaNum] ?? "Lagnesh";
+
   // P1: Lagna alignment
   paragraphs.push(
-    `Aapke Natal Chart (D-1) me ${natalChart.lagnaRashi} Lagna udit hai, jiska lord ${natalChart.planets?.Mercury ? 'Budha' : 'Lagnesh'} hai. Jab hum ${varga.name} (${varga.key}) me pravesh karte hain, to yahan Lagna ${varga.lagna} ban jata hai, jo Natal Lagna se ${houseOffsetFromNatal}th position par hai. Yeh shastric configuration batati hai ki is varga ke vishay (${vMeta.focusArea}) aapki core personality ke sath kis tarah interact karte hain.`
+    `Aapke Natal Chart (D-1) me ${natalChart.lagnaRashi} Lagna udit hai, jiska swami (Lagnesh) ${natalLagnesh} hai. Jab hum ${varga.name} (${varga.key}) me pravesh karte hain, to yahan Lagna ${varga.lagna} ban jata hai, jo Natal Lagna se ${houseOffsetFromNatal}th position par hai. Yeh shastric configuration batati hai ki is varga ke vishay (${vMeta.focusArea}) aapki core personality ke sath kis tarah interact karte hain.`
   );
 
   // P2: Varga Karaka & Strong Planets
