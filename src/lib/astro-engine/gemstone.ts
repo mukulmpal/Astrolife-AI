@@ -901,8 +901,9 @@ export function generateGemstoneReport(chart: NatalChart, rawInput?: unknown): G
         }
 
         // Add to analysis notes
+        const safeAlt = debilityAudit.profile?.safeAlternativeRemedies?.stoneOrMetal || "Natural substitute metals";
         analysisNotes.push(
-          `✦ Functional Debility Preservation: ${pos.planet} in ${pos.sign} gives an innate superpower: "${debilityAudit.profile.functionalSuperpowerHinglish}" DO NOT wear ${fatalStone}. Safe Alternative: ${debilityAudit.profile.safeAlternativeRemedies.stoneOrMetal}.`
+          `✦ Functional Debility Preservation: ${pos.planet} in ${pos.sign} gives an innate superpower: "${debilityAudit.profile.functionalSuperpowerHinglish}" DO NOT wear ${fatalStone}. Safe Alternative: ${safeAlt}.`
         );
 
         // If it was somehow recommended as primary or secondary, add strong caution

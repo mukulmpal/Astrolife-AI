@@ -782,8 +782,9 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
       if (!pD1) continue;
       const guard = evaluateFunctionalDebilityGemstoneGuard(p, pD1.sign);
       if (guard.hasFunctionalDebility && guard.profile) {
+        const safeAlt = guard.profile.safeAlternativeRemedies?.stoneOrMetal || "Natural substitute metals";
         debilityAlerts.push(
-          `✦ ${p} in ${pD1.sign} (Functional Superpower): ${guard.profile.functionalSuperpowerHinglish} | 🛑 FATAL GEMSTONE: DO NOT WEAR ${guard.profile.fatalGemstone} (${guard.profile.whyGemstoneIsFatalHinglish}) | Safe Alternative: ${guard.profile.safeAlternativeRemedies.stoneOrMetal}`
+          `✦ ${p} in ${pD1.sign} (Functional Superpower): ${guard.profile.functionalSuperpowerHinglish} | 🛑 FATAL GEMSTONE: DO NOT WEAR ${guard.profile.fatalGemstone} (${guard.profile.whyGemstoneIsFatalHinglish}) | Safe Alternative: ${safeAlt}`
         );
       }
     }

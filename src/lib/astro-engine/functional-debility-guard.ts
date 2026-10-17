@@ -278,6 +278,13 @@ export interface NadiDebilityPeakProfile {
   }[];
   peakManifestationHinglish: string;
   historicalCaseStudiesHinglish: string[];
+  fatalGemstone?: string;
+  whyGemstoneIsFatalHinglish?: string;
+  safeAlternativeRemedies?: {
+    stoneOrMetal: string;
+    actionPractice: string;
+    karmicAlignment: string;
+  };
 }
 
 export const NADI_DEBILITY_PEAK_REGISTRY: Record<string, NadiDebilityPeakProfile> = {
@@ -423,6 +430,7 @@ export interface NadiDebilityEvaluationResult {
     sign: string;
     degree: number;
     profile: NadiDebilityPeakProfile;
+    debilityProfile?: DebilitySuperpowerProfile;
     matchedSubWindow: string;
     subPhaseDetail: string;
     actionableAdviceHinglish: string;
@@ -446,12 +454,25 @@ export function evaluateNadiDebilityPeak(chart: ChartData | null | undefined): N
     if (pData.sign.toLowerCase() === profile.debilitatedSign.toLowerCase()) {
       const deg = pData.degree || 0;
       const matched = profile.degreeSubWindows.find((w) => deg >= w.minDeg && deg < w.maxDeg) || profile.degreeSubWindows[0]!;
+      const debilityGuard = FUNCTIONAL_DEBILITY_REGISTRY[planetName];
+
+      const mergedProfile: NadiDebilityPeakProfile = {
+        ...profile,
+        fatalGemstone: debilityGuard?.fatalGemstone || "Do not wear gemstones for debilitated planets",
+        whyGemstoneIsFatalHinglish: debilityGuard?.whyGemstoneIsFatalHinglish || "नीच ग्रह के घर्षण से उत्पन्न अद्वितीय दक्षता को पारंपरिक रत्न शांत कर देता है।",
+        safeAlternativeRemedies: debilityGuard?.safeAlternativeRemedies || {
+          stoneOrMetal: "Natural substitute metals or herbal alternatives",
+          actionPractice: "नियमित ध्यान और कर्म संरेखण करें।",
+          karmicAlignment: "ग्रह की ऊर्जा को रचनात्मक दिशा में लगाएं।"
+        }
+      };
 
       results.push({
         planet: planetName,
         sign: pData.sign,
         degree: deg,
-        profile,
+        profile: mergedProfile,
+        debilityProfile: debilityGuard,
         matchedSubWindow: matched.ageRange,
         subPhaseDetail: matched.subPhaseHinglish,
         actionableAdviceHinglish: `आपका ${planetName} ${pData.sign} में नीच का है। नाड़ी ज्योतिष अनुसार यह दोष नहीं, जीवन का गुप्त वरदान है। आपकी आयु ${matched.ageRange} (विशेषकर ${profile.overallPeakAgeRange}) के दौरान आपके ${profile.nadiKaraka} का सर्वोच्च उत्थान आएगा। इस दौरान इसका पारंपरिक रत्न पहनकर इसके संघर्ष के घर्षण को शांत न करें!`

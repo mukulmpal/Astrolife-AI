@@ -616,7 +616,7 @@ export function pageFunctionalDebilityGuard(chart: ChartData, pageNum = "DG"): s
             <strong>Why Fatal:</strong> ${esc(dp.profile.whyGemstoneIsFatalHinglish)}
           </div>
           <div style="font-size:10px;color:var(--jade);">
-            <strong>Safe Alternative:</strong> ${esc(dp.profile.safeAlternativeRemedies.stoneOrMetal)} · ${esc(dp.profile.safeAlternativeRemedies.actionPractice)}
+            <strong>Safe Alternative:</strong> ${esc(dp.profile?.safeAlternativeRemedies?.stoneOrMetal || "Natural substitute metals")} · ${esc(dp.profile?.safeAlternativeRemedies?.actionPractice || "Lifestyle alignment")}
           </div>
         </div>
       `).join("") : `

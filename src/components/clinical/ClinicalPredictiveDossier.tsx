@@ -331,24 +331,32 @@ export function ClinicalPredictiveDossier({
                         <strong>Exact Sub-Window:</strong> Age {ep.matchedSubWindow} ({ep.subPhaseDetail})
                       </div>
 
-                      <div
-                        style={{
-                          background: "#FEF2F2",
-                          border: "1px solid #FECACA",
-                          borderRadius: 8,
-                          padding: "10px 12px",
-                          fontSize: 12.5,
-                          color: "#991B1B"
-                        }}
-                      >
-                        <strong>🛑 Fatal Gemstone Guard:</strong> DO NOT wear{" "}
-                        {ep.profile.fatalGemstone} ({ep.profile.whyGemstoneIsFatalHinglish})
-                      </div>
+                      {/* Fatal Gemstone Guard */}
+                      {(ep.profile?.fatalGemstone || ep.debilityProfile?.fatalGemstone) && (
+                        <div
+                          style={{
+                            background: "#FEF2F2",
+                            border: "1px solid #FECACA",
+                            borderRadius: 8,
+                            padding: "10px 12px",
+                            fontSize: 12.5,
+                            color: "#991B1B"
+                          }}
+                        >
+                          <strong>🛑 Fatal Gemstone Guard:</strong> DO NOT wear{" "}
+                          {ep.profile?.fatalGemstone || ep.debilityProfile?.fatalGemstone} (
+                          {ep.profile?.whyGemstoneIsFatalHinglish || ep.debilityProfile?.whyGemstoneIsFatalHinglish || "नीच ग्रह के स्वाभाविक घर्षण को शांत न करें"}
+                          )
+                        </div>
+                      )}
 
-                      <div style={{ fontSize: 12.5, color: "#166534", background: "#F0FDF4", padding: "8px 12px", borderRadius: 8 }}>
-                        <strong>Safe Remedy:</strong> {ep.profile.safeAlternativeRemedies.stoneOrMetal} —{" "}
-                        {ep.profile.safeAlternativeRemedies.actionPractice}
-                      </div>
+                      {(ep.profile?.safeAlternativeRemedies || ep.debilityProfile?.safeAlternativeRemedies) && (
+                        <div style={{ fontSize: 12.5, color: "#166534", background: "#F0FDF4", padding: "8px 12px", borderRadius: 8 }}>
+                          <strong>Safe Remedy:</strong>{" "}
+                          {ep.profile?.safeAlternativeRemedies?.stoneOrMetal || ep.debilityProfile?.safeAlternativeRemedies?.stoneOrMetal || "Natural substitute metals"} —{" "}
+                          {ep.profile?.safeAlternativeRemedies?.actionPractice || ep.debilityProfile?.safeAlternativeRemedies?.actionPractice || "Lifestyle alignment"}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
