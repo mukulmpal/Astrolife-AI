@@ -1075,7 +1075,7 @@ export default function SpecialLagnasPage() {
                   {alUlSynastry.verdict}
                 </div>
                 <div>
-                  <strong>Jaimini Secret:</strong> {alUlSynastry.transcriptAdvice}
+                  <strong>Jaimini Secret:</strong> {alUlSynastry.classicalAdvice}
                 </div>
                 <div className="pt-2 border-t border-current/20 font-semibold">
                   <strong>Classical Upay:</strong> {alUlSynastry.remedy}

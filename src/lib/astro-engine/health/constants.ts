@@ -18,7 +18,7 @@ import type {
   HealthRemedy,
   RemedyType,
   SixteenDayRemedyProtocol,
-  SpecialTranscriptGuideline,
+  SpecialClassicalGuideline,
 } from "./types";
 
 export interface PlanetaryMedicalProfile {
@@ -27,7 +27,7 @@ export interface PlanetaryMedicalProfile {
   associatedDomains: HealthDomain[];
   primaryDosha: DoshaType;
   traditionalPathologies: string[];
-  transcriptNotes: string;
+  classicalNotes: string;
 }
 
 export const PLANETARY_MEDICAL_DICTIONARY: Record<KPPlanet, PlanetaryMedicalProfile> = {
@@ -810,7 +810,7 @@ export const SIXTEEN_DAY_REMEDY_PROTOCOLS: Record<KPPlanet, SixteenDayRemedyProt
   },
 };
 
-export const SPECIAL_TRANSCRIPT_RULES: SpecialTranscriptGuideline[] = [
+export const SPECIAL_CLASSICAL_RULES: SpecialClassicalGuideline[] = [
   {
     id: "RULE-SAT-RAHU-1ST-HOUSE",
     title: "1st House Saturn / Rahu: Celebration & Energy Protection Rule",

@@ -1,6 +1,6 @@
 // src/lib/astro-engine/house-trikona-remedies.ts
 // AstroLife — Authentic House-Trikona Physical Vehicle Remedy Engine
-// Based strictly on classical tattva trikonas and the oral discourse transcript:
+// Based strictly on classical tattva trikonas and the classical oral tradition:
 // 1, 5, 9   -> Dharma Trikona (Agni Tattva): Homa / Havan with planet mantra
 // 2, 6, 10  -> Artha Trikona (Prithvi Tattva): Bury related substances in clean soil
 // 3, 7, 11  -> Kama Trikona (Vayu Tattva): Mantra Japa / sacred sound chanting

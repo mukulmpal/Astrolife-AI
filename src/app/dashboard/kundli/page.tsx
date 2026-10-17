@@ -29,10 +29,31 @@ import {
   generateSpecsPillarNarrative,
 } from "@/lib/astro-engine/pillar-narrative-engine";
 import { Edit2, Trash2 } from "lucide-react";
+import { evaluateVargaNeuroKarmicProfile } from "@/lib/astro-intelligence/varga-neuro-remedies-engine";
+import { VargaNeuroKarmicCards } from "@/components/charts/VargaNeuroKarmicCards";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
 const PCOL = ["#d97706","#b8860b","#dc2626","#15803d","#d97706","#db2777","#2563eb","#854d0e","#e11d48"];
+
+const VARGA_CHART_META: Record<string, { icon: string; domain: string }> = {
+  D1: { icon: "🔯", domain: "Physical Life & Identity" },
+  D2: { icon: "💰", domain: "Wealth & Finance" },
+  D3: { icon: "⚡", domain: "Courage & Siblings" },
+  D4: { icon: "🏠", domain: "Property & Home" },
+  D7: { icon: "👶", domain: "Children & Legacy" },
+  D9: { icon: "💍", domain: "Marriage & Soul Destiny" },
+  D10: { icon: "💼", domain: "Career & Public Status" },
+  D12: { icon: "👨‍👩‍👧", domain: "Ancestry & Parents" },
+  D16: { icon: "🚗", domain: "Vehicles & Peace of Mind" },
+  D20: { icon: "🕉️", domain: "Spiritual Path & Sadhana" },
+  D24: { icon: "📚", domain: "Learning & Education" },
+  D27: { icon: "🌟", domain: "Soul Strength & Resilience" },
+  D30: { icon: "⚠️", domain: "Obstacles & Karma Traps" },
+  D40: { icon: "☯️", domain: "Auspiciousness & Luck" },
+  D45: { icon: "🎭", domain: "Character & Ethical Spine" },
+  D60: { icon: "🌀", domain: "Root Past-Life Karma" },
+};
 
 export function formatDMS(lon: number): string {
   const norm = ((lon % 30) + 30) % 30;
@@ -430,6 +451,37 @@ export default function KundliPage() {
       ownPlanets,
     };
   }, [d10]);
+
+  const [selectedVarga, setSelectedVarga] = useState<string>("D9");
+
+  const currentDiv = useMemo(() => {
+    if (!divCharts.length) return null;
+    return divCharts.find((d) => d.key === selectedVarga) || divCharts[0];
+  }, [divCharts, selectedVarga]);
+
+  const currentDivPlanets = useMemo(() => {
+    if (!currentDiv) return {};
+    const res: Record<string, { house: number; retrograde: boolean; signNum: number }> = {};
+    currentDiv.planets.forEach((p) => {
+      res[p.planet] = { house: p.house, retrograde: p.retrograde, signNum: p.signNum };
+    });
+    return res;
+  }, [currentDiv]);
+
+  const activeVargaNeuro = useMemo(() => {
+    if (!chart || !currentDiv || !divCharts.length) return null;
+    return evaluateVargaNeuroKarmicProfile(chart, currentDiv, divCharts);
+  }, [chart, currentDiv, divCharts]);
+
+  const d10Neuro = useMemo(() => {
+    if (!chart || !d10 || !divCharts.length) return null;
+    return evaluateVargaNeuroKarmicProfile(chart, d10, divCharts);
+  }, [chart, d10, divCharts]);
+
+  const d9Neuro = useMemo(() => {
+    if (!chart || !d9 || !divCharts.length) return null;
+    return evaluateVargaNeuroKarmicProfile(chart, d9, divCharts);
+  }, [chart, d9, divCharts]);
 
   const activeMD = chart?.dashas.find((d) => d.active);
   const activeAD = chart?.antardasha.find((d) => d.active);
@@ -938,6 +990,7 @@ export default function KundliPage() {
               {[
                 { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
                 { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "7 Pillars" },
+                { id: "divisional", label: "🧩 16 Varga Charts (षोडशवर्ग)", badge: "D1-D60" },
                 { id: "clinical", label: "🧬 Clinical Intelligence (नाड़ी सूत्र)", badge: "5 Engines" },
                 { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
                 { id: "marriage", label: "💍 Love & Marriage (D-9)", badge: "Navamsha" },
@@ -1281,6 +1334,129 @@ export default function KundliPage() {
             )}
 
             {/* ══════════════════════════════════════════════════════ */}
+            {/* 16 VARGA CHARTS (षोडशवर्ग) & NEURO-KARMIC REMEDIES      */}
+            {/* ══════════════════════════════════════════════════════ */}
+            {activeTab === "divisional" && (
+              <div className="space-y-6">
+                {/* Varga Selector Header */}
+                <div className="card">
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                    <div>
+                      <div className="card-tag">✦ Classical Shodashavarga Architecture (BPHS)</div>
+                      <div className="card-title serif">16 Varga Kundali Analysis (षोडशवर्ग चक्र)</div>
+                    </div>
+                    <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+                      16 Vargas Calculated
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed mb-4">
+                    Shastric rule: Natal D1 kundali seed promise (बीज) hai; 16 divisional charts har life domain ke micro-karma ko decode karte hain.
+                    Neeche kisi bhi varga chart par click karein uski dynamic D1 alignment, subconscious karmic bottlenecks aur scientific DNA-based remedies dekhne ke liye:
+                  </p>
+
+                  {/* Varga Selector Pills */}
+                  <div className="flex gap-2 flex-wrap">
+                    {divCharts.map((d) => {
+                      const m = VARGA_CHART_META[d.key] || { icon: "✦", domain: d.purpose };
+                      const isActive = (currentDiv?.key ?? "D9") === d.key;
+                      return (
+                        <button
+                          key={d.key}
+                          type="button"
+                          onClick={() => setSelectedVarga(d.key)}
+                          className={`px-3 py-2 rounded-xl text-left border transition-all text-xs font-medium flex items-center gap-2 ${
+                            isActive
+                              ? "bg-[rgba(184,134,11,0.15)] border-[#B8860B] text-[#B8860B] font-bold shadow-sm"
+                              : "bg-[#FAF7F2] border-[rgba(184,134,11,0.18)] text-[#6B635B] hover:border-[#B8860B]"
+                          }`}
+                        >
+                          <span className="text-sm">{m.icon}</span>
+                          <div>
+                            <div className="font-bold leading-none">{d.key}</div>
+                            <div className="text-[10px] opacity-75 mt-0.5 leading-tight">{m.domain.split("&")[0]}</div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Active Varga Chart & Positions */}
+                {currentDiv && (
+                  <div className="chart-layout">
+                    {/* North Indian Chart for Active Varga */}
+                    <div className="card">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <div className="card-tag">✦ {currentDiv.key} · {currentDiv.name}</div>
+                          <div className="card-title serif">{currentDiv.key} Kundali</div>
+                        </div>
+                        <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+                          {currentDiv.lagna} Lagna
+                        </span>
+                      </div>
+
+                      <NorthIndianChart lagnaNum={currentDiv.lagnaNum} planets={currentDivPlanets} />
+
+                      <div className="mt-3 p-3 rounded-xl bg-[rgba(184,134,11,0.06)] border border-[rgba(184,134,11,0.2)]">
+                        <div className="text-[10px] uppercase font-bold text-[#B8860B] tracking-wider mb-1">
+                          Domain Purpose
+                        </div>
+                        <div className="text-xs text-[#4A4238] leading-relaxed">
+                          {currentDiv.purpose}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Planet Positions in Active Varga */}
+                    <div className="card">
+                      <div className="card-tag">✦ Planetary Placements</div>
+                      <div className="card-title serif mb-2">Planets in {currentDiv.key}</div>
+                      <div className="space-y-1.5 max-h-[360px] overflow-y-auto pr-1">
+                        {currentDiv.planets.map((p, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-2 rounded-lg bg-[#FAF7F2] border border-[rgba(184,134,11,0.12)] text-xs"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span style={{ color: p.color }} className="font-bold">{p.icon}</span>
+                              <span className="font-medium text-[#1A1A1A]">{p.planet}</span>
+                              {p.retrograde && <span className="text-[10px] text-[#F97316] font-bold">(R)</span>}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-[#6B635B]">{p.sign}</span>
+                              <span className="font-bold text-[#1A1A1A] w-8 text-right">H{p.house}</span>
+                              {p.dignity !== "—" ? (
+                                <span
+                                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                                    p.dignity === "Exalted"
+                                      ? "bg-amber-100 text-amber-800"
+                                      : p.dignity === "Own"
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : "bg-rose-100 text-rose-800"
+                                  }`}
+                                >
+                                  {p.dignity}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-gray-400 w-12 text-center">—</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── 3-TIER NEURO-KARMIC SHODASHAVARGA ENGINE ── */}
+                {activeVargaNeuro && (
+                  <VargaNeuroKarmicCards profile={activeVargaNeuro} />
+                )}
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════════════ */}
             {/* PILLAR 2: CAREER & WEALTH (D-10 DASAMSHA)              */}
             {/* ══════════════════════════════════════════════════════ */}
             {activeTab === "career" && (
@@ -1470,6 +1646,11 @@ export default function KundliPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* ── 3-TIER NEURO-KARMIC REMEDIES FOR D-10 ── */}
+                {d10Neuro && (
+                  <VargaNeuroKarmicCards profile={d10Neuro} />
+                )}
               </div>
             )}
 
@@ -1707,6 +1888,11 @@ export default function KundliPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* ── 3-TIER NEURO-KARMIC REMEDIES FOR D-9 ── */}
+                {d9Neuro && (
+                  <VargaNeuroKarmicCards profile={d9Neuro} />
+                )}
               </div>
             )}
 

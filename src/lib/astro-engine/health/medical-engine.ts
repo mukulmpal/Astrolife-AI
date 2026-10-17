@@ -7,7 +7,7 @@
  * - Deterministic scoring & repetition ladder
  * - Dasha-driven health vector & upcoming "Arogya Windows"
  * - Non-invasive traditional remedies (Dana, Dinacharya, Mantras, Modalities)
- * - Explainable case matching from transcript casebook
+ * - Explainable case matching from classical tradition casebook
  * - Absolute clinical guardrails & emergency symptom triage
  * ============================================================================
  */
@@ -36,7 +36,7 @@ import { matchTranscriptCases } from "./case-matcher";
 import {
   TRADITIONAL_TREATMENT_MODALITIES,
   SIXTEEN_DAY_REMEDY_PROTOCOLS,
-  SPECIAL_TRANSCRIPT_RULES,
+  SPECIAL_CLASSICAL_RULES,
 } from "./constants";
 
 export interface MedicalEngineOptions {
@@ -400,18 +400,18 @@ export function runMedicalEngine(
   // ── STEP 14C: SPECIAL TRANSCRIPT GUIDELINES ──────────────────────────────
   const specialGuidelines: SpecialTranscriptGuideline[] = [];
   if (cusp1CSL === "Saturn" || cusp1CSL === "Rahu") {
-    const r = SPECIAL_TRANSCRIPT_RULES.find((x) => x.id === "RULE-SAT-RAHU-1ST-HOUSE");
+    const r = SPECIAL_CLASSICAL_RULES.find((x) => x.id === "RULE-SAT-RAHU-1ST-HOUSE");
     if (r) specialGuidelines.push(r);
   }
   if (cusp6CSL === "Moon" || cusp6Significations.includes(6)) {
-    const r = SPECIAL_TRANSCRIPT_RULES.find((x) => x.id === "RULE-MOON-6TH-INJECTION");
+    const r = SPECIAL_CLASSICAL_RULES.find((x) => x.id === "RULE-MOON-6TH-INJECTION");
     if (r) specialGuidelines.push(r);
   }
   if (cusp12Significations.includes(12) || cusp1Significations.includes(2)) {
-    const r = SPECIAL_TRANSCRIPT_RULES.find((x) => x.id === "RULE-OCULAR-2ND-12TH");
+    const r = SPECIAL_CLASSICAL_RULES.find((x) => x.id === "RULE-OCULAR-2ND-12TH");
     if (r) specialGuidelines.push(r);
   }
-  const sevaRule = SPECIAL_TRANSCRIPT_RULES.find((x) => x.id === "RULE-MEDICAL-ASTRO-SEVA");
+  const sevaRule = SPECIAL_CLASSICAL_RULES.find((x) => x.id === "RULE-MEDICAL-ASTRO-SEVA");
   if (sevaRule) specialGuidelines.push(sevaRule);
 
   // ── STEP 14D: PERSONALIZED 5TH HOUSE TREATMENT MODALITY ───────────────────
@@ -424,7 +424,7 @@ export function runMedicalEngine(
     rationale: cureRecord?.rationale || "5वां भाव रोगमुक्ति और प्राकृतिक आरोग्य का मुख्य भाव है।",
     specialCaution:
       cusp6CSL === "Moon" || cusp6Significations.includes(6)
-        ? "विशेष सावधानी (Transcript Rule): 6th भाव का चन्द्रमा इंजेक्शन / पैरेंट्रल सुई से तीव्र एलर्जी या रिएक्शन का संकेत देता है; ओरल सिरप व तरल औषधियां अधिक अनुकूल रहती हैं।"
+        ? "विशेष सावधानी (Classical Shastric Rule): 6th भाव का चन्द्रमा इंजेक्शन / पैरेंट्रल सुई से तीव्र एलर्जी या रिएक्शन का संकेत देता है; ओरल सिरप व तरल औषधियां अधिक अनुकूल रहती हैं।"
         : undefined,
   };
 

@@ -1,6 +1,6 @@
 // src/lib/astro-engine/transit-nakshatra-remedies.ts
 // AstroLife — Dynamic Dasha Lord Transit & 27 Shivling Upacharas Engine
-// Based strictly on classical tantrik/shastric sources and oral discourse transcripts:
+// Based strictly on classical tantrik/shastric sources and classical oral traditions:
 // 1. Dasha Lord's real-time transit sign and nakshatra
 // 2. Navtara matching (1-9) from natal Moon nakshatra
 // 3. 27-Upachara Shivling sequence (#1 to #27) for both Mahadasha Lord & Antardasha Lord
@@ -18,7 +18,7 @@ export interface ShivlingUpachara {
   itemOrOffering: string;            // Physical material or action
   significanceHinglish: string;      // Why this upachara transforms energy
   procedureNarrativeHinglish: string;// Step-by-step guidance in warm human tone
-  transcriptExample?: string;        // Real life case study / lore if highlighted
+  classicalExample?: string;        // Real life case study / lore if highlighted
 }
 
 export const SHIVLING_27_UPACHARE: ShivlingUpachara[] = [
@@ -138,7 +138,7 @@ export const SHIVLING_27_UPACHARE: ShivlingUpachara[] = [
     itemOrOffering: "पूरी तरह साबुत, श्वेताभ, बिना टूटे हुए कच्चे चावल",
     significanceHinglish: "हस्त हुनर और हाथों का नक्षत्र है। अक्षत कभी क्षय न होने वाली लक्ष्मी का प्रतीक है। टूटे हुए चावल नहीं चढ़ाने चाहिए।",
     procedureNarrativeHinglish: "एक मुट्ठी ऐसे चावल चुनें जिनका एक भी दाना टूटा हुआ न हो। शिवलिंग पर धीमे-धीमे 'ॐ नमः शिवाय' बोलते हुए अर्पित करें।",
-    transcriptExample: "हरिद्वार के प्राचीन नरसिंह मंदिर के बाहर बैठकर जब भक्त ने बिना टूटे हुए शुद्ध चावल शिवलिंग पर अर्पित किए, तो उसकी घोर दरिद्रता और आर्थिक रुकावटें हमेशा के लिए दूर हो गईं।",
+    classicalExample: "हरिद्वार के प्राचीन नरसिंह मंदिर के बाहर बैठकर जब भक्त ने बिना टूटे हुए शुद्ध चावल शिवलिंग पर अर्पित किए, तो उसकी घोर दरिद्रता और आर्थिक रुकावटें हमेशा के लिए दूर हो गईं।",
   },
   {
     upacharaNumber: 14,
@@ -247,7 +247,7 @@ export const SHIVLING_27_UPACHARE: ShivlingUpachara[] = [
     itemOrOffering: "हाथ में पीले ताज़े फूल, 11 बार 'ॐ नमः शिवाय' का ध्यान",
     significanceHinglish: "पूर्वाभाद्रपद तपस्या और रूपांतरण का नक्षत्र है। हाथ में फूल लेकर मंत्र जप करके चढ़ाने से असंभव काम भी संभव हो जाते हैं।",
     procedureNarrativeHinglish: "दोनों अंजलि में ताज़े पीले फूल (गेंदा या कनेर) लें। शिवलिंग के सम्मुख खड़े होकर शांत स्वर में 11 बार 'ॐ नमः शिवाय' बोलें और फिर अत्यंत भक्ति भाव से वे फूल शिवलिंग पर अर्पित कर दें।",
-    transcriptExample: "मिथुन लग्न के जातक की चार मंजिला इमारत का विवाद सालों से नहीं सुलझ रहा था। जब गोचर में राहु पूर्वाभाद्रपद में आया और उन्होंने 11 बार 'ॐ नमः शिवाय' बोलकर पीले फूल शिवलिंग पर चढ़ाए, तो अगले ही दिन सुबह ठीक 11 बजे विपक्षी ने खुद फोन करके समझौता कर लिया!",
+    classicalExample: "मिथुन लग्न के जातक की चार मंजिला इमारत का विवाद सालों से नहीं सुलझ रहा था। जब गोचर में राहु पूर्वाभाद्रपद में आया और उन्होंने 11 बार 'ॐ नमः शिवाय' बोलकर पीले फूल शिवलिंग पर चढ़ाए, तो अगले ही दिन सुबह ठीक 11 बजे विपक्षी ने खुद फोन करके समझौता कर लिया!",
   },
   {
     upacharaNumber: 26,

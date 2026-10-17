@@ -354,7 +354,7 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
   ${dk.hasDkObstacle ? `✦ ⚠️ ${dk.dkObstacleWarning}\n  ` : ""}✦ Marriage Timing Windows: ${dk.marriageTimingSigns.join(", ")} Chara Dashas
 - AK/AmK Status, Life Horizon & Rajayoga:
   ✦ AK (${akAmk.akPlanet} in H${akAmk.akHouseFromLagna} ${akAmk.akSign}): ${akAmk.akStatus} — Fame Timing: ${akAmk.akFameTimingSigns.join(", ")}
-  ✦ AK Life Horizon (Transcript Rule: "Us house ke bahar life nahi ja sakti"): ${akAmk.akLifeSphere.transcriptRule} (${akAmk.akLifeSphere.focus})
+  ✦ AK Life Horizon (Classical Shastric Rule: "Us house ke bahar life nahi ja sakti"): ${akAmk.akLifeSphere.classicalRule} (${akAmk.akLifeSphere.focus})
   ✦ AK Physical & Personality Clues: ${akAmk.akPhysicalMentalTraits.join("; ")}
   ✦ AmK (${akAmk.amkPlanet} in H${akAmk.amkHouseFromLagna} ${akAmk.amkSign}): ${akAmk.amkStatus} (${akAmk.amkCareerField}) — Wealth Surge: ${akAmk.amkGrowthTimingSigns.join(", ")}
   ✦ AmK Wealth Channel ("Wahan se paisa aayega"): ${akAmk.amkWealthChannel.channel} (Key Fields: ${akAmk.amkWealthChannel.practicalField})

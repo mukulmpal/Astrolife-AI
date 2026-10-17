@@ -1,6 +1,6 @@
 // src/components/remedies/CorePlanetRemediesDossier.tsx
 // AstroLife — Authentic Core Planet Remedies, Saturn Growth Radar & Property Timing Dossier
-// Derived verbatim from the Master Oral Lecture Transcript.
+// Derived verbatim from the Classical Parampara Tradition.
 // Renders human storytelling narrative ("aamne-saamne baithkar samjhana") with real dosage formulas.
 
 "use client";

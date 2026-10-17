@@ -18,7 +18,7 @@ import { runKPEngine, type KPPlanet } from "@/lib/astro-engine/kp";
 import {
   runMedicalEngine,
   SIXTEEN_DAY_REMEDY_PROTOCOLS,
-  SPECIAL_TRANSCRIPT_RULES,
+  SPECIAL_CLASSICAL_RULES,
   TRADITIONAL_TREATMENT_MODALITIES,
   MEDICAL_CASEBOOK,
 } from "@/lib/astro-engine/health";
@@ -1022,10 +1022,10 @@ export default function MedicalPage() {
             {/* 4. SPECIAL TRANSCRIPT RULES & WARNINGS */}
             <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
               <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginBottom: "12px" }}>
-                🛡️ गुरुजी के विशेष नियम एवं सावधानियां (Special Transcript Guidelines)
+                🛡️ गुरुजी के विशेष नियम एवं सावधानियां (Special Classical Guidelines)
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
-                {SPECIAL_TRANSCRIPT_RULES.map((rule) => (
+                {SPECIAL_CLASSICAL_RULES.map((rule) => (
                   <div key={rule.id} style={{ background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: "10px", padding: "14px" }}>
                     <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginBottom: "4px" }}>
                       {rule.title}

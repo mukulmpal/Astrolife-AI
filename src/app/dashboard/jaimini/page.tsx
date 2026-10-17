@@ -510,7 +510,7 @@ export default function JaiminiPage() {
 
               {/* Clarification Box: D1 Planets As-Is */}
               <div className="mb-4 rounded-xl border border-[rgba(184,134,11,0.2)] bg-[#FAF7F2] p-3 text-xs text-[#4A4238] leading-relaxed">
-                <strong>Transcript Principle:</strong> Atmakaraka ({kk.akPlanet}) Navamsha (D9) chart me jis rashi ({kk.d9Sign}) me baitha hai, wahi <strong>Karakamsha Lagna</strong> banta hai. D1 birth chart ke planets apni natal rashi me as-is rehte hain — sirf unke bhav Karakamsha Lagna se count hote hain.
+                <strong>Classical Principle:</strong> Atmakaraka ({kk.akPlanet}) Navamsha (D9) chart me jis rashi ({kk.d9Sign}) me baitha hai, wahi <strong>Karakamsha Lagna</strong> banta hai. D1 birth chart ke planets apni natal rashi me as-is rehte hain — sirf unke bhav Karakamsha Lagna se count hote hain.
               </div>
 
               {/* Static Analysis Cards */}
@@ -604,7 +604,7 @@ export default function JaiminiPage() {
                 Dynamic Dasha Lagna Explorer: {activeDashaLagna.dashaSign} Lagna
               </h3>
               <p className="text-sm text-[#6B635B] mt-1 leading-relaxed">
-                Transcript Secret: In Jaimini, whenever a sign runs in Chara Dasha, rotate that sign to House 1 (Lagna).
+                Nadi Secret: In Jaimini, whenever a sign runs in Chara Dasha, rotate that sign to House 1 (Lagna).
                 Where your AK, AmK, GK, and DK fall from this temporary throne tells the absolute truth of that chapter:
                 peak status vs fall, wealth surge vs career agony, and exact testing grounds.
               </p>
@@ -980,7 +980,7 @@ export default function JaiminiPage() {
                 {GEMSTONE_WARNING_FOR_GK}
               </p>
               <div className="mt-2.5 p-2.5 rounded-xl bg-red-200/60 text-xs text-red-900">
-                <strong>Transcript Mandate:</strong> Wearing the stone of {gk.gkPlanet} directly empowers disease, litigation, debts, and enemies. For {gk.gkPlanet}, strictly perform charity, selfless service, and physical canalization — NEVER wear its stone.
+                <strong>Shastric Mandate:</strong> Wearing the stone of {gk.gkPlanet} directly empowers disease, litigation, debts, and enemies. For {gk.gkPlanet}, strictly perform charity, selfless service, and physical canalization — NEVER wear its stone.
               </div>
             </section>
 
@@ -989,7 +989,7 @@ export default function JaiminiPage() {
               <section className="rounded-2xl border-2 border-cyan-400 bg-cyan-50/80 p-4.5 shadow-sm">
                 <div className="flex items-center gap-2.5 text-cyan-950 font-bold text-sm">
                   <span className="text-xl">🌊</span>
-                  <span>NATURAL FLOWING WATER VORTEX (TRANSCRIPT SECRET)</span>
+                  <span>NATURAL FLOWING WATER VORTEX (NADI SUTRA)</span>
                 </div>
                 <p className="text-xs text-cyan-900 mt-1.5 leading-relaxed">
                   {FLOWING_WATER_REMEDY_FOR_MOON}
@@ -1000,7 +1000,7 @@ export default function JaiminiPage() {
               </section>
             )}
 
-            {/* Prescribed Remedies from Transcript */}
+            {/* Prescribed Remedies from Classical Tradition */}
             <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FAF7F2] p-5">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">🌿</span>
@@ -1146,7 +1146,7 @@ export default function JaiminiPage() {
             <section className="rounded-2xl border border-[rgba(184,134,11,0.25)] bg-[#FAF7F2] p-5 shadow-sm">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                 <span className="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                  🧠 BK, MK &amp; PK Life Pillars · Transcript Teachings
+                  🧠 BK, MK &amp; PK Life Pillars · Classical Shastric Teachings
                 </span>
                 <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
                   Subconscious Mind · Education · Purva Punya
@@ -1177,7 +1177,7 @@ export default function JaiminiPage() {
                     Subconscious Drive &amp; Repeated Failure to Mastery
                   </h4>
                   <div className="my-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed">
-                    <strong>Transcript Law:</strong> &ldquo;{bkSub.transcriptRule}&rdquo;
+                    <strong>Classical Sutra:</strong> &ldquo;{bkSub.classicalRule}&rdquo;
                   </div>
                   <div className="flex flex-col gap-2 mt-3 text-xs">
                     <div>
@@ -1211,7 +1211,7 @@ export default function JaiminiPage() {
                     Education Stream &amp; Domestic Roots
                   </h4>
                   <div className="my-2.5 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-950 leading-relaxed">
-                    <strong>Transcript Law:</strong> &ldquo;{mk.transcriptRule}&rdquo;
+                    <strong>Classical Sutra:</strong> &ldquo;{mk.classicalRule}&rdquo;
                   </div>
                   <div className="flex flex-col gap-2 mt-3 text-xs">
                     <div>
@@ -1245,7 +1245,7 @@ export default function JaiminiPage() {
                     Purva Punya, Intellect &amp; Progeny
                   </h4>
                   <div className="my-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 leading-relaxed">
-                    <strong>Transcript Law:</strong> &ldquo;{pk.transcriptRule}&rdquo;
+                    <strong>Classical Sutra:</strong> &ldquo;{pk.classicalRule}&rdquo;
                   </div>
                   <div className="flex flex-col gap-2 mt-3 text-xs">
                     <div>
@@ -1270,7 +1270,7 @@ export default function JaiminiPage() {
           </div>
         )}
 
-        {/* ── TAB: AK-AmK & Life Focus (Transcript Core Rules) ─────────────── */}
+        {/* ── TAB: AK-AmK & Life Focus (Classical Core Principles) ─────────────── */}
         {activeTab === "rajayoga" && (
           <div className="flex flex-col gap-6">
             {/* Header / Intro */}
@@ -1365,9 +1365,9 @@ export default function JaiminiPage() {
                     {akAmk.akLifeSphere.title}
                   </h4>
 
-                  {/* Transcript quote highlight */}
+                  {/* Classical quote highlight */}
                   <div className="my-3 p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 leading-relaxed">
-                    <strong>Transcript Law:</strong> &ldquo;{akAmk.akLifeSphere.transcriptRule}&rdquo;
+                    <strong>Classical Sutra:</strong> &ldquo;{akAmk.akLifeSphere.classicalRule}&rdquo;
                   </div>
 
                   <p className="text-sm text-[#4A4238] leading-relaxed mb-3">
@@ -1412,9 +1412,9 @@ export default function JaiminiPage() {
                     Wealth Gateway: {akAmk.amkWealthChannel.source}
                   </h4>
 
-                  {/* Transcript quote highlight */}
+                  {/* Classical quote highlight */}
                   <div className="my-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-950 leading-relaxed">
-                    <strong>Transcript Law:</strong> &ldquo;AmK jis house me baitha hai, bhagwan ne aapki ajeevika aur wealth generation ka switch wahan jod diya hai.&rdquo;
+                    <strong>Classical Sutra:</strong> &ldquo;AmK jis house me baitha hai, bhagwan ne aapki ajeevika aur wealth generation ka switch wahan jod diya hai.&rdquo;
                   </div>
 
                   <p className="text-sm text-[#4A4238] leading-relaxed mb-3">
@@ -1477,7 +1477,7 @@ export default function JaiminiPage() {
             </div>
 
             <div className="mt-2 rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FAF5EB] p-4 text-xs text-[#4A4238] leading-relaxed">
-              <strong>Transcript Duration Rule:</strong> Rashi se uske lord ki position tak count karein aur 1 minus karein (Max: 12 saal, Min: 1 saal; own sign lord = 12 years). Tap any dasha to reveal all 12 Antardashas for precise event timing.
+              <strong>Jaimini Classical Rule:</strong> Rashi se uske lord ki position tak count karein aur 1 minus karein (Max: 12 saal, Min: 1 saal; own sign lord = 12 years). Tap any dasha to reveal all 12 Antardashas for precise event timing.
             </div>
           </section>
         )}
@@ -1496,7 +1496,7 @@ export default function JaiminiPage() {
                 Latent High-Level Powers in Your Chart
               </h3>
               <p className="text-sm text-amber-900 mt-1 leading-relaxed">
-                As taught in the transcript: Retrograde planets possess immense hidden power, but like Hanuman-ji before his memory was awakened, their potential lies dormant until consciously activated through targeted actions.
+                As taught in the classical tradition: Retrograde planets possess immense hidden power, but like Hanuman-ji before his memory was awakened, their potential lies dormant until consciously activated through targeted actions.
               </p>
             </section>
 

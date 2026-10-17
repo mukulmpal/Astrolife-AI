@@ -329,7 +329,7 @@ const RASHI_7TH_IMPACT_MAP: Record<number, { domain: string; dynamics: string; c
 };
 
 // ── Kalpurush 7th Rashi (Libra / तुला) Cosmic Marriage Anchor ───────────────
-// Based on oral discourse transcripts:
+// Based on classical oral traditions:
 // Where the 7th natural zodiac sign (Libra/तुला) sits indicates:
 // 1. Spouse Karmic Meeting Channel (जीवनसाथी किस माध्यम से आएगा)
 // 2. The Scales of Balance (दांपत्य का तराजू किस विषय पर संभलेगा)
@@ -1408,7 +1408,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
       title: "Charity for Poor/Underprivileged Wedding (12th House Venus Shastra Upay)",
       procedure: "Support or sponsor the wedding expenses, clothes, or rations for a needy/underprivileged boy or girl. Alternatively, contribute to a charitable wedding trust or arrange meals at a marriage ceremony.",
       caution: "Never hoard wealth or maintain hidden resentments. Freely facilitating another's wedding activates 12th house grace and protects your own marital bond from estrangement.",
-      astrologicalRationale: "In oral discourse transcript, Venus/Libra in 12th demands voluntary marital charity. Giving to another's wedding permanently stabilizes personal bedroom bliss and neutralizes hospital/litigation drains.",
+      astrologicalRationale: "In classical oral tradition, Venus/Libra in 12th demands voluntary marital charity. Giving to another's wedding permanently stabilizes personal bedroom bliss and neutralizes hospital/litigation drains.",
     });
   }
 

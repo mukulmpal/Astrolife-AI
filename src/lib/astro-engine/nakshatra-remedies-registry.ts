@@ -1,6 +1,6 @@
 // src/lib/astro-engine/nakshatra-remedies-registry.ts
 // AstroLife — Authentic 27-Nakshatra Personality & Human-Tone Remedy Registry
-// Based strictly on classical shastras and comprehensive oral discourse transcripts.
+// Based strictly on classical shastras and comprehensive classical oral traditions.
 // Written in warm, descriptive, jargon-free narrative paragraphs for native understanding.
 
 export interface HumanNakshatraGuide {
@@ -14,7 +14,7 @@ export interface HumanNakshatraGuide {
 
   // ── 1. Descriptve Personality Story (Simple & Warm Hinglish) ──
   personalityStoryHinglish: string;    // Warm paragraph on current state of mind & swabhav
-  livingArchetypeStoryHinglish: string;// Living historical/mythological archetype from transcript
+  livingArchetypeStoryHinglish: string;// Living historical/mythological archetype from classical tradition
   
   // ── 2. Vulnerability & Karmic Trap ─────────────────────────
   karmicTrapHinglish: string;          // The exact mistake or trap that ruins their progress

@@ -74,7 +74,7 @@ export interface SixteenDayRemedyProtocol {
   specialConditionNotes?: string;
 }
 
-export interface SpecialTranscriptGuideline {
+export interface SpecialClassicalGuideline {
   id: string;
   title: string;
   condition: string;
@@ -100,14 +100,14 @@ export interface MedicalRule {
   clinicalGuidance: string;
   severityWeight: number; // 1 to 10
   recoveryEffect: number; // -5 to +10
-  status: "Canon_KP" | "Transcript_Verified" | "Traditional_Classical";
+  status: "Canon_KP" | "Parampara_Verified" | "Traditional_Classical";
   medicalSafety: "Non_Diagnostic" | "High_Sensitivity_Advisory";
 }
 
 export interface MedicalCase {
   id: string;
   title: string;
-  source: "Transcript_Classroom_Case" | "KP_Reader_Case";
+  source: "Classical_Classroom_Case" | "KP_Reader_Case";
   reportedSymptoms: string[];
   bodySystems: HealthDomain[];
   chartSignifiers: {

@@ -257,7 +257,7 @@ export function evaluateFunctionalDebilityGemstoneGuard(
 
 // ============================================================
 // NADI ASTROLOGY DEBILITATED PLANET PEAK ZENITH ENGINE
-// Based on oral discourse transcripts (Deepanshu Giri / Lunar Astro):
+// Based on Classical Nadi Astrological Tradition:
 // "A debilitated planet will give you the maximum good results during its
 // Nadi activation window and Dasha progression. For debilitated Jupiter,
 // this peak comes between age 36 to 42, timed by its exact degrees."

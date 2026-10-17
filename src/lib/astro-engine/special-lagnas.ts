@@ -57,7 +57,7 @@ export interface AlUlSynastry {
   relationship: string;
   score: number; // 1 to 10
   verdict: string;
-  transcriptAdvice: string;
+  classicalAdvice: string;
   remedy: string;
   secondFromUlSign: string;
   secondFromUlHouse: number;
@@ -830,38 +830,38 @@ export function evaluateAlUlSynastry(al: SpecialLagnaItem, ul: SpecialLagnaItem,
   let relationship = "";
   let score = 5;
   let verdict = "";
-  let transcriptAdvice = "";
+  let classicalAdvice = "";
   let remedy = "";
 
   if (distance === 1) {
     relationship = "1/1 Conjunction (Identity Merged)";
     score = 8.5;
     verdict = "Public persona and marital partner are deeply intertwined. Your spouse directly shapes your public image.";
-    transcriptAdvice = "Maintain mutual respect as your marital conduct directly impacts your societal standing.";
+    classicalAdvice = "Maintain mutual respect as your marital conduct directly impacts your societal standing.";
     remedy = "Perform joint charitable donations on Thursdays.";
   } else if (distance === 7) {
     relationship = "1/7 Samasaptaka (Direct Harmony)";
     score = 9.0;
     verdict = "Classic complementary partnership. What the world sees outside matches the respectful commitment inside.";
-    transcriptAdvice = "Marriage provides balance and grounding to the native's external ambition.";
+    classicalAdvice = "Marriage provides balance and grounding to the native's external ambition.";
     remedy = "Honor each other's career space and cultivate joint partnerships.";
   } else if (distance === 5 || distance === 9) {
     relationship = "5/9 Trikona (Spiritual Affinity)";
     score = 9.5;
     verdict = "Divine philosophical harmony. The marriage is fortified by mutual dharma, trust, and shared values.";
-    transcriptAdvice = "Spouse acts as a natural advisor, bringing prosperity and ethical luck.";
+    classicalAdvice = "Spouse acts as a natural advisor, bringing prosperity and ethical luck.";
     remedy = "Visit sacred pilgrim sites together.";
   } else if (distance === 3 || distance === 11) {
     relationship = "3/11 Upachaya (Growth & Effort)";
     score = 8.0;
     verdict = "Collaborative friendship. Both partners work together toward material prosperity and network expansion.";
-    transcriptAdvice = "Financial gains compound when both partners support each other's ventures.";
+    classicalAdvice = "Financial gains compound when both partners support each other's ventures.";
     remedy = "Engage in shared hobby or creative projects.";
   } else if (distance === 6 || distance === 8) {
     relationship = "6/8 Shadashtaka (Internal Friction / Dual Perception)";
     score = 4.0;
     verdict = "Shadashtaka Friction: The public perceives a glamorous couple, but behind closed doors, differences in ideology or emotional expectations cause friction.";
-    transcriptAdvice = "Jaimini Secret: When AL and UL are in 6/8, public image is shielded from domestic turbulence. Never let external family politics interfere in your marital sanctuary.";
+    classicalAdvice = "Jaimini Secret: When AL and UL are in 6/8, public image is shielded from domestic turbulence. Never let external family politics interfere in your marital sanctuary.";
     const weekdayMap: Record<string, string> = {
       Sun: "Sunday",
       Moon: "Monday",
@@ -878,7 +878,7 @@ export function evaluateAlUlSynastry(al: SpecialLagnaItem, ul: SpecialLagnaItem,
     relationship = "2/12 Dwirdwadasha (Resource Drainage)";
     score = 5.0;
     verdict = "Dwirdwadasha: High financial outlays on domestic responsibilities or physical distance between partners due to career travels.";
-    transcriptAdvice = "Plan finances jointly and schedule deliberate quality time away from work.";
+    classicalAdvice = "Plan finances jointly and schedule deliberate quality time away from work.";
     remedy = "Donate yellow sweets or milk on Mondays to Shiva-Parvati temple.";
   }
 
@@ -921,7 +921,7 @@ export function evaluateAlUlSynastry(al: SpecialLagnaItem, ul: SpecialLagnaItem,
     relationship,
     score,
     verdict,
-    transcriptAdvice,
+    classicalAdvice,
     remedy,
     secondFromUlSign,
     secondFromUlHouse,

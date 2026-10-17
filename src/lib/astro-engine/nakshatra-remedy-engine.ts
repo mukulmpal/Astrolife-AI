@@ -187,7 +187,7 @@ export function buildNakshatraRemedyLlmPromptBlock(chart: ChartData | null | und
 - 27-Upachara Shivling Ritual Remedy (Nakshatra #${tr.transitNakshatraNumber}):
   ✦ Upachara Action: ${tr.shivlingRemedy.upacharaName} (${tr.shivlingRemedy.hindiTitle})
   ✦ Procedure: "${tr.shivlingRemedy.procedureNarrativeHinglish}"
-  ${tr.shivlingRemedy.transcriptExample ? `✦ Real Transcript Example: "${tr.shivlingRemedy.transcriptExample}"` : ""}
+  ${tr.shivlingRemedy.classicalExample ? `✦ Shastric Case Example: "${tr.shivlingRemedy.classicalExample}"` : ""}
 ${tr.distanceAnalysis ? `- MD-AD Distance: ${tr.distanceAnalysis.mahadashaPlanet} vs ${tr.distanceAnalysis.antardashaPlanet} -> ${tr.distanceAnalysis.mutualAxis}. ${tr.distanceAnalysis.impactDescriptionHinglish}` : ""}
 - 6th, 8th & 12th House Specific Remedies:
   ✦ 6th House (Plants/Earth Debt): ${plants || "No planet in H6; planting trees remains virtuous."}
@@ -198,7 +198,7 @@ ${tr.distanceAnalysis ? `- MD-AD Distance: ${tr.distanceAnalysis.mahadashaPlanet
   ✦ 12th House Rule: "${tr.beliefGuidanceHinglish.house12MessageHinglish}"`;
   }
 
-  return `### NAKSHATRA & ELEMENTAL REMEDY INTELLIGENCE (AUTHENTIC TRANSCRIPT DIRECTIVES)
+  return `### NAKSHATRA & ELEMENTAL REMEDY INTELLIGENCE (AUTHENTIC SHASTRA DIRECTIVES)
 - Current Active Dasha Lord: ${report.activeDashaPlanet} sitting in Natal Nakshatra: ${report.activeNakshatraName}
 - Native's Current Mindset & Personality:
   "${report.section1_InnerStateAndPersonality}"
@@ -208,7 +208,7 @@ ${tr.distanceAnalysis ? `- MD-AD Distance: ${tr.distanceAnalysis.mahadashaPlanet
   "${report.section3_KarmicTrapAndAngerWarning}"
 - Daily Life Conduct Rule:
   "${report.section4_BehavioralConductInDailyLife}"
-- Core Fast-Acting Upay (Transcript-backed):
+- Core Fast-Acting Upay (Shastra-backed):
   ✦ Primary Upay: ${report.primaryActionItem}
   ✦ Secondary Upay: ${report.secondaryActionItem}
   ✦ Animal/Nature Seva: ${report.naturePashuSeva}
@@ -218,5 +218,5 @@ ${tr.distanceAnalysis ? `- MD-AD Distance: ${tr.distanceAnalysis.mahadashaPlanet
   ${report.elementalVehicleExplanation}
   Method: ${report.elementalVehicleProcedure}
 ${transitBlock}
-[GUIDELINE FOR AI]: Speak to the native with warm empathy, like a caring mentor. Explain who they are, why they feel this way, and provide these practical, free, transcript-backed remedies in simple Hinglish without cold astrological jargons.`;
+[GUIDELINE FOR AI]: Speak to the native with warm empathy, like a caring mentor. Explain who they are, why they feel this way, and provide these practical, free, shastra-backed remedies in simple Hinglish without cold astrological jargons.`;
 }

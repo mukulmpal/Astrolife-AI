@@ -437,7 +437,7 @@ export function NavtaraIntelligenceView({
           </div>
 
           <p className="text-xs text-[#6B635B] leading-relaxed">
-            Transcript Principle: Rather than purely acting like the lord of your Janma Star ({intel.birthNakshatra.lord}), your foundational internal temperament actively channels the qualities of the <strong>preceding star&apos;s lord ({intel.qualityProfile.channellingLord})</strong>.
+            Classical Principle: Rather than purely acting like the lord of your Janma Star ({intel.birthNakshatra.lord}), your foundational internal temperament actively channels the qualities of the <strong>preceding star&apos;s lord ({intel.qualityProfile.channellingLord})</strong>.
           </p>
 
           <div className="bg-[#FAF7F2] rounded-2xl p-4 border border-amber-900/10">
@@ -723,7 +723,7 @@ export function NavtaraIntelligenceView({
           </div>
 
           <p className="text-xs text-[#6B635B] leading-relaxed">
-            Transcript Transit Rule: When Sun (1 month) or Jupiter (1 year) transit into your active Dasha Lord&apos;s exaltation sign, peak activation manifests. Conversely, transiting the debilitation sign triggers caution phases.
+            Classical Transit Rule: When Sun (1 month) or Jupiter (1 year) transit into your active Dasha Lord&apos;s exaltation sign, peak activation manifests. Conversely, transiting the debilitation sign triggers caution phases.
           </p>
 
           <div className="flex flex-col gap-3">
@@ -823,7 +823,7 @@ export function NavtaraIntelligenceView({
             </div>
 
             <p className="text-xs text-[#6B635B] leading-relaxed">
-              Transcript Directive: Remedy elemental vehicle is determined by the <strong>RASHI</strong> where the planet sits (not the house number). Life domain of pressure is dictated by the House.
+              Shastric Directive: Remedy elemental vehicle is determined by the <strong>RASHI</strong> where the planet sits (not the house number). Life domain of pressure is dictated by the House.
             </p>
 
             {/* Placement context */}

@@ -17,6 +17,8 @@ import {
   extractDashaInput,
   formatVargaLabel,
 } from "@/lib/astro-intelligence/universal-shodasha-varga-engine";
+import { evaluateVargaNeuroKarmicProfile } from "@/lib/astro-intelligence/varga-neuro-remedies-engine";
+import { VargaNeuroKarmicCards } from "@/components/charts/VargaNeuroKarmicCards";
 import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
@@ -165,8 +167,13 @@ export default function DivisionalPage() {
   const color = current ? CHART_COLORS[current.key] ?? "#a855f7" : "#a855f7";
   const meta = current ? CHART_META[current.key] : null;
   const currentUniversal = useMemo(() => universal?.sections.find((section) => section.chart === current?.key), [universal, current?.key]);
+  const neuroProfile = useMemo(() => {
+    if (!chart || !current) return null;
+    return evaluateVargaNeuroKarmicProfile(chart, current, divs);
+  }, [chart, current, divs]);
 
-  if (!hasUserChart || !birth.name || !current || !analysis || !universal) {
+  const chartName = birth.name || chart?.name;
+  if ((!hasUserChart && !chartName) || !current || !analysis || !universal) {
     return (
       <EngineEmptyState
         engineName="Divisional Charts"
@@ -240,7 +247,17 @@ export default function DivisionalPage() {
         .dv-growth-box{background:#FFFFFF;border:1px solid rgba(184,134,11,0.2);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.02)}
         .dv-growth-box h3{font-size:14px;color:#1A1A1A;margin:0 0 8px}
         .dv-growth-box p{font-size:12px;color:#6B635B;line-height:1.75;margin:0}
-        @media(max-width:920px){.dv-universal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dv-universal-head,.dv-growth-grid,.dv-decision-grid{grid-template-columns:1fr}}
+        .dv-neuro-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.25);border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 6px 24px rgba(0,0,0,0.03)}
+        .dv-neuro-badge{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;padding:4px 10px;border-radius:999px;font-weight:700;display:inline-block;margin-bottom:10px}
+        .dv-neuro-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:800;color:#1A1A1A;margin-bottom:8px}
+        .dv-neuro-p{font-size:13.5px;color:#3D3834;line-height:1.85;margin-bottom:12px}
+        .dv-neuro-p:last-child{margin-bottom:0}
+        .dv-remedy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+        .dv-remedy-box{background:#FAF7F2;border:1px solid rgba(184,134,11,0.2);border-radius:14px;padding:16px}
+        .dv-remedy-kicker{font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:800;margin-bottom:6px}
+        .dv-remedy-head{font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:6px}
+        .dv-remedy-desc{font-size:12px;color:#4A4238;line-height:1.75}
+        @media(max-width:920px){.dv-universal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dv-universal-head,.dv-growth-grid,.dv-decision-grid,.dv-remedy-grid{grid-template-columns:1fr}}
         @media(max-width:640px){.dv-universal-grid{grid-template-columns:1fr}}
         @media(max-width:920px){.dv-marriage-grid{grid-template-columns:1fr}}
       `}</style>
@@ -276,6 +293,102 @@ export default function DivisionalPage() {
       </div>
 
       <PremiumFeature feature="Divisional Charts">
+
+      {/* ── 16 VARGA INTERACTIVE SELECTOR ── */}
+      <div className="dv-tabs" style={{ marginTop: 12 }}>
+        {divs.map(d=>{
+          const c = CHART_COLORS[d.key]??"#a855f7";
+          const m = CHART_META[d.key];
+          return (
+            <button key={d.key}
+              className={`dv-tab${activeChart===d.key?" active":""}`}
+              style={{"--tc":c} as React.CSSProperties}
+              onClick={()=>setActiveChart(d.key)}>
+              <span>{m?.icon} {d.key}</span>
+              <div style={{fontSize:10,opacity:0.7,marginTop:2}}>{m?.domain}</div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main Grid: Chart + Planets */}
+      <div className="dv-grid" style={{marginBottom:18}}>
+
+        {/* Mini Chart */}
+        <div className="dv-card" style={{borderColor:color+"33"}}>
+          <div className="dv-card-title">{meta?.icon} {current.key} — {current.name}</div>
+          <MiniChart chart={current}/>
+          <div style={{marginTop:12,padding:"8px 12px",background:color+"0d",border:`1px solid ${color}22`,borderRadius:8}}>
+            <div style={{fontSize:10,color:color,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>Purpose</div>
+            <div style={{fontSize:12,color:"#6B635B",lineHeight:1.7}}>{current.purpose}</div>
+          </div>
+          <div style={{marginTop:8,padding:"8px 12px",background:"#FAF7F2",borderRadius:8,border:"1px solid rgba(184,134,11,0.18)"}}>
+            <div style={{fontSize:10,color:"#6B635B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>{current.key} Lagna</div>
+            <div style={{fontSize:15,color:"#1A1A1A",fontWeight:600}}>{current.lagna}</div>
+          </div>
+        </div>
+
+        {/* Planet Positions */}
+        <div className="dv-card">
+          <div className="dv-card-title">Planet Positions in {current.key}</div>
+          {current.planets.map((p,i)=>(
+            <div key={i} className="dv-planet-row">
+              <span style={{fontSize:15,color:p.color,width:20}}>{p.icon}</span>
+              <span style={{flex:1,fontSize:12,color:"#4A4238"}}>{p.planet}</span>
+              <span style={{fontSize:12,color:"#1A1A1A"}}>{p.sign}</span>
+              <span style={{fontSize:11,color:"#6B635B",width:26,textAlign:"right"}}>H{p.house}</span>
+              {p.dignity!=="—"&&(
+                <span className="dv-badge" style={{
+                  color:p.dignity==="Exalted"?"#c8a030":p.dignity==="Own"?"#22c55e":"#ef4444",
+                  background:p.dignity==="Exalted"?"rgba(200,160,48,0.08)":p.dignity==="Own"?"rgba(34,197,94,0.08)":"rgba(239,68,68,0.08)",
+                  borderColor:p.dignity==="Exalted"?"rgba(200,160,48,0.25)":p.dignity==="Own"?"rgba(34,197,94,0.25)":"rgba(239,68,68,0.25)"}}>
+                  {p.dignity}
+                </span>
+              )}
+              {p.retrograde&&<span style={{fontSize:9,color:"#f97316",fontWeight:600}}>(R)</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 3-TIER NEURO-KARMIC SHODASHAVARGA ENGINE ── */}
+      {neuroProfile && (
+        <div style={{ marginBottom: 20 }}>
+          <VargaNeuroKarmicCards profile={neuroProfile} />
+        </div>
+      )}
+
+      {/* Decision Guide */}
+      {(() => {
+        const guide = getVargaGuide(current.key);
+        return (
+          <section className="dv-decision-grid">
+            <div className="dv-decision-card">
+              <b>How to judge {current.key}</b>
+              <p>{guide.judge}</p>
+            </div>
+            <div className="dv-decision-card">
+              <b>What to avoid</b>
+              <p>{guide.avoid}</p>
+            </div>
+            <div className="dv-decision-card">
+              <b>Next validation</b>
+              <p>{guide.next}</p>
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* Classical Shastric Aphorisms */}
+      <div className="dv-card" style={{marginBottom:16,borderColor:color+"44"}}>
+        <div className="dv-card-title" style={{color}}>{meta?.icon} {current.key} — Classical Shastric Aphorisms</div>
+        {analysis.map((ins,i)=>(
+          <div key={i} className="dv-insight">
+            <span style={{color,marginTop:3,flexShrink:0}}>✦</span>
+            <span>{ins}</span>
+          </div>
+        ))}
+      </div>
 
       {/* Universal Shodasha Varga Intelligence */}
       <section className="dv-universal">
@@ -320,26 +433,6 @@ export default function DivisionalPage() {
           </ul>
         </section>
       )}
-
-      {(() => {
-        const guide = getVargaGuide(current.key);
-        return (
-          <section className="dv-decision-grid">
-            <div className="dv-decision-card">
-              <b>How to judge {current.key}</b>
-              <p>{guide.judge}</p>
-            </div>
-            <div className="dv-decision-card">
-              <b>What to avoid</b>
-              <p>{guide.avoid}</p>
-            </div>
-            <div className="dv-decision-card">
-              <b>Next validation</b>
-              <p>{guide.next}</p>
-            </div>
-          </section>
-        );
-      })()}
 
       <section className="dv-growth-grid">
         <div className="dv-growth-box">
@@ -405,73 +498,6 @@ export default function DivisionalPage() {
         );
       })()}
 
-      {/* Chart Selector */}
-      <div className="dv-tabs">
-        {divs.map(d=>{
-          const c = CHART_COLORS[d.key]??"#a855f7";
-          const m = CHART_META[d.key];
-          return (
-            <button key={d.key}
-              className={`dv-tab${activeChart===d.key?" active":""}`}
-              style={{"--tc":c} as React.CSSProperties}
-              onClick={()=>setActiveChart(d.key)}>
-              <span>{m?.icon} {d.key}</span>
-              <div style={{fontSize:10,opacity:0.7,marginTop:2}}>{m?.domain}</div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Main Grid: Chart + Planets */}
-      <div className="dv-grid" style={{marginBottom:16}}>
-
-        {/* Mini Chart */}
-        <div className="dv-card" style={{borderColor:color+"33"}}>
-          <div className="dv-card-title">{meta?.icon} {current.key} — {current.name}</div>
-          <MiniChart chart={current}/>
-          <div style={{marginTop:12,padding:"8px 12px",background:color+"0d",border:`1px solid ${color}22`,borderRadius:8}}>
-            <div style={{fontSize:10,color:color,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>Purpose</div>
-            <div style={{fontSize:12,color:"#6B635B",lineHeight:1.7}}>{current.purpose}</div>
-          </div>
-          <div style={{marginTop:8,padding:"8px 12px",background:"#FAF7F2",borderRadius:8,border:"1px solid rgba(184,134,11,0.18)"}}>
-            <div style={{fontSize:10,color:"#6B635B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>{current.key} Lagna</div>
-            <div style={{fontSize:15,color:"#1A1A1A",fontWeight:600}}>{current.lagna}</div>
-          </div>
-        </div>
-
-        {/* Planet Positions */}
-        <div className="dv-card">
-          <div className="dv-card-title">Planet Positions in {current.key}</div>
-          {current.planets.map((p,i)=>(
-            <div key={i} className="dv-planet-row">
-              <span style={{fontSize:15,color:p.color,width:20}}>{p.icon}</span>
-              <span style={{flex:1,fontSize:12,color:"#4A4238"}}>{p.planet}</span>
-              <span style={{fontSize:12,color:"#1A1A1A"}}>{p.sign}</span>
-              <span style={{fontSize:11,color:"#6B635B",width:26,textAlign:"right"}}>H{p.house}</span>
-              {p.dignity!=="—"&&(
-                <span className="dv-badge" style={{
-                  color:p.dignity==="Exalted"?"#c8a030":p.dignity==="Own"?"#22c55e":"#ef4444",
-                  background:p.dignity==="Exalted"?"rgba(200,160,48,0.08)":p.dignity==="Own"?"rgba(34,197,94,0.08)":"rgba(239,68,68,0.08)",
-                  borderColor:p.dignity==="Exalted"?"rgba(200,160,48,0.25)":p.dignity==="Own"?"rgba(34,197,94,0.25)":"rgba(239,68,68,0.25)"}}>
-                  {p.dignity}
-                </span>
-              )}
-              {p.retrograde&&<span style={{fontSize:9,color:"#f97316",fontWeight:600}}>(R)</span>}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Interpretation for selected chart */}
-      <div className="dv-card" style={{marginBottom:16,borderColor:color+"44"}}>
-        <div className="dv-card-title" style={{color}}>{meta?.icon} {current.key} — {meta?.domain} Interpretation</div>
-        {analysis.map((ins,i)=>(
-          <div key={i} className="dv-insight">
-            <span style={{color,marginTop:3,flexShrink:0}}>✦</span>
-            <span>{ins}</span>
-          </div>
-        ))}
-      </div>
 
       {/* Special Findings — cross-chart patterns */}
       <div className="dv-card" style={{marginBottom:16}}>

@@ -1880,7 +1880,7 @@ export function getMemorySummary(memory: AstroSoundMemory): {
 // ============================================================
 // SANSKRIT MATRIKA CHAKRA & SOUND PHONETIC ENGINE
 // Maps phonemes to 9 planets and detects 12-house activation risks.
-// Based on oral discourse transcripts:
+// Based on classical oral traditions:
 // "Shabda mein Brahm hai! Adding random letters like 'E' can activate
 // a malefic house (e.g. Saturn in 12th Virgo) and ruin health/career.
 // Whereas auspicious names like 'Devyani' awaken Venusian royal pride."

@@ -325,7 +325,7 @@ export function NakshatraRemedyDossierCard({
               {tr.shivlingRemedy.procedureNarrativeHinglish}
             </p>
 
-            {tr.shivlingRemedy.transcriptExample && (
+            {tr.shivlingRemedy.classicalExample && (
               <div
                 style={{
                   background: "#FFFFFF",
@@ -337,7 +337,7 @@ export function NakshatraRemedyDossierCard({
                   lineHeight: 1.5,
                 }}
               >
-                <strong>📌 Transcript Udaharan:</strong> {tr.shivlingRemedy.transcriptExample}
+                <strong>📌 Shastric Case Reference:</strong> {tr.shivlingRemedy.classicalExample}
               </div>
             )}
           </div>

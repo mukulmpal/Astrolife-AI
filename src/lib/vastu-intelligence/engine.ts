@@ -282,7 +282,7 @@ export function canRecommendEastSunSymbol(input: VastuAnalyzeInput): { allowed: 
   return {
     allowed: true,
     requiresKundli: true,
-    reason: "Khana 1 does not show the blocked planets from the transcript-based safety rule. Symbolic Sun activation may be considered with caution.",
+    reason: "Khana 1 does not show the blocked planets from the shastra-based safety rule. Symbolic Sun activation may be considered with caution.",
   };
 }
 
@@ -315,7 +315,7 @@ function analyzeLalKitab(input: VastuAnalyzeInput): { strengths: VastuStrength[]
         explanation: "SE maps to khana 12 in the Lal Kitab Makan Vastu layer, where bedroom/Venus activation may be useful only after kundli check.",
         score: 6,
         system: "lal_kitab_makan_vastu",
-        sourceTag: "transcript_lal_kitab_khana_12",
+        sourceTag: "classical_lal_kitab_khana_12",
       });
     }
 
@@ -582,7 +582,7 @@ export function calculateMakanAukat(lengthHasta: number, widthHasta: number, sha
     interpretation: item.interpretation,
     remedy: item.good
       ? ["Maintain cleanliness, ethical conduct and proper zone balance."]
-      : ["Lal Kitab transcript-based suggestion: Ketu khana 6 style remedy may be considered.", "Examples: 3 bananas for 43 days in temple, dog feeding/service.", "Keep this experimental and do not promise guaranteed results."],
+      : ["Lal Kitab shastra-based suggestion: Ketu khana 6 style remedy may be considered.", "Examples: 3 bananas for 43 days in temple, dog feeding/service.", "Keep this experimental and do not promise guaranteed results."],
   };
 }
 
@@ -701,7 +701,7 @@ export function analyzeVastuProperty(input: VastuAnalyzeInput = {}): VastuAnalys
       priority: "medium",
       system: "lal_kitab_makan_vastu",
       requiresKundli: false,
-      caution: "This is transcript-based Lal Kitab Makan Vastu logic. Treat as secondary/experimental, not a guaranteed result.",
+      caution: "This is shastra-based Lal Kitab Makan Vastu logic. Treat as secondary/experimental, not a guaranteed result.",
       steps: makanAukat.remedy || [],
     });
   }

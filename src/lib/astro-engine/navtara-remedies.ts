@@ -85,7 +85,7 @@ export const TATTVA_VECTORS: Record<ElementTattva, TattvaRemedyVector> = {
   },
 };
 
-// ── Specific Classical Prescriptions from Transcript ────────────────────────
+// ── Specific Classical Prescriptions from Classical Tradition ────────────────────────
 
 export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> = {
   Rahu: {

@@ -4,7 +4,7 @@
  * ============================================================================
  * Canonical repository of multi-layered health and medical astrology rules:
  * - KP Cuspal Sub-Lord hierarchies (Cusps 1, 6, 8, 12 vs 1, 5, 11)
- * - Multi-planetary combinations directly derived from transcript case analyses
+ * - Multi-planetary combinations directly derived from classical tradition case analyses
  * - Deterministic, non-diagnostic traditional interpretations
  * ============================================================================
  */

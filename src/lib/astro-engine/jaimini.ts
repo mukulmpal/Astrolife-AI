@@ -171,7 +171,7 @@ export interface DkAnalysis {
 export interface AkLifeSphere {
   title: string;
   focus: string;
-  transcriptRule: string;
+  classicalRule: string;
   evolutionArea: string;
 }
 
@@ -270,7 +270,7 @@ export interface BkSubconsciousAnalysis {
   subconsciousDrive: string;
   failureTestZone: string;
   masterySkill: string;
-  transcriptRule: string;
+  classicalRule: string;
 }
 
 // ── MK Education Stream & Parental Nature ─────────────────────────────────────
@@ -282,7 +282,7 @@ export interface MkEducationAnalysis {
   parentalNature: string;
   domesticSanctuary: string;
   mentalPeaceSource: string;
-  transcriptRule: string;
+  classicalRule: string;
 }
 
 // ── PK Purva Punya & Progeny Blessing ─────────────────────────────────────────
@@ -294,7 +294,7 @@ export interface PkPurvaPunyaAnalysis {
   intellectQuality: string;
   progenyBlessing: string;
   progenyTimingSigns: string[];
-  transcriptRule: string;
+  classicalRule: string;
 }
 
 // ── Love Marriage Indicator (Bhavat Bhavam: 5th from 7th = 11th) ──────────────
@@ -488,86 +488,86 @@ export const GK_PLANET_REMEDIES: Record<string, string[]> = {
 
 export const GEMSTONE_WARNING_FOR_GK = "ABSOLUTE PROHIBITION: Never wear the gemstone of your Gnatikaraka (GK)! Wearing a stone empowers the planet, and empowering GK inflates diseases, lawsuits, rivalries, and debts. For GK, strictly use donations, physical canalization, and seva.";
 
-export const FLOWING_WATER_REMEDY_FOR_MOON = "NATURAL FLOWING WATER VORTEX: If Moon is your AmK or AK, sit by natural flowing water bodies (rivers, waterfalls, natural springs) for 2 to 3 hours. As taught in the transcript, this activates Chandra's wealth vortex and triggers an inflow of wealth and contracts ('aandhi ki tarah paisa aana') for the next 6 months!";
+export const FLOWING_WATER_REMEDY_FOR_MOON = "NATURAL FLOWING WATER VORTEX: If Moon is your AmK or AK, sit by natural flowing water bodies (rivers, waterfalls, natural springs) for 2 to 3 hours. As taught in the classical tradition, this activates Chandra's wealth vortex and triggers an inflow of wealth and contracts ('aandhi ki tarah paisa aana') for the next 6 months!";
 
 // ── BK Subconscious Drives Knowledge Base ─────────────────────────────────────
 export const BK_SUBCONSCIOUS_DRIVES: Record<number, {
   drive: string;
   failureTestZone: string;
   masterySkill: string;
-  transcriptRule: string;
+  classicalRule: string;
 }> = {
   1: {
     drive: "Self-identity, personal endurance, physical vitality and self-made authority.",
     failureTestZone: "Initial struggles with self-confidence, identity confusion, and solo endeavors.",
     masterySkill: "Development of formidable personal magnetism, unshakeable stamina, and solo leadership mastery.",
-    transcriptRule: "Subconscious mind is obsessed with proving self-worth; initial identity failures forge ultimate personal power.",
+    classicalRule: "Subconscious mind is obsessed with proving self-worth; initial identity failures forge ultimate personal power.",
   },
   2: {
     drive: "Wealth accumulation, family legacy, oral persuasion, and resource defense.",
     failureTestZone: "Early financial instability, family asset disputes, and vocal miscommunication.",
     masterySkill: "Hypnotic vocal influence, master wealth curation, and legendary financial resilience.",
-    transcriptRule: "Subconscious mind constantly worries about security; financial struggles teach legendary wealth mastery.",
+    classicalRule: "Subconscious mind constantly worries about security; financial struggles teach legendary wealth mastery.",
   },
   3: {
     drive: "Marketing outreach, digital media, writing, and hands-on technical craftsmanship.",
     failureTestZone: "Initial marketing flops, sibling rivalries, and failed creative launches.",
     masterySkill: "Virtuoso communication, unmatched marketing prowess, and brilliant technical skill.",
-    transcriptRule: "Subconscious mind lives in 3rd house; repeated efforts and failures build world-class marketable skill.",
+    classicalRule: "Subconscious mind lives in 3rd house; repeated efforts and failures build world-class marketable skill.",
   },
   4: {
     drive: "Real estate acquisition, domestic sanctuary, vehicles, and inner emotional anchorage.",
     failureTestZone: "Domestic unrest, property purchase delays, and emotional turbulence with maternal ties.",
     masterySkill: "Empire of landed property, tranquil inner stability, and mastery over domestic logistics.",
-    transcriptRule: "Subconscious mind seeks emotional roots; overcoming early domestic chaos builds solid property empires.",
+    classicalRule: "Subconscious mind seeks emotional roots; overcoming early domestic chaos builds solid property empires.",
   },
   5: {
     drive: "Intellectual counsel, creative problem-solving, progeny leadership, and mentoring.",
     failureTestZone: "Speculative investments backfiring, advisory rejection, and creative blocks.",
     masterySkill: "Genius strategic foresight, master advisor status, and transformative creative output.",
-    transcriptRule: "Subconscious mind revolves around genius solutions; early advisory setbacks create supreme wisdom.",
+    classicalRule: "Subconscious mind revolves around genius solutions; early advisory setbacks create supreme wisdom.",
   },
   6: {
     drive: "Conflict resolution, legal/medical defense, organizational service, and dispute mastery.",
     failureTestZone: "Exhausting rivalries, workplace litigation, and chronic daily grind fatigue.",
     masterySkill: "Unbeatable dispute strategist, medical/legal arbitrator, and master of overcoming adversaries.",
-    transcriptRule: "Subconscious mind constantly battles obstacles; repeated conflicts build an invincible problem solver.",
+    classicalRule: "Subconscious mind constantly battles obstacles; repeated conflicts build an invincible problem solver.",
   },
   7: {
     drive: "Bilateral partnerships, commercial contracts, public diplomacy, and spouse synergy.",
     failureTestZone: "Partnership betrayals, contractual misunderstandings, and public misjudgments.",
     masterySkill: "Master negotiator, international alliance architect, and consummate diplomatic dealmaker.",
-    transcriptRule: "Subconscious mind seeks public alliances; initial contractual friction builds negotiation genius.",
+    classicalRule: "Subconscious mind seeks public alliances; initial contractual friction builds negotiation genius.",
   },
   8: {
     drive: "Esoteric sciences, forensic research, crisis turnaround, and deep psychological truths.",
     failureTestZone: "Sudden rug-pulls, acute existential crises, and traumatic hidden disruptions.",
     masterySkill: "Crisis turnaround magician, master of occult/unseen depths, and indestructible psychological grit.",
-    transcriptRule: "Subconscious mind probes the unknown; surviving deep crises transforms the native into an alchemist.",
+    classicalRule: "Subconscious mind probes the unknown; surviving deep crises transforms the native into an alchemist.",
   },
   9: {
     drive: "Higher philosophical doctrine, spiritual dissemination, publishing, and mentoring disciples.",
     failureTestZone: "Disillusionment with dogma, mentor friction, and foreign academic hurdles.",
     masterySkill: "Supreme philosophical preceptor, celebrated author, and inspiring spiritual beacon.",
-    transcriptRule: "Subconscious mind thirsts for dharma; early spiritual disillusionment sparks authentic enlightenment.",
+    classicalRule: "Subconscious mind thirsts for dharma; early spiritual disillusionment sparks authentic enlightenment.",
   },
   10: {
     drive: "Corporate zenith, governmental authority, public reputation, and worldly duty execution.",
     failureTestZone: "Lack of recognition, corporate politics, and early career promotions denied.",
     masterySkill: "Dominant executive authority, flawless administration, and legendary career legacy.",
-    transcriptRule: "Subconscious mind dreams of the throne; overcoming unfair politics builds an untouchable executive leader.",
+    classicalRule: "Subconscious mind dreams of the throne; overcoming unfair politics builds an untouchable executive leader.",
   },
   11: {
     drive: "Ecosystem scaling, mega network communities, collective social influence, and desire fulfillment.",
     failureTestZone: "Group politics, broken promises by syndicate partners, and sudden gain interruptions.",
     masterySkill: "Architect of massive community platforms, master of venture scale, and multi-stream wealth creator.",
-    transcriptRule: "Subconscious mind thrives on scale; initial community betrayals teach the secrets of massive networks.",
+    classicalRule: "Subconscious mind thrives on scale; initial community betrayals teach the secrets of massive networks.",
   },
   12: {
     drive: "Transcendent liberation, foreign offshore frontiers, spiritual retreats, and subconscious clearing.",
     failureTestZone: "Isolation, financial leakages overseas, and sleep/anxiety struggles.",
     masterySkill: "Global bridge builder, master of detachment, spiritual sanctuary creator, and foreign trade authority.",
-    transcriptRule: "Subconscious mind lives in foreign/spiritual realms; early alienation blossoms into sublime freedom.",
+    classicalRule: "Subconscious mind lives in foreign/spiritual realms; early alienation blossoms into sublime freedom.",
   },
 };
 
@@ -577,56 +577,56 @@ export const MK_EDUCATION_STREAMS: Record<string, {
   parentalNature: string;
   domesticSanctuary: string;
   mentalPeaceSource: string;
-  transcriptRule: string;
+  classicalRule: string;
 }> = {
   Sun: {
     stream: "Medicine, Public Administration, Political Science, Surgery, Governance, Constitutional Law",
     parentalNature: "Parents are dignified, disciplined, status-oriented, with father having a dominant role.",
     domesticSanctuary: "Orderly, regal, spotless, values family honor and public reputation.",
     mentalPeaceSource: "Living with absolute self-respect, moral integrity, and father's blessings.",
-    transcriptRule: "MK Sun establishes education in administration/medicine and parental heritage rooted in dignity.",
+    classicalRule: "MK Sun establishes education in administration/medicine and parental heritage rooted in dignity.",
   },
   Moon: {
     stream: "Psychology, Nursing, Hospitality, Marine Sciences, Fine Arts, Dairy & FMCG Logistics",
     parentalNature: "Parents are deeply caring, empathetic, home-loving, with mother playing the central nurturing role.",
     domesticSanctuary: "Emotional haven, fluid atmosphere, near water or lush plants, welcoming to guests.",
     mentalPeaceSource: "Emotional harmony, maternal blessings, and quiet retreats near natural water bodies.",
-    transcriptRule: "MK Moon shapes education around human care/psychology and derives peace from mother and water.",
+    classicalRule: "MK Moon shapes education around human care/psychology and derives peace from mother and water.",
   },
   Mars: {
     stream: "Mechanical & Civil Engineering, Real Estate, Defense/Police Academies, Sports Medicine, Architecture",
     parentalNature: "Parents are energetic, action-driven, assertive, and enforce strict physical discipline.",
     domesticSanctuary: "Active, dynamic, equipped with workout tools, machinery, or architectural models.",
     mentalPeaceSource: "Rigorous daily physical exercise, dynamic sports, and clearing all debts.",
-    transcriptRule: "MK Mars directs education into technical/engineering fields and brings mental peace through action.",
+    classicalRule: "MK Mars directs education into technical/engineering fields and brings mental peace through action.",
   },
   Mercury: {
     stream: "Commerce, Chartered Accountancy (CA), Software/IT, Journalism, Mass Communication, Data Analytics",
     parentalNature: "Parents are intellectual, communicative, business-minded, and maintain a friendly dynamic.",
     domesticSanctuary: "Lively, filled with books, documents, digital devices, and witty conversations.",
     mentalPeaceSource: "Reading books, writing, intellectual debates, and organizing analytical data.",
-    transcriptRule: "MK Mercury orients education towards commerce/IT and finds domestic peace in books and study.",
+    classicalRule: "MK Mercury orients education towards commerce/IT and finds domestic peace in books and study.",
   },
   Jupiter: {
     stream: "Philosophy, Law & Judiciary, Higher Academics, Banking & Economics, Traditional Sanskrit/Vedic Theology",
     parentalNature: "Parents are spiritual, deeply dharmic, respected educators, who instill high ethical morals.",
     domesticSanctuary: "Sacred sanctuary with temple space, altar, sacred texts, and peaceful scholarly vibration.",
     mentalPeaceSource: "Satsang, spiritual study, mentoring others, and receiving guru's holy blessings.",
-    transcriptRule: "MK Jupiter drives education in law/philosophy and makes home a sacred temple of wisdom.",
+    classicalRule: "MK Jupiter drives education in law/philosophy and makes home a sacred temple of wisdom.",
   },
   Venus: {
     stream: "Architecture, Interior Design, Fashion & Styling, Media/Cinema, Luxury Hospitality, Visual Arts",
     parentalNature: "Parents are refined, affectionate, artistic, with strong aesthetic taste and social grace.",
     domesticSanctuary: "Aesthetic masterclass, beautifully decorated, subtle fragrance, elegant ambiance.",
     mentalPeaceSource: "Aesthetic harmony, creative musical arts, luxury comforts, and peaceful romantic bonds.",
-    transcriptRule: "MK Venus shapes education in luxury arts/design and brings deep inner peace through beauty.",
+    classicalRule: "MK Venus shapes education in luxury arts/design and brings deep inner peace through beauty.",
   },
   Saturn: {
     stream: "Law, Labor Relations, Structural Engineering, Geology, Mining, Civil Administration, Ancient History",
     parentalNature: "Parents are hardworking, humble, resilient, having endured hardship with stoic perseverance.",
     domesticSanctuary: "Minimalist, quiet, orderly, grounded, free from flashy superficial distractions.",
     mentalPeaceSource: "Unwavering self-discipline, fulfilling hard duties, and solitude in nature.",
-    transcriptRule: "MK Saturn channels education into law/heavy structures and produces peace through disciplined labor.",
+    classicalRule: "MK Saturn channels education into law/heavy structures and produces peace through disciplined labor.",
   },
 };
 
@@ -635,49 +635,49 @@ export const PK_PURVA_PUNYA_TRAITS: Record<string, {
   goodKarmaManifestation: string;
   intellectStyle: string;
   progenyNature: string;
-  transcriptRule: string;
+  classicalRule: string;
 }> = {
   Sun: {
     goodKarmaManifestation: "Inherited royal authority, moral clarity, and natural social dignity without struggle.",
     intellectStyle: "Executive, decisive, strategic visionary with natural command over systems.",
     progenyNature: "Dignified, ambitious, status-conscious children who bring high honor to the family lineage.",
-    transcriptRule: "PK Sun manifests past-life dharmic leadership into innate brilliance and celebrated progeny.",
+    classicalRule: "PK Sun manifests past-life dharmic leadership into innate brilliance and celebrated progeny.",
   },
   Moon: {
     goodKarmaManifestation: "Inherited public affection, emotional intuition, and widespread social goodwill.",
     intellectStyle: "Deeply intuitive, empathetic, creative imagination with swift associative memory.",
     progenyNature: "Gentle, compassionate, artistic children who share a deep emotional bond with parents.",
-    transcriptRule: "PK Moon reflects past-life compassionate service, granting creative intellect and loving children.",
+    classicalRule: "PK Moon reflects past-life compassionate service, granting creative intellect and loving children.",
   },
   Mars: {
     goodKarmaManifestation: "Inherited courage, physical invincibility, and swift technical execution.",
     intellectStyle: "Sharp, incisive, logic-driven, rapid problem solver with tactical brilliance.",
     progenyNature: "Energetic, courageous, athletic, sports-loving children with strong physical vitality.",
-    transcriptRule: "PK Mars reflects past-life bravery, providing sharp logic and action-oriented progeny.",
+    classicalRule: "PK Mars reflects past-life bravery, providing sharp logic and action-oriented progeny.",
   },
   Mercury: {
     goodKarmaManifestation: "Inherited commercial shrewdness, verbal mastery, and intellectual agility.",
     intellectStyle: "Multi-disciplinary genius, analytical wit, rapid calculation, and encyclopedic curiosity.",
     progenyNature: "Super-intelligent, witty, academically stellar children with high adaptability.",
-    transcriptRule: "PK Mercury proves past-life intellectual merit, yielding brilliant brain power and sharp kids.",
+    classicalRule: "PK Mercury proves past-life intellectual merit, yielding brilliant brain power and sharp kids.",
   },
   Jupiter: {
     goodKarmaManifestation: "Inherited spiritual wisdom, divine protection, and effortless advisory respect.",
     intellectStyle: "Philosophical depth, 'Granth Kanth' memorization capacity, and holistic problem-solving.",
     progenyNature: "Dharmic, virtuous, obedient, academically revered children who carry forward sacred traditions.",
-    transcriptRule: "PK Jupiter is supreme Purva Punya: pristine intellect and deeply blessed, successful children.",
+    classicalRule: "PK Jupiter is supreme Purva Punya: pristine intellect and deeply blessed, successful children.",
   },
   Venus: {
     goodKarmaManifestation: "Inherited refined prosperity, artistic elegance, and magnetic charm.",
     intellectStyle: "Sophisticated aesthetic discernment, diplomatic finesse, and cultured creative expression.",
     progenyNature: "Charming, artistic, affectionate, graceful children who bring joy and prosperity into the home.",
-    transcriptRule: "PK Venus manifests past-life harmony into creative brilliance and loving, flourishing progeny.",
+    classicalRule: "PK Venus manifests past-life harmony into creative brilliance and loving, flourishing progeny.",
   },
   Saturn: {
     goodKarmaManifestation: "Inherited karmic endurance, philosophical maturity, and resilience against worldly illusions.",
     intellectStyle: "Pragmatic, methodical, deep long-term thinker with supreme structural patience.",
     progenyNature: "Serious, responsible, disciplined, duty-bound children who mature early and support parents.",
-    transcriptRule: "PK Saturn shows past-life perseverance, granting profound realistic intellect and mature progeny.",
+    classicalRule: "PK Saturn shows past-life perseverance, granting profound realistic intellect and mature progeny.",
   },
 };
 
@@ -792,79 +792,79 @@ export const AK_SOUL_ATTRIBUTES: Record<string, { quality: string; description: 
 export const AK_HOUSE_SPHERES: Record<number, {
   title: string;
   focus: string;
-  transcriptRule: string;
+  classicalRule: string;
   evolutionArea: string;
 }> = {
   1: {
     title: "1st House — Tan Bhav (Physical Body, Identity & Self)",
     focus: "Life revolves entirely around personal vitality, character development, individual identity, and physical self-mastery.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Aapki poori zindagi aapke sharir, aatmavishwas, aur personal identity ke daayre me hi evolve karegi.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Aapki poori zindagi aapke sharir, aatmavishwas, aur personal identity ke daayre me hi evolve karegi.",
     evolutionArea: "Physical health, self-realization, personal branding, and moral courage.",
   },
   2: {
     title: "2nd House — Dhana Bhav (Wealth, Speech & Family Lineage)",
     focus: "Life revolves around family traditions, accumulated savings, vocal expression, and financial preservation.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Poori life parivaar ke sanskar, vani (speech), aur dhan-sanchay (savings) ke ird-gird ghumegi.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Poori life parivaar ke sanskar, vani (speech), aur dhan-sanchay (savings) ke ird-gird ghumegi.",
     evolutionArea: "Vocal integrity, protecting family wealth, nourishing others, and truth in speech.",
   },
   3: {
     title: "3rd House — Sahaja Bhav (Courage, Skills & Self-Effort)",
     focus: "Life revolves around younger siblings, hands-on craft, communications, digital media, writing, and self-made valor.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Mehnat, communication, bhai-behen, aur naye initiatives lene me hi poori life vyatit hogi.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Mehnat, communication, bhai-behen, aur naye initiatives lene me hi poori life vyatit hogi.",
     evolutionArea: "Artistic/technical execution, digital media outreach, self-reliance, and fearless initiative.",
   },
   4: {
     title: "4th House — Sukha Bhav (Mother, Domestic Peace & Property)",
     focus: "Life revolves around mother, real estate, vehicles, emotional security, and building a peaceful domestic sanctuary.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Ghar, mataji ki seva, zameen-jaydaad, aur man ki shanti hi jeevan ka permanent focal point rahega.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Ghar, mataji ki seva, zameen-jaydaad, aur man ki shanti hi jeevan ka permanent focal point rahega.",
     evolutionArea: "Inner emotional tranquility, landed assets, maternal reverence, and heart-centered peace.",
   },
   5: {
     title: "5th House — Putra Bhav (Intellect, Progeny & Past Merits)",
     focus: "Life revolves around children, deep advisory counsel, creative masterpieces, sharp intellect, and purva punya merits.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Brain power, bachche, guidance dena, aur gyaan ki rachna me hi poori life involve rahegi.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Brain power, bachche, guidance dena, aur gyaan ki rachna me hi poori life involve rahegi.",
     evolutionArea: "Advising disciples, analytical depth, creative legacy, and speculative intelligence.",
   },
   6: {
     title: "6th House — Ari Bhav (Service, Healing & Overcoming Hurdles)",
     focus: "Life revolves around resolving complex disputes, healthcare, service to society, and overcoming debts or workplace rivals.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Seva, problem-solving, rog-shatru se ladna, aur daily discipline hi aatma ka karmic field rahega.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Seva, problem-solving, rog-shatru se ladna, aur daily discipline hi aatma ka karmic field rahega.",
     evolutionArea: "Relentless work ethic, legal arbitration, medical/healing service, and debt mitigation.",
   },
   7: {
     title: "7th House — Jaya Bhav (Marriage, Partner & Public Arena)",
     focus: "Life revolves around spouse, interpersonal contracts, business partnerships, and diplomacy in public dealings.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Spouse, business partner, aur public dealings ke bahar aapka astitva expand nahi hoga.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Spouse, business partner, aur public dealings ke bahar aapka astitva expand nahi hoga.",
     evolutionArea: "Marital devotion, commercial alliances, diplomatic negotiations, and public standing.",
   },
   8: {
     title: "8th House — Randhra Bhav (Occult, Transformation & Hidden Depth)",
     focus: "Life revolves around deep investigative research, sudden transformations, occult sciences, inheritance, and psychological depth.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Rahasyamayi vidya (occult), research, sudden twists, aur deep spiritual cleansing hi life ka path hai.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Rahasyamayi vidya (occult), research, sudden twists, aur deep spiritual cleansing hi life ka path hai.",
     evolutionArea: "Karmic resilience, esoteric wisdom, crisis turnaround, and ego surrender.",
   },
   9: {
     title: "9th House — Dharma Bhav (Higher Dharma, Guru & Pilgrim Path)",
     focus: "Life revolves around spiritual preceptors, father, philosophical doctrines, publishing, and righteous mentor guidance.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Guru ka aashirwad, dharma, dharmik yatrayen, aur higher learning hi aapka permanent circle hai.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Guru ka aashirwad, dharma, dharmik yatrayen, aur higher learning hi aapka permanent circle hai.",
     evolutionArea: "Philosophical truth, upholding family/social ethics, pilgrimage, and spiritual mentorship.",
   },
   10: {
     title: "10th House — Karma Bhav (Career Zenith, Status & Worldly Duty)",
     focus: "Life revolves around professional authority, executive power, public reputation, and social responsibilities.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Karma, pad-pratishtha (status), sarkari ya corporate authority hi aapki mukhya pehchan banegi.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Karma, pad-pratishtha (status), sarkari ya corporate authority hi aapki mukhya pehchan banegi.",
     evolutionArea: "Executive leadership, social legacy, ethical career zenith, and worldly service.",
   },
   11: {
     title: "11th House — Labha Bhav (Aspirations, Networks & Mass Gains)",
     focus: "Life revolves around large communities, elder siblings, fulfillment of life ambitions, and expanding multiple revenue streams.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Dost, organizations, society ke networks, aur lakshya-prapti me hi poori urja lagegi.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Dost, organizations, society ke networks, aur lakshya-prapti me hi poori urja lagegi.",
     evolutionArea: "Community leadership, scaling wealth ecosystems, social empowerment, and realized aspirations.",
   },
   12: {
     title: "12th House — Moksha Bhav (Detachment, Foreign Lands & Solitude)",
     focus: "Life revolves around foreign connections, institutions, spiritual seclusion, charitable giving, and transcendental liberation.",
-    transcriptRule: "Us house ke bahar life nahi ja sakti: Videsh (foreign), akelepan me shanti, hospital/charity, aur moksha ke daayre me hi aatma rahegi.",
+    classicalRule: "Us house ke bahar life nahi ja sakti: Videsh (foreign), akelepan me shanti, hospital/charity, aur moksha ke daayre me hi aatma rahegi.",
     evolutionArea: "Spiritual transcendence, selfless surrender, global foreign horizons, and mental release.",
   },
 };
@@ -1046,7 +1046,7 @@ export function getCharaDashaDirection(lagnaNum: number): {
   // 9th House Confirmation Rule:
   // For signs [0, 1, 2, 4, 5, 9, 10, 11] -> 9th sign counted forward: (lagnaNum + 8) % 12
   // For signs [3, 6, 7, 8] -> 9th sign counted backward: (lagnaNum - 8) % 12
-  // Example from transcript: Virgo (5) -> forward 9th is Taurus (1, Savya) -> Clockwise!
+  // Example from classical tradition: Virgo (5) -> forward 9th is Taurus (1, Savya) -> Clockwise!
   // Example: Libra (6) -> backward 9th is Aquarius (10, Apasavya) -> Anti-clockwise!
   let ninthSignNum: number;
   if ([0, 1, 2, 4, 5, 9, 10, 11].includes(lagnaNum)) {
@@ -1078,7 +1078,7 @@ export function charaDashaYears(signNum: number, planets: ChartData["planets"]):
     ? md(lordSign - signNum, 12) + 1
     : md(signNum - lordSign, 12) + 1;
 
-  // Exact rule from transcript:
+  // Exact rule from classical tradition:
   // "Rashi se uske lord ki position tak count karo, 1 minus kar do. Max 12, Min 1."
   // Example: Taurus (2), lord in 6th house (Virgo, count 5) -> 5 - 1 = 4 saal!
   let duration = houseCount - 1;
@@ -1559,7 +1559,7 @@ export function evaluateAkAmkAnalysis(
   const akLifeSphere = AK_HOUSE_SPHERES[akHouse] ?? {
     title: `House ${akHouse} Karmic Focus`,
     focus: "Soul evolution centered in this house domain.",
-    transcriptRule: "Life focus is anchored within this house.",
+    classicalRule: "Life focus is anchored within this house.",
     evolutionArea: "Spiritual and worldly lessons.",
   };
 
@@ -1580,7 +1580,7 @@ export function evaluateAkAmkAnalysis(
   const isGkAspectingAmk = doesSignAspect(gk.signNum, amk.signNum) && !isAdjacentSign(gk.signNum, amk.signNum);
   const isGkAspectingRajayoga = isGkAspectingAk || isGkAspectingAmk;
 
-  // Transcript Secret: Supreme Teacher / Saraswati Yoga
+  // Nadi Secret: Supreme Teacher / Saraswati Yoga
   // AK & AmK both in dual signs (Gemini 2, Virgo 5, Sagittarius 8, Pisces 11), both Retrograde, mutual aspect, untouched by GK
   const DUAL_SIGNS = [2, 5, 8, 11];
   const isAkInDual = DUAL_SIGNS.includes(ak.signNum);
@@ -1595,7 +1595,7 @@ export function evaluateAkAmkAnalysis(
 
   if (isSupremeTeacherYoga) {
     rajayogaTier = "Supreme Teacher Yoga";
-    rajayogaDescription = `SUPREME TEACHER / SARASWATI RAJAYOGA (Transcript Secret): AK (${ak.planet}) and AmK (${amk.planet}) are BOTH in Dual Signs (${ak.sign} & ${amk.sign}), BOTH are Retrograde, mutually aspecting, and completely untouched by GK. Transcript declares: 'Aap jaisa teacher/guru koi nahi hoga'. Unmatched encyclopedic depth of knowledge, effortless ability to explain complex truths simply, and immense prosperity earned purely through wisdom and teaching.`;
+    rajayogaDescription = `SUPREME TEACHER / SARASWATI RAJAYOGA (Nadi Secret): AK (${ak.planet}) and AmK (${amk.planet}) are BOTH in Dual Signs (${ak.sign} & ${amk.sign}), BOTH are Retrograde, mutually aspecting, and completely untouched by GK. Classical Nadi Shastras declare: 'Aap jaisa teacher/guru koi nahi hoga'. Unmatched encyclopedic depth of knowledge, effortless ability to explain complex truths simply, and immense prosperity earned purely through wisdom and teaching.`;
   } else if (isRajayoga) {
     if (!isGkAspectingRajayoga) {
       rajayogaTier = "Pinnacle Unblemished";
@@ -2028,7 +2028,7 @@ export function evaluateBkSubconscious(
     drive: "Self-reliance and persistent efforts in house affairs.",
     failureTestZone: "Initial struggles and repeated trials.",
     masterySkill: "Elite mastery built through relentless determination.",
-    transcriptRule: "Subconscious mind achieves mastery through repeated efforts.",
+    classicalRule: "Subconscious mind achieves mastery through repeated efforts.",
   };
 
   return {
@@ -2038,7 +2038,7 @@ export function evaluateBkSubconscious(
     subconsciousDrive: data.drive,
     failureTestZone: data.failureTestZone,
     masterySkill: data.masterySkill,
-    transcriptRule: data.transcriptRule,
+    classicalRule: data.classicalRule,
   };
 }
 
@@ -2057,7 +2057,7 @@ export function evaluateMkEducation(
     parentalNature: "Supportive, traditional, and value-oriented parents.",
     domesticSanctuary: "Peaceful and grounded home sanctuary.",
     mentalPeaceSource: "Honest living and harmonious family ties.",
-    transcriptRule: "MK planet determines academic stream and maternal roots.",
+    classicalRule: "MK planet determines academic stream and maternal roots.",
   };
 
   return {
@@ -2068,7 +2068,7 @@ export function evaluateMkEducation(
     parentalNature: data.parentalNature,
     domesticSanctuary: data.domesticSanctuary,
     mentalPeaceSource: data.mentalPeaceSource,
-    transcriptRule: data.transcriptRule,
+    classicalRule: data.classicalRule,
   };
 }
 
@@ -2086,7 +2086,7 @@ export function evaluatePkPurvaPunya(
     goodKarmaManifestation: "Inherited mental clarity and dharmic support.",
     intellectStyle: "Creative problem solver with intuitive insight.",
     progenyNature: "Dharmic and blessed progeny.",
-    transcriptRule: "PK reflects past-life merit and child blessings.",
+    classicalRule: "PK reflects past-life merit and child blessings.",
   };
 
   const h5SignNum = md(lagnaNum + 4, 12);
@@ -2106,7 +2106,7 @@ export function evaluatePkPurvaPunya(
     intellectQuality: data.intellectStyle,
     progenyBlessing: data.progenyNature,
     progenyTimingSigns,
-    transcriptRule: data.transcriptRule,
+    classicalRule: data.classicalRule,
   };
 }
 

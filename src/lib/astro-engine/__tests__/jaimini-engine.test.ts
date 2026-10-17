@@ -331,7 +331,7 @@ test("RULE L: AK Life Sphere ('Us House Ke Bahar Life Nahi Ja Sakti') & AmK Weal
   // Verify AK Life Sphere (House 5: Children, brain, advisory counsel)
   assert.equal(akAmk.akHouseFromLagna, 5);
   assert.ok(akAmk.akLifeSphere.title.includes("5th House"));
-  assert.ok(akAmk.akLifeSphere.transcriptRule.includes("Us house ke bahar life nahi ja sakti"));
+  assert.ok(akAmk.akLifeSphere.classicalRule.includes("Us house ke bahar life nahi ja sakti"));
   assert.ok(akAmk.akLifeSphere.focus.includes("children"));
 
   // Verify AmK Wealth Gateway (House 2: Family enterprise, speech, banking, savings)
@@ -456,7 +456,7 @@ test("RULE P: BK Subconscious Mind & Repeated Failure Skill Mastery", () => {
   assert.ok(bk.subconsciousDrive.includes("Marketing outreach"));
   assert.ok(bk.failureTestZone.includes("Initial marketing flops"));
   assert.ok(bk.masterySkill.includes("Virtuoso communication"));
-  assert.ok(bk.transcriptRule.includes("Subconscious mind lives in 3rd house"));
+  assert.ok(bk.classicalRule.includes("Subconscious mind lives in 3rd house"));
 });
 
 test("RULE Q: MK Education Stream & Parental Nature", () => {

@@ -4,7 +4,7 @@
 // Maps the 12 Divine Jyotirlingas to the 12 Rashis, Houses, Planetary Afflictions,
 // Biological Pathologies, 40-Day Energy Assimilation, and Karmic Knot Dissolution.
 // Based strictly on classical Puranic authorities, Jaimini Upadesha Sutras,
-// and oral discourse transcripts (Deepanshu Giri / Lunar Astro).
+// and sacred Nadi astrological traditions.
 // ============================================================
 
 import type { ChartData } from "./calculations";
