@@ -100,9 +100,14 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { birth } = useUserChart();
-  const userName = birth.name?.split(" ")[0] || "Seeker";
+  const [mounted, setMounted] = useState(false);
+  const userName = mounted && birth.name ? birth.name.split(" ")[0] : "Seeker";
   const { isElite } = useUserTier();
   const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -209,8 +214,8 @@ export function DashboardSidebar() {
 
       {/* User chip */}
       <div className="dash-user">
-        <div className="dash-user-av">{userName[0]?.toUpperCase()}</div>
-        <span className="dash-user-name">{userName}</span>
+        <div className="dash-user-av" suppressHydrationWarning>{userName[0]?.toUpperCase()}</div>
+        <span className="dash-user-name" suppressHydrationWarning>{userName}</span>
         <button className="dash-logout" onClick={handleLogout} title="Logout" type="button">
           <LogOut size={15} strokeWidth={1.7} />
         </button>
