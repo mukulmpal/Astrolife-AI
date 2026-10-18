@@ -36,6 +36,7 @@ import { evaluateMoonDispositorHealthTiming } from "../astro-engine/transit-heal
 import { evaluateTradingRisk } from "../astro-engine/trading-risk-guardrail";
 import { evaluateCareerSpecifier } from "../astro-engine/career-specifier";
 import { resolvePilgrimagePrescription } from "../astro-engine/pilgrimage-engine";
+import { generateSimpleKundliDossierData } from "../astro-engine/simple-kundli-dossier-engine";
 
 /**
  * Builds a comprehensive, unified astrological context from ALL engines.
@@ -926,6 +927,67 @@ ${mksAlerts.length ? `- MKS Exalted "Rise-to-Fall" Parabola:\n  ${mksAlerts.join
   ✦ 40-Day Energy Assimilation Rule: ${pilgrimage.energyAssimilationRuleHinglish}`);
   } catch (err) {
     console.warn("[MasterAstroContext] Advanced Clinical Astrology error:", err);
+  }
+
+  // ── 21. SHASTRIC LIFE DOSSIER & EDITORIAL STORYTELLING ──────────────────────
+  try {
+    const dossier = generateSimpleKundliDossierData(chart);
+    if (dossier) {
+      const yogas = dossier.masterRajyogas
+        .map((y, i) => `${i + 1}. ${y.title}: ${y.desc} ➔ ${y.outcome}`)
+        .join("\n  ✦ ");
+      const challenges = dossier.karmicChallenges
+        .map((c, i) => `${i + 1}. ${c.title}: ${c.desc} ➔ Guru Advice: ${c.advice}`)
+        .join("\n  ✦ ");
+      const idealFields = dossier.career.idealFields
+        .map((f, i) => `${i + 1}. ${f.title} (${f.desc})`)
+        .join("; ");
+      const milestones = dossier.timelines.milestones
+        .map((m) => `${m.age} (${m.years}): ${m.title} — ${m.desc}`)
+        .join("; ");
+      const fatherAdvice = dossier.fatherlyAdvice
+        .map((a, i) => `${i + 1}. ${a.title}: ${a.advice}`)
+        .join("\n  ✦ ");
+      const sacredRemedies = dossier.remedies
+        .map((r, i) => `${i + 1}. ${r.title}: ${r.practice} (Benefit: ${r.benefit})`)
+        .join("\n  ✦ ");
+
+      sections.push(`### 21. SHASTRIC LIFE DOSSIER & EDITORIAL STORYTELLING (HUMAN-TONE SYNTHESIS)
+- Master Rajyogas:
+  ✦ ${yogas || "None identified"}
+- Karmic Challenges & Remedial Directives:
+  ✦ ${challenges || "Clean chart balance"}
+- Core Personality, Work Style & Destiny Key:
+  ✦ Lagna Trait: ${dossier.personality.lagnaTrait}
+  ✦ House & Focus: ${dossier.personality.houseOutcome}
+  ✦ Hidden Superpower: ${dossier.personality.hiddenTrait}
+  ✦ Destiny Key (भाग्य-कुंजी): ${dossier.personality.destinyKey}
+- Career, Wealth & Micro-Vastu Alignment:
+  ✦ Dominant Apex Role: ${dossier.career.roleTitle}
+  ✦ Role Execution: ${dossier.career.roleSummary}
+  ✦ Top Ideal Fields: ${idealFields}
+  ✦ Wealth Flow: ${dossier.career.wealthFlow}
+  ✦ Micro-Vastu: Work Facing ${dossier.career.microVastu.deskDirection} | Sleep Direction ${dossier.career.microVastu.sleepDirection} — ${dossier.career.microVastu.explanation}
+- 100% Dynamic Marriage & Spouse Engine (D-1 + D-9 Navamsha + Manglik + Jaimini Darakaraka):
+  ✦ Spouse Nature: ${dossier.marriage.spouseNature}
+  ✦ Meeting Venue / Context: ${dossier.marriage.meetingVenue}
+  ✦ Marriage Type & Dynamics: ${dossier.marriage.marriageTypeTitle} — ${dossier.marriage.marriageTypeExplanation}
+  ✦ Kalatra Bhagya (Marital Fortune): ${dossier.marriage.kalatraBhagyaNote}
+- Vimshottari Timeline, Turning Point & Milestones:
+  ✦ Active Dasha Climate: ${dossier.activeDashaBadge} (${dossier.timelines.dashaWindow}) — ${dossier.timelines.timeClimate}
+  ✦ Golden Turning Point: ${dossier.timelines.turningPoint.heading} (${dossier.timelines.turningPoint.dates}) — ${dossier.timelines.turningPoint.impact}
+  ✦ Age-Stage Milestones: ${milestones}
+- Protective Life Guardrails (Fatherly Advice):
+  ✦ ${fatherAdvice}
+- Authorized Gemstone & Sacred Remedies:
+  ✦ Prescribed Gemstone: ${dossier.gemstone.primaryStone} (${dossier.gemstone.englishStone}) | Metal: ${dossier.gemstone.metal} | Finger: ${dossier.gemstone.finger} | Time: ${dossier.gemstone.dayTime} | Benefits: ${dossier.gemstone.benefits} | Safe Alternative: ${dossier.gemstone.alternative}
+  ✦ Sacred Remedies:
+  ✦ ${sacredRemedies}
+- Guru's Final Life Blessing:
+  ✦ ${dossier.conclusion}`);
+    }
+  } catch (err) {
+    console.warn("[MasterAstroContext] Shastric Life Dossier error:", err);
   }
 
 
