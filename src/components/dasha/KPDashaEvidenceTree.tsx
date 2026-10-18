@@ -31,9 +31,9 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
     <div
       style={{
         background: "#FFFFFF",
-        border: "1px solid rgba(184, 134, 11, 0.2)",
-        borderRadius: "20px",
-        padding: "24px",
+        border: "1px solid rgba(184, 134, 11, 0.22)",
+        borderRadius: "16px",
+        padding: "20px 24px",
         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
       }}
     >
@@ -71,9 +71,9 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
         <p
           style={{
             color: "#6B635B",
-            fontSize: "12.5px",
-            marginTop: "4px",
-            lineHeight: 1.5,
+            fontSize: "13px",
+            marginTop: "6px",
+            lineHeight: 1.6,
           }}
         >
           Classical KP timing bridges Vimshottari periods to exact house significations. Below is the
@@ -96,10 +96,11 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
             <div
               key={idx}
               style={{
-                background: "#FAF7F2",
-                border: "1px solid rgba(184, 134, 11, 0.15)",
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.22)",
+                borderLeft: `4px solid ${color}`,
                 borderRadius: "12px",
-                padding: "14px",
+                padding: "14px 16px",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -190,10 +191,11 @@ export function KPDashaEvidenceTree({ evidence, tp = (n) => n }: KPDashaEvidence
                 <div
                   key={i}
                   style={{
-                    background: "#FAF7F2",
-                    border: "1px solid rgba(184, 134, 11, 0.15)",
-                    borderRadius: "10px",
-                    padding: "12px 14px",
+                    background: "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.22)",
+                    borderLeft: "4px solid #B8860B",
+                    borderRadius: "12px",
+                    padding: "14px 16px",
                     cursor: "pointer",
                     transition: "border-color 0.15s",
                   }}

@@ -10,7 +10,7 @@ export default function MuhuratPage() {
   const [activeTab, setActiveTab] = useState<"EVENT_MUHURAT" | "TARA_CALENDAR">("TARA_CALENDAR");
 
   return (
-    <div className="page max-w-5xl mx-auto p-4 sm:p-6 space-y-6">
+    <div className="page max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* Top Header */}
       <div className="border-b border-[var(--border)] pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

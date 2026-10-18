@@ -1360,10 +1360,11 @@ export default function KundliPage() {
                       <NorthIndianChart lagnaNum={currentDiv.lagnaNum} planets={currentDivPlanets} />
 
                       <div className="mt-4 p-4 sm:p-5 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.22)] border-l-4 border-l-[#B8860B]">
-                        <div className="text-[11px] uppercase font-bold text-[#B8860B] tracking-wider mb-1.5">
-                          Domain Purpose &amp; Cosmic Scope
+                        <div className="text-[11px] uppercase font-bold text-[#B8860B] tracking-wider mb-1.5 flex items-center gap-1.5">
+                          <span>✦</span>
+                          <span>चक्र का शास्त्रीय प्रयोजन · Shastric Domain Purpose</span>
                         </div>
-                        <div className="text-sm text-[#3D3834] leading-[1.75]">
+                        <div className="font-serif text-[14.5px] sm:text-[15px] text-[#2A241F] leading-[1.8] text-justify">
                           {currentDiv.purpose}
                         </div>
                       </div>

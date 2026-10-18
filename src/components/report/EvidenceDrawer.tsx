@@ -151,7 +151,7 @@ export function EvidenceDrawer({
             </div>
 
             <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-xl p-3.5 space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#B8860B]">
                 Transit Corroboration
               </span>
               <p className="text-xs text-[#6B635B] leading-relaxed">
@@ -160,7 +160,7 @@ export function EvidenceDrawer({
             </div>
 
             <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-xl p-3.5 space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#059669]">
                 Ruling Planets Corroboration
               </span>
               <p className="text-xs text-[#6B635B] leading-relaxed">

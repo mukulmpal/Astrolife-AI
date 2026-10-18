@@ -242,7 +242,7 @@ export function PersonalTaraCalendar() {
               key={day.dateStr}
               type="button"
               onClick={() => setSelectedDayKey(day.dateStr)}
-              className="text-left rounded-2xl p-3.5 border transition-all flex flex-col justify-between gap-2 shadow-sm hover:scale-[1.02]"
+              className="text-left rounded-2xl p-4 sm:p-5 border transition-all flex flex-col justify-between gap-3 shadow-sm hover:scale-[1.02]"
               style={{
                 background: isSelected
                   ? day.isAfflicted
@@ -272,15 +272,15 @@ export function PersonalTaraCalendar() {
               {/* Header with Date and Today Tag */}
               <div className="flex items-center justify-between gap-1 w-full">
                 <div>
-                  <span className="text-[11px] font-bold uppercase text-[#6B635B]">
+                  <span className="text-xs font-bold uppercase text-[#6B635B]">
                     {day.dayName}
                   </span>
-                  <p className="text-sm font-bold text-[#1A1A1A] leading-tight">
+                  <p className="text-base font-bold text-[#1A1A1A] leading-tight mt-0.5">
                     {day.formattedDate}
                   </p>
                 </div>
                 {isToday && (
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-white">
                     TODAY
                   </span>
                 )}
@@ -288,7 +288,7 @@ export function PersonalTaraCalendar() {
 
               {/* Tara Indicator Badge */}
               <div
-                className={`px-2 py-0.5 rounded-lg text-[10px] font-bold flex items-center justify-between ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center justify-between ${
                   day.isAfflicted
                     ? "bg-red-500/15 text-red-700"
                     : day.isJanma
@@ -301,7 +301,7 @@ export function PersonalTaraCalendar() {
               </div>
 
               {/* Moon Star */}
-              <div className="border-t border-amber-900/10 pt-1.5 mt-0.5 text-[11px] text-[#6B635B]">
+              <div className="border-t border-amber-900/10 pt-2 mt-0.5 text-xs text-[#6B635B]">
                 <span className="truncate block font-medium">☽ {day.moonNakshatra.name}</span>
               </div>
             </button>
@@ -312,7 +312,7 @@ export function PersonalTaraCalendar() {
       {/* ── Active Day Detail Spotlight ── */}
       {activeDay && (
         <div
-          className="rounded-3xl p-6 border flex flex-col gap-4 shadow-sm"
+          className="rounded-2xl p-5 sm:p-6 border flex flex-col gap-4 shadow-sm"
           style={{
             background: activeDay.isAfflicted
               ? "rgba(239, 68, 68, 0.03)"
@@ -366,7 +366,7 @@ export function PersonalTaraCalendar() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Recommended Activities */}
-            <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200">
+            <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200 border-l-4 border-l-emerald-600">
               <p className="text-xs font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5 mb-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Prime Activities for this Day</span>
@@ -382,7 +382,7 @@ export function PersonalTaraCalendar() {
             </div>
 
             {/* Caution Guidance */}
-            <div className="bg-red-50/70 p-4 rounded-2xl border border-red-200">
+            <div className="bg-red-50/70 p-4 rounded-xl border border-red-200 border-l-4 border-l-red-600">
               <p className="text-xs font-bold uppercase tracking-wider text-red-900 flex items-center gap-1.5 mb-2">
                 <ShieldAlert className="w-4 h-4 text-red-600" />
                 <span>Activities to Avoid / Postpone</span>

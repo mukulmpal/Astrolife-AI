@@ -421,7 +421,7 @@ import { assertEventRadarReportContract } from "./contracts";
       // Chandrashtama detection (8th rashi from natal Moon)
       const isChandrashtama = transitMoonRashiIdx === ((natalMoonRashiIdx + 7) % 12);
       const chandrashtamaDetail = isChandrashtama
-        ? "Moon transits your 8th house (Chandrashtama). Classical Phaladeepika Ch. 26 warns of mental restlessness and volatile moods; postpone irreversible contracts, risky investments, or surgical procedures."
+        ? "Moon transits your 8th house (Chandrashtama). This sensitive transit indicates temporary mental restlessness or emotional fatigue; postpone irreversible contracts, risky investments, or surgical procedures."
         : undefined;
 
       let overallScore = normalizeOverallScore({

@@ -108,10 +108,11 @@ function RemedyCard({
   return (
     <div
       style={{
-        borderLeft: `3px solid ${priorityColor}`,
-        background: `${priorityColor}07`,
-        borderRadius: "10px",
-        marginBottom: "10px",
+        borderLeft: `4px solid ${priorityColor}`,
+        border: `1px solid rgba(184, 134, 11, 0.18)`,
+        background: "#FAF8F5",
+        borderRadius: "12px",
+        marginBottom: "12px",
         overflow: "hidden",
       }}
     >
@@ -122,17 +123,17 @@ function RemedyCard({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "12px 14px",
+          padding: "14px 18px",
           background: "transparent",
           border: "none",
           cursor: "pointer",
           textAlign: "left",
-          gap: 10,
+          gap: 12,
         }}
       >
         <div>
-          <div style={{ fontWeight: 700, fontSize: "13px", color: "#1A1A1A" }}>{title}</div>
-          <div style={{ fontSize: "11px", color: "#6B635B", marginTop: 2 }}>{purpose}</div>
+          <div style={{ fontWeight: 700, fontSize: "14px", color: "#1A1A1A" }}>{title}</div>
+          <div style={{ fontSize: "12.5px", color: "#6B635B", marginTop: 3 }}>{purpose}</div>
         </div>
         <span
           style={{
@@ -140,8 +141,8 @@ function RemedyCard({
             background: `${priorityColor}18`,
             border: `1px solid ${priorityColor}44`,
             borderRadius: "12px",
-            padding: "2px 10px",
-            fontSize: "10px",
+            padding: "3px 12px",
+            fontSize: "11px",
             fontWeight: 700,
             color: priorityColor,
           }}
@@ -150,8 +151,8 @@ function RemedyCard({
         </span>
       </button>
       {open && (
-        <div style={{ padding: "0 14px 14px", fontSize: "12px", color: "#4A4238", lineHeight: 1.7 }}>
-          <div style={{ marginBottom: 6 }}>
+        <div style={{ padding: "0 18px 16px", fontSize: "13.5px", color: "#4A4238", lineHeight: 1.75 }}>
+          <div style={{ marginBottom: 8 }}>
             <strong>Practice:</strong> {instructions}
           </div>
           <div>
@@ -213,25 +214,19 @@ export default function LineageKarmaPage() {
           <Dna size={22} style={{ color: "#7C3AED" }} />
         </div>
         <div>
-          <div style={{ fontWeight: 800, fontSize: "18px", color: "#1A1A1A" }}>
-            Lineage Karma & Pitru Intelligence
+          <div style={{ fontWeight: 800, fontSize: "20px", color: "#1A1A1A", fontFamily: "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif" }}>
+            Lineage Karma &amp; Pitru Intelligence
           </div>
-          <div style={{ fontSize: "12px", color: "#6B635B" }}>
-            {chart.name} &middot; 7-Layer Ancestral Analysis (BPHS · Arroyo · KN Rao · PVR)
+          <div style={{ fontSize: "13px", color: "#6B635B", marginTop: 2 }}>
+            {chart.name} के पारिवारिक संस्कार, पैतृक आशीर्वाद व आत्मिक शांति का मार्गदर्शन
           </div>
         </div>
       </div>
 
-      {/* Ancestral gate pill */}
-      <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 6 }}>
-        <Pill
-          text={lineage?.ancestralGatePassed ? "✅ Ancestral Gate: OPEN" : "🔵 General Interpretation"}
-          color={lineage?.ancestralGatePassed ? "#059669" : "#6B7280"}
-        />
-        <Pill text={`BTR: ${lineage?.btrConfidence || "High"}`} color="#7C3AED" />
-        {lineage?.gateReasons?.slice(0, 2).map((r) => (
-          <Pill key={r} text={r} color="#D97706" />
-        ))}
+      {/* User-friendly orientation tags */}
+      <div style={{ marginBottom: 18, display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <Pill text="🌿 पैतृक आशीर्वाद संरेखण (Family Harmony)" color="#059669" />
+        <Pill text="🙏 कुल संस्कार व आत्म-शुद्धि (Ancestral Alignment)" color="#7C3AED" />
       </div>
 
       {/* Tabs */}
@@ -326,9 +321,11 @@ export default function LineageKarmaPage() {
           <Section title="इष्ट देवता (Soul Guide)" emoji="✨" color="#0F766E">
             <div style={{ display: "grid", gap: "8px" }}>
               <div>
-                <strong>Soul Deity:</strong> {lineage.ishtaDevata.suggestedDeity.deityName}
+                <strong>Soul Guide:</strong> {lineage.ishtaDevata.suggestedDeity.deityName}
               </div>
-              <div><strong>Atmakaraka:</strong> {lineage.ishtaDevata.atmakarakaPlanet} in D9 {lineage.ishtaDevata.karakamsaSign}</div>
+              <div style={{ color: "#0F766E", fontWeight: 600 }}>
+                ✦ आत्म-संरेखण: आपकी आत्मा की आंतरिक शांति और गहरे ध्यान का मुख्य केंद्र
+              </div>
               <div style={{ background: "rgba(15,118,110,0.07)", border: "1px solid rgba(15,118,110,0.2)", borderRadius: 8, padding: "10px 12px", marginTop: 4 }}>
                 🕉️ <strong>Dhyana Mantra:</strong> {lineage.ishtaDevata.soulDhyanaMantra}
               </div>
@@ -597,7 +594,7 @@ export default function LineageKarmaPage() {
           lineHeight: 1.6,
         }}
       >
-        🕉️ <strong>AstroLife Lineage Karma Engine:</strong> BPHS (L1) · Dr. Prem Kumar Sharma (L2) · Stephen Arroyo (L3) · Sri P.V.R. Narasimha Rao Antahkarana Model (L4). This report is a spiritual guidance tool, not a definitive verdict. Family history validation strengthens conclusions.
+        🕉️ <strong>AstroLife Lineage &amp; Ancestral Intelligence:</strong> यह विश्लेषण आपके पारिवारिक संस्कारों, वंशानुगत आदतों और आत्मिक शांति का समग्र मानवीय दर्पण है। यह भयमुक्त, व्यावहारिक मार्गदर्शन के लिए है।
       </div>
     </main>
   );

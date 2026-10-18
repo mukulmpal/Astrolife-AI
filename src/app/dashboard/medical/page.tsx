@@ -217,37 +217,37 @@ export default function MedicalPage() {
   const familyKeys: FamilyMemberKey[] = ["Self", "Father", "Mother", "Spouse", "Children", "Younger sibling", "Elder sibling"];
 
   return (
-    <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "24px 18px 110px", color: "#1A1A1A" }}>
+    <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "28px 20px 110px", color: "#1A1A1A" }}>
       <style>{`
-        .med-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 14px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .med-card-header { padding: 14px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
-        .med-card-body { padding: 0 16px 16px; border-top: 1px solid rgba(184, 134, 11, 0.12); padding-top: 14px; }
-        .med-section { margin-bottom: 14px; }
-        .med-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; opacity: 0.85; }
-        .med-row { font-size: 12px; color: #4A4238; margin-bottom: 6px; line-height: 1.55; display: flex; gap: 8px; }
-        .med-row strong { color: #1A1A1A; min-width: 80px; flex-shrink: 0; font-weight: 700; }
-        .tab-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid rgba(184, 134, 11, 0.22); cursor: pointer; transition: all 0.15s; }
-        .tab-btn.active { background: rgba(184, 134, 11, 0.14); border-color: rgba(184, 134, 11, 0.35); color: #B8860B; font-weight: 700; }
+        .med-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.25); border-radius: 16px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,0.03); }
+        .med-card-header { padding: 18px 22px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 15.5px; }
+        .med-card-body { padding: 0 22px 22px; border-top: 1px solid rgba(184, 134, 11, 0.12); padding-top: 18px; }
+        .med-section { margin-bottom: 18px; }
+        .med-section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; color: #8A6008; }
+        .med-row { font-size: 14.5px; color: #2D241E; margin-bottom: 9px; line-height: 1.65; display: flex; gap: 10px; }
+        .med-row strong { color: #1A1A1A; min-width: 90px; flex-shrink: 0; font-weight: 700; }
+        .tab-btn { padding: 9px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 600; border: 1px solid rgba(184, 134, 11, 0.22); cursor: pointer; transition: all 0.15s; }
+        .tab-btn.active { background: rgba(184, 134, 11, 0.14); border-color: rgba(184, 134, 11, 0.45); color: #8A6008; font-weight: 700; }
         .tab-btn:not(.active) { background: #FFFFFF; color: #6B635B; }
         .tab-btn:not(.active):hover { color: #1A1A1A; background: rgba(184, 134, 11, 0.08); }
-        .member-pill { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid rgba(184, 134, 11, 0.22); cursor: pointer; transition: all 0.15s; }
+        .member-pill { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid rgba(184, 134, 11, 0.22); cursor: pointer; transition: all 0.15s; }
         .member-pill.active { background: #B8860B; color: #FFFFFF; border-color: #B8860B; }
         .member-pill:not(.active) { background: #FFFFFF; color: #4A4238; }
-        .score-bar-bg { background: rgba(184, 134, 11, 0.15); border-radius: 4px; height: 8px; overflow: hidden; margin-top: 3px; }
-        .score-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
-        .combo-box { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; margin-right: 4px; }
-        .nak-row { display: grid; grid-template-columns: 120px 1fr 80px; gap: 8px; font-size: 11px; padding: 6px 0; border-bottom: 1px solid rgba(184, 134, 11, 0.12); align-items: start; }
+        .score-bar-bg { background: rgba(184, 134, 11, 0.15); border-radius: 6px; height: 10px; overflow: hidden; margin-top: 4px; }
+        .score-bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s; }
+        .combo-box { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .tag { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-right: 6px; }
+        .nak-row { display: grid; grid-template-columns: 140px 1fr 90px; gap: 12px; font-size: 14px; padding: 10px 0; border-bottom: 1px solid rgba(184, 134, 11, 0.12); align-items: start; }
         .nak-row:last-child { border-bottom: none; }
-        .dosha-gauge-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 8px 0; background: rgba(0,0,0,0.05); }
+        .dosha-gauge-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin: 10px 0; background: rgba(0,0,0,0.05); }
       `}</style>
 
-      <div style={{ maxWidth: "820px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "960px", margin: "0 auto" }}>
         {/* Header */}
-        <div style={{ marginBottom: "16px" }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "34px", fontWeight: 700, color: "#1A1A1A" }}>Health & Vitality</div>
-          <div style={{ fontSize: "13px", color: "#6B635B", marginTop: "4px" }}>
-            Ayurvedic & Classical Medical Astrology · Ojas Resilience: <strong style={{ color: "#B8860B" }}>{result.ojasScore}/100</strong> ({result.ojasRating})
+        <div style={{ marginBottom: "20px" }}>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "38px", fontWeight: 700, color: "#1A1A1A" }}>Health &amp; Vitality</div>
+          <div style={{ fontSize: "14.5px", color: "#5A524A", marginTop: "4px" }}>
+            Ayurvedic &amp; Classical Medical Astrology · Ojas Resilience: <strong style={{ color: "#B8860B" }}>{result.ojasScore}/100</strong> ({result.ojasRating})
           </div>
         </div>
 
@@ -401,7 +401,7 @@ export default function MedicalPage() {
         )}
 
         {/* Disclaimer banner */}
-        <div style={{ background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.22)", borderRadius: "10px", padding: "12px 16px", marginBottom: "18px", fontSize: "12px", lineHeight: "1.6" }}>
+        <div style={{ background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.22)", borderRadius: "12px", padding: "16px 20px", marginBottom: "20px", fontSize: "14px", lineHeight: "1.65" }}>
           <span style={{ color: "#DC2626", fontWeight: 700 }}>Wellness Disclaimer:</span>
           <span style={{ color: "#4A4238", marginLeft: "8px" }}>
             This analysis is an awareness tool based on classical Parashari principles and Ayurvedic shastras. It does <strong style={{ color: "#1A1A1A" }}>NOT</strong> constitute medical diagnosis, treatment, or clinical advice. Always consult a qualified registered medical doctor for any health concerns.
@@ -436,13 +436,13 @@ export default function MedicalPage() {
                   <div style={{ fontSize: "18px", fontWeight: 700, color: "#1A1A1A" }}>
                     {familyScan.hindiTitle} — Astrological Health Trace
                   </div>
-                  <div style={{ fontSize: "12px", color: "#6B635B", marginTop: "3px" }}>
+                  <div style={{ fontSize: "13.5px", color: "#6B635B", marginTop: "4px" }}>
                     Primary House: <strong>H{familyScan.primaryHouse}</strong> · Natural Karaka: <strong>{familyScan.karaka}</strong> · Evaluated Transit Date: <strong style={{ color: "#B8860B" }}>{targetDateStr}</strong>
                   </div>
                 </div>
                 <span className="tag" style={{
                   padding: "6px 12px",
-                  fontSize: "11px",
+                  fontSize: "12px",
                   background: familyScan.score >= 70 ? "rgba(220,38,38,0.2)" : familyScan.score >= 40 ? "rgba(220,38,38,0.1)" : familyScan.score >= 20 ? "rgba(180,83,9,0.1)" : "rgba(21,128,61,0.1)",
                   color: familyScan.score >= 40 ? "#DC2626" : familyScan.score >= 20 ? "#B45309" : "#15803D",
                   border: `1px solid ${familyScan.score >= 40 ? "rgba(220,38,38,0.3)" : familyScan.score >= 20 ? "rgba(180,83,9,0.3)" : "rgba(21,128,61,0.3)"}`
@@ -452,46 +452,46 @@ export default function MedicalPage() {
               </div>
 
               {/* Derived 6 Pillars (Including 2H & 7H Maraka Sthanas) */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: "10px", margin: "14px 0" }}>
-                <div style={{ background: "rgba(184,134,11,0.06)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.2)" }}>
-                  <div style={{ fontSize: "10px", color: "#8A6008", fontWeight: 700 }}>1H VITALITY</div>
-                  <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["1"]}</div>
-                  <div style={{ fontSize: "10px", color: "#6B635B" }}>Lagna / Constitution</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "10px", margin: "14px 0" }}>
+                <div style={{ background: "rgba(184,134,11,0.06)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(184,134,11,0.2)" }}>
+                  <div style={{ fontSize: "11.5px", color: "#8A6008", fontWeight: 700 }}>1H VITALITY</div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["1"]}</div>
+                  <div style={{ fontSize: "12px", color: "#6B635B" }}>Lagna / Constitution</div>
                 </div>
-                <div style={{ background: "rgba(220,38,38,0.08)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(220,38,38,0.25)" }}>
-                  <div style={{ fontSize: "10px", color: "#DC2626", fontWeight: 700 }}>2H MARAKA</div>
-                  <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["2"]}</div>
-                  <div style={{ fontSize: "10px", color: "#6B635B" }}>Primary Maraka</div>
+                <div style={{ background: "rgba(220,38,38,0.08)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(220,38,38,0.25)" }}>
+                  <div style={{ fontSize: "11.5px", color: "#DC2626", fontWeight: 700 }}>2H MARAKA</div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["2"]}</div>
+                  <div style={{ fontSize: "12px", color: "#6B635B" }}>Primary Maraka</div>
                 </div>
-                <div style={{ background: "rgba(220,38,38,0.06)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(220,38,38,0.2)" }}>
-                  <div style={{ fontSize: "10px", color: "#DC2626", fontWeight: 700 }}>6H ROGA</div>
-                  <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["6"]}</div>
-                  <div style={{ fontSize: "10px", color: "#6B635B" }}>Acute / Sickness</div>
+                <div style={{ background: "rgba(220,38,38,0.06)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(220,38,38,0.2)" }}>
+                  <div style={{ fontSize: "11.5px", color: "#DC2626", fontWeight: 700 }}>6H ROGA</div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["6"]}</div>
+                  <div style={{ fontSize: "12px", color: "#6B635B" }}>Acute / Sickness</div>
                 </div>
-                <div style={{ background: "rgba(220,38,38,0.08)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(220,38,38,0.25)" }}>
-                  <div style={{ fontSize: "10px", color: "#DC2626", fontWeight: 700 }}>7H MARAKA</div>
-                  <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["7"]}</div>
-                  <div style={{ fontSize: "10px", color: "#6B635B" }}>Secondary Maraka</div>
+                <div style={{ background: "rgba(220,38,38,0.08)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(220,38,38,0.25)" }}>
+                  <div style={{ fontSize: "11.5px", color: "#DC2626", fontWeight: 700 }}>7H MARAKA</div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["7"]}</div>
+                  <div style={{ fontSize: "12px", color: "#6B635B" }}>Secondary Maraka</div>
                 </div>
-                <div style={{ background: "rgba(180,83,9,0.06)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(180,83,9,0.2)" }}>
-                  <div style={{ fontSize: "10px", color: "#B45309", fontWeight: 700 }}>8H CRISIS</div>
-                  <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["8"]}</div>
-                  <div style={{ fontSize: "10px", color: "#6B635B" }}>Randhra / Ayu</div>
+                <div style={{ background: "rgba(180,83,9,0.06)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(180,83,9,0.2)" }}>
+                  <div style={{ fontSize: "11.5px", color: "#B45309", fontWeight: 700 }}>8H CRISIS</div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["8"]}</div>
+                  <div style={{ fontSize: "12px", color: "#6B635B" }}>Randhra / Ayu</div>
                 </div>
-                <div style={{ background: "rgba(29,78,216,0.06)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(29,78,216,0.2)" }}>
-                  <div style={{ fontSize: "10px", color: "#1D4ED8", fontWeight: 700 }}>12H HOSPITAL</div>
-                  <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["12"]}</div>
-                  <div style={{ fontSize: "10px", color: "#6B635B" }}>Vyaya / Exit</div>
+                <div style={{ background: "rgba(29,78,216,0.06)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(29,78,216,0.2)" }}>
+                  <div style={{ fontSize: "11.5px", color: "#1D4ED8", fontWeight: 700 }}>12H HOSPITAL</div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>House {familyScan.derivedHouses["12"]}</div>
+                  <div style={{ fontSize: "12px", color: "#6B635B" }}>Vyaya / Exit</div>
                 </div>
               </div>
 
-              <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.6", background: "#FAF7F2", padding: "10px 12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
+              <div style={{ fontSize: "14px", color: "#3A3228", lineHeight: "1.65", background: "#FAF7F2", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(184,134,11,0.18)" }}>
                 {familyScan.summaryMessage}
               </div>
 
               {/* Active Convergence Hits */}
-              <div style={{ marginTop: "16px" }}>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "#1A1A1A", marginBottom: "8px" }}>
+              <div style={{ marginTop: "18px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A", marginBottom: "10px" }}>
                   🎯 Active Astrological Signatures ({familyScan.hits.length} factors identified):
                 </div>
                 {familyScan.hits.map((hit, idx) => (
@@ -556,19 +556,19 @@ export default function MedicalPage() {
             )}
 
             {/* Overall sensitivity & Ojas */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
-              <div style={{ background: result.riskLevel === "high" ? "rgba(220,38,38,0.06)" : result.riskLevel === "moderate" ? "rgba(180,83,9,0.06)" : "rgba(21,128,61,0.06)", border: `1px solid ${result.riskLevel === "high" ? "rgba(220,38,38,0.25)" : result.riskLevel === "moderate" ? "rgba(180,83,9,0.25)" : "rgba(21,128,61,0.25)"}`, borderRadius: "12px", padding: "16px" }}>
-                <div style={{ fontWeight: 700, fontSize: "12px", color: result.riskLevel === "high" ? "#DC2626" : result.riskLevel === "moderate" ? "#B45309" : "#15803D", marginBottom: "4px" }}>🩺 OVERALL SENSITIVITY</div>
-                <div style={{ fontSize: "20px", fontWeight: 700, color: "#1A1A1A" }}>{result.riskLevel.toUpperCase()}</div>
-                <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "4px", lineHeight: "1.5" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "18px" }}>
+              <div style={{ background: result.riskLevel === "high" ? "rgba(220,38,38,0.06)" : result.riskLevel === "moderate" ? "rgba(180,83,9,0.06)" : "rgba(21,128,61,0.06)", border: `1px solid ${result.riskLevel === "high" ? "rgba(220,38,38,0.25)" : result.riskLevel === "moderate" ? "rgba(180,83,9,0.25)" : "rgba(21,128,61,0.25)"}`, borderRadius: "14px", padding: "18px 20px" }}>
+                <div style={{ fontWeight: 700, fontSize: "13px", color: result.riskLevel === "high" ? "#DC2626" : result.riskLevel === "moderate" ? "#B45309" : "#15803D", marginBottom: "6px" }}>🩺 OVERALL SENSITIVITY</div>
+                <div style={{ fontSize: "24px", fontWeight: 700, color: "#1A1A1A" }}>{result.riskLevel.toUpperCase()}</div>
+                <div style={{ fontSize: "13.5px", color: "#5A524A", marginTop: "6px", lineHeight: "1.55" }}>
                   Synthesized across dusthanas, dasha timing, and classical affliction nodes.
                 </div>
               </div>
 
-              <div style={{ background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "12px", padding: "16px" }}>
-                <div style={{ fontWeight: 700, fontSize: "12px", color: "#B8860B", marginBottom: "4px" }}>🛡️ OJAS (VITALITY RESILIENCE)</div>
-                <div style={{ fontSize: "20px", fontWeight: 700, color: "#1A1A1A" }}>{result.ojasScore} / 100</div>
-                <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "4px", lineHeight: "1.5" }}>
+              <div style={{ background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px 20px" }}>
+                <div style={{ fontWeight: 700, fontSize: "13px", color: "#B8860B", marginBottom: "6px" }}>🛡️ OJAS (VITALITY RESILIENCE)</div>
+                <div style={{ fontSize: "24px", fontWeight: 700, color: "#1A1A1A" }}>{result.ojasScore} / 100</div>
+                <div style={{ fontSize: "13.5px", color: "#5A524A", marginTop: "6px", lineHeight: "1.55" }}>
                   Rating: <strong style={{ color: "#B8860B" }}>{result.ojasRating}</strong> based on Lagna lord & Kendra support.
                 </div>
               </div>
@@ -579,26 +579,26 @@ export default function MedicalPage() {
               <div style={{
                 background: result.majorEventIndicator.isMajorCandidate ? "rgba(220,38,38,0.05)" : "#FFFFFF",
                 border: `1px solid ${result.majorEventIndicator.isMajorCandidate ? "rgba(220,38,38,0.3)" : "rgba(184,134,11,0.22)"}`,
-                borderRadius: "12px",
-                padding: "16px",
-                marginBottom: "16px",
+                borderRadius: "14px",
+                padding: "18px 20px",
+                marginBottom: "18px",
                 boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
               }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "6px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "18px" }}>{result.majorEventIndicator.isMajorCandidate ? "🚨" : "🛡️"}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", flexWrap: "wrap", gap: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "22px" }}>{result.majorEventIndicator.isMajorCandidate ? "🚨" : "🛡️"}</span>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: "14px", color: result.majorEventIndicator.isMajorCandidate ? "#DC2626" : "#1A1A1A" }}>
+                      <div style={{ fontWeight: 700, fontSize: "16px", color: result.majorEventIndicator.isMajorCandidate ? "#DC2626" : "#1A1A1A" }}>
                         Classical Major Event / Crisis Detection Engine
                       </div>
-                      <div style={{ fontSize: "11px", color: "#6B635B" }}>
+                      <div style={{ fontSize: "13px", color: "#6B635B" }}>
                         Multi-Vector Synchronicity: Dasha Marakas + Transit Ingress + Navtara + Dusthana Drishti
                       </div>
                     </div>
                   </div>
                   <span className="tag" style={{
-                    padding: "4px 10px",
-                    fontSize: "11px",
+                    padding: "6px 12px",
+                    fontSize: "12px",
                     fontWeight: 700,
                     background: result.majorEventIndicator.isMajorCandidate ? "rgba(220,38,38,0.15)" : "rgba(21,128,61,0.15)",
                     color: result.majorEventIndicator.isMajorCandidate ? "#DC2626" : "#15803D",
@@ -608,24 +608,24 @@ export default function MedicalPage() {
                   </span>
                 </div>
 
-                <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.6", marginTop: "8px", background: "#FAF7F2", padding: "10px 12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
+                <div style={{ fontSize: "14.5px", color: "#3A3228", lineHeight: "1.65", marginTop: "10px", background: "#FAF7F2", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(184,134,11,0.18)" }}>
                   {result.majorEventIndicator.whyMajorExplanation}
                 </div>
 
                 {result.majorEventIndicator.activeLayers.length > 0 && (
-                  <div style={{ marginTop: "12px" }}>
-                    <div style={{ fontSize: "11px", fontWeight: 700, color: "#8A6008", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+                  <div style={{ marginTop: "14px" }}>
+                    <div style={{ fontSize: "12.5px", fontWeight: 700, color: "#8A6008", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
                       ⚡ Active Converging Triggers on Evaluated Date ({result.majorEventIndicator.convergingLayersCount} layers):
                     </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "8px" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "10px" }}>
                       {result.majorEventIndicator.activeLayers.map((layer, idx) => (
-                        <span key={idx} className="tag" style={{ background: "rgba(220,38,38,0.1)", color: "#DC2626", border: "1px solid rgba(220,38,38,0.25)" }}>
+                        <span key={idx} className="tag" style={{ background: "rgba(220,38,38,0.1)", color: "#DC2626", border: "1px solid rgba(220,38,38,0.25)", fontSize: "12px", padding: "4px 10px" }}>
                           {layer}
                         </span>
                       ))}
                     </div>
                     {result.majorEventIndicator.reasons.map((r, idx) => (
-                      <div key={idx} style={{ fontSize: "11px", color: "#6B635B", lineHeight: "1.5", marginBottom: "3px" }}>
+                      <div key={idx} style={{ fontSize: "13.5px", color: "#5A524A", lineHeight: "1.6", marginBottom: "4px" }}>
                         • {r}
                       </div>
                     ))}
@@ -636,40 +636,41 @@ export default function MedicalPage() {
 
             {/* Active Dasha Health Timing Card */}
             {result.timingAlerts && result.timingAlerts.length > 0 && (
-              <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "12px", padding: "16px", marginBottom: "16px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                  <div style={{ fontWeight: 700, fontSize: "13px", color: "#B8860B" }}>
+              <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "14px", padding: "18px 20px", marginBottom: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                  <div style={{ fontWeight: 700, fontSize: "15px", color: "#B8860B" }}>
                     ⏳ Active Dasha Health Timing (3-Tier Resolution)
                   </div>
-                  <span style={{ fontSize: "11px", color: "#6B635B" }}>Evaluated Date: {targetDateStr}</span>
+                  <span style={{ fontSize: "13px", color: "#6B635B" }}>Evaluated Date: {targetDateStr}</span>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "10px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px" }}>
                   {result.timingAlerts.map((alert, i) => (
                     <div key={i} style={{
                       background: alert.severity === "high" ? "rgba(220,38,38,0.05)" : alert.severity === "medium" ? "rgba(180,83,9,0.05)" : "rgba(21,128,61,0.05)",
                       border: `1px solid ${alert.severity === "high" ? "rgba(220,38,38,0.25)" : alert.severity === "medium" ? "rgba(180,83,9,0.25)" : "rgba(21,128,61,0.25)"}`,
-                      borderRadius: "10px",
-                      padding: "12px"
+                      borderRadius: "12px",
+                      padding: "14px 16px"
                     }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                        <span style={{ fontSize: "11px", fontWeight: 700, color: "#8A6008", textTransform: "uppercase" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "12px", fontWeight: 700, color: "#8A6008", textTransform: "uppercase" }}>
                           {alert.level}
                         </span>
                         <span className="tag" style={{
                           background: alert.severity === "high" ? "rgba(220,38,38,0.15)" : alert.severity === "medium" ? "rgba(180,83,9,0.15)" : "rgba(21,128,61,0.15)",
-                          color: alert.severity === "high" ? "#DC2626" : alert.severity === "medium" ? "#B45309" : "#15803D"
+                          color: alert.severity === "high" ? "#DC2626" : alert.severity === "medium" ? "#B45309" : "#15803D",
+                          fontSize: "11.5px"
                         }}>
                           {alert.severity.toUpperCase()}
                         </span>
                       </div>
-                      <div style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A", marginBottom: "4px" }}>
+                      <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginBottom: "4px" }}>
                         {alert.planet}
                       </div>
-                      <div style={{ fontSize: "11px", fontWeight: 600, color: alert.severity === "high" ? "#DC2626" : "#6B635B", marginBottom: "6px" }}>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: alert.severity === "high" ? "#DC2626" : "#6B635B", marginBottom: "6px" }}>
                         Focal Organs: {alert.concern}
                       </div>
-                      <div style={{ fontSize: "11px", color: "#4A4238", lineHeight: "1.5" }}>
+                      <div style={{ fontSize: "13.5px", color: "#4A4238", lineHeight: "1.6" }}>
                         {alert.message}
                       </div>
                     </div>
@@ -679,47 +680,47 @@ export default function MedicalPage() {
             )}
 
             {/* Quick Tri-Dosha Bar */}
-            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "12px", padding: "16px", marginBottom: "16px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                <div style={{ fontWeight: 700, fontSize: "13px", color: "#1A1A1A" }}>🧬 Prakriti: {result.tridoshaBreakdown.dominant}</div>
-                <div style={{ fontSize: "11px", color: "#B8860B", fontWeight: 600 }}>{result.tridoshaBreakdown.constitutionType}</div>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "14px", padding: "18px 20px", marginBottom: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <div style={{ fontWeight: 700, fontSize: "15px", color: "#1A1A1A" }}>🧬 Prakriti: {result.tridoshaBreakdown.dominant}</div>
+                <div style={{ fontSize: "13px", color: "#B8860B", fontWeight: 600 }}>{result.tridoshaBreakdown.constitutionType}</div>
               </div>
               <div className="dosha-gauge-bar">
                 <div style={{ width: `${result.tridoshaBreakdown.vata}%`, background: "#1D4ED8" }} title={`Vata ${result.tridoshaBreakdown.vata}%`} />
                 <div style={{ width: `${result.tridoshaBreakdown.pitta}%`, background: "#DC2626" }} title={`Pitta ${result.tridoshaBreakdown.pitta}%`} />
                 <div style={{ width: `${result.tridoshaBreakdown.kapha}%`, background: "#15803D" }} title={`Kapha ${result.tridoshaBreakdown.kapha}%`} />
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#6B635B", marginTop: "4px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#5A524A", marginTop: "6px" }}>
                 <span style={{ color: "#1D4ED8", fontWeight: 600 }}>Vata: {result.tridoshaBreakdown.vata}%</span>
                 <span style={{ color: "#DC2626", fontWeight: 600 }}>Pitta: {result.tridoshaBreakdown.pitta}%</span>
                 <span style={{ color: "#15803D", fontWeight: 600 }}>Kapha: {result.tridoshaBreakdown.kapha}%</span>
               </div>
-              <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.6", marginTop: "10px" }}>
+              <div style={{ fontSize: "14px", color: "#3A3228", lineHeight: "1.65", marginTop: "12px" }}>
                 {result.prakriti}
               </div>
             </div>
 
             {/* Agni Digestive Fire Card */}
-            <div style={{ background: "rgba(15,118,110,0.06)", border: "1px solid rgba(15,118,110,0.22)", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                <div style={{ fontWeight: 700, fontSize: "13px", color: "#0F766E" }}>🔥 Jatharagni (Digestive Fire) — {result.agniProfile.title}</div>
-                <div style={{ fontSize: "11px", color: "#0F766E", fontWeight: 600 }}>{result.agniProfile.sanskrit}</div>
+            <div style={{ background: "rgba(15,118,110,0.06)", border: "1px solid rgba(15,118,110,0.22)", borderRadius: "14px", padding: "18px 20px", marginBottom: "18px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                <div style={{ fontWeight: 700, fontSize: "15px", color: "#0F766E" }}>🔥 Jatharagni (Digestive Fire) — {result.agniProfile.title}</div>
+                <div style={{ fontSize: "13px", color: "#0F766E", fontWeight: 600 }}>{result.agniProfile.sanskrit}</div>
               </div>
-              <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.6" }}>{result.agniProfile.tendency}</div>
-              <div style={{ fontSize: "11px", color: "#0F766E", marginTop: "8px", fontWeight: 600 }}>
+              <div style={{ fontSize: "14px", color: "#3A3228", lineHeight: "1.65" }}>{result.agniProfile.tendency}</div>
+              <div style={{ fontSize: "13.5px", color: "#0F766E", marginTop: "10px", fontWeight: 600 }}>
                 Protocol: {result.agniProfile.balancingProtocol}
               </div>
             </div>
 
             {/* Health Sensitivity Scores */}
-            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "12px", padding: "16px", marginBottom: "16px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-              <div style={{ fontWeight: 700, fontSize: "13px", color: "#B8860B", marginBottom: "14px" }}>📊 Body System Sensitivity Scores</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 20px" }}>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "14px", padding: "18px 20px", marginBottom: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+              <div style={{ fontWeight: 700, fontSize: "15px", color: "#B8860B", marginBottom: "16px" }}>📊 Body System Sensitivity Scores</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 24px" }}>
                 {scoreEntries.map(([cat, score]) => {
                   const barColor = score >= 40 ? "#DC2626" : score >= 20 ? "#B45309" : "#15803D";
                   return (
                     <div key={cat}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "2px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13.5px", marginBottom: "4px" }}>
                         <span style={{ color: "#1A1A1A" }}>{cat}</span>
                         <span style={{ color: barColor, fontWeight: 700 }}>{score > 0 ? score : "—"}</span>
                       </div>
@@ -733,10 +734,10 @@ export default function MedicalPage() {
             </div>
 
             {/* Accident / Surgery Score */}
-            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "10px", padding: "14px 16px", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "14px", padding: "16px 20px", marginBottom: "18px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
               <div>
-                <div style={{ fontWeight: 700, fontSize: "13px", color: "#1A1A1A" }}>⚡ Accident & Surgery Sensitivity (Native)</div>
-                <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "3px" }}>
+                <div style={{ fontWeight: 700, fontSize: "15px", color: "#1A1A1A" }}>⚡ Accident &amp; Surgery Sensitivity (Native)</div>
+                <div style={{ fontSize: "13px", color: "#5A524A", marginTop: "4px", lineHeight: "1.5" }}>
                   Mars-Rahu, Mars-Saturn aspects + Ketu surgical indicators + Gochar Mars/Saturn 8H triggers. (Benefics in H8 provide longevity shielding)
                 </div>
               </div>
@@ -966,51 +967,51 @@ export default function MedicalPage() {
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px" }}>
                       <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
-                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>1. कपड़े का रंग एवं पुड़िया</div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.clothColor}</div>
-                        <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "2px" }}>कुल पुड़िया: <strong>16 पुड़िया</strong> बनानी हैं</div>
+                        <div style={{ fontSize: "12px", color: "#8A6008", fontWeight: 700 }}>1. कपड़े का रंग एवं पुड़िया</div>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.clothColor}</div>
+                        <div style={{ fontSize: "12.5px", color: "#6B635B", marginTop: "2px" }}>कुल पुड़िया: <strong>16 पुड़िया</strong> बनानी हैं</div>
                       </div>
 
                       <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
-                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>2. आवश्यक सामग्री</div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.material}</div>
-                        <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "2px" }}>प्रत्येक पुड़िया में इतनी मात्रा रखें</div>
+                        <div style={{ fontSize: "12px", color: "#8A6008", fontWeight: 700 }}>2. आवश्यक सामग्री</div>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.material}</div>
+                        <div style={{ fontSize: "12.5px", color: "#6B635B", marginTop: "2px" }}>प्रत्येक पुड़िया में इतनी मात्रा रखें</div>
                       </div>
 
                       <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
-                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>3. जलाने का तरीका</div>
-                        <div style={{ fontSize: "12px", color: "#1A1A1A", marginTop: "2px", lineHeight: "1.4" }}>{proto.burnMethod}</div>
+                        <div style={{ fontSize: "12px", color: "#8A6008", fontWeight: 700 }}>3. जलाने का तरीका</div>
+                        <div style={{ fontSize: "13.5px", color: "#1A1A1A", marginTop: "2px", lineHeight: "1.5" }}>{proto.burnMethod}</div>
                       </div>
 
                       <div style={{ background: "#FFFFFF", padding: "12px", borderRadius: "8px", border: "1px solid rgba(184,134,11,0.15)" }}>
-                        <div style={{ fontSize: "11px", color: "#8A6008", fontWeight: 700 }}>4. अनुशंसित समय</div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.recommendedTiming}</div>
+                        <div style={{ fontSize: "12px", color: "#8A6008", fontWeight: 700 }}>4. अनुशंसित समय</div>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#1A1A1A", marginTop: "2px" }}>{proto.recommendedTiming}</div>
                       </div>
                     </div>
 
                     {/* Disposal Destination & Food Avoidance */}
                     <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                       <div style={{ background: isFlush ? "rgba(220,38,38,0.08)" : "rgba(21,128,61,0.08)", padding: "12px", borderRadius: "8px", border: `1px solid ${isFlush ? "rgba(220,38,38,0.25)" : "rgba(21,128,61,0.25)"}` }}>
-                        <div style={{ fontSize: "11px", fontWeight: 700, color: isFlush ? "#DC2626" : "#15803D" }}>
+                        <div style={{ fontSize: "12.5px", fontWeight: 700, color: isFlush ? "#DC2626" : "#15803D" }}>
                           🌊 विसर्जन विधि (Disposal Method):
                         </div>
-                        <div style={{ fontSize: "12px", color: "#1A1A1A", marginTop: "4px", lineHeight: "1.5" }}>
+                        <div style={{ fontSize: "13.5px", color: "#1A1A1A", marginTop: "4px", lineHeight: "1.55" }}>
                           {proto.disposalDetails}
                         </div>
                       </div>
 
                       <div style={{ background: "rgba(180,83,9,0.08)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(180,83,9,0.25)" }}>
-                        <div style={{ fontSize: "11px", fontWeight: 700, color: "#B45309" }}>
+                        <div style={{ fontSize: "12.5px", fontWeight: 700, color: "#B45309" }}>
                           🍽️ 16 दिनों तक सख्त खान-पान परहेज़:
                         </div>
-                        <div style={{ fontSize: "12px", color: "#1A1A1A", marginTop: "4px", lineHeight: "1.5" }}>
+                        <div style={{ fontSize: "13.5px", color: "#1A1A1A", marginTop: "4px", lineHeight: "1.55" }}>
                           {proto.strictFoodAvoidance}
                         </div>
                       </div>
                     </div>
 
                     {proto.specialConditionNotes && (
-                      <div style={{ marginTop: "10px", fontSize: "11px", color: "#6B635B", fontStyle: "italic" }}>
+                      <div style={{ marginTop: "10px", fontSize: "12.5px", color: "#6B635B", fontStyle: "italic" }}>
                         💡 <strong>विशेष निर्देश:</strong> {proto.specialConditionNotes}
                       </div>
                     )}
@@ -1460,13 +1461,13 @@ export default function MedicalPage() {
 
         {/* ── NAKSHATRA TABLE TAB ── */}
         {activeTab === "nakshatra" && (
-          <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "12px", padding: "14px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-            <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginBottom: "14px" }}>📚 All 27 Nakshatras — Classical Disease Reference (Dr. S. Krishna Kumar)</div>
-            <div className="nak-row" style={{ fontWeight: 700, color: "#6B635B", borderBottom: "1px solid rgba(184,134,11,0.18)", paddingBottom: "8px", marginBottom: "4px" }}>
+          <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "16px", padding: "20px 24px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontWeight: 700, fontSize: "15px", color: "#8A6008", marginBottom: "16px" }}>📚 All 27 Nakshatras — Classical Disease Reference</div>
+            <div className="nak-row" style={{ fontWeight: 700, color: "#6B635B", borderBottom: "1px solid rgba(184,134,11,0.18)", paddingBottom: "10px", marginBottom: "6px" }}>
               <div>Nakshatra</div><div>Disease Tendency</div><div>Body Zone</div>
             </div>
             {Object.entries(NAKSHATRA_DISEASE_BOOK).map(([nak, data]) => (
-              <div key={nak} className="nak-row" style={{ color: nak === result.birthNakshatra ? "#1A1A1A" : "#4A4238", background: nak === result.birthNakshatra ? "rgba(124,58,237,0.07)" : "transparent", borderRadius: "4px" }}>
+              <div key={nak} className="nak-row" style={{ color: nak === result.birthNakshatra ? "#1A1A1A" : "#4A4238", background: nak === result.birthNakshatra ? "rgba(124,58,237,0.07)" : "transparent", borderRadius: "6px" }}>
                 <div style={{ fontWeight: nak === result.birthNakshatra ? 700 : 500, color: nak === result.birthNakshatra ? "#7C3AED" : "#1A1A1A" }}>
                   {nak === result.birthNakshatra ? "⭐ " : ""}{nak}
                 </div>
@@ -1479,22 +1480,22 @@ export default function MedicalPage() {
 
         {/* ── SIGNS TAB ── */}
         {activeTab === "signs" && (
-          <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "12px", padding: "14px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
-            <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginBottom: "14px" }}>♈ Sign Disease Reference (Kaal Purusha Anatomy)</div>
+          <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "16px", padding: "20px 24px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontWeight: 700, fontSize: "15px", color: "#8A6008", marginBottom: "16px" }}>♈ Sign Disease Reference (Kaal Purusha Anatomy)</div>
             {Object.entries(SIGN_DISEASE).map(([sign, disease]) => (
-              <div key={sign} style={{ display: "flex", gap: "12px", padding: "8px 0", borderBottom: "1px solid rgba(184,134,11,0.12)", background: sign === result.lagnaSign || sign === result.moonSign ? "rgba(184,134,11,0.06)" : "transparent", borderRadius: "4px" }}>
-                <div style={{ minWidth: "90px", fontWeight: 700, fontSize: "12px", color: sign === result.lagnaSign ? "#8A6008" : sign === result.moonSign ? "#1D4ED8" : "#1A1A1A" }}>
+              <div key={sign} style={{ display: "flex", gap: "14px", padding: "10px 0", borderBottom: "1px solid rgba(184,134,11,0.12)", background: sign === result.lagnaSign || sign === result.moonSign ? "rgba(184,134,11,0.06)" : "transparent", borderRadius: "6px" }}>
+                <div style={{ minWidth: "110px", fontWeight: 700, fontSize: "14px", color: sign === result.lagnaSign ? "#8A6008" : sign === result.moonSign ? "#1D4ED8" : "#1A1A1A" }}>
                   {sign === result.lagnaSign ? "⬆ " : sign === result.moonSign ? "🌙 " : ""}{sign}
                 </div>
-                <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.55" }}>{disease}</div>
+                <div style={{ fontSize: "14px", color: "#4A4238", lineHeight: "1.6" }}>{disease}</div>
               </div>
             ))}
-            <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "12px" }}>⬆ = Your lagna sign &nbsp;·&nbsp; 🌙 = Your moon sign</div>
+            <div style={{ fontSize: "13px", color: "#6B635B", marginTop: "14px" }}>⬆ = Your lagna sign &nbsp;·&nbsp; 🌙 = Your moon sign</div>
           </div>
         )}
 
         {/* Footer disclaimer */}
-        <div style={{ marginTop: "28px", padding: "12px 14px", background: "rgba(220,38,38,0.04)", border: "1px solid rgba(220,38,38,0.18)", borderRadius: "8px", fontSize: "11px", color: "#6B635B", lineHeight: "1.6" }}>
+        <div style={{ marginTop: "32px", padding: "16px 20px", background: "rgba(220,38,38,0.04)", border: "1px solid rgba(220,38,38,0.18)", borderRadius: "12px", fontSize: "13px", color: "#6B635B", lineHeight: "1.65" }}>
           ⚕️ This analysis is based on classical Ayurvedic and Parashari medical astrology texts. All scores and patterns are awareness indicators only. No content here replaces professional medical evaluation, diagnosis, or treatment. The authors disclaim all medical liability.
         </div>
       </div>

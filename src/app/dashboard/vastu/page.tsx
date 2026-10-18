@@ -391,30 +391,6 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
 
   return (
     <>
-      {/* Stats row */}
-      <div className="stat-row" style={{ gridTemplateColumns: "repeat(4,1fr)", marginBottom: 24 }}>
-        <div className="stat-card">
-          <div className="stat-icon">🏠</div>
-          <div className="stat-n">{result.zones.length}</div>
-          <div className="stat-l">Total Zones</div>
-        </div>
-        <div className="stat-card" style={{ borderColor: "rgba(34,197,94,0.25)" }}>
-          <div className="stat-icon">✅</div>
-          <div className="stat-n" style={{ color: "#4ade80" }}>{result.strongZones.length}</div>
-          <div className="stat-l">Strong</div>
-        </div>
-        <div className="stat-card" style={{ borderColor: "rgba(239,68,68,0.25)" }}>
-          <div className="stat-icon">⚠️</div>
-          <div className="stat-n" style={{ color: "#f87171" }}>{result.weakZones.length}</div>
-          <div className="stat-l">Weak</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🪐</div>
-          <div className="stat-n">{result.transitAlerts.length}</div>
-          <div className="stat-l">Transit Alerts</div>
-        </div>
-      </div>
-
       <EngineSectionTitle
         eyebrow="MahaVastu · 16 Zones"
         title="Zone Analysis"
@@ -422,7 +398,7 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
       />
 
       {/* Zone sub-tabs */}
-      <div className="tabs">
+      <div className="tabs" style={{ marginTop: 12, marginBottom: 18 }}>
         {(["all","strong","weak","psych","transit","rooms"] as const).map(tab => (
           <button key={tab} className={`tab ${zoneTab === tab ? "active" : ""}`} onClick={() => setZoneTab(tab)}>
             {tab === "psych" ? "Psych Bridge" : tab === "transit" ? "Transit Alerts" : tab === "rooms" ? "Room Guide" : tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -432,39 +408,40 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
 
       {/* Zone grid */}
       {(zoneTab === "all" || zoneTab === "strong" || zoneTab === "weak") && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 16 }}>
           {zones.map((zone) => (
             <div
               key={zone.dir}
               className="card"
               style={{
-                padding: 16,
+                padding: "20px 22px",
+                borderRadius: 16,
                 borderColor:
                   zone.status === "Strong" ? "rgba(34,197,94,0.25)" :
                   zone.status === "Weak"   ? "rgba(239,68,68,0.25)" :
-                  undefined,
+                  "rgba(184,134,11,0.2)",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <span className="card-tag">{zone.dir}</span>
-                <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 700, color: zoneScoreColor(zone.score) }}>
+                <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 700, color: zoneScoreColor(zone.score) }}>
                   {zone.score}
                 </span>
               </div>
-              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>
+              <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 17, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
                 {zone.name}
               </div>
-              <div style={{ fontSize: 11, color: "#6B635B", marginBottom: 6 }}>
+              <div style={{ fontSize: 12.5, color: "#6B635B", marginBottom: 6 }}>
                 {zone.planet} · {"element" in zone ? (zone as {element?: string}).element : ""}
               </div>
-              <div style={{ fontSize: 11, color: "#6B635B", marginBottom: 8 }}>{zone.domain}</div>
+              <div style={{ fontSize: 13, color: "#4A4238", marginBottom: 10, lineHeight: 1.5 }}>{zone.domain}</div>
               {zone.planets.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 8 }}>
-                  {zone.planets.map(p => <span key={p} className="planet-pill">{p}</span>)}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+                  {zone.planets.map(p => <span key={p} className="planet-pill" style={{ padding: "3px 8px", fontSize: "11px" }}>{p}</span>)}
                 </div>
               )}
-              <div style={{ fontSize: 11, color: "#6B635B" }}>Ideal: {zone.roomIdeal}</div>
-              <div style={{ fontSize: 11, color: "#c8a030", marginTop: 4 }}>↺ {zone.remedy}</div>
+              <div style={{ fontSize: 12.5, color: "#6B635B" }}>Ideal: <strong>{zone.roomIdeal}</strong></div>
+              <div style={{ fontSize: 12.5, color: "#8A6008", marginTop: 6, fontWeight: 500, lineHeight: 1.5 }}>↺ {zone.remedy}</div>
             </div>
           ))}
         </div>
@@ -786,7 +763,7 @@ export default function VastuDashboardPage() {
                     value={field.value}
                     onChange={e => field.onChange(e.target.value)}
                     style={{
-                      borderRadius: 12, border: "1px solid #FFFFFF",
+                      borderRadius: 12, border: "1px solid rgba(184, 134, 11, 0.22)",
                       background: "#FAF7F2", color: "#1A1A1A",
                       padding: "10px 14px", fontSize: 13, outline: "none", width: "100%",
                     }}
@@ -812,7 +789,7 @@ export default function VastuDashboardPage() {
                     placeholder={field.placeholder}
                     inputMode="decimal"
                     style={{
-                      borderRadius: 12, border: "1px solid #FFFFFF",
+                      borderRadius: 12, border: "1px solid rgba(184, 134, 11, 0.22)",
                       background: "#FAF7F2", color: "#1A1A1A",
                       padding: "10px 14px", fontSize: 13, outline: "none", width: "100%",
                     }}
@@ -834,7 +811,7 @@ export default function VastuDashboardPage() {
                   key={item.label}
                   style={{
                     display: "flex", alignItems: "center", gap: 10,
-                    borderRadius: 12, border: "1px solid #FFFFFF",
+                    borderRadius: 12, border: "1px solid rgba(184, 134, 11, 0.22)",
                     background: "#FAF7F2", padding: "12px 14px",
                     fontSize: 13, color: "#4A4238", cursor: "pointer",
                   }}
@@ -874,7 +851,7 @@ export default function VastuDashboardPage() {
                   key={room.id}
                   style={{
                     display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto",
-                    gap: 10, borderRadius: 12, border: "1px solid #FFFFFF",
+                    gap: 10, borderRadius: 12, border: "1px solid rgba(184, 134, 11, 0.22)",
                     background: "#FAF7F2", padding: 12,
                   }}
                 >
@@ -883,8 +860,8 @@ export default function VastuDashboardPage() {
                     onChange={e => updateRoom(room.id, { name: e.target.value })}
                     placeholder="Room name"
                     style={{
-                      borderRadius: 10, border: "1px solid #FFFFFF",
-                      background: "#FAF7F2", color: "#1A1A1A",
+                      borderRadius: 10, border: "1px solid rgba(184, 134, 11, 0.22)",
+                      background: "#FFFFFF", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   />
@@ -892,8 +869,8 @@ export default function VastuDashboardPage() {
                     value={room.type}
                     onChange={e => updateRoom(room.id, { type: e.target.value })}
                     style={{
-                      borderRadius: 10, border: "1px solid #FFFFFF",
-                      background: "#FAF7F2", color: "#1A1A1A",
+                      borderRadius: 10, border: "1px solid rgba(184, 134, 11, 0.22)",
+                      background: "#FFFFFF", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   >
@@ -903,8 +880,8 @@ export default function VastuDashboardPage() {
                     value={room.direction}
                     onChange={e => updateRoom(room.id, { direction: e.target.value as Direction })}
                     style={{
-                      borderRadius: 10, border: "1px solid #FFFFFF",
-                      background: "#FAF7F2", color: "#1A1A1A",
+                      borderRadius: 10, border: "1px solid rgba(184, 134, 11, 0.22)",
+                      background: "#FFFFFF", color: "#1A1A1A",
                       padding: "8px 12px", fontSize: 13, outline: "none",
                     }}
                   >
@@ -1033,36 +1010,36 @@ export default function VastuDashboardPage() {
               {/* Strengths + Defects */}
               {(strengths.length > 0 || defects.length > 0) && (
                 <div className="grid-2" style={{ marginBottom: 20 }}>
-                  <div className="card" style={{ borderColor: "rgba(34,197,94,0.2)" }}>
-                    <div className="card-title serif" style={{ color: "#4ade80" }}>✅ Strengths ({strengths.length})</div>
+                  <div className="card" style={{ borderColor: "rgba(34,197,94,0.3)" }}>
+                    <div className="card-title serif" style={{ color: "#15803d" }}>✅ Strengths ({strengths.length})</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {strengths.length === 0 && <p style={{ fontSize: 13, color: "#6B635B" }}>No major strengths detected.</p>}
                       {strengths.map((item, i) => (
-                        <div key={i} className="card" style={{ padding: 14 }}>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>{item.title}</div>
+                        <div key={i} style={{ background: "#FAF8F5", border: "1px solid rgba(34,197,94,0.22)", borderLeft: "4px solid #16a34a", borderRadius: 12, padding: "14px 16px" }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>{item.title}</div>
                           <div style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, marginBottom: 6 }}>{item.explanation}</div>
-                          <div style={{ fontSize: 11, color: "#4ade80" }}>Score: {item.score}/10</div>
+                          <div style={{ fontSize: 12, color: "#15803d", fontWeight: 700 }}>Score: {item.score}/10</div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="card" style={{ borderColor: "rgba(239,68,68,0.2)" }}>
-                    <div className="card-title serif" style={{ color: "#f87171" }}>⚠️ Defects ({defects.length})</div>
+                  <div className="card" style={{ borderColor: "rgba(239,68,68,0.3)" }}>
+                    <div className="card-title serif" style={{ color: "#b91c1c" }}>⚠️ Defects ({defects.length})</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {defects.length === 0 && <p style={{ fontSize: 13, color: "#6B635B" }}>No major defects detected.</p>}
                       {defects.map((item, i) => {
                         const sc = severityColor(item.severity);
                         return (
-                          <div key={i} className="card" style={{ padding: 14 }}>
+                          <div key={i} style={{ background: "#FAF8F5", border: "1px solid rgba(239,68,68,0.22)", borderLeft: "4px solid #dc2626", borderRadius: 12, padding: "14px 16px" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-                              <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A" }}>{item.title}</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>{item.title}</div>
                               <span className="badge" style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.text}33`, flexShrink: 0 }}>{item.severity}/10</span>
                             </div>
                             <div style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, marginBottom: item.remedies.length > 0 ? 8 : 0 }}>{item.explanation}</div>
                             {item.remedies.length > 0 && (
                               <ul style={{ paddingLeft: 18, margin: 0 }}>
-                                {item.remedies.map((r, ri) => <li key={ri} style={{ fontSize: 12, color: "#4A4238", lineHeight: 1.7 }}>{r}</li>)}
+                                {item.remedies.map((r, ri) => <li key={ri} style={{ fontSize: 12.5, color: "#4A4238", lineHeight: 1.7 }}>{r}</li>)}
                               </ul>
                             )}
                           </div>
@@ -1081,15 +1058,15 @@ export default function VastuDashboardPage() {
                     {recommendations.map((item, i) => {
                       const pc = priorityColor(item.priority);
                       return (
-                        <div key={i} className="card" style={{ padding: 14 }}>
+                        <div key={i} style={{ background: "#FAF8F5", border: "1px solid rgba(184,134,11,0.22)", borderLeft: "4px solid #B8860B", borderRadius: 12, padding: "14px 16px" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                            <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A" }}>{item.title}</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>{item.title}</div>
                             <span className="badge" style={{ background: pc.bg, color: pc.text, border: `1px solid ${pc.text}33`, flexShrink: 0, textTransform: "capitalize" }}>{item.priority}</span>
                           </div>
                           <div className="card-tag" style={{ marginBottom: 4 }}>{item.system}</div>
-                          {item.requiresKundli && <div style={{ fontSize: 11, color: "#c8a030", marginBottom: 6 }}>Kundli validation required</div>}
+                          {item.requiresKundli && <div style={{ fontSize: 11.5, color: "#8A6008", fontWeight: 600, marginBottom: 6 }}>Kundli validation required</div>}
                           <ul style={{ paddingLeft: 18, margin: 0 }}>
-                            {item.steps.map((step, si) => <li key={si} style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.7 }}>{step}</li>)}
+                            {item.steps.map((step, si) => <li key={si} style={{ fontSize: 12.5, color: "#6B635B", lineHeight: 1.7 }}>{step}</li>)}
                           </ul>
                         </div>
                       );
@@ -1107,12 +1084,12 @@ export default function VastuDashboardPage() {
                   </p>
                   <div className="grid-3">
                     {[
-                      { label: "First 30 Days",  color: "#f87171",  borderColor: "rgba(239,68,68,0.2)",   items: result.correctionPlan.thirtyDay },
-                      { label: "Days 31–60",     color: "#fbbf24",  borderColor: "rgba(234,179,8,0.2)",   items: result.correctionPlan.sixtyDay },
-                      { label: "Days 61–90",     color: "#4ade80",  borderColor: "rgba(34,197,94,0.2)",   items: result.correctionPlan.ninetyDay },
+                      { label: "First 30 Days",  color: "#b91c1c",  borderColor: "rgba(239,68,68,0.3)", borderLeft: "4px solid #dc2626", items: result.correctionPlan.thirtyDay },
+                      { label: "Days 31–60",     color: "#b45309",  borderColor: "rgba(234,179,8,0.3)", borderLeft: "4px solid #d97706", items: result.correctionPlan.sixtyDay },
+                      { label: "Days 61–90",     color: "#15803d",  borderColor: "rgba(34,197,94,0.3)", borderLeft: "4px solid #16a34a", items: result.correctionPlan.ninetyDay },
                     ].map(col => (
-                      <div key={col.label} className="card" style={{ padding: 16, borderColor: col.borderColor }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: col.color, marginBottom: 12 }}>{col.label}</div>
+                      <div key={col.label} style={{ background: "#FAF8F5", borderRadius: 12, padding: "14px 16px", border: `1px solid ${col.borderColor}`, borderLeft: col.borderLeft }}>
+                        <div style={{ fontSize: 13.5, fontWeight: 700, color: col.color, marginBottom: 10 }}>{col.label}</div>
                         <ol style={{ paddingLeft: 18, margin: 0 }}>
                           {col.items.map((item, i) => (
                             <li key={i} style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.7 }}>{item}</li>

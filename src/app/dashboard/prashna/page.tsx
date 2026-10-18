@@ -118,19 +118,19 @@ export default function PrashnaPage() {
   return (
     <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "24px 18px 110px", color: "#1A1A1A" }}>
       <style>{`
-        .pr-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .pr-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6B635B; margin-bottom: 6px; }
-        .pr-input, .pr-select { width: 100%; background: #FAF7F2; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 8px; padding: 10px 12px; color: #1A1A1A; font-family: inherit; font-size: 13px; }
-        .pr-input:focus, .pr-select:focus { outline: none; border-color: rgba(184, 134, 11, 0.5); }
-        .pr-btn { width: 100%; background: linear-gradient(135deg, #B8860B, #8A6008); border: none; border-radius: 8px; padding: 12px; color: #FFFFFF; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 4px; box-shadow: 0 2px 8px rgba(184, 134, 11, 0.2); }
-        .pr-ghost-btn { background: transparent; border: 1px solid rgba(184,134,11,0.3); color: #8A6008; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .pr-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 16px; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.03); }
+        .pr-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #8A6008; margin-bottom: 6px; }
+        .pr-input, .pr-select { width: 100%; background: #FAF8F5; border: 1px solid rgba(184, 134, 11, 0.25); border-radius: 10px; padding: 11px 14px; color: #1A1A1A; font-family: inherit; font-size: 13.5px; }
+        .pr-input:focus, .pr-select:focus { outline: none; border-color: #B8860B; }
+        .pr-btn { width: 100%; background: linear-gradient(135deg, #B8860B, #8A6008); border: none; border-radius: 10px; padding: 13px 18px; color: #FFFFFF; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 6px; box-shadow: 0 4px 12px rgba(184, 134, 11, 0.25); }
+        .pr-ghost-btn { background: #FAF8F5; border: 1px solid rgba(184,134,11,0.3); color: #8A6008; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
         .pr-city-list { display: grid; gap: 6px; margin-top: 8px; }
-        .pr-city-item { text-align: left; background: #FAF7F2; border: 1px solid rgba(184, 134, 11, 0.22); color: #1A1A1A; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 12px; }
-        .pr-city-item:hover { background: rgba(184, 134, 11, 0.08); }
-        .pr-row { font-size: 12px; color: #4A4238; margin-bottom: 5px; display: flex; gap: 8px; }
-        .pr-row strong { color: #1A1A1A; min-width: 90px; flex-shrink: 0; font-weight: 700; }
-        .factor-item { font-size: 11px; padding: 4px 0; border-bottom: 1px solid rgba(184, 134, 11, 0.1); }
-        .planet-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; margin: 2px; border: 1px solid; }
+        .pr-city-item { text-align: left; background: #FAF8F5; border: 1px solid rgba(184, 134, 11, 0.22); color: #1A1A1A; border-radius: 8px; padding: 9px 12px; cursor: pointer; font-size: 12.5px; }
+        .pr-city-item:hover { background: rgba(184, 134, 11, 0.1); }
+        .pr-row { font-size: 13px; color: #4A4238; margin-bottom: 6px; display: flex; gap: 10px; line-height: 1.6; }
+        .pr-row strong { color: #1A1A1A; min-width: 95px; flex-shrink: 0; font-weight: 700; }
+        .factor-item { font-size: 12px; padding: 6px 0; border-bottom: 1px solid rgba(184, 134, 11, 0.12); line-height: 1.55; }
+        .planet-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 20px; font-size: 11.5px; margin: 3px; border: 1px solid; }
       `}</style>
 
       <div style={{ maxWidth: "700px", margin: "0 auto" }}>
@@ -285,18 +285,18 @@ export default function PrashnaPage() {
             ) : (
           <>
             {/* Verdict */}
-            <div style={{ background: `${result.color}11`, border: `2px solid ${result.color}55`, borderRadius: "14px", padding: "20px", marginBottom: "12px", textAlign: "center" }}>
+            <div style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.25)", borderLeft: `4px solid ${result.color}`, borderRadius: "16px", padding: "22px 24px", marginBottom: "14px", textAlign: "center" }}>
               <div style={{ fontSize: "36px", marginBottom: "8px" }}>{result.icon}</div>
-              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "22px", fontWeight: 700, color: result.color, marginBottom: "8px" }}>{result.title}</div>
-              <div style={{ fontSize: "13px", color: "#4A4238", lineHeight: "1.7", marginBottom: "12px" }}>{result.detail}</div>
-              <div style={{ display: "inline-block", background: `${result.color}22`, borderRadius: "20px", padding: "4px 16px", fontSize: "13px", fontWeight: 700, color: result.color }}>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "24px", fontWeight: 700, color: result.color, marginBottom: "8px" }}>{result.title}</div>
+              <div style={{ fontSize: "13.5px", color: "#4A4238", lineHeight: "1.75", marginBottom: "14px" }}>{result.detail}</div>
+              <div style={{ display: "inline-block", background: `${result.color}22`, borderRadius: "20px", padding: "5px 18px", fontSize: "13px", fontWeight: 700, color: result.color }}>
                 Score: {result.score > 0 ? "+" : ""}{result.score} · Confidence: {result.confidence}
               </div>
             </div>
 
             {/* Summary grid */}
             <div className="pr-card">
-              <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginBottom: "12px" }}>📋 Prashna Chart Summary</div>
+              <div style={{ fontWeight: 700, fontSize: "14px", color: "#8A6008", marginBottom: "12px" }}>📋 Prashna Chart Summary</div>
               <div className="pr-row"><strong>Question:</strong> {result.question || result.topic}</div>
               <div className="pr-row"><strong>Time:</strong> {result.timestamp}</div>
               <div className="pr-row"><strong>Prashna Lagna:</strong> {result.lagnaRashi}</div>
@@ -319,7 +319,7 @@ export default function PrashnaPage() {
 
             {/* Score breakdown */}
             <div className="pr-card">
-              <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginBottom: "10px" }}>🧮 Score Breakdown</div>
+              <div style={{ fontWeight: 700, fontSize: "14px", color: "#8A6008", marginBottom: "10px" }}>🧮 Score Breakdown</div>
               {result.scoreBreakdown.map((item, i) => (
                 <div key={`${item.label}-${i}`} className="factor-item" style={{ color: item.points > 0 ? "#15803D" : item.points < 0 ? "#DC2626" : "#4A4238" }}>
                   <strong style={{ color: "#1A1A1A" }}>{item.label}</strong> {item.points > 0 ? "+" : ""}{item.points}: {item.note}
@@ -328,15 +328,15 @@ export default function PrashnaPage() {
             </div>
 
             {/* Factors */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
               {result.positiveFactors.length > 0 && (
-                <div style={{ background: "rgba(21,128,61,0.06)", border: "1px solid rgba(21,128,61,0.22)", borderRadius: "10px", padding: "12px 14px" }}>
+                <div style={{ background: "#FAF8F5", border: "1px solid rgba(21,128,61,0.25)", borderLeft: "4px solid #15803D", borderRadius: "12px", padding: "14px 16px" }}>
                   <div style={{ fontWeight: 700, fontSize: "11px", color: "#15803D", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>✅ Positive Factors</div>
                   {result.positiveFactors.map((f, i) => <div key={i} className="factor-item" style={{ color: "#15803D" }}>• {f}</div>)}
                 </div>
               )}
               {result.negativeFactors.length > 0 && (
-                <div style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.22)", borderRadius: "10px", padding: "12px 14px" }}>
+                <div style={{ background: "#FAF8F5", border: "1px solid rgba(220,38,38,0.25)", borderLeft: "4px solid #DC2626", borderRadius: "12px", padding: "14px 16px" }}>
                   <div style={{ fontWeight: 700, fontSize: "11px", color: "#DC2626", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>⚠️ Challenging Factors</div>
                   {result.negativeFactors.map((f, i) => <div key={i} className="factor-item" style={{ color: "#DC2626" }}>• {f}</div>)}
                 </div>
@@ -345,8 +345,8 @@ export default function PrashnaPage() {
 
             {/* Planet positions */}
             <div className="pr-card">
-              <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginBottom: "10px" }}>🪐 Prashna Planet Positions</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+              <div style={{ fontWeight: 700, fontSize: "14px", color: "#8A6008", marginBottom: "10px" }}>🪐 Prashna Planet Positions</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {Object.entries(result.planetPositions).map(([p, pd]) => (
                   <span key={p} className="planet-pill" style={{ background: `${pd.color}15`, borderColor: `${pd.color}40`, color: pd.color, fontWeight: 600 }}>
                     {pd.emoji} {p} H{pd.house} · {pd.sign}
@@ -356,20 +356,20 @@ export default function PrashnaPage() {
             </div>
 
             {/* Practical advice */}
-            <div style={{ background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "10px", padding: "14px 16px" }}>
-              <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginBottom: "8px" }}>💡 Practical Advice</div>
-              <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.75" }}>{result.practicalAdvice}</div>
-              <div style={{ fontWeight: 700, fontSize: "12px", color: "#8A6008", marginTop: "12px", marginBottom: "6px" }}>Timing Window</div>
-              <div style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.75" }}>{result.timingWindow}</div>
-              <div style={{ fontWeight: 700, fontSize: "12px", color: "#8A6008", marginTop: "12px", marginBottom: "6px" }}>Decision Protocol</div>
+            <div style={{ background: "#FAF8F5", border: "1px solid rgba(184,134,11,0.25)", borderLeft: "4px solid #B8860B", borderRadius: "14px", padding: "18px 20px" }}>
+              <div style={{ fontWeight: 700, fontSize: "14px", color: "#8A6008", marginBottom: "8px" }}>💡 Practical Advice</div>
+              <div style={{ fontSize: "13px", color: "#4A4238", lineHeight: "1.75" }}>{result.practicalAdvice}</div>
+              <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginTop: "14px", marginBottom: "6px" }}>Timing Window</div>
+              <div style={{ fontSize: "13px", color: "#4A4238", lineHeight: "1.75" }}>{result.timingWindow}</div>
+              <div style={{ fontWeight: 700, fontSize: "13px", color: "#8A6008", marginTop: "14px", marginBottom: "6px" }}>Decision Protocol</div>
               {result.decisionProtocol.map((line, i) => (
-                <div key={i} style={{ fontSize: "12px", color: "#4A4238", lineHeight: "1.65", padding: "3px 0" }}>{i + 1}. {line}</div>
+                <div key={i} style={{ fontSize: "13px", color: "#4A4238", lineHeight: "1.65", padding: "4px 0" }}>{i + 1}. {line}</div>
               ))}
             </div>
           </>
-            )}
-          </>
         )}
+      </>
+    )}
       </div>
     </main>
   );

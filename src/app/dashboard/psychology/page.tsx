@@ -103,9 +103,9 @@ export default function PsychPage() {
   const weakCount = result.planets.filter((p) => p.status === "Weak/Blocked").length;
 
   return (
-    <div className="page" style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 110 }}>
+    <div className="page" style={{ maxWidth: 1080, margin: "0 auto", paddingBottom: 60 }}>
       <div className="page-tag">🧠 Cognitive Neuro-Astrology</div>
-      <h1 className="page-title serif">Psychology & Mental Architecture</h1>
+      <h1 className="page-title serif">Psychology &amp; Mental Architecture</h1>
       <p className="page-sub">
         अन्तःकरण चतुष्टय · त्रिगुण विश्लेषण · Big Five (OCEAN) · Cognitive Shadow Work · Circadian Focus
       </p>
@@ -168,13 +168,13 @@ export default function PsychPage() {
 
         {/* ── TAB 1: VEDIC MIND & ANTAHKARANA ── */}
         {activeTab === "vedic_mind" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {/* NOVELISTIC STORYTELLING PROSE */}
-            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.28)", borderRadius: 16, padding: "22px 24px" }}>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.28)", borderRadius: 16, padding: "18px 22px" }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 6 }}>
                 ✦ अंतर्मन की कथा — आपकी मानसिक कार्यप्रणाली
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 15, color: "#2A241F", lineHeight: 1.8, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 14.5, color: "#2A241F", lineHeight: 1.75, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {result.storytellingProse.map((para, pIdx) => (
                   <p key={pIdx} style={{ margin: 0, textAlign: "justify" }}>
                     {para}
@@ -184,13 +184,13 @@ export default function PsychPage() {
             </div>
 
             {/* ANTAHKARANA CHATUSHTAYA 4 LAYERS */}
-            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.25)", borderRadius: 16, padding: "20px 22px" }}>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.25)", borderRadius: 16, padding: "18px 20px" }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 12 }}>
                 ✦ सांख्य दर्शन: अन्तःकरण चतुष्टय (The 4 Inner Faculties)
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
                 {result.antahkarana.map((layer) => (
-                  <div key={layer.name} style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.2)", borderRadius: 12, padding: "14px 16px" }}>
+                  <div key={layer.name} style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.2)", borderLeft: "4px solid #B8860B", borderRadius: 12, padding: "14px 16px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: "#1A1A1A" }}>{layer.hindiName}</div>
                       <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 8, background: layer.expressionStatus === "Harmonious" ? "rgba(34,197,94,0.12)" : "rgba(245,158,11,0.12)", color: layer.expressionStatus === "Harmonious" ? "#16A34A" : "#D97706" }}>
@@ -212,7 +212,7 @@ export default function PsychPage() {
             </div>
 
             {/* TRIGUNAS GAUGE */}
-            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.25)", borderRadius: 16, padding: "18px 22px" }}>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.25)", borderRadius: 16, padding: "18px 20px" }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 6 }}>
                 ✦ त्रिगुण संतुलन (Triguna Blueprint)
               </div>
@@ -230,7 +230,7 @@ export default function PsychPage() {
             </div>
 
             {/* CIRCADIAN FOCUS PEAK */}
-            <div style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.25)", borderRadius: 14, padding: "16px 20px" }}>
+            <div style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.25)", borderLeft: "4px solid #B8860B", borderRadius: 14, padding: "16px 20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 800, color: "#B8860B", marginBottom: 4 }}>
                 <Clock size={16} />
                 <span>क्रोनोबायोलॉजी व दैनिक फोकस पीक (Circadian Peak Window)</span>
@@ -247,15 +247,15 @@ export default function PsychPage() {
 
         {/* ── TAB 2: BIG FIVE (OCEAN) ── */}
         {activeTab === "bigfive" && (
-          <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.28)", borderRadius: 16, padding: "22px 24px" }}>
+          <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.28)", borderRadius: 16, padding: "18px 22px" }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4 }}>
               ✦ Empirical Psychometrics: Big Five (OCEAN) Scale
             </div>
-            <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, margin: "0 0 18px 0" }}>
+            <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, margin: "0 0 14px 0" }}>
               आधुनिक व्यक्तित्व मनोविज्ञान के 5 प्रमुख आयाम, जिन्हें नवग्रहों के न्यूरोलॉजिकल व्यवहार से मैप किया गया है:
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {result.bigFive.map((trait) => (
                 <div key={trait.trait} style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.2)", borderRadius: 12, padding: "14px 16px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -350,18 +350,18 @@ export default function PsychPage() {
 
         {/* ── TAB 5: SHADOW WORK & CBT ── */}
         {activeTab === "guide" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.28)", borderRadius: 16, padding: "20px 22px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ background: "#FFFFFF", border: "1px solid rgba(184, 134, 11, 0.28)", borderRadius: 16, padding: "18px 20px" }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4 }}>
                 ✦ Cognitive Distortions Bank & CBT Reframing
               </div>
-              <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, margin: "0 0 16px 0" }}>
+              <p style={{ fontSize: 13, color: "#6B635B", lineHeight: 1.6, margin: "0 0 14px 0" }}>
                 ज्योतिषीय ऊर्जा से उत्पन्न होने वाली अचेतन संज्ञानात्मक त्रुटियों (Cognitive Biases) को पहचानकर उन्हें व्यावहारिक मनोविज्ञान से हल करना:
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {result.cognitiveDistortions.map((item, idx) => (
-                  <div key={idx} style={{ padding: "14px 16px", background: "#FAF8F5", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12 }}>
+                  <div key={idx} style={{ padding: "14px 16px", background: "#FAF8F5", border: "1px solid rgba(184,134,11,0.2)", borderLeft: "4px solid #B8860B", borderRadius: 12 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: "#1A1A1A" }}>{item.distortion}</div>
                       <span style={{ fontSize: 11, fontWeight: 700, color: "#DC2626", background: "rgba(220,38,38,0.08)", padding: "2px 8px", borderRadius: 8 }}>

@@ -52,7 +52,7 @@ export function EvidenceChainNavigator({ chains }: EvidenceChainNavigatorProps) 
             <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-lg p-3 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-1.5 text-xs text-[#6B635B] font-semibold mb-1">
-                  <GitFork className="w-3.5 h-3.5 text-amber-400" />
+                  <GitFork className="w-3.5 h-3.5 text-[#B8860B]" />
                   <span>2. Relation</span>
                 </div>
                 <p className="text-xs font-mono font-medium text-[#B8860B]">
@@ -88,7 +88,7 @@ export function EvidenceChainNavigator({ chains }: EvidenceChainNavigatorProps) 
             <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] rounded-lg p-3 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-1.5 text-xs text-[#6B635B] font-semibold mb-1">
-                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
                   <span>4. Provenance</span>
                 </div>
                 <p className="text-xs font-semibold text-emerald-700">

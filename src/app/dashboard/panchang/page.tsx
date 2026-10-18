@@ -49,7 +49,7 @@ const NAVTARA_REMEDY: Record<string, { remedy: string[]; bestFor: string; avoid:
 
 function InfoCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FFFFFF] shadow-sm p-4">
+    <div className="rounded-2xl border border-[rgba(184,134,11,0.2)] bg-[#FFFFFF] shadow-sm p-4 sm:p-4.5">
       <p className="text-xs uppercase tracking-wide text-[#6B635B]">{label}</p>
       <p className="text-xl font-semibold mt-1 text-[#1A1A1A]">{value}</p>
       {sub && <p className="text-xs mt-1" style={{ color: accent ?? "#6B635B" }}>{sub}</p>}
@@ -61,7 +61,7 @@ function RemedyCard({ title, icon, remedies, color, tag }: {
   title: string; icon: string; remedies: string[]; color: string; tag?: string;
 }) {
   return (
-    <div className="rounded-2xl p-4 flex flex-col gap-3" style={{ background: color + "14", border: `1px solid ${color}44` }}>
+    <div className="rounded-xl p-4 sm:p-4.5 flex flex-col gap-2.5" style={{ background: color + "14", border: `1px solid ${color}44`, borderLeft: `4px solid ${color}` }}>
       <div className="flex items-center gap-2">
         <span className="text-xl">{icon}</span>
         <div>
@@ -222,18 +222,18 @@ export default function PanchangPage() {
 
         {/* Rahu Kaal & Gulika */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)" }}>
-            <p className="text-xs uppercase tracking-widest text-red-400">Rahu Kaal</p>
+          <div className="rounded-2xl p-5 sm:p-6" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)" }}>
+            <p className="text-xs uppercase tracking-widest text-red-500 font-bold">Rahu Kaal</p>
             <p className="text-2xl font-bold text-[#1A1A1A] mt-1">{panchang.rahuKaal.start} – {panchang.rahuKaal.end}</p>
             <p className="text-xs text-[#6B635B] mt-1">Avoid important work in this window</p>
           </div>
-          <div className="rounded-2xl p-4" style={{ background: "rgba(184,134,11,0.08)", border: "1px solid rgba(184,134,11,0.25)" }}>
-            <p className="text-xs uppercase tracking-widest text-[#B8860B]">Gulika Kaal</p>
+          <div className="rounded-2xl p-5 sm:p-6" style={{ background: "rgba(184,134,11,0.08)", border: "1px solid rgba(184,134,11,0.25)" }}>
+            <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">Gulika Kaal</p>
             <p className="text-2xl font-bold text-[#1A1A1A] mt-1">{panchang.gulikaKaal.start} – {panchang.gulikaKaal.end}</p>
             <p className="text-xs text-[#6B635B] mt-1">Inauspicious — avoid new starts</p>
           </div>
-          <div className="rounded-2xl p-4" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)" }}>
-            <p className="text-xs uppercase tracking-widest text-amber-300">Yamaganda</p>
+          <div className="rounded-2xl p-5 sm:p-6" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)" }}>
+            <p className="text-xs uppercase tracking-widest text-amber-600 font-bold">Yamaganda</p>
             <p className="text-2xl font-bold text-[#1A1A1A] mt-1">{panchang.yamaganda.start} – {panchang.yamaganda.end}</p>
             <p className="text-xs text-[#6B635B] mt-1">Avoid risky or irreversible decisions</p>
           </div>
@@ -241,11 +241,11 @@ export default function PanchangPage() {
 
         {/* Muhurta Yogas */}
         {panchang.muhurtaYogas.length > 0 && (
-          <section className="rounded-2xl p-4" style={{ background: "rgba(234,179,8,0.10)", border: "1px solid rgba(234,179,8,0.4)" }}>
-            <p className="text-xs uppercase tracking-widest text-amber-300 mb-2">Special Muhurta Yogas Today</p>
+          <section className="rounded-2xl p-5 sm:p-6" style={{ background: "rgba(234,179,8,0.10)", border: "1px solid rgba(234,179,8,0.4)" }}>
+            <p className="text-xs uppercase tracking-widest text-amber-700 font-bold mb-2">Special Muhurta Yogas Today</p>
             <div className="flex flex-wrap gap-2">
               {panchang.muhurtaYogas.map((yoga) => (
-                <span key={yoga} className="text-sm font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(234,179,8,0.2)", color: "#fbbf24" }}>
+                <span key={yoga} className="text-sm font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(234,179,8,0.2)", color: "#8A6008" }}>
                   ✦ {yoga}
                 </span>
               ))}
@@ -256,55 +256,55 @@ export default function PanchangPage() {
 
         {/* Chaughadia */}
         <section>
-          <p className="text-xs uppercase tracking-widest text-[#8C827A] mb-3">Chaughadia Muhurta</p>
+          <p className="text-xs uppercase tracking-widest text-[#8C827A] font-bold mb-3">Chaughadia Muhurta</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Day */}
-            <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-4">
-              <p className="text-xs uppercase tracking-widest text-amber-300 mb-3">Day · Sunrise to Sunset</p>
-              <div className="flex flex-col gap-1.5">
+            <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-4 sm:p-5">
+              <p className="text-xs uppercase tracking-widest text-amber-700 font-bold mb-3">Day · Sunrise to Sunset</p>
+              <div className="flex flex-col gap-2">
                 {panchang.chaughadiaDay.map((w, i) => {
-                  const qColor = w.quality === "Auspicious" ? "#22c55e" : w.quality === "Mixed" ? "#94a3b8" : w.quality === "Caution" ? "#f59e0b" : "#ef4444";
+                  const qColor = w.quality === "Auspicious" ? "#16a34a" : w.quality === "Mixed" ? "#64748b" : w.quality === "Caution" ? "#d97706" : "#dc2626";
                   return (
-                    <div key={i} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all"
+                    <div key={i} className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 transition-all"
                       style={{
-                        background: w.isCurrent ? qColor + "20" : "transparent",
-                        border: `1px solid ${w.isCurrent ? qColor + "55" : "rgba(255,255,255,0.06)"}`,
+                        background: w.isCurrent ? qColor + "18" : "#FAF8F5",
+                        border: `1px solid ${w.isCurrent ? qColor + "55" : "rgba(184,134,11,0.12)"}`,
                       }}>
                       <div className="w-1.5 h-8 rounded-full shrink-0" style={{ background: qColor }} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm text-[#1A1A1A]">{w.name}</span>
-                          {w.isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
+                          {w.isCurrent && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
                         </div>
-                        <p className="text-[11px] text-[#6B635B]">{w.start} – {w.end}</p>
+                        <p className="text-xs text-[#6B635B] mt-0.5">{w.start} – {w.end}</p>
                       </div>
-                      <span className="text-[10px] text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
+                      <span className="text-xs font-semibold text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
                     </div>
                   );
                 })}
               </div>
             </div>
             {/* Night */}
-            <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-4">
-              <p className="text-xs uppercase tracking-widest text-[#6B635B] mb-3">Night · Sunset to Sunrise</p>
-              <div className="flex flex-col gap-1.5">
+            <div className="rounded-2xl border border-[rgba(184,134,11,0.18)] bg-[#FFFFFF] p-4 sm:p-5">
+              <p className="text-xs uppercase tracking-widest text-[#6B635B] font-bold mb-3">Night · Sunset to Sunrise</p>
+              <div className="flex flex-col gap-2">
                 {panchang.chaughadiaNight.map((w, i) => {
-                  const qColor = w.quality === "Auspicious" ? "#22c55e" : w.quality === "Mixed" ? "#94a3b8" : w.quality === "Caution" ? "#f59e0b" : "#ef4444";
+                  const qColor = w.quality === "Auspicious" ? "#16a34a" : w.quality === "Mixed" ? "#64748b" : w.quality === "Caution" ? "#d97706" : "#dc2626";
                   return (
-                    <div key={i} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all"
+                    <div key={i} className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 transition-all"
                       style={{
-                        background: w.isCurrent ? qColor + "20" : "transparent",
-                        border: `1px solid ${w.isCurrent ? qColor + "55" : "rgba(255,255,255,0.06)"}`,
+                        background: w.isCurrent ? qColor + "18" : "#FAF8F5",
+                        border: `1px solid ${w.isCurrent ? qColor + "55" : "rgba(184,134,11,0.12)"}`,
                       }}>
                       <div className="w-1.5 h-8 rounded-full shrink-0" style={{ background: qColor }} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm text-[#1A1A1A]">{w.name}</span>
-                          {w.isCurrent && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
+                          {w.isCurrent && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: qColor + "30", color: qColor }}>NOW</span>}
                         </div>
-                        <p className="text-[11px] text-[#6B635B]">{w.start} – {w.end}</p>
+                        <p className="text-xs text-[#6B635B] mt-0.5">{w.start} – {w.end}</p>
                       </div>
-                      <span className="text-[10px] text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
+                      <span className="text-xs font-semibold text-right shrink-0" style={{ color: qColor }}>{w.quality}</span>
                     </div>
                   );
                 })}
@@ -312,9 +312,9 @@ export default function PanchangPage() {
             </div>
           </div>
           {panchang.currentChaughadia && (() => {
-            const qColor = panchang.currentChaughadia.quality === "Auspicious" ? "#22c55e" : panchang.currentChaughadia.quality === "Mixed" ? "#94a3b8" : panchang.currentChaughadia.quality === "Caution" ? "#f59e0b" : "#ef4444";
+            const qColor = panchang.currentChaughadia.quality === "Auspicious" ? "#22c55e" : panchang.currentChaughadia.quality === "Mixed" ? "#94a3b8" : panchang.currentChaughadia.quality === "Caution" ? "#d97706" : "#ef4444";
             return (
-              <div className="mt-3 rounded-xl p-3 flex gap-3 items-start" style={{ background: qColor + "14", border: `1px solid ${qColor}40` }}>
+              <div className="mt-3 rounded-xl p-3.5 sm:p-4 flex gap-3 items-start" style={{ background: qColor + "14", border: `1px solid ${qColor}40` }}>
                 <span className="text-2xl">⏰</span>
                 <div>
                   <p className="font-semibold text-[#1A1A1A] text-sm">Current: {panchang.currentChaughadia.name} ({panchang.currentChaughadia.start} – {panchang.currentChaughadia.end})</p>
@@ -328,7 +328,7 @@ export default function PanchangPage() {
         {/* Navtara Card */}
         {navtara && (
           <section
-            className="rounded-2xl p-5"
+            className="rounded-2xl p-4 sm:p-5"
             style={{ background: navtaraColor + "12", border: `1px solid ${navtaraColor}44` }}
           >
             <p className="text-xs uppercase tracking-widest mb-2" style={{ color: navtaraColor }}>
@@ -409,15 +409,15 @@ export default function PanchangPage() {
 
         {/* Tithi guidance */}
         {tithiGuide && (
-          <section className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-            <p className="text-xs uppercase tracking-widest text-[#8C827A] mb-2">Tithi Guidance — {tithiKey}</p>
+          <section className="rounded-2xl p-4 sm:p-5" style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.22)" }}>
+            <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold mb-2">Tithi Guidance — {tithiKey}</p>
             <div className="grid sm:grid-cols-3 gap-3 text-sm">
               <div>
                 <p className="text-[#6B635B] text-xs mb-1">Nature</p>
                 <p className="font-semibold" style={{
-                  color: tithiGuide.nature === "Auspicious" ? "#22c55e" :
-                         tithiGuide.nature === "Sensitive" ? "#ef4444" :
-                         tithiGuide.nature === "Caution" ? "#f59e0b" : "#94a3b8"
+                  color: tithiGuide.nature === "Auspicious" ? "#15803d" :
+                         tithiGuide.nature === "Sensitive" ? "#b91c1c" :
+                         tithiGuide.nature === "Caution" ? "#b45309" : "#4b5563"
                 }}>{tithiGuide.nature}</p>
               </div>
               <div>
@@ -435,13 +435,13 @@ export default function PanchangPage() {
 
         <section className="grid sm:grid-cols-2 gap-3">
           <div className="rounded-2xl p-4" style={{ background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.22)" }}>
-            <p className="text-xs uppercase tracking-widest text-emerald-300 mb-2">Aaj Shubh Karya</p>
+            <p className="text-xs uppercase tracking-widest text-emerald-800 font-bold mb-2">Aaj Shubh Karya</p>
             {panchang.shubhKarya.map((item) => (
               <p key={item} className="text-sm text-[#4A4238] leading-relaxed">✦ {item}</p>
             ))}
           </div>
           <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.22)" }}>
-            <p className="text-xs uppercase tracking-widest text-red-300 mb-2">Aaj Avoid / Saavdhani</p>
+            <p className="text-xs uppercase tracking-widest text-red-800 font-bold mb-2">Aaj Avoid / Saavdhani</p>
             {panchang.avoidKarya.map((item) => (
               <p key={item} className="text-sm text-[#4A4238] leading-relaxed">✦ {item}</p>
             ))}
@@ -451,7 +451,7 @@ export default function PanchangPage() {
         {/* Panchang notes */}
         {panchang.notes.length > 0 && (
           <section className="rounded-2xl p-4" style={{ background: "rgba(14,165,233,0.07)", border: "1px solid rgba(14,165,233,0.2)" }}>
-            <p className="text-xs uppercase tracking-widest text-sky-400 mb-2">Special Notes</p>
+            <p className="text-xs uppercase tracking-widest text-sky-800 font-bold mb-2">Special Notes</p>
             {panchang.notes.map((note, i) => (
               <p key={i} className="text-sm text-[#4A4238] leading-relaxed">✦ {note}</p>
             ))}

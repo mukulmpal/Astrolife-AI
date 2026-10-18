@@ -280,35 +280,35 @@ export default function KPPage() {
       </section>
 
       {activeTab === "evidence" && evidenceReport && (
-        <section className="kp-card" style={{ padding: "28px" }}>
+        <section className="kp-card" style={{ padding: "20px 24px" }}>
           {/* Header & Download CTA */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "24px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "20px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "26px", borderBottom: "1px solid rgba(184, 134, 11, 0.18)", paddingBottom: "22px" }}>
             <div>
-              <span style={{ color: "#38bdf8", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 900 }}>
+              <span style={{ color: "#8A6008", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 800 }}>
                 ⚖️ Krishnamurti Paddhati · Frozen Evidence Foundation
               </span>
-              <h2 style={{ fontSize: "28px", color: "#ffffff", margin: "6px 0 8px" }}>
+              <h2 style={{ fontSize: "28px", color: "#1A1A1A", margin: "6px 0 10px", fontFamily: "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif", fontWeight: 700 }}>
                 Evidence-First Classical Synthesis &amp; Verification
               </h2>
-              <p style={{ color: "rgba(232, 227, 240, 0.7)", maxWidth: "700px", fontSize: "13px", lineHeight: 1.6, margin: 0 }}>
-                Deterministic evaluation directly consuming <code style={{ color: "#38bdf8" }}>KPPredictiveEvidenceContract</code>. Every conclusion is bound to verifiable evidence nodes, rule-specific precedence relations (REL-01–REL-10), and classical source citations (*KP Readers I–VI*). Zero scores, zero probability tiers.
+              <p style={{ color: "#5C5248", maxWidth: "720px", fontSize: "14px", lineHeight: 1.75, margin: 0 }}>
+                Deterministic evaluation directly consuming <code style={{ color: "#8A6008", background: "rgba(184,134,11,0.08)", padding: "2px 6px", borderRadius: 4, fontWeight: 600 }}>KPPredictiveEvidenceContract</code>. Every conclusion is bound to verifiable evidence nodes, rule-specific precedence relations (REL-01–REL-10), and classical source citations (*KP Readers I–VI*). Zero scores, zero probability tiers.
               </p>
             </div>
             <Link
               href="/dashboard/report?type=evidence-first"
               style={{
-                background: "linear-gradient(135deg, #0284c7, #0369a1)",
-                border: "1px solid #38bdf8",
+                background: "#B8860B",
+                border: "1px solid #8A6008",
                 borderRadius: "12px",
                 padding: "12px 20px",
-                color: "#ffffff",
+                color: "#FFFFFF",
                 fontWeight: 700,
                 fontSize: "13.5px",
                 textDecoration: "none",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "8px",
-                boxShadow: "0 4px 18px rgba(2, 132, 199, 0.35)",
+                boxShadow: "0 4px 14px rgba(184, 134, 11, 0.25)",
                 whiteSpace: "nowrap",
               }}
             >
@@ -318,7 +318,7 @@ export default function KPPage() {
           </div>
 
           {/* Topic Selector Tabs */}
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "22px" }}>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "24px" }}>
             {evidenceReport.sections.map((sec) => {
               const isSelected = sec.topicId === selectedTopicId;
               const isPending = sec.uncertainty.referencePending;
@@ -328,12 +328,12 @@ export default function KPPage() {
                   key={sec.topicId}
                   onClick={() => setSelectedTopicId(sec.topicId)}
                   style={{
-                    padding: "8px 16px",
+                    padding: "9px 18px",
                     borderRadius: "999px",
-                    border: `1px solid ${isSelected ? (isPending ? "#f59e0b" : "#38bdf8") : "rgba(255,255,255,0.1)"}`,
-                    background: isSelected ? (isPending ? "rgba(245, 158, 11, 0.18)" : "rgba(56, 189, 248, 0.16)") : "rgba(255,255,255,0.04)",
-                    color: isSelected ? (isPending ? "#fbbf24" : "#38bdf8") : "#cbd5e1",
-                    fontWeight: isSelected ? 700 : 500,
+                    border: `1px solid ${isSelected ? (isPending ? "#f59e0b" : "#B8860B") : "rgba(184, 134, 11, 0.2)"}`,
+                    background: isSelected ? (isPending ? "rgba(245, 158, 11, 0.16)" : "rgba(184, 134, 11, 0.14)") : "#FAF7F2",
+                    color: isSelected ? (isPending ? "#b45309" : "#8A6008") : "#5C5248",
+                    fontWeight: isSelected ? 800 : 600,
                     fontSize: "13px",
                     cursor: "pointer",
                     transition: "all 0.15s ease",
@@ -352,7 +352,7 @@ export default function KPPage() {
             const drawerViewModel = buildEvidenceDrawerViewModel(sec);
 
             return (
-              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
                 {/* Epistemic Safeguard Banner for Reference_Pending */}
                 {sec.uncertainty.referencePending && (
                   <div
@@ -363,10 +363,10 @@ export default function KPPage() {
                       padding: "16px 20px",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fbbf24", fontWeight: 700, fontSize: "13px", marginBottom: "6px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#b45309", fontWeight: 700, fontSize: "13px", marginBottom: "6px" }}>
                       <span>⚠️ EPISTEMIC SAFEGUARD: EVALUATION_PENDING</span>
                     </div>
-                    <p style={{ color: "#fef3c7", fontSize: "12px", lineHeight: 1.5, margin: 0 }}>
+                    <p style={{ color: "#78350f", fontSize: "13px", lineHeight: 1.6, margin: 0 }}>
                       {sec.uncertainty.limitations.find((l) => /withheld|precedence|attested|speculative/i.test(l)) ||
                         "Classical KP literature lacks attested conflict precedence for modern speculative financial markets. Precedence resolution is deliberately withheld."}
                     </p>
@@ -376,49 +376,49 @@ export default function KPPage() {
                 {/* Synthesis Header Banner */}
                 <div
                   style={{
-                    background: "rgba(15, 23, 42, 0.75)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.25)",
                     borderRadius: "16px",
-                    padding: "20px",
+                    padding: "20px 24px",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     flexWrap: "wrap",
-                    gap: "12px",
+                    gap: "14px",
                   }}
                 >
                   <div>
-                    <span style={{ fontSize: "11px", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                    <span style={{ fontSize: "11px", color: "#8A6008", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>
                       Evaluated Life Topic ({sec.topicId})
                     </span>
-                    <h3 style={{ fontSize: "20px", color: "#ffffff", fontWeight: 700, margin: "2px 0 0" }}>
+                    <h3 style={{ fontSize: "22px", color: "#1A1A1A", fontWeight: 700, margin: "3px 0 0", fontFamily: "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif" }}>
                       {sec.eventName}
                     </h3>
                   </div>
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
                     <span
                       style={{
-                        padding: "5px 12px",
+                        padding: "6px 14px",
                         borderRadius: "8px",
                         fontSize: "12px",
                         fontFamily: "monospace",
                         fontWeight: 700,
-                        background: sec.uncertainty.referencePending ? "rgba(245, 158, 11, 0.2)" : "rgba(56, 189, 248, 0.2)",
-                        color: sec.uncertainty.referencePending ? "#fbbf24" : "#38bdf8",
-                        border: `1px solid ${sec.uncertainty.referencePending ? "#f59e0b" : "#38bdf8"}`,
+                        background: sec.uncertainty.referencePending ? "rgba(245, 158, 11, 0.15)" : "rgba(34, 197, 94, 0.12)",
+                        color: sec.uncertainty.referencePending ? "#b45309" : "#15803D",
+                        border: `1px solid ${sec.uncertainty.referencePending ? "#f59e0b" : "rgba(34, 197, 94, 0.3)"}`,
                       }}
                     >
                       [ {sec.synthesis.state} ]
                     </span>
                     <span
                       style={{
-                        padding: "5px 12px",
+                        padding: "6px 14px",
                         borderRadius: "8px",
-                        fontSize: "11px",
+                        fontSize: "12px",
                         fontWeight: 600,
-                        background: "rgba(255,255,255,0.06)",
-                        color: "#94a3b8",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "rgba(184, 134, 11, 0.08)",
+                        color: "#5C5248",
+                        border: "1px solid rgba(184, 134, 11, 0.2)",
                       }}
                     >
                       Manifestation: {sec.synthesis.manifestationType}

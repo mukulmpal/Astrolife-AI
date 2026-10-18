@@ -64,6 +64,7 @@ export interface VargaNeuroKarmicProfile {
     natalAlignmentSummary: string;
     paragraphs: string[];
     keyHighlights: string[];
+    primaryHighlight?: string;
   };
 
   // Card 2: Varga Karmic Weakness & Subconscious Bottleneck
@@ -99,6 +100,33 @@ export interface VargaNeuroKarmicProfile {
 
 const md = (x: number, m: number) => ((x % m) + m) % m;
 
+export const SIGN_NAMES_HINDI: Record<string, string> = {
+  Aries: "मेष (Aries)",
+  Taurus: "वृषभ (Taurus)",
+  Gemini: "मिथुन (Gemini)",
+  Cancer: "कर्क (Cancer)",
+  Leo: "सिंह (Leo)",
+  Virgo: "कन्या (Virgo)",
+  Libra: "तुला (Libra)",
+  Scorpio: "वृश्चिक (Scorpio)",
+  Sagittarius: "धनु (Sagittarius)",
+  Capricorn: "मकर (Capricorn)",
+  Aquarius: "कुंभ (Aquarius)",
+  Pisces: "मीन (Pisces)",
+};
+
+export const PLANET_NAMES_HINDI: Record<string, string> = {
+  Sun: "सूर्य देव",
+  Moon: "चंद्र देव",
+  Mars: "मंगल देव",
+  Mercury: "बुध देव",
+  Jupiter: "देवगुरु बृहस्पति",
+  Venus: "शुक्र देव",
+  Saturn: "शनि देव",
+  Rahu: "राहु देव",
+  Ketu: "केतु देव",
+};
+
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
@@ -109,140 +137,310 @@ const SIGN_LORDS = [
   "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"
 ];
 
-// ── Varga Domain Metadata ──────────────────────────────────────
-const VARGA_DOMAINS: Record<string, { title: string; karakas: string[]; focusArea: string }> = {
-  D1:  { title: "Physical Body, Vitality & Core Life Direction", karakas: ["Sun"], focusArea: "Physical stamina, self-identity and stress resilience" },
-  D2:  { title: "Wealth Creation, Financial Capacity & Resources", karakas: ["Jupiter", "Mercury"], focusArea: "Liquid wealth, asset building and scarcity vs abundance mindset" },
-  D3:  { title: "Courage, Willpower, Siblings & Hands-on Effort", karakas: ["Mars"], focusArea: "Execution drive, physical stamina and brotherly/peer karma" },
-  D4:  { title: "Fixed Assets, Real Estate & Domestic Sanctuary", karakas: ["Moon", "Venus"], focusArea: "Home peace, property acquisition and maternal blessings" },
-  D5:  { title: "Past-Life Merit, Purva Punya & Creative Intellect", karakas: ["Jupiter"], focusArea: "Unearned divine grace, intellectual prowess and purva-punya activation" },
-  D6:  { title: "Health Resilience, Disease Defense & Overcoming Obstacles", karakas: ["Mars", "Saturn"], focusArea: "Immune defense, competitive victory, debt resolution and service grit" },
-  D7:  { title: "Children, Progeny Karma & Creative Legacy", karakas: ["Jupiter"], focusArea: "Creative fertility, generational legacy and parent-child rapport" },
-  D8:  { title: "Sudden Transformations, Longevity & Occult Transcendence", karakas: ["Saturn", "Mars"], focusArea: "Crisis transcendence, occult depth, sudden shifts and longevity resilience" },
-  D9:  { title: "Soul Alignment, Inner Dharma & Marital Synergy", karakas: ["Venus", "Jupiter"], focusArea: "Spouse persona, sacred partnership and post-30 soul maturity" },
-  D10: { title: "Career Apex, Authority, Enterprise & Public Impact", karakas: ["Sun", "Saturn", "Mercury"], focusArea: "Professional sovereign leadership, public prestige and monetization" },
-  D11: { title: "Exponential Income Streams, Wealth Fulfillment & Gains", karakas: ["Jupiter", "Mercury"], focusArea: "Large-scale revenue channels, high-net-worth gains and desire fulfillment" },
-  D12: { title: "Ancestral Lineage, Parents & Epigenetic Inheritance", karakas: ["Sun", "Moon"], focusArea: "Paternal/maternal blessings and dissolving generational debt" },
-  D16: { title: "Conveyances, Luxury Vehicles & Inner Peace of Mind", karakas: ["Venus"], focusArea: "Comforts, hedonic adaptation and nervous system tranquility" },
-  D20: { title: "Spiritual Sadhana, Meditation & Higher Consciousness", karakas: ["Jupiter", "Sun", "Ketu"], focusArea: "Jnana yoga, upasana, mantra siddhi and inner awakening" },
-  D24: { title: "Higher Learning, Technical Mastery & Analytical Memory", karakas: ["Mercury", "Jupiter"], focusArea: "Skill acquisition, deep learning and research architecture" },
-  D27: { title: "Subconscious Stamina, Inherent Soul Talents & Resilience", karakas: ["Moon", "Mars"], focusArea: "Crisis management, internal reserves and emotional immunity" },
-  D30: { title: "Karmic Obstacles, Shadow Traps & Remedial Purification", karakas: ["Saturn", "Mars"], focusArea: "Self-sabotage prevention, moral integrity and divine protection" },
-  D40: { title: "General Auspiciousness, Luck & Maternal Ancestry", karakas: ["Moon", "Venus"], focusArea: "Karmic flow, subtle benevolence and maternal ancestral grace" },
-  D45: { title: "Moral Character, Ethical Spine & Refined Conduct", karakas: ["Jupiter", "Sun"], focusArea: "Conscience alignment, noble actions and moral purity" },
-  D60: { title: "Sanchita Root Karma, Past-Life Matrix & Soul Destiny", karakas: ["Saturn", "Jupiter"], focusArea: "Deepest past-life impressions, soul debts and ultimate life purpose" },
+// ── Varga Domain Metadata with Pure Classical Hindi Alignment ──
+const VARGA_DOMAINS: Record<string, { title: string; karakas: string[]; focusArea: string; shastricEssence: string }> = {
+  D1:  {
+    title: "तनु भाव · शारीरिक तेज, व्यक्तित्व व जीवन शक्ति",
+    karakas: ["Sun"],
+    focusArea: "शारीरिक ऊर्जा, जीवन शक्ति और आत्म-विश्वास",
+    shastricEssence: "समस्त चक्रों का मूल आधार और भौतिक चेतना का केंद्र"
+  },
+  D2:  {
+    title: "होरा चक्र · धन-संपत्ति, संचित साधन व वित्तीय सामर्थ्य",
+    karakas: ["Jupiter", "Mercury"],
+    focusArea: "तरल पूंजी, संचित संपदा और वित्तीय स्थिरता",
+    shastricEssence: "सूर्य व चंद्र की होरा द्वारा संचालित भौतिक समृद्धि व संसाधन"
+  },
+  D3:  {
+    title: "द्रेष्काण चक्र · पराक्रम, भ्रातृ सुख, इच्छाशक्ति व कर्म-उद्यम",
+    karakas: ["Mars"],
+    focusArea: "साहस, पुरुषार्थ, सहोदर संबंध और कार्य-ऊर्जा",
+    shastricEssence: "इच्छाशक्ति और शारीरिक जीवटता का सूक्ष्म दर्पण"
+  },
+  D4:  {
+    title: "चतुर्थांश चक्र · अचल संपत्ति, गृह सुख व मातृ कृपा",
+    karakas: ["Moon", "Venus"],
+    focusArea: "भूमि, वाहन, स्थायी संपत्ति और मानसिक शांति",
+    shastricEssence: "भौतिक सुख-साधन और पारिवारिक शांति का आधार"
+  },
+  D5:  {
+    title: "पंचमांश चक्र · पूर्व-पुण्य, सूक्ष्म बुद्धि व सृजनात्मक प्रज्ञा",
+    karakas: ["Jupiter"],
+    focusArea: "अतींद्रिय अंतर्ज्ञान, रचनात्मक प्रतिभा और पूर्व-संचित संस्कार",
+    shastricEssence: "पूर्व जन्मों से प्राप्त अयाचित ईश्वरीय कृपा व मेधा शक्ति"
+  },
+  D6:  {
+    title: "षष्ठांश चक्र · रोग प्रतिरोधकता, संघर्ष विजय व शत्रु-शमन",
+    karakas: ["Mars", "Saturn"],
+    focusArea: "शारीरिक रोग-प्रतिरोधक क्षमता, ऋण-मुक्ति और प्रतिस्पर्धी विजय",
+    shastricEssence: "संकटों से जूझने का आंतरिक धैर्य और जैविक प्रतिरक्षा"
+  },
+  D7:  {
+    title: "सप्तमांश चक्र · संतति सुख, भावी पीढ़ी व वंश-विस्तार",
+    karakas: ["Jupiter"],
+    focusArea: "संतान सुख, रचनात्मक उर्वरता और वंश वृद्धि",
+    shastricEssence: "पीढ़ियों के मध्य कर्म-प्रवाह और सृजनात्मक दायित्व"
+  },
+  D8:  {
+    title: "अष्टमांश चक्र · अप्रत्याशित रूपांतरण, आयु बल व गूढ़ ज्ञान",
+    karakas: ["Saturn", "Mars"],
+    focusArea: "आकस्मिक जीवन परिवर्तन, दीर्घायु और गुप्त विद्याएँ",
+    shastricEssence: "जीवन के गहन रहस्यों और संकटों को सिद्धि में बदलने की शक्ति"
+  },
+  D9:  {
+    title: "नवांश चक्र · आत्मिक धर्म, दांपत्य जीवन व जीवनसाथी का स्वरूप",
+    karakas: ["Venus", "Jupiter"],
+    focusArea: "आत्मिक परिपक्वता, दांपत्य सामंजस्य और उत्तरार्ध का भाग्य",
+    shastricEssence: "मूल जन्म कुंडली के बीजों को यथार्थ में पकाने वाला महा-चक्र"
+  },
+  D10: {
+    title: "दशमांश चक्र · कर्म की सर्वोच्च प्रतिष्ठा, पद, अधिकार व आजीविका",
+    karakas: ["Sun", "Saturn", "Mercury"],
+    focusArea: "व्यावसायिक संप्रभुता, सार्वजनिक पहचान और आजीविका की ऊंचाई",
+    shastricEssence: "समाज में वास्तविक प्रभाव, अधिकार और कर्म सिद्धि का मापक"
+  },
+  D11: {
+    title: "रुद्रांश चक्र · बहु-आयामी लाभ, महा-समृद्धि व अभिलाषा पूर्ति",
+    karakas: ["Jupiter", "Mercury"],
+    focusArea: "गैर-रेखीय वित्तीय विस्तार, बड़े अनुबंध और इच्छा-सिद्धि",
+    shastricEssence: "आर्थिक बंधनों को तोड़कर व्यापक स्तर पर पूंजी निर्माण"
+  },
+  D12: {
+    title: "द्वादशांश चक्र · पितृ ऋण, कुल परंपरा व पूर्वज कर्म-बीज",
+    karakas: ["Sun", "Moon"],
+    focusArea: "माता-पिता के आशीर्वाद, कुल-परंपरा और पैतृक संस्कार",
+    shastricEssence: "पूर्वज डीएनए और आनुवंशिक ऋणों का सूक्ष्म लेखा-जोखा"
+  },
+  D16: {
+    title: "षोडशांश चक्र · सुख-साधन, वाहन सुख व आंतरिक शांति",
+    karakas: ["Venus"],
+    focusArea: "भौतिक ऐश्वर्य, वाहन सुख और तंत्रिका तंत्र की शांति",
+    shastricEssence: "सांसारिक सुखों के मध्य चित्त की विश्रांति"
+  },
+  D20: {
+    title: "विंशांश चक्र · आध्यात्मिक साधना, उपासना व आत्म-ज्ञान",
+    karakas: ["Jupiter", "Sun", "Ketu"],
+    focusArea: "मंत्र साधना, ईश्वरानुराग और उच्चतर चेतना का जागरण",
+    shastricEssence: "साधना की परिपक्वता और आत्म-साक्षात्कार का मार्ग"
+  },
+  D24: {
+    title: "चतुर्विंशांश चक्र · उच्च विद्या, तकनीकी दक्षता व सूक्ष्म प्रज्ञा",
+    karakas: ["Mercury", "Jupiter"],
+    focusArea: "गहन अध्ययन, बौद्धिक शिल्प, अनुसंधान और शास्त्र-ज्ञान",
+    shastricEssence: "ज्ञान के गहनतम सिद्धांतों का अधिग्रहण व अनुप्रयोग"
+  },
+  D27: {
+    title: "सप्तविंशांश (भंशा) चक्र · अवचेतन मनोबल, जन्मजात सामर्थ्य व सहनशक्ति",
+    karakas: ["Moon", "Mars"],
+    focusArea: "आंतरिक ऊर्जा संचय, भावनात्मक दृढ़ता और प्रतिकूलता में स्थिरता",
+    shastricEssence: "आत्मा के सूक्ष्म २७ नक्षत्र खंडों से मिलने वाली अदृश्य शक्ति"
+  },
+  D30: {
+    title: "त्रिंशांश चक्र · अनिष्ट बाधाएँ, छाया दोष व सुरक्षा कवच",
+    karakas: ["Saturn", "Mars"],
+    focusArea: "अवचेतन भय, छाया प्रवृत्तियाँ, अनपेक्षित संकट और उनका शमन",
+    shastricEssence: "कर्म के नकारात्मक संस्कारों का शुद्धिकरण व सुरक्षा उपाय"
+  },
+  D40: {
+    title: "खवेदांश चक्र · मातृ कुल का शुभाशुभ फल व सूक्ष्म सौभाग्य",
+    karakas: ["Moon", "Venus"],
+    focusArea: "मातृ पक्ष के सूक्ष्म संस्कार, दैवीय सुरक्षा और प्राकृतिक कृपा",
+    shastricEssence: "मातृ परंपरा के माध्यम से संचरित होने वाले सूक्ष्म वरदान"
+  },
+  D45: {
+    title: "अक्षवेदांश चक्र · नैतिक चारित्रिक बल, अंतःकरण की शुद्धता व सदाचार",
+    karakas: ["Jupiter", "Sun"],
+    focusArea: "नैतिक दृढ़ता, अंतरात्मा की आवाज़ और चारित्रिक निष्ठा",
+    shastricEssence: "सत्य और धर्म के प्रति निष्ठा का उच्चतम चारित्रिक दर्पण"
+  },
+  D60: {
+    title: "षष्ट्यंश चक्र · संचित मूल कर्म, प्रारब्ध का सूक्ष्म लेखा व आत्मिक गंतव्य",
+    karakas: ["Saturn", "Jupiter"],
+    focusArea: "पूर्व जन्मों के संचित मूल कर्म, प्रारब्ध ऋण और जीवन का सर्वोच्च प्रयोजन",
+    shastricEssence: "पाराशरी ज्योतिष का अंतिम व सर्वोच्च सत्य — कर्म का अकाट्य विधान"
+  },
 };
 
-// ── Epigenetic Ancestral Loop Library (Graha-Based) ─────────────
+// ── Epigenetic Ancestral Loop Library (Graha-Based) in Pure Devnagari Hindi ──
 const ANCESTRAL_PATTERNS: Record<string, { ancestral: string; distortion: string; rewrite: string; somatic: string }> = {
   Sun: {
-    ancestral: "Paternal lineage me authoritative suppression ya public status ke liye extreme personal sacrifice raha hai; parivar me recognition na milne par deep ego-burn carry kiya gaya.",
-    distortion: "Status Imposter Syndrome (Dar ki agar me apex position claim karunga to log criticize karenge).",
-    rewrite: "Apni authority ko validation ke liye nahi, balki responsibility aur systemic order maintain karne ke liye use karein.",
-    somatic: "Subah sunrise ke 30 minute ke andar 10 minute direct natural sunlight me walk (Ventral striatum Dopamine reset)."
+    ancestral: "पितृ कुल में सत्ता, मान-सम्मान अथवा सामाजिक प्रतिष्ठा के लिए अत्यधिक व्यक्तिगत त्याग रहा है; समाज में यथोचित मान्यता न मिलने पर मन में गहरी टीस संचित रही।",
+    distortion: "प्रतिष्ठा संशय (Prestige Imposter Trap) — यह अवचेतन भय कि सर्वोच्च पद या नेतृत्व स्वीकार करने पर लोग आलोचना करेंगे या गिरा देंगे।",
+    rewrite: "अपनी शक्ति व अधिकार का उपयोग व्यक्तिगत सत्यापन के लिए नहीं, बल्कि जनकल्याण और उत्तरदायित्व के सात्विक निर्वहन हेतु करें।",
+    somatic: "सूर्योदय के ३० मिनट के भीतर १० मिनट की प्राकृतिक धूप में चहलकदमी (नेत्र व तंत्रिका तंत्र की नव-ऊर्जा हेतु)।"
   },
   Moon: {
-    ancestral: "Maternal lineage me unspoken emotional grief, akelepan me overthinking aur parivar ke liye apni feelings ko daba kar jeene ka epigenetic pattern.",
-    distortion: "Nocturnal Hyper-Vigilance & Emotional Empathy Fatigue (Doosron ki chinta me raat ko dimag over-speed par chalna).",
-    rewrite: "Doosron ke emotional problems ko absorb karna band karein; compassion rakhein par boundaries ke sath.",
-    somatic: "Cold water vagal hydro-reset: Sone se pehle kalaiyon aur pairon ko 60 seconds thande paani se dhona (Jal-tatva grounding)."
+    ancestral: "मातृ कुल में मौन भावनात्मक पीड़ा, एकांत में अत्यधिक चिंता और परिवार की खातिर अपनी भावनाओं व इच्छाओं को दबाकर जीने का संस्कार।",
+    distortion: "अति-सहानुभूति व मानसिक थकान — दूसरों की चिंताओं को स्वयं पर ओढ़ लेना और रात्रि के समय विचारों का अनियंत्रित चक्र चलना।",
+    rewrite: "दूसरों की भावनाओं को स्पंज की तरह सोखना बंद करें; करुणा रखें, किंतु स्वस्थ और स्पष्ट मानसिक सीमाओं के साथ।",
+    somatic: "शीतल जल का पाद-प्रक्षालन: रात्रि में सोने से पूर्व कलाईयों और पैरों को ६० सेकंड तक ताजे शीतल जल से धोना (जल-तत्व का संतुलन)।"
   },
   Mars: {
-    ancestral: "Ancestral lineage me confrontation, property/land disputes ya jaldbazi me decision lekar nuksan uthane ka impulsive loop.",
-    distortion: "Urgent Reactor Trap (Har problem ko abhi isi second ladkar ya confront karke solve karne ki compulsion).",
-    rewrite: "Energy ko verbal aggression me kharch karne ke bajay physical athletic endurance ya complex code architecture me lagayein.",
-    somatic: "10-Second Vagal Pause: Kisi bhi heated argument me reply dene se pehle 2 deep physiological sighs lein."
+    ancestral: "पूर्वज परंपरा में संपत्ति, भूमि विवाद अथवा त्वरित आवेश में आकर निर्णय लेने के कारण हानि उठाने का आक्रामक चक्र।",
+    distortion: "आवेशी प्रतिक्रिया — हर छोटी-बड़ी समस्या का समाधान उसी क्षण वाद-विवाद या आक्रामकता से करने की आंतरिक छटपटाहट।",
+    rewrite: "अपनी प्रचंड ऊर्जा को शाब्दिक विवादों में व्यर्थ करने के बजाय खेलकूद, तकनीकी शोध अथवा दीर्घकालिक निर्माण में नियोजित करें।",
+    somatic: "१० सेकंड का विश्राम प्राणायाम: किसी भी उत्तेजक परिस्थिति में उत्तर देने से पूर्व दो गहरी श्वास लेकर धीरे-धीरे छोड़ें।"
   },
   Mercury: {
-    ancestral: "Lineage me apni intellectual abilities ya craft ki rightful commercial value na lene ka sankoch; unwritten agreements par bharosa karke cheat hona.",
-    distortion: "Perfectionist Freeze (Product ya task tab tak release na karna jab tak 100% perfect na ho).",
-    rewrite: "Done is better than perfect. 80% ready hone par deploy karein aur real market feedback se iterate karein.",
-    somatic: "Externalization Brain-Dump: Raat ko sone se pehle agle din ke keval 3 main high-impact tasks diary me pen se likhna."
+    ancestral: "कुल में अपनी बौद्धिक कला व कौशल का उचित पारिश्रमिक न ले पाने का संकोच; मौखिक वचनों पर अत्यधिक विश्वास कर हानि सहना।",
+    distortion: "अति-परिपूर्णता का अवरोध (Perfectionist Freeze) — किसी योजना या उत्पाद को तब तक प्रस्तुत न करना जब तक वह शत-प्रतिशत त्रुटिहीन न हो जाए।",
+    rewrite: "कर्म की पूर्णता से अधिक उसकी समयबद्ध प्रस्तुति महत्वपूर्ण है। ८०% तैयारी होते ही आरंभ करें और वास्तविक परिणामों से परिष्कार करें।",
+    somatic: "विचारों का लिखित अंकन: सोने से पहले अगले दिन के केवल ३ मुख्य अनिवार्य कार्यों को हाथ से डायरी में लिखना।"
   },
   Jupiter: {
-    ancestral: "Rigid religious dogma, spiritual pride ya false orthodox mentors ke sath ancestral friction; gyan hone ke baad bhi practical application me aalsya.",
-    distortion: "Intellectual Dogmatism (Har cheez me excessive intellectual debates aur action se pehle endless analysis).",
-    rewrite: "Gyan ko ego-display ke bajay selfless guidance aur teaching ke liye channelize karein.",
-    somatic: "Daily 5 minute silent breath observation (Pranayama) bina kisi phone ya text ke."
+    ancestral: "रूढ़िवादिता, पांडित्य-अभिमान अथवा भ्रामक उपदेशकों से पूर्वज स्तर पर प्राप्त संकोच; प्रचुर ज्ञान होने पर भी व्यावहारिक क्रियान्वयन में आलस्य।",
+    distortion: "अति-दार्शनिक जड़ता — हर सामान्य कार्य में अंतहीन बौद्धिक तर्क-वितर्क और वास्तविक कदम उठाने से पहले अत्यधिक विश्लेषण।",
+    rewrite: "अपने ज्ञान का उपयोग अहम्-तुष्टि के लिए नहीं, बल्कि व्यावहारिक मार्गदर्शन और निस्वार्थ शिक्षा के प्रकाश हेतु करें।",
+    somatic: "दैनिक ५ मिनट मौन श्वास-दर्शन: किसी भी स्क्रीन या पुस्तक के बिना शांत बैठकर केवल श्वास के आवागमन का अवलोकन।"
   },
   Venus: {
-    ancestral: "Relationships me over-giving, unconditional self-sacrifice aur personal self-worth ko partner ke approval se baandhna; financial luxury guilt.",
-    distortion: "Romantic Idealization & Silent Resentment (Partner se unspoken expectations rakhna aur poori na hone par withdraw hona).",
-    rewrite: "Relationships me 100% explicit transparent communication rakhein; boundaries ko guilt-free establish karein.",
-    somatic: "Sensory Calming Ritual: Sham ke samay sandalwood/rose natural aroma ya barefoot grass grounding."
+    ancestral: "संबंधों में अत्यधिक आत्म-त्याग, अपने आत्म-सम्मान को साथी की स्वीकृति से बाँधना अथवा सुख-साधनों के उपभोग में आंतरिक अपराध-बोध।",
+    distortion: "काल्पनिक आदर्शवाद व मौन क्षोभ — साथी से अनकही अपेक्षाएँ रखना और उनके पूरा न होने पर मन ही मन दूर हो जाना।",
+    rewrite: "रिश्तों में पूर्ण पारदर्शी व स्पष्ट संवाद स्थापित करें; अपराध-बोध से मुक्त होकर अपनी सीमाओं का सम्मान करें।",
+    somatic: "इंद्रिय-शांति अनुष्ठान: सायंकाल चंदन अथवा गुलाब की प्राकृतिक सुगंध का प्रयोग या नंगे पाँव हरी दूब पर चलना।"
   },
   Saturn: {
-    ancestral: "Heavy ancestral burden, duty-neglect ka guilt ya akele hi poore parivar ka bojh kandhe par uthane ki intergenerational conditioning.",
-    distortion: "The Sole Carrier Complex (Mujhe lagta hai ki agar me din-raat thak kar kaam nahi karunga to sab bikhar jayega).",
-    rewrite: "Slow compounding par bharosa karein; patience se systems banayein aur healthy delegation seekhein.",
-    somatic: "Spine Alignment & Postural Reset: Har 90 minute ke desk work ke baad 2 minute deep spine decompression stretch."
+    ancestral: "कर्तव्य-भार का भारी बोझ, परिवार का सारा दायित्व अकेले अपने कंधों पर ढोने का संस्कार अथवा विश्राम करने पर अपराध-बोध होना।",
+    distortion: "एकाकी भारवाही ग्रंथि — यह मानना कि यदि मैं दिन-रात थककर काम नहीं करूँगा तो सब कुछ बिखर जाएगा।",
+    rewrite: "धैर्य और व्यवस्था पर विश्वास रखें; सारा काम स्वयं करने के बजाय स्वस्थ रूप से दायित्वों का विभाजन करना सीखें।",
+    somatic: "मेरुदंड खिंचाव व विश्राम: कार्यस्थल पर प्रत्येक ९० मिनट के पश्चात २ मिनट तक रीढ़ की हड्डी को सीधा खींचकर गहरी श्वास लें।"
   },
   Rahu: {
-    ancestral: "Ancestral sudden displacement, non-traditional path chunne par parivar se outcaste hone ka bhay ya financial volatility.",
-    distortion: "Obsessive FOMO & Sudden Escalation Anxiety (Raton-raat scale karne ki jaldbazi me unnecessary high risks lena).",
-    rewrite: "Rahu ki viral energy ko calculated risk aur cutting-edge software me channelize karein, speculative greed me nahi.",
-    somatic: "Digital Sunset: Raat 10:30 PM ke baad saari bright screens band aur zero business discussions over food."
+    ancestral: "पूर्वजों में अचानक स्थान-परिवर्तन, अपरंपरागत मार्ग चुनने पर सामाजिक बहिष्कार का भय अथवा अप्रत्याशित वित्तीय अस्थिरता।",
+    distortion: "तीव्र अधीरता व तात्कालिक सफलता का लोभ — रातों-रात आगे बढ़ने की हड़बड़ाहट में अनावश्यक जोखिम उठाना।",
+    rewrite: "राहु की क्रांतिकारी ऊर्जा को अत्याधुनिक तकनीक, सॉफ्टवेयर और सुविचारित जोखिम में लगाएँ, न कि सट्टेबाजी अथवा लोभ में।",
+    somatic: "डिजिटल सूर्यास्त: रात्रि १०:३० बजे के पश्चात सभी नीली स्क्रीनों को बंद करना और भोजन के समय किसी व्यापारिक चर्चा से बचना।"
   },
   Ketu: {
-    ancestral: "Spiritual detachment, parivar ya duniya se achanak alienation me chale jaana; worldly inheritance se disconnect.",
-    distortion: "Cynical Nihilism ('Kuch bhi karne ka kya fayda, sab niras hai' kehkar productive karma se retreat karna).",
-    rewrite: "Ketu ki inward intuitive insight ko deeply focused specialized technology aur research me convert karein.",
-    somatic: "Earthing Protocol: Daily 10 minute bare ground/earth contact ya deep solitary meditation."
+    ancestral: "सांसारिक विरक्ति, दुनिया या परिवार से अचानक अलगाव में चले जाना अथवा अपनी पैतृक संपदा से अनजाने में विमुख हो जाना।",
+    distortion: "उदासीन शून्यवाद — 'कुछ भी करने का क्या लाभ, सब व्यर्थ है' सोचकर सक्रिय पुरुषार्थ और सृजन से पीछे हट जाना।",
+    rewrite: "केतु की अंतर्मुखी प्रज्ञा को गहन एकाग्रता, शोध, दर्शन और विशेष तकनीकी वास्तुकला में रूपाकार दें।",
+    somatic: "भूमि स्पर्श: दैनिक १० मिनट नंगे पाँव प्राकृतिक मिट्टी अथवा घास पर चलकर पृथ्वी-तत्व से जुड़ना।"
   }
 };
 
 // ── 22nd Drekkana (Kharesh) Organ System Vulnerability ───────────
 const KHARESH_ORGAN_MAP: Record<string, { organ: string; somaticProtocol: string }> = {
   Sun: {
-    organ: "Cardiovascular system, ocular vitality, vertebral spinal column & cellular energy production",
-    somaticProtocol: "Strict sunrise circadian sync, aerobic zone-2 cardio training, and CoQ10/Magnesium-rich whole foods."
+    organ: "हृदय-संचार तंत्र, नेत्र ज्योति, मेरुदंडीय अस्थि संरचना एवं कोशिकीय ऊर्जा उत्पादन",
+    somaticProtocol: "प्रातः सूर्योदय की प्राकृतिक धूप का नियमित सेवन, एरोबिक व्यायाम एवं मैग्नीशियम युक्त आहार।"
   },
   Moon: {
-    organ: "Fluid-electrolyte balance, lymphatic drainage, gastric mucosa & neuro-endocrine mood loops",
-    somaticProtocol: "Cold-water vagal hydro-resets at night, structured meal timing for gut circadian clocks, and electrolyte balancing."
+    organ: "तरल-इलेक्ट्रोलाइट संतुलन, लसीका तंत्र, आमाशय श्लेष्मा एवं मनो-हार्मोनल चक्र",
+    somaticProtocol: "रात्रि में शीतल जल का पाद-प्रक्षालन, पाचन चक्र के अनुसार भोजन का निश्चित समय एवं पर्याप्त जलयोजन।"
   },
   Mars: {
-    organ: "Acute inflammatory cascades, muscular injury vulnerability, cranial tension & bile metabolism",
-    somaticProtocol: "Anti-inflammatory diet, 10-second physiological pause during anger, and non-impact endurance cycling or swimming."
+    organ: "तीव्र सूजन संबंधी प्रवृत्तियाँ, मांसपेशियों में खिंचाव, कपाल तनाव एवं पित्त चयापचय",
+    somaticProtocol: "एंटी-इंफ्लेमेटरी आहार, क्रोध के समय १० सेकंड का गहरा श्वास विराम एवं तैराकी या साइकलिंग।"
   },
   Mercury: {
-    organ: "Autonomic nervous system hypersensitivity, speech center fatigue, dermatological histamine flare-ups & enteric gut-brain axis",
-    somaticProtocol: "Strict sunset digital screen curfew, 4-7-8 parasympathetic breathwork, and limiting concurrent task-switching."
+    organ: "स्वायत्त तंत्रिका तंत्र की संवेदनशीलता, वाणी केंद्र, त्वचा की संवेदनशीलता एवं आंत-मस्तिष्क अक्ष (Gut-Brain Axis)",
+    somaticProtocol: "सूर्यास्त के पश्चात डिजिटल स्क्रीनों से दूरी, ४-७-८ अनुलोम-विलोम प्राणायाम एवं एक समय में एक ही कार्य।"
   },
   Jupiter: {
-    organ: "Hepatic lipid metabolism, arterial compliance, pancreatic insulin response & systemic chronic inflammation",
-    somaticProtocol: "Intermittent 14-hour overnight fasting for cellular autophagy, post-meal brisk 10-min walk, and refined sugar elimination."
+    organ: "यकृत वसा चयापचय, धमनी लचीलापन, अग्न्याशय इंसुलिन संतुलन एवं दीर्घकालिक सूजन",
+    somaticProtocol: "रात्रि के समय १४ घंटे का हल्का उपवास, भोजन के पश्चात १० मिनट की मंद गति चहलकदमी एवं शर्करा नियंत्रण।"
   },
   Venus: {
-    organ: "Renal kidney filtration, reproductive/hormonal balance, endocrine glands & glucose metabolism",
-    somaticProtocol: "Low-glycemic dietary anchoring, deep hydration with natural Himalayan pink salt trace minerals, and pelvic mobility exercises."
+    organ: "वृक्क (गुर्दे) की कार्यप्रणाली, हार्मोनल संतुलन, अंतःस्रावी ग्रंथियाँ एवं ग्लूकोज चयापचय",
+    somaticProtocol: "संतुलित आहार, प्राकृतिक हिमालयन लवण युक्त शुद्ध जल एवं पेल्विक मोबिलिटी व्यायाम।"
   },
   Saturn: {
-    organ: "Skeletal joint integrity, bone mineral density, dental health, chronic neuromuscular stiffness & colon elimination",
-    somaticProtocol: "Resistance weight-bearing load training, daily warm sesame oil spine self-massage, and soluble fiber gut protocol."
+    organ: "अस्थि खनिज घनत्व, संधियों (जोड़ों) का स्वास्थ्य, दांत एवं आंत्र निष्कासन प्रणाली",
+    somaticProtocol: "भार-वहन शक्ति व्यायाम, गुनगुने तिल के तेल से मेरुदंड मालिश एवं घुलनशील फाइबर युक्त आहार।"
   },
   Rahu: {
-    organ: "Psychosomatic hypersensitivity, autoimmune allergen vulnerabilities, sleep architecture disruption & toxic overload",
-    somaticProtocol: "EMF-free sleep sanctuary, bare-earth conductive grounding (15 mins/day), and avoiding artificial stimulants after 2 PM."
+    organ: "मनोदैहिक अति-संवेदनशीलता, एलर्जी प्रवृत्तियाँ, निद्रा चक्र में व्यवधान एवं विषाक्तता संचय",
+    somaticProtocol: "विद्युत-चुंबकीय विकिरण मुक्त शयन कक्ष, नंगे पाँव भूमि-स्पर्श (१५ मिनट प्रतिदिन) एवं दोपहर पश्चात कैफीन से दूरी।"
   },
   Ketu: {
-    organ: "Neuromuscular mystery blind-spots, sacral/spine stiffness, lower extremities circulation & energy depletion",
-    somaticProtocol: "Surya Namaskar mobility, fascia myofascial foam rolling, and focused breath-movement coordination."
+    organ: "तंत्रिका संबंधी अज्ञात दुर्बलता, त्रिक/मेरुदंड अकड़न एवं ऊर्जा का अचानक ह्रास",
+    somaticProtocol: "सूर्य नमस्कार, मायोफेशियल स्ट्रेचिंग एवं श्वास व गति का सचेत समन्वय।"
   }
 };
 
-// ── D10 Digpalas (Ruling Deities of Dasamsha) ───────────────────
+// ── D10 Digpalas (Ruling Deities of Dasamsha) in Rich Devnagari ──
 const DIGPALAS_ODD = [
-  { name: "Indra", role: "East · Sovereign Governance & Vision", mode: "Executive Authority & Strategic Policy", distortion: "Prestige Imposter Trap (Fear of public fall)", remedy: "Lead through systemic delegation rather than personal validation.", somatic: "Morning saccadic eye-movement scanning towards the horizon." },
-  { name: "Agni", role: "South-East · Transformation & Velocity", mode: "Rapid Execution & Disruptive Technology", distortion: "Urgent Reactor Burnout (Compulsion to fight every friction)", remedy: "Channel fire into high-leverage software execution, not interpersonal conflict.", somatic: "Physiological sigh (2 inhales, long exhale) when workplace tension spikes." },
-  { name: "Yama", role: "South · Law, Order & Accountability", mode: "Institutional Rigor & Regulatory Precision", distortion: "Punitive Perfectionism (Paralysis through extreme self-judgment)", remedy: "Establish objective completion criteria; accept iterative deployment.", somatic: "Spine decompression posture resets every 90 minutes of desk work." },
-  { name: "Nirriti", role: "South-West · Unconventional Breakthroughs", mode: "Deep R&D & High-Leverage Non-Traditional Paths", distortion: "Outsider Alienation (Feeling unappreciated by mainstream peers)", remedy: "Turn unconventional insights into proprietary specialized algorithms.", somatic: "Vagal nerve cold-water facial immersion for emotional grounding." },
-  { name: "Varuna", role: "West · Liquid Commerce & Global Trade", mode: "Market Intuition & Global Partnerships", distortion: "Commercial Over-Porosity (Saying yes to too many scattered deals)", remedy: "Establish strict qualification rubrics before committing commercial bandwidth.", somatic: "Deliberate hydration pacing and scheduled silence intervals between meetings." },
-  { name: "Vayu", role: "North-West · Speed, Networks & Distribution", mode: "Information Architecture & Scalable Dissemination", distortion: "Cognitive Dispersion (Starting 10 projects, finishing none)", remedy: "Monotask ruthlessly; close all unneeded browser tabs during creative sprints.", somatic: "Barefoot earthing and 45-minute distraction-free Pomodoro deep work blocks." },
-  { name: "Kubera", role: "North · Treasury & Capital Compounding", mode: "Asset Allocation & Value Preservation", distortion: "Generational Scarcity Anxiety (Fear of depletion despite high revenue)", remedy: "Adopt compounding long-term horizon; separate operational capital from investment.", somatic: "Daily gratitude journaling for capital security and slow deep diaphragmatic breathing." },
-  { name: "Ishana", role: "North-East · Wisdom & Advisory Excellence", mode: "Strategic Mentorship & Research Acumen", distortion: "Ivory-Tower Detachment (Disdain for everyday business execution)", remedy: "Ground deep wisdom into tangible, monetizable educational and advisory frameworks.", somatic: "5-minute dawn meditation in quiet space before opening digital devices." },
-  { name: "Brahma", role: "Zenith · Zero-to-One Creative Architecture", mode: "Original Product Engineering & Innovation", distortion: "Prototype Abandonment Loop (Discarding working products for elusive perfection)", remedy: "Ship version 1.0; let real customer interaction drive architecture improvements.", somatic: "Draft architectural designs by hand on physical paper before coding." },
-  { name: "Ananta", role: "Nadir · Deep Foundations & Stamina", mode: "Unshakeable Institutional Resilience & Infrastructure", distortion: "The Slogger Syndrome (Clinging to outdated legacy methods out of sheer duty)", remedy: "Upgrade underlying foundations regularly; automate routine repetitive workloads.", somatic: "Evening progressive muscle relaxation for restorative deep sleep." }
+  {
+    name: "इंद्र (Indra)",
+    role: "पूर्व दिशा · संप्रभु शासन, विज़न व संगठनात्मक नेतृत्व",
+    mode: "रणनीतिक नीति-निर्माण एवं स्वायत्त प्रशासनिक अधिकार",
+    distortion: "प्रतिष्ठा संशय (Prestige Imposter Trap) — सर्वोच्च पद प्राप्त करने पर समाज या सहयोगियों के पतन का आंतरिक भय।",
+    remedy: "व्यक्तिगत प्रमाणीकरण के बजाय सुदृढ़ प्रणाली और अधिकारों के विभाजन (Delegation) द्वारा नेतृत्व करें।",
+    somatic: "प्रातःकाल सूर्योदय के समय क्षितिज की ओर दृष्टि प्रसार (नेत्र व तंत्रिका तंत्र का संरेखण)।"
+  },
+  {
+    name: "अग्नि (Agni)",
+    role: "दक्षिण-पूर्व (आग्नेय) · तीव्र रूपांतरण, पुरुषार्थ व अग्नि-तत्व",
+    mode: "त्वरित निर्णय-प्रक्रिया, नवाचार एवं विघटनकारी तकनीकी क्षमता",
+    distortion: "अति-सक्रियता व बर्नआउट (Urgent Reactor Burnout) — प्रत्येक समस्या से उसी क्षण भिड़ जाने की आंतरिक छटपटाहट।",
+    remedy: "अपनी प्रचंड अग्नि को व्यक्तिगत विवादों में व्यर्थ करने के बजाय उच्च-प्रभावी तकनीकी व बौद्धिक निर्माण में रूपांतरित करें।",
+    somatic: "कार्यस्थल पर तनाव बढ़ने पर दोहरी गहरी श्वास लेकर धीरे-धीरे मुख से छोड़ना (Physiological Sigh)।"
+  },
+  {
+    name: "यम (Yama)",
+    role: "दक्षिण दिशा · धर्म, कानून, उत्तरदायित्व व निष्पक्ष न्याय",
+    mode: "संस्थागत अनुशासन, कठोर गुणवत्ता नियंत्रण एवं सत्यनिष्ठा",
+    distortion: "दंडकारी पूर्णतावाद (Punitive Perfectionism) — अत्यधिक आत्म-आलोचना के कारण योजनाओं को अटकाए रखना।",
+    remedy: "कार्य पूर्णता के वस्तुनिष्ठ मानदंड तय करें; पुनरावृत्ति (Iterative Progress) के माध्यम से विस्तार स्वीकारें।",
+    somatic: "कंप्यूटर पर काम के प्रत्येक ९० मिनट बाद मेरुदंड को सीधा कर विश्राम मुद्रा अपनाना।"
+  },
+  {
+    name: "निर्रिति (Nirriti)",
+    role: "दक्षिण-पश्चिम (नैऋत्य) · अपरंपरागत मार्ग, गहन शोध व गुप्त भेद",
+    mode: "गहन अनुसंधान, अप्रत्याशित रणनीतियाँ एवं स्वतंत्र तकनीक",
+    distortion: "एकाकी अलगाव (Outsider Alienation) — यह महसूस करना कि पारंपरिक जगत मेरे अद्वितीय विचारों को नहीं समझ सकता।",
+    remedy: "अपनी लीक से हटकर सोचने की क्षमता को विशिष्ट, स्वामित्व-युक्त बौद्धिक संपदा में बदलें।",
+    somatic: "मानसिक स्थिरता हेतु शीतल जल से मुख प्रक्षालन व vagal nerve शांति क्रिया।"
+  },
+  {
+    name: "वरुण (Varuna)",
+    role: "पश्चिम दिशा · तरल वाणिज्य, वैश्विक साझेदारी व संबंध",
+    mode: "बाज़ार की नब्ज पहचानना, वैश्विक विस्तार व व्यापक प्रभाव",
+    distortion: "व्यावसायिक बिखराव (Commercial Over-Porosity) — हर नए अवसर और प्रस्ताव को बिना सोचे 'हाँ' कह देना।",
+    remedy: "किसी भी व्यावसायिक अनुबंध में प्रतिबद्ध होने से पूर्व सख्त मूल्यांकन और प्राथमिकताओं का पालन करें।",
+    somatic: "नियमित जलपान का नियम और बैठकों के मध्य ५ मिनट का पूर्ण मौन अंतराल।"
+  },
+  {
+    name: "वायु (Vayu)",
+    role: "उत्तर-पश्चिम (वायव्य) · गति, नेटवर्क, संवाद व वितरण",
+    mode: "सूचना तंत्र, त्वरित प्रसार एवं स्केलेबल प्रणालियों का संचालन",
+    distortion: "मानसिक भटकाव (Cognitive Dispersion) — एक साथ दस कार्य आरंभ करना और किसी को भी पूर्ण न करना।",
+    remedy: "एक समय में केवल एक मुख्य लक्ष्य पर अडिग रहें; सृजनात्मक कार्य के समय सभी विकर्षणों को बंद रखें।",
+    somatic: "नंगे पाँव भूमि-स्पर्श और ४५ मिनट के एकाग्र कार्य-खंड (Deep Work Blocks)।"
+  },
+  {
+    name: "कुबेर (Kubera)",
+    role: "उत्तर दिशा · राजकोष, संचित संपदा व वित्तीय चक्रवृद्धि",
+    mode: "परिसंपत्ति निर्माण, पूंजी प्रबंधन एवं मूल्य संरक्षण",
+    distortion: "अभाव का अवचेतन भय (Scarcity Anxiety) — प्रचुर आय होने के बावजूद संपदा समाप्त होने की आंतरिक चिंता।",
+    remedy: "दीर्घकालिक चक्रवृद्धि दृष्टिकोण अपनाएँ; दैनिक संचालन पूंजी को दीर्घकालिक निवेश से अलग रखें।",
+    somatic: "प्रातः वित्तीय समीक्षा से पूर्व ५ गहरी उदर-श्वास और कृतज्ञता का मानसिक स्मरण।"
+  },
+  {
+    name: "ईशान (Ishana)",
+    role: "उत्तर-पूर्व (ईशान) · ईश्वरीय प्रज्ञा, परामर्श व दूरदर्शिता",
+    mode: "रणनीतिक परामर्श, ज्ञान का प्रसार एवं मार्गदर्शन",
+    distortion: "व्यावहारिक उदासीनता (Ivory-Tower Detachment) — सांसारिक आजीविका और व्यावहारिक क्रियान्वयन से विरक्त होना।",
+    remedy: "अपने गहन ज्ञान व दूरदर्शिता को व्यावहारिक, लोक-कल्याणकारी और वित्तीय रूप से सक्षम प्रणालियों में बदलें।",
+    somatic: "प्रातः किसी भी डिजिटल स्क्रीन को देखने से पूर्व शांत स्थान पर ५ मिनट का ध्यान।"
+  },
+  {
+    name: "ब्रह्मा (Brahma)",
+    role: "ऊर्ध्व (आकाश) · शून्य से सृष्टि, मूल वास्तुकला व नवाचार",
+    mode: "मौलिक उत्पाद निर्माण, नई दिशाएँ तय करना व आविष्कार",
+    distortion: "प्रारूप परित्याग चक्र (Prototype Abandonment) — पूर्णता की तलाश में तैयार कार्यों को समय पर सार्वजनिक न करना।",
+    remedy: "पहले संस्करण को बाज़ार में प्रस्तुत करें; वास्तविक प्रतिपुष्टि के आधार पर निरंतर सुधार करें।",
+    somatic: "किसी भी जटिल संरचना की कोडिंग से पूर्व हाथ से कागज़ पर उसका खाका खींचना।"
+  },
+  {
+    name: "अनंत (Ananta)",
+    role: "अधो (पाताल) · अगाध आधार, धैर्य, संस्थागत स्थिरता व सहनशक्ति",
+    mode: "अडिग बुनियादी ढाँचा, दीर्घकालिक स्थायित्व एवं अटूट निष्ठा",
+    distortion: "रूढ़िवादिता का संकोच (Legacy Slogger Trap) — पुरानी हो चुकी विधियों से केवल आदतवश चिपके रहना।",
+    remedy: "बुनियादी ढाँचे का नियमित आधुनिकीकरण करें; पुनरावृत्ति वाले कार्यों को स्वचालित (Automate) करें।",
+    somatic: "गहरी निद्रा हेतु सायंकाल मांसपेशियों का क्रमिक विश्राम (Progressive Relaxation)।"
+  }
 ];
 
 // ── Critical Karmic Latent Points Detector ──────────────────────
@@ -254,7 +452,6 @@ export function detectKarmicLatentPoints(
   const result: KarmicLatentPoints = {};
 
   // 1. 22nd Drekkana (Kharesh) in D3
-  // In classical Shastras, 8th house from Lagna in D3 is decanate 22-24, starting with the 22nd Drekkana.
   if (d3) {
     const d3LagnaSignNum = d3.lagnaNum;
     const khareshSignNum = md(d3LagnaSignNum + 7, 12); // 8th house in D3
@@ -271,7 +468,6 @@ export function detectKarmicLatentPoints(
   }
 
   // 2. 64th Navamsha in D9
-  // In classical Shastras, the 64th Navamsha is 4th house in D9 from the Moon's Navamsha (which is 210° from Moon in D1).
   if (d9) {
     const moonInD9 = d9.planets.find(p => p.planet === "Moon");
     if (moonInD9) {
@@ -282,8 +478,8 @@ export function detectKarmicLatentPoints(
         planet: sixtyFourthLord,
         sign: SIGN_NAMES[sixtyFourthSignNum],
         house: 4,
-        triggerZone: `4th Navamsha from Moon (${SIGN_NAMES[sixtyFourthSignNum]}, ruled by ${sixtyFourthLord})`,
-        cognitiveShield: `When stress transits cross ${SIGN_NAMES[sixtyFourthSignNum]}, activate the '72-Hour Decision Rule' — avoid reactive contracts, confrontations, or impulsive financial liquidations until emotional arousal subsides.`
+        triggerZone: `चंद्र नवांश से चतुर्थ भाव (${SIGN_NAMES_HINDI[SIGN_NAMES[sixtyFourthSignNum]] || SIGN_NAMES[sixtyFourthSignNum]}, स्वामी: ${PLANET_NAMES_HINDI[sixtyFourthLord] || sixtyFourthLord})`,
+        cognitiveShield: `जब भी गोचर के क्रूर ग्रह ${SIGN_NAMES_HINDI[SIGN_NAMES[sixtyFourthSignNum]] || SIGN_NAMES[sixtyFourthSignNum]} राशि को पार करें, तब '७२-घंटे का निर्णय नियम' अपनाएँ — किसी भी आवेशपूर्ण अनुबंध, वाद-विवाद या वित्तीय जल्दबाजी से बचें जब तक कि मनोभाव शांत न हो जाएँ।`
       };
     }
   }
@@ -311,37 +507,37 @@ export function detectKarmicLatentPoints(
         // Fire signs: 7th (20°-23°20' Libra) & 9th (26°40'-30° Sag)
         if (degInSign >= 20.0 && degInSign < 23.3333) {
           isPushkar = true;
-          pNavSign = "Libra (Venus)";
+          pNavSign = "तुला (Libra · शुक्र)";
         } else if (degInSign >= 26.6667 && degInSign <= 30.0) {
           isPushkar = true;
-          pNavSign = "Sagittarius (Jupiter)";
+          pNavSign = "धनु (Sagittarius · गुरु)";
         }
       } else if (signType === 1) {
         // Earth signs: 3rd (6°40'-10° Pisces) & 5th (13°20'-16°40' Taurus)
         if (degInSign >= 6.6667 && degInSign < 10.0) {
           isPushkar = true;
-          pNavSign = "Pisces (Jupiter)";
+          pNavSign = "मीन (Pisces · गुरु)";
         } else if (degInSign >= 13.3333 && degInSign < 16.6667) {
           isPushkar = true;
-          pNavSign = "Taurus (Venus)";
+          pNavSign = "वृषभ (Taurus · शुक्र)";
         }
       } else if (signType === 2) {
         // Air signs: 6th (16°40'-20° Pisces) & 8th (23°20'-26°40' Taurus)
         if (degInSign >= 16.6667 && degInSign < 20.0) {
           isPushkar = true;
-          pNavSign = "Pisces (Jupiter)";
+          pNavSign = "मीन (Pisces · गुरु)";
         } else if (degInSign >= 23.3333 && degInSign < 26.6667) {
           isPushkar = true;
-          pNavSign = "Taurus (Venus)";
+          pNavSign = "वृषभ (Taurus · शुक्र)";
         }
       } else if (signType === 3) {
         // Water signs: 1st (0°-3°20' Cancer) & 3rd (6°40'-10° Virgo)
         if (degInSign >= 0.0 && degInSign < 3.3333) {
           isPushkar = true;
-          pNavSign = "Cancer (Moon)";
+          pNavSign = "कर्क (Cancer · चंद्र)";
         } else if (degInSign >= 6.6667 && degInSign < 10.0) {
           isPushkar = true;
-          pNavSign = "Virgo (Mercury)";
+          pNavSign = "कन्या (Virgo · बुध)";
         }
       }
 
@@ -350,7 +546,7 @@ export function detectKarmicLatentPoints(
           planet: p.planet,
           sign: p.sign,
           navamshaSign: pNavSign,
-          blessing: `${p.planet} in Pushkar Navamsha (${pNavSign}) provides extraordinary cellular resilience and cognitive recovery power, granting victory even through severe trials.`
+          blessing: `${PLANET_NAMES_HINDI[p.planet] || p.planet} पुष्कर नवांश (${pNavSign}) में स्थित होकर असाधारण आत्म-कायाकल्प, संकट-मुक्ति और अनपेक्षित सफलता का वरदान प्रदान करते हैं।`
         });
       }
     });
@@ -370,7 +566,7 @@ function resolveVargaDeityArchetype(
   lagnaDeg: number
 ): VargaDeityArchetype {
   if (vargaKey === "D10") {
-    const isOdd = lagnaNum % 2 === 0; // 0,2,4,6,8,10 are odd signs (Aries, Gemini, etc.)
+    const isOdd = lagnaNum % 2 === 0;
     const slice = Math.min(Math.floor(lagnaDeg / 3), 9);
     const digpala = isOdd ? DIGPALAS_ODD[slice] : [...DIGPALAS_ODD].reverse()[slice];
 
@@ -386,10 +582,38 @@ function resolveVargaDeityArchetype(
 
   if (vargaKey === "D4") {
     const kumaras = [
-      { name: "Sanaka", role: "Inward Contemplation & Soul Sanctuary", mode: "Detached asset ownership & tranquil sanctuary", distortion: "Property boundary paranoia", remedy: "Treat living spaces as a calm monastery rather than a status symbol.", somatic: "Evening room decluttering and low-amber lighting." },
-      { name: "Sanandana", role: "Joyful Contentment & Mental Peace", mode: "Family sanctuary harmony & domestic peace", distortion: "Over-idealizing physical comforts", remedy: "Anchor happiness in emotional presence rather than luxury upgrades.", somatic: "Post-dinner walk without smartphone; 10 slow diaphragmatic breaths." },
-      { name: "Sanatkumara", role: "Unaging Vitality & Focus", mode: "Sustainable home base for deep intellectual output", distortion: "Domestic restlessness", remedy: "Designate a dedicated, sacred workspace within home.", somatic: "Morning stretching on natural jute or bare floor." },
-      { name: "Sanatana", role: "Timeless Stability & Ancestral Earth", mode: "Long-term fixed real-estate compounding", distortion: "Fear of asset obsolescence", remedy: "Focus on enduring quality over rapid short-term flips.", somatic: "Walking barefoot on grass or clean earth for 10 minutes weekly." }
+      {
+        name: "सनक (Sanaka)",
+        role: "अंतर्मुखी आत्म-चिंतन व पवित्र गृह-आश्रम",
+        mode: "अनासक्त परिसंपत्ति स्वामित्व एवं शांत घरेलू अभयारण्य",
+        distortion: "संपत्ति व सीमा सुरक्षा को लेकर अत्यधिक संशय।",
+        remedy: "आवास को प्रतिष्ठा के प्रदर्शन के बजाय आंतरिक साधना का शांत स्थल मानें।",
+        somatic: "सायंकाल कक्ष को सुव्यवस्थित रखना और मंद प्रकाश का उपयोग।"
+      },
+      {
+        name: "सनन्दन (Sanandana)",
+        role: "हर्षित संतोष, पारिवारिक प्रेम व मानसिक शांति",
+        mode: "घरेलू सौहार्द, पारिवारिक प्रसन्नता एवं चित्त विश्रांति",
+        distortion: "भौतिक सुख-सुविधाओं का अत्यधिक आदर्शवादी मोह।",
+        remedy: "सुख को भौतिक वस्तुओं के स्थान पर भावनात्मक उपस्थिति में खोजें।",
+        somatic: "रात्रि भोजन के पश्चात बिना मोबाइल १० गहरी श्वास के साथ टहलना।"
+      },
+      {
+        name: "सनत्कुमार (Sanatkumara)",
+        role: "अजर ऊर्जा, अखंड एकाग्रता व बौद्धिक विस्तार",
+        mode: "गहन बौद्धिक सृजन हेतु सुदृढ़ व शांत कार्य-आधार",
+        distortion: "घरेलू परिवेश में निरंतर बेचैनी व असंतोष।",
+        remedy: "घर के भीतर अध्ययन व शोध हेतु एक समर्पित, शांत कोना निर्धारित करें।",
+        somatic: "प्रातः स्वच्छ भूमि या जूट के आसन पर शरीर को खींचने वाले सूक्ष्म व्यायाम।"
+      },
+      {
+        name: "सनातन (Sanatana)",
+        role: "शाश्वत स्थिरता, अचल संपदा व पूर्वज भूमि-कृपा",
+        mode: "दीर्घकालिक अचल परिसंपत्ति निर्माण एवं मूल्य संरक्षण",
+        distortion: "संपत्ति ह्रास या मूल्य घटने का अवचेतन भय।",
+        remedy: "अल्पकालिक खरीद-फरोख्त के बजाय टिकाऊ, ठोस परिसंपत्तियों पर ध्यान दें।",
+        somatic: "सप्ताह में एक बार प्राकृतिक मिट्टी या हरी दूब पर नंगे पाँव १० मिनट चलना।"
+      }
     ];
     const slice = Math.min(Math.floor(lagnaDeg / 7.5), 3);
     const k = kumaras[slice];
@@ -405,10 +629,38 @@ function resolveVargaDeityArchetype(
 
   if (vargaKey === "D12") {
     const pitraDeities = [
-      { name: "Ganesha", role: "Ancestral Obstacle Dissolution", mode: "Clearing foundational lineage blocks", distortion: "Hereditary hesitation before starting", remedy: "Acknowledge family sacrifices; build new habits with sovereign autonomy.", somatic: "Cold-water face splashing before launching new projects." },
-      { name: "Ashwini Kumaras", role: "Lineage Healing & Vitality Regeneration", mode: "Epigenetic cellular rejuvenation", distortion: "Carrying chronic familial health anxieties", remedy: "Implement clean nutrient density; break sedentary ancestral habits.", somatic: "Morning aerobic exercise and consistent meal timings." },
-      { name: "Yama", role: "Ancestral Karmic Accounting & Duty", mode: "Completing unfinished generational responsibilities", distortion: "Guilt-driven overworking for parental approval", remedy: "Honor ancestors through ethical excellence, not self-punishing martyrdom.", somatic: "Spine alignment stretches and boundaries on unpaid emotional labor." },
-      { name: "Sarpa", role: "Subconscious Lineage Wisdom & Kundalini", mode: "Transforming ancient karmic patterns into wisdom", distortion: "Hidden familial fears of betrayal", remedy: "Practice transparent, explicit communication in family affairs.", somatic: "Deep pranayama breathwork to calm autonomic fight-or-flight." }
+      {
+        name: "श्री गणेश (Ganesha)",
+        role: "पूर्वज विघ्न-विनाशक एवं कुल-आरंभक",
+        mode: "पारिवारिक रुकावटों का निवारण एवं नए मार्ग की रचना",
+        distortion: "नया कार्य आरंभ करने से पूर्व पैतृक संकोच व हिचकिचाहट।",
+        remedy: "पूर्वजों के त्याग का कृतज्ञतापूर्वक स्मरण कर स्वतंत्र उत्तरदायित्व के साथ आगे बढ़ें।",
+        somatic: "नए उद्यम के आरंभ से पूर्व शीतल जल से मुख प्रक्षालन व ध्यान।"
+      },
+      {
+        name: "अश्विनी कुमार (Ashwini Kumaras)",
+        role: "वंश आरोग्य, कायाकल्प एवं जैविक नव-ऊर्जा",
+        mode: "कोशिकीय पुनर्जीवन एवं आनुवंशिक स्वास्थ्य संवर्धन",
+        distortion: "परिवार के पुराने स्वास्थ्य संबंधी भयों को स्वयं पर आरोपित करना।",
+        remedy: "पोषक आहार अपनाएँ और पूर्वजों की गतिहीन आदतों को सक्रियता से तोड़ें।",
+        somatic: "प्रातः एरोबिक व्यायाम और भोजन के समय का कठोर अनुशासन।"
+      },
+      {
+        name: "यमराज (Yama)",
+        role: "पूर्वज कर्म-लेखा, मर्यादा व कर्तव्य-पालन",
+        mode: "अधूरे पारिवारिक दायित्वों की सत्यनिष्ठा से पूर्ति",
+        distortion: "माता-पिता की स्वीकृति हेतु स्वयं को अत्यधिक कष्ट देकर काम करना।",
+        remedy: "पूर्वजों का सम्मान आत्म-दंड से नहीं, बल्कि नैतिक उत्कृष्टता से करें।",
+        somatic: "मेरुदंड खिंचाव और मानसिक विश्राम के लिए नियमित प्राणायाम।"
+      },
+      {
+        name: "सर्प / शेषनाग (Sarpa)",
+        role: "अवचेतन कुल-ज्ञान, कुण्डलिनी शक्ति व गूढ़ समझ",
+        mode: "प्राचीन संस्कारों को उच्च आध्यात्मिक प्रज्ञा में रूपांतरित करना",
+        distortion: "पारिवारिक रिश्तों में विश्वासघात का अकारण अवचेतन भय।",
+        remedy: "पारिवारिक मामलों में पूर्ण पारदर्शी व स्पष्ट संवाद बनाए रखें।",
+        somatic: "गहन अनुलोम-विलोम प्राणायाम द्वारा घबराहट और भय का शमन।"
+      }
     ];
     const slice = Math.min(Math.floor(lagnaDeg / 2.5), 3);
     const d = pitraDeities[slice];
@@ -424,11 +676,46 @@ function resolveVargaDeityArchetype(
 
   if (vargaKey === "D30") {
     const bhutaDeities = [
-      { name: "Agni", role: "Fire Tatva · Will & Metabolism", mode: "Dynamic action without reactive rage", distortion: "Impulsive anger & sympathetic fight trigger", remedy: "Cognitive Pause: Never respond to perceived slights within 60 minutes.", somatic: "Physiological sigh and cold shower vagal stimulation." },
-      { name: "Vayu", role: "Air Tatva · Movement & Cognition", mode: "Intellectual agility without restless panic", distortion: "Chronic anxious rumination & scattered focus", remedy: "Grounding protocol: Single-task focus with physical pen-and-paper tracking.", somatic: "Barefoot ground contact and weighted blanket sleep." },
-      { name: "Indra", role: "Space Tatva · Authority & Governance", mode: "Sovereign humility & ethical leadership", distortion: "Entitlement bias and fragile ego reactions", remedy: "Practice radical service: Help someone who cannot return the favor.", somatic: "Morning sunlight walk with relaxed neck and shoulders." },
-      { name: "Kubera", role: "Earth Tatva · Matter & Resources", mode: "Grounded abundance & resource stewardship", distortion: "Hoarding mindset & scarcity panic", remedy: "Adopt an abundance reframe: Regularly circulate value into productive tools.", somatic: "Deliberate deep belly breathing before reviewing finances." },
-      { name: "Varuna", role: "Water Tatva · Emotion & Subconscious", mode: "Emotional regulation & psychic clarity", distortion: "Escapism, addictive avoidance & boundary loss", remedy: "Dopamine fasting: Zero passive social scrolling after 8 PM.", somatic: "Consistent hydration and evening chamomile or herbal grounding." }
+      {
+        name: "अग्नि देव (Agni)",
+        role: "अग्नि तत्व · इच्छाशक्ति, तेजस्विता एवं चयापचय",
+        mode: "बिना किसी क्रोध के सचेत व प्रभावी कर्म-ऊर्जा",
+        distortion: "क्षण-मात्र में भड़कने वाला क्रोध और आवेशपूर्ण प्रतिक्रिया।",
+        remedy: "संज्ञानात्मक विराम: किसी भी उकसावे पर कम से कम ६० मिनट तक कोई प्रतिक्रिया न दें।",
+        somatic: "दोहरी गहरी श्वास लेकर धीरे-धीरे छोड़ना व शीतल जल स्नान।"
+      },
+      {
+        name: "वायु देव (Vayu)",
+        role: "वायु तत्व · विचार-गति, चंचलता व संपर्क",
+        mode: "बौद्धिक फुर्ती बिना किसी अधीर घबराहट के",
+        distortion: "लगातार चिंता, विचारों का बिखराव और एकाग्रता का अभाव।",
+        remedy: "कागज-कलम पर लिखकर केवल एक समय में एक ही कार्य पर पूर्ण ध्यान केंद्रित करना।",
+        somatic: "नंगे पाँव भूमि-स्पर्श और आरामदायक भारी कंबल की निद्रा।"
+      },
+      {
+        name: "इंद्र देव (Indra)",
+        role: "आकाश तत्व · प्रभुत्व, अधिकार व संगठन",
+        mode: "विनम्र स्वायत्तता एवं नैतिक नेतृत्व",
+        distortion: "अधिकार-अहंकार और आलोचना पर तीखी भावनात्मक प्रतिक्रिया।",
+        remedy: "निस्वार्थ सेवा: किसी ऐसे व्यक्ति की गुप्त सहायता करें जो कभी प्रतिदान न दे सके।",
+        somatic: "प्रातः धूप में सीधे कंधे और शांत गर्दन के साथ चहलकदमी।"
+      },
+      {
+        name: "कुबेर देव (Kubera)",
+        role: "पृथ्वी तत्व · ठोस पदार्थ, साधन व स्थिरता",
+        mode: "स्थिर समृद्धि एवं संसाधनों का विवेकपूर्ण प्रबंधन",
+        distortion: "कंजूसी, संग्रह की भूख और धन नष्ट होने का भय।",
+        remedy: "समृद्धि दृष्टिकोण: उत्पादक उपकरणों और जनकल्याण में साधन लगाना सीखें।",
+        somatic: "वित्तीय समीक्षा से पूर्व ५ गहरी उदर-श्वास लेकर मन को शांत करना।"
+      },
+      {
+        name: "वरुण देव (Varuna)",
+        role: "जल तत्व · भावना, अंतःकरण व अंतर्ज्ञान",
+        mode: "भावनात्मक संतुलन एवं चित्त की निर्मलता",
+        distortion: "पलायनवाद, अस्वस्थ आदतों में उलझना और सीमाओं का लोप।",
+        remedy: "डिजिटल उपवास: रात्रि ८ बजे के बाद किसी भी निष्क्रिय सोशल मीडिया से पूर्ण दूरी।",
+        somatic: "पर्याप्त जलयोजन और सायंकाल सौम्य हर्बल पेय।"
+      }
     ];
     const slice = Math.min(Math.floor(lagnaDeg / 6), 4);
     const b = bhutaDeities[slice];
@@ -444,79 +731,79 @@ function resolveVargaDeityArchetype(
 
   if (vargaKey === "D5") {
     return {
-      name: "Brihaspati-Saraswati",
-      traditionalRole: "Purva Punya & High-Order Creative Intellect",
-      leadershipMode: "Intuitive mastery & unearned divine insight",
-      distortionLabel: "Intellectual Procrastination (Waiting for perfect inspiration)",
-      neuroEpigeneticRemedy: "Channel intuition into daily structured creation; honor the family intellectual legacy by publishing research.",
-      somaticCircadianHabit: "Dawn intellectual sprint (30 minutes of undisturbed writing or coding upon waking)."
+      name: "बृहस्पति-सरस्वती (Brihaspati-Saraswati)",
+      traditionalRole: "पूर्व-पुण्य, सूक्ष्म प्रज्ञा व उच्च रचनात्मक मेधा",
+      leadershipMode: "सहज अंतर्ज्ञान एवं अयाचित दिव्य मेधा शक्ति",
+      distortionLabel: "बौद्धिक प्रमाद (पूर्ण प्रेरणा की प्रतीक्षा में कार्य टालना)।",
+      neuroEpigeneticRemedy: "अंतर्ज्ञान को दैनिक अनुशासित सृजन में बदलें; शोध व लेखन द्वारा मेधा को मूर्त रूप दें।",
+      somaticCircadianHabit: "प्रातःकाल जागते ही ३० मिनट का निर्बाध सृजनात्मक कार्य या अध्ययन।"
     };
   }
 
   if (vargaKey === "D6") {
     return {
-      name: "Kartikeya-Rudra",
-      traditionalRole: "Victory over Adversaries & Disease Neutralization",
-      leadershipMode: "Relentless discipline, immune defense & competitive grit",
-      distortionLabel: "Conflict Avoidance or Adversarial Hyper-Vigilance",
-      neuroEpigeneticRemedy: "View competitors and health challenges as training weights; resolve litigation/debts with systematic audits.",
-      somaticCircadianHabit: "Cold hydro-resets, metabolic strength training, and strict inflammatory food elimination."
+      name: "कार्तिकेय-रुद्र (Kartikeya-Rudra)",
+      traditionalRole: "शत्रु-शमन, रोग प्रतिरोधकता व संघर्ष विजय",
+      leadershipMode: "अडिग अनुशासन, जैविक प्रतिरक्षा एवं प्रतिस्पर्धी जीवटता",
+      distortionLabel: "संघर्ष से पलायन अथवा निरंतर शत्रुता का अनावश्यक वहम।",
+      neuroEpigeneticRemedy: "प्रतिद्वंद्वियों और चुनौतियों को व्यायाम की तरह लें; विवादों व ऋणों को योजनाबद्ध रूप से सुलझाएँ।",
+      somaticCircadianHabit: "शीतल जल स्नान, मांसपेशियों का शक्ति-प्रशिक्षण एवं गरिष्ठ भोजन का त्याग।"
     };
   }
 
   if (vargaKey === "D8") {
     return {
-      name: "Mrityunjaya-Kaal",
-      traditionalRole: "Transmutation, Longevity Shield & Crisis Mastery",
-      leadershipMode: "Antifragile adaptability & thriving through volatility",
-      distortionLabel: "Catastrophizing & Fear of Sudden Loss",
-      neuroEpigeneticRemedy: "Build redundant safety buffers; embrace volatility as a mechanism of rapid evolution.",
-      somaticCircadianHabit: "Vagus nerve box-breathing (4s in, 4s hold, 4s out, 4s hold) during times of market or career flux."
+      name: "महामृत्युंजय-काल (Mrityunjaya-Kaal)",
+      traditionalRole: "रूपांतरण, दीर्घायु कवच एवं संकट-सिद्धि",
+      leadershipMode: "अस्थिरता में भी अप्रत्याशित उत्थान व अदम्य लचीलापन",
+      distortionLabel: "अनिष्ट की निरंतर आशंका एवं अचानक नुकसान का भय।",
+      neuroEpigeneticRemedy: "सुरक्षा के अतिरिक्त उपाय रखें; जीवन के उतार-चढ़ावों को चेतना की उच्च छलांग मानें।",
+      somaticCircadianHabit: "कठिन समय में सम-वृत्त प्राणायाम (४ सेकंड श्वास, ४ रोकें, ४ छोड़ें, ४ रोकें)।"
     };
   }
 
   if (vargaKey === "D11") {
     return {
-      name: "Rudra-Kubera",
-      traditionalRole: "Exponential Multiplication & Desire Fulfillment",
-      leadershipMode: "Non-linear revenue channels & removing scarcity ceilings",
-      distortionLabel: "Linear Income Glass-Ceiling (Equating time directly to money)",
-      neuroEpigeneticRemedy: "Architect scalable software, automated systems and equity investments that detach earnings from manual hours.",
-      somaticCircadianHabit: "Weekly 2-hour strategic focus block dedicated exclusively to scalable leverage and distribution."
+      name: "रुद्र-कुबेर (Rudra-Kubera)",
+      traditionalRole: "संपत्ति बहु-गुणन एवं उच्चतम अभिलाषा पूर्ति",
+      leadershipMode: "गैर-रेखीय वित्तीय विस्तार एवं सीमित सीमाओं को तोड़ना",
+      distortionLabel: "सीमित आय का मानसिक दायरा (समय को सीधे धन से तौलना)।",
+      neuroEpigeneticRemedy: "ऐसी स्वचालित प्रणालियों और संपत्तियों का निर्माण करें जो आपकी भौतिक उपस्थिति के बिना भी आय दें।",
+      somaticCircadianHabit: "सप्ताह में २ घंटे का एकांत चिंतन केवल विस्तार और वितरण रणनीतियों पर केंद्रित।"
     };
   }
 
   if (vargaKey === "D9") {
-    const amshaType = lagnaNum % 3 === 0 ? "Deva" : lagnaNum % 3 === 1 ? "Nara" : "Rakshasa";
+    const amshaType = lagnaNum % 3 === 0 ? "देव" : lagnaNum % 3 === 1 ? "नर" : "राक्षस";
     return {
-      name: `${amshaType} Navamsha`,
-      traditionalRole: "Inner Soul Dharma & Sacred Relationship Synergy",
-      leadershipMode: amshaType === "Deva" ? "Benevolent high-trust partnership" : amshaType === "Nara" ? "Pragmatic balanced collaboration" : "Intense transformative drive",
-      distortionLabel: "Relationship Projection & Unspoken Contract Traps",
-      neuroEpigeneticRemedy: "Practice transparent, radical honesty in partnerships; release unrealistic romantic pedestals.",
-      somaticCircadianHabit: "Evening joint gratitude reflection and intentional device-free conversational space."
+      name: `${amshaType} नवांश अधिदेवता`,
+      traditionalRole: "आत्मिक धर्म, दांपत्य संगति व पवित्र सह-जीवन",
+      leadershipMode: amshaType === "देव" ? "उदात्त विश्वास व परोपकारी साझेदारी" : amshaType === "नर" ? "व्यावहारिक, संतुलित एवं यथार्थवादी सहयोग" : "तीव्र परिवर्तनकारी व साहसी सामर्थ्य",
+      distortionLabel: "संबंधों में अनकही अपेक्षाएँ थोपना एवं काल्पनिक आदर्शवाद का मोह।",
+      neuroEpigeneticRemedy: "साझेदारी में पूर्ण स्पष्टता और निर्मल सत्यनिष्ठा रखें; अवास्तविक अपेक्षाओं से मुक्त हों।",
+      somaticCircadianHabit: "सायंकाल साथी के साथ बिना किसी फोन के सौहार्दपूर्ण संवाद व कृतज्ञता भाव।"
     };
   }
 
   if (vargaKey === "D60") {
     return {
-      name: "Sanchita Divine Amsha",
-      traditionalRole: "Root Past-Life Karmic Dispensation & Final Sanction",
-      leadershipMode: "Soul-purpose alignment & fulfilling deep life destiny",
-      distortionLabel: "Existential Meaning Crisis",
-      neuroEpigeneticRemedy: "Align career and actions with genuine dharmic service; clear past-life karmic loans through selfless value creation.",
-      somaticCircadianHabit: "10 minutes of daily silent contemplation on mortality and essential soul priorities."
+      name: "संचित दिव्य षष्ट्यंश (Sanchita Divine Amsha)",
+      traditionalRole: "मूल पूर्वजन्म संचित कर्म, प्रारब्ध विधान व अंतिम ईश्वरीय निर्णय",
+      leadershipMode: "आत्मिक गंतव्य का साक्षात्कार एवं प्रारब्ध ऋणों का निष्काम शोधन",
+      distortionLabel: "अस्तित्ववादी संशय ('मेरे ही साथ ऐसा क्यों?') एवं कर्म से विरक्ति।",
+      neuroEpigeneticRemedy: "अपने कार्य को लोक-कल्याण और धर्म के साथ जोड़ें; निष्काम सेवा से पूर्व कर्मों के बंधनों को काटें।",
+      somaticCircadianHabit: "दैनिक १० मिनट जीवन की नश्वरता और आत्मा के मूल उद्देश्य पर मौन चिंतन।"
     };
   }
 
   // Default Vedic Archetype
   return {
-    name: "Surya-Prajapati",
-    traditionalRole: "Universal Life Force & Micro-Karma Coordination",
-    leadershipMode: "Grounded responsibility, clarity of purpose and steady execution",
-    distortionLabel: "Passive Drift & Micro-Distraction",
-    neuroEpigeneticRemedy: "Harmonize individual efforts with cosmic natural law through daily disciplined routines.",
-    somaticCircadianHabit: "Consistent morning wake-up schedule aligned with natural dawn daylight."
+    name: "सूर्य-प्रजापति (Surya-Prajapati)",
+    traditionalRole: "सार्वभौमिक प्राण-शक्ति एवं सूक्ष्म कर्म नियमन",
+    leadershipMode: "ठोस उत्तरदायित्व, उद्देश्य की स्पष्टता एवं नियमित कर्मठता",
+    distortionLabel: "उद्देश्यहीन भटकाव एवं सूक्ष्म विकर्षणों में समय गँवाना।",
+    neuroEpigeneticRemedy: "दैनिक अनुशासित दिनचर्या द्वारा अपने व्यक्तिगत प्रयासों को प्रकृति के नियमों के अनुकूल करें।",
+    somaticCircadianHabit: "प्रातः सूर्योदय की प्राकृतिक आभा के साथ नियमित रूप से जागने का नियम।"
   };
 }
 
@@ -527,13 +814,14 @@ export function evaluateVargaNeuroKarmicProfile(
   allVargas: DivChart[]
 ): VargaNeuroKarmicProfile {
   const vMeta = VARGA_DOMAINS[varga.key] || {
-    title: `${varga.name} Domain Analysis`,
+    title: `${varga.name} चक्र विश्लेषण`,
     karakas: ["Sun"],
-    focusArea: "General life expansion"
+    focusArea: "जीवन के इस सूक्ष्म आयाम का संवर्धन",
+    shastricEssence: "पाराशरी सूक्ष्म फलित का विशेष परिप्रेक्ष्य"
   };
 
-  const natalLagnaNum = natalChart.lagnaNum;
-  const vargaLagnaNum = varga.lagnaNum;
+  const natalLagnaNum = natalChart.lagnaNum || 1;
+  const vargaLagnaNum = varga.lagnaNum || 1;
   const houseOffsetFromNatal = md(vargaLagnaNum - natalLagnaNum, 12) + 1;
 
   // 1. Detect Critical Karmic Latent Points (Kharesh 22nd Drekkana, 64th Navamsha, Pushkar Navamshas)
@@ -545,18 +833,21 @@ export function evaluateVargaNeuroKarmicProfile(
   const lagnaDeg = natalChart.lagnaLon ? md(natalChart.lagnaLon, 30) : 15;
   const deityArchetype = resolveVargaDeityArchetype(varga.key, vargaLagnaNum, lagnaDeg);
 
-  // 3. Natal Lagna Relation Synthesis
+  // 3. Natal Lagna Relation Synthesis in Pure Dignified Hindi
   let natalRelationDesc = "";
+  const vargaLagnaName = SIGN_NAMES_HINDI[varga.lagna] || varga.lagna;
+  const natalLagnaName = SIGN_NAMES_HINDI[natalChart.lagnaRashi] || natalChart.lagnaRashi;
+
   if (houseOffsetFromNatal === 1) {
-    natalRelationDesc = `${varga.key} Lagna exactly matches Natal Lagna (${varga.lagna}) — High harmonic resonance (Vargottama Lagna quality); natural life promise materializes with minimal internal friction.`;
+    natalRelationDesc = `${varga.key} लग्न एवं जन्म लग्न दोनों ${vargaLagnaName} हैं (वर्गोत्तम लग्न) — यह उच्च आत्मिक सामंजस्य का प्रतीक है; इस क्षेत्र के संकल्प बिना किसी आंतरिक संघर्ष के सहजता से मूर्त रूप लेते हैं।`;
   } else if ([5, 9].includes(houseOffsetFromNatal)) {
-    natalRelationDesc = `${varga.key} Lagna falls in House ${houseOffsetFromNatal} (Trikona) from Natal Lagna — Inherent dharmic support, fortunate intuitive flow and past-life merit activation in this domain.`;
+    natalRelationDesc = `${varga.key} लग्न, जन्म लग्न (${natalLagnaName}) से ${houseOffsetFromNatal}वें भाव (त्रिकोण) में उदित है — यह पूर्व-जन्म के पुण्य, स्वाभाविक अंतर्ज्ञान और इस क्षेत्र में स्वतः प्राप्त होने वाले ईश्वरीय सहयोग को प्रमाणित करता है।`;
   } else if ([4, 7, 10].includes(houseOffsetFromNatal)) {
-    natalRelationDesc = `${varga.key} Lagna falls in House ${houseOffsetFromNatal} (Kendra) from Natal Lagna — High executive action, worldly manifestation capacity and dynamic energy deployment.`;
+    natalRelationDesc = `${varga.key} लग्न, जन्म लग्न (${natalLagnaName}) से ${houseOffsetFromNatal}वें भाव (केंद्र) में उदित है — यह कर्मठता, सामाजिक दायित्व और पुरुषार्थ के बल पर ठोस सांसारिक उपलब्धियों के निर्माण की क्षमता देता है।`;
   } else if ([6, 8, 12].includes(houseOffsetFromNatal)) {
-    natalRelationDesc = `${varga.key} Lagna falls in House ${houseOffsetFromNatal} (Dusthana) from Natal Lagna — Transformational domain requiring deliberate conscious effort, discipline and karmic clearing.`;
+    natalRelationDesc = `${varga.key} लग्न, जन्म लग्न (${natalLagnaName}) से ${houseOffsetFromNatal}वें भाव (त्रिक / दुःस्थान) में उदित है — यह एक परिवर्तनकारी क्षेत्र है, जहाँ अनुशासन, धैर्य और चेतन संकल्प के माध्यम से ही स्थाई सिद्धि प्राप्त होती है।`;
   } else {
-    natalRelationDesc = `${varga.key} Lagna falls in House ${houseOffsetFromNatal} from Natal Lagna (${natalChart.lagnaRashi}) — Shapes specific secondary house growth through deliberate life focus.`;
+    natalRelationDesc = `${varga.key} लग्न, जन्म लग्न (${natalLagnaName}) से ${houseOffsetFromNatal}वें उपचय/वृद्धि भाव में उदित है — यह निरंतर अभ्यास, सजगता और व्यावहारिक संतुलन के माध्यम से जीवन के इस आयाम को उत्तरोत्तर समृद्ध करता है।`;
   }
 
   // 4. Planetary Audits in Varga
@@ -570,52 +861,55 @@ export function evaluateVargaNeuroKarmicProfile(
   const paragraphs: string[] = [];
   const keyHighlights: string[] = [];
 
-  const natalLagnesh = SIGN_LORDS[natalChart.lagnaNum] ?? "Lagnesh";
+  const natalLagnesh = SIGN_LORDS[natalLagnaNum] ?? "Mercury";
+  const natalLagneshHindi = PLANET_NAMES_HINDI[natalLagnesh] || natalLagnesh;
 
-  // P1: Lagna alignment
+  // Paragraph 1: Lagna Alignment & D1 Connection
   paragraphs.push(
-    `Aapke Natal Chart (D-1) me ${natalChart.lagnaRashi} Lagna udit hai, jiska swami (Lagnesh) ${natalLagnesh} hai. Jab hum ${varga.name} (${varga.key}) me pravesh karte hain, to yahan Lagna ${varga.lagna} ban jata hai, jo Natal Lagna se ${houseOffsetFromNatal}th position par hai. Yeh shastric configuration batati hai ki is varga ke vishay (${vMeta.focusArea}) aapki core personality ke sath kis tarah interact karte hain.`
+    `आपकी मूल जन्म कुंडली (D-1) में ${natalLagnaName} लग्न उदित है, जिसके स्वामी लग्नेश ${natalLagneshHindi} हैं। जब हम ${vMeta.title} से जुड़े ${varga.name} चक्र (${varga.key}) का सूक्ष्म विश्लेषण करते हैं, तो यहाँ ${vargaLagnaName} लग्न का उदय होता है, जो मूल जन्म लग्न से ${houseOffsetFromNatal}वें भाव में संरेखित है। शास्त्रीय ज्योतिष के अनुसार यह स्थिति स्पष्ट करती है कि आपका मूल व्यक्तित्व किस प्रकार इस विशिष्ट जीवन आयाम में सक्रिय होता है और आपके अंतर्मन के संकल्प भौतिक जगत में कैसे फलित होते हैं।`
   );
 
-  // P2: Deity Archetype Integration
+  // Paragraph 2: Deity Archetype Integration
   paragraphs.push(
-    `Is varga chart ke Lagna par ${deityArchetype.name} (${deityArchetype.traditionalRole}) ka prabhav hai. Shastric siddhanton ke anusar, yeh adhidevata is kshetra me aapke antahkaran ko "${deityArchetype.leadershipMode}" ki urja pradan karta hai. Jab aap apne daily karma ko is shastric archetype ke sath align karte hain, to subconscious resistance samapt hoti hai aur execution velocity badh jati hai.`
+    `इस वर्ग चक्र के लग्न पर अधिदेवता ${deityArchetype.name} का सूक्ष्म आधिपत्य है, जो ${deityArchetype.traditionalRole} की ऊर्जा का प्रतिनिधित्व करते हैं। महर्षि पाराशर के अनुसार, जब जातक अपने दैनिक कर्म और निर्णय-प्रक्रिया को इस अधिदेवता के सात्विक स्वरूप ("${deityArchetype.leadershipMode}") के साथ संरेखित करता है, तब अवचेतन मन का संशय और आंतरिक घर्षण स्वतः समाप्त हो जाता है। इससे कार्य निष्पादन में अप्रत्याशित स्पष्टता और गतिशीलता का संचार होता है।`
   );
-  keyHighlights.push(`Adhidevata Archetype: ${deityArchetype.name} (${deityArchetype.leadershipMode})`);
+  keyHighlights.push(`अधिदेवता संरेखण: ${deityArchetype.name}`);
 
-  // P3: Varga Karaka & Strong Planets
-  const karakaNames = vMeta.karakas.join(", ");
+  // Paragraph 3: Varga Karaka & Strong Planets
+  const karakaHindiNames = vMeta.karakas.map(k => PLANET_NAMES_HINDI[k] || k).join(", ");
   const karakaInVarga = varga.planets.filter(p => vMeta.karakas.includes(p.planet));
   const strongInVarga = [...exaltedPlanets, ...ownPlanets];
 
   if (strongInVarga.length > 0) {
-    const strongStr = strongInVarga.map(p => `${p.planet} in ${p.sign} (${p.dignity}, House ${p.house})`).join("; ");
+    const strongStr = strongInVarga
+      .map(p => `${PLANET_NAMES_HINDI[p.planet] || p.planet} (${SIGN_NAMES_HINDI[p.sign] || p.sign} में ${p.dignity === "Exalted" ? "उच्च" : "स्वक्षेत्री"}, ${p.house}वां भाव)`)
+      .join("; ");
     paragraphs.push(
-      `Is varga chart me shastric shakti ka prabal kendra hai: ${strongStr}. Parashari siddhanton ke anusar, jab koi graha varga kundali me ucch ya swakshetra hota hai, to wo sambandhit jeevan kshetra me vyakti ko unearned karmic advantage aur extraordinary breakthrough capacity deta hai.`
+      `इस वर्ग चक्र में शास्त्रीय शक्ति का मुख्य केंद्र: ${strongStr} है। शास्त्रों का यह अटल नियम है कि जब कोई ग्रह वर्ग कुंडली में उच्च या स्वक्षेत्री होकर केंद्र या त्रिकोण में बैठता है, तो वह उस विशिष्ट जीवन क्षेत्र में जातक को असाधारण योग्यता, अप्रत्याशित विजय और सहज सामर्थ्य का वरदान देता है।`
     );
-    keyHighlights.push(`Prabal Shakti Kendra: ${strongInVarga.map(p => `${p.planet} (${p.dignity})`).join(", ")}`);
+    keyHighlights.push(`प्रबल शक्ति केंद्र: ${strongInVarga.map(p => `${PLANET_NAMES_HINDI[p.planet] || p.planet} (${p.dignity === "Exalted" ? "उच्च" : "स्वक्षेत्री"})`).join(", ")}`);
   } else {
     paragraphs.push(
-      `Is varga chart me planetary placement santulit (balanced) hai. Yahan ka mukhya karaka (${karakaNames}) House ${karakaInVarga.map(k => k.house).join(", ")} me sthit hokar is varga ki urja ko drive karta hai.`
+      `इस वर्ग चक्र में ग्रहों की स्थिति अत्यंत संतुलित और अनुशासित है। यहाँ के मुख्य कारक ग्रह (${karakaHindiNames}) वर्ग चक्र के महत्वपूर्ण भावों (विशेषतः भाव ${karakaInVarga.map(k => k.house).join(", ")}) में स्थित होकर ऊर्जा को संचालित कर रहे हैं। यह संतुलन दर्शाता है कि इस क्षेत्र में सफलता किसी आकस्मिक चमत्कार से नहीं, बल्कि आपके सतत अभ्यास और सुव्यवस्थित प्राथमिकताओं से निर्मित होगी।`
     );
   }
 
-  // P4: Specialized Varga Insights & Critical Latent Points
+  // Paragraph 4: Specialized Varga Insights & Critical Latent Points
   if (varga.key === "D10") {
     const sun = varga.planets.find(p => p.planet === "Sun");
     const rahu = varga.planets.find(p => p.planet === "Rahu");
     const merc = varga.planets.find(p => p.planet === "Mercury");
     if (merc?.house === 11 && merc?.dignity === "Exalted") {
       paragraphs.push(
-        `D-10 ke 11th house (Labha / Revenue / Network) me Budha (Mercury) UCHHA (Exalted in Kanya) hokar virajman hai. Yeh D-10 ka apex commercial signature hai — yeh declare karta hai ki aapka main financial expansion scalable tech products, algorithms, quantitative models aur automated systems se aayega.`
+        `दशमांश (D-10) के एकादश भाव (लाभ, नेटवर्क व व्यावसायिक विस्तार) में बुध देव अपनी उच्च राशि (कन्या) में विराजमान हैं। यह दशमांश चक्र का सर्वोच्च व्यापारिक व तकनीकी हस्ताक्षर है — यह स्पष्ट घोषणा करता है कि आपका मुख्य आर्थिक विस्तार परिष्कृत बौद्धिक कौशल, तकनीकी समाधानों, एल्गोरिदम और सुव्यवस्थित स्वचालित प्रणालियों से प्राप्त होगा।`
       );
-      keyHighlights.push("D-10 H11: Exalted Mercury (Algorithmic / Tech Revenue)");
+      keyHighlights.push("D-10 एकादश भाव: उच्च बुध (तकनीकी व व्यावसायिक महालाभ)");
     }
     if (sun && rahu && sun.house === rahu.house) {
       paragraphs.push(
-        `D-10 ke House ${sun.house} me Surya aur Rahu ki yuti hai. 10th lord ka Rahu ke sath aana traditional distribution ke bajay cutting-edge digital platforms, global outreach aur non-traditional high-leverage domains me authority deta hai.`
+        `दशमांश के भाव ${sun.house} में सूर्य और राहु की युति स्थित है। कर्मक्षेत्र में राहु की यह सक्रियता पारंपरिक सीमाओं को तोड़कर आधुनिक डिजिटल प्लेटफॉर्म्स, वैश्विक संपर्कों और अपरंपरागत प्रभावशाली माध्यमों में आपको स्वतंत्र अधिकार व प्रतिष्ठा प्रदान करती है।`
       );
-      keyHighlights.push(`D-10 H${sun.house}: Sun + Rahu (Global / Digital Scaling)`);
+      keyHighlights.push(`D-10 भाव ${sun.house}: सूर्य + राहु युति (वैश्विक व डिजिटल विस्तार)`);
     }
   } else if (varga.key === "D9") {
     const moon = varga.planets.find(p => p.planet === "Moon");
@@ -623,84 +917,91 @@ export function evaluateVargaNeuroKarmicProfile(
     const merc = varga.planets.find(p => p.planet === "Mercury");
     if (merc?.house === 4 && merc?.dignity === "Exalted") {
       paragraphs.push(
-        `D-9 ke 4th house me Budha ucch sthiti me baitha hai, jo aatma ke antahkaran me high discernment, intellectual clarity aur dharmic grounding ko darshata hai.`
+        `नवांश (D-9) के चतुर्थ भाव में बुध देव उच्च स्थिति में स्थित हैं, जो आपकी आत्मा के अंतःकरण में तीव्र विवेक, नैतिक स्पष्टता और उच्च बौद्धिक शांति को स्थापित करते हैं।`
       );
-      keyHighlights.push("D-9 H4: Exalted Mercury (Soul Discernment)");
+      keyHighlights.push("D-9 चतुर्थ भाव: उच्च बुध (आत्मिक विवेक व मानसिक शांति)");
     }
     if (moon && rahu && moon.house === 7 && rahu.house === 7) {
       paragraphs.push(
-        `D-9 ke 7th house (Kalatra Bhava) me Chandra aur Rahu ki yuti sthit hai. Yeh combination darshata hai ki partner magnetic, highly ambitious, open-minded aur aisi shaksiyat hoga jo standard societal convention se bahar sochti ho.`
+        `नवांश के सप्तम भाव (कलत्र भाव) में चंद्र और राहु की युति यह इंगित करती है कि जीवनसाथी अत्यंत महत्वाकांक्षी, आधुनिक सोच रखने वाला, बौद्धिक रूप से स्वतंत्र और लीक से हटकर विचार करने वाला व्यक्तित्व होगा।`
       );
-      keyHighlights.push("D-9 H7: Moon + Rahu (Magnetic & Unconventional Partnership)");
+      keyHighlights.push("D-9 सप्तम भाव: चंद्र + राहु युति (विशिष्ट व स्वतंत्र जीवनसाथी)");
     }
     if (latentPoints.sixtyFourthNavamsha) {
       paragraphs.push(
-        `Critical Karmic Point: Chandra ke navamsha se 4th house (64th Navamsha) ${latentPoints.sixtyFourthNavamsha.sign} rashi me padta hai, jiska swami ${latentPoints.sixtyFourthNavamsha.planet} hai. Yeh transit stress me cognitive shock aur jaldbazi se decision lene ka trigger zone hai. Is transit ke samay emotional reactive commitments se bachna hi shastric kavach hai.`
+        `विशेष कार्मिक सतर्कता (६४वाँ नवांश): चंद्र नवांश से चतुर्थ भाव (${SIGN_NAMES_HINDI[latentPoints.sixtyFourthNavamsha.sign] || latentPoints.sixtyFourthNavamsha.sign}) जिसके स्वामी ${PLANET_NAMES_HINDI[latentPoints.sixtyFourthNavamsha.planet] || latentPoints.sixtyFourthNavamsha.planet} हैं, सूक्ष्म तनाव का संवेदनशील बिंदु है। इस राशि पर से होने वाले गोचर के समय आवेशपूर्ण अनुबंधों या त्वरित भावनात्मक प्रतिक्रियाओं से बचना ही सर्वोत्तम शास्त्रीय सुरक्षा कवच है।`
       );
-      keyHighlights.push(`64th Navamsha: ${latentPoints.sixtyFourthNavamsha.sign} (${latentPoints.sixtyFourthNavamsha.planet})`);
+      keyHighlights.push(`६४वाँ नवांश संवेदनशील बिंदु: ${latentPoints.sixtyFourthNavamsha.sign} (${latentPoints.sixtyFourthNavamsha.planet})`);
     }
   } else if (varga.key === "D3" && latentPoints.kharesh22ndDrekkana) {
     paragraphs.push(
-      `Drekkana Sensitive Point: D-3 ke Lagna se 8th house (22nd Drekkana / Kharesh) ${latentPoints.kharesh22ndDrekkana.sign} me sthit hai, jiska swami ${latentPoints.kharesh22ndDrekkana.planet} hai. Yeh shastric bindu body ke us physiological system ko represent karta hai jo generational epigenetic stress ke prati sabse adhik sensitive hai: ${latentPoints.kharesh22ndDrekkana.organSystem}.`
+      `द्रेष्काण का संवेदनशील बिंदु (२२वाँ द्रेष्काण / ख्रेश): D-3 लग्न से अष्टम भाव ${SIGN_NAMES_HINDI[latentPoints.kharesh22ndDrekkana.sign] || latentPoints.kharesh22ndDrekkana.sign} राशि में पड़ता है, जिसके अधिपति ${PLANET_NAMES_HINDI[latentPoints.kharesh22ndDrekkana.planet] || latentPoints.kharesh22ndDrekkana.planet} देव हैं। यह बिंदु शरीर के ${latentPoints.kharesh22ndDrekkana.organSystem} तंत्र की संवेदनशीलता को दर्शाता है, जहाँ नियमित प्राणायाम और तनाव-मुक्ति अत्यंत आवश्यक है।`
     );
-    keyHighlights.push(`22nd Drekkana (Kharesh): ${latentPoints.kharesh22ndDrekkana.planet} (${latentPoints.kharesh22ndDrekkana.sign})`);
+    keyHighlights.push(`२२वाँ द्रेष्काण (ख्रेश बिंदु): ${latentPoints.kharesh22ndDrekkana.planet} (${latentPoints.kharesh22ndDrekkana.sign})`);
   } else if (varga.key === "D5") {
     paragraphs.push(
-      `D-5 (Panchamsha) purva-punya aur unearned intuition ka chakra hai. Isme 5th/9th bhava ka santulan batata hai ki pichhle janmon ke sanchita shastric sanskar is jeevan me creative flow aur high-fluid intelligence bankar activate ho rahe hain.`
+      `पंचमांश चक्र (D-5) पूर्व-पुण्य और अतींद्रिय अंतर्ज्ञान का सूक्ष्म दर्पण है। इस चक्र में शुभ प्रभाव यह सिद्ध करते हैं कि पूर्व जन्मों के सात्विक संस्कार इस जन्म में आपकी सृजनात्मक प्रज्ञा और स्वतः स्फूर्त निर्णय क्षमता बनकर फलित हो रहे हैं।`
     );
-    keyHighlights.push("D-5: Purva-Punya & Unearned Intuition Active");
+    keyHighlights.push("D-5: पूर्व-पुण्य एवं अंतर्ज्ञान सक्रिय");
   } else if (varga.key === "D6") {
     paragraphs.push(
-      `D-6 (Shashthamsha) biological immunity aur competitive victory ko darshata hai. Is chakra ke upachaya bhavon me grahon ki sthiti yeh nirdharit karti hai ki aap sharirik aur manasik dabav me kitni tezi se bounce-back kar sakte hain.`
+      `षष्ठांश चक्र (D-6) जीवन में आने वाली व्याधियों, ऋणों और प्रतिस्पर्धियों पर विजय का सूचक है। उपचय भावों की सुदृढ़ता यह सुनिश्चित करती है कि किसी भी प्रकार का विरोध या संकट आपके धैर्य को डिगा नहीं सकेगा, बल्कि वह आपको और अधिक परिपक्व बनाएगा।`
     );
-    keyHighlights.push("D-6: Immune Grit & Adversary Neutralization");
+    keyHighlights.push("D-6: रोग-प्रतिरोधक क्षमता व प्रतिस्पर्धी विजय");
   } else if (varga.key === "D8") {
     paragraphs.push(
-      `D-8 (Ashtamsha) akasmik jeevan parivartanon (sudden inflection points) aur longevity reserve ko mapta hai. Yeh chakra batata hai ki life ke sudden shocks aapke liye trauma banenge ya transformative breakthroughs.`
+      `अष्टमांश चक्र (D-8) अचानक होने वाले जीवन रूपांतरणों और दीर्घायु की आंतरिक शक्ति को मापता है। यह चक्र दर्शाता है कि अप्रत्याशित उतार-चढ़ाव आपके लिए आघात नहीं, बल्कि चेतना के नए क्षितिज खोलने वाले क्रांतिकारी अवसर सिद्ध होंगे।`
     );
-    keyHighlights.push("D-8: Antifragile Transformation Threshold");
+    keyHighlights.push("D-8: रूपांतरण एवं संकट-सिद्धि सामर्थ्य");
   } else if (varga.key === "D11") {
     paragraphs.push(
-      `D-11 (Rudramsha) non-linear wealth multiplication aur major desire fulfillment ka micro-karma lens hai. Yeh standard salary limits ko todkar high-magnitude scale create karne ki capacity ko verify karta hai.`
+      `रुद्रांश चक्र (D-11) संपत्ति के बहु-गुणन और उच्चतम अभिलाषाओं की पूर्ति का सूक्ष्म नियामक है। यह सामान्य वेतन अथवा सीमित आय के बंधनों से ऊपर उठकर व्यापक वित्तीय साम्राज्य स्थापित करने की सामर्थ्य को पुष्ट करता है।`
     );
-    keyHighlights.push("D-11: Exponential Multi-Stream Capital Scaling");
+    keyHighlights.push("D-11: बहु-आयामी संपत्ति व अभिलाषा पूर्ति");
   } else if (varga.key === "D60") {
     const merc = varga.planets.find(p => p.planet === "Mercury");
     const sun = varga.planets.find(p => p.planet === "Sun");
     const moon = varga.planets.find(p => p.planet === "Moon");
     if (merc?.inLagna) {
       paragraphs.push(
-        `D-60 (Shashtiamsha) ke Lagna me Budha ka baithna yeh confirm karta hai ki aapki mathematical, computational aur logical abilities is janam ki learning nahi hain; yeh pichhle kai janmon ke sanchita sanskar hain.`
+        `षष्ट्यंश चक्र (D-60) के लग्न में बुध देव की स्थिति यह प्रमाणित करती है कि आपकी गणितीय, तार्किक और विश्लेषणात्मक मेधा केवल इस जन्म का अध्ययन नहीं है, अपितु यह कई जन्मों के संचित संस्कारों का सुफल है।`
       );
-      keyHighlights.push("D-60 Lagna: Mercury (Past-Life Algorithmic Memory)");
+      keyHighlights.push("D-60 लग्न: बुध (पूर्व-जन्म संचित तार्किक मेधा)");
     }
     if (sun?.house === 9 && moon?.house === 9) {
       paragraphs.push(
-        `D-60 ke 9th house of Dharma & Pitra me Surya aur Chandra dono virajman hain. Yeh sacred shastric lineage aur purvajon ke aashirwaad ka prabal prateek hai.`
+        `D-60 के नवम भाव (धर्म व पितृ भाव) में सूर्य और चंद्र दोनों देव विराजमान हैं। यह पवित्र कुल परंपरा और पूर्वजों के विशेष शुभाशीष का दुर्लभ शास्त्रीय प्रतीक है।`
       );
-      keyHighlights.push("D-60 H9: Sun + Moon (Ancestral Wisdom Lineage)");
+      keyHighlights.push("D-60 नवम भाव: सूर्य + चंद्र (पूर्वज शुभाशीष एवं धर्म रक्षा)");
     }
   }
 
   // Pushkar Navamsha Recognition
   if (latentPoints.pushkarNavamshas && latentPoints.pushkarNavamshas.length > 0) {
-    const pNames = latentPoints.pushkarNavamshas.map(p => `${p.planet} in ${p.navamshaSign}`).join(", ");
+    const pNames = latentPoints.pushkarNavamshas
+      .map(p => `${PLANET_NAMES_HINDI[p.planet] || p.planet} (${p.navamshaSign})`)
+      .join(", ");
     paragraphs.push(
-      `Pushkar Navamsha Aashirwaad: Aapke chart me shastric Pushkar Navamsha ke shubh ansha active hain (${pNames}). Pushkar Navamsha grahon ko aisi regenerative neuroplasticity pradan karta hai jisse vyakti ghor chunautiyon ke baad bhi unexpected rebirth aur high-order growth achieve karta hai.`
+      `पुष्कर नवांश का दैवीय आशीर्वाद: आपकी कुंडली में पुष्कर नवांश के अमृत अंश सक्रिय हैं (${pNames})। वैदिक ज्योतिष में पुष्कर नवांश को नव-जीवन और अप्रत्याशित कायाकल्प का कारक माना गया है, जो जातक को घोर संकटों के उपरांत भी असाधारण उत्थान और सफलता प्रदान करता है।`
     );
-    keyHighlights.push(`Pushkar Navamsha Active: ${latentPoints.pushkarNavamshas.map(p => p.planet).join(", ")}`);
+    keyHighlights.push(`पुष्कर नवांश अमृत सक्रिय: ${latentPoints.pushkarNavamshas.map(p => p.planet).join(", ")}`);
   }
 
   // Lagna Occupants
   if (lagnaPlanets.length > 0) {
-    const lagnaPStr = lagnaPlanets.map(p => `${p.planet} (${p.sign})`).join(", ");
+    const lagnaPStr = lagnaPlanets
+      .map(p => `${PLANET_NAMES_HINDI[p.planet] || p.planet} (${SIGN_NAMES_HINDI[p.sign] || p.sign})`)
+      .join(", ");
     paragraphs.push(
-      `${varga.key} ke Lagna me ${lagnaPStr} virajman hain. Yeh graha aapke is varga ke antahkaran (inner psychology) ko lead karte hain aur direct approach ko shape karte hain.`
+      `${varga.key} के लग्न में ${lagnaPStr} विराजमान हैं। यह ग्रह इस विशिष्ट चक्र के अंतःकरण का संचालन करते हैं और आपके प्रत्यक्ष दृष्टिकोण व कार्यशैली को स्वरूप देते हैं।`
     );
-    if (!keyHighlights.some(k => k.includes("Lagna Occupants"))) {
-      keyHighlights.push(`Lagna Occupants: ${lagnaPStr}`);
+    if (!keyHighlights.some(k => k.includes("लग्न में स्थित ग्रह"))) {
+      keyHighlights.push(`लग्न में स्थित ग्रह: ${lagnaPlanets.map(p => p.planet).join(", ")}`);
     }
   }
+
+  // Primary highlight summary for golden callout box
+  const primaryHighlight = keyHighlights[0] || `${varga.name} (${varga.key}) शास्त्रीय सूक्ष्म विश्लेषण`;
 
   // ── CARD 2: Varga Karmic Weakness & Subconscious Bottleneck ──
   const frictionPoints: string[] = [];
@@ -708,14 +1009,16 @@ export function evaluateVargaNeuroKarmicProfile(
 
   if (debPlanets.length > 0) {
     debPlanets.forEach(dp => {
-      frictionPoints.push(`${dp.planet} debilitated in House ${dp.house} (${dp.sign})`);
+      frictionPoints.push(`${PLANET_NAMES_HINDI[dp.planet] || dp.planet} भाव ${dp.house} में नीच राशि (${SIGN_NAMES_HINDI[dp.sign] || dp.sign})`);
       afflictedPlanets.push(dp.planet);
     });
   }
 
   if (dusthanaPlanets.length > 0) {
-    const dStr = dusthanaPlanets.map(p => `${p.planet} in House ${p.house}`).join(", ");
-    frictionPoints.push(`Dusthana Pressure: ${dStr}`);
+    const dStr = dusthanaPlanets
+      .map(p => `${PLANET_NAMES_HINDI[p.planet] || p.planet} (भाव ${p.house})`)
+      .join(", ");
+    frictionPoints.push(`त्रिक भाव प्रभाव: ${dStr}`);
     dusthanaPlanets.forEach(p => {
       if (!afflictedPlanets.includes(p.planet)) afflictedPlanets.push(p.planet);
     });
@@ -727,31 +1030,31 @@ export function evaluateVargaNeuroKarmicProfile(
 
   const hasAffliction = frictionPoints.length > 0;
   const frictionSummary = hasAffliction
-    ? `${varga.key} me ${frictionPoints.join(" | ")} ka prabhav hai, jo is kshetra me subconscious resistance create karta hai.`
-    : `${varga.key} me koi gambhir debility nahi hai; urja smooth hai lekin targeted behavioral refinement abhi bhi beneficial hai.`;
+    ? `${varga.key} चक्र में ${frictionPoints.join(" · ")} का शास्त्रीय प्रभाव है, जो इस क्षेत्र में अवचेतन संकोच और निर्णय में विलंब का कारण बनता है।`
+    : `${varga.key} चक्र में कोई प्रत्यक्ष नीच राशि अथवा गंभीर दुर्बलता नहीं है; ऊर्जा प्रवाह सहज व अनुकूल है, जिसे नियमित अभ्यास से और उत्कृष्ट बनाया जा सकता है।`;
 
   const psychologicalBottleneckTitle = hasAffliction
-    ? `${primaryAfflicted} Trigger: ${pat.distortion.split("(")[0].trim()}`
-    : `${deityArchetype.name} Shadow: ${deityArchetype.distortionLabel}`;
+    ? `${PLANET_NAMES_HINDI[primaryAfflicted] || primaryAfflicted} प्रभाव: ${pat.distortion.split("—")[0].trim()}`
+    : `${deityArchetype.name} अधिदेवता छाया: ${deityArchetype.distortionLabel}`;
 
   const psychologicalBottleneckDesc = hasAffliction
-    ? `Jab is kshetra me pressure badhta hai, to aapka subconscious mind is distortion me chala jata hai: ${pat.distortion}. Sath hi ${deityArchetype.name} ka shadow pattern (${deityArchetype.distortionLabel}) decision-making me friction laata hai.`
-    : `Is domain me sabhi graha santulit hone ke bawajood, ${deityArchetype.name} archetype ka shadow trap (${deityArchetype.distortionLabel}) tab manifest hota hai jab proactive systemized routine follow na ho.`;
+    ? `जब इस जीवन क्षेत्र में अप्रत्याशित तनाव या दबाव बढ़ता है, तो अवचेतन मन स्वतः इस पुराने चक्र में चला जाता है: ${pat.distortion}। इसके साथ ही ${deityArchetype.name} अधिदेवता का छाया प्रभाव ("${deityArchetype.distortionLabel}") निर्णय लेने की गति को प्रभावित करता है। चेतन संकल्प द्वारा ही इस वृत्त को तोड़ा जा सकता है।`
+    : `यद्यपि इस चक्र में ग्रह संरेखण संतुलित है, फिर भी ${deityArchetype.name} अधिदेवता का सूक्ष्म छाया प्रभाव ("${deityArchetype.distortionLabel}") तब सिर उठा सकता है जब दैनिक जीवन में अनुशासन और पूर्व-नियोजित प्राथमिकताओं की उपेक्षा हो।`;
 
   const ancestralLineagePattern = pat.ancestral;
 
   // ── CARD 3: Scientific & DNA-Based Neuro-Remedy Protocol ──────
   const ancestralLoopInterruption = pat.rewrite;
   const cognitiveRewiring = {
-    techniqueName: `Neuro-Cognitive Reframing (${primaryAfflicted} & ${deityArchetype.name})`,
-    distortionLabel: `${pat.distortion} · ${deityArchetype.distortionLabel}`,
-    mindsetProtocol: `Subconscious habit break: ${pat.rewrite} ${deityArchetype.neuroEpigeneticRemedy}`
+    techniqueName: `संज्ञानात्मक पुनर्गठन तकनीक (${PLANET_NAMES_HINDI[primaryAfflicted] || primaryAfflicted} व ${deityArchetype.name})`,
+    distortionLabel: `${pat.distortion.split("—")[0].trim()}`,
+    mindsetProtocol: `अवचेतन प्रतिरूप का रूपांतरण: ${pat.rewrite} अधिदेवता की सात्विक युक्ति: ${deityArchetype.neuroEpigeneticRemedy}`
   };
 
   const somaticBehavioralHabit = {
-    habitName: `Daily Somatic Biomarker Reset (${primaryAfflicted})`,
-    neuroMechanism: `Autonomic nervous system recalibration & neural pathway retraining for ${vMeta.title}`,
-    dailyProtocol: `${pat.somatic} · Circadian Habit: ${deityArchetype.somaticCircadianHabit}`
+    habitName: `दैनिक देह-व्यवहार क्रिया (${PLANET_NAMES_HINDI[primaryAfflicted] || primaryAfflicted})`,
+    neuroMechanism: `स्वायत्त तंत्रिका तंत्र (Autonomic Nervous System) का पुनर्संतुलन एवं ${vMeta.title} हेतु एकाग्रता संवर्धन`,
+    dailyProtocol: `${pat.somatic} दैनिक लय: ${deityArchetype.somaticCircadianHabit}`
   };
 
   const archetypeAlignment = {
@@ -769,10 +1072,11 @@ export function evaluateVargaNeuroKarmicProfile(
     deityArchetype,
     latentPoints,
     deepExplanation: {
-      title: `${varga.key} (${varga.name}) — Natal D1 Integrated Shastric Narrative`,
+      title: `${varga.name} चक्र (${varga.key}) · शास्त्रीय सूक्ष्म-फलित एवं जीवन दिशा`,
       natalAlignmentSummary: natalRelationDesc,
       paragraphs,
-      keyHighlights
+      keyHighlights,
+      primaryHighlight
     },
     karmicWeakness: {
       hasAffliction,

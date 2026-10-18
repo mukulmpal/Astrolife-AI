@@ -18,31 +18,32 @@ import "@/app/dashboard/shared.css";
 
 // ── Generic Special Lagna Card ────────────────────────────────────────────────
 function LagnaCard({ item, highlight }: { item: SpecialLagnaItem; highlight?: boolean }) {
+  const [expanded, setExpanded] = useState(false);
   const icon = RASHI_ICONS[item.signNum] ?? "✨";
 
   return (
     <article
-      className="rounded-2xl p-5 flex flex-col justify-between transition-all"
+      className="rounded-2xl p-5 sm:p-6 flex flex-col justify-between transition-all"
       style={{
-        background: highlight ? "rgba(184, 134, 11, 0.06)" : "#FFFFFF",
-        border: `1px solid ${highlight ? "rgba(184, 134, 11, 0.45)" : "rgba(184, 134, 11, 0.2)"}`,
+        background: highlight ? "rgba(184, 134, 11, 0.05)" : "#FFFFFF",
+        border: `1px solid ${highlight ? "rgba(184, 134, 11, 0.4)" : "rgba(184, 134, 11, 0.2)"}`,
         boxShadow: "0 2px 14px rgba(0, 0, 0, 0.03)",
       }}
     >
       <div>
-        <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex items-start justify-between gap-3 mb-2.5">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded bg-[#FAF5EB] text-[#B8860B] border border-[#B8860B]/30">
                 {item.shortName}
               </span>
               {item.sourceHouse && (
-                <span className="text-[10px] text-[#8C827A] font-semibold">
-                  Source: House {item.sourceHouse}
+                <span className="text-[11px] text-[#8C827A] font-medium">
+                  भाव {item.sourceHouse} से
                 </span>
               )}
             </div>
-            <h3 className="text-lg font-bold text-[#1A1A1A] mt-1 font-serif">
+            <h3 className="text-xl font-bold text-[#1A1A1A] mt-1 font-serif">
               {item.name}
             </h3>
           </div>
@@ -52,65 +53,83 @@ function LagnaCard({ item, highlight }: { item: SpecialLagnaItem; highlight?: bo
           </div>
         </div>
 
-        {/* Metadata pills */}
-        <div className="flex flex-wrap gap-1.5 my-2.5">
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-[#FAF7F2] text-[#4A4238] border border-[rgba(184,134,11,0.2)]">
-            House {item.house}
-          </span>
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-[#FAF7F2] text-[#4A4238] border border-[rgba(184,134,11,0.2)]">
-            {item.degreeText}
-          </span>
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-[#FAF7F2] text-[#4A4238] border border-[rgba(184,134,11,0.2)]">
-            Lord: {item.lord}
-          </span>
-          {item.lordHouse && (
-            <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-              Lord in H{item.lordHouse}
-            </span>
-          )}
-        </div>
+        {/* Meaning line */}
+        <p className="text-xs font-semibold text-[#8A6008] mb-2 leading-relaxed">
+          ✦ {item.meaning}
+        </p>
 
-        {/* Meaning & Core Law */}
-        <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] mb-3">
-          <p className="text-xs font-bold text-[#1A1A1A] leading-snug">
-            {item.meaning}
-          </p>
-        </div>
-
-        <p className="text-xs text-[#6B635B] leading-relaxed">
+        {/* Core narrative paragraph */}
+        <p className="text-[13px] text-[#4A4238] leading-[1.75]">
           {item.interpretation}
         </p>
 
-        {/* Occupants & Aspects */}
-        {(item.occupants?.length || item.aspectingPlanets?.length) ? (
-          <div className="mt-3 pt-2.5 border-t border-[rgba(184,134,11,0.12)] flex flex-wrap gap-2 text-[11px]">
-            {item.occupants && item.occupants.length > 0 && (
-              <span className="text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-medium border border-emerald-200">
-                Occupied by: <strong>{item.occupants.join(", ")}</strong>
+        {/* Expandable Technical Aspects & Activation */}
+        {expanded && (
+          <div className="mt-4 pt-3.5 border-t border-[rgba(184,134,11,0.18)] space-y-3">
+            {/* Metadata pills */}
+            <div className="flex flex-wrap gap-1.5">
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-[#FAF7F2] text-[#4A4238] border border-[rgba(184,134,11,0.2)]">
+                House {item.house}
               </span>
-            )}
-            {item.aspectingPlanets && item.aspectingPlanets.length > 0 && (
-              <span className="text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded font-medium border border-indigo-200">
-                Aspected by: {item.aspectingPlanets.join(", ")}
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-[#FAF7F2] text-[#4A4238] border border-[rgba(184,134,11,0.2)]">
+                {item.degreeText}
               </span>
-            )}
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-[#FAF7F2] text-[#4A4238] border border-[rgba(184,134,11,0.2)]">
+                Lord: {item.lord}
+              </span>
+              {item.lordHouse && (
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                  Lord in H{item.lordHouse}
+                </span>
+              )}
+            </div>
+
+            {/* Occupants & Aspects */}
+            {(item.occupants?.length || item.aspectingPlanets?.length) ? (
+              <div className="flex flex-wrap gap-2 text-[11px]">
+                {item.occupants && item.occupants.length > 0 && (
+                  <span className="text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded font-medium border border-emerald-200">
+                    Occupied by: <strong>{item.occupants.join(", ")}</strong>
+                  </span>
+                )}
+                {item.aspectingPlanets && item.aspectingPlanets.length > 0 && (
+                  <span className="text-indigo-800 bg-indigo-50 px-2.5 py-1 rounded font-medium border border-indigo-200">
+                    Aspected by: {item.aspectingPlanets.join(", ")}
+                  </span>
+                )}
+              </div>
+            ) : null}
+
+            {/* Action Plan */}
+            <div className="pt-2">
+              <p className="text-[10px] uppercase tracking-wider font-bold text-[#8C827A] mb-1.5">
+                Activation Strategy
+              </p>
+              <ul className="space-y-1">
+                {item.actionPlan.map((action, idx) => (
+                  <li key={idx} className="text-xs text-[#4A4238] flex items-start gap-1.5 leading-relaxed">
+                    <span className="text-[#B8860B] shrink-0 font-bold">•</span>
+                    <span>{action}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        ) : null}
+        )}
       </div>
 
-      {/* Action Plan */}
-      <div className="mt-4 pt-3 border-t border-[rgba(184,134,11,0.15)]">
-        <p className="text-[10px] uppercase tracking-wider font-bold text-[#8C827A] mb-1.5">
-          Activation Strategy
-        </p>
-        <ul className="space-y-1">
-          {item.actionPlan.map((action, idx) => (
-            <li key={idx} className="text-xs text-[#4A4238] flex items-start gap-1.5 leading-relaxed">
-              <span className="text-[#B8860B] shrink-0 font-bold">•</span>
-              <span>{action}</span>
-            </li>
-          ))}
-        </ul>
+      {/* Bottom Footer with toggle button */}
+      <div className="mt-4 pt-3 border-t border-[rgba(184,134,11,0.15)] flex items-center justify-between">
+        <span className="text-[11px] text-[#6B635B] font-medium">
+          House {item.house} · {item.lord}
+        </span>
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="text-xs font-bold text-[#B8860B] hover:text-[#8A6008] transition-colors"
+        >
+          {expanded ? "कम देखें ▲" : "कार्य-योजना व विवरण ▼"}
+        </button>
       </div>
     </article>
   );
@@ -128,7 +147,7 @@ function MentorNarrativeCard({
 }) {
   return (
     <section
-      className="rounded-3xl p-6 lg:p-8 transition-all"
+      className="rounded-2xl p-5 lg:p-6 transition-all"
       style={{
         background: "linear-gradient(180deg, #FFFFFF 0%, #FAF5EB 100%)",
         border: "1px solid rgba(184, 134, 11, 0.35)",
@@ -174,7 +193,7 @@ function MentorNarrativeCard({
       {isOpen && (
         <div className="mt-6 space-y-6 pt-6 border-t border-[rgba(184,134,11,0.2)]">
           {/* Opening Narrative Quote */}
-          <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.25)] relative shadow-sm">
+          <div className="p-4 sm:p-4.5 rounded-xl bg-white border border-[rgba(184,134,11,0.22)] relative shadow-sm">
             <span className="text-5xl text-[#B8860B]/30 absolute -top-4 left-4 font-serif leading-none select-none">
               “
             </span>
@@ -190,7 +209,7 @@ function MentorNarrativeCard({
           {/* 4 Story Chapters Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Chapter 1: AL */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+            <div className="p-4 sm:p-4.5 rounded-xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
                 <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
                   <span className="text-xl">🎭</span>
@@ -209,7 +228,7 @@ function MentorNarrativeCard({
             </div>
 
             {/* Chapter 2: Indu Lagna */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+            <div className="p-4 sm:p-4.5 rounded-xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
                 <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
                   <span className="text-xl">🪙</span>
@@ -228,7 +247,7 @@ function MentorNarrativeCard({
             </div>
 
             {/* Chapter 3: HL & GL */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+            <div className="p-4 sm:p-4.5 rounded-xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
                 <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
                   <span className="text-xl">👑</span>
@@ -247,7 +266,7 @@ function MentorNarrativeCard({
             </div>
 
             {/* Chapter 4: AL-UL */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+            <div className="p-4 sm:p-4.5 rounded-xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
                 <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
                   <span className="text-xl">💍</span>
@@ -269,7 +288,7 @@ function MentorNarrativeCard({
           {/* Chapters 5 & 6 Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Chapter 5: Paka Lagna */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+            <div className="p-4 sm:p-4.5 rounded-xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
                 <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
                   <span className="text-xl">💡</span>
@@ -288,7 +307,7 @@ function MentorNarrativeCard({
             </div>
 
             {/* Chapter 6: Varnada Lagna */}
-            <div className="p-5 rounded-2xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
+            <div className="p-4 sm:p-4.5 rounded-xl bg-white border border-[rgba(184,134,11,0.2)] flex flex-col justify-between shadow-sm">
               <div>
                 <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgba(184,134,11,0.15)]">
                   <span className="text-xl">🏛️</span>
@@ -308,7 +327,7 @@ function MentorNarrativeCard({
           </div>
 
           {/* Concluding Sacred Synthesis */}
-          <div className="p-5 rounded-2xl bg-[#FAF5EB] border border-[#B8860B]/35 flex items-start gap-3.5 shadow-sm">
+          <div className="p-4 sm:p-4.5 rounded-xl bg-[#FAF5EB] border border-[#B8860B]/35 border-l-4 border-l-[#B8860B] flex items-start gap-3.5 shadow-sm">
             <span className="text-3xl mt-0.5 shrink-0">📜</span>
             <div className="space-y-2">
               <h4 className="text-xs uppercase tracking-wider font-bold text-[#B8860B]">
@@ -358,7 +377,7 @@ export default function SpecialLagnasPage() {
 
   const tabs = [
     { key: "wealth", label: "💰 Dhana & Lakshmi Lagnas", count: "Indu · HL · SL · PL" },
-    { key: "power", label: "👑 Power & Authority Lagnas", count: "GL · BL · BPHS Dhana Raja" },
+    { key: "power", label: "👑 Power & Authority Lagnas", count: "GL · BL · Dhana Raja" },
     { key: "arudha", label: "🏛️ 12 Arudha Padas Matrix", count: "A1 to A12 · AL-UL Synastry" },
     { key: "rajayoga", label: "⚡ Rajayogas & Dasha Radar", count: "Active Activations · Upay" },
   ] as const;
@@ -374,7 +393,7 @@ export default function SpecialLagnasPage() {
                 Classical Special Lagnas · विशेष लग्न
               </span>
               <span className="text-xs text-[#8C827A] font-medium hidden sm:inline">
-                Varahamihira Brihat Jataka &amp; BPHS
+                Classical Vedic Foundations
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-[#1A1A1A] tracking-tight">
@@ -454,7 +473,7 @@ export default function SpecialLagnasPage() {
             </div>
             <p className="text-[11px] text-[#4A4238] font-medium mt-3">
               {rajayogas.some((y) => y.name.includes("Hora-Ghati") && y.isFormed) ? (
-                <span className="text-emerald-700 font-bold">✨ BPHS Hora-Ghati Dhana-Raja Yoga Active</span>
+                <span className="text-emerald-700 font-bold">✨ Hora-Ghati Dhana-Raja Yoga Active</span>
               ) : (
                 <span className="text-[#6B635B]">Independent Wealth &amp; Authority Spheres</span>
               )}
@@ -733,7 +752,7 @@ export default function SpecialLagnasPage() {
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#B8860B] px-2.5 py-0.5 rounded-full bg-[#FAF5EB] border border-[#B8860B]/30">
-                  Brihat Parashara Hora Shastra (BPHS Ch. 5)
+                  Classical Dhana-Raja Foundations
                 </span>
                 <span className="text-xs text-[#8C827A] font-semibold">Special Lagna Raja Yoga</span>
               </div>
@@ -1219,7 +1238,7 @@ export default function SpecialLagnasPage() {
                 <h3 className="text-xl font-serif font-bold text-[#1A1A1A]">
                   Special Lagna Rajayogas &amp; Dhana Combinations
                 </h3>
-                <span className="text-xs text-[#8C827A]">BPHS &amp; Brihat Jataka</span>
+                <span className="text-xs text-[#8C827A]">Classical Vedic Principles</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

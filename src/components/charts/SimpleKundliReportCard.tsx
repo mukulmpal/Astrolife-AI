@@ -62,11 +62,11 @@ export default function SimpleKundliReportCard({
   if (!chart || !data) return null;
 
   const chaptersMeta = [
-    { num: 1, icon: "👑", shortLabel: "१. राजयोग व चुनौतियाँ", title: "कुंडली के ३ सर्वोच्च राजयोग एवं २ मुख्य कार्मिक चुनौतियाँ" },
+    { num: 1, icon: "👑", shortLabel: "१. राजयोग व चुनौतियाँ", title: `कुंडली के ${data.masterRajyogas.length} प्रमुख राजयोग एवं ${data.karmicChallenges.length} मुख्य कार्मिक चुनौतियाँ` },
     { num: 2, icon: "🧠", shortLabel: "२. व्यक्तित्व व भाग्य-कुंजी", title: "व्यक्तित्व, कार्यशैली, सोच एवं भाग्य की गुप्त कुंजी" },
     { num: 3, icon: "💼", shortLabel: "३. करियर, धन व सूक्ष्म-वास्तु", title: "करियर, आजीविका, महालक्ष्मी प्रवाह एवं कार्यक्षेत्र सूक्ष्म-वास्तु" },
     { num: 4, icon: "💍", shortLabel: "४. विवाह व जीवनसाथी", title: "वैवाहिक जीवन, जीवनसाथी का स्वरूप एवं भाग्योदय" },
-    { num: 5, icon: "⏳", shortLabel: "५. दशा चक्र व ३ पड़ाव", title: "वर्तमान दशा चक्र, समय का आकलन एवं ३ प्रमुख जीवन पड़ाव" },
+    { num: 5, icon: "⏳", shortLabel: `५. दशा चक्र व जीवन पड़ाव`, title: `वर्तमान दशा चक्र, समय का आकलन एवं ${data.timelines.milestones.length} प्रमुख जीवन पड़ाव` },
     { num: 6, icon: "🛡️", shortLabel: "६. पिता व गुरु की सीख", title: "पिता व गुरु की संरक्षक सीख (सावधानियाँ एवं जीवन रक्षा)" },
     { num: 7, icon: "💎", shortLabel: "७. अनुकूल रत्न व साधन", title: "अनुकूल रत्न परामर्श एवं दैनिक सात्विक साधन" },
   ];
@@ -145,7 +145,7 @@ export default function SimpleKundliReportCard({
               margin: 0,
             }}
           >
-            वर्तमान समय: {data.timelines.activeAD} · आयु {data.currentAge} वर्ष · ३ राजयोग · २ कार्मिक चुनौतियाँ · विवाह · करियर · रत्न परामर्श
+            वर्तमान समय: {data.timelines.activeAD} · आयु {data.currentAge} वर्ष · {data.masterRajyogas.length} प्रमुख राजयोग · {data.karmicChallenges.length} कार्मिक चुनौतियाँ · विवाह · करियर · रत्न परामर्श
           </p>
         </div>
 
@@ -218,7 +218,7 @@ export default function SimpleKundliReportCard({
             lineHeight: 1.5,
           }}
         >
-          &ldquo;{data.displayName} जी के जीवन का आकाशीय विधान: ३ दैवीय राजयोग, आत्म-शोधन की २ कार्मिक चुनौतियाँ और कालचक्र का स्वर्णिम मार्ग&rdquo;
+          &ldquo;{data.displayName} जी के जीवन का आकाशीय विधान: {data.masterRajyogas.length} दैवीय राजयोग, आत्म-शोधन की {data.karmicChallenges.length} कार्मिक चुनौतियाँ और कालचक्र का स्वर्णिम मार्ग&rdquo;
         </div>
       </div>
 
@@ -331,7 +331,7 @@ export default function SimpleKundliReportCard({
                   margin: "0 0 4px 0",
                 }}
               >
-                कुंडली के ३ सर्वोच्च राजयोग एवं २ मुख्य कार्मिक चुनौतियाँ
+                कुंडली के {data.masterRajyogas.length} प्रमुख राजयोग एवं {data.karmicChallenges.length} मुख्य कार्मिक चुनौतियाँ
               </h4>
 
               <div style={{ fontSize: 13, color: "#6B635B", fontWeight: 500 }}>
@@ -353,7 +353,7 @@ export default function SimpleKundliReportCard({
                 lineHeight: 1.6,
               }}
             >
-              ✦ <strong>मुख्य संकेत:</strong> आपकी कुंडली में ३ विशिष्ट राजयोग सांसारिक उत्कर्ष तय करते हैं, जबकि २ चुनौतियाँ आपको धैर्य और आत्म-अनुशासन का अभ्यास कराती हैं।
+              ✦ <strong>मुख्य संकेत:</strong> आपकी कुंडली में {data.masterRajyogas.length} विशिष्ट राजयोग सांसारिक उत्कर्ष तय करते हैं, जबकि {data.karmicChallenges.length} चुनौतियाँ आपको धैर्य और आत्म-अनुशासन का अभ्यास कराती हैं।
             </div>
 
             {/* Paragraph Prose Flow (Crisp 3-4 lines each) */}
@@ -369,7 +369,7 @@ export default function SimpleKundliReportCard({
               }}
             >
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>{data.displayName} जी</strong>, जब हम आपकी कुंडली को एक समग्र चित्र के रूप में देखते हैं, तो ईश्वर ने आपको ३ अत्यंत दुर्लभ वरदान दिए हैं, और साथ ही आत्म-विकास के लिए २ विशिष्ट परीक्षाएं भी रखी हैं। ये योग केवल किताबी नहीं हैं, बल्कि आपके जीवन में अधिकार, बौद्धिक प्रभुत्व और वित्तीय संप्रभुता के रूप में साकार होंगे।
+                <strong>{data.displayName} जी</strong>, जब हम आपकी कुंडली को एक समग्र चित्र के रूप में देखते हैं, तो ईश्वर ने आपको {data.masterRajyogas.length} अत्यंत दुर्लभ वरदान दिए हैं, और साथ ही आत्म-विकास के लिए {data.karmicChallenges.length} विशिष्ट परीक्षाएं भी रखी हैं। ये योग केवल किताबी नहीं हैं, बल्कि आपके जीवन में अधिकार, बौद्धिक प्रभुत्व और वित्तीय संप्रभुता के रूप में साकार होंगे।
               </p>
 
               {data.masterRajyogas.map((yoga, idx) => (
@@ -565,15 +565,15 @@ export default function SimpleKundliReportCard({
               }}
             >
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>व्यावसायिक पहचान व कार्यक्षेत्र:</strong> आपकी कुंडली का कर्म भाव यह सिद्ध करता है कि आप टेक-आर्किटेक्चर, डेटा साइंस, फिनटेक, मैनेजमेंट कंसल्टेंसी या वैश्विक मल्टीनेशनल कंपनियों के लिए सबसे उपयुक्त हैं। साधारण ९-से-५ के रूटीन काम में आपका दम घुटेगा; आपको ऐसे प्रोजेक्ट चाहिए जहाँ समस्या का समाधान निकालने के लिए रणनीतिक स्वायत्तता मिले।
+                <strong>व्यावसायिक पहचान व कार्यक्षेत्र:</strong> {data.career.roleSummary}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>३ सर्वश्रेष्ठ कार्यक्षेत्र:</strong> प्रथम, {data.career.idealFields[0]?.title}—{data.career.idealFields[0]?.desc}। द्वितीय, {data.career.idealFields[1]?.title}—{data.career.idealFields[1]?.desc}। तृतीय, {data.career.idealFields[2]?.title}—{data.career.idealFields[2]?.desc}। इन क्षेत्रों में आपकी बौद्धिक पूंजी सीधे वित्तीय संप्रभुता में परिवर्तित होगी।
+                <strong>सर्वश्रेष्ठ कार्यक्षेत्र:</strong> {data.career.idealFields.map((f, idx) => `${idx + 1}. ${f.title} (${f.desc})। `).join(" ")}इन क्षेत्रों में आपकी बौद्धिक पूंजी सीधे वित्तीय संप्रभुता में परिवर्तित होगी।
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>महालक्ष्मी प्रवाह व वित्तीय नियम:</strong> {data.career.wealthFlow} लाभ भाव में ग्रहों की स्थिति आपके जीवन में कई स्रोतों से धन आने का मार्ग बनाती है। जीवन के दूसरे हिस्से में आपका संचित धन कई गुना बढ़ेगा। केवल एक सावधानी रखनी है—बिना सोचे-समझे किए गए सट्टेबाजी या अत्यधिक आक्रामक निवेश से बचें; आपका धन आपकी विशेषज्ञता और सेवा से ही सुरक्षित रहेगा।
+                <strong>महालक्ष्मी प्रवाह व वित्तीय नियम:</strong> {data.career.wealthFlow}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
@@ -646,19 +646,19 @@ export default function SimpleKundliReportCard({
               }}
             >
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>जीवनसाथी का स्वरूप व मानसिक स्वभाव:</strong> {data.marriage.spouseNature} वे सुरुचिपूर्ण, व्यावहारिक, बौद्धिक रूप से परिपक्व और कलात्मक समझ रखने वाली होंगी। वे केवल घरेलू साथी नहीं, बल्कि आपके जीवन के हर बड़े निर्णय में एक संतुलित सलाहकार की भूमिका निभाएंगी। उनका स्वभाव शांत लेकिन आत्मसम्मान से परिपूर्ण होगा।
+                <strong>जीवनसाथी का स्वरूप व मानसिक स्वभाव:</strong> {data.marriage.spouseNature}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>मिलन का माध्यम व स्थान:</strong> {data.marriage.meetingVenue} आपका उनसे मिलन किसी उच्च शिक्षण संस्थान, पेशेवर कार्यक्षेत्र, किसी बौद्धिक सेमिनार या किसी करीबी पारिवारिक/सामाजिक आयोजन के दौरान स्वाभाविक रूप से होने की सबसे प्रबल संभावना है।
+                <strong>मिलन का माध्यम व स्थान:</strong> {data.marriage.meetingVenue}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>विवाह का स्वरूप (Love vs Arranged):</strong> {data.marriage.marriageTypeExplanation} आपका विवाह प्रेम और पारिवारिक सहमति के सुंदर समन्वय से संपन्न होने के प्रबल संकेत हैं, जहाँ आपसी समझ और आदर का भाव सर्वोपरि रहेगा।
+                <strong>विवाह का स्वरूप (Love vs Arranged):</strong> {data.marriage.marriageTypeExplanation}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>विवाह उपरांत भाग्योदय (कलत्र भाग्य):</strong> {data.marriage.kalatraBhagyaNote} विवाह के उपरांत आपके जीवन में स्थायित्व और आर्थिक भाग्य में तीव्र वृद्धि होगी। जीवनसाथी के आगमन के बाद आपके बिखरे हुए विचार एक ठोस दिशा पकड़ेंगे और गृहस्थ जीवन में भौतिक सुख-साधनों का स्वाभाविक विस्तार होगा।
+                <strong>विवाह उपरांत भाग्योदय (कलत्र भाग्य):</strong> {data.marriage.kalatraBhagyaNote}
               </p>
             </div>
           </article>
@@ -735,7 +735,13 @@ export default function SimpleKundliReportCard({
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>आगामी ३ प्रमुख जीवन पड़ाव:</strong> <strong>उम्र {data.timelines.milestones[0]?.age} ({data.timelines.milestones[0]?.years})</strong> में {data.timelines.milestones[0]?.title}—{data.timelines.milestones[0]?.desc}। <strong>उम्र {data.timelines.milestones[1]?.age} ({data.timelines.milestones[1]?.years})</strong> में {data.timelines.milestones[1]?.title}—{data.timelines.milestones[1]?.desc}। और <strong>उम्र {data.timelines.milestones[2]?.age} ({data.timelines.milestones[2]?.years})</strong> में {data.timelines.milestones[2]?.title}—{data.timelines.milestones[2]?.desc}।
+                <strong>आगामी प्रमुख जीवन पड़ाव:</strong>{" "}
+                {data.timelines.milestones.map((m, idx) => (
+                  <span key={m.id}>
+                    <strong>{m.age} ({m.years}):</strong> {m.title} — {m.desc}
+                    {idx < data.timelines.milestones.length - 1 ? " · " : ""}
+                  </span>
+                ))}
               </p>
             </div>
           </article>
@@ -879,7 +885,13 @@ export default function SimpleKundliReportCard({
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>४ दैनिक सात्विक साधन:</strong> प्रतिदिन प्रातः तांबे के लोटे से सूर्य देव को अर्घ्य दें और 'ॐ घृणि सूर्याय नमः' का जप करें। नित्य पक्षियों को अन्न-जल दें तथा शनिवार को किसी जरूरतमंद की गुप्त सहायता करें। ये छोटे-छोटे सात्विक साधन आपके आभामंडल को शुद्ध रखते हैं और किसी भी नकारात्मक ऊर्जा को आपके निकट नहीं आने देते।
+                <strong>{data.remedies.length} दैनिक सात्विक साधन:</strong>{" "}
+                {data.remedies.map((r, idx) => (
+                  <span key={r.id}>
+                    <strong>{r.icon} {idx + 1}. {r.title}:</strong> {r.practice} ({r.benefit})
+                    {idx < data.remedies.length - 1 ? " · " : ""}
+                  </span>
+                ))}
               </p>
             </div>
           </article>
@@ -931,7 +943,7 @@ export default function SimpleKundliReportCard({
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {[
-              `मेरे ३ राजयोगों में सबसे बड़ा आर्थिक उछाल किस वर्ष में आएगा?`,
+              `मेरे ${data.masterRajyogas[0]?.title || "राजयोग"} का सबसे बड़ा आर्थिक लाभ किस वर्ष में मिलेगा?`,
               `विवाह के बाद जीवनसाथी के आने से मेरे करियर पर क्या प्रभाव पड़ेगा?`,
               `${data.gemstone.primaryStone} धारण करने की शुद्ध वैदिक विधि क्या है?`,
             ].map((q, idx) => (

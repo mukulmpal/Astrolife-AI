@@ -139,7 +139,7 @@
 }
 
 .kp-marriage-v2 span {
-  color: #f0abfc;
+  color: #be185d;
   font-size: 11px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -168,7 +168,7 @@
 .kp-marriage-v2 aside strong {
   display: block;
   font-size: 34px;
-  color: #f0abfc;
+  color: #be185d;
   line-height: 1;
 }
 
@@ -184,9 +184,9 @@
 .kp-varga-validation {
   max-width: 1180px;
   margin: 0 auto 18px;
-  border: 1px solid rgba(200, 160, 48, 0.16);
-  background: rgba(255, 255, 255, 0.045);
-  border-radius: 24px;
+  border: 1px solid rgba(184, 134, 11, 0.22);
+  background: #FFFFFF;
+  border-radius: 20px;
   padding: 18px;
 }
 
@@ -241,7 +241,7 @@
 
 .kp-varga-validation-grid em {
   display: block;
-  color: #f0abfc;
+  color: #be185d;
   font-style: normal;
   font-weight: 950;
   font-size: 24px;
@@ -627,11 +627,11 @@
 }
 
 .kp-card {
-  padding: 24px;
+  padding: 26px 28px;
 }
 
 .kp-section-head {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .kp-section-head h2 {
@@ -652,10 +652,11 @@
 
 .kp-table-wrap th,
 .kp-table-wrap td {
-  padding: 12px 10px;
+  padding: 14px 16px;
   text-align: left;
   border-bottom: 1px solid rgba(184, 134, 11, 0.15);
-  font-size: 13px;
+  font-size: 13.5px;
+  line-height: 1.6;
 }
 
 .kp-table-wrap th {
@@ -1111,7 +1112,7 @@
 
   .kp-table-wrap th,
   .kp-table-wrap td {
-    padding: 10px 8px;
-    font-size: 12px;
+    padding: 12px 10px;
+    font-size: 12.5px;
   }
 }

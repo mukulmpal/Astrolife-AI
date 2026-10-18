@@ -379,26 +379,26 @@ export default function LalKitabPage() {
         .safety-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:8px}
         .safety-text{font-size:13px;color:#4A4238;line-height:1.8}
         .support-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:14px}
-        .support-card{border-radius:14px;padding:16px;border:1px solid rgba(184,134,11,0.2);background:#FAF7F2}
+        .support-card{border-radius:14px;padding:16px 18px;border:1px solid rgba(184,134,11,0.22);background:#FAF8F5}
         .support-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
         .support-name{font-size:14px;font-weight:700;color:#1A1A1A}
         .support-score{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;line-height:1}
         .safety-pill{font-size:10px;font-weight:700;border-radius:20px;padding:3px 9px;border:1px solid;text-transform:uppercase;letter-spacing:.4px}
         .indicator-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
-        .indicator-card{background:#FAF7F2;border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:14px}
-        .protocol-list{display:grid;gap:7px;margin-top:10px}
-        .protocol-item{font-size:12px;color:#15803D;line-height:1.6;padding:8px 10px;border-radius:8px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.22);font-weight:500}
+        .indicator-card{background:#FAF8F5;border:1px solid rgba(184,134,11,0.22);border-left:4px solid #B8860B;border-radius:12px;padding:14px 18px}
+        .protocol-list{display:grid;gap:8px;margin-top:12px}
+        .protocol-item{font-size:12.5px;color:#15803D;line-height:1.65;padding:10px 14px;border-radius:10px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.22);border-left:4px solid #15803D;font-weight:500}
         .lk-gochar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}
         .lk-chart-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .lk-chart-title{font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:8px}
         .lk-chart{max-width:300px;display:block;margin:8px auto 0}
         .lk-time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
-        .lk-time-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .lk-time-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px 20px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
         .lk-time-stat{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:#1A1A1A;line-height:1;margin-bottom:6px}
         .lk-mini-list{display:grid;gap:8px;margin-top:12px}
-        .lk-mini-item{font-size:13px;color:#1A1A1A;line-height:1.65;padding:10px 14px;border-radius:10px;background:#FAF7F2;border:1px solid rgba(184,134,11,0.18);font-weight:500}
-        .lk-remedy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
-        .lk-remedy-card{border-radius:16px;padding:18px;background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+        .lk-mini-item{font-size:13px;color:#1A1A1A;line-height:1.65;padding:10px 14px;border-radius:10px;background:#FAF8F5;border:1px solid rgba(184,134,11,0.18);font-weight:500}
+        .lk-remedy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px}
+        .lk-remedy-card{border-radius:14px;padding:16px 18px;background:#FAF8F5;border:1px solid rgba(184,134,11,0.22);box-shadow:0 4px 15px rgba(0,0,0,0.03)}
         .lk-remedy-title{font-size:15px;font-weight:800;color:#1A1A1A;margin-bottom:7px}
         .lk-remedy-text{font-size:13px;color:#4A4238;line-height:1.75}
         .lk-vastu-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -418,7 +418,7 @@ export default function LalKitabPage() {
         .yes-no{font-size:12px;font-weight:800}
         .yes-no.yes{color:#15803D}.yes-no.no{color:#6B635B}
         .prediction-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
-        .prediction-card{background:#FAF7F2;border:1px solid rgba(184,134,11,0.2);border-radius:14px;padding:16px}
+        .prediction-card{background:#FAF8F5;border:1px solid rgba(184,134,11,0.22);border-left:4px solid #B8860B;border-radius:12px;padding:14px 18px}
         .prediction-title{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#8A6008;margin-bottom:8px;font-weight:700}
         .prediction-text{font-size:13px;color:#1A1A1A;line-height:1.7}
         .lk-report-block{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
@@ -1376,18 +1376,18 @@ export default function LalKitabPage() {
               <div className="safety-text" style={{marginTop:8,color:"#DC2626",fontWeight:500}}>{advancedResult.remedySafety.highCaution}</div>
 
               {advancedResult.remedySafety.neverDonateGuidance.map((guidance) => (
-                <div key={guidance.planet} style={{marginTop:14,padding:"12px 14px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.22)",borderRadius:10}}>
-                  <div style={{fontSize:12,fontWeight:700,color:"#DC2626",marginBottom:7}}>
+                <div key={guidance.planet} style={{marginTop:14,padding:"14px 18px",background:"#FAF8F5",border:"1px solid rgba(239,68,68,0.3)",borderLeft:"4px solid #DC2626",borderRadius:12}}>
+                  <div style={{fontSize:13,fontWeight:700,color:"#DC2626",marginBottom:8}}>
                     Never donate casually: {guidance.planet} items
                   </div>
-                  <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:8}}>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}}>
                     {guidance.items.map((item) => (
                       <span key={item} className="safety-pill" style={{color:"#DC2626",background:"rgba(239,68,68,0.08)",borderColor:"rgba(239,68,68,0.3)"}}>
                         {item}
                       </span>
                     ))}
                   </div>
-                  <div className="safety-text">{guidance.explanation}</div>
+                  <div className="safety-text" style={{lineHeight: 1.7}}>{guidance.explanation}</div>
                 </div>
               ))}
             </div>

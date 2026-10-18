@@ -452,28 +452,19 @@ function GemstonePageContent() {
         </svg>
       </div>
 
-      <header className="gem-nav">
-        <div className="gem-logo-wrap">
-          <div className="gem-logo-glyph">✦</div>
-          <span className="gem-logo-name">AstroLife</span>
-        </div>
-        <a className="gem-nav-btn" href="/onboarding">Get Free Kundli</a>
-      </header>
-
       <section className="gem-header">
-        <span>Gemstone Intelligence · Medical Master Engine V2</span>
-        <h1>Gemstone Suitability</h1>
-        <p>
-          {input?.ascendant} Lagna · Moon in {input?.moonSign ?? "—"}. Comprehensive scoring across
-          house ownership, dignity, Shadbala, dasha activation and yogakaraka status.
+        <span className="gem-pill">Ratna Intelligence · वैदिक रत्न परामर्श</span>
+        <h1>Primary Gemstone Recommendation</h1>
+        <p className="gem-subtitle">
+          {input?.ascendant} Lagna · Moon in {input?.moonSign ?? "—"} · Dasha: {dashaStr}
         </p>
-        <p>{report.executiveSummary}</p>
+        {report.executiveSummary && (
+          <div className="gem-summary-callout">
+            <span className="gem-callout-icon">✨</span>
+            <p>{report.executiveSummary}</p>
+          </div>
+        )}
       </section>
-
-      {(() => {
-        const intro = engineIntros['gemstone'];
-        return <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />;
-      })()}
 
       <PrimaryGemHero gem={primary} />
 
@@ -516,6 +507,15 @@ function GemstonePageContent() {
         {activeTab === "avoid"     && <AvoidTab report={report} />}
         {activeTab === "medical"   && <MedicalTab report={report} />}
       </section>
+
+      {(() => {
+        const intro = engineIntros['gemstone'];
+        return (
+          <div style={{ maxWidth: 1120, margin: "24px auto 0" }}>
+            <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} />
+          </div>
+        );
+      })()}
 
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
@@ -676,19 +676,46 @@ function GemstonePageContent() {
           margin: 14px auto 0;
           color: #4A4238;
           line-height: 1.78;
-          font-size: 13.5px;
+          font-size: 14px;
+        }
+
+        .gem-summary-callout {
+          max-width: 840px;
+          margin: 18px auto 0;
+          padding: 14px 20px;
+          background: #FFFFFF;
+          border: 1px solid rgba(184, 134, 11, 0.3);
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          text-align: left;
+          box-shadow: 0 4px 18px rgba(184, 134, 11, 0.08);
+        }
+
+        .gem-summary-callout p {
+          margin: 0;
+          color: #2D241E;
+          font-size: 14.5px;
+          line-height: 1.6;
+          font-weight: 500;
+        }
+
+        .gem-callout-icon {
+          font-size: 20px;
+          flex-shrink: 0;
         }
 
         .gem-hero-card {
           position: relative;
           display: grid;
           grid-template-columns: 150px 1fr;
-          gap: 26px;
+          gap: 24px;
           align-items: center;
           border: 1px solid rgba(184, 134, 11, 0.25);
           background: #FFFFFF;
-          border-radius: 20px;
-          padding: 24px;
+          border-radius: 16px;
+          padding: 20px 24px;
           overflow: hidden;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }

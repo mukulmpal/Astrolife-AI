@@ -107,6 +107,31 @@ export default function TransitPage() {
     return calculateTransitReport({ chart: transitChart, base, date: selectedDate });
   }, [transitChart, base, selectedDate]);
 
+  const [transitOverlayMode, setTransitOverlayMode] = useState<"natal" | "gochar" | "dual">("dual");
+
+  const natalView = useMemo(() => {
+    if (!userChart) return null;
+    const lagnaNum =
+      base === "lagna"
+        ? (typeof userChart.lagnaNum === "number" ? userChart.lagnaNum : toRashi(userChart.lagnaRashi))
+        : (userChart.planets?.Moon?.signNum ?? Math.floor(((userChart.planets?.Moon?.lon ?? 0) % 360) / 30) % 12);
+
+    const planets: Record<string, { house: number; retrograde: boolean; signNum: number; rashi: number }> = {};
+    if (userChart.planets) {
+      for (const [name, p] of Object.entries(userChart.planets)) {
+        const signNum = typeof p.signNum === "number" ? p.signNum : Math.floor(((p.lon ?? 0) % 360) / 30) % 12;
+        const houseFromBase = ((signNum - lagnaNum + 12) % 12) + 1;
+        planets[name] = {
+          house: houseFromBase,
+          signNum,
+          rashi: signNum,
+          retrograde: Boolean(p.retrograde),
+        };
+      }
+    }
+    return { lagnaNum, planets };
+  }, [userChart, base]);
+
   const chartView = useMemo(() => {
     if (!userChart || !report) return null;
     const lagnaNum =
@@ -286,7 +311,7 @@ export default function TransitPage() {
           background: #FFFFFF;
           border: 1px solid rgba(184, 134, 11, 0.25);
           border-radius: 16px;
-          padding: 18px;
+          padding: 20px 24px;
           box-shadow: 0 4px 20px -4px rgba(184, 134, 11, 0.12);
         }
         .span-8 { grid-column: span 8; }
@@ -299,7 +324,7 @@ export default function TransitPage() {
           font-weight: 700;
         }
         .tr-p {
-          font-size: 13px;
+          font-size: 13.5px;
           color: #3D3834;
           line-height: 1.7;
         }
@@ -316,36 +341,38 @@ export default function TransitPage() {
         .tr-alerts {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
-          margin-top: 10px;
+          gap: 12px;
+          margin-top: 12px;
         }
         .tr-alert {
-          background: #FAF7F2;
+          background: #FAF8F5;
           border: 1px solid rgba(184, 134, 11, 0.2);
+          border-left: 4px solid #B8860B;
           border-radius: 12px;
-          padding: 12px;
+          padding: 14px 16px;
         }
         .tr-alert h4 {
-          font-size: 13px;
+          font-size: 13.5px;
           margin-bottom: 6px;
           color: #1A1A1A;
           font-weight: 700;
         }
         .tr-alert p {
-          font-size: 12px;
+          font-size: 13px;
           color: #5C5248;
-          line-height: 1.6;
+          line-height: 1.65;
         }
         .tr-areas {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 10px;
+          gap: 12px;
         }
         .tr-area {
-          background: #FAF7F2;
+          background: #FAF8F5;
           border: 1px solid rgba(184, 134, 11, 0.2);
+          border-left: 4px solid rgba(184, 134, 11, 0.4);
           border-radius: 12px;
-          padding: 12px;
+          padding: 14px 16px;
         }
         .tr-area-top {
           display: flex;
@@ -366,13 +393,14 @@ export default function TransitPage() {
         .tr-planets {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 10px;
+          gap: 12px;
         }
         .tr-planet {
-          background: #FAF7F2;
+          background: #FAF8F5;
           border: 1px solid rgba(184, 134, 11, 0.2);
+          border-left: 4px solid #B8860B;
           border-radius: 12px;
-          padding: 12px;
+          padding: 14px 16px;
         }
         .tr-muted {
           color: #6B635B;
@@ -483,21 +511,46 @@ export default function TransitPage() {
               </div>
 
               {chartStyle === "kundli" && (
-                <div className="tr-switch">
-                  <button
-                    type="button"
-                    className={`tr-btn ${base === "moon" ? "active" : ""}`}
-                    onClick={() => setBase("moon")}
-                  >
-                    Moon base · default
-                  </button>
-                  <button
-                    type="button"
-                    className={`tr-btn ${base === "lagna" ? "active" : ""}`}
-                    onClick={() => setBase("lagna")}
-                  >
-                    Lagna base
-                  </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="tr-switch">
+                    <button
+                      type="button"
+                      className={`tr-btn ${transitOverlayMode === "natal" ? "active" : ""}`}
+                      onClick={() => setTransitOverlayMode("natal")}
+                    >
+                      ✦ Natal Planets
+                    </button>
+                    <button
+                      type="button"
+                      className={`tr-btn ${transitOverlayMode === "gochar" ? "active" : ""}`}
+                      onClick={() => setTransitOverlayMode("gochar")}
+                    >
+                      Live Gochar Transits
+                    </button>
+                    <button
+                      type="button"
+                      className={`tr-btn ${transitOverlayMode === "dual" ? "active" : ""}`}
+                      onClick={() => setTransitOverlayMode("dual")}
+                    >
+                      Dual Overlay
+                    </button>
+                  </div>
+                  <div className="tr-switch">
+                    <button
+                      type="button"
+                      className={`tr-btn ${base === "moon" ? "active" : ""}`}
+                      onClick={() => setBase("moon")}
+                    >
+                      Moon base
+                    </button>
+                    <button
+                      type="button"
+                      className={`tr-btn ${base === "lagna" ? "active" : ""}`}
+                      onClick={() => setBase("lagna")}
+                    >
+                      Lagna base
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -505,15 +558,33 @@ export default function TransitPage() {
             {chartStyle === "kundli" ? (
               <>
                 <p className="tr-p" style={{ marginBottom: 16 }}>
-                  {BASE_COPY[base].detail} Planets below are shown in houses from your {base === "lagna" ? "ascendant" : "Moon sign"}.
+                  {transitOverlayMode === "natal"
+                    ? `Showing your permanent natal birth chart planets in houses from your ${base === "lagna" ? "ascendant" : "Moon sign"}.`
+                    : transitOverlayMode === "gochar"
+                    ? `Showing today's live transit planets moving through houses from your ${base === "lagna" ? "ascendant" : "Moon sign"}.`
+                    : `Dual Overlay active: Comparing your birth chart planets with today's live Gochar transits side-by-side in each house.`}
                 </p>
                 {chartView && (
-                  <div className="tr-chart-wrap">
+                  <div className="tr-chart-wrap" style={{ flexDirection: "column", alignItems: "center", gap: 12 }}>
                     <NorthIndianChart
                       lagnaNum={chartView.lagnaNum}
-                      planets={chartView.planets}
+                      planets={transitOverlayMode === "gochar" ? chartView.planets : (natalView?.planets || chartView.planets)}
+                      overlayPlanets={transitOverlayMode === "dual" ? chartView.planets : undefined}
                       size={340}
                     />
+                    {transitOverlayMode === "dual" && (
+                      <div className="flex items-center gap-4 text-xs font-semibold" style={{ background: "#FAF7F2", padding: "6px 16px", borderRadius: "999px", border: "1px solid rgba(184,134,11,0.2)" }}>
+                        <span className="flex items-center gap-1.5 text-[#1A1A1A]">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#f97316]" />
+                          <span>Natal Planets (जन्मकालिक)</span>
+                        </span>
+                        <span className="text-[#8C6508]">|</span>
+                        <span className="flex items-center gap-1.5 text-[#059669]">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#059669]" />
+                          <span>Live Gochar ᴳ (आज का गोचर)</span>
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </>

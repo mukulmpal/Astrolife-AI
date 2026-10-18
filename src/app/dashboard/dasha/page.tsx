@@ -62,26 +62,31 @@ function ActiveCard({
   const color = LORD_COLOR[period.lord];
   return (
     <div
-      className="rounded-2xl p-4 flex flex-col gap-2"
-      style={{ background: "#FFFFFF", border: `1px solid ${color}55`, boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}
+      className="rounded-2xl p-5 flex flex-col gap-3"
+      style={{
+        background: "#FFFFFF",
+        border: `1px solid rgba(184, 134, 11, 0.22)`,
+        borderLeft: `4px solid ${color}`,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+      }}
     >
       <p className="text-xs uppercase tracking-widest font-bold" style={{ color: color }}>
         {label}
       </p>
-      <div className="flex items-center gap-2">
-        <span className="text-2xl">{LORD_ICON[period.lord]}</span>
+      <div className="flex items-center gap-3">
+        <span className="text-3xl">{LORD_ICON[period.lord]}</span>
         <div>
-          <p className="text-xl font-bold text-[#1A1A1A]">{tp(period.lord)}</p>
-          {sub && <p className="text-xs text-[#6B635B]">{sub}</p>}
+          <p className="text-2xl font-bold text-[#1A1A1A]">{tp(period.lord)}</p>
+          {sub && <p className="text-xs text-[#6B635B] mt-0.5">{sub}</p>}
         </div>
       </div>
-      <div className="w-full h-1.5 rounded-full bg-[#FAF7F2] overflow-hidden border border-amber-900/10">
+      <div className="w-full h-2 rounded-full bg-[#FAF7F2] overflow-hidden border border-amber-900/10 mt-1">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${period.progressPercent}%`, background: color }}
         />
       </div>
-      <div className="flex justify-between text-xs text-[#6B635B]">
+      <div className="flex justify-between text-xs text-[#6B635B] pt-0.5">
         <span>{formatDashaDate(period.startDate)}</span>
         <span className="font-bold" style={{ color }}>{formatDaysRemaining(period.daysRemaining)}</span>
         <span>{formatDashaDate(period.endDate)}</span>
@@ -109,20 +114,20 @@ function TimelineRow({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left rounded-xl p-3 flex items-center gap-3 transition-all"
+      className="w-full text-left rounded-xl px-4 sm:px-5 py-3.5 flex items-center gap-4 transition-all"
       style={{
         background: selected ? "rgba(184,134,11,0.12)" : "#FFFFFF",
         border: `1px solid ${selected ? color : "rgba(184,134,11,0.2)"}`,
         opacity: isPast ? 0.6 : 1,
       }}
     >
-      <span className="text-xl w-7 text-center">{LORD_ICON[period.lord]}</span>
+      <span className="text-2xl w-8 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <span className="font-semibold text-[#1A1A1A] text-sm">{tp(period.lord)} Mahadasha</span>
           {period.isActive && (
             <span
-              className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+              className="text-[10px] px-2 py-0.5 rounded-full font-bold"
               style={{ background: color + "22", color }}
             >
               ACTIVE
@@ -144,7 +149,7 @@ function TimelineRow({
             </span>
           )}
         </div>
-        <p className="text-xs text-[#6B635B] mt-0.5">
+        <p className="text-xs text-[#6B635B] mt-1">
           {formatDashaDate(period.startDate)} — {formatDashaDate(period.endDate)} · {LORD_YEARS_DESC[period.lord]}
         </p>
       </div>
@@ -172,20 +177,20 @@ function AntarRow({
   const isPast = period.endDate < now;
   return (
     <div
-      className="flex items-center gap-3 rounded-lg px-3 py-2"
+      className="flex items-center gap-3.5 rounded-xl px-4 py-3.5"
       style={{
         background: period.isActive ? "rgba(184,134,11,0.1)" : "#FFFFFF",
-        border: `1px solid ${period.isActive ? color : "rgba(184,134,11,0.15)"}`,
+        border: `1px solid ${period.isActive ? color : "rgba(184,134,11,0.18)"}`,
         opacity: isPast ? 0.55 : 1,
       }}
     >
-      <span className="text-base w-5 text-center">{LORD_ICON[period.lord]}</span>
+      <span className="text-lg w-6 text-center">{LORD_ICON[period.lord]}</span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium text-[#1A1A1A]">{tp(period.lord)}</span>
           {taraInfo && (
             <span
-              className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
+              className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
                 taraInfo.isAfflicted
                   ? "bg-red-500/15 text-red-700 border border-red-500/30"
                   : taraInfo.isJanma
@@ -199,12 +204,12 @@ function AntarRow({
             </span>
           )}
         </div>
-        <p className="text-[11px] text-[#6B635B]">
+        <p className="text-xs text-[#6B635B] mt-0.5">
           {formatDashaDate(period.startDate)} — {formatDashaDate(period.endDate)}
         </p>
       </div>
       {period.isActive && (
-        <span className="text-[10px] font-bold" style={{ color }}>
+        <span className="text-[11px] font-bold" style={{ color }}>
           {formatDaysRemaining(period.daysRemaining)}
         </span>
       )}
@@ -403,14 +408,15 @@ export default function DashaPage() {
             {/* Navtara */}
             {navtara && (
               <section
-                className="rounded-2xl p-4"
+                className="rounded-2xl p-5"
                 style={{
-                  background: navtara.nature === "malefic" ? "rgba(239,68,68,0.08)" :
-                              navtara.nature === "highly_benefic" ? "rgba(234,179,8,0.12)" :
-                              "rgba(34,197,94,0.08)",
+                  background: "#FAF8F5",
                   border: `1px solid ${navtara.nature === "malefic" ? "rgba(239,68,68,0.3)" :
-                                        navtara.nature === "highly_benefic" ? "rgba(234,179,8,0.4)" :
-                                        "rgba(34,197,94,0.25)"}`,
+                                        navtara.nature === "highly_benefic" ? "rgba(184,134,11,0.4)" :
+                                        "rgba(34,197,94,0.3)"}`,
+                  borderLeft: `4px solid ${navtara.nature === "malefic" ? "#b91c1c" :
+                                            navtara.nature === "highly_benefic" ? "#B8860B" :
+                                            "#15803d"}`,
                 }}
               >
                 <div className="flex items-start gap-3">
@@ -438,7 +444,7 @@ export default function DashaPage() {
             )}
 
             {/* Mahadasha Timeline */}
-            <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.22)] bg-white p-5 sm:p-6 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">120-Year Mahadasha Timeline</p>
                 <div className="flex items-center gap-2 text-[10px] text-[#6B635B] font-medium flex-wrap">
@@ -463,7 +469,7 @@ export default function DashaPage() {
 
             {/* Antardasha for selected / current MD */}
             {selectedPeriod && (
-              <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
+              <section className="rounded-2xl border border-[rgba(184,134,11,0.22)] bg-white p-5 sm:p-6 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                   <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">
                     Antardashas in {tp(selectedPeriod.md.lord)} Mahadasha
@@ -491,7 +497,7 @@ export default function DashaPage() {
             )}
 
             {/* Pratyantardasha for current AD */}
-            <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm">
+            <section className="rounded-2xl border border-[rgba(184,134,11,0.22)] bg-white p-5 sm:p-6 shadow-sm">
               <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold mb-1">
                 Pratyantardashas · {tp(current.antardasha.lord)} {t("dasha.antardasha")}
               </p>

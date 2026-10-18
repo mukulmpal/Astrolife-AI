@@ -15,7 +15,7 @@ function NumCard({ n, expanded, onToggle }: { n: NumerologyNumber; expanded: boo
   const c = n.color;
   return (
     <div
-      className="rounded-2xl p-5 cursor-pointer transition-all"
+      className="rounded-2xl p-5 sm:p-6 cursor-pointer transition-all"
       style={{ background: c + "0e", border: `1px solid ${expanded ? c + "55" : c + "22"}` }}
       onClick={onToggle}
     >
@@ -26,7 +26,7 @@ function NumCard({ n, expanded, onToggle }: { n: NumerologyNumber; expanded: boo
           </div>
           <div>
             <p className="text-xs uppercase tracking-widest text-[#8C827A] mb-1">{n.label}</p>
-            <p className="text-lg font-semibold text-[#1A1A1A]" style={{ fontFamily: "Cormorant Garamond, serif" }}>{n.archetype}</p>
+            <p className="text-xl font-semibold text-[#1A1A1A]" style={{ fontFamily: "Cormorant Garamond, serif" }}>{n.archetype}</p>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               <span className="text-sm" style={{ color: c }}>{n.planetIcon}</span>
               <span className="text-xs text-[#6B635B]">{n.planet}</span>
@@ -38,28 +38,28 @@ function NumCard({ n, expanded, onToggle }: { n: NumerologyNumber; expanded: boo
         <span className="text-[#8C827A] text-sm shrink-0 mt-1">{expanded ? "▲" : "▼"}</span>
       </div>
 
-      <p className="text-sm text-[#6B635B] mt-3 leading-relaxed">{n.theme}</p>
+      <p className="text-sm text-[#5A524A] mt-3 leading-relaxed">{n.theme}</p>
 
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-[rgba(184,134,11,0.18)] flex flex-col gap-4">
-          <p className="text-sm text-[#4A4238] leading-[1.85]">{n.desc}</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl p-3" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.18)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-2">Strengths</p>
-              {n.strengths.map(s => <p key={s} className="text-xs text-[#4A4238] mb-1.5">✦ {s}</p>)}
+        <div className="mt-5 pt-5 border-t border-[rgba(184,134,11,0.18)] flex flex-col gap-4">
+          <p className="text-sm text-[#3A3228] leading-[1.85]">{n.desc}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-xl p-3.5 sm:p-4 border-l-4 border-l-emerald-600" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.18)" }}>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-700 mb-2">Strengths</p>
+              {n.strengths.map(s => <p key={s} className="text-xs text-[#3A3228] mb-1.5 leading-relaxed">✦ {s}</p>)}
             </div>
-            <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-red-400 mb-2">Challenges</p>
-              {n.challenges.map(ch => <p key={ch} className="text-xs text-[#4A4238] mb-1.5">⚠ {ch}</p>)}
+            <div className="rounded-xl p-3.5 sm:p-4 border-l-4 border-l-red-600" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)" }}>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-red-700 mb-2">Challenges</p>
+              {n.challenges.map(ch => <p key={ch} className="text-xs text-[#3A3228] mb-1.5 leading-relaxed">⚠ {ch}</p>)}
             </div>
           </div>
-          <div className="flex items-center gap-4 flex-wrap text-xs text-[#6B635B]">
-            <span>Lucky: <span style={{ color: c }}>{n.luckyDays}</span></span>
+          <div className="flex items-center gap-4 flex-wrap text-xs text-[#6B635B] pt-1">
+            <span>Lucky: <strong style={{ color: c }}>{n.luckyDays}</strong></span>
             <span>Compatible: {n.compatibleWith.map(x => (
-              <span key={x} className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ml-1" style={{ background: c + "20", color: c }}>{x}</span>
+              <span key={x} className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ml-1" style={{ background: c + "20", color: c }}>{x}</span>
             ))}</span>
             <div className="flex gap-1.5 ml-auto">
-              {n.luckyColors.map(col => <div key={col} className="w-3.5 h-3.5 rounded-full border border-[rgba(184,134,11,0.18)]" style={{ background: col }} />)}
+              {n.luckyColors.map(col => <div key={col} className="w-4 h-4 rounded-full border border-[rgba(184,134,11,0.18)]" style={{ background: col }} />)}
             </div>
           </div>
         </div>
@@ -73,16 +73,16 @@ function PinnacleCard({ p }: { p: PinnacleNumber }) {
   const idx = ["1st", "2nd", "3rd", "4th"].indexOf(p.label.split(" ")[0]);
   const c = colors[idx] ?? "#94a3b8";
   return (
-    <div className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: p.isActive ? c + "18" : c + "08", border: `1px solid ${p.isActive ? c + "55" : c + "22"}` }}>
+    <div className="rounded-xl p-4 sm:p-5 flex flex-col gap-2.5" style={{ background: p.isActive ? c + "18" : c + "08", border: `1px solid ${p.isActive ? c + "55" : c + "22"}` }}>
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: c }}>{p.label}</span>
-        {p.isActive && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: c + "25", color: c }}>ACTIVE NOW</span>}
-        {p.isMaster && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/15 text-[#B8860B]">MASTER</span>}
+        {p.isActive && <span className="text-[10px] px-2.5 py-0.5 rounded-full font-bold" style={{ background: c + "25", color: c }}>ACTIVE NOW</span>}
+        {p.isMaster && <span className="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-500/15 text-[#B8860B]">MASTER</span>}
       </div>
       <p className="text-3xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color: c }}>{p.number}</p>
-      <p className="text-sm font-semibold text-[#1A1A1A]">{p.theme}</p>
-      <p className="text-xs text-[#6B635B] leading-relaxed">{p.guidance}</p>
-      <p className="text-xs text-[#8C827A] mt-1">Age {p.ageFrom} – {p.ageTo ?? "∞"}</p>
+      <p className="text-base font-bold text-[#1A1A1A]">{p.theme}</p>
+      <p className="text-xs text-[#5A524A] leading-relaxed">{p.guidance}</p>
+      <p className="text-xs text-[#8C827A] mt-auto pt-2">Age {p.ageFrom} – {p.ageTo ?? "∞"}</p>
     </div>
   );
 }
@@ -91,15 +91,15 @@ function ChallengeCard({ c: ch }: { c: ChallengeNumber }) {
   const isLifelong = ch.label.includes("Life");
   const color = isLifelong ? "#f59e0b" : "#ef4444";
   return (
-    <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: ch.isActive ? color + "12" : color + "06", border: `1px solid ${ch.isActive ? color + "45" : color + "20"}` }}>
+    <div className="rounded-xl p-4 sm:p-5 flex flex-col gap-2.5" style={{ background: ch.isActive ? color + "12" : color + "06", border: `1px solid ${ch.isActive ? color + "45" : color + "20"}` }}>
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color }}>{ch.label}</span>
-        {ch.isActive && !isLifelong && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: color + "20", color }}>ACTIVE</span>}
-        {isLifelong && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-[#B8860B]">WHOLE LIFE</span>}
+        {ch.isActive && !isLifelong && <span className="text-[10px] px-2.5 py-0.5 rounded-full font-bold" style={{ background: color + "20", color }}>ACTIVE</span>}
+        {isLifelong && <span className="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-500/15 text-[#B8860B]">WHOLE LIFE</span>}
       </div>
-      <p className="text-2xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color }}>{ch.number}</p>
-      <p className="text-xs text-[#6B635B] leading-relaxed">{ch.meaning}</p>
-      {!isLifelong && <p className="text-xs text-[#8C827A]">Age {ch.ageFrom} – {ch.ageTo ?? "∞"}</p>}
+      <p className="text-3xl font-bold" style={{ fontFamily: "Cormorant Garamond, serif", color }}>{ch.number}</p>
+      <p className="text-xs text-[#5A524A] leading-relaxed">{ch.meaning}</p>
+      {!isLifelong && <p className="text-xs text-[#8C827A] mt-auto pt-2">Age {ch.ageFrom} – {ch.ageTo ?? "∞"}</p>}
     </div>
   );
 }
@@ -330,10 +330,10 @@ export default function NumerologyPage() {
               </div>
             )}
             {activeChallenge && (
-              <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.30)" }}>
-                <p className="text-xs uppercase tracking-widest text-red-300 mb-2">Active Challenge</p>
+              <div className="rounded-2xl p-4 sm:p-5" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.30)" }}>
+                <p className="text-xs uppercase tracking-widest text-red-800 font-bold mb-2">Active Challenge</p>
                 <div className="flex items-center gap-3">
-                  <span className="text-4xl font-bold text-red-300" style={{ fontFamily: "Cormorant Garamond, serif" }}>{activeChallenge.number}</span>
+                  <span className="text-4xl font-bold text-red-700" style={{ fontFamily: "Cormorant Garamond, serif" }}>{activeChallenge.number}</span>
                   <p className="text-sm text-[#4A4238] leading-relaxed">{activeChallenge.meaning.split("—")[0]?.trim()}</p>
                 </div>
               </div>

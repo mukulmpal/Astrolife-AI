@@ -1,3 +1,13 @@
+// src/components/charts/VargaNeuroKarmicCards.tsx
+// ============================================================================
+// ASTROLIFE SHODASHAVARGA SHASTRIC NARRATIVE & NEURO-KARMIC CARDS
+// Editorial, human storytelling prose matching PillarNarrativeCard standards:
+// - Pure Devnagari Hindi storytelling prose in 3-4 line paragraphs
+// - Warm ivory (#FAF8F5) inner story containers with golden border
+// - Golden callout highlights (✦ मुख्य संकेत:)
+// - High-contrast typography with generous padding (never sticking to borders)
+// ============================================================================
+
 "use client";
 
 import React from "react";
@@ -16,68 +26,126 @@ export function VargaNeuroKarmicCards({ profile, className = "" }: VargaNeuroKar
   const pushkars = profile.latentPoints?.pushkarNavamshas;
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-4 ${className}`}>
       {/* ── CARD 1: NATAL D1 INTEGRATED SHASTRIC NARRATIVE ── */}
       <div
         className="bg-[#FFFFFF] border border-[rgba(184,134,11,0.28)] rounded-2xl shadow-[0_4px_24px_rgba(184,134,11,0.06)] transition-all"
-        style={{ padding: "26px 30px" }}
+        style={{ padding: "20px 24px" }}
       >
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        {/* HEADER BAR */}
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[11px] uppercase tracking-[1.5px] font-bold px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.3)]">
-              ✦ Natal D1 Integrated Shastric Narrative
+              ✦ षोडशवर्ग महा-विश्लेषण · Shodashavarga Shastric Synthesis
             </span>
             {profile.deityArchetype && (
               <span className="text-[11px] px-3 py-1 rounded-full bg-[#FAF5EB] text-[#8C6D1F] border border-[rgba(184,134,11,0.25)] font-semibold flex items-center gap-1.5">
-                <span>⚡ Adhidevata:</span>
+                <span>⚡ अधिदेवता:</span>
                 <strong>{profile.deityArchetype.name}</strong>
               </span>
             )}
           </div>
           <span className="text-xs px-3.5 py-1 rounded-full bg-[#FAF7F2] text-[#4A4238] border border-[rgba(184,134,11,0.2)] font-semibold">
-            {profile.vargaKey} Lagna: {profile.vargaLagna}
+            {profile.vargaKey} लग्न: {profile.vargaLagna}
           </span>
         </div>
 
-        <h2 className="font-serif text-2xl sm:text-[26px] font-bold text-[#1A1A1A] mb-2 leading-tight">
+        {/* TITLE & NATAL RELATION */}
+        <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1.5 leading-tight">
           {profile.deepExplanation.title}
         </h2>
-        
-        <div className="text-xs sm:text-[13px] text-[#8C6D1F] font-semibold mb-5 tracking-wide flex items-center gap-1.5">
+
+        <div className="text-xs sm:text-[13px] text-[#8C6D1F] font-semibold mb-3 tracking-wide flex items-center gap-1.5">
           <span>🏛️</span>
           <span>{profile.natalLagnaRelation}</span>
         </div>
 
-        <div className="space-y-4 font-serif text-[15px] sm:text-[15.5px] text-[#2A241F] leading-[1.85]">
-          {profile.deepExplanation.paragraphs.map((p, idx) => (
-            <p key={idx} className="m-0 text-justify">
-              {p}
-            </p>
-          ))}
-        </div>
+        {/* ── INNER STORY CONTAINER (MATCHING PILLAR NARRATIVE CARD) ── */}
+        <article
+          style={{
+            background: "#FAF8F5",
+            border: "1px solid rgba(184, 134, 11, 0.2)",
+            borderRadius: 12,
+            padding: "16px 20px",
+            position: "relative",
+          }}
+        >
+          {/* KEY HIGHLIGHT CALLOUT BAR */}
+          {profile.deepExplanation.primaryHighlight && (
+            <div
+              style={{
+                marginBottom: 12,
+                padding: "10px 14px",
+                background: "rgba(184, 134, 11, 0.08)",
+                borderLeft: "4px solid #B8860B",
+                borderRadius: "0 8px 8px 0",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#854D0E",
+                lineHeight: 1.55,
+              }}
+            >
+              ✦ <strong>मुख्य संकेत:</strong> {profile.deepExplanation.primaryHighlight}
+            </div>
+          )}
+
+          {/* PARAGRAPHS IN NOVELISTIC DEVNAGARI PROSE */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              fontSize: 14.5,
+              lineHeight: 1.7,
+              color: "#2A241F",
+              fontFamily: "Cormorant Garamond, Georgia, serif",
+            }}
+          >
+            {profile.deepExplanation.paragraphs.map((p, idx) => (
+              <p key={idx} style={{ margin: 0, textAlign: "justify" }}>
+                {p}
+              </p>
+            ))}
+          </div>
+        </article>
 
         {/* Pushkar Navamshas Banner (if any) */}
         {pushkars && pushkars.length > 0 && (
-          <div className="mt-5 p-4 sm:p-5 rounded-xl bg-emerald-50/80 border border-emerald-200/90 border-l-4 border-l-emerald-600 flex items-start gap-3">
-            <span className="text-emerald-600 text-lg leading-none mt-0.5">✨</span>
+          <div
+            style={{
+              marginTop: 14,
+              padding: "12px 16px",
+              borderRadius: 10,
+              background: "rgba(16, 185, 129, 0.08)",
+              border: "1px solid rgba(16, 185, 129, 0.25)",
+              borderLeft: "4px solid #059669",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 10,
+            }}
+          >
+            <span style={{ color: "#059669", fontSize: 16, lineHeight: 1, marginTop: 2 }}>✨</span>
             <div>
-              <div className="text-[11.5px] font-bold text-emerald-900 uppercase tracking-wider mb-1">
-                Pushkar Navamsha Regenerative Grace Active
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#065F46", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4 }}>
+                पुष्कर नवांश का अमृत आशीर्वाद (Pushkar Navamsha Regenerative Grace)
               </div>
-              <div className="text-xs sm:text-[13.5px] text-emerald-800 leading-relaxed">
-                {pushkars.map((pk) => `${pk.planet} in ${pk.navamshaSign}`).join(" · ")} — Endowed with self-regenerating neuroplasticity; converts severe challenges into breakthrough resilience.
+              <div style={{ fontSize: "13.5px", color: "#047857", lineHeight: 1.65, fontWeight: 500 }}>
+                {pushkars.map((pk) => `${pk.planet} in ${pk.navamshaSign}`).join(" · ")} — यह योग घोर विपत्तियों और अप्रत्याशित संकटों के पश्चात भी जीवन को पुनः नव-ऊर्जा और अभूतपूर्व सफलता से भर देने का वरदान देता है।
               </div>
             </div>
           </div>
         )}
 
+        {/* Key Signatures Chips */}
         {profile.deepExplanation.keyHighlights.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap mt-6 pt-4 border-t border-[rgba(184,134,11,0.18)]">
-            <span className="text-[11px] uppercase tracking-wider text-[#B8860B] font-bold mr-1">Key Signatures:</span>
+          <div className="flex items-center gap-2 flex-wrap mt-4 pt-3 border-t border-[rgba(184,134,11,0.18)]">
+            <span className="text-[11px] uppercase tracking-wider text-[#B8860B] font-bold mr-1">
+              मुख्य शास्त्रीय सूत्र:
+            </span>
             {profile.deepExplanation.keyHighlights.map((kh, idx) => (
               <span
                 key={idx}
-                className="text-xs px-3 py-1 rounded-md bg-[#FAF5EB] text-[#1A1A1A] border border-[rgba(184,134,11,0.25)] font-medium"
+                className="text-xs px-3 py-1 rounded-md bg-[#FAF5EB] text-[#1A1A1A] border border-[rgba(184,134,11,0.25)] font-semibold"
               >
                 {kh}
               </span>
@@ -93,9 +161,9 @@ export function VargaNeuroKarmicCards({ profile, className = "" }: VargaNeuroKar
             ? "border-[rgba(220,38,38,0.28)]"
             : "border-[rgba(184,134,11,0.28)]"
         }`}
-        style={{ padding: "26px 30px" }}
+        style={{ padding: "20px 24px" }}
       >
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <span
             className={`text-[11px] uppercase tracking-[1.5px] font-bold px-3 py-1 rounded-full border ${
               profile.karmicWeakness.hasAffliction
@@ -103,73 +171,127 @@ export function VargaNeuroKarmicCards({ profile, className = "" }: VargaNeuroKar
                 : "bg-[rgba(184,134,11,0.1)] text-[#B8860B] border-[rgba(184,134,11,0.3)]"
             }`}
           >
-            ⚠️ Varga Karmic Weakness &amp; Subconscious Bottleneck
+            ⚠️ कार्मिक अवरोध एवं अवचेतन चुनौतियाँ · Karmic Friction &amp; Bottleneck
           </span>
           {profile.karmicWeakness.afflictedPlanets.length > 0 && (
             <span className="text-xs px-3 py-1 rounded-full bg-[rgba(220,38,38,0.08)] text-[#DC2626] font-bold border border-[rgba(220,38,38,0.2)]">
-              Afflicted: {profile.karmicWeakness.afflictedPlanets.join(", ")}
+              संवेदनशील ग्रह: {profile.karmicWeakness.afflictedPlanets.join(", ")}
             </span>
           )}
         </div>
 
-        <h3 className="font-serif text-2xl font-bold text-[#1A1A1A] mb-3 leading-tight">
+        <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-2 leading-tight">
           {profile.karmicWeakness.psychologicalBottleneckTitle}
         </h3>
 
-        <div className="p-4 sm:p-5 rounded-xl bg-[rgba(220,38,38,0.04)] border border-[rgba(220,38,38,0.18)] border-l-4 border-l-[#DC2626] mb-5">
-          <div className="text-xs uppercase font-bold text-[#DC2626] tracking-wider mb-1">
-            Friction Dynamics
+        {/* Friction Dynamics Callout */}
+        <div
+          style={{
+            padding: "12px 16px",
+            borderRadius: 10,
+            background: "rgba(220, 38, 38, 0.04)",
+            border: "1px solid rgba(220, 38, 38, 0.22)",
+            borderLeft: "4px solid #DC2626",
+            marginBottom: 12,
+          }}
+        >
+          <div style={{ fontSize: 11.5, textTransform: "uppercase", fontWeight: 800, color: "#DC2626", letterSpacing: "0.8px", marginBottom: 6 }}>
+            ✦ घर्षण व संकोच का शास्त्रीय विश्लेषण (Friction Dynamics)
           </div>
-          <div className="text-sm text-[#991B1B] font-medium leading-relaxed">
+          <div style={{ fontSize: "14px", color: "#991B1B", fontWeight: 500, lineHeight: 1.65 }}>
             {profile.karmicWeakness.frictionSummary}
           </div>
         </div>
 
-        <div className="font-serif text-[15px] sm:text-[15.5px] text-[#2A241F] leading-[1.85] mb-5">
-          <p className="m-0 text-justify">
-            {profile.karmicWeakness.psychologicalBottleneckDesc}
-          </p>
-        </div>
+        {/* Subconscious Bottleneck Narrative in #FAF8F5 Story Box */}
+        <article
+          style={{
+            background: "#FAF8F5",
+            border: "1px solid rgba(184, 134, 11, 0.2)",
+            borderRadius: 12,
+            padding: "14px 18px",
+            marginBottom: 12,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Cormorant Garamond, Georgia, serif",
+              fontSize: 14.5,
+              lineHeight: 1.7,
+              color: "#2A241F",
+            }}
+          >
+            <p style={{ margin: 0, textAlign: "justify" }}>
+              {profile.karmicWeakness.psychologicalBottleneckDesc}
+            </p>
+          </div>
+        </article>
 
         {/* Specialized Critical Karmic Points (Kharesh in D3, 64th Navamsha in D9) */}
         {isD3 && kharesh && (
-          <div className="mb-5 p-5 sm:p-6 rounded-xl bg-amber-50/80 border border-amber-200 border-l-4 border-l-amber-600">
-            <div className="text-xs uppercase tracking-wider text-amber-900 font-bold mb-1.5 flex items-center gap-1.5">
+          <div
+            style={{
+              marginBottom: 12,
+              padding: "14px 18px",
+              borderRadius: 12,
+              background: "#FAF8F5",
+              border: "1px solid rgba(217, 119, 6, 0.25)",
+              borderLeft: "4px solid #D97706",
+            }}
+          >
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.8px", color: "#92400E", fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
               <span>🛡️</span>
-              <span>22nd Drekkana (Kharesh) — Hereditary Epigenetic Organ Vulnerability</span>
+              <span>२२वाँ द्रेष्काण (ख्रेश बिंदु) — आनुवंशिक व जैविक संवेदनशीलता</span>
             </div>
-            <div className="text-sm text-[#4A4238] leading-relaxed mb-3 font-medium">
-              Lord: <strong>{kharesh.planet}</strong> in <strong>{kharesh.sign}</strong> (House 8).
-              Affects: {kharesh.organSystem}.
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#4A4238", lineHeight: 1.7, marginBottom: 10, fontWeight: 500 }}>
+              अधिपति: <strong>{kharesh.planet}</strong> ({kharesh.sign} राशि, अष्टम भाव)।
+              संवेदनशील शारीरिक तंत्र: <strong>{kharesh.organSystem}</strong>।
             </div>
-            <div className="text-xs sm:text-[13px] text-amber-900 bg-white/90 p-4 rounded-xl border border-amber-200/70 leading-relaxed">
-              <strong>Somatic Preventive Protocol:</strong> {kharesh.somaticProtocol}
+            <div style={{ padding: "10px 14px", borderRadius: 8, background: "#FFFFFF", border: "1px solid rgba(217, 119, 6, 0.2)", fontSize: "13.5px", color: "#92400E", lineHeight: 1.65, fontWeight: 500 }}>
+              <strong>दैनिक निवारक सुरक्षा विधान:</strong> {kharesh.somaticProtocol}
             </div>
           </div>
         )}
 
         {isD9 && sixtyFourth && (
-          <div className="mb-5 p-5 sm:p-6 rounded-xl bg-rose-50/80 border border-rose-200 border-l-4 border-l-rose-600">
-            <div className="text-xs uppercase tracking-wider text-rose-900 font-bold mb-1.5 flex items-center gap-1.5">
+          <div
+            style={{
+              marginBottom: 12,
+              padding: "14px 18px",
+              borderRadius: 12,
+              background: "rgba(225, 29, 72, 0.05)",
+              border: "1px solid rgba(225, 29, 72, 0.25)",
+              borderLeft: "4px solid #E11D48",
+            }}
+          >
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.8px", color: "#9F1239", fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
               <span>⚡</span>
-              <span>64th Navamsha Transit Shock Shield</span>
+              <span>६४वाँ नवांश (संवेदनशील गोचर सुरक्षा ढाल)</span>
             </div>
-            <div className="text-sm text-[#4A4238] leading-relaxed mb-3 font-medium">
-              4th from Moon in D9: <strong>{sixtyFourth.sign}</strong>, ruled by <strong>{sixtyFourth.planet}</strong>.
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#4A4238", lineHeight: 1.7, marginBottom: 10, fontWeight: 500 }}>
+              चंद्र नवांश से चतुर्थ भाव: <strong>{sixtyFourth.sign}</strong>, स्वामी: <strong>{sixtyFourth.planet}</strong> देव।
             </div>
-            <div className="text-xs sm:text-[13px] text-rose-900 bg-white/90 p-4 rounded-xl border border-rose-200/70 leading-relaxed">
-              <strong>Prefrontal Cognitive Shield:</strong> {sixtyFourth.cognitiveShield}
+            <div style={{ padding: "10px 14px", borderRadius: 8, background: "#FFFFFF", border: "1px solid rgba(225, 29, 72, 0.2)", fontSize: "13.5px", color: "#9F1239", lineHeight: 1.65, fontWeight: 500 }}>
+              <strong>संज्ञानात्मक सुरक्षा कवच:</strong> {sixtyFourth.cognitiveShield}
             </div>
           </div>
         )}
 
         {/* Ancestral DNA Kula Karma Imprint */}
-        <div className="p-5 sm:p-6 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.22)] border-l-4 border-l-[#B8860B]">
-          <div className="text-xs uppercase tracking-wider text-[#B8860B] font-bold mb-2 flex items-center gap-1.5">
+        <div
+          style={{
+            padding: "14px 18px",
+            borderRadius: 12,
+            background: "#FAF8F5",
+            border: "1px solid rgba(184, 134, 11, 0.25)",
+            borderLeft: "4px solid #B8860B",
+          }}
+        >
+          <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.8px", color: "#B8860B", fontWeight: 800, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
             <span>🧬</span>
-            <span>Ancestral DNA &amp; Kula Karma Pattern</span>
+            <span>पूर्वज कर्म-बीज व कुल परंपरा · Ancestral DNA &amp; Kula Karma Pattern</span>
           </div>
-          <p className="text-sm sm:text-[14.5px] text-[#3D3834] leading-[1.8] m-0 font-medium">
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#2A241F", lineHeight: 1.7, margin: 0, fontWeight: 500, textAlign: "justify" }}>
             {profile.karmicWeakness.ancestralLineagePattern}
           </p>
         </div>
@@ -178,94 +300,133 @@ export function VargaNeuroKarmicCards({ profile, className = "" }: VargaNeuroKar
       {/* ── CARD 3: SCIENTIFIC & DNA-BASED NEURO-REMEDY PROTOCOL ── */}
       <div
         className="bg-[#FFFFFF] border border-[rgba(34,197,94,0.3)] rounded-2xl shadow-[0_4px_24px_rgba(184,134,11,0.06)] transition-all"
-        style={{ padding: "26px 30px" }}
+        style={{ padding: "20px 24px" }}
       >
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <span className="text-[11px] uppercase tracking-[1.5px] font-bold px-3 py-1 rounded-full bg-[rgba(34,197,94,0.12)] text-[#16A34A] border border-[rgba(34,197,94,0.3)]">
-            🧬 Scientific &amp; DNA-Based Neuro-Remedy Protocol
+            🧬 वैज्ञानिक एवं डीएनए-आधारित न्यूरो-उपाय · Scientific Neuro-Remedies
           </span>
           <span className="text-xs px-3.5 py-1 rounded-full bg-[#FAF5EB] text-[#8C6D1F] border border-[rgba(184,134,11,0.2)] font-semibold">
-            Daily Behavioral Re-Wiring
+            दैनिक व्यवहार पुनर्गठन · Daily Reset
           </span>
         </div>
 
-        <h3 className="font-serif text-2xl font-bold text-[#1A1A1A] mb-5 leading-tight">
-          Neuro-Somatic &amp; Generational Loop Reset for {profile.vargaKey} ({profile.vargaName})
+        <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-3 leading-tight">
+          तंत्रिका-तंत्र व पूर्वज लूप विखंडन · Neuro-Somatic Reset ({profile.vargaKey} {profile.vargaName})
         </h3>
 
-        <div className="space-y-4 mb-5">
+        <div className="space-y-3 mb-2">
           {/* Step 1: Ancestral Interruption */}
-          <div className="bg-[#FAF8F5] border border-[rgba(184,134,11,0.22)] border-l-4 border-l-[#B8860B] rounded-xl p-5 sm:p-6 transition-all">
-            <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-              <span className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
-                १. पूर्वज लूप खंडन · Step 1: Ancestral Loop Interruption
+          <div
+            style={{
+              padding: "14px 18px",
+              borderRadius: 12,
+              background: "#FAF8F5",
+              border: "1px solid rgba(184, 134, 11, 0.25)",
+              borderLeft: "4px solid #B8860B",
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 11.5, textTransform: "uppercase", letterSpacing: "0.8px", fontWeight: 800, color: "#B8860B" }}>
+                १. पूर्वज लूप विखंडन · Step 1: Ancestral Loop Interruption
               </span>
-              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-white text-[#8C6D1F] border border-[rgba(184,134,11,0.25)] font-bold">
+              <span style={{ fontSize: 10.5, padding: "3px 8px", borderRadius: 20, background: "#FFFFFF", color: "#8C6D1F", border: "1px solid rgba(184, 134, 11, 0.25)", fontWeight: 700 }}>
                 Generational Reset
               </span>
             </div>
-            <div className="font-serif text-lg font-bold text-[#1A1A1A] mb-2">
-              Generational Loop Break & Epigenetic Cleansing
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 16.5, fontWeight: 700, color: "#1A1A1A", marginBottom: 6 }}>
+              पारिवारिक संस्कार विखंडन एवं चेतन शुद्धि (Epigenetic Cleansing)
             </div>
-            <p className="text-sm sm:text-[14.5px] text-[#3D3834] leading-[1.8] m-0 font-medium">
+            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#2A241F", lineHeight: 1.7, margin: 0, fontWeight: 500, textAlign: "justify" }}>
               {profile.neuroRemedy.ancestralLoopInterruption}
             </p>
           </div>
 
           {/* Step 2: Cognitive Re-Wiring */}
-          <div className="bg-[#FAF8F5] border border-[rgba(37,99,235,0.2)] border-l-4 border-l-[#2563EB] rounded-xl p-5 sm:p-6 transition-all">
-            <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-              <span className="text-xs uppercase tracking-wider font-extrabold text-[#2563EB]">
+          <div
+            style={{
+              padding: "14px 18px",
+              borderRadius: 12,
+              background: "#FAF8F5",
+              border: "1px solid rgba(37, 99, 235, 0.22)",
+              borderLeft: "4px solid #2563EB",
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 11.5, textTransform: "uppercase", letterSpacing: "0.8px", fontWeight: 800, color: "#2563EB" }}>
                 २. मानसिक पुनर्गठन · Step 2: Cognitive Re-Wiring
               </span>
-              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200 font-bold">
-                Target: {profile.neuroRemedy.cognitiveRewiring.distortionLabel}
+              <span style={{ fontSize: 10.5, padding: "3px 8px", borderRadius: 20, background: "#EFF6FF", color: "#2563EB", border: "1px solid #BFDBFE", fontWeight: 700 }}>
+                लक्षित अवरोध: {profile.neuroRemedy.cognitiveRewiring.distortionLabel}
               </span>
             </div>
-            <div className="font-serif text-lg font-bold text-[#1A1A1A] mb-2">
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 16.5, fontWeight: 700, color: "#1A1A1A", marginBottom: 6 }}>
               {profile.neuroRemedy.cognitiveRewiring.techniqueName}
             </div>
-            <p className="text-sm sm:text-[14.5px] text-[#3D3834] leading-[1.8] m-0 font-medium">
+            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#2A241F", lineHeight: 1.7, margin: 0, fontWeight: 500, textAlign: "justify" }}>
               {profile.neuroRemedy.cognitiveRewiring.mindsetProtocol}
             </p>
           </div>
 
           {/* Step 3: Somatic Behavioral Habit */}
-          <div className="bg-[#FAF8F5] border border-[rgba(22,163,74,0.2)] border-l-4 border-l-[#16A34A] rounded-xl p-5 sm:p-6 transition-all">
-            <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-              <span className="text-xs uppercase tracking-wider font-extrabold text-[#16A34A]">
+          <div
+            style={{
+              padding: "14px 18px",
+              borderRadius: 12,
+              background: "#FAF8F5",
+              border: "1px solid rgba(22, 163, 74, 0.22)",
+              borderLeft: "4px solid #16A34A",
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 11.5, textTransform: "uppercase", letterSpacing: "0.8px", fontWeight: 800, color: "#16A34A" }}>
                 ३. देह-व्यवहार क्रिया · Step 3: Somatic Behavioral Protocol
               </span>
-              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#16A34A] border border-emerald-200 font-bold">
-                Biomarker: {profile.neuroRemedy.somaticBehavioralHabit.neuroMechanism}
+              <span style={{ fontSize: 10.5, padding: "3px 8px", borderRadius: 20, background: "#ECFDF5", color: "#16A34A", border: "1px solid #A7F3D0", fontWeight: 700 }}>
+                तंत्रिका तंत्र प्रभाव
               </span>
             </div>
-            <div className="font-serif text-lg font-bold text-[#1A1A1A] mb-2">
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 16.5, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
               {profile.neuroRemedy.somaticBehavioralHabit.habitName}
             </div>
-            <p className="text-sm sm:text-[14.5px] text-[#1A1A1A] leading-[1.8] m-0 font-medium">
+            <div style={{ fontSize: 12.5, color: "#047857", marginBottom: 6, fontWeight: 600 }}>
+              {profile.neuroRemedy.somaticBehavioralHabit.neuroMechanism}
+            </div>
+            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#2A241F", lineHeight: 1.7, margin: 0, fontWeight: 500, textAlign: "justify" }}>
               {profile.neuroRemedy.somaticBehavioralHabit.dailyProtocol}
             </p>
           </div>
 
           {/* Step 4: Adhidevata Archetype Priming */}
           {profile.neuroRemedy.archetypeAlignment && (
-            <div className="bg-[#FAF8F5] border border-[rgba(168,85,247,0.25)] border-l-4 border-l-[#a855f7] rounded-xl p-5 sm:p-6 transition-all">
-              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-                <div className="text-xs uppercase tracking-wider font-extrabold text-[#a855f7] flex items-center gap-1.5">
+            <div
+              style={{
+                padding: "14px 18px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(168, 85, 247, 0.25)",
+                borderLeft: "4px solid #A855F7",
+                marginBottom: 12,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
+                <div style={{ fontSize: 11.5, textTransform: "uppercase", letterSpacing: "0.8px", fontWeight: 800, color: "#9333EA", display: "flex", alignItems: "center", gap: 6 }}>
                   <span>⚡ ४. अधिदेवता संरेखण · Step 4: Adhidevata Archetypal Priming</span>
                   <span>({profile.neuroRemedy.archetypeAlignment.name})</span>
                 </div>
-                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-purple-50 text-[#a855f7] font-bold border border-purple-200">
+                <span style={{ fontSize: 10.5, padding: "3px 8px", borderRadius: 20, background: "#FAF5FF", color: "#9333EA", fontWeight: 700, border: "1px solid #E9D5FF" }}>
                   Daily Executive Mode
                 </span>
               </div>
-              <div className="space-y-2 mt-2">
-                <div className="text-sm sm:text-[14.5px] text-[#1A1A1A] font-medium leading-[1.8]">
-                  <strong className="text-[#a855f7]">Execution Stance:</strong> {profile.neuroRemedy.archetypeAlignment.executiveProtocol}
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#1A1A1A", fontWeight: 500, lineHeight: 1.65 }}>
+                  <strong style={{ color: "#9333EA" }}>कार्य निष्पादन मुद्रा:</strong> {profile.neuroRemedy.archetypeAlignment.executiveProtocol}
                 </div>
-                <div className="text-sm sm:text-[14.5px] text-[#4A4238] leading-[1.8]">
-                  <strong className="text-[#8C6D1F]">Behavioral Alignment:</strong> {profile.neuroRemedy.archetypeAlignment.cognitiveRefocus}
+                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14.5px", color: "#4A4238", lineHeight: 1.65 }}>
+                  <strong style={{ color: "#8C6D1F" }}>चेतन संरेखण:</strong> {profile.neuroRemedy.archetypeAlignment.cognitiveRefocus}
                 </div>
               </div>
             </div>

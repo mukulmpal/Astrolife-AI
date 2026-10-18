@@ -29,6 +29,7 @@ export interface PlanetData {
 interface Props {
   lagnaNum: number;
   planets: Record<string, PlanetData>;
+  overlayPlanets?: Record<string, PlanetData>;
   size?: number;
   interactive?: boolean;
 }
@@ -97,7 +98,7 @@ function planetSlots(total: number) {
   });
 }
 
-export default function NorthIndianChart({ lagnaNum, planets, size = 310, interactive = true }: Props) {
+export default function NorthIndianChart({ lagnaNum, planets, overlayPlanets, size = 310, interactive = true }: Props) {
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const S = size;
   const h = S / 2;
@@ -142,6 +143,7 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310, intera
     pada?: number;
     dignity?: string;
     sign?: string;
+    isOverlay?: boolean;
   }
 
   const pByH: Record<number, HousePlanetItem[]> = {};
@@ -171,9 +173,41 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310, intera
         pada: pd.pada,
         dignity: pd.dignity,
         sign: pd.sign,
+        isOverlay: false,
       });
     }
   });
+
+  if (overlayPlanets) {
+    PLS.forEach((p) => {
+      const pd = overlayPlanets[p];
+      if (!pd) return;
+      const rashi =
+        typeof pd.signNum === "number"
+          ? pd.signNum
+          : typeof pd.rashi === "number"
+            ? pd.rashi
+            : typeof pd.rashiIndex === "number"
+              ? pd.rashiIndex
+              : typeof pd.signIndex === "number"
+                ? pd.signIndex
+                : null;
+      const house = rashi !== null ? md(rashi - lagnaNum, 12) + 1 : pd.house;
+      if (house >= 1 && house <= 12) {
+        pByH[house].push({
+          name: p,
+          retro: pd.retrograde,
+          degree: pd.degree,
+          minutes: pd.minutes,
+          nakshatra: pd.nakshatra,
+          pada: pd.pada,
+          dignity: pd.dignity,
+          sign: pd.sign,
+          isOverlay: true,
+        });
+      }
+    });
+  }
 
   const ls = { stroke: "#2a2250", strokeWidth: "1" };
 
@@ -282,22 +316,22 @@ export default function NorthIndianChart({ lagnaNum, planets, size = 310, intera
                 const py = ly + (isLagna ? 20 : 15) + slot.y;
 
                 return (
-                  <g key={p.name}>
+                  <g key={`${p.name}-${p.isOverlay ? "overlay" : "natal"}`}>
                     <text
                       x={lx + slot.x}
                       y={py}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fontSize={slot.font}
-                      fontWeight="600"
+                      fontWeight={p.isOverlay ? "800" : "600"}
                       fontFamily="sans-serif"
-                      fill={PCOL[piIdx]}
+                      fill={p.isOverlay ? "#059669" : PCOL[piIdx]}
                     >
-                      {PABBR[piIdx]}
+                      {PABBR[piIdx]}{p.isOverlay ? "ᴳ" : ""}
                     </text>
                     {p.retro && (
                       <text
-                        x={lx + slot.x + 8}
+                        x={lx + slot.x + (p.isOverlay ? 9 : 8)}
                         y={py - 5}
                         textAnchor="middle"
                         fontSize="5.8"

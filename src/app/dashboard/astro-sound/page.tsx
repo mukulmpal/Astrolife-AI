@@ -378,7 +378,7 @@ export default function AstroSoundPage() {
 
   const [musicReferenceType, setMusicReferenceType] = useState<MusicReferenceType>("film_bollywood");
   const { chart, loading: chartLoading, hasUserChart } = useUserChart();
-  const chartData = useMemo(() => hasUserChart ? normalizeAstroSoundChart(chart) : null, [chart, hasUserChart]);
+  const chartData = useMemo(() => normalizeAstroSoundChart(chart), [chart]);
   const dashaPlanets = useMemo(() => {
     const rawChart = chart as unknown as GenericObj | null | undefined;
     const root = ((rawChart?.chart as GenericObj | undefined) ?? rawChart) as GenericObj | undefined;
@@ -462,6 +462,17 @@ export default function AstroSoundPage() {
       }
     }, 250);
   }, [chartData, dashaPlanets, memory, setLastReportText, setLoading, setResult, settings]);
+
+  const lastGeneratedKeyRef = useRef<string>("");
+
+  useEffect(() => {
+    if (!mounted || chartLoading) return;
+    const currentKey = `${chartData ? "hasChart" : "noChart"}-${settings.goal}-${settings.emotion}-${settings.voice}-${settings.intensity}-${settings.mode}-${dashaPlanets.currentMahadasha ?? ""}`;
+    if (lastGeneratedKeyRef.current !== currentKey) {
+      lastGeneratedKeyRef.current = currentKey;
+      generate();
+    }
+  }, [mounted, chartLoading, chartData, settings, dashaPlanets, generate]);
 
   const copyReport = async () => {
     if (!lastReportText) return;
@@ -1506,10 +1517,10 @@ export default function AstroSoundPage() {
 
         .as-meta-grid div,
         .as-alt-card {
-          border: 1px solid rgba(184, 134, 11, 0.18);
-          background: #FAF7F2;
-          border-radius: 14px;
-          padding: 14px;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          background: #FAF8F5;
+          border-radius: 12px;
+          padding: 14px 16px;
         }
 
         .as-meta-grid span,
@@ -1575,15 +1586,16 @@ export default function AstroSoundPage() {
         .as-seven-day {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
-          margin-top: 12px;
+          gap: 12px;
+          margin-top: 14px;
         }
 
         .as-seven-day div {
-          border: 1px solid rgba(184, 134, 11, 0.18);
-          background: #FAF7F2;
-          border-radius: 14px;
-          padding: 12px;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          border-left: 4px solid #B8860B;
+          background: #FAF8F5;
+          border-radius: 12px;
+          padding: 14px 16px;
         }
 
         .as-seven-day strong {
@@ -1603,8 +1615,8 @@ export default function AstroSoundPage() {
         .as-seven-day p {
           margin: 0;
           color: #6B635B;
-          line-height: 1.5;
-          font-size: 12px;
+          line-height: 1.6;
+          font-size: 13px;
         }
 
         .as-tabs {
@@ -1625,10 +1637,11 @@ export default function AstroSoundPage() {
         }
 
         .as-card {
-          border: 1px solid rgba(184, 134, 11, 0.2);
-          background: #FAF7F2;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          border-left: 4px solid #B8860B;
+          background: #FAF8F5;
           border-radius: 16px;
-          padding: 18px;
+          padding: 18px 22px;
         }
 
         .as-card h3 {
@@ -1656,10 +1669,11 @@ export default function AstroSoundPage() {
         }
 
         .as-timing-grid div {
-          border: 1px solid rgba(184, 134, 11, 0.18);
-          background: #FAF7F2;
-          border-radius: 14px;
-          padding: 14px;
+          border: 1px solid rgba(184, 134, 11, 0.22);
+          border-left: 4px solid #B8860B;
+          background: #FAF8F5;
+          border-radius: 12px;
+          padding: 14px 16px;
         }
 
         .as-timing-grid span {

@@ -259,7 +259,7 @@ export function NavtaraIntelligenceView({
           </div>
 
           {/* Pattern description */}
-          <div className="bg-[#FAF7F2] rounded-2xl p-4 border border-amber-900/10">
+          <div className="bg-[#FAF8F5] rounded-xl p-4 border border-amber-900/15 border-l-4 border-l-[#B8860B]">
             <p className="text-sm text-[#1A1A1A] leading-relaxed font-medium">
               {audit.patternDescription}
             </p>
@@ -272,12 +272,13 @@ export function NavtaraIntelligenceView({
               return (
                 <div
                   key={idx}
-                  className="rounded-2xl p-4 flex flex-col gap-2 transition-all"
+                  className="rounded-xl p-4 flex flex-col gap-2 transition-all"
                   style={{
-                    background: isDanger ? "rgba(239, 68, 68, 0.05)" : "#FFFFFF",
+                    background: "#FAF8F5",
                     border: `1px solid ${
-                      isDanger ? "rgba(239, 68, 68, 0.25)" : "rgba(184, 134, 11, 0.2)"
+                      isDanger ? "rgba(239, 68, 68, 0.3)" : "rgba(184, 134, 11, 0.22)"
                     }`,
+                    borderLeft: `4px solid ${isDanger ? "#dc2626" : "#059669"}`,
                   }}
                 >
                   <div className="flex items-center justify-between text-xs">
@@ -375,38 +376,38 @@ export function NavtaraIntelligenceView({
           </p>
 
           {/* 5 Physical & Spiritual Anchors */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <div className="bg-[#FAF7F2] p-2.5 rounded-xl border border-amber-900/10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
               <p className="text-[10px] uppercase font-bold text-[#6B635B]">Devta</p>
               <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
                 {intel.supportStarShield.anchors.devta}
               </p>
             </div>
-            <div className="bg-[#FAF7F2] p-2.5 rounded-xl border border-amber-900/10">
+            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
               <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Bird</p>
               <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
                 {intel.supportStarShield.anchors.bird}
               </p>
             </div>
-            <div className="bg-[#FAF7F2] p-2.5 rounded-xl border border-amber-900/10">
+            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
               <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Animal</p>
               <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
                 {intel.supportStarShield.anchors.animal}
               </p>
             </div>
-            <div className="bg-[#FAF7F2] p-2.5 rounded-xl border border-amber-900/10">
+            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
               <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Flora / Tree</p>
               <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
                 {intel.supportStarShield.anchors.tree}
               </p>
             </div>
-            <div className="bg-[#FAF7F2] p-2.5 rounded-xl border border-amber-900/10">
+            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
               <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Symbol</p>
               <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
                 {intel.supportStarShield.anchors.symbol}
               </p>
             </div>
-            <div className="bg-[#FAF7F2] p-2.5 rounded-xl border border-amber-900/10">
+            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
               <p className="text-[10px] uppercase font-bold text-[#6B635B]">Star Lord</p>
               <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
                 {tp(intel.supportStarShield.nakshatra.lord)}
@@ -415,7 +416,7 @@ export function NavtaraIntelligenceView({
           </div>
 
           {/* Historical Example Callout */}
-          <div className="rounded-2xl bg-amber-500/10 border border-amber-500/25 p-3.5">
+          <div className="rounded-xl bg-[#FAF8F5] border border-amber-900/15 border-l-4 border-l-[#B8860B] p-4">
             <p className="text-xs text-[#5C3D00] leading-relaxed">
               <strong>Classical Prototype:</strong> {intel.supportStarShield.historicalExample}
             </p>
@@ -440,7 +441,7 @@ export function NavtaraIntelligenceView({
             Classical Principle: Rather than purely acting like the lord of your Janma Star ({intel.birthNakshatra.lord}), your foundational internal temperament actively channels the qualities of the <strong>preceding star&apos;s lord ({intel.qualityProfile.channellingLord})</strong>.
           </p>
 
-          <div className="bg-[#FAF7F2] rounded-2xl p-4 border border-amber-900/10">
+          <div className="bg-[#FAF8F5] rounded-xl p-4 border border-amber-900/15 border-l-4 border-l-[#B8860B]">
             <p className="text-sm text-[#1A1A1A] leading-relaxed">
               {intel.qualityProfile.description}
             </p>
@@ -732,16 +733,17 @@ export function NavtaraIntelligenceView({
               return (
                 <div
                   key={idx}
-                  className="rounded-2xl p-3.5 border flex flex-col gap-1.5"
+                  className="rounded-xl p-4 border flex flex-col gap-1.5"
                   style={{
-                    background: isActivation ? "rgba(16, 185, 129, 0.05)" : "rgba(239, 68, 68, 0.05)",
-                    borderColor: isActivation ? "rgba(16, 185, 129, 0.25)" : "rgba(239, 68, 68, 0.25)",
+                    background: "#FAF8F5",
+                    borderColor: isActivation ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)",
+                    borderLeft: `4px solid ${isActivation ? "#059669" : "#dc2626"}`,
                   }}
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span
                       className={`font-bold uppercase tracking-wider ${
-                        isActivation ? "text-emerald-700" : "text-red-700"
+                        isActivation ? "text-emerald-800" : "text-red-800"
                       }`}
                     >
                       {win.triggerPlanet} in {win.targetSign}

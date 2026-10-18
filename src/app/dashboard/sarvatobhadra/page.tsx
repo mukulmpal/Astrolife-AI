@@ -46,21 +46,21 @@ export default function SarvatobhadraPage() {
   return (
     <main className="page" style={{ minHeight: "100vh", paddingBottom: 110 }}>
       <style>{`
-        .svb-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 14px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .svb-row { font-size: 12px; color: #4A4238; margin-bottom: 6px; display: flex; gap: 8px; line-height: 1.55; }
-        .svb-row strong { color: #1A1A1A; min-width: 80px; flex-shrink: 0; font-weight: 700; }
-        .tab-btn { padding: 7px 13px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid rgba(184, 134, 11, 0.22); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .svb-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 16px; margin-bottom: 14px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.03); }
+        .svb-row { font-size: 13px; color: #4A4238; margin-bottom: 6px; display: flex; gap: 10px; line-height: 1.6; }
+        .svb-row strong { color: #1A1A1A; min-width: 85px; flex-shrink: 0; font-weight: 700; }
+        .tab-btn { padding: 8px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600; border: 1px solid rgba(184, 134, 11, 0.22); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
         .tab-btn.active { background: rgba(184, 134, 11, 0.14); border-color: rgba(184, 134, 11, 0.35); color: #B8860B; font-weight: 700; }
         .tab-btn:not(.active) { background: #FFFFFF; color: #6B635B; }
         .tab-btn:not(.active):hover { color: #1A1A1A; background: rgba(184, 134, 11, 0.08); }
-        .planet-tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 10px; font-size: 10px; margin: 1px; border: 1px solid; }
-        .alert-header { padding: 14px 16px; cursor: pointer; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-        .alert-body { padding: 0 16px 16px; border-top: 1px solid rgba(184, 134, 11, 0.12); padding-top: 14px; }
-        .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px; opacity: 0.85; }
-        .zone-cell { padding: 6px 8px; border-radius: 6px; font-size: 10px; }
-        .knowledge-box { background: rgba(15, 118, 110, 0.06); border: 1px solid rgba(15, 118, 110, 0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 12px; color: #4A4238; line-height: 1.7; }
-        .remedy-box { background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.22); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #15803D; line-height: 1.7; font-weight: 500; }
-        .caution-box { background: rgba(220,38,38,0.04); border: 1px solid rgba(220,38,38,0.22); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #DC2626; line-height: 1.7; margin-bottom: 8px; font-weight: 500; }
+        .planet-tag { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 10px; font-size: 10.5px; margin: 2px; border: 1px solid; }
+        .alert-header { padding: 16px 20px; cursor: pointer; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .alert-body { padding: 0 20px 20px; border-top: 1px solid rgba(184, 134, 11, 0.12); padding-top: 16px; }
+        .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; opacity: 0.85; }
+        .zone-cell { padding: 7px 10px; border-radius: 8px; font-size: 11px; }
+        .knowledge-box { background: #FAF8F5; border: 1px solid rgba(15, 118, 110, 0.22); border-left: 4px solid #0F766E; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; font-size: 13px; color: #4A4238; line-height: 1.75; }
+        .remedy-box { background: #FAF8F5; border: 1px solid rgba(21,128,61,0.25); border-left: 4px solid #15803D; border-radius: 12px; padding: 14px 16px; font-size: 12.5px; color: #15803D; line-height: 1.75; font-weight: 500; }
+        .caution-box { background: #FAF8F5; border: 1px solid rgba(220,38,38,0.25); border-left: 4px solid #DC2626; border-radius: 12px; padding: 14px 16px; font-size: 12.5px; color: #DC2626; line-height: 1.75; margin-bottom: 10px; font-weight: 500; }
       `}</style>
 
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>

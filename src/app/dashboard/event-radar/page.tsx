@@ -327,7 +327,7 @@ export default function EventRadarPage() {
         <section className="er-hero">
           <div className="er-row">
             <div>
-              <div className="er-kicker">Predictive Vedic Chronobiology · BPHS Ch. 41 & Phaladeepika Ch. 26</div>
+              <div className="er-kicker">Predictive Vedic Chronobiology · Planetary Transit Rhythm</div>
               <h1 className="er-title">Event Radar 2.0</h1>
               <p className="er-sub">
                 A multi-layered cosmic timing wave fusing planetary Gochar transits, the 9-fold Navatara Chakra, and classical Chandrashtama detection with modern circadian decision windows.
@@ -484,7 +484,7 @@ export default function EventRadarPage() {
                     <div className="er-chandra-alert">
                       <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#B91C1C", fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
                         <span>⚠️ CHANDRASHTAMA ACTIVE</span>
-                        <span style={{ fontSize: 10, background: "rgba(239,68,68,0.2)", padding: "2px 8px", borderRadius: 4 }}>Phaladeepika Ch. 26</span>
+                        <span style={{ fontSize: 10, background: "rgba(239,68,68,0.2)", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>Sensitive Moon Window</span>
                       </div>
                       <p style={{ fontSize: 12, color: "#7F1D1D", lineHeight: 1.6, margin: 0 }}>
                         {selectedDay.chandrashtamaDetail}
@@ -675,7 +675,7 @@ export default function EventRadarPage() {
         {activeTab === "navatara" && (
           <section className="er-grid">
             <article className="er-card span-12">
-              <h2 className="er-card-title">Classical Navatara Chakra (BPHS Ch. 41)</h2>
+              <h2 className="er-card-title">Classical Navatara Chakra</h2>
               <p className="er-card-desc">
                 The 27 Nakshatras divided into 3 cycles (Paryayas) of 9 Taras measured from your natal Janma Nakshatra. Each Tara governs specific psychological states and external outcomes.
               </p>

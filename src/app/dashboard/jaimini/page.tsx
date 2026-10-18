@@ -44,7 +44,7 @@ function KarakaCard({ k }: { k: Karaka }) {
 
   return (
     <div
-      className="rounded-2xl p-4 flex flex-col gap-2 transition-all"
+      className="rounded-2xl p-5 sm:p-6 flex flex-col gap-3 transition-all"
       style={{
         background: isAK
           ? "rgba(184, 134, 11, 0.08)"
@@ -70,23 +70,23 @@ function KarakaCard({ k }: { k: Karaka }) {
     >
       <div className="flex items-center justify-between">
         <span
-          className="text-xs font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full"
+          className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full"
           style={{ background: color + "20", color }}
         >
           {k.role}
         </span>
-        <span className="text-xl">{KARAKA_ICONS[k.role]}</span>
+        <span className="text-2xl">{KARAKA_ICONS[k.role]}</span>
       </div>
       <div>
-        <p className="text-xl font-bold text-[#1A1A1A] mt-1">{k.planet}</p>
-        <p className="text-xs font-medium" style={{ color }}>
+        <p className="text-2xl font-bold text-[#1A1A1A] mt-1">{k.planet}</p>
+        <p className="text-xs font-semibold mt-0.5" style={{ color }}>
           {k.sign} · {k.degreeInSign.toFixed(2)}°
         </p>
       </div>
-      <p className="text-xs font-medium text-[#1A1A1A] leading-snug mt-1">{k.meaning}</p>
-      <p className="text-[11px] text-[#6B635B] leading-relaxed">{k.signifies}</p>
+      <p className="text-sm font-semibold text-[#1A1A1A] leading-snug mt-1">{k.meaning}</p>
+      <p className="text-xs text-[#5A524A] leading-relaxed mt-1">{k.signifies}</p>
       {k.notes && (
-        <p className="text-[10px] italic text-[#B8860B] mt-auto pt-1 border-t border-[rgba(184,134,11,0.15)]">
+        <p className="text-xs italic text-[#8A6008] mt-auto pt-2 border-t border-[rgba(184,134,11,0.15)]">
           {k.notes}
         </p>
       )}
@@ -101,17 +101,17 @@ function ArudhaRow({ a }: { a: ArudhaPada }) {
   const isKey = [1, 7, 10, 12].includes(a.house);
   return (
     <div
-      className="flex items-center gap-3 rounded-xl px-3.5 py-2.5"
+      className="flex items-center gap-4 rounded-2xl px-5 py-3.5"
       style={{
         background: isKey ? "rgba(184, 134, 11, 0.08)" : "#FFFFFF",
         border: `1px solid ${isKey ? "rgba(184, 134, 11, 0.35)" : "rgba(184, 134, 11, 0.15)"}`,
       }}
     >
       <span className="text-xs font-bold w-8 text-center shrink-0" style={{ color }}>{a.shortName}</span>
-      <span className="text-lg w-6 text-center shrink-0">{RASHI_ICONS[a.signNum]}</span>
+      <span className="text-xl w-7 text-center shrink-0">{RASHI_ICONS[a.signNum]}</span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[#1A1A1A]">{a.name}</p>
-        <p className="text-xs text-[#6B635B]">{a.sign} · {a.meaning}</p>
+        <p className="text-sm font-bold text-[#1A1A1A]">{a.name}</p>
+        <p className="text-xs text-[#5A524A] mt-0.5">{a.sign} · {a.meaning}</p>
       </div>
     </div>
   );
@@ -138,7 +138,7 @@ function CharaRow({
     <div className="flex flex-col gap-1">
       <button
         onClick={onClick}
-        className="w-full text-left rounded-xl p-3.5 flex items-center gap-3.5 transition-all"
+        className="w-full text-left rounded-2xl px-5 py-4 flex items-center gap-4 transition-all"
         style={{
           background: selected
             ? "rgba(184, 134, 11, 0.14)"
@@ -1176,7 +1176,7 @@ export default function JaiminiPage() {
                   <h4 className="text-base font-bold text-[#1A1A1A]">
                     Subconscious Drive &amp; Repeated Failure to Mastery
                   </h4>
-                  <div className="my-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed">
+                  <div className="my-3 py-3.5 px-4 rounded-xl bg-amber-50/80 border border-amber-200 border-l-4 border-l-amber-600 text-xs text-amber-950 leading-relaxed">
                     <strong>Classical Sutra:</strong> &ldquo;{bkSub.classicalRule}&rdquo;
                   </div>
                   <div className="flex flex-col gap-2 mt-3 text-xs">
@@ -1210,7 +1210,7 @@ export default function JaiminiPage() {
                   <h4 className="text-base font-bold text-[#1A1A1A]">
                     Education Stream &amp; Domestic Roots
                   </h4>
-                  <div className="my-2.5 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-950 leading-relaxed">
+                  <div className="my-3 py-3.5 px-4 rounded-xl bg-blue-50/80 border border-blue-200 border-l-4 border-l-blue-600 text-xs text-blue-950 leading-relaxed">
                     <strong>Classical Sutra:</strong> &ldquo;{mk.classicalRule}&rdquo;
                   </div>
                   <div className="flex flex-col gap-2 mt-3 text-xs">
@@ -1244,7 +1244,7 @@ export default function JaiminiPage() {
                   <h4 className="text-base font-bold text-[#1A1A1A]">
                     Purva Punya, Intellect &amp; Progeny
                   </h4>
-                  <div className="my-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 leading-relaxed">
+                  <div className="my-3 py-3.5 px-4 rounded-xl bg-emerald-50/80 border border-emerald-200 border-l-4 border-l-emerald-600 text-xs text-emerald-950 leading-relaxed">
                     <strong>Classical Sutra:</strong> &ldquo;{pk.classicalRule}&rdquo;
                   </div>
                   <div className="flex flex-col gap-2 mt-3 text-xs">
@@ -1366,7 +1366,7 @@ export default function JaiminiPage() {
                   </h4>
 
                   {/* Classical quote highlight */}
-                  <div className="my-3 p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 leading-relaxed">
+                  <div className="my-3.5 py-3.5 px-4 rounded-xl bg-amber-50/80 border border-amber-200 border-l-4 border-l-amber-600 text-xs text-amber-950 leading-relaxed">
                     <strong>Classical Sutra:</strong> &ldquo;{akAmk.akLifeSphere.classicalRule}&rdquo;
                   </div>
 
@@ -1413,7 +1413,7 @@ export default function JaiminiPage() {
                   </h4>
 
                   {/* Classical quote highlight */}
-                  <div className="my-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-950 leading-relaxed">
+                  <div className="my-3.5 py-3.5 px-4 rounded-xl bg-emerald-50/80 border border-emerald-200 border-l-4 border-l-emerald-600 text-xs text-emerald-950 leading-relaxed">
                     <strong>Classical Sutra:</strong> &ldquo;AmK jis house me baitha hai, bhagwan ne aapki ajeevika aur wealth generation ka switch wahan jod diya hai.&rdquo;
                   </div>
 
@@ -1421,7 +1421,7 @@ export default function JaiminiPage() {
                     {akAmk.amkWealthChannel.channel}
                   </p>
 
-                  <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.15)] text-xs text-[#1A1A1A]">
+                  <div className="py-3.5 px-4 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.18)] border-l-4 border-l-[#B8860B] text-xs text-[#1A1A1A]">
                     <strong className="text-[#B8860B]">High-Yield Professional Fields:</strong>
                     <p className="mt-1">{akAmk.amkWealthChannel.practicalField}</p>
                   </div>

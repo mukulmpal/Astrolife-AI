@@ -947,7 +947,7 @@ export function evaluateSpecialLagnaRajayogas(
 ): SpecialLagnaRajayoga[] {
   const yogas: SpecialLagnaRajayoga[] = [];
 
-  // 1. Hora-Ghati Dhana-Raja Yoga (BPHS Ch. 5)
+  // 1. Hora-Ghati Dhana-Raja Yoga
   const isHlGlConjunct = hl.signNum === gl.signNum;
   const isHlGlMutualAspect = mod(gl.signNum - hl.signNum, 12) === 6;
   const isLagnaAspectingBoth = mod(hl.signNum - chart.lagnaNum, 12) === 6 && mod(gl.signNum - chart.lagnaNum, 12) === 6;
@@ -959,9 +959,9 @@ export function evaluateSpecialLagnaRajayogas(
     type: "Dhana-Raja Yoga",
     strength: isHlGlConjunct ? "Supreme" : "Strong",
     description: isHlGlFormed
-      ? `As proclaimed by Maharishi Parashara in BPHS: Hora Lagna (${hl.sign}) and Ghati Lagna (${gl.sign}) connect through ${
+      ? `Classical synthesis: Hora Lagna (${hl.sign}) and Ghati Lagna (${gl.sign}) connect through ${
           isHlGlConjunct ? "conjunction" : "mutual aspect"
-        }. The native commands both immense liquid treasury and supreme governmental/executive authority.`
+        }. The native commands both immense liquid treasury and supreme governmental or executive authority.`
       : `Hora Lagna (${hl.sign}) and Ghati Lagna (${gl.sign}) operate in independent signs. Wealth and executive power develop through separate focused life chapters.`,
     involvedLagnas: ["HL", "GL"],
     isFormed: isHlGlFormed,
