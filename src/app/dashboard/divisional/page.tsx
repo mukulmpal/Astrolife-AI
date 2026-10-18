@@ -591,7 +591,7 @@ export default function DivisionalPage() {
           background: #FFFFFF;
           border: 1px solid rgba(184, 134, 11, 0.22);
           border-radius: 16px;
-          padding: 18px;
+          padding: 24px 28px;
           box-shadow: 0 4px 20px rgba(184, 134, 11, 0.05);
           display: flex;
           flex-direction: column;
@@ -599,14 +599,14 @@ export default function DivisionalPage() {
         }
         .dv-card-title {
           font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 18px;
+          font-size: 20px;
           font-weight: 700;
           color: #1A1A1A;
         }
         .dv-coord-table {
           width: 100%;
           border-collapse: collapse;
-          font-size: 13.5px;
+          font-size: 14px;
         }
         .dv-coord-table th {
           font-size: 11px;
@@ -614,12 +614,12 @@ export default function DivisionalPage() {
           letter-spacing: 0.6px;
           color: #8C6D1F;
           font-weight: 700;
-          padding: 8px 10px;
+          padding: 12px 14px;
           border-bottom: 1.5px solid rgba(184, 134, 11, 0.2);
           text-align: left;
         }
         .dv-coord-table td {
-          padding: 7px 10px;
+          padding: 11px 14px;
           border-bottom: 1px solid rgba(184, 134, 11, 0.1);
           color: #2D2825;
           vertical-align: middle;
@@ -833,39 +833,39 @@ export default function DivisionalPage() {
         {/* ── 2. ACTIVE VARGA CORE WORKSPACE: CHART + PLANET POSITIONS ── */}
         <div className="dv-grid">
           {/* Left: North Indian Name-Based Chart ( Su, Mo, Ma, Me, Ju, Ve, Sa, Ra, Ke ) */}
-          <div className="dv-card" style={{ borderColor: color + "40", padding: "16px 18px" }}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="dv-card-title" style={{ color, marginBottom: 0, fontSize: "16px" }}>
+          <div className="dv-card" style={{ borderColor: color + "40", padding: "24px 26px" }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="dv-card-title" style={{ color, marginBottom: 0, fontSize: "19px" }}>
                 {meta?.icon} {current.key} — {current.name} Chakra
               </div>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+              <span className="text-xs px-3 py-1 rounded-full bg-[#FAF7F2] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
                 {current.lagna} Lagna
               </span>
             </div>
 
             <VargaNorthIndianChart chart={current} />
 
-            <div style={{ marginTop: 10, padding: "10px 12px", background: color + "0d", border: `1px solid ${color}22`, borderRadius: 10 }}>
-              <div className="flex items-center justify-between mb-1">
-                <div style={{ fontSize: 10.5, color, letterSpacing: "1.2px", textTransform: "uppercase", fontWeight: 700 }}>
+            <div style={{ marginTop: 14, padding: "14px 18px", background: color + "0d", border: `1px solid ${color}28`, borderRadius: 12 }}>
+              <div className="flex items-center justify-between mb-1.5">
+                <div style={{ fontSize: 11, color, letterSpacing: "1.2px", textTransform: "uppercase", fontWeight: 700 }}>
                   Domain Focus &amp; Adhidevata
                 </div>
                 {neuroProfile?.deityArchetype && (
-                  <span className="text-[11px] px-2 py-0.5 rounded bg-white text-[#8C6D1F] border border-[rgba(184,134,11,0.2)] font-bold">
+                  <span className="text-[11px] px-2.5 py-0.5 rounded bg-white text-[#8C6D1F] border border-[rgba(184,134,11,0.2)] font-bold">
                     ⚡ {neuroProfile.deityArchetype.name}
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 13, color: "#3D3834", lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "#3D3834", lineHeight: 1.7 }}>
                 {current.purpose}
               </div>
             </div>
           </div>
 
           {/* Right: Planet Positions Table in Active Varga */}
-          <div className="dv-card" style={{ padding: "16px 18px" }}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="dv-card-title" style={{ marginBottom: 0, fontSize: "16px" }}>
+          <div className="dv-card" style={{ padding: "24px 26px" }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="dv-card-title" style={{ marginBottom: 0, fontSize: "19px" }}>
                 Planetary Coordinates in {current.key}
               </div>
               <div className="flex items-center gap-1.5">
@@ -1174,9 +1174,9 @@ export default function DivisionalPage() {
                   🏛️ {neuroProfile.natalLagnaRelation}
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4 font-serif text-[15px] sm:text-[15.5px] text-[#2A241F] leading-[1.85]">
                   {neuroProfile.deepExplanation.paragraphs.map((p, idx) => (
-                    <p key={idx} className="text-sm sm:text-[15px] text-[#3D3834] leading-[1.8] m-0">
+                    <p key={idx} className="m-0 text-justify">
                       {p}
                     </p>
                   ))}
@@ -1206,7 +1206,7 @@ export default function DivisionalPage() {
         {activeTab === "diagnostics" && neuroProfile && (
           <div className="space-y-6">
             {/* Adhidevata Archetype Card */}
-            <div className="dv-card" style={{ padding: "24px" }}>
+            <div className="dv-card" style={{ padding: "26px 30px" }}>
               <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <span className="text-xs uppercase tracking-[1.5px] font-bold px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200">
                   ⚡ Ruling Adhidevata Archetype
@@ -1224,20 +1224,20 @@ export default function DivisionalPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-rose-50/70 border border-rose-200">
-                  <div className="text-xs font-bold text-rose-900 uppercase tracking-wider mb-1">
+                <div className="p-5 rounded-xl bg-rose-50/80 border border-rose-200">
+                  <div className="text-xs font-bold text-rose-900 uppercase tracking-wider mb-1.5">
                     Cognitive Distortion &amp; Shadow Trap
                   </div>
-                  <div className="text-sm text-rose-800 leading-relaxed font-medium">
+                  <div className="text-sm text-rose-900 leading-relaxed font-medium">
                     {neuroProfile.deityArchetype.distortionLabel}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
-                  <div className="text-xs font-bold text-emerald-900 uppercase tracking-wider mb-1">
+                <div className="p-5 rounded-xl bg-emerald-50/80 border border-emerald-200">
+                  <div className="text-xs font-bold text-emerald-900 uppercase tracking-wider mb-1.5">
                     Deity Frequency Unlocking Action
                   </div>
-                  <div className="text-sm text-emerald-800 leading-relaxed font-medium">
+                  <div className="text-sm text-emerald-950 leading-relaxed font-medium">
                     {neuroProfile.deityArchetype.neuroEpigeneticRemedy}
                   </div>
                 </div>
@@ -1353,87 +1353,92 @@ export default function DivisionalPage() {
                 Neuro-Somatic &amp; Generational Loop Reset for {neuroProfile.vargaKey} ({neuroProfile.vargaName})
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="space-y-4 mb-5">
                 {/* Step 1: Ancestral Interruption */}
-                <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.2)] border-l-4 border-l-[#B8860B] rounded-xl p-4 flex flex-col justify-between">
-                  <div>
-                    <div className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B] mb-1">
-                      Step 1 · Ancestral Interruption
-                    </div>
-                    <div className="text-base font-bold text-[#1A1A1A] mb-2">
-                      Generational Loop Break
-                    </div>
-                    <div className="text-sm text-[#3D3834] leading-relaxed">
-                      {neuroProfile.neuroRemedy.ancestralLoopInterruption}
-                    </div>
+                <div className="bg-[#FAF8F5] border border-[rgba(184,134,11,0.22)] border-l-4 border-l-[#B8860B] rounded-xl p-5 sm:p-6 transition-all">
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                    <span className="text-xs uppercase tracking-wider font-extrabold text-[#B8860B]">
+                      १. पूर्वज लूप खंडन · Step 1: Ancestral Loop Interruption
+                    </span>
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-white text-[#8C6D1F] border border-[rgba(184,134,11,0.25)] font-bold">
+                      Generational Reset
+                    </span>
                   </div>
+                  <div className="font-serif text-lg font-bold text-[#1A1A1A] mb-2">
+                    Generational Loop Break &amp; Epigenetic Cleansing
+                  </div>
+                  <p className="text-sm sm:text-[14.5px] text-[#3D3834] leading-[1.8] m-0 font-medium">
+                    {neuroProfile.neuroRemedy.ancestralLoopInterruption}
+                  </p>
                 </div>
 
                 {/* Step 2: Cognitive Re-Wiring */}
-                <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.2)] border-l-4 border-l-[#2563EB] rounded-xl p-4 flex flex-col justify-between">
-                  <div>
-                    <div className="text-xs uppercase tracking-wider font-extrabold text-[#2563EB] mb-1">
-                      Step 2 · Cognitive Re-Wiring
-                    </div>
-                    <div className="text-base font-bold text-[#1A1A1A] mb-2">
-                      {neuroProfile.neuroRemedy.cognitiveRewiring.techniqueName}
-                    </div>
-                    <div className="text-sm text-[#3D3834] leading-relaxed">
-                      {neuroProfile.neuroRemedy.cognitiveRewiring.mindsetProtocol}
-                    </div>
+                <div className="bg-[#FAF8F5] border border-[rgba(37,99,235,0.2)] border-l-4 border-l-[#2563EB] rounded-xl p-5 sm:p-6 transition-all">
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                    <span className="text-xs uppercase tracking-wider font-extrabold text-[#2563EB]">
+                      २. मानसिक पुनर्गठन · Step 2: Cognitive Re-Wiring
+                    </span>
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200 font-bold">
+                      Target: {neuroProfile.neuroRemedy.cognitiveRewiring.distortionLabel}
+                    </span>
                   </div>
-                  <div className="mt-3 text-xs text-[#5A524C] bg-white/70 px-2 py-1 rounded border border-[rgba(184,134,11,0.15)]">
-                    Target: {neuroProfile.neuroRemedy.cognitiveRewiring.distortionLabel}
+                  <div className="font-serif text-lg font-bold text-[#1A1A1A] mb-2">
+                    {neuroProfile.neuroRemedy.cognitiveRewiring.techniqueName}
                   </div>
+                  <p className="text-sm sm:text-[14.5px] text-[#3D3834] leading-[1.8] m-0 font-medium">
+                    {neuroProfile.neuroRemedy.cognitiveRewiring.mindsetProtocol}
+                  </p>
                 </div>
 
                 {/* Step 3: Somatic Behavioral Habit */}
-                <div className="bg-[#FAF7F2] border border-[rgba(184,134,11,0.2)] border-l-4 border-l-[#16A34A] rounded-xl p-4 flex flex-col justify-between">
-                  <div>
-                    <div className="text-xs uppercase tracking-wider font-extrabold text-[#16A34A] mb-1">
-                      Step 3 · Somatic Protocol
-                    </div>
-                    <div className="text-base font-bold text-[#1A1A1A] mb-2">
-                      {neuroProfile.neuroRemedy.somaticBehavioralHabit.habitName}
-                    </div>
-                    <div className="text-sm text-[#1A1A1A] font-medium leading-relaxed mb-2">
-                      {neuroProfile.neuroRemedy.somaticBehavioralHabit.dailyProtocol}
-                    </div>
-                  </div>
-                  <div className="text-xs text-[#5A524C] leading-tight mt-2 pt-2 border-t border-[rgba(184,134,11,0.15)]">
-                    Biomarker: {neuroProfile.neuroRemedy.somaticBehavioralHabit.neuroMechanism}
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 4: Adhidevata Archetype Priming */}
-              {neuroProfile.neuroRemedy.archetypeAlignment && (
-                <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.25)] border-l-4 border-l-[#a855f7] mb-4">
-                  <div className="flex items-center justify-between flex-wrap gap-2 mb-1.5">
-                    <div className="text-xs uppercase tracking-wider font-extrabold text-[#a855f7] flex items-center gap-1.5">
-                      <span>⚡ Step 4 · Adhidevata Archetypal Priming</span>
-                      <span>({neuroProfile.neuroRemedy.archetypeAlignment.name})</span>
-                    </div>
-                    <span className="text-xs px-2.5 py-0.5 rounded bg-white text-[#a855f7] font-bold border border-[rgba(168,85,247,0.25)]">
-                      Daily Executive Mode
+                <div className="bg-[#FAF8F5] border border-[rgba(22,163,74,0.2)] border-l-4 border-l-[#16A34A] rounded-xl p-5 sm:p-6 transition-all">
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                    <span className="text-xs uppercase tracking-wider font-extrabold text-[#16A34A]">
+                      ३. देह-व्यवहार क्रिया · Step 3: Somatic Behavioral Protocol
+                    </span>
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#16A34A] border border-emerald-200 font-bold">
+                      Biomarker: {neuroProfile.neuroRemedy.somaticBehavioralHabit.neuroMechanism}
                     </span>
                   </div>
-                  <div className="text-sm text-[#1A1A1A] font-medium leading-relaxed mb-1">
-                    <strong>Execution Stance:</strong> {neuroProfile.neuroRemedy.archetypeAlignment.executiveProtocol}
+                  <div className="font-serif text-lg font-bold text-[#1A1A1A] mb-2">
+                    {neuroProfile.neuroRemedy.somaticBehavioralHabit.habitName}
                   </div>
-                  <div className="text-sm text-[#4A4238] leading-relaxed">
-                    <strong>Behavioral Alignment:</strong> {neuroProfile.neuroRemedy.archetypeAlignment.cognitiveRefocus}
-                  </div>
+                  <p className="text-sm sm:text-[14.5px] text-[#1A1A1A] leading-[1.8] m-0 font-medium">
+                    {neuroProfile.neuroRemedy.somaticBehavioralHabit.dailyProtocol}
+                  </p>
                 </div>
-              )}
+
+                {/* Step 4: Adhidevata Archetype Priming */}
+                {neuroProfile.neuroRemedy.archetypeAlignment && (
+                  <div className="bg-[#FAF8F5] border border-[rgba(168,85,247,0.25)] border-l-4 border-l-[#a855f7] rounded-xl p-5 sm:p-6 transition-all">
+                    <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                      <div className="text-xs uppercase tracking-wider font-extrabold text-[#a855f7] flex items-center gap-1.5">
+                        <span>⚡ ४. अधिदेवता संरेखण · Step 4: Adhidevata Archetypal Priming</span>
+                        <span>({neuroProfile.neuroRemedy.archetypeAlignment.name})</span>
+                      </div>
+                      <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-purple-50 text-[#a855f7] font-bold border border-purple-200">
+                        Daily Executive Mode
+                      </span>
+                    </div>
+                    <div className="space-y-2 mt-2">
+                      <div className="text-sm sm:text-[14.5px] text-[#1A1A1A] font-medium leading-[1.8]">
+                        <strong className="text-[#a855f7]">Execution Stance:</strong> {neuroProfile.neuroRemedy.archetypeAlignment.executiveProtocol}
+                      </div>
+                      <div className="text-sm sm:text-[14.5px] text-[#4A4238] leading-[1.8]">
+                        <strong className="text-[#8C6D1F]">Behavioral Alignment:</strong> {neuroProfile.neuroRemedy.archetypeAlignment.cognitiveRefocus}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Ancestral DNA Kula Karma Imprint */}
-              <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.22)]">
-                <div className="text-xs uppercase tracking-wider text-[#B8860B] font-bold mb-1.5 flex items-center gap-1.5">
+              <div className="p-5 sm:p-6 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.22)] border-l-4 border-l-[#B8860B]">
+                <div className="text-xs uppercase tracking-wider text-[#B8860B] font-bold mb-2 flex items-center gap-1.5">
                   <span>🧬</span>
                   <span>Ancestral DNA &amp; Kula Karma Pattern:</span>
                 </div>
-                <p className="text-sm text-[#4A4238] leading-relaxed m-0 font-medium">
+                <p className="text-sm sm:text-[14.5px] text-[#3D3834] leading-[1.8] m-0 font-medium">
                   {neuroProfile.karmicWeakness.ancestralLineagePattern}
                 </p>
               </div>

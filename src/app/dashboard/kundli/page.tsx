@@ -1301,23 +1301,23 @@ export default function KundliPage() {
             {activeTab === "divisional" && (
               <div className="space-y-6">
                 {/* Varga Selector Header */}
-                <div className="card">
+                <div className="card p-6 sm:p-7 shadow-[0_4px_24px_rgba(184,134,11,0.06)]">
                   <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
                     <div>
                       <div className="card-tag">✦ Classical Shodashavarga Architecture (BPHS)</div>
-                      <div className="card-title serif">16 Varga Kundali Analysis (षोडशवर्ग चक्र)</div>
+                      <div className="card-title serif text-2xl font-bold text-[#1A1A1A]">16 Varga Kundali Analysis (षोडशवर्ग चक्र)</div>
                     </div>
-                    <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+                    <span className="text-xs px-3.5 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
                       16 Vargas Calculated
                     </span>
                   </div>
-                  <p className="text-xs sm:text-sm text-[#4A4238] leading-relaxed mb-4">
+                  <p className="text-sm sm:text-[14.5px] text-[#4A4238] leading-[1.75] mb-5">
                     Shastric rule: Natal D1 kundali seed promise (बीज) hai; 16 divisional charts har life domain ke micro-karma ko decode karte hain.
                     Neeche kisi bhi varga chart par click karein uski dynamic D1 alignment, subconscious karmic bottlenecks aur scientific DNA-based remedies dekhne ke liye:
                   </p>
 
                   {/* Varga Selector Pills */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2.5">
                     {divCharts.map((d) => {
                       const m = VARGA_CHART_META[d.key] || { icon: "✦", domain: d.purpose };
                       const isActive = (currentDiv?.key ?? "D9") === d.key;
@@ -1327,7 +1327,7 @@ export default function KundliPage() {
                           type="button"
                           onClick={() => setSelectedVarga(d.key)}
                           title={`${d.key} (${d.name}): ${m.domain}`}
-                          className={`p-2 rounded-xl text-center border transition-all text-xs font-medium flex flex-col items-center justify-center min-h-[58px] ${
+                          className={`p-2.5 rounded-xl text-center border transition-all text-xs font-medium flex flex-col items-center justify-center min-h-[62px] ${
                             isActive
                               ? "bg-[rgba(184,134,11,0.15)] border-[#B8860B] text-[#B8860B] font-bold shadow-sm"
                               : "bg-[#FAF7F2] border-[rgba(184,134,11,0.18)] text-[#6B635B] hover:border-[#B8860B]"
@@ -1346,61 +1346,67 @@ export default function KundliPage() {
                 {currentDiv && (
                   <div className="chart-layout">
                     {/* North Indian Chart for Active Varga */}
-                    <div className="card">
-                      <div className="flex items-center justify-between mb-2">
+                    <div className="card p-6 sm:p-7 shadow-[0_4px_24px_rgba(184,134,11,0.06)]">
+                      <div className="flex items-center justify-between mb-3">
                         <div>
                           <div className="card-tag">✦ {currentDiv.key} · {currentDiv.name}</div>
-                          <div className="card-title serif">{currentDiv.key} Kundali</div>
+                          <div className="card-title serif text-xl sm:text-2xl font-bold text-[#1A1A1A]">{currentDiv.key} Kundali</div>
                         </div>
-                        <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+                        <span className="text-xs px-3.5 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
                           {currentDiv.lagna} Lagna
                         </span>
                       </div>
 
                       <NorthIndianChart lagnaNum={currentDiv.lagnaNum} planets={currentDivPlanets} />
 
-                      <div className="mt-3 p-3 rounded-xl bg-[rgba(184,134,11,0.06)] border border-[rgba(184,134,11,0.2)]">
-                        <div className="text-[10px] uppercase font-bold text-[#B8860B] tracking-wider mb-1">
-                          Domain Purpose
+                      <div className="mt-4 p-4 sm:p-5 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.22)] border-l-4 border-l-[#B8860B]">
+                        <div className="text-[11px] uppercase font-bold text-[#B8860B] tracking-wider mb-1.5">
+                          Domain Purpose &amp; Cosmic Scope
                         </div>
-                        <div className="text-xs text-[#4A4238] leading-relaxed">
+                        <div className="text-sm text-[#3D3834] leading-[1.75]">
                           {currentDiv.purpose}
                         </div>
                       </div>
                     </div>
 
                     {/* Planet Positions in Active Varga */}
-                    <div className="card">
+                    <div className="card p-6 sm:p-7 shadow-[0_4px_24px_rgba(184,134,11,0.06)]">
                       <div className="card-tag">✦ Planetary Placements</div>
-                      <div className="card-title serif mb-2">Planets in {currentDiv.key}</div>
-                      <div className="space-y-1.5 max-h-[360px] overflow-y-auto pr-1">
+                      <div className="card-title serif text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-3">Planets in {currentDiv.key}</div>
+                      <div className="space-y-2 max-h-[390px] overflow-y-auto pr-1">
                         {currentDiv.planets.map((p, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center justify-between p-2 rounded-lg bg-[#FAF7F2] border border-[rgba(184,134,11,0.12)] text-xs"
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[rgba(184,134,11,0.16)] text-xs sm:text-[13px] hover:border-[#B8860B] transition-colors"
                           >
-                            <div className="flex items-center gap-2">
-                              <span style={{ color: p.color }} className="font-bold">{p.icon}</span>
-                              <span className="font-medium text-[#1A1A1A]">{p.planet}</span>
-                              {p.retrograde && <span className="text-[10px] text-[#F97316] font-bold">(R)</span>}
+                            <div className="flex items-center gap-2.5">
+                              <span style={{ color: p.color }} className="font-bold text-sm">{p.icon}</span>
+                              <span className="font-semibold text-[#1A1A1A]">{p.planet}</span>
+                              {p.retrograde && (
+                                <span className="text-[10px] text-[#F97316] font-bold px-1 rounded bg-orange-50 border border-orange-200">
+                                  (R)
+                                </span>
+                              )}
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className="text-[#6B635B]">{p.sign}</span>
-                              <span className="font-bold text-[#1A1A1A] w-8 text-right">H{p.house}</span>
+                              <span className="text-[#6B635B] font-medium">{p.sign}</span>
+                              <span className="font-bold text-[#B8860B] px-2 py-0.5 rounded bg-white border border-[rgba(184,134,11,0.2)]">
+                                H{p.house}
+                              </span>
                               {p.dignity !== "—" ? (
                                 <span
-                                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                                  className={`text-[10.5px] px-2 py-0.5 rounded font-bold ${
                                     p.dignity === "Exalted"
-                                      ? "bg-amber-100 text-amber-800"
+                                      ? "bg-amber-100 text-amber-800 border border-amber-200"
                                       : p.dignity === "Own"
-                                      ? "bg-emerald-100 text-emerald-800"
-                                      : "bg-rose-100 text-rose-800"
+                                      ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                      : "bg-rose-100 text-rose-800 border border-rose-200"
                                   }`}
                                 >
                                   {p.dignity}
                                 </span>
                               ) : (
-                                <span className="text-[10px] text-gray-400 w-12 text-center">—</span>
+                                <span className="text-[11px] text-gray-400 w-12 text-center">—</span>
                               )}
                             </div>
                           </div>
