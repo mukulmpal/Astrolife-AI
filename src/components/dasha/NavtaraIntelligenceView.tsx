@@ -259,24 +259,34 @@ export function NavtaraIntelligenceView({
           </div>
 
           {/* Pattern description */}
-          <div className="bg-[#FAF8F5] rounded-xl p-4 border border-amber-900/15 border-l-4 border-l-[#B8860B]">
-            <p className="text-sm text-[#1A1A1A] leading-relaxed font-medium">
+          <div
+            style={{
+              padding: "16px 20px",
+              borderRadius: 14,
+              background: "#FAF8F5",
+              border: "1px solid rgba(184, 134, 11, 0.2)",
+              borderLeft: "4px solid #B8860B",
+            }}
+          >
+            <p className="text-[14px] text-[#1A1A1A] leading-[1.7] font-medium m-0">
               {audit.patternDescription}
             </p>
           </div>
 
           {/* The 3 Qualifying Layers */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {audit.layers.map((layer, idx) => {
               const isDanger = layer.isConcern;
               return (
                 <div
                   key={idx}
-                  className="rounded-xl p-4 flex flex-col gap-2 transition-all"
+                  className="flex flex-col gap-2.5 transition-all"
                   style={{
+                    padding: "16px 18px",
+                    borderRadius: 14,
                     background: "#FAF8F5",
                     border: `1px solid ${
-                      isDanger ? "rgba(239, 68, 68, 0.3)" : "rgba(184, 134, 11, 0.22)"
+                      isDanger ? "rgba(239, 68, 68, 0.28)" : "rgba(184, 134, 11, 0.22)"
                     }`,
                     borderLeft: `4px solid ${isDanger ? "#dc2626" : "#059669"}`,
                   }}
@@ -304,8 +314,8 @@ export function NavtaraIntelligenceView({
                   </div>
 
                   <div>
-                    <p className="text-xs text-[#6B635B] font-medium">{layer.label}</p>
-                    <p className="text-base font-bold text-[#1A1A1A] mt-0.5 flex items-center gap-1.5">
+                    <p className="text-xs text-[#6B635B] font-medium m-0">{layer.label}</p>
+                    <p className="text-base font-bold text-[#1A1A1A] mt-1 flex items-center gap-1.5 m-0">
                       <span>{tp(layer.planet)}</span>
                       <span className="text-sm font-semibold text-[#B8860B]">
                         in {layer.nakshatra.name}
@@ -313,19 +323,19 @@ export function NavtaraIntelligenceView({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xl">{layer.tara.icon}</span>
+                  <div className="flex items-center gap-2.5 mt-0.5">
+                    <span className="text-2xl">{layer.tara.icon}</span>
                     <div>
-                      <p className="text-sm font-bold text-[#1A1A1A]">
+                      <p className="text-sm font-bold text-[#1A1A1A] m-0">
                         Tara #{layer.tara.taraNum} — {layer.tara.name}
                       </p>
-                      <p className="text-[11px] text-[#6B635B]">
+                      <p className="text-[11px] text-[#6B635B] mt-0.5 m-0">
                         Pos #{layer.countedPosition} · {layer.paryaya} ({layer.paryayaIntensity})
                       </p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#4A453F] mt-1 border-t border-amber-900/10 pt-2 italic">
+                  <p className="text-xs text-[#4A453F] mt-1 border-t border-amber-900/10 pt-2.5 italic leading-relaxed m-0">
                     {layer.tara.practicalAdvice}
                   </p>
                 </div>
@@ -335,13 +345,22 @@ export function NavtaraIntelligenceView({
 
           {/* Antardasha Active Modifier */}
           {audit.antardashaModifier && (
-            <div className="rounded-2xl border border-blue-500/25 bg-blue-50/50 p-4 flex items-start gap-3">
+            <div
+              style={{
+                padding: "16px 20px",
+                borderRadius: 14,
+                background: "rgba(59, 130, 246, 0.05)",
+                border: "1px solid rgba(59, 130, 246, 0.25)",
+                borderLeft: "4px solid #2563EB",
+              }}
+              className="flex items-start gap-3.5"
+            >
               <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-blue-800">
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-800 m-0">
                   Antardasha Phase Modifier · {audit.antardashaModifier.status}
                 </p>
-                <p className="text-xs text-[#1A1A1A] mt-1 leading-relaxed">
+                <p className="text-[13.5px] text-[#1A1A1A] mt-1.5 leading-[1.7] m-0">
                   {audit.antardashaModifier.explanation}
                 </p>
               </div>
@@ -375,49 +394,117 @@ export function NavtaraIntelligenceView({
             Strict Classical Rule: Calculated strictly as the star immediately preceding your Janma Nakshatra (Star 1 - 1 = Star 27). This star serves as your lifelong energetic shield to neutralize adverse 3, 5, or 7 dasha afflictions.
           </p>
 
-          {/* 5 Physical & Spiritual Anchors */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
-              <p className="text-[10px] uppercase font-bold text-[#6B635B]">Devta</p>
-              <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
+          {/* 6 Physical & Spiritual Anchors */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+            <div
+              style={{
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <p className="text-[10.5px] uppercase font-bold text-[#6B635B] tracking-wider m-0">Devta</p>
+              <p className="text-[13.5px] font-bold text-[#1A1A1A] m-0">
                 {intel.supportStarShield.anchors.devta}
               </p>
             </div>
-            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
-              <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Bird</p>
-              <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
+            <div
+              style={{
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <p className="text-[10.5px] uppercase font-bold text-[#6B635B] tracking-wider m-0">Sacred Bird</p>
+              <p className="text-[13.5px] font-bold text-[#1A1A1A] m-0">
                 {intel.supportStarShield.anchors.bird}
               </p>
             </div>
-            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
-              <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Animal</p>
-              <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
+            <div
+              style={{
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <p className="text-[10.5px] uppercase font-bold text-[#6B635B] tracking-wider m-0">Sacred Animal</p>
+              <p className="text-[13.5px] font-bold text-[#1A1A1A] m-0">
                 {intel.supportStarShield.anchors.animal}
               </p>
             </div>
-            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
-              <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Flora / Tree</p>
-              <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
+            <div
+              style={{
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <p className="text-[10.5px] uppercase font-bold text-[#6B635B] tracking-wider m-0">Sacred Flora / Tree</p>
+              <p className="text-[13.5px] font-bold text-[#1A1A1A] m-0">
                 {intel.supportStarShield.anchors.tree}
               </p>
             </div>
-            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
-              <p className="text-[10px] uppercase font-bold text-[#6B635B]">Sacred Symbol</p>
-              <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
+            <div
+              style={{
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <p className="text-[10.5px] uppercase font-bold text-[#6B635B] tracking-wider m-0">Sacred Symbol</p>
+              <p className="text-[13.5px] font-bold text-[#1A1A1A] m-0">
                 {intel.supportStarShield.anchors.symbol}
               </p>
             </div>
-            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border border-amber-900/15">
-              <p className="text-[10px] uppercase font-bold text-[#6B635B]">Star Lord</p>
-              <p className="text-xs font-bold text-[#1A1A1A] mt-0.5">
+            <div
+              style={{
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.2)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <p className="text-[10.5px] uppercase font-bold text-[#6B635B] tracking-wider m-0">Star Lord</p>
+              <p className="text-[13.5px] font-bold text-[#1A1A1A] m-0">
                 {tp(intel.supportStarShield.nakshatra.lord)}
               </p>
             </div>
           </div>
 
           {/* Historical Example Callout */}
-          <div className="rounded-xl bg-[#FAF8F5] border border-amber-900/15 border-l-4 border-l-[#B8860B] p-4">
-            <p className="text-xs text-[#5C3D00] leading-relaxed">
+          <div
+            style={{
+              padding: "16px 20px",
+              borderRadius: 14,
+              background: "#FAF8F5",
+              border: "1px solid rgba(184, 134, 11, 0.2)",
+              borderLeft: "4px solid #B8860B",
+            }}
+          >
+            <p className="text-[13.5px] text-[#5C3D00] leading-[1.7] m-0">
               <strong>Classical Prototype:</strong> {intel.supportStarShield.historicalExample}
             </p>
           </div>
@@ -441,21 +528,29 @@ export function NavtaraIntelligenceView({
             Classical Principle: Rather than purely acting like the lord of your Janma Star ({intel.birthNakshatra.lord}), your foundational internal temperament actively channels the qualities of the <strong>preceding star&apos;s lord ({intel.qualityProfile.channellingLord})</strong>.
           </p>
 
-          <div className="bg-[#FAF8F5] rounded-xl p-4 border border-amber-900/15 border-l-4 border-l-[#B8860B]">
-            <p className="text-sm text-[#1A1A1A] leading-relaxed">
+          <div
+            style={{
+              padding: "16px 20px",
+              borderRadius: 14,
+              background: "#FAF8F5",
+              border: "1px solid rgba(184, 134, 11, 0.2)",
+              borderLeft: "4px solid #B8860B",
+            }}
+          >
+            <p className="text-[14px] text-[#1A1A1A] leading-[1.75] m-0">
               {intel.qualityProfile.description}
             </p>
           </div>
 
-          <div>
-            <p className="text-xs uppercase tracking-wider font-bold text-[#6B635B] mb-2">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs uppercase tracking-wider font-bold text-[#6B635B] m-0">
               Core Temperament Markers
             </p>
             <div className="flex flex-wrap gap-2">
               {intel.qualityProfile.coreTraits.map((trait, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1 rounded-xl text-xs font-semibold bg-white border border-amber-900/15 text-[#1A1A1A]"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#FAF8F5] border border-amber-900/15 text-[#1A1A1A] shadow-xs"
                 >
                   ✓ {trait}
                 </span>
@@ -727,16 +822,20 @@ export function NavtaraIntelligenceView({
             Classical Transit Rule: When Sun (1 month) or Jupiter (1 year) transit into your active Dasha Lord&apos;s exaltation sign, peak activation manifests. Conversely, transiting the debilitation sign triggers caution phases.
           </p>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3.5">
             {activationWindows.map((win, idx) => {
               const isActivation = win.windowType === "ACTIVATION_WINDOW";
               return (
                 <div
                   key={idx}
-                  className="rounded-xl p-4 border flex flex-col gap-1.5"
+                  className="flex flex-col gap-2 transition-all"
                   style={{
+                    padding: "16px 20px",
+                    borderRadius: 14,
                     background: "#FAF8F5",
-                    borderColor: isActivation ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)",
+                    border: `1px solid ${
+                      isActivation ? "rgba(16, 185, 129, 0.28)" : "rgba(239, 68, 68, 0.28)"
+                    }`,
                     borderLeft: `4px solid ${isActivation ? "#059669" : "#dc2626"}`,
                   }}
                 >
@@ -748,11 +847,11 @@ export function NavtaraIntelligenceView({
                     >
                       {win.triggerPlanet} in {win.targetSign}
                     </span>
-                    <span className="text-[10px] text-[#6B635B] font-medium">
+                    <span className="text-[11px] text-[#6B635B] font-medium bg-black/[0.04] px-2.5 py-0.5 rounded-full">
                       {win.expectedDuration}
                     </span>
                   </div>
-                  <p className="text-xs text-[#1A1A1A] leading-relaxed">
+                  <p className="text-[13.5px] text-[#1A1A1A] leading-[1.7] m-0">
                     {win.strategicGuidance}
                   </p>
                 </div>
@@ -829,35 +928,66 @@ export function NavtaraIntelligenceView({
             </p>
 
             {/* Placement context */}
-            <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-amber-900/10 flex flex-col gap-1 text-xs">
-              <p className="font-semibold text-[#1A1A1A]">
+            <div
+              style={{
+                padding: "14px 18px",
+                borderRadius: 12,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.18)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <p className="font-semibold text-xs text-[#1A1A1A] m-0">
                 Planet Placement: {activeRemedy.planet} in {activeRemedy.rashi} (Sign #{activeRemedy.rashiNum + 1})
               </p>
-              <p className="text-[#6B635B]">{activeRemedy.domainSignificance}</p>
+              <p className="text-xs text-[#6B635B] m-0 leading-relaxed">{activeRemedy.domainSignificance}</p>
             </div>
 
             {/* Directive */}
-            <div className="rounded-2xl p-3.5 bg-amber-500/10 border border-amber-500/25 flex flex-col gap-1">
-              <p className="text-xs font-bold text-[#5C3D00]">
+            <div
+              style={{
+                padding: "16px 20px",
+                borderRadius: 14,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.22)",
+                borderLeft: "4px solid #B8860B",
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+              }}
+            >
+              <p className="text-xs font-bold text-[#8C6D1F] uppercase tracking-wide m-0">
                 Elemental Action: {activeRemedy.tattvaVector.elementalAction}
               </p>
-              <p className="text-xs text-[#5C3D00] leading-relaxed">
+              <p className="text-[13.5px] text-[#2A241F] leading-[1.7] m-0 font-medium">
                 {activeRemedy.harmonizationGuidance}
               </p>
             </div>
 
             {/* Specific Traditional Prescription */}
             {activeRemedy.specificPrescription && (
-              <div className="rounded-2xl border border-amber-900/15 p-3.5 flex flex-col gap-2">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#B8860B]">
+              <div
+                style={{
+                  padding: "16px 20px",
+                  borderRadius: 14,
+                  background: "#FAF8F5",
+                  border: "1px solid rgba(184, 134, 11, 0.2)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                <p className="text-xs font-bold uppercase tracking-wider text-[#B8860B] m-0">
                   Specific Traditional Recipe ({activeRemedy.planet})
                 </p>
-                <ul className="text-xs text-[#1A1A1A] flex flex-col gap-1 list-disc list-inside">
+                <ul className="text-[13px] text-[#1A1A1A] flex flex-col gap-1.5 list-disc list-inside leading-relaxed m-0">
                   {activeRemedy.specificPrescription.substances.map((sub, i) => (
                     <li key={i}>{sub}</li>
                   ))}
                 </ul>
-                <p className="text-xs text-[#6B635B] italic pt-1 border-t border-amber-900/10">
+                <p className="text-xs text-[#6B635B] italic pt-2 border-t border-amber-900/10 m-0">
                   Timing: {activeRemedy.specificPrescription.timingAndVessel}
                 </p>
               </div>

@@ -356,8 +356,6 @@ function buildSevenDayProtocol(ragaName: string, goalLabel: string) {
 
 export default function AstroSoundPage() {
   const [mounted, setMounted] = useState(false);
-  const runIdRef = useRef(0);
-  const aliveRef = useRef(true);
   const [uiNotice, setUiNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -366,13 +364,6 @@ export default function AstroSoundPage() {
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      aliveRef.current = false;
-      runIdRef.current += 1;
-    };
   }, []);
 
 
@@ -427,47 +418,37 @@ export default function AstroSoundPage() {
   }, [result, settings.goal]);
 
   const generate = useCallback(() => {
-    const runId = runIdRef.current + 1;
-    runIdRef.current = runId;
     setLoading(true);
     setUiNotice(null);
 
-    window.setTimeout(() => {
-      if (!aliveRef.current || runId !== runIdRef.current) return;
+    try {
+      const next = runAstroSound({
+        chart: chartData,
+        goal: settings.goal,
+        emotion: settings.emotion,
+        voice: settings.voice,
+        intensity: settings.intensity,
+        mode: settings.mode,
+        currentMahadasha: dashaPlanets.currentMahadasha,
+        currentAntardasha: dashaPlanets.currentAntardasha,
+        memory,
+      });
 
-      try {
-        const next = runAstroSound({
-          chart: chartData,
-          goal: settings.goal,
-          emotion: settings.emotion,
-          voice: settings.voice,
-          intensity: settings.intensity,
-          mode: settings.mode,
-          currentMahadasha: dashaPlanets.currentMahadasha,
-          currentAntardasha: dashaPlanets.currentAntardasha,
-          memory,
-        });
-
-        if (!aliveRef.current || runId !== runIdRef.current) return;
-        setResult(next);
-        setLastReportText(buildReportText(next));
-      } catch {
-        if (aliveRef.current && runId === runIdRef.current) {
-          setUiNotice("Astro Sound could not generate right now. Please try again.");
-        }
-      } finally {
-        if (aliveRef.current && runId === runIdRef.current) {
-          setLoading(false);
-        }
-      }
-    }, 250);
+      setResult(next);
+      setLastReportText(buildReportText(next));
+    } catch (err) {
+      console.error("AstroSound generation failed:", err);
+      setUiNotice("Astro Sound could not generate right now. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, [chartData, dashaPlanets, memory, setLastReportText, setLoading, setResult, settings]);
 
   const lastGeneratedKeyRef = useRef<string>("");
 
   useEffect(() => {
     if (!mounted || chartLoading) return;
-    const currentKey = `${chartData ? "hasChart" : "noChart"}-${settings.goal}-${settings.emotion}-${settings.voice}-${settings.intensity}-${settings.mode}-${dashaPlanets.currentMahadasha ?? ""}`;
+    const currentKey = `${chartData ? "hasChart" : "noChart"}-${settings.goal}-${settings.emotion}-${settings.voice}-${settings.intensity}-${settings.mode}-${dashaPlanets.currentMahadasha ?? ""}-${dashaPlanets.currentAntardasha ?? ""}`;
     if (lastGeneratedKeyRef.current !== currentKey) {
       lastGeneratedKeyRef.current = currentKey;
       generate();
