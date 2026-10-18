@@ -229,7 +229,7 @@ ${actionableDirective.points.map((p) => `• ${p}`).join("\n")}
         <button
           onClick={() => setSelectedChapterIndex("all")}
           style={{
-            padding: "5px 12px",
+            padding: "6px 14px",
             fontSize: 12,
             fontWeight: 700,
             borderRadius: 20,
@@ -247,39 +247,42 @@ ${actionableDirective.points.map((p) => `• ${p}`).join("\n")}
             transition: "all 0.15s ease",
           }}
         >
-          ✦ संपूर्ण आख्यान (सभी {chapters.length} अध्याय)
+          ✦ संपूर्ण आख्यान (सभी विषय)
         </button>
 
-        {chapters.map((ch, idx) => (
-          <button
-            key={idx}
-            onClick={() => setSelectedChapterIndex(idx)}
-            style={{
-              padding: "5px 12px",
-              fontSize: 12,
-              fontWeight: 700,
-              borderRadius: 20,
-              border: `1px solid ${
-                selectedChapterIndex === idx
-                  ? "rgba(184, 134, 11, 0.7)"
-                  : "rgba(184, 134, 11, 0.2)"
-              }`,
-              background:
-                selectedChapterIndex === idx
-                  ? "rgba(184, 134, 11, 0.15)"
-                  : "#FAF8F5",
-              color: selectedChapterIndex === idx ? "#B8860B" : "#4A4238",
-              cursor: "pointer",
-              transition: "all 0.15s ease",
-            }}
-          >
-            <span>{ch.icon}</span> सोपान {ch.chapterNum}
-          </button>
-        ))}
+        {chapters.map((ch, idx) => {
+          const shortTitle = ch.title.split("—")[0].split(":")[0].trim();
+          return (
+            <button
+              key={idx}
+              onClick={() => setSelectedChapterIndex(idx)}
+              style={{
+                padding: "6px 14px",
+                fontSize: 12,
+                fontWeight: 700,
+                borderRadius: 20,
+                border: `1px solid ${
+                  selectedChapterIndex === idx
+                    ? "rgba(184, 134, 11, 0.7)"
+                    : "rgba(184, 134, 11, 0.2)"
+                }`,
+                background:
+                  selectedChapterIndex === idx
+                    ? "rgba(184, 134, 11, 0.15)"
+                    : "#FAF8F5",
+                color: selectedChapterIndex === idx ? "#B8860B" : "#4A4238",
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <span>{ch.icon}</span> {ch.chapterNum}. {shortTitle}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── NOVELISTIC CHAPTERS (STORYTELLING PROSE) ── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
         {displayedChapters.map((chapter, cIdx) => (
           <article
             key={cIdx}
@@ -287,7 +290,7 @@ ${actionableDirective.points.map((p) => `• ${p}`).join("\n")}
               background: "#FAF8F5",
               border: "1px solid rgba(184, 134, 11, 0.2)",
               borderRadius: 14,
-              padding: "22px 24px",
+              padding: "24px 28px",
               position: "relative",
             }}
           >
@@ -307,7 +310,7 @@ ${actionableDirective.points.map((p) => `• ${p}`).join("\n")}
                 }}
               >
                 <span>{chapter.icon}</span>
-                <span>सोपान {chapter.chapterNum}</span>
+                <span>✦ {chapter.chapterNum}. {chapter.title.split("—")[0].trim()}</span>
               </div>
 
               <h4
@@ -352,9 +355,9 @@ ${actionableDirective.points.map((p) => `• ${p}`).join("\n")}
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: 14,
-                fontSize: 15,
-                lineHeight: 1.8,
+                gap: 16,
+                fontSize: 15.5,
+                lineHeight: 1.85,
                 color: "#2A241F",
                 fontFamily: "Cormorant Garamond, Georgia, serif",
               }}
@@ -441,7 +444,7 @@ ${actionableDirective.points.map((p) => `• ${p}`).join("\n")}
                 <div
                   key={mIdx}
                   style={{
-                    padding: "16px 18px",
+                    padding: "18px 22px",
                     background: "#FFFFFF",
                     border: "1px solid rgba(184, 134, 11, 0.22)",
                     borderRadius: 12,
@@ -533,7 +536,7 @@ ${actionableDirective.points.map((p) => `• ${p}`).join("\n")}
         <div
           style={{
             marginTop: 22,
-            padding: "16px 18px",
+            padding: "20px 24px",
             background: "rgba(184, 134, 11, 0.05)",
             border: "1px solid rgba(184, 134, 11, 0.25)",
             borderRadius: 12,
