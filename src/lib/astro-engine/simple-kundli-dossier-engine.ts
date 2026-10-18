@@ -19,6 +19,9 @@
 
 import type { ChartData, PlanetData } from "./calculations";
 import { NAKSHATRA_DATA } from "./nakshatra-data";
+import { calculateDivisional } from "./divisional";
+import { buildMangalDoshaInsight } from "./mangal-dosha-adapter";
+import { generateGemstoneReportFromChart } from "./gemstone";
 
 export interface MasterYogaItem {
   id: number;
@@ -151,6 +154,21 @@ const RASHIS_SHORT = [
   "मीन",
 ];
 
+const RASHIS_NAMES = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces",
+];
+
 const RASHI_LORDS = [
   "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury",
   "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter",
@@ -273,7 +291,7 @@ function getLagneshOutcome(lagnaNum: number, lagneshHouse: number, lagneshName: 
 /**
  * Returns Favourable Gemstone Consultation based on Lagna & Functional Benefics
  */
-function getGemstoneConsultation(lagnaNum: number, lagneshHouse: number): {
+function getGemstoneConsultation(chart: ChartData, lagnaNum: number): {
   primaryStone: string;
   englishStone: string;
   finger: string;
@@ -282,126 +300,135 @@ function getGemstoneConsultation(lagnaNum: number, lagneshHouse: number): {
   benefits: string;
   alternative: string;
 } {
-  const GEM_MAP: Record<number, {
+  const PLANET_GEM_HINDI: Record<string, {
     primaryStone: string;
     englishStone: string;
     finger: string;
     metal: string;
     dayTime: string;
-    benefits: string;
+    defaultBenefits: string;
     alternative: string;
   }> = {
-    0: {
+    Mars: {
       primaryStone: "त्रिकोण लाल मूंगा",
       englishStone: "Red Coral (Moonga)",
       finger: "अनामिका (Ring Finger)",
       metal: "तांबा अथवा स्वर्ण",
       dayTime: "मंगलवार प्रातःकाल (सूर्य उदय के समय)",
-      benefits: "साहस, त्वरित निर्णय क्षमता, प्रशासनिक प्रभाव और शारीरिक ऊर्जा में तीव्र वृद्धि।",
+      defaultBenefits: "साहस, त्वरित निर्णय क्षमता, प्रशासनिक प्रभाव और शारीरिक ऊर्जा में तीव्र वृद्धि।",
       alternative: "लाल कार्नेलियन (Carnelian)",
     },
-    1: {
-      primaryStone: "सफेद पुखराज / ओपल",
-      englishStone: "White Sapphire / Natural Opal",
-      finger: "मध्यमा अथवा कनिष्ठिका",
-      metal: "चांदी अथवा सफेद सोना",
-      dayTime: "शुक्रवार प्रातःकाल",
-      benefits: "मानसिक सौम्यता, पारिवारिक सुख, भौतिक ऐश्वर्य और रचनात्मक प्रचुरता।",
-      alternative: "जरकन (Zircon)",
-    },
-    2: {
-      primaryStone: "शुद्ध जाम्बियन पन्ना",
-      englishStone: "Emerald (Panna)",
-      finger: "कनिष्ठिका (Little Finger)",
-      metal: "पंचधातु, स्वर्ण अथवा चांदी",
-      dayTime: "बुधवार प्रातःकाल (शुक्ल पक्ष)",
-      benefits: "तीक्ष्ण तार्किक मेधा, कोडिंग/डेटा प्रबंधन में निपुणता, वाणी का प्रभाव और व्यापारिक उन्नति।",
-      alternative: "पेरिडॉट अथवा हरा टूर्मलाइन (Peridot)",
-    },
-    3: {
-      primaryStone: "प्राकृतिक सच्चा मोती",
-      englishStone: "Natural Pearl (Moti)",
-      finger: "कनिष्ठिका (Little Finger)",
-      metal: "शुद्ध चांदी",
-      dayTime: "सोमवार प्रातःकाल",
-      benefits: "मानसिक शांति, तनाव व अनिद्रा से मुक्ति, भावनात्मक संतुलन और निर्णय स्थिरता।",
-      alternative: "मूनस्टोन (Moonstone)",
-    },
-    4: {
+    Sun: {
       primaryStone: "माणिक्य",
       englishStone: "Ruby (Manikya)",
       finger: "अनामिका (Ring Finger)",
       metal: "तांबा अथवा स्वर्ण",
       dayTime: "रविवार प्रातःकाल",
-      benefits: "सामाजिक प्रतिष्ठा, नेतृत्व क्षमता, प्रशासनिक अधिकार और अदम्य आत्म-विश्वास।",
+      defaultBenefits: "सामाजिक प्रतिष्ठा, नेतृत्व क्षमता, प्रशासनिक अधिकार और अदम्य आत्म-विश्वास।",
       alternative: "लाल गार्नेट (Red Garnet)",
     },
-    5: {
+    Moon: {
+      primaryStone: "प्राकृतिक सच्चा मोती",
+      englishStone: "Natural Pearl (Moti)",
+      finger: "कनिष्ठिका (Little Finger)",
+      metal: "शुद्ध चांदी",
+      dayTime: "सोमवार प्रातःकाल",
+      defaultBenefits: "मानसिक शांति, तनाव व अनिद्रा से मुक्ति, भावनात्मक संतुलन और निर्णय स्थिरता।",
+      alternative: "मूनस्टोन (Moonstone)",
+    },
+    Mercury: {
       primaryStone: "शुद्ध जाम्बियन पन्ना",
       englishStone: "Emerald (Panna)",
       finger: "कनिष्ठिका (Little Finger)",
       metal: "पंचधातु, स्वर्ण अथवा चांदी",
       dayTime: "बुधवार प्रातःकाल (शुक्ल पक्ष)",
-      benefits: "असाधारण तार्किक मेधा, रणनीतिक दूरदर्शिता, व्यापारिक विस्तार और अत्यधिक सोचने से राहत।",
-      alternative: "पेरिडॉट अथवा हरा टूर्मलाइन (Peridot / Green Tourmaline)",
+      defaultBenefits: "तीक्ष्ण तार्किक मेधा, कोडिंग/डेटा प्रबंधन में निपुणता, वाणी का प्रभाव और व्यापारिक उन्नति।",
+      alternative: "पेरिडॉट अथवा हरा टूर्मलाइन (Peridot)",
     },
-    6: {
-      primaryStone: "सफेद पुखराज अथवा ओपल",
-      englishStone: "White Sapphire / Opal",
-      finger: "मध्यमा अथवा कनिष्ठिका",
-      metal: "चांदी अथवा प्लेटिनम",
-      dayTime: "शुक्रवार प्रातःकाल",
-      benefits: "संबंधों में मधुरता, आकर्षण, वित्तीय अवसर और मानसिक संतुलन।",
-      alternative: "जरकन (Zircon)",
-    },
-    7: {
-      primaryStone: "त्रिकोण लाल मूंगा",
-      englishStone: "Red Coral (Moonga)",
-      finger: "अनामिका (Ring Finger)",
-      metal: "तांबा अथवा स्वर्ण",
-      dayTime: "मंगलवार प्रातःकाल",
-      benefits: "अटूट इच्छाशक्ति, भय-मुक्ति, गूढ़ शोध और अचल संपत्ति का निर्माण।",
-      alternative: "लाल कार्नेलियन (Carnelian)",
-    },
-    8: {
+    Jupiter: {
       primaryStone: "पीला पुखराज",
       englishStone: "Yellow Sapphire (Pukhraj)",
       finger: "तर्जनी (Index Finger)",
       metal: "शुद्ध स्वर्ण अथवा पीतल",
       dayTime: "गुरुवार प्रातःकाल",
-      benefits: "उच्च ज्ञान, ईश्वरीय कृपा, आध्यात्मिक उन्नति, समाज में आदर और वित्तीय संपन्नता।",
+      defaultBenefits: "उच्च ज्ञान, ईश्वरीय कृपा, आध्यात्मिक उन्नति, समाज में आदर और वित्तीय संपन्नता।",
       alternative: "सुनहला (Citrine / Topaz)",
     },
-    9: {
-      primaryStone: "जाम्बियन पन्ना अथवा नीलम (परीक्षणोपरांत)",
-      englishStone: "Emerald / Blue Sapphire",
-      finger: "कनिष्ठिका अथवा मध्यमा",
+    Venus: {
+      primaryStone: "सफेद पुखराज अथवा ओपल",
+      englishStone: "White Sapphire / Natural Opal",
+      finger: "मध्यमा अथवा कनिष्ठिका",
+      metal: "चांदी अथवा सफेद सोना",
+      dayTime: "शुक्रवार प्रातःकाल",
+      defaultBenefits: "मानसिक सौम्यता, पारिवारिक सुख, भौतिक ऐश्वर्य और रचनात्मक प्रचुरता।",
+      alternative: "जरकन (Zircon)",
+    },
+    Saturn: {
+      primaryStone: "नीलम अथवा कटैला (परीक्षणोपरांत)",
+      englishStone: "Blue Sapphire / Amethyst",
+      finger: "मध्यमा (Middle Finger)",
       metal: "पंचधातु अथवा चांदी",
-      dayTime: "बुधवार प्रातःकाल (पन्ना) / शनिवार सायंकाल",
-      benefits: "अनुशासन, दीर्घकालिक साम्राज्य निर्माण, स्थिरता और कर्म में निष्ठा।",
+      dayTime: "शनिवार सायंकाल",
+      defaultBenefits: "अनुशासन, दीर्घकालिक साम्राज्य निर्माण, स्थिरता और कर्म में निष्ठा।",
       alternative: "पेरिडॉट अथवा अमेथिस्ट (Amethyst)",
-    },
-    10: {
-      primaryStone: "जाम्बियन पन्ना अथवा नीलम",
-      englishStone: "Emerald / Blue Sapphire",
-      finger: "कनिष्ठिका अथवा मध्यमा",
-      metal: "पंचधातु अथवा चांदी",
-      dayTime: "बुधवार प्रातःकाल (पन्ना)",
-      benefits: "लीक से हटकर नवाचार, बड़े नेटवर्क्स से लाभ और तंत्रिका तंत्र को शांति।",
-      alternative: "पेरिडॉट (Peridot)",
-    },
-    11: {
-      primaryStone: "पीला पुखराज",
-      englishStone: "Yellow Sapphire (Pukhraj)",
-      finger: "तर्जनी (Index Finger)",
-      metal: "शुद्ध स्वर्ण अथवा पीतल",
-      dayTime: "गुरुवार प्रातःकाल",
-      benefits: "आत्मिक ज्ञान, सहज अंतर्ज्ञान (Intuition), मानसिक शांति और समाज में आदर।",
-      alternative: "सुनहला (Citrine)",
     },
   };
 
-  return GEM_MAP[lagnaNum] || GEM_MAP[0];
+  try {
+    const report = generateGemstoneReportFromChart(chart);
+    const p = report?.primaryGemstone;
+    const planet = p?.planet;
+
+    if (planet && PLANET_GEM_HINDI[planet]) {
+      const meta = PLANET_GEM_HINDI[planet];
+      const benefits = (p?.benefits && p.benefits.length > 0)
+        ? p.benefits.join(" ")
+        : meta.defaultBenefits;
+      const alternative = p?.alternateGemstone
+        ? `${p.alternateGemstone} (${meta.alternative})`
+        : meta.alternative;
+
+      return {
+        primaryStone: meta.primaryStone,
+        englishStone: meta.englishStone,
+        finger: meta.finger,
+        metal: meta.metal,
+        dayTime: meta.dayTime,
+        benefits,
+        alternative,
+      };
+    }
+  } catch (err) {
+    console.warn("Dynamic gemstone report fallback:", err);
+  }
+
+  // Classical Lagna-based Benefic Fallback (Aries/Scorpio -> Mars / Red Coral)
+  const LAGNA_DEFAULT_PLANET: Record<number, string> = {
+    0: "Mars",    // Aries -> Red Coral
+    1: "Venus",   // Taurus -> White Sapphire / Opal
+    2: "Mercury", // Gemini -> Emerald
+    3: "Mars",    // Cancer -> Mars is Yogakaraka (rules 5 & 10) -> Red Coral
+    4: "Mars",    // Leo -> Mars is Yogakaraka (rules 4 & 9) -> Red Coral
+    5: "Mercury", // Virgo -> Emerald
+    6: "Venus",   // Libra -> White Sapphire / Opal
+    7: "Mars",    // Scorpio -> Red Coral
+    8: "Jupiter", // Sagittarius -> Yellow Sapphire
+    9: "Saturn",  // Capricorn -> Blue Sapphire
+    10: "Saturn", // Aquarius -> Blue Sapphire
+    11: "Jupiter",// Pisces -> Yellow Sapphire
+  };
+
+  const fallbackPlanet = LAGNA_DEFAULT_PLANET[lagnaNum] || "Mars";
+  const meta = PLANET_GEM_HINDI[fallbackPlanet] || PLANET_GEM_HINDI["Mars"];
+  return {
+    primaryStone: meta.primaryStone,
+    englishStone: meta.englishStone,
+    finger: meta.finger,
+    metal: meta.metal,
+    dayTime: meta.dayTime,
+    benefits: meta.defaultBenefits,
+    alternative: meta.alternative,
+  };
 }
 
 /**
@@ -411,12 +438,20 @@ export function generateSimpleKundliDossierData(chart: ChartData): SimpleKundliD
   const rawName = chart.name || "जातक";
   const displayName = rawName.includes("(") ? rawName.split("(")[0].trim() : rawName;
 
-  const lagnaNum = chart.lagnaNum ?? 0;
+  const rawLagnaNum = typeof chart.lagnaNum === "number"
+    ? chart.lagnaNum
+    : (chart.lagnaRashi ? RASHIS_NAMES.indexOf(chart.lagnaRashi) : 0);
+  const lagnaNum = (rawLagnaNum >= 0 && rawLagnaNum < 12) ? rawLagnaNum : 0;
   const lagnaLord = RASHI_LORDS[lagnaNum];
   const lagneshData = chart.planets[lagnaLord];
   const lagneshHouse = lagneshData?.house ?? 1;
 
   const { soulPlanet, careerPlanet, spousePlanet } = getSecretKarakas(chart.planets);
+
+  // ── SISTER ENGINE INTEGRATIONS (D-9 NAVAMSHA & MANGLIK INSIGHT) ──
+  const divCharts = calculateDivisional(chart.planets as never, lagnaNum, chart.lagnaLon ?? 0);
+  const d9 = divCharts.find((c) => c.key === "D9");
+  const mangalInsight = buildMangalDoshaInsight(chart);
 
   const moon = chart.planets.Moon;
   const moonHouse = moon ? moon.house : 1;
@@ -437,12 +472,6 @@ export function generateSimpleKundliDossierData(chart: ChartData): SimpleKundliD
   const planetsIn10th = Object.entries(chart.planets)
     .filter(([_, p]) => p.house === 10)
     .map(([name, p]) => ({ name, ...p }));
-
-  // 7th house & lord
-  const seventhSignNum = (lagnaNum + 6) % 12;
-  const seventhLord = RASHI_LORDS[seventhSignNum];
-  const seventhLordData = chart.planets[seventhLord];
-  const seventhLordHouse = seventhLordData ? seventhLordData.house : 7;
 
   // 5th house & lord
   const fifthSignNum = (lagnaNum + 4) % 12;
@@ -573,7 +602,99 @@ export function generateSimpleKundliDossierData(chart: ChartData): SimpleKundliD
 
   vastuExplanation += ` शयन करते समय सिरहाना हमेशा ${sleepDirection} में रखें; यह पृथ्वी के चुंबकीय प्रवाह के साथ जैविक सामंजस्य स्थापित करके प्रगाढ़ अनिद्रा-मुक्त नींद देता है।`;
 
-  // ── LOVE VS ARRANGED MARRIAGE CALCULATION ──
+  // ── DYNAMIC 100% SHASTRIC MARRIAGE ENGINE (D-1 + D-9 NAVAMSHA + MANGLIK + JAIMINI) ──
+  const seventhSignNum = (lagnaNum + 6) % 12;
+  const seventhRashiHindi = RASHIS_HINDI[seventhSignNum];
+  const seventhLord = RASHI_LORDS[seventhSignNum];
+  const seventhLordHindi = PLANET_NAMES_HINDI[seventhLord] || seventhLord;
+  const seventhLordData = chart.planets[seventhLord];
+  const seventhLordHouse = seventhLordData ? seventhLordData.house : 7;
+  const seventhLordDignity = seventhLordData?.dignity || "—";
+  const planetsIn7th = Object.entries(chart.planets)
+    .filter(([_, pl]) => pl.house === 7)
+    .map(([name, pl]) => ({ name, ...pl }));
+
+  // D-9 Navamsha Marriage Indicators
+  const d9LagnaSign = d9?.lagna || "Taurus";
+  const d9LagnaNum = typeof d9?.lagnaNum === "number" ? d9.lagnaNum : 1;
+  const d9SeventhSignIndex = (d9LagnaNum + 6) % 12;
+  const d9SeventhLord = RASHI_LORDS[d9SeventhSignIndex] || "Mars";
+  const d9SeventhLordHindi = PLANET_NAMES_HINDI[d9SeventhLord] || d9SeventhLord;
+
+  // Manglik Insight from sister engine
+  const hasManglik = Boolean(mangalInsight?.result?.hasDosha);
+  const mangalSeverityLabel = mangalInsight?.result?.severityLabel || "सौम्य";
+  const mangalProtection = mangalInsight?.result?.scores?.protection ?? 0;
+  const marsHouse = mars?.house ?? 1;
+  const darakarakaHindi = PLANET_NAMES_HINDI[spousePlanet] || spousePlanet;
+
+  // 1. Spouse Nature (12 Signs + Occupants + Lord Placement + D9 + Darakaraka)
+  const SEVENTH_SIGN_NATURE: Record<number, string> = {
+    0: "सप्तम भाव में मेष राशि होने से आपकी जीवनसाथी स्वभाव से अत्यंत साहसी, ऊर्जावान, निडर, स्वाभिमानी, सीधे मुद्दे पर बात करने वाली और त्वरित निर्णय लेने वाली होंगी। वे किसी पर आश्रित रहने के बजाय अपनी स्वतंत्र सोच और आत्मसम्मान को सर्वोपरि रखती हैं।",
+    1: "सप्तम भाव में वृषभ राशि होने से आपकी जीवनसाथी स्वभाव से शांत, अत्यंत धैर्यवान, सुरुचिपूर्ण, व्यावहारिक, गृहस्थी को सुरुचिपूर्ण ढंग से संवारने वाली और स्थायित्व पसंद होंगी। वे दिखावे से दूर रहकर ठोस पारिवारिक सुख और आर्थिक अनुशासन को प्राथमिकता देती हैं।",
+    2: "सप्तम भाव में मिथुन राशि होने से आपकी जीवनसाथी बहुमुखी प्रतिभा की धनी, तीक्ष्ण तार्किक बुद्धि, सुशिक्षित, कामकाजी (Working Professional), हास्य-विनोद प्रिय और व्यावहारिक संवाद में अत्यंत निपुण होंगी। उनकी वाकपटुता आपको सदा प्रेरित रखेगी।",
+    3: "सप्तम भाव में कर्क राशि होने से आपकी जीवनसाथी अत्यंत संवेदनशील, ममतामयी, परिवार को एक सूत्र में बांधने वाली, सहज अंतर्ज्ञानी (Intuitive) और भावनात्मक रूप से अटूट संबल देने वाली होंगी। उनका आचरण अत्यंत सौम्य और गरिमामय रहेगा।",
+    4: "सप्तम भाव में सिंह राशि होने से आपकी जीवनसाथी स्वाभाविक आत्मसम्मान से ओतप्रोत, उच्च कुलीन संस्कारों वाली, निष्ठावान, आकर्षक व्यक्तित्व और समाज में परिवार की प्रतिष्ठा व गरिमा को सर्वोच्च प्राथमिकता देने वाली होंगी।",
+    5: "सप्तम भाव में कन्या राशि होने से आपकी जीवनसाथी सूक्ष्म विश्लेषक, व्यावहारिक, सुव्यवस्थित, मितव्ययी, हर काम को परफेक्शन से करने वाली और बुद्धिजीवी स्वभाव की होंगी। वे आपकी दिनचर्या और योजनाओं को एक मजबूत व्यवस्था देंगी।",
+    6: "सप्तम भाव में तुला राशि होने से आपकी जीवनसाथी अत्यंत रूपवान, सुरुचिपूर्ण, न्यायप्रिय, कला-प्रेमी, सामाजिक शिष्टाचार में कुशल और दांपत्य में सौहार्द व संतुलन बनाने वाली होंगी। वे आपके सामाजिक जीवन में एक बड़ा आकर्षण बनेंगी।",
+    7: "सप्तम भाव में वृश्चिक राशि होने से आपकी जीवनसाथी अत्यंत गंभीर, निष्ठावान, गूढ़ समझ रखने वाली, स्वाभिमानी और संकट के समय आपके साथ चट्टान की तरह अडिग खड़ी रहने वाली होंगी। उनका समर्पण और वफादारी अटूट रहेगी।",
+    8: "सप्तम भाव में धनु राशि होने से आपकी जीवनसाथी विदुषी, धार्मिक, आशावादी, बड़े विज़न वाली, नैतिक मूल्यों से ओतप्रोत और आपके जीवन में एक सच्ची दार्शनिक मार्गदर्शक सिद्ध होंगी। उनका स्वभाव परिवार में स्वाभाविक आदर दिलाएगा।",
+    9: "सप्तम भाव में मकर राशि होने से आपकी जीवनसाथी कर्तव्यनिष्ठ, परिपक्व, लोहे जैसे अनुशासन वाली, जमीन से जुड़ी हुई और दीर्घकालिक पारिवारिक समृद्धि की ठोस नींव रखने वाली होंगी। वे फिजूल बातों से दूर व्यावहारिक रहेंगी।",
+    10: "सप्तम भाव में कुंभ राशि होने से आपकी जीवनसाथी स्वतंत्र चेतना वाली, लीक से हटकर सोचने वाली, मानवीय मूल्यों से युक्त, आधुनिक और बौद्धिक रूप से अत्यंत समृद्ध होंगी। वे आपके विचारों को एक बड़ा फलक देंगी।",
+    11: "सप्तम भाव में मीन राशि होने से आपकी जीवनसाथी सात्विक, दयालु, कलात्मक, आध्यात्मिक चेतना वाली और निस्वार्थ प्रेम व त्याग की प्रतिमूर्ति होंगी। वे घर के वातावरण को शांति और सकारात्मक ऊर्जा से भर देंगी।",
+  };
+
+  let spouseNatureText = SEVENTH_SIGN_NATURE[seventhSignNum] || SEVENTH_SIGN_NATURE[0];
+
+  if (planetsIn7th.length > 0) {
+    const pNotes = planetsIn7th.map((pl) => {
+      if (pl.name === "Jupiter") return "सप्तम भाव में देवगुरु बृहस्पति की अमृत उपस्थिति जीवनसाथी को विदुषी, धार्मिक, उच्च संस्कारों वाली और परिवार में सर्वोच्च आदर पाने वाली बनाती है।";
+      if (pl.name === "Venus") return "सप्तम भाव में शुक्र देव का वास साथी को अत्यंत सुंदर, सुरुचिपूर्ण, कलात्मक और दांपत्य ऐश्वर्य में प्रचुरता लाने वाला बनाता है।";
+      if (pl.name === "Mars") return "सप्तम भाव में मंगल देव की स्थिति साथी को स्पष्टवादी, निडर, सक्रिय और परिवार के सम्मान के लिए डटकर खड़े रहने वाली साहसी ऊर्जा देती है।";
+      if (pl.name === "Saturn") return "सप्तम भाव में शनि देव की स्थिति जीवनसाथी को अत्यधिक संजीदा, गंभीर, व्यावहारिक, धैर्यवान और मजबूत आधार बनाने वाली बनाती है।";
+      if (pl.name === "Mercury") return "सप्तम भाव में बुध देव की स्थिति साथी को तीक्ष्ण तार्किक बुद्धि, कामकाजी (Professional) और उत्कृष्ट संवादक बनाती है।";
+      if (pl.name === "Sun") return "सप्तम भाव में सूर्य देव का प्रभाव साथी को स्वाभिमानी, नेतृत्व क्षमता से युक्त और सिद्धांतों पर अडिग रहने वाला बनाता है।";
+      if (pl.name === "Rahu") return "सप्तम भाव में राहु का प्रभाव साथी को आधुनिक, तेज-तर्रार, लीक से हटकर और सामाजिक रूप से प्रभावशाली बनाता है।";
+      if (pl.name === "Ketu") return "सप्तम भाव में केतु का प्रभाव साथी को अंतर्मुखी, सात्विक, शांत और भौतिक दिखावे से दूर रहने वाला बनाता है।";
+      if (pl.name === "Moon") return "सप्तम भाव में चंद्रमा की उपस्थिति साथी को अत्यंत सौम्य, ममतामयी, आकर्षक और भावनात्मक रूप से संवेदनशील बनाती है।";
+      return "";
+    }).filter(Boolean);
+
+    if (pNotes.length > 0) {
+      spouseNatureText += ` ${pNotes.join(" ")}`;
+    }
+  }
+
+  const lordPlacementText = seventhLordHouse === 1
+    ? `सप्तमेश ${seventhLordHindi} लग्न (व्यक्तित्व भाव) में होने से जीवनसाथी आपके प्रति पूर्णतः समर्पित रहेंगी और आपकी सलाह को सर्वोच्च प्राथमिकता देंगी।`
+    : seventhLordHouse === 9 || seventhLordHouse === 10
+    ? `सप्तमेश ${seventhLordHindi} का ${seventhLordHouse === 9 ? "भाग्य भाव" : "कर्म भाव"} में बैठना दर्शाता है कि जीवनसाथी स्वयं बहुत प्रतिष्ठित, कामकाजी या उच्च कुलीन संस्कारों से युक्त होंगी।`
+    : seventhLordHouse === 11 || seventhLordHouse === 2
+    ? `सप्तमेश ${seventhLordHindi} का ${seventhLordHouse === 11 ? "लाभ भाव" : "धन भाव"} में होना यह सिद्ध करता है कि जीवनसाथी अत्यंत व्यावहारिक और वित्तीय रूप से समृद्धि लाने वाली होंगी।`
+    : seventhLordHouse === 4 || seventhLordHouse === 5
+    ? `सप्तमेश ${seventhLordHindi} का ${seventhLordHouse === 4 ? "सुख भाव" : "पंचम भाव"} में होना दांपत्य में प्रगाढ़ भावनात्मक प्रेम और गृहस्थी के आनंद को पुष्ट करता है।`
+    : `सप्तमेश ${seventhLordHindi} का ${seventhLordHouse}वें भाव में होना यह दर्शाता है कि आपका साथी संबंधों में परिपक्वता, निष्ठा और जिम्मेदारी को बहुत गंभीरता से निभाएगा।`;
+
+  spouseNatureText += ` ${lordPlacementText}`;
+  spouseNatureText += ` सूक्ष्म दांपत्य दर्पण नवमांश (D-9) में सप्तम भाव ${RASHIS_HINDI[d9SeventhSignIndex]} में होने और नवांश सप्तमेश ${d9SeventhLordHindi} की उपस्थिति से यह पुष्ट होता है कि आंतरिक वैचारिक स्तर पर आपका यह गठबंधन एक सच्चा आत्मिक तालमेल सिद्ध होगा। जैमिनी दाराकारक ${darakarakaHindi} देव साथी के रूप में एक मजबूत नैतिक व भावनात्मक संबल का संकेत देते हैं।`;
+
+  // 2. Meeting Venue & Context
+  let meetingVenue = "";
+  const venueHouse = seventhLordHouse;
+
+  if ([10, 11].includes(venueHouse)) {
+    meetingVenue = `सप्तमेश ${seventhLordHindi} का ${venueHouse === 10 ? "कर्म भाव (10th)" : "लाभ भाव (11th)"} में संरेखण यह सिद्ध करता है कि आपकी प्रथम भेंट कार्यक्षेत्र (Workplace), कॉरपोरेट प्रोजेक्ट्स, प्रोफेशनल नेटवर्किंग इवेंट्स, उद्योग से जुड़ी बैठकों या किसी बड़े प्रोफेशनल सर्कल के माध्यम से साझा पेशेवर लक्ष्यों के सिलसिले में होगी। दोनों के बीच पहला आकर्षण बौद्धिक कार्यकुशलता से उपजेगा।`;
+  } else if ([3, 9, 12].includes(venueHouse)) {
+    meetingVenue = `सप्तमेश ${seventhLordHindi} का ${venueHouse === 9 ? "भाग्य भाव" : venueHouse === 3 ? "तृतीय भाव" : "द्वादश भाव"} में होना यह स्पष्ट संकेत देता है कि आपकी मुलाकात किसी यात्रा (Travel), उच्च शिक्षा संस्थान (University / College), सेमिनार, वर्कशॉप, डिजिटल/ऑनलाइन प्लेटफॉर्म या किसी दूरस्थ/विदेशी परियोजना (Distant / Global Context) के दौरान होगी, जहाँ ज्ञान, नवाचार या स्वतंत्र विचार-विमर्श का वातावरण हो।`;
+  } else if ([1, 5, 7].includes(venueHouse)) {
+    meetingVenue = `सप्तमेश ${seventhLordHindi} का ${venueHouse === 1 ? "लग्न" : venueHouse === 5 ? "पंचम भाव" : "सप्तम भाव"} में होना यह दर्शाता है कि आपकी मुलाकात साझा बौद्धिक रुचियों (Shared Passions), रचनात्मक कार्यक्रमों, किसी कॉमन फ्रेंड सर्कल के माध्यम से या सीधे व्यक्तिगत पहल (Direct Personal Encounter) से होगी। बातचीत की शुरुआत बहुत सहज, स्वाभाविक और परस्पर आकर्षण से होगी।`;
+  } else if ([2, 4].includes(venueHouse)) {
+    meetingVenue = `सप्तमेश ${seventhLordHindi} का ${venueHouse === 2 ? "कुटुंब भाव" : "सुख भाव"} में होना यह संकेत करता है कि आपकी मुलाकात पारिवारिक सूत्रों, सांस्कृतिक आयोजनों, गृह नगर के प्रतिष्ठित परिचितों या किसी विश्वसनीय पारिवारिक माध्यम से होगी, जो बहुत जल्दी एक गहन आत्मीय और बौद्धिक संवाद में बदल जाएगी।`;
+  } else {
+    meetingVenue = `सप्तमेश ${seventhLordHindi} का ${venueHouse}वें भाव में होना यह दर्शाता है कि आपकी मुलाकात किसी अप्रत्याशित परिस्थिति, शोध कार्य, सेवा/चिकित्सा परिवेश या किसी संयुक्त समस्या के समाधान के सिलसिले में होगी, जहाँ पहले दोनों के बीच एक गहरा सम्मान और भरोसा विकसित होगा।`;
+  }
+
+  // 3. Marriage Type (Love vs Arranged + Manglik Integration)
   const has5th7thConnection =
     (fifthLordData && fifthLordData.house === 7) ||
     (seventhLordData && seventhLordData.house === 5) ||
@@ -581,55 +702,44 @@ export function generateSimpleKundliDossierData(chart: ChartData): SimpleKundliD
 
   const isRahuInLoveHouse = rahu && (rahu.house === 5 || rahu.house === 7);
   const isVenusMarsConnected = venus && mars && (venus.house === mars.house || Math.abs(venus.house - mars.house) === 6);
+  const isJupiterAspecting7th = jupiter && ([1, 3, 11].includes(jupiter.house));
 
   let marriageTypeTitle = "";
   let marriageTypeExplanation = "";
 
   if (has5th7thConnection || isRahuInLoveHouse) {
     marriageTypeTitle = "प्रबल प्रेम-विवाह एवं स्वयं की पसंद (Love Marriage / Self-Choice)";
-    marriageTypeExplanation = `आपकी कुंडली में प्रेम, व्यक्तिगत पसंद और विवाह के भावों के बीच सीधा और अटूट तालमेल बन रहा है। यह स्पष्ट संकेत देता है कि आपका विवाह किसी परंपरागत सामाजिक दबाव में नहीं, बल्कि आपसी परिचय, बौद्धिक तालमेल और गहरी आत्मीयता के आधार पर होगा। यदि परिवार शुरुआत में कुछ समय भी ले, तो अंततः दोनों परिवारों की पूर्ण सहमति, आशीर्वाद और मान-सम्मान के साथ यह विवाह परिणय में बदलेगा।`;
+    marriageTypeExplanation = `आपकी कुंडली में पंचमेश ${PLANET_NAMES_HINDI[fifthLord] || fifthLord} और सप्तमेश ${seventhLordHindi} के मध्य सीधा संरेखण बन रहा है। यह शास्त्रीय योग स्पष्ट संकेत देता है कि आपका विवाह किसी रूढ़िवादी सामाजिक दबाव में नहीं, बल्कि आपसी परिचय, बौद्धिक तालमेल और गहरी आत्मीयता के आधार पर होगा। यदि परिवार शुरुआत में कुछ समय भी ले, तो अंततः दोनों परिवारों की पूर्ण सहमति, आशीर्वाद और मान-सम्मान के साथ यह विवाह परिणय में बदलेगा।`;
   } else if (isVenusMarsConnected) {
     marriageTypeTitle = "गहरी मित्रता के बाद परिणय (Friendship-Turned-Marriage)";
-    marriageTypeExplanation = `आपकी कुंडली दर्शाती है कि विवाह से पूर्व आपकी जीवनसाथी के साथ एक मजबूत मानसिक खिंचाव और मित्रता का दौर रहेगा। यह विवाह दोनों पक्षों की परस्पर सहमति, खुले विचारों और गहरे आकर्षण से संपन्न होगा।`;
+    marriageTypeExplanation = `शुक्र और मंगल का गतिशील संबंध दर्शाता है कि विवाह से पूर्व आपकी जीवनसाथी के साथ एक मजबूत मानसिक खिंचाव और मित्रता का दौर रहेगा। यह विवाह दोनों पक्षों की परस्पर सहमति, खुले विचारों और गहरे आकर्षण से संपन्न होगा।`;
+  } else if (isJupiterAspecting7th) {
+    marriageTypeTitle = "संस्कारित व पारिवारिक आशीर्वाद आधारित विवाह (Cultured Alliance with Familial Grace)";
+    marriageTypeExplanation = `सप्तम भाव पर देवगुरु बृहस्पति का शुभ प्रभाव यह सुनिश्चित करता है कि यह गठबंधन उच्च पारिवारिक प्रतिष्ठा, नैतिक मूल्यों और दोनों परिवारों के पूर्ण आशीर्वाद से संपन्न होगा। भले ही शुरुआत पारिवारिक माध्यम से हो, लेकिन अंतिम निर्णय पूरी तरह आपकी और जीवनसाथी की परस्पर सहमति और गहरी बौद्धिक अनुकूलता पर ही टिकेगा।`;
   } else {
-    marriageTypeTitle = "समान विचारधारा व आत्मीयता आधारित विवाह (Cultured Alliance with Mutual Resonance)";
-    marriageTypeExplanation = `यह विवाह भले ही परिवार या किसी विश्वसनीय सूत्र के माध्यम से आगे बढ़े, लेकिन अंतिम निर्णय पूरी तरह आपकी और जीवनसाथी की व्यक्तिगत समझ और बौद्धिक सहमति पर ही टिकेगा। विवाह के बाद दोनों के बीच एक आदर्श मित्रवत संबंध स्थापित होगा।`;
+    marriageTypeTitle = "समान विचारधारा व आत्मीयता आधारित विवाह (Alliance with Mutual Resonance)";
+    marriageTypeExplanation = `सप्तमेश ${seventhLordHindi} की स्थिति दर्शाती है कि यह विवाह एक संतुलित, संस्कारी और आपसी समझ पर आधारित गठबंधन होगा। विवाह के बाद दोनों के बीच एक आदर्श मित्रवत संबंध स्थापित होगा जो जीवन के हर पड़ाव पर एक-दूसरे को आगे बढ़ाएगा।`;
   }
 
-  // Where & How will you meet your spouse?
-  let meetingVenue = "";
-  const spouseSignifierHouse = chart.planets[spousePlanet]?.house || seventhLordHouse;
-
-  if ([3, 9, 12].includes(spouseSignifierHouse) || [3, 9, 12].includes(seventhLordHouse)) {
-    meetingVenue = `किसी यात्रा (Travel), उच्च शिक्षा संस्थान (University / College), सेमिनार, वर्कशॉप, डिजिटल/ऑनलाइन प्लेटफॉर्म या किसी दूरस्थ/विदेशी परियोजना (Distant / Global Context) के दौरान आपकी मुलाकात होने के सबसे प्रबल योग हैं। यह किसी ऐसे परिवेश में होगा जहाँ ज्ञान, विचार-विमर्श या स्वतंत्र कार्य हो रहा हो।`;
-  } else if ([10, 11].includes(spouseSignifierHouse) || [10, 11].includes(seventhLordHouse)) {
-    meetingVenue = `आपके कार्यक्षेत्र (Workplace), कॉरपोरेट प्रोजेक्ट्स, प्रोफेशनल नेटवर्किंग इवेंट्स, उद्योग से जुड़ी बैठकों या किसी बड़े मित्र समूह के माध्यम से मुलाकात होगी। आप दोनों का पहला संपर्क किसी साझा पेशेवर लक्ष्य या काम के सिलसिले में हो सकता है।`;
-  } else if ([1, 5, 7].includes(spouseSignifierHouse) || [1, 5, 7].includes(seventhLordHouse)) {
-    meetingVenue = `साझा बौद्धिक रुचियों (Shared Passions), रचनात्मक कार्यक्रमों, किसी कॉमन फ्रेंड के माध्यम से या सीधे स्वयं की व्यक्तिगत पहल (Direct Personal Encounter) से मुलाकात होगी। बातचीत की शुरुआत बहुत सहज और विचारों के आदान-प्रदान से होगी।`;
+  if (hasManglik) {
+    marriageTypeExplanation += ` [मांगलिक सूत्र: जन्म कुंडली में मंगल देव ${marsHouse}वें भाव में स्थित हैं (${mangalSeverityLabel})। ${mangalProtection >= 40 ? "शास्त्रीय दृष्टि से इसका शुभ प्राकृतिक परिहार उपलब्ध है; दांपत्य में अनावश्यक भय की कोई आवश्यकता नहीं है।" : "रिश्ते में क्रोध व जल्दबाजी पर 5 सेकंड का मौन नियंत्रण दांपत्य को आजीवन सुखी व सुरक्षित रखेगा।"}]`;
   } else {
-    meetingVenue = `पारिवारिक समारोह (Family Gathering), किसी प्रतिष्ठित परिचित के माध्यम से, या अपने सांस्कृतिक व सामाजिक परिवेश में औपचारिक परिचय होगा, जो बहुत जल्दी एक गहन बौद्धिक और भावनात्मक संवाद में बदल जाएगा।`;
+    marriageTypeExplanation += ` [मांगलिक स्थिति: कुंडली किसी भी गंभीर मांगलिक दोष से पूर्णतः मुक्त है; दांपत्य भाव शुभ व सुरक्षित है।]`;
   }
 
-  // Spouse Nature
-  let spouseNatureText = "";
-  if (spousePlanet === "Saturn") {
-    spouseNatureText = `आपकी जीवनसाथी स्वभाव से अत्यधिक संजीदा, कर्तव्यनिष्ठ, परिपक्व, व्यावहारिक और जमीन से जुड़ी हुई (Grounded) होंगी। वे दिखावे या फिजूल बातों से दूर रहने वाली, बहुत स्वाभिमानी और आपके जीवन में एक मजबूत भावनात्मक व पारिवारिक आधार बनेंगी।`;
-  } else if (spousePlanet === "Mercury") {
-    spouseNatureText = `आपकी जीवनसाथी असाधारण रूप से तीक्ष्ण बुद्धि वाली, सुशिक्षित, कामकाजी (Working/Professional), बहुत अच्छी संवादक और व्यावहारिक तार्किक सोच वाली होंगी। उनकी हास्य-विनोद की समझ और त्वरित निर्णय क्षमता आपको बहुत प्रभावित करेगी।`;
-  } else if (spousePlanet === "Jupiter") {
-    spouseNatureText = `आपकी जीवनसाथी उच्च संस्कारों वाली, विदुषी, नैतिक मूल्यों से ओतप्रोत, धैर्यवान और परिवार में स्वाभाविक आदर पाने वाली होंगी। वे आपके लिए एक सच्ची मार्गदर्शक सिद्ध होंगी।`;
-  } else if (spousePlanet === "Sun") {
-    spouseNatureText = `आपकी जीवनसाथी बहुत स्वाभिमानी, अच्छे प्रतिष्ठित परिवार से संबंध रखने वाली, प्रशासनिक स्वभाव और अपने सिद्धांतों पर दृढ़ रहने वाली होंगी।`;
-  } else if (spousePlanet === "Venus") {
-    spouseNatureText = `आपकी जीवनसाथी सुरुचिपूर्ण, सौम्य, कला-प्रिय, सुरुचिपूर्ण वस्त्र व साज-सज्जा की समझ रखने वाली और आपके जीवन में भौतिक व दांपत्य ऐश्वर्य लाने वाली होंगी।`;
-  } else if (spousePlanet === "Mars") {
-    spouseNatureText = `आपकी जीवनसाथी अत्यधिक ऊर्जावान, स्पष्टवादी, निडर, सक्रिय और परिवार के सम्मान के लिए डटकर खड़े रहने वाली साहसी व्यक्तित्व की होंगी।`;
+  // 4. 100% Dynamic Kalatra Bhagya (Marital Fortune)
+  let kalatraBhagyaNote = "";
+  if ([9, 10, 11].includes(seventhLordHouse)) {
+    kalatraBhagyaNote = `विवाह के तुरंत बाद आपके जीवन में 'कलत्र-भाग्य महा-योग' सक्रिय होगा—सप्तमेश ${seventhLordHindi} का ${seventhLordHouse === 9 ? "भाग्य भाव (9th)" : seventhLordHouse === 10 ? "कर्म भाव (10th)" : "लाभ भाव (11th)"} में संरेखण यह सिद्ध करता है कि जीवनसाथी के आगमन के साथ ही आपकी सामाजिक प्रतिष्ठा, कार्यक्षेत्र में अधिकार और वित्तीय संचय में तीव्र गति से उछाल आएगा।`;
+  } else if ([1, 4, 7].includes(seventhLordHouse)) {
+    kalatraBhagyaNote = `सप्तमेश ${seventhLordHindi} का केंद्र भाव (H${seventhLordHouse}) में होना यह सुनिश्चित करता है कि विवाह के पश्चात आपके जीवन में अचल संपत्ति, नए वाहन, स्थायी सुख-सुविधाओं और पारिवारिक वैभव का स्वर्णिम विस्तार होगा। जीवनसाथी आपके घर में लक्ष्मी स्वरूप सिद्ध होंगी।`;
+  } else if ([2, 5].includes(seventhLordHouse)) {
+    kalatraBhagyaNote = `सप्तमेश ${seventhLordHindi} का ${seventhLordHouse === 2 ? "धन भाव (2nd)" : "त्रिकोण भाव (5th)"} में होना यह दर्शाता है कि विवाह के उपरांत आपकी बौद्धिक पूंजी और संचित संपदा में अभूतपूर्व वृद्धि होगी। जीवनसाथी की सलाह आपके लिए भाग्यशाली सिद्ध होगी।`;
+  } else if ([3, 6].includes(seventhLordHouse)) {
+    kalatraBhagyaNote = `सप्तमेश ${seventhLordHindi} का उपचय भाव (H${seventhLordHouse}) में होना यह इंगित करता है कि विवाह के बाद दोनों का साझा पुरुषार्थ और संयुक्त मेहनत करियर को नई ऊँचाइयों पर पहुँचाएगी। विवाह के उपरांत आपका पराक्रम और प्रभाव लगातार बढ़ता जाएगा।`;
   } else {
-    spouseNatureText = `आपकी जीवनसाथी अत्यंत संवेदनशील, ममतामयी, शांत स्वभाव और परिवार को भावनात्मक संबल देने वाली होंगी।`;
+    kalatraBhagyaNote = `सप्तमेश ${seventhLordHindi} का ${seventhLordHouse}वें भाव में होना यह दर्शाता है कि विवाह के उपरांत आर्थिक समृद्धि किसी दूरस्थ स्थान, विदेशी संपर्क, गहरे शोध या संयुक्त वित्तीय अनुशासन के माध्यम से धीरे-धीरे एक अत्यंत ठोस व स्थायी आधारशिला रखेगी।`;
   }
-
-  // Kalatra Bhagya Note
-  const kalatraBhagyaNote = `विवाह के बाद आपके जीवन में एक बहुत बड़ा सकारात्मक मोड़ आएगा, जिसे 'कलत्र-भाग्य योग' कहा जाता है—यानी जीवनसाथी के आने के बाद आपके करियर, सामाजिक प्रतिष्ठा और वित्तीय संचय में तीव्र उछाल आएगा।`;
 
   // Active Dashas
   const activeMD = chart.dashas?.find((d) => d.active) || chart.dashas?.[0];
@@ -1224,7 +1334,7 @@ export function generateSimpleKundliDossierData(chart: ChartData): SimpleKundliD
     icon: "🌾",
   });
 
-  const gemInfo = getGemstoneConsultation(lagnaNum, lagneshHouse);
+  const gemInfo = getGemstoneConsultation(chart, lagnaNum);
   const dashaWindow = `${currentYear} – ${currentYear + 2}`;
 
   return {
@@ -1344,7 +1454,6 @@ ${d.career.idealFields.map((f, idx) => `  ${idx + 1}. **${f.title}:** ${f.desc}`
 
 #### १. जीवनसाथी का स्वरूप एवं स्वभाव:
 ${d.marriage.spouseNature}
-${d.marriage.kalatraBhagyaNote}
 
 #### २. कहाँ और कैसे होगी मुलाकात?:
 ${d.marriage.meetingVenue}
@@ -1352,6 +1461,9 @@ ${d.marriage.meetingVenue}
 #### ३. विवाह का स्वरूप: Love Marriage या Arranged?:
 * **प्रवृत्ति:** **${d.marriage.marriageTypeTitle}**
 * ${d.marriage.marriageTypeExplanation}
+
+#### ४. विवाह उपरांत भाग्योदय (कलत्र भाग्य):
+${d.marriage.kalatraBhagyaNote}
 
 ---
 

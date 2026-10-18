@@ -451,15 +451,15 @@ export default function SimpleKundliReportCard({
               }}
             >
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>मूल स्वभाव व आंतरिक दृष्टिकोण:</strong> {data.personality.lagnaTrait} आप छोटी सोच या संकुचित सीमाओं में बंधकर नहीं रह सकते; आपके भीतर हमेशा ज्ञान अर्जित करने, नए क्षितिजों को तलाशने और समाज में अपनी एक स्वतंत्र व सम्मानीय पहचान बनाने की तीव्र प्रेरणा रहती है।
+                <strong>मूल स्वभाव व आंतरिक दृष्टिकोण:</strong> {data.personality.lagnaTrait}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>कार्यशैली व एकांत में चिंतन:</strong> {data.personality.houseOutcome} आप भीड़भाड़ या लगातार सतही बातचीत में ऊर्जा खो देते हैं। आपकी वास्तविक कार्यक्षमता तब खिलती है जब आपको स्वायत्तता और शांत वातावरण मिले। आप किसी भी जटिल समस्या पर घंटों एकाग्रचित्त होकर काम करने से नहीं थकते।
+                <strong>कार्यशैली व एकांत में चिंतन:</strong> {data.personality.houseOutcome}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>आंतरिक द्वंद्व व मनोवैज्ञानिक संतुलन:</strong> {data.personality.hiddenTrait} बाहर से आप जितने शांत और संयमित दिखते हैं, भीतर उतनी ही तीव्र वैचारिक मंथन की धारा बहती रहती है। कई बार आप दूसरों से भी अपने जितने ऊँचे नैतिक मानकों की उम्मीद कर बैठते हैं, जिससे निराशा हो सकती है। लोगों को उनकी सीमाओं के साथ स्वीकार करना आपकी सबसे बड़ी आंतरिक शक्ति बनेगा।
+                <strong>आंतरिक द्वंद्व व मनोवैज्ञानिक संतुलन:</strong> {data.personality.hiddenTrait}
               </p>
             </div>
 
@@ -569,7 +569,7 @@ export default function SimpleKundliReportCard({
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>सर्वश्रेष्ठ कार्यक्षेत्र:</strong> {data.career.idealFields.map((f, idx) => `${idx + 1}. ${f.title} (${f.desc})। `).join(" ")}इन क्षेत्रों में आपकी बौद्धिक पूंजी सीधे वित्तीय संप्रभुता में परिवर्तित होगी।
+                <strong>सर्वश्रेष्ठ कार्यक्षेत्र:</strong> {data.career.idealFields.map((f, idx) => `${idx + 1}. ${f.title} (${f.desc})। `).join(" ")}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
@@ -577,7 +577,7 @@ export default function SimpleKundliReportCard({
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>कार्यक्षेत्र एवं शयन सूक्ष्म-वास्तु संरेखण:</strong> कार्य करते समय अपना मुख हमेशा <strong>{data.career.microVastu.deskDirection}</strong> दिशा की ओर रखें; इससे आपकी निर्णय क्षमता और मानसिक एकाग्रता में अभूतपूर्व स्पष्टता आएगी। रात्रि को सोते समय सिरहाना <strong>{data.career.microVastu.sleepDirection}</strong> दिशा में रखें, जिससे आपकी नींद गहरी हो और मस्तिष्क का न्यूरोलॉजिकल तनाव शांत रहे। {data.career.microVastu.explanation}
+                <strong>कार्यक्षेत्र एवं शयन सूक्ष्म-वास्तु संरेखण:</strong> कार्य करते समय अपना मुख हमेशा <strong>{data.career.microVastu.deskDirection}</strong> दिशा की ओर रखें तथा रात्रि में शयन करते समय सिरहाना <strong>{data.career.microVastu.sleepDirection}</strong> दिशा में रखें। {data.career.microVastu.explanation}
               </p>
             </div>
           </article>
@@ -727,11 +727,11 @@ export default function SimpleKundliReportCard({
               }}
             >
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>वर्तमान कालचक्र एवं वातावरण:</strong> वर्तमान में आप {data.timelines.activeAD} के प्रभाव में हैं। {data.timelines.timeClimate} यह समय आपके करियर और सामाजिक प्रतिष्ठा के पुनर्गठन का है। इसमें तात्कालिक रूप से कार्यभार या मानसिक दबाव अधिक महसूस हो सकता है, लेकिन यह आपके जीवन की नींव को मजबूत करने वाला एक अत्यंत रचनात्मक परिवर्तन काल है।
+                <strong>वर्तमान कालचक्र एवं वातावरण:</strong> वर्तमान में आप {data.timelines.activeAD} के प्रभाव में हैं। {data.timelines.timeClimate}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
-                <strong>निकट भविष्य का महत्वपूर्ण मोड़ ({data.timelines.turningPoint.dates}):</strong> आगामी समय में आपके कार्यक्षेत्र में {data.timelines.turningPoint.heading} के योग बन रहे हैं। {data.timelines.turningPoint.impact} पुरानी रुकावटें समाप्त होंगी और आपकी मेहनत को सहकर्मियों व वरिष्ठों द्वारा औपचारिक मान्यता मिलने का समय निकट है।
+                <strong>निकट भविष्य का महत्वपूर्ण मोड़ ({data.timelines.turningPoint.dates}):</strong> आगामी समय में आपके कार्यक्षेत्र में {data.timelines.turningPoint.heading} के योग बन रहे हैं। {data.timelines.turningPoint.impact}
               </p>
 
               <p style={{ margin: 0, textAlign: "justify" }}>
@@ -932,7 +932,7 @@ export default function SimpleKundliReportCard({
             fontFamily: "Cormorant Garamond, Georgia, serif",
           }}
         >
-          {data.conclusion} ईश्वर ने आपको एक विशिष्ट कुंडली और तीव्र बुद्धि का वरदान दिया है। अपने धर्म, सत्यनिष्ठा और पुरुषार्थ पर भरोसा रखें—समय पूरी तरह आपके पक्ष में मुड़ रहा है।
+          {data.conclusion}
         </p>
 
         {/* Interactive Chat Questions */}
