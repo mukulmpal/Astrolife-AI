@@ -31,7 +31,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     "dossier" | "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts" | "lifestyle"
   >("dossier");
   const [showCuspsTable, setShowCuspsTable] = useState(false);
-  const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 120>("all");
+  const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 60 | 120>("all");
   const [selectedDirectionCode, setSelectedDirectionCode] = useState<string>("N");
   const [targetDateStr, setTargetDateStr] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
@@ -94,9 +94,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     killerHits180,
     dangerousHits90,
     badHits45,
+    supportiveHits60 = [],
     protectiveShields120,
     allHits,
     shiftingPrescriptions,
+    bodyPartRemedyRegistry = [],
     genericVastuConflicts,
     directionPlanetaryInventory,
     familyCrossHitIsolationRule,
@@ -121,6 +123,8 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
         return { bg: "rgba(234, 88, 12, 0.15)", text: "#ea580c", border: "#fb923c", label: "⚠️ खतरनाक हिट (90°)" };
       case "Bad":
         return { bg: "rgba(202, 138, 4, 0.15)", text: "#ca8a04", border: "#facc15", label: "⚡ खराब हिट (45°)" };
+      case "Opportunity":
+        return { bg: "rgba(3, 105, 161, 0.15)", text: "#0369a1", border: "#38bdf8", label: "🤝 सहायक कोण (60°)" };
       case "Shield":
         return { bg: "rgba(22, 163, 74, 0.15)", text: "#16a34a", border: "#4ade80", label: "🛡️ सुरक्षा ढाल (120°)" };
       default:
@@ -129,16 +133,16 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {/* ── Top Dossier Hero Banner ── */}
       <div
         className="card"
         style={{
-          background: "linear-gradient(135deg, #1A1A1A 0%, #2A241E 50%, #1A1A1A 100%)",
+          background: "linear-gradient(135deg, #1C1917 0%, #292524 50%, #1C1917 100%)",
           color: "#FAF7F2",
-          border: "1px solid rgba(212, 175, 55, 0.4)",
-          borderRadius: 20,
-          padding: "24px 28px",
+          border: "1px solid rgba(212, 175, 55, 0.45)",
+          borderRadius: 18,
+          padding: "18px 22px",
           position: "relative",
           overflow: "hidden",
         }}
@@ -156,40 +160,40 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           }}
         />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
               <span
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  letterSpacing: 2,
+                  letterSpacing: 1.5,
                   textTransform: "uppercase",
-                  color: "#D4AF37",
-                  background: "rgba(212, 175, 55, 0.12)",
-                  padding: "4px 10px",
-                  borderRadius: 20,
-                  border: "1px solid rgba(212, 175, 55, 0.3)",
+                  color: "#FDE047",
+                  background: "rgba(253, 224, 71, 0.15)",
+                  padding: "3px 10px",
+                  borderRadius: 14,
+                  border: "1px solid rgba(253, 224, 71, 0.35)",
                 }}
               >
                 Astro-Vastu Hit Radar · v1.0
               </span>
-              <span style={{ fontSize: 13, color: "#A8A29E" }}>
+              <span style={{ fontSize: 12, color: "#D6D3D1" }}>
                 3-5-8 Orb Formula & Traffic Police Engine
               </span>
             </div>
-            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 28, fontWeight: 700, margin: 0, color: "#FAF7F2" }}>
+            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, fontWeight: 700, margin: 0, color: "#FAF7F2" }}>
               {nativeName ? `${nativeName} — ` : ""}एस्ट्रो-वास्तु हिट थ्योरी ऑडिट
             </h2>
-            <div style={{ marginTop: 8, fontSize: 14, color: "#D6D3D1", lineHeight: 1.6 }}>
-              लग्न: <strong style={{ color: "#FDE047" }}>{lagnaSign}</strong> ({lagnaCompoundDeg.toFixed(2)}° Compound) · 
-              सक्रिय दशा: <strong style={{ color: "#60A5FA" }}>{activeDasha.mahadasha} MD</strong> / <strong style={{ color: "#38BDF8" }}>{activeDasha.antardasha} AD</strong>
+            <div style={{ marginTop: 6, fontSize: 13.5, color: "#E7E5E4", lineHeight: 1.5 }}>
+              लग्न: <strong style={{ color: "#FDE047" }}>{lagnaSign} ({lagnaSignHindi || lagnaSign})</strong> ({lagnaCompoundDeg.toFixed(2)}° Compound) · 
+              सक्रिय दशा: <strong style={{ color: "#93C5FD" }}>{activeDasha.mahadasha} MD</strong> / <strong style={{ color: "#7DD3FC" }}>{activeDasha.antardasha} AD</strong>
             </div>
           </div>
 
           {/* Date Selector for Future Dasha Inspection */}
-          <div style={{ background: "rgba(255,255,255,0.06)", padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)" }}>
-            <div style={{ fontSize: 11, color: "#D4AF37", fontWeight: 600, marginBottom: 4, letterSpacing: 0.5 }}>
+          <div style={{ background: "rgba(0,0,0,0.35)", padding: "8px 12px", borderRadius: 10, border: "1px solid rgba(212, 175, 55, 0.3)" }}>
+            <div style={{ fontSize: 10.5, color: "#FDE047", fontWeight: 700, marginBottom: 4, letterSpacing: 0.5, textTransform: "uppercase" }}>
               दशा तिथि सिमुलेशन (Dasha Date)
             </div>
             <input
@@ -197,45 +201,48 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               value={isMounted ? (targetDateStr || new Date().toISOString().split("T")[0]) : "2026-10-20"}
               onChange={(e) => setTargetDateStr(e.target.value)}
               style={{
-                background: "#1A1A1A",
+                background: "#0C0A09",
                 color: "#FAF7F2",
-                border: "1px solid rgba(212, 175, 55, 0.4)",
-                borderRadius: 8,
-                padding: "6px 10px",
-                fontSize: 13,
+                border: "1px solid rgba(212, 175, 55, 0.5)",
+                borderRadius: 6,
+                padding: "5px 8px",
+                fontSize: 12,
                 outline: "none",
               }}
             />
           </div>
         </div>
 
-        {/* Quick KPI Strip */}
+        {/* Quick KPI Strip with BOLD CONTRAST & 60° SUPPORTIVE HIT */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-            gap: 12,
-            marginTop: 20,
-            paddingTop: 16,
-            borderTop: "1px solid rgba(255,255,255,0.1)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+            gap: 10,
+            marginTop: 14,
+            paddingTop: 14,
+            borderTop: "1px solid rgba(255,255,255,0.12)",
           }}
         >
+          {/* 1. Traffic Police */}
           <div
             style={{
-              background: trafficPoliceBlockades.length > 0 ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.15)",
-              border: `1px solid ${trafficPoliceBlockades.length > 0 ? "rgba(239, 68, 68, 0.4)" : "rgba(34, 197, 94, 0.3)"}`,
-              borderRadius: 12,
-              padding: "10px 14px",
+              background: trafficPoliceBlockades.length > 0 ? "#FEE2E2" : "#DCFCE7",
+              border: `1px solid ${trafficPoliceBlockades.length > 0 ? "#F87171" : "#86EFAC"}`,
+              borderRadius: 10,
+              padding: "8px 10px",
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 11, textTransform: "uppercase", color: "#E7E5E4", letterSpacing: 1 }}>ट्रैफिक पुलिस</div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: trafficPoliceBlockades.length > 0 ? "#991B1B" : "#166534", letterSpacing: 0.5 }}>
+              ट्रैफिक पुलिस
+            </div>
             <div
               style={{
                 fontFamily: "Cormorant Garamond, serif",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: 700,
-                color: trafficPoliceBlockades.length > 0 ? "#F87171" : "#4ADE80",
+                color: trafficPoliceBlockades.length > 0 ? "#B91C1C" : "#15803D",
                 marginTop: 2,
               }}
             >
@@ -243,67 +250,97 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             </div>
           </div>
 
+          {/* 2. 180° Killer Hits */}
           <div
             style={{
-              background: killerHits180.length > 0 ? "rgba(220, 38, 38, 0.18)" : "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(220, 38, 38, 0.35)",
-              borderRadius: 12,
-              padding: "10px 14px",
+              background: killerHits180.length > 0 ? "#FEE2E2" : "#F5F5F4",
+              border: `1px solid ${killerHits180.length > 0 ? "#FCA5A5" : "#E7E5E4"}`,
+              borderRadius: 10,
+              padding: "8px 10px",
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 11, textTransform: "uppercase", color: "#E7E5E4", letterSpacing: 1 }}>180° किलर हिट्स</div>
-            <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, fontWeight: 700, color: "#F87171", marginTop: 2 }}>
+            <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: "#991B1B", letterSpacing: 0.5 }}>
+              180° किलर हिट्स
+            </div>
+            <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, fontWeight: 700, color: "#B91C1C", marginTop: 2 }}>
               {killerHits180.length}
             </div>
           </div>
 
+          {/* 3. 90° Dangerous Hits */}
           <div
             style={{
-              background: dangerousHits90.length > 0 ? "rgba(234, 88, 12, 0.18)" : "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(234, 88, 12, 0.35)",
-              borderRadius: 12,
-              padding: "10px 14px",
+              background: dangerousHits90.length > 0 ? "#FFEDD5" : "#F5F5F4",
+              border: `1px solid ${dangerousHits90.length > 0 ? "#FDBA74" : "#E7E5E4"}`,
+              borderRadius: 10,
+              padding: "8px 10px",
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 11, textTransform: "uppercase", color: "#E7E5E4", letterSpacing: 1 }}>90° घातक हिट्स</div>
-            <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, fontWeight: 700, color: "#FB923C", marginTop: 2 }}>
+            <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: "#9A3412", letterSpacing: 0.5 }}>
+              90° घातक हिट्स
+            </div>
+            <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, fontWeight: 700, color: "#C2410C", marginTop: 2 }}>
               {dangerousHits90.length}
             </div>
           </div>
 
+          {/* 4. 60° Supportive Aspect (NEW) */}
           <div
             style={{
-              background: "rgba(22, 163, 74, 0.15)",
-              border: "1px solid rgba(22, 163, 74, 0.35)",
-              borderRadius: 12,
-              padding: "10px 14px",
+              background: supportiveHits60.length > 0 ? "#E0F2FE" : "#F5F5F4",
+              border: `1px solid ${supportiveHits60.length > 0 ? "#7DD3FC" : "#E7E5E4"}`,
+              borderRadius: 10,
+              padding: "8px 10px",
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 11, textTransform: "uppercase", color: "#E7E5E4", letterSpacing: 1 }}>120° रक्षक ढाल</div>
-            <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 22, fontWeight: 700, color: "#4ADE80", marginTop: 2 }}>
+            <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: "#0369A1", letterSpacing: 0.5 }}>
+              60° सहायक कोण
+            </div>
+            <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, fontWeight: 700, color: "#0284C7", marginTop: 2 }}>
+              {supportiveHits60.length}
+            </div>
+          </div>
+
+          {/* 5. 120° Protector Shield */}
+          <div
+            style={{
+              background: protectiveShields120.length > 0 ? "#DCFCE7" : "#F5F5F4",
+              border: `1px solid ${protectiveShields120.length > 0 ? "#86EFAC" : "#E7E5E4"}`,
+              borderRadius: 10,
+              padding: "8px 10px",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: "#166534", letterSpacing: 0.5 }}>
+              120° रक्षक ढाल
+            </div>
+            <div style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 20, fontWeight: 700, color: "#15803D", marginTop: 2 }}>
               {protectiveShields120.length}
             </div>
           </div>
 
+          {/* 6. Generic Vastu Conflicts */}
           <div
             style={{
-              background: genericVastuConflicts.length > 0 ? "rgba(239, 68, 68, 0.25)" : "rgba(255,255,255,0.04)",
-              border: `1px solid ${genericVastuConflicts.length > 0 ? "#DC2626" : "rgba(255,255,255,0.12)"}`,
-              borderRadius: 12,
-              padding: "10px 14px",
+              background: genericVastuConflicts.length > 0 ? "#FEF2F2" : "#F5F5F4",
+              border: `1px solid ${genericVastuConflicts.length > 0 ? "#F87171" : "#E7E5E4"}`,
+              borderRadius: 10,
+              padding: "8px 10px",
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 11, textTransform: "uppercase", color: "#E7E5E4", letterSpacing: 1 }}>जेनेरिक वास्तु द्वंद्व</div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: genericVastuConflicts.length > 0 ? "#991B1B" : "#4B5563", letterSpacing: 0.5 }}>
+              जेनेरिक वास्तु द्वंद्व
+            </div>
             <div
               style={{
                 fontFamily: "Cormorant Garamond, serif",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: 700,
-                color: genericVastuConflicts.length > 0 ? "#EF4444" : "#A8A29E",
+                color: genericVastuConflicts.length > 0 ? "#DC2626" : "#4B5563",
                 marginTop: 2,
               }}
             >
@@ -894,96 +931,123 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {shiftingPrescriptions.map((shift, sIdx) => (
-                  <div
-                    key={sIdx}
-                    style={{
-                      borderRadius: 14,
-                      border: "1px solid rgba(22, 163, 74, 0.4)",
-                      background: "rgba(22, 163, 74, 0.03)",
-                      padding: "18px 20px",
-                    }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
-                      <span className="badge badge-green" style={{ fontSize: 12 }}>
-                        🛡️ 120° त्रिकोण शिफ्ट: {shift.planetToShift}
-                      </span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "#166534" }}>
-                        {shift.currentDirection} ({shift.currentSignName}) ➔ {shift.targetDirection} ({shift.targetSignName} - {shift.targetDirectionHindi})
-                      </span>
-                    </div>
+                {shiftingPrescriptions.map((shift, sIdx) => {
+                  const sourceCoord = planetCoordinates.find((p) => p.name === shift.problematicPlanet);
+                  const sourceDirStr = sourceCoord ? `${sourceCoord.direction.code} (${sourceCoord.direction.directionHindi})` : "वर्तमान ज़ोन";
 
-                    <p style={{ margin: "6px 0 12px 0", fontSize: 14, color: "#1F2937", lineHeight: 1.6 }}>
-                      {shift.shiftingMethod}
-                    </p>
-
-                    <div className="grid-2" style={{ gap: 12 }}>
-                      <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 12, border: "1px solid rgba(220, 38, 38, 0.25)" }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626", marginBottom: 6 }}>
-                          🚫 {shift.currentDirection} ज़ोन से तुरंत हटाएं:
-                        </div>
-                        <div style={{ fontSize: 13, color: "#4B5563" }}>
-                          {shift.itemsToRemoveFromCurrentZone.join(", ")}
-                        </div>
+                  return (
+                    <div
+                      key={sIdx}
+                      style={{
+                        borderRadius: 14,
+                        border: "1px solid rgba(22, 163, 74, 0.4)",
+                        background: "rgba(22, 163, 74, 0.03)",
+                        padding: "18px 20px",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+                        <span className="badge badge-green" style={{ fontSize: 12 }}>
+                          🛡️ 120° त्रिकोण शिफ्ट: {shift.problematicPlanet}
+                        </span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#166534" }}>
+                          {sourceDirStr} ➔ {shift.targetDirection} ({shift.targetSignName} - {shift.targetDirectionHindi})
+                        </span>
                       </div>
 
-                      <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 12, border: "1px solid rgba(22, 163, 74, 0.3)" }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#16A34A", marginBottom: 6 }}>
-                          ✅ {shift.targetDirection} ज़ोन में स्थापित करें:
+                      <div style={{ fontSize: 12.5, color: "#6B635B", marginBottom: 6 }}>
+                        <strong>उपचार लक्ष्य:</strong> {shift.afflictedTarget} पर {shift.currentHit}
+                      </div>
+
+                      <p style={{ margin: "6px 0 12px 0", fontSize: 14, color: "#1F2937", lineHeight: 1.6 }}>
+                        {shift.shiftingMethod}
+                      </p>
+
+                      <div className="grid-2" style={{ gap: 12 }}>
+                        <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 12, border: "1px solid rgba(220, 38, 38, 0.25)" }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626", marginBottom: 6 }}>
+                            🚫 {sourceDirStr} ज़ोन से तुरंत हटाएं:
+                          </div>
+                          <div style={{ fontSize: 13, color: "#4B5563" }}>
+                            {shift.itemsToRemoveFromCurrentZone.join(", ")}
+                          </div>
                         </div>
-                        <div style={{ fontSize: 13, color: "#4B5563" }}>
-                          {shift.itemsToPlace.join(", ")}
+
+                        <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 12, border: "1px solid rgba(22, 163, 74, 0.3)" }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#16A34A", marginBottom: 6 }}>
+                            ✅ {shift.targetDirection} ज़ोन में स्थापित करें:
+                          </div>
+                          <div style={{ fontSize: 13, color: "#4B5563" }}>
+                            {shift.itemsToPlace.join(", ")}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
+
+            {/* Integrated Secret 1: Family Cross-Hit Protection Callout */}
+            <div
+              style={{
+                marginTop: 18,
+                background: "rgba(217, 119, 6, 0.08)",
+                borderLeft: "4px solid #D97706",
+                borderRadius: 10,
+                padding: "14px 16px",
+                fontSize: 13,
+                color: "#78350F",
+                lineHeight: 1.6,
+              }}
+            >
+              <strong>💡 व्याख्यान का अनिवार्य गुप्त सूत्र 1 (Family Cross-Hit Protection):</strong>{" "}
+              {familyCrossHitIsolationRule.rule}
+            </div>
           </div>
 
           {/* ── SECTION 7: 🧘 शरीर के स्तर पर उपचार (Body Part & Dot/Thread Therapy) ── */}
-          <div className="card" style={{ padding: 24 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
+          <div className="card" style={{ padding: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
               <div>
                 <span className="card-tag">Section 7 · Micro-Somatic Healing</span>
-                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 20 }}>
                   🧘 शरीर के स्तर पर उपचार (Body Part & Dot/Thread Therapy)
                 </h3>
               </div>
-              <div style={{ fontSize: 13, color: "#6B635B" }}>
+              <div style={{ fontSize: 13, color: "#854D0E", fontWeight: 600 }}>
                 किराए के मकान या बिना तोड़-फोड़ के त्वरित देह-वास्तु समाधान
               </div>
             </div>
 
-            <p style={{ margin: "0 0 16px 0", fontSize: 14, color: "#4A4238", lineHeight: 1.6 }}>
-              यदि घर में तुरंत सामान बदलना या शिफ्ट करना संभव न हो, तो शरीर के संबंधित अंग (Sign-to-Body Part) पर डॉट, तेल या धागा उपाय करके ऊर्जा के प्रवाह को तुरंत संतुलित किया जाता है।
+            <p style={{ margin: "0 0 14px 0", fontSize: 13.5, color: "#4A4238", lineHeight: 1.6 }}>
+              यदि घर में तुरंत सामान बदलना या शिफ्ट करना संभव न हो, तो शरीर के संबंधित अंग (Sign-to-Body Part) पर विशेष प्राकृतिक तत्व (केसर, देशी घी, चंदन, काजल) या रंगीन बिंदी लगाकर मारक ऊर्जा को तत्काल सुरक्षा कवच में बदला जाता है।
             </p>
 
-            <div className="grid-3" style={{ gap: 14 }}>
+            {/* 3 Core Rule Cards */}
+            <div className="grid-3" style={{ gap: 12, marginBottom: 16 }}>
               {/* Dot Therapy Card */}
-              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 16, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>
+              <div style={{ background: "#FAF8F5", borderRadius: 12, padding: 14, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>
                   1. नाभि व 4th हाउस उपचार
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
-                  नाभि के 2 इंच का क्षेत्र
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  नाभि के 2 इंच का क्षेत्र (Virgo)
                 </div>
-                <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#4B5563", lineHeight: 1.5 }}>
-                  चतुर्थ भाव पर दबाव होने पर नाभि के 2 इंच के घेरे में शुद्ध देशी गाय का घी या चंदन का तिलक लगाएं। इससे घर की अशांति व अनिद्रा में तत्काल शांति मिलती है।
+                <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                  चतुर्थ भाव या बुध पर दबाव होने पर नाभि के 2 इंच के घेरे में प्रतिदिन सुबह <strong>2 बूंद शुद्ध गाय का देशी घी</strong> या सफेद चंदन लगाएं। यह घर की कलह, अनिद्रा व तनाव को तुरंत शांत करता है।
                 </p>
               </div>
 
               {/* Knee Therapy Card */}
-              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 16, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626", textTransform: "uppercase" }}>
+              <div style={{ background: "#FAF8F5", borderRadius: 12, padding: 14, border: "1px solid rgba(220, 38, 38, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#DC2626", textTransform: "uppercase" }}>
                   2. घुटना डॉट चिकित्सा (Knee Dot)
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
-                  दायां घुटना (पुरुष) / बायां घुटना (महिला)
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  पुरुष दायां घुटना / स्त्री बायां घुटना (मकर)
                 </div>
-                <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#4B5563", lineHeight: 1.5 }}>
-                  दशम भाव या मकर राशि पर दबाव होने पर संबंधित घुटने पर केसर अथवा लाल सिंदूर की एक सूक्ष्म बिंदी (Dot) लगाएं। यह सीधे शनि-मंगल के टकराव को न्यूट्रलाइज करता है।
+                <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                  दशम भाव या शनि की 180° किलर हिट होने पर संबंधित घुटने पर <strong>काजल या मार्कर से एक सूक्ष्म काली बिंदी (Dot)</strong> लगाएं। यह सीधे मारक ऊर्जा को 120° रक्षक कवच में रूपांतरित करता है।
                 </p>
               </div>
 
@@ -991,20 +1055,74 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               <div
                 style={{
                   background: wristThreadTrapAlert.severity === "CRITICAL" ? "rgba(220, 38, 38, 0.06)" : "#FAF8F5",
-                  borderRadius: 14,
-                  padding: 16,
+                  borderRadius: 12,
+                  padding: 14,
                   border: wristThreadTrapAlert.severity === "CRITICAL" ? "1px solid #DC2626" : "1px solid rgba(184, 134, 11, 0.25)",
                 }}
               >
-                <div style={{ fontSize: 12, fontWeight: 700, color: wristThreadTrapAlert.severity === "CRITICAL" ? "#DC2626" : "#B8860B", textTransform: "uppercase" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: wristThreadTrapAlert.severity === "CRITICAL" ? "#DC2626" : "#B8860B", textTransform: "uppercase" }}>
                   3. कलाई में धागा बांधने का जाल
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
                   {wristThreadTrapAlert.alertTitle}
                 </div>
-                <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#4B5563", lineHeight: 1.5 }}>
+                <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
                   {wristThreadTrapAlert.explanation}
                 </p>
+              </div>
+            </div>
+
+            {/* Complete 12-Sign Prescriptive Matrix */}
+            <div style={{ marginTop: 14 }}>
+              <h4 style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginBottom: 10 }}>
+                📋 12 राशि मानव शरीर अंग, डॉट पदार्थ एवं धागा चिकित्सा तालिका:
+              </h4>
+              <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #E5E7EB" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5, textAlign: "left" }}>
+                  <thead>
+                    <tr style={{ background: "#FAF8F5", borderBottom: "2px solid #E5E7EB", color: "#4A4238" }}>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>राशि व अंग</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>डॉट रंग व पदार्थ</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>विधि व लगाने का नियम</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>धागा चिकित्सा निर्देश</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bodyPartRemedyRegistry.map((item, rIdx) => (
+                      <tr
+                        key={item.signNum}
+                        style={{
+                          borderBottom: "1px solid #F3F4F6",
+                          background: item.isThreadHarmful ? "rgba(239, 68, 68, 0.03)" : rIdx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
+                        }}
+                      >
+                        <td style={{ padding: "10px 12px", fontWeight: 700, color: "#1A1A1A" }}>
+                          {item.signNum}. {item.signHindi} ({item.bodyPartHi})
+                        </td>
+                        <td style={{ padding: "10px 12px", color: "#B8860B", fontWeight: 600 }}>
+                          ✦ {item.dotSubstance}
+                        </td>
+                        <td style={{ padding: "10px 12px", color: "#4B5563" }}>
+                          {item.dotApplicationRules}
+                        </td>
+                        <td style={{ padding: "10px 12px" }}>
+                          <span
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: item.isThreadHarmful ? "#DC2626" : "#16A34A",
+                              background: item.isThreadHarmful ? "rgba(220, 38, 38, 0.1)" : "rgba(22, 163, 74, 0.1)",
+                              padding: "2px 8px",
+                              borderRadius: 10,
+                            }}
+                          >
+                            {item.threadVerdict}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -1439,6 +1557,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               { label: `180° किलर (${killerHits180.length})`, val: 180 },
               { label: `90° घातक (${dangerousHits90.length})`, val: 90 },
               { label: `45° खराब (${badHits45.length})`, val: 45 },
+              { label: `60° सहायक (${supportiveHits60.length})`, val: 60 },
               { label: `120° रक्षक (${protectiveShields120.length})`, val: 120 },
             ].map((btn) => (
               <button
@@ -1646,6 +1765,24 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </div>
             ))
           )}
+
+          {/* Secret 1 Integration Callout */}
+          <div
+            className="card"
+            style={{
+              background: "rgba(217, 119, 6, 0.08)",
+              borderLeft: "5px solid #D97706",
+              padding: 16,
+              borderRadius: 12,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#92400E", marginBottom: 4 }}>
+              💡 व्याख्यान का अनिवार्य गुप्त सूत्र 1: Family Cross-Hit Protection (पारिवारिक क्रॉस-हिट निवारण)
+            </div>
+            <p style={{ margin: 0, fontSize: 13, color: "#78350F", lineHeight: 1.6 }}>
+              {familyCrossHitIsolationRule.rule}
+            </p>
+          </div>
         </div>
       )}
 
@@ -1654,86 +1791,184 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "bodyTherapy" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FDFBF7, #FAF5EB)" }}>
-            <span className="card-tag">Astro-Vastu Body-Part Mapping</span>
-            <h3 className="card-title" style={{ margin: "4px 0 8px 0" }}>
-              12 राशि मानव शरीर अंग एवं डॉट / धागा चिकित्सा (Body-Part Dot Therapy)
+          <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FDFBF7, #FAF5EB)", border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+            <span className="card-tag" style={{ color: "#854D0E" }}>Somatic Astro-Vastu Bio-Magnetic Protocol</span>
+            <h3 className="card-title" style={{ margin: "4px 0 8px 0", color: "#1A1A1A" }}>
+              🧘 12 राशि मानव शरीर अंग एवं डॉट / धागा चिकित्सा (Body-Part Dot Therapy)
             </h3>
             <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.65, margin: 0 }}>
-              कालपुरुष के सिद्धांत अनुसार, 12 राशियां सीधे हमारे शरीर के 12 प्रमुख अंगों को नियंत्रित करती हैं। जब किसी ग्रह की हिट घर में स्थान परिवर्तन से ठीक न हो पाए या तुरंत राहत चाहिए हो, तो शरीर के संबंधित अंग पर विशेष रंग का डॉट या धागा बांधकर आंतरिक बायो-मैग्नेटिक फ्रीक्वेंसी को तत्काल संतुलित किया जाता है।
+              कालपुरुष सिद्धांत के अनुसार, 12 राशियां सीधे हमारे शरीर के 12 प्रमुख अंगों को नियंत्रित करती हैं। जब किराए के मकान या फ्लैट में तुरंत सामान शिफ्ट करना संभव न हो, तो शरीर के संबंधित अंग पर विशेष प्राकृतिक द्रव्य (शुद्ध कुमकुम, केसर, सफेद चंदन, देशी घी, काजल) की बिंदी (Dot) या धागा बांधकर आंतरिक विद्युत-चुंबकीय प्रवाह को तत्काल सुरक्षा कवच में बदला जाता है।
             </p>
           </div>
 
-          {/* Active Prescriptions from Shifting */}
-          {shiftingPrescriptions.some((sp) => sp.bodyPartTherapy) && (
+          {/* 1. Kundali-Specific Active Prescriptions for Blockers / Hits */}
+          {shiftingPrescriptions.filter((sp) => sp.bodyPartTherapy).length > 0 && (
             <div
               className="card"
               style={{
                 borderLeft: "5px solid #2563EB",
-                background: "#FAF8F5",
-                padding: 18,
+                background: "#FFFFFF",
+                padding: 20,
               }}
             >
-              <div className="card-tag" style={{ color: "#2563EB" }}>
-                कुंडली अनुसार विशेष शरीर अंग उपचार (Personalized Body Action)
-              </div>
-              {shiftingPrescriptions.map((sp, i) => (
-                <div key={i} style={{ marginTop: 8 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>
-                    अंग: {sp.bodyPartTherapy.targetBodyPart}
-                  </div>
-                  <div style={{ fontSize: 13, color: "#4A4238", marginTop: 4, lineHeight: 1.6 }}>
-                    {sp.bodyPartTherapy.instructions}
-                  </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                <div>
+                  <span className="badge badge-blue" style={{ fontSize: 12 }}>
+                    ✦ आपकी कुंडली अनुसार विशेष शरीर अंग उपचार
+                  </span>
+                  <h4 style={{ margin: "4px 0 0 0", fontSize: 17, color: "#1A1A1A", fontWeight: 700 }}>
+                    सक्रिय दशा व आघातों के लिए देह-वास्तु निर्देश ({shiftingPrescriptions.filter((sp) => sp.bodyPartTherapy).length} ग्रह सक्रिय)
+                  </h4>
                 </div>
-              ))}
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {shiftingPrescriptions
+                  .filter((sp) => sp.bodyPartTherapy)
+                  .map((sp, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        background: "#FAF8F5",
+                        borderRadius: 12,
+                        padding: "14px 16px",
+                        border: "1px solid rgba(37, 99, 235, 0.2)",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 700,
+                              background: "#2563EB",
+                              color: "#FFFFFF",
+                              padding: "2px 8px",
+                              borderRadius: 6,
+                            }}
+                          >
+                            🪐 {sp.problematicPlanet}
+                          </span>
+                          <strong style={{ fontSize: 14.5, color: "#1A1A1A" }}>
+                            उपचार अंग: {sp.bodyPartTherapy.targetBodyPart}
+                          </strong>
+                        </div>
+                        <span style={{ fontSize: 12, color: "#4B5563" }}>
+                          आघात: <strong>{sp.currentHit}</strong> (लक्ष्य: {sp.afflictedTarget})
+                        </span>
+                      </div>
+
+                      <div style={{ marginTop: 8, fontSize: 13.5, color: "#1F2937", lineHeight: 1.6 }}>
+                        <strong>सटीक विधि:</strong> {sp.bodyPartTherapy.instructions}
+                      </div>
+
+                      <div style={{ marginTop: 6, fontSize: 12, color: "#166534" }}>
+                        🛡️ <strong>120° त्रिकोण दिशा:</strong> {sp.targetDirection} ({sp.targetDirectionHindi})
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
 
-          {/* 12 Sign Body Mapping Grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-              gap: 12,
-            }}
-          >
-            {Object.entries(SIGN_BODY_PART_MAPPINGS).map(([sNumStr, map]) => {
-              const sNum = Number(sNumStr);
-              const isLagna = sNum === lagnaSignNum;
+          {/* 2. Three Core Axioms Cards */}
+          <div className="grid-3" style={{ gap: 12 }}>
+            <div style={{ background: "#FAF8F5", borderRadius: 12, padding: 14, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>
+                1. नाभि व 4th हाउस शांति
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                नाभि के 2 इंच का क्षेत्र (कन्या/सूर्य/बुध)
+              </div>
+              <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                चतुर्थ भाव या बुध पर दबाव होने पर नाभि के 2 इंच के घेरे में प्रतिदिन सुबह <strong>2 बूंद शुद्ध गाय का देशी घी</strong> या सफेद चंदन लगाएं। यह घर की कलह व अनिद्रा को तुरंत शांत करता है।
+              </p>
+            </div>
 
-              return (
-                <div
-                  key={sNum}
-                  className="card"
-                  style={{
-                    padding: 16,
-                    borderRadius: 14,
-                    border: isLagna ? "2px solid #B8860B" : "1px solid rgba(184, 134, 11, 0.2)",
-                    background: isLagna ? "rgba(184, 134, 11, 0.05)" : "#FFFFFF",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#B8860B" }}>
-                      राशि {map.signNum} · {map.signName}
-                    </span>
-                    {isLagna && (
-                      <span className="badge badge-gold" style={{ fontSize: 10 }}>
-                        ✦ आपका लग्न
-                      </span>
-                    )}
-                  </div>
+            <div style={{ background: "#FAF8F5", borderRadius: 12, padding: 14, border: "1px solid rgba(220, 38, 38, 0.25)" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#DC2626", textTransform: "uppercase" }}>
+                2. घुटना डॉट चिकित्सा (Knee Dot)
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                पुरुष दायां घुटना / स्त्री बायां घुटना (मकर/शनि)
+              </div>
+              <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                शनि की 180° किलर हिट होने पर घुटने पर <strong>काजल से एक सूक्ष्म काली बिंदी</strong> लगाएं। यह मारक ऊर्जा को सीधे 120° रक्षक कवच में रूपांतरित करता है।
+              </p>
+            </div>
 
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A" }}>
-                    {map.bodyPartHi} ({map.bodyPartEn})
-                  </div>
+            <div
+              style={{
+                background: wristThreadTrapAlert.isDusthana ? "rgba(220, 38, 38, 0.06)" : "#FAF8F5",
+                borderRadius: 12,
+                padding: 14,
+                border: wristThreadTrapAlert.isDusthana ? "1px solid #DC2626" : "1px solid rgba(184, 134, 11, 0.25)",
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 700, color: wristThreadTrapAlert.isDusthana ? "#DC2626" : "#B8860B", textTransform: "uppercase" }}>
+                3. कलाई में धागा बांधने का चक्रव्यूह
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                {wristThreadTrapAlert.alertTitle}
+              </div>
+              <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                {wristThreadTrapAlert.explanation}
+              </p>
+            </div>
+          </div>
 
-                  <div style={{ fontSize: 12.5, color: "#6B635B", marginTop: 8, lineHeight: 1.5 }}>
-                    <strong>चिकित्सा सूत्र:</strong> {map.therapyNotes}
-                  </div>
-                </div>
-              );
-            })}
+          {/* 3. Comprehensive 12-Sign Prescriptive Matrix Table */}
+          <div className="card" style={{ padding: 20 }}>
+            <h4 style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", margin: "0 0 12px 0" }}>
+              📋 12 राशि मानव शरीर अंग, डॉट पदार्थ एवं धागा चिकित्सा तालिका:
+            </h4>
+            <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #E5E7EB" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5, textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "#FAF8F5", borderBottom: "2px solid #E5E7EB", color: "#4A4238" }}>
+                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>राशि व अंग</th>
+                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>डॉट रंग व पदार्थ</th>
+                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>विधि व लगाने का नियम</th>
+                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>धागा चिकित्सा निर्देश</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bodyPartRemedyRegistry.map((item, rIdx) => (
+                    <tr
+                      key={item.signNum}
+                      style={{
+                        borderBottom: "1px solid #F3F4F6",
+                        background: item.isThreadHarmful ? "rgba(239, 68, 68, 0.03)" : rIdx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
+                      }}
+                    >
+                      <td style={{ padding: "10px 12px", fontWeight: 700, color: "#1A1A1A" }}>
+                        {item.signNum}. {item.signHindi} ({item.bodyPartHi})
+                      </td>
+                      <td style={{ padding: "10px 12px", color: "#B8860B", fontWeight: 600 }}>
+                        ✦ {item.dotSubstance}
+                      </td>
+                      <td style={{ padding: "10px 12px", color: "#4B5563" }}>
+                        {item.dotApplicationRules}
+                      </td>
+                      <td style={{ padding: "10px 12px" }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: item.isThreadHarmful ? "#DC2626" : "#16A34A",
+                            background: item.isThreadHarmful ? "rgba(220, 38, 38, 0.1)" : "rgba(22, 163, 74, 0.1)",
+                            padding: "2px 8px",
+                            borderRadius: 10,
+                          }}
+                        >
+                          {item.threadVerdict}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -1841,14 +2076,28 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FEFCE8, #FFFBEB)", border: "1px solid rgba(217, 119, 6, 0.3)" }}>
             <span className="card-tag" style={{ color: "#B45309" }}>
-              Authentic Astro-Vastu Lecture Secrets (1, 2, 5, 6)
+              Integrated Astro-Vastu Architectural Axioms
             </span>
             <h3 className="card-title" style={{ margin: "4px 0 8px 0", color: "#78350F" }}>
-              🎯 एस्ट्रो-वास्तु के 4 विशेष गुप्त व्यावहारिक सूत्र
+              🎯 एस्ट्रो-वास्तु के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6 का संपूर्ण समन्वय)
             </h3>
             <p style={{ fontSize: 13.5, color: "#92400E", lineHeight: 1.65, margin: 0 }}>
-              ये 4 सूत्र किताबी वास्तु में कहीं नहीं मिलते। यह जातक की व्यक्तिगत कुंडली, पारिवारिक सुरक्षा, शारीरिक अंग सक्रियता, और जीवनशैली से सीधे जुड़े हैं।
+              ये 4 सूत्र किताबी वास्तु में कहीं नहीं मिलते। यह कोई अलग परिशिष्ट नहीं हैं, बल्कि आपकी कुंडली के प्रत्येक अनुभाग में पूरी तरह से गहराई से एकीकृत (Deeply Integrated) हैं:
             </p>
+            <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 8 }}>
+              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.2)", fontSize: 12, color: "#78350F" }}>
+                <strong>सूत्र 1</strong> ➔ 120° शिफ्टिंग (पारिवारिक क्रॉस-हिट से सुरक्षा)
+              </div>
+              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(220, 38, 38, 0.2)", fontSize: 12, color: "#991B1B" }}>
+                <strong>सूत्र 2</strong> ➔ कलाई धागा ट्रैप (मिथुन 6/8/12 दुस्थान नियम)
+              </div>
+              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(234, 88, 12, 0.2)", fontSize: 12, color: "#C2410C" }}>
+                <strong>सूत्र 5</strong> ➔ मंगल उग्रता, मसूर दाल त्याग व नाभि उपचार
+              </div>
+              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(37, 99, 235, 0.2)", fontSize: 12, color: "#1D4ED8" }}>
+                <strong>सूत्र 6</strong> ➔ 4th, 9th, 10th भाव स्टडी व वर्क दिशा
+              </div>
+            </div>
           </div>
 
           {/* 1. पारिवारिक क्रॉस-हिट निवारण नियम */}

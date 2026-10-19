@@ -213,6 +213,12 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
       // Verify Sun 180° Killer Hit on House 4
       const sunHitHouse4 = dossier.killerHits180.find(h => h.sourceName === "Sun" && h.targetHouse === 4);
       assert.ok(sunHitHouse4, "Sun in 10th must cast 180° Killer Hit on 4th House");
+
+      // Verify Shifting Prescriptions now include blockers Mars, Saturn, and Sun!
+      const shiftedPlanets = dossier.shiftingPrescriptions.map(s => s.problematicPlanet);
+      assert.ok(shiftedPlanets.includes("Mars"), "Must prescribe shifting for blocking planet Mars");
+      assert.ok(shiftedPlanets.includes("Saturn"), "Must prescribe shifting for blocking planet Saturn");
+      assert.ok(shiftedPlanets.includes("Sun"), "Must prescribe shifting for Sun hitting 4th house");
     });
   });
 
