@@ -28,8 +28,9 @@ interface AstroVastuHitRadarViewProps {
 
 export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   const [activeTab, setActiveTab] = useState<
-    "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts" | "lifestyle"
-  >("radar");
+    "dossier" | "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts" | "lifestyle"
+  >("dossier");
+  const [showCuspsTable, setShowCuspsTable] = useState(false);
   const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 120>("all");
   const [selectedDirectionCode, setSelectedDirectionCode] = useState<string>("N");
   const [targetDateStr, setTargetDateStr] = useState<string>("");
@@ -80,9 +81,15 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   const {
     nativeName,
     lagnaSign,
+    lagnaSignHindi,
     lagnaSignNum,
     lagnaCompoundDeg,
     activeDasha,
+    planetCoordinates = [],
+    cuspCoordinates = [],
+    clusters = [],
+    dashaLordHitsAnalysis = [],
+    spatialFieldTest = [],
     trafficPoliceBlockades,
     killerHits180,
     dangerousHits90,
@@ -307,7 +314,20 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       </div>
 
       {/* ── Sub Navigation Tabs ── */}
-      <div className="tabs" style={{ margin: "4px 0 12px 0" }}>
+      <div className="tabs" style={{ margin: "4px 0 12px 0", flexWrap: "wrap", gap: 6 }}>
+        <button
+          className={`tab ${activeTab === "dossier" ? "active" : ""}`}
+          onClick={() => setActiveTab("dossier")}
+          style={{
+            fontWeight: 700,
+            background: activeTab === "dossier" ? "#854D0E" : "rgba(212, 175, 55, 0.15)",
+            color: activeTab === "dossier" ? "#FFFFFF" : "#B8860B",
+            borderColor: activeTab === "dossier" ? "#B8860B" : "rgba(212, 175, 55, 0.4)",
+            boxShadow: activeTab === "dossier" ? "0 2px 8px rgba(184, 134, 11, 0.25)" : "none",
+          }}
+        >
+          📜 संपूर्ण फील्ड ऑडिट रिपोर्ट (Master Dossier)
+        </button>
         <button
           className={`tab ${activeTab === "radar" ? "active" : ""}`}
           onClick={() => setActiveTab("radar")}
@@ -359,6 +379,753 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           🎯 विशेष रहस्य व दिशाएं (1, 2, 5, 6)
         </button>
       </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 0: MASTER EXECUTIVE FIELD AUDIT DOSSIER (संपूर्ण फील्ड ऑडिट)
+      ───────────────────────────────────────────────────────────── */}
+      {activeTab === "dossier" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          {/* ── SECTION 1: EXECUTIVE IDENTITY & VITAL BANNER ── */}
+          <div
+            className="card"
+            style={{
+              background: "linear-gradient(135deg, #2D241E 0%, #1A1A1A 100%)",
+              color: "#FAF7F2",
+              border: "1px solid rgba(212, 175, 55, 0.4)",
+              borderRadius: 18,
+              padding: "22px 24px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
+              <div>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 1.5,
+                    textTransform: "uppercase",
+                    color: "#FDE047",
+                    background: "rgba(253, 224, 71, 0.12)",
+                    padding: "3px 10px",
+                    borderRadius: 20,
+                    border: "1px solid rgba(253, 224, 71, 0.3)",
+                  }}
+                >
+                  अध्याय 1 · संपूर्ण जन्मकुंडली एवं एस्ट्रो-वास्तु ऑडिट
+                </span>
+                <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, fontWeight: 700, margin: "8px 0 4px 0", color: "#FAF7F2" }}>
+                  {nativeName ? `${nativeName} जी का ` : ""}मास्टर फील्ड ऑडिट डॉसियर
+                </h3>
+                <p style={{ margin: 0, fontSize: 14, color: "#D6D3D1", lineHeight: 1.6 }}>
+                  व्याख्यान का मुख्य सूत्र: <em style={{ color: "#FDE047" }}>"जिसका समय चल रहा है, उसी ग्रह को पकड़ना है!"</em> यह रिपोर्ट आपकी कुंडली की स्पष्ट डिग्री, कम्पाउंड डिग्री और वर्तमान दशा चक्र पर 100% गतिशील रूप से तैयार की गई है।
+                </p>
+              </div>
+
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <div style={{ background: "rgba(255,255,255,0.08)", padding: "8px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <div style={{ fontSize: 11, color: "#D4AF37", fontWeight: 600 }}>लग्न (Lagna)</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF", marginTop: 2 }}>
+                    {lagnaSign} ({lagnaSignHindi || lagnaSign}) · {lagnaCompoundDeg.toFixed(2)}°
+                  </div>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.08)", padding: "8px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <div style={{ fontSize: 11, color: "#60A5FA", fontWeight: 600 }}>सक्रिय महादशा / अंतर्दशा</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF", marginTop: 2 }}>
+                    {activeDasha.mahadasha} / {activeDasha.antardasha}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECTION 2: 📊 ग्रह स्थिति एवं कम्पाउंड डिग्रियां (Compound Degree Master Table) ── */}
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+              <div>
+                <span className="card-tag">Section 2 · Mathematical Foundation</span>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                  📊 ग्रह स्थिति एवं कम्पाउंड डिग्रियां (Compound Degree Master Table)
+                </h3>
+              </div>
+              <div
+                style={{
+                  background: "#F5EFE3",
+                  padding: "8px 14px",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#854D0E",
+                  border: "1px solid rgba(184, 134, 11, 0.3)",
+                }}
+              >
+                सूत्र: <code style={{ fontFamily: "monospace", color: "#B8860B" }}>Compound Degree = राशि की प्रारंभिक डिग्री + राशि में स्पष्ट डिग्री</code>
+              </div>
+            </div>
+
+            {/* Planets Table */}
+            <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #E5E7EB" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "#FAF8F5", borderBottom: "2px solid #E5E7EB", color: "#4A4238" }}>
+                    <th style={{ padding: "12px 14px", fontWeight: 700 }}>ग्रह (Planet)</th>
+                    <th style={{ padding: "12px 14px", fontWeight: 700, textAlign: "center" }}>भाव</th>
+                    <th style={{ padding: "12px 14px", fontWeight: 700 }}>राशि (संख्या)</th>
+                    <th style={{ padding: "12px 14px", fontWeight: 700 }}>स्पष्ट डिग्री</th>
+                    <th style={{ padding: "12px 14px", fontWeight: 700 }}>प्रारंभिक डिग्री</th>
+                    <th style={{ padding: "12px 14px", fontWeight: 700, color: "#B8860B" }}>कम्पाउंड डिग्री</th>
+                    <th style={{ padding: "12px 14px", fontWeight: 700 }}>नक्षत्र (स्वामी)</th>
+                    <th style={{ padding: "12px 14px", fontWeight: 700 }}>एस्ट्रो-वास्तु दिशा</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {planetCoordinates.map((p, idx) => {
+                    const isDashaLord = p.name === activeDasha.mahadasha || p.name === activeDasha.antardasha;
+                    return (
+                      <tr
+                        key={idx}
+                        style={{
+                          borderBottom: "1px solid #F3F4F6",
+                          background: isDashaLord ? "rgba(254, 240, 138, 0.15)" : idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
+                        }}
+                      >
+                        <td style={{ padding: "12px 14px", fontWeight: 700, color: "#1A1A1A" }}>
+                          {p.hindiName} ({p.name})
+                          {isDashaLord && (
+                            <span
+                              style={{
+                                marginLeft: 6,
+                                fontSize: 10,
+                                background: "#B8860B",
+                                color: "#FFFFFF",
+                                padding: "2px 6px",
+                                borderRadius: 10,
+                              }}
+                            >
+                              दशानाथ
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 600 }}>{p.house}</td>
+                        <td style={{ padding: "12px 14px" }}>
+                          {p.signHindi} ({p.signNum})
+                        </td>
+                        <td style={{ padding: "12px 14px", fontFamily: "monospace" }}>{p.degInSignFormatted}</td>
+                        <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "#6B635B" }}>{p.startDeg}°</td>
+                        <td style={{ padding: "12px 14px", fontFamily: "monospace", fontWeight: 700, color: "#B8860B" }}>
+                          {p.compoundDegFormatted}
+                        </td>
+                        <td style={{ padding: "12px 14px", color: "#4A4238" }}>
+                          {p.nakshatra} ({p.nakshatraLord})
+                        </td>
+                        <td style={{ padding: "12px 14px", fontWeight: 600, color: "#1E3A8A" }}>
+                          {p.direction.code} ({p.direction.directionHindi})
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Toggle Cusp Table */}
+            <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={() => setShowCuspsTable(!showCuspsTable)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#B8860B",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+              >
+                {showCuspsTable ? "▲ 12 भाव कस्प डिग्रियां छिपाएं" : "▼ 12 भाव कस्प डिग्रियां देखें (House Cusps Table)"}
+              </button>
+            </div>
+
+            {showCuspsTable && cuspCoordinates.length > 0 && (
+              <div style={{ marginTop: 12, overflowX: "auto", borderRadius: 12, border: "1px solid #E5E7EB" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, textAlign: "left" }}>
+                  <thead>
+                    <tr style={{ background: "#F5EFE3", borderBottom: "2px solid #E5E7EB", color: "#4A4238" }}>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>भाव (House)</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>राशि</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>स्पष्ट डिग्री</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>प्रारंभिक डिग्री</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700, color: "#B8860B" }}>कम्पाउंड डिग्री</th>
+                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>एस्ट्रो-वास्तु दिशा</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cuspCoordinates.map((c, idx) => (
+                      <tr key={idx} style={{ borderBottom: "1px solid #F3F4F6", background: idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5" }}>
+                        <td style={{ padding: "10px 12px", fontWeight: 700 }}>भाव {c.house}</td>
+                        <td style={{ padding: "10px 12px" }}>{c.signHindi} ({c.signNum})</td>
+                        <td style={{ padding: "10px 12px", fontFamily: "monospace" }}>{c.degInSignFormatted}</td>
+                        <td style={{ padding: "10px 12px", fontFamily: "monospace", color: "#6B635B" }}>{c.startDeg}°</td>
+                        <td style={{ padding: "10px 12px", fontFamily: "monospace", fontWeight: 700, color: "#B8860B" }}>{c.compoundDegFormatted}</td>
+                        <td style={{ padding: "10px 12px", fontWeight: 600, color: "#1E3A8A" }}>{c.direction.code} ({c.direction.directionHindi})</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Clusters & Power Center Callout */}
+            {clusters.length > 0 && (
+              <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 12 }}>
+                {clusters.map((c, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: c.isPowerCenter ? "linear-gradient(135deg, #FEF3C7 0%, #FFFBEB 100%)" : "#F5EFE3",
+                      border: `1px solid ${c.isPowerCenter ? "#F59E0B" : "rgba(184, 134, 11, 0.3)"}`,
+                      borderRadius: 14,
+                      padding: "16px 18px",
+                      boxShadow: c.isPowerCenter ? "0 4px 14px rgba(245, 158, 11, 0.15)" : "none",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontSize: 18 }}>{c.isPowerCenter ? "🌟" : "✦"}</span>
+                      <strong style={{ fontSize: 15, color: c.isPowerCenter ? "#B45309" : "#78350F" }}>
+                        {c.isPowerCenter ? `अद्भुत योग (${c.planets.length} ग्रहों का जमावड़ा - Power Center)` : `ग्रह संकुल (Planetary Cluster)`}
+                      </strong>
+                      <span style={{ fontSize: 12, background: "rgba(0,0,0,0.06)", padding: "2px 8px", borderRadius: 8 }}>
+                        दिशा: {c.direction.code} ({c.direction.directionHindi})
+                      </span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 13.5, color: "#451A03", lineHeight: 1.6 }}>
+                      {c.narrative}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── SECTION 3: ⏳ वर्तमान सक्रिय दशा ऑडिट (Current Dasha Audit) ── */}
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
+              <div>
+                <span className="card-tag">Section 3 · Time Activation</span>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                  ⏳ वर्तमान सक्रिय दशा ऑडिट (Current Dasha Audit)
+                </h3>
+              </div>
+              <div style={{ fontStyle: "italic", fontSize: 13, color: "#854D0E" }}>
+                "जिसका समय चल रहा है, उसी ग्रह को पकड़ना है!"
+              </div>
+            </div>
+
+            <div className="grid-2" style={{ gap: 14 }}>
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 18, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>महादशा (Mahadasha - MD)</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  {activeDasha.mahadasha}
+                </div>
+                <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
+                  अवधि: {activeDasha.mahadashaStart || "आरंभ"} से {activeDasha.mahadashaEnd || "सक्रिय"}
+                </div>
+              </div>
+
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 18, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>अंतर्दशा (Antardasha - AD)</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  {activeDasha.antardasha}
+                </div>
+                <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
+                  अवधि: {activeDasha.antardashaStart || "आरंभ"} से {activeDasha.antardashaEnd || "सक्रिय"}
+                </div>
+              </div>
+            </div>
+
+            {/* Traffic Police Status Banner */}
+            <div
+              style={{
+                marginTop: 16,
+                borderRadius: 14,
+                padding: 16,
+                border: trafficPoliceBlockades.length > 0 ? "1px solid #DC2626" : "1px solid #16A34A",
+                background: trafficPoliceBlockades.length > 0 ? "rgba(239, 68, 68, 0.06)" : "rgba(34, 197, 94, 0.06)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 24 }}>{trafficPoliceBlockades.length > 0 ? "🚨" : "✅"}</span>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: trafficPoliceBlockades.length > 0 ? "#DC2626" : "#15803D" }}>
+                    ट्रैफिक पुलिस ऑडिट: {trafficPoliceBlockades.length > 0 ? `${trafficPoliceBlockades.length} रुकावट सक्रिय (Traffic Police Jam)` : "मार्ग पूर्णतः स्वच्छ व निर्बाध"}
+                  </h4>
+                  <p style={{ margin: "4px 0 0 0", fontSize: 13.5, color: "#4A4238", lineHeight: 1.5 }}>
+                    {trafficPoliceBlockades.length > 0
+                      ? `दशा स्वामी ${activeDasha.mahadasha} को अन्य ग्रहों द्वारा कोणीय दबाव (90°/180°) मिल रहा है, जिससे दशा के शुभ फल घर के वास्तु दोषों के कारण रुक रहे हैं।`
+                      : `वर्तमान दशा स्वामी पर किसी शत्रु अथवा पापी ग्रह का कोई कोणीय जाम नहीं है। दशा की ऊर्जा स्वतंत्र प्रवाहित हो रही है।`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECTION 4: 🚨 दशानाथ की हिट्स एवं वर्णनात्मक भविष्यफल (Hits & Predictive Impacts - Paragraph Style) ── */}
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+              <div>
+                <span className="card-tag">Section 4 · Predictive Analytics</span>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                  🚨 दशानाथ की हिट्स एवं वर्णनात्मक भविष्यफल (Hits of Dasha Lord & Real-Life Symptoms)
+                </h3>
+              </div>
+              <div style={{ fontSize: 12, color: "#6B635B" }}>
+                3-5-8 ऑर्ब नियम के अनुसार सटीक कोणीय गणना
+              </div>
+            </div>
+
+            {dashaLordHitsAnalysis.length === 0 ? (
+              <div style={{ padding: 20, textAlign: "center", background: "#FAF8F5", borderRadius: 12, color: "#6B635B" }}>
+                वर्तमान दशा स्वामी अथवा प्रमुख केंद्र भावों पर कोई विध्वंसक हिट सक्रिय नहीं है।
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                {dashaLordHitsAnalysis.map((hit, idx) => {
+                  const is180 = hit.hitAngle === 180;
+                  const is90 = hit.hitAngle === 90;
+                  const badgeColor = is180 ? "#DC2626" : is90 ? "#EA580C" : "#CA8A04";
+                  const borderColor = is180 ? "rgba(220, 38, 38, 0.4)" : is90 ? "rgba(234, 88, 12, 0.4)" : "rgba(202, 138, 4, 0.4)";
+                  const bgLight = is180 ? "rgba(220, 38, 38, 0.03)" : is90 ? "rgba(234, 88, 12, 0.03)" : "rgba(202, 138, 4, 0.03)";
+
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        borderRadius: 16,
+                        border: `1px solid ${borderColor}`,
+                        borderLeft: `6px solid ${badgeColor}`,
+                        background: bgLight,
+                        padding: "20px 22px",
+                        boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                      }}
+                    >
+                      {/* Hit Header */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+                        <div>
+                          <span
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: badgeColor,
+                              background: is180 ? "rgba(220, 38, 38, 0.12)" : is90 ? "rgba(234, 88, 12, 0.12)" : "rgba(202, 138, 4, 0.12)",
+                              padding: "3px 10px",
+                              borderRadius: 12,
+                            }}
+                          >
+                            {is180 ? "💀 180° किलर हिट (Killer Hit)" : is90 ? "⚠️ 90° घातक हिट (Dangerous Hit)" : `${hit.hitAngle}° कोणीय हिट`}
+                          </span>
+                          <h4 style={{ margin: "8px 0 0 0", fontSize: 19, fontWeight: 700, color: "#1A1A1A" }}>
+                            {hit.hitTitle}
+                          </h4>
+                        </div>
+                        <div style={{ fontSize: 12, color: "#6B635B" }}>
+                          Orb: <strong>{hit.orbDistance.toFixed(2)}°</strong> (सीमा: ±{hit.orbLimit}°)
+                        </div>
+                      </div>
+
+                      {/* Exact Math Formula Box */}
+                      <div
+                        style={{
+                          background: "#FFFFFF",
+                          border: "1px solid rgba(0,0,0,0.08)",
+                          borderRadius: 10,
+                          padding: "10px 14px",
+                          fontFamily: "monospace",
+                          fontSize: 13,
+                          color: "#1E293B",
+                          marginBottom: 14,
+                        }}
+                      >
+                        {hit.calculationFormula}
+                      </div>
+
+                      {/* Descriptive Narrative Paragraph */}
+                      <div style={{ marginBottom: 14 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#4A4238", textTransform: "uppercase", marginBottom: 6, letterSpacing: 0.5 }}>
+                          📖 वर्णनात्मक फलकथन (Predictive Interpretation):
+                        </div>
+                        <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.7, color: "#1F2937" }}>
+                          {hit.predictiveNarrative}
+                        </p>
+                      </div>
+
+                      {/* Real Life Symptoms Bullet Checklist */}
+                      {hit.realLifeSymptoms.length > 0 && (
+                        <div style={{ background: "#FFFFFF", borderRadius: 12, padding: "14px 16px", border: "1px solid rgba(0,0,0,0.06)" }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: badgeColor, textTransform: "uppercase", marginBottom: 8 }}>
+                            ✦ दैनिक जीवन में दिखने वाले प्रत्यक्ष लक्षण (Visible Symptoms):
+                          </div>
+                          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13.5, color: "#374151", lineHeight: 1.6 }}>
+                            {hit.realLifeSymptoms.map((sym, sIdx) => (
+                              <li key={sIdx} style={{ marginBottom: 4 }}>
+                                {sym}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* ── SECTION 5: 🏠 घर के किस ज़ोन में क्या सामान पड़ा होगा? (Astro-Vastu Field Test) ── */}
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+              <div>
+                <span className="card-tag">Section 5 · Practical Field Test</span>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                  🏠 घर के किस ज़ोन में क्या सामान पड़ा होगा? (Astro-Vastu Field Test)
+                </h3>
+              </div>
+              <div style={{ fontSize: 13, color: "#6B635B" }}>
+                कुंडली के अनुसार जातक के वास्तविक घर की भौतिक वस्तुएं व वास्तु दोष
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {spatialFieldTest
+                .filter((z) => z.planetsPresent.length > 0 || z.isDashaLordZone || z.mahaVastuWarningParagraph)
+                .map((zone, zIdx) => (
+                  <div
+                    key={zIdx}
+                    style={{
+                      borderRadius: 14,
+                      border: zone.mahaVastuWarningParagraph
+                        ? "1.5px solid #EF4444"
+                        : "1px solid rgba(184, 134, 11, 0.25)",
+                      background: "#FFFFFF",
+                      padding: "18px 20px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            background: "#F5EFE3",
+                            color: "#854D0E",
+                            padding: "3px 10px",
+                            borderRadius: 8,
+                          }}
+                        >
+                          {zone.zoneCode} ({zone.directionHindi})
+                        </span>
+                        <strong style={{ fontSize: 16, color: "#1A1A1A" }}>
+                          {zone.signHindi} ({zone.signNum} नंबर राशि) · भाव {zone.houseNumbers.join(", ")}
+                        </strong>
+                      </div>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {zone.planetsPresent.map((p) => (
+                          <span key={p} className="badge badge-gold" style={{ fontSize: 11, padding: "3px 8px" }}>
+                            🪐 {p}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Predicted Objects */}
+                    <p style={{ margin: "0 0 10px 0", fontSize: 14, color: "#374151", lineHeight: 1.6 }}>
+                      {zone.predictedItemsParagraph}
+                    </p>
+
+                    {/* MahaVastu Blunder Warning */}
+                    {zone.mahaVastuWarningParagraph && (
+                      <div
+                        style={{
+                          background: "rgba(239, 68, 68, 0.08)",
+                          borderLeft: "4px solid #DC2626",
+                          padding: "10px 14px",
+                          borderRadius: 8,
+                          fontSize: 13.5,
+                          color: "#991B1B",
+                          lineHeight: 1.6,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <strong>⚠️ महावास्तु वालों की किताबी गलती से सावधान:</strong> {zone.mahaVastuWarningParagraph}
+                      </div>
+                    )}
+
+                    {/* Corrective Action */}
+                    <div style={{ fontSize: 13, color: "#065F46", background: "rgba(16, 185, 129, 0.08)", padding: "8px 12px", borderRadius: 8 }}>
+                      <strong>✦ सुधारात्मक निर्देश:</strong> {zone.correctiveActionParagraph}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* ── SECTION 6: 🛡️ न्यूट्रलाइजेशन एवं 120° रक्षक ढाल (120° Protective Shield Shifting) ── */}
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
+              <div>
+                <span className="card-tag">Section 6 · Neutralization Protocol</span>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                  🛡️ न्यूट्रलाइजेशन एवं 120° रक्षक ढाल (120° Protective Shield Shifting)
+                </h3>
+              </div>
+              <div style={{ fontSize: 13, color: "#6B635B" }}>
+                180° किलर हिट को 120° मित्र त्रिकोण में मोड़कर सुरक्षित ढाल बनाना
+              </div>
+            </div>
+
+            <p style={{ margin: "0 0 16px 0", fontSize: 14, color: "#4A4238", lineHeight: 1.6 }}>
+              व्याख्यान का प्रमुख नियम: <em>"हिट को तोड़ा नहीं जा सकता, परंतु ग्रह के भौतिक कारक सामान को उसके 120° त्रिकोण मित्र भाव में शिफ्ट करके उसकी मारक ऊर्जा को सुरक्षा कवच में रूपांतरित किया जा सकता है।"</em>
+            </p>
+
+            {shiftingPrescriptions.length === 0 ? (
+              <div style={{ padding: 18, background: "#FAF8F5", borderRadius: 12, textAlign: "center", color: "#6B635B" }}>
+                वर्तमान में किसी ग्रह के लिए 120° शिफ्टिंग की आवश्यकता नहीं है।
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {shiftingPrescriptions.map((shift, sIdx) => (
+                  <div
+                    key={sIdx}
+                    style={{
+                      borderRadius: 14,
+                      border: "1px solid rgba(22, 163, 74, 0.4)",
+                      background: "rgba(22, 163, 74, 0.03)",
+                      padding: "18px 20px",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+                      <span className="badge badge-green" style={{ fontSize: 12 }}>
+                        🛡️ 120° त्रिकोण शिफ्ट: {shift.planetToShift}
+                      </span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#166534" }}>
+                        {shift.currentDirection} ({shift.currentSignName}) ➔ {shift.targetDirection} ({shift.targetSignName} - {shift.targetDirectionHindi})
+                      </span>
+                    </div>
+
+                    <p style={{ margin: "6px 0 12px 0", fontSize: 14, color: "#1F2937", lineHeight: 1.6 }}>
+                      {shift.shiftingMethod}
+                    </p>
+
+                    <div className="grid-2" style={{ gap: 12 }}>
+                      <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 12, border: "1px solid rgba(220, 38, 38, 0.25)" }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626", marginBottom: 6 }}>
+                          🚫 {shift.currentDirection} ज़ोन से तुरंत हटाएं:
+                        </div>
+                        <div style={{ fontSize: 13, color: "#4B5563" }}>
+                          {shift.itemsToRemoveFromCurrentZone.join(", ")}
+                        </div>
+                      </div>
+
+                      <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 12, border: "1px solid rgba(22, 163, 74, 0.3)" }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#16A34A", marginBottom: 6 }}>
+                          ✅ {shift.targetDirection} ज़ोन में स्थापित करें:
+                        </div>
+                        <div style={{ fontSize: 13, color: "#4B5563" }}>
+                          {shift.itemsToPlace.join(", ")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── SECTION 7: 🧘 शरीर के स्तर पर उपचार (Body Part & Dot/Thread Therapy) ── */}
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
+              <div>
+                <span className="card-tag">Section 7 · Micro-Somatic Healing</span>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                  🧘 शरीर के स्तर पर उपचार (Body Part & Dot/Thread Therapy)
+                </h3>
+              </div>
+              <div style={{ fontSize: 13, color: "#6B635B" }}>
+                किराए के मकान या बिना तोड़-फोड़ के त्वरित देह-वास्तु समाधान
+              </div>
+            </div>
+
+            <p style={{ margin: "0 0 16px 0", fontSize: 14, color: "#4A4238", lineHeight: 1.6 }}>
+              यदि घर में तुरंत सामान बदलना या शिफ्ट करना संभव न हो, तो शरीर के संबंधित अंग (Sign-to-Body Part) पर डॉट, तेल या धागा उपाय करके ऊर्जा के प्रवाह को तुरंत संतुलित किया जाता है।
+            </p>
+
+            <div className="grid-3" style={{ gap: 14 }}>
+              {/* Dot Therapy Card */}
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 16, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>
+                  1. नाभि व 4th हाउस उपचार
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  नाभि के 2 इंच का क्षेत्र
+                </div>
+                <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#4B5563", lineHeight: 1.5 }}>
+                  चतुर्थ भाव पर दबाव होने पर नाभि के 2 इंच के घेरे में शुद्ध देशी गाय का घी या चंदन का तिलक लगाएं। इससे घर की अशांति व अनिद्रा में तत्काल शांति मिलती है।
+                </p>
+              </div>
+
+              {/* Knee Therapy Card */}
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 16, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626", textTransform: "uppercase" }}>
+                  2. घुटना डॉट चिकित्सा (Knee Dot)
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  दायां घुटना (पुरुष) / बायां घुटना (महिला)
+                </div>
+                <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#4B5563", lineHeight: 1.5 }}>
+                  दशम भाव या मकर राशि पर दबाव होने पर संबंधित घुटने पर केसर अथवा लाल सिंदूर की एक सूक्ष्म बिंदी (Dot) लगाएं। यह सीधे शनि-मंगल के टकराव को न्यूट्रलाइज करता है।
+                </p>
+              </div>
+
+              {/* Wrist Thread Alert Card */}
+              <div
+                style={{
+                  background: wristThreadTrapAlert.severity === "CRITICAL" ? "rgba(220, 38, 38, 0.06)" : "#FAF8F5",
+                  borderRadius: 14,
+                  padding: 16,
+                  border: wristThreadTrapAlert.severity === "CRITICAL" ? "1px solid #DC2626" : "1px solid rgba(184, 134, 11, 0.25)",
+                }}
+              >
+                <div style={{ fontSize: 12, fontWeight: 700, color: wristThreadTrapAlert.severity === "CRITICAL" ? "#DC2626" : "#B8860B", textTransform: "uppercase" }}>
+                  3. कलाई में धागा बांधने का जाल
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  {wristThreadTrapAlert.alertTitle}
+                </div>
+                <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#4B5563", lineHeight: 1.5 }}>
+                  {wristThreadTrapAlert.explanation}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECTION 8: 🎯 व्याख्यान के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6) ── */}
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+              <div>
+                <span className="card-tag">Section 8 · Secret Practical Axioms</span>
+                <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
+                  🎯 व्याख्यान के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6)
+                </h3>
+              </div>
+              <div style={{ fontSize: 13, color: "#854D0E", fontWeight: 600 }}>
+                एस्ट्रो-वास्तु के सबसे गूढ़ नियम
+              </div>
+            </div>
+
+            <div className="grid-2" style={{ gap: 14 }}>
+              {/* Formula 1 */}
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 18, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>
+                  सूत्र 1 · नाभि एवं 4th कस्प संबंध
+                </div>
+                <h4 style={{ margin: "6px 0 4px 0", fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>
+                  शरीर में नाभि = घर में 4था भाव (मानसिक शांति)
+                </h4>
+                <p style={{ margin: 0, fontSize: 13.5, color: "#4A4238", lineHeight: 1.6 }}>
+                  कन्या राशि नाभि की कारक है। यदि कुंडली में 4थे भाव पर कोई पापी हिट आ रही हो, तो घर के 4थे भाव के साथ-साथ जातक की नाभि के 2 इंच का क्षेत्र भी अशांत हो जाता है। इस पर चंदन या शुद्ध घी का प्रयोग घर के कलह को तुरंत शांत करता है।
+                </p>
+              </div>
+
+              {/* Formula 2 */}
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 18, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#2563EB", textTransform: "uppercase" }}>
+                  सूत्र 2 · 4th, 9th, 10th हाउस स्टडी व वर्क ज़ोन
+                </div>
+                <h4 style={{ margin: "6px 0 4px 0", fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>
+                  शिक्षा {studyAndWorkDirection.recommendedStudyZone} में, ऑनलाइन कार्य {studyAndWorkDirection.recommendedOnlineWorkZone} में
+                </h4>
+                <p style={{ margin: 0, fontSize: 13.5, color: "#4A4238", lineHeight: 1.6 }}>
+                  अध्ययन के लिए 4थे भाव की दिशा ({studyAndWorkDirection.fourthHouseDirection} - {studyAndWorkDirection.fourthHouseHindi}) तथा उच्च विद्या के लिए 9वें भाव की दिशा ({studyAndWorkDirection.ninthHouseDirection}) का चयन करें। लैपटॉप और ऑनलाइन व्यापार के लिए 10वें भाव की दिशा ({studyAndWorkDirection.tenthHouseDirection}) सर्वोत्तम है।
+                </p>
+              </div>
+
+              {/* Formula 5 */}
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 18, border: "1px solid rgba(220, 38, 38, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#DC2626", textTransform: "uppercase" }}>
+                  सूत्र 5 · मंगल दोष: सौंफ/मिश्री, लाल कपड़ा त्याग व घुटना उपचार
+                </div>
+                <h4 style={{ margin: "6px 0 4px 0", fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>
+                  अत्यधिक उग्र मंगल को शांत करने की दैनिक जीवनशैली
+                </h4>
+                <p style={{ margin: 0, fontSize: 13.5, color: "#4A4238", lineHeight: 1.6 }}>
+                  यदि मंगल की दशा हो या मंगल 4थे/10वें भाव पर किलर हिट मार रहा हो, तो भोजन के बाद सौंफ और धागे वाली मिश्री का सेवन अनिवार्य करें। लाल चादर, लाल तकिया और लाल कपड़े पहनना पूरी तरह बंद करें।
+                </p>
+              </div>
+
+              {/* Formula 6 */}
+              <div style={{ background: "#FAF8F5", borderRadius: 14, padding: 18, border: "1px solid rgba(147, 51, 234, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#9333EA", textTransform: "uppercase" }}>
+                  सूत्र 6 · कलाई में धागा/मौली बांधने का जाल
+                </div>
+                <h4 style={{ margin: "6px 0 4px 0", fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>
+                  कलाई (मिथुन) का दुस्थान भावों से संबंध
+                </h4>
+                <p style={{ margin: 0, fontSize: 13.5, color: "#4A4238", lineHeight: 1.6 }}>
+                  कालपुरुष चक्र में मिथुन राशि (3) कलाई का प्रतिनिधित्व करती है। यदि आपकी कुंडली में मिथुन राशि 6ठे, 8वें या 12वें भाव में हो, तो कलाई में धागा बांधना सीधे रोग, दुर्घटना या अस्पताल के खर्चे को सक्रिय कर देता है। कलाई को सर्वथा मुक्त रखें।
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Direct Deep Dive CTA Bar ── */}
+          <div
+            style={{
+              background: "#F5EFE3",
+              borderRadius: 14,
+              padding: "16px 20px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
+              border: "1px solid rgba(184, 134, 11, 0.3)",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>
+                विस्तृत इंटरैक्टिव टूल्स देखें (Interactive Tools)
+              </div>
+              <div style={{ fontSize: 13, color: "#6B635B" }}>
+                12-दिशा चक्र, ट्रैफिक पुलिस ब्लॉकेड, अथवा 120° शिफ्टिंग सिमुलेटर का व्यक्तिगत उपयोग करें
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button
+                onClick={() => setActiveTab("radar")}
+                className="btn btn-secondary"
+                style={{ fontSize: 13, padding: "6px 14px" }}
+              >
+                🧭 कम्पास रडार
+              </button>
+              <button
+                onClick={() => setActiveTab("trafficPolice")}
+                className="btn btn-secondary"
+                style={{ fontSize: 13, padding: "6px 14px" }}
+              >
+                🚨 ट्रैफिक पुलिस
+              </button>
+              <button
+                onClick={() => setActiveTab("shifting")}
+                className="btn btn-secondary"
+                style={{ fontSize: 13, padding: "6px 14px" }}
+              >
+                🔄 120° शिफ्टिंग
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─────────────────────────────────────────────────────────────
           TAB 1: 12-DIRECTION COMPASS RADAR
