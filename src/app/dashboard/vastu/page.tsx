@@ -7,6 +7,7 @@ import { calculateVastu, type VastuResult as CompleteVastuResult } from "@/lib/a
 import { useUserChart } from "@/lib/user-chart";
 import { EngineShell, EngineHeader, EngineSectionTitle } from "@/components/engine/EngineShell";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { AstroVastuHitRadarView } from "@/components/vastu/AstroVastuHitRadarView";
 import "@/app/dashboard/shared.css";
 
 type Direction = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "CENTER" | "";
@@ -508,7 +509,7 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
 export default function VastuDashboardPage() {
   const { chart, loading: chartLoading, hasUserChart } = useUserChart();
   const [kundli, setKundli] = useState<NormalizedKundli | null>(null);
-  const [analysisMode, setAnalysisMode] = useState<"kundli" | "property">("kundli");
+  const [analysisMode, setAnalysisMode] = useState<"kundli" | "property" | "hitRadar">("kundli");
   const [chartLoadMessage, setChartLoadMessage] = useState("Chart not loaded yet.");
   const [propertyType, setPropertyType] = useState("home");
   const [facing, setFacing] = useState<Direction>("");
@@ -670,13 +671,11 @@ export default function VastuDashboardPage() {
           { label: "Weak Zones",   value: completeAnalysis.weakZones.length,   tone: "red"   },
           { label: "Transits",     value: completeAnalysis.transitAlerts.length },
         ] : [
-          { label: "Mode", value: analysisMode === "kundli" ? "Kundli" : "Property", tone: "gold" },
+          { label: "Mode", value: analysisMode === "kundli" ? "Kundli" : analysisMode === "property" ? "Property" : "Hit Radar", tone: "gold" },
           { label: "Rooms", value: rooms.length, tone: "blue" },
           { label: "Chart", value: chart ? "Linked" : "Needed", tone: chart ? "green" : "red" },
         ]}
       />
-
-        
 
       {/* Mode switcher */}
       <div className="tabs">
@@ -686,7 +685,26 @@ export default function VastuDashboardPage() {
         <button className={`tab ${analysisMode === "property" ? "active" : ""}`} onClick={() => setAnalysisMode("property")}>
           🏗 Property Vastu
         </button>
+        <button
+          className={`tab ${analysisMode === "hitRadar" ? "active" : ""}`}
+          onClick={() => setAnalysisMode("hitRadar")}
+          style={
+            analysisMode === "hitRadar"
+              ? {
+                  background: "linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(220, 38, 38, 0.15))",
+                  color: "#B8860B",
+                  borderColor: "rgba(212, 175, 55, 0.5)",
+                  fontWeight: 700,
+                }
+              : {}
+          }
+        >
+          ⚡ Astro-Vastu Hit Radar (हिट थ्योरी)
+        </button>
       </div>
+
+      {/* ── ASTRO-VASTU HIT RADAR ── */}
+      {analysisMode === "hitRadar" && <AstroVastuHitRadarView chart={chart} />}
 
       {/* ── KUNDLI VASTU ── */}
       {analysisMode === "kundli" && <CompleteAnalysisPanel result={completeAnalysis} />}

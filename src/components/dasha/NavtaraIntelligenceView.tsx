@@ -20,6 +20,10 @@ import {
 import type { SupportedAyanamsha } from "@/lib/astro-engine/ayanamsa-config";
 import { NakshatraChakraWheel } from "@/components/dasha/NakshatraChakraWheel";
 import {
+  evaluateNakshatraRemedyDossier,
+  type NakshatraHumanReport,
+} from "@/lib/astro-engine/nakshatra-remedy-engine";
+import {
   Shield,
   Sparkles,
   AlertTriangle,
@@ -37,6 +41,9 @@ import {
   Check,
   PieChart,
   Grid,
+  BookOpen,
+  Activity,
+  Droplets,
 } from "lucide-react";
 
 interface NavtaraIntelligenceViewProps {
@@ -62,6 +69,21 @@ export function NavtaraIntelligenceView({
   const [selectedChakraItem, setSelectedChakraItem] =
     useState<NavtaraMatrixItem | null>(null);
   const [copiedRemedy, setCopiedRemedy] = useState<boolean>(false);
+  const [activeRemedyTab, setActiveRemedyTab] = useState<
+    "NARRATIVE" | "CHECKLIST" | "TRIKONA" | "SHIVLING"
+  >("NARRATIVE");
+  const [copiedNakshatraRemedy, setCopiedNakshatraRemedy] = useState<boolean>(false);
+  const [showOtherProblemPlanets, setShowOtherProblemPlanets] = useState<boolean>(false);
+
+  // Compute Human-Tone Nakshatra Remedy Dossier (5-Section Narrative, Checklist, Elemental Vehicle, 27 Shivling Upacharas)
+  const nakshatraDossier: NakshatraHumanReport | null = useMemo(() => {
+    try {
+      return evaluateNakshatraRemedyDossier(chart);
+    } catch (err) {
+      console.warn("[NavtaraIntelligenceView] Failed to compute nakshatraDossier:", err);
+      return null;
+    }
+  }, [chart]);
 
   // Compute Full Navtara Intelligence reactively based on chosen Ayanamsa
   const intel: FullNavtaraIntelligence = useMemo(() => {
@@ -801,6 +823,551 @@ export function NavtaraIntelligenceView({
           </div>
         )}
       </section>
+
+      {/* ── Active Dasha Nakshatra Karma & Sacred Upay Protocol ── */}
+      {nakshatraDossier && (
+        <section className="rounded-3xl border border-amber-900/15 bg-white p-6 shadow-sm flex flex-col gap-6">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amber-900/10 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Feather className="w-4 h-4 text-[#B8860B]" />
+                <span className="text-xs uppercase tracking-widest font-bold text-[#B8860B]">
+                  सक्रिय नक्षत्र आख्यान एवं मानवीय उपचार
+                </span>
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-[#875C06] font-bold">
+                  {tp(nakshatraDossier.activeDashaPlanet)} महादशा ➔ {nakshatraDossier.activeNakshatraName} नक्षत्र
+                </span>
+              </div>
+              <h3 className="text-2xl font-bold text-[#1A1A1A] mt-1" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                सक्रिय दशा नक्षत्र: मानसिक स्वरूप, कर्म-जाल एवं अचूक सात्विक साधना
+              </h3>
+              <p className="text-xs text-[#6B635B] mt-0.5">
+                शास्त्रीय नियम: वर्तमान दशा स्वामी जिस नक्षत्र में स्थित होते हैं, उस नक्षत्र की आंतरिक तासीर ही इस समय आपके अंतर्मन, निर्णयों और कर्मों को चलाती है।
+              </p>
+            </div>
+
+            {/* Actions: Copy & WhatsApp */}
+            <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
+              <button
+                onClick={() => {
+                  const text = `✦ AstroLife सक्रिय नक्षत्र सात्विक साधना ✦\nजातक: ${chart.name || "Seeker"}\nसक्रिय दशा: ${tp(nakshatraDossier.activeDashaPlanet)} महादशा (${nakshatraDossier.activeNakshatraName} नक्षत्र)\n\n✦ स्वर्णिम नियम (Golden Rule): ${nakshatraDossier.goldenRule}\n✦ प्राथमिक उपाय: ${nakshatraDossier.primaryActionItem}\n✦ सहायक नियम: ${nakshatraDossier.secondaryActionItem}\n✦ पशु-पक्षी व प्रकृति सेवा: ${nakshatraDossier.naturePashuSeva}\n✦ शुभ समय व मुहूर्त: ${nakshatraDossier.timingAndMuhurat}\n✦ आवश्यक सामग्री: ${nakshatraDossier.materialsNeeded.join(", ")}\n\n✦ भाव-त्रिकोण पंचतत्व वाहन: ${nakshatraDossier.elementalVehicleTitle}\nविधि: ${nakshatraDossier.elementalVehicleProcedure}\n${nakshatraDossier.transitRemedy ? `\n✦ गोचर 27-शिवलिंग उपक्रम (#${nakshatraDossier.transitRemedy.transitNakshatraNumber}): ${nakshatraDossier.transitRemedy.shivlingRemedy.hindiTitle} — ${nakshatraDossier.transitRemedy.shivlingRemedy.procedureNarrativeHinglish}\n` : ""}विस्तृत कुंडली: https://astrolife-ai.vercel.app/dashboard/dasha`;
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text);
+                    setCopiedNakshatraRemedy(true);
+                    setTimeout(() => setCopiedNakshatraRemedy(false), 2500);
+                  }
+                  const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                  window.open(waUrl, "_blank");
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#FAF7F2] border border-amber-900/15 text-[#4A4238] hover:text-[#1A1A1A] hover:bg-white transition-all shadow-sm"
+                title="Share on WhatsApp"
+              >
+                <Share2 className="w-3.5 h-3.5 text-[#B8860B]" />
+                <span>WhatsApp</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  const text = `✦ AstroLife सक्रिय नक्षत्र सात्विक साधना ✦\nजातक: ${chart.name || "Seeker"}\nसक्रिय दशा: ${tp(nakshatraDossier.activeDashaPlanet)} महादशा (${nakshatraDossier.activeNakshatraName} नक्षत्र)\n\n✦ स्वर्णिम नियम (Golden Rule): ${nakshatraDossier.goldenRule}\n✦ प्राथमिक उपाय: ${nakshatraDossier.primaryActionItem}\n✦ सहायक नियम: ${nakshatraDossier.secondaryActionItem}\n✦ पशु-पक्षी व प्रकृति सेवा: ${nakshatraDossier.naturePashuSeva}\n✦ शुभ समय व मुहूर्त: ${nakshatraDossier.timingAndMuhurat}\n✦ आवश्यक सामग्री: ${nakshatraDossier.materialsNeeded.join(", ")}\n\n✦ भाव-त्रिकोण पंचतत्व वाहन: ${nakshatraDossier.elementalVehicleTitle}\nविधि: ${nakshatraDossier.elementalVehicleProcedure}\n${nakshatraDossier.transitRemedy ? `\n✦ गोचर 27-शिवलिंग उपक्रम (#${nakshatraDossier.transitRemedy.transitNakshatraNumber}): ${nakshatraDossier.transitRemedy.shivlingRemedy.hindiTitle} — ${nakshatraDossier.transitRemedy.shivlingRemedy.procedureNarrativeHinglish}\n` : ""}विस्तृत कुंडली: https://astrolife-ai.vercel.app/dashboard/dasha`;
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text);
+                    setCopiedNakshatraRemedy(true);
+                    setTimeout(() => setCopiedNakshatraRemedy(false), 2500);
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#FAF7F2] border border-amber-900/15 text-[#4A4238] hover:text-[#1A1A1A] transition-all shadow-sm"
+              >
+                {copiedNakshatraRemedy ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700">कॉपी हो गया!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-[#6B635B]" />
+                    <span>साधना कॉपी करें</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Golden Rule Banner */}
+          <div
+            style={{
+              padding: "16px 20px",
+              borderRadius: 14,
+              background: "linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(254, 243, 199, 0.45) 100%)",
+              border: "1px solid rgba(184, 134, 11, 0.35)",
+              borderLeft: "4px solid #B8860B",
+            }}
+          >
+            <div className="flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-[#B8860B] mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs font-bold text-[#875C06] uppercase tracking-wider m-0">
+                  नक्षत्र का अखंड स्वर्णिम नियम (Golden Rule)
+                </p>
+                <p className="text-[14.5px] font-semibold text-[#1A1A1A] mt-1 leading-[1.65] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                  &ldquo;{nakshatraDossier.goldenRule}&rdquo;
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Sub Tabs Selector */}
+          <div className="flex items-center gap-2 border-b border-amber-900/10 pb-2 flex-wrap">
+            {[
+              { id: "NARRATIVE", label: "१. मानवीय कथा व मनोदशा", icon: BookOpen },
+              { id: "CHECKLIST", label: "२. अचूक सात्विक उपाय व सेवा", icon: Shield },
+              { id: "TRIKONA", label: "३. भाव-त्रिकोण पंचतत्व वाहन", icon: Activity },
+              { id: "SHIVLING", label: "४. गोचर व 27 शिवलिंग उपक्रम", icon: Droplets },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeRemedyTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveRemedyTab(tab.id as any)}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                    isActive
+                      ? "bg-[#B8860B] text-white shadow-sm"
+                      : "bg-[#FAF7F2] text-[#6B635B] hover:text-[#1A1A1A] hover:bg-white border border-amber-900/10"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* TAB 1: NARRATIVE (5-Section Human Story) */}
+          {activeRemedyTab === "NARRATIVE" && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Left Column: Personality & Living Archetype */}
+              <div className="flex flex-col gap-4">
+                <div
+                  style={{
+                    padding: "18px 20px",
+                    borderRadius: 14,
+                    background: "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Compass className="w-4 h-4 text-[#B8860B]" />
+                    <p className="text-xs uppercase tracking-widest font-bold text-[#B8860B] m-0">
+                      आंतरिक मनोदशा व वर्तमान स्वभाव
+                    </p>
+                  </div>
+                  <p className="text-[14px] text-[#2A241F] leading-[1.8] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                    {nakshatraDossier.section1_InnerStateAndPersonality}
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    padding: "18px 20px",
+                    borderRadius: 14,
+                    background: "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Feather className="w-4 h-4 text-[#B8860B]" />
+                    <p className="text-xs uppercase tracking-widest font-bold text-[#B8860B] m-0">
+                      शास्त्रीय जीवंत स्वरूप (Living Archetype Story)
+                    </p>
+                  </div>
+                  <p className="text-[14px] text-[#2A241F] leading-[1.8] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                    {nakshatraDossier.section2_LivingArchetypeStory}
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column: Karmic Trap & Conduct Guardrail */}
+              <div className="flex flex-col gap-4">
+                <div
+                  style={{
+                    padding: "18px 20px",
+                    borderRadius: 14,
+                    background: "rgba(239, 68, 68, 0.04)",
+                    border: "1px solid rgba(239, 68, 68, 0.25)",
+                    borderLeft: "4px solid #dc2626",
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-red-600" />
+                    <p className="text-xs uppercase tracking-widest font-bold text-red-700 m-0">
+                      सावधानी: कार्मिक भूल व क्रोध-जाल (Karmic Trap)
+                    </p>
+                  </div>
+                  <p className="text-[14px] text-[#2A241F] leading-[1.8] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                    {nakshatraDossier.section3_KarmicTrapAndAngerWarning}
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    padding: "18px 20px",
+                    borderRadius: 14,
+                    background: "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                    borderLeft: "4px solid #059669",
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="w-4 h-4 text-emerald-600" />
+                    <p className="text-xs uppercase tracking-widest font-bold text-emerald-800 m-0">
+                      दैनिक जीवन में आचरण सुरक्षा नियम (Conduct Guardrail)
+                    </p>
+                  </div>
+                  <p className="text-[14px] text-[#2A241F] leading-[1.8] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                    {nakshatraDossier.section4_BehavioralConductInDailyLife}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: CHECKLIST (Actionable Upay & Seva) */}
+          {activeRemedyTab === "CHECKLIST" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Primary Upay */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  borderRadius: 14,
+                  background: "#FAF8F5",
+                  border: "1px solid rgba(184, 134, 11, 0.25)",
+                  borderTop: "4px solid #B8860B",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#875C06]">
+                    प्राथमिक अचूक उपाय
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-[#875C06] font-bold">
+                    तीव्र फलदायी
+                  </span>
+                </div>
+                <p className="text-[14px] font-medium text-[#1A1A1A] leading-[1.7] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                  {nakshatraDossier.primaryActionItem}
+                </p>
+                <div className="pt-2 border-t border-amber-900/10 flex flex-col gap-1 text-xs text-[#6B635B]">
+                  <div>
+                    <strong>शुभ समय/मुहूर्त:</strong> {nakshatraDossier.timingAndMuhurat}
+                  </div>
+                  {nakshatraDossier.materialsNeeded.length > 0 && (
+                    <div>
+                      <strong>सामग्री:</strong> {nakshatraDossier.materialsNeeded.join(", ")}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Secondary Upay */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  borderRadius: 14,
+                  background: "#FAF8F5",
+                  border: "1px solid rgba(184, 134, 11, 0.25)",
+                  borderTop: "4px solid #059669",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                    सहायक सात्विक नियम
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 font-bold">
+                    सतत स्थिरता
+                  </span>
+                </div>
+                <p className="text-[14px] font-medium text-[#1A1A1A] leading-[1.7] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                  {nakshatraDossier.secondaryActionItem}
+                </p>
+                <p className="text-xs text-[#6B635B] pt-2 border-t border-amber-900/10 m-0">
+                  इस नियम का पालन करने से नक्षत्र की सकारात्मक रश्मियां शरीर के आभामंडल (Aura) को सुरक्षित रखती हैं।
+                </p>
+              </div>
+
+              {/* Animal & Nature Seva */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  borderRadius: 14,
+                  background: "#FAF8F5",
+                  border: "1px solid rgba(184, 134, 11, 0.25)",
+                  borderTop: "4px solid #2563eb",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-blue-800">
+                    पशु-पक्षी व प्रकृति सेवा
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-700 font-bold">
+                    पुण्य संवर्धन
+                  </span>
+                </div>
+                <p className="text-[14px] font-medium text-[#1A1A1A] leading-[1.7] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                  {nakshatraDossier.naturePashuSeva}
+                </p>
+                <p className="text-xs text-[#6B635B] pt-2 border-t border-amber-900/10 m-0">
+                  मूक प्राणियों की सेवा से पूर्वजन्म के ऋणानुबंधन शीघ्रता से कटते हैं।
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: TRIKONA (House-Trikona Elemental Vehicle) */}
+          {activeRemedyTab === "TRIKONA" && (
+            <div
+              style={{
+                padding: "20px 24px",
+                borderRadius: 16,
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.22)",
+                borderLeft: "5px solid #B8860B",
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-[#B8860B]" />
+                  <h4 className="text-lg font-bold text-[#1A1A1A] m-0">
+                    {nakshatraDossier.elementalVehicleTitle}
+                  </h4>
+                </div>
+                <span className="text-xs px-3 py-1 rounded-full bg-amber-500/15 text-[#875C06] font-bold">
+                  पंचतत्व भौतिक क्रिया (Physical Grounding Vehicle)
+                </span>
+              </div>
+
+              <p className="text-[14px] text-[#2A241F] leading-[1.8] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                {nakshatraDossier.elementalVehicleExplanation}
+              </p>
+
+              <div
+                style={{
+                  padding: "16px 20px",
+                  borderRadius: 12,
+                  background: "#FFFFFF",
+                  border: "1px solid rgba(184, 134, 11, 0.2)",
+                }}
+              >
+                <p className="text-xs uppercase tracking-wider font-bold text-[#875C06] mb-1.5">
+                  ✦ शास्त्रीय व्यावहारिक क्रिया-विधि (Exact Daily Procedure):
+                </p>
+                <p className="text-[14px] text-[#1A1A1A] leading-[1.8] m-0 font-medium" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                  {nakshatraDossier.elementalVehicleProcedure}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: SHIVLING (Transit Nakshatra & 27 Shivling Upacharas) */}
+          {activeRemedyTab === "SHIVLING" && nakshatraDossier.transitRemedy && (
+            <div className="flex flex-col gap-5">
+              {/* Transit Context Banner */}
+              <div
+                style={{
+                  padding: "18px 22px",
+                  borderRadius: 14,
+                  background: "#FAF8F5",
+                  border: "1px solid rgba(184, 134, 11, 0.25)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <Droplets className="w-5 h-5 text-[#B8860B]" />
+                    <span className="font-bold text-base text-[#1A1A1A]">
+                      वर्तमान गोचर संरेखण (Transit Placement of {nakshatraDossier.transitRemedy.activeDashaLord})
+                    </span>
+                  </div>
+                  <span className="text-xs px-3 py-1 rounded-full bg-blue-500/15 text-blue-700 font-bold">
+                    तारा #{nakshatraDossier.transitRemedy.taraNumber} {nakshatraDossier.transitRemedy.taraName} ({nakshatraDossier.transitRemedy.taraRelationType})
+                  </span>
+                </div>
+
+                <p className="text-xs text-[#6B635B] m-0">
+                  वर्तमान में {nakshatraDossier.transitRemedy.activeDashaLord} ग्रह <strong>{nakshatraDossier.transitRemedy.transitSign}</strong> राशि में {nakshatraDossier.transitRemedy.transitDegree}° पर <strong>{nakshatraDossier.transitRemedy.transitNakshatra} नक्षत्र (#{nakshatraDossier.transitRemedy.transitNakshatraNumber})</strong> में संचरण कर रहे हैं। आपकी जन्म-राशि चंद्रमा से यह {nakshatraDossier.transitRemedy.taraExplanationHinglish}
+                </p>
+
+                {nakshatraDossier.transitRemedy.distanceAnalysis && (
+                  <div className="text-xs text-[#5C3D00] pt-2 border-t border-amber-900/10">
+                    <strong>महादशा व अंतर्दशा संबंध:</strong> {nakshatraDossier.transitRemedy.distanceAnalysis.mutualAxis} अक्ष — {nakshatraDossier.transitRemedy.distanceAnalysis.impactDescriptionHinglish}
+                  </div>
+                )}
+              </div>
+
+              {/* The Shivling Upachara Card */}
+              <div
+                style={{
+                  padding: "20px 24px",
+                  borderRadius: 16,
+                  background: "#FAF8F5",
+                  border: "1px solid rgba(184, 134, 11, 0.25)",
+                  borderLeft: "5px solid #059669",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                }}
+              >
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <span className="text-xs uppercase tracking-wider font-bold text-emerald-800">
+                      27-शिवलिंग उपक्रम विधान (उपक्रम #{nakshatraDossier.transitRemedy.shivlingRemedy.upacharaNumber})
+                    </span>
+                    <h4 className="text-xl font-bold text-[#1A1A1A] mt-0.5" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                      {nakshatraDossier.transitRemedy.shivlingRemedy.hindiTitle}
+                    </h4>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-800 font-bold">
+                      अर्पण: {nakshatraDossier.transitRemedy.shivlingRemedy.itemOrOffering}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="text-[14px] text-[#2A241F] leading-[1.8] m-0" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                  <strong>शास्त्रीय रहस्य:</strong> {nakshatraDossier.transitRemedy.shivlingRemedy.significanceHinglish}
+                </p>
+
+                <div
+                  style={{
+                    padding: "16px 20px",
+                    borderRadius: 12,
+                    background: "#FFFFFF",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                  }}
+                >
+                  <p className="text-xs uppercase tracking-wider font-bold text-emerald-800 mb-1">
+                    ✦ शिवलिंग पर अर्पण की विधि (Exact Procedure):
+                  </p>
+                  <p className="text-[14px] text-[#1A1A1A] leading-[1.8] m-0 font-medium" style={{ fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                    {nakshatraDossier.transitRemedy.shivlingRemedy.procedureNarrativeHinglish}
+                  </p>
+                </div>
+              </div>
+
+              {/* 6th, 8th & 12th House Specific Wisdom */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  style={{
+                    padding: "16px 18px",
+                    borderRadius: 14,
+                    background: "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                  }}
+                >
+                  <p className="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-1">
+                    🌱 ६ठे भाव का नियम (पौधे व अंधी निष्ठा / Blind Faith)
+                  </p>
+                  <p className="text-xs text-[#2A241F] leading-relaxed m-0">
+                    {nakshatraDossier.transitRemedy.beliefGuidanceHinglish.house6MessageHinglish}
+                  </p>
+                  {nakshatraDossier.transitRemedy.house6PlantRemedies.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-amber-900/10 text-xs text-[#6B635B]">
+                      <strong>पौधा सेवा:</strong> {nakshatraDossier.transitRemedy.house6PlantRemedies.map((p) => `${p.planet}: ${p.plantName}`).join(", ")}
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  style={{
+                    padding: "16px 18px",
+                    borderRadius: 14,
+                    background: "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                  }}
+                >
+                  <p className="text-xs font-bold text-purple-800 uppercase tracking-wide mb-1">
+                    🌊 १२वें भाव का नियम (कठिन परीक्षा व त्याग / Parikshan)
+                  </p>
+                  <p className="text-xs text-[#2A241F] leading-relaxed m-0">
+                    {nakshatraDossier.transitRemedy.beliefGuidanceHinglish.house12MessageHinglish}
+                  </p>
+                  {nakshatraDossier.transitRemedy.house12DonationRemedies.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-amber-900/10 text-xs text-[#6B635B]">
+                      <strong>गुप्त दान:</strong> {nakshatraDossier.transitRemedy.house12DonationRemedies.map((d) => `${d.planet}: ${d.targetCategory}`).join(", ")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Optional: Afflicted Planets Drawer */}
+          {nakshatraDossier.evaluatedPlanets.filter((p) => p.isProblemPlanet).length > 0 && (
+            <div className="pt-2 border-t border-amber-900/10">
+              <button
+                onClick={() => setShowOtherProblemPlanets(!showOtherProblemPlanets)}
+                className="w-full flex items-center justify-between text-left py-2"
+              >
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600" />
+                  <span className="text-xs font-bold text-[#875C06]">
+                    कुंडली के अन्य संवेदनशील ग्रह ({nakshatraDossier.evaluatedPlanets.filter((p) => p.isProblemPlanet).length} ग्रह ६/८/१२ या नीचस्थ भाव में)
+                  </span>
+                </div>
+                {showOtherProblemPlanets ? (
+                  <ChevronUp className="w-4 h-4 text-[#6B635B]" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-[#6B635B]" />
+                )}
+              </button>
+
+              {showOtherProblemPlanets && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  {nakshatraDossier.evaluatedPlanets
+                    .filter((p) => p.isProblemPlanet)
+                    .map((p, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3.5 rounded-xl bg-[#FAF7F2] border border-amber-900/15 flex flex-col gap-1.5 text-xs"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[#1A1A1A]">
+                            {tp(p.planet)} in {p.nakshatra} (House {p.house}, {p.sign})
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/15 text-red-700 font-bold">
+                            कष्ट निवारण
+                          </span>
+                        </div>
+                        <p className="text-[#6B635B] m-0">{p.reasonForFocus}</p>
+                        {p.nakshatraGuide && (
+                          <p className="text-[#1A1A1A] m-0 pt-1 border-t border-amber-900/10">
+                            <strong>उपाय:</strong> {p.nakshatraGuide.primaryRemedyHinglish}
+                          </p>
+                        )}
+                        <p className="text-[#875C06] m-0 font-medium">
+                          <strong>पंचतत्व वाहन:</strong> {p.houseTrikonaRule.actionTitleHinglish}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ── Two-Column Row: Transit Activation Windows & Tattva Remedies ── */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -20,6 +20,7 @@ import { calculateNumerology } from "../astro-engine/numerology";
 import { buildNatalChartFromAnyChart, generateGemstoneReport, SIGN_RULERS, type ZodiacSign } from "../astro-engine/gemstone";
 import { calculateSpecialLagnas } from "../astro-engine/special-lagnas";
 import { calculateVastu } from "../astro-engine/vastu";
+import { runAstroVastuHitEngine } from "../astro-engine/astro-vastu-hit-engine";
 import { calculateSarvatobhadra } from "../astro-engine/sarvatobhadra";
 import { scanMarriageWindows } from "../astro-engine/marriage-window-scanner";
 import { calculateLineageKarma } from "../astro-engine/lineage-karma";
@@ -521,24 +522,53 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
     console.warn("[MasterAstroContext] Special Lagnas error:", err);
   }
 
-  // ── 14. ASTRO-VASTU (16-ZONE SPATIAL ENERGETICS & REMEDIES) ───────────────────
+  // ── 14. ASTRO-VASTU & HIT THEORY INTELLIGENCE (3-5-8 RULE & SPATIAL RADAR) ───
   try {
     const activeMD = chart.dashas?.find((d) => d.active)?.planet;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const vastu = calculateVastu(chart.planets as any, activeMD);
+    const hitDossier = runAstroVastuHitEngine(chart);
 
     const strongNames = vastu.strongZones.map((z) => `${z.dir} (${z.name}, ${z.score}pts)`).join(", ") || "None";
     const weakNames = vastu.weakZones.map((z) => `${z.dir} (${z.name}, ${z.score}pts)`).join(", ") || "None";
     const keyRemedies = vastu.weakZones.slice(0, 3).map((z) => `${z.dir} (${z.domain}): ${z.remedy}`).join("\n  ✦ ");
     const psych = vastu.psychBridge.slice(0, 2).join(" ");
 
-    sections.push(`### 14. ASTRO-VASTU (16-ZONE SPATIAL ENERGETICS & LIVING REMEDIES)
+    let hitSection = "";
+    if (hitDossier) {
+      const policeText = hitDossier.trafficPoliceBlockades.length > 0
+        ? hitDossier.trafficPoliceBlockades.map(b => `[TRAFFIC POLICE] ${b.blockingPlanet} is blocking ${b.dashaLordRole} Lord ${b.dashaLordName} with ${b.hitAngle}° Hit! Location: ${b.physicalLocation.direction} zone. Action: ${b.physicalLocation.actionRequired}`).join("\n  ✦ ")
+        : "None (Active Dasha lords are moving without 90°/180° planetary obstruction).";
+
+      const killerHitsText = hitDossier.killerHits180.slice(0, 3).map(k => `${k.sourceName} (H${k.sourceHouse} ${k.sourceDirection}) -> ${k.targetName} [${k.exactDiff}° exact diff]`).join("\n  ✦ ") || "No 180° killer hits active.";
+
+      const shiftsText = hitDossier.shiftingPrescriptions.slice(0, 2).map(s => `${s.problematicPlanet} attacking ${s.afflictedTarget}: Shift to ${s.targetDirection} (House ${s.targetHouse} - ${s.targetSignName}). Body Therapy: ${s.bodyPartTherapy.instructions}`).join("\n  ✦ ") || "No critical shifts required.";
+
+      const conflictsText = hitDossier.genericVastuConflicts.map(c => `[${c.dangerLevel}] ${c.zoneName}: Generic MahaVastu rule clashes with chart! ${c.personalAstroVastuReality} Recommendation: ${c.recommendation}`).join("\n  ✦ ") || "No critical generic Vastu conflicts.";
+
+      hitSection = `
+- ⚡ ASTRO-VASTU HIT THEORY (3-5-8 RULE & COMPOUND DEGREES):
+  ✦ Active Dasha Traffic Police Blockade:
+    ${policeText}
+  ✦ Critical 180° Killer Hits on Vital Houses:
+    ✦ ${killerHitsText}
+  ✦ 120° Protective Shield Shifting & Body Dot Prescriptions:
+    ✦ ${shiftsText}
+  ✦ Personal Astro-Vastu vs Generic MahaVastu Conflicts:
+    ✦ ${conflictsText}
+  ✦ Subtle Astro-Vastu Guardrails (Authentic Lecture Directives):
+    ✦ [FAMILY CROSS-HIT ISOLATION]: If placing an item in a shared house zone could cross-hit another family member's chart, KEEP REMEDY EXCLUSIVELY in the native's personal pocket, wallet, bedroom, or private study desk (e.g. 4-5 red chilies or copper coin in personal pocket).
+    ✦ [WRIST THREAD CAUTION]: The wrist represents Gemini (3rd House). Never tie colored sacred threads on wrists blindly if Gemini/Mercury rules dusthanas (6/8/12), as it immediately triggers anxiety and severs friends/gains.
+    ✦ [NAVEL 2-INCH BOUNDARY]: Dot therapy for Virgo/Mercury must stay strictly within 2 inches above or 2 inches below the navel; never exceed this boundary.`;
+    }
+
+    sections.push(`### 14. ASTRO-VASTU & HIT THEORY INTELLIGENCE (3-5-8 RULE & SPATIAL RADAR)
 - Overall Home/Workspace Vastu Score: ${vastu.overallScore}/100
 - Strongest Zones (Effortless Flow): ${strongNames}
 - Vulnerable / Blocked Zones (Requiring Remedial Attention): ${weakNames}
 - Priority Spatial Corrections:
   ✦ ${keyRemedies || "Keep North and East clutter-free; place light water elements in Ishanya (NE)."}
-- Astro-Vastu Psychological Link: ${psych}`);
+- Astro-Vastu Psychological Link: ${psych}${hitSection}`);
   } catch (err) {
     console.warn("[MasterAstroContext] Astro-Vastu error:", err);
   }
