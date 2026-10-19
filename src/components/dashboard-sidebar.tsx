@@ -81,7 +81,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem },
       { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf },
       { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen },
-      { label: "Vastu", href: "/dashboard/vastu", Icon: HomeIcon },
+      { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon },
       { label: "Astro Sound", href: "/dashboard/astro-sound", Icon: Music },
     ],
   },

@@ -19,7 +19,7 @@ interface AstroVastuHitRadarViewProps {
 
 export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   const [activeTab, setActiveTab] = useState<
-    "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts"
+    "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts" | "lifestyle"
   >("radar");
   const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 120>("all");
   const [selectedDirectionCode, setSelectedDirectionCode] = useState<string>("N");
@@ -67,6 +67,9 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     genericVastuConflicts,
     directionPlanetaryInventory,
     familyCrossHitIsolationRule,
+    studyAndWorkDirection,
+    marsDietaryLifestyleProtocol,
+    wristThreadTrapAlert,
   } = dossier;
 
   const filteredHits = useMemo(() => {
@@ -316,6 +319,18 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           style={genericVastuConflicts.length > 0 ? { color: "#b91c1c", fontWeight: 700 } : {}}
         >
           🛑 जेनेरिक वास्तु विरोध ({genericVastuConflicts.length})
+        </button>
+        <button
+          className={`tab ${activeTab === "lifestyle" ? "active" : ""}`}
+          onClick={() => setActiveTab("lifestyle")}
+          style={{
+            color: activeTab === "lifestyle" ? "#B8860B" : "#854D0E",
+            fontWeight: 700,
+            background: activeTab === "lifestyle" ? "#FAF5EB" : "rgba(217, 119, 6, 0.08)",
+            border: "1px solid rgba(217, 119, 6, 0.3)",
+          }}
+        >
+          🎯 विशेष रहस्य व दिशाएं (1, 2, 5, 6)
         </button>
       </div>
 
@@ -1023,6 +1038,246 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </div>
             ))
           )}
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 7: SPECIAL NUANCES (1, 2, 5, 6)
+      ───────────────────────────────────────────────────────────── */}
+      {activeTab === "lifestyle" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FEFCE8, #FFFBEB)", border: "1px solid rgba(217, 119, 6, 0.3)" }}>
+            <span className="card-tag" style={{ color: "#B45309" }}>
+              Authentic Astro-Vastu Lecture Secrets (1, 2, 5, 6)
+            </span>
+            <h3 className="card-title" style={{ margin: "4px 0 8px 0", color: "#78350F" }}>
+              🎯 एस्ट्रो-वास्तु के 4 विशेष गुप्त व्यावहारिक सूत्र
+            </h3>
+            <p style={{ fontSize: 13.5, color: "#92400E", lineHeight: 1.65, margin: 0 }}>
+              ये 4 सूत्र किताबी वास्तु में कहीं नहीं मिलते। यह जातक की व्यक्तिगत कुंडली, पारिवारिक सुरक्षा, शारीरिक अंग सक्रियता, और जीवनशैली से सीधे जुड़े हैं।
+            </p>
+          </div>
+
+          {/* 1. पारिवारिक क्रॉस-हिट निवारण नियम */}
+          <div
+            className="card"
+            style={{
+              borderLeft: "6px solid #D97706",
+              background: "#FFFFFF",
+              padding: 22,
+              boxShadow: "0 4px 16px rgba(217, 119, 6, 0.08)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "gap 10" }}>
+              <div>
+                <span className="badge badge-gold" style={{ fontWeight: 700 }}>
+                  सूत्र 1 · Family Cross-Hit Protection
+                </span>
+                <h3 style={{ margin: "6px 0", fontSize: 18, color: "#1A1A1A", fontWeight: 700 }}>
+                  💡 {familyCrossHitIsolationRule.title}
+                </h3>
+              </div>
+            </div>
+            <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.65, margin: "8px 0" }}>
+              {familyCrossHitIsolationRule.rule}
+            </p>
+            <div
+              style={{
+                background: "rgba(217, 119, 6, 0.08)",
+                border: "1px solid rgba(217, 119, 6, 0.25)",
+                borderRadius: 10,
+                padding: "12px 14px",
+                fontSize: 13,
+                color: "#78350F",
+                lineHeight: 1.6,
+                marginTop: 10,
+              }}
+            >
+              ✦ <strong>सटीक उपाय:</strong> {familyCrossHitIsolationRule.practicalAdvice}
+            </div>
+          </div>
+
+          {/* 2. कलाई पर धागे का चक्रव्यूह */}
+          <div
+            className="card"
+            style={{
+              borderLeft: wristThreadTrapAlert.isDusthana ? "6px solid #DC2626" : "6px solid #16a34a",
+              background: "#FFFFFF",
+              padding: 22,
+              boxShadow: wristThreadTrapAlert.isDusthana ? "0 4px 16px rgba(220, 38, 38, 0.08)" : "none",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <span
+                  className={wristThreadTrapAlert.isDusthana ? "badge badge-red" : "badge badge-green"}
+                  style={{ fontWeight: 700 }}
+                >
+                  सूत्र 2 · Wrist Thread Trap (Gemini / Sign 3)
+                </span>
+                <h3 style={{ margin: "6px 0", fontSize: 18, color: "#1A1A1A", fontWeight: 700 }}>
+                  {wristThreadTrapAlert.alertTitle}
+                </h3>
+              </div>
+            </div>
+            <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.65, margin: "8px 0" }}>
+              {wristThreadTrapAlert.explanation}
+            </p>
+            <div
+              style={{
+                background: wristThreadTrapAlert.isDusthana ? "rgba(220, 38, 38, 0.06)" : "rgba(22, 163, 74, 0.06)",
+                border: wristThreadTrapAlert.isDusthana ? "1px solid rgba(220, 38, 38, 0.25)" : "1px solid rgba(22, 163, 74, 0.25)",
+                borderRadius: 10,
+                padding: "12px 14px",
+                fontSize: 13,
+                color: wristThreadTrapAlert.isDusthana ? "#991B1B" : "#15803d",
+                lineHeight: 1.6,
+                marginTop: 10,
+              }}
+            >
+              ✦ <strong>सख्त निर्देश:</strong> {wristThreadTrapAlert.correctiveAction}
+            </div>
+          </div>
+
+          {/* 5. मंगल किलर हिट: खान-पान व जीवनशैली निषेध */}
+          <div
+            className="card"
+            style={{
+              borderLeft: marsDietaryLifestyleProtocol.isMarsAfflicted ? "6px solid #EA580C" : "6px solid #16a34a",
+              background: "#FFFFFF",
+              padding: 22,
+              boxShadow: marsDietaryLifestyleProtocol.isMarsAfflicted ? "0 4px 16px rgba(234, 88, 12, 0.08)" : "none",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <span
+                  className={marsDietaryLifestyleProtocol.isMarsAfflicted ? "badge badge-red" : "badge badge-green"}
+                  style={{ fontWeight: 700 }}
+                >
+                  सूत्र 5 · Mars Dietary & Lifestyle Protocol
+                </span>
+                <h3 style={{ margin: "6px 0", fontSize: 18, color: "#1A1A1A", fontWeight: 700 }}>
+                  🌶️ मंगल आघात: खान-पान व जीवनशैली निषेध
+                </h3>
+              </div>
+              {marsDietaryLifestyleProtocol.afflictionType && (
+                <span style={{ fontSize: 12, color: "#EA580C", fontWeight: 700, background: "rgba(234, 88, 12, 0.1)", padding: "4px 8px", borderRadius: 8 }}>
+                  {marsDietaryLifestyleProtocol.afflictionType}
+                </span>
+              )}
+            </div>
+
+            <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.65, margin: "8px 0" }}>
+              {marsDietaryLifestyleProtocol.directiveText}
+            </p>
+
+            <div className="grid-2" style={{ marginTop: 14 }}>
+              <div style={{ background: "#FEF2F2", borderRadius: 12, padding: 14, border: "1px solid rgba(239, 68, 68, 0.25)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#DC2626", textTransform: "uppercase", marginBottom: 6 }}>
+                  ❌ तत्काल वर्जित खान-पान व वस्तुएं
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                  {marsDietaryLifestyleProtocol.prohibitedDiet.concat(marsDietaryLifestyleProtocol.prohibitedItems).map((item, i) => (
+                    <li key={i} style={{ fontSize: 12.5, color: "#7F1D1D", lineHeight: 1.6 }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div style={{ background: "#F0FDF4", borderRadius: 12, padding: 14, border: "1px solid rgba(34, 197, 94, 0.25)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#15803d", textTransform: "uppercase", marginBottom: 6 }}>
+                  ✅ अनुशंसित सकारात्मक जीवनशैली
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                  {marsDietaryLifestyleProtocol.recommendedReplacements.map((item, i) => (
+                    <li key={i} style={{ fontSize: 12.5, color: "#14532D", lineHeight: 1.6 }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* 6. पढ़ाई और ऑनलाइन कार्य की सही दिशा */}
+          <div
+            className="card"
+            style={{
+              borderLeft: "6px solid #2563EB",
+              background: "#FFFFFF",
+              padding: 22,
+              boxShadow: "0 4px 16px rgba(37, 99, 235, 0.08)",
+            }}
+          >
+            <div>
+              <span className="badge badge-blue" style={{ fontWeight: 700 }}>
+                सूत्र 6 · Personal Study & Online Work Direction
+              </span>
+              <h3 style={{ margin: "6px 0", fontSize: 18, color: "#1A1A1A", fontWeight: 700 }}>
+                📚 व्यक्तिगत पढ़ाई व ऑनलाइन कार्य दिशा कैलकुलेटर
+              </h3>
+            </div>
+
+            <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.65, margin: "8px 0" }}>
+              {studyAndWorkDirection.rationale}
+            </p>
+
+            <div className="grid-3" style={{ marginTop: 14 }}>
+              <div style={{ background: "#FAF8F5", borderRadius: 12, padding: 14, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>
+                  4था भाव · शिक्षा व मानसिक शांति
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  {studyAndWorkDirection.fourthHouseSign}
+                </div>
+                <div style={{ fontSize: 13, color: "#B8860B", fontWeight: 600, marginTop: 2 }}>
+                  {studyAndWorkDirection.fourthHouseDirection} ({studyAndWorkDirection.fourthHouseHindi})
+                </div>
+              </div>
+
+              <div style={{ background: "#FAF8F5", borderRadius: 12, padding: 14, border: "1px solid rgba(184, 134, 11, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase" }}>
+                  9वां भाव · उच्च ज्ञान व भाग्य
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  {studyAndWorkDirection.ninthHouseSign}
+                </div>
+                <div style={{ fontSize: 13, color: "#B8860B", fontWeight: 600, marginTop: 2 }}>
+                  {studyAndWorkDirection.ninthHouseDirection} ({studyAndWorkDirection.ninthHouseHindi})
+                </div>
+              </div>
+
+              <div style={{ background: "#FAF8F5", borderRadius: 12, padding: 14, border: "1px solid rgba(37, 99, 235, 0.25)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#2563EB", textTransform: "uppercase" }}>
+                  10वां भाव · करियर व ऑनलाइन बिज़नेस
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A", marginTop: 4 }}>
+                  {studyAndWorkDirection.tenthHouseSign}
+                </div>
+                <div style={{ fontSize: 13, color: "#2563EB", fontWeight: 600, marginTop: 2 }}>
+                  {studyAndWorkDirection.tenthHouseDirection} ({studyAndWorkDirection.tenthHouseHindi})
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: 14,
+                background: "rgba(37, 99, 235, 0.06)",
+                border: "1px solid rgba(37, 99, 235, 0.25)",
+                borderRadius: 10,
+                padding: "12px 14px",
+                fontSize: 13,
+                color: "#1E40AF",
+                lineHeight: 1.6,
+              }}
+            >
+              ✦ <strong>अध्ययन की सर्वोत्तम दिशा:</strong> {studyAndWorkDirection.recommendedStudyZone} ({studyAndWorkDirection.recommendedStudyZoneHindi}) में बैठकर पूर्व या उत्तर मुख करें।<br/>
+              ✦ <strong>ऑनलाइन कार्य/लैपटॉप टेबल:</strong> {studyAndWorkDirection.recommendedOnlineWorkZone} ({studyAndWorkDirection.recommendedOnlineWorkZoneHindi}) क्षेत्र में बैठना सर्वाधिक लाभकारी है।
+            </div>
+          </div>
         </div>
       )}
     </div>

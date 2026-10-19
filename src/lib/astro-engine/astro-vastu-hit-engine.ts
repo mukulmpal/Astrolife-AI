@@ -122,6 +122,41 @@ export interface GenericVastuConflict {
   recommendation: string;
 }
 
+export interface StudyAndWorkDirection {
+  fourthHouseSign: string;
+  fourthHouseDirection: string;
+  fourthHouseHindi: string;
+  ninthHouseSign: string;
+  ninthHouseDirection: string;
+  ninthHouseHindi: string;
+  tenthHouseSign: string;
+  tenthHouseDirection: string;
+  tenthHouseHindi: string;
+  recommendedStudyZone: string;
+  recommendedStudyZoneHindi: string;
+  recommendedOnlineWorkZone: string;
+  recommendedOnlineWorkZoneHindi: string;
+  rationale: string;
+}
+
+export interface MarsDietaryLifestyleProtocol {
+  isMarsAfflicted: boolean;
+  afflictionType?: string;
+  prohibitedDiet: string[];
+  prohibitedItems: string[];
+  recommendedReplacements: string[];
+  directiveText: string;
+}
+
+export interface WristThreadTrapAlert {
+  geminiHouse: number;
+  isDusthana: boolean;
+  severity: "CRITICAL" | "HIGH" | "NONE";
+  alertTitle: string;
+  explanation: string;
+  correctiveAction: string;
+}
+
 export interface AstroVastuHitDossier {
   nativeName: string;
   lagnaSign: string;
@@ -146,6 +181,9 @@ export interface AstroVastuHitDossier {
     rule: string;
     practicalAdvice: string;
   };
+  studyAndWorkDirection: StudyAndWorkDirection;
+  marsDietaryLifestyleProtocol: MarsDietaryLifestyleProtocol;
+  wristThreadTrapAlert: WristThreadTrapAlert;
 }
 
 // ── Master Definitions & Constants ──────────────────────────────────────────
@@ -676,6 +714,74 @@ export function runAstroVastuHitEngine(
     };
   }
 
+  // 10. Study and Work Direction Calculation (Lecture Rule: 4th House comfort & 9th/10th House direction)
+  const cusp4 = cuspCoords[4];
+  const cusp9 = cuspCoords[9];
+  const cusp10 = cuspCoords[10];
+
+  const studyAndWorkDirection: StudyAndWorkDirection = {
+    fourthHouseSign: cusp4?.sign || "Cancer",
+    fourthHouseDirection: cusp4?.direction.direction || "NE",
+    fourthHouseHindi: cusp4?.direction.directionHindi || "उत्तर-पूर्व (ईशान)",
+    ninthHouseSign: cusp9?.sign || "Sagittarius",
+    ninthHouseDirection: cusp9?.direction.direction || "NE",
+    ninthHouseHindi: cusp9?.direction.directionHindi || "उत्तर-पूर्व (ईशान)",
+    tenthHouseSign: cusp10?.sign || "Capricorn",
+    tenthHouseDirection: cusp10?.direction.direction || "South",
+    tenthHouseHindi: cusp10?.direction.directionHindi || "दक्षिण",
+    recommendedStudyZone: `${cusp4?.direction.direction || "NE"} (${cusp4?.sign || ""}) या ${cusp9?.direction.direction || "NE"} (${cusp9?.sign || ""})`,
+    recommendedStudyZoneHindi: `${cusp4?.direction.directionHindi || ""} या ${cusp9?.direction.directionHindi || ""}`,
+    recommendedOnlineWorkZone: `${cusp10?.direction.direction || "South"} (${cusp10?.sign || ""}) या ${cusp4?.direction.direction || "NE"}`,
+    recommendedOnlineWorkZoneHindi: `${cusp10?.direction.directionHindi || ""} या ${cusp4?.direction.directionHindi || ""}`,
+    rationale: `किताबी वास्तु केवल उत्तर/पूर्व बताता है, परंतु एस्ट्रो-वास्तु के अनुसार आपकी शिक्षा व मानसिक सुख 4थे भाव (${cusp4?.sign} - ${cusp4?.direction.direction}) और 9वें भाव (${cusp9?.sign} - ${cusp9?.direction.direction}) से संचालित है। इस दिशा में बैठकर पूर्व या उत्तर की ओर मुख करके अध्ययन करने से उच्चतम एकाग्रता प्राप्त होती है। ऑनलाइन व्यापार व करियर के लिए 10वें भाव (${cusp10?.sign} - ${cusp10?.direction.direction}) की दिशा में बैठना सर्वोत्तम है।`,
+  };
+
+  // 11. Mars Dietary & Lifestyle Protocol (Lecture Rule: 180°/90° Hit or Traffic Police)
+  const marsAffliction = killerHits180.find(h => h.sourceName === "Mars") || dangerousHits90.find(h => h.sourceName === "Mars") || trafficPoliceBlockades.find(b => b.blockingPlanet === "Mars");
+  const marsDietaryLifestyleProtocol: MarsDietaryLifestyleProtocol = {
+    isMarsAfflicted: Boolean(marsAffliction),
+    afflictionType: marsAffliction
+      ? "hitAngle" in marsAffliction
+        ? `Traffic Police ${marsAffliction.hitAngle}° Blockade on ${marsAffliction.dashaLordName}`
+        : `${marsAffliction.hitDef.name} on ${marsAffliction.targetName}`
+      : undefined,
+    prohibitedDiet: [
+      "तीखी लाल मिर्च (Spicy red chilies) का सेवन तत्काल बंद करें",
+      "साबुत या धुली मसूर की दाल (Red Lentils / Masoor Dal) पूर्णतः वर्जित रखें",
+      "अत्यधिक गरम मसाले, सिरका व उत्तेजक भोजन से परहेज करें",
+    ],
+    prohibitedItems: [
+      "कलाई, गले या शरीर पर लाल मौली/धागा या गहरे लाल रंग के वस्त्र न पहनें",
+      "घर के ENE (पूर्व-उत्तर-पूर्व) या पीड़ित जोन में धारदार चाकू, हथियार या जलते हीटर न रखें",
+    ],
+    recommendedReplacements: [
+      "120° त्रिकोण भाव (House 9 / 5) की दिशा में सिंदूरी हनुमान जी का चित्र लगाएं",
+      "भोजन में सौम्य सात्विक आहार लें और क्रोध/उत्तेजना से बचें",
+    ],
+    directiveText: Boolean(marsAffliction)
+      ? "आपकी कुंडली में मंगल सक्रिय आघात या दशा अवरोध उत्पन्न कर रहा है। जब तक मसूर की दाल, तीखी लाल मिर्च और लाल मौली का त्याग नहीं किया जाता, तब तक प्रत्यंतर दशा आते ही सर्जरी, चोट या कलह का खतरा बना रहेगा।"
+      : "मंगल सामान्य स्थिति में है; कोई गंभीर खान-पान निषेध लागू नहीं है।",
+  };
+
+  // 12. Wrist-Thread Trap Alert (Lecture Rule: Gemini / 3rd Sign)
+  const geminiCusp = Object.values(cuspCoords).find(c => c.signNum === 3);
+  const geminiHouse = geminiCusp?.house || 3;
+  const isGeminiDusthana = [6, 8, 12].includes(geminiHouse);
+  const wristThreadTrapAlert: WristThreadTrapAlert = {
+    geminiHouse,
+    isDusthana: isGeminiDusthana,
+    severity: isGeminiDusthana ? "HIGH" : "NONE",
+    alertTitle: isGeminiDusthana
+      ? `⚠️ कलाई पर धागे का चक्रव्यूह: मिथुन राशि भाव ${geminiHouse} में स्थित है`
+      : `कलाई ऊर्जा सामान्य: मिथुन राशि भाव ${geminiHouse} में स्थित है`,
+    explanation: isGeminiDusthana
+      ? `कलाई और बाजुएं सीधे कालपुरुष के 3रे भाव (मिथुन) का प्रतिनिधित्व करती हैं। आपकी जन्मकुंडली में मिथुन राशि भाव ${geminiHouse} (${geminiHouse === 8 ? "मृत्यु/बाधा/चिंता" : geminiHouse === 12 ? "व्यय/हानि/अनिद्रा" : "रोग/ऋण"}) की स्वामी है। यदि आप कलाई पर किसी मंदिर या पंडित जी का दिया हुआ हरा, लाल या काला धागा बांधते हैं, तो वह सीधे भाव ${geminiHouse} की नकारात्मक ऊर्जा को सक्रिय कर देता है, जिससे भारी तनाव व मित्रों से विच्छेद होता है!`
+      : `आपकी कुंडली में मिथुन राशि केंद्र/त्रिकोण (भाव ${geminiHouse}) में है, इसलिए कलाई पर धागा बांधने से कोई दुस्थान जनित दोष उत्पन्न नहीं होता।`,
+    correctiveAction: isGeminiDusthana
+      ? "कलाई को किसी भी प्रकार के धागे से तुरंत मुक्त रखें। यदि कुबेर जी या किसी देवता की पूजा करनी है तो उनका प्रतीक घर की उत्तर दिशा में स्थापित करें, शरीर पर धागा न बांधें।"
+      : "कलाई पर सामान्य रक्षा सूत्र धारण किया जा सकता है।",
+  };
+
   return {
     nativeName: chart.name || "Seeker",
     lagnaSign: chart.lagnaRashi,
@@ -699,6 +805,9 @@ export function runAstroVastuHitEngine(
       rule: "यदि घर के सामान्य/साझा कमरे में कोई वस्तु या रंग स्थापित करने से परिवार के किसी अन्य सदस्य की कुंडली पर विपरीत प्रभाव (Cross-Hit) पड़ने की संभावना हो, तो उस उपाय को पूरे घर या साझा हॉल में न करें।",
       practicalAdvice: "उस वस्तु को केवल जातक के व्यक्तिगत शयनकक्ष (Personal Bedroom), निजी स्टडी डेस्क, जेब (Pocket), या पर्स में ही रखें। उदाहरण के लिए, लाल कपड़े में 4-5 लाल मिर्च या तांबे का सिक्का अपनी जेब में रखने से केवल जातक का मंगल सक्रिय होगा, परिवार के बाकी सदस्यों की शांति भंग नहीं होगी।",
     },
+    studyAndWorkDirection,
+    marsDietaryLifestyleProtocol,
+    wristThreadTrapAlert,
   };
 }
 

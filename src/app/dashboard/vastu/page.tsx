@@ -509,7 +509,7 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
 export default function VastuDashboardPage() {
   const { chart, loading: chartLoading, hasUserChart } = useUserChart();
   const [kundli, setKundli] = useState<NormalizedKundli | null>(null);
-  const [analysisMode, setAnalysisMode] = useState<"kundli" | "property" | "hitRadar">("kundli");
+  const [analysisMode, setAnalysisMode] = useState<"hitRadar" | "kundli" | "property">("hitRadar");
   const [chartLoadMessage, setChartLoadMessage] = useState("Chart not loaded yet.");
   const [propertyType, setPropertyType] = useState("home");
   const [facing, setFacing] = useState<Direction>("");
@@ -651,9 +651,9 @@ export default function VastuDashboardPage() {
   if (!hasUserChart) {
     return (
       <EngineEmptyState
-        engineName="Vastu Shastra"
+        engineName="Astro-Vastu Shastra"
         engineIcon="🏠"
-        whatItAnalyzes={["16-zone MahaVastu map", "Strong & weak zones", "Room placement", "Remedial directions"]}
+        whatItAnalyzes={["Astro-Vastu Hit Radar (3-5-8 Rule)", "Traffic Police Dasha Blockade", "120° Protective Shield Shifting", "16-Zone MahaVastu Map"]}
       />
     );
   }
@@ -661,9 +661,9 @@ export default function VastuDashboardPage() {
   return (
     <EngineShell>
       <EngineHeader
-        eyebrow="Vastu Engine"
-        title="AstroLife Vastu Shastra Intelligence"
-        subtitle="Kundli Vastu for chart-based zone intelligence. Property Vastu for practical room, direction and remedy analysis."
+        eyebrow="Astro-Vastu Shastra"
+        title="AstroLife Astro-Vastu & Hit Theory Intelligence"
+        subtitle="Authentic Astro-Vastu Hit Theory, 12-direction spatial radar, Traffic Police dasha blockades, 120° protective shifting, and 16-zone MahaVastu."
         icon="🏠"
         metrics={completeAnalysis ? [
           { label: "Overall Score", value: completeAnalysis.overallScore },
@@ -679,12 +679,6 @@ export default function VastuDashboardPage() {
 
       {/* Mode switcher */}
       <div className="tabs">
-        <button className={`tab ${analysisMode === "kundli" ? "active" : ""}`} onClick={() => setAnalysisMode("kundli")}>
-          ✦ Kundli Vastu
-        </button>
-        <button className={`tab ${analysisMode === "property" ? "active" : ""}`} onClick={() => setAnalysisMode("property")}>
-          🏗 Property Vastu
-        </button>
         <button
           className={`tab ${analysisMode === "hitRadar" ? "active" : ""}`}
           onClick={() => setAnalysisMode("hitRadar")}
@@ -700,6 +694,12 @@ export default function VastuDashboardPage() {
           }
         >
           ⚡ Astro-Vastu Hit Radar (हिट थ्योरी)
+        </button>
+        <button className={`tab ${analysisMode === "kundli" ? "active" : ""}`} onClick={() => setAnalysisMode("kundli")}>
+          ✦ Kundli Vastu
+        </button>
+        <button className={`tab ${analysisMode === "property" ? "active" : ""}`} onClick={() => setAnalysisMode("property")}>
+          🏗 Property Vastu
         </button>
       </div>
 

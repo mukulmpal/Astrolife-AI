@@ -1116,7 +1116,7 @@ function DashboardContent() {
                   { icon:"🧮", label:"Ashtakavarga",      desc:"House bindu scoring",         href:"/dashboard/ashtakavarga" },
                   { icon:"🧩", label:"Divisional Charts", desc:"D9 and varga depth",          href:"/dashboard/divisional" },
                   { icon:"🔢", label:"Numerology",        desc:"Name and date numbers",       href:"/dashboard/numerology" },
-                  { icon:"🏠", label:"Vastu",             desc:"16-zone vastu engine",        href:"/dashboard/vastu" },
+                  { icon:"🏠", label:"Astro-Vastu",       desc:"Hit Theory, 12-dir radar & traffic police", href:"/dashboard/vastu" },
                   { icon:"🧭", label:"KP Engine",         desc:"Krishnamurti precision",      href:"/dashboard/kp" },
                   { icon:"💎", label:"Gemstone",         desc:"Safe gemstone guidance",       href:"/dashboard/gemstone" },
                   { icon:"📄", label:"Premium Report",    desc:"Full integrated report",      href:"/dashboard/report" },
