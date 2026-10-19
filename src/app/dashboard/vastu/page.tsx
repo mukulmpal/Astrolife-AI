@@ -4,11 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { downloadVastuPDFReport } from "@/lib/report-generator";
 import { calculateVastu, type VastuResult as CompleteVastuResult } from "@/lib/astro-engine/vastu";
-import { useUserChart } from "@/lib/user-chart";
+import { useUserChart, buildChart, type BirthDetails } from "@/lib/user-chart";
 import { EngineShell, EngineHeader, EngineSectionTitle } from "@/components/engine/EngineShell";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { AstroVastuHitRadarView } from "@/components/vastu/AstroVastuHitRadarView";
 import "@/app/dashboard/shared.css";
+
+const DEMO_VASTU_BIRTH: BirthDetails = {
+  name: "Mukul Ji (Demo Chart)",
+  dob: "1995-07-04",
+  tob: "12:30",
+  city: "Delhi",
+  tz: 5.5,
+};
 
 type Direction = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "CENTER" | "";
 
@@ -529,10 +537,18 @@ export default function VastuDashboardPage() {
   const [mindMakanTab, setMindMakanTab] = useState<"physical" | "behavioural" | "routine" | "emotional" | "spiritual">("physical");
   const [activeZoneTab, setActiveZoneTab] = useState<"all" | "strong" | "weak" | "psych" | "transit">("all");
   const [pdfLoading, setPdfLoading] = useState(false);
+  const isDemo = !hasUserChart || !chart?.planets || Object.keys(chart.planets).length === 0;
+  const effectiveChart = useMemo(() => {
+    if (!isDemo && chart) {
+      return chart;
+    }
+    return buildChart(DEMO_VASTU_BIRTH);
+  }, [isDemo, chart]);
+
   const completeAnalysis = useMemo(() => {
-    if (!chart?.planets) return null;
-    return calculateVastu(chart.planets);
-  }, [chart]);
+    if (!effectiveChart?.planets) return null;
+    return calculateVastu(effectiveChart.planets);
+  }, [effectiveChart]);
 
   function refreshChart() {
     const loaded = loadUserChartFromStorage();
@@ -648,16 +664,6 @@ export default function VastuDashboardPage() {
     );
   }
 
-  if (!hasUserChart) {
-    return (
-      <EngineEmptyState
-        engineName="Astro-Vastu Shastra"
-        engineIcon="🏠"
-        whatItAnalyzes={["Astro-Vastu Hit Radar (3-5-8 Rule)", "Traffic Police Dasha Blockade", "120° Protective Shield Shifting", "16-Zone MahaVastu Map"]}
-      />
-    );
-  }
-
   return (
     <EngineShell>
       <EngineHeader
@@ -673,9 +679,72 @@ export default function VastuDashboardPage() {
         ] : [
           { label: "Mode", value: analysisMode === "kundli" ? "Kundli" : analysisMode === "property" ? "Property" : "Hit Radar", tone: "gold" },
           { label: "Rooms", value: rooms.length, tone: "blue" },
-          { label: "Chart", value: chart ? "Linked" : "Needed", tone: chart ? "green" : "red" },
+          { label: "Chart", value: !isDemo ? "Personal" : "Demo (Mukul)", tone: !isDemo ? "green" : "gold" },
         ]}
       />
+
+      {/* Demo Chart Notice Banner when no personal chart is loaded */}
+      {isDemo && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(184, 134, 11, 0.05))",
+            border: "1px solid rgba(212, 175, 55, 0.35)",
+            borderRadius: 14,
+            padding: "14px 18px",
+            marginBottom: 20,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 12,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 24 }}>💡</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#8A6008" }}>
+                डेमो कुंडली सक्रिय (Sample Kundli: Mukul Ji · कन्या लग्न)
+              </div>
+              <div style={{ fontSize: 13, color: "#4A4238", marginTop: 2 }}>
+                आप लाइव एस्ट्रो-वास्तु हिट रडार (3-5-8 नियम), ट्रैफिक पुलिस व दिशाएं देख रहे हैं। अपनी व्यक्तिगत कुंडली से देखने के लिए अपनी जन्म तिथि जोड़ें।
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <a
+              href="/onboarding"
+              style={{
+                padding: "8px 16px",
+                borderRadius: 8,
+                background: "#B8860B",
+                color: "#FAF7F2",
+                fontSize: 13,
+                fontWeight: 600,
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              + अपनी कुंडली बनाएं
+            </a>
+            <a
+              href="/dashboard/history"
+              style={{
+                padding: "8px 16px",
+                borderRadius: 8,
+                border: "1px solid rgba(184, 134, 11, 0.4)",
+                background: "#FFFFFF",
+                color: "#8A6008",
+                fontSize: 13,
+                fontWeight: 600,
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              सेव्ड कुंडली चुनें
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Mode switcher */}
       <div className="tabs">
@@ -704,7 +773,7 @@ export default function VastuDashboardPage() {
       </div>
 
       {/* ── ASTRO-VASTU HIT RADAR ── */}
-      {analysisMode === "hitRadar" && <AstroVastuHitRadarView chart={chart} />}
+      {analysisMode === "hitRadar" && <AstroVastuHitRadarView chart={effectiveChart} />}
 
       {/* ── KUNDLI VASTU ── */}
       {analysisMode === "kundli" && <CompleteAnalysisPanel result={completeAnalysis} />}

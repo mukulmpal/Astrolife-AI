@@ -368,11 +368,21 @@ export function runAstroVastuHitEngine(
   chart: ChartData | null | undefined,
   evaluationDate: Date = new Date()
 ): AstroVastuHitDossier | null {
-  if (!chart || !chart.planets || !chart.lagnaRashi) {
+  if (!chart || !chart.planets) {
     return null;
   }
 
-  const lagnaSignNum = chart.lagnaNum || getSignNumber(chart.lagnaRashi);
+  const lagnaSign =
+    chart.lagnaRashi ||
+    (chart as any).ascendant?.sign ||
+    (chart as any).lagna?.sign ||
+    (chart as any).ascendant ||
+    (chart as any).lagna ||
+    (typeof chart.lagnaNum === "number" && chart.lagnaNum >= 1 && chart.lagnaNum <= 12
+      ? RASHIS_ORDER[chart.lagnaNum - 1]
+      : "Virgo");
+
+  const lagnaSignNum = chart.lagnaNum || getSignNumber(lagnaSign);
   const lagnaDegInSign = (chart.lagnaLon ?? 0) % 30;
   const lagnaCompoundDeg = calculateCompoundDegree(lagnaSignNum, lagnaDegInSign);
 
@@ -386,6 +396,20 @@ export function runAstroVastuHitEngine(
     const s = new Date(a.start), e = new Date(a.end);
     return evaluationDate >= s && evaluationDate < e;
   })?.planet || chart.antardasha?.find(a => a.active)?.planet || activeMD;
+
+  // Helper for resilient planet data access (handles titlecase, lowercase, or named objects)
+  const getPlanetData = (p: string) => {
+    if (!chart?.planets) return undefined;
+    if (chart.planets[p]) return chart.planets[p];
+    if (chart.planets[p.toLowerCase()]) return chart.planets[p.toLowerCase()];
+    const entry = Object.entries(chart.planets).find(
+      ([k, v]: [string, any]) =>
+        k.toLowerCase() === p.toLowerCase() ||
+        (v?.name && String(v.name).toLowerCase() === p.toLowerCase()) ||
+        (v?.planet && String(v.planet).toLowerCase() === p.toLowerCase())
+    );
+    return entry ? entry[1] : undefined;
+  };
 
   // 2. Build Planet Coordinates Map
   const planetCoords: Record<string, {
@@ -405,12 +429,12 @@ export function runAstroVastuHitEngine(
   // Find all nakshatra lords to detect Untenanted planets
   const occupiedNakLords = new Set<string>();
   planetNames.forEach(p => {
-    const d = chart.planets[p];
+    const d = getPlanetData(p);
     if (d?.nakshatraLord) occupiedNakLords.add(d.nakshatraLord);
   });
 
   planetNames.forEach(p => {
-    const d = chart.planets[p];
+    const d = getPlanetData(p);
     if (!d) return;
     const sNum = d.signNum !== undefined ? (d.signNum >= 1 && d.signNum <= 12 ? d.signNum : d.signNum + 1) : getSignNumber(d.sign);
     const deg = (d.degree || 0) + (d.minutes || 0) / 60;
@@ -784,7 +808,7 @@ export function runAstroVastuHitEngine(
 
   return {
     nativeName: chart.name || "Seeker",
-    lagnaSign: chart.lagnaRashi,
+    lagnaSign,
     lagnaSignNum,
     lagnaCompoundDeg,
     activeDasha: {

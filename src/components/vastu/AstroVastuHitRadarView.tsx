@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChartData } from "@/lib/astro-engine/calculations";
+import { buildChart, type BirthDetails } from "@/lib/user-chart";
 import {
   runAstroVastuHitEngine,
   ASTRO_VASTU_SIGN_DIRECTIONS,
@@ -13,8 +14,16 @@ import {
   type GenericVastuConflict,
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
 
+const DEMO_VASTU_FALLBACK: BirthDetails = {
+  name: "Mukul Ji (Demo Chart)",
+  dob: "1995-07-04",
+  tob: "12:30",
+  city: "Delhi",
+  tz: 5.5,
+};
+
 interface AstroVastuHitRadarViewProps {
-  chart: ChartData | any;
+  chart?: ChartData | any;
 }
 
 export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
@@ -24,6 +33,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 120>("all");
   const [selectedDirectionCode, setSelectedDirectionCode] = useState<string>("N");
   const [targetDateStr, setTargetDateStr] = useState<string>("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const targetDate = useMemo(() => {
     if (!targetDateStr) return new Date();
@@ -31,15 +45,27 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     return isNaN(parsed.getTime()) ? new Date() : parsed;
   }, [targetDateStr]);
 
+  const resolvedChart = useMemo(() => {
+    if (chart && chart.planets && Object.keys(chart.planets).length > 0) {
+      return chart;
+    }
+    return buildChart(DEMO_VASTU_FALLBACK);
+  }, [chart]);
+
   const dossier: AstroVastuHitDossier | null = useMemo(() => {
-    if (!chart) return null;
     try {
-      return runAstroVastuHitEngine(chart, targetDate);
+      const res = runAstroVastuHitEngine(resolvedChart, targetDate);
+      if (res) return res;
+      return runAstroVastuHitEngine(buildChart(DEMO_VASTU_FALLBACK), targetDate);
     } catch (e) {
       console.error("AstroVastu Hit Engine error:", e);
-      return null;
+      try {
+        return runAstroVastuHitEngine(buildChart(DEMO_VASTU_FALLBACK), targetDate);
+      } catch {
+        return null;
+      }
     }
-  }, [chart, targetDate]);
+  }, [resolvedChart, targetDate]);
 
   if (!dossier) {
     return (
@@ -161,7 +187,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             </div>
             <input
               type="date"
-              value={targetDateStr || new Date().toISOString().split("T")[0]}
+              value={isMounted ? (targetDateStr || new Date().toISOString().split("T")[0]) : "2026-10-20"}
               onChange={(e) => setTargetDateStr(e.target.value)}
               style={{
                 background: "#1A1A1A",
