@@ -1,8 +1,24 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { isAdminUser } from "@/lib/access";
 import { NextResponse } from "next/server";
+
+async function verifyAdminCaller() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !isAdminUser(user.email)) {
+    return null;
+  }
+  return user;
+}
 
 export async function GET() {
   try {
+    const adminUser = await verifyAdminCaller();
+    if (!adminUser) {
+      return NextResponse.json({ error: "Unauthorized. Admin access only." }, { status: 403 });
+    }
+
     const admin = createAdminClient();
 
     const [

@@ -319,7 +319,7 @@ export function CorePlanetRemediesDossier({
                 fontWeight: 700
               }}
             >
-              Master Oral Lecture Engine ✦ Shaktikaran, Daan &amp; Gochar
+              Classical Remedy Engine ✦ Shaktikaran, Daan &amp; Gochar
             </div>
             <div
               style={{
@@ -1198,7 +1198,7 @@ export function CorePlanetRemediesDossier({
                 }}
               >
                 <h4 style={{ margin: "0 0 12px 0", fontSize: 16, fontWeight: 800, color: "#1F2937" }}>
-                  Oral Lecture Derived Formula: Kharid vs Bikri Bhavat Bhavam
+                  Classical Shastric Formula: Kharid vs Bikri Bhavat Bhavam
                 </h4>
                 <div
                   style={{

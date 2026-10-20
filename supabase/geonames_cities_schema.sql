@@ -29,3 +29,13 @@ on public.cities(lower(name));
 
 create index if not exists cities_ascii_name_lower_idx
 on public.cities(lower(ascii_name));
+
+-- Enable Row Level Security and allow public read-only access for autocomplete/search
+alter table public.cities enable row level security;
+
+drop policy if exists "Allow public read access on cities" on public.cities;
+create policy "Allow public read access on cities"
+  on public.cities
+  for select
+  to anon, authenticated
+  using (true);

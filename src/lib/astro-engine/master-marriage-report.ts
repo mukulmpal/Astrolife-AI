@@ -659,7 +659,7 @@ export function generateMasterMarriageReport(
       title: "गरीब विवाह सहयोग दान (12th House Venus Shastra Upay)",
       procedure: charityRemedy,
       caution: "अहंकार रहित होकर गुप्त रूप से सहयोग करें।",
-      astrologicalRationale: "गुरुजी के व्याख्यान का सूत्र: 12वें भाव से जुड़े शुक्र/तुला का दान करने से शयन सुख की रक्षा होती है और अनावश्यक खर्च व अस्पताल का भय कटता है।",
+      astrologicalRationale: "शास्त्रीय सूत्र: 12वें भाव से जुड़े शुक्र/तुला का दान करने से शयन सुख की रक्षा होती है और अनावश्यक खर्च व अस्पताल का भय कटता है।",
     });
   }
 

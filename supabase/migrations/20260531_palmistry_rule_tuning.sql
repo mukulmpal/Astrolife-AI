@@ -29,3 +29,7 @@ on palmistry_rule_tuning(recommendation);
 
 create index if not exists palmistry_rule_tuning_category_idx
 on palmistry_rule_tuning(category);
+
+-- Enable RLS and restrict access to service role
+alter table palmistry_rule_tuning enable row level security;
+revoke all on palmistry_rule_tuning from public;

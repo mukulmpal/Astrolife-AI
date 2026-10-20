@@ -606,7 +606,7 @@ export function auditUserWearables(
     const symptoms: string[] = [];
     let recommendation = "";
 
-    // ── PATTERN A: Copper/Red Mouli during Mars Dasha with 180° Hit (e.g. Manisha's case)
+    // ── PATTERN A: Copper/Red Mouli during Mars Dasha with 180° Hit
     if ((worn.item === "copper" || worn.item === "red_mouli" || worn.item === "coral") && (itemPlanet === "Mars" || itemPlanet === "Sun")) {
       if (isDashaLord && hasAfflictionHits) {
         severity = "CRITICAL_REMOVE";
@@ -862,10 +862,13 @@ export function auditUserWearables(
 
 // ── Preset Diagnostic Scenarios for Instant Testing ──────────────────────────
 
-export const PRESET_MANISHA_ITEMS: WornItemInput[] = [
+export const PRESET_SAMPLE_ITEMS: WornItemInput[] = [
   { id: "item-1", location: "finger_index", item: "copper" },
   { id: "item-2", location: "wrist_right", item: "red_mouli" },
   { id: "item-3", location: "wrist_right", item: "steel_heavy" },
   { id: "item-4", location: "feet_soles", item: "silver_ghungroo" },
   { id: "item-5", location: "feet_soles", item: "black_thread" },
 ];
+
+export const PRESET_MANISHA_ITEMS = PRESET_SAMPLE_ITEMS;
+

@@ -6,7 +6,7 @@ import {
   auditUserWearables,
   BODY_LOCATION_REGISTRY,
   WEARABLE_ITEMS_REGISTRY,
-  PRESET_MANISHA_ITEMS,
+  PRESET_SAMPLE_ITEMS,
   type BodyLocationId,
   type WearableItemId,
   type WornItemInput,
@@ -44,8 +44,8 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
     setWornItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleLoadManishaPreset = () => {
-    setWornItems(PRESET_MANISHA_ITEMS);
+  const handleLoadSamplePreset = () => {
+    setWornItems(PRESET_SAMPLE_ITEMS);
   };
 
   const handleClearAll = () => {
@@ -94,7 +94,7 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button
-              onClick={handleLoadManishaPreset}
+              onClick={handleLoadSamplePreset}
               style={{
                 fontSize: 12,
                 fontWeight: 700,
@@ -106,7 +106,7 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
                 cursor: "pointer",
               }}
             >
-              ⚡ मनीषा जी के 5 आभूषण लोड करें (Demo)
+              ⚡ मानक केस स्टडी लोड करें (Sample Demo)
             </button>
             <button
               onClick={handleClearAll}
@@ -475,3 +475,4 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
     </div>
   );
 }
+

@@ -449,7 +449,7 @@ export default function MasterMarriageReportPanel({
         <div className="card" style={{ borderColor: "rgba(184,134,11,0.35)", background: "linear-gradient(145deg, #FFFFFF 0%, #FFFDF8 100%)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
             <div>
-              <div className="card-tag" style={{ color: "#875C06" }}>कालपुरुष दांपत्य सूत्र · मौखिक व्याख्यान रहस्य</div>
+              <div className="card-tag" style={{ color: "#875C06" }}>कालपुरुष दांपत्य सूत्र · शास्त्रीय रहस्य</div>
               <h2 className="card-title serif" style={{ margin: 0, fontSize: 24, color: "#1A1A1A" }}>
                 ⚖️ कालपुरुष की ७वीं राशि (तुला) — जीवनसाथी प्राप्ति व दांपत्य संतुलन
               </h2>
@@ -460,7 +460,7 @@ export default function MasterMarriageReportPanel({
           </div>
 
           <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.8, marginBottom: 18 }}>
-            कालपुरुष प्राकृतिक चक्र में <strong>७वीं राशि तुला (Libra)</strong> शुक्र की मूल राशि है, जो समस्त जगत में विवाह, जीवनसाथी और साझेदारी की जन्मजात अधिष्ठात्री है। व्याख्यान के अनुसार, आपकी जन्म कुंडली में ७ नंबर (तुला) जिस भाव में बैठती है, वह यह तय करती है कि <em>जीवनसाथी किस माध्यम से आएगा</em>, और <em>दांपत्य जीवन का तराजू किस विषय पर साधना होगा</em>।
+            कालपुरुष प्राकृतिक चक्र में <strong>७वीं राशि तुला (Libra)</strong> शुक्र की मूल राशि है, जो समस्त जगत में विवाह, जीवनसाथी और साझेदारी की जन्मजात अधिष्ठात्री है। शास्त्रीय ज्योतिष के अनुसार, आपकी जन्म कुंडली में ७ नंबर (तुला) जिस भाव में बैठती है, वह यह तय करती है कि <em>जीवनसाथी किस माध्यम से आएगा</em>, और <em>दांपत्य जीवन का तराजू किस विषय पर साधना होगा</em>।
           </p>
 
           {/* Dual Partner Grid */}
@@ -544,7 +544,7 @@ export default function MasterMarriageReportPanel({
               <span style={{ fontSize: 24, flexShrink: 0 }}>🎁</span>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "#875C06", marginBottom: 4 }}>
-                  व्याख्यान का विशेष विवाह सूत्र: गरीब विवाह सहयोग (12th House Venus Charity)
+                  शास्त्रीय विशेष विवाह सूत्र: गरीब विवाह सहयोग (12th House Venus Charity)
                 </div>
                 <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#382D20" }}>
                   {kalpurush7thAudit.weddingCharityRemedy}
@@ -638,7 +638,7 @@ export default function MasterMarriageReportPanel({
                 💥 H4 गृह सुख ("एटम बम" मंगल-राहु परीक्षण):
               </div>
               <p style={{ margin: 0, fontSize: 11.5, color: "#4A3E2C", lineHeight: 1.5 }}>
-                व्याख्यान के अनुसार D9 के चौथे भाव में मंगल-राहु की युति गृहस्थी में विस्फोटक गुस्सा ('एटम बम') लाती है। चतुर्थ भाव शांत रहने पर घर में कभी उग्र टकराव नहीं होता।
+                शास्त्रीय ज्योतिष के अनुसार D9 के चौथे भाव में मंगल-राहु की युति गृहस्थी में विस्फोटक गुस्सा ('एटम बम') लाती है। चतुर्थ भाव शांत रहने पर घर में कभी उग्र टकराव नहीं होता।
               </p>
             </div>
 
@@ -676,7 +676,7 @@ export default function MasterMarriageReportPanel({
           </div>
 
           <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.8, marginBottom: 16 }}>
-            वैदिक व के.पी. ज्योतिष के सूक्ष्म व्याख्यान के अनुसार विवाह के दो प्रमुख आयाम होते हैं: <strong>(1) 7वें भाव का सब-लॉर्ड</strong> बताता है कि रिश्ता ज़िंदगी में किस माध्यम से प्रवेश करेगा, जबकि <strong>(2) सप्तम भाव में प्रत्यक्ष बैठे ग्रह का नक्षत्र स्वामी</strong> (या भाव रिक्त होने पर सप्तमेश का नक्षत्र स्वामी) तय करता है कि विवाह के बाद आपका वास्तविक जीवन अनुभव कैसा रहेगा और दांपत्य का कर्म किस भाव में जाकर खुलेगा।
+            वैदिक व के.पी. ज्योतिष के सूक्ष्म सिद्धांतों के अनुसार विवाह के दो प्रमुख आयाम होते हैं: <strong>(1) 7वें भाव का सब-लॉर्ड</strong> बताता है कि रिश्ता ज़िंदगी में किस माध्यम से प्रवेश करेगा, जबकि <strong>(2) सप्तम भाव में प्रत्यक्ष बैठे ग्रह का नक्षत्र स्वामी</strong> (या भाव रिक्त होने पर सप्तमेश का नक्षत्र स्वामी) तय करता है कि विवाह के बाद आपका वास्तविक जीवन अनुभव कैसा रहेगा और दांपत्य का कर्म किस भाव में जाकर खुलेगा।
           </p>
 
           {/* ── PART A: 7TH CSL MEETING CONTEXT ── */}
@@ -758,7 +758,7 @@ export default function MasterMarriageReportPanel({
                       </div>
                       {occ.remedyHinglish && (
                         <div style={{ background: "rgba(200,160,48,0.12)", border: "1px solid rgba(200,160,48,0.35)", borderRadius: 8, padding: "8px 10px", fontSize: 11.5, color: "#875C06", lineHeight: 1.5 }}>
-                          <strong>🌿 व्याख्यान का उपाय:</strong> {occ.remedyHinglish}
+                          <strong>🌿 शास्त्रीय उपाय:</strong> {occ.remedyHinglish}
                         </div>
                       )}
                     </div>
@@ -789,7 +789,7 @@ export default function MasterMarriageReportPanel({
                       </div>
                       {occ.remedyHinglish && (
                         <div style={{ background: "rgba(200,160,48,0.12)", border: "1px solid rgba(200,160,48,0.35)", borderRadius: 8, padding: "8px 10px", fontSize: 11.5, color: "#875C06", lineHeight: 1.5 }}>
-                          <strong>🌿 व्याख्यान का उपाय:</strong> {occ.remedyHinglish}
+                          <strong>🌿 शास्त्रीय उपाय:</strong> {occ.remedyHinglish}
                         </div>
                       )}
                     </div>
@@ -1089,7 +1089,7 @@ export default function MasterMarriageReportPanel({
           <div className="card-tag" style={{ margin: 0 }}>अंतिम ज्योतिषाचार्य महा-निष्कर्ष (Executive Verdict)</div>
         </div>
         <h3 className="card-title serif" style={{ fontSize: 22, color: "#1A1A1A", marginBottom: 12 }}>
-          राधे राधे: मुकुल एवं मनीषा वैवाहिक मिलान का समेकित निर्णय
+          {couple.partner1.name} एवं {couple.partner2.name} वैवाहिक मिलान का समेकित निर्णय
         </h3>
 
         <div style={{ fontSize: 14, color: "#1A1A1A", lineHeight: 2, background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: 12, padding: "18px 22px", marginBottom: 14 }}>

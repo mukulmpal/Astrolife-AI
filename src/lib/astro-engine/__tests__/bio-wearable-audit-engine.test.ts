@@ -9,8 +9,8 @@ import {
 import type { ChartData } from "../calculations";
 
 describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
-  const manishaChart: ChartData = {
-    name: "Manisha",
+  const sampleAquariusChart: ChartData = {
+    name: "Sample Native",
     dob: "1993-12-06",
     tob: "12:30:00",
     city: "Delhi",
@@ -46,10 +46,10 @@ describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
     ],
   } as unknown as ChartData;
 
-  it("should accurately audit Manisha's 5 preset items as CRITICAL_REMOVE", () => {
-    const dossier = auditUserWearables(manishaChart, PRESET_MANISHA_ITEMS, new Date("2026-10-20"));
+  it("should accurately audit sample scenario's 5 preset items as CRITICAL_REMOVE", () => {
+    const dossier = auditUserWearables(sampleAquariusChart, PRESET_MANISHA_ITEMS, new Date("2026-10-20"));
     assert.ok(dossier);
-    assert.equal(dossier.nativeName, "Manisha");
+    assert.equal(dossier.nativeName, "Sample Native");
     assert.equal(dossier.activeMahadasha, "Mars");
     assert.equal(dossier.itemsAudited.length, 5);
 
@@ -82,7 +82,7 @@ describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
     const items: WornItemInput[] = [
       { id: "gold-neck", location: "neck", item: "gold" },
     ];
-    const dossier = auditUserWearables(manishaChart, items);
+    const dossier = auditUserWearables(sampleAquariusChart, items);
     const goldItem = dossier.itemsAudited[0];
     assert.equal(goldItem.severity, "SAFE_BENEFICIAL");
     assert.ok(goldItem.badgeText.includes("कल्याणकारी"));
@@ -93,7 +93,7 @@ describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
     const items: WornItemInput[] = [
       { id: "silver-wrist", location: "wrist_right", item: "silver" },
     ];
-    const dossier = auditUserWearables(manishaChart, items);
+    const dossier = auditUserWearables(sampleAquariusChart, items);
     const silverItem = dossier.itemsAudited[0];
     assert.equal(silverItem.severity, "SAFE_BENEFICIAL");
     assert.ok(silverItem.badgeText.includes("शांतिकारक"));
@@ -103,7 +103,7 @@ describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
     const items: WornItemInput[] = [
       { id: "black-neck", location: "neck", item: "black_thread" },
     ];
-    const dossier = auditUserWearables(manishaChart, items);
+    const dossier = auditUserWearables(sampleAquariusChart, items);
     const item = dossier.itemsAudited[0];
     assert.equal(item.severity, "CRITICAL_REMOVE");
     assert.ok(item.badgeText.includes("वर्जित"));
@@ -113,7 +113,7 @@ describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
     const items: WornItemInput[] = [
       { id: "black-ankle", location: "ankle_left", item: "black_thread" },
     ];
-    const dossier = auditUserWearables(manishaChart, items);
+    const dossier = auditUserWearables(sampleAquariusChart, items);
     const item = dossier.itemsAudited[0];
     assert.equal(item.severity, "SAFE_BENEFICIAL");
     assert.ok(item.badgeText.includes("रक्षा सूत्र"));
@@ -123,7 +123,7 @@ describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
     const items: WornItemInput[] = [
       { id: "tagdi", location: "waist", item: "silver_tagdi" },
     ];
-    const dossier = auditUserWearables(manishaChart, items);
+    const dossier = auditUserWearables(sampleAquariusChart, items);
     const item = dossier.itemsAudited[0];
     assert.equal(item.severity, "SAFE_BENEFICIAL");
   });

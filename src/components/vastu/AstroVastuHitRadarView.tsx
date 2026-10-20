@@ -7,16 +7,19 @@ import {
   runAstroVastuHitEngine,
   ASTRO_VASTU_SIGN_DIRECTIONS,
   SIGN_BODY_PART_MAPPINGS,
+  getElementalBalancingGuide,
   type AstroVastuHitDossier,
   type EvaluatedHit,
   type TrafficPoliceBlockade,
   type ShiftingPrescription,
   type GenericVastuConflict,
+  type DevataEntity,
+  type NativeDevataMapping,
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
 import { BioWearableAuditView } from "./BioWearableAuditView";
 
 const DEMO_VASTU_FALLBACK: BirthDetails = {
-  name: "Mukul Ji (Demo Chart)",
+  name: "मानक जन्म चक्र (Reference Chart)",
   dob: "1995-07-04",
   tob: "12:30",
   city: "Delhi",
@@ -29,13 +32,37 @@ interface AstroVastuHitRadarViewProps {
 
 export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   const [activeTab, setActiveTab] = useState<
-    "dossier" | "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts" | "lifestyle" | "wearableAudit"
+    | "dossier"
+    | "radar"
+    | "trafficPolice"
+    | "hits"
+    | "shifting"
+    | "bodyTherapy"
+    | "conflicts"
+    | "lifestyle"
+    | "wearableAudit"
+    | "mandala"
+    | "barChart"
   >("dossier");
   const [showCuspsTable, setShowCuspsTable] = useState(false);
   const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 60 | 120>("all");
   const [selectedDirectionCode, setSelectedDirectionCode] = useState<string>("N");
   const [targetDateStr, setTargetDateStr] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
+
+  // 45 Devatas & 32 Entrances interactive states
+  const [selectedPadCode, setSelectedPadCode] = useState<string>("E3");
+  const [activeQuadrant, setActiveQuadrant] = useState<"East" | "South" | "West" | "North">("East");
+  const [devataLayerFilter, setDevataLayerFilter] = useState<"All" | "Brahmasthan" | "CardinalFaces" | "DiagonalCorners" | "OuterPerimeter">("OuterPerimeter");
+
+  // Bar Chart 5-Elements Balancing state
+  const [zoneConditions, setZoneConditions] = useState<Record<string, "Exhausted_Depleted" | "Extended_Bloated" | "Balanced">>({
+    N: "Balanced",
+    E: "Balanced",
+    S: "Balanced",
+    SW: "Balanced",
+    W: "Balanced",
+  });
 
   useEffect(() => {
     setIsMounted(true);
@@ -106,7 +133,18 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     studyAndWorkDirection,
     marsDietaryLifestyleProtocol,
     wristThreadTrapAlert,
+    mandalaDossier,
   } = dossier;
+
+  const dynamicBalancingGuides = useMemo(() => {
+    return [
+      getElementalBalancingGuide("N", "Water", zoneConditions.N || "Balanced"),
+      getElementalBalancingGuide("E", "AirWood", zoneConditions.E || "Balanced"),
+      getElementalBalancingGuide("S", "Fire", zoneConditions.S || "Balanced"),
+      getElementalBalancingGuide("SW", "Earth", zoneConditions.SW || "Balanced"),
+      getElementalBalancingGuide("W", "Space", zoneConditions.W || "Balanced"),
+    ];
+  }, [zoneConditions]);
 
   const filteredHits = useMemo(() => {
     if (hitFilter === "all") return allHits;
@@ -810,6 +848,32 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
         >
           🎯 विशेष रहस्य व दिशाएं (1, 2, 5, 6)
         </button>
+        <button
+          className={`tab ${activeTab === "mandala" ? "active" : ""}`}
+          onClick={() => setActiveTab("mandala")}
+          style={{
+            fontWeight: 700,
+            background: activeTab === "mandala" ? "#92400E" : "rgba(245, 158, 11, 0.15)",
+            color: activeTab === "mandala" ? "#FFFFFF" : "#B45309",
+            borderColor: activeTab === "mandala" ? "#B8860B" : "rgba(245, 158, 11, 0.4)",
+            boxShadow: activeTab === "mandala" ? "0 2px 8px rgba(180, 83, 9, 0.25)" : "none",
+          }}
+        >
+          🏛️ 45 देवता व 32 द्वार (Mandala & Entrances)
+        </button>
+        <button
+          className={`tab ${activeTab === "barChart" ? "active" : ""}`}
+          onClick={() => setActiveTab("barChart")}
+          style={{
+            fontWeight: 700,
+            background: activeTab === "barChart" ? "#0F766E" : "rgba(20, 184, 166, 0.12)",
+            color: activeTab === "barChart" ? "#FFFFFF" : "#0D9488",
+            borderColor: activeTab === "barChart" ? "#0D9488" : "rgba(20, 184, 166, 0.4)",
+            boxShadow: activeTab === "barChart" ? "0 2px 8px rgba(13, 148, 136, 0.25)" : "none",
+          }}
+        >
+          ⚖️ बार चार्ट 5-तत्व व भोग (Bar Chart Balancer)
+        </button>
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
@@ -850,7 +914,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                   {nativeName ? `${nativeName} जी का ` : ""}मास्टर फील्ड ऑडिट डॉसियर
                 </h3>
                 <p style={{ margin: 0, fontSize: 14, color: "#D6D3D1", lineHeight: 1.6 }}>
-                  व्याख्यान का मुख्य सूत्र: <em style={{ color: "#FDE047" }}>"जिसका समय चल रहा है, उसी ग्रह को पकड़ना है!"</em> यह रिपोर्ट आपकी कुंडली की स्पष्ट डिग्री, कम्पाउंड डिग्री और वर्तमान दशा चक्र पर 100% गतिशील रूप से तैयार की गई है।
+                  एस्ट्रो-वास्तु का मुख्य सूत्र: <em style={{ color: "#FDE047" }}>"जिसका समय चल रहा है, उसी ग्रह को पकड़ना है!"</em> यह रिपोर्ट आपकी कुंडली की स्पष्ट डिग्री, कम्पाउंड डिग्री और वर्तमान दशा चक्र पर 100% गतिशील रूप से तैयार की गई है।
                 </p>
               </div>
 
@@ -1317,7 +1381,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             </div>
 
             <p style={{ margin: "0 0 16px 0", fontSize: 14, color: "#4A4238", lineHeight: 1.6 }}>
-              व्याख्यान का प्रमुख नियम: <em>"हिट को तोड़ा नहीं जा सकता, परंतु ग्रह के भौतिक कारक सामान को उसके 120° त्रिकोण मित्र भाव में शिफ्ट करके उसकी मारक ऊर्जा को सुरक्षा कवच में रूपांतरित किया जा सकता है।"</em>
+              एस्ट्रो-वास्तु का प्रमुख नियम: <em>"हिट को तोड़ा नहीं जा सकता, परंतु ग्रह के भौतिक कारक सामान को उसके 120° त्रिकोण मित्र भाव में शिफ्ट करके उसकी मारक ऊर्जा को सुरक्षा कवच में रूपांतरित किया जा सकता है।"</em>
             </p>
 
             {shiftingPrescriptions.length === 0 ? (
@@ -1395,7 +1459,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 lineHeight: 1.6,
               }}
             >
-              <strong>💡 व्याख्यान का अनिवार्य गुप्त सूत्र 1 (Family Cross-Hit Protection):</strong>{" "}
+              <strong>💡 एस्ट्रो-वास्तु अनिवार्य गुप्त सूत्र 1 (Family Cross-Hit Protection):</strong>{" "}
               {familyCrossHitIsolationRule.rule}
             </div>
           </div>
@@ -1471,13 +1535,13 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             {renderDynamicBodyTherapyTable()}
           </div>
 
-          {/* ── SECTION 8: 🎯 व्याख्यान के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6) ── */}
+          {/* ── SECTION 8: 🎯 एस्ट्रो-वास्तु के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6) ── */}
           <div className="card" style={{ padding: 24 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
               <div>
                 <span className="card-tag">Section 8 · Secret Practical Axioms</span>
                 <h3 className="card-title" style={{ margin: "4px 0 0 0", fontSize: 22 }}>
-                  🎯 व्याख्यान के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6)
+                  🎯 एस्ट्रो-वास्तु के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6)
                 </h3>
               </div>
               <div style={{ fontSize: 13, color: "#854D0E", fontWeight: 600 }}>
@@ -2002,7 +2066,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             </p>
           </div>
 
-          {/* 💡 Family Cross-Hit Protection Principle from Lecture */}
+          {/* 💡 Family Cross-Hit Protection Principle */}
           {familyCrossHitIsolationRule && (
             <div
               className="card"
@@ -2121,7 +2185,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             }}
           >
             <div style={{ fontSize: 13, fontWeight: 700, color: "#92400E", marginBottom: 4 }}>
-              💡 व्याख्यान का अनिवार्य गुप्त सूत्र 1: Family Cross-Hit Protection (पारिवारिक क्रॉस-हिट निवारण)
+              💡 एस्ट्रो-वास्तु का अनिवार्य गुप्त सूत्र 1: Family Cross-Hit Protection (पारिवारिक क्रॉस-हिट निवारण)
             </div>
             <p style={{ margin: 0, fontSize: 13, color: "#78350F", lineHeight: 1.6 }}>
               {familyCrossHitIsolationRule.rule}
@@ -2405,7 +2469,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               boxShadow: "0 4px 16px rgba(217, 119, 6, 0.08)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "gap 10" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
               <div>
                 <span className="badge badge-gold" style={{ fontWeight: 700 }}>
                   सूत्र 1 · Family Cross-Hit Protection
@@ -2623,6 +2687,553 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "wearableAudit" && (
         <BioWearableAuditView chart={resolvedChart} />
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 9: 45 DEVATAS & 32 ENTRANCE MANDALA (शक्ति चक्र व 32 द्वार)
+      ───────────────────────────────────────────────────────────── */}
+      {activeTab === "mandala" && mandalaDossier && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* ── BANNER ── */}
+          <div
+            className="card"
+            style={{
+              padding: 22,
+              background: "linear-gradient(135deg, #1C1917 0%, #292524 100%)",
+              color: "#FAF7F2",
+              border: "1px solid rgba(212, 175, 55, 0.4)",
+              borderRadius: 18,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <span className="badge badge-gold" style={{ fontWeight: 700, letterSpacing: 0.5 }}>
+                  Authentic Brihat Samhita & Shilpa Shastra Engine
+                </span>
+                <h2 style={{ margin: "8px 0 4px 0", fontSize: 22, fontWeight: 700, color: "#FDE68A" }}>
+                  🏛️ 45 देवता वास्तु पुरुष मंडल एवं 32 मुख्य प्रवेश द्वार
+                </h2>
+                <div style={{ fontSize: 13.5, color: "#D6D3D1", lineHeight: 1.6 }}>
+                  33 कोटि (प्रकार) के देवगण + 12 असुर शक्तियां · ब्रह्मस्थान (नाभि) से संपूर्ण ऊर्जा का संचार · जन्मकुंडली भाव संरेखण
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ background: "rgba(245, 158, 11, 0.2)", border: "1px solid #B45309", color: "#FDE68A", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
+                  45 कुल शक्तियां (33 देव + 12 असुर)
+                </span>
+                <span style={{ background: "rgba(34, 197, 94, 0.2)", border: "1px solid #15803D", color: "#86EFAC", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
+                  32 परिधि मुख्य द्वार
+                </span>
+                <span style={{ background: "rgba(59, 130, 246, 0.2)", border: "1px solid #1D4ED8", color: "#93C5FD", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
+                  लग्न: {lagnaSignHindi} ({lagnaSign})
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── CRITICAL WARNINGS & OCCULT DIAGNOSTICS ROW ── */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
+            {/* 1. NE Toilet Warning */}
+            <div
+              className="card"
+              style={{
+                borderLeft: "6px solid #DC2626",
+                background: "#FEF2F2",
+                padding: 18,
+                borderRadius: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ fontSize: 20 }}>🚨</span>
+                <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#991B1B" }}>
+                  ईशान कोण (NE) टॉयलेट आपातकालीन निर्देश
+                </h4>
+              </div>
+              <div style={{ fontSize: 12.5, color: "#7F1D1D", lineHeight: 1.55 }}>
+                {mandalaDossier.toiletNeEmergencyProtocol.strictWarning}
+              </div>
+              <div style={{ marginTop: 10, background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid #FECACA", fontSize: 12, color: "#991B1B" }}>
+                <strong>शास्त्रीय उपचार:</strong> टॉयलेट सीट के चारों ओर 3-इंच हरे रंग का पेंट (Green Paint) या 3-इंच ग्रीन टेप लगाएं + भीतर 0-वाट का हरा बल्ब 24 घंटे जलाएं।
+              </div>
+            </div>
+
+            {/* 2. Occult & Negative Energy Kundli Diagnostic */}
+            <div
+              className="card"
+              style={{
+                borderLeft: `6px solid ${mandalaDossier.occultDiagnostic.isAfflicted ? "#DC2626" : "#16A34A"}`,
+                background: mandalaDossier.occultDiagnostic.isAfflicted ? "#FFF7ED" : "#F0FDF4",
+                padding: 18,
+                borderRadius: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ fontSize: 20 }}>{mandalaDossier.occultDiagnostic.isAfflicted ? "🔮" : "🛡️"}</span>
+                <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: mandalaDossier.occultDiagnostic.isAfflicted ? "#9A3412" : "#166534" }}>
+                  {mandalaDossier.occultDiagnostic.diagnosticTitle}
+                </h4>
+              </div>
+              <div style={{ fontSize: 12.5, color: mandalaDossier.occultDiagnostic.isAfflicted ? "#7C2D12" : "#14532D", lineHeight: 1.55 }}>
+                {mandalaDossier.occultDiagnostic.diagnosticExplanation}
+              </div>
+              <div style={{ marginTop: 10, background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: `1px solid ${mandalaDossier.occultDiagnostic.isAfflicted ? "#FED7AA" : "#BBF7D0"}`, fontSize: 12, color: mandalaDossier.occultDiagnostic.isAfflicted ? "#9A3412" : "#166534" }}>
+                <strong>उपाय:</strong> {mandalaDossier.occultDiagnostic.shastricRemedyGuidance}
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECTION: INTERACTIVE 32-GATE KUNDLI GATEKEEPER ── */}
+          <div className="card" style={{ padding: 22, background: "#FFFFFF", borderRadius: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#1A1A1A" }}>
+                  🚪 32 मुख्य प्रवेश द्वार परीक्षक (Personalized Kundli Gatekeeper)
+                </h3>
+                <div style={{ fontSize: 13, color: "#666" }}>
+                  अपनी दिशा चुनें और प्रवेश द्वार के पैड (Pad) पर क्लिक करके देखें कि यह आपकी जन्मकुंडली के अनुसार अमृत है या त्रिक दोष:
+                </div>
+              </div>
+
+              {/* Quadrant Selector */}
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {(["East", "South", "West", "North"] as const).map((q) => {
+                  const icons: Record<string, string> = { East: "🌅 पूर्व", South: "🔥 दक्षिण", West: "🌪️ पश्चिम", North: "🌊 उत्तर" };
+                  const isAct = activeQuadrant === q;
+                  return (
+                    <button
+                      key={q}
+                      onClick={() => setActiveQuadrant(q)}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        border: isAct ? "1px solid #B45309" : "1px solid #D6D3D1",
+                        background: isAct ? "#FEF3C7" : "#F5F5F4",
+                        color: isAct ? "#92400E" : "#44403C",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {icons[q]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 8 Pads Grid for Active Quadrant */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 8, marginBottom: 18 }}>
+              {mandalaDossier.nativeMappings
+                .filter((m) => m.devata.layer === "OuterPerimeter" && m.devata.cardinalCompassDirection === activeQuadrant)
+                .map((m) => {
+                  const isSel = selectedPadCode === m.devata.padCode;
+                  const isDusthana = m.isDusthanaBlocked;
+                  const isSup = m.devata.auspiciousness === "Supreme";
+                  const isDes = m.devata.auspiciousness === "Destructive";
+                  const isCau = m.devata.auspiciousness === "Caution" || m.devata.auspiciousness === "Inauspicious";
+
+                  let borderColor = isSel ? "#B45309" : "#E7E5E4";
+                  let bg = isSel ? "#FFFBEB" : "#FAFAF9";
+                  let badgeCol = isDusthana ? "#DC2626" : isSup ? "#16A34A" : isDes ? "#DC2626" : isCau ? "#D97706" : "#2563EB";
+
+                  return (
+                    <div
+                      key={m.devata.id}
+                      onClick={() => setSelectedPadCode(m.devata.padCode || "E3")}
+                      style={{
+                        border: `2px solid ${borderColor}`,
+                        background: bg,
+                        borderRadius: 10,
+                        padding: "10px 8px",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                        boxShadow: isSel ? "0 4px 12px rgba(180, 83, 9, 0.15)" : "none",
+                      }}
+                    >
+                      <div style={{ fontSize: 11, fontWeight: 700, color: badgeCol }}>
+                        {m.devata.padCode}
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#1C1917", margin: "2px 0" }}>
+                        {m.devata.nameHi.split(" ")[0]}
+                      </div>
+                      <div style={{ fontSize: 10.5, color: isDusthana ? "#DC2626" : "#78716C", fontWeight: isDusthana ? 700 : 500 }}>
+                        {isDusthana ? `🚨 भाव ${m.nativeHouseNum}` : `भाव ${m.nativeHouseNum}`}
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 4,
+                          fontSize: 9.5,
+                          padding: "2px 4px",
+                          borderRadius: 4,
+                          background: isDusthana ? "rgba(220, 38, 38, 0.12)" : isSup ? "rgba(22, 163, 74, 0.12)" : "rgba(120, 113, 108, 0.12)",
+                          color: isDusthana ? "#DC2626" : isSup ? "#15803D" : "#57534E",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {isDusthana ? "वर्जित" : m.devata.auspiciousness}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Selected Pad Inspector Card */}
+            {(() => {
+              const sel = mandalaDossier.nativeMappings.find((m) => m.devata.padCode === selectedPadCode);
+              if (!sel) return null;
+              const d = sel.devata;
+              const isDusthana = sel.isDusthanaBlocked;
+
+              return (
+                <div
+                  style={{
+                    background: isDusthana ? "#FEF2F2" : "#F8FAFC",
+                    border: `1.5px solid ${isDusthana ? "#FECACA" : "#CBD5E1"}`,
+                    borderRadius: 12,
+                    padding: 18,
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10, marginBottom: 10 }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 18, fontWeight: 800, color: isDusthana ? "#DC2626" : "#0F172A" }}>
+                          [{d.padCode}] {d.nameHi}
+                        </span>
+                        <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 6, background: isDusthana ? "#DC2626" : "#16A34A", color: "#FFFFFF", fontWeight: 700 }}>
+                          {sel.shastricVerdictBadge}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12.5, color: "#64748B", marginTop: 2 }}>
+                        दिशा: {d.directionHindi} · तत्व: {d.element} ({d.elementColor}) · धातु: {d.zoneMetal}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#0369A1", background: "#E0F2FE", padding: "4px 10px", borderRadius: 8 }}>
+                        कुंडली संरेखण: भाव {sel.nativeHouseNum}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: 13.5, color: isDusthana ? "#991B1B" : "#1E293B", lineHeight: 1.6, marginBottom: 12, background: "#FFFFFF", padding: "10px 14px", borderRadius: 8, border: `1px solid ${isDusthana ? "#FCA5A5" : "#E2E8F0"}` }}>
+                    <strong>शास्त्रीय निर्णय:</strong> {sel.verdictExplanation}
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 10, fontSize: 12.5 }}>
+                    <div style={{ background: "#FFFFFF", padding: "10px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                      <strong style={{ color: "#0F172A" }}>प्रत्यक्ष जीवन लक्षण (Symptoms):</strong>
+                      <div style={{ color: "#475569", marginTop: 3 }}>{d.realLifeSymptom}</div>
+                    </div>
+                    <div style={{ background: "#FFFFFF", padding: "10px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                      <strong style={{ color: "#0F172A" }}>गुप्त शास्त्रीय सूत्र (Secret Axiom):</strong>
+                      <div style={{ color: "#475569", marginTop: 3 }}>{d.secretShastricAxiom || "सामान्य स्वच्छता व संतुलन रखें।"}</div>
+                    </div>
+                    {d.sacredFoodOffering && (
+                      <div style={{ background: "#FFFFFF", padding: "10px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                        <strong style={{ color: "#B45309" }}>देवता नैवेद्य / भोग (Bhog Offering):</strong>
+                        <div style={{ color: "#92400E", marginTop: 3 }}>
+                          🍲 {d.sacredFoodOffering} ({d.foodDurationGuide || "10-15 दिन रखें"})
+                        </div>
+                      </div>
+                    )}
+                    <div style={{ background: "#FFFFFF", padding: "10px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                      <strong style={{ color: "#15803D" }}>सक्रियकरण / ब्लॉक विधि:</strong>
+                      <div style={{ color: "#334155", marginTop: 3 }}>
+                        ✦ <strong>खोलने हेतु:</strong> {d.activationMethod}<br/>
+                        ✦ <strong>बंद करने हेतु:</strong> {d.blockingMethod}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* ── SECTION: BRAHMASTHAN & 4 CARDINAL FACES OF BRAHMA ── */}
+          <div className="card" style={{ padding: 22, background: "#FFFFFF", borderRadius: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 22 }}>☸️</span>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#1A1A1A" }}>
+                  ब्रह्मस्थान (नाभि) एवं ब्रह्मा जी के 4 मुख (4 फीट बाउंड्री पर सक्रिय)
+                </h3>
+                <div style={{ fontSize: 12.5, color: "#666" }}>
+                  भवन का प्राण-केंद्र जहां से समस्त 45 देवताओं को ऊर्जा वितरित होती है (G.O.D. - Generator ब्रह्मा)
+                </div>
+              </div>
+            </div>
+
+            {/* Brahmasthan Consecration Recipe Card */}
+            <div style={{ background: "linear-gradient(135deg, #FFFBEB, #FEF3C7)", border: "1px solid #FCD34D", borderRadius: 10, padding: 14, marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, color: "#92400E", fontSize: 14, marginBottom: 4 }}>
+                🥛 ब्रह्मस्थान अभिमंत्रित नैवेद्य (Consecration Formula):
+              </div>
+              <div style={{ fontSize: 13, color: "#78350F", lineHeight: 1.6 }}>
+                <strong>सामग्री:</strong> {mandalaDossier.brahmasthanProtocol.consecrationMixture.join(" + ")}<br/>
+                ✦ <strong>नए निर्माण में:</strong> केंद्र की खुदाई करके लोटे में भरकर यह मिश्रण अर्पित करें।<br/>
+                ✦ <strong>बने हुए मकान/फ्लैट में:</strong> प्रातः सफाई के बाद इसका छिड़काव करें। रात्रि में पात्र में रखकर सुबह पौधों में विसर्जित करें (टॉयलेट में कभी नहीं)।<br/>
+                ✦ <strong>स्वास्थ्य संबंध:</strong> {mandalaDossier.brahmasthanProtocol.liverHealthConnection}
+              </div>
+            </div>
+
+            {/* 4 Cardinal Faces Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+              {mandalaDossier.nativeMappings
+                .filter((m) => m.devata.layer === "CardinalFaces")
+                .map((m) => {
+                  const d = m.devata;
+                  return (
+                    <div
+                      key={d.id}
+                      style={{
+                        border: "1px solid #E5E7EB",
+                        borderRadius: 10,
+                        padding: 12,
+                        background: "#F9FAFB",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                        <span style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>
+                          {d.nameHi}
+                        </span>
+                        <span style={{ fontSize: 11, background: "#E0E7FF", color: "#3730A3", padding: "2px 6px", borderRadius: 4, fontWeight: 600 }}>
+                          भाव {m.nativeHouseNum}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.5, marginBottom: 6 }}>
+                        {d.classicalSignificance}
+                      </div>
+                      <div style={{ fontSize: 12, background: "#FFFFFF", padding: "6px 8px", borderRadius: 6, border: "1px solid #E5E7EB", color: "#B45309", fontWeight: 600 }}>
+                        🍲 भोग: {d.sacredFoodOffering}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* ── SECTION: 8 DIAGONAL CORNER DEITIES (8 फीट बाउंड्री पर सक्रिय) ── */}
+          <div className="card" style={{ padding: 22, background: "#FFFFFF", borderRadius: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 22 }}>📐</span>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#1A1A1A" }}>
+                  चारों कोनों के 8 देवता (8 फीट बाउंड्री वॉल पर सक्रिय)
+                </h3>
+                <div style={{ fontSize: 12.5, color: "#666" }}>
+                  ईशान (NE), आग्नेय (SE), नैऋत्य (SW), एवं वायव्य (NW) संधि देवता
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+              {mandalaDossier.nativeMappings
+                .filter((m) => m.devata.layer === "DiagonalCorners")
+                .map((m) => {
+                  const d = m.devata;
+                  const isRaj = d.id === "RAJAYAKSHMA";
+                  return (
+                    <div
+                      key={d.id}
+                      style={{
+                        border: `1px solid ${isRaj ? "#FECACA" : "#E2E8F0"}`,
+                        background: isRaj ? "#FEF2F2" : "#FFFFFF",
+                        borderRadius: 10,
+                        padding: 12,
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                        <span style={{ fontWeight: 700, fontSize: 13.5, color: isRaj ? "#991B1B" : "#0F172A" }}>
+                          {d.nameHi}
+                        </span>
+                        <span style={{ fontSize: 11, background: isRaj ? "#FEE2E2" : "#F1F5F9", color: isRaj ? "#991B1B" : "#475569", padding: "2px 6px", borderRadius: 4, fontWeight: 600 }}>
+                          {d.directionZone} · भाव {m.nativeHouseNum}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: isRaj ? "#7F1D1D" : "#475569", lineHeight: 1.5, marginBottom: 6 }}>
+                        {d.classicalSignificance}
+                      </div>
+                      {d.secretShastricAxiom && (
+                        <div style={{ fontSize: 11.5, color: "#0369A1", background: "#F0F9FF", padding: "4px 8px", borderRadius: 6, marginBottom: 4 }}>
+                          💡 {d.secretShastricAxiom}
+                        </div>
+                      )}
+                      {d.sacredFoodOffering && (
+                        <div style={{ fontSize: 11.5, color: "#B45309", background: "#FFFBEB", padding: "4px 8px", borderRadius: 6 }}>
+                          🍲 {d.sacredFoodOffering}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 10: BAR CHART 5-ELEMENTS BALANCER & SACRED BHOG (पंचतत्व संतुलन)
+      ───────────────────────────────────────────────────────────── */}
+      {activeTab === "barChart" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* ── BANNER ── */}
+          <div
+            className="card"
+            style={{
+              padding: 22,
+              background: "linear-gradient(135deg, #0F766E 0%, #115E59 100%)",
+              color: "#FAF7F2",
+              borderRadius: 18,
+              boxShadow: "0 8px 24px rgba(15, 118, 110, 0.2)",
+            }}
+          >
+            <span className="badge badge-gold" style={{ fontWeight: 700 }}>
+              Shilpa Shastra Bar-Chart Harmonizer
+            </span>
+            <h2 style={{ margin: "8px 0 4px 0", fontSize: 22, fontWeight: 700, color: "#CCFBF1" }}>
+              ⚖️ बार चार्ट पंचतत्व संतुलन एवं 45 देवता भोग प्रिस्क्रिप्शन
+            </h2>
+            <div style={{ fontSize: 13.5, color: "#E6FFFA", lineHeight: 1.6 }}>
+              <strong>शास्त्रीय सूत्र:</strong> यदि ज़ोन कम है ➔ <em>"पीछे वाला आगे लाएं"</em> (Parent feeds Child) | यदि ज़ोन बढ़ा है ➔ <em>"आगे वाला पीछे लाएं"</em> (Child exhausts Parent)
+            </div>
+          </div>
+
+          {/* ── 5-ELEMENTS BALANCING CONTROLLERS ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {dynamicBalancingGuides.map((guide) => {
+              const code = guide.zoneCode;
+              const cond = zoneConditions[code] || "Balanced";
+
+              return (
+                <div
+                  key={code}
+                  className="card"
+                  style={{
+                    padding: 18,
+                    background: "#FFFFFF",
+                    borderRadius: 12,
+                    border: `1.5px solid ${cond === "Exhausted_Depleted" ? "#F59E0B" : cond === "Extended_Bloated" ? "#DC2626" : "#E2E8F0"}`,
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0F172A" }}>
+                        {guide.zoneNameHi}
+                      </h4>
+                      <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+                        तत्व: {guide.element} · वर्तमान स्थिति: <strong>{cond === "Exhausted_Depleted" ? "कम / कटा हुआ (Cut)" : cond === "Extended_Bloated" ? "बढ़ा हुआ (Extended)" : "संतुलित (Balanced)"}</strong>
+                      </div>
+                    </div>
+
+                    {/* Condition Segmented Switch */}
+                    <div style={{ display: "flex", background: "#F1F5F9", borderRadius: 8, padding: 3, gap: 4 }}>
+                      {(["Exhausted_Depleted", "Balanced", "Extended_Bloated"] as const).map((c) => {
+                        const labels: Record<string, string> = {
+                          Exhausted_Depleted: "📉 कम (Cut)",
+                          Balanced: "⚖️ संतुलित",
+                          Extended_Bloated: "📈 बढ़ा (Extended)",
+                        };
+                        const isAct = cond === c;
+                        return (
+                          <button
+                            key={c}
+                            onClick={() => setZoneConditions((prev) => ({ ...prev, [code]: c }))}
+                            style={{
+                              padding: "5px 12px",
+                              fontSize: 12,
+                              fontWeight: isAct ? 700 : 500,
+                              border: "none",
+                              borderRadius: 6,
+                              cursor: "pointer",
+                              background: isAct
+                                ? c === "Exhausted_Depleted"
+                                  ? "#F59E0B"
+                                  : c === "Extended_Bloated"
+                                  ? "#DC2626"
+                                  : "#10B981"
+                                : "transparent",
+                              color: isAct ? "#FFFFFF" : "#475569",
+                              transition: "all 0.15s ease",
+                            }}
+                          >
+                            {labels[c]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Shastric Formula & Explanation */}
+                  <div style={{ background: cond === "Balanced" ? "#F8FAFC" : cond === "Exhausted_Depleted" ? "#FFFBEB" : "#FEF2F2", padding: "10px 14px", borderRadius: 8, border: `1px solid ${cond === "Balanced" ? "#E2E8F0" : cond === "Exhausted_Depleted" ? "#FDE68A" : "#FECACA"}`, marginBottom: 10 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: cond === "Exhausted_Depleted" ? "#B45309" : cond === "Extended_Bloated" ? "#991B1B" : "#059669", marginBottom: 3 }}>
+                      ✦ {guide.actionFormula}
+                    </div>
+                    <div style={{ fontSize: 12.5, color: "#334155", lineHeight: 1.55 }}>
+                      {guide.actionExplanation}
+                    </div>
+                  </div>
+
+                  {/* Treatments & Prohibitions Grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, fontSize: 12 }}>
+                    {guide.recommendedTreatments.length > 0 && (
+                      <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 8, padding: "8px 12px" }}>
+                        <strong style={{ color: "#166534" }}>✅ अनुशंसित उपचार (Recommended):</strong>
+                        <div style={{ color: "#15803D", marginTop: 3 }}>
+                          {guide.recommendedTreatments.join(" · ")}
+                        </div>
+                      </div>
+                    )}
+                    {guide.prohibitedItems.length > 0 && (
+                      <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "8px 12px" }}>
+                        <strong style={{ color: "#991B1B" }}>❌ सख्त वर्जित (Prohibited):</strong>
+                        <div style={{ color: "#B91C1C", marginTop: 3 }}>
+                          {guide.prohibitedItems.join(" · ")}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ── MIRROR (दर्पण) ELEMENTAL AXIOM CARD ── */}
+          <div className="card" style={{ padding: 20, background: "#FFFFFF", borderRadius: 14, borderLeft: "6px solid #0284C7", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 22 }}>🪞</span>
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#0C4A6E" }}>
+                दर्पण (Looking Mirror) का वैज्ञानिक पंचतत्व नियम
+              </h3>
+            </div>
+            <div style={{ fontSize: 13, color: "#334155", lineHeight: 1.65 }}>
+              ✦ <strong>तत्व:</strong> दर्पण वास्तु में <strong>जल तत्व (चंद्रमा व बुध)</strong> का प्रतिनिधित्व करता है, राहु का नहीं।<br/>
+              ✦ <strong>शुभ दिशाएं:</strong> उत्तर, उत्तर-पूर्व, पूर्व, और पश्चिम के कटे हुए ज़ोन को बढ़ाने हेतु दर्पण लगाया जा सकता है।<br/>
+              ✦ <strong>सख्त वर्जित दिशाएं:</strong> दक्षिण (South), दक्षिण-पूर्व (South-East) और दक्षिण-पश्चिम (South-West)।<br/>
+              ✦ <strong>साउथ-वेस्ट में दर्पण का दुष्परिणाम:</strong> {mandalaDossier.mirrorElementalAxiom.consequencesOfSouthMirror}<br/>
+              ✦ <strong>यदि SW वैनिटी में शीशा हटाना असंभव हो:</strong> {mandalaDossier.mirrorElementalAxiom.correctionMethod}
+            </div>
+          </div>
+
+          {/* ── SACRED FOOD OFFERINGS & SPRINGS DIRECTIVES CARD ── */}
+          <div className="card" style={{ padding: 20, background: "#FFFFFF", borderRadius: 14, borderLeft: "6px solid #B45309", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 22 }}>🍲</span>
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#78350F" }}>
+                देवता भोग (Food Offerings) एवं स्प्रिंग स्थापन के 6 अचूक नियम
+              </h3>
+            </div>
+            <div style={{ fontSize: 13, color: "#451A03", lineHeight: 1.65 }}>
+              1. <strong>धातु के पात्र का नियम:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.utensilBoxRule}<br/>
+              2. <strong>एंटी-कलर निषेध:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.antiColorWarning}<br/>
+              3. <strong>फ्लैट्स हेतु 'चुटकी भर' मात्रा:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.pinchQuantityRule}<br/>
+              4. <strong>सक्रियकरण अवधि:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.activationDuration}<br/>
+              5. <strong>3-इंच ड्रिलिंग स्थायी समाधान:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.floorDrillingPermanentRule}<br/>
+              6. <strong>पवित्र विसर्जन:</strong> {mandalaDossier.brahmasthanProtocol.overnightVesselDisposalRule}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

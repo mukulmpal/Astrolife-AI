@@ -16,6 +16,33 @@
 // ============================================================================
 
 import type { ChartData, PlanetData } from "./calculations";
+import {
+  runVastuPurushaMandalaEngine,
+  MASTER_45_DEVATAS,
+  getElementalBalancingGuide,
+  evaluateOccultKundliDiagnostic,
+  type VastuPurushaMandalaDossier,
+  type DevataEntity,
+  type NativeDevataMapping,
+  type OccultKundliDiagnostic,
+  type ElementalBarChartBalancing,
+  type BrahmasthanSanctificationProtocol,
+  type SubtleShastricDirectives,
+} from "./vastu-purusha-mandala-engine";
+
+export {
+  runVastuPurushaMandalaEngine,
+  MASTER_45_DEVATAS,
+  getElementalBalancingGuide,
+  evaluateOccultKundliDiagnostic,
+  type VastuPurushaMandalaDossier,
+  type DevataEntity,
+  type NativeDevataMapping,
+  type OccultKundliDiagnostic,
+  type ElementalBarChartBalancing,
+  type BrahmasthanSanctificationProtocol,
+  type SubtleShastricDirectives,
+};
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -315,6 +342,7 @@ export interface AstroVastuHitDossier {
   studyAndWorkDirection: StudyAndWorkDirection;
   marsDietaryLifestyleProtocol: MarsDietaryLifestyleProtocol;
   wristThreadTrapAlert: WristThreadTrapAlert;
+  mandalaDossier: VastuPurushaMandalaDossier;
 }
 
 export const RASHIS_HINDI: Record<number, string> = {
@@ -762,7 +790,7 @@ export function runAstroVastuHitEngine(
   const processedPlanets = new Set<string>();
 
   // A. First: Address EVERY Traffic Police blocker holding up the Dasha Lord!
-  // Authentic Lecture Rule: "जिस ग्रह ने दशा स्वामी को रोक रखा है (Traffic Police), उसी के सामान को 120° त्रिकोण मित्र दिशा में शिफ्ट करना है!"
+  // Astro-Vastu Shastric Rule: "जिस ग्रह ने दशा स्वामी को रोक रखा है (Traffic Police), उसी के सामान को 120° त्रिकोण मित्र दिशा में शिफ्ट करना है!"
   trafficPoliceBlockades.forEach(blockade => {
     const plName = blockade.blockingPlanet;
     if (processedPlanets.has(plName)) return;
@@ -945,7 +973,7 @@ export function runAstroVastuHitEngine(
     };
   }
 
-  // 10. Study and Work Direction Calculation (Lecture Rule: 4th House comfort & 9th/10th House direction)
+  // 10. Study and Work Direction Calculation (4th House comfort & 9th/10th House direction)
   const cusp4 = cuspCoords[4];
   const cusp9 = cuspCoords[9];
   const cusp10 = cuspCoords[10];
@@ -967,7 +995,7 @@ export function runAstroVastuHitEngine(
     rationale: `किताबी वास्तु केवल उत्तर/पूर्व बताता है, परंतु एस्ट्रो-वास्तु के अनुसार आपकी शिक्षा व मानसिक सुख 4थे भाव (${cusp4?.sign} - ${cusp4?.direction.direction}) और 9वें भाव (${cusp9?.sign} - ${cusp9?.direction.direction}) से संचालित है। इस दिशा में बैठकर पूर्व या उत्तर की ओर मुख करके अध्ययन करने से उच्चतम एकाग्रता प्राप्त होती है। ऑनलाइन व्यापार व करियर के लिए 10वें भाव (${cusp10?.sign} - ${cusp10?.direction.direction}) की दिशा में बैठना सर्वोत्तम है।`,
   };
 
-  // 11. Mars Dietary & Lifestyle Protocol (Lecture Rule: 180°/90° Hit or Traffic Police)
+  // 11. Mars Dietary & Lifestyle Protocol (180°/90° Hit or Traffic Police)
   const marsAffliction = killerHits180.find(h => h.sourceName === "Mars") || dangerousHits90.find(h => h.sourceName === "Mars") || trafficPoliceBlockades.find(b => b.blockingPlanet === "Mars");
   const marsDietaryLifestyleProtocol: MarsDietaryLifestyleProtocol = {
     isMarsAfflicted: Boolean(marsAffliction),
@@ -994,7 +1022,7 @@ export function runAstroVastuHitEngine(
       : "मंगल सामान्य स्थिति में है; कोई गंभीर खान-पान निषेध लागू नहीं है।",
   };
 
-  // 12. Wrist-Thread Trap Alert (Lecture Rule: Gemini / 3rd Sign)
+  // 12. Wrist-Thread Trap Alert (Gemini / 3rd Sign)
   const geminiCusp = Object.values(cuspCoords).find(c => c.signNum === 3);
   const geminiHouse = geminiCusp?.house || (((3 - lagnaSignNum + 12) % 12) + 1);
   const isGeminiDusthana = [6, 8, 12].includes(geminiHouse);
@@ -1066,7 +1094,7 @@ export function runAstroVastuHitEngine(
       const houseNum = occupants[0]?.house || 1;
       const isPowerCenter = occupants.length >= 3;
       const planetListHi = occupants.map(o => PLANETS_HINDI[o.name] || o.name).join(", ");
-      const narrative = `दशम/भाव ${houseNum} (${RASHIS_HINDI[s]} - ${s}) में ${planetListHi} — कुल ${occupants.length} ग्रह एक साथ बैठे हैं! व्याख्यान के अनुसार ${s} नंबर राशि की दिशा ${signDir.code} (${signDir.directionHindi}) है। यानी जातक के घर का ${signDir.code} ज़ोन इनकी पूरी ज़िंदगी का ${isPowerCenter ? "महा-ऊर्जा केंद्र (Power Center)" : "अत्यधिक संवेदनशील ऊर्जा क्षेत्र"} है!`;
+      const narrative = `दशम/भाव ${houseNum} (${RASHIS_HINDI[s]} - ${s}) में ${planetListHi} — कुल ${occupants.length} ग्रह एक साथ बैठे हैं! एस्ट्रो-वास्तु पद्धति के अनुसार ${s} नंबर राशि की दिशा ${signDir.code} (${signDir.directionHindi}) है। यानी जातक के घर का ${signDir.code} ज़ोन इनकी पूरी ज़िंदगी का ${isPowerCenter ? "महा-ऊर्जा केंद्र (Power Center)" : "अत्यधिक संवेदनशील ऊर्जा क्षेत्र"} है!`;
       clusters.push({
         house: houseNum,
         sign: RASHIS_ORDER[s - 1],
@@ -1097,7 +1125,7 @@ export function runAstroVastuHitEngine(
     if (h.targetType === "House") {
       const hNum = h.targetHouse || 1;
       if (hNum === 4) {
-        narrative = `जैसे ही ${h.sourceName} की सक्रिय दशा का प्रभाव प्रारंभ हुआ है, चतुर्थ भाव (${h.targetSign} - घरेलू सुख, मानसिक शांति, माता, वाहन एवं भवन) पर ${h.hitDef.hindiName || h.hitDef.name} का सीधा आघात पड़ा है। व्याख्यान के अनुसार जब भी चतुर्थ भाव पर 180° किलर हिट या 90° का दबाव आता है, तो व्यक्ति का बाहरी कार्यक्षेत्र भले ही गति पकड़े, परंतु घर में प्रवेश करते ही भारी मानसिक अशांति, अनिद्रा और बेचैनी महसूस होती है। प्रॉपर्टी, वाहन या माता के स्वास्थ्य को लेकर भी अचानक तनाव उत्पन्न होता है।`;
+        narrative = `जैसे ही ${h.sourceName} की सक्रिय दशा का प्रभाव प्रारंभ हुआ है, चतुर्थ भाव (${h.targetSign} - घरेलू सुख, मानसिक शांति, माता, वाहन एवं भवन) पर ${h.hitDef.hindiName || h.hitDef.name} का सीधा आघात पड़ा है। एस्ट्रो-वास्तु सिद्धांत के अनुसार जब भी चतुर्थ भाव पर 180° किलर हिट या 90° का दबाव आता है, तो व्यक्ति का बाहरी कार्यक्षेत्र भले ही गति पकड़े, परंतु घर में प्रवेश करते ही भारी मानसिक अशांति, अनिद्रा और बेचैनी महसूस होती है। प्रॉपर्टी, वाहन या माता के स्वास्थ्य को लेकर भी अचानक तनाव उत्पन्न होता है।`;
         symptoms.push("घर के वातावरण में अचानक बेचैनी, सुकून की कमी व अनिद्रा (Insomnia)");
         symptoms.push("परिजनों या माता के साथ अकारण तीखी बहस व वैचारिक मतभेद");
         symptoms.push("वाहन या प्रॉपर्टी को लेकर रुकावटें अथवा अप्रत्याशित खर्चे");
@@ -1314,7 +1342,7 @@ export function runAstroVastuHitEngine(
     10: {
       dotColor: "काला / काजल",
       dotSubstance: "काजल की सूक्ष्म बिंदी अथवा सरसों का तेल",
-      baseApplicationRules: "व्याख्यान का गुप्त सूत्र: जब भी दशम भाव या शनि की क्रूर 180° किलर हिट आ रही हो, तो संबंधित घुटने पर परमानेंट मार्कर या काजल से एक सूक्ष्म काली बिंदी लगाएं। यह किलर हिट को तत्काल 120° रक्षा ढाल में बदल देता है!",
+      baseApplicationRules: "एस्ट्रो-वास्तु का गुप्त सूत्र: जब भी दशम भाव या शनि की क्रूर 180° किलर हिट आ रही हो, तो संबंधित घुटने पर परमानेंट मार्कर या काजल से एक सूक्ष्म काली बिंदी लगाएं। यह किलर हिट को तत्काल 120° रक्षा ढाल में बदल देता है!",
       threadColor: "काला धागा (केवल टखने पर)",
       defaultThreadVerdict: "काले धागे को कभी कलाई या गले में न बांधें, केवल पैर के टखने पर बांधें।",
     },
@@ -1498,6 +1526,7 @@ export function runAstroVastuHitEngine(
     studyAndWorkDirection,
     marsDietaryLifestyleProtocol,
     wristThreadTrapAlert,
+    mandalaDossier: runVastuPurushaMandalaEngine(chart),
   };
 }
 

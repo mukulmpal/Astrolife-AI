@@ -89,8 +89,9 @@ DROP POLICY IF EXISTS "Anyone can insert events"    ON user_events;
 CREATE POLICY "Anyone can insert events" ON user_events FOR INSERT WITH CHECK (true);
 
 
--- 3. ADMIN SUMMARY VIEW
-CREATE OR REPLACE VIEW admin_user_summary AS
+-- 3. ADMIN SUMMARY VIEW (Moved to admin schema to prevent auth_users_exposed security vulnerability in public schema)
+CREATE SCHEMA IF NOT EXISTS admin;
+CREATE OR REPLACE VIEW admin.user_summary AS
 SELECT
   u.id                                                        AS user_id,
   u.email,

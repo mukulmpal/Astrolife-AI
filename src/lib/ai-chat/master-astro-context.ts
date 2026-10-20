@@ -557,7 +557,7 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
     ✦ ${shiftsText}
   ✦ Personal Astro-Vastu vs Generic MahaVastu Conflicts:
     ✦ ${conflictsText}
-  ✦ Subtle Astro-Vastu Guardrails (Authentic Lecture Directives):
+  ✦ Subtle Astro-Vastu Guardrails (Authentic Shastric Directives):
     ✦ [FAMILY CROSS-HIT ISOLATION]: If placing an item in a shared house zone could cross-hit another family member's chart, KEEP REMEDY EXCLUSIVELY in the native's personal pocket, wallet, bedroom, or private study desk (e.g. 4-5 red chilies or copper coin in personal pocket).
     ✦ [WRIST THREAD CAUTION]: The wrist represents Gemini (3rd House). Never tie colored sacred threads on wrists blindly if Gemini/Mercury rules dusthanas (6/8/12), as it immediately triggers anxiety and severs friends/gains.
     ✦ [NAVEL 2-INCH BOUNDARY]: Dot therapy for Virgo/Mercury must stay strictly within 2 inches above or 2 inches below the navel; never exceed this boundary.`;

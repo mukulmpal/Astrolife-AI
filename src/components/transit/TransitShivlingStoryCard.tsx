@@ -391,7 +391,7 @@ export function TransitShivlingStoryCard({
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#875C06", fontWeight: 700, fontSize: 14 }}>
-              <span>📜 व्याख्यान की सच्ची घटना: चार मंजिला इमारत और २५वां उपचार (Mantra Pushpam)</span>
+              <span>📜 प्रामाणिक केस स्टडी व अनुभव: चार मंजिला इमारत और २५वां उपचार (Mantra Pushpam)</span>
             </div>
             <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.8, color: "#382D20" }}>
               {data.geminiCaseStudyHinglish}
