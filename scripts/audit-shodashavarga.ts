@@ -1,8 +1,8 @@
 import { calculateChart } from "../src/lib/astro-engine/calculations";
 import { calculateDivisional, getChartAnalysis, getSpecialFindings } from "../src/lib/astro-engine/divisional";
 
-const mukul = calculateChart(
-  "Mukul Pal",
+const sampleChart = calculateChart(
+  "Sample Native",
   "1995-07-04",
   "12:30:00",
   "Delhi",
@@ -11,7 +11,7 @@ const mukul = calculateChart(
   5.5
 );
 
-const allVargas = calculateDivisional(mukul.planets, mukul.lagnaNum, mukul.lagnaLon);
+const allVargas = calculateDivisional(sampleChart.planets, sampleChart.lagnaNum, sampleChart.lagnaLon);
 
 // Parashara Classical 16 Shodashavarga keys:
 const SHODASHAVARGA_KEYS = [
@@ -20,7 +20,7 @@ const SHODASHAVARGA_KEYS = [
 ];
 
 console.log("================================================================================");
-console.log("MUKUL PAL — COMPLETE 16 SHODASHAVARGA CHARTS AUDIT");
+console.log("SAMPLE NATIVE — COMPLETE 16 SHODASHAVARGA CHARTS AUDIT");
 console.log("================================================================================");
 
 SHODASHAVARGA_KEYS.forEach((key, idx) => {

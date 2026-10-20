@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 import { PanchangStrip } from './panchang-strip';
 
 interface DirectionANavProps {
@@ -10,6 +12,7 @@ interface DirectionANavProps {
 
 export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
   const [solid, setSolid] = useState(false);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
 
   useEffect(() => {
     const on = () => setSolid(window.scrollY > 24);
@@ -17,6 +20,33 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
     window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
   }, []);
+
+  useEffect(() => {
+    try {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data }) => {
+        setUser(data.user);
+      });
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+      });
+      return () => subscription.unsubscribe();
+    } catch {
+      // In case client env missing during build
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      setUser(null);
+      window.location.reload();
+    } catch (e) {
+      console.error('Logout error:', e);
+      window.location.assign('/logout');
+    }
+  };
 
   return (
     <header
@@ -67,28 +97,65 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <a
-            href="/login"
-            onClick={(event) => {
-              if (!onSignIn) return;
-              event.preventDefault();
-              onSignIn();
-            }}
-            className="hidden text-sm font-medium sm:inline"
-            style={{ color: 'var(--al-ivory)' }}
-          >
-            Sign in
-          </a>
-          <button
-            onClick={onGetStarted}
-            className="cursor-pointer rounded-full px-3.5 py-1.5 sm:px-5 sm:py-2 text-xs font-semibold tracking-wide transition-transform duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: 'linear-gradient(180deg, var(--al-gold-bright), var(--al-gold))',
-              color: 'var(--al-bg)',
-            }}
-          >
-            <span className="hidden sm:inline">Generate </span>Free Kundli
-          </button>
+          {user ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-xs sm:text-sm font-medium transition-colors hover:text-amber-400"
+                style={{ color: 'var(--al-ivory)' }}
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="cursor-pointer text-xs px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border transition-opacity hover:opacity-80"
+                style={{
+                  color: 'var(--al-ivory-dim)',
+                  borderColor: 'rgba(255,255,255,0.18)',
+                  background: 'rgba(255,255,255,0.04)',
+                }}
+                title="Sign out of AstroLife"
+                type="button"
+              >
+                Logout
+              </button>
+              <Link
+                href="/dashboard"
+                className="cursor-pointer rounded-full px-3.5 py-1.5 sm:px-5 sm:py-2 text-xs font-semibold tracking-wide transition-transform duration-300 hover:scale-105 active:scale-95"
+                style={{
+                  background: 'linear-gradient(180deg, var(--al-gold-bright), var(--al-gold))',
+                  color: 'var(--al-bg)',
+                }}
+              >
+                Open Dashboard ✦
+              </Link>
+            </>
+          ) : (
+            <>
+              <a
+                href="/login"
+                onClick={(event) => {
+                  if (!onSignIn) return;
+                  event.preventDefault();
+                  onSignIn();
+                }}
+                className="hidden text-sm font-medium sm:inline"
+                style={{ color: 'var(--al-ivory)' }}
+              >
+                Sign in
+              </a>
+              <button
+                onClick={onGetStarted}
+                className="cursor-pointer rounded-full px-3.5 py-1.5 sm:px-5 sm:py-2 text-xs font-semibold tracking-wide transition-transform duration-300 hover:scale-105 active:scale-95"
+                style={{
+                  background: 'linear-gradient(180deg, var(--al-gold-bright), var(--al-gold))',
+                  color: 'var(--al-bg)',
+                }}
+              >
+                <span className="hidden sm:inline">Generate </span>Free Kundli
+              </button>
+            </>
+          )}
         </div>
       </div>
     </header>

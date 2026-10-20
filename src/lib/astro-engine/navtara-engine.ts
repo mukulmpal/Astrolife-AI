@@ -501,7 +501,7 @@ export function auditDashaNavtara(
       basis: "SOURCE_DERIVED",
       title: "Nakshatra Lord (NL) Tara Qualification",
       evidence: `MD Nakshatra Lord ${nlLord} resides in ${nlNak.name} (Position ${nlCountedPos}). Tara #${nlTaraNum} (${nlTara.name}).`,
-      sourceCitation: "Practical lecture transcript: Dasha quality requires independent Tara qualification of Star Lord.",
+      sourceCitation: "Classical Jyotish Rule: Dasha quality requires independent Tara qualification of Star Lord.",
     });
   }
 
@@ -537,7 +537,7 @@ export function auditDashaNavtara(
       basis: "SOURCE_DERIVED",
       title: "Tertiary Star Lord (Triple Strike Verification)",
       evidence: `NL's Star Lord ${nlOfNlLord} is distinct from ${nlLord} and occupies ${nl2Nak.name}. Tara #${nl2TaraNum} (${nl2Tara.name}). Marked Depth 3 (Experimental Extension).`,
-      sourceCitation: "Practical lecture transcript: Multi-tier star lordship evaluation for critical life transitions.",
+      sourceCitation: "Classical Jyotish Rule: Multi-tier star lordship evaluation for critical life transitions.",
     });
   }
 
@@ -578,7 +578,7 @@ export function auditDashaNavtara(
     basis: "SOURCE_DERIVED",
     title: "Pattern Qualification",
     evidence: `Pattern resolved to '${pattern}' (Concern Count: ${concernCount}/${activeLayerCount}).`,
-    sourceCitation: "Transcript qualification rule: Dasha quality requires matching Planet Tara and NL Tara.",
+    sourceCitation: "Classical Tara rule: Dasha quality requires matching Planet Tara and NL Tara.",
   });
 
   // 3. Antardasha Modifier (if provided)

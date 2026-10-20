@@ -1,6 +1,6 @@
 // src/lib/astro-engine/core-planet-remedies.ts
 // AstroLife — Authentic Core Planet Remedies, Dignity Assessment & Elemental Vehicles
-// Derived verbatim from the Classical Master Lecture Transcript & Universal Remedy Schema.
+// Derived from Classical Shastras, Parashari Principles & Universal Remedy Schema.
 // Governs: Favorable (Power-Up / Gemstone) vs Afflicted (Mitigate / Charity / Never Gemstone),
 // Moon Psychological Heart-Sharing Map, Conjunction Resolutions, and Specific Charity Dosages.
 
@@ -243,7 +243,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Morning to afternoon",
         targetRecipient: "Disposal vehicle according to house element (Tattva Trikona)",
         place: "Fire: Mandir/Bhatti | Earth: Zameen me dabayein | Air: Peepal par taangein | Water: Behta jal",
-        esotericReason: "Transcript verbatim formula: Taambe ka tikona piece, sabut lal mirch, masoor daal aur shehad ko laal kapde me baandh kar trikona ke anusaar sthapit/pravahit karne se Mangal ka bhandaar shant ho jata hai aur property v police disputes khatam hote hain."
+        esotericReason: "Classical Shastric Formula: Taambe ka tikona piece, sabut lal mirch, masoor daal aur shehad ko laal kapde me baandh kar trikona ke anusaar sthapit/pravahit karne se Mangal ka bhandaar shant ho jata hai aur property v police disputes khatam hote hain."
       },
       {
         item: "Red Lentils (Lal Masoor Dal) in Earthen Pot (Mitti ka Ghada)",
@@ -323,7 +323,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Wednesday morning purchase -> 7 days feed (green guava & red chilli) -> next Wednesday morning release",
         targetRecipient: "Dense green forest / open sky canopy",
         place: "Dense forest or large sanctuary canopy",
-        esotericReason: "Transcript verbatim formula: 'Budhwar ko tota layein, 7 din hari mirch aur amrood khilayein, agle Budhwar jungle me azaad karein' — trading, vyapaar aur dimaag ke saare bandhan 100% khul jaate hain."
+        esotericReason: "Classical Shastric Formula: 'Budhwar ko tota layein, 7 din hari mirch aur amrood khilayein, agle Budhwar jungle me azaad karein' — trading, vyapaar aur dimaag ke saare bandhan 100% khul jaate hain."
       },
       {
         item: "Kinnar Seva with Agra Petha & Green Dress",
@@ -332,7 +332,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Daytime before sunset",
         targetRecipient: "Kinnar (transgenders)",
         place: "Direct donation with humble folded hands",
-        esotericReason: "Transcript secret: Kinnar Budha ke sakshat prateek hain; unko hara petha aur vastra dekar ashirwad lena Budh ke klesh ko shubh gyan aur dhan me badalta hai."
+        esotericReason: "Classical Shastric Secret: Kinnar Budha ke sakshat prateek hain; unko hara petha aur vastra dekar ashirwad lena Budh ke klesh ko shubh gyan aur dhan me badalta hai."
       },
       {
         item: "Green fodder / Spinach (Hari Ghaas ya Palak)",
@@ -486,7 +486,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Morning to afternoon",
         targetRecipient: "Temple kitchen, Gurudwara Langar, or public community kitchen",
         place: "Langar kitchen / Dharmik bhojanalaya",
-        esotericReason: "Transcript formula: Shukra ki peeda ko shaant karne ke liye 6kg aloo langar me daan karna aashcharyajanak roop se dhan aur rishto ko bachaata hai."
+        esotericReason: "Classical Shastric Formula: Shukra ki peeda ko shaant karne ke liye 6kg aloo langar me daan karna aashcharyajanak roop se dhan aur rishto ko bachaata hai."
       },
       {
         item: "Pure Camphor (Bhimseni Kapoor) & Cow Ghee",
@@ -559,7 +559,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Afternoon during harsh sun",
         targetRecipient: "Poor roadside vegetable/fruit vendor or manual laborer working in scorching heat",
         place: "Roadside / Sabzi Mandi street",
-        esotericReason: "Transcript verbatim formula: Dhoop me tap rahe mehnatkash ko kali chhatri ya chhaya dena Shani Dev ko turant prasanna karta hai aur klesh door karta hai."
+        esotericReason: "Classical Shastric Formula: Dhoop me tap rahe mehnatkash ko kali chhatri ya chhaya dena Shani Dev ko turant prasanna karta hai aur klesh door karta hai."
       },
       {
         item: "Old Leather Shoes Donation (पुराने जूते दान)",
@@ -649,7 +649,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Early morning sunrise",
         targetRecipient: "Temple / Gurudwara Entrance Threshold",
         place: "Mandir / Gurudwara main gate dehleez",
-        esotericReason: "Transcript verbatim miracle: Mandir ki dehleez ko peele rumaal se saaf karein, apna matha dehleez par takein (Sar = Rahu), aur us rumaal ko jeb me rakhein — Rahu ka vish amrit me badal jata hai."
+        esotericReason: "Classical Shastric Remedy: Mandir ki dehleez ko peele rumaal se saaf karein, apna matha dehleez par takein (Sar = Rahu), aur us rumaal ko jeb me rakhein — Rahu ka vish amrit me badal jata hai."
       },
       {
         item: "4 Brooms (Jhadu) to Municipal Sweeper",
@@ -658,7 +658,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Morning",
         targetRecipient: "Road sweeper / Safai karamchari",
         place: "Local street",
-        esotericReason: "Transcript formula: Char jhadu Rahu ke chaaro dishaon ke dhuen aur kachre ko baha deti hain."
+        esotericReason: "Classical Shastric Formula: Char jhadu Rahu ke chaaro dishaon ke dhuen aur kachre ko baha deti hain."
       },
       {
         item: "Raw Charcoal (Koyla) / Barley (Jau) / Radish (Mooli)",
@@ -670,13 +670,13 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         esotericReason: "Koyla aur Jau Rahu ke vish aur dhuen ko behte jal me vileen karte hain."
       },
       {
-        item: "Cigarette Box appeasement formula (Transcript Master Secret)",
+        item: "Cigarette Box appeasement formula (Classical Master Secret)",
         quantity: "1 sealed cigarette box",
         day: "Saturday evening",
         timing: "After sunset",
         targetRecipient: "A poor manual road-sweeper / safai karamchari (who smokes)",
         place: "Direct hand to hand outside house",
-        esotericReason: "Transcript secret: Safai karamchari ko cigarette box dekar usme se ek cigarette nikal kar unhe aadar se sulga kar dena Rahu ke dhuen ki aahuti banker native ke dhuen aur shrap ko turant baha deta hai."
+        esotericReason: "Classical Shastric Secret: Safai karamchari ko cigarette box dekar usme se ek cigarette nikal kar unhe aadar se sulga kar dena Rahu ke dhuen ki aahuti banker native ke dhuen aur shrap ko turant baha deta hai."
       }
     ],
     avoidColours: ["Smoky blue or navy blue clothes (when afflicted)", "Dirty patched synthetic clothes"],
@@ -735,13 +735,13 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
     afflictedStoneWarning: "LEHSUNIA (CAT'S EYE) BHULKAR BHI NA PEHNE agar Ketu peedit ho; yah poori grihasthi aur paise ko kaat kar alag kar dega!",
     afflictedCharity: [
       {
-        item: "7 Ripe Bananas to Lord Ganesha (The Transcript Miracle Formula)",
+        item: "7 Ripe Bananas to Lord Ganesha (The Classical Shastric Formula)",
         quantity: "7 Ripe Yellow Bananas (सात पके केले)",
         day: "Tuesday or Thursday (or any day during emergency crisis)",
         timing: "Morning sunrise or before noon",
         targetRecipient: "Lord Ganesha Sanctuary in temple",
         place: "Ganesha Temple",
-        esotericReason: "Transcript verbatim formula: '7 bananas lene hain aur Ganesh ji ko arpit kar do, chamatkari upay hai, 1 ghante me result aate hain!' Ketu ke klesh ko Ganesha turant har lete hain."
+        esotericReason: "Classical Shastric Formula: '7 bananas lene hain aur Ganesh ji ko arpit kar do, chamatkari upay hai, 1 ghante me result aate hain!' Ketu ke klesh ko Ganesha turant har lete hain."
       },
       {
         item: "Sunset Godhuli Vela Lemons & Imli Jal-Pravah (गोधूलि वेla जल प्रवाह)",
@@ -750,7 +750,7 @@ export const MASTER_PLANET_REGISTRY: Record<PlanetId, PlanetMasterDefinition> = 
         timing: "Sunset (Godhuli Vela) strictly before complete dark",
         targetRecipient: "Clean flowing river or water canal",
         place: "Flowing natural river",
-        esotericReason: "Transcript verbatim formula: 'Nimboo aur imli pure Ketu hain; sunset se pehle inko behte jal me pravahit karne se Ketu ka dushprabhav jal me vileen ho jata hai.'"
+        esotericReason: "Classical Shastric Formula: 'Nimboo aur imli pure Ketu hain; sunset se pehle inko behte jal me pravahit karne se Ketu ka dushprabhav jal me vileen ho jata hai.'"
       },
       {
         item: "Fish Feeding with Black & White Sesame Balls (मछली सेवा)",
@@ -997,7 +997,7 @@ export function getMoonSharingGuide(moonHouse: number, sign: string = "Cancer"):
 
 /**
  * Multi-Planet Conjunction Treatment Resolver
- * Transcript principle: When two or more planets sit in the same house:
+ * Classical principle: When two or more planets sit in the same house:
  * - If a Malefic conjuncts a Benefic (e.g. Saturn + Venus, Sun + Mercury, Rahu + Venus),
  *   treat the malefic (charity/mitigation) to liberate the benefic's fruit!
  * - Never wear the stone of the malefic in that combination.
@@ -1028,7 +1028,7 @@ export function evaluateConjunctionInHouse(
   const hasMercury = names.includes("Mercury");
   const hasMoon = names.includes("Moon");
 
-  // Specific Transcript Combos:
+  // Specific Classical Combos:
   if (hasVenus && hasRahu) {
     return {
       houseNumber,
@@ -1046,7 +1046,7 @@ export function evaluateConjunctionInHouse(
       planets: names,
       primaryTreatmentTarget: "Ketu",
       remedyActionTitle: "Saturn-Ketu Profession Cut Yog (Ketu Ko Creative Route Dein)",
-      narrativeHinglish: "Ketu jahan baithta hai vahan se detach karta hai; Shani kriya v karm hai. Shani-Ketu ka yog career me achanak virakti ya cut lagata hai. Iska sabse best upay transcript me bataya gaya hai: Ketu ko align karein (silayi, gardening, yoga, astrology, research). Ketu ko 7 kele Ganesh ji ko chadhayein taaki Shani ka profession secure rahe.",
+      narrativeHinglish: "Ketu jahan baithta hai vahan se detach karta hai; Shani kriya v karm hai. Shani-Ketu ka yog career me achanak virakti ya cut lagata hai. Iska sabse best shastrik upay hai: Ketu ko align karein (silayi, gardening, yoga, astrology, research). Ketu ko 7 kele Ganesh ji ko chadhayein taaki Shani ka profession secure rahe.",
       strictWarning: "Achanak naukri ya vyapaar bina doosra vikalp chune na chhodein."
     };
   }
@@ -1057,7 +1057,7 @@ export function evaluateConjunctionInHouse(
       planets: names,
       primaryTreatmentTarget: "Both (Auspicious Synthesis)",
       remedyActionTitle: "Jupiter-Ketu Param Adhyatma Yog (Divinity & Wisdom)",
-      narrativeHinglish: "Transcript verbatim: 'Jupiter aur Ketu ka combination bahut achha maana gaya hai; isme aapko adhyatma aur gudh gyan ki praapti hoti hai, aap super-religious aur gyani ban jaate hain.' Dono grah milkar teesra netra kholte hain. Is yog me sadhu-sant seva aur dharmik granthon ka adhyayan karein.",
+      narrativeHinglish: "Classical Jyotish Rule: 'Jupiter aur Ketu ka combination bahut achha maana gaya hai; isme aapko adhyatma aur gudh gyan ki praapti hoti hai, aap super-religious aur gyani ban jaate hain.' Dono grah milkar teesra netra kholte hain. Is yog me sadhu-sant seva aur dharmik granthon ka adhyayan karein.",
       strictWarning: "Apne adhyatmik gyan par ahankar na karein."
     };
   }
@@ -1092,14 +1092,14 @@ export function evaluateConjunctionInHouse(
     planets: names,
     primaryTreatmentTarget: malefic,
     remedyActionTitle: `${names.join(" + ")} Conjunction in House ${houseNumber}`,
-    narrativeHinglish: `Is bhav me ek se adhik grah virajman hain. Classical aur transcript niyam ke anusar, pehle kleshkarak grah (${malefic}) ka daan v shanti karke bhav ke prabhav ko nirmal kiya jata hai, taaki shubh grahon ki urja mukt ho sake.`,
+    narrativeHinglish: `Is bhav me ek se adhik grah virajman hain. Classical shastrik niyam ke anusar, pehle kleshkarak grah (${malefic}) ka daan v shanti karke bhav ke prabhav ko nirmal kiya jata hai, taaki shubh grahon ki urja mukt ho sake.`,
     strictWarning: "Dono grahon ka ek saath ratna na dharan karein bina nakshtra v sub-lord check kiye."
   };
 }
 
 /**
  * Contextual Life-Domain Remedy Architecture (The 3-Tier Dynamic Activation System)
- * Derived verbatim from the Classical Master Lecture Transcript:
+ * Derived from Classical Shastras & Parashari Principles:
  * "Kundli me 50 rajyog ho ya 50 dur-yog, kaam wahi karega jo planet Dasha/Antardasha me active hai ya jis House ka trigger chala hai!"
  */
 export type LifeDomainContext =
@@ -1238,7 +1238,7 @@ export function resolveContextualRemedies(
       context: "dasha",
       titleHinglish: "⏰ Active Dasha & Antardasha Priority Dossier",
       subtitleHinglish: `Mahadasha: ${mdPlanet} · Antardasha: ${adPlanet}`,
-      primaryRationaleHinglish: "Transcript niyam: 'Chart me 50 rajyog ho ya 50 dosh, fal wahi deta hai jo Dasha aur Antardasha me active hai!' Abhi inhi do grahon ka prabhav aapke vartaman jeevan par 70% chal raha hai.",
+      primaryRationaleHinglish: "Shastric Niyam: 'Chart me 50 rajyog ho ya 50 dosh, fal wahi deta hai jo Dasha aur Antardasha me active hai!' Abhi inhi do grahon ka prabhav aapke vartaman jeevan par 70% chal raha hai.",
       signifiedHouses: [
         chart.planets[mdPlanet]?.house || 1,
         chart.planets[adPlanet]?.house || 1
@@ -1288,7 +1288,7 @@ export function resolveContextualRemedies(
       {
         title: "Mars Triangle Copper Piece Potli (तांबे का तिकोना टुकड़ा Upay)",
         badge: "Property Dispute Breaker",
-        esotericSecretHinglish: "Transcript verbatim formula: Taambe ka tikona tukda, 1kg lal masoor dal, sabut lal mirch, lal sindoor aur pure honey ko lal kapde me bandhkar bhav ke tattva ke anusaar sthapit ya pravahit karein. Mangal ka klesh shant hota hai aur registry safal hoti hai.",
+        esotericSecretHinglish: "Classical Shastric Formula: Taambe ka tikona tukda, 1kg lal masoor dal, sabut lal mirch, lal sindoor aur pure honey ko lal kapde me bandhkar bhav ke tattva ke anusaar sthapit ya pravahit karein. Mangal ka klesh shant hota hai aur registry safal hoti hai.",
         itemsRequired: ["Taambe ka tikona tukda", "1kg Lal Masoor Dal", "Sabut Lal Mirch", "Lal Sindoor", "Shuddh Shehad", "Lal Vastra"],
         exactDosage: "1 potli tied securely on Tuesday",
         timing: "Tuesday morning to afternoon",
@@ -1306,7 +1306,7 @@ export function resolveContextualRemedies(
       {
         title: "4th House Ketu Roof Flag Rule",
         badge: "Strict Warning",
-        esotericSecretHinglish: "Transcript verbatim secret: Agar Ketu 4th house me ho to chhat par tiranga ya lamba flag na lagayein (yeh ghar ki shanti kaat-ta hai), sirf chhota safed dhwaja lagayein.",
+        esotericSecretHinglish: "Classical Shastric Secret: Agar Ketu 4th house me ho to chhat par tiranga ya lamba flag na lagayein (yeh ghar ki shanti kaat-ta hai), sirf chhota safed dhwaja lagayein.",
         itemsRequired: ["Small white flag"],
         exactDosage: "1 small white flag",
         timing: "Thursday morning",
@@ -1368,7 +1368,7 @@ export function resolveContextualRemedies(
       {
         title: "Venus South-East Kitchen Sink Curd Totka (रसोई सिंक दही उपाय)",
         badge: "Marital Harmony Healer",
-        esotericSecretHinglish: "Transcript verbatim formula: Kitchen Agni (Fire) hai aur sink Jal (Water) hai. Roz subah 2 chamach dahi aur raat ko 2 chamach dahi kitchen ke sink me daalkar paani baha dein. Dahi Agni-Jal ke takraav ko shaant karta hai aur South-East vastu dosha mitata hai.",
+        esotericSecretHinglish: "Classical Shastric Formula: Kitchen Agni (Fire) hai aur sink Jal (Water) hai. Roz subah 2 chamach dahi aur raat ko 2 chamach dahi kitchen ke sink me daalkar paani baha dein. Dahi Agni-Jal ke takraav ko shaant karta hai aur South-East vastu dosha mitata hai.",
         itemsRequired: ["Fresh white curd (Dahi)", "Water tap"],
         exactDosage: "2 spoons morning + 2 spoons night down kitchen sink",
         timing: "Daily morning and night",
@@ -1447,9 +1447,9 @@ export function resolveContextualRemedies(
 
     const specialFormulas: ContextualSpecialFormula[] = [
       {
-        title: "Saturn 7th House Growth Radar (Transcript Benchmark)",
+        title: "Saturn 7th House Growth Radar (Classical Benchmark)",
         badge: "Career Elevation",
-        esotericSecretHinglish: "Transcript verbatim formula: Transit Saturn jahan baithta hai, uske theek 7th house ka status badhata hai! 8th Shani = 2nd house dhan status; 9th Shani = 3rd house media status; 10th Shani = 4th house big mansion status.",
+        esotericSecretHinglish: "Classical Shastric Formula: Transit Saturn jahan baithta hai, uske theek 7th house ka status badhata hai! 8th Shani = 2nd house dhan status; 9th Shani = 3rd house media status; 10th Shani = 4th house big mansion status.",
         itemsRequired: ["Shani discipline", "Respect for blue collar workers"],
         exactDosage: "Analyze your 2.5-year transit window",
         timing: "Current 2.5-year cycle",
@@ -1467,7 +1467,7 @@ export function resolveContextualRemedies(
       {
         title: "Mercury Parrot Freedom & Kinnar Seva (तोता सेवा v किन्नर आशीर्वाद)",
         badge: "Business & Trading Breakthrough",
-        esotericSecretHinglish: "Transcript verbatim formula: Budhwar ko tota layein, 7 din hari mirch aur amrood khilayein, agle Budhwar jungle me uda dein. Kinnar ko hara suit aur Agra Petha dekar ashirwad lein.",
+        esotericSecretHinglish: "Classical Shastric Formula: Budhwar ko tota layein, 7 din hari mirch aur amrood khilayein, agle Budhwar jungle me uda dein. Kinnar ko hara suit aur Agra Petha dekar ashirwad lein.",
         itemsRequired: ["Green parrot (fed 7 days)", "Green dress", "1 kg Agra petha", "₹500 dakshina"],
         exactDosage: "1 week feeding then free release in forest",
         timing: "Wednesday to Wednesday",
@@ -1530,7 +1530,7 @@ export function resolveContextualRemedies(
       {
         title: "Ketu 7 Ripe Bananas to Lord Ganesha (1 Ghante Me Raahat)",
         badge: "Emergency Relief Miracle",
-        esotericSecretHinglish: "Transcript verbatim formula: '7 bananas lene hain aur Ganesh ji ko arpit kar do, chamatkari upay hai, 1 ghante me result aate hain!' Ketu ke phantom dard, klesh aur achanak sankat ko Ganesha turant har lete hain.",
+        esotericSecretHinglish: "Classical Shastric Formula: '7 bananas lene hain aur Ganesh ji ko arpit kar do, chamatkari upay hai, 1 ghante me result aate hain!' Ketu ke phantom dard, klesh aur achanak sankat ko Ganesha turant har lete hain.",
         itemsRequired: ["7 Ripe Yellow Bananas (सात पके केले)"],
         exactDosage: "7 bananas offered at Ganesha Sanctuary",
         timing: "Tuesday, Thursday or any emergency moment",
@@ -1539,7 +1539,7 @@ export function resolveContextualRemedies(
       {
         title: "Sunset Godhuli Vela Lemons & Imli Jal-Pravah",
         badge: "Chronic Sickness Cleanser",
-        esotericSecretHinglish: "Transcript verbatim formula: 7 nimboo + 1 packet imli bhoore kapde me bandhkar sunset se theek pehle behte jal me pravahit karein. Khatti cheezein Ketu hain, inka jal-pravah roga-shrap ko baha deta hai.",
+        esotericSecretHinglish: "Classical Shastric Formula: 7 nimboo + 1 packet imli bhoore kapde me bandhkar sunset se theek pehle behte jal me pravahit karein. Khatti cheezein Ketu hain, inka jal-pravah roga-shrap ko baha deta hai.",
         itemsRequired: ["7 Lemons", "1 packet dry tamarind (Imli)", "Brown cloth"],
         exactDosage: "Flow into clean running water",
         timing: "Sunset (Godhuli Vela) strictly before nightfall",
@@ -1605,7 +1605,7 @@ export function resolveContextualRemedies(
       {
         title: "Golden Emergency Rule: NEVER WEAR GEMSTONE",
         badge: "Strict Shastra Law",
-        esotericSecretHinglish: "Transcript verbatim principle: Jo grah dushit, neech ya 6/8/12 me fasa hai, uska stone pehanna aag me ghee daalne jaisa hai! Aise grah ko shant karne ke liye kewal daan, jal pravah aur seva karein.",
+        esotericSecretHinglish: "Classical Shastric Principle: Jo grah dushit, neech ya 6/8/12 me fasa hai, uska stone pehanna aag me ghee daalne jaisa hai! Aise grah ko shant karne ke liye kewal daan, jal pravah aur seva karein.",
         itemsRequired: ["Strict restraint from gemstones"],
         exactDosage: "Zero gemstone usage for afflicted planets",
         timing: "Lifelong or dasha duration",

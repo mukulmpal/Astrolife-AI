@@ -1,8 +1,8 @@
 import { calculateChart } from "../src/lib/astro-engine/calculations";
 import { calculateDivisional, getChartAnalysis } from "../src/lib/astro-engine/divisional";
 
-const mukul = calculateChart("Mukul Pal", "1995-07-04", "12:30:00", "Delhi", 28.65195, 77.23149, 5.5);
-const allVargas = calculateDivisional(mukul.planets, mukul.lagnaNum, mukul.lagnaLon);
+const sampleChart = calculateChart("Sample Native", "1995-07-04", "12:30:00", "Delhi", 28.65195, 77.23149, 5.5);
+const allVargas = calculateDivisional(sampleChart.planets, sampleChart.lagnaNum, sampleChart.lagnaLon);
 const first9 = ["D1", "D2", "D3", "D4", "D7", "D9", "D10", "D12", "D16"];
 
 first9.forEach((key) => {

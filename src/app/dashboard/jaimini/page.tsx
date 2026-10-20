@@ -1303,7 +1303,7 @@ export default function JaiminiPage() {
                 Life Horizon, Wealth Channels & Pinnacle Rajayogas
               </h3>
               <p className="text-sm text-[#6B635B] mt-1 leading-relaxed">
-                As revealed in classical Jaimini transcripts: AK sets the non-negotiable boundaries of where your soul must evolve (&quot;us house ke bahar life nahi ja sakti&quot;), while AmK governs the exact house gateway through which wealth, assets, and authority materialize.
+                As revealed in classical Jaimini Sutras: AK sets the non-negotiable boundaries of where your soul must evolve (&quot;us house ke bahar life nahi ja sakti&quot;), while AmK governs the exact house gateway through which wealth, assets, and authority materialize.
               </p>
             </section>
 

@@ -1959,7 +1959,7 @@ export function calculateDashaLagna(
 
   if ([1, 10, 11].includes(akHouse)) {
     akStatus = "Peak Elevation & Status (1/10/11)";
-    akVerdict = `Supreme Elevation: Atmakaraka (${ak.planet}) sits in House ${akHouse} from this Dasha Lagna. The transcript confirms: when AK is in 1, 10, or 11 from the running Dasha, the native experiences royal dignity, supreme career elevation, social status boom, and unshakeable authority.`;
+    akVerdict = `Supreme Elevation: Atmakaraka (${ak.planet}) sits in House ${akHouse} from this Dasha Lagna. Classical Jaimini Sutras confirm: when AK is in 1, 10, or 11 from the running Dasha, the native experiences royal dignity, supreme career elevation, social status boom, and unshakeable authority.`;
   } else if ([8, 12].includes(akHouse)) {
     akStatus = "Downfall & Vulnerability (8/12)";
     akVerdict = `Karmic Testing & Vulnerability: Atmakaraka (${ak.planet}) sits in House ${akHouse} from this Dasha Lagna ('Girte hain log'). Indicates loss of position, health vulnerability, ego deflation, or unmerited accusations. Maintain low profile, avoid arrogance, and focus on spiritual surrender.`;

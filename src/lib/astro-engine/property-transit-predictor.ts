@@ -117,7 +117,7 @@ export function evaluatePropertyTiming(chart: ChartData | null | undefined): Pro
       timingStatus: "Highly_Favorable_Acquisition",
       headlineHinglish: "🏠 Makaan / Zameen Khareedne Ka Prabal Yog (4-11-12)",
       verbatimRationaleHinglish:
-        "Transcript verbatim: 'Property ka combination hota hai ki dasha ka script 4-11-12 de. 4 number property ka hai, 11 number desire fulfillment ka hai, aur 12 number investment ka hai. Jab tak aapka kharch nahi hoga, investment active nahi hogi, property nahi banti!' Aapki dasha me yeh yog sakriya ho raha hai.",
+        "Classical Bhavat Bhavam: 'Property ka combination hota hai ki dasha ka script 4-11-12 de. 4 number property ka hai, 11 number desire fulfillment ka hai, aur 12 number investment ka hai. Jab tak aapka kharch nahi hoga, investment active nahi hogi, property nahi banti!' Aapki dasha me yeh yog sakriya ho raha hai.",
       signifiedHouses: houses,
       formulaIdentified: "4_11_12_Acquisition",
       recommendationsHinglish: [
@@ -134,7 +134,7 @@ export function evaluatePropertyTiming(chart: ChartData | null | undefined): Pro
       timingStatus: "Active_Sale_Window",
       headlineHinglish: "🤝 Property / Flat Bikri Ka Yog (3-7-10-5)",
       verbatimRationaleHinglish:
-        "Transcript verbatim: 'Property sale kab hogi jab dasha ke andar 3-7-10 aur 5 jaise combinations aate hain. 3rd house property ko negate karta hai (12th from 4th), 7th house khareeddar (client/buyer) hai, 10th house buyer ki property hai (4th from 7th), aur 5th house buyer ki desire fulfillment hai (11th from 7th)!' Yahan bikri tezi se ho sakti hai.",
+        "Classical Bhavat Bhavam: 'Property sale kab hogi jab dasha ke andar 3-7-10 aur 5 jaise combinations aate hain. 3rd house property ko negate karta hai (12th from 4th), 7th house khareeddar (client/buyer) hai, 10th house buyer ki property hai (4th from 7th), aur 5th house buyer ki desire fulfillment hai (11th from 7th)!' Yahan bikri tezi se ho sakti hai.",
       signifiedHouses: houses,
       formulaIdentified: "3_7_10_5_Sale",
       recommendationsHinglish: [
@@ -192,19 +192,19 @@ function getSaturnGrowthStory(growthHouse: number, saturnTransitHouse: number): 
     case 2:
       return {
         theme: "Kutumbik Dhan, Bank Balance & Share Market Surge (Family Wealth)",
-        story: "Transcript verbatim formula: 'Shani jab 8th me hota hai to wo kiska status badhata hai? 2nd house ka! Family ke andar status badha, paiso ka status badha, share market se paise kamaye!' Shani ka aathve se doosre bhav par dhyan parivarik sanchit kosh ko achanak vistar deta hai.",
+        story: "Classical Shastric Formula: 'Shani jab 8th me hota hai to wo kiska status badhata hai? 2nd house ka! Family ke andar status badha, paiso ka status badha, share market se paise kamaye!' Shani ka aathve se doosre bhav par dhyan parivarik sanchit kosh ko achanak vistar deta hai.",
         indicators: ["Bank balance aur liquid capital me achanak badhotri", "Parivar ke andar samman aur auda badhna", "Share bazaar, investment ya purani dharohar se dhan labh"]
       };
     case 3:
       return {
         theme: "Sanchar Kranti, Writing, Media & Prerna (Massive Reach & Courage)",
-        story: "Transcript reference (Sachidanand ji chart): Shani 9th bhav me chal kar seedha 3rd bhav (communication, teaching reach, writing, outreach) ka status badhata hai. Aapki baatcheet ka daayra failta hai, internet ya shishyagan aapki vani se judte hain.",
+        story: "Classical Shastric Reference: Shani 9th bhav me chal kar seedha 3rd bhav (communication, teaching reach, writing, outreach) ka status badhata hai. Aapki baatcheet ka daayra failta hai, internet ya shishyagan aapki vani se judte hain.",
         indicators: ["Social media, YouTube ya teaching network me vistar", "Chhoti yatraon se prachur fayda", "Lekhan, pustak ya gyan prasar me shandaar safalta"]
       };
     case 4:
       return {
         theme: "Bada Makaan, Badi Gaadi & Griha-Sukha (Luxury Real Estate Surge)",
-        story: "Transcript verbatim formula: 'Shani jab 10th me chal kar 4th ko dekhta hai, ya 12th se 4th par asar daalta hai: kya banne wala hai pata hai aapko? Makaan! Bada makaan banne wala hai, kyunki usne bada status dena hai, badi gaadi lene wale hain, bada ghar banne wala hai!' Real estate me sabse bada uchhal yahan hota hai.",
+        story: "Classical Shastric Formula: 'Shani jab 10th me chal kar 4th ko dekhta hai, ya 12th se 4th par asar daalta hai: kya banne wala hai pata hai aapko? Makaan! Bada makaan banne wala hai, kyunki usne bada status dena hai, badi gaadi lene wale hain, bada ghar banne wala hai!' Real estate me sabse bada uchhal yahan hota hai.",
         indicators: ["Naye bade aalishan makaan ya flat ka nirman", "Badi luxury gaadi / vehicle ki khareedari", "Mata ji ki sehad aur aashirwad me vriddhi"]
       };
     case 5:
@@ -349,15 +349,15 @@ export function evaluateBNNTransitConjunctions(
       switch (pName) {
         case "Sun":
           meaning = "Shani Surya se milta hai: Jyotish/Adhyatma ya prashasnik kshetra me shandaar Name, Fame, Status aur sarkar/sanstha se samman milta hai.";
-          quote = "Transcript verbatim: 'Agar Shani Sun ko milta hai to name-fame status milega teaching line me!'";
+          quote = "Classical Jyotish Rule: 'Agar Shani Sun ko milta hai to name-fame status milega teaching line me!'";
           break;
         case "Mercury":
           meaning = "Shani Budh se milta hai: Lekhan, documentation, brain calculation, astrological research aur marketing/teaching ka bada network khulta hai.";
-          quote = "Transcript verbatim: 'Mercury aaya to inke connection badhne shuru ho jayenge, dimaag padhne me bohot achha rahega, teaching management level badha dega!'";
+          quote = "Classical Jyotish Rule: 'Mercury aaya to inke connection badhne shuru ho jayenge, dimaag padhne me bohot achha rahega, teaching management level badha dega!'";
           break;
         case "Venus":
           meaning = "Shani Shukra se milta hai: Dhan, liquidity aur aishwarya ka bhari aagman hota hai; consultation aur gyan se prachur paisa aata hai.";
-          quote = "Transcript verbatim: 'Venus mil raha hai to Venus to hai hi wealth! Kaam karne wale ko bohot paisa aane wala hai!'";
+          quote = "Classical Jyotish Rule: 'Venus mil raha hai to Venus to hai hi wealth! Kaam karne wale ko bohot paisa aane wala hai!'";
           break;
         case "Mars":
           meaning = "Shani Mangal se milta hai: Bhoomi nirman, technical surgery/engineering aur physical toughness ka vistar hota hai.";

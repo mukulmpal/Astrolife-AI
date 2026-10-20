@@ -139,7 +139,7 @@ function ContextualDomainCard({ response }: { response: ContextualRemedyResponse
         <div style={{ marginBottom: 24 }}>
           <h4 style={{ fontSize: 14, fontWeight: 800, color: "#1F2937", letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
             <Flame size={16} color="#DC2626" />
-            <span>Transcript Classical Secret Formulas &amp; Micro-Totke</span>
+            <span>Classical Secret Formulas &amp; Micro-Totke</span>
           </h4>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
             {response.specialFormulas.map((f, idx) => (
@@ -995,7 +995,7 @@ export function CorePlanetRemediesDossier({
                   </h3>
                 </div>
                 <p style={{ fontSize: 14, lineHeight: 1.7, color: "#1E3A8A", margin: 0 }}>
-                  Transcript Master Formula: &quot;Shani jahan transit karta hai, uske 7th house ki growth honi shuru ho jaati hai, uska status badhna shuru ho jaata hai!&quot; Shani apne karmik dhar se saamne wale bhav ko amrit v vistar pradan karta hai.
+                  Classical Master Formula: &quot;Shani jahan transit karta hai, uske 7th house ki growth honi shuru ho jaati hai, uska status badhna shuru ho jaata hai!&quot; Shani apne karmik dhar se saamne wale bhav ko amrit v vistar pradan karta hai.
                 </p>
               </div>
 

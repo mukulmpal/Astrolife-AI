@@ -119,6 +119,9 @@ export interface SubtleShastricDirectives {
   shoeRackNorthAxiom: string;
   ancestorPhotoAxiom: string;
   bnnDharmaKarmaAxiom: string;
+  shareMarketVenusKetuRahuParadox?: string;
+  shaktiChakraDeityVsZoneColorNuance?: string;
+  piscesLagnaExaltedVenusRahuIpoYoga?: string;
   classicalCaseStudies: Array<{
     title: string;
     kundliContext: string;
@@ -1508,6 +1511,9 @@ export function runVastuPurushaMandalaEngine(
       shoeRackNorthAxiom: "उत्तर दिशा के मुख्य द्वार पर शू-रैक रखा जा सकता है, परंतु जूते-चप्पल खुले नहीं होने चाहिए। शू-रैक लकड़ी का और पूर्णतः बंद अलमारी (Closed Cabinet) रूप में होना अनिवार्य है।",
       ancestorPhotoAxiom: "पितरों एवं दिवंगत पूर्वजों का चित्र सदैव दक्षिण-पश्चिम (SW) दिशा में 'पितृ देवता' (W1) के स्थान पर ही स्थापित करना चाहिए।",
       bnnDharmaKarmaAxiom: "भृगु नंदी नाड़ी (BNN) में 1-5-9 त्रिकोण कर्म नहीं है, वह 'धर्म' (कर्तव्य एवं पूर्वजन्मों का ऋण चुकाना) है। कर्म, आजीविका और धन पूर्णतः '2-6-10' (अर्थ त्रिकोण) में समाहित है।",
+      shareMarketVenusKetuRahuParadox: "जिम साइमंस (Jim Simons) व चार्ली मंगर (Charlie Munger) नाड़ी सूत्र: भृगु नंदी नाड़ी (BNN) में शुक्र + केतु (Venus-Ketu) योग शेयर बाजार में आध्यात्मिक डिटैचमेंट देता है, लेकिन संसार का महा-धन कमाने हेतु केतु सांसारिक मोह त्याग देता है। शेयर बाजार से अकूत गणितीय व सट्टे का धन कमाने के लिए 'राहु' (Rahu = अल्गोरिदम, हेज फंड, अचानक लाभ, असीमित महत्वाकांक्षा) अथवा शुक्र-राहु युति अनिवार्य होती है।",
+      shaktiChakraDeityVsZoneColorNuance: "शक्ति चक्र (45 Devata Chakra) में कुछ देवताओं पर दर्शाए गए आंतरिक रंग (जैसे E8 आकाश या वरुण या असुर पर लाल/विशिष्ट रंग) केवल उस विशिष्ट 'देवता की व्यक्तिगत दैवीय ऊर्जा' का प्रतीक हैं, उस 'दिशा या वास्तु ज़ोन' के तत्व का रंग नहीं! अतः ज़ोनल बार-चार्ट उपचार सदैव ज़ोन के मूल पंचतत्व (16 Zones Element) के आधार पर ही करना चाहिए, देवता के आंतरिक प्रतीक रंग से भ्रमित होकर गलत रंग न लगाएं।",
+      piscesLagnaExaltedVenusRahuIpoYoga: "मीन लग्न का आईपीओ व सट्टा योग (सनी सहगल केस स्टडी): मीन लग्न के प्रथम भाव में उच्च का शुक्र (Exalted Venus in 1st house / Pisces) और राहु की युति जातक को शेयर बाजार, आईपीओ (IPO) और अप्रत्याशित वित्तीय सट्टेबाजी में 100% सटीक वित्तीय प्रेडिक्शन और अरबों का लाभ प्रदान करती है।",
       classicalCaseStudies: [
         {
           title: "प्रसिद्ध स्वर्ण व्यवसायी की उत्तर दीवार (Scorpio Lagna Jeweler)",
