@@ -13,6 +13,7 @@ import {
   type ShiftingPrescription,
   type GenericVastuConflict,
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
+import { BioWearableAuditView } from "./BioWearableAuditView";
 
 const DEMO_VASTU_FALLBACK: BirthDetails = {
   name: "Mukul Ji (Demo Chart)",
@@ -28,7 +29,7 @@ interface AstroVastuHitRadarViewProps {
 
 export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   const [activeTab, setActiveTab] = useState<
-    "dossier" | "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts" | "lifestyle"
+    "dossier" | "radar" | "trafficPolice" | "hits" | "shifting" | "bodyTherapy" | "conflicts" | "lifestyle" | "wearableAudit"
   >("dossier");
   const [showCuspsTable, setShowCuspsTable] = useState(false);
   const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 60 | 120>("all");
@@ -776,6 +777,19 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           onClick={() => setActiveTab("bodyTherapy")}
         >
           🧘 शरीर अंग डॉट/धागा चिकित्सा
+        </button>
+        <button
+          className={`tab ${activeTab === "wearableAudit" ? "active" : ""}`}
+          onClick={() => setActiveTab("wearableAudit")}
+          style={{
+            fontWeight: 700,
+            background: activeTab === "wearableAudit" ? "#854D0E" : "rgba(245, 158, 11, 0.12)",
+            color: activeTab === "wearableAudit" ? "#FFFFFF" : "#B45309",
+            borderColor: activeTab === "wearableAudit" ? "#B8860B" : "rgba(245, 158, 11, 0.35)",
+            boxShadow: activeTab === "wearableAudit" ? "0 2px 8px rgba(184, 134, 11, 0.25)" : "none",
+          }}
+        >
+          📿 देह-आभूषण व धागा ऑडिटर (Wearable Audit)
         </button>
         <button
           className={`tab ${activeTab === "conflicts" ? "active" : ""}`}
@@ -2602,6 +2616,13 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 8: BIO-MAGNETIC WEARABLE, GEMSTONE & THREAD AUDITOR
+      ───────────────────────────────────────────────────────────── */}
+      {activeTab === "wearableAudit" && (
+        <BioWearableAuditView chart={resolvedChart} />
       )}
     </div>
   );

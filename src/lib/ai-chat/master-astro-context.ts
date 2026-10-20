@@ -21,6 +21,7 @@ import { buildNatalChartFromAnyChart, generateGemstoneReport, SIGN_RULERS, type 
 import { calculateSpecialLagnas } from "../astro-engine/special-lagnas";
 import { calculateVastu } from "../astro-engine/vastu";
 import { runAstroVastuHitEngine } from "../astro-engine/astro-vastu-hit-engine";
+import { runVastuPurushaMandalaEngine } from "../astro-engine/vastu-purusha-mandala-engine";
 import { calculateSarvatobhadra } from "../astro-engine/sarvatobhadra";
 import { scanMarriageWindows } from "../astro-engine/marriage-window-scanner";
 import { calculateLineageKarma } from "../astro-engine/lineage-karma";
@@ -562,13 +563,43 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
     ✦ [NAVEL 2-INCH BOUNDARY]: Dot therapy for Virgo/Mercury must stay strictly within 2 inches above or 2 inches below the navel; never exceed this boundary.`;
     }
 
+    let mandalaSection = "";
+    try {
+      const mandala = runVastuPurushaMandalaEngine(chart);
+      if (mandala) {
+        const occult = mandala.occultDiagnostic;
+        const dusthanaPads = mandala.nativeMappings
+          .filter((m) => m.isDusthanaBlocked && m.devata.layer === "OuterPerimeter")
+          .slice(0, 4)
+          .map((m) => `${m.devata.padCode} (${m.devata.nameHi} - H${m.nativeHouseNum})`)
+          .join(", ") || "None";
+
+        const supremePads = mandala.nativeMappings
+          .filter((m) => !m.isDusthanaBlocked && m.devata.auspiciousness === "Supreme" && m.devata.layer === "OuterPerimeter")
+          .slice(0, 4)
+          .map((m) => `${m.devata.padCode} (${m.devata.nameHi})`)
+          .join(", ");
+
+        mandalaSection = `
+- 🏛️ 45 DEVATAS & 32 ENTRANCE MANDALA (SHILPA SHASTRA + ASTRO-VASTU):
+  ✦ Brahmasthan Navel Formula: Consecrate center with Ganga Jal, Raw Cow Milk, Turmeric & Saffron.
+  ✦ Occult/Tantra Diagnostic: ${occult.diagnosticTitle} — ${occult.shastricRemedyGuidance}
+  ✦ Chart-Specific Dusthana Entrances (DO NOT OPEN/ACTIVATE): ${dusthanaPads}
+  ✦ Top Supreme Auspicious Entrances for Native: ${supremePads}
+  ✦ Bar Chart 5-Elements Balancing: If zone depleted -> bring behind forward (Parent element); if extended -> bring ahead back (Child element).
+  ✦ Subtle Directives: White is Space/Metal (Cream is neutral); South iron gate needs Peach/Cherry; NE Toilet must NEVER be cut with cutter (use 3" green tape/paint + 0W green bulb); Sleeping head strictly South or East.`;
+      }
+    } catch (e) {
+      console.warn("[MasterAstroContext] Vastu Purusha Mandala error:", e);
+    }
+
     sections.push(`### 14. ASTRO-VASTU & HIT THEORY INTELLIGENCE (3-5-8 RULE & SPATIAL RADAR)
 - Overall Home/Workspace Vastu Score: ${vastu.overallScore}/100
 - Strongest Zones (Effortless Flow): ${strongNames}
 - Vulnerable / Blocked Zones (Requiring Remedial Attention): ${weakNames}
 - Priority Spatial Corrections:
   ✦ ${keyRemedies || "Keep North and East clutter-free; place light water elements in Ishanya (NE)."}
-- Astro-Vastu Psychological Link: ${psych}${hitSection}`);
+- Astro-Vastu Psychological Link: ${psych}${hitSection}${mandalaSection}`);
   } catch (err) {
     console.warn("[MasterAstroContext] Astro-Vastu error:", err);
   }
