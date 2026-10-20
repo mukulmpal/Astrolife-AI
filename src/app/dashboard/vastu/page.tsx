@@ -669,7 +669,7 @@ export default function VastuDashboardPage() {
       <EngineHeader
         eyebrow="Astro-Vastu Shastra"
         title="AstroLife Astro-Vastu & Hit Theory Intelligence"
-        subtitle="Authentic Astro-Vastu Hit Theory, 12-direction spatial radar, Traffic Police dasha blockades, 120° protective shifting, and 16-zone MahaVastu."
+        subtitle="Authentic Astro-Vastu Hit Theory, 12-direction spatial radar, Cosmic Friction Radar & locks, 120° protective shifting, and 16-zone MahaVastu."
         icon="🏠"
         metrics={completeAnalysis ? [
           { label: "Overall Score", value: completeAnalysis.overallScore },
@@ -706,7 +706,7 @@ export default function VastuDashboardPage() {
                 डेमो कुंडली सक्रिय (Sample Kundli: कन्या लग्न)
               </div>
               <div style={{ fontSize: 13, color: "#4A4238", marginTop: 2 }}>
-                आप लाइव एस्ट्रो-वास्तु हिट रडार (3-5-8 नियम), ट्रैफिक पुलिस व दिशाएं देख रहे हैं। अपनी व्यक्तिगत कुंडली से देखने के लिए अपनी जन्म तिथि जोड़ें।
+                आप लाइव एस्ट्रो-वास्तु हिट रडार (3-5-8 नियम), कॉस्मिक फ्रिक्शन रडार व दिशाएं देख रहे हैं। अपनी व्यक्तिगत कुंडली से देखने के लिए अपनी जन्म तिथि जोड़ें।
               </div>
             </div>
           </div>

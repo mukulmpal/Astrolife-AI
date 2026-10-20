@@ -629,7 +629,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 Astro-Vastu Hit Radar · v1.0
               </span>
               <span style={{ fontSize: 12.5, color: "#F5F5F4", fontWeight: 600 }}>
-                3-5-8 Orb Formula & Traffic Police Engine
+                3-5-8 Orb Formula & Cosmic Friction Radar Engine
               </span>
             </div>
             <div
@@ -688,7 +688,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             borderTop: "1px solid rgba(255,255,255,0.12)",
           }}
         >
-          {/* 1. Traffic Police */}
+          {/* 1. Cosmic Friction Locks */}
           <div
             style={{
               background: trafficPoliceBlockades.length > 0 ? "#FEE2E2" : "#DCFCE7",
@@ -1255,7 +1255,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </div>
             </div>
 
-            {/* Traffic Police Status Banner */}
+            {/* Cosmic Friction Status Banner */}
             <div
               style={{
                 marginTop: 16,
@@ -1801,7 +1801,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 const isSelected = selectedDirectionCode === dirInfo.code;
                 const hasPlanets = inv && inv.planets.length > 0;
 
-                // Check if this direction has an active traffic police blockade source
+                // Check if this direction has an active cosmic friction lock source
                 const hasBlockade = trafficPoliceBlockades.some(
                   (tp) => tp.physicalLocation.direction.includes(dirInfo.direction) || tp.physicalLocation.direction.includes(dirInfo.code)
                 );
@@ -2426,7 +2426,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 2: TRAFFIC POLICE BLOCKADES / COSMIC FRICTION LOCKS
+          TAB 2: COSMIC FRICTION LOCKS / DYNAMIC RADAR
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "trafficPolice" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

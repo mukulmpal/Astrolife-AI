@@ -178,7 +178,7 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
 
   // ── 6. BENCHMARK AUDIT: VIRGO LAGNA CHART ───────────────────────────
   describe("Virgo Lagna Benchmark Audit", () => {
-    it("should detect Traffic Police (Mars & Saturn) blocking Mercury Antardasha lord", () => {
+    it("should detect Cosmic Friction Locks (Mars & Saturn) blocking Mercury Antardasha lord", () => {
       const virgoChart = {
         name: "Virgo Benchmark Chart",
         dob: "1995-07-04",
@@ -205,10 +205,10 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
       const dossier = runAstroVastuHitEngine(virgoChart, new Date("2026-10-20"));
       assert.ok(dossier);
 
-      // Traffic Police: Mars and Saturn hitting Mercury AD Lord with 90°
-      const policeBlockers = dossier.trafficPoliceBlockades.map(b => b.blockingPlanet);
-      assert.ok(policeBlockers.includes("Mars"), "Mars must be identified as blocking Traffic Police");
-      assert.ok(policeBlockers.includes("Saturn"), "Saturn must be identified as blocking Traffic Police");
+      // Cosmic Friction Locks: Mars and Saturn hitting Mercury AD Lord with 90°
+      const frictionBlockers = (dossier.cosmicFrictionLocks || dossier.trafficPoliceBlockades).map(b => b.blockingPlanet);
+      assert.ok(frictionBlockers.includes("Mars"), "Mars must be identified as blocking Cosmic Friction Lock");
+      assert.ok(frictionBlockers.includes("Saturn"), "Saturn must be identified as blocking Cosmic Friction Lock");
 
       // Verify Sun 180° Killer Hit on House 4
       const sunHitHouse4 = dossier.killerHits180.find(h => h.sourceName === "Sun" && h.targetHouse === 4);

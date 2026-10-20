@@ -8,7 +8,7 @@
 //    - Negative: 45° (±3° [42°-48°]), 90° (±5° [85°-95°]), 180° (±8° [172°-188°]).
 //    - Positive: 30° (±3° [27°-33°]), 60° (±5° [55°-65°]), 120° (±8° [112°-128°]).
 // 3. Specialized Astro-Vastu 12-Sign Direction Grid (1=E, 2=NW, 3=NNW, 4=NE... 8=SSW).
-// 4. Two Hit Dimensions: Planet-to-House Hits & Planet-to-Planet "Traffic Police" Blockade.
+// 4. Two Hit Dimensions: Planet-to-House Hits & Planet-to-Planet "Cosmic Friction" Lock.
 // 5. Active Dasha Priority (MD / AD / PD focus).
 // 6. 120° Protective Shield Shifting Technique (180° किलर को 120° रक्षक ढाल में बदलना).
 // 7. 12-Sign Human Body-Part Mapping for Dot/Thread Therapy.
@@ -29,6 +29,10 @@ import {
   type BrahmasthanSanctificationProtocol,
   type SubtleShastricDirectives,
 } from "./vastu-purusha-mandala-engine";
+import {
+  evaluateAstroPrescriptionFormula,
+  type AstroPharmacologicalPrescription,
+} from "./astro-prescription-engine";
 
 export {
   runVastuPurushaMandalaEngine,
@@ -42,6 +46,8 @@ export {
   type ElementalBarChartBalancing,
   type BrahmasthanSanctificationProtocol,
   type SubtleShastricDirectives,
+  evaluateAstroPrescriptionFormula,
+  type AstroPharmacologicalPrescription,
 };
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -324,6 +330,8 @@ export interface AstroVastuHitDossier {
   dashaLordHitsAnalysis: DashaLordHitNarrative[];
   spatialFieldTest: SpatialZoneDiagnostic[];
   trafficPoliceBlockades: TrafficPoliceBlockade[];
+  cosmicFrictionLocks: TrafficPoliceBlockade[];
+  astroPrescription: AstroPharmacologicalPrescription;
   killerHits180: EvaluatedHit[];
   dangerousHits90: EvaluatedHit[];
   badHits45: EvaluatedHit[];
@@ -422,7 +430,7 @@ export const HIT_DEFINITIONS: Record<HitAngleType, HitDefinition> = {
     minDiff: 85,
     maxDiff: 95,
     severity: "Dangerous",
-    description: "अत्यधिक गंभीर रुकावट। ट्रैफिक पुलिस की तरह कार्य को पूर्णतः लॉकअप में डाल देती है।"
+    description: "अत्यधिक गंभीर रुकावट। कॉस्मिक फ्रिक्शन लॉक की तरह कार्य को पूर्णतः रोक देती है।"
   },
   180: {
     angle: 180,
@@ -709,7 +717,7 @@ export function runAstroVastuHitEngine(
     }
   });
 
-  // 5. Evaluate Planet-to-Planet Hits & Traffic Police Blockades
+  // 5. Evaluate Planet-to-Planet Hits & Cosmic Friction Locks
   const trafficPoliceBlockades: TrafficPoliceBlockade[] = [];
 
   for (let i = 0; i < planetNames.length; i++) {
@@ -763,7 +771,7 @@ export function runAstroVastuHitEngine(
                 hitSeverity: hit.hitDef.angle === 180 ? "Killer" : "Dangerous",
                 exactDiff: hit.exactDiff,
                 orbDistance: hit.orbDistance,
-                blockageTheme: `${blocker.name} acts as a Traffic Police Officer stopping ${role} Lord ${lord} with a ${hit.hitDef.name}, detaining its positive results!`,
+                blockageTheme: `${blocker.name} creates a Cosmic Friction Lock stopping ${role} Lord ${lord} with a ${hit.hitDef.name}, detaining its positive results!`,
                 physicalLocation: {
                   direction: blocker.direction.direction,
                   directionHindi: blocker.direction.directionHindi,
@@ -789,8 +797,8 @@ export function runAstroVastuHitEngine(
   const shiftingPrescriptions: ShiftingPrescription[] = [];
   const processedPlanets = new Set<string>();
 
-  // A. First: Address EVERY Traffic Police blocker holding up the Dasha Lord!
-  // Astro-Vastu Shastric Rule: "जिस ग्रह ने दशा स्वामी को रोक रखा है (Traffic Police), उसी के सामान को 120° त्रिकोण मित्र दिशा में शिफ्ट करना है!"
+  // A. First: Address EVERY Cosmic Friction blocker holding up the Dasha Lord!
+  // Astro-Vastu Shastric Rule: "जिस ग्रह ने दशा स्वामी को रोक रखा है (Cosmic Friction Lock), उसी के सामान को 120° त्रिकोण मित्र दिशा में शिफ्ट करना है!"
   trafficPoliceBlockades.forEach(blockade => {
     const plName = blockade.blockingPlanet;
     if (processedPlanets.has(plName)) return;
@@ -995,13 +1003,13 @@ export function runAstroVastuHitEngine(
     rationale: `किताबी वास्तु केवल उत्तर/पूर्व बताता है, परंतु एस्ट्रो-वास्तु के अनुसार आपकी शिक्षा व मानसिक सुख 4थे भाव (${cusp4?.sign} - ${cusp4?.direction.direction}) और 9वें भाव (${cusp9?.sign} - ${cusp9?.direction.direction}) से संचालित है। इस दिशा में बैठकर पूर्व या उत्तर की ओर मुख करके अध्ययन करने से उच्चतम एकाग्रता प्राप्त होती है। ऑनलाइन व्यापार व करियर के लिए 10वें भाव (${cusp10?.sign} - ${cusp10?.direction.direction}) की दिशा में बैठना सर्वोत्तम है।`,
   };
 
-  // 11. Mars Dietary & Lifestyle Protocol (180°/90° Hit or Traffic Police)
+  // 11. Mars Dietary & Lifestyle Protocol (180°/90° Hit or Cosmic Friction Lock)
   const marsAffliction = killerHits180.find(h => h.sourceName === "Mars") || dangerousHits90.find(h => h.sourceName === "Mars") || trafficPoliceBlockades.find(b => b.blockingPlanet === "Mars");
   const marsDietaryLifestyleProtocol: MarsDietaryLifestyleProtocol = {
     isMarsAfflicted: Boolean(marsAffliction),
     afflictionType: marsAffliction
       ? "hitAngle" in marsAffliction
-        ? `Traffic Police ${marsAffliction.hitAngle}° Blockade on ${marsAffliction.dashaLordName}`
+        ? `Cosmic Friction ${marsAffliction.hitAngle}° Lock on ${marsAffliction.dashaLordName}`
         : `${marsAffliction.hitDef.name} on ${marsAffliction.targetName}`
       : undefined,
     prohibitedDiet: [
@@ -1488,7 +1496,7 @@ export function runAstroVastuHitEngine(
     };
   });
 
-  return {
+  const dossier = {
     nativeName: chart.name || "Seeker",
     lagnaSign,
     lagnaSignHindi: RASHIS_HINDI[lagnaSignNum] || lagnaSign,
@@ -1527,6 +1535,14 @@ export function runAstroVastuHitEngine(
     marsDietaryLifestyleProtocol,
     wristThreadTrapAlert,
     mandalaDossier: runVastuPurushaMandalaEngine(chart),
+  };
+
+  const astroPrescription = evaluateAstroPrescriptionFormula(chart, dossier as any);
+
+  return {
+    ...dossier,
+    cosmicFrictionLocks: trafficPoliceBlockades,
+    astroPrescription,
   };
 }
 

@@ -538,7 +538,7 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
     let hitSection = "";
     if (hitDossier) {
       const policeText = hitDossier.trafficPoliceBlockades.length > 0
-        ? hitDossier.trafficPoliceBlockades.map(b => `[TRAFFIC POLICE] ${b.blockingPlanet} is blocking ${b.dashaLordRole} Lord ${b.dashaLordName} with ${b.hitAngle}° Hit! Location: ${b.physicalLocation.direction} zone. Action: ${b.physicalLocation.actionRequired}`).join("\n  ✦ ")
+        ? hitDossier.trafficPoliceBlockades.map(b => `[COSMIC FRICTION LOCK] ${b.blockingPlanet} is blocking ${b.dashaLordRole} Lord ${b.dashaLordName} with ${b.hitAngle}° Hit! Location: ${b.physicalLocation.direction} zone. Action: ${b.physicalLocation.actionRequired}`).join("\n  ✦ ")
         : "None (Active Dasha lords are moving without 90°/180° planetary obstruction).";
 
       const killerHitsText = hitDossier.killerHits180.slice(0, 3).map(k => `${k.sourceName} (H${k.sourceHouse} ${k.sourceDirection}) -> ${k.targetName} [${k.exactDiff}° exact diff]`).join("\n  ✦ ") || "No 180° killer hits active.";
@@ -549,7 +549,7 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
 
       hitSection = `
 - ⚡ ASTRO-VASTU HIT THEORY (3-5-8 RULE & COMPOUND DEGREES):
-  ✦ Active Dasha Traffic Police Blockade:
+  ✦ Active Dasha Cosmic Friction Lock (ऊर्जा गतिरोध):
     ${policeText}
   ✦ Critical 180° Killer Hits on Vital Houses:
     ✦ ${killerHitsText}
