@@ -17,7 +17,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-001",
     title: "Cutaneous Allergy, Erythema & Dry Eczema",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Skin itching", "Dry erythematous rash", "Urticarial bumps", "Epidermal dryness"],
     bodySystems: ["dermatological"],
     chartSignifiers: {
@@ -45,7 +45,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-002",
     title: "Pulmonary Infection Transitioning to Neuromuscular Weakness",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: [
       "Chronic cough",
       "Opportunistic lung infection (TB theme)",
@@ -82,7 +82,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-003",
     title: "Renal Filtration Stress & Dialysis Pattern",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: [
       "Kidney filtration compromise",
       "Fluid retention",
@@ -116,7 +116,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-004",
     title: "Cellular Hyperplasia & Post-Intervention Convalescence",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: [
       "Abnormal cellular lump/mass",
       "Severe fatigue",
@@ -150,7 +150,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-005",
     title: "Vertebral Compression & Hyperchlorhydria (Back Pain + Acidity)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: [
       "Lumbar spine stiffness",
       "Sciatic nerve ache",
@@ -182,7 +182,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-006",
     title: "Nephrolithiasis / Kidney Stone Obstruction",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: [
       "Flank pain",
       "Urinary burning",
@@ -215,7 +215,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-007",
     title: "Hemodynamic Blood Pressure Spikes & Sleep Disturbance",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: [
       "Fluctuating blood pressure",
       "Nocturnal restlessness",
@@ -247,7 +247,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-008",
     title: "Chronic Severe Constipation (20-Year History)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["20-year chronic constipation", "Severe flatulence", "Intestinal Vata blockage", "Gas migrating to head"],
     bodySystems: ["digestive"],
     chartSignifiers: {
@@ -269,7 +269,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-009",
     title: "Bronchial Asthma & Opportunistic Respiratory Distress",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Wheezing / Breathlessness", "Bronchial constriction", "Nocturnal coughing spells", "Low blood oxygen drops"],
     bodySystems: ["respiratory"],
     chartSignifiers: {
@@ -291,7 +291,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-010",
     title: "Severe Mechanical Knee Pain & Cartilage Degeneration",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Bilateral knee joint pain", "Crepitus / clicking sounds", "Inflammatory stiffness upon standing"],
     bodySystems: ["musculoskeletal"],
     chartSignifiers: {
@@ -313,7 +313,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-011",
     title: "Avoided Kidney Transplant Protocol",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Critical nephron filtration decline", "Severe toxic buildup", "Transplant recommendation by hospital"],
     bodySystems: ["renal_urinary", "hematological"],
     chartSignifiers: {
@@ -335,7 +335,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-012",
     title: "Surgical Cancellation Following Infection Clearance",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Scheduled emergency operation", "Atypical localized infection", "Severe inflammatory swelling"],
     bodySystems: ["hematological"],
     chartSignifiers: {
@@ -357,7 +357,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-013",
     title: "Neurodevelopmental & Speech Delay Sensitivity (Autism Context)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Delayed verbal communication", "Sensory motor processing differences", "Nervous hypersensitivity"],
     bodySystems: ["neurological"],
     chartSignifiers: {
@@ -379,7 +379,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-014",
     title: "Cognitive Impairment & Memory Blockage (Alzheimer's Theme)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Progressive memory retrieval loss", "Cerebral circulation slowing", "Cognitive confusion"],
     bodySystems: ["neurological"],
     chartSignifiers: {
@@ -401,7 +401,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-015",
     title: "Cholelithiasis (Gallbladder Stone Obstruction)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Right upper quadrant abdominal pain", "Fatty food intolerance", "Gallbladder calculus on ultrasound"],
     bodySystems: ["digestive"],
     chartSignifiers: {
@@ -423,7 +423,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-016",
     title: "Recurrent Cysts, Nodes & Fibrous Lumps (गांठ / रसौली)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Multiple subcutaneous fibrous cysts", "Uterine fibroid tenderness", "Encapsulated benign lumps"],
     bodySystems: ["musculoskeletal", "reproductive"],
     chartSignifiers: {
@@ -445,7 +445,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-017",
     title: "Organ Tissue Shrinkage & Parenchymal Atrophy",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Unilateral kidney shrinkage", "Decreased renal cortical thickness", "Parenchymal loss"],
     bodySystems: ["renal_urinary"],
     chartSignifiers: {
@@ -467,7 +467,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-018",
     title: "Essential Hypertension & Arterial Pressure Spikes",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Systolic blood pressure exceeding 160", "Occipital throbbing headache", "Facial flushing upon anger"],
     bodySystems: ["cardiovascular"],
     chartSignifiers: {
@@ -489,7 +489,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-019",
     title: "Orthostatic Hypotension & Vasovagal Fatigue (Low BP)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Postural lightheadedness", "Low blood pressure (below 90/60)", "Cold extremities and lethargy"],
     bodySystems: ["cardiovascular"],
     chartSignifiers: {
@@ -511,7 +511,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
   {
     id: "CASE-MED-020",
     title: "Ocular Asymmetry & Vision Impairment (Right vs. Left Eye)",
-    source: "Transcript_Classroom_Case",
+    source: "Classical_Classroom_Case",
     reportedSymptoms: ["Right eye visual acuity decline", "Retinal dryness", "Photophobia under bright daylight"],
     bodySystems: ["ophthalmology"],
     chartSignifiers: {

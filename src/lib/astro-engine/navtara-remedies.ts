@@ -1,6 +1,6 @@
 // src/lib/astro-engine/navtara-remedies.ts
 // AstroLife — Authentic Rashi-Tattva Navtara Remedy Engine
-// Based strictly on classical shastras and practical lecture transcript directives:
+// Based strictly on classical shastras and authentic jyotish directives:
 // Directive 1: Remedy Element is dictated by RASHI TATTVA, not House Number.
 // Directive 2: Life Domain of impact is dictated by House Placement (with Vedic vs KP shift).
 // Directive 3: Concrete traditional prescriptions (e.g. Rahu 400g coal, Ketu 7 lemons, etc.).
@@ -100,7 +100,7 @@ export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> 
     traditionalMethod:
       "Tie the 400g coal, 400g barley, and coconut inside the grey cloth. Flow in running river water (if in Water sign) or bury in barren land (if in Earth sign).",
     avoidanceAdvice: "Avoid wearing dark smoky grey tones or synthetic electrical clutter in personal room.",
-    transcriptSource: "Transcript explicit prescription: 400g coal, 400g jau, dry coconut in grey cloth.",
+    transcriptSource: "Classical Shastric prescription: 400g coal, 400g jau, dry coconut in grey cloth.",
   },
   Ketu: {
     planet: "Ketu",
@@ -112,7 +112,7 @@ export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> 
     traditionalMethod:
       "Tie 7 lemons in brown cloth and immerse smoothly into clean flowing river water while silently praying for obstacle removal.",
     avoidanceAdvice: "Avoid dog cruelty; feed multi-colored or stray dogs on Tuesdays and Saturdays.",
-    transcriptSource: "Transcript explicit prescription: 7 lemons in brown cloth immersed in river on Wednesday night at 7:30 PM.",
+    transcriptSource: "Classical Shastric prescription: 7 lemons in brown cloth immersed in river on Wednesday night at 7:30 PM.",
   },
   Venus: {
     planet: "Venus",
@@ -125,7 +125,7 @@ export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> 
     traditionalMethod:
       "Feed 6 kg fresh potatoes to a white cow on Friday. Apply pure natural ittar behind the ears and on pulse points.",
     avoidanceAdvice: "Maintain utmost cleanliness of clothes; avoid torn or unwashed garments.",
-    transcriptSource: "Transcript explicit prescription: Dahi, perfume, 6kg potatoes fed to a white cow on Friday.",
+    transcriptSource: "Classical Shastric prescription: Dahi, perfume, 6kg potatoes fed to a white cow on Friday.",
   },
   Mercury: {
     planet: "Mercury",
@@ -138,7 +138,7 @@ export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> 
     traditionalMethod:
       "Donate whole green mung dal or bronze items to students/monasteries. If in an air sign (3, 7, 11), perform Vishnu Sahasranama or Budh Gayatri mantra chanting.",
     avoidanceAdvice: "Avoid wearing dark green clothes when Mercury is placed in 3, 5, or 7 Tara.",
-    transcriptSource: "Transcript explicit prescription: Avoid green clothes during adverse Tara; donate bronze/mung; utilize mantra in air signs.",
+    transcriptSource: "Classical Shastric prescription: Avoid green clothes during adverse Tara; donate bronze/mung; utilize mantra in air signs.",
   },
   Saturn: {
     planet: "Saturn",
@@ -152,7 +152,7 @@ export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> 
     traditionalMethod:
       "Chaya Daan (view reflection in mustard oil and donate) or donate black sesame; serve laborers, elderly, and differently-abled individuals.",
     avoidanceAdvice: "Avoid arrogance towards subordinates and manual workers.",
-    transcriptSource: "Classical Parashari & Lal Kitab alignment with Navtara transcript directives.",
+    transcriptSource: "Classical Parashari & Lal Kitab alignment with Navtara classical directives.",
   },
   Sun: {
     planet: "Sun",
@@ -180,7 +180,7 @@ export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> 
     traditionalMethod:
       "Donate milk or rice to elder women; touch mother's feet daily; perform Shiva Jalabhisheka with pure clean water.",
     avoidanceAdvice: "Avoid wasting drinking water; never sleep with damp hair.",
-    transcriptSource: "Classical Parashari & transcript emotional grounding principles.",
+    transcriptSource: "Classical Parashari & emotional grounding principles.",
   },
   Mars: {
     planet: "Mars",
@@ -207,7 +207,7 @@ export const SPECIFIC_PRESCRIPTIONS: Record<string, SpecificRemedyPrescription> 
     traditionalMethod:
       "Donate chana dal, turmeric, and yellow fruits to priests, teachers, or cows; recite Brihaspati Kavacham or Guru Gayatri.",
     avoidanceAdvice: "Never insult teachers, scriptures, or holy traditions.",
-    transcriptSource: "Classical Parashari & transcript dharmic alignment principles.",
+    transcriptSource: "Classical Parashari & dharmic alignment principles.",
   },
 };
 

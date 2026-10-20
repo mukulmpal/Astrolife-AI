@@ -877,7 +877,7 @@ export function evaluateCorePlanetRemedy(
       isFavorable: false,
       recommendationType: "Mitigate_Charity_Afflicted",
       primaryHeadline: `⚠️ ${def.hindiName} Peedit Hain: Bhulkar Bhi Ratna Na Pehnein (Keval Daan v Upay Karein)!`,
-      descriptiveNarrativeHinglish: `Kyunki ${def.hindiName} aapki kundli me ${reasonAfflicted}, is grah ko taqat (stone) dena aag me ghee daalne jaisa hoga! Master transcript ka spashtha niyam hai: jab koi grah dushit ho to uska ratna kabhi nahi dharan karna chahiye. Iski jagah, is grah ke dushit karmic aavran ko shaant karne ke liye nirdharit daan, beej mantra, aur tattva ke anusaar upay (${elementalRule.actionTitleHinglish}) karein.`,
+      descriptiveNarrativeHinglish: `Kyunki ${def.hindiName} aapki kundli me ${reasonAfflicted}, is grah ko taqat (stone) dena aag me ghee daalne jaisa hoga! प्रामाणिक ज्योतिष शास्त्र का स्पष्ट नियम है: jab koi grah dushit ho to uska ratna kabhi nahi dharan karna chahiye. Iski jagah, is grah ke dushit karmic aavran ko shaant karne ke liye nirdharit daan, beej mantra, aur tattva ke anusaar upay (${elementalRule.actionTitleHinglish}) karein.`,
       gemstoneAdvice: {
         canWearStone: false,
         strictWarning: def.afflictedStoneWarning

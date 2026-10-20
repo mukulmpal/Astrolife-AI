@@ -235,7 +235,7 @@ export const MEDICAL_RULE_REGISTRY: Record<string, MedicalRule> = {
     planets: ["Jupiter", "Mars", "Rahu"],
     doshaAffinity: "Tridosha",
     traditionalInterpretation:
-      "Jupiter (cellular expansion and adipose tissues) afflicted by Mars (inflammatory mutation) and Rahu (uncontrolled proliferation) in houses of crisis and hospital confinement represents intensive medical therapy cases in transcript references.",
+      "Jupiter (cellular expansion and adipose tissues) afflicted by Mars (inflammatory mutation) and Rahu (uncontrolled proliferation) in houses of crisis and hospital confinement represents intensive medical therapy cases in classical reference cases.",
     clinicalGuidance:
       "Never self-diagnose or panic based on astrological patterns. Periodic routine screenings (mammograms, sonography, blood panels) are standard medical best practice.",
     severityWeight: 9,
@@ -311,7 +311,7 @@ export const MEDICAL_RULE_REGISTRY: Record<string, MedicalRule> = {
     planets: ["Jupiter", "Venus"],
     doshaAffinity: "Kapha",
     traditionalInterpretation:
-      "Jupiter (cellular nutrition, lipid growth) interacting with Venus (sweet secretions, pancreatic insulin) is the classical transcript signature for Diabetes Mellitus and discovery of effective restorative medicinal therapy.",
+      "Jupiter (cellular nutrition, lipid growth) interacting with Venus (sweet secretions, pancreatic insulin) is the classical shastric signature for Diabetes Mellitus and discovery of effective restorative medicinal therapy.",
     clinicalGuidance:
       "Maintain active glucose monitoring (HbA1c), reduce simple sugars, and undergo routine endocrine wellness evaluations.",
     severityWeight: 5,
@@ -330,7 +330,7 @@ export const MEDICAL_RULE_REGISTRY: Record<string, MedicalRule> = {
     planets: ["Mercury", "Moon"],
     doshaAffinity: "Vata-Kapha",
     traditionalInterpretation:
-      "Mercury (logical intellect, neural synaptic transmission) colliding with Moon (emotional mind, subconscious peace) in 6/8/12 houses traditionally manifests as severe depressive episodes, insomnia, or psychiatric inpatient care in transcript case records.",
+      "Mercury (logical intellect, neural synaptic transmission) colliding with Moon (emotional mind, subconscious peace) in 6/8/12 houses traditionally manifests as severe depressive episodes, insomnia, or psychiatric inpatient care in classical case records.",
     clinicalGuidance:
       "Prioritize compassionate mental healthcare, structured sleep hygiene, and professional psychiatric/psychological support.",
     severityWeight: 8,
@@ -406,7 +406,7 @@ export const MEDICAL_RULE_REGISTRY: Record<string, MedicalRule> = {
     planets: ["Jupiter", "Venus", "Saturn"],
     doshaAffinity: "Kapha-Vata",
     traditionalInterpretation:
-      "Jupiter (bile / gallbladder) plus Venus (cholesterol fluid composition) solidified by Saturn (stone formation / calcification) is the classical transcript hallmark for Gallbladder stones.",
+      "Jupiter (bile / gallbladder) plus Venus (cholesterol fluid composition) solidified by Saturn (stone formation / calcification) is the classical shastric hallmark for Gallbladder stones.",
     clinicalGuidance:
       "Avoid excess fried fatty foods, consume warm water with lemon, and undergo abdominal sonography if right upper-quadrant discomfort occurs.",
     severityWeight: 6,
@@ -444,7 +444,7 @@ export const MEDICAL_RULE_REGISTRY: Record<string, MedicalRule> = {
     planets: ["Saturn", "Ketu"],
     doshaAffinity: "Vata",
     traditionalInterpretation:
-      "Saturn (blockage, hard density) conjoined with Ketu (cysts, encapsulated nodes, knots) repeatedly produces localized cysts, rasoli (fibroids/cysts), or fibrous nodules in transcript cases.",
+      "Saturn (blockage, hard density) conjoined with Ketu (cysts, encapsulated nodes, knots) repeatedly produces localized cysts, rasoli (fibroids/cysts), or fibrous nodules in classical cases.",
     clinicalGuidance:
       "Have any newly discovered lumps or cysts clinically evaluated and palpated by a qualified doctor; monitor for changes in size.",
     severityWeight: 6,

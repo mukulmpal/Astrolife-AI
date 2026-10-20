@@ -123,9 +123,9 @@ describe("Moon Psychological Heart-Sharing Sanctuary Map", () => {
   });
 });
 
-describe("Property Timing & Saturn 7th House Growth Predictor (Sachidanand Ji Benchmark)", () => {
-  const sachidanandChart: ChartData = {
-    name: "Sachidanand Ji (Basti UP Benchmark)",
+describe("Property Timing & Saturn 7th House Growth Predictor (Gemini Benchmark)", () => {
+  const geminiBenchmarkChart: ChartData = {
+    name: "Gemini Benchmark Chart",
     dob: "1965-03-05",
     tob: "14:00",
     city: "Basti",
@@ -151,7 +151,7 @@ describe("Property Timing & Saturn 7th House Growth Predictor (Sachidanand Ji Be
   };
 
   it("verifies Gemini Lagna Saturn Growth Radar: past 8th->2nd (wealth), current 9th->3rd (communication), future 10th->4th (big mansion)", () => {
-    const growth = evaluateSaturn7thHouseGrowth(sachidanandChart);
+    const growth = evaluateSaturn7thHouseGrowth(geminiBenchmarkChart);
     
     // Past: Saturn in Capricorn (8th house) -> growth in 2nd house (family wealth / stock market)
     assert.strictEqual(growth.past.saturnTransitHouse, 8);
@@ -170,7 +170,7 @@ describe("Property Timing & Saturn 7th House Growth Predictor (Sachidanand Ji Be
   });
 
   it("verifies BNN Transit Conjunctions in Aquarius: Sun, Mercury, and Venus", () => {
-    const hits = evaluateBNNTransitConjunctions(sachidanandChart, "Aquarius");
+    const hits = evaluateBNNTransitConjunctions(geminiBenchmarkChart, "Aquarius");
     assert.ok(hits.length >= 3);
 
     const sunHit = hits.find((h) => h.natalPlanet === "Sun");
@@ -187,13 +187,13 @@ describe("Property Timing & Saturn 7th House Growth Predictor (Sachidanand Ji Be
   });
 
   it("detects Property Acquisition (4-11-12) vs Sale (3-7-10-5)", () => {
-    const propertyResult = evaluatePropertyTiming(sachidanandChart);
+    const propertyResult = evaluatePropertyTiming(geminiBenchmarkChart);
     assert.ok(propertyResult);
     assert.ok(propertyResult.timingStatus);
   });
 
   it("builds the master transit radar dossier and identifies benchmark chart", () => {
-    const dossier = buildMasterTransitRadarDossier(sachidanandChart);
+    const dossier = buildMasterTransitRadarDossier(geminiBenchmarkChart);
     assert.ok(dossier);
     assert.strictEqual(dossier.isBenchmarkChart, true);
     assert.strictEqual(dossier.lagnaSignName, "Gemini");

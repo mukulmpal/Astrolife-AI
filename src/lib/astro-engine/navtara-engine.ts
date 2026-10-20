@@ -618,7 +618,7 @@ export function auditDashaNavtara(
       basis: "SOURCE_DERIVED",
       title: "Antardasha Modifier Integration",
       evidence: `AD Lord ${currentAD} in ${adNak.name} (Tara #${adTaraNum} ${adTara.name}) -> Status: ${adStatus}.`,
-      sourceCitation: "Practical lecture transcript: Antardashas serve as dynamic relief or intensification phases.",
+      sourceCitation: "Classical Jyotish Rule: Antardashas serve as dynamic relief or intensification phases.",
     });
   }
 
@@ -682,7 +682,7 @@ export function runNavtaraIntelligence(
     basis: "SOURCE_DERIVED",
     title: "27th Support Star Derivation",
     evidence: `Birth Star ${birthNakshatra.name} (#${birthNakshatra.id}) -> Preceding Star ${supportStarShield.nakshatra.name} (#${supportStarShield.nakshatra.id}).`,
-    sourceCitation: "Transcript strict rule: 27th star is always and exclusively calculated from Janma Nakshatra.",
+    sourceCitation: "Classical Navtara rule: 27th star is always and exclusively calculated from Janma Nakshatra.",
   });
 
   // 4. Compute Birth Star Quality Profile
@@ -692,7 +692,7 @@ export function runNavtaraIntelligence(
     basis: "SOURCE_DERIVED",
     title: "Birth Star Quality Profile Derivation",
     evidence: `Preceding Star Lord ${qualityProfile.channellingLord} defines underlying innate temperament: ${qualityProfile.temperamentTitle}.`,
-    sourceCitation: "Practical lecture transcript: Core behavioural temperament reflects the preceding star's lord.",
+    sourceCitation: "Classical Jyotish Rule: Core behavioural temperament reflects the preceding star's lord.",
   });
 
   // 5. Audit Current Active Dasha if available

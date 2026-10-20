@@ -5422,7 +5422,7 @@ export const MASTER_MEDICAL_RULES: MasterMedicalRule[] = [
     "ruleType": "Classical rule/claim",
     "domain": "General/Constitutional",
     "diseaseOutcome": "Lal Kitab/Rahu",
-    "ruleSummary": "Rahu-related remedies are linked by the speaker to Moon symbolism, but the transcript presents this as a systematic traditional insertion rather than a clinical treatment claim.",
+    "ruleSummary": "Rahu-related remedies are linked to Moon symbolism as a systematic traditional insertion rather than a clinical treatment claim.",
     "planets": "Moon, Rahu",
     "houses": "",
     "signs": "",

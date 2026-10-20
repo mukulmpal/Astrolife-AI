@@ -93,11 +93,11 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
     });
   });
 
-  // ── 4. LECTURE CASE STUDY 1: PRIYANKA JI (Mars 180° Killer Hit) ───────────
-  describe("Case Study 1: Priyanka Ji (Mars 180° Hit on Lagna from Sagittarius)", () => {
+  // ── 4. CASE STUDY 1: GEMINI LAGNA (Mars 180° Killer Hit) ───────────
+  describe("Case Study 1: Gemini Lagna (Mars 180° Hit on Lagna from Sagittarius)", () => {
     it("should detect Mars 180° Killer Hit on Gemini Lagna", () => {
-      const priyankaChart = {
-        name: "Priyanka",
+      const geminiChart = {
+        name: "Gemini Case Study",
         dob: "1998-02-04",
         tob: "16:46:00",
         city: "Solapur",
@@ -122,7 +122,7 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
         ],
       } as unknown as ChartData;
 
-      const dossier = runAstroVastuHitEngine(priyankaChart);
+      const dossier = runAstroVastuHitEngine(geminiChart);
       assert.ok(dossier);
 
       // Difference = 265 - 89 = 176° -> Falls into 180° Killer Hit (172° to 188°)
@@ -133,11 +133,11 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
     });
   });
 
-  // ── 5. LECTURE CASE STUDY 2: SHIVANGI JI (Saturn 180° Hit on 7th House) ────
-  describe("Case Study 2: Shivangi Ji (Saturn 180° Hit on 7th House from Scorpio)", () => {
+  // ── 5. CASE STUDY 2: SCORPIO LAGNA (Saturn 180° Hit on 7th House) ────
+  describe("Case Study 2: Scorpio Lagna (Saturn 180° Hit on 7th House from Scorpio)", () => {
     it("should detect Saturn 180° Killer Hit on Taurus 7th House and recommend Knee dot shifting", () => {
-      const shivangiChart = {
-        name: "Shivangi",
+      const scorpioChart = {
+        name: "Scorpio Lagna Case Study",
         dob: "1986-05-02",
         tob: "20:05:00",
         city: "Delhi",
@@ -162,7 +162,7 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
         ],
       } as unknown as ChartData;
 
-      const dossier = runAstroVastuHitEngine(shivangiChart);
+      const dossier = runAstroVastuHitEngine(scorpioChart);
       assert.ok(dossier);
 
       // Difference = 224 - 44 = 180° exact Killer Hit on 7th House
@@ -176,11 +176,11 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
     });
   });
 
-  // ── 6. REAL USER AUDIT: MUKUL'S CHART ──────────────────────────────────────
-  describe("Mukul's Real Chart Audit", () => {
+  // ── 6. BENCHMARK AUDIT: VIRGO LAGNA CHART ───────────────────────────
+  describe("Virgo Lagna Benchmark Audit", () => {
     it("should detect Traffic Police (Mars & Saturn) blocking Mercury Antardasha lord", () => {
-      const mukulChart = {
-        name: "Mukul Pal",
+      const virgoChart = {
+        name: "Virgo Benchmark Chart",
         dob: "1995-07-04",
         tob: "12:30:00",
         city: "Delhi",
@@ -202,7 +202,7 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
         },
       } as unknown as ChartData;
 
-      const dossier = runAstroVastuHitEngine(mukulChart, new Date("2026-10-20"));
+      const dossier = runAstroVastuHitEngine(virgoChart, new Date("2026-10-20"));
       assert.ok(dossier);
 
       // Traffic Police: Mars and Saturn hitting Mercury AD Lord with 90°
@@ -222,11 +222,11 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
     });
   });
 
-  // ── 7. REAL USER AUDIT: MANISHA'S CHART ────────────────────────────────────
-  describe("Manisha's Real Chart Audit", () => {
+  // ── 7. BENCHMARK AUDIT: AQUARIUS LAGNA CHART ─────────────────────────
+  describe("Aquarius Lagna Benchmark Audit", () => {
     it("should detect 5-planet Scorpio cluster in SSW and Mars MD 180° Hit on 4th House", () => {
-      const manishaChart = {
-        name: "Manisha",
+      const aquariusChart = {
+        name: "Aquarius Benchmark Chart",
         dob: "1993-12-06",
         tob: "12:30:00",
         city: "Delhi",
@@ -248,7 +248,7 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
         },
       } as unknown as ChartData;
 
-      const dossier = runAstroVastuHitEngine(manishaChart, new Date("2026-10-20"));
+      const dossier = runAstroVastuHitEngine(aquariusChart, new Date("2026-10-20"));
       assert.ok(dossier);
 
       // Verify active Dasha is Mars
@@ -271,9 +271,9 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
 
   // ── 8. 100% DYNAMIC CHART-DRIVEN BODY PART THERAPY MATRIX ──────────────────
   describe("100% Dynamic Chart-Driven 12-Sign Body Part Matrix", () => {
-    it("should compute dynamic houses, occupants, and thread verdicts for Mukul (Virgo Lagna)", () => {
-      const mukulChart = {
-        name: "Mukul Pal",
+    it("should compute dynamic houses, occupants, and thread verdicts for Virgo Lagna chart", () => {
+      const virgoChart = {
+        name: "Virgo Benchmark Chart",
         dob: "1995-07-04",
         tob: "12:30:00",
         city: "Delhi",
@@ -295,7 +295,7 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
         },
       } as unknown as ChartData;
 
-      const dossier = runAstroVastuHitEngine(mukulChart, new Date("2026-10-20"));
+      const dossier = runAstroVastuHitEngine(virgoChart, new Date("2026-10-20"));
       assert.ok(dossier.bodyPartRemedyRegistry);
       assert.equal(dossier.bodyPartRemedyRegistry.length, 12, "Must contain all 12 signs");
 
@@ -339,7 +339,7 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
     it("should correctly resolve house 7 for Pisces when chart comes from calculateChart (0-indexed lagnaNum)", () => {
       // When chart has lagnaRashi: "Virgo", lagnaNum: 5 (0-indexed from dR), and houseCusps with signNum 0..11
       const chartWith0Indexed = {
-        name: "Mukul Calc Chart",
+        name: "Sample Calc Chart",
         lagnaRashi: "Virgo",
         lagnaNum: 5, // 0-indexed Virgo from calculations.ts
         planets: {
@@ -370,9 +370,9 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
       assert.equal(piscesRow.isThreadHarmful, false);
     });
 
-    it("should synthesize critical hit status for afflicted body parts in Priyanka Ji's chart", () => {
-      const priyankaChart = {
-        name: "Priyanka",
+    it("should synthesize critical hit status for afflicted body parts in Gemini Lagna chart", () => {
+      const geminiChart = {
+        name: "Gemini Lagna Sample",
         dob: "1994-11-28",
         tob: "18:45:00",
         city: "Delhi",
@@ -398,10 +398,10 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
         ],
       } as unknown as ChartData;
 
-      const dossier = runAstroVastuHitEngine(priyankaChart);
+      const dossier = runAstroVastuHitEngine(geminiChart);
       const geminiRow = dossier.bodyPartRemedyRegistry.find(r => r.signNum === 3);
       assert.ok(geminiRow);
-      assert.equal(geminiRow.houseNum, 1, "Gemini is Lagna for Priyanka");
+      assert.equal(geminiRow.houseNum, 1, "Gemini is Lagna for Gemini Lagna Sample");
       assert.equal(geminiRow.statusVerdict.statusType, "critical_hit", "Must detect Mars 180° killer hit on Gemini");
       assert.ok(geminiRow.statusVerdict.badgeText.includes("180°"), "Badge must display 180° hit");
     });

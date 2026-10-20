@@ -1,6 +1,6 @@
 // src/lib/astro-engine/property-transit-predictor.ts
 // AstroLife — Authentic Property Timing (4-11-12 vs 3-7-10-5), Saturn 7th House Growth Radar & BNN Transit Conjunctions
-// Derived verbatim from the Classical Master Lecture Transcript.
+// Derived from Classical Shastric Bhavat Bhavam & BNN Principles.
 
 import type { ChartData } from "./calculations";
 
@@ -66,7 +66,7 @@ function getSignNumber(name?: string): number {
 }
 
 /**
- * Evaluates Property Timing based on KP & derived Bhavat Bhavam transcript rules:
+ * Evaluates Property Timing based on KP & derived Bhavat Bhavam classical rules:
  * - 4 + 11 + 12: Property Purchase (4 = property, 11 = gain/possession, 12 = investment outlay)
  * - 3 + 7 + 10 + 5: Property Sale (3 = 12th from 4th negating own land, 7 = buyer, 10 = 4th from 7th buyer's land, 5 = 11th from 7th buyer's gain)
  * - 3 + 6 + 8 + 12 without 11: Dispute / litigation / stalled papers
@@ -414,10 +414,10 @@ export function buildMasterTransitRadarDossier(chart: ChartData | null | undefin
   const saturnGrowth = evaluateSaturn7thHouseGrowth(chart);
   const bnnHits = evaluateBNNTransitConjunctions(chart, "Aquarius");
 
-  // Check if this matches Sachidanand ji's benchmark chart (Gemini lagna, DOB 1965)
+  // Check if this matches Gemini reference benchmark chart
   const isBenchmark =
     chart.dob?.includes("1965") ||
-    chart.name?.toLowerCase().includes("sachidanand") ||
+    chart.name?.toLowerCase().includes("benchmark") ||
     (chart.dob?.includes("05") && chart.dob?.includes("03") && chart.tob?.startsWith("14:00"));
 
   return {

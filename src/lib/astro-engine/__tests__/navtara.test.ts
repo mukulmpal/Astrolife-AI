@@ -96,8 +96,8 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
     assert.equal(audit.layers.length, 2, "3rd layer must be omitted when NL === NL's Lord");
   });
 
-  // ── Case 3: Mukul (Uttara Phalguni Janma Nakshatra) ────────────────────────
-  it("Case 3 — Mukul: Uttara Phalguni (#12) -> 27th Star Purva Phalguni (#11)", () => {
+  // ── Case 3: Uttara Phalguni Janma Nakshatra Benchmark ───────────────────
+  it("Case 3 — Benchmark Chart: Uttara Phalguni (#12) -> 27th Star Purva Phalguni (#11)", () => {
     const up = getNakshatraByName("Uttara Phalguni");
     assert.ok(up, "Uttara Phalguni must exist");
     assert.equal(up.id, 12);
@@ -114,11 +114,11 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
     assert.ok(quality.temperamentTitle.includes("Harmonizer"));
   });
 
-  // ── Case 4: Manisha Chart (Purva Phalguni Moon, Sun in Jyeshtha) ───────────
-  it("Case 4 — Manisha Chart: Purva Phalguni Moon with Sun in Jyeshtha", () => {
-    // Manisha: DOB 6 Dec 1993, 12:45 PM. Moon at Leo ~15.63° (Purva Phalguni), Sun at Scorpio 20.40° (Jyeshtha)
-    const mockManishaChart: ChartData = {
-      name: "Manisha",
+  // ── Case 4: Aquarius Lagna Benchmark (Purva Phalguni Moon, Sun in Jyeshtha) ──
+  it("Case 4 — Benchmark Chart: Purva Phalguni Moon with Sun in Jyeshtha", () => {
+    // Benchmark Chart: Moon at Leo ~15.63° (Purva Phalguni), Sun at Scorpio 20.40° (Jyeshtha)
+    const mockBenchmarkChart: ChartData = {
+      name: "Aquarius Benchmark Chart",
       dob: "1993-12-06",
       tob: "12:45",
       city: "Jaipur",
@@ -141,14 +141,14 @@ describe("Navtara Master Engine — 5 Known Cases & Core Precision", () => {
       antardasha: [],
     };
 
-    const intel = runNavtaraIntelligence(mockManishaChart, "Lahiri_Chitrapaksha");
+    const intel = runNavtaraIntelligence(mockBenchmarkChart, "Lahiri_Chitrapaksha");
     assert.equal(intel.birthNakshatra.name, "Purva Phalguni");
     assert.equal(intel.birthNakshatra.id, 11);
     assert.equal(intel.supportStarShield.nakshatra.name, "Magha"); // #10
     assert.equal(intel.supportStarShield.nakshatra.lord, "Ketu");
 
     // Sun at 230.51° (Scorpio 20°30') is well inside Jyeshtha (16°40' - 30°00')
-    const sunCoord = resolveNakshatraCoordinate(230.51, mockManishaChart.jd, "Lahiri_Chitrapaksha");
+    const sunCoord = resolveNakshatraCoordinate(230.51, mockBenchmarkChart.jd, "Lahiri_Chitrapaksha");
     assert.equal(sunCoord.nakshatra.name, "Jyeshtha");
     assert.equal(sunCoord.boundary.isNearBoundary, false, "Sun is ~3.8° from border, not near boundary");
   });

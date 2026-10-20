@@ -29,7 +29,7 @@ import { EngineStateCard } from "@/components/engine-state-card";
  * FEATURE GATE FLAG (Rollout Controller):
  * - When `false`: Advanced Bhavat Bhavam Family Health, Gochar Backtesting Date
  *   Controller, and Critical Crisis Predictor are strictly restricted to
- *   ADMIN_EMAILS (mukulpal9@gmail.com, 9palmukul@gmail.com) and localhost.
+ *   ADMIN_EMAILS and localhost.
  *   Regular public users see only the stable, standard wellness dashboard.
  * - When `true`: All features instantly become accessible to 100% of all users.
  * ─────────────────────────────────────────────────────────────────────────────
@@ -256,7 +256,7 @@ export default function MedicalPage() {
           return intro ? <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} /> : null;
         })()}
 
-        {/* ── ADMIN TESTING LAB & BACKTEST TOOLBAR (Gated to Admin Mukul Pal) ── */}
+        {/* ── ADMIN TESTING LAB & BACKTEST TOOLBAR ── */}
         {hasAdvancedAccess && (
           <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.35)", borderRadius: "14px", padding: "14px 16px", marginBottom: "18px", boxShadow: "0 4px 16px rgba(184,134,11,0.06)" }}>
             {/* Admin Lab Header Badge */}
@@ -1020,10 +1020,10 @@ export default function MedicalPage() {
               })()}
             </div>
 
-            {/* 4. SPECIAL TRANSCRIPT RULES & WARNINGS */}
+            {/* 4. SPECIAL CLASSICAL RULES & WARNINGS */}
             <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.25)", borderRadius: "14px", padding: "18px", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
               <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginBottom: "12px" }}>
-                🛡️ गुरुजी के विशेष नियम एवं सावधानियां (Special Classical Guidelines)
+                🛡️ विशेष शास्त्रीय नियम एवं सावधानियां (Special Classical Guidelines)
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
                 {SPECIAL_CLASSICAL_RULES.map((rule) => (
@@ -1135,10 +1135,10 @@ export default function MedicalPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                 <div>
                   <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A" }}>
-                    📚 लाइव क्लासरूम केस स्टडीज़ (20 Ground-Truth Casebook)
+                    📚 प्रामाणिक शास्त्रीय केस स्टडीज़ (20 Ground-Truth Casebook)
                   </div>
                   <div style={{ fontSize: "12px", color: "#6B635B", marginTop: "2px" }}>
-                    गुरुजी की लाइव क्लास में हल किए गए वास्तविक स्वास्थ्य एवं उपचार केस
+                    वैदिक एवं के.पी. ज्योतिष में परीक्षित वास्तविक स्वास्थ्य एवं उपचार केस
                   </div>
                 </div>
                 <button

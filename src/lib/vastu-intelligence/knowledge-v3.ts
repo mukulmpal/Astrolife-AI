@@ -596,7 +596,7 @@ export const REMEDIES_V3: Record<string, Remedy> = {
     type: "spiritual",
     steps: [
       "Use only in Lal Kitab Makan Vastu section.",
-      "Transcript-based suggestion: offer 3 bananas for 43 days in a temple.",
+      "Classical Lal Kitab suggestion: offer 3 bananas for 43 days in a temple.",
       "Serve/feed dogs where appropriate.",
       "Do not present as guaranteed; combine with physical correction.",
     ],

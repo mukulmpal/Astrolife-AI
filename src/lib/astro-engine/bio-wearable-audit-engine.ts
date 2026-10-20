@@ -870,5 +870,3 @@ export const PRESET_SAMPLE_ITEMS: WornItemInput[] = [
   { id: "item-5", location: "feet_soles", item: "black_thread" },
 ];
 
-export const PRESET_MANISHA_ITEMS = PRESET_SAMPLE_ITEMS;
-

@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   auditUserWearables,
-  PRESET_MANISHA_ITEMS,
+  PRESET_SAMPLE_ITEMS,
   type WornItemInput,
 } from "../bio-wearable-audit-engine";
 import type { ChartData } from "../calculations";
@@ -47,7 +47,7 @@ describe("Bio-Magnetic Wearable, Gemstone & Thread Audit Engine", () => {
   } as unknown as ChartData;
 
   it("should accurately audit sample scenario's 5 preset items as CRITICAL_REMOVE", () => {
-    const dossier = auditUserWearables(sampleAquariusChart, PRESET_MANISHA_ITEMS, new Date("2026-10-20"));
+    const dossier = auditUserWearables(sampleAquariusChart, PRESET_SAMPLE_ITEMS, new Date("2026-10-20"));
     assert.ok(dossier);
     assert.equal(dossier.nativeName, "Sample Native");
     assert.equal(dossier.activeMahadasha, "Mars");

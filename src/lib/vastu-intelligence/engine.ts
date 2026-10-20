@@ -503,7 +503,7 @@ function analyzeConstruction(input: VastuAnalyzeInput): { defects: VastuDefect[]
       ],
       system: "lal_kitab_makan_vastu",
       authorityLevel: "experimental",
-      sourceTag: "construction_stage_transcript_rule",
+      sourceTag: "construction_stage_shastric_rule",
     });
   }
 

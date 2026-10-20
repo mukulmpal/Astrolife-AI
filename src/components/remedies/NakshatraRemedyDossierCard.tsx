@@ -393,7 +393,7 @@ export function NakshatraRemedyDossierCard({
         </div>
       )}
 
-      {/* ── TAB 2: Social & Personality Narrative (From Transcript 1) ── */}
+      {/* ── TAB 2: Social & Personality Narrative ── */}
       {activeTab === "social_personality" && (
         <div style={{ padding: "24px" }}>
           {/* Golden Rule Bar */}

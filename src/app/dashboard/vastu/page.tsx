@@ -11,7 +11,7 @@ import { AstroVastuHitRadarView } from "@/components/vastu/AstroVastuHitRadarVie
 import "@/app/dashboard/shared.css";
 
 const DEMO_VASTU_BIRTH: BirthDetails = {
-  name: "Mukul Ji (Demo Chart)",
+  name: "Sample Chart (Demo)",
   dob: "1995-07-04",
   tob: "12:30",
   city: "Delhi",
@@ -679,7 +679,7 @@ export default function VastuDashboardPage() {
         ] : [
           { label: "Mode", value: analysisMode === "kundli" ? "Kundli" : analysisMode === "property" ? "Property" : "Hit Radar", tone: "gold" },
           { label: "Rooms", value: rooms.length, tone: "blue" },
-          { label: "Chart", value: !isDemo ? "Personal" : "Demo (Mukul)", tone: !isDemo ? "green" : "gold" },
+          { label: "Chart", value: !isDemo ? "Personal" : "Demo Chart", tone: !isDemo ? "green" : "gold" },
         ]}
       />
 
@@ -703,7 +703,7 @@ export default function VastuDashboardPage() {
             <span style={{ fontSize: 24 }}>💡</span>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#8A6008" }}>
-                डेमो कुंडली सक्रिय (Sample Kundli: Mukul Ji · कन्या लग्न)
+                डेमो कुंडली सक्रिय (Sample Kundli: कन्या लग्न)
               </div>
               <div style={{ fontSize: 13, color: "#4A4238", marginTop: 2 }}>
                 आप लाइव एस्ट्रो-वास्तु हिट रडार (3-5-8 नियम), ट्रैफिक पुलिस व दिशाएं देख रहे हैं। अपनी व्यक्तिगत कुंडली से देखने के लिए अपनी जन्म तिथि जोड़ें।

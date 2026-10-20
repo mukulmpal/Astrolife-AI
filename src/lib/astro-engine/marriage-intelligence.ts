@@ -1051,7 +1051,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
   const starLordRow = kpResult.rows.find((r) => r.name === starLordOfSubLord);
   const starLordHouse = starLordRow?.bhavaHouse || starLordRow?.house || 7;
 
-  // Evaluate Meeting Context (Section 6 of Lecture)
+  // Evaluate Meeting Context (KP Cuspal Inter-links)
   const meetingMeta = MEETING_CONTEXT_MAP[starLordHouse] || MEETING_CONTEXT_MAP[7];
   const meetingContext: MeetingContextResult = {
     house: starLordHouse,
@@ -1062,7 +1062,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
     starLordHouse,
   };
 
-  // Evaluate 7th Rashi Impact (Section 7 of Lecture)
+  // Evaluate 7th Rashi Impact (Classical Shastric Archetypes)
   const d1LagnaNum = chart.lagnaNum ?? 0;
   const d1SeventhRashiNum = ((d1LagnaNum + 6) % 12) + 1; // 1-indexed Rashi
   const rashiImpactMeta = RASHI_7TH_IMPACT_MAP[d1SeventhRashiNum] || RASHI_7TH_IMPACT_MAP[1];
@@ -1203,7 +1203,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
         : "Favorable D9 Navamsha structural alignment for marital longevity.",
   };
 
-  // Evaluate Dual / Second Marriage (Section 10 of Lecture)
+  // Evaluate Dual / Second Marriage (Dual Sign Dynamics)
   const subLordPlanetData = chart.planets[cusp7SubLord];
   const subLordSignNum = subLordPlanetData?.signNum ?? 0;
   const subLordInDual = DUAL_SIGNS.includes(subLordSignNum + 1);
@@ -1295,7 +1295,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
   // D1 to D9 Cross-Mapping (Trik & Wealth rashis in D9 houses)
   const d1ToD9Mapping = mapD1toD9CrossImpact(chart);
 
-  // Compile Practical Remedies (Section 11 of Lecture & Research Paper)
+  // Compile Practical Remedies (Classical Research Protocols)
   const remedies: MarriageRemedyItem[] = [];
 
   // Universal Shivalinga worship (always applicable for marriage harmony)

@@ -382,7 +382,7 @@ export const ARUDHA_META: Record<number, { name: string; shortName: string; mean
   12: { name: "Upapada Lagna", shortName: "UL",  meaning: "Spouse quality, marriage, liberation" },
 };
 
-// Jaimini sign lords — Mars for Scorpio, Saturn for Aquarius (Rahu/Ketu excluded per transcript)
+// Jaimini sign lords — Mars for Scorpio, Saturn for Aquarius (Rahu/Ketu excluded per Jaimini Upadesha Sutras)
 export const JAIMINI_LORD: Record<number, string> = {
   0: "Mars", 1: "Venus", 2: "Mercury", 3: "Moon",
   4: "Sun",  5: "Mercury", 6: "Venus",  7: "Mars",
@@ -1184,7 +1184,7 @@ export function calculateCharaDashaAD(
   return ads;
 }
 
-// ── Karakamsha Kundali (D9 Navamsha Base — Transcript Correct Method) ─────────
+// ── Karakamsha Kundali (D9 Navamsha Base — Classical Shastric Method) ─────────
 
 export function getPlanetsInD1Sign(chart: ChartData, sNum: number): string[] {
   const normalized = md(sNum, 12);

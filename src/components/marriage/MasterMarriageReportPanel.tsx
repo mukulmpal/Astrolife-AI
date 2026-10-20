@@ -631,7 +631,7 @@ export default function MasterMarriageReportPanel({
             </div>
           </div>
 
-          {/* Transcript Specific D9 Affliction Highlights */}
+          {/* Classical D9 Affliction Highlights */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12, marginTop: 14, marginBottom: 14 }}>
             <div style={{ background: "#FFFDF5", border: "1px solid rgba(184,134,11,0.25)", borderRadius: 10, padding: "12px 14px" }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#875C06", marginBottom: 3 }}>

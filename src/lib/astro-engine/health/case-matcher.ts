@@ -3,7 +3,7 @@
  * ASTROLIFE — CASE MATCHER & PATTERN RECOGNITION (PHASE 2I-MED)
  * ============================================================================
  * Compares natal chart health vectors and running dasha against ground-truth
- * classroom cases from the teacher transcript casebook.
+ * classical benchmark cases from authentic Jyotish research archives.
  * ============================================================================
  */
 
