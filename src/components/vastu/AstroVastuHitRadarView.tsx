@@ -2422,6 +2422,163 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </div>
             </div>
           )}
+
+          {/* Daily Modern Wearables & Tech Astro-Prescription */}
+          {astroPrescription.accessories && (
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                border: "1px solid #E5E7EB",
+                borderRadius: 14,
+                padding: 20,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 20 }}>📱</span>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#111827" }}>
+                      आधुनिक दैनिक वेशभूषा व गैजेट वास्तु (Modern Daily Wearable & Tech Prescription)
+                    </h4>
+                    <div style={{ fontSize: 12, color: "#6B7280", marginTop: 2 }}>
+                      फोन कवर, जूते, टोपी, बेल्ट व मास्क — 24 घंटे की आभा (Aura) को शील्ड करने वाले आधुनिक उपादान
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+                {/* 1. Phone Cover */}
+                <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
+                      📱 {astroPrescription.accessories.phoneCover.title}
+                    </div>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 6px", borderRadius: 6 }}>3rd House</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#374151" }}>
+                    <strong>✅ सर्वोत्तम रंग:</strong> {astroPrescription.accessories.phoneCover.recommendedColors.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#DC2626" }}>
+                    <strong>🚫 सख्त वर्जित:</strong> {astroPrescription.accessories.phoneCover.colorsToAvoid.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#4B5563" }}>
+                    <strong>मटेरियल:</strong> {astroPrescription.accessories.phoneCover.caseMaterial}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#059669" }}>
+                    <strong>वॉलपेपर:</strong> {astroPrescription.accessories.phoneCover.idealWallpaperAffirmation}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.45, marginTop: 2 }}>
+                    {astroPrescription.accessories.phoneCover.planetaryMechanism}
+                  </div>
+                  <div style={{ marginTop: "auto", fontSize: 11, background: "#FFFBEB", color: "#92400E", padding: "6px 8px", borderRadius: 6, border: "1px solid #FDE68A" }}>
+                    ⚠️ {astroPrescription.accessories.phoneCover.cautionNotice}
+                  </div>
+                </div>
+
+                {/* 2. Footwear / Shoes */}
+                <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
+                      👟 {astroPrescription.accessories.footwear.title}
+                    </div>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, background: "#F5F3FF", color: "#6D28D9", padding: "2px 6px", borderRadius: 6 }}>12th House</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#374151" }}>
+                    <strong>✅ सर्वोत्तम रंग:</strong> {astroPrescription.accessories.footwear.recommendedColors.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#DC2626" }}>
+                    <strong>🚫 सख्त वर्जित:</strong> {astroPrescription.accessories.footwear.colorsToAvoid.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#4B5563" }}>
+                    <strong>मटेरियल:</strong> {astroPrescription.accessories.footwear.materialType}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.45, marginTop: 2 }}>
+                    {astroPrescription.accessories.footwear.planetaryMechanism}
+                  </div>
+                  <div style={{ marginTop: "auto", fontSize: 11, background: "#FEF2F2", color: "#991B1B", padding: "6px 8px", borderRadius: 6, border: "1px solid #FECACA" }}>
+                    ⚠️ {astroPrescription.accessories.footwear.cautionNotice}
+                  </div>
+                </div>
+
+                {/* 3. Cap / Headwear */}
+                <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
+                      🧢 {astroPrescription.accessories.headwearCap.title}
+                    </div>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, background: "#FEF3C7", color: "#B45309", padding: "2px 6px", borderRadius: 6 }}>1st & 10th</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#374151" }}>
+                    <strong>✅ सर्वोत्तम रंग:</strong> {astroPrescription.accessories.headwearCap.recommendedColors.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#DC2626" }}>
+                    <strong>🚫 सख्त वर्जित:</strong> {astroPrescription.accessories.headwearCap.colorsToAvoid.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#4B5563" }}>
+                    <strong>शैली:</strong> {astroPrescription.accessories.headwearCap.style}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.45, marginTop: 2 }}>
+                    {astroPrescription.accessories.headwearCap.planetaryMechanism}
+                  </div>
+                  <div style={{ marginTop: "auto", fontSize: 11, background: "#FFFBEB", color: "#92400E", padding: "6px 8px", borderRadius: 6, border: "1px solid #FDE68A" }}>
+                    ⚠️ {astroPrescription.accessories.headwearCap.cautionNotice}
+                  </div>
+                </div>
+
+                {/* 4. Waist Belt */}
+                <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
+                      🥋 {astroPrescription.accessories.belt.title}
+                    </div>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, background: "#ECFDF5", color: "#047857", padding: "2px 6px", borderRadius: 6 }}>7th House</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#374151" }}>
+                    <strong>✅ सर्वोत्तम रंग:</strong> {astroPrescription.accessories.belt.recommendedColors.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#DC2626" }}>
+                    <strong>🚫 सख्त वर्जित:</strong> {astroPrescription.accessories.belt.colorsToAvoid.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#4B5563" }}>
+                    <strong>बकल धातु:</strong> {astroPrescription.accessories.belt.buckleMetal}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.45, marginTop: 2 }}>
+                    {astroPrescription.accessories.belt.planetaryMechanism}
+                  </div>
+                  <div style={{ marginTop: "auto", fontSize: 11, background: "#FFFBEB", color: "#92400E", padding: "6px 8px", borderRadius: 6, border: "1px solid #FDE68A" }}>
+                    ⚠️ {astroPrescription.accessories.belt.cautionNotice}
+                  </div>
+                </div>
+
+                {/* 5. Face Mask */}
+                <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
+                      😷 {astroPrescription.accessories.faceMask.title}
+                    </div>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, background: "#E0F2FE", color: "#0369A1", padding: "2px 6px", borderRadius: 6 }}>2nd House</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#374151" }}>
+                    <strong>✅ सर्वोत्तम रंग:</strong> {astroPrescription.accessories.faceMask.recommendedColors.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#DC2626" }}>
+                    <strong>🚫 सख्त वर्जित:</strong> {astroPrescription.accessories.faceMask.colorsToAvoid.join(", ")}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#4B5563" }}>
+                    <strong>कपड़ा:</strong> {astroPrescription.accessories.faceMask.fabric}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.45, marginTop: 2 }}>
+                    {astroPrescription.accessories.faceMask.planetaryMechanism}
+                  </div>
+                  <div style={{ marginTop: "auto", fontSize: 11, background: "#FFFBEB", color: "#92400E", padding: "6px 8px", borderRadius: 6, border: "1px solid #FDE68A" }}>
+                    ⚠️ {astroPrescription.accessories.faceMask.cautionNotice}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

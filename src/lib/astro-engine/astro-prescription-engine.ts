@@ -118,6 +118,56 @@ export interface DegreeChromaticModulation {
   scientificRule: string;
 }
 
+export interface DailyAccessoryProtocol {
+  phoneCover: {
+    title: string;
+    recommendedColors: string[];
+    recommendedHexes: string[];
+    colorsToAvoid: string[];
+    caseMaterial: string;
+    planetaryMechanism: string;
+    idealWallpaperAffirmation: string;
+    cautionNotice: string;
+  };
+  footwear: {
+    title: string;
+    recommendedColors: string[];
+    recommendedHexes: string[];
+    colorsToAvoid: string[];
+    materialType: string;
+    planetaryMechanism: string;
+    cautionNotice: string;
+  };
+  headwearCap: {
+    title: string;
+    recommendedColors: string[];
+    recommendedHexes: string[];
+    colorsToAvoid: string[];
+    style: string;
+    planetaryMechanism: string;
+    cautionNotice: string;
+  };
+  belt: {
+    title: string;
+    recommendedColors: string[];
+    recommendedHexes: string[];
+    colorsToAvoid: string[];
+    material: string;
+    buckleMetal: string;
+    planetaryMechanism: string;
+    cautionNotice: string;
+  };
+  faceMask: {
+    title: string;
+    recommendedColors: string[];
+    recommendedHexes: string[];
+    colorsToAvoid: string[];
+    fabric: string;
+    planetaryMechanism: string;
+    cautionNotice: string;
+  };
+}
+
 export interface AstroPharmacologicalPrescription {
   title: string;
   formulaSubtitle: string;
@@ -131,6 +181,7 @@ export interface AstroPharmacologicalPrescription {
   anatomicalProtocols: AnatomicalTargetingRecommendation[];
   crystals: CrystalProtocol;
   wallet: WalletProtocol;
+  accessories: DailyAccessoryProtocol;
   frictionDiagnosisSummary: string;
 }
 
@@ -423,6 +474,121 @@ function evaluateAnatomicalProtocols(
   });
 
   return protocols;
+}
+
+function evaluateDailyAccessories(
+  chart: ChartData,
+  activeSaltPlanet: string,
+  shieldPlanet: string,
+  chromaticModulation: DegreeChromaticModulation
+): DailyAccessoryProtocol {
+  const lagnaNum = chart.lagnaNum; // 0-11
+  const isVirgo = chart.lagnaRashi === "Virgo" || lagnaNum === 5;
+  const isAquarius = chart.lagnaRashi === "Aquarius" || lagnaNum === 10;
+
+  // 1. Smartphone Cover (3rd House - Gemini / Mercury / Digital Communication)
+  // The phone is handheld in the 3rd house bio-field 10-14 hours daily!
+  let phoneColors = ["Lime Green (लाइम ग्रीन)", "Forest Green (गहरा हरा)", "Tan Brown (टैन)", "Silver / Muted White"];
+  let phoneHexes = [chromaticModulation.hexCode, "#166534", "#B45309", "#F8FAFC"];
+  let phoneAvoid = ["Aggressive Blood Red (चटक लाल)", "Jet Black (गहरा काला)"];
+  let phoneMaterial = "मैट सिलिकॉन या वेगन लेदर (चिकना व नॉन-ग्लेयर ग्रिप)";
+  let phoneMechanism = "फोन कालपुरुष के 3रे भाव (हाथ, संपर्क, डिजिटल संचार) का मुख्य यंत्र है। आपके बुध पर मंगल की 90° हिट को शांत करने के लिए लाइम/फॉरेस्ट ग्रीन बैक-कवर एक विद्युत-चुंबकीय शील्ड (EMF Shield) की तरह काम करता है।";
+  let phoneWallpaper = "शांत हरी प्रकृति (Bamboo/Forest) या सुनहरी ज्यामिति (Golden Ratio Yantra)";
+  let phoneCaution = "टूटा हुआ स्क्रीन गार्ड, चटका हुआ कवर या भड़कीले लाल कवर का उपयोग न करें; यह सीधे नर्वस सिस्टम में अधीरता (Impatience) पैदा करता है।";
+
+  if (isAquarius) {
+    phoneColors = ["Royal Blue (गहरा नीला)", "Citrine Gold (सुनहला पीला)", "Camel Tan", "Slate Grey"];
+    phoneHexes = ["#1D4ED8", "#F59E0B", "#B45309", "#64748B"];
+    phoneAvoid = ["Fiery Neon Red", "Dark Purple (गहरा जामुनी)"];
+    phoneMaterial = "पॉलीकार्बोनेट मैट या प्रीमियम लेदर ग्रिप";
+    phoneMechanism = "कुंभ लग्न में 3रे भाव का स्वामी मंगल 10वें भाव में अस्त है। रॉयल ब्लू व सिट्रीन गोल्ड कवर व्यावसायिक संचार व अटके भुगतानों को तुरंत गति देता है।";
+    phoneWallpaper = "शांत बहता जल या आयरन पाइराइट / सिट्रीन क्रिस्टल की छवि";
+    phoneCaution = "काले या लाल रंग के हिंसक ग्राफिक्स वाले फोन केस से बचें।";
+  }
+
+  // 2. Footwear / Shoes (12th House - Pisces / Saturn / Shani)
+  // Lal Kitab Axiom: "Shoes are the physical domain of Saturn. Torn or ill-suited shoes destroy the 12th & 10th houses."
+  let footColors = ["Dark Slate Grey", "Navy Blue (गहरा नेवी)", "Tan Brown", "Muted Earthy Olive"];
+  let footHexes = ["#334155", "#1E3A8A", "#78350F", "#3F6212"];
+  let footAvoid = ["Neon / Bright Red (चटक लाल)", "Dirty Neon Yellow"];
+  let footMaterial = "प्रीमियम ब्रीदेबल मेश या सॉफ्ट टैन लेदर (सॉफ्ट सोल)";
+  let footMechanism = "पैर कालपुरुष का 12वां भाव हैं और जूते सीधे शनि के आधिपत्य में आते हैं। सही रंग व संतुलित जूते पहनने से शनि का अनुशासन सक्रिय होता है और अनचाहे खर्चे रुकते हैं।";
+  let footCaution = "घिसे हुए, फटे तलवे वाले या धूल भरे जूते कभी न पहनें (लाल किताब अनुसार फटे जूते कोर्ट-कचहरी व अस्पताल का खर्च बढ़ाते हैं)। जूतों को हमेशा पश्चिम/दक्षिण दिशा में सीधा रखें।";
+
+  // 3. Headwear / Cap (1st House - Scalp/Brain & 10th House - Prestige/Turban)
+  let capColors = ["Pure White (दूधिया सफेद)", "Soft Cream / Khaki", "Olive Green", "Classic Navy"];
+  let capHexes = ["#FFFFFF", "#F5F5DC", "#4D7C0F", "#1E3A8A"];
+  let capAvoid = ["Flaming Red (अग्नि लाल)", "Camouflage / Dark Skull Prints"];
+  let capStyle = "सूती बेसबॉल कैप / कॉटन हैट / सफेद साफ़ा";
+  let capMechanism = "सिर 1st भाव (मंगल/सूर्य) और टोपी 10वां भाव (प्रतिष्ठा) है। सफेद या सौम्य रंग की टोपी पहनने से राहु की नकारात्मक तरंगें मस्तिष्क में प्रवेश नहीं कर पातीं और गुस्सा शांत रहता है।";
+  let capCaution = "जिम या धूप में लाल या काले रंग की टोपी न लगाएं; यह सिर में पित्त व रक्तचाप को अचानक बढ़ाती है।";
+
+  // 4. Waist Belt & Buckle (7th House - Libra / Venus & Lower Spine)
+  let beltColors = ["Tan Brown (क्लासिक टैन)", "Coffee Brown (डार्क ब्राउन)", "Matte Black (मैट ब्लैक)"];
+  let beltHexes = ["#B45309", "#451A03", "#1F2937"];
+  let beltAvoid = ["Studded Punk Red", "Shiny Patent Red"];
+  let beltMaterial = "शुद्ध लेदर या सूती कैनवास (Cotton Canvas)";
+  let buckleMetal = "ब्रश किया हुआ सिल्वर / मैट क्रोम (चांदनी शीतलता) या डल ब्रास (पीतल)";
+  let beltMechanism = "कमर तुला राशि (शुक्र) है जो तरल धन व वैवाहिक सुख की अधिष्ठात्री है। कमर पर संतुलित बेल्ट व सिल्वर बकल लगाने से नाभि केंद्र स्थिर रहता है और खर्चों का रिसाव रुकता है।";
+  let beltCaution = "अत्यधिक नुकीले, कांटेदार या खोपड़ी की आकृति वाले बकल कभी न पहनें; यह मूलाधार चक्र को क्षत-विक्षत करते हैं।";
+
+  // 5. Face Mask (2nd House - Mouth/Speech & 1st House - Prana Vayu)
+  let maskColors = ["Breathable White (सफेद कॉटन)", "Soft Pastel Green", "Sky Blue (आसमानी)", "Soft Cream"];
+  let maskHexes = ["#FFFFFF", "#86EFAC", "#BAE6FD", "#FEF3C7"];
+  let maskAvoid = ["Pitch Synthetic Black (सिंथेटिक काला)", "Blood Red"];
+  let maskFabric = "100% शुद्ध कॉटन (Double-Layered Breathable Organic Cotton)";
+  let maskMechanism = "मुख 2nd भाव (वाणी व परिवार) और नाक प्राण वायु (बुध व चंद्रमा) है। सफेद या हल्के हरे रंग का कॉटन मास्क प्राण वायु के प्रवाह को शुद्ध रखता है और फेफड़ों को ऑक्सीजन संतुलन देता है।";
+  let maskCaution = "सिंथेटिक पॉलिएस्टर के काले मास्क से बचें; यह शरीर में कार्बन-डाइऑक्साइड चक्र को दूषित कर सिरदर्द पैदा करते हैं।";
+
+  return {
+    phoneCover: {
+      title: "स्मार्टफोन बैक कवर (3rd House Bio-Armor)",
+      recommendedColors: phoneColors,
+      recommendedHexes: phoneHexes,
+      colorsToAvoid: phoneAvoid,
+      caseMaterial: phoneMaterial,
+      planetaryMechanism: phoneMechanism,
+      idealWallpaperAffirmation: phoneWallpaper,
+      cautionNotice: phoneCaution,
+    },
+    footwear: {
+      title: "जूते व फुटवियर (12th House & Shani Shield)",
+      recommendedColors: footColors,
+      recommendedHexes: footHexes,
+      colorsToAvoid: footAvoid,
+      materialType: footMaterial,
+      planetaryMechanism: footMechanism,
+      cautionNotice: footCaution,
+    },
+    headwearCap: {
+      title: "टोपी व हेडवियर (1st & 10th House Cap)",
+      recommendedColors: capColors,
+      recommendedHexes: capHexes,
+      colorsToAvoid: capAvoid,
+      style: capStyle,
+      planetaryMechanism: capMechanism,
+      cautionNotice: capCaution,
+    },
+    belt: {
+      title: "कमर बेल्ट व बकल (7th House & Wealth Lock)",
+      recommendedColors: beltColors,
+      recommendedHexes: beltHexes,
+      colorsToAvoid: beltAvoid,
+      material: beltMaterial,
+      buckleMetal,
+      planetaryMechanism: beltMechanism,
+      cautionNotice: beltCaution,
+    },
+    faceMask: {
+      title: "फेस मास्क व श्वास रक्षा (2nd House & Prana Vayu)",
+      recommendedColors: maskColors,
+      recommendedHexes: maskHexes,
+      colorsToAvoid: maskAvoid,
+      fabric: maskFabric,
+      planetaryMechanism: maskMechanism,
+      cautionNotice: maskCaution,
+    },
+  };
 }
 
 // ── Master Prescription Evaluator ───────────────────────────────────────────
@@ -754,6 +920,7 @@ export function evaluateAstroPrescriptionFormula(
       recommendedCurrencyNote: currencyNote,
       scientificReason: "वॉलेट धन भाव (2nd House) का भौतिक प्रतीक है। सही रंग व शुद्ध धातु धन के अनावश्यक रिसाव को रोकते हैं।"
     },
+    accessories: evaluateDailyAccessories(chart, activeSaltPlanet, shieldPlanet, chromaticModulation),
     frictionDiagnosisSummary: hasFrictionLock && primaryFrictionHit
       ? `सावधानी: आपकी कुंडली में ${primaryFrictionHit.sourceName} द्वारा ${primaryFrictionHit.exactDiff.toFixed(1)}° का कॉस्मिक फ्रिक्शन लॉक आ रहा है। बिना रक्षक बफर (PPI Shield) के एकांगी उपाय करने से मानसिक तनाव हो सकता था, जिसे इस संयुक्त सूत्र द्वारा पूर्णतः निष्प्रभावी कर दिया गया है।`
       : "आपकी कुंडली में मुख्य सक्रिय ग्रह पर कोई गंभीर फ्रिक्शन लॉक नहीं है। यह संयुक्त सूत्र पूर्णतः निर्दोष व अमृत समान फलदायी है।"
