@@ -268,5 +268,103 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
       assert.equal(sswConflict.dangerLevel, "CRITICAL");
     });
   });
+
+  // ── 8. 100% DYNAMIC CHART-DRIVEN BODY PART THERAPY MATRIX ──────────────────
+  describe("100% Dynamic Chart-Driven 12-Sign Body Part Matrix", () => {
+    it("should compute dynamic houses, occupants, and thread verdicts for Mukul (Virgo Lagna)", () => {
+      const mukulChart = {
+        name: "Mukul Pal",
+        dob: "1995-07-04",
+        tob: "12:30:00",
+        city: "Delhi",
+        lagnaRashi: "Virgo",
+        lagnaNum: 6,
+        lagnaLon: 168.58,
+        dashas: [{ planet: "Rahu", active: true, start: new Date("2017-05-14"), end: new Date("2035-05-14") }],
+        antardasha: [{ planet: "Mercury", active: true, start: new Date("2025-04-26"), end: new Date("2027-11-13") }],
+        planets: {
+          Sun: { sign: "Gemini", signNum: 3, degree: 18, minutes: 4, house: 10, lon: 78.07, nakshatra: "Ardra", nakshatraLord: "Rahu" },
+          Moon: { sign: "Leo", signNum: 5, degree: 29, minutes: 12, house: 12, lon: 149.20, nakshatra: "Uttara Phalguni", nakshatraLord: "Sun" },
+          Mars: { sign: "Leo", signNum: 5, degree: 26, minutes: 15, house: 12, lon: 146.26, nakshatra: "Purva Phalguni", nakshatraLord: "Venus" },
+          Mercury: { sign: "Taurus", signNum: 2, degree: 27, minutes: 43, house: 9, lon: 57.71, nakshatra: "Mrigashira", nakshatraLord: "Mars" },
+          Jupiter: { sign: "Scorpio", signNum: 8, degree: 13, minutes: 16, house: 3, lon: 223.26, nakshatra: "Anuradha", nakshatraLord: "Saturn" },
+          Venus: { sign: "Gemini", signNum: 3, degree: 5, minutes: 1, house: 10, lon: 65.01, nakshatra: "Mrigashira", nakshatraLord: "Mars" },
+          Saturn: { sign: "Pisces", signNum: 12, degree: 1, minutes: 55, house: 7, lon: 331.91, nakshatra: "Purva Bhadrapada", nakshatraLord: "Jupiter" },
+          Rahu: { sign: "Libra", signNum: 7, degree: 8, minutes: 13, house: 2, lon: 188.22, nakshatra: "Swati", nakshatraLord: "Rahu" },
+          Ketu: { sign: "Aries", signNum: 1, degree: 8, minutes: 13, house: 8, lon: 8.22, nakshatra: "Ashwini", nakshatraLord: "Ketu" },
+        },
+      } as unknown as ChartData;
+
+      const dossier = runAstroVastuHitEngine(mukulChart, new Date("2026-10-20"));
+      assert.ok(dossier.bodyPartRemedyRegistry);
+      assert.equal(dossier.bodyPartRemedyRegistry.length, 12, "Must contain all 12 signs");
+
+      // Sign 1 (Aries - Head): Should be 8th house for Virgo lagna
+      const ariesRow = dossier.bodyPartRemedyRegistry.find(r => r.signNum === 1);
+      assert.ok(ariesRow);
+      assert.equal(ariesRow.houseNum, 8);
+      assert.ok(ariesRow.isThreadHarmful, "Dusthana 8th house must mark thread as harmful");
+      assert.ok(ariesRow.planetsInSign.some(p => p.name === "Ketu"));
+
+      // Sign 2 (Taurus - Throat): 9th house, houses Mercury (active Antardasha Lord)
+      const taurusRow = dossier.bodyPartRemedyRegistry.find(r => r.signNum === 2);
+      assert.ok(taurusRow);
+      assert.equal(taurusRow.houseNum, 9);
+      const mercuryOccupant = taurusRow.planetsInSign.find(p => p.name === "Mercury");
+      assert.ok(mercuryOccupant);
+      assert.equal(mercuryOccupant.isDashaLord, true, "Mercury must be marked as active Dasha Lord");
+
+      // Sign 3 (Gemini - Arms/Wrists): 10th house, houses Sun and Venus
+      const geminiRow = dossier.bodyPartRemedyRegistry.find(r => r.signNum === 3);
+      assert.ok(geminiRow);
+      assert.equal(geminiRow.houseNum, 10);
+      assert.equal(geminiRow.planetsInSign.length, 2, "Gemini must have 2 planets (Sun, Venus)");
+
+      // Every item must have authentic dot substance and non-empty guidance
+      for (const row of dossier.bodyPartRemedyRegistry) {
+        assert.ok(row.dotSubstance.length > 0, `Sign ${row.signNum} dot substance must not be empty`);
+        assert.ok(row.dotApplicationRules.length > 0, `Sign ${row.signNum} rules must not be empty`);
+        assert.ok(row.threadVerdict.length > 0, `Sign ${row.signNum} thread verdict must not be empty`);
+        assert.ok(row.statusVerdict.badgeText.length > 0, `Sign ${row.signNum} badge must not be empty`);
+      }
+    });
+
+    it("should synthesize critical hit status for afflicted body parts in Priyanka Ji's chart", () => {
+      const priyankaChart = {
+        name: "Priyanka",
+        dob: "1994-11-28",
+        tob: "18:45:00",
+        city: "Delhi",
+        lagnaRashi: "Gemini",
+        lagnaNum: 3,
+        lagnaLon: 89,
+        dashas: [{ planet: "Mars", active: true, start: new Date("2020-01-01"), end: new Date("2027-01-01") }],
+        planets: {
+          Mars: {
+            sign: "Sagittarius",
+            signNum: 9,
+            degree: 29,
+            minutes: 0,
+            house: 7,
+            lon: 269,
+            nakshatra: "Uttara Ashadha",
+            nakshatraLord: "Sun",
+          },
+        },
+        houseCusps: [
+          { house: 1, sign: "Gemini", signNum: 3, degree: 29, minutes: 0, lon: 89 },
+          { house: 7, sign: "Sagittarius", signNum: 9, degree: 29, minutes: 0, lon: 269 },
+        ],
+      } as unknown as ChartData;
+
+      const dossier = runAstroVastuHitEngine(priyankaChart);
+      const geminiRow = dossier.bodyPartRemedyRegistry.find(r => r.signNum === 3);
+      assert.ok(geminiRow);
+      assert.equal(geminiRow.houseNum, 1, "Gemini is Lagna for Priyanka");
+      assert.equal(geminiRow.statusVerdict.statusType, "critical_hit", "Must detect Mars 180° killer hit on Gemini");
+      assert.ok(geminiRow.statusVerdict.badgeText.includes("180°"), "Badge must display 180° hit");
+    });
+  });
 });
+
 
