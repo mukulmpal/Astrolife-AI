@@ -132,6 +132,387 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     }
   };
 
+  const renderDynamicBodyTherapyTable = () => {
+    const hitsCount = bodyPartRemedyRegistry.filter((r) => r.activeHits && r.activeHits.length > 0).length;
+    const dashaCount = bodyPartRemedyRegistry.filter((r) => r.planetsInSign && r.planetsInSign.some((p) => p.isDashaLord)).length;
+    const harmfulThreadCount = bodyPartRemedyRegistry.filter((r) => r.isThreadHarmful).length;
+
+    return (
+      <div style={{ marginTop: 16 }}>
+        {/* Table Header KPI Bar */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 10,
+            marginBottom: 12,
+            padding: "10px 14px",
+            background: "#FAF8F5",
+            borderRadius: 12,
+            border: "1px solid #E5E7EB",
+          }}
+        >
+          <div>
+            <h4 style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", margin: 0 }}>
+              📋 12 राशि मानव शरीर अंग, डॉट पदार्थ एवं धागा चिकित्सा तालिका (100% आपकी कुंडली आधारित):
+            </h4>
+            <p style={{ margin: "3px 0 0 0", fontSize: 12, color: "#6B635B" }}>
+              प्रत्येक राशि का आपकी कुंडली में भाव (H1-H12), विद्यमान ग्रह, सक्रिय आघात (Hits) व व्यक्तिगत धागा चिकित्सा निर्देश
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                background: "rgba(220, 38, 38, 0.1)",
+                color: "#DC2626",
+                padding: "3px 9px",
+                borderRadius: 12,
+                border: "1px solid rgba(220, 38, 38, 0.25)",
+              }}
+            >
+              🚨 आघात प्रभावित: {hitsCount} अंग
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                background: "rgba(217, 119, 6, 0.1)",
+                color: "#B45309",
+                padding: "3px 9px",
+                borderRadius: 12,
+                border: "1px solid rgba(217, 119, 6, 0.25)",
+              }}
+            >
+              ⚡ दशा केंद्र: {dashaCount} अंग
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                background: "rgba(107, 114, 128, 0.12)",
+                color: "#374151",
+                padding: "3px 9px",
+                borderRadius: 12,
+                border: "1px solid #D1D5DB",
+              }}
+            >
+              ⚠️ धागा वर्जित दुस्थान: {harmfulThreadCount} अंग
+            </span>
+          </div>
+        </div>
+
+        {/* Dynamic Matrix Table */}
+        <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #E5E7EB", background: "#FFFFFF", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5, textAlign: "left", minWidth: 980 }}>
+            <thead>
+              <tr style={{ background: "#FAF8F5", borderBottom: "2px solid #E5E7EB", color: "#4A4238" }}>
+                <th style={{ padding: "12px 14px", fontWeight: 700, width: "17%" }}>राशि व देह अंग (Sign & Body)</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, width: "17%" }}>आपकी कुंडली में भाव (House)</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, width: "16%" }}>विद्यमान ग्रह (Occupants)</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, width: "18%" }}>आघात व ऊर्जा स्थिति (Hits & Status)</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, width: "18%" }}>बायो-मैग्नेटिक डॉट पदार्थ व विधि</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, width: "14%" }}>धागा चिकित्सा निर्देश (Verdict)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bodyPartRemedyRegistry.map((item, rIdx) => {
+                const dirInfo = ASTRO_VASTU_SIGN_DIRECTIONS[item.signNum];
+                const isCriticalRow = item.statusVerdict.statusType === "critical_hit";
+                const isDangerousRow = item.statusVerdict.statusType === "dangerous_hit";
+                const rowBg = isCriticalRow
+                  ? "rgba(239, 68, 68, 0.05)"
+                  : isDangerousRow
+                  ? "rgba(249, 115, 22, 0.04)"
+                  : item.isThreadHarmful
+                  ? "rgba(245, 158, 11, 0.03)"
+                  : rIdx % 2 === 0
+                  ? "#FFFFFF"
+                  : "#FAF9F6";
+
+                return (
+                  <tr
+                    key={item.signNum}
+                    style={{
+                      borderBottom: "1px solid #F3F4F6",
+                      background: rowBg,
+                    }}
+                  >
+                    {/* 1. Sign, Body Part & Direction */}
+                    <td style={{ padding: "12px 14px", verticalAlign: "top" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: 22,
+                            height: 22,
+                            borderRadius: 6,
+                            background: "#4A4238",
+                            color: "#FFFFFF",
+                            fontSize: 11,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {item.signNum}
+                        </span>
+                        <strong style={{ fontSize: 13.5, color: "#1A1A1A" }}>
+                          {item.signHindi}
+                        </strong>
+                        <span style={{ fontSize: 11, color: "#6B7280" }}>
+                          ({item.signName})
+                        </span>
+                      </div>
+                      <div style={{ marginTop: 4, fontWeight: 700, color: "#8B5CF6", fontSize: 12 }}>
+                        📍 {item.bodyPartHi}
+                      </div>
+                      <div style={{ fontSize: 10.5, color: "#6B7280", marginTop: 1 }}>
+                        {item.bodyPartEn}
+                      </div>
+                      {dirInfo && (
+                        <div
+                          style={{
+                            marginTop: 5,
+                            fontSize: 10.5,
+                            fontWeight: 600,
+                            color: "#4B5563",
+                            background: "#F3F4F6",
+                            display: "inline-block",
+                            padding: "1px 6px",
+                            borderRadius: 4,
+                            border: "1px solid #E5E7EB",
+                          }}
+                        >
+                          दिशा: {dirInfo.code} ({dirInfo.directionHindi})
+                        </div>
+                      )}
+                    </td>
+
+                    {/* 2. Kundli House for this Seeker */}
+                    <td style={{ padding: "12px 14px", verticalAlign: "top" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "2px 7px",
+                            borderRadius: 6,
+                            background: [6, 8, 12].includes(item.houseNum)
+                              ? "rgba(220, 38, 38, 0.12)"
+                              : [1, 4, 7, 10].includes(item.houseNum)
+                              ? "rgba(37, 99, 235, 0.12)"
+                              : "rgba(16, 185, 129, 0.12)",
+                            color: [6, 8, 12].includes(item.houseNum)
+                              ? "#DC2626"
+                              : [1, 4, 7, 10].includes(item.houseNum)
+                              ? "#2563EB"
+                              : "#059669",
+                          }}
+                        >
+                          H{item.houseNum}
+                        </span>
+                        <strong style={{ fontSize: 12.5, color: "#1A1A1A" }}>
+                          {item.houseNum}वां भाव
+                        </strong>
+                      </div>
+                      <div style={{ marginTop: 4, fontSize: 11.5, color: "#4B5563", lineHeight: 1.4 }}>
+                        {item.houseNameHi}
+                      </div>
+                      {[6, 8, 12].includes(item.houseNum) && (
+                        <div
+                          style={{
+                            marginTop: 4,
+                            fontSize: 10.5,
+                            fontWeight: 700,
+                            color: "#DC2626",
+                            background: "rgba(220, 38, 38, 0.08)",
+                            display: "inline-block",
+                            padding: "1px 6px",
+                            borderRadius: 4,
+                          }}
+                        >
+                          ⚠️ दुस्थान / संवेदनशील भाव
+                        </div>
+                      )}
+                    </td>
+
+                    {/* 3. Occupying Planets */}
+                    <td style={{ padding: "12px 14px", verticalAlign: "top" }}>
+                      {item.planetsInSign && item.planetsInSign.length > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          {item.planetsInSign.map((p, pIdx) => (
+                            <div
+                              key={pIdx}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 6,
+                                fontSize: 11.5,
+                                background: p.isDashaLord
+                                  ? "rgba(217, 119, 6, 0.12)"
+                                  : "#F3F4F6",
+                                padding: "2px 8px",
+                                borderRadius: 6,
+                                border: p.isDashaLord
+                                  ? "1px solid #F59E0B"
+                                  : "1px solid #E5E7EB",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontWeight: 700,
+                                  color: p.isDashaLord ? "#B45309" : "#1F2937",
+                                }}
+                              >
+                                {p.hindi}
+                              </span>
+                              <span style={{ fontSize: 10.5, color: "#6B7280" }}>
+                                {p.degreesFormatted}
+                              </span>
+                              {p.isDashaLord && (
+                                <span
+                                  style={{
+                                    fontSize: 9.5,
+                                    fontWeight: 800,
+                                    color: "#B45309",
+                                    background: "#FEF3C7",
+                                    padding: "0 4px",
+                                    borderRadius: 4,
+                                  }}
+                                >
+                                  ★ दशानाथ
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: 11.5, color: "#9CA3AF", fontStyle: "italic" }}>
+                          — रिक्त भाव
+                        </span>
+                      )}
+                    </td>
+
+                    {/* 4. Hits & Status */}
+                    <td style={{ padding: "12px 14px", verticalAlign: "top" }}>
+                      <div>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "2px 8px",
+                            borderRadius: 12,
+                            background:
+                              item.statusVerdict.statusType === "critical_hit"
+                                ? "rgba(220, 38, 38, 0.15)"
+                                : item.statusVerdict.statusType === "dangerous_hit"
+                                ? "rgba(234, 88, 12, 0.15)"
+                                : item.statusVerdict.statusType === "dasha_active"
+                                ? "rgba(217, 119, 6, 0.15)"
+                                : item.statusVerdict.statusType === "shielded"
+                                ? "rgba(22, 163, 74, 0.15)"
+                                : "rgba(107, 114, 128, 0.12)",
+                            color: item.statusVerdict.badgeColor || "#374151",
+                            border: `1px solid ${item.statusVerdict.badgeColor || "#D1D5DB"}`,
+                            display: "inline-block",
+                          }}
+                        >
+                          {item.statusVerdict.badgeText}
+                        </span>
+                      </div>
+
+                      {item.activeHits && item.activeHits.length > 0 && (
+                        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 3 }}>
+                          {item.activeHits.map((hit, hIdx) => (
+                            <div
+                              key={hIdx}
+                              style={{
+                                fontSize: 11,
+                                color: hit.angle === 180 ? "#DC2626" : hit.angle === 90 ? "#EA580C" : "#4B5563",
+                                fontWeight: hit.angle === 180 || hit.angle === 90 ? 700 : 500,
+                              }}
+                            >
+                              • {hit.angle}° {hit.aspectName} ({hit.hittingPlanet} से, ±{hit.orbDeg.toFixed(2)}°)
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div style={{ marginTop: 4, fontSize: 11, color: "#6B7280", lineHeight: 1.35 }}>
+                        {item.statusVerdict.summaryText}
+                      </div>
+                    </td>
+
+                    {/* 5. Bio-Magnetic Dot Substance & Method */}
+                    <td style={{ padding: "12px 14px", verticalAlign: "top" }}>
+                      <div style={{ fontWeight: 700, color: "#B8860B", fontSize: 12.5 }}>
+                        ✦ {item.dotSubstance}
+                      </div>
+                      <div style={{ marginTop: 4, fontSize: 11.5, color: "#4B5563", lineHeight: 1.45 }}>
+                        {item.dotApplicationRules}
+                      </div>
+                      {item.dotColor && (
+                        <div style={{ marginTop: 4 }}>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 600,
+                              color: "#4A4238",
+                              background: "#F3F4F6",
+                              padding: "1px 6px",
+                              borderRadius: 4,
+                            }}
+                          >
+                            वर्ण/रंग: {item.dotColor}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* 6. Thread Verdict */}
+                    <td style={{ padding: "12px 14px", verticalAlign: "top" }}>
+                      <div style={{ marginBottom: 4 }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "2px 8px",
+                            borderRadius: 10,
+                            background: item.isThreadHarmful ? "rgba(220, 38, 38, 0.12)" : "rgba(22, 163, 74, 0.12)",
+                            color: item.isThreadHarmful ? "#DC2626" : "#16A34A",
+                            border: item.isThreadHarmful ? "1px solid #FCA5A5" : "1px solid #86EFAC",
+                            display: "inline-block",
+                          }}
+                        >
+                          {item.isThreadHarmful ? "🚨 धागा निषेध" : "✅ धागा अनुकूल"}
+                        </span>
+                      </div>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 11.5,
+                          color: item.isThreadHarmful ? "#991B1B" : "#166534",
+                          lineHeight: 1.45,
+                          fontWeight: item.isThreadHarmful ? 600 : 400,
+                        }}
+                      >
+                        {item.threadVerdict}
+                      </p>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {/* ── Top Dossier Hero Banner ── */}
@@ -1072,59 +1453,8 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </div>
             </div>
 
-            {/* Complete 12-Sign Prescriptive Matrix */}
-            <div style={{ marginTop: 14 }}>
-              <h4 style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginBottom: 10 }}>
-                📋 12 राशि मानव शरीर अंग, डॉट पदार्थ एवं धागा चिकित्सा तालिका:
-              </h4>
-              <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #E5E7EB" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5, textAlign: "left" }}>
-                  <thead>
-                    <tr style={{ background: "#FAF8F5", borderBottom: "2px solid #E5E7EB", color: "#4A4238" }}>
-                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>राशि व अंग</th>
-                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>डॉट रंग व पदार्थ</th>
-                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>विधि व लगाने का नियम</th>
-                      <th style={{ padding: "10px 12px", fontWeight: 700 }}>धागा चिकित्सा निर्देश</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bodyPartRemedyRegistry.map((item, rIdx) => (
-                      <tr
-                        key={item.signNum}
-                        style={{
-                          borderBottom: "1px solid #F3F4F6",
-                          background: item.isThreadHarmful ? "rgba(239, 68, 68, 0.03)" : rIdx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
-                        }}
-                      >
-                        <td style={{ padding: "10px 12px", fontWeight: 700, color: "#1A1A1A" }}>
-                          {item.signNum}. {item.signHindi} ({item.bodyPartHi})
-                        </td>
-                        <td style={{ padding: "10px 12px", color: "#B8860B", fontWeight: 600 }}>
-                          ✦ {item.dotSubstance}
-                        </td>
-                        <td style={{ padding: "10px 12px", color: "#4B5563" }}>
-                          {item.dotApplicationRules}
-                        </td>
-                        <td style={{ padding: "10px 12px" }}>
-                          <span
-                            style={{
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: item.isThreadHarmful ? "#DC2626" : "#16A34A",
-                              background: item.isThreadHarmful ? "rgba(220, 38, 38, 0.1)" : "rgba(22, 163, 74, 0.1)",
-                              padding: "2px 8px",
-                              borderRadius: 10,
-                            }}
-                          >
-                            {item.threadVerdict}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            {/* Complete 12-Sign Prescriptive Matrix (100% Dynamic & Chart-Driven) */}
+            {renderDynamicBodyTherapyTable()}
           </div>
 
           {/* ── SECTION 8: 🎯 व्याख्यान के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6) ── */}
@@ -1917,58 +2247,9 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             </div>
           </div>
 
-          {/* 3. Comprehensive 12-Sign Prescriptive Matrix Table */}
+          {/* 3. Comprehensive 12-Sign Prescriptive Matrix Table (100% Dynamic & Chart-Driven) */}
           <div className="card" style={{ padding: 20 }}>
-            <h4 style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", margin: "0 0 12px 0" }}>
-              📋 12 राशि मानव शरीर अंग, डॉट पदार्थ एवं धागा चिकित्सा तालिका:
-            </h4>
-            <div style={{ overflowX: "auto", borderRadius: 12, border: "1px solid #E5E7EB" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5, textAlign: "left" }}>
-                <thead>
-                  <tr style={{ background: "#FAF8F5", borderBottom: "2px solid #E5E7EB", color: "#4A4238" }}>
-                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>राशि व अंग</th>
-                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>डॉट रंग व पदार्थ</th>
-                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>विधि व लगाने का नियम</th>
-                    <th style={{ padding: "10px 12px", fontWeight: 700 }}>धागा चिकित्सा निर्देश</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bodyPartRemedyRegistry.map((item, rIdx) => (
-                    <tr
-                      key={item.signNum}
-                      style={{
-                        borderBottom: "1px solid #F3F4F6",
-                        background: item.isThreadHarmful ? "rgba(239, 68, 68, 0.03)" : rIdx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
-                      }}
-                    >
-                      <td style={{ padding: "10px 12px", fontWeight: 700, color: "#1A1A1A" }}>
-                        {item.signNum}. {item.signHindi} ({item.bodyPartHi})
-                      </td>
-                      <td style={{ padding: "10px 12px", color: "#B8860B", fontWeight: 600 }}>
-                        ✦ {item.dotSubstance}
-                      </td>
-                      <td style={{ padding: "10px 12px", color: "#4B5563" }}>
-                        {item.dotApplicationRules}
-                      </td>
-                      <td style={{ padding: "10px 12px" }}>
-                        <span
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: item.isThreadHarmful ? "#DC2626" : "#16A34A",
-                            background: item.isThreadHarmful ? "rgba(220, 38, 38, 0.1)" : "rgba(22, 163, 74, 0.1)",
-                            padding: "2px 8px",
-                            borderRadius: 10,
-                          }}
-                        >
-                          {item.threadVerdict}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {renderDynamicBodyTherapyTable()}
           </div>
         </div>
       )}

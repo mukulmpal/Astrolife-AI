@@ -233,12 +233,40 @@ export interface SpatialZoneDiagnostic {
   correctiveActionParagraph: string;
 }
 
+export interface BodyPartPlanetOccupant {
+  name: string;
+  hindi: string;
+  degreesFormatted: string;
+  compoundDeg: number;
+  isDashaLord: boolean;
+  isBenefic: boolean;
+}
+
+export interface BodyPartActiveHit {
+  aspectName: string;
+  hittingPlanet: string;
+  angle: number;
+  severity: "Killer" | "Dangerous" | "Bad" | "Shield" | "Opportunity" | "Minor";
+  orbDeg: number;
+}
+
 export interface BodyPartRemedyItem {
   signNum: number;
   signName: string;
   signHindi: string;
   bodyPartHi: string;
   bodyPartEn: string;
+  houseNum: number;
+  houseNameHi: string;
+  planetsInSign: BodyPartPlanetOccupant[];
+  activeHits: BodyPartActiveHit[];
+  statusVerdict: {
+    statusType: "critical_hit" | "dangerous_hit" | "dasha_active" | "dusthana_warning" | "shielded" | "balanced";
+    badgeText: string;
+    badgeColor: string;
+    summaryText: string;
+  };
+  personalizedDiagnosis: string;
   dotColor: string;
   dotSubstance: string;
   dotApplicationRules: string;
@@ -759,7 +787,7 @@ export function runAstroVastuHitEngine(
     shiftingPrescriptions.push({
       afflictedTarget: `दशा स्वामी ${blockade.dashaLordName}`,
       problematicPlanet: plName,
-      currentHit: `${blockade.hitAngle}° ${blockade.hitSeverity} ट्रैफिक पुलिस जाम`,
+      currentHit: blockade.hitAngle === 180 ? "180° Killer Hit" : "90° Dangerous Hit",
       targetHouse,
       targetSignNum,
       targetSignName: targetDir.signName,
@@ -815,7 +843,7 @@ export function runAstroVastuHitEngine(
     shiftingPrescriptions.push({
       afflictedTarget: ch.targetName,
       problematicPlanet: plName,
-      currentHit: ch.hitDef.angle === 180 ? "180° किलर हिट" : "90° घातक हिट",
+      currentHit: ch.hitDef.angle === 180 ? "180° Killer Hit" : "90° Dangerous Hit",
       targetHouse,
       targetSignNum: targetCusp.signNum,
       targetSignName: targetCusp.sign,
@@ -1190,185 +1218,240 @@ export function runAstroVastuHitEngine(
     return isNaN(date.getTime()) ? undefined : date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
   };
 
-  // 17. Prescriptive Body-Part Dot & Thread Therapy Registry
-  const bodyPartRemedyRegistry: BodyPartRemedyItem[] = [
-    {
-      signNum: 1,
-      signName: "Aries",
-      signHindi: "मेष",
-      bodyPartHi: "माथा एवं ललाट (Forehead & Head)",
-      bodyPartEn: "Forehead & Head",
+  // 17. Prescriptive Body-Part Dot & Thread Therapy Registry (100% Dynamic & Chart-Driven)
+  const HOUSE_NAMES_HI: Record<number, string> = {
+    1: "प्रथम भाव (लग्न - देह व मस्तक)",
+    2: "द्वितीय भाव (धन, कुटुंब व वाणी/कंठ)",
+    3: "तृतीय भाव (पराक्रम, भ्राता व बाजुएं)",
+    4: "चतुर्थ भाव (सुख, माता, गृह व हृदय)",
+    5: "पंचम भाव (बुद्धि, संतान व उदर)",
+    6: "षष्ठ भाव (रोग, ऋण, शत्रु व नाभि)",
+    7: "सप्तम भाव (दांपत्य, साझेदारी व पेल्विक)",
+    8: "अष्टम भाव (आयु, गुप्त रोग व मूलाधार)",
+    9: "नवम भाव (भाग्य, धर्म व जांघ)",
+    10: "दशम भाव (कर्म, मान-सम्मान व घुटने)",
+    11: "एकादश भाव (लाभ, आय व पिंडलियां)",
+    12: "द्वादश भाव (व्यय, हानि, मोक्ष व पैर के तलवे)",
+  };
+
+  const SIGN_MEDICINAL_DOT_BASICS: Record<number, {
+    dotColor: string;
+    dotSubstance: string;
+    baseApplicationRules: string;
+    threadColor: string;
+    defaultThreadVerdict: string;
+  }> = {
+    1: {
       dotColor: "लाल / केसरिया",
       dotSubstance: "शुद्ध कुमकुम (लाल सिंदूर) अथवा केसर का तिलक",
-      dotApplicationRules: "माथे के मध्य (आज्ञा चक्र) पर लगाएं। यह सूर्य व मंगल की शक्ति को प्रखर करता है और आलस्य/भय को समाप्त करता है।",
+      baseApplicationRules: "माथे के मध्य (आज्ञा चक्र) पर लगाएं। यह सूर्य व मंगल की शक्ति को प्रखर करता है और आलस्य/भय को समाप्त करता है।",
       threadColor: "लाल या पीला धागा",
-      isThreadHarmful: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 1)?.house || 1),
-      threadVerdict: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 1)?.house || 1)
-        ? "सावधानी: मेष दुस्थान में होने पर लाल धागा बांधने से क्रोध व दुर्घटना का योग बनता है। कलाई पर न बांधें।"
-        : "दाएं हाथ में लाल मौली/रक्षा सूत्र धारण कर सकते हैं।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 1).map(p => p.name),
+      defaultThreadVerdict: "दाएं हाथ में लाल मौली/रक्षा सूत्र धारण कर सकते हैं।",
     },
-    {
-      signNum: 2,
-      signName: "Taurus",
-      signHindi: "वृषभ",
-      bodyPartHi: "कंठ, गला एवं मुख (Throat & Neck)",
-      bodyPartEn: "Throat & Neck",
+    2: {
       dotColor: "सफेद",
       dotSubstance: "सफेद चंदन अथवा शुद्ध गुलाब जल",
-      dotApplicationRules: "कंठ कूप पर सफेद चंदन की एक बूंद लगाएं। यह वाणी में आकर्षण, धन-आकर्षण और शुक्र के शुभ प्रभाव को जागृत करता है।",
+      baseApplicationRules: "कंठ कूप पर सफेद चंदन की एक बूंद लगाएं। यह वाणी में आकर्षण, धन-आकर्षण और शुक्र के शुभ प्रभाव को जागृत करता है।",
       threadColor: "सफेद रेशमी धागा",
-      isThreadHarmful: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 2)?.house || 2),
-      threadVerdict: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 2)?.house || 2)
-        ? "सावधानी: वृषभ 6/8/12 में होने पर सफेद धागा अनिद्रा व हार्मोनल असंतुलन ला सकता है।"
-        : "गले या कलाई में सफेद रेशमी धागा धारण करना शुभ है।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 2).map(p => p.name),
+      defaultThreadVerdict: "गले या कलाई में सफेद रेशमी धागा धारण करना शुभ है।",
     },
-    {
-      signNum: 3,
-      signName: "Gemini",
-      signHindi: "मिथुन",
-      bodyPartHi: "कलाई, बाजुएं एवं कंधे (Wrists & Arms)",
-      bodyPartEn: "Wrists, Arms & Shoulders",
+    3: {
       dotColor: "हरा / तुलसी अर्क",
       dotSubstance: "तुलसी का ताजा रस अथवा हल्का हरा चंदन",
-      dotApplicationRules: "कलाई के भीतरी हिस्से पर तुलसी अर्क लगाएं। यह सीधे नर्वस सिस्टम को शांति देता है।",
+      baseApplicationRules: "कलाई के भीतरी हिस्से पर तुलसी अर्क लगाएं। यह सीधे नर्वस सिस्टम को शांति देता है।",
       threadColor: "हरा धागा / मौली",
-      isThreadHarmful: isGeminiDusthana,
-      threadVerdict: isGeminiDusthana
-        ? "🚨 सख्त चेतावनी (Wrist Thread Trap): आपकी कुंडली में मिथुन दुस्थान (6/8/12) में है! कलाई पर किसी भी प्रकार का धागा (मौली/कलावा) बांधना तुरंत मानसिक तनाव, अनिद्रा व मित्रों से झगड़ा लाता है। कलाई को सर्वथा मुक्त रखें!"
-        : "कलाई पर सामान्य रक्षा सूत्र या हरा धागा धारण किया जा सकता है।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 3).map(p => p.name),
+      defaultThreadVerdict: "कलाई पर सामान्य रक्षा सूत्र या हरा धागा धारण किया जा सकता है।",
     },
-    {
-      signNum: 4,
-      signName: "Cancer",
-      signHindi: "कर्क",
-      bodyPartHi: "छाती एवं हृदय क्षेत्र (Chest & Heart)",
-      bodyPartEn: "Chest & Heart",
+    4: {
       dotColor: "सफेद",
       dotSubstance: "सफेद चंदन का लेप या शुद्ध गाय के दूध की बूंद",
-      dotApplicationRules: "हृदय के केंद्र पर सफेद चंदन का गोलाकार तिलक लगाएं। यह मानसिक अशांति, डिप्रेशन, फोबिया और बेचैनी को समाप्त करता है।",
+      baseApplicationRules: "हृदय के केंद्र पर सफेद चंदन का गोलाकार तिलक लगाएं। यह मानसिक अशांति, डिप्रेशन, फोबिया और बेचैनी को समाप्त करता है।",
       threadColor: "सफेद सूती धागा",
-      isThreadHarmful: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 4)?.house || 4),
-      threadVerdict: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 4)?.house || 4)
-        ? "छाती पर भारी लॉकेट या धागा न लटकाएं।"
-        : "सफेद धागा धारण कर सकते हैं।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 4).map(p => p.name),
+      defaultThreadVerdict: "सफेद धागा धारण कर सकते हैं।",
     },
-    {
-      signNum: 5,
-      signName: "Leo",
-      signHindi: "सिंह",
-      bodyPartHi: "ऊपरी पेट एवं सोलर प्लेक्सस (Solar Plexus & Upper Abdomen)",
-      bodyPartEn: "Upper Abdomen & Spine",
+    5: {
       dotColor: "केसरिया / लाल",
       dotSubstance: "केसर मिश्रित जल या लाल कुमकुम",
-      dotApplicationRules: "नाभि से ठीक 2 इंच ऊपर सोलर प्लेक्सस पर केसर की बिंदी लगाएं। यह आत्म-विश्वास, नेतृत्व क्षमता और पाचन शक्ति को तीव्र करता है।",
+      baseApplicationRules: "नाभि से ठीक 2 इंच ऊपर सोलर प्लेक्सस पर केसर की बिंदी लगाएं। यह आत्म-विश्वास, नेतृत्व क्षमता और पाचन शक्ति को तीव्र करता है।",
       threadColor: "नारंगी / पीला धागा",
-      isThreadHarmful: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 5)?.house || 5),
-      threadVerdict: "सूर्य की कृपा हेतु कलाई या कंठ पर पीला/नारंगी धागा पहन सकते हैं।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 5).map(p => p.name),
+      defaultThreadVerdict: "सूर्य की कृपा हेतु कलाई या कंठ पर पीला/नारंगी धागा पहन सकते हैं।",
     },
-    {
-      signNum: 6,
-      signName: "Virgo",
-      signHindi: "कन्या",
-      bodyPartHi: "नाभि एवं नाभि के 2 इंच का क्षेत्र (Navel & 2-inch Perimeter)",
-      bodyPartEn: "Navel & 2-inch Perimeter",
+    6: {
       dotColor: "पारदर्शी / स्वर्णिम",
       dotSubstance: "शुद्ध देशी गाय का घी (2 बूंद)",
-      dotApplicationRules: "नाभि के ठीक 2 इंच के दायरे में प्रतिदिन सुबह 2 बूंद शुद्ध गाय का घी हल्के हाथ से लगाएं। यह नर्वस सिस्टम, अनिद्रा व बुध की अशांति को तत्काल शांत करता है।",
+      baseApplicationRules: "नाभि के ठीक 2 इंच के दायरे में प्रतिदिन सुबह 2 बूंद शुद्ध गाय का घी हल्के हाथ से लगाएं। यह नर्वस सिस्टम, अनिद्रा व बुध की अशांति को तत्काल शांत करता है।",
       threadColor: "धागा वर्जित",
-      isThreadHarmful: true,
-      threadVerdict: "कमर में काला या रंगीन धागा कभी न बांधें।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 6).map(p => p.name),
+      defaultThreadVerdict: "कमर में काला या रंगीन धागा कभी न बांधें।",
     },
-    {
-      signNum: 7,
-      signName: "Libra",
-      signHindi: "तुला",
-      bodyPartHi: "कमर एवं पेल्विक क्षेत्र (Lower Abdomen & Waist)",
-      bodyPartEn: "Lower Abdomen & Waist",
+    7: {
       dotColor: "सफेद / सुगंधित",
       dotSubstance: "सफेद चंदन या बिना अल्कोहल का शुद्ध गुलाब इत्र",
-      dotApplicationRules: "नाभि के नीचे पेल्विक क्षेत्र पर चंदन लगाएं। दांपत्य जीवन के तनाव को दूर करता है।",
+      baseApplicationRules: "नाभि के नीचे पेल्विक क्षेत्र पर चंदन लगाएं। दांपत्य जीवन के तनाव को दूर करता है।",
       threadColor: "सफेद रेशमी धागा",
-      isThreadHarmful: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 7)?.house || 7),
-      threadVerdict: "कमर में धागा न बांधें।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 7).map(p => p.name),
+      defaultThreadVerdict: "कमर में धागा न बांधें।",
     },
-    {
-      signNum: 8,
-      signName: "Scorpio",
-      signHindi: "वृश्चिक",
-      bodyPartHi: "मूलाधार व उत्सर्जन तंत्र (Root & Pelvic Base)",
-      bodyPartEn: "Root & Pelvic Base",
+    8: {
       dotColor: "शीतल चंदन",
       dotSubstance: "कपूर मिश्रित सफेद चंदन",
-      dotApplicationRules: "नाभि के निचले हिस्से पर चंदन लगाएं ताकि उग्र मंगल/वृश्चिक की अत्यधिक ऊष्मा शांत हो सके।",
+      baseApplicationRules: "नाभि के निचले हिस्से / मूलाधार पर चंदन लगाएं ताकि उग्र मंगल/वृश्चिक की अत्यधिक ऊष्मा शांत हो सके।",
       threadColor: "लाल धागा वर्जित",
-      isThreadHarmful: true,
-      threadVerdict: "यदि वृश्चिक 8वें या 10वें भाव में उग्र ग्रहों से युक्त हो, तो शरीर पर लाल धागा/लाल वस्त्र पहनना वर्जित रखें।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 8).map(p => p.name),
+      defaultThreadVerdict: "शरीर पर लाल धागा/लाल वस्त्र पहनना वर्जित रखें।",
     },
-    {
-      signNum: 9,
-      signName: "Sagittarius",
-      signHindi: "धनु",
-      bodyPartHi: "दोनों जांघें (Thighs)",
-      bodyPartEn: "Thighs",
+    9: {
       dotColor: "पीला",
       dotSubstance: "शुद्ध कस्तूरी हल्दी या केसर",
-      dotApplicationRules: "माथे या कंठ पर पीला तिलक लगाएं (धनु गुरु की राशि है)। यह भाग्य में अवरोधों को नष्ट करता है।",
+      baseApplicationRules: "माथे या कंठ पर पीला तिलक लगाएं (धनु गुरु की राशि है)। यह भाग्य में अवरोधों को नष्ट करता है।",
       threadColor: "पीला सूती धागा",
-      isThreadHarmful: [6, 8, 12].includes(Object.values(cuspCoords).find(c => c.signNum === 9)?.house || 9),
-      threadVerdict: "गले में पीला धागा पहनना शुभ फलदायी है।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 9).map(p => p.name),
+      defaultThreadVerdict: "गले में पीला धागा पहनना शुभ फलदायी है।",
     },
-    {
-      signNum: 10,
-      signName: "Capricorn",
-      signHindi: "मकर",
-      bodyPartHi: "घुटने (Knees - पुरुष दायां घुटना, स्त्री बायां घुटना)",
-      bodyPartEn: "Knees (Male Right, Female Left)",
+    10: {
       dotColor: "काला / काजल",
       dotSubstance: "काजल की सूक्ष्म बिंदी अथवा सरसों का तेल",
-      dotApplicationRules: "व्याख्यान का गुप्त सूत्र: जब भी दशम भाव या शनि की क्रूर 180° किलर हिट आ रही हो, तो संबंधित घुटने पर परमानेंट मार्कर या काजल से एक सूक्ष्म काली बिंदी लगाएं। यह किलर हिट को तत्काल 120° रक्षा ढाल में बदल देता है!",
+      baseApplicationRules: "व्याख्यान का गुप्त सूत्र: जब भी दशम भाव या शनि की क्रूर 180° किलर हिट आ रही हो, तो संबंधित घुटने पर परमानेंट मार्कर या काजल से एक सूक्ष्म काली बिंदी लगाएं। यह किलर हिट को तत्काल 120° रक्षा ढाल में बदल देता है!",
       threadColor: "काला धागा (केवल टखने पर)",
-      isThreadHarmful: false,
-      threadVerdict: "काले धागे को कभी कलाई या गले में न बांधें, केवल पैर के टखने पर बांधें।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 10).map(p => p.name),
+      defaultThreadVerdict: "काले धागे को कभी कलाई या गले में न बांधें, केवल पैर के टखने पर बांधें।",
     },
-    {
-      signNum: 11,
-      signName: "Aquarius",
-      signHindi: "कुंभ",
-      bodyPartHi: "पिंडलियां एवं टखने (Calves & Ankles)",
-      bodyPartEn: "Calves, Shins & Ankles",
+    11: {
       dotColor: "नीला / तेल",
       dotSubstance: "सरसों के तेल की हल्की मालिश",
-      dotApplicationRules: "शनिवार को पिंडलियों पर सरसों के तेल से मालिश करें। यह शनि के पैरों पर पड़ने वाले भार और काम के तनाव को मुक्त करता है।",
+      baseApplicationRules: "शनिवार को पिंडलियों पर सरसों के तेल से मालिश करें। यह शनि के पैरों पर पड़ने वाले भार और काम के तनाव को मुक्त करता है।",
       threadColor: "काला धागा",
-      isThreadHarmful: false,
-      threadVerdict: "पैर के टखने पर काला धागा बांधना शनि व राहु की बुरी नजर से रक्षा करता है।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 11).map(p => p.name),
+      defaultThreadVerdict: "पैर के टखने पर काला धागा बांधना शनि व राहु की बुरी नजर से रक्षा करता है।",
     },
-    {
-      signNum: 12,
-      signName: "Pisces",
-      signHindi: "मीन",
-      bodyPartHi: "पैर के तलवे एवं पंजे (Soles & Feet)",
-      bodyPartEn: "Soles & Feet",
+    12: {
       dotColor: "तेल मालिश",
       dotSubstance: "शुद्ध तिल का तेल या सरसों का तेल",
-      dotApplicationRules: "रात्रि को सोने से पूर्व पैरों के दोनों तलवों पर 2 मिनट तिल के तेल से मालिश करें। यह 12वें भाव के व्यय, अनिद्रा, डिप्रेशन और हॉस्पिटल के खर्चों को तुरंत शांत करता है।",
+      baseApplicationRules: "रात्रि को सोने से पूर्व पैरों के दोनों तलवों पर 2 मिनट तिल के तेल से मालिश करें। यह 12वें भाव के व्यय, अनिद्रा, डिप्रेशन और हॉस्पिटल के खर्चों को तुरंत शांत करता है।",
       threadColor: "धागा वर्जित",
-      isThreadHarmful: true,
-      threadVerdict: "पैरों के पंजों पर कोई धागा न बांधें।",
-      associatedPlanets: Object.values(planetCoords).filter(p => p.signNum === 12).map(p => p.name),
+      defaultThreadVerdict: "पैरों के पंजों पर कोई धागा न बांधें।",
     },
-  ];
+  };
+
+  const bodyPartRemedyRegistry: BodyPartRemedyItem[] = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const).map(signNum => {
+    const mapping = SIGN_BODY_PART_MAPPINGS[signNum];
+    const basics = SIGN_MEDICINAL_DOT_BASICS[signNum];
+
+    // 1. Dynamic House Resolution
+    const matchedCusp = Object.values(cuspCoords).find(c => c.signNum === signNum);
+    const houseNum = matchedCusp?.house || (((signNum - lagnaSignNum + 12) % 12) + 1);
+    const houseNameHi = HOUSE_NAMES_HI[houseNum] || `${houseNum}वां भाव`;
+    const isDusthana = [6, 8, 12].includes(houseNum);
+
+    // 2. Planets occupying this sign
+    const occupyingPlanets: BodyPartPlanetOccupant[] = Object.values(planetCoords)
+      .filter(p => p.signNum === signNum)
+      .map(p => ({
+        name: p.name,
+        hindi: PLANETS_HINDI[p.name] || p.name,
+        degreesFormatted: `${p.degInSign.toFixed(2)}°`,
+        compoundDeg: p.compoundDeg,
+        isDashaLord: [activeMD, activeAD].includes(p.name),
+        isBenefic: ["Jupiter", "Venus", "Mercury", "Moon"].includes(p.name),
+      }));
+
+    // 3. Hits directly targeting this sign, its cusp, or planets inside it
+    const relevantHits: BodyPartActiveHit[] = allHits
+      .filter(h => h.targetSignNum === signNum)
+      .map(h => ({
+        aspectName: h.hitDef.name,
+        hittingPlanet: h.sourceName,
+        angle: h.hitDef.angle,
+        severity: h.hitDef.severity,
+        orbDeg: h.orbDistance,
+      }));
+
+    // 4. Status Verdict Synthesis
+    let statusType: "critical_hit" | "dangerous_hit" | "dasha_active" | "dusthana_warning" | "shielded" | "balanced" = "balanced";
+    let badgeText = "✅ संतुलित / शांत";
+    let badgeColor = "#4B5563";
+    let summaryText = "कोई प्रतिकूल आघात नहीं — प्राकृतिक अवस्था में रखें।";
+
+    const hasKillerHit = relevantHits.some(h => h.angle === 180);
+    const hasDangerousHit = relevantHits.some(h => h.angle === 90);
+    const hasSupportiveOrShield = relevantHits.some(h => h.angle === 60 || h.angle === 120);
+    const hasDashaLord = occupyingPlanets.some(p => p.isDashaLord);
+
+    if (hasKillerHit) {
+      statusType = "critical_hit";
+      const hittingP = relevantHits.find(h => h.angle === 180)?.hittingPlanet || "पापी ग्रह";
+      badgeText = `🚨 180° किलर हिट (${hittingP})`;
+      badgeColor = "#DC2626";
+      summaryText = `गंभीर मारक आघात! इस अंग पर तत्काल ${basics.dotSubstance} लगाना अनिवार्य है।`;
+    } else if (hasDangerousHit) {
+      statusType = "dangerous_hit";
+      const hittingP = relevantHits.find(h => h.angle === 90)?.hittingPlanet || "ग्रह";
+      badgeText = `⚠️ 90° बाधा आघात (${hittingP})`;
+      badgeColor = "#EA580C";
+      summaryText = `बाधा व तनाव ऊर्जा। शांति हेतु ${basics.dotSubstance} का प्रयोग करें।`;
+    } else if (hasDashaLord) {
+      statusType = "dasha_active";
+      badgeText = `⚡ वर्तमान दशा केंद्र (${occupyingPlanets.find(p => p.isDashaLord)?.hindi})`;
+      badgeColor = "#D97706";
+      summaryText = `सक्रिय दशानाथ का ऊर्जा केंद्र — देह-वास्तु नियंत्रण अनिवार्य।`;
+    } else if (isDusthana) {
+      statusType = "dusthana_warning";
+      badgeText = `⚠️ दुस्थान (${houseNum}वां भाव)`;
+      badgeColor = "#B45309";
+      summaryText = `कमजोर/संवेदनशील भाव — कलाई/कमर पर धागा बांधना सख्त वर्जित है।`;
+    } else if (hasSupportiveOrShield) {
+      statusType = "shielded";
+      badgeText = `🛡️ 120° रक्षा ढाल`;
+      badgeColor = "#16A34A";
+      summaryText = `सकारात्मक त्रिकोण ऊर्जा — शक्ति संतुलित है।`;
+    }
+
+    // 5. Thread Verdict personalized to this chart
+    let threadVerdict = basics.defaultThreadVerdict;
+    let isThreadHarmful = isDusthana;
+    if (signNum === 3) { // Gemini
+      isThreadHarmful = isGeminiDusthana;
+      threadVerdict = isGeminiDusthana
+        ? "🚨 सख्त चेतावनी (Wrist Thread Trap): आपकी कुंडली में मिथुन दुस्थान (6/8/12) में है! कलाई पर किसी भी प्रकार का धागा (मौली/कलावा) बांधना तुरंत मानसिक तनाव व रोग लाता है। कलाई को सर्वथा मुक्त रखें!"
+        : "कलाई पर सामान्य रक्षा सूत्र या हरा धागा धारण किया जा सकता है।";
+    } else if (isDusthana) {
+      isThreadHarmful = true;
+      threadVerdict = `सावधानी: यह राशि आपकी कुंडली में ${houseNum}वें दुस्थान भाव में है। इस अंग या कलाई पर ${basics.threadColor} बांधना वर्जित है।`;
+    }
+
+    // 6. Dynamic Personalized Diagnosis Note
+    let personalizedDiagnosis = "";
+    if (occupyingPlanets.length > 0) {
+      const pNames = occupyingPlanets.map(p => `${p.hindi} (${p.degreesFormatted}${p.isDashaLord ? " ★दशानाथ" : ""})`).join(", ");
+      personalizedDiagnosis = `आपकी कुंडली में ${houseNameHi} में ${pNames} विराजमान हैं। `;
+    } else {
+      personalizedDiagnosis = `आपकी कुंडली में ${houseNameHi} रिक्त है। `;
+    }
+    if (relevantHits.length > 0) {
+      personalizedDiagnosis += `इस अंग पर ${relevantHits.map(h => `${h.aspectName} (${h.hittingPlanet})`).join(", ")} का प्रभाव आ रहा है। `;
+    }
+    personalizedDiagnosis += basics.baseApplicationRules;
+
+    return {
+      signNum,
+      signName: mapping.signName,
+      signHindi: RASHIS_HINDI[signNum],
+      bodyPartHi: mapping.bodyPartHi,
+      bodyPartEn: mapping.bodyPartEn,
+      houseNum,
+      houseNameHi,
+      planetsInSign: occupyingPlanets,
+      activeHits: relevantHits,
+      statusVerdict: {
+        statusType,
+        badgeText,
+        badgeColor,
+        summaryText,
+      },
+      personalizedDiagnosis,
+      dotColor: basics.dotColor,
+      dotSubstance: basics.dotSubstance,
+      dotApplicationRules: basics.baseApplicationRules,
+      threadColor: basics.threadColor,
+      isThreadHarmful,
+      threadVerdict,
+      associatedPlanets: occupyingPlanets.map(p => p.name),
+    };
+  });
 
   return {
     nativeName: chart.name || "Seeker",
