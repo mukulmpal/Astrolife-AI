@@ -554,17 +554,38 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <style>{`
+        .vastu-executive-banner {
+          background: linear-gradient(135deg, #1C1917 0%, #0F0E0D 100%) !important;
+          color: #FFFFFF !important;
+          border: 2px solid rgba(212, 175, 55, 0.65) !important;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
+        }
+        .vastu-mandala-banner {
+          background: linear-gradient(135deg, #1C1917 0%, #171412 100%) !important;
+          color: #FFFFFF !important;
+          border: 2px solid rgba(212, 175, 55, 0.65) !important;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
+        }
+        .vastu-barchart-banner {
+          background: linear-gradient(135deg, #042F2E 0%, #064E3B 100%) !important;
+          color: #FFFFFF !important;
+          border: 2px solid rgba(20, 184, 166, 0.65) !important;
+          box-shadow: 0 10px 30px rgba(4, 47, 46, 0.35) !important;
+        }
+      `}</style>
       {/* ── Top Dossier Hero Banner ── */}
       <div
-        className="card"
+        className="vastu-executive-banner"
         style={{
-          background: "linear-gradient(135deg, #1C1917 0%, #292524 50%, #1C1917 100%)",
-          color: "#FAF7F2",
-          border: "1px solid rgba(212, 175, 55, 0.45)",
+          background: "linear-gradient(135deg, #1C1917 0%, #0F0E0D 100%)",
+          color: "#FFFFFF",
+          border: "2px solid rgba(212, 175, 55, 0.65)",
           borderRadius: 18,
-          padding: "18px 22px",
+          padding: "20px 24px",
           position: "relative",
           overflow: "hidden",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
         }}
       >
         <div
@@ -582,38 +603,38 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <span
                 style={{
                   fontSize: 11,
-                  fontWeight: 700,
+                  fontWeight: 800,
                   letterSpacing: 1.5,
                   textTransform: "uppercase",
-                  color: "#FDE047",
-                  background: "rgba(253, 224, 71, 0.15)",
-                  padding: "3px 10px",
+                  color: "#78350F",
+                  background: "#FEF08A",
+                  padding: "4px 10px",
                   borderRadius: 14,
-                  border: "1px solid rgba(253, 224, 71, 0.35)",
+                  border: "1.5px solid #F59E0B",
                 }}
               >
                 Astro-Vastu Hit Radar · v1.0
               </span>
-              <span style={{ fontSize: 12, color: "#D6D3D1" }}>
+              <span style={{ fontSize: 12.5, color: "#F5F5F4", fontWeight: 600 }}>
                 3-5-8 Orb Formula & Traffic Police Engine
               </span>
             </div>
-            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, fontWeight: 700, margin: 0, color: "#FAF7F2" }}>
+            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 28, fontWeight: 800, margin: 0, color: "#FFFFFF", textShadow: "0 2px 4px rgba(0,0,0,0.6)" }}>
               {nativeName ? `${nativeName} — ` : ""}एस्ट्रो-वास्तु हिट थ्योरी ऑडिट
             </h2>
-            <div style={{ marginTop: 6, fontSize: 13.5, color: "#E7E5E4", lineHeight: 1.5 }}>
-              लग्न: <strong style={{ color: "#FDE047" }}>{lagnaSign} ({lagnaSignHindi || lagnaSign})</strong> ({lagnaCompoundDeg.toFixed(2)}° Compound) · 
-              सक्रिय दशा: <strong style={{ color: "#93C5FD" }}>{activeDasha.mahadasha} MD</strong> / <strong style={{ color: "#7DD3FC" }}>{activeDasha.antardasha} AD</strong>
+            <div style={{ marginTop: 8, fontSize: 14, color: "#F5F5F4", lineHeight: 1.5, fontWeight: 500 }}>
+              लग्न: <strong style={{ color: "#FEF08A", fontWeight: 800 }}>{lagnaSign} ({lagnaSignHindi || lagnaSign})</strong> ({lagnaCompoundDeg.toFixed(2)}° Compound) · 
+              सक्रिय दशा: <strong style={{ color: "#93C5FD", fontWeight: 800 }}>{activeDasha.mahadasha} MD</strong> / <strong style={{ color: "#7DD3FC", fontWeight: 800 }}>{activeDasha.antardasha} AD</strong>
             </div>
           </div>
 
           {/* Date Selector for Future Dasha Inspection */}
-          <div style={{ background: "rgba(0,0,0,0.35)", padding: "8px 12px", borderRadius: 10, border: "1px solid rgba(212, 175, 55, 0.3)" }}>
-            <div style={{ fontSize: 10.5, color: "#FDE047", fontWeight: 700, marginBottom: 4, letterSpacing: 0.5, textTransform: "uppercase" }}>
+          <div style={{ background: "#0C0A09", padding: "10px 14px", borderRadius: 12, border: "1.5px solid rgba(212, 175, 55, 0.6)", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
+            <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 800, marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>
               दशा तिथि सिमुलेशन (Dasha Date)
             </div>
             <input
@@ -621,12 +642,13 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               value={isMounted ? (targetDateStr || new Date().toISOString().split("T")[0]) : "2026-10-20"}
               onChange={(e) => setTargetDateStr(e.target.value)}
               style={{
-                background: "#0C0A09",
-                color: "#FAF7F2",
-                border: "1px solid rgba(212, 175, 55, 0.5)",
+                background: "#1C1917",
+                color: "#FFFFFF",
+                fontWeight: 700,
+                border: "1px solid rgba(212, 175, 55, 0.6)",
                 borderRadius: 6,
-                padding: "5px 8px",
-                fontSize: 12,
+                padding: "6px 10px",
+                fontSize: 13,
                 outline: "none",
               }}
             />
@@ -883,51 +905,105 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {/* ── SECTION 1: EXECUTIVE IDENTITY & VITAL BANNER ── */}
           <div
-            className="card"
+            className="vastu-executive-banner"
             style={{
-              background: "linear-gradient(135deg, #2D241E 0%, #1A1A1A 100%)",
-              color: "#FAF7F2",
-              border: "1px solid rgba(212, 175, 55, 0.4)",
+              background: "linear-gradient(135deg, #1C1917 0%, #0F0E0D 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.65)",
               borderRadius: 18,
-              padding: "22px 24px",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+              padding: "24px 26px",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
-              <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+              <div style={{ flex: "1 1 540px", minWidth: 280 }}>
                 <span
                   style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: 1.5,
+                    display: "inline-block",
+                    fontSize: 11.5,
+                    fontWeight: 800,
+                    letterSpacing: 1.2,
                     textTransform: "uppercase",
-                    color: "#FDE047",
-                    background: "rgba(253, 224, 71, 0.12)",
-                    padding: "3px 10px",
+                    color: "#78350F",
+                    background: "#FEF08A",
+                    padding: "4px 12px",
                     borderRadius: 20,
-                    border: "1px solid rgba(253, 224, 71, 0.3)",
+                    border: "1.5px solid #F59E0B",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                   }}
                 >
                   अध्याय 1 · संपूर्ण जन्मकुंडली एवं एस्ट्रो-वास्तु ऑडिट
                 </span>
-                <h3 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 26, fontWeight: 700, margin: "8px 0 4px 0", color: "#FAF7F2" }}>
+                <h3
+                  style={{
+                    fontFamily: "Cormorant Garamond, serif",
+                    fontSize: 28,
+                    fontWeight: 800,
+                    margin: "10px 0 6px 0",
+                    color: "#FFFFFF",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.6)",
+                    letterSpacing: 0.3,
+                    lineHeight: 1.25,
+                  }}
+                >
                   {nativeName ? `${nativeName} जी का ` : ""}मास्टर फील्ड ऑडिट डॉसियर
                 </h3>
-                <p style={{ margin: 0, fontSize: 14, color: "#D6D3D1", lineHeight: 1.6 }}>
-                  एस्ट्रो-वास्तु का मुख्य सूत्र: <em style={{ color: "#FDE047" }}>"जिसका समय चल रहा है, उसी ग्रह को पकड़ना है!"</em> यह रिपोर्ट आपकी कुंडली की स्पष्ट डिग्री, कम्पाउंड डिग्री और वर्तमान दशा चक्र पर 100% गतिशील रूप से तैयार की गई है।
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 14.5,
+                    color: "#F5F5F4",
+                    lineHeight: 1.65,
+                    fontWeight: 500,
+                  }}
+                >
+                  एस्ट्रो-वास्तु का मुख्य सूत्र:{" "}
+                  <strong
+                    style={{
+                      color: "#FEF08A",
+                      background: "rgba(254, 240, 138, 0.2)",
+                      padding: "2px 8px",
+                      borderRadius: 6,
+                      border: "1px solid rgba(254, 240, 138, 0.5)",
+                      fontWeight: 800,
+                    }}
+                  >
+                    "जिसका समय चल रहा है, उसी ग्रह को पकड़ना है!"
+                  </strong>{" "}
+                  यह रिपोर्ट आपकी कुंडली की स्पष्ट डिग्री, कम्पाउंड डिग्री और वर्तमान दशा चक्र पर 100% गतिशील रूप से तैयार की गई है।
                 </p>
               </div>
 
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <div style={{ background: "rgba(255,255,255,0.08)", padding: "8px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)" }}>
-                  <div style={{ fontSize: 11, color: "#D4AF37", fontWeight: 600 }}>लग्न (Lagna)</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF", marginTop: 2 }}>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div
+                  style={{
+                    background: "#0C0A09",
+                    padding: "10px 16px",
+                    borderRadius: 12,
+                    border: "1.5px solid rgba(212, 175, 55, 0.6)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                  }}
+                >
+                  <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>
+                    लग्न (Lagna)
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "#FFFFFF", marginTop: 3 }}>
                     {lagnaSign} ({lagnaSignHindi || lagnaSign}) · {lagnaCompoundDeg.toFixed(2)}°
                   </div>
                 </div>
-                <div style={{ background: "rgba(255,255,255,0.08)", padding: "8px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)" }}>
-                  <div style={{ fontSize: 11, color: "#60A5FA", fontWeight: 600 }}>सक्रिय महादशा / अंतर्दशा</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF", marginTop: 2 }}>
+                <div
+                  style={{
+                    background: "#0C0A09",
+                    padding: "10px 16px",
+                    borderRadius: 12,
+                    border: "1.5px solid rgba(147, 197, 253, 0.6)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                  }}
+                >
+                  <div style={{ fontSize: 11, color: "#93C5FD", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>
+                    सक्रिय महादशा / अंतर्दशा
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "#FFFFFF", marginTop: 3 }}>
                     {activeDasha.mahadasha} / {activeDasha.antardasha}
                   </div>
                 </div>
@@ -2696,36 +2772,49 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* ── BANNER ── */}
           <div
-            className="card"
+            className="vastu-mandala-banner"
             style={{
-              padding: 22,
-              background: "linear-gradient(135deg, #1C1917 0%, #292524 100%)",
-              color: "#FAF7F2",
-              border: "1px solid rgba(212, 175, 55, 0.4)",
+              padding: 24,
+              background: "linear-gradient(135deg, #1C1917 0%, #171412 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.65)",
               borderRadius: 18,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
               <div>
-                <span className="badge badge-gold" style={{ fontWeight: 700, letterSpacing: 0.5 }}>
+                <span
+                  style={{
+                    display: "inline-block",
+                    fontSize: 11.5,
+                    fontWeight: 800,
+                    letterSpacing: 1.2,
+                    textTransform: "uppercase",
+                    color: "#78350F",
+                    background: "#FEF08A",
+                    padding: "4px 12px",
+                    borderRadius: 20,
+                    border: "1.5px solid #F59E0B",
+                  }}
+                >
                   Authentic Brihat Samhita & Shilpa Shastra Engine
                 </span>
-                <h2 style={{ margin: "8px 0 4px 0", fontSize: 22, fontWeight: 700, color: "#FDE68A" }}>
+                <h2 style={{ margin: "10px 0 6px 0", fontSize: 26, fontWeight: 800, color: "#FFFFFF", textShadow: "0 2px 4px rgba(0,0,0,0.6)" }}>
                   🏛️ 45 देवता वास्तु पुरुष मंडल एवं 32 मुख्य प्रवेश द्वार
                 </h2>
-                <div style={{ fontSize: 13.5, color: "#D6D3D1", lineHeight: 1.6 }}>
+                <div style={{ fontSize: 14, color: "#F5F5F4", lineHeight: 1.6, fontWeight: 500 }}>
                   33 कोटि (प्रकार) के देवगण + 12 असुर शक्तियां · ब्रह्मस्थान (नाभि) से संपूर्ण ऊर्जा का संचार · जन्मकुंडली भाव संरेखण
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <span style={{ background: "rgba(245, 158, 11, 0.2)", border: "1px solid #B45309", color: "#FDE68A", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
+                <span style={{ background: "#78350F", border: "1.5px solid #D97706", color: "#FEF3C7", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 800 }}>
                   45 कुल शक्तियां (33 देव + 12 असुर)
                 </span>
-                <span style={{ background: "rgba(34, 197, 94, 0.2)", border: "1px solid #15803D", color: "#86EFAC", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
-                  32 परिधि मुख्य द्वार
+                <span style={{ background: "#14532D", border: "1.5px solid #16A34A", color: "#DCFCE7", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 800 }}>
+                  32 मुख्य प्रवेश द्वार
                 </span>
-                <span style={{ background: "rgba(59, 130, 246, 0.2)", border: "1px solid #1D4ED8", color: "#93C5FD", padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
+                <span style={{ background: "#1E3A8A", border: "1.5px solid #2563EB", color: "#DBEAFE", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 800 }}>
                   लग्न: {lagnaSignHindi} ({lagnaSign})
                 </span>
               </div>
@@ -3079,23 +3168,37 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* ── BANNER ── */}
           <div
-            className="card"
+            className="vastu-barchart-banner"
             style={{
-              padding: 22,
-              background: "linear-gradient(135deg, #0F766E 0%, #115E59 100%)",
-              color: "#FAF7F2",
+              padding: 24,
+              background: "linear-gradient(135deg, #042F2E 0%, #064E3B 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(20, 184, 166, 0.65)",
               borderRadius: 18,
-              boxShadow: "0 8px 24px rgba(15, 118, 110, 0.2)",
+              boxShadow: "0 10px 30px rgba(4, 47, 46, 0.35)",
             }}
           >
-            <span className="badge badge-gold" style={{ fontWeight: 700 }}>
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 11.5,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: "#042F2E",
+                background: "#CCFBF1",
+                padding: "4px 12px",
+                borderRadius: 20,
+                border: "1.5px solid #0D9488",
+              }}
+            >
               Shilpa Shastra Bar-Chart Harmonizer
             </span>
-            <h2 style={{ margin: "8px 0 4px 0", fontSize: 22, fontWeight: 700, color: "#CCFBF1" }}>
+            <h2 style={{ margin: "10px 0 6px 0", fontSize: 26, fontWeight: 800, color: "#FFFFFF", textShadow: "0 2px 4px rgba(0,0,0,0.6)" }}>
               ⚖️ बार चार्ट पंचतत्व संतुलन एवं 45 देवता भोग प्रिस्क्रिप्शन
             </h2>
-            <div style={{ fontSize: 13.5, color: "#E6FFFA", lineHeight: 1.6 }}>
-              <strong>शास्त्रीय सूत्र:</strong> यदि ज़ोन कम है ➔ <em>"पीछे वाला आगे लाएं"</em> (Parent feeds Child) | यदि ज़ोन बढ़ा है ➔ <em>"आगे वाला पीछे लाएं"</em> (Child exhausts Parent)
+            <div style={{ fontSize: 14, color: "#F0FDFA", lineHeight: 1.6, fontWeight: 500 }}>
+              <strong style={{ color: "#FEF08A" }}>शास्त्रीय सूत्र:</strong> यदि ज़ोन कम है ➔ <em style={{ color: "#A7F3D0", fontWeight: 700 }}>"पीछे वाला आगे लाएं"</em> (Parent feeds Child) | यदि ज़ोन बढ़ा है ➔ <em style={{ color: "#A7F3D0", fontWeight: 700 }}>"आगे वाला पीछे लाएं"</em> (Child exhausts Parent)
             </div>
           </div>
 
