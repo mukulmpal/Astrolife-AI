@@ -65,3 +65,12 @@ scripts/test-*
 scripts/generate_*
 MED/
 
+# Large datasets & agent scratch
+Astrobank/
+data/geonames/
+.agents/
+.claude/
+archive/
+backups/
+
+
