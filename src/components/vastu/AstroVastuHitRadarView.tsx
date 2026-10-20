@@ -2676,7 +2676,9 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       {/* ─────────────────────────────────────────────────────────────
           TAB: DAILY ACCESSORIES & MODERN WEARABLES
       ───────────────────────────────────────────────────────────── */}
-      {activeTab === "accessories" && renderDailyAccessoriesSection()}
+      {activeTab === "accessories" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {renderDailyAccessoriesSection()}
         </div>
       )}
 
