@@ -490,14 +490,21 @@ export function check358Hit(deg1: number, deg2: number): { hitDef: HitDefinition
 }
 
 /**
- * Helper to get sign index from 1 to 12.
+ * Canonical 1-indexed sign number (1 = Aries ... 12 = Pisces).
+ * Always prioritizes the text sign name when available to prevent
+ * 0-indexed (0..11) vs 1-indexed (1..12) mismatches.
  */
-function getSignNumber(signNameOrNum: string | number): number {
-  if (typeof signNameOrNum === "number") {
-    return signNameOrNum;
+export function getSignNumber(signNameOrNum?: string | number, signStringFallback?: string): number {
+  const candidateStr = typeof signNameOrNum === "string" ? signNameOrNum : signStringFallback;
+  if (candidateStr && typeof candidateStr === "string") {
+    const idx = RASHIS_ORDER.findIndex(r => r.toLowerCase() === candidateStr.toLowerCase());
+    if (idx >= 0) return idx + 1;
   }
-  const idx = RASHIS_ORDER.indexOf(signNameOrNum as typeof RASHIS_ORDER[number]);
-  return idx >= 0 ? idx + 1 : 1;
+  if (typeof signNameOrNum === "number") {
+    if (signNameOrNum === 0) return 1;
+    if (signNameOrNum >= 1 && signNameOrNum <= 12) return signNameOrNum;
+  }
+  return 1;
 }
 
 // ── Master Engine Function ──────────────────────────────────────────────────
@@ -523,7 +530,7 @@ export function runAstroVastuHitEngine(
       ? RASHIS_ORDER[chart.lagnaNum - 1]
       : "Virgo");
 
-  const lagnaSignNum = chart.lagnaNum || getSignNumber(lagnaSign);
+  const lagnaSignNum = getSignNumber(lagnaSign, typeof chart.lagnaRashi === "string" ? chart.lagnaRashi : undefined);
   const lagnaDegInSign = (chart.lagnaLon ?? 0) % 30;
   const lagnaCompoundDeg = calculateCompoundDegree(lagnaSignNum, lagnaDegInSign);
 
@@ -577,7 +584,7 @@ export function runAstroVastuHitEngine(
   planetNames.forEach(p => {
     const d = getPlanetData(p);
     if (!d) return;
-    const sNum = d.signNum !== undefined ? (d.signNum >= 1 && d.signNum <= 12 ? d.signNum : d.signNum + 1) : getSignNumber(d.sign);
+    const sNum = getSignNumber(d.sign, d.sign);
     const deg = (d.degree || 0) + (d.minutes || 0) / 60;
     const compound = calculateCompoundDegree(sNum, deg);
     const dir = ASTRO_VASTU_SIGN_DIRECTIONS[sNum];
@@ -608,7 +615,7 @@ export function runAstroVastuHitEngine(
 
   if (chart.houseCusps && chart.houseCusps.length >= 12) {
     chart.houseCusps.forEach(hc => {
-      const sNum = hc.signNum !== undefined ? (hc.signNum >= 1 && hc.signNum <= 12 ? hc.signNum : hc.signNum + 1) : getSignNumber(hc.sign);
+      const sNum = getSignNumber(hc.sign, hc.sign);
       const deg = (hc.degree || 0) + (hc.minutes || 0) / 60;
       const compound = calculateCompoundDegree(sNum, deg);
       cuspCoords[hc.house] = {
@@ -989,7 +996,7 @@ export function runAstroVastuHitEngine(
 
   // 12. Wrist-Thread Trap Alert (Lecture Rule: Gemini / 3rd Sign)
   const geminiCusp = Object.values(cuspCoords).find(c => c.signNum === 3);
-  const geminiHouse = geminiCusp?.house || 3;
+  const geminiHouse = geminiCusp?.house || (((3 - lagnaSignNum + 12) % 12) + 1);
   const isGeminiDusthana = [6, 8, 12].includes(geminiHouse);
   const wristThreadTrapAlert: WristThreadTrapAlert = {
     geminiHouse,

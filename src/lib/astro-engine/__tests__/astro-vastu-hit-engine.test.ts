@@ -320,6 +320,13 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
       assert.equal(geminiRow.houseNum, 10);
       assert.equal(geminiRow.planetsInSign.length, 2, "Gemini must have 2 planets (Sun, Venus)");
 
+      // Sign 12 (Pisces - Feet & Soles): MUST BE 7th house for Virgo Lagna!
+      const piscesRow = dossier.bodyPartRemedyRegistry.find(r => r.signNum === 12);
+      assert.ok(piscesRow);
+      assert.equal(piscesRow.houseNum, 7, "Pisces (Sign 12) MUST be 7th House for Virgo Lagna!");
+      assert.equal(piscesRow.isThreadHarmful, false, "House 7 is a Kendra house, not Dusthana");
+      assert.ok(piscesRow.planetsInSign.some(p => p.name === "Saturn"), "Pisces holds Saturn");
+
       // Every item must have authentic dot substance and non-empty guidance
       for (const row of dossier.bodyPartRemedyRegistry) {
         assert.ok(row.dotSubstance.length > 0, `Sign ${row.signNum} dot substance must not be empty`);
@@ -327,6 +334,40 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
         assert.ok(row.threadVerdict.length > 0, `Sign ${row.signNum} thread verdict must not be empty`);
         assert.ok(row.statusVerdict.badgeText.length > 0, `Sign ${row.signNum} badge must not be empty`);
       }
+    });
+
+    it("should correctly resolve house 7 for Pisces when chart comes from calculateChart (0-indexed lagnaNum)", () => {
+      // When chart has lagnaRashi: "Virgo", lagnaNum: 5 (0-indexed from dR), and houseCusps with signNum 0..11
+      const chartWith0Indexed = {
+        name: "Mukul Calc Chart",
+        lagnaRashi: "Virgo",
+        lagnaNum: 5, // 0-indexed Virgo from calculations.ts
+        planets: {
+          Saturn: { sign: "Pisces", signNum: 11, degree: 1, minutes: 55, house: 7 },
+        },
+        houseCusps: [
+          { house: 1, sign: "Virgo", signNum: 5 },
+          { house: 2, sign: "Libra", signNum: 6 },
+          { house: 3, sign: "Scorpio", signNum: 7 },
+          { house: 4, sign: "Sagittarius", signNum: 8 },
+          { house: 5, sign: "Capricorn", signNum: 9 },
+          { house: 6, sign: "Aquarius", signNum: 10 },
+          { house: 7, sign: "Pisces", signNum: 11 },
+          { house: 8, sign: "Aries", signNum: 0 },
+          { house: 9, sign: "Taurus", signNum: 1 },
+          { house: 10, sign: "Gemini", signNum: 2 },
+          { house: 11, sign: "Cancer", signNum: 3 },
+          { house: 12, sign: "Leo", signNum: 4 },
+        ],
+      } as unknown as ChartData;
+
+      const dossier = runAstroVastuHitEngine(chartWith0Indexed);
+      assert.ok(dossier);
+      const piscesRow = dossier.bodyPartRemedyRegistry.find(r => r.signNum === 12);
+      assert.ok(piscesRow);
+      assert.equal(piscesRow.houseNum, 7, "Pisces MUST be resolved to House 7 even with 0-indexed input");
+      assert.equal(piscesRow.houseNameHi, "सप्तम भाव (दांपत्य, साझेदारी व पेल्विक)");
+      assert.equal(piscesRow.isThreadHarmful, false);
     });
 
     it("should synthesize critical hit status for afflicted body parts in Priyanka Ji's chart", () => {
