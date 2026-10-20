@@ -124,10 +124,17 @@ export function HtmlPreferencesSync() {
       html[data-theme-mode="light"] .result-name,
       html[data-theme-mode="light"] .library-name,
       html[data-theme-mode="light"] .dv-title,
-      html[data-theme-mode="light"] h1,
-      html[data-theme-mode="light"] h2,
-      html[data-theme-mode="light"] h3 {
+      html[data-theme-mode="light"] h1:not(.vastu-banner-title),
+      html[data-theme-mode="light"] h2:not(.vastu-banner-title),
+      html[data-theme-mode="light"] h3:not(.vastu-banner-title) {
         color: var(--app-fg) !important;
+      }
+
+      html[data-theme-mode="light"] .vastu-banner-title,
+      html[data-landing-theme="saffron"] .vastu-banner-title,
+      .vastu-banner-title {
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
       }
 
       html[data-theme-mode="light"] .page-sub,

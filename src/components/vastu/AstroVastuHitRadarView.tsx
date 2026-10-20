@@ -33,6 +33,7 @@ interface AstroVastuHitRadarViewProps {
 export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   const [activeTab, setActiveTab] = useState<
     | "dossier"
+    | "rxPrescription"
     | "radar"
     | "trafficPolice"
     | "hits"
@@ -134,6 +135,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     marsDietaryLifestyleProtocol,
     wristThreadTrapAlert,
     mandalaDossier,
+    astroPrescription,
   } = dossier;
 
   const dynamicBalancingGuides = useMemo(() => {
@@ -555,23 +557,30 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <style>{`
-        .vastu-executive-banner {
+        .vastu-executive-banner,
+        .vastu-mandala-banner,
+        .vastu-barchart-banner {
           background: linear-gradient(135deg, #1C1917 0%, #0F0E0D 100%) !important;
-          color: #FFFFFF !important;
-          border: 2px solid rgba(212, 175, 55, 0.65) !important;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
-        }
-        .vastu-mandala-banner {
-          background: linear-gradient(135deg, #1C1917 0%, #171412 100%) !important;
           color: #FFFFFF !important;
           border: 2px solid rgba(212, 175, 55, 0.65) !important;
           box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
         }
         .vastu-barchart-banner {
           background: linear-gradient(135deg, #042F2E 0%, #064E3B 100%) !important;
-          color: #FFFFFF !important;
           border: 2px solid rgba(20, 184, 166, 0.65) !important;
-          box-shadow: 0 10px 30px rgba(4, 47, 46, 0.35) !important;
+        }
+        .vastu-banner-title,
+        .vastu-executive-banner .vastu-banner-title,
+        .vastu-mandala-banner .vastu-banner-title,
+        .vastu-barchart-banner .vastu-banner-title,
+        html[data-theme-mode="light"] .vastu-banner-title,
+        html[data-landing-theme="saffron"] .vastu-banner-title,
+        html[data-theme-mode="light"] .vastu-executive-banner :is(h1, h2, h3, h4, .vastu-banner-title),
+        html[data-theme-mode="light"] .vastu-mandala-banner :is(h1, h2, h3, h4, .vastu-banner-title),
+        html[data-theme-mode="light"] .vastu-barchart-banner :is(h1, h2, h3, .vastu-banner-title) {
+          color: #FFFFFF !important;
+          -webkit-text-fill-color: #FFFFFF !important;
+          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8) !important;
         }
       `}</style>
       {/* ── Top Dossier Hero Banner ── */}
@@ -623,9 +632,22 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 3-5-8 Orb Formula & Traffic Police Engine
               </span>
             </div>
-            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: 28, fontWeight: 800, margin: 0, color: "#FFFFFF", textShadow: "0 2px 4px rgba(0,0,0,0.6)" }}>
+            <div
+              role="heading"
+              aria-level={2}
+              className="vastu-banner-title"
+              style={{
+                fontFamily: "Cormorant Garamond, serif",
+                fontSize: 28,
+                fontWeight: 800,
+                margin: 0,
+                color: "#FFFFFF",
+                WebkitTextFillColor: "#FFFFFF",
+                textShadow: "0 2px 6px rgba(0,0,0,0.8)",
+              }}
+            >
               {nativeName ? `${nativeName} — ` : ""}एस्ट्रो-वास्तु हिट थ्योरी ऑडिट
-            </h2>
+            </div>
             <div style={{ marginTop: 8, fontSize: 14, color: "#F5F5F4", lineHeight: 1.5, fontWeight: 500 }}>
               लग्न: <strong style={{ color: "#FEF08A", fontWeight: 800 }}>{lagnaSign} ({lagnaSignHindi || lagnaSign})</strong> ({lagnaCompoundDeg.toFixed(2)}° Compound) · 
               सक्रिय दशा: <strong style={{ color: "#93C5FD", fontWeight: 800 }}>{activeDasha.mahadasha} MD</strong> / <strong style={{ color: "#7DD3FC", fontWeight: 800 }}>{activeDasha.antardasha} AD</strong>
@@ -677,7 +699,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             }}
           >
             <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: trafficPoliceBlockades.length > 0 ? "#991B1B" : "#166534", letterSpacing: 0.5 }}>
-              ट्रैफिक पुलिस
+              कॉस्मिक फ्रिक्शन
             </div>
             <div
               style={{
@@ -688,7 +710,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 marginTop: 2,
               }}
             >
-              {trafficPoliceBlockades.length > 0 ? `🚨 ${trafficPoliceBlockades.length} जाम` : "✅ क्लियर"}
+              {trafficPoliceBlockades.length > 0 ? `⚡ ${trafficPoliceBlockades.length} लॉक` : "✅ क्लियर"}
             </div>
           </div>
 
@@ -808,6 +830,19 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           📜 संपूर्ण फील्ड ऑडिट रिपोर्ट (Master Dossier)
         </button>
         <button
+          className={`tab ${activeTab === "rxPrescription" ? "active" : ""}`}
+          onClick={() => setActiveTab("rxPrescription")}
+          style={{
+            fontWeight: 700,
+            background: activeTab === "rxPrescription" ? "#065F46" : "rgba(16, 185, 129, 0.15)",
+            color: activeTab === "rxPrescription" ? "#FFFFFF" : "#047857",
+            borderColor: activeTab === "rxPrescription" ? "#059669" : "rgba(16, 185, 129, 0.4)",
+            boxShadow: activeTab === "rxPrescription" ? "0 2px 8px rgba(16, 185, 129, 0.25)" : "none",
+          }}
+        >
+          💊 Rx त्रि-आयामी औषधि प्रिस्क्रिप्शन
+        </button>
+        <button
           className={`tab ${activeTab === "radar" ? "active" : ""}`}
           onClick={() => setActiveTab("radar")}
         >
@@ -818,7 +853,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           onClick={() => setActiveTab("trafficPolice")}
           style={trafficPoliceBlockades.length > 0 ? { color: "#dc2626", fontWeight: 700 } : {}}
         >
-          🚨 ट्रैफिक पुलिस ब्लॉक ({trafficPoliceBlockades.length})
+          ⚡ कॉस्मिक फ्रिक्शन रडार ({trafficPoliceBlockades.length})
         </button>
         <button
           className={`tab ${activeTab === "hits" ? "active" : ""}`}
@@ -934,20 +969,24 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 >
                   अध्याय 1 · संपूर्ण जन्मकुंडली एवं एस्ट्रो-वास्तु ऑडिट
                 </span>
-                <h3
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="vastu-banner-title"
                   style={{
                     fontFamily: "Cormorant Garamond, serif",
                     fontSize: 28,
                     fontWeight: 800,
                     margin: "10px 0 6px 0",
                     color: "#FFFFFF",
-                    textShadow: "0 2px 4px rgba(0,0,0,0.6)",
+                    WebkitTextFillColor: "#FFFFFF",
+                    textShadow: "0 2px 6px rgba(0,0,0,0.8)",
                     letterSpacing: 0.3,
                     lineHeight: 1.25,
                   }}
                 >
                   {nativeName ? `${nativeName} जी का ` : ""}मास्टर फील्ड ऑडिट डॉसियर
-                </h3>
+                </div>
                 <p
                   style={{
                     margin: 0,
@@ -1230,7 +1269,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 <span style={{ fontSize: 24 }}>{trafficPoliceBlockades.length > 0 ? "🚨" : "✅"}</span>
                 <div>
                   <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: trafficPoliceBlockades.length > 0 ? "#DC2626" : "#15803D" }}>
-                    ट्रैफिक पुलिस ऑडिट: {trafficPoliceBlockades.length > 0 ? `${trafficPoliceBlockades.length} रुकावट सक्रिय (Traffic Police Jam)` : "मार्ग पूर्णतः स्वच्छ व निर्बाध"}
+                    कॉस्मिक फ्रिक्शन ऑडिट: {trafficPoliceBlockades.length > 0 ? `${trafficPoliceBlockades.length} गतिरोध सक्रिय (Cosmic Friction Lock)` : "ऊर्जा पथ पूर्णतः स्वच्छ व निर्बाध"}
                   </h4>
                   <p style={{ margin: "4px 0 0 0", fontSize: 13.5, color: "#4A4238", lineHeight: 1.5 }}>
                     {trafficPoliceBlockades.length > 0
@@ -1699,7 +1738,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 विस्तृत इंटरैक्टिव टूल्स देखें (Interactive Tools)
               </div>
               <div style={{ fontSize: 13, color: "#6B635B" }}>
-                12-दिशा चक्र, ट्रैफिक पुलिस ब्लॉकेड, अथवा 120° शिफ्टिंग सिमुलेटर का व्यक्तिगत उपयोग करें
+                12-दिशा चक्र, कॉस्मिक फ्रिक्शन रडार, अथवा 120° शिफ्टिंग सिमुलेटर का व्यक्तिगत उपयोग करें
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -1715,7 +1754,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 className="btn btn-secondary"
                 style={{ fontSize: 13, padding: "6px 14px" }}
               >
-                🚨 ट्रैफिक पुलिस
+                ⚡ कॉस्मिक फ्रिक्शन
               </button>
               <button
                 onClick={() => setActiveTab("shifting")}
@@ -1912,7 +1951,482 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 2: TRAFFIC POLICE BLOCKADES
+          TAB: ASTRO-PHARMACOLOGICAL PRESCRIPTION FORMULA
+      ───────────────────────────────────────────────────────────── */}
+      {activeTab === "rxPrescription" && astroPrescription && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Prescription Master Header */}
+          <div
+            className="card"
+            style={{
+              background: "linear-gradient(135deg, #064E3B 0%, #065F46 100%)",
+              color: "#FFFFFF",
+              padding: 24,
+              borderRadius: 16,
+              boxShadow: "0 8px 24px rgba(6, 78, 59, 0.25)",
+              border: "1px solid rgba(52, 211, 153, 0.3)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 24 }}>💊</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", background: "rgba(255,255,255,0.2)", padding: "2px 8px", borderRadius: 6 }}>
+                    Rx MASTER PRESCRIPTION
+                  </span>
+                </div>
+                <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#FFFFFF" }}>
+                  {astroPrescription.title} — {astroPrescription.nativeName}
+                </h2>
+                <p style={{ margin: "6px 0 0 0", fontSize: 13.5, color: "#A7F3D0" }}>
+                  {astroPrescription.formulaSubtitle}
+                </p>
+              </div>
+              <div
+                style={{
+                  background: "rgba(0,0,0,0.25)",
+                  padding: "10px 16px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  fontSize: 12,
+                  color: "#E2E8F0",
+                  maxWidth: 360,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: "#34D399", marginBottom: 2 }}>⚡ फ्रिक्शन डायग्नोसिस:</div>
+                {astroPrescription.frictionDiagnosisSummary}
+              </div>
+            </div>
+          </div>
+
+          {/* Tri-Fold Formula Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+            {/* 1. Active Salt */}
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                borderTop: "5px solid #10B981",
+                padding: 20,
+                borderRadius: 12,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span className="badge" style={{ background: "#ECFDF5", color: "#065F46", fontWeight: 700, fontSize: 12 }}>
+                  {astroPrescription.activeSalt.badgeLabel}
+                </span>
+                <span style={{ fontSize: 22 }}>💊</span>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#111827" }}>
+                  1. सक्रिय घटक (Active Molecule)
+                </h3>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#059669", marginTop: 4 }}>
+                  {astroPrescription.activeSalt.elementOrAction}
+                </div>
+              </div>
+              <p style={{ margin: 0, fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                <strong>लक्ष्य:</strong> {astroPrescription.activeSalt.targetObjective}
+              </p>
+              <div style={{ background: "#F3F4F6", padding: "8px 12px", borderRadius: 8, fontSize: 11.5, color: "#374151" }}>
+                <strong>शास्त्रीय आधार:</strong> {astroPrescription.activeSalt.scientificHitReason}
+              </div>
+            </div>
+
+            {/* 2. PPI Antacid Shield */}
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                borderTop: "5px solid #3B82F6",
+                padding: 20,
+                borderRadius: 12,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span className="badge" style={{ background: "#EFF6FF", color: "#1E40AF", fontWeight: 700, fontSize: 12 }}>
+                  {astroPrescription.protonPumpInhibitor.badgeLabel}
+                </span>
+                <span style={{ fontSize: 22 }}>🛡️</span>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#111827" }}>
+                  2. सुरक्षा कवच (120° PPI Buffer Shield)
+                </h3>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#2563EB", marginTop: 4 }}>
+                  {astroPrescription.protonPumpInhibitor.elementOrAction}
+                </div>
+              </div>
+              <p style={{ margin: 0, fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                <strong>सुरक्षा कार्य:</strong> {astroPrescription.protonPumpInhibitor.targetObjective}
+              </p>
+              <div style={{ background: "#F3F4F6", padding: "8px 12px", borderRadius: 8, fontSize: 11.5, color: "#374151" }}>
+                <strong>शास्त्रीय आधार:</strong> {astroPrescription.protonPumpInhibitor.scientificHitReason}
+              </div>
+            </div>
+
+            {/* 3. Nutritional Support */}
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                borderTop: "5px solid #8B5CF6",
+                padding: 20,
+                borderRadius: 12,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span className="badge" style={{ background: "#F5F3FF", color: "#5B21B6", fontWeight: 700, fontSize: 12 }}>
+                  ⚡ पोषण व क्रिस्टल सपोर्ट
+                </span>
+                <span style={{ fontSize: 22 }}>💎</span>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#111827" }}>
+                  3. सह-पोषक तत्व (Nutritional Co-Factor)
+                </h3>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#7C3AED", marginTop: 4 }}>
+                  {astroPrescription.crystals.wearableBracelet.map(c => c.crystalName).join(" + ")}
+                </div>
+              </div>
+              <p style={{ margin: 0, fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                <strong>पोषण लक्ष्य:</strong> नर्वस सिस्टम की थकान, अनिद्रा व स्क्रीन स्ट्रेस का शमन कर वित्तीय अवसरों का चुंबक बनना।
+              </p>
+              <div style={{ background: "#F3F4F6", padding: "8px 12px", borderRadius: 8, fontSize: 11.5, color: "#374151" }}>
+                <strong>तारा बल:</strong> {astroPrescription.crystals.wearableBracelet.map(c => `${c.crystalName} (${c.taraName})`).join(", ")}
+              </div>
+            </div>
+          </div>
+
+          {/* Strict Contraindications Box */}
+          {astroPrescription.contraindications.length > 0 && (
+            <div
+              className="card"
+              style={{
+                background: "#FEF2F2",
+                border: "1.5px solid #F87171",
+                borderLeft: "6px solid #DC2626",
+                padding: 18,
+                borderRadius: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: 22 }}>🚫</span>
+                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#991B1B" }}>
+                  सख्त वर्जित घटक (Contraindications / Negative Side-Effects Warning)
+                </h4>
+              </div>
+              <p style={{ margin: "0 0 10px 0", fontSize: 12.5, color: "#7F1D1D" }}>
+                नवतारा चक्र (7वीं वध तारा) एवं अस्त ग्रहों के विश्लेषण से निम्नलिखित रत्न/रंग आपकी कुंडली के लिए जहर समान हैं। इन्हें कलाई या शरीर पर कभी धारण न करें:
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {astroPrescription.contraindications.map((ci, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "baseline", gap: 8, fontSize: 12.5, color: "#B91C1C" }}>
+                    <span style={{ fontWeight: 700 }}>• [{ci.badgeLabel}]</span>
+                    <span>{ci.elementOrAction} — <em>{ci.scientificHitReason}</em></span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Compound Thread & Crystals Detailed Protocol */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
+            {/* Custom Compound Thread Card */}
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                border: "1px solid #E5E7EB",
+                padding: 20,
+                borderRadius: 12,
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 20 }}>🧵</span>
+                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#111827" }}>
+                  कस्टमाइज्ड संयुक्त रक्षा सूत्र (Shielded Compound Thread)
+                </h4>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, background: "#F3F4F6", padding: 12, borderRadius: 10 }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: "50%",
+                    background: astroPrescription.compoundThread.blendedHex,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    border: "2px solid #FFFFFF",
+                    flexShrink: 0,
+                  }}
+                />
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
+                    {astroPrescription.compoundThread.blendedColorHindi}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#6B7280" }}>
+                    हेक्स कोड: {astroPrescription.compoundThread.blendedHex} ({astroPrescription.compoundThread.blendedColorName})
+                  </div>
+                </div>
+              </div>
+              <p style={{ margin: 0, fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
+                {astroPrescription.compoundThread.whyBlended}
+              </p>
+              <div style={{ borderTop: "1px solid #E5E7EB", paddingTop: 10, fontSize: 12, color: "#374151" }}>
+                <div><strong>कलाई:</strong> {astroPrescription.compoundThread.wristHand}</div>
+                <div style={{ marginTop: 4 }}><strong>मुहूर्त:</strong> {astroPrescription.compoundThread.wearingDayAndTiming}</div>
+                <div style={{ marginTop: 4 }}><strong>विधि:</strong> {astroPrescription.compoundThread.ritualInstructions}</div>
+              </div>
+            </div>
+
+            {/* Crystals & Wallet Protocol Card */}
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                border: "1px solid #E5E7EB",
+                padding: 20,
+                borderRadius: 12,
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 20 }}>👛</span>
+                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#111827" }}>
+                  क्रिस्टल व वॉलेट समृद्धि प्रोटोकॉल
+                </h4>
+              </div>
+              <div style={{ fontSize: 12.5, color: "#374151", lineHeight: 1.5 }}>
+                <div><strong>क्रिस्टल ब्रेसलेट:</strong> {astroPrescription.crystals.wearableBracelet.map(c => c.crystalHindi).join(" + ")}</div>
+                {astroPrescription.crystals.deskManifestationCrystal.length > 0 && (
+                  <div style={{ marginTop: 6, color: "#B45309" }}>
+                    <strong>वर्क-डेस्क एसेट:</strong> {astroPrescription.crystals.deskManifestationCrystal.map(d => `${d.crystalName} (${d.placementZone})`).join(", ")}
+                  </div>
+                )}
+                <div style={{ marginTop: 8 }}>
+                  <strong>वॉलेट के सर्वोत्तम रंग:</strong> {astroPrescription.wallet.recommendedColors.join(", ")}
+                </div>
+                <div style={{ marginTop: 4, color: "#DC2626" }}>
+                  <strong>वॉलेट में वर्जित रंग:</strong> {astroPrescription.wallet.colorsToAvoid.join(", ")}
+                </div>
+                <div style={{ marginTop: 4 }}>
+                  <strong>वॉलेट का बीज तत्व:</strong> {astroPrescription.wallet.seedItemInside}
+                </div>
+                <div style={{ marginTop: 4 }}>
+                  <strong>बरकत नोट:</strong> {astroPrescription.wallet.recommendedCurrencyNote}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Degree-Based Chromatic Tone Modulation */}
+          {astroPrescription.chromaticModulation && (
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                border: "1px solid #E5E7EB",
+                borderRadius: 14,
+                padding: 20,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 20 }}>🎨</span>
+                  <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#111827" }}>
+                    अंश-आधारित क्रोमेटिक टोन मॉड्युलेशन (Degree-Based Chromatic Tone Modulation)
+                  </h4>
+                </div>
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    padding: "3px 10px",
+                    borderRadius: 12,
+                    background: "#EEF2FF",
+                    color: "#4338CA",
+                    border: "1px solid #C7D2FE",
+                  }}
+                >
+                  {astroPrescription.chromaticModulation.avasthaHindi}
+                </span>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #E5E7EB" }}>
+                  <div
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: 10,
+                      background: astroPrescription.chromaticModulation.hexCode,
+                      boxShadow: "0 2px 10px rgba(0,0,0,0.18)",
+                      border: "2px solid #FFFFFF",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
+                      {astroPrescription.chromaticModulation.toneDescription}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#4B5563", marginTop: 2 }}>
+                      ग्रह: <strong>{astroPrescription.chromaticModulation.planet} ({astroPrescription.chromaticModulation.degFormatted})</strong>
+                    </div>
+                    <div style={{ fontSize: 11, color: "#6B7280", marginTop: 1, fontFamily: "monospace" }}>
+                      HEX: {astroPrescription.chromaticModulation.hexCode} · {astroPrescription.chromaticModulation.hslString}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12.5, color: "#374151", lineHeight: 1.55 }}>
+                  <div style={{ fontWeight: 700, color: "#0F172A", marginBottom: 3 }}>
+                    🔬 वैज्ञानिक एवं शास्त्रीय नियम (Baladi Avastha Tuning):
+                  </div>
+                  <div>{astroPrescription.chromaticModulation.scientificRule}</div>
+                  <div style={{ marginTop: 6, fontSize: 11.5, color: "#6B7280" }}>
+                    संतृप्ति (Saturation): <strong>{astroPrescription.chromaticModulation.saturationPercent}%</strong> | प्रकाश (Lightness): <strong>{astroPrescription.chromaticModulation.lightnessPercent}%</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Anatomical Body-Zone Astro-Targeting Matrix */}
+          {astroPrescription.anatomicalProtocols && astroPrescription.anatomicalProtocols.length > 0 && (
+            <div
+              className="card"
+              style={{
+                background: "#FAF8F5",
+                border: "1px solid #E5E7EB",
+                borderRadius: 14,
+                padding: 20,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 20 }}>🏃</span>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#111827" }}>
+                      देह-अंग खगोलीय लक्ष्यीकरण प्रोटोकॉल (Anatomical Body-Zone Targeting)
+                    </h4>
+                    <div style={{ fontSize: 12, color: "#6B7280", marginTop: 2 }}>
+                      कालपुरुष राशियां, अंग अधिष्ठान, एवं आपकी कुंडली के अनुसार धारण-स्थान अनुकूलता
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+                {astroPrescription.anatomicalProtocols.map((proto, pIdx) => {
+                  const isAllowed = proto.isAllowedForNative;
+                  return (
+                    <div
+                      key={pIdx}
+                      style={{
+                        background: isAllowed ? "#FFFFFF" : "#FEF2F2",
+                        border: `1.5px solid ${isAllowed ? "#E5E7EB" : "#FECACA"}`,
+                        borderRadius: 12,
+                        padding: 14,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: isAllowed ? "#111827" : "#991B1B" }}>
+                            {proto.bodyZoneHi} ({proto.bodyZoneEn})
+                          </div>
+                          <div style={{ fontSize: 11.5, color: "#6B7280" }}>
+                            {proto.correspondingSign} · <strong>भाव {proto.houseInNativeChart}</strong> · {proto.rulingPlanet}
+                          </div>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: 10.5,
+                            fontWeight: 700,
+                            padding: "2px 8px",
+                            borderRadius: 8,
+                            background: isAllowed ? "rgba(220, 38, 38, 0.12)" : "rgba(22, 163, 74, 0.12)",
+                            color: isAllowed ? "#16A34A" : "#DC2626",
+                            border: `1px solid ${isAllowed ? "#86EFAC" : "#FCA5A5"}`,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {isAllowed ? "✅ जातक अनुकूल" : "🚨 वर्जित"}
+                        </span>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, background: isAllowed ? "#F9FAFB" : "#FFF1F2", padding: "8px 10px", borderRadius: 8 }}>
+                        <div
+                          style={{
+                            width: 22,
+                            height: 22,
+                            borderRadius: 6,
+                            background: proto.toneAndHex.hexColor,
+                            border: "1.5px solid #FFFFFF",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                            flexShrink: 0,
+                          }}
+                        />
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#1F2937" }}>
+                          {proto.wearableForm}
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: 11.5, color: "#4B5563", lineHeight: 1.45 }}>
+                        <strong>उद्देश्य:</strong> {proto.purpose}
+                      </div>
+
+                      <div style={{ fontSize: 11.5, color: "#6B7280", lineHeight: 1.45 }}>
+                        <strong>खगोलीय प्रभाव:</strong> {proto.planetaryMechanism}
+                      </div>
+
+                      {proto.cautionNotice && (
+                        <div
+                          style={{
+                            marginTop: "auto",
+                            fontSize: 11,
+                            padding: "6px 8px",
+                            borderRadius: 6,
+                            background: isAllowed ? "#F0FDF4" : "#FEE2E2",
+                            color: isAllowed ? "#166534" : "#991B1B",
+                            border: `1px solid ${isAllowed ? "#BBF7D0" : "#FECACA"}`,
+                            fontWeight: 500,
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {proto.cautionNotice}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 2: TRAFFIC POLICE BLOCKADES / COSMIC FRICTION LOCKS
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "trafficPolice" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -1929,10 +2443,10 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 <span style={{ fontSize: 32 }}>✅</span>
                 <div>
                   <h3 style={{ margin: 0, fontSize: 18, color: "#15803d", fontWeight: 700 }}>
-                    ट्रैफिक पुलिस क्लियर: कोई ग्रह दशा स्वामी को नहीं रोक रहा
+                    कॉस्मिक फ्रिक्शन क्लियर: ऊर्जा पथ पूर्णतः निर्बाध
                   </h3>
                   <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#4A4238" }}>
-                    वर्तमान दशा स्वामी ({activeDasha.mahadasha} / {activeDasha.antardasha}) पर किसी भी शत्रु या पापी ग्रह की 90° या 180° की हिट नहीं है। दशा के पूर्ण फल निर्बाध रूप से प्राप्त होंगे।
+                    वर्तमान दशा स्वामी ({activeDasha.mahadasha} / {activeDasha.antardasha}) पर किसी भी शत्रु ग्रह की 90° या 180° की गतिरोध हिट नहीं है। ऊर्जा का प्रवाह पूर्णतः स्वच्छ है।
                   </p>
                 </div>
               </div>
@@ -1953,7 +2467,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span className="badge badge-red" style={{ fontWeight: 700 }}>
-                        🚨 ट्रैफिक पुलिस लॉकअप: {tp.hitAngle}° {tp.hitSeverity} Hit
+                        ⚡ कॉस्मिक फ्रिक्शन लॉक: {tp.hitAngle}° {tp.hitSeverity} Hit
                       </span>
                       <span style={{ fontSize: 12, color: "#6B635B" }}>
                         Orb Distance: {tp.orbDistance.toFixed(2)}° (Exact Diff: {tp.exactDiff.toFixed(2)}°)
@@ -2015,7 +2529,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
 
                   <div style={{ background: "#FFFFFF", borderRadius: 12, padding: 14, border: "1px solid rgba(184, 134, 11, 0.2)" }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#15803d", textTransform: "uppercase", marginBottom: 6 }}>
-                      🛠️ ट्रैफिक पुलिस रिहाई उपाय (Remedial Action)
+                      🛠️ गतिरोध निवारण उपाय (Friction Release Action)
                     </div>
                     <p style={{ margin: 0, fontSize: 13, color: "#4A4238", lineHeight: 1.6 }}>
                       {tp.physicalLocation.actionRequired}
@@ -2800,9 +3314,21 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 >
                   Authentic Brihat Samhita & Shilpa Shastra Engine
                 </span>
-                <h2 style={{ margin: "10px 0 6px 0", fontSize: 26, fontWeight: 800, color: "#FFFFFF", textShadow: "0 2px 4px rgba(0,0,0,0.6)" }}>
+                <div
+                  role="heading"
+                  aria-level={2}
+                  className="vastu-banner-title"
+                  style={{
+                    margin: "10px 0 6px 0",
+                    fontSize: 26,
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                    WebkitTextFillColor: "#FFFFFF",
+                    textShadow: "0 2px 6px rgba(0,0,0,0.8)",
+                  }}
+                >
                   🏛️ 45 देवता वास्तु पुरुष मंडल एवं 32 मुख्य प्रवेश द्वार
-                </h2>
+                </div>
                 <div style={{ fontSize: 14, color: "#F5F5F4", lineHeight: 1.6, fontWeight: 500 }}>
                   33 कोटि (प्रकार) के देवगण + 12 असुर शक्तियां · ब्रह्मस्थान (नाभि) से संपूर्ण ऊर्जा का संचार · जन्मकुंडली भाव संरेखण
                 </div>
@@ -3194,9 +3720,21 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             >
               Shilpa Shastra Bar-Chart Harmonizer
             </span>
-            <h2 style={{ margin: "10px 0 6px 0", fontSize: 26, fontWeight: 800, color: "#FFFFFF", textShadow: "0 2px 4px rgba(0,0,0,0.6)" }}>
+            <div
+              role="heading"
+              aria-level={2}
+              className="vastu-banner-title"
+              style={{
+                margin: "10px 0 6px 0",
+                fontSize: 26,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                WebkitTextFillColor: "#FFFFFF",
+                textShadow: "0 2px 6px rgba(0,0,0,0.8)",
+              }}
+            >
               ⚖️ बार चार्ट पंचतत्व संतुलन एवं 45 देवता भोग प्रिस्क्रिप्शन
-            </h2>
+            </div>
             <div style={{ fontSize: 14, color: "#F0FDFA", lineHeight: 1.6, fontWeight: 500 }}>
               <strong style={{ color: "#FEF08A" }}>शास्त्रीय सूत्र:</strong> यदि ज़ोन कम है ➔ <em style={{ color: "#A7F3D0", fontWeight: 700 }}>"पीछे वाला आगे लाएं"</em> (Parent feeds Child) | यदि ज़ोन बढ़ा है ➔ <em style={{ color: "#A7F3D0", fontWeight: 700 }}>"आगे वाला पीछे लाएं"</em> (Child exhausts Parent)
             </div>
