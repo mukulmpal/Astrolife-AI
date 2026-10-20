@@ -476,11 +476,11 @@ function evaluateAnatomicalProtocols(
   return protocols;
 }
 
-function evaluateDailyAccessories(
+export function evaluateDailyAccessories(
   chart: ChartData,
-  activeSaltPlanet: string,
-  shieldPlanet: string,
-  chromaticModulation: DegreeChromaticModulation
+  activeSaltPlanet: string = "Mercury",
+  shieldPlanet: string = "Jupiter",
+  chromaticModulation?: DegreeChromaticModulation
 ): DailyAccessoryProtocol {
   const lagnaNum = chart.lagnaNum; // 0-11
   const isVirgo = chart.lagnaRashi === "Virgo" || lagnaNum === 5;
@@ -488,8 +488,9 @@ function evaluateDailyAccessories(
 
   // 1. Smartphone Cover (3rd House - Gemini / Mercury / Digital Communication)
   // The phone is handheld in the 3rd house bio-field 10-14 hours daily!
+  const modulationHex = chromaticModulation?.hexCode || "#166534";
   let phoneColors = ["Lime Green (लाइम ग्रीन)", "Forest Green (गहरा हरा)", "Tan Brown (टैन)", "Silver / Muted White"];
-  let phoneHexes = [chromaticModulation.hexCode, "#166534", "#B45309", "#F8FAFC"];
+  let phoneHexes = [modulationHex, "#166534", "#B45309", "#F8FAFC"];
   let phoneAvoid = ["Aggressive Blood Red (चटक लाल)", "Jet Black (गहरा काला)"];
   let phoneMaterial = "मैट सिलिकॉन या वेगन लेदर (चिकना व नॉन-ग्लेयर ग्रिप)";
   let phoneMechanism = "फोन कालपुरुष के 3रे भाव (हाथ, संपर्क, डिजिटल संचार) का मुख्य यंत्र है। आपके बुध पर मंगल की 90° हिट को शांत करने के लिए लाइम/फॉरेस्ट ग्रीन बैक-कवर एक विद्युत-चुंबकीय शील्ड (EMF Shield) की तरह काम करता है।";

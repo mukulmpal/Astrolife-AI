@@ -17,6 +17,7 @@ import {
   type NativeDevataMapping,
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
 import { BioWearableAuditView } from "./BioWearableAuditView";
+import { evaluateDailyAccessories } from "@/lib/astro-engine/astro-prescription-engine";
 
 const DEMO_VASTU_FALLBACK: BirthDetails = {
   name: "मानक जन्म चक्र (Reference Chart)",
@@ -556,28 +557,71 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   };
 
   const renderDailyAccessoriesSection = () => {
-    if (!astroPrescription?.accessories) return null;
-    const acc = astroPrescription.accessories;
+    const acc =
+      astroPrescription?.accessories ||
+      evaluateDailyAccessories(
+        resolvedChart,
+        astroPrescription?.activeSalt?.planet || "Mercury",
+        astroPrescription?.protonPumpInhibitor?.planet || "Jupiter",
+        astroPrescription?.chromaticModulation
+      );
+    if (!acc) return null;
 
     return (
-      <div
-        className="card"
-        style={{
-          background: "#FAF8F5",
-          border: "1px solid #E5E7EB",
-          borderRadius: 14,
-          padding: 20,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 22 }}>📱</span>
-            <div>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#111827" }}>
-                आधुनिक दैनिक वेशभूषा व गैजेट वास्तु (Modern Daily Wearable & Tech Prescription)
-              </h3>
-              <div style={{ fontSize: 12.5, color: "#6B7280", marginTop: 2 }}>
-                फोन कवर, जूते, टोपी, बेल्ट व मास्क — 24 घंटे की आभा (Aura) को शील्ड करने वाले आधुनिक उपादान
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div
+          className="vastu-royal-banner"
+          style={{
+            background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+            color: "#FFFFFF",
+            border: "2px solid rgba(212, 175, 55, 0.85)",
+            borderRadius: 18,
+            padding: "22px 24px",
+            boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 32 }}>📱</span>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      letterSpacing: 1.2,
+                      textTransform: "uppercase",
+                      color: "#78350F",
+                      background: "#FEF08A",
+                      padding: "3px 10px",
+                      borderRadius: 14,
+                      border: "1.5px solid #F59E0B",
+                    }}
+                  >
+                    24-Hour Bio-Field Aura Shield
+                  </span>
+                  <span style={{ fontSize: 12, color: "#FEF3C7", fontWeight: 600 }}>
+                    3rd · 12th · 1st/10th · 7th · 2nd भाव
+                  </span>
+                </div>
+                <h3
+                  className="vastu-banner-title"
+                  style={{
+                    margin: 0,
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                    fontFamily: "Cormorant Garamond, serif",
+                  }}
+                >
+                  📱 आधुनिक दैनिक वेशभूषा व गैजेट वास्तु (Modern Daily Wearable & Tech Prescription)
+                </h3>
+                <div
+                  className="vastu-banner-subtitle"
+                  style={{ fontSize: 13.5, color: "#FEF3C7", marginTop: 4, lineHeight: 1.5 }}
+                >
+                  फोन कवर, जूते, टोपी, बेल्ट व मास्क — 24 घंटे की आभा (Aura) को शील्ड करने वाले आधुनिक उपादान
+                </div>
               </div>
             </div>
           </div>
@@ -721,42 +765,50 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       <style>{`
         .vastu-executive-banner,
         .vastu-mandala-banner,
-        .vastu-barchart-banner {
-          background: linear-gradient(135deg, #1C1917 0%, #0F0E0D 100%) !important;
+        .vastu-barchart-banner,
+        .vastu-royal-banner {
+          background: linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%) !important;
           color: #FFFFFF !important;
-          border: 2px solid rgba(212, 175, 55, 0.65) !important;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
-        }
-        .vastu-barchart-banner {
-          background: linear-gradient(135deg, #042F2E 0%, #064E3B 100%) !important;
-          border: 2px solid rgba(20, 184, 166, 0.65) !important;
+          border: 2px solid rgba(212, 175, 55, 0.85) !important;
+          box-shadow: 0 10px 30px rgba(36, 22, 10, 0.45) !important;
+          border-radius: 18px !important;
         }
         .vastu-banner-title,
         .vastu-executive-banner .vastu-banner-title,
         .vastu-mandala-banner .vastu-banner-title,
         .vastu-barchart-banner .vastu-banner-title,
+        .vastu-royal-banner .vastu-banner-title,
         html[data-theme-mode="light"] .vastu-banner-title,
         html[data-landing-theme="saffron"] .vastu-banner-title,
         html[data-theme-mode="light"] .vastu-executive-banner :is(h1, h2, h3, h4, .vastu-banner-title),
         html[data-theme-mode="light"] .vastu-mandala-banner :is(h1, h2, h3, h4, .vastu-banner-title),
-        html[data-theme-mode="light"] .vastu-barchart-banner :is(h1, h2, h3, .vastu-banner-title) {
+        html[data-theme-mode="light"] .vastu-barchart-banner :is(h1, h2, h3, .vastu-banner-title),
+        html[data-theme-mode="light"] .vastu-royal-banner :is(h1, h2, h3, h4, .vastu-banner-title) {
           color: #FFFFFF !important;
           -webkit-text-fill-color: #FFFFFF !important;
-          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8) !important;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+        }
+        .vastu-banner-subtitle,
+        .vastu-executive-banner .vastu-banner-subtitle,
+        .vastu-mandala-banner .vastu-banner-subtitle,
+        .vastu-barchart-banner .vastu-banner-subtitle,
+        .vastu-royal-banner .vastu-banner-subtitle {
+          color: #FEF3C7 !important;
+          -webkit-text-fill-color: #FEF3C7 !important;
         }
       `}</style>
       {/* ── Top Dossier Hero Banner ── */}
       <div
         className="vastu-executive-banner"
         style={{
-          background: "linear-gradient(135deg, #1C1917 0%, #0F0E0D 100%)",
+          background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
           color: "#FFFFFF",
-          border: "2px solid rgba(212, 175, 55, 0.65)",
+          border: "2px solid rgba(212, 175, 55, 0.85)",
           borderRadius: 18,
           padding: "20px 24px",
           position: "relative",
           overflow: "hidden",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+          boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
         }}
       >
         <div
@@ -790,7 +842,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               >
                 Astro-Vastu Hit Radar · v1.0
               </span>
-              <span style={{ fontSize: 12.5, color: "#F5F5F4", fontWeight: 600 }}>
+              <span style={{ fontSize: 12.5, color: "#FEF3C7", fontWeight: 600 }}>
                 3-5-8 Orb Formula & Cosmic Friction Radar Engine
               </span>
             </div>
@@ -810,14 +862,14 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             >
               {nativeName ? `${nativeName} — ` : ""}एस्ट्रो-वास्तु हिट थ्योरी ऑडिट
             </div>
-            <div style={{ marginTop: 8, fontSize: 14, color: "#F5F5F4", lineHeight: 1.5, fontWeight: 500 }}>
+            <div className="vastu-banner-subtitle" style={{ marginTop: 8, fontSize: 14, color: "#FEF3C7", lineHeight: 1.5, fontWeight: 500 }}>
               लग्न: <strong style={{ color: "#FEF08A", fontWeight: 800 }}>{lagnaSign} ({lagnaSignHindi || lagnaSign})</strong> ({lagnaCompoundDeg.toFixed(2)}° Compound) · 
               सक्रिय दशा: <strong style={{ color: "#93C5FD", fontWeight: 800 }}>{activeDasha.mahadasha} MD</strong> / <strong style={{ color: "#7DD3FC", fontWeight: 800 }}>{activeDasha.antardasha} AD</strong>
             </div>
           </div>
 
           {/* Date Selector for Future Dasha Inspection */}
-          <div style={{ background: "#0C0A09", padding: "10px 14px", borderRadius: 12, border: "1.5px solid rgba(212, 175, 55, 0.6)", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
+          <div style={{ background: "rgba(36, 22, 10, 0.85)", padding: "10px 14px", borderRadius: 12, border: "1.5px solid rgba(212, 175, 55, 0.75)", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
             <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 800, marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>
               दशा तिथि सिमुलेशन (Dasha Date)
             </div>
@@ -826,10 +878,10 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               value={isMounted ? (targetDateStr || new Date().toISOString().split("T")[0]) : "2026-10-20"}
               onChange={(e) => setTargetDateStr(e.target.value)}
               style={{
-                background: "#1C1917",
+                background: "#24160A",
                 color: "#FFFFFF",
                 fontWeight: 700,
-                border: "1px solid rgba(212, 175, 55, 0.6)",
+                border: "1px solid rgba(212, 175, 55, 0.7)",
                 borderRadius: 6,
                 padding: "6px 10px",
                 fontSize: 13,
@@ -982,11 +1034,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           className={`tab ${activeTab === "dossier" ? "active" : ""}`}
           onClick={() => setActiveTab("dossier")}
           style={{
-            fontWeight: 700,
-            background: activeTab === "dossier" ? "#854D0E" : "rgba(212, 175, 55, 0.15)",
-            color: activeTab === "dossier" ? "#FFFFFF" : "#B8860B",
-            borderColor: activeTab === "dossier" ? "#B8860B" : "rgba(212, 175, 55, 0.4)",
-            boxShadow: activeTab === "dossier" ? "0 2px 8px rgba(184, 134, 11, 0.25)" : "none",
+            fontWeight: activeTab === "dossier" ? 800 : 600,
+            background: activeTab === "dossier" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "dossier" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "dossier" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "dossier" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
           }}
         >
           📜 संपूर्ण फील्ड ऑडिट रिपोर्ट (Master Dossier)
@@ -995,11 +1047,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           className={`tab ${activeTab === "rxPrescription" ? "active" : ""}`}
           onClick={() => setActiveTab("rxPrescription")}
           style={{
-            fontWeight: 700,
-            background: activeTab === "rxPrescription" ? "#065F46" : "rgba(16, 185, 129, 0.15)",
-            color: activeTab === "rxPrescription" ? "#FFFFFF" : "#047857",
-            borderColor: activeTab === "rxPrescription" ? "#059669" : "rgba(16, 185, 129, 0.4)",
-            boxShadow: activeTab === "rxPrescription" ? "0 2px 8px rgba(16, 185, 129, 0.25)" : "none",
+            fontWeight: activeTab === "rxPrescription" ? 800 : 600,
+            background: activeTab === "rxPrescription" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "rxPrescription" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "rxPrescription" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "rxPrescription" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
           }}
         >
           💊 Rx त्रि-आयामी औषधि प्रिस्क्रिप्शन
@@ -1008,43 +1060,77 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           className={`tab ${activeTab === "accessories" ? "active" : ""}`}
           onClick={() => setActiveTab("accessories")}
           style={{
-            fontWeight: 800,
-            background: activeTab === "accessories" ? "#1E3A8A" : "rgba(30, 58, 138, 0.12)",
-            color: activeTab === "accessories" ? "#FFFFFF" : "#1E3A8A",
-            borderColor: activeTab === "accessories" ? "#1D4ED8" : "rgba(30, 58, 138, 0.35)",
-            boxShadow: activeTab === "accessories" ? "0 2px 8px rgba(30, 58, 138, 0.25)" : "none",
+            fontWeight: activeTab === "accessories" ? 800 : 600,
+            background: activeTab === "accessories" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "accessories" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "accessories" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "accessories" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
           }}
         >
-          📱 दैनिक गैजेट व एक्सेसरीज़
+          📱 आधुनिक दैनिक वेशभूषा व गैजेट वास्तु
         </button>
         <button
           className={`tab ${activeTab === "radar" ? "active" : ""}`}
           onClick={() => setActiveTab("radar")}
+          style={{
+            fontWeight: activeTab === "radar" ? 800 : 600,
+            background: activeTab === "radar" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "radar" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "radar" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "radar" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
+          }}
         >
           🧭 12-दिशा कम्पास रडार (Compass Radar)
         </button>
         <button
           className={`tab ${activeTab === "trafficPolice" ? "active" : ""}`}
           onClick={() => setActiveTab("trafficPolice")}
-          style={trafficPoliceBlockades.length > 0 ? { color: "#dc2626", fontWeight: 700 } : {}}
+          style={{
+            fontWeight: activeTab === "trafficPolice" ? 800 : 600,
+            background: activeTab === "trafficPolice" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "trafficPolice" ? "#FFFFFF" : (trafficPoliceBlockades.length > 0 ? "#DC2626" : "#78350F"),
+            borderColor: activeTab === "trafficPolice" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "trafficPolice" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
+          }}
         >
           ⚡ कॉस्मिक फ्रिक्शन रडार ({trafficPoliceBlockades.length})
         </button>
         <button
           className={`tab ${activeTab === "hits" ? "active" : ""}`}
           onClick={() => setActiveTab("hits")}
+          style={{
+            fontWeight: activeTab === "hits" ? 800 : 600,
+            background: activeTab === "hits" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "hits" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "hits" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "hits" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
+          }}
         >
           ⚡ सभी हिट्स ({allHits.length})
         </button>
         <button
           className={`tab ${activeTab === "shifting" ? "active" : ""}`}
           onClick={() => setActiveTab("shifting")}
+          style={{
+            fontWeight: activeTab === "shifting" ? 800 : 600,
+            background: activeTab === "shifting" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "shifting" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "shifting" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "shifting" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
+          }}
         >
           🔄 120° शिफ्टिंग तकनीक ({shiftingPrescriptions.length})
         </button>
         <button
           className={`tab ${activeTab === "bodyTherapy" ? "active" : ""}`}
           onClick={() => setActiveTab("bodyTherapy")}
+          style={{
+            fontWeight: activeTab === "bodyTherapy" ? 800 : 600,
+            background: activeTab === "bodyTherapy" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "bodyTherapy" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "bodyTherapy" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "bodyTherapy" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
+          }}
         >
           🧘 शरीर अंग डॉट/धागा चिकित्सा
         </button>
@@ -1052,19 +1138,25 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           className={`tab ${activeTab === "wearableAudit" ? "active" : ""}`}
           onClick={() => setActiveTab("wearableAudit")}
           style={{
-            fontWeight: 700,
-            background: activeTab === "wearableAudit" ? "#854D0E" : "rgba(245, 158, 11, 0.12)",
-            color: activeTab === "wearableAudit" ? "#FFFFFF" : "#B45309",
-            borderColor: activeTab === "wearableAudit" ? "#B8860B" : "rgba(245, 158, 11, 0.35)",
-            boxShadow: activeTab === "wearableAudit" ? "0 2px 8px rgba(184, 134, 11, 0.25)" : "none",
+            fontWeight: activeTab === "wearableAudit" ? 800 : 600,
+            background: activeTab === "wearableAudit" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "wearableAudit" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "wearableAudit" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "wearableAudit" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
           }}
         >
-          📿 देह-आभूषण व धागा ऑडिटर (Wearable Audit)
+          📿 देह-आभूषण व धागा ऑडिटर
         </button>
         <button
           className={`tab ${activeTab === "conflicts" ? "active" : ""}`}
           onClick={() => setActiveTab("conflicts")}
-          style={genericVastuConflicts.length > 0 ? { color: "#b91c1c", fontWeight: 700 } : {}}
+          style={{
+            fontWeight: activeTab === "conflicts" ? 800 : 600,
+            background: activeTab === "conflicts" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "conflicts" ? "#FFFFFF" : (genericVastuConflicts.length > 0 ? "#DC2626" : "#78350F"),
+            borderColor: activeTab === "conflicts" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "conflicts" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
+          }}
         >
           🛑 जेनेरिक वास्तु विरोध ({genericVastuConflicts.length})
         </button>
@@ -1072,10 +1164,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           className={`tab ${activeTab === "lifestyle" ? "active" : ""}`}
           onClick={() => setActiveTab("lifestyle")}
           style={{
-            color: activeTab === "lifestyle" ? "#B8860B" : "#854D0E",
-            fontWeight: 700,
-            background: activeTab === "lifestyle" ? "#FAF5EB" : "rgba(217, 119, 6, 0.08)",
-            border: "1px solid rgba(217, 119, 6, 0.3)",
+            fontWeight: activeTab === "lifestyle" ? 800 : 600,
+            background: activeTab === "lifestyle" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "lifestyle" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "lifestyle" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "lifestyle" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
           }}
         >
           🎯 विशेष रहस्य व दिशाएं (1, 2, 5, 6)
@@ -1084,24 +1177,24 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           className={`tab ${activeTab === "mandala" ? "active" : ""}`}
           onClick={() => setActiveTab("mandala")}
           style={{
-            fontWeight: 700,
-            background: activeTab === "mandala" ? "#92400E" : "rgba(245, 158, 11, 0.15)",
-            color: activeTab === "mandala" ? "#FFFFFF" : "#B45309",
-            borderColor: activeTab === "mandala" ? "#B8860B" : "rgba(245, 158, 11, 0.4)",
-            boxShadow: activeTab === "mandala" ? "0 2px 8px rgba(180, 83, 9, 0.25)" : "none",
+            fontWeight: activeTab === "mandala" ? 800 : 600,
+            background: activeTab === "mandala" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "mandala" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "mandala" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "mandala" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
           }}
         >
-          🏛️ 45 देवता व 32 द्वार (Mandala & Entrances)
+          🏛️ 45 देवता व 32 द्वार (Mandala)
         </button>
         <button
           className={`tab ${activeTab === "barChart" ? "active" : ""}`}
           onClick={() => setActiveTab("barChart")}
           style={{
-            fontWeight: 700,
-            background: activeTab === "barChart" ? "#0F766E" : "rgba(20, 184, 166, 0.12)",
-            color: activeTab === "barChart" ? "#FFFFFF" : "#0D9488",
-            borderColor: activeTab === "barChart" ? "#0D9488" : "rgba(20, 184, 166, 0.4)",
-            boxShadow: activeTab === "barChart" ? "0 2px 8px rgba(13, 148, 136, 0.25)" : "none",
+            fontWeight: activeTab === "barChart" ? 800 : 600,
+            background: activeTab === "barChart" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "barChart" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "barChart" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "barChart" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
           }}
         >
           ⚖️ बार चार्ट 5-तत्व व भोग (Bar Chart Balancer)
@@ -1117,12 +1210,12 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           <div
             className="vastu-executive-banner"
             style={{
-              background: "linear-gradient(135deg, #1C1917 0%, #0F0E0D 100%)",
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
               color: "#FFFFFF",
-              border: "2px solid rgba(212, 175, 55, 0.65)",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
               borderRadius: 18,
               padding: "24px 26px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
@@ -1163,10 +1256,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                   {nativeName ? `${nativeName} जी का ` : ""}मास्टर फील्ड ऑडिट डॉसियर
                 </div>
                 <p
+                  className="vastu-banner-subtitle"
                   style={{
                     margin: 0,
                     fontSize: 14.5,
-                    color: "#F5F5F4",
+                    color: "#FEF3C7",
                     lineHeight: 1.65,
                     fontWeight: 500,
                   }}
@@ -1191,10 +1285,10 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                 <div
                   style={{
-                    background: "#0C0A09",
+                    background: "rgba(36, 22, 10, 0.85)",
                     padding: "10px 16px",
                     borderRadius: 12,
-                    border: "1.5px solid rgba(212, 175, 55, 0.6)",
+                    border: "1.5px solid rgba(212, 175, 55, 0.75)",
                     boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
                   }}
                 >
@@ -1207,10 +1301,10 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 </div>
                 <div
                   style={{
-                    background: "#0C0A09",
+                    background: "rgba(36, 22, 10, 0.85)",
                     padding: "10px 16px",
                     borderRadius: 12,
-                    border: "1.5px solid rgba(147, 197, 253, 0.6)",
+                    border: "1.5px solid rgba(212, 175, 55, 0.75)",
                     boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
                   }}
                 >
@@ -1226,74 +1320,86 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           </div>
 
           {/* ── EXECUTIVE DIRECT LINK: DAILY ACCESSORIES & MODERN WEARABLES ── */}
-          {astroPrescription?.accessories && (
-            <div
-              className="card"
-              style={{
-                borderLeft: "6px solid #1E3A8A",
-                background: "linear-gradient(135deg, #EFF6FF, #F8FAFC)",
-                padding: 18,
-                borderRadius: 14,
-                boxShadow: "0 2px 10px rgba(30, 58, 138, 0.08)",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 22 }}>📱</span>
-                    <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1E3A8A" }}>
-                      दैनिक गैजेट व वेशभूषा वास्तु (Daily Tech & Wearables Bio-Armor)
-                    </h4>
-                    <span style={{ fontSize: 11, background: "#DBEAFE", color: "#1E40AF", padding: "2px 8px", borderRadius: 10, fontWeight: 700 }}>
-                      5 उपादान सक्रिय
-                    </span>
+          {(() => {
+            const accData =
+              astroPrescription?.accessories ||
+              evaluateDailyAccessories(
+                resolvedChart,
+                astroPrescription?.activeSalt?.planet || "Mercury",
+                astroPrescription?.protonPumpInhibitor?.planet || "Jupiter",
+                astroPrescription?.chromaticModulation
+              );
+            if (!accData) return null;
+            return (
+              <div
+                className="card"
+                style={{
+                  borderLeft: "6px solid #D97706",
+                  background: "linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)",
+                  padding: 18,
+                  borderRadius: 14,
+                  boxShadow: "0 4px 14px rgba(180, 83, 9, 0.12)",
+                  border: "1px solid rgba(217, 119, 6, 0.3)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 22 }}>📱</span>
+                      <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#78350F" }}>
+                        दैनिक गैजेट व वेशभूषा वास्तु (Daily Tech & Wearables Bio-Armor)
+                      </h4>
+                      <span style={{ fontSize: 11, background: "#FEF08A", color: "#78350F", padding: "2px 8px", borderRadius: 10, fontWeight: 800, border: "1px solid #F59E0B" }}>
+                        5 उपादान सक्रिय
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: "#92400E", marginTop: 4 }}>
+                      फोन कवर (3rd House), जूते (12th House), टोपी (1st & 10th), बेल्ट (7th House) व मास्क (2nd House)
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12.5, color: "#475569", marginTop: 4 }}>
-                    फोन कवर (3rd House), जूते (12th House), टोपी (1st & 10th), बेल्ट (7th House) व मास्क (2nd House)
-                  </div>
+                  <button
+                    onClick={() => setActiveTab("accessories")}
+                    style={{
+                      background: "linear-gradient(135deg, #78350F 0%, #92400E 100%)",
+                      color: "#FFFFFF",
+                      border: "1.5px solid #D97706",
+                      borderRadius: 8,
+                      padding: "8px 16px",
+                      fontWeight: 800,
+                      fontSize: 12.5,
+                      cursor: "pointer",
+                      boxShadow: "0 2px 6px rgba(120, 53, 15, 0.3)",
+                    }}
+                  >
+                    👉 संपूर्ण एक्सेसरीज़ निर्देश देखें
+                  </button>
                 </div>
-                <button
-                  onClick={() => setActiveTab("accessories")}
-                  style={{
-                    background: "#1E3A8A",
-                    color: "#FFFFFF",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "8px 16px",
-                    fontWeight: 700,
-                    fontSize: 12.5,
-                    cursor: "pointer",
-                    boxShadow: "0 2px 6px rgba(30, 58, 138, 0.25)",
-                  }}
-                >
-                  👉 संपूर्ण एक्सेसरीज़ निर्देश देखें
-                </button>
-              </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8, marginTop: 12 }}>
-                <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#1E40AF" }}>📱 फोन कवर (3rd H)</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A", marginTop: 2 }}>{astroPrescription.accessories.phoneCover.recommendedColors[0]}</div>
-                </div>
-                <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#6D28D9" }}>👟 जूते (12th H)</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A", marginTop: 2 }}>{astroPrescription.accessories.footwear.recommendedColors[0]}</div>
-                </div>
-                <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#B45309" }}>🧢 टोपी (1st & 10th)</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A", marginTop: 2 }}>{astroPrescription.accessories.headwearCap.recommendedColors[0]}</div>
-                </div>
-                <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#047857" }}>🥋 कमर बेल्ट (7th H)</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A", marginTop: 2 }}>{astroPrescription.accessories.belt.recommendedColors[0]}</div>
-                </div>
-                <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#0369A1" }}>😷 फेस मास्क (2nd H)</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A", marginTop: 2 }}>{astroPrescription.accessories.faceMask.recommendedColors[0]}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8, marginTop: 12 }}>
+                  <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>📱 फोन कवर (3rd H)</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.phoneCover.recommendedColors[0]}</div>
+                  </div>
+                  <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>👟 जूते (12th H)</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.footwear.recommendedColors[0]}</div>
+                  </div>
+                  <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>🧢 टोपी (1st & 10th)</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.headwearCap.recommendedColors[0]}</div>
+                  </div>
+                  <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>🥋 कमर बेल्ट (7th H)</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.belt.recommendedColors[0]}</div>
+                  </div>
+                  <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>😷 फेस मास्क (2nd H)</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.faceMask.recommendedColors[0]}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── SECTION 2: 📊 ग्रह स्थिति एवं कम्पाउंड डिग्रियां (Compound Degree Master Table) ── */}
           <div className="card" style={{ padding: 24 }}>
@@ -2018,17 +2124,62 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "radar" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div
+            className="vastu-royal-banner"
+            style={{
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
+              borderRadius: 18,
+              padding: "20px 24px",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <span
+                  style={{
+                    display: "inline-block",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: 1.2,
+                    textTransform: "uppercase",
+                    color: "#78350F",
+                    background: "#FEF08A",
+                    padding: "3px 10px",
+                    borderRadius: 14,
+                    border: "1.5px solid #F59E0B",
+                    marginBottom: 6,
+                  }}
+                >
+                  Astro-Vastu Direction Grid
+                </span>
+                <h3
+                  className="vastu-banner-title"
+                  style={{
+                    margin: 0,
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                    fontFamily: "Cormorant Garamond, serif",
+                  }}
+                >
+                  🧭 12 राशियों का एस्ट्रो-वास्तु दिशा चक्र (Direction Radar)
+                </h3>
+              </div>
+              <span className="vastu-banner-subtitle" style={{ fontSize: 13.5, color: "#FEF3C7", fontWeight: 600 }}>
+                किसी भी दिशा पर क्लिक करके वहां के ग्रह व सामान देखें
+              </span>
+            </div>
+          </div>
+
           <div className="card" style={{ padding: 22 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div>
-                <span className="card-tag">Astro-Vastu Direction Grid</span>
-                <h3 className="card-title" style={{ margin: 0 }}>
-                  12 राशियों का एस्ट्रो-वास्तु दिशा चक्र (Direction Radar)
-                </h3>
+                <h4 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#1A1A1A" }}>
+                  12-दिशा इंटरेक्टिव कम्पास ग्रिड
+                </h4>
               </div>
-              <span style={{ fontSize: 13, color: "#6B635B" }}>
-                किसी भी दिशा पर क्लिक करके वहां के ग्रह व सामान देखें
-              </span>
             </div>
 
             {/* Visual Direction Grid */}
@@ -2202,43 +2353,64 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Prescription Master Header */}
           <div
-            className="card"
+            className="vastu-royal-banner"
             style={{
-              background: "linear-gradient(135deg, #064E3B 0%, #065F46 100%)",
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
               color: "#FFFFFF",
               padding: 24,
-              borderRadius: 16,
-              boxShadow: "0 8px 24px rgba(6, 78, 59, 0.25)",
-              border: "1px solid rgba(52, 211, 153, 0.3)",
+              borderRadius: 18,
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                   <span style={{ fontSize: 24 }}>💊</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", background: "rgba(255,255,255,0.2)", padding: "2px 8px", borderRadius: 6 }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: 1.2,
+                      textTransform: "uppercase",
+                      background: "#FEF08A",
+                      color: "#78350F",
+                      padding: "3px 10px",
+                      borderRadius: 14,
+                      border: "1.5px solid #F59E0B",
+                    }}
+                  >
                     Rx MASTER PRESCRIPTION
                   </span>
                 </div>
-                <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#FFFFFF" }}>
+                <h2
+                  className="vastu-banner-title"
+                  style={{
+                    margin: 0,
+                    fontSize: 24,
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                    fontFamily: "Cormorant Garamond, serif",
+                  }}
+                >
                   {astroPrescription.title} — {astroPrescription.nativeName}
                 </h2>
-                <p style={{ margin: "6px 0 0 0", fontSize: 13.5, color: "#A7F3D0" }}>
+                <p className="vastu-banner-subtitle" style={{ margin: "6px 0 0 0", fontSize: 14, color: "#FEF3C7", lineHeight: 1.5 }}>
                   {astroPrescription.formulaSubtitle}
                 </p>
               </div>
               <div
                 style={{
-                  background: "rgba(0,0,0,0.25)",
+                  background: "rgba(36, 22, 10, 0.8)",
                   padding: "10px 16px",
-                  borderRadius: 10,
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: 12,
+                  border: "1.5px solid rgba(212, 175, 55, 0.5)",
                   fontSize: 12,
-                  color: "#E2E8F0",
+                  color: "#FEF3C7",
                   maxWidth: 360,
                 }}
               >
-                <div style={{ fontWeight: 700, color: "#34D399", marginBottom: 2 }}>⚡ फ्रिक्शन डायग्नोसिस:</div>
+                <div style={{ fontWeight: 800, color: "#FEF08A", marginBottom: 2 }}>⚡ फ्रिक्शन डायग्नोसिस:</div>
                 {astroPrescription.frictionDiagnosisSummary}
               </div>
             </div>
@@ -2687,6 +2859,54 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "trafficPolice" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div
+            className="vastu-royal-banner"
+            style={{
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
+              borderRadius: 18,
+              padding: "20px 24px",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <span
+                  style={{
+                    display: "inline-block",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: 1.2,
+                    textTransform: "uppercase",
+                    color: "#78350F",
+                    background: "#FEF08A",
+                    padding: "3px 10px",
+                    borderRadius: 14,
+                    border: "1.5px solid #F59E0B",
+                    marginBottom: 6,
+                  }}
+                >
+                  Dynamic Orb Radar
+                </span>
+                <h3
+                  className="vastu-banner-title"
+                  style={{
+                    margin: 0,
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                    fontFamily: "Cormorant Garamond, serif",
+                  }}
+                >
+                  ⚡ कॉस्मिक फ्रिक्शन रडार / ऊर्जा गतिरोध ({trafficPoliceBlockades.length})
+                </h3>
+              </div>
+              <span className="vastu-banner-subtitle" style={{ fontSize: 13.5, color: "#FEF3C7", fontWeight: 600 }}>
+                दशा स्वामी पर 90° व 180° के खगोलीय गतिरोधों का रीयल-टाइम स्कैन
+              </span>
+            </div>
+          </div>
           {trafficPoliceBlockades.length === 0 ? (
             <div
               className="card"
@@ -2804,6 +3024,54 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "hits" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div
+            className="vastu-royal-banner"
+            style={{
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
+              borderRadius: 18,
+              padding: "20px 24px",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <span
+                  style={{
+                    display: "inline-block",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: 1.2,
+                    textTransform: "uppercase",
+                    color: "#78350F",
+                    background: "#FEF08A",
+                    padding: "3px 10px",
+                    borderRadius: 14,
+                    border: "1.5px solid #F59E0B",
+                    marginBottom: 6,
+                  }}
+                >
+                  Orb Aspect Matrix
+                </span>
+                <h3
+                  className="vastu-banner-title"
+                  style={{
+                    margin: 0,
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                    fontFamily: "Cormorant Garamond, serif",
+                  }}
+                >
+                  ⚡ सभी खगोलीय हिट्स एवं दृष्टि संबंध ({allHits.length})
+                </h3>
+              </div>
+              <span className="vastu-banner-subtitle" style={{ fontSize: 13.5, color: "#FEF3C7", fontWeight: 600 }}>
+                180° किलर, 90° घातक, 45° खराबी, 60° सहायक व 120° रक्षक कोण
+              </span>
+            </div>
+          </div>
           {/* Hit Filter Pills */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#6B635B", textTransform: "uppercase" }}>फ़िल्टर:</span>
@@ -2903,12 +3171,47 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "shifting" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FDFBF7, #FAF5EB)" }}>
-            <span className="card-tag">Astro-Vastu Shifting Formula</span>
-            <h3 className="card-title" style={{ margin: "4px 0 8px 0" }}>
+          <div
+            className="vastu-royal-banner"
+            style={{
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
+              borderRadius: 18,
+              padding: "20px 24px",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: "#78350F",
+                background: "#FEF08A",
+                padding: "3px 10px",
+                borderRadius: 14,
+                border: "1.5px solid #F59E0B",
+                marginBottom: 6,
+              }}
+            >
+              Astro-Vastu Shifting Formula
+            </span>
+            <h3
+              className="vastu-banner-title"
+              style={{
+                margin: "4px 0 8px 0",
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                fontFamily: "Cormorant Garamond, serif",
+              }}
+            >
               180° किलर हिट को 120° रक्षक ढाल में बदलना (Protective 120° Shifting)
             </h3>
-            <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.65, margin: 0 }}>
+            <p className="vastu-banner-subtitle" style={{ fontSize: 13.5, color: "#FEF3C7", lineHeight: 1.65, margin: 0 }}>
               एस्ट्रो-वास्तु का मूल सूत्र: <em>&quot;जब कोई ग्रह किसी भाव या लग्न को 180° से मार रहा हो, तो उसे मिटाने की बजाय 120° त्रिकोण स्थान पर शिफ्ट कर दें। जो ग्रह मार रहा था, वही सबसे बड़ा रक्षक और भाग्यवर्धक बन जाता है।&quot;</em>
             </p>
           </div>
@@ -3046,12 +3349,47 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "bodyTherapy" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FDFBF7, #FAF5EB)", border: "1px solid rgba(184, 134, 11, 0.25)" }}>
-            <span className="card-tag" style={{ color: "#854D0E" }}>Somatic Astro-Vastu Bio-Magnetic Protocol</span>
-            <h3 className="card-title" style={{ margin: "4px 0 8px 0", color: "#1A1A1A" }}>
+          <div
+            className="vastu-royal-banner"
+            style={{
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
+              borderRadius: 18,
+              padding: "20px 24px",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: "#78350F",
+                background: "#FEF08A",
+                padding: "3px 10px",
+                borderRadius: 14,
+                border: "1.5px solid #F59E0B",
+                marginBottom: 6,
+              }}
+            >
+              Somatic Astro-Vastu Bio-Magnetic Protocol
+            </span>
+            <h3
+              className="vastu-banner-title"
+              style={{
+                margin: "4px 0 8px 0",
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                fontFamily: "Cormorant Garamond, serif",
+              }}
+            >
               🧘 12 राशि मानव शरीर अंग एवं डॉट / धागा चिकित्सा (Body-Part Dot Therapy)
             </h3>
-            <p style={{ fontSize: 13.5, color: "#4A4238", lineHeight: 1.65, margin: 0 }}>
+            <p className="vastu-banner-subtitle" style={{ fontSize: 13.5, color: "#FEF3C7", lineHeight: 1.65, margin: 0 }}>
               कालपुरुष सिद्धांत के अनुसार, 12 राशियां सीधे हमारे शरीर के 12 प्रमुख अंगों को नियंत्रित करती हैं। जब किराए के मकान या फ्लैट में तुरंत सामान शिफ्ट करना संभव न हो, तो शरीर के संबंधित अंग पर विशेष प्राकृतिक द्रव्य (शुद्ध कुमकुम, केसर, सफेद चंदन, देशी घी, काजल) की बिंदी (Dot) या धागा बांधकर आंतरिक विद्युत-चुंबकीय प्रवाह को तत्काल सुरक्षा कवच में बदला जाता है।
             </p>
           </div>
@@ -3184,14 +3522,47 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "conflicts" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FEF2F2, #FFF7ED)" }}>
-            <span className="card-tag" style={{ color: "#DC2626" }}>
+          <div
+            className="vastu-royal-banner"
+            style={{
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
+              borderRadius: 18,
+              padding: "20px 24px",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: "#78350F",
+                background: "#FEF08A",
+                padding: "3px 10px",
+                borderRadius: 14,
+                border: "1.5px solid #F59E0B",
+                marginBottom: 6,
+              }}
+            >
               Critical Astro-Vastu Rule Alert
             </span>
-            <h3 className="card-title" style={{ margin: "4px 0 8px 0", color: "#991B1B" }}>
+            <h3
+              className="vastu-banner-title"
+              style={{
+                margin: "4px 0 8px 0",
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                fontFamily: "Cormorant Garamond, serif",
+              }}
+            >
               🛑 जेनेरिक महावास्तु विरुद्ध व्यक्तिगत कुंडली का टकराव
             </h3>
-            <p style={{ fontSize: 13.5, color: "#7F1D1D", lineHeight: 1.65, margin: 0 }}>
+            <p className="vastu-banner-subtitle" style={{ fontSize: 13.5, color: "#FEF3C7", lineHeight: 1.65, margin: 0 }}>
               व्यावसायिक जेनेरिक वास्तु में कुछ दिशाओं (जैसे SSW / WNW) को केवल &quot;डिस्पोज़ल / टॉयलेट&quot; बता दिया जाता है। लेकिन यदि जातक की कुंडली में वही राशि लग्न (शरीर/स्वास्थ्य) या दशम भाव (आजीविका/करियर) बन रही हो, तो वहां टॉयलेट बनाने से जातक का जीवन और करियर बह (Disposal) जाता है!
             </p>
           </div>
@@ -3280,28 +3651,61 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "lifestyle" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div className="card" style={{ padding: 20, background: "linear-gradient(135deg, #FEFCE8, #FFFBEB)", border: "1px solid rgba(217, 119, 6, 0.3)" }}>
-            <span className="card-tag" style={{ color: "#B45309" }}>
+          <div
+            className="vastu-royal-banner"
+            style={{
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+              color: "#FFFFFF",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
+              borderRadius: 18,
+              padding: "20px 24px",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: "#78350F",
+                background: "#FEF08A",
+                padding: "3px 10px",
+                borderRadius: 14,
+                border: "1.5px solid #F59E0B",
+                marginBottom: 6,
+              }}
+            >
               Integrated Astro-Vastu Architectural Axioms
             </span>
-            <h3 className="card-title" style={{ margin: "4px 0 8px 0", color: "#78350F" }}>
+            <h3
+              className="vastu-banner-title"
+              style={{
+                margin: "4px 0 8px 0",
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                fontFamily: "Cormorant Garamond, serif",
+              }}
+            >
               🎯 एस्ट्रो-वास्तु के 4 विशेष गुप्त व्यावहारिक सूत्र (Secrets 1, 2, 5, 6 का संपूर्ण समन्वय)
             </h3>
-            <p style={{ fontSize: 13.5, color: "#92400E", lineHeight: 1.65, margin: 0 }}>
+            <p className="vastu-banner-subtitle" style={{ fontSize: 13.5, color: "#FEF3C7", lineHeight: 1.65, margin: 0 }}>
               ये 4 सूत्र किताबी वास्तु में कहीं नहीं मिलते। यह कोई अलग परिशिष्ट नहीं हैं, बल्कि आपकी कुंडली के प्रत्येक अनुभाग में पूरी तरह से गहराई से एकीकृत (Deeply Integrated) हैं:
             </p>
             <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 8 }}>
-              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.2)", fontSize: 12, color: "#78350F" }}>
-                <strong>सूत्र 1</strong> ➔ 120° शिफ्टिंग (पारिवारिक क्रॉस-हिट से सुरक्षा)
+              <div style={{ background: "rgba(36, 22, 10, 0.85)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.4)", fontSize: 12, color: "#FEF3C7" }}>
+                <strong style={{ color: "#FEF08A" }}>सूत्र 1</strong> ➔ 120° शिफ्टिंग (पारिवारिक क्रॉस-हिट से सुरक्षा)
               </div>
-              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(220, 38, 38, 0.2)", fontSize: 12, color: "#991B1B" }}>
-                <strong>सूत्र 2</strong> ➔ कलाई धागा ट्रैप (मिथुन 6/8/12 दुस्थान नियम)
+              <div style={{ background: "rgba(36, 22, 10, 0.85)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.4)", fontSize: 12, color: "#FEF3C7" }}>
+                <strong style={{ color: "#FEF08A" }}>सूत्र 2</strong> ➔ कलाई धागा ट्रैप (मिथुन 6/8/12 दुस्थान नियम)
               </div>
-              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(234, 88, 12, 0.2)", fontSize: 12, color: "#C2410C" }}>
-                <strong>सूत्र 5</strong> ➔ मंगल उग्रता, मसूर दाल त्याग व नाभि उपचार
+              <div style={{ background: "rgba(36, 22, 10, 0.85)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.4)", fontSize: 12, color: "#FEF3C7" }}>
+                <strong style={{ color: "#FEF08A" }}>सूत्र 5</strong> ➔ मंगल उग्रता, मसूर दाल त्याग व नाभि उपचार
               </div>
-              <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(37, 99, 235, 0.2)", fontSize: 12, color: "#1D4ED8" }}>
-                <strong>सूत्र 6</strong> ➔ 4th, 9th, 10th भाव स्टडी व वर्क दिशा
+              <div style={{ background: "rgba(36, 22, 10, 0.85)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.4)", fontSize: 12, color: "#FEF3C7" }}>
+                <strong style={{ color: "#FEF08A" }}>सूत्र 6</strong> ➔ 4th, 9th, 10th भाव स्टडी व वर्क दिशा
               </div>
             </div>
           </div>
@@ -3549,11 +3953,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             className="vastu-mandala-banner"
             style={{
               padding: 24,
-              background: "linear-gradient(135deg, #1C1917 0%, #171412 100%)",
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
               color: "#FFFFFF",
-              border: "2px solid rgba(212, 175, 55, 0.65)",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
               borderRadius: 18,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
@@ -3589,7 +3993,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 >
                   🏛️ 45 देवता वास्तु पुरुष मंडल एवं 32 मुख्य प्रवेश द्वार
                 </div>
-                <div style={{ fontSize: 14, color: "#F5F5F4", lineHeight: 1.6, fontWeight: 500 }}>
+                <div className="vastu-banner-subtitle" style={{ fontSize: 14, color: "#FEF3C7", lineHeight: 1.6, fontWeight: 500 }}>
                   33 कोटि (प्रकार) के देवगण + 12 असुर शक्तियां · ब्रह्मस्थान (नाभि) से संपूर्ण ऊर्जा का संचार · जन्मकुंडली भाव संरेखण
                 </div>
               </div>
@@ -3957,11 +4361,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             className="vastu-barchart-banner"
             style={{
               padding: 24,
-              background: "linear-gradient(135deg, #042F2E 0%, #064E3B 100%)",
+              background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
               color: "#FFFFFF",
-              border: "2px solid rgba(20, 184, 166, 0.65)",
+              border: "2px solid rgba(212, 175, 55, 0.85)",
               borderRadius: 18,
-              boxShadow: "0 10px 30px rgba(4, 47, 46, 0.35)",
+              boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
             }}
           >
             <span
@@ -3971,11 +4375,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 fontWeight: 800,
                 letterSpacing: 1.2,
                 textTransform: "uppercase",
-                color: "#042F2E",
-                background: "#CCFBF1",
+                color: "#78350F",
+                background: "#FEF08A",
                 padding: "4px 12px",
                 borderRadius: 20,
-                border: "1.5px solid #0D9488",
+                border: "1.5px solid #F59E0B",
               }}
             >
               Shilpa Shastra Bar-Chart Harmonizer
@@ -3995,8 +4399,8 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             >
               ⚖️ बार चार्ट पंचतत्व संतुलन एवं 45 देवता भोग प्रिस्क्रिप्शन
             </div>
-            <div style={{ fontSize: 14, color: "#F0FDFA", lineHeight: 1.6, fontWeight: 500 }}>
-              <strong style={{ color: "#FEF08A" }}>शास्त्रीय सूत्र:</strong> यदि ज़ोन कम है ➔ <em style={{ color: "#A7F3D0", fontWeight: 700 }}>"पीछे वाला आगे लाएं"</em> (Parent feeds Child) | यदि ज़ोन बढ़ा है ➔ <em style={{ color: "#A7F3D0", fontWeight: 700 }}>"आगे वाला पीछे लाएं"</em> (Child exhausts Parent)
+            <div className="vastu-banner-subtitle" style={{ fontSize: 14, color: "#FEF3C7", lineHeight: 1.6, fontWeight: 500 }}>
+              <strong style={{ color: "#FEF08A" }}>शास्त्रीय सूत्र:</strong> यदि ज़ोन कम है ➔ <em style={{ color: "#FEF08A", fontWeight: 700 }}>"पीछे वाला आगे लाएं"</em> (Parent feeds Child) | यदि ज़ोन बढ़ा है ➔ <em style={{ color: "#FEF08A", fontWeight: 700 }}>"आगे वाला पीछे लाएं"</em> (Child exhausts Parent)
             </div>
           </div>
 

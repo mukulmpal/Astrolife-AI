@@ -58,13 +58,14 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
       <div
         className="card"
         style={{
-          background: "linear-gradient(135deg, #1C1917 0%, #2E251E 50%, #1C1917 100%)",
-          color: "#FAF7F2",
-          border: "1px solid rgba(212, 175, 55, 0.45)",
+          background: "linear-gradient(135deg, #24160A 0%, #382410 50%, #1A1006 100%)",
+          color: "#FFFFFF",
+          border: "2px solid rgba(212, 175, 55, 0.85)",
           borderRadius: 18,
           padding: "20px 24px",
           position: "relative",
           overflow: "hidden",
+          boxShadow: "0 10px 30px rgba(36, 22, 10, 0.45)",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
@@ -72,22 +73,22 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
             <span
               style={{
                 fontSize: 11,
-                fontWeight: 700,
+                fontWeight: 800,
                 letterSpacing: 1.5,
                 textTransform: "uppercase",
-                color: "#FDE047",
-                background: "rgba(253, 224, 71, 0.15)",
+                color: "#78350F",
+                background: "#FEF08A",
                 padding: "3px 10px",
                 borderRadius: 14,
-                border: "1px solid rgba(253, 224, 71, 0.35)",
+                border: "1.5px solid #F59E0B",
               }}
             >
               Bio-Magnetic Wearable & Thread Audit · 100% Dynamic
             </span>
-            <h2 style={{ fontSize: 24, fontWeight: 800, margin: "8px 0 4px 0", color: "#FFFFFF" }}>
+            <h2 style={{ fontSize: 24, fontWeight: 800, margin: "8px 0 4px 0", color: "#FFFFFF", fontFamily: "Cormorant Garamond, serif", textShadow: "0 2px 6px rgba(0,0,0,0.8)" }}>
               📿 देह-आभूषण, धातु, रत्न व धागा ऑडिटर
             </h2>
-            <p style={{ margin: 0, fontSize: 13.5, color: "#D6D3D1", maxWidth: 740, lineHeight: 1.55 }}>
+            <p style={{ margin: 0, fontSize: 13.5, color: "#FEF3C7", maxWidth: 740, lineHeight: 1.55 }}>
               आपने शरीर के किस अंग पर कौन सी धातु, रत्न, कड़ा, धागा या करधनी बांध रखी है? आपकी कुंडली के भावों, सक्रिय महादशा ({auditReport.activeMahadasha}) और 180° किलर आघातों के आधार पर लाइव डायग्नोसिस।
             </p>
           </div>
