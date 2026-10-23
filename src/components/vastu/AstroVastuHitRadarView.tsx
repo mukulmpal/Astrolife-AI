@@ -17,6 +17,7 @@ import {
   type NativeDevataMapping,
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
 import { BioWearableAuditView } from "./BioWearableAuditView";
+// Force rebuild after UI fixes
 import { evaluateDailyAccessories } from "@/lib/astro-engine/astro-prescription-engine";
 
 const DEMO_VASTU_FALLBACK: BirthDetails = {
