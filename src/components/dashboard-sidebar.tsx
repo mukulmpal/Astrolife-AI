@@ -20,7 +20,7 @@ import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
 import { useUserTier } from "@/context/ChartContext";
 
-type NavItem = { label: string; href: string; Icon: LucideIcon };
+type NavItem = { label: string; href: string; Icon: LucideIcon; badge?: string };
 type NavGroup = { label: string; items: NavItem[] };
 
 /**
@@ -81,7 +81,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem },
       { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf },
       { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen },
-      { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon },
+      { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon, badge: "PRO" },
       { label: "Astro Sound", href: "/dashboard/astro-sound", Icon: Music },
     ],
   },
@@ -152,7 +152,7 @@ export function DashboardSidebar() {
         {NAV_GROUPS.map((group) => (
           <div key={group.label} className="dash-nav-section">
             <div className="dash-nav-label" aria-hidden="true">{group.label}</div>
-            {group.items.map(({ label, href, Icon }) => (
+            {group.items.map(({ label, href, Icon, badge }) => (
               <Link
                 key={href}
                 href={href}
@@ -161,7 +161,24 @@ export function DashboardSidebar() {
                 aria-current={pathname === href ? "page" : undefined}
               >
                 <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
-                <span>{label}</span>
+                <span style={{ flex: 1 }}>{label}</span>
+                {badge && (
+                  <span
+                    style={{
+                      fontSize: "9px",
+                      fontWeight: 700,
+                      letterSpacing: "0.5px",
+                      padding: "1px 5px",
+                      borderRadius: "4px",
+                      background: "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))",
+                      color: "#c8a030",
+                      border: "1px solid rgba(200, 160, 48, 0.35)",
+                      lineHeight: "1.3",
+                    }}
+                  >
+                    {badge}
+                  </span>
+                )}
               </Link>
             ))}
           </div>

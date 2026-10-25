@@ -7,9 +7,10 @@ import { useUserTier } from "@/context/ChartContext";
 type PremiumFeatureProps = {
   children: React.ReactNode;
   feature: string;
+  enforceLock?: boolean;
 };
 
-export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
+export function PremiumFeature({ children, feature, enforceLock }: PremiumFeatureProps) {
   const { userTier } = useUserTier();
   const fullAccess = isFullAccessEnabled();
 
@@ -17,7 +18,7 @@ export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
     return <>{children}</>;
   }
 
-  const enforced = isBillingEnforced();
+  const enforced = enforceLock ?? isBillingEnforced();
   const isPremium = userTier !== "free";
   const isLocked = enforced && !isPremium;
   const planLabel = userTier.toUpperCase();
@@ -41,30 +42,31 @@ export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
         .premium-gate.locked .premium-gate-badge{background:rgba(239,68,68,0.14);color:#fca5a5;border:1px solid rgba(239,68,68,0.25)}
         .premium-gate.locked .premium-gate-cta{background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2}
         .premium-feature-shell{position:relative}
-        .premium-feature-shell.locked .premium-feature-content{filter:blur(6px);opacity:0.45;pointer-events:none;user-select:none}
-        .premium-feature-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px}
-        .premium-feature-card{max-width:360px;text-align:center;background:rgba(6,4,16,0.92);border:1px solid rgba(200,160,48,0.2);border-radius:18px;padding:20px}
-        .premium-feature-card-title{font-family:"Cormorant Garamond",serif;font-size:24px;color:#1A1A1A;margin-bottom:8px}
-        .premium-feature-card-text{font-size:13px;color:#4A4238;line-height:1.7;margin-bottom:14px}
-        .premium-feature-card-cta{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;text-decoration:none;font-size:12px;font-weight:600}
+        .premium-feature-shell.locked .premium-feature-content{filter:blur(8px);opacity:0.35;pointer-events:none;user-select:none}
+        .premium-feature-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:20}
+        .premium-feature-card{max-width:420px;text-align:center;background:rgba(18,12,6,0.96);border:1.5px solid rgba(212,175,55,0.45);border-radius:20px;padding:26px;box-shadow:0 12px 40px rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
+        .premium-feature-card-title{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:700;color:#FFFFFF;margin-bottom:8px}
+        .premium-feature-card-text{font-size:13px;color:#FEF3C7;line-height:1.65;margin-bottom:18px}
+        .premium-feature-card-cta{display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:12px;background:linear-gradient(135deg,#c8a030,#a07820);color:#FAF7F2;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 4px 15px rgba(200,160,48,0.35);transition:all 0.15s ease}
+        .premium-feature-card-cta:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,160,48,0.5)}
       `}</style>
 
       <div className={`premium-gate ${isPremium ? "unlocked" : isLocked ? "locked" : "soft"}`}>
         <div className="premium-gate-copy">
           <span className="premium-gate-badge">
-            {isPremium ? `${planLabel} Unlocked` : isLocked ? "Premium Locked" : "Testing Mode"}
+            {isPremium ? `${planLabel} Unlocked` : isLocked ? "🔒 Premium Locked" : "Testing Mode"}
           </span>
           <div className="premium-gate-title">{feature} is a premium engine.</div>
           <div className="premium-gate-sub">
             {isPremium
-              ? "Full access is active on your account."
+              ? "Full access is active on your account (प्रीमियम सक्रिय है)।"
               : isLocked
-                ? "Billing enforcement is on. Upgrade to continue using this feature."
+                ? "यह मॉड्यूल केवल प्रीमियम और एलीट सदस्यों के लिए उपलब्ध है। अनलॉक करने के लिए अपग्रेड करें।"
                 : "Billing enforcement is off, so this premium feature stays open for product testing."}
           </div>
         </div>
         <Link href="/dashboard/upgrade" className="premium-gate-cta">
-          {isPremium ? "Manage Plan" : "Upgrade"}
+          {isPremium ? "Manage Plan" : "Upgrade (अपग्रेड करें)"}
         </Link>
       </div>
 
@@ -73,11 +75,14 @@ export function PremiumFeature({ children, feature }: PremiumFeatureProps) {
         {isLocked && (
           <div className="premium-feature-overlay">
             <div className="premium-feature-card">
-              <div className="premium-feature-card-title">Premium Preview</div>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🔒</div>
+              <div className="premium-feature-card-title">{feature}</div>
               <div className="premium-feature-card-text">
-                {feature} will unlock fully after upgrade. Testing mode can be reopened by turning billing enforcement off.
+                यह एडवांस्ड एस्ट्रो-वास्तु हिट थ्योरी, 4-सेकंड जीपीएस नेविगेटर, प्लॉट ड्यूल-ग्रिड व सूक्ष्म वास्तु विश्लेषण केवल प्रीमियम व एलीट मेंबर्स के लिए उपलब्ध है।
               </div>
-              <Link href="/dashboard/upgrade" className="premium-feature-card-cta">Upgrade to Premium</Link>
+              <Link href="/dashboard/upgrade" className="premium-feature-card-cta">
+                ✦ Unlock with Premium (अपग्रेड करें)
+              </Link>
             </div>
           </div>
         )}

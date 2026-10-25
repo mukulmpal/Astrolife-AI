@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
+import { PremiumFeature } from "@/components/premium-feature";
 import { downloadVastuPDFReport } from "@/lib/report-generator";
 import { calculateVastu, type VastuResult as CompleteVastuResult } from "@/lib/astro-engine/vastu";
 import { useUserChart, buildChart, type BirthDetails } from "@/lib/user-chart";
@@ -803,8 +804,10 @@ export default function VastuDashboardPage() {
         </div>
       )}
 
-      {/* Mode switcher */}
-      <div className="tabs">
+      {/* Premium Gate Enforcement */}
+      <PremiumFeature feature="Astro-Vastu Shastra (Hit Theory & 16-Zones)" enforceLock>
+        {/* Mode switcher */}
+        <div className="tabs">
         <button
           className={`tab ${analysisMode === "hitRadar" ? "active" : ""}`}
           onClick={() => setAnalysisMode("hitRadar")}
@@ -1807,6 +1810,7 @@ export default function VastuDashboardPage() {
           )}
         </>
       )}
+      </PremiumFeature>
     </EngineShell>
   );
 }
