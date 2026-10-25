@@ -463,7 +463,7 @@ export const MEDICAL_RULE_REGISTRY: Record<string, MedicalRule> = {
     planets: ["Saturn", "Mars"],
     doshaAffinity: "Vata-Pitta",
     traditionalInterpretation:
-      "Saturn (knees, joints, cartilage degeneration) clashing with Mars (acute heat, friction, inflammation) is the classic transcript indicator for severe knee pain, bursitis, and mechanical joint wear.",
+      "Saturn (knees, joints, cartilage degeneration) clashing with Mars (acute heat, friction, inflammation) is the classical indicator for severe knee pain, bursitis, and mechanical joint wear.",
     clinicalGuidance:
       "Maintain healthy body weight, perform low-impact quad strengthening (swimming/cycling), and apply warm anti-inflammatory compresses.",
     severityWeight: 6,
@@ -501,7 +501,7 @@ export const MEDICAL_RULE_REGISTRY: Record<string, MedicalRule> = {
     planets: ["Moon", "Rahu"],
     doshaAffinity: "Vata",
     traditionalInterpretation:
-      "Moon (subconscious peace, emotional stability) shadowed by Rahu (illusions, panic, phobias, toxic imagination) creates severe psychosomatic dread, hypochondriac fear, and sleep disturbances in transcript analyses.",
+      "Moon (subconscious peace, emotional stability) shadowed by Rahu (illusions, panic, phobias, toxic imagination) creates severe psychosomatic dread, hypochondriac fear, and sleep disturbances in classical analyses.",
     clinicalGuidance:
       "Practice grounding breathwork (Anulom-Vilom), avoid scary or morbid media before bed, and consult a qualified therapist for panic or anxiety.",
     severityWeight: 6,

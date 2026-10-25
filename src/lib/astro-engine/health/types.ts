@@ -8,7 +8,7 @@
  * - Dasha timing & health vector activation
  * - Non-invasive, safe traditional remedies (Karmic Dana, Dinacharya, Mantras)
  * - Emergency safety guardrails & non-diagnostic boundaries
- * - Live transcript casebook reference structures
+ * - Classical clinical casebook reference structures
  * ============================================================================
  */
 

@@ -556,31 +556,6 @@ export function runAstroVastuHitEngine(
     return null;
   }
 
-  const lagnaSign =
-    chart.lagnaRashi ||
-    (chart as any).ascendant?.sign ||
-    (chart as any).lagna?.sign ||
-    (chart as any).ascendant ||
-    (chart as any).lagna ||
-    (typeof chart.lagnaNum === "number" && chart.lagnaNum >= 1 && chart.lagnaNum <= 12
-      ? RASHIS_ORDER[chart.lagnaNum - 1]
-      : "Virgo");
-
-  const lagnaSignNum = getSignNumber(lagnaSign, typeof chart.lagnaRashi === "string" ? chart.lagnaRashi : undefined);
-  const lagnaDegInSign = (chart.lagnaLon ?? 0) % 30;
-  const lagnaCompoundDeg = calculateCompoundDegree(lagnaSignNum, lagnaDegInSign);
-
-  // 1. Resolve Active Dasha Lords
-  let activeMD = chart.dashas?.find(d => {
-    const s = new Date(d.start), e = new Date(d.end);
-    return evaluationDate >= s && evaluationDate < e;
-  })?.planet || chart.dashas?.find(d => d.active)?.planet || "Mars";
-
-  let activeAD = chart.antardasha?.find(a => {
-    const s = new Date(a.start), e = new Date(a.end);
-    return evaluationDate >= s && evaluationDate < e;
-  })?.planet || chart.antardasha?.find(a => a.active)?.planet || activeMD;
-
   // Helper for resilient planet data access (handles titlecase, lowercase, or named objects)
   const getPlanetData = (p: string) => {
     if (!chart?.planets) return undefined;
@@ -594,6 +569,42 @@ export function runAstroVastuHitEngine(
     );
     return entry ? entry[1] : undefined;
   };
+
+  const resolveLagnaSign = (): string => {
+    if (typeof chart.lagnaRashi === "string" && chart.lagnaRashi.trim()) return chart.lagnaRashi.trim();
+    if (typeof (chart as any).ascendant?.sign === "string") return (chart as any).ascendant.sign;
+    if (typeof (chart as any).lagna?.sign === "string") return (chart as any).lagna.sign;
+    if (typeof (chart as any).ascendant === "string") return (chart as any).ascendant;
+    if (typeof (chart as any).lagna === "string") return (chart as any).lagna;
+    if (typeof chart.lagnaLon === "number") {
+      const idx = Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30);
+      return RASHIS_ORDER[idx] || "Aries";
+    }
+    if (typeof chart.lagnaNum === "number") {
+      if (chart.lagnaNum >= 0 && chart.lagnaNum <= 11) return RASHIS_ORDER[chart.lagnaNum];
+      if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) return RASHIS_ORDER[chart.lagnaNum - 1];
+    }
+    return "Aries";
+  };
+
+  const lagnaSign = resolveLagnaSign();
+  const lagnaSignNum = getSignNumber(lagnaSign, typeof chart.lagnaRashi === "string" ? chart.lagnaRashi : undefined);
+  const lagnaDegInSign = (chart.lagnaLon ?? 0) % 30;
+  const lagnaCompoundDeg = calculateCompoundDegree(lagnaSignNum, lagnaDegInSign);
+
+  // 1. Resolve Active Dasha Lords
+  const moonData = getPlanetData("Moon");
+  const fallbackLord = moonData?.nakshatraLord || "Sun";
+
+  let activeMD = chart.dashas?.find(d => {
+    const s = new Date(d.start), e = new Date(d.end);
+    return evaluationDate >= s && evaluationDate < e;
+  })?.planet || chart.dashas?.find(d => d.active)?.planet || (chart as any).currentDasha?.mahadasha || fallbackLord;
+
+  let activeAD = chart.antardasha?.find(a => {
+    const s = new Date(a.start), e = new Date(a.end);
+    return evaluationDate >= s && evaluationDate < e;
+  })?.planet || chart.antardasha?.find(a => a.active)?.planet || (chart as any).currentDasha?.antardasha || activeMD;
 
   // 2. Build Planet Coordinates Map
   const planetCoords: Record<string, {
@@ -1102,7 +1113,7 @@ export function runAstroVastuHitEngine(
       const houseNum = occupants[0]?.house || 1;
       const isPowerCenter = occupants.length >= 3;
       const planetListHi = occupants.map(o => PLANETS_HINDI[o.name] || o.name).join(", ");
-      const narrative = `दशम/भाव ${houseNum} (${RASHIS_HINDI[s]} - ${s}) में ${planetListHi} — कुल ${occupants.length} ग्रह एक साथ बैठे हैं! एस्ट्रो-वास्तु पद्धति के अनुसार ${s} नंबर राशि की दिशा ${signDir.code} (${signDir.directionHindi}) है। यानी जातक के घर का ${signDir.code} ज़ोन इनकी पूरी ज़िंदगी का ${isPowerCenter ? "महा-ऊर्जा केंद्र (Power Center)" : "अत्यधिक संवेदनशील ऊर्जा क्षेत्र"} है!`;
+      const narrative = `भाव ${houseNum} (${RASHIS_HINDI[s]} - ${s}) में ${planetListHi} — कुल ${occupants.length} ग्रह एक साथ बैठे हैं! एस्ट्रो-वास्तु पद्धति के अनुसार ${s} नंबर राशि की दिशा ${signDir.code} (${signDir.directionHindi}) है। यानी जातक के घर का ${signDir.code} ज़ोन इनकी पूरी ज़िंदगी का ${isPowerCenter ? "महा-ऊर्जा केंद्र (Power Center)" : "अत्यधिक संवेदनशील ऊर्जा क्षेत्र"} है!`;
       clusters.push({
         house: houseNum,
         sign: RASHIS_ORDER[s - 1],

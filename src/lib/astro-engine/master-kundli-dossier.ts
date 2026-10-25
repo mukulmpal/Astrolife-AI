@@ -536,25 +536,59 @@ export function generateMasterKundliDossier(chart: ChartData): MasterDossierResu
   const p = chart.planets || {};
   const name = chart.name || "Seeker";
 
+  // Helper for resilient planet data access
+  const getPData = (pName: string): any => {
+    if (!p) return undefined;
+    if (p[pName]) return p[pName];
+    if (p[pName.toLowerCase()]) return p[pName.toLowerCase()];
+    const entry = Object.entries(p).find(
+      ([k, v]: [string, any]) =>
+        k.toLowerCase() === pName.toLowerCase() ||
+        (v?.name && String(v.name).toLowerCase() === pName.toLowerCase()) ||
+        (v?.planet && String(v.planet).toLowerCase() === pName.toLowerCase())
+    );
+    return entry ? entry[1] : undefined;
+  };
+
   // Lagna Resolution
-  const lagnaRashiName = chart.lagnaRashi || "Capricorn";
-  const lagnaLord = chart.lagnaLord || SIGN_LORDS[lagnaRashiName] || "Saturn";
-  const lagnaLordData = p[lagnaLord];
+  const resolveLagna = (): { rashiName: string; lagnaNum: number } => {
+    if (typeof chart.lagnaRashi === "string" && chart.lagnaRashi.trim()) {
+      const idx = RASHIS.indexOf(chart.lagnaRashi.trim() as any);
+      return { rashiName: chart.lagnaRashi.trim(), lagnaNum: idx >= 0 ? idx : 0 };
+    }
+    if (typeof chart.lagnaNum === "number") {
+      if (chart.lagnaNum >= 0 && chart.lagnaNum <= 11) {
+        return { rashiName: RASHIS[chart.lagnaNum] || "Aries", lagnaNum: chart.lagnaNum };
+      }
+      if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) {
+        return { rashiName: RASHIS[chart.lagnaNum - 1] || "Aries", lagnaNum: chart.lagnaNum - 1 };
+      }
+    }
+    if (typeof chart.lagnaLon === "number") {
+      const idx = Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30);
+      return { rashiName: RASHIS[idx] || "Aries", lagnaNum: idx };
+    }
+    return { rashiName: "Aries", lagnaNum: 0 };
+  };
+
+  const { rashiName: lagnaRashiName, lagnaNum: resolvedLagnaNum } = resolveLagna();
+  const lagnaLord = chart.lagnaLord || SIGN_LORDS[lagnaRashiName] || "Mars";
+  const lagnaLordData = getPData(lagnaLord);
   const lagnaLordPlacement = lagnaLordData
     ? `${HOUSE_NAMES_HINDI[lagnaLordData.house] || `House ${lagnaLordData.house}`} (${SIGN_NAMES_HINDI[lagnaLordData.sign] || lagnaLordData.sign})`
     : `प्रथम भाव (${lagnaRashiName})`;
 
   // Moon Resolution
-  const moonData = p.Moon;
-  const moonSignName = moonData?.sign || "Libra";
-  const moonNakName = moonData?.nakshatra || "Chitra";
+  const moonData = getPData("Moon");
+  const moonSignName = moonData?.sign || RASHIS[resolvedLagnaNum] || "Aries";
+  const moonNakName = moonData?.nakshatra || "Ashwini";
   const moonPada = moonData?.pada || 1;
-  const nakMeta = NAKSHATRA_DEITIES[moonNakName] || { deity: "त्वष्टा / विश्वकर्मा", lord: "मंगल" };
+  const nakMeta = NAKSHATRA_DEITIES[moonNakName] || { deity: "केतु / अश्विनी कुमार", lord: "केतु" };
 
   // Sun Resolution
-  const sunData = p.Sun;
-  const sunSignName = sunData?.sign || "Virgo";
-  const sunHouse = sunData?.house || 9;
+  const sunData = getPData("Sun");
+  const sunSignName = sunData?.sign || RASHIS[resolvedLagnaNum] || "Aries";
+  const sunHouse = sunData?.house || 1;
   const sunDignity = sunData?.dignity || (sunHouse === 10 ? "दिग्बली (Digbali in 10H)" : "सम / मित्र राशि");
 
   // ── 1. BIRTH PROFILE ────────────────────────────────────────────────────────
@@ -653,7 +687,7 @@ export function generateMasterKundliDossier(chart: ChartData): MasterDossierResu
   });
 
   // ── 3. DYNAMIC YOGAS DETECTION ──────────────────────────────────────────────
-  const rawYogas = detectYogas(chart.planets as any, chart.lagnaNum || 10, "elite");
+  const rawYogas = detectYogas(chart.planets as any, resolvedLagnaNum, "elite");
   const presentYogas = rawYogas.filter((y) => y.present && !y.isDosha);
 
   let keyYogas = presentYogas.slice(0, 4).map((y) => ({
@@ -845,9 +879,9 @@ export function generateMasterKundliDossier(chart: ChartData): MasterDossierResu
       timezone: String(chart.tz || 5.5),
       latitude: chart.lat || 28.61,
       longitude: chart.lon || 77.21,
-      lagnaSign: typeof chart.lagnaNum === "number" ? ((chart.lagnaNum - 1 + 12) % 12) : 9, // Capricorn default
-      moonLongitude: moonData?.lon || 180,
-      moonNakshatra: moonData?.lon ? Math.floor(moonData.lon / (360 / 27)) % 27 : 13, // Chitra default
+      lagnaSign: resolvedLagnaNum,
+      moonLongitude: moonData?.lon ?? (resolvedLagnaNum * 30 + 15),
+      moonNakshatra: moonData?.lon !== undefined ? Math.floor(moonData.lon / (360 / 27)) % 27 : 0,
       activeMahadasha: mdPlanet,
       activeAntardasha: adPlanet,
     });

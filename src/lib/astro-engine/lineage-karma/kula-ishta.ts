@@ -51,17 +51,39 @@ export function calculateKulaAndIshtaDevata(chart: ChartData): {
   // ── 1. KULA DEVATA IDENTIFICATION ──────────────────────────────────────────
   // Check 9th Lord, 2nd Lord, and 5th Lord.
   // 9th house is primary for Kula Parampara.
-  const lagnaNum = chart.lagnaNum || 3;
-  const houseToSignNum = (h: number) => (((lagnaNum - 1 + (h - 1)) % 12) + 1);
   const SIGN_NAMES_BY_NUM: Record<number, string> = {
     1: "Aries", 2: "Taurus", 3: "Gemini", 4: "Cancer", 5: "Leo", 6: "Virgo",
     7: "Libra", 8: "Scorpio", 9: "Sagittarius", 10: "Capricorn", 11: "Aquarius", 12: "Pisces"
   };
 
-  const ninthSign = SIGN_NAMES_BY_NUM[houseToSignNum(9)] || "Aquarius";
-  const ninthLord = SIGN_LORDS[ninthSign] || "Saturn";
-  const secondSign = SIGN_NAMES_BY_NUM[houseToSignNum(2)] || "Cancer";
-  const secondLord = SIGN_LORDS[secondSign] || "Moon";
+  const resolveLagnaSignNum = (): number => {
+    if (typeof chart.lagnaRashi === "string" && chart.lagnaRashi.trim()) {
+      const idx = Object.values(SIGN_NAMES_BY_NUM).indexOf(chart.lagnaRashi.trim());
+      if (idx >= 0) return idx + 1;
+    }
+    if (typeof (chart as any).ascendant?.sign === "string") {
+      const idx = Object.values(SIGN_NAMES_BY_NUM).indexOf((chart as any).ascendant.sign);
+      if (idx >= 0) return idx + 1;
+    }
+    if (typeof chart.lagnaNum === "number") {
+      // 0-indexed (0 to 11)
+      if (chart.lagnaNum >= 0 && chart.lagnaNum <= 11) return chart.lagnaNum + 1;
+      // 1-indexed (1 to 12)
+      if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) return chart.lagnaNum;
+    }
+    if (typeof chart.lagnaLon === "number") {
+      return (Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30) % 12) + 1;
+    }
+    return 1;
+  };
+
+  const lagnaSignNum = resolveLagnaSignNum();
+  const houseToSignNum = (h: number) => (((lagnaSignNum - 1 + (h - 1)) % 12) + 1);
+
+  const ninthSign = SIGN_NAMES_BY_NUM[houseToSignNum(9)] || "Sagittarius";
+  const ninthLord = SIGN_LORDS[ninthSign] || "Jupiter";
+  const secondSign = SIGN_NAMES_BY_NUM[houseToSignNum(2)] || "Taurus";
+  const secondLord = SIGN_LORDS[secondSign] || "Venus";
 
   // Significator planet: primary is 9th lord. If 9th lord is severely combust/debilitated, blend with 2nd lord.
   const pData = chart.planets?.[ninthLord];

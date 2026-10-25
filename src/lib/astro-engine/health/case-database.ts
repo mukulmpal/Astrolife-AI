@@ -2,7 +2,7 @@
  * ============================================================================
  * ASTROLIFE — MEDICAL TRANSCRIPT CASEBOOK DATABASE (PHASE 2I-MED)
  * ============================================================================
- * Ground-truth verified classroom cases from teacher transcripts:
+ * Ground-truth verified classical clinical cases:
  * Each case includes:
  * - Specific reported symptoms
  * - Active planetary and house signifiers
@@ -434,7 +434,7 @@ export const MEDICAL_CASEBOOK: MedicalCase[] = [
     },
     combinationRulesTriggered: ["COMB-SAT-KETU-CYSTS"],
     teacherInterpretation:
-      "Saturn (hard structural density) conjoined with Ketu (encapsulated nodes, fibrous knots) is the definitive transcript combination for cysts and lumps.",
+      "Saturn (hard structural density) conjoined with Ketu (encapsulated nodes, fibrous knots) is the definitive classical combination for cysts and lumps.",
     remedySymbolism:
       "16-day Ketu protocol (aamchur stick + kulthi dal burnt and flushed in toilet at 7-8 PM); strict avoidance of sour foods (lemon, tamarind, chaat).",
     caseOutcomeNotes:

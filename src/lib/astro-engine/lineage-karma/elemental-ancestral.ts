@@ -124,16 +124,36 @@ export function calculateElementalAncestral(chart: ChartData): {
 
   // 4. Water Houses Trilogy (4th, 8th, 12th)
   // Find which signs occupy Houses 4, 8, 12 based on Lagna
-  const lagnaNum = chart.lagnaNum || 3; // 1-12
-  const houseToSignNum = (h: number) => (((lagnaNum - 1 + (h - 1)) % 12) + 1);
   const SIGN_NAMES_BY_NUM: Record<number, string> = {
     1: "Aries", 2: "Taurus", 3: "Gemini", 4: "Cancer", 5: "Leo", 6: "Virgo",
     7: "Libra", 8: "Scorpio", 9: "Sagittarius", 10: "Capricorn", 11: "Aquarius", 12: "Pisces"
   };
 
-  const h4Sign = SIGN_NAMES_BY_NUM[houseToSignNum(4)] || "Virgo";
-  const h8Sign = SIGN_NAMES_BY_NUM[houseToSignNum(8)] || "Capricorn";
-  const h12Sign = SIGN_NAMES_BY_NUM[houseToSignNum(12)] || "Taurus";
+  const resolveLagnaSignNum = (): number => {
+    if (typeof chart.lagnaRashi === "string" && chart.lagnaRashi.trim()) {
+      const idx = Object.values(SIGN_NAMES_BY_NUM).indexOf(chart.lagnaRashi.trim());
+      if (idx >= 0) return idx + 1;
+    }
+    if (typeof (chart as any).ascendant?.sign === "string") {
+      const idx = Object.values(SIGN_NAMES_BY_NUM).indexOf((chart as any).ascendant.sign);
+      if (idx >= 0) return idx + 1;
+    }
+    if (typeof chart.lagnaNum === "number") {
+      if (chart.lagnaNum >= 0 && chart.lagnaNum <= 11) return chart.lagnaNum + 1;
+      if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) return chart.lagnaNum;
+    }
+    if (typeof chart.lagnaLon === "number") {
+      return (Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30) % 12) + 1;
+    }
+    return 1;
+  };
+
+  const lagnaSignNum = resolveLagnaSignNum();
+  const houseToSignNum = (h: number) => (((lagnaSignNum - 1 + (h - 1)) % 12) + 1);
+
+  const h4Sign = SIGN_NAMES_BY_NUM[houseToSignNum(4)] || "Cancer";
+  const h8Sign = SIGN_NAMES_BY_NUM[houseToSignNum(8)] || "Scorpio";
+  const h12Sign = SIGN_NAMES_BY_NUM[houseToSignNum(12)] || "Pisces";
 
   const waterHousesTrilogy = {
     fourthHouseLearned: `House 4 in ${h4Sign} (${SIGN_ELEMENT_MAP[h4Sign]}): Childhood environment taught you that emotional security requires ${
