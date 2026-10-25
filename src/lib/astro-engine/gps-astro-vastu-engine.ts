@@ -23,7 +23,7 @@ import {
   PLANETS_HINDI,
   getSignNumber,
   type AstroVastuDirection,
-} from "./astro-vastu-hit-engine";
+} from "./astro-vastu-types";
 
 // ── Types & Contracts ───────────────────────────────────────────────────────
 

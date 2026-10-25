@@ -10,6 +10,7 @@ import {
   HIT_DEFINITIONS,
 } from "../astro-vastu-hit-engine";
 import type { ChartData } from "../calculations";
+import { calculateChart } from "../calculations";
 
 describe("Astro-Vastu Hit Theory Computational Engine", () => {
   // ── 1. COMPOUND DEGREE TESTS ──────────────────────────────────────────────
@@ -404,6 +405,41 @@ describe("Astro-Vastu Hit Theory Computational Engine", () => {
       assert.equal(geminiRow.houseNum, 1, "Gemini is Lagna for Gemini Lagna Sample");
       assert.equal(geminiRow.statusVerdict.statusType, "critical_hit", "Must detect Mars 180° killer hit on Gemini");
       assert.ok(geminiRow.statusVerdict.badgeText.includes("180°"), "Badge must display 180° hit");
+    });
+  });
+
+  // ── 7. COMPREHENSIVE 12-LAGNA SUITE ──────────────────────────────────────
+  describe("All 12 Lagnas End-to-End Pipeline Resilience", () => {
+    it("should process all 12 Lagnas without throwing any exceptions", () => {
+      const dates = [
+        "1990-01-01T00:00:00",
+        "1990-02-01T02:00:00",
+        "1990-03-01T04:00:00",
+        "1990-04-01T06:00:00",
+        "1990-05-01T08:00:00",
+        "1990-06-01T10:00:00",
+        "1990-07-01T12:00:00",
+        "1990-08-01T14:00:00",
+        "1990-09-01T16:00:00",
+        "1990-10-01T18:00:00",
+        "1990-11-01T20:00:00",
+        "1990-12-01T22:00:00",
+      ];
+      for (let i = 0; i < dates.length; i++) {
+        const [dob, timeWithRest] = dates[i].split("T");
+        const tob = timeWithRest.slice(0, 5);
+        const chart = calculateChart(`User ${i + 1}`, dob, tob, "Delhi", 28.6139, 77.2090, 5.5);
+        const dossier = runAstroVastuHitEngine(chart);
+        assert.ok(dossier, `dossier should exist for chart ${i + 1}`);
+        assert.ok(dossier.allHits, `allHits must exist for chart ${i + 1}`);
+        assert.ok(dossier.gpsDossier, `gpsDossier must exist for chart ${i + 1}`);
+        assert.ok(dossier.mandalaDossier, `mandalaDossier must exist for chart ${i + 1}`);
+        assert.ok(dossier.astroPrescription, `astroPrescription must exist for chart ${i + 1}`);
+        assert.equal(dossier.bodyPartRemedyRegistry.length, 12, `Must contain 12 body part rows for chart ${i + 1}`);
+        assert.equal(dossier.mandalaDossier.nativeMappings.length, 45, `Must map 45 devatas for chart ${i + 1}`);
+        assert.equal(Object.keys(dossier.gpsDossier.queryAnalyses).length, 12, `Must contain 12 GPS query analyses for chart ${i + 1}`);
+        assert.ok(dossier.gpsDossier.houseUtilizationAdvices.length > 0, `Must contain house utilization advices for chart ${i + 1}`);
+      }
     });
   });
 });

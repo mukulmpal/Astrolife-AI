@@ -124,17 +124,17 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     clusters = [],
     dashaLordHitsAnalysis = [],
     spatialFieldTest = [],
-    trafficPoliceBlockades,
-    killerHits180,
-    dangerousHits90,
-    badHits45,
+    trafficPoliceBlockades = [],
+    killerHits180 = [],
+    dangerousHits90 = [],
+    badHits45 = [],
     supportiveHits60 = [],
-    protectiveShields120,
-    allHits,
-    shiftingPrescriptions,
+    protectiveShields120 = [],
+    allHits = [],
+    shiftingPrescriptions = [],
     bodyPartRemedyRegistry = [],
-    genericVastuConflicts,
-    directionPlanetaryInventory,
+    genericVastuConflicts = [],
+    directionPlanetaryInventory = {},
     familyCrossHitIsolationRule,
     studyAndWorkDirection,
     marsDietaryLifestyleProtocol,
@@ -154,11 +154,12 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
   }, [zoneConditions]);
 
   const filteredHits = useMemo(() => {
+    if (!allHits) return [];
     if (hitFilter === "all") return allHits;
-    return allHits.filter((h) => h.hitDef.angle === hitFilter);
+    return allHits.filter((h) => h?.hitDef?.angle === hitFilter);
   }, [allHits, hitFilter]);
 
-  const selectedDirectionData = directionPlanetaryInventory[selectedDirectionCode];
+  const selectedDirectionData = directionPlanetaryInventory?.[selectedDirectionCode];
 
   // Helper colors
   const getSeverityBadge = (severity: string) => {
@@ -640,22 +641,22 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               <span style={{ fontSize: 11, fontWeight: 700, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 6 }}>3rd House</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#374151" }}>
-              <strong>✅ सर्वोत्तम रंग:</strong> {acc.phoneCover.recommendedColors.join(", ")}
+              <strong>✅ सर्वोत्तम रंग:</strong> {(acc.phoneCover?.recommendedColors || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12.5, color: "#DC2626" }}>
-              <strong>🚫 सख्त वर्जित:</strong> {acc.phoneCover.colorsToAvoid.join(", ")}
+              <strong>🚫 सख्त वर्जित:</strong> {(acc.phoneCover?.colorsToAvoid || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12, color: "#4B5563" }}>
-              <strong>मटेरियल:</strong> {acc.phoneCover.caseMaterial}
+              <strong>मटेरियल:</strong> {acc.phoneCover?.caseMaterial || "—"}
             </div>
             <div style={{ fontSize: 12, color: "#059669" }}>
-              <strong>वॉलपेपर:</strong> {acc.phoneCover.idealWallpaperAffirmation}
+              <strong>वॉलपेपर:</strong> {acc.phoneCover?.idealWallpaperAffirmation || "—"}
             </div>
             <div style={{ fontSize: 11.5, color: "#6B7280", lineHeight: 1.5, marginTop: 2 }}>
-              {acc.phoneCover.planetaryMechanism}
+              {acc.phoneCover?.planetaryMechanism || "—"}
             </div>
             <div style={{ marginTop: "auto", fontSize: 11.5, background: "#FFFBEB", color: "#92400E", padding: "8px 10px", borderRadius: 8, border: "1px solid #FDE68A" }}>
-              ⚠️ {acc.phoneCover.cautionNotice}
+              ⚠️ {acc.phoneCover?.cautionNotice || "—"}
             </div>
           </div>
 
@@ -663,24 +664,24 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
-                👟 {acc.footwear.title}
+                👟 {acc.footwear?.title || "जूते व सैंडल्स"}
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, background: "#F5F3FF", color: "#6D28D9", padding: "2px 8px", borderRadius: 6 }}>12th House</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#374151" }}>
-              <strong>✅ सर्वोत्तम रंग:</strong> {acc.footwear.recommendedColors.join(", ")}
+              <strong>✅ सर्वोत्तम रंग:</strong> {(acc.footwear?.recommendedColors || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12.5, color: "#DC2626" }}>
-              <strong>🚫 सख्त वर्जित:</strong> {acc.footwear.colorsToAvoid.join(", ")}
+              <strong>🚫 सख्त वर्जित:</strong> {(acc.footwear?.colorsToAvoid || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12, color: "#4B5563" }}>
-              <strong>मटेरियल:</strong> {acc.footwear.materialType}
+              <strong>मटेरियल:</strong> {acc.footwear?.materialType || "—"}
             </div>
             <div style={{ fontSize: 11.5, color: "#6B7280", lineHeight: 1.5, marginTop: 2 }}>
-              {acc.footwear.planetaryMechanism}
+              {acc.footwear?.planetaryMechanism || "—"}
             </div>
             <div style={{ marginTop: "auto", fontSize: 11.5, background: "#FEF2F2", color: "#991B1B", padding: "8px 10px", borderRadius: 8, border: "1px solid #FECACA" }}>
-              ⚠️ {acc.footwear.cautionNotice}
+              ⚠️ {acc.footwear?.cautionNotice || "—"}
             </div>
           </div>
 
@@ -688,24 +689,24 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
-                🧢 {acc.headwearCap.title}
+                🧢 {acc.headwearCap?.title || "टोपी / हेडगियर"}
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, background: "#FEF3C7", color: "#B45309", padding: "2px 8px", borderRadius: 6 }}>1st & 10th</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#374151" }}>
-              <strong>✅ सर्वोत्तम रंग:</strong> {acc.headwearCap.recommendedColors.join(", ")}
+              <strong>✅ सर्वोत्तम रंग:</strong> {(acc.headwearCap?.recommendedColors || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12.5, color: "#DC2626" }}>
-              <strong>🚫 सख्त वर्जित:</strong> {acc.headwearCap.colorsToAvoid.join(", ")}
+              <strong>🚫 सख्त वर्जित:</strong> {(acc.headwearCap?.colorsToAvoid || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12, color: "#4B5563" }}>
-              <strong>शैली:</strong> {acc.headwearCap.style}
+              <strong>शैली:</strong> {acc.headwearCap?.style || "—"}
             </div>
             <div style={{ fontSize: 11.5, color: "#6B7280", lineHeight: 1.5, marginTop: 2 }}>
-              {acc.headwearCap.planetaryMechanism}
+              {acc.headwearCap?.planetaryMechanism || "—"}
             </div>
             <div style={{ marginTop: "auto", fontSize: 11.5, background: "#FFFBEB", color: "#92400E", padding: "8px 10px", borderRadius: 8, border: "1px solid #FDE68A" }}>
-              ⚠️ {acc.headwearCap.cautionNotice}
+              ⚠️ {acc.headwearCap?.cautionNotice || "—"}
             </div>
           </div>
 
@@ -713,24 +714,24 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
-                🥋 {acc.belt.title}
+                🥋 {acc.belt?.title || "कमर बेल्ट"}
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, background: "#ECFDF5", color: "#047857", padding: "2px 8px", borderRadius: 6 }}>7th House</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#374151" }}>
-              <strong>✅ सर्वोत्तम रंग:</strong> {acc.belt.recommendedColors.join(", ")}
+              <strong>✅ सर्वोत्तम रंग:</strong> {(acc.belt?.recommendedColors || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12.5, color: "#DC2626" }}>
-              <strong>🚫 सख्त वर्जित:</strong> {acc.belt.colorsToAvoid.join(", ")}
+              <strong>🚫 सख्त वर्जित:</strong> {(acc.belt?.colorsToAvoid || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12, color: "#4B5563" }}>
-              <strong>बकल धातु:</strong> {acc.belt.buckleMetal}
+              <strong>बकल धातु:</strong> {acc.belt?.buckleMetal || "—"}
             </div>
             <div style={{ fontSize: 11.5, color: "#6B7280", lineHeight: 1.5, marginTop: 2 }}>
-              {acc.belt.planetaryMechanism}
+              {acc.belt?.planetaryMechanism || "—"}
             </div>
             <div style={{ marginTop: "auto", fontSize: 11.5, background: "#FFFBEB", color: "#92400E", padding: "8px 10px", borderRadius: 8, border: "1px solid #FDE68A" }}>
-              ⚠️ {acc.belt.cautionNotice}
+              ⚠️ {acc.belt?.cautionNotice || "—"}
             </div>
           </div>
 
@@ -738,15 +739,15 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           <div style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
-                😷 {acc.faceMask.title}
+                😷 {acc.faceMask?.title || "फेस मास्क"}
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, background: "#E0F2FE", color: "#0369A1", padding: "2px 8px", borderRadius: 6 }}>2nd House</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#374151" }}>
-              <strong>✅ सर्वोत्तम रंग:</strong> {acc.faceMask.recommendedColors.join(", ")}
+              <strong>✅ सर्वोत्तम रंग:</strong> {(acc.faceMask?.recommendedColors || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12.5, color: "#DC2626" }}>
-              <strong>🚫 सख्त वर्जित:</strong> {acc.faceMask.colorsToAvoid.join(", ")}
+              <strong>🚫 सख्त वर्जित:</strong> {(acc.faceMask?.colorsToAvoid || []).join(", ") || "—"}
             </div>
             <div style={{ fontSize: 12, color: "#4B5563" }}>
               <strong>कपड़ा:</strong> {acc.faceMask.fabric}
@@ -1394,23 +1395,23 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8, marginTop: 12 }}>
                   <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>📱 फोन कवर (3rd H)</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.phoneCover.recommendedColors[0]}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData?.phoneCover?.recommendedColors?.[0] || "—"}</div>
                   </div>
                   <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>👟 जूते (12th H)</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.footwear.recommendedColors[0]}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData?.footwear?.recommendedColors?.[0] || "—"}</div>
                   </div>
                   <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>🧢 टोपी (1st & 10th)</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.headwearCap.recommendedColors[0]}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData?.headwearCap?.recommendedColors?.[0] || "—"}</div>
                   </div>
                   <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>🥋 कमर बेल्ट (7th H)</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.belt.recommendedColors[0]}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData?.belt?.recommendedColors?.[0] || "—"}</div>
                   </div>
                   <div style={{ background: "#FFFFFF", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(217, 119, 6, 0.25)" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#92400E" }}>😷 फेस मास्क (2nd H)</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData.faceMask.recommendedColors[0]}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#78350F", marginTop: 2 }}>{accData?.faceMask?.recommendedColors?.[0] || "—"}</div>
                   </div>
                 </div>
               </div>
@@ -2320,9 +2321,9 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#B8860B", textTransform: "uppercase", marginBottom: 6 }}>
                     विद्यमान ग्रह (Planets Residing in this Direction)
                   </div>
-                  {selectedDirectionData.planets.length > 0 ? (
+                  {(selectedDirectionData.planets || []).length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                      {selectedDirectionData.planets.map((p) => (
+                      {(selectedDirectionData.planets || []).map((p) => (
                         <span key={p} className="badge badge-gold" style={{ fontSize: 13, padding: "5px 12px" }}>
                           ✦ {p}
                         </span>
@@ -2340,7 +2341,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                     प्राकृतिक कारक वस्तुएं (Physical Karaka Items in House)
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {selectedDirectionData.karakaObjects.map((item, idx) => (
+                    {(selectedDirectionData.karakaObjects || []).map((item, idx) => (
                       <span
                         key={idx}
                         style={{
@@ -2531,20 +2532,20 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                   3. सह-पोषक तत्व (Nutritional Co-Factor)
                 </h3>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "#7C3AED", marginTop: 4 }}>
-                  {astroPrescription.crystals.wearableBracelet.map(c => c.crystalName).join(" + ")}
+                  {(astroPrescription.crystals?.wearableBracelet || []).map(c => c.crystalName).join(" + ") || "—"}
                 </div>
               </div>
               <p style={{ margin: 0, fontSize: 12.5, color: "#4B5563", lineHeight: 1.5 }}>
                 <strong>पोषण लक्ष्य:</strong> नर्वस सिस्टम की थकान, अनिद्रा व स्क्रीन स्ट्रेस का शमन कर वित्तीय अवसरों का चुंबक बनना।
               </p>
               <div style={{ background: "#F3F4F6", padding: "8px 12px", borderRadius: 8, fontSize: 11.5, color: "#374151" }}>
-                <strong>तारा बल:</strong> {astroPrescription.crystals.wearableBracelet.map(c => `${c.crystalName} (${c.taraName})`).join(", ")}
+                <strong>तारा बल:</strong> {(astroPrescription.crystals?.wearableBracelet || []).map(c => `${c.crystalName} (${c.taraName})`).join(", ") || "—"}
               </div>
             </div>
           </div>
 
           {/* Strict Contraindications Box */}
-          {astroPrescription.contraindications.length > 0 && (
+          {(astroPrescription.contraindications || []).length > 0 && (
             <div
               className="card"
               style={{
@@ -2565,7 +2566,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 नवतारा चक्र (7वीं वध तारा) एवं अस्त ग्रहों के विश्लेषण से निम्नलिखित रत्न/रंग आपकी कुंडली के लिए जहर समान हैं। इन्हें कलाई या शरीर पर कभी धारण न करें:
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {astroPrescription.contraindications.map((ci, idx) => (
+                {(astroPrescription.contraindications || []).map((ci, idx) => (
                   <div key={idx} style={{ display: "flex", alignItems: "baseline", gap: 8, fontSize: 12.5, color: "#B91C1C" }}>
                     <span style={{ fontWeight: 700 }}>• [{ci.badgeLabel}]</span>
                     <span>{ci.elementOrAction} — <em>{ci.scientificHitReason}</em></span>
@@ -2647,24 +2648,28 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 </h4>
               </div>
               <div style={{ fontSize: 12.5, color: "#374151", lineHeight: 1.5 }}>
-                <div><strong>क्रिस्टल ब्रेसलेट:</strong> {astroPrescription.crystals.wearableBracelet.map(c => c.crystalHindi).join(" + ")}</div>
-                {astroPrescription.crystals.deskManifestationCrystal.length > 0 && (
+                <div><strong>क्रिस्टल ब्रेसलेट:</strong> {(astroPrescription.crystals?.wearableBracelet || []).map(c => c.crystalHindi).join(" + ") || "—"}</div>
+                {(astroPrescription.crystals?.deskManifestationCrystal || []).length > 0 && (
                   <div style={{ marginTop: 6, color: "#B45309" }}>
-                    <strong>वर्क-डेस्क एसेट:</strong> {astroPrescription.crystals.deskManifestationCrystal.map(d => `${d.crystalName} (${d.placementZone})`).join(", ")}
+                    <strong>वर्क-डेस्क एसेट:</strong> {(astroPrescription.crystals?.deskManifestationCrystal || []).map(d => `${d.crystalName} (${d.placementZone})`).join(", ")}
                   </div>
                 )}
-                <div style={{ marginTop: 8 }}>
-                  <strong>वॉलेट के सर्वोत्तम रंग:</strong> {astroPrescription.wallet.recommendedColors.join(", ")}
-                </div>
-                <div style={{ marginTop: 4, color: "#DC2626" }}>
-                  <strong>वॉलेट में वर्जित रंग:</strong> {astroPrescription.wallet.colorsToAvoid.join(", ")}
-                </div>
-                <div style={{ marginTop: 4 }}>
-                  <strong>वॉलेट का बीज तत्व:</strong> {astroPrescription.wallet.seedItemInside}
-                </div>
-                <div style={{ marginTop: 4 }}>
-                  <strong>बरकत नोट:</strong> {astroPrescription.wallet.recommendedCurrencyNote}
-                </div>
+                {astroPrescription.wallet && (
+                  <>
+                    <div style={{ marginTop: 8 }}>
+                      <strong>वॉलेट के सर्वोत्तम रंग:</strong> {(astroPrescription.wallet.recommendedColors || []).join(", ") || "—"}
+                    </div>
+                    <div style={{ marginTop: 4, color: "#DC2626" }}>
+                      <strong>वॉलेट में वर्जित रंग:</strong> {(astroPrescription.wallet.colorsToAvoid || []).join(", ") || "—"}
+                    </div>
+                    <div style={{ marginTop: 4 }}>
+                      <strong>वॉलेट का बीज तत्व:</strong> {astroPrescription.wallet.seedItemInside || "—"}
+                    </div>
+                    <div style={{ marginTop: 4 }}>
+                      <strong>बरकत नोट:</strong> {astroPrescription.wallet.recommendedCurrencyNote || "—"}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -4272,10 +4277,10 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
                 🥛 ब्रह्मस्थान अभिमंत्रित नैवेद्य (Consecration Formula):
               </div>
               <div style={{ fontSize: 13, color: "#78350F", lineHeight: 1.6 }}>
-                <strong>सामग्री:</strong> {mandalaDossier.brahmasthanProtocol.consecrationMixture.join(" + ")}<br/>
+                <strong>सामग्री:</strong> {(mandalaDossier.brahmasthanProtocol?.consecrationMixture || []).join(" + ") || "दूध + गंगाजल + केसर + कच्ची खांड"}<br/>
                 ✦ <strong>नए निर्माण में:</strong> केंद्र की खुदाई करके लोटे में भरकर यह मिश्रण अर्पित करें।<br/>
                 ✦ <strong>बने हुए मकान/फ्लैट में:</strong> प्रातः सफाई के बाद इसका छिड़काव करें। रात्रि में पात्र में रखकर सुबह पौधों में विसर्जित करें (टॉयलेट में कभी नहीं)।<br/>
-                ✦ <strong>स्वास्थ्य संबंध:</strong> {mandalaDossier.brahmasthanProtocol.liverHealthConnection}
+                ✦ <strong>स्वास्थ्य संबंध:</strong> {mandalaDossier.brahmasthanProtocol?.liverHealthConnection || "लीवर व पाचन संस्थान का संतुलन"}
               </div>
             </div>
 
@@ -4539,8 +4544,8 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               ✦ <strong>तत्व:</strong> दर्पण वास्तु में <strong>जल तत्व (चंद्रमा व बुध)</strong> का प्रतिनिधित्व करता है, राहु का नहीं।<br/>
               ✦ <strong>शुभ दिशाएं:</strong> उत्तर, उत्तर-पूर्व, पूर्व, और पश्चिम के कटे हुए ज़ोन को बढ़ाने हेतु दर्पण लगाया जा सकता है।<br/>
               ✦ <strong>सख्त वर्जित दिशाएं:</strong> दक्षिण (South), दक्षिण-पूर्व (South-East) और दक्षिण-पश्चिम (South-West)।<br/>
-              ✦ <strong>साउथ-वेस्ट में दर्पण का दुष्परिणाम:</strong> {mandalaDossier.mirrorElementalAxiom.consequencesOfSouthMirror}<br/>
-              ✦ <strong>यदि SW वैनिटी में शीशा हटाना असंभव हो:</strong> {mandalaDossier.mirrorElementalAxiom.correctionMethod}
+              ✦ <strong>साउथ-वेस्ट में दर्पण का दुष्परिणाम:</strong> {mandalaDossier.mirrorElementalAxiom?.consequencesOfSouthMirror || "संबंधों में खटास व अस्थिरता"}<br/>
+              ✦ <strong>यदि SW वैनिटी में शीशा हटाना असंभव हो:</strong> {mandalaDossier.mirrorElementalAxiom?.correctionMethod || "पीली फिल्म या लकड़ी के फ्रेम से आवृत करें"}
             </div>
           </div>
 
@@ -4553,12 +4558,12 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </h3>
             </div>
             <div style={{ fontSize: 13, color: "#451A03", lineHeight: 1.65 }}>
-              1. <strong>धातु के पात्र का नियम:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.utensilBoxRule}<br/>
-              2. <strong>एंटी-कलर निषेध:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.antiColorWarning}<br/>
-              3. <strong>फ्लैट्स हेतु 'चुटकी भर' मात्रा:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.pinchQuantityRule}<br/>
-              4. <strong>सक्रियकरण अवधि:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.activationDuration}<br/>
-              5. <strong>3-इंच ड्रिलिंग स्थायी समाधान:</strong> {mandalaDossier.subtleShastricDirectives.foodPlacementSubtleRules.floorDrillingPermanentRule}<br/>
-              6. <strong>पवित्र विसर्जन:</strong> {mandalaDossier.brahmasthanProtocol.overnightVesselDisposalRule}
+              1. <strong>धातु के पात्र का नियम:</strong> {mandalaDossier.subtleShastricDirectives?.foodPlacementSubtleRules?.utensilBoxRule || "तांबा/पीतल का उपयोग करें"}<br/>
+              2. <strong>एंटी-कलर निषेध:</strong> {mandalaDossier.subtleShastricDirectives?.foodPlacementSubtleRules?.antiColorWarning || "विरोधी रंगों के डिब्बों में न रखें"}<br/>
+              3. <strong>फ्लैट्स हेतु 'चुटकी भर' मात्रा:</strong> {mandalaDossier.subtleShastricDirectives?.foodPlacementSubtleRules?.pinchQuantityRule || "एक चुटकी मात्रा पर्याप्त है"}<br/>
+              4. <strong>सक्रियकरण अवधि:</strong> {mandalaDossier.subtleShastricDirectives?.foodPlacementSubtleRules?.activationDuration || "21 दिन"}<br/>
+              5. <strong>3-इंच ड्रिलिंग स्थायी समाधान:</strong> {mandalaDossier.subtleShastricDirectives?.foodPlacementSubtleRules?.floorDrillingPermanentRule || "3 इंच ड्रिल कर स्थापित करें"}<br/>
+              6. <strong>पवित्र विसर्जन:</strong> {mandalaDossier.brahmasthanProtocol?.overnightVesselDisposalRule || "प्रातः जल में या पौधों में विसर्जन करें"}
             </div>
           </div>
         </div>

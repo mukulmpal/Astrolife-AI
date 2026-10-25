@@ -1340,7 +1340,7 @@ export function getElementalBalancingGuide(
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function evaluateOccultKundliDiagnostic(chart: ChartData): OccultKundliDiagnostic {
-  const p = chart.planets || {};
+  const p = chart?.planets || {};
   const saturn = p["Saturn"];
   const rahu = p["Rahu"];
 
@@ -1356,9 +1356,9 @@ export function evaluateOccultKundliDiagnostic(chart: ChartData): OccultKundliDi
   }
 
   // Check 8th house lordship / connection
-  const cusp8 = chart.houseCusps?.find(c => c.house === 8);
-  const cusp4 = chart.houseCusps?.find(c => c.house === 4);
-  const cusp1 = chart.houseCusps?.find(c => c.house === 1);
+  const cusp8 = chart?.houseCusps?.find(c => c.house === 8);
+  const cusp4 = chart?.houseCusps?.find(c => c.house === 4);
+  const cusp1 = chart?.houseCusps?.find(c => c.house === 1);
 
   const saturnHouse = saturn.house || 1;
   const rahuHouse = rahu.house || 1;
@@ -1416,6 +1416,7 @@ const RASHIS_ORDER = [
 ];
 
 function resolveNative1IndexedLagna(chart: ChartData): number {
+  if (!chart) return 1;
   if (typeof chart.lagnaRashi === "string" && chart.lagnaRashi.trim()) {
     const idx = RASHIS_ORDER.findIndex(r => r.toLowerCase() === chart.lagnaRashi.trim().toLowerCase());
     if (idx >= 0) return idx + 1;
