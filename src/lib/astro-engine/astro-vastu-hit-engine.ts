@@ -33,6 +33,15 @@ import {
   evaluateAstroPrescriptionFormula,
   type AstroPharmacologicalPrescription,
 } from "./astro-prescription-engine";
+import {
+  runGPSAstroVastuEngine,
+  MASTER_GPS_CODES,
+  type GPSAstroVastuDossier,
+  type QueryHouseGPSAnalysis,
+  type KetuCutZoneReport,
+  type RahuExtendedZoneReport,
+  type GPSPlanetaryCode,
+} from "./gps-astro-vastu-engine";
 
 export {
   runVastuPurushaMandalaEngine,
@@ -48,6 +57,13 @@ export {
   type SubtleShastricDirectives,
   evaluateAstroPrescriptionFormula,
   type AstroPharmacologicalPrescription,
+  runGPSAstroVastuEngine,
+  MASTER_GPS_CODES,
+  type GPSAstroVastuDossier,
+  type QueryHouseGPSAnalysis,
+  type KetuCutZoneReport,
+  type RahuExtendedZoneReport,
+  type GPSPlanetaryCode,
 };
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -351,6 +367,7 @@ export interface AstroVastuHitDossier {
   marsDietaryLifestyleProtocol: MarsDietaryLifestyleProtocol;
   wristThreadTrapAlert: WristThreadTrapAlert;
   mandalaDossier: VastuPurushaMandalaDossier;
+  gpsDossier?: GPSAstroVastuDossier;
 }
 
 export const RASHIS_HINDI: Record<number, string> = {
@@ -821,22 +838,50 @@ export function runAstroVastuHitEngine(
     // Source sign of the blocker
     const sourceSign = plCoord.signNum;
     // 120° trine is 5th or 9th sign from source sign
-    const targetSignNum = ((sourceSign - 1 + 4) % 12) + 1;
+    let targetSignNum = ((sourceSign - 1 + 4) % 12) + 1;
+    let targetHouse = Object.values(cuspCoords).find(c => c.signNum === targetSignNum)?.house || ((plCoord.house - 1 + 4) % 12) + 1;
+
+    // Classical Shastric Invariant from Lecture: DO NOT place the relocated planet into a Dusthana House (6, 8, 12)!
+    if ([6, 8, 12].includes(targetHouse)) {
+      const altSignNum = ((sourceSign - 1 + 8) % 12) + 1;
+      const altHouse = Object.values(cuspCoords).find(c => c.signNum === altSignNum)?.house || ((plCoord.house - 1 + 8) % 12) + 1;
+      if (![6, 8, 12].includes(altHouse)) {
+        targetSignNum = altSignNum;
+        targetHouse = altHouse;
+      }
+    }
+
     const targetDir = ASTRO_VASTU_SIGN_DIRECTIONS[targetSignNum];
-    const targetHouse = Object.values(cuspCoords).find(c => c.signNum === targetSignNum)?.house || ((plCoord.house - 1 + 4) % 12) + 1;
     const bodyMapping = SIGN_BODY_PART_MAPPINGS[targetSignNum] || SIGN_BODY_PART_MAPPINGS[1];
     const items = PLANET_KARAKA_OBJECTS[plName] || [];
 
     const placeItems: string[] = [];
     if (plName === "Mars") placeItems.push("सिंदूरी हनुमान जी का चित्र", "तांबे का त्रिकोण यंत्र");
     else if (plName === "Saturn") placeItems.push("शनि का स्वच्छ प्रतीक", "काले चने/उड़द का पात्र", "लोहे का स्वच्छ छल्ला/घोड़े की नाल");
-    else if (plName === "Moon") placeItems.push("चांदी का चौकोर सिक्का", "स्वच्छ जल कलश/चांदी का पात्र");
-    else if (plName === "Sun") placeItems.push("तांबे का सूर्य यंत्र", "पिता का आशीर्वाद स्वरूप उपहार");
-    else if (plName === "Mercury") placeItems.push("हरा इनडोर पौधा (तुलसी/मनी प्लांट)", "बुध यंत्र");
-    else if (plName === "Jupiter") placeItems.push("पीतल की घंटी", "केसर/हल्दी स्वस्तिक", "श्रीयंत्र");
-    else if (plName === "Venus") placeItems.push("सफेद सुगंधित फूल", "कपूर की कटोरी", "सफेद संगमरमर कलाकृति");
+    else if (plName === "Moon") placeItems.push("चांदी का चौकोर सिक्का", "स्वच्छ जल कलश/चांदी का पात्र", "जल का बहता फव्वारा");
+    else if (plName === "Sun") placeItems.push("तांबे का सूर्य यंत्र", "दहाड़ते हुए शेर (Roaring Lion) या तेजस्वी राजा का चित्र");
+    else if (plName === "Mercury") placeItems.push("हरा इनडोर पौधा (तुलसी/मनी प्लांट)", "बुध यंत्र", "किताबों की सुव्यवस्थित रैक");
+    else if (plName === "Jupiter") placeItems.push("पीतल की घंटी", "केसर/हल्दी स्वस्तिक", "श्रीयंत्र", "आदरणीय गुरुजी की तस्वीर");
+    else if (plName === "Venus") placeItems.push("सफेद सुगंधित फूल", "ब्रांडेड इत्र/परफ्यूम", "सफेद संगमरमर कलाकृति");
     else if (plName === "Rahu") placeItems.push("ठोस चांदी का टुकड़ा", "नीला क्रिस्टल");
     else placeItems.push(`${plName} का शुभ सात्विक प्रतीक`);
+
+    let therapyInstructions = `${bodyMapping.bodyPartHi} पर ${plName} के अनुसार उपचार करें।`;
+    if (plName === "Saturn" || targetSignNum === 10) {
+      therapyInstructions = "घुटने (पुरुष दायां, स्त्री बायां) पर काजल से एक सूक्ष्म काली बिंदी लगाएं। यह 180° किलर हिट को तुरंत 120° रक्षक ढाल में बदलता है।";
+    } else if (plName === "Jupiter" && targetSignNum === 2) {
+      therapyInstructions = "कंठ (गला - वृषभ 2 नंबर) पर पीले रंग का धागा (Yellow Thread) पहनें या आदरणीय गुरुजी की तस्वीर उत्तर-पश्चिम (NW) में लगाएं।";
+    } else if (plName === "Jupiter" && targetSignNum === 12) {
+      therapyInstructions = "पांव के नाखूनों पर पीली नेल पॉलिश, तलवों पर हल्दी का तिलक लगाएं या पीले मोज़े (Yellow Socks) पहनें। यह मीन राशि में गुरु को 120° सक्रिय करता है।";
+    } else if (plName === "Mars") {
+      therapyInstructions = "नाभि के 2 इंच के घेरे में शुद्ध गाय का घी लगाएं और लाल रंग का वस्त्र/धागा त्यागें।";
+    } else if (plName === "Moon") {
+      therapyInstructions = "छाती या नाभि पर सफेद चंदन का लेप लगाएं अथवा सोमवार को मेंटल हॉस्पिटल में दूध का दान करें।";
+    } else if (plName === "Sun") {
+      therapyInstructions = "दक्षिण (10 नंबर) ज़ोन से पुराना लोहा/कबाड़ हटाकर दहाड़ते हुए शेर (Roaring Lion) की तस्वीर लगाएं।";
+    } else if (plName === "Venus") {
+      therapyInstructions = "उत्तर (कन्या 6 नंबर) में ब्रांडेड परफ्यूम रखें। यदि किचन है तो गैस चूल्हे के नीचे पीला संगमरमर स्लैब रखें।";
+    }
 
     shiftingPrescriptions.push({
       afflictedTarget: `दशा स्वामी ${blockade.dashaLordName}`,
@@ -854,13 +899,7 @@ export function runAstroVastuHitEngine(
         targetBodyPart: bodyMapping.bodyPartHi,
         action: plName === "Saturn" ? "Dot" : plName === "Mercury" ? "Remove_Thread" : "Apply_Oil_Ghee",
         color: plName === "Saturn" ? "Black" : plName === "Mars" ? "Red" : plName === "Jupiter" ? "Yellow" : "White",
-        instructions: plName === "Saturn"
-          ? "घुटने (पुरुष दायां, स्त्री बायां) पर काजल से एक सूक्ष्म काली बिंदी लगाएं।"
-          : plName === "Mars"
-          ? "नाभि के 2 इंच के घेरे में शुद्ध गाय का घी लगाएं और लाल रंग का वस्त्र/धागा त्यागें।"
-          : plName === "Moon"
-          ? "छाती या नाभि पर सफेद चंदन का लेप लगाएं।"
-          : `${bodyMapping.bodyPartHi} पर ${plName} के अनुसार उपचार करें।`
+        instructions: therapyInstructions,
       }
     });
   });
@@ -1555,6 +1594,7 @@ export function runAstroVastuHitEngine(
     marsDietaryLifestyleProtocol,
     wristThreadTrapAlert,
     mandalaDossier: runVastuPurushaMandalaEngine(chart),
+    gpsDossier: runGPSAstroVastuEngine(chart) || undefined,
   };
 
   const astroPrescription = evaluateAstroPrescriptionFormula(chart, dossier as any);

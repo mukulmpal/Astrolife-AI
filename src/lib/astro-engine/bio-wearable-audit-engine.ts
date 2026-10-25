@@ -76,7 +76,10 @@ export type WearableItemId =
   | "black_tourmaline"  // ब्लैक टर्मेलीन / लावा स्टोन
   | "tortoise_ring"     // कछुआ अंगूठी
   | "silver_ghungroo"   // चांदी के घुंघरू / छनछन पायल
-  | "silver_tagdi";     // चांदी की करधनी / तगड़ी
+  | "silver_tagdi"      // चांदी की करधनी / तगड़ी
+  | "yellow_socks"      // पीले मोज़े (Yellow Socks - मीन गुरु सक्रियण)
+  | "feet_turmeric"     // पांव/नाखून पर हल्दी या पीली नेल पॉलिश (Feet Turmeric)
+  | "lion_symbol";      // दहाड़ता हुआ शेर / सूर्य प्रतीक (Roaring Lion)
 
 export interface WornItemInput {
   id: string; // unique identifier
@@ -554,6 +557,33 @@ export const WEARABLE_ITEMS_REGISTRY: Record<WearableItemId, {
     element: "Jala",
     notesHi: "कमर में चांदी की करधनी पेडू व हार्मोन्स को शीतल रखती है।",
   },
+  yellow_socks: {
+    id: "yellow_socks",
+    titleHi: "पीले मोज़े (Yellow Socks)",
+    category: "accessory",
+    planet: "Jupiter",
+    planetHi: "गुरु (Jupiter)",
+    element: "Akasha",
+    notesHi: "पैरों (मीन राशि/12वें भाव) में पीले मोज़े पहनना गुरु को सक्रिय कर 120° रक्षा ढाल बनाता है।",
+  },
+  feet_turmeric: {
+    id: "feet_turmeric",
+    titleHi: "पांव पर हल्दी या पीली नेल पॉलिश (Feet Turmeric/Yellow Nail Polish)",
+    category: "accessory",
+    planet: "Jupiter",
+    planetHi: "गुरु (Jupiter)",
+    element: "Akasha",
+    notesHi: "पैरों के नाखूनों पर पीली नेल पॉलिश या हल्दी का तिलक गुरु को मीन राशि में जागृत करता है।",
+  },
+  lion_symbol: {
+    id: "lion_symbol",
+    titleHi: "दहाड़ता हुआ शेर / सूर्य प्रतीक (Roaring Lion)",
+    category: "accessory",
+    planet: "Sun",
+    planetHi: "सूर्य (Sun)",
+    element: "Agni",
+    notesHi: "शेर जंगल का राजा है और सूर्य का प्रतीक है। यह मन की घबराहट मिटाकर प्रचंड आत्मविश्वास देता है।",
+  },
 };
 
 // ── Master Computation Function ─────────────────────────────────────────────
@@ -733,6 +763,40 @@ export function auditUserWearables(
         mechanism = `${lagnaSignHindi} लग्न के लिए शनि मारक/शत्रु है। नीलम पहनने से जीवन में अचानक भारी नुकसान, अकेलापन व अवसाद उत्पन्न होता है।`;
         symptoms.push("अचानक काम धंधा ठप होना व मानसिक यातना");
         recommendation = `नीलम तुरंत उतारें।`;
+      } else if (worn.item === "cats_eye") {
+        const moonInGeminiOr12th = dossier?.planetCoordinates.some(p => p.name === "Moon" && (p.signNum === 3 || p.house === 12 || p.house === 8));
+        const mercuryAfflicted = dossier?.planetCoordinates.some(p => p.name === "Mercury" && (p.house === 1 || p.house === 3 || p.signNum === 3));
+        const isArmOrWrist = ["wrist_left", "wrist_right", "upper_arm", "finger_index", "finger_middle", "finger_ring", "finger_little"].includes(worn.location);
+        
+        if (isArmOrWrist && moonInGeminiOr12th) {
+          severity = "CRITICAL_REMOVE";
+          badgeText = "🚨 लहसुनिया सख्त वर्जित (चंद्र-केतु अनिद्रा/अवसाद)";
+          badgeColor = "#DC2626";
+          badgeBg = "rgba(220, 38, 38, 0.12)";
+          mechanism = "हाथ/कलाई (मिथुन 3 नंबर राशि) पर लहसुनिया (केतु) ब्रेसलेट या अंगूठी पहनना सीधे चंद्रमा के साथ ग्रहण/विच्छेद योग बनाता है। इससे नर्वस सिस्टम में अत्यधिक अशांति, रात को नींद न आना (Insomnia), अकारण रोने का मन करना और गहरा मानसिक अवसाद उत्पन्न होता है।";
+          symptoms.push("अचानक रात को नींद टूटना व भयंकर अनिद्रा (Insomnia)");
+          symptoms.push("अकेलेपन का भय, अकारण रोना व घबराहट");
+          symptoms.push("मानसिक शांति पूर्णतः भंग होना व बेचैनी");
+          recommendation = "लहसुनिया को तत्काल उतारें। चंद्रमा को शांत करने हेतु सोमवार को मानसिक आरोग्यशाला या जरूरतमंदों को दूध का दान करें और कलाई पर सादा चांदी का कड़ा पहनें।";
+        } else if (mercuryAfflicted) {
+          severity = "CRITICAL_REMOVE";
+          badgeText = "🚨 लहसुनिया सख्त वर्जित (बुध-केतु शिक्षा ब्रेक)";
+          badgeColor = "#DC2626";
+          badgeBg = "rgba(220, 38, 38, 0.12)";
+          mechanism = "आपकी कुंडली में बुध लग्न अथवा बुद्धि/शिक्षा के भाव में है। केतु का रत्न (लहसुनिया) धारण करने से 'बुध-केतु' का अलगाव योग सक्रिय हो जाता है, जो सीधे बुद्धि को कुंद करता है और शिक्षा/करियर में अचानक ब्रेक लगा देता है।";
+          symptoms.push("पढ़ाई में अचानक मन न लगना व एकाग्रता भंग होना");
+          symptoms.push("निर्णय लेने की क्षमता कुंद होना व भ्रम");
+          symptoms.push("नर्वस सिस्टम में खिंचाव व सुस्ती");
+          recommendation = "लहसुनिया तत्काल उतारें। शिक्षा में सुधार हेतु हरे पौधे लगाएं और गणेश जी की आराधना करें।";
+        } else {
+          severity = "CAUTION";
+          badgeText = "⚠️ लहसुनिया सावधानी (केतु विक्षेप)";
+          badgeColor = "#D97706";
+          badgeBg = "rgba(217, 119, 6, 0.12)";
+          mechanism = "लहसुनिया (केतु) संकोच व विरक्ति का पत्थर है। इसे बिना विशेष दशा व ग्रह स्थिति के पहनने से अकेलापन व बेचैनी बढ़ती है।";
+          symptoms.push("अकेलापन व संबंधों में विरक्ति");
+          recommendation = "लहसुनिया के स्थान पर सात्विक रुद्राक्ष धारण करना अधिक सुरक्षित है।";
+        }
       } else {
         severity = "CAUTION";
         badgeText = "⚠️ रत्न दशा अनुसार जांचें";
@@ -775,6 +839,39 @@ export function auditUserWearables(
       mechanism = `टखना कालपुरुष के 11वें भाव (कुंभ राशि) का प्रतिनिधित्व करता है। केवल टखने पर सादा काला धागा बांधना बुरी नजर और नकारात्मक तरंगों से रक्षा करता है।`;
       symptoms.push("बुरी नजर व ऊपरी बाधा से सुरक्षा");
       recommendation = `इसे बिना किसी धातु या घुंघरू के सादा ही पहने रखें।`;
+    }
+
+    // ── PATTERN J: Yellow Thread in Neck (Jupiter 120° Shield Shifting)
+    else if (worn.item === "yellow_thread" && worn.location === "neck") {
+      severity = "SAFE_BENEFICIAL";
+      badgeText = "✅ अमृत समान (कंठ में गुरु 120° रक्षक)";
+      badgeColor = "#16A34A";
+      badgeBg = "rgba(22, 163, 74, 0.12)";
+      mechanism = "कंठ कालपुरुष की द्वितीय राशि (वृषभ) का स्थान है। गले में पीला धागा धारण करने से गुरु वृषभ में सक्रिय होकर चंद्रमा अथवा पीड़ित भाव पर 120° की अमृतमयी रक्षक ढाल बनाता है, जो 180° किलर हिट को तत्काल शांत करता है।";
+      symptoms.push("वाणी में सौम्यता, ज्ञान का सही उपयोग व धन आगमन");
+      recommendation = "इसे श्रद्धापूर्वक गले में धारण रखें।";
+    }
+
+    // ── PATTERN K: Yellow Socks or Feet Turmeric (Jupiter in Pisces / Feet Activation)
+    else if ((worn.item === "yellow_socks" || worn.item === "feet_turmeric") && (worn.location === "feet_soles" || worn.location === "ankle_right" || worn.location === "ankle_left")) {
+      severity = "SAFE_BENEFICIAL";
+      badgeText = "✅ परम कल्याणकारी (मीन राशि गुरु सक्रियण)";
+      badgeColor = "#16A34A";
+      badgeBg = "rgba(22, 163, 74, 0.12)";
+      mechanism = "पैर के तलवे व नाखून कालपुरुष की 12वीं राशि (मीन) का प्रतिनिधित्व करते हैं। पांव पर हल्दी का तिलक, पीली नेल पॉलिश या पीले मोज़े पहनना गुरु को अपनी स्वराशि (मीन) में सक्रिय करता है और किलर आघात को 120° रक्षा कवच में परिवर्तित करता है।";
+      symptoms.push("पैरों में हल्कापन, दुःस्वप्नों से मुक्ति व आध्यात्मिक शांति");
+      recommendation = "इसे नियमित रूप से प्रयोग करें।";
+    }
+
+    // ── PATTERN L: Roaring Lion Symbol (Sun Courage Armor)
+    else if (worn.item === "lion_symbol") {
+      severity = "SAFE_BENEFICIAL";
+      badgeText = "✅ राजसी आत्मबल कवच (सूर्य शेर प्रतीक)";
+      badgeColor = "#16A34A";
+      badgeBg = "rgba(22, 163, 74, 0.12)";
+      mechanism = "दहाड़ता हुआ शेर सूर्य (राजा) का प्रत्यक्ष पराक्रम प्रतीक है। यह मन की घबराहट, स्टेज-फियर व संकोच को नष्ट कर अदम्य साहस व निर्भयता प्रदान करता है।";
+      symptoms.push("प्रचंड आत्मविश्वास, नेतृत्व क्षमता व निर्भय संवाद");
+      recommendation = "इसे आत्मबल वृद्धि हेतु निसंकोच प्रयोग करें।";
     }
 
     // ── DEFAULT FALLBACK
