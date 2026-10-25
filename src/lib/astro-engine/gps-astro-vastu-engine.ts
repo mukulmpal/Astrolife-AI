@@ -57,6 +57,7 @@ export interface QueryHouseGPSAnalysis {
   targetDirectionCode: string;
   clutterToInspect: string[];
   actionRequired: string;
+  shastricMechanism: string;
   activatingRemedy: string;
   utilizationProtocol?: string;
 }
@@ -200,6 +201,85 @@ export const SIGN_LORDS: Record<number, string> = {
   12: "Jupiter",  // Pisces
 };
 
+// ── 12 Signs Master Clutter & Anti-Element Matrix ────────────────────────────
+
+export const SIGN_CLUTTER_MATRIX: Record<number, { element: string; antiElements: string[]; clutterItems: string[] }> = {
+  1: {
+    element: "अग्नि तत्व (Fire - East)",
+    antiElements: ["जल तत्व", "नीला/काला रंग", "सीलन"],
+    clutterItems: ["गंदा रुका हुआ पानी", "नीला/काला पुराना कपड़ा", "टूटा हुआ फर्नीचर", "एंटी-वाटर तत्व"]
+  },
+  2: {
+    element: "पृथ्वी/वायु तत्व (North-West)",
+    antiElements: ["भारी कबाड़", "अग्नि तत्व", "कटे-फटे कागज"],
+    clutterItems: ["गंदे बिना धुले बर्तन", "भारी कबाड़", "पुराने कटे-फटे व्यर्थ कागजात", "खराब प्रसाधन सामग्री"]
+  },
+  3: {
+    element: "वायु/बुद्धि तत्व (North-East)",
+    antiElements: ["भारी वजन", "अंधेरा", "कबाड़"],
+    clutterItems: ["अव्यवस्थित रद्दी किताबें", "खराब इलेक्ट्रॉनिक्स/पेन", "टूटी घड़ियां", "अव्यवस्था"]
+  },
+  4: {
+    element: "जल तत्व (Water - North)",
+    antiElements: ["अग्नि", "चूल्हा", "लाल/पीला रंग"],
+    clutterItems: ["गंदा पानी", "बंद नल/सीपेज", "लाल वस्तुएं/हीटर/अग्नि", "सूखा कचरा"]
+  },
+  5: {
+    element: "अग्नि/सूर्य तत्व (East-North-East)",
+    antiElements: ["अंधेरा", "नीला/काला रंग", "कचरा"],
+    clutterItems: ["अंधेरा व सीलन", "नीले/काले पर्दे या डिब्बे", "कबाड़ व धूल-मिट्टी", "बंद इलेक्ट्रॉनिक गैजेट्स"]
+  },
+  6: {
+    element: "पृथ्वी/जल संधि (North - Kuber Zone)",
+    antiElements: ["रसोई की अग्नि", "लाल रंग", "कूड़ा"],
+    clutterItems: ["रसोई की अग्नि/चूल्हा (जल में अग्नि)", "लाल रंग की वस्तुएं", "कूड़ेदान (Dustbin)", "अव्यवस्था"]
+  },
+  7: {
+    element: "वायु/आकाश तत्व (West-South-West - Vidya Zone)",
+    antiElements: ["लोहे का भारी कबाड़", "जंग", "अग्नि"],
+    clutterItems: ["वर्कशॉप का भारी औजार", "लोहे का सामान", "जंग लगा पुराना लोहा", "अव्यवस्थित फाइलें"]
+  },
+  8: {
+    element: "जल/अग्नि संधि (South-South-West - Disposal Zone)",
+    antiElements: ["पवित्र ग्रंथ", "तिजोरी", "अध्ययन सामग्री"],
+    clutterItems: ["शौचालय में रखी किताबें", "दवाइयों का ढेर", "डस्टबिन में पेन/कागज", "टूटे औजार"]
+  },
+  9: {
+    element: "अग्नि/विचार तत्व (East-South-East)",
+    antiElements: ["जूते-चप्पल", "गंदा जल", "कबाड़"],
+    clutterItems: ["जूते-चप्पल/डस्टबिन", "धार्मिक वस्तुओं का अनादर", "सीलन", "एंटी-कलर वस्तुएं"]
+  },
+  10: {
+    element: "पृथ्वी/शनि तत्व (South - Yama Zone)",
+    antiElements: ["जल", "नीला रंग", "शीशा"],
+    clutterItems: ["जंग लगा पुराना लोहा", "कबाड़/टूटा सामान", "काले पुराने जूते/कपड़े", "टूटी मशीनें"]
+  },
+  11: {
+    element: "वायु/आकाश तत्व (West - Labha Zone)",
+    antiElements: ["अग्नि", "हरा रंग", "रुका हुआ जल"],
+    clutterItems: ["रुका हुआ गंदा पानी", "पुराना अनुपयोगी कबाड़", "टूटे हुए शीशे/फ्रेम", "अवरोधक वस्तुएं"]
+  },
+  12: {
+    element: "जल/आकाश तत्व (North-East - Ishan Zone)",
+    antiElements: ["शौचालय", "भारी वजन", "चमड़ा", "अग्नि"],
+    clutterItems: ["भारी जूते-चप्पल", "शौचालय/गंदगी", "चमड़े का सामान", "अग्नि/हीटर/लाल रंग"]
+  }
+};
+
+// ── 9 Planetary Karaka Activation Items ─────────────────────────────────────
+
+export const PLANET_KARAKA_ACTIVATION_ITEMS: Record<string, string> = {
+  Sun: "दहाड़ते हुए शेर (Roaring Lion) अथवा तेजस्वी उगते सूर्य का चित्र लगाएं, जो आत्मबल व मान-प्रतिष्ठा में वृद्धि करे।",
+  Moon: "शुद्ध जल का बहता झरना (Water Fountain) लगाएं अथवा चांदी का चौकोर सिक्का / शांति कलश स्थापित करें।",
+  Mars: "तांबे का पिरामिड या मंगल यंत्र स्थापित करें अथवा लाल रंग का प्रेरक प्रतीक रखें।",
+  Mercury: "हरा तुलसी का पौधा लगाएं, श्रीयंत्र स्थापित करें या पारदर्शी कांच की बोतल में जल रखें।",
+  Jupiter: "आदरणीय गुरुजी/ईष्टदेव का चित्र, पवित्र धार्मिक ग्रंथ अथवा पीतल की घंटी स्थापित करें।",
+  Venus: "एक छोटी कांच की शीशी में प्रीमियम ब्रांडेड परफ्यूम रखें अथवा सफेद चंदन/चांदी की वस्तु स्थापित करें।",
+  Saturn: "नीला एंटी-क्लॉकवाइज स्प्रिंग लगाएं अथवा लोहे का शनि छल्ला/लेड पिरामिड स्थापित करें।",
+  Rahu: "कच्ची चांदी का चौकोर टुकड़ा अथवा 5 रॉड्स वाली मेटल विंड चाइम लगाएं।",
+  Ketu: "24 घंटे जलने वाला पीला बल्ब लगाएं अथवा त्रिकोणीय केसरिया/पीला धर्म ध्वज स्थापित करें।"
+};
+
 // ── 12 Query Houses Themes ──────────────────────────────────────────────────
 
 export const QUERY_HOUSE_THEMES: Record<number, { en: string; hi: string }> = {
@@ -300,45 +380,39 @@ export function runGPSAstroVastuEngine(chart: ChartData | null | undefined): GPS
     const targetSign = RASHIS_ORDER[targetSignNum - 1];
     const dirInfo = ASTRO_VASTU_SIGN_DIRECTIONS[targetSignNum] || ASTRO_VASTU_SIGN_DIRECTIONS[1];
 
-    // Clutter items to inspect based on target zone & lord
-    const clutter: string[] = [];
-    if (dirInfo.code === "S" || targetSignNum === 10) clutter.push("जंग लगा पुराना लोहा", "कबाड़/टूटा सामान", "काले पुराने जूते/कपड़े");
-    else if (dirInfo.code === "WSW" || targetSignNum === 7) clutter.push("वर्कशॉप का भारी औजार", "लोहे का सामान", "अव्यवस्थित फाइलें");
-    else if (dirInfo.code === "SSW" || targetSignNum === 8) clutter.push("शौचालय में रखी किताबें", "दवाइयों का ढेर", "डस्टबिन में पेन/कागज");
-    else if (dirInfo.code === "N" || targetSignNum === 6) clutter.push("रसोई की अग्नि/चूल्हा", "लाल रंग की वस्तुएं", "कूड़ेदान");
-    else if (dirInfo.code === "NW" || targetSignNum === 2) clutter.push("गंदे बर्तन", "भारी कबाड़", "कटे-फटे कागजात");
-    else if (dirInfo.code === "ENE" || targetSignNum === 5) clutter.push("अंधेरा", "नीला/काला रंग", "कचरा");
-    else clutter.push("एंटी-एलिमेंट (विरोधी तत्व)", "एंटी-ऑब्जेक्ट (विरोधी वस्तुएं)", "गंदगी/कबाड़");
+    // Clutter items dynamically resolved from target zone element & sign
+    const clutterDef = SIGN_CLUTTER_MATRIX[targetSignNum] || SIGN_CLUTTER_MATRIX[1];
+    const clutter = [...clutterDef.clutterItems];
 
     // Action Required
     const actionRequired = `घर के ${dirInfo.direction} (${dirInfo.directionHindi} - ${dirInfo.code}) ज़ोन को तत्काल नीट एंड क्लीन करें। वहां से ${clutter.slice(0, 2).join(" व ")} तत्काल हटाएं।`;
 
-    // Activating Remedy
+    // Dynamic Shastric Reverse-Counting Mechanism
+    const targetThemeHi = QUERY_HOUSE_THEMES[targetHouse]?.hi || `${targetHouse}वां भाव`;
+    const queryThemeHi = QUERY_HOUSE_THEMES[h]?.hi || `${h}वां भाव`;
+    const shastricMechanism = `भाव ${h} (${queryThemeHi}) का स्वामी ${lordPlanetHindi} आपके भाव ${placedHouse} (${placedSign}) में स्थित है। ${lordPlanetHindi} का जीपीएस कोड ${gpsDef.code} है। ${
+      gpsDef.code === 1
+        ? "चूंकि जीपीएस कोड 1 है, अतः यह ग्रह उसी भाव में बैठकर फल देता है।"
+        : `अतः भाव ${placedHouse} से वामावर्त (घड़ी की उल्टी दिशा) ${gpsDef.code} भाव पीछे चलने पर ट्रिगर भाव ${targetHouse} (${targetSign}) प्राप्त होता है।`
+    } शास्त्रीय नियम के अनुसार, जब तक आपका ट्रिगर भाव ${targetHouse} (${targetThemeHi}) और इसकी दिशा ${dirInfo.directionHindi} (${dirInfo.code}) संतुलित व सक्रिय नहीं होगी, तब तक भाव ${h} का अभीष्ट फल गति नहीं पकड़ेगा।`;
+
+    // Activating Remedy dynamically derived from Lord's Karaka & Target Zone
+    const karakaItem = PLANET_KARAKA_ACTIVATION_ITEMS[lordPlanet] || PLANET_KARAKA_ACTIVATION_ITEMS.Mercury;
     let activatingRemedy = "";
-    if (h === 1) {
+    if (h === 7 && lordPlanet === "Venus") {
+      activatingRemedy = `${dirInfo.directionHindi} में एक छोटी कांच की शीशी में प्रीमियम ब्रांडेड परफ्यूम रखें। यदि वहां किचन है तो गैस चूल्हे के नीचे पीला संगमरमर स्लैब रखें।`;
+    } else if (h === 1 && lordPlanet === "Sun") {
       activatingRemedy = `सूर्य/आत्मबल को प्रखर करने हेतु ${dirInfo.directionHindi} में दहाड़ते हुए शेर (Roaring Lion) अथवा तेजस्वी राजा का चित्र लगाएं।`;
-    } else if (h === 2) {
-      activatingRemedy = `${dirInfo.directionHindi} में शुद्ध जल का बहता झरना (Water Fountain) लगाएं अथवा चांदी का चौकोर सिक्का स्थापित करें।`;
-    } else if (h === 3) {
-      activatingRemedy = `${dirInfo.directionHindi} में इंटरनेट/वाई-फाई राउटर या हरे तुलसी के पौधे की स्थापना करें और खुलकर संवाद करें।`;
     } else if (h === 4) {
-      activatingRemedy = `मन की शांति हेतु अपने प्रोफेशन (दशम भाव) को स्थिर करें और ${dirInfo.directionHindi} में सफेद चंदन या शांति कलश रखें।`;
-    } else if (h === 5) {
-      activatingRemedy = `${dirInfo.directionHindi} में मोरपंख या श्रीसरस्वती/गाय-बछड़े की तस्वीर लगाएं।`;
+      activatingRemedy = `मन की शांति हेतु अपने ट्रिगर भाव ${targetHouse} (${targetThemeHi}) को सुदृढ़ करें और ${dirInfo.directionHindi} में ${karakaItem}`;
     } else if (h === 6) {
-      activatingRemedy = `जरूरतमंद बच्चों को मुफ्त शिक्षा या धार्मिक संस्था में निःस्वार्थ सेवा (सेवा भाव) दें।`;
-    } else if (h === 7) {
-      activatingRemedy = `${dirInfo.directionHindi} में एक छोटी कांच की शीशी में प्रीमियम ब्रांडेड परफ्यूम रखें। यदि किचन है तो गैस चूल्हे के नीचे पीला संगमरमर स्लैब रखें।`;
+      activatingRemedy = `शिक्षा व विद्या की निःस्वार्थ सेवा (जरूरतमंद बच्चों को पढ़ाना) करें। साथ ही ${dirInfo.directionHindi} में ${karakaItem}`;
     } else if (h === 8) {
-      activatingRemedy = `अष्टम भाव को ज्योतिष, गुप्त ज्ञान या गहन रिसर्च में लगाकर यूटिलाइज करें; ${dirInfo.directionHindi} से दवाइयों का ढेर हटाएं।`;
-    } else if (h === 9) {
-      activatingRemedy = `${dirInfo.directionHindi} में अपने आदरणीय गुरुजी की तस्वीर, धार्मिक ग्रंथ या पीतल की घंटी स्थापित करें।`;
-    } else if (h === 10) {
-      activatingRemedy = `${dirInfo.directionHindi} में उगते हुए सूर्य की तस्वीर लगाएं और वरिष्ठों का सम्मान करें।`;
-    } else if (h === 11) {
-      activatingRemedy = `${dirInfo.directionHindi} में कुबेर जी की मूर्ति या तिजोरी/कैश बॉक्स का मुख इस दिशा की ओर रखें।`;
+      activatingRemedy = `अष्टम भाव को ज्योतिष, गुप्त ज्ञान या गहन रिसर्च में लगाकर यूटिलाइज करें; ${dirInfo.directionHindi} से दवाइयों का ढेर हटाएं और वहां ${karakaItem}`;
     } else if (h === 12) {
-      activatingRemedy = `सोमवार को मानसिक आरोग्यशाला (मेंटल हॉस्पिटल) या विशेष बच्चों की संस्था में दूध का दान करें और नित्य ध्यान (Meditation) करें।`;
+      activatingRemedy = `सोमवार को मेंटल हॉस्पिटल या अनाथालय में दूध/फल का दान करें और नित्य ध्यान (Meditation) करें। साथ ही ${dirInfo.directionHindi} में ${karakaItem}`;
+    } else {
+      activatingRemedy = `${dirInfo.directionHindi} (${dirInfo.code}) ज़ोन में ${karakaItem}`;
     }
 
     // Utilization Protocol for dusthanas or difficult houses
@@ -371,6 +445,7 @@ export function runGPSAstroVastuEngine(chart: ChartData | null | undefined): GPS
       targetDirectionCode: dirInfo.code,
       clutterToInspect: clutter,
       actionRequired,
+      shastricMechanism,
       activatingRemedy,
       utilizationProtocol,
     };
@@ -419,26 +494,54 @@ export function runGPSAstroVastuEngine(chart: ChartData | null | undefined): GPS
     }
   };
 
-  // 5. House Utilization Advices
+  // 5. Dynamic House Utilization Advices (100% Chart-Driven)
+  const getHouseOccupants = (houseNum: number): string[] => {
+    if (!chart.planets) return [];
+    return Object.entries(chart.planets)
+      .filter(([_, p]: [string, any]) => {
+        const ph = p?.house || p?.rashiHouse;
+        return ph === houseNum;
+      })
+      .map(([name, _]) => PLANETS_HINDI[name] || name);
+  };
+
+  const h8SignNum = getHouseSignNum(8);
+  const h8Lord = SIGN_LORDS[h8SignNum] || "Mercury";
+  const h8LordHi = PLANETS_HINDI[h8Lord] || h8Lord;
+  const h8Occupants = getHouseOccupants(8);
+  const h8Connected = h8Occupants.length > 0 ? `${h8LordHi} (स्वामी), ${h8Occupants.join(", ")} (स्थित)` : `${h8LordHi} (भाव स्वामी)`;
+
+  const h12SignNum = getHouseSignNum(12);
+  const h12Lord = SIGN_LORDS[h12SignNum] || "Jupiter";
+  const h12LordHi = PLANETS_HINDI[h12Lord] || h12Lord;
+  const h12Occupants = getHouseOccupants(12);
+  const h12Connected = h12Occupants.length > 0 ? `${h12LordHi} (स्वामी), ${h12Occupants.join(", ")} (स्थित)` : `${h12LordHi} (भाव स्वामी)`;
+
+  const h6SignNum = getHouseSignNum(6);
+  const h6Lord = SIGN_LORDS[h6SignNum] || "Mercury";
+  const h6LordHi = PLANETS_HINDI[h6Lord] || h6Lord;
+  const h6Occupants = getHouseOccupants(6);
+  const h6Connected = h6Occupants.length > 0 ? `${h6LordHi} (स्वामी), ${h6Occupants.join(", ")} (स्थित)` : `${h6LordHi} (भाव स्वामी)`;
+
   const houseUtilizationAdvices: HouseUtilizationAdvice[] = [
     {
       houseNumber: 8,
       houseTheme: "अष्टम भाव (पीड़ा, गुप्त रहस्य व रुकावटें)",
-      connectedPlanet: "बुध / शनि",
+      connectedPlanet: h8Connected,
       philosophicalConcept: "हर ग्रह और भाव आपसे पूछता है: 'आप मुझे यूटिलाइज करोगे या मैं आपको कष्ट दूं?'",
       practicalAction: "ज्योतिष, वास्तु, रिसर्च या गुप्त गूढ़ विद्याओं का अध्ययन करें। अष्टम भाव का सकारात्मक उपयोग होते ही यह मानसिक यातना देने के बजाय दिव्य ज्ञान का उपहार बन जाता है।"
     },
     {
       houseNumber: 12,
       houseTheme: "द्वादश भाव (हॉस्पिटल, अनिद्रा व धन व्यय)",
-      connectedPlanet: "चंद्र / केतु",
+      connectedPlanet: h12Connected,
       philosophicalConcept: "12वां भाव व्यय का है; यदि इसे सात्विक कार्यों में खर्च नहीं करेंगे तो यह बीमारी व कोर्ट में नष्ट होगा।",
       practicalAction: "सोमवार को मेंटल हॉस्पिटल या अनाथालय में दूध व फल का दान करें। प्रतिदिन 30 मिनट से 1 घंटा योग व ध्यान (Meditation) करें ताकि मोक्ष व आंतरिक शांति प्राप्त हो।"
     },
     {
       houseNumber: 6,
       houseTheme: "षष्ठ भाव (ऋण, रोग, शत्रु व सेवा)",
-      connectedPlanet: "बुध / केतु",
+      connectedPlanet: h6Connected,
       philosophicalConcept: "सेवा (Service) से षष्ठ भाव का रोग व ऋण तुरंत कट जाता है।",
       practicalAction: "गरीब या असहाय बच्चों को पुस्तकें बांटें और उन्हें मुफ्त शिक्षा प्रदान करें। इससे आपका प्रोफेशन व सामाजिक प्रतिष्ठा आकाश छूने लगेगी।"
     }

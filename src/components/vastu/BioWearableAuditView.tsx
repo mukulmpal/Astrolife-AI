@@ -19,9 +19,8 @@ interface BioWearableAuditViewProps {
 
 export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
   const [wornItems, setWornItems] = useState<WornItemInput[]>([
-    { id: "def-1", location: "neck", item: "gold" },
-    { id: "def-2", location: "wrist_right", item: "red_mouli" },
-    { id: "def-3", location: "ankle_left", item: "black_thread" },
+    { id: "def-1", location: "wrist_right", item: "red_mouli" },
+    { id: "def-2", location: "neck", item: "gold" },
   ]);
 
   const [selectedLocation, setSelectedLocation] = useState<BodyLocationId>("wrist_right");
@@ -350,7 +349,33 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
           🔍 व्यक्तिगत मद-वार विश्लेषण एवं वैज्ञानिक प्रभाव (Item-by-Item Analysis):
         </h4>
 
-        {auditReport.itemsAudited.map((item, idx) => (
+        {auditReport.itemsAudited.length === 0 ? (
+          <div style={{ padding: 28, textAlign: "center", background: "#FAF8F5", borderRadius: 14, border: "1.5px dashed #D1D5DB" }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>📿</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#1F2937" }}>
+              आपकी बायो-मैग्नेटिक ऑडिट सूची अभी खाली है
+            </div>
+            <p style={{ fontSize: 13, color: "#6B7280", margin: "6px 0 16px 0", maxWidth: 520, marginInline: "auto" }}>
+              ऊपर दिए गए फॉर्म से चुनें कि आपने शरीर के किस अंग पर कौन सा आभूषण, कड़ा, रत्न या धागा पहना हुआ है और &apos;सूची में जोड़ें&apos; पर क्लिक करें। यह इंजन आपकी जन्मकुंडली की महादशा और 180°/90° हिट्स के विरुद्ध उनका लाइव बायो-मैग्नेटिक ऑडिट करता है।
+            </p>
+            <button
+              onClick={handleLoadSamplePreset}
+              style={{
+                padding: "9px 18px",
+                background: "#B8860B",
+                color: "#FFFFFF",
+                fontSize: 13,
+                fontWeight: 700,
+                borderRadius: 8,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              ⚡ उदाहरण देखने हेतु नमूना डेटा लोड करें (Load 5 Preset Items)
+            </button>
+          </div>
+        ) : (
+          auditReport.itemsAudited.map((item, idx) => (
           <div
             key={item.id || idx}
             className="card"
@@ -449,7 +474,8 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
               🛠️ <strong>सुधारात्मक निर्देश:</strong> {item.correctiveRecommendation}
             </div>
           </div>
-        ))}
+        ))
+      )}
       </div>
 
       {/* ── Daily Body-Vastu Protocols ── */}
