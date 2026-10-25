@@ -18,6 +18,7 @@ import {
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
 import { BioWearableAuditView } from "./BioWearableAuditView";
 import { GPSAstroVastuView } from "./GPSAstroVastuView";
+import { evaluateNavtaraHitPrecedence } from "@/lib/astro-engine/micro-vastu-auditor";
 // Force rebuild after UI fixes
 import { evaluateDailyAccessories } from "@/lib/astro-engine/astro-prescription-engine";
 
@@ -101,6 +102,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       }
     }
   }, [resolvedChart, targetDate]);
+
+  const navtaraOverrides = useMemo(() => {
+    return evaluateNavtaraHitPrecedence(resolvedChart, dossier);
+  }, [resolvedChart, dossier]);
+  const prohibitedNavtaraItems = navtaraOverrides.filter(o => o.precedenceVerdict === "PROHIBITED_ACTIVATION");
 
   if (!dossier) {
     return (
@@ -1335,6 +1341,44 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
               </div>
             </div>
           </div>
+
+          {/* ── NAVTARA-HIT PRECEDENCE OVERRIDE NOTIFICATION ── */}
+          {prohibitedNavtaraItems.length > 0 && (
+            <div
+              style={{
+                background: "linear-gradient(135deg, #FEF2F2 0%, #FFF5F5 100%)",
+                border: "2px solid #EF4444",
+                borderRadius: 16,
+                padding: "18px 22px",
+                boxShadow: "0 6px 20px rgba(239, 68, 68, 0.15)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: 24 }}>🚨</span>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#991B1B" }}>
+                    नवतारा-हिट वरीयता चेतावनी (Navtara-Hit Precedence Override Active)
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "#7F1D1D", marginTop: 2 }}>
+                    शास्त्रीय नियम: नवतारा में शुभ (परम मित्र / सम्पत) दिखने वाला ग्रह यदि दशा स्वामी पर किलर हिट कर रहा हो, तो हिट थ्योरी नवतारा को पूर्णतः ओवरराइड करती है!
+                  </div>
+                </div>
+              </div>
+              {prohibitedNavtaraItems.map((item) => (
+                <div key={item.planet} style={{ marginTop: 10, background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #FECACA" }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 800, color: "#991B1B" }}>
+                    • {item.planet} ({item.taraNameHi}): {item.hitTargetName || "दशा स्वामी"} पर {item.hitAngle || 180}° किलर वेध सक्रिय है!
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "#7F1D1D", marginTop: 4, lineHeight: 1.5 }}>
+                    {item.warningNoticeHi}
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "#15803D", fontWeight: 700, marginTop: 4 }}>
+                    💡 सुरक्षात्मक समाधान: {item.actionProtocolHi}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* ── EXECUTIVE DIRECT LINK: DAILY ACCESSORIES & MODERN WEARABLES ── */}
           {(() => {

@@ -12,6 +12,7 @@ import {
   type WornItemInput,
   type BioWearableDossier,
 } from "@/lib/astro-engine/bio-wearable-audit-engine";
+import { evaluateNavtaraHitPrecedence } from "@/lib/astro-engine/micro-vastu-auditor";
 
 interface BioWearableAuditViewProps {
   chart: ChartData | any;
@@ -29,6 +30,11 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
   const auditReport: BioWearableDossier = useMemo(() => {
     return auditUserWearables(chart, wornItems, new Date());
   }, [chart, wornItems]);
+
+  const navtaraOverrides = useMemo(() => {
+    return evaluateNavtaraHitPrecedence(chart);
+  }, [chart]);
+  const prohibitedItems = navtaraOverrides.filter(o => o.precedenceVerdict === "PROHIBITED_ACTIVATION");
 
   const handleAddItem = () => {
     const newItem: WornItemInput = {
@@ -125,6 +131,67 @@ export function BioWearableAuditView({ chart }: BioWearableAuditViewProps) {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── Navtara-Hit Precedence Override Alert Banner ── */}
+      {prohibitedItems.length > 0 && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, #FEF2F2 0%, #FFF5F5 100%)",
+            border: "2px solid #EF4444",
+            borderRadius: 14,
+            padding: "16px 20px",
+            boxShadow: "0 4px 15px rgba(239, 68, 68, 0.15)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <span style={{ fontSize: 22 }}>🚨</span>
+            <div style={{ fontSize: 15, fontWeight: 800, color: "#991B1B" }}>
+              नवतारा-हिट वरीयता चेतावनी (Navtara-Hit Precedence Override Active)
+            </div>
+          </div>
+          {prohibitedItems.map((item) => (
+            <div key={item.planet} style={{ marginTop: 8, background: "#FFFFFF", padding: 12, borderRadius: 10, border: "1px solid #FECACA" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#991B1B" }}>
+                • {item.planet} ({item.taraNameHi}): 180°/90° किलर वेध सक्रिय होने के कारण इसका रत्न/कड़ा पहनना पूर्णतः वर्जित है!
+              </div>
+              <div style={{ fontSize: 12, color: "#7F1D1D", marginTop: 4, lineHeight: 1.5 }}>
+                {item.warningNoticeHi}
+              </div>
+              <div style={{ fontSize: 12, color: "#15803D", fontWeight: 700, marginTop: 4 }}>
+                💡 शास्त्रीय उपचार: {item.actionProtocolHi}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Body-Part Trap & Tilak Vector Callout ── */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)",
+          border: "1.5px solid #FCD34D",
+          borderRadius: 14,
+          padding: "14px 18px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 12,
+        }}
+      >
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>
+            ⚠️ देह-वास्तु ट्रैप सूत्र (Body-Part Calibration & Tilak Rules):
+          </div>
+          <div style={{ fontSize: 12, color: "#78350F", marginTop: 4, lineHeight: 1.5 }}>
+            • <strong>कलाई (Wrist):</strong> कालपुरुष की तीसरी राशि <em>मिथुन (3rd Sign/Arms)</em> का प्रतिनिधित्व करती है। कलाई पर पीली मौली या सोने का कड़ा बांधने से कुंडली का तीसरा भाव सक्रिय होता है। यदि तीसरा भाव या उसका स्वामी दशा स्वामी पर किलर हिट कर रहा हो तो कलाई पर पीला/सोना वर्जित है।<br />
+            • <strong>तिलक स्थान:</strong> मस्तक (Forehead) = मेष (1st sign)। नाभि से 3 इंच ऊपर (Solar Plexus) = सिंह राशि (5th sign / गुरु-सूर्य तेज)।
+          </div>
+        </div>
+        <span style={{ fontSize: 11, fontWeight: 800, padding: "4px 10px", background: "#F59E0B", color: "#FFFFFF", borderRadius: 8 }}>
+          देह-वास्तु नियम
+        </span>
       </div>
 
       {/* ── Interactive Item Selector Box ── */}

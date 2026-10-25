@@ -45,6 +45,7 @@ import {
   Activity,
   Droplets,
 } from "lucide-react";
+import { evaluateNavtaraHitPrecedence } from "@/lib/astro-engine/micro-vastu-auditor";
 
 interface NavtaraIntelligenceViewProps {
   chart: ChartData;
@@ -89,6 +90,11 @@ export function NavtaraIntelligenceView({
   const intel: FullNavtaraIntelligence = useMemo(() => {
     return runNavtaraIntelligence(chart, selectedAyanamsa);
   }, [chart, selectedAyanamsa]);
+
+  const navtaraHitOverrides = useMemo(() => {
+    return evaluateNavtaraHitPrecedence(chart);
+  }, [chart]);
+  const activeProhibitions = navtaraHitOverrides.filter(o => o.precedenceVerdict === "PROHIBITED_ACTIVATION");
 
   // Compute Dasha Activation Windows
   const activationWindows: DashaTransitWindow[] = useMemo(() => {
@@ -244,6 +250,27 @@ export function NavtaraIntelligenceView({
                   {b.severity === "HIGH" ? "Ayanamsa Shift (HIGH)" : "Boundary Cusp (LOW)"}
                 </span>
                 <span>{b.alertText}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Navtara-Hit Precedence Override Guard ── */}
+      {activeProhibitions.length > 0 && (
+        <section className="rounded-2xl border-2 border-red-500/40 bg-red-50/80 p-5 flex flex-col gap-3 shadow-sm">
+          <div className="flex items-center gap-2 text-red-900 font-bold text-sm tracking-wide">
+            <span className="text-xl">🚨</span>
+            <span>नवतारा-हिट वरीयता चेतावनी (Astro-Vastu Hit Overrides Navtara Beneficence)</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            {activeProhibitions.map((p) => (
+              <div key={p.planet} className="rounded-xl bg-white p-3.5 border border-red-200 text-xs text-red-900 flex flex-col gap-1.5 leading-relaxed">
+                <div className="font-bold text-red-800 text-sm">
+                  • {p.planet} ({p.taraNameHi}): {p.hitTargetName || "दशा स्वामी"} पर 180°/90° किलर वेध सक्रिय है!
+                </div>
+                <div className="text-[#7F1D1D]">{p.warningNoticeHi}</div>
+                <div className="text-emerald-800 font-semibold">💡 शास्त्रीय समाधान: {p.actionProtocolHi}</div>
               </div>
             ))}
           </div>

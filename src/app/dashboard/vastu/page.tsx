@@ -8,6 +8,18 @@ import { useUserChart, buildChart, type BirthDetails } from "@/lib/user-chart";
 import { EngineShell, EngineHeader, EngineSectionTitle } from "@/components/engine/EngineShell";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { AstroVastuHitRadarView } from "@/components/vastu/AstroVastuHitRadarView";
+import {
+  calculatePlotDualGridDecomposition,
+  type DualGridAuditResult,
+} from "@/lib/astro-engine/plot-geometry-dual-grid";
+import {
+  auditKitchenMicroGrid,
+  auditEmergencyMedicalVastuAlerts,
+  auditWallClockZone,
+  type EmergencyMedicalVastuAlert,
+  type KitchenMicroGridAuditResult,
+  type WallClockZoneAudit,
+} from "@/lib/astro-engine/micro-vastu-auditor";
 import "@/app/dashboard/shared.css";
 
 const DEMO_VASTU_BIRTH: BirthDetails = {
@@ -537,6 +549,23 @@ export default function VastuDashboardPage() {
   const [mindMakanTab, setMindMakanTab] = useState<"physical" | "behavioural" | "routine" | "emotional" | "spiritual">("physical");
   const [activeZoneTab, setActiveZoneTab] = useState<"all" | "strong" | "weak" | "psych" | "transit">("all");
   const [pdfLoading, setPdfLoading] = useState(false);
+
+  // Plot Geometry & Dual Grid State
+  const [plotLengthFeet, setPlotLengthFeet] = useState<number>(50);
+  const [plotWidthFeet, setPlotWidthFeet] = useState<number>(35);
+  const [cutLengthFeet, setCutLengthFeet] = useState<number>(20);
+  const [cutWidthFeet, setCutWidthFeet] = useState<number>(15);
+  const [cutLocation, setCutLocation] = useState<"NE" | "NW" | "SE" | "SW">("NE");
+  const [showDualGridControls, setShowDualGridControls] = useState<boolean>(false);
+
+  // Kitchen Micro-Grid State
+  const [stoveZoneKitchen, setStoveZoneKitchen] = useState<"SE" | "SOUTH" | "EAST" | "NORTH" | "NE" | "NW" | "SW">("SE");
+  const [sinkZoneKitchen, setSinkZoneKitchen] = useState<"NORTH" | "NE" | "NW" | "SE" | "SOUTH" | "EAST" | "SW">("NORTH");
+  const [sameCounter, setSameCounter] = useState<boolean>(true);
+  const [stoveSinkDist, setStoveSinkDist] = useState<number>(3);
+
+  // Wall Clock Zone State
+  const [wallClockZone, setWallClockZone] = useState<string>("N");
   const isDemo = !hasUserChart || !chart?.planets || Object.keys(chart.planets).length === 0;
   const effectiveChart = useMemo(() => {
     if (!isDemo && chart) {
@@ -585,6 +614,34 @@ export default function VastuDashboardPage() {
   const roomPlacementOverall = roomPlacementScorecard.length
     ? Math.round(roomPlacementScorecard.reduce((sum, room) => sum + room.placement.score, 0) / roomPlacementScorecard.length)
     : 0;
+
+  const emergencyMedicalAlerts: EmergencyMedicalVastuAlert[] = useMemo(() => {
+    return auditEmergencyMedicalVastuAlerts(rooms.filter(r => r.direction));
+  }, [rooms]);
+
+  const dualGridResult: DualGridAuditResult = useMemo(() => {
+    return calculatePlotDualGridDecomposition({
+      lengthFeet: Number(plotLengthFeet) || 50,
+      widthFeet: Number(plotWidthFeet) || 35,
+      cutLengthFeet: Number(cutLengthFeet) || 0,
+      cutWidthFeet: Number(cutWidthFeet) || 0,
+      cutLocation,
+      shapeCategory: shape === "cut" ? "l_shape_dual_block" : shape === "irregular" ? "l_shape_dual_block" : shape === "square" ? "regular_square" : "regular_rectangle",
+    });
+  }, [plotLengthFeet, plotWidthFeet, cutLengthFeet, cutWidthFeet, cutLocation, shape]);
+
+  const kitchenMicroAudit: KitchenMicroGridAuditResult = useMemo(() => {
+    return auditKitchenMicroGrid({
+      stoveZoneWithinKitchen: stoveZoneKitchen,
+      sinkZoneWithinKitchen: sinkZoneKitchen,
+      areStoveAndSinkOnSameCounter: sameCounter,
+      distanceBetweenStoveAndSinkFeet: Number(stoveSinkDist) || 3,
+    });
+  }, [stoveZoneKitchen, sinkZoneKitchen, sameCounter, stoveSinkDist]);
+
+  const wallClockAudit: WallClockZoneAudit = useMemo(() => {
+    return auditWallClockZone(wallClockZone);
+  }, [wallClockZone]);
 
   function updateRoom(id: string, patch: Partial<RoomInput>) {
     setRooms(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
@@ -912,6 +969,409 @@ export default function VastuDashboardPage() {
                   {item.label}
                 </label>
               ))}
+            </div>
+          </div>
+
+          {/* ── EMERGENCY MEDICAL ALERTS FOR NE BURNER / TOILET ── */}
+          {emergencyMedicalAlerts.length > 0 && (
+            <div
+              style={{
+                marginBottom: 20,
+                background: "linear-gradient(135deg, #FEF2F2 0%, #FFF5F5 100%)",
+                border: "2px solid #EF4444",
+                borderRadius: 16,
+                padding: "20px 22px",
+                boxShadow: "0 6px 20px rgba(239, 68, 68, 0.15)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                <span style={{ fontSize: 28 }}>🚨</span>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#991B1B" }}>
+                    अत्यंत गंभीर आपातकालीन वास्तु व स्वास्थ्य चेतावनी (CRITICAL EMERGENCY MEDICAL ALERT)
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "#7F1D1D", marginTop: 2 }}>
+                    ईशान कोण (North-East / NNE / ENE) में अग्नि (किचन/गैस स्टोव) अथवा विसर्जन (टॉयलेट) का प्रत्यक्ष प्रभाव।
+                  </div>
+                </div>
+              </div>
+
+              {emergencyMedicalAlerts.map((alert, idx) => (
+                <div key={idx} style={{ marginTop: 12, background: "#FFFFFF", borderRadius: 12, border: "1px solid #FECACA", padding: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
+                    <span style={{ fontSize: 13.5, fontWeight: 800, color: "#991B1B" }}>
+                      ⚠️ {alert.roomType === "kitchen_stove" ? "ईशान में गैस चूल्हा / रसोई (Fire in Water Zone)" : "ईशान में टॉयलेट / सेप्टिक टैंक (Excreta in Head)"} [{alert.zone} दिशा]
+                    </span>
+                    <span style={{ padding: "3px 8px", background: "#DC2626", color: "#FFFFFF", fontSize: 11, fontWeight: 800, borderRadius: 6 }}>
+                      शून्य-उपाय अस्वीकरण
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#7F1D1D", marginBottom: 6 }}>
+                    स्वास्थ्य एवं जानलेवा जोखिम (Medical Hazards):
+                  </div>
+                  <ul style={{ margin: "0 0 10px 0", paddingLeft: 20, fontSize: 12, color: "#991B1B", lineHeight: 1.5 }}>
+                    {alert.medicalHazardsHi.map((h, i) => (
+                      <li key={i}>{h}</li>
+                    ))}
+                  </ul>
+
+                  <div style={{ padding: 10, background: "#FEF2F2", borderRadius: 8, border: "1px dashed #EF4444", fontSize: 12, color: "#991B1B", lineHeight: 1.5, marginBottom: 8 }}>
+                    {alert.zeroRemedyDisclaimerHi}
+                  </div>
+
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#15803D" }}>
+                    अनिवार्य शास्त्रीय समाधान: {alert.mandatoryActionHi}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── PLOT GEOMETRY & L-SHAPE DUAL-GRID CALCULATOR ── */}
+          <div className="card" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+              <div>
+                <div className="card-title serif" style={{ marginBottom: 0 }}>
+                  📐 प्लॉट ज्यामिति व एल-शेप ड्यूल-ग्रिड कैलकुलेटर
+                </div>
+                <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
+                  कट प्लॉट एवं एल-शेप भूमि के लिए दोहरे ब्रह्मस्थान और खड़ी पीतल की पत्ती (Brass Strip) से ऊर्जा विभाजन।
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDualGridControls(!showDualGridControls)}
+                style={{
+                  padding: "6px 14px",
+                  borderRadius: 14,
+                  border: "1px solid rgba(184, 134, 11, 0.4)",
+                  background: showDualGridControls ? "#B8860B" : "transparent",
+                  color: showDualGridControls ? "#FFFFFF" : "#8A6008",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {showDualGridControls ? "कैलकुलेटर छुपाएं" : "प्लॉट माप बदलें"}
+              </button>
+            </div>
+
+            {/* Inputs */}
+            {(showDualGridControls || shape === "cut" || shape === "irregular") && (
+              <div style={{ background: "#FAF7F2", borderRadius: 12, padding: 16, border: "1px solid rgba(184, 134, 11, 0.2)", marginBottom: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+                  <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 12, color: "#6B635B" }}>प्लॉट कुल लंबाई (Feet):</span>
+                    <input
+                      type="number"
+                      value={plotLengthFeet}
+                      onChange={(e) => setPlotLengthFeet(Number(e.target.value))}
+                      style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                    />
+                  </label>
+                  <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 12, color: "#6B635B" }}>प्लॉट कुल चौड़ाई (Feet):</span>
+                    <input
+                      type="number"
+                      value={plotWidthFeet}
+                      onChange={(e) => setPlotWidthFeet(Number(e.target.value))}
+                      style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                    />
+                  </label>
+                  <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 12, color: "#6B635B" }}>कट की लंबाई (Feet):</span>
+                    <input
+                      type="number"
+                      value={cutLengthFeet}
+                      onChange={(e) => setCutLengthFeet(Number(e.target.value))}
+                      style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                    />
+                  </label>
+                  <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 12, color: "#6B635B" }}>कट की चौड़ाई (Feet):</span>
+                    <input
+                      type="number"
+                      value={cutWidthFeet}
+                      onChange={(e) => setCutWidthFeet(Number(e.target.value))}
+                      style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                    />
+                  </label>
+                  <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 12, color: "#6B635B" }}>कट किस दिशा में है:</span>
+                    <select
+                      value={cutLocation}
+                      onChange={(e) => setCutLocation(e.target.value as any)}
+                      style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                    >
+                      <option value="NE">उत्तर-पूर्व (NE)</option>
+                      <option value="SE">दक्षिण-पूर्व (SE)</option>
+                      <option value="SW">दक्षिण-पश्चिम (SW)</option>
+                      <option value="NW">उत्तर-पश्चिम (NW)</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Dual Grid Result Display */}
+            <div style={{ background: "#F8FAFC", borderRadius: 14, border: "1.5px solid #E2E8F0", padding: 18 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "#0F172A" }}>
+                    {dualGridResult.categoryTitleHi}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+                    कुल निर्मित भू-क्षेत्र: {dualGridResult.totalAreaSqFt} वर्ग फीट | स्थिति: {dualGridResult.isDualGridRequired ? "ड्यूल ग्रिड (Block A + B) अनिवार्य" : "एकल ग्रिड पर्याप्त"}
+                  </div>
+                </div>
+                <span
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: 8,
+                    fontSize: 11,
+                    fontWeight: 800,
+                    background: dualGridResult.isDualGridRequired ? "#DBEAFE" : "#DCFCE7",
+                    color: dualGridResult.isDualGridRequired ? "#1E40AF" : "#15803D",
+                  }}
+                >
+                  {dualGridResult.isDualGridRequired ? "2 स्वतंत्र ब्रह्मस्थान" : "1 मुख्य ब्रह्मस्थान"}
+                </span>
+              </div>
+
+              {/* Blocks */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 16 }}>
+                {dualGridResult.blocks.map((blk) => (
+                  <div key={blk.blockId} style={{ background: "#FFFFFF", borderRadius: 10, border: "1px solid #CBD5E1", padding: 14 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>{blk.titleHi}</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#0284C7" }}>{blk.areaPercentage}% क्षेत्रफल</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "#475569", marginBottom: 4 }}>
+                      माप: {blk.widthFeet} फीट × {blk.lengthFeet} फीट ({blk.areaSqFt} वर्ग फीट)
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "#0369A1", marginBottom: 6 }}>
+                      📍 <strong>ब्रह्मस्थान:</strong> {blk.brahmasthanCoordinate.label}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#334155", background: "#F1F5F9", padding: 8, borderRadius: 6 }}>
+                      {blk.recommendedUsageHi}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Brass Strip Partition Protocol if Dual Grid */}
+              {dualGridResult.demarcationStrip && (
+                <div style={{ background: "#FEF3C7", border: "1.5px solid #F59E0B", borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 18 }}>🪙</span>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>
+                      भू-ऊर्जा विभाजन: {dualGridResult.demarcationStrip.materialHi}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#78350F", lineHeight: 1.5, marginBottom: 6 }}>
+                    <strong>शास्त्रीय अधिष्ठान:</strong> {dualGridResult.demarcationStrip.shastricRuleHi}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#B45309", background: "#FFFFFF", padding: 8, borderRadius: 6, border: "1px dashed #F59E0B" }}>
+                    ⚙️ <strong>स्थापना विधि:</strong> {dualGridResult.demarcationStrip.installationProtocolHi}
+                  </div>
+                </div>
+              )}
+
+              {/* Squaring Guidelines */}
+              <div style={{ fontSize: 11.5, color: "#475569" }}>
+                <strong>शास्त्रीय ग्रिड नियम:</strong>
+                <ul style={{ margin: "4px 0 0 0", paddingLeft: 18, lineHeight: 1.5 }}>
+                  {dualGridResult.squaringGuidelinesHi.map((g, i) => (
+                    <li key={i}>{g}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* ── KITCHEN MICRO-GRID AUDITOR ── */}
+          <div className="card" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+              <div>
+                <div className="card-title serif" style={{ marginBottom: 0 }}>
+                  🍳 रसोईघर माइक्रो-ग्रिड ऑडिटर (Kitchen Micro-Grid)
+                </div>
+                <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
+                  रसोई के भीतर अग्नि (चूल्हा) और जल (सिंक) का पृथक्करण एवं सूक्ष्म वास्तु विश्लेषण।
+                </div>
+              </div>
+              <span
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 8,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  background: kitchenMicroAudit.hasFireWaterClash ? "#FEE2E2" : "#DCFCE7",
+                  color: kitchenMicroAudit.hasFireWaterClash ? "#DC2626" : "#15803D",
+                }}
+              >
+                {kitchenMicroAudit.hasFireWaterClash ? "⚠️ अग्नि-जल द्वंद्व सक्रिय" : "✓ सूक्ष्म वास्तु संतुलित"}
+              </span>
+            </div>
+
+            <div style={{ background: "#FAF7F2", borderRadius: 12, padding: 16, border: "1px solid rgba(184, 134, 11, 0.2)", marginBottom: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+                <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ fontSize: 12, color: "#6B635B" }}>रसोई में गैस चूल्हा किस दिशा में है:</span>
+                  <select
+                    value={stoveZoneKitchen}
+                    onChange={(e) => setStoveZoneKitchen(e.target.value as any)}
+                    style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                  >
+                    <option value="SE">माइक्रो-आग्नेय (SE - सर्वोत्तम)</option>
+                    <option value="SOUTH">माइक्रो-दक्षिण (South - उत्तम)</option>
+                    <option value="EAST">माइक्रो-पूर्व (East - शुभ)</option>
+                    <option value="NORTH">माइक्रो-उत्तर (North - दोषपूर्ण)</option>
+                    <option value="NE">माइक्रो-ईशान (NE - अति घातक)</option>
+                    <option value="NW">माइक्रो-वायव्य (NW - स्वीकार्य)</option>
+                    <option value="SW">माइक्रो-नैऋत्य (SW - वर्जित)</option>
+                  </select>
+                </label>
+
+                <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ fontSize: 12, color: "#6B635B" }}>रसोई में सिंक/पानी किस दिशा में है:</span>
+                  <select
+                    value={sinkZoneKitchen}
+                    onChange={(e) => setSinkZoneKitchen(e.target.value as any)}
+                    style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                  >
+                    <option value="NORTH">माइक्रो-उत्तर (North - सर्वोत्तम)</option>
+                    <option value="NE">माइक्रो-ईशान (NE - उत्तम)</option>
+                    <option value="NW">माइक्रो-वायव्य (NW - अनुकूल)</option>
+                    <option value="EAST">माइक्रो-पूर्व (East - स्वीकार्य)</option>
+                    <option value="SE">माइक्रो-आग्नेय (SE - अग्नि-जल द्वंद्व)</option>
+                    <option value="SOUTH">माइक्रो-दक्षिण (South - दोषपूर्ण)</option>
+                  </select>
+                </label>
+
+                <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 18, cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={sameCounter}
+                    onChange={(e) => setSameCounter(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: "#c8a030" }}
+                  />
+                  <span style={{ fontSize: 12.5, color: "#4A4238" }}>चूल्हा व सिंक एक ही स्लैब/काउंटर पर हैं</span>
+                </label>
+
+                {sameCounter && (
+                  <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 12, color: "#6B635B" }}>चूल्हे और सिंक के बीच दूरी (Feet):</span>
+                    <input
+                      type="number"
+                      value={stoveSinkDist}
+                      onChange={(e) => setStoveSinkDist(Number(e.target.value))}
+                      style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 13 }}
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            {/* Verdict Box */}
+            <div style={{ background: "#FFFFFF", borderRadius: 10, border: "1px solid #E2E8F0", padding: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12, marginBottom: 10 }}>
+                <div style={{ fontSize: 12.5, color: "#334155" }}>
+                  🔥 <strong>चूल्हे का विश्लेषण:</strong> {kitchenMicroAudit.stovePositionVerdictHi}
+                </div>
+                <div style={{ fontSize: 12.5, color: "#334155" }}>
+                  💧 <strong>सिंक का विश्लेषण:</strong> {kitchenMicroAudit.sinkPositionVerdictHi}
+                </div>
+              </div>
+
+              {kitchenMicroAudit.clashConsequencesHi.length > 0 && (
+                <div style={{ marginBottom: 10, padding: 10, background: "#FEF2F2", borderRadius: 8, border: "1px solid #FECACA" }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#991B1B", marginBottom: 4 }}>
+                    ⚠️ अग्नि-जल द्वंद्व के संभावित प्रभाव:
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: 18, fontSize: 11.5, color: "#B91C1C", lineHeight: 1.4 }}>
+                    {kitchenMicroAudit.clashConsequencesHi.map((c, i) => (
+                      <li key={i}>{c}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div style={{ padding: 10, background: "#F0FDF4", borderRadius: 8, border: "1px solid #BBF7D0", fontSize: 12, color: "#166534" }}>
+                <strong>💡 व्यावहारिक लो-कॉस्ट समाधान:</strong> {kitchenMicroAudit.lowCostRemedyHi}
+              </div>
+            </div>
+          </div>
+
+          {/* ── WALL CLOCK (घड़ी / काल चक्र) DIRECTION AUDITOR ── */}
+          <div className="card" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+              <div>
+                <div className="card-title serif" style={{ marginBottom: 0 }}>
+                  ⏱️ दीवार घड़ी (घड़ी / काल चक्र) दिशा ऑडिटर
+                </div>
+                <div style={{ fontSize: 13, color: "#6B635B", marginTop: 4 }}>
+                  घड़ी निरंतर समय व ऊर्जा चक्र (Kaal Chakra) को गति देती है। गलत दिशा में घड़ी समय की बर्बादी कराती है।
+                </div>
+              </div>
+              <span
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 8,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  background:
+                    wallClockAudit.status === "AUSPICIOUS" ? "#DCFCE7" :
+                    wallClockAudit.status === "HAZARDOUS" ? "#FEE2E2" : "#FEF3C7",
+                  color:
+                    wallClockAudit.status === "AUSPICIOUS" ? "#15803D" :
+                    wallClockAudit.status === "HAZARDOUS" ? "#DC2626" : "#92400E",
+                }}
+              >
+                {wallClockAudit.status === "AUSPICIOUS" ? "✓ अत्यंत शुभ" : wallClockAudit.status === "HAZARDOUS" ? "⚠️ वर्जित / हानिकारक" : "मध्यम"}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+              {[
+                { zone: "N", label: "उत्तर (North - कुबेर)" },
+                { zone: "E", label: "पूर्व (East - इंद्र)" },
+                { zone: "W", label: "पश्चिम (West - लाभ)" },
+                { zone: "SSW", label: "दक्षिण-दक्षिण-पश्चिम (SSW - विसर्जन)" },
+                { zone: "WNW", label: "पश्चिम-उत्तर-पश्चिम (WNW - डिप्रेशन)" },
+                { zone: "ESE", label: "पूर्व-दक्षिण-पूर्व (ESE - चिंता)" },
+                { zone: "S", label: "दक्षिण (South)" },
+                { zone: "NE", label: "उत्तर-पूर्व (NE)" },
+              ].map((z) => {
+                const isSel = wallClockZone === z.zone;
+                return (
+                  <button
+                    key={z.zone}
+                    onClick={() => setWallClockZone(z.zone)}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      border: isSel ? "2px solid #0284C7" : "1px solid #CBD5E1",
+                      background: isSel ? "#0284C7" : "#F8FAFC",
+                      color: isSel ? "#FFFFFF" : "#334155",
+                      fontWeight: isSel ? 800 : 600,
+                      fontSize: 12,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {z.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ background: "#FFFFFF", borderRadius: 10, border: "1px solid #E2E8F0", padding: 14 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: wallClockAudit.status === "HAZARDOUS" ? "#DC2626" : "#0F172A", marginBottom: 6 }}>
+                प्रभाव: {wallClockAudit.effectHi}
+              </div>
+              <div style={{ fontSize: 12, color: "#166534", background: "#F0FDF4", padding: 8, borderRadius: 6, border: "1px solid #BBF7D0" }}>
+                <strong>शास्त्रीय निर्देश:</strong> {wallClockAudit.recommendationHi}
+              </div>
             </div>
           </div>
 
