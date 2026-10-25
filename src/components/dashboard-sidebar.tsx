@@ -35,14 +35,14 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "My Kundli", href: "/dashboard/kundli", Icon: CircleDot       },
       { label: "Astro Bank", href: "/dashboard/astro-bank", Icon: Database   },
       { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot },
-      { label: "Predictions", href: "/dashboard/destiny", Icon: TrendingUp },
+      { label: "Predictions", href: "/dashboard/destiny", Icon: TrendingUp, badge: "PRO" },
       { label: "Report", href: "/dashboard/report", Icon: FileText },
     ],
   },
   {
     label: "Relationships",
     items: [
-      { label: "Kundali Milan",   href: "/dashboard/kundali-milan",   Icon: Users           },
+      { label: "Kundali Milan",   href: "/dashboard/kundali-milan",   Icon: Users, badge: "PRO" },
       { label: "Marriage Timing", href: "/dashboard/marriage-timing", Icon: Heart           },
       { label: "Family Karma",    href: "/dashboard/family-synastry", Icon: HeartHandshake  },
     ],
@@ -57,7 +57,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Prashna", href: "/dashboard/prashna", Icon: HelpCircle },
       { label: "Panchang", href: "/dashboard/panchang", Icon: Calendar },
       { label: "Muhurat", href: "/dashboard/muhurat", Icon: Sparkles },
-      { label: "Transit Purchase", href: "/dashboard/transit-purchase", Icon: ShoppingBag },
+      { label: "Transit Purchase", href: "/dashboard/transit-purchase", Icon: ShoppingBag, badge: "PRO" },
     ],
   },
   {
@@ -80,7 +80,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus },
       { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem },
       { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf },
-      { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen },
+      { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen, badge: "PRO" },
       { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon, badge: "PRO" },
       { label: "Astro Sound", href: "/dashboard/astro-sound", Icon: Music },
     ],
@@ -89,7 +89,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Personal Tools",
     items: [
       { label: "Numerology", href: "/dashboard/numerology", Icon: Hash },
-      { label: "Palmistry", href: "/dashboard/palmistry", Icon: Hand },
+      { label: "Palmistry", href: "/dashboard/palmistry", Icon: Hand, badge: "PRO" },
       { label: "Birth Rectification", href: "/dashboard/rectify", Icon: Timer },
       { label: "History", href: "/dashboard/history", Icon: History },
     ],
