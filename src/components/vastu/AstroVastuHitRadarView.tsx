@@ -3960,7 +3960,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 8B: SHASTgeneric GPS ASTRO-VASTU & 4-SEC REVERSE COUNTING
+          TAB 8B: SHASTRIC GPS ASTRO-VASTU & 4-SEC REVERSE COUNTING
       ───────────────────────────────────────────────────────────── */}
       {activeTab === "gpsRadar" && (
         <GPSAstroVastuView chart={resolvedChart} />

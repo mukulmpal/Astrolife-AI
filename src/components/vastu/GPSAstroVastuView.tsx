@@ -28,17 +28,40 @@ export function GPSAstroVastuView({ chart }: GPSAstroVastuViewProps) {
   const [selectedHybridZones, setSelectedHybridZones] = useState<string[]>(["ESE", "SE"]);
   const [activeCategory, setActiveCategory] = useState<"ALL" | "HEALTH" | "CAREER" | "FAMILY">("ALL");
 
-  const gpsDossier: GPSAstroVastuDossier = useMemo(() => {
+  const gpsDossier = useMemo(() => {
     return runGPSAstroVastuEngine(chart);
   }, [chart]);
 
-  const activeQueryAnalysis: QueryHouseGPSAnalysis = useMemo(() => {
-    return gpsDossier.queryAnalyses[selectedHouse] || gpsDossier.queryAnalyses[4];
+  const activeQueryAnalysis = useMemo(() => {
+    if (!gpsDossier) return null;
+    return (
+      gpsDossier.queryAnalyses?.[selectedHouse] ||
+      gpsDossier.queryAnalyses?.[4] ||
+      (gpsDossier.queryAnalyses ? Object.values(gpsDossier.queryAnalyses)[0] : null)
+    );
   }, [gpsDossier, selectedHouse]);
 
   const hybridMetalResult = useMemo(() => {
     return resolveDominantZoneMetal(selectedHybridZones);
   }, [selectedHybridZones]);
+
+  if (!gpsDossier) {
+    return (
+      <div
+        style={{
+          padding: 32,
+          textAlign: "center",
+          background: "#F8FAFC",
+          borderRadius: 16,
+          border: "1px solid #E2E8F0",
+          color: "#64748B",
+          fontSize: 14,
+        }}
+      >
+        कुंडली डेटा लोड हो रहा है या अनुपलब्ध है। कृपया कुंडली विवरण जांचें।
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -69,7 +92,7 @@ export function GPSAstroVastuView({ chart }: GPSAstroVastuViewProps) {
                 border: "1px solid rgba(255, 255, 255, 0.3)",
               }}
             >
-              🛰️ SHASTgeneric GPS ASTRO-VASTU & CLINICAL DIAGNOSTICS
+              🛰️ SHASTRIC GPS ASTRO-VASTU & CLINICAL DIAGNOSTICS
             </span>
             <h2 style={{ fontSize: 24, fontWeight: 800, margin: "4px 0 8px 0" }}>
               जीपीएस एस्ट्रो-वास्तु, 9 ग्रह कोड्स एवं 4-सेकंड रिवर्स काउंटिंग
@@ -149,53 +172,90 @@ export function GPSAstroVastuView({ chart }: GPSAstroVastuViewProps) {
         </div>
 
         {/* Active Analysis Card */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)",
-            border: "1.5px solid #7DD3FC",
-            borderRadius: 14,
-            padding: 20,
-          }}
-        >
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
-            <div style={{ background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #BAE6FD" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#0369A1" }}>🎯 अभीष्ट भाव (Query Target)</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", marginTop: 4 }}>
-                भाव {activeQueryAnalysis.targetHouse}: {activeQueryAnalysis.targetHouseNameHi}
+        {activeQueryAnalysis && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)",
+              border: "1.5px solid #7DD3FC",
+              borderRadius: 14,
+              padding: 20,
+            }}
+          >
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+              <div style={{ background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #BAE6FD" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#0369A1" }}>🎯 अभीष्ट भाव (Query Target)</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", marginTop: 4 }}>
+                  भाव {activeQueryAnalysis.queryHouse}: {activeQueryAnalysis.queryThemeHindi}
+                </div>
+                <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>
+                  राशि: {activeQueryAnalysis.houseSign} ({activeQueryAnalysis.houseSignNum}) | स्वामी: {activeQueryAnalysis.houseLordHindi} ({activeQueryAnalysis.houseLord})
+                </div>
+              </div>
+
+              <div style={{ background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #BAE6FD" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#B45309" }}>⚡ 4-सेकंड ट्रिगर भाव (GPS Target House)</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#92400E", marginTop: 4 }}>
+                  भाव {activeQueryAnalysis.targetHouse}: {activeQueryAnalysis.targetSign} ({activeQueryAnalysis.targetSignNum})
+                </div>
+                <div style={{ fontSize: 12, color: "#B45309", marginTop: 4 }}>
+                  स्वामी स्थित: भाव {activeQueryAnalysis.placedHouse} (जीपीएस कोड: {activeQueryAnalysis.gpsCode})
+                </div>
+              </div>
+
+              <div style={{ background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #BAE6FD" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#15803D" }}>🧭 सक्रिय करने योग्य दिशा (Actionable Vastu Zone)</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#166534", marginTop: 4 }}>
+                  {activeQueryAnalysis.targetDirectionHindi} ({activeQueryAnalysis.targetDirection} - {activeQueryAnalysis.targetDirectionCode})
+                </div>
+                <div style={{ fontSize: 12, color: "#15803D", marginTop: 4 }}>
+                  तत्व दिशा कोड: {activeQueryAnalysis.targetDirectionCode}
+                </div>
               </div>
             </div>
 
-            <div style={{ background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #BAE6FD" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#B45309" }}>⚡ 4-सेकंड ट्रिगर भाव (Trigger Point)</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#92400E", marginTop: 4 }}>
-                भाव {activeQueryAnalysis.triggerHouse}: {activeQueryAnalysis.triggerHouseNameHi}
+            <div style={{ marginTop: 16, background: "#FFFFFF", padding: 16, borderRadius: 12, border: "1px solid #BAE6FD" }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#0369A1", marginBottom: 6 }}>
+                📜 शास्त्रीय क्रियाविधि व तत्काल शुद्धि (Action Required):
               </div>
-            </div>
+              <p style={{ fontSize: 13.5, color: "#334155", margin: "0 0 12px 0", lineHeight: 1.6 }}>
+                {activeQueryAnalysis.actionRequired}
+              </p>
 
-            <div style={{ background: "#FFFFFF", padding: 14, borderRadius: 10, border: "1px solid #BAE6FD" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#15803D" }}>🧭 सक्रिय करने योग्य दिशा (Vastu Zone)</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#166534", marginTop: 4 }}>
-                {activeQueryAnalysis.actionableZoneHindi} ({activeQueryAnalysis.actionableZone})
+              {activeQueryAnalysis.clutterToInspect && activeQueryAnalysis.clutterToInspect.length > 0 && (
+                <div style={{ marginBottom: 12, padding: 10, background: "#FFFBEB", borderRadius: 8, border: "1px solid #FDE68A" }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, color: "#B45309", marginBottom: 4 }}>
+                    ⚠️ इस दिशा से हटाने योग्य संभावित कबाड़/एंटी-एलिमेंट्स:
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {activeQueryAnalysis.clutterToInspect.map((clt, i) => (
+                      <span key={i} style={{ fontSize: 11, padding: "2px 8px", background: "#FEF3C7", color: "#92400E", borderRadius: 6, fontWeight: 600 }}>
+                        {clt}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#15803D", marginBottom: 6 }}>
+                💡 ₹0 लो-कॉस्ट सक्रियता उपचार (Practical Activating Remedy):
               </div>
+              <p style={{ fontSize: 13.5, color: "#14532D", margin: "0 0 8px 0", fontWeight: 600, lineHeight: 1.6 }}>
+                {activeQueryAnalysis.activatingRemedy}
+              </p>
+
+              {activeQueryAnalysis.utilizationProtocol && (
+                <div style={{ marginTop: 10, padding: 10, background: "#F0FDF4", borderRadius: 8, border: "1px solid #86EFAC" }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, color: "#166534", marginBottom: 2 }}>
+                    उपयोग नियम (Utilization Protocol):
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "#14532D" }}>
+                    {activeQueryAnalysis.utilizationProtocol}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-
-          <div style={{ marginTop: 16, background: "#FFFFFF", padding: 16, borderRadius: 12, border: "1px solid #BAE6FD" }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "#0369A1", marginBottom: 6 }}>
-              📜 शास्त्रीय क्रियाविधि (Shastric Mechanism):
-            </div>
-            <p style={{ fontSize: 13.5, color: "#334155", margin: "0 0 12px 0", lineHeight: 1.6 }}>
-              {activeQueryAnalysis.shastricMechanism}
-            </p>
-
-            <div style={{ fontSize: 12, fontWeight: 800, color: "#15803D", marginBottom: 6 }}>
-              💡 ₹0 लो-कॉस्ट व्यावहारिक उपचार (Practical Actionable Remedy):
-            </div>
-            <p style={{ fontSize: 13.5, color: "#14532D", margin: 0, fontWeight: 600, lineHeight: 1.6 }}>
-              {activeQueryAnalysis.practicalRemedyHi}
-            </p>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* ── 3. 9 PLANETARY GPS CODES & 45 DEVATAS ─────────────────── */}
@@ -394,22 +454,31 @@ export function GPSAstroVastuView({ chart }: GPSAstroVastuViewProps) {
               ✂️ केतु कट-ज़ोन (कटा हुआ कोना)
             </h4>
             <span style={{ fontSize: 11, fontWeight: 800, padding: "2px 8px", background: "#FEF3C7", color: "#92400E", borderRadius: 6 }}>
-              {gpsDossier.ketuCutZone.costEstimate}
+              ₹0-₹20 लो-कॉस्ट
             </span>
           </div>
 
           <div style={{ fontSize: 13, color: "#78350F", marginBottom: 10 }}>
-            <strong>कट दिशा:</strong> {gpsDossier.ketuCutZone.cutZoneDirection} ({gpsDossier.ketuCutZone.cutZoneSignName} राशि)
+            <strong>कट दिशा:</strong> {gpsDossier.ketuCutZone?.cutDirectionHindi || gpsDossier.ketuCutZone?.cutDirection} ({gpsDossier.ketuCutZone?.cutDirectionCode}) | भाव {gpsDossier.ketuCutZone?.ketuHouse} ({gpsDossier.ketuCutZone?.ketuSignName} राशि)
           </div>
 
           <p style={{ fontSize: 12.5, color: "#334155", lineHeight: 1.6, marginBottom: 14 }}>
-            {gpsDossier.ketuCutZone.shastricMechanism}
+            {gpsDossier.ketuCutZone?.defectDescription}
           </p>
 
-          <div style={{ background: "#FFFBEB", padding: 12, borderRadius: 10, border: "1px solid #FDE68A" }}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#B45309", marginBottom: 4 }}>अचूक देह-वास्तु उपचार:</div>
-            <div style={{ fontSize: 12.5, color: "#78350F", fontWeight: 600 }}>
-              {gpsDossier.ketuCutZone.remedyYellowSocks}
+          <div style={{ background: "#FFFBEB", padding: 14, borderRadius: 10, border: "1px solid #FDE68A", display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#B45309" }}>शास्त्रीय ऊर्जा-पूरक उपचार (Energy Fill-up):</div>
+            <div style={{ fontSize: 12, color: "#78350F", lineHeight: 1.5 }}>
+              💡 <strong>24 घंटे पीला बल्ब:</strong> {gpsDossier.ketuCutZone?.correctiveRemedies?.yellowBulb24Hr}
+            </div>
+            <div style={{ fontSize: 12, color: "#78350F", lineHeight: 1.5 }}>
+              🚩 <strong>छत पर धर्म ध्वज:</strong> {gpsDossier.ketuCutZone?.correctiveRemedies?.roofCornerFlag}
+            </div>
+            <div style={{ fontSize: 12, color: "#78350F", lineHeight: 1.5 }}>
+              🧦 <strong>देह-वास्तु उपाय:</strong> पीले मोज़े (Yellow Socks) अथवा चेक मोज़े पहनें व पैरों के तलवों पर हल्दी का तिलक लगाएं।
+            </div>
+            <div style={{ fontSize: 11.5, color: "#92400E", fontStyle: "italic", borderTop: "1px dashed #FDE68A", paddingTop: 6 }}>
+              {gpsDossier.ketuCutZone?.correctiveRemedies?.cleanlinessProtocol}
             </div>
           </div>
         </div>
@@ -429,28 +498,83 @@ export function GPSAstroVastuView({ chart }: GPSAstroVastuViewProps) {
               📐 राहु एक्सटेंडेड-ज़ोन (बढ़ा हुआ कोना)
             </h4>
             <span style={{ fontSize: 11, fontWeight: 800, padding: "2px 8px", background: "#DBEAFE", color: "#1E40AF", borderRadius: 6 }}>
-              {gpsDossier.rahuExtendedZone.costEstimate}
+              ₹0-₹20 लो-कॉस्ट
             </span>
           </div>
 
           <div style={{ fontSize: 13, color: "#1E40AF", marginBottom: 10 }}>
-            <strong>विस्तार दिशा:</strong> {gpsDossier.rahuExtendedZone.extendedZoneDirection} ({gpsDossier.rahuExtendedZone.extendedZoneSignName} राशि)
+            <strong>विस्तार दिशा:</strong> {gpsDossier.rahuExtendedZone?.extendedDirectionHindi || gpsDossier.rahuExtendedZone?.extendedDirection} ({gpsDossier.rahuExtendedZone?.extendedDirectionCode}) | भाव {gpsDossier.rahuExtendedZone?.rahuHouse} ({gpsDossier.rahuExtendedZone?.rahuSignName} राशि)
           </div>
 
-          <div style={{ fontSize: 12.5, color: "#334155", lineHeight: 1.6, marginBottom: 14 }}>
-            राहु का क्षेत्र बढ़ा होने पर अत्यधिक अति-महत्वाकांक्षा, व्यर्थ की भागदौड़ व सिर में भारीपन रहता है।
-          </div>
+          <p style={{ fontSize: 12.5, color: "#334155", lineHeight: 1.6, marginBottom: 14 }}>
+            {gpsDossier.rahuExtendedZone?.defectDescription}
+          </p>
 
-          <div style={{ background: "#EFF6FF", padding: 12, borderRadius: 10, border: "1px solid #BFDBFE" }}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#1D4ED8", marginBottom: 4 }}>शास्त्रीय हारमोनाइजेशन:</div>
-            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "#1E40AF" }}>
-              {gpsDossier.rahuExtendedZone.recommendations.map((rec, i) => (
-                <li key={i} style={{ marginBottom: 4 }}>{rec}</li>
-              ))}
-            </ul>
+          <div style={{ background: "#EFF6FF", padding: 14, borderRadius: 10, border: "1px solid #BFDBFE", display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#1D4ED8" }}>शास्त्रीय हारमोनाइजेशन व ग्राउंडिंग (Grounding Balance):</div>
+            <div style={{ fontSize: 12, color: "#1E40AF", lineHeight: 1.5 }}>
+              ⚡ <strong>ऊर्जा ग्राउंडिंग (Earthing):</strong> {gpsDossier.rahuExtendedZone?.correctiveRemedies?.groundingCure}
+            </div>
+            <div style={{ fontSize: 12, color: "#1E40AF", lineHeight: 1.5 }}>
+              🔌 <strong>इलेक्ट्रिकल शुद्धि:</strong> {gpsDossier.rahuExtendedZone?.correctiveRemedies?.electricalNeutralization}
+            </div>
+            <div style={{ fontSize: 12, color: "#1E40AF", lineHeight: 1.5 }}>
+              🔔 <strong>धातु/ध्वनि संतुलन:</strong> इस बढ़े कोने में 5 या 6 रॉड्स वाली मेटल विंड चाइम लगाएं अथवा ब्रास/कॉपर पिरामिड स्ट्रिप से ऊर्जा को ग्राउंड करें।
+            </div>
           </div>
         </div>
       </div>
+
+      {/* ── 5B. NEGATIVE HOUSES UTILIZATION PROTOCOL (6, 8, 12) ───── */}
+      {gpsDossier.houseUtilizationAdvices && gpsDossier.houseUtilizationAdvices.length > 0 && (
+        <div
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #E2E8F0",
+            borderRadius: 16,
+            padding: 24,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
+          }}
+        >
+          <div style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: "#0F172A", margin: 0 }}>
+              🛡️ त्रिक भाव उपयोग सूत्र (Negative House Utilization Formulas)
+            </h3>
+            <p style={{ fontSize: 13, color: "#64748B", margin: "4px 0 0 0" }}>
+              6ठे, 8वें और 12वें भाव को कष्ट देने से रोकने के लिए उनका सकारात्मक उपयोग (Utilization) अनिवार्य है।
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+            {gpsDossier.houseUtilizationAdvices.map((adv) => (
+              <div
+                key={adv.houseNumber}
+                style={{
+                  background: "#F8FAFC",
+                  border: "1.5px solid #CBD5E1",
+                  borderRadius: 12,
+                  padding: 16,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#0F172A", marginBottom: 6 }}>
+                    {adv.houseTheme}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#64748B", marginBottom: 8, fontStyle: "italic" }}>
+                    &quot;{adv.philosophicalConcept}&quot;
+                  </div>
+                </div>
+                <div style={{ background: "#FFFFFF", padding: 10, borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12, color: "#1E293B", lineHeight: 1.4 }}>
+                  <strong>शास्त्रीय कर्म:</strong> {adv.practicalAction}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── 6. TOILET BLOCKING & DOMINANT-WORD RULE ────────────────── */}
       <div
@@ -573,3 +697,4 @@ export function GPSAstroVastuView({ chart }: GPSAstroVastuViewProps) {
     </div>
   );
 }
+
