@@ -11,6 +11,14 @@ import {
   MASTER_GPS_CODES,
 } from "../gps-astro-vastu-engine";
 import { auditUserWearables } from "../bio-wearable-audit-engine";
+import {
+  MASTER_45_DEVATAS,
+  getDevatasByPlanet,
+  MASTER_CLINICAL_PROBLEM_DIAGNOSTICS,
+  resolveDominantZoneMetal,
+  checkKPScriptEligibility,
+  runAstroVastuHitEngine,
+} from "../astro-vastu-hit-engine";
 import type { ChartData } from "../calculations";
 
 describe("Astro-Vastu GPS Astrology Computational Engine", () => {
@@ -207,4 +215,119 @@ describe("Astro-Vastu GPS Astrology Computational Engine", () => {
     const yellowSocksAudit = audit.itemsAudited.find(i => i.item === "yellow_socks");
     assert.strictEqual(yellowSocksAudit?.severity, "SAFE_BENEFICIAL");
   });
+
+  describe("Shastric 45 Devatas, Clinical Diagnostics, Dominant-Word & KP Invariants", () => {
+    it("should verify 45 Devatas distributed accurately across 9 planets", () => {
+      assert.strictEqual(MASTER_45_DEVATAS.length, 45);
+
+      const ketuDevatas = getDevatasByPlanet("Ketu");
+      const venusDevatas = getDevatasByPlanet("Venus");
+      const sunDevatas = getDevatasByPlanet("Sun");
+      const moonDevatas = getDevatasByPlanet("Moon");
+      const marsDevatas = getDevatasByPlanet("Mars");
+      const rahuDevatas = getDevatasByPlanet("Rahu");
+      const jupiterDevatas = getDevatasByPlanet("Jupiter");
+      const saturnDevatas = getDevatasByPlanet("Saturn");
+      const mercuryDevatas = getDevatasByPlanet("Mercury");
+
+      assert.strictEqual(ketuDevatas.length, 4, "Ketu must have exactly 4 Devatas");
+      assert.strictEqual(venusDevatas.length, 5, "Venus must have exactly 5 Devatas");
+      assert.strictEqual(sunDevatas.length, 6, "Sun must have exactly 6 Devatas");
+      assert.strictEqual(moonDevatas.length, 5, "Moon must have exactly 5 Devatas");
+      assert.strictEqual(marsDevatas.length, 4, "Mars must have exactly 4 Devatas");
+      assert.strictEqual(rahuDevatas.length, 6, "Rahu must have exactly 6 Devatas");
+      assert.strictEqual(jupiterDevatas.length, 2, "Jupiter must have exactly 2 Devatas (Brahma + Jayanta)");
+      assert.strictEqual(saturnDevatas.length, 6, "Saturn must have exactly 6 Devatas");
+      assert.strictEqual(mercuryDevatas.length, 7, "Mercury must have exactly 7 Devatas");
+
+      const total = 4 + 5 + 6 + 5 + 4 + 6 + 2 + 6 + 7;
+      assert.strictEqual(total, 45);
+    });
+
+    it("should resolve hybrid toilet zones using the Dominant Word Rule", () => {
+      // ESE + SE -> 'East' word occurs twice -> Stainless Steel strip
+      const hybridEast = resolveDominantZoneMetal(["ESE", "SE"]);
+      assert.strictEqual(hybridEast.dominantQuadrant, "East");
+      assert.ok(hybridEast.metalStrip.includes("स्टेनलेस स्टील"));
+
+      // SSW + SW -> 'South' / 'West' dominant
+      const hybridWest = resolveDominantZoneMetal(["WSW", "W"]);
+      assert.strictEqual(hybridWest.dominantQuadrant, "West");
+      assert.ok(hybridWest.metalStrip.includes("कच्चा लोहा"));
+    });
+
+    it("should map clinical life problems to exact devatas and remedies", () => {
+      const addiction = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find(p => p.id === "DRUG_ALCOHOL_SUBSTANCE_ADDICTION");
+      assert.strictEqual(addiction?.targetDevataId, "W8");
+      assert.strictEqual(addiction?.governingPlanet, "Rahu");
+      assert.strictEqual(addiction?.actionProtocol, "BLOCK_DEACTIVATE");
+      assert.strictEqual(addiction?.springDirective, "CLOCKWISE_BLOCK");
+
+      const election = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find(p => p.id === "ELECTION_PUBLIC_ISOLATION");
+      assert.strictEqual(election?.targetDevataId, "ARYAMA");
+      assert.strictEqual(election?.governingPlanet, "Mars");
+      assert.ok(election?.physicalRemedyHi.includes("गुड़"));
+
+      const apparel = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find(p => p.id === "APPAREL_BRAND_SAMPLE_REJECTION");
+      assert.strictEqual(apparel?.targetDevataId, "N2");
+      assert.strictEqual(apparel?.governingPlanet, "Rahu");
+      assert.ok(apparel?.physicalRemedyHi.includes("दालचीनी"));
+
+      const stalled = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find(p => p.id === "FACTORY_CONSTRUCTION_STALLED");
+      assert.strictEqual(stalled?.targetDevataId, "BRAHMA");
+      assert.strictEqual(stalled?.governingPlanet, "Jupiter");
+    });
+
+    it("should enforce KP Script Eligibility: Rashi, Nakshatra, Sub-Lord only; Sub-Sub Lord prohibited", () => {
+      const mockChart: ChartData = {
+        name: "KP Test Seeker",
+        lagnaNum: 0, // Aries
+        lagnaRashi: "Aries",
+        planets: {},
+        houseCusps: [
+          {
+            house: 5,
+            sign: "Leo", // Rashi Lord: Sun
+            signNum: 5,
+            degree: 12,
+            minutes: 30,
+            lon: 132.5,
+            nakshatra: "Magha",
+            nakshatraLord: "Ketu", // Nakshatra Lord: Ketu
+            subLord: "Mercury", // Sub-Lord: Mercury
+            subSubLord: "Venus", // Sub-Sub Lord: Venus
+            pada: 4,
+            source: "degree-equal-bhava",
+          }
+        ]
+      };
+
+      // 1. Sun is Rashi Lord of Leo -> Eligible
+      const sunCheck = checkKPScriptEligibility(mockChart, "Sun", 5);
+      assert.strictEqual(sunCheck.isEligible, true);
+      assert.strictEqual(sunCheck.matchedLevel, "RASHI_LORD");
+
+      // 2. Ketu is Nakshatra Lord -> Eligible
+      const ketuCheck = checkKPScriptEligibility(mockChart, "Ketu", 5);
+      assert.strictEqual(ketuCheck.isEligible, true);
+      assert.strictEqual(ketuCheck.matchedLevel, "NAKSHATRA_LORD");
+
+      // 3. Mercury is Sub-Lord -> Eligible
+      const mercuryCheck = checkKPScriptEligibility(mockChart, "Mercury", 5);
+      assert.strictEqual(mercuryCheck.isEligible, true);
+      assert.strictEqual(mercuryCheck.matchedLevel, "SUB_LORD");
+
+      // 4. Venus is Sub-Sub Lord only -> PROHIBITED
+      const venusCheck = checkKPScriptEligibility(mockChart, "Venus", 5);
+      assert.strictEqual(venusCheck.isEligible, false);
+      assert.strictEqual(venusCheck.subSubLordOnly, true);
+      assert.ok(venusCheck.reasonHi.includes("सब-सब लॉर्ड"));
+
+      // 5. Mars is not in script -> Ineligible
+      const marsCheck = checkKPScriptEligibility(mockChart, "Mars", 5);
+      assert.strictEqual(marsCheck.isEligible, false);
+      assert.ok(marsCheck.reasonHi.includes("अपात्र भाव"));
+    });
+  });
 });
+

@@ -21,6 +21,13 @@ import {
   MASTER_45_DEVATAS,
   getElementalBalancingGuide,
   evaluateOccultKundliDiagnostic,
+  MASTER_CLINICAL_PROBLEM_DIAGNOSTICS,
+  TOILET_BLOCKING_MATRIX,
+  resolveDominantZoneMetal,
+  ENERGY_SPRING_DIRECTIVES,
+  E1_ENTRANCE_NAZAR_DEFENSE,
+  PLANET_TO_45_DEVATAS,
+  getDevatasByPlanet,
   type VastuPurushaMandalaDossier,
   type DevataEntity,
   type NativeDevataMapping,
@@ -28,6 +35,8 @@ import {
   type ElementalBarChartBalancing,
   type BrahmasthanSanctificationProtocol,
   type SubtleShastricDirectives,
+  type ClinicalProblemDiagnostic,
+  type ToiletBlockingProtocol,
 } from "./vastu-purusha-mandala-engine";
 import {
   evaluateAstroPrescriptionFormula,
@@ -48,6 +57,15 @@ export {
   MASTER_45_DEVATAS,
   getElementalBalancingGuide,
   evaluateOccultKundliDiagnostic,
+  MASTER_CLINICAL_PROBLEM_DIAGNOSTICS,
+  TOILET_BLOCKING_MATRIX,
+  resolveDominantZoneMetal,
+  ENERGY_SPRING_DIRECTIVES,
+  E1_ENTRANCE_NAZAR_DEFENSE,
+  PLANET_TO_45_DEVATAS,
+  getDevatasByPlanet,
+  checkKPScriptEligibility,
+  SIGN_LORDS_MAP,
   type VastuPurushaMandalaDossier,
   type DevataEntity,
   type NativeDevataMapping,
@@ -55,6 +73,8 @@ export {
   type ElementalBarChartBalancing,
   type BrahmasthanSanctificationProtocol,
   type SubtleShastricDirectives,
+  type ClinicalProblemDiagnostic,
+  type ToiletBlockingProtocol,
   evaluateAstroPrescriptionFormula,
   type AstroPharmacologicalPrescription,
   runGPSAstroVastuEngine,
@@ -122,6 +142,7 @@ export interface EvaluatedHit {
   exactDiff: number;
   orbDistance: number;
   isUntenantedAlert?: boolean;
+  classicalYogaConflict?: string;
   effectSummary: string;
 }
 
@@ -154,6 +175,17 @@ export interface ShiftingPrescription {
   shiftingMethod: string;
   itemsToPlace: string[];
   itemsToRemoveFromCurrentZone: string[];
+  dualDirectionClearing?: {
+    sourceDirection: string;
+    targetDirection: string;
+    ruleExplanationHi: string;
+  };
+  kpScriptEligibility?: {
+    isEligible: boolean;
+    matchedLevel?: "RASHI_LORD" | "NAKSHATRA_LORD" | "SUB_LORD";
+    subSubLordOnly?: boolean;
+    reasonHi: string;
+  };
   bodyPartTherapy: {
     targetBodyPart: string;
     action: "Dot" | "Remove_Thread" | "Apply_Oil_Ghee";
@@ -331,6 +363,11 @@ export interface AstroVastuHitDossier {
   lagnaSignHindi: string;
   lagnaSignNum: number;
   lagnaCompoundDeg: number;
+  mdAgeAxiom?: {
+    mdLord: string;
+    runningYears: number;
+    guidelineHi: string;
+  };
   activeDasha: {
     mahadasha: string;
     antardasha: string;
@@ -519,6 +556,97 @@ export function calculateCompoundDegree(signNum: number, degreeInSign: number): 
   const normalizedSign = ((signNum - 1) % 12 + 12) % 12; // 0 to 11
   const baseStart = normalizedSign * 30;
   return baseStart + (degreeInSign % 30);
+}
+
+export const SIGN_LORDS_MAP: Record<string, string> = {
+  Aries: "Mars",
+  Taurus: "Venus",
+  Gemini: "Mercury",
+  Cancer: "Moon",
+  Leo: "Sun",
+  Virgo: "Mercury",
+  Libra: "Venus",
+  Scorpio: "Mars",
+  Sagittarius: "Jupiter",
+  Capricorn: "Saturn",
+  Aquarius: "Saturn",
+  Pisces: "Jupiter",
+};
+
+export function checkKPScriptEligibility(
+  chart: ChartData | null | undefined,
+  planetName: string,
+  targetHouse: number
+): {
+  isEligible: boolean;
+  matchedLevel?: "RASHI_LORD" | "NAKSHATRA_LORD" | "SUB_LORD";
+  subSubLordOnly?: boolean;
+  reasonHi: string;
+} {
+  if (!chart) {
+    return {
+      isEligible: true,
+      matchedLevel: "SUB_LORD",
+      reasonHi: `मानक जन्म चक्र के आधार पर ग्रह ${planetName} भाव ${targetHouse} में स्थानांतरण हेतु पात्र है।`,
+    };
+  }
+
+  const cusps = chart.kpCusps && chart.kpCusps.length > 0 ? chart.kpCusps : chart.houseCusps;
+  const cusp = cusps?.find((c) => c.house === targetHouse);
+  const pLower = planetName.trim().toLowerCase();
+
+  if (!cusp) {
+    return {
+      isEligible: true,
+      reasonHi: `भाव ${targetHouse} की कस्पल जानकारी उपलब्ध न होने से सामान्य 120° त्रिकोण सिद्धांत लागू होगा।`,
+    };
+  }
+
+  // 1. Check Rashi Lord level
+  const rashiLord = SIGN_LORDS_MAP[cusp.sign] || "";
+  if (rashiLord.toLowerCase() === pLower) {
+    return {
+      isEligible: true,
+      matchedLevel: "RASHI_LORD",
+      reasonHi: `ग्रह स्थानांतरण की KP कस्पल पात्रता (KP Script Eligible): ग्रह ${planetName} भाव ${targetHouse} की स्क्रिप्ट में 'राशि स्वामी' (Rashi Lord: ${cusp.sign}) के रूप में उपस्थित है, अतः यह स्थानांतरण पूर्णतः सुरक्षित व फलदायी है।`,
+    };
+  }
+
+  // 2. Check Nakshatra Lord / Star Lord level
+  const starLord = cusp.nakshatraLord || cusp.starLord || "";
+  if (starLord.toLowerCase() === pLower) {
+    return {
+      isEligible: true,
+      matchedLevel: "NAKSHATRA_LORD",
+      reasonHi: `ग्रह स्थानांतरण की KP कस्पल पात्रता (KP Script Eligible): ग्रह ${planetName} भाव ${targetHouse} की स्क्रिप्ट में 'नक्षत्र स्वामी' (Nakshatra Lord) के रूप में उपस्थित है, अतः यह स्थानांतरण सुरक्षित है।`,
+    };
+  }
+
+  // 3. Check Sub-Lord level
+  const subLord = cusp.subLord || "";
+  if (subLord.toLowerCase() === pLower) {
+    return {
+      isEligible: true,
+      matchedLevel: "SUB_LORD",
+      reasonHi: `ग्रह स्थानांतरण की KP कस्पल पात्रता (KP Script Eligible): ग्रह ${planetName} भाव ${targetHouse} की स्क्रिप्ट में 'उप-स्वामी' (Sub-Lord) के रूप में सक्रिय है, अतः यह 120° स्थानांतरण पूर्णतः प्रभावी रहेगा।`,
+    };
+  }
+
+  // 4. Check Sub-Sub Lord level (STRICTLY PROHIBITED in classical lecture axiom)
+  const subSubLord = cusp.subSubLord || "";
+  if (subSubLord.toLowerCase() === pLower) {
+    return {
+      isEligible: false,
+      subSubLordOnly: true,
+      reasonHi: `अमान्य स्थानांतरण (Prohibited Shift): ग्रह ${planetName} भाव ${targetHouse} की कस्पल स्क्रिप्ट में केवल 'सब-सब लॉर्ड' (Sub-Sub Lord) स्तर पर है। शास्त्रीय नियम अनुसार सब-सब लॉर्ड स्तर पर ग्रह को कभी भी उस भाव में स्थापित नहीं किया जा सकता, यह उस भाव के फलों को नष्ट कर सकता है।`,
+    };
+  }
+
+  // Fallback: Not present at primary script levels
+  return {
+    isEligible: false,
+    reasonHi: `अपात्र भाव (Unverified Shift): ग्रह ${planetName} भाव ${targetHouse} की KP स्क्रिप्ट (राशि, नक्षत्र या सब-लॉर्ड) में सक्रिय नहीं है। इसे किसी ऐसे भाव में स्थानांतरित करें जहाँ यह कस्पल स्क्रिप्ट में उपस्थित हो।`,
+  };
 }
 
 /**
@@ -756,6 +884,18 @@ export function runAstroVastuHitEngine(
 
       const hit = check358Hit(p1.compoundDeg, p2.compoundDeg);
       if (hit) {
+        let classicalYogaConflict: string | undefined = undefined;
+        if (hit.hitDef.angle === 180) {
+          const pair = [p1.name, p2.name].sort().join("-");
+          if (pair === "Jupiter-Moon") {
+            classicalYogaConflict = "पारंपरिक गजकेसरी योग बनाम 180° किलर हिट द्वंद्व: यद्यपि गुरु और चंद्र वैदिक ज्योतिष में गजकेसरी योग बनाते हैं, परंतु इनके मध्य 180° किलर हिट (172°-188°) सक्रिय होने से यह 'लेग-पुलिंग' (Leg-Pulling Conflict) में बदल गया है। गुरु या चंद्र का एक-दूसरे को बाधित करना मानसिक व आध्यात्मिक तनाव दे सकता है।";
+          } else if (pair === "Mars-Moon") {
+            classicalYogaConflict = "पारंपरिक चंद्र-मंगल योग बनाम 180° किलर हिट द्वंद्व: चंद्र-मंगल का 180° दृष्टि संबंध रक्तचाप, उग्रता एवं संपत्ति विवाद के रूप में लेग-पुलिंग करता है।";
+          } else if (pair === "Mercury-Venus") {
+            classicalYogaConflict = "पारंपरिक लक्ष्मी-नारायण योग बनाम 180° किलर हिट द्वंद्व: बुध-शुक्र का 180° टकराव वित्तीय फैसलों में भटकाव एवं वैवाहिक अवरोध पैदा करता है।";
+          }
+        }
+
         allHits.push({
           sourceType: "Planet",
           sourceName: p1.name,
@@ -774,6 +914,7 @@ export function runAstroVastuHitEngine(
           hitDef: hit.hitDef,
           exactDiff: hit.exactDiff,
           orbDistance: hit.orbDistance,
+          classicalYogaConflict,
           effectSummary: `${p1.name} (H${p1.house}) <-> ${p2.name} (H${p2.house}) mutually form ${hit.hitDef.name}`,
         });
 
@@ -883,6 +1024,8 @@ export function runAstroVastuHitEngine(
       therapyInstructions = "उत्तर (कन्या 6 नंबर) में ब्रांडेड परफ्यूम रखें। यदि किचन है तो गैस चूल्हे के नीचे पीला संगमरमर स्लैब रखें।";
     }
 
+    const kpEligibility = checkKPScriptEligibility(chart, plName, targetHouse);
+
     shiftingPrescriptions.push({
       afflictedTarget: `दशा स्वामी ${blockade.dashaLordName}`,
       problematicPlanet: plName,
@@ -895,6 +1038,12 @@ export function runAstroVastuHitEngine(
       shiftingMethod: `दशा स्वामी ${blockade.dashaLordName} को ${plName} द्वारा 90°/180° के जाम से मुक्त करने के लिए ${plName} के सामान को वर्तमान दिशा (${plCoord.direction.code} - ${plCoord.direction.directionHindi}) से हटाकर इसकी 120° त्रिकोण मित्र दिशा (${targetDir.code} - ${targetDir.directionHindi}) में स्थापित करें। इससे रुकावट तुरंत 120° सुरक्षा कवच में परिवर्तित हो जाएगी।`,
       itemsToPlace: placeItems,
       itemsToRemoveFromCurrentZone: items.slice(0, 4),
+      dualDirectionClearing: {
+        sourceDirection: `${plCoord.direction.code} (${plCoord.direction.directionHindi})`,
+        targetDirection: `${targetDir.code} (${targetDir.directionHindi})`,
+        ruleExplanationHi: `दोहरी दिशा सफाई नियम: ${plName} के सामान को प्रहारक दिशा (${plCoord.direction.directionHindi}) से हटाकर 120° मित्र दिशा (${targetDir.directionHindi}) में शिफ्ट करें।`,
+      },
+      kpScriptEligibility: kpEligibility,
       bodyPartTherapy: {
         targetBodyPart: bodyMapping.bodyPartHi,
         action: plName === "Saturn" ? "Dot" : plName === "Mercury" ? "Remove_Thread" : "Apply_Oil_Ghee",
@@ -933,6 +1082,8 @@ export function runAstroVastuHitEngine(
     else if (plName === "Moon") placeItems.push("चांदी का चौकोर सिक्का", "स्वच्छ जल कलश");
     else placeItems.push(`${plName} का सकारात्मक प्रतीक`);
 
+    const kpEligibility = checkKPScriptEligibility(chart, plName, targetHouse);
+
     shiftingPrescriptions.push({
       afflictedTarget: ch.targetName,
       problematicPlanet: plName,
@@ -945,6 +1096,12 @@ export function runAstroVastuHitEngine(
       shiftingMethod: `${ch.targetName} पर ${plName} की ${ch.hitDef.angle}° हिट को शांत करने के लिए ${plName} की भौतिक वस्तुओं को ${plCoord.direction.direction} ज़ोन से हटाकर ${targetCusp.direction.directionHindi} (${targetCusp.direction.code}) में शिफ्ट करें ताकि यह 120° रक्षक ढाल में बदल जाए।`,
       itemsToPlace: placeItems,
       itemsToRemoveFromCurrentZone: items.slice(0, 4),
+      dualDirectionClearing: {
+        sourceDirection: `${plCoord.direction.code} (${plCoord.direction.directionHindi})`,
+        targetDirection: `${targetCusp.direction.code} (${targetCusp.direction.directionHindi})`,
+        ruleExplanationHi: `दोहरी दिशा सफाई नियम (Dual-Direction Clearing Invariant): जब ${plName} द्वारा ${ch.targetName} पर 180°/90° की हिट होती है, तो ${plName} की भौतिक वस्तुएं दोनों दिशाओं में प्रकट होती हैं — प्रहारक दिशा (${plCoord.direction.directionHindi}) एवं आहत भाव की दिशा (${targetCusp.direction.directionHindi})। अतः पूर्ण दोष-निवारण हेतु दोनों दिशाओं से इस ग्रह की वस्तुओं को हटाया जाना अनिवार्य है।`,
+      },
+      kpScriptEligibility: kpEligibility,
       bodyPartTherapy: {
         targetBodyPart: bodyMapping.bodyPartHi,
         action: plName === "Sun" ? "Apply_Oil_Ghee" : plName === "Saturn" ? "Dot" : "Apply_Oil_Ghee",
@@ -1569,6 +1726,19 @@ export function runAstroVastuHitEngine(
       antardashaStart: formatDateShort(activeADEntry?.start),
       antardashaEnd: formatDateShort(activeADEntry?.end),
     },
+    mdAgeAxiom: (() => {
+      const mdStart = activeMDEntry?.start ? new Date(activeMDEntry.start).getTime() : 0;
+      if (!mdStart) return undefined;
+      const yrs = (evaluationDate.getTime() - mdStart) / (1000 * 60 * 60 * 24 * 365.25);
+      if (yrs >= 5) {
+        return {
+          mdLord: activeMD,
+          runningYears: Math.round(yrs * 10) / 10,
+          guidelineHi: `महादशा आयु नियम (Mahadasha Duration Invariant): ${activeMD} की महादशा को चलते हुए लगभग ${Math.round(yrs)} वर्ष बीत चुके हैं। शास्त्रीय सिद्धांत अनुसार जब महादशा पुरानी हो जाती है, तो तात्कालिक संकट व दैनिक अवरोधों का मुख्य प्रेरक अंतर्दशा स्वामी (${activeAD}) होता है। अंतर्दशा स्वामी की हिट्स और स्क्रिप्ट को सर्वोच्च प्राथमिकता पर उपचारित करना अनिवार्य है।`,
+        };
+      }
+      return undefined;
+    })(),
     planetCoordinates,
     cuspCoordinates,
     clusters,

@@ -85,6 +85,7 @@ export interface WornItemInput {
   id: string; // unique identifier
   location: BodyLocationId;
   item: WearableItemId;
+  gender?: "male" | "female";
   customNotes?: string;
 }
 
@@ -744,10 +745,19 @@ export function auditUserWearables(
       }
     }
 
-    // ── PATTERN F: Gemstone Incompatibilities
+    // ── PATTERN F: Gemstone Incompatibilities & Hit Trap
     else if (itemMeta.category === "gemstone") {
-      // E.g. Coral (Moonga) for Aquarius/Virgo, or Blue Sapphire (Neelam) for Sun/Mars ascendant
-      if (worn.item === "coral" && ["Aquarius", "Virgo", "Gemini", "Libra"].includes(lagnaSign)) {
+      if (hasAfflictionHits) {
+        severity = "CRITICAL_REMOVE";
+        badgeText = "🚨 तत्काल उतारें (योगकारक किलर हिट ट्रैप)";
+        badgeColor = "#DC2626";
+        badgeBg = "rgba(220, 38, 38, 0.12)";
+        mechanism = `शास्त्रीय योगकारक भ्रम निवारण: यद्यपि ${itemPlanet} को आपकी कुंडली में योगकारक या शुभ माना गया हो, परंतु यह वर्तमान में ${killerHitsByPlanet[0]?.targetName || dangerousHitsByPlanet[0]?.targetName || "संवेदनशील भाव/ग्रह"} पर ${killerHitsByPlanet[0]?.hitDef.name || dangerousHitsByPlanet[0]?.hitDef.name || "प्रतिकूल हिट"} दे रहा है। रत्न धारण करने से इसकी प्रतिकूल बायो-मैग्नेटिक हिट को कई गुना ऊर्जा मिल रही है, जिससे कार्यों में रुकावट व जीवनसाथी/परिवार द्वारा विरोध उत्पन्न हो रहा है।`;
+        symptoms.push("जीवनसाथी या करीबी लोगों द्वारा आपके काम में बाधा डालना व टोकना");
+        symptoms.push("काम बनते-बनते ऐन वक्त पर रुक जाना");
+        symptoms.push("मानसिक अशांति, अनिद्रा अथवा अत्यधिक तनाव");
+        recommendation = `इस रत्न की अंगूठी को आज ही उतारें। जब तक प्रतिकूल हिट शांत न हो, कोई भी रत्न धारण न करें।`;
+      } else if (worn.item === "coral" && ["Aquarius", "Virgo", "Gemini", "Libra"].includes(lagnaSign)) {
         severity = "CRITICAL_REMOVE";
         badgeText = "🚨 मूंगा रत्न वर्जित (मारक अग्नि)";
         badgeColor = "#DC2626";
@@ -883,6 +893,17 @@ export function auditUserWearables(
       mechanism = `${itemMeta.titleHi} का प्रभाव ${locMeta.titleHi} (${houseNameHi}) पर सामान्य रहता है।`;
       symptoms.push("सामान्य ऊर्जा प्रभाव");
       recommendation = isDusthana ? "दुस्थान भाव होने से अत्यधिक भारी वस्तु न बांधें।" : "पहन सकते हैं।";
+    }
+
+    // Gender Polarity Check
+    if (worn.gender) {
+      const isMale = worn.gender === "male";
+      const isFemale = worn.gender === "female";
+      if (isMale && worn.location.includes("left") && !worn.location.includes("feet_soles")) {
+        symptoms.push("ध्रुवता नियम: पुरुषों के शरीर में सक्रिय ऊर्जा 'दाएं अंग' (Right Side) से संचालित होती है। बायीं ओर धारण करने से इसका पूरा लाभ नहीं मिलता।");
+      } else if (isFemale && worn.location.includes("right") && !worn.location.includes("feet_soles")) {
+        symptoms.push("ध्रुवता नियम: महिलाओं के शरीर में प्राण ऊर्जा 'बाएं अंग' (Left Side) से प्रवाहित होती है। दायीं ओर धारण करने से असंतुलन हो सकता है।");
+      }
     }
 
     results.push({

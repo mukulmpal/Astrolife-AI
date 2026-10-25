@@ -17,6 +17,7 @@ import {
   type NativeDevataMapping,
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
 import { BioWearableAuditView } from "./BioWearableAuditView";
+import { GPSAstroVastuView } from "./GPSAstroVastuView";
 // Force rebuild after UI fixes
 import { evaluateDailyAccessories } from "@/lib/astro-engine/astro-prescription-engine";
 
@@ -45,6 +46,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     | "conflicts"
     | "lifestyle"
     | "wearableAudit"
+    | "gpsRadar"
     | "mandala"
     | "barChart"
   >("dossier");
@@ -1147,6 +1149,19 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           }}
         >
           📿 देह-आभूषण व धागा ऑडिटर
+        </button>
+        <button
+          className={`tab ${activeTab === "gpsRadar" ? "active" : ""}`}
+          onClick={() => setActiveTab("gpsRadar")}
+          style={{
+            fontWeight: activeTab === "gpsRadar" ? 800 : 600,
+            background: activeTab === "gpsRadar" ? "linear-gradient(135deg, #0284C7 0%, #0369A1 100%)" : "rgba(224, 242, 254, 0.55)",
+            color: activeTab === "gpsRadar" ? "#FFFFFF" : "#0369A1",
+            borderColor: activeTab === "gpsRadar" ? "#0284C7" : "rgba(2, 132, 199, 0.3)",
+            boxShadow: activeTab === "gpsRadar" ? "0 2px 8px rgba(2, 132, 199, 0.35)" : "none",
+          }}
+        >
+          🛰️ GPS एस्ट्रो-वास्तु (9 Codes)
         </button>
         <button
           className={`tab ${activeTab === "conflicts" ? "active" : ""}`}
@@ -3942,6 +3957,13 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           <BioWearableAuditView chart={resolvedChart} />
           {renderDailyAccessoriesSection()}
         </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 8B: SHASTgeneric GPS ASTRO-VASTU & 4-SEC REVERSE COUNTING
+      ───────────────────────────────────────────────────────────── */}
+      {activeTab === "gpsRadar" && (
+        <GPSAstroVastuView chart={resolvedChart} />
       )}
 
       {/* ─────────────────────────────────────────────────────────────

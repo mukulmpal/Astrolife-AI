@@ -21,6 +21,7 @@ export type EntranceAuspiciousness =
 
 export interface DevataEntity {
   id: string; // e.g. "BRAHMA", "BHUDHAR", "E1", "W4", etc.
+  governingPlanet: "Ketu" | "Venus" | "Sun" | "Moon" | "Mars" | "Rahu" | "Jupiter" | "Saturn" | "Mercury";
   padCode?: string; // e.g. "E1", "E2", "S3", "W4", "N4"
   nameEn: string;
   nameHi: string;
@@ -162,6 +163,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // ── LAYER 1: BRAHMASTHAN (Center / Navel) ──────────────────────────────────
   {
     id: "BRAHMA",
+    governingPlanet: "Jupiter",
     nameEn: "Brahma (ब्रह्मा)",
     nameHi: "ब्रह्मा (सृष्टिकर्ता)",
     classification: "Devata",
@@ -186,6 +188,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // ── LAYER 2: 4 CARDINAL FACES OF BRAHMA (Activates at 4 ft Boundary) ──────
   {
     id: "BHUDHAR",
+    governingPlanet: "Venus",
     nameEn: "Bhudhar (भूधर)",
     nameHi: "भूधर (उत्तरी मुख)",
     classification: "Devata",
@@ -208,6 +211,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "ARYAMA",
+    governingPlanet: "Mars",
     nameEn: "Aryama (आर्यमा)",
     nameHi: "आर्यमा (पूर्वी मुख)",
     classification: "Devata",
@@ -230,6 +234,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "VIVASVAN",
+    governingPlanet: "Mercury",
     nameEn: "Vivasvan (विवस्वान)",
     nameHi: "विवस्वान (दक्षिणी मुख)",
     classification: "Devata",
@@ -252,6 +257,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "MITRA",
+    governingPlanet: "Saturn",
     nameEn: "Mitra (मित्र)",
     nameHi: "मित्र (पश्चिमी मुख)",
     classification: "Devata",
@@ -277,6 +283,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // North-East Intermediate Deities (Between Bhudhar & Aryama)
   {
     id: "APA",
+    governingPlanet: "Mars",
     nameEn: "Apa (अपा)",
     nameHi: "अपा (दिव्य औषधि देवता)",
     classification: "Devata",
@@ -299,6 +306,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "AAPAVATSA",
+    governingPlanet: "Ketu",
     nameEn: "Aapavatsa (अपावत्स)",
     nameHi: "अपावत्स (औषधि संचरण व प्रेरणा देवता)",
     classification: "Devata",
@@ -323,6 +331,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // South-East Intermediate Deities (Between Aryama & Vivasvan)
   {
     id: "SAVITA",
+    governingPlanet: "Venus",
     nameEn: "Savita (सविता)",
     nameHi: "सविता (सूर्य तेज - आकस्मिक गति)",
     classification: "Devata",
@@ -345,6 +354,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "SAVITRA",
+    governingPlanet: "Mercury",
     nameEn: "Savitra (सवित्र)",
     nameHi: "सवित्र (द्रव्य प्रवाह / कैश फ्लो असुर)",
     classification: "Asura", // Classical texts categorise Savitra in Asura clan handling tangible wealth
@@ -369,6 +379,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // South-West Intermediate Deities (Between Vivasvan & Mitra)
   {
     id: "INDRA_INNER",
+    governingPlanet: "Sun",
     nameEn: "Indra (इंद्र - आंतरिक)",
     nameHi: "इंद्र (धन संचय व गर्भधारण)",
     classification: "Devata",
@@ -391,6 +402,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "JAYA",
+    governingPlanet: "Saturn",
     nameEn: "Jaya (जय / जयंत - आंतरिक)",
     nameHi: "जय (हुनर, कौशल व सर्व-सफलता)",
     classification: "Devata",
@@ -415,6 +427,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // North-West Intermediate Deities (Between Mitra & Bhudhar)
   {
     id: "RUDRA",
+    governingPlanet: "Moon",
     nameEn: "Rudra (रुद्र)",
     nameHi: "रुद्र (भगवान शिव का संहारक व दिव्य-दृष्टि स्वरूप)",
     classification: "Devata",
@@ -437,6 +450,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "RAJYAKSHMA",
+    governingPlanet: "Mars",
     nameEn: "Rajyakshma (राजयक्ष्मा)",
     nameHi: "राजयक्ष्मा (कार्य अवरोधक असुर)",
     classification: "Asura",
@@ -463,6 +477,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // EAST ENTRANCES (E1 to E8)
   {
     id: "E1",
+    governingPlanet: "Moon",
     padCode: "E1",
     nameEn: "Shikhi (शिखी)",
     nameHi: "शिखी (मस्तिष्क शिखा / अग्नि)",
@@ -484,6 +499,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "E2",
+    governingPlanet: "Rahu",
     padCode: "E2",
     nameEn: "Parjanya (पर्जन्य)",
     nameHi: "पर्जन्य (अनावश्यक व्यय)",
@@ -505,6 +521,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "E3",
+    governingPlanet: "Jupiter",
     padCode: "E3",
     nameEn: "Jayanta (जयंत)",
     nameHi: "जयंत (अमृत पद - महा-लाभ व सफलता)",
@@ -526,6 +543,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "E4",
+    governingPlanet: "Venus",
     padCode: "E4",
     nameEn: "Mahendra (महेंद्र)",
     nameHi: "महेंद्र (राजकृपा व सरकारी संरक्षण)",
@@ -547,6 +565,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "E5",
+    governingPlanet: "Sun",
     padCode: "E5",
     nameEn: "Surya (सूर्य)",
     nameHi: "सूर्य (तेजस्वी मान-सम्मान किंतु प्रचंड क्रोध)",
@@ -568,6 +587,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "E6",
+    governingPlanet: "Sun",
     padCode: "E6",
     nameEn: "Satya (सत्य)",
     nameHi: "सत्य (वचन-भंग व गलत निर्णय)",
@@ -589,6 +609,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "E7",
+    governingPlanet: "Mercury",
     padCode: "E7",
     nameEn: "Bhrisha (भृश)",
     nameHi: "भृश (मूड का उतार-चढ़ाव व कार्य में अरुचि)",
@@ -610,6 +631,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "E8",
+    governingPlanet: "Moon",
     padCode: "E8",
     nameEn: "Aakash (आकाश)",
     nameHi: "आकाश (दुर्घटना, चोरी व अग्निकांड)",
@@ -633,6 +655,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // SOUTH ENTRANCES (S1 to S8)
   {
     id: "S1",
+    governingPlanet: "Venus",
     padCode: "S1",
     nameEn: "Anila (अनिल)",
     nameHi: "अनिल (पुत्रों का कुसंगत व विद्रोह)",
@@ -654,6 +677,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "S2",
+    governingPlanet: "Saturn",
     padCode: "S2",
     nameEn: "Pusha (पूषा)",
     nameHi: "पूषा (नौकरी में उच्च पद किंतु व्यापार में बाधक)",
@@ -675,6 +699,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "S3",
+    governingPlanet: "Sun",
     padCode: "S3",
     nameEn: "Vidhata (विधाता)",
     nameHi: "विधाता (दक्षिण का अमृत द्वार - परमानंद व महा-सफलता)",
@@ -696,6 +721,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "S4",
+    governingPlanet: "Mercury",
     padCode: "S4",
     nameEn: "Grihakshata (गृहक्षत)",
     nameHi: "गृहक्षत (फैक्ट्री, मैन्युफैक्चरिंग व उद्योगों का महा-द्वार)",
@@ -717,6 +743,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "S5",
+    governingPlanet: "Rahu",
     padCode: "S5",
     nameEn: "Yama (यम)",
     nameHi: "यम (ऋण, कर्ज व धन का भारी अपव्यय)",
@@ -738,6 +765,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "S6",
+    governingPlanet: "Saturn",
     padCode: "S6",
     nameEn: "Gandharva (गंधर्व)",
     nameHi: "गंधर्व (सामान्य जन हेतु दरिद्रता, कलाकारों हेतु महा-ख्याति)",
@@ -759,6 +787,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "S7",
+    governingPlanet: "Ketu",
     padCode: "S7",
     nameEn: "Bhringaraja (भृंगराज)",
     nameHi: "भृंगराज (प्रत्येक क्षेत्र में असफलता / विसर्जन)",
@@ -780,6 +809,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "S8",
+    governingPlanet: "Mercury",
     padCode: "S8",
     nameEn: "Mriga (मृग)",
     nameHi: "मृग (संबंध विच्छेद व भारी धन हानि)",
@@ -803,6 +833,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // WEST ENTRANCES (W1 to W8)
   {
     id: "W1",
+    governingPlanet: "Rahu",
     padCode: "W1",
     nameEn: "Pitra (पितृ)",
     nameHi: "पितृ (अल्पायु व कुल में बार-बार मृत्यु)",
@@ -824,6 +855,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "W2",
+    governingPlanet: "Rahu",
     padCode: "W2",
     nameEn: "Dauvarika (दौवारिक / द्वारिक)",
     nameHi: "दौवारिक (करियर व व्यवसाय में अस्थिरता)",
@@ -845,6 +877,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "W3",
+    governingPlanet: "Mercury",
     padCode: "W3",
     nameEn: "Sugriva (सुग्रीव)",
     nameHi: "सुग्रीव (सर्व-सपोर्ट, विश्व-मैत्री व संपूर्ण सफलता)",
@@ -866,6 +899,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "W4",
+    governingPlanet: "Venus",
     padCode: "W4",
     nameEn: "Pushpadanta (पुष्पदंत)",
     nameHi: "पुष्पदंत (मनोकामना पूर्ति व संतोषप्रद समृद्धि)",
@@ -889,6 +923,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "W5",
+    governingPlanet: "Ketu",
     padCode: "W5",
     nameEn: "Varuna (वरुण)",
     nameHi: "वरुण (असीमित लालसा व असंतोष)",
@@ -910,6 +945,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "W6",
+    governingPlanet: "Moon",
     padCode: "W6",
     nameEn: "Asura (असुर)",
     nameHi: "असुर (गंभीर डिप्रेशन व मानसिक अवसाद)",
@@ -931,6 +967,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "W7",
+    governingPlanet: "Mercury",
     padCode: "W7",
     nameEn: "Shosha (शोष)",
     nameHi: "शोष (शांति, गहन शोध व डिप्रेशन मुक्ति)",
@@ -952,6 +989,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "W8",
+    governingPlanet: "Rahu",
     padCode: "W8",
     nameEn: "Papyakshma (पापयक्ष्मा)",
     nameHi: "पापयक्ष्मा (नशे की लत व व्यसन का जाल - Golden Alert)",
@@ -975,6 +1013,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   // NORTH ENTRANCES (N1 to N8)
   {
     id: "N1",
+    governingPlanet: "Saturn",
     padCode: "N1",
     nameEn: "Roga (रोग)",
     nameHi: "रोग (शत्रु पीड़ा व निरंतर टांग खिंचाई)",
@@ -996,6 +1035,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "N2",
+    governingPlanet: "Rahu",
     padCode: "N2",
     nameEn: "Naga (नागा)",
     nameHi: "नागा (ब्रांड खिंचाव व सम्मोहन, किंतु तीव्र नजर दोष)",
@@ -1019,6 +1059,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "N3",
+    governingPlanet: "Mars",
     padCode: "N3",
     nameEn: "Mukhya (मुख्य)",
     nameHi: "मुख्य (सर्व-क्षेत्रीय सफलता व पुत्र संतान का गुप्त सूत्र)",
@@ -1042,6 +1083,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "N4",
+    governingPlanet: "Saturn",
     padCode: "N4",
     nameEn: "Bhallata (भल्लाट)",
     nameHi: "भल्लाट (360° ट्रू नॉर्थ - कुबेर का अखंड खजाना)",
@@ -1063,6 +1105,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "N5",
+    governingPlanet: "Sun",
     padCode: "N5",
     nameEn: "Soma (सोम)",
     nameHi: "सोम (अमृतमयी शांति, भजन-कीर्तन व धर्मपरायणता)",
@@ -1084,6 +1127,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "N6",
+    governingPlanet: "Moon",
     padCode: "N6",
     nameEn: "Bhujanga (भुजंग)",
     nameHi: "भुजंग (प्रचुर संपदा किंतु वहम व अंधविश्वास)",
@@ -1105,6 +1149,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "N7",
+    governingPlanet: "Sun",
     padCode: "N7",
     nameEn: "Aditi (अदिति)",
     nameHi: "अदिति (कन्याओं का विद्रोही स्वभाव)",
@@ -1126,6 +1171,7 @@ export const MASTER_45_DEVATAS: DevataEntity[] = [
   },
   {
     id: "N8",
+    governingPlanet: "Ketu",
     padCode: "N8",
     nameEn: "Diti (दिति)",
     nameHi: "दिति (अखंड बैंक बैलेंस, भरे हुए पर्स व एटीएम)",
@@ -1554,3 +1600,257 @@ export function runVastuPurushaMandalaEngine(
   };
 }
 
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 10. PLANETARY LORDSHIP OF 45 DEVATAS & CLINICAL PROBLEM DIAGNOSTICS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const PLANET_TO_45_DEVATAS: Record<string, string[]> = {
+  Ketu: ["AAPAVATSA", "Bhringaraja (S7)", "Varuna (W5)", "Diti (N8)"],
+  Venus: ["BHUDHAR", "SAVITA", "Mahendra (E4)", "Anila (S1)", "Pushpadanta (W4)"],
+  Sun: ["INDRA_INNER", "Surya (E5)", "Satya (E6)", "Vidhata (S3)", "Soma (N5)", "Aditi (N7)"],
+  Moon: ["RUDRA", "Shikhi (E1)", "Aakash (E8)", "Asura (W6)", "Bhujanga (N6)"],
+  Mars: ["ARYAMA", "APA", "RAJYAKSHMA", "Mukhya (N3)"],
+  Rahu: ["Parjanya (E2)", "Yama (S5)", "Pitra (W1)", "Dauvarika (W2)", "Papyakshma (W8)", "Naga (N2)"],
+  Jupiter: ["BRAHMA", "Jayanta (E3)"],
+  Saturn: ["MITRA", "JAYA", "Pusha (S2)", "Gandharva (S6)", "Roga (N1)", "Bhallata (N4)"],
+  Mercury: ["VIVASVAN", "SAVITRA", "Bhrisha (E7)", "Grihakshata (S4)", "Mriga (S8)", "Sugriva (W3)", "Shosha (W7)"],
+};
+
+export function getDevatasByPlanet(planet: string): DevataEntity[] {
+  const norm = planet.trim().toLowerCase();
+  return MASTER_45_DEVATAS.filter((d) => d.governingPlanet.toLowerCase() === norm);
+}
+
+export interface ClinicalProblemDiagnostic {
+  id: string;
+  problemTitleHi: string;
+  problemTitleEn: string;
+  targetDevataId: string;
+  targetDevataName: string;
+  governingPlanet: string;
+  zone: string;
+  shastricDiagnosis: string;
+  actionProtocol: "ACTIVATE" | "BLOCK_DEACTIVATE" | "CLEANSE_OFFERING";
+  physicalRemedyHi: string;
+  springDirective?: "CLOCKWISE_BLOCK" | "ANTICLOCKWISE_OPEN";
+  offeringDetails?: string;
+}
+
+export const MASTER_CLINICAL_PROBLEM_DIAGNOSTICS: ClinicalProblemDiagnostic[] = [
+  {
+    id: "DRUG_ALCOHOL_SUBSTANCE_ADDICTION",
+    problemTitleHi: "नशा, शराब, ड्रग्स एवं व्यसन की लत (Substance Abuse)",
+    problemTitleEn: "Substance & Alcohol Addiction",
+    targetDevataId: "W8",
+    targetDevataName: "Papyakshma (पापयक्ष्मा)",
+    governingPlanet: "Rahu",
+    zone: "WSW / W8",
+    shastricDiagnosis: "पापयक्ष्मा असुर पद अति-सक्रिय या दूषित होने पर जातक असामाजिक संगति, नशाखोरी और आत्मघाती व्यसनों में लिप्त हो जाता है।",
+    actionProtocol: "BLOCK_DEACTIVATE",
+    physicalRemedyHi: "पापयक्ष्मा पद पर फर्श में छेद करके उसी तत्व/रंग का 'क्लॉकवाइज स्प्रिंग' (Clockwise Spring) स्थापित करके ऊर्जा को ब्लॉक/निष्क्रिय करें।",
+    springDirective: "CLOCKWISE_BLOCK",
+  },
+  {
+    id: "LINEAGE_CONCEPTION_FAILURE",
+    problemTitleHi: "वंश वृद्धि में रुकावट / संतान हीनता (Lineage Stoppage)",
+    problemTitleEn: "Inability to Conceive / Lineage Interruption",
+    targetDevataId: "W1",
+    targetDevataName: "Pitra (पितृ)",
+    governingPlanet: "Rahu",
+    zone: "SW / W1",
+    shastricDiagnosis: "नैऋत्य कोण में पितृ पद पर टॉयलेट, गड्ढा, कट या गंदगी होने से पितृ दोष सक्रिय होता है और विवाह उपरांत भी वंश आगे नहीं बढ़ पाता।",
+    actionProtocol: "CLEANSE_OFFERING",
+    physicalRemedyHi: "पितृ पद की पूर्ण स्वच्छता करें। यदि टॉयलेट हो तो उसे तुरंत ब्लॉक करें तथा पितृ निमित्त तर्पण/राहु शांति उपाय करें।",
+  },
+  {
+    id: "ELECTION_PUBLIC_ISOLATION",
+    problemTitleHi: "चुनाव में पराजय / सामाजिक अलगाव / जनसमर्थन का अभाव (Social Isolation / Election Defeat)",
+    problemTitleEn: "Election Loss & Broken Social Alliances",
+    targetDevataId: "ARYAMA",
+    targetDevataName: "Aryama (आर्यमा - पूर्वी मुख)",
+    governingPlanet: "Mars",
+    zone: "East-Central",
+    shastricDiagnosis: "आर्यमा देवता समाज से गठबंधन और जनसमर्थन के प्रदाता हैं। इनके अवरुद्ध होने पर सामाजिक समर्थन अचानक शून्य हो जाता है।",
+    actionProtocol: "ACTIVATE",
+    physicalRemedyHi: "आर्यमा पद पर फर्श पर शुद्ध देशी गुड़ की एक डली (Jaggery block) 10-15 दिन रखें अथवा हरा एंटी-क्लॉकवाइज स्प्रिंग लगाएं।",
+    springDirective: "ANTICLOCKWISE_OPEN",
+    offeringDetails: "10-15 दिन बाद गुड़ गाय को खिलाएं या बहते जल में प्रवाहित करें।",
+  },
+  {
+    id: "FRIENDS_ALLIES_DEFECTION",
+    problemTitleHi: "सच्चे मित्रों और वफादार सहयोगियों का अभाव / ऐन वक्त पर धोखा (Abandonment by Friends & Allies)",
+    problemTitleEn: "Lack of Loyal Friends / Desertion by Allies",
+    targetDevataId: "W3",
+    targetDevataName: "Sugriva (सुग्रीव)",
+    governingPlanet: "Mercury",
+    zone: "West / W3",
+    shastricDiagnosis: "सुग्रीव पद भगवान श्रीराम के परम मित्र सुग्रीव की शक्ति का केंद्र है। यहाँ दोष होने पर मित्र संकट के समय साथ छोड़ देते हैं।",
+    actionProtocol: "ACTIVATE",
+    physicalRemedyHi: "सुग्रीव पद को स्वच्छ और भारमुक्त करें। यहाँ कांस्य/कांच की वस्तुएं रखें तथा एंटी-क्लॉकवाइज स्प्रिंग से ऊर्जा सक्रिय करें।",
+    springDirective: "ANTICLOCKWISE_OPEN",
+  },
+  {
+    id: "TEMPER_RAGE_AFTER_HOUSEWARMING",
+    problemTitleHi: "नये घर में प्रवेश के बाद भयानक गुस्सा व पारिवारिक कलह (Violent Anger Post Griha Pravesh)",
+    problemTitleEn: "Extreme Rage & Domestic Strife After Moving In",
+    targetDevataId: "E1",
+    targetDevataName: "Shikhi (शिखी)",
+    governingPlanet: "Moon",
+    zone: "NE / E1",
+    shastricDiagnosis: "शिखी पद वास्तु पुरुष का मस्तक व शिखा है। यहाँ भारी निर्माण या अग्नि तत्व आने से मस्तिष्क में प्रचंड अग्नि भड़कती है।",
+    actionProtocol: "CLEANSE_OFFERING",
+    physicalRemedyHi: "ईशान के शिखी पद से अग्नि/भारी भार हटाएं। शुद्ध गंगाजल का छिड़काव करें और वास्तु पुरुष के मस्तक को शीतल रखें।",
+  },
+  {
+    id: "WISH_DESIRE_FULFILLMENT",
+    problemTitleHi: "मनोकामना सिद्धि / गुप्त संकल्प की पूर्ति (Wish Manifestation)",
+    problemTitleEn: "Secret Wish & Goal Manifestation",
+    targetDevataId: "W4",
+    targetDevataName: "Pushpadanta (पुष्पदंत)",
+    governingPlanet: "Venus",
+    zone: "West / W4",
+    shastricDiagnosis: "पुष्पदंत पद मनोकामना पूर्ति और संकल्प को सिद्धि तक पहुँचाने का मुख्य ऊर्जा केंद्र है।",
+    actionProtocol: "ACTIVATE",
+    physicalRemedyHi: "सफेद अथवा सिल्वर कागज़ पर अपना संकल्प/विश स्लिप लिखकर पुष्पदंत पद पर स्थापित करें।",
+  },
+  {
+    id: "FACTORY_CONSTRUCTION_STALLED",
+    problemTitleHi: "फैक्ट्री या व्यावसायिक निर्माण वर्षों से ठप पड़ा होना (Stalled Construction / Factory Paralysis)",
+    problemTitleEn: "Stagnant Project / Stalled Commercial Construction",
+    targetDevataId: "BRAHMA",
+    targetDevataName: "Brahma (ब्रह्मा - केंद्र)",
+    governingPlanet: "Jupiter",
+    zone: "Center / Brahmasthan",
+    shastricDiagnosis: "ब्रह्मस्थान पर पिलर, बीम, गड्ढा, बोरवेल या अत्यधिक भारी भार होने से पूरे वास्तु मंडल का जीवन-संचार (G.O.D.) अवरुद्ध हो जाता है।",
+    actionProtocol: "CLEANSE_OFFERING",
+    physicalRemedyHi: "ब्रह्मस्थान की पूर्ण सफाई कर कच्चा गाय का दूध, शुद्ध गंगाजल, हल्दी व केसर का पवित्र मिश्रण छिड़कें व पीतल पिरामिड लगाएं।",
+    offeringDetails: "प्रातःकाल निरंतर 11 से 21 दिन ब्रह्मस्थान पर अर्घ्य/छिड़काव करें।",
+  },
+  {
+    id: "ZERO_CLIENT_FOOTFALL",
+    problemTitleHi: "दुकान/शोरूम में ग्राहकों का फुटफॉल शून्य होना (Zero Customer Footfall / Enquiries Dropping)",
+    problemTitleEn: "Zero Client Footfall / Lost Enquiries",
+    targetDevataId: "N4",
+    targetDevataName: "Bhallata (भल्लाट)",
+    governingPlanet: "Saturn",
+    zone: "North / N4",
+    shastricDiagnosis: "भल्लाट पद धन, समृद्धि और ग्राहक प्रवाह का अधिपति है। यहाँ ब्लॉकेज होने पर ग्राहक दुकान के बाहर से ही लौट जाते हैं।",
+    actionProtocol: "ACTIVATE",
+    physicalRemedyHi: "भल्लाट पद की ब्लॉकेज हटाएं। उत्तर में नीला/एल्युमिनियम एंटी-क्लॉकवाइज स्प्रिंग लगाएं जिससे ग्राहकों का आगमन त्वरित हो सके।",
+    springDirective: "ANTICLOCKWISE_OPEN",
+  },
+  {
+    id: "APPAREL_BRAND_SAMPLE_REJECTION",
+    problemTitleHi: "गारमेंट्स / फैशन सैंपल्स का बायर्स द्वारा बार-बार रिजेक्ट होना (Apparel Sample / Export Brand Rejection)",
+    problemTitleEn: "Garment & Export Sample Rejection by Buyers",
+    targetDevataId: "N2",
+    targetDevataName: "Naga (नागा)",
+    governingPlanet: "Rahu",
+    zone: "North-NNW / N2",
+    shastricDiagnosis: "नागा पद विदेशी व्यापार, बायर आकर्षण और नमूनों (Samples) की स्वीकृति का अधिपति है। राहु ऊर्जा दूषित होने पर खरीदार डील फाइनल नहीं करते।",
+    actionProtocol: "CLEANSE_OFFERING",
+    physicalRemedyHi: "नागा पद पर शुद्ध **दालचीनी (Cinnamon)** की आहुति/भेंट रखें। यह राहु के नागा पद को तृप्त कर अंतरराष्ट्रीय खरीदारों के ऑर्डर्स तुरंत फाइनल करवाता है।",
+    offeringDetails: "नागा पद पर दालचीनी की छाल अथवा चूर्ण 11 दिन तक स्वच्छ पात्र में स्थापित रखें।",
+  },
+];
+
+export interface ToiletBlockingProtocol {
+  quadrant: "East" | "South" | "West" | "North";
+  element: "Air" | "Fire" | "Earth_Space" | "Water";
+  metalStrip: string;
+  metalColor: string;
+  floorGrooveMethod: string;
+  dominantWordRule: string;
+}
+
+export const TOILET_BLOCKING_MATRIX: Record<string, ToiletBlockingProtocol> = {
+  East: {
+    quadrant: "East",
+    element: "Air",
+    metalStrip: "स्टेनलेस स्टील की पत्ती (Stainless Steel Strip)",
+    metalColor: "#16A34A",
+    floorGrooveMethod: "फर्श में 1 इंच गहरी ग्रूव काटकर स्टेनलेस स्टील की पत्ती खड़ी (Vertical) स्थापित करें।",
+    dominantWordRule: "पूर्व से जुड़े ज़ोन (E, ENE, ESE) में हमेशा स्टेनलेस स्टील का प्रयोग करें।",
+  },
+  South: {
+    quadrant: "South",
+    element: "Fire",
+    metalStrip: "तांबे की पत्ती (Pure Copper Strip)",
+    metalColor: "#DC2626",
+    floorGrooveMethod: "फर्श में 1 इंच गहरी ग्रूव काटकर शुद्ध तांबे की पत्ती वर्टिकल सील करें।",
+    dominantWordRule: "दक्षिण और अग्नि ज़ोन (S, SSE, SE) में तांबे की पत्ती अनिवार्य है।",
+  },
+  West: {
+    quadrant: "West",
+    element: "Earth_Space",
+    metalStrip: "कच्चा लोहा की पत्ती (Raw Iron Strip)",
+    metalColor: "#475569",
+    floorGrooveMethod: "फर्श में ग्रूव काटकर कच्चे लोहे की पत्ती डालें (सफेद टाइल्स या कमोड होने पर भी लोहा ऊर्जा को ग्राउंड करता है)।",
+    dominantWordRule: "पश्चिम और वायव्य-नैऋत्य संधि (W, WSW, SSW) में कच्चा लोहा प्रयुक्त होता है।",
+  },
+  North: {
+    quadrant: "North",
+    element: "Water",
+    metalStrip: "एल्युमिनियम की पत्ती (Aluminium Strip)",
+    metalColor: "#0284C7",
+    floorGrooveMethod: "फर्श में ग्रूव काटकर एल्युमिनियम पत्ती खड़ी लगाएं।",
+    dominantWordRule: "उत्तर और जल ज़ोन (N, NNE, NNW) में एल्युमिनियम का प्रयोग होता है।",
+  },
+};
+
+export function resolveDominantZoneMetal(zones: string[]): {
+  dominantQuadrant: "East" | "South" | "West" | "North";
+  metalStrip: string;
+  explanation: string;
+} {
+  let eastCount = 0;
+  let southCount = 0;
+  let westCount = 0;
+  let northCount = 0;
+
+  for (const z of zones) {
+    const upper = z.toUpperCase();
+    if (upper.includes("E") && !upper.includes("W")) eastCount++;
+    if (upper.includes("S") && !upper.includes("N")) southCount++;
+    if (upper.includes("W")) westCount++;
+    if (upper.includes("N")) northCount++;
+  }
+
+  const counts = [
+    { quadrant: "East" as const, count: eastCount },
+    { quadrant: "South" as const, count: southCount },
+    { quadrant: "West" as const, count: westCount },
+    { quadrant: "North" as const, count: northCount },
+  ];
+  counts.sort((a, b) => b.count - a.count);
+  const winner = counts[0].quadrant;
+  const protocol = TOILET_BLOCKING_MATRIX[winner];
+
+  return {
+    dominantQuadrant: winner,
+    metalStrip: protocol.metalStrip,
+    explanation: `हाइब्रिड संधि नियम (Dominant Word Rule): संधि ज़ोन [${zones.join(", ")}] में '${winner}' शब्द की प्रधानता (${counts[0].count} बार) होने के कारण ${protocol.metalStrip} द्वारा टॉयलेट ब्लॉकिंग की जाएगी।`,
+  };
+}
+
+export const ENERGY_SPRING_DIRECTIVES = {
+  CLOCKWISE: {
+    direction: "Clockwise (दक्षिणावर्ती)",
+    action: "BLOCK_AND_SUPPRESS (ऊर्जा का शमन / ब्लॉकेज)",
+    clinicalApplication: "असुर पदों (जैसे W8 पापयक्ष्मा) या दूषित क्षेत्रों की हानिकारक तरंगों को दबाने हेतु फर्श में होल करके उसी तत्व का क्लॉकवाइज स्प्रिंग नीचे दबाया जाता है।",
+  },
+  ANTICLOCKWISE: {
+    direction: "Anti-Clockwise (वामावर्ती)",
+    action: "OPEN_AND_ACTIVATE (ऊर्जा का प्रकटीकरण / जागृति)",
+    clinicalApplication: "शुभ देवताओं (जैसे अर्यमा, भूधर, भल्लाट, सुग्रीव) के सुप्त पदों को जागृत कर कार्य, धन और संबंधों में त्वरित गति लाने हेतु एंटी-क्लॉकवाइज स्प्रिंग लगाया जाता है।",
+  },
+};
+
+export const E1_ENTRANCE_NAZAR_DEFENSE = {
+  padCode: "E1",
+  deity: "Shikhi (शिखी / पर्जन्य संधि)",
+  vulnerability: "तीव्र नज़र दोष, नकारात्मक मनोवैज्ञानिक दृष्टि एवं सामाजिक ईर्ष्या (Extreme Evil Eye Vulnerability)",
+  classicalRemedyHi: "शरीर पर अभिमंत्रित काला धागा धारण करें अथवा कान के पीछे शुद्ध काला टीका लगाएं। यह नकारात्मक दृष्टि तरंगों को तत्काल निष्प्रभावी करता है।",
+};
