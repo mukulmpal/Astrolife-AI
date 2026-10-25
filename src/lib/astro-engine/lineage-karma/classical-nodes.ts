@@ -87,30 +87,30 @@ export function calculateClassicalNodalLineage(chart: ChartData): NodalLineagePr
   // 2. Vargottama Detection
   // Check if D9 navamsha sign matches D1 sign
   // In chart.navamsha (if present) or calculate
-  const rahuD1Sign = rahu?.sign || "Cancer";
-  const ketuD1Sign = ketu?.sign || "Capricorn";
+  const rahuD1Sign = rahu?.sign;
+  const ketuD1Sign = ketu?.sign;
   
   // Approximate or retrieve D9 signs
-  const rahuD9Sign = chart.planets?.Rahu?.navamsha || (chart as any).navamsha?.planets?.Rahu?.sign || rahuD1Sign;
-  const ketuD9Sign = chart.planets?.Ketu?.navamsha || (chart as any).navamsha?.planets?.Ketu?.sign || ketuD1Sign;
+  const rahuD9Sign = chart.planets?.Rahu?.navamsha || (chart as any).navamsha?.planets?.Rahu?.sign;
+  const ketuD9Sign = chart.planets?.Ketu?.navamsha || (chart as any).navamsha?.planets?.Ketu?.sign;
   
-  const isRahuVargottama = Boolean(rahuD9Sign && rahuD9Sign === rahuD1Sign);
-  const isKetuVargottama = Boolean(ketuD9Sign && ketuD9Sign === ketuD1Sign);
+  const isRahuVargottama = Boolean(rahuD1Sign && rahuD9Sign && rahuD9Sign === rahuD1Sign);
+  const isKetuVargottama = Boolean(ketuD1Sign && ketuD9Sign && ketuD9Sign === ketuD1Sign);
 
   // 3. Kendra-Trikona Yogakaraka Status for Nodes
-  const rahuH = rahu?.house || 2;
-  const ketuH = ketu?.house || 8;
-  const isKendra = (h: number) => [1, 4, 7, 10].includes(h);
-  const isTrikona = (h: number) => [1, 5, 9].includes(h);
-  const isTrik = (h: number) => [6, 8, 12].includes(h);
+  const rahuH = rahu?.house;
+  const ketuH = ketu?.house;
+  const isKendra = (h?: number) => h !== undefined && [1, 4, 7, 10].includes(h);
+  const isTrikona = (h?: number) => h !== undefined && [1, 5, 9].includes(h);
+  const isTrik = (h?: number) => h !== undefined && [6, 8, 12].includes(h);
 
-  const isRahuYogakaraka = (isKendra(rahuH) || isTrikona(rahuH)) && !isTrik(rahuH);
+  const isRahuYogakaraka = Boolean(rahuH && (isKendra(rahuH) || isTrikona(rahuH)) && !isTrik(rahuH));
 
   // 4. Bahuputra Yoga (Rahu in 5th not in Saturn's Navamsha)
-  const isBahuputraYoga = rahuH === 5 && !["Capricorn", "Aquarius"].includes(rahuD9Sign);
+  const isBahuputraYoga = rahuH === 5 && !["Capricorn", "Aquarius"].includes(rahuD9Sign || "");
 
   // 5. Vipreet Raja Yoga by Nodes
-  const isVipreet = isTrik(rahuH) && isTrik(ketuH);
+  const isVipreet = Boolean(rahuH && ketuH && isTrik(rahuH) && isTrik(ketuH));
 
   // 6. 19th Constellation Eclipse Sensitivity
   const birthNakIndex = NAKSHATRAS.indexOf(moonNak);

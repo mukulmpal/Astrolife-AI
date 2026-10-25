@@ -615,8 +615,8 @@ export function generateSimpleKundliDossierData(chart: ChartData): SimpleKundliD
     .map(([name, pl]) => ({ name, ...pl }));
 
   // D-9 Navamsha Marriage Indicators
-  const d9LagnaSign = d9?.lagna || "Taurus";
-  const d9LagnaNum = typeof d9?.lagnaNum === "number" ? d9.lagnaNum : 1;
+  const d9LagnaSign = d9?.lagna || chart.lagnaRashi || RASHI_NAMES[lagnaNum] || "Aries";
+  const d9LagnaNum = typeof d9?.lagnaNum === "number" ? d9.lagnaNum : lagnaNum;
   const d9SeventhSignIndex = (d9LagnaNum + 6) % 12;
   const d9SeventhLord = RASHI_LORDS[d9SeventhSignIndex] || "Mars";
   const d9SeventhLordHindi = PLANET_NAMES_HINDI[d9SeventhLord] || d9SeventhLord;

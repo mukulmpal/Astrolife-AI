@@ -924,7 +924,7 @@ export function runAstroVastuHitEngine(
 
   // Scorpio (Sign 8) Check: Generic Vastu says SSW is Disposal / Toilet
   const scorpioDir = ASTRO_VASTU_SIGN_DIRECTIONS[8];
-  const scorpioHouse = Object.values(cuspCoords).find(c => c.signNum === 8)?.house || 8;
+  const scorpioHouse = Object.values(cuspCoords).find(c => c.signNum === 8)?.house || (((8 - lagnaSignNum + 12) % 12) + 1);
   const scorpioPlanets = Object.values(planetCoords).filter(p => p.signNum === 8).map(p => p.name);
 
   if (scorpioHouse === 1 || scorpioHouse === 10 || scorpioHouse === 2 || scorpioHouse === 11 || scorpioPlanets.length >= 2 || scorpioPlanets.includes(activeMD)) {
@@ -940,7 +940,7 @@ export function runAstroVastuHitEngine(
 
   // Sagittarius / Pisces (Sign 9 & 12) Check: Generic Vastu says Temple in NE
   const neDir = ASTRO_VASTU_SIGN_DIRECTIONS[9];
-  const house9Sign = Object.values(cuspCoords).find(c => c.signNum === 9)?.house || 9;
+  const house9Sign = Object.values(cuspCoords).find(c => c.signNum === 9)?.house || (((9 - lagnaSignNum + 12) % 12) + 1);
   if (house9Sign === 8 || house9Sign === 12 || house9Sign === 6) {
     genericVastuConflicts.push({
       zoneCode: "NE",
@@ -953,7 +953,7 @@ export function runAstroVastuHitEngine(
   }
 
   // Taurus (Sign 2 - NW) Check: Generic Vastu says Put Silver Elephant / 7 White Horses in NW
-  const house2Sign = Object.values(cuspCoords).find(c => c.signNum === 2)?.house || 2;
+  const house2Sign = Object.values(cuspCoords).find(c => c.signNum === 2)?.house || (((2 - lagnaSignNum + 12) % 12) + 1);
   if (house2Sign === 12 || house2Sign === 8 || house2Sign === 6) {
     genericVastuConflicts.push({
       zoneCode: "NW",
@@ -966,7 +966,7 @@ export function runAstroVastuHitEngine(
   }
 
   // Gemini (Sign 3 - NNW) Check: Wrist thread trap
-  const house3Sign = Object.values(cuspCoords).find(c => c.signNum === 3)?.house || 3;
+  const house3Sign = Object.values(cuspCoords).find(c => c.signNum === 3)?.house || (((3 - lagnaSignNum + 12) % 12) + 1);
   if (house3Sign === 8 || house3Sign === 12) {
     genericVastuConflicts.push({
       zoneCode: "NNW",
@@ -997,16 +997,23 @@ export function runAstroVastuHitEngine(
   const cusp9 = cuspCoords[9];
   const cusp10 = cuspCoords[10];
 
+  const cusp4DefaultSign = RASHIS_ORDER[((lagnaSignNum - 1 + 3) % 12)];
+  const cusp4DefaultSignNum = ((lagnaSignNum - 1 + 3) % 12) + 1;
+  const cusp9DefaultSign = RASHIS_ORDER[((lagnaSignNum - 1 + 8) % 12)];
+  const cusp9DefaultSignNum = ((lagnaSignNum - 1 + 8) % 12) + 1;
+  const cusp10DefaultSign = RASHIS_ORDER[((lagnaSignNum - 1 + 9) % 12)];
+  const cusp10DefaultSignNum = ((lagnaSignNum - 1 + 9) % 12) + 1;
+
   const studyAndWorkDirection: StudyAndWorkDirection = {
-    fourthHouseSign: cusp4?.sign || "Cancer",
-    fourthHouseDirection: cusp4?.direction.direction || "NE",
-    fourthHouseHindi: cusp4?.direction.directionHindi || "उत्तर-पूर्व (ईशान)",
-    ninthHouseSign: cusp9?.sign || "Sagittarius",
-    ninthHouseDirection: cusp9?.direction.direction || "NE",
-    ninthHouseHindi: cusp9?.direction.directionHindi || "उत्तर-पूर्व (ईशान)",
-    tenthHouseSign: cusp10?.sign || "Capricorn",
-    tenthHouseDirection: cusp10?.direction.direction || "South",
-    tenthHouseHindi: cusp10?.direction.directionHindi || "दक्षिण",
+    fourthHouseSign: cusp4?.sign || cusp4DefaultSign,
+    fourthHouseDirection: cusp4?.direction.direction || ASTRO_VASTU_SIGN_DIRECTIONS[cusp4DefaultSignNum]?.direction || "NE",
+    fourthHouseHindi: cusp4?.direction.directionHindi || ASTRO_VASTU_SIGN_DIRECTIONS[cusp4DefaultSignNum]?.directionHindi || "उत्तर-पूर्व (ईशान)",
+    ninthHouseSign: cusp9?.sign || cusp9DefaultSign,
+    ninthHouseDirection: cusp9?.direction.direction || ASTRO_VASTU_SIGN_DIRECTIONS[cusp9DefaultSignNum]?.direction || "NE",
+    ninthHouseHindi: cusp9?.direction.directionHindi || ASTRO_VASTU_SIGN_DIRECTIONS[cusp9DefaultSignNum]?.directionHindi || "उत्तर-पूर्व (ईशान)",
+    tenthHouseSign: cusp10?.sign || cusp10DefaultSign,
+    tenthHouseDirection: cusp10?.direction.direction || ASTRO_VASTU_SIGN_DIRECTIONS[cusp10DefaultSignNum]?.direction || "South",
+    tenthHouseHindi: cusp10?.direction.directionHindi || ASTRO_VASTU_SIGN_DIRECTIONS[cusp10DefaultSignNum]?.directionHindi || "दक्षिण",
     recommendedStudyZone: `${cusp4?.direction.direction || "NE"} (${cusp4?.sign || ""}) या ${cusp9?.direction.direction || "NE"} (${cusp9?.sign || ""})`,
     recommendedStudyZoneHindi: `${cusp4?.direction.directionHindi || ""} या ${cusp9?.direction.directionHindi || ""}`,
     recommendedOnlineWorkZone: `${cusp10?.direction.direction || "South"} (${cusp10?.sign || ""}) या ${cusp4?.direction.direction || "NE"}`,
@@ -1110,7 +1117,8 @@ export function runAstroVastuHitEngine(
     const occupants = Object.values(planetCoords).filter(p => p.signNum === s);
     if (occupants.length >= 2) {
       const signDir = ASTRO_VASTU_SIGN_DIRECTIONS[s];
-      const houseNum = occupants[0]?.house || 1;
+      const matchedCusp = Object.values(cuspCoords).find(c => c.signNum === s);
+      const houseNum = occupants[0]?.house || matchedCusp?.house || (((s - lagnaSignNum + 12) % 12) + 1);
       const isPowerCenter = occupants.length >= 3;
       const planetListHi = occupants.map(o => PLANETS_HINDI[o.name] || o.name).join(", ");
       const narrative = `भाव ${houseNum} (${RASHIS_HINDI[s]} - ${s}) में ${planetListHi} — कुल ${occupants.length} ग्रह एक साथ बैठे हैं! एस्ट्रो-वास्तु पद्धति के अनुसार ${s} नंबर राशि की दिशा ${signDir.code} (${signDir.directionHindi}) है। यानी जातक के घर का ${signDir.code} ज़ोन इनकी पूरी ज़िंदगी का ${isPowerCenter ? "महा-ऊर्जा केंद्र (Power Center)" : "अत्यधिक संवेदनशील ऊर्जा क्षेत्र"} है!`;
@@ -1197,7 +1205,8 @@ export function runAstroVastuHitEngine(
     const dirInfo = ASTRO_VASTU_SIGN_DIRECTIONS[s];
     const occupants = Object.values(planetCoords).filter(p => p.signNum === s);
     const occupantNames = occupants.map(o => o.name);
-    const houseNum = cuspCoords[s]?.house || occupants[0]?.house || s;
+    const matchedCusp = Object.values(cuspCoords).find(c => c.signNum === s);
+    const houseNum = matchedCusp?.house || occupants[0]?.house || (((s - lagnaSignNum + 12) % 12) + 1);
     const isDashaZone = occupantNames.includes(activeMD) || occupantNames.includes(activeAD);
     const isCluster = occupantNames.length >= 2;
 

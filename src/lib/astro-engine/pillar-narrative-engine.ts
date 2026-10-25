@@ -71,6 +71,18 @@ const SIGN_NAMES_HINDI: Record<string, string> = {
   Pisces: "मीन (Pisces)",
 };
 
+const PLANET_NAMES_HINDI: Record<string, string> = {
+  Sun: "सूर्य देव",
+  Moon: "चंद्र देव",
+  Mars: "मंगल देव",
+  Mercury: "बुध देव",
+  Jupiter: "देवगुरु बृहस्पति",
+  Venus: "शुक्र देव",
+  Saturn: "शनि देव",
+  Rahu: "राहु देव",
+  Ketu: "केतु देव",
+};
+
 const GEMSTONES_BY_LORD: Record<string, { gem: string; finger: string; note: string }> = {
   Sun: { gem: "माणिक्य (Ruby)", finger: "अनामिका (Ring finger)", note: "सूर्य देव को बल देकर आत्मबल, नेतृत्व व मान-सम्मान को अजेय बनाता है।" },
   Moon: { gem: "मोती (Natural Pearl)", finger: "कनिष्ठिका (Little finger)", note: "चंद्रमा को शांत कर मानसिक स्पष्टता, सौम्यता व निर्णय क्षमता बढ़ाता है।" },
@@ -158,7 +170,10 @@ export function generateCareerPillarNarrative(
   const d10TenthLordPl = d10PlanetsList.find((pl) => pl.planet === d10TenthLord);
   const d10LagnaLordPl = d10PlanetsList.find((pl) => pl.planet === d10LagnaLord);
 
-  const lagnaGem = GEMSTONES_BY_LORD[chart.lagnaLord || "Mercury"] || GEMSTONES_BY_LORD.Mercury;
+  const lagnaLord = chart.lagnaLord || getHouseLord(lagnaNum, 1);
+  const lagnaLordHindi = PLANET_NAMES_HINDI[lagnaLord] || lagnaLord;
+  const tenthLordHindi = PLANET_NAMES_HINDI[tenthLord] || tenthLord;
+  const lagnaGem = GEMSTONES_BY_LORD[lagnaLord] || GEMSTONES_BY_LORD.Mercury;
 
   // Real-time Gochar computation
   let saturnSign = "Pisces";
@@ -320,8 +335,8 @@ export function generateCareerPillarNarrative(
     actionableDirective: {
       title: "करियर व धन की सिद्धि हेतु शास्त्रीय निर्देश",
       points: [
-        `अपने लग्नेश ${chart.lagnaLord || "बुध"} को बलवान रखने हेतु ${lagnaGem.gem} को ${lagnaGem.finger} में धारण करने का विचार करें (${lagnaGem.note})।`,
-        `दशम भाव के स्वामी ${tenthLord} देव की कृपा प्राप्त करने हेतु उनके बीज मंत्र का नित्य स्मरण करें।`,
+        `अपने लग्नेश ${lagnaLordHindi} को बलवान रखने हेतु ${lagnaGem.gem} को ${lagnaGem.finger} में धारण करने का विचार करें (${lagnaGem.note})।`,
+        `दशम भाव के स्वामी ${tenthLordHindi} की कृपा प्राप्त करने हेतु उनके बीज मंत्र का नित्य स्मरण करें।`,
         "सट्टेबाज़ी, अनियंत्रित शॉर्टकट या बिना शोध के जोखिम से 100% दूर रहें — आपका धन वास्तविक मूल्य निर्माण और सिस्टम्स से ही स्थायी बनेगा।",
         "शनिवार को किसी ज़रूरतमंद या सफाई कर्मचारी की सहायता करें जिससे शनि का गोचरीय दबाव सौम्य होकर शुभ परिणाम देने लगे।"
       ],
@@ -348,12 +363,12 @@ export function generateMarriagePillarNarrative(
   const seventhHouseSign = chart.houseCusps?.[6]?.sign || Object.keys(SIGN_NAMES_HINDI)[(lagnaNum + 6) % 12];
 
   // D-9 Navamsha Operational Reality (Phala - Marital Core & Spouse Soul)
-  const d9LagnaSign = d9?.lagna || "Taurus";
-  const d9LagnaNum = typeof d9?.lagnaNum === "number" ? d9.lagnaNum : 1;
+  const d9LagnaSign = d9?.lagna || lagnaRashi;
+  const d9LagnaNum = typeof d9?.lagnaNum === "number" ? d9.lagnaNum : lagnaNum;
   const d9LagnaLord = RASHI_LORDS[d9LagnaNum] || "Venus";
 
   const d9SeventhSignIndex = (d9LagnaNum + 6) % 12;
-  const d9SeventhSignName = Object.keys(SIGN_NAMES_HINDI)[d9SeventhSignIndex] || "Scorpio";
+  const d9SeventhSignName = Object.keys(SIGN_NAMES_HINDI)[d9SeventhSignIndex] || Object.keys(SIGN_NAMES_HINDI)[(lagnaNum + 6) % 12];
   const d9SeventhLord = RASHI_LORDS[d9SeventhSignIndex] || "Mars";
 
   const d9PlanetsList = d9?.planets || [];

@@ -1322,7 +1322,7 @@ export function evaluateOccultKundliDiagnostic(chart: ChartData): OccultKundliDi
   const isSaturnOrRahuIn4 = saturnHouse === 4 || rahuHouse === 4;
   const isSaturnOrRahuIn1 = saturnHouse === 1 || rahuHouse === 1;
   const isSaturnRahuConjunction = saturn.signNum === rahu.signNum;
-  const is8thInvolved = saturnHouse === 8 || rahuHouse === 8 || (cusp8 && (cusp8.signNum === 10 || cusp8.signNum === 11));
+  const is8thInvolved = saturnHouse === 8 || rahuHouse === 8 || (cusp8 && (cusp8.sign === "Capricorn" || cusp8.sign === "Aquarius" || cusp8.signNum === 9 || cusp8.signNum === 10 || cusp8.signNum === 11));
 
   if ((is8thInvolved || isSaturnRahuConjunction) && (isSaturnOrRahuIn4 || isSaturnOrRahuIn1)) {
     const isBoth = isSaturnOrRahuIn4 && isSaturnOrRahuIn1;
@@ -1364,16 +1364,38 @@ export function evaluateOccultKundliDiagnostic(chart: ChartData): OccultKundliDi
 // 4. MAIN DISPATCHER FUNCTION
 // ─────────────────────────────────────────────────────────────────────────────
 
+const RASHIS_ORDER = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+];
+
+function resolveNative1IndexedLagna(chart: ChartData): number {
+  if (typeof chart.lagnaRashi === "string" && chart.lagnaRashi.trim()) {
+    const idx = RASHIS_ORDER.findIndex(r => r.toLowerCase() === chart.lagnaRashi.trim().toLowerCase());
+    if (idx >= 0) return idx + 1;
+  }
+  if (typeof chart.lagnaLon === "number") {
+    const idx = Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30);
+    return idx + 1;
+  }
+  if (typeof chart.lagnaNum === "number") {
+    if (chart.lagnaNum === 0) return 1;
+    if (chart.lagnaNum === 12) return 12;
+    return chart.lagnaNum + 1;
+  }
+  return 1;
+}
+
 export function runVastuPurushaMandalaEngine(
   chart: ChartData,
   zoneConditions?: Record<string, "Exhausted_Depleted" | "Extended_Bloated" | "Balanced">
 ): VastuPurushaMandalaDossier {
-  const lagnaNum = chart.lagnaNum || 1;
+  const lagnaSign1to12 = resolveNative1IndexedLagna(chart);
 
   // Map each of the 45 Deities to Native's Lagna Kundli!
   const nativeMappings: NativeDevataMapping[] = MASTER_45_DEVATAS.map((devata) => {
     const sNum = devata.signNum;
-    const houseNum = ((sNum - lagnaNum + 12) % 12) + 1;
+    const houseNum = ((sNum - lagnaSign1to12 + 12) % 12) + 1;
     const isDusthana = [6, 8, 12].includes(houseNum);
     const isBenefic = [1, 2, 5, 9, 10, 11].includes(houseNum);
     const houseNature: "Benefic" | "Dusthana" | "Neutral" = isDusthana

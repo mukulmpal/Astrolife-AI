@@ -65,6 +65,20 @@ function getSignNumber(name?: string): number {
   return idx >= 0 ? idx + 1 : 1;
 }
 
+function resolveLagnaSignName(chart: ChartData | null | undefined): string {
+  if (typeof chart?.lagnaRashi === "string" && chart.lagnaRashi.trim()) {
+    return chart.lagnaRashi.trim();
+  }
+  if (typeof chart?.lagnaNum === "number" && chart.lagnaNum >= 0 && chart.lagnaNum <= 11) {
+    return ZODIAC_SIGNS[chart.lagnaNum];
+  }
+  if (typeof chart?.lagnaLon === "number") {
+    const idx = Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30);
+    return ZODIAC_SIGNS[idx] || "Aries";
+  }
+  return "Aries";
+}
+
 /**
  * Evaluates Property Timing based on KP & derived Bhavat Bhavam classical rules:
  * - 4 + 11 + 12: Property Purchase (4 = property, 11 = gain/possession, 12 = investment outlay)
@@ -84,8 +98,17 @@ export function evaluatePropertyTiming(chart: ChartData | null | undefined): Pro
   }
 
   // Collect houses signified by active dasha/antardasha lords, or key property planets (Mars, 4th lord, active dasha)
-  const activeMD = chart.dashas?.find((d) => d.active) ?? chart.dashas?.[0];
-  const activeAD = chart.antardasha?.find((a) => a.active);
+  const now = new Date();
+  const activeMD = chart.dashas?.find((d) => {
+    const s = new Date(d.start), e = new Date(d.end);
+    return now >= s && now < e;
+  }) ?? chart.dashas?.find((d) => d.active) ?? chart.dashas?.[0];
+
+  const activeAD = chart.antardasha?.find((a) => {
+    const s = new Date(a.start), e = new Date(a.end);
+    return now >= s && now < e;
+  }) ?? chart.antardasha?.find((a) => a.active);
+
   const mdPlanet = activeMD?.planet || "Jupiter";
   const adPlanet = activeAD?.planet || "Saturn";
 
@@ -272,7 +295,7 @@ export function evaluateSaturn7thHouseGrowth(chart: ChartData | null | undefined
   current: TransitSaturnGrowthPeriod;
   future: TransitSaturnGrowthPeriod;
 } {
-  const lagnaRashiName = chart?.lagnaRashi || "Gemini";
+  const lagnaRashiName = resolveLagnaSignName(chart);
   const lagnaSignNum = getSignNumber(lagnaRashiName);
 
   // Transit Saturn Signs:
@@ -404,11 +427,19 @@ export function evaluateBNNTransitConjunctions(
 export function buildMasterTransitRadarDossier(chart: ChartData | null | undefined): MasterTransitRadarReport | null {
   if (!chart) return null;
 
-  const lagnaRashi = chart.lagnaRashi || "Gemini";
+  const lagnaRashi = resolveLagnaSignName(chart);
   const lagnaNum = getSignNumber(lagnaRashi);
 
-  const activeMD = chart.dashas?.find((d) => d.active) ?? chart.dashas?.[0];
-  const activeAD = chart.antardasha?.find((a) => a.active);
+  const now = new Date();
+  const activeMD = chart.dashas?.find((d) => {
+    const s = new Date(d.start), e = new Date(d.end);
+    return now >= s && now < e;
+  }) ?? chart.dashas?.find((d) => d.active) ?? chart.dashas?.[0];
+
+  const activeAD = chart.antardasha?.find((a) => {
+    const s = new Date(a.start), e = new Date(a.end);
+    return now >= s && now < e;
+  }) ?? chart.antardasha?.find((a) => a.active);
 
   const propertyForecast = evaluatePropertyTiming(chart);
   const saturnGrowth = evaluateSaturn7thHouseGrowth(chart);
