@@ -81,8 +81,22 @@ const GEMSTONES_BY_LORD: Record<string, { gem: string; finger: string; note: str
   Saturn: { gem: "नीलम या कटैला (Blue Sapphire / Amethyst)", finger: "मध्यमा (Middle finger)", note: "शनि देव को अनुकूल कर कर्मठता, अनुशासन, धैर्य व स्थायित्व देता है।" },
 };
 
+function resolveLagnaNum(chart: ChartData): number {
+  if (typeof chart.lagnaNum === "number" && chart.lagnaNum >= 0 && chart.lagnaNum <= 11) {
+    return chart.lagnaNum;
+  }
+  if (chart.lagnaRashi) {
+    const idx = Object.keys(SIGN_NAMES_HINDI).indexOf(chart.lagnaRashi);
+    if (idx >= 0) return idx;
+  }
+  if (typeof chart.lagnaLon === "number") {
+    return Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30);
+  }
+  return 0; // Aries fallback (0)
+}
+
 function getHouseLord(lagnaNum: number, houseNum: number): string {
-  const signIndex = (((lagnaNum - 1) + (houseNum - 1)) % 12 + 12) % 12;
+  const signIndex = ((lagnaNum + (houseNum - 1)) % 12 + 12) % 12;
   return RASHI_LORDS[signIndex] || "Mercury";
 }
 
@@ -106,8 +120,8 @@ export function generateCareerPillarNarrative(
 ): PillarNarrativeData {
   const name = chart.name || "जातक";
   const p = chart.planets || {};
-  const lagnaNum = chart.lagnaNum || 1;
-  const lagnaRashi = chart.lagnaRashi || "Aries";
+  const lagnaNum = resolveLagnaNum(chart);
+  const lagnaRashi = chart.lagnaRashi || Object.keys(SIGN_NAMES_HINDI)[lagnaNum] || "Aries";
   const moonRashi = p.Moon?.sign || "Aries";
 
   // D-1 Natal Foundations (Bija - Potential & Karma Seed)
@@ -123,7 +137,7 @@ export function generateCareerPillarNarrative(
 
   // D-10 Dasamsha Operational Reality (Phala - Workplace Status & Execution)
   const d10LagnaSign = d10?.lagna || lagnaRashi;
-  const d10LagnaNum = typeof d10?.lagnaNum === "number" ? d10.lagnaNum : (((lagnaNum - 1) % 12) + 12) % 12;
+  const d10LagnaNum = typeof d10?.lagnaNum === "number" ? d10.lagnaNum : lagnaNum;
   const d10LagnaLord = RASHI_LORDS[d10LagnaNum] || "Mercury";
 
   const d10TenthSignIndex = (d10LagnaNum + 9) % 12;
@@ -160,7 +174,7 @@ export function generateCareerPillarNarrative(
       timezone: String(chart.tz || 5.5),
       latitude: chart.lat || 28.61,
       longitude: chart.lon || 77.21,
-      lagnaSign: (chart.lagnaNum ? chart.lagnaNum - 1 : 0),
+      lagnaSign: lagnaNum,
       moonLongitude: p.Moon?.lon || 15,
       moonNakshatra: Math.floor((p.Moon?.lon || 15) / (360 / 27)),
       activeMahadasha: chart.dashas?.find((d) => d.active)?.planet || "Rahu",
@@ -325,13 +339,13 @@ export function generateMarriagePillarNarrative(
 ): PillarNarrativeData {
   const name = chart.name || "जातक";
   const p = chart.planets || {};
-  const lagnaNum = chart.lagnaNum || 1;
-  const lagnaRashi = chart.lagnaRashi || "Aries";
+  const lagnaNum = resolveLagnaNum(chart);
+  const lagnaRashi = chart.lagnaRashi || Object.keys(SIGN_NAMES_HINDI)[lagnaNum] || "Aries";
 
   // D-1 Natal Foundations (Bija - Marriage Seed)
   const seventhLord = getHouseLord(lagnaNum, 7);
   const seventhPlanets = getPlanetsInHouse(chart, 7);
-  const seventhHouseSign = chart.houseCusps?.[6]?.sign || Object.keys(SIGN_NAMES_HINDI)[(lagnaNum + 5) % 12];
+  const seventhHouseSign = chart.houseCusps?.[6]?.sign || Object.keys(SIGN_NAMES_HINDI)[(lagnaNum + 6) % 12];
 
   // D-9 Navamsha Operational Reality (Phala - Marital Core & Spouse Soul)
   const d9LagnaSign = d9?.lagna || "Taurus";

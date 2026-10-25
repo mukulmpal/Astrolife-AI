@@ -582,7 +582,7 @@ export function runAstroVastuHitEngine(
     }
     if (typeof chart.lagnaNum === "number") {
       if (chart.lagnaNum >= 0 && chart.lagnaNum <= 11) return RASHIS_ORDER[chart.lagnaNum];
-      if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) return RASHIS_ORDER[chart.lagnaNum - 1];
+      if (chart.lagnaNum === 12) return "Pisces";
     }
     return "Aries";
   };

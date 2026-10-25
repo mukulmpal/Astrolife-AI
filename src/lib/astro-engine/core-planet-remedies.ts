@@ -1158,8 +1158,10 @@ const RASHI_LORDS: PlanetId[] = [
 ];
 
 export function getHouseLord(chart: ChartData | null | undefined, houseNo: number): PlanetId {
-  const lagnaNum = chart?.lagnaNum || 1;
-  const rashiIdx = ((lagnaNum + houseNo - 2) % 12);
+  const lagnaNum = typeof chart?.lagnaNum === "number" && chart.lagnaNum >= 0 && chart.lagnaNum <= 11
+    ? chart.lagnaNum
+    : 0;
+  const rashiIdx = ((lagnaNum + (houseNo - 1)) % 12 + 12) % 12;
   return RASHI_LORDS[rashiIdx] || "Sun";
 }
 

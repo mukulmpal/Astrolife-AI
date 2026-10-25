@@ -265,12 +265,15 @@ export function normalizeLagnaIndex(chart: ChartData): number {
     if (idx >= 0) return idx;
   }
   if (typeof chart.lagnaNum === "number") {
-    if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) {
-      return chart.lagnaNum - 1;
-    }
     if (chart.lagnaNum >= 0 && chart.lagnaNum <= 11) {
       return chart.lagnaNum;
     }
+    if (chart.lagnaNum === 12) {
+      return 11;
+    }
+  }
+  if (typeof chart.lagnaLon === "number") {
+    return Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30);
   }
   return 0; // Aries fallback
 }

@@ -560,8 +560,8 @@ export function generateMasterKundliDossier(chart: ChartData): MasterDossierResu
       if (chart.lagnaNum >= 0 && chart.lagnaNum <= 11) {
         return { rashiName: RASHIS[chart.lagnaNum] || "Aries", lagnaNum: chart.lagnaNum };
       }
-      if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) {
-        return { rashiName: RASHIS[chart.lagnaNum - 1] || "Aries", lagnaNum: chart.lagnaNum - 1 };
+      if (chart.lagnaNum === 12) {
+        return { rashiName: "Pisces", lagnaNum: 11 };
       }
     }
     if (typeof chart.lagnaLon === "number") {
