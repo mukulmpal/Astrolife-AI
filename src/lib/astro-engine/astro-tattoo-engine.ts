@@ -456,6 +456,28 @@ export const GOAL_DEFINITIONS: Record<LifeGoal, GoalMeta> = {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
+function getPlanetList(chart: ChartData): any[] {
+  if (!chart || !chart.planets) return [];
+  if (Array.isArray(chart.planets)) return chart.planets;
+  return Object.values(chart.planets);
+}
+
+function findPlanetData(chart: ChartData, name: string): any | null {
+  if (!chart || !chart.planets) return null;
+  if (Array.isArray(chart.planets)) {
+    return chart.planets.find((p: any) => p.name?.toLowerCase() === name.toLowerCase()) || null;
+  }
+  const planetsObj = chart.planets as unknown as Record<string, any>;
+  if (planetsObj[name]) return planetsObj[name];
+  const lower = name.toLowerCase();
+  for (const [k, v] of Object.entries(planetsObj)) {
+    if (k.toLowerCase() === lower || v?.name?.toLowerCase() === lower) {
+      return v;
+    }
+  }
+  return null;
+}
+
 function getLagnaSignNumber(chart: ChartData): number {
   if (chart.houses && chart.houses.length > 0) {
     const h1 = chart.houses[0];
@@ -480,10 +502,11 @@ function resolveSignAtHouse(lagnaSignNum: number, targetHouse: number): number {
  * Check if a planet is Untenanted (no other planet occupies its nakshatras)
  */
 export function checkIsUntenanted(chart: ChartData, planetName: string): boolean {
-  if (!chart.planets || chart.planets.length === 0) return false;
+  const pList = getPlanetList(chart);
+  if (pList.length === 0) return false;
   
   const occupiedStarLords = new Set<string>();
-  chart.planets.forEach(p => {
+  pList.forEach(p => {
     if (p.nakshatraLord) {
       occupiedStarLords.add(p.nakshatraLord.toLowerCase());
     }
@@ -508,7 +531,7 @@ export function resolveActivatingPlanet(
   reasoning: string;
 } {
   const defaultPlanet = preferredPlanet || chart.dasha?.currentDasha?.mahadasha || "Mercury";
-  const pData = chart.planets?.find(p => p.name.toLowerCase() === defaultPlanet.toLowerCase());
+  const pData = findPlanetData(chart, defaultPlanet);
 
   const starLord = pData?.nakshatraLord || defaultPlanet;
   const isUntenanted = checkIsUntenanted(chart, defaultPlanet);
@@ -554,7 +577,7 @@ export function generateAstroTattooAudit(
     ? {
         planet: targetPlanetChoice,
         isUntenanted: checkIsUntenanted(chart, targetPlanetChoice),
-        starLord: chart.planets?.find(p => p.name.toLowerCase() === targetPlanetChoice.toLowerCase())?.nakshatraLord || targetPlanetChoice,
+        starLord: findPlanetData(chart, targetPlanetChoice)?.nakshatraLord || targetPlanetChoice,
         reasoning: `प्रत्यक्ष ग्रह चयन: ${targetPlanetChoice}।`,
       }
     : resolveActivatingPlanet(chart, currentMahadasha);
