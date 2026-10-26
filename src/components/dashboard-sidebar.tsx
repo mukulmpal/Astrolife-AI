@@ -82,6 +82,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf },
       { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen, badge: "PRO" },
       { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon, badge: "PRO" },
+      { label: "Astro Tattoo (Dot Therapy)", href: "/dashboard/astro-tattoo", Icon: Sparkles, badge: "PRO" },
       { label: "Astro Sound", href: "/dashboard/astro-sound", Icon: Music },
     ],
   },

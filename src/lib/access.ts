@@ -19,7 +19,8 @@ export type FeatureKey =
   | "marriage_timing"
   | "palmistry"
   | "transit_purchase"
-  | "astro_sound";
+  | "astro_sound"
+  | "astro_tattoo";
 
 export const PLAN_LIMITS = {
   free: {
@@ -59,6 +60,7 @@ export const FEATURE_ACCESS: Record<FeatureKey, SubscriptionTier[]> = {
   palmistry: ["premium", "elite"],
   transit_purchase: ["premium", "elite"],
   astro_sound: ["premium", "elite"],
+  astro_tattoo: ["premium", "elite"],
 };
 
 export const ELITE_EMAILS = new Set([
