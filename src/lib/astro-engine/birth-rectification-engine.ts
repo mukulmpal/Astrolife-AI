@@ -54,6 +54,23 @@ export interface BTREvent {
   title: string;
   date: string; // YYYY-MM-DD
   category: BTREventCategory;
+  // Specific Medical / Vocational / Structural Anchor for Instant Cusp Sub-Lord Locking
+  specificOrganOrIssue?:
+    | "liver_jaundice"
+    | "bones_joints_stiffness"
+    | "nerves_skin_speech"
+    | "blood_muscles_surgery"
+    | "heart_vitality_fever"
+    | "kidney_urinary_hormonal"
+    | "respiratory_phobia_seizure";
+  vocationalField?:
+    | "advisory_consulting_cs"
+    | "engineering_machinery_labor"
+    | "analytics_trading_accounts"
+    | "defense_police_surgery"
+    | "governance_leadership_admin"
+    | "creative_luxury_design"
+    | "research_foreign_occult";
 }
 
 export interface BTRPalmInput {
@@ -248,6 +265,15 @@ export interface BTREvidenceMatrix {
     totalCount: number;
     score: number;
     details: string;
+  };
+  instantCuspSubLordLock?: {
+    passed: boolean;
+    targetCusp: number;
+    expectedSubLord: string;
+    actualSubLord: string;
+    matched: boolean;
+    score: number;
+    audit: string;
   };
   palmistry: {
     score: number;
@@ -1180,6 +1206,136 @@ function evaluateEventAgainstDasha(
   };
 }
 
+// ── Instant Cusp Sub-Lord Disease/Vocational Anchor Evaluator ─────────────────
+// Classical KP & BNN Live Master Rule:
+// e.g. Liver/Jaundice & Advisory/CS Job => 6th Cusp Sub-Lord MUST be Jupiter!
+export const ORGAN_AND_VOCATION_SUB_LORD_RULES: Record<
+  string,
+  {
+    targetCusp: number;
+    expectedSubLords: string[];
+    shastricVerdictHi: string;
+  }
+> = {
+  liver_jaundice: {
+    targetCusp: 6,
+    expectedSubLords: ["Jupiter"],
+    shastricVerdictHi: "पीलिया (Jaundice/Liver) देवगुरु बृहस्पति से संचालित है; षष्ठ भाव (रोग) का सब-लॉर्ड बृहस्पति होना अनिवार्य है।",
+  },
+  advisory_consulting_cs: {
+    targetCusp: 6,
+    expectedSubLords: ["Jupiter", "Mercury"],
+    shastricVerdictHi: "कंपनी सेक्रेटरी/सलाहकार/एडवाइजरी कार्य षष्ठ भाव के सब-लॉर्ड गुरु/बुध से संचालित होता है।",
+  },
+  bones_joints_stiffness: {
+    targetCusp: 6,
+    expectedSubLords: ["Saturn"],
+    shastricVerdictHi: "जोड़ों का दर्द व वात व्याधि शनि से संचालित है; षष्ठ भाव का सब-लॉर्ड शनि होना अनिवार्य है।",
+  },
+  engineering_machinery_labor: {
+    targetCusp: 6,
+    expectedSubLords: ["Saturn", "Mars"],
+    shastricVerdictHi: "इंजीनियरिंग, मशीनरी व कठिन श्रम षष्ठ भाव के सब-लॉर्ड शनि/मंगल से संचालित होता है।",
+  },
+  nerves_skin_speech: {
+    targetCusp: 6,
+    expectedSubLords: ["Mercury", "Rahu"],
+    shastricVerdictHi: "त्वचा, तंत्रिका तंत्र (नर्व्स) व वाणी रोग का कारक बुध है; षष्ठ भाव का सब-लॉर्ड बुध होना चाहिए।",
+  },
+  analytics_trading_accounts: {
+    targetCusp: 6,
+    expectedSubLords: ["Mercury"],
+    shastricVerdictHi: "अकाउंट्स, शेयर ट्रेडिंग व डेटा एनालिटिक्स कार्य षष्ठ भाव के सब-लॉर्ड बुध से संचालित होता है।",
+  },
+  blood_muscles_surgery: {
+    targetCusp: 8,
+    expectedSubLords: ["Mars", "Ketu"],
+    shastricVerdictHi: "रक्तस्राव, आकस्मिक सर्जरी व मांसपेशियों का आघात अष्टम भाव के सब-लॉर्ड मंगल/केतु से संचालित होता है।",
+  },
+  defense_police_surgery: {
+    targetCusp: 10,
+    expectedSubLords: ["Mars", "Sun"],
+    shastricVerdictHi: "सेना, पुलिस, रक्षा व शल्य चिकित्सा (Surgeon) दशम भाव के सब-लॉर्ड मंगल/सूर्य से संचालित होता है।",
+  },
+  heart_vitality_fever: {
+    targetCusp: 6,
+    expectedSubLords: ["Sun", "Mars"],
+    shastricVerdictHi: "हृदय, तेज ज्वर व जीवन-ऊर्जा का ह्रास षष्ठ भाव के सब-लॉर्ड सूर्य/मंगल से संचालित होता है।",
+  },
+  governance_leadership_admin: {
+    targetCusp: 10,
+    expectedSubLords: ["Sun", "Jupiter"],
+    shastricVerdictHi: "सरकारी पद, आईएएस/प्रशासनिक नेतृत्व दशम भाव के सब-लॉर्ड सूर्य/गुरु से संचालित होता है।",
+  },
+  kidney_urinary_hormonal: {
+    targetCusp: 6,
+    expectedSubLords: ["Venus"],
+    shastricVerdictHi: "किडनी, मूत्र विकार व प्रजनन हार्मोन्स का रोग षष्ठ भाव के सब-लॉर्ड शुक्र से संचालित होता है।",
+  },
+  creative_luxury_design: {
+    targetCusp: 10,
+    expectedSubLords: ["Venus"],
+    shastricVerdictHi: "फैशन, लग्जरी, इंटीरियर व कला व्यवसाय दशम भाव के सब-लॉर्ड शुक्र से संचालित होता है।",
+  },
+  respiratory_phobia_seizure: {
+    targetCusp: 6,
+    expectedSubLords: ["Rahu", "Mercury", "Moon"],
+    shastricVerdictHi: "सांस की नली, फोबिया, पैनिक अटैक व मिर्गी षष्ठ भाव के सब-लॉर्ड राहु/बुध से संचालित होते हैं।",
+  },
+  research_foreign_occult: {
+    targetCusp: 9,
+    expectedSubLords: ["Rahu", "Jupiter", "Ketu"],
+    shastricVerdictHi: "गहन शोध, विदेशी संबंध व गूढ़ ज्योतिष नवम भाव के सब-लॉर्ड राहु/गुरु/केतु से संचालित होते हैं।",
+  },
+};
+
+export function evaluateInstantCuspSubLordLock(
+  events: BTREvent[],
+  placidusCusps: Array<{ house: number; subLord: string; starLord: string }>
+): {
+  passed: boolean;
+  targetCusp: number;
+  expectedSubLord: string;
+  actualSubLord: string;
+  matched: boolean;
+  score: number;
+  audit: string;
+} {
+  // Scan events for specificOrganOrIssue or vocationalField
+  for (const ev of events) {
+    const key = ev.specificOrganOrIssue || ev.vocationalField;
+    if (key && ORGAN_AND_VOCATION_SUB_LORD_RULES[key]) {
+      const rule = ORGAN_AND_VOCATION_SUB_LORD_RULES[key];
+      const cuspData = placidusCusps[rule.targetCusp - 1];
+      const actualSubLord = cuspData?.subLord || "Unknown";
+      const isMatch = rule.expectedSubLords.includes(actualSubLord);
+
+      return {
+        passed: isMatch,
+        targetCusp: rule.targetCusp,
+        expectedSubLord: rule.expectedSubLords.join("/"),
+        actualSubLord,
+        matched: isMatch,
+        score: isMatch ? 20 : 0,
+        audit: isMatch
+          ? `[Cusp Lock Match]: भाव ${rule.targetCusp} का सब-लॉर्ड '${actualSubLord}' है, जो '${key}' (${rule.shastricVerdictHi}) से 100% संरेखित है।`
+          : `[Cusp Lock Mismatch]: भाव ${rule.targetCusp} का सब-लॉर्ड '${actualSubLord}' मिला, जबकि '${key}' हेतु '${rule.expectedSubLords.join("/")}' अपेक्षित था।`,
+      };
+    }
+  }
+
+  // Default when no specific organ/vocation tag is supplied
+  return {
+    passed: true,
+    targetCusp: 6,
+    expectedSubLord: "Any",
+    actualSubLord: placidusCusps[5]?.subLord || "Unknown",
+    matched: true,
+    score: 10,
+    audit: "कोई विशिष्ट अंग/व्यवसाय टैग नहीं दिया गया; सामान्य कस्पल प्रवाह स्वीकृत।",
+  };
+}
+
 // ── Palmistry Compatibility Scorer ──────────────────────────────────────────
 function scorePalmCompatibility(
   palm: BTRPalmInput | undefined,
@@ -1363,25 +1519,29 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
         const kunda = calculateKunda(chart.lagnaLon);
         const kundaMatch = kunda.kundaLord === moonNak.lord;
 
-        // 13. Prenatal Epoch (Adhana Lagna - Chapter XII)
+        // 13. Instant Cusp Sub-Lord Disease/Vocational Anchor Evaluator (Live Lecture Master Rule)
+        const cuspLockRes = evaluateInstantCuspSubLordLock(input.events, placidusCusps);
+
+        // 14. Prenatal Epoch (Adhana Lagna - Chapter XII)
         const prenatalEpoch = evaluatePrenatalEpoch(chart, dateStr, timeStr, tz);
 
-        // 13. Palm Compatibility
+        // 15. Palm Compatibility
         const palmScore = scorePalmCompatibility(
           input.palmFeatures,
           chart.lagnaRashi,
           chart
         );
 
-        // 14. Multi-Family Auditable Scoring (Spec Section 29 + R.K. Das Canon)
-        // Primary: KP 3-Level (0-30), Rule of Origin (0-20), Life Events (0-30)
+        // 16. Multi-Family Auditable Scoring (Spec Section 29 + R.K. Das Canon + Cusp SubLord Lock)
+        // Primary: KP 3-Level (0-30), Rule of Origin (0-20), Life Events (0-30), Instant Cusp Lock (0-20)
         // Secondary: Pranapada (0-10), Gulika (0-5), Pala Harmonics (0-8)
         // Supporting: ND Gender (0-3), Sun-Star Asc (0-3), Tattva (0-2), Kunda (0-3), Palm (0-10)
-        // Max Raw Score: 30 + 20 + 30 + 10 + 5 + 8 + 3 + 3 + 2 + 3 + 10 = 124 points
+        // Max Raw Score: 30 + 20 + 30 + 20 + 10 + 5 + 8 + 3 + 3 + 2 + 3 + 10 = 144 points
         const rawScore =
           kpThreeLevel.score +
           originRes.score +
           (avgEventScore * 0.3) +
+          cuspLockRes.score +
           pranapadaRes.score +
           gulikaRes.score +
           palaHarmonics.score +
@@ -1391,7 +1551,7 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           (kundaMatch ? 3 : 0) +
           (palmScore * 0.1);
 
-        const totalConfidence = Math.max(0, Math.min(100, Math.round((rawScore / 124) * 100)));
+        const totalConfidence = Math.max(0, Math.min(100, Math.round((rawScore / 144) * 100)));
 
         const deg = Math.floor(chart.lagnaLon % 30);
         const mins = Math.floor(((chart.lagnaLon % 30) - deg) * 60);
@@ -1469,6 +1629,15 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
             score: Math.round(avgEventScore * 0.3),
             details: `Matched ${matchedEventCount}/${input.events.length} life milestones via active Dasha`,
           },
+          instantCuspSubLordLock: {
+            passed: cuspLockRes.passed,
+            targetCusp: cuspLockRes.targetCusp,
+            expectedSubLord: cuspLockRes.expectedSubLord,
+            actualSubLord: cuspLockRes.actualSubLord,
+            matched: cuspLockRes.matched,
+            score: cuspLockRes.score,
+            audit: cuspLockRes.audit,
+          },
           palmistry: {
             score: Math.round(palmScore * 0.1),
             elementMatch: input.palmFeatures?.handElement === RASHI_ELEMENTS[chart.lagnaRashi],
@@ -1481,6 +1650,7 @@ export function runBirthTimeRectification(input: BTRInput): BTRResult {
           `Time: ${timeStr} · Elapsed Palas: ${sunInfo.elapsedPalas.toFixed(1)} (${sunInfo.astrologicalWeekday})`,
           `KP 3-Level: ${kpThreeLevel.supported ? "PASS" : "PARTIAL"} (+${kpThreeLevel.score} pts)`,
           `Rule of Origin: ${originRes.originValidated ? "VALID" : "UNCONFIRMED"} (+${originRes.score} pts)`,
+          `Cusp Lock: Cusp ${cuspLockRes.targetCusp} Sub=${cuspLockRes.actualSubLord} (${cuspLockRes.matched ? "MATCH" : "DIFF"}) (+${cuspLockRes.score} pts)`,
           `Pranapada: error ${pranapadaRes.errorDeg}° (${pranapadaRes.passed ? "PASS" : "DEVIATION"}) (+${pranapadaRes.score} pts)`,
           `Pala Harmonics: 3P mod 7 => ${palaHarmonics.computedWeekdayNumber}, 4P mod 9 => ${palaHarmonics.computedStarGroup} (+${palaHarmonics.score} pts)`,
           `N-D Gender: Point #${ndGender.ndPointNumber} (${ndGender.ndGender.toUpperCase()}) ${ndGender.matched ? "MATCH" : "MISMATCH"} (+${ndGender.score} pts)`,

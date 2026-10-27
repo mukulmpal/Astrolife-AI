@@ -7,6 +7,9 @@ import {
   evaluatePranapada,
   evaluateSunStarToAscendant,
   evaluatePrenatalEpoch,
+  evaluateInstantCuspSubLordLock,
+  runBirthTimeRectification,
+  type BTREvent,
 } from "../birth-rectification-engine";
 import {
   hasKPLinkage,
@@ -104,4 +107,52 @@ test("R.K. Das Chapter XI: Tattva 3-Fold Sex Sub-division & Border Check", () =>
   const borderTat = evaluateTattva(0.1, "Thursday", "Aquarius");
   assert.equal(borderTat.isBorderJuncture, true);
   assert.equal(borderTat.subSegmentGender, "border_eunuch");
+});
+
+test("Live Case Study: Instant 6th Cusp Sub-Lord BTR Lock (Jaundice/Liver & CS Job)", () => {
+  // Mock placidus cusps where 6th cusp sub-lord is Jupiter
+  const placidusWithJupiterOn6 = [
+    { house: 1, subLord: "Mercury", starLord: "Moon" },
+    { house: 2, subLord: "Venus", starLord: "Mars" },
+    { house: 3, subLord: "Sun", starLord: "Rahu" },
+    { house: 4, subLord: "Moon", starLord: "Jupiter" },
+    { house: 5, subLord: "Mars", starLord: "Saturn" },
+    { house: 6, subLord: "Jupiter", starLord: "Mercury" }, // Target!
+    { house: 7, subLord: "Saturn", starLord: "Ketu" },
+    { house: 8, subLord: "Rahu", starLord: "Venus" },
+    { house: 9, subLord: "Jupiter", starLord: "Sun" },
+    { house: 10, subLord: "Mercury", starLord: "Moon" },
+    { house: 11, subLord: "Venus", starLord: "Mars" },
+    { house: 12, subLord: "Sun", starLord: "Rahu" },
+  ];
+
+  // Mock placidus cusps where 6th cusp sub-lord is Saturn (wrong time candidate)
+  const placidusWithSaturnOn6 = placidusWithJupiterOn6.map((c) =>
+    c.house === 6 ? { ...c, subLord: "Saturn" } : c
+  );
+
+  const events: BTREvent[] = [
+    {
+      title: "Severe Jaundice & Joints Recovery",
+      date: "2012-06-15",
+      category: "health_crisis",
+      specificOrganOrIssue: "liver_jaundice",
+      vocationalField: "advisory_consulting_cs",
+    },
+  ];
+
+  // Evaluate candidate with Jupiter on 6th sub-lord -> should lock with 100% match (+20 pts)
+  const matchResult = evaluateInstantCuspSubLordLock(events, placidusWithJupiterOn6);
+  assert.equal(matchResult.matched, true);
+  assert.equal(matchResult.targetCusp, 6);
+  assert.equal(matchResult.actualSubLord, "Jupiter");
+  assert.equal(matchResult.score, 20);
+  assert.ok(matchResult.audit.includes("पीलिया"));
+
+  // Evaluate candidate with Saturn on 6th sub-lord -> should mismatch (0 pts)
+  const mismatchResult = evaluateInstantCuspSubLordLock(events, placidusWithSaturnOn6);
+  assert.equal(mismatchResult.matched, false);
+  assert.equal(mismatchResult.actualSubLord, "Saturn");
+  assert.equal(mismatchResult.score, 0);
+  assert.ok(mismatchResult.audit.includes("Mismatch"));
 });
