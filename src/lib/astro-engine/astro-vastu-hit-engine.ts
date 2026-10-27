@@ -68,6 +68,39 @@ import {
   type RahuExtendedZoneReport,
   type GPSPlanetaryCode,
 } from "./gps-astro-vastu-engine";
+import {
+  evaluateGoalHouseActivation,
+  evaluateAllGoalActivations,
+  evaluateLagnaMandatoryShield,
+  evaluatePartnershipRiskAudit,
+  evaluatePlanetToHouseHits,
+  getDevataFloorHardwareProtocols,
+  getVirtualDoorProtocol,
+  type GoalActivationId,
+  type GoalActivationResult,
+  type GoalActivationHouseDetail,
+  type CuspEvaluatedHit,
+  type LagnaMandatoryShieldAssessment,
+  type PartnershipRiskAssessment,
+  type DevataFloorProtocol,
+} from "./goal-house-activation-engine";
+
+export {
+  evaluateGoalHouseActivation,
+  evaluateAllGoalActivations,
+  evaluateLagnaMandatoryShield,
+  evaluatePartnershipRiskAudit,
+  evaluatePlanetToHouseHits,
+  getDevataFloorHardwareProtocols,
+  getVirtualDoorProtocol,
+  type GoalActivationId,
+  type GoalActivationResult,
+  type GoalActivationHouseDetail,
+  type CuspEvaluatedHit,
+  type LagnaMandatoryShieldAssessment,
+  type PartnershipRiskAssessment,
+  type DevataFloorProtocol,
+};
 
 export {
   runVastuPurushaMandalaEngine,
@@ -412,6 +445,12 @@ export interface AstroVastuHitDossier {
   wristThreadTrapAlert: WristThreadTrapAlert;
   mandalaDossier: VastuPurushaMandalaDossier;
   gpsDossier?: GPSAstroVastuDossier;
+  lagnaMandatoryShield?: LagnaMandatoryShieldAssessment;
+  goalActivations?: Record<GoalActivationId, GoalActivationResult>;
+  cuspEvaluatedHits?: CuspEvaluatedHit[];
+  partnershipRisk?: PartnershipRiskAssessment;
+  devataFloorProtocols?: DevataFloorProtocol;
+  virtualDoorProtocol?: { installationHeight: string; wallPlacement: string; dualZoneDivisionHi: string };
 }
 
 
@@ -1721,6 +1760,12 @@ export function runAstroVastuHitEngine(
     wristThreadTrapAlert,
     mandalaDossier: runVastuPurushaMandalaEngine(chart),
     gpsDossier: runGPSAstroVastuEngine(chart) || undefined,
+    lagnaMandatoryShield: evaluateLagnaMandatoryShield(chart),
+    goalActivations: evaluateAllGoalActivations(chart),
+    cuspEvaluatedHits: evaluatePlanetToHouseHits(chart),
+    partnershipRisk: evaluatePartnershipRiskAudit(chart),
+    devataFloorProtocols: getDevataFloorHardwareProtocols(),
+    virtualDoorProtocol: getVirtualDoorProtocol(),
   };
 
   const astroPrescription = evaluateAstroPrescriptionFormula(chart, dossier as any);

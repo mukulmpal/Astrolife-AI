@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import type { ChartData } from "../calculations";
 import {
   MASTER_45_DEVATAS,
+  MASTER_CLINICAL_PROBLEM_DIAGNOSTICS,
   runVastuPurushaMandalaEngine,
   getElementalBalancingGuide,
   evaluateOccultKundliDiagnostic,
@@ -160,5 +161,39 @@ describe("45 Devata Vastu Purusha Mandala & 32 Pad Entrance Engine", () => {
     assert.equal(w4Mapping.houseNature, "Dusthana");
     assert.equal(w4Mapping.isDusthanaBlocked, true);
     assert.ok(w4Mapping.shastricVerdictBadge.includes("भाव 8"));
+  });
+
+  it("should have authentic 4-feet and 8-feet wall triggers and new clinical diagnostics", () => {
+    const dummyChart = { lagnaRashi: "Virgo", planets: {} } as unknown as ChartData;
+    const dossier = runVastuPurushaMandalaEngine(dummyChart);
+
+    // Verify 4-feet and 8-feet construction triggers
+    const triggers = dossier.subtleShastricDirectives.constructionWallHeightTriggers;
+    assert.ok(triggers);
+    assert.ok(triggers.fourFeetCardinalTrigger.includes("4 फीट"));
+    assert.ok(triggers.fourFeetCardinalTrigger.includes("भूधर"));
+    assert.ok(triggers.eightFeetDiagonalCornerTrigger.includes("8 फीट"));
+    assert.ok(triggers.eightFeetDiagonalCornerTrigger.includes("सविता"));
+
+    // Verify new clinical diagnostics from the master lecture
+    const maleProgeny = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find((d) => d.id === "MALE_PROGENY_DESIRE");
+    assert.ok(maleProgeny);
+    assert.equal(maleProgeny.targetDevataId, "N3");
+    assert.ok(maleProgeny.physicalRemedyHi.includes("नवजात"));
+
+    const conception = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find((d) => d.id === "FEMALE_CONCEPTION_INFERTILITY");
+    assert.ok(conception);
+    assert.equal(conception.targetDevataId, "INDRA_CORNER");
+    assert.ok(conception.physicalRemedyHi.includes("पीतल"));
+
+    const inheritance = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find((d) => d.id === "PARENTAL_INHERITANCE_STALLED");
+    assert.ok(inheritance);
+    assert.equal(inheritance.targetDevataId, "N4");
+    assert.ok(inheritance.shastricDiagnosis.includes("पैतृक संपत्ति"));
+
+    const rebelliousDaughter = MASTER_CLINICAL_PROBLEM_DIAGNOSTICS.find((d) => d.id === "REBELLIOUS_DAUGHTER_BEHAVIOR");
+    assert.ok(rebelliousDaughter);
+    assert.equal(rebelliousDaughter.targetDevataId, "N7");
+    assert.equal(rebelliousDaughter.actionProtocol, "BLOCK_DEACTIVATE");
   });
 });

@@ -120,6 +120,11 @@ export interface SubtleShastricDirectives {
   shoeRackNorthAxiom: string;
   ancestorPhotoAxiom: string;
   bnnDharmaKarmaAxiom: string;
+  constructionWallHeightTriggers?: {
+    fourFeetCardinalTrigger: string;
+    eightFeetDiagonalCornerTrigger: string;
+    manifestationChainRule: string;
+  };
   shareMarketVenusKetuRahuParadox?: string;
   shaktiChakraDeityVsZoneColorNuance?: string;
   piscesLagnaExaltedVenusRahuIpoYoga?: string;
@@ -1580,6 +1585,11 @@ export function runVastuPurushaMandalaEngine(
       shoeRackNorthAxiom: "उत्तर दिशा के मुख्य द्वार पर शू-रैक रखा जा सकता है, परंतु जूते-चप्पल खुले नहीं होने चाहिए। शू-रैक लकड़ी का और पूर्णतः बंद अलमारी (Closed Cabinet) रूप में होना अनिवार्य है।",
       ancestorPhotoAxiom: "पितरों एवं दिवंगत पूर्वजों का चित्र सदैव दक्षिण-पश्चिम (SW) दिशा में 'पितृ देवता' (W1) के स्थान पर ही स्थापित करना चाहिए।",
       bnnDharmaKarmaAxiom: "भृगु नंदी नाड़ी (BNN) में 1-5-9 त्रिकोण कर्म नहीं है, वह 'धर्म' (कर्तव्य एवं पूर्वजन्मों का ऋण चुकाना) है। कर्म, आजीविका और धन पूर्णतः '2-6-10' (अर्थ त्रिकोण) में समाहित है।",
+      constructionWallHeightTriggers: {
+        fourFeetCardinalTrigger: "भवन निर्माण में जब दीवारें 4 फीट की ऊंचाई तक पहुंचती हैं, तब केवल ब्रह्माजी के 4 मुख्य मुख सक्रिय होते हैं: उत्तर (भूधर - कार्य का शुभारंभ/मेनिफेस्टेशन), पूर्व (अर्यमा - सामाजिक गठबंधन/नेटवर्किंग), दक्षिण (विवस्वान - फेम/रुतबा/प्रसार) और पश्चिम (मित्र - संबंधों को बांधना व मुनाफा निकालना)।",
+        eightFeetDiagonalCornerTrigger: "दीवारें 8 फीट होने पर चारों कोनों के 8 उप-देवता सक्रिय होते हैं: NE में आप+आपवत्स (औषधि व आरोग्य), SE में सविता+सवित्रा (किक-स्टार्ट व फंसा हुआ धन निकालना), SW में इंद्र+जाया (संतान गर्भधारण, सेविंग्स व स्किल्स), NW में रुद्र+राजयक्ष्मा (सूक्ष्म दृष्टि व अनियंत्रित दौड़ पर ब्रेक)।",
+        manifestationChainRule: "पूर्ण कार्य सिद्धि चक्र: कार्य शुरू करना (भूधर) -> लोगों को जोड़ना (अर्यमा) -> नाम व प्रभाव बढ़ाना (विवस्वान) -> संबंध व लाभ को स्थायी रूप से बांधना (मित्र)। इनमें से जो चरण बाधित हो, उसी दिशा के मुख का उपचार किया जाता है।",
+      },
       shareMarketVenusKetuRahuParadox: "जिम साइमंस (Jim Simons) व चार्ली मंगर (Charlie Munger) नाड़ी सूत्र: भृगु नंदी नाड़ी (BNN) में शुक्र + केतु (Venus-Ketu) योग शेयर बाजार में आध्यात्मिक डिटैचमेंट देता है, लेकिन संसार का महा-धन कमाने हेतु केतु सांसारिक मोह त्याग देता है। शेयर बाजार से अकूत गणितीय व सट्टे का धन कमाने के लिए 'राहु' (Rahu = अल्गोरिदम, हेज फंड, अचानक लाभ, असीमित महत्वाकांक्षा) अथवा शुक्र-राहु युति अनिवार्य होती है।",
       shaktiChakraDeityVsZoneColorNuance: "शक्ति चक्र (45 Devata Chakra) में कुछ देवताओं पर दर्शाए गए आंतरिक रंग (जैसे E8 आकाश या वरुण या असुर पर लाल/विशिष्ट रंग) केवल उस विशिष्ट 'देवता की व्यक्तिगत दैवीय ऊर्जा' का प्रतीक हैं, उस 'दिशा या वास्तु ज़ोन' के तत्व का रंग नहीं! अतः ज़ोनल बार-चार्ट उपचार सदैव ज़ोन के मूल पंचतत्व (16 Zones Element) के आधार पर ही करना चाहिए, देवता के आंतरिक प्रतीक रंग से भ्रमित होकर गलत रंग न लगाएं।",
       piscesLagnaExaltedVenusRahuIpoYoga: "मीन लग्न का आईपीओ व वित्तीय योग: मीन लग्न के प्रथम भाव में उच्च का शुक्र (Exalted Venus in 1st house / Pisces) और राहु की युति जातक को शेयर बाजार, आईपीओ (IPO) और वित्तीय निवेश में असाधारण अंतर्दृष्टि और प्रचुर लाभ प्रदान करती है।",
@@ -1754,6 +1764,61 @@ export const MASTER_CLINICAL_PROBLEM_DIAGNOSTICS: ClinicalProblemDiagnostic[] = 
     actionProtocol: "CLEANSE_OFFERING",
     physicalRemedyHi: "नागा पद पर शुद्ध **दालचीनी (Cinnamon)** की आहुति/भेंट रखें। यह राहु के नागा पद को तृप्त कर अंतरराष्ट्रीय खरीदारों के ऑर्डर्स तुरंत फाइनल करवाता है।",
     offeringDetails: "नागा पद पर दालचीनी की छाल अथवा चूर्ण 11 दिन तक स्वच्छ पात्र में स्थापित रखें।",
+  },
+  {
+    id: "MALE_PROGENY_DESIRE",
+    problemTitleHi: "पुत्र संतान प्राप्ति की गुप्त अभिलाषा (Male Progeny / Boy Conception Wish)",
+    problemTitleEn: "Male Child Progeny Key",
+    targetDevataId: "N3",
+    targetDevataName: "Mukhya (मुख्य देवता)",
+    governingPlanet: "Mars",
+    zone: "North / N3",
+    shastricDiagnosis: "यदि परिवार में केवल कन्या संतति हो रही हो और कुल वृद्धि हेतु पुत्र संतान की विशेष कामना हो, तो उत्तर दिशा का N3 मुख्य पद इसे सक्रिय करने का साक्षात सामर्थ्य रखता है।",
+    actionProtocol: "ACTIVATE",
+    physicalRemedyHi: "N3 मुख्य देवता के पद पर एक हंसते हुए नवजात शिशु (Baby Boy) का चित्र लगाएं अथवा एल्युमिनियम पात्र में माखन-मिश्री का भोग 11 दिन अर्पित रखें।",
+    springDirective: "ANTICLOCKWISE_OPEN",
+    offeringDetails: "N3 पद को पूर्ण स्वच्छ व हल्का रखें, यहाँ माखन-मिश्री अर्पित करने से मुख्य देवता अति प्रसन्न होते हैं।",
+  },
+  {
+    id: "FEMALE_CONCEPTION_INFERTILITY",
+    problemTitleHi: "स्त्री गर्भधारण में बाधा / संतान उत्पत्ति असमर्थता (Female Conception Infertility)",
+    problemTitleEn: "Infertility & Conception Power Key",
+    targetDevataId: "INDRA_CORNER",
+    targetDevataName: "Indra (इंद्र - कोणीय देवता)",
+    governingPlanet: "Sun",
+    zone: "South-West / SW Corner",
+    shastricDiagnosis: "दक्षिण-पश्चिम में इंद्र देवता का पद शरीर में गर्भधारण शक्ति, हार्मोनल स्थिरता और डिम्ब/बीज की जीवन-ऊर्जा का संचालन करता है। यहाँ दोष होने पर गर्भ नहीं ठहरता।",
+    actionProtocol: "ACTIVATE",
+    physicalRemedyHi: "SW कोण में इंद्र पद को दोषमुक्त करें (कट या टॉयलेट हटाएं)। पीतल (Brass) के पात्र में शुद्ध गाय का घी या शहद रखकर इंद्र देवता को बलि/भोग दें।",
+    offeringDetails: "पीतल की कटोरी में शहद 11 दिन रखें, तत्पश्चात गमले में विसर्जित करें।",
+  },
+  {
+    id: "PARENTAL_INHERITANCE_STALLED",
+    problemTitleHi: "माता-पिता की पैतृक संपत्ति / वसीयत प्राप्ति में अड़चन (Parental Inheritance Stoppage)",
+    problemTitleEn: "Parental Inheritance & Family Property Clearance",
+    targetDevataId: "N4",
+    targetDevataName: "Bhallata (भल्लाट देवता)",
+    governingPlanet: "Saturn",
+    zone: "North / N4",
+    shastricDiagnosis: "भल्लाट देवता 0°/360° के अधिपति होने के साथ-साथ जातक को माता-पिता एवं पूर्वजों की संचित पैतृक संपत्ति (Ancestral Inheritance) प्राप्त करवाने के सर्वोच्च अधिकारी हैं।",
+    actionProtocol: "ACTIVATE",
+    physicalRemedyHi: "N4 पद पर एक चांदी या एल्युमिनियम की प्लेट में हरे फल या पंचमेवा स्थापित करें और नीले/एल्युमिनियम एंटी-क्लॉकवाइज स्प्रिंग से अवरोध हटाएं।",
+    springDirective: "ANTICLOCKWISE_OPEN",
+    offeringDetails: "पैतृक संपत्ति के कागजात की एक प्रति N4 ज़ोन में एक साफ सफेद या हरे फोल्डर में रखें।",
+  },
+  {
+    id: "REBELLIOUS_DAUGHTER_BEHAVIOR",
+    problemTitleHi: "कन्याओं / बेटियों का माता-पिता के प्रति विद्रोह व भटकाव (Rebellious Daughter Mindset)",
+    problemTitleEn: "Rebellious Daughter Attitude Remedy",
+    targetDevataId: "N7",
+    targetDevataName: "Aditi (अदिति पद)",
+    governingPlanet: "Sun",
+    zone: "NNE / N7",
+    shastricDiagnosis: "N7 अदिति पद पर मुख्य द्वार, अग्नि या असंतुलन होने पर घर की बेटियां माता-पिता की मर्जी के खिलाफ बगावती हो जाती हैं और गलत राह चुनती हैं।",
+    actionProtocol: "BLOCK_DEACTIVATE",
+    physicalRemedyHi: "यदि N7 में मुख्य द्वार या खिड़की हो तो दहलीज पर नीली टेप (Blue Tape) अथवा एल्युमिनियम स्ट्रिप लगाकर उसके बगावती प्रवाह को तत्काल ब्लॉक करें।",
+    springDirective: "CLOCKWISE_BLOCK",
+    offeringDetails: "अदिति पद पर जल में थोड़ा सा कच्चा दूध मिलाकर छिड़कें ताकि शांति स्थापित हो सके।",
   },
 ];
 

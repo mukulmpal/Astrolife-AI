@@ -18,6 +18,7 @@ import {
 } from "@/lib/astro-engine/astro-vastu-hit-engine";
 import { BioWearableAuditView } from "./BioWearableAuditView";
 import { GPSAstroVastuView } from "./GPSAstroVastuView";
+import { GoalHouseActivationView } from "./GoalHouseActivationView";
 import { evaluateNavtaraHitPrecedence } from "@/lib/astro-engine/micro-vastu-auditor";
 // Force rebuild after UI fixes
 import { evaluateDailyAccessories } from "@/lib/astro-engine/astro-prescription-engine";
@@ -50,6 +51,7 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     | "gpsRadar"
     | "mandala"
     | "barChart"
+    | "goalActivation"
   >("dossier");
   const [showCuspsTable, setShowCuspsTable] = useState(false);
   const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 60 | 120>("all");
@@ -1221,6 +1223,19 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
           }}
         >
           ⚖️ बार चार्ट 5-तत्व व भोग (Bar Chart Balancer)
+        </button>
+        <button
+          className={`tab ${activeTab === "goalActivation" ? "active" : ""}`}
+          onClick={() => setActiveTab("goalActivation")}
+          style={{
+            fontWeight: activeTab === "goalActivation" ? 800 : 600,
+            background: activeTab === "goalActivation" ? "linear-gradient(135deg, #78350F 0%, #92400E 100%)" : "rgba(254, 243, 199, 0.45)",
+            color: activeTab === "goalActivation" ? "#FFFFFF" : "#78350F",
+            borderColor: activeTab === "goalActivation" ? "#D97706" : "rgba(217, 119, 6, 0.3)",
+            boxShadow: activeTab === "goalActivation" ? "0 2px 8px rgba(120, 53, 15, 0.35)" : "none",
+          }}
+        >
+          🎯 लक्ष्य सक्रियण व कस्प प्रिसिजन (Goal Activation)
         </button>
       </div>
 
@@ -4611,6 +4626,11 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── TAB: GOAL HOUSE ACTIVATION & CUSP PRECISION ── */}
+      {activeTab === "goalActivation" && (
+        <GoalHouseActivationView chart={resolvedChart} />
       )}
     </div>
   );
