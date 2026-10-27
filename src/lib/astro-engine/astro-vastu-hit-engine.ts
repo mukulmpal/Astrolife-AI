@@ -263,6 +263,8 @@ export interface StudyAndWorkDirection {
 export interface MarsDietaryLifestyleProtocol {
   isMarsAfflicted: boolean;
   afflictionType?: string;
+  isRedColorProhibitedOnBody: boolean;
+  redColorProhibitionReasonHi?: string;
   prohibitedDiet: string[];
   prohibitedItems: string[];
   recommendedReplacements: string[];
@@ -961,6 +963,16 @@ export function runAstroVastuHitEngine(
   const shiftingPrescriptions: ShiftingPrescription[] = [];
   const processedPlanets = new Set<string>();
 
+  // Check Mercury Lagnesh and Mars/Aries in 6, 8, 12 condition
+  const lagnaLordName = SIGN_LORDS_MAP[lagnaSign] || "Mercury";
+  const marsCoord = planetCoords["Mars"];
+  const marsHouse = marsCoord?.house || 1;
+  const ariesCusp = Object.values(cuspCoords).find(c => c.signNum === 1);
+  const ariesHouse = ariesCusp?.house || (((1 - lagnaSignNum + 12) % 12) + 1);
+  const isMarsDusthana = [6, 8, 12].includes(marsHouse);
+  const isAriesDusthana = [6, 8, 12].includes(ariesHouse);
+  const isRedProhibited = (lagnaLordName === "Mercury" && (isMarsDusthana || isAriesDusthana)) || isAriesDusthana;
+
   // A. First: Address EVERY Cosmic Friction blocker holding up the Dasha Lord!
   // Astro-Vastu Shastric Rule: "जिस ग्रह ने दशा स्वामी को रोक रखा है (Cosmic Friction Lock), उसी के सामान को 120° त्रिकोण मित्र दिशा में शिफ्ट करना है!"
   trafficPoliceBlockades.forEach(blockade => {
@@ -1010,7 +1022,9 @@ export function runAstroVastuHitEngine(
     } else if (plName === "Jupiter" && targetSignNum === 12) {
       therapyInstructions = "पांव के नाखूनों पर पीली नेल पॉलिश, तलवों पर हल्दी का तिलक लगाएं या पीले मोज़े (Yellow Socks) पहनें। यह मीन राशि में गुरु को 120° सक्रिय करता है।";
     } else if (plName === "Mars") {
-      therapyInstructions = "नाभि के 2 इंच के घेरे में शुद्ध गाय का घी लगाएं और लाल रंग का वस्त्र/धागा त्यागें।";
+      therapyInstructions = isRedProhibited
+        ? "सख्त शास्त्रीय निषेध: आपकी कुंडली में मंगल/मेष 6, 8 या 12वें भाव में होने तथा लग्नेश बुध होने के कारण शरीर (नाभि/माथा) पर लाल सिंदूर या लाल धागा लगाना पूर्णतः वर्जित है! नाभि पर केवल 2 बूंद शुद्ध गौघृत लगाएं और ENE में सौंफ/मिश्री रखें।"
+        : "नाभि के 2 इंच के घेरे में शुद्ध गाय का घी लगाएं और लाल रंग का वस्त्र/धागा त्यागें।";
     } else if (plName === "Moon") {
       therapyInstructions = "छाती या नाभि पर सफेद चंदन का लेप लगाएं अथवा सोमवार को मेंटल हॉस्पिटल में दूध का दान करें।";
     } else if (plName === "Sun") {
@@ -1221,18 +1235,28 @@ export function runAstroVastuHitEngine(
         ? `Cosmic Friction ${marsAffliction.hitAngle}° Lock on ${marsAffliction.dashaLordName}`
         : `${marsAffliction.hitDef.name} on ${marsAffliction.targetName}`
       : undefined,
+    isRedColorProhibitedOnBody: isRedProhibited,
+    redColorProhibitionReasonHi: isRedProhibited
+      ? `सख्त शास्त्रीय निषेध नियम: आपकी कुंडली में लग्नेश ${lagnaLordName} है तथा मंगल भाव ${marsHouse} में / मेष राशि भाव ${ariesHouse} (6, 8, 12 त्रिक भाव) में स्थित है। अतः शरीर पर (नाभि, माथा, कलाई) लाल सिंदूर, लाल कुमकुम, लाल धागा (मौली) या अत्यधिक लाल रंग का प्रयोग करना अग्नि को भड़काकर रक्तचाप, एसिडिटी व उग्रता उत्पन्न करता है। नाभि पर केवल शुद्ध गौघृत का प्रयोग करें!`
+      : undefined,
     prohibitedDiet: [
       "तीखी लाल मिर्च (Spicy red chilies) का सेवन तत्काल बंद करें",
       "साबुत या धुली मसूर की दाल (Red Lentils / Masoor Dal) पूर्णतः वर्जित रखें",
       "अत्यधिक गरम मसाले, सिरका व उत्तेजक भोजन से परहेज करें",
     ],
     prohibitedItems: [
-      "कलाई, गले या शरीर पर लाल मौली/धागा या गहरे लाल रंग के वस्त्र न पहनें",
+      isRedProhibited
+        ? "शरीर (नाभि, माथा या कलाई) पर लाल सिंदूर, लाल कुमकुम या लाल मौली लगाना पूर्णतः वर्जित है!"
+        : "कलाई, गले या शरीर पर लाल मौली/धागा या गहरे लाल रंग के वस्त्र न पहनें",
       "घर के ENE (पूर्व-उत्तर-पूर्व) या पीड़ित जोन में धारदार चाकू, हथियार या जलते हीटर न रखें",
     ],
     recommendedReplacements: [
-      "120° त्रिकोण भाव (House 9 / 5) की दिशा में सिंदूरी हनुमान जी का चित्र लगाएं",
-      "भोजन में सौम्य सात्विक आहार लें और क्रोध/उत्तेजना से बचें",
+      isRedProhibited
+        ? "नाभि पर केवल शुद्ध देशी गाय का घी (2 बूंद) लगाएं, सिंदूर छूना भी नहीं है"
+        : "नाभि पर शुद्ध देशी गाय का घी लगाएं",
+      "घर के ENE ज़ोन में मिट्टी के कुल्हड़ में सौंफ व मिश्री रखें",
+      "120° त्रिकोण भाव (House 9 / 5) की दिशा में सिंदूरी हनुमान जी का चित्र लगाएं (घर में, शरीर पर नहीं)",
+      "भोजन में सौम्य सात्विक आहार लें और प्रतिदिन पसीना बहाने वाला वर्कआउट करें",
     ],
     directiveText: Boolean(marsAffliction)
       ? "आपकी कुंडली में मंगल सक्रिय आघात या दशा अवरोध उत्पन्न कर रहा है। जब तक मसूर की दाल, तीखी लाल मिर्च और लाल मौली का त्याग नहीं किया जाता, तब तक प्रत्यंतर दशा आते ही सर्जरी, चोट या कलह का खतरा बना रहेगा।"
