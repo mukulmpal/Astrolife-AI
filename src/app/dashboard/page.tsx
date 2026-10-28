@@ -880,14 +880,14 @@ function DashboardContent() {
             <div className="upgrade" style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.15), rgba(200,160,48,0.15))", borderColor: "rgba(168,85,247,0.35)" }}>
               <div>
                 <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:"#1A1A1A",marginBottom:4}}>
-                  ✦ AstroLife Elite Universe Active
+                  💎 AstroLife Elite Universe Active
                 </div>
                 <div style={{fontSize:13,color:"#6B635B"}}>
                   All 25+ astrology engines, unlimited AI questions, luxury dossiers, and VIP intelligence unlocked.
                 </div>
               </div>
               <div style={{ padding: "8px 18px", borderRadius: 10, background: "linear-gradient(135deg,#B8860B,#996515)", color: "#FFFFFF", fontSize: 12, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>
-                ✦ Elite Member
+                💎 Elite Member
               </div>
             </div>
           ) : (

@@ -177,9 +177,12 @@ export function DashboardSidebar() {
                       color: badge === "ELITE" ? "#c084fc" : "#c8a030",
                       border: badge === "ELITE" ? "1px solid rgba(168, 85, 247, 0.45)" : "1px solid rgba(200, 160, 48, 0.35)",
                       lineHeight: "1.3",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "3px",
                     }}
                   >
-                    {badge}
+                    {badge === "ELITE" ? "💎 ELITE" : badge}
                   </span>
                 )}
               </Link>
@@ -199,7 +202,7 @@ export function DashboardSidebar() {
               }}
             >
               <Sparkles size={15} strokeWidth={1.7} aria-hidden="true" style={{ color: "#c084fc" }} />
-              <span style={{ fontWeight: 600 }}>✦ Elite Member</span>
+              <span style={{ fontWeight: 600 }}>💎 Elite Member</span>
             </div>
           ) : (
             <Link

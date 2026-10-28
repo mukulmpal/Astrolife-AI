@@ -43,7 +43,7 @@ const PLANS = [
   },
   {
     id: "elite",
-    name: "Elite",
+    name: "Elite 💎",
     price: "₹1,999",
     period: "/ month",
     highlight: false,
@@ -58,7 +58,7 @@ const PLANS = [
       "Astro-Sound Therapy (Binaural Beats)",
       "Birth Time Rectification (BTR Engine)",
     ],
-    cta: "Upgrade to Elite",
+    cta: "Upgrade to Elite 💎",
     disabled: false,
   },
 ];
