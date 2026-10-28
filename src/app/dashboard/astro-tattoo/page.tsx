@@ -85,9 +85,9 @@ export default function AstroTattooPage() {
   return (
     <EngineShell>
       <EngineHeader
-        eyebrow="Astro-Biometrics & KP Dot Therapy"
-        title="AstroLife Astro-Tattoo & Biometric Dot Activation"
-        subtitle="Individual somatotopic activation through gender-lateralized planetary dots, untenanted priority, and classical KP house negation/multiplication."
+        eyebrow="Astro-Biometrics & Somatotopic Activation"
+        title="AstroLife Astro-Tattoo Intelligence"
+        subtitle="Individual somatotopic activation through gender-lateralized planetary alignment, untenanted priority, and classical KP house negation/multiplication."
         icon="✨"
         metrics={[
           { label: "Lagna", value: chartLagna.signName, tone: "gold" },
@@ -97,7 +97,7 @@ export default function AstroTattooPage() {
         ]}
       />
 
-      <PremiumFeature feature="Astro-Tattoo & Biometric Dot Activation" enforceLock>
+      <PremiumFeature feature="Astro-Tattoo & Biometric Activation" enforceLock>
         {/* Interactive Master Controller */}
         <div className="card" style={{ marginBottom: 20, padding: "20px 24px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16 }}>

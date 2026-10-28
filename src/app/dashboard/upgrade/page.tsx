@@ -53,7 +53,7 @@ const PLANS = [
       "Health & Vitality (Medical Astrology)",
       "Divisional Charts (D-1 to D-60 Shodashvarga)",
       "Marriage Timing Scanner (K.N. Rao 8-Param)",
-      "Astro-Vastu Hit Theory & Astro-Tattoo",
+      "Astro-Vastu & Astro-Tattoo",
       "Astro-Sound Therapy (Binaural Beats)",
       "Birth Time Rectification (BTR Engine)",
     ],

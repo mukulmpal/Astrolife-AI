@@ -726,8 +726,8 @@ export default function VastuDashboardPage() {
     <EngineShell>
       <EngineHeader
         eyebrow="Astro-Vastu Shastra"
-        title="AstroLife Astro-Vastu & Hit Theory Intelligence"
-        subtitle="Authentic Astro-Vastu Hit Theory, 12-direction spatial radar, Cosmic Friction Radar & locks, 120° protective shifting, and 16-zone MahaVastu."
+        title="AstroLife Astro-Vastu Intelligence"
+        subtitle="Authentic 12-direction spatial radar, Cosmic Friction Radar & locks, 120° protective shifting, and 16-zone MahaVastu."
         icon="🏠"
         metrics={completeAnalysis ? [
           { label: "Overall Score", value: completeAnalysis.overallScore },
@@ -805,7 +805,7 @@ export default function VastuDashboardPage() {
       )}
 
       {/* Premium Gate Enforcement */}
-      <PremiumFeature feature="Astro-Vastu Shastra (Hit Theory & 16-Zones)" enforceLock>
+      <PremiumFeature feature="Astro-Vastu Shastra (16-Zones)" enforceLock>
         {/* Mode switcher */}
         <div className="tabs">
         <button
