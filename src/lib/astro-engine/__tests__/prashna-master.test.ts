@@ -84,7 +84,7 @@ describe("Master Prashna Kundali Engine — 10-Layer Shastra Suite", () => {
   it("Layer 5 — 16 Tajaka Yogas Engine checks Deeptaamshas and applying aspects", () => {
     const res = calculatePrashna("When will my business succeed?", "finance", 28.6139, 77.2090, 5.5);
     assert.ok(Array.isArray(res.layer5TajakaYogas));
-    // Verify Deeptaamsha values adhere strictly to PVR Rao
+    // Verify Deeptaamsha values adhere strictly to Classical Tajaka standards
     assert.equal(DEEPTAAMSHA.Sun, 15.0);
     assert.equal(DEEPTAAMSHA.Moon, 12.0);
     assert.equal(DEEPTAAMSHA.Jupiter, 9.0);

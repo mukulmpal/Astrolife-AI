@@ -316,7 +316,7 @@ Generated via AstroLife Classical 10-Layer Prashna Engine`;
                 }}
               >
                 <div style={{ fontWeight: 700, color: "#8A6008", marginBottom: "4px" }}>
-                  📜 प्रश्न मार्ग (Prashna Marga) के 4 शास्त्रीय नियम:
+                  📜 प्रश्न विचार के 4 शास्त्रीय नियम:
                 </div>
                 • <strong>एक समय में एक ही प्रश्न:</strong> कभी भी नौकरी और शादी जैसे कई सवाल एक साथ न जोड़ें। एक बार में केवल एक मुख्य विषय पर एकाग्र हों।<br />
                 • <strong>मन में सच्ची व्याकुलता:</strong> प्रश्न केवल तब फलित होता है जब मन में वास्तव में समाधान की आवश्यकता हो। केवल मनोरंजन या परीक्षा लेने के लिए पूछे गए प्रश्नों में चित्त-वृत्ति भटकाव दिखाती है।<br />
@@ -532,7 +532,7 @@ Generated via AstroLife Classical 10-Layer Prashna Engine`;
                 {result.layer5TajakaYogas.length > 0 && (
                   <div className="pr-card" style={{ background: "linear-gradient(135deg, rgba(200,160,48,0.06), rgba(255,255,255,0.9))" }}>
                     <div style={{ fontWeight: 700, fontSize: "13.5px", color: "#8A6008", marginBottom: "10px", display: "flex", alignItems: "center", gap: 6 }}>
-                      <span>✨ Active Tajaka Yogas (P.V.R. Narasimha Rao Ch. 29)</span>
+                      <span>✨ Active Tajaka Yogas (षोडश ताजिक योग)</span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       {result.layer5TajakaYogas.map((y, i) => (
@@ -702,7 +702,7 @@ Generated via AstroLife Classical 10-Layer Prashna Engine`;
                 {/* Layer 5 */}
                 <div className="layer-box">
                   <div className="layer-title" style={{ color: "#8A6008" }}>
-                    <span>Layer 5 · 16 Tajaka Yogas Engine (PVR Rao Ch. 29)</span>
+                    <span>Layer 5 · 16 Tajaka Yogas Engine (षोडश ताजिक योग)</span>
                     <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", background: "rgba(184,134,11,0.12)", color: "#8A6008" }}>
                       {result.layer5TajakaYogas.length} Active
                     </span>
@@ -738,7 +738,7 @@ Generated via AstroLife Classical 10-Layer Prashna Engine`;
                 {/* Layer 7 */}
                 <div className="layer-box">
                   <div className="layer-title" style={{ color: "#8A6008" }}>
-                    <span>Layer 7 · KP Horary & Cuspal Sub-Lords (Prof. Krishnamurti)</span>
+                    <span>Layer 7 · KP Horary & Cuspal Sub-Lords (1–249 Sub-Divisions)</span>
                     <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", background: "rgba(184,134,11,0.12)", color: "#8A6008" }}>
                       {result.layer7KPHorary.mode.toUpperCase()}
                     </span>

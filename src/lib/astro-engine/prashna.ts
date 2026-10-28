@@ -3,10 +3,10 @@
  * ASTROLIFE — MASTER PRASHNA KUNDALI ENGINE (10-LAYER SHASTRA)
  * ============================================================================
  * An authentic, rigorous classical Horary Astrology system synthesizing:
- * 1. Daivajna Neelakantha ("Tajaka Neelakanthi")
- * 2. P.V.R. Narasimha Rao ("Vedic Astrology: An Integrated Approach" - Ch. 28 & 29)
- * 3. Prof. K.S. Krishnamurti ("KP Reader III: Predictive Stellar Astrology — Horary")
- * 4. Classical Prashna Marga & Ashtamangala Tradition
+ * 1. Classical Tajaka Shastra (16 Yogas & Deeptaamshas)
+ * 2. Classical Saham & Inversion Principles
+ * 3. Classical KP Horary 1–249 Cuspal Sub-Lord Sub-Division
+ * 4. Classical Shastric Tradition (Panchanga Shuddhi, Badhaka & Ruling Planets)
  *
  * 10 Master Layers:
  * - Layer 1: Panchanga Shuddhi & Vishti (Bhadra) Check
@@ -15,7 +15,7 @@
  * - Layer 4: Badhakasthana & Marakasthana Karmic Obstacle Detection
  * - Layer 5: 16 Tajaka Yogas Engine (Ithasala, Eesarpha, Nakta, Yamaya, Kamboola, etc.)
  * - Layer 6: Sahams with Day vs Night Reversal (Arabic Parts)
- * - Layer 7: KP Horary 1–249 Mode & Cuspal Sub-Lords (Prof. K.S. Krishnamurti)
+ * - Layer 7: KP Horary 1–249 Mode & Cuspal Sub-Lords
  * - Layer 8: 5-Fold Ruling Planets (RP) Synchronization
  * - Layer 9: Phala Prapti Kaala (Precise Manifestation Timing)
  * - Layer 10: 3-Tier Shastric Verdict (Sadhya / Krichhra-Sadhya / Asadhya) + Upayas
@@ -57,7 +57,7 @@ export const PLANET_COLORS: Record<string, string> = {
   Jupiter: "#f59e0b", Venus: "#ec4899", Saturn: "#60a5fa", Rahu: "#a78bfa", Ketu: "#fb7185",
 };
 
-// Deeptaamsha (Orb of influence) according to P.V.R. Narasimha Rao (Ch. 28)
+// Deeptaamsha (Orb of influence) according to Classical Tajaka Shastra
 export const DEEPTAAMSHA: Record<string, number> = {
   Sun: 15.0,
   Moon: 12.0,
@@ -115,7 +115,7 @@ export const HORA_FAVORABLE: Record<PrashnaTopic, string[]> = {
 export const BENEFICS = new Set(["Jupiter", "Venus", "Moon", "Mercury"]);
 export const MALEFICS = new Set(["Saturn", "Mars", "Rahu", "Ketu", "Sun"]);
 
-// Saham (Arabic Parts) Configuration with Day vs Night Formulas (P.V.R. Narasimha Rao Ch. 28)
+// Saham (Arabic Parts) Configuration with Day vs Night Formulas
 // Day:   (A - B + Lagna)
 // Night: (B - A + Lagna)
 interface SahamDefinition {
@@ -492,7 +492,7 @@ function checkMoonVOC(moonLon: number, planetLons: Record<string, number>) {
   return { voidOfCourse: nearestTarget === null, applyingTo: nearestTarget };
 }
 
-// ── 16 TAJAKA YOGAS COMPUTATIONAL ENGINE (P.V.R. Narasimha Rao Ch. 29) ────────
+// ── 16 TAJAKA YOGAS COMPUTATIONAL ENGINE (षोडश ताजिक योग) ────────────────────
 function computeTajakaAspectsAndYogas(
   lagnesh: string,
   karyesh: string,
@@ -693,7 +693,7 @@ function computeTajakaAspectsAndYogas(
   return yogas;
 }
 
-// ── SAHAM ENGINE WITH DAY VS NIGHT REVERSAL (P.V.R. Narasimha Rao Ch. 28) ─────
+// ── SAHAM ENGINE WITH DAY VS NIGHT REVERSAL ──────────────────────────────────
 function calculateDayNightSaham(
   topic: PrashnaTopic,
   lagnaLon: number,
