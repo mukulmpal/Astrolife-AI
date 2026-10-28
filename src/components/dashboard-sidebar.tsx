@@ -189,89 +189,133 @@ export function DashboardSidebar() {
             ))}
           </div>
         ))}
-
-        <div className="dash-nav-section">
-          {isElite ? (
-            <div
-              className="dash-nav-item"
-              style={{
-                color: "#c084fc",
-                borderLeftColor: "#a855f7",
-                background: "rgba(168,85,247,0.08)",
-                cursor: "default",
-              }}
-            >
-              <Sparkles size={15} strokeWidth={1.7} aria-hidden="true" style={{ color: "#c084fc" }} />
-              <span style={{ fontWeight: 600 }}>💎 Elite Member</span>
-            </div>
-          ) : userTier === "premium" ? (
-            <div
-              className="dash-nav-item"
-              style={{
-                color: "#c8a030",
-                borderLeftColor: "#c8a030",
-                background: "rgba(200,160,48,0.08)",
-                cursor: "default",
-              }}
-            >
-              <Sparkles size={15} strokeWidth={1.7} aria-hidden="true" style={{ color: "#c8a030" }} />
-              <span style={{ fontWeight: 600 }}>👑 Pro Member</span>
-            </div>
-          ) : (
-            <div>
-              <div
-                style={{
-                  fontSize: "11px",
-                  color: "#16a34a",
-                  padding: "5px 12px",
-                  margin: "0 8px 6px 8px",
-                  borderRadius: "6px",
-                  background: "rgba(34,197,94,0.08)",
-                  border: "1px solid rgba(34,197,94,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontWeight: 600,
-                }}
-              >
-                <span>🌱</span>
-                <span>Basic (The Seed)</span>
-              </div>
-              <Link
-                href="/dashboard/upgrade"
-                className={`dash-nav-item dash-upgrade-item${pathname === "/dashboard/upgrade" ? " active" : ""}`}
-                aria-current={pathname === "/dashboard/upgrade" ? "page" : undefined}
-              >
-                <Zap size={15} strokeWidth={1.7} aria-hidden="true" />
-                <span>Upgrade to Pro 👑</span>
-              </Link>
-            </div>
-          )}
-
-          {isAdmin && (
-            <Link
-              href="/dashboard/admin"
-              className={`dash-nav-item${pathname === "/dashboard/admin" ? " active" : ""}`}
-              style={
-                pathname === "/dashboard/admin"
-                  ? { borderLeftColor: "#eab308", color: "#eab308", background: "rgba(234,179,8,0.1)" }
-                  : { color: "#eab308" }
-              }
-              aria-current={pathname === "/dashboard/admin" ? "page" : undefined}
-            >
-              <Shield size={15} strokeWidth={1.7} aria-hidden="true" />
-              <span style={{ fontWeight: 600 }}>Admin Panel</span>
-            </Link>
-          )}
-        </div>
       </nav>
 
+      {/* Fixed Sidebar Footer: Tier Status & Upgrade */}
+      <div style={{ borderTop: "1px solid rgba(184,134,11,0.18)", padding: "10px 14px", flexShrink: 0, background: "rgba(0,0,0,0.02)" }}>
+        {isElite ? (
+          <div
+            style={{
+              padding: "7px 12px",
+              borderRadius: "8px",
+              background: "linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(192, 132, 252, 0.18))",
+              border: "1px solid rgba(168, 85, 247, 0.35)",
+              color: "#c084fc",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "12px",
+              fontWeight: 600,
+            }}
+          >
+            <Sparkles size={14} style={{ color: "#c084fc" }} />
+            <span>💎 Elite Member</span>
+          </div>
+        ) : userTier === "premium" ? (
+          <div
+            style={{
+              padding: "7px 12px",
+              borderRadius: "8px",
+              background: "linear-gradient(135deg, rgba(200, 160, 48, 0.12), rgba(160, 120, 32, 0.18))",
+              border: "1px solid rgba(200, 160, 48, 0.35)",
+              color: "#c8a030",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "12px",
+              fontWeight: 600,
+            }}
+          >
+            <Sparkles size={14} style={{ color: "#c8a030" }} />
+            <span>👑 Pro Member</span>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#16a34a",
+                padding: "5px 10px",
+                borderRadius: "6px",
+                background: "rgba(34,197,94,0.08)",
+                border: "1px solid rgba(34,197,94,0.22)",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontWeight: 600,
+              }}
+            >
+              <span>🌱</span>
+              <span>Basic (The Seed / Beej)</span>
+            </div>
+            <Link
+              href="/dashboard/upgrade"
+              className={`dash-nav-item dash-upgrade-item${pathname === "/dashboard/upgrade" ? " active" : ""}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 12px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 600,
+                textDecoration: "none",
+                background: "linear-gradient(135deg, rgba(200,160,48,0.15), rgba(160,120,32,0.2))",
+                border: "1px solid rgba(200,160,48,0.4)",
+                color: "#c8a030",
+              }}
+              aria-current={pathname === "/dashboard/upgrade" ? "page" : undefined}
+            >
+              <Zap size={14} />
+              <span>Upgrade to Pro 👑</span>
+            </Link>
+          </div>
+        )}
 
+        {isAdmin && (
+          <Link
+            href="/dashboard/admin"
+            className={`dash-nav-item${pathname === "/dashboard/admin" ? " active" : ""}`}
+            style={{
+              marginTop: "6px",
+              borderLeftColor: "#eab308",
+              color: "#eab308",
+              background: pathname === "/dashboard/admin" ? "rgba(234,179,8,0.1)" : "transparent",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 10px",
+              fontSize: "12px",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+            aria-current={pathname === "/dashboard/admin" ? "page" : undefined}
+          >
+            <Shield size={14} />
+            <span>Admin Panel</span>
+          </Link>
+        )}
+      </div>
 
       {/* User chip */}
       <div className="dash-user">
         <div className="dash-user-av" suppressHydrationWarning>{userName[0]?.toUpperCase()}</div>
-        <span className="dash-user-name" suppressHydrationWarning>{userName}</span>
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: "2px" }}>
+          <span className="dash-user-name" suppressHydrationWarning>{userName}</span>
+          <span
+            style={{
+              fontSize: "10px",
+              fontWeight: 600,
+              letterSpacing: "0.3px",
+              color: isElite ? "#c084fc" : userTier === "premium" ? "#c8a030" : "#16a34a",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {isElite ? "💎 Elite Member" : userTier === "premium" ? "👑 Pro Plan" : "🌱 Basic (The Seed / Beej)"}
+          </span>
+        </div>
         <button className="dash-logout" onClick={handleLogout} title="Logout" type="button">
           <LogOut size={15} strokeWidth={1.7} />
         </button>
