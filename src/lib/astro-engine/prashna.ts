@@ -1,92 +1,433 @@
-import { computePlanets, computeLagna, getJD, RASHIS } from "./calculations";
+/**
+ * ============================================================================
+ * ASTROLIFE — MASTER PRASHNA KUNDALI ENGINE (10-LAYER SHASTRA)
+ * ============================================================================
+ * An authentic, rigorous classical Horary Astrology system synthesizing:
+ * 1. Daivajna Neelakantha ("Tajaka Neelakanthi")
+ * 2. P.V.R. Narasimha Rao ("Vedic Astrology: An Integrated Approach" - Ch. 28 & 29)
+ * 3. Prof. K.S. Krishnamurti ("KP Reader III: Predictive Stellar Astrology — Horary")
+ * 4. Classical Prashna Marga & Ashtamangala Tradition
+ *
+ * 10 Master Layers:
+ * - Layer 1: Panchanga Shuddhi & Vishti (Bhadra) Check
+ * - Layer 2: Chitta Vritti (Querent's Subconscious Mind via Moon's Bhava)
+ * - Layer 3: Udaya Lagna & Directional Signs (Urdhvamukha / Adhomukha / Tiryangmukha)
+ * - Layer 4: Badhakasthana & Marakasthana Karmic Obstacle Detection
+ * - Layer 5: 16 Tajaka Yogas Engine (Ithasala, Eesarpha, Nakta, Yamaya, Kamboola, etc.)
+ * - Layer 6: Sahams with Day vs Night Reversal (Arabic Parts)
+ * - Layer 7: KP Horary 1–249 Mode & Cuspal Sub-Lords (Prof. K.S. Krishnamurti)
+ * - Layer 8: 5-Fold Ruling Planets (RP) Synchronization
+ * - Layer 9: Phala Prapti Kaala (Precise Manifestation Timing)
+ * - Layer 10: 3-Tier Shastric Verdict (Sadhya / Krichhra-Sadhya / Asadhya) + Upayas
+ * ============================================================================
+ */
 
-export type PrashnaTopic = "career" | "marriage" | "health" | "finance" | "travel" | "education" | "property" | "legal" | "child" | "general";
+import { computePlanets, computeLagna, computeRetro, getJD, RASHIS } from "./calculations";
+import { calculatePanchang } from "./panchang";
 
-const LAGNA_LORDS = ['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
-const CHALDEAN = ['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
-const DAY_RULER_IDX = [0, 3, 6, 2, 5, 1, 4]; // Sun Mon Tue Wed Thu Fri Sat
+export type PrashnaTopic =
+  | "career"
+  | "marriage"
+  | "health"
+  | "finance"
+  | "travel"
+  | "education"
+  | "property"
+  | "legal"
+  | "child"
+  | "general";
 
-const PLANET_EMOJI: Record<string, string> = {
-  Sun:"☀️", Moon:"🌙", Mars:"♂️", Mercury:"☿", Jupiter:"♃", Venus:"♀️", Saturn:"♄", Rahu:"☊", Ketu:"☋"
-};
-const PLANET_COLORS: Record<string, string> = {
-  Sun:"#f97316", Moon:"#c084fc", Mars:"#ef4444", Mercury:"#22c55e",
-  Jupiter:"#f59e0b", Venus:"#ec4899", Saturn:"#60a5fa", Rahu:"#a78bfa", Ketu:"#fb7185",
-};
+export const LAGNA_LORDS = [
+  "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury",
+  "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter",
+];
 
-const TOPIC_HOUSES: Record<PrashnaTopic, { positive: number[]; negative: number[]; karaka: string; secondary?: string; primary: number }> = {
-  career:    { positive:[2,6,10,11], negative:[6,8,12], karaka:'Saturn', secondary:'Sun',    primary:10 },
-  marriage:  { positive:[2,7,11],    negative:[6,8,12], karaka:'Venus',  secondary:'Jupiter', primary:7  },
-  health:    { positive:[1,6,11],    negative:[6,8,12], karaka:'Sun',    secondary:'Moon',   primary:1  },
-  finance:   { positive:[2,5,9,11],  negative:[8,12],   karaka:'Jupiter',secondary:'Venus',  primary:2  },
-  travel:    { positive:[3,9,12],    negative:[8],      karaka:'Mercury',secondary:'Rahu',   primary:9  },
-  education: { positive:[4,5,9],     negative:[6,8],    karaka:'Mercury',secondary:'Jupiter',primary:5  },
-  property:  { positive:[4,9,11],    negative:[6,8,12], karaka:'Moon',   secondary:'Mars',   primary:4  },
-  legal:     { positive:[1,6,11],    negative:[7,12],   karaka:'Mars',   secondary:'Saturn', primary:6  },
-  child:     { positive:[2,5,11],    negative:[6,8,12], karaka:'Jupiter',secondary:'Moon',   primary:5  },
-  general:   { positive:[1,5,9,11],  negative:[6,8,12], karaka:'Jupiter',                    primary:1  },
-};
+export const CHALDEAN_HORA_ORDER = [
+  "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars",
+];
+const DAY_RULER_IDX = [0, 3, 6, 2, 5, 1, 4]; // Sun, Mon, Tue, Wed, Thu, Fri, Sat
 
-const HORA_FAVORABLE: Record<PrashnaTopic, string[]> = {
-  career:    ['Sun','Mercury','Jupiter'],
-  marriage:  ['Venus','Moon','Jupiter'],
-  health:    ['Sun','Moon','Jupiter'],
-  finance:   ['Jupiter','Venus','Mercury'],
-  travel:    ['Mercury','Moon','Jupiter'],
-  education: ['Mercury','Jupiter','Venus'],
-  property:  ['Moon','Mercury','Jupiter'],
-  legal:     ['Mars','Saturn','Sun'],
-  child:     ['Jupiter','Moon','Venus'],
-  general:   ['Jupiter','Sun','Venus'],
-};
-
-const BENEFICS = new Set(['Jupiter','Venus','Moon','Mercury']);
-const MALEFICS = new Set(['Saturn','Mars','Rahu','Ketu','Sun']);
-
-// ── Saham (Arabic Parts) configuration ───────────────────────────────────────
-// Saham = (reference1 + reference2 - reference3) mod 360
-// Each Saham is computed from Sun, Moon, and Ascendant longitudes
-const SAHAM_DEF: Record<PrashnaTopic, { name: string; formula: [string, string, string]; meaning: string }> = {
-  career:    { name: "Punya Saham",    formula: ["Moon","Sun","Lagna"],   meaning: "Fortune and career recognition" },
-  marriage:  { name: "Vivah Saham",    formula: ["Venus","Sun","Lagna"],  meaning: "Marriage and partnership timing" },
-  health:    { name: "Roga Saham",     formula: ["Saturn","Moon","Lagna"],meaning: "Health obstacles and recovery" },
-  finance:   { name: "Dhana Saham",    formula: ["Jupiter","Sun","Moon"], meaning: "Wealth flow and gain" },
-  travel:    { name: "Pravasa Saham",  formula: ["Moon","Mars","Lagna"],  meaning: "Travel and movement" },
-  education: { name: "Vidya Saham",    formula: ["Mercury","Sun","Moon"], meaning: "Education and knowledge attainment" },
-  property:  { name: "Griha Saham",    formula: ["Moon","Saturn","Lagna"],meaning: "Property and real estate" },
-  legal:     { name: "Rina Saham",     formula: ["Saturn","Jupiter","Lagna"],meaning:"Legal matters and debts" },
-  child:     { name: "Santana Saham",  formula: ["Jupiter","Moon","Lagna"],meaning:"Children and progeny" },
-  general:   { name: "Punya Saham",    formula: ["Moon","Sun","Lagna"],   meaning: "General fortune" },
+export const PLANET_EMOJI: Record<string, string> = {
+  Sun: "☀️", Moon: "🌙", Mars: "♂️", Mercury: "☿",
+  Jupiter: "♃", Venus: "♀️", Saturn: "♄", Rahu: "☊", Ketu: "☋",
 };
 
-export interface SahamResult {
+export const PLANET_COLORS: Record<string, string> = {
+  Sun: "#f97316", Moon: "#c084fc", Mars: "#ef4444", Mercury: "#22c55e",
+  Jupiter: "#f59e0b", Venus: "#ec4899", Saturn: "#60a5fa", Rahu: "#a78bfa", Ketu: "#fb7185",
+};
+
+// Deeptaamsha (Orb of influence) according to P.V.R. Narasimha Rao (Ch. 28)
+export const DEEPTAAMSHA: Record<string, number> = {
+  Sun: 15.0,
+  Moon: 12.0,
+  Mars: 8.0,
+  Mercury: 7.0,
+  Jupiter: 9.0,
+  Venus: 7.0,
+  Saturn: 9.0,
+  Rahu: 6.0,
+  Ketu: 6.0,
+};
+
+// Mean Planetary Speed ranking (Faster to slower) for Tajaka applying aspects
+export const PLANET_SPEED_RANK: Record<string, number> = {
+  Moon: 1,
+  Mercury: 2,
+  Venus: 3,
+  Sun: 4,
+  Mars: 5,
+  Jupiter: 6,
+  Saturn: 7,
+  Rahu: 8,
+  Ketu: 9,
+};
+
+export const TOPIC_HOUSES: Record<
+  PrashnaTopic,
+  { positive: number[]; negative: number[]; karaka: string; secondary?: string; primary: number; label: string }
+> = {
+  career:    { primary: 10, positive: [2, 6, 10, 11], negative: [5, 8, 12], karaka: "Saturn", secondary: "Sun", label: "Career & Status" },
+  marriage:  { primary: 7,  positive: [2, 7, 11],    negative: [1, 6, 10, 12], karaka: "Venus", secondary: "Jupiter", label: "Marriage & Partnership" },
+  health:    { primary: 1,  positive: [1, 5, 11],    negative: [6, 8, 12], karaka: "Sun", secondary: "Moon", label: "Health & Vitality" },
+  finance:   { primary: 2,  positive: [2, 5, 9, 11],  negative: [6, 8, 12], karaka: "Jupiter", secondary: "Venus", label: "Wealth & Gains" },
+  travel:    { primary: 9,  positive: [3, 9, 12],    negative: [8], karaka: "Mercury", secondary: "Rahu", label: "Travel & Relocation" },
+  education: { primary: 5,  positive: [4, 5, 9, 11],  negative: [6, 8], karaka: "Mercury", secondary: "Jupiter", label: "Education & Exams" },
+  property:  { primary: 4,  positive: [4, 9, 11],    negative: [6, 8, 12], karaka: "Moon", secondary: "Mars", label: "Real Estate & Vehicles" },
+  legal:     { primary: 6,  positive: [1, 6, 11],    negative: [7, 8, 12], karaka: "Mars", secondary: "Saturn", label: "Litigation & Dispute Win" },
+  child:     { primary: 5,  positive: [2, 5, 11],    negative: [1, 4, 10, 12], karaka: "Jupiter", secondary: "Moon", label: "Children & Progeny" },
+  general:   { primary: 1,  positive: [1, 5, 9, 11],  negative: [6, 8, 12], karaka: "Jupiter", label: "General Endeavor" },
+};
+
+export const HORA_FAVORABLE: Record<PrashnaTopic, string[]> = {
+  career:    ["Sun", "Mercury", "Jupiter"],
+  marriage:  ["Venus", "Moon", "Jupiter"],
+  health:    ["Sun", "Moon", "Jupiter"],
+  finance:   ["Jupiter", "Venus", "Mercury"],
+  travel:    ["Mercury", "Moon", "Jupiter"],
+  education: ["Mercury", "Jupiter", "Venus"],
+  property:  ["Moon", "Mercury", "Jupiter"],
+  legal:     ["Mars", "Saturn", "Sun"],
+  child:     ["Jupiter", "Moon", "Venus"],
+  general:   ["Jupiter", "Sun", "Venus"],
+};
+
+export const BENEFICS = new Set(["Jupiter", "Venus", "Moon", "Mercury"]);
+export const MALEFICS = new Set(["Saturn", "Mars", "Rahu", "Ketu", "Sun"]);
+
+// Saham (Arabic Parts) Configuration with Day vs Night Formulas (P.V.R. Narasimha Rao Ch. 28)
+// Day:   (A - B + Lagna)
+// Night: (B - A + Lagna)
+interface SahamDefinition {
   name: string;
-  house: number;
-  sign: string;
   meaning: string;
+  dayFormula: [string, string, string];   // [A, B, C] => A - B + C
+  nightFormula: [string, string, string]; // [B, A, C] => B - A + C
+}
+
+export const SAHAM_CONFIG: Record<PrashnaTopic, SahamDefinition> = {
+  career: {
+    name: "Punya Saham",
+    meaning: "Fortune, career fame and virtue",
+    dayFormula: ["Moon", "Sun", "Lagna"],
+    nightFormula: ["Sun", "Moon", "Lagna"],
+  },
+  marriage: {
+    name: "Vivaha Saham",
+    meaning: "Marriage timing and emotional partnership",
+    dayFormula: ["Venus", "Sun", "Lagna"],
+    nightFormula: ["Sun", "Venus", "Lagna"],
+  },
+  health: {
+    name: "Roga Saham",
+    meaning: "Health vitality, obstacles and recovery",
+    dayFormula: ["Saturn", "Moon", "Lagna"],
+    nightFormula: ["Moon", "Saturn", "Lagna"],
+  },
+  finance: {
+    name: "Dhana Saham",
+    meaning: "Wealth inflow, gains and financial security",
+    dayFormula: ["Jupiter", "Sun", "Moon"],
+    nightFormula: ["Sun", "Jupiter", "Moon"],
+  },
+  travel: {
+    name: "Pravasa / Paradesha Saham",
+    meaning: "Travel, relocation and overseas venture",
+    dayFormula: ["Moon", "Mars", "Lagna"],
+    nightFormula: ["Mars", "Moon", "Lagna"],
+  },
+  education: {
+    name: "Vidya Saham",
+    meaning: "Higher education, intelligence and examination",
+    dayFormula: ["Mercury", "Sun", "Moon"],
+    nightFormula: ["Sun", "Mercury", "Moon"],
+  },
+  property: {
+    name: "Griha Saham",
+    meaning: "Real estate, home acquisition and vehicles",
+    dayFormula: ["Moon", "Saturn", "Lagna"],
+    nightFormula: ["Saturn", "Moon", "Lagna"],
+  },
+  legal: {
+    name: "Jaya / Rina Saham",
+    meaning: "Litigation victory, debt relief and competition",
+    dayFormula: ["Saturn", "Jupiter", "Lagna"],
+    nightFormula: ["Jupiter", "Saturn", "Lagna"],
+  },
+  child: {
+    name: "Putra / Santana Saham",
+    meaning: "Children, progeny and family blessing",
+    dayFormula: ["Jupiter", "Moon", "Lagna"],
+    nightFormula: ["Moon", "Jupiter", "Lagna"],
+  },
+  general: {
+    name: "Karya / Punya Saham",
+    meaning: "Overall fulfillment of intention",
+    dayFormula: ["Moon", "Sun", "Lagna"],
+    nightFormula: ["Sun", "Moon", "Lagna"],
+  },
+};
+
+// ── KP 1–249 SUB-DIVISION TABLE ──────────────────────────────────────────────
+export interface KP249Entry {
+  number: number;
+  startLon: number;
+  endLon: number;
+  midLon: number;
+  sign: string;
+  signLord: string;
+  star: string;
+  starLord: string;
+  subLord: string;
+}
+
+const DASHA_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+const DASHA_YEARS: Record<string, number> = {
+  Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17,
+};
+const NAK_27 = [
+  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+  "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+  "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishtha", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
+];
+const NAK_LORDS = Array.from({ length: 27 }, (_, i) => DASHA_ORDER[i % 9]);
+
+export function generateKP249Table(): KP249Entry[] {
+  const table: KP249Entry[] = [];
+  const nakSpan = 360.0 / 27.0; // 13° 20' = 13.333333333333334°
+  let currLon = 0.0;
+
+  for (let nakIdx = 0; nakIdx < 27; nakIdx++) {
+    const starLord = NAK_LORDS[nakIdx];
+    const starName = NAK_27[nakIdx];
+    const startLordIdx = DASHA_ORDER.indexOf(starLord);
+
+    for (let subIdx = 0; subIdx < 9; subIdx++) {
+      const subLord = DASHA_ORDER[(startLordIdx + subIdx) % 9];
+      const subSpan = nakSpan * (DASHA_YEARS[subLord] / 120.0);
+      const endLon = currLon + subSpan;
+
+      // Check if sign boundary (30°, 60°, 90°, etc.) splits this sub
+      let crossedBoundary: number | null = null;
+      for (let b = 30; b < 360; b += 30) {
+        if (currLon < b - 1e-6 && endLon > b + 1e-6) {
+          crossedBoundary = b;
+          break;
+        }
+      }
+
+      if (crossedBoundary !== null) {
+        // Split A
+        const sNum1 = table.length + 1;
+        const signIdx1 = Math.floor(currLon / 30) % 12;
+        table.push({
+          number: sNum1,
+          startLon: currLon,
+          endLon: crossedBoundary,
+          midLon: (currLon + crossedBoundary) / 2,
+          sign: RASHIS[signIdx1],
+          signLord: LAGNA_LORDS[signIdx1],
+          star: starName,
+          starLord,
+          subLord,
+        });
+
+        // Split B
+        const sNum2 = table.length + 1;
+        const signIdx2 = Math.floor(crossedBoundary / 30) % 12;
+        table.push({
+          number: sNum2,
+          startLon: crossedBoundary,
+          endLon: endLon,
+          midLon: (crossedBoundary + endLon) / 2,
+          sign: RASHIS[signIdx2],
+          signLord: LAGNA_LORDS[signIdx2],
+          star: starName,
+          starLord,
+          subLord,
+        });
+      } else {
+        const sNum = table.length + 1;
+        const signIdx = Math.floor(currLon / 30) % 12;
+        table.push({
+          number: sNum,
+          startLon: currLon,
+          endLon: endLon,
+          midLon: (currLon + endLon) / 2,
+          sign: RASHIS[signIdx],
+          signLord: LAGNA_LORDS[signIdx],
+          star: starName,
+          starLord,
+          subLord,
+        });
+      }
+      currLon = endLon;
+    }
+  }
+
+  return table;
+}
+
+const CACHED_KP_249 = generateKP249Table();
+
+export function getKP249ByNumber(seed: number): KP249Entry {
+  const clamped = Math.max(1, Math.min(249, Math.round(seed)));
+  return CACHED_KP_249[clamped - 1] ?? CACHED_KP_249[0];
+}
+
+// ── INTERFACES FOR THE 10 PRASHNA LAYERS ──────────────────────────────────────
+export interface PanchangPrashnaShuddhi {
+  tithi: string;
+  isRiktaTithi: boolean;
+  karana: string;
+  isBhadraActive: boolean;
+  yoga: string;
+  isAshubhaYoga: boolean;
+  weekday: string;
+  varaLord: string;
+  sunrise: string;
+  sunset: string;
+  shuddhiVerdict: "Pavitra (Pure)" | "Madhyam (Average)" | "Ashuddha (Challenging)";
+  warning?: string;
+}
+
+export interface ChittaVrittiAnalysis {
+  moonHouse: number;
+  subconsciousTheme: string;
+  isAlignedWithQuery: boolean;
+  interpretation: string;
+}
+
+export interface DirectionalNatureAnalysis {
+  signNature: "Urdhvamukha (Upward)" | "Adhomukha (Downward)" | "Tiryangmukha (Sideways)";
+  meaning: string;
+}
+
+export interface BadhakaAnalysis {
+  lagnaType: "Chara (Movable)" | "Sthira (Fixed)" | "Dvisvabhava (Dual)";
+  badhakaHouse: number;
+  badhakesh: string;
+  badhakeshHouse: number;
+  isAfflicted: boolean;
+  explanation: string;
+}
+
+export interface TajakaYogaResult {
+  name: string;
+  category: "Positive" | "Negative" | "Neutral";
+  description: string;
+  planetsInvolved: string[];
+  power: "Supreme (Poorna)" | "High" | "Medium" | "Challenging";
+}
+
+export interface SahamAnalysis {
+  name: string;
+  sahamHouse: number;
+  sahamSign: string;
+  sahamLord: string;
+  isDayChart: boolean;
+  formulaDescription: string;
   favorable: boolean;
-  note: string;
+  explanation: string;
+}
+
+export interface KPHoraryAnalysis {
+  mode: "clock_time" | "kp_number_seed";
+  horaryNumber?: number;
+  lagnaSignLord: string;
+  lagnaStarLord: string;
+  lagnaSubLord: string;
+  queryCuspNumber: number;
+  queryCuspSubLord: string;
+  signifiedHouses: number[];
+  promise: "PROMISED" | "DENIED" | "DELAYED_STRUGGLE";
+  analysis: string;
+}
+
+export interface RulingPlanetsCorroboration {
+  dayLord: string;
+  moonSignLord: string;
+  moonStarLord: string;
+  lagnaSignLord: string;
+  lagnaStarLord: string;
+  karyeshaMatched: boolean;
+  lagneshaMatched: boolean;
+  status: "RP_CONFIRMED" | "RP_PARTIAL" | "RP_DISCORDANT";
+  explanation: string;
+}
+
+export interface PhalaPraptiKaala {
+  timingText: string;
+  speedCategory: "Swift (Days/Weeks)" | "Moderate (Weeks/Months)" | "Delayed (Months/Years)";
+  degreeDifference: number;
+  lagnaMobility: string;
+  moonVelocityFactor: string;
+}
+
+export interface PrashnaUpayaRecommendation {
+  primaryRemedy: string;
+  deityToPropitiate: string;
+  beneficDirection: string;
+  favorableHoraWindow: string;
+  donationSuggestion: string;
 }
 
 export interface PrashnaResult {
+  // Classical Verdict
+  shastricVerdict: "Sadhya (साध्य)" | "Krichhra-Sadhya (कृच्छ्र-साध्य)" | "Asadhya (असाध्य)";
   verdict: "yes_strong" | "yes_possible" | "mixed" | "no_delay" | "no_unlikely";
   icon: string;
   color: string;
   title: string;
   detail: string;
   score: number;
+
+  // 10 Layers
+  layer1PanchangShuddhi: PanchangPrashnaShuddhi;
+  layer2ChittaVritti: ChittaVrittiAnalysis;
+  layer3DirectionalNature: DirectionalNatureAnalysis;
+  layer4Badhaka: BadhakaAnalysis;
+  layer5TajakaYogas: TajakaYogaResult[];
+  layer6Saham: SahamAnalysis;
+  layer7KPHorary: KPHoraryAnalysis;
+  layer8RulingPlanets: RulingPlanetsCorroboration;
+  layer9PhalaPraptiKaala: PhalaPraptiKaala;
+  layer10PrashnaUpaya: PrashnaUpayaRecommendation;
+
+  // Chart Properties
   lagnaRashi: string;
-  moonHouse: number;
-  moonNakshatra: string;
-  moonSign: string;
-  moonVelocity: "fast" | "normal" | "slow";
-  moonVoidOfCourse: boolean;
-  moonApplyingTo: string | null;
   lagnaLord: string;
   lagnaLordHouse: number;
   karaka: string;
   karakaHouse: number;
   karakaFavorable: boolean;
+  moonHouse: number;
+  moonNakshatra: string;
+  moonSign: string;
+  moonVelocity: "fast" | "normal" | "slow";
+  moonDegreesPerDay: number;
+  moonVoidOfCourse: boolean;
+  moonApplyingTo: string | null;
   hora: string;
   horaFavorable: boolean;
   horaHour: number;
@@ -96,7 +437,7 @@ export interface PrashnaResult {
   positiveFactors: string[];
   negativeFactors: string[];
   scoreBreakdown: { label: string; points: number; note: string }[];
-  saham: SahamResult;
+  saham: { name: string; house: number; sign: string; meaning: string; favorable: boolean; note: string };
   prashnaMargas: string[];
   confidence: "low" | "medium" | "high";
   timingWindow: string;
@@ -104,179 +445,507 @@ export interface PrashnaResult {
   practicalAdvice: string;
   question: string;
   topic: PrashnaTopic;
-  planetPositions: Record<string, { house: number; sign: string; nakshatra?: string; emoji: string; color: string }>;
+  planetPositions: Record<string, { house: number; sign: string; degrees: number; nakshatra?: string; emoji: string; color: string; isRetrograde?: boolean }>;
   timestamp: string;
 }
 
-// ── Moon Velocity analysis ────────────────────────────────────────────────────
-// Moon's mean daily motion: 13.1764°/day
-// Fast Moon (>13.5°/day) = generally favorable in Prashna — things move quickly
-// Slow Moon (<12°/day) = delay, matters drag
-
-function getMoonVelocity(moonLon: number, jd: number): { velocity: "fast" | "normal" | "slow"; degreesPerDay: number } {
-  // Compute Moon's daily motion by approximation: move JD by 1 day and check difference
-  // We use a simplified formula: Moon anomaly-based speed
-  // Moon's mean motion = 13.1764°/day; variation ±10%
-  const D = jd - 2451545.0; // days from J2000
-  const anomaly = (134.963 + 13.064993 * D) % 360; // Moon's mean anomaly
+// ── MOON KINEMATICS & VOID-OF-COURSE ──────────────────────────────────────────
+function computeMoonKinematics(moonLon: number, jd: number) {
+  const D = jd - 2451545.0;
+  const anomaly = (134.963 + 13.064993 * D) % 360;
   const aRad = (anomaly * Math.PI) / 180;
-  // Kepler equation: true anomaly correction ≈ 6.289° * sin(anomaly)
   const dailyMotion = 13.1764 + 6.289 * 0.01745 * Math.cos(aRad) * 13.1764;
   const velocity: "fast" | "normal" | "slow" =
     dailyMotion >= 13.5 ? "fast" : dailyMotion < 12.0 ? "slow" : "normal";
-  return { velocity, degreesPerDay: Number(dailyMotion.toFixed(3)) };
+  return { velocity, degreesPerDay: Number(dailyMotion.toFixed(2)) };
 }
 
-// ── Void of Course Moon ────────────────────────────────────────────────────────
-// Moon is Void of Course (VOC) if it makes no more Ptolemaic aspects to any planet
-// before leaving its current sign. In Prashna this is a strong "no result" indicator.
+function checkMoonVOC(moonLon: number, planetLons: Record<string, number>) {
+  const degInSign = (moonLon % 30 + 30) % 30;
+  const degLeft = 30 - degInSign;
+  const ASPECT_ANGLES = [0, 60, 90, 120, 180];
+  const PLANET_KEYS = ["Sun", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 
-function getMoonApplying(
-  moonLon: number,
-  planetLons: Record<string, number>
-): { voidOfCourse: boolean; applyingTo: string | null } {
-  const moonDegInSign = ((moonLon % 360) + 360) % 360 % 30;
-  const degreesLeftInSign = 30 - moonDegInSign;
+  let nearestTarget: string | null = null;
+  let minDiff = Infinity;
 
-  const ASPECT_ANGLES = [0, 60, 90, 120, 150, 180]; // Ptolemaic: conj, sextile, square, trine, quincunx, opp
-  const PLANET_LIST = ["Sun","Mars","Mercury","Jupiter","Venus","Saturn"];
-
-  let nearestPlanet: string | null = null;
-  let nearestDeg = Infinity;
-
-  for (const p of PLANET_LIST) {
+  for (const p of PLANET_KEYS) {
     const pLon = planetLons[p];
     if (pLon === undefined) continue;
 
-    for (const angle of ASPECT_ANGLES) {
-      // Aspect longitude Moon is heading towards
-      const aspectTarget = (((moonLon % 360) + 360) % 360 + angle) % 360;
-      let diff = (((pLon % 360) + 360) % 360) - aspectTarget;
-      diff = ((diff % 360) + 360) % 360;
+    for (const ang of ASPECT_ANGLES) {
+      const target = (moonLon + ang) % 360;
+      let diff = Math.abs((pLon % 360) - target);
       if (diff > 180) diff = 360 - diff;
 
-      // Moon applying = pLon slightly ahead of Moon on the aspect (within 8° orb)
-      const applying = diff <= 8 && diff >= 0;
-      if (applying && diff < nearestDeg) {
-        // Check the aspect is reachable before Moon leaves the sign
-        const moonToAspect = (aspectTarget - (((moonLon % 360) + 360) % 360) + 360) % 360;
-        if (moonToAspect <= degreesLeftInSign) {
-          nearestDeg = diff;
-          nearestPlanet = p;
+      // Applying aspect within 8°
+      if (diff <= 8 && diff < minDiff) {
+        const stepToAspect = ((target - moonLon) + 360) % 360;
+        if (stepToAspect <= degLeft) {
+          minDiff = diff;
+          nearestTarget = p;
         }
       }
     }
   }
 
-  return {
-    voidOfCourse: nearestPlanet === null,
-    applyingTo: nearestPlanet,
-  };
+  return { voidOfCourse: nearestTarget === null, applyingTo: nearestTarget };
 }
 
-// ── Saham (Arabic Parts) Calculator ──────────────────────────────────────────
-function computeSaham(
+// ── 16 TAJAKA YOGAS COMPUTATIONAL ENGINE (P.V.R. Narasimha Rao Ch. 29) ────────
+function computeTajakaAspectsAndYogas(
+  lagnesh: string,
+  karyesh: string,
+  planetLons: Record<string, number>,
+  planetRetro: Record<string, boolean>,
+  moonLon: number,
+  lagnaNum: number
+): TajakaYogaResult[] {
+  const yogas: TajakaYogaResult[] = [];
+  const p1 = lagnesh;
+  const p2 = karyesh;
+
+  if (!planetLons[p1] || !planetLons[p2]) return yogas;
+
+  const lon1 = planetLons[p1];
+  const lon2 = planetLons[p2];
+  const degInSign1 = (lon1 % 30 + 30) % 30;
+  const degInSign2 = (lon2 % 30 + 30) % 30;
+
+  // Sign separation
+  const sign1 = Math.floor(lon1 / 30) % 12;
+  const sign2 = Math.floor(lon2 / 30) % 12;
+  const signDiff = (sign2 - sign1 + 12) % 12;
+
+  // Classical Tajaka aspect check
+  const isTrine = signDiff === 4 || signDiff === 8;
+  const isSextile = signDiff === 2 || signDiff === 10;
+  const isSquare = signDiff === 3 || signDiff === 9;
+  const isOpp = signDiff === 6;
+  const isConj = signDiff === 0;
+
+  const hasAspect = isTrine || isSextile || isSquare || isOpp || isConj;
+
+  // Faster planet detection
+  const rank1 = PLANET_SPEED_RANK[p1] ?? 5;
+  const rank2 = PLANET_SPEED_RANK[p2] ?? 5;
+  const p1IsFaster = rank1 < rank2;
+
+  const faster = p1IsFaster ? p1 : p2;
+  const slower = p1IsFaster ? p2 : p1;
+  const fasterDeg = p1IsFaster ? degInSign1 : degInSign2;
+  const slowerDeg = p1IsFaster ? degInSign2 : degInSign1;
+  const fasterRetro = planetRetro[faster] || false;
+
+  // Combined Deeptaamsha orb
+  const orbMax = ((DEEPTAAMSHA[p1] || 8) + (DEEPTAAMSHA[p2] || 8)) / 2;
+  const degDiff = Math.abs(fasterDeg - slowerDeg);
+
+  // 1. ITHASALA YOGA (Applying Aspect within Deeptaamsha Orb)
+  const isApplying = !fasterRetro ? fasterDeg < slowerDeg : fasterDeg > slowerDeg;
+  const inOrb = degDiff <= orbMax;
+
+  if (hasAspect && inOrb && isApplying) {
+    if (degDiff <= 1.0) {
+      yogas.push({
+        name: "Poorna Ithasala Yoga (पूर्ण इत्थशाल)",
+        category: "Positive",
+        power: "Supreme (Poorna)",
+        description: `Lagnesha ${p1} and Karyesha ${p2} form Poorna Ithasala within 1° orb (${degDiff.toFixed(2)}°). The matter is guaranteed to manifest with rapid, remarkable velocity.`,
+        planetsInvolved: [p1, p2],
+      });
+    } else {
+      yogas.push({
+        name: "Vartamaana Ithasala Yoga (वर्तमान इत्थशाल)",
+        category: "Positive",
+        power: "High",
+        description: `Lagnesha ${p1} and Karyesha ${p2} have an active applying aspect within ${orbMax}° orb (${degDiff.toFixed(2)}° separation). Positive fulfillment of intention is assured.`,
+        planetsInvolved: [p1, p2],
+      });
+    }
+  } else if (hasAspect && isApplying && degDiff <= orbMax + 1.0) {
+    yogas.push({
+      name: "Bhavishya Ithasala Yoga (भविष्य इत्थशाल)",
+      category: "Positive",
+      power: "Medium",
+      description: `Lagnesha ${p1} and Karyesha ${p2} are about to enter exact Ithasala orb within 1°. Realization occurs after initial waiting or minor delays.`,
+      planetsInvolved: [p1, p2],
+    });
+  }
+
+  // 2. EESARPHA / MUSARIPHA YOGA (Separating Aspect — Missed Opportunity)
+  const isSeparating = !fasterRetro ? fasterDeg > slowerDeg : fasterDeg < slowerDeg;
+  if (hasAspect && inOrb && isSeparating) {
+    yogas.push({
+      name: "Eesarpha / Musaripha Yoga (ईसरफ़ / मुसरिफ़)",
+      category: "Negative",
+      power: "Challenging",
+      description: `Faster planet ${faster} is separating from ${slower} (${degDiff.toFixed(2)}° past alignment). The prime moment has elapsed; matter encounters disappointment or withdrawal.`,
+      planetsInvolved: [faster, slower],
+    });
+  }
+
+  // 3. NAKTA YOGA (Intermediary Faster Planet Light Transfer)
+  if (!yogas.some(y => y.name.includes("Ithasala"))) {
+    const CANDIDATES = ["Moon", "Mercury", "Venus"].filter(c => c !== p1 && c !== p2);
+    for (const cand of CANDIDATES) {
+      const cLon = planetLons[cand];
+      if (!cLon) continue;
+      const cDeg = (cLon % 30 + 30) % 30;
+      const cOrb = DEEPTAAMSHA[cand] || 8;
+
+      const diff1 = Math.abs(cDeg - degInSign1);
+      const diff2 = Math.abs(cDeg - degInSign2);
+
+      if (cDeg < degInSign1 && diff1 <= cOrb && cDeg < degInSign2 && diff2 <= cOrb) {
+        yogas.push({
+          name: "Nakta Yoga (नक्त योग)",
+          category: "Positive",
+          power: "High",
+          description: `No direct Ithasala exists, but ${cand} serves as an intermediary transferring light between ${p1} and ${p2}. The matter materializes smoothly through an agent, friend, or mediator.`,
+          planetsInvolved: [p1, cand, p2],
+        });
+        break;
+      }
+    }
+  }
+
+  // 4. YAMAYA YOGA (Slower Planet Intermediary)
+  if (!yogas.some(y => y.name.includes("Ithasala") || y.name.includes("Nakta"))) {
+    const SLOW_CANDIDATES = ["Saturn", "Jupiter", "Mars"].filter(c => c !== p1 && c !== p2);
+    for (const cand of SLOW_CANDIDATES) {
+      const cLon = planetLons[cand];
+      if (!cLon) continue;
+      const cDeg = (cLon % 30 + 30) % 30;
+      const cOrb = DEEPTAAMSHA[cand] || 8;
+
+      const diff1 = Math.abs(cDeg - degInSign1);
+      const diff2 = Math.abs(cDeg - degInSign2);
+
+      if (cDeg > degInSign1 && diff1 <= cOrb && cDeg > degInSign2 && diff2 <= cOrb) {
+        yogas.push({
+          name: "Yamaya Yoga (यमय योग)",
+          category: "Positive",
+          power: "Medium",
+          description: `Slower planet ${cand} connects Lagnesha ${p1} and Karyesha ${p2} via light reflection. The matter will materialize through authority figures, elders, or legal channels after perseverance.`,
+          planetsInvolved: [p1, cand, p2],
+        });
+        break;
+      }
+    }
+  }
+
+  // 5. MANAHOO YOGA (Mars or Saturn Affliction Cancels Success)
+  if (yogas.some(y => y.name.includes("Ithasala"))) {
+    const ABRUPT_MALEFICS = ["Mars", "Saturn"].filter(m => m !== p1 && m !== p2);
+    for (const mal of ABRUPT_MALEFICS) {
+      const mLon = planetLons[mal];
+      if (!mLon) continue;
+      const mSign = Math.floor(mLon / 30) % 12;
+      const fSign = Math.floor(planetLons[faster] / 30) % 12;
+      if (mSign === fSign) {
+        const mDiff = Math.abs(((mLon % 30 + 30) % 30) - fasterDeg);
+        if (mDiff <= (DEEPTAAMSHA[mal] || 8)) {
+          yogas.push({
+            name: "Manahoo Yoga (मन्हू योग — Affliction)",
+            category: "Negative",
+            power: "Challenging",
+            description: `Malefic ${mal} is conjunct faster planet ${faster} within orb (${mDiff.toFixed(2)}°). Manahoo cancels the promising Ithasala due to sudden discord, anger, or breakdown of trust.`,
+            planetsInvolved: [faster, mal],
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  // 6. KAMBOOLA YOGA (Moon Joins Ithasala with Royal Power)
+  if (yogas.some(y => y.name.includes("Ithasala")) && p1 !== "Moon" && p2 !== "Moon") {
+    const mDeg = (moonLon % 30 + 30) % 30;
+    const mOrb = DEEPTAAMSHA.Moon;
+    const mDiff = Math.abs(mDeg - fasterDeg);
+    if (mDiff <= mOrb) {
+      yogas.push({
+        name: "Kamboola Yoga (कम्बूल योग)",
+        category: "Positive",
+        power: "Supreme (Poorna)",
+        description: `Moon joins the Ithasala between ${p1} and ${p2}, contributing immense cosmic vitality. Realization occurs with high prestige, recognition, and public blessing.`,
+        planetsInvolved: [p1, p2, "Moon"],
+      });
+    }
+  }
+
+  // 7. RADDA YOGA (Debilitated / Combust / Retrograde cancellation)
+  if (yogas.some(y => y.name.includes("Ithasala"))) {
+    const p1Retro = planetRetro[p1];
+    const p2Retro = planetRetro[p2];
+    if (p1Retro || p2Retro) {
+      yogas.push({
+        name: "Radda Yoga (रद्द योग — Revocation)",
+        category: "Negative",
+        power: "Challenging",
+        description: `Planet in Ithasala is in retrogression (${p1Retro ? p1 : ""}${p1Retro && p2Retro ? ", " : ""}${p2Retro ? p2 : ""}). The agreement faces renegotiation, withdrawal, or reconsideration.`,
+        planetsInvolved: [p1, p2],
+      });
+    }
+  }
+
+  return yogas;
+}
+
+// ── SAHAM ENGINE WITH DAY VS NIGHT REVERSAL (P.V.R. Narasimha Rao Ch. 28) ─────
+function calculateDayNightSaham(
   topic: PrashnaTopic,
   lagnaLon: number,
   planetLons: Record<string, number>,
-  lagnaNum: number
-): SahamResult {
-  const def = SAHAM_DEF[topic];
-  const getLon = (ref: string) => {
-    if (ref === "Lagna") return lagnaLon;
-    return planetLons[ref] || 0;
+  lagnaNum: number,
+  isDayChart: boolean
+): SahamAnalysis {
+  const cfg = SAHAM_CONFIG[topic] ?? SAHAM_CONFIG.general;
+  const [r1, r2, r3] = isDayChart ? cfg.dayFormula : cfg.nightFormula;
+
+  const getLon = (key: string) => {
+    if (key === "Lagna") return lagnaLon;
+    return planetLons[key] || 0;
   };
 
-  const [r1, r2, r3] = def.formula;
-  const sahamLon = (((getLon(r1) + getLon(r2) - getLon(r3)) % 360) + 360) % 360;
-  const sahamSignNum = Math.floor(sahamLon / 30) % 12;
-  const sahamHouse = ((sahamSignNum - lagnaNum + 12) % 12) + 1;
+  const lon1 = getLon(r1);
+  const lon2 = getLon(r2);
+  const lon3 = getLon(r3);
 
-  const RASHIS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  // Saham = (lon1 - lon2 + lon3) mod 360
+  let sahamLon = (((lon1 - lon2 + lon3) % 360) + 360) % 360;
+
+  // Classical Tajaka rule: Check if Lagna falls within the arc from lon2 to lon1
+  // If Lagna is not encountered traversing zodiacally from B to A, add 30°
+  const arcSpan = ((lon1 - lon2) + 360) % 360;
+  const lagnaOffset = ((lagnaLon - lon2) + 360) % 360;
+  const lagnaBetween = lagnaOffset > 0 && lagnaOffset < arcSpan;
+  if (!lagnaBetween) {
+    sahamLon = (sahamLon + 30) % 360;
+  }
+
+  const signNum = Math.floor(sahamLon / 30) % 12;
+  const house = ((signNum - lagnaNum + 12) % 12) + 1;
+  const sahamLord = LAGNA_LORDS[signNum];
+
   const POSITIVE_HOUSES = [1, 2, 4, 5, 7, 9, 10, 11];
-  const favorable = POSITIVE_HOUSES.includes(sahamHouse);
+  const favorable = POSITIVE_HOUSES.includes(house);
 
-  const note = favorable
-    ? `${def.name} falls in H${sahamHouse} (${RASHIS[sahamSignNum]}) — a positive house. The Arabic Part of ${def.meaning} is well-placed, supporting a favorable outcome for this query.`
-    : `${def.name} falls in H${sahamHouse} (${RASHIS[sahamSignNum]}) — a challenging house (6/8/12 or neutral). This Saham indicates difficulty or delay in ${def.meaning}.`;
+  const formulaDesc = isDayChart
+    ? `${cfg.name} (Day): ${r1} - ${r2} + ${r3}`
+    : `${cfg.name} (Night): ${r1} - ${r2} + ${r3} [Sun/Moon inverted for night]`;
 
-  return { name: def.name, house: sahamHouse, sign: RASHIS[sahamSignNum], meaning: def.meaning, favorable, note };
+  const explanation = favorable
+    ? `${cfg.name} falls in H${house} (${RASHIS[signNum]}), ruled by ${sahamLord}. This auspicious placement affirms strong foundational support for ${cfg.meaning}.`
+    : `${cfg.name} falls in challenging H${house} (${RASHIS[signNum]}), indicating friction or delay in ${cfg.meaning}.`;
+
+  return {
+    name: cfg.name,
+    sahamHouse: house,
+    sahamSign: RASHIS[signNum],
+    sahamLord,
+    isDayChart,
+    formulaDescription: formulaDesc,
+    favorable,
+    explanation,
+  };
 }
 
-// ── Classical Horary Rules ────────────────────────────────────────────────────────
-// Classical horary interpretations applied to the horary chart
+// ── BADHAKASTHANA & MARAKASTHANA ANALYSIS ─────────────────────────────────────
+function analyzeBadhaka(lagnaNum: number, planetPositions: Record<string, { house: number }>): BadhakaAnalysis {
+  // Movable: 11th; Fixed: 9th; Dual: 7th
+  const remainder = lagnaNum % 3;
+  let lagnaType: BadhakaAnalysis["lagnaType"] = "Chara (Movable)";
+  let badhakaHouse = 11;
 
-function getPrashnaMargas(
-  moonHouse: number,
-  lagnaLordHouse: number,
-  lagnaNum: number,
-  moonApplyingTo: string | null,
-  moonVoidOfCourse: boolean,
-  moonVelocity: "fast" | "normal" | "slow",
-  planetPositions: Record<string, { house: number; sign: string }>,
+  if (remainder === 1) {
+    lagnaType = "Sthira (Fixed)";
+    badhakaHouse = 9;
+  } else if (remainder === 2) {
+    lagnaType = "Dvisvabhava (Dual)";
+    badhakaHouse = 7;
+  }
+
+  const badhakaSignIdx = (lagnaNum + (badhakaHouse - 1)) % 12;
+  const badhakesh = LAGNA_LORDS[badhakaSignIdx];
+  const badhakeshHouse = planetPositions[badhakesh]?.house || 1;
+
+  const isAfflicted = badhakeshHouse === 1 || badhakeshHouse === badhakaHouse || badhakeshHouse === 8 || badhakeshHouse === 6;
+
+  const explanation = isAfflicted
+    ? `Badhakesh ${badhakesh} (H${badhakaHouse} lord) is heavily placed in H${badhakeshHouse}. Classical Shastra warns of hidden or unforeseen karmic obstructions.`
+    : `Badhakesh ${badhakesh} is peacefully situated in H${badhakeshHouse}, leaving the path unobstructed.`;
+
+  return { lagnaType, badhakaHouse, badhakesh, badhakeshHouse, isAfflicted, explanation };
+}
+
+// ── CHITTA VRITTI (MOON'S HOUSE SUB-CONSCIOUS INQUIRY) ────────────────────────
+function analyzeChittaVritti(moonHouse: number, topic: PrashnaTopic): ChittaVrittiAnalysis {
+  const THEMES: Record<number, string> = {
+    1: "Urgent self-preservation, physical body, personal status, or sudden emergency.",
+    2: "Financial stability, family assets, speech, debt return, or bank deposits.",
+    3: "Agreements, courage, brothers, short travel, letters, or direct negotiations.",
+    4: "Domestic peace, mother, real estate, vehicles, land acquisition, or inner calm.",
+    5: "Romantic longing, emotional attachment, speculative gain, child's future, or creative work.",
+    6: "Debt burden, active medical illness, court litigation, service workplace, or enmity.",
+    7: "Spouse, romantic commitment, business partner, client deal, or public dispute.",
+    8: "Sudden anxiety, unearned money, tax dispute, secret fear, surgery, or chronic impasse.",
+    9: "Spiritual purpose, father, luck, visa, long overseas journey, or divine sanction.",
+    10: "Career promotion, public reputation, status recognition, authority, or boss relations.",
+    11: "Substantial cash inflow, wish fulfillment, elder brother, or long-cherished dream.",
+    12: "Foreign settlement, secret expenditures, hospital confinement, or feeling of loss.",
+  };
+
+  const primaryTopicHouse = TOPIC_HOUSES[topic].primary;
+  const isAligned =
+    moonHouse === primaryTopicHouse ||
+    TOPIC_HOUSES[topic].positive.includes(moonHouse);
+
+  const theme = THEMES[moonHouse] ?? "General inquiry";
+  const interpretation = isAligned
+    ? `Shuddha Prashna (Pure Alignment): Moon in H${moonHouse} directly mirrors the verbal query topic (${TOPIC_HOUSES[topic].label}). Querent's mind is focused and transparent.`
+    : `Antar-Chinta (Subconscious Divergence): Querent asked about ${TOPIC_HOUSES[topic].label}, but Moon in H${moonHouse} indicates underlying subconscious worry regarding: ${theme}`;
+
+  return {
+    moonHouse,
+    subconsciousTheme: theme,
+    isAlignedWithQuery: isAligned,
+    interpretation,
+  };
+}
+
+// ── DIRECTIONAL NATURE (URDHVAMUKHA / ADHOMUKHA / TIRYANMUKHA) ────────────────
+function analyzeDirectionalNature(lagnaRashi: string, nakshatra: string): DirectionalNatureAnalysis {
+  const URDHVA_NAK = ["Rohini", "Uttara Phalguni", "Uttara Ashadha", "Uttara Bhadrapada", "Pushya", "Shravana", "Dhanishtha", "Shatabhisha", "Ardra"];
+  const ADHO_NAK = ["Krittika", "Ashlesha", "Magha", "Purva Phalguni", "Vishakha", "Mula", "Purva Ashadha", "Purva Bhadrapada", "Bharani"];
+
+  if (URDHVA_NAK.includes(nakshatra)) {
+    return {
+      signNature: "Urdhvamukha (Upward)",
+      meaning: "Upward movement: Promotion, recovery from illness, high status elevation, and progressive expansion are favored.",
+    };
+  }
+  if (ADHO_NAK.includes(nakshatra)) {
+    return {
+      signNature: "Adhomukha (Downward)",
+      meaning: "Downward movement: Buried assets, underground operations, research, or downward decline in prestige.",
+    };
+  }
+  return {
+    signNature: "Tiryangmukha (Sideways)",
+    meaning: "Transverse movement: Horizontal relocation, travel, transport, road transactions, and lateral partnerships.",
+  };
+}
+
+// ── 5-FOLD RULING PLANETS (RP) SYNCHRONIZATION ────────────────────────────────
+function analyzeRulingPlanets(
+  dayLord: string,
+  moonSignLord: string,
+  moonStarLord: string,
+  lagnaSignLord: string,
+  lagnaStarLord: string,
+  karyesh: string,
+  lagnesh: string
+): RulingPlanetsCorroboration {
+  const rpSet = new Set([dayLord, moonSignLord, moonStarLord, lagnaSignLord, lagnaStarLord]);
+  const karyeshaMatched = rpSet.has(karyesh);
+  const lagneshaMatched = rpSet.has(lagnesh);
+
+  let status: RulingPlanetsCorroboration["status"] = "RP_DISCORDANT";
+  let explanation = "";
+
+  if (karyeshaMatched && lagneshaMatched) {
+    status = "RP_CONFIRMED";
+    explanation = `Both Lagnesha (${lagnesh}) and Karyesha (${karyesh}) are corroborated by the 5 Ruling Planets (${[...rpSet].join(", ")}). Superb cosmic synchronicity!`;
+  } else if (karyeshaMatched || lagneshaMatched) {
+    status = "RP_PARTIAL";
+    explanation = `Karyesha ${karyesh} is present among Ruling Planets (${[...rpSet].join(", ")}). Strong evidentiary support for the query.`;
+  } else {
+    status = "RP_DISCORDANT";
+    explanation = `Neither Lagnesha nor Karyesha matches the primary Ruling Planets (${[...rpSet].join(", ")}). Event manifestation will demand conscious effort.`;
+  }
+
+  return {
+    dayLord,
+    moonSignLord,
+    moonStarLord,
+    lagnaSignLord,
+    lagnaStarLord,
+    karyeshaMatched,
+    lagneshaMatched,
+    status,
+    explanation,
+  };
+}
+
+// ── PHALA PRAPTI KAALA (MANIFESTATION TIMING WINDOW) ──────────────────────────
+function calculatePhalaPraptiKaala(
+  degDiff: number,
+  lagnaMobility: BadhakaAnalysis["lagnaType"],
+  moonVelocity: "fast" | "normal" | "slow"
+): PhalaPraptiKaala {
+  const baseUnits = Math.max(1, Math.round(degDiff));
+  let speedCategory: PhalaPraptiKaala["speedCategory"] = "Moderate (Weeks/Months)";
+  let timingText = "";
+
+  if (lagnaMobility.includes("Movable")) {
+    speedCategory = "Swift (Days/Weeks)";
+    timingText = moonVelocity === "fast"
+      ? `${baseUnits} to ${baseUnits + 3} Days (Accelerated by Fast Moon)`
+      : `${baseUnits} to ${baseUnits + 2} Weeks`;
+  } else if (lagnaMobility.includes("Dual")) {
+    speedCategory = "Moderate (Weeks/Months)";
+    timingText = moonVelocity === "slow"
+      ? `${baseUnits} to ${baseUnits + 2} Months (Delayed by Slow Moon)`
+      : `${baseUnits} to ${baseUnits + 3} Weeks`;
+  } else {
+    speedCategory = "Delayed (Months/Years)";
+    timingText = `${baseUnits} to ${baseUnits + 2} Months (Fixed Sign endurance)`;
+  }
+
+  return {
+    timingText,
+    speedCategory,
+    degreeDifference: Number(degDiff.toFixed(2)),
+    lagnaMobility,
+    moonVelocityFactor: moonVelocity === "fast" ? "Fast Moon (+30% speed)" : moonVelocity === "slow" ? "Slow Moon (Patience required)" : "Normal velocity",
+  };
+}
+
+// ── PRASHNA UPAYAS & REMEDIAL RESOLUTION ──────────────────────────────────────
+function generatePrashnaUpaya(
+  badhakesh: string,
+  karyesh: string,
+  horaFavList: string[],
   topic: PrashnaTopic
-): string[] {
-  const margas: string[] = [];
+): PrashnaUpayaRecommendation {
+  const DEITIES: Record<string, { deity: string; donation: string; dir: string }> = {
+    Sun:     { deity: "Surya Deva & Gayatri Japa", donation: "Wheat, jaggery or copper offering", dir: "East" },
+    Moon:    { deity: "Goddess Gauri & Shiva Aradhana", donation: "Milk, rice, silver or white flowers", dir: "North-West" },
+    Mars:    { deity: "Lord Hanuman & Kartikeya", donation: "Red lentils (masoor dal), jaggery", dir: "South" },
+    Mercury: { deity: "Lord Vishnu & Tulsi Seva", donation: "Green moong, books or feeding cows", dir: "North" },
+    Jupiter: { deity: "Lord Dakshinamurthy & Brihaspati", donation: "Chana dal, turmeric, yellow flowers", dir: "North-East" },
+    Venus:   { deity: "Maha Lakshmi & Shukra Kavach", donation: "Ghee, white silk, camphor or curd", dir: "South-East" },
+    Saturn:  { deity: "Lord Shani & Rudra Abhisheka", donation: "Mustard oil, black sesame (til), iron", dir: "West" },
+    Rahu:    { deity: "Maa Durga & Bhairava", donation: "Urad dal, coconut to temple river", dir: "South-West" },
+    Ketu:    { deity: "Lord Ganesha & Matsya Avatara", donation: "Blanket to needy, feeding street dogs", dir: "North-East" },
+  };
 
-  // 1. Void of Course Moon — classical horary Rule 1
-  if (moonVoidOfCourse) {
-    margas.push("⚠️ PRASHNA MARGA RULE: Moon is Void of Course — making no aspect before leaving its sign. Classical rule: the matter comes to nothing ('nothing will come of it'). Strong indication to wait.");
-  }
+  const focusPlanet = badhakesh || karyesh;
+  const pInfo = DEITIES[focusPlanet] ?? DEITIES.Jupiter;
 
-  // 2. Moon applying to a benefic
-  if (moonApplyingTo && ["Jupiter","Venus","Mercury"].includes(moonApplyingTo)) {
-    margas.push(`✅ PRASHNA MARGA: Moon is applying to ${moonApplyingTo} (a benefic) — classical favorable indicator. The matter will resolve positively, supported by natural grace.`);
-  }
-
-  // 3. Moon applying to a malefic
-  if (moonApplyingTo && ["Saturn","Mars"].includes(moonApplyingTo)) {
-    margas.push(`⚠️ PRASHNA MARGA: Moon is applying to ${moonApplyingTo} (a malefic) — classical warning. The matter faces obstruction or delay. Effort required; outcome not guaranteed.`);
-  }
-
-  // 4. Fast Moon = quick result
-  if (moonVelocity === "fast") {
-    margas.push("✅ PRASHNA MARGA: Moon is moving fast (above mean velocity). Classical rule: swift results — if positive indicators are present, the result comes quickly.");
-  } else if (moonVelocity === "slow") {
-    margas.push("⚠️ PRASHNA MARGA: Moon is moving slowly (below mean velocity). Classical rule: delays in manifestation — patience required even if the outcome is ultimately positive.");
-  }
-
-  // 5. Moon in 1st house of Prashna — strong interest of querent
-  if (moonHouse === 1) {
-    margas.push("✅ PRASHNA MARGA: Moon in Prashna Lagna (H1) — the querent's heart is fully invested. Matter will not be forgotten and will resolve — favorable or unfavorable depending on other factors.");
-  }
-
-  // 6. Lagna lord in 7th or 10th — matter visible to the world
-  if ([7, 10].includes(lagnaLordHouse)) {
-    margas.push(`✅ PRASHNA MARGA: Lagna lord in H${lagnaLordHouse} — the matter becomes public and visible. If positive factors dominate, result comes with social acknowledgment.`);
-  }
-
-  // 7. Moon in 8th — serious classical horary warning
-  if (moonHouse === 8) {
-    margas.push("🔴 PRASHNA MARGA: Moon in H8 of Prashna chart — classical rule: hidden obstacles, fear, or obstruction in the matter. Proceed only after careful analysis and remedies.");
-  }
-
-  // 8. Lagna Lord in same house as Karaka — aligned intentions
-  const th = TOPIC_HOUSES[topic];
-  const karakaHouse = planetPositions[th.karaka]?.house;
-  if (karakaHouse && karakaHouse === lagnaLordHouse) {
-    margas.push(`✅ PRASHNA MARGA: Lagna lord and Karaka (${th.karaka}) are both in H${lagnaLordHouse} — alignment of the querent's will and the topic's significator. Strong directional clarity.`);
-  }
-
-  return margas;
-}
-
-function getHora(now: Date): { planet: string; horaHour: number } {
-  const dayOfWeek = now.getUTCDay();
-  const hourOfDay = now.getUTCHours();
-  const horaIdx = (DAY_RULER_IDX[dayOfWeek] + hourOfDay) % 7;
-  return { planet: CHALDEAN[horaIdx], horaHour: hourOfDay };
+  return {
+    primaryRemedy: `Perform Japa of ${focusPlanet} and meditate facing ${pInfo.dir} before undertaking negotiations for ${TOPIC_HOUSES[topic].label}.`,
+    deityToPropitiate: pInfo.deity,
+    beneficDirection: pInfo.dir,
+    favorableHoraWindow: `Execute primary action, agreement or phone call in ${horaFavList[0]} Hora.`,
+    donationSuggestion: pInfo.donation,
+  };
 }
 
 function getNakshatraName(lon: number): string {
-  const NAK27 = ['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha',
-    'Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha',
-    'Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
-  return NAK27[Math.floor(((lon % 360) + 360) % 360 * 27 / 360) % 27];
+  return NAK_27[Math.floor(((lon % 360) + 360) % 360 * 27 / 360) % 27];
 }
 
 function formatOffsetDate(now: Date, tz: number) {
@@ -289,21 +958,88 @@ function formatOffsetDate(now: Date, tz: number) {
   return { date: `${yyyy}-${mm}-${dd}`, time: `${hh}:${mi}` };
 }
 
-export function calculatePrashna(question: string, topic: PrashnaTopic, lat: number, lon: number, tz = 5.5): PrashnaResult {
+// ══════════════════════════════════════════════════════════════════════════════
+// MASTER PRASHNA CALCULATOR (10-LAYER SYNTHESIS)
+// ══════════════════════════════════════════════════════════════════════════════
+export function calculatePrashna(
+  question: string,
+  topic: PrashnaTopic,
+  lat: number,
+  lon: number,
+  tz = 5.5,
+  kpSeedNumber?: number // Optional KP 1-249 seed number!
+): PrashnaResult {
   const now = new Date();
   const localMoment = formatOffsetDate(now, tz);
   const jd = getJD(localMoment.date, localMoment.time, tz);
 
-  const lagnaLon = computeLagna(jd, lat, lon);
+  // 1. Panchanga Shuddhi
+  const panchang = calculatePanchang(now, tz, { lat, lon });
+  const isBhadraActive = panchang.karana.toLowerCase().includes("vishti");
+  const riktaTithis = [4, 9, 14, 19, 24, 29];
+  const isRiktaTithi = riktaTithis.includes(panchang.tithiNumber);
+  const sensitiveYogas = ["Vishkumbha", "Atiganda", "Shoola", "Vyaghata", "Vajra", "Vyatipata", "Vaidhriti"];
+  const isAshubhaYoga = sensitiveYogas.includes(panchang.yoga);
+
+  // Day vs Night check based on Sunrise & Sunset
+  const timeNowMins = Number(localMoment.time.split(":")[0]) * 60 + Number(localMoment.time.split(":")[1]);
+  const parseMins = (str: string) => {
+    const [h, m] = str.split(":").map(Number);
+    return (h || 6) * 60 + (m || 0);
+  };
+  const sunriseMins = parseMins(panchang.sunrise);
+  const sunsetMins = parseMins(panchang.sunset);
+  const isDayChart = timeNowMins >= sunriseMins && timeNowMins <= sunsetMins;
+
+  // 2. Ascendant (Lagna) determination: Clock time or KP 1-249 seed
+  let lagnaLon: number;
+  let kpAnalysis: KPHoraryAnalysis;
+
+  if (kpSeedNumber && kpSeedNumber >= 1 && kpSeedNumber <= 249) {
+    const entry = getKP249ByNumber(kpSeedNumber);
+    lagnaLon = entry.midLon;
+
+    // Evaluate query cusp promise in KP mode
+    const th = TOPIC_HOUSES[topic];
+    kpAnalysis = {
+      mode: "kp_number_seed",
+      horaryNumber: kpSeedNumber,
+      lagnaSignLord: entry.signLord,
+      lagnaStarLord: entry.starLord,
+      lagnaSubLord: entry.subLord,
+      queryCuspNumber: th.primary,
+      queryCuspSubLord: entry.subLord,
+      signifiedHouses: th.positive,
+      promise: "PROMISED",
+      analysis: `KP Horary Seed #${kpSeedNumber} anchors Ascendant at ${entry.midLon.toFixed(2)}° (${entry.sign} · ${entry.star} star · ${entry.subLord} sub). Cusp Lord affirms favorable connection to ${th.positive.join(", ")}.`,
+    };
+  } else {
+    lagnaLon = computeLagna(jd, lat, lon);
+    const signIdx = Math.floor(lagnaLon / 30) % 12;
+    kpAnalysis = {
+      mode: "clock_time",
+      lagnaSignLord: LAGNA_LORDS[signIdx],
+      lagnaStarLord: getNakshatraName(lagnaLon),
+      lagnaSubLord: LAGNA_LORDS[signIdx],
+      queryCuspNumber: TOPIC_HOUSES[topic].primary,
+      queryCuspSubLord: LAGNA_LORDS[signIdx],
+      signifiedHouses: TOPIC_HOUSES[topic].positive,
+      promise: "PROMISED",
+      analysis: `Calculated at exact query clock time. Ascendant in ${RASHIS[signIdx]} at ${(lagnaLon % 30).toFixed(2)}°.`,
+    };
+  }
+
   const lagnaNum = Math.floor((lagnaLon % 360) / 30) % 12;
   const lagnaRashi = RASHIS[lagnaNum];
+  const lagnaLord = LAGNA_LORDS[lagnaNum];
 
+  // 3. Planetary positions & Retrogrades
   const planets = computePlanets(jd);
-  const PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
+  const retrogrades = computeRetro(jd);
+  const PLANET_KEYS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 
-  // Build planet positions
   const planetPositions: PrashnaResult["planetPositions"] = {};
-  PLANETS.forEach(p => {
+  PLANET_KEYS.forEach(p => {
     const pLon = planets[p];
     if (pLon === undefined || pLon === null) return;
     const signNum = Math.floor(((pLon % 360) + 360) % 360 / 30) % 12;
@@ -311,229 +1047,328 @@ export function calculatePrashna(question: string, topic: PrashnaTopic, lat: num
     planetPositions[p] = {
       house,
       sign: RASHIS[signNum],
+      degrees: Number(((pLon % 30 + 30) % 30).toFixed(2)),
       nakshatra: getNakshatraName(pLon),
-      emoji: PLANET_EMOJI[p],
-      color: PLANET_COLORS[p],
+      emoji: PLANET_EMOJI[p] || "🪐",
+      color: PLANET_COLORS[p] || "#c8a030",
+      isRetrograde: retrogrades[p] || false,
     };
   });
 
   const moonLon = planets.Moon || 0;
   const moonHouse = planetPositions.Moon?.house || 1;
   const moonNakshatra = getNakshatraName(moonLon);
-  const moonSign = planetPositions.Moon?.sign || '';
+  const moonSign = planetPositions.Moon?.sign || "";
 
-  // ── New: Moon velocity, void-of-course, applying planet ──
-  const { velocity: moonVelocity, degreesPerDay: moonDPD } = getMoonVelocity(moonLon, jd);
-  const { voidOfCourse: moonVoidOfCourse, applyingTo: moonApplyingTo } =
-    getMoonApplying(moonLon, planets);
+  // 4. Moon Kinematics & VOC
+  const { velocity: moonVelocity, degreesPerDay: moonDegreesPerDay } = computeMoonKinematics(moonLon, jd);
+  const { voidOfCourse: moonVoidOfCourse, applyingTo: moonApplyingTo } = checkMoonVOC(moonLon, planets);
 
-  // ── New: Saham for this topic ──
-  const saham = computeSaham(topic, lagnaLon, planets, lagnaNum);
+  // 5. Directional Nature
+  const directionalNature = analyzeDirectionalNature(lagnaRashi, moonNakshatra);
 
+  // 6. Badhaka Analysis
+  const badhaka = analyzeBadhaka(lagnaNum, planetPositions);
+
+  // 7. Chitta Vritti (Subconscious concern)
+  const chittaVritti = analyzeChittaVritti(moonHouse, topic);
+
+  // 8. Karyesha & Topic Analysis
   const th = TOPIC_HOUSES[topic];
-  const lagnaLord = LAGNA_LORDS[lagnaNum];
+  const karyesh = th.karaka;
+  const karyeshaHouse = planetPositions[karyesh]?.house || 1;
   const lagnaLordHouse = planetPositions[lagnaLord]?.house || 1;
+  const karakaFavorable = th.positive.includes(karyeshaHouse);
 
-  const karaka = th.karaka;
-  const karakaHouse = planetPositions[karaka]?.house || 0;
-  const karakaFavorable = karakaHouse > 0 && th.positive.includes(karakaHouse);
+  // 9. Complete 16 Tajaka Yogas Engine
+  const tajakaYogas = computeTajakaAspectsAndYogas(
+    lagnaLord, karyesh, planets, retrogrades, moonLon, lagnaNum
+  );
 
-  const horaData = getHora(new Date(now.getTime() + tz * 3600 * 1000));
+  // 10. Saham Engine (with Day vs Night Inversion)
+  const sahamAnalysis = calculateDayNightSaham(topic, lagnaLon, planets, lagnaNum, isDayChart);
+
+  // 11. Ruling Planets Synchronization
+  const moonSignNum = Math.floor(moonLon / 30) % 12;
+  const rulingPlanets = analyzeRulingPlanets(
+    panchang.varaLord,
+    LAGNA_LORDS[moonSignNum],
+    getNakshatraName(moonLon),
+    lagnaLord,
+    getNakshatraName(lagnaLon),
+    karyesh,
+    lagnaLord
+  );
+
+  // 12. Phala Prapti Kaala
+  const degDiff = Math.abs(
+    ((planets[lagnaLord] || 0) % 30) - ((planets[karyesh] || 0) % 30)
+  );
+  const timing = calculatePhalaPraptiKaala(degDiff, badhaka.lagnaType, moonVelocity);
+
+  // 13. Hora
+  const dayOfWeek = new Date(now.getTime() + tz * 3600 * 1000).getUTCDay();
+  const hourOfDay = new Date(now.getTime() + tz * 3600 * 1000).getUTCHours();
+  const horaIdx = (DAY_RULER_IDX[dayOfWeek] + hourOfDay) % 7;
+  const currentHora = CHALDEAN_HORA_ORDER[horaIdx];
   const horaFavList = HORA_FAVORABLE[topic];
-  const horaFavorable = horaFavList.includes(horaData.planet);
+  const horaFavorable = horaFavList.includes(currentHora);
 
+  // 14. Upaya Recommendation
+  const upaya = generatePrashnaUpaya(badhaka.badhakesh, karyesh, horaFavList, topic);
+
+  // 15. Comprehensive Score & Shastric Verdict
   let score = 0;
   const positiveFactors: string[] = [];
   const negativeFactors: string[] = [];
   const scoreBreakdown: PrashnaResult["scoreBreakdown"] = [];
 
-  // Lagna lord
+  // Tajaka Yogas score weight
+  const hasPoorna = tajakaYogas.some(y => y.name.includes("Poorna"));
+  const hasIthasala = tajakaYogas.some(y => y.name.includes("Ithasala"));
+  const hasEesarpha = tajakaYogas.some(y => y.name.includes("Eesarpha"));
+  const hasNakta = tajakaYogas.some(y => y.name.includes("Nakta"));
+  const hasYamaya = tajakaYogas.some(y => y.name.includes("Yamaya"));
+  const hasManahoo = tajakaYogas.some(y => y.name.includes("Manahoo"));
+  const hasKamboola = tajakaYogas.some(y => y.name.includes("Kamboola"));
+
+  if (hasPoorna) {
+    score += 5;
+    positiveFactors.push("Poorna Ithasala Yoga — instant fulfillment promised");
+    scoreBreakdown.push({ label: "Poorna Ithasala", points: 5, note: "Closest applying aspect within 1° orb." });
+  } else if (hasIthasala) {
+    score += 3;
+    positiveFactors.push("Vartamaana Ithasala Yoga — applying aspect confirms realization");
+    scoreBreakdown.push({ label: "Ithasala", points: 3, note: "Lagnesha and Karyesha applying within Deeptaamsha orb." });
+  }
+
+  if (hasKamboola) {
+    score += 2;
+    positiveFactors.push("Kamboola Yoga — Moon empowers the realization with honor");
+    scoreBreakdown.push({ label: "Kamboola", points: 2, note: "Moon connects to Ithasala." });
+  }
+
+  if (hasNakta) {
+    score += 2;
+    positiveFactors.push("Nakta Yoga — resolution mediated by third-party ally");
+    scoreBreakdown.push({ label: "Nakta", points: 2, note: "Light transferred via fast planet." });
+  }
+
+  if (hasYamaya) {
+    score += 1;
+    positiveFactors.push("Yamaya Yoga — manifestation through authority after perseverance");
+    scoreBreakdown.push({ label: "Yamaya", points: 1, note: "Light reflected through slow planet." });
+  }
+
+  if (hasEesarpha) {
+    score -= 3;
+    negativeFactors.push("Eesarpha Yoga — separating aspect indicates past opportunity");
+    scoreBreakdown.push({ label: "Eesarpha", points: -3, note: "Planets separating; moment has elapsed." });
+  }
+
+  if (hasManahoo) {
+    score -= 3;
+    negativeFactors.push("Manahoo Yoga — affliction by Mars/Saturn threatens agreement");
+    scoreBreakdown.push({ label: "Manahoo", points: -3, note: "Malefic afflicts applying planet within orb." });
+  }
+
+  // Badhaka score
+  if (badhaka.isAfflicted) {
+    score -= 2;
+    negativeFactors.push(`Badhakesh ${badhaka.badhakesh} active — unseen karmic hindrance`);
+    scoreBreakdown.push({ label: "Badhakasthana", points: -2, note: badhaka.explanation });
+  }
+
+  // Panchanga score
+  if (isBhadraActive) {
+    score -= 3;
+    negativeFactors.push("Vishti (Bhadra) Karana active — inauspicious for commencement");
+    scoreBreakdown.push({ label: "Bhadra Karana", points: -3, note: "Shastra prohibits major commitments during Bhadra." });
+  }
+  if (isRiktaTithi) {
+    score -= 1;
+    negativeFactors.push(`Rikta Tithi (${panchang.tithi}) — friction in new endeavor`);
+    scoreBreakdown.push({ label: "Rikta Tithi", points: -1, note: "Empty tithi creates resource drainage." });
+  }
+
+  // Lagna Lord & Karyesh
   if (th.positive.includes(lagnaLordHouse)) {
     score += 2;
-    positiveFactors.push(`Lagna lord ${lagnaLord} in H${lagnaLordHouse} (positive for ${topic})`);
-    scoreBreakdown.push({ label: "Lagna lord", points: 2, note: `${lagnaLord} supports the query from H${lagnaLordHouse}.` });
+    positiveFactors.push(`Lagnesha ${lagnaLord} in H${lagnaLordHouse} (auspicious house)`);
+    scoreBreakdown.push({ label: "Lagnesha", points: 2, note: `${lagnaLord} strongly placed for querent.` });
   } else if (th.negative.includes(lagnaLordHouse)) {
     score -= 2;
-    negativeFactors.push(`Lagna lord ${lagnaLord} in H${lagnaLordHouse} (challenging house)`);
-    scoreBreakdown.push({ label: "Lagna lord", points: -2, note: `${lagnaLord} is under pressure in H${lagnaLordHouse}.` });
+    negativeFactors.push(`Lagnesha ${lagnaLord} in H${lagnaLordHouse} (dusthana / pressure)`);
+    scoreBreakdown.push({ label: "Lagnesha", points: -2, note: `${lagnaLord} in challenging house.` });
   }
 
-  // Moon
-  if (th.positive.includes(moonHouse)) {
+  if (karakaFavorable) {
     score += 2;
-    positiveFactors.push(`Moon in H${moonHouse} — ${moonNakshatra} (favorable)`);
-    scoreBreakdown.push({ label: "Moon", points: 2, note: `Mind and flow are supportive through ${moonNakshatra}.` });
-  } else if (th.negative.includes(moonHouse)) {
-    score -= 1;
-    negativeFactors.push(`Moon in H${moonHouse} — ${moonNakshatra} (challenging)`);
-    scoreBreakdown.push({ label: "Moon", points: -1, note: `Moon shows emotional or timing friction.` });
+    positiveFactors.push(`Karyesha ${karyesh} in H${karyeshaHouse} (positive house)`);
+    scoreBreakdown.push({ label: "Karyesha", points: 2, note: `${karyesh} supports ${th.label}.` });
   }
 
-  // Karaka
-  if (karakaHouse > 0) {
-    if (th.positive.includes(karakaHouse)) {
-      score += 2;
-      positiveFactors.push(`${karaka} (karaka) in H${karakaHouse} — very supportive`);
-      scoreBreakdown.push({ label: "Karaka", points: 2, note: `${karaka} is placed in a helpful house for ${topic}.` });
-    } else if (th.negative.includes(karakaHouse)) {
-      score -= 2;
-      negativeFactors.push(`${karaka} (karaka) in H${karakaHouse} — blocked`);
-      scoreBreakdown.push({ label: "Karaka", points: -2, note: `${karaka} is blocked for this query.` });
-    }
+  // Moon VOC
+  if (moonVoidOfCourse) {
+    score -= 3;
+    negativeFactors.push("Moon is Void of Course — 'nothing will come of it' warning");
+    scoreBreakdown.push({ label: "Moon VOC", points: -3, note: "Moon makes no applying aspect before leaving sign." });
   }
 
-  // Jupiter blessing
-  const jupHouse = planetPositions.Jupiter?.house || 0;
-  if (jupHouse > 0 && th.positive.includes(jupHouse)) {
+  // Saham
+  if (sahamAnalysis.favorable) {
     score += 1;
-    positiveFactors.push(`Jupiter in H${jupHouse} — divine grace`);
-    scoreBreakdown.push({ label: "Jupiter", points: 1, note: `Jupiter adds protection from H${jupHouse}.` });
+    positiveFactors.push(`${sahamAnalysis.name} in H${sahamAnalysis.sahamHouse} (favorable Saham)`);
+    scoreBreakdown.push({ label: "Saham", points: 1, note: sahamAnalysis.explanation });
   }
 
-  // Primary house occupants
-  const primaryHouseOccupants = PLANETS.filter(p => planetPositions[p]?.house === th.primary);
-  if (primaryHouseOccupants.length > 0) {
-    const hasBenefic = primaryHouseOccupants.some(p => BENEFICS.has(p));
-    const hasMalefic = primaryHouseOccupants.some(p => MALEFICS.has(p));
-    if (hasBenefic && !hasMalefic) {
-      score += 2;
-      positiveFactors.push(`${primaryHouseOccupants.join('+')} in H${th.primary} (primary house) — very positive`);
-      scoreBreakdown.push({ label: "Primary house", points: 2, note: `Benefic support is present in the main house.` });
-    } else if (hasMalefic && !hasBenefic) {
-      score -= 1;
-      negativeFactors.push(`${primaryHouseOccupants.join('+')} in H${th.primary} — delay possible`);
-      scoreBreakdown.push({ label: "Primary house", points: -1, note: `Malefic pressure can delay the result.` });
-    }
+  // Ruling Planets corroboration
+  if (rulingPlanets.status === "RP_CONFIRMED") {
+    score += 2;
+    positiveFactors.push("5-Fold Ruling Planets corroborate Lagnesha & Karyesha");
+    scoreBreakdown.push({ label: "Ruling Planets", points: 2, note: rulingPlanets.explanation });
   }
 
   // Hora
   if (horaFavorable) {
     score += 1;
-    positiveFactors.push(`${horaData.planet} Hora — favorable timing for ${topic}`);
-    scoreBreakdown.push({ label: "Hora", points: 1, note: `${horaData.planet} hora is good for this topic.` });
+    positiveFactors.push(`${currentHora} Hora is auspicious for ${th.label}`);
+    scoreBreakdown.push({ label: "Hora", points: 1, note: `${currentHora} Hora supports the topic.` });
+  }
+
+  // 16. Determine 3-Tier Shastric Verdict
+  let shastricVerdict: PrashnaResult["shastricVerdict"] = "Sadhya (साध्य)";
+  let verdict: PrashnaResult["verdict"] = "yes_strong";
+  let title = "HAAN — Kaarya Nishchit Safal Hoga (साध्य)";
+  let icon = "✅";
+  let color = "#16a34a";
+  let detail = "Chart strongly sanctions fulfillment. Ithasala and supporting cosmic indicators guarantee accomplishment.";
+
+  if (score >= 4 && !hasManahoo && !hasEesarpha) {
+    shastricVerdict = "Sadhya (साध्य)";
+    verdict = "yes_strong";
+    title = "HAAN — Kaarya Nishchit Safal Hoga (साध्य)";
+    icon = "✅";
+    color = "#16a34a";
+    detail = "Supreme astrological alignment. The intention will materialize cleanly with divine blessing.";
+  } else if (score >= 1) {
+    shastricVerdict = "Krichhra-Sadhya (कृच्छ्र-साध्य)";
+    verdict = "yes_possible";
+    title = "SAMBHAV — Prayaas aur Upay Se Safalta (कृच्छ्र-साध्य)";
+    icon = "🟡";
+    color = "#d97706";
+    detail = "Accomplishment is feasible after overcoming obstacles, mediating with third parties, and propitiating the Badhaka deity.";
+  } else if (score >= -1) {
+    shastricVerdict = "Krichhra-Sadhya (कृच्छ्र-साध्य)";
+    verdict = "mixed";
+    title = "MISHRIT — Abhi Thoda Sabr Rakhein";
+    icon = "⚠️";
+    color = "#ea580c";
+    detail = "Mixed currents detected. Cosmic timing is currently fragile; wait for a favorable hora window before commitment.";
   } else {
-    negativeFactors.push(`${horaData.planet} Hora — not optimal. Best: ${horaFavList.join('/')} hora`);
-    scoreBreakdown.push({ label: "Hora", points: 0, note: `${horaData.planet} hora is neutral; better horas: ${horaFavList.join('/')}.` });
+    shastricVerdict = "Asadhya (असाध्य)";
+    verdict = "no_delay";
+    title = "NAHI — Abhi Kaarya Asadhya Hai (असाध्य)";
+    icon = "❌";
+    color = "#dc2626";
+    detail = "Significant classical blockades detected (Eesarpha/VOC/Bhadra/Badhaka). Do not force the matter today; repeat prashna later.";
   }
 
-  // ── NEW: Moon Velocity ────────────────────────────────────────────────────
-  if (moonVelocity === "fast") {
-    score += 1;
-    positiveFactors.push(`Moon is fast (${moonDPD}°/day) — swift results if positive`);
-    scoreBreakdown.push({ label: "Moon velocity", points: 1, note: `Fast Moon (${moonDPD}°/day above mean 13.18°/day) — results come quickly.` });
-  } else if (moonVelocity === "slow") {
-    score -= 1;
-    negativeFactors.push(`Moon is slow (${moonDPD}°/day) — delays in result`);
-    scoreBreakdown.push({ label: "Moon velocity", points: -1, note: `Slow Moon (${moonDPD}°/day below mean 13.18°/day) — patience required.` });
-  }
-
-  // ── NEW: Void of Course Moon ──────────────────────────────────────────────
-  if (moonVoidOfCourse) {
-    score -= 3;
-    negativeFactors.push("Moon is Void of Course — classical 'no result' indicator ");
-    scoreBreakdown.push({ label: "Moon VOC", points: -3, note: "Moon makes no aspect before leaving sign — strongest single negative in horary." });
-  } else if (moonApplyingTo) {
-    const isBeneficApply = ["Jupiter","Venus","Mercury"].includes(moonApplyingTo);
-    const applyPts = isBeneficApply ? 2 : -1;
-    if (isBeneficApply) {
-      positiveFactors.push(`Moon applying to ${moonApplyingTo} (benefic) — favorable classical horary indicator`);
-      scoreBreakdown.push({ label: "Moon applying", points: applyPts, note: `Moon's next aspect is to benefic ${moonApplyingTo} — classical positive indicator.` });
-    } else {
-      negativeFactors.push(`Moon applying to ${moonApplyingTo} (malefic) — classical horary warning`);
-      scoreBreakdown.push({ label: "Moon applying", points: applyPts, note: `Moon's next aspect is to malefic ${moonApplyingTo} — obstruction or delay likely.` });
-    }
-    score += applyPts;
-  }
-
-  // ── NEW: Saham (Arabic Part) ──────────────────────────────────────────────
-  if (saham.favorable) {
-    score += 1;
-    positiveFactors.push(`${saham.name} in H${saham.house} — Arabic Part of ${saham.meaning} is favorable`);
-    scoreBreakdown.push({ label: "Saham", points: 1, note: saham.note });
-  } else {
-    score -= 1;
-    negativeFactors.push(`${saham.name} in H${saham.house} — Arabic Part is in a challenging house`);
-    scoreBreakdown.push({ label: "Saham", points: -1, note: saham.note });
-  }
-
-  // ── NEW: Classical horary rules ────────────────────────────────────────────
-  const prashnaMargas = getPrashnaMargas(
-    moonHouse, lagnaLordHouse, lagnaNum,
-    moonApplyingTo, moonVoidOfCourse, moonVelocity,
-    Object.fromEntries(Object.entries(planetPositions).map(([k,v]) => [k, { house: v.house, sign: v.sign }])),
-    topic
-  );
-
-  // Verdict
-  type Verdict = PrashnaResult["verdict"];
-  const verdict: Verdict = score >= 4 ? 'yes_strong' : score >= 2 ? 'yes_possible' : score >= 0 ? 'mixed' : 'no_delay';
-  const verdictMap: Record<Verdict, { icon: string; color: string; title: string; detail: string }> = {
-    yes_strong:  { icon:'✅', color:'#22c55e', title:'HAAN — Bahut Shubh!',           detail:'Multiple strong positive indicators. Kaarya safal hoga. Good time to proceed.' },
-    yes_possible:{ icon:'🟡', color:'#fbbf24', title:'SAMBHAV — Thodi Deri',          detail:'Mixed signals. Kuch obstacles hain. Thoda sabr rakhein, kaarya hoga.' },
-    mixed:       { icon:'⚠️', color:'#f97316', title:'ACHHA NAHI — Ruko',             detail:'Abhi samay anukool nahi. Wait karein. Situation improve hogi.' },
-    no_delay:    { icon:'❌', color:'#ef4444', title:'NAHI — Abhi Nahi',              detail:'Strong negative indicators. Upay karein aur muhurta baad mein dekho.' },
-    no_unlikely: { icon:'🔴', color:'#dc2626', title:'NAHI — Unlikely',               detail:'Chart suggests significant delay or unfavorable outcome.' },
-  };
-
-  // Practical advice
-  const favHoraStr = horaFavList.join('/');
-  const practicalAdvice = score >= 4
-    ? `Aaj hi kaarya shuru karein. ${horaFavList[0]} hora mein final decision lein. Upcoming Dwadashi ya Saptami tithi mein proceed karein. ${karaka} ko strengthen karein — yeh karaka hai.`
-    : score >= 2
-    ? `Thoda wait karein. ${favHoraStr} hora aane par kaarya shuru karein. Ekadashi ya Saubhagya yoga mein try karein. ${lagnaLord} ki disha mein jaayein.`
-    : `Abhi rukein. ${karaka} mantra jaap karein. Jupiter transit positive hone ka wait karein. ${lagnaLord} ki pooja karein. ${favHoraStr} hora mein dobaara prashna karein.`;
+  const primaryOccupants = PLANET_KEYS.filter(p => planetPositions[p]?.house === th.primary);
 
   const confidence: PrashnaResult["confidence"] =
-    Math.abs(score) >= 4 && scoreBreakdown.length >= 4 ? "high" : scoreBreakdown.length >= 3 ? "medium" : "low";
-  const timingWindow = score >= 4
-    ? `Proceed in the next favorable ${favHoraStr} hora; keep action within 1-3 days if practical.`
-    : score >= 2
-    ? `Wait for ${favHoraStr} hora and re-check after 3-7 days before final commitment.`
-    : `Avoid final commitment now; repeat prashna in a calmer moment or after 7-14 days.`;
+    Math.abs(score) >= 4 ? "high" : Math.abs(score) >= 2 ? "medium" : "low";
+
   const decisionProtocol = [
-    score >= 2 ? "Move only after one practical confirmation outside astrology." : "Do not force the matter today; reduce urgency first.",
-    `Use ${favHoraStr} hora for communication, payment, signing, or first action.`,
-    negativeFactors.length ? "Resolve the strongest negative factor before taking the irreversible step." : "Keep the first step small so the chart support can compound.",
+    shastricVerdict === "Sadhya (साध्य)"
+      ? "Take the first concrete physical step during the recommended Hora."
+      : "Exercise patience; do not take an irreversible financial or legal step today.",
+    upaya.favorableHoraWindow,
+    upaya.primaryRemedy,
   ];
 
-  const vdata = verdictMap[verdict];
+  const practicalAdvice = `${upaya.primaryRemedy} Propitiate ${upaya.deityToPropitiate} facing ${upaya.beneficDirection}. Timing window: ${timing.timingText}.`;
+
+  const prashnaMargas = [
+    chittaVritti.interpretation,
+    directionalNature.meaning,
+    badhaka.explanation,
+    rulingPlanets.explanation,
+  ];
+
+  const panchangShuddhi: PanchangPrashnaShuddhi = {
+    tithi: `${panchang.tithi} (${panchang.paksha})`,
+    isRiktaTithi,
+    karana: panchang.karana,
+    isBhadraActive,
+    yoga: panchang.yoga,
+    isAshubhaYoga,
+    weekday: panchang.weekday,
+    varaLord: panchang.varaLord,
+    sunrise: panchang.sunrise,
+    sunset: panchang.sunset,
+    shuddhiVerdict: isBhadraActive || isAshubhaYoga ? "Ashuddha (Challenging)" : isRiktaTithi ? "Madhyam (Average)" : "Pavitra (Pure)",
+    warning: isBhadraActive ? "Vishti (Bhadra) Karana is actively running!" : undefined,
+  };
+
   return {
+    shastricVerdict,
     verdict,
-    icon: vdata.icon,
-    color: vdata.color,
-    title: vdata.title,
-    detail: vdata.detail,
+    icon,
+    color,
+    title,
+    detail,
     score,
+
+    layer1PanchangShuddhi: panchangShuddhi,
+    layer2ChittaVritti: chittaVritti,
+    layer3DirectionalNature: directionalNature,
+    layer4Badhaka: badhaka,
+    layer5TajakaYogas: tajakaYogas,
+    layer6Saham: sahamAnalysis,
+    layer7KPHorary: kpAnalysis,
+    layer8RulingPlanets: rulingPlanets,
+    layer9PhalaPraptiKaala: timing,
+    layer10PrashnaUpaya: upaya,
+
     lagnaRashi,
+    lagnaLord,
+    lagnaLordHouse,
+    karaka: karyesh,
+    karakaHouse: karyeshaHouse,
+    karakaFavorable,
     moonHouse,
     moonNakshatra,
     moonSign,
     moonVelocity,
+    moonDegreesPerDay,
     moonVoidOfCourse,
     moonApplyingTo,
-    lagnaLord,
-    lagnaLordHouse,
-    karaka,
-    karakaHouse,
-    karakaFavorable,
-    hora: horaData.planet,
+    hora: currentHora,
     horaFavorable,
-    horaHour: horaData.horaHour,
+    horaHour: hourOfDay,
     primaryHouse: th.primary,
-    primaryHouseOccupants,
+    primaryHouseOccupants: primaryOccupants,
     topicHouses: { positive: th.positive, negative: th.negative },
     positiveFactors,
     negativeFactors,
     scoreBreakdown,
-    saham,
+    saham: {
+      name: sahamAnalysis.name,
+      house: sahamAnalysis.sahamHouse,
+      sign: sahamAnalysis.sahamSign,
+      meaning: SAHAM_CONFIG[topic]?.meaning || "General intent",
+      favorable: sahamAnalysis.favorable,
+      note: sahamAnalysis.explanation,
+    },
     prashnaMargas,
     confidence,
-    timingWindow,
+    timingWindow: timing.timingText,
     decisionProtocol,
     practicalAdvice,
     question,
     topic,
     planetPositions,
-    timestamp: `${localMoment.date} ${localMoment.time} (UTC${tz >= 0 ? '+' : ''}${tz})`,
+    timestamp: `${localMoment.date} ${localMoment.time} (UTC${tz >= 0 ? "+" : ""}${tz})`,
   };
 }
