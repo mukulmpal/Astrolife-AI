@@ -278,7 +278,7 @@ export default function UpgradePage() {
           .plan-price{font-size:44px}
           .plan-feature{font-size:13px}
           .faq-item{padding:16px}
-          .mobile-cta{display:block;position:sticky;bottom:12px;z-index:20;padding-top:10px}
+          .mobile-cta{display:block;position:sticky;bottom:calc(66px + env(safe-area-inset-bottom, 0px));z-index:20;padding-top:10px}
           .mobile-cta .plan-btn{box-shadow:0 8px 30px rgba(200,160,48,0.35)}
         }
       `}</style>

@@ -34,7 +34,7 @@ export function Pricing() {
                   </li>
                 ))}
               </ul>
-              <Link href={plan.name === "Free" ? ctaHref : "/dashboard/upgrade"} className={`landing-btn ${plan.popular ? "landing-btn-primary" : "landing-btn-ghost"}`}>
+              <Link href={plan.price === "₹0" || plan.name.includes("Free") || plan.name.includes("Basic") ? ctaHref : "/dashboard/upgrade"} className={`landing-btn ${plan.popular ? "landing-btn-primary" : "landing-btn-ghost"}`}>
                 {plan.cta}
               </Link>
             </article>
