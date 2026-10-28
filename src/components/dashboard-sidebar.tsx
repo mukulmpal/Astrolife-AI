@@ -51,7 +51,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Prediction & Timing",
     items: [
       { label: "Dasha", href: "/dashboard/dasha", Icon: Timer },
-      { label: "Transits", href: "/dashboard/transits", Icon: Globe },
+      { label: "Transits", href: "/dashboard/transits", Icon: Globe, badge: "ELITE" },
       { label: "Event Radar", href: "/dashboard/event-radar", Icon: Radar },
       { label: "KP", href: "/dashboard/kp", Icon: Target },
       { label: "Prashna", href: "/dashboard/prashna", Icon: HelpCircle },
@@ -67,8 +67,8 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Shadbala", href: "/dashboard/shadbala", Icon: BarChart3 },
       { label: "Ashtakavarga", href: "/dashboard/ashtakavarga", Icon: Grid3x3 },
       { label: "Divisional Charts", href: "/dashboard/divisional", Icon: Layers, badge: "ELITE" },
-      { label: "Special Lagnas", href: "/dashboard/special-lagnas", Icon: Sunrise },
-      { label: "Jaimini", href: "/dashboard/jaimini", Icon: Star },
+      { label: "Special Lagnas", href: "/dashboard/special-lagnas", Icon: Sunrise, badge: "PRO" },
+      { label: "Jaimini", href: "/dashboard/jaimini", Icon: Star, badge: "ELITE" },
       { label: "Sarvatobhadra", href: "/dashboard/sarvatobhadra", Icon: Grid3x3 },
     ],
   },
@@ -77,9 +77,9 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Lineage Karma", href: "/dashboard/lineage-karma", Icon: Dna, badge: "ELITE" },
       { label: "Psychology", href: "/dashboard/psychology", Icon: Brain },
-      { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus },
-      { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem },
-      { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf },
+      { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus, badge: "ELITE" },
+      { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem, badge: "PRO" },
+      { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf, badge: "PRO" },
       { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen, badge: "PRO" },
       { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon, badge: "ELITE" },
       { label: "Astro Tattoo (Dot Therapy)", href: "/dashboard/astro-tattoo", Icon: Sparkles, badge: "ELITE" },
@@ -89,7 +89,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Personal Tools",
     items: [
-      { label: "Numerology", href: "/dashboard/numerology", Icon: Hash },
+      { label: "Numerology", href: "/dashboard/numerology", Icon: Hash, badge: "PRO" },
       { label: "Palmistry", href: "/dashboard/palmistry", Icon: Hand, badge: "PRO" },
       { label: "Birth Rectification", href: "/dashboard/rectify", Icon: Timer, badge: "ELITE" },
       { label: "History", href: "/dashboard/history", Icon: History },

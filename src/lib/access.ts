@@ -21,7 +21,13 @@ export type FeatureKey =
   | "transit_purchase"
   | "astro_sound"
   | "astro_tattoo"
-  | "rectify";
+  | "rectify"
+  | "transits"
+  | "jaimini"
+  | "medical"
+  | "special_lagnas"
+  | "gemstone"
+  | "remedy";
 
 export const PLAN_LIMITS = {
   free: {
@@ -63,6 +69,12 @@ export const FEATURE_ACCESS: Record<FeatureKey, SubscriptionTier[]> = {
   astro_sound: ["elite"],
   astro_tattoo: ["elite"],
   rectify: ["elite"],
+  transits: ["elite"],
+  jaimini: ["elite"],
+  medical: ["elite"],
+  special_lagnas: ["premium", "elite"],
+  gemstone: ["premium", "elite"],
+  remedy: ["premium", "elite"],
 };
 
 export const ELITE_EMAILS = new Set([
