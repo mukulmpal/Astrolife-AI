@@ -103,7 +103,7 @@ export function DashboardSidebar() {
   const { birth } = useUserChart();
   const [mounted, setMounted] = useState(false);
   const userName = mounted && birth.name ? birth.name.split(" ")[0] : "Seeker";
-  const { isElite } = useUserTier();
+  const { isElite, userTier } = useUserTier();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -204,15 +204,48 @@ export function DashboardSidebar() {
               <Sparkles size={15} strokeWidth={1.7} aria-hidden="true" style={{ color: "#c084fc" }} />
               <span style={{ fontWeight: 600 }}>💎 Elite Member</span>
             </div>
-          ) : (
-            <Link
-              href="/dashboard/upgrade"
-              className={`dash-nav-item dash-upgrade-item${pathname === "/dashboard/upgrade" ? " active" : ""}`}
-              aria-current={pathname === "/dashboard/upgrade" ? "page" : undefined}
+          ) : userTier === "premium" ? (
+            <div
+              className="dash-nav-item"
+              style={{
+                color: "#c8a030",
+                borderLeftColor: "#c8a030",
+                background: "rgba(200,160,48,0.08)",
+                cursor: "default",
+              }}
             >
-              <Zap size={15} strokeWidth={1.7} aria-hidden="true" />
-              <span>Upgrade to Pro 👑</span>
-            </Link>
+              <Sparkles size={15} strokeWidth={1.7} aria-hidden="true" style={{ color: "#c8a030" }} />
+              <span style={{ fontWeight: 600 }}>👑 Pro Member</span>
+            </div>
+          ) : (
+            <div>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "#16a34a",
+                  padding: "5px 12px",
+                  margin: "0 8px 6px 8px",
+                  borderRadius: "6px",
+                  background: "rgba(34,197,94,0.08)",
+                  border: "1px solid rgba(34,197,94,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontWeight: 600,
+                }}
+              >
+                <span>🌱</span>
+                <span>Basic (The Seed)</span>
+              </div>
+              <Link
+                href="/dashboard/upgrade"
+                className={`dash-nav-item dash-upgrade-item${pathname === "/dashboard/upgrade" ? " active" : ""}`}
+                aria-current={pathname === "/dashboard/upgrade" ? "page" : undefined}
+              >
+                <Zap size={15} strokeWidth={1.7} aria-hidden="true" />
+                <span>Upgrade to Pro 👑</span>
+              </Link>
+            </div>
           )}
 
           {isAdmin && (

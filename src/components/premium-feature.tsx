@@ -54,19 +54,19 @@ export function PremiumFeature({ children, feature, enforceLock }: PremiumFeatur
       <div className={`premium-gate ${isPremium ? "unlocked" : isLocked ? "locked" : "soft"}`}>
         <div className="premium-gate-copy">
           <span className="premium-gate-badge">
-            {isPremium ? `${planLabel} Unlocked` : isLocked ? "🔒 Premium Locked" : "Testing Mode"}
+            {isPremium ? `${planLabel} Unlocked` : isLocked ? `🔒 Locked for ${planLabel}` : "🌱 Basic (Preview Mode)"}
           </span>
           <div className="premium-gate-title">{feature} is a premium engine.</div>
           <div className="premium-gate-sub">
             {isPremium
-              ? "Full access is active on your account (प्रीमियम सक्रिय है)।"
+              ? "Full access is active on your account (सक्रिय है)।"
               : isLocked
-                ? "यह मॉड्यूल केवल प्रीमियम और एलीट सदस्यों के लिए उपलब्ध है। अनलॉक करने के लिए अपग्रेड करें।"
-                : "Billing enforcement is off, so this premium feature stays open for product testing."}
+                ? "यह मॉड्यूल केवल 👑 Pro और 💎 Elite सदस्यों के लिए उपलब्ध है। अनलॉक करने के लिए अपग्रेड करें।"
+                : "Billing enforcement is off, so this feature stays open for product testing."}
           </div>
         </div>
         <Link href="/dashboard/upgrade" className="premium-gate-cta">
-          {isPremium ? "Manage Plan" : "Upgrade (अपग्रेड करें)"}
+          {isPremium ? "Manage Plan" : "Upgrade to Pro 👑"}
         </Link>
       </div>
 
@@ -78,10 +78,10 @@ export function PremiumFeature({ children, feature, enforceLock }: PremiumFeatur
               <div style={{ fontSize: 36, marginBottom: 8 }}>🔒</div>
               <div className="premium-feature-card-title">{feature}</div>
               <div className="premium-feature-card-text">
-                यह एडवांस्ड एस्ट्रो-वास्तु हिट थ्योरी, 4-सेकंड जीपीएस नेविगेटर, प्लॉट ड्यूल-ग्रिड व सूक्ष्म वास्तु विश्लेषण केवल प्रीमियम व एलीट मेंबर्स के लिए उपलब्ध है।
+                यह एडवांस्ड एस्ट्रो इंजन केवल 👑 Pro और 💎 Elite सदस्यों के लिए उपलब्ध है। अपने 🌱 Basic (The Seed) प्लान को अपग्रेड करके तुरंत एक्सेस प्राप्त करें।
               </div>
               <Link href="/dashboard/upgrade" className="premium-feature-card-cta">
-                ✦ Unlock with Premium (अपग्रेड करें)
+                👑 Unlock with Pro / 💎 Elite
               </Link>
             </div>
           </div>

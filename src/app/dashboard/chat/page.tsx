@@ -713,14 +713,14 @@ export default function ChatPage() {
     <div className="usage-row">
     {usageStatus.enforcementEnabled ? (
       <>
-        <strong>Free plan:</strong> {usageStatus.left}/{usageStatus.limit} questions left this month.
+        <strong>🌱 Basic plan:</strong> {usageStatus.left}/{usageStatus.limit} questions left this month.
       </>
     ) : (
       <>
-        <strong>Testing mode:</strong> {usageStatus.left}/{usageStatus.limit} free questions left this month. Limit cross hone par bhi chat chalta rahega.
+        <strong>🌱 Basic (Testing mode):</strong> {usageStatus.left}/{usageStatus.limit} questions left this month. Limit cross hone par bhi chat chalta rahega.
       </>
     )}
-    <Link className="usage-link" href="/dashboard/upgrade">Upgrade</Link>
+    <Link className="usage-link" href="/dashboard/upgrade">Upgrade to Pro 👑</Link>
     </div>
     <div className="usage-progress">
       <span style={{ width: `${Math.max(0, Math.min(100, (usageStatus.used / Math.max(usageStatus.limit, 1)) * 100))}%` }} />
@@ -758,7 +758,7 @@ export default function ChatPage() {
               <span className="free-tag">
                 {usageStatus.isUnlimited
                   ? `${subscriptionTier?.toUpperCase() ?? "PREMIUM"} Plan — Unlimited questions`
-                  : `Free Plan — ${usageStatus.left}/${usageStatus.limit} left this month`}
+                  : `🌱 Basic Plan (The Seed) — ${usageStatus.left}/${usageStatus.limit} left this month`}
               </span>
             </div>
           </div>

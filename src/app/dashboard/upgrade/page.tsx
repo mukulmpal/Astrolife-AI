@@ -6,19 +6,20 @@ import { createClient } from "@/lib/supabase/client";
 const PLANS = [
   {
     id: "free",
-    name: "🌱 Basic (Beej)",
+    name: "🌱 Basic (The Seed / Beej)",
     price: "₹0",
     period: "forever",
     highlight: false,
-    color: "#6B635B",
+    color: "#16a34a",
     features: [
+      "The Seed / Foundation Tier",
       "Foundational Janam Kundli",
       "5 AI Questions / month",
       "Daily Horoscope Card",
       "Core Yogas & Lagna Analysis",
       "Panchang & Planetary Positions",
     ],
-    cta: "Current Plan",
+    cta: "Current Plan (Active)",
     disabled: true,
   },
   {

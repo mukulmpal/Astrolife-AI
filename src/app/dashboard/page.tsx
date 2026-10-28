@@ -890,17 +890,31 @@ function DashboardContent() {
                 💎 Elite Member
               </div>
             </div>
-          ) : (
-            <div className="upgrade">
+          ) : plan === "PREMIUM" ? (
+            <div className="upgrade" style={{ background: "linear-gradient(135deg, rgba(200,160,48,0.12), rgba(160,120,32,0.12))", borderColor: "rgba(200,160,48,0.35)" }}>
               <div>
-                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,color:"#1A1A1A",marginBottom:4}}>
-                  Unlock Your Full Cosmic Blueprint ✦
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:20,color:"#1A1A1A",marginBottom:4}}>
+                  👑 AstroLife Pro Active
                 </div>
                 <div style={{fontSize:13,color:"#6B635B"}}>
-                  Upgrade to access all 25+ engines, 30+ modules, unlimited AI chat, and destiny timeline.
+                  Special Lagnas, Gemstones, Lal Kitab & Remedies unlocked. Upgrade to 💎 Elite for Transits, Jaimini, Medical and BTR.
                 </div>
               </div>
-              <Link href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Premium →</Link>
+              <Link href="/dashboard/upgrade" className="upgrade-btn" style={{ background: "linear-gradient(135deg,#a855f7,#7e22ce)" }}>
+                Upgrade to Elite 💎 →
+              </Link>
+            </div>
+          ) : (
+            <div className="upgrade" style={{ background: "linear-gradient(135deg, rgba(34,197,94,0.06), rgba(200,160,48,0.08))", borderColor: "rgba(34,197,94,0.22)" }}>
+              <div>
+                <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:18,color:"#1A1A1A",marginBottom:4}}>
+                  🌱 Current Plan: Basic (The Seed / Beej)
+                </div>
+                <div style={{fontSize:13,color:"#6B635B"}}>
+                  Foundational Kundli active. Upgrade to 👑 Pro or 💎 Elite to unlock advanced timing, transits, remedies, and unlimited AI chat.
+                </div>
+              </div>
+              <Link href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Pro 👑 →</Link>
             </div>
           )}
 
