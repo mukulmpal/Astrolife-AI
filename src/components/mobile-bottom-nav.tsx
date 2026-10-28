@@ -9,7 +9,7 @@ interface EngineItem {
   icon: string;
   label: string;
   href: string;
-  badge?: "PRO" | "ELITE";
+  badge?: "BASIC" | "PRO" | "ELITE";
 }
 
 const ENGINE_ITEMS: EngineItem[] = [
@@ -38,20 +38,20 @@ const ENGINE_ITEMS: EngineItem[] = [
   { icon: "🛍️", label: "Transit Purchase", href: "/dashboard/transit-purchase", badge: "PRO" },
 
   // BASIC & Foundational Engines
-  { icon: "⚖️", label: "Shadbala", href: "/dashboard/shadbala" },
-  { icon: "⏳", label: "Dasha", href: "/dashboard/dasha" },
-  { icon: "🧮", label: "Ashtakavarga", href: "/dashboard/ashtakavarga" },
-  { icon: "🧠", label: "Psychology", href: "/dashboard/psychology" },
-  { icon: "🧭", label: "KP System", href: "/dashboard/kp" },
-  { icon: "📡", label: "Event Radar", href: "/dashboard/event-radar" },
-  { icon: "❓", label: "Prashna", href: "/dashboard/prashna" },
-  { icon: "📅", label: "Panchang", href: "/dashboard/panchang" },
-  { icon: "✨", label: "Muhurat", href: "/dashboard/muhurat" },
-  { icon: "🔯", label: "Sarvatobhadra", href: "/dashboard/sarvatobhadra" },
-  { icon: "🏦", label: "Astro Bank", href: "/dashboard/astro-bank" },
-  { icon: "📄", label: "Report", href: "/dashboard/report" },
-  { icon: "🤖", label: "AI Astrologer", href: "/dashboard/chat" },
-  { icon: "📊", label: "History", href: "/dashboard/history" },
+  { icon: "⚖️", label: "Shadbala", href: "/dashboard/shadbala", badge: "BASIC" },
+  { icon: "⏳", label: "Dasha", href: "/dashboard/dasha", badge: "BASIC" },
+  { icon: "🧮", label: "Ashtakavarga", href: "/dashboard/ashtakavarga", badge: "BASIC" },
+  { icon: "🧠", label: "Psychology", href: "/dashboard/psychology", badge: "BASIC" },
+  { icon: "🧭", label: "KP System", href: "/dashboard/kp", badge: "BASIC" },
+  { icon: "📡", label: "Event Radar", href: "/dashboard/event-radar", badge: "BASIC" },
+  { icon: "❓", label: "Prashna", href: "/dashboard/prashna", badge: "BASIC" },
+  { icon: "📅", label: "Panchang", href: "/dashboard/panchang", badge: "BASIC" },
+  { icon: "✨", label: "Muhurat", href: "/dashboard/muhurat", badge: "BASIC" },
+  { icon: "🔯", label: "Sarvatobhadra", href: "/dashboard/sarvatobhadra", badge: "BASIC" },
+  { icon: "🏦", label: "Astro Bank", href: "/dashboard/astro-bank", badge: "BASIC" },
+  { icon: "📄", label: "Report", href: "/dashboard/report", badge: "BASIC" },
+  { icon: "🤖", label: "AI Astrologer", href: "/dashboard/chat", badge: "BASIC" },
+  { icon: "📊", label: "History", href: "/dashboard/history", badge: "BASIC" },
   { icon: "👑", label: "Upgrade Plan", href: "/dashboard/upgrade" },
 ];
 
@@ -150,8 +150,8 @@ export function MobileBottomNav() {
               <div className="mobile-more-top-row">
                 <span className="mobile-more-icon">{item.icon}</span>
                 {item.badge && (
-                  <span className={`mobile-badge-pill ${item.badge === "ELITE" ? "elite" : "pro"}`}>
-                    {item.badge === "ELITE" ? "💎 ELITE" : "👑 PRO"}
+                  <span className={`mobile-badge-pill ${item.badge.toLowerCase()}`}>
+                    {item.badge === "ELITE" ? "💎 ELITE" : item.badge === "PRO" ? "👑 PRO" : "🌱 BASIC"}
                   </span>
                 )}
               </div>
@@ -453,6 +453,12 @@ export function MobileBottomNav() {
             background: linear-gradient(135deg, rgba(200, 160, 48, 0.18), rgba(160, 120, 32, 0.25));
             color: #c8a030;
             border: 1px solid rgba(200, 160, 48, 0.35);
+          }
+
+          .mobile-badge-pill.basic {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.14), rgba(22, 163, 74, 0.22));
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.3);
           }
 
           .mobile-more-label {

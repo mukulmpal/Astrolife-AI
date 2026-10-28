@@ -32,11 +32,11 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Core",
     items: [
       { label: "Dashboard", href: "/dashboard",        Icon: LayoutDashboard },
-      { label: "My Kundli", href: "/dashboard/kundli", Icon: CircleDot       },
-      { label: "Astro Bank", href: "/dashboard/astro-bank", Icon: Database   },
-      { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot },
+      { label: "My Kundli", href: "/dashboard/kundli", Icon: CircleDot, badge: "BASIC" },
+      { label: "Astro Bank", href: "/dashboard/astro-bank", Icon: Database, badge: "BASIC" },
+      { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot, badge: "BASIC" },
       { label: "Predictions", href: "/dashboard/destiny", Icon: TrendingUp, badge: "PRO" },
-      { label: "Report", href: "/dashboard/report", Icon: FileText },
+      { label: "Report", href: "/dashboard/report", Icon: FileText, badge: "BASIC" },
     ],
   },
   {
@@ -50,33 +50,33 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Prediction & Timing",
     items: [
-      { label: "Dasha", href: "/dashboard/dasha", Icon: Timer },
+      { label: "Dasha", href: "/dashboard/dasha", Icon: Timer, badge: "BASIC" },
       { label: "Transits", href: "/dashboard/transits", Icon: Globe, badge: "ELITE" },
-      { label: "Event Radar", href: "/dashboard/event-radar", Icon: Radar },
-      { label: "KP", href: "/dashboard/kp", Icon: Target },
-      { label: "Prashna", href: "/dashboard/prashna", Icon: HelpCircle },
-      { label: "Panchang", href: "/dashboard/panchang", Icon: Calendar },
-      { label: "Muhurat", href: "/dashboard/muhurat", Icon: Sparkles },
+      { label: "Event Radar", href: "/dashboard/event-radar", Icon: Radar, badge: "BASIC" },
+      { label: "KP", href: "/dashboard/kp", Icon: Target, badge: "BASIC" },
+      { label: "Prashna", href: "/dashboard/prashna", Icon: HelpCircle, badge: "BASIC" },
+      { label: "Panchang", href: "/dashboard/panchang", Icon: Calendar, badge: "BASIC" },
+      { label: "Muhurat", href: "/dashboard/muhurat", Icon: Sparkles, badge: "BASIC" },
       { label: "Transit Purchase", href: "/dashboard/transit-purchase", Icon: ShoppingBag, badge: "PRO" },
     ],
   },
   {
     label: "Chart Intelligence",
     items: [
-      { label: "Yogas", href: "/dashboard/yogas", Icon: Sparkles },
-      { label: "Shadbala", href: "/dashboard/shadbala", Icon: BarChart3 },
-      { label: "Ashtakavarga", href: "/dashboard/ashtakavarga", Icon: Grid3x3 },
+      { label: "Yogas", href: "/dashboard/yogas", Icon: Sparkles, badge: "BASIC" },
+      { label: "Shadbala", href: "/dashboard/shadbala", Icon: BarChart3, badge: "BASIC" },
+      { label: "Ashtakavarga", href: "/dashboard/ashtakavarga", Icon: Grid3x3, badge: "BASIC" },
       { label: "Divisional Charts", href: "/dashboard/divisional", Icon: Layers, badge: "ELITE" },
       { label: "Special Lagnas", href: "/dashboard/special-lagnas", Icon: Sunrise, badge: "PRO" },
       { label: "Jaimini", href: "/dashboard/jaimini", Icon: Star, badge: "ELITE" },
-      { label: "Sarvatobhadra", href: "/dashboard/sarvatobhadra", Icon: Grid3x3 },
+      { label: "Sarvatobhadra", href: "/dashboard/sarvatobhadra", Icon: Grid3x3, badge: "BASIC" },
     ],
   },
   {
     label: "Wellness & Remedies",
     items: [
       { label: "Lineage Karma", href: "/dashboard/lineage-karma", Icon: Dna, badge: "ELITE" },
-      { label: "Psychology", href: "/dashboard/psychology", Icon: Brain },
+      { label: "Psychology", href: "/dashboard/psychology", Icon: Brain, badge: "BASIC" },
       { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus, badge: "ELITE" },
       { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem, badge: "PRO" },
       { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf, badge: "PRO" },
@@ -92,7 +92,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Numerology", href: "/dashboard/numerology", Icon: Hash, badge: "PRO" },
       { label: "Palmistry", href: "/dashboard/palmistry", Icon: Hand, badge: "PRO" },
       { label: "Birth Rectification", href: "/dashboard/rectify", Icon: Timer, badge: "ELITE" },
-      { label: "History", href: "/dashboard/history", Icon: History },
+      { label: "History", href: "/dashboard/history", Icon: History, badge: "BASIC" },
     ],
   },
 ];
@@ -173,16 +173,22 @@ export function DashboardSidebar() {
                       borderRadius: "4px",
                       background: badge === "ELITE"
                         ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
-                        : "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))",
-                      color: badge === "ELITE" ? "#c084fc" : "#c8a030",
-                      border: badge === "ELITE" ? "1px solid rgba(168, 85, 247, 0.45)" : "1px solid rgba(200, 160, 48, 0.35)",
+                        : badge === "PRO"
+                        ? "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))"
+                        : "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.25))",
+                      color: badge === "ELITE" ? "#c084fc" : badge === "PRO" ? "#c8a030" : "#16a34a",
+                      border: badge === "ELITE"
+                        ? "1px solid rgba(168, 85, 247, 0.45)"
+                        : badge === "PRO"
+                        ? "1px solid rgba(200, 160, 48, 0.35)"
+                        : "1px solid rgba(34, 197, 94, 0.3)",
                       lineHeight: "1.3",
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "3px",
                     }}
                   >
-                    {badge === "ELITE" ? "💎 ELITE" : badge === "PRO" ? "👑 PRO" : badge}
+                    {badge === "ELITE" ? "💎 ELITE" : badge === "PRO" ? "👑 PRO" : badge === "BASIC" ? "🌱 BASIC" : badge}
                   </span>
                 )}
               </Link>
