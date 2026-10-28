@@ -1479,7 +1479,7 @@ html {
 .panchang-ticker-track {
   display: flex;
   width: max-content;
-  animation: panchangTicker 26s linear infinite;
+  animation: panchangTicker 36s linear infinite;
   will-change: transform;
 }
 

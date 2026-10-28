@@ -3,6 +3,71 @@
 import { useState } from 'react';
 import { calculatePanchang, type PanchangResult } from '@/lib/astro-engine/panchang';
 
+function PanchangItemSequence({ panchang }: { panchang: PanchangResult }) {
+  return (
+    <div className="flex items-center gap-4 pr-8 whitespace-nowrap">
+      <span className="text-[#FAF7F2] font-semibold flex items-center gap-1.5">
+        <span>📅</span> {panchang.weekday}, {panchang.paksha} {panchang.tithi}
+        {panchang.tithiEnd && (
+          <span className="text-[#A89F91] text-[10px] font-normal">(ends {panchang.tithiEnd})</span>
+        )}
+      </span>
+
+      <span className="text-[#D4AF37]/50 font-bold">•</span>
+
+      <span className="text-[#D4AF37] font-semibold flex items-center gap-1.5">
+        <span>🪐</span> {panchang.nakshatra} (Pada {panchang.nakshatraPada})
+        <span className="text-[#A89F91] text-[10px] font-normal">· Lord: {panchang.nakshatraLord}</span>
+      </span>
+
+      <span className="text-[#D4AF37]/50 font-bold">•</span>
+
+      <span className="text-[#E7E2D8] flex items-center gap-1.5">
+        <span>⚡</span> Yoga: <strong>{panchang.yoga}</strong>
+        <span className="text-[#A89F91] text-[10px]">· Karana: {panchang.karana}</span>
+      </span>
+
+      {panchang.abhijitMuhurta && (
+        <>
+          <span className="text-[#D4AF37]/50 font-bold">•</span>
+          <span className="text-emerald-400 font-medium flex items-center gap-1.5 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">
+            <span>🟢</span> Abhijit: {panchang.abhijitMuhurta.start} – {panchang.abhijitMuhurta.end}
+            <span className="text-[9px] uppercase tracking-wider text-emerald-300 font-bold">Golden Window</span>
+          </span>
+        </>
+      )}
+
+      {panchang.rahuKaal && (
+        <>
+          <span className="text-[#D4AF37]/50 font-bold">•</span>
+          <span className="text-rose-400 font-medium flex items-center gap-1.5 bg-rose-950/40 px-2 py-0.5 rounded border border-rose-500/20">
+            <span>🔴</span> Rahu Kaal: {panchang.rahuKaal.start} – {panchang.rahuKaal.end}
+            <span className="text-[9px] uppercase tracking-wider text-rose-300 font-bold">Inauspicious</span>
+          </span>
+        </>
+      )}
+
+      <span className="text-[#D4AF37]/50 font-bold">•</span>
+
+      <span className="text-[#A89F91] flex items-center gap-1.5">
+        <span>🌅</span> Sunrise: {panchang.sunrise} · <span>🌇</span> Sunset: {panchang.sunset}
+      </span>
+
+      <span className="text-[#D4AF37]/50 font-bold">•</span>
+
+      <span className="text-[#E7E2D8] flex items-center gap-1.5">
+        <span>☽</span> Moon: {panchang.moonSign} · <span>☉</span> Sun: {panchang.sunSign}
+      </span>
+
+      <span className="text-[#D4AF37]/50 font-bold">•</span>
+
+      <span className="text-[#D4AF37] text-[10px] uppercase tracking-wider flex items-center gap-1 font-semibold">
+        <span>☸️</span> Lahiri Chitrapaksha Ephemeris (NASA Moshier Engine)
+      </span>
+    </div>
+  );
+}
+
 export function PanchangStrip() {
   const [panchang] = useState<PanchangResult | null>(() => {
     try {
@@ -22,207 +87,133 @@ export function PanchangStrip() {
   return (
     <>
       <div
-        className="relative z-40 w-full border-b py-1 px-3 sm:px-4 text-xs font-mono transition-all overflow-hidden"
+        className="relative z-40 w-full border-b py-1.5 px-2.5 sm:px-4 text-xs font-mono transition-all overflow-hidden"
         style={{
-          background: 'linear-gradient(90deg, #1C1917 0%, #2A241E 50%, #1C1917 100%)',
+          background: 'linear-gradient(90deg, #181512 0%, #25201A 50%, #181512 100%)',
           borderColor: 'rgba(184, 134, 11, 0.35)',
           color: '#FAF7F2',
         }}
       >
-        {/* DESKTOP VIEW (md: and up) */}
-        <div className="hidden md:flex mx-auto max-w-6xl items-center justify-between gap-3 text-10px tracking-wider">
-          {/* Left: Tithi & Nakshatra */}
-          <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-            <span className="flex items-center gap-1.5 font-bold text-[#D4AF37]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-              TODAY&rsquo;S VEDIC PANCHANG:
+        <div className="flex items-center gap-2 sm:gap-3 text-10px sm:text-11px">
+          {/* Pinned Left Badge */}
+          <div className="flex items-center gap-2 flex-shrink-0 z-10 pr-2.5 sm:pr-3.5 border-r border-[#B8860B]/30 bg-[#181512]">
+            <span className="flex items-center gap-1.5 font-bold text-[#D4AF37] tracking-wider whitespace-nowrap text-9px sm:text-10px">
+              <span className="h-2 w-2 rounded-full bg-[#D4AF37] animate-pulse" />
+              <span className="hidden sm:inline">TODAY&rsquo;S VEDIC PANCHANG</span>
+              <span className="sm:hidden">VEDIC PANCHANG</span>
             </span>
-            <span className="text-[#E7E2D8]">
-              {panchang.weekday}, {panchang.paksha} {panchang.tithi}
-            </span>
-            <span className="text-[#8C6508]">•</span>
-            <span className="text-[#D4AF37]">
-              {panchang.nakshatra} (Pada {panchang.nakshatraPada})
-            </span>
-            <span className="text-[#8C6508]">•</span>
-            <span className="text-[#C5BBAF]">
-              Yoga: {panchang.yoga}
-            </span>
+            <button
+              type="button"
+              onClick={() => setShowDetails(!showDetails)}
+              className="px-2 py-0.5 rounded text-9px font-bold bg-[#2A241E] text-[#D4AF37] border border-[#B8860B]/40 hover:bg-[#3D3328] transition-colors cursor-pointer whitespace-nowrap"
+              aria-label="Toggle Full Vedic Panchang Details"
+            >
+              {showDetails ? '▲ Close' : '▼ 5 Limbs'}
+            </button>
           </div>
 
-          {/* Right: Auspicious & Inauspicious Muhurtas */}
-          <div className="flex items-center gap-3 whitespace-nowrap text-10px">
-            {panchang.abhijitMuhurta && (
-              <span className="flex items-center gap-1 text-[#10b981]">
-                <span className="font-semibold text-emerald-400">Abhijit:</span>{' '}
-                {panchang.abhijitMuhurta.start} – {panchang.abhijitMuhurta.end}
-              </span>
-            )}
-            {panchang.rahuKaal && (
-              <span className="flex items-center gap-1 text-[#f87171]">
-                <span className="font-semibold text-rose-400">Rahu Kaal:</span>{' '}
-                {panchang.rahuKaal.start} – {panchang.rahuKaal.end}
-              </span>
-            )}
-            <span className="text-[#8C6508]">•</span>
-            <span className="text-[#A89F91]">
-              🌅 {panchang.sunrise}
-            </span>
-          </div>
-        </div>
-
-        {/* MOBILE VIEW (< md) - Silky smooth marquee ticker + pinned badge */}
-        <div className="flex md:hidden items-center gap-2 text-10px">
-          <button
-            type="button"
-            onClick={() => setShowDetails(!showDetails)}
-            className="flex items-center gap-1 font-bold text-[#D4AF37] flex-shrink-0 bg-[#2A241E] px-2 py-0.5 rounded border border-[#B8860B]/40 text-9px cursor-pointer"
-            aria-label="Toggle Full Vedic Panchang Details"
+          {/* Continuous Left-Scrolling Marquee Ticker (Both Desktop and Mobile) */}
+          <div
+            className="relative flex-1 overflow-hidden whitespace-nowrap"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+            }}
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-            <span>VEDIC PANCHANG</span>
-            <span className="text-8px text-[#D4AF37]/90 font-mono">
-              {showDetails ? '▲ Close' : '▼ View'}
-            </span>
-          </button>
-
-          {/* Continuous Infinite Marquee Ticker */}
-          <div className="relative flex-1 overflow-hidden whitespace-nowrap mask-edges">
-            <div className="panchang-ticker-track text-9px tracking-wide">
+            <div className="panchang-ticker-track text-10px sm:text-11px tracking-wide">
               {/* Set 1 */}
-              <div className="flex items-center gap-3 pr-6">
-                <span className="text-[#E7E2D8]">
-                  📅 {panchang.weekday}, {panchang.paksha} {panchang.tithi}
-                </span>
-                <span className="text-[#8C6508]">•</span>
-                <span className="text-[#D4AF37]">
-                  🪐 {panchang.nakshatra} (Pada {panchang.nakshatraPada})
-                </span>
-                <span className="text-[#8C6508]">•</span>
-                <span className="text-[#C5BBAF]">
-                  ⚡ Yoga: {panchang.yoga}
-                </span>
-                {panchang.abhijitMuhurta && (
-                  <>
-                    <span className="text-[#8C6508]">•</span>
-                    <span className="text-emerald-400">
-                      🟢 Abhijit: {panchang.abhijitMuhurta.start} – {panchang.abhijitMuhurta.end}
-                    </span>
-                  </>
-                )}
-                {panchang.rahuKaal && (
-                  <>
-                    <span className="text-[#8C6508]">•</span>
-                    <span className="text-rose-400">
-                      🔴 Rahu Kaal: {panchang.rahuKaal.start} – {panchang.rahuKaal.end}
-                    </span>
-                  </>
-                )}
-                <span className="text-[#8C6508]">•</span>
-                <span className="text-[#A89F91]">
-                  🌅 Sunrise: {panchang.sunrise}
-                </span>
-              </div>
-
-              {/* Set 2 (for infinite loop) */}
-              <div className="flex items-center gap-3 pr-6">
-                <span className="text-[#E7E2D8]">
-                  📅 {panchang.weekday}, {panchang.paksha} {panchang.tithi}
-                </span>
-                <span className="text-[#8C6508]">•</span>
-                <span className="text-[#D4AF37]">
-                  🪐 {panchang.nakshatra} (Pada {panchang.nakshatraPada})
-                </span>
-                <span className="text-[#8C6508]">•</span>
-                <span className="text-[#C5BBAF]">
-                  ⚡ Yoga: {panchang.yoga}
-                </span>
-                {panchang.abhijitMuhurta && (
-                  <>
-                    <span className="text-[#8C6508]">•</span>
-                    <span className="text-emerald-400">
-                      🟢 Abhijit: {panchang.abhijitMuhurta.start} – {panchang.abhijitMuhurta.end}
-                    </span>
-                  </>
-                )}
-                {panchang.rahuKaal && (
-                  <>
-                    <span className="text-[#8C6508]">•</span>
-                    <span className="text-rose-400">
-                      🔴 Rahu Kaal: {panchang.rahuKaal.start} – {panchang.rahuKaal.end}
-                    </span>
-                  </>
-                )}
-                <span className="text-[#8C6508]">•</span>
-                <span className="text-[#A89F91]">
-                  🌅 Sunrise: {panchang.sunrise}
-                </span>
-              </div>
+              <PanchangItemSequence panchang={panchang} />
+              {/* Set 2 (for seamless continuous infinite leftward scroll) */}
+              <PanchangItemSequence panchang={panchang} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* MOBILE EXPANDED 5-ANGA PANCHANG CARD */}
+      {/* EXPANDED 5-ANGA PANCHANG CARD (Works on all screens) */}
       {showDetails && (
         <div
-          className="md:hidden relative z-40 w-full border-b px-4 py-3 text-xs font-mono transition-all animate-fadeIn"
+          className="relative z-40 w-full border-b px-4 py-3.5 text-xs font-mono transition-all animate-fadeIn"
           style={{
-            background: '#1F1A15',
-            borderColor: 'rgba(184, 134, 11, 0.4)',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+            background: 'linear-gradient(180deg, #1F1A15 0%, #17130F 100%)',
+            borderColor: 'rgba(184, 134, 11, 0.45)',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
           }}
         >
-          <div className="flex items-center justify-between pb-2 border-b border-[#B8860B]/20">
-            <span className="text-10px uppercase tracking-wider font-bold text-[#D4AF37] flex items-center gap-1.5">
-              <span>✦</span> Daily Panchang (5 Limbs of Time)
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowDetails(false)}
-              className="text-10px text-[#A89F91] hover:text-[#FAF7F2] px-2 py-0.5 rounded bg-[#2A241E] border border-[#B8860B]/20"
-            >
-              ✕ Close
-            </button>
-          </div>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#B8860B]/25">
+              <span className="text-11px uppercase tracking-wider font-bold text-[#D4AF37] flex items-center gap-1.5">
+                <span>✦</span> Daily Shastric Panchang (5 Limbs of Time)
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowDetails(false)}
+                className="text-10px text-[#A89F91] hover:text-[#FAF7F2] px-2.5 py-0.5 rounded bg-[#2A241E] border border-[#B8860B]/30 transition-colors"
+              >
+                ✕ Close
+              </button>
+            </div>
 
-          <div className="mt-2.5 grid grid-cols-2 gap-2 text-10px">
-            <div className="rounded p-2 bg-[#2A241E]/80 border border-[#B8860B]/15">
-              <span className="text-[#A89F91] text-9px block">1. Tithi (Lunar Phase)</span>
-              <span className="font-bold text-[#FAF7F2]">{panchang.paksha} {panchang.tithi}</span>
-            </div>
-            <div className="rounded p-2 bg-[#2A241E]/80 border border-[#B8860B]/15">
-              <span className="text-[#A89F91] text-9px block">2. Vara (Weekday)</span>
-              <span className="font-bold text-[#FAF7F2]">{panchang.weekday}</span>
-            </div>
-            <div className="rounded p-2 bg-[#2A241E]/80 border border-[#B8860B]/15">
-              <span className="text-[#A89F91] text-9px block">3. Nakshatra</span>
-              <span className="font-bold text-[#D4AF37]">{panchang.nakshatra} (Pada {panchang.nakshatraPada})</span>
-            </div>
-            <div className="rounded p-2 bg-[#2A241E]/80 border border-[#B8860B]/15">
-              <span className="text-[#A89F91] text-9px block">4. Yoga & 5. Karana</span>
-              <span className="font-bold text-[#FAF7F2]">{panchang.yoga} · {panchang.karana}</span>
-            </div>
-          </div>
-
-          <div className="mt-2 grid grid-cols-2 gap-2 text-10px">
-            {panchang.abhijitMuhurta && (
-              <div className="rounded p-2 bg-[#059669]/10 border border-[#059669]/30">
-                <span className="text-emerald-400 text-9px font-bold block">🟢 Abhijit Muhurta (Shubh)</span>
-                <span className="font-bold text-[#FAF7F2]">{panchang.abhijitMuhurta.start} – {panchang.abhijitMuhurta.end}</span>
+            <div className="mt-3 grid grid-cols-2 md:grid-cols-5 gap-2.5 text-10px">
+              <div className="rounded-lg p-2.5 bg-[#2A241E]/90 border border-[#B8860B]/20">
+                <span className="text-[#A89F91] text-9px block">1. Tithi (Lunar Phase)</span>
+                <span className="font-bold text-[#FAF7F2] text-11px mt-0.5 block">{panchang.paksha} {panchang.tithi}</span>
+                <span className="text-[#A89F91] text-[9px]">Ends {panchang.tithiEnd}</span>
               </div>
-            )}
-            {panchang.rahuKaal && (
-              <div className="rounded p-2 bg-[#DC2626]/10 border border-[#DC2626]/30">
-                <span className="text-rose-400 text-9px font-bold block">🔴 Rahu Kaal (Varjya)</span>
-                <span className="font-bold text-[#FAF7F2]">{panchang.rahuKaal.start} – {panchang.rahuKaal.end}</span>
+              <div className="rounded-lg p-2.5 bg-[#2A241E]/90 border border-[#B8860B]/20">
+                <span className="text-[#A89F91] text-9px block">2. Vara (Weekday)</span>
+                <span className="font-bold text-[#FAF7F2] text-11px mt-0.5 block">{panchang.weekday}</span>
+                <span className="text-[#A89F91] text-[9px]">Vara Lord: {panchang.weekday}</span>
               </div>
-            )}
-          </div>
+              <div className="rounded-lg p-2.5 bg-[#2A241E]/90 border border-[#B8860B]/20">
+                <span className="text-[#A89F91] text-9px block">3. Nakshatra</span>
+                <span className="font-bold text-[#D4AF37] text-11px mt-0.5 block">{panchang.nakshatra} (P{panchang.nakshatraPada})</span>
+                <span className="text-[#A89F91] text-[9px]">Lord: {panchang.nakshatraLord}</span>
+              </div>
+              <div className="rounded-lg p-2.5 bg-[#2A241E]/90 border border-[#B8860B]/20">
+                <span className="text-[#A89F91] text-9px block">4. Yoga</span>
+                <span className="font-bold text-[#FAF7F2] text-11px mt-0.5 block">{panchang.yoga}</span>
+                <span className="text-[#A89F91] text-[9px]">Sun + Moon Longitude</span>
+              </div>
+              <div className="rounded-lg p-2.5 bg-[#2A241E]/90 border border-[#B8860B]/20">
+                <span className="text-[#A89F91] text-9px block">5. Karana (Half-Tithi)</span>
+                <span className="font-bold text-[#FAF7F2] text-11px mt-0.5 block">{panchang.karana}</span>
+                <span className="text-[#A89F91] text-[9px]">Active Karana</span>
+              </div>
+            </div>
 
-          <div className="mt-2 pt-2 border-t border-[#B8860B]/15 flex items-center justify-between text-9px text-[#A89F91]">
-            <span>🌅 Rise: {panchang.sunrise} · 🌇 Set: {panchang.sunset}</span>
-            <span className="text-[#D4AF37]">Lahiri Ephemeris</span>
+            <div className="mt-2.5 grid grid-cols-1 md:grid-cols-3 gap-2.5 text-10px">
+              {panchang.abhijitMuhurta && (
+                <div className="rounded-lg p-2.5 bg-[#059669]/15 border border-[#059669]/35">
+                  <span className="text-emerald-400 text-9px font-bold block flex items-center gap-1">
+                    <span>🟢</span> Abhijit Muhurta (Sarvartha Siddhi)
+                  </span>
+                  <span className="font-bold text-[#FAF7F2] text-11px mt-0.5 block">
+                    {panchang.abhijitMuhurta.start} – {panchang.abhijitMuhurta.end}
+                  </span>
+                </div>
+              )}
+              {panchang.rahuKaal && (
+                <div className="rounded-lg p-2.5 bg-[#DC2626]/15 border border-[#DC2626]/35">
+                  <span className="text-rose-400 text-9px font-bold block flex items-center gap-1">
+                    <span>🔴</span> Rahu Kaal (Varjya Kaala)
+                  </span>
+                  <span className="font-bold text-[#FAF7F2] text-11px mt-0.5 block">
+                    {panchang.rahuKaal.start} – {panchang.rahuKaal.end}
+                  </span>
+                </div>
+              )}
+              <div className="rounded-lg p-2.5 bg-[#2A241E]/90 border border-[#B8860B]/20 flex items-center justify-between">
+                <div>
+                  <span className="text-[#A89F91] text-9px block">Sun Window</span>
+                  <span className="font-bold text-[#FAF7F2] text-10px">🌅 {panchang.sunrise} · 🌇 {panchang.sunset}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[#A89F91] text-9px block">Rashi</span>
+                  <span className="font-bold text-[#D4AF37] text-10px">☽ {panchang.moonSign}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
