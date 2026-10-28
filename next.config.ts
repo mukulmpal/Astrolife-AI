@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   compress: false,
   serverExternalPackages: ["pdfkit", "puppeteer-core", "@sparticuz/chromium", "@sparticuz/chromium-min"],
+  outputFileTracingExcludes: {
+    "api/astro/rectify/pdf": [
+      "./node_modules/@sparticuz/**",
+      "./node_modules/puppeteer-core/**",
+    ],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
