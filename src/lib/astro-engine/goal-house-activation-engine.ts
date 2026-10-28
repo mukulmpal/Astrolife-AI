@@ -17,6 +17,7 @@ import {
   type AstroVastuDirection,
   ASTRO_VASTU_SIGN_DIRECTIONS,
   RASHIS_HINDI,
+  getSignNumber,
 } from "./astro-vastu-types";
 import {
   calculateCompoundDegree,
@@ -196,55 +197,61 @@ function findPlanetData(chart: ChartData, name: string): any | null {
 }
 
 export function resolveEffectiveCusps(chart: ChartData): HouseCuspData[] {
+  let baseCusps: HouseCuspData[] = [];
   if (chart.kpCusps && Array.isArray(chart.kpCusps) && chart.kpCusps.length >= 12) {
-    return chart.kpCusps;
-  }
-  if (chart.houseCusps && Array.isArray(chart.houseCusps) && chart.houseCusps.length > 0) {
-    // If partial cusps provided, fill missing from Lagna
-    if (chart.houseCusps.length === 12) {
-      return chart.houseCusps;
+    baseCusps = chart.kpCusps;
+  } else if (chart.houseCusps && Array.isArray(chart.houseCusps) && chart.houseCusps.length === 12) {
+    baseCusps = chart.houseCusps;
+  } else {
+    const lagna1to12 = getSignNumber(chart.lagnaRashi, chart.lagnaNum);
+    const lagnaLon = chart.lagnaLon || 0;
+    const lagnaDegInSign = lagnaLon % 30;
+
+    const RASHIS = [
+      "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+      "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+    ];
+
+    const generated: HouseCuspData[] = [];
+    for (let h = 1; h <= 12; h++) {
+      const existing = chart.houseCusps?.find((c) => c.house === h);
+      if (existing) {
+        generated.push(existing);
+        continue;
+      }
+      const sNum = ((lagna1to12 - 1 + (h - 1)) % 12) + 1;
+      const sName = RASHIS[sNum - 1];
+      const lon = ((sNum - 1) * 30 + lagnaDegInSign) % 360;
+      generated.push({
+        house: h,
+        lon,
+        sign: sName,
+        signNum: sNum,
+        degree: Math.floor(lagnaDegInSign),
+        minutes: Math.round((lagnaDegInSign - Math.floor(lagnaDegInSign)) * 60),
+        nakshatra: "Ashwini",
+        nakshatraLord: "Ketu",
+        pada: 1,
+        source: "degree-equal-bhava",
+      });
     }
+    baseCusps = generated;
   }
 
-  // Build/merge using chart.houseCusps if present, else fallback from Lagna
-  const lagnaNum = chart.lagnaNum || 1;
-  const lagnaLon = chart.lagnaLon || 0;
-  const lagnaDegInSign = lagnaLon % 30;
-
-  const RASHIS = [
-    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-  ];
-
-  const generated: HouseCuspData[] = [];
-  for (let h = 1; h <= 12; h++) {
-    const existing = chart.houseCusps?.find((c) => c.house === h);
-    if (existing) {
-      generated.push(existing);
-      continue;
-    }
-    const sNum = ((lagnaNum - 1 + (h - 1)) % 12) + 1;
-    const sName = RASHIS[sNum - 1];
-    const lon = ((sNum - 1) * 30 + lagnaDegInSign) % 360;
-    generated.push({
-      house: h,
-      lon,
-      sign: sName,
+  // Ensure every single cusp has guaranteed 1-indexed signNum (1..12)
+  return baseCusps.map((c) => {
+    const sNum = getSignNumber(c.sign, c.signNum);
+    return {
+      ...c,
       signNum: sNum,
-      degree: Math.floor(lagnaDegInSign),
-      minutes: Math.round((lagnaDegInSign - Math.floor(lagnaDegInSign)) * 60),
-      nakshatra: "Ashwini",
-      nakshatraLord: "Ketu",
-      pada: 1,
-      source: "degree-equal-bhava",
-    });
-  }
-  return generated;
+    };
+  });
 }
 
 export function getCuspCompoundDegree(cusp: HouseCuspData): number {
   const degInSign = (cusp.degree || 0) + (cusp.minutes || 0) / 60;
-  return calculateCompoundDegree(cusp.signNum, degInSign);
+  const sNum = getSignNumber(cusp.sign, cusp.signNum);
+  return calculateCompoundDegree(sNum, degInSign);
 }
 
 // ── Planet-to-House Hit Calculation ─────────────────────────────────────────
@@ -564,10 +571,10 @@ export function evaluateGoalHouseActivation(
     biometricDotInstructionHi: string
   ): GoalActivationHouseDetail => {
     const cusp = cusps.find((c) => c.house === houseNum) || cusps[(houseNum - 1) % 12];
-    const sNum = cusp.signNum || ((chart.lagnaNum - 1 + (houseNum - 1)) % 12) + 1;
+    const sNum = getSignNumber(cusp?.sign, cusp?.signNum);
     const compoundDeg = getCuspCompoundDegree(cusp);
-    const dirData = ASTRO_VASTU_SIGN_DIRECTIONS[sNum];
-    const bodyPart = SIGN_BODY_PART_MAPPINGS[sNum];
+    const dirData = ASTRO_VASTU_SIGN_DIRECTIONS[sNum] || ASTRO_VASTU_SIGN_DIRECTIONS[1];
+    const bodyPart = SIGN_BODY_PART_MAPPINGS[sNum] || SIGN_BODY_PART_MAPPINGS[1];
 
     return {
       house: houseNum,
