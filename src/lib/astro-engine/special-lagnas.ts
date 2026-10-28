@@ -349,7 +349,7 @@ const META: Record<SpecialLagnaKey, Omit<SpecialLagnaItem, "sign" | "signNum" | 
     shortName: "BL",
     category: "power",
     meaning: "Embodied life force, practical execution, physical vitality, and daily temperament.",
-    interpretation: "Moving from sunrise (1 sign per 48 minutes). Bhava Lagna reflects how chart energy is practically embodied into physical routines and day-to-day actions.",
+    interpretation: "Moving from sunrise at 1 sign per 5 Ghatis (120 minutes / 0.25° per minute per BPHS Ch. 5). Bhava Lagna reflects how chart energy is practically embodied into physical routines and day-to-day actions.",
     actionPlan: ["Align daily routine with BL sign's elemental nature.", "Sustain physical vitality through clean nutrition.", "Guard health during high-intensity periods."],
   },
   SL: {
@@ -1193,10 +1193,10 @@ export function calculateSpecialLagnas(rawChart: ChartData): SpecialLagnaResult 
   const ul = arudhaItems[11];
   const a10 = arudhaItems[9];
 
-  // 2. Sunrise-based Lagnas
+  // 2. Sunrise-based Lagnas (BPHS Ch. 5: HL 1 sign/2.5 Ghatis = 0.5°/m; GL 1 sign/1 Ghati = 1.25°/m; BL 1 sign/5 Ghatis = 0.25°/m)
   const hl = makeItem("HL", sunAtSunrise + minutesSinceSunrise * 0.5, chart);
   const gl = makeItem("GL", sunAtSunrise + minutesSinceSunrise * 1.25, chart);
-  const bl = makeItem("BL", sunAtSunrise + minutesSinceSunrise * 0.625, chart);
+  const bl = makeItem("BL", sunAtSunrise + minutesSinceSunrise * 0.25, chart);
 
   const sunriseItems = [hl, gl, bl];
 

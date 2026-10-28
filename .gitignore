@@ -72,6 +72,7 @@ data/geonames/
 .claude/
 archive/
 backups/
+user_transcripts/
 
 
 .env*.local

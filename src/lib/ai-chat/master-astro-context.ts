@@ -38,6 +38,7 @@ import { evaluateMoonDispositorHealthTiming } from "../astro-engine/transit-heal
 import { evaluateTradingRisk } from "../astro-engine/trading-risk-guardrail";
 import { evaluateCareerSpecifier } from "../astro-engine/career-specifier";
 import { resolvePilgrimagePrescription } from "../astro-engine/pilgrimage-engine";
+import { getTrikaBhavaRemedyAnalysis } from "../astro-engine/trika-remedies-engine";
 import { generateSimpleKundliDossierData } from "../astro-engine/simple-kundli-dossier-engine";
 
 /**
@@ -560,7 +561,10 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
   ✦ Subtle Astro-Vastu Guardrails (Authentic Shastric Directives):
     ✦ [FAMILY CROSS-HIT ISOLATION]: If placing an item in a shared house zone could cross-hit another family member's chart, KEEP REMEDY EXCLUSIVELY in the native's personal pocket, wallet, bedroom, or private study desk (e.g. 4-5 red chilies or copper coin in personal pocket).
     ✦ [WRIST THREAD CAUTION]: The wrist represents Gemini (3rd House). Never tie colored sacred threads on wrists blindly if Gemini/Mercury rules dusthanas (6/8/12), as it immediately triggers anxiety and severs friends/gains.
-    ✦ [NAVEL 2-INCH BOUNDARY]: Dot therapy for Virgo/Mercury must stay strictly within 2 inches above or 2 inches below the navel; never exceed this boundary.`;
+    ✦ [NAVEL 2-INCH BOUNDARY & GHEE INVARIANT]: Dot therapy for Virgo/Mercury must stay strictly within 2 inches above or 2 inches below the navel. When Mercury is Lagna Lord and Mars or Aries sits in dusthanas (6, 8, 12), red vermilion/sindoor on body or navel is strictly prohibited (भड़क जाएगा और रक्तचाप/एसिडिटी बढ़ा देगा); only pure cow desi ghee is prescribed on and around the navel to soothe internal fire.
+    ✦ [FEET THREAD & SILVER GHUNGROO TRAP]: For Aquarius/Pisces Lagna or Saturn in 1st/12th, wearing black threads with silver ghungroos on ankles bridges the Saturn-Rahu-Moon maraka circuit to ground energy, triggering family crises and psychological overwhelm. Must be cut immediately.
+    ✦ [ASTRO-TATTOO SOMATOTOPIC INVARIANT]: Female tattoos/dots MUST strictly occupy the Left anatomical quadrant (वाम अंग); Male strictly Right (दक्षिण अंग). Marriage goal activates 7th house anatomical sign; Health activates 5th house (negates 6th house disease). Venus activations require turquoise/sky blue ink plus natural attar/perfume.
+    ✦ [STUCK MONEY & LOAN RECOVERY (11TH CUSP SUB-LORD KETU)]: When 11th cusp sub-lord is Ketu or under 180° hit from Mars/Sun, avoid direct aggressive confrontation. Feed two-colored or black-and-white street dogs with sweet jaggery bread on Wednesdays/Saturdays, and keep fennel seeds (saunf) + khand wrapped in cloth beside pillow for 43 days to unlock blocked funds.`;
     }
 
     let mandalaSection = "";
@@ -602,6 +606,36 @@ ${varshInfo ? `- Annual Varshphal: ${varshInfo}` : ""}`);
 - Astro-Vastu Psychological Link: ${psych}${hitSection}${mandalaSection}`);
   } catch (err) {
     console.warn("[MasterAstroContext] Astro-Vastu error:", err);
+  }
+
+  // ── 14B. TRIKA BHAVA MATRIX & SACRED MITIGATION (6TH, 8TH, 12TH DUSTHANAS) ───
+  try {
+    const p6 = Object.values(chart.planets).find(p => p.house === 6)?.name;
+    const p8 = Object.values(chart.planets).find(p => p.house === 8)?.name;
+    const p12 = Object.values(chart.planets).find(p => p.house === 12)?.name;
+    const trika = getTrikaBhavaRemedyAnalysis({
+      house6Planet: p6,
+      house8Planet: p8,
+      house12Planet: p12,
+    });
+    const spec = trika.chartSpecificPrescription;
+
+    sections.push(`### 14B. TRIKA BHAVA (6, 8, 12) REMEDIAL MATRIX & PREVENTIVE TITHE
+- 6th House (Roga/Rina/Shatru) Plant Shield:
+  ✦ Target Planet: ${spec?.house6Planet || "None in 6th"} ➔ Plant: ${spec?.activePlantRemedy?.plantNameHi} (${spec?.activePlantRemedy?.plantNameEn})
+  ✦ Protocol: ${spec?.activePlantRemedy?.mediumSpecificationHi} | ${spec?.activePlantRemedy?.wateringProtocolHi}
+  ✦ Ailment/Debt Relief: ${spec?.activePlantRemedy?.targetAilmentDebtHi}
+- 8th House (Peeda/Accidents/Sudden Traumas) Fruit & Bhojan Daan:
+  ✦ Target Planet: ${spec?.house8Planet || "None in 8th"} ➔ Daan Item: ${spec?.activeFruitRemedy?.fruitOrFoodHi} (${spec?.activeFruitRemedy?.quantityHi})
+  ✦ Venue & Timing: ${spec?.activeFruitRemedy?.donationVenueHi} on ${spec?.activeFruitRemedy?.timingDayHi}
+  ✦ Protection: ${spec?.activeFruitRemedy?.targetPeedaHi}
+- 12th House (Vyaya/Hospital/Penalties) KP Voluntary Tithe:
+  ✦ Target Planet: ${spec?.house12Planet || "None in 12th"} ➔ Voluntary Expense: ${spec?.activeTitheRemedy?.voluntaryActionHi}
+  ✦ Involuntary Drain Prevented: ${spec?.activeTitheRemedy?.preventedInvoluntaryDrainHi}
+  ✦ Recipient & Budget: ${spec?.activeTitheRemedy?.recommendedBudgetOrItemHi} to ${spec?.activeTitheRemedy?.targetRecipientHi}
+  ✦ KP Principle: ${spec?.activeTitheRemedy?.kpPrincipleHi}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Trika Bhava matrix error:", err);
   }
 
   // ── 15. SARVATOBHADRA CHAKRA & GOCHAR VEDHA ──────────────────────────────────

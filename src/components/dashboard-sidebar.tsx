@@ -43,8 +43,8 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Relationships",
     items: [
       { label: "Kundali Milan",   href: "/dashboard/kundali-milan",   Icon: Users, badge: "PRO" },
-      { label: "Marriage Timing", href: "/dashboard/marriage-timing", Icon: Heart           },
-      { label: "Family Karma",    href: "/dashboard/family-synastry", Icon: HeartHandshake  },
+      { label: "Marriage Timing", href: "/dashboard/marriage-timing", Icon: Heart, badge: "ELITE" },
+      { label: "Family Karma",    href: "/dashboard/family-synastry", Icon: HeartHandshake, badge: "ELITE" },
     ],
   },
   {
@@ -66,7 +66,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Yogas", href: "/dashboard/yogas", Icon: Sparkles },
       { label: "Shadbala", href: "/dashboard/shadbala", Icon: BarChart3 },
       { label: "Ashtakavarga", href: "/dashboard/ashtakavarga", Icon: Grid3x3 },
-      { label: "Divisional Charts", href: "/dashboard/divisional", Icon: Layers },
+      { label: "Divisional Charts", href: "/dashboard/divisional", Icon: Layers, badge: "ELITE" },
       { label: "Special Lagnas", href: "/dashboard/special-lagnas", Icon: Sunrise },
       { label: "Jaimini", href: "/dashboard/jaimini", Icon: Star },
       { label: "Sarvatobhadra", href: "/dashboard/sarvatobhadra", Icon: Grid3x3 },
@@ -75,15 +75,15 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Wellness & Remedies",
     items: [
-      { label: "Lineage Karma", href: "/dashboard/lineage-karma", Icon: Dna },
+      { label: "Lineage Karma", href: "/dashboard/lineage-karma", Icon: Dna, badge: "ELITE" },
       { label: "Psychology", href: "/dashboard/psychology", Icon: Brain },
       { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus },
       { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem },
       { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf },
       { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen, badge: "PRO" },
-      { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon, badge: "PRO" },
-      { label: "Astro Tattoo (Dot Therapy)", href: "/dashboard/astro-tattoo", Icon: Sparkles, badge: "PRO" },
-      { label: "Astro Sound", href: "/dashboard/astro-sound", Icon: Music },
+      { label: "Astro-Vastu (Hit Theory)", href: "/dashboard/vastu", Icon: HomeIcon, badge: "ELITE" },
+      { label: "Astro Tattoo (Dot Therapy)", href: "/dashboard/astro-tattoo", Icon: Sparkles, badge: "ELITE" },
+      { label: "Astro Sound", href: "/dashboard/astro-sound", Icon: Music, badge: "ELITE" },
     ],
   },
   {
@@ -91,7 +91,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Numerology", href: "/dashboard/numerology", Icon: Hash },
       { label: "Palmistry", href: "/dashboard/palmistry", Icon: Hand, badge: "PRO" },
-      { label: "Birth Rectification", href: "/dashboard/rectify", Icon: Timer },
+      { label: "Birth Rectification", href: "/dashboard/rectify", Icon: Timer, badge: "ELITE" },
       { label: "History", href: "/dashboard/history", Icon: History },
     ],
   },
@@ -171,9 +171,11 @@ export function DashboardSidebar() {
                       letterSpacing: "0.5px",
                       padding: "1px 5px",
                       borderRadius: "4px",
-                      background: "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))",
-                      color: "#c8a030",
-                      border: "1px solid rgba(200, 160, 48, 0.35)",
+                      background: badge === "ELITE"
+                        ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
+                        : "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))",
+                      color: badge === "ELITE" ? "#c084fc" : "#c8a030",
+                      border: badge === "ELITE" ? "1px solid rgba(168, 85, 247, 0.45)" : "1px solid rgba(200, 160, 48, 0.35)",
                       lineHeight: "1.3",
                     }}
                   >

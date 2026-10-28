@@ -20,7 +20,8 @@ export type FeatureKey =
   | "palmistry"
   | "transit_purchase"
   | "astro_sound"
-  | "astro_tattoo";
+  | "astro_tattoo"
+  | "rectify";
 
 export const PLAN_LIMITS = {
   free: {
@@ -48,19 +49,20 @@ export const FEATURE_ACCESS: Record<FeatureKey, SubscriptionTier[]> = {
   psychology: ["premium", "elite"],
   ashtakavarga: ["premium", "elite"],
   numerology: ["premium", "elite"],
-  divisional: ["premium", "elite"],
-  vastu: ["premium", "elite"],
+  divisional: ["elite"],
+  vastu: ["elite"],
   kundali_milan: ["premium", "elite"],
   lalkitab: ["premium", "elite"],
   shadbala: ["premium", "elite"],
   reports: ["premium", "elite"],
   family_charts: ["elite"],
   transit_ripple: ["premium", "elite"],
-  marriage_timing: ["premium", "elite"],
+  marriage_timing: ["elite"],
   palmistry: ["premium", "elite"],
   transit_purchase: ["premium", "elite"],
-  astro_sound: ["premium", "elite"],
-  astro_tattoo: ["premium", "elite"],
+  astro_sound: ["elite"],
+  astro_tattoo: ["elite"],
+  rectify: ["elite"],
 };
 
 export const ELITE_EMAILS = new Set([
