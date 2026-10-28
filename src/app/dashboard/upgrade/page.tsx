@@ -6,18 +6,17 @@ import { createClient } from "@/lib/supabase/client";
 const PLANS = [
   {
     id: "free",
-    name: "Free",
+    name: "🌱 Basic (Beej)",
     price: "₹0",
     period: "forever",
     highlight: false,
     color: "#6B635B",
     features: [
-      "Basic Kundli Chart",
+      "Foundational Janam Kundli",
       "5 AI Questions / month",
       "Daily Horoscope Card",
-      "Top 5 Yogas Only",
-      "Watermarked PDF",
-      "Ad-supported",
+      "Core Yogas & Lagna Analysis",
+      "Panchang & Planetary Positions",
     ],
     cta: "Current Plan",
     disabled: true,

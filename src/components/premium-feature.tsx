@@ -21,7 +21,7 @@ export function PremiumFeature({ children, feature, enforceLock }: PremiumFeatur
   const enforced = enforceLock ?? isBillingEnforced();
   const isPremium = userTier !== "free";
   const isLocked = enforced && !isPremium;
-  const planLabel = userTier.toUpperCase();
+  const planLabel = userTier === "elite" ? "💎 Elite" : userTier === "premium" ? "👑 Pro" : "🌱 Basic";
 
   return (
     <>

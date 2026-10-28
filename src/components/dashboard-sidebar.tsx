@@ -211,7 +211,7 @@ export function DashboardSidebar() {
               aria-current={pathname === "/dashboard/upgrade" ? "page" : undefined}
             >
               <Zap size={15} strokeWidth={1.7} aria-hidden="true" />
-              <span>Upgrade to Premium</span>
+              <span>Upgrade to Pro 👑</span>
             </Link>
           )}
 
