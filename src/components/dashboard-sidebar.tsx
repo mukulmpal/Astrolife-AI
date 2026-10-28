@@ -182,7 +182,7 @@ export function DashboardSidebar() {
                       gap: "3px",
                     }}
                   >
-                    {badge === "ELITE" ? "💎 ELITE" : badge}
+                    {badge === "ELITE" ? "💎 ELITE" : badge === "PRO" ? "👑 PRO" : badge}
                   </span>
                 )}
               </Link>

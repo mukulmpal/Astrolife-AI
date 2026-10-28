@@ -24,7 +24,7 @@ const PLANS = [
   },
   {
     id: "premium",
-    name: "Premium (Pro)",
+    name: "Pro 👑",
     price: "₹499",
     period: "/ month",
     highlight: true,
@@ -38,7 +38,7 @@ const PLANS = [
       "PDF Exports — No Watermark",
       "Advanced PDF Reports",
     ],
-    cta: "Upgrade to Pro",
+    cta: "Upgrade to Pro 👑",
     disabled: false,
   },
   {
