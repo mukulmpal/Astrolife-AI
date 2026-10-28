@@ -163,4 +163,71 @@ describe("Astro-Pharmacological Prescription Engine (Dynamic & Non-Hardcoded)", 
     assert.equal(saturnRx.compoundThread.blendedHex, "#1D4ED8");
     assert.ok(saturnRx.compoundThread.blendedColorName.includes("Royal Indigo"));
   });
+
+  it("should generate completely distinct footwear, cap, belt, and mask across all 12 Lagnas", () => {
+    const rashiNames = [
+      "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+      "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+    ];
+
+    const allAccs = rashiNames.map((rashi, idx) => {
+      const chart = {
+        name: `${rashi} Native`,
+        lagnaRashi: rashi,
+        lagnaNum: idx,
+        dashas: [{ planet: "Jupiter", active: true, start: new Date("2024-01-01"), end: new Date("2036-01-01") }],
+        planets: {
+          Jupiter: { sign: rashi, signNum: idx + 1, degree: 15, minutes: 0, house: 1, lon: idx * 30 + 15 },
+          Moon: { sign: "Aries", signNum: 1, degree: 10, minutes: 0, house: 1, lon: 10, nakshatra: "Ashwini" },
+        }
+      } as unknown as ChartData;
+      return evaluateDailyAccessories(chart);
+    });
+
+    // Check that footwear mechanism mentions different 12th house signs
+    const footMechanisms = allAccs.map(a => a.footwear.planetaryMechanism);
+    assert.equal(new Set(footMechanisms).size, 12, "All 12 Lagnas must have unique footwear mechanisms");
+
+    // Check that belt buckle metals are tailored to 7th houses
+    const beltBuckles = allAccs.map(a => a.belt.buckleMetal);
+    assert.ok(beltBuckles.some(b => b.includes("सिल्वर")));
+    assert.ok(beltBuckles.some(b => b.includes("ब्रास") || b.includes("पीतल")));
+    assert.ok(beltBuckles.some(b => b.includes("स्टील")));
+
+    // Check that face mask fabrics and mechanisms are tailored
+    const maskMechanisms = allAccs.map(a => a.faceMask.planetaryMechanism);
+    assert.equal(new Set(maskMechanisms).size, 12, "All 12 Lagnas must have unique face mask mechanisms");
+  });
+
+  it("should accurately resolve Hindi and Sanskrit lagna names without defaulting to Aries", () => {
+    const hindiChart = {
+      name: "मिथुन जातक",
+      lagnaRashi: "मिथुन",
+      dashas: [{ planet: "Mercury", active: true, start: new Date("2024-01-01"), end: new Date("2030-01-01") }],
+      planets: {
+        Mercury: { sign: "Gemini", signNum: 3, degree: 10, minutes: 0, house: 1, lon: 70 },
+      }
+    } as unknown as ChartData;
+
+    const acc = evaluateDailyAccessories(hindiChart);
+    // Gemini 3rd house is Leo (Sun) -> Amber Gold, Copper Tan
+    assert.ok(acc.phoneCover.recommendedColors.some(c => c.includes("Amber Gold") || c.includes("Copper Tan")));
+    // Gemini 12th house is Taurus (Venus) -> Ivory Cream
+    assert.ok(acc.footwear.recommendedColors.some(c => c.includes("Ivory Cream")));
+
+    const sanskritChart = {
+      name: "Kanya Native",
+      lagnaRashi: "Kanya",
+      dashas: [{ planet: "Mercury", active: true, start: new Date("2024-01-01"), end: new Date("2030-01-01") }],
+      planets: {
+        Mercury: { sign: "Virgo", signNum: 6, degree: 10, minutes: 0, house: 1, lon: 160 },
+      }
+    } as unknown as ChartData;
+
+    const accKanya = evaluateDailyAccessories(sanskritChart);
+    // Virgo 3rd house is Scorpio (Mars) -> Terracotta Tan
+    assert.ok(accKanya.phoneCover.recommendedColors.some(c => c.includes("Terracotta Tan")));
+    // Virgo 12th house is Leo (Sun) -> Golden Amber
+    assert.ok(accKanya.footwear.recommendedColors.some(c => c.includes("Golden Amber")));
+  });
 });

@@ -37,6 +37,26 @@ export const RASHIS_ORDER = [
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ] as const;
 
+export const RASHIS_SANSKRIT = [
+  "Mesha", "Vrishabha", "Mithuna", "Karkata", "Simha", "Kanya",
+  "Tula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"
+] as const;
+
+export const RASHIS_SANSKRIT_VARIANTS: Record<number, string[]> = {
+  1: ["mesha", "mesa", "aries", "मेष"],
+  2: ["vrishabha", "vrishabh", "vrshabha", "taurus", "वृषभ"],
+  3: ["mithuna", "mithun", "gemini", "मिथुन"],
+  4: ["karka", "karkata", "kark", "cancer", "कर्क"],
+  5: ["simha", "singh", "leo", "सिंह"],
+  6: ["kanya", "virgo", "कन्या"],
+  7: ["tula", "libra", "तुला"],
+  8: ["vrishchika", "vrischika", "vrischik", "scorpio", "वृश्चिक"],
+  9: ["dhanu", "dhanus", "dhanusha", "sagittarius", "धनु"],
+  10: ["makara", "makar", "capricorn", "मकर"],
+  11: ["kumbha", "kumbh", "aquarius", "कुंभ"],
+  12: ["meena", "mina", "meen", "pisces", "मीन"],
+};
+
 /**
  * 12 Signs mapped to Directions in Astro-Vastu Hit Theory.
  */
@@ -57,16 +77,22 @@ export const ASTRO_VASTU_SIGN_DIRECTIONS: Record<number, AstroVastuDirection> = 
 
 /**
  * Normalizes sign string or 1-12 number into a 1-based sign index (1 = Aries ... 12 = Pisces).
+ * Fully supports English, Sanskrit, and Hindi sign names.
  */
 export function getSignNumber(signNameOrNum?: string | number, signStringFallback?: string): number {
-  const candidateStr = typeof signNameOrNum === "string" ? signNameOrNum : signStringFallback;
-  if (candidateStr && typeof candidateStr === "string") {
-    const idx = RASHIS_ORDER.findIndex(r => r.toLowerCase() === candidateStr.toLowerCase());
-    if (idx >= 0) return idx + 1;
-  }
   if (typeof signNameOrNum === "number") {
-    if (signNameOrNum === 0) return 1;
     if (signNameOrNum >= 1 && signNameOrNum <= 12) return signNameOrNum;
+    if (signNameOrNum === 0) return 1;
+  }
+  const candidateStr = (typeof signNameOrNum === "string" ? signNameOrNum : signStringFallback)?.trim().toLowerCase();
+  if (candidateStr) {
+    for (const [numStr, variants] of Object.entries(RASHIS_SANSKRIT_VARIANTS)) {
+      if (variants.some(v => v.toLowerCase() === candidateStr || candidateStr.includes(v.toLowerCase()))) {
+        return Number(numStr);
+      }
+    }
+    const idx = RASHIS_ORDER.findIndex(r => r.toLowerCase() === candidateStr);
+    if (idx >= 0) return idx + 1;
   }
   return 1;
 }

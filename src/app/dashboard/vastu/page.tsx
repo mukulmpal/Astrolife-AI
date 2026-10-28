@@ -5,7 +5,7 @@ import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { PremiumFeature } from "@/components/premium-feature";
 import { downloadVastuPDFReport } from "@/lib/report-generator";
 import { calculateVastu, type VastuResult as CompleteVastuResult } from "@/lib/astro-engine/vastu";
-import { useUserChart, buildChart, type BirthDetails } from "@/lib/user-chart";
+import { useUserChart, buildChart, listSavedCharts, selectSavedChart, type SavedChartSummary, type BirthDetails } from "@/lib/user-chart";
 import { EngineShell, EngineHeader, EngineSectionTitle } from "@/components/engine/EngineShell";
 import { EngineStateCard } from "@/components/engine-state-card";
 import { AstroVastuHitRadarView } from "@/components/vastu/AstroVastuHitRadarView";
@@ -30,6 +30,27 @@ const DEMO_VASTU_BIRTH: BirthDetails = {
   city: "Delhi",
   tz: 5.5,
 };
+
+export const VASTU_LAGNA_PRESETS: Array<{
+  signNum: number;
+  signEn: string;
+  signHi: string;
+  icon: string;
+  birth: BirthDetails;
+}> = [
+  { signNum: 1, signEn: "Aries", signHi: "मेष", icon: "♈", birth: { name: "मेष लग्न चक्र (Aries)", dob: "1995-04-15", tob: "06:30", city: "Delhi", tz: 5.5 } },
+  { signNum: 2, signEn: "Taurus", signHi: "वृषभ", icon: "♉", birth: { name: "वृषभ लग्न चक्र (Taurus)", dob: "1995-04-15", tob: "08:15", city: "Delhi", tz: 5.5 } },
+  { signNum: 3, signEn: "Gemini", signHi: "मिथुन", icon: "♊", birth: { name: "मिथुन लग्न चक्र (Gemini)", dob: "1995-04-15", tob: "10:15", city: "Delhi", tz: 5.5 } },
+  { signNum: 4, signEn: "Cancer", signHi: "कर्क", icon: "♋", birth: { name: "कर्क लग्न चक्र (Cancer)", dob: "1995-04-15", tob: "12:30", city: "Delhi", tz: 5.5 } },
+  { signNum: 5, signEn: "Leo", signHi: "सिंह", icon: "♌", birth: { name: "सिंह लग्न चक्र (Leo)", dob: "1995-04-15", tob: "14:45", city: "Delhi", tz: 5.5 } },
+  { signNum: 6, signEn: "Virgo", signHi: "कन्या", icon: "♍", birth: { name: "कन्या लग्न चक्र (Virgo)", dob: "1995-07-04", tob: "12:30", city: "Delhi", tz: 5.5 } },
+  { signNum: 7, signEn: "Libra", signHi: "तुला", icon: "♎", birth: { name: "तुला लग्न चक्र (Libra)", dob: "1995-04-15", tob: "19:15", city: "Delhi", tz: 5.5 } },
+  { signNum: 8, signEn: "Scorpio", signHi: "वृश्चिक", icon: "♏", birth: { name: "वृश्चिक लग्न चक्र (Scorpio)", dob: "1995-04-15", tob: "21:30", city: "Delhi", tz: 5.5 } },
+  { signNum: 9, signEn: "Sagittarius", signHi: "धनु", icon: "♐", birth: { name: "धनु लग्न चक्र (Sagittarius)", dob: "1995-04-15", tob: "23:45", city: "Delhi", tz: 5.5 } },
+  { signNum: 10, signEn: "Capricorn", signHi: "मकर", icon: "♑", birth: { name: "मकर लग्न चक्र (Capricorn)", dob: "1995-04-16", tob: "01:45", city: "Delhi", tz: 5.5 } },
+  { signNum: 11, signEn: "Aquarius", signHi: "कुंभ", icon: "♒", birth: { name: "कुंभ लग्न चक्र (Aquarius)", dob: "1995-04-16", tob: "03:30", city: "Delhi", tz: 5.5 } },
+  { signNum: 12, signEn: "Pisces", signHi: "मीन", icon: "♓", birth: { name: "मीन लग्न चक्र (Pisces)", dob: "1995-04-16", tob: "05:00", city: "Delhi", tz: 5.5 } },
+];
 
 type Direction = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "CENTER" | "";
 
@@ -567,13 +588,36 @@ export default function VastuDashboardPage() {
 
   // Wall Clock Zone State
   const [wallClockZone, setWallClockZone] = useState<string>("N");
-  const isDemo = !hasUserChart || !chart?.planets || Object.keys(chart.planets).length === 0;
+
+  // Dynamic Lagna Switcher & Custom Chart State
+  const [selectedPresetLagna, setSelectedPresetLagna] = useState<number | null>(null);
+  const [customBirth, setCustomBirth] = useState<BirthDetails | null>(null);
+  const [showCustomForm, setShowCustomForm] = useState<boolean>(false);
+  const [customName, setCustomName] = useState<string>("");
+  const [customDob, setCustomDob] = useState<string>("1995-01-01");
+  const [customTob, setCustomTob] = useState<string>("12:00");
+  const [customCity, setCustomCity] = useState<string>("Delhi");
+  const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
+
+  useEffect(() => {
+    listSavedCharts().then(setSavedCharts).catch(() => {});
+  }, []);
+
+  const isDemo = (!hasUserChart || !chart?.planets || Object.keys(chart.planets).length === 0) && selectedPresetLagna === null && !customBirth;
+  
   const effectiveChart = useMemo(() => {
-    if (!isDemo && chart) {
+    if (selectedPresetLagna !== null) {
+      const preset = VASTU_LAGNA_PRESETS.find(p => p.signNum === selectedPresetLagna);
+      if (preset) return buildChart(preset.birth);
+    }
+    if (customBirth) {
+      return buildChart(customBirth);
+    }
+    if (!isDemo && chart && chart.planets && Object.keys(chart.planets).length > 0) {
       return chart;
     }
     return buildChart(DEMO_VASTU_BIRTH);
-  }, [isDemo, chart]);
+  }, [selectedPresetLagna, customBirth, isDemo, chart]);
 
   const completeAnalysis = useMemo(() => {
     if (!effectiveChart?.planets) return null;
@@ -741,68 +785,269 @@ export default function VastuDashboardPage() {
         ]}
       />
 
-      {/* Demo Chart Notice Banner when no personal chart is loaded */}
-      {isDemo && (
-        <div
-          style={{
-            background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(184, 134, 11, 0.05))",
-            border: "1px solid rgba(212, 175, 55, 0.35)",
-            borderRadius: 14,
-            padding: "14px 18px",
-            marginBottom: 20,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
+      {/* ── INTERACTIVE ASTRO-VASTU KUNDLI SELECTOR & 12-LAGNA SWITCHER ── */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #FFFDF8, #FAF5EB)",
+          border: "1.5px solid rgba(212, 175, 55, 0.45)",
+          borderRadius: 14,
+          padding: "16px 20px",
+          marginBottom: 20,
+          boxShadow: "0 4px 16px rgba(184, 134, 11, 0.08)",
+        }}
+      >
+        {/* Top Row: Current Chart Info & Action Buttons */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 24 }}>💡</span>
+            <span style={{ fontSize: 28 }}>🧭</span>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#8A6008" }}>
-                डेमो कुंडली सक्रिय (Sample Kundli: कन्या लग्न)
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 16, fontWeight: 800, color: "#1A1A1A" }}>
+                  {effectiveChart?.name || "जातक जन्म चक्र"}
+                </span>
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #B8860B, #8A6008)",
+                    color: "#FFFFFF",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    padding: "3px 10px",
+                    borderRadius: 20,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  ♈ लग्न: {effectiveChart?.lagnaRashi || "मेष"}
+                </span>
+                {effectiveChart?.planets?.Moon && (
+                  <span style={{ fontSize: 12, color: "#78350F", background: "#FEF3C7", padding: "3px 8px", borderRadius: 6, fontWeight: 600 }}>
+                    🌙 चंद्र: {effectiveChart.planets.Moon.sign} ({effectiveChart.planets.Moon.nakshatra || "नक्षत्र"})
+                  </span>
+                )}
+                {effectiveChart?.dashas?.find((d: any) => d.active) && (
+                  <span style={{ fontSize: 12, color: "#1E3A8A", background: "#DBEAFE", padding: "3px 8px", borderRadius: 6, fontWeight: 600 }}>
+                    ⏳ सक्रिय: {effectiveChart.dashas.find((d: any) => d.active)?.planet} महादशा
+                  </span>
+                )}
               </div>
-              <div style={{ fontSize: 13, color: "#4A4238", marginTop: 2 }}>
-                आप लाइव एस्ट्रो-वास्तु हिट रडार (3-5-8 नियम), कॉस्मिक फ्रिक्शन रडार व दिशाएं देख रहे हैं। अपनी व्यक्तिगत कुंडली से देखने के लिए अपनी जन्म तिथि जोड़ें।
+              <div style={{ fontSize: 12.5, color: "#6B635B", marginTop: 4 }}>
+                100% व्यक्तिगत कुंडली-संचालित: 45 देवता भाव आवंटन, 32 द्वार, कॉस्मिक फ्रिक्शन रडार एवं दैनिक वेशभूषा वास्तु
               </div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <a
-              href="/onboarding"
+
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            {hasUserChart && (selectedPresetLagna !== null || customBirth !== null) && (
+              <button
+                onClick={() => {
+                  setSelectedPresetLagna(null);
+                  setCustomBirth(null);
+                  setShowCustomForm(false);
+                }}
+                style={{
+                  padding: "7px 14px",
+                  borderRadius: 8,
+                  background: "#16A34A",
+                  color: "#FFFFFF",
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                👤 मेरी प्रोफाइल कुंडली
+              </button>
+            )}
+
+            {savedCharts.length > 0 && (
+              <select
+                onChange={async (e) => {
+                  const chartId = e.target.value;
+                  if (!chartId) return;
+                  const res = await selectSavedChart(chartId);
+                  if (res.chart) {
+                    setSelectedPresetLagna(null);
+                    setCustomBirth(null);
+                    setShowCustomForm(false);
+                  }
+                }}
+                defaultValue=""
+                style={{
+                  padding: "7px 12px",
+                  borderRadius: 8,
+                  border: "1px solid rgba(184, 134, 11, 0.4)",
+                  background: "#FFFFFF",
+                  color: "#8A6008",
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                <option value="" disabled>📁 सेव्ड चार्ट्स ({savedCharts.length})</option>
+                {savedCharts.map((sc) => (
+                  <option key={sc.id} value={sc.id}>
+                    {sc.name} ({sc.dob} {sc.city})
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <button
+              onClick={() => setShowCustomForm(prev => !prev)}
               style={{
-                padding: "8px 16px",
-                borderRadius: 8,
-                background: "#B8860B",
-                color: "#FAF7F2",
-                fontSize: 13,
-                fontWeight: 600,
-                textDecoration: "none",
-                display: "inline-block",
-              }}
-            >
-              + अपनी कुंडली बनाएं
-            </a>
-            <a
-              href="/dashboard/history"
-              style={{
-                padding: "8px 16px",
+                padding: "7px 14px",
                 borderRadius: 8,
                 border: "1px solid rgba(184, 134, 11, 0.4)",
-                background: "#FFFFFF",
+                background: showCustomForm ? "#FEF3C7" : "#FFFFFF",
                 color: "#8A6008",
-                fontSize: 13,
-                fontWeight: 600,
-                textDecoration: "none",
-                display: "inline-block",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer",
               }}
             >
-              सेव्ड कुंडली चुनें
-            </a>
+              {showCustomForm ? "✕ बंद करें" : "✍️ नई जन्म तिथि जोड़ें"}
+            </button>
           </div>
         </div>
-      )}
+
+        {/* Custom Birth Details Input Form */}
+        {showCustomForm && (
+          <div
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid #FCD34D",
+              borderRadius: 10,
+              padding: 14,
+              marginBottom: 14,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+              gap: 10,
+              alignItems: "end",
+            }}
+          >
+            <div>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#78350F", marginBottom: 3 }}>
+                जातक का नाम:
+              </label>
+              <input
+                type="text"
+                value={customName}
+                placeholder="उदा. राहुल शर्मा"
+                onChange={(e) => setCustomName(e.target.value)}
+                style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: "1px solid #D1D5DB", fontSize: 12 }}
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#78350F", marginBottom: 3 }}>
+                जन्म तिथि (DOB):
+              </label>
+              <input
+                type="date"
+                value={customDob}
+                onChange={(e) => setCustomDob(e.target.value)}
+                style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: "1px solid #D1D5DB", fontSize: 12 }}
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#78350F", marginBottom: 3 }}>
+                जन्म समय (TOB):
+              </label>
+              <input
+                type="time"
+                value={customTob}
+                onChange={(e) => setCustomTob(e.target.value)}
+                style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: "1px solid #D1D5DB", fontSize: 12 }}
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#78350F", marginBottom: 3 }}>
+                जन्म शहर (City):
+              </label>
+              <input
+                type="text"
+                value={customCity}
+                placeholder="Delhi"
+                onChange={(e) => setCustomCity(e.target.value)}
+                style={{ width: "100%", padding: "6px 10px", borderRadius: 6, border: "1px solid #D1D5DB", fontSize: 12 }}
+              />
+            </div>
+            <div>
+              <button
+                onClick={() => {
+                  if (!customDob || !customTob) return;
+                  setCustomBirth({
+                    name: customName.trim() || "व्यक्तिगत कुंडली",
+                    dob: customDob,
+                    tob: customTob,
+                    city: customCity.trim() || "Delhi",
+                    tz: 5.5,
+                  });
+                  setSelectedPresetLagna(null);
+                  setShowCustomForm(false);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "7px 12px",
+                  borderRadius: 6,
+                  background: "#B8860B",
+                  color: "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                ✓ कुंडली लागू करें
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Row: 12 Zodiac Lagna Quick Switcher Pills */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#78350F" }}>
+              ⚡ 12 लग्न त्वरित परीक्षक (Quick 12-Lagna Switcher — क्लिक करें और देखें कि हर चार्ट पर गणनाएं कैसे 100% बदलती हैं):
+            </span>
+            <span style={{ fontSize: 11, color: "#8A6008" }}>
+              (12 Lagnas Live Demo)
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {VASTU_LAGNA_PRESETS.map((p) => {
+              const isActive = (selectedPresetLagna === p.signNum) || 
+                (selectedPresetLagna === null && !customBirth && (effectiveChart?.lagnaRashi === p.signEn || effectiveChart?.lagnaRashi === p.signHi));
+              return (
+                <button
+                  key={p.signNum}
+                  onClick={() => {
+                    setSelectedPresetLagna(p.signNum);
+                    setCustomBirth(null);
+                    setShowCustomForm(false);
+                  }}
+                  style={{
+                    padding: "6px 11px",
+                    borderRadius: 8,
+                    fontSize: 12,
+                    fontWeight: isActive ? 800 : 600,
+                    border: isActive ? "1.5px solid #92400E" : "1px solid #E5E7EB",
+                    background: isActive
+                      ? "linear-gradient(135deg, #B45309, #78350F)"
+                      : "#FFFFFF",
+                    color: isActive ? "#FFFFFF" : "#374151",
+                    cursor: "pointer",
+                    boxShadow: isActive ? "0 2px 8px rgba(180, 83, 9, 0.25)" : "none",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {p.icon} {p.signHi} ({p.signEn.slice(0, 3)}) {isActive && "✓"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* Premium Gate Enforcement */}
       <PremiumFeature feature="Astro-Vastu Shastra (16-Zones)" enforceLock>

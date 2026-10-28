@@ -3,6 +3,7 @@
 // Authentic Classical Vedic Shilpa Shastra & Brihat Samhita Formulations
 
 import type { ChartData } from "./calculations";
+import { getSignNumber } from "./astro-vastu-types";
 
 export type DevataClassification = "Devata" | "Asura";
 
@@ -1423,17 +1424,20 @@ const RASHIS_ORDER = [
 function resolveNative1IndexedLagna(chart: ChartData): number {
   if (!chart) return 1;
   if (typeof chart.lagnaRashi === "string" && chart.lagnaRashi.trim()) {
-    const idx = RASHIS_ORDER.findIndex(r => r.toLowerCase() === chart.lagnaRashi.trim().toLowerCase());
-    if (idx >= 0) return idx + 1;
+    const sNum = getSignNumber(chart.lagnaRashi.trim());
+    if (sNum >= 1 && sNum <= 12) return sNum;
   }
   if (typeof chart.lagnaLon === "number") {
     const idx = Math.floor((((chart.lagnaLon % 360) + 360) % 360) / 30);
     return idx + 1;
   }
   if (typeof chart.lagnaNum === "number") {
+    if (chart.lagnaNum >= 1 && chart.lagnaNum <= 12) return chart.lagnaNum;
     if (chart.lagnaNum === 0) return 1;
-    if (chart.lagnaNum === 12) return 12;
-    return chart.lagnaNum + 1;
+  }
+  if (Array.isArray(chart.houseCusps) && chart.houseCusps[0]?.sign) {
+    const sNum = getSignNumber(chart.houseCusps[0].sign);
+    if (sNum >= 1 && sNum <= 12) return sNum;
   }
   return 1;
 }
