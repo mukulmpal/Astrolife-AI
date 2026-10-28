@@ -479,11 +479,25 @@ function findPlanetData(chart: ChartData, name: string): any | null {
 }
 
 function getLagnaSignNumber(chart: ChartData): number {
+  if (typeof (chart as any).lagnaNum === "number") {
+    return (chart as any).lagnaNum + 1; // 0-indexed in ChartData to 1-indexed
+  }
+  if (typeof (chart as any).lagnaRashi === "string") {
+    const match = ANATOMICAL_SIGNS.find(s => s.signName.toLowerCase() === (chart as any).lagnaRashi.toLowerCase());
+    if (match) return match.signNumber;
+  }
   if (chart.houses && chart.houses.length > 0) {
     const h1 = chart.houses[0];
     if (typeof h1.signNumber === "number") return h1.signNumber;
     if (typeof h1.sign === "string") {
       const match = ANATOMICAL_SIGNS.find(s => s.signName.toLowerCase() === h1.sign.toLowerCase());
+      if (match) return match.signNumber;
+    }
+  }
+  if ((chart as any).houseCusps && (chart as any).houseCusps.length > 0) {
+    const c1 = (chart as any).houseCusps[0];
+    if (typeof c1.sign === "string") {
+      const match = ANATOMICAL_SIGNS.find(s => s.signName.toLowerCase() === c1.sign.toLowerCase());
       if (match) return match.signNumber;
     }
   }
@@ -569,8 +583,8 @@ export function generateAstroTattooAudit(
   const lagnaSignNum = getLagnaSignNumber(chart);
   const lagnaSign = ANATOMICAL_SIGNS[lagnaSignNum - 1];
 
-  const currentMahadasha = chart.dasha?.currentDasha?.mahadasha || "Venus";
-  const currentAntardasha = chart.dasha?.currentDasha?.antardasha || "Moon";
+  const currentMahadasha = (chart as any).dashas?.find((d: any) => d.active)?.planet || chart.dasha?.currentDasha?.mahadasha || "Venus";
+  const currentAntardasha = (chart as any).antardasha?.find((d: any) => d.active)?.planet || chart.dasha?.currentDasha?.antardasha || "Moon";
 
   const targetPlanetChoice = options?.selectedPlanet;
   const activatingResolution = targetPlanetChoice

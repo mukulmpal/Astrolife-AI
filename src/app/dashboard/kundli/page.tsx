@@ -29,9 +29,11 @@ import {
   generateTimingPillarNarrative,
   generateSpecsPillarNarrative,
 } from "@/lib/astro-engine/pillar-narrative-engine";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, X, Sparkles } from "lucide-react";
 import { evaluateVargaNeuroKarmicProfile } from "@/lib/astro-intelligence/varga-neuro-remedies-engine";
 import { VargaNeuroKarmicCards } from "@/components/charts/VargaNeuroKarmicCards";
+import { LiveDashaTickerStrip } from "@/components/dasha/LiveDashaTickerStrip";
+import { VimshottariFiveLevelExplorer } from "@/components/dasha/VimshottariFiveLevelExplorer";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -133,11 +135,62 @@ export default function KundliPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showForm, setShowForm] = useState(() => !(hasUserChart && primaryChart));
   const [showLibrary, setShowLibrary] = useState(false);
+  const [isNewChartModalOpen, setIsNewChartModalOpen] = useState(false);
   const [editingSavedChart, setEditingSavedChart] = useState<SavedChartSummary | null>(null);
   const [deletingSavedChart, setDeletingSavedChart] = useState<SavedChartSummary | null>(null);
   const [isDeletingSavedChart, setIsDeletingSavedChart] = useState(false);
   const [yogaSearch, setYogaSearch] = useState("");
   const [yogaFilter, setYogaFilter] = useState<"all" | "benefic" | "dosha" | "rare">("all");
+
+  // Check URL query parameters for ?action=new or ?action=saved
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("action") === "new" || params.get("new") === "1") {
+        setIsNewChartModalOpen(true);
+      } else if (params.get("action") === "saved") {
+        setShowLibrary(true);
+      }
+    }
+  }, []);
+
+  const handleOpenNewModal = () => {
+    setForm({
+      name: "",
+      dob: "",
+      tob: "",
+      city: "",
+      lat: null,
+      lon: null,
+      tz: null,
+    });
+    setSelectedCity(null);
+    setIsNewChartModalOpen(true);
+  };
+
+  const handleOpenEditModal = () => {
+    if (chart) {
+      setForm({
+        name: chart.name,
+        dob: chart.dob,
+        tob: chart.tob,
+        city: chart.city,
+        lat: chart.lat,
+        lon: chart.lon,
+        tz: chart.tz,
+      });
+      setSelectedCity({
+        display_name: chart.city,
+        latitude: chart.lat,
+        longitude: chart.lon,
+        timezone: String(chart.tz),
+        name: chart.city,
+        state: "",
+        country: "",
+      });
+    }
+    setIsNewChartModalOpen(true);
+  };
 
   const yogas = useMemo(() => {
     if (!chart?.planets) return [];
@@ -252,6 +305,7 @@ export default function KundliPage() {
         applyChart(nextChart);
         setSaveStatus(`${nextChart.name}'s chart loaded.`);
         setSavedCharts(await listSavedCharts());
+        setShowLibrary(false);
       } else {
         setSaveStatus("Could not open selected chart.");
       }
@@ -311,6 +365,8 @@ export default function KundliPage() {
       applyChart(data);
       setSaveStatus("Chart generated. Use Save Chart to store it in your account library.");
       setShowForm(false);
+      setIsNewChartModalOpen(false);
+      setShowLibrary(false);
       void saveChartToAccount(data, { replacePrimary: true });
       await fetch("/api/charts/track", {
         method: "POST",
@@ -652,43 +708,123 @@ export default function KundliPage() {
           Moshier / NASA Ephemeris · Lahiri Chitrapaksha · 120 Yogas · Classical Shastric Proofs
         </p>
 
-        {/* SAVED CHARTS LIBRARY DRAWER */}
-        <div className="card" style={{ marginBottom: 16 }}>
-          <div className="library-top" style={{ marginBottom: showLibrary ? 14 : 0 }}>
-            <div>
-              <div className="card-tag">✦ Saved Charts & Database</div>
-              <div className="card-title serif" style={{ marginBottom: 0 }}>Chart Library</div>
-              <div className="library-sub">{saveStatus}</div>
-            </div>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+        {/* TOP ACTION BAR: POPUP MODAL TRIGGER & SAVED CHARTS */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "10px",
+            marginBottom: "16px",
+            padding: "10px 14px",
+            background: "#FFFFFF",
+            border: "1px solid rgba(184, 134, 11, 0.2)",
+            borderRadius: "12px",
+            boxShadow: "0 2px 8px rgba(184, 134, 11, 0.04)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="btn-gen"
+              onClick={handleOpenNewModal}
+              style={{
+                padding: "8px 18px",
+                fontSize: "13px",
+                fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                borderRadius: "8px",
+              }}
+            >
+              <Sparkles size={14} /> ✦ Create / New Kundli
+            </button>
+
+            {chart && (
               <button
+                type="button"
                 className="btn-save"
-                onClick={() => setShowLibrary(!showLibrary)}
+                onClick={handleOpenEditModal}
                 style={{
-                  borderColor: showLibrary ? "rgba(200,160,48,0.4)" : "rgba(200,160,48,0.2)",
-                  background: showLibrary ? "rgba(200,160,48,0.1)" : "transparent",
+                  padding: "8px 14px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
                 }}
               >
-                {showLibrary ? "▲ Hide Saved Charts" : `▼ Saved Charts (${savedCharts.length})`}
+                <Edit2 size={13} /> Edit Birth Details
               </button>
-              <button
-                className="btn-save"
-                onClick={() => setShowForm(!showForm)}
-                style={{
-                  borderColor: showForm ? "rgba(239,68,68,0.3)" : "rgba(200,160,48,0.3)",
-                  color: showForm ? "#ef4444" : "#c8a030",
-                }}
-              >
-                {showForm ? "✕ Close Form" : "✦ New Chart"}
-              </button>
-              <button className="btn-save" onClick={refreshSavedCharts} disabled={libraryLoading}>
-                {libraryLoading ? "⟳ Loading..." : "↻ Refresh"}
-              </button>
-            </div>
+            )}
           </div>
 
-          {showLibrary && (
-            <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(184, 134, 11, 0.2)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="btn-save"
+              onClick={() => setShowLibrary((prev) => !prev)}
+              style={{
+                padding: "8px 14px",
+                fontSize: "12px",
+                fontWeight: 600,
+                background: showLibrary ? "rgba(184, 134, 11, 0.12)" : "transparent",
+                borderColor: showLibrary ? "rgba(184, 134, 11, 0.45)" : "rgba(184, 134, 11, 0.25)",
+              }}
+            >
+              📁 {showLibrary ? "▲ Hide Saved Charts" : `▼ Saved Charts (${savedCharts.length})`}
+            </button>
+            <button
+              type="button"
+              className="btn-save"
+              onClick={refreshSavedCharts}
+              disabled={libraryLoading}
+              title="Refresh charts from database"
+              style={{ padding: "8px 10px", fontSize: "12px" }}
+            >
+              {libraryLoading ? "⟳" : "↻"}
+            </button>
+            {chart && (
+              <button
+                type="button"
+                className="btn-save"
+                onClick={handleSaveCurrentChart}
+                disabled={libraryLoading}
+                style={{ padding: "8px 12px", fontSize: "12px", fontWeight: 600 }}
+              >
+                💾 Save Chart
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* COLLAPSIBLE SAVED CHARTS DRAWER */}
+        {showLibrary && (
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <div>
+                <div className="card-tag">✦ Saved Charts & Database</div>
+                <div className="card-title serif" style={{ marginBottom: 0 }}>Chart Library ({savedCharts.length})</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowLibrary(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#6B635B",
+                  fontSize: 18,
+                  lineHeight: 1,
+                  padding: 4,
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            {saveStatus && <div className="library-sub" style={{ marginBottom: 10 }}>{saveStatus}</div>}
               <div style={{ fontSize: "13px", fontWeight: 700, color: "#1A1A1A", marginBottom: 12 }}>
                 📁 My Saved Charts ({savedCharts.length})
               </div>
@@ -837,92 +973,259 @@ export default function KundliPage() {
                   No saved charts found yet. Generate a chart to save it to your account!
                 </div>
               )}
-            </div>
-          )}
-        </div>
-
-        {/* INPUT FORM */}
-        {(showForm || !chart) && (
-          <div className="form-card">
-            <div className="form-grid">
-              <div className="form-group">
-                <label className="label">Full Name</label>
-                <input
-                  className="input"
-                  placeholder="Enter full name"
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                />
-              </div>
-              <div className="form-group">
-                <label className="label">Date of Birth</label>
-                <input
-                  className="input"
-                  type="date"
-                  value={form.dob}
-                  max={new Date().toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      dob: e.target.value,
-                      tz: selectedCity ? ianaToUtcOffset(selectedCity.timezone, e.target.value, f.tob) : f.tz,
-                    }))
-                  }
-                  style={{ colorScheme: "light" }}
-                />
-              </div>
-              <div className="form-group">
-                <label className="label">Time of Birth</label>
-                <input
-                  className="input"
-                  type="time"
-                  value={form.tob}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      tob: e.target.value,
-                      tz: selectedCity ? ianaToUtcOffset(selectedCity.timezone, f.dob, e.target.value) : f.tz,
-                    }))
-                  }
-                  style={{ colorScheme: "light" }}
-                />
-              </div>
-              <div className="form-group">
-                <CityAutocomplete
-                  label="Birth City"
-                  value={selectedCity}
-                  placeholder="Search from 68k+ cities, e.g. Mumbai, Delhi, New York"
-                  onChange={(city) => {
-                    setSelectedCity(city);
-                    setForm((prev) => ({
-                      ...prev,
-                      city: city?.displayName ?? "",
-                      lat: city?.latitude ?? null,
-                      lon: city?.longitude ?? null,
-                      tz: city ? ianaToUtcOffset(city.timezone, prev.dob, prev.tob) : null,
-                    }));
-                  }}
-                />
-                <div className="city-note">
-                  Automatic GPS coordinates & exact solar timezone offset applied.
-                </div>
-              </div>
-            </div>
-            <button
-              className="btn-gen"
-              onClick={handleGenerate}
-              disabled={!form.name || !form.dob || !form.tob || !form.city || !selectedCity || loading}
-            >
-              {loading ? "⟳ Calculating Astronomical Ephemeris..." : "🔯 Calculate Kundli & Yogas"}
-            </button>
           </div>
         )}
 
-        {chart && !showForm && (
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
-            <button className="btn-save" onClick={() => setShowForm(true)}>
-              ✎ Edit Birth Details
-            </button>
+        {/* WELCOME / EMPTY STATE WHEN NO CHART IS SELECTED */}
+        {!chart && !loading && (
+          <div
+            className="card"
+            style={{
+              textAlign: "center",
+              padding: "48px 24px",
+              background: "linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 100%)",
+              border: "1px solid rgba(184, 134, 11, 0.25)",
+              borderRadius: "16px",
+              marginBottom: "24px",
+            }}
+          >
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔯</div>
+            <h2
+              className="serif"
+              style={{
+                fontSize: "24px",
+                fontWeight: 700,
+                color: "#1A1A1A",
+                marginBottom: "8px",
+              }}
+            >
+              No Kundli Currently Loaded
+            </h2>
+            <p
+              style={{
+                fontSize: "14px",
+                color: "#6B635B",
+                maxWidth: "500px",
+                margin: "0 auto 24px auto",
+                lineHeight: 1.6,
+              }}
+            >
+              Enter birth details to generate full Vedic birth chart with 120 Yogas, 16 Divisional charts, and 5-tier Vimshottari Dasha timeline.
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                className="btn-gen"
+                onClick={handleOpenNewModal}
+                style={{
+                  padding: "12px 28px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <Sparkles size={16} /> ✦ Create My Kundli (Popup)
+              </button>
+              {savedCharts.length > 0 && (
+                <button
+                  type="button"
+                  className="btn-save"
+                  onClick={() => setShowLibrary(true)}
+                  style={{ padding: "12px 24px", fontSize: "14px", fontWeight: 600 }}
+                >
+                  📁 Open Saved Chart ({savedCharts.length})
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* CREATE / EDIT KUNDLI MODAL (POPUP IN FRONT OF WINDOW) */}
+        {isNewChartModalOpen && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(10, 8, 5, 0.7)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+              zIndex: 99999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "16px",
+              overflowY: "auto",
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsNewChartModalOpen(false);
+            }}
+          >
+            <div
+              style={{
+                background: "#FFFFFF",
+                borderRadius: "20px",
+                border: "1px solid rgba(184, 134, 11, 0.35)",
+                boxShadow: "0 24px 64px rgba(0, 0, 0, 0.35)",
+                width: "100%",
+                maxWidth: "640px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                padding: "28px",
+                position: "relative",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* MODAL HEADER */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  marginBottom: "20px",
+                  borderBottom: "1px solid rgba(184, 134, 11, 0.15)",
+                  paddingBottom: "14px",
+                }}
+              >
+                <div>
+                  <div className="card-tag">✦ Astronomical Vedic Engine</div>
+                  <h2
+                    className="serif"
+                    style={{
+                      fontSize: "22px",
+                      fontWeight: 700,
+                      color: "#1A1A1A",
+                      margin: "4px 0 0 0",
+                    }}
+                  >
+                    {form.name ? `Kundli for ${form.name}` : "Create My Kundli"}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsNewChartModalOpen(false)}
+                  style={{
+                    background: "rgba(184, 134, 11, 0.08)",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                    borderRadius: "50%",
+                    width: 34,
+                    height: 34,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    color: "#6B635B",
+                  }}
+                  title="Close popup"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* MODAL FORM INPUTS */}
+              <div className="space-y-4">
+                <div className="form-group">
+                  <label className="label">Full Name</label>
+                  <input
+                    className="input"
+                    placeholder="e.g. Rahul Sharma"
+                    value={form.name}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div className="form-group">
+                    <label className="label">Date of Birth</label>
+                    <input
+                      className="input"
+                      type="date"
+                      value={form.dob}
+                      max={new Date().toISOString().split("T")[0]}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          dob: e.target.value,
+                          tz: selectedCity ? ianaToUtcOffset(selectedCity.timezone, e.target.value, f.tob) : f.tz,
+                        }))
+                      }
+                      style={{ colorScheme: "light" }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="label">Time of Birth</label>
+                    <input
+                      className="input"
+                      type="time"
+                      value={form.tob}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          tob: e.target.value,
+                          tz: selectedCity ? ianaToUtcOffset(selectedCity.timezone, f.dob, e.target.value) : f.tz,
+                        }))
+                      }
+                      style={{ colorScheme: "light" }}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <CityAutocomplete
+                    label="Birth City"
+                    value={selectedCity}
+                    placeholder="Search 68k+ cities worldwide, e.g. New Delhi, Mumbai, New York"
+                    onChange={(city) => {
+                      setSelectedCity(city);
+                      setForm((prev) => ({
+                        ...prev,
+                        city: city?.displayName ?? "",
+                        lat: city?.latitude ?? null,
+                        lon: city?.longitude ?? null,
+                        tz: city ? ianaToUtcOffset(city.timezone, prev.dob, prev.tob) : null,
+                      }));
+                    }}
+                  />
+                  <div className="city-note">
+                    Automatic GPS coordinates & solar timezone offset applied via NASA ephemeris.
+                  </div>
+                </div>
+              </div>
+
+              {/* MODAL FOOTER ACTION */}
+              <div
+                style={{
+                  marginTop: "24px",
+                  display: "flex",
+                  gap: "10px",
+                  justifyContent: "flex-end",
+                  borderTop: "1px solid rgba(184, 134, 11, 0.15)",
+                  paddingTop: "16px",
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn-save"
+                  onClick={() => setIsNewChartModalOpen(false)}
+                  style={{ padding: "10px 18px", fontSize: "13px" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn-gen"
+                  onClick={handleGenerate}
+                  disabled={!form.name || !form.dob || !form.tob || !form.city || !selectedCity || loading}
+                  style={{ padding: "10px 24px", fontSize: "13px", fontWeight: 700 }}
+                >
+                  {loading ? "⟳ Calculating..." : "🔯 Calculate Kundli & Yogas"}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -989,6 +1292,13 @@ export default function KundliPage() {
 
             {/* LIVE DAILY PANCHANG EMBEDDED WIDGET */}
             <DailyPanchangWidget compact className="mb-4" />
+
+            {/* LIVE SLOW-SCROLLING DASHA & ANTARDASHA TICKER STRIP */}
+            <LiveDashaTickerStrip
+              chart={chart}
+              onOpenExplorer={() => setActiveTab("timing")}
+              className="mb-4"
+            />
 
             {/* ── 4 INTENT-DRIVEN PILLARS + ASK AI TABS ── */}
             <div className="tabs">
@@ -1871,11 +2181,17 @@ export default function KundliPage() {
               <div className="space-y-6">
                 {timingNarrative && <PillarNarrativeCard narrative={timingNarrative} />}
 
+                {/* LIVE DASHA TICKER */}
+                <LiveDashaTickerStrip chart={chart} />
+
+                {/* FULL 5-LEVEL VIMSHOTTARI EXPLORER */}
+                <VimshottariFiveLevelExplorer chart={chart} />
+
                 <div className="card">
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <div>
                       <div className="card-tag">✦ Vimshottari Timeline (120-Year Cycle)</div>
-                      <div className="card-title serif mb-0">Your Karmic Progression</div>
+                      <div className="card-title serif mb-0">Your Karmic Progression Overview</div>
                     </div>
                     {activeMD && (
                       <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">

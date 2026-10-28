@@ -51,6 +51,8 @@ export const viewport: Viewport = {
 };
 
 import { ThemeScript } from "@/components/theme-script";
+import { NavigationProgress } from "@/components/navigation-progress";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -62,6 +64,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${cormorant.variable} ${outfit.variable} min-h-full flex flex-col theme-ivory`} data-theme-mode="light" suppressHydrationWarning>
         <ThemeScript />
         <ThemeProvider>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           {children}
           <Analytics />
           <HtmlPreferencesSync />

@@ -797,15 +797,16 @@ function analyzeChittaVritti(moonHouse: number, topic: PrashnaTopic): ChittaVrit
     12: "Foreign settlement, secret expenditures, hospital confinement, or feeling of loss.",
   };
 
-  const primaryTopicHouse = TOPIC_HOUSES[topic].primary;
+  const safeTopic: PrashnaTopic = (topic && TOPIC_HOUSES[topic]) ? topic : "career";
+  const primaryTopicHouse = TOPIC_HOUSES[safeTopic].primary;
   const isAligned =
     moonHouse === primaryTopicHouse ||
-    TOPIC_HOUSES[topic].positive.includes(moonHouse);
+    TOPIC_HOUSES[safeTopic].positive.includes(moonHouse);
 
   const theme = THEMES[moonHouse] ?? "General inquiry";
   const interpretation = isAligned
-    ? `Shuddha Prashna (Pure Alignment): Moon in H${moonHouse} directly mirrors the verbal query topic (${TOPIC_HOUSES[topic].label}). Querent's mind is focused and transparent.`
-    : `Antar-Chinta (Subconscious Divergence): Querent asked about ${TOPIC_HOUSES[topic].label}, but Moon in H${moonHouse} indicates underlying subconscious worry regarding: ${theme}`;
+    ? `Shuddha Prashna (Pure Alignment): Moon in H${moonHouse} directly mirrors the verbal query topic (${TOPIC_HOUSES[safeTopic].label}). Querent's mind is focused and transparent.`
+    : `Antar-Chinta (Subconscious Divergence): Querent asked about ${TOPIC_HOUSES[safeTopic].label}, but Moon in H${moonHouse} indicates underlying subconscious worry regarding: ${theme}`;
 
   return {
     moonHouse,
@@ -1000,7 +1001,8 @@ export function calculatePrashna(
     lagnaLon = entry.midLon;
 
     // Evaluate query cusp promise in KP mode
-    const th = TOPIC_HOUSES[topic];
+    const safeTopic: PrashnaTopic = (topic && TOPIC_HOUSES[topic]) ? topic : "career";
+    const th = TOPIC_HOUSES[safeTopic];
     kpAnalysis = {
       mode: "kp_number_seed",
       horaryNumber: kpSeedNumber,
@@ -1016,14 +1018,16 @@ export function calculatePrashna(
   } else {
     lagnaLon = computeLagna(jd, lat, lon);
     const signIdx = Math.floor(lagnaLon / 30) % 12;
+    const safeTopic: PrashnaTopic = (topic && TOPIC_HOUSES[topic]) ? topic : "career";
+    const th = TOPIC_HOUSES[safeTopic];
     kpAnalysis = {
       mode: "clock_time",
       lagnaSignLord: LAGNA_LORDS[signIdx],
       lagnaStarLord: getNakshatraName(lagnaLon),
       lagnaSubLord: LAGNA_LORDS[signIdx],
-      queryCuspNumber: TOPIC_HOUSES[topic].primary,
+      queryCuspNumber: th.primary,
       queryCuspSubLord: LAGNA_LORDS[signIdx],
-      signifiedHouses: TOPIC_HOUSES[topic].positive,
+      signifiedHouses: th.positive,
       promise: "PROMISED",
       analysis: `Calculated at exact query clock time. Ascendant in ${RASHIS[signIdx]} at ${(lagnaLon % 30).toFixed(2)}°.`,
     };

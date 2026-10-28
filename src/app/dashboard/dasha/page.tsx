@@ -29,6 +29,8 @@ import {
   CLASSICAL_TARAS,
 } from "@/lib/astro-engine/navtara-engine";
 import { resolveNakshatraCoordinate } from "@/lib/astro-engine/ayanamsa-config";
+import { LiveDashaTickerStrip } from "@/components/dasha/LiveDashaTickerStrip";
+import { VimshottariFiveLevelExplorer } from "@/components/dasha/VimshottariFiveLevelExplorer";
 import "@/app/dashboard/shared.css";
 
 export interface TaraRowInfo {
@@ -385,6 +387,9 @@ export default function DashaPage() {
 
         {mainTab === "TIMELINE" && (
           <>
+            {/* Live Slow-Scrolling Dasha Ticker Strip */}
+            <LiveDashaTickerStrip chart={chart} className="mb-4" />
+
             {/* Current Active Periods */}
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <ActiveCard
@@ -442,6 +447,11 @@ export default function DashaPage() {
                 <KPDashaEvidenceTree evidence={dashaEvidence} tp={tp} />
               </section>
             )}
+
+            {/* Complete 5-Tier Vimshottari Dasha Drill-Down Explorer */}
+            <section>
+              <VimshottariFiveLevelExplorer chart={chart} />
+            </section>
 
             {/* Mahadasha Timeline */}
             <section className="rounded-2xl border border-[rgba(184,134,11,0.22)] bg-white p-5 sm:p-6 shadow-sm">

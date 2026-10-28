@@ -1115,13 +1115,19 @@ function goalPlanetSupport(chart: ChartData | null, raga: RagaItem, goal: GoalKe
   return score;
 }
 
-function chartSignature(chart: ChartData | null) {
+function chartSignature(chart: any | null) {
   if (!chart) return 0;
 
-  return Object.entries(chart.planets ?? {}).reduce((sum, [name, planet]) => {
+  const lagNum = chart.lagnaNum ?? chart.lagR ?? 0;
+  const lagLon = chart.lagnaLon ?? chart.lagLon ?? 0;
+
+  return Object.entries(chart.planets ?? {}).reduce((sum, [name, planet]: [string, any]) => {
     const nameScore = Array.from(name).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return sum + nameScore + planet.rashi * 11 + planet.house * 17 + Math.round(planet.lon || 0);
-  }, chart.lagR * 29 + Math.round(chart.lagLon ?? 0));
+    const rashiNum = planet.signNum ?? planet.rashi ?? 0;
+    const houseNum = planet.house ?? 1;
+    const lonNum = Math.round(planet.lon || 0);
+    return sum + nameScore + rashiNum * 11 + houseNum * 17 + lonNum;
+  }, lagNum * 29 + Math.round(lagLon));
 }
 
 function ragaSignature(id: string) {
@@ -1548,7 +1554,15 @@ function buildAstroSoundTiming(
   };
 }
 
-export function runAstroSound(input: AstroSoundInput): AstroSoundResult {
+export function runAstroSound(rawInput: AstroSoundInput): AstroSoundResult {
+  const effectiveMD = rawInput.currentMahadasha || (rawInput.chart as any)?.dashas?.find((d: any) => d.active)?.planet;
+  const effectiveAD = rawInput.currentAntardasha || (rawInput.chart as any)?.antardasha?.find((d: any) => d.active)?.planet;
+  const input: AstroSoundInput = {
+    ...rawInput,
+    currentMahadasha: effectiveMD,
+    currentAntardasha: effectiveAD,
+  };
+
   const scored = RAGA_DB
     .map((raga) => scoreRaga(input, raga))
     .sort((a, b) => b.score - a.score);

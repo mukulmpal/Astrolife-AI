@@ -40,7 +40,7 @@ export default function AstroTattooPage() {
 
   // If user chart not available, generate deterministic chart from demo
   const effectiveChart = useMemo(() => {
-    if (chart && chart.planets && chart.planets.length > 0) return chart;
+    if (chart && chart.planets && Object.keys(chart.planets).length > 0) return chart;
     return buildChart(birth && birth.dob ? birth : DEMO_BIRTH_DETAILS);
   }, [chart, birth]);
 
