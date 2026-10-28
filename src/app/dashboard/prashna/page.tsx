@@ -71,6 +71,7 @@ export default function PrashnaPage() {
   const [resultTab, setResultTab] = useState<"judgment" | "lagnaChart" | "moonChart" | "tenLayers">("judgment");
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [showGuidelines, setShowGuidelines] = useState(false);
 
   const handleCopySummary = () => {
     if (!result) return;
@@ -246,6 +247,83 @@ Generated via AstroLife Classical 10-Layer Prashna Engine`;
             >
               🔢 KP Seed Number (1–249)
             </button>
+          </div>
+
+          {/* Mode Guidance Note */}
+          <div
+            style={{
+              background: mode === "clock_time" ? "rgba(184, 134, 11, 0.08)" : "rgba(34, 197, 94, 0.08)",
+              border: mode === "clock_time" ? "1px solid rgba(184, 134, 11, 0.22)" : "1px solid rgba(34, 197, 94, 0.22)",
+              borderRadius: "8px",
+              padding: "9px 12px",
+              marginBottom: "12px",
+              fontSize: "12px",
+              color: "#4A4238",
+              lineHeight: 1.5,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "8px",
+            }}
+          >
+            <span style={{ fontSize: "14px", flexShrink: 0 }}>
+              {mode === "clock_time" ? "🕒" : "🔢"}
+            </span>
+            <div>
+              {mode === "clock_time" ? (
+                <>
+                  <strong style={{ color: "#8A6008" }}>Clock Time Mode:</strong> आदर्श तात्कालिक व अचानक घटनाओं के लिए (जैसे खोई वस्तु, आपातकालीन प्रश्न, या अभी आई कॉल/मीटिंग)। यह वर्तमान क्षण के वास्तविक आकाशीय लग्न का उपयोग करता है।
+                </>
+              ) : (
+                <>
+                  <strong style={{ color: "#16a34a" }}>KP 1–249 Mode:</strong> आदर्श गंभीर व जीवन बदलने वाले निर्णयों के लिए (जैसे विवाह, नौकरी परिवर्तन, नया व्यापार, वीज़ा)। आँखें बंद करें, अपने इष्टदेव का स्मरण करें और 1 से 249 के बीच जो पहला अंक मन में चमके, उसे नीचे दर्ज करें।
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Expandable Shastric Guidelines */}
+          <div style={{ marginBottom: "16px" }}>
+            <button
+              type="button"
+              onClick={() => setShowGuidelines(!showGuidelines)}
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: "0",
+                color: "#8A6008",
+                fontSize: "12px",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
+            >
+              {showGuidelines ? "▴ Hide Shastric Guidelines (मर्यादा छुपाएं)" : "📖 Shastric Guidelines: सही प्रश्न पूछने के स्वर्णिम नियम (Click to read)"}
+            </button>
+
+            {showGuidelines && (
+              <div
+                style={{
+                  marginTop: "8px",
+                  background: "#FAF8F5",
+                  border: "1px solid rgba(184, 134, 11, 0.22)",
+                  borderRadius: "10px",
+                  padding: "12px 14px",
+                  fontSize: "12px",
+                  color: "#4A4238",
+                  lineHeight: 1.6,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: "#8A6008", marginBottom: "4px" }}>
+                  📜 प्रश्न मार्ग (Prashna Marga) के 4 शास्त्रीय नियम:
+                </div>
+                • <strong>एक समय में एक ही प्रश्न:</strong> कभी भी नौकरी और शादी जैसे कई सवाल एक साथ न जोड़ें। एक बार में केवल एक मुख्य विषय पर एकाग्र हों।<br />
+                • <strong>मन में सच्ची व्याकुलता:</strong> प्रश्न केवल तब फलित होता है जब मन में वास्तव में समाधान की आवश्यकता हो। केवल मनोरंजन या परीक्षा लेने के लिए पूछे गए प्रश्नों में चित्त-वृत्ति भटकाव दिखाती है।<br />
+                • <strong>शुभ दिशा:</strong> प्रश्न विचारते समय मुख पूर्व (East) या उत्तर (North) दिशा की ओर रखना श्रेष्ठ माना गया है।<br />
+                • <strong>मोड का चयन:</strong> अचानक हुई घटना में <em>Clock Mode</em> और सोच-समझकर लिए जाने वाले बड़े फैसलों में <em>KP 1–249 Mode</em> चुनें।
+              </div>
+            )}
           </div>
 
           {/* Question Input */}
