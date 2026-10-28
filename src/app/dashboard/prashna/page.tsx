@@ -70,6 +70,35 @@ export default function PrashnaPage() {
   const [result, setResult] = useState<PrashnaResult | null>(null);
   const [resultTab, setResultTab] = useState<"judgment" | "lagnaChart" | "moonChart" | "tenLayers">("judgment");
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopySummary = () => {
+    if (!result) return;
+    const text = `❓ PRASHNA KUNDALI SHASTRA REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Question: ${result.question}
+Topic: ${result.topic.toUpperCase()}
+Timestamp: ${result.timestamp}
+
+⚖️ 3-TIER VERDICT: ${result.shastricVerdict}
+Status: ${result.title}
+Detail: ${result.detail}
+
+⏱️ PHALA PRAPTI KAALA (Timing):
+${result.layer9PhalaPraptiKaala.timingText} (${result.layer9PhalaPraptiKaala.speedCategory})
+
+🕉️ SHASTRA UPAYAS & REMEDIES:
+• Action: ${result.layer10PrashnaUpaya.primaryRemedy}
+• Deity: ${result.layer10PrashnaUpaya.deityToPropitiate} (Face ${result.layer10PrashnaUpaya.beneficDirection})
+• Muhurta / Hora: ${result.layer10PrashnaUpaya.favorableHoraWindow}
+• Offering / Daana: ${result.layer10PrashnaUpaya.donationSuggestion}
+
+Generated via AstroLife Classical 10-Layer Prashna Engine`;
+
+    navigator.clipboard?.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2200);
+  };
 
   useEffect(() => {
     const query = cityQuery.trim();
@@ -148,6 +177,14 @@ export default function PrashnaPage() {
         .tajaka-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
         .layer-box { background: #FAF8F5; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
         .layer-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+        .pr-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+        .pr-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        @media (max-width: 640px) {
+          .pr-grid-2, .pr-grid-3 { grid-template-columns: 1fr !important; }
+          .pr-card { padding: 16px 14px !important; }
+          .pr-row { flex-direction: column !important; gap: 2px !important; }
+          .pr-row strong { min-width: unset !important; }
+        }
       `}</style>
 
       <div style={{ maxWidth: "760px", margin: "0 auto" }}>
@@ -225,7 +262,7 @@ export default function PrashnaPage() {
           </div>
 
           {/* Topic & KP Number Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: mode === "kp_number" ? "1fr 1fr" : "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+          <div className="pr-grid-2">
             <div>
               <div className="pr-label">Topic Category</div>
               <select className="pr-select" value={topic} onChange={(e) => setTopic(e.target.value as PrashnaTopic)}>
@@ -313,7 +350,7 @@ export default function PrashnaPage() {
           </div>
 
           {showAdvanced && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginBottom: "14px" }}>
+            <div className="pr-grid-3">
               <div>
                 <div className="pr-label">Latitude</div>
                 <input type="number" className="pr-input" value={lat} onChange={(e) => setLat(e.target.value)} step="0.01" />
@@ -393,13 +430,23 @@ export default function PrashnaPage() {
                   <div style={{ fontSize: "13.5px", color: "#4A4238", lineHeight: "1.75", marginBottom: "14px", maxWidth: "600px", margin: "0 auto 14px" }}>
                     {result.detail}
                   </div>
-                  <div style={{ display: "inline-flex", gap: "8px", flexWrap: "wrap", justifyContent: "center" }}>
+                  <div style={{ display: "inline-flex", gap: "8px", flexWrap: "wrap", justifyContent: "center", marginBottom: "14px" }}>
                     <span style={{ background: `${result.color}22`, borderRadius: "20px", padding: "4px 14px", fontSize: "12px", fontWeight: 700, color: result.color, border: `1px solid ${result.color}40` }}>
                       Shastra: {result.shastricVerdict}
                     </span>
                     <span style={{ background: "rgba(184,134,11,0.12)", borderRadius: "20px", padding: "4px 14px", fontSize: "12px", fontWeight: 700, color: "#8A6008" }}>
                       Score: {result.score > 0 ? "+" : ""}{result.score} · {result.confidence.toUpperCase()} Confidence
                     </span>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={handleCopySummary}
+                      className="pr-ghost-btn"
+                      style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+                    >
+                      {copied ? "✅ Copied Shastra Report!" : "📋 Copy Shastric Verdict & Remedies"}
+                    </button>
                   </div>
                 </div>
 
@@ -473,7 +520,7 @@ export default function PrashnaPage() {
                 </div>
 
                 {/* Score breakdown & factors */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+                <div className="pr-grid-2">
                   {result.positiveFactors.length > 0 && (
                     <div style={{ background: "#FAF8F5", border: "1px solid rgba(21,128,61,0.25)", borderLeft: "4px solid #15803D", borderRadius: "12px", padding: "14px 16px" }}>
                       <div style={{ fontWeight: 700, fontSize: "11px", color: "#15803D", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
