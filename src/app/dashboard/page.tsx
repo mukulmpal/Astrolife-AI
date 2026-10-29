@@ -204,7 +204,17 @@ function planetLabelSlots(total: number) {
   });
 }
 
-function CompactNorthChart({ chart }: { chart: DivChart }) {
+function CompactNorthChart({
+  chart,
+  mode = "rashi",
+  kpCusps,
+  planetSubLords,
+}: {
+  chart: DivChart;
+  mode?: "rashi" | "chalit" | "kp";
+  kpCusps?: Array<{ house: number; degreeText: string; subLord: string; sign: string }>;
+  planetSubLords?: Record<string, string>;
+}) {
   const S = 300;
   const lagR = chart.lagnaNum;
   const houses = [
@@ -230,7 +240,7 @@ function CompactNorthChart({ chart }: { chart: DivChart }) {
   return (
     <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{ maxWidth: 330, display: "block", margin: "0 auto" }}>
       <rect width={S} height={S} fill="var(--chart-bg)" rx="8"/>
-      <rect x={0} y={0} width={S} height={S} fill="none" stroke="var(--chart-line)" strokeWidth="1.4" rx="8"/>
+      <rect x={0} y={0} width={S} height={S} fill="none" stroke={mode === "kp" ? "#B8860B" : "var(--chart-line)"} strokeWidth={mode === "kp" ? "1.6" : "1.4"} rx="8"/>
       <line x1={0} y1={0} x2={S} y2={S} stroke="var(--chart-line-soft)" strokeWidth="1"/>
       <line x1={S} y1={0} x2={0} y2={S} stroke="var(--chart-line-soft)" strokeWidth="1"/>
       <line x1={S/2} y1={0} x2={S} y2={S/2} stroke="var(--chart-line-soft)" strokeWidth="1"/>
@@ -241,22 +251,64 @@ function CompactNorthChart({ chart }: { chart: DivChart }) {
         const rIdx = mod(lagR + houseNo - 1, 12);
         const here = pByH[houseNo] ?? [];
         const isLagna = houseNo === 1;
+        const cusp = kpCusps?.find((c) => c.house === houseNo);
+
         return (
           <g key={houseNo}>
-            <text x={lx} y={ly - 6} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={isLagna ? "var(--app-gold)" : "var(--chart-label)"} fontWeight={isLagna ? "700" : "400"}>
-              {rIdx + 1}
-            </text>
-            {isLagna && <text x={lx} y={ly + 5} textAnchor="middle" dominantBaseline="middle" fontSize="6.5" fill="var(--app-gold)" fontWeight="700">Lagna</text>}
+            {/* Top house identifier */}
+            {mode === "kp" && cusp ? (
+              <text x={lx} y={ly - 8} textAnchor="middle" dominantBaseline="middle" fontSize="7.2" fill="#B8860B" fontWeight="700">
+                {cusp.degreeText.split(" ")[0]} [{cusp.subLord.slice(0, 2)}]
+              </text>
+            ) : mode === "chalit" ? (
+              <text x={lx} y={ly - 7} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="var(--chart-label)" fontWeight="700">
+                भाव {houseNo}
+              </text>
+            ) : (
+              <text x={lx} y={ly - 6} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={isLagna ? "var(--app-gold)" : "var(--chart-label)"} fontWeight={isLagna ? "700" : "400"}>
+                {rIdx + 1}
+              </text>
+            )}
+
+            {isLagna && mode !== "kp" && mode !== "chalit" && (
+              <text x={lx} y={ly + 5} textAnchor="middle" dominantBaseline="middle" fontSize="6.5" fill="var(--app-gold)" fontWeight="700">
+                Lagna
+              </text>
+            )}
+
+            {/* Planets in this house */}
             {here.map((p, idx) => {
               const pIdx = CHART_PLANETS.indexOf(p.planet);
               const slot = planetLabelSlots(here.length)[idx] ?? { x: 0, y: 0, font: 9 };
-              const baseY = ly + (isLagna ? 20 : 15);
+              const baseY = ly + (isLagna ? 18 : 14);
+              const subLord = planetSubLords?.[p.planet];
+              const pLabel = pIdx >= 0 ? CHART_EMOJI[pIdx] : p.planet.slice(0, 2);
+
               return (
                 <g key={`${houseNo}-${p.planet}-${idx}`}>
-                  <text x={lx + slot.x} y={baseY + slot.y} textAnchor="middle" dominantBaseline="middle" fontSize={slot.font} fontWeight="700" fill={pIdx >= 0 ? p.color : "#aaa"}>
-                    {pIdx >= 0 ? CHART_EMOJI[pIdx] : p.planet.slice(0, 2)}
+                  <text
+                    x={lx + slot.x}
+                    y={baseY + slot.y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={mode === "kp" ? 8 : slot.font}
+                    fontWeight="700"
+                    fill={pIdx >= 0 ? p.color : "#aaa"}
+                  >
+                    {mode === "kp" && subLord ? `${pLabel}[${subLord.slice(0, 2)}]` : pLabel}
                   </text>
-                  {p.retrograde && <text x={lx + slot.x + 8} y={baseY + slot.y - 5} textAnchor="middle" fontSize="5.8" fill="#f97316" fontWeight="700">(R)</text>}
+                  {p.retrograde && (
+                    <text
+                      x={lx + slot.x + (mode === "kp" && subLord ? 14 : 8)}
+                      y={baseY + slot.y - 4}
+                      textAnchor="middle"
+                      fontSize="5.5"
+                      fill="#f97316"
+                      fontWeight="700"
+                    >
+                      (R)
+                    </text>
+                  )}
                 </g>
               );
             })}
@@ -529,6 +581,15 @@ function DashboardContent() {
         bhavaHouse: r.bhavaHouse,
         shift: r.bhavaShift > 0 ? `+${r.bhavaShift}` : `${r.bhavaShift}`,
       }));
+  }, [kpResult]);
+
+  const planetSubLords = useMemo(() => {
+    if (!kpResult?.rows) return {} as Record<string, string>;
+    const map: Record<string, string> = {};
+    kpResult.rows.forEach((r) => {
+      map[r.name] = r.subLord;
+    });
+    return map;
   }, [kpResult]);
 
   const chartLayers = useMemo(() => {
@@ -891,18 +952,23 @@ function DashboardContent() {
               <div className="chart-panel">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                   <div className="chart-panel-title" style={{ marginBottom: 0 }}>3. Nirayana Bhava Chalit (चलित)</div>
-                  <span style={{ fontSize: "10px", color: "var(--app-gold)", fontWeight: 700 }}>Actual House Shift</span>
+                  <span style={{ fontSize: "10px", color: "var(--app-gold)", fontWeight: 700 }}>Vedic Bhava Chalit</span>
                 </div>
-                <CompactNorthChart chart={chartLayers.chalitChart} />
+                <CompactNorthChart chart={chartLayers.chalitChart} mode="chalit" />
               </div>
 
               {/* 4. KP Cuspal Chart */}
               <div className="chart-panel">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                   <div className="chart-panel-title" style={{ marginBottom: 0 }}>4. KP Cuspal (कस्पल कुण्डली)</div>
-                  <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Placidus & Sub-Lord</span>
+                  <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Placidus &amp; Sub-Lords</span>
                 </div>
-                <CompactNorthChart chart={chartLayers.kpChart} />
+                <CompactNorthChart
+                  chart={chartLayers.kpChart}
+                  mode="kp"
+                  kpCusps={kpResult?.cusps}
+                  planetSubLords={planetSubLords}
+                />
               </div>
             </div>
 

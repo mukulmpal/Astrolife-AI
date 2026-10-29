@@ -1523,6 +1523,18 @@ export default function KundliPage() {
                           <div style={{ display: "flex", justifyContent: "center" }}>
                             <NorthIndianChart lagnaNum={chart.lagnaNum} planets={kpPlanets} size={250} />
                           </div>
+                          {kpResult?.rows && (
+                            <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.18)", borderRadius: "8px", fontSize: "11px", color: "#1A1A1A" }}>
+                              <div style={{ fontWeight: 700, color: "#B8860B", marginBottom: "3px" }}>✦ KP Planet Sub-Lords (उप-स्वामी):</div>
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                                {kpResult.rows.map((r) => (
+                                  <span key={r.name} style={{ background: "#FFFFFF", padding: "1px 6px", borderRadius: "4px", border: "1px solid rgba(184,134,11,0.2)", fontSize: "10.5px" }}>
+                                    <strong>{r.name}</strong> [{r.subLord}]
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                           <div style={{ marginTop: "8px", textAlign: "center" }}>
                             <Link href="/dashboard/kp" style={{ fontSize: "11px", color: "#B8860B", fontWeight: 700, textDecoration: "none" }}>
                               🔗 View Full KP Sub-Lord Significators Table →
