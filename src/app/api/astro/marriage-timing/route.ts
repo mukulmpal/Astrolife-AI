@@ -13,7 +13,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 interface MarriageTimingRequest {
-  // K.N. Rao Timing Input
+  // Classical Timing Input
   knRaoTiming: MarriageTimingInput;
 
   // Optional divisional charts
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<MarriageT
     }
     const body = parsedBody.data;
 
-    // Build the marriage intelligence result with K.N. Rao timing
+    // Build the marriage intelligence result with classical timing
     const result = buildMarriageIntelligenceV2({
       divs: body.divs,
       kp: body.kp,

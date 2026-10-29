@@ -226,10 +226,10 @@ function aspects(
 }
 
 /**
- * Classical K.N. Rao Retrograde & Sandhi Transit Rule:
+ * Classical Retrograde & Sandhi Transit Rule:
  * When a transiting planet is retrograde (Vakri) or at sign sandhi (0°-2°),
  * it casts its aspects and effects not only from its occupied sign/house,
- * but ALSO from the preceding sign/house (Proven in K.N. Rao cases 3, 6, 9, 15, 20, 25, 28, 41, 47, 50).
+ * but ALSO from the preceding sign/house (Validated across classical research cases).
  */
 function getTransitPositions(p?: { sign: string; house: number; retrograde?: boolean; lon?: number }): Array<{ sign: string; house: number; isSandhiOrRetro: boolean }> {
   if (!p || !p.sign) return [];
@@ -1061,7 +1061,7 @@ Rules: No fixed destiny. Combine with D1 promise, D9 quality, Ashtakoot, KP 2-7-
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CONDITIONAL DASHAS (Research from Shri K.N. Rao)
+// CONDITIONAL DASHAS (Classical Research)
 // Conditional Dashas apply when specific astrological conditions are met in
 // the birth chart, often providing razor-sharp event timing.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1149,14 +1149,14 @@ export function detectConditionalDashas(chart: {
       cycleYears: 72,
       isApplicable: dwisaptatiMet,
       conditionDescription: `Lagna Lord (${ll} in H${llHouse}) in 7H or 7th Lord (${l7} in H${l7House}) in Lagna`,
-      researchRule: "K.N. Rao Research: Applied to charts where LL is in 7H or 7L in 1H. Check 2H/2L, 7H/7L in D1 & D9.",
+      researchRule: "Classical Research: Applied to charts where LL is in 7H or 7L in 1H. Check 2H/2L, 7H/7L in D1 & D9.",
     },
     {
       dashaName: "Chatursheeti Sama Dasha (84 yrs)",
       cycleYears: 84,
       isApplicable: chatursheetiMet,
       conditionDescription: `10th Lord (${l10} in H${l10House}) placed in 10th House`,
-      researchRule: "K.N. Rao Research: Applied when 10L sits in 10H. Marriage timing triggers through 4H/4L & 7H/7L in D1, and 1H/7H/5H/11H in D9.",
+      researchRule: "Classical Research: Applied when 10L sits in 10H. Marriage timing triggers through 4H/4L & 7H/7L in D1, and 1H/7H/5H/11H in D9.",
     },
     {
       dashaName: "Dwadashottari Dasha (112 yrs)",

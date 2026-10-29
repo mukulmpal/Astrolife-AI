@@ -259,7 +259,7 @@ export default function MasterMarriageReportPanel({
           { id: "d9", label: "💎 D9 नवांश चार-स्तंभ" },
           { id: "kp", label: "🧭 KP सब-लॉर्ड & मिलन" },
           { id: "punarbu", label: "🛡️ पुनर्भु योग शोध" },
-          { id: "timing", label: "⏳ विवाह समय निर्धारण (K.N. Rao)" },
+          { id: "timing", label: "⏳ विवाह समय निर्धारण (शास्त्रीय 8-मापदंड)" },
           { id: "remedies", label: "🌿 वैदिक व वास्तु उपाय" },
         ].map(tab => (
           <button
@@ -873,13 +873,13 @@ export default function MasterMarriageReportPanel({
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 6: K.N. RAO MARRIAGE TIMING & TRANSIT AUDIT
+          SECTION 6: CLASSICAL MARRIAGE TIMING & TRANSIT AUDIT
       ══════════════════════════════════════════════════════════════════════ */}
       {(selectedSection === "all" || selectedSection === "timing") && (
         <div className="card" style={{ borderColor: "rgba(200,160,48,0.35)", background: "#FFFFFF" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
             <div>
-              <div className="card-tag">स्तंभ 6 · के.एन. राव 8-पैरामीटर विवाह समय निर्धारण</div>
+              <div className="card-tag">स्तंभ 6 · शास्त्रीय 8-मापदंड विवाह समय निर्धारण</div>
               <h2 className="card-title serif" style={{ margin: 0, fontSize: 24 }}>
                 विवाह समय एवं गोचर मुहूर्त परीक्षण
               </h2>

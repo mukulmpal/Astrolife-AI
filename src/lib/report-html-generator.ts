@@ -4509,7 +4509,7 @@ function pageMarriageTimingFusion(chart: ChartData): string {
         <h2>Marriage Timing Fusion</h2>
       </div>
       <div class="body-s" style="margin-bottom:14px;max-width:640px;line-height:1.6;">
-        These are not fixed wedding dates. They are readiness windows that combine K.N. Rao style marriage timing, monthly dasha/transit support and Mangal Dosha readiness. Partner-fusion scoring can be added when a second chart is attached to the PDF request.
+        These are not fixed wedding dates. They are readiness windows that combine classical 8-parameter marriage timing, monthly dasha/transit support and Mangal Dosha readiness. Partner-fusion scoring can be added when a second chart is attached to the PDF request.
       </div>
 
       ${best ? `<div class="card gold-edge" style="margin-bottom:12px;display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center;">

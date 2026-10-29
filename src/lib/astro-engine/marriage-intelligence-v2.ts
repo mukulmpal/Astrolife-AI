@@ -38,7 +38,7 @@ export interface MarriageV2Result {
   label: MarriageLabel;
   narrative: string;
 
-  // === K.N. RAO TIMING ENGINE (NEW) ===
+  // === CLASSICAL TIMING ENGINE ===
   knRaoTiming: MarriageTimingResult | null;
 
   divisional: {
@@ -356,7 +356,7 @@ export function buildMarriageIntelligenceV2(params: {
   const kp = params.kp ? buildMarriageKPIntelligence(params.kp) : null;
   const eventRadar = params.radar ? buildMarriageEventRadar(params.radar, kp) : null;
 
-  // === K.N. RAO TIMING ENGINE ===
+  // === CLASSICAL TIMING ENGINE ===
   const knRaoTiming = params.knRaoTiming ? analyzeMarriageTimingKNRao(params.knRaoTiming) : null;
 
   const scores = [
@@ -378,7 +378,7 @@ export function buildMarriageIntelligenceV2(params: {
     label: labelFromScore(overallScore),
     narrative: `Marriage Readiness Engine separates judgement into timing parameters, divisional delivery, KP validation and support periods. This prevents one method from becoming a confusing final verdict. ${knRaoTiming ? `Classical timing shows ${knRaoTiming.strengthLabel} with ${knRaoTiming.activeParameterCount}/8 parameters active. ` : ""}The current combined signal is ${labelText(labelFromScore(overallScore))}.`,
 
-    // === K.N. RAO TIMING (NEW SECTION) ===
+    // === CLASSICAL TIMING ===
     knRaoTiming,
 
     divisional,

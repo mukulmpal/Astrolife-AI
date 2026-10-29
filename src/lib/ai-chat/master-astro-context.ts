@@ -659,20 +659,20 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
     console.warn("[MasterAstroContext] Sarvatobhadra error:", err);
   }
 
-  // ── 16. KN RAO MARRIAGE TIMING & RESEARCH ENGINE ──────────────────────────────
+  // ── 16. CLASSICAL MARRIAGE TIMING & RESEARCH ENGINE ──────────────────────────────
   try {
     const marriageScan = scanMarriageWindows(chart);
     const bestWin = marriageScan.bestWindow;
     const outlook = marriageScan.overallOutlook;
 
-    sections.push(`### 16. KN RAO 8-PARAMETER MARRIAGE & RELATIONSHIP TIMING
+    sections.push(`### 16. CLASSICAL 8-PARAMETER MARRIAGE & RELATIONSHIP TIMING
 - Research Study Model: 8 Core Parameters (Vimshottari PAC in D1/D9, Chara Dasha DK/UL, Double Transit Jupiter+Saturn on 1/7 axis, Vivah Saham, Piya Milan connection)
 - Overall Timing Outlook: ${outlook}
 - Peak Marriage Timing Score: ${marriageScan.peakScore}/100 across 9-month horizon
 - Best Marriage Window: ${bestWin ? `${bestWin.month} (Score: ${bestWin.adjustedScore}/100, ${bestWin.verdict.toUpperCase()}) — ${bestWin.keyFactor}` : "Scanning ongoing"}
 - Double Transit Status: ${bestWin?.activeParams.includes("P4: Double transit Jupiter + Saturn") ? "Jupiter & Saturn double transit confirms active relationship manifestation." : "Double transit preparing alignment in upcoming months."}`);
   } catch (err) {
-    console.warn("[MasterAstroContext] KN Rao Marriage Timing error:", err);
+    console.warn("[MasterAstroContext] Classical Marriage Timing error:", err);
   }
 
   // ── 17. LINEAGE KARMA, PITRU INTELLIGENCE & KULA DEVATA ─────────────────────
@@ -771,7 +771,7 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
 - D1 ➔ D9 Cross-Mapping Manifestation:
   ✦ Friction Zones: ${mi.d1ToD9Mapping.trikInD9.map((t) => `D1 H${t.d1House} in D9 H${t.d9House}`).join(", ")}
   ✦ Prosperity Zones: ${mi.d1ToD9Mapping.wealthInD9.map((w) => `D1 H${w.d1House} in D9 H${w.d9House}`).join(", ")}
-- Conditional Dashas (K.N. Rao Research):
+- Conditional Dashas (Classical Research):
   ${dashasStr}
 - Special Dynamics:
   ✦ Dual/Second Marriage Potential: ${mi.dualMarriage.notes}

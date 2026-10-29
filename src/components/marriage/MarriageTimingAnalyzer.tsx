@@ -516,7 +516,7 @@ export function MarriageTimingAnalyzer() {
     const natalMarsSign  = chart.planets.Mars?.sign  ?? "";
     const natalMarsHouse = chart.planets.Mars?.house ?? 0;
 
-    // Vivah Saham — K.N. Rao correct formula: (LL_lon + 7L_lon) mod 360 → sign
+    // Vivah Saham — Classical formula: (LL_lon + 7L_lon) mod 360 → sign
     let vivahSahamSign = "";
     const lagnaLordLon   = chart.planets[lagnaLord]?.lon     ?? 0;
     const d17LordLon     = chart.planets[d1SeventhLord]?.lon ?? 0;
@@ -713,7 +713,7 @@ export function MarriageTimingAnalyzer() {
       <div className="empty">
         <div className="empty-icon">💍</div>
         <div className="empty-text">Birth Chart Required</div>
-        <p style={{ fontSize:13, color:"#6B635B" }}>Generate your kundli first to see K.N. Rao marriage timing analysis.</p>
+        <p style={{ fontSize:13, color:"#6B635B" }}>Generate your kundli first to see classical marriage timing analysis.</p>
       </div>
     );
   }
@@ -758,7 +758,7 @@ export function MarriageTimingAnalyzer() {
           )}
 
           <div style={{ flex:1 }}>
-            <div className="page-tag" style={{ marginBottom:4 }}>💍 K.N. RAO MARRIAGE TIMING ENGINE</div>
+            <div className="page-tag" style={{ marginBottom:4 }}>💍 CLASSICAL MARRIAGE TIMING ENGINE</div>
             <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:20, fontWeight:600,
               color: "#1A1A1A", marginBottom:6 }}>
               {chart.name}&apos;s Commitment Readiness Analysis
@@ -774,7 +774,7 @@ export function MarriageTimingAnalyzer() {
               </div>
             )}
             {loading && (
-              <div style={{ fontSize:12, color:"#6B635B" }}>Analyzing K.N. Rao parameters...</div>
+              <div style={{ fontSize:12, color:"#6B635B" }}>Analyzing classical timing parameters...</div>
             )}
           </div>
 
@@ -971,7 +971,7 @@ export function MarriageTimingAnalyzer() {
                 <div style={{ display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
                   <ScoreRing score={score} size={96} />
                   <div style={{ flex:1 }}>
-                    <div className="card-tag">TIMING WINDOW — K.N. RAO RESEARCH LAYER</div>
+                    <div className="card-tag">TIMING WINDOW — CLASSICAL RESEARCH LAYER</div>
                     <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:22, fontWeight:700,
                       color:scoreColor(score), marginBottom:6 }}>
                       {strengthDisplay(strength)} Readiness
@@ -1009,7 +1009,7 @@ export function MarriageTimingAnalyzer() {
                       {mangalTiming.label}
                     </div>
                     <div style={{ fontSize:12, color:"#4A4238", lineHeight:1.7 }}>
-                      K.N. Rao timing remains the base score. This Mars layer adjusts commitment readiness by reading
+                      Classical timing remains the base score. This Mars layer adjusts commitment readiness by reading
                       Mangal severity, protection, activation and constructive potential.
                     </div>
                   </div>
@@ -1038,12 +1038,12 @@ export function MarriageTimingAnalyzer() {
               {/* 8-Parameter Breakdown */}
               {result.backendJson?.parameters && (
                 <div className="card">
-                  <div className="card-tag">✦ 8-PARAMETER BREAKDOWN — K.N. RAO BINARY √/×</div>
+                  <div className="card-tag">✦ 8-PARAMETER BREAKDOWN — CLASSICAL BINARY √/×</div>
                   <div className="card-title serif" style={{ marginBottom:4 }}>
-                    {active}/8 Fulfilled — {active >= 6 ? "K.N. Rao Threshold Met ✦" : active >= 4 ? "Moderate Support" : "Below Threshold"}
+                    {active}/8 Fulfilled — {active >= 6 ? "Classical Threshold Met ✦" : active >= 4 ? "Moderate Support" : "Below Threshold"}
                   </div>
                   <div style={{ fontSize:11, color:"#6B635B", marginBottom:14 }}>
-                    √ = fulfilled (binary) · ~ = partial · × = not met · 6+/8 = strong commitment-support period per K.N. Rao research
+                    √ = fulfilled (binary) · ~ = partial · × = not met · 6+/8 = strong commitment-support period per classical research
                   </div>
                   <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                     {Object.values(result.backendJson.parameters as Record<string, any>).map((p: any) => {
@@ -1092,15 +1092,15 @@ export function MarriageTimingAnalyzer() {
                 </div>
               )}
 
-              {/* K.N. Rao Observations (O2/O3) */}
+              {/* Classical Observations (O2/O3) */}
               {bonusLayers.length > 0 && (
                 <div className="card" style={{ borderColor:"rgba(56,189,248,0.25)" }}>
-                  <div className="card-tag">✦ K.N. RAO OBSERVATIONS — O2 / O3</div>
+                  <div className="card-tag">✦ CLASSICAL OBSERVATIONS — O2 / O3</div>
                   <div className="card-title serif" style={{ marginBottom:6 }}>
                     Supporting Observations — {bonusActive}/{bonusTotal} active
                   </div>
                   <div style={{ fontSize:11, color:"#6B635B", marginBottom:14, lineHeight:1.6 }}>
-                    O2 and O3 are supporting observations from K.N. Rao&apos;s framework — not core parameters.
+                    O2 and O3 are supporting observations from classical timing research framework — not core parameters.
                     They add a small confidence nudge (+{bonusScore}) to the core {score}/100.
                     Adjusted: <strong style={{ color:scoreColor(adjustedScore) }}>{adjustedScore}/100</strong>.
                   </div>
@@ -1138,7 +1138,7 @@ export function MarriageTimingAnalyzer() {
               {/* Safety Note */}
               <div style={{ padding:"12px 16px", borderRadius:10, background: "#FAF7F2",
                 border: "1px solid rgba(184,134,11,0.2)", fontSize:11, color: "#6B635B", textAlign:"center" }}>
-                ⚠️ No fixed destiny predictions. K.N. Rao framework is for timing confidence, not certainty.
+                ⚠️ No fixed destiny predictions. Classical framework is for timing confidence, not certainty.
                 Combine with D1 promise, D9 quality, Ashtakoot compatibility and practical readiness.
               </div>
             </>
@@ -1341,7 +1341,7 @@ export function MarriageTimingAnalyzer() {
               <div className="card" style={{ borderColor:`${scoreColor(score)}33` }}>
                 <div className="card-tag">✦ MARRIAGE TIMING — FULL NARRATIVE</div>
                 <div className="card-title serif">
-                  {result.formats?.dashboardCard?.title ?? "K.N. Rao Timing Assessment"}
+                  {result.formats?.dashboardCard?.title ?? "Classical Timing Assessment"}
                 </div>
                 <div style={{ display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" }}>
                   <span className="badge badge-gold">Score: {score}/100</span>
@@ -1385,7 +1385,7 @@ export function MarriageTimingAnalyzer() {
               {/* Report Header */}
               <div className="card" style={{ borderColor:"rgba(200,160,48,0.3)",
                 background:"linear-gradient(135deg,rgba(200,160,48,0.05),rgba(124,58,237,0.04))" }}>
-                <div className="card-tag">📋 MARRIAGE TIMING VALIDATOR — K.N. RAO RESEARCH LAYER</div>
+                <div className="card-tag">📋 MARRIAGE TIMING VALIDATOR — CLASSICAL RESEARCH LAYER</div>
                 <div className="card-title serif" style={{ fontSize:22 }}>
                   {result.formats?.pdfSection?.title ?? "Marriage Timing Report"}
                 </div>
@@ -1405,7 +1405,7 @@ export function MarriageTimingAnalyzer() {
               {/* All Parameters — PDF Style */}
               <div className="card">
                 <div className="card-tag">✦ ALL 8 PARAMETERS — DETAILED</div>
-                <div className="card-title serif" style={{ marginBottom:16 }}>K.N. Rao Parameter Analysis</div>
+                <div className="card-title serif" style={{ marginBottom:16 }}>Classical Timing Parameter Analysis</div>
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                   {(result.formats?.pdfSection?.parameters ?? []).map((p: any, i: number) => {
                     const isFulfilled = p.score === 100;
@@ -1509,7 +1509,7 @@ function LoadingCard({ name }: { name: string }) {
     <div className="card" style={{ textAlign:"center", padding:48 }}>
       <div style={{ fontSize:40, marginBottom:16, color:"#c8a030" }}>✦</div>
       <div style={{ fontFamily:"Cormorant Garamond,serif", fontSize:18, color: "#1A1A1A", marginBottom:8 }}>
-        Analyzing K.N. Rao Parameters...
+        Analyzing Classical Timing Parameters...
       </div>
       <div style={{ fontSize:12, color:"#6B635B" }}>
         Evaluating 8 timing parameters for {name}

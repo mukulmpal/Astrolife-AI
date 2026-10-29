@@ -406,7 +406,7 @@ export function PalmistryAnalyzer() {
                   <h3 className="font-serif text-2xl font-bold text-[#e6c869]">Ready to scan</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">
                     AstroLife AI aapki hatheli ki lines, mounts aur fingers ko classical palmistry
-                    (Samudrika Shastra + K.N. Rao) ke hisaab se analyze karega.
+                    (Samudrika Shastra + Vedic Jyotish) ke hisaab se analyze karega.
                   </p>
                   <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
                     <PremiumButton onClick={analyze} disabled={scanning}>

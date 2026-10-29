@@ -467,11 +467,31 @@ export default function LalKitabPage() {
               <div className="hstat-n" style={{color:"#2dd4bf"}}>{result.rins.length}</div>
               <div className="hstat-l">RIN ZONES</div>
             </div>
+            <div className="hstat">
+              <div className="hstat-n" style={{color: result.tevaType === "Dharmi Teva" ? "#22c55e" : result.tevaType === "Andha Teva" ? "#ef4444" : "#8A6008", fontSize: 13}}>
+                {result.tevaType || "Sadharan"}
+              </div>
+              <div className="hstat-l">TEVA PRAKAR</div>
+            </div>
           </div>
         </div>
 
-        {/* SUMMARY */}
+        {/* SUMMARY & TEVA BANNER */}
         <div className="summary-strip">📕 {result.summary}</div>
+        {result.tevaExplanation && result.tevaType !== "Sadharan Teva" && (
+          <div style={{
+            background: result.tevaType === "Dharmi Teva" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
+            border: `1px solid ${result.tevaType === "Dharmi Teva" ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+            borderRadius: 12,
+            padding: "12px 18px",
+            marginBottom: 16,
+            fontSize: 13,
+            color: "#4A4238",
+            lineHeight: 1.7
+          }}>
+            {result.tevaExplanation}
+          </div>
+        )}
 
         {/* KISMAT KA GRAH BANNER */}
         <div className="kismat-bar">
@@ -753,13 +773,13 @@ export default function LalKitabPage() {
         {activeTab === "takkar" && (
           <div>
             <div className="detail-note">
-              Takkar sirf tab count hota hai jab do grah ek hi Lal Kitab ghar mein baithkar ya known enemy relation se ek doosre ko disturb karte hain. Agar count zero ho, iska matlab engine broken nahi hai; iska matlab major same-house takkar nahi mila. Planet-wise dushman ghar, mandi halat aur rin signals Planets/Safety tabs mein alag se read honge.
+              Takkar Lal Kitab mein do mukhya roop mein aati hai: (1) Ek hi ghar mein shatru grahon ki Yuti, aur (2) 180° aamne-saamne (7ve bhav) ki frontal takkar. Upaya mein dono grahon ka daan nahi kiya jata; keval mandi halat wale grah ki shanti ki jaati hai ya teesre mediator grah ki sahayata li jaati hai.
             </div>
             {result.takkars.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">✅</div>
                 <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:22,color:"#4A4238"}}>Koi bada Takkar nahi</div>
-                <div style={{fontSize:13,marginTop:8}}>Same-house enemy clash nahi mila. Ab judgement planet condition aur varshphal timing se hoga.</div>
+                <div style={{fontSize:13,marginTop:8}}>Chart mein koi shatru takkar ya conflicting axis nahi mila. Sabhi grah aapas mein santulit urja sajha kar rahe hain.</div>
               </div>
             ) : (
               result.takkars.map((t, i) => (
@@ -770,16 +790,16 @@ export default function LalKitabPage() {
                     {t.icons[0]} {t.p1} {t.kind === "support" ? "🤝" : "⚔️"} {t.icons[1]} {t.p2}
                   </div>
                   <div className="takkar-house">
-                    House {t.house} · {
-                      t.kind === "enemy" ? "Shatruta — conflict active" :
-                      t.kind === "support" ? "Mitra Yog — positive energy" :
-                      "Jatil Yog — mixed results"
+                    {t.houseLabel || `House ${t.house}`} · {
+                      t.kind === "enemy" ? "Shatruta — Takkar sakriya" :
+                      t.kind === "support" ? "Mitra Yog — Positive energy" :
+                      "Jatil Yog — Mixed results"
                     }
                   </div>
                   <div className="takkar-effect">{t.effect}</div>
                   {t.kind !== "support" && (
                     <div className="takkar-upaya">
-                      🪬 Upaya: Dono planets ki cheezein alag alag din daan karein. Ek doosre ko neutralize karein.
+                      🪬 Upaya: {t.upaya || "Dono grahon mein jo mandi halat mein ho keval uski shanti karein; nek grah ki vastu preserve rakhein."}
                     </div>
                   )}
                 </div>
@@ -1282,9 +1302,13 @@ export default function LalKitabPage() {
                         </span>
                       ))}
                     </div>
-                    {occupied && (
+                    {occupied ? (
                       <div style={{marginTop:10,fontSize:11,color:"#15803D",padding:"6px 8px",background:"rgba(34,197,94,0.08)",borderRadius:6,fontWeight:600}}>
                         ⚡ {h.planets.join(" + ")} yahan hai — is zone ki cheezein seedha prabhavit hoti hain
+                      </div>
+                    ) : (
+                      <div style={{marginTop:10,fontSize:11,color:"#4A4238",padding:"6px 8px",background:"rgba(184,134,11,0.06)",borderRadius:6,lineHeight:1.6}}>
+                        <span style={{color:"#8A6008",fontWeight:700}}>💤 Soya Ghar:</span> Jagane wala grah: <strong>{h.awakenerPlanet}</strong>. {h.awakeningRemedy}
                       </div>
                     )}
                   </div>

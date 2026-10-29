@@ -1132,7 +1132,7 @@ export function DirectionAFeatures() {
               {
                 id: 'marriage',
                 icon: '💍',
-                title: 'K.N. Rao Marriage Window Scanner',
+                title: 'Classical Marriage Window Scanner',
                 badge: 'Double-Transit Sutra',
                 desc: 'Identifies the precise 12-month marriage timing window through Jupiter and Saturn mutual aspects on the 7th house and lagna, combined with 36-point Ashtakoota & Nadi Dosha cancellation.',
                 tabs: ['Double-Transit Sutra', '36-Point Ashtakoota'],

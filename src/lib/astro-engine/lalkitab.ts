@@ -60,12 +60,14 @@ export interface LKPlanet {
 }
 
 export interface LKTakkar {
-  p1:     string;
-  p2:     string;
-  house:  number;
-  effect: string;
-  icons:  [string, string];
-  kind:   "enemy" | "support" | "complex";
+  p1:          string;
+  p2:          string;
+  house:       number;
+  houseLabel?: string;
+  effect:      string;
+  icons:       [string, string];
+  kind:        "enemy" | "support" | "complex";
+  upaya?:      string;
 }
 
 export interface LKRin {
@@ -151,9 +153,12 @@ export interface LKVarshphalPrediction {
 }
 
 export interface LKHouseOmen extends HouseOmenRule {
-  planets:      string[];
-  planetIcons:  string[];
-  planetColors: string[];
+  planets:         string[];
+  planetIcons:     string[];
+  planetColors:    string[];
+  isSoya:          boolean;
+  awakenerPlanet:  string;
+  awakeningRemedy: string;
 }
 
 export interface LKResult {
@@ -168,6 +173,8 @@ export interface LKResult {
   coreAccuracy:  LKCoreAccuracyRow[];
   varshphal:     LKVarshphal;
   summary:       string;
+  tevaType?:     "Dharmi Teva" | "Andha Teva" | "Ratandh Teva" | "Sadharan Teva";
+  tevaExplanation?: string;
 }
 
 // Planet input shape
@@ -249,8 +256,30 @@ function planetPosition(planet: string, signNum: number): LKCoreAccuracyRow["pos
   return "NEUTRAL_SIGN";
 }
 
-function isSoyaPlanet(planet: string, status: LKPlanet["status"], state: LKPlanet["state"], position: LKCoreAccuracyRow["position"]) {
-  return status === "dushman" || state === "mandi" || position === "DEBILITATED" || ["Rahu","Ketu"].includes(planet);
+function isSoyaPlanet(
+  planet: string,
+  house: number,
+  allPlanets: Record<string, PD>,
+  currentAge: number,
+) {
+  // 1. Classical rule: A planet awakens automatically upon reaching its activation age
+  const actAge = LK_ACT_AGE[planet] || 25;
+  if (currentAge >= actAge) return false;
+
+  // 2. A companion planet in the same house awakens it (Yuti)
+  const hasCompanion = Object.entries(allPlanets).some(
+    ([p, pd]) => p !== planet && pd.house === house
+  );
+  if (hasCompanion) return false;
+
+  // 3. A planet in the opposing 7th house (direct 100% frontal drishti) awakens it
+  const oppositeHouse = ((house + 6 - 1) % 12) + 1;
+  const hasOpposing = Object.entries(allPlanets).some(
+    ([, pd]) => pd.house === oppositeHouse
+  );
+  if (hasOpposing) return false;
+
+  return true;
 }
 
 function beneficMalefic(
@@ -304,21 +333,21 @@ function houseReading(house: number) {
   return map[house] || `House ${house} ka year`;
 }
 
-// Pakka Ghar (multi-house — for display)
+// Pakka Ghar (classical multi-house mapping per 1952 edition)
 const LK_PAKKA: Record<string,number[]> = {
-  Sun:[1,9,10], Moon:[4], Mars:[1,3,8], Mercury:[7,10],
-  Jupiter:[2,5,9], Venus:[2,7], Saturn:[7,8,10,11], Rahu:[6,11,3], Ketu:[3,6,12]
+  Sun:[1], Moon:[4], Mars:[3,8], Mercury:[6,7],
+  Jupiter:[2,5,9,11], Venus:[2,7], Saturn:[8,10], Rahu:[12], Ketu:[6]
 };
 
-// Primary pakka house (single — for scoring)
+// Primary pakka house (single — for scoring & anchor)
 const LK_PAKKA_PRIMARY: Record<string,number> = {
-  Sun:1, Moon:4, Mars:3, Mercury:7, Jupiter:2, Venus:7, Saturn:8, Rahu:6, Ketu:12
+  Sun:1, Moon:4, Mars:3, Mercury:7, Jupiter:2, Venus:7, Saturn:8, Rahu:12, Ketu:6
 };
 
-// Dushman Ghar
+// Dushman Ghar (debilitated or classical enemy houses)
 const LK_ENEMY: Record<string,number[]> = {
-  Sun:[7], Moon:[8], Mars:[4], Mercury:[1],
-  Jupiter:[3,6], Venus:[6], Saturn:[1,4,5], Rahu:[1,5,9], Ketu:[2,7]
+  Sun:[7,8], Moon:[6,8], Mars:[4,8], Mercury:[1,12],
+  Jupiter:[6,8,10], Venus:[6], Saturn:[1,4,5], Rahu:[1,5,8,9], Ketu:[1,2,7,8]
 };
 
 // Activation ages
@@ -496,91 +525,91 @@ const LK_NISHANI: Record<string,Record<number,string>> = {
   },
 };
 
-// Hindi Upaya (remedies)
+// Hindi Upaya (classical authentic remedies)
 const LK_UPAYA: Record<string,Record<number,string>> = {
   Sun:{
-    1:"Har roz ugta hua Surya ko jal chadhaen. Tambe ka lota use karein.",
-    2:"Nadee mein tambe ka sikka aur gehoon bahaen — Sunday ko.",
+    1:"Har roz ugta hua Surya ko jal chadhaen. Tambe ka lota use karein. Tamba/gehoon ka daan na karein.",
+    2:"Nadee mein tambe ka sikka bahaen. Meethi roti banakar baantein.",
     3:"Hanuman ji ki pooja karein. Bhai-behen ke saath rishta achha rakhein.",
-    4:"Pita ki seva karein. Mandir mein gehoon ka daan.",
-    5:"Surya Namaskar 108 baar roz karein.",
-    6:"Surya ko jal chadhaen — Suryoday par.",
-    7:"Shaadi se pehle nadee mein tambe ka sikka bahaen.",
-    8:"Gehoon + tambe ki cheez + lal kapda daan karein.",
-    9:"Surya ko jal + pita ke bhaiyon ko daan.",
-    10:"Pita ka aadar karein. Roz Surya ko jal.",
-    11:"Andhon ki madad karein. Gehoon ka daan Sunday.",
-    12:"Tambe ka sikka bahein. Suryoday pe dhyaan.",
+    4:"Pita aur mata ki nitya seva karein. Ghar ke mandir ko pavitra rakhein.",
+    5:"Surya Namaskar karein. Bachhon ke sath prem aur gyan sajha karein.",
+    6:"Suryoday par Surya ko jal samarpit karein. Rogiyon ki nishkaam seva karein.",
+    7:"Shaadi se pehle nadee mein tambe ka sikka bahaen. Ahankar par niyantran rakhein.",
+    8:"Gehoon + tambe ki cheez + lal kapda daan karein. Meethi rewari jal pravah karein.",
+    9:"Surya ko jal dein. Pita aur guru ke aadesh ka nishtha se palan karein.",
+    10:"Pita ka aadar karein. Roz Surya ko jal dein. Karobaar mein satyanishtha rakhein.",
+    11:"Andhon ko bhojan karayein. Pita ka aashirwad lein. Gehoon/tambe ka daan na karein.",
+    12:"Tambe ka sikka nadee mein bahayein. Suryoday par dhyaan karein.",
   },
   Moon:{
-    1:"Chaandi ki anguthi pehnein. Kamre mein paani ka bartan rakhein.",
-    2:"Aurtono ko doodh, chawal, chaandi daan karein.",
-    3:"Chaandi ka daan karein. Doodh ya paani kabhi mat bechein.",
-    4:"Maa ki seva karein. Ghar mein chhoti si chaandi rakhein.",
-    5:"Shiv ji ko doodh chadhayein. Yateem bachcho ko daan.",
-    6:"Chaandi ke glass mein paani piyein.",
-    7:"Monday ko doodh + safed cheezein aurtono ko daan.",
-    8:"Chandra ko jal. Moti pehnein.",
-    9:"Saas ki seva karein. Monday ko doodh ka daan.",
-    10:"Kaam kaarne wali aurtono ka aadar.",
-    11:"Ghar ke paas paani ka source banaye rakhein.",
-    12:"Bujurga aurtono ki seva. Safed daan.",
+    1:"Chaandi ki anguthi ya chain pehnein. Kamre mein paani ka saaf bartan rakhein.",
+    2:"Mata aur bujurg auraton ka ashirwad lein. Chaandi ka chauras tukda paas rakhein. Doodh-chawal ka daan na karein.",
+    3:"Kanya ya chaandi ka daan na karein. Doodh ya paani kabhi na bechein. Bachhon ko kheer khilayein.",
+    4:"Maa ki nitya seva karein. Ghar mein chhoti si chaandi rakhein. Doodh ka daan na karein.",
+    5:"Shiv ji ko jal chadhayein. Yateem bachhon ki shiksha mein sahayata karein.",
+    6:"Chaandi ke glass mein paani piyein. Patal ke kuan/borewell saaf rakhein.",
+    7:"Patni aur mata ka aadar karein. Parivar mein prem banaye rakhein. Doodh-chaandi ka daan na karein.",
+    8:"Chandra ko nitya pranam karein. Purani property/seepage ki marammat karein.",
+    9:"Saas aur mata ki seva karein. Teerth sthal par jal bhent karein. Doodh ka daan na karein.",
+    10:"Kaam karne wali mahilaon ka samman karein. Routine mein dhairya rakhein.",
+    11:"Ghar ke paas paani ka source saaf rakhein. Bujurg striyon ko aadar dein.",
+    12:"Bujurg auraton ki seva karein. Pyase logon ko nishkaam paani pilayein.",
   },
   Mars:{
-    1:"Peepal ya neem lagayen. Blood donation karein.",
-    2:"Ped kabhi mat kaatein. Lal masoor ki daal ka daan.",
-    3:"Bhai-behen ki madad karein. Ped lagaen.",
-    4:"Bhai-behen se rishta theek rakhein. Zameen ke jhagde mat karein.",
-    5:"Mangalvar ko lal masoor ka daan.",
-    6:"Public jagah pe ped lagaen. Blood donation.",
-    7:"Nadee mein tambe ke sikke bahayen.",
-    8:"Moonga pehnein. Ghar mein rishta theek rakhein.",
-    9:"Mandir mein lal kapda daan.",
-    10:"Kaam ki jagah pe ped lagaen.",
-    11:"Income ke liye ped lagaen.",
-    12:"Mandir mein lal daan. Ped mat kaatein.",
+    1:"Peepal ya neem lagayen. Blood donation karein. Krodh par sayyam rakhein.",
+    2:"Ped kabhi mat kaatein. Lal masoor ki daal ka niyantrit daan karein.",
+    3:"Bhai-behen ki madad karein. Chaandi ka chhalla pehnein. Saahas ka sahi upyog karein.",
+    4:"Bhai-behen se rishta theek rakhein. Zameen ke jhagde mat karein. Chaandi dharan karein.",
+    5:"Suryoday par Surya ko jal dein. Bachhon ko khed-kood mein prerit karein.",
+    6:"Public jagah pe chhayadar ped lagayein. Blood donation karein.",
+    7:"Nadee mein tambe ke sikke bahayen. Jeevansathi se vivad na karein.",
+    8:"Gale mein chaandi ki chain pehnein. Behti nadee mein rewari ya gud bahayein. Moonga bilkul na pehnein.",
+    9:"Mandir mein lal kapda ya lal masoor bhent karein. Dharmik maryada rakhein.",
+    10:"Kaam ki jagah par mazdooron ka aadar karein. Shramik discipline banaye rakhein.",
+    11:"Vyapar aur income mein satya aacharan rakhein. Bhaiyon ki bhalai sochein.",
+    12:"Mandir mein lal anaj bhent karein. Krodh aur hathiyaron se door rahein.",
   },
   Mercury:{
-    1:"Budh-var ko haari ghaas gaay ko khilaen.",
-    2:"Behen-massi ko haare rang ki choodiyan dein.",
-    3:"Maami ki seva karein.",
-    4:"Maasi-nana paksh ki seva karein.",
-    5:"Pakshiyon ko daana dein. Haari choodiyan.",
-    6:"Panna pehnein. Maami ki seva.",
-    7:"Business mein sachchi baat bolein hamesha.",
-    8:"Dhokha mat karein. Toton ko khaana dein.",
-    9:"Guru ka aadar karein. Kitaben daan karein.",
-    10:"Kaam ki jagah pe sachhai rakhein.",
-    11:"Budh-var ko haara daan.",
-    12:"Gaay ko haari ghaas khilaen.",
+    1:"Budh-var ko hari ghaas gaay ko khilayein. Behen-beti ka aashirwad lein.",
+    2:"Behen-maasi ko hare rang ki choodiyan dein. Vyapar mein sachhai rakhein.",
+    3:"Maami aur behen ki seva karein. Lekhan aur communication saaf rakhein.",
+    4:"Maasi-nana paksh ki seva karein. Ghar ke kagazaat vyavasthit rakhein.",
+    5:"Pakshiyon ko hara moong daana dein. Vidyarthiyon ki sahayata karein.",
+    6:"Haath mein chaandi ka bejodh chhalla pehnein. Maami aur behen ka samman karein.",
+    7:"Business mein sachchi baat bolein hamesha. Jeevansathi se paridrishyata rakhein.",
+    8:"Dhokha mat karein. Toton aur pakshiyon ko paani-dana dein.",
+    9:"Guru ka aadar karein. Kitaben aur lekhak samagri vidyarthiyon ko dein.",
+    10:"Kaam ki jagah par sachhai rakhein. Legal papers hamesha saaf rakhein.",
+    11:"Budh-var ko behen-beti ko uphaar dein. Vyaparik samjhauta imaandari se karein.",
+    12:"Gaay ko hari ghaas khilayein. Raat ko sone se pehle likhkar man halka karein.",
   },
   Jupiter:{
-    1:"Kesar ka tilak lagaen. Bujurgon ke paon choein.",
-    2:"Guruvar ko Brahmin ko peeli chizein daan.",
-    3:"Bhai-behen ki padhai mein daan.",
-    4:"Ghar ke Guru ki pooja karein.",
-    5:"Doosron ko sikhaaein. Peela daan.",
-    6:"Guruvar ko peela kapda + haldi daan.",
-    7:"Roz kesar ka tilak lagaen.",
-    8:"Vishnu Sahasranama padhein.",
-    9:"Guru ko Dakshina dein.",
-    10:"Kaam ki jagah pe kesar ka tilak.",
-    11:"Guruvar ko kela + peeli chiz daan.",
-    12:"Spiritual sansthaaon ko daan.",
+    1:"Kesar ka tilak lagaen. Bujurgon ke paon choein. Gyan ka vistar karein.",
+    2:"Kesar ya haldi ka tilak lagayein. Guru aur pita ka ashirwad lein. Peeli vastu ka daan na karein.",
+    3:"Bhai-behen ki padhai mein nishkaam madad karein. Gyan sajha karein.",
+    4:"Ghar ke Guru ki pooja karein. Ghar mein dharmik vatavaran banaye rakhein.",
+    5:"Bachhon ko nishkaam padhayein. Puja sthan roshan rakhein. Peeli vastu ka daan na karein.",
+    6:"Guruvar ko peela kapda + haldi zarooratmand ko dein. Rogiyon ki seva karein.",
+    7:"Roz kesar ka tilak lagaen. Jeevansathi ko barabar samman dein.",
+    8:"Vishnu Sahasranama padhein. Gupt gyan ka durupyog na karein.",
+    9:"Guru ko Dakshina dein. Dharmik tirth yatra karein aur vidya baatein.",
+    10:"Kaam ki jagah par kesar ka tilak lagayein. Nyayapoorna aacharan rakhein.",
+    11:"Kalaai par peela sooti dhaga ya sona pehnein. Guru aur pita ka samman karein. Peela daan na karein.",
+    12:"Spiritual sansthaaon mein nishkaam seva karein. Dhyan aur sadhana karein.",
   },
   Venus:{
-    1:"Aurtono ko safed chawal + shakkar daan.",
-    2:"Patni ka aadar karein. Safed daan.",
-    3:"Bahan-behen ko Shukravar ko safed daan.",
-    4:"Safed gaay rakhein. Ghar mein safed chizein.",
-    5:"Shukravar ko safed mithai daan.",
-    6:"Sab aurtono ka aadar karein.",
-    7:"Best house — patni ka aadar karein. Safed daan regularly.",
-    8:"Chaandi + safed chizein daan.",
-    9:"Mandir mein safed mithai daan.",
-    10:"Female colleagues ki seva.",
-    11:"Shukravar ko safed chawal + shakkar daan.",
-    12:"Videsh mein safed daan.",
+    1:"Ghar ko sugandhit rakhein. Jeevansathi ka samman karein. Charitra shuddh rakhein.",
+    2:"Patni ka aadar karein. Ghar ko saaf aur sugandhit rakhein. Safed vastu ka daan na karein.",
+    3:"Behen aur kanyaon ko aadar dein. Kalaatmak ruchi ko badhava dein.",
+    4:"Safed gaay ki seva karein. Ghar mein swachhta aur shanti banaye rakhein.",
+    5:"Kala aur saundarya mein maryada rakhein. Vidyarthiyon ko prerit karein.",
+    6:"Sabhi auraton ka samman karein. Shukravar ko safed chawal gaay ko dein.",
+    7:"Patni ka samman karein. Charitra pavitra rakhein. Safed vastu ya sugandh ka daan na karein.",
+    8:"Chaandi dharan karein. Parayi stree se door rahein aur maryada banaye rakhein.",
+    9:"Mandir mein safed phool bhent karein. Dharmik parampara ka aadar karein.",
+    10:"Karyasthal par stree sahkariyon ka aadar karein. Kala mein nishtha rakhein.",
+    11:"Shukravar ko kheer banakar kanyaon ko khilayein. Safed vastu ka bematlab daan na karein.",
+    12:"Ghar ke shayan kaksh ko pavitra aur swachh rakhein. Nishkaam seva karein.",
   },
   Saturn:{
     1:"Sarson ka tel + kaale til ka daan karein. Kauon ko khaana dein.",
@@ -901,71 +930,216 @@ export function calculateLalKitab(
     };
   }).filter(Boolean) as LKPlanet[];
 
-  // ── Takkar analysis ───────────────────────────────────
+  // ── Takkar analysis (Both same-house Yuti and opposite 7th-axis Takkar) ──
   const takkars: LKTakkar[] = [];
   PLS.forEach((p1, i) => {
     PLS.forEach((p2, j) => {
       if (j <= i || !planets[p1] || !planets[p2]) return;
-      if (planets[p1].house !== planets[p2].house) return;
+      const h1 = planets[p1].house;
+      const h2 = planets[p2].house;
+      const sameHouse = h1 === h2;
+      const oppositeAxis = Math.abs(h1 - h2) === 6;
+
+      if (!sameHouse && !oppositeAxis) return;
+
       const isEnemy  = (LK_ENEMY_PLANET[p1]||[]).includes(p2) || (LK_ENEMY_PLANET[p2]||[]).includes(p1);
       const isFriend = (LK_FRIENDS[p1]||[]).includes(p2) || (LK_FRIENDS[p2]||[]).includes(p1);
-      const pair = [p1,p2].sort().join("-");
+
+      const locationText = sameHouse ? `H${h1}` : `H${h1} vs H${h2}`;
+      const locationLabel = sameHouse ? `House ${h1} (Yuti)` : `House ${h1} aamne-saamne House ${h2}`;
+
+      // Classical authentic mediator / third-planet remedies for mutual clashes
+      let takkarUpaya = "";
+      if (isEnemy || !isFriend) {
+        if ((p1 === "Sun" && p2 === "Saturn") || (p1 === "Saturn" && p2 === "Sun")) {
+          takkarUpaya = "Brihaspati (Guru) ko beech mein layein: Kesar ka tilak lagayein ya mandir mein peela anaj dein; dono ki vastu ek sath daan na karein.";
+        } else if ((p1 === "Mars" && p2 === "Saturn") || (p1 === "Saturn" && p2 === "Mars")) {
+          takkarUpaya = "Chandra ya Shukra ki shanti lein: Behti nadee mein thoda doodh bahayein, krodh aur lohe se savdhani rakhein.";
+        } else if ((p1 === "Moon" && p2 === "Rahu") || (p1 === "Rahu" && p2 === "Moon")) {
+          takkarUpaya = "Surya aur Shiva upasana karein. Chaandi ka tukda apne paas rakhein, nasha bilkul na karein.";
+        } else if ((p1 === "Venus" && p2 === "Rahu") || (p1 === "Rahu" && p2 === "Venus")) {
+          takkarUpaya = "Neeli/kaali cheezein bedroom se door rakhein, jeevansathi ke prati nishtha rakhein, silver dharan karein.";
+        } else if ((p1 === "Mars" && p2 === "Mercury") || (p1 === "Mercury" && p2 === "Mars")) {
+          takkarUpaya = "Boli par sayyam rakhein, behen ya bhaiyon se vivad na karein, haath mein chaandi ka chhalla pehnein.";
+        } else {
+          takkarUpaya = "Dono grahon mein jo grah mandi/dushman halat mein ho keval uski shanti karein; nek/supportive grah ki vastu daan na karein.";
+        }
+      }
 
       // Check structured takkar rules first
       const takkarRule = TAKKAR_RULES.find(r => r.planets.includes(p1) && r.planets.includes(p2));
       if (takkarRule) {
         takkars.push({
-          p1, p2, house: planets[p1].house,
-          effect: takkarRule.meaning,
+          p1, p2, house: h1, houseLabel: locationLabel,
+          effect: `${takkarRule.meaning} (${locationText} mein sakriya).`,
           icons: [PEMO[i], PEMO[j]],
           kind: "enemy",
+          upaya: takkarUpaya || "Pehle behavior correction karein, dono planets ki vastu ek sath donate na karein.",
         });
       } else if (isEnemy) {
         takkars.push({
-          p1, p2, house: planets[p1].house,
-          effect: `${p1} aur ${p2} ki aapas mein nahi banti — conflict, delays, mixed results in H${planets[p1].house}.`,
+          p1, p2, house: h1, houseLabel: locationLabel,
+          effect: `${p1} aur ${p2} ki shatruta hai (${locationText}) — karya mein vilamb ya aapas mein urja ka takraav.`,
           icons: [PEMO[i], PEMO[j]],
           kind: "enemy",
+          upaya: takkarUpaya || "Dono mein se keval mandi grah ki shanti karein, nek grah ki vastu preserve rakhein.",
         });
-      } else if (isFriend) {
+      } else if (isFriend && sameHouse) {
         takkars.push({
-          p1, p2, house: planets[p1].house,
-          effect: `${p1} aur ${p2} dono milkar H${planets[p1].house} ke phal ko boost karte hain — double positive.`,
+          p1, p2, house: h1, houseLabel: locationLabel,
+          effect: `${p1} aur ${p2} dono milkar ${locationText} ke phal ko boost karte hain — shubh mitra yog.`,
           icons: [PEMO[i], PEMO[j]],
           kind: "support",
         });
-      } else {
-        // Complex combo without clear friend/enemy
+      } else if (sameHouse) {
         takkars.push({
-          p1, p2, house: planets[p1].house,
-          effect: `${p1} + ${p2} in H${planets[p1].house} — mixed karmic interaction, results depend on dasha.`,
+          p1, p2, house: h1, houseLabel: locationLabel,
+          effect: `${p1} + ${p2} in ${locationText} — mixed karmic interaction, dasha anusaar prabhav aayega.`,
           icons: [PEMO[i], PEMO[j]],
           kind: "complex",
+          upaya: "Pehle dono grahon ki halat alag-alag parkhein; jaldbaazi mein koi daan na karein.",
         });
       }
-      void pair;
     });
   });
 
-  // ── Rin Siddhant ──────────────────────────────────────
+  // ── Rin Siddhant (Classical 1952 Ancestral Debts) ─────
   const rins: LKRin[] = [];
-  PLS.forEach((planet, pi) => {
-    if (!planets[planet]) return;
-    const h = planets[planet].house;
-    const isRinPlanet = ["Rahu","Ketu","Saturn","Mars"].includes(planet);
-    const isRinHouse  = [6,8,12].includes(h);
-    if (isRinPlanet || isRinHouse) {
-      rins.push({
-        planet, icon: PEMO[pi], house: h,
-        rin:  LK_RIN[h] || `H${h} — Karmic zone`,
-        upaya: LK_UPAYA[planet]?.[h] || "Pitra Tarpan karein. Ancestral karma clear karein.",
-      });
-    }
-  });
+  const jup = planets["Jupiter"];
+  const sun = planets["Sun"];
+  const rahu = planets["Rahu"];
+  const saturn = planets["Saturn"];
+  const moon = planets["Moon"];
+  const mars = planets["Mars"];
+  const venus = planets["Venus"];
+  const merc = planets["Mercury"];
+  const ketu = planets["Ketu"];
 
-  const hasPitraRin = rins.some(r =>
-    ["Rahu","Sun"].includes(r.planet) && [1,2,5,9].includes(r.house)
+  // 1. Pitru Rin (Forefathers' Debt)
+  const isPitruRin = Boolean(
+    (jup && [2,5,9,12].includes(jup.house) && (
+      (rahu && rahu.house === jup.house) || (saturn && saturn.house === jup.house)
+    )) || (sun && sun.house === 9 && rahu && rahu.house === 9)
   );
+  if (isPitruRin) {
+    rins.push({
+      planet: "Jupiter",
+      icon: "♃",
+      house: jup ? jup.house : 9,
+      rin: "Pitru Rin (पूर्वजों का ऋण) — Mandir ya peepal ka anisht ya pita/guru ke aashirwad mein kami.",
+      upaya: "Kutumb ke sabhi rakt sambandhiyon se barabar dhan lekar mandir ya dharmik sthal par bhent karein.",
+    });
+  }
+
+  // 2. Matru Rin (Mother's Debt)
+  const isMatruRin = Boolean(
+    (moon && [4,8].includes(moon.house) && (
+      (ketu && ketu.house === moon.house) || (rahu && rahu.house === moon.house)
+    )) || (moon && moon.house === 6 && Boolean(saturn && saturn.house === 6))
+  );
+  if (isMatruRin && moon) {
+    rins.push({
+      planet: "Moon",
+      icon: "☽",
+      house: moon.house,
+      rin: "Matru Rin (मातृ ऋण) — Mata ya stree shakti ke prati pichle janam ki laparvahi ya jal ka dushit hona.",
+      upaya: "Khandan ke sabhi logon se barabar chandi ikattha karke behti nadee mein pravahit karein.",
+    });
+  }
+
+  // 3. Stri Rin (Wife's / Feminine Debt)
+  const isStriRin = Boolean(
+    venus && [2,7].includes(venus.house) && (
+      (sun && sun.house === venus.house) || (mars && mars.house === venus.house) || (rahu && rahu.house === venus.house)
+    )
+  );
+  if (isStriRin && venus) {
+    rins.push({
+      planet: "Venus",
+      icon: "♀",
+      house: venus.house,
+      rin: "Stri Rin (स्त्री ऋण) — Pichle janam mein kisi stree ya jeevansathi ke samman mein aaghat.",
+      upaya: "Parivar ke sabhi sadasyon se barabar chawal ikattha karke 100 gaayon ko bhojan karayein.",
+    });
+  }
+
+  // 4. Bhratri Rin (Sibling / Relatives Debt)
+  const isBhratriRin = Boolean(
+    (mars && [3,8].includes(mars.house) && merc && merc.house === mars.house) ||
+    (merc && [1,8].includes(merc.house) && mars && [1,8].includes(mars.house))
+  );
+  if (isBhratriRin) {
+    rins.push({
+      planet: "Mars",
+      icon: "♂",
+      house: mars ? mars.house : (merc ? merc.house : 3),
+      rin: "Bhratri Rin (भ्रातृ ऋण) — Bhaiyon ya mitron ke adhikar ya zameen se juda karmic dosha.",
+      upaya: "Khandan ke sabhi sadasyon se barabar paise lekar kisi beemar ya asahay vyakti ki dawa ka prabandh karein.",
+    });
+  }
+
+  // 5. Shramik / Zameeni Rin (Worker / Labourer Debt)
+  const isShramikRin = Boolean(
+    saturn && [8,10,11].includes(saturn.house) && (
+      (sun && sun.house === saturn.house) || (mars && mars.house === saturn.house)
+    )
+  );
+  if (isShramikRin && saturn) {
+    rins.push({
+      planet: "Saturn",
+      icon: "♄",
+      house: saturn.house,
+      rin: "Shramik Rin (श्रमिक ऋण) — Mazdooron, daas ya nirdosh garibon ke haq ka hanan.",
+      upaya: "Khandan ke sabhi sadasyon se thoda-thoda sarson ka tel aur kaale til lekar garib shramikon ko daan karein.",
+    });
+  }
+
+  // 6. Kudarati / Sarpa Rin (Nature / Serpent Debt)
+  const isKudaratiRin = Boolean(
+    (rahu && [6,8,12].includes(rahu.house) && (sun?.house === rahu.house || mars?.house === rahu.house)) ||
+    (ketu && [6,8,12].includes(ketu.house) && (sun?.house === ketu.house || saturn?.house === ketu.house))
+  );
+  if (isKudaratiRin) {
+    rins.push({
+      planet: rahu && [6,8,12].includes(rahu.house) ? "Rahu" : "Ketu",
+      icon: rahu && [6,8,12].includes(rahu.house) ? "☊" : "☋",
+      house: rahu && [6,8,12].includes(rahu.house) ? rahu.house : (ketu ? ketu.house : 6),
+      rin: "Kudarati / Sarpa Rin (दैवीय / कुदरती ऋण) — Pichle janam mein kisi bejuban pashu ya kudarati vatavaran ko kshati.",
+      upaya: "100 dinon tak kutton aur machhliyon ko niyamit bhojan dein; kudarat ke niyam ka samman karein.",
+    });
+  }
+
+  const hasPitraRin = isPitruRin;
+
+  // ── Teva Classification (Dharmi / Andha / Ratandh / Sadharan) ──
+  let tevaType: "Dharmi Teva" | "Andha Teva" | "Ratandh Teva" | "Sadharan Teva" = "Sadharan Teva";
+  let tevaExplanation = "Aapka chart sadharan niyamon ke anusaar chalta hai; grahon ke apne-apne swabhavik phal milte hain.";
+
+  // Dharmi Teva: Jupiter in 9 or 11, OR Jupiter conjunct Saturn, OR Moon in 4
+  const isDharmi = Boolean(
+    (jup && [9, 11].includes(jup.house)) ||
+    (jup && saturn && jup.house === saturn.house) ||
+    (moon && moon.house === 4)
+  );
+
+  // Ratandh Teva: Sun in 7 and Saturn in 1
+  const isRatandh = Boolean(sun && saturn && sun.house === 7 && saturn.house === 1);
+
+  // Andha Teva: Mutual enemies in House 10 OR House 10 vacant while 4 and 7 have severe affliction
+  const h10Planets = PLS.filter(p => planets[p]?.house === 10);
+  const isAndha = (h10Planets.includes("Saturn") && h10Planets.includes("Sun")) ||
+    (h10Planets.length === 0 && Boolean(sun && sun.house === 4 && saturn && saturn.house === 7));
+
+  if (isDharmi) {
+    tevaType = "Dharmi Teva";
+    tevaExplanation = "✨ Dharmi Teva (धर्मी तेवा): Lal Kitab ke anusaar aapki kundali par Ishwariya kripa ka chhatra hai. Yahan paapi grah (Shani, Rahu, Ketu) bhi apna poora ashubh asar nahi de pate aur sankat ke samay adrishya madad mil jaati hai.";
+  } else if (isRatandh) {
+    tevaType = "Ratandh Teva";
+    tevaExplanation = "🌙 Ratandh Teva (रतौंधी तेवा): Surya aur Shani ke aamne-saamne hone se din mein kaam tezi se bante hain, kintu raat ke faisle ya andhere mein kiye gaye samjhaute mein vishesh savdhani zaroori hai.";
+  } else if (isAndha) {
+    tevaType = "Andha Teva";
+    tevaExplanation = "⚡ Andha Teva (अंधा तेवा): Dasham sthan (karma) par dristi ya urja ki rukawat ke karan mehnat ka pura fal dikhne mein vilamb hota hai. Upaya: 10 andhon ko bhojan karayein aur karma sthal par imaandari rakhein.";
+  }
 
   // ── Combinations ──────────────────────────────────────
   const ruledCombinations: LKCombination[] = COMBINATION_RULES.filter(rule => {
@@ -1017,16 +1191,39 @@ export function calculateLalKitab(
   }));
 
   // ── Kismat Ka Grah ────────────────────────────────────
+  const KISMAT_ACTIVATIONS: Record<string, string> = {
+    Sun: "Surya aapka mukhya bhagya activator hai. Pita ka nitya ashirwad lein, pratidin Suryoday par jal samarpit karein, aur sarkari/adhikarik karyon mein satyanishtha banaye rakhein.",
+    Moon: "Chandra aapka mukhya bhagya activator hai. Mata aur ghar ki streeyon ka ashirwad lein, chandi ka tukda apne paas rakhein, aur doodh/paani ka kabhi apvyay na karein.",
+    Mars: "Mangal aapka mukhya bhagya activator hai. Chhote bhaiyon aur sahyogiyon ki madad karein, sharirik shram aur saahas ko sakaratmak disha dein, aur krodh par niyantran rakhein.",
+    Mercury: "Budh aapka mukhya bhagya activator hai. Behen, beti aur bua ka samman karein, vyapar aur vartalap mein sachhai rakhein, aur pakshiyon ko hara dana dein.",
+    Jupiter: "Brihaspati (Guru) aapka sarvashreshtha bhagya activator hai. Guru aur bujurgon ke charan sparsh karein, mashtak par kesar/haldi ka tilak lagayein, aur dharmik aacharan rakhein.",
+    Venus: "Shukra aapka mukhya bhagya activator hai. Jeevansathi ka samman karein, ghar ko swachh aur sugandhit rakhein, aur kalaatmak va saundaryapoorna karyon mein ruchi lein.",
+    Saturn: "Shani aapka mukhya bhagya activator hai. Mazdooron aur asahay logon ki seva karein, niyamit parishram karein, aur galat tarike se dhan arjan se door rahein.",
+    Rahu: "Rahu aapka aakasmik bhagya activator hai. Rasoi mein baithkar bhojan karein, unconventional takneek aur digital kshetra mein naye raste khojein, aur jhooth se bachein.",
+    Ketu: "Ketu aapka adhyatmik bhagya activator hai. Kutton ko bhojan dein, nishkaam seva karein, ghamand se door rahein aur antaratma ki aawaz par vishwas karein.",
+  };
+
   const kismatRanked = PLS.map((planet, pi) => {
-    if (!planets[planet]) return null;
-    const h = planets[planet].house;
+    const pd = planets[planet];
+    if (!pd) return null;
+    const h = pd.house;
     const hScore = KISMAT_HOUSE_WEIGHTS[h] || 5;
     const pScore = KISMAT_PLANET_BASE[planet] || 5;
-    const rawScore = hScore + pScore; // Range 8 to 20 (max 20)
+    const { score: condScore, state } = conditionScore(planet);
+    const inPakka = (LK_PAKKA[planet] || []).includes(h);
+    const inDushman = (LK_ENEMY[planet] || []).includes(h);
+
+    let bonus = 0;
+    if (inPakka || state === "nek") bonus += 2;
+    if (inDushman || state === "mandi") bonus -= 3;
+    if (h === 9) bonus += 2; // natural Bhagya house
+
+    const rawScore = Math.max(1, Math.min(20, hScore + pScore + bonus));
     // Scale raw fortune score to Lal Kitab's standard 95-point scale (matching domainScore and UI /95)
     const scaledScore = Math.min(95, Math.max(10, Math.round((rawScore / 20) * 95)));
-    return { planet, icon: PEMO[pi], house: h, score: scaledScore, rawScore };
-  }).filter(Boolean) as { planet:string; icon:string; house:number; score:number; rawScore:number }[];
+    return { planet, icon: PEMO[pi], house: h, score: scaledScore, rawScore, state };
+  }).filter(Boolean) as { planet:string; icon:string; house:number; score:number; rawScore:number; state:string }[];
+
   kismatRanked.sort((a,b) => b.score - a.score);
   const topKismat = kismatRanked[0];
   const kismat: LKKismat = {
@@ -1034,14 +1231,14 @@ export function calculateLalKitab(
     icon:           topKismat.icon,
     house:          topKismat.house,
     score:          topKismat.score,
-    interpretation: `${topKismat.planet} in H${topKismat.house} acts as your major fortune activator. Strengthen its positive behaviour before using material remedies.`,
+    interpretation: `${topKismat.planet} in H${topKismat.house} acts as your major fortune activator. ${KISMAT_ACTIVATIONS[topKismat.planet] || "Strengthen its positive behaviour before using material remedies."}`,
   };
 
   const coreAccuracy: LKCoreAccuracyRow[] = lkPlanets.map((planet) => {
     const pd = planets[planet.planet];
     const position = planetPosition(planet.planet, pd.signNum);
-    const soya = isSoyaPlanet(planet.planet, planet.status, planet.state, position);
-    const kismatJaganewala = planet.planet === kismat.planet || planet.isActNow || planet.state === "nek";
+    const soya = isSoyaPlanet(planet.planet, planet.house, planets, currentAge);
+    const kismatJaganewala = planet.planet === kismat.planet || (planet.house === 9 && planet.state !== "mandi");
     const bm = beneficMalefic(planet.planet, planet.house, planet.status, planet.state, position);
     return {
       planet: planet.planet,
@@ -1138,22 +1335,44 @@ export function calculateLalKitab(
   const dushmanCount = lkPlanets.filter(p => p.status === "dushman").length;
   const nekCount     = lkPlanets.filter(p => p.state  === "nek").length;
   const summary =
-    pakkaCount >= 4
-      ? `Aapke chart mein ${pakkaCount} planets apne Pakka Ghar mein hain — bahut shubh! Strong material and spiritual foundation. ${nekCount} planets Nek Halat mein hain.`
-      : dushmanCount >= 3
-        ? `${dushmanCount} planets Dushman Ghar mein hain — upay bahut important hai. Rin siddhant ka dhyan rakhein.`
-        : `Balanced chart — ${pakkaCount} pakka, ${dushmanCount} dushman ghar. Mixed results with focused upay. Kismat Ka Grah: ${kismat.planet}.`;
+    tevaType === "Dharmi Teva"
+      ? `Aapka chart 'Dharmi Teva' hai (${pakkaCount} pakka ghar, ${nekCount} nek grah) — paapi grah bhi Ishwariya kripa se anisht nahi kar paate. Kismat Ka Grah: ${kismat.planet}.`
+      : pakkaCount >= 4
+        ? `Aapke chart mein ${pakkaCount} planets apne Pakka Ghar mein hain — bahut shubh! Strong material and spiritual foundation. ${nekCount} planets Nek Halat mein hain.`
+        : dushmanCount >= 3
+          ? `${dushmanCount} planets Dushman Ghar mein hain — focused upaya zaroori hai. Rin siddhant ka dhyan rakhein.`
+          : `Balanced chart — ${pakkaCount} pakka, ${dushmanCount} dushman ghar. Mixed results with focused upay. Kismat Ka Grah: ${kismat.planet}.`;
 
-  // ── House-wise Home Omens ─────────────────────────────
+  // ── House-wise Home Omens & Soya House Awakeners ──────
+  const HOUSE_AWAKENERS: Record<number, { planet: string; remedy: string }> = {
+    1:  { planet: "Mars / Sun",    remedy: "Surya ko jal samarpit karein, aatmasamman aur saahas ko sakriya rakhein." },
+    2:  { planet: "Moon / Jupiter", remedy: "Mata ka ashirwad lein, chandi ka chauras tukda ghar mein rakhein, peeli vastu ka daan na karein." },
+    3:  { planet: "Mercury / Mars", remedy: "Bhai-behenon se sambandh theek rakhein, vyavsayik vartalap ko satyanishtha banayein." },
+    4:  { planet: "Moon",           remedy: "Mata ki nitya seva karein, ghar ke jal strot ko sadaiv saaf aur shuddh rakhein." },
+    5:  { planet: "Sun / Jupiter",  remedy: "Vidya aur gyan ka daan karein, vidyarthiyon ki madad karein, puja sthal roshan rakhein." },
+    6:  { planet: "Rahu / Ketu",    remedy: "Kutton ko bhojan karayein, asahay rogiyon ki seva karein, vivad se bachein." },
+    7:  { planet: "Venus / Mercury",remedy: "Jeevansathi ka aadar karein, ghar mein sugandh aur shuddhata rakhein, chhal-kapat na karein." },
+    8:  { planet: "Moon / Saturn",  remedy: "Purane dark corners ko saaf karein, gale mein chandi ki chain dharan karein." },
+    9:  { planet: "Jupiter",        remedy: "Dharmik sthano aur mandiro mein nishkaam bhent karein, Guru ke aadesh ka palan karein." },
+    10: { planet: "Saturn",         remedy: "Shramikon aur mazdooron ko samman dein, karma kshetra mein nishthawan rahein." },
+    11: { planet: "Jupiter",        remedy: "Kamai ka ek chhota hissa dharmik/shaikshik karya mein lagayein, bujurgon ka aadar karein." },
+    12: { planet: "Ketu / Rahu",    remedy: "Niyamit dhyan sadhana karein, rasoi mein baithkar bhojan karein, nasha door rakhein." },
+  };
+
   const houseOmens: LKHouseOmen[] = HOUSE_WISE_OMENS.map(rule => {
     const occupants = PLS.filter(p => planets[p] && planets[p].house === rule.house);
+    const isSoya = occupants.length === 0;
+    const awakener = HOUSE_AWAKENERS[rule.house] || { planet: "Jupiter", remedy: "Dharma aur satya aacharan." };
     return {
       ...rule,
-      planets:      occupants,
-      planetIcons:  occupants.map(p => PEMO[PLS.indexOf(p)]),
-      planetColors: occupants.map(p => PCOL[PLS.indexOf(p)]),
+      planets:         occupants,
+      planetIcons:     occupants.map(p => PEMO[PLS.indexOf(p)]),
+      planetColors:    occupants.map(p => PCOL[PLS.indexOf(p)]),
+      isSoya,
+      awakenerPlanet:  awakener.planet,
+      awakeningRemedy: awakener.remedy,
     };
   });
 
-  return { planets: lkPlanets, takkars, rins, hasPitraRin, combinations: activeCombinations, homeOmens, houseOmens, kismat, coreAccuracy, varshphal, summary };
+  return { planets: lkPlanets, takkars, rins, hasPitraRin, combinations: activeCombinations, homeOmens, houseOmens, kismat, coreAccuracy, varshphal, summary, tevaType, tevaExplanation };
 }

@@ -2383,7 +2383,7 @@ export default function KundliPage() {
                           href="/dashboard/marriage-timing"
                           className="p-3 text-center rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)] hover:border-[rgba(184,134,11,0.45)] text-xs text-[#1A1A1A] font-bold transition-colors block"
                         >
-                          🔗 K.N. Rao Timing Window
+                          🔗 Classical Timing Window
                         </Link>
                       </div>
 

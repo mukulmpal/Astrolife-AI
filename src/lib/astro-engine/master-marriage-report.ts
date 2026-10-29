@@ -11,7 +11,7 @@
  * 6. Separative Influences & Barren Signs Audit
  * 7. Geographic Direction of Spouse
  * 8. D1 ➔ D9 Cross-Mapping (Friction vs Wealth Multipliers)
- * 9. K.N. Rao 8-Parameter Marriage Timing & Conditional Dashas
+ * 9. Classical 8-Parameter Marriage Timing & Conditional Dashas
  * 10. Practical Vedic & Astro-Vastu Remedial Blueprint
  * ============================================================================
  */

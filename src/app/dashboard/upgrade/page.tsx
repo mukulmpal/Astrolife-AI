@@ -53,7 +53,7 @@ const PLANS = [
       "Transits (Gochar Engine) & Jaimini Sutras",
       "Health & Vitality (Medical Astrology)",
       "Divisional Charts (D-1 to D-60 Shodashvarga)",
-      "Marriage Timing Scanner (K.N. Rao 8-Param)",
+      "Marriage Timing Scanner (Classical 8-Param)",
       "Astro-Vastu & Astro-Tattoo",
       "Astro-Sound Therapy (Binaural Beats)",
       "Birth Time Rectification (BTR Engine)",

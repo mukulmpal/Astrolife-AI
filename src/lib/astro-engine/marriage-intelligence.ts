@@ -2,7 +2,7 @@
  * ============================================================================
  * ASTROLIFE — MARRIAGE INTELLIGENCE & D9 NAVAMSHA ENGINE
  * ============================================================================
- * Deep synthesis of KP Stellar Astrology, K.N. Rao Research, and Classical
+ * Deep synthesis of KP Stellar Astrology, Classical Research, and Classical
  * Navamsha (D9) Marriage Varga Analysis.
  *
  * Capabilities:
@@ -650,7 +650,7 @@ function getNavamshaSignNum(lon: number): number {
   return (D9_STARTS[signIdx] + navPart) % 12;
 }
 
-// ── Research Helpers: Veluchamy (2022) & K.N. Rao Synthesis ─────────────────
+// ── Research Helpers: Veluchamy (2022) & Classical Synthesis ─────────────────
 
 /**
  * Detects Punarbu / Punarphoo Yoga (Moon-Saturn Connection)
