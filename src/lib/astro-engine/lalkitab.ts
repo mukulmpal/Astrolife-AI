@@ -308,7 +308,7 @@ function coreReason(row: {
   const parts = [
     `${row.planet} H${row.house} mein hai`,
     row.status === "pakka" ? "pakka ghar support deta hai" : row.status === "dushman" ? "dushman ghar challenge deta hai" : "sadharan ghar mixed phal deta hai",
-    row.position.replaceAll("_", " ").toLowerCase(),
+    String(row.position).replace(/_/g, " ").toLowerCase(),
     row.state === "nek" ? "nek halat" : row.state === "mandi" ? "mandi halat" : "madhyam halat",
   ];
   if (row.kismatJaganewala) parts.push("kismat jagane wala grah");
