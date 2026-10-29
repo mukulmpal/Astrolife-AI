@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { calculateChart, type ChartData, NAK } from "@/lib/astro-engine/calculations";
+import { calculateChart, type ChartData, NAK, getJD } from "@/lib/astro-engine/calculations";
 import { detectYogas, calculateYogaScore, CATEGORY_META, type YogaResult, type PlanTier } from "@/lib/astro-engine/yogas";
 import { listSavedCharts, saveChartToAccount, selectSavedChart, deleteSavedChart, type SavedChartSummary, useUserChart, buildChart, type BirthDetails, saveCurrentChart, useChartEngine } from "@/lib/user-chart";
 import NorthIndianChart from "@/components/north-indian-chart";
@@ -149,13 +149,23 @@ export default function KundliPage() {
   const [activeOuterPlanetKeys, setActiveOuterPlanetKeys] = useState<OuterPlanetKey[]>(["URANUS"]);
 
   const outerPlanetsData = useMemo(() => {
-    if (!chart || !chart.jd) return null;
+    if (!chart) return null;
+    let jd = chart.jd;
+    if (!jd && chart.dob && chart.tob) {
+      jd = getJD(chart.dob, chart.tob, chart.tz ?? 5.5);
+    }
+    if (!jd) return null;
+
     const natalLons: Record<string, number> = {};
-    for (const [pName, pData] of Object.entries(chart.planets)) {
-      if (pData.lon !== undefined) natalLons[pName] = pData.lon;
+    for (const [pName, pData] of Object.entries(chart.planets || {})) {
+      if (pData.lon !== undefined) {
+        natalLons[pName] = pData.lon;
+      } else if (pData.degree !== undefined && pData.signNum !== undefined) {
+        natalLons[pName] = pData.signNum * 30 + pData.degree;
+      }
     }
     const cusps = chart.houseCusps?.map((c) => c.degree) || [];
-    return computeNatalOuterPlanets(chart.jd, chart.lagnaNum, natalLons, cusps);
+    return computeNatalOuterPlanets(jd, chart.lagnaNum || 1, natalLons, cusps);
   }, [chart]);
 
   // Check URL query parameters for ?action=new or ?action=saved
@@ -1473,6 +1483,14 @@ export default function KundliPage() {
                           planets={chart.planets}
                           outerPlanets={outerPlanetsData?.chartDataMap}
                           showOuterToggles={true}
+                          activeOuterPlanets={activeOuterPlanetKeys}
+                          onToggleOuterPlanet={(key) => {
+                            const mapKey: OuterPlanetKey =
+                              key === "indra" ? "URANUS" : key === "varun" ? "NEPTUNE" : "PLUTO";
+                            setActiveOuterPlanetKeys((prev) =>
+                              prev.includes(mapKey) ? prev.filter((k) => k !== mapKey) : [...prev, mapKey]
+                            );
+                          }}
                         />
 
                         {outerPlanetsData && (

@@ -48,15 +48,10 @@ interface Props {
   mode?: "rashi" | "chalit" | "kp";
   kpCusps?: Array<{ house: number; degreeText: string; subLord: string; sign: string }>;
   subLords?: Record<string, string>;
-  outerPlanets?: {
-    indra?: PlanetData;
-    varun?: PlanetData;
-    yam?: PlanetData;
-    uranus?: PlanetData;
-    neptune?: PlanetData;
-    pluto?: PlanetData;
-  };
+  outerPlanets?: Record<string, PlanetData>;
   showOuterToggles?: boolean;
+  activeOuterPlanets?: string[];
+  onToggleOuterPlanet?: (key: "indra" | "varun" | "yam") => void;
 }
 
 const HOUSE_NAMES: Record<number, { name: string; sa: string; karaka: string }> = {
@@ -134,9 +129,11 @@ export default function NorthIndianChart({
   subLords,
   outerPlanets,
   showOuterToggles = true,
+  activeOuterPlanets,
+  onToggleOuterPlanet,
 }: Props) {
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
-  const [enabledOuter, setEnabledOuter] = useState<{
+  const [localOuter, setLocalOuter] = useState<{
     indra: boolean;
     varun: boolean;
     yam: boolean;
@@ -262,16 +259,58 @@ export default function NorthIndianChart({
     });
   }
 
-  // Inject Outer Planets (INDRA, VARUN, YAM) when toggled
+  // Robust case-insensitive resolver across both outerPlanets and planets props
+  const getOuterData = (...aliases: string[]): PlanetData | undefined => {
+    const sources = [outerPlanets, planets];
+    for (const src of sources) {
+      if (!src) continue;
+      for (const alias of aliases) {
+        const lower = alias.toLowerCase();
+        for (const [k, v] of Object.entries(src)) {
+          if (k.toLowerCase() === lower && v) return v as PlanetData;
+        }
+      }
+    }
+    return undefined;
+  };
+
   const resolvedOuter: Record<string, PlanetData | undefined> = {
-    Indra: outerPlanets?.indra ?? outerPlanets?.uranus ?? planets["Indra"] ?? planets["Uranus"],
-    Varun: outerPlanets?.varun ?? outerPlanets?.neptune ?? planets["Varun"] ?? planets["Neptune"],
-    Yam: outerPlanets?.yam ?? outerPlanets?.pluto ?? planets["Yam"] ?? planets["Pluto"],
+    Indra: getOuterData("indra", "uranus"),
+    Varun: getOuterData("varun", "neptune"),
+    Yam: getOuterData("yam", "pluto"),
   };
 
   const isAnyOuterAvailable = Boolean(resolvedOuter.Indra || resolvedOuter.Varun || resolvedOuter.Yam);
 
-  if (enabledOuter.indra && resolvedOuter.Indra) {
+  // Check if active from parent activeOuterPlanets or local state
+  const isIndraActive = activeOuterPlanets
+    ? activeOuterPlanets.some((k) => ["indra", "uranus"].includes(k.toLowerCase()))
+    : localOuter.indra;
+
+  const isVarunActive = activeOuterPlanets
+    ? activeOuterPlanets.some((k) => ["varun", "neptune"].includes(k.toLowerCase()))
+    : localOuter.varun;
+
+  const isYamActive = activeOuterPlanets
+    ? activeOuterPlanets.some((k) => ["yam", "pluto"].includes(k.toLowerCase()))
+    : localOuter.yam;
+
+  const handleToggleIndra = () => {
+    setLocalOuter((prev) => ({ ...prev, indra: !prev.indra }));
+    onToggleOuterPlanet?.("indra");
+  };
+
+  const handleToggleVarun = () => {
+    setLocalOuter((prev) => ({ ...prev, varun: !prev.varun }));
+    onToggleOuterPlanet?.("varun");
+  };
+
+  const handleToggleYam = () => {
+    setLocalOuter((prev) => ({ ...prev, yam: !prev.yam }));
+    onToggleOuterPlanet?.("yam");
+  };
+
+  if (isIndraActive && resolvedOuter.Indra) {
     const pd = resolvedOuter.Indra;
     const rashi = typeof pd.signNum === "number" ? pd.signNum : typeof pd.rashi === "number" ? pd.rashi : typeof pd.rashiIndex === "number" ? pd.rashiIndex : null;
     const house = typeof pd.house === "number" && pd.house >= 1 && pd.house <= 12 ? pd.house : rashi !== null ? md(rashi - lagnaNum, 12) + 1 : 1;
@@ -290,7 +329,7 @@ export default function NorthIndianChart({
     }
   }
 
-  if (enabledOuter.varun && resolvedOuter.Varun) {
+  if (isVarunActive && resolvedOuter.Varun) {
     const pd = resolvedOuter.Varun;
     const rashi = typeof pd.signNum === "number" ? pd.signNum : typeof pd.rashi === "number" ? pd.rashi : typeof pd.rashiIndex === "number" ? pd.rashiIndex : null;
     const house = typeof pd.house === "number" && pd.house >= 1 && pd.house <= 12 ? pd.house : rashi !== null ? md(rashi - lagnaNum, 12) + 1 : 1;
@@ -309,7 +348,7 @@ export default function NorthIndianChart({
     }
   }
 
-  if (enabledOuter.yam && resolvedOuter.Yam) {
+  if (isYamActive && resolvedOuter.Yam) {
     const pd = resolvedOuter.Yam;
     const rashi = typeof pd.signNum === "number" ? pd.signNum : typeof pd.rashi === "number" ? pd.rashi : typeof pd.rashiIndex === "number" ? pd.rashiIndex : null;
     const house = typeof pd.house === "number" && pd.house >= 1 && pd.house <= 12 ? pd.house : rashi !== null ? md(rashi - lagnaNum, 12) + 1 : 1;
@@ -630,23 +669,23 @@ export default function NorthIndianChart({
             {resolvedOuter.Indra && (
               <button
                 type="button"
-                onClick={() => setEnabledOuter((prev) => ({ ...prev, indra: !prev.indra }))}
+                onClick={handleToggleIndra}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 4,
                   padding: "3px 8px",
                   borderRadius: 6,
-                  border: `1px solid ${enabledOuter.indra ? "#06b6d4" : "rgba(184, 134, 11, 0.2)"}`,
-                  background: enabledOuter.indra ? "rgba(6, 182, 212, 0.12)" : "#FFFFFF",
-                  color: enabledOuter.indra ? "#0891b2" : "#6B635B",
+                  border: `1px solid ${isIndraActive ? "#06b6d4" : "rgba(184, 134, 11, 0.2)"}`,
+                  background: isIndraActive ? "rgba(6, 182, 212, 0.12)" : "#FFFFFF",
+                  color: isIndraActive ? "#0891b2" : "#6B635B",
                   fontSize: 11,
-                  fontWeight: enabledOuter.indra ? 700 : 500,
+                  fontWeight: isIndraActive ? 700 : 500,
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                 }}
               >
-                <span>{enabledOuter.indra ? "☑" : "☐"}</span>
+                <span>{isIndraActive ? "☑" : "☐"}</span>
                 <span>⚡ Indra (Uranus)</span>
                 {resolvedOuter.Indra.house && (
                   <span style={{ fontSize: 9.5, opacity: 0.8 }}>H{resolvedOuter.Indra.house}</span>
@@ -660,23 +699,23 @@ export default function NorthIndianChart({
             {resolvedOuter.Varun && (
               <button
                 type="button"
-                onClick={() => setEnabledOuter((prev) => ({ ...prev, varun: !prev.varun }))}
+                onClick={handleToggleVarun}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 4,
                   padding: "3px 8px",
                   borderRadius: 6,
-                  border: `1px solid ${enabledOuter.varun ? "#8b5cf6" : "rgba(184, 134, 11, 0.2)"}`,
-                  background: enabledOuter.varun ? "rgba(139, 92, 246, 0.12)" : "#FFFFFF",
-                  color: enabledOuter.varun ? "#7c3aed" : "#6B635B",
+                  border: `1px solid ${isVarunActive ? "#8b5cf6" : "rgba(184, 134, 11, 0.2)"}`,
+                  background: isVarunActive ? "rgba(139, 92, 246, 0.12)" : "#FFFFFF",
+                  color: isVarunActive ? "#7c3aed" : "#6B635B",
                   fontSize: 11,
-                  fontWeight: enabledOuter.varun ? 700 : 500,
+                  fontWeight: isVarunActive ? 700 : 500,
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                 }}
               >
-                <span>{enabledOuter.varun ? "☑" : "☐"}</span>
+                <span>{isVarunActive ? "☑" : "☐"}</span>
                 <span>🌊 Varun (Neptune)</span>
                 {resolvedOuter.Varun.house && (
                   <span style={{ fontSize: 9.5, opacity: 0.8 }}>H{resolvedOuter.Varun.house}</span>
@@ -690,23 +729,23 @@ export default function NorthIndianChart({
             {resolvedOuter.Yam && (
               <button
                 type="button"
-                onClick={() => setEnabledOuter((prev) => ({ ...prev, yam: !prev.yam }))}
+                onClick={handleToggleYam}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 4,
                   padding: "3px 8px",
                   borderRadius: 6,
-                  border: `1px solid ${enabledOuter.yam ? "#dc2626" : "rgba(184, 134, 11, 0.2)"}`,
-                  background: enabledOuter.yam ? "rgba(220, 38, 38, 0.12)" : "#FFFFFF",
-                  color: enabledOuter.yam ? "#b91c1c" : "#6B635B",
+                  border: `1px solid ${isYamActive ? "#dc2626" : "rgba(184, 134, 11, 0.2)"}`,
+                  background: isYamActive ? "rgba(220, 38, 38, 0.12)" : "#FFFFFF",
+                  color: isYamActive ? "#b91c1c" : "#6B635B",
                   fontSize: 11,
-                  fontWeight: enabledOuter.yam ? 700 : 500,
+                  fontWeight: isYamActive ? 700 : 500,
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                 }}
               >
-                <span>{enabledOuter.yam ? "☑" : "☐"}</span>
+                <span>{isYamActive ? "☑" : "☐"}</span>
                 <span>🌋 Yam (Pluto)</span>
                 {resolvedOuter.Yam.house && (
                   <span style={{ fontSize: 9.5, opacity: 0.8 }}>H{resolvedOuter.Yam.house}</span>
