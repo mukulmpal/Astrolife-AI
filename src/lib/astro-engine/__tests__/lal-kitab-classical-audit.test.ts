@@ -130,4 +130,113 @@ describe("Lal Kitab Classical Axioms & Safety Engine Audit", () => {
       "Venus in 7 must advise NOT to donate white articles!"
     );
   });
+
+  it("11. Classical 1952 Varshphal Progression: Follows Pt. Roop Chand Joshi 12-year cyclic table", () => {
+    // For running year 1 (cycle year 1):
+    // Target date set to birth year + 6 months -> completed age 0, running year 1
+    const resYear1 = calculateLalKitab(cleanPlanets, "2000-01-01", 1, new Date("2000-06-01"));
+    assert.equal(resYear1.varshphal.runningAge, 1);
+    assert.equal(resYear1.varshphal.cycleYear, 1);
+
+    // In Year 1 table: Natal H10 -> H12, Natal H4 -> H3, Natal H3 -> H10
+    const sunY1 = resYear1.varshphal.chartRows.find(r => r.planet === "Sun"); // natal H10
+    const moonY1 = resYear1.varshphal.chartRows.find(r => r.planet === "Moon"); // natal H4
+    const marsY1 = resYear1.varshphal.chartRows.find(r => r.planet === "Mars"); // natal H3
+    assert.equal(sunY1?.varshHouse, 12, "Natal H10 moves to H12 in Year 1 per 1952 table");
+    assert.equal(moonY1?.varshHouse, 3, "Natal H4 moves to H3 in Year 1 per 1952 table");
+    assert.equal(marsY1?.varshHouse, 10, "Natal H3 moves to H10 in Year 1 per 1952 table");
+
+    // For running year 31 (completed age 30 -> cycle year 7):
+    const resYear31 = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2020-06-01"));
+    assert.equal(resYear31.varshphal.runningAge, 31);
+    assert.equal(resYear31.varshphal.cycleYear, 7);
+
+    // In Year 7 table: Natal H10 -> H2, Natal H7 (Venus) -> H1 (Varsheshwar!)
+    const sunY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Sun"); // natal H10
+    const venY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Venus"); // natal H7
+    assert.equal(sunY31?.varshHouse, 2, "Natal H10 moves to H2 in Year 7 per 1952 table");
+    assert.equal(venY31?.varshHouse, 1, "Natal H7 moves to H1 in Year 7 per 1952 table");
+    assert.ok(resYear31.varshphal.varsheshwar.includes("Venus"), "Venus in H1 becomes Varsheshwar");
+  });
+
+  it("12. Varshphal Conjunction Integrity: Conjunct natal planets move together to same annual house", () => {
+    // Both Saturn and Ketu are in natal H6 in cleanPlanets
+    const resYear31 = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2020-06-01"));
+    const satY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Saturn");
+    const ketY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Ketu");
+
+    // In Year 7: Natal H6 -> H4
+    assert.equal(satY31?.varshHouse, 4);
+    assert.equal(ketY31?.varshHouse, 4);
+    assert.equal(satY31?.varshHouse, ketY31?.varshHouse, "Conjunct planets in natal chart must stay conjunct in Varshphal!");
+  });
+
+  it("13. Varshphal Lagna Stability: Natal Lagna remains anchored, no arbitrary sign rotation", () => {
+    const res = calculateLalKitab(cleanPlanets, "1990-05-15", 1, new Date("2024-06-01"));
+    // Natal lagna is 1 (Vrishabha / Taurus)
+    assert.equal(res.varshphal.lagnaSign, "Vrishabha", "Varshphal lagna must match native's natal lagna sign");
+  });
+
+  it("14. Lal Kitab Special Drishti Radar: Detects Dhokha (H8->H2) and special aspect vectors", () => {
+    // In cleanPlanets: Moon in 4, Mars in 3, Sun in 10
+    // Put Jupiter in H2 and Saturn in H8 to test Dhokha Drishti H8 -> H2
+    const planetsWithH8 = {
+      ...cleanPlanets,
+      Jupiter: { house: 2, sign: "Mithuna", signNum: 2, retrograde: false, dignity: "Neutral", lon: 75 },
+      Saturn: { house: 8, sign: "Vrishchika", signNum: 7, retrograde: false, dignity: "Neutral", lon: 224 },
+    };
+    const res = calculateLalKitab(planetsWithH8, "1990-05-15", 1);
+    
+    // Dhokha Drishti H8 -> H2
+    const dhokha = res.drishtis.find(d => d.fromHouse === 8 && d.toHouse === 2);
+    assert.ok(dhokha, "Dhokha Drishti H8 -> H2 must be detected when H8 has a planet");
+    assert.equal(dhokha?.type, "dhokha");
+    assert.ok(dhokha?.fromPlanets.includes("Saturn"));
+    assert.ok(dhokha?.toPlanets.includes("Jupiter"));
+    assert.ok(dhokha?.isAfflicted, "Dhokha Drishti with active H8 occupant must be marked as afflicted");
+
+    // Adhikar Drishti H4 -> H10 (Moon in H4, Sun in H10)
+    const adhikar = res.drishtis.find(d => d.fromHouse === 4 && d.toHouse === 10);
+    assert.ok(adhikar, "Adhikar Drishti H4 -> H10 must be detected");
+    assert.equal(adhikar?.strengthPercent, 50);
+  });
+
+  it("15. 12-Year Progression Matrix: Generates complete 12-year cycle with accurate Varsheshwar and current flag", () => {
+    const res = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2020-06-01")); // Age 31, cycle year 7
+    const matrix = res.varshphal.twelveYearMatrix;
+    
+    assert.ok(matrix, "twelveYearMatrix must exist");
+    assert.equal(matrix.length, 12, "Matrix must contain exactly 12 cycle rows");
+
+    // Check row 7 is marked as current
+    const currentRow = matrix.find(r => r.cycleYear === 7);
+    assert.ok(currentRow?.isCurrent, "Cycle Year 7 must be marked as isCurrent");
+    assert.equal(currentRow?.runningAge, 31);
+    assert.equal(currentRow?.calendarYear, 2020);
+    assert.ok(currentRow?.varsheshwar.includes("Venus"));
+
+    // Check row 1
+    const row1 = matrix.find(r => r.cycleYear === 1);
+    assert.equal(row1?.isCurrent, false);
+    assert.equal(row1?.cycleYear, 1);
+    assert.ok(row1?.planetHouses["Sun"]);
+  });
+
+  it("16. 43-Day Consecutive Upay Protocols: Validates daytime windows and classical conduct", () => {
+    const res = calculateLalKitab(cleanPlanets, "1990-05-15", 1);
+    const upays = res.upayProtocols;
+
+    assert.ok(upays.length > 0, "Must generate 43-day upay protocols");
+    
+    // Check daytime restriction on all upays
+    upays.forEach(u => {
+      assert.ok(
+        u.timeWindow.includes("सूर्योदय") || u.timeWindow.includes("दिन"),
+        `Upay for ${u.planet} must mandate daytime (Suryauday se Suryast) window`
+      );
+      assert.ok(u.conductRule.length > 0, `Upay for ${u.planet} must include conduct guidance`);
+      assert.ok(u.materialsNeeded.length > 0, `Upay for ${u.planet} must list authentic materials`);
+      assert.ok(u.prohibitions.length > 0, `Upay for ${u.planet} must specify Lal Kitab prohibitions`);
+    });
+  });
 });

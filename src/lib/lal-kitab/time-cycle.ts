@@ -507,12 +507,14 @@ function buildVarshphal(
 ): LalKitabAnnualVarshphal {
   const base = calculateLalKitab(input.planets, input.dob, input.lagnaNum ?? 0, targetDate).varshphal;
   const runningVarsh = getRunningVarsh(input.dob, targetDate);
-  const yearShift = positiveMod(runningVarsh.completedYears, 12);
-  const activeHouse = houseFromShift(1, yearShift);
-  const activePlanets = planetNamesInHouse(input.planets, activeHouse);
+  const runningAge = base.runningAge || (runningVarsh.completedYears + 1);
+  const cycleYear = base.cycleYear || (positiveMod(runningAge - 1, 12) + 1);
+  const yearShift = cycleYear - 1;
+  const activeHouse = cycleYear;
+  const activePlanets = base.chartRows.filter((row) => row.varshHouse === 1).map((row) => row.planet);
   const activeLine = activePlanets.length
-    ? `${activePlanets.join(", ")} is saal actively front seat par aate hain. In grahon ke natal house, state aur sambandh ko dekh kar hi daan, purchase, relation aur career decisions lene chahiye.`
-    : `Is saal koi direct natal grah annual active house mein nahi baitha, isliye phal zyada house theme, lagna shift aur shubh/savdhani grahon se read hoga.`;
+    ? `Varsheshwar (House 1): ${activePlanets.join(", ")} is saal sabse sakriya urja hain. In grahon ke natal house, state aur sambandh ko dekh kar hi daan, purchase, relation aur career decisions lene chahiye.`
+    : `Is saal Varshphal H1 mein koi direct grah nahi hai (${base.varsheshwar}), isliye phal zyada house theme, 12-varshiya chakra aur shubh/savdhani grahon se read hoga.`;
   const shubhLine = base.shubhPlanets.length
     ? `${base.shubhPlanets.join(", ")} supportive channel khol sakte hain: planning, help, relationship support, learning, income ya public response better ho sakta hai.`
     : `Shubh grahon ka signal loud nahi hai, isliye year ko steady effort, correction aur patience ke saath chalana better rahega.`;
@@ -522,7 +524,7 @@ function buildVarshphal(
   const summary =
     base.year === runningVarsh.startYear
       ? base.summary
-      : `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak annual shift ${yearShift} use karega. Read House ${activeHouse} matters first: ${HOUSE_THEMES[activeHouse]}.`;
+      : `Lal Kitab Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak Running Age ${runningAge} (Cycle Year ${cycleYear}, Varsheshwar: ${base.varsheshwar}). Focus: House ${activeHouse} (${HOUSE_THEMES[activeHouse]}).`;
 
   return {
     ...base,
@@ -537,7 +539,7 @@ function buildVarshphal(
     activePlanets,
     summary,
     prediction:
-      `${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak ka Varshphal House ${activeHouse} ko activate karta hai, jiska theme hai ${HOUSE_THEMES[activeHouse]}. ${activeLine} ${shubhLine} ${cautionLine} Is saal ka practical reading yeh hai ki bade kaam tab karein jab active house ki zimmedari clear ho: documents, family promise, health routine, money flow aur relationship duties ko pending na chhodein. Remedy ke naam par sab grahon ka daan nahi; sirf wahi vastu daan karein jiska grah natal Lal Kitab chart mein challenge zone mein ho.`,
+      `${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak ka Varshphal (Pt. Roop Chand Joshi 1952 Paddhati, Running Age ${runningAge}). ${activeLine} ${shubhLine} ${cautionLine} Is saal ka practical reading yeh hai ki bade kaam tab karein jab active house ki zimmedari clear ho: documents, family promise, health routine, money flow aur relationship duties ko pending na chhodein. Remedy ke naam par sab grahon ka daan nahi; sirf wahi vastu daan karein jiska grah natal Lal Kitab chart mein challenge zone mein ho.`,
     actionLine:
       base.cautionPlanets.length > 0
         ? `Handle ${base.cautionPlanets.join(", ")} with discipline and safe remedies; avoid fear-based daan.`
@@ -555,14 +557,16 @@ function buildMonthlyPhal(
   const runningVarsh = getRunningVarsh(input.dob, targetDate);
   const monthIndex = runningVarshMonthIndex(runningVarsh.startDate, targetDate);
   const runningMonth = monthIndex + 1;
-  const monthShift = monthIndex;
-  const activeHouse = houseFromShift(varshphal.activeHouse, monthShift);
-  const activePlanets = planetNamesInHouse(input.planets, activeHouse);
+  // In classical Lal Kitab Varshphal, Month 1 is House 1, Month 2 is House 2 ... Month 12 is House 12
+  const activeHouse = runningMonth;
+  const activePlanets = varshphal.chartRows
+    ? varshphal.chartRows.filter((r) => r.varshHouse === activeHouse).map((r) => r.planet)
+    : planetNamesInHouse(input.planets, activeHouse);
   const theme = HOUSE_THEMES[activeHouse];
   const nimitToWatch = getNimitFor(activePlanets, activeHouse);
   const activeLine = activePlanets.length
-    ? `${activePlanets.join(", ")} is mahine direct trigger dete hain. In grahon se judi vastu, aadat aur family signal ko carefully observe karein.`
-    : `Is mahine direct planet trigger nahi hai, isliye house theme aur annual varshphal ka promise zyada important rahega.`;
+    ? `${activePlanets.join(", ")} is mahine Varshphal H${activeHouse} mein hone ke karan direct trigger dete hain. In grahon se judi vastu, aadat aur family signal ko carefully observe karein.`
+    : `Is mahine Varshphal H${activeHouse} mein koi direct grah nahi hai, isliye house theme aur annual varshphal ka promise zyada important rahega.`;
   const cautionLine = [6, 8, 12].includes(activeHouse)
     ? "Yeh correction month hai: debt, disease, dispute, hidden stress, expense, sleep, hospital ya isolation type matters ko lightly na lein. Risky purchase, fight, impulsive loan, ego-based remedy aur bina samjhe daan avoid karein."
     : [2, 4, 9, 10, 11].includes(activeHouse)

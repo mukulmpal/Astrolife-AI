@@ -105,18 +105,60 @@ export interface LKKismat {
   interpretation: string;
 }
 
+export interface LK12YearMatrixRow {
+  cycleYear:    number;
+  runningAge:   number;
+  calendarYear: number;
+  varsheshwar:  string;
+  isCurrent:    boolean;
+  planetHouses: Record<string, number>;
+  theme:        string;
+  focalHouse:   number;
+}
+
+export interface LKDrishti {
+  fromHouse:       number;
+  toHouse:         number;
+  fromPlanets:     string[];
+  toPlanets:       string[];
+  type:            "100_buniyad" | "50_adhikar" | "25_sahayak" | "dhokha" | "achanak" | "sanstha";
+  name:            string;
+  hindiName:       string;
+  strengthPercent: number;
+  effect:          string;
+  upaya?:          string;
+  isAfflicted:     boolean;
+}
+
+export interface LK43DayUpay {
+  planet:          string;
+  house:           number;
+  priority:        "high" | "medium" | "preventative";
+  title:           string;
+  ritual:          string;
+  timeWindow:      string;
+  duration:        string;
+  prohibitions:    string[];
+  materialsNeeded: string[];
+  conductRule:     string;
+}
+
 export interface LKVarshphal {
   year:           number;
   startDate:      string;
   endDate:        string;
   periodLabel:    string;
   yearShift:      number;
+  runningAge:     number;
+  cycleYear:      number;
+  varsheshwar:    string;
   lagnaSign:      string;
   shubhPlanets:   string[];
   cautionPlanets: string[];
   summary:        string;
   chartRows:      LKVarshphalPlanet[];
   annualPrediction: LKVarshphalPrediction;
+  twelveYearMatrix: LK12YearMatrixRow[];
 }
 
 export interface LKCoreAccuracyRow {
@@ -172,6 +214,8 @@ export interface LKResult {
   kismat:        LKKismat;
   coreAccuracy:  LKCoreAccuracyRow[];
   varshphal:     LKVarshphal;
+  drishtis:      LKDrishti[];
+  upayProtocols: LK43DayUpay[];
   summary:       string;
   tevaType?:     "Dharmi Teva" | "Andha Teva" | "Ratandh Teva" | "Sadharan Teva";
   tevaExplanation?: string;
@@ -814,6 +858,28 @@ function expandHomeTag(tag: string, planet: string): string {
   return `${cleaned} ka ghar mein hona ${planet} ki urja ka ek seedha prabhav hai. Yeh sanket batata hai ki is grah ka prabhav aapke ghar ke mahaul mein clearly dikh raha hai. Is jagah ko saadar aur organized rakhna is grah ke aashirwaad ko barkarar rakhta hai.`;
 }
 
+// ── Classical Lal Kitab 1952 Varshphal Progression Table (Pt. Roop Chand Joshi) ──
+// Maps Natal House (1-12) to Annual Progressed House for Running Year Cycle (1-12)
+export const LK_1952_VARSHPHAL_TABLE: Record<number, Record<number, number>> = {
+  1:  { 1: 1,  2: 9,  3: 10, 4: 3,  5: 5,  6: 2,  7: 11, 8: 7,  9: 6,  10: 12, 11: 4,  12: 8 },
+  2:  { 1: 4,  2: 1,  3: 12, 4: 9,  5: 3,  6: 7,  7: 5,  8: 6,  9: 2,  10: 8,  11: 10, 12: 11 },
+  3:  { 1: 9,  2: 4,  3: 1,  4: 2,  5: 8,  6: 3,  7: 10, 8: 5,  9: 7,  10: 11, 11: 12, 12: 6 },
+  4:  { 1: 3,  2: 8,  3: 4,  4: 1,  5: 10, 6: 9,  7: 6,  8: 11, 9: 5,  10: 7,  11: 2,  12: 12 },
+  5:  { 1: 11, 2: 3,  3: 8,  4: 4,  5: 1,  6: 5,  7: 9,  8: 2,  9: 12, 10: 6,  11: 7,  12: 10 },
+  6:  { 1: 5,  2: 12, 3: 3,  4: 8,  5: 4,  6: 11, 7: 2,  8: 9,  9: 1,  10: 10, 11: 6,  12: 7 },
+  7:  { 1: 7,  2: 6,  3: 9,  4: 5,  5: 12, 6: 4,  7: 1,  8: 10, 9: 11, 10: 2,  11: 8,  12: 3 },
+  8:  { 1: 2,  2: 7,  3: 6,  4: 12, 5: 9,  6: 10, 7: 3,  8: 1,  9: 8,  10: 5,  11: 11, 12: 4 },
+  9:  { 1: 12, 2: 2,  3: 7,  4: 6,  5: 11, 6: 1,  7: 8,  8: 4,  9: 10, 10: 3,  11: 5,  12: 9 },
+  10: { 1: 10, 2: 11, 3: 2,  4: 7,  5: 6,  6: 12, 7: 4,  8: 8,  9: 3,  10: 1,  11: 9,  12: 5 },
+  11: { 1: 8,  2: 5,  3: 11, 4: 10, 5: 7,  6: 6,  7: 12, 8: 3,  9: 9,  10: 4,  11: 1,  12: 2 },
+  12: { 1: 6,  2: 10, 3: 5,  4: 11, 5: 2,  6: 8,  7: 7,  8: 12, 9: 4,  10: 9,  11: 3,  12: 1 },
+};
+
+export function getLalKitabVarshphalHouse(natalHouse: number, runningAge: number): number {
+  const cycleYear = (((runningAge - 1) % 12) + 12) % 12 + 1;
+  return LK_1952_VARSHPHAL_TABLE[cycleYear]?.[natalHouse] ?? natalHouse;
+}
+
 // ── MAIN CALCULATOR ───────────────────────────────────────
 export function calculateLalKitab(
   planets: Record<string,PD>,
@@ -1261,13 +1327,15 @@ export function calculateLalKitab(
     };
   });
 
-  // ── Varshphal ─────────────────────────────────────────
-  const yearShift = ((runningVarsh.completedYears % 12) + 12) % 12;
-  const varshLagna = (lagnaNum + yearShift) % 12;
+  // ── Varshphal (Lal Kitab 1952 Classical Progression Table) ──
+  const runningAge = runningVarsh.completedYears + 1;
+  const cycleYear = (((runningAge - 1) % 12) + 12) % 12 + 1;
+  const yearShift = cycleYear - 1;
+
   const varshHits = PLS.map(p => {
     if (!planets[p]) return null;
     const natalH = planets[p].house;
-    const vh = ((natalH + yearShift - 1) % 12) + 1;
+    const vh = getLalKitabVarshphalHouse(natalH, runningAge);
     return { planet: p, natalH, vh };
   }).filter(Boolean) as { planet:string; natalH:number; vh:number }[];
 
@@ -1290,45 +1358,289 @@ export function calculateLalKitab(
       beneficMalefic: shiftedCondition,
       soya: Boolean(core?.soya),
       kismatJaganewala: Boolean(core?.kismatJaganewala),
-      reading: `${hit.planet} natal H${hit.natalH} se Varshphal H${hit.vh} mein shift hota hai. ${houseReading(hit.vh)}. Iska annual condition ${shiftedCondition} read hoga, natal condition ko ignore nahi karna.`,
+      reading: `${hit.planet} natal H${hit.natalH} se Varshphal H${hit.vh} mein pravesh karta hai (1952 Paddhati). ${houseReading(hit.vh)}. Iska annual condition ${shiftedCondition} read hoga, natal condition ko base maan kar.`,
     };
   });
+
+  // Varsheshwar: Planet in Varshphal H1, or natal ruler mapping to H1
+  const h1Planets = varshRows.filter(r => r.varshHouse === 1);
+  const varsheshwar = h1Planets.length > 0 
+    ? h1Planets.map(r => r.planet).join(", ")
+    : "Mars / Sun (Khana 1 Adhishtatha)";
 
   const shubhPlanets  = varshRows.filter(x => x.beneficMalefic === "Benefic" && [1,4,7,10,11].includes(x.varshHouse)).map(x => x.planet);
   const cautionPlanets= varshRows.filter(x => x.beneficMalefic === "Malefic" || [6,8,12].includes(x.varshHouse)).map(x => x.planet);
   const strongAnnual = varshRows.filter(row => row.kismatJaganewala || row.beneficMalefic !== "Mixed").slice(0, 3);
   const annualPrediction: LKVarshphalPrediction = {
     headline:
-      `Is Varshphal mein lagna ${RASHIS_SA[varshLagna]} shift hota hai aur year focus ${houseReading(((yearShift % 12) + 1))} par aata hai. ${strongAnnual.length ? `${strongAnnual.map(row => `${row.planet} H${row.varshHouse}`).join(", ")} sabse zyada visible rahenge.` : "Year ka result balanced rahega, koi ek grah excessively loud nahi."}`,
+      `Lal Kitab 1952 Varshphal: Running Age ${runningAge} (12-Varshiya Chakra Varsh ${cycleYear}). Natal Lagna: ${RASHIS_SA[lagnaNum]}. Varshphal mein Varsheshwar: ${varsheshwar}. ${strongAnnual.length ? `${strongAnnual.map(row => `${row.planet} H${row.varshHouse}`).join(", ")} is saal sabse sakriya urja rahenge.` : "Year ka result balanced rahega."}`,
     career:
-      `Career reading mein H10, H11, H6 aur active grahon ko priority milegi. ${varshRows.filter(row => [6,10,11].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Koi direct work-house trigger loud nahi"}; isliye kaam mein discipline, documentation aur timing ko pakadna zaroori hai.`,
+      `Career reading mein Varshphal H10, H11, H6 aur active grahon ko priority milegi. ${varshRows.filter(row => [6,10,11].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Koi direct work-house trigger nahi"}; kaam mein satyanishtha aur Lal Kitab maryada ka palan karein.`,
     money:
-      `Money reading H2, H11, H8 aur H12 se niklegi. ${varshRows.filter(row => [2,8,11,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Money houses par direct heavy trigger nahi"}; unnecessary debt, impulsive luxury aur unclear documentation avoid karein.`,
+      `Money reading Varshphal H2, H11, H8 aur H12 se dekhi gayi. ${varshRows.filter(row => [2,8,11,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Money houses par direct affliction nahi"}; apratyakshit kharch ya anavashyak rin lene se bachein.`,
     family:
-      `Family reading H2, H4, H7 aur H9 se dekhi gayi. ${varshRows.filter(row => [2,4,7,9].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Family houses balanced hain"}; parents, spouse, home peace aur guru/father blessings ko year ke nimit maana jayega.`,
+      `Family reading Varshphal H2, H4, H7 aur H9 se dekhi gayi. ${varshRows.filter(row => [2,4,7,9].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Family houses shant hain"}; mata-pita, jeevansathi aur guru ke ashirwad ko varsh ka mukhya nimit maanein.`,
     health:
-      `Health reading H1, H6, H8 aur H12 se dekhi gayi. ${varshRows.filter(row => [1,6,8,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Major health warning loud nahi"}; sleep, digestion, stress aur chronic patterns par early correction rakhein.`,
+      `Health reading Varshphal H1, H6, H8 aur H12 se dekhi gayi. ${varshRows.filter(row => [1,6,8,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Major health sanket shant hai"}; niyamit dincharya aur swachh aahar banaye rakhein.`,
     remedy:
-      `Remedy rule simple hai: Varshphal sirf timing batata hai, daan ka final decision natal classical condition se hoga. Supportive grah ki core vastu daan avoid; challenged grah ki vastu controlled tareeke se, bina fear ke.`,
+      `Lal Kitab Varshphal Upaya niyam: Upaya keval usi varsh ke liye maanya hote hain. Supportive grah ki mukhya vastu ka daan kadapi na karein; challenged grah ka daan ya seva shant bhav se karein.`,
   };
 
+  // ── 12-Year Varshphal Matrix (Classical Progression Roadmap) ──
+  const twelveYearMatrix: LK12YearMatrixRow[] = [];
+  const startCycleYearRunningAge = runningAge - (cycleYear - 1);
+  for (let c = 1; c <= 12; c++) {
+    const rowRunningAge = startCycleYearRunningAge + (c - 1);
+    const calYear = birthYear + rowRunningAge - 1;
+    const pHouses: Record<string, number> = {};
+    PLS.forEach(p => {
+      if (planets[p]) {
+        pHouses[p] = getLalKitabVarshphalHouse(planets[p].house, rowRunningAge);
+      }
+    });
+    const h1Occupants = Object.entries(pHouses).filter(([_, h]) => h === 1).map(([p]) => p);
+    const rowVarsheshwar = h1Occupants.length > 0
+      ? h1Occupants.join(", ")
+      : "Mars / Sun (H1)";
+
+    twelveYearMatrix.push({
+      cycleYear: c,
+      runningAge: rowRunningAge,
+      calendarYear: calYear,
+      varsheshwar: rowVarsheshwar,
+      isCurrent: c === cycleYear,
+      planetHouses: pHouses,
+      theme: HOUSE_WISE_OMENS.find(h => h.house === c)?.zone || `House ${c}`,
+      focalHouse: c,
+    });
+  }
+
   const varshphal: LKVarshphal = {
-    year:      runningVarsh.startYear,
-    startDate: formatLKDate(runningVarsh.startDate),
-    endDate:   formatLKDate(runningVarsh.endDate),
+    year:        runningVarsh.startYear,
+    startDate:   formatLKDate(runningVarsh.startDate),
+    endDate:     formatLKDate(runningVarsh.endDate),
     periodLabel: `${formatLKDate(runningVarsh.startDate)} to ${formatLKDate(runningVarsh.endDate)}`,
     yearShift,
-    lagnaSign: RASHIS_SA[varshLagna],
+    runningAge,
+    cycleYear,
+    varsheshwar,
+    lagnaSign:   RASHIS_SA[lagnaNum],
     shubhPlanets,
     cautionPlanets,
-    chartRows: varshRows,
+    chartRows:   varshRows,
     annualPrediction,
+    twelveYearMatrix,
     summary: shubhPlanets.length
-      ? `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${shubhPlanets.join(", ")} shubh phal de sakte hain.${cautionPlanets.length ? ` ${cautionPlanets.join(", ")} se savdhaan rahein.` : ""}`
+      ? `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} (Running Age ${runningAge}, Varsheshwar: ${varsheshwar}). Is varsh ${shubhPlanets.join(", ")} shubh phal de sakte hain.${cautionPlanets.length ? ` ${cautionPlanets.join(", ")} se savdhaan rahein.` : ""}`
       : cautionPlanets.length
-        ? `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak chalega. Is running year mein ${cautionPlanets.join(", ")} se savdhaan rahein. Upaya chart-specific rakhein.`
-        : `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak balanced hai — koi bada shubh ya ashubh pattern loud nahi.`,
+        ? `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} (Running Age ${runningAge}, Varsheshwar: ${varsheshwar}). Is varsh ${cautionPlanets.join(", ")} se savdhaan rahein. Upaya chart-specific rakhein.`
+        : `Varshphal ${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} (Running Age ${runningAge}, Varsheshwar: ${varsheshwar}) — balanced phal.`,
   };
+
+  // ── Lal Kitab Special Drishtis (दृष्टि रडार) ───────────────
+  const drishtis: LKDrishti[] = [];
+  const DRISHTI_CONFIGS = [
+    {
+      from: 1, to: 7, type: "100_buniyad" as const,
+      name: "100% Purna Drishti", hindiName: "पूर्ण बुनियादी दृष्टि (100%)",
+      percent: 100,
+      effect: "प्रथम भाव के ग्रह सप्तम भाव पर सीधा और पूर्ण प्रभाव डालते हैं। आमने-सामने का प्रत्यक्ष प्रभाव।",
+      upaya: "दोनों भावों के ग्रहों के मित्र/शत्रु स्वभाव अनुसार संतुलन बनाए रखें।"
+    },
+    {
+      from: 7, to: 1, type: "100_buniyad" as const,
+      name: "100% Prati-Drishti", hindiName: "सप्तम से लग्न दृष्टि (100%)",
+      percent: 100,
+      effect: "सप्तम भाव का ग्रह लग्न और शरीर पर सीधा पलटवार या सहयोग करता है।",
+      upaya: "जीवनसाथी और व्यापारिक साझेदार से संबंध मधुर रखें।"
+    },
+    {
+      from: 4, to: 10, type: "50_adhikar" as const,
+      name: "50% Adhikar Drishti", hindiName: "अधिकार दृष्टि (50%)",
+      percent: 50,
+      effect: "चतुर्थ भाव (सुख/माता) दशम भाव (कर्म/आजीविका) को आधी शक्ति से देखता और नियंत्रित करता है।",
+      upaya: "माता का आशीर्वाद लेकर ही कोई बड़ा व्यावसायिक निर्णय लें।"
+    },
+    {
+      from: 3, to: 9, type: "25_sahayak" as const,
+      name: "25% Sahayak Drishti", hindiName: "चौथाई भाग्य दृष्टि (25%)",
+      percent: 25,
+      effect: "तृतीय भाव का पराक्रम नवम भाव के भाग्य को 25% गति प्रदान करता है। स्वप्रयास से भाग्य चमकता है।",
+      upaya: "छोटे भाई-बहनों का सम्मान करें।"
+    },
+    {
+      from: 3, to: 11, type: "25_sahayak" as const,
+      name: "25% Labh Drishti", hindiName: "चौथाई लाभ दृष्टि (25%)",
+      percent: 25,
+      effect: "तृतीय भाव की शक्ति एकादश भाव की आय को 25% प्रभावित करती है।",
+      upaya: "व्यापार में सत्य निष्ठा बनाए रखें।"
+    },
+    {
+      from: 8, to: 2, type: "dhokha" as const,
+      name: "Dhokha Drishti (Deceit)", hindiName: "धोखा दृष्टि (अष्टम से द्वितीय)",
+      percent: 100,
+      effect: "लाल किताब का अति-महत्वपूर्ण नियम: अष्टम भाव (विपदा/गुप्त बाधा) द्वितीय भाव (धन/परिवार) पर धोखे का वार करता है। अचानक धन हानि या पारिवारिक विश्वासघात की संभावना।",
+      upaya: "मंदिर में नंगे पांव जाएं, केसर का तिलक लगाएं, अष्टम भाव के अशुभ ग्रह की वस्तु का दान करें।",
+      isAfflicted: true
+    },
+    {
+      from: 2, to: 8, type: "achanak" as const,
+      name: "Faisla Drishti", hindiName: "फैसला / रक्षा दृष्टि (द्वितीय से अष्टम)",
+      percent: 50,
+      effect: "द्वितीय भाव (धर्म स्थान / गुरु) अष्टम भाव के विष को शांत करने की क्षमता रखता है।",
+      upaya: "घर में चांदी का चौरस टुकड़ा रखें, कुलदेवता की उपासना करें।"
+    },
+    {
+      from: 5, to: 9, type: "sanstha" as const,
+      name: "Buniyad Drishti", hindiName: "संस्था दृष्टि (पंचम से नवम)",
+      percent: 50,
+      effect: "पंचम भाव का ज्ञान और संतान नवम भाव के धर्म और भाग्य की नींव बनते हैं।",
+      upaya: "ज्ञान का विस्तार करें, विद्यार्थियों की मदद करें।"
+    },
+  ];
+
+  DRISHTI_CONFIGS.forEach(cfg => {
+    const fromP = PLS.filter(p => planets[p] && planets[p].house === cfg.from);
+    const toP = PLS.filter(p => planets[p] && planets[p].house === cfg.to);
+    if (fromP.length > 0 || toP.length > 0) {
+      drishtis.push({
+        fromHouse: cfg.from,
+        toHouse: cfg.to,
+        fromPlanets: fromP,
+        toPlanets: toP,
+        type: cfg.type,
+        name: cfg.name,
+        hindiName: cfg.hindiName,
+        strengthPercent: cfg.percent,
+        effect: cfg.effect,
+        upaya: cfg.upaya,
+        isAfflicted: Boolean(cfg.isAfflicted && fromP.length > 0),
+      });
+    }
+  });
+
+  // ── 43-Day Continuous Upay Protocols (४३-दिवसीय अनुष्ठान) ──
+  const upayProtocols: LK43DayUpay[] = [];
+  const UPAY_43_RULES: Record<string, {
+    title: string;
+    ritual: string;
+    materials: string[];
+    timeWindow: string;
+    conduct: string;
+  }> = {
+    Sun: {
+      title: "सूर्य शुद्धि 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन सूर्योदय से दोपहर 12 बजे के मध्य बहते जल में थोड़ा सा गुड़ या तांबे का सिक्का प्रवाहित करें, अथवा सूर्य को तांबे के लोटे से अर्घ्य दें।",
+      materials: ["तांबे का सिक्का / लोटा", "गुड़", "लाल चंदन"],
+      timeWindow: "प्रातः सूर्योदय से दोपहर 12 बजे तक (सूर्यास्त के बाद कदापि न करें)",
+      conduct: "पिता का प्रतिदिन चरण स्पर्श करें, कटु वचन न बोलें, झूठे वादे न करें।"
+    },
+    Moon: {
+      title: "चन्द्र शांति 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन प्रातःकाल माता का आशीर्वाद लें, दूध या जल का किसी पात्र में पक्षियों के लिए प्रबंध करें, अथवा शिवलिंग पर कच्चा दूध अर्पित करें।",
+      materials: ["कच्चा दूध", "चांदी का चौकोर टुकड़ा", "चावल"],
+      timeWindow: "दिन के समय (सूर्योदय से सूर्यास्त तक)",
+      conduct: "माता से किसी भी प्रकार का विवाद न करें, जल की बर्बादी न करें।"
+    },
+    Mars: {
+      title: "मंगल दोष निवारण 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन दोपहर से पूर्व लाल मसूर की दाल पक्षियों को डालें अथवा बहते जल में थोड़ा सा शहद या रेवड़ी प्रवाहित करें।",
+      materials: ["लाल मसूर", "गुड़ / रेवड़ी", "चांदी का छल्ला"],
+      timeWindow: "दिन के समय (विशेषकर दोपहर 12 बजे से पूर्व)",
+      conduct: "क्रोध और अपशब्दों पर पूर्ण नियंत्रण रखें, भाइयों से विवाद न करें।"
+    },
+    Mercury: {
+      title: "बुध सुधार 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन हरी दूर्वा अथवा साबुत मूंग गाय को खिलाएं, अथवा कन्याओं को मीठा खिलाकर उनका आशीर्वाद लें।",
+      materials: ["साबुत हरी मूंग", "हरी चूड़ियां", "चांदी का बिना जोड़ का छल्ला"],
+      timeWindow: "दिन के उजाले में",
+      conduct: "वाणी में सत्यता रखें, बहन, बेटी व बुआ का आदर करें, जुआ-सट्टे से दूर रहें।"
+    },
+    Jupiter: {
+      title: "बृहस्पति देव 43-दिवसीय प्रतिष्ठा अनुष्ठान",
+      ritual: "प्रतिदिन प्रातः स्नान के बाद माथे व नाभि पर केसर अथवा हल्दी का तिलक लगाएं। विष्णु सहस्रनाम या गुरु वंदना करें।",
+      materials: ["शुद्ध कश्मीरी केसर", "चने की दाल", "पीला सूती धागा"],
+      timeWindow: "प्रातः काल पूजा के समय",
+      conduct: "गुरु व वृद्धजनों का आदर करें, धार्मिक ग्रंथों का अनादर न करें, पीली वस्तु का दान न करें।"
+    },
+    Venus: {
+      title: "शुक्र बलवर्धन 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन सफेद गाय को दो पेड़े या चने की दाल-रोटी खिलाएं। शरीर व वस्त्रों को सुगंधित व स्वच्छ रखें।",
+      materials: ["कपूर", "सफेद चंदन", "इत्र / सुगंध"],
+      timeWindow: "दिन के समय",
+      conduct: "जीवनसाथी का सम्मान करें, पराई स्त्री से दूरी रखें, चरित्र की पवित्रता बनाए रखें।"
+    },
+    Saturn: {
+      title: "शनि कृपा 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन कौओं या काले कुत्तों को सरसों के तेल से चुपड़ी रोटी डालें। शनिवार को गरीबों व मजदूरों को भोजन कराएं।",
+      materials: ["सरसों का तेल", "काले तिल", "लोहे का टुकड़ा / कील"],
+      timeWindow: "दिन के समय (सूर्यास्त से पहले)",
+      conduct: "मजदूरों व निर्धनों का हक न मारें, शराब व मांस का सर्वथा त्याग रखें।"
+    },
+    Rahu: {
+      title: "राहु शांति 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन बहते पानी में नारियल अथवा जौ के दाने दूध से धोकर प्रवाहित करें। चांदी का एक चौकोर टुकड़ा सदैव अपनी जेब में रखें।",
+      materials: ["जौ", "कच्चा दूध", "पानी वाला नारियल", "चांदी का चौरस"],
+      timeWindow: "सूर्योदय से सूर्यास्त के मध्य",
+      conduct: "शौचालय व छत की सफाई रखें, ससुराल पक्ष से संबंध न बिगाड़ें, बिजली के खराब उपकरण घर से हटाएं।"
+    },
+    Ketu: {
+      title: "केतु शुद्धि 43-दिवसीय अनुष्ठान",
+      ritual: "प्रतिदिन दोरंगा (काला-सफेद) कुत्ता अथवा आवारा कुत्तों को मीठी रोटी खिलाएं। कान में सोना अथवा रेशमी पीला धागा पहनें।",
+      materials: ["दोरंगा कंबल (जरूरतमंद को)", "तिल के लड्डू", "पीला रेशमी धागा"],
+      timeWindow: "दिन के समय (सूर्योदय से सूर्यास्त तक)",
+      conduct: "साधु-संतों का अपमान न करें, भांजे व दामाद का आदर करें, गुप्त द्वेष न रखें।"
+    },
+  };
+
+  PLS.forEach(p => {
+    const pl = lkPlanets.find(x => x.planet === p);
+    if (!pl) return;
+    const rule = UPAY_43_RULES[p];
+    if (!rule) return;
+    const isDusthana = [6, 8, 12].includes(pl.house);
+    const isMandi = pl.state === "mandi";
+    const isDushman = pl.status === "dushman";
+
+    if (isMandi || isDushman || isDusthana) {
+      upayProtocols.push({
+        planet: p,
+        house: pl.house,
+        priority: (isDusthana && isMandi) ? "high" : (isMandi || isDushman) ? "medium" : "preventative",
+        title: rule.title,
+        ritual: rule.ritual,
+        timeWindow: rule.timeWindow,
+        duration: "43 दिन लगातार (बिना एक भी दिन छूटे)",
+        prohibitions: [
+          "उपाय केवल दिन के समय (सूर्योदय से सूर्यास्त तक) ही करें; रात्रि में लाल किताब उपाय वर्जित हैं।",
+          "43 दिनों के मध्य यदि 1 दिन भी नागा हुआ, तो गिनती पुनः 1 से शुरू होगी।",
+          "उपाय काल में तामसिक भोजन (मांसाहार, मदिरा) का पूर्ण निषेध रखें।",
+          pl.neverDonate.length ? `इस ग्रह की मुख्य वस्तु (${pl.neverDonate.slice(0, 2).join(", ")}) का दान कदापि न करें।` : "अनावश्यक दान से बचें।"
+        ],
+        materialsNeeded: rule.materials,
+        conductRule: rule.conduct,
+      });
+    }
+  });
+
+  if (upayProtocols.length === 0 && kismat.planet && UPAY_43_RULES[kismat.planet]) {
+    const rule = UPAY_43_RULES[kismat.planet];
+    upayProtocols.push({
+      planet: kismat.planet,
+      house: kismat.house,
+      priority: "preventative",
+      title: `${kismat.planet} भाग्य संवर्धन 43-दिवसीय अनुष्ठान`,
+      ritual: rule.ritual,
+      timeWindow: rule.timeWindow,
+      duration: "43 दिन लगातार",
+      prohibitions: [
+        "उपाय केवल दिन के समय करें।",
+        "43 दिनों तक बिना नागा नियम पालें।"
+      ],
+      materialsNeeded: rule.materials,
+      conductRule: rule.conduct,
+    });
+  }
 
   // ── Summary ───────────────────────────────────────────
   const pakkaCount   = lkPlanets.filter(p => p.status === "pakka").length;
@@ -1374,5 +1686,21 @@ export function calculateLalKitab(
     };
   });
 
-  return { planets: lkPlanets, takkars, rins, hasPitraRin, combinations: activeCombinations, homeOmens, houseOmens, kismat, coreAccuracy, varshphal, summary, tevaType, tevaExplanation };
+  return {
+    planets: lkPlanets,
+    takkars,
+    rins,
+    hasPitraRin,
+    combinations: activeCombinations,
+    homeOmens,
+    houseOmens,
+    kismat,
+    coreAccuracy,
+    varshphal,
+    drishtis,
+    upayProtocols,
+    summary,
+    tevaType,
+    tevaExplanation,
+  };
 }

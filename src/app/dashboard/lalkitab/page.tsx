@@ -13,7 +13,7 @@ import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { useLanguage } from "@/lib/language-context";
 
-type Tab = "planets" | "accuracy" | "takkar" | "rin" | "ages" | "combos" | "varshphal" | "lkgochar" | "ghar" | "safety";
+type Tab = "planets" | "accuracy" | "takkar" | "drishti" | "rin" | "ages" | "combos" | "varshphal" | "upay43" | "lkgochar" | "ghar" | "safety";
 type DomainTab = "nishani" | "career" | "money" | "marriage" | "health" | "psychology";
 
 const ADVANCED_PLANETS: Planet[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -210,6 +210,8 @@ export default function LalKitabPage() {
   const [domainTab, setDomainTab]     = useState<DomainTab>("nishani");
   const [lkYearOffset, setLkYearOffset] = useState(0);
   const [lkMonthIndex, setLkMonthIndex] = useState<number | null>(null);
+  const [varshViewMode, setVarshViewMode] = useState<"single" | "matrix">("single");
+  const [trackedUpays, setTrackedUpays] = useState<Record<string, number>>({});
   const { birth, chart, hasUserChart }              = useUserChart();
   const { t, tp, ts, lang } = useLanguage();
   // Safe DOB used purely for crash-proof computation when no chart exists yet.
@@ -242,18 +244,34 @@ export default function LalKitabPage() {
   );
   const natalLagnaIndex = (chart as never as { lagnaNum?: number }).lagnaNum ?? 0;
   const natalChart = useMemo(() => buildShiftedPlanets(chart.planets, 0), [chart.planets]);
-  const varshChart = useMemo(
-    () => buildShiftedPlanets(chart.planets, timeResult.varshphal.yearShift),
-    [chart.planets, timeResult.varshphal.yearShift],
-  );
-  const monthlyChart = useMemo(
-    () =>
-      buildShiftedPlanets(
-        chart.planets,
-        timeResult.varshphal.yearShift + timeResult.monthlyPhal.monthIndex,
-      ),
-    [chart.planets, timeResult.varshphal.yearShift, timeResult.monthlyPhal.monthIndex],
-  );
+  const varshChart = useMemo(() => {
+    const chartMap: Record<string, { house: number; retrograde: boolean }> = {};
+    if (timeResult.varshphal.chartRows && timeResult.varshphal.chartRows.length > 0) {
+      timeResult.varshphal.chartRows.forEach((row) => {
+        chartMap[row.planet] = {
+          house: row.varshHouse,
+          retrograde: Boolean(chart.planets[row.planet]?.retrograde),
+        };
+      });
+    } else {
+      ADVANCED_PLANETS.forEach((planet) => {
+        const data = chart.planets[planet];
+        if (data) {
+          chartMap[planet] = {
+            house: data.house,
+            retrograde: Boolean(data.retrograde),
+          };
+        }
+      });
+    }
+    return chartMap;
+  }, [timeResult.varshphal.chartRows, chart.planets]);
+
+  const monthlyChart = useMemo(() => {
+    // In authentic Lal Kitab Varshphal, the chart displays annual 1952 progressed placements
+    // with each month highlighting its specific active house (Month 1 = H1, Month 2 = H2, etc.)
+    return varshChart;
+  }, [varshChart]);
 
   const pakkaCount   = result.planets.filter(p => p.status === "pakka").length;
   const dushmanCount = result.planets.filter(p => p.status === "dushman").length;
@@ -430,6 +448,78 @@ export default function LalKitabPage() {
         .lk-scroll-btn{white-space:nowrap;border:1px solid rgba(184,134,11,0.25);background:#FAF7F2;color:#4A4238;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
         .lk-scroll-btn.active{border-color:#B8860B;background:rgba(184,134,11,0.15);color:#8A6008}
         .lk-scroll-meta{font-size:12px;color:#6B635B;line-height:1.6;margin-top:6px}
+
+        /* UNIFIED HERO INSIGHT GRID */
+        .lk-hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:20px}
+        .teva-status-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.25);border-radius:16px;padding:18px 22px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.03)}
+        .teva-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+        .teva-badge{display:inline-block;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid}
+        .teva-badge.dharmi{background:rgba(34,197,94,0.1);color:#15803D;border-color:rgba(34,197,94,0.3)}
+        .teva-badge.andha{background:rgba(239,68,68,0.1);color:#DC2626;border-color:rgba(239,68,68,0.3)}
+        .teva-badge.sadharan{background:rgba(184,134,11,0.1);color:#8A6008;border-color:rgba(184,134,11,0.3)}
+        .pitra-badge{display:inline-block;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.3)}
+        .teva-summary-text{font-size:13.5px;color:#1A1A1A;line-height:1.75;font-weight:600}
+        .teva-sub-text{font-size:12.5px;color:#4A4238;line-height:1.65;margin-top:6px}
+
+        /* TABS HORIZONTAL SCROLLBAR */
+        .lk-tabs-container{overflow-x:auto;padding-bottom:6px;margin-bottom:18px;scrollbar-width:thin}
+        .lk-tabs{flex-wrap:nowrap;margin-bottom:0}
+
+        /* DRISHTI RADAR STYLES */
+        .drishti-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:20px}
+        .drishti-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.22);border-radius:16px;padding:18px;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+        .drishti-card.afflicted{border-color:rgba(239,68,68,0.45);background:rgba(239,68,68,0.02)}
+        .drishti-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+        .drishti-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#1A1A1A}
+        .drishti-pct{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(184,134,11,0.12);color:#B8860B}
+        .drishti-houses{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+        .drishti-pill{font-size:12px;padding:4px 10px;border-radius:8px;font-weight:600}
+        .drishti-pill.from{background:rgba(184,134,11,0.1);color:#8A6008;border:1px solid rgba(184,134,11,0.25)}
+        .drishti-arrow{color:#B8860B;font-weight:800}
+        .drishti-pill.to{background:rgba(29,78,216,0.08);color:#1D4ED8;border:1px solid rgba(29,78,216,0.25)}
+        .drishti-effect{font-size:13px;color:#4A4238;line-height:1.7;margin-bottom:8px}
+        .drishti-upaya{font-size:12px;color:#B45309;padding:8px 10px;background:rgba(245,158,11,0.07);border-radius:8px;border:1px solid rgba(245,158,11,0.2);line-height:1.6}
+
+        /* 43-DAY UPAY PROTOCOL STYLES */
+        .upay43-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:20px}
+        .upay43-card{background:#FFFFFF;border:1px solid rgba(184,134,11,0.25);border-radius:16px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+        .upay43-card.priority-high{border-left:5px solid #DC2626}
+        .upay43-card.priority-medium{border-left:5px solid #F59E0B}
+        .upay43-card.priority-preventative{border-left:5px solid #15803D}
+        .upay43-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+        .upay43-badge-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+        .upay43-priority-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px}
+        .upay43-priority-badge.high{background:rgba(220,38,38,0.1);color:#DC2626}
+        .upay43-priority-badge.medium{background:rgba(245,158,11,0.1);color:#B45309}
+        .upay43-priority-badge.preventative{background:rgba(21,128,61,0.1);color:#15803D}
+        .upay43-time-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;background:rgba(184,134,11,0.1);color:#8A6008}
+        .upay43-title{font-size:19px;font-weight:700;color:#1A1A1A;margin-bottom:2px}
+        .upay43-house{font-size:11px;color:#6B635B;font-weight:600}
+        .upay43-ritual{font-size:13px;color:#1A1A1A;line-height:1.75;margin:10px 0;padding:10px 12px;background:#FAF8F5;border-radius:10px;border:1px solid rgba(184,134,11,0.18)}
+        .upay43-materials{margin:8px 0}
+        .upay43-mat-title{font-size:11px;font-weight:700;color:#8A6008;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+        .upay43-mat-tags{display:flex;gap:6px;flex-wrap:wrap}
+        .upay43-mat-tag{font-size:11px;padding:3px 8px;border-radius:6px;background:rgba(184,134,11,0.08);color:#4A4238;border:1px solid rgba(184,134,11,0.2);font-weight:500}
+        .upay43-conduct{font-size:12.5px;color:#15803D;line-height:1.65;padding:8px 10px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);margin:8px 0}
+        .upay43-prohibitions{margin:8px 0}
+        .upay43-prohib-title{font-size:11px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+        .upay43-prohib-item{font-size:12px;color:#7C2D12;line-height:1.55;margin-bottom:3px}
+        .upay43-tracker{margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.06)}
+        .tracker-top{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#4A4238;margin-bottom:6px}
+        .tracker-bar-wrap{width:100%;height:6px;background:#E8E2D8;border-radius:3px;overflow:hidden;margin-bottom:8px}
+        .tracker-bar-fill{height:100%;background:#15803D;border-radius:3px;transition:width 0.3s}
+        .tracker-actions{display:flex;gap:8px}
+        .tracker-btn{padding:5px 12px;font-size:11.5px;font-weight:700;border-radius:6px;border:1px solid #15803D;background:#15803D;color:#FFFFFF;cursor:pointer}
+        .tracker-btn.reset{border-color:rgba(0,0,0,0.15);background:transparent;color:#6B635B}
+
+        /* 12-YEAR MATRIX TABLE STYLES */
+        .matrix-table th{text-align:center}
+        .matrix-table td{text-align:center}
+        .current-year-row{background:rgba(184,134,11,0.12)!important;font-weight:700}
+        .cycle-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:#F5EFE3;color:#6B635B}
+        .cycle-badge.active{background:#B8860B;color:#FFFFFF}
+        @media(max-width:850px){.lk-hero-grid{grid-template-columns:1fr}}
+
         @media(max-width:768px){.planet-grid{grid-template-columns:1fr}.combo-grid{grid-template-columns:1fr}.varsh-grid{grid-template-columns:1fr}}
         @media(max-width:900px){.lk-gochar-grid,.lk-time-grid{grid-template-columns:1fr}}
       `}</style>
@@ -476,70 +566,67 @@ export default function LalKitabPage() {
           </div>
         </div>
 
-        {/* SUMMARY & TEVA BANNER */}
-        <div className="summary-strip">📕 {result.summary}</div>
-        {result.tevaExplanation && result.tevaType !== "Sadharan Teva" && (
-          <div style={{
-            background: result.tevaType === "Dharmi Teva" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
-            border: `1px solid ${result.tevaType === "Dharmi Teva" ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
-            borderRadius: 12,
-            padding: "12px 18px",
-            marginBottom: 16,
-            fontSize: 13,
-            color: "#4A4238",
-            lineHeight: 1.7
-          }}>
-            {result.tevaExplanation}
-          </div>
-        )}
-
-        {/* KISMAT KA GRAH BANNER */}
-        <div className="kismat-bar">
-          <div className="kismat-icon">{result.kismat.icon}</div>
-          <div className="kismat-content">
-            <div className="kismat-label">Kismat Ka Grah · House {result.kismat.house}</div>
-            <div className="kismat-title serif">{result.kismat.planet} — Aapka Bhagya Grah</div>
-            <div className="kismat-interp">{result.kismat.interpretation}</div>
-          </div>
-          <div>
-            <div className="kismat-score serif" style={{color: scoreColor(result.kismat.score)}}>
-              {result.kismat.score}
+        {/* UNIFIED HERO INSIGHT GRID (REALIGNED & COMPACT WHITESPACE) */}
+        <div className="lk-hero-grid">
+          {/* LEFT: KISMAT KA GRAH */}
+          <div className="kismat-bar" style={{marginBottom:0}}>
+            <div className="kismat-icon">{result.kismat.icon}</div>
+            <div className="kismat-content">
+              <div className="kismat-label">Kismat Ka Grah · House {result.kismat.house}</div>
+              <div className="kismat-title serif">{result.kismat.planet} — Aapka Bhagya Grah</div>
+              <div className="kismat-interp">{result.kismat.interpretation}</div>
             </div>
-            <div style={{fontSize:10,color:"#6B635B",textAlign:"center",marginTop:2}}>/ 95</div>
+            <div style={{textAlign:"center",minWidth:50}}>
+              <div className="kismat-score serif" style={{color: scoreColor(result.kismat.score)}}>
+                {result.kismat.score}
+              </div>
+              <div style={{fontSize:10,color:"#6B635B",textAlign:"center",marginTop:2}}>/ 95</div>
+            </div>
+          </div>
+
+          {/* RIGHT: TEVA & KARMIC STATUS */}
+          <div className="teva-status-card">
+            <div className="teva-top">
+              <span className={`teva-badge ${result.tevaType === "Dharmi Teva" ? "dharmi" : result.tevaType === "Andha Teva" ? "andha" : "sadharan"}`}>
+                {result.tevaType || "Sadharan Teva"}
+              </span>
+              {result.hasPitraRin && (
+                <span className="pitra-badge">⚠️ Pitra Rin Active</span>
+              )}
+            </div>
+            <div className="teva-summary-text">📕 {result.summary}</div>
+            {result.tevaExplanation && result.tevaType !== "Sadharan Teva" && (
+              <div className="teva-sub-text">{result.tevaExplanation}</div>
+            )}
+            {result.hasPitraRin && (
+              <div style={{fontSize:11.5,color:"#DC2626",marginTop:6,fontWeight:500}}>
+                Paternal karma unresolved: Amavasya Pitra Tarpan aur kauon ko bhojan karana aavashyak hai.
+              </div>
+            )}
           </div>
         </div>
 
-        {/* PITRA RIN ALERT */}
-        {result.hasPitraRin && (
-          <div className="pitra-alert">
-            <div className="pitra-icon">⚠️</div>
-            <div>
-              <div className="pitra-title">Pitra Rin Detected</div>
-              <div className="pitra-text">
-                Aapke chart mein Pitra Rin ke indicators hain — paternal ancestral karma unresolved hai.
-                Amavasya pe Pitra Tarpan karein. Kaago (kauon) ko khaana khilaen. Pita ke parivar ke sath rishta sudhaarein.
-              </div>
-            </div>
+        {/* HORIZONTALLY SCROLLABLE SLEEK TABS */}
+        <div className="lk-tabs-container">
+          <div className="tabs lk-tabs">
+            {([
+              ["planets",   `Planets (${result.planets.length})`],
+              ["accuracy",  "Core Accuracy"],
+              ["takkar",    `Takkar (${result.takkars.length})`],
+              ["drishti",   `Drishti (${result.drishtis.length})`],
+              ["rin",       `Rin (${result.rins.length})`],
+              ["ages",      "Ages"],
+              ["combos",    `Combos (${result.combinations.length})`],
+              ["varshphal", "Varshphal (1952)"],
+              ["upay43",    `43-Day Upay (${result.upayProtocols.length})`],
+              ["lkgochar",  "LK Gochar"],
+              ["ghar",      "Ghar"],
+              ["safety",    "Safety"],
+            ] as [Tab,string][]).map(([t,l]) => (
+              <button key={t} className={`tab ${activeTab===t?"active":""}`}
+                onClick={() => setActiveTab(t)}>{l}</button>
+            ))}
           </div>
-        )}
-
-        {/* TABS */}
-        <div className="tabs">
-          {([
-            ["planets",  `Planets (${result.planets.length})`],
-            ["accuracy", "Core Accuracy"],
-            ["takkar",   `Takkar (${result.takkars.length})`],
-            ["rin",      `Rin (${result.rins.length})`],
-            ["ages",     "Ages"],
-            ["combos",   `Combos (${result.combinations.length})`],
-            ["varshphal","Varshphal"],
-            ["lkgochar", "LK Gochar"],
-            ["ghar",     "Ghar"],
-            ["safety",   "Safety"],
-          ] as [Tab,string][]).map(([t,l]) => (
-            <button key={t} className={`tab ${activeTab===t?"active":""}`}
-              onClick={() => setActiveTab(t)}>{l}</button>
-          ))}
         </div>
 
         {/* ── PLANETS TAB ── */}
@@ -808,6 +895,41 @@ export default function LalKitabPage() {
           </div>
         )}
 
+        {/* ── DRISHTI TAB (विशेष दृष्टि रडार) ── */}
+        {activeTab === "drishti" && (
+          <div>
+            <div style={{background:"rgba(184,134,11,0.06)",border:"1px solid rgba(184,134,11,0.22)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
+              👁️ <strong style={{color:"#8A6008"}}>Lal Kitab Vishesh Drishti Radar</strong> — लाल किताब में पारंपरिक पराशरी दृष्टियों के स्थान पर विशेष दृष्टिकोण काम करते हैं: <strong>धोखा दृष्टि (H8 → H2)</strong>, <strong>अधिकार दृष्टि (H4 → H10 50%)</strong>, <strong>सहायक दृष्टि (H3 → H9/H11 25%)</strong> और <strong>बुनियादी दृष्टि (H1 ↔ H7 100%)</strong>। नीचे आपकी कुंडली में सक्रिय दृष्टियों का विश्लेषण दिया गया है:
+            </div>
+
+            <div className="drishti-grid">
+              {result.drishtis.map((d, idx) => (
+                <div key={idx} className={`drishti-card ${d.isAfflicted ? "afflicted" : d.type}`}>
+                  <div className="drishti-top">
+                    <span className="drishti-name">{d.hindiName}</span>
+                    <span className="drishti-pct">{d.strengthPercent}% प्रभाव</span>
+                  </div>
+                  <div className="drishti-houses">
+                    <span className="drishti-pill from">
+                      H{d.fromHouse} ({d.fromPlanets.length ? d.fromPlanets.join(", ") : "खाली"})
+                    </span>
+                    <span className="drishti-arrow">➔</span>
+                    <span className="drishti-pill to">
+                      H{d.toHouse} ({d.toPlanets.length ? d.toPlanets.join(", ") : "खाली"})
+                    </span>
+                  </div>
+                  <div className="drishti-effect">{d.effect}</div>
+                  {d.upaya && (
+                    <div className="drishti-upaya">
+                      <strong>🛡️ शास्त्रीय उपाय:</strong> {d.upaya}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ── RIN TAB ── */}
         {activeTab === "rin" && (
           <div>
@@ -917,104 +1039,274 @@ export default function LalKitabPage() {
         {/* ── VARSHPHAL TAB ── */}
         {activeTab === "varshphal" && (
           <div>
-            <div style={{background:"rgba(96,165,250,0.05)",border:"1px solid rgba(96,165,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
-              📅 <strong style={{color:"#60a5fa"}}>Varshphal</strong> — Lal Kitab mein har saal lagna ek ghar aage khisak jaata hai. Is saal ka lagna aur grahon ki position se varshik phal nikala jaata hai.
+            <div style={{background:"rgba(96,165,250,0.05)",border:"1px solid rgba(96,165,250,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:16,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
+              📅 <strong style={{color:"#60a5fa"}}>Lal Kitab 1952 Varshphal</strong> — लाल किताब 1952 (पं. रूपचंद जोशी) के प्रमाणिक 12-वर्षीय चक्र तालिका (Progression Table) पर आधारित। जन्म लग्न स्थिर रहता है और प्रत्येक ग्रह अपने वार्षिक भाव में भ्रमण करता है, जिसमें वर्षेश (Varsheshwar) का वर्षभर मुख्य प्रभाव रहता है।
             </div>
-            <div className="varsh-card">
-              <div style={{display:"flex",alignItems:"flex-start",gap:20,marginBottom:20}}>
-                <div>
-                  <div className="varsh-year serif">{result.varshphal.year}</div>
-                  <div className="varsh-lagna">
-                    Period: {result.varshphal.periodLabel}
-                    <br />
-                    Varsh Lagna: {result.varshphal.lagnaSign}
-                    <span style={{marginLeft:8,fontSize:11,color:"#6B635B"}}>
-                      (Shift: +{result.varshphal.yearShift} ghar)
-                    </span>
+
+            {/* VIEW MODE TOGGLE */}
+            <div style={{display:"flex",gap:8,marginBottom:16}}>
+              <button
+                type="button"
+                className={`lk-scroll-btn ${varshViewMode === "single" ? "active" : ""}`}
+                onClick={() => setVarshViewMode("single")}
+              >
+                📅 1-Year Detail View ({result.varshphal.year} — {result.varshphal.year + 1})
+              </button>
+              <button
+                type="button"
+                className={`lk-scroll-btn ${varshViewMode === "matrix" ? "active" : ""}`}
+                onClick={() => setVarshViewMode("matrix")}
+              >
+                📊 12-Year Progression Matrix (1952 Roadmap)
+              </button>
+            </div>
+
+            {varshViewMode === "single" ? (
+              <div className="varsh-card">
+                <div style={{display:"flex",alignItems:"flex-start",gap:20,marginBottom:20}}>
+                  <div>
+                    <div className="varsh-year serif">{result.varshphal.year} — {result.varshphal.year + 1}</div>
+                    <div className="varsh-lagna">
+                      Period: {result.varshphal.periodLabel}
+                      <br />
+                      Natal Lagna: {result.varshphal.lagnaSign} · Running Age: {result.varshphal.runningAge}
+                      <span style={{marginLeft:8,fontSize:11,color:"#6B635B"}}>
+                        (12-Varshiya Cycle: Varsh {result.varshphal.cycleYear} · Varsheshwar: {result.varshphal.varsheshwar})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="varsh-summary">{result.varshphal.summary}</div>
+                <div className="prediction-grid">
+                  <div className="prediction-card">
+                    <div className="prediction-title">Year Headline</div>
+                    <div className="prediction-text">{result.varshphal.annualPrediction.headline}</div>
+                  </div>
+                  <div className="prediction-card">
+                    <div className="prediction-title">Career</div>
+                    <div className="prediction-text">{result.varshphal.annualPrediction.career}</div>
+                  </div>
+                  <div className="prediction-card">
+                    <div className="prediction-title">Money</div>
+                    <div className="prediction-text">{result.varshphal.annualPrediction.money}</div>
+                  </div>
+                  <div className="prediction-card">
+                    <div className="prediction-title">Family</div>
+                    <div className="prediction-text">{result.varshphal.annualPrediction.family}</div>
+                  </div>
+                  <div className="prediction-card">
+                    <div className="prediction-title">Health</div>
+                    <div className="prediction-text">{result.varshphal.annualPrediction.health}</div>
+                  </div>
+                  <div className="prediction-card">
+                    <div className="prediction-title">Remedy</div>
+                    <div className="prediction-text">{result.varshphal.annualPrediction.remedy}</div>
+                  </div>
+                </div>
+                <div className="lk-table-wrap" style={{marginTop:14}}>
+                  <table className="lk-table">
+                    <thead>
+                      <tr>
+                        <th>Planet</th>
+                        <th>Natal</th>
+                        <th>Varsh</th>
+                        <th>Sign</th>
+                        <th>Soya</th>
+                        <th>Kismat</th>
+                        <th>Annual Condition</th>
+                        <th>Reading</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {result.varshphal.chartRows.map((row) => (
+                        <tr key={row.planet}>
+                          <td style={{fontWeight:800,color:LK_COLORS[row.planet]}}>{row.planet}</td>
+                          <td>H{row.natalHouse}</td>
+                          <td>H{row.varshHouse}</td>
+                          <td>{row.signShort}<br /><span style={{fontSize:11,color:"#6B635B"}}>{row.sign}</span></td>
+                          <td><span className={`yes-no ${row.soya ? "yes" : "no"}`}>{row.soya ? "Yes" : "No"}</span></td>
+                          <td><span className={`yes-no ${row.kismatJaganewala ? "yes" : "no"}`}>{row.kismatJaganewala ? "Yes" : "No"}</span></td>
+                          <td>
+                            <span className={row.beneficMalefic === "Benefic" ? "bm-benefic" : row.beneficMalefic === "Malefic" ? "bm-malefic" : "bm-mixed"}>
+                              {row.beneficMalefic}
+                            </span>
+                          </td>
+                          <td>{row.reading}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="varsh-grid">
+                  <div className="varsh-col shubh">
+                    <div className="varsh-col-title" style={{color:"#15803D"}}>✨ Shubh Graha (Is Saal)</div>
+                    {result.varshphal.shubhPlanets.length === 0
+                      ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh shubh grah nahi</div>
+                      : result.varshphal.shubhPlanets.map((pl,i) => (
+                          <div key={i} className="varsh-planet" style={{color:"#15803D"}}>{pl}</div>
+                        ))
+                    }
+                  </div>
+                  <div className="varsh-col caution">
+                    <div className="varsh-col-title" style={{color:"#DC2626"}}>⚠️ Savdhani (Is Saal)</div>
+                    {result.varshphal.cautionPlanets.length === 0
+                      ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh savdhani nahi</div>
+                      : result.varshphal.cautionPlanets.map((pl,i) => (
+                          <div key={i} className="varsh-planet" style={{color:"#DC2626"}}>{pl}</div>
+                        ))
+                    }
                   </div>
                 </div>
               </div>
-              <div className="varsh-summary">{result.varshphal.summary}</div>
-              <div className="prediction-grid">
-                <div className="prediction-card">
-                  <div className="prediction-title">Year Headline</div>
-                  <div className="prediction-text">{result.varshphal.annualPrediction.headline}</div>
+            ) : (
+              <div className="varsh-card">
+                <div style={{marginBottom:16}}>
+                  <div className="varsh-year serif" style={{fontSize:24}}>12-वर्षीय चक्र प्रगति तालिका (1952 Progression Roadmap)</div>
+                  <div style={{fontSize:13,color:"#6B635B",marginTop:4}}>
+                    लाल किताब 1952 के अनुसार प्रत्येक 12 वर्ष में ग्रहों का चक्र आगे बढ़ता है। वर्तमान आयु: <strong>{result.varshphal.runningAge}</strong> (चक्र वर्ष <strong>{result.varshphal.cycleYear}</strong>)।
+                  </div>
                 </div>
-                <div className="prediction-card">
-                  <div className="prediction-title">Career</div>
-                  <div className="prediction-text">{result.varshphal.annualPrediction.career}</div>
-                </div>
-                <div className="prediction-card">
-                  <div className="prediction-title">Money</div>
-                  <div className="prediction-text">{result.varshphal.annualPrediction.money}</div>
-                </div>
-                <div className="prediction-card">
-                  <div className="prediction-title">Family</div>
-                  <div className="prediction-text">{result.varshphal.annualPrediction.family}</div>
-                </div>
-                <div className="prediction-card">
-                  <div className="prediction-title">Health</div>
-                  <div className="prediction-text">{result.varshphal.annualPrediction.health}</div>
-                </div>
-                <div className="prediction-card">
-                  <div className="prediction-title">Remedy</div>
-                  <div className="prediction-text">{result.varshphal.annualPrediction.remedy}</div>
-                </div>
-              </div>
-              <div className="lk-table-wrap" style={{marginTop:14}}>
-                <table className="lk-table">
-                  <thead>
-                    <tr>
-                      <th>Planet</th>
-                      <th>Natal</th>
-                      <th>Varsh</th>
-                      <th>Sign</th>
-                      <th>Soya</th>
-                      <th>Kismat</th>
-                      <th>Annual Condition</th>
-                      <th>Reading</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.varshphal.chartRows.map((row) => (
-                      <tr key={row.planet}>
-                        <td style={{fontWeight:800,color:LK_COLORS[row.planet]}}>{row.planet}</td>
-                        <td>H{row.natalHouse}</td>
-                        <td>H{row.varshHouse}</td>
-                        <td>{row.signShort}<br /><span style={{fontSize:11,color:"#6B635B"}}>{row.sign}</span></td>
-                        <td><span className={`yes-no ${row.soya ? "yes" : "no"}`}>{row.soya ? "Yes" : "No"}</span></td>
-                        <td><span className={`yes-no ${row.kismatJaganewala ? "yes" : "no"}`}>{row.kismatJaganewala ? "Yes" : "No"}</span></td>
-                        <td>
-                          <span className={row.beneficMalefic === "Benefic" ? "bm-benefic" : row.beneficMalefic === "Malefic" ? "bm-malefic" : "bm-mixed"}>
-                            {row.beneficMalefic}
-                          </span>
-                        </td>
-                        <td>{row.reading}</td>
+
+                <div className="lk-table-wrap">
+                  <table className="lk-table matrix-table">
+                    <thead>
+                      <tr>
+                        <th>Cycle Yr</th>
+                        <th>Cal. Year</th>
+                        <th>Age</th>
+                        <th>Varsheshwar</th>
+                        <th>Focus Theme</th>
+                        <th>Sun</th>
+                        <th>Moon</th>
+                        <th>Mars</th>
+                        <th>Merc</th>
+                        <th>Jup</th>
+                        <th>Venus</th>
+                        <th>Sat</th>
+                        <th>Rahu</th>
+                        <th>Ketu</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="varsh-grid">
-                <div className="varsh-col shubh">
-                  <div className="varsh-col-title" style={{color:"#15803D"}}>✨ Shubh Graha (Is Saal)</div>
-                  {result.varshphal.shubhPlanets.length === 0
-                    ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh shubh grah nahi</div>
-                    : result.varshphal.shubhPlanets.map((pl,i) => (
-                        <div key={i} className="varsh-planet" style={{color:"#15803D"}}>{pl}</div>
-                      ))
-                  }
+                    </thead>
+                    <tbody>
+                      {result.varshphal.twelveYearMatrix?.map((row) => (
+                        <tr key={row.cycleYear} className={row.isCurrent ? "current-year-row" : ""}>
+                          <td>
+                            <span className={`cycle-badge ${row.isCurrent ? "active" : ""}`}>
+                              Yr {row.cycleYear} {row.isCurrent ? "⚡ Current" : ""}
+                            </span>
+                          </td>
+                          <td><strong>{row.calendarYear}</strong></td>
+                          <td>{row.runningAge}</td>
+                          <td style={{fontWeight:700,color:"#B8860B"}}>{row.varsheshwar}</td>
+                          <td style={{fontSize:12,color:"#4A4238"}}>{row.theme}</td>
+                          <td>H{row.planetHouses["Sun"]}</td>
+                          <td>H{row.planetHouses["Moon"]}</td>
+                          <td>H{row.planetHouses["Mars"]}</td>
+                          <td>H{row.planetHouses["Mercury"]}</td>
+                          <td>H{row.planetHouses["Jupiter"]}</td>
+                          <td>H{row.planetHouses["Venus"]}</td>
+                          <td>H{row.planetHouses["Saturn"]}</td>
+                          <td>H{row.planetHouses["Rahu"]}</td>
+                          <td>H{row.planetHouses["Ketu"]}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <div className="varsh-col caution">
-                  <div className="varsh-col-title" style={{color:"#DC2626"}}>⚠️ Savdhani (Is Saal)</div>
-                  {result.varshphal.cautionPlanets.length === 0
-                    ? <div style={{fontSize:13,color:"#6B635B"}}>Koi vishesh savdhani nahi</div>
-                    : result.varshphal.cautionPlanets.map((pl,i) => (
-                        <div key={i} className="varsh-planet" style={{color:"#DC2626"}}>{pl}</div>
-                      ))
-                  }
-                </div>
               </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 43-DAY UPAY TAB ── */}
+        {activeTab === "upay43" && (
+          <div>
+            <div style={{background:"rgba(220,38,38,0.06)",border:"1px solid rgba(220,38,38,0.22)",borderRadius:12,padding:"14px 18px",marginBottom:20,fontSize:13,color:"#4A4238",lineHeight:1.8}}>
+              🪬 <strong style={{color:"#DC2626"}}>लाल किताब 43-दिवसीय नियम (43-Day Consecutive Ritual Protocol)</strong> — पं. रूपचंद जोशी कृत लाल किताब का सर्वोच्च नियम: कोई भी शास्त्रीय उपाय <strong>लगातार 43 दिन तक बिना खंडित किए</strong> (Without Break) दिन के उजाले में (सूर्योदय से सूर्यास्त के मध्य) किया जाता है। यदि बीच में 1 दिन भी छूट जाए तो पूर्व के सभी दिन निष्फल माने जाते हैं और गिनती 1 से पुनः आरंभ करनी पड़ती है।
+            </div>
+
+            <div className="upay43-grid">
+              {result.upayProtocols.map((upay) => {
+                const completedDays = trackedUpays[upay.planet] || 0;
+                const progressPct = Math.min(100, Math.round((completedDays / 43) * 100));
+                return (
+                  <div key={upay.planet} className={`upay43-card priority-${upay.priority}`}>
+                    <div className="upay43-header">
+                      <div>
+                        <div className="upay43-badge-wrap">
+                          <span className={`upay43-priority-badge ${upay.priority}`}>
+                            {upay.priority === "high" ? "🔴 High Priority" : upay.priority === "medium" ? "🟡 Moderate" : "🟢 Preventative"}
+                          </span>
+                          <span className="upay43-time-badge">⏰ {upay.timeWindow}</span>
+                        </div>
+                        <div className="upay43-title serif">{upay.title}</div>
+                        <div className="upay43-house">{upay.planet} · House {upay.house}</div>
+                      </div>
+                    </div>
+
+                    <div className="upay43-ritual">
+                      <strong>विधि:</strong> {upay.ritual}
+                    </div>
+
+                    {(upay.materialsNeeded || []).length > 0 && (
+                      <div className="upay43-materials">
+                        <div className="upay43-mat-title">आवश्यक पूजन व उपाय सामग्री</div>
+                        <div className="upay43-mat-tags">
+                          {(upay.materialsNeeded || []).map((m, idx) => (
+                            <span key={idx} className="upay43-mat-tag">{m}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="upay43-conduct">
+                      <strong>✨ आचरण व मर्यादा (Conduct):</strong> {upay.conductRule}
+                    </div>
+
+                    {(upay.prohibitions || []).length > 0 && (
+                      <div className="upay43-prohibitions">
+                        <div className="upay43-prohib-title">⛔ लाल किताब वर्जित कार्य (Prohibitions)</div>
+                        {(upay.prohibitions || []).map((p, idx) => (
+                          <div key={idx} className="upay43-prohib-item">• {p}</div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="upay43-tracker">
+                      <div className="tracker-top">
+                        <span>43-दिवसीय ट्रैकर प्रगति</span>
+                        <span>{completedDays} / 43 दिन ({progressPct}%)</span>
+                      </div>
+                      <div className="tracker-bar-wrap">
+                        <div className="tracker-bar-fill" style={{ width: `${progressPct}%` }} />
+                      </div>
+                      <div className="tracker-actions">
+                        <button
+                          type="button"
+                          className="tracker-btn"
+                          onClick={() => setTrackedUpays(prev => ({ ...prev, [upay.planet]: Math.min(43, (prev[upay.planet] || 0) + 1) }))}
+                          disabled={completedDays >= 43}
+                        >
+                          {completedDays >= 43 ? "✨ 43 दिन पूर्ण!" : "+ आज का दिन पूरा किया"}
+                        </button>
+                        {completedDays > 0 && (
+                          <button
+                            type="button"
+                            className="tracker-btn reset"
+                            onClick={() => {
+                              if (window.confirm(`${upay.planet} का अनुष्ठान रीसेट करें? (लाल किताब नियम: छूटने पर पुनः 0 से शुरू करें)`)) {
+                                setTrackedUpays(prev => ({ ...prev, [upay.planet]: 0 }));
+                              }
+                            }}
+                          >
+                            ↺ रीसेट (छूटने पर)
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -1089,18 +1381,18 @@ export default function LalKitabPage() {
                 lagnaSignIndex={natalLagnaIndex}
               />
               <LalKitabHouseChart
-                title="Varshphal Chart"
-                subtitle={timeResult.varshphal.periodLabel}
+                title="Varshphal Chart (1952)"
+                subtitle={`${timeResult.varshphal.periodLabel} · Age ${timeResult.age.runningAge}`}
                 planets={varshChart}
-                activeHouse={timeResult.varshphal.activeHouse}
-                lagnaSignIndex={natalLagnaIndex + timeResult.varshphal.yearShift}
+                activeHouse={1}
+                lagnaSignIndex={natalLagnaIndex}
               />
               <LalKitabHouseChart
                 title="Monthly Phal Chart"
                 subtitle={`${timeResult.monthlyPhal.monthName} · Varsh month ${timeResult.monthlyPhal.runningMonth}`}
                 planets={monthlyChart}
                 activeHouse={timeResult.monthlyPhal.activeHouse}
-                lagnaSignIndex={natalLagnaIndex + timeResult.varshphal.yearShift + timeResult.monthlyPhal.monthIndex}
+                lagnaSignIndex={natalLagnaIndex}
               />
             </div>
 
