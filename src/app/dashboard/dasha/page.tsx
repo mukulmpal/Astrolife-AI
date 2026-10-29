@@ -31,6 +31,7 @@ import {
 import { resolveNakshatraCoordinate } from "@/lib/astro-engine/ayanamsa-config";
 import { LiveDashaTickerStrip } from "@/components/dasha/LiveDashaTickerStrip";
 import { VimshottariFiveLevelExplorer } from "@/components/dasha/VimshottariFiveLevelExplorer";
+import { DashaProgressCapsule } from "@/components/dasha/DashaProgressCapsule";
 import "@/app/dashboard/shared.css";
 
 export interface TaraRowInfo {
@@ -72,9 +73,18 @@ function ActiveCard({
         boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
       }}
     >
-      <p className="text-xs uppercase tracking-widest font-bold" style={{ color: color }}>
-        {label}
-      </p>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-xs uppercase tracking-widest font-bold" style={{ color: color }}>
+          {label}
+        </p>
+        <DashaProgressCapsule
+          planet={period.lord}
+          startYear={new Date(period.startDate).getFullYear()}
+          endYear={new Date(period.endDate).getFullYear()}
+          exactStartDate={period.startDate}
+          exactEndDate={period.endDate}
+        />
+      </div>
       <div className="flex items-center gap-3">
         <span className="text-3xl">{LORD_ICON[period.lord]}</span>
         <div>

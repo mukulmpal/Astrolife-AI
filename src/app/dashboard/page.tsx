@@ -21,6 +21,8 @@ import { AajKaTaraCard } from "@/components/dasha/AajKaTaraCard";
 import { NakshatraRemedyDossierCard } from "@/components/remedies/NakshatraRemedyDossierCard";
 import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemediesDossier";
 import { LiveMuhurtaAlert } from "@/components/panchang/LiveMuhurtaAlert";
+import { DashaProgressCapsule } from "@/components/dasha/DashaProgressCapsule";
+import { runKPEngine } from "@/lib/astro-engine/kp";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -506,10 +508,68 @@ function DashboardContent() {
 
     return { panchang, transit, radar: { ...radar, bestDay, cautionDay }, topArea, cautionCount, oppCount, cosmicPulse, cosmicRadarHorizons };
   }, [chart]);
+
+  const kpResult = useMemo(() => {
+    if (!chart?.planets) return null;
+    try {
+      return runKPEngine(chart as never);
+    } catch (err) {
+      console.warn("KP calculation error on dashboard:", err);
+      return null;
+    }
+  }, [chart]);
+
+  const chalitShifts = useMemo(() => {
+    if (!kpResult?.rows) return [];
+    return kpResult.rows
+      .filter((r) => r.bhavaShift !== 0)
+      .map((r) => ({
+        planet: r.name,
+        rashiHouse: r.rashiHouse,
+        bhavaHouse: r.bhavaHouse,
+        shift: r.bhavaShift > 0 ? `+${r.bhavaShift}` : `${r.bhavaShift}`,
+      }));
+  }, [kpResult]);
+
   const chartLayers = useMemo(() => {
     const divisional = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
     const d1 = divisional.find((c) => c.key === "D1") ?? divisional[0];
     const d9 = divisional.find((c) => c.key === "D9") ?? divisional[0];
+
+    // Chalit Chart with shifted houses
+    const chalitPlanets: DivPlanet[] = d1.planets.map((p) => {
+      const row = kpResult?.rows?.find((r) => r.name.toLowerCase() === p.planet.toLowerCase());
+      return {
+        ...p,
+        house: row ? row.bhavaHouse : p.house,
+      };
+    });
+    const chalitChart: DivChart = {
+      key: "Chalit",
+      name: "Nirayana Bhava Chalit",
+      division: 1,
+      lagnaNum: chart.lagnaNum,
+      lagnaLon: chart.lagnaLon,
+      planets: chalitPlanets,
+    };
+
+    // KP Cuspal Chart
+    const kpPlanets: DivPlanet[] = d1.planets.map((p) => {
+      const row = kpResult?.rows?.find((r) => r.name.toLowerCase() === p.planet.toLowerCase());
+      return {
+        ...p,
+        house: row ? row.bhavaHouse : p.house,
+      };
+    });
+    const kpChart: DivChart = {
+      key: "KP",
+      name: "KP Cuspal Chart",
+      division: 1,
+      lagnaNum: chart.lagnaNum,
+      lagnaLon: chart.lagnaLon,
+      planets: kpPlanets,
+    };
+
     const byHouse = (layer: DivChart) =>
       Array.from({ length: 12 }).map((_, i) => {
         const house = i + 1;
@@ -517,8 +577,18 @@ function DashboardContent() {
         const occupants = layer.planets.filter((p) => p.house === house);
         return { house, rashiIdx, rashi: RASHI_NAMES[rashiIdx], occupants };
       });
-    return { d1, d9, d1Houses: byHouse(d1), d9Houses: byHouse(d9) };
-  }, [chart]);
+
+    return {
+      d1,
+      d9,
+      chalitChart,
+      kpChart,
+      d1Houses: byHouse(d1),
+      d9Houses: byHouse(d9),
+      chalitHouses: byHouse(chalitChart),
+      kpHouses: byHouse(kpChart),
+    };
+  }, [chart, kpResult]);
 
   return (
     <>
@@ -695,8 +765,17 @@ function DashboardContent() {
               <div className="greeting-sub" style={{ marginTop: 8 }}>
                 AI Vedic Astrology operating system &middot; 25+ engines &middot; 30+ modules
               </div>
-              <div className="greeting-sub">
-                {birth.city} &middot; Lagna {chart.lagnaRashi} &middot; {activeDasha.planet} MD{activeAntardasha ? ` / ${activeAntardasha.planet} AD` : ""}
+              <div className="greeting-sub" style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginTop: 6 }}>
+                <span>{birth.city} &middot; Lagna {chart.lagnaRashi} &middot; {activeDasha.planet} MD{activeAntardasha ? ` / ${activeAntardasha.planet} AD` : ""}</span>
+                {activeDasha?.start && activeDasha?.end && (
+                  <DashaProgressCapsule
+                    planet={activeDasha.planet}
+                    startYear={new Date(activeDasha.start).getFullYear()}
+                    endYear={new Date(activeDasha.end).getFullYear()}
+                    exactStartDate={activeDasha.start}
+                    exactEndDate={activeDasha.end}
+                  />
+                )}
               </div>
             </div>
             <div className="topbar-right">
@@ -722,22 +801,115 @@ function DashboardContent() {
 
           {activeTab === "overview" && (
           <>
+          {/* 4-CHART COMPARATIVE QUAD VIEW (2 ABOVE, 2 BELOW) */}
           <div className="card" style={{ marginBottom: 24 }}>
-            <div className="card-tag">✦ D1 + D9 Home Charts</div>
-            <div className="card-title serif">Lagna Chart and Navamsha with House/Rashi/Planet Placement</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
-              <div className="chart-panel">
-                <div className="chart-panel-title">D1 · Rasi</div>
-                <CompactNorthChart chart={chartLayers.d1} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <div className="card-tag">✦ 4-Chart Quad View (चारों प्रमुख कुण्डलियाँ)</div>
+                <div className="card-title serif" style={{ marginBottom: 2 }}>
+                  Janma Lagna (D-1), Navamsha (D-9), Nirayana Bhava Chalit & KP Cuspal
+                </div>
               </div>
-              <div className="chart-panel">
-                <div className="chart-panel-title">D9 · Navamsha</div>
-                <CompactNorthChart chart={chartLayers.d9} />
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                <span className="energy-pill" style={{ fontSize: "11px", fontWeight: 700, padding: "4px 10px" }}>
+                  {chart.lagnaRashi} Lagna ({chart.lagnaNum + 1})
+                </span>
+                <Link
+                  href="/dashboard/kundli"
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "var(--app-gold)",
+                    textDecoration: "none",
+                    padding: "4px 10px",
+                    borderRadius: "8px",
+                    background: "rgba(184, 134, 11, 0.1)",
+                    border: "1px solid rgba(184, 134, 11, 0.25)",
+                  }}
+                >
+                  Full Kundli Suite &rsaquo;
+                </Link>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, marginTop: 14 }}>
+
+            {chalitShifts.length > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "8px 12px",
+                  background: "rgba(184, 134, 11, 0.08)",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(184, 134, 11, 0.2)",
+                  fontSize: "12px",
+                  color: "#1A1A1A",
+                  marginBottom: "16px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <span style={{ color: "#B8860B", fontWeight: 700 }}>⚡ चलित भाव परिवर्तन (Bhava Shifts):</span>
+                {chalitShifts.map((s) => (
+                  <span
+                    key={s.planet}
+                    style={{
+                      background: "#FFFFFF",
+                      padding: "3px 8px",
+                      borderRadius: "6px",
+                      border: "1px solid rgba(184, 134, 11, 0.25)",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {s.planet}: Rashi H{s.rashiHouse} → Chalit H{s.bhavaHouse} ({s.shift})
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* 4-Chart 2x2 Grid: 2 Above (D-1, D-9), 2 Below (Chalit, KP) */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+              {/* 1. Lagna D-1 */}
+              <div className="chart-panel">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div className="chart-panel-title" style={{ marginBottom: 0 }}>1. D-1 · Janma Lagna (लग्न)</div>
+                  <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Natal Rashi Base</span>
+                </div>
+                <CompactNorthChart chart={chartLayers.d1} />
+              </div>
+
+              {/* 2. Navamsha D-9 */}
+              <div className="chart-panel">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div className="chart-panel-title" style={{ marginBottom: 0 }}>2. D-9 · Navamsha (नवांश)</div>
+                  <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Dharma & Marriage</span>
+                </div>
+                <CompactNorthChart chart={chartLayers.d9} />
+              </div>
+
+              {/* 3. Nirayana Bhava Chalit */}
+              <div className="chart-panel">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div className="chart-panel-title" style={{ marginBottom: 0 }}>3. Nirayana Bhava Chalit (चलित)</div>
+                  <span style={{ fontSize: "10px", color: "var(--app-gold)", fontWeight: 700 }}>Actual House Shift</span>
+                </div>
+                <CompactNorthChart chart={chartLayers.chalitChart} />
+              </div>
+
+              {/* 4. KP Cuspal Chart */}
+              <div className="chart-panel">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div className="chart-panel-title" style={{ marginBottom: 0 }}>4. KP Cuspal (कस्पल कुण्डली)</div>
+                  <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Placidus & Sub-Lord</span>
+                </div>
+                <CompactNorthChart chart={chartLayers.kpChart} />
+              </div>
+            </div>
+
+            {/* Comparative Breakdown Tables */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginTop: 16 }}>
               <div className="chart-table-panel">
-                <div className="chart-table-title">D1 House · Rashi · Planets</div>
+                <div className="chart-table-title">D-1 Lagna House &middot; Rashi &middot; Planets</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {chartLayers.d1Houses.map((h) => (
                     <div key={`d1-${h.house}`} className="chart-house-row">
@@ -749,7 +921,7 @@ function DashboardContent() {
                 </div>
               </div>
               <div className="chart-table-panel">
-                <div className="chart-table-title">D9 House · Rashi · Planets</div>
+                <div className="chart-table-title">D-9 Navamsha House &middot; Rashi &middot; Planets</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {chartLayers.d9Houses.map((h) => (
                     <div key={`d9-${h.house}`} className="chart-house-row">

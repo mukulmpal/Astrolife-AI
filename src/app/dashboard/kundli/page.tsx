@@ -699,8 +699,8 @@ export default function KundliPage() {
         .asc-val{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--app-gold, #B8860B)}
         .asc-deg{font-size:12px;color:var(--app-muted, #6B635B);margin-top:2px}
         .acc-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,139,34,0.08);border:1px solid rgba(34,139,34,0.25);border-radius:100px;padding:4px 12px;font-size:12.5px;color:#1E7E34;margin-bottom:12px;font-weight:600}
-        .tabs{display:flex;gap:6px;margin-bottom:16px;background:#F4F0E8;border:1px solid rgba(184, 134, 11, 0.2);border-radius:14px;padding:5px;width:100%;overflow-x:auto}
-        .tab{padding:8px 16px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--app-muted, #6B635B);border:none;background:none;font-family:'Outfit',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:6px}
+        .tabs{display:flex;gap:6px;margin-bottom:16px;background:#F4F0E8;border:1px solid rgba(184, 134, 11, 0.2);border-radius:14px;padding:5px;width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+        .tab{padding:8px 16px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--app-muted, #6B635B);border:none;background:none;font-family:'Outfit',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:6px;flex-shrink:0}
         .tab:hover{color:var(--app-fg, #1A1A1A);background:rgba(184, 134, 11, 0.08)}
         .tab.active{background:#FFFFFF;color:var(--app-gold, #B8860B);border:1px solid rgba(184, 134, 11, 0.35);box-shadow:0 4px 14px rgba(184, 134, 11, 0.12);font-weight:700}
         .tab-badge{font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(184, 134, 11, 0.12);color:var(--app-gold, #B8860B);font-weight:700}
@@ -1357,48 +1357,34 @@ export default function KundliPage() {
               className="mb-4"
             />
 
-            {/* ── 4 INTENT-DRIVEN PILLARS + ASK AI TABS WITH MOBILE SWIPE INDICATOR ── */}
-            <div className="relative mb-4">
-              <div
-                className="tabs"
-                style={{
-                  scrollbarWidth: "none",
-                  WebkitOverflowScrolling: "touch",
-                }}
-              >
-                {[
-                  { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
-                  { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "विस्तृत फलित" },
-                  { id: "divisional", label: "🧩 16 Varga Charts (षोडशवर्ग)", badge: "D1-D60" },
-                  { id: "clinical", label: "🧬 Clinical Intelligence (नाड़ी सूत्र)", badge: "5 Engines" },
-                  { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
-                  { id: "marriage", label: "💍 Love & Marriage (D-9)", badge: "Navamsha" },
-                  { id: "timing", label: "⏳ Timing & Dashas", badge: "Vimshottari" },
-                  { id: "specs", label: "🔬 Astrologer Tech Specs", badge: `${presentYogas.length} Yogas` },
-                  { id: "ask_ai", label: "💬 Ask AI (Proof-Backed)", badge: "Live" },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    className={`tab ${activeTab === tab.id ? "active" : ""}`}
-                    onClick={() => setActiveTab(tab.id)}
-                  >
-                    <span>{tab.label}</span>
-                    {tab.badge && <span className="tab-badge">{tab.badge}</span>}
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile Right Edge Gradient & Swipe Cue */}
-              <div
-                className="md:hidden pointer-events-none absolute right-0 top-0 bottom-0 flex items-center justify-end pr-1 text-xs"
-                style={{
-                  width: "36px",
-                  background: "linear-gradient(to right, transparent 0%, #FAF7F2 85%)",
-                  color: "#B8860B",
-                }}
-              >
-                <span className="animate-pulse" style={{ fontSize: "16px", fontWeight: 700 }}>›</span>
-              </div>
+            {/* ── 4 INTENT-DRIVEN PILLARS + ASK AI TABS ── */}
+            <div
+              className="tabs"
+              style={{
+                scrollbarWidth: "none",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+              {[
+                { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
+                { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "विस्तृत फलित" },
+                { id: "divisional", label: "🧩 16 Varga Charts (षोडशवर्ग)", badge: "D1-D60" },
+                { id: "clinical", label: "🧬 Clinical Intelligence (नाड़ी सूत्र)", badge: "5 Engines" },
+                { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
+                { id: "marriage", label: "💍 Love & Marriage (D-9)", badge: "Navamsha" },
+                { id: "timing", label: "⏳ Timing & Dashas", badge: "Vimshottari" },
+                { id: "specs", label: "🔬 Astrologer Tech Specs", badge: `${presentYogas.length} Yogas` },
+                { id: "ask_ai", label: "💬 Ask AI (Proof-Backed)", badge: "Live" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`tab ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <span>{tab.label}</span>
+                  {tab.badge && <span className="tab-badge">{tab.badge}</span>}
+                </button>
+              ))}
             </div>
 
             {/* ══════════════════════════════════════════════════════ */}
@@ -2401,9 +2387,18 @@ export default function KundliPage() {
                       <div className="card-title serif mb-0">Your Karmic Progression Overview</div>
                     </div>
                     {activeMD && (
-                      <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
-                        Active: {activeMD.planet} Mahadasha ({formatDate(activeMD.start)} - {formatDate(activeMD.end)})
-                      </span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+                          Active: {activeMD.planet} Mahadasha ({formatDate(activeMD.start)} - {formatDate(activeMD.end)})
+                        </span>
+                        <DashaProgressCapsule
+                          planet={activeMD.planet}
+                          startYear={new Date(activeMD.start).getFullYear()}
+                          endYear={new Date(activeMD.end).getFullYear()}
+                          exactStartDate={activeMD.start}
+                          exactEndDate={activeMD.end}
+                        />
+                      </div>
                     )}
                   </div>
 
