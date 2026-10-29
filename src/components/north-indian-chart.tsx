@@ -32,6 +32,9 @@ interface Props {
   overlayPlanets?: Record<string, PlanetData>;
   size?: number;
   interactive?: boolean;
+  mode?: "rashi" | "chalit" | "kp";
+  kpCusps?: Array<{ house: number; degreeText: string; subLord: string; sign: string }>;
+  subLords?: Record<string, string>;
 }
 
 const HOUSE_NAMES: Record<number, { name: string; sa: string; karaka: string }> = {
@@ -98,7 +101,16 @@ function planetSlots(total: number) {
   });
 }
 
-export default function NorthIndianChart({ lagnaNum, planets, overlayPlanets, size = 310, interactive = true }: Props) {
+export default function NorthIndianChart({
+  lagnaNum,
+  planets,
+  overlayPlanets,
+  size = 310,
+  interactive = true,
+  mode = "rashi",
+  kpCusps,
+  subLords,
+}: Props) {
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const S = size;
   const h = S / 2;
@@ -162,7 +174,14 @@ export default function NorthIndianChart({ lagnaNum, planets, overlayPlanets, si
             : typeof pd.signIndex === "number"
               ? pd.signIndex
               : null;
-    const house = rashi !== null ? md(rashi - lagnaNum, 12) + 1 : pd.house;
+
+    // Prioritize explicit pd.house (crucial for Chalit & KP shifts), fallback to rashi house
+    const house =
+      typeof pd.house === "number" && pd.house >= 1 && pd.house <= 12
+        ? pd.house
+        : rashi !== null
+          ? md(rashi - lagnaNum, 12) + 1
+          : 1;
     if (house >= 1 && house <= 12) {
       pByH[house].push({
         name: p,
@@ -281,20 +300,48 @@ export default function NorthIndianChart({ lagnaNum, planets, overlayPlanets, si
               style={{ cursor: interactive ? "pointer" : "default" }}
               onClick={() => handleHouseClick(hNum)}
             >
-              <text
-                x={lx}
-                y={ly - 6}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="9"
-                fill={isSelected ? "#B8860B" : isLagna ? "#d4af37" : "#4a4070"}
-                fontFamily="serif"
-                fontWeight={isSelected || isLagna ? "700" : "400"}
-              >
-                {rashiIdx + 1}
-              </text>
+              {mode === "kp" && kpCusps?.find((c) => c.house === hNum) ? (
+                <text
+                  x={lx}
+                  y={ly - 8}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="7.5"
+                  fill="#B8860B"
+                  fontFamily="sans-serif"
+                  fontWeight="700"
+                >
+                  {kpCusps.find((c) => c.house === hNum)!.degreeText.split(" ")[0]} [{kpCusps.find((c) => c.house === hNum)!.subLord.slice(0, 2)}]
+                </text>
+              ) : mode === "chalit" ? (
+                <text
+                  x={lx}
+                  y={ly - 7}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="8"
+                  fill="#8A6008"
+                  fontFamily="sans-serif"
+                  fontWeight="700"
+                >
+                  भाव {hNum}
+                </text>
+              ) : (
+                <text
+                  x={lx}
+                  y={ly - 6}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="9"
+                  fill={isSelected ? "#B8860B" : isLagna ? "#d4af37" : "#4a4070"}
+                  fontFamily="serif"
+                  fontWeight={isSelected || isLagna ? "700" : "400"}
+                >
+                  {rIdx + 1}
+                </text>
+              )}
 
-              {isLagna && (
+              {isLagna && mode !== "kp" && mode !== "chalit" && (
                 <text
                   x={lx}
                   y={ly + 5}
@@ -313,7 +360,9 @@ export default function NorthIndianChart({ lagnaNum, planets, overlayPlanets, si
                 const piIdx = PLS.indexOf(p.name);
                 if (piIdx < 0) return null;
                 const slot = planetSlots(total)[idx] ?? { x: 0, y: 0, font: 9 };
-                const py = ly + (isLagna ? 20 : 15) + slot.y;
+                const py = ly + (isLagna && mode === "rashi" ? 20 : 15) + slot.y;
+                const subLord = subLords?.[p.name];
+                const pAbbr = PABBR[piIdx];
 
                 return (
                   <g key={`${p.name}-${p.isOverlay ? "overlay" : "natal"}`}>
@@ -322,19 +371,20 @@ export default function NorthIndianChart({ lagnaNum, planets, overlayPlanets, si
                       y={py}
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      fontSize={slot.font}
-                      fontWeight={p.isOverlay ? "800" : "600"}
+                      fontSize={mode === "kp" ? 8 : slot.font}
+                      fontWeight={p.isOverlay ? "800" : "700"}
                       fontFamily="sans-serif"
                       fill={p.isOverlay ? "#059669" : PCOL[piIdx]}
                     >
-                      {PABBR[piIdx]}{p.isOverlay ? "ᴳ" : ""}
+                      {mode === "kp" && subLord ? `${pAbbr}[${subLord.slice(0, 2)}]` : pAbbr}
+                      {p.isOverlay ? "ᴳ" : ""}
                     </text>
                     {p.retro && (
                       <text
-                        x={lx + slot.x + (p.isOverlay ? 9 : 8)}
+                        x={lx + slot.x + (mode === "kp" && subLord ? 14 : p.isOverlay ? 9 : 8)}
                         y={py - 5}
                         textAnchor="middle"
-                        fontSize="5.8"
+                        fontSize="5.5"
                         fill="#f97316"
                         fontWeight="700"
                         fontFamily="sans-serif"

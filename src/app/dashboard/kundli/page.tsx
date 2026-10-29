@@ -455,38 +455,52 @@ export default function KundliPage() {
 
   const chalitPlanets = useMemo(() => {
     if (!chart?.planets) return {};
-    if (!kpResult?.rows) return chart.planets;
-    const copy: Record<string, any> = { ...chart.planets };
-    kpResult.rows.forEach((row) => {
-      if (copy[row.name]) {
-        copy[row.name] = {
-          ...copy[row.name],
-          house: row.bhavaHouse,
-          retrograde: row.retrograde,
-        };
-      }
+    const copy: Record<string, any> = {};
+    Object.entries(chart.planets).forEach(([pName, pData]) => {
+      copy[pName] = {
+        ...pData,
+        house: pData.bhavaHouse ?? pData.house,
+      };
     });
     return copy;
-  }, [chart, kpResult]);
+  }, [chart]);
+
+  const chalitShifts = useMemo(() => {
+    if (!chart?.planets) return [];
+    return Object.entries(chart.planets)
+      .filter(([_, p]) => p.bhavaShift && p.bhavaShift !== 0)
+      .map(([name, p]) => ({
+        name,
+        rashiHouse: p.rashiHouse,
+        bhavaHouse: p.bhavaHouse,
+        shift: p.bhavaShift > 0 ? `+${p.bhavaShift}` : `${p.bhavaShift}`,
+      }));
+  }, [chart]);
 
   const kpPlanets = useMemo(() => {
     if (!chart?.planets) return {};
-    if (!kpResult?.rows) return chart.planets;
-    const copy: Record<string, any> = { ...chart.planets };
-    kpResult.rows.forEach((row) => {
-      if (copy[row.name]) {
-        copy[row.name] = {
-          ...copy[row.name],
-          house: row.bhavaHouse,
-          retrograde: row.retrograde,
-          subLord: row.subLord,
-        };
-      }
+    const copy: Record<string, any> = {};
+    Object.entries(chart.planets).forEach(([pName, pData]) => {
+      const kpRow = kpResult?.rows?.find((r) => r.name.toLowerCase() === pName.toLowerCase());
+      copy[pName] = {
+        ...pData,
+        house: kpRow ? kpRow.bhavaHouse : pData.house,
+        subLord: kpRow?.subLord,
+      };
     });
     return copy;
   }, [chart, kpResult]);
 
-  const chalitShifts = useMemo(() => {
+  const planetSubLords = useMemo(() => {
+    if (!kpResult?.rows) return {} as Record<string, string>;
+    const map: Record<string, string> = {};
+    kpResult.rows.forEach((r) => {
+      map[r.name] = r.subLord;
+    });
+    return map;
+  }, [kpResult]);
+
+  const kpShifts = useMemo(() => {
     if (!kpResult?.rows) return [];
     return kpResult.rows.filter((r) => r.bhavaShift !== 0);
   }, [kpResult]);
@@ -1458,7 +1472,7 @@ export default function KundliPage() {
                             </span>
                           </div>
                           <div style={{ display: "flex", justifyContent: "center" }}>
-                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} size={250} />
+                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} size={250} mode="rashi" />
                           </div>
                         </div>
 
@@ -1475,7 +1489,7 @@ export default function KundliPage() {
                           </div>
                           <div style={{ display: "flex", justifyContent: "center" }}>
                             {d9 ? (
-                              <NorthIndianChart lagnaNum={d9.lagnaNum} planets={d9Planets} size={250} />
+                              <NorthIndianChart lagnaNum={d9.lagnaNum} planets={d9Planets} size={250} mode="rashi" />
                             ) : (
                               <div style={{ padding: "40px", fontSize: "12px", color: "#6B635B" }}>Calculating D9...</div>
                             )}
@@ -1490,21 +1504,25 @@ export default function KundliPage() {
                               <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>Nirayana Bhava Chalit</div>
                             </div>
                             <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: chalitShifts.length > 0 ? "rgba(220,38,38,0.1)" : "rgba(34,197,94,0.1)", color: chalitShifts.length > 0 ? "#DC2626" : "#15803D" }}>
-                              {chalitShifts.length > 0 ? `${chalitShifts.length} Shifted` : "No Shifts"}
+                              {chalitShifts.length > 0 ? `${chalitShifts.length} Shifted` : "Vedic Chalit"}
                             </span>
                           </div>
                           <div style={{ display: "flex", justifyContent: "center" }}>
-                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chalitPlanets} size={250} />
+                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chalitPlanets} size={250} mode="chalit" />
                           </div>
-                          {chalitShifts.length > 0 && (
+                          {chalitShifts.length > 0 ? (
                             <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: "8px", fontSize: "11px", color: "#991B1B" }}>
-                              <strong>✦ भाव परिवर्तन: </strong>
+                              <strong>✦ वैदिक भाव परिवर्तन: </strong>
                               {chalitShifts.map((s, idx) => (
                                 <span key={s.name}>
                                   {idx > 0 && ", "}
-                                  <strong>{s.name}</strong> (H{s.rashiHouse}→H{s.bhavaHouse})
+                                  <strong>{s.name}</strong> (H{s.rashiHouse}→भाव {s.bhavaHouse})
                                 </span>
                               ))}
+                            </div>
+                          ) : (
+                            <div style={{ marginTop: "8px", padding: "4px 8px", background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: "8px", fontSize: "11px", color: "#15803D", textAlign: "center" }}>
+                              ✓ सभी ग्रह अपने जन्म राशि भाव में ही स्थित हैं (No shifts)
                             </div>
                           )}
                         </div>
@@ -1517,11 +1535,18 @@ export default function KundliPage() {
                               <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>KP Cuspal Chart</div>
                             </div>
                             <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
-                              Placidus Cusps
+                              Placidus &amp; Sub-Lords
                             </span>
                           </div>
                           <div style={{ display: "flex", justifyContent: "center" }}>
-                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={kpPlanets} size={250} />
+                            <NorthIndianChart
+                              lagnaNum={chart.lagnaNum}
+                              planets={kpPlanets}
+                              size={250}
+                              mode="kp"
+                              kpCusps={kpResult?.cusps}
+                              subLords={planetSubLords}
+                            />
                           </div>
                           {kpResult?.rows && (
                             <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.18)", borderRadius: "8px", fontSize: "11px", color: "#1A1A1A" }}>
@@ -1529,7 +1554,7 @@ export default function KundliPage() {
                               <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                                 {kpResult.rows.map((r) => (
                                   <span key={r.name} style={{ background: "#FFFFFF", padding: "1px 6px", borderRadius: "4px", border: "1px solid rgba(184,134,11,0.2)", fontSize: "10.5px" }}>
-                                    <strong>{r.name}</strong> [{r.subLord}]
+                                    <strong>{r.name}</strong> [{r.subLord.slice(0, 2)}]
                                   </span>
                                 ))}
                               </div>
