@@ -5,6 +5,7 @@ import { useUserChart } from "@/lib/user-chart";
 import { calculateLineageKarma } from "@/lib/astro-engine/lineage-karma";
 import { Dna, ChevronDown, ChevronUp, Flame, Droplets, TreePine, Eye } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { PremiumFeature } from "@/components/premium-feature";
 
 // ── Section collapse helper ──────────────────────────────────────────────────
 function Section({
@@ -197,7 +198,8 @@ export default function LineageKarmaPage() {
   ];
 
   return (
-    <main style={{ padding: "24px 20px", maxWidth: 760, margin: "0 auto" }}>
+    <PremiumFeature feature="Lineage Karma & Ancestral Intelligence" requiredTier="elite">
+      <main style={{ padding: "24px 20px", maxWidth: 760, margin: "0 auto" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
         <div
@@ -597,5 +599,6 @@ export default function LineageKarmaPage() {
         🕉️ <strong>AstroLife Lineage &amp; Ancestral Intelligence:</strong> यह विश्लेषण आपके पारिवारिक संस्कारों, वंशानुगत आदतों और आत्मिक शांति का समग्र मानवीय दर्पण है। यह भयमुक्त, व्यावहारिक मार्गदर्शन के लिए है।
       </div>
     </main>
+    </PremiumFeature>
   );
 }

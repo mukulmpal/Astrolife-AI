@@ -11,6 +11,7 @@ import {
   type Planet,
 } from "@/lib/astro-intelligence/phase-1-remedies/complete-remedy-intelligence-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { PremiumFeature } from "@/components/premium-feature";
 import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemediesDossier";
 import { PilgrimageDossierCard } from "@/components/remedies/PilgrimageDossierCard";
 
@@ -109,7 +110,8 @@ export default function RemedyPage() {
     .slice(0, 3);
 
   return (
-    <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "24px 18px 110px", color: "#1A1A1A" }}>
+    <PremiumFeature feature="Classical Remedies & Upay" requiredTier="premium">
+      <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "24px 18px 110px", color: "#1A1A1A" }}>
       <style>{`
         .rem-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.22); border-radius: 14px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .rem-card-header { padding: 14px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
@@ -420,5 +422,6 @@ export default function RemedyPage() {
         </div>
       </div>
     </main>
+    </PremiumFeature>
   );
 }

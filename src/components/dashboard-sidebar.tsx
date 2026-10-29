@@ -273,47 +273,63 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
           {filteredGroups.map((group) => (
             <div key={group.label} className="dash-nav-section">
               <div className="dash-nav-label" aria-hidden="true">{group.label}</div>
-              {group.items.map(({ label, href, Icon, badge }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => onCloseMobile?.()}
-                  className={`dash-nav-item${pathname === href ? " active" : ""}`}
-                  style={pathname === href ? { borderLeftColor: 'var(--al-primary)', color: 'var(--al-primary)' } : undefined}
-                  aria-current={pathname === href ? "page" : undefined}
-                >
-                  <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
-                  <span style={{ flex: 1 }}>{label}</span>
-                  {badge && (
-                    <span
-                      style={{
-                        fontSize: "9px",
-                        fontWeight: 700,
-                        letterSpacing: "0.5px",
-                        padding: "1px 5px",
-                        borderRadius: "4px",
-                        background: badge === "ELITE"
-                          ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
-                          : badge === "PRO"
-                          ? "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))"
-                          : "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.25))",
-                        color: badge === "ELITE" ? "#c084fc" : badge === "PRO" ? "#c8a030" : "#16a34a",
-                        border: badge === "ELITE"
-                          ? "1px solid rgba(168, 85, 247, 0.45)"
-                          : badge === "PRO"
-                          ? "1px solid rgba(200, 160, 48, 0.35)"
-                          : "1px solid rgba(34, 197, 94, 0.3)",
-                        lineHeight: "1.3",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "3px",
-                      }}
-                    >
-                      {badge === "ELITE" ? "💎 ELITE" : badge === "PRO" ? "👑 PRO" : badge === "BASIC" ? "🌱 BASIC" : badge}
-                    </span>
-                  )}
-                </Link>
-              ))}
+              {group.items.map(({ label, href, Icon, badge }) => {
+                const isLocked =
+                  !isElite &&
+                  ((badge === "ELITE") || (badge === "PRO" && userTier === "free"));
+
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => onCloseMobile?.()}
+                    className={`dash-nav-item${pathname === href ? " active" : ""}`}
+                    style={pathname === href ? { borderLeftColor: 'var(--al-primary)', color: 'var(--al-primary)' } : undefined}
+                    aria-current={pathname === href ? "page" : undefined}
+                  >
+                    <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
+                    <span style={{ flex: 1 }}>{label}</span>
+                    {badge && (
+                      <span
+                        style={{
+                          fontSize: "9px",
+                          fontWeight: 700,
+                          letterSpacing: "0.5px",
+                          padding: "1px 5px",
+                          borderRadius: "4px",
+                          background: badge === "ELITE"
+                            ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
+                            : badge === "PRO"
+                            ? "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))"
+                            : "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.25))",
+                          color: badge === "ELITE" ? "#c084fc" : badge === "PRO" ? "#c8a030" : "#16a34a",
+                          border: badge === "ELITE"
+                            ? "1px solid rgba(168, 85, 247, 0.45)"
+                            : badge === "PRO"
+                            ? "1px solid rgba(200, 160, 48, 0.35)"
+                            : "1px solid rgba(34, 197, 94, 0.3)",
+                          lineHeight: "1.3",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "3px",
+                        }}
+                      >
+                        {isLocked ? (
+                          badge === "ELITE" ? "🔒 💎 ELITE" : "🔒 👑 PRO"
+                        ) : badge === "ELITE" ? (
+                          "💎 ELITE"
+                        ) : badge === "PRO" ? (
+                          "👑 PRO"
+                        ) : badge === "BASIC" ? (
+                          "🌱 BASIC"
+                        ) : (
+                          badge
+                        )}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           ))}
           {filteredGroups.length === 0 && (

@@ -3,6 +3,7 @@
 
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { EngineIntro } from "@/components/engine/engine-intro";
+import { PremiumFeature } from "@/components/premium-feature";
 import { engineIntros } from "@/data/engine-intros";
 import { useUserChart } from "@/lib/user-chart";
 import {
@@ -441,7 +442,8 @@ function GemstonePageContent() {
     : "Not connected";
 
   return (
-    <main className="gem-page">
+    <PremiumFeature feature="Gemstone & Ratna Intelligence" requiredTier="premium">
+      <main className="gem-page">
       <div className="gem-bg">
         <div className="gem-orb one" />
         <div className="gem-orb two" />
@@ -1152,5 +1154,6 @@ function GemstonePageContent() {
         }
       `}</style>
     </main>
+    </PremiumFeature>
   );
 }

@@ -151,7 +151,9 @@ export function MobileBottomNav() {
                 <span className="mobile-more-icon">{item.icon}</span>
                 {item.badge && (
                   <span className={`mobile-badge-pill ${item.badge.toLowerCase()}`}>
-                    {item.badge === "ELITE" ? "💎 ELITE" : item.badge === "PRO" ? "👑 PRO" : "🌱 BASIC"}
+                    {!isElite && ((item.badge === "ELITE") || (item.badge === "PRO" && userTier === "free"))
+                      ? (item.badge === "ELITE" ? "🔒 💎 ELITE" : "🔒 👑 PRO")
+                      : (item.badge === "ELITE" ? "💎 ELITE" : item.badge === "PRO" ? "👑 PRO" : "🌱 BASIC")}
                   </span>
                 )}
               </div>

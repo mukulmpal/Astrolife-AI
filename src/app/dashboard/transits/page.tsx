@@ -10,6 +10,7 @@ import NorthIndianChart from "@/components/north-indian-chart";
 import { NakshatraChakraWheel } from "@/components/dasha/NakshatraChakraWheel";
 import { runNavtaraIntelligence } from "@/lib/astro-engine/navtara-engine";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { PremiumFeature } from "@/components/premium-feature";
 import { useLanguage } from "@/lib/language-context";
 import "@/app/dashboard/shared.css";
 
@@ -422,7 +423,8 @@ export default function TransitPage() {
         }
       `}</style>
 
-      <div className="tr-shell">
+      <PremiumFeature feature="Transits (Gochar Engine)" requiredTier="elite">
+        <div className="tr-shell">
         {/* Top Unified Gochar Nav Bar */}
         <section
           className="rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 transition-all"
@@ -771,6 +773,7 @@ export default function TransitPage() {
           </>
         )}
       </div>
+      </PremiumFeature>
     </main>
   );
 }

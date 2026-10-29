@@ -109,9 +109,26 @@ export function isFullAccessEnabled() {
   return process.env.NEXT_PUBLIC_FULL_ACCESS_ENABLED === "true";
 }
 
+export const TIER_RANK: Record<SubscriptionTier, number> = {
+  free: 0,
+  premium: 1,
+  elite: 2,
+};
+
+export function canAccessTier(
+  requiredTier: SubscriptionTier,
+  userTier?: string | null,
+  email?: string | null
+): boolean {
+  if (isFullAccessEnabled()) return true;
+  if (email && isEliteEmail(email)) return true;
+  const normalized = normalizeTier(userTier, email);
+  return TIER_RANK[normalized] >= TIER_RANK[requiredTier];
+}
+
 export function isBillingEnforced() {
   if (isFullAccessEnabled()) return false;
-  return process.env.NEXT_PUBLIC_BILLING_ENFORCED === "true";
+  return process.env.NEXT_PUBLIC_BILLING_ENFORCED !== "false";
 }
 
 export function canAccessFeature(feature: FeatureKey, tier?: string | null, email?: string | null) {

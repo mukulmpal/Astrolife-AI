@@ -2389,7 +2389,7 @@ function pageLalKitabCoreAccuracy(chart: ChartData): string {
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
       <div class="card"><div class="kicker">Supportive</div><div class="display-s" style="color:var(--jade);">${benefic.length}</div><div class="body-s">${esc(benefic.map(p => p.planet).join(", ") || "None")}</div></div>
       <div class="card"><div class="kicker">Needs Care</div><div class="display-s" style="color:var(--crimson);">${malefic.length}</div><div class="body-s">${esc(malefic.map(p => p.planet).join(", ") || "None")}</div></div>
-      <div class="card"><div class="kicker">Kismat Trigger</div><div class="display-s" style="color:var(--gold);">${esc(lk.kismat.planet)}</div><div class="body-s">H${lk.kismat.house} · Score ${lk.kismat.score}</div></div>
+      <div class="card"><div class="kicker">Kismat Trigger</div><div class="display-s" style="color:var(--gold);">${esc(lk.kismat.planet)}</div><div class="body-s">H${lk.kismat.house} · Score ${lk.kismat.score}/95</div></div>
     </div>
 
     <table style="width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;font-size:10.5px;">

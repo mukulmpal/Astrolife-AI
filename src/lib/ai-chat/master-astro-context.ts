@@ -232,7 +232,7 @@ ${takYog ? `- Dasha-Antardasha Distance & Harmonics:
     const lk = calculateLalKitab(chart.planets, chart.dob, chart.lagnaNum);
 
     const kismatInfo = lk.kismat
-      ? `Kismat Jagane Wala Grah: ${lk.kismat.planet} in House ${lk.kismat.house} (Score: ${lk.kismat.score}/100) — ${lk.kismat.interpretation}`
+      ? `Kismat Jagane Wala Grah: ${lk.kismat.planet} in House ${lk.kismat.house} (Score: ${lk.kismat.score}/95) — ${lk.kismat.interpretation}`
       : "Kismat Grah: Balanced";
 
     const rinsInfo = lk.rins && lk.rins.length > 0

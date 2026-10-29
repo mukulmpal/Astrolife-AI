@@ -14,6 +14,7 @@ import {
   type VarnadaLagnaAnalysis,
   type PranapadaLagnaAnalysis,
 } from "@/lib/astro-engine/special-lagnas";
+import { PremiumFeature } from "@/components/premium-feature";
 import "@/app/dashboard/shared.css";
 
 // ── Generic Special Lagna Card ────────────────────────────────────────────────
@@ -383,7 +384,8 @@ export default function SpecialLagnasPage() {
   ] as const;
 
   return (
-    <main className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A] pb-24">
+    <PremiumFeature feature="Special Lagnas & Wealth Rays" requiredTier="premium">
+      <main className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A] pb-24">
       {/* ── Top Hero Banner ─────────────────────────────────────────────────── */}
       <section className="border-b border-[rgba(184,134,11,0.2)] bg-gradient-to-b from-[#FFFDF9] to-[#FAF7F2] px-4 py-8 lg:px-10 lg:py-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -1339,5 +1341,6 @@ export default function SpecialLagnasPage() {
         )}
       </div>
     </main>
+    </PremiumFeature>
   );
 }

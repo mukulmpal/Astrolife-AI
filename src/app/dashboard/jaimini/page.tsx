@@ -31,6 +31,7 @@ import {
   type LoveMarriageAnalysis,
 } from "@/lib/astro-engine/jaimini";
 import { useLanguage } from "@/lib/language-context";
+import { PremiumFeature } from "@/components/premium-feature";
 import "@/app/dashboard/shared.css";
 
 // ── Karaka Card ───────────────────────────────────────────────────────────────
@@ -320,7 +321,8 @@ export default function JaiminiPage() {
   const tabs = TABS;
 
   return (
-    <div className="page">
+    <PremiumFeature feature="Jaimini Sutras & Karakas" requiredTier="elite">
+      <div className="page">
       <div className="flex flex-col gap-6">
         <div className="page-tag">{t("jaimini.page_tag")}</div>
         <h1 className="page-title serif">{t("jaimini.page_title")}</h1>
@@ -1607,5 +1609,6 @@ export default function JaiminiPage() {
         )}
       </div>
     </div>
+    </PremiumFeature>
   );
 }

@@ -800,7 +800,7 @@ export default function DivisionalPage() {
         </div>
       </div>
 
-      <PremiumFeature feature="Divisional Charts">
+      <PremiumFeature feature="Divisional Charts (D-1 to D-60)" requiredTier="elite">
         {/* ── 5 HARMONIC PLANES FILTER ── */}
         <div className="flex items-center gap-1.5 mb-2.5 overflow-x-auto pb-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C6D1F] whitespace-nowrap mr-1">

@@ -250,7 +250,8 @@ describe("Platform-Wide Multi-Engine Dynamic Verification Scan", () => {
     const prashna2 = calculatePrashna("Will I buy the house?", "property", 19.0760, 72.8777, 5.5, 189);
 
     assert.notEqual(prashna1.lagnaRashi, prashna2.lagnaRashi);
-    assert.notEqual(prashna1.score, prashna2.score);
+    assert.notEqual(prashna1.primaryHouse, prashna2.primaryHouse);
+    assert.notEqual(prashna1.layer7KPHorary.horaryNumber, prashna2.layer7KPHorary.horaryNumber);
   });
 
   it("21. Astro-Vastu Full Suite (15 Tabs): Dynamic and distinct across all tabs", () => {

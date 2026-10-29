@@ -9,6 +9,7 @@ import {
   type FamilyMemberChart, type FamilyRole, type FamilyPatternResult, type KaalSarpResult,
 } from "@/lib/astro-engine/family-synastry";
 import NorthIndianChart from "@/components/north-indian-chart";
+import { PremiumFeature } from "@/components/premium-feature";
 import "@/app/dashboard/shared.css";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -358,7 +359,8 @@ export default function FamilySynastryPage() {
         .city-wrap>div>label{display:none}
       `}</style>
 
-      <div className="page" style={{ maxWidth: 980 }}>
+      <PremiumFeature feature="Family Synastry & Karma Grid" requiredTier="elite">
+        <div className="page" style={{ maxWidth: 980 }}>
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <div className="page-tag">Family Karma Grid</div>
@@ -622,6 +624,7 @@ export default function FamilySynastryPage() {
           </div>
         )}
       </div>
+      </PremiumFeature>
     </>
   );
 }

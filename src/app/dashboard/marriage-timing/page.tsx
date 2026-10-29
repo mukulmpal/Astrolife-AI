@@ -10,7 +10,7 @@ export default function MarriageTimingPage() {
       <h1 className="page-title serif">K.N. Rao Marriage Timing Engine</h1>
       <p className="page-sub">Analyze marriage timing windows using the 8-parameter K.N. Rao framework with divisional chart validation.</p>
 
-      <PremiumFeature feature="Marriage Timing">
+      <PremiumFeature feature="Marriage Timing Scanner (K.N. Rao 8-Param)" requiredTier="elite">
         <MarriageTimingAnalyzer />
       </PremiumFeature>
     </div>

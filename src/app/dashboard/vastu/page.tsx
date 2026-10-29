@@ -1050,7 +1050,7 @@ export default function VastuDashboardPage() {
       </div>
 
       {/* Premium Gate Enforcement */}
-      <PremiumFeature feature="Astro-Vastu Shastra (16-Zones)" enforceLock>
+      <PremiumFeature feature="Astro-Vastu Shastra (16-Zones)" requiredTier="elite">
         {/* Mode switcher */}
         <div className="tabs">
         <button

@@ -23,6 +23,7 @@ import {
   MEDICAL_CASEBOOK,
 } from "@/lib/astro-engine/health";
 import { EngineStateCard } from "@/components/engine-state-card";
+import { PremiumFeature } from "@/components/premium-feature";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -217,7 +218,8 @@ export default function MedicalPage() {
   const familyKeys: FamilyMemberKey[] = ["Self", "Father", "Mother", "Spouse", "Children", "Younger sibling", "Elder sibling"];
 
   return (
-    <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "28px 20px 110px", color: "#1A1A1A" }}>
+    <PremiumFeature feature="Health & Vitality (Medical Astrology)" requiredTier="elite">
+      <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "28px 20px 110px", color: "#1A1A1A" }}>
       <style>{`
         .med-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.25); border-radius: 16px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,0.03); }
         .med-card-header { padding: 18px 22px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 15.5px; }
@@ -1500,5 +1502,6 @@ export default function MedicalPage() {
         </div>
       </div>
     </main>
+    </PremiumFeature>
   );
 }

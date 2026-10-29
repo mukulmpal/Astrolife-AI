@@ -1022,8 +1022,11 @@ export function calculateLalKitab(
     const h = planets[planet].house;
     const hScore = KISMAT_HOUSE_WEIGHTS[h] || 5;
     const pScore = KISMAT_PLANET_BASE[planet] || 5;
-    return { planet, icon: PEMO[pi], house: h, score: hScore + pScore };
-  }).filter(Boolean) as { planet:string; icon:string; house:number; score:number }[];
+    const rawScore = hScore + pScore; // Range 8 to 20 (max 20)
+    // Scale raw fortune score to Lal Kitab's standard 95-point scale (matching domainScore and UI /95)
+    const scaledScore = Math.min(95, Math.max(10, Math.round((rawScore / 20) * 95)));
+    return { planet, icon: PEMO[pi], house: h, score: scaledScore, rawScore };
+  }).filter(Boolean) as { planet:string; icon:string; house:number; score:number; rawScore:number }[];
   kismatRanked.sort((a,b) => b.score - a.score);
   const topKismat = kismatRanked[0];
   const kismat: LKKismat = {

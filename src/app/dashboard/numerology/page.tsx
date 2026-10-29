@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { EngineHeader, EngineShell } from "@/components/engine/EngineShell";
+import { PremiumFeature } from "@/components/premium-feature";
 import { calculateNumerology, analyzeNumber, suggestATMPins, type NumerologyNumber, type PinnacleNumber, type ChallengeNumber, type IntensityEntry, type DigitAnalysis, type CompatScore } from "@/lib/astro-engine/numerology";
 import { useUserChart } from "@/lib/user-chart";
 import "@/app/dashboard/shared.css";
@@ -275,7 +276,8 @@ export default function NumerologyPage() {
   }
 
   return (
-    <EngineShell>
+    <PremiumFeature feature="Numerology & Vibrational Intelligence" requiredTier="premium">
+      <EngineShell>
       <EngineHeader
         eyebrow="Numerology Engine"
         title="AstroLife Numerology Intelligence"
@@ -692,5 +694,6 @@ export default function NumerologyPage() {
 
       </div>
     </EngineShell>
+    </PremiumFeature>
   );
 }

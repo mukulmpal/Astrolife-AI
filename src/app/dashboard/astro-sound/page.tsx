@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback, useMemo, useRef, useState } from "react";
 import { EngineShell, EngineHeader } from "@/components/engine/EngineShell";
+import { PremiumFeature } from "@/components/premium-feature";
 import { useUserChart } from "@/lib/user-chart";
 import { ragaMusicReferences, type MusicReferenceType } from "@/data/astrosound/ragaMusicReferences";
 import {
@@ -498,7 +499,8 @@ export default function AstroSoundPage() {
   }
 
   return (
-    <EngineShell className="as-shell">
+    <PremiumFeature feature="Astro-Sound Therapy & Ragas" requiredTier="elite">
+      <EngineShell className="as-shell">
       <EngineHeader
         eyebrow="Astro Sound Engine"
         title="AstroLife Sound Intelligence"
@@ -1983,5 +1985,6 @@ export default function AstroSoundPage() {
         }
 `}</style>
     </EngineShell>
+    </PremiumFeature>
   );
 }

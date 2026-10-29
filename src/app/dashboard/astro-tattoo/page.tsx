@@ -97,7 +97,7 @@ export default function AstroTattooPage() {
         ]}
       />
 
-      <PremiumFeature feature="Astro-Tattoo & Biometric Activation" enforceLock>
+      <PremiumFeature feature="Astro-Tattoo & Biometric Activation" requiredTier="elite">
         {/* Interactive Master Controller */}
         <div className="card" style={{ marginBottom: 20, padding: "20px 24px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
