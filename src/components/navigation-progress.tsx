@@ -4,12 +4,9 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 /**
- * NavigationProgress — Sacred Om (ॐ) Glowing Loop Indicator
- * Features:
- * 1. Centered luxury sacred medallion with the divine ॐ symbol.
- * 2. 360° Glowing Gold Circular Loop that traces and completes as loading progresses.
- * 3. Orbiting cosmic parikrama light beam with golden drop-shadow glow.
- * 4. Zero-latency instant click/touch detection with auto route transition dismissal.
+ * NavigationProgress — Sacred Om (ॐ) Compact Glowing Loop Indicator
+ * Sleek, refined, compact luxury jewel in the center of the screen.
+ * Traces a 360° golden parikrama loop around the sacred ॐ symbol as pages load.
  */
 export function NavigationProgress() {
   const pathname = usePathname();
@@ -51,7 +48,7 @@ export function NavigationProgress() {
     setTimeout(() => {
       setLoading(false);
       setProgress(0);
-    }, 240);
+    }, 220);
   }, []);
 
   // Dismiss on route change
@@ -131,8 +128,8 @@ export function NavigationProgress() {
 
   if (!loading && progress === 0) return null;
 
-  // Circumference for r=44: 2 * Math.PI * 44 ≈ 276.46
-  const circleRadius = 44;
+  // Circumference for compact r=23: 2 * Math.PI * 23 ≈ 144.51
+  const circleRadius = 23;
   const circumference = 2 * Math.PI * circleRadius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
@@ -160,7 +157,7 @@ export function NavigationProgress() {
             height: "100%",
             width: `${progress}%`,
             background: "linear-gradient(90deg, #996515, #B8860B, #FFD700, #F59E0B)",
-            boxShadow: "0 0 12px rgba(255, 215, 0, 0.8), 0 0 6px rgba(184, 134, 11, 0.6)",
+            boxShadow: "0 0 10px rgba(255, 215, 0, 0.8), 0 0 5px rgba(184, 134, 11, 0.6)",
             transition: "width 0.16s ease, opacity 0.2s ease",
             opacity: progress === 100 ? 0 : 1,
             borderRadius: "0 2px 2px 0",
@@ -168,7 +165,7 @@ export function NavigationProgress() {
         />
       </div>
 
-      {/* ── Center Sacred ॐ Glowing Loop Modal ── */}
+      {/* ── Center Sacred ॐ Glowing Loop Modal (Compact & Sleek) ── */}
       <div
         style={{
           position: "fixed",
@@ -178,10 +175,10 @@ export function NavigationProgress() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "rgba(10, 8, 5, 0.25)",
-          backdropFilter: "blur(6px)",
-          WebkitBackdropFilter: "blur(6px)",
-          animation: "fadeInBackdrop 0.16s ease-out forwards",
+          background: "rgba(10, 8, 5, 0.16)",
+          backdropFilter: "blur(3px)",
+          WebkitBackdropFilter: "blur(3px)",
+          animation: "fadeInBackdrop 0.14s ease-out forwards",
         }}
       >
         <div
@@ -191,19 +188,19 @@ export function NavigationProgress() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            animation: "omScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            animation: "omScaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards",
           }}
         >
-          {/* Sacred Circular Medallion */}
+          {/* Compact Sacred Circular Medallion (58px x 58px) */}
           <div
             style={{
               position: "relative",
-              width: "112px",
-              height: "112px",
+              width: "58px",
+              height: "58px",
               borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(28, 22, 16, 0.95) 0%, rgba(14, 11, 8, 0.98) 100%)",
-              border: "1.5px solid rgba(212, 175, 55, 0.35)",
-              boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4), 0 0 35px rgba(212, 175, 55, 0.25), inset 0 0 20px rgba(184, 134, 11, 0.15)",
+              background: "radial-gradient(circle, rgba(28, 22, 16, 0.96) 0%, rgba(14, 11, 8, 0.98) 100%)",
+              border: "1px solid rgba(212, 175, 55, 0.35)",
+              boxShadow: "0 10px 25px rgba(0, 0, 0, 0.45), 0 0 20px rgba(212, 175, 55, 0.25), inset 0 0 10px rgba(184, 134, 11, 0.2)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -211,9 +208,9 @@ export function NavigationProgress() {
           >
             {/* SVG Glowing Progress Loop */}
             <svg
-              width="112"
-              height="112"
-              viewBox="0 0 112 112"
+              width="58"
+              height="58"
+              viewBox="0 0 58 58"
               style={{
                 position: "absolute",
                 top: 0,
@@ -223,13 +220,13 @@ export function NavigationProgress() {
             >
               <defs>
                 <linearGradient id="omLoopGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFF2B2" />
-                  <stop offset="35%" stopColor="#FFD700" />
-                  <stop offset="70%" stopColor="#D4AF37" />
+                  <stop offset="0%" stopColor="#FFF4B8" />
+                  <stop offset="40%" stopColor="#FFD700" />
+                  <stop offset="75%" stopColor="#D4AF37" />
                   <stop offset="100%" stopColor="#B8860B" />
                 </linearGradient>
                 <filter id="omLoopGlow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feGaussianBlur stdDeviation="2" result="blur" />
                   <feMerge>
                     <feMergeNode in="blur" />
                     <feMergeNode in="SourceGraphic" />
@@ -239,22 +236,22 @@ export function NavigationProgress() {
 
               {/* Faint Guide Ring */}
               <circle
-                cx="56"
-                cy="56"
+                cx="29"
+                cy="29"
                 r={circleRadius}
                 fill="none"
-                stroke="rgba(212, 175, 55, 0.16)"
-                strokeWidth="3"
+                stroke="rgba(212, 175, 55, 0.18)"
+                strokeWidth="2.2"
               />
 
               {/* Glowing Loop that completes with progress */}
               <circle
-                cx="56"
-                cy="56"
+                cx="29"
+                cy="29"
                 r={circleRadius}
                 fill="none"
                 stroke="url(#omLoopGold)"
-                strokeWidth="3.5"
+                strokeWidth="2.6"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
@@ -269,13 +266,13 @@ export function NavigationProgress() {
             <div
               style={{
                 position: "absolute",
-                inset: "2px",
+                inset: "1.5px",
                 borderRadius: "50%",
-                border: "2px solid transparent",
-                borderTopColor: "rgba(255, 215, 0, 0.9)",
+                border: "1.8px solid transparent",
+                borderTopColor: "rgba(255, 215, 0, 0.95)",
                 borderRightColor: "rgba(212, 175, 55, 0.4)",
-                animation: "parikramaSpin 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite",
-                filter: "drop-shadow(0 0 6px rgba(255, 215, 0, 0.8))",
+                animation: "parikramaSpin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+                filter: "drop-shadow(0 0 5px rgba(255, 215, 0, 0.8))",
                 pointerEvents: "none",
               }}
             />
@@ -285,14 +282,14 @@ export function NavigationProgress() {
               style={{
                 position: "relative",
                 zIndex: 2,
-                fontSize: "42px",
+                fontSize: "22px",
                 lineHeight: 1,
                 fontFamily: "'Cormorant Garamond', 'Noto Serif Devanagari', 'Georgia', serif",
                 fontWeight: 700,
                 background: "linear-gradient(135deg, #FFF9E6 0%, #FFD700 45%, #D4AF37 75%, #B8860B 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                filter: "drop-shadow(0 0 10px rgba(255, 215, 0, 0.65))",
+                filter: "drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))",
                 animation: "omBreathing 1.8s ease-in-out infinite",
                 userSelect: "none",
                 textAlign: "center",
@@ -302,42 +299,42 @@ export function NavigationProgress() {
             </div>
           </div>
 
-          {/* Ethereal Label Below */}
+          {/* Compact Pill Label Below */}
           <div
             style={{
-              marginTop: "12px",
-              padding: "5px 14px",
+              marginTop: "8px",
+              padding: "3px 10px",
               borderRadius: "999px",
-              background: "rgba(24, 19, 14, 0.85)",
-              border: "1px solid rgba(212, 175, 55, 0.3)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
+              background: "rgba(20, 16, 12, 0.85)",
+              border: "1px solid rgba(212, 175, 55, 0.28)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              gap: "5px",
             }}
           >
             <span
               style={{
-                width: "6px",
-                height: "6px",
+                width: "5px",
+                height: "5px",
                 borderRadius: "50%",
                 background: "#FFD700",
-                boxShadow: "0 0 8px #FFD700",
+                boxShadow: "0 0 6px #FFD700",
                 animation: "dotBlink 1s ease-in-out infinite",
               }}
             />
             <span
               style={{
-                fontSize: "12px",
+                fontSize: "11px",
                 fontWeight: 600,
-                letterSpacing: "0.5px",
+                letterSpacing: "0.3px",
                 color: "#F5EAD4",
                 fontFamily: "'Outfit', sans-serif",
               }}
             >
-              खुल रहा है... <span style={{ color: "#D4AF37", fontSize: "11px" }}>{Math.min(100, Math.round(progress))}%</span>
+              खुल रहा है... <span style={{ color: "#D4AF37", fontSize: "10px" }}>{Math.min(100, Math.round(progress))}%</span>
             </span>
           </div>
         </div>
@@ -349,7 +346,7 @@ export function NavigationProgress() {
           to { opacity: 1; }
         }
         @keyframes omScaleIn {
-          from { opacity: 0; transform: scale(0.86); }
+          from { opacity: 0; transform: scale(0.88); }
           to { opacity: 1; transform: scale(1); }
         }
         @keyframes parikramaSpin {
@@ -357,11 +354,11 @@ export function NavigationProgress() {
           100% { transform: rotate(360deg); }
         }
         @keyframes omBreathing {
-          0%, 100% { transform: scale(0.97); filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5)); }
-          50% { transform: scale(1.05); filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.9)); }
+          0%, 100% { transform: scale(0.96); filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.45)); }
+          50% { transform: scale(1.05); filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.85)); }
         }
         @keyframes dotBlink {
-          0%, 100% { opacity: 0.4; }
+          0%, 100% { opacity: 0.35; }
           50% { opacity: 1; }
         }
       `}</style>
