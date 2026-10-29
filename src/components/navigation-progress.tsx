@@ -4,11 +4,12 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 /**
- * NavigationProgress — Global Route Transition & Click Loading Indicator
- * Center-of-page Loading Modal (Issue 4):
- * Immediately displays an unmistakable, elegant loading sign in the CENTER of the page
- * whenever any route link, option, or action is clicked, so the user knows immediately
- * that the next window is loading.
+ * NavigationProgress — Sacred Om (ॐ) Glowing Loop Indicator
+ * Features:
+ * 1. Centered luxury sacred medallion with the divine ॐ symbol.
+ * 2. 360° Glowing Gold Circular Loop that traces and completes as loading progresses.
+ * 3. Orbiting cosmic parikrama light beam with golden drop-shadow glow.
+ * 4. Zero-latency instant click/touch detection with auto route transition dismissal.
  */
 export function NavigationProgress() {
   const pathname = usePathname();
@@ -20,25 +21,25 @@ export function NavigationProgress() {
 
   const startLoading = useCallback(() => {
     setLoading(true);
-    setProgress(18);
+    setProgress(15);
 
     if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
 
-    // Increment progress in gentle steps
+    // Smoothly advance the circular loop
     progressTimerRef.current = setInterval(() => {
       setProgress((prev) => {
-        if (prev < 45) return prev + 14;
-        if (prev < 75) return prev + 7;
-        if (prev < 90) return prev + 2;
+        if (prev < 40) return prev + 15;
+        if (prev < 70) return prev + 8;
+        if (prev < 92) return prev + 3;
         return prev;
       });
-    }, 140);
+    }, 130);
 
-    // Safety timeout: auto-hide after 7 seconds if navigation aborted
+    // Safety timeout: auto-hide after 6.5s if navigation stalled
     safetyTimeoutRef.current = setTimeout(() => {
       stopLoading();
-    }, 7000);
+    }, 6500);
   }, []);
 
   const stopLoading = useCallback(() => {
@@ -50,17 +51,16 @@ export function NavigationProgress() {
     setTimeout(() => {
       setLoading(false);
       setProgress(0);
-    }, 220);
+    }, 240);
   }, []);
 
-  // When pathname or searchParams change, the new route has arrived
+  // Dismiss on route change
   useEffect(() => {
     stopLoading();
   }, [pathname, searchParams, stopLoading]);
 
-  // Global listener for internal links and click triggers
+  // Global instantaneous click/touch listener
   useEffect(() => {
-    // Expose window helper for programmatic triggers
     if (typeof window !== "undefined") {
       (window as unknown as Record<string, unknown>).__startNavigationLoading = startLoading;
       (window as unknown as Record<string, unknown>).__stopNavigationLoading = stopLoading;
@@ -75,7 +75,7 @@ export function NavigationProgress() {
         const href = anchor.getAttribute("href");
         if (!href) return;
 
-        // Ignore external links, anchor links (#), mailto, tel, target="_blank", or modifier clicks
+        // Ignore external, hash, tel, mailto, target="_blank", or modifier clicks
         if (
           href.startsWith("http") &&
           !href.startsWith(window.location.origin)
@@ -95,18 +95,16 @@ export function NavigationProgress() {
           return;
         }
 
-        // Check if clicking the exact current URL
         const currentUrl = window.location.pathname + window.location.search;
         if (href === currentUrl || href === window.location.pathname) {
           return;
         }
 
-        // It's an internal route change: trigger loading feedback immediately!
         startLoading();
         return;
       }
 
-      // Also check if any button or element has data-loading-trigger
+      // Check if clicked element or button requests loading feedback
       const trigger = target.closest("[data-loading-trigger='true']");
       if (trigger) {
         startLoading();
@@ -116,7 +114,6 @@ export function NavigationProgress() {
     const handleCustomStart = () => startLoading();
     const handleCustomStop = () => stopLoading();
 
-    // Listen on pointerdown for instant zero-latency feedback before click bubble
     document.addEventListener("pointerdown", handleNavigationTrigger, { capture: true });
     document.addEventListener("click", handleNavigationTrigger, { capture: true });
     window.addEventListener("astrolife:loading:start", handleCustomStart);
@@ -133,6 +130,11 @@ export function NavigationProgress() {
   }, [startLoading, stopLoading]);
 
   if (!loading && progress === 0) return null;
+
+  // Circumference for r=44: 2 * Math.PI * 44 ≈ 276.46
+  const circleRadius = 44;
+  const circumference = 2 * Math.PI * circleRadius;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
     <>
@@ -166,7 +168,7 @@ export function NavigationProgress() {
         />
       </div>
 
-      {/* ── Center of Page Loading Modal (Requested: Right in the Centre) ── */}
+      {/* ── Center Sacred ॐ Glowing Loop Modal ── */}
       <div
         style={{
           position: "fixed",
@@ -176,10 +178,10 @@ export function NavigationProgress() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "rgba(15, 12, 8, 0.32)",
-          backdropFilter: "blur(5px)",
-          WebkitBackdropFilter: "blur(5px)",
-          animation: "fadeInBackdrop 0.14s ease-out forwards",
+          background: "rgba(10, 8, 5, 0.25)",
+          backdropFilter: "blur(6px)",
+          WebkitBackdropFilter: "blur(6px)",
+          animation: "fadeInBackdrop 0.16s ease-out forwards",
         }}
       >
         <div
@@ -189,115 +191,154 @@ export function NavigationProgress() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: "12px",
-            padding: "24px 34px",
-            borderRadius: "20px",
-            background: "rgba(255, 255, 255, 0.98)",
-            border: "1.5px solid rgba(184, 134, 11, 0.45)",
-            boxShadow: "0 24px 60px rgba(0, 0, 0, 0.28), 0 0 40px rgba(184, 134, 11, 0.25)",
-            minWidth: "260px",
-            maxWidth: "92vw",
-            textAlign: "center",
-            animation: "centerScaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            animation: "omScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
           }}
         >
-          {/* Dual spinning gold cosmic loader */}
-          <div style={{ position: "relative", width: "46px", height: "46px" }}>
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                border: "2.5px dashed rgba(184, 134, 11, 0.35)",
-                animation: "spinSlow 6s linear infinite",
-              }}
-            />
-            <svg
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "46px",
-                height: "46px",
-                animation: "spinFast 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite",
-                color: "#B8860B",
-              }}
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="9.5"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeDasharray="26"
-                strokeLinecap="round"
-                style={{ opacity: 0.25 }}
-              />
-              <path
-                d="M12 2.5a9.5 9.5 0 0 1 9.5 9.5"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div
-              style={{
-                position: "absolute",
-                inset: "14px",
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, #B8860B, #FFD700)",
-                boxShadow: "0 0 10px rgba(255, 215, 0, 0.8)",
-                animation: "pulseCenter 1.2s ease-in-out infinite",
-              }}
-            />
-          </div>
-
-          <div>
-            <div
-              style={{
-                fontSize: "15px",
-                fontWeight: 800,
-                color: "#1A1A1A",
-                letterSpacing: "0.2px",
-                lineHeight: 1.3,
-              }}
-            >
-              ✦ खुल रहा है... Loading
-            </div>
-            <div
-              style={{
-                fontSize: "11px",
-                color: "#B8860B",
-                fontWeight: 600,
-                marginTop: "3px",
-              }}
-            >
-              कृपया प्रतीक्षा करें · Window loading soon...
-            </div>
-          </div>
-
-          {/* Shimmer progress bar */}
+          {/* Sacred Circular Medallion */}
           <div
             style={{
-              width: "170px",
-              height: "4px",
-              background: "rgba(184, 134, 11, 0.15)",
-              borderRadius: "999px",
-              overflow: "hidden",
-              marginTop: "2px",
+              position: "relative",
+              width: "112px",
+              height: "112px",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(28, 22, 16, 0.95) 0%, rgba(14, 11, 8, 0.98) 100%)",
+              border: "1.5px solid rgba(212, 175, 55, 0.35)",
+              boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4), 0 0 35px rgba(212, 175, 55, 0.25), inset 0 0 20px rgba(184, 134, 11, 0.15)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
+            {/* SVG Glowing Progress Loop */}
+            <svg
+              width="112"
+              height="112"
+              viewBox="0 0 112 112"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                transform: "rotate(-90deg)",
+              }}
+            >
+              <defs>
+                <linearGradient id="omLoopGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FFF2B2" />
+                  <stop offset="35%" stopColor="#FFD700" />
+                  <stop offset="70%" stopColor="#D4AF37" />
+                  <stop offset="100%" stopColor="#B8860B" />
+                </linearGradient>
+                <filter id="omLoopGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              {/* Faint Guide Ring */}
+              <circle
+                cx="56"
+                cy="56"
+                r={circleRadius}
+                fill="none"
+                stroke="rgba(212, 175, 55, 0.16)"
+                strokeWidth="3"
+              />
+
+              {/* Glowing Loop that completes with progress */}
+              <circle
+                cx="56"
+                cy="56"
+                r={circleRadius}
+                fill="none"
+                stroke="url(#omLoopGold)"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                filter="url(#omLoopGlow)"
+                style={{
+                  transition: "stroke-dashoffset 0.16s ease-out",
+                }}
+              />
+            </svg>
+
+            {/* Continuous Orbital Radiant Parikrama Aura */}
             <div
               style={{
-                height: "100%",
-                width: `${progress}%`,
-                background: "linear-gradient(90deg, #996515, #B8860B, #FFD700)",
-                borderRadius: "999px",
-                transition: "width 0.16s ease",
-                boxShadow: "0 0 8px rgba(255, 215, 0, 0.8)",
+                position: "absolute",
+                inset: "2px",
+                borderRadius: "50%",
+                border: "2px solid transparent",
+                borderTopColor: "rgba(255, 215, 0, 0.9)",
+                borderRightColor: "rgba(212, 175, 55, 0.4)",
+                animation: "parikramaSpin 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+                filter: "drop-shadow(0 0 6px rgba(255, 215, 0, 0.8))",
+                pointerEvents: "none",
               }}
             />
+
+            {/* Sacred ॐ Symbol in Center */}
+            <div
+              style={{
+                position: "relative",
+                zIndex: 2,
+                fontSize: "42px",
+                lineHeight: 1,
+                fontFamily: "'Cormorant Garamond', 'Noto Serif Devanagari', 'Georgia', serif",
+                fontWeight: 700,
+                background: "linear-gradient(135deg, #FFF9E6 0%, #FFD700 45%, #D4AF37 75%, #B8860B 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                filter: "drop-shadow(0 0 10px rgba(255, 215, 0, 0.65))",
+                animation: "omBreathing 1.8s ease-in-out infinite",
+                userSelect: "none",
+                textAlign: "center",
+              }}
+            >
+              ॐ
+            </div>
+          </div>
+
+          {/* Ethereal Label Below */}
+          <div
+            style={{
+              marginTop: "12px",
+              padding: "5px 14px",
+              borderRadius: "999px",
+              background: "rgba(24, 19, 14, 0.85)",
+              border: "1px solid rgba(212, 175, 55, 0.3)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <span
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                background: "#FFD700",
+                boxShadow: "0 0 8px #FFD700",
+                animation: "dotBlink 1s ease-in-out infinite",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: 600,
+                letterSpacing: "0.5px",
+                color: "#F5EAD4",
+                fontFamily: "'Outfit', sans-serif",
+              }}
+            >
+              खुल रहा है... <span style={{ color: "#D4AF37", fontSize: "11px" }}>{Math.min(100, Math.round(progress))}%</span>
+            </span>
           </div>
         </div>
       </div>
@@ -307,21 +348,21 @@ export function NavigationProgress() {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-        @keyframes centerScaleIn {
-          from { opacity: 0; transform: scale(0.92); }
+        @keyframes omScaleIn {
+          from { opacity: 0; transform: scale(0.86); }
           to { opacity: 1; transform: scale(1); }
         }
-        @keyframes spinSlow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes parikramaSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
-        @keyframes spinFast {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes omBreathing {
+          0%, 100% { transform: scale(0.97); filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5)); }
+          50% { transform: scale(1.05); filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.9)); }
         }
-        @keyframes pulseCenter {
-          0%, 100% { transform: scale(0.85); opacity: 0.8; }
-          50% { transform: scale(1.15); opacity: 1; }
+        @keyframes dotBlink {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 1; }
         }
       `}</style>
     </>
