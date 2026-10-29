@@ -337,7 +337,7 @@ export default function NorthIndianChart({
                   fontFamily="serif"
                   fontWeight={isSelected || isLagna ? "700" : "400"}
                 >
-                  {rIdx + 1}
+                  {rashiIdx + 1}
                 </text>
               )}
 
