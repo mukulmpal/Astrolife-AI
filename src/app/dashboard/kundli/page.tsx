@@ -37,6 +37,8 @@ import { VimshottariFiveLevelExplorer } from "@/components/dasha/VimshottariFive
 import { DashaProgressCapsule } from "@/components/dasha/DashaProgressCapsule";
 import { LiveMuhurtaAlert } from "@/components/panchang/LiveMuhurtaAlert";
 import { runKPEngine } from "@/lib/astro-engine/kp";
+import { computeNatalOuterPlanets, type OuterPlanetKey } from "@/lib/astro-engine/outer-planets-engine";
+import OuterPlanetsDossierCard from "@/components/charts/OuterPlanetsDossierCard";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -144,6 +146,17 @@ export default function KundliPage() {
   const [isDeletingSavedChart, setIsDeletingSavedChart] = useState(false);
   const [yogaSearch, setYogaSearch] = useState("");
   const [yogaFilter, setYogaFilter] = useState<"all" | "benefic" | "dosha" | "rare">("all");
+  const [activeOuterPlanetKeys, setActiveOuterPlanetKeys] = useState<OuterPlanetKey[]>(["URANUS"]);
+
+  const outerPlanetsData = useMemo(() => {
+    if (!chart || !chart.jd) return null;
+    const natalLons: Record<string, number> = {};
+    for (const [pName, pData] of Object.entries(chart.planets)) {
+      if (pData.lon !== undefined) natalLons[pName] = pData.lon;
+    }
+    const cusps = chart.houseCusps?.map((c) => c.degree) || [];
+    return computeNatalOuterPlanets(chart.jd, chart.lagnaNum, natalLons, cusps);
+  }, [chart]);
 
   // Check URL query parameters for ?action=new or ?action=saved
   useEffect(() => {
@@ -1455,7 +1468,24 @@ export default function KundliPage() {
                         aria-label={`Natal chart for ${chart?.name || 'chart'}`}
                         tabIndex={-1}
                       >
-                        <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} />
+                        <NorthIndianChart
+                          lagnaNum={chart.lagnaNum}
+                          planets={chart.planets}
+                          outerPlanets={outerPlanetsData?.chartDataMap}
+                          showOuterToggles={true}
+                        />
+
+                        {outerPlanetsData && (
+                          <OuterPlanetsDossierCard
+                            evaluations={outerPlanetsData.evaluations}
+                            activePlanetKeys={activeOuterPlanetKeys}
+                            onTogglePlanet={(key) => {
+                              setActiveOuterPlanetKeys((prev) =>
+                                prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                              );
+                            }}
+                          />
+                        )}
                       </div>
                     ) : (
                       /* 4-CHART QUAD VIEW: 2 UP (Lagna + D9), 2 DOWN (Bhava Chalit + KP) */
@@ -1472,7 +1502,14 @@ export default function KundliPage() {
                             </span>
                           </div>
                           <div style={{ display: "flex", justifyContent: "center" }}>
-                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} size={250} mode="rashi" />
+                            <NorthIndianChart
+                              lagnaNum={chart.lagnaNum}
+                              planets={chart.planets}
+                              outerPlanets={outerPlanetsData?.chartDataMap}
+                              size={250}
+                              mode="rashi"
+                              showOuterToggles={false}
+                            />
                           </div>
                         </div>
 

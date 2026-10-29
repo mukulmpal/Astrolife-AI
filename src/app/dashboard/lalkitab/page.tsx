@@ -1077,6 +1077,19 @@ export default function LalKitabPage() {
                   </div>
                 </div>
                 <div className="varsh-summary">{result.varshphal.summary}</div>
+
+                <div style={{display:"flex",justifyContent:"center",margin:"20px 0"}}>
+                  <div style={{maxWidth:460,width:"100%"}}>
+                    <LalKitabHouseChart
+                      title={`Lal Kitab Varshphal Kundli (${result.varshphal.periodLabel})`}
+                      subtitle={`Year: ${result.varshphal.runningAge} · Varsheshwar: ${result.varshphal.varsheshwar}`}
+                      planets={varshChart}
+                      activeHouse={1}
+                      lagnaSignIndex={natalLagnaIndex}
+                    />
+                  </div>
+                </div>
+
                 <div className="prediction-grid">
                   <div className="prediction-card">
                     <div className="prediction-title">Year Headline</div>

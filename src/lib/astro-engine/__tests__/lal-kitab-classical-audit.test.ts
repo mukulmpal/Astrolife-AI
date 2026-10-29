@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { calculateLalKitab } from "../lalkitab";
+import { calculateLalKitabTimeEngine } from "../../lal-kitab/time-cycle";
 
 describe("Lal Kitab Classical Axioms & Safety Engine Audit", () => {
   // Baseline chart: clean Taurus lagna
@@ -146,26 +147,85 @@ describe("Lal Kitab Classical Axioms & Safety Engine Audit", () => {
     assert.equal(moonY1?.varshHouse, 3, "Natal H4 moves to H3 in Year 1 per 1952 table");
     assert.equal(marsY1?.varshHouse, 10, "Natal H3 moves to H10 in Year 1 per 1952 table");
 
-    // For running year 31 (completed age 30 -> cycle year 7):
-    const resYear31 = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2020-06-01"));
+    // For running year 7 (Cycle 1, Year 7):
+    const resYear7 = calculateLalKitab(cleanPlanets, "2000-01-01", 1, new Date("2007-06-01"));
+    assert.equal(resYear7.varshphal.runningAge, 7);
+    assert.equal(resYear7.varshphal.cycleYear, 7);
+    const sunY7 = resYear7.varshphal.chartRows.find(r => r.planet === "Sun"); // natal H10
+    const venY7 = resYear7.varshphal.chartRows.find(r => r.planet === "Venus"); // natal H7
+    assert.equal(sunY7?.varshHouse, 2, "Natal H10 moves to H2 in Year 7 per 1952 table");
+    assert.equal(venY7?.varshHouse, 1, "Natal H7 moves to H1 in Year 7 per 1952 table");
+    assert.ok(resYear7.varshphal.varsheshwar.includes("Venus"), "Venus in H1 becomes Varsheshwar in Year 7");
+
+    // For running year 31 (Cycle 3, Year 7):
+    const resYear31 = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2021-06-01"));
     assert.equal(resYear31.varshphal.runningAge, 31);
     assert.equal(resYear31.varshphal.cycleYear, 7);
-
-    // In Year 7 table: Natal H10 -> H2, Natal H7 (Venus) -> H1 (Varsheshwar!)
     const sunY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Sun"); // natal H10
     const venY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Venus"); // natal H7
-    assert.equal(sunY31?.varshHouse, 2, "Natal H10 moves to H2 in Year 7 per 1952 table");
-    assert.equal(venY31?.varshHouse, 1, "Natal H7 moves to H1 in Year 7 per 1952 table");
-    assert.ok(resYear31.varshphal.varsheshwar.includes("Venus"), "Venus in H1 becomes Varsheshwar");
+    assert.equal(sunY31?.varshHouse, 6, "Natal H10 moves to H6 in Year 31 per 1952 multi-cycle table");
+    assert.equal(venY31?.varshHouse, 1, "Natal H7 moves to H1 in Year 31 per 1952 multi-cycle table");
+    assert.ok(resYear31.varshphal.varsheshwar.includes("Venus"), "Venus in H1 becomes Varsheshwar in Year 31");
+  });
+
+  it("11b. AstroSage Benchmark Ground Truth: Matches AstroSage Varshphal Across Running Years", () => {
+    // Native from AstroSage screenshots (DOB: 1995-04-17)
+    const nativePlanets = {
+      Jupiter: { house: 1, sign: "Dhanu", signNum: 8, retrograde: false, dignity: "Neutral", lon: 245 },
+      Mars:    { house: 4, sign: "Meena", signNum: 11, retrograde: false, dignity: "Neutral", lon: 340 },
+      Saturn:  { house: 4, sign: "Meena", signNum: 11, retrograde: false, dignity: "Neutral", lon: 345 },
+      Moon:    { house: 4, sign: "Meena", signNum: 11, retrograde: false, dignity: "Neutral", lon: 350 },
+      Ketu:    { house: 4, sign: "Meena", signNum: 11, retrograde: true, dignity: "Neutral", lon: 355 },
+      Sun:     { house: 5, sign: "Mesha", signNum: 0, retrograde: false, dignity: "Exalted", lon: 3 },
+      Mercury: { house: 5, sign: "Mesha", signNum: 0, retrograde: false, dignity: "Neutral", lon: 8 },
+      Venus:   { house: 6, sign: "Vrishabha", signNum: 1, retrograde: false, dignity: "Own", lon: 35 },
+      Rahu:    { house: 10, sign: "Kanya", signNum: 5, retrograde: true, dignity: "Neutral", lon: 175 },
+    };
+
+    // Benchmark 1: 17/4/2026 to 17/4/2027 (31 Year) -> Must match Row 31
+    const res31 = calculateLalKitab(nativePlanets, "1995-04-17", 8, new Date("2026-06-01"));
+    assert.equal(res31.varshphal.runningAge, 31);
+    const getH31 = (p: string) => res31.varshphal.chartRows.find(r => r.planet === p)?.varshHouse;
+    assert.equal(getH31("Venus"), 4, "Venus in H4 for Year 31");
+    assert.equal(getH31("Rahu"), 6, "Rahu in H6 for Year 31");
+    assert.equal(getH31("Jupiter"), 7, "Jupiter in H7 for Year 31");
+    assert.equal(getH31("Sun"), 9, "Sun in H9 for Year 31");
+    assert.equal(getH31("Mercury"), 9, "Mercury in H9 for Year 31");
+    assert.equal(getH31("Mars"), 12, "Mars in H12 for Year 31");
+    assert.equal(getH31("Moon"), 12, "Moon in H12 for Year 31");
+    assert.equal(getH31("Saturn"), 12, "Saturn in H12 for Year 31");
+    assert.equal(getH31("Ketu"), 12, "Ketu in H12 for Year 31");
+
+    // Benchmark 2: 17/4/2025 to 17/4/2026 (30 Year) -> Must match Row 30
+    const res30 = calculateLalKitab(nativePlanets, "1995-04-17", 8, new Date("2025-06-01"));
+    assert.equal(res30.varshphal.runningAge, 30);
+    const getH30 = (p: string) => res30.varshphal.chartRows.find(r => r.planet === p)?.varshHouse;
+    assert.equal(getH30("Venus"), 1, "Venus in H1 for Year 30");
+    assert.equal(getH30("Sun"), 4, "Sun in H4 for Year 30");
+    assert.equal(getH30("Mercury"), 4, "Mercury in H4 for Year 30");
+    assert.equal(getH30("Jupiter"), 5, "Jupiter in H5 for Year 30");
+    assert.equal(getH30("Mars"), 9, "Mars in H9 for Year 30");
+    assert.equal(getH30("Rahu"), 10, "Rahu in H10 for Year 30");
+
+    // Benchmark 3: 17/4/2027 to 17/4/2028 (32 Year) -> Must match Row 32
+    const res32 = calculateLalKitab(nativePlanets, "1995-04-17", 8, new Date("2027-06-01"));
+    assert.equal(res32.varshphal.runningAge, 32);
+    const getH32 = (p: string) => res32.varshphal.chartRows.find(r => r.planet === p)?.varshHouse;
+    assert.equal(getH32("Rahu"), 1, "Rahu in H1 for Year 32");
+    assert.equal(getH32("Jupiter"), 2, "Jupiter in H2 for Year 32");
+    assert.equal(getH32("Sun"), 3, "Sun in H3 for Year 32");
+    assert.equal(getH32("Mercury"), 3, "Mercury in H3 for Year 32");
+    assert.equal(getH32("Mars"), 11, "Mars in H11 for Year 32");
+    assert.equal(getH32("Venus"), 12, "Venus in H12 for Year 32");
   });
 
   it("12. Varshphal Conjunction Integrity: Conjunct natal planets move together to same annual house", () => {
     // Both Saturn and Ketu are in natal H6 in cleanPlanets
-    const resYear31 = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2020-06-01"));
+    const resYear31 = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2021-06-01"));
     const satY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Saturn");
     const ketY31 = resYear31.varshphal.chartRows.find(r => r.planet === "Ketu");
 
-    // In Year 7: Natal H6 -> H4
+    // In Year 7 (Cycle 3, Year 31): Natal H6 -> H4
     assert.equal(satY31?.varshHouse, 4);
     assert.equal(ketY31?.varshHouse, 4);
     assert.equal(satY31?.varshHouse, ketY31?.varshHouse, "Conjunct planets in natal chart must stay conjunct in Varshphal!");
@@ -202,7 +262,7 @@ describe("Lal Kitab Classical Axioms & Safety Engine Audit", () => {
   });
 
   it("15. 12-Year Progression Matrix: Generates complete 12-year cycle with accurate Varsheshwar and current flag", () => {
-    const res = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2020-06-01")); // Age 31, cycle year 7
+    const res = calculateLalKitab(cleanPlanets, "1990-01-01", 1, new Date("2021-06-01")); // Age 31, cycle year 7
     const matrix = res.varshphal.twelveYearMatrix;
     
     assert.ok(matrix, "twelveYearMatrix must exist");
@@ -212,7 +272,7 @@ describe("Lal Kitab Classical Axioms & Safety Engine Audit", () => {
     const currentRow = matrix.find(r => r.cycleYear === 7);
     assert.ok(currentRow?.isCurrent, "Cycle Year 7 must be marked as isCurrent");
     assert.equal(currentRow?.runningAge, 31);
-    assert.equal(currentRow?.calendarYear, 2020);
+    assert.equal(currentRow?.calendarYear, 2021);
     assert.ok(currentRow?.varsheshwar.includes("Venus"));
 
     // Check row 1
@@ -238,5 +298,43 @@ describe("Lal Kitab Classical Axioms & Safety Engine Audit", () => {
       assert.ok(u.materialsNeeded.length > 0, `Upay for ${u.planet} must list authentic materials`);
       assert.ok(u.prohibitions.length > 0, `Upay for ${u.planet} must specify Lal Kitab prohibitions`);
     });
+  });
+
+  it("17. Deep Dynamic Annual Prediction Synthesis: Tailored to Varsheshwar, House triggers, and Remedies", () => {
+    const res = calculateLalKitab(cleanPlanets, "1990-05-15", 1, undefined, "2021-06-01");
+    const pred = res.varshphal.annualPrediction;
+
+    assert.ok(pred.headline.length > 50, "Headline must be rich and descriptive");
+    assert.ok(pred.career.length > 50, "Career prediction must be rich and descriptive");
+    assert.ok(pred.money.length > 50, "Money prediction must be rich and descriptive");
+    assert.ok(pred.family.length > 50, "Family prediction must be rich and descriptive");
+    assert.ok(pred.health.length > 50, "Health prediction must be rich and descriptive");
+    assert.ok(pred.remedy.length > 50, "Remedy prediction must be rich and descriptive");
+
+    // Check that headline mentions Varsheshwar
+    assert.ok(pred.headline.includes("Varsheshwar"), "Headline must mention Varsheshwar");
+    // Check that remedy mentions classical rule
+    assert.ok(pred.remedy.includes("Lal Kitab Upaya") || pred.remedy.includes("daan"), "Remedy must cite classical rules");
+  });
+
+  it("18. Deep Dynamic Monthly Phal Synthesis: Month 1 vs Month 6 vs Month 8 produce distinct nimits, dos and avoids", () => {
+    const inputMonth1 = {
+      dob: "1990-05-15",
+      planets: cleanPlanets,
+      targetDate: "2021-05-20", // Month 1 from birthday
+    };
+    const inputMonth6 = {
+      dob: "1990-05-15",
+      planets: cleanPlanets,
+      targetDate: "2021-10-20", // Month 6 from birthday
+    };
+    const resMonth1 = calculateLalKitabTimeEngine(inputMonth1);
+    const resMonth6 = calculateLalKitabTimeEngine(inputMonth6);
+
+    assert.notEqual(resMonth1.monthlyPhal.activeHouse, resMonth6.monthlyPhal.activeHouse);
+    assert.notEqual(resMonth1.monthlyPhal.overview, resMonth6.monthlyPhal.overview);
+    assert.notEqual(resMonth1.monthlyPhal.nimitToWatch[0], resMonth6.monthlyPhal.nimitToWatch[0]);
+    assert.notEqual(resMonth1.monthlyPhal.doThisMonth[0], resMonth6.monthlyPhal.doThisMonth[0]);
+    assert.notEqual(resMonth1.monthlyPhal.avoidThisMonth[0], resMonth6.monthlyPhal.avoidThisMonth[0]);
   });
 });

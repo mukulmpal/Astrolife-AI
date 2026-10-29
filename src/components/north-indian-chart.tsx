@@ -8,6 +8,18 @@ const PLS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Ra
 const PABBR = ["Su", "Mo", "Ma", "Me", "Ju", "Ve", "Sa", "Ra", "Ke"];
 const PCOL = ["#f97316", "#c084fc", "#ef4444", "#22c55e", "#f59e0b", "#ec4899", "#60a5fa", "#a78bfa", "#fb7185"];
 
+// Modern Outer Planets support (INDRA, VARUN, YAM)
+export const OUTER_PLANET_KEYS = ["Indra", "Varun", "Yam", "Uranus", "Neptune", "Pluto"] as const;
+
+export const OUTER_PLANET_STYLE: Record<string, { abbr: string; color: string; label: string; icon: string }> = {
+  Indra: { abbr: "Ind", color: "#06b6d4", label: "Indra (Uranus)", icon: "⚡" },
+  Uranus: { abbr: "Ind", color: "#06b6d4", label: "Indra (Uranus)", icon: "⚡" },
+  Varun: { abbr: "Var", color: "#8b5cf6", label: "Varun (Neptune)", icon: "🌊" },
+  Neptune: { abbr: "Var", color: "#8b5cf6", label: "Varun (Neptune)", icon: "🌊" },
+  Yam: { abbr: "Yam", color: "#dc2626", label: "Yam (Pluto)", icon: "🌋" },
+  Pluto: { abbr: "Yam", color: "#dc2626", label: "Yam (Pluto)", icon: "🌋" },
+};
+
 const md = (x: number, m: number) => ((x % m) + m) % m;
 
 export interface PlanetData {
@@ -24,6 +36,7 @@ export interface PlanetData {
   dignity?: string;
   sign?: string;
   lon?: number;
+  hasSepharialVibrationBoost?: boolean;
 }
 
 interface Props {
@@ -35,6 +48,15 @@ interface Props {
   mode?: "rashi" | "chalit" | "kp";
   kpCusps?: Array<{ house: number; degreeText: string; subLord: string; sign: string }>;
   subLords?: Record<string, string>;
+  outerPlanets?: {
+    indra?: PlanetData;
+    varun?: PlanetData;
+    yam?: PlanetData;
+    uranus?: PlanetData;
+    neptune?: PlanetData;
+    pluto?: PlanetData;
+  };
+  showOuterToggles?: boolean;
 }
 
 const HOUSE_NAMES: Record<number, { name: string; sa: string; karaka: string }> = {
@@ -110,8 +132,20 @@ export default function NorthIndianChart({
   mode = "rashi",
   kpCusps,
   subLords,
+  outerPlanets,
+  showOuterToggles = true,
 }: Props) {
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
+  const [enabledOuter, setEnabledOuter] = useState<{
+    indra: boolean;
+    varun: boolean;
+    yam: boolean;
+  }>({
+    indra: false,
+    varun: false,
+    yam: false,
+  });
+
   const S = size;
   const h = S / 2;
 
@@ -226,6 +260,72 @@ export default function NorthIndianChart({
         });
       }
     });
+  }
+
+  // Inject Outer Planets (INDRA, VARUN, YAM) when toggled
+  const resolvedOuter: Record<string, PlanetData | undefined> = {
+    Indra: outerPlanets?.indra ?? outerPlanets?.uranus ?? planets["Indra"] ?? planets["Uranus"],
+    Varun: outerPlanets?.varun ?? outerPlanets?.neptune ?? planets["Varun"] ?? planets["Neptune"],
+    Yam: outerPlanets?.yam ?? outerPlanets?.pluto ?? planets["Yam"] ?? planets["Pluto"],
+  };
+
+  const isAnyOuterAvailable = Boolean(resolvedOuter.Indra || resolvedOuter.Varun || resolvedOuter.Yam);
+
+  if (enabledOuter.indra && resolvedOuter.Indra) {
+    const pd = resolvedOuter.Indra;
+    const rashi = typeof pd.signNum === "number" ? pd.signNum : typeof pd.rashi === "number" ? pd.rashi : typeof pd.rashiIndex === "number" ? pd.rashiIndex : null;
+    const house = typeof pd.house === "number" && pd.house >= 1 && pd.house <= 12 ? pd.house : rashi !== null ? md(rashi - lagnaNum, 12) + 1 : 1;
+    if (house >= 1 && house <= 12) {
+      pByH[house].push({
+        name: "Indra",
+        retro: pd.retrograde,
+        degree: pd.degree,
+        minutes: pd.minutes,
+        nakshatra: pd.nakshatra,
+        pada: pd.pada,
+        dignity: pd.dignity,
+        sign: pd.sign,
+        isOverlay: false,
+      });
+    }
+  }
+
+  if (enabledOuter.varun && resolvedOuter.Varun) {
+    const pd = resolvedOuter.Varun;
+    const rashi = typeof pd.signNum === "number" ? pd.signNum : typeof pd.rashi === "number" ? pd.rashi : typeof pd.rashiIndex === "number" ? pd.rashiIndex : null;
+    const house = typeof pd.house === "number" && pd.house >= 1 && pd.house <= 12 ? pd.house : rashi !== null ? md(rashi - lagnaNum, 12) + 1 : 1;
+    if (house >= 1 && house <= 12) {
+      pByH[house].push({
+        name: "Varun",
+        retro: pd.retrograde,
+        degree: pd.degree,
+        minutes: pd.minutes,
+        nakshatra: pd.nakshatra,
+        pada: pd.pada,
+        dignity: pd.dignity,
+        sign: pd.sign,
+        isOverlay: false,
+      });
+    }
+  }
+
+  if (enabledOuter.yam && resolvedOuter.Yam) {
+    const pd = resolvedOuter.Yam;
+    const rashi = typeof pd.signNum === "number" ? pd.signNum : typeof pd.rashi === "number" ? pd.rashi : typeof pd.rashiIndex === "number" ? pd.rashiIndex : null;
+    const house = typeof pd.house === "number" && pd.house >= 1 && pd.house <= 12 ? pd.house : rashi !== null ? md(rashi - lagnaNum, 12) + 1 : 1;
+    if (house >= 1 && house <= 12) {
+      pByH[house].push({
+        name: "Yam",
+        retro: pd.retrograde,
+        degree: pd.degree,
+        minutes: pd.minutes,
+        nakshatra: pd.nakshatra,
+        pada: pd.pada,
+        dignity: pd.dignity,
+        sign: pd.sign,
+        isOverlay: false,
+      });
+    }
   }
 
   const ls = { stroke: "#2a2250", strokeWidth: "1" };
@@ -358,11 +458,14 @@ export default function NorthIndianChart({
 
               {here.map((p, idx) => {
                 const piIdx = PLS.indexOf(p.name);
-                if (piIdx < 0) return null;
+                const outerStyle = OUTER_PLANET_STYLE[p.name];
+                if (piIdx < 0 && !outerStyle) return null;
+
                 const slot = planetSlots(total)[idx] ?? { x: 0, y: 0, font: 9 };
                 const py = ly + (isLagna && mode === "rashi" ? 20 : 15) + slot.y;
                 const subLord = subLords?.[p.name];
-                const pAbbr = PABBR[piIdx];
+                const pAbbr = piIdx >= 0 ? PABBR[piIdx] : outerStyle.abbr;
+                const pColor = p.isOverlay ? "#059669" : piIdx >= 0 ? PCOL[piIdx] : outerStyle.color;
 
                 return (
                   <g key={`${p.name}-${p.isOverlay ? "overlay" : "natal"}`}>
@@ -374,7 +477,7 @@ export default function NorthIndianChart({
                       fontSize={mode === "kp" ? 8 : slot.font}
                       fontWeight={p.isOverlay ? "800" : "700"}
                       fontFamily="sans-serif"
-                      fill={p.isOverlay ? "#059669" : PCOL[piIdx]}
+                      fill={pColor}
                     >
                       {mode === "kp" && subLord ? `${pAbbr}[${subLord.slice(0, 2)}]` : pAbbr}
                       {p.isOverlay ? "ᴳ" : ""}
@@ -444,11 +547,15 @@ export default function NorthIndianChart({
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
                   {selectedOccupants.map((occ) => {
                     const piIdx = PLS.indexOf(occ.name);
-                    const color = piIdx >= 0 ? PCOL[piIdx] : "#B8860B";
+                    const outerStyle = OUTER_PLANET_STYLE[occ.name];
+                    const color = piIdx >= 0 ? PCOL[piIdx] : outerStyle ? outerStyle.color : "#B8860B";
+                    const displayName = outerStyle ? outerStyle.label : occ.name;
                     const degText =
                       occ.degree !== undefined && occ.minutes !== undefined
                         ? `${occ.degree}° ${occ.minutes}'`
-                        : "";
+                        : occ.degree !== undefined
+                          ? `${occ.degree}°`
+                          : "";
                     return (
                       <span
                         key={occ.name}
@@ -459,11 +566,11 @@ export default function NorthIndianChart({
                           padding: "3px 8px",
                           borderRadius: 6,
                           background: "#FFFFFF",
-                          border: "1px solid rgba(184, 134, 11, 0.2)",
+                          border: `1px solid ${color}40`,
                           fontSize: 11.5,
                         }}
                       >
-                        <span style={{ color, fontWeight: 700 }}>{occ.name}</span>
+                        <span style={{ color, fontWeight: 700 }}>{displayName}</span>
                         {occ.retro && <span style={{ color: "#D97706", fontWeight: 700 }}>(R)</span>}
                         {degText && <span style={{ color: "#1A1A1A", fontWeight: 600 }}>{degText}</span>}
                         {occ.nakshatra && (
@@ -496,6 +603,120 @@ export default function NorthIndianChart({
               💡 Click any house on the chart to inspect its planets, exact degrees &amp; nakshatras
             </div>
           )}
+        </div>
+      )}
+
+      {/* D1 Modern Outer Planets Toggle Bar */}
+      {showOuterToggles && isAnyOuterAvailable && (
+        <div
+          style={{
+            marginTop: 10,
+            padding: "8px 10px",
+            background: "#FAF7F2",
+            border: "1px solid rgba(184, 134, 11, 0.25)",
+            borderRadius: 8,
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: "#8A6008", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              ⚡ Modern Grahas (Outer Planets Layer)
+            </span>
+            <span style={{ fontSize: 9.5, color: "#8C8278" }}>Click to toggle on chart</span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {resolvedOuter.Indra && (
+              <button
+                type="button"
+                onClick={() => setEnabledOuter((prev) => ({ ...prev, indra: !prev.indra }))}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "3px 8px",
+                  borderRadius: 6,
+                  border: `1px solid ${enabledOuter.indra ? "#06b6d4" : "rgba(184, 134, 11, 0.2)"}`,
+                  background: enabledOuter.indra ? "rgba(6, 182, 212, 0.12)" : "#FFFFFF",
+                  color: enabledOuter.indra ? "#0891b2" : "#6B635B",
+                  fontSize: 11,
+                  fontWeight: enabledOuter.indra ? 700 : 500,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span>{enabledOuter.indra ? "☑" : "☐"}</span>
+                <span>⚡ Indra (Uranus)</span>
+                {resolvedOuter.Indra.house && (
+                  <span style={{ fontSize: 9.5, opacity: 0.8 }}>H{resolvedOuter.Indra.house}</span>
+                )}
+                {resolvedOuter.Indra.retrograde && (
+                  <span style={{ fontSize: 9.5, color: "#D97706", fontWeight: 700 }}>(R)</span>
+                )}
+              </button>
+            )}
+
+            {resolvedOuter.Varun && (
+              <button
+                type="button"
+                onClick={() => setEnabledOuter((prev) => ({ ...prev, varun: !prev.varun }))}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "3px 8px",
+                  borderRadius: 6,
+                  border: `1px solid ${enabledOuter.varun ? "#8b5cf6" : "rgba(184, 134, 11, 0.2)"}`,
+                  background: enabledOuter.varun ? "rgba(139, 92, 246, 0.12)" : "#FFFFFF",
+                  color: enabledOuter.varun ? "#7c3aed" : "#6B635B",
+                  fontSize: 11,
+                  fontWeight: enabledOuter.varun ? 700 : 500,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span>{enabledOuter.varun ? "☑" : "☐"}</span>
+                <span>🌊 Varun (Neptune)</span>
+                {resolvedOuter.Varun.house && (
+                  <span style={{ fontSize: 9.5, opacity: 0.8 }}>H{resolvedOuter.Varun.house}</span>
+                )}
+                {resolvedOuter.Varun.retrograde && (
+                  <span style={{ fontSize: 9.5, color: "#D97706", fontWeight: 700 }}>(R)</span>
+                )}
+              </button>
+            )}
+
+            {resolvedOuter.Yam && (
+              <button
+                type="button"
+                onClick={() => setEnabledOuter((prev) => ({ ...prev, yam: !prev.yam }))}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "3px 8px",
+                  borderRadius: 6,
+                  border: `1px solid ${enabledOuter.yam ? "#dc2626" : "rgba(184, 134, 11, 0.2)"}`,
+                  background: enabledOuter.yam ? "rgba(220, 38, 38, 0.12)" : "#FFFFFF",
+                  color: enabledOuter.yam ? "#b91c1c" : "#6B635B",
+                  fontSize: 11,
+                  fontWeight: enabledOuter.yam ? 700 : 500,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span>{enabledOuter.yam ? "☑" : "☐"}</span>
+                <span>🌋 Yam (Pluto)</span>
+                {resolvedOuter.Yam.house && (
+                  <span style={{ fontSize: 9.5, opacity: 0.8 }}>H{resolvedOuter.Yam.house}</span>
+                )}
+                {resolvedOuter.Yam.retrograde && (
+                  <span style={{ fontSize: 9.5, color: "#D97706", fontWeight: 700 }}>(R)</span>
+                )}
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -858,26 +858,144 @@ function expandHomeTag(tag: string, planet: string): string {
   return `${cleaned} ka ghar mein hona ${planet} ki urja ka ek seedha prabhav hai. Yeh sanket batata hai ki is grah ka prabhav aapke ghar ke mahaul mein clearly dikh raha hai. Is jagah ko saadar aur organized rakhna is grah ke aashirwaad ko barkarar rakhta hai.`;
 }
 
-// ── Classical Lal Kitab 1952 Varshphal Progression Table (Pt. Roop Chand Joshi) ──
-// Maps Natal House (1-12) to Annual Progressed House for Running Year Cycle (1-12)
+// ── Classical Lal Kitab 1952 Varshphal 120-Year Progression Table (Pt. Roop Chand Joshi) ──
+// Maps Natal House (1-12) to Annual Progressed House for Running Age (1-120)
 export const LK_1952_VARSHPHAL_TABLE: Record<number, Record<number, number>> = {
-  1:  { 1: 1,  2: 9,  3: 10, 4: 3,  5: 5,  6: 2,  7: 11, 8: 7,  9: 6,  10: 12, 11: 4,  12: 8 },
-  2:  { 1: 4,  2: 1,  3: 12, 4: 9,  5: 3,  6: 7,  7: 5,  8: 6,  9: 2,  10: 8,  11: 10, 12: 11 },
-  3:  { 1: 9,  2: 4,  3: 1,  4: 2,  5: 8,  6: 3,  7: 10, 8: 5,  9: 7,  10: 11, 11: 12, 12: 6 },
-  4:  { 1: 3,  2: 8,  3: 4,  4: 1,  5: 10, 6: 9,  7: 6,  8: 11, 9: 5,  10: 7,  11: 2,  12: 12 },
-  5:  { 1: 11, 2: 3,  3: 8,  4: 4,  5: 1,  6: 5,  7: 9,  8: 2,  9: 12, 10: 6,  11: 7,  12: 10 },
-  6:  { 1: 5,  2: 12, 3: 3,  4: 8,  5: 4,  6: 11, 7: 2,  8: 9,  9: 1,  10: 10, 11: 6,  12: 7 },
-  7:  { 1: 7,  2: 6,  3: 9,  4: 5,  5: 12, 6: 4,  7: 1,  8: 10, 9: 11, 10: 2,  11: 8,  12: 3 },
-  8:  { 1: 2,  2: 7,  3: 6,  4: 12, 5: 9,  6: 10, 7: 3,  8: 1,  9: 8,  10: 5,  11: 11, 12: 4 },
-  9:  { 1: 12, 2: 2,  3: 7,  4: 6,  5: 11, 6: 1,  7: 8,  8: 4,  9: 10, 10: 3,  11: 5,  12: 9 },
-  10: { 1: 10, 2: 11, 3: 2,  4: 7,  5: 6,  6: 12, 7: 4,  8: 8,  9: 3,  10: 1,  11: 9,  12: 5 },
-  11: { 1: 8,  2: 5,  3: 11, 4: 10, 5: 7,  6: 6,  7: 12, 8: 3,  9: 9,  10: 4,  11: 1,  12: 2 },
-  12: { 1: 6,  2: 10, 3: 5,  4: 11, 5: 2,  6: 8,  7: 7,  8: 12, 9: 4,  10: 9,  11: 3,  12: 1 },
+  // Cycle 1 (Ages 1 - 12)
+  1: { 1: 1, 2: 9, 3: 10, 4: 3, 5: 5, 6: 2, 7: 11, 8: 7, 9: 6, 10: 12, 11: 4, 12: 8 },
+  2: { 1: 4, 2: 1, 3: 12, 4: 9, 5: 3, 6: 7, 7: 5, 8: 6, 9: 2, 10: 8, 11: 10, 12: 11 },
+  3: { 1: 9, 2: 4, 3: 1, 4: 2, 5: 8, 6: 3, 7: 10, 8: 5, 9: 7, 10: 11, 11: 12, 12: 6 },
+  4: { 1: 3, 2: 8, 3: 4, 4: 1, 5: 10, 6: 9, 7: 6, 8: 11, 9: 5, 10: 7, 11: 2, 12: 12 },
+  5: { 1: 11, 2: 3, 3: 8, 4: 4, 5: 1, 6: 5, 7: 9, 8: 2, 9: 12, 10: 6, 11: 7, 12: 10 },
+  6: { 1: 5, 2: 12, 3: 3, 4: 8, 5: 4, 6: 11, 7: 2, 8: 9, 9: 1, 10: 10, 11: 6, 12: 7 },
+  7: { 1: 7, 2: 6, 3: 9, 4: 5, 5: 12, 6: 4, 7: 1, 8: 10, 9: 11, 10: 2, 11: 8, 12: 3 },
+  8: { 1: 2, 2: 7, 3: 6, 4: 12, 5: 9, 6: 10, 7: 3, 8: 1, 9: 8, 10: 5, 11: 11, 12: 4 },
+  9: { 1: 12, 2: 2, 3: 7, 4: 6, 5: 11, 6: 1, 7: 8, 8: 4, 9: 10, 10: 3, 11: 5, 12: 9 },
+  10: { 1: 10, 2: 11, 3: 2, 4: 7, 5: 6, 6: 12, 7: 4, 8: 8, 9: 3, 10: 1, 11: 9, 12: 5 },
+  11: { 1: 8, 2: 5, 3: 11, 4: 10, 5: 7, 6: 6, 7: 12, 8: 3, 9: 9, 10: 4, 11: 1, 12: 2 },
+  12: { 1: 6, 2: 10, 3: 5, 4: 11, 5: 2, 6: 8, 7: 7, 8: 12, 9: 4, 10: 9, 11: 3, 12: 1 },
+  // Cycle 2 (Ages 13 - 24)
+  13: { 1: 1, 2: 5, 3: 10, 4: 8, 5: 11, 6: 6, 7: 7, 8: 2, 9: 12, 10: 3, 11: 9, 12: 4 },
+  14: { 1: 4, 2: 1, 3: 3, 4: 2, 5: 5, 6: 7, 7: 8, 8: 11, 9: 6, 10: 12, 11: 10, 12: 9 },
+  15: { 1: 9, 2: 4, 3: 1, 4: 6, 5: 8, 6: 5, 7: 2, 8: 7, 9: 11, 10: 10, 11: 12, 12: 3 },
+  16: { 1: 3, 2: 9, 3: 4, 4: 1, 5: 12, 6: 8, 7: 6, 8: 5, 9: 2, 10: 7, 11: 11, 12: 10 },
+  17: { 1: 11, 2: 3, 3: 9, 4: 4, 5: 1, 6: 10, 7: 5, 8: 6, 9: 7, 10: 8, 11: 2, 12: 12 },
+  18: { 1: 5, 2: 11, 3: 6, 4: 9, 5: 4, 6: 1, 7: 12, 8: 8, 9: 10, 10: 2, 11: 3, 12: 7 },
+  19: { 1: 7, 2: 10, 3: 11, 4: 3, 5: 9, 6: 4, 7: 1, 8: 12, 9: 8, 10: 5, 11: 6, 12: 2 },
+  20: { 1: 2, 2: 7, 3: 5, 4: 12, 5: 3, 6: 9, 7: 10, 8: 1, 9: 4, 10: 6, 11: 8, 12: 11 },
+  21: { 1: 12, 2: 2, 3: 8, 4: 5, 5: 10, 6: 3, 7: 9, 8: 4, 9: 1, 10: 11, 11: 7, 12: 6 },
+  22: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 6, 6: 11, 7: 3, 8: 9, 9: 5, 10: 1, 11: 4, 12: 8 },
+  23: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 7, 6: 2, 7: 11, 8: 3, 9: 9, 10: 4, 11: 1, 12: 5 },
+  24: { 1: 6, 2: 8, 3: 7, 4: 11, 5: 2, 6: 12, 7: 4, 8: 10, 9: 3, 10: 9, 11: 5, 12: 1 },
+  // Cycle 3 (Ages 25 - 36)
+  25: { 1: 1, 2: 6, 3: 10, 4: 3, 5: 2, 6: 8, 7: 7, 8: 4, 9: 11, 10: 5, 11: 12, 12: 9 },
+  26: { 1: 4, 2: 1, 3: 3, 4: 8, 5: 6, 6: 7, 7: 2, 8: 11, 9: 12, 10: 9, 11: 5, 12: 10 },
+  27: { 1: 9, 2: 4, 3: 1, 4: 5, 5: 10, 6: 11, 7: 12, 8: 7, 9: 6, 10: 8, 11: 2, 12: 3 },
+  28: { 1: 3, 2: 9, 3: 4, 4: 1, 5: 11, 6: 5, 7: 6, 8: 8, 9: 7, 10: 2, 11: 10, 12: 12 },
+  29: { 1: 11, 2: 3, 3: 9, 4: 4, 5: 1, 6: 6, 7: 8, 8: 2, 9: 10, 10: 12, 11: 7, 12: 5 },
+  30: { 1: 5, 2: 11, 3: 8, 4: 9, 5: 4, 6: 1, 7: 3, 8: 12, 9: 2, 10: 10, 11: 6, 12: 7 },
+  31: { 1: 7, 2: 5, 3: 11, 4: 12, 5: 9, 6: 4, 7: 1, 8: 10, 9: 8, 10: 6, 11: 3, 12: 2 },
+  32: { 1: 2, 2: 7, 3: 5, 4: 11, 5: 3, 6: 12, 7: 10, 8: 6, 9: 4, 10: 1, 11: 9, 12: 8 },
+  33: { 1: 12, 2: 2, 3: 6, 4: 10, 5: 8, 6: 3, 7: 9, 8: 1, 9: 5, 10: 7, 11: 4, 12: 11 },
+  34: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 5, 6: 9, 7: 11, 8: 3, 9: 1, 10: 4, 11: 8, 12: 6 },
+  35: { 1: 8, 2: 10, 3: 12, 4: 6, 5: 7, 6: 2, 7: 4, 8: 5, 9: 9, 10: 3, 11: 11, 12: 1 },
+  36: { 1: 6, 2: 8, 3: 7, 4: 2, 5: 12, 6: 10, 7: 5, 8: 9, 9: 3, 10: 11, 11: 1, 12: 4 },
+  // Cycle 4 (Ages 37 - 48)
+  37: { 1: 1, 2: 3, 3: 10, 4: 6, 5: 9, 6: 12, 7: 7, 8: 5, 9: 11, 10: 2, 11: 4, 12: 8 },
+  38: { 1: 4, 2: 1, 3: 3, 4: 8, 5: 6, 6: 5, 7: 2, 8: 7, 9: 12, 10: 10, 11: 11, 12: 9 },
+  39: { 1: 9, 2: 4, 3: 1, 4: 12, 5: 8, 6: 2, 7: 10, 8: 11, 9: 6, 10: 3, 11: 5, 12: 7 },
+  40: { 1: 3, 2: 9, 3: 4, 4: 1, 5: 11, 6: 8, 7: 6, 8: 12, 9: 2, 10: 5, 11: 7, 12: 10 },
+  41: { 1: 11, 2: 7, 3: 9, 4: 4, 5: 1, 6: 6, 7: 8, 8: 2, 9: 10, 10: 12, 11: 3, 12: 5 },
+  42: { 1: 5, 2: 11, 3: 8, 4: 9, 5: 12, 6: 1, 7: 3, 8: 4, 9: 7, 10: 6, 11: 10, 12: 2 },
+  43: { 1: 7, 2: 5, 3: 11, 4: 2, 5: 3, 6: 4, 7: 1, 8: 10, 9: 8, 10: 9, 11: 12, 12: 6 },
+  44: { 1: 2, 2: 10, 3: 5, 4: 3, 5: 4, 6: 9, 7: 12, 8: 8, 9: 1, 10: 7, 11: 6, 12: 11 },
+  45: { 1: 12, 2: 2, 3: 6, 4: 5, 5: 10, 6: 7, 7: 9, 8: 1, 9: 3, 10: 11, 11: 8, 12: 4 },
+  46: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 5, 6: 3, 7: 11, 8: 6, 9: 4, 10: 8, 11: 9, 12: 1 },
+  47: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 7, 6: 11, 7: 4, 8: 9, 9: 5, 10: 1, 11: 2, 12: 3 },
+  48: { 1: 6, 2: 8, 3: 7, 4: 11, 5: 2, 6: 10, 7: 5, 8: 3, 9: 9, 10: 4, 11: 1, 12: 12 },
+  // Cycle 5 (Ages 49 - 60)
+  49: { 1: 1, 2: 7, 3: 10, 4: 6, 5: 12, 6: 2, 7: 8, 8: 4, 9: 11, 10: 9, 11: 3, 12: 5 },
+  50: { 1: 4, 2: 1, 3: 8, 4: 3, 5: 6, 6: 12, 7: 5, 8: 11, 9: 2, 10: 7, 11: 10, 12: 9 },
+  51: { 1: 9, 2: 4, 3: 1, 4: 2, 5: 8, 6: 3, 7: 12, 8: 6, 9: 7, 10: 10, 11: 5, 12: 11 },
+  52: { 1: 3, 2: 9, 3: 4, 4: 1, 5: 11, 6: 7, 7: 2, 8: 12, 9: 5, 10: 8, 11: 6, 12: 10 },
+  53: { 1: 11, 2: 10, 3: 7, 4: 4, 5: 1, 6: 6, 7: 3, 8: 9, 9: 12, 10: 5, 11: 8, 12: 2 },
+  54: { 1: 5, 2: 11, 3: 3, 4: 9, 5: 4, 6: 1, 7: 6, 8: 2, 9: 10, 10: 12, 11: 7, 12: 8 },
+  55: { 1: 7, 2: 5, 3: 11, 4: 8, 5: 3, 6: 9, 7: 1, 8: 10, 9: 6, 10: 4, 11: 2, 12: 12 },
+  56: { 1: 2, 2: 3, 3: 5, 4: 11, 5: 9, 6: 4, 7: 10, 8: 1, 9: 8, 10: 6, 11: 12, 12: 7 },
+  57: { 1: 12, 2: 2, 3: 6, 4: 5, 5: 10, 6: 8, 7: 9, 8: 7, 9: 4, 10: 11, 11: 1, 12: 3 },
+  58: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 5, 6: 11, 7: 4, 8: 8, 9: 3, 10: 1, 11: 9, 12: 6 },
+  59: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 7, 6: 5, 7: 11, 8: 3, 9: 9, 10: 2, 11: 4, 12: 1 },
+  60: { 1: 6, 2: 8, 3: 9, 4: 12, 5: 2, 6: 10, 7: 7, 8: 5, 9: 1, 10: 3, 11: 11, 12: 4 },
+  // Cycle 6 (Ages 61 - 72)
+  61: { 1: 1, 2: 11, 3: 10, 4: 6, 5: 12, 6: 2, 7: 4, 8: 7, 9: 8, 10: 9, 11: 5, 12: 3 },
+  62: { 1: 4, 2: 1, 3: 6, 4: 8, 5: 3, 6: 12, 7: 2, 8: 10, 9: 9, 10: 5, 11: 7, 12: 11 },
+  63: { 1: 9, 2: 4, 3: 1, 4: 2, 5: 8, 6: 6, 7: 12, 8: 11, 9: 7, 10: 3, 11: 10, 12: 5 },
+  64: { 1: 3, 2: 9, 3: 4, 4: 1, 5: 6, 6: 8, 7: 7, 8: 12, 9: 5, 10: 2, 11: 11, 12: 10 },
+  65: { 1: 11, 2: 2, 3: 9, 4: 4, 5: 1, 6: 5, 7: 8, 8: 3, 9: 10, 10: 12, 11: 6, 12: 7 },
+  66: { 1: 5, 2: 10, 3: 3, 4: 9, 5: 2, 6: 1, 7: 6, 8: 8, 9: 11, 10: 7, 11: 12, 12: 4 },
+  67: { 1: 7, 2: 5, 3: 11, 4: 3, 5: 10, 6: 4, 7: 1, 8: 9, 9: 12, 10: 6, 11: 8, 12: 2 },
+  68: { 1: 2, 2: 3, 3: 5, 4: 11, 5: 9, 6: 7, 7: 10, 8: 1, 9: 6, 10: 8, 11: 4, 12: 12 },
+  69: { 1: 12, 2: 8, 3: 7, 4: 5, 5: 11, 6: 3, 7: 9, 8: 4, 9: 1, 10: 10, 11: 2, 12: 6 },
+  70: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 5, 6: 11, 7: 3, 8: 6, 9: 4, 10: 1, 11: 9, 12: 8 },
+  71: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 7, 6: 9, 7: 11, 8: 5, 9: 2, 10: 4, 11: 3, 12: 1 },
+  72: { 1: 6, 2: 7, 3: 8, 4: 12, 5: 4, 6: 10, 7: 5, 8: 2, 9: 3, 10: 11, 11: 1, 12: 9 },
+  // Cycle 7 (Ages 73 - 84)
+  73: { 1: 1, 2: 4, 3: 10, 4: 6, 5: 12, 6: 11, 7: 7, 8: 8, 9: 2, 10: 5, 11: 9, 12: 3 },
+  74: { 1: 4, 2: 2, 3: 3, 4: 8, 5: 6, 6: 12, 7: 1, 8: 11, 9: 7, 10: 10, 11: 5, 12: 9 },
+  75: { 1: 9, 2: 10, 3: 1, 4: 3, 5: 8, 6: 6, 7: 2, 8: 7, 9: 5, 10: 4, 11: 12, 12: 11 },
+  76: { 1: 3, 2: 9, 3: 6, 4: 1, 5: 2, 6: 8, 7: 5, 8: 11, 9: 12, 10: 7, 11: 10, 12: 4 },
+  77: { 1: 11, 2: 3, 3: 9, 4: 4, 5: 1, 6: 2, 7: 8, 8: 10, 9: 12, 10: 6, 11: 7, 12: 5 },
+  78: { 1: 5, 2: 11, 3: 4, 4: 9, 5: 7, 6: 1, 7: 6, 8: 2, 9: 10, 10: 12, 11: 3, 12: 8 },
+  79: { 1: 7, 2: 5, 3: 11, 4: 2, 5: 9, 6: 4, 7: 12, 8: 6, 9: 3, 10: 1, 11: 8, 12: 10 },
+  80: { 1: 2, 2: 8, 3: 5, 4: 11, 5: 4, 6: 7, 7: 10, 8: 3, 9: 1, 10: 9, 11: 6, 12: 12 },
+  81: { 1: 12, 2: 1, 3: 7, 4: 5, 5: 11, 6: 10, 7: 9, 8: 4, 9: 8, 10: 3, 11: 2, 12: 6 },
+  82: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 5, 6: 3, 7: 4, 8: 9, 9: 6, 10: 8, 11: 11, 12: 1 },
+  83: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 3, 6: 5, 7: 11, 8: 1, 9: 9, 10: 2, 11: 4, 12: 7 },
+  84: { 1: 6, 2: 7, 3: 8, 4: 12, 5: 10, 6: 9, 7: 3, 8: 5, 9: 4, 10: 11, 11: 1, 12: 2 },
+  // Cycle 8 (Ages 85 - 96)
+  85: { 1: 1, 2: 3, 3: 10, 4: 6, 5: 12, 6: 2, 7: 8, 8: 11, 9: 5, 10: 4, 11: 9, 12: 7 },
+  86: { 1: 4, 2: 1, 3: 8, 4: 3, 5: 6, 6: 12, 7: 11, 8: 2, 9: 7, 10: 9, 11: 10, 12: 5 },
+  87: { 1: 9, 2: 4, 3: 1, 4: 7, 5: 3, 6: 8, 7: 12, 8: 5, 9: 2, 10: 6, 11: 11, 12: 10 },
+  88: { 1: 3, 2: 9, 3: 4, 4: 1, 5: 8, 6: 10, 7: 2, 8: 7, 9: 12, 10: 5, 11: 6, 12: 11 },
+  89: { 1: 11, 2: 10, 3: 9, 4: 4, 5: 1, 6: 6, 7: 7, 8: 12, 9: 3, 10: 8, 11: 5, 12: 2 },
+  90: { 1: 5, 2: 11, 3: 6, 4: 9, 5: 4, 6: 1, 7: 3, 8: 8, 9: 10, 10: 2, 11: 7, 12: 12 },
+  91: { 1: 7, 2: 5, 3: 11, 4: 2, 5: 10, 6: 4, 7: 6, 8: 9, 9: 8, 10: 3, 11: 12, 12: 1 },
+  92: { 1: 2, 2: 7, 3: 5, 4: 11, 5: 9, 6: 3, 7: 10, 8: 4, 9: 1, 10: 12, 11: 8, 12: 6 },
+  93: { 1: 12, 2: 8, 3: 7, 4: 5, 5: 2, 6: 11, 7: 9, 8: 1, 9: 6, 10: 10, 11: 3, 12: 4 },
+  94: { 1: 10, 2: 12, 3: 2, 4: 8, 5: 11, 6: 5, 7: 4, 8: 6, 9: 9, 10: 7, 11: 1, 12: 3 },
+  95: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 5, 6: 7, 7: 1, 8: 3, 9: 4, 10: 11, 11: 2, 12: 9 },
+  96: { 1: 6, 2: 2, 3: 3, 4: 12, 5: 7, 6: 9, 7: 5, 8: 10, 9: 11, 10: 1, 11: 4, 12: 8 },
+  // Cycle 9 (Ages 97 - 108)
+  97: { 1: 1, 2: 9, 3: 10, 4: 6, 5: 12, 6: 2, 7: 7, 8: 5, 9: 3, 10: 4, 11: 8, 12: 11 },
+  98: { 1: 4, 2: 1, 3: 6, 4: 8, 5: 10, 6: 12, 7: 11, 8: 2, 9: 9, 10: 7, 11: 3, 12: 5 },
+  99: { 1: 9, 2: 4, 3: 1, 4: 2, 5: 6, 6: 8, 7: 12, 8: 11, 9: 5, 10: 3, 11: 10, 12: 7 },
+  100: { 1: 3, 2: 10, 3: 8, 4: 1, 5: 5, 6: 7, 7: 6, 8: 12, 9: 2, 10: 9, 11: 11, 12: 4 },
+  101: { 1: 11, 2: 3, 3: 9, 4: 4, 5: 1, 6: 6, 7: 8, 8: 10, 9: 7, 10: 5, 11: 12, 12: 2 },
+  102: { 1: 5, 2: 11, 3: 3, 4: 9, 5: 4, 6: 1, 7: 2, 8: 6, 9: 8, 10: 12, 11: 7, 12: 10 },
+  103: { 1: 7, 2: 5, 3: 11, 4: 3, 5: 9, 6: 4, 7: 1, 8: 8, 9: 12, 10: 10, 11: 2, 12: 6 },
+  104: { 1: 2, 2: 7, 3: 5, 4: 11, 5: 3, 6: 9, 7: 10, 8: 1, 9: 6, 10: 8, 11: 4, 12: 12 },
+  105: { 1: 12, 2: 2, 3: 4, 4: 5, 5: 11, 6: 3, 7: 9, 8: 7, 9: 10, 10: 6, 11: 1, 12: 8 },
+  106: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 8, 6: 5, 7: 3, 8: 9, 9: 4, 10: 11, 11: 6, 12: 1 },
+  107: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 7, 6: 11, 7: 4, 8: 3, 9: 1, 10: 2, 11: 5, 12: 9 },
+  108: { 1: 6, 2: 8, 3: 7, 4: 12, 5: 2, 6: 10, 7: 5, 8: 4, 9: 11, 10: 1, 11: 9, 12: 3 },
+  // Cycle 10 (Ages 109 - 120)
+  109: { 1: 1, 2: 6, 3: 10, 4: 3, 5: 9, 6: 11, 7: 5, 8: 7, 9: 2, 10: 12, 11: 8, 12: 4 },
+  110: { 1: 4, 2: 1, 3: 6, 4: 8, 5: 10, 6: 12, 7: 3, 8: 5, 9: 7, 10: 2, 11: 11, 12: 9 },
+  111: { 1: 9, 2: 4, 3: 1, 4: 2, 5: 5, 6: 8, 7: 12, 8: 10, 9: 6, 10: 7, 11: 3, 12: 11 },
+  112: { 1: 3, 2: 10, 3: 8, 4: 9, 5: 11, 6: 7, 7: 4, 8: 1, 9: 2, 10: 12, 11: 6, 12: 5 },
+  113: { 1: 11, 2: 3, 3: 9, 4: 4, 5: 1, 6: 6, 7: 2, 8: 7, 9: 10, 10: 5, 11: 8, 12: 12 },
+  114: { 1: 5, 2: 11, 3: 3, 4: 1, 5: 4, 6: 10, 7: 6, 8: 8, 9: 12, 10: 9, 11: 7, 12: 2 },
+  115: { 1: 7, 2: 5, 3: 11, 4: 3, 5: 9, 6: 4, 7: 1, 8: 12, 9: 8, 10: 10, 11: 2, 12: 6 },
+  116: { 1: 2, 2: 7, 3: 5, 4: 11, 5: 3, 6: 9, 7: 10, 8: 6, 9: 4, 10: 8, 11: 12, 12: 1 },
+  117: { 1: 12, 2: 2, 3: 4, 4: 5, 5: 6, 6: 1, 7: 8, 8: 9, 9: 3, 10: 11, 11: 10, 12: 7 },
+  118: { 1: 10, 2: 12, 3: 2, 4: 7, 5: 8, 6: 11, 7: 9, 8: 3, 9: 1, 10: 6, 11: 5, 12: 4 },
+  119: { 1: 8, 2: 6, 3: 12, 4: 10, 5: 7, 6: 5, 7: 11, 8: 2, 9: 9, 10: 4, 11: 1, 12: 3 },
+  120: { 1: 6, 2: 8, 3: 7, 4: 12, 5: 2, 6: 3, 7: 5, 8: 4, 9: 11, 10: 1, 11: 9, 12: 10 },
 };
 
 export function getLalKitabVarshphalHouse(natalHouse: number, runningAge: number): number {
-  const cycleYear = (((runningAge - 1) % 12) + 12) % 12 + 1;
-  return LK_1952_VARSHPHAL_TABLE[cycleYear]?.[natalHouse] ?? natalHouse;
+  const effectiveAge = (((runningAge - 1) % 120) + 120) % 120 + 1;
+  return LK_1952_VARSHPHAL_TABLE[effectiveAge]?.[natalHouse] ?? natalHouse;
 }
 
 // ── MAIN CALCULATOR ───────────────────────────────────────
@@ -1328,7 +1446,8 @@ export function calculateLalKitab(
   });
 
   // ── Varshphal (Lal Kitab 1952 Classical Progression Table) ──
-  const runningAge = runningVarsh.completedYears + 1;
+  const varshphalAge = runningVarsh.completedYears > 0 ? runningVarsh.completedYears : 1;
+  const runningAge = varshphalAge;
   const cycleYear = (((runningAge - 1) % 12) + 12) % 12 + 1;
   const yearShift = cycleYear - 1;
 
@@ -1371,19 +1490,164 @@ export function calculateLalKitab(
   const shubhPlanets  = varshRows.filter(x => x.beneficMalefic === "Benefic" && [1,4,7,10,11].includes(x.varshHouse)).map(x => x.planet);
   const cautionPlanets= varshRows.filter(x => x.beneficMalefic === "Malefic" || [6,8,12].includes(x.varshHouse)).map(x => x.planet);
   const strongAnnual = varshRows.filter(row => row.kismatJaganewala || row.beneficMalefic !== "Mixed").slice(0, 3);
+
+  // ── Deep Lal Kitab 1952 Annual Prediction Synthesis ──
+  const varsheshwarFlavors: Record<string, string> = {
+    Jupiter: "Guru (Brihaspati) is varsh Varsheshwar hain — gyan, parivaarik samman, santan unnati aur shubh aashirwad ka varsh hai. Buzurgon ke charan sparsh aur peeli vastuon ke aadar se kismat ke band dwar khulenge.",
+    Sun: "Surya is varsh Varsheshwar hain — aatmasamman, prashasanik daayitva, samajik pratishta aur aatmanirbharta mein tezi aayegi. Krodh, ahankar aur sarkari niyam ullanghan se door rahein.",
+    Moon: "Chandra is varsh Varsheshwar hain — mansik shanti, maata ka aashirwad, bhavnatmak thehrav aur parivar mein sheetalta ka varsh hai. Doodh, chandi ya taaza paani se jude nimit shubh rahenge.",
+    Mars: "Mangal is varsh Varsheshwar hain — sahas, urja, zameen-jaydad ke faisle aur kathin chunautiyon par vijay milegi. Jaldbaazi, vivad aur rakt/BP utaar-chadhaw se savdhaan rahein.",
+    Mercury: "Budh is varsh Varsheshwar hain — vyaparik soojh-boojh, commercial contracts, communication aur likhit dastavez mein labh hoga. Behan, beti ya bua ka samman kalyankari rahega.",
+    Venus: "Shukra is varsh Varsheshwar hain — dampatya sukh, saundarya, aakarshan, vahan aur bhog-vilas ke sadhano mein vikas hoga. Kapdo ki safai aur shuchita banaye rakhein.",
+    Saturn: "Shani is varsh Varsheshwar hain — kathor anushasan, parishram aur karmik nishtha ka parikshan hoga. Mehnat se ghabrayein nahi; shramikon aur majdooron ki seva se bhaagya chamkega.",
+    Rahu: "Rahu is varsh Varsheshwar hain — achanak parivartan, digital/takneeki kshetra aur videsh ya doorasth sampark sakriya rahenge. Illusion, afwah aur bina kagaz ke nivesh se bachein.",
+    Ketu: "Ketu is varsh Varsheshwar hain — aatmik shanti, shodh, sadhana aur purani chintaon se mukti ka samay hai. Kutton ki seva aur dharmik dhyan vishesh phal dega.",
+  };
+
+  const primaryVarsheshwar = varsheshwar.split(",")[0].trim().split(" ")[0];
+  const varsheshwarText = varsheshwarFlavors[primaryVarsheshwar] ||
+    `Khana 1 Adhishtatha urja (${varsheshwar}) jeevan ko aatmanirbhar aur naye lakshyon ki ore sakriya karegi.`;
+
+  const kismatActive = varshRows.find(r => r.kismatJaganewala);
+  const kismatSentence = kismatActive
+    ? ` Is varsh aapka kismat jagane wala grah ${kismatActive.planet} Khana ${kismatActive.varshHouse} mein virajman ho kar bhagya ke dvar kholne ka mukhya nimit ban raha hai.`
+    : "";
+
+  const headline = `Lal Kitab 1952 Varshphal: Running Age ${runningAge} (12-Varshiya Chakra Varsh ${cycleYear}, Lagna: ${RASHIS_SA[lagnaNum]}). Varsheshwar: ${varsheshwar}. ${varsheshwarText}${kismatSentence}`;
+
+  // Career Synthesis (H10, H11, H6, H1)
+  const vH10Planets = varshRows.filter(r => r.varshHouse === 10);
+  const vH11Planets = varshRows.filter(r => r.varshHouse === 11);
+  const vH6Planets  = varshRows.filter(r => r.varshHouse === 6);
+  let careerText = "";
+  if (vH10Planets.length > 0) {
+    const p10 = vH10Planets[0];
+    const r10 = PLANET_HOUSE_RULES[p10.planet]?.[10];
+    careerText += `${p10.planet} Varshphal Khana 10 (Takht / Ajeevika) mein baitha hai: ${r10?.career || "Karyakshetra mein nishtha aur zimmedari badhegi"}. `;
+  }
+  if (vH11Planets.length > 0) {
+    careerText += `${vH11Planets.map(p => p.planet).join(", ")} Khana 11 mein aawak aur net-worth ke sadhano ko tezi de rahe hain, sahyogiyon se laabh milne ke sanket hain. `;
+  }
+  if (vH6Planets.length > 0) {
+    const isChallenged = vH6Planets.some(p => ["Malefic", "Mixed"].includes(p.beneficMalefic));
+    careerText += isChallenged
+      ? `${vH6Planets.map(p => p.planet).join(", ")} Khana 6 mein pratiyogita aur kaam ke daayitva mein bojh badha sakte hain; karyasthal par kisi aapsi vivad ya galti se bachein. `
+      : `${vH6Planets.map(p => p.planet).join(", ")} Khana 6 mein virodhiyon par dabdaba aur daily workflow mein sthirta dilayenge. `;
+  }
+  if (!careerText) {
+    careerText = `Is saal work houses (H10, H11, H6) shant hain, jiska arth hai ki maujuda profile ko polish karna aur routine kaam ko sthir rakhna sarvottam rahega. Khana 10 ke pakke swami Shani ke anusaar kaam mein aalas na karein, subordinates ke sath narm rahein aur lalach mein koi naya anjaana risk na lein.`;
+  } else {
+    careerText += `Kaam mein satyanishtha aur Lal Kitab maryada ka palan karein.`;
+  }
+
+  // Money Synthesis (H2, H11, H8, H12)
+  const vH2Planets  = varshRows.filter(r => r.varshHouse === 2);
+  const vH8Planets  = varshRows.filter(r => r.varshHouse === 8);
+  const vH12Planets = varshRows.filter(r => r.varshHouse === 12);
+  let moneyText = "";
+  if (vH2Planets.length > 0) {
+    const p2 = vH2Planets[0];
+    const r2 = PLANET_HOUSE_RULES[p2.planet]?.[2];
+    moneyText += `${p2.planet} Khana 2 (Dhana & Tijori) mein aane se: ${r2?.money || "Parivaarik sanchit dhan aur savings par seedha asar rahega"}. `;
+  }
+  if (vH11Planets.length > 0 && vH2Planets.length === 0) {
+    moneyText += `${vH11Planets.map(p => p.planet).join(", ")} Khana 11 mein aarthik aawak aur monthly cashflow ko niyamit banaye rakhenge. `;
+  }
+  if (vH8Planets.length > 0) {
+    moneyText += `Savdhani: ${vH8Planets.map(p => p.planet).join(", ")} Khana 8 mein anapekshit kharch, machine ya gaadi ki marammat, ya payment delay ka darr banate hain; kisi ko bina kagazi saboot ke udhaar na dein. `;
+  }
+  if (vH12Planets.length > 0) {
+    moneyText += `${vH12Planets.map(p => p.planet).join(", ")} Khana 12 mein hone se videsh, hospital, ya online/electronic transactions par kharch badh sakta hai; budget par sakht niyantran rakhein. `;
+  }
+  if (!moneyText) {
+    moneyText = `Dhan ke sthan (Khana 2 aur 11) par koi direct dushprabhav nahi hai. Dhan ka pravah samanya aur santulit rahega. Parivaarik sanchit punji ko surakshit rakhein aur speculative shares ya jua-type trades se poori tarah bachein.`;
+  }
+
+  // Family Synthesis (H2, H4, H7, H9)
+  const vH4Planets = varshRows.filter(r => r.varshHouse === 4);
+  const vH7Planets = varshRows.filter(r => r.varshHouse === 7);
+  const vH9Planets = varshRows.filter(r => r.varshHouse === 9);
+  let familyText = "";
+  if (vH4Planets.length > 0) {
+    const p4 = vH4Planets[0];
+    const r4 = PLANET_HOUSE_RULES[p4.planet]?.[4];
+    familyText += `${p4.planet} Khana 4 (Ghar & Maata) mein: ${r4?.family || "Ghar ke sukh-shanti aur maata ke swasthya ka sanket deta hai"}. `;
+  }
+  if (vH7Planets.length > 0) {
+    const p7 = vH7Planets[0];
+    const r7 = PLANET_HOUSE_RULES[p7.planet]?.[7];
+    familyText += `${p7.planet} Khana 7 (Jeevansathi & Saajhedaari) mein hone se: ${r7?.marriage || "Dampatya jeevan mein taalmeyl aur sauhard banaye rakhna zaroori hoga"}. `;
+  }
+  if (vH9Planets.length > 0) {
+    familyText += `${vH9Planets.map(p => p.planet).join(", ")} Khana 9 mein pita aur kul ke bujurgon ke aashirwad ka nimit ban rahe hain. `;
+  }
+  if (vH2Planets.length > 0 && vH4Planets.length === 0) {
+    familyText += `${vH2Planets.map(p => p.planet).join(", ")} Khana 2 mein kutumb ke logon ke sath baatcheet aur parivaarik aayojano ko sakriya karenge. `;
+  }
+  if (!familyText) {
+    familyText = `Parivaarik sthan shant aur anukool hain. Jeevansathi, mata-pita aur bhai-behno ke sath samwaad khula rakhein. Ghar ke bujurgon ka ashirwad aur rasoi mein baithkar bhojan karna parivaarik shanti ko majboot karega.`;
+  }
+
+  // Health Synthesis (H1, H6, H8, H12)
+  const vH1PlanetsHealth = varshRows.filter(r => r.varshHouse === 1 && ["Malefic", "Mixed"].includes(r.beneficMalefic));
+  let healthText = "";
+  if (vH1PlanetsHealth.length > 0) {
+    healthText += `${vH1PlanetsHealth.map(p => p.planet).join(", ")} Khana 1 mein hone se seer dard, sharirik thakan ya aatmavishwas ke utaar-chadhaw par dhyan dein. `;
+  }
+  if (vH6Planets.length > 0) {
+    const p6 = vH6Planets[0];
+    const r6 = PLANET_HOUSE_RULES[p6.planet]?.[6];
+    healthText += `${p6.planet} Khana 6 mein rukh rakhne se: ${r6?.health || "Paachan, acidity ya seasonal sardi-zukham se savdhani maangta hai"}. `;
+  }
+  if (vH8Planets.length > 0) {
+    const p8 = vH8Planets[0];
+    const r8 = PLANET_HOUSE_RULES[p8.planet]?.[8];
+    healthText += `${p8.planet} Khana 8 mein jodo ke dard (joints), neend ya achanak susti ke prati savdhaan rehne ka sanket deta hai. `;
+  }
+  if (vH12Planets.length > 0 && !healthText) {
+    healthText += `${vH12Planets.map(p => p.planet).join(", ")} Khana 12 mein neend ki aniyamitta ya aakhon par screen-time ka dabav badha sakta hai; raat ko samay par sone ki aadat daalein. `;
+  }
+  if (!healthText) {
+    healthText = `Swasthya ke sthan par koi gambhir nakaratmak grah prabhav nahi hai. Shareer mein vata-pitta ka santulan rakhein, swachh aahar lein aur niyamit dincharya banaye rakhein.`;
+  }
+
+  // Remedy Synthesis (Classical Lal Kitab 1952)
+  const afflicted = varshRows.filter(r => [6, 8, 12].includes(r.varshHouse) || r.beneficMalefic === "Malefic");
+  const specificRemedies: string[] = [];
+
+  afflicted.forEach(r => {
+    if (r.planet === "Rahu" && [8, 12].includes(r.varshHouse)) {
+      specificRemedies.push("Rahu shanti hetu jau (barley) ya nariyal bahte jal mein pravahit karein, ghar ki chhat par kabad ya kharab electronics na rakhein");
+    } else if (r.planet === "Ketu" && [6, 8].includes(r.varshHouse)) {
+      specificRemedies.push("Ketu hetu do-rangi (kaale-safed) kutte ko meethi roti khilayein, kaan ya jodo ki safai rakhein");
+    } else if (r.planet === "Saturn" && [6, 8].includes(r.varshHouse)) {
+      specificRemedies.push("Shani shanti ke liye shramikon aur majdooron ko samman dein, shaniwar ko sarson ke tel mein chhaya dekh kar daan karein");
+    } else if (r.planet === "Mars" && [8, 12].includes(r.varshHouse)) {
+      specificRemedies.push("Mangal mandi ke liye mitti ke bartan mein shehad bhar kar surakshit sthan par rakhein, rasoi mein meetha banayein");
+    } else if (r.planet === "Mercury" && [12, 8].includes(r.varshHouse)) {
+      specificRemedies.push("Budh shanti ke liye taambe ka chhed wala sikka gale mein dharan karein ya behan-beti ko samman dein");
+    } else if (r.planet === "Moon" && [6, 8].includes(r.varshHouse)) {
+      specificRemedies.push("Chandra hetu chandi ka chaukore tukda hamesha apne paas rakhein, maata ke charan sparsh karein");
+    } else if (r.planet === "Sun" && [6, 7, 8].includes(r.varshHouse)) {
+      specificRemedies.push("Surya hetu pita ka samman karein, taambe ke bartan se surya ko jal arpit karein, gusse se bachein");
+    } else if (r.planet === "Jupiter" && [6, 10].includes(r.varshHouse)) {
+      specificRemedies.push("Guru shanti ke liye kesar ya haldi ka tilak maathe aur naabhi par lagayein, peepal ko jal dein");
+    } else if (r.planet === "Venus" && [6, 9].includes(r.varshHouse)) {
+      specificRemedies.push("Shukra hetu safed vastra aur sugandh ka prayog karein, jeevansathi ka aadar karein");
+    }
+  });
+
+  const remedyText = specificRemedies.length > 0
+    ? `Is varsh ke Pramukh Lal Kitab Upaya: 1) ${specificRemedies.slice(0, 2).join("; 2) ")}. Niyam: Yeh upaya keval is varsh ke liye hain. Kismat jagane wale shubh grah ki mukhya vastu ka daan kadapi na karein!`
+    : `Lal Kitab Varshphal Upaya niyam: Is saal koi bhari dushprabhav nahi hai. Shubh aacharan, rasoi mein baithkar bhojan, mata-pita ki seva aur ghar ke mandir ko saaf rakhna hi sarvottam upaya hai. Supportive grah ki mukhya vastu ka daan kadapi na karein.`;
+
   const annualPrediction: LKVarshphalPrediction = {
-    headline:
-      `Lal Kitab 1952 Varshphal: Running Age ${runningAge} (12-Varshiya Chakra Varsh ${cycleYear}). Natal Lagna: ${RASHIS_SA[lagnaNum]}. Varshphal mein Varsheshwar: ${varsheshwar}. ${strongAnnual.length ? `${strongAnnual.map(row => `${row.planet} H${row.varshHouse}`).join(", ")} is saal sabse sakriya urja rahenge.` : "Year ka result balanced rahega."}`,
-    career:
-      `Career reading mein Varshphal H10, H11, H6 aur active grahon ko priority milegi. ${varshRows.filter(row => [6,10,11].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Koi direct work-house trigger nahi"}; kaam mein satyanishtha aur Lal Kitab maryada ka palan karein.`,
-    money:
-      `Money reading Varshphal H2, H11, H8 aur H12 se dekhi gayi. ${varshRows.filter(row => [2,8,11,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Money houses par direct affliction nahi"}; apratyakshit kharch ya anavashyak rin lene se bachein.`,
-    family:
-      `Family reading Varshphal H2, H4, H7 aur H9 se dekhi gayi. ${varshRows.filter(row => [2,4,7,9].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Family houses shant hain"}; mata-pita, jeevansathi aur guru ke ashirwad ko varsh ka mukhya nimit maanein.`,
-    health:
-      `Health reading Varshphal H1, H6, H8 aur H12 se dekhi gayi. ${varshRows.filter(row => [1,6,8,12].includes(row.varshHouse)).map(row => `${row.planet} H${row.varshHouse}`).join(", ") || "Major health sanket shant hai"}; niyamit dincharya aur swachh aahar banaye rakhein.`,
-    remedy:
-      `Lal Kitab Varshphal Upaya niyam: Upaya keval usi varsh ke liye maanya hote hain. Supportive grah ki mukhya vastu ka daan kadapi na karein; challenged grah ka daan ya seva shant bhav se karein.`,
+    headline,
+    career: careerText,
+    money: moneyText,
+    family: familyText,
+    health: healthText,
+    remedy: remedyText,
   };
 
   // ── 12-Year Varshphal Matrix (Classical Progression Roadmap) ──
@@ -1391,7 +1655,7 @@ export function calculateLalKitab(
   const startCycleYearRunningAge = runningAge - (cycleYear - 1);
   for (let c = 1; c <= 12; c++) {
     const rowRunningAge = startCycleYearRunningAge + (c - 1);
-    const calYear = birthYear + rowRunningAge - 1;
+    const calYear = birthYear + rowRunningAge;
     const pHouses: Record<string, number> = {};
     PLS.forEach(p => {
       if (planets[p]) {

@@ -1,4 +1,4 @@
-import { calculateLalKitab, type LKPlanet, type LKVarshphal } from "@/lib/astro-engine/lalkitab";
+import { calculateLalKitab, type LKPlanet, type LKVarshphal } from "../astro-engine/lalkitab";
 
 export type LalKitabTimeCycleMethod =
   | "35_year_chakra"
@@ -539,14 +539,126 @@ function buildVarshphal(
     activePlanets,
     summary,
     prediction:
-      `${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak ka Varshphal (Pt. Roop Chand Joshi 1952 Paddhati, Running Age ${runningAge}). ${activeLine} ${shubhLine} ${cautionLine} Is saal ka practical reading yeh hai ki bade kaam tab karein jab active house ki zimmedari clear ho: documents, family promise, health routine, money flow aur relationship duties ko pending na chhodein. Remedy ke naam par sab grahon ka daan nahi; sirf wahi vastu daan karein jiska grah natal Lal Kitab chart mein challenge zone mein ho.`,
+      base.annualPrediction
+        ? `${base.annualPrediction.headline} ${base.annualPrediction.career} ${base.annualPrediction.money} ${base.annualPrediction.remedy}`
+        : `${formatLKDate(runningVarsh.startDate)} se ${formatLKDate(runningVarsh.endDate)} tak ka Varshphal (Pt. Roop Chand Joshi 1952 Paddhati, Running Age ${runningAge}). ${activeLine} ${shubhLine} ${cautionLine}`,
     actionLine:
-      base.cautionPlanets.length > 0
+      base.annualPrediction?.remedy ||
+      (base.cautionPlanets.length > 0
         ? `Handle ${base.cautionPlanets.join(", ")} with discipline and safe remedies; avoid fear-based daan.`
-        : `Use shubh planets and active house matters for planning, but keep remedies chart-specific.`,
+        : `Use shubh planets and active house matters for planning, but keep remedies chart-specific.`),
     confidence: base.year === runningVarsh.startYear ? "lal_kitab_varshphal" : "classical_timing",
   };
 }
+
+// ── Classical Lal Kitab 1952 Monthly House & Nimit Knowledge ──
+interface LKMonthlyHouseMeta {
+  hindiName: string;
+  pakkaRulers: string;
+  significance: string;
+  defaultNimit: string[];
+  defaultDo: string[];
+  defaultAvoid: string[];
+}
+
+const LK_MONTHLY_HOUSE_DATA: Record<number, LKMonthlyHouseMeta> = {
+  1: {
+    hindiName: "Pehla Khana (Tanu · Seer · Aatmasamman)",
+    pakkaRulers: "Surya & Mangal",
+    significance: "Sharirik urja, aatmavishwas, seer ki shanti aur jeevan ki disha",
+    defaultNimit: ["Chashma ya topi gum hona ya milna", "Maathe par dhoop se garmi ya halka dard", "Naye kapde ya naya faisla lene ki ichha", "Mukhya dwar par safai ki aavashyakta"],
+    defaultDo: ["Subah taaza paani pi kar surya ko namaskar karein", "Aatmasamman banaye rakhein par ahankar se door rahein", "Mukhya pravesh dwar ko saaf aur roshan rakhein", "Bade bujurgon ke charan sparsh se din shuru karein"],
+    defaultAvoid: ["Gusse mein aakar koi lamba wada na karein", "Raat ko der tak jaag kar subah late uthna", "Bina wajah kisi par chillana ya ahem dikhana", "Ghar ke main gate par kooda ya jootey bikharna"],
+  },
+  2: {
+    hindiName: "Doosra Khana (Dhana · Tijori · Kutumb)",
+    pakkaRulers: "Guru & Shukra",
+    significance: "Sanchit punji, bank balance, parivaarik baatcheet aur vaani",
+    defaultNimit: ["Mandir ke aas-paas ya tijori ke paas safai", "Parivar mein kisi dawat ya dharohar par charcha", "Purane sikke ya gehne dekhne ka avsar", "Meethe bhojan ki apeksha ya baatcheet"],
+    defaultDo: ["Meethi aur narm vaani ka prayog karein", "Mandir ya tijori mein chandi ya kesar ka nimit rakhein", "Kutumb ke buzurgon ko aadar ke sath bhojan karwayein", "Dhan ki bachat ko likhit roop mein niyamit karein"],
+    defaultAvoid: ["Parivaarik baatcheet mein kadwe shabdo ka istemal", "Tijori ya locker mein fultu kabaad jama karna", "Bina soche-samjhe anavashyak aarthik risk lena", "Dharma sthan ya mandir ke niyam todna"],
+  },
+  3: {
+    hindiName: "Teesra Khana (Bhrata · Sahas · Sandesh)",
+    pakkaRulers: "Mangal & Budh",
+    significance: "Bhai-behan, short journeys, communication, haath aur dastavez",
+    defaultNimit: ["Chhoti yatra ya ticket booking ka yog", "Bhai ya behan ka achanak phone/sandesh", "Haath ya kandhe (shoulders) mein halki thakan", "Writing, paperwork ya online files ka kaam"],
+    defaultDo: ["Bhai-behno aur padosiyo ke sath prem banaye rakhein", "Important paperwork ko dhyan se padhkar sign karein", "Sharirik vyayam ya yoga se baahon ko sakriya rakhein", "Chhoti yatraon ke dauran samay ka palan karein"],
+    defaultAvoid: ["Bhai-behno se kisi purani baat par kadvahat", "Bina verify kiye WhatsApp/email par faisla lena", "Aalas mein important dastavez ko pending chhodna", "Haath ke auzaron ya hathiyaron se laparwahi"],
+  },
+  4: {
+    hindiName: "Chautha Khana (Maata · Sukh · Peene ka Paani)",
+    pakkaRulers: "Chandra",
+    significance: "Ghar ka sukh-chain, maata ka ashirwad, paani aur vahan",
+    defaultNimit: ["Ghar ke nal se paani tapakna ya tanki overflow hona", "Doodh ka ubal kar girna ya safed vastu aana", "Maata ji ki tabiyat ya unka achanak ashirwad", "Ghar ke farsh par nami ya safai"],
+    defaultDo: ["Maata ke charan sparsh karke unka ashirwad lein", "Ghar ke peene ke paani ke sthan ko swachh rakhein", "Chandi ke bartan mein paani peena labhkari rahega", "Ghar ke aangan aur drawing room ko shant rakhein"],
+    defaultAvoid: ["Ghar mein paani ya doodh ki barbadi karna", "Maata ya maata tulya stri ke aadar mein chook", "Ghar mein raat ko chhat par ya aangan mein klesh", "Seelan aur gande paani ka thehrav ignore karna"],
+  },
+  5: {
+    hindiName: "Paanchva Khana (Santan · Buddhi · Purva Punya)",
+    pakkaRulers: "Guru",
+    significance: "Padhai, vidya, bachon ka vikas, aatmik gyan aur purva punya",
+    defaultNimit: ["Kitabo ya stationery par dhool safai", "Bachon ki shiksha ya unki aadat par dhyan aana", "Puja-path mein achanak dhyan lagna", "Pet (digestion) mein halki garmi ya bhookh mein badlav"],
+    defaultDo: ["Roz thoda samay adhyayan aur shant dhyan mein bitayein", "Bachon ke sath dostana aur prerak vatavaran rakhein", "Guru mantra ya Gayatri mantra ka jaap karein", "Bhojan mein satvik aur taaza aahar shaamil karein"],
+    defaultAvoid: ["Bina research ke stock market ya gambling mein daanv", "Bachon par anavashyak gussa ya shanka karna", "Pavitra kitabon ya adhyayan samagri ka apman", "Basi ya bhari fried khana khana"],
+  },
+  6: {
+    hindiName: "Chhatha Khana (Rin · Rog · Shatru · Mama)",
+    pakkaRulers: "Budh & Ketu",
+    significance: "Karyasthal ka bojh, pratiyogita, swasthya jaanch aur maternal relatives",
+    defaultNimit: ["Masi ya mama ji se sandesh ya mulaqat", "Office mein achanak checking ya files ka audit", "Paltoo janwar ya kutte ka aana", "Pet mein gas ya paachan vikar ka halka lakshan"],
+    defaultDo: ["Karyasthal par imaandari aur anushasan se kaam karein", "Purane udhaar ya debt ki repayment schedule banayein", "Roz subah gunguna paani piyein aur walk karein", "Kutton ko meethi roti ya doodh-roti khilayein"],
+    defaultAvoid: ["Office mein aapsi chugli ya vivad mein hissa lena", "Naya anavashyak loan ya credit card liability badhana", "Maternal relatives ke sath aarthik matbhed", "Chhoti bimari ko ignore karke dawai na lena"],
+  },
+  7: {
+    hindiName: "Saatva Khana (Dampatya · Saajhedaari · Vyapar)",
+    pakkaRulers: "Shukra & Budh",
+    significance: "Jeevansathi ka sath, daily retail business, public contacts aur bedroom",
+    defaultNimit: ["Jeevansathi ke kapde ya shringaar ki vastu khareedna", "Ghar ke bedroom mein safai aur sugandh", "Business partner ya retail customer ka naya contact", "Kacha doodh ya dahi ka rasoi mein aana"],
+    defaultDo: ["Jeevansathi ki pasand aur ichhaon ka samman karein", "Bedroom ko swachh, sugandhit aur vyavasthit rakhein", "Vyaparik deals ko written agreement ke sath finalize karein", "Dahi ya makhan ka rasoi mein niyamit upyog karein"],
+    defaultAvoid: ["Jeevansathi par bina baat ke gussa ya shanka", "Bedroom mein kabad, tute kanch ya joote rakhna", "Business partner se koi gupt jhooth bolna", "Gande ya fati hui bedsheet ka upyog karna"],
+  },
+  8: {
+    hindiName: "Aathva Khana (Achanak Ghatna · Rahasya · Seelan)",
+    pakkaRulers: "Mangal & Shani",
+    significance: "Achanak badlav, purani seelan, secret matters, jodo ke dard aur machinery",
+    defaultNimit: ["Ghar ki dakshin deewar par seelan ya plaster girna", "Chabi (keys) ya purani cheez ka achanak gumna", "Gas chulha, stove ya tandoor ki repairing", "Jodo (joints) ya kamar mein achanak jakdan"],
+    defaultDo: ["Dakshin disha aur rasoi ki bhati/stove ko swachh rakhein", "Raat ko jaldi soyein aur vehicle hamesha dhyan se chalayein", "Purana loha ya toot-phoot ghar se turant hatayein", "Pavitra mantra jaap aur eeshwar chintan karein"],
+    defaultAvoid: ["Andhere ya sunsan raste par akele tezi se chalna", "Dakshin gate par kabad ya ganda paani thehrane dena", "Bina kisi verification ke risky secret plan mein hissa lena", "Ghar mein bhatti ya tandoor zameen ke andar banana"],
+  },
+  9: {
+    hindiName: "Nauva Khana (Bhaagya · Pita · Teerth Yatra)",
+    pakkaRulers: "Guru",
+    significance: "Kismat ka uday, pita ka ashirwad, dharmik karya aur dhyan",
+    defaultNimit: ["Dharmik sthan ya mandir jane ka sudden plan", "Pita ji ki purani cheez ya unki salah milna", "Peeli daal, haldi ya kesar ka rasoi mein upyog", "Ghar mein kisi bujurg shant vyakti ka aagman"],
+    defaultDo: ["Pita aur guru ke charan sparsh karke ashirwad lein", "Maathe aur naabhi par kesar ya chandan ka tilak lagayein", "Dharmik granth ya gyanwardhak pustak padhein", "Kisi zarooratmand vidyarthi ki madad karein"],
+    defaultAvoid: ["Dharma, devta ya pita ke vachano ka mazaak udana", "Mandir mein ashuddh bhav se pravesh karna", "Bujurgon ki salah ko anadekha karke ahem dikhana", "Peepal ke ped ya devsthan ko ashuddh karna"],
+  },
+  10: {
+    hindiName: "Dasva Khana (Ajeevika · Takht · Pratishta)",
+    pakkaRulers: "Shani",
+    significance: "Career ka vikas, sarkari adhikaari, pita ka rutba aur samajik pad",
+    defaultNimit: ["Office se related purani files ya stamp ka kaam", "Pathar ke farsh ya cement ki safai", "Pita ke daayitva ya samajik prashansa ka sandesh", "Karyasthal par kisi senior official se meeting"],
+    defaultDo: ["Apne karma kshetra mein poori imaandari aur satya rakhein", "Shramikon, mazdooron aur subordinates ka aadar karein", "Sarkari niyamo aur taxes ka samay par palan karein", "Karya-sthal ki table aur auzaron ko saaf rakhein"],
+    defaultAvoid: ["Subordinates ya chhote karmiyon ke sath bhedbhav", "Sarkari karya mein rishwat ya jhooth ka sahara lena", "Office mein alcohol ya gande shabdo ka istemal", "Pita ya unke sthan ka anadar karna"],
+  },
+  11: {
+    hindiName: "Gyarahva Khana (Aawak · Laabh · Bada Bhai)",
+    pakkaRulers: "Guru",
+    significance: "Monthly profit, wishes fulfillment, bade bhai/behan aur social network",
+    defaultNimit: ["Purane dost ya bade bhai se achanak baatcheet", "Ruka hua paisa ya bonus aane ka sanket", "Ghar mein mehmaano ka aagman", "Naye contacts ya society meeting mein aamantran"],
+    defaultDo: ["Bade bhai aur jyeshth janon ka sammaan karein", "Apni kamai ka ek hissa daan ya shubh karya mein lagayein", "Social connections ke sath sachha sambandh banaye rakhein", "Naye lakshyon ki leekhit yojana banayein"],
+    defaultAvoid: ["Bade bhai se dhan ya zameen ko lekar vivad", "Lalach mein aakar dost ko dhoka dena", "Ghar aane wale mehmaan ka bina aadar bhej dena", "Galat ya anaitik sadhano se aavak badhana"],
+  },
+  12: {
+    hindiName: "Barahva Khana (Kharch · Neend · Videsh · Moksha)",
+    pakkaRulers: "Guru & Rahu",
+    significance: "Shayan sukh, neend, hospital/charity, videsh ya doorasth sampark",
+    defaultNimit: ["Neend mein ajeeb sapne ya raat ko neend tootna", "Chhat par padosi ya pakshi ka aagman", "Mobile charger, wiring ya bulb ka kharab hona", "Hospital, dawa ya anapekshit kharch ka bill"],
+    defaultDo: ["Raat ko sone se pehle pair saaf thande paani se dhoyein", "Chhat ko bilkul saaf aur kabad-mukt rakhein", "Rasoi mein baithkar khana khayein", "Zarooratmand marij ko dawa ya khana dein"],
+    defaultAvoid: ["Chhat par purana loha, lakdi ya toote bartan rakhna", "Bister par baithkar khana khana ya gandagi karna", "Raat ko late mobile screen dekh kar neend kharab karna", "Bina kisi wajah ke hospital ya davaon se darna"],
+  },
+};
 
 function buildMonthlyPhal(
   input: LalKitabTimeEngineInput,
@@ -562,16 +674,112 @@ function buildMonthlyPhal(
   const activePlanets = varshphal.chartRows
     ? varshphal.chartRows.filter((r) => r.varshHouse === activeHouse).map((r) => r.planet)
     : planetNamesInHouse(input.planets, activeHouse);
-  const theme = HOUSE_THEMES[activeHouse];
-  const nimitToWatch = getNimitFor(activePlanets, activeHouse);
+
+  const houseMeta = LK_MONTHLY_HOUSE_DATA[activeHouse] || LK_MONTHLY_HOUSE_DATA[1];
+  const theme = `${houseMeta.hindiName} · ${houseMeta.significance}`;
+
+  // Dynamic Overview Generation
+  let overview = "";
+  let moneyCareer = "";
+  let familyHealth = "";
+  const dynamicNimit: string[] = [...houseMeta.defaultNimit];
+  const dynamicDo: string[] = [...houseMeta.defaultDo];
+  const dynamicAvoid: string[] = [...houseMeta.defaultAvoid];
+
+  if (activePlanets.length > 0) {
+    const planetsStr = activePlanets.join(" aur ");
+    overview = `Is mahine Lal Kitab 1952 Paddhati ke anusaar ${houseMeta.hindiName} sakriya hai aur isme ${planetsStr} virajman hain. Varshphal ke niyam ke anusaar, is mahine ka mukhya dhyan ${houseMeta.significance} par rahega. ${planetsStr} ki urja is 30-din ke dauran seedhi halchal paida karegi; achanak nimit aur ghar ke ghatnakram ko gaur se dekhein.`;
+
+    if (activePlanets.includes("Sun")) {
+      overview += " Surya ki upsthiti se aatmasamman, sarkari karya aur aatmanirbharta mein uchhal aayega; parantu krodh se bachein.";
+      moneyCareer += "Senior officials, boss ya authority se sampark laabhdayak hoga. Sarkari ya administrative kaamon mein safalta milegi. ";
+      familyHealth += "Pita ki sehat aur unki salah is mahine sabse bada aashirwad banegi. Aankhon aur sir mein garmi badhne par taaza paani piyein. ";
+      dynamicNimit.unshift("Taambe ka bartan ya pita ki purani ghadi/chashma samne aana");
+      dynamicDo.unshift("Subah uthkar pita ke charan sparsh karein aur surya ko namaskar karein");
+      dynamicAvoid.unshift("Ahankaar mein aakar kisi adhikaari ya buzurg se vivaad na karein");
+    }
+    if (activePlanets.includes("Moon")) {
+      overview += " Chandra ki sthiti se mansik thehrav, maata ka aashirwad aur ghar mein sukh-shanti ka pravah badhega.";
+      moneyCareer += "Trading ya liquid cashflow mein achha movement milega. Lalch mein aakar jaldbaazi ka faisla na lein. ";
+      familyHealth += "Maata ka ashirwad aur ghar ke peene ke paani ki shuddhata sabse shubh phal degi. Mansik chintaon ko dhyan se shaant karein. ";
+      dynamicNimit.unshift("Doodh ka ubal kar girna ya ghar ke nal se paani ka rukaav theek hona");
+      dynamicDo.unshift("Chandi ke gilaas mein paani piyein aur maata ji ki seva karein");
+      dynamicAvoid.unshift("Raat ko kacha doodh peene se bachein aur maata ka dil na dukhayein");
+    }
+    if (activePlanets.includes("Mars")) {
+      overview += " Mangal yahan saahas aur faisla lene ki tezi dega, lekin gusse aur sharir mein pitta/acidity par niyantran rakhna aavashyak hai.";
+      moneyCareer += "Workplace par pratiyogiyon par dabdaba banega; kintu vivadon mein phasne ke bajaye apne goal par focus rakhein. ";
+      familyHealth += "Rasoi ke gas burner aur teekhi cheezon se savdhaan rahein. Raktchaap (BP) aur gusse ko santulit rakhein. ";
+      dynamicNimit.unshift("Kitchen mein chamach/bartan achanak girna ya gas chulha kharab hona");
+      dynamicDo.unshift("Bhaiyon ke sath milkar kaam karein aur rasoi mein meethi roti banayein");
+      dynamicAvoid.unshift("Jaldbaazi mein driving karna ya vehicle tezi se chalana");
+    }
+    if (activePlanets.includes("Mercury")) {
+      overview += " Budh ki upsthiti vyaparik buddhi, paperwork, communication aur commercial deals ke liye atyant shubh hai.";
+      moneyCareer += "Clients ke sath baatcheet, trading deals, aur nayi commercial partnership mein labh ke raste khulenge. ";
+      familyHealth += "Behan, beti ya bua ke sath samwaad shubh sanket dega. Daanto aur gale ki swachhta par vishesh dhyan dein. ";
+      dynamicNimit.unshift("Ghar ke green plant par nayi patti aana ya mobile/internet issue theek hona");
+      dynamicDo.unshift("Chhoti kanyaon ko meethi cheez ya hare phal dein, written notes banayein");
+      dynamicAvoid.unshift("Zabaan se jhooth bolna ya kisi ko dhoke bhara wada karna");
+    }
+    if (activePlanets.includes("Jupiter")) {
+      overview += " Guru yahan gyan, adhyayan, dharmik vishwas aur bujurgon ke ashirwad se kismat ko gati denge.";
+      moneyCareer += "Salahkari, shikshan, audit ya financial management mein safalta milegi. Dhan ka pravah sthir rahega. ";
+      familyHealth += "Parivaarik aadar aur purvajon ke ashirwad se ghar mein shanti rahegi. Saattvik aahar lein. ";
+      dynamicNimit.unshift("Kesar, peeli sarson ya mandir ki pustak ka samne aana");
+      dynamicDo.unshift("Maathe aur naabhi par kesar/haldi ka tilak lagayein, peepal ko jal dein");
+      dynamicAvoid.unshift("Pita tulya vyakti ya shikshak ka niradar kadapi na karein");
+    }
+    if (activePlanets.includes("Venus")) {
+      overview += " Shukra dampatya jeevan, saundarya, vahan sukh aur bhog-vilas ke sadhano mein unnati pradan karega.";
+      moneyCareer += "Creative, design, luxury ya female clients se jude karya mein vishesh aarthik laabh hoga. ";
+      familyHealth += "Jeevansathi ke sath prem badhega. Bedroom ki safai aur shuchita banaye rakhna anivarya hai. ";
+      dynamicNimit.unshift("Itra (perfume), safed kapde ya cosmetics ka aagman");
+      dynamicDo.unshift("Swachh safed vastra pehnein aur jeevansathi ki pasand ka dhyan rakhein");
+      dynamicAvoid.unshift("Bedroom mein tooti vastu rakhna ya gande kapde pehanna");
+    }
+    if (activePlanets.includes("Saturn")) {
+      overview += " Shani yahan karmik parikshan aur kathor mehnat ki maang karega; imaandari se kiye kaam ka dugna parinam milega.";
+      moneyCareer += "Karyasthal par zimmedari badhegi. Shramikon aur majdooron ka aadar karne se unka poora sahyog milega. ";
+      familyHealth += "Jodo ke dard, ghutno aur kamar par dhyan dein. Shaniwar ko sarson ke tel ki maalish labhkari rahegi. ";
+      dynamicNimit.unshift("Lohar/machinery repairer ka aana ya joote/chappal ki repairing");
+      dynamicDo.unshift("Mazdooron aur shramikon ko namkeen bhojan karwayein, anushasan rakhein");
+      dynamicAvoid.unshift("Kaam mein aalas karna ya apne se kamzor vyakti par rob jhaadna");
+    }
+    if (activePlanets.includes("Rahu")) {
+      overview += " Rahu achanak unexpected badlav, digital/technical karya aur chamatkari badlav la sakta hai; illusion se bachein.";
+      moneyCareer += "Online projects aur digital deals mein mauka milega; parantu bina kagazat ke koi bada payment transfer na karein. ";
+      familyHealth += "Neend mein bechaini ya ajeeb sapno se bachein. Ghar ki chhat aur dakshin-pashchim konay ko kabad-mukt rakhein. ";
+      dynamicNimit.unshift("Mobile charger/laptop mein sudden glitch ya sasural se unexpected call");
+      dynamicDo.unshift("Rasoi mein baithkar khana khayein aur jau (barley) jal mein pravahit karein");
+      dynamicAvoid.unshift("Raat ke samay lambi yatra ya kisi un-verified risky tip par invest karna");
+    }
+    if (activePlanets.includes("Ketu")) {
+      overview += " Ketu aatmik khoj, sadhana, shodh aur purani chintaon ke visarjan ka samay darshata hai.";
+      moneyCareer += "Silent research aur technical perfection par focus karein; public limelight ke bajaye backend kaam behtar rahega. ";
+      familyHealth += "Kaan, jodo aur pairon ke talwon ki safai rakhein. Do-rangi kutte ki seva atyant labhdayak hogi. ";
+      dynamicNimit.unshift("Ghar ke paas kisi kutte ka lagataar aana ya aatmik vichaar");
+      dynamicDo.unshift("Kutton ko meethi roti khilayein aur dhyan sadhana mein samay bitayein");
+      dynamicAvoid.unshift("Apne bhatije ya santan ke sath bina wajah kadvahat paida karna");
+    }
+  } else {
+    overview = `Is mahine Lal Kitab Varshphal mein ${houseMeta.hindiName} sakriya hai. Is khana mein is varsh koi grah sthit nahi hai, isliye iska phal iske pakke swami (${houseMeta.pakkaRulers}) aur ${houseMeta.significance} se nirdharit hoga. Yeh mahina ground-level foundation aur discipline banaye rakhne ka hai.`;
+    moneyCareer = `Work aur money side: Khana ${activeHouse} ke pakke niyam ka palan karein. Budget ko clean rakhein, ruka hua karya samapt karein aur lalach mein aakar koi risky commitment na karein.`;
+    familyHealth = `Ghar-parivar mein shaanti banaye rakhein. ${houseMeta.significance} se judi chintaon ko samay par baat karke suljhayein. Niyamit aahar aur swachhta banaye rakhein.`;
+  }
+
   const activeLine = activePlanets.length
-    ? `${activePlanets.join(", ")} is mahine Varshphal H${activeHouse} mein hone ke karan direct trigger dete hain. In grahon se judi vastu, aadat aur family signal ko carefully observe karein.`
-    : `Is mahine Varshphal H${activeHouse} mein koi direct grah nahi hai, isliye house theme aur annual varshphal ka promise zyada important rahega.`;
+    ? `${activePlanets.join(", ")} is mahine Varshphal H${activeHouse} mein hone ke karan direct trigger dete hain.`
+    : `Varshphal H${activeHouse} mein koi direct grah nahi hai; pakke swami (${houseMeta.pakkaRulers}) ka aashirwad kaam karega.`;
+
   const cautionLine = [6, 8, 12].includes(activeHouse)
-    ? "Yeh correction month hai: debt, disease, dispute, hidden stress, expense, sleep, hospital ya isolation type matters ko lightly na lein. Risky purchase, fight, impulsive loan, ego-based remedy aur bina samjhe daan avoid karein."
-    : [2, 4, 9, 10, 11].includes(activeHouse)
-      ? "Yeh mahina useful movement de sakta hai: family, home, fortune, career, income ya support network activate ho sakte hain. Documents, budget aur family/work duty clean ho to progress better milegi."
-      : "Is mahine ko simple, practical aur grounded rakhein. Chhoti galti bhi unnecessary confusion create kar sakti hai, isliye promise kam aur execution zyada rakhein.";
+    ? "Savdhani: Yeh vishesh correction ka mahina hai — udhaar, dispute, machinery fault ya anavashyak kharch se bachein."
+    : "Yeh mahina unnatikari aur sakriya hai — shubh nimiton ko pehchanein aur imandari se aage badhein.";
+
+  const prediction = `${houseMeta.hindiName} activation (Varsh month ${runningMonth}): ${overview} ${cautionLine}`;
+  const actionLine = activePlanets.length > 0
+    ? `${activePlanets.join(", ")} trigger: Supportive grah ki vastu daan na karein; challenged grah ki nishani dikhne par soft seva karein.`
+    : `Pakke swami (${houseMeta.pakkaRulers}) ki maryada aur Lal Kitab aacharan ka palan karein.`;
 
   return {
     method: "monthly_phal",
@@ -583,38 +791,16 @@ function buildMonthlyPhal(
     activeHouse,
     activePlanets,
     theme,
-    prediction:
-      `${MONTH_NAMES[month - 1]} ka monthly phal House ${activeHouse} ko activate karta hai: ${theme}. ${activeLine} ${cautionLine} Is mahine ghar ke sanket bhi important hain: jis grah ka trigger ho uski vastu tootna, gum hona, kharab hona, ya repeated expense dena ek nimit maana jayega. Remedy tabhi karein jab natal condition bhi confirm kare; supportive grah ki core vastu daan karke apni madad kam na karein.`,
-    actionLine:
-      activePlanets.length > 0
-        ? `${activePlanets.join(", ")} ke liye daan decision natal condition se niklega: 6/8/12, mandi ya dushman ho to controlled daan; nek/pakka/supportive ho to uski main vastu ka daan avoid.`
-        : `Monthly phal timing signal hai; final daan natal Lal Kitab condition se hi niklega.`,
-    overview:
-      `${MONTH_NAMES[month - 1]} mahine mein Lal Kitab monthly phal House ${activeHouse} ko activate karta hai. Is month ko sirf calendar month ke roop mein nahi dekhna; yeh annual varshphal ke andar ek focused sub-period hai. Jo kaam poore saal background mein chal raha tha, uska ek specific part is mahine visible ho sakta hai.`,
-    moneyCareer:
-      [2, 6, 10, 11].includes(activeHouse)
-        ? `Money/career side active hai. Income, workload, service, documentation, client dealing, boss pressure ya gains ka signal aa sakta hai. Agar active planets supportive hain to movement milega; agar challenging hain to debt, dispute, delay ya wrong commitment se bachna hoga.`
-        : `Money/career direct focus nahi hai, lekin is mahine ka house theme indirectly kaam aur dhan ko affect karega. Budget, documentation aur daily routine clean rakhna safe rahega.`,
-    familyHealth:
-      [1, 4, 6, 7, 8, 12].includes(activeHouse)
-        ? `Family/health side sensitive hai. Home peace, spouse/partner, mother, sleep, digestion, stress, hidden fear ya chronic pattern dhyan maang sakte hain. Small symptoms ko ignore na karein; Lal Kitab mein repeated small sign bhi nimit maana jata hai.`
-        : `Family/health side balanced rahe sakti hai, par user ko relation tone, food routine, sleep aur ghar ki safai maintain rakhni chahiye.`,
-    nimitToWatch,
-    doThisMonth: [
-      `House ${activeHouse} ke kaam ko organize karein: ${theme}.`,
-      "Bills, documents, promises and family duties ko delay na karein.",
-      "Agar active planet ka nimit repeat ho to us planet ki soft correction shuru karein.",
-      "Daan karna ho to item, day, intention aur recipient clean rakhein.",
-    ],
-    avoidThisMonth: [
-      "Supportive planet ki core vastu donate na karein.",
-      "Fear mein aakar multiple remedies ek saath na karein.",
-      "Broken objects, dirty water, old iron, unused tools, spoiled food ya neglected puja/books ko ignore na karein.",
-      "Risky purchase, loan, fight or legal promise ko bina verification finalize na karein.",
-    ],
+    prediction,
+    actionLine,
+    overview,
+    moneyCareer: moneyCareer.trim(),
+    familyHealth: familyHealth.trim(),
+    nimitToWatch: Array.from(new Set(dynamicNimit)).slice(0, 6),
+    doThisMonth: Array.from(new Set(dynamicDo)).slice(0, 4),
+    avoidThisMonth: Array.from(new Set(dynamicAvoid)).slice(0, 4),
     confidence: "rule_based_monthly",
-    sourceNote:
-      "Monthly phal is intentionally separate from astronomical transit and follows the Lal Kitab time-layer reading.",
+    sourceNote: "Monthly phal follows authentic Lal Kitab 1952 progressive house activation and planetary triggers.",
   };
 }
 
