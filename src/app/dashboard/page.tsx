@@ -20,6 +20,7 @@ import { CosmicPulseCard, CosmicRadar } from "@/components/cosmic-pulse";
 import { AajKaTaraCard } from "@/components/dasha/AajKaTaraCard";
 import { NakshatraRemedyDossierCard } from "@/components/remedies/NakshatraRemedyDossierCard";
 import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemediesDossier";
+import { LiveMuhurtaAlert } from "@/components/panchang/LiveMuhurtaAlert";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -706,6 +707,9 @@ function DashboardContent() {
               <div className="notif-btn">🔔</div>
             </div>
           </div>
+
+          {/* LIVE MUHURTA / RAHU KAAL BANNER */}
+          <LiveMuhurtaAlert className="mb-4" />
 
           {/* TABS */}
           <div className="tabs">

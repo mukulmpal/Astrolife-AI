@@ -34,6 +34,9 @@ import { evaluateVargaNeuroKarmicProfile } from "@/lib/astro-intelligence/varga-
 import { VargaNeuroKarmicCards } from "@/components/charts/VargaNeuroKarmicCards";
 import { LiveDashaTickerStrip } from "@/components/dasha/LiveDashaTickerStrip";
 import { VimshottariFiveLevelExplorer } from "@/components/dasha/VimshottariFiveLevelExplorer";
+import { DashaProgressCapsule } from "@/components/dasha/DashaProgressCapsule";
+import { LiveMuhurtaAlert } from "@/components/panchang/LiveMuhurtaAlert";
+import { runKPEngine } from "@/lib/astro-engine/kp";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -436,6 +439,57 @@ export default function KundliPage() {
     if (!d9) return [];
     return getNavamshaAnalysis(d9);
   }, [d9]);
+
+  // 4-Chart Quad View State & Engines (Lagna D1, Navamsha D9, Nirayana Bhava Chalit, KP Cuspal)
+  const [isQuadView, setIsQuadView] = useState(false);
+
+  const kpResult = useMemo(() => {
+    if (!chart?.planets) return null;
+    try {
+      return runKPEngine(chart as never);
+    } catch (err) {
+      console.warn("KP calculation error:", err);
+      return null;
+    }
+  }, [chart]);
+
+  const chalitPlanets = useMemo(() => {
+    if (!chart?.planets) return {};
+    if (!kpResult?.rows) return chart.planets;
+    const copy: Record<string, any> = { ...chart.planets };
+    kpResult.rows.forEach((row) => {
+      if (copy[row.name]) {
+        copy[row.name] = {
+          ...copy[row.name],
+          house: row.bhavaHouse,
+          retrograde: row.retrograde,
+        };
+      }
+    });
+    return copy;
+  }, [chart, kpResult]);
+
+  const kpPlanets = useMemo(() => {
+    if (!chart?.planets) return {};
+    if (!kpResult?.rows) return chart.planets;
+    const copy: Record<string, any> = { ...chart.planets };
+    kpResult.rows.forEach((row) => {
+      if (copy[row.name]) {
+        copy[row.name] = {
+          ...copy[row.name],
+          house: row.bhavaHouse,
+          retrograde: row.retrograde,
+          subLord: row.subLord,
+        };
+      }
+    });
+    return copy;
+  }, [chart, kpResult]);
+
+  const chalitShifts = useMemo(() => {
+    if (!kpResult?.rows) return [];
+    return kpResult.rows.filter((r) => r.bhavaShift !== 0);
+  }, [kpResult]);
 
   const d9Meta = useMemo(() => {
     if (!d9) return null;
@@ -1290,6 +1344,9 @@ export default function KundliPage() {
               ✓ NASA Ephemeris · Lahiri Ayanamsha · {presentYogas.length} Yogas Detected · Classical Math Verified
             </div>
 
+            {/* REAL-TIME LIVE MUHURTA / RAHU KAAL ALERT */}
+            <LiveMuhurtaAlert className="mb-4" />
+
             {/* LIVE DAILY PANCHANG EMBEDDED WIDGET */}
             <DailyPanchangWidget compact className="mb-4" />
 
@@ -1300,28 +1357,48 @@ export default function KundliPage() {
               className="mb-4"
             />
 
-            {/* ── 4 INTENT-DRIVEN PILLARS + ASK AI TABS ── */}
-            <div className="tabs">
-              {[
-                { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
-                { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "विस्तृत फलित" },
-                { id: "divisional", label: "🧩 16 Varga Charts (षोडशवर्ग)", badge: "D1-D60" },
-                { id: "clinical", label: "🧬 Clinical Intelligence (नाड़ी सूत्र)", badge: "5 Engines" },
-                { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
-                { id: "marriage", label: "💍 Love & Marriage (D-9)", badge: "Navamsha" },
-                { id: "timing", label: "⏳ Timing & Dashas", badge: "Vimshottari" },
-                { id: "specs", label: "🔬 Astrologer Tech Specs", badge: `${presentYogas.length} Yogas` },
-                { id: "ask_ai", label: "💬 Ask AI (Proof-Backed)", badge: "Live" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  className={`tab ${activeTab === tab.id ? "active" : ""}`}
-                  onClick={() => setActiveTab(tab.id)}
-                >
-                  <span>{tab.label}</span>
-                  {tab.badge && <span className="tab-badge">{tab.badge}</span>}
-                </button>
-              ))}
+            {/* ── 4 INTENT-DRIVEN PILLARS + ASK AI TABS WITH MOBILE SWIPE INDICATOR ── */}
+            <div className="relative mb-4">
+              <div
+                className="tabs"
+                style={{
+                  scrollbarWidth: "none",
+                  WebkitOverflowScrolling: "touch",
+                }}
+              >
+                {[
+                  { id: "overview", label: "🧭 Overview & Life Pulse", badge: null },
+                  { id: "master_dossier", label: "📜 संपूर्ण महा-विश्लेषण", badge: "विस्तृत फलित" },
+                  { id: "divisional", label: "🧩 16 Varga Charts (षोडशवर्ग)", badge: "D1-D60" },
+                  { id: "clinical", label: "🧬 Clinical Intelligence (नाड़ी सूत्र)", badge: "5 Engines" },
+                  { id: "career", label: "💼 Career & Wealth (D-10)", badge: "Karma" },
+                  { id: "marriage", label: "💍 Love & Marriage (D-9)", badge: "Navamsha" },
+                  { id: "timing", label: "⏳ Timing & Dashas", badge: "Vimshottari" },
+                  { id: "specs", label: "🔬 Astrologer Tech Specs", badge: `${presentYogas.length} Yogas` },
+                  { id: "ask_ai", label: "💬 Ask AI (Proof-Backed)", badge: "Live" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    className={`tab ${activeTab === tab.id ? "active" : ""}`}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    <span>{tab.label}</span>
+                    {tab.badge && <span className="tab-badge">{tab.badge}</span>}
+                  </button>
+                ))}
+              </div>
+
+              {/* Mobile Right Edge Gradient & Swipe Cue */}
+              <div
+                className="md:hidden pointer-events-none absolute right-0 top-0 bottom-0 flex items-center justify-end pr-1 text-xs"
+                style={{
+                  width: "36px",
+                  background: "linear-gradient(to right, transparent 0%, #FAF7F2 85%)",
+                  color: "#B8860B",
+                }}
+              >
+                <span className="animate-pulse" style={{ fontSize: "16px", fontWeight: 700 }}>›</span>
+              </div>
             </div>
 
             {/* ══════════════════════════════════════════════════════ */}
@@ -1330,26 +1407,144 @@ export default function KundliPage() {
             {activeTab === "overview" && (
               <div className="space-y-6">
                 {/* Visual Chart + Active Dasha Side by Side */}
-                <div className="chart-layout">
-                  {/* Lagna Chart */}
+                <div className={`chart-layout ${isQuadView ? "quad-active" : ""}`} style={isQuadView ? { gridTemplateColumns: "1fr" } : undefined}>
+                  {/* Kundli Diagram Card */}
                   <div className="card">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                       <div>
-                        <div className="card-tag">✦ Primary Birth Chart (D-1)</div>
-                        <div className="card-title serif">Janma Lagna Kundli</div>
+                        <div className="card-tag">
+                          {isQuadView ? "✦ 4-Chart Comparative Quad Engine" : "✦ Primary Birth Chart (D-1)"}
+                        </div>
+                        <div className="card-title serif mb-0">
+                          {isQuadView ? "4-Chart Quad View (2 ऊपर / 2 नीचे)" : "Janma Lagna Kundli"}
+                        </div>
                       </div>
-                      <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
-                        {chart.lagnaRashi} Rising
-                      </span>
+
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          onClick={() => setIsQuadView((v) => !v)}
+                          style={{
+                            padding: "6px 12px",
+                            borderRadius: "8px",
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            background: isQuadView ? "rgba(184, 134, 11, 0.16)" : "#FAF8F5",
+                            border: isQuadView ? "1.5px solid #B8860B" : "1px solid rgba(184, 134, 11, 0.3)",
+                            color: isQuadView ? "#B8860B" : "#1A1A1A",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}
+                        >
+                          <span>⊞</span>
+                          <span>{isQuadView ? "✓ 4-Chart Quad Active" : "⊞ Compare 4 Charts (Lagna, D9, Chalit, KP)"}</span>
+                        </button>
+
+                        <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
+                          {chart.lagnaRashi} Rising
+                        </span>
+                      </div>
                     </div>
 
-                    <div
-                      role="region"
-                      aria-label={`Natal chart for ${chart?.name || 'chart'}`}
-                      tabIndex={-1}
-                    >
-                      <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} />
-                    </div>
+                    {!isQuadView ? (
+                      /* SINGLE LAGNA CHART (Default) */
+                      <div
+                        role="region"
+                        aria-label={`Natal chart for ${chart?.name || 'chart'}`}
+                        tabIndex={-1}
+                      >
+                        <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} />
+                      </div>
+                    ) : (
+                      /* 4-CHART QUAD VIEW: 2 UP (Lagna + D9), 2 DOWN (Bhava Chalit + KP) */
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        {/* 1. Top-Left: Lagna (D1 Rashi) */}
+                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                            <div>
+                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 1 · राशि कुंडली</div>
+                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>D-1 Janma Lagna Kundli</div>
+                            </div>
+                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
+                              {chart.lagnaRashi}
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "center" }}>
+                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chart.planets} size={250} />
+                          </div>
+                        </div>
+
+                        {/* 2. Top-Right: Navamsha (D9 Dharma & Soul) */}
+                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                            <div>
+                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 2 · भाग्य व आत्मा</div>
+                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>D-9 Navamsha Kundli</div>
+                            </div>
+                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
+                              {d9?.rashi || "D-9"}
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "center" }}>
+                            {d9 ? (
+                              <NorthIndianChart lagnaNum={d9.lagnaNum} planets={d9Planets} size={250} />
+                            ) : (
+                              <div style={{ padding: "40px", fontSize: "12px", color: "#6B635B" }}>Calculating D9...</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 3. Bottom-Left: Nirayana Bhava Chalit */}
+                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                            <div>
+                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 3 · भाव चलित</div>
+                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>Nirayana Bhava Chalit</div>
+                            </div>
+                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: chalitShifts.length > 0 ? "rgba(220,38,38,0.1)" : "rgba(34,197,94,0.1)", color: chalitShifts.length > 0 ? "#DC2626" : "#15803D" }}>
+                              {chalitShifts.length > 0 ? `${chalitShifts.length} Shifted` : "No Shifts"}
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "center" }}>
+                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chalitPlanets} size={250} />
+                          </div>
+                          {chalitShifts.length > 0 && (
+                            <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: "8px", fontSize: "11px", color: "#991B1B" }}>
+                              <strong>✦ भाव परिवर्तन: </strong>
+                              {chalitShifts.map((s, idx) => (
+                                <span key={s.name}>
+                                  {idx > 0 && ", "}
+                                  <strong>{s.name}</strong> (H{s.rashiHouse}→H{s.bhavaHouse})
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 4. Bottom-Right: KP Cuspal Chart */}
+                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                            <div>
+                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 4 · कस्पल पद्धति</div>
+                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>KP Cuspal Chart</div>
+                            </div>
+                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
+                              Placidus Cusps
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "center" }}>
+                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={kpPlanets} size={250} />
+                          </div>
+                          <div style={{ marginTop: "8px", textAlign: "center" }}>
+                            <Link href="/dashboard/kp" style={{ fontSize: "11px", color: "#B8860B", fontWeight: 700, textDecoration: "none" }}>
+                              🔗 View Full KP Sub-Lord Significators Table →
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12 }}>
                       <div style={{ fontSize: 11, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4, fontWeight: 700 }}>
@@ -1370,7 +1565,7 @@ export default function KundliPage() {
                         {tp(activeMD?.planet || "")} Mahadasha
                       </div>
                       <div className="space-y-3">
-                        <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)] flex items-center justify-between">
+                        <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)] flex items-center justify-between flex-wrap gap-2">
                           <div>
                             <div className="text-xs text-[#6B635B] font-semibold">Active Vimshottari Period</div>
                             <div className="text-base font-bold text-[#1A1A1A] mt-0.5">
@@ -1385,6 +1580,18 @@ export default function KundliPage() {
                             </div>
                           </div>
                         </div>
+
+                        {/* Interactive Dasha Progress Capsule */}
+                        {activeMD && (
+                          <div className="pt-1">
+                            <DashaProgressCapsule
+                              start={activeAD?.start || activeMD.start}
+                              end={activeAD?.end || activeMD.end}
+                              label={activeAD ? `${tp(activeAD.planet)} Antardasha` : `${tp(activeMD.planet)} Mahadasha`}
+                              className="w-full"
+                            />
+                          </div>
+                        )}
 
                         <p className="text-xs text-[#3D3834] leading-relaxed">
                           Classical Jyotish ke niyam anusar, Mahadasha Lord chart ke un bhavo ka phal activate karta hai jinka yeh swami ya sthit hai. Antardasha Lord samayik ghatnao ko trigger karta hai.

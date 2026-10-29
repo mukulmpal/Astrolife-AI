@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 
 import { usePathname, useRouter } from "next/navigation";
@@ -13,7 +13,7 @@ import {
   History, Star, HeartHandshake, Heart, HelpCircle, Hash,
   Hand, LogOut, type LucideIcon,
   Radar, Globe, ShoppingBag, Sunrise,
-  Shield, Database, Dna,
+  Shield, Database, Dna, Search, X,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
@@ -97,7 +97,12 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-export function DashboardSidebar() {
+export interface DashboardSidebarProps {
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}
+
+export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { birth } = useUserChart();
@@ -105,6 +110,20 @@ export function DashboardSidebar() {
   const userName = mounted && birth.name ? birth.name.split(" ")[0] : "Seeker";
   const { isElite, userTier } = useUserTier();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filteredGroups = useMemo(() => {
+    if (!search.trim()) return NAV_GROUPS;
+    const q = search.toLowerCase();
+    return NAV_GROUPS.map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) =>
+          item.label.toLowerCase().includes(q) ||
+          (item.badge && item.badge.toLowerCase().includes(q))
+      ),
+    })).filter((group) => group.items.length > 0);
+  }, [search]);
 
   useEffect(() => {
     setMounted(true);
@@ -131,7 +150,6 @@ export function DashboardSidebar() {
     };
   }, []);
 
-
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -140,62 +158,170 @@ export function DashboardSidebar() {
   };
 
   return (
-    <aside className="dash-sidebar">
-      {/* Logo */}
-      <div className="dash-logo" style={{ borderBottomColor: 'var(--al-primary)' }}>
+    <>
+      {/* Mobile Drawer Backdrop */}
+      {mobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+            zIndex: 9999,
+          }}
+        />
+      )}
 
-        <div className="dash-logo-gem">✦</div>
-        <span className="dash-logo-name">AstroLife</span>
-      </div>
-
-      {/* Scrollable nav */}
-      <nav className="dash-nav" aria-label="Main navigation">
-        {NAV_GROUPS.map((group) => (
-          <div key={group.label} className="dash-nav-section">
-            <div className="dash-nav-label" aria-hidden="true">{group.label}</div>
-            {group.items.map(({ label, href, Icon, badge }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`dash-nav-item${pathname === href ? " active" : ""}`}
-                style={pathname === href ? { borderLeftColor: 'var(--al-primary)', color: 'var(--al-primary)' } : undefined}
-                aria-current={pathname === href ? "page" : undefined}
-              >
-                <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
-                <span style={{ flex: 1 }}>{label}</span>
-                {badge && (
-                  <span
-                    style={{
-                      fontSize: "9px",
-                      fontWeight: 700,
-                      letterSpacing: "0.5px",
-                      padding: "1px 5px",
-                      borderRadius: "4px",
-                      background: badge === "ELITE"
-                        ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
-                        : badge === "PRO"
-                        ? "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))"
-                        : "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.25))",
-                      color: badge === "ELITE" ? "#c084fc" : badge === "PRO" ? "#c8a030" : "#16a34a",
-                      border: badge === "ELITE"
-                        ? "1px solid rgba(168, 85, 247, 0.45)"
-                        : badge === "PRO"
-                        ? "1px solid rgba(200, 160, 48, 0.35)"
-                        : "1px solid rgba(34, 197, 94, 0.3)",
-                      lineHeight: "1.3",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "3px",
-                    }}
-                  >
-                    {badge === "ELITE" ? "💎 ELITE" : badge === "PRO" ? "👑 PRO" : badge === "BASIC" ? "🌱 BASIC" : badge}
-                  </span>
-                )}
-              </Link>
-            ))}
+      <aside className={`dash-sidebar ${mobileOpen ? "mobile-open" : ""}`}>
+        {/* Logo & Mobile Close Button */}
+        <div
+          className="dash-logo"
+          style={{
+            borderBottomColor: 'var(--al-primary)',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div className="dash-logo-gem">✦</div>
+            <span className="dash-logo-name">AstroLife</span>
           </div>
-        ))}
-      </nav>
+          {mobileOpen && (
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              style={{
+                background: "transparent",
+                border: "none",
+                fontSize: "18px",
+                color: "#6B635B",
+                cursor: "pointer",
+                padding: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              aria-label="Close navigation"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+
+        {/* Quick Search Bar for 30+ Engines */}
+        <div style={{ padding: "8px 12px 6px 12px", borderBottom: "1px solid rgba(184,134,11,0.12)" }}>
+          <div style={{ position: "relative" }}>
+            <input
+              type="text"
+              placeholder="Search 30+ engines..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "6px 26px 6px 26px",
+                fontSize: "11px",
+                borderRadius: "8px",
+                border: "1px solid rgba(184, 134, 11, 0.25)",
+                background: "rgba(255, 255, 255, 0.8)",
+                color: "#1A1A1A",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+            <Search
+              size={12}
+              style={{
+                position: "absolute",
+                left: "8px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#B8860B",
+                pointerEvents: "none",
+              }}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                style={{
+                  position: "absolute",
+                  right: "8px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "transparent",
+                  border: "none",
+                  fontSize: "10px",
+                  color: "#6B635B",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Scrollable nav */}
+        <nav className="dash-nav" aria-label="Main navigation">
+          {filteredGroups.map((group) => (
+            <div key={group.label} className="dash-nav-section">
+              <div className="dash-nav-label" aria-hidden="true">{group.label}</div>
+              {group.items.map(({ label, href, Icon, badge }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => onCloseMobile?.()}
+                  className={`dash-nav-item${pathname === href ? " active" : ""}`}
+                  style={pathname === href ? { borderLeftColor: 'var(--al-primary)', color: 'var(--al-primary)' } : undefined}
+                  aria-current={pathname === href ? "page" : undefined}
+                >
+                  <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
+                  <span style={{ flex: 1 }}>{label}</span>
+                  {badge && (
+                    <span
+                      style={{
+                        fontSize: "9px",
+                        fontWeight: 700,
+                        letterSpacing: "0.5px",
+                        padding: "1px 5px",
+                        borderRadius: "4px",
+                        background: badge === "ELITE"
+                          ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
+                          : badge === "PRO"
+                          ? "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))"
+                          : "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.25))",
+                        color: badge === "ELITE" ? "#c084fc" : badge === "PRO" ? "#c8a030" : "#16a34a",
+                        border: badge === "ELITE"
+                          ? "1px solid rgba(168, 85, 247, 0.45)"
+                          : badge === "PRO"
+                          ? "1px solid rgba(200, 160, 48, 0.35)"
+                          : "1px solid rgba(34, 197, 94, 0.3)",
+                        lineHeight: "1.3",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "3px",
+                      }}
+                    >
+                      {badge === "ELITE" ? "💎 ELITE" : badge === "PRO" ? "👑 PRO" : badge === "BASIC" ? "🌱 BASIC" : badge}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          ))}
+          {filteredGroups.length === 0 && (
+            <div style={{ padding: "20px 12px", fontSize: "12px", color: "#6B635B", textAlign: "center" }}>
+              No engine found for &quot;{search}&quot;
+            </div>
+          )}
+        </nav>
 
       {/* Fixed Sidebar Footer: Tier Status & Upgrade */}
       <div style={{ borderTop: "1px solid rgba(184,134,11,0.18)", padding: "10px 14px", flexShrink: 0, background: "rgba(0,0,0,0.02)" }}>
@@ -327,5 +453,6 @@ export function DashboardSidebar() {
         </button>
       </div>
     </aside>
+    </>
   );
 }

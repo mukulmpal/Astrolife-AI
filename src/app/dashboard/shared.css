@@ -893,11 +893,29 @@ html[data-theme-mode="light"] .dash-sidebar {
 
 @media (max-width: 1024px) {
   .dash-sidebar { display: none; }
+  .dash-sidebar.mobile-open {
+    display: flex !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    max-width: 86vw;
+    z-index: 10000;
+    box-shadow: 8px 0 35px rgba(0, 0, 0, 0.35);
+    background: #FAF7F2;
+    animation: slideInLeft 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
   .dash-main {
     margin-left: 0;
     width: 100%;
     padding-bottom: 84px;
   }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
 }
 
 /* ── UNIFORM LIGHT WARM CREAM PARCHMENT & HIGH CONTRAST TYPOGRAPHY OVERRIDES ── */
