@@ -1532,6 +1532,7 @@ export default function KundliPage() {
                               size={250}
                               mode="rashi"
                               showOuterToggles={false}
+                              activeOuterPlanets={activeOuterPlanetKeys}
                             />
                           </div>
                         </div>
@@ -1555,12 +1556,8 @@ export default function KundliPage() {
                                 size={250}
                                 mode="rashi"
                                 outerPlanets={d9OuterPlanets}
-                                activeOuterPlanets={activeOuterPlanets}
-                                onToggleOuterPlanet={(key) => {
-                                  setActiveOuterPlanets((prev) =>
-                                    prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-                                  );
-                                }}
+                                showOuterToggles={false}
+                                activeOuterPlanets={activeOuterPlanetKeys}
                               />
                             ) : (
                               <div style={{ padding: "40px", fontSize: "12px", color: "#6B635B" }}>Calculating D9...</div>
@@ -2261,10 +2258,13 @@ export default function KundliPage() {
                         lagnaNum={d9.lagnaNum}
                         planets={d9Planets}
                         outerPlanets={d9OuterPlanets}
-                        activeOuterPlanets={activeOuterPlanets}
+                        showOuterToggles={true}
+                        activeOuterPlanets={activeOuterPlanetKeys}
                         onToggleOuterPlanet={(key) => {
-                          setActiveOuterPlanets((prev) =>
-                            prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                          const mapKey: OuterPlanetKey =
+                            key === "indra" ? "URANUS" : key === "varun" ? "NEPTUNE" : "PLUTO";
+                          setActiveOuterPlanetKeys((prev) =>
+                            prev.includes(mapKey) ? prev.filter((k) => k !== mapKey) : [...prev, mapKey]
                           );
                         }}
                       />
