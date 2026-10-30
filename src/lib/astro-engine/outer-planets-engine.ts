@@ -619,12 +619,10 @@ export function evaluateOuterPlanet(
     ([r, d]) => r === rashiIndex && d === decanate
   );
 
-  // Whole-Sign Rashi House calculation (Natal D1 standard)
-  const ascRashi0 =
-    ascendantRashi >= 1 && ascendantRashi <= 12
-      ? ascendantRashi - 1
-      : ((ascendantRashi % 12) + 12) % 12;
-  const planetRashi0 = Math.floor(norm360(activeLon) / 30); // 0 to 11
+  // Whole-Sign Rashi House calculation (Natal D1 standard).
+  // Note: In calculations.ts and Kundli engine, lagnaNum / ascendantRashi is strictly 0-indexed (0 = Aries, ..., 5 = Virgo, ..., 11 = Pisces).
+  const ascRashi0 = ((ascendantRashi % 12) + 12) % 12;
+  const planetRashi0 = Math.floor(norm360(activeLon) / 30); // 0 = Aries, ..., 9 = Capricorn
   const rashiHouse = ((planetRashi0 - ascRashi0 + 12) % 12) + 1; // 1 to 12
 
   // In Vedic Natal Chart (D1), planetary placement in the sign chart is by Rashi House (Whole Sign).
