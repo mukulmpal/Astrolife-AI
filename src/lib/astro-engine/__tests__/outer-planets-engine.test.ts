@@ -162,6 +162,12 @@ test("Outer Planets Engine — computeNatalOuterPlanets evaluated via Moshier Ep
   assert.ok(chartDataMap.Varun);
   assert.ok(chartDataMap.Yam);
 
+  // Check accurate house mapping and signNum
+  assert.equal(typeof chartDataMap.Indra.house, "number");
+  assert.ok(chartDataMap.Indra.house >= 1 && chartDataMap.Indra.house <= 12);
+  assert.equal(typeof chartDataMap.Indra.signNum, "number");
+  assert.ok(chartDataMap.Indra.signNum >= 0 && chartDataMap.Indra.signNum <= 11);
+
   // Predictions are synthesized
   assert.ok(indra?.synthesis.includes("INDRA (Uranus)"));
   assert.ok(varun?.synthesis.includes("VARUN (Neptune)"));

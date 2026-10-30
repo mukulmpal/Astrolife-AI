@@ -164,8 +164,8 @@ export default function KundliPage() {
         natalLons[pName] = pData.signNum * 30 + pData.degree;
       }
     }
-    const cusps = chart.houseCusps?.map((c) => c.degree) || [];
-    return computeNatalOuterPlanets(jd, chart.lagnaNum || 1, natalLons, cusps);
+    const cusps = chart.houseCusps?.map((c) => c.lon) || [];
+    return computeNatalOuterPlanets(jd, chart.lagnaNum ?? 0, natalLons, cusps.length === 12 ? cusps : undefined);
   }, [chart]);
 
   // Check URL query parameters for ?action=new or ?action=saved

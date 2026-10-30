@@ -617,14 +617,22 @@ export function evaluateOuterPlanet(
     ([r, d]) => r === rashiIndex && d === decanate
   );
 
-  // House calculation with optional 3° cusp buffer
-  let house = ((rashiIndex - ascendantRashi + 12) % 12) + 1;
+  // House calculation (Support both 0-indexed 0..11 and 1-indexed 1..12 ascendant)
+  const ascRashi0 =
+    ascendantRashi >= 1 && ascendantRashi <= 12
+      ? ascendantRashi - 1
+      : ((ascendantRashi % 12) + 12) % 12;
+  const planetRashi0 = Math.floor(norm360(activeLon) / 30); // 0 to 11
+  let house = ((planetRashi0 - ascRashi0 + 12) % 12) + 1; // 1 to 12
   let nextHouseBufferActive: number | null = null;
 
-  if (houseCusps && houseCusps.length === 12) {
+  // Only apply cuspal buffer if valid distinct 0-360 cusps are provided
+  if (houseCusps && houseCusps.length === 12 && houseCusps[0] !== houseCusps[1]) {
     const cuspRes = getHousePlacementWithBuffer(activeLon, houseCusps);
-    house = cuspRes.currentHouse;
-    nextHouseBufferActive = cuspRes.nextHouseBufferActive;
+    if (cuspRes.currentHouse >= 1 && cuspRes.currentHouse <= 12) {
+      house = cuspRes.currentHouse;
+      nextHouseBufferActive = cuspRes.nextHouseBufferActive;
+    }
   }
 
   // Motion state (Direct, Retrograde, Stationary)
@@ -795,6 +803,9 @@ export function computeNatalOuterPlanets(
 
     const planetObj = {
       house: res.house,
+      signNum: res.rashiIndex - 1, // 0 to 11
+      rashi: res.rashiIndex - 1,
+      rashiIndex: res.rashiIndex,
       degree: degInt,
       minutes: minInt,
       retrograde: res.motionState === 'RETROGRADE',
