@@ -248,25 +248,24 @@ function CompactNorthChart({
   if (outerPlanets) {
     const defaultActiveKeys: OuterPlanetKey[] = ["URANUS", "NEPTUNE", "PLUTO"];
     const enabledKeys = activeOuterPlanets && activeOuterPlanets.length > 0 ? activeOuterPlanets : defaultActiveKeys;
-    Object.entries(outerPlanets).forEach(([pName, pData]) => {
-      const up = pName.toUpperCase();
-      const isTarget =
-        (up.includes("URANUS") || up.includes("INDRA") || up.includes("ARUN")) ? enabledKeys.includes("URANUS") :
-        (up.includes("NEPTUNE") || up.includes("VARUN")) ? enabledKeys.includes("NEPTUNE") :
-        (up.includes("PLUTO") || up.includes("YAM")) ? enabledKeys.includes("PLUTO") : false;
-      if (!isTarget) return;
+    const PRIMARY_KEYS = ["INDRA", "VARUN", "YAM"];
+    PRIMARY_KEYS.forEach((primaryKey) => {
+      const pData = outerPlanets[primaryKey] || outerPlanets[primaryKey.toLowerCase()] || outerPlanets[primaryKey === "INDRA" ? "Uranus" : primaryKey === "VARUN" ? "Neptune" : "Pluto"];
+      if (!pData) return;
+      const keyEnum: OuterPlanetKey = primaryKey === "INDRA" ? "URANUS" : primaryKey === "VARUN" ? "NEPTUNE" : "PLUTO";
+      if (!enabledKeys.includes(keyEnum)) return;
 
       const pHouse = pData.house || pData.currentHouse || pData.houseNum;
       if (pHouse >= 1 && pHouse <= 12) {
-        const hindi = pData.vedicName || (up.includes("URAN") ? "INDRA" : up.includes("NEP") ? "VARUN" : "YAM");
+        const hindi = primaryKey;
         pByH[pHouse].push({
           planet: hindi,
           house: pHouse,
-          sign: pData.rashi || "",
-          rashiNum: pData.rashiNum ?? 0,
-          degree: pData.degInSign ?? pData.degree ?? 0,
-          color: up.includes("URAN") ? "#0284c7" : up.includes("NEP") ? "#2563eb" : "#7c3aed",
-          retrograde: Boolean(pData.isRetrograde || pData.retrograde),
+          sign: pData.sign || pData.rashi || "",
+          rashiNum: pData.rashiNum ?? (pData.signNum ?? 0),
+          degree: pData.degree ?? (pData.degInSign ?? 0),
+          color: primaryKey === "INDRA" ? "#0284c7" : primaryKey === "VARUN" ? "#2563eb" : "#7c3aed",
+          retrograde: Boolean(pData.retrograde || pData.isRetrograde),
         });
       }
     });
@@ -317,7 +316,7 @@ function CompactNorthChart({
               const slot = planetLabelSlots(here.length)[idx] ?? { x: 0, y: 0, font: 9 };
               const baseY = ly + (isLagna ? 18 : 14);
               const subLord = planetSubLords?.[p.planet];
-              const pLabel = pIdx >= 0 ? CHART_EMOJI[pIdx] : p.planet.slice(0, 2);
+              const pLabel = pIdx >= 0 ? CHART_EMOJI[pIdx] : (p.planet === "INDRA" ? "IN" : p.planet === "VARUN" ? "VA" : p.planet === "YAM" ? "YA" : p.planet.slice(0, 2));
 
               return (
                 <g key={`${houseNo}-${p.planet}-${idx}`}>
