@@ -837,3 +837,53 @@ export function computeNatalOuterPlanets(
 
   return { evaluations, chartDataMap };
 }
+
+/**
+ * Calculates outer planets in D9 Navamsha Chart mathematically.
+ * Uses 3°20' (3.333333°) per navamsha arc on the sidereal longitude.
+ */
+export function computeD9OuterPlanets(
+  natalOuterMap: Record<string, any>,
+  d9LagnaNum: number
+): Record<string, any> {
+  const d9OuterMap: Record<string, any> = {};
+  const entries: Array<{ key: 'Indra' | 'Varun' | 'Yam'; aliases: string[] }> = [
+    { key: 'Indra', aliases: ['Indra', 'INDRA', 'Uranus'] },
+    { key: 'Varun', aliases: ['Varun', 'VARUN', 'Neptune'] },
+    { key: 'Yam', aliases: ['Yam', 'YAM', 'Pluto'] },
+  ];
+
+  const d9Asc0 = ((d9LagnaNum % 12) + 12) % 12;
+
+  for (const { key, aliases } of entries) {
+    const data = natalOuterMap[key] || natalOuterMap[key.toUpperCase()];
+    if (!data || typeof data.lon !== 'number') continue;
+
+    const norm = ((data.lon % 360) + 360) % 360;
+    const navIndex = Math.floor(norm / (30 / 9)); // 3°20' per Navamsha
+    const signNum = navIndex % 12; // 0 to 11
+    const degInNav = (norm % (30 / 9)) * 9;
+    const degInt = Math.floor(degInNav);
+    const minInt = Math.round((degInNav - degInt) * 60);
+    const house = ((signNum - d9Asc0 + 12) % 12) + 1; // 1 to 12
+
+    const obj = {
+      house,
+      signNum,
+      rashi: signNum,
+      rashiIndex: signNum + 1,
+      sign: SIGN_NAMES[signNum],
+      degree: degInt,
+      minutes: minInt,
+      retrograde: Boolean(data.retrograde),
+      lon: norm,
+      hasSepharialVibrationBoost: Boolean(data.hasSepharialVibrationBoost),
+    };
+
+    for (const alias of aliases) {
+      d9OuterMap[alias] = obj;
+    }
+  }
+
+  return d9OuterMap;
+}

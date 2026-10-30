@@ -37,7 +37,7 @@ import { VimshottariFiveLevelExplorer } from "@/components/dasha/VimshottariFive
 import { DashaProgressCapsule } from "@/components/dasha/DashaProgressCapsule";
 import { LiveMuhurtaAlert } from "@/components/panchang/LiveMuhurtaAlert";
 import { runKPEngine } from "@/lib/astro-engine/kp";
-import { computeNatalOuterPlanets, type OuterPlanetKey } from "@/lib/astro-engine/outer-planets-engine";
+import { computeNatalOuterPlanets, computeD9OuterPlanets, type OuterPlanetKey } from "@/lib/astro-engine/outer-planets-engine";
 import OuterPlanetsDossierCard from "@/components/charts/OuterPlanetsDossierCard";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
@@ -457,6 +457,11 @@ export default function KundliPage() {
     });
     return res;
   }, [d9]);
+
+  const d9OuterPlanets = useMemo(() => {
+    if (!d9 || !outerPlanetsData?.chartDataMap) return {};
+    return computeD9OuterPlanets(outerPlanetsData.chartDataMap, d9.lagnaNum);
+  }, [d9, outerPlanetsData]);
 
   const d9Analysis = useMemo(() => {
     if (!d9) return [];
@@ -1544,7 +1549,19 @@ export default function KundliPage() {
                           </div>
                           <div style={{ display: "flex", justifyContent: "center" }}>
                             {d9 ? (
-                              <NorthIndianChart lagnaNum={d9.lagnaNum} planets={d9Planets} size={250} mode="rashi" />
+                              <NorthIndianChart
+                                lagnaNum={d9.lagnaNum}
+                                planets={d9Planets}
+                                size={250}
+                                mode="rashi"
+                                outerPlanets={d9OuterPlanets}
+                                activeOuterPlanets={activeOuterPlanets}
+                                onToggleOuterPlanet={(key) => {
+                                  setActiveOuterPlanets((prev) =>
+                                    prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                                  );
+                                }}
+                              />
                             ) : (
                               <div style={{ padding: "40px", fontSize: "12px", color: "#6B635B" }}>Calculating D9...</div>
                             )}
@@ -2240,7 +2257,17 @@ export default function KundliPage() {
                     </div>
 
                     {d9 ? (
-                      <NorthIndianChart lagnaNum={d9.lagnaNum} planets={d9Planets} />
+                      <NorthIndianChart
+                        lagnaNum={d9.lagnaNum}
+                        planets={d9Planets}
+                        outerPlanets={d9OuterPlanets}
+                        activeOuterPlanets={activeOuterPlanets}
+                        onToggleOuterPlanet={(key) => {
+                          setActiveOuterPlanets((prev) =>
+                            prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                          );
+                        }}
+                      />
                     ) : (
                       <div className="py-20 text-center text-[#6B635B]">D-9 Not Calculated</div>
                     )}

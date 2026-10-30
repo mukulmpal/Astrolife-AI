@@ -9,6 +9,7 @@ import {
   getTripleTransitStage,
   getHousePlacementWithBuffer,
   computeNatalOuterPlanets,
+  computeD9OuterPlanets,
   OUTER_PLANETS_CONFIG,
   PLANETARY_COMBINATIONS_KB,
 } from "../outer-planets-engine";
@@ -172,5 +173,32 @@ test("Outer Planets Engine — computeNatalOuterPlanets evaluated via Moshier Ep
   assert.ok(indra?.synthesis.includes("INDRA (Uranus)"));
   assert.ok(varun?.synthesis.includes("VARUN (Neptune)"));
   assert.ok(yam?.synthesis.includes("YAM (Pluto)"));
+});
+
+test("Outer Planets Engine — computeD9OuterPlanets mathematically matches D9 Navamsha placements", () => {
+  // Mukul natal data:
+  // D9 Lagna = Gemini (sign index 2)
+  // Arun: 275.378° (05° Makara) -> D9 Aquarius (sign index 10) -> House 9
+  // Varun: 270.707° (00° Makara) -> D9 Capricorn (sign index 9) -> House 8
+  // Yam: 214.421° (04° Scorpio) -> D9 Leo (sign index 4) -> House 3
+  const mockNatalMap = {
+    Indra: { lon: 275.3786, retrograde: true },
+    Varun: { lon: 270.7072, retrograde: true },
+    Yam: { lon: 214.4217, retrograde: true },
+  };
+
+  const d9Outer = computeD9OuterPlanets(mockNatalMap, 2);
+
+  assert.equal(d9Outer.Indra.house, 9);
+  assert.equal(d9Outer.Indra.sign, "Aquarius");
+  assert.equal(d9Outer.Indra.degree, 18);
+
+  assert.equal(d9Outer.Varun.house, 8);
+  assert.equal(d9Outer.Varun.sign, "Capricorn");
+  assert.equal(d9Outer.Varun.degree, 6);
+
+  assert.equal(d9Outer.Yam.house, 3);
+  assert.equal(d9Outer.Yam.sign, "Leo");
+  assert.equal(d9Outer.Yam.degree, 9);
 });
 
