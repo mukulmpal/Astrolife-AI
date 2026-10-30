@@ -468,8 +468,8 @@ export default function KundliPage() {
     return getNavamshaAnalysis(d9);
   }, [d9]);
 
-  // 4-Chart Quad View State & Engines (Lagna D1, Navamsha D9, Nirayana Bhava Chalit, KP Cuspal)
-  const [isQuadView, setIsQuadView] = useState(false);
+  // Chart View Mode: "normal" (D1 + D9 side by side) vs "advance" (4 Charts: D1, D9, Nirayana Chalit, KP)
+  const [chartViewMode, setChartViewMode] = useState<"normal" | "advance">("normal");
 
   const kpResult = useMemo(() => {
     if (!chart?.planets) return null;
@@ -1435,40 +1435,70 @@ export default function KundliPage() {
             {activeTab === "overview" && (
               <div className="space-y-6">
                 {/* Visual Chart + Active Dasha Side by Side */}
-                <div className={`chart-layout ${isQuadView ? "quad-active" : ""}`} style={isQuadView ? { gridTemplateColumns: "1fr" } : undefined}>
+                <div className="chart-layout" style={{ gridTemplateColumns: "1fr" }}>
                   {/* Kundli Diagram Card */}
                   <div className="card">
                     <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                       <div>
                         <div className="card-tag">
-                          {isQuadView ? "✦ 4-Chart Comparative Quad Engine" : "✦ Primary Birth Chart (D-1)"}
+                          {chartViewMode === "advance"
+                            ? "✦ Advanced Comparative Engine (D1, D9, Nirayana Chalit, KP)"
+                            : "✦ Core Vedic Kundli (D-1 Janma Lagna & D-9 Navamsha)"}
                         </div>
                         <div className="card-title serif mb-0">
-                          {isQuadView ? "4-Chart Quad View (2 ऊपर / 2 नीचे)" : "Janma Lagna Kundli"}
+                          {chartViewMode === "advance"
+                            ? "Advanced Charts (D-1, D-9, भाव चलित, KP कस्पल)"
+                            : "Normal Kundli (D-1 लग्न + D-9 नवमांश)"}
                         </div>
                       </div>
 
                       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-                        <button
-                          type="button"
-                          onClick={() => setIsQuadView((v) => !v)}
+                        {/* 2-Toggle View System: Normal (D1 + D9) vs Advance (Nirayan + KP) */}
+                        <div
                           style={{
-                            padding: "6px 12px",
-                            borderRadius: "8px",
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            background: isQuadView ? "rgba(184, 134, 11, 0.16)" : "#FAF8F5",
-                            border: isQuadView ? "1.5px solid #B8860B" : "1px solid rgba(184, 134, 11, 0.3)",
-                            color: isQuadView ? "#B8860B" : "#1A1A1A",
-                            cursor: "pointer",
                             display: "inline-flex",
-                            alignItems: "center",
-                            gap: "6px",
+                            padding: "3px",
+                            background: "#FAF7F2",
+                            border: "1px solid rgba(184, 134, 11, 0.25)",
+                            borderRadius: "10px",
+                            gap: "2px",
                           }}
                         >
-                          <span>⊞</span>
-                          <span>{isQuadView ? "✓ 4-Chart Quad Active" : "⊞ Compare 4 Charts (Lagna, D9, Chalit, KP)"}</span>
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => setChartViewMode("normal")}
+                            style={{
+                              padding: "5px 12px",
+                              borderRadius: "7px",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              background: chartViewMode === "normal" ? "#B8860B" : "transparent",
+                              color: chartViewMode === "normal" ? "#FFFFFF" : "#6B635B",
+                              border: "none",
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                            }}
+                          >
+                            Normal Kundali (D1 + D9)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setChartViewMode("advance")}
+                            style={{
+                              padding: "5px 12px",
+                              borderRadius: "7px",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              background: chartViewMode === "advance" ? "#B8860B" : "transparent",
+                              color: chartViewMode === "advance" ? "#FFFFFF" : "#6B635B",
+                              border: "none",
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                            }}
+                          >
+                            Advance (Nirayan + KP)
+                          </button>
+                        </div>
 
                         <span className="text-xs px-3 py-1 rounded-full bg-[rgba(184,134,11,0.12)] text-[#B8860B] border border-[rgba(184,134,11,0.25)] font-bold">
                           {chart.lagnaRashi} Rising
@@ -1476,168 +1506,165 @@ export default function KundliPage() {
                       </div>
                     </div>
 
-                    {!isQuadView ? (
-                      /* SINGLE LAGNA CHART (Default) */
-                      <div
-                        role="region"
-                        aria-label={`Natal chart for ${chart?.name || 'chart'}`}
-                        tabIndex={-1}
-                      >
-                        <NorthIndianChart
-                          lagnaNum={chart.lagnaNum}
-                          planets={chart.planets}
-                          outerPlanets={outerPlanetsData?.chartDataMap}
-                          showOuterToggles={true}
-                          activeOuterPlanets={activeOuterPlanetKeys}
-                          onToggleOuterPlanet={(key) => {
-                            const mapKey: OuterPlanetKey =
-                              key === "indra" ? "URANUS" : key === "varun" ? "NEPTUNE" : "PLUTO";
-                            setActiveOuterPlanetKeys((prev) =>
-                              prev.includes(mapKey) ? prev.filter((k) => k !== mapKey) : [...prev, mapKey]
-                            );
-                          }}
-                        />
-
-                        {outerPlanetsData && (
-                          <OuterPlanetsDossierCard
-                            evaluations={outerPlanetsData.evaluations}
-                            activePlanetKeys={activeOuterPlanetKeys}
-                            onTogglePlanet={(key) => {
+                    {/* Charts Container: Always shows D1 and D9 side by side. In "advance" mode, also shows Nirayan Chalit & KP below */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                      {/* 1. Top-Left: Lagna (D1 Rashi) */}
+                      <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                          <div>
+                            <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 1 · राशि कुंडली</div>
+                            <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>D-1 Janma Lagna Kundli</div>
+                          </div>
+                          <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
+                            {chart.lagnaRashi}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "center" }}>
+                          <NorthIndianChart
+                            lagnaNum={chart.lagnaNum}
+                            planets={chart.planets}
+                            outerPlanets={outerPlanetsData?.chartDataMap}
+                            size={280}
+                            mode="rashi"
+                            showOuterToggles={true}
+                            activeOuterPlanets={activeOuterPlanetKeys}
+                            onToggleOuterPlanet={(key) => {
+                              const mapKey: OuterPlanetKey =
+                                key === "indra" ? "URANUS" : key === "varun" ? "NEPTUNE" : "PLUTO";
                               setActiveOuterPlanetKeys((prev) =>
-                                prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                                prev.includes(mapKey) ? prev.filter((k) => k !== mapKey) : [...prev, mapKey]
                               );
                             }}
                           />
-                        )}
+                        </div>
                       </div>
-                    ) : (
-                      /* 4-CHART QUAD VIEW: 2 UP (Lagna + D9), 2 DOWN (Bhava Chalit + KP) */
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                        {/* 1. Top-Left: Lagna (D1 Rashi) */}
-                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                            <div>
-                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 1 · राशि कुंडली</div>
-                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>D-1 Janma Lagna Kundli</div>
-                            </div>
-                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
-                              {chart.lagnaRashi}
-                            </span>
+
+                      {/* 2. Top-Right: Navamsha (D9 Dharma & Soul) */}
+                      <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                          <div>
+                            <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 2 · भाग्य व आत्मा</div>
+                            <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>D-9 Navamsha Kundli</div>
                           </div>
-                          <div style={{ display: "flex", justifyContent: "center" }}>
+                          <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
+                            {d9?.rashi || "D-9"}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "center" }}>
+                          {d9 ? (
                             <NorthIndianChart
-                              lagnaNum={chart.lagnaNum}
-                              planets={chart.planets}
-                              outerPlanets={outerPlanetsData?.chartDataMap}
-                              size={250}
+                              lagnaNum={d9.lagnaNum}
+                              planets={d9Planets}
+                              size={280}
                               mode="rashi"
-                              showOuterToggles={false}
+                              outerPlanets={d9OuterPlanets}
+                              showOuterToggles={true}
                               activeOuterPlanets={activeOuterPlanetKeys}
+                              onToggleOuterPlanet={(key) => {
+                                const mapKey: OuterPlanetKey =
+                                  key === "indra" ? "URANUS" : key === "varun" ? "NEPTUNE" : "PLUTO";
+                                setActiveOuterPlanetKeys((prev) =>
+                                  prev.includes(mapKey) ? prev.filter((k) => k !== mapKey) : [...prev, mapKey]
+                                );
+                              }}
                             />
-                          </div>
-                        </div>
-
-                        {/* 2. Top-Right: Navamsha (D9 Dharma & Soul) */}
-                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                            <div>
-                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 2 · भाग्य व आत्मा</div>
-                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>D-9 Navamsha Kundli</div>
-                            </div>
-                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
-                              {d9?.rashi || "D-9"}
-                            </span>
-                          </div>
-                          <div style={{ display: "flex", justifyContent: "center" }}>
-                            {d9 ? (
-                              <NorthIndianChart
-                                lagnaNum={d9.lagnaNum}
-                                planets={d9Planets}
-                                size={250}
-                                mode="rashi"
-                                outerPlanets={d9OuterPlanets}
-                                showOuterToggles={false}
-                                activeOuterPlanets={activeOuterPlanetKeys}
-                              />
-                            ) : (
-                              <div style={{ padding: "40px", fontSize: "12px", color: "#6B635B" }}>Calculating D9...</div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 3. Bottom-Left: Nirayana Bhava Chalit */}
-                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                            <div>
-                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 3 · भाव चलित</div>
-                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>Nirayana Bhava Chalit</div>
-                            </div>
-                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: chalitShifts.length > 0 ? "rgba(220,38,38,0.1)" : "rgba(34,197,94,0.1)", color: chalitShifts.length > 0 ? "#DC2626" : "#15803D" }}>
-                              {chalitShifts.length > 0 ? `${chalitShifts.length} Shifted` : "Vedic Chalit"}
-                            </span>
-                          </div>
-                          <div style={{ display: "flex", justifyContent: "center" }}>
-                            <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chalitPlanets} size={250} mode="chalit" />
-                          </div>
-                          {chalitShifts.length > 0 ? (
-                            <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: "8px", fontSize: "11px", color: "#991B1B" }}>
-                              <strong>✦ वैदिक भाव परिवर्तन: </strong>
-                              {chalitShifts.map((s, idx) => (
-                                <span key={s.name}>
-                                  {idx > 0 && ", "}
-                                  <strong>{s.name}</strong> (H{s.rashiHouse}→भाव {s.bhavaHouse})
-                                </span>
-                              ))}
-                            </div>
                           ) : (
-                            <div style={{ marginTop: "8px", padding: "4px 8px", background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: "8px", fontSize: "11px", color: "#15803D", textAlign: "center" }}>
-                              ✓ सभी ग्रह अपने जन्म राशि भाव में ही स्थित हैं (No shifts)
-                            </div>
+                            <div style={{ padding: "40px", fontSize: "12px", color: "#6B635B" }}>Calculating D9...</div>
                           )}
                         </div>
+                      </div>
 
-                        {/* 4. Bottom-Right: KP Cuspal Chart */}
-                        <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                            <div>
-                              <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 4 · कस्पल पद्धति</div>
-                              <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>KP Cuspal Chart</div>
+                      {/* 3 & 4. Advance Charts: Nirayana Bhava Chalit & KP Cuspal (Only in "advance" mode) */}
+                      {chartViewMode === "advance" && (
+                        <>
+                          {/* 3. Nirayana Bhava Chalit */}
+                          <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                              <div>
+                                <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 3 · भाव चलित</div>
+                                <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>Nirayana Bhava Chalit</div>
+                              </div>
+                              <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: chalitShifts.length > 0 ? "rgba(220,38,38,0.1)" : "rgba(34,197,94,0.1)", color: chalitShifts.length > 0 ? "#DC2626" : "#15803D" }}>
+                                {chalitShifts.length > 0 ? chalitShifts.length + " Shifted" : "Vedic Chalit"}
+                              </span>
                             </div>
-                            <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
-                              Placidus &amp; Sub-Lords
-                            </span>
-                          </div>
-                          <div style={{ display: "flex", justifyContent: "center" }}>
-                            <NorthIndianChart
-                              lagnaNum={chart.lagnaNum}
-                              planets={kpPlanets}
-                              size={250}
-                              mode="kp"
-                              kpCusps={kpResult?.cusps}
-                              subLords={planetSubLords}
-                            />
-                          </div>
-                          {kpResult?.rows && (
-                            <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.18)", borderRadius: "8px", fontSize: "11px", color: "#1A1A1A" }}>
-                              <div style={{ fontWeight: 700, color: "#B8860B", marginBottom: "3px" }}>✦ KP Planet Sub-Lords (उप-स्वामी):</div>
-                              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                                {kpResult.rows.map((r) => (
-                                  <span key={r.name} style={{ background: "#FFFFFF", padding: "1px 6px", borderRadius: "4px", border: "1px solid rgba(184,134,11,0.2)", fontSize: "10.5px" }}>
-                                    <strong>{r.name}</strong> [{r.subLord.slice(0, 2)}]
+                            <div style={{ display: "flex", justifyContent: "center" }}>
+                              <NorthIndianChart lagnaNum={chart.lagnaNum} planets={chalitPlanets} size={280} mode="chalit" />
+                            </div>
+                            {chalitShifts.length > 0 ? (
+                              <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: "8px", fontSize: "11px", color: "#991B1B" }}>
+                                <strong>✦ वैदिक भाव परिवर्तन: </strong>
+                                {chalitShifts.map((s, idx) => (
+                                  <span key={s.name}>
+                                    {idx > 0 && ", "}
+                                    <strong>{s.name}</strong> (H{s.rashiHouse}→भाव {s.bhavaHouse})
                                   </span>
                                 ))}
                               </div>
-                            </div>
-                          )}
-                          <div style={{ marginTop: "8px", textAlign: "center" }}>
-                            <Link href="/dashboard/kp" style={{ fontSize: "11px", color: "#B8860B", fontWeight: 700, textDecoration: "none" }}>
-                              🔗 View Full KP Sub-Lord Significators Table →
-                            </Link>
+                            ) : (
+                              <div style={{ marginTop: "8px", padding: "4px 8px", background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: "8px", fontSize: "11px", color: "#15803D", textAlign: "center" }}>
+                                ✓ सभी ग्रह अपने जन्म राशि भाव में ही स्थित हैं (No shifts)
+                              </div>
+                            )}
                           </div>
-                        </div>
+
+                          {/* 4. KP Cuspal Chart */}
+                          <div style={{ padding: "12px", background: "#FAF8F5", borderRadius: "14px", border: "1px solid rgba(184,134,11,0.25)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                              <div>
+                                <div style={{ fontSize: "10px", fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "1px" }}>चार्ट 4 · कस्पल पद्धति</div>
+                                <div className="serif" style={{ fontSize: "15px", fontWeight: 700, color: "#1A1A1A" }}>KP Cuspal Chart</div>
+                              </div>
+                              <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: "rgba(184,134,11,0.12)", color: "#B8860B" }}>
+                                Placidus &amp; Sub-Lords
+                              </span>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "center" }}>
+                              <NorthIndianChart
+                                lagnaNum={chart.lagnaNum}
+                                planets={kpPlanets}
+                                size={280}
+                                mode="kp"
+                                kpCusps={kpResult?.cusps}
+                                subLords={planetSubLords}
+                              />
+                            </div>
+                            {kpResult?.rows && (
+                              <div style={{ marginTop: "8px", padding: "6px 10px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.18)", borderRadius: "8px", fontSize: "11px", color: "#1A1A1A" }}>
+                                <div style={{ fontWeight: 700, color: "#B8860B", marginBottom: "3px" }}>✦ KP Planet Sub-Lords (उप-स्वामी):</div>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                                  {kpResult.rows.map((r) => (
+                                    <span key={r.name} style={{ background: "#FFFFFF", padding: "1px 6px", borderRadius: "4px", border: "1px solid rgba(184,134,11,0.2)", fontSize: "10.5px" }}>
+                                      <strong>{r.name}</strong> [{r.subLord.slice(0, 2)}]
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            <div style={{ marginTop: "8px", textAlign: "center" }}>
+                              <Link href="/dashboard/kp" style={{ fontSize: "11px", color: "#B8860B", fontWeight: 700, textDecoration: "none" }}>
+                                🔗 View Full KP Sub-Lord Significators Table →
+                              </Link>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Outer Planets Dossier (Synthesis, Esoteric octaves, Chakras, Colors) */}
+                    {outerPlanetsData && (
+                      <div style={{ marginTop: 14 }}>
+                        <OuterPlanetsDossierCard
+                          evaluations={outerPlanetsData.evaluations}
+                          activePlanetKeys={activeOuterPlanetKeys}
+                          onTogglePlanet={(key) => {
+                            setActiveOuterPlanetKeys((prev) =>
+                              prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                            );
+                          }}
+                        />
                       </div>
                     )}
-
                     <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 12 }}>
                       <div style={{ fontSize: 11, color: "#B8860B", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4, fontWeight: 700 }}>
                         Lagna Summary — {chart.lagnaRashi}
