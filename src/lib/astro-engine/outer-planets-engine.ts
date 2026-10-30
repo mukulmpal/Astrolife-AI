@@ -574,6 +574,8 @@ export interface OuterPlanetEvaluationResult {
   hasSepharialVibrationBoost: boolean;
   nakshatraIndex: number;
   house: number;
+  rashiHouse: number;
+  bhavaHouse: number;
   nextHouseBufferActive: number | null;
   strengthScore: number;
   isAfflicted: boolean;
@@ -617,20 +619,24 @@ export function evaluateOuterPlanet(
     ([r, d]) => r === rashiIndex && d === decanate
   );
 
-  // House calculation (Support both 0-indexed 0..11 and 1-indexed 1..12 ascendant)
+  // Whole-Sign Rashi House calculation (Natal D1 standard)
   const ascRashi0 =
     ascendantRashi >= 1 && ascendantRashi <= 12
       ? ascendantRashi - 1
       : ((ascendantRashi % 12) + 12) % 12;
   const planetRashi0 = Math.floor(norm360(activeLon) / 30); // 0 to 11
-  let house = ((planetRashi0 - ascRashi0 + 12) % 12) + 1; // 1 to 12
+  const rashiHouse = ((planetRashi0 - ascRashi0 + 12) % 12) + 1; // 1 to 12
+
+  // In Vedic Natal Chart (D1), planetary placement in the sign chart is by Rashi House (Whole Sign).
+  // Bhava Chalit / unequal cusps are tracked separately if houseCusps are passed.
+  let house = rashiHouse;
+  let bhavaHouse = rashiHouse;
   let nextHouseBufferActive: number | null = null;
 
-  // Only apply cuspal buffer if valid distinct 0-360 cusps are provided
   if (houseCusps && houseCusps.length === 12 && houseCusps[0] !== houseCusps[1]) {
     const cuspRes = getHousePlacementWithBuffer(activeLon, houseCusps);
     if (cuspRes.currentHouse >= 1 && cuspRes.currentHouse <= 12) {
-      house = cuspRes.currentHouse;
+      bhavaHouse = cuspRes.currentHouse;
       nextHouseBufferActive = cuspRes.nextHouseBufferActive;
     }
   }
@@ -690,6 +696,8 @@ export function evaluateOuterPlanet(
     hasSepharialVibrationBoost,
     nakshatraIndex,
     house,
+    rashiHouse,
+    bhavaHouse,
     nextHouseBufferActive,
     strengthScore: totalScore,
     isAfflicted,
@@ -803,6 +811,8 @@ export function computeNatalOuterPlanets(
 
     const planetObj = {
       house: res.house,
+      rashiHouse: res.rashiHouse,
+      bhavaHouse: res.bhavaHouse,
       signNum: res.rashiIndex - 1, // 0 to 11
       rashi: res.rashiIndex - 1,
       rashiIndex: res.rashiIndex,
