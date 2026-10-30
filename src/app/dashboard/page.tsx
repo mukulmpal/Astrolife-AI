@@ -23,6 +23,11 @@ import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemed
 import { LiveMuhurtaAlert } from "@/components/panchang/LiveMuhurtaAlert";
 import { DashaProgressCapsule } from "@/components/dasha/DashaProgressCapsule";
 import { runKPEngine } from "@/lib/astro-engine/kp";
+import { computeNatalOuterPlanets, computeD9OuterPlanets, type OuterPlanetKey } from "@/lib/astro-engine/outer-planets-engine";
+import OuterPlanetsDossierCard from "@/components/charts/OuterPlanetsDossierCard";
+import ProUpgradePromptModal from "@/components/charts/ProUpgradePromptModal";
+import { isFullAccessEnabled } from "@/lib/access";
+import { getJD } from "@/lib/astro-engine/calculations";
 type User = { email?: string; phone?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
 type Profile = { subscription_tier?: string | null; subscription_expires_at?: string | null };
 const TRANSIT_PLANETS: PlanetName[] = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
@@ -209,11 +214,15 @@ function CompactNorthChart({
   mode = "rashi",
   kpCusps,
   planetSubLords,
+  outerPlanets,
+  activeOuterPlanets,
 }: {
   chart: DivChart;
   mode?: "rashi" | "chalit" | "kp";
   kpCusps?: Array<{ house: number; degreeText: string; subLord: string; sign: string }>;
   planetSubLords?: Record<string, string>;
+  outerPlanets?: Record<string, any>;
+  activeOuterPlanets?: OuterPlanetKey[];
 }) {
   const S = 300;
   const lagR = chart.lagnaNum;
@@ -236,6 +245,32 @@ function CompactNorthChart({
   chart.planets.forEach((p) => {
     if (p.house >= 1 && p.house <= 12) pByH[p.house].push(p);
   });
+  if (outerPlanets) {
+    const defaultActiveKeys: OuterPlanetKey[] = ["URANUS", "NEPTUNE", "PLUTO"];
+    const enabledKeys = activeOuterPlanets && activeOuterPlanets.length > 0 ? activeOuterPlanets : defaultActiveKeys;
+    Object.entries(outerPlanets).forEach(([pName, pData]) => {
+      const up = pName.toUpperCase();
+      const isTarget =
+        (up.includes("URANUS") || up.includes("INDRA") || up.includes("ARUN")) ? enabledKeys.includes("URANUS") :
+        (up.includes("NEPTUNE") || up.includes("VARUN")) ? enabledKeys.includes("NEPTUNE") :
+        (up.includes("PLUTO") || up.includes("YAM")) ? enabledKeys.includes("PLUTO") : false;
+      if (!isTarget) return;
+
+      const pHouse = pData.house || pData.currentHouse || pData.houseNum;
+      if (pHouse >= 1 && pHouse <= 12) {
+        const hindi = pData.vedicName || (up.includes("URAN") ? "INDRA" : up.includes("NEP") ? "VARUN" : "YAM");
+        pByH[pHouse].push({
+          planet: hindi,
+          house: pHouse,
+          sign: pData.rashi || "",
+          rashiNum: pData.rashiNum ?? 0,
+          degree: pData.degInSign ?? pData.degree ?? 0,
+          color: up.includes("URAN") ? "#0284c7" : up.includes("NEP") ? "#2563eb" : "#7c3aed",
+          retrograde: Boolean(pData.isRetrograde || pData.retrograde),
+        });
+      }
+    });
+  }
 
   return (
     <svg viewBox={`0 0 ${S} ${S}`} width="100%" style={{ maxWidth: 330, display: "block", margin: "0 auto" }}>
@@ -328,6 +363,15 @@ function DashboardContent() {
   const [time, setTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState("overview");
   const [chartForm, setChartForm] = useState(getInitialChartForm);
+  // 2-Toggle View System for Quad View: "normal" (D1 + D9) vs "advance" (4 Charts: D1, D9, Nirayana Chalit, KP)
+  const [chartViewMode, setChartViewMode] = useState<"normal" | "advance">("normal");
+  const [showOuterPlanets, setShowOuterPlanets] = useState<boolean>(false);
+  const [activeOuterPlanetKeys, setActiveOuterPlanetKeys] = useState<OuterPlanetKey[]>(["URANUS", "NEPTUNE", "PLUTO"]);
+  const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
+  const [upgradeModalFeature, setUpgradeModalFeature] = useState<{ title: string; desc: string }>({
+    title: "Outer Planets & Advanced Systems",
+    desc: "INDRA (Uranus), VARUN (Neptune), YAM (Pluto), Nirayana Bhava Chalit & KP Cuspal are premium astrological intelligence layers.",
+  });
   const [chartLoading, setChartLoading] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [showCities, setShowCities] = useState(false);
@@ -592,6 +636,65 @@ function DashboardContent() {
     return map;
   }, [kpResult]);
 
+  // Outer Planets Calculation
+  const outerPlanetsData = useMemo(() => {
+    if (!chart) return null;
+    let jd = chart.jd;
+    if (!jd && chart.dob && chart.tob) {
+      jd = getJD(chart.dob, chart.tob, chart.tz ?? 5.5);
+    }
+    if (!jd) return null;
+
+    const natalLons: Record<string, number> = {};
+    for (const [pName, pData] of Object.entries(chart.planets || {})) {
+      if ((pData as any).lon !== undefined) {
+        natalLons[pName] = (pData as any).lon;
+      } else if (pData.degree !== undefined && pData.signNum !== undefined) {
+        natalLons[pName] = pData.signNum * 30 + pData.degree;
+      }
+    }
+    const cusps = chart.houseCusps?.map((c) => c.lon) || [];
+    return computeNatalOuterPlanets(jd, chart.lagnaNum ?? 0, natalLons, cusps.length === 12 ? cusps : undefined);
+  }, [chart]);
+
+
+
+  // Access Tier Verification for Pro / Elite Paywall
+  const isProOrElite = Boolean(
+    isFullAccessEnabled() ||
+    (user?.email && isEliteEmail(user.email)) ||
+    profile?.subscription_tier === "premium" ||
+    profile?.subscription_tier === "elite"
+  );
+
+  const handleToggleAdvanceMode = () => {
+    if (chartViewMode === "advance") {
+      setChartViewMode("normal");
+      return;
+    }
+    if (!isProOrElite) {
+      setUpgradeModalFeature({
+        title: "Nirayana Bhava Chalit & KP Cuspal Charts",
+        desc: "Nirayana Bhava Chalit and KP Cuspal Charts are advanced Vedic & KP astrological systems exclusively available to Pro and Elite members.",
+      });
+      setShowUpgradeModal(true);
+      return;
+    }
+    setChartViewMode("advance");
+  };
+
+  const handleToggleOuterPlanets = () => {
+    if (!showOuterPlanets && !isProOrElite) {
+      setUpgradeModalFeature({
+        title: "Modern Outer Planets (इंद्र, वरुण, यम)",
+        desc: "Astronomical coordinates, whole-sign house placements, and subconscious karmic synthesis for Uranus, Neptune, and Pluto are reserved for Pro and Elite members.",
+      });
+      setShowUpgradeModal(true);
+      return;
+    }
+    setShowOuterPlanets((prev) => !prev);
+  };
+
   const chartLayers = useMemo(() => {
     const divisional = calculateDivisional(chart.planets as never, chart.lagnaNum, chart.lagnaLon);
     const d1 = divisional.find((c) => c.key === "D1") ?? divisional[0];
@@ -650,6 +753,11 @@ function DashboardContent() {
       kpHouses: byHouse(kpChart),
     };
   }, [chart, kpResult]);
+
+  const d9OuterPlanets = useMemo(() => {
+    if (!chartLayers?.d9 || !outerPlanetsData?.chartDataMap) return {};
+    return computeD9OuterPlanets(outerPlanetsData.chartDataMap, chartLayers.d9.lagnaNum);
+  }, [chartLayers, outerPlanetsData]);
 
   return (
     <>
@@ -866,12 +974,100 @@ function DashboardContent() {
           <div className="card" style={{ marginBottom: 24 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
               <div>
-                <div className="card-tag">✦ 4-Chart Quad View (चारों प्रमुख कुण्डलियाँ)</div>
+                <div className="card-tag">✦ {chartViewMode === "advance" ? "4-Chart Quad View (चारों प्रमुख कुण्डलियाँ)" : "2-Chart Dual View (लग्न एवं नवांश)"}</div>
                 <div className="card-title serif" style={{ marginBottom: 2 }}>
-                  Janma Lagna (D-1), Navamsha (D-9), Nirayana Bhava Chalit & KP Cuspal
+                  {chartViewMode === "advance"
+                    ? "Janma Lagna (D-1), Navamsha (D-9), Nirayana Bhava Chalit & KP Cuspal"
+                    : "Janma Lagna (D-1 Rashi) & Navamsha (D-9 Dharma Kundali)"}
                 </div>
               </div>
+
+              {/* View Switches & Outer Planets Controls */}
               <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                {/* 2-Toggle View: Normal Kundali (D1 + D9) vs Advance (Nirayan + KP) */}
+                <div
+                  style={{
+                    display: "inline-flex",
+                    background: "#F4EFE6",
+                    borderRadius: "10px",
+                    padding: "3px",
+                    border: "1px solid rgba(184, 134, 11, 0.25)",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setChartViewMode("normal")}
+                    style={{
+                      padding: "5px 12px",
+                      borderRadius: "7px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      background: chartViewMode === "normal" ? "#B8860B" : "transparent",
+                      color: chartViewMode === "normal" ? "#FFFFFF" : "#6B635B",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    Normal Kundali (D1 + D9)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleToggleAdvanceMode}
+                    style={{
+                      padding: "5px 12px",
+                      borderRadius: "7px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      background: chartViewMode === "advance" ? "#B8860B" : "transparent",
+                      color: chartViewMode === "advance" ? "#FFFFFF" : "#6B635B",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    <span>Advance (Nirayan + KP)</span>
+                    {!isProOrElite && (
+                      <span style={{ fontSize: "9px", background: "rgba(184,134,11,0.2)", padding: "1px 5px", borderRadius: "999px", color: "#B8860B" }}>
+                        PRO 👑
+                      </span>
+                    )}
+                  </button>
+                </div>
+
+                {/* Outer Planets Checkbox Toggle */}
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    padding: "5px 10px",
+                    borderRadius: "8px",
+                    background: showOuterPlanets ? "rgba(184, 134, 11, 0.12)" : "#FAF8F5",
+                    border: "1px solid rgba(184, 134, 11, 0.3)",
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showOuterPlanets}
+                    onChange={handleToggleOuterPlanets}
+                    style={{ accentColor: "#B8860B", cursor: "pointer" }}
+                  />
+                  <span>Outer Planets (इंद्र, वरुण, यम)</span>
+                  {!isProOrElite && (
+                    <span style={{ fontSize: "9px", background: "rgba(184,134,11,0.2)", padding: "1px 5px", borderRadius: "999px", color: "#B8860B", fontWeight: 700 }}>
+                      PRO 👑
+                    </span>
+                  )}
+                </label>
+
                 <span className="energy-pill" style={{ fontSize: "11px", fontWeight: 700, padding: "4px 10px" }}>
                   {chart.lagnaRashi} Lagna ({chart.lagnaNum + 1})
                 </span>
@@ -929,14 +1125,18 @@ function DashboardContent() {
             )}
 
             {/* 4-Chart 2x2 Grid: 2 Above (D-1, D-9), 2 Below (Chalit, KP) */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: chartViewMode === "advance" ? "repeat(auto-fit, minmax(280px, 1fr))" : "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
               {/* 1. Lagna D-1 */}
               <div className="chart-panel">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                   <div className="chart-panel-title" style={{ marginBottom: 0 }}>1. D-1 · Janma Lagna (लग्न)</div>
                   <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Natal Rashi Base</span>
                 </div>
-                <CompactNorthChart chart={chartLayers.d1} />
+                <CompactNorthChart
+                  chart={chartLayers.d1}
+                  outerPlanets={showOuterPlanets ? outerPlanetsData?.chartDataMap : undefined}
+                  activeOuterPlanets={activeOuterPlanetKeys}
+                />
               </div>
 
               {/* 2. Navamsha D-9 */}
@@ -945,32 +1145,56 @@ function DashboardContent() {
                   <div className="chart-panel-title" style={{ marginBottom: 0 }}>2. D-9 · Navamsha (नवांश)</div>
                   <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Dharma & Marriage</span>
                 </div>
-                <CompactNorthChart chart={chartLayers.d9} />
-              </div>
-
-              {/* 3. Nirayana Bhava Chalit */}
-              <div className="chart-panel">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <div className="chart-panel-title" style={{ marginBottom: 0 }}>3. Nirayana Bhava Chalit (चलित)</div>
-                  <span style={{ fontSize: "10px", color: "var(--app-gold)", fontWeight: 700 }}>Vedic Bhava Chalit</span>
-                </div>
-                <CompactNorthChart chart={chartLayers.chalitChart} mode="chalit" />
-              </div>
-
-              {/* 4. KP Cuspal Chart */}
-              <div className="chart-panel">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <div className="chart-panel-title" style={{ marginBottom: 0 }}>4. KP Cuspal (कस्पल कुण्डली)</div>
-                  <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Placidus &amp; Sub-Lords</span>
-                </div>
                 <CompactNorthChart
-                  chart={chartLayers.kpChart}
-                  mode="kp"
-                  kpCusps={kpResult?.cusps}
-                  planetSubLords={planetSubLords}
+                  chart={chartLayers.d9}
+                  outerPlanets={showOuterPlanets ? d9OuterPlanets : undefined}
+                  activeOuterPlanets={activeOuterPlanetKeys}
                 />
               </div>
+
+              {/* 3 & 4. Only in Advance Mode */}
+              {chartViewMode === "advance" && (
+                <>
+                  {/* 3. Nirayana Bhava Chalit */}
+                  <div className="chart-panel">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div className="chart-panel-title" style={{ marginBottom: 0 }}>3. Nirayana Bhava Chalit (चलित)</div>
+                      <span style={{ fontSize: "10px", color: "var(--app-gold)", fontWeight: 700 }}>Vedic Bhava Chalit</span>
+                    </div>
+                    <CompactNorthChart chart={chartLayers.chalitChart} mode="chalit" />
+                  </div>
+
+                  {/* 4. KP Cuspal Chart */}
+                  <div className="chart-panel">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div className="chart-panel-title" style={{ marginBottom: 0 }}>4. KP Cuspal (कस्पल कुण्डली)</div>
+                      <span style={{ fontSize: "10px", color: "var(--app-muted)", fontWeight: 600 }}>Placidus &amp; Sub-Lords</span>
+                    </div>
+                    <CompactNorthChart
+                      chart={chartLayers.kpChart}
+                      mode="kp"
+                      kpCusps={kpResult?.cusps}
+                      planetSubLords={planetSubLords}
+                    />
+                  </div>
+                </>
+              )}
             </div>
+
+            {/* Outer Planets Dossier Card shown when Outer Planets checkbox is active */}
+            {showOuterPlanets && outerPlanetsData && (
+              <div style={{ marginTop: 16 }}>
+                <OuterPlanetsDossierCard
+                  evaluations={outerPlanetsData.evaluations}
+                  activePlanetKeys={activeOuterPlanetKeys}
+                  onTogglePlanet={(key) => {
+                    setActiveOuterPlanetKeys((prev) =>
+                      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                    );
+                  }}
+                />
+              </div>
+            )}
 
             {/* Comparative Breakdown Tables */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginTop: 16 }}>
@@ -1389,7 +1613,14 @@ function DashboardContent() {
           </div>
           </div>
 
-        </main>
+              {/* PRO / ELITE UPGRADE PROMPT MODAL */}
+      <ProUpgradePromptModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureTitle={upgradeModalFeature.title}
+        featureDescription={upgradeModalFeature.desc}
+      />
+    </main>
       </div>
     </>
   );

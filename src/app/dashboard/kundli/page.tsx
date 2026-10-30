@@ -39,6 +39,8 @@ import { LiveMuhurtaAlert } from "@/components/panchang/LiveMuhurtaAlert";
 import { runKPEngine } from "@/lib/astro-engine/kp";
 import { computeNatalOuterPlanets, computeD9OuterPlanets, type OuterPlanetKey } from "@/lib/astro-engine/outer-planets-engine";
 import OuterPlanetsDossierCard from "@/components/charts/OuterPlanetsDossierCard";
+import ProUpgradePromptModal from "@/components/charts/ProUpgradePromptModal";
+import { useUserTier } from "@/context/ChartContext";
 
 const PLS  = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 const PEMO = ["Su","Mo","Ma","Me","Ju","Ve","Sa","Ra","Ke"];
@@ -130,7 +132,50 @@ export default function KundliPage() {
   });
   const [selectedCity, setSelectedCity] = useState<CitySearchResult | null>(null);
   const { userTier: contextTier, setChartData } = useChartEngine();
+  const { isElite: contextIsElite } = useUserTier();
   const userTier = (contextTier ?? "free") as PlanTier;
+  const isProOrEliteUser = Boolean(
+    isFullAccessEnabled() ||
+    contextIsElite ||
+    userTier === "premium" ||
+    userTier === "elite"
+  );
+
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeModalFeature, setUpgradeModalFeature] = useState({
+    title: "Outer Planets & Advanced Systems",
+    desc: "INDRA (Uranus), VARUN (Neptune), YAM (Pluto), Nirayana Bhava Chalit & KP Cuspal are premium astrological intelligence layers.",
+  });
+
+  const handleToggleAdvanceMode = () => {
+    if (chartViewMode === "advance") {
+      setChartViewMode("normal");
+      return;
+    }
+    if (!isProOrEliteUser) {
+      setUpgradeModalFeature({
+        title: "Nirayana Bhava Chalit & KP Cuspal Charts",
+        desc: "Nirayana Bhava Chalit and KP Cuspal Charts are advanced Vedic & KP astrological systems exclusively available to Pro and Elite members.",
+      });
+      setShowUpgradeModal(true);
+      return;
+    }
+    setChartViewMode("advance");
+  };
+
+  const handleOuterPlanetToggle = (key: OuterPlanetKey) => {
+    if (!isProOrEliteUser) {
+      setUpgradeModalFeature({
+        title: "Modern Outer Planets (इंद्र, वरुण, यम)",
+        desc: "Astronomical coordinates, whole-sign house placements, and subconscious karmic synthesis for Uranus, Neptune, and Pluto are reserved for Pro and Elite members.",
+      });
+      setShowUpgradeModal(true);
+      return;
+    }
+    setActiveOuterPlanetKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
   const { chart: primaryChart, loading: chartLoading, hasUserChart } = useUserChart();
   const [chart, setChart] = useState<ChartData | null>(() => (hasUserChart && primaryChart) ? primaryChart : null);
   const [loading, setLoading] = useState(false);
@@ -1483,7 +1528,7 @@ export default function KundliPage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setChartViewMode("advance")}
+                            onClick={handleToggleAdvanceMode}
                             style={{
                               padding: "5px 12px",
                               borderRadius: "7px",
@@ -1494,9 +1539,17 @@ export default function KundliPage() {
                               border: "none",
                               cursor: "pointer",
                               transition: "all 0.15s ease",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
                             }}
                           >
-                            Advance (Nirayan + KP)
+                            <span>Advance (Nirayan + KP)</span>
+                            {!isProOrEliteUser && (
+                              <span style={{ fontSize: "9px", background: "rgba(184,134,11,0.2)", padding: "1px 5px", borderRadius: "999px", color: "#B8860B" }}>
+                                PRO 👑
+                              </span>
+                            )}
                           </button>
                         </div>
 
@@ -1657,11 +1710,7 @@ export default function KundliPage() {
                         <OuterPlanetsDossierCard
                           evaluations={outerPlanetsData.evaluations}
                           activePlanetKeys={activeOuterPlanetKeys}
-                          onTogglePlanet={(key) => {
-                            setActiveOuterPlanetKeys((prev) =>
-                              prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-                            );
-                          }}
+                          onTogglePlanet={handleOuterPlanetToggle}
                         />
                       </div>
                     )}
