@@ -14,19 +14,19 @@ export const navLinks = [
 ];
 
 export const trustBadges = [
-  "Free Kundli in 60 seconds",
-  "25+ Astrology Engines",
-  "30+ Intelligent Modules",
-  "Personalized Remedies",
-  "Premium PDF Reports",
+  "16 Classical Astrological Engines",
+  "Deterministic Ephemeris (Zero Hallucination)",
+  "KP Sub-Lords & Jaimini Chara Dasha",
+  "27 Nakshatra Social & Shivling Remedies",
+  "Instant Deterministic Vector PDF Dossier",
 ];
 
 export const metrics = [
-  { value: "25+", label: "Astrology Engines" },
-  { value: "30+", label: "Modules" },
-  { value: "60-sec", label: "Free Kundli" },
-  { value: "12-month", label: "Forecasts" },
-  { value: "PDF", label: "Premium Reports" },
+  { value: "16", label: "Classical Engines" },
+  { value: "100%", label: "Deterministic Ephemeris" },
+  { value: "0", label: "Math Hallucinations" },
+  { value: "27", label: "Nakshatra Social Remedies" },
+  { value: "65+", label: "Pages Vector Dossier" },
 ];
 
 export const painPoints = [
@@ -53,6 +53,11 @@ export const features = [
   { icon: "BriefcaseBusiness", title: "Career & Wealth Timing", description: "See career growth, income periods and practical windows for action." },
   { icon: "Heart", title: "Love & Marriage Analysis", description: "Decode relationship patterns, marriage timing and compatibility themes." },
   { icon: "Compass", title: "KP Sub-Lord Predictions", description: "Use cusp, star-lord and sub-lord logic for sharper event analysis." },
+  { icon: "Home", title: "Astro-Vastu 16-Zone Radar", description: "Compound degree hits, 45 Devatas, 32 Pad entrances, and 120° shield object shifting." },
+  { icon: "Shield", title: "Thread & Wrist Trap Audit (धागा)", description: "Detects Gemini Dusthana wrist traps (मौली से रोग/तनाव), neck thread traps, and personalized thread rules." },
+  { icon: "Watch", title: "Bio-Wearables & Metal Audit", description: "Audit rings, metallic kadas, smartwatch wrist polarity, and bio-magnetic electromagnetic interference." },
+  { icon: "Sparkles", title: "Astro-Tattoo & Somatotopic Ink", description: "Goal house activation via skin ink, gender lateralization (वाम/दक्षिण अंग), and untenanted planet precedence." },
+  { icon: "CircleDot", title: "Biometric Dot Therapy (बिंदु)", description: "12-sign anatomical points, 2-inch navel desi ghee protocol, and classical cooling balms for acute planetary friction." },
   { icon: "HandHeart", title: "Lal Kitab Remedies", description: "Simple behavioral, charity and household remedies connected to your chart." },
   { icon: "GitBranch", title: "Nadi Karmic Patterns", description: "Read repeating karmic loops and storylines through planetary sequences." },
   { icon: "Grid3X3", title: "Ashtakavarga Strength", description: "Measure house strength through bindus for better planning." },
@@ -93,22 +98,22 @@ export const steps = [
 ];
 
 export const engines = [
-  "Vedic Kundli",
-  "Parashari",
-  "KP Astrology",
-  "Lal Kitab",
-  "Bhrigu Nandi Nadi",
-  "Jaimini",
-  "Vimshottari Dasha",
-  "Transit Engine",
-  "Ashtakavarga",
-  "Shadbala",
-  "Divisional Charts",
-  "Panchang",
-  "Numerology",
-  "Vastu",
-  "AstroSound",
-  "Family Karma",
+  "Vedic Parashari (D1–D60)",
+  "KP Placidus Sub-Lords",
+  "Jaimini Chara Dasha",
+  "Special Lagnas (Indu, Hora, Shree)",
+  "27 Nakshatra Social Remedies",
+  "Transit Nakshatra Shivling",
+  "Astro-Vastu 16-Zone Hit Radar",
+  "Thread & Wrist Trap Audit (धागा)",
+  "Bio-Wearables & Metal Shield",
+  "Astro-Tattoo & Somatotopic Ink",
+  "Biometric Dot Therapy (बिंदु)",
+  "Bhrigu Nandi Nadi Karmic",
+  "Lal Kitab Debts & Upayas",
+  "Ashtakavarga Strength (SAV)",
+  "Shadbala 6-Fold Power",
+  "Samudrika Shastra Palmistry",
 ];
 
 export const useCases = [

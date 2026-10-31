@@ -16,6 +16,7 @@ import {
   type PalmistryReport,
 } from "@/lib/astro-engine/palmistry-engine";
 import { detectHandGeometry, applyHandGeometry } from "@/lib/palmistry/hand-geometry";
+import { HumanPalmDrawing } from "./HumanPalmDrawing";
 import { PalmLoadingScreen } from "./PalmLoadingScreen";
 import { StylePicker, type ReportStyle } from "./StylePicker";
 import { DashboardReport } from "./DashboardReport";
@@ -67,6 +68,7 @@ function PremiumButton({
 function PalmScanner({
   src, report, scanning,
 }: { src: string; report: PalmistryReport | null; scanning: boolean }) {
+  const [viewMode, setViewMode] = useState<"photo" | "anatomical">("photo");
   const [hover, setHover] = useState<string | null>(null);
   const [aspect, setAspect] = useState(3 / 3.6);
   const lineById = useMemo(
@@ -78,126 +80,162 @@ function PalmScanner({
   const mirror = report?.meta.hand === "left";
 
   return (
-    <div
-      className="relative mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-[#c8a030]/30 bg-black shadow-[0_0_60px_-15px_rgba(200,160,48,0.5)]"
-      style={{ aspectRatio: String(aspect) }}
-    >
-      {/* radial glow */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(200,160,48,0.18),transparent_60%)]" />
-      {/* palm image — user-supplied data URL, next/image not applicable.
-          Container aspect matches the image so object-cover neither crops nor
-          letterboxes, keeping the overlay aligned to the real palm. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt="Your palm"
-        className="absolute inset-0 h-full w-full object-cover opacity-90"
-        onLoad={(e) => {
-          const img = e.currentTarget;
-          if (img.naturalWidth && img.naturalHeight) setAspect(img.naturalWidth / img.naturalHeight);
-        }}
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
+    <div className="space-y-3">
+      {/* Mode Switcher */}
+      <div className="flex items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={() => setViewMode("photo")}
+          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+            viewMode === "photo"
+              ? "bg-[#c8a030] text-black shadow-[0_0_12px_rgba(200,160,48,0.5)]"
+              : "border border-[#c8a030]/30 text-[#e6c869] hover:bg-[#c8a030]/10"
+          }`}
+        >
+          📷 Photo Scan
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("anatomical")}
+          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+            viewMode === "anatomical"
+              ? "bg-[#c8a030] text-black shadow-[0_0_12px_rgba(200,160,48,0.5)]"
+              : "border border-[#c8a030]/30 text-[#e6c869] hover:bg-[#c8a030]/10"
+          }`}
+        >
+          ✋ Vedic Palm Map
+        </button>
+      </div>
 
-      {/* gold grid */}
-      <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <line key={`v${i}`} x1={(i + 1) * 10} y1="0" x2={(i + 1) * 10} y2="100" stroke={GOLD} strokeWidth="0.15" />
-        ))}
-        {Array.from({ length: 9 }).map((_, i) => (
-          <line key={`h${i}`} x1="0" y1={(i + 1) * 10} x2="100" y2={(i + 1) * 10} stroke={GOLD} strokeWidth="0.15" />
-        ))}
-      </svg>
+      {viewMode === "anatomical" ? (
+        <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-[#c8a030]/40 bg-black/80 p-3 shadow-[0_0_50px_rgba(200,160,48,0.25)]">
+          <HumanPalmDrawing
+            hand={mirror ? "left" : "right"}
+            customLines={report?.lines}
+            customMounts={report?.mounts}
+          />
+        </div>
+      ) : (
+        <div
+          className="relative mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-[#c8a030]/30 bg-black shadow-[0_0_60px_-15px_rgba(200,160,48,0.5)]"
+          style={{ aspectRatio: String(aspect) }}
+        >
+          {/* radial glow */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(200,160,48,0.18),transparent_60%)]" />
+          {/* palm image */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt="Your palm"
+            className="absolute inset-0 h-full w-full object-cover opacity-90"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              if (img.naturalWidth && img.naturalHeight) setAspect(img.naturalWidth / img.naturalHeight);
+            }}
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
 
-      {/* scanning beam */}
-      {scanning && (
-        <motion.div
-          className="absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-[#c8a030]/40 to-transparent"
-          initial={{ top: "-20%" }}
-          animate={{ top: ["-20%", "100%"] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        />
-      )}
+          {/* gold grid */}
+          <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <line key={`v${i}`} x1={(i + 1) * 10} y1="0" x2={(i + 1) * 10} y2="100" stroke={GOLD} strokeWidth="0.15" />
+            ))}
+            {Array.from({ length: 9 }).map((_, i) => (
+              <line key={`h${i}`} x1="0" y1={(i + 1) * 10} x2="100" y2={(i + 1) * 10} stroke={GOLD} strokeWidth="0.15" />
+            ))}
+          </svg>
 
-      {/* line overlays — drawn in normalized 0-100 image space */}
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {PALM_LINES.map((def, i) => {
-          const reading = lineById.get(def.id);
-          const raw = reading?.points ?? FALLBACK_LINE_POINTS[def.id];
-          const usingModel = Boolean(reading?.points);
-          const pts = usingModel ? raw : raw.map((p) => mirrorX(p, mirror));
-          const active = hover === def.id;
-          return (
-            <motion.path
-              key={def.id}
-              d={buildLinePath(pts)}
-              fill="none"
-              stroke={def.color}
-              strokeWidth={active ? 1.4 : 0.9}
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-              style={{ filter: `drop-shadow(0 0 ${active ? 8 : 4}px ${def.color})`, cursor: "pointer" }}
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: scanning ? 0.35 : 0.95 }}
-              transition={{ duration: 1.4, delay: 0.3 + i * 0.25, ease: "easeInOut" }}
-              onMouseEnter={() => reading && setHover(def.id)}
-              onMouseLeave={() => setHover(null)}
-            />
-          );
-        })}
-      </svg>
-
-      {/* line tooltip */}
-      <AnimatePresence>
-        {hover && lineById.get(hover) && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="absolute bottom-3 left-3 right-3 rounded-xl border border-[#c8a030]/30 bg-black/85 p-3 backdrop-blur-md"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold" style={{ color: lineById.get(hover)!.color }}>
-                {lineById.get(hover)!.name}
-              </span>
-              <span className="text-xs text-[#e6c869]">{lineById.get(hover)!.confidence}% confidence</span>
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-[#3D3834]">{lineById.get(hover)!.summary}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* floating mount labels — at real (or mirrored fallback) positions */}
-      {report &&
-        report.mounts.map((m, i) => {
-          const fallback = FALLBACK_MOUNT_POS[m.id];
-          const pos = m.pos ?? (fallback ? mirrorX(fallback, mirror) : undefined);
-          if (!pos) return null;
-          return (
+          {/* scanning beam */}
+          {scanning && (
             <motion.div
-              key={m.id}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: scanning ? 0 : 1, scale: 1, y: [0, -4, 0] }}
-              transition={{
-                opacity: { delay: 1.6 + i * 0.1 },
-                scale: { delay: 1.6 + i * 0.1 },
-                y: { duration: 3 + i * 0.3, repeat: Infinity, ease: "easeInOut" },
-              }}
-            >
-              <div className="whitespace-nowrap rounded-full border border-[#c8a030]/40 bg-black/70 px-2 py-0.5 text-[9px] font-semibold text-[#e6c869] backdrop-blur">
-                {m.name.replace("Mount of ", "").replace(" / Apollo", "")} · {m.score}%
-              </div>
-            </motion.div>
-          );
-        })}
+              className="absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-[#c8a030]/40 to-transparent"
+              initial={{ top: "-20%" }}
+              animate={{ top: ["-20%", "100%"] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            />
+          )}
 
-      {/* scanning label */}
-      {scanning && (
-        <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2">
-          <ScanLine className="animate-pulse text-[#e6c869]" size={28} />
-          <span className="text-xs font-medium tracking-widest text-[#e6c869]">SCANNING PALM…</span>
+          {/* line overlays — drawn in normalized 0-100 image space */}
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            {PALM_LINES.map((def, i) => {
+              const reading = lineById.get(def.id);
+              const raw = reading?.points ?? FALLBACK_LINE_POINTS[def.id];
+              const usingModel = Boolean(reading?.points);
+              const pts = usingModel ? raw : raw.map((p) => mirrorX(p, mirror));
+              const active = hover === def.id;
+              return (
+                <motion.path
+                  key={def.id}
+                  d={buildLinePath(pts)}
+                  fill="none"
+                  stroke={def.color}
+                  strokeWidth={active ? 1.4 : 0.9}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  style={{ filter: `drop-shadow(0 0 ${active ? 8 : 4}px ${def.color})`, cursor: "pointer" }}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: scanning ? 0.35 : 0.95 }}
+                  transition={{ duration: 1.4, delay: 0.3 + i * 0.25, ease: "easeInOut" }}
+                  onMouseEnter={() => reading && setHover(def.id)}
+                  onMouseLeave={() => setHover(null)}
+                />
+              );
+            })}
+          </svg>
+
+          {/* line tooltip */}
+          <AnimatePresence>
+            {hover && lineById.get(hover) && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="absolute bottom-3 left-3 right-3 rounded-xl border border-[#c8a030]/30 bg-black/85 p-3 backdrop-blur-md"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold" style={{ color: lineById.get(hover)!.color }}>
+                    {lineById.get(hover)!.name}
+                  </span>
+                  <span className="text-xs text-[#e6c869]">{lineById.get(hover)!.confidence}% confidence</span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-[#3D3834]">{lineById.get(hover)!.summary}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* floating mount labels — at real (or mirrored fallback) positions */}
+          {report &&
+            report.mounts.map((m, i) => {
+              const fallback = FALLBACK_MOUNT_POS[m.id];
+              const pos = m.pos ?? (fallback ? mirrorX(fallback, mirror) : undefined);
+              if (!pos) return null;
+              return (
+                <motion.div
+                  key={m.id}
+                  className="absolute -translate-x-1/2 -translate-y-1/2"
+                  style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: scanning ? 0 : 1, scale: 1, y: [0, -4, 0] }}
+                  transition={{
+                    opacity: { delay: 1.6 + i * 0.1 },
+                    scale: { delay: 1.6 + i * 0.1 },
+                    y: { duration: 3 + i * 0.3, repeat: Infinity, ease: "easeInOut" },
+                  }}
+                >
+                  <div className="whitespace-nowrap rounded-full border border-[#c8a030]/40 bg-black/70 px-2 py-0.5 text-[9px] font-semibold text-[#e6c869] backdrop-blur">
+                    {m.name.replace("Mount of ", "").replace(" / Apollo", "")} · {m.score}%
+                  </div>
+                </motion.div>
+              );
+            })}
+
+          {/* scanning label */}
+          {scanning && (
+            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2">
+              <ScanLine className="animate-pulse text-[#e6c869]" size={28} />
+              <span className="text-xs font-medium tracking-widest text-[#e6c869]">SCANNING PALM…</span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -375,19 +413,36 @@ export function PalmistryAnalyzer() {
             />
 
             {!preview ? (
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[#c8a030]/30 py-14 transition-colors hover:border-[#c8a030]/60 hover:bg-[#c8a030]/[0.04]"
-              >
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#c8a030]/10">
-                  <Hand className="text-[#e6c869]" size={30} />
+              <div className="grid gap-8 lg:grid-cols-[1fr_360px] items-center">
+                <div className="relative overflow-hidden rounded-3xl border border-[#c8a030]/25 bg-black/60 p-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                  <div className="mb-3 flex items-center justify-between px-1">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#e6c869]">
+                      Samudrika Shastra Anatomical Palm Reference
+                    </span>
+                    <span className="text-[11px] text-[#a09070]">Hover on lines & mounts to explore</span>
+                  </div>
+                  <HumanPalmDrawing hand="right" />
                 </div>
-                <span className="text-base font-semibold text-[#1A1A1A]">Apni hatheli ki photo upload karein</span>
-                <span className="flex items-center gap-1.5 text-xs text-[#6B635B]">
-                  <Upload size={12} /> JPG / PNG · Max {MAX_MB}MB · achhi roshni mein khinchi hui photo
-                </span>
-              </button>
+
+                <div className="flex flex-col justify-center space-y-4">
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[#c8a030]/35 bg-[#c8a030]/[0.02] py-12 px-6 transition-all hover:border-[#c8a030]/70 hover:bg-[#c8a030]/[0.06]"
+                  >
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#c8a030]/15 shadow-[0_0_24px_rgba(200,160,48,0.25)]">
+                      <Hand className="text-[#e6c869]" size={32} />
+                    </div>
+                    <span className="text-base font-semibold text-white">Apni hatheli ki photo upload karein</span>
+                    <span className="flex items-center gap-1.5 text-xs text-[#a09070] text-center">
+                      <Upload size={12} /> JPG / PNG · Max {MAX_MB}MB · Seedhi hatheli aur achhi roshni
+                    </span>
+                  </button>
+                  <p className="text-xs leading-relaxed text-[#a09070] text-center">
+                    AstroLife AI aapki hatheli ki Jeevan, Mastak, Hridaya, Bhagya, Surya aur Budh Rekhaon ke sath 8 Graha Parvat map karega.
+                  </p>
+                </div>
+              </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-[320px_1fr] md:items-center">
                 <div className="relative mx-auto w-full max-w-xs">

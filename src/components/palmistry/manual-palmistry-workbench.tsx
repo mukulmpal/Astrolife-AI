@@ -9,6 +9,7 @@ import { PalmistryReportView } from "./palmistry-report";
 import { PalmistrySaveButton } from "./palmistry-save-button";
 import { PalmistryStyleToggle } from "./palmistry-style-toggle";
 import { PalmistryUpload } from "./palmistry-upload";
+import { HumanPalmDrawing } from "./HumanPalmDrawing";
 import type { DominantHand, HandSide, PalmAnalyzeInput, PalmReportStyle, PalmRuleReport, PalmVisionResult } from "@/lib/palmistry/types";
 
 export function ManualPalmistryWorkbench() {
@@ -71,8 +72,15 @@ export function ManualPalmistryWorkbench() {
         <PalmistryStyleToggle value={style} onChange={setStyle} />
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
         <div className="space-y-4">
+          <div className="overflow-hidden rounded-2xl border border-[#c8a030]/25 bg-black/60 p-4 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+            <div className="mb-2 flex items-center justify-between text-xs font-semibold text-[#e6c869]">
+              <span>Anatomical Reference</span>
+              <span className="text-[10px] text-[#a09070]">{handSide.toUpperCase()} HAND</span>
+            </div>
+            <HumanPalmDrawing hand={handSide === "left" ? "left" : "right"} />
+          </div>
           <PalmistryUpload onPreview={() => undefined} onExtracted={applyVision} />
           {vision && <VisionConfidenceCard vision={vision} />}
         </div>

@@ -33,9 +33,10 @@ const DEMO_VASTU_FALLBACK: BirthDetails = {
 
 interface AstroVastuHitRadarViewProps {
   chart?: ChartData | any;
+  defaultTab?: string;
 }
 
-export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
+export function AstroVastuHitRadarView({ chart, defaultTab }: AstroVastuHitRadarViewProps) {
   const [activeTab, setActiveTab] = useState<
     | "dossier"
     | "rxPrescription"
@@ -52,7 +53,13 @@ export function AstroVastuHitRadarView({ chart }: AstroVastuHitRadarViewProps) {
     | "mandala"
     | "barChart"
     | "goalActivation"
-  >("dossier");
+  >((defaultTab as any) || "dossier");
+
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab as any);
+    }
+  }, [defaultTab]);
   const [showCuspsTable, setShowCuspsTable] = useState(false);
   const [hitFilter, setHitFilter] = useState<"all" | 180 | 90 | 45 | 60 | 120>("all");
   const [selectedDirectionCode, setSelectedDirectionCode] = useState<string>("N");

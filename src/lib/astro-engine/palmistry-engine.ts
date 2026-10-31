@@ -180,23 +180,23 @@ const DISCLAIMER =
 // model does not return per-image coordinates. The UI mirrors these for a
 // left hand. Model-detected `points`/`pos` always take priority.
 export const FALLBACK_LINE_POINTS: Record<PalmLineId, Point[]> = {
-  heart:   [{ x: 16.7, y: 31.0 }, { x: 36.7, y: 25.3 }, { x: 58.3, y: 26.3 }, { x: 83.3, y: 31.6 }],
-  head:    [{ x: 19.3, y: 42.0 }, { x: 40.0, y: 39.5 }, { x: 63.3, y: 44.2 }, { x: 81.7, y: 46.8 }],
-  life:    [{ x: 23.3, y: 33.7 }, { x: 24.0, y: 52.6 }, { x: 36.7, y: 71.0 }, { x: 50.0, y: 86.8 }],
-  fate:    [{ x: 56.0, y: 86.8 }, { x: 57.3, y: 65.8 }, { x: 56.7, y: 47.4 }, { x: 54.0, y: 31.6 }],
-  sun:     [{ x: 70.0, y: 86.8 }, { x: 71.3, y: 68.4 }, { x: 72.0, y: 52.6 }, { x: 71.3, y: 39.5 }],
-  mercury: [{ x: 80.0, y: 86.8 }, { x: 82.0, y: 71.0 }, { x: 81.3, y: 57.9 }, { x: 78.7, y: 46.8 }],
+  heart:   [{ x: 86.8, y: 51.4 }, { x: 72.7, y: 47.9 }, { x: 56.8, y: 47.5 }, { x: 42.0, y: 43.9 }],
+  head:    [{ x: 33.6, y: 49.3 }, { x: 44.3, y: 53.2 }, { x: 58.0, y: 56.4 }, { x: 72.7, y: 61.6 }],
+  life:    [{ x: 33.6, y: 49.1 }, { x: 35.5, y: 57.1 }, { x: 36.8, y: 69.6 }, { x: 42.0, y: 82.1 }, { x: 49.5, y: 88.9 }],
+  fate:    [{ x: 54.5, y: 87.1 }, { x: 54.1, y: 71.4 }, { x: 53.9, y: 57.1 }, { x: 53.6, y: 43.2 }],
+  sun:     [{ x: 65.5, y: 68.8 }, { x: 66.1, y: 56.3 }, { x: 66.8, y: 44.6 }],
+  mercury: [{ x: 74.1, y: 76.8 }, { x: 77.3, y: 61.6 }, { x: 80.5, y: 47.3 }],
 };
 
 export const FALLBACK_MOUNT_POS: Record<PalmMountId, Point> = {
-  jupiter:   { x: 16, y: 24 },
-  saturn:    { x: 42, y: 14 },
-  sun:       { x: 66, y: 18 },
-  mercury:   { x: 86, y: 30 },
-  venus:     { x: 14, y: 74 },
-  moon:      { x: 84, y: 76 },
-  upperMars: { x: 88, y: 52 },
-  lowerMars: { x: 12, y: 50 },
+  jupiter:   { x: 40.5, y: 41.1 },
+  saturn:    { x: 53.6, y: 38.9 },
+  sun:       { x: 67.0, y: 39.6 },
+  mercury:   { x: 80.7, y: 42.1 },
+  venus:     { x: 42.0, y: 71.4 },
+  moon:      { x: 76.1, y: 74.1 },
+  upperMars: { x: 79.1, y: 57.1 },
+  lowerMars: { x: 38.2, y: 54.5 },
 };
 
 // Mirror a normalized point horizontally (for left vs right hand).

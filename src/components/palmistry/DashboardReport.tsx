@@ -30,6 +30,7 @@ import {
   buildLinePath,
   mirrorX,
 } from "@/lib/astro-engine/palmistry-engine";
+import { HumanPalmDrawing } from "./HumanPalmDrawing";
 
 const GOLD = "#c8a030";
 
@@ -278,6 +279,7 @@ function IntelligenceModeBar({
 }
 
 function CommandPalmScanner({ report, preview }: { report: PalmistryReport; preview: string }) {
+  const [viewMode, setViewMode] = useState<"photo" | "anatomical">("photo");
   const lineById = useMemo(
     () => new Map<string, PalmistryReport["lines"][number]>(report.lines.map((l) => [l.id as string, l])),
     [report.lines],
@@ -297,42 +299,76 @@ function CommandPalmScanner({ report, preview }: { report: PalmistryReport; prev
   return (
     <div className="relative min-h-[680px] overflow-hidden rounded-[2rem] border border-[rgba(184,134,11,0.2)] bg-[radial-gradient(circle_at_50%_40%,rgba(23,143,190,0.18),transparent_46%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))] p-4 shadow-[0_0_100px_rgba(33,150,243,0.10)]">
       <div className="pointer-events-none absolute inset-0 opacity-25" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)", backgroundSize: "42px 42px" }} />
-      <div className="absolute left-1/2 top-5 z-20 -translate-x-1/2 rounded-full border border-cyan-300/30 bg-[#FAF7F2] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-100 backdrop-blur">
-        <ScanLine size={13} className="mr-2 inline" /> Palm Scan Complete
+      
+      {/* Top Controls: Scan Status & View Mode */}
+      <div className="absolute left-1/2 top-5 z-20 flex -translate-x-1/2 items-center gap-3">
+        <div className="rounded-full border border-cyan-300/30 bg-[#FAF7F2] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-100 backdrop-blur">
+          <ScanLine size={13} className="mr-2 inline" /> Palm Scan Complete
+        </div>
+        <div className="flex items-center gap-1 rounded-full border border-[#c8a030]/30 bg-black/60 p-1 backdrop-blur">
+          <button
+            type="button"
+            onClick={() => setViewMode("photo")}
+            className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+              viewMode === "photo" ? "bg-[#c8a030] text-black" : "text-[#e6c869] hover:bg-[#c8a030]/10"
+            }`}
+          >
+            📷 Photo
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("anatomical")}
+            className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+              viewMode === "anatomical" ? "bg-[#c8a030] text-black" : "text-[#e6c869] hover:bg-[#c8a030]/10"
+            }`}
+          >
+            ✋ Hand Map
+          </button>
+        </div>
       </div>
 
-      <div className="relative mx-auto mt-10 aspect-[4/5] max-h-[560px] max-w-[470px] overflow-hidden rounded-[42%]">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 28, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[86%] w-[86%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/25" />
-        <motion.div animate={{ rotate: -360 }} transition={{ duration: 42, repeat: Infinity, ease: "linear" }} className="absolute left-[15%] top-[15%] h-[70%] w-[70%] rounded-full border border-dashed border-[#c8a030]/18" />
-        <motion.div animate={{ y: [0, 450, 0] }} transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }} className="absolute left-[24%] right-[24%] z-30 h-px bg-cyan-200/80 shadow-[0_0_30px_8px_rgba(90,220,255,0.25)]" />
+      {viewMode === "anatomical" ? (
+        <div className="relative mx-auto mt-14 max-w-[440px] rounded-3xl border border-[#c8a030]/30 bg-black/75 p-4 shadow-[0_0_50px_rgba(200,160,48,0.25)]">
+          <HumanPalmDrawing
+            hand={mirror ? "left" : "right"}
+            customLines={report.lines}
+            customMounts={report.mounts}
+          />
+        </div>
+      ) : (
+        <div className="relative mx-auto mt-10 aspect-[4/5] max-h-[560px] max-w-[470px] overflow-hidden rounded-[42%]">
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 28, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[86%] w-[86%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/25" />
+          <motion.div animate={{ rotate: -360 }} transition={{ duration: 42, repeat: Infinity, ease: "linear" }} className="absolute left-[15%] top-[15%] h-[70%] w-[70%] rounded-full border border-dashed border-[#c8a030]/18" />
+          <motion.div animate={{ y: [0, 450, 0] }} transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }} className="absolute left-[24%] right-[24%] z-30 h-px bg-cyan-200/80 shadow-[0_0_30px_8px_rgba(90,220,255,0.25)]" />
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={preview} alt="Your palm" className="absolute inset-0 h-full w-full object-cover opacity-95" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/15" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview} alt="Your palm" className="absolute inset-0 h-full w-full object-cover opacity-95" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/15" />
 
-        <svg className="absolute inset-0 z-20 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-          {PALM_LINES.map((def, i) => {
-            const reading = lineById.get(def.id);
-            const raw = reading?.points ?? FALLBACK_LINE_POINTS[def.id];
-            const pts = reading?.points ? raw : raw.map((p) => mirrorX(p, mirror));
-            return (
-              <motion.path
-                key={def.id}
-                d={buildLinePath(pts)}
-                fill="none"
-                stroke={def.color}
-                strokeWidth={1}
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-                style={{ filter: `drop-shadow(0 0 5px ${def.color})` }}
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.96 }}
-                transition={{ duration: 1.3, delay: 0.2 + i * 0.18, ease: "easeInOut" }}
-              />
-            );
-          })}
-        </svg>
-      </div>
+          <svg className="absolute inset-0 z-20 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            {PALM_LINES.map((def, i) => {
+              const reading = lineById.get(def.id);
+              const raw = reading?.points ?? FALLBACK_LINE_POINTS[def.id];
+              const pts = reading?.points ? raw : raw.map((p) => mirrorX(p, mirror));
+              return (
+                <motion.path
+                  key={def.id}
+                  d={buildLinePath(pts)}
+                  fill="none"
+                  stroke={def.color}
+                  strokeWidth={1}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  style={{ filter: `drop-shadow(0 0 5px ${def.color})` }}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 0.96 }}
+                  transition={{ duration: 1.3, delay: 0.2 + i * 0.18, ease: "easeInOut" }}
+                />
+              );
+            })}
+          </svg>
+        </div>
+      )}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-8 mx-auto h-24 max-w-[520px] rounded-[100%] border border-cyan-300/20 bg-cyan-300/10 blur-[1px]" />
 

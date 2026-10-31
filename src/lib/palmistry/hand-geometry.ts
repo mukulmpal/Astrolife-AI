@@ -68,35 +68,46 @@ function buildGeometry(lm: LM[]): HandGeometry {
   const webThumb = mid(P(INDEX_MCP), P(THUMB_MCP)); // gap between thumb & index
 
   const lines: HandGeometry["lines"] = {
-    // Heart line: a curve just below the finger bases, pinky → index side.
+    // Heart line: a graceful curve just below the finger bases, pinky → index side.
     heart: [
-      below(P(PINKY_MCP), 0.20), below(P(RING_MCP), 0.17),
-      below(P(MIDDLE_MCP), 0.17), below(P(INDEX_MCP), 0.22),
+      below(P(PINKY_MCP), 0.20),
+      below(P(RING_MCP), 0.17),
+      below(P(MIDDLE_MCP), 0.17),
+      below(P(INDEX_MCP), 0.22),
     ].map(cl),
     // Head line: below the heart line, thumb-web → pinky side.
     head: [
-      below(webThumb, 0.30), below(P(MIDDLE_MCP), 0.36),
-      below(P(RING_MCP), 0.36), below(P(PINKY_MCP), 0.33),
+      below(webThumb, 0.30),
+      below(P(MIDDLE_MCP), 0.36),
+      below(P(RING_MCP), 0.36),
+      below(P(PINKY_MCP), 0.33),
     ].map(cl),
-    // Life line: arc from thumb-web around the thumb ball down to the wrist.
+    // Life line: natural arc encircling the Venus thenar eminence down to the wrist.
     life: [
-      lerp(webThumb, C, 0.12), lerp(P(THUMB_MCP), C, 0.26),
-      lerp(P(THUMB_CMC), C, 0.22), lerp(P(WRIST), C, 0.16),
+      lerp(webThumb, P(INDEX_MCP), 0.08),
+      lerp(P(THUMB_MCP), C, 0.22),
+      lerp(venus, P(WRIST), 0.30),
+      lerp(venus, P(WRIST), 0.75),
+      lerp(P(WRIST), venus, 0.25),
     ].map(cl),
-    // Fate line: up the centre of the palm, wrist → middle finger base.
+    // Fate line: central vertical axis, from wrist base up towards the Saturn mount.
     fate: [
-      lerp(P(WRIST), P(MIDDLE_MCP), 0.18), lerp(P(WRIST), P(MIDDLE_MCP), 0.5),
-      lerp(P(WRIST), P(MIDDLE_MCP), 0.82),
+      lerp(P(WRIST), C, 0.22),
+      lerp(P(WRIST), C, 0.62),
+      lerp(C, P(MIDDLE_MCP), 0.48),
+      lerp(C, P(MIDDLE_MCP), 0.86),
     ].map(cl),
-    // Sun line: lower palm → ring finger base (shorter, upper).
+    // Sun line: mid-palm plain of Mars up towards the ring finger (Sun mount).
     sun: [
-      lerp(P(WRIST), P(RING_MCP), 0.42), lerp(P(WRIST), P(RING_MCP), 0.64),
-      lerp(P(WRIST), P(RING_MCP), 0.84),
+      lerp(C, P(RING_MCP), 0.28),
+      lerp(C, P(RING_MCP), 0.58),
+      lerp(C, P(RING_MCP), 0.86),
     ].map(cl),
     // Mercury line: from the Moon mount up toward the little finger base.
     mercury: [
-      lerp(moon, P(PINKY_MCP), 0.2), lerp(moon, P(PINKY_MCP), 0.55),
-      lerp(moon, P(PINKY_MCP), 0.85),
+      lerp(moon, P(PINKY_MCP), 0.25),
+      lerp(moon, P(PINKY_MCP), 0.58),
+      lerp(moon, P(PINKY_MCP), 0.88),
     ].map(cl),
   };
 

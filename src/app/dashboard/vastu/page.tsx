@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { EngineEmptyState } from "@/components/engine/engine-intro";
 import { PremiumFeature } from "@/components/premium-feature";
 import { downloadVastuPDFReport } from "@/lib/report-generator";
@@ -550,6 +551,8 @@ function CompleteAnalysisPanel({ result }: { result: CompleteVastuResult | null 
 /* ─── Main Page ───────────────────────────────────────────────── */
 export default function VastuDashboardPage() {
   const { chart, loading: chartLoading, hasUserChart } = useUserChart();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get("tab") || undefined;
   const [kundli, setKundli] = useState<NormalizedKundli | null>(null);
   const [analysisMode, setAnalysisMode] = useState<"hitRadar" | "kundli" | "property">("hitRadar");
   const [chartLoadMessage, setChartLoadMessage] = useState("Chart not loaded yet.");
@@ -1078,7 +1081,7 @@ export default function VastuDashboardPage() {
       </div>
 
       {/* ── ASTRO-VASTU HIT RADAR ── */}
-      {analysisMode === "hitRadar" && <AstroVastuHitRadarView chart={effectiveChart} />}
+      {analysisMode === "hitRadar" && <AstroVastuHitRadarView chart={effectiveChart} defaultTab={tabParam} />}
 
       {/* ── KUNDLI VASTU ── */}
       {analysisMode === "kundli" && <CompleteAnalysisPanel result={completeAnalysis} />}
