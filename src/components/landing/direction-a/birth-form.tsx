@@ -62,41 +62,9 @@ const DEMO_ARCHETYPES = [
   },
 ];
 
-function getLiveCosmicWindow() {
-  const now = new Date();
-  const h = now.getHours();
-  const m = now.getMinutes();
-  const totalMin = h * 60 + m;
-
-  // Abhijit Muhurat: ~11:40 to 12:30 (around solar midday)
-  if (totalMin >= 700 && totalMin <= 750) {
-    return {
-      title: '🟢 Abhijit Muhurat Active (Golden Window)',
-      sub: 'Most auspicious moment · High-success chart casting',
-    };
-  }
-  if (h >= 6 && h < 12) {
-    return {
-      title: '✨ Amrit & Shubh Chaughadia Active',
-      sub: 'Solar Prana surge · 0.01° Swiss Ephemeris micro-precision',
-    };
-  }
-  if (h >= 12 && h < 18) {
-    return {
-      title: '⚡ Labha & Shubh Window Active',
-      sub: 'Dhana Yoga activation window · Multi-House transit ripple',
-    };
-  }
-  return {
-    title: '🌙 Chandra Hora Active (High Intuition)',
-    sub: 'Subconscious karmic clarity · 12-Rashi Somatotopic alignment',
-  };
-}
-
 export function BirthDetailsForm() {
   const router = useRouter();
   const [formMode, setFormMode] = useState<'custom' | 'demo'>('custom');
-  const [cosmicWindow, setCosmicWindow] = useState(getLiveCosmicWindow);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [useSuryaKundli, setUseSuryaKundli] = useState(false);
@@ -108,9 +76,13 @@ export function BirthDetailsForm() {
   });
 
   useEffect(() => {
-    const timer = setInterval(() => setCosmicWindow(getLiveCosmicWindow()), 60000);
-    return () => clearInterval(timer);
-  }, []);
+    // Prefetch dashboard route in idle time for instant 1-click loading
+    try {
+      router.prefetch('/dashboard');
+    } catch {
+      // ignore
+    }
+  }, [router]);
 
   const handleLaunchDemo = (demo: typeof DEMO_ARCHETYPES[0]) => {
     setLoading(true);
@@ -282,30 +254,6 @@ export function BirthDetailsForm() {
 
   return (
     <div className="space-y-4">
-      {/* Live Cosmic Hour Pill */}
-      <div
-        className="flex items-center justify-between rounded-xl px-3.5 py-2 border shadow-xs"
-        style={{ background: '#FAF7F2', borderColor: 'rgba(184, 134, 11, 0.35)' }}
-      >
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <span className="text-10px font-mono font-bold tracking-wider text-[#8C6508]">
-            LIVE COSMIC WINDOW
-          </span>
-        </div>
-        <div className="text-right">
-          <div className="text-10px font-bold text-[#1A1A1A]">
-            {cosmicWindow.title}
-          </div>
-          <div className="text-8px font-medium text-[#6B635B]">
-            {cosmicWindow.sub}
-          </div>
-        </div>
-      </div>
-
       {/* Mode Switcher: Custom vs 1-Click Demo */}
       <div
         className="grid grid-cols-2 gap-1 rounded-lg p-1 border"
