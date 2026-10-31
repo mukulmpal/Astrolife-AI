@@ -74,12 +74,13 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
           </span>
         </a>
 
-        <nav className="hidden items-center gap-9 md:flex">
+        <nav className="hidden items-center gap-7 lg:gap-9 md:flex">
           {[
             ['Features', '#features'],
+            ['Astro-Vastu', '/dashboard/vastu'],
+            ['Palmistry', '/dashboard/palmistry'],
             ['How it works', '#how'],
             ['Pricing', '#pricing'],
-            ['Testimonials', '#testimonials'],
           ].map(([label, href]) => (
             <a
               key={href}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { CelestialInstrument, FolioMarker, OrnamentDivider } from './celestial';
+import { HumanPalmDrawing } from '@/components/palmistry/HumanPalmDrawing';
 
 const TINT = (pct: number) =>
   `color-mix(in srgb, var(--al-surface) ${pct}%, transparent)`;
@@ -884,91 +885,28 @@ export function DirectionAFeatures() {
                   </button>
                 </div>
 
-                {/* Hand Palm SVG Illustration */}
-                <div className="relative mt-3 h-44 w-full flex items-center justify-center overflow-hidden rounded-lg bg-[#FAF5EB] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
-                  <svg className="h-full max-w-[280px]" viewBox="0 0 320 220" fill="none">
-                    {/* Hand Palm Silhouette */}
-                    <path
-                      d="M 60 190 C 50 160, 52 110, 65 95 C 68 85, 78 40, 85 45 C 92 50, 95 85, 105 85 C 112 55, 120 20, 130 22 C 140 25, 142 80, 150 80 C 158 50, 170 15, 182 18 C 192 20, 190 80, 200 85 C 208 55, 220 35, 230 40 C 238 45, 230 95, 235 110 C 248 135, 255 170, 240 195 C 220 215, 100 215, 60 190 Z"
-                      fill="#FFFFFF"
-                      stroke="rgba(184, 134, 11, 0.45)"
-                      strokeWidth="2"
-                    />
-
-                    {/* MediaPipe 21 Landmark Keypoints */}
-                    {[
-                      [65, 190], [150, 205], [240, 195], // wrist
-                      [70, 135], [78, 90], [85, 45], // thumb
-                      [105, 110], [112, 75], [120, 45], [130, 22], // index
-                      [150, 110], [158, 70], [170, 40], [182, 18], // middle
-                      [190, 115], [198, 75], [208, 50], [220, 35], // ring
-                      [225, 125], [232, 95], [238, 70], // pinky
-                    ].map(([cx, cy], idx) => (
-                      <circle
-                        key={idx}
-                        cx={cx}
-                        cy={cy}
-                        r={isScanningPalm ? 3.5 : 2}
-                        fill="#B8860B"
-                        opacity={isScanningPalm ? 0.9 : 0.4}
-                        className={isScanningPalm ? 'animate-ping' : ''}
+                {/* Anatomical Human Palm Drawing & Samudrika Shastra Live Map */}
+                <div className="relative mt-3 h-64 sm:h-72 w-full flex items-center justify-center overflow-hidden rounded-xl bg-[#FAF5EB] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                  <HumanPalmDrawing
+                    hand="right"
+                    selectedLine={palmLine}
+                    onSelectLine={(line) => setPalmLine(line as any)}
+                    showMounts
+                    showLines
+                    showLabels={false}
+                    className="h-full w-full max-w-[320px]"
+                  />
+                  {/* Scanning Beam Animation overlay when user clicks Simulate Scan */}
+                  {isScanningPalm && (
+                    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+                      <div
+                        className="h-1 w-full bg-gradient-to-r from-transparent via-[#059669] to-transparent shadow-[0_0_12px_#059669]"
+                        style={{
+                          animation: 'pulse 1.2s infinite ease-in-out',
+                        }}
                       />
-                    ))}
-
-                    {/* 1. Heart Line */}
-                    <path
-                      d="M 85 92 C 120 88, 175 92, 225 65"
-                      fill="none"
-                      stroke="#DC2626"
-                      strokeWidth={palmLine === 'heart' ? 4 : 1.8}
-                      strokeOpacity={palmLine === 'heart' ? 1 : 0.4}
-                      strokeLinecap="round"
-                    />
-
-                    {/* 2. Head Line */}
-                    <path
-                      d="M 95 115 C 140 118, 185 130, 230 148"
-                      fill="none"
-                      stroke="#2563EB"
-                      strokeWidth={palmLine === 'head' ? 4 : 1.8}
-                      strokeOpacity={palmLine === 'head' ? 1 : 0.4}
-                      strokeLinecap="round"
-                    />
-
-                    {/* 3. Life Line */}
-                    <path
-                      d="M 95 115 C 115 140, 125 175, 115 198"
-                      fill="none"
-                      stroke="#059669"
-                      strokeWidth={palmLine === 'life' ? 4 : 1.8}
-                      strokeOpacity={palmLine === 'life' ? 1 : 0.4}
-                      strokeLinecap="round"
-                    />
-
-                    {/* 4. Fate Line */}
-                    <path
-                      d="M 152 200 C 154 155, 158 110, 155 70"
-                      fill="none"
-                      stroke="#B8860B"
-                      strokeWidth={palmLine === 'fate' ? 4.5 : 2}
-                      strokeOpacity={palmLine === 'fate' ? 1 : 0.4}
-                      strokeLinecap="round"
-                    />
-
-                    {/* Active Line Indicator Ring */}
-                    {palmLine === 'heart' && <circle cx="155" cy="89" r="6" fill="none" stroke="#DC2626" strokeWidth="2" className="animate-pulse" />}
-                    {palmLine === 'head' && <circle cx="165" cy="124" r="6" fill="none" stroke="#2563EB" strokeWidth="2" className="animate-pulse" />}
-                    {palmLine === 'life' && <circle cx="118" cy="155" r="6" fill="none" stroke="#059669" strokeWidth="2" className="animate-pulse" />}
-                    {palmLine === 'fate' && <circle cx="156" cy="135" r="7" fill="none" stroke="#B8860B" strokeWidth="2.5" className="animate-pulse" />}
-
-                    {/* Scanning Beam Animation */}
-                    {isScanningPalm && (
-                      <line x1="40" y1="20" x2="280" y2="20" stroke="#059669" strokeWidth="3" opacity="0.8">
-                        <animate attributeName="y1" values="20;200;20" dur="1.2s" repeatCount="indefinite" />
-                        <animate attributeName="y2" values="20;200;20" dur="1.2s" repeatCount="indefinite" />
-                      </line>
-                    )}
-                  </svg>
+                    </div>
+                  )}
                 </div>
 
                 {/* Live Specimen Report Card */}
@@ -1115,7 +1053,7 @@ export function DirectionAFeatures() {
           </div>
         </div>
 
-        {/* TIER 2: DECISION & LIFE INTELLIGENCE SUITE (6 Interactive Cards) */}
+        {/* TIER 2: DECISION & LIFE INTELLIGENCE SUITE (9 Interactive Engines) */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
@@ -1123,17 +1061,83 @@ export function DirectionAFeatures() {
               Tier 2 · Practical Life Solutions
             </span>
             <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: '#6B635B' }}>
-              6 Interactive Decision Engines
+              9 Interactive Decision & Remedy Engines
             </span>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
+                id: 'vastu',
+                icon: '🏛️',
+                title: '16-Zone Astro-Vastu Radar & Hit Detection',
+                badge: '45 Devatas · 180° Hits',
+                link: '/dashboard/vastu',
+                desc: 'Maps the 16 architectural zones, 32 compass entrances, 45 energy Devatas, and detects destructive 180° planetary hit lines. Non-demolition 120° house shifting remedies.',
+                tabs: ['180° Hit Detection', '45 Devatas & 120° Shift'],
+                previews: [
+                  'Identifies direct 180° planetary hits where afflicted natal planets clash with household zones (e.g., Saturn-Mars kitchen hit).',
+                  'Applies non-destructive 120° spatial shift: rebalances energy using copper, brass, elemental colors, and yantras without breaking walls.',
+                ],
+              },
+              {
+                id: 'threads',
+                icon: '🧵',
+                title: 'Sacred Wrist Threads (धागा / कलावा / मौली) Audit',
+                badge: 'Moli Trap Prevention',
+                link: '/dashboard/vastu?tab=wearableAudit',
+                desc: 'Calculates exact benefic thread composition (raw cotton vs silk), count of turns (3, 5, or 7), and strict color rules. Prevents the "Moli Trap" that drains your ascendant lord.',
+                tabs: ['Moli Trap Rules', 'Vedic Thread Formula'],
+                previews: [
+                  'Alerts against wearing red moli when Mars is an 8th/12th functional malefic; prevents vitality drain and emotional aggression.',
+                  'Specifies exact ritual thread: right wrist for men & unmarried women, left wrist for married women, tied on Shukla Paksha sunrise.',
+                ],
+              },
+              {
+                id: 'wearables',
+                icon: '⌚',
+                title: 'Smartwatch, Kada & Metal Shield Audit',
+                badge: 'EMF & Dhatu Bala',
+                link: '/dashboard/vastu?tab=wearableAudit',
+                desc: 'Analyzes modern bio-wearables (Apple Watch, fitness bands, smart rings) and sacred metals (Kada, Panchdhatu, Copper, Silver) to prevent Rahu EMF aggravation.',
+                tabs: ['Smartwatch Wrist Rules', 'Metal Kada Alignment'],
+                previews: [
+                  'Smartwatch on wrong wrist amplifies Rahu (EMF) and suppresses Chandra (Moon pulse); guides switching wrists or adding silver band.',
+                  'Audit for Sarv Rog Nashak Kada: pure copper for Mars/Sun vitality, pure silver for Moon peace, or ashtadhatu for Rahu neutralisation.',
+                ],
+              },
+              {
+                id: 'tattoo',
+                icon: '🖋️',
+                title: 'Astro-Tattoo & Somatotopic Skin Ink',
+                badge: 'Permanent Body Yantra',
+                link: '/dashboard/astro-tattoo',
+                desc: 'Permanent ink penetrates dermis and acts as a 24/7 energetic transmitter. Determines safe vs dangerous motifs, gender lateralization, and prohibited deity inks.',
+                tabs: ['Skin Sector Safety', 'Gender Lateralization'],
+                previews: [
+                  'Never tattoo sacred deities or Beej mantras below waist; scans natal chart to block malefic planetary symbols from skin contact.',
+                  'Maps feminine/lunar left hemisphere vs masculine/solar right hemisphere based on your D1 Lagna and 6th/8th house lords.',
+                ],
+              },
+              {
+                id: 'dotTherapy',
+                icon: '🔴',
+                title: '12-Rashi Biometric Dot & Bindi Therapy',
+                badge: '120° Body Trine Shield',
+                link: '/dashboard/vastu?tab=bodyTherapy',
+                desc: 'Stimulates somatic reflex zones corresponding to the 12 rashis. Includes 2-inch Nabhi (Navel) Desi Ghee ritual and colored bindi placements to shield sensitive houses.',
+                tabs: ['Nabhi Ghee Protocol', '120° Shield Bindi'],
+                previews: [
+                  'Nabhi 2-inch application: warm A2 cow ghee on navel before sleep activates Samana Vayu, balancing Rahu-Ketu nervous tremors.',
+                  'Calculates protective colored bindi placement on forehead (Agya Chakra) or throat to deflect 8th house malefic transits.',
+                ],
+              },
+              {
                 id: 'marriage',
                 icon: '💍',
                 title: 'Classical Marriage Window Scanner',
                 badge: 'Double-Transit Sutra',
+                link: '/dashboard/chat?prompt=marriage',
                 desc: 'Identifies the precise 12-month marriage timing window through Jupiter and Saturn mutual aspects on the 7th house and lagna, combined with 36-point Ashtakoota & Nadi Dosha cancellation.',
                 tabs: ['Double-Transit Sutra', '36-Point Ashtakoota'],
                 previews: [
@@ -1146,6 +1150,7 @@ export function DirectionAFeatures() {
                 icon: '⚡',
                 title: '300+ Vedic Yogas & 6-Fold Shadbala',
                 badge: 'Algorithmic Shastra',
+                link: '/dashboard/kundli',
                 desc: 'Automatic detection of Raja, Dhana, Gajakesari, and Viparita yogas with Sthana, Dik, Kaala, and Chesta mathematical Shadbala scores to compute genuine planetary strength.',
                 tabs: ['Yoga Detector', '6-Fold Shadbala'],
                 previews: [
@@ -1154,22 +1159,11 @@ export function DirectionAFeatures() {
                 ],
               },
               {
-                id: 'numerology',
-                icon: '🔢',
-                title: 'Vedic & Pythagorean Numerology Matrix',
-                badge: 'Name Vibration',
-                desc: 'Life Path, Soul Urge, and Destiny Number calculations with Lo-Shu Grid analysis. Optimizes personal and business name spellings for harmonic frequency alignment with your planetary chart.',
-                tabs: ['Lo-Shu 3x3 Grid', 'Name Harmonic Tuning'],
-                previews: [
-                  'Identifies missing numbers and energetic arrows of will, intellect, and prosperity in the 3x3 Lo-Shu grid.',
-                  'Compound name vibration tuning to eliminate anti-planetary friction with Lagna & Dasha lords.',
-                ],
-              },
-              {
                 id: 'muhurat',
                 icon: '⏱️',
                 title: '30-Day Precision Shubh Muhurat Scanner',
                 badge: 'Auspicious Timing',
+                link: '/dashboard/panchang',
                 desc: 'Automated 30-day shastra scanner for Vivah, Griha Pravesh, Startup Registration, and Major Investments — pre-calculating Chaughadia, Abhijit, Hora, and eliminating Rahu Kaal pitfalls.',
                 tabs: ['Shubh Chaughadia', 'Rahu Kaal Filter'],
                 previews: [
@@ -1178,27 +1172,16 @@ export function DirectionAFeatures() {
                 ],
               },
               {
-                id: 'vastu',
-                icon: '🏛️',
-                title: '16-Zone Astro-Vastu Directional Engine',
-                badge: 'Spatial Alignment',
-                desc: 'Maps the 16 Vastu directions of your home or workplace to your planetary strengths. Detects directional blockages without costly architectural demolition, providing subtle element remedies.',
-                tabs: ['16-Zone Compass', 'Zero-Demolition Upaya'],
+                id: 'numerology',
+                icon: '🔢',
+                title: 'Vedic & Pythagorean Numerology Matrix',
+                badge: 'Name Vibration',
+                link: '/dashboard/chat?prompt=numerology',
+                desc: 'Life Path, Soul Urge, and Destiny Number calculations with Lo-Shu Grid analysis. Optimizes personal and business name spellings for harmonic frequency alignment with your planetary chart.',
+                tabs: ['Lo-Shu 3x3 Grid', 'Name Harmonic Tuning'],
                 previews: [
-                  'Maps North-East (Ishanya/Jupiter) to South-West (Nairutya/Rahu) to balance personal energy flow.',
-                  'Zero-demolition elemental remedies using metals, elemental colors, yantras, and lighting.',
-                ],
-              },
-              {
-                id: 'jung',
-                icon: '🧠',
-                title: 'Jungian Astro-Psychology & Shadow Work',
-                badge: 'Subconscious Archetypes',
-                desc: 'Bridges Swiss psychoanalyst Carl Jung with ancient Jyotish. Analyzes elemental temperament, shadow archetypes, and subconscious karmic blind spots for authentic psychological growth.',
-                tabs: ['Shadow Archetypes', 'Karmic Blind Spots'],
-                previews: [
-                  'Unveils Rahu-Ketu axis subconscious fixation: unconscious obsessions and repressed potential.',
-                  'Actionable shadow integration prompts to turn astrological conflict into psychological maturity.',
+                  'Identifies missing numbers and energetic arrows of will, intellect, and prosperity in the 3x3 Lo-Shu grid.',
+                  'Compound name vibration tuning to eliminate anti-planetary friction with Lagna & Dasha lords.',
                 ],
               },
             ].map((card) => {
@@ -1244,10 +1227,22 @@ export function DirectionAFeatures() {
                       <span className="text-[#8C6508] font-mono text-9px font-bold block mb-0.5">✦ Live Engine Logic:</span>
                       {card.previews[activeIdx]}
                     </div>
+                    {card.link && (
+                      <div className="mt-2 flex justify-end">
+                        <a
+                          href={card.link}
+                          className="font-mono text-9px font-bold text-[#8C6508] hover:underline"
+                        >
+                          Explore Engine →
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
             })}
+          </div>
+        </div>
           </div>
         </div>
 

@@ -20,18 +20,18 @@ export function DirectionAHero() {
               className="dira-reveal dira-reveal-1 in mb-4 sm:mb-8 font-serif text-base sm:text-lg italic md:text-xl"
               style={{ color: 'var(--al-ivory-dim)' }}
             >
-              Most astrology apps give you sun signs.
+              Stop Guessing with Generic Horoscopes.
             </p>
 
             <div className="dira-reveal dira-reveal-1 in mb-5 sm:mb-7 flex">
-              <span className="dira-rule-label">✦ AI Vedic Intelligence OS · 25+ Engines</span>
+              <span className="dira-rule-label">✦ 16 Classical Vedic Engines · Zero AI Hallucination · Swiss Ephemeris 0.01°</span>
             </div>
 
             <h1 className="dira-display dira-reveal dira-reveal-2 in" style={{ color: 'var(--al-ivory)' }}>
-              Your destiny,
+              Mathematical Destiny
               <br />
               <span className="italic" style={{ color: 'var(--al-gold-bright)' }}>
-                written in the sky.
+                Intelligence OS.
               </span>
             </h1>
 
@@ -39,33 +39,73 @@ export function DirectionAHero() {
               className="dira-reveal dira-reveal-3 in max-w-xl text-sm sm:text-base leading-relaxed md:text-lg"
               style={{ color: 'var(--al-ivory-dim)' }}
             >
-              A kundli is not a chart — it is your life&rsquo;s operating system. 90-year destiny curves,
-              planetary sound therapy, medical ayurvedic blueprints, and the precise hour the universe turns in your favour.
+              AstroLife AI is not a generic chatbot. It is a multi-layered Vedic intelligence engine unifying
+              Parashara, KP Sub-Lords, Jaimini Chara Dasha, 16-Zone Astro-Vastu Hit Radar, Sacred Wrist Threads,
+              Bio-Wearable Shields, Somatotopic Tattoos, and Biometric Dot Therapy.
             </p>
 
             {/* Features */}
             <div className="dira-reveal dira-reveal-4 in mt-8 sm:mt-10 space-y-4">
               <div className="flex gap-3 sm:gap-4">
-                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>📈</div>
+                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🏛️</div>
                 <div>
-                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>90-Year Destiny Curve & Transit Ripple</div>
-                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Visual life score trajectory, career golden windows & multi-house ripple shocks</p>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>16-Zone Astro-Vastu Radar & Hit Detection</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>45 Devatas, 32 Entrances, 180° Planetary Hits & zero-demolition 120° House Shifting</p>
                 </div>
               </div>
               <div className="flex gap-3 sm:gap-4">
-                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🩺</div>
+                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🛡️</div>
                 <div>
-                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Medical Kundli & Dasha Sound Therapy</div>
-                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Nakshatra organ mapping, Tridosha balance & Indian Classical Raagas for active dashas</p>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Bio-Wearables, Wrist Threads & Dot Therapy</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Smartwatch metal shielding, Moli Trap prevention, Somatotopic Skin Ink & 12-Rashi Bindi healing</p>
                 </div>
               </div>
               <div className="flex gap-3 sm:gap-4">
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>◈</div>
                 <div>
-                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Sub-Arcsecond Sidereal Precision & AI</div>
-                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Swiss Ephemeris 0.01° accuracy • Every answer cited from classical Shastra</p>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Multi-System Rigor (KP + Jaimini + Palmistry)</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Swiss Ephemeris 0.01° sub-lords, 7 Chara Karakas, and authentic Samudrika Shastra hand analysis</p>
                 </div>
               </div>
+            </div>
+
+            {/* Quick Engine Telemetry Badges */}
+            <div className="dira-reveal dira-reveal-4 in mt-6 flex flex-wrap gap-2">
+              <a
+                href="/dashboard/vastu"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all hover:scale-105"
+                style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.35)' }}
+              >
+                <span>🏛️</span> Astro-Vastu Radar
+              </a>
+              <a
+                href="/dashboard/vastu?tab=wearableAudit"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all hover:scale-105"
+                style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.35)' }}
+              >
+                <span>🧵</span> Threads & Wearables
+              </a>
+              <a
+                href="/dashboard/vastu?tab=bodyTherapy"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all hover:scale-105"
+                style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.35)' }}
+              >
+                <span>🔴</span> Dot Therapy (बिंदु)
+              </a>
+              <a
+                href="/dashboard/astro-tattoo"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all hover:scale-105"
+                style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.35)' }}
+              >
+                <span>🖋️</span> Astro Tattoo
+              </a>
+              <a
+                href="/dashboard/palmistry"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all hover:scale-105"
+                style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.35)' }}
+              >
+                <span>✋</span> Samudrika Palmistry
+              </a>
             </div>
 
             {/* Trust Strip */}
@@ -74,9 +114,9 @@ export function DirectionAHero() {
               style={{ border: '1px solid rgba(184, 134, 11, 0.3)', background: 'rgba(184, 134, 11, 0.2)' }}
             >
               {[
-                { k: '40,000+', v: 'charts cast' },
-                { k: '4.9★', v: 'verified reviews' },
-                { k: '0.01°', v: 'Swiss precision' },
+                { k: '16 Engines', v: 'Vedic · KP · Vastu · Lal Kitab' },
+                { k: '0.01°', v: 'Swiss Ephemeris Precision' },
+                { k: '100% Exact', v: 'Zero AI Hallucination' },
               ].map((s) => (
                 <div
                   key={s.v}
