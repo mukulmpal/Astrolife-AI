@@ -483,7 +483,7 @@ export default function LineageKarmaPage() {
           >
             <strong style={{ color: "#7C3AED" }}>Vedic Computational Consciousness</strong>
             <br />
-            Sri P.V.R. Narasimha Rao के अनुसार आपका अंतःकरण एक कंप्यूटर की तरह काम करता है। यहाँ आपके chart के आधार पर इसकी mapping है:
+            वैदिक चेतना विज्ञान के अनुसार आपका अंतःकरण एक उन्नत आत्मिक तंत्र की तरह काम करता है। यहाँ आपके chart के आधार पर इसकी mapping है:
           </div>
 
           {/* 5 layers */}
@@ -544,11 +544,11 @@ export default function LineageKarmaPage() {
             );
           })}
 
-          {/* PVR Tarpana section */}
+          {/* Vedic Tarpana section */}
           {lineage.pvrTarpana && (
             <div style={{ marginTop: 20 }}>
               <div style={{ fontWeight: 700, fontSize: "14px", color: "#7C3AED", marginBottom: 12 }}>
-                🪔 PVR Tarpana & Ancestral Karma Release
+                🪔 Vedic Tarpana & Ancestral Karma Release
               </div>
 
               <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.18)", borderRadius: 10, padding: "14px 16px", marginBottom: 12, fontSize: 13, lineHeight: 1.75, color: "#3D3530" }}>

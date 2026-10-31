@@ -118,7 +118,7 @@ export default function ProUpgradePromptModal({
             <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
               <CheckCircle2 size={16} color="#B8860B" style={{ flexShrink: 0, marginTop: "2px" }} />
               <div style={{ fontSize: "12px", color: "#292524" }}>
-                <strong>Modern Outer Planets (⚡ Indra, 🌊 Varun, 🌋 Yam):</strong> Real ephemeris coordinates, retrograde loops, Robert Hand timing &amp; psychological synthesis.
+                <strong>Modern Outer Planets (⚡ Indra, 🌊 Varun, 🌋 Yam):</strong> Real ephemeris coordinates, retrograde loops, algebraic aspect timing &amp; psychological synthesis.
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>

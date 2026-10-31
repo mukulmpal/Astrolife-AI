@@ -12703,5 +12703,104 @@
     "latitude": null,
     "longitude": null,
     "tz": null
+  },
+  {
+    "name": "Narendra Modi",
+    "country": "india",
+    "category": "politician",
+    "birthDate": "1950-09-17",
+    "birthTime": "11:00:00",
+    "birthPlace": "Vadnagar, Gujarat",
+    "latitude": 23.7844,
+    "longitude": 72.6372,
+    "tz": 5.5
+  },
+  {
+    "name": "Elon Musk",
+    "country": "south_africa",
+    "category": "entrepreneur",
+    "birthDate": "1971-06-28",
+    "birthTime": "07:30:00",
+    "birthPlace": "Pretoria, South Africa",
+    "latitude": -25.7479,
+    "longitude": 28.2293,
+    "tz": 2
+  },
+  {
+    "name": "Virat Kohli",
+    "country": "india",
+    "category": "cricketer",
+    "birthDate": "1988-11-05",
+    "birthTime": "10:28:00",
+    "birthPlace": "Delhi, India",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "tz": 5.5
+  },
+  {
+    "name": "Steve Jobs",
+    "country": "united_states",
+    "category": "entrepreneur",
+    "birthDate": "1955-02-24",
+    "birthTime": "19:15:00",
+    "birthPlace": "San Francisco, USA",
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "tz": -8
+  },
+  {
+    "name": "Shah Rukh Khan",
+    "country": "india",
+    "category": "actor",
+    "birthDate": "1965-11-02",
+    "birthTime": "02:30:00",
+    "birthPlace": "New Delhi, India",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "tz": 5.5
+  },
+  {
+    "name": "MS Dhoni",
+    "country": "india",
+    "category": "cricketer",
+    "birthDate": "1981-07-07",
+    "birthTime": "11:15:00",
+    "birthPlace": "Ranchi, India",
+    "latitude": 23.3441,
+    "longitude": 85.3096,
+    "tz": 5.5
+  },
+  {
+    "name": "Albert Einstein",
+    "country": "germany",
+    "category": "scientist",
+    "birthDate": "1879-03-14",
+    "birthTime": "11:30:00",
+    "birthPlace": "Ulm, Germany",
+    "latitude": 48.4011,
+    "longitude": 9.9876,
+    "tz": 1
+  },
+  {
+    "name": "Bill Gates",
+    "country": "united_states",
+    "category": "entrepreneur",
+    "birthDate": "1955-10-28",
+    "birthTime": "22:00:00",
+    "birthPlace": "Seattle, USA",
+    "latitude": 47.6062,
+    "longitude": -122.3321,
+    "tz": -8
+  },
+  {
+    "name": "Lionel Messi",
+    "country": "argentina",
+    "category": "association_football_player",
+    "birthDate": "1987-06-24",
+    "birthTime": "06:00:00",
+    "birthPlace": "Rosario, Argentina",
+    "latitude": -32.9468,
+    "longitude": -60.6393,
+    "tz": -3
   }
 ]

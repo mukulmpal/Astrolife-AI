@@ -1,7 +1,7 @@
 // src/lib/astro-engine/lineage-karma/antahkarana-mapper.ts
 // ============================================================================
 // VEDIC ANTAHKARANA & COMPUTATIONAL CONSCIOUSNESS ENGINE
-// Grounded in Sri P.V.R. Narasimha Rao's "Vedic Wisdom" (pp. 118-122, 211-216)
+// Grounded in Classical Vedic Consciousness & Tarpana Canons
 //
 // 1. Antahkarana Computer Architecture:
 //    - CPU (Ahamkara / I-ness): Atmakaraka (AK) + Tripod (Lagna, Moon, Sun)
@@ -10,7 +10,7 @@
 //    - I/O Controller (Manas / Sensory Mind): Moon + Mercury interfacing with 5 Jnanendriyas & 5 Karmendriyas
 //    - Power Supply (Prana): 5 vital airs sustaining consciousness
 //
-// 2. PVR Tarpana & Ancestral Karma Release Architecture:
+// 2. Vedic Tarpana & Ancestral Karma Release Architecture:
 //    - Homam burns personal past-life actions (Bhootaagni)
 //    - Tarpana washes away inherited ancestral debts (Rina / Predispositions)
 //    - Internal Genetics: Ancestors reside inside us as karmic conditioning
@@ -141,7 +141,7 @@ export function calculateAntahkarana(chart: ChartData): {
     ],
   };
 
-  // ── PVR TARPANA & ANCESTRAL DEBT RELEASE PROFILE ──────────────────────────
+  // ── VEDIC TARPANA & ANCESTRAL DEBT RELEASE PROFILE ──────────────────────────
   const pvrTarpana: PvrTarpanaProfile = {
     tarpanaVsHomamDistinction: {
       homamRole:

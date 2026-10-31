@@ -1,6 +1,6 @@
 // src/lib/astro-engine/lineage-karma/elemental-ancestral.ts
 // ============================================================================
-// ELEMENTAL ANCESTRAL INTELLIGENCE (Stephen Arroyo + Dr. Stone Polarity Therapy)
+// ELEMENTAL ANCESTRAL INTELLIGENCE (Classical Tattva Philosophy & Polarity Therapy)
 // Calculates the Elemental Substance of Ancestral Inheritance:
 // - Saturn's Element: Location of Lineage Blockage
 // - Self-Expressive (Fire/Air) vs Self-Repressive (Earth/Water)

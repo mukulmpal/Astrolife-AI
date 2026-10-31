@@ -1,7 +1,7 @@
 // ============================================================
 // AYURVEDIC DAIVA VYAPASHRAYA CHIKITSA & SHASTRIYA PROTOCOLS
 // Academic Baseline: "आयुर्वेद एवं ज्योतिषशास्त्रीy सिद्धान्तों की अन्तर्सम्बन्धीय मीमांसा"
-// Author: Prof. Jaiprakash Narayan Dwivedi (AYU Journal, Vol 34, 2013)
+// Reference: Classical Ayurvedic Chikitsa Research (AYU Journal, Vol 34, 2013)
 // Sources: Charaka Samhita, Sushruta Samhita, Kashyapa Samhita, Saravali, Uttara Kalamrita
 // ============================================================
 

@@ -1,7 +1,7 @@
 // ============================================================
 // ASTROLIFE MEDICAL ASTROLOGY ENGINE v3.0
 // Comprehensive Ayurvedic & Classical Parashari Medical Intelligence
-// Foundations: Dr. S. Krishna Kumar, BPHS, Charaka Samhita, Saravali
+// Foundations: Classical Medical Jyotish, BPHS, Charaka Samhita, Saravali
 // Features: Tri-Fold (Bhava-Bhavesh-Karaka), Parashari Aspects,
 //           Algorithmic Tri-Dosha & Agni, Ojas Resilience Index,
 //           D6 Shasthamsa Cross-Verification, Safe Tone Guardrails
@@ -68,7 +68,7 @@ export interface DhatuAffliction {
 
 export interface DiseaseCombination {
   disease: string; // Traditional disease title (e.g. "Tuberculosis / Rajyakshma (Deep Pulmonary & Respiratory Sensitivity)")
-  classicalCitation: string; // Text source (Dr. S. Krishna Kumar Ch. 19 / BPHS)
+  classicalCitation: string; // Text source (Classical Medical Text Ch. 19 / BPHS)
   safeToneGuidance: string; // Non-fatalistic, empathetic clinical guidance
   note: string; // Combined summary for backward compatibility
   severity: "low" | "medium" | "high";
@@ -163,7 +163,7 @@ export interface MajorEventIndicator {
   whyMajorExplanation: string;
 }
 
-// ── Classical Nakshatra Disease Mapping (Dr. S. Krishna Kumar) ───────────
+// ── Classical Nakshatra Disease Mapping (Classical Medical Astrology) ───────────
 export const NAKSHATRA_DISEASE_BOOK: Record<string, { disease: string; body: string; note: string }> = {
   Ashwini:            { disease: "Periodical fever / sudden temperature spikes",   body: "Head / Cerebral area",      note: "Ashwini Kumaras ruled — high metabolic speed, sudden fever tendency" },
   Bharani:            { disease: "Digestive & bowel elimination sensitivity",      body: "Head / Facial nerves",      note: "Yama ruled — elimination rhythm and digestive cleansing sensitivity" },
@@ -522,11 +522,11 @@ interface RawDiseaseCombo {
 }
 
 export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
-  // ── Traditional Tuberculosis / Rajyakshma (Dr. S. Krishna Kumar Ch. 19 & BPHS) ──
+  // ── Traditional Tuberculosis / Rajyakshma (Classical Medical Text & BPHS) ──
   {
     key: "tb_mercury_mars_6",
     traditionalTitle: "Tuberculosis / Rajyakshma (Deep Pulmonary Sensitivity)",
-    classicalCitation: "Dr. S. Krishna Kumar Ch. 19: Mercury and Mars in 6th house indicate Kshaya Roga (bronchial & lung tissue exhaustion).",
+    classicalCitation: "Classical Medical Astrology: Mercury and Mars in 6th house indicate Kshaya Roga (bronchial & lung tissue exhaustion).",
     safeToneGuidance: "High respiratory sensitivity; prioritize clean air environments, avoid smoking or dusty exposure, and seek timely clinical screening for persistent coughs.",
     severity: "high",
     participatingPlanets: ["Mercury", "Mars"],
@@ -535,7 +535,7 @@ export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
   {
     key: "tb_saturn_mars_6",
     traditionalTitle: "Tuberculosis / Rajyakshma (Chest & Rib Cage Vulnerability)",
-    classicalCitation: "Dr. S. Krishna Kumar Ch. 19: Saturn and Mars conjunct in 6th house indicate deep thoracic depletion and chronic lung wear.",
+    classicalCitation: "Classical Medical Astrology: Saturn and Mars conjunct in 6th house indicate deep thoracic depletion and chronic lung wear.",
     safeToneGuidance: "Thoracic and pulmonary focus area; maintain chest warmth in seasonal shifts, practice diaphragmatic breathing, and obtain prompt medical care for chest congestion.",
     severity: "high",
     participatingPlanets: ["Saturn", "Mars"],
@@ -544,7 +544,7 @@ export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
   {
     key: "tb_rahu_6",
     traditionalTitle: "Tuberculosis / Rajyakshma (Karmic Respiratory Vulnerability)",
-    classicalCitation: "Dr. S. Krishna Kumar Ch. 19: Rahu in 6th house linked with chest debility and chronic bronchial vulnerability during nodal cycles.",
+    classicalCitation: "Classical Medical Astrology: Rahu in 6th house linked with chest debility and chronic bronchial vulnerability during nodal cycles.",
     safeToneGuidance: "Respiratory barrier awareness; avoid polluted work zones, ensure mold-free living spaces, and keep pulmonary screenings up to date.",
     severity: "medium",
     participatingPlanets: ["Rahu"],
@@ -598,7 +598,7 @@ export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
   {
     key: "pavana_prakopa",
     traditionalTitle: "Pavana Prakopa Yoga (Vata Imbalance & Nervous Agitation)",
-    classicalCitation: "Dr. S. Krishna Kumar: Saturn in 1st house with Mars in 5th or 9th provokes severe Vata disturbance and neurological agitation.",
+    classicalCitation: "Classical Medical Astrology: Saturn in 1st house with Mars in 5th or 9th provokes severe Vata disturbance and neurological agitation.",
     safeToneGuidance: "High nervous system sensitivity; favor warm, grounding meals, minimize late-night screen stimulation, and practice gentle restorative yoga.",
     severity: "medium",
     participatingPlanets: ["Saturn", "Mars"],
@@ -627,7 +627,7 @@ export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
   {
     key: "netra_venus_dusthana",
     traditionalTitle: "Shukra Netra Roga (Ocular Fluid Sensitivity)",
-    classicalCitation: "Dr. S. Krishna Kumar: Venus in 6th or 8th house influences ocular fluid circulation and night vision adaptation.",
+    classicalCitation: "Classical Medical Astrology: Venus in 6th or 8th house influences ocular fluid circulation and night vision adaptation.",
     safeToneGuidance: "Maintain proper lighting during night driving, stay hydrated, and support tear-film stability with omega-3 fatty acids under doctor advice.",
     severity: "medium",
     participatingPlanets: ["Venus"],
@@ -638,7 +638,7 @@ export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
   {
     key: "nephritis_sun_mars",
     traditionalTitle: "Vrikka Roga (Nephritic & Renal Filtration Sensitivity)",
-    classicalCitation: "Dr. S. Krishna Kumar: Sun in Lagna combined with Mars in 6th house indicates high metabolic urea heat and renal filtration strain.",
+    classicalCitation: "Classical Medical Astrology: Sun in Lagna combined with Mars in 6th house indicates high metabolic urea heat and renal filtration strain.",
     safeToneGuidance: "Hydration and kidney health focus; maintain steady daily water intake, monitor blood pressure, and limit excessive sodium or energy drinks.",
     severity: "high",
     participatingPlanets: ["Sun", "Mars"],
@@ -649,7 +649,7 @@ export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
   {
     key: "hridaya_4th_sun_afflicted",
     traditionalTitle: "Hridaya Roga (Cardiovascular Vitality Pacing)",
-    classicalCitation: "Parashara & Krishna Kumar: Affliction to 4th house and 4th lord along with Sun indicates cardiovascular sensitivity.",
+    classicalCitation: "Parashara & Classical Medical Treatise: Affliction to 4th house and 4th lord along with Sun indicates cardiovascular sensitivity.",
     safeToneGuidance: "Heart health awareness; engage in regular moderate aerobic exercise, manage emotional pacing, and check lipid profile annually post-35.",
     severity: "high",
     participatingPlanets: ["Sun"],
@@ -676,7 +676,7 @@ export const CLASSICAL_COMBOS_REGISTRY: RawDiseaseCombo[] = [
   {
     key: "charma_sat_merc",
     traditionalTitle: "Twak Roga (Dermal Barrier & Eczema Sensitivity)",
-    classicalCitation: "Dr. S. Krishna Kumar: Saturn conjunct Mercury in difficult houses causes dry skin, dermal roughness, and barrier allergies.",
+    classicalCitation: "Classical Medical Astrology: Saturn conjunct Mercury in difficult houses causes dry skin, dermal roughness, and barrier allergies.",
     safeToneGuidance: "Skin barrier protection; use gentle fragrance-free cleansers, maintain regular barrier moisturization, and track dietary allergy triggers.",
     severity: "low",
     participatingPlanets: ["Saturn", "Mercury"],

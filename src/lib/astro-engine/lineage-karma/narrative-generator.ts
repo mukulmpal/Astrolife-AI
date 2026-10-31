@@ -335,13 +335,13 @@ ${name}, आपके लिए उपाय किसी भय के का�
 - **Source Level L1 (Classical BPHS / Phaldeepika):**
   ✦ Sun in House ${sunH} (${sunSign}) · Moon in House ${moonH} (${moonSign})
   ✦ Saturn in House ${saturnH} (${saturnSign}) · Lagna ${lagnaRashi}
-- **Source Level L2 (Tradition-Specific / BNN / Dr. Prem Kumar Sharma):**
+- **Source Level L2 (Tradition-Specific / BNN / Classical Nodal Canons):**
   ✦ Paternal Grandfather (Dada): Rahu in H${rahuH} (${result.nodalLineage?.rahuPaternalGrandfather?.sign || rahuSign}) — ${result.nodalLineage?.rahuPaternalGrandfather?.lineageTheme || "Heritage Lineage"}
   ✦ Maternal Grandfather (Nana): Ketu in H${ketuH} (${result.nodalLineage?.ketuMaternalGrandfather?.sign || ketuSign}) — ${result.nodalLineage?.ketuMaternalGrandfather?.lineageTheme || "Spiritual Detachment"}
-- **Source Level L3 (AstroLife Elemental Synthesis - Stephen Arroyo):**
+- **Source Level L3 (AstroLife Elemental Synthesis - Tattva Resonance):**
   ✦ Saturn's Blocked Element: ${result.elemental?.saturnElement || "Earth"} (${result.elemental?.saturnBlockageTheme || "Structure & Material Security"})
   ✦ Somatic Energy Mapping: ${result.somatic?.vulnerableOrganSystem || "Nervous and Endocrine Systems"}
-- **Source Level L4 (Vedic Computational Antahkarana - Sri P.V.R. Rao Model):**
+- **Source Level L4 (Vedic Computational Antahkarana Architecture):**
   ✦ CPU (Ahamkara): ${result.antahkarana?.ahamkara?.cpuSignificator || "Atmakaraka"}
   ✦ Memory/Cache (Chitta): Root impressions in ${result.antahkarana?.chitta?.subconsciousRootVargas?.join(", ") || "D60, D45, D30"}
   ✦ ALU/Logic (Buddhi): ${result.antahkarana?.buddhi?.aluController || "AmK + Jupiter"}

@@ -2,10 +2,10 @@
 // ============================================================================
 // MASTER ORCHESTRATOR: LINEAGE KARMA & ANCESTRAL INTELLIGENCE ENGINE (v1.0)
 // Unifies:
-// 1. Classical Jyotish (BPHS + Dr. Prem Kumar Sharma)
+// 1. Classical Jyotish (BPHS & Classical Nodal Canons)
 // 2. Varga Recurrence (D1, D9, D12)
-// 3. Elemental Ancestral Substance (Stephen Arroyo)
-// 4. Somatic & Energy Field (Mr. A + Polarity Therapy)
+// 3. Elemental Ancestral Substance (Classical Elemental Philosophy)
+// 4. Somatic & Energy Field (Polarity Therapy)
 // 5. Positive Pitru Anugraha & Obstacle Diagnostics
 // 6. Kula & Ishta Devata (Roots & Wings)
 // 7. Human Language Presentation Layer (Language Style Guide v1.0)

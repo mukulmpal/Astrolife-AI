@@ -650,11 +650,11 @@ function getNavamshaSignNum(lon: number): number {
   return (D9_STARTS[signIdx] + navPart) % 12;
 }
 
-// ── Research Helpers: Veluchamy (2022) & Classical Synthesis ─────────────────
+// ── Research Helpers: Classical Shani-Chandra Synthesis ─────────────────
 
 /**
  * Detects Punarbu / Punarphoo Yoga (Moon-Saturn Connection)
- * Researched by Dr. S. Veluchamy & N. Karuna Moorthy (2022, VISTAS).
+ * Classical Shani-Chandra connectivity research.
  * Causes delays, sudden renegotiations, hesitation, and pre-marital anxiety.
  */
 export function detectPunarbuYoga(chart: ChartData, kpResult?: ReturnType<typeof runKPEngine>): PunarbuYogaResult {
@@ -1280,7 +1280,7 @@ export function evaluateMarriageIntelligence(chart: ChartData): MarriageIntellig
       : "Standard intimacy and attraction vectors active.",
   };
 
-  // Evaluate Punarbu / Punarphoo Yoga (Dr. Veluchamy & Karuna Moorthy 2022)
+  // Evaluate Punarbu / Punarphoo Yoga (Classical Research)
   const punarbuYoga = detectPunarbuYoga(chart, kpResult);
 
   // Evaluate Separative Influences (Sun, Saturn, Rahu, Ketu, 12L)

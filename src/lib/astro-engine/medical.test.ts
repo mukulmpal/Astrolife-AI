@@ -157,7 +157,7 @@ describe("Medical Astrology Engine v3.0 Audit Tests", () => {
     const tbCombo = result.triggeredCombos.find(c => c.disease.includes("Tuberculosis") || c.disease.includes("Rajyakshma"));
 
     assert.ok(tbCombo, "Traditional Tuberculosis / Rajyakshma must be detected when Mercury & Mars occupy 6th house");
-    assert.ok(tbCombo.classicalCitation.includes("Krishna Kumar") || tbCombo.classicalCitation.includes("Kshaya"));
+    assert.ok(tbCombo.classicalCitation.includes("Classical Medical") || tbCombo.classicalCitation.includes("Kshaya"));
     assert.ok(tbCombo.safeToneGuidance.includes("respiratory") || tbCombo.safeToneGuidance.includes("pulmonary"));
     assert.ok(result.healthScores.Respiratory >= 24, "Respiratory score should be elevated for Rajyakshma combo");
   });

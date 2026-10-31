@@ -7,10 +7,10 @@
  *
  * Core Capabilities:
  *  1. Astronomical Parameters, Ephemeris Speeds & Progressions by Averages
- *  2. Sepharial Decanate Vibration Boost
+ *  2. Decanate Vibration Boost
  *  3. Strict Transit Aspect Engine (Major 3°/2°, Minor 1°: Quintile, Septile, Quincunx, Sesquiquadrate, Semisquare)
  *  4. Stationary Peak Multiplier (EXTREME_STATIONARY_PEAK at <= 1.0° orb)
- *  5. Robert Hand's Algebraic Event-Timing Engine (Applying vs Separating Net Orb = 0)
+ *  5. Algebraic Event-Timing Engine (Applying vs Separating Net Orb = 0)
  *  6. Symbolic Directions (1° = 1 year, Zero Orb) & Progressed MC (0° 59' 8.17" per year)
  *  7. Triple Transit Retrograde Loop State Machine (Pass 1 -> Pass 2 -> Pass 3)
  *  8. Next-House Cusp Buffer Rule (3.0° pre-ingress activation)
@@ -309,7 +309,7 @@ export function isRetrogradeBySunDistance(
 }
 
 /**
- * 4. Robert Hand's Algebraic Event Timing Calculator
+ * 4. Algebraic Event Timing Calculator
  * Computes net signed transit orb. When algebraic sum approaches 0.0, the event peaks.
  */
 export function calculateAlgebraicEventTiming(transitingAngles: number[]) {
@@ -614,7 +614,7 @@ export function evaluateOuterPlanet(
 
   const config = OUTER_PLANETS_CONFIG[planetKey];
 
-  // Check Sepharial Decanate Boost
+  // Check Decanate Boost
   const hasSepharialVibrationBoost = config.decanateBoost.some(
     ([r, d]) => r === rashiIndex && d === decanate
   );
@@ -665,7 +665,7 @@ export function evaluateOuterPlanet(
   else if (config.debilitationSigns.includes(rashiIndex)) signWeight = 0.0;
   else if (config.enemySigns.includes(rashiIndex)) signWeight = 0.10;
 
-  // Add Sepharial boost bonus to score (+0.25)
+  // Add Decanate boost bonus to score (+0.25)
   const decanateBonus = hasSepharialVibrationBoost ? 0.25 : 0.0;
 
   const netAspectScore = harmoniousAspectSum - stressfulAspectSum;

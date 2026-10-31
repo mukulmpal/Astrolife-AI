@@ -2,9 +2,9 @@
 // ============================================================================
 // ASTROLIFE LINEAGE KARMA & PITRU INTELLIGENCE ENGINE (v1.0)
 // Complete 7-Layer Holistic Framework:
-// 1. Classical Jyotish (BPHS, Dr. Prem Kumar Sharma)
+// 1. Classical Jyotish (BPHS, Classical Nodal Canons)
 // 2. Varga Recurrence (D1, D9, D12, D60)
-// 3. Elemental Ancestral Substance (Stephen Arroyo)
+// 3. Elemental Ancestral Substance (Classical Elemental Philosophy)
 // 4. Psychological & Somatic Field (Mr. A, Polarity Therapy)
 // 5. Time-Based Activation (Gochar, Dasha, Eclipse 19th Nakshatra)
 // 6. Positive Ancestral Assets (Pitru Anugraha, Bahuputra, Yogakaraka Nodes)
@@ -33,7 +33,7 @@ export type CertaintyLevel =
   | "Possibility"
   | "Hypothesis / Synthesis";
 
-// ── 1. ELEMENTAL ANCESTRAL LAYER (Stephen Arroyo) ──────────────────────────
+// ── 1. ELEMENTAL ANCESTRAL LAYER ──────────────────────────
 export interface ElementalAncestralProfile {
   saturnElement: ElementType;
   saturnBlockageTheme: string;
@@ -57,7 +57,7 @@ export interface ElementalAncestralProfile {
   };
 }
 
-// ── 2. CLASSICAL NODAL & LINEAGE LAYER (Dr. Prem Kumar Sharma) ──────────────
+// ── 2. CLASSICAL NODAL & LINEAGE LAYER ──────────────
 export interface GandamoolaAssessment {
   isGandamoola: boolean;
   nakshatra?: string;
@@ -146,7 +146,7 @@ export interface SomaticAncestralProfile {
   restorativeSomaticPractice: string;
 }
 
-// ── 7. ANTAHKARANA & VEDIC COMPUTATIONAL CONSCIOUSNESS (PVR Rao Model) ───
+// ── 7. ANTAHKARANA & VEDIC COMPUTATIONAL CONSCIOUSNESS (Vedic Consciousness Architecture) ───
 export interface AntahkaranaComponent {
   layer: "Ahamkara_CPU" | "Chitta_Memory" | "Buddhi_ALU" | "Manas_IO" | "Prana_Power";
   vedicConcept: string;
@@ -188,7 +188,7 @@ export interface AntahkaranaProfile {
   components: AntahkaranaComponent[];
 }
 
-// ── 8. PVR TARPANA & ANCESTRAL DEBT RELEASE (Vedic Wisdom Architecture) ────
+// ── 8. VEDIC TARPANA & ANCESTRAL DEBT RELEASE (Vedic Wisdom Architecture) ────
 export interface PvrTarpanaProfile {
   tarpanaVsHomamDistinction: {
     homamRole: string; // Burns personal past-life karmas

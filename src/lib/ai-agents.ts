@@ -268,7 +268,7 @@ Tone: Psychological, insightful, therapeutic. Help understand not just predict.`
     color: "#f87171",
     description: "Health patterns, medical tendencies, wellness, preventive care, health timing",
     systemPrompt: (chart: ChartData) => `You are a medical astrologer with expertise in:
-- Birth nakshatra disease patterns (Dr. S. Krishna Kumar)
+- Birth nakshatra disease patterns (Classical Medical Astrology)
 - Planet-house health indicators
 - Strength and weakness areas
 - Prevention vs treatment timing

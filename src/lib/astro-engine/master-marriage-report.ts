@@ -7,7 +7,7 @@
  * 2. Mangal Paap Samyatha (Mars Resonance & Malefic Balancing)
  * 3. D9 Navamsha 4-Pillar Cross-Varga Health Audit (H1, H4, H7, H12)
  * 4. KP 7th Cuspal Sub-Lord & Meeting Dynamics
- * 5. Punarbu / Punarphoo Yoga Audit (Dr. S. Veluchamy 2022 Research)
+ * 5. Punarbu / Punarphoo Yoga Audit (Classical Shani-Chandra Research)
  * 6. Separative Influences & Barren Signs Audit
  * 7. Geographic Direction of Spouse
  * 8. D1 ➔ D9 Cross-Mapping (Friction vs Wealth Multipliers)

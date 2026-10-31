@@ -1275,7 +1275,7 @@ export default function MedicalPage() {
                 📜 Daiva Vyapashraya Chikitsa (Traditional Shastriya Protocols)
               </div>
               <div style={{ fontSize: "11px", color: "#6B635B", marginBottom: "14px" }}>
-                Academic Reference: Prof. Jaiprakash Narayan Dwivedi, <em>AYU Journal</em> (Dwarka Sanskrit Academy).
+                Academic Reference: Classical Ayurvedic Chikitsa Research, <em>AYU Journal</em> (Dwarka Sanskrit Academy).
               </div>
 
               {/* Snan Aushadhi Card */}
@@ -1359,7 +1359,7 @@ export default function MedicalPage() {
         {activeTab === "combos" && (
           <>
             <div style={{ background: "rgba(184,134,11,0.06)", border: "1px solid rgba(184,134,11,0.22)", borderRadius: "10px", padding: "12px 16px", marginBottom: "16px", fontSize: "12px", color: "#4A4238", lineHeight: "1.6" }}>
-              🏛️ <strong>Classical Medical Texts & Medical Safe Tone Engine:</strong> This section cross-examines classical yoga citations (including traditional references like Rajyakshma / Tuberculosis from Dr. S. Krishna Kumar & BPHS) alongside modern non-fatalistic, empathetic clinical guidance.
+              🏛️ <strong>Classical Medical Texts & Medical Safe Tone Engine:</strong> This section cross-examines classical yoga citations (including traditional references like Rajyakshma / Tuberculosis from classical medical astrology texts & BPHS) alongside modern non-fatalistic, empathetic clinical guidance.
             </div>
 
             {result.triggeredCombos.length === 0 ? (

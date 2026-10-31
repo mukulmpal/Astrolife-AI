@@ -165,7 +165,7 @@ export default function OuterPlanetsDossierCard({
         <div style={{ padding: "8px 10px", background: "#FFFFFF", borderRadius: 8, border: "1px solid rgba(184,134,11,0.15)" }}>
           <div style={{ fontSize: 9.5, color: "#8C8278", textTransform: "uppercase", fontWeight: 700 }}>Decanate / Boost</div>
           <div style={{ fontSize: 12.5, fontWeight: 700, color: activeEval.hasSepharialVibrationBoost ? "#0891b2" : "#1A1A1A" }}>
-            Decanate {activeEval.decanate} {activeEval.hasSepharialVibrationBoost ? "⚡ Sepharial Boost" : ""}
+            Decanate {activeEval.decanate} {activeEval.hasSepharialVibrationBoost ? "⚡ Decanate Boost" : ""}
           </div>
         </div>
       </div>

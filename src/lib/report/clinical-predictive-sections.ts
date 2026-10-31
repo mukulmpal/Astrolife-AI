@@ -688,9 +688,9 @@ export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK"): st
         </div>
       </div>
 
-      <!-- Arroyo Elemental Water Houses (4-8-12) -->
+      <!-- Elemental Ancestral Water Houses (4-8-12) -->
       <div class="card" style="padding:12px;border-left:3px solid var(--saffron);margin-bottom:12px;">
-        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">Arroyo Ancestral Water Houses (4-8-12 Trilogy)</div>
+        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">Ancestral Water Houses (4-8-12 Trilogy)</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:10px;color:var(--ivory-dim);">
           <div style="padding:6px;background:var(--surface);border-radius:3px;">
             <strong style="color:var(--ivory);">H4 (Learned):</strong> ${esc(lineage.elemental.waterHousesTrilogy.fourthHouseLearned)}
@@ -704,9 +704,9 @@ export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK"): st
         </div>
       </div>
 
-      <!-- PVR Rao Tarpana & Somatic Restoration -->
+      <!-- Vedic Tarpana & Somatic Restoration -->
       <div class="card" style="padding:12px;background:var(--surface);">
-        <div class="kicker" style="color:var(--jade);margin-bottom:4px;">PVR Rao Karma Release &amp; Somatic Balance</div>
+        <div class="kicker" style="color:var(--jade);margin-bottom:4px;">Vedic Karma Release &amp; Somatic Balance</div>
         <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;margin-bottom:6px;">
           <strong>Homam vs Tarpana:</strong> Homam burns personal past-life karma; Tarpana washes inherited ancestral debts. 
           Ancestors live within us as genetic and emotional conditioning.

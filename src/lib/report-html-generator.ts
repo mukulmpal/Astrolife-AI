@@ -2682,7 +2682,7 @@ function page11EngineLedger(context: ReportEngineContext): string {
     ["Career D10 Specifier", "covered", "D10 institutional micro-niche, workplace mobility, and deep-tech signatures."],
     ["Health Degree Timing", "covered", "Moon dispositor 2°-3° entry recovery window and clinical guardrails."],
     ["Functional Debility", "covered", "Debility-inversion superpowers, fatal gemstone alerts, and Nadi zenith windows."],
-    ["Lineage Karma", "covered", "Kula Devata roots, Ishta Devata wings, Arroyo elemental water houses, and PVR Rao tarpana."],
+    ["Lineage Karma", "covered", "Kula Devata roots, Ishta Devata wings, elemental water houses, and Vedic tarpana."],
     ["12 Jyotirlinga", "covered", "Deterministic primary sanctuary matching, 528Hz healing, and 40-day assimilation."],
   ];
 

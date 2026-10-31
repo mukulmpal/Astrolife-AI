@@ -1,6 +1,6 @@
 // src/lib/astro-engine/lineage-karma/classical-nodes.ts
 // ============================================================================
-// NODAL & CLASSICAL LINEAGE ENGINE (Dr. Prem Kumar Sharma & BPHS)
+// NODAL & CLASSICAL LINEAGE ENGINE (Classical Nodal Lineage & BPHS)
 // Implements:
 // - Rahu = Paternal Grandfather (Dada) Lineage Mapping
 // - Ketu = Maternal Grandfather (Nana) Lineage Mapping

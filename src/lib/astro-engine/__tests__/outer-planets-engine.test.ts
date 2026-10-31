@@ -67,8 +67,8 @@ test("Outer Planets Engine — detects Stationary and Retrograde motion states",
   assert.equal(stationByAngle, "STATIONARY");
 });
 
-test("Outer Planets Engine — Sepharial Decanate Vibration Boost", () => {
-  // INDRA in Taurus (Sign 2), 1st Decanate (0° to 10°) has Sepharial boost
+test("Outer Planets Engine — Decanate Vibration Boost", () => {
+  // INDRA in Taurus (Sign 2), 1st Decanate (0° to 10°) has Decanate boost
   const tropicalLon = 29; // Taurus 5 deg sidereal when ayanamsa=24
   const ayanamsa = 24;   // 29 - 24 = 5 deg Aries (Rashi 1, no boost)
   const res1 = evaluateOuterPlanet("URANUS", tropicalLon, ayanamsa, 1, {}, 180, "sidereal");
@@ -94,7 +94,7 @@ test("Outer Planets Engine — Stationary Multiplier (EXTREME_STATIONARY_PEAK) o
   assert.ok(res.activeTransits[0].combinationInsight?.gift.includes("Laser focus"));
 });
 
-test("Outer Planets Engine — Robert Hand's Algebraic Event Timing", () => {
+test("Outer Planets Engine — Algebraic Event Timing", () => {
   // Two transits: one applying (-0.4°), one separating (+0.35°)
   const timing = calculateAlgebraicEventTiming([-0.4, 0.35]);
   assert.ok(Math.abs(timing.algebraicSumDeg - (-0.05)) < 0.001);

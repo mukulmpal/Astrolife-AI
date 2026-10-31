@@ -694,15 +694,15 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
 - Ishta Devata (The Wings / Soul's Personal Guide):
   ✦ Soul Deity: ${lineage.ishtaDevata.suggestedDeity.deityName} (Atmakaraka ${lineage.ishtaDevata.atmakarakaPlanet} in Karakamsa D9 ${lineage.ishtaDevata.karakamsaSign})
   ✦ Dhyana Mantra: ${lineage.ishtaDevata.soulDhyanaMantra}
-- Arroyo Elemental Ancestral Analysis:
+- Elemental Ancestral Analysis:
   ✦ Saturn's Blocked Element: ${lineage.elemental.saturnElement} — ${lineage.elemental.saturnBlockageTheme}
   ✦ Balance: ${lineage.elemental.selfExpressiveCount} Self-Expressive (Fire/Air) vs ${lineage.elemental.selfRepressiveCount} Self-Repressive (Earth/Water)
   ✦ Water Houses (4-8-12): Learned in H4 (${lineage.elemental.waterHousesTrilogy.fourthHouseLearned}), Carried in H8 (${lineage.elemental.waterHousesTrilogy.eighthHouseCarried}), Release in H12 (${lineage.elemental.waterHousesTrilogy.twelfthHouseRelease})
-- Nodal Lineage Mapping (Dr. Prem Kumar Sharma):
+- Nodal Lineage Mapping (Classical Nodal Lineage):
   ✦ Rahu (Paternal Grandfather / Dada): H${lineage.nodalLineage.rahuPaternalGrandfather.house} (${lineage.nodalLineage.rahuPaternalGrandfather.sign})
   ✦ Ketu (Maternal Grandfather / Nana): H${lineage.nodalLineage.ketuMaternalGrandfather.house} (${lineage.nodalLineage.ketuMaternalGrandfather.sign})
   ✦ Gandamoola: ${lineage.nodalLineage.gandamoola.isGandamoola ? `Active in ${lineage.nodalLineage.gandamoola.nakshatra} P${lineage.nodalLineage.gandamoola.pada}` : "None"}
-- Somatic Energy Field (Mr. A & Polarity Therapy):
+- Somatic Energy Field (Polarity Therapy):
   ✦ Sensitive System: ${lineage.somatic.vulnerableOrganSystem}
   ✦ Restoration: ${lineage.somatic.restorativeSomaticPractice}
 - Real-Life Obstacle Diagnostics:
@@ -715,12 +715,12 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
   ✦ Top Essential Practice 3: ${lineage.remedyIntelligence?.topEssentialPractices?.[2]?.title || "Financial Clarity"} (${lineage.remedyIntelligence?.topEssentialPractices?.[2]?.oneLinePurpose || ""})
   ✦ Gemstone Contraindication: ${lineage.remedyIntelligence?.gemstoneEligibility?.reason || "Strictly gated"}
   ✦ 30-Day Self-Observation: ${lineage.remedyIntelligence?.thirtyDayAuditGuide?.questions?.[0] || "Reflect on family peace"}
-- Vedic Computational Antahkarana (PVR Rao Model):
+- Vedic Computational Antahkarana Model:
   ✦ CPU (Ahamkara / I-ness): ${lineage.antahkarana?.ahamkara.cpuSignificator || "Atmakaraka"} | Tripod: ${lineage.antahkarana?.ahamkara.tripod.sthoolaLagna || ""}, ${lineage.antahkarana?.ahamkara.tripod.sookshmaMoon || ""}
   ✦ Memory/Cache (Chitta): Subconscious impressions in ${lineage.antahkarana?.chitta.subconsciousRootVargas.join(", ") || "D60, D45, D30"}
   ✦ ALU/Logic (Buddhi): ${lineage.antahkarana?.buddhi.aluController || "AmK + Jupiter"} (Transmitter: ${lineage.antahkarana?.buddhi.transmitter || "Mercury"})
   ✦ I/O Controller (Manas): ${lineage.antahkarana?.manas.ioController || "Moon + Mercury"}
-- PVR Tarpana & Karma Release Mechanism:
+- Vedic Tarpana & Karma Release Mechanism:
   ✦ Homam vs Tarpana: Homam burns personal past-life karma; Tarpana washes inherited ancestral debts (Rina).
   ✦ Internal Genetics: Ancestors are present inside as karmic predispositions. Tarpana releases this internal conditioning.
   ✦ Jivat-Pitruk: Living father does NOT prevent son/grandson from performing Tarpana for ancestor debts.
@@ -756,7 +756,7 @@ ${vedhaAlerts ? `- Active Gochar Vedha Signals:\n  ✦ ${vedhaAlerts}` : ""}`);
   ✦ H4 (Domestic Peace): ${mi.d9Audit.pillars.h4MaritalPeace.interpretation} [Severity: ${mi.d9Audit.pillars.h4MaritalPeace.severity}]
   ✦ H7 (Spouse Stability): ${mi.d9Audit.pillars.h7SpouseNature.interpretation} [Severity: ${mi.d9Audit.pillars.h7SpouseNature.severity}]
   ✦ H12 (Bedroom Bliss): ${mi.d9Audit.pillars.h12BedroomBliss.interpretation} [Index: ${mi.d9Audit.bedroomBlissStatus}]
-- Punarbu / Punarphoo Yoga Audit (Dr. Veluchamy Research 2022):
+- Punarbu / Punarphoo Yoga Audit (Classical Shani-Chandra Research):
   ✦ Status: ${mi.punarbuYoga.detected ? `ACTIVE [Severity: ${mi.punarbuYoga.severity}]` : "CLEAN (No Punarbu Yoga)"}
   ✦ Conditions: ${mi.punarbuYoga.conditions.join("; ") || "None"}
   ✦ Neutralization / Cancelled: ${mi.punarbuYoga.isCancelled ? `YES (${mi.punarbuYoga.cancellationFactors.join(", ")})` : "No cancellation"}

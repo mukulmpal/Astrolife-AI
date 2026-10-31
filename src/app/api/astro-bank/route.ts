@@ -82,11 +82,37 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(search) ||
-          (p.birthPlace && p.birthPlace.toLowerCase().includes(search))
-      );
+      // Intelligent multi-field search and relevance ranking
+      const searchTerms = search.split(/\s+/).filter(Boolean);
+      
+      filtered = filtered.filter((p) => {
+        const name = p.name.toLowerCase();
+        const place = (p.birthPlace || "").toLowerCase();
+        const cat = (p.category || "").toLowerCase();
+        const cntry = (p.country || "").toLowerCase();
+        const full = `${name} ${place} ${cat} ${cntry}`;
+        return searchTerms.every((term) => full.includes(term));
+      });
+
+      // Rank exact & prefix matches on name higher
+      filtered.sort((a, b) => {
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        const aExact = aName === search ? 1 : 0;
+        const bExact = bName === search ? 1 : 0;
+        if (aExact !== bExact) return bExact - aExact;
+
+        const aStarts = aName.startsWith(search) ? 1 : 0;
+        const bStarts = bName.startsWith(search) ? 1 : 0;
+        if (aStarts !== bStarts) return bStarts - aStarts;
+
+        return a.name.localeCompare(b.name);
+      });
+
+      // Limit search-only queries to top 60 to prevent payload bloat
+      if (!country && !category) {
+        filtered = filtered.slice(0, 60);
+      }
     }
 
     return NextResponse.json(

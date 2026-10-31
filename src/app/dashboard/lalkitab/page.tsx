@@ -520,8 +520,51 @@ export default function LalKitabPage() {
         .cycle-badge.active{background:#B8860B;color:#FFFFFF}
         @media(max-width:850px){.lk-hero-grid{grid-template-columns:1fr}}
 
-        @media(max-width:768px){.planet-grid{grid-template-columns:1fr}.combo-grid{grid-template-columns:1fr}.varsh-grid{grid-template-columns:1fr}}
+        @media(max-width:768px){
+          .planet-grid{grid-template-columns:1fr}.combo-grid{grid-template-columns:1fr}.varsh-grid{grid-template-columns:1fr}
+          .drishti-grid{grid-template-columns:1fr}.upay43-grid{grid-template-columns:1fr}
+        }
         @media(max-width:900px){.lk-gochar-grid,.lk-time-grid{grid-template-columns:1fr}}
+        @media(max-width:640px){
+          .drishti-grid, .upay43-grid, .planet-grid, .ages-grid, .prediction-grid, .lk-remedy-grid, .lk-bullet-grid, .support-grid, .indicator-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .kismat-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 14px 16px;
+            gap: 10px;
+          }
+          .kismat-score {
+            align-self: flex-start;
+            font-size: 28px;
+          }
+          .varsh-card {
+            padding: 16px !important;
+          }
+          .varsh-year {
+            font-size: 28px !important;
+          }
+          .header-card {
+            padding: 14px 16px !important;
+          }
+          .header-stats {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            width: 100% !important;
+            gap: 6px !important;
+          }
+          .hstat {
+            min-width: 0 !important;
+            padding: 6px 4px !important;
+          }
+          .hstat-n {
+            font-size: 18px !important;
+          }
+          .hstat-l {
+            font-size: 9px !important;
+          }
+        }
       `}</style>
 
       <div className="page">
