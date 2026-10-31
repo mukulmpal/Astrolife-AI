@@ -1243,8 +1243,6 @@ export function DirectionAFeatures() {
             })}
           </div>
         </div>
-          </div>
-        </div>
 
         {/* TIER 3: THE CLASSICAL VEDIC SUPERCOMPUTER (6 Core Systems) */}
         <div className="space-y-6">
