@@ -9,15 +9,17 @@ interface EngineItem {
   icon: string;
   label: string;
   href: string;
-  badge?: "BASIC" | "PRO" | "ELITE";
+  badge?: "BASIC" | "PRO" | "ELITE" | "FREE";
 }
 
 const ENGINE_ITEMS: EngineItem[] = [
+  // 100% Free Public Health Engine
+  { icon: "🌿", label: "Health & Vitality", href: "/dashboard/medical", badge: "FREE" },
+
   // ELITE Tier Engines
   { icon: "🪐", label: "Transits", href: "/dashboard/transits", badge: "ELITE" },
   { icon: "🧩", label: "Divisional Charts", href: "/dashboard/divisional", badge: "ELITE" },
   { icon: "🕉️", label: "Jaimini", href: "/dashboard/jaimini", badge: "ELITE" },
-  { icon: "🌿", label: "Health & Vitality", href: "/dashboard/medical", badge: "ELITE" },
   { icon: "💍", label: "Marriage Timing", href: "/dashboard/marriage-timing", badge: "ELITE" },
   { icon: "🤝", label: "Family Karma", href: "/dashboard/family-synastry", badge: "ELITE" },
   { icon: "🧬", label: "Lineage Karma", href: "/dashboard/lineage-karma", badge: "ELITE" },
@@ -111,7 +113,7 @@ export function MobileBottomNav() {
                 <span className="tcm-tag">Universe Active</span>
               </div>
               <div className="tcm-title">All 25+ Astrology Engines Unlocked</div>
-              <p className="tcm-sub">Transits, Jaimini, Medical, Astro-Vastu, Astro Tattoo & priority AI unlocked.</p>
+              <p className="tcm-sub">Transits, Jaimini, Astro-Vastu, Astro Tattoo & priority AI unlocked.</p>
             </div>
           ) : userTier === "premium" ? (
             <div className="tier-card-mobile pro-card">
@@ -153,7 +155,7 @@ export function MobileBottomNav() {
                   <span className={`mobile-badge-pill ${item.badge.toLowerCase()}`}>
                     {!isElite && ((item.badge === "ELITE") || (item.badge === "PRO" && userTier === "free"))
                       ? (item.badge === "ELITE" ? "🔒 💎 ELITE" : "🔒 👑 PRO")
-                      : (item.badge === "ELITE" ? "💎 ELITE" : item.badge === "PRO" ? "👑 PRO" : "🌱 BASIC")}
+                      : (item.badge === "ELITE" ? "💎 ELITE" : item.badge === "PRO" ? "👑 PRO" : item.badge === "FREE" ? "✨ FREE" : "🌱 BASIC")}
                   </span>
                 )}
               </div>
@@ -461,6 +463,13 @@ export function MobileBottomNav() {
             background: linear-gradient(135deg, rgba(34, 197, 94, 0.14), rgba(22, 163, 74, 0.22));
             color: #16a34a;
             border: 1px solid rgba(34, 197, 94, 0.3);
+          }
+
+          .mobile-badge-pill.free {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(22, 163, 74, 0.3));
+            color: #15803d;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            font-weight: 800;
           }
 
           .mobile-more-label {

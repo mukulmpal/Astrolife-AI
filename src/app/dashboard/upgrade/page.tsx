@@ -14,6 +14,7 @@ const PLANS = [
     features: [
       "The Seed / Foundation Tier",
       "Foundational Janam Kundli",
+      "Health & Vitality (Medical Astrology) — 100% Free",
       "5 AI Questions / month",
       "Daily Horoscope Card",
       "Core Yogas & Lagna Analysis",
@@ -51,7 +52,6 @@ const PLANS = [
     features: [
       "Everything in Pro",
       "Transits (Gochar Engine) & Jaimini Sutras",
-      "Health & Vitality (Medical Astrology)",
       "Divisional Charts (D-1 to D-60 Shodashvarga)",
       "Marriage Timing Scanner (Classical 8-Param)",
       "Astro-Vastu & Astro-Tattoo",
@@ -362,6 +362,7 @@ export default function UpgradePage() {
           <div className="compare-title serif">Feature Comparison</div>
           {[
             { feature:"Basic Kundli Chart",           free:true,  premium:true,  elite:true },
+            { feature:"Health & Vitality (Medical)",  free:true,  premium:true,  elite:true },
             { feature:"AI Chat Questions",            free:"5/mo", premium:"∞",  elite:"∞" },
             { feature:"All Astrology Engines",        free:false, premium:true,  elite:true },
             { feature:"PDF Export (No Watermark)",    free:false, premium:true,  elite:true },

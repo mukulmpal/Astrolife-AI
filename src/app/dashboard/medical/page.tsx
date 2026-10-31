@@ -23,7 +23,6 @@ import {
   MEDICAL_CASEBOOK,
 } from "@/lib/astro-engine/health";
 import { EngineStateCard } from "@/components/engine-state-card";
-import { PremiumFeature } from "@/components/premium-feature";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -35,7 +34,7 @@ import { PremiumFeature } from "@/components/premium-feature";
  * - When `true`: All features instantly become accessible to 100% of all users.
  * ─────────────────────────────────────────────────────────────────────────────
  */
-export const ENABLE_ADVANCED_FEATURES_FOR_ALL = false;
+export const ENABLE_ADVANCED_FEATURES_FOR_ALL = true;
 
 const DOSHA_COLOR: Record<string, string> = { Pitta: "#DC2626", Kapha: "#15803D", Vata: "#1D4ED8" };
 const FUNC_COLOR = { benefic: "#15803D", malefic: "#DC2626", neutral: "#6B635B" };
@@ -218,8 +217,7 @@ export default function MedicalPage() {
   const familyKeys: FamilyMemberKey[] = ["Self", "Father", "Mother", "Spouse", "Children", "Younger sibling", "Elder sibling"];
 
   return (
-    <PremiumFeature feature="Health & Vitality (Medical Astrology)" requiredTier="elite">
-      <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "28px 20px 110px", color: "#1A1A1A" }}>
+    <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "28px 20px 110px", color: "#1A1A1A" }}>
       <style>{`
         .med-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.25); border-radius: 16px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,0.03); }
         .med-card-header { padding: 18px 22px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 15.5px; }
@@ -247,7 +245,24 @@ export default function MedicalPage() {
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "20px" }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "38px", fontWeight: 700, color: "#1A1A1A" }}>Health &amp; Vitality</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "6px" }}>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "38px", fontWeight: 700, color: "#1A1A1A" }}>Health &amp; Vitality</div>
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              background: "linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(22, 163, 74, 0.26))",
+              border: "1px solid rgba(34, 197, 94, 0.45)",
+              color: "#15803D",
+              fontSize: "12px",
+              fontWeight: 800,
+              padding: "4px 12px",
+              borderRadius: "20px",
+              letterSpacing: "0.5px"
+            }}>
+              ✨ 100% Free · Public Health Blessing
+            </span>
+          </div>
           <div style={{ fontSize: "14.5px", color: "#5A524A", marginTop: "4px" }}>
             Ayurvedic &amp; Classical Medical Astrology · Ojas Resilience: <strong style={{ color: "#B8860B" }}>{result.ojasScore}/100</strong> ({result.ojasRating})
           </div>
@@ -258,15 +273,15 @@ export default function MedicalPage() {
           return intro ? <EngineIntro title={intro.title} subtitle={intro.subtitle} description={intro.description} safetyNote={intro.safetyNote} /> : null;
         })()}
 
-        {/* ── ADMIN TESTING LAB & BACKTEST TOOLBAR ── */}
+        {/* ── ADVANCED VITALITY ENGINE & BACKTEST TOOLBAR ── */}
         {hasAdvancedAccess && (
           <div style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.35)", borderRadius: "14px", padding: "14px 16px", marginBottom: "18px", boxShadow: "0 4px 16px rgba(184,134,11,0.06)" }}>
-            {/* Admin Lab Header Badge */}
+            {/* Header Badge */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", paddingBottom: "8px", borderBottom: "1px solid rgba(184,134,11,0.15)", flexWrap: "wrap", gap: "6px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <span style={{ fontSize: "14px" }}>🔬</span>
+                <span style={{ fontSize: "14px" }}>🌿</span>
                 <span style={{ fontSize: "11px", fontWeight: 800, color: "#8A6008", textTransform: "uppercase", letterSpacing: "0.6px" }}>
-                  Admin Testing Lab Mode
+                  {ENABLE_ADVANCED_FEATURES_FOR_ALL ? "Universal Vitality & Backtest Engine" : "Admin Testing Lab Mode"}
                 </span>
                 {userEmail && (
                   <span style={{ fontSize: "11px", background: "rgba(184,134,11,0.14)", color: "#8A6008", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>
@@ -274,8 +289,8 @@ export default function MedicalPage() {
                   </span>
                 )}
               </div>
-              <span style={{ fontSize: "10px", color: "#6B635B", fontStyle: "italic" }}>
-                (Testing features restricted to Admin · Hidden from public users)
+              <span style={{ fontSize: "10px", color: "#15803D", fontWeight: 600 }}>
+                {ENABLE_ADVANCED_FEATURES_FOR_ALL ? "100% Unlocked for All (Public Health Blessing)" : "(Testing features restricted to Admin · Hidden from public users)"}
               </span>
             </div>
 
@@ -1502,6 +1517,5 @@ export default function MedicalPage() {
         </div>
       </div>
     </main>
-    </PremiumFeature>
   );
 }

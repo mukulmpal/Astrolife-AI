@@ -138,6 +138,7 @@ export const pricingPlans = [
     popular: false,
     features: [
       "Foundational Vedic Kundli",
+      "Health & Vitality Medical Astrology (100% Free)",
       "Daily Astrology Card",
       "Basic Dasha & House Analysis",
       "Top Yogas & Dosha Detection",
@@ -172,7 +173,6 @@ export const pricingPlans = [
       "Everything in Pro 👑",
       "Live Transits & Event Radar",
       "Jaimini Chara Dasha & Karakas",
-      "Health & Vitality Medical Astrology",
       "Astro-Vastu & Astro Tattoo Analysis",
       "All 16 Divisional Charts (Vargas)",
       "Marriage Timing & Family Karma",

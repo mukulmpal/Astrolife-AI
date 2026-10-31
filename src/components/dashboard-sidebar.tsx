@@ -77,12 +77,11 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Lineage Karma", href: "/dashboard/lineage-karma", Icon: Dna, badge: "ELITE" },
       { label: "Psychology", href: "/dashboard/psychology", Icon: Brain, badge: "BASIC" },
-      { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus, badge: "ELITE" },
+      { label: "Health & Vitality", href: "/dashboard/medical", Icon: ShieldPlus, badge: "FREE" },
       { label: "Gemstone", href: "/dashboard/gemstone", Icon: Gem, badge: "PRO" },
       { label: "Remedies", href: "/dashboard/remedy", Icon: Leaf, badge: "PRO" },
       { label: "Lal Kitab", href: "/dashboard/lalkitab", Icon: BookOpen, badge: "PRO" },
       { label: "Astro-Vastu Radar", href: "/dashboard/vastu", Icon: HomeIcon, badge: "ELITE" },
-      { label: "Bio-Wearables & Threads", href: "/dashboard/vastu?tab=wearableAudit", Icon: Shield, badge: "ELITE" },
       { label: "Dot Therapy (बिंदु)", href: "/dashboard/vastu?tab=bodyTherapy", Icon: CircleDot, badge: "ELITE" },
       { label: "Astro Tattoo", href: "/dashboard/astro-tattoo", Icon: Sparkles, badge: "ELITE" },
       { label: "Astro Sound", href: "/dashboard/astro-sound", Icon: Music, badge: "ELITE" },
@@ -322,6 +321,8 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
                           "💎 ELITE"
                         ) : badge === "PRO" ? (
                           "👑 PRO"
+                        ) : badge === "FREE" ? (
+                          "✨ FREE"
                         ) : badge === "BASIC" ? (
                           "🌱 BASIC"
                         ) : (
