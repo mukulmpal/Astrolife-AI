@@ -65,16 +65,16 @@ function ActiveCard({
   const color = LORD_COLOR[period.lord];
   return (
     <div
-      className="rounded-2xl p-5 flex flex-col gap-3"
+      className="rounded-2xl p-6 flex flex-col gap-4"
       style={{
         background: "#FFFFFF",
-        border: `1px solid rgba(184, 134, 11, 0.22)`,
-        borderLeft: `4px solid ${color}`,
-        boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+        border: `1.5px solid rgba(184, 134, 11, 0.25)`,
+        borderLeft: `5px solid ${color}`,
+        boxShadow: "0 2px 14px rgba(0,0,0,0.04)",
       }}
     >
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <p className="text-xs uppercase tracking-widest font-bold" style={{ color: color }}>
+        <p className="text-xs sm:text-sm uppercase tracking-widest font-black" style={{ color: color }}>
           {label}
         </p>
         <DashaProgressCapsule
@@ -85,14 +85,14 @@ function ActiveCard({
           exactEndDate={period.endDate}
         />
       </div>
-      <div className="flex items-center gap-3">
-        <span className="text-3xl">{LORD_ICON[period.lord]}</span>
+      <div className="flex items-center gap-3.5">
+        <span className="text-4xl">{LORD_ICON[period.lord]}</span>
         <div>
-          <p className="text-2xl font-bold text-[#1A1A1A]">{tp(period.lord)}</p>
-          {sub && <p className="text-xs text-[#6B635B] mt-0.5">{sub}</p>}
+          <p className="text-2xl sm:text-3xl font-black text-[#1A1A1A]">{tp(period.lord)}</p>
+          {sub && <p className="text-xs sm:text-sm text-[#6B635B] mt-0.5 font-medium">{sub}</p>}
         </div>
       </div>
-      <div className="w-full h-2 rounded-full bg-[#FAF7F2] overflow-hidden border border-amber-900/10 mt-1">
+      <div className="w-full h-2.5 rounded-full bg-[#FAF7F2] overflow-hidden border border-amber-900/10 mt-1">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${period.progressPercent}%`, background: color }}
@@ -368,29 +368,31 @@ export default function DashaPage() {
           ]}
         />
 
-        {/* Tab Switcher */}
-        <div className="flex items-center gap-3 border-b border-amber-900/15 pb-1">
+        {/* Large Prominent Tab Switcher */}
+        <div className="p-2 bg-[#F6F2E9] rounded-3xl border-2 border-amber-900/15 flex flex-wrap items-center gap-3 shadow-sm">
           <button
             onClick={() => setMainTab("TIMELINE")}
-            className={`pb-2.5 px-3 text-sm font-bold transition-all relative flex items-center gap-2 ${
+            className={`py-3.5 px-6 sm:px-8 text-base sm:text-lg font-black rounded-2xl transition-all flex items-center gap-3 ${
               mainTab === "TIMELINE"
-                ? "text-[#B8860B] border-b-2 border-[#B8860B]"
-                : "text-[#6B635B] hover:text-[#1A1A1A]"
+                ? "bg-white text-[#B8860B] shadow-md border-2 border-amber-500/40"
+                : "text-[#6B635B] hover:text-[#1A1A1A] hover:bg-white/50 border-2 border-transparent"
             }`}
           >
-            <span>⏳ Vimshottari & KP Timeline</span>
+            <span className="text-xl">⏳</span>
+            <span>Vimshottari & KP Timeline</span>
           </button>
           <button
             onClick={() => setMainTab("NAVTARA")}
-            className={`pb-2.5 px-3 text-sm font-bold transition-all relative flex items-center gap-2 ${
+            className={`py-3.5 px-6 sm:px-8 text-base sm:text-lg font-black rounded-2xl transition-all flex items-center gap-3 ${
               mainTab === "NAVTARA"
-                ? "text-[#B8860B] border-b-2 border-[#B8860B]"
-                : "text-[#6B635B] hover:text-[#1A1A1A]"
+                ? "bg-white text-[#B8860B] shadow-md border-2 border-amber-500/40"
+                : "text-[#6B635B] hover:text-[#1A1A1A] hover:bg-white/50 border-2 border-transparent"
             }`}
           >
-            <span>✦ Navtara Intelligence</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-[#B8860B] font-extrabold uppercase">
-              Master Engine
+            <span className="text-xl">✦</span>
+            <span>Navtara Intelligence</span>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/15 text-[#B8860B] font-extrabold uppercase border border-amber-500/30">
+              6 Life Solvers
             </span>
           </button>
         </div>

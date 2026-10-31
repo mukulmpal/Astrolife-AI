@@ -24,6 +24,11 @@ import {
   type NakshatraHumanReport,
 } from "@/lib/astro-engine/nakshatra-remedy-engine";
 import {
+  evaluateLifeProblemNavtaraDossier,
+  type LifeProblemDossierReport,
+} from "@/lib/astro-engine/navtara-problem-solver";
+import { NavtaraProblemSolverDeck } from "./NavtaraProblemSolverDeck";
+import {
   Shield,
   Sparkles,
   AlertTriangle,
@@ -85,6 +90,16 @@ export function NavtaraIntelligenceView({
       return null;
     }
   }, [chart]);
+
+  // Compute 6-Life Problem Navtara & Dasha Synergy Dossier
+  const problemSolverReport: LifeProblemDossierReport = useMemo(() => {
+    try {
+      return evaluateLifeProblemNavtaraDossier(chart, activeMD, activeAD);
+    } catch (err) {
+      console.warn("[NavtaraIntelligenceView] Failed to compute problemSolverReport:", err);
+      return evaluateLifeProblemNavtaraDossier(chart);
+    }
+  }, [chart, activeMD, activeAD]);
 
   // Compute Full Navtara Intelligence reactively based on chosen Ayanamsa
   const intel: FullNavtaraIntelligence = useMemo(() => {
@@ -179,37 +194,37 @@ export function NavtaraIntelligenceView({
     patternConfig[audit?.pattern ?? "FOUNDATIONAL"];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {/* ── Top Bar: Ayanamsa Switcher & Birth Star Context ── */}
-      <section className="rounded-3xl border border-amber-900/15 bg-white p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <section className="rounded-3xl border-2 border-amber-900/15 bg-white p-6 sm:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-widest font-bold text-[#B8860B]">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs sm:text-sm uppercase tracking-widest font-black text-[#B8860B]">
               Birth Star Anchor
             </span>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 text-[#B8860B] font-semibold">
+            <span className="text-xs sm:text-sm px-3 py-1 rounded-full bg-amber-500/15 text-[#B8860B] font-bold">
               Janma Nakshatra #{intel.birthNakshatra.id}
             </span>
           </div>
-          <h2 className="text-xl font-bold text-[#1A1A1A] mt-1 flex items-center gap-2">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A1A] mt-1.5 flex items-center gap-3">
             <span>{intel.birthNakshatra.name}</span>
-            <span className="text-sm font-normal text-[#6B635B]">
+            <span className="text-base sm:text-lg font-medium text-[#6B635B]">
               Pada {intel.birthPada} · Lord: {tp(intel.birthNakshatra.lord)}
             </span>
           </h2>
-          <p className="text-xs text-[#6B635B] mt-0.5">
+          <p className="text-sm sm:text-base text-[#6B635B] mt-1.5 leading-relaxed">
             Devta: <strong className="text-[#1A1A1A]">{intel.birthNakshatra.devta}</strong> · Animal:{" "}
             {intel.birthNakshatra.animal} · Tree: {intel.birthNakshatra.tree}
           </p>
         </div>
 
         {/* Ayanamsa Toggle */}
-        <div className="flex items-center gap-2 self-start md:self-auto bg-[#FAF7F2] p-1.5 rounded-2xl border border-amber-900/10">
-          <Sliders className="w-3.5 h-3.5 text-[#B8860B] ml-1.5" />
-          <span className="text-xs font-semibold text-[#6B635B] mr-1">Ayanamsa:</span>
+        <div className="flex items-center gap-2 self-start md:self-auto bg-[#FAF7F2] p-2 rounded-2xl border border-amber-900/15">
+          <Sliders className="w-4 h-4 text-[#B8860B] ml-1.5" />
+          <span className="text-xs sm:text-sm font-bold text-[#6B635B] mr-1">Ayanamsa:</span>
           <button
             onClick={() => setSelectedAyanamsa("Lahiri_Chitrapaksha")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
               selectedAyanamsa === "Lahiri_Chitrapaksha"
                 ? "bg-[#B8860B] text-white shadow-sm"
                 : "text-[#6B635B] hover:text-[#1A1A1A]"
@@ -219,7 +234,7 @@ export function NavtaraIntelligenceView({
           </button>
           <button
             onClick={() => setSelectedAyanamsa("KP_Krishnamurti")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
               selectedAyanamsa === "KP_Krishnamurti"
                 ? "bg-[#B8860B] text-white shadow-sm"
                 : "text-[#6B635B] hover:text-[#1A1A1A]"
@@ -279,30 +294,30 @@ export function NavtaraIntelligenceView({
 
       {/* ── Hero Card: Active Dasha 3-Layer Navtara Audit ── */}
       {audit && (
-        <section className="rounded-3xl border border-amber-900/15 bg-white p-6 shadow-sm flex flex-col gap-5">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-amber-900/10 pb-4">
+        <section className="rounded-3xl border-2 border-amber-900/15 bg-white p-6 sm:p-8 shadow-sm flex flex-col gap-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-amber-900/10 pb-5">
             <div>
-              <p className="text-xs uppercase tracking-widest text-[#B8860B] font-bold">
+              <p className="text-xs sm:text-sm uppercase tracking-widest text-[#B8860B] font-black">
                 Active Dasha Qualification Audit
               </p>
-              <h3 className="text-2xl font-bold text-[#1A1A1A] mt-0.5 flex items-center gap-2">
+              <h3 className="text-2xl sm:text-3xl font-black text-[#1A1A1A] mt-1 flex items-center gap-2.5">
                 <span>{tp(audit.activeMahadasha)} Mahadasha</span>
                 {audit.activeAntardasha && (
-                  <span className="text-base font-normal text-[#6B635B]">
+                  <span className="text-base sm:text-lg font-medium text-[#6B635B]">
                     · {tp(audit.activeAntardasha)} Antardasha
                   </span>
                 )}
               </h3>
             </div>
             <div
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide border flex items-center gap-1.5"
+              className="px-4 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide border flex items-center gap-2"
               style={{
                 background: currentPatternStyle.bg,
                 borderColor: currentPatternStyle.border,
                 color: currentPatternStyle.text,
               }}
             >
-              <Shield className="w-3.5 h-3.5" />
+              <Shield className="w-4 h-4" />
               <span>{currentPatternStyle.label}</span>
             </div>
           </div>
@@ -310,14 +325,14 @@ export function NavtaraIntelligenceView({
           {/* Pattern description */}
           <div
             style={{
-              padding: "16px 20px",
-              borderRadius: 14,
+              padding: "18px 24px",
+              borderRadius: 16,
               background: "#FAF8F5",
-              border: "1px solid rgba(184, 134, 11, 0.2)",
-              borderLeft: "4px solid #B8860B",
+              border: "1px solid rgba(184, 134, 11, 0.25)",
+              borderLeft: "5px solid #B8860B",
             }}
           >
-            <p className="text-[14px] text-[#1A1A1A] leading-[1.7] font-medium m-0">
+            <p className="text-sm sm:text-base text-[#1A1A1A] leading-relaxed font-medium m-0">
               {audit.patternDescription}
             </p>
           </div>
@@ -417,6 +432,9 @@ export function NavtaraIntelligenceView({
           )}
         </section>
       )}
+
+      {/* ── 6 Core Life Problems & Atimitra Solver Deck (Master Feature) ── */}
+      <NavtaraProblemSolverDeck report={problemSolverReport} tp={tp} />
 
       {/* ── Two-Column Row: 27th Support Star & Birth Star Quality Profile ── */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">

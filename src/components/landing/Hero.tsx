@@ -55,7 +55,8 @@ export function Hero() {
 
           <div className="landing-hero-actions">
             <Link href={ctaHref} className="landing-btn landing-btn-primary landing-btn-lg">
-              Generate Multi-Engine Kundli (Free)
+              Generate Multi-Engine Kundli
+              <span className="ml-2 inline-block px-2 py-0.5 text-xs font-semibold text-white bg-[#f4a12a] rounded-full">Free</span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
             <Link href="#engines" className="landing-btn landing-btn-ghost landing-btn-lg">

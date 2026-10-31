@@ -123,6 +123,20 @@ body.theme-maroon, body.theme-forest, body.theme-twilight {
 }
 
 /* ── Utility classes from design system ──────────────────── */
+
+/* Free badge – tiny pill */
+.free-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0px 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  background: #f4a12a;   /* same gold used elsewhere */
+  border-radius: 9999px;
+}
+
 .al-serif       { font-family: var(--al-font-display); }
 .al-mono        { font-family: var(--al-font-mono); }
 .al-eyebrow {
