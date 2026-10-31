@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { isBillingEnforced } from '@/lib/access';
 import { calculateChart, CITY_COORDS, RASHIS } from '@/lib/astro-engine/calculations';
+import { saveCurrentChart } from '@/lib/user-chart';
 
 const PLANET_GLYPHS: Record<string, string> = {
   Sun: '☉',
@@ -19,8 +20,83 @@ const PLANET_GLYPHS: Record<string, string> = {
 
 const POPULAR_CITIES = ['New Delhi', 'Mumbai', 'Bengaluru', 'London', 'New York'];
 
+const DEMO_ARCHETYPES = [
+  {
+    id: 'elon_musk',
+    tag: 'Multi-Planetary Titan',
+    name: 'Elon Musk',
+    dob: '1971-06-28',
+    tob: '07:30',
+    city: 'Pretoria, South Africa',
+    lat: -25.7479,
+    lon: 28.2293,
+    tz: 2.0,
+    highlights: 'Cancer Lagna · Exalted Uchha Mars in 7th (Rockets) · Moon in Magha',
+    badge: 'SpaceX & Tesla Vision',
+  },
+  {
+    id: 'virat_kohli',
+    tag: 'Global Cricket Icon',
+    name: 'Virat Kohli',
+    dob: '1988-11-05',
+    tob: '10:28',
+    city: 'Delhi, India',
+    lat: 28.6139,
+    lon: 77.2090,
+    tz: 5.5,
+    highlights: 'Sagittarius Lagna · Fierce Mars in 4th · Sun in 11th Labha',
+    badge: 'Relentless Athletic Will',
+  },
+  {
+    id: 'steve_jobs',
+    tag: 'Design & Silicon Visionary',
+    name: 'Steve Jobs',
+    dob: '1955-02-24',
+    tob: '19:15',
+    city: 'San Francisco, USA',
+    lat: 37.7749,
+    lon: -122.4194,
+    tz: -8.0,
+    highlights: 'Leo Lagna · 10th House Sun-Mercury Budhaditya · Rahu in 5th',
+    badge: 'Apple Innovation',
+  },
+];
+
+function getLiveCosmicWindow() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const totalMin = h * 60 + m;
+
+  // Abhijit Muhurat: ~11:40 to 12:30 (around solar midday)
+  if (totalMin >= 700 && totalMin <= 750) {
+    return {
+      title: '🟢 Abhijit Muhurat Active (Golden Window)',
+      sub: 'Most auspicious moment · High-success chart casting',
+    };
+  }
+  if (h >= 6 && h < 12) {
+    return {
+      title: '✨ Amrit & Shubh Chaughadia Active',
+      sub: 'Solar Prana surge · 0.01° Swiss Ephemeris micro-precision',
+    };
+  }
+  if (h >= 12 && h < 18) {
+    return {
+      title: '⚡ Labha & Shubh Window Active',
+      sub: 'Dhana Yoga activation window · Multi-House transit ripple',
+    };
+  }
+  return {
+    title: '🌙 Chandra Hora Active (High Intuition)',
+    sub: 'Subconscious karmic clarity · 12-Rashi Somatotopic alignment',
+  };
+}
+
 export function BirthDetailsForm() {
   const router = useRouter();
+  const [formMode, setFormMode] = useState<'custom' | 'demo'>('custom');
+  const [cosmicWindow, setCosmicWindow] = useState(getLiveCosmicWindow);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [useSuryaKundli, setUseSuryaKundli] = useState(false);
@@ -30,6 +106,31 @@ export function BirthDetailsForm() {
     time: '',
     city: '',
   });
+
+  useEffect(() => {
+    const timer = setInterval(() => setCosmicWindow(getLiveCosmicWindow()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleLaunchDemo = (demo: typeof DEMO_ARCHETYPES[0]) => {
+    setLoading(true);
+    try {
+      const chart = calculateChart(
+        demo.name,
+        demo.dob,
+        demo.tob,
+        demo.city,
+        demo.lat,
+        demo.lon,
+        demo.tz
+      );
+      saveCurrentChart(chart);
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Failed to calculate demo chart:', err);
+      router.push('/dashboard?sample=true');
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -180,8 +281,106 @@ export function BirthDetailsForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Name Input with dynamic personalized greeting */}
+    <div className="space-y-4">
+      {/* Live Cosmic Hour Pill */}
+      <div
+        className="flex items-center justify-between rounded-xl px-3.5 py-2 border shadow-xs"
+        style={{ background: '#FAF7F2', borderColor: 'rgba(184, 134, 11, 0.35)' }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span className="text-10px font-mono font-bold tracking-wider text-[#8C6508]">
+            LIVE COSMIC WINDOW
+          </span>
+        </div>
+        <div className="text-right">
+          <div className="text-10px font-bold text-[#1A1A1A]">
+            {cosmicWindow.title}
+          </div>
+          <div className="text-8px font-medium text-[#6B635B]">
+            {cosmicWindow.sub}
+          </div>
+        </div>
+      </div>
+
+      {/* Mode Switcher: Custom vs 1-Click Demo */}
+      <div
+        className="grid grid-cols-2 gap-1 rounded-lg p-1 border"
+        style={{ background: '#FAF5EB', borderColor: 'rgba(184, 134, 11, 0.25)' }}
+      >
+        <button
+          type="button"
+          onClick={() => setFormMode('custom')}
+          className={`cursor-pointer rounded py-1.5 text-xs font-bold transition-all ${
+            formMode === 'custom'
+              ? 'bg-[#FFFFFF] text-[#8C6508] shadow-xs border border-[rgba(184,134,11,0.3)]'
+              : 'text-[#6B635B] hover:text-[#1A1A1A]'
+          }`}
+        >
+          📝 Enter Birth Details
+        </button>
+        <button
+          type="button"
+          onClick={() => setFormMode('demo')}
+          className={`cursor-pointer rounded py-1.5 text-xs font-bold transition-all ${
+            formMode === 'demo'
+              ? 'bg-[#FFFFFF] text-[#8C6508] shadow-xs border border-[rgba(184,134,11,0.3)]'
+              : 'text-[#6B635B] hover:text-[#1A1A1A]'
+          }`}
+        >
+          ⚡ Instant Demo (1-Click)
+        </button>
+      </div>
+
+      {formMode === 'demo' ? (
+        <div className="space-y-2.5">
+          <p className="text-xs text-[#5C5248] leading-relaxed">
+            Don&rsquo;t have your exact birth time? Launch all 38 engines instantly with verified historical charts:
+          </p>
+          {DEMO_ARCHETYPES.map((arch) => (
+            <div
+              key={arch.id}
+              onClick={() => handleLaunchDemo(arch)}
+              className="group cursor-pointer rounded-xl p-3 border transition-all hover:border-[#B8860B] hover:scale-[1.01]"
+              style={{ background: '#FFFFFF', borderColor: 'rgba(184, 134, 11, 0.25)' }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#1A1A1A] group-hover:text-[#8C6508]">
+                  {arch.name}
+                </span>
+                <span className="rounded px-1.5 py-0.5 font-mono text-8px uppercase font-semibold bg-[#FAF5EB] text-[#8C6508] border border-[rgba(184,134,11,0.2)]">
+                  {arch.badge}
+                </span>
+              </div>
+              <p className="mt-1 text-9px text-[#6B635B]">
+                {arch.highlights}
+              </p>
+              <div className="mt-2 flex items-center justify-between text-9px font-bold text-[#8C6508]">
+                <span>{arch.city}</span>
+                <span className="group-hover:translate-x-0.5 transition-transform">Launch Instant Chart →</span>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => handleLaunchDemo(DEMO_ARCHETYPES[0])}
+            disabled={loading}
+            className="mt-3 w-full cursor-pointer rounded-lg py-3 text-xs font-bold tracking-wide shadow-md transition-all hover:scale-[1.02]"
+            style={{
+              background: 'linear-gradient(180deg, #D4AF37 0%, #B8860B 100%)',
+              color: '#1A1A1A',
+              boxShadow: '0 8px 24px -6px rgba(184, 134, 11, 0.45)',
+            }}
+          >
+            {loading ? 'Launching All 38 Engines...' : '⚡ Launch Elon Musk Demo in 1-Click →'}
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name Input with dynamic personalized greeting */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
           <label className="block text-xs font-bold uppercase tracking-wider" style={{ color: '#8C6508' }}>
@@ -531,6 +730,8 @@ export function BirthDetailsForm() {
       <p className="mt-2 text-center text-10px uppercase tracking-wider font-semibold" style={{ color: '#6B635B' }}>
         ✓ 100% Free · No Card Required · Swiss Ephemeris Precision
       </p>
-    </form>
+        </form>
+      )}
+    </div>
   );
 }
