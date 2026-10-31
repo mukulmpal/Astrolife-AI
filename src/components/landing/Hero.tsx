@@ -38,7 +38,7 @@ export function Hero() {
         >
           <div className="landing-kicker">
             <Sparkles size={14} className="text-[#f4a12a]" aria-hidden="true" />
-            <span>16 Classical Engines · Zero AI Hallucination · Swiss Ephemeris</span>
+            <span>38 Specialized Engines · Zero AI Hallucination · Swiss Ephemeris</span>
           </div>
 
           <h1>
@@ -50,8 +50,7 @@ export function Hero() {
 
           <p className="landing-hero-subtitle">
             While generic AI chatbots hallucinate planetary degrees, AstroLife AI computes your exact birth chart across{" "}
-            <strong className="text-white font-semibold">Vedic Parashari, KP Placidus Sub-Lords, Jaimini Chara Dasha, Indu Lagna Wealth</strong>, and{" "}
-            <strong className="text-white font-semibold">27-Nakshatra Social Remedies</strong> — delivering verifiable, explainable life timing with zero guesswork.
+            <strong className="text-white font-semibold">38 Specialized Vedic & Scientific Engines</strong> (Parashara, KP Placidus Sub-Lords, Jaimini Chara Dasha, 16-Zone Astro-Vastu, Bio-Wearables, and Somatotopic Remedies) — delivering verifiable, explainable life timing with zero guesswork.
           </p>
 
           <div className="landing-hero-actions">
@@ -60,7 +59,7 @@ export function Hero() {
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
             <Link href="#engines" className="landing-btn landing-btn-ghost landing-btn-lg">
-              Explore 16 Classical Engines
+              Explore 38 Specialized Engines
             </Link>
           </div>
 

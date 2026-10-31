@@ -24,7 +24,7 @@ export function DirectionAHero() {
             </p>
 
             <div className="dira-reveal dira-reveal-1 in mb-5 sm:mb-7 flex">
-              <span className="dira-rule-label">✦ 16 Classical Vedic Engines · Zero AI Hallucination · Swiss Ephemeris 0.01°</span>
+              <span className="dira-rule-label">✦ 38 Specialized Vedic & Scientific Engines · Zero AI Hallucination · Swiss Ephemeris 0.01°</span>
             </div>
 
             <h1 className="dira-display dira-reveal dira-reveal-2 in" style={{ color: 'var(--al-ivory)' }}>
@@ -39,13 +39,27 @@ export function DirectionAHero() {
               className="dira-reveal dira-reveal-3 in max-w-xl text-sm sm:text-base leading-relaxed md:text-lg"
               style={{ color: 'var(--al-ivory-dim)' }}
             >
-              AstroLife AI is not a generic chatbot. It is a multi-layered Vedic intelligence engine unifying
-              Parashara, KP Sub-Lords, Jaimini Chara Dasha, 16-Zone Astro-Vastu Hit Radar, Sacred Wrist Threads,
-              Bio-Wearable Shields, Somatotopic Tattoos, and Biometric Dot Therapy.
+              AstroLife AI is not a generic chatbot. It is a unified supercomputer of 38 specialized Vedic and
+              scientific engines: 90-year destiny curves, KP Sub-Lords, Jaimini Chara Dasha, 16-Zone Astro-Vastu Hit Radar,
+              Sacred Wrist Threads, Bio-Wearable Shields, Somatotopic Tattoos, and Biometric Dot Therapy.
             </p>
 
             {/* Features */}
             <div className="dira-reveal dira-reveal-4 in mt-8 sm:mt-10 space-y-4">
+              <div className="flex gap-3 sm:gap-4">
+                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>📈</div>
+                <div>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>90-Year Destiny Curve & Transit Ripple</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Visual life score trajectory, career golden windows & multi-house ripple shocks</p>
+                </div>
+              </div>
+              <div className="flex gap-3 sm:gap-4">
+                <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🩺</div>
+                <div>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Medical Kundli & Dasha Sound Therapy</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Nakshatra organ mapping, Tridosha balance & Indian Classical Raagas for active dashas</p>
+                </div>
+              </div>
               <div className="flex gap-3 sm:gap-4">
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🏛️</div>
                 <div>
@@ -114,7 +128,7 @@ export function DirectionAHero() {
               style={{ border: '1px solid rgba(184, 134, 11, 0.3)', background: 'rgba(184, 134, 11, 0.2)' }}
             >
               {[
-                { k: '16 Engines', v: 'Vedic · KP · Vastu · Lal Kitab' },
+                { k: '38 Engines', v: 'Vedic · KP · Jaimini · Vastu' },
                 { k: '0.01°', v: 'Swiss Ephemeris Precision' },
                 { k: '100% Exact', v: 'Zero AI Hallucination' },
               ].map((s) => (

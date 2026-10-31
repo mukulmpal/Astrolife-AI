@@ -347,7 +347,7 @@ export function DirectionAFeatures() {
         <div>
           <FolioMarker numeral="II" label="The Complete Vedic Ecosystem" />
           <h2 className="dira-display-sm mb-4" style={{ color: '#1A1A1A' }}>
-            25+ specialized engines.
+            38 specialized engines.
             <span className="italic" style={{ color: '#8C6508' }}> One Unified OS.</span>
           </h2>
           <p className="max-w-3xl text-sm md:text-base leading-relaxed" style={{ color: '#3D3834' }}>
