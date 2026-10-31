@@ -466,10 +466,11 @@ export function MobileBottomNav() {
           }
 
           .mobile-badge-pill.free {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(22, 163, 74, 0.3));
-            color: #15803d;
-            border: 1px solid rgba(34, 197, 94, 0.4);
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: #FFFFFF;
+            border: 1px solid #B91C1C;
             font-weight: 800;
+            box-shadow: 0 1px 4px rgba(220, 38, 38, 0.35);
           }
 
           .mobile-more-label {

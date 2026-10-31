@@ -302,13 +302,24 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
                             ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
                             : badge === "PRO"
                             ? "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))"
+                            : badge === "FREE"
+                            ? "linear-gradient(135deg, #EF4444, #DC2626)"
                             : "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.25))",
-                          color: badge === "ELITE" ? "#c084fc" : badge === "PRO" ? "#c8a030" : "#16a34a",
+                          color: badge === "ELITE"
+                            ? "#c084fc"
+                            : badge === "PRO"
+                            ? "#c8a030"
+                            : badge === "FREE"
+                            ? "#FFFFFF"
+                            : "#16a34a",
                           border: badge === "ELITE"
                             ? "1px solid rgba(168, 85, 247, 0.45)"
                             : badge === "PRO"
                             ? "1px solid rgba(200, 160, 48, 0.35)"
+                            : badge === "FREE"
+                            ? "1px solid #B91C1C"
                             : "1px solid rgba(34, 197, 94, 0.3)",
+                          boxShadow: badge === "FREE" ? "0 1px 4px rgba(220, 38, 38, 0.35)" : undefined,
                           lineHeight: "1.3",
                           display: "inline-flex",
                           alignItems: "center",

@@ -251,14 +251,15 @@ export default function MedicalPage() {
               display: "inline-flex",
               alignItems: "center",
               gap: "4px",
-              background: "linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(22, 163, 74, 0.26))",
-              border: "1px solid rgba(34, 197, 94, 0.45)",
-              color: "#15803D",
+              background: "linear-gradient(135deg, #EF4444, #DC2626)",
+              border: "1px solid #B91C1C",
+              color: "#FFFFFF",
               fontSize: "12px",
               fontWeight: 800,
               padding: "4px 12px",
               borderRadius: "20px",
-              letterSpacing: "0.5px"
+              letterSpacing: "0.5px",
+              boxShadow: "0 2px 6px rgba(220, 38, 38, 0.28)"
             }}>
               ✨ 100% Free · Public Health Blessing
             </span>
