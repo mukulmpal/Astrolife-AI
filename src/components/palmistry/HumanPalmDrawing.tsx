@@ -13,6 +13,8 @@ export interface HumanPalmDrawingProps {
   showLabels?: boolean;
   showMounts?: boolean;
   showLines?: boolean;
+  showFloatingCard?: boolean;
+  showBottomBar?: boolean;
   activeMode?: "all" | "lines" | "mounts";
   customLines?: Array<{
     id: string;
@@ -154,6 +156,8 @@ export function HumanPalmDrawing({
   showLabels = true,
   showMounts = true,
   showLines = true,
+  showFloatingCard = true,
+  showBottomBar = true,
   activeMode = "all",
   customLines,
   customMounts,
@@ -184,51 +188,53 @@ export function HumanPalmDrawing({
   return (
     <div className={`relative mx-auto w-full select-none ${className}`}>
       {/* ── Active Info Card (Floats at top or bottom) ── */}
-      <AnimatePresence>
-        {(activeLineInfo || activeMountInfo) && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="pointer-events-none absolute left-3 right-3 top-3 z-30 rounded-2xl border border-[#c8a030]/40 bg-black/90 p-3.5 shadow-[0_12px_36px_rgba(0,0,0,0.8)] backdrop-blur-md"
-          >
-            {activeLineInfo && (
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: activeLineInfo.color }} />
-                    <span className="font-serif text-sm font-bold text-[#e6c869]">{activeLineInfo.sanskrit}</span>
-                    <span className="text-xs text-[#a09070]">({activeLineInfo.english})</span>
-                  </div>
-                  <span className="rounded-full border border-[#c8a030]/30 bg-[#c8a030]/10 px-2 py-0.5 text-[10px] font-semibold text-[#e6c869]">
-                    Samudrika Shastra
-                  </span>
-                </div>
-                <p className="mt-1.5 text-xs leading-relaxed text-[#dcd0b8]">{activeLineInfo.governs}</p>
-              </div>
-            )}
-            {activeMountInfo && !activeLineInfo && (
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-serif text-base" style={{ color: activeMountInfo.color }}>
-                      {activeMountInfo.symbol}
+      {showFloatingCard && (
+        <AnimatePresence>
+          {(activeLineInfo || activeMountInfo) && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="pointer-events-none absolute left-3 right-3 top-3 z-30 rounded-2xl border border-[#c8a030]/40 bg-black/90 p-3.5 shadow-[0_12px_36px_rgba(0,0,0,0.8)] backdrop-blur-md"
+            >
+              {activeLineInfo && (
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: activeLineInfo.color }} />
+                      <span className="font-serif text-sm font-bold text-[#e6c869]">{activeLineInfo.sanskrit}</span>
+                      <span className="text-xs text-[#a09070]">({activeLineInfo.english})</span>
+                    </div>
+                    <span className="rounded-full border border-[#c8a030]/30 bg-[#c8a030]/10 px-2 py-0.5 text-[10px] font-semibold text-[#e6c869]">
+                      Samudrika Shastra
                     </span>
-                    <span className="font-serif text-sm font-bold text-[#e6c869]">{activeMountInfo.sanskrit}</span>
-                    <span className="text-xs text-[#a09070]">({activeMountInfo.graha})</span>
                   </div>
-                  {activeMount && mountScoreMap.has(activeMount) && (
-                    <span className="rounded-full border border-[#c8a030]/40 bg-[#c8a030]/20 px-2 py-0.5 text-xs font-bold text-[#f5e7b8]">
-                      {mountScoreMap.get(activeMount)}% Score
-                    </span>
-                  )}
+                  <p className="mt-1.5 text-xs leading-relaxed text-[#dcd0b8]">{activeLineInfo.governs}</p>
                 </div>
-                <p className="mt-1.5 text-xs leading-relaxed text-[#dcd0b8]">{activeMountInfo.governs}</p>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+              )}
+              {activeMountInfo && !activeLineInfo && (
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif text-base" style={{ color: activeMountInfo.color }}>
+                        {activeMountInfo.symbol}
+                      </span>
+                      <span className="font-serif text-sm font-bold text-[#e6c869]">{activeMountInfo.sanskrit}</span>
+                      <span className="text-xs text-[#a09070]">({activeMountInfo.graha})</span>
+                    </div>
+                    {activeMount && mountScoreMap.has(activeMount) && (
+                      <span className="rounded-full border border-[#c8a030]/40 bg-[#c8a030]/20 px-2 py-0.5 text-xs font-bold text-[#f5e7b8]">
+                        {mountScoreMap.get(activeMount)}% Score
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-xs leading-relaxed text-[#dcd0b8]">{activeMountInfo.governs}</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
       {/* ── Main SVG Illustration ── */}
       <svg
@@ -716,21 +722,23 @@ export function HumanPalmDrawing({
       </svg>
 
       {/* ── Subtle Controls Bar ── */}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-2 text-[11px] text-[#a09070]">
-        <div className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />
-          <span>Life</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#06b6d4] ml-1.5" />
-          <span>Head</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#ec4899] ml-1.5" />
-          <span>Heart</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#a855f7] ml-1.5" />
-          <span>Fate</span>
+      {showBottomBar && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-2 text-[11px] text-[#a09070]">
+          <div className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />
+            <span>Life</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#06b6d4] ml-1.5" />
+            <span>Head</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#ec4899] ml-1.5" />
+            <span>Heart</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#a855f7] ml-1.5" />
+            <span>Fate</span>
+          </div>
+          <span className="font-serif tracking-wider text-[#e6c869]">
+            {hand === "left" ? "LEFT HAND (स्त्री / Inner Karma)" : "RIGHT HAND (पुरुष / Manifest Destiny)"}
+          </span>
         </div>
-        <span className="font-serif tracking-wider text-[#e6c869]">
-          {hand === "left" ? "LEFT HAND (स्त्री / Inner Karma)" : "RIGHT HAND (पुरुष / Manifest Destiny)"}
-        </span>
-      </div>
+      )}
     </div>
   );
 }

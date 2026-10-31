@@ -886,7 +886,7 @@ export function DirectionAFeatures() {
                 </div>
 
                 {/* Anatomical Human Palm Drawing & Samudrika Shastra Live Map */}
-                <div className="relative mt-3 h-64 sm:h-72 w-full flex items-center justify-center overflow-hidden rounded-xl bg-[#FAF5EB] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
+                <div className="relative mt-3 h-80 sm:h-96 w-full flex items-center justify-center overflow-hidden rounded-xl bg-[#FAF5EB] border" style={{ borderColor: 'rgba(184, 134, 11, 0.2)' }}>
                   <HumanPalmDrawing
                     hand="right"
                     selectedLine={palmLine}
@@ -894,7 +894,9 @@ export function DirectionAFeatures() {
                     showMounts
                     showLines
                     showLabels={false}
-                    className="h-full w-full max-w-[320px]"
+                    showFloatingCard={false}
+                    showBottomBar={false}
+                    className="h-full w-full max-w-[340px] p-2"
                   />
                   {/* Scanning Beam Animation overlay when user clicks Simulate Scan */}
                   {isScanningPalm && (

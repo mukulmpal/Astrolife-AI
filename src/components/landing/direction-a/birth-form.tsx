@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { isBillingEnforced } from '@/lib/access';
 import { calculateChart, CITY_COORDS, RASHIS } from '@/lib/astro-engine/calculations';
-import { saveCurrentChart } from '@/lib/user-chart';
+import { saveCurrentChart, ianaToUtcOffset } from '@/lib/user-chart';
 
 const PLANET_GLYPHS: Record<string, string> = {
   Sun: '☉',
@@ -18,7 +18,13 @@ const PLANET_GLYPHS: Record<string, string> = {
   Ketu: '☋',
 };
 
-const POPULAR_CITIES = ['New Delhi', 'Mumbai', 'Bengaluru', 'London', 'New York'];
+const POPULAR_CITIES = [
+  { name: 'New Delhi, Delhi, India', lat: 28.6139, lon: 77.2090, tz: 5.5, label: 'Delhi' },
+  { name: 'Mumbai, Maharashtra, India', lat: 19.0760, lon: 72.8777, tz: 5.5, label: 'Mumbai' },
+  { name: 'Bengaluru, Karnataka, India', lat: 12.9716, lon: 77.5946, tz: 5.5, label: 'Bengaluru' },
+  { name: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 0.0, label: 'London' },
+  { name: 'New York, USA', lat: 40.7128, lon: -74.0060, tz: -5.0, label: 'New York' },
+];
 
 const DEMO_ARCHETYPES = [
   {
@@ -75,6 +81,28 @@ export function BirthDetailsForm() {
     city: '',
   });
 
+  const [selectedCityData, setSelectedCityData] = useState<{
+    displayName: string;
+    lat: number;
+    lon: number;
+    tz: number;
+    timezone?: string | null;
+  } | null>(null);
+
+  const [cityResults, setCityResults] = useState<Array<{
+    geonameId: number;
+    name: string;
+    countryCode: string;
+    admin1: string | null;
+    latitude: number;
+    longitude: number;
+    timezone: string | null;
+    displayName: string;
+  }>>([]);
+  const [isSearchingCity, setIsSearchingCity] = useState(false);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const cityBoxRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     // Prefetch dashboard route in idle time for instant 1-click loading
     try {
@@ -83,6 +111,55 @@ export function BirthDetailsForm() {
       // ignore
     }
   }, [router]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (cityBoxRef.current && !cityBoxRef.current.contains(event.target as Node)) {
+        setShowCityDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Live 68k Cities Autocomplete Search with Debounce
+  useEffect(() => {
+    const query = formData.city.trim();
+    if (selectedCityData && query === selectedCityData.displayName) {
+      return;
+    }
+    if (query.length < 2) {
+      setCityResults([]);
+      setShowCityDropdown(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        setIsSearchingCity(true);
+        const res = await fetch(`/api/locations/search?q=${encodeURIComponent(query)}&limit=8`, {
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setCityResults(data);
+          setShowCityDropdown(data.length > 0);
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        console.warn('City search failed:', err);
+      } finally {
+        setIsSearchingCity(false);
+      }
+    }, 220);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [formData.city, selectedCityData]);
 
   const handleLaunchDemo = (demo: typeof DEMO_ARCHETYPES[0]) => {
     setLoading(true);
@@ -106,12 +183,50 @@ export function BirthDetailsForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const next = { ...prev, [name]: value };
+      if ((name === 'dob' || name === 'time') && selectedCityData?.timezone) {
+        const nextTz = ianaToUtcOffset(
+          selectedCityData.timezone,
+          next.dob,
+          next.time || '12:00'
+        );
+        setSelectedCityData((city) => (city ? { ...city, tz: nextTz } : null));
+      }
+      return next;
+    });
     setError('');
   };
 
-  const handleCitySelect = (city: string) => {
-    setFormData((prev) => ({ ...prev, city }));
+  const handleSelectCityResult = (city: {
+    displayName: string;
+    latitude: number;
+    longitude: number;
+    timezone: string | null;
+  }) => {
+    const tz = ianaToUtcOffset(city.timezone, formData.dob, formData.time || '12:00');
+    setFormData((prev) => ({ ...prev, city: city.displayName }));
+    setSelectedCityData({
+      displayName: city.displayName,
+      lat: city.latitude,
+      lon: city.longitude,
+      tz,
+      timezone: city.timezone,
+    });
+    setShowCityDropdown(false);
+    setError('');
+  };
+
+  const handlePopularCityClick = (pop: typeof POPULAR_CITIES[0]) => {
+    setFormData((prev) => ({ ...prev, city: pop.name }));
+    setSelectedCityData({
+      displayName: pop.name,
+      lat: pop.lat,
+      lon: pop.lon,
+      tz: pop.tz,
+      timezone: null,
+    });
+    setShowCityDropdown(false);
     setError('');
   };
 
@@ -137,22 +252,36 @@ export function BirthDetailsForm() {
       const hasExactTime = Boolean(formData.time) && !useSuryaKundli;
       const timeToUse = formData.time && !useSuryaKundli ? formData.time : '12:00';
 
-      // Match city in CITY_COORDS or fallback to New Delhi
+      // Match city in selectedCityData, CITY_COORDS or fallback to New Delhi
       let cityToUse = formData.city.trim() || 'New Delhi';
-      const cleanCity = cityToUse.toLowerCase();
-      const prefixMatch = cleanCity.split(',')[0].trim();
-      const matchedKey = Object.keys(CITY_COORDS).find((k) => {
-        const lk = k.toLowerCase();
-        return cleanCity === lk || prefixMatch === lk || cleanCity.startsWith(lk);
-      });
-      cityToUse = matchedKey || 'New Delhi';
+      let customLat = selectedCityData?.lat;
+      let customLon = selectedCityData?.lon;
+      let customTz = selectedCityData?.tz;
+
+      if (customLat == null || customLon == null) {
+        const cleanCity = cityToUse.toLowerCase();
+        const prefixMatch = cleanCity.split(',')[0].trim();
+        const matchedKey = Object.keys(CITY_COORDS).find((k) => {
+          const lk = k.toLowerCase();
+          return cleanCity === lk || prefixMatch === lk || cleanCity.startsWith(lk);
+        });
+        if (matchedKey && CITY_COORDS[matchedKey]) {
+          cityToUse = matchedKey;
+          customLat = CITY_COORDS[matchedKey].lat;
+          customLon = CITY_COORDS[matchedKey].lon;
+          customTz = CITY_COORDS[matchedKey].tz;
+        }
+      }
 
       // Authoritative Vedic Chart Calculation
       const chart = calculateChart(
         formData.name.trim() || 'Native',
         formData.dob,
         timeToUse,
-        cityToUse
+        cityToUse,
+        customLat,
+        customLon,
+        customTz
       );
 
       if (!chart || !chart.planets || !chart.planets.Moon) return null;
@@ -206,7 +335,7 @@ export function BirthDetailsForm() {
       console.error('Live preview calculation error:', e);
       return null;
     }
-  }, [formData.dob, formData.time, formData.city, useSuryaKundli, formData.name]);
+  }, [formData.dob, formData.time, formData.city, useSuryaKundli, formData.name, selectedCityData]);
 
   const handleWhatsAppShare = () => {
     if (!livePreview) return;
@@ -236,6 +365,26 @@ export function BirthDetailsForm() {
         return;
       }
 
+      // Pre-calculate and save chart immediately for instant transition
+      const customLat = selectedCityData?.lat;
+      const customLon = selectedCityData?.lon;
+      const customTz = selectedCityData?.tz;
+
+      try {
+        const chart = calculateChart(
+          formData.name.trim(),
+          formData.dob,
+          formData.time,
+          formData.city.trim(),
+          customLat,
+          customLon,
+          customTz
+        );
+        saveCurrentChart(chart);
+      } catch (err) {
+        console.warn('Pre-save chart error:', err);
+      }
+
       const params = new URLSearchParams({
         name: formData.name,
         dob: formData.dob,
@@ -244,6 +393,9 @@ export function BirthDetailsForm() {
         surya: useSuryaKundli ? 'true' : 'false',
         from: 'homepage',
       });
+      if (customLat != null) params.set('lat', customLat.toString());
+      if (customLon != null) params.set('lon', customLon.toString());
+      if (customTz != null) params.set('tz', customTz.toString());
 
       router.push(`/dashboard?${params.toString()}`);
     } catch (err) {
@@ -410,42 +562,121 @@ export function BirthDetailsForm() {
         </label>
       </div>
 
-      {/* City Input & Quick Select Chips */}
-      <div>
-        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: '#8C6508' }}>
-          Birth Place (City, Country)
-        </label>
-        <input
-          type="text"
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          placeholder="e.g. Mumbai, India or London, UK"
-          disabled={loading}
-          className="w-full rounded-lg border px-4 py-2.5 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#B8860B]/40 disabled:opacity-50"
-          style={{
-            borderColor: 'rgba(184, 134, 11, 0.35)',
-            background: '#FAF7F2',
-            color: '#1A1A1A',
-          }}
-        />
+      {/* City Input with 68k Database Autocomplete & Quick Select Chips */}
+      <div ref={cityBoxRef} className="relative">
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider" style={{ color: '#8C6508' }}>
+            Birth Place (City, Country)
+          </label>
+          <span className="text-[10px] font-mono text-[#8C6508]">
+            68,000+ Cities Database
+          </span>
+        </div>
+
+        <div className="relative">
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={(e) => {
+              const val = e.target.value;
+              setFormData((prev) => ({ ...prev, city: val }));
+              setError('');
+              if (selectedCityData && val !== selectedCityData.displayName) {
+                setSelectedCityData(null);
+              }
+            }}
+            onFocus={() => {
+              if (cityResults.length > 0) setShowCityDropdown(true);
+            }}
+            placeholder="Type city (e.g. Ayodhya, Varanasi, London, New York...)"
+            autoComplete="off"
+            disabled={loading}
+            className="w-full rounded-lg border px-4 py-2.5 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#B8860B]/40 disabled:opacity-50 pr-9"
+            style={{
+              borderColor: 'rgba(184, 134, 11, 0.35)',
+              background: '#FAF7F2',
+              color: '#1A1A1A',
+            }}
+          />
+
+          {isSearchingCity && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C6508]">
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {/* 68,000 Cities Live Dropdown */}
+        {showCityDropdown && cityResults.length > 0 && (
+          <div
+            className="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-xl border p-1 shadow-2xl backdrop-blur-md"
+            style={{
+              background: '#FFFFFF',
+              borderColor: 'rgba(184, 134, 11, 0.35)',
+              boxShadow: '0 12px 30px -8px rgba(0, 0, 0, 0.25)',
+            }}
+          >
+            <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8C6508] border-b border-[#FAF5EB] flex items-center justify-between">
+              <span>Matching Cities ({cityResults.length})</span>
+              <span className="font-mono text-[9px] text-[#6B635B]">High Precision Ephemeris</span>
+            </div>
+            {cityResults.map((c) => (
+              <button
+                key={c.geonameId}
+                type="button"
+                onClick={() => handleSelectCityResult(c)}
+                className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#FAF5EB] transition-colors border-b border-[#FAF7F2] last:border-0 cursor-pointer flex items-center justify-between group"
+              >
+                <div>
+                  <div className="text-xs font-semibold text-[#1A1A1A] group-hover:text-[#8C6508]">
+                    {c.displayName}
+                  </div>
+                  <div className="text-[10px] text-[#6B635B] mt-0.5">
+                    {c.latitude.toFixed(4)}°, {c.longitude.toFixed(4)}° {c.timezone ? `· ${c.timezone}` : ''}
+                  </div>
+                </div>
+                <span className="rounded px-1.5 py-0.5 text-[9px] font-mono font-bold bg-[#FAF5EB] text-[#8C6508] border border-[rgba(184,134,11,0.2)]">
+                  {c.countryCode}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Selected City Coordinates Lock Badge */}
+        {selectedCityData && (
+          <div className="mt-1.5 flex items-center justify-between text-[10px] text-[#059669] bg-[#ecfdf5] border border-[#a7f3d0] rounded-md px-2 py-1">
+            <span className="flex items-center gap-1 font-medium">
+              <span>✓ Ephemeris Coordinates Locked:</span>
+              <span className="font-mono">{selectedCityData.lat.toFixed(2)}°, {selectedCityData.lon.toFixed(2)}°</span>
+            </span>
+            <span className="font-mono text-[9px]">
+              UTC {selectedCityData.tz >= 0 ? `+${selectedCityData.tz}` : selectedCityData.tz}
+            </span>
+          </div>
+        )}
+
         {/* Quick City Chips */}
         <div className="mt-2 flex flex-wrap items-center gap-1.5 text-10px">
           <span className="text-[#8C6508] font-mono">Popular:</span>
           {POPULAR_CITIES.map((c) => (
             <button
-              key={c}
+              key={c.name}
               type="button"
-              onClick={() => handleCitySelect(c)}
+              onClick={() => handlePopularCityClick(c)}
               className="cursor-pointer rounded px-2 py-0.5 transition-colors border"
               style={{
-                background: formData.city === c ? 'rgba(184, 134, 11, 0.18)' : '#FAF5EB',
-                borderColor: formData.city === c ? '#B8860B' : 'rgba(184, 134, 11, 0.2)',
-                color: formData.city === c ? '#785404' : '#6B635B',
-                fontWeight: formData.city === c ? 700 : 500,
+                background: formData.city === c.name ? 'rgba(184, 134, 11, 0.18)' : '#FAF5EB',
+                borderColor: formData.city === c.name ? '#B8860B' : 'rgba(184, 134, 11, 0.2)',
+                color: formData.city === c.name ? '#785404' : '#6B635B',
+                fontWeight: formData.city === c.name ? 700 : 500,
               }}
             >
-              {c}
+              {c.label}
             </button>
           ))}
         </div>

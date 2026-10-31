@@ -77,16 +77,26 @@ function autoCalculateFromUrl(): ChartData | null {
   const dob = params.get("dob");
   const tob = params.get("tob");
   const city = params.get("city");
+  const latStr = params.get("lat");
+  const lonStr = params.get("lon");
+  const tzStr = params.get("tz");
 
   // No complete birth details in the URL → nothing to auto-generate.
   if (!name || !dob || !tob || !city) return null;
 
   try {
+    const lat = latStr ? parseFloat(latStr) : undefined;
+    const lon = lonStr ? parseFloat(lonStr) : undefined;
+    const tz = tzStr ? parseFloat(tzStr) : undefined;
+
     const chart = calculateChart(
       decodeURIComponent(name),
       dob,
       tob,
       decodeURIComponent(city),
+      lat,
+      lon,
+      tz
     );
     // Persist to device so useUserChart picks it up on its mount-effect.
     saveCurrentChart(chart);
