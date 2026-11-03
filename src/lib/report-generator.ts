@@ -10,7 +10,7 @@ import { calculateLalKitab } from "./astro-engine/lalkitab";
 import { calculateNumerology } from "./astro-engine/numerology";
 import { calculateAshtakavarga } from "./astro-engine/ashtakavarga";
 import { calculateDivisional, getRasiAnalysis, getHoraAnalysis, getDrekkanaAnalysis, getSaptamsaAnalysis, getNavamshaAnalysis, getDashamshaAnalysis } from "./astro-engine/divisional";
-import { generateGemstoneReportFromChart } from "./astro-engine/gemstone";
+import { generateGemstoneReportFromChart, generateDashaGemstoneRecommendationsFromChart, makeRudrakshaRecommendation } from "./astro-engine/gemstone";
 import { calculateKarakas, calculateArudhas, calculateCharaDasha } from "./astro-engine/jaimini";
 import { runTransitEngine } from "./astro-engine/transit";
 import { calculateDestiny } from "./astro-engine/destiny";
@@ -2363,6 +2363,55 @@ export async function generateLegacyPDFReport(
       b.pdf.setFont("helvetica", "normal");
       b.black();
     }
+
+    // ─── Vedic Rudraksha Intelligence & Sacred Shield ──────────────
+    b.spacer(6);
+    b.subHeader("Vedic Rudraksha Intelligence & Sacred Shield");
+    b.line("Unlike gemstones, Rudraksha carries pure sattvic energy without negative side effects. It activates the Front of the Chakras (giving and projection), creating complete harmony when paired with gemstones.");
+    b.spacer(3);
+
+    // Life Rudraksha (Lagna Lord)
+    if (gems.lagnaLord && gems.lagnaLord !== "Ascendant") {
+      const lagnaPos = (chart.planets as any)?.[gems.lagnaLord];
+      const lifeR = safeCall(() => makeRudrakshaRecommendation(gems.lagnaLord as any, lagnaPos as any), null);
+      if (lifeR) {
+        b.checkPage(24);
+        b.bullet(`Life Rudraksha (Lagna Lord ${gems.lagnaLord}): ${lifeR.mukhi} (${lifeR.bead})`);
+        b.keyValue("  Ruling Deity", lifeR.rulingDeity, 4);
+        b.keyValue("  Sacred Mantra", lifeR.mantra, 4);
+        b.keyValue("  Wearing Guide", `${lifeR.wearing.metal} on ${lifeR.wearing.day} (${lifeR.wearing.position})`, 4);
+        if (lifeR.reason) { b.pdf.setFontSize(8); b.gray(); b.pdf.text(`  ${lifeR.reason}`, b.margin + 8, b.y); b.y += 5; b.black(); }
+        if (lifeR.healthBenefits?.length) {
+          b.pdf.setFontSize(8); b.gray();
+          b.pdf.text(`  Health & Spiritual Benefits: ${lifeR.healthBenefits.slice(0, 3).join(", ")}`, b.margin + 8, b.y);
+          b.y += 5; b.black();
+        }
+      }
+    }
+
+    // Dasha-specific Rudraksha
+    const dashaRecs = safeCall(() => generateDashaGemstoneRecommendationsFromChart(chart), []);
+    if (dashaRecs?.length) {
+      dashaRecs.forEach(dr => {
+        if (!dr.rudraksha) return;
+        b.checkPage(20);
+        b.spacer(2);
+        b.bullet(`Active ${dr.level} Shield (${dr.planet}): ${dr.rudraksha.mukhi} (${dr.rudraksha.bead})`);
+        b.keyValue("  Deity & Mantra", `${dr.rudraksha.rulingDeity} | ${dr.rudraksha.mantra}`, 4);
+        b.keyValue("  Wearing Guide", `${dr.rudraksha.wearing.metal} on ${dr.rudraksha.wearing.day} (${dr.rudraksha.wearing.position})`, 4);
+        if (dr.reason) { b.pdf.setFontSize(8); b.gray(); b.pdf.text(`  Purpose: ${dr.reason}`, b.margin + 8, b.y); b.y += 5; b.black(); }
+      });
+    }
+
+    // Shastrik Mala & Japa Guidance
+    b.spacer(3);
+    b.checkPage(18);
+    b.pdf.setFontSize(8.5); b.gold(); b.pdf.setFont("helvetica", "bold");
+    b.pdf.text("Shastrik Mala & Japa Rules (Skanda Purana & Devi Bhagavata):", b.margin, b.y); b.y += 5;
+    b.pdf.setFont("helvetica", "normal"); b.black();
+    b.bullet("Mala Count: 108 beads for all desires/moksha, 27 beads for health & longevity, 30 beads for wealth & abundance.", 4);
+    b.bullet("Stringing Rule: String bead mouth-to-mouth and tail-to-tail ('Mukham Mukhena Samyojya').", 4);
+    b.bullet("Japa Secret: Count using thumb & middle finger for wealth; never touch with index finger.", 4);
   }
 
   // ═══════════════════════════════════════════════════════════════

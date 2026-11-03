@@ -17,6 +17,13 @@ import {
   type Sign,
   type Dignity,
 } from "@/lib/astro-engine/gemstone-medical-master-v2";
+import {
+  RUDRAKSHA_MUKHI,
+  getAllRudrakshas,
+  findRudrakshaForProblem,
+  getRudrakshaData,
+  type RudrakshaData,
+} from "@/lib/astro-engine/gemstone";
 import { EngineStateCard } from "@/components/engine-state-card";
 
 // ─── Adapter ──────────────────────────────────────────────────────────────────
@@ -469,37 +476,156 @@ function RudrakshaTab({
   const mdRudraksha = mdPlanet ? RUDRAKSHA_CATALOG[mdPlanet] : null;
   const adRudraksha = adPlanet ? RUDRAKSHA_CATALOG[adPlanet] : null;
 
+  // State for Problem Solver search & Category filter
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "health" | "wealth" | "protection" | "relationship" | "intellect">("all");
+  const [selectedMukhiTab, setSelectedMukhiTab] = useState<number | "rare">(1);
+
+  const allMukhis = useMemo(() => getAllRudrakshas(), []);
+
+  // Filtered Rudrakshas based on category and search
+  const filteredProblems = useMemo(() => {
+    let list = allMukhis;
+    if (selectedCategory === "health") {
+      list = list.filter((r) => [1, 2, 3, 5, 6, 7, 16, 18, 19].includes(r.mukhi));
+    } else if (selectedCategory === "wealth") {
+      list = list.filter((r) => [7, 8, 12, 13, 17, 18, 19, 21].includes(r.mukhi));
+    } else if (selectedCategory === "protection") {
+      list = list.filter((r) => [8, 9, 10, 11, 14, 16, 20].includes(r.mukhi));
+    } else if (selectedCategory === "relationship") {
+      list = list.filter((r) => [2, 6, 13].includes(r.mukhi));
+    } else if (selectedCategory === "intellect") {
+      list = list.filter((r) => [4, 6, 8, 14, 17].includes(r.mukhi));
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      return list.filter((r) =>
+        r.nameHindi.toLowerCase().includes(q) ||
+        r.nameEnglish.toLowerCase().includes(q) ||
+        r.problemsSolved.some((p) => p.toLowerCase().includes(q)) ||
+        r.healthBenefits.some((h) => h.toLowerCase().includes(q)) ||
+        r.materialBenefits.some((m) => m.toLowerCase().includes(q)) ||
+        r.bestFor.some((b) => b.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [allMukhis, selectedCategory, searchQuery]);
+
+  // Rare Sacred Rudraksha types
+  const rareTypes = [
+    {
+      name: "गौरी-शंकर रुद्राक्ष (Gauri Shankar)",
+      deity: "भगवान शिव एवं माँ पार्वती (Ardhanarishvara)",
+      planet: "चंद्रमा (Moon)",
+      mantra: "ॐ गौरीशंकराय नमः (Om Gauri Shankaraye Namah)",
+      purpose: "पति-पत्नी में अटूट प्रेम, शीघ्र विवाह, दांपत्य कलह से मुक्ति एवं निःसंतान दंपतियों को संतान सुख।",
+      rarity: "Very Rare",
+    },
+    {
+      name: "गणेश रुद्राक्ष (Ganesha Rudraksha)",
+      deity: "विघ्नहर्ता भगवान श्री गणेश",
+      planet: "राहु एवं केतु",
+      mantra: "ॐ गं गणपतये नमः (Om Gam Ganapataye Namaha)",
+      purpose: "कार्यों में आने वाली अप्रत्याशित बाधाओं का समूल नाश, बौद्धिक मेधा, रिद्धि-सिद्धि व व्यापारिक सफलता।",
+      rarity: "Uncommon",
+    },
+    {
+      name: "त्रिजुटी / त्रिभागी रुद्राक्ष (Trijuti)",
+      deity: "परमब्रह्म त्रिदेव (ब्रह्मा, विष्णु, महेश)",
+      planet: "सर्व ग्रह (All 9 Planets)",
+      mantra: "ॐ त्रिमूर्ति देवाय नमः (Om Trimurti Devaya Namah)",
+      purpose: "सर्वोच्च आध्यात्मिक व सांसारिक सत्ता, विषम परिस्थितियों पर पूर्ण नियंत्रण व समाज में अलौकिक सम्मान।",
+      rarity: "Extremely Rare",
+    },
+    {
+      name: "सवार रुद्राक्ष (Sawar Rudraksha)",
+      deity: "साक्षात शिव स्वरूप (1 मुखी सवार)",
+      planet: "सूर्य (Sun)",
+      mantra: "ॐ नमः शिवाय (Om Namah Shivaya)",
+      purpose: "आत्म-साक्षात्कार, दिव्य आभामंडल, सर्वोच्च नेतृत्व और जन्म-मरण के बंधनों से मुक्ति।",
+      rarity: "Extremely Rare",
+    },
+  ];
+
+  const currentDetailMukhi = typeof selectedMukhiTab === "number" ? getRudrakshaData(selectedMukhiTab) : null;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      {/* Sacred Intro Banner */}
+    <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+      {/* 1. Sacred Intro Banner */}
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(200, 160, 48, 0.05) 100%)",
-          border: "1px solid rgba(184, 134, 11, 0.3)",
+          background: "linear-gradient(135deg, rgba(184, 134, 11, 0.12) 0%, rgba(200, 160, 48, 0.06) 100%)",
+          border: "1px solid rgba(184, 134, 11, 0.35)",
           borderRadius: "16px",
           padding: "20px 24px",
-          boxShadow: "0 4px 16px rgba(184, 134, 11, 0.05)",
+          boxShadow: "0 4px 16px rgba(184, 134, 11, 0.06)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
           <span style={{ fontSize: "24px" }}>🔱</span>
           <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#1A1A1A", fontFamily: "'Cormorant Garamond', serif" }}>
-            वैदिक रुद्राक्ष विज्ञान एवं व्यक्तिगत कवच (Sacred Rudraksha Intelligence)
+            वैदिक रुद्राक्ष विज्ञान, १-२१ मुखी ज्ञानकोष एवं व्यक्तिगत कवच
           </h2>
         </div>
         <p style={{ margin: 0, fontSize: "14px", color: "#4A4238", lineHeight: 1.7 }}>
-          शास्त्रों के अनुसार रुद्राक्ष भगवान शिव के अश्रुओं से उत्पन्न साक्षात दिव्य ऊर्जा है। <strong>रत्नों के विपरीत, रुद्राक्ष का कोई भी नकारात्मक या प्रतिकूल प्रभाव (Side Effect) कभी नहीं होता।</strong> यह किसी भी अवस्था में केवल सकारात्मक सात्विक ऊर्जा, मानसिक स्थिरता और प्राण-शक्ति प्रदान करता है।
+          शास्त्रों (शिव महापुराण, स्कन्द पुराण, देवी भागवत) के अनुसार रुद्राक्ष भगवान शिव के अश्रुओं से उत्पन्न साक्षात पराशक्ति है। <strong>रत्नों के विपरीत, रुद्राक्ष का कोई भी नकारात्मक या प्रतिकूल प्रभाव (Side Effect) कभी नहीं होता।</strong> यह किसी भी अवस्था में केवल सकारात्मक सात्विक ऊर्जा, मानसिक शांति और प्राण-शक्ति प्रदान करता है।
         </p>
       </div>
 
-      {/* Primary Life & Dasha Rudraksha Cards */}
+      {/* 2. Dual-Chakra Synergy Card: Front (Rudraksha) + Back (Ratna) */}
+      <div
+        style={{
+          background: "#FFFFFF",
+          border: "1.5px solid rgba(184, 134, 11, 0.3)",
+          borderRadius: "16px",
+          padding: "20px 24px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.03)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+          <span style={{ fontSize: "20px" }}>⚡</span>
+          <h3 style={{ margin: 0, fontSize: "18px", color: "#1A1A1A", fontWeight: 700 }}>
+            रत्न + रुद्राक्ष दिव्य चक्र युति (Front & Back Chakra Harmony)
+          </h3>
+        </div>
+        <p style={{ fontSize: "13.5px", color: "#4A4238", lineHeight: 1.6, margin: "0 0 14px" }}>
+          इण्डो-नॉर्डिक शोध संस्थान के अनुसार प्रत्येक चक्र के दो पहलू होते हैं — <strong>अग्र भाग (Front Chakra)</strong> जो देने और अभिव्यक्ति की क्षमता है, तथा <strong>पृष्ठ भाग (Back Chakra)</strong> जो ग्रहण करने और अवसरों का केंद्र है। <strong>रुद्राक्ष फ्रंट चक्र को हील करता है और रत्न बैक चक्र को।</strong> दोनों का संयोग चक्र को 100% जाग्रत करता है।
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px" }}>
+          <div style={{ background: "rgba(184, 134, 11, 0.06)", border: "1px solid rgba(184, 134, 11, 0.2)", borderRadius: "12px", padding: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#8A6008", textTransform: "uppercase" }}>
+              💎 Back Chakra (ऊर्जा ग्रहण व समाज में स्थिति)
+            </span>
+            <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "4px" }}>
+              अनुशंसित रत्न: {primary.gemstone}
+            </div>
+            <div style={{ fontSize: "13px", color: "#5A5248", marginTop: "4px" }}>
+              लग्नेश {primary.planet} को बल देकर जीवन में भाग्य, मान-सम्मान व सुरक्षा को आकर्षित करता है। (त्वचा स्पर्श अनिवार्य)
+            </div>
+          </div>
+          <div style={{ background: "rgba(37, 99, 235, 0.06)", border: "1px solid rgba(37, 99, 235, 0.2)", borderRadius: "12px", padding: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", textTransform: "uppercase" }}>
+              🔱 Front Chakra (ऊर्जा अभिव्यक्ति व आंतरिक शुद्धि)
+            </span>
+            <div style={{ fontSize: "16px", fontWeight: 700, color: "#1A1A1A", marginTop: "4px" }}>
+              अनुशंसित रुद्राक्ष: {primaryRudraksha.mukhi}
+            </div>
+            <div style={{ fontSize: "13px", color: "#5A5248", marginTop: "4px" }}>
+              आभामंडल (Aura) को शुद्ध कर मानसिक स्थिरता, आत्मबल व आंतरिक शांति प्रदान करता है। (बिना त्वचा छुए भी प्रभावी)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Primary Life & Dasha Rudraksha Shields */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "18px" }}>
-        {/* 1. Life / Lagna Rudraksha */}
+        {/* Life / Lagna Rudraksha */}
         <div className="gem-panel" style={{ borderLeft: "4px solid #B8860B" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
             <div>
               <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: "#B8860B", fontWeight: 700 }}>
-                लग्न अधिपति रुद्राक्ष · Life Rudraksha
+                लग्न अधिपति रुद्राक्ष · Life Shield
               </span>
               <h3 style={{ margin: "4px 0 0", fontSize: "18px", color: "#1A1A1A" }}>
                 {primaryRudraksha.mukhi}
@@ -520,7 +646,7 @@ function RudrakshaTab({
           </div>
         </div>
 
-        {/* 2. Active Mahadasha Rudraksha */}
+        {/* Active Mahadasha Rudraksha */}
         {mdRudraksha && (
           <div className="gem-panel" style={{ borderLeft: "4px solid #2563EB" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -548,7 +674,7 @@ function RudrakshaTab({
           </div>
         )}
 
-        {/* 3. Active Antardasha Rudraksha (if distinct) */}
+        {/* Active Antardasha Rudraksha */}
         {adRudraksha && adPlanet !== mdPlanet && adPlanet !== primary.planet && (
           <div className="gem-panel" style={{ borderLeft: "4px solid #059669" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -577,65 +703,271 @@ function RudrakshaTab({
         )}
       </div>
 
-      {/* Sacred Wearing & Energization Guide */}
-      <div className="gem-panel" style={{ background: "#FAF8F5" }}>
-        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>🌿</span> रुद्राक्ष धारण एवं प्राण-प्रतिष्ठा की शास्त्रीय विधि
-        </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", fontSize: "13.5px", color: "#4A4238", lineHeight: 1.65 }}>
-          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>१. शुद्धिकरण (Purification)</strong>
-            रुद्राक्ष को धारण करने से पूर्व एक रात गाय के कच्चे दूध में रखें, फिर प्रातः गंगाजल अथवा स्वच्छ जल से धोकर साफ करें।
+      {/* 4. Interactive Problem Solver Search & Filter Widget */}
+      <div className="gem-panel" style={{ background: "#FFFFFF", border: "1.5px solid rgba(184, 134, 11, 0.25)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: "18px", color: "#1A1A1A", display: "flex", alignItems: "center", gap: "8px" }}>
+              <span>🔍</span> समस्या अनुसार रुद्राक्ष चयन (Instant Remedy Finder)
+            </h3>
+            <span style={{ fontSize: "12.5px", color: "#6B635B" }}>
+              अपनी समस्या या लक्ष्य चुनें — शास्त्रोक्त सटीक मुखी रुद्राक्ष स्वतः खोजें
+            </span>
           </div>
-          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>२. प्राण-प्रतिष्ठा मंत्र (Chanting)</strong>
-            शिवलिंग अथवा भगवान शिव की प्रतिमा के समक्ष बैठकर <strong>"ॐ नमः शिवाय"</strong> अथवा संबंधित बीज मंत्र का १०८ बार शांत मन से जप करें।
+          <div style={{ width: "100%", maxWidth: "340px" }}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="सर्च करें (उदा. diabetes, BP, साढ़ेसाती, धन, नजर)..."
+              style={{
+                width: "100%",
+                padding: "8px 14px",
+                borderRadius: "10px",
+                border: "1px solid rgba(184, 134, 11, 0.3)",
+                fontSize: "13px",
+                outline: "none",
+                background: "#FAF8F5",
+              }}
+            />
           </div>
-          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>३. शुभ दिन व समय (Auspicious Timing)</strong>
-            सोमवार प्रातःकाल, शिवरात्रि, प्रदोष काल अथवा सावन/पूर्णिमा के दिन रुद्राक्ष धारण करना सर्वोत्तम फलदायी माना गया है।
-          </div>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
+          {[
+            { id: "all", label: "सभी (All)" },
+            { id: "health", label: "🌿 स्वास्थ्य व रोग निवारण" },
+            { id: "wealth", label: "💰 धन, व्यापार व साढ़ेसाती" },
+            { id: "protection", label: "🛡️ नजर, तंत्र व सुरक्षा" },
+            { id: "relationship", label: "❤️ विवाह व दांपत्य सुख" },
+            { id: "intellect", label: "📚 विद्यार्थी, बुद्धि व एकाग्रता" },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id as any)}
+              style={{
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontSize: "12px",
+                fontWeight: 600,
+                cursor: "pointer",
+                border: "1px solid",
+                borderColor: selectedCategory === cat.id ? "#B8860B" : "rgba(184, 134, 11, 0.2)",
+                background: selectedCategory === cat.id ? "#B8860B" : "#FAF8F5",
+                color: selectedCategory === cat.id ? "#FFFFFF" : "#4A4238",
+                transition: "all 0.15s ease",
+              }}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Results Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px" }}>
+          {filteredProblems.slice(0, 6).map((r) => (
+            <div
+              key={r.mukhi}
+              style={{
+                background: "#FAF8F5",
+                border: "1px solid rgba(184, 134, 11, 0.18)",
+                borderRadius: "12px",
+                padding: "14px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <strong style={{ fontSize: "15px", color: "#1A1A1A" }}>
+                  {r.nameHindi} ({r.nameEnglish})
+                </strong>
+                <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 8px", borderRadius: "12px", background: "rgba(184, 134, 11, 0.15)", color: "#8A6008" }}>
+                  {r.rulingPlanet}
+                </span>
+              </div>
+              <div style={{ fontSize: "12.5px", color: "#6B635B" }}>
+                <strong>देवता:</strong> {r.rulingDeity}
+              </div>
+              <div style={{ fontSize: "12px" }}>
+                <code style={{ background: "#FFFFFF", padding: "2px 6px", borderRadius: "4px", color: "#8A6008", fontWeight: 700, border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+                  {r.mantra}
+                </code>
+              </div>
+              <div style={{ fontSize: "12.5px", color: "#3A3228", marginTop: "4px" }}>
+                <strong>मुख्य निवारण:</strong> {r.problemsSolved.slice(0, 3).join(", ")}
+              </div>
+              <div style={{ fontSize: "12px", color: "#8A6008", marginTop: "2px" }}>
+                <strong>सर्वश्रेष्ठ:</strong> {r.bestFor.join(", ")}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Complete 1 to 9 Mukhi Classical Reference Table */}
+      {/* 5. Complete 1 to 21 Mukhi + Rare Types Explorer */}
       <div className="gem-panel">
-        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>📖</span> संपूर्ण नवग्रह रुद्राक्ष संदर्भ तालिका (Comprehensive Planetary Guide)
+        <h3 style={{ fontSize: "18px", color: "#1A1A1A", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>📜</span> संपूर्ण १ से २१ मुखी एवं दुर्लभ रुद्राक्ष ज्ञानकोष (Visual Encyclopedia)
         </h3>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
-            <thead>
-              <tr style={{ background: "#FAF7F2", borderBottom: "1.5px solid rgba(184, 134, 11, 0.3)", color: "#8A6008" }}>
-                <th style={{ padding: "10px 12px" }}>ग्रह</th>
-                <th style={{ padding: "10px 12px" }}>रुद्राक्ष मुखी</th>
-                <th style={{ padding: "10px 12px" }}>अधिष्ठाता देवता</th>
-                <th style={{ padding: "10px 12px" }}>बीज मंत्र</th>
-                <th style={{ padding: "10px 12px" }}>मुख्य प्रभाव व लाभ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(RUDRAKSHA_CATALOG).map(([planet, data], idx) => (
-                <tr
-                  key={planet}
-                  style={{
-                    borderBottom: "1px solid rgba(184, 134, 11, 0.12)",
-                    background: idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
-                  }}
-                >
-                  <td style={{ padding: "10px 12px", fontWeight: 700, color: "#1A1A1A" }}>{planet}</td>
-                  <td style={{ padding: "10px 12px", fontWeight: 600, color: "#B8860B" }}>{data.mukhi}</td>
-                  <td style={{ padding: "10px 12px", color: "#3A3228" }}>{data.deity}</td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <code style={{ background: "rgba(184, 134, 11, 0.1)", padding: "2px 6px", borderRadius: "4px", fontSize: "12px", color: "#8A6008" }}>
-                      {data.mantra}
-                    </code>
-                  </td>
-                  <td style={{ padding: "10px 12px", color: "#4A4238", lineHeight: 1.5 }}>{data.benefits}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {/* Mukhi Selector Chips */}
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "16px" }}>
+          {allMukhis.map((r) => (
+            <button
+              key={r.mukhi}
+              onClick={() => setSelectedMukhiTab(r.mukhi)}
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "10px",
+                fontSize: "12px",
+                fontWeight: 700,
+                cursor: "pointer",
+                border: "1px solid",
+                borderColor: selectedMukhiTab === r.mukhi ? "#B8860B" : "rgba(184, 134, 11, 0.25)",
+                background: selectedMukhiTab === r.mukhi ? "#B8860B" : "#FAF8F5",
+                color: selectedMukhiTab === r.mukhi ? "#FFFFFF" : "#4A4238",
+              }}
+            >
+              {r.mukhi}
+            </button>
+          ))}
+          <button
+            onClick={() => setSelectedMukhiTab("rare")}
+            style={{
+              padding: "0 14px",
+              height: "36px",
+              borderRadius: "10px",
+              fontSize: "12px",
+              fontWeight: 700,
+              cursor: "pointer",
+              border: "1px solid",
+              borderColor: selectedMukhiTab === "rare" ? "#B8860B" : "rgba(184, 134, 11, 0.25)",
+              background: selectedMukhiTab === "rare" ? "#B8860B" : "#FAF8F5",
+              color: selectedMukhiTab === "rare" ? "#FFFFFF" : "#4A4238",
+            }}
+          >
+            दुर्लभ प्रकार (Rare)
+          </button>
+        </div>
+
+        {/* Detailed Mukhi View */}
+        {currentDetailMukhi && (
+          <div
+            style={{
+              background: "#FAF8F5",
+              border: "1px solid rgba(184, 134, 11, 0.25)",
+              borderRadius: "14px",
+              padding: "18px",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "16px",
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "24px" }}>⚜️</span>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: "18px", color: "#1A1A1A" }}>
+                    {currentDetailMukhi.nameHindi} ({currentDetailMukhi.nameEnglish})
+                  </h4>
+                  <span style={{ fontSize: "12px", color: "#8A6008", fontWeight: 700 }}>
+                    दुर्लभता: {currentDetailMukhi.rarity} · तत्व: {currentDetailMukhi.element}
+                  </span>
+                </div>
+              </div>
+              <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "6px", fontSize: "13.5px" }}>
+                <div><strong>अधिष्ठाता देवता:</strong> {currentDetailMukhi.rulingDeity}</div>
+                <div><strong>शासक ग्रह:</strong> {currentDetailMukhi.rulingPlanet}</div>
+                <div>
+                  <strong>सिद्ध बीज मंत्र:</strong>{" "}
+                  <code style={{ background: "#FFFFFF", padding: "2px 8px", borderRadius: "6px", color: "#8A6008", fontWeight: 700, border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+                    {currentDetailMukhi.mantra}
+                  </code>
+                </div>
+                <div><strong>धारण विधान:</strong> {currentDetailMukhi.wearing.metal} · {currentDetailMukhi.wearing.day} · {currentDetailMukhi.wearing.position} ({currentDetailMukhi.wearing.finger})</div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px", lineHeight: 1.6 }}>
+              <div>
+                <strong style={{ color: "#B8860B" }}>आरोग्य व स्वास्थ्य लाभ:</strong>
+                <ul style={{ margin: "4px 0 0", paddingLeft: "18px", color: "#4A4238" }}>
+                  {currentDetailMukhi.healthBenefits.map((b, i) => <li key={i}>{b}</li>)}
+                </ul>
+              </div>
+              <div>
+                <strong style={{ color: "#B8860B" }}>सांसारिक व आर्थिक लाभ:</strong>
+                <ul style={{ margin: "4px 0 0", paddingLeft: "18px", color: "#4A4238" }}>
+                  {currentDetailMukhi.materialBenefits.map((b, i) => <li key={i}>{b}</li>)}
+                </ul>
+              </div>
+              <div>
+                <strong style={{ color: "#B8860B" }}>किन समस्याओं का समाधान करता है:</strong>
+                <div style={{ marginTop: "2px", color: "#3A3228" }}>
+                  {currentDetailMukhi.problemsSolved.join(" • ")}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Rare Types View */}
+        {selectedMukhiTab === "rare" && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px" }}>
+            {rareTypes.map((rt, i) => (
+              <div key={i} style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.2)", borderRadius: "12px", padding: "14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                  <strong style={{ fontSize: "15px", color: "#1A1A1A" }}>{rt.name}</strong>
+                  <span style={{ fontSize: "10.5px", fontWeight: 700, padding: "2px 8px", borderRadius: "10px", background: "rgba(184, 134, 11, 0.15)", color: "#8A6008" }}>
+                    {rt.rarity}
+                  </span>
+                </div>
+                <div style={{ fontSize: "12.5px", color: "#6B635B", marginBottom: "4px" }}>
+                  <strong>देवता:</strong> {rt.deity} · <strong>ग्रह:</strong> {rt.planet}
+                </div>
+                <div style={{ fontSize: "12px", marginBottom: "6px" }}>
+                  <code style={{ background: "#FFFFFF", padding: "2px 6px", borderRadius: "4px", color: "#8A6008", fontWeight: 700, border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+                    {rt.mantra}
+                  </code>
+                </div>
+                <div style={{ fontSize: "12.5px", color: "#3A3228", lineHeight: 1.5 }}>
+                  <strong>उद्देश्य व फल:</strong> {rt.purpose}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 6. Vedic Mala Calculator & Sacred Rules */}
+      <div className="gem-panel" style={{ background: "#FAF8F5" }}>
+        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>📿</span> वैदिक माला निर्धारण, गुंथन नियम एवं जप विज्ञान
+        </h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px", fontSize: "13px", color: "#4A4238", lineHeight: 1.6 }}>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>१. दानों की संख्या का शास्त्रीय फल</strong>
+            • <strong>१०८ दाने:</strong> पूर्ण सर्वकामना सिद्धि व मोक्ष<br />
+            • <strong>३० दाने:</strong> केवल धन-संपत्ति वृद्धि हेतु विशेष जप<br />
+            • <strong>२७ दाने:</strong> उत्तम स्वास्थ्य, पुष्टि व दीर्घायु<br />
+            • <strong>३२ दाने:</strong> गले में धारण कर नीलकंठ स्वरूप सुरक्षा
+          </div>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>२. गुंथन का दिव्य नियम (Stringing)</strong>
+            <em>"मुखं मुखेन संयोज्य पुच्छं पुच्छेन योजयेत्"</em> — रुद्राक्ष को पिरोते समय मुख से मुख और पूंछ से पूंछ मिलनी चाहिए। सुमेरु का मुख ऊपर हो और दाईं ओर चांदी तथा बाईं ओर तांबे की कैप शुभ है।
+          </div>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>३. जप में अंगुलियों का गुप्त रहस्य</strong>
+            अंगूठा मोक्ष देता है और <strong>मध्यमा अंगुली धन व ऐश्वर्य देती है</strong>। अनामिका शांति देती है। <strong>तर्जनी (इंडेक्स फिंगर) का स्पर्श वर्जित है</strong> — इससे जप का पुण्य समाप्त हो जाता है।
+          </div>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>४. आयुर्वेदिक घरेलू कल्प (Chikitsa)</strong>
+            • <strong>हाई बीपी/हृदय:</strong> ५ मुखी रुद्राक्ष मिट्टी के पात्र में रातभर भिगोकर सुबह बासी मुंह ४० दिन पिएं।<br />
+            • <strong>कफ/दमा:</strong> रुद्राक्ष को पत्थर पर घिसकर शहद के साथ चटाएं।
+          </div>
         </div>
       </div>
     </div>

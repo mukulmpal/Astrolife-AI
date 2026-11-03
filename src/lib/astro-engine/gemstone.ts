@@ -87,12 +87,44 @@ export interface GemstoneReport {
   safetyNote: string;
 }
 
+export interface RudrakshaWearing {
+  metal: string;
+  day: string;
+  finger: string;
+  position: string;
+}
+
+export interface RudrakshaData {
+  mukhi: number;
+  nameHindi: string;
+  nameEnglish: string;
+  rulingDeity: string;
+  rulingPlanet: string;
+  mantra: string;
+  element: string;
+  spiritualBenefits: string[];
+  healthBenefits: string[];
+  materialBenefits: string[];
+  problemsSolved: string[];
+  bestFor: string[];
+  wearing: RudrakshaWearing;
+  rarity: "Common" | "Uncommon" | "Rare" | "Very Rare" | "Extremely Rare";
+}
+
 export interface RudrakshaRecommendation {
   planet: Exclude<Planet, "Ascendant">;
   mukhi: string;
   bead: string;
   mantra: string;
   reason: string;
+  rulingDeity: string;
+  spiritualBenefits: string[];
+  healthBenefits: string[];
+  materialBenefits: string[];
+  problemsSolved: string[];
+  bestFor: string[];
+  wearing: RudrakshaWearing;
+  rarity: string;
 }
 
 export interface DashaGemRecommendation {
@@ -404,11 +436,743 @@ const PLANET_RUDRAKSHA: Record<Exclude<Planet, "Ascendant">, { mukhi: string; be
   Jupiter: { mukhi: "5 Mukhi", bead: "Paanch Mukhi", mantra: "Om Hreem Namah" },
   Venus: { mukhi: "6 Mukhi", bead: "Chhah Mukhi", mantra: "Om Hreem Hum Namah" },
   Saturn: { mukhi: "7 Mukhi", bead: "Saat Mukhi", mantra: "Om Hum Namah" },
-  Rahu: { mukhi: "8 Mukhi", bead: "Aath Mukhi", mantra: "Om Hum Namah" },
-  Ketu: { mukhi: "9 Mukhi", bead: "Nau Mukhi", mantra: "Om Hreem Hum Namah" },
+  Rahu: { mukhi: "8 Mukhi", bead: "Aath Mukhi", mantra: "Om Gneshaya Namaha" },
+  Ketu: { mukhi: "9 Mukhi", bead: "Nau Mukhi", mantra: "Om Hreem Hoom Namaha" },
 };
 
-// ─── Utilities ────────────────────────────────────────────────────────────────
+// Extended Rudraksha Mukhi data (1‑21) — comprehensive, PDF-verified
+export const RUDRAKSHA_MUKHI: Record<number, RudrakshaData> = {
+  1: {
+    mukhi: 1,
+    nameHindi: "एक मुखी",
+    nameEnglish: "Eka Mukhi",
+    rulingDeity: "Lord Shiva",
+    rulingPlanet: "Sun",
+    mantra: "Om Hreem Namaha",
+    element: "Fire",
+    spiritualBenefits: [
+      "Spiritual growth & enlightenment",
+      "Inner peace & calm",
+      "Enhanced meditation & mindfulness",
+      "Detachment from worldly affairs",
+      "Feeling of contentment & happiness",
+    ],
+    healthBenefits: [
+      "Lowers blood pressure",
+      "Mental clarity & focus",
+      "Emotional balance",
+      "Stress reduction",
+    ],
+    materialBenefits: [
+      "Health, Wealth & Happiness combined",
+      "Fearlessness — no negative power or enmity can affect",
+      "Power of concentration increases",
+      "All sins destroyed",
+    ],
+    problemsSolved: [
+      "Spiritual blockage",
+      "Negative energies",
+      "Lack of contentment",
+      "Sin destruction",
+      "Fear and anxiety",
+    ],
+    bestFor: ["Spiritual seekers", "Meditation practitioners", "Those seeking inner peace"],
+    wearing: { metal: "Gold or Silver cap", day: "Monday", finger: "Ring finger", position: "Neck pendant" },
+    rarity: "Extremely Rare",
+  },
+  2: {
+    mukhi: 2,
+    nameHindi: "दो मुखी",
+    nameEnglish: "Do Mukhi",
+    rulingDeity: "Lord Shiva & Goddess Parvati (Ardhanarishvara)",
+    rulingPlanet: "Moon",
+    mantra: "Om Namaha",
+    element: "Water",
+    spiritualBenefits: [
+      "Unity & harmony",
+      "Emotional balance",
+      "Enhanced intuition & insight",
+      "Protection from emotional turmoil",
+    ],
+    healthBenefits: [
+      "Blood pressure regulation",
+      "Stress & anxiety relief",
+      "Emotional healing",
+    ],
+    materialBenefits: [
+      "Harmonious relationships (Husband-Wife, Father-Son, Friends)",
+      "Finding suitable match for marriage",
+      "Happy family life",
+      "Improved relationships with all people",
+    ],
+    problemsSolved: [
+      "Relationship conflicts",
+      "Emotional turmoil",
+      "Loneliness",
+      "Marital problems",
+      "Difficulty finding life partner",
+    ],
+    bestFor: ["Couples", "Those with relationship issues", "People seeking emotional balance", "Those looking for marriage"],
+    wearing: { metal: "Silver", day: "Monday", finger: "Ring finger", position: "Neck or Wrist" },
+    rarity: "Uncommon",
+  },
+  3: {
+    mukhi: 3,
+    nameHindi: "तीन मुखी",
+    nameEnglish: "Teen Mukhi",
+    rulingDeity: "Lord Agni (Fire God) / Brahma-Vishnu-Shiva Trinity",
+    rulingPlanet: "Mars",
+    mantra: "Om Kleem Namaha",
+    element: "Fire",
+    spiritualBenefits: [
+      "Destroys past life sins",
+      "Spiritual purification",
+      "Spiritual liberation",
+      "Enhanced creativity & imagination",
+    ],
+    healthBenefits: [
+      "Increases physical energy",
+      "Removes laziness",
+      "Boosts vitality",
+    ],
+    materialBenefits: [
+      "Self-confidence boost",
+      "Freedom from inferiority complex",
+      "Personal transformation",
+    ],
+    problemsSolved: [
+      "Inferiority complex",
+      "Fear of unknown",
+      "Self-hatred",
+      "Mental stress",
+      "Laziness and lethargy",
+      "Past life karma burden",
+    ],
+    bestFor: ["Those with low confidence", "People suffering mental stress", "Anyone feeling stuck or lazy"],
+    wearing: { metal: "Gold or Silver", day: "Tuesday", finger: "Ring finger", position: "Neck or Wrist" },
+    rarity: "Common",
+  },
+  4: {
+    mukhi: 4,
+    nameHindi: "चार मुखी",
+    nameEnglish: "Char Mukhi",
+    rulingDeity: "Lord Brahma (Creator of Universe)",
+    rulingPlanet: "Mercury",
+    mantra: "Om Hreem Namaha",
+    element: "Air",
+    spiritualBenefits: [
+      "Represents 4 Vedas (Rigveda, Yajurveda, Samaveda, Atharvaveda)",
+      "Knowledge & wisdom",
+      "Spiritual enlightenment",
+    ],
+    healthBenefits: [
+      "Enhanced memory power",
+      "Better concentration",
+      "Mental clarity",
+    ],
+    materialBenefits: [
+      "Improved communication skills",
+      "Problem-solving abilities",
+      "Better speech & oratory",
+      "Academic excellence",
+    ],
+    problemsSolved: [
+      "Poor memory",
+      "Lack of concentration",
+      "Communication difficulties",
+      "Educational struggles",
+      "Mental confusion",
+    ],
+    bestFor: ["Students", "Teachers", "Writers", "Speakers", "Anyone in learning or education"],
+    wearing: { metal: "Gold", day: "Wednesday", finger: "Little finger", position: "Neck" },
+    rarity: "Common",
+  },
+  5: {
+    mukhi: 5,
+    nameHindi: "पाँच मुखी",
+    nameEnglish: "Panch Mukhi",
+    rulingDeity: "Lord Kalagni (form of Lord Shiva)",
+    rulingPlanet: "Jupiter",
+    mantra: "Om Hreem Namaha",
+    element: "Ether",
+    spiritualBenefits: [
+      "Destroys bad karma of present life",
+      "Meditation & Saadhna support",
+      "Dev Guru Rudraksha status",
+      "Name & Fame",
+    ],
+    healthBenefits: [
+      "Blood pressure regulation",
+      "Heart health improvement",
+      "Overall wellbeing",
+      "Protection from accidental death",
+    ],
+    materialBenefits: [
+      "Name, Fame & Mental Peace",
+      "Purification of present life karma",
+      "Universally safe for everyone",
+    ],
+    problemsSolved: [
+      "Bad karma of present life",
+      "Lack of mental peace",
+      "Fear of accidental death",
+      "Spiritual practice difficulties",
+      "General negativity",
+    ],
+    bestFor: ["Everyone (universally safe)", "Spiritual practitioners", "Meditation beginners", "First-time Rudraksha wearers"],
+    wearing: { metal: "Any metal", day: "Thursday", finger: "Index finger", position: "Neck (mala of 108)" },
+    rarity: "Common",
+  },
+  6: {
+    mukhi: 6,
+    nameHindi: "छ: मुखी",
+    nameEnglish: "Chhah Mukhi",
+    rulingDeity: "Lord Kartikeya (Son of Lord Shiva)",
+    rulingPlanet: "Venus",
+    mantra: "Om Hreem Hoom Namah",
+    element: "Water",
+    spiritualBenefits: [
+      "Blessed by Goddess Parvati, Lakshmi & Saraswati",
+      "Courage & wisdom",
+      "Spiritual liberation",
+    ],
+    healthBenefits: [
+      "Good health",
+      "Enhanced willpower",
+      "Self-confidence & motivation",
+    ],
+    materialBenefits: [
+      "Health, Wealth & Happiness",
+      "All luxuries, pleasures & comforts of life",
+      "Improved power of expression & speech",
+    ],
+    problemsSolved: [
+      "Lack of courage",
+      "Weak willpower",
+      "Poor expression or speech skills",
+      "Lack of luxury & comfort",
+      "Venus affliction in horoscope",
+    ],
+    bestFor: ["Leaders", "Actors", "Public speakers", "Those needing courage", "Venus-afflicted individuals"],
+    wearing: { metal: "Silver or Gold", day: "Friday", finger: "Ring finger", position: "Neck or Wrist" },
+    rarity: "Common",
+  },
+  7: {
+    mukhi: 7,
+    nameHindi: "सात मुखी",
+    nameEnglish: "Saat Mukhi",
+    rulingDeity: "Goddess Maha Lakshmi + Saptarshi (Seven Sages)",
+    rulingPlanet: "Saturn",
+    mantra: "Om Hoom Namaha",
+    element: "Earth",
+    spiritualBenefits: [
+      "Blessings of 7 divine snakes (Nag protection)",
+      "Spiritual growth & introspection",
+      "Protection from karmic debts",
+    ],
+    healthBenefits: [
+      "Protection from poisoning of any kind",
+      "Good health via Saptarshi blessings",
+    ],
+    materialBenefits: [
+      "Wealth & prosperity",
+      "Business success & increased profits",
+      "Block funds recovery",
+      "Job promotion & career growth",
+      "Good luck, Name & Fame",
+    ],
+    problemsSolved: [
+      "Saturn Sade Sati affliction",
+      "Saturn malefic effects (Small Panoti)",
+      "Financial blocks & stuck money",
+      "Business obstacles",
+      "Career stagnation",
+      "Lack of wealth",
+    ],
+    bestFor: ["Businessmen", "Job seekers", "Those under Sade Sati", "People wanting wealth & promotion"],
+    wearing: { metal: "Silver", day: "Saturday", finger: "Middle finger", position: "Neck or Ring" },
+    rarity: "Uncommon",
+  },
+  8: {
+    mukhi: 8,
+    nameHindi: "आठ मुखी",
+    nameEnglish: "Aath Mukhi",
+    rulingDeity: "Lord Ganesha (Vighna Harta — Remover of Obstacles)",
+    rulingPlanet: "Rahu",
+    mantra: "Om Gneshaya Namaha",
+    element: "Air",
+    spiritualBenefits: [
+      "Stability of mind",
+      "Inner peace & calm",
+      "Spiritual growth & self-awareness",
+    ],
+    healthBenefits: [
+      "Mental stability & calm mind",
+      "Improved focus",
+    ],
+    materialBenefits: [
+      "Success in every venture",
+      "Obstacle removal in all endeavors",
+      "Name, Fame & Leadership qualities",
+    ],
+    problemsSolved: [
+      "Constant obstacles in life",
+      "Rahu dosha / Rahu affliction",
+      "Lack of mental stability",
+      "Career obstacles",
+      "Repeated failures",
+    ],
+    bestFor: ["Those facing constant obstacles", "Rahu-affected individuals", "Aspiring leaders", "New business starters"],
+    wearing: { metal: "Gold", day: "Wednesday", finger: "Middle finger", position: "Neck or Wrist" },
+    rarity: "Uncommon",
+  },
+  9: {
+    mukhi: 9,
+    nameHindi: "नौ मुखी",
+    nameEnglish: "Nau Mukhi",
+    rulingDeity: "Goddess Maha Durga (all 9 forms) + Lord Kaal Bhairav + Yamraj",
+    rulingPlanet: "Ketu",
+    mantra: "Om Hreem Hoom Namaha",
+    element: "Fire",
+    spiritualBenefits: [
+      "Blessings equal to 9-day Navratri fast",
+      "Fearlessness & divine courage",
+      "Protection from all 9 planets' malefic effects",
+      "Blessed by Lord Kaal Bhairav & Yamraj",
+    ],
+    healthBenefits: [
+      "Energy & dynamism boost",
+      "Better self-confidence",
+      "Enhanced physical power",
+    ],
+    materialBenefits: [
+      "Success, Name & Fame",
+      "Power & dynamism",
+      "Fearless personality",
+    ],
+    problemsSolved: [
+      "Fear of death",
+      "Lack of courage",
+      "Ketu dosha / Ketu affliction",
+      "All 9 planet malefic effects",
+      "Fearfulness & cowardice",
+      "Lack of energy",
+    ],
+    bestFor: ["Those needing courage", "Ketu-affected individuals", "People fearing death or unknown", "Those lacking energy"],
+    wearing: { metal: "Gold or Silver", day: "Tuesday", finger: "Ring finger", position: "Neck" },
+    rarity: "Rare",
+  },
+  10: {
+    mukhi: 10,
+    nameHindi: "दस मुखी",
+    nameEnglish: "Das Mukhi",
+    rulingDeity: "Lord Vishnu (Preserver) + Das Maha Vidya (10 incarnations)",
+    rulingPlanet: "None (pacifies all 9 planets)",
+    mantra: "Om Hreem Namaha",
+    element: "Ether",
+    spiritualBenefits: [
+      "Divine protection & preservation",
+      "Universal consciousness",
+      "Protection from Gods of all 10 directions",
+      "Sins of 10 human organs destroyed",
+    ],
+    healthBenefits: [
+      "Protection from untimely death",
+      "Blessed by Yamraj — saved from premature death",
+    ],
+    materialBenefits: [
+      "Family protection",
+      "Vastu dosh removal",
+      "Protection from black magic & evil eye",
+    ],
+    problemsSolved: [
+      "Black magic (Kala Jadoo)",
+      "Evil eye (Nazar)",
+      "Vastu faults / Vastu dosh",
+      "All 9 planet issues",
+      "Fear of untimely death",
+      "Evil spirits & negative entities",
+    ],
+    bestFor: ["Those affected by black magic or evil eye", "Vastu correction needs", "Family protection", "Those fearing untimely death"],
+    wearing: { metal: "Gold", day: "Any day", finger: "Index finger", position: "Neck" },
+    rarity: "Rare",
+  },
+  11: {
+    mukhi: 11,
+    nameHindi: "ग्यारह मुखी",
+    nameEnglish: "Gyarah Mukhi",
+    rulingDeity: "11th Rudra (Lord Hanuman) + Lord Indra",
+    rulingPlanet: "None",
+    mantra: "Om Hreem Hoom Namaha",
+    element: "Air",
+    spiritualBenefits: [
+      "Right actions & courageous decisions",
+      "Enhanced psychic abilities & intuition",
+      "Unfulfilled good deed wishes count as completed",
+    ],
+    healthBenefits: [
+      "Enhanced vitality & stamina",
+      "Improved courage-related hormonal balance",
+    ],
+    materialBenefits: [
+      "All fortunes & luxuries of life (Indra's blessings)",
+      "Adventure & bravery support",
+    ],
+    problemsSolved: [
+      "Lack of courage & bravery",
+      "Cowardice",
+      "Inability to do good deeds",
+      "Lack of fortune & luxury",
+      "Fear of taking action",
+    ],
+    bestFor: ["Adventurers", "Those needing courage", "People wanting blessings of Indra", "Military/police/security"],
+    wearing: { metal: "Gold", day: "Thursday", finger: "Index finger", position: "Neck" },
+    rarity: "Rare",
+  },
+  12: {
+    mukhi: 12,
+    nameHindi: "बारह मुखी",
+    nameEnglish: "Barah Mukhi",
+    rulingDeity: "Lord Surya (Sun God) + 12 Adityas",
+    rulingPlanet: "Sun",
+    mantra: "Om Kraum Sraum Raum Namaha",
+    element: "Fire",
+    spiritualBenefits: [
+      "Powerful aura creation around the wearer",
+      "Brilliance, Luster, Radiance & Strength of Lord Sun",
+    ],
+    healthBenefits: [
+      "Protection from diseases",
+      "Protection from wild animals & armed people",
+    ],
+    materialBenefits: [
+      "Administrative capacity enhancement",
+      "Name, Fame, Wealth & Power",
+      "Leadership & authority",
+    ],
+    problemsSolved: [
+      "Weak Sun in horoscope",
+      "Lack of authority & leadership",
+      "Administrative weakness",
+      "Fear of armed people or wild animals",
+      "Diseases & worries",
+    ],
+    bestFor: ["Administrators", "Businessmen", "Politicians", "Leaders", "Leo ascendant individuals"],
+    wearing: { metal: "Gold", day: "Sunday", finger: "Ring finger", position: "Neck" },
+    rarity: "Rare",
+  },
+  13: {
+    mukhi: 13,
+    nameHindi: "तेरह मुखी",
+    nameEnglish: "Terah Mukhi",
+    rulingDeity: "Lord Kamadeva + Lord Indra (King of Gods)",
+    rulingPlanet: "Venus",
+    mantra: "Om Hreem Namaha",
+    element: "Water",
+    spiritualBenefits: [
+      "Perfection in alchemy & research",
+      "Blessings of all Gods via Lord Indra",
+    ],
+    healthBenefits: [
+      "Enhanced vitality & passion",
+      "Improved physical attraction & charisma",
+    ],
+    materialBenefits: [
+      "Immense wealth",
+      "Position of authority",
+      "All luxuries of life",
+      "Charisma — liked by everyone who interacts",
+      "Great heights of success",
+    ],
+    problemsSolved: [
+      "Lack of wealth",
+      "Lack of authority or respect",
+      "Poor oratory & debating skills",
+      "Research blocks",
+      "Lack of personal charm",
+    ],
+    bestFor: ["Researchers", "Orators & debaters", "Those seeking wealth & authority", "Scientists & alchemists"],
+    wearing: { metal: "Gold", day: "Friday", finger: "Ring finger", position: "Neck" },
+    rarity: "Very Rare",
+  },
+  14: {
+    mukhi: 14,
+    nameHindi: "चौदह मुखी",
+    nameEnglish: "Chaudah Mukhi",
+    rulingDeity: "Lord Shiva (Dev Mani — Divine Gem, represents 14 Lokas)",
+    rulingPlanet: "Saturn",
+    mantra: "Om Namaha",
+    element: "Ether",
+    spiritualBenefits: [
+      "Ajna Chakra (Third Eye) activation",
+      "Future visualization ability",
+      "Shiva & Shakti blessings combined",
+      "Quick results (hence named Dev Mani)",
+    ],
+    healthBenefits: [
+      "Third eye activation enhances intuition",
+      "Enhanced spiritual perception",
+    ],
+    materialBenefits: [
+      "Correct decision-making ability",
+      "Better present & brighter future",
+      "Protection from all enemies",
+    ],
+    problemsSolved: [
+      "Negative energies & enemies",
+      "Poor decision-making",
+      "Saturn affliction",
+      "Inability to foresee consequences",
+      "Negativity from all sides",
+    ],
+    bestFor: ["Decision-makers & CEOs", "Those needing enemy protection", "Advanced spiritual practitioners", "Saturn-afflicted individuals"],
+    wearing: { metal: "Gold", day: "Saturday", finger: "Middle finger", position: "Neck" },
+    rarity: "Very Rare",
+  },
+  15: {
+    mukhi: 15,
+    nameHindi: "पंद्रह मुखी",
+    nameEnglish: "Pandrah Mukhi",
+    rulingDeity: "Lord Pashupati",
+    rulingPlanet: "Rahu",
+    mantra: "Om Shreem Manovaanchiatam Hreem Om Namah",
+    element: "Air",
+    spiritualBenefits: [
+      "Path to salvation (moksha)",
+      "Freedom from negative soul shades",
+      "Abstract & lateral thinking enhancement",
+    ],
+    healthBenefits: [
+      "Mental balance",
+      "Emotional disturbance pacification",
+      "High energy levels",
+    ],
+    materialBenefits: [
+      "Improved intuitions & foresight",
+      "Higher consciousness in daily life",
+    ],
+    problemsSolved: [
+      "Emotional disturbance",
+      "Mental imbalance",
+      "Low energy & lethargy",
+      "Rahu affliction / Rahu dosha",
+      "Negative shades on soul",
+    ],
+    bestFor: ["Spiritual seekers on path of moksha", "Those with Rahu issues", "People needing mental balance"],
+    wearing: { metal: "Gold or Silver cap, Red thread", day: "Saturday", finger: "Middle finger", position: "Neck (touch to Shiva Linga before wearing)" },
+    rarity: "Very Rare",
+  },
+  16: {
+    mukhi: 16,
+    nameHindi: "सोलह मुखी (महामृत्युंजय रुद्राक्ष)",
+    nameEnglish: "Solah Mukhi (Mahamrityunjaya Rudraksha)",
+    rulingDeity: "Lord Mahakal (fierce form of Shiva) + Lord Ram",
+    rulingPlanet: "Ketu",
+    mantra: "Om Tryambakam Yajamahe Sugandhim Pushti-Vardhanam Urvarukamiva Bandhanan Mrityor Mukshiya Mamritat",
+    element: "Fire",
+    spiritualBenefits: [
+      "Freedom from fear of Kaal (Death)",
+      "Victory over most fearsome diseases",
+      "Punya (merit) of 7 births",
+      "Life on the path of Satya (Truth)",
+    ],
+    healthBenefits: [
+      "Tuberculosis support",
+      "Leprosy support",
+      "Lung diseases support",
+      "General disease protection",
+    ],
+    materialBenefits: [
+      "Home protection from theft, fire & accidents",
+      "Navgrah Dosh removal",
+      "Also called Jai Rudraksha — full of great human virtues",
+    ],
+    problemsSolved: [
+      "Fear of death",
+      "Fear of losing loved ones",
+      "Fear of loss of name & fame",
+      "Fear of loss of faith in oneself",
+      "Navgrah Dosh",
+      "Serious lung/skin diseases",
+    ],
+    bestFor: ["Those with serious health issues", "People fearing death", "Ketu-affected individuals", "Home protection"],
+    wearing: { metal: "Gold", day: "Tuesday", finger: "Ring finger", position: "Neck (also keep at home for protection)" },
+    rarity: "Extremely Rare",
+  },
+  17: {
+    mukhi: 17,
+    nameHindi: "सत्रह मुखी",
+    nameEnglish: "Satrah Mukhi",
+    rulingDeity: "Devi Katyayani (6th form of Maa Durga) + Lord Vishwakarma",
+    rulingPlanet: "None (nullifies negative Saturn effects)",
+    mantra: "Om Hreeng Hoong Hoong Namaha",
+    element: "Earth",
+    spiritualBenefits: [
+      "Soul enlightenment",
+      "Connection with Devi energy",
+      "All 4 Purusharthas: Dharma, Artha, Kama & Moksha",
+    ],
+    healthBenefits: [
+      "Removes laziness & lethargic attitude",
+      "Increases memory & intelligence",
+    ],
+    materialBenefits: [
+      "Sudden wealth (share market rise, property appreciation, inheritance, lottery)",
+      "Progeny blessing (children)",
+      "Good luck & prosperity",
+      "Power of manifestation & achievement",
+    ],
+    problemsSolved: [
+      "Shani Sade Sati obstacles",
+      "Laziness & lethargy",
+      "Poor memory",
+      "Lack of manifestation power",
+      "Financial blocks",
+      "Childlessness",
+    ],
+    bestFor: ["Investors & traders", "Those under Sade Sati", "People seeking sudden wealth", "Those wanting children (progeny)"],
+    wearing: { metal: "Gold", day: "Saturday", finger: "Middle finger", position: "Neck" },
+    rarity: "Extremely Rare",
+  },
+  18: {
+    mukhi: 18,
+    nameHindi: "अठारह मुखी",
+    nameEnglish: "Atharah Mukhi",
+    rulingDeity: "Goddess Earth (Bhumi Devi) + Lord Bhairava",
+    rulingPlanet: "Earth",
+    mantra: "AUM HREEM HOOM EKATATVA RUPE HOOM HREEM AUM",
+    element: "Earth",
+    spiritualBenefits: [
+      "Great patience & tolerance",
+      "Spiritual wisdom & inner strength",
+    ],
+    healthBenefits: [
+      "Prevention of child abortion / miscarriage",
+      "Pregnancy complications support",
+    ],
+    materialBenefits: [
+      "Success in major projects",
+      "Business expansion success",
+      "Real estate business prosperity",
+      "Manufacturing business growth",
+    ],
+    problemsSolved: [
+      "Project failures",
+      "Business stagnation",
+      "Miscarriage / repeated abortion issues",
+      "Impatience & intolerance",
+      "Real estate problems",
+    ],
+    bestFor: ["Entrepreneurs", "Real estate professionals", "Manufacturing businesses", "Women with pregnancy complications"],
+    wearing: { metal: "Gold", day: "Thursday", finger: "Index finger", position: "Neck" },
+    rarity: "Extremely Rare",
+  },
+  19: {
+    mukhi: 19,
+    nameHindi: "उन्नीस मुखी",
+    nameEnglish: "Unnis Mukhi",
+    rulingDeity: "Lord Narayana + Goddess Lakshmi + Trinity Gods (Brahma, Vishnu, Mahesh)",
+    rulingPlanet: "Mercury",
+    mantra: "Om Vam Vishnave Sheershayane Swaha",
+    element: "Water",
+    spiritualBenefits: [
+      "Blessed by Trinity (Brahma, Vishnu, Mahesh)",
+      "No detraction in life",
+      "Complete spiritual protection",
+    ],
+    healthBenefits: [
+      "Diabetes control support",
+      "Sexual disorders treatment support",
+      "Blood pressure management",
+      "Spinal problems relief",
+      "Blood-related diseases support",
+    ],
+    materialBenefits: [
+      "Economic prosperity",
+      "High position in work field",
+      "Pride & honor in society",
+      "Wife, child & wealth blessings",
+    ],
+    problemsSolved: [
+      "Financial difficulties",
+      "Career stagnation & low position",
+      "Diabetes",
+      "Sexual health issues",
+      "Spinal & blood problems",
+      "Lack of social respect",
+    ],
+    bestFor: ["Career-focused individuals", "Those with chronic health issues (diabetes, BP)", "People seeking economic prosperity"],
+    wearing: { metal: "Gold", day: "Wednesday", finger: "Little finger", position: "Neck" },
+    rarity: "Extremely Rare",
+  },
+  20: {
+    mukhi: 20,
+    nameHindi: "बीस मुखी",
+    nameEnglish: "Bees Mukhi",
+    rulingDeity: "Lord Brahma (Creator of Universe)",
+    rulingPlanet: "All Nine Planets",
+    mantra: "Om Hreem Hreem Hum Hum Brahmane Namah",
+    element: "Ether",
+    spiritualBenefits: [
+      "Powers of Trinity + 9 Planets + 8 Dikpals converged",
+      "Brahma Swarupa (embodiment of Brahma)",
+      "Supreme spiritual consciousness",
+    ],
+    healthBenefits: [
+      "Complete all-round health protection",
+      "Protection via combined planetary energies",
+    ],
+    materialBenefits: [
+      "Power to achieve almost anything desired",
+      "Destiny rewriting ability",
+      "Combined blessings of all divine entities",
+    ],
+    problemsSolved: [
+      "All planetary doshas simultaneously",
+      "All directional doshas (Dik-dosh)",
+      "Overall life obstacles of every kind",
+      "Unfulfilled desires",
+    ],
+    bestFor: ["Those seeking all-round protection", "Advanced spiritual practitioners", "People wanting supreme achievement"],
+    wearing: { metal: "Gold", day: "Any auspicious day", finger: "Index finger", position: "Neck" },
+    rarity: "Extremely Rare",
+  },
+  21: {
+    mukhi: 21,
+    nameHindi: "इक्कीस मुखी (कुबेर रुद्राक्ष)",
+    nameEnglish: "Ikkees Mukhi (Kuber Rudraksha)",
+    rulingDeity: "Lord Kuber (God of Wealth)",
+    rulingPlanet: "All",
+    mantra: "Om Yakshaya Kuberya Vaishravanaya Dhana-Dhanyadi",
+    element: "Earth",
+    spiritualBenefits: [
+      "Third eye chakra opening",
+      "6th sense & clairvoyance abilities",
+      "Spiritual growth & enlightenment",
+      "Benefits of ALL 1-21 Mukhi combined",
+    ],
+    healthBenefits: [
+      "Great health protection",
+      "All-encompassing healing energy",
+    ],
+    materialBenefits: [
+      "Great wealth (Kuber's blessings)",
+      "All benefits of 1-21 Mukhi combined in one",
+      "Supreme material prosperity",
+    ],
+    problemsSolved: [
+      "Wealth problems & poverty",
+      "Lack of intuition & 6th sense",
+      "Spiritual blocks of all kinds",
+      "Any life problem (covers all Mukhi benefits)",
+    ],
+    bestFor: ["Wealth seekers", "Spiritual masters", "Those wanting all-round blessings", "Collectors of rare spiritual items"],
+    wearing: { metal: "Gold", day: "Any auspicious day", finger: "Index finger", position: "Neck" },
+    rarity: "Extremely Rare",
+  },
+};
+
+
 
 function mod(n: number, m: number) {
   return ((n % m) + m) % m;
@@ -1031,17 +1795,29 @@ function getHouseRelevanceLine(planetPos: PlanetPosition | undefined): string {
   return `Placed in house ${planetPos.house} — assess based on current life priorities and personal tolerance.`;
 }
 
-function makeRudrakshaRecommendation(
+export function makeRudrakshaRecommendation(
   planet: Exclude<Planet, "Ascendant">,
   planetPos: PlanetPosition | undefined
 ): RudrakshaRecommendation {
   const data = PLANET_RUDRAKSHA[planet];
+  // Extract numeric Mukhi (e.g., "1 Mukhi" -> 1)
+  const mukhiNum = parseInt(data.mukhi.split(' ')[0]);
+  const extended = RUDRAKSHA_MUKHI[mukhiNum];
+  const defaultWearing: RudrakshaWearing = { metal: "Gold or Silver", day: "Any day", finger: "Ring finger", position: "Neck" };
   return {
     planet,
     mukhi: data.mukhi,
-    bead: data.bead,
-    mantra: data.mantra,
+    bead: extended?.nameEnglish ?? data.bead,
+    mantra: extended?.mantra ?? data.mantra,
     reason: `${planet} balancing and activating support. ${getHouseRelevanceLine(planetPos)}`,
+    rulingDeity: extended?.rulingDeity ?? "Unknown",
+    spiritualBenefits: extended?.spiritualBenefits ?? [],
+    healthBenefits: extended?.healthBenefits ?? [],
+    materialBenefits: extended?.materialBenefits ?? [],
+    problemsSolved: extended?.problemsSolved ?? [],
+    bestFor: extended?.bestFor ?? [],
+    wearing: extended?.wearing ?? defaultWearing,
+    rarity: extended?.rarity ?? "Unknown",
   };
 }
 
@@ -1074,6 +1850,30 @@ export function generateDashaGemstoneRecommendationsFromChart(input: unknown): D
   if (md) result.push(makeDashaRecommendation("Mahadasha", md, natal));
   if (ad) result.push(makeDashaRecommendation("Antardasha", ad, natal));
   return result;
+}
+
+// ─── Rudraksha Query Helpers ──────────────────────────────────────────────────
+
+export function getRudrakshaData(mukhi: number): RudrakshaData | undefined {
+  return RUDRAKSHA_MUKHI[mukhi];
+}
+
+export function getAllRudrakshas(): RudrakshaData[] {
+  return Object.values(RUDRAKSHA_MUKHI);
+}
+
+export function findRudrakshaForProblem(query: string): RudrakshaData[] {
+  if (!query || !query.trim()) return [];
+  const q = query.toLowerCase().trim();
+  return Object.values(RUDRAKSHA_MUKHI).filter((r) => {
+    return (
+      r.problemsSolved.some((p) => p.toLowerCase().includes(q)) ||
+      r.healthBenefits.some((h) => h.toLowerCase().includes(q)) ||
+      r.materialBenefits.some((m) => m.toLowerCase().includes(q)) ||
+      r.spiritualBenefits.some((s) => s.toLowerCase().includes(q)) ||
+      r.bestFor.some((b) => b.toLowerCase().includes(q))
+    );
+  });
 }
 
 // ─── Compatibility exports ────────────────────────────────────────────────────
