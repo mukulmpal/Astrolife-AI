@@ -362,9 +362,289 @@ function MedicalTab({ report }: { report: GemstoneMedicalMasterReport }) {
   );
 }
 
+// ─── Rudraksha Intelligence Tab ───────────────────────────────────────────────
+
+const RUDRAKSHA_CATALOG: Record<string, {
+  mukhi: string;
+  sanskritName: string;
+  deity: string;
+  mantra: string;
+  benefits: string;
+  relevance: string;
+  metal: string;
+}> = {
+  Sun: {
+    mukhi: "1 Mukhi (एक मुखी)",
+    sanskritName: "Eka Mukhi",
+    deity: "Lord Shiva (साक्षात शिव स्वरूप)",
+    mantra: "ॐ ह्रीं नमः (Om Hreem Namah)",
+    benefits: "आत्मबल, नेतृत्व क्षमता, सूर्य जैसा तेज, पिता का सुख एवं हृदय व नेत्र स्वास्थ्य।",
+    relevance: "सूर्य के आत्मिक प्रभाव को जागृत करता है और अंतरात्मा को असीम स्थिरता देता है।",
+    metal: "स्वर्ण (Gold) अथवा लाल रेशमी धागा",
+  },
+  Moon: {
+    mukhi: "2 Mukhi (दो मुखी)",
+    sanskritName: "Dvi Mukhi",
+    deity: "Ardhanarishvara (अर्धनारीश्वर - शिव-पार्वती स्वरूप)",
+    mantra: "ॐ नमः (Om Namah) / ॐ सों सोमाय नमः",
+    benefits: "मानसिक शांति, भावनात्मक संतुलन, दांपत्य सामंजस्य एवं अनिद्रा, भय व अवसाद (Depression) की शांति।",
+    relevance: "चंद्रमा के अशांत व संवेदनशील मन को अमृतमयी शीतलता और आत्म-संयम प्रदान करता है।",
+    metal: "शुद्ध चांदी (Silver) अथवा श्वेत रेशमी धागा",
+  },
+  Mars: {
+    mukhi: "3 Mukhi (तीन मुखी)",
+    sanskritName: "Tri Mukhi",
+    deity: "Lord Agni (अग्नि देव)",
+    mantra: "ॐ क्लीं नमः (Om Kleem Namah)",
+    benefits: "आलस्य का नाश, पराक्रम, आत्मविश्वास, रक्त शुद्धि एवं हीनभावना (Inferiority Complex) से मुक्ति।",
+    relevance: "मंगल के उग्र तेज को सात्विक साहस और क्रियाशीलता में रूपांतरित करता है।",
+    metal: "तांबा (Copper) अथवा पीला/लाल धागा",
+  },
+  Mercury: {
+    mukhi: "4 Mukhi (चार मुखी)",
+    sanskritName: "Chatur Mukhi",
+    deity: "Lord Brahma (चतुरानन ब्रह्मा जी)",
+    mantra: "ॐ ह्रीं नमः (Om Hreem Namah)",
+    benefits: "तार्किक बुद्धि, स्मरण शक्ति, वाक-सिद्धि, शिक्षा, अनुसंधान एवं नसों/तंत्रिका तंत्र का संतुलन।",
+    relevance: "लग्नेश बुध की बौद्धिक मेधा, निर्णय क्षमता और व्यापारिक सफलता को कई गुना बढ़ाता है।",
+    metal: "चांदी अथवा हरा/लाल रेशमी धागा",
+  },
+  Jupiter: {
+    mukhi: "5 Mukhi (पंच मुखी)",
+    sanskritName: "Pancha Mukhi",
+    deity: "Kalagni Rudra (कालाग्नि रुद्र)",
+    mantra: "ॐ ह्रीं नमः (Om Hreem Namah)",
+    benefits: "सर्व-कल्याणकारी, ज्ञान, गुरु कृपा, उच्च विचार, रक्तचाप नियंत्रण एवं आध्यात्मिक उन्नति।",
+    relevance: "देवगुरु बृहस्पति के सात्विक आशीर्वाद से समाज में मान-सम्मान और नैतिक नेतृत्व दिलाता है।",
+    metal: "पंचधातु, स्वर्ण अथवा पीला धागा",
+  },
+  Venus: {
+    mukhi: "6 Mukhi (छह मुखी)",
+    sanskritName: "Shan Mukhi",
+    deity: "Lord Kartikeya (भगवान कार्तिकेय)",
+    mantra: "ॐ ह्रीं हुं नमः (Om Hreem Hum Namah)",
+    benefits: "आकर्षण, वैवाहिक सौहार्द, कलात्मक प्रतिभा, पौरुष बल एवं विलासिता में स्थिरता।",
+    relevance: "शुक्र के भौतिक व दांपत्य सुखों को संतुलित और पवित्र बनाता है।",
+    metal: "चांदी अथवा सफेद/चमकीला धागा",
+  },
+  Saturn: {
+    mukhi: "7 Mukhi (सात मुखी)",
+    sanskritName: "Sapta Mukhi",
+    deity: "Goddess Mahalakshmi (महालक्ष्मी एवं सप्तर्षि)",
+    mantra: "ॐ हुं नमः (Om Hum Namah)",
+    benefits: "दरिद्रता का नाश, स्थिर लक्ष्मी, शनि साढ़ेसाती/ढैया में सुरक्षा, हड्डियों व जोड़ों को बल।",
+    relevance: "शनि के कठोर अनुशासन को कर्म-सिद्धि और आर्थिक स्थिरता में परिवर्तित करता है।",
+    metal: "चांदी अथवा काला/नीला रेशमी धागा",
+  },
+  Rahu: {
+    mukhi: "8 Mukhi (आठ मुखी)",
+    sanskritName: "Ashta Mukhi",
+    deity: "Lord Ganesha & Bhairava (विघ्नहर्ता गणेश)",
+    mantra: "ॐ हुं नमः (Om Hum Namah) / ॐ रां राहवे नमः",
+    benefits: "अचानक विपत्तियों से रक्षा, राहु के भ्रम व पैनिक अटैक की शांति, कोर्ट-कचहरी व शत्रुओं पर विजय।",
+    relevance: "राहु के भय, फोबिया, अनिद्रा और विषैले मानसिक लूप को जड़ से शांत करता है।",
+    metal: "चांदी अथवा स्लेटी/धूमिल रेशमी धागा",
+  },
+  Ketu: {
+    mukhi: "9 Mukhi (नौ मुखी)",
+    sanskritName: "Nava Mukhi",
+    deity: "Goddess Durga (नवदुर्गा - शक्ति स्वरूपा)",
+    mantra: "ॐ ह्रीं हुं नमः (Om Hreem Hum Namah)",
+    benefits: "अकाल मृत्यु का भय दूर, अदम्य साहस, तंत्र-बाधा से रक्षा, केतु की आध्यात्मिक सिद्धि।",
+    relevance: "केतु के रहस्यमयी प्रभावों को दिव्य शक्ति और आत्मबल में रूपांतरित करता है।",
+    metal: "पंचधातु अथवा नारंगी/भूरा धागा",
+  },
+};
+
+function RudrakshaTab({
+  primary,
+  input,
+}: {
+  primary: GemstoneReportItem;
+  input: GemstoneMedicalInput | null;
+}) {
+  const primaryRudraksha = RUDRAKSHA_CATALOG[primary.planet] ?? RUDRAKSHA_CATALOG.Mercury;
+  const mdPlanet = input?.dasha?.mahadasha;
+  const adPlanet = input?.dasha?.antardasha;
+  const mdRudraksha = mdPlanet ? RUDRAKSHA_CATALOG[mdPlanet] : null;
+  const adRudraksha = adPlanet ? RUDRAKSHA_CATALOG[adPlanet] : null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {/* Sacred Intro Banner */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(200, 160, 48, 0.05) 100%)",
+          border: "1px solid rgba(184, 134, 11, 0.3)",
+          borderRadius: "16px",
+          padding: "20px 24px",
+          boxShadow: "0 4px 16px rgba(184, 134, 11, 0.05)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+          <span style={{ fontSize: "24px" }}>🔱</span>
+          <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#1A1A1A", fontFamily: "'Cormorant Garamond', serif" }}>
+            वैदिक रुद्राक्ष विज्ञान एवं व्यक्तिगत कवच (Sacred Rudraksha Intelligence)
+          </h2>
+        </div>
+        <p style={{ margin: 0, fontSize: "14px", color: "#4A4238", lineHeight: 1.7 }}>
+          शास्त्रों के अनुसार रुद्राक्ष भगवान शिव के अश्रुओं से उत्पन्न साक्षात दिव्य ऊर्जा है। <strong>रत्नों के विपरीत, रुद्राक्ष का कोई भी नकारात्मक या प्रतिकूल प्रभाव (Side Effect) कभी नहीं होता।</strong> यह किसी भी अवस्था में केवल सकारात्मक सात्विक ऊर्जा, मानसिक स्थिरता और प्राण-शक्ति प्रदान करता है।
+        </p>
+      </div>
+
+      {/* Primary Life & Dasha Rudraksha Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "18px" }}>
+        {/* 1. Life / Lagna Rudraksha */}
+        <div className="gem-panel" style={{ borderLeft: "4px solid #B8860B" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: "#B8860B", fontWeight: 700 }}>
+                लग्न अधिपति रुद्राक्ष · Life Rudraksha
+              </span>
+              <h3 style={{ margin: "4px 0 0", fontSize: "18px", color: "#1A1A1A" }}>
+                {primaryRudraksha.mukhi}
+              </h3>
+            </div>
+            <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: "rgba(184, 134, 11, 0.15)", color: "#8A6008" }}>
+              लग्नेश {primary.planet}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13.5px", color: "#3A3228", lineHeight: 1.6 }}>
+            <div><strong>अधिष्ठाता देवता:</strong> {primaryRudraksha.deity}</div>
+            <div><strong>सिद्ध बीज मंत्र:</strong> <code style={{ background: "#FAF7F2", padding: "2px 6px", borderRadius: "6px", color: "#8A6008", fontWeight: 700 }}>{primaryRudraksha.mantra}</code></div>
+            <div><strong>धारण धातु / धागा:</strong> {primaryRudraksha.metal}</div>
+            <div style={{ marginTop: "4px", borderTop: "1px solid rgba(184, 134, 11, 0.15)", paddingTop: "8px" }}>
+              <strong>विशेष लाभ:</strong> {primaryRudraksha.benefits}
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Active Mahadasha Rudraksha */}
+        {mdRudraksha && (
+          <div className="gem-panel" style={{ borderLeft: "4px solid #2563EB" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
+              <div>
+                <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: "#2563EB", fontWeight: 700 }}>
+                  सक्रिय महादशा कवच · Dasha Shield
+                </span>
+                <h3 style={{ margin: "4px 0 0", fontSize: "18px", color: "#1A1A1A" }}>
+                  {mdRudraksha.mukhi}
+                </h3>
+              </div>
+              <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: "rgba(37, 99, 235, 0.12)", color: "#1D4ED8" }}>
+                महादशा: {mdPlanet}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13.5px", color: "#3A3228", lineHeight: 1.6 }}>
+              <div><strong>अधिष्ठाता देवता:</strong> {mdRudraksha.deity}</div>
+              <div><strong>सिद्ध बीज मंत्र:</strong> <code style={{ background: "#FAF7F2", padding: "2px 6px", borderRadius: "6px", color: "#1D4ED8", fontWeight: 700 }}>{mdRudraksha.mantra}</code></div>
+              <div><strong>धारण धातु / धागा:</strong> {mdRudraksha.metal}</div>
+              <div style={{ marginTop: "4px", borderTop: "1px solid rgba(37, 99, 235, 0.15)", paddingTop: "8px" }}>
+                <strong>दशा प्रभाव:</strong> {mdRudraksha.relevance}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Active Antardasha Rudraksha (if distinct) */}
+        {adRudraksha && adPlanet !== mdPlanet && adPlanet !== primary.planet && (
+          <div className="gem-panel" style={{ borderLeft: "4px solid #059669" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
+              <div>
+                <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: "#059669", fontWeight: 700 }}>
+                  अंतर्दशा संतुलन रुद्राक्ष · Antardasha Harmony
+                </span>
+                <h3 style={{ margin: "4px 0 0", fontSize: "18px", color: "#1A1A1A" }}>
+                  {adRudraksha.mukhi}
+                </h3>
+              </div>
+              <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: "rgba(5, 150, 105, 0.12)", color: "#059669" }}>
+                अंतर्दशा: {adPlanet}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13.5px", color: "#3A3228", lineHeight: 1.6 }}>
+              <div><strong>अधिष्ठाता देवता:</strong> {adRudraksha.deity}</div>
+              <div><strong>सिद्ध बीज मंत्र:</strong> <code style={{ background: "#FAF7F2", padding: "2px 6px", borderRadius: "6px", color: "#059669", fontWeight: 700 }}>{adRudraksha.mantra}</code></div>
+              <div><strong>धारण धातु / धागा:</strong> {adRudraksha.metal}</div>
+              <div style={{ marginTop: "4px", borderTop: "1px solid rgba(5, 150, 105, 0.15)", paddingTop: "8px" }}>
+                <strong>शांतिकारी प्रभाव:</strong> {adRudraksha.benefits}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sacred Wearing & Energization Guide */}
+      <div className="gem-panel" style={{ background: "#FAF8F5" }}>
+        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>🌿</span> रुद्राक्ष धारण एवं प्राण-प्रतिष्ठा की शास्त्रीय विधि
+        </h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", fontSize: "13.5px", color: "#4A4238", lineHeight: 1.65 }}>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>१. शुद्धिकरण (Purification)</strong>
+            रुद्राक्ष को धारण करने से पूर्व एक रात गाय के कच्चे दूध में रखें, फिर प्रातः गंगाजल अथवा स्वच्छ जल से धोकर साफ करें।
+          </div>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>२. प्राण-प्रतिष्ठा मंत्र (Chanting)</strong>
+            शिवलिंग अथवा भगवान शिव की प्रतिमा के समक्ष बैठकर <strong>"ॐ नमः शिवाय"</strong> अथवा संबंधित बीज मंत्र का १०८ बार शांत मन से जप करें।
+          </div>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>३. शुभ दिन व समय (Auspicious Timing)</strong>
+            सोमवार प्रातःकाल, शिवरात्रि, प्रदोष काल अथवा सावन/पूर्णिमा के दिन रुद्राक्ष धारण करना सर्वोत्तम फलदायी माना गया है।
+          </div>
+        </div>
+      </div>
+
+      {/* Complete 1 to 9 Mukhi Classical Reference Table */}
+      <div className="gem-panel">
+        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>📖</span> संपूर्ण नवग्रह रुद्राक्ष संदर्भ तालिका (Comprehensive Planetary Guide)
+        </h3>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+            <thead>
+              <tr style={{ background: "#FAF7F2", borderBottom: "1.5px solid rgba(184, 134, 11, 0.3)", color: "#8A6008" }}>
+                <th style={{ padding: "10px 12px" }}>ग्रह</th>
+                <th style={{ padding: "10px 12px" }}>रुद्राक्ष मुखी</th>
+                <th style={{ padding: "10px 12px" }}>अधिष्ठाता देवता</th>
+                <th style={{ padding: "10px 12px" }}>बीज मंत्र</th>
+                <th style={{ padding: "10px 12px" }}>मुख्य प्रभाव व लाभ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(RUDRAKSHA_CATALOG).map(([planet, data], idx) => (
+                <tr
+                  key={planet}
+                  style={{
+                    borderBottom: "1px solid rgba(184, 134, 11, 0.12)",
+                    background: idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
+                  }}
+                >
+                  <td style={{ padding: "10px 12px", fontWeight: 700, color: "#1A1A1A" }}>{planet}</td>
+                  <td style={{ padding: "10px 12px", fontWeight: 600, color: "#B8860B" }}>{data.mukhi}</td>
+                  <td style={{ padding: "10px 12px", color: "#3A3228" }}>{data.deity}</td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <code style={{ background: "rgba(184, 134, 11, 0.1)", padding: "2px 6px", borderRadius: "4px", fontSize: "12px", color: "#8A6008" }}>
+                      {data.mantra}
+                    </code>
+                  </td>
+                  <td style={{ padding: "10px 12px", color: "#4A4238", lineHeight: 1.5 }}>{data.benefits}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type TabKey = "analysis" | "wearing" | "dasha" | "secondary" | "avoid" | "medical";
+type TabKey = "analysis" | "wearing" | "dasha" | "secondary" | "avoid" | "medical" | "rudraksha";
 
 export default function GemstonePage() {
   const mounted = useSyncExternalStore(
@@ -407,6 +687,7 @@ function GemstonePageContent() {
     { id: "secondary", label: "◇ Secondary Gems" },
     { id: "avoid",     label: "⊗ Avoid / Careful" },
     { id: "medical",   label: "✦ Medical Awareness" },
+    { id: "rudraksha", label: "🔱 Rudraksha" },
   ];
 
   if (loading) {
@@ -508,6 +789,7 @@ function GemstonePageContent() {
         {activeTab === "secondary" && <SecondaryTab report={report} />}
         {activeTab === "avoid"     && <AvoidTab report={report} />}
         {activeTab === "medical"   && <MedicalTab report={report} />}
+        {activeTab === "rudraksha" && <RudrakshaTab primary={primary} input={input} />}
       </section>
 
       {(() => {
