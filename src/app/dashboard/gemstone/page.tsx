@@ -565,7 +565,7 @@ function RudrakshaTab({
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
           <span style={{ fontSize: "24px" }}>🔱</span>
           <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#1A1A1A", fontFamily: "'Cormorant Garamond', serif" }}>
-            वैदिक रुद्राक्ष विज्ञान, १-२१ मुखी ज्ञानकोष एवं व्यक्तिगत कवच
+            वैदिक रुद्राक्ष विज्ञान, 1-21 मुखी ज्ञानकोष एवं व्यक्तिगत कवच
           </h2>
         </div>
         <p style={{ margin: 0, fontSize: "14px", color: "#4A4238", lineHeight: 1.7 }}>
@@ -809,7 +809,7 @@ function RudrakshaTab({
       {/* 5. Complete 1 to 21 Mukhi + Rare Types Explorer */}
       <div className="gem-panel">
         <h3 style={{ fontSize: "18px", color: "#1A1A1A", marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>📜</span> संपूर्ण १ से २१ मुखी एवं दुर्लभ रुद्राक्ष ज्ञानकोष (Visual Encyclopedia)
+          <span>📜</span> संपूर्ण 1 से 21 मुखी एवं दुर्लभ रुद्राक्ष ज्ञानकोष (Visual Encyclopedia)
         </h3>
 
         {/* Mukhi Selector Chips */}
@@ -949,23 +949,23 @@ function RudrakshaTab({
         </h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px", fontSize: "13px", color: "#4A4238", lineHeight: 1.6 }}>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>१. दानों की संख्या का शास्त्रीय फल</strong>
-            • <strong>१०८ दाने:</strong> पूर्ण सर्वकामना सिद्धि व मोक्ष<br />
-            • <strong>३० दाने:</strong> केवल धन-संपत्ति वृद्धि हेतु विशेष जप<br />
-            • <strong>२७ दाने:</strong> उत्तम स्वास्थ्य, पुष्टि व दीर्घायु<br />
-            • <strong>३२ दाने:</strong> गले में धारण कर नीलकंठ स्वरूप सुरक्षा
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>1. दानों की संख्या का शास्त्रीय फल</strong>
+            • <strong>108 दाने:</strong> पूर्ण सर्वकामना सिद्धि व मोक्ष<br />
+            • <strong>30 दाने:</strong> केवल धन-संपत्ति वृद्धि हेतु विशेष जप<br />
+            • <strong>27 दाने:</strong> उत्तम स्वास्थ्य, पुष्टि व दीर्घायु<br />
+            • <strong>32 दाने:</strong> गले में धारण कर नीलकंठ स्वरूप सुरक्षा
           </div>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>२. गुंथन का दिव्य नियम (Stringing)</strong>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>2. गुंथन का दिव्य नियम (Stringing)</strong>
             <em>"मुखं मुखेन संयोज्य पुच्छं पुच्छेन योजयेत्"</em> — रुद्राक्ष को पिरोते समय मुख से मुख और पूंछ से पूंछ मिलनी चाहिए। सुमेरु का मुख ऊपर हो और दाईं ओर चांदी तथा बाईं ओर तांबे की कैप शुभ है।
           </div>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>३. जप में अंगुलियों का गुप्त रहस्य</strong>
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>3. जप में अंगुलियों का गुप्त रहस्य</strong>
             अंगूठा मोक्ष देता है और <strong>मध्यमा अंगुली धन व ऐश्वर्य देती है</strong>। अनामिका शांति देती है। <strong>तर्जनी (इंडेक्स फिंगर) का स्पर्श वर्जित है</strong> — इससे जप का पुण्य समाप्त हो जाता है।
           </div>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>४. आयुर्वेदिक घरेलू कल्प (Chikitsa)</strong>
-            • <strong>हाई बीपी/हृदय:</strong> ५ मुखी रुद्राक्ष मिट्टी के पात्र में रातभर भिगोकर सुबह बासी मुंह ४० दिन पिएं।<br />
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>4. आयुर्वेदिक घरेलू कल्प (Chikitsa)</strong>
+            • <strong>हाई बीपी/हृदय:</strong> 5 मुखी रुद्राक्ष मिट्टी के पात्र में रातभर भिगोकर सुबह बासी मुंह 40 दिन पिएं।<br />
             • <strong>कफ/दमा:</strong> रुद्राक्ष को पत्थर पर घिसकर शहद के साथ चटाएं।
           </div>
         </div>
