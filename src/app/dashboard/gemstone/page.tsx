@@ -546,8 +546,16 @@ function RudrakshaTab({
       deity: "भगवान शिव एवं माँ पार्वती (Ardhanarishvara)",
       planet: "चंद्रमा (Moon)",
       mantra: "ॐ गौरीशंकराय नमः (Om Gauri Shankaraye Namah)",
-      purpose: "पति-पत्नी में अटूट प्रेम, शीघ्र विवाह, दांपत्य कलह से मुक्ति एवं निःसंतान दंपतियों को संतान सुख।",
+      purpose: "पति-पत्नी में अटूट प्रेम, शीघ्र विवाह, दांपत्य कलह से मुक्ति एवं पारिवारिक सामंजस्य।",
       rarity: "Very Rare",
+    },
+    {
+      name: "गर्भ-गौरी रुद्राक्ष (Garbh Gauri)",
+      deity: "माँ पार्वती एवं बाल गणेश (Maternal Bond)",
+      planet: "बृहस्पति एवं चंद्रमा (Jupiter & Moon)",
+      mantra: "ॐ गर्भ गौरी शंकराय नमः (Om Garbh Gauri Shankaraye Namah)",
+      purpose: "संतान प्राप्ति में बाधा, सुरक्षित गर्भावस्था, गर्भ रक्षा एवं माता-संतान के मध्य प्रगाढ़ भावनात्मक संबंध।",
+      rarity: "Extremely Rare",
     },
     {
       name: "गणेश रुद्राक्ष (Ganesha Rudraksha)",
@@ -987,89 +995,306 @@ function RudrakshaTab({
         )}
       </div>
 
-      {/* 6. Special Formulations: Sarva-Siddha (1-14 Mukhi) & Indra Mala (1-21 Mukhi) */}
+      {/* 6. Master Malas: Sarva-Siddha (1-14), Maha-Mrityunjay (1-17), Narayani (1-19) & Indra Mala (1-21) */}
       <div className="gem-panel" style={{ background: "linear-gradient(135deg, #FAF7F2 0%, #FFFFFF 100%)", border: "1.5px solid rgba(184, 134, 11, 0.3)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
           <h3 style={{ margin: 0, fontSize: "17px", color: "#1A1A1A", display: "flex", alignItems: "center", gap: "8px" }}>
-            <span>👑</span> महा-संयोजन: सर्व-सिद्ध माला (1-14 मुखी) एवं सर्वोच्च इंद्र माला (1-21 मुखी)
+            <span>👑</span> महा-संयोजन: 4 सर्वोच्च सिद्ध मालाएं (Master Sacred Malas)
           </h3>
           <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", background: "rgba(184, 134, 11, 0.15)", color: "#8A6008" }}>
-            सर्वग्रह शांति एवं अखंड ऐश्वर्य
+            सर्वग्रह शांति, अखंड आरोग्य व ऐश्वर्य
           </span>
         </div>
         <p style={{ fontSize: "13px", color: "#4A4238", lineHeight: 1.6, marginBottom: "14px" }}>
-          वैदिक परंपरा में जब एक से अधिक विशिष्ट मुखी रुद्राक्षों को एक साथ पिरोया जाता है, तो वे एक-दूसरे की ऊर्जा को कई गुना बढ़ा देते हैं। यह कुंडली के समस्त 9 ग्रहों और 14 भुवनों का संपूर्ण सुरक्षा चक्र निर्मित करता है।
+          वैदिक परंपरा में जब एक से अधिक विशिष्ट मुखी रुद्राक्षों को शास्त्रीय क्रम में पिरोया जाता है, तो वे एक-दूसरे की ऊर्जा को कई गुना बढ़ा देते हैं। यह कुंडली के समस्त 9 ग्रहों, 14 भुवनों और जीवन के सभी आयामों का अभेद्य कवच निर्मित करता है।
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px" }}>
           {/* Sarva Siddha Mala */}
           <div style={{ background: "#FFFFFF", padding: "16px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-              <strong style={{ fontSize: "15px", color: "#1A1A1A" }}>सर्व-सिद्ध माला (1 से 14 मुखी)</strong>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "#2563EB", background: "rgba(37, 99, 235, 0.1)", padding: "2px 8px", borderRadius: "6px" }}>14 मुखी + गणेश + गौरी-शंकर</span>
+              <strong style={{ fontSize: "15px", color: "#1A1A1A" }}>1. सर्व-सिद्ध माला (1 से 14 मुखी)</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#2563EB", background: "rgba(37, 99, 235, 0.1)", padding: "2px 8px", borderRadius: "6px" }}>14 मुखी + गौरी-शंकर + गणेश</span>
             </div>
             <div style={{ fontSize: "12.5px", color: "#6B635B", lineHeight: 1.6 }}>
-              • <strong>1 से 9 मुखी:</strong> समस्त नवग्रहों की शांति व अनुकूलता।<br />
-              • <strong>10 से 14 मुखी:</strong> दसों दिशाओं की रक्षा (विष्णु), एकादश रुद्र बल, द्वादश आदित्य तेज, कामदेव आकर्षण व हनुमान/शिव आज्ञा चक्र जागरण।<br />
-              • <strong>प्रभाव:</strong> व्यापार, नेतृत्व, पारिवारिक शांति, शत्रु बाधा मुक्ति और समग्र जीवन उत्थान।
+              • <strong>स्वरूप:</strong> 1 से 14 मुखी पूर्ण स्पेक्ट्रम + गणेश व गौरी-शंकर।<br />
+              • <strong>कार्य:</strong> 9 ग्रहों की शांति, 14 इंद्रियों व भुवनों का संतुलन, व्यापारिक प्रगति, मान-सम्मान व पारिवारिक शांति।
+            </div>
+          </div>
+
+          {/* Maha Mrityunjay Mala */}
+          <div style={{ background: "#FFFFFF", padding: "16px", borderRadius: "12px", border: "1px solid rgba(22, 101, 52, 0.25)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+              <strong style={{ fontSize: "15px", color: "#166534" }}>2. महा-मृत्युंजय माला (1 से 17 मुखी)</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#166534", background: "rgba(22, 101, 52, 0.1)", padding: "2px 8px", borderRadius: "6px" }}>सर्वोच्च आरोग्य व दीर्घायु</span>
+            </div>
+            <div style={{ fontSize: "12.5px", color: "#6B635B", lineHeight: 1.6 }}>
+              • <strong>स्वरूप:</strong> 1 से 17 मुखी + पशुपतिनाथ (15), महामृत्युंजय विजय (16) व कात्यायनी (17)।<br />
+              • <strong>कार्य:</strong> असाध्य व्याधियों, गंभीर रोगों, सर्जरी के भय व अकाल मृत्यु के संकट से रक्षा; संपूर्ण कायाकल्प व जीवनी शक्ति।
+            </div>
+          </div>
+
+          {/* Narayani Mala */}
+          <div style={{ background: "#FFFFFF", padding: "16px", borderRadius: "12px", border: "1px solid rgba(109, 40, 217, 0.25)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+              <strong style={{ fontSize: "15px", color: "#6D28D9" }}>3. नारायणी माला (1 से 19 मुखी)</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#6D28D9", background: "rgba(109, 40, 217, 0.1)", padding: "2px 8px", borderRadius: "6px" }}>नारायण कवच व व्यापारिक विजय</span>
+            </div>
+            <div style={{ fontSize: "12.5px", color: "#6B635B", lineHeight: 1.6 }}>
+              • <strong>स्वरूप:</strong> 1 से 19 मुखी + भूमि देवी (18) व नारायण सहज समृद्धि (19)।<br />
+              • <strong>कार्य:</strong> अचल संपत्ति लाभ, अंतरराष्ट्रीय व्यापार विस्तार, ईर्ष्यालु व प्रतिकूल प्रतिस्पर्धा से रक्षा तथा अखंड वैभव।
             </div>
           </div>
 
           {/* Indra Mala */}
           <div style={{ background: "#FFFFFF", padding: "16px", borderRadius: "12px", border: "1.5px solid rgba(184, 134, 11, 0.4)", boxShadow: "0 2px 10px rgba(184, 134, 11, 0.08)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-              <strong style={{ fontSize: "15px", color: "#8A6008" }}>सर्वोच्च इंद्र माला (1 से 21 मुखी)</strong>
+              <strong style={{ fontSize: "15px", color: "#8A6008" }}>4. सर्वोच्च इंद्र माला (1 से 21 मुखी)</strong>
               <span style={{ fontSize: "11px", fontWeight: 700, color: "#8A6008", background: "rgba(184, 134, 11, 0.18)", padding: "2px 8px", borderRadius: "6px" }}>परम दुर्लभ · 21 मुखी पूर्ण स्पेक्ट्रम</span>
             </div>
             <div style={{ fontSize: "12.5px", color: "#6B635B", lineHeight: 1.6 }}>
-              • <strong>15 से 21 मुखी शक्ति:</strong> पशुपतिनाथ (हृदय चक्र), महामृत्युंजय विजय (16), कात्यायनी अचानक धन (17), भूमि देवी अचल संपत्ति (18), नारायण सहज समृद्धि (19), ब्रह्मा ज्ञान शोध (20), एवं कुबेर अखंड निधि (21)।<br />
-              • <strong>प्रभाव:</strong> शास्त्रों में इसे पृथ्वी का सर्वोच्च भौतिक व आध्यात्मिक रत्न माना गया है। जो साधक इसे धारण या पूजा स्थान में रखता है, उसके कुल में दरिद्रता का नाश होता है।
+              • <strong>स्वरूप:</strong> 1 से 21 मुखी + ब्रह्मा (20) व कुबेर अखंड निधि (21) + त्रिजुटी।<br />
+              • <strong>कार्य:</strong> शास्त्रों में वर्णित पृथ्वी का सर्वोच्च आध्यात्मिक व भौतिक कवच। कुल में दरिद्रता का समूल नाश व अलौकिक राजयोग।
             </div>
           </div>
         </div>
       </div>
 
-      {/* 7. Four Targeted Siddh Kavach Formulations */}
+      {/* 7. Astrological Dosha Nivarak Kavach Sets */}
       <div className="gem-panel">
         <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>🛡️</span> 4 विशेष सिद्ध कवच संयोजन (Targeted Purpose Kavach Sets)
+          <span>🛡️</span> 5 प्रमुख ज्योतिषीय दोष निवारक कवच (Dosha Nivarak Shields)
         </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px" }}>
-          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", fontSize: "14px", marginBottom: "4px" }}>1. स्वास्थ्य व दीर्घायु कवच</strong>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#166534", background: "rgba(22, 101, 52, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>3 मुखी + 5 मुखी + 11 मुखी</span>
+        <p style={{ fontSize: "13px", color: "#4A4238", lineHeight: 1.6, marginBottom: "14px" }}>
+          जब जन्म कुंडली में भारी ग्रह दोष उपस्थित हों, तो केवल एक मनके के स्थान पर इन सिद्ध युगल या त्रिक संयोजनों को धारण करने से दोषों का सौम्य व त्वरित शमन होता है।
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "12px" }}>
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>कालसर्प दोष निवारक कवच</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#DC2626", background: "rgba(220, 38, 38, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>राहु-केतु शमन</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#1D4ED8" }}>8 मुखी + 9 मुखी + 10 मुखी</span>
             <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
-              अग्नि तत्व दोषों का दमन, हृदय व रक्तचाप संतुलन और 11 रुद्रों की सुरक्षा से अकाल भय व रोगों से रक्षा।
+              विघ्नहर्ता गणेश (8), नवदुर्गा शक्ति (9) एवं भगवान विष्णु का 10 दिशाओं का चक्र (10)—राहु-केतु के सर्प पाश, आकस्मिक नुकसान व मानसिक भय को शांत करता है।
             </p>
           </div>
 
-          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", fontSize: "14px", marginBottom: "4px" }}>2. लक्ष्मी-कुबेर व्यापार पोटली</strong>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#B8860B", background: "rgba(184, 134, 11, 0.12)", padding: "2px 6px", borderRadius: "4px" }}>7 + 8 + 12 + 13 मुखी</span>
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>शनि साढ़े साती / ढैय्या कवच</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#4338CA", background: "rgba(67, 56, 202, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>शनि पीड़ा निवारक</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#1D4ED8" }}>7 मुखी + 14 मुखी (देवमणि)</span>
             <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
-              महालक्ष्मी धन, गणेश विघ्ननाश, 12 आदित्य अधिकार व कामदेव आकर्षण—व्यापारियों व कॉरपोरेट लीडर्स हेतु सिद्ध।
+              महालक्ष्मी कृपा (7) एवं हनुमान / रुद्र स्वरूप देवमणि (14)—शनि देव की कठोर दृष्टि, मुकदमों, साढ़े साती व ढैय्या के कष्टों को निष्प्रभावी कर प्रगति देता है।
             </p>
           </div>
 
-          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", fontSize: "14px", marginBottom: "4px" }}>3. सरस्वती विद्या व एकाग्रता कवच</strong>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#1D4ED8", background: "rgba(37, 99, 235, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>4 मुखी + 6 मुखी</span>
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>मांगलिक (कुज) दोष शांति कवच</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#B91C1C", background: "rgba(185, 28, 28, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>वैवाहिक शांति</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#1D4ED8" }}>3 मुखी + 11 मुखी</span>
             <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
-              ब्रह्मा की मेधा शक्ति और कार्तिकेय की वाकपटुता—विद्यार्थियों, वक्ताओं, लेखकों और शोधार्थियों की स्मरण शक्ति बढ़ाता है।
+              अग्नि देव (3) द्वारा मंगल के उग्र तत्व का शोधन एवं एकादश रुद्र (11) का सुरक्षा चक्र—विवाह में विलंब, आपसी कलह व रक्त विकारों का शमन करता है।
             </p>
           </div>
 
-          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", fontSize: "14px", marginBottom: "4px" }}>4. इंट्यूशन व आध्यात्मिक मोक्ष कवच</strong>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#6D28D9", background: "rgba(109, 40, 217, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>1 मुखी + 9 मुखी + 14 मुखी</span>
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>गुरु चांडाल दोष निवारक कवच</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#D97706", background: "rgba(217, 119, 6, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>विवेक व ज्ञान शुद्धि</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#1D4ED8" }}>5 मुखी + 8 मुखी + 11 मुखी</span>
             <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
-              शिव आत्मज्ञान, माँ दुर्गा शक्ति कवच और देव मणि आज्ञा चक्र—साधकों में पूर्वाभास (Intuition) और ध्यान जाग्रत करता है।
+              बृहस्पति का ज्ञान (5), गणेश जी का विघ्ननाश (8) एवं एकादश रुद्र (11)—गुरु-राहु युति से होने वाले गलत निर्णयों, धोखे व भटकाव से बुद्धि की रक्षा करता है।
+            </p>
+          </div>
+
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>पितृ दोष शांति कवच</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#047857", background: "rgba(4, 120, 87, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>वंश व संतान रक्षा</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#1D4ED8" }}>10 मुखी + 12 मुखी</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              भगवान विष्णु (10) की मोक्ष शक्ति एवं द्वादश आदित्य (12) का तेज—पूर्वजों की आत्मा को तृप्ति देकर वंश वृद्धि की रुकावटों व पारिवारिक अशांति को समाप्त करता है।
             </p>
           </div>
         </div>
       </div>
 
-      {/* 8. Practical Buyer Science: Nepal vs Java, X-Ray Authenticity & Metal Capping */}
+      {/* 8. Classical Targeted Bandhs */}
+      <div className="gem-panel">
+        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>🔗</span> क्लासिकल बंध संयोजन (Targeted Classical Bandhs)
+        </h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "12px" }}>
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>स्वास्थ्य बंध (Swasthya Bandh)</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#166534", background: "rgba(22, 101, 52, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>आरोग्य व ओज</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#166534" }}>3 मुखी + 5 मुखी</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              अग्नि देव एवं कालाग्नि रुद्र का सामंजस्य। शरीर में रक्त संचार, मधुमेह नियंत्रण, रक्तचाप संतुलन और अवसाद व थकान से स्थायी राहत।
+            </p>
+          </div>
+
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>सरस्वती बंध (Saraswati Bandh)</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", background: "rgba(37, 99, 235, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>विद्या व मेधा</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#1D4ED8" }}>4 मुखी + 6 मुखी</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              ब्रह्म देव एवं कार्तिकेय स्वरूप। एकाग्रता, तीव्र स्मरण शक्ति, तार्किक बुद्धि, वाकपटुता तथा प्रतियोगी परीक्षाओं में सफलता।
+            </p>
+          </div>
+
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>गणेश-लक्ष्मी बंध (Ganesh-Lakshmi)</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#B8860B", background: "rgba(184, 134, 11, 0.15)", padding: "2px 6px", borderRadius: "4px" }}>स्थिर धन लाभ</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#B8860B" }}>7 मुखी + 8 मुखी</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              माता महालक्ष्मी एवं विघ्नहर्ता गणेश। व्यापारिक रुकावटों का अंत, ऋण मुक्ति, रुका हुआ धन वापस आना और नियमित आय के नए स्रोत।
+            </p>
+          </div>
+
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <strong style={{ color: "#B8860B", fontSize: "14px" }}>अनिद्रा व ध्यान वलय (Dhyan Bandh)</strong>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#6D28D9", background: "rgba(109, 40, 217, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>गहरी निद्रा व शांति</span>
+            </div>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#6D28D9" }}>5 मुखी + 11 मुखी</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              अति-सक्रिय नर्वस सिस्टम और मेलाटोनिन असंतुलन को शांत कर गहरी प्राकृतिक नींद लाता है तथा ध्यान में शून्य अवस्था प्राप्त कराता है।
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 9. Scientific Rudraksha Water Therapy Protocol */}
+      <div className="gem-panel" style={{ background: "linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%)", border: "1.5px solid rgba(37, 99, 235, 0.25)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", flexWrap: "wrap", gap: "8px" }}>
+          <h3 style={{ margin: 0, fontSize: "17px", color: "#1A1A1A", display: "flex", alignItems: "center", gap: "8px" }}>
+            <span>💧</span> वैज्ञानिक रुद्राक्ष जल चिकित्सा विधि (Water Therapy Protocol)
+          </h3>
+          <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", background: "rgba(5, 150, 105, 0.15)", color: "#065F46" }}>
+            उषापान चिकित्सा · 100% प्राकृतिक व निरापद
+          </span>
+        </div>
+        <p style={{ fontSize: "13px", color: "#4A4238", lineHeight: 1.6, marginBottom: "14px" }}>
+          प्रयोगशाला परीक्षणों व शोध से प्रमाणित है कि जब रुद्राक्ष के दानों को जल में रखा जाता है, तो इसके प्राकृतिक बायो-इलेक्ट्रोमैग्नेटिक और जीवाणुरोधी घटक जल के आणविक बंध (Molecular Structure) को ऊर्जावान बना देते हैं।
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px" }}>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(37, 99, 235, 0.2)" }}>
+            <strong style={{ color: "#1D4ED8", display: "block", fontSize: "13.5px", marginBottom: "8px" }}>
+              📋 4-चरणीय प्रयोग विधि (Preparation Steps)
+            </strong>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "12.5px", color: "#3A3228", lineHeight: 1.5 }}>
+              <div><strong>1. सामग्री:</strong> 3 दाने शुद्ध 5-मुखी रुद्राक्ष (अच्छी तरह जल से धुले हुए) और 1 गिलास शुद्ध कांच या तांबे का पात्र।</div>
+              <div><strong>2. जल अभिमंत्रण:</strong> रात्रि में सोने से पूर्व इन तीनों दानों को गिलास पानी में डालकर ढक दें।</div>
+              <div><strong>3. उषापान:</strong> प्रातःकाल शौच आदि से निवृत्त होकर, खाली पेट इस जल को धीरे-धीरे घूंट-घूंट करके पिएं।</div>
+              <div><strong>4. देखभाल:</strong> जल पीने के बाद दानों को निकालकर साफ सूती कपड़े से सुखाएं और पुनः शाम को उपयोग करें।</div>
+            </div>
+          </div>
+          <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(5, 150, 105, 0.2)" }}>
+            <strong style={{ color: "#065F46", display: "block", fontSize: "13.5px", marginBottom: "8px" }}>
+              🩺 चिकित्सकीय लाभ (Proven Wellness Benefits)
+            </strong>
+            <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "12.5px", color: "#3A3228", lineHeight: 1.6 }}>
+              <li><strong>रक्तचाप नियंत्रण:</strong> हाई ब्लड प्रेशर और हृदय की धड़कन (palpitations) को बिना किसी साइड इफेक्ट के नियंत्रित करता है।</li>
+              <li><strong>पाचन व एसिडिटी:</strong> आंतों की सूजन, पुरानी कब्ज, गैस और खट्टी डकारों में 21 से 40 दिनों में स्थायी लाभ।</li>
+              <li><strong>रक्त शोधन व त्वचा:</strong> शरीर के विषाक्त पदार्थों (toxins) को बाहर निकालकर मुंहासों व चर्म रोगों में राहत देता है।</li>
+              <li><strong>मस्तिष्क शांति:</strong> नर्वस सिस्टम को शांत कर दिनभर कार्यक्षमता व ताज़गी बनाए रखता है।</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* 10. Hybrid Spiritual Fusion Science */}
+      <div className="gem-panel">
+        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>☯️</span> हाइब्रिड फ्यूजन विज्ञान: स्फटिक, कर्रुंगाली एवं तुलसी (Spiritual Fusion Science)
+        </h3>
+        <p style={{ fontSize: "13px", color: "#4A4238", lineHeight: 1.6, marginBottom: "14px" }}>
+          रुद्राक्ष को अन्य पवित्र प्राकृतिक तत्वों के साथ संयोजित करके शरीर के अग्नि, सोम व पृथ्वी तत्वों का सूक्ष्म संतुलन स्थापित किया जाता है।
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <strong style={{ color: "#B8860B", display: "block", fontSize: "14px", marginBottom: "4px" }}>1. रुद्राक्ष + स्फटिक (Agni-Soma Pitta Balance)</strong>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#0284C7", background: "rgba(2, 132, 199, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>अग्नि (रुद्राक्ष) + सोम (स्फटिक क्वार्ट्ज)</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              रुद्राक्ष की उष्ण वीर्य (गरम) ऊर्जा को स्फटिक की शीतल तरंगे संतुलित करती हैं। जिनका पित्त अधिक है, जिन्हें जल्दी गुस्सा आता है या हाई बीपी रहता है, उनके लिए यह सर्वोत्तम संयोजन है।
+            </p>
+          </div>
+
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <strong style={{ color: "#B8860B", display: "block", fontSize: "14px", marginBottom: "4px" }}>2. रुद्राक्ष + कर्रुंगाली (Black Ebony Wood Shield)</strong>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E293B", background: "rgba(30, 41, 59, 0.12)", padding: "2px 6px", borderRadius: "4px" }}>काला आबनूस काष्ठ कवच</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              दक्षिण भारतीय आगमिक परंपरा में अत्यधिक पूजनीय कर्रुंगाली लकड़ी नकारात्मक ऊर्जा, ईर्ष्या तरंगों और बुरी नजर को तुरंत अवशोषित करती है, जबकि रुद्राक्ष सकारात्मक प्राण-शक्ति का संचार करता है।
+            </p>
+          </div>
+
+          <div style={{ background: "#FAF8F5", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.2)" }}>
+            <strong style={{ color: "#B8860B", display: "block", fontSize: "14px", marginBottom: "4px" }}>3. रुद्राक्ष + तुलसी (Hari-Hara Harmony)</strong>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#15803D", background: "rgba(21, 128, 61, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>शैव + वैष्णव एकात्मता</span>
+            <p style={{ margin: "6px 0 0", fontSize: "12.5px", color: "#4A4238", lineHeight: 1.5 }}>
+              भगवान शिव के रुद्राक्ष और भगवान विष्णु की तुलसी का संगम। यह मानसिक भटकाव, अनिद्रा और चिंताओं को समाप्त कर हृदय में भक्ति, दया व सात्विक शांति भरता है।
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 11. Complete 12 Zodiac Rudraksha Matrix */}
+      <div className="gem-panel" style={{ background: "#FFFFFF" }}>
+        <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>♈</span> संपूर्ण 12 राशि-वार रुद्राक्ष संरेखण तालिका (12 Zodiac Alignment Matrix)
+        </h3>
+        <p style={{ fontSize: "13px", color: "#4A4238", lineHeight: 1.6, marginBottom: "14px" }}>
+          जन्म राशि (चंद्र राशि अथवा लग्न राशि) के अनुसार अनुशंसित मुख्य रुद्राक्ष और सहायक सिद्ध बंध:
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "10px" }}>
+          {[
+            { sign: "मेष (Aries)", planet: "मंगल (Mars)", primary: "3 मुखी", secondary: "11 मुखी", bandh: "स्वास्थ्य बंध (3+5)", focus: "साहस, ऊर्जा नियमन व क्रोध शांति" },
+            { sign: "वृषभ (Taurus)", planet: "शुक्र (Venus)", primary: "6 मुखी", secondary: "7 मुखी", bandh: "सौंदर्य व ऐश्वर्य बंध (6+7)", focus: "विलासिता, संबंध व व्यापारिक आकर्षण" },
+            { sign: "मिथुन (Gemini)", planet: "बुध (Mercury)", primary: "4 मुखी", secondary: "10 मुखी", bandh: "सरस्वती बंध (4+6)", focus: "वाणी चातुर्य, बुद्धि व तंत्रिका संतुलन" },
+            { sign: "कर्क (Cancer)", planet: "चंद्र (Moon)", primary: "2 मुखी", secondary: "गौरी-शंकर", bandh: "चित्त शांति बंध (2+5)", focus: "मानसिक स्थिरता, दांपत्य प्रेम व शांति" },
+            { sign: "सिंह (Leo)", planet: "सूर्य (Sun)", primary: "1 मुखी / 12 मुखी", secondary: "3 मुखी", bandh: "सूर्य-आदित्य बंध (1+12)", focus: "प्रशासनिक नेतृत्व, ओज व सम्मान" },
+            { sign: "कन्या (Virgo)", planet: "बुध (Mercury)", primary: "4 मुखी", secondary: "8 मुखी", bandh: "सरस्वती बंध (4+6)", focus: "तार्किक मेधा, निर्णय शक्ति व स्वास्थ्य" },
+            { sign: "तुला (Libra)", planet: "शुक्र (Venus)", primary: "6 मुखी", secondary: "13 मुखी", bandh: "लक्ष्मी-गणेश बंध (7+8)", focus: "सौहार्द, वित्तीय संतुलन व आकर्षण" },
+            { sign: "वृश्चिक (Scorpio)", planet: "मंगल (Mars)", primary: "3 मुखी", secondary: "14 मुखी", bandh: "रुद्र-वीर बंध (3+11)", focus: "अंतर्ज्ञान, सुरक्षा व अदम्य साहस" },
+            { sign: "धनु (Sagittarius)", planet: "बृहस्पति (Jupiter)", primary: "5 मुखी", secondary: "11 मुखी", bandh: "गुरु-कृपा बंध (5+11)", focus: "उच्च ज्ञान, धर्म, दर्शन व भाग्य" },
+            { sign: "मकर (Capricorn)", planet: "शनि (Saturn)", primary: "7 मुखी", secondary: "14 मुखी", bandh: "शनि-शमन बंध (7+14)", focus: "साढ़े साती शांति, कर्म सिद्धि व स्थायित्व" },
+            { sign: "कुंभ (Aquarius)", planet: "शनि (Saturn)", primary: "7 मुखी", secondary: "14 मुखी", bandh: "लक्ष्मी-कुबेर बंध (7+8)", focus: "नवीन शोध, वित्तीय सुरक्षा व न्याय" },
+            { sign: "मीन (Pisces)", planet: "बृहस्पति (Jupiter)", primary: "5 मुखी", secondary: "9 मुखी", bandh: "मोक्ष-विद्या बंध (5+9)", focus: "आध्यात्मिक मोक्ष, ध्यान व भय मुक्ति" },
+          ].map((z, idx) => (
+            <div key={idx} style={{ background: "#FAF8F5", border: "1px solid rgba(184, 134, 11, 0.18)", borderRadius: "10px", padding: "10px 12px", fontSize: "12.5px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3px" }}>
+                <strong style={{ color: "#1A1A1A", fontSize: "13px" }}>{z.sign}</strong>
+                <span style={{ fontSize: "10.5px", fontWeight: 700, color: "#8A6008", background: "rgba(184, 134, 11, 0.12)", padding: "1px 6px", borderRadius: "4px" }}>{z.planet}</span>
+              </div>
+              <div style={{ color: "#B8860B", fontWeight: 700, marginBottom: "2px" }}>
+                मुख्य: {z.primary} · सहायक: {z.secondary}
+              </div>
+              <div style={{ color: "#1D4ED8", fontSize: "11.5px", marginBottom: "2px" }}>
+                अनुशंसित बंध: {z.bandh}
+              </div>
+              <div style={{ color: "#5A5248", fontSize: "11.5px" }}>
+                {z.focus}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 12. Practical Buyer Science: Nepal vs Java, X-Ray Authenticity & Metal Capping */}
       <div className="gem-panel" style={{ background: "#FFFFFF" }}>
         <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
           <span>🔬</span> वैज्ञानिक परीक्षण, उत्पत्ति भेद (नेपाल बनाम जावा) एवं धातु गुंथन
@@ -1103,31 +1328,29 @@ function RudrakshaTab({
         </div>
       </div>
 
-      {/* 9. Vedic Mala Calculator & Sacred Rules */}
+      {/* 13. Meridian Pulse Science, Meru Bead & Sacred Rules */}
       <div className="gem-panel" style={{ background: "#FAF8F5" }}>
         <h3 style={{ fontSize: "17px", color: "#1A1A1A", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>📿</span> वैदिक माला निर्धारण, गुंथन नियम एवं जप विज्ञान
+          <span>📿</span> नाड़ी स्पर्श विज्ञान (Meridian Science), मेरु दाना एवं जप विधान
         </h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px", fontSize: "13px", color: "#4A4238", lineHeight: 1.6 }}>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>1. दानों की संख्या का शास्त्रीय फल</strong>
-            • <strong>108 दाने:</strong> पूर्ण सर्वकामना सिद्धि व मोक्ष<br />
-            • <strong>30 दाने:</strong> केवल धन-संपत्ति वृद्धि हेतु विशेष जप<br />
-            • <strong>27 दाने:</strong> उत्तम स्वास्थ्य, पुष्टि व दीर्घायु<br />
-            • <strong>32 दाने:</strong> गले में धारण कर नीलकंठ स्वरूप सुरक्षा
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>1. कलाई ब्रेसलेट बनाम कंठ माला</strong>
+            • <strong>कलाई पल्स मेरिडियन:</strong> कलाई की रेडियल धमनी पर स्पर्श से अचानक होने वाली घबराहट (Panic Attacks), हाथ के कंपन व चिंता में तुरंत स्थिरता आती है।<br />
+            • <strong>कंठ माला:</strong> वेगस नर्व और थायरॉयड ग्रंथि को बायो-इलेक्ट्रिक संकेत देकर हृदय गति व हार्मोनल संतुलन बनाती है।
           </div>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>2. गुंथन का दिव्य नियम (Stringing)</strong>
-            <em>"मुखं मुखेन संयोज्य पुच्छं पुच्छेन योजयेत्"</em> — रुद्राक्ष को पिरोते समय मुख से मुख और पूंछ से पूंछ मिलनी चाहिए। सुमेरु का मुख ऊपर हो और दाईं ओर चांदी तथा बाईं ओर तांबे की कैप शुभ है।
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>2. मेरु / गुरु दाने का शास्त्रीय नियम</strong>
+            माला में 108 दानों के ऊपर का 109वां मनका 'मेरु' (Guru Bead) कहलाता है। <strong>जप करते समय मेरु को कभी लांघा नहीं जाता</strong>; 108 जप पूर्ण होने पर माला को उंगलियों से घुमाकर उल्टी दिशा में जप पुनः प्रारंभ किया जाता है।
           </div>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>3. जप में अंगुलियों का गुप्त रहस्य</strong>
-            अंगूठा मोक्ष देता है और <strong>मध्यमा अंगुली धन व ऐश्वर्य देती है</strong>। अनामिका शांति देती है। <strong>तर्जनी (इंडेक्स फिंगर) का स्पर्श वर्जित है</strong> — इससे जप का पुण्य समाप्त हो जाता है।
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>3. गुंथन व अंगुलियों का गुप्त रहस्य</strong>
+            <em>"मुखं मुखेन संयोज्य पुच्छं पुच्छेन योजयेत्"</em> — मुख से मुख और पूंछ से पूंछ मिले। जप में अंगूठा मोक्ष और <strong>मध्यमा अंगुली धन व ऐश्वर्य देती है</strong>। <strong>तर्जनी (इंडेक्स फिंगर) का स्पर्श वर्जित है</strong>।
           </div>
           <div style={{ background: "#FFFFFF", padding: "14px", borderRadius: "12px", border: "1px solid rgba(184, 134, 11, 0.18)" }}>
-            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>4. आयुर्वेदिक घरेलू कल्प (Chikitsa)</strong>
-            • <strong>हाई बीपी/हृदय:</strong> 5 मुखी रुद्राक्ष मिट्टी के पात्र में रातभर भिगोकर सुबह बासी मुंह 40 दिन पिएं।<br />
-            • <strong>कफ/दमा:</strong> रुद्राक्ष को पत्थर पर घिसकर शहद के साथ चटाएं।
+            <strong style={{ color: "#B8860B", display: "block", marginBottom: "4px" }}>4. प्राण-प्रतिष्ठा का शुभ मुहूर्त</strong>
+            • <strong>सर्वोत्तम समय:</strong> सोमवार, शुक्ल पक्ष पूर्णिमा, महाशिवरात्रि अथवा प्रदोष काल।<br />
+            • <strong>विधि:</strong> पंचामृत व गंगाजल अभिषेक के बाद 'ॐ नमः शिवाय' अथवा विशिष्ट मुखी बीज मंत्र का 108 बार उच्चारण कर धारण करें।
           </div>
         </div>
       </div>
