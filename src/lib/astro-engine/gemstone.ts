@@ -142,6 +142,12 @@ export interface DashaGemRecommendation {
     weight: string;
   };
   reason: string;
+  isMaraka?: boolean;
+  isPureMaraka?: boolean;
+  isGemstoneBlocked?: boolean;
+  blockedReason?: string;
+  marakaWarning?: string;
+  safeAlternative?: string;
 }
 
 const SIGNS: ZodiacSign[] = [
@@ -173,6 +179,83 @@ export const SIGN_RULERS: Record<ZodiacSign, Planet> = {
   Aquarius: "Saturn",
   Pisces: "Jupiter",
 };
+
+export interface MarakaStatusResult {
+  isMaraka: boolean;
+  isPureMaraka: boolean;
+  housesRuled: number[];
+  isGemstoneBlocked: boolean;
+  protectionReason?: string;
+  blockedReason?: string;
+  marakaWarning?: string;
+  safeAlternative: string;
+}
+
+export const PLANET_RULED_SIGNS: Partial<Record<Exclude<Planet, "Ascendant">, ZodiacSign[]>> = {
+  Sun: ["Leo"],
+  Moon: ["Cancer"],
+  Mars: ["Aries", "Scorpio"],
+  Mercury: ["Gemini", "Virgo"],
+  Jupiter: ["Sagittarius", "Pisces"],
+  Venus: ["Taurus", "Libra"],
+  Saturn: ["Capricorn", "Aquarius"],
+};
+
+export function evaluateMarakaStatus(
+  lagna: ZodiacSign,
+  planet: Exclude<Planet, "Ascendant">,
+  planetPos?: PlanetPosition
+): MarakaStatusResult {
+  const lagnaIdx = SIGNS.indexOf(lagna);
+  const ruledSigns = PLANET_RULED_SIGNS[planet] ?? [];
+
+  const housesRuled: number[] = ruledSigns.map((sign) => {
+    const signIdx = SIGNS.indexOf(sign);
+    return ((signIdx - lagnaIdx + 12) % 12) + 1;
+  });
+
+  const rulesMarakaHouse = housesRuled.includes(2) || housesRuled.includes(7);
+  const placedInMarakaHouse = planetPos ? (planetPos.house === 2 || planetPos.house === 7) : false;
+  const isMaraka = rulesMarakaHouse || placedInMarakaHouse;
+
+  // Protection Check: Rules Lagna (1) or Trine (5, 9)
+  const rulesLagna = housesRuled.includes(1);
+  const rulesTrikona = housesRuled.includes(5) || housesRuled.includes(9);
+  const isProtected = rulesLagna || rulesTrikona;
+
+  const isPureMaraka = rulesMarakaHouse && !isProtected;
+  const isGemstoneBlocked = isPureMaraka;
+
+  let protectionReason: string | undefined;
+  if (rulesMarakaHouse && isProtected) {
+    if (rulesLagna) {
+      protectionReason = `यह ग्रह मारक भाव के साथ लग्नेश (भाव 1) भी है, अतः मारक दोष शांत रहता है।`;
+    } else {
+      protectionReason = `यह ग्रह मारक भाव के साथ त्रिकोण भाव (भाव 5/9) का स्वामी भी है, अतः शुभ त्रिकोण संरक्षण प्राप्त है।`;
+    }
+  }
+
+  let blockedReason: string | undefined;
+  let marakaWarning: string | undefined;
+
+  if (isGemstoneBlocked) {
+    blockedReason = `मारक दशा सुरक्षा नियम: ${planet} इस लग्न हेतु मारक भाव (भाव ${housesRuled.join("/")}) का स्वामी है। मारक दशा के दौरान इस ग्रह का रत्न धारण करना वर्जित है क्योंकि यह मारक रश्मियों को उत्तेजित कर सकता है।`;
+    marakaWarning = `⚠️ मारक दशा सुरक्षा नियम: ${planet} मारक भाव का स्वामी है। इस सक्रिय दशा में इसका रत्न धारण करना निषेध है। सुरक्षा कवच के रूप में सात्विक रुद्राक्ष धारण करें।`;
+  } else if (placedInMarakaHouse && !isProtected) {
+    marakaWarning = `⚠️ भाव स्थिति चेतावनी: ${planet} मारक भाव (भाव ${planetPos?.house}) में स्थित है। रत्न धारण से पूर्व विशेष सावधानी बरतें।`;
+  }
+
+  return {
+    isMaraka,
+    isPureMaraka,
+    housesRuled,
+    isGemstoneBlocked,
+    protectionReason,
+    blockedReason,
+    marakaWarning,
+    safeAlternative: "रत्न के स्थान पर सात्विक रुद्राक्ष कवच, महामृत्युंजय जप अथवा दान का आश्रय लें।",
+  };
+}
 
 export const PLANET_GEMSTONES: Record<
   Planet,
@@ -1687,6 +1770,33 @@ export function generateGemstoneReport(chart: NatalChart, rawInput?: unknown): G
     }
   }
 
+  // Classical Maraka Safety Protocol: Check pure maraka planets
+  for (const planet of Object.keys(PLANET_GEMSTONES) as Exclude<Planet, "Ascendant">[]) {
+    const marakaAudit = evaluateMarakaStatus(lagna, planet, chart.planets.find((p) => p.planet === planet));
+    if (marakaAudit.isPureMaraka) {
+      const alreadyAvoided = avoidGemstones.some((a) => a.planet === planet);
+      if (!alreadyAvoided) {
+        avoidGemstones.push({
+          gemstone: PLANET_GEMSTONES[planet].primary,
+          planet,
+          reason: `मारक भाव सुरक्षा नियम: ${planet} इस लग्न हेतु मारक भाव (भाव ${marakaAudit.housesRuled.join("/")}) का स्वामी है। बिना विशेष परीक्षण के इसका रत्न धारण न करें।`,
+        });
+      }
+      if (primaryGemstone.planet === planet) {
+        primaryGemstone.cautions.unshift(
+          `⚠️ मारक दशा सुरक्षा चेतावनी: ${planet} इस लग्न हेतु मारक भाव का स्वामी है। मारक दशा के दौरान इसका रत्न धारण करने से बचें।`
+        );
+      }
+      for (const sec of secondaryGemstones) {
+        if (sec.planet === planet) {
+          sec.cautions.unshift(
+            `⚠️ मारक दशा सुरक्षा चेतावनी: ${planet} इस लग्न हेतु मारक भाव का स्वामी है। मारक दशा के दौरान इसका रत्न धारण करने से बचें।`
+          );
+        }
+      }
+    }
+  }
+
   // Lagna lord placement
   const lagnaLordPosition = chart.planets.find((planet) => planet.planet === lagnaLord);
   if (lagnaLordPosition && [1, 4, 5, 9, 10].includes(lagnaLordPosition.house)) {
@@ -1726,6 +1836,16 @@ export function generateGemstoneReport(chart: NatalChart, rawInput?: unknown): G
   }
 
   const currentDasha = readGemstoneDasha(rawInput);
+  const activeMDPlanet = findActiveDashaPlanet(rawInput, "dashas");
+  if (activeMDPlanet) {
+    const mdAudit = evaluateMarakaStatus(lagna, activeMDPlanet, chart.planets.find((p) => p.planet === activeMDPlanet));
+    if (mdAudit.isGemstoneBlocked) {
+      analysisNotes.push(
+        `⚠️ मारक दशा सुरक्षा चेतावनी: वर्तमान महादशा स्वामी (${activeMDPlanet}) आपकी कुंडली में मारक भाव का स्वामी है। इस सक्रिय अवधि में ${PLANET_GEMSTONES[activeMDPlanet].primary} रत्न धारण करना वर्जित है। सात्विक रुद्राक्ष शील्ड अथवा जप का आश्रय लें।`
+      );
+    }
+  }
+
   const dashaNote =
     currentDasha && currentDasha !== "Not connected"
       ? `Current dasha active: ${currentDasha}. Gemstone suitability must be cross-checked against the active dasha lord and period before wearing.`
@@ -1829,6 +1949,11 @@ function makeDashaRecommendation(
   const gem = PLANET_GEMSTONES[planet];
   const wear = PLANET_WEARING[planet];
   const pos = chart.planets.find((p) => p.planet === planet);
+  const marakaAudit = evaluateMarakaStatus(chart.ascendant, planet, pos);
+
+  const baseReason = marakaAudit.isGemstoneBlocked
+    ? `मारक दशा सुरक्षा नियम: ${planet} सक्रिय ${level} स्वामी है और इस लग्न हेतु मारक भाव (भाव ${marakaAudit.housesRuled.join("/")}) का स्वामी है। मारक दशा के दौरान इसका रत्न धारण करना वर्जित है क्योंकि यह शारीरिक व मानसिक शांति के प्रतिकूल हो सकता है। इसके स्थान पर सात्विक रुद्राक्ष शील्ड या जप करें।`
+    : `${planet} is the active ${level} lord. ${getHouseRelevanceLine(pos)} Strengthening this planet through its gemstone or rudraksha may support the themes of this dasha period.`;
 
   return {
     level,
@@ -1837,7 +1962,13 @@ function makeDashaRecommendation(
     alternateGemstone: gem.alternate,
     rudraksha: makeRudrakshaRecommendation(planet, pos),
     wearing: wear,
-    reason: `${planet} is the active ${level} lord. ${getHouseRelevanceLine(pos)} Strengthening this planet through its gemstone or rudraksha may support the themes of this dasha period.`,
+    reason: baseReason,
+    isMaraka: marakaAudit.isMaraka,
+    isPureMaraka: marakaAudit.isPureMaraka,
+    isGemstoneBlocked: marakaAudit.isGemstoneBlocked,
+    blockedReason: marakaAudit.blockedReason,
+    marakaWarning: marakaAudit.marakaWarning,
+    safeAlternative: marakaAudit.safeAlternative,
   };
 }
 

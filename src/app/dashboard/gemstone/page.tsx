@@ -22,6 +22,7 @@ import {
   getAllRudrakshas,
   findRudrakshaForProblem,
   getRudrakshaData,
+  evaluateMarakaStatus,
   type RudrakshaData,
 } from "@/lib/astro-engine/gemstone";
 import { EngineStateCard } from "@/components/engine-state-card";
@@ -251,13 +252,31 @@ function WearingTab({ gem }: { gem: GemstoneReportItem }) {
   );
 }
 
-function DashaTab({ gem }: { gem: GemstoneReportItem }) {
+function DashaTab({ gem, input }: { gem: GemstoneReportItem; input: GemstoneMedicalInput | null }) {
+  const mdPlanet = input?.dasha?.mahadasha;
+  const asc = input?.ascendant;
+  const marakaAudit = (asc && mdPlanet && VALID_PLANETS.has(mdPlanet))
+    ? evaluateMarakaStatus(asc as any, mdPlanet as any)
+    : null;
+
   return (
-    <div className="gem-grid-two">
-      <TextSection title="Dasha Timing Interpretation" body={gem.dashaTimingInterpretation} />
-      <div className="gem-panel">
-        <h3>PDF Summary</h3>
-        <p style={{ whiteSpace: "pre-wrap" }}>{gem.pdfReadyParagraph}</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {marakaAudit?.isGemstoneBlocked && (
+        <div style={{ background: "rgba(239, 68, 68, 0.08)", border: "1.5px solid rgba(239, 68, 68, 0.35)", borderRadius: "12px", padding: "16px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#DC2626", fontWeight: 700, fontSize: "16px", marginBottom: "6px" }}>
+            <span>⚠️</span> मारक दशा सुरक्षा नियम (Gemstone Blocked)
+          </div>
+          <p style={{ margin: 0, fontSize: "13.5px", color: "#4A4238", lineHeight: 1.6 }}>
+            वर्तमान महादशा स्वामी (<strong>{mdPlanet}</strong>) आपकी कुंडली में मारक भाव (भाव {marakaAudit.housesRuled.join("/")}) का स्वामी है। वैदिक मारक सुरक्षा नियम के अनुसार इस दशा के दौरान इसका रत्न धारण करना वर्जित है, क्योंकि यह मारक रश्मियों को उत्तेजित कर सकता है। इसके स्थान पर केवल सात्विक रुद्राक्ष, महामृत्युंजय जप अथवा दान का आश्रय लें।
+          </p>
+        </div>
+      )}
+      <div className="gem-grid-two">
+        <TextSection title="Dasha Timing Interpretation" body={gem.dashaTimingInterpretation} />
+        <div className="gem-panel">
+          <h3>PDF Summary</h3>
+          <p style={{ whiteSpace: "pre-wrap" }}>{gem.pdfReadyParagraph}</p>
+        </div>
       </div>
     </div>
   );
@@ -473,8 +492,16 @@ function RudrakshaTab({
   const primaryRudraksha = RUDRAKSHA_CATALOG[primary.planet] ?? RUDRAKSHA_CATALOG.Mercury;
   const mdPlanet = input?.dasha?.mahadasha;
   const adPlanet = input?.dasha?.antardasha;
+  const asc = input?.ascendant;
   const mdRudraksha = mdPlanet ? RUDRAKSHA_CATALOG[mdPlanet] : null;
   const adRudraksha = adPlanet ? RUDRAKSHA_CATALOG[adPlanet] : null;
+
+  const mdMaraka = (asc && mdPlanet && VALID_PLANETS.has(mdPlanet))
+    ? evaluateMarakaStatus(asc as any, mdPlanet as any)
+    : null;
+  const adMaraka = (asc && adPlanet && VALID_PLANETS.has(adPlanet))
+    ? evaluateMarakaStatus(asc as any, adPlanet as any)
+    : null;
 
   // State for Problem Solver search & Category filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -569,7 +596,7 @@ function RudrakshaTab({
           </h2>
         </div>
         <p style={{ margin: 0, fontSize: "14px", color: "#4A4238", lineHeight: 1.7 }}>
-          शास्त्रों (शिव महापुराण, स्कन्द पुराण, देवी भागवत) के अनुसार रुद्राक्ष भगवान शिव के अश्रुओं से उत्पन्न साक्षात पराशक्ति है। <strong>रत्नों के विपरीत, रुद्राक्ष का कोई भी नकारात्मक या प्रतिकूल प्रभाव (Side Effect) कभी नहीं होता।</strong> यह किसी भी अवस्था में केवल सकारात्मक सात्विक ऊर्जा, मानसिक शांति और प्राण-शक्ति प्रदान करता है।
+          प्रामाणिक वैदिक परंपरा के अनुसार रुद्राक्ष भगवान शिव के अश्रुओं से उत्पन्न साक्षात पराशक्ति है। <strong>रत्नों के विपरीत, रुद्राक्ष का कोई भी नकारात्मक या प्रतिकूल प्रभाव (Side Effect) कभी नहीं होता।</strong> यह किसी भी अवस्था में केवल सकारात्मक सात्विक ऊर्जा, मानसिक शांति और प्राण-शक्ति प्रदान करता है।
         </p>
       </div>
 
@@ -648,24 +675,33 @@ function RudrakshaTab({
 
         {/* Active Mahadasha Rudraksha */}
         {mdRudraksha && (
-          <div className="gem-panel" style={{ borderLeft: "4px solid #2563EB" }}>
+          <div className="gem-panel" style={{ borderLeft: `4px solid ${mdMaraka?.isGemstoneBlocked ? "#DC2626" : "#2563EB"}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
               <div>
-                <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: "#2563EB", fontWeight: 700 }}>
-                  सक्रिय महादशा कवच · Dasha Shield
+                <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: mdMaraka?.isGemstoneBlocked ? "#DC2626" : "#2563EB", fontWeight: 700 }}>
+                  {mdMaraka?.isGemstoneBlocked ? "🛡️ मारक सुरक्षा कवच · Maraka Shield" : "सक्रिय महादशा कवच · Dasha Shield"}
                 </span>
                 <h3 style={{ margin: "4px 0 0", fontSize: "18px", color: "#1A1A1A" }}>
                   {mdRudraksha.mukhi}
                 </h3>
               </div>
-              <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: "rgba(37, 99, 235, 0.12)", color: "#1D4ED8" }}>
+              <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: mdMaraka?.isGemstoneBlocked ? "rgba(220, 38, 38, 0.12)" : "rgba(37, 99, 235, 0.12)", color: mdMaraka?.isGemstoneBlocked ? "#DC2626" : "#1D4ED8" }}>
                 महादशा: {mdPlanet}
               </span>
             </div>
 
+            {mdMaraka?.isGemstoneBlocked && (
+              <div style={{ background: "rgba(220, 38, 38, 0.08)", border: "1px solid rgba(220, 38, 38, 0.25)", borderRadius: "8px", padding: "8px 12px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontSize: "15px" }}>⚠️</span>
+                <span style={{ fontSize: "12px", color: "#B91C1C", fontWeight: 700 }}>
+                  मारक दशा सुरक्षा नियम: रत्न वर्जित · केवल सात्विक रुद्राक्ष धारण करें
+                </span>
+              </div>
+            )}
+
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13.5px", color: "#3A3228", lineHeight: 1.6 }}>
               <div><strong>अधिष्ठाता देवता:</strong> {mdRudraksha.deity}</div>
-              <div><strong>सिद्ध बीज मंत्र:</strong> <code style={{ background: "#FAF7F2", padding: "2px 6px", borderRadius: "6px", color: "#1D4ED8", fontWeight: 700 }}>{mdRudraksha.mantra}</code></div>
+              <div><strong>सिद्ध बीज मंत्र:</strong> <code style={{ background: "#FAF7F2", padding: "2px 6px", borderRadius: "6px", color: mdMaraka?.isGemstoneBlocked ? "#DC2626" : "#1D4ED8", fontWeight: 700 }}>{mdRudraksha.mantra}</code></div>
               <div><strong>धारण धातु / धागा:</strong> {mdRudraksha.metal}</div>
               <div style={{ marginTop: "4px", borderTop: "1px solid rgba(37, 99, 235, 0.15)", paddingTop: "8px" }}>
                 <strong>दशा प्रभाव:</strong> {mdRudraksha.relevance}
@@ -676,24 +712,33 @@ function RudrakshaTab({
 
         {/* Active Antardasha Rudraksha */}
         {adRudraksha && adPlanet !== mdPlanet && adPlanet !== primary.planet && (
-          <div className="gem-panel" style={{ borderLeft: "4px solid #059669" }}>
+          <div className="gem-panel" style={{ borderLeft: `4px solid ${adMaraka?.isGemstoneBlocked ? "#DC2626" : "#059669"}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
               <div>
-                <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: "#059669", fontWeight: 700 }}>
-                  अंतर्दशा संतुलन रुद्राक्ष · Antardasha Harmony
+                <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: adMaraka?.isGemstoneBlocked ? "#DC2626" : "#059669", fontWeight: 700 }}>
+                  {adMaraka?.isGemstoneBlocked ? "🛡️ मारक सुरक्षा कवच · Maraka Shield" : "अंतर्दशा संतुलन रुद्राक्ष · Antardasha Harmony"}
                 </span>
                 <h3 style={{ margin: "4px 0 0", fontSize: "18px", color: "#1A1A1A" }}>
                   {adRudraksha.mukhi}
                 </h3>
               </div>
-              <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: "rgba(5, 150, 105, 0.12)", color: "#059669" }}>
+              <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: adMaraka?.isGemstoneBlocked ? "rgba(220, 38, 38, 0.12)" : "rgba(5, 150, 105, 0.12)", color: adMaraka?.isGemstoneBlocked ? "#DC2626" : "#059669" }}>
                 अंतर्दशा: {adPlanet}
               </span>
             </div>
 
+            {adMaraka?.isGemstoneBlocked && (
+              <div style={{ background: "rgba(220, 38, 38, 0.08)", border: "1px solid rgba(220, 38, 38, 0.25)", borderRadius: "8px", padding: "8px 12px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontSize: "15px" }}>⚠️</span>
+                <span style={{ fontSize: "12px", color: "#B91C1C", fontWeight: 700 }}>
+                  मारक दशा सुरक्षा नियम: रत्न वर्जित · केवल सात्विक रुद्राक्ष धारण करें
+                </span>
+              </div>
+            )}
+
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13.5px", color: "#3A3228", lineHeight: 1.6 }}>
               <div><strong>अधिष्ठाता देवता:</strong> {adRudraksha.deity}</div>
-              <div><strong>सिद्ध बीज मंत्र:</strong> <code style={{ background: "#FAF7F2", padding: "2px 6px", borderRadius: "6px", color: "#059669", fontWeight: 700 }}>{adRudraksha.mantra}</code></div>
+              <div><strong>सिद्ध बीज मंत्र:</strong> <code style={{ background: "#FAF7F2", padding: "2px 6px", borderRadius: "6px", color: adMaraka?.isGemstoneBlocked ? "#DC2626" : "#059669", fontWeight: 700 }}>{adRudraksha.mantra}</code></div>
               <div><strong>धारण धातु / धागा:</strong> {adRudraksha.metal}</div>
               <div style={{ marginTop: "4px", borderTop: "1px solid rgba(5, 150, 105, 0.15)", paddingTop: "8px" }}>
                 <strong>शांतिकारी प्रभाव:</strong> {adRudraksha.benefits}
@@ -1117,7 +1162,7 @@ function GemstonePageContent() {
       <section className="gem-content">
         {activeTab === "analysis"  && <AnalysisTab gem={primary} />}
         {activeTab === "wearing"   && <WearingTab gem={primary} />}
-        {activeTab === "dasha"     && <DashaTab gem={primary} />}
+        {activeTab === "dasha"     && <DashaTab gem={primary} input={input} />}
         {activeTab === "secondary" && <SecondaryTab report={report} />}
         {activeTab === "avoid"     && <AvoidTab report={report} />}
         {activeTab === "medical"   && <MedicalTab report={report} />}

@@ -2399,6 +2399,11 @@ export async function generateLegacyPDFReport(
         b.bullet(`Active ${dr.level} Shield (${dr.planet}): ${dr.rudraksha.mukhi} (${dr.rudraksha.bead})`);
         b.keyValue("  Deity & Mantra", `${dr.rudraksha.rulingDeity} | ${dr.rudraksha.mantra}`, 4);
         b.keyValue("  Wearing Guide", `${dr.rudraksha.wearing.metal} on ${dr.rudraksha.wearing.day} (${dr.rudraksha.wearing.position})`, 4);
+        if (dr.isGemstoneBlocked) {
+          b.pdf.setFontSize(8); b.pdf.setTextColor(180, 40, 40);
+          b.pdf.text(`  [MARAKA DASHA SAFETY ALERT]: Gemstone is restricted during this active period. Wear ${dr.rudraksha.mukhi} Rudraksha shield instead.`, b.margin + 8, b.y);
+          b.y += 5; b.black();
+        }
         if (dr.reason) { b.pdf.setFontSize(8); b.gray(); b.pdf.text(`  Purpose: ${dr.reason}`, b.margin + 8, b.y); b.y += 5; b.black(); }
       });
     }
@@ -2407,7 +2412,7 @@ export async function generateLegacyPDFReport(
     b.spacer(3);
     b.checkPage(18);
     b.pdf.setFontSize(8.5); b.gold(); b.pdf.setFont("helvetica", "bold");
-    b.pdf.text("Shastrik Mala & Japa Rules (Skanda Purana & Devi Bhagavata):", b.margin, b.y); b.y += 5;
+    b.pdf.text("Sacred Vedic Mala & Japa Rules:", b.margin, b.y); b.y += 5;
     b.pdf.setFont("helvetica", "normal"); b.black();
     b.bullet("Mala Count: 108 beads for all desires/moksha, 27 beads for health & longevity, 30 beads for wealth & abundance.", 4);
     b.bullet("Stringing Rule: String bead mouth-to-mouth and tail-to-tail ('Mukham Mukhena Samyojya').", 4);
