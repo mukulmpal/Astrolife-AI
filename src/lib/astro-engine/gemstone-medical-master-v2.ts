@@ -510,9 +510,17 @@ function roleScore(ascendant: Sign, planet: Planet): ScoreComponent {
     reasons.push(`${planet} owns the 12th house, so its gemstone may increase loss, isolation, sleep disturbance, expenses or withdrawal unless spiritually required.`);
   }
 
-  if (owned.includes(2) || owned.includes(7)) {
-    points -= 5;
-    reasons.push(`${planet} has maraka-house involvement, so the gemstone must be judged carefully and not recommended blindly.`);
+  const isMarakaLord = owned.includes(2) || owned.includes(7);
+  const isProtectedMaraka = owned.includes(1) || owned.includes(5) || owned.includes(9);
+
+  if (isMarakaLord) {
+    if (isProtectedMaraka) {
+      points -= 4;
+      reasons.push(`${planet} owns a maraka house (house ${owned.filter((h) => h === 2 || h === 7).join("/")}), but also owns a lagna or trikona house, softening the maraka affliction.`);
+    } else {
+      points -= 22;
+      reasons.push(`${planet} is a primary Maraka lord (ruling house ${owned.filter((h) => h === 2 || h === 7).join("/")}) without lagna/trikona protection. Direct gemstone strengthening carries risks of amplifying maraka energy.`);
+    }
   }
 
   return {
@@ -529,22 +537,33 @@ function getDashaRelevance(input: GemstoneMedicalInput, planet: Planet): ScoreCo
   const ad = input.dasha?.antardasha;
   const pd = input.dasha?.pratyantardasha;
 
+  const owned = getHousesOwnedByPlanet(input.ascendant, planet);
+  const isMarakaLord = owned.includes(2) || owned.includes(7);
+  const isProtectedMaraka = owned.includes(1) || owned.includes(5) || owned.includes(9);
+  const isPureMaraka = isMarakaLord && !isProtectedMaraka;
+
   let points = 0;
   const parts: string[] = [];
 
-  if (md === planet) {
-    points += 12;
-    parts.push(`${planet} is the current Mahadasha lord, so its karma is strongly active in the native's present life period.`);
-  }
+  // Maraka Dasha Safety Protocol: If running dasha of pure maraka lord, prohibit gemstone and apply penalty
+  if (isPureMaraka && (md === planet || ad === planet)) {
+    points -= 25;
+    parts.push(`⚠️ मारक दशा सुरक्षा नियम: ${planet} वर्तमान सक्रिय ${md === planet ? "महादशा" : "अंतर्दशा"} स्वामी है और मारक भाव (भाव ${owned.filter((h) => h === 2 || h === 7).join("/")}) का स्वामी है। मारक दशा के दौरान इस ग्रह का रत्न धारण करना वर्जित है क्योंकि यह मारक रश्मियों को उत्तेजित कर सकता है। इसके स्थान पर केवल सात्विक रुद्राक्ष, महामृत्युंजय जप अथवा दान का आश्रय लें।`);
+  } else {
+    if (md === planet) {
+      points += 12;
+      parts.push(`${planet} is the current Mahadasha lord, so its karma is strongly active in the native's present life period.`);
+    }
 
-  if (ad === planet) {
-    points += 8;
-    parts.push(`${planet} is the current Antardasha lord, making its results more visible in current decisions, events and emotional experience.`);
-  }
+    if (ad === planet) {
+      points += 8;
+      parts.push(`${planet} is the current Antardasha lord, making its results more visible in current decisions, events and emotional experience.`);
+    }
 
-  if (pd === planet) {
-    points += 4;
-    parts.push(`${planet} is also active at Pratyantardasha level, giving short-term relevance.`);
+    if (pd === planet) {
+      points += 4;
+      parts.push(`${planet} is also active at Pratyantardasha level, giving short-term relevance.`);
+    }
   }
 
   return {
@@ -681,6 +700,19 @@ function buildScoringNarrative(p: PlanetInput, components: ScoreComponent[], sco
 
 function buildWhyRecommended(input: GemstoneMedicalInput, p: PlanetInput, score: number, status: GemStatus): string {
   const gem = GEM_KNOWLEDGE[p.planet];
+  const owned = getHousesOwnedByPlanet(input.ascendant, p.planet);
+  const isMarakaLord = owned.includes(2) || owned.includes(7);
+  const isProtectedMaraka = owned.includes(1) || owned.includes(5) || owned.includes(9);
+  const isPureMaraka = isMarakaLord && !isProtectedMaraka;
+  const isRunningMarakaDasha = isPureMaraka && (input.dasha?.mahadasha === p.planet || input.dasha?.antardasha === p.planet);
+
+  if (isRunningMarakaDasha) {
+    return paragraphJoin([
+      `⚠️ मारक दशा सुरक्षा नियम: ${gem.gemstone} (${p.planet}) वर्तमान में सख्त निषेध (Avoid) श्रेणी में रखा गया है।`,
+      `आपकी कुंडली (${input.ascendant} लग्न) में ${p.planet} मारक भाव (भाव ${owned.filter((h) => h === 2 || h === 7).join("/")}) का स्वामी है। वर्तमान में इसकी सक्रिय दशा चलने के कारण इसका रत्न धारण करना वर्जित है, क्योंकि यह मारक रश्मियों (स्वास्थ्य, तनाव व जीवन-ऊर्जा क्षय) को उत्तेजित कर सकता है।`,
+      `शास्त्रीय सुरक्षा विकल्प: रत्न पहनने के स्थान पर केवल सात्विक रुद्राक्ष कवच धारण करें अथवा महामृत्युंजय मंत्र जप का आश्रय लें।`,
+    ]);
+  }
 
   if (status === "avoid") {
     return paragraphJoin([
@@ -796,8 +828,17 @@ function buildAlternativeRemedies(p: PlanetInput): string {
   ]);
 }
 
-function buildCaution(p: PlanetInput, status: GemStatus): string {
+function buildCaution(input: GemstoneMedicalInput, p: PlanetInput, status: GemStatus): string {
   const gem = GEM_KNOWLEDGE[p.planet];
+  const owned = getHousesOwnedByPlanet(input.ascendant, p.planet);
+  const isMarakaLord = owned.includes(2) || owned.includes(7);
+  const isProtectedMaraka = owned.includes(1) || owned.includes(5) || owned.includes(9);
+  const isPureMaraka = isMarakaLord && !isProtectedMaraka;
+  const isRunningMarakaDasha = isPureMaraka && (input.dasha?.mahadasha === p.planet || input.dasha?.antardasha === p.planet);
+
+  if (isRunningMarakaDasha) {
+    return `⚠️ मारक दशा निषेध: ${p.planet} मारक भाव (भाव ${owned.filter((h) => h === 2 || h === 7).join("/")}) का स्वामी है और वर्तमान दशा में इसका रत्न धारण करना वर्जित है। रत्न के स्थान पर सात्विक रुद्राक्ष अथवा जप करें।`;
+  }
 
   if (status === "avoid") {
     return paragraphJoin([
@@ -828,12 +869,31 @@ function buildPdfParagraph(item: { p: PlanetInput; score: number; status: GemSta
 
 function buildGemstoneReportItem(input: GemstoneMedicalInput, planetInput: PlanetInput): GemstoneReportItem {
   const components = scorePlanet(input, planetInput);
-  const score = totalScore(components);
-  const status = statusFromScore(score);
+  let score = totalScore(components);
+  let status = statusFromScore(score);
   const gem = GEM_KNOWLEDGE[planetInput.planet];
+
+  // Maraka Dasha Hard Guard
+  const owned = getHousesOwnedByPlanet(input.ascendant, planetInput.planet);
+  const isMarakaLord = owned.includes(2) || owned.includes(7);
+  const isProtectedMaraka = owned.includes(1) || owned.includes(5) || owned.includes(9);
+  const isPureMaraka = isMarakaLord && !isProtectedMaraka;
+  const isRunningMarakaDasha = isPureMaraka && (input.dasha?.mahadasha === planetInput.planet || input.dasha?.antardasha === planetInput.planet);
+
+  if (isRunningMarakaDasha) {
+    status = "avoid";
+    score = Math.min(score, 32);
+  } else if (isPureMaraka && (status === "highly_recommended" || status === "recommended" || status === "supportive")) {
+    status = "use_carefully";
+    score = Math.min(score, 52);
+  }
 
   const why = buildWhyRecommended(input, planetInput, score, status);
   const benefits = buildExpectedBenefits(planetInput, status);
+
+  const verdictLabel = isRunningMarakaDasha
+    ? "Avoid (Maraka Dasha Blocked)"
+    : statusLabel(status);
 
   return {
     planet: planetInput.planet,
@@ -846,8 +906,10 @@ function buildGemstoneReportItem(input: GemstoneMedicalInput, planetInput: Plane
     confidence: score,
     scoreComponents: components,
 
-    verdictTitle: `${gem.gemstone} for ${planetInput.planet}: ${statusLabel(status)}`,
-    shortVerdict: `${gem.gemstone} is classified as ${statusLabel(status)} with ${score}/100 confidence.`,
+    verdictTitle: `${gem.gemstone} for ${planetInput.planet}: ${verdictLabel}`,
+    shortVerdict: isRunningMarakaDasha
+      ? `⚠️ ${gem.gemstone} is in Avoid category due to active Maraka Dasha (rules house ${owned.filter((h) => h === 2 || h === 7).join("/")}). Gemstone is strictly prohibited.`
+      : `${gem.gemstone} is classified as ${statusLabel(status)} with ${score}/100 confidence.`,
 
     scoringExplanation: buildScoringNarrative(planetInput, components, score),
     whyAstroLifeRecommendsIt: why,
@@ -856,7 +918,7 @@ function buildGemstoneReportItem(input: GemstoneMedicalInput, planetInput: Plane
     healthAndPsychologyConnection: buildHealthConnection(planetInput),
     dashaTimingInterpretation: buildDashaTiming(input, planetInput, status),
     wearingGuidance: buildWearingGuidance(planetInput, status),
-    cautionOrAvoidance: buildCaution(planetInput, status),
+    cautionOrAvoidance: buildCaution(input, planetInput, status),
     alternativeRemedies: buildAlternativeRemedies(planetInput),
 
     pdfReadyParagraph: buildPdfParagraph({ p: planetInput, score, status, why, benefits }),
