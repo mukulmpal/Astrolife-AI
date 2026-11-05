@@ -5,22 +5,34 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import { fail, isRecord, ok, readJsonWithLimit, validationErrorResponse, type ValidationResult } from "@/lib/validation/api";
-
-const razorpay = new Razorpay({
-  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_placeholder",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "rzp_placeholder_secret",
-});
+import { monitor } from "@/lib/server-monitoring";
 
 type CreateOrderBody = { plan: keyof typeof PAID_PLANS };
 
 function validateCreateOrderBody(value: unknown): ValidationResult<CreateOrderBody> {
   if (!isRecord(value)) return fail("Payment payload must be an object.");
-  if (!isPaidPlan(value.plan)) return fail("Invalid plan.");
-  return ok({ plan: value.plan });
+  const plan = (value as Record<string, unknown>).plan;
+  if (!isPaidPlan(plan)) return fail("Invalid plan.");
+  return ok({ plan });
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret || keyId === "rzp_placeholder") {
+      monitor.error("payment.gateway_not_configured", new Error("Missing Razorpay credentials"));
+      return NextResponse.json(
+        { error: "Payment gateway is not configured yet. Please configure Razorpay keys." },
+        { status: 503 }
+      );
+    }
+
+    const razorpay = new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret,
+    });
     const limit = checkRateLimit(req, { scope: "payment-create-order", limit: 10, windowMs: 15 * 60_000 });
     if (!limit.allowed) return rateLimitResponse(limit.resetAt);
 
@@ -58,7 +70,11 @@ export async function POST(req: NextRequest) {
         raw_payload: order,
       });
     } catch (error) {
-      console.warn("Payment create log skipped:", error);
+      monitor.error("payment.create_order_insert_failed", error, {
+        userId: user.id,
+        orderId: order.id,
+        plan,
+      });
     }
 
     return NextResponse.json({
@@ -67,11 +83,11 @@ export async function POST(req: NextRequest) {
       currency: planData.currency,
       name: planData.name,
       description: planData.description,
-      keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      keyId: keyId,
     });
 
   } catch (error) {
-    console.error("Create order error:", error);
+    monitor.error("payment.create_order_failed", error);
     return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   }
 }

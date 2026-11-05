@@ -457,7 +457,15 @@ function DashboardContent() {
     // If we auto-built a chart from URL params, persist it to the account
     // (logged-in users) and strip the params so a refresh stays clean.
     if (autoChart) {
-      saveChartToAccount(autoChart, { replacePrimary: true }).catch(() => {});
+      saveChartToAccount(autoChart, { replacePrimary: true })
+        .then((res) => {
+          if (!res?.ok && res?.error) {
+            console.warn("Auto-save primary chart notice:", res.error);
+          }
+        })
+        .catch((err) => {
+          console.error("Auto-save primary chart error:", err);
+        });
       if (typeof window !== "undefined" && window.location.search) {
         window.history.replaceState(null, "", "/dashboard");
       }

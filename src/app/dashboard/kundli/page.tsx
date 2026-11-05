@@ -438,12 +438,19 @@ export default function KundliPage() {
       setShowForm(false);
       setIsNewChartModalOpen(false);
       setShowLibrary(false);
-      void saveChartToAccount(data, { replacePrimary: true });
+      try {
+        await saveChartToAccount(data, { replacePrimary: true });
+      } catch (saveErr) {
+        setSaveStatus("Notice: Chart displayed locally, but cloud sync was skipped.");
+        console.warn("Auto-save chart to account failed:", saveErr);
+      }
       await fetch("/api/charts/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: form.name, dob: form.dob, tob: form.tob, city: form.city, lat: form.lat, lon: form.lon }),
-      }).catch(() => {});
+      }).catch((trackErr) => {
+        console.warn("Chart tracking non-critical log skipped:", trackErr);
+      });
     } catch (e) {
       console.error(e);
     }

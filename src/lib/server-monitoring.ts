@@ -18,8 +18,51 @@ function cleanContext(context: LogContext = {}) {
   );
 }
 
+export interface DiagnosticEntry {
+  id: string;
+  level: LogLevel;
+  event: string;
+  service: string;
+  environment: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+const RING_BUFFER_SIZE = 250;
+const memoryDiagnosticSheet: DiagnosticEntry[] = [];
+
+async function recordToDiagnosticSheet(payload: DiagnosticEntry) {
+  memoryDiagnosticSheet.unshift(payload);
+  if (memoryDiagnosticSheet.length > RING_BUFFER_SIZE) {
+    memoryDiagnosticSheet.pop();
+  }
+
+  if (typeof window === "undefined") {
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
+      const logDir = path.join(process.cwd(), ".logs");
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+      }
+      fs.appendFileSync(
+        path.join(logDir, "diagnostic-sheet.jsonl"),
+        JSON.stringify(payload) + "\n",
+        "utf8"
+      );
+    } catch {
+      // Serverless or read-only filesystem graceful bypass
+    }
+  }
+}
+
+export function getDiagnosticSheetEntries(limit = 100): DiagnosticEntry[] {
+  return memoryDiagnosticSheet.slice(0, limit);
+}
+
 function emit(level: LogLevel, event: string, context: LogContext = {}) {
-  const payload = {
+  const payload: DiagnosticEntry = {
+    id: `diag_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     level,
     event,
     service: "astrolife-ai",
@@ -28,6 +71,8 @@ function emit(level: LogLevel, event: string, context: LogContext = {}) {
     timestamp: new Date().toISOString(),
     ...cleanContext(context),
   };
+
+  recordToDiagnosticSheet(payload);
 
   const line = JSON.stringify(payload);
   const webhookUrl = process.env.MONITORING_WEBHOOK_URL;
