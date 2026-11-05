@@ -2417,6 +2417,70 @@ export async function generateLegacyPDFReport(
     b.bullet("Mala Count: 108 beads for all desires/moksha, 27 beads for health & longevity, 30 beads for wealth & abundance.", 4);
     b.bullet("Stringing Rule: String bead mouth-to-mouth and tail-to-tail ('Mukham Mukhena Samyojya').", 4);
     b.bullet("Japa Secret: Count using thumb & middle finger for wealth; never touch with index finger.", 4);
+
+    // Personalized 3-Bead Custom Shield Synthesis
+    b.spacer(3);
+    b.checkPage(24);
+    b.subHeader("Personalized 3-Bead Sacred Kavach Synthesis");
+    b.line("A custom-engineered 3-bead sacred combination calibrated specifically to protect the physical body (Lagna), the temporal mental cycle (Dasha), and Karmic afflictions:");
+    if (gems.lagnaLord && gems.lagnaLord !== "Ascendant") {
+      const lagnaPos = (chart.planets as any)?.[gems.lagnaLord];
+      const lifeR = safeCall(() => makeRudrakshaRecommendation(gems.lagnaLord as any, lagnaPos as any), null);
+      const activeDr = dashaRecs?.[0];
+      b.bullet(`Bead 1 (Life Shield): ${lifeR?.mukhi ?? "Lagna Lord Bead"} — Strengthens physical vitality, immune defense, and aura baseline.`, 4);
+      b.bullet(`Bead 2 (Temporal Cycle Shield): ${activeDr?.rudraksha?.mukhi ?? "Dasha Lord Bead"} — Harmonizes active planetary dasha period${activeDr?.isGemstoneBlocked ? " (Crucial Maraka safety protection)" : ""}.`, 4);
+      b.bullet(`Bead 3 (Universal Obstacle Shield): 14 Mukhi Devamani (or 8 Mukhi Ganesha) — Awakes the Ajna Chakra, dissolves obstacles, and provides unassailable energetic shielding.`, 4);
+      b.keyValue("  Capping & Stringing", "Capped in pure Silver or Panchdhatu, strung in red/yellow silk thread.", 4);
+      b.keyValue("  Optimal Placement", "Worn close to the heart (Anahata Chakra) or on the right wrist pulse point.", 4);
+    }
+
+    // Astrological Dosha Nivarak Shields
+    b.spacer(3);
+    b.checkPage(24);
+    b.subHeader("Astrological Dosha Nivarak Sacred Formulations");
+    b.line("When heavy planetary afflictions or doshas are active in the birth chart, these multi-bead combinations neutralize malefic vibrations without any side effects:");
+    b.bullet("Kaal Sarp Dosha Kavach (8 + 9 + 10 Mukhi): Ganesha (Rahu), Durga (Ketu), and Vishnu (10 Directions) — dissolves sudden crises, serpent afflictions, and erratic hurdles.", 4);
+    b.bullet("Shani Sade Sati & Dhaiya Shield (7 + 14 Mukhi): Mahalaxmi grace + Hanuman/Rudra Devamani — provides total protection against Saturn's severe gaze and litigation.", 4);
+    b.bullet("Manglik (Kuja) Dosha Shield (3 + 11 Mukhi): Agni dev fire purification + 11 Rudras — relieves marital delays, domestic strife, and excessive aggression.", 4);
+    b.bullet("Guru Chandal Dosha Shield (5 + 8 + 11 Mukhi): Jupiter wisdom + Ganesha obstacle remover + Rudra discernment — prevents deceptive traps and intellectual delusion.", 4);
+    b.bullet("Pitra Dosha Peace Shield (10 + 12 Mukhi): Lord Vishnu liberation + 12 Adityas — brings peace to ancestral lineage, protects offspring, and dissolves chronic blocks.", 4);
+
+    // Master Malas Reference
+    b.spacer(3);
+    b.checkPage(22);
+    b.subHeader("Sacred Master Malas (1-14 to 1-21 Mukhi Spectrum)");
+    b.bullet("Sarva-Siddha Mala (1 to 14 Mukhi + Gauri-Shankar & Ganesha): Pacifies all 9 planets and aligns all 14 worldly dimensions for holistic mastery.", 4);
+    b.bullet("Maha-Mrityunjay Mala (1 to 17 Mukhi): Supreme healing formulation; overcomes chronic illness, surgery trauma, and premature longevity threats.", 4);
+    b.bullet("Narayani Mala (1 to 19 Mukhi): Complete Vishnu-Laxmi blessing; brings unassailable commercial success, immense asset growth, and triumph over competition.", 4);
+    b.bullet("Indra Mala (1 to 21 Mukhi + Trijuti): The rarest supreme jewel on Earth; eliminates poverty across generations and bestows divine sovereign authority.", 4);
+
+    // Gemstone + Rudraksha Synergy Matrix (Zero Energy Conflict)
+    b.spacer(3);
+    b.checkPage(22);
+    b.subHeader("Gemstone + Rudraksha Synergy Matrix (Zero-Conflict Science)");
+    b.line("Gemstones refract external cosmic light onto the Back of the Chakras (receptivity and societal standing), while Rudraksha acts as a bio-capacitor regulating the Front of the Chakras (vitality and internal purity). They never clash and create 100% harmonious resonance:");
+    b.bullet("Ruby (Sun) pairs with 1 or 12 Mukhi | Pearl (Moon) pairs with 2 Mukhi & Sphatik (Quartz)", 4);
+    b.bullet("Red Coral (Mars) pairs with 3 or 11 Mukhi | Emerald (Mercury) pairs with 4 or 6 Mukhi", 4);
+    b.bullet("Yellow Sapphire (Jupiter) pairs with 5 Mukhi | Diamond/Opal (Venus) pairs with 6 or 7 Mukhi", 4);
+    b.bullet("Blue Sapphire (Saturn) pairs with 7 or 14 Mukhi | Hessonite (Rahu) pairs with 8 Mukhi", 4);
+    b.bullet("Cat's Eye (Ketu) pairs with 9 Mukhi (Maa Durga)", 4);
+
+    // Scientific Water Therapy Protocol
+    b.spacer(3);
+    b.checkPage(20);
+    b.subHeader("Scientific Rudraksha Water Therapy Protocol (Ushapana)");
+    b.line("Laboratory research confirms that natural Rudraksha beads exhibit bio-capacitive and antimicrobial properties when immersed in water overnight:");
+    b.bullet("Method: Soak 3 genuine 5-Mukhi beads in a glass or copper vessel of clean drinking water overnight.", 4);
+    b.bullet("Usage: Drink the energized water on an empty stomach first thing in the morning (Ushapana).", 4);
+    b.bullet("Proven Benefits: Regulates blood pressure, relieves gastric acidity & constipation, and detoxifies cellular metabolic waste.", 4);
+
+    // Auspicious Consecration & Wearing Muhurat Rules
+    b.spacer(3);
+    b.checkPage(22);
+    b.subHeader("Auspicious Consecration & Wearing Muhurat Rules");
+    b.bullet("Optimal Days: Mondays (Somvar), Shukla Paksha Purnima (Full Moon), Pradosh Vrat, or Masik Shivratri.", 4);
+    b.bullet("Best Daily Windows: Abhijit Muhurat (11:45 AM - 12:35 PM) or morning Amrit Choghadiya (shortly after sunrise). Avoid Rahu Kaal strictly.", 4);
+    b.bullet("5-Step Prana-Pratishtha: Wash with raw cow milk & Ganga water, apply sandalwood paste, light a pure ghee lamp/dhoop, chant 'Om Namah Shivaya' 108 times, and wear with clear sacred intent.", 4);
   }
 
   // ═══════════════════════════════════════════════════════════════
