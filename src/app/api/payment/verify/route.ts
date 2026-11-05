@@ -61,14 +61,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Login required" }, { status: 401 });
     }
 
-    // Verify signature
+    // Verify signature safely using constant-time comparison (prevents timing attacks)
+    const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!razorpaySecret) {
+      console.error("RAZORPAY_KEY_SECRET is not configured on the server");
+      return NextResponse.json({ error: "Payment verification service misconfigured" }, { status: 500 });
+    }
+
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
+      .createHmac("sha256", razorpaySecret)
       .update(body)
       .digest("hex");
 
-    if (expectedSignature !== razorpay_signature) {
+    const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+    const receivedBuffer = Buffer.from(razorpay_signature, "utf8");
+
+    if (
+      expectedBuffer.length !== receivedBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+    ) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 

@@ -210,9 +210,9 @@ function ensureCompleteResponse(rawText: string): string {
 }
 
 const GEMINI_MODELS = [
-  "gemini-3.8-flash",
   "gemini-2.5-flash",
-  "gemini-flash-latest",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash",
   "gemini-2.5-flash-lite",
 ];
 
@@ -225,10 +225,13 @@ async function callGemini(system: string, messages: { role: string; content: str
   for (const apiKey of apiKeys) {
     for (const model of GEMINI_MODELS) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
         const res = await fetchWithTimeout(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: system }] },
             contents: messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),

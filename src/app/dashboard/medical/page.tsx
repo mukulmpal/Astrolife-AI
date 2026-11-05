@@ -192,11 +192,11 @@ export default function MedicalPage() {
     return scanFamilyMemberHealth(chart, effectiveMember, effectiveTargetDate);
   }, [chart, hasUserChart, hasAdvancedAccess, effectiveMember, effectiveTargetDate]);
 
-  // Compute future health windows for selected member from target date
+  // Compute future health windows for selected member lazily only when on the timeline tab
   const futureWindows = useMemo(() => {
-    if (!chart || !hasUserChart || !hasAdvancedAccess) return [];
+    if (!chart || !hasUserChart || !hasAdvancedAccess || activeTab !== "timeline") return [];
     return scanFutureHealthWindows(chart, effectiveMember, 180, effectiveTargetDate);
-  }, [chart, hasUserChart, hasAdvancedAccess, effectiveMember, effectiveTargetDate]);
+  }, [chart, hasUserChart, hasAdvancedAccess, effectiveMember, effectiveTargetDate, activeTab]);
 
   // Ensure active tab is valid for the user's tier
   useEffect(() => {
@@ -219,7 +219,7 @@ export default function MedicalPage() {
   return (
     <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "28px 20px 110px", color: "#1A1A1A" }}>
       <style>{`
-        .med-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.25); border-radius: 16px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,0.03); }
+        .med-card { background: #FFFFFF; border: 1px solid rgba(184, 134, 11, 0.25); border-radius: 16px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,0.03); content-visibility: auto; contain-intrinsic-size: 1px 250px; }
         .med-card-header { padding: 18px 22px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 15.5px; }
         .med-card-body { padding: 0 22px 22px; border-top: 1px solid rgba(184, 134, 11, 0.12); padding-top: 18px; }
         .med-section { margin-bottom: 18px; }

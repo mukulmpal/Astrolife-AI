@@ -109,14 +109,22 @@ export async function GET(request: NextRequest) {
         return a.name.localeCompare(b.name);
       });
 
-      // Limit search-only queries to top 60 to prevent payload bloat
-      if (!country && !category) {
-        filtered = filtered.slice(0, 60);
+      // Sort alphabetically if not search-ranked
+      if (!search) {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
       }
     }
 
+    // Enforce safety limit and optional pagination across all queries to prevent memory bloat
+    const limitParam = parseInt(searchParams.get("limit") || "60", 10);
+    const safeLimit = Math.min(Math.max(isNaN(limitParam) ? 60 : limitParam, 1), 100);
+    const offsetParam = parseInt(searchParams.get("offset") || "0", 10);
+    const safeOffset = Math.max(isNaN(offsetParam) ? 0 : offsetParam, 0);
+
+    const paginated = filtered.slice(safeOffset, safeOffset + safeLimit);
+
     return NextResponse.json(
-      { ok: true, data: filtered },
+      { ok: true, data: paginated, total: filtered.length, limit: safeLimit, offset: safeOffset },
       {
         headers: {
           "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=1800",

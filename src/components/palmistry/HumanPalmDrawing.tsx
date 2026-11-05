@@ -243,6 +243,7 @@ export function HumanPalmDrawing({
         style={{
           transform: mirror ? "scaleX(-1)" : "none",
           transformOrigin: "center center",
+          willChange: "transform",
         }}
       >
         <defs>
