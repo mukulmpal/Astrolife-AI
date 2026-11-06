@@ -111,13 +111,13 @@ export function NavigationProgress() {
     const handleCustomStart = () => startLoading();
     const handleCustomStop = () => stopLoading();
 
-    document.addEventListener("pointerdown", handleNavigationTrigger, { capture: true });
+    // Only listen to authentic click events — NEVER pointerdown/touchstart,
+    // which fire instantly on thumb drag/scroll and cause false loading popups on mobile!
     document.addEventListener("click", handleNavigationTrigger, { capture: true });
     window.addEventListener("astrolife:loading:start", handleCustomStart);
     window.addEventListener("astrolife:loading:stop", handleCustomStop);
 
     return () => {
-      document.removeEventListener("pointerdown", handleNavigationTrigger, { capture: true });
       document.removeEventListener("click", handleNavigationTrigger, { capture: true });
       window.removeEventListener("astrolife:loading:start", handleCustomStart);
       window.removeEventListener("astrolife:loading:stop", handleCustomStop);

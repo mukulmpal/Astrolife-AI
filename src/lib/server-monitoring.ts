@@ -19,20 +19,26 @@ function cleanContext(context: LogContext = {}) {
 }
 
 export interface DiagnosticEntry {
-  id: string;
-  level: LogLevel;
-  event: string;
-  service: string;
-  environment: string;
-  timestamp: string;
-  [key: string]: unknown;
+  readonly id: string;
+  readonly level: LogLevel;
+  readonly event: string;
+  readonly service: string;
+  readonly environment: string;
+  readonly timestamp: string;
+  readonly deploymentUrl?: string;
+  readonly errorName?: string;
+  readonly errorMessage?: string;
+  readonly errorStack?: string;
+  readonly route?: string;
+  readonly userId?: string;
+  readonly [key: string]: unknown;
 }
 
 const RING_BUFFER_SIZE = 250;
 const memoryDiagnosticSheet: DiagnosticEntry[] = [];
 
 async function recordToDiagnosticSheet(payload: DiagnosticEntry) {
-  memoryDiagnosticSheet.unshift(payload);
+  memoryDiagnosticSheet.unshift(Object.freeze({ ...payload }));
   if (memoryDiagnosticSheet.length > RING_BUFFER_SIZE) {
     memoryDiagnosticSheet.pop();
   }
@@ -56,8 +62,8 @@ async function recordToDiagnosticSheet(payload: DiagnosticEntry) {
   }
 }
 
-export function getDiagnosticSheetEntries(limit = 100): DiagnosticEntry[] {
-  return memoryDiagnosticSheet.slice(0, limit);
+export function getDiagnosticSheetEntries(limit = 100): readonly DiagnosticEntry[] {
+  return Object.freeze(memoryDiagnosticSheet.slice(0, limit).map((e) => Object.freeze({ ...e })));
 }
 
 function emit(level: LogLevel, event: string, context: LogContext = {}) {

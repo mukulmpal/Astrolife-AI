@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message: "Payment already verified",
-        plan: String(alreadyPaid.plan),
+        plan: (alreadyPaid.plan as keyof typeof PAID_PLANS) || plan,
       });
     }
 

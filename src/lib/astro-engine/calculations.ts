@@ -90,39 +90,48 @@ export interface DashaEntry {
 }
 
 // ── Constants ─────────────────────────────────────────────────
-export const RASHIS = [
+export const RASHIS = Object.freeze([
   'Aries','Taurus','Gemini','Cancer','Leo','Virgo',
   'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'
-];
+] as const);
 
-export const RASHIS_SA = [
+export type RashiName = (typeof RASHIS)[number];
+export type RashiIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+export type HouseNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+export const VEDIC_PLANETS = Object.freeze([
+  'Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'
+] as const);
+export type VedicPlanet = (typeof VEDIC_PLANETS)[number];
+
+export const RASHIS_SA = Object.freeze([
   'Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya',
   'Tula','Vrishchika','Dhanu','Makara','Kumbha','Meena'
-];
+] as const);
 
-export const RASHI_ICONS = [
+export const RASHI_ICONS = Object.freeze([
   '♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'
-];
+] as const);
 
-export const NAK = [
+export const NAK = Object.freeze([
   'Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra',
   'Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni',
   'Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha',
   'Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha',
   'Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'
-];
+] as const);
 
-export const NLRD = [
+export const NLRD = Object.freeze([
   'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
   'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
   'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'
-];
+] as const);
 
 // Dasha order + years
-export const DO = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
-export const DY: Record<string, number> = {
+export const DO = Object.freeze(['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'] as const);
+export const DY: Readonly<Record<string, number>> = Object.freeze({
   Ketu:7, Venus:20, Sun:6, Moon:10, Mars:7, Rahu:18, Jupiter:16, Saturn:19, Mercury:17
-};
+});
 
 // ── Math Helpers ──────────────────────────────────────────────
 const _r = (d: number) => d * Math.PI / 180;
@@ -432,7 +441,8 @@ export function buildDashaSeq(moonLon: number, dob: string, tob: string): DashaE
   for (let i = 0; i < 9; i++) {
     const pi     = md(lIdx + i, 9);
     const planet = DO[pi];
-    const yrs    = i === 0 ? remFrac * DY[planet] : DY[planet];
+    const planetYrs = DY[planet] ?? 0;
+    const yrs    = i === 0 ? remFrac * planetYrs : planetYrs;
     const end    = new Date(cursor.getTime() + yrs * 365.25 * 24 * 3600 * 1000);
     seq.push({
       planet,
@@ -455,7 +465,8 @@ export function buildAntarDasha(md_planet: string, mdStart: Date, mdYrs: number)
   for (let i = 0; i < 9; i++) {
     const pi  = md(mi + i, 9);
     const p   = DO[pi];
-    const yrs = mdYrs * DY[p] / 120;
+    const pYrs = DY[p] ?? 0;
+    const yrs = (mdYrs * pYrs) / 120;
     const end = new Date(cur.getTime() + yrs * 365.25 * 24 * 3600 * 1000);
     seq.push({
       planet: p,
