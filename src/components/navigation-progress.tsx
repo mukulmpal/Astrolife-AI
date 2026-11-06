@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 /**
  * NavigationProgress — Sleek 3px Golden Progress Bar
  * Non-intrusive, luxury top bar that indicates authentic page transitions.
+ * NEVER intercepts touch or click events.
  * NEVER blocks scrolling, never pops up intrusive full-screen modals.
  */
 export function NavigationProgress() {
@@ -15,10 +16,11 @@ export function NavigationProgress() {
   const [progress, setProgress] = useState(0);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialMount = useRef(true);
 
   const startLoading = useCallback(() => {
     setLoading(true);
-    setProgress(15);
+    setProgress(20);
 
     if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
@@ -26,17 +28,17 @@ export function NavigationProgress() {
     // Smoothly advance the top progress bar
     progressTimerRef.current = setInterval(() => {
       setProgress((prev) => {
-        if (prev < 40) return prev + 15;
-        if (prev < 70) return prev + 8;
-        if (prev < 92) return prev + 3;
+        if (prev < 50) return prev + 15;
+        if (prev < 80) return prev + 8;
+        if (prev < 95) return prev + 2;
         return prev;
       });
-    }, 130);
+    }, 120);
 
-    // Safety timeout: auto-hide after 5s if navigation completed or stalled
+    // Safety timeout: auto-hide after 3s if navigation completed or stalled
     safetyTimeoutRef.current = setTimeout(() => {
       stopLoading();
-    }, 5000);
+    }, 3000);
   }, []);
 
   const stopLoading = useCallback(() => {
@@ -48,115 +50,39 @@ export function NavigationProgress() {
     setTimeout(() => {
       setLoading(false);
       setProgress(0);
-    }, 200);
+    }, 220);
   }, []);
 
-  // Dismiss on route change
+  // On genuine route transition completion: flash a brief smooth progress indicator
   useEffect(() => {
-    stopLoading();
-  }, [pathname, searchParams, stopLoading]);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    // Route changed
+    setLoading(true);
+    setProgress(100);
+    const timer = setTimeout(() => {
+      setLoading(false);
+      setProgress(0);
+    }, 220);
+    return () => clearTimeout(timer);
+  }, [pathname, searchParams]);
 
-  // Global instantaneous click/touch listener with touch-drag immunity
+  // Safe manual / custom-event triggers — ZERO document click/touch listeners
   useEffect(() => {
     if (typeof window !== "undefined") {
       (window as unknown as Record<string, unknown>).__startNavigationLoading = startLoading;
       (window as unknown as Record<string, unknown>).__stopNavigationLoading = stopLoading;
     }
 
-    let isTouching = false;
-    let isScrolling = false;
-    let startX = 0;
-    let startY = 0;
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        isTouching = true;
-        isScrolling = false;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-      }
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (!isTouching || e.touches.length === 0) return;
-      const dx = Math.abs(e.touches[0].clientX - startX);
-      const dy = Math.abs(e.touches[0].clientY - startY);
-      // If user moved more than 4px, it is a scroll gesture — NOT a tap!
-      if (dx > 4 || dy > 4) {
-        isScrolling = true;
-      }
-    };
-
-    const onTouchEnd = () => {
-      isTouching = false;
-      setTimeout(() => {
-        isScrolling = false;
-      }, 150);
-    };
-
-    const handleNavigationTrigger = (e: MouseEvent | PointerEvent) => {
-      // If user was scrolling or swiping, NEVER trigger loader!
-      if (isScrolling) return;
-
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-
-      const anchor = target.closest("a");
-      if (anchor) {
-        const href = anchor.getAttribute("href");
-        if (!href) return;
-
-        // Ignore external, hash, tel, mailto, target="_blank", or modifier clicks
-        if (
-          href.startsWith("http") &&
-          !href.startsWith(window.location.origin)
-        ) {
-          return;
-        }
-        if (
-          href.startsWith("#") ||
-          href.startsWith("mailto:") ||
-          href.startsWith("tel:") ||
-          anchor.target === "_blank" ||
-          e.ctrlKey ||
-          e.metaKey ||
-          e.shiftKey ||
-          e.altKey
-        ) {
-          return;
-        }
-
-        const currentUrl = window.location.pathname + window.location.search;
-        if (href === currentUrl || href === window.location.pathname) {
-          return;
-        }
-
-        startLoading();
-        return;
-      }
-
-      // Check if clicked element or button requests loading feedback
-      const trigger = target.closest("[data-loading-trigger='true']");
-      if (trigger) {
-        startLoading();
-      }
-    };
-
     const handleCustomStart = () => startLoading();
     const handleCustomStop = () => stopLoading();
 
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    document.addEventListener("click", handleNavigationTrigger, { capture: true });
     window.addEventListener("astrolife:loading:start", handleCustomStart);
     window.addEventListener("astrolife:loading:stop", handleCustomStop);
 
     return () => {
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      document.removeEventListener("click", handleNavigationTrigger, { capture: true });
       window.removeEventListener("astrolife:loading:start", handleCustomStart);
       window.removeEventListener("astrolife:loading:stop", handleCustomStop);
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
