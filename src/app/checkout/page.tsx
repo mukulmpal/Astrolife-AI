@@ -5,7 +5,9 @@ import Link from "next/link";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 
 export default function CheckoutPage() {
-  // Direct ₹1 default plan as requested
+  // Category state: "consultation" (default) or "membership"
+  const [activeCategory, setActiveCategory] = useState<"consultation" | "membership">("consultation");
+  // Default selected plan: ₹1 trial
   const [selectedPlan, setSelectedPlan] = useState<string>("trial");
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
@@ -13,24 +15,61 @@ export default function CheckoutPage() {
   const [paymentSuccessData, setPaymentSuccessData] = useState<{
     order_id: string;
     payment_id: string;
+    plan_id: string;
   } | null>(null);
 
-  const tiers = [
+  const consultationTiers = [
     {
       id: "trial",
-      title: "⚡ Instant Test Offering",
+      title: "⚡ Instant Cosmic Question",
       badge: "Direct ₹1",
       price: "₹1",
       paise: 100,
-      period: "Instant Access",
-      description: "Direct ₹1 sacred offering to verify cosmic activation & gateway link.",
+      period: "Instant Calculation",
+      description: "Direct ₹1 sacred offering to verify cosmic link and get 1 instant AI calculation.",
       features: [
+        "Instant Vedic AI Kundli calculation",
+        "1 specific query answered instantly",
         "Direct ₹1 settlement to live account",
-        "Instant Order ID & Signature Verification",
-        "Full PCI-DSS Level 1 Security",
+        "Full 256-bit PCI-DSS Level 1 Security",
       ],
       highlight: true,
     },
+    {
+      id: "express",
+      title: "📜 Express 3-Questions Dossier",
+      badge: "🔥 Most Popular",
+      price: "₹99",
+      paise: 9900,
+      period: "Personalized PDF",
+      description: "Ask 3 specific questions on Career, Marriage, or Finance with Lal Kitab remedies.",
+      features: [
+        "3 deep-dive life questions answered",
+        "Mahadasha & Antardasha planetary timeline",
+        "Lal Kitab & Gemstone remedy recommendations",
+        "Downloadable high-res Kundli PDF report",
+      ],
+      highlight: false,
+    },
+    {
+      id: "consultation_live",
+      title: "📞 1-on-1 Astrologer Session",
+      badge: "⭐ Certified Astrologer",
+      price: "₹499",
+      paise: 49900,
+      period: "15-Min Live Audio/Video",
+      description: "Private live consultation slot with a verified senior Vedic astrologer.",
+      features: [
+        "15-minute private 1-on-1 consultation",
+        "Live Birth Chart reading & Kundli Milan",
+        "Personalized question discussion & Vedic remedies",
+        "Astrologer coordinator connects within 30 mins",
+      ],
+      highlight: false,
+    },
+  ];
+
+  const membershipTiers = [
     {
       id: "pro",
       title: "👑 Pro Kundli Tier",
@@ -45,7 +84,7 @@ export default function CheckoutPage() {
         "Classical Gemstone & Lal Kitab remedies",
         "Watermark-free High Res Kundli PDF exports",
       ],
-      highlight: false,
+      highlight: true,
     },
     {
       id: "elite",
@@ -65,7 +104,13 @@ export default function CheckoutPage() {
     },
   ];
 
-  const currentTier = tiers.find((t) => t.id === selectedPlan) || tiers[0];
+  const currentTiers = activeCategory === "consultation" ? consultationTiers : membershipTiers;
+  const currentTier =
+    currentTiers.find((t) => t.id === selectedPlan) ||
+    consultationTiers.find((t) => t.id === selectedPlan) ||
+    membershipTiers.find((t) => t.id === selectedPlan) ||
+    consultationTiers[0];
+
   const payablePaise = currentTier.paise;
   const payableRupees = (payablePaise / 100).toLocaleString("en-IN", {
     minimumFractionDigits: 2,
@@ -125,9 +170,66 @@ export default function CheckoutPage() {
           </p>
         </div>
 
-        {/* 3-Column Plan Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12">
-          {tiers.map((tier) => {
+        {/* Category Tabs: Consultations vs Full Memberships */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex p-1.5 rounded-2xl bg-[#FFFFFF] border border-[#E7DFD5] shadow-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveCategory("consultation");
+                if (selectedPlan === "pro" || selectedPlan === "elite") {
+                  setSelectedPlan("trial");
+                }
+              }}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                activeCategory === "consultation"
+                  ? "bg-[#FAF7F2] text-[#1A1A1A] shadow-sm border border-[#c8a030]/50 font-bold"
+                  : "text-[#6B635B] hover:text-[#1A1A1A]"
+              }`}
+            >
+              <span>🔮</span>
+              <span>Consultations & Questions</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c8a030]/15 text-[#a07820] font-bold">
+                From ₹1
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveCategory("membership");
+                if (
+                  selectedPlan === "trial" ||
+                  selectedPlan === "express" ||
+                  selectedPlan === "consultation_live"
+                ) {
+                  setSelectedPlan("pro");
+                }
+              }}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                activeCategory === "membership"
+                  ? "bg-[#FAF7F2] text-[#1A1A1A] shadow-sm border border-[#c8a030]/50 font-bold"
+                  : "text-[#6B635B] hover:text-[#1A1A1A]"
+              }`}
+            >
+              <span>👑</span>
+              <span>All-Access Memberships</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3c2880]/10 text-[#3c2880] font-bold">
+                Pro & Elite
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Plan Grid */}
+        <div
+          className={`grid grid-cols-1 ${
+            activeCategory === "consultation"
+              ? "md:grid-cols-3"
+              : "md:grid-cols-2 max-w-3xl mx-auto"
+          } gap-6 lg:gap-8 mb-12`}
+        >
+          {currentTiers.map((tier) => {
             const isSelected = selectedPlan === tier.id;
             return (
               <div
@@ -329,6 +431,7 @@ export default function CheckoutPage() {
                     setPaymentSuccessData({
                       order_id: data.order_id,
                       payment_id: data.payment_id,
+                      plan_id: currentTier.id,
                     });
                   }}
                   onFailure={() => {
@@ -337,18 +440,49 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              {/* Success Result Box */}
+              {/* Success Result Box with dynamic fulfillment guidance */}
               {paymentSuccessData && (
-                <div className="p-4 rounded-xl bg-[#16a34a]/10 border border-[#16a34a]/30 text-[#16a34a] space-y-2">
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#16a34a]/10 border border-[#16a34a]/30 text-[#16a34a] space-y-3">
                   <div className="flex items-center gap-2 font-semibold text-sm">
-                    <span>✦</span>
-                    <span>Payment Verified & Account Activated!</span>
+                    <span className="text-base">✦</span>
+                    <span>Payment Verified & Offering Accepted!</span>
                   </div>
-                  <div className="text-[11px] font-mono bg-white/80 p-2.5 rounded-lg border border-[#16a34a]/20 text-[#4A4238] space-y-0.5">
-                    <div>Order: <span className="font-semibold text-[#1A1A1A]">{paymentSuccessData.order_id}</span></div>
-                    <div>Payment: <span className="font-semibold text-[#1A1A1A]">{paymentSuccessData.payment_id}</span></div>
-                    <div className="text-[#16a34a] font-semibold">Status: HMAC-SHA256 SIGNATURE VERIFIED</div>
+
+                  <div className="text-xs text-[#2e5e3b] leading-relaxed bg-white/70 p-3 rounded-xl border border-[#16a34a]/20">
+                    {paymentSuccessData.plan_id === "consultation_live" && (
+                      <p>
+                        <strong>📞 1-on-1 Consultation Booked:</strong> Our astrologer desk will reach out via WhatsApp / Call at <strong>{customerPhone || "your mobile number"}</strong> within 30 minutes to confirm your preferred astrologer & live appointment slot.
+                      </p>
+                    )}
+                    {paymentSuccessData.plan_id === "express" && (
+                      <p>
+                        <strong>📜 Express Dossier Active:</strong> Your 3 questions quota has been credited! Proceed to the Astrologer chat or Kundli dashboard to submit your questions.
+                      </p>
+                    )}
+                    {paymentSuccessData.plan_id === "trial" && (
+                      <p>
+                        <strong>⚡ Instant ₹1 Offering Confirmed:</strong> Razorpay live gateway verified and your 1 instant cosmic query calculation is ready.
+                      </p>
+                    )}
+                    {(paymentSuccessData.plan_id === "pro" || paymentSuccessData.plan_id === "elite") && (
+                      <p>
+                        <strong>👑 All-Access Membership Activated:</strong> Unlimited Kundli, Dasha timelines, remedies, and AI astrologer agents are unlocked.
+                      </p>
+                    )}
                   </div>
+
+                  <div className="text-[11px] font-mono bg-white/90 p-2.5 rounded-lg border border-[#16a34a]/20 text-[#4A4238] space-y-0.5">
+                    <div>Order ID: <span className="font-semibold text-[#1A1A1A]">{paymentSuccessData.order_id}</span></div>
+                    <div>Payment ID: <span className="font-semibold text-[#1A1A1A]">{paymentSuccessData.payment_id}</span></div>
+                    <div className="text-[#16a34a] font-semibold">Signature: HMAC-SHA256 VERIFIED ✓</div>
+                  </div>
+
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center justify-center w-full py-2.5 px-4 rounded-xl bg-[#16a34a] text-[#FAF7F2] font-semibold text-xs tracking-wider uppercase shadow-sm hover:bg-[#15803d] transition-colors"
+                  >
+                    Go to AstroLife Dashboard →
+                  </Link>
                 </div>
               )}
             </div>
