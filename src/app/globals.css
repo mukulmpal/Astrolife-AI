@@ -2,11 +2,13 @@
 
 html {
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
 }
 
 body {
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
 }
 
 /* ============================================================

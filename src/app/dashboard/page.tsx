@@ -779,8 +779,8 @@ export default function Dashboard() {
     <>
       <style>{`
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        html{-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
-        body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain}
+        html{-webkit-overflow-scrolling:touch;overscroll-behavior:none!important;overscroll-behavior-y:none!important}
+        body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior:none!important;overscroll-behavior-y:none!important}
         .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#FAF7F2}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}

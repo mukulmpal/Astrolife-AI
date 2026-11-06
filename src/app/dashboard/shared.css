@@ -1,15 +1,17 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{
   -webkit-overflow-scrolling:touch;
-  overscroll-behavior-y:contain;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
 }
 body{
   background:var(--app-bg,#FAF7F2);
   color:var(--app-fg,#1A1A1A);
   font-family:var(--font-outfit),'Outfit',sans-serif;
-  min-height:100vh;
+  min-height:100dvh;
   -webkit-font-smoothing:antialiased;
-  overscroll-behavior-y:contain;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
 }
 .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
 ::-webkit-scrollbar{width:3px}

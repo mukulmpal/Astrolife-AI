@@ -119,10 +119,12 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
       let resolvedElite = isFullAccessEnabled();
 
       if (user) {
+        const appMetadata = user.app_metadata as Record<string, unknown> | undefined;
+        const userMetadata = user.user_metadata as Record<string, unknown> | undefined;
         const userIsElite =
-          (user.email && isEliteEmail(user.email)) ||
-          (user as any).app_metadata?.subscription_tier === "elite" ||
-          (user as any).user_metadata?.subscription_tier === "elite";
+          Boolean(user.email && isEliteEmail(user.email)) ||
+          appMetadata?.subscription_tier === "elite" ||
+          userMetadata?.subscription_tier === "elite";
 
         if (userIsElite) {
           resolvedTier = "elite";

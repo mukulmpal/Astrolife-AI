@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useContext } from "react";
+import type { User } from "@supabase/supabase-js";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 export type { ChartData };
 import { createClient } from "@/lib/supabase/client";
@@ -768,7 +769,7 @@ export async function updateSavedChart(
 
 let activePrimaryChartPromise: Promise<ChartData | null> | null = null;
 
-export async function loadPrimaryChartFromAccount(existingUser?: any): Promise<ChartData | null> {
+export async function loadPrimaryChartFromAccount(existingUser?: User | null): Promise<ChartData | null> {
   if (activePrimaryChartPromise) {
     return activePrimaryChartPromise;
   }
