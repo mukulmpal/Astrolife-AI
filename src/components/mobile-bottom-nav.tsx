@@ -175,6 +175,11 @@ export function MobileBottomNav() {
             key={item.href}
             href={item.href}
             prefetch={false}
+            onClick={(e) => {
+              if (pathname === item.href) {
+                e.preventDefault();
+              }
+            }}
             className={`mobile-bottom-nav-item ${pathname === item.href ? "active" : ""} ${item.customClass || ""}`}
           >
             <span className="mobile-bottom-nav-icon">{item.icon}</span>
@@ -505,12 +510,14 @@ export function MobileBottomNav() {
             z-index: 140;
             box-sizing: border-box;
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+            touch-action: manipulation;
           }
 
           .mobile-bottom-nav-item {
             appearance: none;
             -webkit-appearance: none;
             text-decoration: none;
+            touch-action: manipulation;
             color: var(--app-soft, #6B635B);
             display: flex;
             width: 100%;

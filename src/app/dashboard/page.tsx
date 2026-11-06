@@ -1,5 +1,4 @@
 "use client";
-import { Suspense } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -363,7 +362,7 @@ function CompactNorthChart({
   );
 }
 
-function DashboardContent() {
+export default function Dashboard() {
   const [supabase] = useState(() => createClient());
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -781,13 +780,13 @@ function DashboardContent() {
       <style>{`
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
-        body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain}
+        body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain}
         .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#FAF7F2}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
         /* MAIN */
-        .main{padding:20px 24px 60px;min-height:100vh}
+        .main{padding:20px 24px 60px;min-height:100dvh}
 
         /* TOPBAR */
         .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:14px}
@@ -1089,6 +1088,7 @@ function DashboardContent() {
                 </span>
                 <Link
                   href="/dashboard/kundli"
+                  prefetch={false}
                   style={{
                     fontSize: "12px",
                     fontWeight: 600,
@@ -1317,6 +1317,7 @@ function DashboardContent() {
               </div>
               <Link
                 href="/dashboard/kundli"
+                prefetch={false}
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
@@ -1382,7 +1383,7 @@ function DashboardContent() {
                   Special Lagnas, Gemstones, Lal Kitab & Remedies unlocked. Upgrade to 💎 Elite for Transits, Jaimini, Medical and BTR.
                 </div>
               </div>
-              <Link href="/dashboard/upgrade" className="upgrade-btn" style={{ background: "linear-gradient(135deg,#a855f7,#7e22ce)" }}>
+              <Link href="/dashboard/upgrade" prefetch={false} className="upgrade-btn" style={{ background: "linear-gradient(135deg,#a855f7,#7e22ce)" }}>
                 Upgrade to Elite 💎 →
               </Link>
             </div>
@@ -1396,7 +1397,7 @@ function DashboardContent() {
                   Foundational Kundli active. Upgrade to 👑 Pro or 💎 Elite to unlock advanced timing, transits, remedies, and unlimited AI chat.
                 </div>
               </div>
-              <Link href="/dashboard/upgrade" className="upgrade-btn">Upgrade to Pro 👑 →</Link>
+              <Link href="/dashboard/upgrade" prefetch={false} className="upgrade-btn">Upgrade to Pro 👑 →</Link>
             </div>
           )}
 
@@ -1583,7 +1584,7 @@ function DashboardContent() {
                 <div className="today-summary-card">
                   <div className="today-summary-k">Remedy</div>
                   <div className="today-summary-v">{dailyFeed.radar.days[0]?.remedy ?? "Keep routine stable and avoid impulsive reactions."}</div>
-                  <div className="today-summary-hint"><Link href="/dashboard/event-radar" style={{ color: "#c8a030", textDecoration: "none" }}>Open Event Radar →</Link></div>
+                  <div className="today-summary-hint"><Link href="/dashboard/event-radar" prefetch={false} style={{ color: "#c8a030", textDecoration: "none" }}>Open Event Radar →</Link></div>
                 </div>
               </div>
             </div>
@@ -1642,21 +1643,5 @@ function DashboardContent() {
     </main>
       </div>
     </>
-  );
-}
-
-function DashboardLoading() {
-  return (
-    <div style={{ minHeight: '100vh', background: '#FAF7F2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#c8a030', fontSize: 18 }}>Loading your cosmic command center...</div>
-    </div>
-  );
-}
-
-export default function Dashboard() {
-  return (
-    <Suspense fallback={<DashboardLoading />}>
-      <DashboardContent />
-    </Suspense>
   );
 }

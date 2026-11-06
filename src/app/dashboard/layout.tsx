@@ -82,7 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             <div
               className="dash-page-container"
-              style={{ minHeight: "100vh" }}
+              style={{ minHeight: "100dvh" }}
             >
               {children}
             </div>
