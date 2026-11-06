@@ -829,9 +829,11 @@ function DashboardContent() {
         .card-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B635B;margin-bottom:6px}
 
         /* QUICK ACTIONS */
-        .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .action-btn{padding:14px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;cursor:pointer;transition:all 0.25s;text-align:left;text-decoration:none;display:block}
-        .action-btn:hover{transform:translateY(-2px);border-color:rgba(200,160,48,0.25);background:#FFFFFF}
+        .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;content-visibility:auto;contain-intrinsic-size:1px 600px}
+        .action-btn{padding:14px;border-radius:12px;border:1px solid #FFFFFF;background:#FAF7F2;cursor:pointer;transition:border-color 0.15s, background-color 0.15s;text-align:left;text-decoration:none;display:block;contain:content}
+        @media(hover:hover){
+          .action-btn:hover{transform:translateY(-2px);border-color:rgba(200,160,48,0.25);background:#FFFFFF}
+        }
         .action-btn-icon{font-size:22px;margin-bottom:8px}
         .action-btn-label{font-size:13px;font-weight:500;color:#4A4238;margin-bottom:2px}
         .action-btn-desc{font-size:11px;color:#6B635B}
@@ -900,9 +902,9 @@ function DashboardContent() {
           .upgrade-btn{width:100%;text-align:center;padding:12px 16px}
           .stats-row{grid-template-columns:1fr 1fr}
           .today-score{display:none}
-          .actions-grid{grid-template-columns:1fr}
+          .actions-grid{grid-template-columns:1fr;content-visibility:auto;contain-intrinsic-size:1px 900px}
           .action-btn{padding:14px}
-          .card{padding:18px}
+          .card{padding:18px;contain:content}
           .planet-row{gap:8px}
           .energy-pill{padding:2px 8px}
           .mobile-nav{display:flex;gap:4px;position:fixed;left:10px;right:10px;bottom:10px;overflow-x:auto;background:rgba(10,7,32,0.96);border:1px solid #FFFFFF;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120;scrollbar-width:none}

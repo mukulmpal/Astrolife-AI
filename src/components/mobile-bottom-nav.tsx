@@ -92,78 +92,80 @@ export function MobileBottomNav() {
         />
       )}
 
-      <section id="mobile-more-sheet" className={`mobile-more-sheet ${open ? "open" : ""}`} aria-hidden={!open}>
-        {/* Header */}
-        <div className="mobile-more-head">
-          <div>
-            <div className="mobile-more-kicker">AstroLife • 25+ Engines</div>
-            <div className="mobile-more-title">Astro Engines</div>
+      {open && (
+        <section id="mobile-more-sheet" className="mobile-more-sheet open" aria-hidden={false}>
+          {/* Header */}
+          <div className="mobile-more-head">
+            <div>
+              <div className="mobile-more-kicker">AstroLife • 25+ Engines</div>
+              <div className="mobile-more-title">Astro Engines</div>
+            </div>
+            <button className="mobile-more-close" onClick={() => setOpen(false)} aria-label="Close engines menu">
+              ✕
+            </button>
           </div>
-          <button className="mobile-more-close" onClick={() => setOpen(false)} aria-label="Close engines menu">
-            ✕
-          </button>
-        </div>
 
-        {/* Mobile Tier Status Card */}
-        <div className="mobile-tier-strip">
-          {isElite ? (
-            <div className="tier-card-mobile elite-card">
-              <div className="tcm-badge-row">
-                <span className="tcm-badge elite">💎 ELITE MEMBER</span>
-                <span className="tcm-tag">Universe Active</span>
+          {/* Mobile Tier Status Card */}
+          <div className="mobile-tier-strip">
+            {isElite ? (
+              <div className="tier-card-mobile elite-card">
+                <div className="tcm-badge-row">
+                  <span className="tcm-badge elite">💎 ELITE MEMBER</span>
+                  <span className="tcm-tag">Universe Active</span>
+                </div>
+                <div className="tcm-title">All 25+ Astrology Engines Unlocked</div>
+                <p className="tcm-sub">Transits, Jaimini, Astro-Vastu, Astro Tattoo & priority AI unlocked.</p>
               </div>
-              <div className="tcm-title">All 25+ Astrology Engines Unlocked</div>
-              <p className="tcm-sub">Transits, Jaimini, Astro-Vastu, Astro Tattoo & priority AI unlocked.</p>
-            </div>
-          ) : userTier === "premium" ? (
-            <div className="tier-card-mobile pro-card">
-              <div className="tcm-badge-row">
-                <span className="tcm-badge pro">👑 PRO PLAN ACTIVE</span>
-                <Link href="/dashboard/upgrade" onClick={() => setOpen(false)} className="tcm-btn elite-btn">
-                  Go Elite 💎
-                </Link>
+            ) : userTier === "premium" ? (
+              <div className="tier-card-mobile pro-card">
+                <div className="tcm-badge-row">
+                  <span className="tcm-badge pro">👑 PRO PLAN ACTIVE</span>
+                  <Link href="/dashboard/upgrade" onClick={() => setOpen(false)} className="tcm-btn elite-btn">
+                    Go Elite 💎
+                  </Link>
+                </div>
+                <div className="tcm-title">Royal Wisdom & Remedies Unlocked</div>
+                <p className="tcm-sub">Special Lagnas, Remedies & Gemstones active. Upgrade to Elite for Transits & Astro-Vastu.</p>
               </div>
-              <div className="tcm-title">Royal Wisdom & Remedies Unlocked</div>
-              <p className="tcm-sub">Special Lagnas, Remedies & Gemstones active. Upgrade to Elite for Transits & Astro-Vastu.</p>
-            </div>
-          ) : (
-            <div className="tier-card-mobile basic-card">
-              <div className="tcm-badge-row">
-                <span className="tcm-badge basic">🌱 BASIC (THE SEED / BEEJ)</span>
-                <Link href="/dashboard/upgrade" onClick={() => setOpen(false)} className="tcm-btn pro-btn">
-                  Upgrade 👑
-                </Link>
+            ) : (
+              <div className="tier-card-mobile basic-card">
+                <div className="tcm-badge-row">
+                  <span className="tcm-badge basic">🌱 BASIC (THE SEED / BEEJ)</span>
+                  <Link href="/dashboard/upgrade" onClick={() => setOpen(false)} className="tcm-btn pro-btn">
+                    Upgrade 👑
+                  </Link>
+                </div>
+                <div className="tcm-title">Foundational Vedic Kundli</div>
+                <p className="tcm-sub">Unlock Special Lagnas, Gemstones & Remedies with Pro, or all 25+ engines with Elite.</p>
               </div>
-              <div className="tcm-title">Foundational Vedic Kundli</div>
-              <p className="tcm-sub">Unlock Special Lagnas, Gemstones & Remedies with Pro, or all 25+ engines with Elite.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Engines Grid with Badges */}
-        <div className="mobile-more-grid">
-          {ENGINE_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`mobile-more-item ${pathname === item.href ? "active" : ""}`}
-              onClick={() => setOpen(false)}
-            >
-              <div className="mobile-more-top-row">
-                <span className="mobile-more-icon">{item.icon}</span>
-                {item.badge && (
-                  <span className={`mobile-badge-pill ${item.badge.toLowerCase()}`}>
-                    {!isElite && ((item.badge === "ELITE") || (item.badge === "PRO" && userTier === "free"))
-                      ? (item.badge === "ELITE" ? "🔒 💎 ELITE" : "🔒 👑 PRO")
-                      : (item.badge === "ELITE" ? "💎 ELITE" : item.badge === "PRO" ? "👑 PRO" : item.badge === "FREE" ? "✨ FREE" : "🌱 BASIC")}
-                  </span>
-                )}
-              </div>
-              <span className="mobile-more-label">{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+          {/* Engines Grid with Badges */}
+          <div className="mobile-more-grid">
+            {ENGINE_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`mobile-more-item ${pathname === item.href ? "active" : ""}`}
+                onClick={() => setOpen(false)}
+              >
+                <div className="mobile-more-top-row">
+                  <span className="mobile-more-icon">{item.icon}</span>
+                  {item.badge && (
+                    <span className={`mobile-badge-pill ${item.badge.toLowerCase()}`}>
+                      {!isElite && ((item.badge === "ELITE") || (item.badge === "PRO" && userTier === "free"))
+                        ? (item.badge === "ELITE" ? "🔒 💎 ELITE" : "🔒 👑 PRO")
+                        : (item.badge === "ELITE" ? "💎 ELITE" : item.badge === "PRO" ? "👑 PRO" : item.badge === "FREE" ? "✨ FREE" : "🌱 BASIC")}
+                    </span>
+                  )}
+                </div>
+                <span className="mobile-more-label">{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Persistent Bottom Bar */}
       <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
@@ -408,6 +410,9 @@ export function MobileBottomNav() {
             font-size: 12px;
             font-weight: 600;
             line-height: 1.2;
+            contain: content;
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 74px;
             transition: border-color 0.15s, background-color 0.15s;
           }
 
