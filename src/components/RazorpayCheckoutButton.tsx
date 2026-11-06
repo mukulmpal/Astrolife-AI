@@ -128,7 +128,7 @@ export default function RazorpayCheckoutButton({
       const keyId =
         orderData.key_id ||
         process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
-        "rzp_test_Tx0cQSnrukaAgZ";
+        "rzp_live_Tx0owKqxOHnX2U";
 
       const options = {
         key: keyId,
