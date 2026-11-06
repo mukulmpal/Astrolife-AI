@@ -120,7 +120,7 @@ export function MobileBottomNav() {
               <div className="tier-card-mobile pro-card">
                 <div className="tcm-badge-row">
                   <span className="tcm-badge pro">👑 PRO PLAN ACTIVE</span>
-                  <Link href="/dashboard/upgrade" onClick={() => setOpen(false)} className="tcm-btn elite-btn">
+                  <Link href="/dashboard/upgrade" prefetch={false} onClick={() => setOpen(false)} className="tcm-btn elite-btn">
                     Go Elite 💎
                   </Link>
                 </div>
@@ -131,7 +131,7 @@ export function MobileBottomNav() {
               <div className="tier-card-mobile basic-card">
                 <div className="tcm-badge-row">
                   <span className="tcm-badge basic">🌱 BASIC (THE SEED / BEEJ)</span>
-                  <Link href="/dashboard/upgrade" onClick={() => setOpen(false)} className="tcm-btn pro-btn">
+                  <Link href="/dashboard/upgrade" prefetch={false} onClick={() => setOpen(false)} className="tcm-btn pro-btn">
                     Upgrade 👑
                   </Link>
                 </div>
@@ -147,6 +147,7 @@ export function MobileBottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 className={`mobile-more-item ${pathname === item.href ? "active" : ""}`}
                 onClick={() => setOpen(false)}
               >
@@ -173,6 +174,7 @@ export function MobileBottomNav() {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={false}
             className={`mobile-bottom-nav-item ${pathname === item.href ? "active" : ""} ${item.customClass || ""}`}
           >
             <span className="mobile-bottom-nav-icon">{item.icon}</span>

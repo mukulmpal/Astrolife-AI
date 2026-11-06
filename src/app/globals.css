@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+html {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+body {
+  overscroll-behavior-y: contain;
+}
+
 /* ============================================================
    AstroLife · Unified Design Token System
    From design handoff — single source of truth.

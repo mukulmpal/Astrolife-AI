@@ -779,12 +779,9 @@ function DashboardContent() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        html{scroll-behavior:smooth}
-        body{background:#FAF7F2;color:#1A1A1A;font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
-        .serif{font-family:'Cormorant Garamond',Georgia,serif}
-        body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+        html{-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+        body{background:#FAF7F2;color:#1A1A1A;font-family:var(--font-outfit),'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain}
         .serif{font-family:var(--font-cormorant),'Cormorant Garamond',Georgia,serif}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#FAF7F2}::-webkit-scrollbar-thumb{background:#c8a030;border-radius:2px}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
@@ -907,7 +904,7 @@ function DashboardContent() {
           .card{padding:18px;contain:content}
           .planet-row{gap:8px}
           .energy-pill{padding:2px 8px}
-          .mobile-nav{display:flex;gap:4px;position:fixed;left:10px;right:10px;bottom:10px;overflow-x:auto;background:rgba(10,7,32,0.96);border:1px solid #FFFFFF;border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(10px);z-index:120;scrollbar-width:none}
+          .mobile-nav{display:flex;gap:4px;position:fixed;left:10px;right:10px;bottom:10px;overflow-x:auto;background:#0A0720;border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));z-index:120;scrollbar-width:none}
           .mobile-nav::-webkit-scrollbar{display:none}
           .mobile-nav-item{text-decoration:none;color:#6B635B;display:flex;flex:0 0 58px;min-height:44px;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:10px}
           .mobile-nav-item.active{color:#c8a030;background:rgba(200,160,48,0.1)}
@@ -1262,21 +1259,21 @@ function DashboardContent() {
           <CosmicRadar horizons={dailyFeed.cosmicRadarHorizons} />
 
           <div className="today-summary-grid">
-            <Link href="/dashboard/transits" className="today-summary-card">
+            <Link href="/dashboard/transits" prefetch={false} className="today-summary-card">
               <div className="today-summary-k">Transit Engine</div>
               <div className="today-summary-v">
                 {strongestArea.name} domain is actively supported today.
               </div>
               <div className="today-summary-hint">Open Transit Calculations →</div>
             </Link>
-            <Link href="/dashboard/dasha" className="today-summary-card">
+            <Link href="/dashboard/dasha" prefetch={false} className="today-summary-card">
               <div className="today-summary-k">Dasha Cycle</div>
               <div className="today-summary-v">
                 Active {activeDasha.planet} MD {activeAntardasha ? `· ${activeAntardasha.planet} AD` : ""}.
               </div>
               <div className="today-summary-hint">Explore Vimshottari Timeline →</div>
             </Link>
-            <Link href="/dashboard/report" className="today-summary-card">
+            <Link href="/dashboard/report" prefetch={false} className="today-summary-card">
               <div className="today-summary-k">Personal Vedic Report</div>
               <div className="today-summary-v">
                 Full Shastra breakdown & planetary remedial alignment.
@@ -1625,7 +1622,7 @@ function DashboardContent() {
                   { icon:"🔱", label:"Jaimini",           desc:"Chara Karakas, Arudha, Dasha", href:"/dashboard/jaimini" },
                   { icon:"🤖", label:"AI Chat",           desc:"Talk to AI astrologer",       href:"/dashboard/chat" },
               ].map((a,i) => (
-                  <Link key={i} href={a.href} className="action-btn">
+                  <Link key={i} href={a.href} prefetch={false} className="action-btn">
                     <div className="action-btn-icon">{a.icon}</div>
                     <div className="action-btn-label">{a.label}</div>
                     <div className="action-btn-desc">{a.desc}</div>

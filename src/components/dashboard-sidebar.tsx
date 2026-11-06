@@ -283,6 +283,7 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
                   <Link
                     key={href}
                     href={href}
+                    prefetch={false}
                     onClick={() => onCloseMobile?.()}
                     className={`dash-nav-item${pathname === href ? " active" : ""}`}
                     style={pathname === href ? { borderLeftColor: 'var(--al-primary)', color: 'var(--al-primary)' } : undefined}
