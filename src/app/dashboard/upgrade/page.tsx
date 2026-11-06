@@ -65,7 +65,10 @@ const PLANS = [
 
 declare global {
   interface Window {
-    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+    Razorpay: new (options: Record<string, unknown>) => {
+      open: () => void;
+      on: (event: string, handler: (response: unknown) => void) => void;
+    };
   }
 }
 
@@ -158,6 +161,12 @@ export default function UpgradePage() {
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", (response: unknown) => {
+        const failure = response as { error?: { description?: string } };
+        console.error("Payment failed event:", failure?.error);
+        setStatusMessage(failure?.error?.description || "Payment process fail ho gaya. Please try again.");
+        setLoading(null);
+      });
       rzp.open();
 
     } catch (error) {
