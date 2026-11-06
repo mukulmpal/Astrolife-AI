@@ -5,219 +5,420 @@ import Link from "next/link";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 
 export default function CheckoutPage() {
-  const [selectedAmount, setSelectedAmount] = useState<number>(100); // 100 paise = ₹1.00
-  const [customPaise, setCustomPaise] = useState<string>("100");
-  const [customerName, setCustomerName] = useState<string>("Test Customer");
-  const [customerEmail, setCustomerEmail] = useState<string>("customer@astrolife.ai");
-  const [customerPhone, setCustomerPhone] = useState<string>("9999999999");
+  const [selectedPlan, setSelectedPlan] = useState<string>("pro");
+  const [customPaise, setCustomPaise] = useState<string>("49900");
+  const [customerName, setCustomerName] = useState<string>("AstroLife Seeker");
+  const [customerEmail, setCustomerEmail] = useState<string>("seeker@astrolife.ai");
+  const [customerPhone, setCustomerPhone] = useState<string>("9876543210");
   const [paymentSuccessData, setPaymentSuccessData] = useState<{
     order_id: string;
     payment_id: string;
   } | null>(null);
 
-  const presets = [
-    { label: "₹1 (Test Minimum - 100 paise)", paise: 100 },
-    { label: "₹499 (Pro Tier - 49,900 paise)", paise: 49900 },
-    { label: "₹1,999 (Elite Tier - 1,99,900 paise)", paise: 199900 },
+  const tiers = [
+    {
+      id: "trial",
+      title: "🌱 Sacred Seed Offering",
+      badge: "Verification",
+      price: "₹1",
+      paise: 100,
+      period: "Instant Verification",
+      description: "Quick 100-paise test payment to verify gateway & cosmic link.",
+      features: [
+        "Instant Order ID & Signature Verification",
+        "PCI-DSS Level 1 Certified Gateway",
+        "Direct Bank Settlement to Razorpay",
+      ],
+      highlight: false,
+    },
+    {
+      id: "pro",
+      title: "👑 Pro Kundli Tier",
+      badge: "Most Popular",
+      price: "₹499",
+      paise: 49900,
+      period: "/ month",
+      description: "Unlimited AI Kundli queries, full Dasha, KP & classical Lal Kitab remedies.",
+      features: [
+        "Unlimited Cosmic AI Chat across all agents",
+        "Full Dasha timeline + Sub-periods (Pratyantar)",
+        "Classical Gemstone & Lal Kitab remedies",
+        "Full KP Astrology & Planetary Aspect engine",
+        "Watermark-free High Res Kundli PDF exports",
+      ],
+      highlight: true,
+    },
+    {
+      id: "elite",
+      title: "💎 Elite Master Tier",
+      badge: "Master Access",
+      price: "₹1,999",
+      paise: 199900,
+      period: "/ month",
+      description: "Complete Vedic master suite: D-1 to D-60, Vastu, Sound Therapy & BTR.",
+      features: [
+        "Everything in Pro Tier included",
+        "Divisional Charts (D-1 to D-60 Shodashvarga)",
+        "Astro-Vastu compass & GPS alignment",
+        "Astro-Sound Therapy (Binaural planetary beats)",
+        "Birth Time Rectification (BTR) engine",
+      ],
+      highlight: false,
+    },
   ];
 
-  const handleAmountChange = (paise: number) => {
-    setSelectedAmount(paise);
-    setCustomPaise(String(paise));
-  };
+  const currentTier = tiers.find((t) => t.id === selectedPlan) || tiers[1];
+  const payablePaise = selectedPlan === "custom" ? Number(customPaise) || 100 : currentTier.paise;
+  const payableRupees = (payablePaise / 100).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between p-4 sm:p-8 font-sans">
-      <div className="max-w-3xl mx-auto w-full py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-6 mb-8">
-          <div>
-            <span className="text-xs uppercase tracking-widest text-amber-400 font-semibold">
-              Payment Gateway
+    <div className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A] font-sans selection:bg-[#c8a030]/20 selection:text-[#1A1A1A] flex flex-col justify-between">
+      {/* Top sacred navigation */}
+      <header className="border-b border-[#c8a030]/20 bg-[#FAF7F2]/90 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-center gap-2.5 group">
+            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3c2880] to-[#c8a030] flex items-center justify-center text-[#FAF7F2] text-sm shadow-sm group-hover:scale-105 transition-transform">
+              ✦
             </span>
-            <h1 className="text-3xl font-bold tracking-tight text-white mt-1">
-              Razorpay Standard Checkout
-            </h1>
-          </div>
-          <Link
-            href="/"
-            className="text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            ← Back to Home
+            <span className="font-serif text-2xl font-bold tracking-tight text-[#1A1A1A]">
+              AstroLife <span className="text-[#c8a030] italic font-normal">AI</span>
+            </span>
           </Link>
+
+          <div className="flex items-center gap-4 text-xs font-medium">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#c8a030]/10 text-[#a07820] border border-[#c8a030]/30">
+              <span className="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
+              Live Gateway Active
+            </span>
+            <Link
+              href="/dashboard/upgrade"
+              className="text-[#6B635B] hover:text-[#1A1A1A] transition-colors"
+            >
+              Plans Comparison
+            </Link>
+            <Link
+              href="/dashboard"
+              className="text-[#c8a030] hover:text-[#a07820] transition-colors"
+            >
+              Dashboard →
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Container */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16 flex-1 w-full">
+        {/* Hero header */}
+        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-[#c8a030] mb-3">
+            <span>✦</span>
+            <span>Sacred Gateway • Instant Activation</span>
+            <span>✦</span>
+          </div>
+          <h1 className="font-serif text-3xl sm:text-5xl font-semibold tracking-tight text-[#1A1A1A] leading-tight">
+            Unlock Your Cosmic <em className="italic text-[#c8a030] font-normal">Destiny</em>
+          </h1>
+          <p className="mt-3 text-[#6B635B] text-sm sm:text-base leading-relaxed">
+            Choose your sacred astrological tier below. All transactions are securely processed
+            via Razorpay with bank-grade 256-bit encryption.
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-sm">
-          <div className="space-y-6">
-            {/* Amount selection */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Select Test Amount
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                {presets.map((preset) => (
-                  <button
-                    key={preset.paise}
-                    type="button"
-                    onClick={() => handleAmountChange(preset.paise)}
-                    className={`px-4 py-3 rounded-xl border text-left text-sm font-medium transition-all ${
-                      selectedAmount === preset.paise
-                        ? "border-amber-400 bg-amber-400/10 text-amber-300"
-                        : "border-slate-800 bg-slate-800/50 hover:bg-slate-800 text-slate-300"
+        {/* 3-Column Plan Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12">
+          {tiers.map((tier) => {
+            const isSelected = selectedPlan === tier.id;
+            return (
+              <div
+                key={tier.id}
+                onClick={() => setSelectedPlan(tier.id)}
+                className={`cursor-pointer rounded-2xl p-6 sm:p-7 relative transition-all duration-300 flex flex-col justify-between ${
+                  isSelected
+                    ? "bg-[#FFFFFF] border-2 border-[#c8a030] shadow-[0_12px_36px_rgba(200,160,48,0.22)] -translate-y-1"
+                    : "bg-[#FFFFFF] border border-[#E7DFD5] hover:border-[#c8a030]/50 hover:shadow-md hover:-translate-y-0.5"
+                }`}
+              >
+                {tier.highlight && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#c8a030] to-[#a07820] text-[#FAF7F2] text-[10px] font-bold uppercase tracking-widest px-3.5 py-1 rounded-full shadow-sm">
+                    {tier.badge}
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs uppercase font-semibold tracking-wider text-[#6B635B]">
+                      {tier.title}
+                    </span>
+                    <input
+                      type="radio"
+                      name="tier_select"
+                      checked={isSelected}
+                      onChange={() => setSelectedPlan(tier.id)}
+                      className="accent-[#c8a030] w-4 h-4 cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-baseline gap-1 mb-2">
+                    <span className="font-serif text-4xl sm:text-5xl font-semibold text-[#1A1A1A]">
+                      {tier.price}
+                    </span>
+                    <span className="text-xs text-[#6B635B] font-medium">{tier.period}</span>
+                  </div>
+
+                  <p className="text-xs text-[#6B635B] mb-6 leading-relaxed">
+                    {tier.description}
+                  </p>
+
+                  <div className="h-[1px] bg-[#E7DFD5] mb-5"></div>
+
+                  <ul className="space-y-2.5 mb-6 text-xs text-[#4A4238]">
+                    {tier.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-[#c8a030] text-xs mt-0.5 flex-shrink-0">✦</span>
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="pt-2">
+                  <div
+                    className={`text-center py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-colors ${
+                      isSelected
+                        ? "bg-[#c8a030]/15 text-[#a07820] border border-[#c8a030]/40 font-bold"
+                        : "bg-[#FAF7F2] text-[#6B635B] border border-[#E7DFD5]"
                     }`}
                   >
-                    {preset.label}
-                  </button>
-                ))}
+                    {isSelected ? "Selected Tier" : "Select Tier"}
+                  </div>
+                </div>
               </div>
+            );
+          })}
+        </div>
 
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs text-slate-400">Custom amount (in paise):</span>
-                <input
-                  type="number"
-                  min="100"
-                  value={customPaise}
-                  onChange={(e) => {
-                    setCustomPaise(e.target.value);
-                    const val = Number(e.target.value);
-                    if (!isNaN(val)) setSelectedAmount(val);
-                  }}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1 text-sm text-white w-32 focus:outline-none focus:border-amber-400"
-                />
-                <span className="text-xs text-slate-400">
-                  = ₹{(selectedAmount / 100).toFixed(2)}
+        {/* Custom Offering Option */}
+        <div className="bg-[#FFFFFF] border border-[#E7DFD5] rounded-2xl p-5 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-xl text-[#c8a030]">✦</span>
+            <div>
+              <div className="text-sm font-semibold text-[#1A1A1A]">
+                Custom Offering or Custom Consultation Amount
+              </div>
+              <div className="text-xs text-[#6B635B]">
+                Specify an exact custom amount in paise ($\ge$ 100 paise / ₹1.00)
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input
+              type="number"
+              min="100"
+              placeholder="e.g. 50000"
+              value={customPaise}
+              onChange={(e) => {
+                setCustomPaise(e.target.value);
+                setSelectedPlan("custom");
+              }}
+              className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2 text-sm text-[#1A1A1A] w-36 focus:outline-none focus:border-[#c8a030]"
+            />
+            <button
+              type="button"
+              onClick={() => setSelectedPlan("custom")}
+              className={`text-xs px-4 py-2.5 rounded-xl font-semibold transition-all ${
+                selectedPlan === "custom"
+                  ? "bg-[#c8a030] text-[#FAF7F2] shadow-sm"
+                  : "bg-[#FAF7F2] border border-[#E7DFD5] text-[#6B635B]"
+              }`}
+            >
+              Apply Custom
+            </button>
+          </div>
+        </div>
+
+        {/* Checkout Card (Customer Details + Gateway Action) */}
+        <div className="bg-[#FFFFFF] border border-[#c8a030]/30 rounded-3xl p-6 sm:p-10 shadow-[0_16px_40px_rgba(200,160,48,0.12)]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Customer details */}
+            <div className="lg:col-span-7 space-y-6">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#c8a030]">
+                  Step 1 • Seeker Information
                 </span>
+                <h3 className="font-serif text-2xl font-semibold text-[#1A1A1A] mt-1">
+                  Contact & Communication Details
+                </h3>
+                <p className="text-xs text-[#6B635B] mt-1">
+                  Payment confirmation receipt and cosmic chart access will be routed to these details.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#4A4238] mb-1.5">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#c8a030] transition-colors"
+                    placeholder="Your Name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#4A4238] mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#c8a030] transition-colors"
+                    placeholder="you@email.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#4A4238] mb-1.5">
+                    Phone (for UPI/SMS)
+                  </label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#c8a030] transition-colors"
+                    placeholder="9876543210"
+                  />
+                </div>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="pt-4 border-t border-[#E7DFD5] grid grid-cols-3 gap-3 text-center text-[11px] text-[#6B635B]">
+                <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-[#FAF7F2]/80">
+                  <span className="text-base">🔒</span>
+                  <span className="font-semibold text-[#1A1A1A]">256-Bit SSL</span>
+                  <span>Bank-Grade Encryption</span>
+                </div>
+                <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-[#FAF7F2]/80">
+                  <span className="text-base">⚡</span>
+                  <span className="font-semibold text-[#1A1A1A]">Instant Access</span>
+                  <span>Zero Manual Waiting</span>
+                </div>
+                <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-[#FAF7F2]/80">
+                  <span className="text-base">🛡️</span>
+                  <span className="font-semibold text-[#1A1A1A]">PCI-DSS Level 1</span>
+                  <span>Certified by Razorpay</span>
+                </div>
               </div>
             </div>
 
-            {/* Customer Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-800">
+            {/* Right Column: Order summary & Button */}
+            <div className="lg:col-span-5 bg-[#FAF7F2] border border-[#E7DFD5] rounded-2xl p-6 sm:p-7 space-y-6">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">
-                  Customer Name
-                </label>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400"
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#c8a030]">
+                  Step 2 • Order Summary
+                </span>
+                <div className="flex items-baseline justify-between mt-2">
+                  <span className="text-sm font-semibold text-[#1A1A1A]">
+                    {selectedPlan === "custom" ? "Custom Consultation Offering" : currentTier.title}
+                  </span>
+                  <span className="font-serif text-2xl font-bold text-[#c8a030]">
+                    ₹{payableRupees}
+                  </span>
+                </div>
+                <div className="text-xs text-[#6B635B] mt-1">
+                  100% Tax & GST Included • Direct Bank Settlement
+                </div>
+              </div>
+
+              <div className="h-[1px] bg-[#E7DFD5]"></div>
+
+              <div className="space-y-2 text-xs text-[#6B635B]">
+                <div className="flex justify-between">
+                  <span>Selected Offering</span>
+                  <span className="text-[#1A1A1A] font-medium">₹{payableRupees}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Gateway Handling Fee</span>
+                  <span className="text-[#16a34a] font-medium">Free (Covered)</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-[#E7DFD5] text-sm font-bold text-[#1A1A1A]">
+                  <span>Total Payable</span>
+                  <span className="text-[#c8a030] font-serif text-xl">₹{payableRupees}</span>
+                </div>
+              </div>
+
+              {/* Payment Button */}
+              <div className="pt-2">
+                <RazorpayCheckoutButton
+                  amount={payablePaise}
+                  currency="INR"
+                  name="AstroLife AI"
+                  description={`${selectedPlan === "custom" ? "Offering" : currentTier.title} • ₹${payableRupees}`}
+                  buttonText={`Pay ₹${payableRupees} with Razorpay`}
+                  prefill={{
+                    name: customerName,
+                    email: customerEmail,
+                    contact: customerPhone,
+                  }}
+                  onSuccess={(data) => {
+                    setPaymentSuccessData({
+                      order_id: data.order_id,
+                      payment_id: data.payment_id,
+                    });
+                  }}
+                  onFailure={() => {
+                    setPaymentSuccessData(null);
+                  }}
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400"
-                />
-              </div>
-            </div>
-
-            {/* Summary */}
-            <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between">
-              <div>
-                <div className="text-xs text-slate-400">Total Payable Amount</div>
-                <div className="text-2xl font-bold text-amber-400">
-                  ₹{(selectedAmount / 100).toFixed(2)}
+              {/* Success Result Box */}
+              {paymentSuccessData && (
+                <div className="p-4 rounded-xl bg-[#16a34a]/10 border border-[#16a34a]/30 text-[#16a34a] space-y-2">
+                  <div className="flex items-center gap-2 font-semibold text-sm">
+                    <span>✦</span>
+                    <span>Payment Verified & Account Activated!</span>
+                  </div>
+                  <div className="text-[11px] font-mono bg-white/80 p-2.5 rounded-lg border border-[#16a34a]/20 text-[#4A4238] space-y-0.5">
+                    <div>Order: <span className="font-semibold text-[#1A1A1A]">{paymentSuccessData.order_id}</span></div>
+                    <div>Payment: <span className="font-semibold text-[#1A1A1A]">{paymentSuccessData.payment_id}</span></div>
+                    <div className="text-[#16a34a] font-semibold">Status: HMAC-SHA256 SIGNATURE VERIFIED</div>
+                  </div>
                 </div>
-              </div>
-              <div className="text-right text-xs text-slate-400">
-                <div>Currency: <span className="text-slate-200">INR</span></div>
-                <div>Amount in paise: <span className="text-slate-200">{selectedAmount}</span></div>
-              </div>
+              )}
             </div>
-
-            {/* Checkout Button */}
-            <div className="pt-2">
-              <RazorpayCheckoutButton
-                amount={selectedAmount}
-                currency="INR"
-                name="AstroLife AI"
-                description={`Order payment of ₹${(selectedAmount / 100).toFixed(2)}`}
-                buttonText={`Pay ₹${(selectedAmount / 100).toFixed(2)} with Razorpay`}
-                prefill={{
-                  name: customerName,
-                  email: customerEmail,
-                  contact: customerPhone,
-                }}
-                onSuccess={(data) => {
-                  setPaymentSuccessData({
-                    order_id: data.order_id,
-                    payment_id: data.payment_id,
-                  });
-                }}
-                onFailure={() => {
-                  setPaymentSuccessData(null);
-                }}
-              />
-            </div>
-
-            {/* Payment Success Details */}
-            {paymentSuccessData && (
-              <div className="mt-4 p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 space-y-2">
-                <div className="flex items-center gap-2 font-semibold text-emerald-300">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Payment Verified & Completed!
-                </div>
-                <div className="text-xs font-mono bg-slate-950/60 p-3 rounded-lg border border-emerald-900/60 space-y-1">
-                  <div>Order ID: <span className="text-white">{paymentSuccessData.order_id}</span></div>
-                  <div>Payment ID: <span className="text-white">{paymentSuccessData.payment_id}</span></div>
-                  <div>Status: <span className="text-emerald-400 font-bold">HMAC-SHA256 SIGNATURE MATCHED</span></div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
+      </main>
 
-        {/* Integration Architecture info */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-400">
-          <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
-            <span className="font-semibold text-slate-200 block mb-1">1. Create Order</span>
-            Calls <code className="text-amber-400">/api/create-order</code> with amount, currency, receipt. Validates ≥ 100 paise.
+      {/* Sacred Footer */}
+      <footer className="border-t border-[#c8a030]/20 bg-[#FAF7F2] py-6 text-center text-xs text-[#6B635B]">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 text-[#a07820] font-serif">
+            <span>✦</span>
+            <span>AstroLife AI • Vedic Astrology & Cosmic Intelligence</span>
           </div>
-          <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
-            <span className="font-semibold text-slate-200 block mb-1">2. Modal Checkout</span>
-            Opens Razorpay Standard modal using checkout.js with test key <code className="text-amber-400">rzp_test_...</code>.
-          </div>
-          <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
-            <span className="font-semibold text-slate-200 block mb-1">3. Verify Signature</span>
-            Calls <code className="text-amber-400">/api/verify-payment</code>, verifying HMAC-SHA256(order_id|payment_id).
+          <div className="flex items-center gap-4 text-[11px]">
+            <Link href="/privacy" className="hover:text-[#1A1A1A] transition-colors">
+              Privacy Policy
+            </Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:text-[#1A1A1A] transition-colors">
+              Terms of Service
+            </Link>
+            <span>•</span>
+            <Link href="/refund" className="hover:text-[#1A1A1A] transition-colors">
+              Refund Policy
+            </Link>
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="text-center text-xs text-slate-600 py-4">
-        AstroLife AI • Razorpay Test Mode Integration
       </footer>
     </div>
   );

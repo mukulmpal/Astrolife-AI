@@ -9,7 +9,7 @@ export interface RazorpaySuccessResponse {
 }
 
 export interface RazorpayCheckoutButtonProps {
-  amount?: number; // in paise (e.g. 100 = ₹1.00, 50000 = ₹500.00)
+  amount?: number; // in paise (e.g. 100 = ₹1.00, 49900 = ₹499.00)
   currency?: string;
   receipt?: string;
   notes?: Record<string, string>;
@@ -70,14 +70,14 @@ export function loadRazorpayScript(): Promise<boolean> {
 }
 
 export default function RazorpayCheckoutButton({
-  amount = 10000, // ₹100.00
+  amount = 10000,
   currency = "INR",
   receipt,
   notes,
   name = "AstroLife AI",
-  description = "AstroLife Premium Services",
+  description = "AstroLife Cosmic Access",
   prefill,
-  buttonText = "Pay with Razorpay",
+  buttonText,
   className = "",
   onSuccess,
   onFailure,
@@ -85,6 +85,9 @@ export default function RazorpayCheckoutButton({
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const displayPrice = `₹${(amount / 100).toLocaleString("en-IN")}`;
+  const defaultLabel = buttonText || `Proceed with Payment • ${displayPrice}`;
 
   const handleCheckout = async () => {
     setStatusMessage(null);
@@ -95,7 +98,7 @@ export default function RazorpayCheckoutButton({
       // 1. Ensure SDK script is loaded
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded || !window.Razorpay) {
-        const errMsg = "Failed to load Razorpay checkout SDK. Please check your internet connection.";
+        const errMsg = "Payment window load nahi ho paya. Kripya internet connection check karein.";
         setStatusMessage(errMsg);
         onFailure?.(errMsg);
         setLoading(false);
@@ -117,7 +120,7 @@ export default function RazorpayCheckoutButton({
       const orderData = await orderRes.json();
 
       if (!orderRes.ok || !orderData.order_id) {
-        const errMsg = orderData.error || "Unable to initiate payment order.";
+        const errMsg = orderData.error || "Order generate nahi ho paya. Please retry karein.";
         setStatusMessage(errMsg);
         onFailure?.(errMsg);
         setLoading(false);
@@ -137,16 +140,18 @@ export default function RazorpayCheckoutButton({
         name,
         description,
         order_id: orderData.order_id,
+        image: "/logo.png",
         prefill: {
           name: prefill?.name || "",
           email: prefill?.email || "",
           contact: prefill?.contact || "",
         },
         theme: {
-          color: "#c8a030", // AstroLife gold theme
+          color: "#c8a030", // AstroLife signature gold
+          backdrop_color: "rgba(26, 26, 26, 0.8)",
         },
         handler: async (response: RazorpaySuccessResponse) => {
-          setStatusMessage("Payment received. Verifying signature...");
+          setStatusMessage("Payment received. Cosmic verification in progress...");
 
           try {
             // 4. Send payment details to /api/verify-payment
@@ -164,7 +169,7 @@ export default function RazorpayCheckoutButton({
 
             if (verifyRes.ok && verifyData.success) {
               setIsSuccess(true);
-              setStatusMessage("Payment verified successfully!");
+              setStatusMessage("✦ Payment verified successfully! Your cosmic tier is unlocked.");
               onSuccess?.({
                 success: true,
                 order_id: response.razorpay_order_id,
@@ -177,7 +182,7 @@ export default function RazorpayCheckoutButton({
             }
           } catch (err: unknown) {
             const error = err as Error;
-            const errMsg = error.message || "Failed to contact payment verification endpoint.";
+            const errMsg = error.message || "Failed to reach verification service.";
             setStatusMessage(errMsg);
             onFailure?.(errMsg);
           } finally {
@@ -186,7 +191,7 @@ export default function RazorpayCheckoutButton({
         },
         modal: {
           ondismiss: () => {
-            const cancelMsg = "Payment was cancelled.";
+            const cancelMsg = "Payment cancel kar diya gaya. Aap jab chahein tab retry kar sakte hain.";
             setStatusMessage(cancelMsg);
             onFailure?.(cancelMsg);
             setLoading(false);
@@ -202,7 +207,7 @@ export default function RazorpayCheckoutButton({
           error?: { description?: string; code?: string; reason?: string };
         };
         console.error("Razorpay payment failed:", failure?.error);
-        const errMsg = failure?.error?.description || "Payment failed. Please try again.";
+        const errMsg = failure?.error?.description || "Payment process fail ho gaya. Please try again.";
         setStatusMessage(errMsg);
         onFailure?.(errMsg);
         setLoading(false);
@@ -220,10 +225,10 @@ export default function RazorpayCheckoutButton({
   };
 
   const defaultClasses =
-    "inline-flex items-center justify-center font-medium rounded-xl px-6 py-3 transition-all duration-200 shadow-md bg-amber-500 hover:bg-amber-600 text-black font-semibold disabled:opacity-50 disabled:cursor-not-allowed";
+    "w-full py-4 px-6 rounded-xl font-semibold text-[15px] tracking-wide transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_6px_20px_rgba(200,160,48,0.35)] hover:shadow-[0_10px_28px_rgba(200,160,48,0.5)] hover:-translate-y-0.5 active:translate-y-0 text-[#FAF7F2] bg-gradient-to-r from-[#c8a030] to-[#a07820]";
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3 w-full">
       <button
         type="button"
         onClick={handleCheckout}
@@ -231,9 +236,9 @@ export default function RazorpayCheckoutButton({
         className={className || defaultClasses}
       >
         {loading ? (
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-2.5">
             <svg
-              className="animate-spin h-5 w-5 text-current"
+              className="animate-spin h-5 w-5 text-[#FAF7F2]"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -247,15 +252,18 @@ export default function RazorpayCheckoutButton({
                 strokeWidth="4"
               ></circle>
               <path
-                className="opacity-75"
+                className="opacity-90"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8v8H4z"
               ></path>
             </svg>
-            Processing...
+            Processing Cosmic Order...
           </span>
         ) : (
-          buttonText
+          <span className="flex items-center gap-2">
+            <span>✦</span>
+            <span>{defaultLabel}</span>
+          </span>
         )}
       </button>
 
@@ -263,12 +271,12 @@ export default function RazorpayCheckoutButton({
         <div
           role="status"
           aria-live="polite"
-          className={`text-sm px-3 py-2 rounded-lg border ${
+          className={`text-xs sm:text-sm px-4 py-3 rounded-xl border transition-all ${
             isSuccess
-              ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-300"
-              : statusMessage.includes("cancelled")
-              ? "bg-amber-950/40 border-amber-500/40 text-amber-300"
-              : "bg-red-950/40 border-red-500/40 text-red-300"
+              ? "bg-[#16a34a]/10 border-[#16a34a]/40 text-[#16a34a] font-medium"
+              : statusMessage.includes("cancel")
+              ? "bg-[#c8a030]/10 border-[#c8a030]/40 text-[#a07820]"
+              : "bg-red-500/10 border-red-500/30 text-red-600"
           }`}
         >
           {statusMessage}
