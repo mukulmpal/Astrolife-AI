@@ -209,23 +209,45 @@ export default function ReportsStorePage() {
     {
       id: "destiny_curve_flagship",
       title: "📈 Destiny Curve: 90-Year Life Master Dossier",
-      tagline: "Vimshottari Dasha life score curve (Age 0-90), Golden Peak vs Challenge windows & 6 life areas.",
+      tagline: "Vimshottari Dasha life score curve (Age 0-90), Navtara 9-Chakra, Peak windows & 6 life areas.",
       price: "₹499",
       paise: 49900,
-      vargas: ["Vimshottari Dasha", "0-90 Life Arc", "Antardasha Radar", "6 Life Pillars"],
+      vargas: ["Vimshottari Dasha", "Navtara Chakra", "0-90 Life Arc", "Antardasha Radar", "6 Life Pillars"],
       badge: "👑 Flagship Report",
       badgeColor: "bg-gradient-to-r from-[#c8a030] to-[#b45309] text-white shadow-sm",
       popular: true,
       deliveryTime: "60 Seconds Delivery",
       description:
-        "Our crowning predictive masterwork. Maps your lifetime energetic trajectory across 90 years with year-by-year 0-100% scores, pinpointing your exact golden peak windows, karmic endurance cycles, current planetary drivers, and a 5-year milestone forecast across Career, Wealth, Health, Love, Mind & Dharma.",
+        "Our crowning predictive masterwork. Maps your lifetime energetic trajectory across 90 years with year-by-year 0-100% scores. Combines full Vimshottari Mahadasha & Antardasha cycles with ancient Navtara (9 Tara) intelligence to identify exactly which planets act as Sampat (Wealth) vs Vipat/Vadha (Danger), pinpointing your golden peak windows, current drivers, and a 5-year milestone forecast across Career, Wealth, Health, Love, Mind & Dharma.",
       sections: [
         "Age 0 to 90 Complete Visual Life Curve & Percentage Trajectory",
+        "Vimshottari Mahadasha & Antardasha Complete Lifecycle Audit",
+        "Navtara 9-Chakra Classification: Sampat, Kshema, Sadhaka vs Vipat, Pratyari & Vadha",
         "Golden Peak Mahadasha & Antardasha Periods Identification",
         "Karmic Challenge Windows & Strategic Mitigation Protocol",
         "Current Planetary Driver Breakdown (Support, Caution, Transformation)",
         "Next 5-Year Yearly Milestone Roadmap (Score Trends & Action Plan)",
         "6 Fundamental Life Areas Scoring: Career, Wealth, Health, Marriage, Mind & Dharma",
+      ],
+    },
+    {
+      id: "navtara_dasha_single",
+      title: "🌟 Navtara Chakra & Dasha Transit Audit",
+      tagline: "9 Taras (Janma to Parama Mitra), 27th Support Star Shield & active dasha friction.",
+      price: "₹89",
+      paise: 8900,
+      vargas: ["Navtara 9-Taras", "Vimshottari Dasha", "Nakshatra Lords", "Support Star"],
+      badge: "🛡️ Star Shield",
+      badgeColor: "bg-[#0f766e] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Pinpoints the exact energetic nature of every transit and dasha planet counted from your Moon Nakshatra. Reveals your Sampat (wealth), Kshema (wellbeing), and Sadhaka (success) stars versus hazardous Vipat, Pratyari, and Vadha stars.",
+      sections: [
+        "Janma Nakshatra Base Coordinate & 27 Nakshatras 3-Cycle Mapping",
+        "Navtara 9-Tara Breakdown: Janma, Sampat, Vipat, Kshema, Pratyari, Sadhaka, Vadha, Mitra, Parama Mitra",
+        "Active Mahadasha & Antardasha Planet Tara Status & Friction Score",
+        "27th Support Star Shield (Preceding Nakshatra Sacred Anchor)",
+        "Safe vs Dangerous Donation (Daan) Protocols Based on Tara Placement",
       ],
     },
     {
@@ -712,7 +734,7 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>⚡</span>
-              <span>Single & Flagship Tools (21)</span>
+              <span>Single & Flagship Tools (22)</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3c2880]/10 text-[#3c2880] font-bold">
                 From ₹49
               </span>
