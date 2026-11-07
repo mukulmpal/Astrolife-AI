@@ -36,7 +36,8 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Astro Bank", href: "/dashboard/astro-bank", Icon: Database, badge: "BASIC" },
       { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot, badge: "BASIC" },
       { label: "Predictions", href: "/dashboard/destiny", Icon: TrendingUp, badge: "PRO" },
-      { label: "Report", href: "/dashboard/report", Icon: FileText, badge: "BASIC" },
+      { label: "Reports Store ✦", href: "/reports", Icon: Sparkles, badge: "HOT" },
+      { label: "Report Viewer", href: "/dashboard/report", Icon: FileText, badge: "BASIC" },
     ],
   },
   {

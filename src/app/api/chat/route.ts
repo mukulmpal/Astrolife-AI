@@ -419,11 +419,11 @@ function validateChatBody(value: unknown): ValidationResult<ChatRequestBody> {
   const body: ChatRequestBody = {
     messages,
     agentId,
-    chartContext: optionalText(value.chartContext, 20_000),
-    masterAstroContext: optionalText(value.masterAstroContext, 45_000),
-    transitContext: optionalText(value.transitContext, 12_000),
-    dailyFeedContext: optionalText(value.dailyFeedContext, 12_000),
-    vargaContext: optionalText(value.vargaContext, 20_000),
+    chartContext: optionalText(value.chartContext, 30_000),
+    masterAstroContext: optionalText(value.masterAstroContext, 100_000),
+    transitContext: optionalText(value.transitContext, 25_000),
+    dailyFeedContext: optionalText(value.dailyFeedContext, 20_000),
+    vargaContext: optionalText(value.vargaContext, 30_000),
     palmSessionId: optionalText(value.palmSessionId, 120),
     userId: optionalText(value.userId, 120),
   };
@@ -437,7 +437,7 @@ export async function POST(req: NextRequest) {
     const limit = checkRateLimit(req, { scope: "api-chat", limit: 30, windowMs: 60_000 });
     if (!limit.allowed) return rateLimitResponse(limit.resetAt);
 
-    const parsed = await readJsonWithLimit(req, validateChatBody, { maxBytes: 120_000, routeName: "api-chat" });
+    const parsed = await readJsonWithLimit(req, validateChatBody, { maxBytes: 250_000, routeName: "api-chat" });
     if (!parsed.ok) return validationErrorResponse(parsed);
 
     const body = parsed.data;
@@ -524,6 +524,11 @@ export async function POST(req: NextRequest) {
       masterAstroContext ? "Lal Kitab System"       : null,
       masterAstroContext ? "Jaimini Sutras"         : null,
       masterAstroContext ? "Ashtakavarga Matrix"    : null,
+      masterAstroContext ? "Bio-Wearables & Vastu"  : null,
+      masterAstroContext ? "Goal House Activation"  : null,
+      masterAstroContext ? "Outer Planets (Indra/Varun/Yam)" : null,
+      masterAstroContext ? "Transit Purchase Guidance" : null,
+      masterAstroContext ? "Prashna Horary Oracle"   : null,
       vargaContext       ? "Shodasha Varga"         : null,
       transitContext     ? "Transit/Gochar"         : null,
       dailyFeedContext   ? "Daily Feed"             : null,

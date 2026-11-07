@@ -40,6 +40,17 @@ import { evaluateCareerSpecifier } from "../astro-engine/career-specifier";
 import { resolvePilgrimagePrescription } from "../astro-engine/pilgrimage-engine";
 import { getTrikaBhavaRemedyAnalysis } from "../astro-engine/trika-remedies-engine";
 import { generateSimpleKundliDossierData } from "../astro-engine/simple-kundli-dossier-engine";
+import { buildFutureTransitTimeline } from "../astro-engine/future-transit-timeline";
+import { computeNatalOuterPlanets } from "../astro-engine/outer-planets-engine";
+import { auditUserWearables, PRESET_SAMPLE_ITEMS } from "../astro-engine/bio-wearable-audit-engine";
+import { generateAstroTattooAudit } from "../astro-engine/astro-tattoo-engine";
+import { evaluateAllGoalActivations } from "../astro-engine/goal-house-activation-engine";
+import { evaluateDateMuhurat } from "../astro-engine/muhurat";
+import { detectMoonBoundarySensitivity } from "../astro-engine/lunar-boundary";
+import { normalizeChartForTransit } from "../astro-engine/chart-normalize";
+import { calculateTransitReport } from "../astro-engine/transits";
+import { generateTransitPurchaseGuidance } from "../astro-engine/transit-purchase-guidance";
+import { calculatePrashna } from "../astro-engine/prashna";
 
 /**
  * Builds a comprehensive, unified astrological context from ALL engines.
@@ -194,6 +205,15 @@ ${takYog ? `- Dasha-Antardasha Distance & Harmonics:
     }
   } catch (err) {
     console.warn("[MasterAstroContext] Transit Nakshatra Shivling error:", err);
+  }
+
+  // ── 2D. PRE-COMPUTED MAJOR TRANSIT TIMELINE (2025–2030) ──────────────────
+  try {
+    const moonSign = chart.planets?.Moon?.sign || chart.lagnaRashi;
+    const timeline = buildFutureTransitTimeline(chart.lagnaRashi, moonSign);
+    sections.push(timeline.promptBlock);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Future transit timeline error:", err);
   }
 
   // ── 3. KP SYSTEM (KRISHNAMURTI PADDHATI) ────────────────────────────────────
@@ -1083,6 +1103,125 @@ ${mksAlerts.length ? `- MKS Exalted "Rise-to-Fall" Parabola:\n  ${mksAlerts.join
     }
   } catch (err) {
     console.warn("[MasterAstroContext] Shastric Life Dossier error:", err);
+  }
+
+  // ── 22. OUTER PLANETS DEEP-SPACE INTELLIGENCE (INDRA, VARUN, YAM) ───────────
+  try {
+    const natalLons = Object.fromEntries(Object.entries(chart.planets).map(([k, v]) => [k, v.lon]));
+    const outer = computeNatalOuterPlanets(chart.jd, chart.lagnaNum, natalLons);
+    const outerLines = outer.evaluations
+      .map((e) => `✦ ${e.name} (${e.devanagariName}): ${e.rashiName} H${e.house} (${e.degreeInRashi.toFixed(1)}°, ${e.motionState}) — ${e.synthesis}`)
+      .join("\n");
+
+    sections.push(`### 22. OUTER PLANETS DEEP-SPACE INTELLIGENCE (INDRA, VARUN, YAM)
+${outerLines}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Outer planets error:", err);
+  }
+
+  // ── 23. BIO-WEARABLES & METALLIC AUDIT (SMARTWATCH, RINGS, METALS) ──────────
+  try {
+    const wearable = auditUserWearables(chart, PRESET_SAMPLE_ITEMS);
+    const critical = wearable.itemsAudited
+      .filter((i) => i.severity === "CRITICAL_REMOVE")
+      .map((i) => `${i.locationTitleHi} [${i.itemTitleHi}]: ${i.badgeText} — ${i.correctiveRecommendation}`)
+      .join("; ");
+
+    sections.push(`### 23. BIO-WEARABLES & METALLIC AUDIT (SMARTWATCH, RINGS, METALS)
+- Summary: ${wearable.generalVerdictSummary}
+- Critical Metallic Clashes: ${critical || "None detected on body"}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Bio-wearable error:", err);
+  }
+
+  // ── 24. ASTRO-TATTOO & SACRED BODY ANATOMY MANIFESTATION ────────────────────
+  try {
+    const tat = generateAstroTattooAudit(chart);
+    const p = tat.prescription;
+
+    sections.push(`### 24. ASTRO-TATTOO & SACRED BODY ANATOMY MANIFESTATION
+- Target Goal: ${p.goalTitleHindi}
+- Recommended Safe Body Zone: ${p.anatomicalLocation.detailedPlacement}
+- Activating Planet & Medium: ${p.activatingPlanet.name} (${p.activatingPlanet.hindiName}) — ${p.activatingPlanet.color.colorNameHindi} (${p.activatingPlanet.color.hexColor})
+- Shastric Mechanism: ${p.houseSignificatorsExplanation}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Astro-tattoo error:", err);
+  }
+
+  // ── 25. GOAL HOUSE ACTIVATION & DIRECTIONAL TRIGGERS ────────────────────────
+  try {
+    const goals = evaluateAllGoalActivations(chart);
+    const goalLines = [
+      goals.foreign_travel ? `✦ Foreign Travel (3-9-12): ${goals.foreign_travel.shastricVerdictHi} [${goals.foreign_travel.negationHouseWarning.warningHi}]` : null,
+      goals.property_purchase ? `✦ Property Purchase (4-11): ${goals.property_purchase.shastricVerdictHi}` : null,
+      goals.partnership_risk_audit ? `✦ Partnership Risk (7-8): ${goals.partnership_risk_audit.shastricVerdictHi}` : null,
+      goals.lagna_mandatory_shield ? `✦ Lagna Vitality Shield: ${goals.lagna_mandatory_shield.shastricVerdictHi}` : null,
+    ].filter(Boolean).join("\n");
+
+    sections.push(`### 25. GOAL HOUSE ACTIVATION & DIRECTIONAL TRIGGERS
+${goalLines}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Goal house activation error:", err);
+  }
+
+  // ── 26. MUHURAT & REAL-TIME AUSPICIOUS TIMING ───────────────────────────────
+  try {
+    const muhurat = evaluateDateMuhurat(new Date(), "business", chart.tz, { lat: chart.lat, lon: chart.lon }, chart.planets.Moon?.nakshatra);
+
+    sections.push(`### 26. MUHURAT & REAL-TIME AUSPICIOUS TIMING
+- Today's Business/General Muhurat Rating: ${muhurat.rating} (${muhurat.score}/100)
+- Best Window of the Day: ${muhurat.bestTimeOfDay}
+- Shastra Summary: ${muhurat.shastraSummary}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Muhurat error:", err);
+  }
+
+  // ── 27. LUNAR BOUNDARY PRECISION & BIRTH TIME CONFIDENCE ────────────────────
+  try {
+    const moonLon = chart.planets?.Moon?.lon;
+    if (typeof moonLon === "number") {
+      const boundary = detectMoonBoundarySensitivity(moonLon);
+      const boundaryText = boundary.isSensitive
+        ? `⚠️ Moon within ${boundary.distanceToBoundaryDeg.toFixed(2)}° of ${boundary.boundaryType} boundary. High birth-time sensitivity alert.`
+        : "Moon is comfortably centered within Nakshatra core (High birth-time confidence).";
+
+      sections.push(`### 27. LUNAR BOUNDARY PRECISION & BIRTH TIME CONFIDENCE
+- Birth-Time Sensitivity: ${boundaryText}`);
+    }
+  } catch (err) {
+    console.warn("[MasterAstroContext] Lunar boundary error:", err);
+  }
+
+  // ── 28. TRANSIT PURCHASE GUIDANCE (TODAY'S BUY/AVOID RECOMMENDATIONS) ────────
+  try {
+    const tc = normalizeChartForTransit(chart);
+    const rep = calculateTransitReport({ chart: tc, base: "moon", date: new Date() });
+    const guidance = generateTransitPurchaseGuidance(rep);
+    const purchaseLines = guidance.windows
+      .map((w) => `✦ ${w.title}: ${w.verdict} (${w.score}/100) — ${w.timing}`)
+      .join("\n  ");
+
+    sections.push(`### 28. TRANSIT PURCHASE GUIDANCE (TODAY'S BUY/AVOID ADVICE)
+- Daily Purchasing Climate: ${guidance.summary || "Evaluate with normal diligence"}
+  ${purchaseLines}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Transit purchase guidance error:", err);
+  }
+
+  // ── 29. PRASHNA & REAL-TIME HORARY ORACLE (QUERY MOMENT ASTROLOGY) ───────────
+  try {
+    const lat = chart.lat ?? 28.6139;
+    const lon = chart.lon ?? 77.2090;
+    const tz = chart.tz ?? 5.5;
+    const prashna = calculatePrashna("Current seeker consultation", "general", lat, lon, tz, new Date());
+
+    sections.push(`### 29. PRASHNA & REAL-TIME HORARY ASTROLOGY (QUERY MOMENT ORACLE)
+- Horary Chart: Lagna ${prashna.lagnaRashi} (Lord ${prashna.lagnaLord} in H${prashna.lagnaLordHouse}) | Moon in ${prashna.moonSign} (${prashna.moonNakshatra}, H${prashna.moonHouse}) | Hora: ${prashna.hora}
+- Shastric Verdict: ${prashna.verdict.toUpperCase()} (Score ${prashna.score}/100) — ${prashna.shastricVerdict}
+- Practical Timing Window: ${prashna.timingWindow || "Unspecified"}
+- Decision Protocol: ${prashna.decisionProtocol || "Proceed with caution"}`);
+  } catch (err) {
+    console.warn("[MasterAstroContext] Prashna error:", err);
   }
 
 

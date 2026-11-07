@@ -22,6 +22,7 @@ import { calculateEventRadarReport } from "@/lib/astro-engine/event-radar";
 import { calculatePanchang } from "@/lib/astro-engine/panchang";
 import { PalmistryAiChatBanner } from "@/components/palmistry/palmistry-ai-chat-banner";
 import { buildMasterAstroContext } from "@/lib/ai-chat/master-astro-context";
+import { buildFutureTransitTimeline } from "@/lib/astro-engine/future-transit-timeline";
 
 interface Message {
   role: "user" | "assistant";
@@ -244,8 +245,11 @@ export default function ChatPage() {
         base: "moon",
         date: new Date(),
       });
+
+      const moonSign = chart.planets?.Moon?.sign || chart.lagnaRashi;
+      const timeline = buildFutureTransitTimeline(chart.lagnaRashi, moonSign);
   
-      return transitReport.aiContext;
+      return `${transitReport.aiContext}\n\n${timeline.promptBlock}`;
     } catch (error) {
       console.warn("Transit context failed:", error);
       return "";

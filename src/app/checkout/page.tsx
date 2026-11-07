@@ -137,10 +137,16 @@ export default function CheckoutPage() {
               Live Gateway Active
             </span>
             <Link
+              href="/reports"
+              className="text-[#a07820] font-semibold hover:text-[#1A1A1A] transition-colors"
+            >
+              Reports Store ✦
+            </Link>
+            <Link
               href="/dashboard/upgrade"
               className="text-[#6B635B] hover:text-[#1A1A1A] transition-colors"
             >
-              Plans Comparison
+              Plans
             </Link>
             <Link
               href="/dashboard"

@@ -59,8 +59,8 @@ export function validationErrorResponse(result: { error: string; issues?: string
 export function sanitizeText(value: unknown, maxLength = 8_000): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
-  if (!trimmed || trimmed.length > maxLength) return null;
-  return trimmed;
+  if (!trimmed) return null;
+  return trimmed.length > maxLength ? trimmed.slice(0, maxLength) : trimmed;
 }
 
 export function optionalText(value: unknown, maxLength = 20_000): string | undefined {
