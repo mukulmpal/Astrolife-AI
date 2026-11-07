@@ -36,132 +36,254 @@ export default function ReportsStorePage() {
     payment_id: string;
   } | null>(null);
 
-  // 1. Five Master Life Solution Packs (Combining multiple engines into high-value dossiers)
-  const masterReports: ReportItem[] = [
+  // 1. Four High-Converting Modular Packages (3-4 related engines each)
+  // Designed so that no single package solves everything; seekers naturally acquire 2-3 packages.
+  const packageReports: ReportItem[] = [
     {
-      id: "career_wealth",
-      title: "💼 Career, Business & Wealth Super-Dossier",
-      tagline: "High-precision KP Sub-Lord, D10 Dashamsha & Ashtakavarga financial forecast.",
-      price: "₹199",
-      paise: 19900,
-      vargas: ["D1", "D10", "KP Sub-Lord", "Ashtakavarga"],
-      badge: "🔥 Most Popular",
-      badgeColor: "bg-[#c8a030] text-[#FAF7F2]",
-      popular: true,
-      deliveryTime: "60 Seconds Delivery",
-      description:
-        "Comprehensive 22-page financial and professional blueprint. Identifies exact job change windows, promotion probabilities, business viability, and auspicious investment timings.",
-      sections: [
-        "10th House Karma & 2nd/11th House Wealth Analysis",
-        "D-10 Dashamsha Career Micro-Architecture",
-        "KP System Ruling Planets & Precise Sub-Lord Predictions",
-        "Sarvashtakavarga Financial Strengths & Favorable Sectors",
-        "12-Month Professional Timeline & Favorable Quarters",
-      ],
-    },
-    {
-      id: "vivah_destiny",
-      title: "💍 Vivah & Relationship Destiny Suite",
-      tagline: "D-9 Navamsha, Marriage Timing Scanner, Kundali Milan & Mangal Dosha.",
-      price: "₹199",
-      paise: 19900,
-      vargas: ["D1", "D9 Navamsha", "36-Guna", "Synastry"],
-      badge: "⭐ Top Requested",
+      id: "pkg_union_family",
+      title: "💍 Sacred Union & Family Destiny Pack",
+      tagline: "4-in-1 Suite: Kundali Milan, Vivah Timing, Family Karma & Mangal Dosha.",
+      price: "₹249",
+      paise: 24900,
+      vargas: ["Kundali Milan", "D-9 Navamsha", "Family Karma", "Mangal Dosha"],
+      badge: "🔥 Top Marital Pack",
       badgeColor: "bg-[#e11d48] text-white",
       popular: true,
       deliveryTime: "60 Seconds Delivery",
       description:
-        "Deep-dive 20-page marital dossier. Reveals spouse characteristics, exact marriage timing windows, Mangal dosha mitigation, and Ashtakoota compatibility analysis.",
+        "Complete 24-page relationship and lineage suite. Evaluates 36-guna Ashtakoota matching, partner characteristics, ancestral karmic baggage, and exact 12-month marriage timing windows.",
       sections: [
-        "7th House Lord, Kalatra Karaka (Venus/Jupiter) Analysis",
-        "D-9 Navamsha Chart & Life Partner Personality Blueprint",
-        "12-Month Marriage Timing Window Scanner",
-        "Mangal Dosha & Bhakoot/Nadi Dosha In-depth Mitigation",
-        "Classical Marital Remedies & Shubh Vivah Muhurat Guidelines",
+        "Ashtakoota 36-Guna Milan & Nadi/Bhakoot Exception Scanner",
+        "D-9 Navamsha Life Partner Personality & In-law Dynamics",
+        "Family Karma Synastry: Multi-Generational Planetary Imprints",
+        "Mangal Dosha In-depth Mitigation & Vivah Timing Scanner",
+        "Classical Marital Remedies, Shubh Muhurat & Relationship Harmonizers",
       ],
     },
     {
-      id: "lalkitab_vault",
-      title: "🛡️ Karmic Debt & Lal Kitab Upay Vault",
-      tagline: "Pitra/Matra Rin diagnosis, instant classical totke & gemstone prescription.",
-      price: "₹149",
-      paise: 14900,
-      vargas: ["Lal Kitab 1952", "Pitra Rin", "Beej Mantra", "Gemstone"],
-      badge: "⚡ Instant Remedies",
+      id: "pkg_bio_remedies",
+      title: "🛡️ Bio-Vedic Protection & Sacred Remedy Vault",
+      tagline: "4-in-1 Vault: Advance Gemstone, Astro Dot Therapy, Astro-Tattoo & Lal Kitab.",
+      price: "₹249",
+      paise: 24900,
+      vargas: ["Gemstones & Rudraksha", "Dot Therapy & Thread", "Astro-Tattoo", "Lal Kitab"],
+      badge: "⚡ Energy Shield",
       badgeColor: "bg-[#16a34a] text-white",
+      popular: true,
       deliveryTime: "45 Seconds Delivery",
       description:
-        "Actionable 16-page remedial playbook. Decodes hidden ancestral karmic debts (Rin), unblocks stagnant financial energy, and prescribes zero-cost classical Lal Kitab remedies.",
+        "The ultimate physical and esoteric bio-energy defense. Combines planetary acupressure dot points, sacred protective thread timings, talismanic tattoo geometry, and zero-cost Lal Kitab upay.",
       sections: [
-        "Identification of 9 Major Lal Kitab Rins (Pitra, Matra, Stri Rin)",
-        "Household Omens & Subconscious Behavioral Corrections",
-        "House-Wise Precise Classical Lal Kitab Remedies (Totke)",
-        "Personalized Natural Gemstone, Rudraksha & Metal Guide",
-        "Daily & Weekly Dos and Don'ts for Planetary Harmony",
+        "Advance Natural Gemstone & Ek-Mukhi to 14-Mukhi Rudraksha Prescription",
+        "Astro Dot Therapy: Planetary Acupressure Points on Palm & Body",
+        "Sacred Protective Thread (Mauli) Tying Timings & Consecration Mantras",
+        "Astro-Tattoo Sacred Geometry: Planetary Symbols & Skin Placement Rules",
+        "Classical Lal Kitab Rin (Pitra/Matra/Rahu) Instant Neutralization Upay",
       ],
     },
     {
-      id: "vastu_space",
-      title: "🏡 Astro-Vastu & Space Energy Alignment",
-      tagline: "16 Vedic directions, home compass & astrological space alignment.",
-      price: "₹199",
-      paise: 19900,
-      vargas: ["16 Directions", "Vastu Compass", "Sarvatobhadra"],
-      badge: "🏡 Home & Business",
+      id: "pkg_wealth_yogas",
+      title: "👑 Raja Yoga & Wealth Acceleration Suite",
+      tagline: "4-in-1 Suite: 300+ Classical Yogas, KP Sub-Lord, Numerology & Transit Purchase.",
+      price: "₹249",
+      paise: 24900,
+      vargas: ["300+ Yogas", "KP Sub-Lord", "Vedic Numerology", "Transit Purchase"],
+      badge: "💰 High Net-Worth",
+      badgeColor: "bg-[#c8a030] text-[#FAF7F2]",
+      popular: true,
+      deliveryTime: "60 Seconds Delivery",
+      description:
+        "Comprehensive 25-page commercial and career accelerator. Scans 300+ classical yogas for dormant wealth, locks KP job promotion sub-lords, tunes name spelling vibrations, and pinpoints asset purchase dates.",
+      sections: [
+        "300+ Classical Planetary Yogas (Raja, Dhana, Gajakesari & Vipreet Yogas)",
+        "KP Sub-Lord Precision Career Timing & 10th House Sub-Ruler",
+        "Vedic & Chaldean Numerology Name Correction & Phone Resonance",
+        "Transit Purchase Timing: Shubh Muhurat for Cars, Property & Gold",
+        "Quarter-by-Quarter Financial Growth & Auspicious Expansion Windows",
+      ],
+    },
+    {
+      id: "pkg_space_destiny",
+      title: "🏡 Space Energy, Palmistry & Destiny Calibration",
+      tagline: "4-in-1 Suite: Astro-Vastu Radar, AI Palmistry, BTR & 1-Year Transit Forecast.",
+      price: "₹249",
+      paise: 24900,
+      vargas: ["16-Zone Vastu", "AI Palmistry", "BTR Engine", "1-Year Gochar"],
+      badge: "🔬 High Diagnostic",
       badgeColor: "bg-[#0284c7] text-white",
       deliveryTime: "60 Seconds Delivery",
       description:
-        "18-page spatial intelligence report. Maps your Janam Kundli planets directly onto your home's 16 Vastu zones. Identifies directional flaws creating financial drain or health stress.",
+        "Deep diagnostic master suite. Maps your chart to home's 16 Vastu zones, scans physical hand lines via computer vision, rectifies uncertain birth minutes, and provides a 12-month Gochar roadmap.",
       sections: [
-        "Birth Chart Planet-to-Home Zone Mapping (16 Directions)",
-        "Entrance, Master Bedroom & Pooja Mandir Directional Audit",
-        "Remedies for North-East (Ishan) & South-West (Nairutya) Flaws",
-        "Elemental Balance: Fire, Water, Air, Earth & Space Energy",
-        "Non-Destructive Vastu Cures (Colors, Metals & Pyramids)",
-      ],
-    },
-    {
-      id: "mind_health",
-      title: "⚕️ Mind, Health & Vitality Shield",
-      tagline: "Medical astrology, mental clarity patterns & Shadbala vitality scores.",
-      price: "₹149",
-      paise: 14900,
-      vargas: ["D1", "D3 Drekkana", "6th House", "Shadbala"],
-      badge: "🌿 Ayurvedic Balance",
-      badgeColor: "bg-[#059669] text-white",
-      deliveryTime: "45 Seconds Delivery",
-      description:
-        "15-page vitality and wellness forecast. Analyzes 6th/8th house vulnerabilities, psychosomatic stress triggers, and prescribes Ayurvedic lifestyle alignment.",
-      sections: [
-        "Ascendant Strength & 6-Fold Shadbala Planetary Vitality",
-        "6th & 8th House Vulnerability Analysis (Roga Vichar)",
-        "Ayurvedic Tridosha Mapping: Vata, Pitta, Kapha Balance",
-        "Mental Resilience & Moon-Mercury Emotional Axis",
-        "Planetary Fasting & Daily Solar/Lunar Energy Habits",
+        "Astro-Vastu Directional Radar: 16-Zone Birth Planet Home Mapping",
+        "AI Palmistry Vision Scan: Heart, Head & Fate Lines vs Chart Alignment",
+        "Mathematical Birth Time Rectification (BTR) Exact Minute Calculation",
+        "2026-2027 1-Year Transit & Shani Sade Sati Month-by-Month Forecast",
+        "Non-Destructive Space Harmonization & Spatial Energy Balancing",
       ],
     },
   ];
 
-  // 2. Specialized Single-Engine Tools (Unbundled micro-tools for specific needs)
+  // 2. Specialized Single-Engine Tools (Unbundled à la carte tools)
   const singleEngineReports: ReportItem[] = [
     {
-      id: "btr_mathematical",
-      title: "⏱️ Mathematical Birth Time Rectification (BTR)",
-      tagline: "Exact minute calculation via Tattwa Shodhana & KP ruling planets.",
-      price: "₹149",
-      paise: 14900,
-      vargas: ["BTR Engine", "KP Ruling", "Tattwa Shodhana"],
-      badge: "🔬 High Precision",
-      badgeColor: "bg-[#7c3aed] text-white",
-      deliveryTime: "Instant Verification",
+      id: "kundali_milan_single",
+      title: "💍 Kundali Milan & 36-Guna Compatibility",
+      tagline: "Ashtakoota 36-guna calculation, Manglik dosha & Navamsha synastry.",
+      price: "₹99",
+      paise: 9900,
+      vargas: ["36-Guna", "D-9 Navamsha", "Manglik Check"],
+      badge: "💑 Partner Sync",
+      badgeColor: "bg-[#e11d48] text-white",
+      deliveryTime: "Instant 30s",
       description:
-        "For seekers whose birth time is uncertain (e.g. 'between 4:15 PM and 4:45 PM'). Uses verified life milestones and planetary sub-lords to lock your exact astrological second.",
+        "Precise matrimonial compatibility analysis between two birth charts. Analyzes Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, and Nadi.",
       sections: [
-        "Pre-natal Epoch & Tattwa Shodhana Gender Verification",
-        "KP Ruling Planets Alignment at Query Time",
-        "Milestone Cross-Verification (Education, Marriage, Relocation)",
-        "Final Corrected Lagna Degree & Navamsha Shift Analysis",
-        "Official Corrected Vedic Chart Timestamp",
+        "Ashtakoota 36-Points Breakdown with Critical Nadi Analysis",
+        "Manglik Dosha Severity Check & Mutual Cancellation Factors",
+        "D-9 Navamsha Dual-Chart Emotional Compatibility Score",
+        "Dasha Period Overlap: Longevity & Financial Prosperity Together",
+        "Classical Marital Harmony Remedies for Dosha Mitigation",
+      ],
+    },
+    {
+      id: "family_karma_single",
+      title: "🌳 Family Karma & Lineage Synastry",
+      tagline: "Ancestral karmic imprints, Pitra dosha & multi-generational chart sync.",
+      price: "₹99",
+      paise: 9900,
+      vargas: ["Lineage Karma", "Pitra Dosha", "Family Synastry"],
+      badge: "🧬 Ancestral",
+      badgeColor: "bg-[#7c3aed] text-white",
+      deliveryTime: "45 Seconds Delivery",
+      description:
+        "Decodes unresolved ancestral karma passed through DNA and planetary placements. Pinpoints Pitra dosha and generational patterns of financial or emotional blockage.",
+      sections: [
+        "9th House & Sun/Saturn Ancestral Lineage Audit",
+        "Pitra Dosha Identification & Degree of Karmic Entanglement",
+        "Parent-Child Astrological Synastry & Conflict Resolvers",
+        "Karmic Debts Carried from Paternal & Maternal Ancestors",
+        "Classical Vedic Tarpana & Daily Lineage Healing Rituals",
+      ],
+    },
+    {
+      id: "classical_yogas_single",
+      title: "✨ 300+ Classical Yogas & Awakening Timing",
+      tagline: "Scans your chart for Raja, Dhana, Gajakesari & Vipreet Yogas.",
+      price: "₹89",
+      paise: 8900,
+      vargas: ["300+ Yogas", "Raja Yoga", "Dhana Yoga"],
+      badge: "👑 Royal Yogas",
+      badgeColor: "bg-[#c8a030] text-[#FAF7F2]",
+      deliveryTime: "45 Seconds Delivery",
+      description:
+        "Comprehensive inventory of over 300 classical Parashari and Jaimini yogas present in your horoscope, with exact Dasha periods when each yoga will activate.",
+      sections: [
+        "Major Raja Yogas & Power/Authority Activation Dates",
+        "Dhana Yogas & Sudden Wealth Accumulation Windows",
+        "Vipreet Raja Yogas: Victory Emerging from Adversity",
+        "Dormant vs Active Yogas: Factors Hindering Fruition",
+        "Actionable Gemstones & Mantras to Awaken Benefic Yogas",
+      ],
+    },
+    {
+      id: "gemstone_rudraksha_single",
+      title: "💎 Advance Gemstone & Rudraksha Prescription",
+      tagline: "Custom carat weight, ideal metal, finger & lab energization rituals.",
+      price: "₹79",
+      paise: 7900,
+      vargas: ["Gemstones", "Rudraksha 1-14 Mukhi", "Prana Pratishtha"],
+      badge: "🔮 Precision Talisman",
+      badgeColor: "bg-[#059669] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Never wear the wrong stone. Calculates your Anukul, Ishta, and Bhagya stones based on sub-lords. Prescribes exact Mukhi Rudraksha and sacred consecration timings.",
+      sections: [
+        "Primary Life Stone (Lagnesh) & Wealth Stone (Bhagyesh) Analysis",
+        "Maraka & Badhaka Stones to Strictly Avoid (Danger Precautions)",
+        "Exact Carat, Metal (Gold/Silver/Panchdhatu) & Auspicious Finger",
+        "Specific Mukhi Rudraksha (1 to 14 Mukhi) Natal Chart Resonance",
+        "Step-by-Step Prana Pratishtha & Shubh Muhurat Wearing Ritual",
+      ],
+    },
+    {
+      id: "vastu_radar_single",
+      title: "🧭 Astro-Vastu Directional Radar",
+      tagline: "16 directional zones energy radar mapped to your personal Kundli.",
+      price: "₹119",
+      paise: 11900,
+      vargas: ["16 Directions", "Vastu Compass", "Directional Radar"],
+      badge: "🏡 Space Alignment",
+      badgeColor: "bg-[#0284c7] text-white",
+      deliveryTime: "45 Seconds Delivery",
+      description:
+        "Bridges physical architecture with personal astrology. Identifies which of the 16 compass zones in your home or workplace is suppressing your planetary fortunes.",
+      sections: [
+        "16 Vastu Zones Coordinate Mapping with Natal Planets",
+        "North-East (Wisdom), South-West (Stability) & South-East (Cash) Audit",
+        "Entrance & Master Bed Placement According to Moon Sign",
+        "Anti-Element Detection (e.g. Fire in Water Zone) & Remedies",
+        "Non-Invasive Remedial Cures: Copper Strips, Plants & Sacred Mirrors",
+      ],
+    },
+    {
+      id: "dot_therapy_thread_single",
+      title: "🔴 Astro Dot Therapy & Sacred Thread Protocol",
+      tagline: "Planetary acupressure micro-dots & protective thread (Mauli) timings.",
+      price: "₹79",
+      paise: 7900,
+      vargas: ["Dot Therapy", "Astro-Acupressure", "Sacred Thread"],
+      badge: "🌿 Bio-Energy",
+      badgeColor: "bg-[#d97706] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Ancient esoteric bio-field therapy. Identifies precise color dot placement points on hands/feet to harmonize afflicted planets, plus consecrated protective thread rules.",
+      sections: [
+        "Afflicted Planet Micro-Dot Mapping on Palms (Red, Green, Yellow, Blue)",
+        "Daily Astro-Acupressure Activation Points for Nervous Health",
+        "Sacred Protective Thread (Mauli/Raksha Sutra) Consecration Protocol",
+        "Ideal Day, Tithi & Nakshatra for Thread Tying & Replacement",
+        "21-Day Bio-Field Reset & Aura Fortification Guidelines",
+      ],
+    },
+    {
+      id: "astro_tattoo_single",
+      title: "🎨 Astro-Tattoo & Sacred Yantra Geometry",
+      tagline: "Custom geometric yantras, planetary symbols & skin placement rules.",
+      price: "₹79",
+      paise: 7900,
+      vargas: ["Sacred Geometry", "Yantra Tattoo", "Planetary Skin Zones"],
+      badge: "✍️ Permanent Talisman",
+      badgeColor: "bg-[#3c2880] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Tattoos permanently alter your bio-magnetic field. This guide determines your most benefic planetary yantras, symbols (Trishul, Lotus, Om, Chakra) and safe skin zones.",
+      sections: [
+        "Most Benefic Planetary Symbols & Yantra Geometric Blueprints",
+        "Strictly Prohibited Body Locations & Dark Planetary Glyphs",
+        "Recommended Body Zones: Forearm, Shoulder, Spine & Wrist Alignment",
+        "Color Resonance: Black, Ochre, Gold vs Planetary Elements",
+        "Consecration Meditation to Spiritually Activate the Tattoo",
+      ],
+    },
+    {
+      id: "numerology_single",
+      title: "🔢 Vedic Numerology & Name Resonance",
+      tagline: "Chaldean vibrations, mobile number compatibility & name spelling tuning.",
+      price: "₹69",
+      paise: 6900,
+      vargas: ["Chaldean Numerology", "Name Vibration", "Mobile Resonance"],
+      badge: "📱 Digital Luck",
+      badgeColor: "bg-[#0891b2] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Harness the vibrational frequency of numbers. Calculates your Destiny, Psychic, and Soul Urge numbers, tunes your name spelling for success, and checks phone number luck.",
+      sections: [
+        "Psychic (Mulank) & Destiny (Bhagyank) Harmony Index",
+        "Name Spelling Calculation: Optimizing Compound Numbers (e.g. 23, 37)",
+        "Mobile Number & Bank Account Astrological Compatibility",
+        "Lucky Vehicle Numbers, Colors & House Number Alignment",
+        "Annual Numerological Personal Year Forecast (1 to 9 Cycle)",
       ],
     },
     {
@@ -182,6 +304,26 @@ export default function ReportsStorePage() {
         "Heart Line Trajectory & Emotional Relationship Patterns",
         "Fate Line (Bhagya Rekha) Wealth Emergence Points",
         "Mount of Jupiter & Mount of Venus Strength Ratings",
+      ],
+    },
+    {
+      id: "btr_mathematical",
+      title: "⏱️ Mathematical Birth Time Rectification (BTR)",
+      tagline: "Exact minute calculation via Tattwa Shodhana & KP ruling planets.",
+      price: "₹149",
+      paise: 14900,
+      vargas: ["BTR Engine", "KP Ruling", "Tattwa Shodhana"],
+      badge: "🔬 High Precision",
+      badgeColor: "bg-[#7c3aed] text-white",
+      deliveryTime: "Instant Verification",
+      description:
+        "For seekers whose birth time is uncertain (e.g. 'between 4:15 PM and 4:45 PM'). Uses verified life milestones and planetary sub-lords to lock your exact astrological second.",
+      sections: [
+        "Pre-natal Epoch & Tattwa Shodhana Gender Verification",
+        "KP Ruling Planets Alignment at Query Time",
+        "Milestone Cross-Verification (Education, Marriage, Relocation)",
+        "Final Corrected Lagna Degree & Navamsha Shift Analysis",
+        "Official Corrected Vedic Chart Timestamp",
       ],
     },
     {
@@ -332,9 +474,9 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>🌟</span>
-              <span>Master Life Packs (5 Clusters)</span>
+              <span>4-in-1 Power Bundles</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c8a030]/15 text-[#a07820] font-bold">
-                From ₹149
+                ₹249 Each
               </span>
             </button>
 
@@ -348,7 +490,7 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>⚡</span>
-              <span>Single-Engine Tools</span>
+              <span>Single-Engine Tools (14)</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3c2880]/10 text-[#3c2880] font-bold">
                 From ₹49
               </span>
@@ -445,11 +587,11 @@ export default function ReportsStorePage() {
           </div>
         )}
 
-        {/* Tab Content 1: Master Life Packs */}
+        {/* Tab Content 1: 4-in-1 Power Bundles */}
         {activeTab === "master" && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-              {masterReports.map((report) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+              {packageReports.map((report) => {
                 const isExpanded = expandedReportId === report.id;
                 return (
                   <div
