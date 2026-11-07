@@ -207,6 +207,28 @@ export default function ReportsStorePage() {
   // 2. Specialized Single-Engine Tools (Unbundled à la carte tools)
   const singleEngineReports: ReportItem[] = [
     {
+      id: "destiny_curve_flagship",
+      title: "📈 Destiny Curve: 90-Year Life Master Dossier",
+      tagline: "Vimshottari Dasha life score curve (Age 0-90), Golden Peak vs Challenge windows & 6 life areas.",
+      price: "₹499",
+      paise: 49900,
+      vargas: ["Vimshottari Dasha", "0-90 Life Arc", "Antardasha Radar", "6 Life Pillars"],
+      badge: "👑 Flagship Report",
+      badgeColor: "bg-gradient-to-r from-[#c8a030] to-[#b45309] text-white shadow-sm",
+      popular: true,
+      deliveryTime: "60 Seconds Delivery",
+      description:
+        "Our crowning predictive masterwork. Maps your lifetime energetic trajectory across 90 years with year-by-year 0-100% scores, pinpointing your exact golden peak windows, karmic endurance cycles, current planetary drivers, and a 5-year milestone forecast across Career, Wealth, Health, Love, Mind & Dharma.",
+      sections: [
+        "Age 0 to 90 Complete Visual Life Curve & Percentage Trajectory",
+        "Golden Peak Mahadasha & Antardasha Periods Identification",
+        "Karmic Challenge Windows & Strategic Mitigation Protocol",
+        "Current Planetary Driver Breakdown (Support, Caution, Transformation)",
+        "Next 5-Year Yearly Milestone Roadmap (Score Trends & Action Plan)",
+        "6 Fundamental Life Areas Scoring: Career, Wealth, Health, Marriage, Mind & Dharma",
+      ],
+    },
+    {
       id: "kundali_milan_single",
       title: "💍 Kundali Milan & 36-Guna Compatibility",
       tagline: "Ashtakoota 36-guna calculation, Manglik dosha & Navamsha synastry.",
@@ -690,7 +712,7 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>⚡</span>
-              <span>Single-Engine Tools (20)</span>
+              <span>Single & Flagship Tools (21)</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3c2880]/10 text-[#3c2880] font-bold">
                 From ₹49
               </span>
@@ -915,7 +937,11 @@ export default function ReportsStorePage() {
                 return (
                   <div
                     key={report.id}
-                    className="bg-[#FFFFFF] border border-[#E7DFD5] rounded-2xl p-6 sm:p-7 relative transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:border-[#c8a030]/60"
+                    className={`rounded-2xl p-6 sm:p-7 relative transition-all duration-300 flex flex-col justify-between hover:shadow-lg ${
+                      report.popular
+                        ? "border-2 border-[#c8a030] shadow-[0_12px_40px_rgba(200,160,48,0.18)] md:col-span-2 lg:col-span-3 bg-gradient-to-br from-[#FFFFFF] via-[#FFFFFF] to-[#FAF7F2]"
+                        : "bg-[#FFFFFF] border border-[#E7DFD5] hover:border-[#c8a030]/60"
+                    }`}
                   >
                     {report.badge && (
                       <div
