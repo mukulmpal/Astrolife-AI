@@ -1603,7 +1603,7 @@ export default function Dashboard() {
                   { icon:"🪐", label:"Transits",          desc:"Live gochar analysis",        href:"/dashboard/transits" },
                   { icon:"📅", label:"Panchang",          desc:"Daily tithi & nakshatra",     href:"/dashboard/panchang" },
                   { icon:"🎵", label:"Astro Sound",       desc:"Raga-based sound remedy",     href:"/dashboard/astro-sound" },
-                  { icon:"📈", label:"Destiny Timeline",  desc:"Life arc and dasha flow",     href:"/dashboard/destiny" },
+                  { icon:"📈", label:"Destiny Curve",     desc:"0 to 90 Life arc & dasha flow",  href:"/dashboard/destiny" },
                   { icon:"⏳", label:"Dasha Timeline",   desc:"Maha + Antar + Pratyantar",   href:"/dashboard/dasha" },
                   { icon:"🧠", label:"Psychology",        desc:"Mind and behavior mapping",   href:"/dashboard/psychology" },
                   { icon:"💑", label:"Kundali Milan",     desc:"36-point compatibility",      href:"/dashboard/kundali-milan" },

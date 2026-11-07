@@ -35,7 +35,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "My Kundli", href: "/dashboard/kundli", Icon: CircleDot, badge: "BASIC" },
       { label: "Astro Bank", href: "/dashboard/astro-bank", Icon: Database, badge: "BASIC" },
       { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot, badge: "BASIC" },
-      { label: "Predictions", href: "/dashboard/destiny", Icon: TrendingUp, badge: "PRO" },
+      { label: "Destiny Curve", href: "/dashboard/destiny", Icon: TrendingUp, badge: "PRO" },
       { label: "Reports Store ✦", href: "/reports", Icon: Sparkles, badge: "HOT" },
       { label: "Report Viewer", href: "/dashboard/report", Icon: FileText, badge: "BASIC" },
     ],

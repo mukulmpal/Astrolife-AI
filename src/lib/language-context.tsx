@@ -178,8 +178,8 @@ const TRANSLATIONS: Record<string, Record<Language, string>> = {
   "medical.page_title": { english: "Health Awareness", hindi: "स्वास्थ्य जागरूकता", hinglish: "Health Awareness" },
 
   // ── Destiny ──
-  "destiny.page_tag": { english: "✦ Destiny Reading", hindi: "✦ भाग्य पठन", hinglish: "✦ Destiny Reading" },
-  "destiny.page_title": { english: "Destiny & Purpose", hindi: "भाग्य और उद्देश्य", hinglish: "Destiny & Purpose" },
+  "destiny.page_tag": { english: "✦ Destiny Curve", hindi: "✦ डेस्टिनी कर्व (भाग्य वक्र)", hinglish: "✦ Destiny Curve" },
+  "destiny.page_title": { english: "Destiny Curve", hindi: "डेस्टिनी कर्व (जीवन ऊर्जा वक्र)", hinglish: "Destiny Curve" },
 
   // ── Language Toggle ──
   "lang.english": { english: "English", hindi: "English", hinglish: "English" },

@@ -36,7 +36,7 @@ const ENGINE_ITEMS: EngineItem[] = [
   { icon: "🔢", label: "Numerology", href: "/dashboard/numerology", badge: "PRO" },
   { icon: "💑", label: "Kundali Milan", href: "/dashboard/kundali-milan", badge: "PRO" },
   { icon: "🤚", label: "Palmistry", href: "/dashboard/palmistry", badge: "PRO" },
-  { icon: "📈", label: "Predictions", href: "/dashboard/destiny", badge: "PRO" },
+  { icon: "📈", label: "Destiny Curve", href: "/dashboard/destiny", badge: "PRO" },
   { icon: "🛍️", label: "Transit Purchase", href: "/dashboard/transit-purchase", badge: "PRO" },
 
   // BASIC & Foundational Engines

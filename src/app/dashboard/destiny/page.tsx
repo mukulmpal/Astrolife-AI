@@ -388,7 +388,7 @@ export default function DestinyPage() {
   if (loading || !hasUserChart || !result) {
     return (
       <EngineEmptyState
-        engineName="Destiny Timeline"
+        engineName="Destiny Curve"
         engineIcon="📈"
         whatItAnalyzes={["Life-score curve", "Peak & challenge periods", "6 life-area scores", "Dasha-based timing"]}
       />
@@ -400,13 +400,13 @@ export default function DestinyPage() {
       <div className="page-tag">{t("destiny.page_tag")}</div>
       <h1 className="page-title serif">{t("destiny.page_title")}</h1>
       <p className="page-sub">Dasha-based life scoring · Peak & challenge periods · 6 life area scores</p>
-      <PremiumFeature feature="Destiny Timeline">
+      <PremiumFeature feature="Destiny Curve">
 
       {/* HEADER */}
       <div className="header-card">
         <div className="header-orb"/>
         <div style={{position:"relative",zIndex:1}}>
-          <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#c8a030",marginBottom:6}}>📈 Destiny Analysis</div>
+          <div style={{fontSize:11,letterSpacing:"2px",textTransform:"uppercase",color:"#c8a030",marginBottom:6}}>📈 Destiny Curve Analysis</div>
           <div style={{fontFamily:"Cormorant Garamond,serif",fontSize:26,fontWeight:600,color:"#1A1A1A"}}>{effectiveName}</div>
           <div style={{fontSize:13,color:"#6B635B",marginTop:4}}>Age {result.currentAge} · {result.currentDasha} Mahadasha · Score {result.currentScore}%</div>
         </div>
