@@ -36,7 +36,7 @@ export default function ReportsStorePage() {
     payment_id: string;
   } | null>(null);
 
-  // 1. Four High-Converting Modular Packages (3-4 related engines each)
+  // 1. Eight High-Converting Modular Packages (3-4 related engines each)
   // Designed so that no single package solves everything; seekers naturally acquire 2-3 packages.
   const packageReports: ReportItem[] = [
     {
@@ -120,6 +120,86 @@ export default function ReportsStorePage() {
         "Mathematical Birth Time Rectification (BTR) Exact Minute Calculation",
         "2026-2027 1-Year Transit & Shani Sade Sati Month-by-Month Forecast",
         "Non-Destructive Space Harmonization & Spatial Energy Balancing",
+      ],
+    },
+    {
+      id: "pkg_stock_trading",
+      title: "📈 Stock Market, Trading & Speculation Pack",
+      tagline: "4-in-1 Suite: Sarvatobhadra Hit Radar, Ashtakavarga 337-Bindus, 5th/11th House Speculation & Transit Timing.",
+      price: "₹299",
+      paise: 29900,
+      vargas: ["Sarvatobhadra", "Ashtakavarga", "5th/11th Speculation", "Intraday Muhurat"],
+      badge: "📊 Trader Speculation",
+      badgeColor: "bg-[#059669] text-white",
+      deliveryTime: "60 Seconds Delivery",
+      description:
+        "Specialized financial astrology suite for equity, crypto, F&O and commodity traders. Combines 28-nakshatra Sarvatobhadra vedha hit lines, Ashtakavarga bindu strength, and volatile planetary aspects.",
+      sections: [
+        "Sarvatobhadra Chakra 28-Nakshatra Vedha (Cross-Ray) Hit Detection",
+        "5th House (Speculative Gain) & 11th House (Profit Inflow) Planetary Strength",
+        "Ashtakavarga 337-Bindus House Heatmap for Bullish vs Bearish Market Cycles",
+        "Rahu & Mercury Aspect Windows: Avoiding Greed Traps & Market Crashes",
+        "Personal Lucky Trading Hours, Days & Wealth Consecration Mantras",
+      ],
+    },
+    {
+      id: "pkg_jaimini_soul",
+      title: "🧘 Jaimini Soul Blueprint & Karmic Mission",
+      tagline: "4-in-1 Suite: Atmakaraka Soul Purpose, Karakamsa Lagna, Chara Dasha & Arudha Lagna.",
+      price: "₹249",
+      paise: 24900,
+      vargas: ["Atmakaraka", "Karakamsa", "Chara Dasha", "Arudha Lagna"],
+      badge: "👁️ Soul Awakening",
+      badgeColor: "bg-[#7c3aed] text-white",
+      deliveryTime: "45 Seconds Delivery",
+      description:
+        "Unlocks Jaimini Sutras to reveal your soul's deepest mission (Atmakaraka), spiritual liberation path (Karakamsa), external societal illusion/reputation (Arudha Lagna), and sign-based Chara dasha timing.",
+      sections: [
+        "Atmakaraka (King of Soul) & Amatyakaraka (Career Guide) Secret Matrix",
+        "Karakamsa Lagna in Navamsha: Ishta Devata & Spiritual Liberation Blueprint",
+        "Arudha Lagna (AL) & Rajya Arudha (A10): Social Image vs True Wealth",
+        "Jaimini Chara Dasha: Rashi-Based Karmic Phase Timelines",
+        "Remedies for Releasing Karmic Blockages & Soul Evolution Upay",
+      ],
+    },
+    {
+      id: "pkg_ayurvedic_medical",
+      title: "⚕️ Ayurvedic Medical & Psychological Vitality Shield",
+      tagline: "4-in-1 Suite: Medical Astrology, Tridosha Balance, Cognitive Stress & Astro-Sound Hz.",
+      price: "₹199",
+      paise: 19900,
+      vargas: ["Medical Kundli", "Tridosha Balance", "Cognitive Health", "Planetary Hz"],
+      badge: "🌿 Vitality & Longevity",
+      badgeColor: "bg-[#0284c7] text-white",
+      deliveryTime: "45 Seconds Delivery",
+      description:
+        "Preventive bio-astrological health audit. Maps planetary afflictions to bodily organ vulnerabilities, Vata-Pitta-Kapha tridosha imbalances, Moon-Mercury cognitive stress, and restorative planetary frequencies.",
+      sections: [
+        "6th, 8th & 12th House Medical Vulnerability & Organ Weakness Audit",
+        "Ayurvedic Tridosha (Vata / Pitta / Kapha) Natal Constitution Analysis",
+        "Moon-Mercury-Rahu Cognitive Stress & Sleep Disorder Indicators",
+        "Planetary Gemstone & Herbal Decoctions for Bio-Field Balancing",
+        "Custom Solfeggio Planetary Hz Audio Therapy for Cellular Healing",
+      ],
+    },
+    {
+      id: "pkg_muhurat_panchang",
+      title: "⚡ Golden Muhurat & Auspicious Decision Suite",
+      tagline: "4-in-1 Suite: Instant Prashna, Choghadiya & Hora Radar, Transit Purchase & Tithi Audit.",
+      price: "₹149",
+      paise: 14900,
+      vargas: ["Prashna Shastra", "Choghadiya", "Hora Radar", "Muhurat Engine"],
+      badge: "⏱️ Perfect Timing",
+      badgeColor: "bg-[#d97706] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Never take a major leap during Rahu Kaal or Bhadra. Equips you with instant horary answers, 24/7 planetary Hora and Choghadiya windows, and personalized high-yield decision dates.",
+      sections: [
+        "Instant Prashna Kundli: Binary Yes/No Analysis for Immediate Dilemmas",
+        "24-Hour Planetary Hora & Choghadiya Real-Time Energy Windows",
+        "Shubh Muhurat for Contracts, Legal Filing & Business Inaugurations",
+        "Abhijit Muhurat & Rahu Kaal / Gulika Kaal Danger Timetable",
+        "Custom Tithi & Nakshatra Synchronization for Unstoppable Success",
       ],
     },
   ];
@@ -406,6 +486,126 @@ export default function ReportsStorePage() {
         "Direct Download Link for Customized Planetary Audio",
       ],
     },
+    {
+      id: "sarvatobhadra_single",
+      title: "📊 Sarvatobhadra Transit & Trading Hit Radar",
+      tagline: "28-nakshatra cosmic grid scanning cross-ray vedhas on your natal planets.",
+      price: "₹149",
+      paise: 14900,
+      vargas: ["Sarvatobhadra", "28 Nakshatras", "Vedha Ray"],
+      badge: "📈 Speculation Tech",
+      badgeColor: "bg-[#059669] text-white",
+      deliveryTime: "Instant 45s",
+      description:
+        "The ancient secret of kings and modern financial astrologers. Uses the 28-nakshatra Sarvatobhadra Chakra to detect front, right, and left vedha hits on your natal points.",
+      sections: [
+        "28-Nakshatra (including Abhijit) Sarvatobhadra Grid Mapping",
+        "Panchaka (Janma, Karma, Sanghatika, Samudayika, Vainashika) Nakshatra Vedha",
+        "Malefic Cross-Rays (Saturn, Mars, Rahu) on Natal Sun & Moon",
+        "High-Risk Market Exposure Dates vs Bullish Expansion Windows",
+        "Protective Planetary Yantra for Financial Defense",
+      ],
+    },
+    {
+      id: "special_lagnas_single",
+      title: "👑 Special Lagnas: Hora & Sree Lagna Wealth Dossier",
+      tagline: "Independent wealth degree calculations: Hora Lagna (HL) & Sree Lagna (SL).",
+      price: "₹89",
+      paise: 8900,
+      vargas: ["Hora Lagna", "Sree Lagna", "Ghati Lagna"],
+      badge: "💰 Secret Wealth Degrees",
+      badgeColor: "bg-[#c8a030] text-[#FAF7F2]",
+      deliveryTime: "Instant 30s",
+      description:
+        "Parashara's hidden wealth ascendants. While normal Lagna shows physical self, Hora Lagna governs monetary influx and Sree Lagna governs Lakshmi's permanent blessings.",
+      sections: [
+        "Exact Degrees of Hora Lagna (HL) & Sree Lagna (SL)",
+        "Benefic Planetary Aspects on Wealth Ascendants",
+        "Ghati Lagna (GL) Power, Authority & Political Elevation Capacity",
+        "Timing of Multi-Fold Financial Liquidity Events",
+        "Special Lakshmi & Kuber Yantras Aligned to Your Sree Lagna",
+      ],
+    },
+    {
+      id: "atmakaraka_soul_single",
+      title: "👁️ Atmakaraka & Jaimini Soul Purpose Dossier",
+      tagline: "The king planet of your chart: soul desires, karmic lessons & Ishta Devata.",
+      price: "₹89",
+      paise: 8900,
+      vargas: ["Atmakaraka", "Karakamsa", "Ishta Devata"],
+      badge: "🧘 Soul Mission",
+      badgeColor: "bg-[#7c3aed] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "In Jaimini astrology, the planet with the highest longitude is the Atmakaraka — the king of the chart representing the soul's incarnation journey, past debts, and ultimate mission.",
+      sections: [
+        "Atmakaraka Planet Identification & Inherent Soul Desires",
+        "Karakamsa Lagna in D-9 Navamsha: Higher Spiritual Identity",
+        "Identification of Your Specific Ishta Devata for Liberation (Moksha)",
+        "Amatyakaraka Alignment: Selecting a Career in Sync with Soul Purpose",
+        "Daily Sadhana & Contemplation Protocol for Inner Peace",
+      ],
+    },
+    {
+      id: "ashtakavarga_bindus_single",
+      title: "🔢 Ashtakavarga 337-Bindus Strength Matrix",
+      tagline: "Mathematical point distribution across all 12 houses and 7 planets.",
+      price: "₹79",
+      paise: 7900,
+      vargas: ["Sarvashtakavarga", "Bhinnashtakavarga", "Kakshya"],
+      badge: "📊 Pure Math",
+      badgeColor: "bg-[#0284c7] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Eliminates astrologer subjectivity. The 337-bindu Ashtakavarga matrix calculates objective scores (0 to 8 points) for every house, revealing where luck flows and where friction exists.",
+      sections: [
+        "Sarvashtakavarga (SAV) Complete 12-House Numerical Heatmap",
+        "11th House (Gains) vs 12th House (Losses) Bindu Balance Ratio",
+        "Transit Activation via Kakshya System for Crucial Life Steps",
+        "Low-Bindu House Strengthening & Energy Conservation Strategies",
+        "Samudaya Ashtakavarga Lifetime Financial Accumulation Potential",
+      ],
+    },
+    {
+      id: "medical_roga_single",
+      title: "🏥 Medical Astrology & Organ Vulnerability Audit",
+      tagline: "6th, 8th & 12th house disease patterns, Tridosha balance & vital organs.",
+      price: "₹79",
+      paise: 7900,
+      vargas: ["Medical Kundli", "Tridosha", "Roga Bhava"],
+      badge: "⚕️ Health Shield",
+      badgeColor: "bg-[#e11d48] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Deep Ayurvedic-astrological preventive health analysis. Analyzes planetary rulers of the 6th house (diseases), 8th house (chronic ailments), and Lagnesh vitality.",
+      sections: [
+        "Constitutional Prakriti: Vata, Pitta, and Kapha Astrological Breakdown",
+        "Vulnerable Organ Mapping Based on Zodiac Sign Significations",
+        "Dasha-Antardasha Health Hazard Timing & Caution Windows",
+        "Sun-Saturn & Mars-Moon Afflictions: Cardiovascular & Nervous Health",
+        "Dietary, Lifestyle & Ayurvedic Herbal Recommendations",
+      ],
+    },
+    {
+      id: "cognitive_mind_single",
+      title: "🧠 Cognitive Mind & Emotional Stress Decoder",
+      tagline: "Moon-Mercury-Rahu axis, emotional triggers, anxiety & mental clarity.",
+      price: "₹69",
+      paise: 6900,
+      vargas: ["Manas Bhava", "Moon-Mercury", "Chitta Shudhi"],
+      badge: "🧘 Mental Peace",
+      badgeColor: "bg-[#d97706] text-white",
+      deliveryTime: "Instant 30s",
+      description:
+        "Decodes psychological wiring. Analyzes Moon (emotions/subconscious), Mercury (analytical intellect/nervous system), and Rahu (obsessions/overthinking) for clarity and calm.",
+      sections: [
+        "Moon Sign & Nakshatra Emotional Vulnerability & Stress Triggers",
+        "Mercury Retrogression & Combustion: Processing Style & Overthinking",
+        "Kemadruma & Rahu-Chandra Grahan Yoga: Releasing Deep-Seated Anxiety",
+        "Circadian Rhythm & Bedtime Astrological Grounding Techniques",
+        "Breathwork (Pranayama) & Beej Mantras Tailored to Your Mind Chart",
+      ],
+    },
   ];
 
   return (
@@ -474,9 +674,9 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>🌟</span>
-              <span>4-in-1 Power Bundles</span>
+              <span>8 Power Bundles</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c8a030]/15 text-[#a07820] font-bold">
-                ₹249 Each
+                ₹149 - ₹299
               </span>
             </button>
 
@@ -490,7 +690,7 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>⚡</span>
-              <span>Single-Engine Tools (14)</span>
+              <span>Single-Engine Tools (20)</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3c2880]/10 text-[#3c2880] font-bold">
                 From ₹49
               </span>
