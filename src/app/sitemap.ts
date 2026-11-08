@@ -1,8 +1,16 @@
 import type { MetadataRoute } from "next";
+import { SEO_LANDING_PAGES } from "@/lib/report-seo-catalog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://astrolife-ai.vercel.app";
   const now = new Date();
+
+  const programmaticReportPages = Object.keys(SEO_LANDING_PAGES).map((slug) => ({
+    url: `${baseUrl}/reports/${slug}`,
+    lastModified: now,
+    changeFrequency: "daily" as const,
+    priority: 0.9,
+  }));
 
   return [
     {
@@ -17,6 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.95,
     },
+    ...programmaticReportPages,
     {
       url: `${baseUrl}/landing-a`,
       lastModified: now,

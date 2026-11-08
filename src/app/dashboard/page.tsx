@@ -16,6 +16,7 @@ import { isEliteEmail } from "@/lib/access";
 import { calculateCosmicPulse } from "@/lib/astro-engine/cosmic-pulse";
 import { buildRadarHorizons } from "@/lib/astro-engine/cosmic-pulse/forecast";
 import { CosmicPulseCard, CosmicRadar } from "@/components/cosmic-pulse";
+import { DailyCosmicAlertBanner } from "@/components/daily-cosmic-alert-banner";
 import { AajKaTaraCard } from "@/components/dasha/AajKaTaraCard";
 import { NakshatraRemedyDossierCard } from "@/components/remedies/NakshatraRemedyDossierCard";
 import { CorePlanetRemediesDossier } from "@/components/remedies/CorePlanetRemediesDossier";
@@ -1240,6 +1241,9 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          {/* DAILY COSMIC PULSE RETENTION & WHATSAPP SHARING BANNER */}
+          <DailyCosmicAlertBanner panchang={dailyFeed.panchang} chart={chart} />
 
           {/* COSMIC PULSE INTELLIGENCE CARD */}
           <CosmicPulseCard pulse={dailyFeed.cosmicPulse} />
