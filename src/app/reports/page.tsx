@@ -27,6 +27,7 @@ export default function ReportsStorePage() {
   const [expandedReportId, setExpandedReportId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<boolean>(false);
   const [sampleLoadingId, setSampleLoadingId] = useState<string | null>(null);
+  const [previewModalReport, setPreviewModalReport] = useState<ReportItem | null>(null);
 
   // Customer contact details for report delivery
   const [customerName, setCustomerName] = useState<string>("");
@@ -1014,21 +1015,11 @@ export default function ReportsStorePage() {
 
                       <button
                         type="button"
-                        disabled={sampleLoadingId === report.id}
-                        onClick={() => handlePreviewSample(report)}
+                        onClick={() => setPreviewModalReport(report)}
                         className="w-full mt-2 py-2 px-3 rounded-xl border border-[#c8a030]/40 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                       >
-                        {sampleLoadingId === report.id ? (
-                          <>
-                            <span className="animate-spin text-xs">⟳</span>
-                            <span>Compiling Sample...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>👁️</span>
-                            <span>View Sample PDF</span>
-                          </>
-                        )}
+                        <span>👁️</span>
+                        <span>View Sample Preview</span>
                       </button>
 
                       <div className="text-[11px] text-center text-[#9C948A] mt-2 flex items-center justify-center gap-1">
@@ -1163,21 +1154,11 @@ export default function ReportsStorePage() {
 
                       <button
                         type="button"
-                        disabled={sampleLoadingId === report.id}
-                        onClick={() => handlePreviewSample(report)}
+                        onClick={() => setPreviewModalReport(report)}
                         className="w-full mt-2 py-2 px-3 rounded-xl border border-[#3c2880]/30 text-[#3c2880] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                       >
-                        {sampleLoadingId === report.id ? (
-                          <>
-                            <span className="animate-spin text-xs">⟳</span>
-                            <span>Compiling Sample...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>👁️</span>
-                            <span>View Sample PDF</span>
-                          </>
-                        )}
+                        <span>👁️</span>
+                        <span>View Sample Preview</span>
                       </button>
 
                       <div className="text-[11px] text-center text-[#9C948A] mt-2 flex items-center justify-center gap-1">
@@ -1427,6 +1408,19 @@ export default function ReportsStorePage() {
                 )}
               </button>
 
+              {/* Viral WhatsApp Share Action */}
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `I just received my official ${purchasedReport.title} from AstroLife AI! Download your precision Vedic life dossier here: https://astrolife-ai.vercel.app/reports`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full mt-3 py-3 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+              >
+                <span>💬</span>
+                <span>Share Confirmation on WhatsApp</span>
+              </a>
+
               <div className="mt-4 flex items-center justify-center gap-4 text-xs text-[#6B635B]">
                 <button
                   type="button"
@@ -1442,6 +1436,157 @@ export default function ReportsStorePage() {
                 >
                   Return to Dashboard →
                 </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Interactive In-Page Sample Preview Modal */}
+        {previewModalReport && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto">
+              <button
+                type="button"
+                onClick={() => setPreviewModalReport(null)}
+                className="absolute top-4 right-4 text-[#6B635B] hover:text-[#1A1A1A] text-lg font-bold p-1 rounded-full w-8 h-8 flex items-center justify-center bg-black/5 hover:bg-black/10 transition-colors"
+                aria-label="Close dialog"
+              >
+                ✕
+              </button>
+
+              <div className="text-center mb-6">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#a07820] block mb-1">
+                  ✦ Sacred Dossier Live Preview ✦
+                </span>
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
+                  {previewModalReport.title}
+                </h3>
+                <p className="text-xs text-[#6B635B] mt-1">
+                  Sample structure computed from your active natal coordinates
+                </p>
+              </div>
+
+              {/* Sample Document Simulation Card */}
+              <div className="bg-white border-2 border-[#B8860B]/40 rounded-2xl p-6 shadow-sm text-left relative overflow-hidden mb-6">
+                {/* Subtle watermark */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] rotate-[-25deg] select-none text-5xl font-serif font-black text-[#1A1A1A]">
+                  ASTROLIFE SAMPLE
+                </div>
+
+                <div className="border-b border-[#E7DFD5] pb-3 mb-4 flex justify-between items-center text-xs">
+                  <span className="font-serif font-bold text-[#8C6508] tracking-widest text-[11px]">
+                    ASTROLIFE • SACRED SHASTRA DOSSIER
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#c8a030]/15 text-[#a07820] text-[10px] font-bold">
+                    Official Vector PDF
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs bg-[#FAF7F0] p-3.5 rounded-xl border border-[#E0D7C6] mb-4">
+                  <div>
+                    <span className="text-[#6B635B] block text-[10px]">Seeker Name</span>
+                    <strong className="text-[#1A1A1A]">{customerName || chart?.name || "Sacred Seeker"}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[#6B635B] block text-[10px]">Ascendant / Moon</span>
+                    <strong className="text-[#8C6508]">{chart?.lagnaRashi || "Ascendant"} • {chart?.planets?.Moon?.sign || "Chandra"}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[#6B635B] block text-[10px]">Active Mahadasha</span>
+                    <strong className="text-[#1A1A1A]">{chart?.dashas?.[0]?.planet || "Jupiter"} Mahadasha</strong>
+                  </div>
+                  <div>
+                    <span className="text-[#6B635B] block text-[10px]">Mathematical Engine</span>
+                    <strong className="text-[#1A1A1A]">Swiss Ephemeris Sidereal</strong>
+                  </div>
+                </div>
+
+                <div className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                  <span className="text-[#c8a030]">✦</span>
+                  <span>Included Dossier Chapters (20-24 Pages):</span>
+                </div>
+
+                <ul className="space-y-2 text-xs text-[#4A4238] mb-4">
+                  {previewModalReport.sections.map((sec, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5">✓</span>
+                      <span><strong>Chapter {idx + 1}:</strong> {sec}</span>
+                    </li>
+                  ))}
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5">✓</span>
+                    <span><strong>Chapter {previewModalReport.sections.length + 1}:</strong> 100% Free Authentic Classical Remedial Blueprint (Japa, Dana, Lifestyle Vastu)</span>
+                  </li>
+                </ul>
+
+                <div className="p-3 rounded-xl bg-[#FAF0D7] border border-[#c8a030]/30 text-[11px] text-[#8C6508] leading-relaxed">
+                  <strong>Ethical Vedic Guarantee:</strong> Zero fear-mongering and no commercial upsells. Every recommendation is purely classical, empowering you with actionable guidance for your life path.
+                </div>
+              </div>
+
+              {/* Action Buttons in Modal */}
+              <div className="space-y-3">
+                <RazorpayCheckoutButton
+                  amount={previewModalReport.paise}
+                  currency="INR"
+                  name="AstroLife AI"
+                  description={`${previewModalReport.title} • ${previewModalReport.price}`}
+                  buttonText={`Unlock Full Official Dossier · ${previewModalReport.price}`}
+                  prefill={{
+                    name: customerName,
+                    email: customerEmail,
+                    contact: customerPhone,
+                  }}
+                  onSuccess={(data) => {
+                    const purchaseInfo = {
+                      id: previewModalReport.id,
+                      title: previewModalReport.title,
+                      price: previewModalReport.price,
+                      order_id: data.order_id,
+                      payment_id: data.payment_id,
+                    };
+                    setPreviewModalReport(null);
+                    setPurchasedReport(purchaseInfo);
+                    void savePurchasedReport({
+                      reportId: previewModalReport.id,
+                      title: previewModalReport.title,
+                      price: previewModalReport.price,
+                      orderId: data.order_id,
+                      paymentId: data.payment_id,
+                      seekerName: customerName || chart?.name || "Sacred Seeker",
+                      chartSnapshot: chart || undefined,
+                    });
+                  }}
+                />
+
+                <button
+                  type="button"
+                  disabled={sampleLoadingId === previewModalReport.id}
+                  onClick={() => handlePreviewSample(previewModalReport)}
+                  className="w-full py-2.5 px-4 rounded-xl border border-[#c8a030]/50 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  {sampleLoadingId === previewModalReport.id ? (
+                    <>
+                      <span className="animate-spin text-xs">⟳</span>
+                      <span>Compiling Sample PDF...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>📥</span>
+                      <span>Download Sample PDF File Directly</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => setPreviewModalReport(null)}
+                  className="text-xs text-[#6B635B] hover:text-[#1A1A1A] underline"
+                >
+                  Back to Store
+                </button>
               </div>
             </div>
           </div>
