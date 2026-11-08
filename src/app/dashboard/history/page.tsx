@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { EducationTooltip } from "@/components/education-tooltip";
 import {
   listSavedCharts,
@@ -11,16 +12,27 @@ import {
   type SavedChartSummary,
   useUserChart,
 } from "@/lib/user-chart";
+import {
+  getPurchasedReports,
+  triggerDossierDownload,
+  type PurchasedReportRecord,
+} from "@/lib/user-reports";
 import "@/app/dashboard/shared.css";
 
 export default function HistoryPage() {
   const router = useRouter();
   const { chart, hasUserChart } = useUserChart();
   const [charts, setCharts] = useState<SavedChartSummary[]>([]);
+  const [purchasedReports, setPurchasedReports] = useState<PurchasedReportRecord[]>([]);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState("");
   const [switchingId, setSwitchingId] = useState<string | null>(null);
+
+  const refreshPurchasedReports = useCallback(() => {
+    setPurchasedReports(getPurchasedReports());
+  }, []);
 
   const refreshCharts = useCallback(async () => {
     setLoading(true);
@@ -50,11 +62,35 @@ export default function HistoryPage() {
     }
 
     void loadInitialCharts();
+    refreshPurchasedReports();
+
+    const handleReportPurchased = () => {
+      refreshPurchasedReports();
+    };
+
+    window.addEventListener("astrolife:report-purchased", handleReportPurchased);
 
     return () => {
       active = false;
+      window.removeEventListener("astrolife:report-purchased", handleReportPurchased);
     };
-  }, []);
+  }, [refreshPurchasedReports]);
+
+  const handleDownloadPurchasedPdf = async (record: PurchasedReportRecord) => {
+    try {
+      setDownloadingId(record.id);
+      await triggerDossierDownload(
+        { id: record.reportId, title: record.title, orderId: record.orderId, paymentId: record.paymentId },
+        chart,
+        record.seekerName || chart?.name
+      );
+    } catch (err) {
+      console.error("Failed to download dossier:", err);
+      alert("Error downloading dossier. Please try again.");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const handleSaveChart = async () => {
     if (!chart || !hasUserChart) return;
@@ -145,6 +181,142 @@ export default function HistoryPage() {
             <li><strong>Dasha:</strong> Current life period (<EducationTooltip term="dasha">what is Dasha?</EducationTooltip>)</li>
           </ul>
         </div>
+      </div>
+
+      {/* MY PURCHASED SACRED DOSSIERS SECTION */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <div>
+            <div style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#B8860B", fontWeight: 700 }}>
+              ✦ Sacred Reports Vault
+            </div>
+            <h3 className="serif" style={{ margin: "2px 0 0", color: "#1A1A1A", fontSize: 20 }}>
+              My Purchased Dossiers ({purchasedReports.length})
+            </h3>
+          </div>
+          <Link
+            href="/reports"
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#c8a030",
+              textDecoration: "none",
+              padding: "6px 12px",
+              borderRadius: 8,
+              background: "rgba(200,160,48,0.1)",
+              border: "1px solid rgba(200,160,48,0.25)",
+            }}
+          >
+            + Store Catalog →
+          </Link>
+        </div>
+
+        {purchasedReports.length === 0 ? (
+          <div
+            style={{
+              padding: "20px 24px",
+              background: "#FFFFFF",
+              border: "1px dashed rgba(184,134,11,0.3)",
+              borderRadius: 14,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>
+              No custom life dossiers purchased yet
+            </div>
+            <div style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.6 }}>
+              Get comprehensive 24-page mathematical reports on Sacred Union, Career Yogas, Astro-Vastu, and 10-Year Destiny Horary timelines. Pay once, keep your official vector PDF forever.
+            </div>
+            <div style={{ marginTop: 4 }}>
+              <Link
+                href="/reports"
+                style={{
+                  display: "inline-block",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "#FAF7F2",
+                  background: "linear-gradient(135deg, #c8a030, #a07820)",
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                  textDecoration: "none",
+                }}
+              >
+                Browse Reports Catalog (From ₹49) →
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
+            {purchasedReports.map((rec) => (
+              <div
+                key={rec.id}
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid rgba(184,134,11,0.25)",
+                  borderRadius: 14,
+                  padding: 16,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 10, color: "#a07820", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
+                    Official Dossier • {rec.price}
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginBottom: 6, lineHeight: 1.3 }}>
+                    {rec.title}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B635B", lineHeight: 1.5 }}>
+                    <strong>Recipient:</strong> {rec.seekerName || "Seeker"}
+                    <br />
+                    <strong>Purchased:</strong> {new Date(rec.purchasedAt).toLocaleDateString()}
+                    <br />
+                    <span style={{ fontFamily: "monospace", fontSize: 10 }}>Order: {rec.orderId}</span>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 14 }}>
+                  <button
+                    type="button"
+                    disabled={downloadingId === rec.id}
+                    onClick={() => handleDownloadPurchasedPdf(rec)}
+                    style={{
+                      width: "100%",
+                      padding: "9px 14px",
+                      borderRadius: 10,
+                      background: "linear-gradient(135deg, #c8a030, #a07820)",
+                      border: "none",
+                      color: "#FAF7F2",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: downloadingId === rec.id ? "wait" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                    }}
+                  >
+                    {downloadingId === rec.id ? (
+                      <>
+                        <span style={{ fontSize: 14 }}>⟳</span>
+                        <span>Compiling PDF...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>📥</span>
+                        <span>Download Dossier (PDF)</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <h3 className="serif" style={{ marginBottom: 16, color: "#1A1A1A" }}>

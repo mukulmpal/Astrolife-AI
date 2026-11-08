@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 import { useUserChart } from "@/lib/user-chart";
+import { savePurchasedReport, triggerDossierDownload } from "@/lib/user-reports";
 
 interface ReportItem {
   id: string;
@@ -25,6 +26,7 @@ export default function ReportsStorePage() {
   const [activeTab, setActiveTab] = useState<"master" | "single" | "sovereign">("master");
   const [expandedReportId, setExpandedReportId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<boolean>(false);
+  const [sampleLoadingId, setSampleLoadingId] = useState<string | null>(null);
 
   // Customer contact details for report delivery
   const [customerName, setCustomerName] = useState<string>("");
@@ -38,6 +40,22 @@ export default function ReportsStorePage() {
     order_id: string;
     payment_id: string;
   } | null>(null);
+
+  const handlePreviewSample = async (report: ReportItem) => {
+    try {
+      setSampleLoadingId(report.id);
+      await triggerDossierDownload(
+        { id: report.id, title: `SAMPLE - ${report.title}` },
+        chart,
+        customerName || chart?.name || "Sample Seeker"
+      );
+    } catch (err) {
+      console.error("Preview sample error:", err);
+      alert("Could not load sample preview. Please try again.");
+    } finally {
+      setSampleLoadingId(null);
+    }
+  };
 
   const handleDownloadDossier = async (report: { id: string; title: string; order_id: string; payment_id: string }) => {
     try {
@@ -960,7 +978,7 @@ export default function ReportsStorePage() {
                       </div>
                     </div>
 
-                    {/* Razorpay Buy Button */}
+                    {/* Razorpay Buy Button & Sample Preview */}
                     <div className="pt-2">
                       <RazorpayCheckoutButton
                         amount={report.paise}
@@ -974,15 +992,45 @@ export default function ReportsStorePage() {
                           contact: customerPhone,
                         }}
                         onSuccess={(data) => {
-                          setPurchasedReport({
+                          const purchaseInfo = {
                             id: report.id,
                             title: report.title,
                             price: report.price,
                             order_id: data.order_id,
                             payment_id: data.payment_id,
+                          };
+                          setPurchasedReport(purchaseInfo);
+                          void savePurchasedReport({
+                            reportId: report.id,
+                            title: report.title,
+                            price: report.price,
+                            orderId: data.order_id,
+                            paymentId: data.payment_id,
+                            seekerName: customerName || chart?.name || "Sacred Seeker",
+                            chartSnapshot: chart || undefined,
                           });
                         }}
                       />
+
+                      <button
+                        type="button"
+                        disabled={sampleLoadingId === report.id}
+                        onClick={() => handlePreviewSample(report)}
+                        className="w-full mt-2 py-2 px-3 rounded-xl border border-[#c8a030]/40 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        {sampleLoadingId === report.id ? (
+                          <>
+                            <span className="animate-spin text-xs">⟳</span>
+                            <span>Compiling Sample...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>👁️</span>
+                            <span>View Sample PDF</span>
+                          </>
+                        )}
+                      </button>
+
                       <div className="text-[11px] text-center text-[#9C948A] mt-2 flex items-center justify-center gap-1">
                         <span>⚡ {report.deliveryTime}</span>
                         <span>•</span>
@@ -1079,7 +1127,7 @@ export default function ReportsStorePage() {
                       </div>
                     </div>
 
-                    {/* Razorpay Buy Button */}
+                    {/* Razorpay Buy Button & Sample Preview */}
                     <div className="pt-2">
                       <RazorpayCheckoutButton
                         amount={report.paise}
@@ -1093,15 +1141,45 @@ export default function ReportsStorePage() {
                           contact: customerPhone,
                         }}
                         onSuccess={(data) => {
-                          setPurchasedReport({
+                          const purchaseInfo = {
                             id: report.id,
                             title: report.title,
                             price: report.price,
                             order_id: data.order_id,
                             payment_id: data.payment_id,
+                          };
+                          setPurchasedReport(purchaseInfo);
+                          void savePurchasedReport({
+                            reportId: report.id,
+                            title: report.title,
+                            price: report.price,
+                            orderId: data.order_id,
+                            paymentId: data.payment_id,
+                            seekerName: customerName || chart?.name || "Sacred Seeker",
+                            chartSnapshot: chart || undefined,
                           });
                         }}
                       />
+
+                      <button
+                        type="button"
+                        disabled={sampleLoadingId === report.id}
+                        onClick={() => handlePreviewSample(report)}
+                        className="w-full mt-2 py-2 px-3 rounded-xl border border-[#3c2880]/30 text-[#3c2880] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        {sampleLoadingId === report.id ? (
+                          <>
+                            <span className="animate-spin text-xs">⟳</span>
+                            <span>Compiling Sample...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>👁️</span>
+                            <span>View Sample PDF</span>
+                          </>
+                        )}
+                      </button>
+
                       <div className="text-[11px] text-center text-[#9C948A] mt-2 flex items-center justify-center gap-1">
                         <span>⚡ {report.deliveryTime}</span>
                         <span>•</span>
