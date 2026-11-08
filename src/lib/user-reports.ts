@@ -95,6 +95,8 @@ export async function triggerDossierDownload(
   customerName?: string
 ): Promise<boolean> {
   try {
+    const isSample = Boolean(!report.orderId || !report.paymentId || report.title.toUpperCase().includes("SAMPLE"));
+
     const res = await fetch("/api/reports/generate-pdf", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -105,8 +107,9 @@ export async function triggerDossierDownload(
         customer: {
           name: customerName || chart?.name || "Sacred Seeker",
         },
-        orderId: report.orderId || `ORD_${Date.now().toString(36).toUpperCase()}`,
-        paymentId: report.paymentId || `PAY_${Date.now().toString(36).toUpperCase()}`,
+        orderId: report.orderId,
+        paymentId: report.paymentId,
+        isSample,
       }),
     });
 

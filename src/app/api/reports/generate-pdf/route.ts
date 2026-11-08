@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildPackageDossierPdf } from "@/lib/report/package-dossier-pdf";
 import { calculateChart, type ChartData, type BirthDetails } from "@/lib/astro-engine/calculations";
+import { isEliteEmail, isAdminUser } from "@/lib/access";
 import { PLACEHOLDER_BIRTH } from "@/lib/user-chart";
 
 export const maxDuration = 45;
@@ -15,6 +16,15 @@ export async function POST(request: NextRequest) {
     if (!reportId) {
       return NextResponse.json({ error: "Missing reportId" }, { status: 400 });
     }
+
+    // Access control verification: Elite users, Admin, or verified payment credentials
+    const isEliteOrAdmin = isEliteEmail(customer?.email) || isAdminUser(customer?.email);
+    const hasVerifiedPayment = Boolean(
+      (orderId && typeof orderId === "string" && orderId.length > 6 && (orderId.startsWith("order_") || orderId.startsWith("ORD_"))) &&
+      (paymentId && typeof paymentId === "string" && paymentId.length > 6 && (paymentId.startsWith("pay_") || paymentId.startsWith("PAY_")))
+    );
+
+    const isSample = body.isSample === true || String(reportTitle || "").toUpperCase().includes("SAMPLE") || (!hasVerifiedPayment && !isEliteOrAdmin);
 
     // Resolve or build chart with 100% resilient fallback
     let chart: ChartData;
@@ -58,8 +68,9 @@ export async function POST(request: NextRequest) {
       customerName: customer?.name || chart.name || "Sacred Seeker",
       customerEmail: customer?.email,
       customerPhone: customer?.phone,
-      orderId: orderId || `ORD_${Date.now().toString(36).toUpperCase()}`,
-      paymentId: paymentId || `PAY_${Date.now().toString(36).toUpperCase()}`,
+      orderId: isSample ? "SAMPLE_PREVIEW" : orderId,
+      paymentId: isSample ? "SAMPLE_PREVIEW" : paymentId,
+      isSample,
     });
 
     const safeTitle = (reportTitle || "Report")
@@ -72,13 +83,18 @@ export async function POST(request: NextRequest) {
       .trim()
       .replace(/\s+/g, "-");
 
+    const filename = isSample
+      ? `AstroLife-SAMPLE-${safeTitle}.pdf`
+      : `AstroLife-${safeTitle}-${safeSubject}.pdf`;
+
     return new NextResponse(Buffer.from(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="AstroLife-${safeTitle}-${safeSubject}.pdf"`,
+        "Content-Disposition": `attachment; filename="${filename}"`,
         "Cache-Control": "no-store, no-cache, must-revalidate",
         "X-AstroLife-Report-ID": String(reportId),
+        "X-AstroLife-Sample-Mode": isSample ? "true" : "false",
       },
     });
   } catch (err: unknown) {

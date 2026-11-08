@@ -21,6 +21,7 @@ export interface PackageDossierOptions {
   orderId?: string;
   paymentId?: string;
   fixedTimestamp?: string;
+  isSample?: boolean;
 }
 
 const DEFAULT_FONT_CANDIDATES = [
@@ -83,7 +84,11 @@ export async function buildPackageDossierPdf(
       // ───────────────────────────────────────────────────────────────────────
       // PAGE 1: LUXURY COVER & CERTIFIED SEEKER PROFILE
       // ───────────────────────────────────────────────────────────────────────
-      renderPage1Cover(doc, chart, subjectName, reportTitle, orderId, paymentId, auditDate);
+      const displayTitle = options.isSample ? `[SAMPLE PREVIEW] ${reportTitle}` : reportTitle;
+      const displayOrderId = options.isSample ? "SAMPLE_PREVIEW" : orderId;
+      const displayPaymentId = options.isSample ? "SAMPLE_PREVIEW" : paymentId;
+
+      renderPage1Cover(doc, chart, subjectName, displayTitle, displayOrderId, displayPaymentId, auditDate);
 
       // ───────────────────────────────────────────────────────────────────────
       // PAGE 2: NATAL GRAHA STHITI & D1/D9 CORE MATRICES
@@ -91,27 +96,37 @@ export async function buildPackageDossierPdf(
       doc.addPage();
       renderPage2NatalPlacements(doc, chart, subjectName);
 
-      // ───────────────────────────────────────────────────────────────────────
-      // PAGE 3: SPECIALIZED THEMATIC ENGINE ANALYSIS
-      // ───────────────────────────────────────────────────────────────────────
-      doc.addPage();
-      renderPage3ThematicAnalysis(doc, chart, options.reportId, reportTitle);
+      if (options.isSample) {
+        // SAMPLE MODE: Locked teaser page with CTA to buy full dossier
+        doc.addPage();
+        renderPageSampleLockedNotice(doc, reportTitle);
+      } else {
+        // PAID MODE: Full Proprietary Thematic Deep-Dive & Classical Remedies
+        doc.addPage();
+        renderPage3ThematicAnalysis(doc, chart, options.reportId, reportTitle);
+
+        doc.addPage();
+        renderPage4RemediesAndGuidance(doc, chart, options.reportId);
+      }
 
       // ───────────────────────────────────────────────────────────────────────
-      // PAGE 4: CLASSICAL REMEDIAL PROTOCOL & LIFE HARMONIZATION
-      // ───────────────────────────────────────────────────────────────────────
-      doc.addPage();
-      renderPage4RemediesAndGuidance(doc, chart, options.reportId);
-
-      // ───────────────────────────────────────────────────────────────────────
-      // PAGE NUMBERING & AUDIT FOOTER
+      // WATERMARK & PAGE NUMBERING
       // ───────────────────────────────────────────────────────────────────────
       const totalPages = doc.bufferedPageRange().count;
       for (let i = 0; i < totalPages; i++) {
         doc.switchToPage(i);
+
+        if (options.isSample) {
+          doc.save();
+          doc.fontSize(28).fillColor("#B8860B").opacity(0.13);
+          doc.rotate(-35, { origin: [297, 420] });
+          doc.text("ASTROLIFE SAMPLE PREVIEW • UNLOCK FULL DOSSIER", 20, 410, { align: "center", width: 550 });
+          doc.restore();
+        }
+
         doc.fontSize(8).fillColor("#8C6508");
         doc.text(
-          `AstroLife Sacred Dossier | ${reportTitle} | Order: ${orderId} | Page ${i + 1} of ${totalPages}`,
+          `AstroLife Sacred Dossier | ${displayTitle} | Ref: ${displayOrderId} | Page ${i + 1} of ${totalPages}`,
           45,
           800,
           { align: "center", width: 505 }
@@ -475,4 +490,58 @@ function renderPage4RemediesAndGuidance(doc: typeof PDFDocument, chart: ChartDat
     { width: 475, align: "center", lineGap: 3 }
   );
   doc.fontSize(8).fillColor("#9C948A").text("www.astrolife-ai.vercel.app • Verified Immutable Shastra Record", 60, y + 88, { align: "center", width: 475 });
+}
+
+function renderPageSampleLockedNotice(
+  doc: PDFKit.PDFDocument,
+  reportTitle: string
+) {
+  // Page Border
+  doc.rect(40, 35, 515, 765).lineWidth(1.2).strokeColor("#B8860B").stroke();
+
+  doc.fontSize(16).fillColor("#8C6508").text("ASTROLIFE SAMPLE PREVIEW", 45, 55, { align: "center", width: 505 });
+  doc.fontSize(9.5).fillColor("#6B635B").text("Preliminary Mathematical Sample • Full Analysis Locked", 45, 78, { align: "center", width: 505 });
+  doc.moveTo(45, 95).lineTo(550, 95).lineWidth(0.8).strokeColor("#B8860B").stroke();
+
+  // Locked Banner
+  doc.rect(45, 115, 505, 160).fillAndStroke("#FAF7F0", "#B8860B");
+  doc.fontSize(13).fillColor("#8C6508").text("🔒 FULL 20–24 PAGE OFFICIAL DOSSIER LOCKED", 60, 135, { align: "center", width: 475 });
+
+  doc.fontSize(9.5).fillColor("#2A2520").text(
+    `You are viewing a watermarked sample preview of "${reportTitle}". The complete dossier includes deep divisional harmonic calculations, exact degree-level planetary transits, and your personal classical remedial blueprint:`,
+    60,
+    160,
+    { width: 475, lineGap: 3, align: "center" }
+  );
+
+  const lockedFeatures = [
+    "✓ Deep Harmonic Divisional Varga Analysis (D-9 Navamsha, D-10 Dasamsa, D-60 Shashtiamsha)",
+    "✓ Exact Degree-Level Orbit Timing & Double-Transit Confirmation (Saturn & Jupiter)",
+    "✓ 10-Year Mahadasha, Antardasha & Pratyantardasha Predictive Timeline",
+    "✓ Complete 100% Free Authentic Classical Remedies (Japa, Dana, Vastu Lifestyle Alignment)",
+    "✓ Lifetime Permanent Re-Download Access from your AstroLife History Vault",
+    "✓ Instant Vector Print-Ready PDF Dispatched to Your Email Inbox",
+  ];
+
+  let y = 295;
+  lockedFeatures.forEach((feat, idx) => {
+    doc.rect(45, y, 505, 34).fillAndStroke(idx % 2 === 0 ? "#FFFFFF" : "#FAF7F2", "#E0D7C6");
+    doc.fontSize(9).fillColor("#8C6508").text(feat, 60, y + 10, { width: 475 });
+    y += 40;
+  });
+
+  // Call to Action Box
+  y += 15;
+  doc.rect(45, y, 505, 130).fillAndStroke("#1A1A1A", "#B8860B");
+  doc.fontSize(12).fillColor("#D4AF37").text("✦ HOW TO UNLOCK YOUR OFFICIAL FULL DOSSIER ✦", 60, y + 18, { align: "center", width: 475 });
+
+  doc.fontSize(9).fillColor("#F5EAD4").text(
+    "To generate and download your official un-watermarked 20-24 page dossier with all personalized remedies, choose your package at the AstroLife Reports Store:",
+    60,
+    y + 42,
+    { width: 475, align: "center", lineGap: 3 }
+  );
+
+  doc.rect(130, y + 78, 335, 30).fillAndStroke("#B8860B", "#D4AF37");
+  doc.fontSize(10.5).fillColor("#FFFFFF").text("VISIT: https://astrolife-ai.vercel.app/reports", 130, y + 87, { align: "center", width: 335 });
 }
