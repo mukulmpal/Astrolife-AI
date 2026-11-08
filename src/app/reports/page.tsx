@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
+import { useUserChart } from "@/lib/user-chart";
 
 interface ReportItem {
   id: string;
@@ -20,8 +21,10 @@ interface ReportItem {
 }
 
 export default function ReportsStorePage() {
+  const { chart, birth } = useUserChart();
   const [activeTab, setActiveTab] = useState<"master" | "single" | "sovereign">("master");
   const [expandedReportId, setExpandedReportId] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<boolean>(false);
 
   // Customer contact details for report delivery
   const [customerName, setCustomerName] = useState<string>("");
@@ -35,6 +38,49 @@ export default function ReportsStorePage() {
     order_id: string;
     payment_id: string;
   } | null>(null);
+
+  const handleDownloadDossier = async (report: { id: string; title: string; order_id: string; payment_id: string }) => {
+    try {
+      setDownloading(true);
+      const res = await fetch("/api/reports/generate-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reportId: report.id,
+          reportTitle: report.title,
+          chart,
+          birth,
+          customer: {
+            name: customerName || chart?.name || "Sacred Seeker",
+            email: customerEmail,
+            phone: customerPhone,
+          },
+          orderId: report.order_id,
+          paymentId: report.payment_id,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to generate PDF");
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const safeTitle = report.title.replace(/[^a-zA-Z0-9]/g, "-").replace(/-+/g, "-");
+      a.download = `AstroLife-${safeTitle}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF download error:", err);
+      alert("Error downloading dossier. Please try again or contact support.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   // 1. Eight High-Converting Modular Packages (3-4 related engines each)
   // Designed so that no single package solves everything; seekers naturally acquire 2-3 packages.
@@ -1233,6 +1279,95 @@ export default function ReportsStorePage() {
             <span>Swiss Ephemeris accuracy</span>
           </div>
         </div>
+
+        {/* Purchase Success & Instant PDF Download Modal */}
+        {purchasedReport && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl relative">
+              <button
+                type="button"
+                onClick={() => setPurchasedReport(null)}
+                className="absolute top-4 right-4 text-[#6B635B] hover:text-[#1A1A1A] text-lg font-bold p-1 rounded-full w-8 h-8 flex items-center justify-center bg-black/5 hover:bg-black/10 transition-colors"
+                aria-label="Close dialog"
+              >
+                ✕
+              </button>
+
+              <div className="w-16 h-16 rounded-full bg-[#16a34a]/15 text-[#16a34a] text-3xl flex items-center justify-center mx-auto mb-4 border border-[#16a34a]/30">
+                ✓
+              </div>
+
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#a07820] block mb-1">
+                Payment Verified • Sacred Dossier Generated
+              </span>
+
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A] mb-2">
+                {purchasedReport.title}
+              </h3>
+
+              <p className="text-xs text-[#6B635B] mb-5 leading-relaxed">
+                Your print-ready mathematical Shastra dossier is fully calculated and compiled. Click below to download your official vector PDF report.
+              </p>
+
+              {/* Transaction details card */}
+              <div className="bg-white border border-[#E7DFD5] rounded-2xl p-4 mb-6 text-left text-xs space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-[#6B635B]">Order ID:</span>
+                  <span className="font-mono text-[#1A1A1A] font-semibold">{purchasedReport.order_id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#6B635B]">Payment ID:</span>
+                  <span className="font-mono text-[#1A1A1A] font-semibold">{purchasedReport.payment_id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#6B635B]">Seeker Name:</span>
+                  <span className="text-[#1A1A1A] font-semibold">{customerName || chart?.name || "Sacred Seeker"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#6B635B]">Delivery Mode:</span>
+                  <span className="text-[#16a34a] font-semibold">Instant Vector PDF (Lifetime Access)</span>
+                </div>
+              </div>
+
+              {/* Instant Download Action */}
+              <button
+                type="button"
+                disabled={downloading}
+                onClick={() => handleDownloadDossier(purchasedReport)}
+                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#c8a030] to-[#a07820] text-[#FAF7F2] font-semibold text-sm shadow-md hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {downloading ? (
+                  <>
+                    <span className="animate-spin text-base">⟳</span>
+                    <span>Compiling Your Sacred PDF...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>📥</span>
+                    <span>Download Sacred Dossier (PDF)</span>
+                  </>
+                )}
+              </button>
+
+              <div className="mt-4 flex items-center justify-center gap-4 text-xs text-[#6B635B]">
+                <button
+                  type="button"
+                  onClick={() => setPurchasedReport(null)}
+                  className="hover:text-[#1A1A1A] underline text-[11px]"
+                >
+                  Close Window
+                </button>
+                <span>•</span>
+                <Link
+                  href="/dashboard"
+                  className="text-[#c8a030] hover:text-[#a07820] font-semibold text-[11px]"
+                >
+                  Return to Dashboard →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Sacred Footer */}
