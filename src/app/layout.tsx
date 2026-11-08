@@ -25,6 +25,20 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://astrolife-ai.vercel.app"),
+  applicationName: "AstroLife AI",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "AstroLife",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   title: "AstroLife — AI Vedic Astrology, Free Kundli & Personalized Remedies",
   description:
     "Generate your free AI Kundli and get personalized Vedic astrology insights, dashas, transits, remedies, marriage, career and wealth guidance.",
@@ -48,10 +62,12 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#080811",
 };
 
 import { ThemeScript } from "@/components/theme-script";
 import { NavigationProgress } from "@/components/navigation-progress";
+import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { Suspense } from "react";
 
 export default function RootLayout({
@@ -70,6 +86,7 @@ export default function RootLayout({
           {children}
           <Analytics />
           <HtmlPreferencesSync />
+          <PWAInstallPrompt />
         </ThemeProvider>
       </body>
     </html>
