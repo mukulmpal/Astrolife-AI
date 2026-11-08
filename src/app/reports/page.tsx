@@ -33,6 +33,9 @@ export default function ReportsStorePage() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
+  const [emailSending, setEmailSending] = useState<boolean>(false);
+  const [emailSentStatus, setEmailSentStatus] = useState<string | null>(null);
+  const [modalInputEmail, setModalInputEmail] = useState<string>("");
 
   const [purchasedReport, setPurchasedReport] = useState<{
     id: string;
@@ -41,6 +44,75 @@ export default function ReportsStorePage() {
     order_id: string;
     payment_id: string;
   } | null>(null);
+
+  const handleSendEmailDossier = async (
+    emailToUse: string,
+    reportToUse: { id: string; title: string; price: string; order_id: string; payment_id: string }
+  ) => {
+    if (!emailToUse || !emailToUse.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    try {
+      setEmailSending(true);
+      setEmailSentStatus(null);
+      const res = await fetch("/api/reports/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailToUse,
+          seekerName: customerName || chart?.name || "Sacred Seeker",
+          reportId: reportToUse.id,
+          reportTitle: reportToUse.title,
+          price: reportToUse.price,
+          orderId: reportToUse.order_id,
+          paymentId: reportToUse.payment_id,
+          chart,
+          birth,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setEmailSentStatus(`✅ Dispatched to ${emailToUse}`);
+      } else {
+        setEmailSentStatus("⚠️ Email queued. Download PDF below.");
+      }
+    } catch (err) {
+      console.error("Email send failed:", err);
+      setEmailSentStatus("⚠️ Could not send email. Download PDF below.");
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
+  const handlePurchaseSuccess = (
+    report: { id: string; title: string; price: string },
+    data: { order_id: string; payment_id: string }
+  ) => {
+    const purchaseInfo = {
+      id: report.id,
+      title: report.title,
+      price: report.price,
+      order_id: data.order_id,
+      payment_id: data.payment_id,
+    };
+    setPurchasedReport(purchaseInfo);
+    setModalInputEmail(customerEmail || "");
+    setEmailSentStatus(null);
+    void savePurchasedReport({
+      reportId: report.id,
+      title: report.title,
+      price: report.price,
+      orderId: data.order_id,
+      paymentId: data.payment_id,
+      seekerName: customerName || chart?.name || "Sacred Seeker",
+      chartSnapshot: chart || undefined,
+    });
+
+    if (customerEmail && customerEmail.includes("@")) {
+      void handleSendEmailDossier(customerEmail, purchaseInfo);
+    }
+  };
 
   const handlePreviewSample = async (report: ReportItem) => {
     try {
@@ -992,25 +1064,7 @@ export default function ReportsStorePage() {
                           email: customerEmail,
                           contact: customerPhone,
                         }}
-                        onSuccess={(data) => {
-                          const purchaseInfo = {
-                            id: report.id,
-                            title: report.title,
-                            price: report.price,
-                            order_id: data.order_id,
-                            payment_id: data.payment_id,
-                          };
-                          setPurchasedReport(purchaseInfo);
-                          void savePurchasedReport({
-                            reportId: report.id,
-                            title: report.title,
-                            price: report.price,
-                            orderId: data.order_id,
-                            paymentId: data.payment_id,
-                            seekerName: customerName || chart?.name || "Sacred Seeker",
-                            chartSnapshot: chart || undefined,
-                          });
-                        }}
+                        onSuccess={(data) => handlePurchaseSuccess(report, data)}
                       />
 
                       <button
@@ -1131,25 +1185,7 @@ export default function ReportsStorePage() {
                           email: customerEmail,
                           contact: customerPhone,
                         }}
-                        onSuccess={(data) => {
-                          const purchaseInfo = {
-                            id: report.id,
-                            title: report.title,
-                            price: report.price,
-                            order_id: data.order_id,
-                            payment_id: data.payment_id,
-                          };
-                          setPurchasedReport(purchaseInfo);
-                          void savePurchasedReport({
-                            reportId: report.id,
-                            title: report.title,
-                            price: report.price,
-                            orderId: data.order_id,
-                            paymentId: data.payment_id,
-                            seekerName: customerName || chart?.name || "Sacred Seeker",
-                            chartSnapshot: chart || undefined,
-                          });
-                        }}
+                        onSuccess={(data) => handlePurchaseSuccess(report, data)}
                       />
 
                       <button
@@ -1388,6 +1424,48 @@ export default function ReportsStorePage() {
                 </div>
               </div>
 
+              {/* Official Email PDF Delivery Card */}
+              <div className="bg-[#FAF7F2] border border-[#c8a030]/40 rounded-2xl p-4 mb-5 text-left shadow-inner">
+                <div className="flex items-center justify-between text-xs font-semibold text-[#1A1A1A] mb-1">
+                  <span className="flex items-center gap-1.5">
+                    <span>✉️</span>
+                    <span>Official Email PDF Delivery</span>
+                  </span>
+                  {emailSentStatus && (
+                    <span className="text-[11px] font-bold text-[#16a34a] bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+                      {emailSentStatus}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-[#6B635B] mb-2.5">
+                  Receive an official vector copy attached directly to your email inbox:
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={modalInputEmail}
+                    onChange={(e) => setModalInputEmail(e.target.value)}
+                    placeholder="Enter email (e.g. name@gmail.com)"
+                    className="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-[#E7DFD5] text-[#1A1A1A] placeholder:text-[#9C948A] focus:outline-none focus:border-[#c8a030]"
+                  />
+                  <button
+                    type="button"
+                    disabled={emailSending || !modalInputEmail}
+                    onClick={() => handleSendEmailDossier(modalInputEmail, purchasedReport)}
+                    className="px-3.5 py-2 rounded-xl bg-[#c8a030] hover:bg-[#a07820] text-white text-xs font-semibold disabled:opacity-50 transition-colors flex items-center gap-1.5 shrink-0"
+                  >
+                    {emailSending ? (
+                      <>
+                        <span className="animate-spin text-xs">⟳</span>
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <span>Send PDF</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
               {/* Instant Download Action */}
               <button
                 type="button"
@@ -1538,24 +1616,8 @@ export default function ReportsStorePage() {
                     contact: customerPhone,
                   }}
                   onSuccess={(data) => {
-                    const purchaseInfo = {
-                      id: previewModalReport.id,
-                      title: previewModalReport.title,
-                      price: previewModalReport.price,
-                      order_id: data.order_id,
-                      payment_id: data.payment_id,
-                    };
                     setPreviewModalReport(null);
-                    setPurchasedReport(purchaseInfo);
-                    void savePurchasedReport({
-                      reportId: previewModalReport.id,
-                      title: previewModalReport.title,
-                      price: previewModalReport.price,
-                      orderId: data.order_id,
-                      paymentId: data.payment_id,
-                      seekerName: customerName || chart?.name || "Sacred Seeker",
-                      chartSnapshot: chart || undefined,
-                    });
+                    handlePurchaseSuccess(previewModalReport, data);
                   }}
                 />
 
