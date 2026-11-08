@@ -180,11 +180,16 @@ function renderPage1Cover(
   doc.fontSize(9).fillColor("#4A4238").text("Time & Location:", 60, boxTop + 72);
   doc.fontSize(9).fillColor("#1A1A1A").text(`${chart.tob || "Standard"} • ${chart.city || "Sacred Geometry"}`, 170, boxTop + 72);
 
+  const moonData = (chart.planets as any)?.Moon;
+  const moonSign = (chart as any).moonSign || moonData?.sign || "Chandra";
+  const moonNakshatra = (chart as any).moonNakshatra || moonData?.nakshatra || "Nakshatra";
+  const moonPada = (chart as any).moonPada || moonData?.pada || 1;
+
   doc.fontSize(9).fillColor("#4A4238").text("Lagna / Janma Rashi:", 60, boxTop + 90);
-  doc.fontSize(9).fillColor("#8C6508").text(`${chart.lagnaRashi || "Ascendant"} (${chart.lagnaNum ? chart.lagnaNum + 1 : 1}) • ${chart.moonSign || "Chandra"}`, 170, boxTop + 90);
+  doc.fontSize(9).fillColor("#8C6508").text(`${chart.lagnaRashi || "Ascendant"} (${chart.lagnaNum !== undefined ? chart.lagnaNum + 1 : 1}) • ${moonSign}`, 170, boxTop + 90);
 
   doc.fontSize(9).fillColor("#4A4238").text("Nakshatra & Pada:", 60, boxTop + 108);
-  doc.fontSize(9).fillColor("#1A1A1A").text(`${chart.moonNakshatra || "Nakshatra"} (Pada ${chart.moonPada || 1})`, 170, boxTop + 108);
+  doc.fontSize(9).fillColor("#1A1A1A").text(`${moonNakshatra} (Pada ${moonPada})`, 170, boxTop + 108);
 
   // Verification Badge
   doc.rect(350, boxTop + 24, 185, 88).fillAndStroke("#FFFFFF", "#B8860B");
@@ -252,20 +257,23 @@ function renderPage2NatalPlacements(doc: typeof PDFDocument, chart: ChartData, s
   doc.text("STATE", 485, tableTop + 6);
 
   let currentY = tableTop + 22;
-  const planets = chart.planets || [];
+  const rawPlanets = chart.planets || {};
+  const planetList = Array.isArray(rawPlanets)
+    ? (rawPlanets as any[]).map((p) => ({ name: p.name || p.planet || "Graha", ...p }))
+    : Object.entries(rawPlanets).map(([name, data]) => ({ name, ...data }));
 
-  planets.slice(0, 10).forEach((p, idx) => {
+  planetList.slice(0, 10).forEach((p: any, idx: number) => {
     const bg = idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
     doc.rect(45, currentY, 505, 20).fill(bg);
 
     doc.fontSize(8.5).fillColor("#1A1A1A");
     doc.text(p.name, 55, currentY + 5);
-    doc.text(p.rashi, 135, currentY + 5);
+    doc.text(p.sign || p.rashi || "—", 135, currentY + 5);
     doc.text(`${(p.degree ?? 0).toFixed(2)}°`, 235, currentY + 5);
     doc.text(`${p.nakshatra || "—"} (${p.nakshatraLord || "—"})`, 310, currentY + 5);
     doc.text(`H${p.house ?? 1}`, 435, currentY + 5);
-    doc.fillColor(p.isRetrograde ? "#B91C1C" : "#16A34A");
-    doc.text(p.isRetrograde ? "Retro (R)" : "Direct", 485, currentY + 5);
+    doc.fillColor(p.retrograde || p.isRetrograde ? "#B91C1C" : "#16A34A");
+    doc.text(p.retrograde || p.isRetrograde ? "Retro (R)" : "Direct", 485, currentY + 5);
 
     currentY += 20;
   });

@@ -18,27 +18,27 @@ export async function POST(request: NextRequest) {
 
     // Resolve or build chart
     let chart: ChartData;
-    if (rawChart && rawChart.planets && rawChart.planets.length > 0) {
+    if (rawChart && rawChart.planets && Array.isArray(rawChart.planets) && rawChart.planets.length > 0) {
       chart = rawChart;
     } else if (birth && birth.dob && birth.tob) {
       chart = calculateChart(
+        birth.name || customer?.name || "Sacred Seeker",
         birth.dob,
         birth.tob,
-        birth.lat || 19.076,
-        birth.lon || 72.8777,
-        birth.tz || 5.5,
-        birth.name || customer?.name || "Sacred Seeker",
-        birth.city || "Mumbai"
+        birth.city || "New Delhi",
+        birth.lat || 28.6139,
+        birth.lon || 77.209,
+        birth.tz || 5.5
       );
     } else {
       chart = calculateChart(
+        customer?.name || "Sacred Seeker",
         PLACEHOLDER_BIRTH.dob,
         PLACEHOLDER_BIRTH.tob,
-        PLACEHOLDER_BIRTH.lat || 19.076,
-        PLACEHOLDER_BIRTH.lon || 72.8777,
-        PLACEHOLDER_BIRTH.tz || 5.5,
-        customer?.name || "Sacred Seeker",
-        PLACEHOLDER_BIRTH.city
+        PLACEHOLDER_BIRTH.city || "New Delhi",
+        PLACEHOLDER_BIRTH.lat || 28.6139,
+        PLACEHOLDER_BIRTH.lon || 77.209,
+        PLACEHOLDER_BIRTH.tz || 5.5
       );
     }
 
