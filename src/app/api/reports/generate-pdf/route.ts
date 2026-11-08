@@ -16,9 +16,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing reportId" }, { status: 400 });
     }
 
-    // Resolve or build chart
+    // Resolve or build chart with 100% resilient fallback
     let chart: ChartData;
-    if (rawChart && rawChart.planets && Array.isArray(rawChart.planets) && rawChart.planets.length > 0) {
+    if (rawChart && rawChart.planets && typeof rawChart.planets === "object" && rawChart.dob && rawChart.tob) {
       chart = rawChart;
     } else if (birth && birth.dob && birth.tob) {
       chart = calculateChart(
@@ -30,15 +30,25 @@ export async function POST(request: NextRequest) {
         birth.lon || 77.209,
         birth.tz || 5.5
       );
+    } else if (rawChart && rawChart.dob && typeof rawChart.dob === "string") {
+      chart = calculateChart(
+        rawChart.name || customer?.name || "Sacred Seeker",
+        rawChart.dob,
+        rawChart.tob || "12:00",
+        rawChart.city || "New Delhi",
+        rawChart.lat || 28.6139,
+        rawChart.lon || 77.209,
+        rawChart.tz || 5.5
+      );
     } else {
       chart = calculateChart(
         customer?.name || "Sacred Seeker",
-        PLACEHOLDER_BIRTH.dob,
-        PLACEHOLDER_BIRTH.tob,
-        PLACEHOLDER_BIRTH.city || "New Delhi",
-        PLACEHOLDER_BIRTH.lat || 28.6139,
-        PLACEHOLDER_BIRTH.lon || 77.209,
-        PLACEHOLDER_BIRTH.tz || 5.5
+        "2000-01-01",
+        "12:00",
+        "New Delhi",
+        28.6139,
+        77.209,
+        5.5
       );
     }
 
