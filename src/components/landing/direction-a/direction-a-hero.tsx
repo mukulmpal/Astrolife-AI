@@ -28,10 +28,10 @@ export function DirectionAHero() {
             </div>
 
             <h1 className="dira-display dira-reveal dira-reveal-2 in" style={{ color: 'var(--al-ivory)' }}>
-              Computational Vedic
+              Decoding Destiny
               <br />
               <span className="italic" style={{ color: 'var(--al-gold-bright)' }}>
-                Destiny Intelligence.
+                Through the Science of the Vedas.
               </span>
             </h1>
 

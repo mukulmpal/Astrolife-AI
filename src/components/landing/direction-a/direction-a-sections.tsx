@@ -1710,7 +1710,7 @@ export function DirectionAFooter() {
               </span>
             </div>
             <p className="max-w-xs text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
-              Vedic Astrological Intelligence. Rooted in Shastra. Verified by Mathematics. Yours forever.
+              Decoding Destiny Through the Science of the Vedas. Rooted in Shastra. Verified by Mathematics.
             </p>
           </div>
 
