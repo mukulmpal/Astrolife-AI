@@ -25,20 +25,49 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
   // Scroll spy to highlight active section in navbar
   useEffect(() => {
     const sectionIds = ['features', 'vastu', 'palmistry', 'how', 'pricing'];
+
     const handleScrollSpy = () => {
-      const scrollPosition = window.scrollY + 120;
+      // Find all target sections and their absolute document offsets
+      const sections = sectionIds
+        .map((id) => {
+          const el = document.getElementById(id);
+          if (!el) return null;
+          const rect = el.getBoundingClientRect();
+          const top = rect.top + window.scrollY;
+          return { id, top, height: el.offsetHeight };
+        })
+        .filter((s): s is { id: string; top: number; height: number } => s !== null);
+
+      // Sort by vertical position in the document
+      sections.sort((a, b) => a.top - b.top);
+
+      const triggerPoint = window.scrollY + 200;
+
+      // If user is near the very top of the page, clear all active highlights
+      if (window.scrollY < 300) {
+        setActiveSection('');
+        return;
+      }
+
+      // Check which section the user is currently reading
       let current = '';
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            current = `#${id}`;
+      for (const section of sections) {
+        if (triggerPoint >= section.top && triggerPoint < section.top + section.height) {
+          current = `#${section.id}`;
+          break;
+        }
+      }
+
+      // If between section gaps, fall back to the last passed section
+      if (!current) {
+        for (let i = sections.length - 1; i >= 0; i--) {
+          if (triggerPoint >= sections[i].top) {
+            current = `#${sections[i].id}`;
             break;
           }
         }
       }
+
       setActiveSection(current);
     };
 
@@ -112,8 +141,8 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
         <nav className="hidden items-center gap-7 lg:gap-9 md:flex">
           {[
             ['Features', '#features'],
-            ['Astro-Vastu', '#vastu'],
             ['Palmistry', '#palmistry'],
+            ['Astro-Vastu', '#vastu'],
             ['How it works', '#how'],
             ['Pricing', '#pricing'],
           ].map(([label, href]) => {
