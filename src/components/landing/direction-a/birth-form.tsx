@@ -438,7 +438,7 @@ export function BirthDetailsForm() {
       {formMode === 'demo' ? (
         <div className="space-y-2.5">
           <p className="text-xs text-[#5C5248] leading-relaxed">
-            Don&rsquo;t have your exact birth time? Launch all 38 engines instantly with verified historical charts:
+            Don&rsquo;t have your exact birth time? Explore all 38 shastric calculations instantly with verified historical charts:
           </p>
           {DEMO_ARCHETYPES.map((arch) => (
             <div
@@ -475,7 +475,7 @@ export function BirthDetailsForm() {
               boxShadow: '0 8px 24px -6px rgba(184, 134, 11, 0.45)',
             }}
           >
-            {loading ? 'Launching All 38 Engines...' : '⚡ Launch Elon Musk Demo in 1-Click →'}
+            {loading ? 'Calculating Planetary Positions...' : '⚡ Explore Elon Musk Chart in 1-Click →'}
           </button>
         </div>
       ) : (

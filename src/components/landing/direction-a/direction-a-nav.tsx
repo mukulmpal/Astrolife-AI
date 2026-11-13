@@ -137,7 +137,7 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
 
         <nav className="hidden items-center gap-7 lg:gap-9 md:flex">
           {[
-            ['Ecosystem', '#features'],
+            ['Features', '#features'],
             ['How It Works', '#how'],
             ['Pricing', '#pricing'],
             ['Reviews', '#testimonials'],

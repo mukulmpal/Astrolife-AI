@@ -364,7 +364,7 @@ export function DirectionAFeatures() {
               Tier 1 · Flagship Breakthroughs
             </span>
             <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: '#6B635B' }}>
-              Core Predictive & Therapeutic Engines
+              Core Predictive &amp; Healing Systems
             </span>
           </div>
 
@@ -942,7 +942,7 @@ export function DirectionAFeatures() {
               </div>
             </div>
 
-            {/* 5. TRANSIT RIPPLE ENGINE (Full-width card) */}
+            {/* 5. PLANETARY TRANSIT RIPPLE SYSTEM (Full-width card) */}
             <div className="lg:col-span-2 flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
               style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 4px 20px -4px rgba(184, 134, 11, 0.12)' }}>
               <div>
@@ -950,11 +950,11 @@ export function DirectionAFeatures() {
                   <span className="text-3xl">🌊</span>
                   <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
                     style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
-                    Multi-House Shockwave Engine
+                    Multi-House Resonance Dynamics
                   </span>
                 </div>
                 <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
-                  Planetary Transit Ripple Engine
+                  Planetary Transit Ripple System
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed max-w-4xl" style={{ color: '#3D3834' }}>
                   Major planetary transits never act in isolation. When slow-moving cosmic giants (Saturn, Jupiter, Rahu, Ketu) enter a new rashi,
@@ -1226,7 +1226,7 @@ export function DirectionAFeatures() {
                       ))}
                     </div>
                     <div className="rounded p-2.5 text-10px leading-relaxed border" style={{ background: '#FAF7F2', borderColor: 'rgba(184, 134, 11, 0.2)', color: '#2A2623' }}>
-                      <span className="text-[#8C6508] font-mono text-9px font-bold block mb-0.5">✦ Live Engine Logic:</span>
+                      <span className="text-[#8C6508] font-mono text-9px font-bold block mb-0.5">✦ Classical Shastric Method:</span>
                       {card.previews[activeIdx]}
                     </div>
                     {card.link && (
@@ -1235,7 +1235,7 @@ export function DirectionAFeatures() {
                           href={card.link}
                           className="font-mono text-9px font-bold text-[#8C6508] hover:underline"
                         >
-                          Explore Engine →
+                          Explore Shastra →
                         </a>
                       </div>
                     )}
