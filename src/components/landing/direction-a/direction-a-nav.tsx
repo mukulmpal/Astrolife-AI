@@ -24,10 +24,10 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
 
   // Scroll spy to highlight active section in navbar
   useEffect(() => {
-    const sectionIds = ['features', 'vastu', 'palmistry', 'how', 'pricing'];
+    const sectionIds = ['features', 'how', 'pricing', 'testimonials'];
 
     const handleScrollSpy = () => {
-      // Find all target sections and their absolute document offsets
+      // Find all target top-level sections and their absolute document offsets
       const sections = sectionIds
         .map((id) => {
           const el = document.getElementById(id);
@@ -38,18 +38,16 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
         })
         .filter((s): s is { id: string; top: number; height: number } => s !== null);
 
-      // Sort by vertical position in the document
       sections.sort((a, b) => a.top - b.top);
 
       const triggerPoint = window.scrollY + 200;
 
-      // If user is near the very top of the page, clear all active highlights
-      if (window.scrollY < 300) {
+      // If user is near the very top of the page (Hero & Problem section), clear highlight
+      if (window.scrollY < 400) {
         setActiveSection('');
         return;
       }
 
-      // Check which section the user is currently reading
       let current = '';
       for (const section of sections) {
         if (triggerPoint >= section.top && triggerPoint < section.top + section.height) {
@@ -58,7 +56,6 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
         }
       }
 
-      // If between section gaps, fall back to the last passed section
       if (!current) {
         for (let i = sections.length - 1; i >= 0; i--) {
           if (triggerPoint >= sections[i].top) {
@@ -140,11 +137,10 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
 
         <nav className="hidden items-center gap-7 lg:gap-9 md:flex">
           {[
-            ['Features', '#features'],
-            ['Palmistry', '#palmistry'],
-            ['Astro-Vastu', '#vastu'],
-            ['How it works', '#how'],
+            ['Ecosystem', '#features'],
+            ['How It Works', '#how'],
             ['Pricing', '#pricing'],
+            ['Reviews', '#testimonials'],
           ].map(([label, href]) => {
             const isActive = activeSection === href;
             return (
