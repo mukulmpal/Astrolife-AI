@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
@@ -45,7 +46,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 >
                   <Menu size={18} color="#B8860B" />
                 </button>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Link
+                  href="/"
+                  title="Return to Home"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    textDecoration: "none",
+                  }}
+                >
                   <span style={{ color: "#B8860B", fontSize: "14px", fontWeight: 700 }}>✦</span>
                   <span
                     style={{
@@ -58,7 +68,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   >
                     AstroLife
                   </span>
-                </div>
+                </Link>
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

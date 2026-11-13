@@ -34,7 +34,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Dashboard", href: "/dashboard",        Icon: LayoutDashboard },
       { label: "My Kundli", href: "/dashboard/kundli", Icon: CircleDot, badge: "BASIC" },
       { label: "Astro Bank", href: "/dashboard/astro-bank", Icon: Database, badge: "BASIC" },
-      { label: "AI Astrologer", href: "/dashboard/chat", Icon: Bot, badge: "BASIC" },
+      { label: "Astrologer Consultation", href: "/dashboard/chat", Icon: Bot, badge: "BASIC" },
       { label: "Destiny Curve", href: "/dashboard/destiny", Icon: TrendingUp, badge: "PRO" },
       { label: "Reports Store ✦", href: "/reports", Icon: Sparkles, badge: "HOT" },
       { label: "Report Viewer", href: "/dashboard/report", Icon: FileText, badge: "BASIC" },
@@ -111,7 +111,6 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
   const [mounted, setMounted] = useState(false);
   const userName = mounted && birth.name ? birth.name.split(" ")[0] : "Seeker";
   const { isElite, userTier } = useUserTier();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [search, setSearch] = useState("");
 
   const filteredGroups = useMemo(() => {
@@ -129,27 +128,6 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
 
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const checkAdmin = async () => {
-      try {
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        const user = session?.user ?? null;
-        if (user?.email && !cancelled) {
-          const { isAdminUser } = await import("@/lib/access");
-          if (isAdminUser(user.email)) {
-            setIsAdmin(true);
-          }
-        }
-      } catch {}
-    };
-    checkAdmin();
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   const handleLogout = async () => {
@@ -187,10 +165,22 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Link
+            href="/"
+            title="Return to AstroLife Home"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              textDecoration: "none",
+              color: "inherit",
+              transition: "opacity 0.2s ease",
+            }}
+            className="hover:opacity-80"
+          >
             <div className="dash-logo-gem">✦</div>
             <span className="dash-logo-name">AstroLife</span>
-          </div>
+          </Link>
           {mobileOpen && (
             <button
               type="button"
@@ -434,30 +424,6 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
               <span>Upgrade to Pro 👑</span>
             </Link>
           </div>
-        )}
-
-        {isAdmin && (
-          <Link
-            href="/dashboard/admin"
-            className={`dash-nav-item${pathname === "/dashboard/admin" ? " active" : ""}`}
-            style={{
-              marginTop: "6px",
-              borderLeftColor: "#eab308",
-              color: "#eab308",
-              background: pathname === "/dashboard/admin" ? "rgba(234,179,8,0.1)" : "transparent",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "6px 10px",
-              fontSize: "12px",
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
-            aria-current={pathname === "/dashboard/admin" ? "page" : undefined}
-          >
-            <Shield size={14} />
-            <span>Admin Panel</span>
-          </Link>
         )}
       </div>
 

@@ -24,14 +24,14 @@ export function DirectionAHero() {
             </p>
 
             <div className="dira-reveal dira-reveal-1 in mb-5 sm:mb-7 flex">
-              <span className="dira-rule-label">✦ 38 Specialized Vedic & Scientific Engines · Zero AI Hallucination · Swiss Ephemeris 0.01°</span>
+              <span className="dira-rule-label">✦ 8 Master Traditions · 38 Classical Shastric Calculations · Swiss Ephemeris 0.01°</span>
             </div>
 
             <h1 className="dira-display dira-reveal dira-reveal-2 in" style={{ color: 'var(--al-ivory)' }}>
-              Mathematical Destiny
+              Computational Vedic
               <br />
               <span className="italic" style={{ color: 'var(--al-gold-bright)' }}>
-                Intelligence OS.
+                Destiny Intelligence.
               </span>
             </h1>
 
@@ -39,9 +39,8 @@ export function DirectionAHero() {
               className="dira-reveal dira-reveal-3 in max-w-xl text-sm sm:text-base leading-relaxed md:text-lg"
               style={{ color: 'var(--al-ivory-dim)' }}
             >
-              AstroLife AI is not a generic chatbot. It is a unified supercomputer of 38 specialized Vedic and
-              scientific engines: 90-year destiny curves, KP Sub-Lords, Jaimini Chara Dasha, 16-Zone Astro-Vastu Hit Radar,
-              Sacred Wrist Threads, Bio-Wearable Shields, Somatotopic Tattoos, and Biometric Dot Therapy.
+              AstroLife replaces generic horoscopes with a unified computational Vedic sanctuary: 90-year destiny curves,
+              KP sub-lords, Jaimini timing, 16-zone Astro-Vastu alignment, and personalised biometric wellness guidance.
             </p>
 
             {/* Features */}
@@ -50,7 +49,7 @@ export function DirectionAHero() {
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>📈</div>
                 <div>
                   <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>90-Year Destiny Curve & Transit Ripple</div>
-                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Visual life score trajectory, career golden windows & multi-house ripple shocks</p>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Visual life score trajectory, career golden windows & multi-house resonance waves</p>
                 </div>
               </div>
               <div className="flex gap-3 sm:gap-4">
@@ -63,15 +62,15 @@ export function DirectionAHero() {
               <div className="flex gap-3 sm:gap-4">
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🏛️</div>
                 <div>
-                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>16-Zone Astro-Vastu Radar & Hit Detection</div>
-                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>45 Devatas, 32 Entrances, 180° Planetary Hits & zero-demolition 120° House Shifting</p>
+                  <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>16-Zone Astro-Vastu & 45 Devatas</div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>45 Devatas, 32 Entrances, 180° Planetary Vedha (वेध) & 120° Padavinyasa spatial harmony</p>
                 </div>
               </div>
               <div className="flex gap-3 sm:gap-4">
                 <div className="flex-shrink-0 text-xl" style={{ color: 'var(--al-gold-bright)' }}>🛡️</div>
                 <div>
                   <div className="font-semibold text-sm md:text-base" style={{ color: '#8C6508' }}>Bio-Wearables, Wrist Threads & Dot Therapy</div>
-                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Smartwatch metal shielding, Moli Trap prevention, Somatotopic Skin Ink & 12-Rashi Bindi healing</p>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--al-ivory-dim)' }}>Smartwatch metal shielding, Raksha Sutra harmony, Somatotopic Skin Ink & 12-Rashi Bindi healing</p>
                 </div>
               </div>
               <div className="flex gap-3 sm:gap-4">
@@ -128,9 +127,9 @@ export function DirectionAHero() {
               style={{ border: '1px solid rgba(184, 134, 11, 0.3)', background: 'rgba(184, 134, 11, 0.2)' }}
             >
               {[
-                { k: '38 Engines', v: 'Vedic · KP · Jaimini · Vastu' },
-                { k: '0.01°', v: 'Swiss Ephemeris Precision' },
-                { k: '100% Exact', v: 'Zero AI Hallucination' },
+                { k: '8 Master Traditions', v: 'Parashara · KP · Jaimini · Vastu' },
+                { k: '38 Calculations', v: '0.01° Swiss Ephemeris Precision' },
+                { k: '100% Exact', v: 'Pure Mathematical Astronomy' },
               ].map((s) => (
                 <div
                   key={s.v}

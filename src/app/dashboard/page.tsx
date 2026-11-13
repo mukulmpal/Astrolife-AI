@@ -948,7 +948,7 @@ export default function Dashboard() {
                 {greeting}, <em>{userName}</em>
               </h1>
               <div className="greeting-sub" style={{ marginTop: 8 }}>
-                AI Vedic Astrology operating system &middot; 25+ engines &middot; 30+ modules
+                Vedic Astrology Sanctuary &middot; 8 Master Traditions &middot; 38 Shastric Calculations
               </div>
               <div className="greeting-sub" style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginTop: 6 }}>
                 <span>{birth.city} &middot; Lagna {chart.lagnaRashi} &middot; {activeDasha.planet} MD{activeAntardasha ? ` / ${activeAntardasha.planet} AD` : ""}</span>
@@ -1370,7 +1370,7 @@ export default function Dashboard() {
                   💎 AstroLife Elite Universe Active
                 </div>
                 <div style={{fontSize:13,color:"#6B635B"}}>
-                  All 25+ astrology engines, unlimited AI questions, luxury dossiers, and VIP intelligence unlocked.
+                  All 8 master traditions, 38 shastric calculations, unlimited consultations, luxury dossiers, and VIP intelligence unlocked.
                 </div>
               </div>
               <div style={{ padding: "8px 18px", borderRadius: 10, background: "linear-gradient(135deg,#B8860B,#996515)", color: "#FFFFFF", fontSize: 12, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>
@@ -1398,7 +1398,7 @@ export default function Dashboard() {
                   🌱 Current Plan: Basic (The Seed / Beej)
                 </div>
                 <div style={{fontSize:13,color:"#6B635B"}}>
-                  Foundational Kundli active. Upgrade to 👑 Pro or 💎 Elite to unlock advanced timing, transits, remedies, and unlimited AI chat.
+                  Foundational Kundli active. Upgrade to 👑 Pro or 💎 Elite to unlock advanced timing, transits, remedies, and unlimited consultations.
                 </div>
               </div>
               <Link href="/dashboard/upgrade" prefetch={false} className="upgrade-btn">Upgrade to Pro 👑 →</Link>
@@ -1426,7 +1426,7 @@ export default function Dashboard() {
           <div className="stats-row">
             {[
               { icon:"🔯", val:chartCount, lbl:"Charts Created", change:birth.city ? birth.city : "Create your first chart" },
-              { icon:"🤖", val:aiQuestionsLeft, lbl:"AI Questions Left", change:aiQuestionsChange },
+              { icon:"💬", val:aiQuestionsLeft, lbl:"Questions Left", change:aiQuestionsChange },
               { icon:"⚡", val:dailyFeed.cosmicPulse.taraBala.name, lbl:"Tara Bala Rhythm", change:`${dailyFeed.cosmicPulse.taraBala.quality === "supportive" ? "Supportive" : "Mindful"} star flow` },
               { icon:"🌙", val:activeDasha.planet, lbl:"Active Dasha", change:`Until ${activeDasha.end.getFullYear()}` },
             ].map((s,i) => (
@@ -1547,8 +1547,8 @@ export default function Dashboard() {
 
           {activeTab === "insights" && (
           <div className="card" style={{ marginBottom: 16 }}>
-            <div className="card-tag">✦ AI Insights</div>
-            <div className="card-title serif">Your cosmic intelligence briefing</div>
+            <div className="card-tag">✦ Cosmic Insights</div>
+            <div className="card-title serif">Your astrological intelligence briefing</div>
             {insights.map((ins,i) => (
               <div key={i} className={`insight ${ins.urgent?"urgent":""}`}>
                 <div className="insight-top">
@@ -1625,7 +1625,7 @@ export default function Dashboard() {
                   { icon:"💎", label:"Gemstone",         desc:"Safe gemstone guidance",       href:"/dashboard/gemstone" },
                   { icon:"📄", label:"Premium Report",    desc:"Full integrated report",      href:"/dashboard/report" },
                   { icon:"🔱", label:"Jaimini",           desc:"Chara Karakas, Arudha, Dasha", href:"/dashboard/jaimini" },
-                  { icon:"🤖", label:"AI Chat",           desc:"Talk to AI astrologer",       href:"/dashboard/chat" },
+                  { icon:"📜", label:"Astrology Chat",    desc:"Talk to your astrologer",     href:"/dashboard/chat" },
               ].map((a,i) => (
                   <Link key={i} href={a.href} prefetch={false} className="action-btn">
                     <div className="action-btn-icon">{a.icon}</div>

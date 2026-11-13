@@ -62,7 +62,7 @@ function PanchangItemSequence({ panchang }: { panchang: PanchangResult }) {
       <span className="text-[#D4AF37]/50 font-bold">•</span>
 
       <span className="text-[#D4AF37] text-[10px] uppercase tracking-wider flex items-center gap-1 font-semibold">
-        <span>☸️</span> Lahiri Chitrapaksha Ephemeris (NASA Moshier Engine)
+        <span>☸️</span> Lahiri Chitrapaksha Ephemeris · High-Precision Astronomical Calculations
       </span>
     </div>
   );
@@ -97,30 +97,40 @@ export function PanchangStrip() {
         <div className="flex items-center gap-2 sm:gap-3 text-10px sm:text-11px">
           {/* Pinned Left Badge */}
           <div className="flex items-center gap-2 flex-shrink-0 z-10 pr-2.5 sm:pr-3.5 border-r border-[#B8860B]/30 bg-[#181512]">
-            <span className="flex items-center gap-1.5 font-bold text-[#D4AF37] tracking-wider whitespace-nowrap text-9px sm:text-10px">
-              <span className="h-2 w-2 rounded-full bg-[#D4AF37] animate-pulse" />
-              <span className="hidden sm:inline">TODAY&rsquo;S VEDIC PANCHANG</span>
-              <span className="sm:hidden">VEDIC PANCHANG</span>
-            </span>
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
-              className="px-2 py-0.5 rounded text-9px font-bold bg-[#2A241E] text-[#D4AF37] border border-[#B8860B]/40 hover:bg-[#3D3328] transition-colors cursor-pointer whitespace-nowrap"
+              className="flex items-center gap-1.5 font-bold text-[#D4AF37] tracking-wider whitespace-nowrap text-9px sm:text-10px hover:opacity-90 transition-opacity cursor-pointer group"
+              title="Click to view Panch Ang details"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]" />
+              </span>
+              <span className="hidden sm:inline group-hover:text-amber-300 transition-colors">TODAY&rsquo;S VEDIC PANCHANG</span>
+              <span className="sm:hidden group-hover:text-amber-300 transition-colors">VEDIC PANCHANG</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowDetails(!showDetails)}
+              className="px-2.5 py-0.5 rounded text-9px font-bold bg-[#2A241E] text-[#D4AF37] border border-[#B8860B]/50 hover:bg-[#B8860B]/20 transition-all cursor-pointer whitespace-nowrap shadow-[0_0_10px_rgba(212,175,55,0.25)] hover:shadow-[0_0_14px_rgba(212,175,55,0.45)]"
               aria-label="Toggle Full Vedic Panchang Details"
             >
-              {showDetails ? '▲ Close' : '▼ 5 Limbs'}
+              {showDetails ? '▲ Close' : '▼ Panch Ang (पञ्चाङ्ग)'}
             </button>
           </div>
 
           {/* Continuous Left-Scrolling Marquee Ticker (Both Desktop and Mobile) */}
           <div
-            className="relative flex-1 overflow-hidden whitespace-nowrap"
+            onClick={() => setShowDetails(!showDetails)}
+            className="relative flex-1 overflow-hidden whitespace-nowrap cursor-pointer group"
+            title="Click to inspect 5 Sacred Elements (Panch Ang)"
             style={{
               maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
               WebkitMaskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
             }}
           >
-            <div className="panchang-ticker-track text-10px sm:text-11px tracking-wide">
+            <div className="panchang-ticker-track text-10px sm:text-11px tracking-wide group-hover:opacity-90 transition-opacity">
               {/* Set 1 */}
               <PanchangItemSequence panchang={panchang} />
               {/* Set 2 (for seamless continuous infinite leftward scroll) */}
@@ -143,7 +153,7 @@ export function PanchangStrip() {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between pb-2.5 border-b border-[#B8860B]/25">
               <span className="text-11px uppercase tracking-wider font-bold text-[#D4AF37] flex items-center gap-1.5">
-                <span>✦</span> Daily Shastric Panchang (5 Limbs of Time)
+                <span>✦</span> Daily Shastric Panchang · Panch Ang (पञ्चाङ्ग · 5 Sacred Pillars of Time)
               </span>
               <button
                 type="button"

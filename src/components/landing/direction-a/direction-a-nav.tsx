@@ -13,12 +13,38 @@ interface DirectionANavProps {
 export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
   const [solid, setSolid] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [activeSection, setActiveSection] = useState<string>('');
 
   useEffect(() => {
     const on = () => setSolid(window.scrollY > 24);
     on();
     window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
+  }, []);
+
+  // Scroll spy to highlight active section in navbar
+  useEffect(() => {
+    const sectionIds = ['features', 'vastu', 'palmistry', 'how', 'pricing'];
+    const handleScrollSpy = () => {
+      const scrollPosition = window.scrollY + 120;
+      let current = '';
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            current = `#${id}`;
+            break;
+          }
+        }
+      }
+      setActiveSection(current);
+    };
+
+    window.addEventListener('scroll', handleScrollSpy, { passive: true });
+    handleScrollSpy();
+    return () => window.removeEventListener('scroll', handleScrollSpy);
   }, []);
 
   useEffect(() => {
@@ -59,42 +85,67 @@ export function DirectionANav({ onSignIn, onGetStarted }: DirectionANavProps) {
     >
       <PanchangStrip />
       <div className="mx-auto flex max-w-6xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3 md:px-10">
-        <a href="#top" className="flex items-center gap-2 sm:gap-3">
-          <svg width="24" height="24" viewBox="-12 -12 24 24" style={{ color: 'var(--al-gold)' }} className="sm:w-[26px] sm:h-[26px]">
+        <Link
+          href="/"
+          onClick={(e) => {
+            if (window.location.pathname === '/') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+          className="flex items-center gap-2 sm:gap-3 group"
+        >
+          <svg width="24" height="24" viewBox="-12 -12 24 24" style={{ color: 'var(--al-gold)' }} className="sm:w-[26px] sm:h-[26px] transition-transform duration-300 group-hover:scale-110">
             <circle r="10.5" stroke="currentColor" strokeWidth="0.7" fill="none" />
             <polygon points="0,-6 5,3 -5,3" fill="none" stroke="currentColor" strokeWidth="0.7" />
             <polygon points="0,6 5,-3 -5,-3" fill="none" stroke="currentColor" strokeWidth="0.7" />
             <circle r="1.9" fill="var(--al-accent)" />
           </svg>
           <span
-            className="font-serif text-base sm:text-lg font-medium uppercase"
+            className="font-serif text-base sm:text-lg font-medium uppercase transition-colors group-hover:text-amber-400"
             style={{ color: 'var(--al-ivory)', letterSpacing: '0.18em' }}
           >
             AstroLife
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-7 lg:gap-9 md:flex">
           {[
             ['Features', '#features'],
-            ['Astro-Vastu', '/dashboard/vastu'],
-            ['Palmistry', '/dashboard/palmistry'],
+            ['Astro-Vastu', '#vastu'],
+            ['Palmistry', '#palmistry'],
             ['How it works', '#how'],
             ['Pricing', '#pricing'],
-          ].map(([label, href]) => (
-            <a
-              key={href}
-              href={href}
-              className="group relative text-sm"
-              style={{ color: 'var(--al-ivory-dim)' }}
-            >
-              {label}
-              <span
-                className="absolute -bottom-1 left-0 h-px w-0 transition-all duration-300 group-hover:w-full"
-                style={{ background: 'var(--al-gold)' }}
-              />
-            </a>
-          ))}
+          ].map(([label, href]) => {
+            const isActive = activeSection === href;
+            return (
+              <a
+                key={href}
+                href={href}
+                onClick={(e) => {
+                  if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                      target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }
+                }}
+                className={`group relative text-sm transition-colors duration-200 ${
+                  isActive ? 'font-semibold text-amber-400' : 'hover:text-amber-300'
+                }`}
+                style={{ color: isActive ? '#D4AF37' : 'var(--al-ivory-dim)' }}
+              >
+                {label}
+                <span
+                  className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
+                    isActive ? 'w-full shadow-[0_0_8px_rgba(212,175,55,0.8)]' : 'w-0 group-hover:w-full'
+                  }`}
+                  style={{ background: '#D4AF37' }}
+                />
+              </a>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">

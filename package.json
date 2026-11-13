@@ -13,6 +13,7 @@
     "benchmark:run": "node --import jiti/register scripts/benchmarks/runner.ts",
     "smoke:chart-save": "node scripts/smoke-user-chart.mjs",
     "check:supabase": "node scripts/check-supabase-schema.mjs",
+    "grant": "node scripts/grant-tier.mjs",
     "postinstall": "node scripts/patch-browserslist.js"
   },
   "dependencies": {

@@ -1,7 +1,6 @@
 "use client";
 
 import type { ChartData } from "@/lib/astro-engine/calculations";
-import { createClient } from "@/lib/supabase/client";
 
 export interface PurchasedReportRecord {
   id: string;
@@ -62,25 +61,6 @@ export async function savePurchasedReport(
     } catch (err) {
       console.error("Error writing purchased report to local storage:", err);
     }
-  }
-
-  // Attempt background sync to Supabase if user is authenticated
-  try {
-    const supabase = createClient();
-    const { data } = await supabase.auth.getUser();
-    if (data?.user) {
-      await supabase.from("payments").insert({
-        user_id: data.user.id,
-        order_id: fullRecord.orderId,
-        payment_id: fullRecord.paymentId,
-        amount: parseFloat(fullRecord.price.replace(/[^0-9.]/g, "")) || 0,
-        currency: "INR",
-        status: "captured",
-        plan: fullRecord.reportId,
-      });
-    }
-  } catch {
-    // Non-blocking: guest users retain access via localStorage
   }
 
   return fullRecord;

@@ -310,7 +310,7 @@ export function DirectionAFeatures() {
     PRAHARS.find((p) => p.hours.includes(currentHour)) ||
     (currentHour >= 7 && currentHour < 10 ? PRAHARS[0] : PRAHARS[2]);
 
-  // 4. Interactive AI Palmistry Scanner line selection & scan animation state
+  // 4. Interactive Samudrika Palmistry Scanner line selection & scan animation state
   const [palmLine, setPalmLine] = useState<'heart' | 'head' | 'life' | 'fate'>('fate');
   const [isScanningPalm, setIsScanningPalm] = useState(false);
 
@@ -347,8 +347,8 @@ export function DirectionAFeatures() {
         <div>
           <FolioMarker numeral="II" label="The Complete Vedic Ecosystem" />
           <h2 className="dira-display-sm mb-4" style={{ color: '#1A1A1A' }}>
-            38 specialized engines.
-            <span className="italic" style={{ color: '#8C6508' }}> One Unified OS.</span>
+            8 Master Traditions · 38 Shastric Calculations.
+            <span className="italic" style={{ color: '#8C6508' }}> One Unified Destiny Intelligence.</span>
           </h2>
           <p className="max-w-3xl text-sm md:text-base leading-relaxed" style={{ color: '#3D3834' }}>
             Beyond simple sun signs and fear-based predictions. AstroLife unifies ancient astronomical shastras,
@@ -823,22 +823,22 @@ export function DirectionAFeatures() {
               </div>
             </div>
 
-            {/* 4. AI PALMISTRY VISION SCANNER - WITH INTERACTIVE HAND SVG & SPECIMEN REPORT */}
-            <div className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
+            {/* 4. PALMISTRY VISION SCANNER - WITH INTERACTIVE HAND SVG & SPECIMEN REPORT */}
+            <div id="palmistry" className="flex flex-col justify-between rounded-2xl p-7 md:p-8 transition-transform duration-300 hover:-translate-y-1"
               style={{ background: '#FFFFFF', border: '1px solid rgba(184, 134, 11, 0.3)', boxShadow: '0 4px 20px -4px rgba(184, 134, 11, 0.12)' }}>
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">✋</span>
                   <span className="rounded-full px-2.5 py-0.5 font-mono text-9px uppercase tracking-wider font-semibold"
                     style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.25)' }}>
-                    Experimental Research Feature
+                    Samudrika Shastra
                   </span>
                 </div>
                 <h3 className="mt-5 font-serif text-2xl font-bold" style={{ color: '#1A1A1A' }}>
-                  AI Palmistry Vision Scanner
+                  Samudrika Palmistry Scanner
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: '#3D3834' }}>
-                  Snap a photo of your palm. Our computer-vision neural pipeline traces key anatomical landmarks and contour line vectors (Heart, Head, Life, and Fate lines). Fuses physical line signatures with your natal chart for experimental cross-verification with birth chart indications (exploratory research, not deterministic fortune prediction).
+                  Snap a photo of your palm. Our computer-vision pipeline traces key anatomical landmarks and contour line vectors (Heart, Head, Life, and Fate lines). Fuses physical line signatures with your natal chart for classical cross-verification with birth chart indications.
                 </p>
               </div>
 
@@ -958,7 +958,7 @@ export function DirectionAFeatures() {
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed max-w-4xl" style={{ color: '#3D3834' }}>
                   Major planetary transits never act in isolation. When slow-moving cosmic giants (Saturn, Jupiter, Rahu, Ketu) enter a new rashi,
-                  their drishti (aspects) and resonance trigger 4 interconnected houses simultaneously. Click below to simulate how each cosmic transit propagates its shockwave.
+                  their drishti (aspects) and resonance trigger 4 interconnected houses simultaneously. Click below to simulate how each cosmic transit propagates its planetary resonance waves.
                 </p>
               </div>
 
@@ -1055,15 +1055,15 @@ export function DirectionAFeatures() {
           </div>
         </div>
 
-        {/* TIER 2: DECISION & LIFE INTELLIGENCE SUITE (9 Interactive Engines) */}
-        <div className="space-y-6">
+        {/* TIER 2: DECISION & LIFE INTELLIGENCE SUITE (9 Classical Disciplines) */}
+        <div id="vastu" className="space-y-6">
           <div className="flex items-center gap-3">
             <span className="rounded-full px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider"
               style={{ background: '#FAF5EB', color: '#8C6508', border: '1px solid rgba(184, 134, 11, 0.4)' }}>
               Tier 2 · Practical Life Solutions
             </span>
             <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: '#6B635B' }}>
-              9 Interactive Decision & Remedy Engines
+              9 Classical Vedic Shastras &amp; Predictive Disciplines
             </span>
           </div>
 
@@ -1072,26 +1072,26 @@ export function DirectionAFeatures() {
               {
                 id: 'vastu',
                 icon: '🏛️',
-                title: '16-Zone Astro-Vastu Radar & Hit Detection',
-                badge: '45 Devatas · 180° Hits',
+                title: '16-Zone Astro-Vastu & 45 Devata Resonance',
+                badge: '45 Devatas · Planetary Vedha',
                 link: '/dashboard/vastu',
-                desc: 'Maps the 16 architectural zones, 32 compass entrances, 45 energy Devatas, and detects destructive 180° planetary hit lines. Non-demolition 120° house shifting remedies.',
-                tabs: ['180° Hit Detection', '45 Devatas & 120° Shift'],
+                desc: 'Maps the 16 architectural zones, 32 compass entrances, 45 energy Devatas, and identifies 180° planetary Vedha (वेध) alignments. Spatial rebalancing without structural alteration.',
+                tabs: ['Planetary Vedha (वेध)', '45 Devatas & 120° Shift'],
                 previews: [
-                  'Identifies direct 180° planetary hits where afflicted natal planets clash with household zones (e.g., Saturn-Mars kitchen hit).',
-                  'Applies non-destructive 120° spatial shift: rebalances energy using copper, brass, elemental colors, and yantras without breaking walls.',
+                  'Identifies 180° planetary Vedha (वेध) where afflicted natal planets clash with household directional zones.',
+                  'Applies 120° sacred geometric spatial realignment: rebalances energy using elemental copper, brass, sacred yantras, and colors without wall alterations.',
                 ],
               },
               {
                 id: 'threads',
                 icon: '🧵',
-                title: 'Sacred Wrist Threads (धागा / कलावा / मौली) Audit',
-                badge: 'Moli Trap Prevention',
+                title: 'Sacred Raksha Sutra (रक्षा सूत्र / मौली) Harmony Audit',
+                badge: 'Raksha Sutra Harmony',
                 link: '/dashboard/vastu?tab=wearableAudit',
-                desc: 'Calculates exact benefic thread composition (raw cotton vs silk), count of turns (3, 5, or 7), and strict color rules. Prevents the "Moli Trap" that drains your ascendant lord.',
-                tabs: ['Moli Trap Rules', 'Vedic Thread Formula'],
+                desc: 'Calculates exact benefic thread composition (raw cotton vs silk), count of turns (3, 5, or 7), and strict color rules to protect and strengthen your ascendant lord.',
+                tabs: ['Sacred Color Rules', 'Vedic Thread Formula'],
                 previews: [
-                  'Alerts against wearing red moli when Mars is an 8th/12th functional malefic; prevents vitality drain and emotional aggression.',
+                  'Alerts against wearing red thread when Mars is an 8th/12th functional malefic; prevents vitality drain and emotional friction.',
                   'Specifies exact ritual thread: right wrist for men & unmarried women, left wrist for married women, tied on Shukla Paksha sunrise.',
                 ],
               },
@@ -1331,7 +1331,7 @@ export function DirectionAInsights() {
           It answers from <span className="italic" style={{ color: '#8C6508' }}>your</span> chart.
         </h2>
         <p className="mb-8 text-sm md:text-base leading-relaxed" style={{ color: '#3D3834' }}>
-          No canned horoscopes or generic AI filler. Toggle to Classical Shastra Proof to see the exact Sanskrit sutras,
+          No canned horoscopes or generic filler. Toggle to Classical Shastra Proof to see the exact Sanskrit sutras,
           ephemeris coordinates, and KP sub-lord mathematics calculating each answer.
         </p>
 
@@ -1346,7 +1346,7 @@ export function DirectionAInsights() {
                 ✦
               </span>
               <div>
-                <div className="text-sm font-bold" style={{ color: '#1A1A1A' }}>AstroLife AI Engine</div>
+                <div className="text-sm font-bold" style={{ color: '#1A1A1A' }}>AstroLife Shastric Synthesis</div>
                 <div className="text-9px font-mono uppercase tracking-wider flex items-center gap-1.5" style={{ color: '#059669' }}>
                   <span className="h-1.5 w-1.5 rounded-full bg-[#059669] animate-pulse" />
                   Live Natal Chart Active · Lahiri Ayanamsha
@@ -1499,7 +1499,7 @@ export function DirectionAHowItWorks() {
   const steps = [
     { t: 'Give your birth', d: 'Date, time and place. Thirty seconds, no account.' },
     { t: 'Receive your kundli', d: 'D-1, D-9 and current daśā — yours to keep, forever, no card.' },
-    { t: 'Ask anything', d: 'Career, marriage, money, timing. The AI reasons aloud from your chart.' },
+    { t: 'Ask anything', d: 'Career, marriage, money, timing. Authentic astrological synthesis reasoned directly from your chart.' },
     { t: 'Go deeper when ready', d: 'Premium opens KP, Lāl Kitāb, family karma and the printed Blueprint.' },
   ];
   return (
@@ -1530,13 +1530,13 @@ export function DirectionAHowItWorks() {
 export function DirectionAPricing() {
   const plans = [
     { tier: 'Free', price: '₹0', note: 'Begin here', primary: false,
-      bullets: ['Full Vedic chart (D-1, D-9)', '10 AI questions / month', 'Today’s daśā teaser', 'Daily one-line forecast'],
+      bullets: ['Full Vedic chart (D-1, D-9)', '10 questions / month', 'Today’s daśā teaser', 'Daily one-line forecast'],
       cta: 'Cast my free kundli' },
     { tier: 'Premium', price: '₹499', note: 'Most chosen', primary: true,
-      bullets: ['Everything in Free', 'Unlimited AI conversations', 'Full daśā · antardaśā · pratyantar', 'KP · Lāl Kitāb · Nāḍī · Vāstu', 'Compatibility & matching', 'Printed Cosmic Blueprint (PDF)'],
+      bullets: ['Everything in Free', 'Unlimited consultations', 'Full daśā · antardaśā · pratyantar', 'KP · Lāl Kitāb · Nāḍī · Vāstu', 'Compatibility & matching', 'Printed Cosmic Blueprint (PDF)'],
       cta: 'Begin Premium' },
     { tier: 'Elite', price: '₹1,999', note: 'For the seekers', primary: false,
-      bullets: ['Everything in Premium', 'A named, personalized AI astrologer', 'Family-karma chart linking', 'Annual Varṣaphala forecast', 'Priority WhatsApp line', 'Quarterly human review'],
+      bullets: ['Everything in Premium', 'Dedicated personalized astrologer profile', 'Family-karma chart linking', 'Annual Varṣaphala forecast', 'Priority WhatsApp line', 'Quarterly human review'],
       cta: 'Go Elite' },
   ];
   return (
@@ -1672,15 +1672,15 @@ export function DirectionAFooter() {
   const columns: { head: string; links: Array<{label: string; href: string}> }[] = [
     { head: 'Product', links: [
       { label: 'Free Kundli', href: '/onboarding' },
-      { label: 'AI Chat', href: '/dashboard/chat' },
+      { label: 'Astrology Chat', href: '/dashboard/chat' },
       { label: 'Reports', href: '/dashboard/report' },
       { label: 'Pricing', href: '#pricing' },
     ]},
-    { head: 'Engines', links: [
+    { head: 'Disciplines', links: [
       { label: 'KP System', href: '/dashboard/kp' },
       { label: 'Lal Kitab', href: '/dashboard/lalkitab' },
       { label: 'Dasha', href: '/dashboard/dasha' },
-      { label: 'All Engines', href: '/dashboard' },
+      { label: 'All Shastras', href: '/dashboard' },
     ]},
     { head: 'Company', links: [
       { label: 'Contact', href: 'mailto:hello@astrolife.ai' },
@@ -1706,11 +1706,11 @@ export function DirectionAFooter() {
                 <polygon points="0,6 5,-3 -5,-3" fill="none" stroke="currentColor" strokeWidth="0.7" />
               </svg>
               <span className="font-serif text-lg uppercase" style={{ color: 'var(--al-ivory)', letterSpacing: '0.18em' }}>
-                AstroLife AI
+                AstroLife
               </span>
             </div>
             <p className="max-w-xs text-sm leading-relaxed" style={{ color: 'var(--al-ivory-dim)' }}>
-              AI-powered Vedic Astrology Intelligence OS. Guidance-oriented. Precise. Yours forever.
+              Vedic Astrological Intelligence. Rooted in Shastra. Verified by Mathematics. Yours forever.
             </p>
           </div>
 
@@ -1736,7 +1736,7 @@ export function DirectionAFooter() {
         <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t pt-7 text-center sm:flex-row sm:text-left"
           style={{ borderColor: 'var(--al-line)' }}>
           <div className="text-9px" style={{ color: 'var(--al-ivory-mute)' }}>
-            © 2026 AstroLife AI. All rights reserved.
+            © 2026 AstroLife. All rights reserved.
           </div>
           <div className="text-9px italic" style={{ color: 'var(--al-ivory-mute)' }}>
             Guidance-oriented astrology, not fear-based predictions.

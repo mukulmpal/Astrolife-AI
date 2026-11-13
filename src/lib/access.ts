@@ -85,7 +85,16 @@ export const ELITE_EMAILS = new Set([
 
 export function isEliteEmail(email?: string | null): boolean {
   if (!email) return false;
-  return ELITE_EMAILS.has(email.toLowerCase().trim());
+  const normalized = email.toLowerCase().trim();
+  if (ELITE_EMAILS.has(normalized)) return true;
+
+  // Dynamic override from environment variable (comma-separated list of emails)
+  const envEmails = process.env.ELITE_EMAILS || process.env.NEXT_PUBLIC_ELITE_EMAILS || "";
+  if (envEmails) {
+    const list = envEmails.split(",").map((e) => e.trim().toLowerCase());
+    if (list.includes(normalized)) return true;
+  }
+  return false;
 }
 
 export const ADMIN_EMAILS = new Set([
@@ -95,7 +104,14 @@ export const ADMIN_EMAILS = new Set([
 
 export function isAdminUser(email?: string | null): boolean {
   if (!email) return false;
-  return ADMIN_EMAILS.has(email.toLowerCase().trim());
+  const normalized = email.toLowerCase().trim();
+  if (ADMIN_EMAILS.has(normalized)) return true;
+  const envAdmins = process.env.ADMIN_EMAILS || "";
+  if (envAdmins) {
+    const list = envAdmins.split(",").map((e) => e.trim().toLowerCase());
+    if (list.includes(normalized)) return true;
+  }
+  return false;
 }
 
 

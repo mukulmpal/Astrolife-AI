@@ -140,12 +140,12 @@ export function DailyPanchangWidget({ compact = false, className = "" }: DailyPa
             onClick={() => setShowDetails(!showDetails)}
             className="text-xs text-[#B8860B] hover:text-[#1A1A1A] transition-colors ml-1 px-2.5 py-1 rounded bg-[#FAF8F5] border border-[rgba(184,134,11,0.2)] font-semibold"
           >
-            {showDetails ? "▲ Summary" : "▼ 5 Limbs"}
+            {showDetails ? "▲ Summary" : "▼ Panch Ang (पञ्चाङ्ग)"}
           </button>
         </div>
       </div>
 
-      {/* 5 Limbs Highlights Grid */}
+      {/* Panch Ang (5 Sacred Pillars of Time) Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3">
         <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[rgba(184,134,11,0.18)]">
           <div className="text-[10px] text-[#6B635B] uppercase tracking-wider font-bold">Tithi</div>

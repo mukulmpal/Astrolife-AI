@@ -340,7 +340,7 @@ export function BirthDetailsForm() {
   const handleWhatsAppShare = () => {
     if (!livePreview) return;
     const name = formData.name.trim() || 'My';
-    const text = `✨ ${name}'s Vedic Cosmic Signature on AstroLife AI:\n` +
+    const text = `✨ ${name}'s Vedic Cosmic Signature on AstroLife:\n` +
       `• Lagna: ${livePreview.lagnaSign}\n` +
       `• Moon Sign: ${livePreview.moonSign} (${livePreview.nakshatra} Pada ${livePreview.pada})\n` +
       `• Active Mahadasha: ${livePreview.activeDasha}\n` +

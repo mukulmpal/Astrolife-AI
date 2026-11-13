@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildPackageDossierPdf } from "@/lib/report/package-dossier-pdf";
-import { calculateChart, type ChartData, type BirthDetails } from "@/lib/astro-engine/calculations";
+import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { isEliteEmail, isAdminUser } from "@/lib/access";
-import { PLACEHOLDER_BIRTH } from "@/lib/user-chart";
+import { createClient } from "@/lib/supabase/server";
 
 export const maxDuration = 45;
 export const dynamic = "force-dynamic";
@@ -17,11 +17,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing reportId" }, { status: 400 });
     }
 
-    // Access control verification: Elite users, Admin, or verified payment credentials
-    const isEliteOrAdmin = isEliteEmail(customer?.email) || isAdminUser(customer?.email);
+    // Server-verified access control: Check authenticated session user
+    let isEliteOrAdmin = false;
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email && (isEliteEmail(user.email) || isAdminUser(user.email))) {
+        isEliteOrAdmin = true;
+      }
+    } catch {
+      // Unauthenticated / guest
+    }
+
     const hasVerifiedPayment = Boolean(
-      (orderId && typeof orderId === "string" && orderId.length > 6 && (orderId.startsWith("order_") || orderId.startsWith("ORD_"))) &&
-      (paymentId && typeof paymentId === "string" && paymentId.length > 6 && (paymentId.startsWith("pay_") || paymentId.startsWith("PAY_")))
+      (orderId && typeof orderId === "string" && orderId.length > 8 && (orderId.startsWith("order_") || orderId.startsWith("ORD_"))) &&
+      (paymentId && typeof paymentId === "string" && paymentId.length > 8 && (paymentId.startsWith("pay_") || paymentId.startsWith("PAY_")))
     );
 
     const isSample = body.isSample === true || String(reportTitle || "").toUpperCase().includes("SAMPLE") || (!hasVerifiedPayment && !isEliteOrAdmin);

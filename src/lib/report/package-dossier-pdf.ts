@@ -12,6 +12,8 @@ import PDFDocument from "pdfkit";
 import fs from "fs";
 import type { ChartData } from "@/lib/astro-engine/calculations";
 
+type PDFDoc = InstanceType<typeof PDFDocument>;
+
 export interface PackageDossierOptions {
   reportId: string;
   reportTitle: string;
@@ -144,7 +146,7 @@ export async function buildPackageDossierPdf(
 // PAGE 1: COVER & NATIVE CERTIFICATE
 // ─────────────────────────────────────────────────────────────────────────────
 function renderPage1Cover(
-  doc: typeof PDFDocument,
+  doc: PDFDoc,
   chart: ChartData,
   subject: string,
   title: string,
@@ -235,7 +237,7 @@ function renderPage1Cover(
   doc.rect(45, execTop, 505, 175).fillAndStroke("#FFFFFF", "#E0D7C6");
   doc.fontSize(11).fillColor("#1A1A1A").text("DOSSIER EXECUTIVE OVERVIEW", 60, execTop + 14);
   doc.fontSize(9).fillColor("#4A4238").text(
-    `Welcome to your personalized ${title}. Your natal chart reflects a unique karmic alignment configured by Lagna ${chart.lagnaRashi} and Moon Sign ${chart.moonSign}. The following chapters provide an unbundled, surgical examination of your specific planetary indicators, current life cycle timing, and precise remedial actions to harmonize your destiny.`,
+    `Welcome to your personalized ${title}. Your natal chart reflects a unique karmic alignment configured by Lagna ${chart.lagnaRashi} and Moon Sign ${moonSign}. The following chapters provide an unbundled, surgical examination of your specific planetary indicators, current life cycle timing, and precise remedial actions to harmonize your destiny.`,
     60,
     execTop + 34,
     { width: 475, lineGap: 4 }
@@ -251,7 +253,7 @@ function renderPage1Cover(
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE 2: NATAL GRAHA STHITI TABLE
 // ─────────────────────────────────────────────────────────────────────────────
-function renderPage2NatalPlacements(doc: typeof PDFDocument, chart: ChartData, subject: string) {
+function renderPage2NatalPlacements(doc: PDFDoc, chart: ChartData, subject: string) {
   doc.rect(25, 25, 545, 765).lineWidth(1).strokeColor("#B8860B").stroke();
 
   doc.moveDown(1);
@@ -275,7 +277,7 @@ function renderPage2NatalPlacements(doc: typeof PDFDocument, chart: ChartData, s
   const rawPlanets = chart.planets || {};
   const planetList = Array.isArray(rawPlanets)
     ? (rawPlanets as any[]).map((p) => ({ name: p.name || p.planet || "Graha", ...p }))
-    : Object.entries(rawPlanets).map(([name, data]) => ({ name, ...data }));
+    : Object.entries(rawPlanets).map(([name, data]) => ({ name, ...(typeof data === "object" && data !== null ? data : {}) }));
 
   planetList.slice(0, 10).forEach((p: any, idx: number) => {
     const bg = idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
@@ -337,7 +339,7 @@ function renderPage2NatalPlacements(doc: typeof PDFDocument, chart: ChartData, s
 // PAGE 3: SPECIALIZED THEMATIC ANALYSIS
 // ─────────────────────────────────────────────────────────────────────────────
 function renderPage3ThematicAnalysis(
-  doc: typeof PDFDocument,
+  doc: PDFDoc,
   chart: ChartData,
   reportId: string,
   reportTitle: string
@@ -413,10 +415,11 @@ function getThematicContent(reportId: string, chart: ChartData): Array<{ title: 
   }
 
   // Default Universal / Holistic Vedic Blueprint
+  const resolvedMoonSign = (chart as any).moonSign || (chart.planets as any)?.Moon?.sign || "Chandra";
   return [
     {
       title: "Core Karmic Blueprint & Life Mission",
-      body: `Born under ${chart.lagnaRashi} Lagna and ${chart.moonSign} Rashi, your life path involves balancing worldly responsibilities with inner spiritual sovereignty. Benefic planets in key angular houses safeguard you against sudden adversities.`,
+      body: `Born under ${chart.lagnaRashi} Lagna and ${resolvedMoonSign} Rashi, your life path involves balancing worldly responsibilities with inner spiritual sovereignty. Benefic planets in key angular houses safeguard you against sudden adversities.`,
       metric: "Planetary Equilibrium Index: Balanced with high resilient recovery.",
     },
     {
@@ -435,7 +438,7 @@ function getThematicContent(reportId: string, chart: ChartData): Array<{ title: 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE 4: CLASSICAL REMEDIES & UPAYAS
 // ─────────────────────────────────────────────────────────────────────────────
-function renderPage4RemediesAndGuidance(doc: typeof PDFDocument, chart: ChartData, reportId: string) {
+function renderPage4RemediesAndGuidance(doc: PDFDoc, chart: ChartData, reportId: string) {
   doc.rect(25, 25, 545, 765).lineWidth(1).strokeColor("#B8860B").stroke();
 
   doc.moveDown(1);
@@ -455,7 +458,7 @@ function renderPage4RemediesAndGuidance(doc: typeof PDFDocument, chart: ChartDat
     { width: 475, lineGap: 3 }
   );
   doc.rect(60, y + 68, 475, 28).fill("#FFFFFF");
-  doc.fontSize(9.5).fillColor("#8C6508").text("ॐ नमः शिवाय (Om Namah Shivaya) / Gayatri Mantra", 70, y + 76, { align: "center", width: 455 });
+  doc.fontSize(9.5).fillColor("#8C6508").text("Om Namah Shivaya (Shiva Panchakshara Stotra) / Gayatri Mantra", 70, y + 76, { align: "center", width: 455 });
 
   // Remedial Box 2: Dana & Karmic Balancing
   y += 125;
@@ -493,7 +496,7 @@ function renderPage4RemediesAndGuidance(doc: typeof PDFDocument, chart: ChartDat
 }
 
 function renderPageSampleLockedNotice(
-  doc: PDFKit.PDFDocument,
+  doc: PDFDoc,
   reportTitle: string
 ) {
   // Page Border
