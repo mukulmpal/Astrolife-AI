@@ -1604,13 +1604,18 @@ export default function KundaliMilanPage() {
   const hasPartnerFullChart = Boolean(partnerChart);
   const hasCoupleResult = hasQuickMatch || hasPartnerFullChart || Boolean(masterReport);
   const ashtakootPct = masterReport?.ashtakoot.percentage ?? milanResult?.percentage;
-  const coupleScoreParts = [
-    ashtakootPct,
-    mangalCompatibility?.balanceScore,
-  ].filter((score): score is number => typeof score === "number");
-  const coupleScore = coupleScoreParts.length > 0
-    ? Math.round(coupleScoreParts.reduce((sum, score) => sum + score, 0) / coupleScoreParts.length)
-    : null;
+  
+  // Use comprehensive master compatibility score if full report exists, else fallback to composite average
+  const coupleScore = masterReport?.masterCompatibility?.score ?? (
+    [ashtakootPct, mangalCompatibility?.balanceScore].filter((score): score is number => typeof score === "number").length > 0
+      ? Math.round(
+          [ashtakootPct, mangalCompatibility?.balanceScore]
+            .filter((score): score is number => typeof score === "number")
+            .reduce((sum, score) => sum + (score ?? 0), 0) /
+          [ashtakootPct, mangalCompatibility?.balanceScore].filter((score): score is number => typeof score === "number").length
+        )
+      : null
+  );
   const dataConfidence = hasPartnerFullChart ? "High (Full Master Dossier Ready)" : hasQuickMatch ? "Quick Match Only" : "Not Ready";
 
   function switchMode(nextMode: PageMode) {
