@@ -209,7 +209,7 @@ const POWER_HOUSES = new Set([1,5,9,10]);
 const TARA_DEFS: Omit<NavtaraInfo,"taraNum"|"interpretation">[] = [
   { taraName:"Janma",        quality:"self/rebirth",    modifier:-3,  color:"#c8a030", icon:"🌟" }, // FIX: was 0, classical = slightly challenging
   { taraName:"Sampat",       quality:"wealth",          modifier:+8,  color:"#22c55e", icon:"💰" },
-  { taraName:"Vipat",        quality:"danger",          modifier:-10, color:"#ef4444", icon:"⚠️" },
+  { taraName:"Vipat",        quality:"restructuring & vigilance", modifier:-8,  color:"#f59e0b", icon:"⚠️" },
   { taraName:"Kshema",       quality:"stability",       modifier:+6,  color:"#4ade80", icon:"🛡️" },
   { taraName:"Pratyari",     quality:"enmity",          modifier:-8,  color:"#f97316", icon:"⚔️" },
   { taraName:"Sadhaka",      quality:"achievement",     modifier:+7,  color:"#38bdf8", icon:"✅" },
@@ -221,7 +221,7 @@ const TARA_DEFS: Omit<NavtaraInfo,"taraNum"|"interpretation">[] = [
 const TARA_INTERP: string[] = [
   "Janma Tara — Same nakshatra as your birth star. Dasha is intensely personal — karmic confrontations, identity pressure, inner growth through outer turbulence. Not easy, but deeply transformative.",
   "Sampat Tara — Wealth Tara. Financial opportunities, resource accumulation, and abundance themes are naturally highlighted in this dasha.",
-  "Vipat Tara — Danger Tara. Unexpected obstacles, health awareness, and vigilance are essential. Remedies strongly advised during this period.",
+  "Vipat Tara — Restructuring & Vigilance Tara. Demands hard grind, patience, and conscious adjustments. Unexpected friction or delays yield valuable resilience when managed with documentation and proper remedies.",
   "Kshema Tara — Comfort & Stability Tara. Protection, domestic stability, and safe progress. Best period for consolidation rather than bold risk-taking.",
   "Pratyari Tara — Enmity Tara. Opposition, rivalry, and conflict are attracted. Competitors and hidden enemies may be active. Patience and documentation essential.",
   "Sadhaka Tara — Achievement Tara. Highly productive — goals accomplished, recognition comes, sustained effort yields clear results.",
@@ -277,6 +277,7 @@ function getFunctionalRole(
   const rTrikona  = ruledHouses.some(h => TRIKONAS.has(h));
   const rDusth    = ruledHouses.some(h => DUSTH.has(h));
   const rMaraka   = ruledHouses.some(h => MARAKAS.has(h));
+  const rLabha    = ruledHouses.includes(11);
   const rLagna    = ruledHouses.includes(1);
 
   // True Yogakaraka: owns a kendra AND a trikona where neither is the shared 1st house
@@ -290,6 +291,11 @@ function getFunctionalRole(
   if (rTrikona && rDusth  && !rLagna)             return { delta: 3, role:"Trikona+Dusthana Lord",     ruledHouses };
   if (rLagna   && !rDusth)                        return { delta: 8, role:"Lagna Lord",                ruledHouses };
   if (rLagna   && rDusth)                         return { delta: 2, role:"Lagna+Dusthana Lord",       ruledHouses };
+
+  // Kendra + Labha Lord (e.g. Venus for Cancer Lagna: rules 4th Sukh & 11th Labha)
+  if (rKendra && rLabha && !rDusth) {
+    return { delta: 4, role:"Kendra + Labha Lord (Sukhesh & Labhesh)", ruledHouses };
+  }
 
   if (rKendra && !rDusth) {
     // Kendradhipati dosha: natural benefics owning Kendras lose strength
@@ -678,8 +684,10 @@ export function calculateDestiny(
     },
   };
 
-  const peak      = [...bands].sort((a,b) => b.score - a.score)[0] || fallbackBand;
-  const challenge = [...bands].sort((a,b) => a.score - b.score)[0] || fallbackBand;
+  // Lifetime peak dasha: prefer active adult career bands (endAge >= 18) for actionable life guidance; fallback to all bands
+  const adultBands = bands.filter(b => b.endAge >= 18);
+  const peak      = [...(adultBands.length > 0 ? adultBands : bands)].sort((a,b) => b.score - a.score)[0] || fallbackBand;
+  const challenge = [...(adultBands.length > 0 ? adultBands : bands)].sort((a,b) => a.score - b.score)[0] || fallbackBand;
 
   // Area scores (also Navtara-aware)
   const activeMD = normalizedDashas.find(s => s.start <= now && s.end > now) || normalizedDashas[0] || {
