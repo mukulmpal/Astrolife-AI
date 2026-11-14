@@ -35,6 +35,7 @@ export interface PlanetScore {
   inboundScore:    number;   // net from planets aspecting this planet's house
   vargottama:      boolean;
   d9Exalted:       boolean;
+  d9Own?:          boolean;
   bindus:          number | null;
 }
 
@@ -344,6 +345,13 @@ function getInboundAspectScore(
   return Math.max(-15, Math.min(12, score));
 }
 
+// Helper: Derive D9 Navamsha sign (0-11) directly from sidereal longitude
+export function lonToD9Sign(lon: number | undefined): number | undefined {
+  if (lon === undefined || isNaN(lon)) return undefined;
+  const navIdx = Math.floor((((lon % 360) + 360) % 360) / (360 / 108));
+  return navIdx % 12;
+}
+
 // ── LAYER 8 — Ashtakavarga bindus ────────────────────────────
 // bindu count for planet in its natal sign (0-8; avg ~4)
 
@@ -356,19 +364,49 @@ function getBinduScore(bindus: number | undefined): number {
   return -8; // 0-2: very weak
 }
 
-// ── LAYER 9 — Vargottama / D9 exaltation ─────────────────────
+// ── LAYER 9 — Vargottama / D9 exaltation / D9 Own Sign ───────
 
 function getD9Score(
   planet: string, pd: PD, d9Signs: Record<string,number> | undefined
-): { bonus: number; vargottama: boolean; d9Exalted: boolean } {
-  if (!d9Signs?.[planet]) return { bonus:0, vargottama:false, d9Exalted:false };
-  const d9Sign = d9Signs[planet];
-  if (d9Sign === pd.signNum) return { bonus:+10, vargottama:true, d9Exalted:false }; // Vargottama
-  if (EXALT_SIGN[planet] === d9Sign) return { bonus:+6, vargottama:false, d9Exalted:true }; // Exalted in D9
+): { bonus: number; vargottama: boolean; d9Exalted: boolean; d9Own: boolean } {
+  const d9Sign = d9Signs?.[planet] !== undefined ? d9Signs[planet] : lonToD9Sign(pd.lon);
+  if (d9Sign === undefined) return { bonus:0, vargottama:false, d9Exalted:false, d9Own:false };
+  if (d9Sign === pd.signNum) return { bonus:+10, vargottama:true, d9Exalted:false, d9Own:false }; // Vargottama
+  if (EXALT_SIGN[planet] === d9Sign) return { bonus:+8, vargottama:false, d9Exalted:true, d9Own:false }; // Exalted in D9
+  if (SIGN_LORD[d9Sign] === planet) return { bonus:+6, vargottama:false, d9Exalted:false, d9Own:true }; // Own sign in D9 (Maharishi Parashara)
   // Debilitated in D9: suppress
   const debSign = (EXALT_SIGN[planet] + 6) % 12;
-  if (debSign === d9Sign) return { bonus:-5, vargottama:false, d9Exalted:false };
-  return { bonus:0, vargottama:false, d9Exalted:false };
+  if (debSign === d9Sign) return { bonus:-5, vargottama:false, d9Exalted:false, d9Own:false };
+  return { bonus:0, vargottama:false, d9Exalted:false, d9Own:false };
+}
+
+// ── LAYER 9b — Planetary Conjunctions (Same House Companions) ──
+function getConjunctionBonus(
+  planet: string,
+  pd: PD,
+  allPlanets: Record<string, PD>,
+  lagnaNum: number
+): number {
+  let bonus = 0;
+  for (const [otherP, otherPd] of Object.entries(allPlanets)) {
+    if (otherP === planet || !otherPd || otherPd.house !== pd.house) continue;
+    const diff = Math.abs(((otherPd.lon - pd.lon + 360) % 360));
+    const sep = Math.min(diff, 360 - diff);
+    const closeness = sep <= 6 ? 1.0 : sep <= 12 ? 0.7 : 0.4;
+
+    // Benefic companion softens dusthana or boosts kendra/trikona
+    if (NAT_BEN.has(otherP)) {
+      bonus += Math.round(5 * closeness);
+    }
+    // Conjunction with Yogakaraka for this lagna (e.g. Mars for Cancer/Leo; Saturn for Taurus/Libra)
+    const isYogakarakaCompanion =
+      ((lagnaNum === 3 || lagnaNum === 4) && otherP === "Mars") ||
+      ((lagnaNum === 1 || lagnaNum === 6) && otherP === "Saturn");
+    if (isYogakarakaCompanion) {
+      bonus += Math.round(6 * closeness);
+    }
+  }
+  return Math.min(10, Math.max(-6, bonus));
 }
 
 // ── Master scoring function — ALL 10 layers ───────────────────
@@ -441,12 +479,16 @@ function scorePlanet(
   const binduScore = getBinduScore(binduVal);
   s += binduScore;
 
-  // LAYER 9 — Vargottama / D9 exaltation
-  const { bonus: d9Bonus, vargottama, d9Exalted } = getD9Score(planet, pd, d9Signs);
+  // LAYER 9 — Vargottama / D9 exaltation / D9 Own Sign
+  const { bonus: d9Bonus, vargottama, d9Exalted, d9Own } = getD9Score(planet, pd, d9Signs);
   s += d9Bonus;
 
+  // LAYER 9b — Planetary Conjunction (same house companion boost)
+  const conjunctionBonus = getConjunctionBonus(planet, pd, allPlanets, lagnaNum);
+  s += conjunctionBonus;
+
   return {
-    total:          Math.min(95, Math.max(15, Math.round(s))),
+    total:          Math.min(95, Math.max(20, Math.round(s))),
     functionalRole: role,
     ruledHouses,
     combusted,
@@ -454,6 +496,7 @@ function scorePlanet(
     inboundScore,
     vargottama,
     d9Exalted,
+    d9Own,
     bindus:         binduVal ?? null,
   };
 }
@@ -573,7 +616,7 @@ export function calculateDestiny(
       }
     }
 
-    return Math.min(95, Math.max(15, Math.round(score)));
+    return Math.min(95, Math.max(20, Math.round(score)));
   }
 
   // Curve points (age 0 → 90)
@@ -663,7 +706,7 @@ export function calculateDestiny(
       });
     });
     if (planets[activeMD.planet] && houses.includes(planets[activeMD.planet].house)) s += 10;
-    return Math.min(95, Math.max(15, Math.round(s)));
+    return Math.min(95, Math.max(20, Math.round(s)));
   }
 
   const areaData = [
@@ -836,7 +879,7 @@ export function calculateADDestiny(
     score += Math.round((mdTara?.modifier ?? 0) * 0.6);
     score += Math.round((adTara?.modifier ?? 0) * 0.4);
 
-    return Math.min(95, Math.max(15, Math.round(score)));
+    return Math.min(95, Math.max(20, Math.round(score)));
   }
 
   // Monthly resolution curve
@@ -866,7 +909,7 @@ export function calculateADDestiny(
     points.push({
       monthOffset: m,
       date,
-      score:       Math.min(95, Math.max(15, base + waveMod)),
+      score:       Math.min(95, Math.max(20, base + waveMod)),
       adPlanet:    adP,
       mdPlanet,
       mdNavtara:   mdTara,
