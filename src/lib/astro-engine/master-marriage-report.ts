@@ -411,14 +411,21 @@ export function generateMasterMarriageReport(
   const hasNadiDosha = nadiKoot && nadiKoot.hasDosha;
   let nadiPariharaApplied = false;
 
+  // Nakshatra lords (Vimshottari 9-cycle)
+  const NAK_LORDS = ["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"];
+  const p1NakLord = NAK_LORDS[p1NakIdx % 9];
+  const p2NakLord = NAK_LORDS[p2NakIdx % 9];
+
   if (!hasNadiDosha) {
     pariharas.push(`नाड़ी दोष रहित (Nadi Dosha Free): दोनों की नाड़ियां परस्पर अनुकूल हैं, जिससे स्वास्थ्य, दीर्घायु व कुल वृद्धि हेतु पूर्ण ${nadiKoot?.points ?? 8}/${nadiKoot?.maxPoints ?? 8} अंक प्राप्त हैं।`);
   } else {
     // Classical Parihara: "भिन्नराशौ पृथक् ऋक्षे नाड़ीदोषो न विद्यते" (मुहूर्त चिंतामणि)
-    // If Moon rashis are different AND Nakshatras are different -> Parihara applies!
-    if (p1RashiIdx !== p2RashiIdx && p1NakIdx !== p2NakIdx) {
+    // CRITICAL EXCEPTION: "एकाधिपत्ये न परिहारः" — यदि दोनों नक्षत्रों का स्वामी एक ही हो (जैसे दोनों शनि शासित), तो मध्य नाड़ी दोष निरस्त नहीं होता!
+    if (p1RashiIdx !== p2RashiIdx && p1NakIdx !== p2NakIdx && p1NakLord !== p2NakLord) {
       nadiPariharaApplied = true;
-      pariharas.push(`नाड़ी दोष परिहार (Nadi Dosha Parihara): मुहूर्त चिंतामणि के शास्त्रोक्त नियम ('भिन्नराशौ पृथक् ऋक्षे नाड़ीदोषो न विद्यते') के अनुसार दोनों की चंद्र राशियां (${p1MoonSign} व ${p2MoonSign}) तथा जन्म नक्षत्र (${p1MoonNak} व ${p2MoonNak}) भिन्न होने से नाड़ी दोष स्वतः निरस्त होकर सुरक्षा प्रदान करता है।`);
+      pariharas.push(`नाड़ी दोष परिहार (Nadi Dosha Parihara): मुहूर्त चिंतामणि के शास्त्रोक्त नियम ('भिन्नराशौ पृथक् ऋक्षे नाड़ीदोषो न विद्यते') के अनुसार दोनों की चंद्र राशियां (${p1MoonSign} व ${p2MoonSign}), जन्म नक्षत्र (${p1MoonNak} व ${p2MoonNak}) एवं नक्षत्र स्वामी (${p1NakLord} व ${p2NakLord}) भिन्न होने से नाड़ी दोष स्वतः निरस्त होकर सुरक्षा प्रदान करता है।`);
+    } else if (p1NakLord === p2NakLord) {
+      pariharas.push(`नाड़ी दोष विचार (समान स्वामी): दोनों के जन्म नक्षत्र एक ही ग्रह (${p1NakLord}) द्वारा शासित होने के कारण मध्य नाड़ी दोष का पूर्ण परिहार संभव नहीं है। महामृत्युंजय जप एवं विशिष्ट शांति उपाय अनिवार्य हैं।`);
     } else {
       pariharas.push(`नाड़ी दोष विचार: नाड़ी दोष दृष्टिगत है, जिसके निवारण हेतु शास्त्रीय महामृत्युंजय जप एवं सुवर्ण/गौ दान की अनुशंसा की जाती है।`);
     }
@@ -691,21 +698,55 @@ export function generateMasterMarriageReport(
   const ashtakootEffective = Math.min(36, ashtakootScore + (nadiPariharaApplied ? 8 : 0));
   const ashtakootPillarScore = Math.round((ashtakootEffective / 36) * 20);
 
-  // 2. Lagna-to-Lagna Core Nature (15 Points): Same lagna is Amrit (15/15), 5-9/3-11 (13/15)
+  // 2. Lagna-to-Lagna Core Nature (15 Points):
+  // Same lagna = 15/15 (Amrit)
+  // 5-9 Trine = 14/15
+  // 3-11 Upachaya = 12/15
+  // 1-7 Complementary = 13/15
+  // 4-10 Kendra: Same element/friendly = 11, Water vs Fire clash (e.g. Cancer vs Aries) = 7
+  // 6-8 / 2-12 = 6
   const l1Idx = SIGNS_LIST.indexOf(chart1.lagnaRashi);
   const l2Idx = SIGNS_LIST.indexOf(chart2.lagnaRashi);
   const lagnaDiff = (l2Idx - l1Idx + 12) % 12;
-  const lagnaPillarScore = lagnaDiff === 0 ? 15 : [4, 8].includes(lagnaDiff) ? 14 : [2, 10, 3, 9].includes(lagnaDiff) ? 12 : [6].includes(lagnaDiff) ? 13 : 7;
+  
+  // Element mapping: 0=Fire(Aries,Leo,Sag), 1=Earth(Taurus,Virgo,Cap), 2=Air(Gemini,Libra,Aquarius), 3=Water(Cancer,Scorpio,Pisces)
+  const elem1 = l1Idx % 4;
+  const elem2 = l2Idx % 4;
+  const isFireWaterClash = (elem1 === 0 && elem2 === 3) || (elem1 === 3 && elem2 === 0);
+
+  let lagnaPillarScore = 8;
+  if (lagnaDiff === 0) {
+    lagnaPillarScore = 15;
+  } else if (lagnaDiff === 4 || lagnaDiff === 8) {
+    lagnaPillarScore = 14;
+  } else if (lagnaDiff === 6) {
+    lagnaPillarScore = 13;
+  } else if (lagnaDiff === 2 || lagnaDiff === 10) {
+    lagnaPillarScore = 12;
+  } else if (lagnaDiff === 3 || lagnaDiff === 9) {
+    lagnaPillarScore = isFireWaterClash ? 7 : 11;
+  } else {
+    lagnaPillarScore = 6;
+  }
 
   // 3. Mangal & Paap Samyam (15 Points):
-  const paapPillarScore = isMangalBalanced ? 15 : paapDiff <= 3 ? 11 : 6;
+  const paapPillarScore = isMangalBalanced ? 15 : paapDiff <= 3 ? 10 : 5;
 
   // 4. D9 Navamsha Cross Health (15 Points):
   const d9PillarScore = (d9Diff === 0 || d9Diff === 4 || d9Diff === 8 ? 13 : [2, 10, 3, 9].includes(d9Diff) ? 12 : 9) +
     (overallH12 === "harmonious" ? 2 : 0);
 
   // 5. 7th CSL & 7th House Purity (15 Points):
-  const seventhPillarScore = Math.min(15, 12 + (mi1.meetingContext.circumstance ? 1 : 0) + (mi2.meetingContext.circumstance ? 2 : 0));
+  // Check for debilitated planets in Kendra/7th house (e.g., Neecha Shani in Lagna or Neecha Mars in 4th/7th)
+  let seventhDeduction = 0;
+  const p1Planets = Object.values(chart1.planets || {});
+  const p2Planets = Object.values(chart2.planets || {});
+  const hasSevereAffliction = p1Planets.some(p => p.house === 7 && p.isDebilitated) ||
+    p2Planets.some(p => (p.house === 7 || p.house === 1 || p.house === 4) && p.isDebilitated && ["Mars", "Saturn"].includes(p.name));
+  if (hasSevereAffliction) {
+    seventhDeduction = 5; // Heavy deduction for Neecha Shani/Mars afflicting marriage axis
+  }
+  const seventhPillarScore = Math.max(5, Math.min(15, 12 + (mi1.meetingContext.circumstance ? 1 : 0) + (mi2.meetingContext.circumstance ? 2 : 0) - seventhDeduction));
 
   // 6. Punarbu & Mental Harmony (10 Points):
   const punarbuPillarScore = punarbuCancelled ? 10 : 6;
