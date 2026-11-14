@@ -204,21 +204,23 @@ export default function MasterMarriageReportPanel({
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ width: 68, height: 68, borderRadius: "50%", background: "linear-gradient(135deg, #10b981, #059669)", color: "#FFFFFF", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }}>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 28, fontWeight: 800, lineHeight: 1 }}>
-                  {ashtakoot.totalScore}
+              {/* Composite 100-Point Synastry Gauge */}
+              <div style={{ width: 72, height: 72, borderRadius: "50%", background: (report.masterCompatibility?.score ?? 85) >= 80 ? "linear-gradient(135deg, #10b981, #059669)" : (report.masterCompatibility?.score ?? 85) >= 65 ? "linear-gradient(135deg, #f59e0b, #d97706)" : "linear-gradient(135deg, #ef4444, #dc2626)", color: "#FFFFFF", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }}>
+                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 800, lineHeight: 1 }}>
+                  {report.masterCompatibility?.score ?? 85}
                 </div>
-                <div style={{ fontSize: 10, fontWeight: 600, opacity: 0.9 }}>/ {ashtakoot.maxScore}</div>
+                <div style={{ fontSize: 9, fontWeight: 700, opacity: 0.9 }}>/ 100 अंक</div>
               </div>
 
               <div>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 6, padding: "2px 8px", marginBottom: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 800, color: "#059669" }}>
-                    ✦ {ashtakoot.tierTitleHindi} ({ashtakoot.percentage}%)
+                    ✦ {report.masterCompatibility?.badgeTitle || "अमृत मिलान"} ({report.masterCompatibility?.grade || "A+"})
                   </span>
+                  <span style={{ fontSize: 11, color: "#6B635B" }}>• अष्टकूट: {ashtakoot.totalScore}/36 गुण</span>
                 </div>
                 <div style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.5, maxWidth: 540 }}>
-                  {ashtakoot.tierDescription}
+                  {report.masterCompatibility?.description || ashtakoot.tierDescription}
                 </div>
               </div>
             </div>
@@ -226,13 +228,13 @@ export default function MasterMarriageReportPanel({
             {/* Quick KPI Badges */}
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <div style={{ textAlign: "center", background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "8px 14px", minWidth: 90 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#059669" }}>0 अन्तर</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#059669" }}>{mangalSamyam.paapDifference} अन्तर</div>
                 <div style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>मंगल साम्यता</div>
               </div>
 
               <div style={{ textAlign: "center", background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "8px 14px", minWidth: 90 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#3b82f6" }}>5-9 त्रिकोण</div>
-0                <div style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>नवांश D9 अक्ष</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#3b82f6" }}>D9 अक्ष</div>
+                <div style={{ fontSize: 10, color: "#6B635B", marginTop: 2 }}>नवांश समन्वय</div>
               </div>
 
               <div style={{ textAlign: "center", background: "#FAF7F2", border: "1px solid rgba(184,134,11,0.2)", borderRadius: 10, padding: "8px 14px", minWidth: 90 }}>
@@ -301,7 +303,7 @@ export default function MasterMarriageReportPanel({
           </div>
 
           <p style={{ fontSize: 13, color: "#4A4238", lineHeight: 1.8, marginBottom: 16 }}>
-            वैदिक ज्योतिष में केवल सतही गुण मिलान नहीं देखा जाता, बल्कि यदि कोई कूट कम अंक दे रहा हो तो महर्षि पराशर व मुहूर्त चिंतामणि के प्रामाणिक <strong>परिहार (Pariharas)</strong> लागू होते हैं। दोनों कुंडलियों में एक राशि (सिंह) एवं भिन्न नक्षत्र (पूर्वाफाल्गुनी व उत्तराफाल्गुनी) होने से भकूट व नाड़ी दोनों का पूर्ण परिहार सिद्ध होता है।
+            वैदिक ज्योतिष में केवल सतही गुण मिलान नहीं देखा जाता, बल्कि यदि कोई कूट कम अंक दे रहा हो तो महर्षि पराशर व मुहूर्त चिंतामणि के प्रामाणिक <strong>परिहार (Pariharas)</strong> लागू होते हैं। दोनों कुंडलियों में भिन्न चंद्र राशियां ({couple.partner1.moonSign} एवं {couple.partner2.moonSign}) तथा भिन्न जन्म नक्षत्र ({couple.partner1.moonNakshatra} एवं {couple.partner2.moonNakshatra}) होने से शास्त्रीय परिहार स्वतः सिद्ध होकर दांपत्य को सुरक्षा प्रदान करते हैं।
           </p>
 
           {/* Parihara Highlights Box */}

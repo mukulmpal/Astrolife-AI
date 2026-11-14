@@ -111,8 +111,35 @@ export function calculateMilan(
   const ganaScore = g1 === g2 ? 6 : ((g1==="Deva"&&g2==="Manushya")||(g1==="Manushya"&&g2==="Deva")) ? 5 : 0;
 
   // 7. BHAKUT (max 7) — rashi distance
+  // Classical Inauspicious pairs: 6/8 (Shadashtaka), 2/12 (Dvidvadasha), 5/9 (Navapanchama without friendship)
+  // Auspicious pairs: 1/1 (Eka Rashi), 3/11 (Tritiya-Ekadasha), 4/10 (Kendra), 7/7 (Saptama)
   const rashiDiff = ((rashi2 - rashi1 + 12) % 12) + 1;
-  const bhakutScore = [2,6,5,9,3,11].includes(rashiDiff) ? 0 : 7;
+  const isDirectInauspicious = [2, 12, 6, 8].includes(rashiDiff);
+  const isNavapanchama = [5, 9].includes(rashiDiff);
+  
+  // Parihara for 5/9 (Navapanchama): canceled if lords are mutual friends or same
+  // Parihara for 6/8 (Shadashtaka): canceled if lords are same (e.g. Aries-Scorpio, Taurus-Libra)
+  const mutualFriends = (f12 && f21) || lord1 === lord2;
+
+  let bhakutScore = 7;
+  let bhakutHasDosha = false;
+  if (isDirectInauspicious) {
+    if ((rashiDiff === 6 || rashiDiff === 8) && lord1 === lord2) {
+      bhakutScore = 7; // Shadashtaka parihara by same lord
+      bhakutHasDosha = false;
+    } else {
+      bhakutScore = 0;
+      bhakutHasDosha = true;
+    }
+  } else if (isNavapanchama) {
+    if (mutualFriends) {
+      bhakutScore = 7; // Navapanchama parihara by friendly lords
+      bhakutHasDosha = false;
+    } else {
+      bhakutScore = 0;
+      bhakutHasDosha = true;
+    }
+  }
 
   // 8. NADI (max 8) — biological compatibility (same nadi = dosha)
   const nadiScore = NK_NADI[nak1] === NK_NADI[nak2] ? 0 : 8;
@@ -173,8 +200,8 @@ export function calculateMilan(
       name:"Bhakut", hindiName:"भकूट", points:bhakutScore, maxPoints:7,
       percentage:Math.round(bhakutScore/7*100),
       meaning:"Emotional Direction & Life Flow",
-      detail:`Rashi distance: ${rashiDiff}. ${bhakutScore===0?"Bhakut Dosha — emotional directions are opposed. Financial and health challenges possible.":"Favorable bhakut — emotional energy flows in the same direction."}`,
-      hasDosha:bhakutScore===0, doshaText:bhakutScore===0?"Bhakut Dosha — emotional opposition, financial strain possible.":"",
+      detail:`Rashi distance: ${rashiDiff}. ${bhakutScore===0?"Bhakut Dosha — emotional directions are opposed. Financial and health challenges possible.":isNavapanchama && mutualFriends?"Navapanchama (5/9) with mutual friendship of rashi lords — Bhakoot Dosha parihara applies.":"Favorable bhakut — emotional energy flows in harmony."}`,
+      hasDosha:bhakutHasDosha, doshaText:bhakutHasDosha?"Bhakut Dosha — emotional opposition, financial strain possible.":"",
       status:kootStatus(Math.round(bhakutScore/7*100)), color:kootColor(Math.round(bhakutScore/7*100)),
     },
     {

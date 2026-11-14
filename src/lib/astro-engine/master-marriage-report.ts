@@ -65,6 +65,19 @@ export interface MasterMarriageReport {
     partner1: PartnerSummary;
     partner2: PartnerSummary;
   };
+  masterCompatibility: {
+    score: number;
+    maxScore: 100;
+    grade: "A+" | "A" | "B+" | "B" | "C";
+    badgeTitle: string;
+    description: string;
+    pillars: {
+      name: string;
+      score: number;
+      maxScore: number;
+      status: string;
+    }[];
+  };
   ashtakoot: {
     totalScore: number;
     maxScore: number;
@@ -393,12 +406,22 @@ export function generateMasterMarriageReport(
     }
   }
 
-  // Check Nadi Dosha status
+  // Check Nadi Dosha status & Authentic Shastric Parihara
   const nadiKoot = milanRaw.koots.find(k => k.name === "Nadi");
-  if (nadiKoot && !nadiKoot.hasDosha) {
-    pariharas.push(`नाड़ी दोष रहित (Nadi Dosha Free): दोनों की नाड़ियां परस्पर अनुकूल हैं, जिससे स्वास्थ्य, दीर्घायु व कुल वृद्धि हेतु पूर्ण ${nadiKoot.points}/${nadiKoot.maxPoints} अंक प्राप्त हैं।`);
-  } else if (nadiKoot && nadiKoot.hasDosha) {
-    pariharas.push(`नाड़ी दोष विचार: नाड़ी दोष दृष्टिगत है, जिसके निवारण हेतु शास्त्रीय महामृत्युंजय जप एवं सुवर्ण/गौ दान की अनुशंसा की जाती है।`);
+  const hasNadiDosha = nadiKoot && nadiKoot.hasDosha;
+  let nadiPariharaApplied = false;
+
+  if (!hasNadiDosha) {
+    pariharas.push(`नाड़ी दोष रहित (Nadi Dosha Free): दोनों की नाड़ियां परस्पर अनुकूल हैं, जिससे स्वास्थ्य, दीर्घायु व कुल वृद्धि हेतु पूर्ण ${nadiKoot?.points ?? 8}/${nadiKoot?.maxPoints ?? 8} अंक प्राप्त हैं।`);
+  } else {
+    // Classical Parihara: "भिन्नराशौ पृथक् ऋक्षे नाड़ीदोषो न विद्यते" (मुहूर्त चिंतामणि)
+    // If Moon rashis are different AND Nakshatras are different -> Parihara applies!
+    if (p1RashiIdx !== p2RashiIdx && p1NakIdx !== p2NakIdx) {
+      nadiPariharaApplied = true;
+      pariharas.push(`नाड़ी दोष परिहार (Nadi Dosha Parihara): मुहूर्त चिंतामणि के शास्त्रोक्त नियम ('भिन्नराशौ पृथक् ऋक्षे नाड़ीदोषो न विद्यते') के अनुसार दोनों की चंद्र राशियां (${p1MoonSign} व ${p2MoonSign}) तथा जन्म नक्षत्र (${p1MoonNak} व ${p2MoonNak}) भिन्न होने से नाड़ी दोष स्वतः निरस्त होकर सुरक्षा प्रदान करता है।`);
+    } else {
+      pariharas.push(`नाड़ी दोष विचार: नाड़ी दोष दृष्टिगत है, जिसके निवारण हेतु शास्त्रीय महामृत्युंजय जप एवं सुवर्ण/गौ दान की अनुशंसा की जाती है।`);
+    }
   }
 
   const ashtakootScore = milanRaw.totalScore;
@@ -663,13 +686,79 @@ export function generateMasterMarriageReport(
     });
   }
 
-  // ── Executive Summaries ─────────────────────────────────────────────────────
+  // ── Executive Summaries & Master Compatibility Synthesis (100-Point Scale) ──
+  // 1. Ashtakoot Contribution (Scaled to 20): Raw score + Shastric Parihara bonus
+  const ashtakootEffective = Math.min(36, ashtakootScore + (nadiPariharaApplied ? 8 : 0));
+  const ashtakootPillarScore = Math.round((ashtakootEffective / 36) * 20);
+
+  // 2. Lagna-to-Lagna Core Nature (15 Points): Same lagna is Amrit (15/15), 5-9/3-11 (13/15)
+  const l1Idx = SIGNS_LIST.indexOf(chart1.lagnaRashi);
+  const l2Idx = SIGNS_LIST.indexOf(chart2.lagnaRashi);
+  const lagnaDiff = (l2Idx - l1Idx + 12) % 12;
+  const lagnaPillarScore = lagnaDiff === 0 ? 15 : [4, 8].includes(lagnaDiff) ? 14 : [2, 10, 3, 9].includes(lagnaDiff) ? 12 : [6].includes(lagnaDiff) ? 13 : 7;
+
+  // 3. Mangal & Paap Samyam (15 Points):
+  const paapPillarScore = isMangalBalanced ? 15 : paapDiff <= 3 ? 11 : 6;
+
+  // 4. D9 Navamsha Cross Health (15 Points):
+  const d9PillarScore = (d9Diff === 0 || d9Diff === 4 || d9Diff === 8 ? 13 : [2, 10, 3, 9].includes(d9Diff) ? 12 : 9) +
+    (overallH12 === "harmonious" ? 2 : 0);
+
+  // 5. 7th CSL & 7th House Purity (15 Points):
+  const seventhPillarScore = Math.min(15, 12 + (mi1.meetingContext.circumstance ? 1 : 0) + (mi2.meetingContext.circumstance ? 2 : 0));
+
+  // 6. Punarbu & Mental Harmony (10 Points):
+  const punarbuPillarScore = punarbuCancelled ? 10 : 6;
+
+  // 7. Dynamic Timing & Dasha Support (10 Points):
+  const timingPillarScore = dynamicTiming.isDoubleTransitActive ? 10 : 8;
+
+  const totalMasterScore = Math.min(100, Math.max(30,
+    ashtakootPillarScore + lagnaPillarScore + paapPillarScore + d9PillarScore +
+    seventhPillarScore + punarbuPillarScore + timingPillarScore
+  ));
+
+  let masterGrade: MasterMarriageReport["masterCompatibility"]["grade"] = "B";
+  let masterBadge = "मध्यम अनुकूलता (Fair Compatibility)";
+  let masterDesc = "पारस्परिक समझदारी और आवश्यक ज्योतिषीय मार्गदर्शन से गृहस्थी संतुलित रहेगी।";
+
+  if (totalMasterScore >= 82) {
+    masterGrade = "A+";
+    masterBadge = "अमृत मिलान (A+ Excellence)";
+    masterDesc = "दोनों कुंडलियों में लग्न, नवमांश, पाप साम्यता और अष्टकूट परिहार का दुर्लभ समन्वय है। अखंड सौभाग्य व सुखद दांपत्य।";
+  } else if (totalMasterScore >= 72) {
+    masterGrade = "A";
+    masterBadge = "उत्तम मिलान (A Grade Auspicious)";
+    masterDesc = "अधिकांश प्रमुख वैवाहिक स्तंभ अत्यधिक मजबूत हैं। गृहस्थी में सुख, शांति और समृद्धि बनी रहेगी।";
+  } else if (totalMasterScore >= 60) {
+    masterGrade = "B+";
+    masterBadge = "संतोषजनक मिलान (B+ Good)";
+    masterDesc = "विवाह के लिए उपयुक्त; स्वभाव में कुछ समायोजन व प्राथमिक उपायों से जीवन सुखद रहेगा।";
+  }
+
+  const masterCompatibility: MasterMarriageReport["masterCompatibility"] = {
+    score: totalMasterScore,
+    maxScore: 100,
+    grade: masterGrade,
+    badgeTitle: masterBadge,
+    description: masterDesc,
+    pillars: [
+      { name: "अष्टकूट व शास्त्रीय परिहार", score: ashtakootPillarScore, maxScore: 20, status: ashtakootEffective >= 24 ? "उत्तम" : "मध्यम" },
+      { name: "लग्न-से-लग्न मूल तालमेल", score: lagnaPillarScore, maxScore: 15, status: lagnaDiff === 0 ? "अमृत (समान लग्न)" : "अनुकूल" },
+      { name: "मंगल व पाप साम्यता", score: paapPillarScore, maxScore: 15, status: isMangalBalanced ? "पूर्ण संतुलित" : "संतुलन विचारणीय" },
+      { name: "D9 नवमांश 4-स्तंभ व शयन सुख", score: d9PillarScore, maxScore: 15, status: overallH12 === "harmonious" ? "सुरक्षित" : "मध्यम" },
+      { name: "7th CSL व सप्तम भाव शुद्धि", score: seventhPillarScore, maxScore: 15, status: "शुभ" },
+      { name: "पुनर्भू व मानसिक सौहार्द", score: punarbuPillarScore, maxScore: 10, status: punarbuCancelled ? "दोष मुक्त" : "सावधानी" },
+      { name: "दशा व गोचर समय संबल", score: timingPillarScore, maxScore: 10, status: "सकारात्मक" },
+    ],
+  };
+
   const weddingDateStr = weddingDate || "प्रस्तावित विवाह तिथि";
-  const nadiStatus = nadiKoot && !nadiKoot.hasDosha ? "शून्य" : "न्यूनतम / परिहार समर्थित";
+  const nadiStatus = nadiKoot && !nadiKoot.hasDosha ? "शून्य" : nadiPariharaApplied ? "शास्त्रोक्त परिहार सिद्ध (शून्य प्रभाव)" : "न्यूनतम / परिहार समर्थित";
 
-  const executiveSummaryHindi = `${p1Name} और ${p2Name} का अष्टकूट मिलान 36 में से ${ashtakootScore} गुण (${tierTitleHindi}) है, जिसमें नाड़ी दोष ${nadiStatus} है। मांगलिक स्तर पर ${p1Paap} vs ${p2Paap} अंक की ${mangalSamyam.balanceLevel} है। कालपुरुष की ७वीं राशि (तुला) दोनों के दांपत्य संतुलन को भाव ${k7p1.d1House} व ${k7p2.d1House} से जोड़ती है। नवांश (D9) में दोनों के लग्न ${axisRel} में स्थित हैं तथा 12वां भाव शयन-सुख स्तर ${overallH12 === "harmonious" ? "अनुकूल" : "सामान्य"} है। ${weddingDateStr} पर गोचर व दशा का प्रभाव संबंध को सकारात्मक संबल प्रदान करता है।`;
+  const executiveSummaryHindi = `${p1Name} और ${p2Name} का अष्टकूट मिलान 36 में से ${ashtakootScore} गुण (${tierTitleHindi}) है, जिसमें नाड़ी दोष ${nadiStatus} है। समग्र 10-स्तंभ सिनैस्ट्री स्कोर 100 में से ${totalMasterScore} अंक (${masterBadge}) है। मांगलिक स्तर पर ${p1Paap} vs ${p2Paap} अंक की ${mangalSamyam.balanceLevel} है। कालपुरुष की ७वीं राशि (तुला) दोनों के दांपत्य संतुलन को भाव ${k7p1.d1House} व ${k7p2.d1House} से जोड़ती है। नवांश (D9) में दोनों के लग्न ${axisRel} में स्थित हैं तथा 12वां भाव शयन-सुख स्तर ${overallH12 === "harmonious" ? "अनुकूल" : "सामान्य"} है। ${weddingDateStr} पर गोचर व दशा का प्रभाव संबंध को सकारात्मक संबल प्रदान करता है।`;
 
-  const executiveSummaryEnglish = `${p1Name} and ${p2Name} possess an Ashtakoot compatibility of ${ashtakootScore} / 36 Gunas (${tierTitleHindi}) with ${nadiKoot && !nadiKoot.hasDosha ? "zero" : "remedied"} Nadi dosha. The Manglik paap balance is ${p1Paap} vs ${p2Paap} (${mangalSamyam.balanceLevel}). Kalpurush 7th sign (Libra) aligns with House ${k7p1.d1House} and ${k7p2.d1House}. In the D9 Navamsha, their ascendants form an auspicious ${axisRel} alignment with ${overallH12} 12th house dynamics. The transit alignment around ${weddingDateStr} supports long-term harmony and mutual prosperity.`;
+  const executiveSummaryEnglish = `${p1Name} and ${p2Name} possess an Ashtakoot compatibility of ${ashtakootScore} / 36 Gunas (${tierTitleHindi}) with ${nadiKoot && !nadiKoot.hasDosha ? "zero" : "remedied"} Nadi dosha, and an overall Master Synastry Score of ${totalMasterScore} / 100 (${masterBadge}). The Manglik paap balance is ${p1Paap} vs ${p2Paap} (${mangalSamyam.balanceLevel}). Kalpurush 7th sign (Libra) aligns with House ${k7p1.d1House} and ${k7p2.d1House}. In the D9 Navamsha, their ascendants form an auspicious ${axisRel} alignment with ${overallH12} 12th house dynamics. The transit alignment around ${weddingDateStr} supports long-term harmony and mutual prosperity.`;
 
   return {
     id: `MMR-${Date.now()}`,
@@ -678,6 +767,7 @@ export function generateMasterMarriageReport(
       partner1: partner1Summary,
       partner2: partner2Summary,
     },
+    masterCompatibility,
     ashtakoot: {
       totalScore: ashtakootScore,
       maxScore: 36,
