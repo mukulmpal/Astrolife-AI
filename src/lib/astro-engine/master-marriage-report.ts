@@ -16,7 +16,7 @@
  * ============================================================================
  */
 
-import { calculateChart, type ChartData } from "./calculations";
+import { calculateChart, type ChartData, type PlanetData } from "./calculations";
 import { calculateMilan, type MilanResult, type KootScore } from "./kundali-milan";
 import {
   evaluateMarriageIntelligence,
@@ -460,26 +460,39 @@ export function generateMasterMarriageReport(
     mangalComparison = null;
   }
 
-  const p1Paap = mangalComparison?.traditionalPaapBalance?.personA ?? 0;
-  const p2Paap = mangalComparison?.traditionalPaapBalance?.personB ?? 0;
-  const paapDiff = Math.abs(p1Paap - p2Paap);
-  const isMangalBalanced = paapDiff <= 2;
+  // Classical Direct Lagna Mangal Check (Houses 1, 4, 7, 8, 12)
+  const MANGLIK_HOUSES = [1, 4, 7, 8, 12];
+  const p1MarsHouse = chart1.planets.Mars?.house ?? 1;
+  const p2MarsHouse = chart2.planets.Mars?.house ?? 1;
+  const p1IsDirectManglik = MANGLIK_HOUSES.includes(p1MarsHouse);
+  const p2IsDirectManglik = MANGLIK_HOUSES.includes(p2MarsHouse);
+
+  // Compute traditional malefic points if adapter returns 0 or missing
+  let p1Paap = mangalComparison?.traditionalPaapBalance?.personA ?? 0;
+  let p2Paap = mangalComparison?.traditionalPaapBalance?.personB ?? 0;
+  if (p1Paap === 0 && p1IsDirectManglik) p1Paap = 8;
+  if (p2Paap === 0 && p2IsDirectManglik) p2Paap = 8;
+
+  // Severe asymmetry if one is Manglik and other is Non-Manglik
+  const isDirectManglikClash = p1IsDirectManglik !== p2IsDirectManglik;
+  const paapDiff = isDirectManglikClash ? Math.max(6, Math.abs(p1Paap - p2Paap)) : Math.abs(p1Paap - p2Paap);
+  const isMangalBalanced = !isDirectManglikClash && paapDiff <= 2;
 
   const p1MarsSign = chart1.planets.Mars?.sign || "";
-  const p1MarsHouse = chart1.planets.Mars?.house ?? 1;
   const p2MarsSign = chart2.planets.Mars?.sign || "";
-  const p2MarsHouse = chart2.planets.Mars?.house ?? 1;
 
   const mangalSamyam: MasterMarriageReport["mangalSamyam"] = {
     isBalanced: isMangalBalanced,
     paapDifference: paapDiff,
     partner1Paap: p1Paap,
     partner2Paap: p2Paap,
-    balanceLevel: isMangalBalanced ? "पूर्ण साम्यता (Harmonious Balance)" : "साम्यता संतुलन विचारणीय",
+    balanceLevel: isMangalBalanced ? "पूर्ण साम्यता (Harmonious Balance)" : isDirectManglikClash ? "मांगलिक असंतुलन (Manglik Asymmetry)" : "साम्यता संतुलन विचारणीय",
     verdict: isMangalBalanced
       ? `दोनों कुंडलियों में मांगलिक पाप साम्यता (${p1Paap} vs ${p2Paap} अंक) संतुलित है। मंगल का परस्पर प्रभाव सामंजस्यपूर्ण और दोष-मुक्त है।`
-      : `मंगल दोष में ${paapDiff} अंकों का अंतर है (${p1Paap} vs ${p2Paap}), जिसे विशिष्ट शांति उपायों और समझदारी से संतुलित किया जा सकता है।`,
-    details: `${p1Name} (भाव ${p1MarsHouse} ${p1MarsSign} मंगल) एवं ${p2Name} (भाव ${p2MarsHouse} ${p2MarsSign} मंगल) की ऊर्जा स्थिति परस्पर सामंजस्य स्थापित करती है।`,
+      : isDirectManglikClash
+      ? `एक कुंडली मांगलिक (भाव ${p1IsDirectManglik ? p1MarsHouse : p2MarsHouse}) एवं दूसरी अमांगलिक होने से ${paapDiff} अंकों का मांगलिक असंतुलन है।`
+      : `मंगल दोष में ${paapDiff} अंकों का अंतर है (${p1Paap} vs ${p2Paap}), जिसे विशिष्ट शांति उपायों से संतुलित किया जा सकता है।`,
+    details: `${p1Name} (भाव ${p1MarsHouse} ${p1MarsSign} मंगल) एवं ${p2Name} (भाव ${p2MarsHouse} ${p2MarsSign} मंगल) की ऊर्जा स्थिति का विश्लेषण।`,
   };
 
   // ── 3. Marriage Intelligence Engines for Both Partners ───────────────────────
@@ -738,11 +751,21 @@ export function generateMasterMarriageReport(
 
   // 5. 7th CSL & 7th House Purity (15 Points):
   // Check for debilitated planets in Kendra/7th house (e.g., Neecha Shani in Lagna or Neecha Mars in 4th/7th)
+  // Classical standard: Sun in Libra, Moon in Scorpio, Mars in Cancer, Mercury in Pisces, Jupiter in Capricorn, Venus in Virgo, Saturn in Aries
+  const DEBIL_MAP: Record<string, string> = {
+    Sun: "Libra", Moon: "Scorpio", Mars: "Cancer", Mercury: "Pisces", Jupiter: "Capricorn", Venus: "Virgo", Saturn: "Aries"
+  };
+  function isPlanetDebilitated(planetName: string, p: PlanetData | undefined): boolean {
+    if (!p) return false;
+    if (p.dignity?.toLowerCase().includes("debilitat")) return true;
+    return DEBIL_MAP[planetName] === p.sign;
+  }
+
   let seventhDeduction = 0;
-  const p1Planets = Object.values(chart1.planets || {});
-  const p2Planets = Object.values(chart2.planets || {});
-  const hasSevereAffliction = p1Planets.some(p => p.house === 7 && p.isDebilitated) ||
-    p2Planets.some(p => (p.house === 7 || p.house === 1 || p.house === 4) && p.isDebilitated && ["Mars", "Saturn"].includes(p.name));
+  const p1PlanetEntries = Object.entries(chart1.planets || {});
+  const p2PlanetEntries = Object.entries(chart2.planets || {});
+  const hasSevereAffliction = p1PlanetEntries.some(([name, p]) => p.house === 7 && isPlanetDebilitated(name, p)) ||
+    p2PlanetEntries.some(([name, p]) => (p.house === 7 || p.house === 1 || p.house === 4) && isPlanetDebilitated(name, p) && ["Mars", "Saturn"].includes(name));
   if (hasSevereAffliction) {
     seventhDeduction = 5; // Heavy deduction for Neecha Shani/Mars afflicting marriage axis
   }
