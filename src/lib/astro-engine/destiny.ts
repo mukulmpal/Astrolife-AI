@@ -208,7 +208,7 @@ const POWER_HOUSES = new Set([1,5,9,10]);
 const TARA_DEFS: Omit<NavtaraInfo,"taraNum"|"interpretation">[] = [
   { taraName:"Janma",        quality:"self/rebirth",    modifier:-3,  color:"#c8a030", icon:"🌟" }, // FIX: was 0, classical = slightly challenging
   { taraName:"Sampat",       quality:"wealth",          modifier:+8,  color:"#22c55e", icon:"💰" },
-  { taraName:"Vipat",        quality:"restructuring & vigilance", modifier:-8,  color:"#f59e0b", icon:"⚠️" },
+  { taraName:"Vipat",        quality:"danger",          modifier:-10, color:"#ef4444", icon:"⚠️" },
   { taraName:"Kshema",       quality:"stability",       modifier:+6,  color:"#4ade80", icon:"🛡️" },
   { taraName:"Pratyari",     quality:"enmity",          modifier:-8,  color:"#f97316", icon:"⚔️" },
   { taraName:"Sadhaka",      quality:"achievement",     modifier:+7,  color:"#38bdf8", icon:"✅" },
@@ -220,7 +220,7 @@ const TARA_DEFS: Omit<NavtaraInfo,"taraNum"|"interpretation">[] = [
 const TARA_INTERP: string[] = [
   "Janma Tara — Same nakshatra as your birth star. Dasha is intensely personal — karmic confrontations, identity pressure, inner growth through outer turbulence. Not easy, but deeply transformative.",
   "Sampat Tara — Wealth Tara. Financial opportunities, resource accumulation, and abundance themes are naturally highlighted in this dasha.",
-  "Vipat Tara — Restructuring & Vigilance Tara. Demands hard grind, patience, and conscious adjustments. Unexpected friction or delays yield valuable resilience when managed with documentation and proper remedies.",
+  "Vipat Tara — Danger Tara. Unexpected obstacles, health awareness, and vigilance are essential. Remedies strongly advised during this period.",
   "Kshema Tara — Comfort & Stability Tara. Protection, domestic stability, and safe progress. Best period for consolidation rather than bold risk-taking.",
   "Pratyari Tara — Enmity Tara. Opposition, rivalry, and conflict are attracted. Competitors and hidden enemies may be active. Patience and documentation essential.",
   "Sadhaka Tara — Achievement Tara. Highly productive — goals accomplished, recognition comes, sustained effort yields clear results.",
@@ -276,7 +276,6 @@ function getFunctionalRole(
   const rTrikona  = ruledHouses.some(h => TRIKONAS.has(h));
   const rDusth    = ruledHouses.some(h => DUSTH.has(h));
   const rMaraka   = ruledHouses.some(h => MARAKAS.has(h));
-  const rLabha    = ruledHouses.includes(11);
   const rLagna    = ruledHouses.includes(1);
 
   // True Yogakaraka: owns a kendra AND a trikona where neither is the shared 1st house
@@ -290,11 +289,6 @@ function getFunctionalRole(
   if (rTrikona && rDusth  && !rLagna)             return { delta: 3, role:"Trikona+Dusthana Lord",     ruledHouses };
   if (rLagna   && !rDusth)                        return { delta: 8, role:"Lagna Lord",                ruledHouses };
   if (rLagna   && rDusth)                         return { delta: 2, role:"Lagna+Dusthana Lord",       ruledHouses };
-
-  // Kendra + Labha Lord (e.g. Venus for Cancer Lagna: rules 4th Sukh & 11th Labha)
-  if (rKendra && rLabha && !rDusth) {
-    return { delta: 4, role:"Kendra + Labha Lord (Sukhesh & Labhesh)", ruledHouses };
-  }
 
   if (rKendra && !rDusth) {
     // Kendradhipati dosha: natural benefics owning Kendras lose strength
@@ -377,35 +371,6 @@ function getD9Score(
   return { bonus:0, vargottama:false, d9Exalted:false };
 }
 
-// ── LAYER 9b — Planetary Conjunctions (Same House Companions) ──
-function getConjunctionBonus(
-  planet: string,
-  pd: PD,
-  allPlanets: Record<string, PD>,
-  lagnaNum: number
-): number {
-  let bonus = 0;
-  for (const [otherP, otherPd] of Object.entries(allPlanets)) {
-    if (otherP === planet || !otherPd || otherPd.house !== pd.house) continue;
-    const diff = Math.abs(((otherPd.lon - pd.lon + 360) % 360));
-    const sep = Math.min(diff, 360 - diff);
-    const closeness = sep <= 6 ? 1.0 : sep <= 12 ? 0.7 : 0.4;
-
-    // Benefic companion softens dusthana or boosts kendra/trikona
-    if (NAT_BEN.has(otherP)) {
-      bonus += Math.round(5 * closeness);
-    }
-    // Conjunction with Yogakaraka for this lagna (e.g. Mars for Cancer/Leo; Saturn for Taurus/Libra)
-    const isYogakarakaCompanion =
-      ((lagnaNum === 3 || lagnaNum === 4) && otherP === "Mars") ||
-      ((lagnaNum === 1 || lagnaNum === 6) && otherP === "Saturn");
-    if (isYogakarakaCompanion) {
-      bonus += Math.round(6 * closeness);
-    }
-  }
-  return Math.min(10, Math.max(-6, bonus));
-}
-
 // ── Master scoring function — ALL 10 layers ───────────────────
 
 function scorePlanet(
@@ -480,12 +445,8 @@ function scorePlanet(
   const { bonus: d9Bonus, vargottama, d9Exalted } = getD9Score(planet, pd, d9Signs);
   s += d9Bonus;
 
-  // LAYER 9b — Planetary Conjunction (same house companion boost)
-  const conjunctionBonus = getConjunctionBonus(planet, pd, allPlanets, lagnaNum);
-  s += conjunctionBonus;
-
   return {
-    total:          Math.min(95, Math.max(20, Math.round(s))),
+    total:          Math.min(95, Math.max(15, Math.round(s))),
     functionalRole: role,
     ruledHouses,
     combusted,
@@ -612,7 +573,7 @@ export function calculateDestiny(
       }
     }
 
-    return Math.min(95, Math.max(20, Math.round(score)));
+    return Math.min(95, Math.max(15, Math.round(score)));
   }
 
   // Curve points (age 0 → 90)
@@ -674,10 +635,8 @@ export function calculateDestiny(
     },
   };
 
-  // Lifetime peak dasha: prefer active adult career bands (endAge >= 18) for actionable life guidance; fallback to all bands
-  const adultBands = bands.filter(b => b.endAge >= 18);
-  const peak      = [...(adultBands.length > 0 ? adultBands : bands)].sort((a,b) => b.score - a.score)[0] || fallbackBand;
-  const challenge = [...(adultBands.length > 0 ? adultBands : bands)].sort((a,b) => a.score - b.score)[0] || fallbackBand;
+  const peak      = [...bands].sort((a,b) => b.score - a.score)[0] || fallbackBand;
+  const challenge = [...bands].sort((a,b) => a.score - b.score)[0] || fallbackBand;
 
   // Area scores (also Navtara-aware)
   const activeMD = normalizedDashas.find(s => s.start <= now && s.end > now) || normalizedDashas[0] || {
@@ -704,7 +663,7 @@ export function calculateDestiny(
       });
     });
     if (planets[activeMD.planet] && houses.includes(planets[activeMD.planet].house)) s += 10;
-    return Math.min(95, Math.max(20, Math.round(s)));
+    return Math.min(95, Math.max(15, Math.round(s)));
   }
 
   const areaData = [
@@ -877,7 +836,7 @@ export function calculateADDestiny(
     score += Math.round((mdTara?.modifier ?? 0) * 0.6);
     score += Math.round((adTara?.modifier ?? 0) * 0.4);
 
-    return Math.min(95, Math.max(20, Math.round(score)));
+    return Math.min(95, Math.max(15, Math.round(score)));
   }
 
   // Monthly resolution curve
@@ -907,7 +866,7 @@ export function calculateADDestiny(
     points.push({
       monthOffset: m,
       date,
-      score:       Math.min(95, Math.max(20, base + waveMod)),
+      score:       Math.min(95, Math.max(15, base + waveMod)),
       adPlanet:    adP,
       mdPlanet,
       mdNavtara:   mdTara,
@@ -988,9 +947,7 @@ export function calculateADDestiny(
   ].filter(Boolean);
 
   return {
-    mdPlanet,
-    mdStart: safeStart,
-    mdEnd: safeEnd,
+    mdPlanet, mdStart, mdEnd,
     mdNavtara:    mdTara,
     mdScore:      mdBaseScore,
     mdFunctional: mdSB?.functionalRole ?? "Unknown",
