@@ -81,6 +81,7 @@ export const ELITE_EMAILS = new Set([
   "mukulpal9@gmail.com",
   "9palmukul@gmail.com",
   "prachi269pal@gmail.com",
+  "anujkmrb97@gmail.com",
 ]);
 
 export function isEliteEmail(email?: string | null): boolean {
