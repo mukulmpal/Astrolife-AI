@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import {
   fail,
@@ -11,6 +12,8 @@ import {
   type ValidationResult,
 } from "@/lib/validation/api";
 import { NextRequest, NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
 
 type TrackChartBody = {
   name: string;
@@ -20,7 +23,23 @@ type TrackChartBody = {
   lat: number | null;
   lon: number | null;
   tz: number | null;
+  gender?: string | null;
+  userId?: string | null;
+  userEmail?: string | null;
+  chartData?: Record<string, unknown> | null;
 };
+
+async function saveKundliToDisk(entry: Record<string, unknown>) {
+  try {
+    const base = path.join(process.cwd(), "data", "kundlis");
+    await fs.mkdir(base, { recursive: true });
+    const date = new Date().toISOString().slice(0, 10);
+    const file = path.join(base, `${date}.ndjson`);
+    await fs.appendFile(file, JSON.stringify(entry) + "\n", { encoding: "utf8" });
+  } catch (err) {
+    console.error("saveKundliToDisk error:", err);
+  }
+}
 
 function validateTrackChartBody(value: unknown): ValidationResult<TrackChartBody> {
   if (!isRecord(value)) return fail("Chart tracking payload must be an object.");
@@ -63,22 +82,63 @@ function validateTrackChartBody(value: unknown): ValidationResult<TrackChartBody
     lat: normalizedLat,
     lon: normalizedLon,
     tz: normalizedTz,
+    gender: optionalText(value.gender, 20) ?? null,
+    userId: optionalText(value.userId, 100) ?? null,
+    userEmail: optionalText(value.userEmail, 150) ?? null,
+    chartData: isRecord(value.chartData) ? (value.chartData as Record<string, unknown>) : null,
   });
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const limit = checkRateLimit(req, { scope: "charts-track", limit: 80, windowMs: 60 * 60_000 });
+    const limit = checkRateLimit(req, { scope: "charts-track", limit: 120, windowMs: 60 * 60_000 });
     if (!limit.allowed) return rateLimitResponse(limit.resetAt);
 
-    const parsed = await readJsonWithLimit(req, validateTrackChartBody, { maxBytes: 24_000, routeName: "charts-track" });
+    const parsed = await readJsonWithLimit(req, validateTrackChartBody, { maxBytes: 150_000, routeName: "charts-track" });
     if (!parsed.ok) return validationErrorResponse(parsed);
 
-    const { name, dob, tob, city, lat, lon, tz } = parsed.data;
+    const { name, dob, tob, city, lat, lon, tz, gender, userId: passedUserId, userEmail: passedUserEmail, chartData } = parsed.data;
 
-    const admin = createAdminClient();
-    await admin.from("user_charts").insert({
-      user_id:    null,
+    // Detect logged in user if available
+    let effectiveUserId = passedUserId;
+    let effectiveUserEmail = passedUserEmail;
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        effectiveUserId = user.id;
+        effectiveUserEmail = user.email ?? effectiveUserEmail;
+      }
+    } catch {
+      // Non-fatal if session is not present
+    }
+
+    const payload = {
+      user_id: effectiveUserId ?? null,
+      name,
+      dob,
+      tob,
+      city,
+      lat,
+      lon,
+      tz: tz !== null ? String(tz) : null,
+      chart_data: chartData ?? {},
+      updated_at: new Date().toISOString(),
+    };
+
+    // Save to DB
+    try {
+      const admin = createAdminClient();
+      await admin.from("user_charts").insert(payload);
+    } catch (dbErr) {
+      console.warn("DB chart track warning:", dbErr);
+    }
+
+    // Always log to disk as resilient audit record
+    const diskRecord = {
+      timestamp: new Date().toISOString(),
+      user_id: effectiveUserId ?? null,
+      user_email: effectiveUserEmail ?? "Anonymous",
       name,
       dob,
       tob,
@@ -86,8 +146,13 @@ export async function POST(req: NextRequest) {
       lat,
       lon,
       tz,
-      chart_data: {},
-    });
+      gender,
+      chart_summary: chartData ? {
+        lagna: (chartData as Record<string, unknown>).lagnaRashi,
+        moon: (chartData as Record<string, unknown>).planets ? ((chartData as Record<string, unknown>).planets as Record<string, { sign?: string }>).Moon?.sign : undefined,
+      } : null,
+    };
+    saveKundliToDisk(diskRecord).catch(() => {});
 
     return NextResponse.json({ ok: true });
   } catch (e) {

@@ -19,6 +19,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { clearCurrentChart, useUserChart } from "@/lib/user-chart";
 import { useUserTier } from "@/context/ChartContext";
+import { isAdminUser } from "@/lib/access";
 
 type NavItem = { label: string; href: string; Icon: LucideIcon; badge?: string };
 type NavGroup = { label: string; items: NavItem[] };
@@ -109,14 +110,27 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
   const router = useRouter();
   const { birth } = useUserChart();
   const [mounted, setMounted] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const userName = mounted && birth.name ? birth.name.split(" ")[0] : "Seeker";
   const { isElite, userTier } = useUserTier();
   const [search, setSearch] = useState("");
 
   const filteredGroups = useMemo(() => {
-    if (!search.trim()) return NAV_GROUPS;
+    let base = NAV_GROUPS;
+    if (isAdmin) {
+      base = [
+        {
+          label: "Administration",
+          items: [
+            { label: "Admin Intelligence", href: "/dashboard/admin", Icon: Shield, badge: "ADMIN" },
+          ],
+        },
+        ...NAV_GROUPS,
+      ];
+    }
+    if (!search.trim()) return base;
     const q = search.toLowerCase();
-    return NAV_GROUPS.map((group) => ({
+    return base.map((group) => ({
       ...group,
       items: group.items.filter(
         (item) =>
@@ -124,10 +138,16 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
           (item.badge && item.badge.toLowerCase().includes(q))
       ),
     })).filter((group) => group.items.length > 0);
-  }, [search]);
+  }, [search, isAdmin]);
 
   useEffect(() => {
     setMounted(true);
+    const supabase = createClient();
+    supabase.auth.getUser().then((res: { data: { user: { email?: string | null } | null } }) => {
+      if (res?.data?.user?.email && isAdminUser(res.data.user.email)) {
+        setIsAdmin(true);
+      }
+    }).catch(() => {});
   }, []);
 
   const handleLogout = async () => {
@@ -290,14 +310,18 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
                           letterSpacing: "0.5px",
                           padding: "1px 5px",
                           borderRadius: "4px",
-                          background: badge === "ELITE"
+                          background: badge === "ADMIN"
+                            ? "linear-gradient(135deg, #B8860B, #996515)"
+                            : badge === "ELITE"
                             ? "linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(192, 132, 252, 0.35))"
                             : badge === "PRO"
                             ? "linear-gradient(135deg, rgba(200, 160, 48, 0.2), rgba(160, 120, 32, 0.3))"
                             : badge === "FREE"
                             ? "linear-gradient(135deg, #EF4444, #DC2626)"
                             : "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.25))",
-                          color: badge === "ELITE"
+                          color: badge === "ADMIN"
+                            ? "#FFFFFF"
+                            : badge === "ELITE"
                             ? "#c084fc"
                             : badge === "PRO"
                             ? "#c8a030"
@@ -320,6 +344,8 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
                       >
                         {isLocked ? (
                           badge === "ELITE" ? "🔒 💎 ELITE" : "🔒 👑 PRO"
+                        ) : badge === "ADMIN" ? (
+                          "🛡️ ADMIN"
                         ) : badge === "ELITE" ? (
                           "💎 ELITE"
                         ) : badge === "PRO" ? (
@@ -344,6 +370,32 @@ export function DashboardSidebar({ mobileOpen = false, onCloseMobile }: Dashboar
             </div>
           )}
         </nav>
+
+      {/* Admin Quick Access */}
+      {isAdmin && (
+        <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(184,134,11,0.2)" }}>
+          <Link
+            href="/dashboard/admin"
+            className={`dash-nav-item${pathname === "/dashboard/admin" ? " active" : ""}`}
+            style={{
+              background: pathname === "/dashboard/admin" ? "linear-gradient(135deg, rgba(184,134,11,0.2), rgba(124,58,237,0.2))" : "linear-gradient(135deg, rgba(184,134,11,0.08), rgba(124,58,237,0.08))",
+              border: "1px solid rgba(184,134,11,0.35)",
+              borderRadius: "8px",
+              color: "#8A6008",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "7px 10px",
+              textDecoration: "none",
+              fontSize: "12px",
+            }}
+          >
+            <Shield size={14} style={{ color: "#B8860B" }} />
+            <span>Admin Intelligence 🛡️</span>
+          </Link>
+        </div>
+      )}
 
       {/* Fixed Sidebar Footer: Tier Status & Upgrade */}
       <div style={{ borderTop: "1px solid rgba(184,134,11,0.18)", padding: "10px 14px", flexShrink: 0, background: "rgba(0,0,0,0.02)" }}>

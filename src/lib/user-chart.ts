@@ -219,11 +219,47 @@ function stripSavedChartId(chartId: string) {
 export const CHART_STORAGE_EVENT = "astrolife:chart-updated";
 export const CHART_CLEARED_EVENT = "astrolife:chart-cleared";
 
+let lastTrackedBirthKey = "";
+
+export function trackChartInBackend(chart: ChartData) {
+  if (typeof window === "undefined" || !chart || !chart.name?.trim() || !chart.dob?.trim()) return;
+  const key = `${chart.name.trim()}_${chart.dob.trim()}_${chart.tob || ""}_${chart.city || ""}`;
+  if (key === lastTrackedBirthKey) return;
+  lastTrackedBirthKey = key;
+
+  try {
+    fetch("/api/charts/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: chart.name.trim(),
+        dob: chart.dob.trim(),
+        tob: chart.tob || "12:00",
+        city: chart.city || "Unknown",
+        lat: chart.lat ?? null,
+        lon: chart.lon ?? null,
+        tz: chart.tz ?? null,
+        chartData: {
+          lagnaRashi: chart.lagnaRashi,
+          planets: {
+            Moon: { sign: chart.planets?.Moon?.sign },
+            Sun: { sign: chart.planets?.Sun?.sign },
+          },
+        },
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // Non-blocking
+  }
+}
+
 export function saveCurrentChart(chart: ChartData) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chart));
     window.dispatchEvent(new CustomEvent(CHART_STORAGE_EVENT, { detail: chart }));
+    trackChartInBackend(chart);
   } catch (err) {
     console.warn("Could not save chart to device storage:", err);
   }

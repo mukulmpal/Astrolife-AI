@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { getServerAiUsageState, incrementServerAiUsage } from "@/lib/server-usage";
 import { monitor } from "@/lib/server-monitoring";
 import { buildUnifiedAstroLifeChatPrompt } from "@/lib/ai-chat/astrolife-unified-context";
@@ -348,15 +349,54 @@ async function callGroq(system: string, messages: { role: string; content: strin
 import fs from "fs/promises";
 import path from "path";
 
-async function saveChatMessages(userId: string | null, sessionId: string, agentId: string, userMsg: string, aiMsg: string) {
+async function saveChatMessages(
+  userId: string | null,
+  sessionId: string,
+  agentId: string,
+  userMsg: string,
+  aiMsg: string,
+  chartName: string | null
+) {
   try {
     const admin = createAdminClient();
     const { error } = await admin.from("chat_messages").insert([
-      { user_id: userId, session_id: sessionId, agent_id: agentId, role: "user", content: userMsg },
-      { user_id: userId, session_id: sessionId, agent_id: agentId, role: "assistant", content: aiMsg },
+      { user_id: userId, session_id: sessionId, agent_id: agentId, role: "user", content: userMsg, chart_name: chartName },
+      { user_id: userId, session_id: sessionId, agent_id: agentId, role: "assistant", content: aiMsg, chart_name: chartName },
     ]);
     if (error) console.error("chat save error:", error.message);
   } catch (e) { console.error("chat save exception:", e); }
+}
+
+async function saveChatInteractionToDisk(details: {
+  userId: string | null;
+  userEmail: string | null;
+  sessionId: string;
+  agentId: string;
+  question: string;
+  aiResponse: string;
+  chartName: string;
+  chartDetails?: Record<string, unknown> | null;
+}) {
+  try {
+    const base = path.join(process.cwd(), "data", "chat-interactions");
+    await fs.mkdir(base, { recursive: true });
+    const date = new Date().toISOString().slice(0, 10);
+    const file = path.join(base, `${date}.ndjson`);
+    const entry = {
+      ts: new Date().toISOString(),
+      sessionId: details.sessionId,
+      userId: details.userId,
+      userEmail: details.userEmail ?? "Anonymous",
+      agentId: details.agentId,
+      chartName: details.chartName,
+      chartDetails: details.chartDetails ?? null,
+      question: details.question,
+      aiResponse: details.aiResponse,
+    };
+    await fs.appendFile(file, JSON.stringify(entry) + "\n", { encoding: "utf8" });
+  } catch (e) {
+    console.error("saveChatInteractionToDisk error:", e);
+  }
 }
 
 async function saveQuestionToDisk(userId: string | null, agentId: string, question: string) {
@@ -373,9 +413,51 @@ async function saveQuestionToDisk(userId: string | null, agentId: string, questi
     };
     await fs.appendFile(file, JSON.stringify(entry) + "\n", { encoding: "utf8" });
   } catch (e) {
-    // Non-fatal — log and continue
     console.error("saveQuestionToDisk error:", e);
   }
+}
+
+function extractChartSummary(
+  chartDetails?: Record<string, unknown> | null,
+  chartContext?: string | null
+): string {
+  if (chartDetails && typeof chartDetails === "object") {
+    const name = typeof chartDetails.name === "string" ? chartDetails.name.trim() : "";
+    const dob = typeof chartDetails.dob === "string" ? chartDetails.dob.trim() : "";
+    const tob = typeof chartDetails.tob === "string" ? chartDetails.tob.trim() : "";
+    const city = typeof chartDetails.city === "string" ? chartDetails.city.trim() : "";
+    const lagna = typeof chartDetails.lagna === "string" ? chartDetails.lagna.trim() : "";
+    const moon = typeof chartDetails.moonSign === "string" ? chartDetails.moonSign.trim() : "";
+
+    if (name) {
+      const parts = [
+        name,
+        dob || tob || city ? `(${[dob, tob, city].filter(Boolean).join(" ")})` : "",
+        lagna ? `Lagna: ${lagna}` : "",
+        moon ? `Moon: ${moon}` : "",
+      ].filter(Boolean);
+      return parts.join(" | ");
+    }
+  }
+
+  if (chartContext && typeof chartContext === "string") {
+    const matchName = chartContext.match(/Name:\s*([^,\n]+)/i);
+    const matchDob = chartContext.match(/DOB:\s*([^,\n]+)/i);
+    const matchTob = chartContext.match(/TOB:\s*([^,\n]+)/i);
+    const matchCity = chartContext.match(/City:\s*([^,\n]+)/i);
+    const matchAsc = chartContext.match(/Ascendant:\s*([^,\n]+)/i);
+
+    const name = matchName?.[1]?.trim();
+    if (name) {
+      const dob = matchDob?.[1]?.trim() || "";
+      const tob = matchTob?.[1]?.trim() || "";
+      const city = matchCity?.[1]?.trim() || "";
+      const asc = matchAsc?.[1]?.trim() || "";
+      return `${name} (${[dob, tob, city].filter(Boolean).join(" ")})${asc ? ` | Lagna: ${asc}` : ""}`;
+    }
+  }
+
+  return "General Query (No Chart Loaded)";
 }
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -383,6 +465,7 @@ type ChatRequestBody = {
   messages: ChatMessage[];
   agentId: string;
   chartContext?: string;
+  chartDetails?: Record<string, unknown>;
   masterAstroContext?: string;
   transitContext?: string;
   dailyFeedContext?: string;
@@ -420,6 +503,7 @@ function validateChatBody(value: unknown): ValidationResult<ChatRequestBody> {
     messages,
     agentId,
     chartContext: optionalText(value.chartContext, 30_000),
+    chartDetails: isRecord(value.chartDetails) ? (value.chartDetails as Record<string, unknown>) : undefined,
     masterAstroContext: optionalText(value.masterAstroContext, 100_000),
     transitContext: optionalText(value.transitContext, 25_000),
     dailyFeedContext: optionalText(value.dailyFeedContext, 20_000),
@@ -535,13 +619,43 @@ export async function POST(req: NextRequest) {
       palmSessionId      ? "Palmistry Report"       : null,
     ].filter(Boolean);
 
-    // Save to DB — always, even for anonymous users
+    // Resolve authenticated user from session if available
+    let authUserId: string | null = body.userId ?? null;
+    let authUserEmail: string | null = null;
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        authUserId = user.id;
+        authUserEmail = user.email ?? null;
+      }
+    } catch {
+      // Session extraction skipped
+    }
+
+    // Save to DB and Disk — always, linking to the specific kundli
     const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
     if (lastUserMsg?.content) {
       const sid = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-      // Write to disk for engagement analysis (non-blocking — errors logged inside)
-      saveQuestionToDisk(body.userId ?? null, agentId, lastUserMsg.content).catch(() => {});
-      await saveChatMessages(null, sid, agentId, lastUserMsg.content, text);
+      const chartSummary = extractChartSummary(body.chartDetails, body.chartContext);
+
+      // Write to disk for engagement & admin intelligence (non-blocking)
+      saveChatInteractionToDisk({
+        userId: authUserId,
+        userEmail: authUserEmail,
+        sessionId: sid,
+        agentId,
+        question: lastUserMsg.content,
+        aiResponse: text,
+        chartName: chartSummary,
+        chartDetails: body.chartDetails,
+      }).catch(() => {});
+
+      // Save question legacy disk entry
+      saveQuestionToDisk(authUserId, agentId, lastUserMsg.content).catch(() => {});
+
+      // Save into Supabase chat_messages table with chart_name
+      await saveChatMessages(authUserId, sid, agentId, lastUserMsg.content, text, chartSummary);
     }
 
     const usage = await incrementServerAiUsage(usageState);

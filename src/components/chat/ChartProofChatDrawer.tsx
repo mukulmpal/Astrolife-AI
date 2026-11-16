@@ -165,6 +165,14 @@ export function ChartProofChatDrawer({
           messages: history,
           agentId: selectedAgent.id,
           chartContext,
+          chartDetails: activeChart && activeChart.name ? {
+            name: activeChart.name,
+            dob: activeChart.dob,
+            tob: activeChart.tob,
+            city: activeChart.city,
+            lagna: activeChart.lagnaRashi,
+            moonSign: activeChart.planets?.Moon?.sign,
+          } : undefined,
           vargaContext: activeChart ? `Lagna: ${activeChart.lagnaRashi}, Moon: ${activeChart.planets?.Moon?.sign ?? ""}, Nakshatra: ${activeChart.planets?.Moon?.nakshatra ?? ""}` : undefined,
         }),
       });
