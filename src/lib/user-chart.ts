@@ -228,26 +228,35 @@ export function trackChartInBackend(chart: ChartData) {
   lastTrackedBirthKey = key;
 
   try {
-    fetch("/api/charts/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: chart.name.trim(),
-        dob: chart.dob.trim(),
-        tob: chart.tob || "12:00",
-        city: chart.city || "Unknown",
-        lat: chart.lat ?? null,
-        lon: chart.lon ?? null,
-        tz: chart.tz ?? null,
-        chartData: {
-          lagnaRashi: chart.lagnaRashi,
-          planets: {
-            Moon: { sign: chart.planets?.Moon?.sign },
-            Sun: { sign: chart.planets?.Sun?.sign },
+    const supabase = createClient();
+    supabase.auth.getSession().then((res: { data: { session: { user?: { id?: string; email?: string | null } | null } | null } }) => {
+      const userId = res.data?.session?.user?.id ?? null;
+      const userEmail = res.data?.session?.user?.email ?? null;
+
+      fetch("/api/charts/track", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: chart.name.trim(),
+          dob: chart.dob.trim(),
+          tob: chart.tob || "12:00",
+          city: chart.city || "Unknown",
+          lat: chart.lat ?? null,
+          lon: chart.lon ?? null,
+          tz: chart.tz ?? null,
+          userId,
+          userEmail,
+          chartData: {
+            lagnaRashi: chart.lagnaRashi,
+            planets: {
+              Moon: { sign: chart.planets?.Moon?.sign },
+              Sun: { sign: chart.planets?.Sun?.sign },
+            },
           },
-        },
-      }),
-      keepalive: true,
+        }),
+        keepalive: true,
+      }).catch(() => {});
     }).catch(() => {});
   } catch {
     // Non-blocking

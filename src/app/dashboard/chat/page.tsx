@@ -218,6 +218,7 @@ export default function ChatPage() {
   }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string; email?: string | null } | null>(null);
   const [languageMode, setLanguageMode] = useState<LanguageMode>("hinglish");
   const pathname = typeof window !== "undefined" ? window.location.pathname : "/dashboard/chat";
   const palmSessionId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("palmSessionId") : null;
@@ -302,6 +303,9 @@ export default function ChatPage() {
     const loadPlan = async () => {
       try {
         const { data } = await supabase.auth.getUser();
+        if (data?.user) {
+          setCurrentUser(data.user);
+        }
         if (!data?.user) {
           setUsageStatus(getAiUsageStatus(null));
           setUsageReady(true);
@@ -402,6 +406,7 @@ export default function ChatPage() {
 
       const res = await fetch("/api/chat", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
@@ -415,6 +420,8 @@ export default function ChatPage() {
             lagna: chart.lagnaRashi,
             moonSign: chart.planets?.Moon?.sign,
           } : undefined,
+          userId: currentUser?.id,
+          userEmail: currentUser?.email,
           masterAstroContext,
           transitContext: transitContext,
           dailyFeedContext,

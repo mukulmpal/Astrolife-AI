@@ -141,8 +141,18 @@ export default function Onboarding() {
       // Track chart generation for admin (await so it doesn't get cancelled on navigate)
       await fetch("/api/charts/track", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, dob: form.dob, tob: form.tob, city: form.city, lat: form.lat, lon: form.lon }),
+        body: JSON.stringify({
+          name: form.name,
+          dob: form.dob,
+          tob: form.tob,
+          city: form.city,
+          lat: form.lat,
+          lon: form.lon,
+          userId: user?.id ?? null,
+          userEmail: user?.email ?? null,
+        }),
       }).catch(() => {});
     } catch (e) { console.log(e); }
     setLoading(false);

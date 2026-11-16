@@ -111,20 +111,30 @@ export async function GET(req: NextRequest) {
       console.warn("chat_messages fetch warning:", error.message);
     }
 
-    // Get emails for logged-in user_ids (skip nulls)
-    const uniqueIds = [...new Set((messages ?? [])
-      .map((m) => (m as { user_id: string | null }).user_id)
-      .filter((id): id is string => !!id))];
+    // Get emails for logged-in user_ids and map names to emails
     const emailMap: Record<string, string> = {};
-    if (uniqueIds.length > 0) {
-      try {
-        const { data: authData } = await admin.auth.admin.listUsers({ perPage: 500 });
-        for (const u of authData?.users ?? []) {
-          if (uniqueIds.includes(u.id)) emailMap[u.id] = u.email ?? "—";
+    const nameToEmail: Record<string, string> = {};
+
+    try {
+      const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+      for (const u of authData?.users ?? []) {
+        if (u.id && u.email) {
+          emailMap[u.id] = u.email;
         }
-      } catch (authErr) {
-        console.warn("auth list warning:", authErr);
       }
+    } catch (authErr) {
+      console.warn("auth list warning:", authErr);
+    }
+
+    try {
+      const { data: profiles } = await admin.from("profiles").select("id, name");
+      for (const p of profiles ?? []) {
+        if (p.name && p.id && emailMap[p.id]) {
+          nameToEmail[String(p.name).toLowerCase().trim()] = emailMap[p.id];
+        }
+      }
+    } catch (profErr) {
+      console.warn("profiles list warning:", profErr);
     }
 
     const formattedDb: EnrichedChatMessage[] = (messages ?? []).map((m) => {
@@ -133,7 +143,18 @@ export async function GET(req: NextRequest) {
         agent_id: string; role: string; content: string;
         chart_name: string | null; created_at: string;
       };
-      const userEmail = row.user_id ? (emailMap[row.user_id] ?? "Registered User") : "Guest (Anonymous)";
+
+      let userEmail = "Guest (Anonymous)";
+      if (row.user_id && emailMap[row.user_id]) {
+        userEmail = emailMap[row.user_id];
+      } else if (row.chart_name) {
+        // Try matching first part of chart_name to profile name
+        const cleanName = row.chart_name.split("(")[0].split("|")[0].trim().toLowerCase();
+        if (cleanName && nameToEmail[cleanName]) {
+          userEmail = nameToEmail[cleanName];
+        }
+      }
+
       const aiResponse = responseMap[row.session_id] ?? null;
       return {
         ...row,
