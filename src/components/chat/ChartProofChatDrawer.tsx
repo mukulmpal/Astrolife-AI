@@ -25,7 +25,7 @@ interface ChatMessage {
 }
 
 const AGENTS = [
-  { id: "general", name: "AstroLife AI", emoji: "✦", desc: "Holistic Vedic Guidance" },
+  { id: "general", name: "AstroLife", emoji: "✦", desc: "Holistic Vedic Guidance" },
   { id: "career", name: "Career & Karma", emoji: "💼", desc: "10th House, D10 & Dashas" },
   { id: "marriage", name: "Marriage & Love", emoji: "💍", desc: "D9 Navamsha, 7th House & Milan" },
   { id: "wealth", name: "Dhana & Wealth", emoji: "💰", desc: "2nd/11th House & Yogas" },
@@ -110,7 +110,7 @@ export function ChartProofChatDrawer({
       content: activeChart
         ? `Namaste **${activeChart.name}**! Main aapka context-aware Vedic Assistant hoon. Aapke **${activeChart.lagnaRashi} Lagna** aur active **${activeChart.dashas.find((d: any) => d.active)?.planet ?? "Dasha"} Mahadasha** ke verified shastric math ke saath main aapke career, vivah, dhan aur timing ke har question ka uttar classical evidence ke saath dunga. Poochiye!`
         : `Namaste! Main AstroLife ka Classical Proof-Backed AI Assistant hoon. Apne janma kundli se juda koi bhi prashna poochein, har prediction ka shastric proof dekhein.`,
-      agent: "AstroLife AI",
+      agent: "AstroLife",
       emoji: "✦",
       timestamp: new Date(),
     },
@@ -291,7 +291,7 @@ export function ChartProofChatDrawer({
               {m.role === "assistant" && (
                 <div className="flex items-center justify-between gap-3 mb-2 pb-1.5 border-b border-[rgba(184,134,11,0.18)] text-[11px] text-[#6B635B]">
                   <span className="flex items-center gap-1 font-semibold text-[#c8a030]">
-                    <span>{m.emoji || "✦"}</span> {m.agent || "AstroLife AI"}
+                    <span>{m.emoji || "✦"}</span> {m.agent || "AstroLife"}
                   </span>
                   {m.sources && (
                     <span className="text-[10px] text-[#6B635B]">

@@ -54,7 +54,7 @@ export function DirectionBInsights() {
             />
             <div>
               <div className="text-sm font-semibold" style={{ color: 'var(--al-ivory)' }}>
-                AstroLife AI
+                AstroLife
               </div>
               <div className="text-7px uppercase tracking-wider" style={{ color: 'var(--al-accent)' }}>
                 ● Online · Reading your chart

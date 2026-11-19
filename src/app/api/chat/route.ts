@@ -18,8 +18,8 @@ import {
 
 const AGENTS: Record<string, { name: string; emoji: string; system: string }> = {
   general: {
-    name: "AstroLife AI", emoji: "✦",
-    system: `You are AstroLife AI — India's premier multi-engine astrological and karmic intelligence assistant.
+    name: "AstroLife Guide", emoji: "✦",
+    system: `You are AstroLife Guide — India's premier multi-engine astrological and karmic intelligence assistant.
 You possess complete master data across ALL 16+ AstroLife engines:
 1. Navtara Master Engine: Janma Nakshatra, 27th Support Star Shield (Mor-Pankh archetype), and 3-Layer Dasha Audit (DOUBLE_SUPPORT, SAVED_BY_ONE, DOUBLE_CONCERN, TRIPLE_CONCERN).
 2. KP System (Krishnamurti Paddhati): Placidus cusps, Sub-Lords of H1/H7/H10/H2/H11, 4-fold Significators, and Bhava shifts.
@@ -541,7 +541,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: usageState.reason === "login_required"
-            ? "Login required to use AstroLife AI."
+            ? "Login required to use AstroLife."
             : "Your free AI question limit is finished. Please upgrade to continue.",
           usage: usageState,
         },

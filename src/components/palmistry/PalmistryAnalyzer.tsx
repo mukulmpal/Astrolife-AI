@@ -357,8 +357,8 @@ export function PalmistryAnalyzer() {
 
   const share = useCallback(async () => {
     const text = report
-      ? `My AstroLife AI Palm Reading: ${report.overallImpression.headline}`
-      : "AstroLife AI Palm Reading";
+      ? `My AstroLife Palm Reading: ${report.overallImpression.headline}`
+      : "AstroLife Palm Reading";
     try {
       if (navigator.share) await navigator.share({ title: "AstroLife Palm Reading", text });
       else { await navigator.clipboard.writeText(text); alert("Report summary copied!"); }
@@ -439,7 +439,7 @@ export function PalmistryAnalyzer() {
                     </span>
                   </button>
                   <p className="text-xs leading-relaxed text-[#a09070] text-center">
-                    AstroLife AI aapki hatheli ki Jeevan, Mastak, Hridaya, Bhagya, Surya aur Budh Rekhaon ke sath 8 Graha Parvat map karega.
+                    AstroLife aapki hatheli ki Jeevan, Mastak, Hridaya, Bhagya, Surya aur Budh Rekhaon ke sath 8 Graha Parvat map karega.
                   </p>
                 </div>
               </div>
@@ -460,7 +460,7 @@ export function PalmistryAnalyzer() {
                 <div className="text-center md:text-left">
                   <h3 className="font-serif text-2xl font-bold text-[#e6c869]">Ready to scan</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[#4A4238]">
-                    AstroLife AI aapki hatheli ki lines, mounts aur fingers ko classical palmistry
+                    AstroLife aapki hatheli ki lines, mounts aur fingers ko classical palmistry
                     (Samudrika Shastra + Vedic Jyotish) ke hisaab se analyze karega.
                   </p>
                   <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">

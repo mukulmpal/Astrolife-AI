@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Refund Policy | AstroLife AI",
-  description: "Refund rules for AstroLife AI reports, subscriptions and digital astrology products.",
+  title: "Refund Policy | AstroLife",
+  description: "Refund rules for AstroLife reports, subscriptions and digital astrology products.",
 };
 
 export default function RefundPage() {
@@ -11,7 +11,7 @@ export default function RefundPage() {
     <LegalPage
       title="Refund Policy"
       updated="May 23, 2026"
-      intro="AstroLife AI sells digital astrology reports and premium features. This policy keeps refund handling clear before paid launch."
+      intro="AstroLife sells digital astrology reports and premium features. This policy keeps refund handling clear before paid launch."
     >
       <LegalSection title="Digital Products">
         <p>

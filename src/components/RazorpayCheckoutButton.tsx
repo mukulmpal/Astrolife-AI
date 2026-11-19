@@ -22,6 +22,7 @@ export interface RazorpayCheckoutButtonProps {
   };
   buttonText?: string;
   className?: string;
+  onBeforeCheckout?: () => boolean | Promise<boolean>;
   onSuccess?: (verifyResult: {
     success: boolean;
     order_id: string;
@@ -74,11 +75,12 @@ export default function RazorpayCheckoutButton({
   currency = "INR",
   receipt,
   notes,
-  name = "AstroLife AI",
+  name = "AstroLife",
   description = "AstroLife Cosmic Access",
   prefill,
   buttonText,
   className = "",
+  onBeforeCheckout,
   onSuccess,
   onFailure,
 }: RazorpayCheckoutButtonProps) {
@@ -90,6 +92,10 @@ export default function RazorpayCheckoutButton({
   const defaultLabel = buttonText || `Proceed with Payment • ${displayPrice}`;
 
   const handleCheckout = async () => {
+    if (onBeforeCheckout) {
+      const allowed = await onBeforeCheckout();
+      if (!allowed) return;
+    }
     setStatusMessage(null);
     setIsSuccess(false);
     setLoading(true);

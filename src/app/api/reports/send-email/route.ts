@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     const textContent = buildDossierEmailText(emailParams);
 
     const resendApiKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "AstroLife AI <onboarding@resend.dev>";
+    const fromEmail = process.env.RESEND_FROM_EMAIL || "AstroLife <onboarding@resend.dev>";
 
     // 5. Dispatch via Resend API if API key is present
     if (resendApiKey) {
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           from: fromEmail,
           to: [email],
-          subject: `ॐ Your Sacred Dossier: ${reportTitle} — AstroLife AI`,
+          subject: `ॐ Your Sacred Dossier: ${reportTitle} — AstroLife`,
           html: htmlContent,
           text: textContent,
           attachments: [

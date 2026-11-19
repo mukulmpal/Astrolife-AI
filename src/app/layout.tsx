@@ -25,7 +25,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://astrolife-ai.vercel.app"),
-  applicationName: "AstroLife AI",
+  applicationName: "AstroLife",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     description:
       "Generate your free AI Kundli and get personalized Vedic astrology insights, dashas, transits, remedies, marriage, career and wealth guidance.",
     url: "https://astrolife-ai.vercel.app",
-    siteName: "AstroLife AI",
+    siteName: "AstroLife",
     type: "website",
   },
   twitter: {

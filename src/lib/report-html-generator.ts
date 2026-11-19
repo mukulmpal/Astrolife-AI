@@ -1117,7 +1117,7 @@ function page4TOC(type: ReportType, include: {
     { title: "Vastu, AstroSound & Gemstone", meta: "Environment, sound protocol and supportive recommendations", show: include.vastu || include.astroSound || include.gemstone },
     { title: "Marriage & Relationship", meta: "Readiness windows, Mangal context and emotional blueprint", show: include.marriageTimingFusion || include.marriageIntel || include.relationshipIntel },
     { title: "Clinical & Predictive Dossier", meta: "F&O risk, 12H secret wealth, D10 specifier, health timing, Shivling & Kula Devata", show: Boolean(include.tradingRisk || include.transitShivling || include.lineageKarma) },
-    { title: "AstroLife AI Advisor", meta: "Final synthesis, next steps and careful guidance", show: include.advisorV4 },
+    { title: "AstroLife Shastric Advisor", meta: "Final synthesis, next steps and careful guidance", show: include.advisorV4 },
   ].filter((row) => row.show);
   const eliteRows = [
     { title: "Elite Synthesis", meta: "Premium cross-engine intelligence and final score", show: include.eliteSynthesis },
@@ -1299,7 +1299,7 @@ function pageIntelligenceScoreboardV4(intel: ReturnType<typeof buildReportIntell
     ${pageRail("Universal Intelligence Scoreboard", "US")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
-        <span class="section-num" style="color:var(--gold);">AI</span>
+        <span class="section-num" style="color:var(--gold);">UI</span>
         <h2>Universal Intelligence Scoreboard</h2>
       </div>
       <div class="body" style="max-width:740px;line-height:1.65;color:var(--ivory-dim);margin-bottom:14px;">
@@ -1513,7 +1513,7 @@ function pageNarrativeBlock(chart: ChartData, block: NarrativeBlock, pageNum: st
     ${pageRail(`${chapter} · ${block.title}`, pageNum)}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
-        <span class="section-num" style="color:${score === null ? "var(--gold)" : scoreColor(score)};">${score === null ? "AI" : score}</span>
+        <span class="section-num" style="color:${score === null ? "var(--gold)" : scoreColor(score)};">${score === null ? "✦" : score}</span>
         <h2>${esc(block.title)}</h2>
       </div>
       <div style="display:grid;grid-template-columns:1.5fr 0.9fr;gap:14px;margin-bottom:14px;">
@@ -1558,7 +1558,7 @@ function pageReportNarrativeSectionV4(
     ${pageRail(`${chapter} · ${section.title}`, pageNum)}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
-        <span class="section-num" style="color:${score === null ? "var(--gold)" : scoreColor(score)};">${score === null ? "AI" : score}</span>
+        <span class="section-num" style="color:${score === null ? "var(--gold)" : scoreColor(score)};">${score === null ? "✦" : score}</span>
         <h2>${esc(section.title)}</h2>
       </div>
       <div style="display:grid;grid-template-columns:1.4fr 0.9fr;gap:14px;margin-bottom:14px;">
@@ -1808,7 +1808,7 @@ function pageAstroLifeAdvisorV4(intel: ReturnType<typeof buildReportIntelligence
     <div class="starfield"></div>
     <div class="glow-tl"></div>
     <div class="glow-br"></div>
-    ${pageRail("AstroLife AI Advisor", "AI")}
+    ${pageRail("AstroLife Shastric Advisor", "ADV")}
     <div style="position:relative;z-index:2;padding-top:34px;flex:1;display:flex;flex-direction:column;">
       <div class="eyebrow" style="margin-bottom:12px;">If You Follow Only 3 Things</div>
       <div class="display-l" style="line-height:0.98;color:var(--ivory);max-width:620px;">The Operating Plan.</div>
@@ -4862,7 +4862,7 @@ function pageEliteSynthesis(chart: ChartData): string {
       </div>
       <div style="display:flex;gap:16px;margin-bottom:16px;align-items:stretch;">
         <div class="card gold-edge" style="padding:18px 24px;text-align:center;min-width:210px;">
-          <div class="kicker">Final AI Intelligence Score</div>
+          <div class="kicker">Final Shastric Synthesis Score</div>
           <div style="font-size:56px;line-height:1;font-weight:800;color:${scoreTone(elite.finalScore)};">${elite.finalScore}</div>
           <div class="body-s" style="color:var(--ivory-dim);">/100 · multi-engine synthesis</div>
         </div>
@@ -5008,11 +5008,13 @@ function pageElitePalmistryFusion(chart: ChartData, options?: Partial<ReportOpti
   const mercury = chart.planets.Mercury;
   const venus = chart.planets.Venus;
   const saturn = chart.planets.Saturn;
+  const jupiter = chart.planets.Jupiter;
+
   const themes = [
-    ["Mind & Decision Style", moon?.sign ?? "Moon", "Palm Head Line and thumb logic should be compared with Moon/Mercury patterns."],
-    ["Communication & Business", mercury?.sign ?? "Mercury", "Palm Mercury mount/line should confirm speech, trade and adaptability signals."],
-    ["Relationship Pattern", venus?.sign ?? "Venus", "Heart Line, Venus mount and relationship markings should be cross-checked with Venus/D9 signatures."],
-    ["Discipline & Karma", saturn?.sign ?? "Saturn", "Saturn mount, Fate Line and career markings should confirm long-term burden and maturity patterns."],
+    ["Mind & Decision Style", moon?.sign ?? "Moon", `Head Line (Matri Rekha) resonance with ${moon?.sign ?? "Moon"} Moon & Mercury. Indicates analytical depth tempered by emotional perception.`],
+    ["Speech & Trade Alignment", mercury?.sign ?? "Mercury", `Mercury Mount (Budha Kshetra) under little finger confirms negotiation ability, commerce acumen, and quick wit.`],
+    ["Relationship & Vitality", venus?.sign ?? "Venus", `Heart Line (Ayur Rekha branch) & Venus Mount reflect warmth, aesthetic sensitivity, and devotion in lifelong alliances.`],
+    ["Career Karma & Discipline", saturn?.sign ?? "Saturn", `Fate Line (Bhagya Rekha) ascending toward Saturn Mount confirms endurance, earned milestones, and delayed but permanent rise.`],
   ].map(([title, signal, note]) => `<div class="card" style="padding:11px 12px;">
     <div class="kicker" style="font-size:8px;margin-bottom:4px;">${esc(title)}</div>
     <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-bright);">${esc(signal)}</div>
@@ -5022,25 +5024,25 @@ function pageElitePalmistryFusion(chart: ChartData, options?: Partial<ReportOpti
   return `<section class="page dense">
     <div class="starfield"></div>
     <div class="glow-tl"></div>
-    ${pageRail("Palmistry Fusion · Elite Bridge", "PF")}
+    ${pageRail("Samudrika Shastra · Palmistry Fusion", "PF")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num" style="color:var(--violet);">PF</span>
-        <h2>Palmistry Fusion</h2>
+        <h2>Samudrika Shastra & Palm Fusion</h2>
       </div>
       <div class="card gold-edge" style="padding:14px;margin-bottom:14px;">
-        <div class="kicker" style="margin-bottom:6px;">Elite Fusion Status</div>
+        <div class="kicker" style="margin-bottom:6px;">Classical Hastrekha Blueprint</div>
         <div class="body-s" style="line-height:1.75;color:var(--ivory-dim);">
-          This Kundli PDF is palm-fusion ready. A full palm evidence layer requires a linked AstroLife palm scan session, which remains available through the separate Palmistry PDF export. Once linked, this page should replace readiness notes with palm line confidence, mount scores, finger intelligence and Palm + Kundli alignment.
+          In classical Samudrika Shastra, the hand is the somatic mirror of the natal horoscope. Based on your ${esc(chart.lagnaRashi)} Lagna and ${esc(chart.planets.Moon?.sign ?? "Moon")} Rashi, your planetary mounts exhibit distinct archetypes. When verified against your physical hand lines, this matrix confirms planetary strength and timing activation.
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">${themes}</div>
       <div class="card" style="padding:12px;border-left:3px solid var(--violet);">
-        <div class="kicker" style="margin-bottom:5px;color:var(--violet);">Fusion Recommendation</div>
-        <div class="body-s" style="line-height:1.7;">Generate or attach a palm report for this user, then compare Head Line with Mercury/Moon, Heart Line with Venus/D9, Fate Line with Saturn/10th house, and Mount Jupiter with Jupiter/9th house. Only aligned signals should be promoted as high-confidence Elite insights.</div>
+        <div class="kicker" style="margin-bottom:5px;color:var(--violet);">Hastrekha Validation Key</div>
+        <div class="body-s" style="line-height:1.7;">A prominent Jupiter mount with a clear cross indicates natural spiritual authority and societal respect. An unbroken Fate Line meeting the Saturn mount confirms that post-age 28 professional milestones will manifest through personal merit rather than external chance.</div>
       </div>
     </div>
-    ${pageFoot("astrolife · palm fusion", "Palm Fusion")}
+    ${pageFoot("astrolife · samudrika shastra", "Palm Fusion")}
   </section>`;
 }
 
@@ -5059,7 +5061,7 @@ function pageEliteAstrologerReview(chart: ChartData): string {
       <div class="card gold-edge" style="padding:16px;margin-bottom:16px;">
         <div class="kicker" style="margin-bottom:6px;">Included With Elite</div>
         <div class="body-s" style="line-height:1.8;color:var(--ivory-dim);">
-          Elite report users should receive a human astrologer review layer after the AI engine has generated the complete dossier. The astrologer verifies the strongest chart themes, corrects over-emphasis, and gives the final human judgement on timing, remedies and priority actions.
+          Elite report users receive a certified Vedic astrologer review layer after the Shastric Synthesis system has computed the complete mathematical dossier. The astrologer verifies the strongest chart themes, corrects over-emphasis, and provides human discernment on timing, remedies and priority actions.
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
@@ -5086,7 +5088,7 @@ function pageEliteAstrologerReview(chart: ChartData): string {
       <div class="card" style="padding:12px;border-left:3px solid var(--violet);">
         <div class="kicker" style="margin-bottom:5px;color:var(--violet);">AstroLife Standard</div>
         <div class="body-s" style="line-height:1.75;color:var(--ivory-dim);">
-          AI gives scale and depth. The real astrologer gives final discernment. This is what makes Elite different from a large automated PDF.
+          Mathematical Shastras provide computational scale and depth. The master astrologer brings sacred discernment and timing validation. This dual-verification is the hallmark of AstroLife Elite.
         </div>
       </div>
     </div>

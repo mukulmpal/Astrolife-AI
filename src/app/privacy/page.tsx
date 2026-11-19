@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | AstroLife AI",
+  title: "Privacy Policy | AstroLife",
   description:
-    "AstroLife AI Privacy Policy: Full compliance with India DPDP Act 2023, GDPR, zero-retention ephemeral palm image scanning, and end-to-end encrypted astrological consultations.",
+    "AstroLife Privacy Policy: Full compliance with India DPDP Act 2023, GDPR, zero-retention ephemeral palm image scanning, and end-to-end encrypted astrological consultations.",
 };
 
 export default function PrivacyPage() {
@@ -12,11 +12,11 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy Policy & Data Protection"
       updated="October 2026 (Compliant with India DPDP Act 2023 & Global GDPR)"
-      intro="At AstroLife AI, we believe your cosmic and personal data is deeply sacred and private. This policy details how we protect your birth details, handle ephemeral palm scanner images with zero biometric retention, encrypt AI astrological consultations, and uphold your legal rights under India's Digital Personal Data Protection (DPDP) Act 2023 and the General Data Protection Regulation (GDPR)."
+      intro="At AstroLife, we believe your cosmic and personal data is deeply sacred and private. This policy details how we protect your birth details, handle ephemeral palm scanner images with zero biometric retention, encrypt AI astrological consultations, and uphold your legal rights under India's Digital Personal Data Protection (DPDP) Act 2023 and the General Data Protection Regulation (GDPR)."
     >
       <LegalSection title="1. Regulatory Framework & Lawful Consent">
         <p>
-          AstroLife AI operates under strict data minimization and privacy-by-design principles.
+          AstroLife operates under strict data minimization and privacy-by-design principles.
           In accordance with the <strong>Digital Personal Data Protection Act, 2023 (India)</strong>, the{" "}
           <strong>General Data Protection Regulation (EU/UK GDPR)</strong>, and applicable global data
           protection standards, we process your personal data solely on the lawful basis of your{" "}
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
               C. AI Astrological Consultations & Chat Records:
             </strong>
             <p style={{ margin: "4px 0 0" }}>
-              Questions asked to the AstroLife AI assistant are encrypted in transit via TLS 1.3 and at rest
+              Questions asked to the AstroLife assistant are encrypted in transit via TLS 1.3 and at rest
               using AES-256. Chat histories are private to your authenticated session. We do{" "}
               <strong>NOT</strong> sell, share, or use your private conversations to train public or
               open-source foundational LLM models.
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
             <p style={{ margin: "4px 0 0" }}>
               Account authentication is managed securely via encrypted sessions. Billing transactions are
               processed directly by certified PCI-DSS Level 1 compliant gateways (such as Stripe or Razorpay).
-              AstroLife AI never touches, stores, or logs raw credit card numbers or banking passwords.
+              AstroLife never touches, stores, or logs raw credit card numbers or banking passwords.
             </p>
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
           <p style={{ margin: "0 0 6px", fontWeight: 700, color: "#facc15" }}>
             Data Protection & Grievance Redressal Officer
           </p>
-          <p style={{ margin: "0 0 4px" }}>AstroLife AI Legal & Privacy Team</p>
+          <p style={{ margin: "0 0 4px" }}>AstroLife Legal & Privacy Team</p>
           <p style={{ margin: "0 0 4px" }}>
             Email:{" "}
             <a href="mailto:grievance@astrolife.ai" style={{ color: "#93c5fd" }}>

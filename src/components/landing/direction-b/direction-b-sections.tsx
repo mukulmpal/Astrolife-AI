@@ -182,7 +182,7 @@ export function DirectionBHowItWorks() {
   const steps = [
     { n: '01', title: 'Birth details', body: 'Date, time and place. Thirty seconds.' },
     { n: '02', title: 'Free Vedic kundli', body: 'D-1, D-9, current Dasha. Yours forever, no card needed.' },
-    { n: '03', title: 'Ask AstroLife AI', body: 'Career, marriage, money, timing. The AI reasons from your chart.' },
+    { n: '03', title: 'Ask AstroLife', body: 'Career, marriage, money, timing. The AI reasons from your chart.' },
     { n: '04', title: 'Go deep when ready', body: 'Premium unlocks the full operating system — dasha, KP, Lal Kitab, PDF report.' },
   ];
 

@@ -141,7 +141,7 @@ export function StylePicker({ onSelect, onClose }: StylePickerProps) {
             </span>
           </div>
           <h2 className="font-serif text-3xl font-bold bg-gradient-to-b from-[#f5e7b8] to-[#c8a030] bg-clip-text text-transparent">
-            All Reports Powered by AstroLife AI Palm Intelligence
+            All Reports Powered by AstroLife Palm Intelligence
           </h2>
         </div>
 

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | AstroLife AI",
-  description: "AstroLife AI terms for astrology guidance, accounts, payments and acceptable use.",
+  title: "Terms of Service | AstroLife",
+  description: "AstroLife terms for astrology guidance, accounts, payments and acceptable use.",
 };
 
 export default function TermsPage() {
@@ -11,7 +11,7 @@ export default function TermsPage() {
     <LegalPage
       title="Terms of Service"
       updated="May 23, 2026"
-      intro="AstroLife AI provides guidance-oriented Vedic astrology tools. By using the service, users agree to use outputs responsibly and not as a replacement for professional advice."
+      intro="AstroLife provides guidance-oriented Vedic astrology tools. By using the service, users agree to use outputs responsibly and not as a replacement for professional advice."
     >
       <LegalSection title="Nature of Service">
         <p>
@@ -29,7 +29,7 @@ export default function TermsPage() {
       <LegalSection title="Accounts and Payments">
         <p>
           Paid features may require an account, successful payment and active entitlement.
-          AstroLife AI may limit, suspend or revoke access for abuse, fraud, chargeback misuse
+          AstroLife may limit, suspend or revoke access for abuse, fraud, chargeback misuse
           or attempts to bypass gating.
         </p>
       </LegalSection>

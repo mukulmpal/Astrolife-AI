@@ -65,7 +65,7 @@ export async function buildPackageDossierPdf(
         margins: { top: 40, bottom: 40, left: 45, right: 45 },
         info: {
           Title: `AstroLife — ${reportTitle} — ${subjectName}`,
-          Author: "AstroLife AI Vedic Operating System",
+          Author: "AstroLife Vedic Shastric System",
           Subject: reportTitle,
           Keywords: "Vedic Astrology, Sacred Dossier, Shastra, Kundli, Upayas",
           CreationDate: new Date(),
@@ -159,7 +159,7 @@ function renderPage1Cover(
   doc.rect(28, 28, 539, 759).lineWidth(0.5).strokeColor("#E5C158").stroke();
 
   doc.moveDown(1.5);
-  doc.fontSize(11).fillColor("#8C6508").text("ASTROLIFE • AI VEDIC OPERATING SYSTEM", {
+  doc.fontSize(11).fillColor("#8C6508").text("ASTROLIFE • VEDIC SHASTRIC SYSTEM", {
     align: "center",
     characterSpacing: 2,
   });
@@ -487,7 +487,7 @@ function renderPage4RemediesAndGuidance(doc: PDFDoc, chart: ChartData, reportId:
   doc.rect(45, y, 505, 115).fillAndStroke("#1A1A1A", "#B8860B");
   doc.fontSize(11).fillColor("#D4AF37").text("✦ ASTROLIFE SACRED AUTHENTICITY SEAL ✦", 60, y + 14, { align: "center", width: 475 });
   doc.fontSize(8.5).fillColor("#F5EAD4").text(
-    "Generated deterministically by AstroLife AI Vedic Operating System • Certified Ephemeris Precision • All computations strictly follow Brihat Parashara Hora Shastra, Jaimini Upadesha Sutras, and Krishnamurti Paddhati principles.",
+    "Generated deterministically by AstroLife Vedic Shastric System • Certified Ephemeris Precision • All computations strictly follow Brihat Parashara Hora Shastra, Jaimini Upadesha Sutras, and Krishnamurti Paddhati principles.",
     60,
     y + 36,
     { width: 475, align: "center", lineGap: 3 }

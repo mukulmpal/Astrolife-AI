@@ -118,7 +118,7 @@ export default function UpgradePage() {
         key: order.keyId,
         amount: order.amount,
         currency: order.currency,
-        name: "AstroLife AI",
+        name: "AstroLife",
         description: order.description,
         order_id: order.orderId,
         image: "/logo.png",

@@ -49,7 +49,7 @@ export function Hero() {
           </h1>
 
           <p className="landing-hero-subtitle">
-            While generic AI chatbots hallucinate planetary degrees, AstroLife AI computes your exact birth chart across{" "}
+            While generic AI chatbots hallucinate planetary degrees, AstroLife computes your exact birth chart across{" "}
             <strong className="text-white font-semibold">38 Specialized Vedic & Scientific Engines</strong> (Parashara, KP Placidus Sub-Lords, Jaimini Chara Dasha, 16-Zone Astro-Vastu, Bio-Wearables, and Somatotopic Remedies) — delivering verifiable, explainable life timing with zero guesswork.
           </p>
 

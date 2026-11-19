@@ -7,11 +7,11 @@ export function Footer() {
     <footer className="landing-footer">
       <div className="landing-container landing-footer-grid">
         <div>
-          <Link href="/" className="landing-logo" aria-label="AstroLife AI home">
+          <Link href="/" className="landing-logo" aria-label="AstroLife home">
             <span className="landing-logo-mark">
               <Sparkles size={18} aria-hidden="true" />
             </span>
-            <span>AstroLife AI</span>
+            <span>AstroLife</span>
           </Link>
           <p>AI-powered Vedic Astrology Intelligence OS.</p>
         </div>
@@ -30,7 +30,7 @@ export function Footer() {
         </div>
       </div>
       <div className="landing-container landing-footer-bottom">
-        <span>© 2026 AstroLife AI. All rights reserved.</span>
+        <span>© 2026 AstroLife. All rights reserved.</span>
         <span>Guidance-oriented astrology, not fear-based predictions.</span>
       </div>
     </footer>

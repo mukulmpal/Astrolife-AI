@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vedic Astrology Reports & Dossiers (From ₹49) | AstroLife AI",
+  title: "Vedic Astrology Reports & Dossiers (From ₹49) | AstroLife",
   description:
     "Instant 24-page mathematical Vedic astrology dossiers on Sacred Union, Career Yogas, Astro-Vastu, Medical Health, and 10-Year Destiny Horary timelines. Instant vector PDF.",
   keywords: [
@@ -18,17 +18,17 @@ export const metadata: Metadata = {
     canonical: "https://astrolife-ai.vercel.app/reports",
   },
   openGraph: {
-    title: "Vedic Astrology Reports & Dossiers (From ₹49) | AstroLife AI",
+    title: "Vedic Astrology Reports & Dossiers (From ₹49) | AstroLife",
     description:
       "Get hyper-targeted 24-page mathematical dossiers computed from your exact birth coordinates by 35+ specialized Vedic engines. Instant vector PDF download.",
     url: "https://astrolife-ai.vercel.app/reports",
-    siteName: "AstroLife AI",
+    siteName: "AstroLife",
     type: "website",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Specialized Vedic Astrology Dossiers | AstroLife AI",
+    title: "Specialized Vedic Astrology Dossiers | AstroLife",
     description:
       "Instant 24-page precision astrological dossiers on Marriage, Career Yogas, Astro-Vastu, and Destiny Horary timelines.",
   },
@@ -42,7 +42,7 @@ const productSchema = {
     "Hyper-targeted 24-page mathematical Vedic astrology dossiers on Sacred Union, Career Raja Yogas, Astro-Vastu, Medical Health, and 10-Year Destiny Horary timelines. Instant print-ready vector PDF.",
   brand: {
     "@type": "Brand",
-    name: "AstroLife AI",
+    name: "AstroLife",
   },
   offers: {
     "@type": "AggregateOffer",

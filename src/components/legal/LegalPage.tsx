@@ -13,7 +13,7 @@ export function LegalPage({ title, updated, intro, children }: LegalPageProps) {
     <main style={page}>
       <section style={shell}>
         <Link href="/" style={backLink}>
-          AstroLife AI
+          AstroLife
         </Link>
         <p style={eyebrow}>Launch policy</p>
         <h1 style={heading}>{title}</h1>

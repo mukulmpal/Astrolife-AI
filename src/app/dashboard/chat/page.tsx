@@ -50,7 +50,7 @@ const SOURCE_LINKS: Record<string, string> = {
 };
 
 const AGENTS = [
-  { id:"general",    name:"AstroLife AI",  emoji:"✦",  desc:"General astrology guidance"     },
+  { id:"general",    name:"AstroLife Guide",  emoji:"✦",  desc:"General astrology guidance"     },
   { id:"career",     name:"Career",        emoji:"📈", desc:"Profession & success timing"    },
   { id:"marriage",   name:"Marriage",      emoji:"💑", desc:"Love, relationships & timing"   },
   { id:"karmic",     name:"Karmic",        emoji:"☯️", desc:"Past life & soul lessons"       },
@@ -184,7 +184,7 @@ function normalizeChartForTransit(userChart: any) {
   };
 }
 const WELCOMES: Record<string, string> = {
-  general:    "✦ Namaste! I am AstroLife AI — your personal Vedic astrology guide.\n\nI combine the wisdom of Vedic astrology, Lal Kitab, KP System, and modern psychology to give you deep, personalized insights.\n\nShare your birth details or ask me anything about your chart!",
+  general:    "✦ Namaste! I am your AstroLife personal Vedic astrology guide.\n\nI combine the wisdom of Vedic astrology, Lal Kitab, KP System, and classical Jyotish to give you deep, personalized insights.\n\nShare your birth details or ask me anything about your chart!",
   career:     "📈 Namaste! I am your Career Astrology Agent.\n\nI specialize in career timing, profession analysis, and success periods using your 10th house, D-10 chart, and planetary dashas.\n\nShare your birth details and I'll reveal your ideal career path!",
   marriage:   "💑 Namaste! I am your Marriage Trigger Agent.\n\nI analyze D1/D9 promise, 7th house, Venus, KP validation, dasha activation and event trigger windows to reveal relationship patterns and marriage timing.\n\nWhat would you like to know about your love life?",
   karmic:     "☯️ Namaste, dear soul. I am your Karmic Intelligence Agent.\n\nThrough your Rahu-Ketu axis and past-life indicators, I reveal the deeper purpose of your current incarnation.\n\nWhat karmic patterns shall we explore today?",
@@ -632,7 +632,7 @@ export default function ChatPage() {
               >
                 <div className="history-name">{conversation.title}</div>
                 <div className="history-meta">
-                  {AGENTS.find((agent) => agent.id === conversation.agentId)?.name || "AstroLife AI"}
+                  {AGENTS.find((agent) => agent.id === conversation.agentId)?.name || "AstroLife Guide"}
                 </div>
               </button>
             )) : (

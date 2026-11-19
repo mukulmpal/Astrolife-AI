@@ -11,11 +11,11 @@ export function Header() {
   return (
     <header className="landing-header">
       <div className="landing-container landing-nav">
-        <Link href="/" className="landing-logo" aria-label="AstroLife AI home">
+        <Link href="/" className="landing-logo" aria-label="AstroLife home">
           <span className="landing-logo-mark">
             <Sparkles size={18} aria-hidden="true" />
           </span>
-          <span>AstroLife AI</span>
+          <span>AstroLife</span>
         </Link>
 
         <nav className="landing-nav-links" aria-label="Primary navigation">

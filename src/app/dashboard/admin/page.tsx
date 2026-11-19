@@ -65,7 +65,7 @@ type UserRecord = {
 };
 
 const AGENT_LABELS: Record<string, { label: string; emoji: string }> = {
-  general: { label: "AstroLife AI", emoji: "✦" },
+  general: { label: "AstroLife", emoji: "✦" },
   career: { label: "Career", emoji: "📈" },
   marriage: { label: "Marriage", emoji: "💑" },
   karmic: { label: "Karmic", emoji: "☯️" },

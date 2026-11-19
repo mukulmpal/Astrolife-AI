@@ -45,6 +45,22 @@ export default function ReportsStorePage() {
     payment_id: string;
   } | null>(null);
 
+  const deliveryFormRef = React.useRef<HTMLDivElement>(null);
+
+  const requireCustomerContact = (): boolean => {
+    if (!customerEmail || !customerEmail.includes("@")) {
+      deliveryFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const emailInput = document.getElementById("seeker-email-input");
+      if (emailInput) {
+        emailInput.focus();
+        emailInput.classList.add("ring-2", "ring-[#c8a030]");
+        setTimeout(() => emailInput.classList.remove("ring-2", "ring-[#c8a030]"), 2500);
+      }
+      return false;
+    }
+    return true;
+  };
+
   const handleSendEmailDossier = async (
     emailToUse: string,
     reportToUse: { id: string; title: string; price: string; order_id: string; payment_id: string }
@@ -799,7 +815,7 @@ export default function ReportsStorePage() {
               ✦
             </span>
             <span className="font-serif text-2xl font-bold tracking-tight text-[#1A1A1A]">
-              AstroLife <span className="text-[#c8a030] italic font-normal">AI</span>
+              AstroLife <span className="text-[#c8a030] italic font-normal">Sanctuary</span>
             </span>
           </Link>
 
@@ -896,13 +912,13 @@ export default function ReportsStorePage() {
         </div>
 
         {/* Seeker Input Details Bar */}
-        <div className="bg-[#FFFFFF] border border-[#E7DFD5] rounded-2xl p-5 mb-10 max-w-4xl mx-auto shadow-sm">
+        <div ref={deliveryFormRef} className="bg-[#FFFFFF] border-2 border-[#c8a030]/40 rounded-2xl p-5 mb-10 max-w-4xl mx-auto shadow-sm">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#c8a030] flex items-center gap-1.5">
               <span>✦</span> Step 1: Provide Delivery Information
             </span>
             <span className="text-[11px] text-[#6B635B]">
-              PDF will be generated and saved to this account
+              PDF will be generated and dispatched to this email immediately
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -914,11 +930,13 @@ export default function ReportsStorePage() {
               className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030]"
             />
             <input
+              id="seeker-email-input"
               type="email"
+              required
               value={customerEmail}
               onChange={(e) => setCustomerEmail(e.target.value)}
-              placeholder="Email (for PDF receipt)"
-              className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030]"
+              placeholder="Email (required for PDF delivery) *"
+              className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030] transition-all"
             />
             <input
               type="tel"
@@ -1056,9 +1074,10 @@ export default function ReportsStorePage() {
                       <RazorpayCheckoutButton
                         amount={report.paise}
                         currency="INR"
-                        name="AstroLife AI"
+                        name="AstroLife"
                         description={`${report.title} • ${report.price}`}
                         buttonText={`Get Instant Report · ${report.price}`}
+                        onBeforeCheckout={requireCustomerContact}
                         prefill={{
                           name: customerName,
                           email: customerEmail,
@@ -1177,9 +1196,10 @@ export default function ReportsStorePage() {
                       <RazorpayCheckoutButton
                         amount={report.paise}
                         currency="INR"
-                        name="AstroLife AI"
+                        name="AstroLife"
                         description={`${report.title} • ${report.price}`}
                         buttonText={`Unlock for ${report.price}`}
+                        onBeforeCheckout={requireCustomerContact}
                         prefill={{
                           name: customerName,
                           email: customerEmail,
@@ -1249,7 +1269,7 @@ export default function ReportsStorePage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#c8a030]">✦</span>
-                    <span>Unlimited AI Astrologer Chat across all specialized agents</span>
+                    <span>Unlimited Astrologer Chat across all specialized agents</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#c8a030]">✦</span>
@@ -1261,9 +1281,10 @@ export default function ReportsStorePage() {
               <RazorpayCheckoutButton
                 amount={99900}
                 currency="INR"
-                name="AstroLife AI"
+                name="AstroLife"
                 description="AstroLife Sovereign Annual Pass • ₹999/yr"
                 buttonText="Get 1-Year Sovereign Pass · ₹999"
+                onBeforeCheckout={requireCustomerContact}
                 prefill={{
                   name: customerName,
                   email: customerEmail,
@@ -1329,9 +1350,10 @@ export default function ReportsStorePage() {
               <RazorpayCheckoutButton
                 amount={199900}
                 currency="INR"
-                name="AstroLife AI"
+                name="AstroLife"
                 description="Astrologer Pro Studio SaaS • ₹1,999/mo"
                 buttonText="Subscribe to Astrologer Studio · ₹1,999"
+                onBeforeCheckout={requireCustomerContact}
                 prefill={{
                   name: customerName,
                   email: customerEmail,
@@ -1489,7 +1511,7 @@ export default function ReportsStorePage() {
               {/* Viral WhatsApp Share Action */}
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `I just received my official ${purchasedReport.title} from AstroLife AI! Download your precision Vedic life dossier here: https://astrolife-ai.vercel.app/reports`
+                  `I just received my official ${purchasedReport.title} from AstroLife! Download your precision Vedic life dossier here: https://astrolife-ai.vercel.app/reports`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1521,8 +1543,8 @@ export default function ReportsStorePage() {
 
         {/* Interactive In-Page Sample Preview Modal */}
         {previewModalReport && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative max-h-[92vh] overflow-y-auto">
               <button
                 type="button"
                 onClick={() => setPreviewModalReport(null)}
@@ -1534,54 +1556,63 @@ export default function ReportsStorePage() {
 
               <div className="text-center mb-6">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#a07820] block mb-1">
-                  ✦ Sacred Dossier Live Preview ✦
+                  ✦ Sacred Shastra Dossier Live Preview ✦
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
                   {previewModalReport.title}
                 </h3>
                 <p className="text-xs text-[#6B635B] mt-1">
-                  Sample structure computed from your active natal coordinates
+                  Official Vector A4 Preview • Computed from Active Planetary Coordinates
                 </p>
               </div>
 
-              {/* Sample Document Simulation Card */}
-              <div className="bg-white border-2 border-[#B8860B]/40 rounded-2xl p-6 shadow-sm text-left relative overflow-hidden mb-6">
+              {/* Realistic Sample Document Simulation Card */}
+              <div className="bg-white border-2 border-[#B8860B]/50 rounded-2xl p-6 shadow-md text-left relative overflow-hidden mb-6">
+                {/* Visual Gold Corner Accent Marks */}
+                <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#B8860B]/60 pointer-events-none"></div>
+                <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-[#B8860B]/60 pointer-events-none"></div>
+                <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-[#B8860B]/60 pointer-events-none"></div>
+                <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#B8860B]/60 pointer-events-none"></div>
+
                 {/* Subtle watermark */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] rotate-[-25deg] select-none text-5xl font-serif font-black text-[#1A1A1A]">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] rotate-[-25deg] select-none text-5xl font-serif font-black text-[#1A1A1A]">
                   ASTROLIFE SAMPLE
                 </div>
 
                 <div className="border-b border-[#E7DFD5] pb-3 mb-4 flex justify-between items-center text-xs">
-                  <span className="font-serif font-bold text-[#8C6508] tracking-widest text-[11px]">
-                    ASTROLIFE • SACRED SHASTRA DOSSIER
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-[#c8a030]/15 text-[#a07820] text-[10px] font-bold">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[#8C6508] font-bold">✦</span>
+                    <span className="font-serif font-bold text-[#8C6508] tracking-widest text-[11px]">
+                      ASTROLIFE • SACRED SHASTRA DOSSIER
+                    </span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#15803d] text-[10px] font-bold border border-[#16a34a]/30">
                     Official Vector PDF
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-xs bg-[#FAF7F0] p-3.5 rounded-xl border border-[#E0D7C6] mb-4">
                   <div>
-                    <span className="text-[#6B635B] block text-[10px]">Seeker Name</span>
+                    <span className="text-[#6B635B] block text-[10px] font-medium">Seeker Name</span>
                     <strong className="text-[#1A1A1A]">{customerName || chart?.name || "Sacred Seeker"}</strong>
                   </div>
                   <div>
-                    <span className="text-[#6B635B] block text-[10px]">Ascendant / Moon</span>
+                    <span className="text-[#6B635B] block text-[10px] font-medium">Ascendant / Moon</span>
                     <strong className="text-[#8C6508]">{chart?.lagnaRashi || "Ascendant"} • {chart?.planets?.Moon?.sign || "Chandra"}</strong>
                   </div>
                   <div>
-                    <span className="text-[#6B635B] block text-[10px]">Active Mahadasha</span>
+                    <span className="text-[#6B635B] block text-[10px] font-medium">Active Mahadasha</span>
                     <strong className="text-[#1A1A1A]">{chart?.dashas?.[0]?.planet || "Jupiter"} Mahadasha</strong>
                   </div>
                   <div>
-                    <span className="text-[#6B635B] block text-[10px]">Mathematical Engine</span>
-                    <strong className="text-[#1A1A1A]">Swiss Ephemeris Sidereal</strong>
+                    <span className="text-[#6B635B] block text-[10px] font-medium">Ephemeris Precision</span>
+                    <strong className="text-[#1A1A1A]">Swiss Ephemeris 0.01°</strong>
                   </div>
                 </div>
 
-                <div className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <div className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
                   <span className="text-[#c8a030]">✦</span>
-                  <span>Included Dossier Chapters (20-24 Pages):</span>
+                  <span>Included Official Chapters (20-24 Pages):</span>
                 </div>
 
                 <ul className="space-y-2 text-xs text-[#4A4238] mb-4">
@@ -1597,7 +1628,36 @@ export default function ReportsStorePage() {
                   </li>
                 </ul>
 
-                <div className="p-3 rounded-xl bg-[#FAF0D7] border border-[#c8a030]/30 text-[11px] text-[#8C6508] leading-relaxed">
+                {/* Visual Vector PDF Miniature Sheet Preview */}
+                <div className="bg-[#F5EFE6] border border-[#D8C7A5] rounded-xl p-3 mb-4 shadow-inner">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-[#8C6508] mb-2 uppercase tracking-wider">
+                    <span>📑 Page 2 Vector Shastra Preview:</span>
+                    <span>Graha Sthiti & Kundli Matrix</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5 text-[9.5px] font-mono text-center">
+                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
+                      <span className="text-[#6B635B] block text-[8px]">LAGNA</span>
+                      <strong>{chart?.lagnaRashi || "Asc"}</strong>
+                    </div>
+                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
+                      <span className="text-[#6B635B] block text-[8px]">CHANDRA</span>
+                      <strong>{chart?.planets?.Moon?.sign?.slice(0, 5) || "Moon"}</strong>
+                    </div>
+                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
+                      <span className="text-[#6B635B] block text-[8px]">SURYA</span>
+                      <strong>{chart?.planets?.Sun?.sign?.slice(0, 5) || "Sun"}</strong>
+                    </div>
+                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
+                      <span className="text-[#6B635B] block text-[8px]">SHANI</span>
+                      <strong>{chart?.planets?.Saturn?.sign?.slice(0, 5) || "Saturn"}</strong>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-[9px] text-[#8C6508] italic text-center">
+                    Full 24-page vector edition contains D1/D9 charts, 300+ yogas, and exact planetary degrees.
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#FAF0D7] border border-[#c8a030]/35 text-[11px] text-[#8C6508] leading-relaxed">
                   <strong>Ethical Vedic Guarantee:</strong> Zero fear-mongering and no commercial upsells. Every recommendation is purely classical, empowering you with actionable guidance for your life path.
                 </div>
               </div>
@@ -1607,7 +1667,7 @@ export default function ReportsStorePage() {
                 <RazorpayCheckoutButton
                   amount={previewModalReport.paise}
                   currency="INR"
-                  name="AstroLife AI"
+                  name="AstroLife"
                   description={`${previewModalReport.title} • ${previewModalReport.price}`}
                   buttonText={`Unlock Full Official Dossier · ${previewModalReport.price}`}
                   prefill={{
@@ -1625,17 +1685,17 @@ export default function ReportsStorePage() {
                   type="button"
                   disabled={sampleLoadingId === previewModalReport.id}
                   onClick={() => handlePreviewSample(previewModalReport)}
-                  className="w-full py-2.5 px-4 rounded-xl border border-[#c8a030]/50 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full py-2.5 px-4 rounded-xl border border-[#c8a030]/50 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm"
                 >
                   {sampleLoadingId === previewModalReport.id ? (
                     <>
                       <span className="animate-spin text-xs">⟳</span>
-                      <span>Compiling Sample PDF...</span>
+                      <span>Compiling Watermarked Sample PDF...</span>
                     </>
                   ) : (
                     <>
                       <span>📥</span>
-                      <span>Download Sample PDF File Directly</span>
+                      <span>Download Sample PDF File Directly (Free)</span>
                     </>
                   )}
                 </button>
@@ -1645,7 +1705,7 @@ export default function ReportsStorePage() {
                 <button
                   type="button"
                   onClick={() => setPreviewModalReport(null)}
-                  className="text-xs text-[#6B635B] hover:text-[#1A1A1A] underline"
+                  className="text-xs text-[#6B635B] hover:text-[#1A1A1A] underline transition-colors"
                 >
                   Back to Store
                 </button>
@@ -1660,7 +1720,7 @@ export default function ReportsStorePage() {
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 text-[#a07820] font-serif">
             <span>✦</span>
-            <span>AstroLife AI • Precision Vedic Astrology Reports Store</span>
+            <span>AstroLife • Precision Vedic Astrology Reports Store</span>
           </div>
           <div className="flex items-center gap-4 text-[11px]">
             <Link href="/privacy" className="hover:text-[#1A1A1A] transition-colors">

@@ -425,7 +425,7 @@ export default function CheckoutPage() {
                 <RazorpayCheckoutButton
                   amount={payablePaise}
                   currency="INR"
-                  name="AstroLife AI"
+                  name="AstroLife"
                   description={`${currentTier.title} • ₹${payableRupees}`}
                   buttonText={`Pay ₹${payableRupees} with Razorpay`}
                   prefill={{
@@ -501,7 +501,7 @@ export default function CheckoutPage() {
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 text-[#a07820] font-serif">
             <span>✦</span>
-            <span>AstroLife AI • Vedic Astrology & Cosmic Intelligence</span>
+            <span>AstroLife • Vedic Astrology & Cosmic Intelligence</span>
           </div>
           <div className="flex items-center gap-4 text-[11px]">
             <Link href="/privacy" className="hover:text-[#1A1A1A] transition-colors">

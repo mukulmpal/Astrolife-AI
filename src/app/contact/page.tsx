@@ -3,14 +3,14 @@ import Link from "next/link";
 import { LegalPage, LegalSection } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Contact | AstroLife AI",
-  description: "Contact AstroLife AI for support, privacy, payments and launch inquiries.",
+  title: "Contact | AstroLife",
+  description: "Contact AstroLife for support, privacy, payments and launch inquiries.",
 };
 
 export default function ContactPage() {
   return (
     <LegalPage
-      title="Contact AstroLife AI"
+      title="Contact AstroLife"
       updated="May 23, 2026"
       intro="Use this page for support, privacy, payment and business inquiries while the product moves from beta to paid launch."
     >

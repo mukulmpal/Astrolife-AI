@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!pageData) {
     return {
-      title: "Vedic Astrology Dossier | AstroLife AI",
+      title: "Vedic Astrology Dossier | AstroLife",
     };
   }
 
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: pageData.metaTitle,
       description: pageData.metaDescription,
       url: canonicalUrl,
-      siteName: "AstroLife AI",
+      siteName: "AstroLife",
       type: "website",
       locale: "en_IN",
     },
@@ -74,7 +74,7 @@ export default async function ReportSeoPage({ params }: PageProps) {
     image: "https://astrolife-ai.vercel.app/icons/icon-512.png",
     brand: {
       "@type": "Brand",
-      name: "AstroLife AI",
+      name: "AstroLife",
     },
     offers: {
       "@type": "Offer",
@@ -85,7 +85,7 @@ export default async function ReportSeoPage({ params }: PageProps) {
       availability: "https://schema.org/InStock",
       seller: {
         "@type": "Organization",
-        name: "AstroLife AI",
+        name: "AstroLife",
       },
     },
     aggregateRating: {
@@ -331,14 +331,14 @@ export default async function ReportSeoPage({ params }: PageProps) {
       {/* Comparison: AstroLife vs Generic Computer Kundli */}
       <section className="max-w-5xl mx-auto px-4 mb-16">
         <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A] mb-6 text-center">
-          Why Discerning Seekers Choose AstroLife AI
+          Why Discerning Seekers Choose AstroLife
         </h2>
 
         <div className="bg-white border border-[#E7DFD5] rounded-3xl overflow-hidden shadow-xs">
           <div className="grid grid-cols-3 bg-[#FAF7F2] border-b border-[#E7DFD5] p-4 text-xs font-bold text-[#6B635B]">
             <div>Feature / Precision</div>
             <div className="text-center text-[#9C948A]">Generic Computer Horoscopes</div>
-            <div className="text-center text-[#c8a030]">AstroLife AI Shastra Dossier</div>
+            <div className="text-center text-[#c8a030]">AstroLife Shastra Dossier</div>
           </div>
 
           <div className="divide-y divide-[#E7DFD5] text-xs">
