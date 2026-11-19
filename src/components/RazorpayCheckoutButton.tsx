@@ -231,7 +231,7 @@ export default function RazorpayCheckoutButton({
   };
 
   const defaultClasses =
-    "w-full py-4 px-6 rounded-xl font-semibold text-[15px] tracking-wide transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_6px_20px_rgba(200,160,48,0.35)] hover:shadow-[0_10px_28px_rgba(200,160,48,0.5)] hover:-translate-y-0.5 active:translate-y-0 text-[#FAF7F2] bg-gradient-to-r from-[#c8a030] to-[#a07820]";
+    "w-full py-4 px-6 rounded-xl font-semibold text-[15px] tracking-wide transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_6px_20px_rgba(200,160,48,0.35)] hover:shadow-[0_10px_28px_rgba(200,160,48,0.5)] hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c8a030] focus-visible:ring-offset-2 text-[#FAF7F2] bg-gradient-to-r from-[#c8a030] via-[#b8860b] to-[#a07820] relative overflow-hidden group";
 
   return (
     <div className="flex flex-col gap-3 w-full">
@@ -239,8 +239,16 @@ export default function RazorpayCheckoutButton({
         type="button"
         onClick={handleCheckout}
         disabled={loading}
+        aria-busy={loading}
+        aria-label={loading ? "Securing payment session" : defaultLabel}
         className={className || defaultClasses}
       >
+        {/* Subtle shimmer micro-interaction on hover */}
+        <span
+          className="absolute inset-0 w-1/2 h-full bg-white/15 skew-x-[-20deg] -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-out pointer-events-none"
+          aria-hidden="true"
+        />
+
         {loading ? (
           <span className="flex items-center gap-2.5">
             <svg
@@ -248,6 +256,7 @@ export default function RazorpayCheckoutButton({
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <circle
                 className="opacity-25"
@@ -256,18 +265,18 @@ export default function RazorpayCheckoutButton({
                 r="10"
                 stroke="currentColor"
                 strokeWidth="4"
-              ></circle>
+              />
               <path
-                className="opacity-90"
+                className="opacity-75"
                 fill="currentColor"
-                d="M4 12a8 8 0 018-8v8H4z"
-              ></path>
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
-            Processing Cosmic Order...
+            <span className="font-medium tracking-wide">Connecting Secure Gateway...</span>
           </span>
         ) : (
           <span className="flex items-center gap-2">
-            <span>✦</span>
+            <span className="text-base">🔒</span>
             <span>{defaultLabel}</span>
           </span>
         )}

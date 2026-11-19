@@ -258,18 +258,18 @@ export default function ReportsStorePage() {
     {
       id: "pkg_space_destiny",
       title: "🏡 Space Energy, Palmistry & Destiny Calibration",
-      tagline: "4-in-1 Suite: Astro-Vastu Radar, AI Palmistry, BTR & 1-Year Transit Forecast.",
+      tagline: "4-in-1 Suite: Astro-Vastu Radar, Samudrika Palmistry, BTR & 1-Year Transit Forecast.",
       price: "₹249",
       paise: 24900,
-      vargas: ["16-Zone Vastu", "AI Palmistry", "BTR Engine", "1-Year Gochar"],
+      vargas: ["16-Zone Vastu", "Samudrika Shastra", "BTR System", "1-Year Gochar"],
       badge: "🔬 High Diagnostic",
       badgeColor: "bg-[#0284c7] text-white",
       deliveryTime: "60 Seconds Delivery",
       description:
-        "Deep diagnostic master suite. Maps your chart to home's 16 Vastu zones, scans physical hand lines via computer vision, rectifies uncertain birth minutes, and provides a 12-month Gochar roadmap.",
+        "Deep diagnostic master suite. Maps your chart to home's 16 Vastu zones, scans physical hand lines via classical Samudrika shastra, rectifies uncertain birth minutes, and provides a 12-month Gochar roadmap.",
       sections: [
         "Astro-Vastu Directional Radar: 16-Zone Birth Planet Home Mapping",
-        "AI Palmistry Vision Scan: Heart, Head & Fate Lines vs Chart Alignment",
+        "Samudrika Shastra Palm Mounts & Vital Line Synchronicity",
         "Mathematical Birth Time Rectification (BTR) Exact Minute Calculation",
         "2026-2027 1-Year Transit & Shani Sade Sati Month-by-Month Forecast",
         "Non-Destructive Space Harmonization & Spatial Energy Balancing",
@@ -565,16 +565,16 @@ export default function ReportsStorePage() {
     },
     {
       id: "palmistry_scan",
-      title: "🖐️ AI Palmistry & Hastrekha Scan",
-      tagline: "Computer vision scan of Heart, Head & Life lines mapped to planets.",
+      title: "🖐️ Samudrika Shastra & Palm Scan",
+      tagline: "Precision Shastric scan of Heart, Head & Life lines mapped to planetary mounts.",
       price: "₹99",
       paise: 9900,
-      vargas: ["Palm AI", "Hand Mounts", "3 Major Lines"],
-      badge: "📸 Vision AI",
+      vargas: ["Samudrika Shastra", "Hand Mounts", "3 Major Lines"],
+      badge: "🖐️ Palm Shastra",
       badgeColor: "bg-[#d97706] text-white",
-      deliveryTime: "Instant Scan",
+      deliveryTime: "Instant 30s",
       description:
-        "Fuses digital palmistry with Vedic planetary mounts. Analyzes palm mounts (Jupiter, Venus, Saturn) and palm lines to provide a lifetime character and destiny reading.",
+        "Fuses Samudrika Shastra palmistry with Vedic planetary mounts. Analyzes palm mounts (Jupiter, Venus, Saturn) and palm lines to provide a lifetime character and destiny reading.",
       sections: [
         "Life Line Arc & Vitality Depth Measurement",
         "Head Line Slope & Analytical vs Creative Intelligence",
@@ -1543,22 +1543,33 @@ export default function ReportsStorePage() {
 
         {/* Interactive In-Page Sample Preview Modal */}
         {previewModalReport && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
-            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative max-h-[92vh] overflow-y-auto">
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sample-modal-title"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setPreviewModalReport(null);
+            }}
+          >
+            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-5 sm:p-8 max-w-2xl w-full shadow-2xl relative max-h-[92vh] overflow-y-auto ring-1 ring-[#c8a030]/20">
               <button
                 type="button"
                 onClick={() => setPreviewModalReport(null)}
-                className="absolute top-4 right-4 text-[#6B635B] hover:text-[#1A1A1A] text-lg font-bold p-1 rounded-full w-8 h-8 flex items-center justify-center bg-black/5 hover:bg-black/10 transition-colors"
-                aria-label="Close dialog"
+                className="absolute top-4 right-4 text-[#6B635B] hover:text-[#1A1A1A] text-lg font-bold p-1 rounded-full w-9 h-9 flex items-center justify-center bg-black/5 hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-[#c8a030] transition-colors"
+                aria-label="Close sample preview dialog"
               >
                 ✕
               </button>
 
-              <div className="text-center mb-6">
+              <div className="text-center mb-5">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#a07820] block mb-1">
                   ✦ Sacred Shastra Dossier Live Preview ✦
                 </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
+                <h3
+                  id="sample-modal-title"
+                  className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]"
+                >
                   {previewModalReport.title}
                 </h3>
                 <p className="text-xs text-[#6B635B] mt-1">
@@ -1567,12 +1578,12 @@ export default function ReportsStorePage() {
               </div>
 
               {/* Realistic Sample Document Simulation Card */}
-              <div className="bg-white border-2 border-[#B8860B]/50 rounded-2xl p-6 shadow-md text-left relative overflow-hidden mb-6">
+              <div className="bg-white border-2 border-[#B8860B]/50 rounded-2xl p-5 sm:p-6 shadow-md text-left relative overflow-hidden mb-6">
                 {/* Visual Gold Corner Accent Marks */}
-                <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#B8860B]/60 pointer-events-none"></div>
-                <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-[#B8860B]/60 pointer-events-none"></div>
-                <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-[#B8860B]/60 pointer-events-none"></div>
-                <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#B8860B]/60 pointer-events-none"></div>
+                <div className="absolute top-2.5 left-2.5 w-3.5 h-3.5 border-t-2 border-l-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
+                <div className="absolute top-2.5 right-2.5 w-3.5 h-3.5 border-t-2 border-r-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
+                <div className="absolute bottom-2.5 left-2.5 w-3.5 h-3.5 border-b-2 border-l-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
+                <div className="absolute bottom-2.5 right-2.5 w-3.5 h-3.5 border-b-2 border-r-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
 
                 {/* Subtle watermark */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] rotate-[-25deg] select-none text-5xl font-serif font-black text-[#1A1A1A]">
@@ -1618,42 +1629,45 @@ export default function ReportsStorePage() {
                 <ul className="space-y-2 text-xs text-[#4A4238] mb-4">
                   {previewModalReport.sections.map((sec, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5">✓</span>
+                      <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5" aria-hidden="true">✓</span>
                       <span><strong>Chapter {idx + 1}:</strong> {sec}</span>
                     </li>
                   ))}
                   <li className="flex items-start gap-2">
-                    <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5">✓</span>
+                    <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5" aria-hidden="true">✓</span>
                     <span><strong>Chapter {previewModalReport.sections.length + 1}:</strong> 100% Free Authentic Classical Remedial Blueprint (Japa, Dana, Lifestyle Vastu)</span>
                   </li>
                 </ul>
 
                 {/* Visual Vector PDF Miniature Sheet Preview */}
-                <div className="bg-[#F5EFE6] border border-[#D8C7A5] rounded-xl p-3 mb-4 shadow-inner">
+                <div className="bg-gradient-to-b from-[#FBF8F3] to-[#F3EAD9] border-2 border-[#D8C7A5] rounded-xl p-3.5 mb-4 shadow-inner">
                   <div className="flex items-center justify-between text-[10px] font-bold text-[#8C6508] mb-2 uppercase tracking-wider">
-                    <span>📑 Page 2 Vector Shastra Preview:</span>
-                    <span>Graha Sthiti & Kundli Matrix</span>
+                    <span className="flex items-center gap-1">
+                      <span>📑</span>
+                      <span>Page 2 Vector Shastra Preview:</span>
+                    </span>
+                    <span className="bg-[#8C6508]/10 text-[#8C6508] px-2 py-0.5 rounded text-[9px]">Graha Sthiti Kundli Matrix</span>
                   </div>
-                  <div className="grid grid-cols-4 gap-1.5 text-[9.5px] font-mono text-center">
-                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
-                      <span className="text-[#6B635B] block text-[8px]">LAGNA</span>
-                      <strong>{chart?.lagnaRashi || "Asc"}</strong>
+                  <div className="grid grid-cols-4 gap-2 text-[10px] font-mono text-center">
+                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
+                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">LAGNA</span>
+                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.lagnaRashi || "Asc"}</strong>
                     </div>
-                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
-                      <span className="text-[#6B635B] block text-[8px]">CHANDRA</span>
-                      <strong>{chart?.planets?.Moon?.sign?.slice(0, 5) || "Moon"}</strong>
+                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
+                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">CHANDRA</span>
+                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.planets?.Moon?.sign?.slice(0, 5) || "Moon"}</strong>
                     </div>
-                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
-                      <span className="text-[#6B635B] block text-[8px]">SURYA</span>
-                      <strong>{chart?.planets?.Sun?.sign?.slice(0, 5) || "Sun"}</strong>
+                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
+                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">SURYA</span>
+                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.planets?.Sun?.sign?.slice(0, 5) || "Sun"}</strong>
                     </div>
-                    <div className="bg-white p-1 rounded border border-[#E7DFD5]">
-                      <span className="text-[#6B635B] block text-[8px]">SHANI</span>
-                      <strong>{chart?.planets?.Saturn?.sign?.slice(0, 5) || "Saturn"}</strong>
+                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
+                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">SHANI</span>
+                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.planets?.Saturn?.sign?.slice(0, 5) || "Saturn"}</strong>
                     </div>
                   </div>
-                  <div className="mt-2 text-[9px] text-[#8C6508] italic text-center">
-                    Full 24-page vector edition contains D1/D9 charts, 300+ yogas, and exact planetary degrees.
+                  <div className="mt-2.5 text-[9.5px] text-[#8C6508] font-medium text-center">
+                    ✨ Full 24-page vector edition contains D1/D9 charts, 300+ classical yogas, and exact planetary degrees.
                   </div>
                 </div>
 
