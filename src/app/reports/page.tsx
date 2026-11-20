@@ -2176,7 +2176,7 @@ export default function ReportsStorePage() {
                   ) : (
                     <>
                       <span>📥</span>
-                      <span>Download 5-Page Sample PDF Directly (Free)</span>
+                      <span>Download Full 24-Page Sample PDF (Watermarked Free)</span>
                     </>
                   )}
                 </button>

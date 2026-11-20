@@ -195,10 +195,14 @@ export function generatePackageDossierHTML(
   const atmakaraka = charaKarakas.find((k) => k.role === "AK") || { planet: "Sun", sign: sunRashi };
   const amatyakaraka = charaKarakas.find((k) => k.role === "AmK") || { planet: "Jupiter", sign: "Cancer" };
 
-  // Total pages based on mode
-  const totalPages = isSample ? 5 : 24;
+  // Total pages: Always full 24 pages (watermarked in sample mode, clean official in paid mode)
+  const totalPages = 24;
+  const sampleWatermark = isSample
+    ? '<div class="sample-watermark">ASTROLIFE SAMPLE PREVIEW • UNLOCK FULL DOSSIER</div>'
+    : "";
 
   const headerRail = (chapter: string) => `
+    ${sampleWatermark}
     <div class="page-rail">
       <span class="brand">✦ AstroLife Shastra Dossier</span>
       <span class="kicker">${escapeHtml(chapter)}</span>
@@ -859,7 +863,6 @@ ${isSample ? `
   ${footerRail("D-9 Navamsha Harmony", 4)}
 </section>
 
-${isSample ? sampleLockedPage : `
 <!-- PAGE 5: COMPLETE 9-GRAHA PLACEMENT LEDGER -->
 <section class="page">
   ${headerRail("CHAPTER 3: COMPLETE 9-GRAHA LEDGER")}
@@ -1203,16 +1206,21 @@ ${isSample ? sampleLockedPage : `
         This 24-page dossier is computed deterministically under Brihat Parashara Hora Shastra, Jaimini Upadesha Sutras, and Swiss Ephemeris certified astronomical algorithms. Free from speculative AI hallucinations.
       </p>
       <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:0.08em;margin-bottom:6px;">
-        VERIFIED IMMUTABLE SHASTRA RECORD · CERTIFICATE ID: ${paymentId}
+        ${isSample ? "SAMPLE PREVIEW RECORD · OFFICIAL CERTIFICATION LOCKED" : `VERIFIED IMMUTABLE SHASTRA RECORD · CERTIFICATE ID: ${paymentId}`}
       </div>
       <div style="font-size:10px;color:var(--ivory-mute);">
         Certified for: ${subjectName} · Archive Ref: ${orderId} · www.astrolife-ai.vercel.app
       </div>
+      ${isSample ? `
+        <div style="margin-top:16px;background:rgba(201,169,97,0.12);border:1px solid var(--border-gold);border-radius:6px;padding:10px 14px;display:inline-block;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold-bright);margin-bottom:2px;">✦ OFFICIAL HIGH-DEFINITION DOSSIER UNLOCK ✦</div>
+          <div style="font-size:10px;color:var(--ivory-dim);">To generate your un-watermarked permanent archival copy, visit <span style="color:var(--gold);">astrolife-ai.vercel.app/reports</span></div>
+        </div>
+      ` : ""}
     </div>
   </div>
   ${footerRail("Certified Shastra Archive", 24)}
 </section>
-`}
 
 </body>
 </html>`;

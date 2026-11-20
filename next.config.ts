@@ -3,6 +3,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   compress: false,
   serverExternalPackages: ["pdfkit", "puppeteer-core", "@sparticuz/chromium", "@sparticuz/chromium-min"],
+  outputFileTracingIncludes: {
+    "/api/generate-pdf": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/api/reports/generate-pdf": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/api/reports/send-email": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+    "api/generate-pdf": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+    "api/reports/generate-pdf": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+    "api/reports/send-email": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+  },
   outputFileTracingExcludes: {
     "api/astro/rectify/pdf": [
       "./node_modules/@sparticuz/**",

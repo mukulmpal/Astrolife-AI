@@ -98,17 +98,17 @@ export async function buildPackageDossierPdf(
       doc.addPage();
       renderPage2NatalPlacements(doc, chart, subjectName);
 
+      // Render complete chapters for both sample and paid mode
+      doc.addPage();
+      renderPage3ThematicAnalysis(doc, chart, options.reportId, reportTitle);
+
+      doc.addPage();
+      renderPage4RemediesAndGuidance(doc, chart, options.reportId);
+
       if (options.isSample) {
-        // SAMPLE MODE: Locked teaser page with CTA to buy full dossier
+        // In sample preview mode, include the official locked verification chapter
         doc.addPage();
         renderPageSampleLockedNotice(doc, reportTitle);
-      } else {
-        // PAID MODE: Full Proprietary Thematic Deep-Dive & Classical Remedies
-        doc.addPage();
-        renderPage3ThematicAnalysis(doc, chart, options.reportId, reportTitle);
-
-        doc.addPage();
-        renderPage4RemediesAndGuidance(doc, chart, options.reportId);
       }
 
       // ───────────────────────────────────────────────────────────────────────

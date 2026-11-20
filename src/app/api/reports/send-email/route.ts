@@ -15,12 +15,37 @@ async function launchBrowser() {
   if (process.env.VERCEL || process.env.NODE_ENV === "production") {
     const chromium = (await import("@sparticuz/chromium")).default;
     const puppeteer = (await import("puppeteer-core")).default;
-    const executablePath = await chromium.executablePath();
+    const path = await import("path");
+    const fs = await import("fs");
+
+    const candidateBinPaths = [
+      path.join(process.cwd(), "node_modules/@sparticuz/chromium/bin"),
+      path.join(process.cwd(), ".next/server/node_modules/@sparticuz/chromium/bin"),
+      "/var/task/node_modules/@sparticuz/chromium/bin",
+      "/var/task/.next/server/node_modules/@sparticuz/chromium/bin",
+    ];
+
+    let executablePath: string | undefined;
+    for (const p of candidateBinPaths) {
+      if (fs.existsSync(p)) {
+        try {
+          executablePath = await chromium.executablePath(p);
+          if (executablePath) break;
+        } catch {
+          // continue checking
+        }
+      }
+    }
+
+    if (!executablePath) {
+      executablePath = await chromium.executablePath();
+    }
+
     return puppeteer.launch({
       args: chromium.args,
       defaultViewport: REPORT_VIEWPORT,
       executablePath,
-      headless: "shell",
+      headless: chromium.headless ?? true,
     });
   } else {
     const puppeteer = (await import("puppeteer-core")).default;
@@ -31,6 +56,12 @@ async function launchBrowser() {
     return puppeteer.launch({
       executablePath: execPath,
       headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--user-data-dir=/tmp/astrolife-chrome-dev",
+      ],
       defaultViewport: REPORT_VIEWPORT,
     });
   }
