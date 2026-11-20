@@ -27,13 +27,14 @@ export interface RazorpayCheckoutButtonProps {
     success: boolean;
     order_id: string;
     payment_id: string;
+    signature?: string;
   }) => void;
   onFailure?: (errorMessage: string) => void;
 }
 
 declare global {
   interface Window {
-    Razorpay?: new (options: Record<string, unknown>) => {
+    Razorpay: new (options: Record<string, unknown>) => {
       open: () => void;
       on: (event: string, handler: (response: unknown) => void) => void;
     };
@@ -180,6 +181,7 @@ export default function RazorpayCheckoutButton({
                 success: true,
                 order_id: response.razorpay_order_id,
                 payment_id: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
               });
             } else {
               const errMsg = verifyData.error || "Payment verification failed.";

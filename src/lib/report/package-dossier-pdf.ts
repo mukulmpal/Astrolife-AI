@@ -325,10 +325,13 @@ function renderPage2NatalPlacements(doc: PDFDoc, chart: ChartData, subject: stri
   );
 
   // Card 2: Chandra Emotional Grounding
+  const moonP = chart.planets?.["Moon"];
+  const moonRashi = moonP?.sign || "Taurus";
+  const moonNak = moonP?.nakshatra || "Rohini";
   doc.rect(305, cardY, colWidth, 120).fillAndStroke("#FFFFFF", "#E0D7C6");
   doc.fontSize(9.5).fillColor("#8C6508").text("Chandra & Emotional Mind", 315, cardY + 12);
   doc.fontSize(8.5).fillColor("#4A4238").text(
-    `Moon in ${chart.moonSign} under Nakshatra ${chart.moonNakshatra || "Sacred"} governs your emotional intuition, stress-response, and subconscious memory. Cultivating mental tranquility is vital during transition periods.`,
+    `Moon in ${moonRashi} under Nakshatra ${moonNak} governs your emotional intuition, stress-response, and subconscious memory. Cultivating mental tranquility is vital during transition periods.`,
     315,
     cardY + 32,
     { width: 225, lineGap: 2.5 }

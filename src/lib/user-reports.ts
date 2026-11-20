@@ -9,6 +9,7 @@ export interface PurchasedReportRecord {
   price: string;
   orderId: string;
   paymentId: string;
+  signature?: string;
   purchasedAt: string;
   seekerName: string;
   chartSnapshot?: Partial<ChartData>;
@@ -70,7 +71,7 @@ export async function savePurchasedReport(
  * Triggers a real-time vector PDF download for any purchased report.
  */
 export async function triggerDossierDownload(
-  report: { id: string; title: string; orderId?: string; paymentId?: string },
+  report: { id: string; title: string; orderId?: string; paymentId?: string; signature?: string },
   chart?: ChartData | null,
   customerName?: string
 ): Promise<boolean> {
@@ -89,6 +90,7 @@ export async function triggerDossierDownload(
         },
         orderId: report.orderId,
         paymentId: report.paymentId,
+        signature: report.signature,
         isSample,
       }),
     });

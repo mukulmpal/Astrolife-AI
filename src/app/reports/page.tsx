@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 import { useUserChart } from "@/lib/user-chart";
+import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { savePurchasedReport, triggerDossierDownload } from "@/lib/user-reports";
 
 interface ReportItem {
@@ -11,6 +12,8 @@ interface ReportItem {
   title: string;
   tagline: string;
   price: string;
+  originalPrice?: string;
+  discountBadge?: string;
   paise: number;
   vargas: string[];
   badge?: string;
@@ -21,6 +24,85 @@ interface ReportItem {
   deliveryTime: string;
 }
 
+const HOUSE_COORDS: Record<number, [number, number]> = {
+  1: [180, 110], 2: [100, 55], 3: [55, 100], 4: [110, 180],
+  5: [55, 260], 6: [100, 305], 7: [180, 250], 8: [260, 305],
+  9: [305, 260], 10: [250, 180], 11: [305, 100], 12: [260, 55],
+};
+
+function KundliDiamondSvg({
+  chart,
+  isD9 = false,
+  size = 280,
+}: {
+  chart?: ChartData | null;
+  isD9?: boolean;
+  size?: number;
+}) {
+  const houseContents: Record<number, string[]> = {};
+  for (let h = 1; h <= 12; h++) houseContents[h] = [];
+  houseContents[1].push("As");
+
+  const lagnaIndex = chart?.lagnaNum || 0;
+  const effectiveLagna = isD9 ? ((lagnaIndex + 8) % 12) : lagnaIndex;
+
+  if (chart?.planets) {
+    const PLANET_ABBR: Record<string, string> = {
+      Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me",
+      Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke",
+    };
+    for (const [name, p] of Object.entries(chart.planets)) {
+      const abbr = PLANET_ABBR[name] || name.slice(0, 2);
+      const h = p.house >= 1 && p.house <= 12 ? p.house : 1;
+      const targetHouse = isD9 ? (((h + 3) % 12) + 1) : h;
+      houseContents[targetHouse].push(abbr + (p.retrograde ? "(R)" : ""));
+    }
+  }
+
+  return (
+    <svg width={size} height={size} viewBox="0 0 360 360" className="mx-auto select-none drop-shadow-sm">
+      <g stroke="#C9A961" strokeWidth="1.2" fill="none" opacity="0.85">
+        <rect x="10" y="10" width="340" height="340" rx="4" />
+        <polygon points="180,10 350,180 180,350 10,180" />
+        <line x1="10" y1="10" x2="350" y2="350" />
+        <line x1="350" y1="10" x2="10" y2="350" />
+      </g>
+      {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => {
+        const [cx, cy] = HOUSE_COORDS[h];
+        const signNum = ((effectiveLagna + (h - 1)) % 12) + 1;
+        const items = houseContents[h] || [];
+        return (
+          <g key={h}>
+            <text
+              x={cx}
+              y={cy - 12}
+              textAnchor="middle"
+              className="font-mono text-[10px] font-bold fill-[#8C6508]"
+            >
+              {signNum}
+            </text>
+            {items.map((item, idx) => {
+              const offsetY = (idx - (items.length - 1) / 2) * 11;
+              return (
+                <text
+                  key={idx}
+                  x={cx}
+                  y={cy + 6 + offsetY}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="font-sans text-[9px] font-bold fill-[#C9A961]"
+                >
+                  {item}
+                </text>
+              );
+            })}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 export default function ReportsStorePage() {
   const { chart, birth } = useUserChart();
   const [activeTab, setActiveTab] = useState<"master" | "single" | "sovereign">("master");
@@ -28,11 +110,16 @@ export default function ReportsStorePage() {
   const [downloading, setDownloading] = useState<boolean>(false);
   const [sampleLoadingId, setSampleLoadingId] = useState<string | null>(null);
   const [previewModalReport, setPreviewModalReport] = useState<ReportItem | null>(null);
+  const [previewPageIndex, setPreviewPageIndex] = useState<number>(0);
 
-  // Customer contact details for report delivery
-  const [customerName, setCustomerName] = useState<string>("");
+  // Customer & Birth data details for certified calculation and report delivery
+  const [customerName, setCustomerName] = useState<string>(() => chart?.name || birth?.name || "");
+  const [customerDob, setCustomerDob] = useState<string>(() => chart?.dob || birth?.dob || "");
+  const [customerTob, setCustomerTob] = useState<string>(() => chart?.tob || birth?.tob || "12:00");
+  const [customerCity, setCustomerCity] = useState<string>(() => chart?.city || birth?.city || "");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
+  const [formValidationError, setFormValidationError] = useState<string | null>(null);
   const [emailSending, setEmailSending] = useState<boolean>(false);
   const [emailSentStatus, setEmailSentStatus] = useState<string | null>(null);
   const [modalInputEmail, setModalInputEmail] = useState<string>("");
@@ -43,19 +130,60 @@ export default function ReportsStorePage() {
     price: string;
     order_id: string;
     payment_id: string;
+    signature?: string;
   } | null>(null);
 
   const deliveryFormRef = React.useRef<HTMLDivElement>(null);
 
-  const requireCustomerContact = (): boolean => {
-    if (!customerEmail || !customerEmail.includes("@")) {
-      deliveryFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      const emailInput = document.getElementById("seeker-email-input");
-      if (emailInput) {
-        emailInput.focus();
-        emailInput.classList.add("ring-2", "ring-[#c8a030]");
-        setTimeout(() => emailInput.classList.remove("ring-2", "ring-[#c8a030]"), 2500);
+  // Real-time calculated natal chart using Swiss Ephemeris algorithm
+  const activeNatalChart = React.useMemo(() => {
+    if (customerDob && customerCity) {
+      try {
+        return calculateChart(
+          customerName || "Sacred Seeker",
+          customerDob,
+          customerTob || "12:00",
+          customerCity
+        );
+      } catch {
+        return chart;
       }
+    }
+    return chart;
+  }, [customerName, customerDob, customerTob, customerCity, chart]);
+
+  const requireCustomerContact = (): boolean => {
+    setFormValidationError(null);
+
+    const highlightField = (id: string, message: string) => {
+      setFormValidationError(message);
+      deliveryFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const el = document.getElementById(id);
+      if (el) {
+        el.focus();
+        el.classList.add("ring-2", "ring-[#e11d48]");
+        setTimeout(() => el.classList.remove("ring-2", "ring-[#e11d48]"), 3000);
+      }
+    };
+
+    if (!customerName || customerName.trim().length < 2) {
+      highlightField("seeker-name-input", "Please provide your Full Name for astrological certification.");
+      return false;
+    }
+    if (!customerDob || !/^\d{4}-\d{2}-\d{2}$/.test(customerDob)) {
+      highlightField("seeker-dob-input", "Please select your Date of Birth (YYYY-MM-DD).");
+      return false;
+    }
+    if (!customerTob) {
+      highlightField("seeker-tob-input", "Please provide your approximate Time of Birth.");
+      return false;
+    }
+    if (!customerCity || customerCity.trim().length < 2) {
+      highlightField("seeker-city-input", "Please provide your Birth City for latitude/longitude lookup.");
+      return false;
+    }
+    if (!customerEmail || !customerEmail.includes("@") || !customerEmail.includes(".")) {
+      highlightField("seeker-email-input", "Please provide a valid Email Address for PDF dossier dispatch.");
       return false;
     }
     return true;
@@ -63,7 +191,7 @@ export default function ReportsStorePage() {
 
   const handleSendEmailDossier = async (
     emailToUse: string,
-    reportToUse: { id: string; title: string; price: string; order_id: string; payment_id: string }
+    reportToUse: { id: string; title: string; price: string; order_id: string; payment_id: string; signature?: string }
   ) => {
     if (!emailToUse || !emailToUse.includes("@")) {
       alert("Please enter a valid email address.");
@@ -77,14 +205,20 @@ export default function ReportsStorePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: emailToUse,
-          seekerName: customerName || chart?.name || "Sacred Seeker",
+          seekerName: customerName || activeNatalChart?.name || "Sacred Seeker",
           reportId: reportToUse.id,
           reportTitle: reportToUse.title,
           price: reportToUse.price,
           orderId: reportToUse.order_id,
           paymentId: reportToUse.payment_id,
-          chart,
-          birth,
+          signature: reportToUse.signature,
+          chart: activeNatalChart,
+          birth: {
+            name: customerName,
+            dob: customerDob,
+            tob: customerTob,
+            city: customerCity,
+          },
         }),
       });
       const data = await res.json();
@@ -103,7 +237,7 @@ export default function ReportsStorePage() {
 
   const handlePurchaseSuccess = (
     report: { id: string; title: string; price: string },
-    data: { order_id: string; payment_id: string }
+    data: { order_id: string; payment_id: string; signature?: string }
   ) => {
     const purchaseInfo = {
       id: report.id,
@@ -111,6 +245,7 @@ export default function ReportsStorePage() {
       price: report.price,
       order_id: data.order_id,
       payment_id: data.payment_id,
+      signature: data.signature,
     };
     setPurchasedReport(purchaseInfo);
     setModalInputEmail(customerEmail || "");
@@ -121,8 +256,9 @@ export default function ReportsStorePage() {
       price: report.price,
       orderId: data.order_id,
       paymentId: data.payment_id,
-      seekerName: customerName || chart?.name || "Sacred Seeker",
-      chartSnapshot: chart || undefined,
+      signature: data.signature,
+      seekerName: customerName || activeNatalChart?.name || "Sacred Seeker",
+      chartSnapshot: activeNatalChart || undefined,
     });
 
     if (customerEmail && customerEmail.includes("@")) {
@@ -135,8 +271,8 @@ export default function ReportsStorePage() {
       setSampleLoadingId(report.id);
       await triggerDossierDownload(
         { id: report.id, title: `SAMPLE - ${report.title}` },
-        chart,
-        customerName || chart?.name || "Sample Seeker"
+        activeNatalChart,
+        customerName || activeNatalChart?.name || "Sample Seeker"
       );
     } catch (err) {
       console.error("Preview sample error:", err);
@@ -146,7 +282,7 @@ export default function ReportsStorePage() {
     }
   };
 
-  const handleDownloadDossier = async (report: { id: string; title: string; order_id: string; payment_id: string }) => {
+  const handleDownloadDossier = async (report: { id: string; title: string; order_id: string; payment_id: string; signature?: string }) => {
     try {
       setDownloading(true);
       const res = await fetch("/api/reports/generate-pdf", {
@@ -155,15 +291,21 @@ export default function ReportsStorePage() {
         body: JSON.stringify({
           reportId: report.id,
           reportTitle: report.title,
-          chart,
-          birth,
+          chart: activeNatalChart,
+          birth: {
+            name: customerName || activeNatalChart?.name || "Sacred Seeker",
+            dob: customerDob || activeNatalChart?.dob || "2000-01-01",
+            tob: customerTob || activeNatalChart?.tob || "12:00",
+            city: customerCity || activeNatalChart?.city || "New Delhi",
+          },
           customer: {
-            name: customerName || chart?.name || "Sacred Seeker",
+            name: customerName || activeNatalChart?.name || "Sacred Seeker",
             email: customerEmail,
             phone: customerPhone,
           },
           orderId: report.order_id,
           paymentId: report.payment_id,
+          signature: report.signature,
         }),
       });
 
@@ -189,15 +331,16 @@ export default function ReportsStorePage() {
     }
   };
 
-  // 1. Eight High-Converting Modular Packages (3-4 related engines each)
-  // Designed so that no single package solves everything; seekers naturally acquire 2-3 packages.
+  // 1. Eight High-Converting Modular Packages (4-in-1 deep engines each, 24-page dossier)
   const packageReports: ReportItem[] = [
     {
       id: "pkg_union_family",
       title: "💍 Sacred Union & Family Destiny Pack",
       tagline: "4-in-1 Suite: Kundali Milan, Vivah Timing, Family Karma & Mangal Dosha.",
-      price: "₹249",
-      paise: 24900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["Kundali Milan", "D-9 Navamsha", "Family Karma", "Mangal Dosha"],
       badge: "🔥 Top Marital Pack",
       badgeColor: "bg-[#e11d48] text-white",
@@ -217,15 +360,17 @@ export default function ReportsStorePage() {
       id: "pkg_bio_remedies",
       title: "🛡️ Bio-Vedic Protection & Sacred Remedy Vault",
       tagline: "4-in-1 Vault: Advance Gemstone, Astro Dot Therapy, Astro-Tattoo & Lal Kitab.",
-      price: "₹249",
-      paise: 24900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["Gemstones & Rudraksha", "Dot Therapy & Thread", "Astro-Tattoo", "Lal Kitab"],
       badge: "⚡ Energy Shield",
       badgeColor: "bg-[#16a34a] text-white",
       popular: true,
-      deliveryTime: "45 Seconds Delivery",
+      deliveryTime: "60 Seconds Delivery",
       description:
-        "The ultimate physical and esoteric bio-energy defense. Combines planetary acupressure dot points, sacred protective thread timings, talismanic tattoo geometry, and zero-cost Lal Kitab upay.",
+        "Complete 24-page physical and esoteric bio-energy defense. Combines planetary acupressure dot points, sacred protective thread timings, talismanic tattoo geometry, and zero-cost Lal Kitab upay.",
       sections: [
         "Advance Natural Gemstone & Ek-Mukhi to 14-Mukhi Rudraksha Prescription",
         "Astro Dot Therapy: Planetary Acupressure Points on Palm & Body",
@@ -238,15 +383,17 @@ export default function ReportsStorePage() {
       id: "pkg_wealth_yogas",
       title: "👑 Raja Yoga & Wealth Acceleration Suite",
       tagline: "4-in-1 Suite: 300+ Classical Yogas, KP Sub-Lord, Numerology & Transit Purchase.",
-      price: "₹249",
-      paise: 24900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["300+ Yogas", "KP Sub-Lord", "Vedic Numerology", "Transit Purchase"],
       badge: "💰 High Net-Worth",
       badgeColor: "bg-[#c8a030] text-[#FAF7F2]",
       popular: true,
       deliveryTime: "60 Seconds Delivery",
       description:
-        "Comprehensive 25-page commercial and career accelerator. Scans 300+ classical yogas for dormant wealth, locks KP job promotion sub-lords, tunes name spelling vibrations, and pinpoints asset purchase dates.",
+        "Comprehensive 24-page commercial and career accelerator. Scans 300+ classical yogas for dormant wealth, locks KP job promotion sub-lords, tunes name spelling vibrations, and pinpoints asset purchase dates.",
       sections: [
         "300+ Classical Planetary Yogas (Raja, Dhana, Gajakesari & Vipreet Yogas)",
         "KP Sub-Lord Precision Career Timing & 10th House Sub-Ruler",
@@ -259,14 +406,16 @@ export default function ReportsStorePage() {
       id: "pkg_space_destiny",
       title: "🏡 Space Energy, Palmistry & Destiny Calibration",
       tagline: "4-in-1 Suite: Astro-Vastu Radar, Samudrika Palmistry, BTR & 1-Year Transit Forecast.",
-      price: "₹249",
-      paise: 24900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["16-Zone Vastu", "Samudrika Shastra", "BTR System", "1-Year Gochar"],
       badge: "🔬 High Diagnostic",
       badgeColor: "bg-[#0284c7] text-white",
       deliveryTime: "60 Seconds Delivery",
       description:
-        "Deep diagnostic master suite. Maps your chart to home's 16 Vastu zones, scans physical hand lines via classical Samudrika shastra, rectifies uncertain birth minutes, and provides a 12-month Gochar roadmap.",
+        "Deep 24-page diagnostic master suite. Maps your chart to home's 16 Vastu zones, scans physical hand lines via classical Samudrika shastra, rectifies uncertain birth minutes, and provides a 12-month Gochar roadmap.",
       sections: [
         "Astro-Vastu Directional Radar: 16-Zone Birth Planet Home Mapping",
         "Samudrika Shastra Palm Mounts & Vital Line Synchronicity",
@@ -279,14 +428,16 @@ export default function ReportsStorePage() {
       id: "pkg_stock_trading",
       title: "📈 Stock Market, Trading & Speculation Pack",
       tagline: "4-in-1 Suite: Sarvatobhadra Hit Radar, Ashtakavarga 337-Bindus, 5th/11th House Speculation & Transit Timing.",
-      price: "₹299",
-      paise: 29900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["Sarvatobhadra", "Ashtakavarga", "5th/11th Speculation", "Intraday Muhurat"],
       badge: "📊 Trader Speculation",
       badgeColor: "bg-[#059669] text-white",
       deliveryTime: "60 Seconds Delivery",
       description:
-        "Specialized financial astrology suite for equity, crypto, F&O and commodity traders. Combines 28-nakshatra Sarvatobhadra vedha hit lines, Ashtakavarga bindu strength, and volatile planetary aspects.",
+        "Specialized 24-page financial astrology suite for equity, crypto, F&O and commodity traders. Combines 28-nakshatra Sarvatobhadra vedha hit lines, Ashtakavarga bindu strength, and volatile planetary aspects.",
       sections: [
         "Sarvatobhadra Chakra 28-Nakshatra Vedha (Cross-Ray) Hit Detection",
         "5th House (Speculative Gain) & 11th House (Profit Inflow) Planetary Strength",
@@ -299,14 +450,16 @@ export default function ReportsStorePage() {
       id: "pkg_jaimini_soul",
       title: "🧘 Jaimini Soul Blueprint & Karmic Mission",
       tagline: "4-in-1 Suite: Atmakaraka Soul Purpose, Karakamsa Lagna, Chara Dasha & Arudha Lagna.",
-      price: "₹249",
-      paise: 24900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["Atmakaraka", "Karakamsa", "Chara Dasha", "Arudha Lagna"],
       badge: "👁️ Soul Awakening",
       badgeColor: "bg-[#7c3aed] text-white",
-      deliveryTime: "45 Seconds Delivery",
+      deliveryTime: "60 Seconds Delivery",
       description:
-        "Unlocks Jaimini Sutras to reveal your soul's deepest mission (Atmakaraka), spiritual liberation path (Karakamsa), external societal illusion/reputation (Arudha Lagna), and sign-based Chara dasha timing.",
+        "Exhaustive 24-page Jaimini Sutras dossier revealing your soul's deepest mission (Atmakaraka), spiritual liberation path (Karakamsa), external societal illusion/reputation (Arudha Lagna), and sign-based Chara dasha timing.",
       sections: [
         "Atmakaraka (King of Soul) & Amatyakaraka (Career Guide) Secret Matrix",
         "Karakamsa Lagna in Navamsha: Ishta Devata & Spiritual Liberation Blueprint",
@@ -319,14 +472,16 @@ export default function ReportsStorePage() {
       id: "pkg_ayurvedic_medical",
       title: "⚕️ Ayurvedic Medical & Psychological Vitality Shield",
       tagline: "4-in-1 Suite: Medical Astrology, Tridosha Balance, Cognitive Stress & Astro-Sound Hz.",
-      price: "₹199",
-      paise: 19900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["Medical Kundli", "Tridosha Balance", "Cognitive Health", "Planetary Hz"],
       badge: "🌿 Vitality & Longevity",
       badgeColor: "bg-[#0284c7] text-white",
-      deliveryTime: "45 Seconds Delivery",
+      deliveryTime: "60 Seconds Delivery",
       description:
-        "Preventive bio-astrological health audit. Maps planetary afflictions to bodily organ vulnerabilities, Vata-Pitta-Kapha tridosha imbalances, Moon-Mercury cognitive stress, and restorative planetary frequencies.",
+        "Comprehensive 24-page preventive bio-astrological health audit. Maps planetary afflictions to bodily organ vulnerabilities, Vata-Pitta-Kapha tridosha imbalances, Moon-Mercury cognitive stress, and restorative planetary frequencies.",
       sections: [
         "6th, 8th & 12th House Medical Vulnerability & Organ Weakness Audit",
         "Ayurvedic Tridosha (Vata / Pitta / Kapha) Natal Constitution Analysis",
@@ -339,14 +494,16 @@ export default function ReportsStorePage() {
       id: "pkg_muhurat_panchang",
       title: "⚡ Golden Muhurat & Auspicious Decision Suite",
       tagline: "4-in-1 Suite: Instant Prashna, Choghadiya & Hora Radar, Transit Purchase & Tithi Audit.",
-      price: "₹149",
-      paise: 14900,
+      price: "₹499",
+      originalPrice: "₹1,499",
+      discountBadge: "67% OFF",
+      paise: 49900,
       vargas: ["Prashna Shastra", "Choghadiya", "Hora Radar", "Muhurat Engine"],
       badge: "⏱️ Perfect Timing",
       badgeColor: "bg-[#d97706] text-white",
-      deliveryTime: "Instant 30s",
+      deliveryTime: "60 Seconds Delivery",
       description:
-        "Never take a major leap during Rahu Kaal or Bhadra. Equips you with instant horary answers, 24/7 planetary Hora and Choghadiya windows, and personalized high-yield decision dates.",
+        "Essential 24-page strategic timing handbook. Equips you with instant horary answers, 24/7 planetary Hora and Choghadiya windows, Rahu Kaal mitigation, and personalized high-yield decision dates.",
       sections: [
         "Instant Prashna Kundli: Binary Yes/No Analysis for Immediate Dilemmas",
         "24-Hour Planetary Hora & Choghadiya Real-Time Energy Windows",
@@ -363,10 +520,12 @@ export default function ReportsStorePage() {
       id: "destiny_curve_flagship",
       title: "📈 Destiny Curve: 90-Year Life Master Dossier",
       tagline: "Vimshottari Dasha life score curve (Age 0-90), Navtara 9-Chakra, Peak windows & 6 life areas.",
-      price: "₹499",
-      paise: 49900,
+      price: "₹999",
+      originalPrice: "₹3,499",
+      discountBadge: "71% OFF",
+      paise: 99900,
       vargas: ["Vimshottari Dasha", "Navtara Chakra", "0-90 Life Arc", "Antardasha Radar", "6 Life Pillars"],
-      badge: "👑 Flagship Report",
+      badge: "👑 Most Popular Flagship • 24 Pages",
       badgeColor: "bg-gradient-to-r from-[#c8a030] to-[#b45309] text-white shadow-sm",
       popular: true,
       deliveryTime: "60 Seconds Delivery",
@@ -843,19 +1002,43 @@ export default function ReportsStorePage() {
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16 flex-1 w-full">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
           <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-[#c8a030] mb-3">
             <span>✦</span>
-            <span>Unbundled Precision Astrology • 35+ Vedic Engines</span>
+            <span>Certified 24-Page Parashari Shastra Dossiers • Swiss Ephemeris 0.01°</span>
             <span>✦</span>
           </div>
           <h1 className="font-serif text-3xl sm:text-5xl font-semibold tracking-tight text-[#1A1A1A] leading-tight">
             Specialized Cosmic <em className="italic text-[#c8a030] font-normal">Dossiers</em>
           </h1>
           <p className="mt-3 text-[#6B635B] text-sm sm:text-base leading-relaxed">
-            Don&apos;t pay for general astrology. Get hyper-targeted, 15 to 25-page dossiers generated
-            from your exact birth coordinates by our specialized mathematical engines.
+            Don&apos;t settle for generic computer prints. Acquire hyper-targeted, 24-page shastric dossiers
+            synthesized from your exact astronomical coordinates by our 35+ Parashari & Jaimini calculation modules.
           </p>
+        </div>
+
+        {/* 4-Pillar Shastric Trust Badges */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto mb-10 text-center">
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E7DFD5] shadow-xs flex flex-col items-center">
+            <span className="text-base mb-1">🏛️</span>
+            <div className="text-[11px] font-bold text-[#1A1A1A]">100% Classical Shastra</div>
+            <div className="text-[9.5px] text-[#6B635B]">Parashari & Jaimini Sutras</div>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E7DFD5] shadow-xs flex flex-col items-center">
+            <span className="text-base mb-1">📐</span>
+            <div className="text-[11px] font-bold text-[#1A1A1A]">Swiss Ephemeris 0.01°</div>
+            <div className="text-[9.5px] text-[#6B635B]">Astronomical Precision</div>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E7DFD5] shadow-xs flex flex-col items-center">
+            <span className="text-base mb-1">⚡</span>
+            <div className="text-[11px] font-bold text-[#1A1A1A]">Instant 60s Delivery</div>
+            <div className="text-[9.5px] text-[#6B635B]">24-Page Official PDF</div>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E7DFD5] shadow-xs flex flex-col items-center">
+            <span className="text-base mb-1">🛡️</span>
+            <div className="text-[11px] font-bold text-[#1A1A1A]">Pure Vedic Remedies</div>
+            <div className="text-[9.5px] text-[#6B635B]">Zero Gemstone Upsells</div>
+          </div>
         </div>
 
         {/* Category Tabs */}
@@ -871,9 +1054,9 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>🌟</span>
-              <span>8 Power Bundles</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c8a030]/15 text-[#a07820] font-bold">
-                ₹149 - ₹299
+              <span>8 Power Dossiers (24 Pgs)</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#16a34a]/15 text-[#15803d] font-bold">
+                ₹499 (67% OFF)
               </span>
             </button>
 
@@ -887,9 +1070,9 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>⚡</span>
-              <span>Single & Flagship Tools (22)</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3c2880]/10 text-[#3c2880] font-bold">
-                From ₹49
+              <span>Single & Flagship Tools</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c8a030]/15 text-[#a07820] font-bold">
+                Flagship ₹999
               </span>
             </button>
 
@@ -903,48 +1086,125 @@ export default function ReportsStorePage() {
               }`}
             >
               <span>👑</span>
-              <span>All-35 Engines Pass</span>
+              <span>Sovereign All-Access Pass</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#16a34a]/15 text-[#16a34a] font-bold">
-                Save 65%
+                Save 67% • ₹1,999
               </span>
             </button>
           </div>
         </div>
 
         {/* Seeker Input Details Bar */}
-        <div ref={deliveryFormRef} className="bg-[#FFFFFF] border-2 border-[#c8a030]/40 rounded-2xl p-5 mb-10 max-w-4xl mx-auto shadow-sm">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#c8a030] flex items-center gap-1.5">
-              <span>✦</span> Step 1: Provide Delivery Information
-            </span>
-            <span className="text-[11px] text-[#6B635B]">
-              PDF will be generated and dispatched to this email immediately
-            </span>
+        <div ref={deliveryFormRef} className="bg-[#FFFFFF] border-2 border-[#c8a030]/60 rounded-3xl p-6 mb-12 max-w-4xl mx-auto shadow-[0_8px_30px_rgba(200,160,48,0.12)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E7DFD5]">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#c8a030] flex items-center gap-1.5">
+                <span>✦</span> Step 1: Cosmic Identity & Natal Anchor
+              </span>
+              <p className="text-[11px] text-[#6B635B] mt-0.5">
+                Exact birth coordinates are required for Swiss Ephemeris mathematical precision
+              </p>
+            </div>
+            {activeNatalChart && customerDob && customerCity ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#16a34a]/10 border border-[#16a34a]/30 text-[#16a34a] text-[11px] font-semibold">
+                <span>✓</span>
+                <span>Anchor Verified: {activeNatalChart.lagnaRashi} Lagna · {activeNatalChart.planets?.["Moon"]?.sign} Moon ({activeNatalChart.planets?.["Moon"]?.nakshatra})</span>
+              </div>
+            ) : (
+              <span className="text-[11px] font-medium text-[#b45309] bg-[#b45309]/10 px-3 py-1 rounded-full">
+                ⚠️ Complete birth details below to calculate custom dossier
+              </span>
+            )}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input
-              type="text"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="Full Name (e.g. Rahul Sharma)"
-              className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030]"
-            />
-            <input
-              id="seeker-email-input"
-              type="email"
-              required
-              value={customerEmail}
-              onChange={(e) => setCustomerEmail(e.target.value)}
-              placeholder="Email (required for PDF delivery) *"
-              className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030] transition-all"
-            />
-            <input
-              type="tel"
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              placeholder="Mobile Number (+91)"
-              className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030]"
-            />
+
+          {formValidationError && (
+            <div className="mt-3 p-3 rounded-xl bg-[#e11d48]/10 border border-[#e11d48]/30 text-[#e11d48] text-xs font-medium flex items-center gap-2">
+              <span>⚠️</span>
+              <span>{formValidationError}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-4">
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#6B635B] mb-1">
+                Full Name *
+              </label>
+              <input
+                id="seeker-name-input"
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="Seeker Name (e.g. Rahul Sharma)"
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#6B635B] mb-1">
+                Date of Birth *
+              </label>
+              <input
+                id="seeker-dob-input"
+                type="date"
+                required
+                value={customerDob}
+                onChange={(e) => setCustomerDob(e.target.value)}
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#6B635B] mb-1">
+                Time of Birth (Approx) *
+              </label>
+              <input
+                id="seeker-tob-input"
+                type="time"
+                required
+                value={customerTob}
+                onChange={(e) => setCustomerTob(e.target.value)}
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#6B635B] mb-1">
+                Birth City / Place *
+              </label>
+              <input
+                id="seeker-city-input"
+                type="text"
+                required
+                value={customerCity}
+                onChange={(e) => setCustomerCity(e.target.value)}
+                placeholder="City (e.g. Mumbai, Delhi, London)"
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#6B635B] mb-1">
+                Email for PDF Dispatch *
+              </label>
+              <input
+                id="seeker-email-input"
+                type="email"
+                required
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                placeholder="name@example.com"
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#6B635B] mb-1">
+                Mobile Number (Optional)
+              </label>
+              <input
+                id="seeker-phone-input"
+                type="tel"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                placeholder="+91 98765 43210"
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
+              />
+            </div>
           </div>
         </div>
 
@@ -970,12 +1230,24 @@ export default function ReportsStorePage() {
               <div>Payment: <span className="font-semibold text-[#1A1A1A]">{purchasedReport.payment_id}</span></div>
             </div>
             <div className="pt-2 flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/dashboard/report"
-                className="flex-1 text-center py-2.5 px-4 rounded-xl bg-[#16a34a] text-white font-semibold text-xs tracking-wider uppercase shadow-sm hover:bg-[#15803d] transition-colors"
+              <button
+                type="button"
+                onClick={() => handleDownloadDossier(purchasedReport)}
+                disabled={downloading}
+                className="flex-1 text-center py-2.5 px-4 rounded-xl bg-[#16a34a] text-white font-semibold text-xs tracking-wider uppercase shadow-sm hover:bg-[#15803d] transition-colors flex items-center justify-center gap-2"
               >
-                Open in Report Viewer →
-              </Link>
+                {downloading ? (
+                  <>
+                    <span className="animate-spin text-xs">⟳</span>
+                    <span>Generating Official 24-Page PDF...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>📥</span>
+                    <span>Download Official 24-Page PDF Dossier</span>
+                  </>
+                )}
+              </button>
               <Link
                 href="/dashboard"
                 className="py-2.5 px-4 text-center rounded-xl bg-white border border-[#16a34a]/40 text-[#16a34a] font-semibold text-xs transition-colors hover:bg-slate-50"
@@ -1029,12 +1301,22 @@ export default function ReportsStorePage() {
                         {report.tagline}
                       </p>
 
-                      <div className="flex items-baseline gap-1 mb-3">
+                      <div className="flex items-baseline gap-2 mb-3">
                         <span className="font-serif text-3xl font-bold text-[#1A1A1A]">
                           {report.price}
                         </span>
+                        {report.originalPrice && (
+                          <span className="text-xs line-through text-[#9C948A] font-medium">
+                            {report.originalPrice}
+                          </span>
+                        )}
+                        {report.discountBadge && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#16a34a]/10 text-[#15803d] border border-[#16a34a]/30">
+                            {report.discountBadge}
+                          </span>
+                        )}
                         <span className="text-xs text-[#6B635B] font-medium">
-                          • One-time payment
+                          • 24-Page Dossier
                         </span>
                       </div>
 
@@ -1076,7 +1358,7 @@ export default function ReportsStorePage() {
                         currency="INR"
                         name="AstroLife"
                         description={`${report.title} • ${report.price}`}
-                        buttonText={`Get Instant Report · ${report.price}`}
+                        buttonText={`Unlock Full 24-Page Dossier · ${report.price}`}
                         onBeforeCheckout={requireCustomerContact}
                         prefill={{
                           name: customerName,
@@ -1088,11 +1370,14 @@ export default function ReportsStorePage() {
 
                       <button
                         type="button"
-                        onClick={() => setPreviewModalReport(report)}
-                        className="w-full mt-2 py-2 px-3 rounded-xl border border-[#c8a030]/40 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                        onClick={() => {
+                          setPreviewPageIndex(0);
+                          setPreviewModalReport(report);
+                        }}
+                        className="w-full mt-2 py-2 px-3 rounded-xl border border-[#c8a030]/50 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                       >
-                        <span>👁️</span>
-                        <span>View Sample Preview</span>
+                        <span>📖</span>
+                        <span>Interactive Flipbook Preview (5 Pages)</span>
                       </button>
 
                       <div className="text-[11px] text-center text-[#9C948A] mt-2 flex items-center justify-center gap-1">
@@ -1151,10 +1436,20 @@ export default function ReportsStorePage() {
                         {report.tagline}
                       </p>
 
-                      <div className="flex items-baseline gap-1 mb-3">
+                      <div className="flex items-baseline gap-2 mb-3">
                         <span className="font-serif text-3xl font-bold text-[#1A1A1A]">
                           {report.price}
                         </span>
+                        {report.originalPrice && (
+                          <span className="text-xs line-through text-[#9C948A] font-medium">
+                            {report.originalPrice}
+                          </span>
+                        )}
+                        {report.discountBadge && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#16a34a]/10 text-[#15803d] border border-[#16a34a]/30">
+                            {report.discountBadge}
+                          </span>
+                        )}
                         <span className="text-xs text-[#6B635B] font-medium">
                           • One-time unlock
                         </span>
@@ -1210,11 +1505,14 @@ export default function ReportsStorePage() {
 
                       <button
                         type="button"
-                        onClick={() => setPreviewModalReport(report)}
-                        className="w-full mt-2 py-2 px-3 rounded-xl border border-[#3c2880]/30 text-[#3c2880] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                        onClick={() => {
+                          setPreviewPageIndex(0);
+                          setPreviewModalReport(report);
+                        }}
+                        className="w-full mt-2 py-2 px-3 rounded-xl border border-[#3c2880]/30 text-[#3c2880] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                       >
-                        <span>👁️</span>
-                        <span>View Sample Preview</span>
+                        <span>📖</span>
+                        <span>Interactive Flipbook Preview</span>
                       </button>
 
                       <div className="text-[11px] text-center text-[#9C948A] mt-2 flex items-center justify-center gap-1">
@@ -1236,7 +1534,7 @@ export default function ReportsStorePage() {
             {/* Sovereign Annual Pass */}
             <div className="bg-[#FFFFFF] border-2 border-[#c8a030] rounded-3xl p-8 relative shadow-[0_16px_40px_rgba(200,160,48,0.22)] flex flex-col justify-between">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#c8a030] to-[#a07820] text-[#FAF7F2] text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full shadow-sm">
-                🔥 Best Value • Save 65%
+                🔥 Best Value • Save 67%
               </div>
 
               <div>
@@ -1247,13 +1545,17 @@ export default function ReportsStorePage() {
                   AstroLife Sovereign Annual Pass
                 </h3>
                 <p className="text-xs text-[#6B635B] mb-6 leading-relaxed">
-                  Unlock every single report and all 35+ specialized astrological engines for a full
+                  Unlock every single report, all 8 power packages, and all 35+ specialized astrological engines for a full
                   365 days. Zero per-report fees.
                 </p>
 
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className="font-serif text-5xl font-bold text-[#1A1A1A]">₹999</span>
-                  <span className="text-xs text-[#6B635B] font-medium">/ full year (₹83/mo)</span>
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="font-serif text-5xl font-bold text-[#1A1A1A]">₹1,999</span>
+                  <span className="text-sm line-through text-[#9C948A] font-medium">₹5,999</span>
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#16a34a]/10 text-[#15803d] border border-[#16a34a]/30">
+                    67% OFF
+                  </span>
+                  <span className="text-xs text-[#6B635B] font-medium">/ full year</span>
                 </div>
 
                 <div className="h-[1px] bg-[#E7DFD5] mb-6"></div>
@@ -1261,7 +1563,11 @@ export default function ReportsStorePage() {
                 <ul className="space-y-3 mb-8 text-xs text-[#4A4238]">
                   <li className="flex items-start gap-2">
                     <span className="text-[#c8a030]">✦</span>
-                    <span><strong>All 5 Master Life Dossiers</strong> (Career, Marriage, Lal Kitab, Vastu, Health) included</span>
+                    <span><strong>All 8 Power 24-Page Dossiers</strong> (Union, Wealth, Protection, Space, Trading, Soul, Medical, Muhurat) included</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#c8a030]">✦</span>
+                    <span><strong>90-Year Destiny Curve Flagship</strong> Lifetime dossier included</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#c8a030]">✦</span>
@@ -1279,11 +1585,11 @@ export default function ReportsStorePage() {
               </div>
 
               <RazorpayCheckoutButton
-                amount={99900}
+                amount={199900}
                 currency="INR"
                 name="AstroLife"
-                description="AstroLife Sovereign Annual Pass • ₹999/yr"
-                buttonText="Get 1-Year Sovereign Pass · ₹999"
+                description="AstroLife Sovereign Annual Pass • ₹1,999/yr"
+                buttonText="Get 1-Year Sovereign Pass · ₹1,999"
                 onBeforeCheckout={requireCustomerContact}
                 prefill={{
                   name: customerName,
@@ -1294,9 +1600,10 @@ export default function ReportsStorePage() {
                   setPurchasedReport({
                     id: "sovereign_pass",
                     title: "AstroLife Sovereign Annual Pass",
-                    price: "₹999",
+                    price: "₹1,999",
                     order_id: data.order_id,
                     payment_id: data.payment_id,
+                    signature: data.signature,
                   });
                 }}
               />
@@ -1541,7 +1848,7 @@ export default function ReportsStorePage() {
           </div>
         )}
 
-        {/* Interactive In-Page Sample Preview Modal */}
+        {/* Interactive In-Page 5-Page Parashari Flipbook Preview Modal */}
         {previewModalReport && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
@@ -1552,7 +1859,7 @@ export default function ReportsStorePage() {
               if (e.key === "Escape") setPreviewModalReport(null);
             }}
           >
-            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-5 sm:p-8 max-w-2xl w-full shadow-2xl relative max-h-[92vh] overflow-y-auto ring-1 ring-[#c8a030]/20">
+            <div className="bg-[#FAF7F2] border-2 border-[#c8a030] rounded-3xl p-5 sm:p-7 max-w-3xl w-full shadow-2xl relative max-h-[94vh] overflow-y-auto ring-1 ring-[#c8a030]/20 flex flex-col justify-between">
               <button
                 type="button"
                 onClick={() => setPreviewModalReport(null)}
@@ -1562,9 +1869,9 @@ export default function ReportsStorePage() {
                 ✕
               </button>
 
-              <div className="text-center mb-5">
+              <div className="text-center mb-4">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#a07820] block mb-1">
-                  ✦ Sacred Shastra Dossier Live Preview ✦
+                  ✦ Sacred Shastra Dossier Live Flipbook Preview ✦
                 </span>
                 <h3
                   id="sample-modal-title"
@@ -1572,118 +1879,278 @@ export default function ReportsStorePage() {
                 >
                   {previewModalReport.title}
                 </h3>
-                <p className="text-xs text-[#6B635B] mt-1">
-                  Official Vector A4 Preview • Computed from Active Planetary Coordinates
+                <p className="text-xs text-[#6B635B] mt-0.5">
+                  Official 24-Page Parashari Vector Dossier • Computed from Active Planetary Coordinates
                 </p>
               </div>
 
-              {/* Realistic Sample Document Simulation Card */}
-              <div className="bg-white border-2 border-[#B8860B]/50 rounded-2xl p-5 sm:p-6 shadow-md text-left relative overflow-hidden mb-6">
+              {/* Flipbook Page Selector Tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 border-b border-[#E7DFD5]">
+                {[
+                  { idx: 0, label: "1. Sacred Cover", icon: "✦" },
+                  { idx: 1, label: "2. Shastric Overview", icon: "📊" },
+                  { idx: 2, label: "3. D-1 Kundli Map", icon: "🪐" },
+                  { idx: 3, label: "4. D-9 Navamsha", icon: "💍" },
+                  { idx: 4, label: "5. Locked Vault (19 Pgs)", icon: "🔒" },
+                ].map((tab) => (
+                  <button
+                    key={tab.idx}
+                    type="button"
+                    onClick={() => setPreviewPageIndex(tab.idx)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                      previewPageIndex === tab.idx
+                        ? "bg-[#c8a030] text-[#1A1A1A] shadow-sm font-bold border border-[#c8a030]"
+                        : "bg-white text-[#6B635B] hover:text-[#1A1A1A] border border-[#E7DFD5]"
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Realistic A4 Document Simulation Stage */}
+              <div className="bg-white border-2 border-[#B8860B]/50 rounded-2xl p-5 sm:p-6 shadow-md text-left relative overflow-hidden mb-4 min-h-[440px] flex flex-col justify-between">
                 {/* Visual Gold Corner Accent Marks */}
                 <div className="absolute top-2.5 left-2.5 w-3.5 h-3.5 border-t-2 border-l-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
                 <div className="absolute top-2.5 right-2.5 w-3.5 h-3.5 border-t-2 border-r-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
                 <div className="absolute bottom-2.5 left-2.5 w-3.5 h-3.5 border-b-2 border-l-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
                 <div className="absolute bottom-2.5 right-2.5 w-3.5 h-3.5 border-b-2 border-r-2 border-[#B8860B] pointer-events-none" aria-hidden="true"></div>
 
-                {/* Subtle watermark */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] rotate-[-25deg] select-none text-5xl font-serif font-black text-[#1A1A1A]">
-                  ASTROLIFE SAMPLE
-                </div>
-
-                <div className="border-b border-[#E7DFD5] pb-3 mb-4 flex justify-between items-center text-xs">
+                {/* Top Document Rail */}
+                <div className="border-b border-[#E7DFD5] pb-2.5 mb-3 flex justify-between items-center text-xs">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[#8C6508] font-bold">✦</span>
                     <span className="font-serif font-bold text-[#8C6508] tracking-widest text-[11px]">
-                      ASTROLIFE • SACRED SHASTRA DOSSIER
+                      ASTROLIFE • SACRED SHASTRA ARCHIVE
                     </span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#15803d] text-[10px] font-bold border border-[#16a34a]/30">
-                    Official Vector PDF
+                  <span className="px-2 py-0.5 rounded-full bg-[#16a34a]/15 text-[#15803d] text-[10px] font-bold border border-[#16a34a]/30">
+                    Page {previewPageIndex + 1} of 5 (Sample Preview)
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-xs bg-[#FAF7F0] p-3.5 rounded-xl border border-[#E0D7C6] mb-4">
-                  <div>
-                    <span className="text-[#6B635B] block text-[10px] font-medium">Seeker Name</span>
-                    <strong className="text-[#1A1A1A]">{customerName || chart?.name || "Sacred Seeker"}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#6B635B] block text-[10px] font-medium">Ascendant / Moon</span>
-                    <strong className="text-[#8C6508]">{chart?.lagnaRashi || "Ascendant"} • {chart?.planets?.Moon?.sign || "Chandra"}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#6B635B] block text-[10px] font-medium">Active Mahadasha</span>
-                    <strong className="text-[#1A1A1A]">{chart?.dashas?.[0]?.planet || "Jupiter"} Mahadasha</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#6B635B] block text-[10px] font-medium">Ephemeris Precision</span>
-                    <strong className="text-[#1A1A1A]">Swiss Ephemeris 0.01°</strong>
-                  </div>
-                </div>
-
-                <div className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
-                  <span className="text-[#c8a030]">✦</span>
-                  <span>Included Official Chapters (20-24 Pages):</span>
-                </div>
-
-                <ul className="space-y-2 text-xs text-[#4A4238] mb-4">
-                  {previewModalReport.sections.map((sec, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5" aria-hidden="true">✓</span>
-                      <span><strong>Chapter {idx + 1}:</strong> {sec}</span>
-                    </li>
-                  ))}
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#16a34a] font-bold text-sm leading-none mt-0.5" aria-hidden="true">✓</span>
-                    <span><strong>Chapter {previewModalReport.sections.length + 1}:</strong> 100% Free Authentic Classical Remedial Blueprint (Japa, Dana, Lifestyle Vastu)</span>
-                  </li>
-                </ul>
-
-                {/* Visual Vector PDF Miniature Sheet Preview */}
-                <div className="bg-gradient-to-b from-[#FBF8F3] to-[#F3EAD9] border-2 border-[#D8C7A5] rounded-xl p-3.5 mb-4 shadow-inner">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-[#8C6508] mb-2 uppercase tracking-wider">
-                    <span className="flex items-center gap-1">
-                      <span>📑</span>
-                      <span>Page 2 Vector Shastra Preview:</span>
-                    </span>
-                    <span className="bg-[#8C6508]/10 text-[#8C6508] px-2 py-0.5 rounded text-[9px]">Graha Sthiti Kundli Matrix</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2 text-[10px] font-mono text-center">
-                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
-                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">LAGNA</span>
-                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.lagnaRashi || "Asc"}</strong>
+                {/* PAGE 1: SACRED COVER */}
+                {previewPageIndex === 0 && (
+                  <div className="space-y-4 my-auto">
+                    <div className="text-center">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-[#a07820] mb-1">
+                        ✦ VEDIC EPHEMERIS RECORD ✦
+                      </div>
+                      <h4 className="font-serif text-2xl font-bold text-[#1A1A1A] mb-1.5">
+                        {previewModalReport.title}
+                      </h4>
+                      <p className="text-xs text-[#6B635B] max-w-md mx-auto">
+                        Exhaustive multi-varga astrological synthesis calculated with Swiss Ephemeris astronomical precision, Parashari principles, and Jaimini Sutras.
+                      </p>
                     </div>
-                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
-                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">CHANDRA</span>
-                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.planets?.Moon?.sign?.slice(0, 5) || "Moon"}</strong>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs bg-[#FAF7F0] p-4 rounded-xl border border-[#E0D7C6]">
+                      <div>
+                        <span className="text-[#6B635B] block text-[10px] font-medium">Seeker Name</span>
+                        <strong className="text-[#1A1A1A] text-sm">{customerName || activeNatalChart?.name || "Sacred Seeker"}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[#6B635B] block text-[10px] font-medium">Date & Time of Birth</span>
+                        <strong className="text-[#1A1A1A] text-sm">{customerDob || activeNatalChart?.dob || "Recorded"} · {customerTob || activeNatalChart?.tob || "12:00"} IST</strong>
+                      </div>
+                      <div>
+                        <span className="text-[#6B635B] block text-[10px] font-medium">Birth Location & Coords</span>
+                        <strong className="text-[#1A1A1A]">{customerCity || activeNatalChart?.city || "New Delhi"}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[#6B635B] block text-[10px] font-medium">Lagna & Nakshatra Anchor</span>
+                        <strong className="text-[#8C6508]">{activeNatalChart?.lagnaRashi || "Ascendant"} Lagna · {activeNatalChart?.planets?.["Moon"]?.nakshatra || "Rohini"} Nakshatra</strong>
+                      </div>
                     </div>
-                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
-                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">SURYA</span>
-                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.planets?.Sun?.sign?.slice(0, 5) || "Sun"}</strong>
-                    </div>
-                    <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-lg border border-[#E7DFD5] shadow-xs">
-                      <span className="text-[#6B635B] block text-[8px] font-sans font-bold">SHANI</span>
-                      <strong className="text-[#1A1A1A] text-[11px]">{chart?.planets?.Saturn?.sign?.slice(0, 5) || "Saturn"}</strong>
+
+                    <div className="p-3 rounded-xl bg-[#FAF0D7] border border-[#c8a030]/35 flex items-center justify-between text-xs text-[#8C6508]">
+                      <span className="flex items-center gap-2">
+                        <span>✓</span>
+                        <span><strong>Swiss Ephemeris 0.01° Precision:</strong> Calculated for exact longitude and latitude.</span>
+                      </span>
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-[#a07820]">Official Seal</span>
                     </div>
                   </div>
-                  <div className="mt-2.5 text-[9.5px] text-[#8C6508] font-medium text-center">
-                    ✨ Full 24-page vector edition contains D1/D9 charts, 300+ classical yogas, and exact planetary degrees.
-                  </div>
-                </div>
+                )}
 
-                <div className="p-3.5 rounded-xl bg-[#FAF0D7] border border-[#c8a030]/35 text-[11px] text-[#8C6508] leading-relaxed">
-                  <strong>Ethical Vedic Guarantee:</strong> Zero fear-mongering and no commercial upsells. Every recommendation is purely classical, empowering you with actionable guidance for your life path.
+                {/* PAGE 2: EXECUTIVE SHASTRIC OVERVIEW */}
+                {previewPageIndex === 1 && (
+                  <div className="space-y-3.5 my-auto">
+                    <div>
+                      <h4 className="font-serif text-lg font-bold text-[#1A1A1A] mb-1">Executive Shastric Overview & Natal Indices</h4>
+                      <p className="text-xs text-[#6B635B]">Core cosmic indices governing psychological temperaments, vital strength, and evolutionary soul focus.</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E0D7C6]">
+                        <span className="text-[#8C6508] font-bold block text-[10px] uppercase">✦ Janma Rashi & Chandra Kundli</span>
+                        <p className="text-[#4A4238] mt-1 text-[11.5px]">
+                          Moon placed in <strong>{activeNatalChart?.planets?.["Moon"]?.sign || "Taurus"}</strong> under <strong>{activeNatalChart?.planets?.["Moon"]?.nakshatra || "Rohini"}</strong> nakshatra. Dispositor of psychological immunity, memory, and instincts.
+                        </p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E0D7C6]">
+                        <span className="text-[#8C6508] font-bold block text-[10px] uppercase">✦ Ascendant (Lagna) Foundation</span>
+                        <p className="text-[#4A4238] mt-1 text-[11.5px]">
+                          Ascendant in <strong>{activeNatalChart?.lagnaRashi || "Scorpio"}</strong>. Primary vector of physical constitution, worldly dharma, and instinctual reaction patterns.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                      <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
+                        <span className="text-[9px] text-[#6B635B] block font-bold">TITHI</span>
+                        <strong className="text-[#1A1A1A] text-[11px]">Shukla / Krishna</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
+                        <span className="text-[9px] text-[#6B635B] block font-bold">VARA</span>
+                        <strong className="text-[#1A1A1A] text-[11px]">Solar Day</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
+                        <span className="text-[9px] text-[#6B635B] block font-bold">YOGA</span>
+                        <strong className="text-[#1A1A1A] text-[11px]">Shubh Yoga</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
+                        <span className="text-[9px] text-[#6B635B] block font-bold">ACTIVE DASHA</span>
+                        <strong className="text-[#c8a030] text-[11px]">{activeNatalChart?.dashas?.find((d) => d.active)?.planet || "Jupiter"} MD</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* PAGE 3: D-1 KUNDLI STAR MAP */}
+                {previewPageIndex === 2 && (
+                  <div className="space-y-3 my-auto">
+                    <div>
+                      <h4 className="font-serif text-lg font-bold text-[#1A1A1A] mb-1">Natal Star Map & Diamond Kundli (D-1)</h4>
+                      <p className="text-xs text-[#6B635B]">Traditional North-Indian diamond chart mapping all 12 bhavas at the exact epoch of birth.</p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <div className="p-2 rounded-xl bg-[#FAF7F0] border border-[#E0D7C6] shrink-0">
+                        <KundliDiamondSvg chart={activeNatalChart} isD9={false} size={220} />
+                      </div>
+                      <div className="flex-1 space-y-2 text-xs w-full">
+                        <div className="p-2.5 rounded-lg bg-white border border-[#E7DFD5]">
+                          <span className="text-[9px] text-[#8C6508] font-bold block uppercase">Ascendant (Lagna)</span>
+                          <strong className="text-[#1A1A1A]">{activeNatalChart?.lagnaRashi || "Ascendant"}</strong>
+                          <p className="text-[10.5px] text-[#6B635B] mt-0.5">Physical vitality, temperament, and life purpose anchor.</p>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-white border border-[#E7DFD5]">
+                          <span className="text-[9px] text-[#8C6508] font-bold block uppercase">Chandra Rashi</span>
+                          <strong className="text-[#1A1A1A]">{activeNatalChart?.planets?.["Moon"]?.sign || "Moon"} ({activeNatalChart?.planets?.["Moon"]?.nakshatra || "Rohini"})</strong>
+                          <p className="text-[10.5px] text-[#6B635B] mt-0.5">Subconscious architecture and emotional responsiveness.</p>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-white border border-[#E7DFD5]">
+                          <span className="text-[9px] text-[#c8a030] font-bold block uppercase">Active Governing Cycle</span>
+                          <strong className="text-[#c8a030]">{activeNatalChart?.dashas?.find((d) => d.active)?.planet || "Jupiter"} Mahadasha</strong>
+                          <p className="text-[10.5px] text-[#6B635B] mt-0.5">Primary governing energetic lifecycle at current age.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* PAGE 4: D-9 NAVAMSHA HARMONIC CHART */}
+                {previewPageIndex === 3 && (
+                  <div className="space-y-3 my-auto">
+                    <div>
+                      <h4 className="font-serif text-lg font-bold text-[#1A1A1A] mb-1">D-9 Navamsha: Soul Dharma & Maturity</h4>
+                      <p className="text-xs text-[#6B635B]">The 9th harmonic division evaluates spiritual maturity, marital synastry, and refined planetary strength in the second half of life.</p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <div className="p-2 rounded-xl bg-[#FAF7F0] border border-[#E0D7C6] shrink-0">
+                        <KundliDiamondSvg chart={activeNatalChart} isD9={true} size={220} />
+                      </div>
+                      <div className="flex-1 space-y-2 text-xs w-full">
+                        <div className="p-2.5 rounded-lg bg-white border border-[#E7DFD5]">
+                          <span className="text-[9px] text-[#8C6508] font-bold block uppercase">✦ Navamsha Harmonic Potency</span>
+                          <p className="text-[11px] text-[#4A4238] mt-0.5">Reveals internal character, subconscious spiritual direction, and marriage partner alignment.</p>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-white border border-[#E7DFD5]">
+                          <span className="text-[9px] text-[#8C6508] font-bold block uppercase">✦ Vargottama Planets</span>
+                          <p className="text-[11px] text-[#4A4238] mt-0.5">Planets occupying identical signs in D1 and D9 acquire sovereign potency (Vargottama bala), acting as unyielding shields during dasha periods.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* PAGE 5: LOCKED 24-PAGE VAULT */}
+                {previewPageIndex === 4 && (
+                  <div className="space-y-3 my-auto text-center">
+                    <div className="w-12 h-12 rounded-full bg-[#FAF0D7] border border-[#c8a030]/60 flex items-center justify-center text-xl mx-auto shadow-inner">
+                      🔒
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-[#a07820] mb-0.5">
+                        ✦ OFFICIAL MASTER DOSSIER LOCKED ✦
+                      </div>
+                      <h4 className="font-serif text-xl font-bold text-[#1A1A1A]">
+                        Unlock Complete 24-Page Certified Dossier
+                      </h4>
+                      <p className="text-xs text-[#6B635B] max-w-lg mx-auto mt-1">
+                        You have previewed the foundational 4 pages computed for <strong>{customerName || "Sacred Seeker"}</strong>. The complete official 24-page dossier contains all remaining 19 advanced computation modules:
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-[#4A4238] bg-[#FAF7F0] p-3 rounded-xl border border-[#E0D7C6] text-left">
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>9-Graha Ephemeris Ledger & Dignities (P.5)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>12-Bhava Lordship Pillars & Strength (P.6)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Shadbala 6-Fold Power Vectors & Rupas (P.7)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Ashtakavarga 337-Bindu Matrix (P.8)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Specialized 4-Page Thematic Chapters (P.9-12)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>300+ Classical Raja & Dhana Yogas (P.13)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>120-Year Vimshottari Timeline (P.14)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>5-Year Antardasha Precision Horizon (P.16)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Double-Transit Radar: Shani & Guru (P.17)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Rahu-Ketu Karmic Axis Synthesis (P.18)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Ayurvedic Tridosha Bio-Health Audit (P.19)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Astro-Vastu Directional Hit Matrix (P.20)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Precision Gemstone & Rudraksha Upay (P.21)</span></div>
+                      <div className="flex items-center gap-1.5"><span className="text-[#16a34a] font-bold">✓</span> <span>Strategic 12-Month Action Blueprint (P.23)</span></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Flipbook Page Navigation Bar */}
+                <div className="border-t border-[#E7DFD5] pt-3 mt-3 flex items-center justify-between text-xs">
+                  <button
+                    type="button"
+                    disabled={previewPageIndex === 0}
+                    onClick={() => setPreviewPageIndex((p) => Math.max(0, p - 1))}
+                    className="px-3 py-1.5 rounded-lg border border-[#E7DFD5] text-[#4A4238] hover:bg-[#FAF7F2] disabled:opacity-40 transition-colors font-medium flex items-center gap-1"
+                  >
+                    <span>←</span>
+                    <span>Previous</span>
+                  </button>
+
+                  <span className="text-[11px] font-semibold text-[#8C6508]">
+                    Viewing Page {previewPageIndex + 1} of 5
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={previewPageIndex === 4}
+                    onClick={() => setPreviewPageIndex((p) => Math.min(4, p + 1))}
+                    className="px-3 py-1.5 rounded-lg bg-[#c8a030] text-[#1A1A1A] hover:bg-[#a07820] disabled:opacity-40 transition-colors font-bold flex items-center gap-1 shadow-xs"
+                  >
+                    <span>Next</span>
+                    <span>→</span>
+                  </button>
                 </div>
               </div>
 
               {/* Action Buttons in Modal */}
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 <RazorpayCheckoutButton
                   amount={previewModalReport.paise}
                   currency="INR"
                   name="AstroLife"
                   description={`${previewModalReport.title} • ${previewModalReport.price}`}
-                  buttonText={`Unlock Full Official Dossier · ${previewModalReport.price}`}
+                  buttonText={`Unlock Full 24-Page Official Dossier · ${previewModalReport.price}`}
+                  onBeforeCheckout={requireCustomerContact}
                   prefill={{
                     name: customerName,
                     email: customerEmail,
@@ -1699,7 +2166,7 @@ export default function ReportsStorePage() {
                   type="button"
                   disabled={sampleLoadingId === previewModalReport.id}
                   onClick={() => handlePreviewSample(previewModalReport)}
-                  className="w-full py-2.5 px-4 rounded-xl border border-[#c8a030]/50 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm"
+                  className="w-full py-2.5 px-4 rounded-xl border border-[#c8a030]/50 text-[#a07820] bg-white hover:bg-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-xs"
                 >
                   {sampleLoadingId === previewModalReport.id ? (
                     <>
@@ -1709,13 +2176,13 @@ export default function ReportsStorePage() {
                   ) : (
                     <>
                       <span>📥</span>
-                      <span>Download Sample PDF File Directly (Free)</span>
+                      <span>Download 5-Page Sample PDF Directly (Free)</span>
                     </>
                   )}
                 </button>
               </div>
 
-              <div className="text-center mt-4">
+              <div className="text-center mt-3">
                 <button
                   type="button"
                   onClick={() => setPreviewModalReport(null)}
@@ -1727,6 +2194,45 @@ export default function ReportsStorePage() {
             </div>
           </div>
         )}
+        {/* Floating Quick-Conversion Assurance Pill (Desktop/Mobile) */}
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-2xl bg-white/95 backdrop-blur-md border-2 border-[#c8a030]/50 rounded-2xl p-2.5 sm:p-3 shadow-[0_12px_36px_rgba(200,160,48,0.25)] flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <span className="w-7 h-7 rounded-full bg-[#FAF0D7] border border-[#c8a030]/60 flex items-center justify-center text-sm shrink-0">
+              ✦
+            </span>
+            <div className="leading-tight">
+              <div className="font-bold text-[#1A1A1A] text-[11px] sm:text-xs">
+                Official 24-Page Parashari Dossiers
+              </div>
+              <div className="text-[9.5px] text-[#6B635B]">
+                Swiss Ephemeris 0.01° • Instant 60s PDF • Starting at ₹499
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const pkg = packageReports[0];
+                setPreviewPageIndex(0);
+                setPreviewModalReport(pkg);
+              }}
+              className="px-3 py-1.5 rounded-xl border border-[#c8a030]/60 text-[#a07820] bg-white hover:bg-[#FAF7F2] font-semibold text-[11px] whitespace-nowrap transition-colors shadow-xs"
+            >
+              📖 Preview Sample
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("master");
+                window.scrollTo({ top: 380, behavior: "smooth" });
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#c8a030] to-[#a07820] text-white font-bold text-[11px] whitespace-nowrap shadow-sm hover:shadow-md transition-all"
+            >
+              Explore 8 Dossiers →
+            </button>
+          </div>
+        </div>
       </main>
 
       {/* Sacred Footer */}
