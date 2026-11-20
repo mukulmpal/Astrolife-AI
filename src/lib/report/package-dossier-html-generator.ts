@@ -1007,10 +1007,20 @@ ${isSample ? `
         ${(chart.dashas || []).map((d) => `
           <tr style="${d.active ? "background:rgba(201,169,97,0.18);" : ""}">
             <td style="font-weight:700;color:${d.active ? "var(--saffron)" : "var(--gold)"};">${escapeHtml(d.planet)} ${d.active ? "✦ CURRENT" : ""}</td>
-            <td>${d.yrs} Years</td>
+            <td>${typeof d.yrs === "number" ? Number(d.yrs).toFixed(1) : d.yrs} Years</td>
             <td>${d.start instanceof Date ? d.start.toLocaleDateString("en-US", { month: "short", year: "numeric" }) : String(d.start).slice(0, 10)}</td>
             <td>${d.end instanceof Date ? d.end.toLocaleDateString("en-US", { month: "short", year: "numeric" }) : String(d.end).slice(0, 10)}</td>
-            <td>${d.planet === "Jupiter" ? "Wisdom & Growth" : d.planet === "Saturn" ? "Discipline & Legacy" : d.planet === "Mercury" ? "Intellect & Commerce" : "Transformation"}</td>
+            <td>${
+              d.planet === "Sun" ? "Authority & Soul Stature" :
+              d.planet === "Moon" ? "Emotional Anchor & Mind" :
+              d.planet === "Mars" ? "Courage & Decisive Action" :
+              d.planet === "Mercury" ? "Intellect & Commerce" :
+              d.planet === "Jupiter" ? "Wisdom & Spiritual Wealth" :
+              d.planet === "Venus" ? "Creative Harmony & Assets" :
+              d.planet === "Saturn" ? "Discipline & Karmic Mastery" :
+              d.planet === "Rahu" ? "Ambitious Expansion" :
+              d.planet === "Ketu" ? "Spiritual Detachment" : "Karmic Maturation"
+            }</td>
           </tr>
         `).join("")}
       </tbody>
@@ -1053,7 +1063,18 @@ ${isSample ? `
             ${ad.start instanceof Date ? ad.start.toLocaleDateString("en-US", { month: "short", year: "numeric" }) : String(ad.start).slice(0, 7)} to 
             ${ad.end instanceof Date ? ad.end.toLocaleDateString("en-US", { month: "short", year: "numeric" }) : String(ad.end).slice(0, 7)}
           </p>
-          <div class="body-s" style="margin-top:4px;">Directs mental focus toward material crystallization and structural achievements.</div>
+          <div class="body-s" style="margin-top:4px;">${
+            ad.planet === "Sun" ? "Elevates vital self-confidence, leadership recognition, and authoritative decisions." :
+            ad.planet === "Moon" ? "Heightens intuitive clarity, emotional sensitivity, and domestic harmony." :
+            ad.planet === "Mars" ? "Ignites ambitious drive, executive determination, and decisive breakthroughs." :
+            ad.planet === "Mercury" ? "Sharpens commercial contracts, analytical agility, and communications." :
+            ad.planet === "Jupiter" ? "Expands auspicious blessings, spiritual wisdom, financial fortune, and mentor support." :
+            ad.planet === "Venus" ? "Harmonizes relationships, creative endeavors, luxury assets, and diplomatic alliances." :
+            ad.planet === "Saturn" ? "Demands rigorous discipline, structural consolidation, patience, and karmic pruning." :
+            ad.planet === "Rahu" ? "Surges rapid unconventional opportunities, ambitious appetite, and bold leaps." :
+            ad.planet === "Ketu" ? "Induces deep spiritual contemplation, subtle insights, and detachment from ego noise." :
+            "Directs mental focus toward material crystallization and structural achievements."
+          }</div>
         </div>
       `).join("")}
     </div>
