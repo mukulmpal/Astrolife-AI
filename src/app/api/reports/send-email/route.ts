@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildPackageDossierPdf } from "@/lib/report/package-dossier-pdf";
+import { generatePackageDossierHTML } from "@/lib/report/package-dossier-html-generator";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { buildDossierEmailHtml, buildDossierEmailText } from "@/lib/email/dossier-email-template";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
@@ -7,6 +8,33 @@ import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+const REPORT_VIEWPORT = { width: 820, height: 1160 };
+
+async function launchBrowser() {
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    const chromium = (await import("@sparticuz/chromium")).default;
+    const puppeteer = (await import("puppeteer-core")).default;
+    const executablePath = await chromium.executablePath();
+    return puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: REPORT_VIEWPORT,
+      executablePath,
+      headless: "shell",
+    });
+  } else {
+    const puppeteer = (await import("puppeteer-core")).default;
+    const execPath =
+      process.platform === "darwin"
+        ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        : "/usr/bin/google-chrome-stable";
+    return puppeteer.launch({
+      executablePath: execPath,
+      headless: true,
+      defaultViewport: REPORT_VIEWPORT,
+    });
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +54,7 @@ export async function POST(request: NextRequest) {
       seekerName = "Sacred Seeker",
       reportId,
       reportTitle = "Vedic Shastra Dossier",
-      price = "₹249",
+      price = "₹499",
       orderId = `ORD_${Date.now().toString(36).toUpperCase()}`,
       paymentId = `PAY_${Date.now().toString(36).toUpperCase()}`,
       chart: rawChart,
@@ -77,15 +105,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Compile high-grade vector PDF dossier
-    const pdfBuffer = await buildPackageDossierPdf(chart, {
+    // 3. Compile high-grade 24-page vector PDF dossier
+    const dossierOptions = {
       reportId: String(reportId),
       reportTitle: String(reportTitle),
       customerName: seekerName,
       customerEmail: email,
       orderId,
       paymentId,
-    });
+      isSample: false,
+    };
+
+    let pdfBuffer: Buffer;
+    let browser;
+    try {
+      const html = generatePackageDossierHTML(chart, dossierOptions);
+      browser = await launchBrowser();
+      const page = await browser.newPage();
+      await page.setViewport(REPORT_VIEWPORT);
+      await page.emulateMediaType("print");
+      await page.setContent(html, {
+        waitUntil: "domcontentloaded",
+        timeout: 25_000,
+      });
+      await page.evaluate(() =>
+        Promise.race([
+          document.fonts.ready,
+          new Promise((r) => setTimeout(r, 6000)),
+        ])
+      );
+      const pdf = await page.pdf({
+        width: `${REPORT_VIEWPORT.width}px`,
+        height: `${REPORT_VIEWPORT.height}px`,
+        printBackground: true,
+        preferCSSPageSize: true,
+        margin: { top: "0", right: "0", bottom: "0", left: "0" },
+        tagged: false,
+      });
+      await page.close();
+      pdfBuffer = Buffer.from(pdf);
+    } catch (browserErr) {
+      console.warn("[reports/send-email] Chromium HTML render fallback to vector PDFKit:", browserErr);
+      pdfBuffer = await buildPackageDossierPdf(chart, dossierOptions);
+    } finally {
+      if (browser) {
+        try {
+          await browser.close();
+        } catch {
+          // ignore
+        }
+      }
+    }
 
     const safeTitle = (reportTitle || "Dossier")
       .replace(/[^a-zA-Z0-9 ]/g, "")

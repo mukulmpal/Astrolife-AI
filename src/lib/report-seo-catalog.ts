@@ -34,8 +34,8 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
     h1: "36-Guna Kundali Milan & Sacred Marital Compatibility Dossier",
     h2Subtitle:
       "Astronomical precision matching using exact birth coordinates. Goes far beyond generic computer scores with D-9 Navamsha and classical Nadi cancellation rules.",
-    price: "₹249",
-    paise: 24900,
+    price: "₹499",
+    paise: 49900,
     originalPrice: "₹1,499",
     badge: "🔥 Top Marital Match",
     targetKeywords: [
@@ -101,9 +101,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
     h1: "Vedic Vivah Yog & Marriage Timing Scanner Dossier",
     h2Subtitle:
       "Pinpoint your high-probability marriage activation windows across the next 12 to 36 months using authentic classical double-transit rules.",
-    price: "₹149",
-    paise: 14900,
-    originalPrice: "₹999",
+    price: "₹499",
+    paise: 49900,
+    originalPrice: "₹1,499",
     badge: "💍 High Precision Timing",
     targetKeywords: [
       "Marriage timing astrology PDF",
@@ -113,8 +113,8 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
       "Jupiter transit marriage timing",
     ],
     vargas: ["D-1 Rashi", "D-9 Navamsha", "Guru Gochar", "KP Sub-Lord"],
-    pageCount: "18 Pages",
-    deliveryTime: "Instant 45-Second Download",
+    pageCount: "24 Pages",
+    deliveryTime: "Instant 60-Second Download",
     coreHighlights: [
       {
         title: "Double-Transit Confirmation",
@@ -163,9 +163,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
     h1: "300+ Classical Raja Yogas & Career Acceleration Dossier",
     h2Subtitle:
       "Unlock the dormant power of your 10th and 11th houses. Decodes promotions, government job yogas, business vs job suitability, and multi-stream wealth triggers.",
-    price: "₹249",
-    paise: 24900,
-    originalPrice: "₹1,999",
+    price: "₹499",
+    paise: 49900,
+    originalPrice: "₹1,499",
     badge: "👑 High Net-Worth",
     targetKeywords: [
       "Raja Yoga in Kundli PDF",
@@ -225,8 +225,8 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
     h1: "Astro-Vastu Sacred Directions & Space Alignment Dossier",
     h2Subtitle:
       "Align your physical home and workplace with your active natal planetary frequencies. Zero-demolition classical remedies for health, wealth, and peaceful living.",
-    price: "₹249",
-    paise: 24900,
+    price: "₹499",
+    paise: 49900,
     originalPrice: "₹1,499",
     badge: "🏛️ Space & Energy Harmonizer",
     targetKeywords: [
@@ -237,7 +237,7 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
       "Kundali based home directions",
     ],
     vargas: ["16-Zone Vastu", "4th House Griha", "Elemental Balance", "Devata Mandala"],
-    pageCount: "22 Pages",
+    pageCount: "24 Pages",
     deliveryTime: "Instant 60-Second Download",
     coreHighlights: [
       {
@@ -287,9 +287,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
     h1: "Shani Sade Sati & Dhaiya Complete Mitigation Dossier",
     h2Subtitle:
       "Transform fear into sovereign discipline. Accurate mathematical degree-level tracking of Saturn's 7.5-year cycle with authentic, non-commercial Vedic Upayas.",
-    price: "₹129",
-    paise: 12900,
-    originalPrice: "₹799",
+    price: "₹499",
+    paise: 49900,
+    originalPrice: "₹1,499",
     badge: "🪐 Karmic Transformation",
     targetKeywords: [
       "Shani Sade Sati report PDF",
@@ -299,8 +299,8 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
       "Saturn transit over Moon remedies",
     ],
     vargas: ["Shani Gochar", "Ashtakavarga Bindus", "Chandra Rashi", "Karmic Upay"],
-    pageCount: "16 Pages",
-    deliveryTime: "Instant 45-Second Download",
+    pageCount: "24 Pages",
+    deliveryTime: "Instant 60-Second Download",
     coreHighlights: [
       {
         title: "Degree-Level Orbit Tracking",
@@ -349,8 +349,8 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
     h1: "Medical Astrology & Cellular Vitality Health Dossier",
     h2Subtitle:
       "Vedic preventive health intelligence. Correlates planetary configurations with biological vulnerabilities to optimize longevity and physical vitality.",
-    price: "₹249",
-    paise: 24900,
+    price: "₹499",
+    paise: 49900,
     originalPrice: "₹1,499",
     badge: "🩺 Bio-Vedic Defense",
     targetKeywords: [
@@ -361,7 +361,7 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPageData> = {
       "Vedic astrology health remedies",
     ],
     vargas: ["D-1 Rashi", "D-6 Shashthamsha", "Tridosha Balance", "Ayur-Vedic"],
-    pageCount: "22 Pages",
+    pageCount: "24 Pages",
     deliveryTime: "Instant 60-Second Download",
     coreHighlights: [
       {

@@ -223,8 +223,8 @@ export default async function ReportSeoPage({ params }: PageProps) {
                 <span className="text-sm text-[#9C948A] line-through font-medium">
                   {data.originalPrice}
                 </span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-[#16a34a]/15 text-[#16a34a] font-bold">
-                  80% Off Launch Special
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#15803d] font-bold border border-[#16a34a]/30">
+                  67% OFF • Launch Special
                 </span>
               </div>
               <p className="text-xs text-[#6B635B]">
