@@ -21,6 +21,7 @@ import { detectYogas, type YogaResult } from "../astro-engine/yogas";
 import { calculateShadbala, type ShadbalaResult } from "../astro-engine/shadbala";
 import { calculateAshtakavarga, type AKVResult } from "../astro-engine/ashtakavarga";
 import { calculateKarakas } from "../astro-engine/jaimini";
+import { generateSacredUnionDossierHTML } from "./generators/sacred-union-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -133,6 +134,20 @@ export function generatePackageDossierHTML(
   chart: ChartData,
   options: PackageDossierOptions
 ): string {
+  const reportId = options.reportId || "";
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // DEDICATED MASTER DOSSIER GENERATORS (24 Pages Each)
+  // ─────────────────────────────────────────────────────────────────────────
+  if (
+    reportId.includes("union") ||
+    reportId.includes("family") ||
+    reportId.includes("milan") ||
+    reportId.includes("marriage")
+  ) {
+    return generateSacredUnionDossierHTML(chart, options);
+  }
+
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
   const reportTitle = escapeHtml(options.reportTitle || "AstroLife Sacred Shastra Dossier");
   const orderId = escapeHtml(options.orderId || `ORD_${Date.now().toString(36).toUpperCase()}`);
@@ -220,8 +235,6 @@ export function generatePackageDossierHTML(
   // ─────────────────────────────────────────────────────────────────────────
   // THEMATIC 4-PAGE MODULE (Pages 9, 10, 11, 12)
   // ─────────────────────────────────────────────────────────────────────────
-  const reportId = options.reportId || "";
-
   let themeP9 = "";
   let themeP10 = "";
   let themeP11 = "";
