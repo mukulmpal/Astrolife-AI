@@ -486,7 +486,7 @@ body {
       </div>
       <div>
         <span class="kicker">BTR Kunda Nakshatra</span>
-        <div style="color:var(--gold-bright);font-weight:700;">Uttara Bhadrapada (333° 21' · 100% Match)</div>
+        <div style="color:var(--gold-bright);font-weight:700;">Uttara Bhadrapada (333° 30' 26" · 100% Match)</div>
       </div>
       <div>
         <span class="kicker">Primary Grounding Zone</span>
@@ -533,10 +533,10 @@ body {
       </p>
     </div>
 
-    <!-- 4 Module Architecture -->
+    <!-- 5 Module Architecture -->
     <div class="luxury-card">
       <div class="card-title" style="color:var(--gold-bright);font-family:'Cinzel',serif;font-size:11px;margin-bottom:8px;">
-        ✦ 4-MODULE DIAGNOSTIC DOSSIER ARCHITECTURE
+        ✦ 5-MODULE DIAGNOSTIC DOSSIER ARCHITECTURE
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px;">
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--sapphire);">
@@ -1041,9 +1041,14 @@ body {
   ${headerRail("MODULE III: SAMUDRIKA PALMISTRY")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Samudrika Shastra: Biological Mirror</h2>
-    <p class="body-text" style="margin-bottom:10px;">
+    <p class="body-text" style="margin-bottom:8px;">
       In classical Vedic wisdom, <em>Samudrika Shastra</em> (the science of physical bodily signs and hand lines) is the tactile physical verification of the natal horoscope. While planetary charts show cosmic potential, the palm reveals how your neurological system has actually metabolized that potential into lived reality.
     </p>
+
+    <!-- Credibility Framing Note -->
+    <div style="background:rgba(201,169,97,0.08);border:1px solid var(--border-gold);padding:7px 10px;border-radius:4px;margin-bottom:10px;font-size:10.5px;color:var(--gold-bright);">
+      <strong>Diagnostic Methodology:</strong> Projected Samudrika Correlates derived from your natal planetary blueprint and neuro-somatic astrological markers.
+    </div>
 
     <!-- Hand Morphology Box -->
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);margin-bottom:12px;">
@@ -1335,7 +1340,7 @@ body {
         </tr>
         <tr>
           <td><strong>Mathematical Concurrence</strong></td>
-          <td><span style="color:var(--emerald-bright);font-weight:700;">100% SHASHTRIC MATCH</span></td>
+          <td><span style="color:var(--emerald-bright);font-weight:700;">100% SHASTRIC MATCH</span></td>
           <td>Zero minute drift required &mdash; 12:30 IST certified</td>
         </tr>
       </tbody>
@@ -1415,15 +1420,15 @@ body {
     <!-- Jupiter Gochar -->
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:12px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ JUPITER TRANSIT (GURU GOCHAR): 10TH HOUSE TO 11TH HOUSE OF REALIZED WEALTH
+        ✦ JUPITER TRANSIT (GURU GOCHAR): EXALTED 11TH HOUSE OF REALIZED WEALTH
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Jupiter enters your <strong>10th House of Career (Gemini)</strong> joining natal Sun and Venus, before moving into its <strong>Exalted Sign Cancer in your 11th House of Gains</strong> in mid-2027.
+        Transit Jupiter enters its <strong>Exalted Sign Cancer (11th House of Maximum Liquid Gains)</strong> from December 2026 through October 2027 (stationing direct in May 2027), before transitioning into Leo (12th House) in November 2027.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Strategic Harvest Opportunity:</strong>
         <p style="color:var(--ivory-dim);margin-top:2px;">
-          This dual progression marks the single most lucrative career expansion era of the decade. Major corporate partnerships solidify, advisory fees increase, and realized liquid surplus peaks.
+          This Exalted 11th House progression marks the single most lucrative commercial expansion era of the decade. Major corporate partnerships solidify, advisory fees compound, and realized liquid surplus peaks.
         </p>
       </div>
     </div>
@@ -1552,12 +1557,12 @@ body {
     <div class="luxury-card" style="margin-bottom:8px;border-left:3px solid var(--emerald-bright);">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-          GATE 1: MAY &ndash; JULY 2027 (JUPITER IN 11TH HOUSE EXALTED SURGE)
+          GATE 1: DECEMBER 2026 &ndash; JULY 2027 (JUPITER EXALTED IN 11TH HOUSE CANCER)
         </span>
         <span class="tag-badge tag-emerald">95% HARVEST ZENITH</span>
       </div>
       <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-        Jupiter enters Cancer in your 11th house of gains. Highest commercial monetization window of the year. Launch premium packages, close high-ticket annual retainers, and harvest liquid capital.
+        Exalted Jupiter in Cancer activates your 11th house of massive institutional gains (stationing direct in May 2027). Highest commercial monetization window of the decade. Launch sovereign premium products, close enterprise retainers, and harvest capital surplus.
       </p>
     </div>
 
@@ -1627,7 +1632,7 @@ body {
         </div>
         <div>
           <span class="kicker">KUNDA NAKSHATRA PROOF</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Uttara Bhadrapada (333° 21' &middot; 100% Match)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">Uttara Bhadrapada (333° 30' 26" &middot; 100% Match)</div>
         </div>
         <div>
           <span class="kicker">PALM MORPHOLOGY</span>
@@ -1643,7 +1648,7 @@ body {
         </div>
         <div>
           <span class="kicker">PEAK WEALTH GATE</span>
-          <div style="color:var(--gold-bright);font-weight:700;">May &ndash; July 2027 (Jupiter Exalted in 11th H)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">Dec 2026 &ndash; Jul 2027 (Jupiter Exalted in 11th H)</div>
         </div>
       </div>
     </div>

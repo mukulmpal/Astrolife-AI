@@ -5171,6 +5171,7 @@ function pageEliteAstrologerReview(chart: ChartData): string {
 }
 
 export function generateReportHTML(chart: ChartData, options?: Partial<ReportOptions>): string {
+  const lang = normalizeReportLang(options?.language);
   const context = buildReportEngineContext(chart, options);
   const { palette, cover } = context.settings;
   const editionLabel = reportEditionLabel(context.settings.type);
@@ -5313,7 +5314,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.doshas     ? safe(() => pageDoshas(chart),      "Doshas")          : "",
     include.shadbala   ? safe(() => pageShadbala(chart),    "Shadbala")        : "",
     include.ashtakavarga ? safe(() => pageAshtakavarga(chart, "Av"), "Ashtakavarga") : "",
-    include.divisional ? safe(() => pageDivisional(chart),  "Divisional")      : "",
+    include.divisional ? safe(() => pageDivisional(chart, lang), "Divisional") : "",
     include.dasha      ? safe(() => page7CurrentDasha(chart),  "Current Dasha")  : "",
     include.dasha      ? safe(() => page8UpcomingDashas(chart),"Upcoming Dashas"): "",
     include.antardasha ? safe(() => pageAntardashaDetail(chart, "Ad"), "Antardasha") : "",
@@ -5324,7 +5325,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.nakshatra  ? safe(() => pageNavtaraAndShield(chart), "Navtara & 27th Shield Star") : "",
     ...lifeAreaPages,
     include.health     ? safe(() => pageHealth(chart),      "Health")          : "",
-    include.psychology ? safe(() => pagePsychology(chart),  "Psychology")      : "",
+    include.psychology ? safe(() => pagePsychology(chart, lang), "Psychology") : "",
     include.numerology ? safe(() => pageNumerology(chart),  "Numerology")      : "",
     include.remedies         ? safe(() => page9Remedies(chart),             "Remedies")             : "",
     // Phase 4 — 12 new engine pages
@@ -5346,12 +5347,15 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.astrologerReview ? safe(() => pageEliteAstrologerReview(chart), "Real Astrologer Review") : "",
     include.advisorV4        ? safe(() => pageAstroLifeAdvisorV4(reportIntelligence),    "AstroLife Advisor")    : "",
     // Phase 5 — 9 Clinical, Karmic & Predictive Engines
-    include.transitShivling  ? safe(() => pageTransitShivlingUpacharas(chart, "SU"), "Transit Shivling Upacharas") : "",
-    include.nakshatraSocial  ? safe(() => pageNakshatraSocialRegistry(chart, "NS"), "Nakshatra Social Registry") : "",
-    include.tradingRisk      ? safe(() => pageTradingRiskCircuitBreaker(chart, "TR"), "Trading Risk Guardrail") : "",
-    include.twelfthHouse     ? safe(() => pageTwelfthHouseSecretWealth(chart, "12H"), "12th House Secret Wealth") : "",
-    include.careerD10        ? safe(() => pageCareerSpecifierD10(chart, "D10"), "D10 Career Specifier") : "",
-    include.transitHealthTiming ? safe(() => pageTransitHealthTiming(chart, "HT"), "Moon Dispositor Health Timing") : "",
+    include.transitShivling  ? safe(() => pageTransitShivlingUpacharas(chart, "SU", lang), "Transit Shivling Upacharas") : "",
+    include.nakshatraSocial  ? safe(() => pageNakshatraSocialRegistry(chart, "NS", lang), "Nakshatra Social Registry") : "",
+    include.tradingRisk      ? safe(() => pageTradingRiskCircuitBreaker(chart, "TR", lang), "Trading Risk Guardrail") : "",
+    include.twelfthHouse     ? safe(() => pageTwelfthHouseSecretWealth(chart, "12H", lang), "12th House Secret Wealth") : "",
+    include.careerD10        ? safe(() => pageCareerSpecifierD10(chart, "D10", lang), "D10 Career Specifier") : "",
+    include.transitHealthTiming ? safe(() => pageTransitHealthTiming(chart, "HT", lang), "Moon Dispositor Health Timing") : "",
+    include.functionalDebilityGuard ? safe(() => pageFunctionalDebilityGuard(chart, "DG"), "Functional Debility Guard") : "",
+    include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK"), "Lineage Karma & Kula Devata") : "",
+    include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP"), "12 Jyotirlinga Sanctuary") : "",
     include.functionalDebilityGuard ? safe(() => pageFunctionalDebilityGuard(chart, "DG"), "Functional Debility Guard") : "",
     include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK"), "Lineage Karma & Kula Devata") : "",
     include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP"), "12 Jyotirlinga Sanctuary") : "",

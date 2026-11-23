@@ -75,6 +75,12 @@ function validatePdfBody(value: unknown): ValidationResult<PdfRequestBody> {
   if (!chartResult.ok) return chartResult;
   const rawOptions = isRecord(value.options) ? value.options : {};
   const options = rawOptions as Partial<ReportOptions>;
+  const rawLang = typeof rawOptions.language === "string" ? rawOptions.language.toLowerCase().trim() : undefined;
+  if (rawLang === "hi" || rawLang === "hindi") {
+    options.language = "hi";
+  } else if (rawLang === "en" || rawLang === "english") {
+    options.language = "en";
+  }
   const palmistrySessionId = optionalText(rawOptions.palmistrySessionId, 120);
   if (palmistrySessionId) options.palmistrySessionId = palmistrySessionId;
   return ok({ chart: reviveChartDates(chartResult.data), options });
