@@ -681,6 +681,28 @@ function pageFoot(left: string, right: string): string {
   return `<div class="page-foot"><span>${esc(left)}</span><span>${esc(right)}</span></div>`;
 }
 
+function truncateWords(text: string, maxLen: number): string {
+  if (!text || text.length <= maxLen) return text || "";
+  const sub = text.slice(0, maxLen);
+  const lastSpace = sub.lastIndexOf(" ");
+  return (lastSpace > 20 ? sub.slice(0, lastSpace) : sub).trim() + "…";
+}
+
+function formatDashaPattern(pat?: string): string {
+  if (!pat) return "";
+  if (pat === "DOUBLE_SUPPORT") return "Double Planetary Support";
+  if (pat === "SAVED_BY_ONE") return "Shielded By Support Star";
+  if (pat === "BOTH_VULNERABLE") return "Vulnerable Transit Window";
+  return pat.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatRelationshipLabel(lbl?: string): string {
+  if (!lbl) return "";
+  if (lbl === "needs_patience") return "Requires Patience & Maturity";
+  if (lbl === "mixed_supportive") return "Mixed Supportive Dynamics";
+  return lbl.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
 // ── Page 1: Cover – Wheel ─────────────────────────────────────────────────
 
 function reportEditionLabel(type: ReportType): string {
@@ -1164,7 +1186,6 @@ function page4TOC(type: ReportType, include: {
 
         <div class="toc-part-heading"><span class="part-no">${eliteRows.length ? "Part 5" : "Part 4"}</span><span class="part-name">Closing</span></div>
         <div class="toc-row"><span class="num">✓</span><div><div class="title">Closing Reflection</div><div class="meta">A final synthesis written for practical use</div></div><div></div><span class="pg">End</span></div>
-        <div class="toc-row"><span class="num">✓</span><div><div class="title">Engine Ledger</div><div class="meta">Transparent list of report modules and coverage</div></div><div></div><span class="pg">End</span></div>
       </div>
     </div>
   </div>
@@ -1353,10 +1374,15 @@ function renderEvidenceList(items: string[]): string {
   `).join("");
 }
 
-function renderActionList(items: string[]): string {
+function renderActionList(items: string[] = [], fallbackType: "opportunity" | "risk" | "action" = "action"): string {
   const clean = items.filter(Boolean);
   if (!clean.length) {
-    return `<div class="body-s" style="line-height:1.55;color:var(--ivory-mute);">Keep this area under monthly review. Act only when timing, readiness and practical evidence agree.</div>`;
+    const fallbacks: Record<string, string> = {
+      opportunity: "Align initiatives with running dasha windows; cultivate inner clarity and leverage natural planetary strengths.",
+      risk: "Avoid impulsive commitments during transitional transit windows; maintain balance between ambition and reflection.",
+      action: "Anchor decisions in steady daily routines; review monthly progress through quiet reflection rather than forced urgency.",
+    };
+    return `<div class="body-s" style="line-height:1.55;color:var(--ivory-mute);">${fallbacks[fallbackType] || "Keep this area under monthly review with conscious discernment."}</div>`;
   }
   return clean.slice(0, 4).map((item, index) => `
     <div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:${index === 0 ? "0" : "1px solid var(--line)"};">
@@ -1589,15 +1615,15 @@ function pageReportNarrativeSectionV4(
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
         <div class="card" style="padding:12px;">
           <div class="kicker" style="color:var(--jade);margin-bottom:6px;">Opportunities</div>
-          ${renderActionList(section.opportunities.slice(0, 3))}
+          ${renderActionList(section.opportunities.slice(0, 3), "opportunity")}
         </div>
         <div class="card" style="padding:12px;">
           <div class="kicker" style="color:var(--crimson);margin-bottom:6px;">Risks</div>
-          ${renderActionList(section.risks.slice(0, 3))}
+          ${renderActionList(section.risks.slice(0, 3), "risk")}
         </div>
         <div class="card" style="padding:12px;">
           <div class="kicker" style="color:var(--gold);margin-bottom:6px;">Actions</div>
-          ${renderActionList(section.actions.slice(0, 3))}
+          ${renderActionList(section.actions.slice(0, 3), "action")}
         </div>
       </div>
     </div>
@@ -1680,17 +1706,17 @@ function pageNarrativeSectionActionV4(
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto;">
         <div class="card" style="padding:12px;">
           <div class="kicker" style="color:var(--jade);margin-bottom:6px;">Opportunities</div>
-          ${renderActionList(section.opportunities)}
+          ${renderActionList(section.opportunities, "opportunity")}
         </div>
         <div class="card" style="padding:12px;">
           <div class="kicker" style="color:var(--crimson);margin-bottom:6px;">Careful With</div>
-          ${renderActionList(section.risks)}
+          ${renderActionList(section.risks, "risk")}
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
         <div class="card" style="padding:12px;">
           <div class="kicker" style="color:var(--gold);margin-bottom:6px;">Action Rules</div>
-          ${renderActionList(section.actions)}
+          ${renderActionList(section.actions, "action")}
         </div>
         <div class="card" style="padding:12px;border-left:3px solid var(--saffron);">
           <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">Decision Rule</div>
@@ -2219,9 +2245,9 @@ function page7CurrentDasha(chart: ChartData): string {
   }).join("");
 
   // Truncate paragraphs to fit cleanly on their respective pages
-  const vedicShort = vedicPara.length > 900 ? vedicPara.slice(0, 897) + "…" : vedicPara;
-  const lkShort    = lkPara.length    > 700 ? lkPara.slice(0, 697)    + "…" : lkPara;
-  const psychShort = psychPara.length > 700 ? psychPara.slice(0, 697)  + "…" : psychPara;
+  const vedicShort = truncateWords(vedicPara, 900);
+  const lkShort    = truncateWords(lkPara, 700);
+  const psychShort = truncateWords(psychPara, 700);
 
   return `<section class="page dense">
   <div class="starfield"></div>
@@ -2312,7 +2338,7 @@ function page8UpcomingDashas(chart: ChartData): string {
       md.planet, pd?.house ?? 1, pd?.sign ?? "",
       md.yrs, startYear, endYear, interp, lkRule, pd?.dignity
     );
-    const para = paraFull.length > MAX_PARA ? paraFull.slice(0, MAX_PARA - 1) + "…" : paraFull;
+    const para = truncateWords(paraFull, MAX_PARA);
 
     return `<div class="card${idx === 0 ? " gold-edge" : ""}" style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
@@ -2638,7 +2664,7 @@ function page10Closing(): string {
     </div>
     <div class="body-s" style="letter-spacing:0.2em;text-transform:uppercase;color:var(--ivory-mute);">Vedic Intelligence · Est. 2024</div>
     <div class="devanagari" style="font-size:18px;color:var(--gold-dim);margin-top:12px;opacity:0.7;">सर्वे भवन्तु सुखिनः</div>
-    <div class="serif-italic" style="font-size:13px;color:var(--ivory-mute);margin-top:4px;">May all beings be happy.</div>
+    <div class="serif-italic" style="font-size:13px;color:var(--ivory-mute);margin-top:4px;">Om Sarve Bhavantu Sukhinah · May all beings be happy.</div>
   </div>
 
   <div style="position:relative;z-index:2;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
@@ -3292,7 +3318,7 @@ function pageNavtaraAndShield(chart: ChartData): string {
           <div class="card" style="padding:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
               <div class="kicker" style="color:var(--violet);margin-bottom:0;">Dasha Navtara Audit</div>
-              ${audit ? `<span class="badge" style="font-size:9px;color:${patternBadgeColor};border-color:${patternBadgeColor};">${esc(audit.pattern)}</span>` : ""}
+              ${audit ? `<span class="badge" style="font-size:9px;color:${patternBadgeColor};border-color:${patternBadgeColor};">${esc(formatDashaPattern(audit.pattern))}</span>` : ""}
             </div>
             ${audit ? `
               <div style="font-size:14px;font-weight:700;color:var(--ivory-bright);margin-bottom:4px;">
@@ -3427,11 +3453,11 @@ function pagePerPlanet(chart: ChartData, name: string, pageNum: string): string 
   }
 
   const skt = PLANET_SANSKRIT[name] ?? name;
-  const dignityLower = pd.dignity.toLowerCase();
+  const dignityLower = (pd.dignity || "").toLowerCase();
   let dignityColor = "var(--violet)";
-  if (dignityLower.includes("exalt")) dignityColor = "var(--jade)";
-  else if (dignityLower.includes("debilit")) dignityColor = "var(--crimson)";
-  else if (dignityLower.includes("own") || dignityLower.includes("sva")) dignityColor = "var(--gold)";
+  if (dignityLower.includes("exalt") || dignityLower.includes("friend")) dignityColor = "var(--jade)";
+  else if (dignityLower.includes("debilit") || dignityLower.includes("enemy")) dignityColor = "var(--crimson)";
+  else if (dignityLower.includes("own") || dignityLower.includes("sva") || dignityLower.includes("moola")) dignityColor = "var(--gold)";
 
   // House-effect text from Lal Kitab knowledge if available
   const houseRule = PLANET_HOUSE_RULES[name]?.[pd.house];
@@ -3590,7 +3616,7 @@ function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string): stri
           <div class="kicker" style="margin-bottom:6px;color:var(--gold);">House Lord · ${esc(houseLord)}</div>
           ${lordPd
             ? `<div class="body-s">Placed in <strong style="color:var(--ivory);">${esc(lordPd.sign)}</strong>, House <strong style="color:var(--ivory);">${lordPd.house}</strong> at ${lordPd.degree}°${String(lordPd.minutes).padStart(2,"0")}'.</div>
-               <div class="body-s" style="margin-top:6px;">Dignity: <strong style="color:var(--gold-bright);">${esc(lordPd.dignity)}</strong></div>`
+               <div class="body-s" style="margin-top:6px;">Dignity: <strong style="color:${(lordPd.dignity || '').toLowerCase().includes('debilit') || (lordPd.dignity || '').toLowerCase().includes('enemy') ? 'var(--crimson)' : (lordPd.dignity || '').toLowerCase().includes('exalt') || (lordPd.dignity || '').toLowerCase().includes('friend') ? 'var(--jade)' : 'var(--gold-bright)'};">${esc(lordPd.dignity || 'Neutral Sign')}</strong></div>`
             : `<div class="body-s">Lord placement unavailable.</div>`}
         </div>
         <div class="card">
@@ -4120,10 +4146,10 @@ function pageJaimini(chart: ChartData): string {
   const karakas = calculateKarakas(chart.planets) as any[];
   const arudhas  = calculateArudhas(chart) as any[];
   const charaDasha = calculateCharaDasha(chart) as any[];
-  const atmakaraka = karakas.find((k: any) => k.karaka === "AK" || k.karaka === "Atmakaraka") ?? karakas[0];
+  const atmakaraka = karakas.find((k: any) => k.role === "AK" || k.karaka === "AK" || k.role === "Atmakaraka" || k.karaka === "Atmakaraka") ?? karakas[0];
   const active = charaDasha.find((cd: any) => cd.active) ?? charaDasha[0];
   return `<section class="page dense">
-    ${pageRail("Jaimini System · Karakas &amp; Chara Dasha", "J1")}
+    ${pageRail("Jaimini System · Karakas & Chara Dasha", "J1")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num" style="color:var(--saffron);">J1</span>
@@ -4136,12 +4162,15 @@ function pageJaimini(chart: ChartData): string {
         <div class="card" style="padding:14px;">
           <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Karakas</div>
           <table style="width:100%;border-collapse:collapse;font-size:11px;">
-            ${karakas.slice(0,7).map((k: any) => `<tr style="border-bottom:1px solid var(--line);">
-              <td style="padding:5px 4px;color:var(--gold);">${esc(k.karaka ?? "")}</td>
-              <td style="padding:5px 4px;color:var(--ivory);">${esc(k.planet ?? "")}</td>
-              <td style="padding:5px 4px;color:var(--ivory-dim);" class="mono">${((k.lon ?? 0) % 30).toFixed(2)}°</td>
-              <td style="padding:5px 4px;color:var(--ivory-dim);">${esc(k.sign ?? "")}</td>
-            </tr>`).join("")}
+            ${karakas.slice(0,7).map((k: any) => {
+              const deg = typeof k.degreeInSign === "number" ? k.degreeInSign : ((k.lon ?? 0) % 30);
+              return `<tr style="border-bottom:1px solid var(--line);">
+                <td style="padding:5px 4px;color:var(--gold);">${esc(k.role ?? k.karaka ?? "")}</td>
+                <td style="padding:5px 4px;color:var(--ivory);">${esc(k.planet ?? "")}</td>
+                <td style="padding:5px 4px;color:var(--ivory-dim);" class="mono">${deg.toFixed(2)}°</td>
+                <td style="padding:5px 4px;color:var(--ivory-dim);">${esc(k.sign ?? "")}</td>
+              </tr>`;
+            }).join("")}
           </table>
         </div>
         <div class="card" style="padding:14px;">

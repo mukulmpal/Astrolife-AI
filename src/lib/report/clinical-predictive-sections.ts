@@ -256,7 +256,7 @@ export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR"):
   const isSevere = risk.speculativeRuinRisk === "CRITICAL" || risk.speculativeRuinRisk === "HIGH";
 
   return `<section class="page dense">
-    ${pageRail("Trading Risk Guardrail · F&amp;O Circuit Breaker", pageNum)}
+    ${pageRail("Trading Risk Guardrail · F&O Circuit Breaker", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:${isSevere ? "var(--crimson)" : "var(--jade)"};">✦</span>
@@ -388,11 +388,11 @@ export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H"):
       <!-- 4th Lord in 12th & Viparita Raja Yoga Grid -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--cyan);">
-          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">4th Lord in 12th House Insight</div>
+          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${result.fourthLordAlienationInsight ? "4th Lord in 12th House Insight" : "4th Lord Griha &amp; Root Stability"}</div>
           <div style="font-size:11px;color:var(--ivory-dim);line-height:1.4;">
             ${result.fourthLordAlienationInsight 
               ? esc(result.fourthLordAlienationInsight) 
-              : "चतुर्थेश 12वें में नहीं है: जातक को पैतृक स्थान अथवा स्वदेश में संपत्ति सुख सामान्य रूप से प्राप्त होता है।"}
+              : "The 4th Lord is preserved outside the 12th house: ancestral land, domestic stability and property retention in native place remain secure without sudden displacement."}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid ${result.viparitaRajaYoga.hasVRY ? "var(--gold)" : "var(--surface)"};">
@@ -647,7 +647,7 @@ export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK"): st
   const lineage = calculateLineageKarma(chart, { nativeName: chart.name || "Seeker", btrConfidence: "High" });
 
   return `<section class="page dense">
-    ${pageRail("Lineage Karma · Kula Devata &amp; Pitru Intelligence", pageNum)}
+    ${pageRail("Lineage Karma · Kula Devata & Pitru Intelligence", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--gold);">✦</span>

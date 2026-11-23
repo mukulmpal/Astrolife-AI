@@ -297,19 +297,47 @@ function getNavamsha(lon: number): string {
 function getPStatus(p: string, lon: number): string {
   const r = dR(lon);
   const d2 = dIR(lon);
-  const uch:    Record<string, number>   = { Sun:0, Moon:1, Mars:9, Mercury:5, Jupiter:3, Venus:11, Saturn:6 };
-  const uchdeg: Record<string, number>   = { Sun:10, Moon:3, Mars:28, Mercury:15, Jupiter:5, Venus:27, Saturn:20 };
-  const nee:    Record<string, number>   = { Sun:6, Moon:7, Mars:3, Mercury:11, Jupiter:9, Venus:5, Saturn:0 };
-  const own:    Record<string, number[]> = { Sun:[4], Moon:[3], Mars:[0,7], Mercury:[2,5], Jupiter:[8,11], Venus:[1,6], Saturn:[9,10] };
+  const uch:    Record<string, number>   = { Sun:0, Moon:1, Mars:9, Mercury:5, Jupiter:3, Venus:11, Saturn:6, Rahu:1, Ketu:7 };
+  const uchdeg: Record<string, number>   = { Sun:10, Moon:3, Mars:28, Mercury:15, Jupiter:5, Venus:27, Saturn:20, Rahu:20, Ketu:20 };
+  const nee:    Record<string, number>   = { Sun:6, Moon:7, Mars:3, Mercury:11, Jupiter:9, Venus:5, Saturn:0, Rahu:7, Ketu:1 };
+  const own:    Record<string, number[]> = { Sun:[4], Moon:[3], Mars:[0,7], Mercury:[2,5], Jupiter:[8,11], Venus:[1,6], Saturn:[9,10], Rahu:[10], Ketu:[8] };
   const mool:   Record<string, number>   = { Sun:4, Moon:1, Mars:0, Mercury:5, Jupiter:8, Venus:6, Saturn:9 };
 
-  if (uch[p] === r) return 'Exalted' + (Math.abs(d2 - uchdeg[p]) <= 5 ? ' ★' : '');
+  if (uch[p] === r) return 'Exalted' + (Math.abs(d2 - (uchdeg[p] ?? 15)) <= 5 ? ' ★' : '');
   if (nee[p] === r) return 'Debilitated';
   if (own[p]?.includes(r)) {
     if (mool[p] === r) return 'Moolatrikona';
-    return 'Own';
+    return 'Own Sign';
   }
-  return '—';
+
+  // Classical Rashi Lords
+  const rashiLord: Record<number, string> = {
+    0: "Mars", 1: "Venus", 2: "Mercury", 3: "Moon", 4: "Sun", 5: "Mercury",
+    6: "Venus", 7: "Mars", 8: "Jupiter", 9: "Saturn", 10: "Saturn", 11: "Jupiter"
+  };
+  const lord = rashiLord[r];
+  if (!lord) return 'Neutral Sign';
+
+  // Natural relationships (Naisargika Mitra / Shatru / Sama)
+  const relations: Record<string, { friends: string[]; enemies: string[] }> = {
+    Sun: { friends: ["Moon", "Mars", "Jupiter"], enemies: ["Venus", "Saturn"] },
+    Moon: { friends: ["Sun", "Mercury"], enemies: [] },
+    Mars: { friends: ["Sun", "Moon", "Jupiter"], enemies: ["Mercury"] },
+    Mercury: { friends: ["Sun", "Venus"], enemies: ["Moon"] },
+    Jupiter: { friends: ["Sun", "Moon", "Mars"], enemies: ["Mercury", "Venus"] },
+    Venus: { friends: ["Mercury", "Saturn"], enemies: ["Sun", "Moon"] },
+    Saturn: { friends: ["Mercury", "Venus"], enemies: ["Sun", "Moon", "Mars"] },
+    Rahu: { friends: ["Mercury", "Venus", "Saturn"], enemies: ["Sun", "Moon", "Mars"] },
+    Ketu: { friends: ["Mars", "Venus", "Saturn"], enemies: ["Sun", "Moon"] },
+  };
+
+  const rel = relations[p];
+  if (rel) {
+    if (rel.friends.includes(lord)) return "Friendly Sign";
+    if (rel.enemies.includes(lord)) return "Enemy Sign";
+    return "Neutral Sign";
+  }
+  return 'Neutral Sign';
 }
 
 // ── True obliquity ────────────────────────────────────────────

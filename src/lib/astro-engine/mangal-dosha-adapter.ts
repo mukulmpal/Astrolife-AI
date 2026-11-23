@@ -149,13 +149,14 @@ export function buildMangalDoshaInsight(chart: ChartData): MangalDoshaInsight {
     ? "Current activation is not calculated from transits, so read this as natal potential."
     : `Current Mars expression is ${result.scores.currentExpression}/100 with ${result.activationLabel} activation.`;
 
+  const nativeName = chart.name ? chart.name.charAt(0).toUpperCase() + chart.name.slice(1) : "Native";
   return {
     title: "Mangal Dosha Intelligence",
     result,
     tone,
     keyEvidence: topEvidence(result),
     summary:
-      `${chart.name}'s Mars relationship pattern is ${result.severityLabel.toLowerCase()} ` +
+      `${nativeName}'s Mars relationship pattern is ${result.severityLabel.toLowerCase()} ` +
       `with natal severity ${result.scores.natalSeverity}/100. Key domains: ${riskDomains}. ${current}`,
     productGuidance: [
       "Use this as a relationship pattern layer, not a fear verdict.",
