@@ -2385,7 +2385,7 @@ function pageLalKitabCoreAccuracy(chart: ChartData): string {
     return `<tr>
       <td>${esc(row.planet)}</td>
       <td>${esc(row.signShort)} · H${row.house}</td>
-      <td>${esc(row.position.replaceAll("_", " "))}</td>
+      <td>${esc(row.position.replace(/_/g, " "))}</td>
       <td>${row.soya ? "Yes" : "No"}</td>
       <td>${row.kismatJaganewala ? "Yes" : "No"}</td>
       <td><span class="badge ${badge}" style="font-size:8px;">${esc(row.beneficMalefic)}</span></td>
@@ -4487,7 +4487,7 @@ function pageSpecialLagnas(chart: ChartData): string {
   const hl = items.find((i: any) => i.key === "HL");
   const gl = items.find((i: any) => i.key === "GL");
   return `<section class="page dense">
-    ${pageRail("Special Lagnas · Arudhas &amp; Sensitive Points", "SL")}
+    ${pageRail("Special Lagnas · Arudhas & Sensitive Points", "SL")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num" style="color:var(--jade);">SL</span>
@@ -4605,7 +4605,7 @@ function pageMarriageIntelligence(chart: ChartData): string {
   const d9c = result.divisional?.d9ContinuityCare;
   const d7 = result.divisional?.d7ChildrenAwareness;
   return `<section class="page dense">
-    ${pageRail("Marriage Intelligence · D9 &amp; KP Analysis", "MI")}
+    ${pageRail("Marriage Intelligence · D9 & KP Analysis", "MI")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num" style="color:var(--gold);">MI</span>
@@ -4664,16 +4664,24 @@ function pageRelationshipIntelligence(chart: ChartData): string {
   const houses = Array.from({ length: 12 }, (_, i) => ({ house: i + 1 }));
   const activeMD = chart.dashas?.find((d: any) => d.active) ?? chart.dashas?.[0];
   const activeAD = (chart as any).antardasha?.find((d: any) => d.active) ?? (chart as any).antardasha?.[0];
+  const mangalInsight = buildMangalDoshaInsight(chart);
+  const severityScore = mangalInsight?.result?.scores?.natalSeverity ?? 0;
+  const nativeManglik = severityScore >= 40;
+  const manglikSeverity: "none" | "mild" | "medium" | "strong" = severityScore >= 75 ? "strong" : severityScore >= 50 ? "medium" : severityScore >= 30 ? "mild" : "none";
   const relInput: RelationshipInput = {
     language: "english",
     planets,
     houses,
     dasha: activeMD ? { mahadasha: activeMD.planet as any, antardasha: activeAD?.planet as any } : undefined,
+    manglik: {
+      nativeManglik,
+      severity: manglikSeverity,
+    },
   };
   const result = analyzeRelationshipIntelligence(relInput) as any;
   const layers = result.layers ?? {};
   return `<section class="page dense">
-    ${pageRail("Relationship Intelligence · Marriage &amp; Children", "RI")}
+    ${pageRail("Relationship Intelligence · Marriage & Children", "RI")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num" style="color:var(--gold);">RI</span>
@@ -4683,7 +4691,7 @@ function pageRelationshipIntelligence(chart: ChartData): string {
         <div class="card" style="padding:12px 18px;text-align:center;">
           <div class="kicker">Marriage Score</div>
           <div style="font-size:30px;font-weight:700;color:${(result.marriageScore ?? 0) >= 70 ? "var(--jade)" : (result.marriageScore ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${result.marriageScore ?? "—"}</div>
-          <div class="body-s" style="font-size:9px;">${esc(result.marriageLabel ?? "")}</div>
+          <div class="body-s" style="font-size:9px;">${esc(formatRelationshipLabel(result.marriageLabel ?? ""))}</div>
         </div>
         <div class="card" style="padding:12px 18px;text-align:center;">
           <div class="kicker">Children Score</div>
@@ -4691,14 +4699,14 @@ function pageRelationshipIntelligence(chart: ChartData): string {
         </div>
         <div class="card" style="padding:12px 18px;flex:1;">
           <div class="kicker" style="margin-bottom:4px;">Narrative</div>
-          <div class="body-s" style="line-height:1.5;">${esc((result.marriageNarrative ?? "").slice(0,120))}</div>
+          <div class="body-s" style="line-height:1.5;">${esc(truncateWords(result.marriageNarrative ?? "", 160))}</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
         ${Object.entries(layers).slice(0,6).map(([key, val]: [string, any]) => `<div class="card" style="padding:8px;">
           <div class="mono" style="font-size:8px;color:var(--gold-dim);margin-bottom:3px;">${esc(key.replace(/([A-Z])/g, " $1").trim())}</div>
           <div style="font-size:20px;font-weight:700;color:${(val?.score ?? 0) >= 70 ? "var(--jade)" : (val?.score ?? 0) >= 50 ? "var(--gold)" : "var(--crimson)"};">${val?.score ?? "—"}</div>
-          <div class="body-s" style="font-size:8px;line-height:1.3;">${esc((val?.paragraph ?? "").slice(0,60))}</div>
+          <div class="body-s" style="font-size:8px;line-height:1.3;">${esc(truncateWords(val?.paragraph ?? "", 90))}</div>
         </div>`).join("")}
       </div>
       <div class="card" style="padding:10px 12px;border-left:3px solid var(--jade);">
@@ -4731,7 +4739,7 @@ function pageAstroSound(chart: ChartData): string {
   const timing = soundResult.timing ?? {};
   const mantra = soundResult.mantraPlan ?? {};
   return `<section class="page dense">
-    ${pageRail("Astro Sound Protocol · Raga &amp; Frequency Therapy", "AS")}
+    ${pageRail("Astro Sound Protocol · Raga & Frequency Therapy", "AS")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num" style="color:var(--violet);">AS</span>
@@ -5241,7 +5249,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
       ])
     : [];
 
-  const pages = [
+  const rawPages = [
     safe(() => coverPage,                    "Cover"),
     safe(() => page2Welcome(),              "Welcome"),
     safe(() => page3Foreword(),              "Foreword"),
@@ -5311,8 +5319,13 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK"), "Lineage Karma & Kula Devata") : "",
     include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP"), "12 Jyotirlinga Sanctuary") : "",
     safe(() => page10Closing(),              "Closing"),
-    safe(() => page11EngineLedger(context),  "Engine Ledger"),
   ].filter(Boolean).join("\n\n");
+
+  // Re-number pages sequentially (Cover is page 1 without pagenum)
+  let pageNumCounter = 2;
+  const pages = rawPages.replace(/<div class="pagenum">[\s\S]*?<\/div>/g, () => {
+    return `<div class="pagenum">${pageNumCounter++}</div>`;
+  });
 
   return `<!doctype html>
 <html lang="en">

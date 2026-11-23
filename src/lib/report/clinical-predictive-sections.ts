@@ -333,19 +333,31 @@ export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR"):
 }
 
 // ── 4. Page: 12th House Sacred Currency (Sampada) & Incubation ───────────────
+const RASHI_LORDS_12H = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+
 export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H"): string {
   const lagna = chart.lagnaRashi || "Aries";
+  const lagnaNum = chart.lagnaNum ?? 0;
   const activeMD = chart.dashas?.find((d) => d.active)?.planet || "Jupiter";
-  const fourthLordHouse = chart.planets.Moon?.house || 4;
+
+  const h4Lord = RASHI_LORDS_12H[(lagnaNum + 4 - 1) % 12];
+  const h6Lord = RASHI_LORDS_12H[(lagnaNum + 6 - 1) % 12];
+  const h8Lord = RASHI_LORDS_12H[(lagnaNum + 8 - 1) % 12];
+  const h12Lord = RASHI_LORDS_12H[(lagnaNum + 12 - 1) % 12];
+
+  const fourthLordHouse = chart.planets[h4Lord]?.house ?? 4;
+  const sixthLordHouse = chart.planets[h6Lord]?.house ?? 6;
+  const eighthLordHouse = chart.planets[h8Lord]?.house ?? 8;
+  const twelfthLordHouse = chart.planets[h12Lord]?.house ?? 12;
 
   const result = evaluateTwelfthHouseIntelligence(
     lagna,
     fourthLordHouse,
     activeMD,
-    "Jupiter",
-    chart.planets.Mars?.house || 6,
-    chart.planets.Saturn?.house || 8,
-    chart.planets.Jupiter?.house || 12
+    h12Lord,
+    sixthLordHouse,
+    eighthLordHouse,
+    twelfthLordHouse
   );
 
   const sampada = result.sampadaProfile;
