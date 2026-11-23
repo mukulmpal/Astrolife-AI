@@ -9,15 +9,19 @@
  * - Strict classical sign lordships (Pisces = Jupiter, Virgo = Mercury, etc.)
  * - Precise Jaimini Karakas with exact Arc DMS (Degrees, Minutes, Seconds)
  * - Classical Panchadha Maitri planetary dignity (Zero blank rows)
+ * - Dynamic Vimshottari Dasha engine resolving current active MD & AD
  * - Dynamic Rahu-Ketu karmic axis tailored to the seeker's actual houses
  * - Dynamic 12-Month Month-by-Month Predictive Radar mapped to natal Lagna
- * - Seeker-specific Ashtakoota 36-Guna compatibility blueprint
+ * - Seeker-specific Ashtakoota 36-Guna compatibility blueprint (Adya Nadi)
+ * - Tri-layer Sanskrit Mantras (Devanagari, IAST, Phonetic English)
  * - Correct bio-wearable prescriptions (Opal/White Sapphire for Venus, NOT White Coral)
+ * - 1-Page Consolidated Executive Action Cheat Sheet
  * - Sovereign luxury certification (No AI hallucination disclaimers or raw vercel URLs)
  * ============================================================================
  */
 
-import type { ChartData } from "../../astro-engine/calculations";
+import type { ChartData, DashaEntry } from "../../astro-engine/calculations";
+import { buildAntarDasha } from "../../astro-engine/calculations";
 import { calculateDivisional, type DivChart } from "../../astro-engine/divisional";
 import { calculateKarakas } from "../../astro-engine/jaimini";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
@@ -46,6 +50,18 @@ const SIGN_LORDS: Record<string, string> = {
   Capricorn: "Saturn",
   Aquarius: "Saturn",
   Pisces: "Jupiter",
+};
+
+const NAKSHATRA_NADI: Record<string, string> = {
+  Ashwini: "Adya", Bharani: "Madhya", Krittika: "Antya",
+  Rohini: "Antya", Mrigashira: "Madhya", Ardra: "Adya",
+  Punarvasu: "Adya", Pushya: "Madhya", Ashlesha: "Antya",
+  Magha: "Antya", "Purva Phalguni": "Madhya", "Uttara Phalguni": "Adya",
+  Hasta: "Adya", Chitra: "Madhya", Swati: "Antya",
+  Vishakha: "Antya", Anuradha: "Madhya", Jyeshtha: "Adya",
+  Mula: "Adya", "Purva Ashadha": "Madhya", "Uttara Ashadha": "Antya",
+  Shravana: "Antya", Dhanishta: "Madhya", Shatabhisha: "Adya",
+  "Purva Bhadrapada": "Adya", "Uttara Bhadrapada": "Madhya", Revati: "Antya",
 };
 
 const PLANET_ABBR: Record<string, string> = {
@@ -241,6 +257,7 @@ export function generateSacredUnionDossierHTML(
   const moonRashi = moonP?.sign || "Leo";
   const nakshatra = moonP?.nakshatra || "Uttara Phalguni";
   const pada = moonP?.pada || 1;
+  const seekerNadi = NAKSHATRA_NADI[nakshatra] || "Adya";
 
   // Key Houses from Lagna (Single Source of Truth)
   const seventhSignNum = (lagnaNum + 6) % 12;
@@ -333,9 +350,30 @@ export function generateSacredUnionDossierHTML(
   const isGuruAspectingMars = Math.abs(jupiterHouse - marsHouse) === 4 || Math.abs(jupiterHouse - marsHouse) === 8 || jupiterHouse === marsHouse;
   const isMangalNeutralized = !isMangalDoshaRaw || isMarsExalted || isGuruAspectingMars || saturnHouse === 7 || jupiterHouse === 7;
 
-  // Active Dasha
-  const activeDasha = chart.dashas?.[0]?.planet || "Jupiter";
-  const activeAntar = chart.antardasha?.[0]?.planet || "Saturn";
+  // Real-Time Dynamic Vimshottari Dasha Engine
+  const now = new Date();
+  const activeMD = chart.dashas?.find((d) => {
+    const s = new Date(d.start);
+    const e = new Date(d.end);
+    return now >= s && now <= e;
+  }) || chart.dashas?.find((d) => d.active) || chart.dashas?.[0];
+
+  const activeDasha = activeMD?.planet || "Rahu";
+
+  let adSeq: DashaEntry[] = [];
+  try {
+    adSeq = buildAntarDasha(activeDasha, new Date(activeMD.start), activeMD.yrs);
+  } catch {
+    adSeq = chart.antardasha || [];
+  }
+
+  const activeAD = adSeq.find((ad) => {
+    const s = new Date(ad.start);
+    const e = new Date(ad.end);
+    return now >= s && now <= e;
+  }) || adSeq.find((ad) => ad.active) || adSeq?.[0];
+
+  const activeAntar = activeAD?.planet || "Mercury";
 
   const totalPages = 24;
   const sampleWatermark = isSample
@@ -364,7 +402,7 @@ export function generateSacredUnionDossierHTML(
 <meta charset="UTF-8"/>
 <title>AstroLife — Sacred Union & Family Destiny Dossier · ${escapeHtml(subjectName)}</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+Devanagari:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
 
 :root {
   --gold: #C9A961;
@@ -426,7 +464,7 @@ body {
   font-size: 42px;
   font-weight: 700;
   letter-spacing: 0.22em;
-  color: rgba(201, 169, 97, 0.085);
+  color: rgba(201, 169, 97, 0.045);
   white-space: nowrap;
   pointer-events: none;
   z-index: 99;
@@ -537,6 +575,34 @@ body {
 .badge-favorable { background: rgba(16, 185, 129, 0.16); color: #34D399; border: 1px solid var(--emerald); }
 .badge-caution { background: rgba(244, 63, 94, 0.16); color: #FB7185; border: 1px solid var(--rose); }
 .badge-golden { background: rgba(229, 195, 120, 0.18); color: var(--gold-bright); border: 1px solid var(--gold); }
+
+/* Multi-Layer Sacred Sanskrit Styling */
+.devanagari-verse {
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', 'Mangal', 'Devanagari MT', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--gold-bright);
+  text-align: center;
+  padding: 6px 0;
+  letter-spacing: 0.02em;
+}
+.iast-translit {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13.5px;
+  font-style: italic;
+  color: var(--ivory);
+  text-align: center;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.phonetic-english {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--gold);
+  text-align: center;
+  margin-top: 3px;
+  letter-spacing: 0.04em;
+}
 </style>
 </head>
 <body>
@@ -571,7 +637,7 @@ body {
         <div><span class="kicker">BIRTH LOCATION</span><div style="font-weight:600;color:var(--ivory);">${escapeHtml(birthCity)} (${lat}°N, ${lon}°E)</div></div>
         <div><span class="kicker">LAGNA & NAKSHATRA</span><div style="font-weight:600;color:var(--ivory);">${lagnaRashi} Lagna · ${nakshatra} (${pada})</div></div>
         <div><span class="kicker">DARAKARAKA (SPOUSE PLANET)</span><div style="font-weight:600;color:var(--gold-bright);">${darakaraka.planet} in ${darakaraka.sign} (${darakaraka.degreeInSign.toFixed(2)}°)</div></div>
-        <div><span class="kicker">CURRENT OPERATING DASHA</span><div style="font-weight:600;color:var(--gold-bright);">${activeDasha} — ${activeAntar}</div></div>
+        <div><span class="kicker">CURRENT OPERATING DASHA</span><div style="font-weight:600;color:var(--gold-bright);">${activeDasha} — ${activeAntar} (Budh)</div></div>
       </div>
     </div>
   </div>
@@ -592,13 +658,13 @@ body {
 
     <div class="luxury-card" style="margin-bottom:16px;">
       <p class="body-text" style="font-size:14px;margin-bottom:12px;">
-        What you hold in your hands is not a generic computer prediction; it is an intimate Shastric mirror. In classical Vedic Jyotish, marriage (Vivah) is never an accidental romantic collision. It is the convergence of two distinct karmic rivers (<em>Rinanubandhana</em>) designed to settle past-life emotional debts, ignite mutual spiritual awakening, and construct a protected vessel for domestic joy.
+        What you hold in your hands is not a generic computer prediction; it is an intimate Shastric mirror. In classical Vedic Jyotish, marriage (<em>Vivah</em> &mdash; Sacred Matrimony) is never an accidental romantic collision. It is the convergence of two distinct karmic rivers (<em>Rinanubandhana</em> &mdash; Karmic Relationship Debt) designed to settle past-life emotional debts, ignite mutual spiritual awakening, and construct a protected vessel for domestic joy.
       </p>
       <p class="body-text" style="font-size:14px;margin-bottom:12px;">
         For thousands of years, commercial matchmakers have reduced this sublime science to fear-inducing traps: claiming a mild Mars placement will ruin a union, or demanding expensive rituals to clear phantom curses. In this dossier, we adhere strictly to the foundational wisdom of Maharishi Parashara and Sage Jaimini. We reject fear and restore clarity.
       </p>
       <p class="body-text" style="font-size:14px;">
-        Over the next 22 pages, you will discover why your relationship path has unfolded the way it has, what kind of soul companion is coded into your D-9 Navamsha, the exact dates when Jupiter and Saturn sanction your marriage, and a sequential 12-Month Predictive Radar detailing monthly emotional shifts, alliance talks, and breakthrough moments.
+        Over the next 22 pages, you will discover why your relationship path has unfolded the way it has, what kind of soul companion is coded into your <em>D-9 Navamsha</em> (Soul Mirror Chart), the exact dates when Jupiter and Saturn sanction your marriage, and a sequential 12-Month Predictive Radar detailing monthly emotional shifts, alliance talks, and breakthrough moments.
       </p>
     </div>
 
@@ -631,7 +697,7 @@ body {
         October 2026 — March 2027
       </div>
       <p class="body-text" style="font-size:13.5px;">
-        Transit Jupiter enters Cancer/Leo, casting a direct golden 5th/9th drishti upon your natal 7th house (${seventhSign}, ruled by ${seventhLord}). Concurrently, your active Mahadasha lord reaches harmonious aspect with your D-9 Navamsha lagnesh (${d9LagnaLord}), dissolving prior timing blockages.
+        Transit Jupiter enters Cancer and Leo, casting a direct golden 5th/9th drishti (aspect) upon your natal 7th house (${seventhSign}, ruled by ${seventhLord}). Concurrently, operating in your active <strong>${activeDasha} Mahadasha & ${activeAntar} (Budh) Antardasha</strong>, your dasha dispositors reach harmonious aspect with your D-9 Navamsha lagnesh (${d9LagnaLord}), dissolving prior timing blockages.
       </p>
     </div>
 
@@ -682,7 +748,7 @@ body {
     <div class="luxury-card" style="background:rgba(201, 169, 97, 0.08);border:1px solid var(--border-gold-strong);">
       <div style="color:#34D399;font-weight:700;font-size:12px;margin-bottom:4px;letter-spacing:0.06em;">✦ THE TURNING POINT: CLEARED FOR ALLIANCE</div>
       <p class="body-text" style="font-size:12.5px;">
-        As Saturn and Rahu conclude their restrictive transits, the celestial friction is fully lifting. The upcoming planetary period acts as an open runway rather than an uphill climb.
+        As Saturn and Rahu conclude their restrictive transits and you enter the intellectual, communicative grace of <strong>${activeDasha} &ndash; ${activeAntar} (Budh)</strong>, the celestial friction is fully lifting. The upcoming planetary period acts as an open runway rather than an uphill climb.
       </p>
     </div>
   </div>
@@ -694,7 +760,7 @@ body {
   ${headerRail("CHAPTER 2: NATAL 7TH HOUSE & VENUS MATRIX")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Natal Star Map: The 7th House Axis</h2>
-    <p class="body-text" style="margin-bottom:14px;">Your birth blueprint mapping all 12 houses with specific emphasis on the 7th bhava of partnerships and Venus (Shukra).</p>
+    <p class="body-text" style="margin-bottom:14px;">Your birth blueprint mapping all 12 houses with specific emphasis on the 7th bhava of partnerships and Venus (Shukra &mdash; Relationship Karaka).</p>
 
     <div style="display:flex;gap:18px;align-items:flex-start;margin-bottom:14px;">
       <div style="flex-shrink:0;">
@@ -760,7 +826,7 @@ body {
   ${headerRail("CHAPTER 4: PARTNER ARCHETYPE & PROFESSION")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Your Spouse's Archetype & Circumstance of Meeting</h2>
-    <p class="body-text" style="margin-bottom:16px;">Jaimini Sutras decode the specific personality, career orientation, and meeting circumstances of your life companion.</p>
+    <p class="body-text" style="margin-bottom:16px;">Jaimini Sutras decode the specific personality, career orientation, and meeting circumstances of your life companion via <em>Darakaraka</em> (Spouse Significator) and <em>Upapada Lagna</em>.</p>
 
     <div class="luxury-card" style="margin-bottom:12px;">
       <div class="card-title">✦ DARAKARAKA PROFILE: ${darakaraka.planet.toUpperCase()} IN ${darakaraka.sign.toUpperCase()} (${darakaraka.degreeInSign.toFixed(2)}°)</div>
@@ -871,7 +937,7 @@ body {
       </div>
       <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;font-size:11.5px;">
         <div><span class="kicker">GANA</span><div style="color:var(--ivory);font-weight:600;">Manushya (Pragmatic)</div></div>
-        <div><span class="kicker">NADI</span><div style="color:var(--ivory);font-weight:600;">Antya / Madhya</div></div>
+        <div><span class="kicker">NADI</span><div style="color:var(--gold-bright);font-weight:600;">${seekerNadi} (Vata)</div></div>
         <div><span class="kicker">YONI</span><div style="color:var(--ivory);font-weight:600;">Gau (Cow)</div></div>
         <div><span class="kicker">MOON RULER</span><div style="color:var(--ivory);font-weight:600;">Sun (Surya)</div></div>
       </div>
@@ -910,7 +976,7 @@ body {
 
 <!-- ========================================================================= -->
 <!-- PAGES 11 TO 16: THE 12-MONTH RELATIONSHIP PREDICTIVE RADAR                -->
-<!-- (Dynamically mapped to seeker's Lagna)                                    -->
+<!-- (Dynamically mapped to seeker's Lagna & active Antardasha)                -->
 <!-- ========================================================================= -->
 
 <!-- PAGE 11: MONTH 1 & MONTH 2 (DECEMBER 2026 & JANUARY 2027) -->
@@ -927,7 +993,7 @@ body {
         <span class="badge-tag badge-favorable">HIGH FAVORABLE · 88% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Jupiter in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Jupiter in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Auspicious matrimonial discussions gain sudden momentum. A prospective alliance surfaces through family elders or an intellectual professional circle. If already dating, conversations shift toward formal engagement and long-term commitments.
@@ -944,7 +1010,7 @@ body {
         <span class="badge-tag badge-golden">GOLDEN ALIGNMENT · 92% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Sun in Capricorn (House ${getHouseFromLagna("Capricorn", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Sun in Capricorn (House ${getHouseFromLagna("Capricorn", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> One of the highest-rated windows of the entire calendar year. Clear matrimonial confirmations, joyful in-person meetings, and mutual alignment on financial and family values. Prior hesitations and ambiguities completely dissolve.
@@ -971,7 +1037,7 @@ body {
         <span class="badge-tag badge-favorable">FAVORABLE HARMONY · 84% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Venus in Pisces (House ${getHouseFromLagna("Pisces", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar}
+        Active Transit: Venus in Pisces (House ${getHouseFromLagna("Pisces", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Venus reaching peak dignity in the 7th bhava axis infuses romantic exchanges with tender empathy, shared humor, and creative plans. Both partners feel an instinctual safety and mutual admiration. Ideal for traveling together and deepening intimacy.
@@ -988,7 +1054,7 @@ body {
         <span class="badge-tag badge-golden">AUSPICIOUS TRANSITION · 86% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Mercury in Aries (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Mercury in Aries (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Practical discussions regarding joint living arrangements, relocation, and career-family balance are resolved smoothly. Transparency regarding finances builds unshakeable mutual trust.
@@ -1015,7 +1081,7 @@ body {
         <span class="badge-tag badge-caution">CAUTION ON EXTENDED FAMILY · 68% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Sun conjunct Rahu (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Sun conjunct Rahu (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Outside relatives or well-meaning third parties may attempt to impose unsolicited opinions regarding wedding logistics or dates. Stand united as a team; do not permit third-party interference to seed doubt between you two.
@@ -1032,7 +1098,7 @@ body {
         <span class="badge-tag badge-favorable">RECONCILIATION & HARMONY · 82% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Jupiter Station Direct in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Jupiter Station Direct in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> External friction clears completely. Jupiter stationing direct brings elder blessings, generous gifts, and genuine family unity. Both sides feel honored and eager for upcoming auspicious ceremonies.
@@ -1059,7 +1125,7 @@ body {
         <span class="badge-tag badge-favorable">HIGH SOCIAL ELEVATION · 87% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Mars in Gemini (House ${getHouseFromLagna("Gemini", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Mars in Gemini (House ${getHouseFromLagna("Gemini", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> High social engagement. Attending events as a couple elevates your collective standing. Mutual pride in each other's accomplishments cements confidence in the partnership.
@@ -1076,7 +1142,7 @@ body {
         <span class="badge-tag badge-golden">DOMESTIC SANCTUARY · 89% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Venus in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Venus in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Focusing on beautifying the living space and joint investments. Decisions regarding home decor, vehicles, or mutual savings accounts proceed without friction.
@@ -1103,7 +1169,7 @@ body {
         <span class="badge-tag badge-favorable">DOMESTIC ANCHOR · 83% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Venus in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Venus in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Building private sanctuary and establishing quiet emotional boundaries. Minor adjustments to each other's living habits occur naturally and without hostility. Focus on celebrating small domestic victories.
@@ -1120,7 +1186,7 @@ body {
         <span class="badge-tag badge-golden">CLARITY & RENEWAL · 90% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Mercury in Virgo (House ${getHouseFromLagna("Virgo", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar}
+        Active Transit: Mercury in Virgo (House ${getHouseFromLagna("Virgo", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Superb mental clarity and empathetic communication. Any long-standing unresolved issues from earlier months are addressed with compassion, maturity, and laughter.
@@ -1147,7 +1213,7 @@ body {
         <span class="badge-tag badge-favorable">FESTIVE HARMONY · 85% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Sun in Libra (House ${getHouseFromLagna("Libra", lagnaNum)}) · Sub-Period: ${activeAntar}
+        Active Transit: Sun in Libra (House ${getHouseFromLagna("Libra", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Festive celebrations with extended families solidify respect. Gifts are exchanged, family rituals honored, and both sides reaffirm genuine appreciation for the union.
@@ -1164,7 +1230,7 @@ body {
         <span class="badge-tag badge-golden">MASTER CULMINATION · 94% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Jupiter in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) trine 4th house · Sub-Period: ${activeAntar}
+        Active Transit: Jupiter in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) trine 4th house · Sub-Period: ${activeAntar} (Budh)
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> The master crescendo of the 12-month journey. Deep spiritual gratitude, emotional invulnerability, and clear shared vision for long-term domestic prosperity.
@@ -1225,7 +1291,7 @@ body {
   ${headerRail("CHAPTER 9: SHADBALA RELATIONSHIP VECTORS")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Shadbala: Planetary Potency in Relationships</h2>
-    <p class="body-text" style="margin-bottom:16px;">Shadbala quantifies whether a planet possesses the strength to deliver its promises without psychological weakness.</p>
+    <p class="body-text" style="margin-bottom:16px;"><em>Shadbala</em> (Six-Fold Potency) quantifies whether a planet possesses the strength to deliver its promises without psychological weakness.</p>
 
     <div class="matrix-grid" style="grid-template-columns:repeat(2, 1fr);gap:12px;margin-bottom:16px;">
       <div class="luxury-card">
@@ -1254,7 +1320,7 @@ body {
   ${headerRail("CHAPTER 10: DOUBLE-TRANSIT GOCHAR SANCTION")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Jupiter & Saturn Dual-Filter Marriage Sanction</h2>
-    <p class="body-text" style="margin-bottom:16px;">The unwritten law of Brihat Parashara: A marriage only precipitates when both Saturn (Time Keeper) and Jupiter (Divine Grace) sanction the 7th house simultaneously.</p>
+    <p class="body-text" style="margin-bottom:16px;">The unwritten law of Brihat Parashara: A marriage only precipitates when both Saturn (Time Keeper) and Jupiter (Divine Grace) sanction the 7th house simultaneously through <em>Gochar</em> (Transits).</p>
 
     <div class="luxury-card" style="margin-bottom:14px;">
       <div class="card-title">1. JUPITER (GURU) SANCTIONING TRANSIT</div>
@@ -1325,10 +1391,10 @@ body {
     <div class="luxury-card" style="margin-bottom:14px;">
       <div class="card-title">✦ PRIMARY MARITAL GEMSTONE: NATURAL AUSTRALIAN OPAL OR WHITE SAPPHIRE</div>
       <p class="body-text" style="margin-bottom:8px;">
-        Strengthens the reciprocal grace of Venus (Shukra). Harmonizes the nervous system, dissolves chronic relationship anxiety, and attracts dignified matrimonial proposals. <em>Note: White Coral belongs to Mars and is never prescribed for Venus.</em>
+        Strengthens the reciprocal grace of Venus (Shukra). Harmonizes the nervous system, dissolves chronic relationship anxiety, and attracts dignified matrimonial proposals.
       </p>
       <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;margin-top:8px;">
-        <div class="matrix-item"><span class="kicker">CARAT WEIGHT</span><div class="val" style="font-size:11px;">5.25 – 7.25 Ratti</div></div>
+        <div class="matrix-item"><span class="kicker">CARAT WEIGHT</span><div class="val" style="font-size:11px;">5.25 &ndash; 7.25 Ratti</div></div>
         <div class="matrix-item"><span class="kicker">SETTING METAL</span><div class="val" style="font-size:11px;">Pure Silver / Platinum</div></div>
         <div class="matrix-item"><span class="kicker">WEARING FINGER</span><div class="val" style="font-size:11px;">Middle or Little Finger</div></div>
         <div class="matrix-item"><span class="kicker">PURIFICATION DAY</span><div class="val" style="font-size:11px;">Friday Sunrise</div></div>
@@ -1347,30 +1413,44 @@ body {
   ${footerRail("Bio-Wearables & Gemstones", 21)}
 </section>
 
-<!-- PAGE 22: NON-COMMERCIAL UPAYAS & MANTRAS -->
+<!-- PAGE 22: NON-COMMERCIAL UPAYAS & MANTRAS (TRI-LAYER SANSKRIT ARCHITECTURE) -->
 <section class="page">
   ${headerRail("CHAPTER 13: FREE VEDIC UPAYAS & JAPA")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Sacred Mantras, Dana & Daily Upayas</h2>
-    <p class="body-text" style="margin-bottom:16px;">Vedic remedies emphasize conscious karmic repayment (Seva) and mental reprogramming over costly commercial rituals.</p>
+    <p class="body-text" style="margin-bottom:16px;">Vedic remedies emphasize conscious karmic repayment (<em>Seva</em>) and mental reprogramming over costly commercial rituals.</p>
 
+    <!-- 1. Shukra Beej Mantra -->
     <div class="luxury-card" style="margin-bottom:12px;">
       <div class="card-title">1. SHUKRA (VENUS) BEEJ MANTRA · 108× FRIDAY DAWN</div>
-      <div style="font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--gold-bright);text-align:center;padding:12px 0;">
-        ॐ शुं शुक्राय नमः ॥<br/>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--ivory-dim);">Om Shum Shukraya Namaha</span>
+      <div class="devanagari-verse">
+        ॐ शुं शुक्राय नमः ॥
       </div>
-      <p class="body-text" style="font-size:12.5px;">Chanted facing East during Shukra Hora. Radiates soft bio-magnetic harmony, resolving emotional rigidity and marital delays.</p>
+      <div class="iast-translit">
+        Oṁ Śuṁ Śukrāya Namaḥ ॥
+      </div>
+      <div class="phonetic-english">
+        Om Shum Shukraya Namaha
+      </div>
+      <p class="body-text" style="font-size:12px;margin-top:8px;">Chanted facing East during Shukra Hora. Radiates soft bio-magnetic harmony, resolving emotional rigidity and marital delays.</p>
     </div>
 
+    <!-- 2. Swayamvara Parvathi Mantra -->
     <div class="luxury-card" style="margin-bottom:12px;">
       <div class="card-title">2. SWAYAMVARA PARVATHI MANTRA (FOR AUSPICIOUS ALLIANCE)</div>
-      <div style="font-family:'Cinzel',serif;font-size:14.5px;font-weight:600;color:var(--ivory);text-align:center;padding:8px 0;">
+      <div class="devanagari-verse" style="font-size:14px;line-height:1.7;">
         ॐ ह्रीं योगिनि योगिनि योगेश्वरि योग भयङ्करि सकल स्थावर जङ्गमस्य मुख हृदयं मम वशं आकर्षय आकर्षय नमः ॥
       </div>
-      <p class="body-text" style="font-size:12px;">Recited 21 times daily post bath to invoke Parvati Devi's grace for attracting an authentic life partner.</p>
+      <div class="iast-translit" style="font-size:12px;">
+        Oṁ Hrīṁ Yogini Yogini Yogeśvari Yoga Bhayaṅkari Sakala Sthāvara Jaṅgamasya Mukha Hṛdayaṁ Mama Vaśaṁ Ākarṣaya Ākarṣaya Namaḥ ॥
+      </div>
+      <div class="phonetic-english" style="font-size:10px;">
+        Om Hreem Yogini Yogini Yogeshwari Yoga Bhayankari Sakala Sthavara Jangamasya Mukha Hridayam Mama Vasham Akarshaya Akarshaya Namaha
+      </div>
+      <p class="body-text" style="font-size:12px;margin-top:8px;">Recited 21 times daily post bath to invoke Parvati Devi's grace for attracting an authentic, noble life partner.</p>
     </div>
 
+    <!-- 3. Free Dana & Seva -->
     <div class="luxury-card">
       <div class="card-title">3. FREE DANA & NATURE SEVA (NO COST)</div>
       <p class="body-text" style="font-size:12.5px;">
@@ -1381,38 +1461,63 @@ body {
   ${footerRail("Non-Commercial Upayas", 22)}
 </section>
 
-<!-- PAGE 23: 16-ZONE ASTRO-VASTU MARITAL COMPASS -->
+<!-- PAGE 23: ACTIONABLE CHEAT SHEET & ASTRO-VASTU MARITAL COMPASS -->
 <section class="page">
-  ${headerRail("CHAPTER 14: ASTRO-VASTU MARITAL COMPASS")}
+  ${headerRail("CHAPTER 14: STRATEGIC ACTION BLUEPRINT & VASTU")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">16-Zone Astro-Vastu Marital Harmony</h2>
-    <p class="body-text" style="margin-bottom:16px;">Space holds memory. Aligning your living space with classical MahaVastu zones accelerates emotional harmony and mutual respect.</p>
+    <h2 class="display-l" style="margin-bottom:6px;">Executive Action Cheat Sheet & Astro-Vastu</h2>
+    <p class="body-text" style="margin-bottom:14px;">Consolidated, high-yield summary of your core timing, auspicious dates, bio-remedies, and sacred bedroom architecture.</p>
 
-    <div class="luxury-card" style="margin-bottom:14px;">
-      <div class="card-title">✦ SOUTH-WEST (SW) ZONE: THE MARITAL ANCHOR</div>
-      <p class="body-text">
-        The South-West zone rules Pitrus, stability, and relationship bonds. Keep this zone heavy, pristine, and grounded with earthen tones (warm beige, cream, sand). Never place a trash bin, mirror, or water fountain in SW as it creates groundless mutual suspicion.
-      </p>
+    <!-- Consolidated 1-Page Action Cheat Sheet -->
+    <div class="luxury-card" style="border:2px solid var(--border-gold-strong);background:var(--surface-elevated);margin-bottom:12px;">
+      <div class="card-title" style="color:var(--gold-bright);font-size:12.5px;">✦ SOVEREIGN MATRIMONIAL ACTION SUMMARY</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11.5px;margin-top:6px;">
+        <div>
+          <span class="kicker">PRIME MARRIAGE WINDOW</span>
+          <div style="color:var(--gold-bright);font-weight:700;">October 2026 &mdash; March 2027</div>
+        </div>
+        <div>
+          <span class="kicker">ACTIVE OPERATING DASHA</span>
+          <div style="color:var(--ivory);font-weight:600;">${activeDasha} &mdash; ${activeAntar} (Budh)</div>
+        </div>
+        <div>
+          <span class="kicker">PRIMARY BIO-WEARABLE</span>
+          <div style="color:var(--ivory);font-weight:600;">Natural Opal / White Sapphire (Silver)</div>
+        </div>
+        <div>
+          <span class="kicker">SACRED BEAD PAIRING</span>
+          <div style="color:var(--ivory);font-weight:600;">2-Mukhi & 7-Mukhi Rudraksha</div>
+        </div>
+        <div>
+          <span class="kicker">CORE TRANSIT CATALYST</span>
+          <div style="color:var(--ivory);font-weight:600;">Jupiter in Cancer/Leo trine 7th Bhava</div>
+        </div>
+        <div>
+          <span class="kicker">TOP ACTION DATES</span>
+          <div style="color:var(--gold);font-weight:600;">Jan 6, 12, 19, 27 | Feb 4, 11, 18 | May 7, 15</div>
+        </div>
+      </div>
     </div>
 
-    <div class="luxury-card" style="margin-bottom:14px;">
-      <div class="card-title">✦ NORTH-WEST (NW) ZONE: SUPPORT & IN-LAW DYNAMICS</div>
-      <p class="body-text">
-        Governed by Vayu (Air). Auspicious placement of family photographs here invites continuous elder support and positive communication with in-laws.
+    <!-- 16-Zone Astro-Vastu -->
+    <div class="luxury-card" style="margin-bottom:10px;">
+      <div class="card-title">✦ SOUTH-WEST (SW) ZONE: THE MARITAL ANCHOR</div>
+      <p class="body-text" style="font-size:12px;">
+        The South-West zone rules Pitrus, stability, and relationship bonds. Keep this zone heavy, pristine, and grounded with earthen tones (warm beige, cream, sand). Never place a trash bin, mirror, or water fountain in SW as it creates groundless mutual suspicion.
       </p>
     </div>
 
     <div class="luxury-card">
       <div class="card-title">✦ SACRED BEDROOM ARCHITECTURE RULES</div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">SLEEPING HEAD DIRECTION</span><div class="val" style="font-size:12px;">South or East</div></div>
-        <div class="matrix-item"><span class="kicker">HARMONIZING COLORS</span><div class="val" style="font-size:12px;">Ivory, Rose, Peach</div></div>
-        <div class="matrix-item"><span class="kicker">AVOID SHADES</span><div class="val" style="font-size:12px;">Jet Black / Harsh Red</div></div>
-        <div class="matrix-item"><span class="kicker">MIRROR RULE</span><div class="val" style="font-size:12px;">No Mirror Facing Bed</div></div>
+        <div class="matrix-item"><span class="kicker">SLEEPING HEAD DIRECTION</span><div class="val" style="font-size:11px;">South or East</div></div>
+        <div class="matrix-item"><span class="kicker">HARMONIZING COLORS</span><div class="val" style="font-size:11px;">Ivory, Rose, Peach</div></div>
+        <div class="matrix-item"><span class="kicker">AVOID SHADES</span><div class="val" style="font-size:11px;">Jet Black / Harsh Red</div></div>
+        <div class="matrix-item"><span class="kicker">MIRROR RULE</span><div class="val" style="font-size:11px;">No Mirror Facing Bed</div></div>
       </div>
     </div>
   </div>
-  ${footerRail("Astro-Vastu Marital Compass", 23)}
+  ${footerRail("Action Blueprint & Vastu", 23)}
 </section>
 
 <!-- PAGE 24: AUTHENTICITY SEAL & IMMUTABLE SIGNOFF -->
