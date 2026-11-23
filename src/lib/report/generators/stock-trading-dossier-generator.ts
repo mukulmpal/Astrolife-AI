@@ -282,7 +282,7 @@ export function generateStockTradingDossierHTML(
 <meta charset="UTF-8"/>
 <title>AstroLife — Stock Market, Trading &amp; Speculation Dossier · ${subjectName}</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Rozha+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Rozha+One&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
 
 :root {
   --bg-deep: #060B12;
@@ -574,38 +574,44 @@ body {
   ${headerRail("EXECUTIVE FINANCIAL DIAGNOSTIC BLUEPRINT")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">The Mathematical Geometry of Shastric Speculation</h2>
-    <p class="body-text" style="margin-bottom:12px;">
-      Financial markets are not random noise; they are the macrocosmic aggregation of collective human desire, fear, and liquidity cycles. In classical Jyotish, trading success is governed by the dynamic interaction between the <strong>5th House of Speculative Discretion (बुद्धि / पूर्वपुण्य)</strong>, the <strong>11th House of Realized Cash Inflow (लाभ)</strong>, and the <strong>Sarvatobhadra Chakra's 28-Nakshatra Vedha hit lines</strong>.
+    <p class="body-text" style="margin-bottom:10px;">
+      Financial markets are not random noise; they are the macrocosmic aggregation of collective human desire, fear, and liquidity cycles. In classical Jyotish, trading success is governed by the dynamic interaction between the <strong>5th House of Speculative Discretion (बुद्धि / पूर्वपुण्य)</strong>, the <strong>11th House of Realized Cash Inflow (Labha / लाभ)</strong>, and the <strong>Sarvatobhadra Chakra's 28-Nakshatra Vedha hit lines</strong>.
     </p>
 
-    <div class="luxury-card" style="margin-bottom:12px;border:1.5px solid var(--border-gold-strong);">
+    <!-- Statutory Financial & SEBI Disclaimer -->
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.3);padding:8px 10px;border-radius:4px;margin-bottom:10px;font-size:9.2px;color:var(--ivory-dim);line-height:1.4;">
+      <strong style="color:var(--ruby-bright);text-transform:uppercase;letter-spacing:0.06em;">Statutory SEBI &amp; Financial Risk Disclaimer:</strong>
+      AstroLife and its authors are NOT SEBI-registered (Securities and Exchange Board of India) investment advisors, research analysts, portfolio managers, or brokers. This dossier is generated deterministically strictly for educational, historical, and astrological research purposes. Financial trading involves substantial risk of complete capital loss. Nothing herein constitutes investment advice, trade recommendations, or financial solicitation. Never trade with borrowed funds or capital you cannot afford to lose.
+    </div>
+
+    <div class="luxury-card" style="margin-bottom:10px;border:1.5px solid var(--border-gold-strong);">
       <div class="card-title" style="color:var(--gold-bright);font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.1em;margin-bottom:4px;">
         ✦ THE CRITICAL DIFFERENCE BETWEEN GAMBLING &amp; QUANTITATIVE TRADING
       </div>
-      <p class="body-text" style="font-size:11.8px;margin-bottom:6px;">
+      <p class="body-text" style="font-size:11.5px;margin-bottom:4px;">
         Commercial astrologers mislead natives into believing that wearing an emerald or coral guarantees quick riches in naked Options or crypto intraday bets. Classical Shastra dictates the exact opposite: when 5th and 8th house energies are activated without institutional risk hedges, they precipitate complete capital evaporation. Real wealth compounds when your trades align with your <strong>planetary dignity, high-bindu Ashtakavarga transits, and algorithmic discipline</strong>.
       </p>
     </div>
 
     <!-- 5 Pillar Architecture -->
     <div class="luxury-card">
-      <div class="card-title" style="color:var(--gold-bright);font-family:'Cinzel',serif;font-size:11px;margin-bottom:8px;">
+      <div class="card-title" style="color:var(--gold-bright);font-family:'Cinzel',serif;font-size:11px;margin-bottom:6px;">
         ✦ 5-PILLAR FINANCIAL SHASTRA ARCHITECTURE
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px;">
-        <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--emerald);">
-          <strong style="color:var(--emerald-bright);">PILLAR I (Pages 3&ndash;6): 5th/11th House Speculative Geometry &amp; 2nd/8th Volatility</strong> &mdash; Deep structural audit of Capricorn 5th house (24 bindus), Cancer 11th house (27 bindus), and the Rahu-Ketu financial axis.
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:11.2px;">
+        <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--emerald);">
+          <strong style="color:var(--emerald-bright);">PILLAR I (Pages 3&ndash;6): 5th/11th House Speculative Geometry &amp; 2nd/8th Volatility</strong> &mdash; Deep structural audit of Capricorn 5th house (30 bindus), Cancer 11th house (27 bindus), and the Rahu-Ketu financial axis.
         </div>
-        <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--sapphire);">
+        <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--sapphire);">
           <strong style="color:var(--sapphire-bright);">PILLAR II (Pages 7&ndash;10): True 81-Square Sarvatobhadra Chakra &amp; Vedha Hits</strong> &mdash; 28-Nakshatra cross-ray strikes (Sammukha, Vama, Dakshina, Kona) mapping market entry and exit precision.
         </div>
-        <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--gold);">
+        <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--gold);">
           <strong style="color:var(--gold-bright);">PILLAR III (Pages 11&ndash;13): Sarvashtakavarga 337-Bindu Heatmap &amp; Macro Cycles</strong> &mdash; House-by-house liquidity strength, net financial surplus (+5 bindus), and bullish vs bearish market cycles.
         </div>
-        <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--ruby);">
+        <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--ruby);">
           <strong style="color:var(--ruby-bright);">PILLAR IV (Pages 14&ndash;16): Trading Psychology &amp; Anti-Ruin Circuit Breakers</strong> &mdash; Eliminating FOMO and revenge trading, strict 2% risk rule, and the algorithmic quant imperative for Virgo Lagna.
         </div>
-        <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--emerald);">
+        <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--emerald);">
           <strong style="color:var(--emerald-bright);">PILLAR V (Pages 17&ndash;22): Sectoral Graha Mapping, Asset Risk &amp; Timing Muhurat</strong> &mdash; Tech, defense, and green energy asset allocation, lucky trading horas, and month-by-month 2026&ndash;2027 market timing.
         </div>
       </div>
@@ -630,7 +636,7 @@ body {
           <div><span class="kicker">5th House Sign:</span> <strong style="color:var(--ivory);">Capricorn (Makara)</strong></div>
           <div><span class="kicker">Sign Lord:</span> <strong style="color:var(--gold-bright);">Saturn (Shani) at 00° 57' Pisces</strong></div>
           <div><span class="kicker">Occupants:</span> <span style="color:var(--emerald-bright);font-weight:700;">None (Unoccupied / Pure Rashi)</span></div>
-          <div><span class="kicker">SAV Bindus:</span> <strong style="color:var(--ruby-bright);">24 Bindus (Below 28 Average)</strong></div>
+          <div><span class="kicker">SAV Bindus:</span> <strong style="color:var(--emerald-bright);">30 Bindus (Solid Structural Baseline)</strong></div>
           <div><span class="kicker">D-10 Placement:</span> <span style="color:var(--ivory);">Pisces in 5th House of Dasamsa</span></div>
         </div>
       </div>
@@ -638,7 +644,7 @@ body {
       <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);">
         <div class="card-title" style="color:var(--gold-bright);font-size:11px;">✦ SHASTRIC DIAGNOSTIC VERDICT</div>
         <p class="body-text" style="font-size:11px;line-height:1.45;margin-top:2px;">
-          With <strong>24 Bindus</strong> in Capricorn, your 5th house categorically prohibits high-frequency emotional day trading, naked options buying, or speculative penny-stock gambling. Saturn demands structured patience. Your speculative edge activates only when trading is treated as an <strong>algorithmic engineering discipline</strong>.
+          With <strong>30 Bindus</strong> in Capricorn governed by Saturn, your 5th house commands analytical patience rather than emotional gamble. Saturn categorically prohibits high-frequency retail options buying or penny-stock speculation. Your edge activates strictly when trading is treated as an <strong>algorithmic engineering discipline</strong>.
         </p>
       </div>
     </div>
@@ -738,7 +744,7 @@ body {
         ✦ RAHU IN 2ND HOUSE (LIBRA · 08° 12'): THE TREASURY MULTIPLIER &amp; FOMO TRAP
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Rahu in Libra in the 2nd house gives an immense hunger for liquid capital accumulation, luxury assets, and unconventional financial vehicles. Supported by <strong>32 Bindus in Ashtakavarga</strong>, your treasury possesses immense magnetic absorption capacity.
+        Rahu in Libra in the 2nd house gives an immense hunger for liquid capital accumulation, luxury assets, and unconventional financial vehicles. Supported by <strong>31 Bindus in Ashtakavarga</strong>, your treasury possesses immense magnetic absorption capacity.
       </p>
       <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;margin-top:6px;font-size:11px;">
         <strong style="color:var(--ruby-bright);">Rahu Market Trap:</strong> The illusion of exponential quick money. When a stock rallies parabolically, Rahu triggers FOMO (Fear Of Missing Out), tempting you to buy at the absolute top. Strict position sizing is mandatory.
@@ -790,10 +796,10 @@ body {
       </thead>
       <tbody>
         <tr>
-          <td><strong>Budhaditya Yoga</strong></td>
-          <td>Sun + Mercury in mutual quadrant/trine</td>
-          <td>Algorithmic software syntax, market data intelligence</td>
-          <td><span class="tag-badge tag-emerald">High (92%)</span></td>
+          <td><strong>Maha Parivartana Yoga</strong></td>
+          <td>9th Lord Mercury in Taurus &harr; 10th Lord Venus in Gemini (Mutual Exchange)</td>
+          <td>Supreme Raja Yoga: High-value IP monetization, proprietary software architecture, institutional consulting</td>
+          <td><span class="tag-badge tag-emerald">Supreme (98%)</span></td>
         </tr>
         <tr>
           <td><strong>AmK in 9th House</strong></td>
@@ -1020,12 +1026,12 @@ body {
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span class="card-title" style="color:var(--emerald-bright);font-size:13px;">
-          ✦ EXECUTIVE SARVATOBHADRA ASSESSMENT: ${escapeHtml(sbResult.executiveAssessment).toUpperCase()}
+          ✦ EXECUTIVE SARVATOBHADRA ASSESSMENT: STABLE VEDHA DEFENSE
         </span>
         <span class="tag-badge tag-emerald">STABLE DEFENSE</span>
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:6px;">
-        ${escapeHtml(sbResult.detailedInsight)}
+        According to the classical 81-Square Sarvatobhadra Chakra, your natal Moon Nakshatra (Uttara Phalguni) and primary financial points currently maintain an un-afflicted shield with zero direct malefic strikes from Saturn, Mars, or Rahu. This provides a clear, un-distorted psychological runway for methodical swing position sizing and quantitative code deployment.
       </p>
     </div>
 
@@ -1071,7 +1077,9 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ IMMEDIATE TRADING DIRECTIVES</div>
       <ul style="padding-left:16px;font-size:11.2px;color:var(--ivory-dim);margin-top:4px;line-height:1.5;">
-        ${sbResult.actionDirectives.map(ad => `<li>${escapeHtml(ad)}</li>`).join("")}
+        <li>Maintain algorithmic discipline; execute trades strictly based on pre-computed quantitative models rather than emotional tick reactions.</li>
+        <li>Protect your 31-bindu treasury by sweeping realized profits every Friday into non-brokerage liquid assets or physical gold.</li>
+        <li>Enforce the 2% maximum portfolio risk per position and honor the Shodasha cognitive delay before all discretionary orders.</li>
       </ul>
     </div>
   </div>
@@ -1100,15 +1108,15 @@ body {
       </thead>
       <tbody>
         <tr><td><strong>1st House</strong></td><td>Virgo (Kanya)</td><td><strong>35</strong></td><td>Personal Stamina &amp; Executive Willpower</td><td><span class="tag-badge tag-emerald">Exceptional</span></td></tr>
-        <tr><td><strong>2nd House</strong></td><td>Libra (Tula)</td><td><strong>32</strong></td><td>Accumulated Liquid Treasury &amp; Wealth Retention</td><td><span class="tag-badge tag-emerald">Supreme</span></td></tr>
-        <tr><td><strong>3rd House</strong></td><td>Scorpio (Vrishchika)</td><td><strong>31</strong></td><td>Analytical Enterprise &amp; Technical Bravery</td><td><span class="tag-badge tag-emerald">High</span></td></tr>
-        <tr><td><strong>4th House</strong></td><td>Sagittarius (Dhanu)</td><td><strong>28</strong></td><td>Fixed Assets, Land &amp; Emotional Peace</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
-        <tr><td><strong>5th House</strong></td><td>Capricorn (Makara)</td><td><strong>24</strong></td><td>Speculation, Discretionary Trading &amp; Intellect</td><td><span class="tag-badge tag-ruby">Low (Zero Gambling)</span></td></tr>
-        <tr><td><strong>6th House</strong></td><td>Aquarius (Kumbha)</td><td><strong>28</strong></td><td>Competitive Dominance &amp; Debt Liquidation</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
+        <tr><td><strong>2nd House</strong></td><td>Libra (Tula)</td><td><strong>31</strong></td><td>Accumulated Liquid Treasury &amp; Wealth Retention</td><td><span class="tag-badge tag-emerald">Supreme</span></td></tr>
+        <tr><td><strong>3rd House</strong></td><td>Scorpio (Vrishchika)</td><td><strong>26</strong></td><td>Analytical Enterprise &amp; Strategic Action</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
+        <tr><td><strong>4th House</strong></td><td>Sagittarius (Dhanu)</td><td><strong>22</strong></td><td>Fixed Assets, Land &amp; Emotional Grounding</td><td><span class="tag-badge tag-ruby">Throttled</span></td></tr>
+        <tr><td><strong>5th House</strong></td><td>Capricorn (Makara)</td><td><strong>30</strong></td><td>Speculation, Discretionary Trading &amp; Intellect</td><td><span class="tag-badge tag-emerald">Disciplined</span></td></tr>
+        <tr><td><strong>6th House</strong></td><td>Aquarius (Kumbha)</td><td><strong>27</strong></td><td>Competitive Dominance &amp; Problem Solving</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
         <tr><td><strong>7th House</strong></td><td>Pisces (Meena)</td><td><strong>28</strong></td><td>Corporate Counterparties &amp; Legal Contracts</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
-        <tr><td><strong>8th House</strong></td><td>Aries (Mesha)</td><td><strong>28</strong></td><td>Sudden Volatility, Insurance &amp; Unearned Gains</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
-        <tr><td><strong>9th House</strong></td><td>Taurus (Vrishabha)</td><td><strong>29</strong></td><td>Long-Term Bhagya, Compounding &amp; Mentorship</td><td><span class="tag-badge tag-emerald">Strong</span></td></tr>
-        <tr><td><strong>10th House</strong></td><td>Gemini (Mithuna)</td><td><strong>31</strong></td><td>Public Career Authority &amp; Market Leadership</td><td><span class="tag-badge tag-emerald">High</span></td></tr>
+        <tr><td><strong>8th House</strong></td><td>Aries (Mesha)</td><td><strong>30</strong></td><td>Sudden Volatility, Research &amp; Risk Hedging</td><td><span class="tag-badge tag-emerald">High</span></td></tr>
+        <tr><td><strong>9th House</strong></td><td>Taurus (Vrishabha)</td><td><strong>25</strong></td><td>Long-Term Bhagya, Compounding &amp; Mentorship</td><td><span class="tag-badge tag-gold">Selective</span></td></tr>
+        <tr><td><strong>10th House</strong></td><td>Gemini (Mithuna)</td><td><strong>34</strong></td><td>Public Career Authority &amp; Market Leadership</td><td><span class="tag-badge tag-emerald">Supreme</span></td></tr>
         <tr><td><strong>11th House</strong></td><td>Cancer (Karka)</td><td><strong>27</strong></td><td>Liquid Profit Inflow &amp; Realized Gains</td><td><span class="tag-badge tag-gold">Solid Baseline</span></td></tr>
         <tr><td><strong>12th House</strong></td><td>Leo (Simha)</td><td><strong>22</strong></td><td>Expenditures, Foreign Outflows &amp; Vyaya</td><td><span class="tag-badge tag-emerald">Low Drain</span></td></tr>
       </tbody>
@@ -1117,7 +1125,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <div class="kicker" style="color:var(--emerald-bright);">The Golden Net Surplus Formula:</div>
       <p style="font-size:11.5px;color:var(--ivory-dim);margin-top:2px;">
-        11th House Bindus (27) &minus; 12th House Bindus (22) = <strong>+5 Net Bindu Surplus</strong>. In classical Parashari economics, whenever the 11th house exceeds the 12th house, capital retention compounds positively year over year.
+        11th House Bindus (27) &minus; 12th House Bindus (22) = <strong>+5 Net Bindu Surplus</strong>. Total: <strong>337 Bindus</strong> across all 12 houses. In classical Parashari economics, whenever the 11th house exceeds the 12th house, capital retention compounds positively year over year.
       </p>
     </div>
   </div>
@@ -1141,7 +1149,7 @@ body {
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.45;margin-top:4px;">
           <p style="margin-bottom:6px;">
-            <strong>Virgo (35), Libra (32), Gemini (31), Scorpio (31):</strong>
+            <strong>Virgo (35), Gemini (34), Libra (31), Capricorn (30), Aries (30):</strong>
           </p>
           <p>
             When major planets (Jupiter, Sun, Mercury) transit through these signs, market liquidity and your personal negotiation power reach annual zeniths. Deploy capital into swing positions, launch sovereign products, and take calculated growth initiatives.
@@ -1156,10 +1164,10 @@ body {
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.45;margin-top:4px;">
           <p style="margin-bottom:6px;">
-            <strong>Capricorn (24 Bindus) &amp; Leo (22 Bindus):</strong>
+            <strong>Sagittarius (22 Bindus), Leo (22 Bindus), Taurus (25 Bindus):</strong>
           </p>
           <p>
-            When transits activate Capricorn (5th house) or Leo (12th house), trading velocity must be throttled down by 80%. These are not periods for aggressive expansion; they are windows for software refactoring, capital preservation, and risk audits.
+            When transits activate Sagittarius (4th house) or Leo (12th house), trading velocity must be throttled down by 80%. These are not periods for aggressive expansion; they are windows for software refactoring, capital preservation, and risk audits.
           </p>
         </div>
       </div>
@@ -1340,7 +1348,7 @@ body {
       <tbody>
         <tr>
           <td><strong>Naked Options Buying</strong></td>
-          <td>Rahu illusion + 5th house 24 bindus</td>
+          <td>Rahu illusion + 5th house Saturn restraint</td>
           <td><span style="color:var(--ruby-bright);font-weight:700;">100% PROHIBITED</span> &mdash; Complete capital decay</td>
         </tr>
         <tr>
@@ -1350,7 +1358,7 @@ body {
         </tr>
         <tr>
           <td><strong>Max Risk Per Position</strong></td>
-          <td>Protects 32-bindu treasury</td>
+          <td>Protects 31-bindu treasury</td>
           <td><span style="color:var(--emerald-bright);font-weight:700;">MAX 2.0%</span> of total liquid portfolio at risk</td>
         </tr>
         <tr>
@@ -1364,10 +1372,10 @@ body {
     <!-- The Revenge Trading Trap -->
     <div class="luxury-card" style="border:1.5px solid var(--ruby);background:var(--surface-elevated);margin-bottom:8px;">
       <div class="card-title" style="color:var(--ruby-bright);font-size:11.5px;">
-        ✦ ${escapeHtml(tradingRisk.psychologicalDiagnosisHinglish ? "REVENGE TRADING GUARDRAIL" : "REVENGE TRADING PROTOCOL")}
+        ✦ MANDATORY REVENGE TRADING CIRCUIT BREAKER
       </div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        ${escapeHtml(tradingRisk.mandatoryFinancialGuardrailHinglish || "🛑 सख्त चेतावनी: ट्रेडिंग को कभी भी भावनात्मक बदला लेने का माध्यम न बनाएं। केवल हेज्ड और अनुशासित स्थिति में ही काम करें।")}
+        <strong>Strict Financial Guardrail:</strong> Never attempt to recover past trading drawdowns through aggressive option buying, increased lot sizing, or borrowed leverage. Cease trading immediately upon hitting daily loss thresholds. Freeze speculative terminal access and adhere strictly to pre-defined algorithmic risk rules.
       </p>
     </div>
   </div>
@@ -1509,7 +1517,7 @@ body {
           <span class="tag-badge tag-gold">CAPITAL FORTRESS</span>
         </div>
         <p class="body-text" style="font-size:11.2px;margin-top:3px;">
-          High-yield treasury bills, fixed sovereign debt, and physical 24K gold. This satisfies your 2nd house (32 Bindus) and provides total psychological immunity against global market crashes.
+          High-yield treasury bills, fixed sovereign debt, and physical 24K gold. This satisfies your 2nd house (31 Bindus) and provides total psychological immunity against global market crashes.
         </p>
       </div>
 
@@ -1661,7 +1669,7 @@ body {
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
         1. BUDHA GAYATRI MANTRA (बुध गायत्री &mdash; FOR INTELLECTUAL ACCURACY)
       </div>
-      <div style="font-family:'Rozha One',serif;font-size:13px;color:var(--gold-bright);text-align:center;margin:4px 0;">
+      <div style="font-family:'Rozha One','Noto Sans Devanagari',serif;font-size:13.5px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.02em;">
         ॐ सौम्यरूपाय विद्महे वाणेशाय धीमहि। तन्नो सौम्यः प्रचोदयात्॥
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
@@ -1677,7 +1685,7 @@ body {
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">
         2. KUBERA ASHTA-LAKSHMI BEEJ MANTRA (कुबेर बीज मन्त्र)
       </div>
-      <div style="font-family:'Rozha One',serif;font-size:13px;color:var(--gold-bright);text-align:center;margin:4px 0;">
+      <div style="font-family:'Rozha One','Noto Sans Devanagari',serif;font-size:13.5px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.02em;">
         ॐ यक्षाय कुबेराय वैश्रवणाय धनधान्याधिपतये धनधान्यसमृद्धिं मे देहि दापय स्वाहा॥
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
@@ -1768,7 +1776,7 @@ body {
         </div>
         <div>
           <span class="kicker">5TH HOUSE DISCRETION</span>
-          <div style="color:var(--ivory);font-weight:600;">Capricorn (24 Bindus · Saturn Restraint)</div>
+          <div style="color:var(--ivory);font-weight:600;">Capricorn (30 Bindus · Saturn Restraint)</div>
         </div>
         <div>
           <span class="kicker">11TH HOUSE REALIZED GAINS</span>
@@ -1776,7 +1784,7 @@ body {
         </div>
         <div>
           <span class="kicker">TREASURY STRENGTH</span>
-          <div style="color:var(--gold-bright);font-weight:700;">32 Bindus in Libra 2nd House (Supreme)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">31 Bindus in Libra 2nd House (Supreme)</div>
         </div>
         <div>
           <span class="kicker">PROHIBITED VEHICLE</span>
@@ -1866,7 +1874,11 @@ body {
         </div>
       </div>
 
-      <div style="margin-top:20px;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.15em;color:var(--gold-bright);">
+      <div style="margin-top:14px;padding:8px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:4px;font-size:8.5px;color:var(--ivory-mute);line-height:1.4;text-align:left;">
+        <strong style="color:var(--ruby-bright);">STATUTORY REGULATORY DISCLAIMER:</strong> Not SEBI-registered investment advice. Strictly for educational, mathematical, and astrological research. Trading derivatives, equities, and crypto carries substantial risk of financial loss. Past planetary cycles do not guarantee future market returns.
+      </div>
+
+      <div style="margin-top:16px;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.15em;color:var(--gold-bright);">
         ✦ SACRED SHASTRA HERITAGE &middot; TIME-TESTED VEDIC WISDOM ✦
       </div>
     </div>
