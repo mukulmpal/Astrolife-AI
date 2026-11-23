@@ -23,6 +23,7 @@ import { calculateAshtakavarga, type AKVResult } from "../astro-engine/ashtakava
 import { calculateKarakas } from "../astro-engine/jaimini";
 import { generateSacredUnionDossierHTML } from "./generators/sacred-union-dossier-generator";
 import { generateRajaYogaWealthDossierHTML } from "./generators/raja-yoga-wealth-dossier-generator";
+import { generateBioVedicRemediesDossierHTML } from "./generators/bio-vedic-remedies-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -157,6 +158,17 @@ export function generatePackageDossierHTML(
     reportId.includes("pkg_wealth_yogas")
   ) {
     return generateRajaYogaWealthDossierHTML(chart, options);
+  }
+
+  if (
+    reportId.includes("remed") ||
+    reportId.includes("bio") ||
+    reportId.includes("protect") ||
+    reportId.includes("vault") ||
+    reportId.includes("pkg_bio_remedies") ||
+    reportId.includes("gemstone")
+  ) {
+    return generateBioVedicRemediesDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
