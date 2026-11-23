@@ -22,6 +22,7 @@ import { calculateShadbala, type ShadbalaResult } from "../astro-engine/shadbala
 import { calculateAshtakavarga, type AKVResult } from "../astro-engine/ashtakavarga";
 import { calculateKarakas } from "../astro-engine/jaimini";
 import { generateSacredUnionDossierHTML } from "./generators/sacred-union-dossier-generator";
+import { generateRajaYogaWealthDossierHTML } from "./generators/raja-yoga-wealth-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -146,6 +147,16 @@ export function generatePackageDossierHTML(
     reportId.includes("marriage")
   ) {
     return generateSacredUnionDossierHTML(chart, options);
+  }
+
+  if (
+    reportId.includes("wealth") ||
+    reportId.includes("raja") ||
+    reportId.includes("career") ||
+    reportId.includes("money") ||
+    reportId.includes("pkg_wealth_yogas")
+  ) {
+    return generateRajaYogaWealthDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
