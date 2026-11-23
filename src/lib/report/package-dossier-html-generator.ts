@@ -25,6 +25,7 @@ import { generateSacredUnionDossierHTML } from "./generators/sacred-union-dossie
 import { generateRajaYogaWealthDossierHTML } from "./generators/raja-yoga-wealth-dossier-generator";
 import { generateBioVedicRemediesDossierHTML } from "./generators/bio-vedic-remedies-dossier-generator";
 import { generateSpaceDestinyDossierHTML } from "./generators/space-destiny-dossier-generator";
+import { generateStockTradingDossierHTML } from "./generators/stock-trading-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -182,6 +183,17 @@ export function generatePackageDossierHTML(
     reportId.includes("calibration")
   ) {
     return generateSpaceDestinyDossierHTML(chart, options);
+  }
+
+  if (
+    reportId.includes("stock") ||
+    reportId.includes("trading") ||
+    reportId.includes("speculat") ||
+    reportId.includes("sarvatobhadra") ||
+    reportId.includes("pkg_stock_trading") ||
+    reportId.includes("market")
+  ) {
+    return generateStockTradingDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");

@@ -190,6 +190,7 @@ export default function ReportPage() {
   const [reportType, setReportType]   = useState<ReportOptions["type"]>("basic");
   const [palette, setPalette]         = useState<ReportPalette>("midnight");
   const [cover, setCover]             = useState<ReportCover>("wheel");
+  const [language, setLanguage]       = useState<"en" | "hi">("en");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied]           = useState(false);
   const [latestPalmSessionId, setLatestPalmSessionId] = useState<string | null>(null);
@@ -250,6 +251,7 @@ export default function ReportPage() {
         type: reportType,
         palette,
         cover,
+        language,
         palmistrySessionId: reportType === "elite" ? latestPalmSessionId ?? undefined : undefined,
       });
       const win = window.open("", "_blank");
@@ -280,6 +282,7 @@ export default function ReportPage() {
         type: reportType,
         palette,
         cover,
+        language,
         palmistrySessionId: reportType === "elite" ? latestPalmSessionId ?? undefined : undefined,
       });
     } catch (error) {
@@ -431,8 +434,8 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Palette & Cover — side by side */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "18px" }}>
+        {/* Palette, Cover & Language Selector */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px", marginBottom: "18px" }}>
           <div className="rep-section" style={{ marginBottom: 0 }}>
             <div className="rep-title">🎨 Palette</div>
             <div className="seg-group" style={{ marginTop: 0 }}>
@@ -461,6 +464,41 @@ export default function ReportPage() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+          <div className="rep-section" style={{ marginBottom: 0 }}>
+            <div className="rep-title">🌐 Edition Language</div>
+            <div className="seg-group" style={{ marginTop: 0, flexDirection: "column", gap: "8px" }}>
+              <button
+                type="button"
+                className="seg-btn"
+                onClick={() => setLanguage("en")}
+                style={{
+                  borderColor: language === "en" ? "#B8860B" : undefined,
+                  background: language === "en" ? "rgba(184,134,11,0.14)" : undefined,
+                  color: language === "en" ? "#B8860B" : undefined,
+                  justifyContent: "space-between",
+                  padding: "10px 14px",
+                }}
+              >
+                <span style={{ fontWeight: 600 }}>🇬🇧 100% English</span>
+                <span style={{ fontSize: "11px", opacity: 0.8 }}>For NRI & International</span>
+              </button>
+              <button
+                type="button"
+                className="seg-btn"
+                onClick={() => setLanguage("hi")}
+                style={{
+                  borderColor: language === "hi" ? "#B8860B" : undefined,
+                  background: language === "hi" ? "rgba(184,134,11,0.14)" : undefined,
+                  color: language === "hi" ? "#B8860B" : undefined,
+                  justifyContent: "space-between",
+                  padding: "10px 14px",
+                }}
+              >
+                <span style={{ fontWeight: 600 }}>🇮🇳 100% शुद्ध हिन्दी</span>
+                <span style={{ fontSize: "11px", opacity: 0.8 }}>भारत व हिन्दी भाषी</span>
+              </button>
             </div>
           </div>
         </div>
