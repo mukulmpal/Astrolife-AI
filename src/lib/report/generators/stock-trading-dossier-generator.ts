@@ -797,7 +797,7 @@ body {
       <tbody>
         <tr>
           <td><strong>Maha Parivartana Yoga</strong></td>
-          <td>9th Lord Mercury in Taurus &harr; 10th Lord Venus in Gemini (Mutual Exchange)</td>
+          <td>10th Lord Mercury in 9th (Taurus) &harr; 9th Lord Venus in 10th (Gemini) (Dharma-Karmadhipati Exchange)</td>
           <td>Supreme Raja Yoga: High-value IP monetization, proprietary software architecture, institutional consulting</td>
           <td><span class="tag-badge tag-emerald">Supreme (98%)</span></td>
         </tr>
@@ -1179,7 +1179,7 @@ body {
         ✦ THE ASHTAKAVARGA TRADE EXECUTION AXIOM
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Never buy options or enter directional swing positions on days when the transiting Moon traverses a sign containing fewer than 26 Bindus. Wait for Moon to enter Virgo (35), Libra (32), or Gemini (31) for maximum momentum synchronicity.
+        Never buy options or enter directional swing positions on days when the transiting Moon traverses a sign containing fewer than 26 Bindus. Wait for Moon to enter Virgo (35), Gemini (34), or Libra (31) for maximum momentum synchronicity.
       </p>
     </div>
   </div>
@@ -1211,23 +1211,23 @@ body {
         <tr>
           <td><strong>Sun (Surya)</strong></td>
           <td>5 Bindus</td>
-          <td>3 Bindus</td>
           <td>4 Bindus</td>
+          <td>3 Bindus</td>
           <td>5 Bindus</td>
           <td>Institutional reputation &amp; corporate backing</td>
         </tr>
         <tr>
           <td><strong>Moon (Chandra)</strong></td>
           <td>4 Bindus</td>
-          <td>3 Bindus</td>
           <td>4 Bindus</td>
+          <td>3 Bindus</td>
           <td>4 Bindus</td>
           <td>Intuitive timing &amp; liquid cash reserves</td>
         </tr>
         <tr>
           <td><strong>Mars (Mangal)</strong></td>
-          <td>4 Bindus</td>
-          <td>2 Bindus</td>
+          <td>3 Bindus</td>
+          <td>3 Bindus</td>
           <td>3 Bindus</td>
           <td>3 Bindus</td>
           <td>Execution courage (requires strict risk stops)</td>
@@ -1235,7 +1235,7 @@ body {
         <tr>
           <td><strong>Mercury (Budha)</strong></td>
           <td>6 Bindus</td>
-          <td>4 Bindus</td>
+          <td>5 Bindus</td>
           <td>5 Bindus</td>
           <td>5 Bindus</td>
           <td>Algorithmic data syntax &amp; quantitative trading</td>
@@ -1243,8 +1243,8 @@ body {
         <tr>
           <td><strong>Jupiter (Guru)</strong></td>
           <td>5 Bindus</td>
-          <td>4 Bindus</td>
           <td>5 Bindus</td>
+          <td>4 Bindus</td>
           <td>4 Bindus</td>
           <td>Advisory wisdom &amp; long-term compounding</td>
         </tr>
@@ -1259,12 +1259,22 @@ body {
         <tr>
           <td><strong>Saturn (Shani)</strong></td>
           <td>4 Bindus</td>
-          <td>4 Bindus</td>
-          <td>4 Bindus</td>
+          <td>5 Bindus</td>
+          <td>3 Bindus</td>
           <td>2 Bindus</td>
           <td>Institutional risk discipline &amp; patience</td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr style="border-top:1.5px solid var(--border-gold);background:var(--surface-elevated);font-weight:700;">
+          <td><strong>SAV Column Total</strong></td>
+          <td style="color:var(--emerald-bright);"><strong>31 Bindus</strong></td>
+          <td style="color:var(--emerald-bright);"><strong>30 Bindus</strong></td>
+          <td style="color:var(--gold-bright);"><strong>25 Bindus</strong></td>
+          <td style="color:var(--gold-bright);"><strong>27 Bindus</strong></td>
+          <td><span class="tag-badge tag-emerald">100% SAV-337 Synced</span></td>
+        </tr>
+      </tfoot>
     </table>
 
     <div class="luxury-card" style="border:1.5px solid var(--emerald);background:var(--surface-elevated);">
@@ -1669,7 +1679,7 @@ body {
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
         1. BUDHA GAYATRI MANTRA (बुध गायत्री &mdash; FOR INTELLECTUAL ACCURACY)
       </div>
-      <div style="font-family:'Rozha One','Noto Sans Devanagari',serif;font-size:13.5px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.02em;">
+      <div style="font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;font-size:14px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.04em;">
         ॐ सौम्यरूपाय विद्महे वाणेशाय धीमहि। तन्नो सौम्यः प्रचोदयात्॥
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
@@ -1685,7 +1695,7 @@ body {
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">
         2. KUBERA ASHTA-LAKSHMI BEEJ MANTRA (कुबेर बीज मन्त्र)
       </div>
-      <div style="font-family:'Rozha One','Noto Sans Devanagari',serif;font-size:13.5px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.02em;">
+      <div style="font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;font-size:14px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.04em;">
         ॐ यक्षाय कुबेराय वैश्रवणाय धनधान्याधिपतये धनधान्यसमृद्धिं मे देहि दापय स्वाहा॥
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
