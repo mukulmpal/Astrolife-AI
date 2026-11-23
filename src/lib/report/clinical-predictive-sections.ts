@@ -30,6 +30,15 @@ import {
 } from "../astro-engine/functional-debility-guard";
 import { calculateLineageKarma } from "../astro-engine/lineage-karma";
 import { resolvePilgrimagePrescription } from "../astro-engine/pilgrimage-engine";
+import {
+  getTwelfthHouseI18n,
+  getCareerSpecifierI18n,
+  getTradingRiskI18n,
+  getShivlingUpacharaI18n,
+  getNakshatraSocialI18n,
+  REPORT_LABELS,
+  type ReportLang,
+} from "./report-i18n";
 
 // ── Helpers & Styling Primitives ─────────────────────────────────────────────
 
@@ -53,11 +62,11 @@ function pageFoot(left: string, right: string): string {
 }
 
 // ── 1. Page: 27 Transit Shivling Upacharas & Sacred Offerings ────────────────
-export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU"): string {
+export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU", lang: ReportLang = "en"): string {
   const transitRemedy = evaluateTransitNakshatraRemedy(chart);
   if (!transitRemedy) {
     return `<section class="page dense">${pageRail("Transit Shivling Upacharas", pageNum)}
-      <div style="padding:48px;color:var(--ivory-dim);">Transit calculations pending for this chart.</div>
+      <div style="padding:48px;color:var(--ivory-dim);">${lang === "hi" ? "इस कुंडली के लिए गोचर गणना लंबित है।" : "Transit calculations pending for this chart."}</div>
       ${pageFoot("astrolife · sacred remedies", "Shivling Upachara")}
     </section>`;
   }
@@ -67,80 +76,86 @@ export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU"): 
   const takYog = transitRemedy.distanceAnalysis;
   const belief = transitRemedy.beliefGuidanceHinglish;
 
+  const i18nShiv = getShivlingUpacharaI18n(lang, transitRemedy.transitNakshatra, shiv.upacharaName, shiv.hindiTitle);
+  const isEn = lang === "en";
+
   return `<section class="page dense">
     ${pageRail("Transit Nakshatra Shivling Engine · 27 Upacharas", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--gold);">✦</span>
-        <h2>Transit Nakshatra Shivling Upacharas</h2>
+        <h2>${isEn ? "Transit Nakshatra Shivling Upacharas" : "गोचर नक्षत्र 27 शिवलिंग उपचारावली"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:14px;max-width:680px;color:var(--ivory-dim);">
-        Based on classical Shastric texts and oral traditions: The active Dasha Lord's transit nakshatra determines the exact 
-        vibrational medicine for the soul. Aligning daily Shivling offerings with the transit star transmutes friction into Grace.
+        ${isEn 
+          ? "Based on classical Shastric texts and oral traditions: The active Dasha Lord's transit nakshatra determines the exact vibrational medicine for the soul. Aligning daily Shivling offerings with the transit star transmutes friction into Grace."
+          : "शास्त्रीय परंपरा के अनुसार दशा स्वामी का गोचर नक्षत्र आत्मा के लिए सटीक उपचारात्मक स्पंदन निर्धारित करता है। गोचर तारा के अनुसार शिवलिंग सेवा संघर्ष को अनुग्रह में रूपांतरित करती है।"}
       </div>
 
       <!-- Mahadasha Lord Hero Card -->
       <div class="card" style="padding:14px;border-left:3px solid var(--gold);margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div class="kicker" style="color:var(--gold-bright);">Mahadasha Lord Transit: ${esc(transitRemedy.activeDashaLord)}</div>
+          <div class="kicker" style="color:var(--gold-bright);">${isEn ? "Mahadasha Lord Transit:" : "महादशा स्वामी गोचर:"} ${esc(transitRemedy.activeDashaLord)}</div>
           <span style="font-size:10px;padding:2px 8px;border-radius:3px;background:var(--surface);color:var(--gold);border:1px solid var(--gold-dim);">
             Tara #${transitRemedy.taraNumber} · ${esc(transitRemedy.taraName)} (${esc(transitRemedy.taraRelationType)})
           </span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:8px;">
           <div>
-            <div style="font-size:10px;color:var(--ivory-mute);text-transform:uppercase;">Transit Placement</div>
+            <div style="font-size:10px;color:var(--ivory-mute);text-transform:uppercase;">${isEn ? "Transit Placement" : "गोचर स्थिति"}</div>
             <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);">${esc(transitRemedy.transitSign)} · Star #${transitRemedy.transitNakshatraNumber}</div>
             <div style="font-size:12px;color:var(--gold);">${esc(transitRemedy.transitNakshatra)}</div>
           </div>
           <div>
-            <div style="font-size:10px;color:var(--ivory-mute);text-transform:uppercase;">Prescribed Upachara (#${shiv.upacharaNumber})</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-bright);">${esc(shiv.upacharaName)} — ${esc(shiv.hindiTitle)}</div>
-            <div style="font-size:11px;color:var(--ivory);margin-top:2px;"><strong>Offering Material:</strong> ${esc(shiv.itemOrOffering)}</div>
+            <div style="font-size:10px;color:var(--ivory-mute);text-transform:uppercase;">${isEn ? `Prescribed Upachara (#${shiv.upacharaNumber})` : `निर्धारित उपचार (#${shiv.upacharaNumber})`}</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-bright);">${esc(i18nShiv.title)}</div>
+            <div style="font-size:11px;color:var(--ivory);margin-top:2px;"><strong>${isEn ? "Offering Material:" : "पूजन सामग्री:"}</strong> ${esc(isEn ? i18nShiv.offeringMaterial : shiv.itemOrOffering)}</div>
           </div>
         </div>
         <div class="body-s" style="font-size:11px;color:var(--ivory-dim);border-top:1px solid var(--surface);padding-top:6px;margin-top:4px;">
-          <strong>Significance:</strong> ${esc(shiv.significanceHinglish)}
+          <strong>${isEn ? "Significance:" : "महत्व:"}</strong> ${esc(isEn ? i18nShiv.significance : shiv.significanceHinglish)}
         </div>
         <div class="body-s" style="font-size:11px;color:var(--ivory-dim);margin-top:4px;">
-          <strong>Vidhi (Procedure):</strong> ${esc(shiv.procedureNarrativeHinglish)}
+          <strong>${isEn ? "Vidhi (Procedure):" : "विधि:"}</strong> ${esc(isEn ? i18nShiv.procedure : shiv.procedureNarrativeHinglish)}
         </div>
       </div>
 
       <!-- Antardasha & Tak Yog Grid -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         ${adShiv ? `<div class="card" style="padding:12px;border-left:3px solid var(--cyan);">
-          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">Antardasha Lord: ${esc(transitRemedy.activeAntardashaLord)}</div>
+          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${isEn ? "Antardasha Lord:" : "अंतर्दशा स्वामी:"} ${esc(transitRemedy.activeAntardashaLord)}</div>
           <div style="font-size:12px;color:var(--ivory);font-weight:600;">Transit in ${esc(transitRemedy.antardashaTransitNakshatra)} (${esc(transitRemedy.antardashaTransitSign)})</div>
-          <div style="font-size:11px;color:var(--gold-bright);margin-top:4px;">Upachara #${adShiv.upacharaNumber}: ${esc(adShiv.upacharaName)} (${esc(adShiv.hindiTitle)})</div>
-          <div style="font-size:10px;color:var(--ivory-dim);margin-top:4px;">Offering: ${esc(adShiv.itemOrOffering)}</div>
+          <div style="font-size:11px;color:var(--gold-bright);margin-top:4px;">Upachara #${adShiv.upacharaNumber}: ${esc(adShiv.upacharaName)}</div>
+          <div style="font-size:10px;color:var(--ivory-dim);margin-top:4px;">Offering: ${esc(isEn ? "Pure water & Bilva leaf" : adShiv.itemOrOffering)}</div>
         </div>` : ""}
 
         <div class="card" style="padding:12px;border-left:3px solid ${takYog?.isTakYog ? "var(--crimson)" : "var(--jade)"};">
-          <div class="kicker" style="color:${takYog?.isTakYog ? "var(--crimson)" : "var(--jade)"};margin-bottom:4px;">MD-AD Harmonics &amp; Tak Yog (${esc(takYog?.mutualAxis ?? "1/7")})</div>
-          <div style="font-size:12px;color:var(--ivory);font-weight:600;">${esc(takYog?.impactDescriptionHinglish ?? "Harmonic Flow")}</div>
+          <div class="kicker" style="color:${takYog?.isTakYog ? "var(--crimson)" : "var(--jade)"};margin-bottom:4px;">MD-AD Harmonics & Tak Yog (${esc(takYog?.mutualAxis ?? "1/7")})</div>
+          <div style="font-size:12px;color:var(--ivory);font-weight:600;">${isEn ? (takYog?.isTakYog ? "6/8 Axis Friction Active" : "Harmonic Cooperative Flow") : esc(takYog?.impactDescriptionHinglish ?? "Harmonic Flow")}</div>
           <div style="font-size:10px;color:var(--ivory-dim);margin-top:4px;">
-            ${takYog?.isTakYog ? esc(takYog.takYogRemedyHinglish ?? "6/8 friction active.") : "Dasha and Antardasha lords operate in cooperative synergy. No 6/8 Tak Yog obstruction active."}
+            ${isEn 
+              ? (takYog?.isTakYog ? "Mutual 6/8 distance requires patience; perform pacification remedies." : "Dasha and Antardasha lords operate in cooperative synergy. No 6/8 Tak Yog obstruction active.") 
+              : (takYog?.isTakYog ? esc(takYog.takYogRemedyHinglish ?? "6/8 घर्षण सक्रिय है।") : "दशा और अंतर्दशा स्वामी परस्पर सहयोग में हैं। कोई 6/8 टकराव नहीं।")}
           </div>
         </div>
       </div>
 
       <!-- House 6, 8, 12 Practical Regimen -->
       <div class="card" style="padding:12px;background:var(--surface);">
-        <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">6th, 8th &amp; 12th House Remedial Matrix</div>
+        <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">6th, 8th & 12th House Remedial Matrix</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
-            <div style="font-size:10px;font-weight:700;color:var(--jade);">6th House: Shraddha (Plants)</div>
-            <div style="font-size:9px;color:var(--ivory-dim);margin-top:3px;">${esc(belief.house6MessageHinglish)}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--jade);">6th House: Plants & Seva</div>
+            <div style="font-size:9px;color:var(--ivory-dim);margin-top:3px;">${isEn ? "Care for tulsi or green healing plants on Wednesdays; avoid speculative arguments." : esc(belief.house6MessageHinglish)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
-            <div style="font-size:10px;font-weight:700;color:var(--gold);">8th House: Fruits (Transformation)</div>
-            <div style="font-size:9px;color:var(--ivory-dim);margin-top:3px;">Offer seasonal fruits on Amavasya/Tuesdays to dissolve sudden crisis.</div>
+            <div style="font-size:10px;font-weight:700;color:var(--gold);">8th House: Fruits & Release</div>
+            <div style="font-size:9px;color:var(--ivory-dim);margin-top:3px;">${isEn ? "Offer seasonal fruits on Tuesdays or Amavasya to dissolve sudden hurdles." : "अमावस्या या मंगलवार को मौसमी फल दान करने से आकस्मिक संकट दूर होते हैं।"}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
-            <div style="font-size:10px;font-weight:700;color:var(--crimson);">12th House: Strict Parikshan</div>
-            <div style="font-size:9px;color:var(--ivory-dim);margin-top:3px;">${esc(belief.house12MessageHinglish)}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--crimson);">12th House: Quiet Sanctuary</div>
+            <div style="font-size:9px;color:var(--ivory-dim);margin-top:3px;">${isEn ? "Direct expenditures toward temple/hospital charity; keep private retreats sacred." : esc(belief.house12MessageHinglish)}</div>
           </div>
         </div>
       </div>
@@ -150,75 +165,79 @@ export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU"): 
 }
 
 // ── 2. Page: 27 Nakshatra Social Archetypes & Service Registry ───────────────
-export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS"): string {
+export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", lang: ReportLang = "en"): string {
   const dossier = evaluateNakshatraRemedyDossier(chart);
   if (!dossier) {
     return `<section class="page dense">${pageRail("Nakshatra Social Archetypes", pageNum)}
-      <div style="padding:48px;color:var(--ivory-dim);">Nakshatra dossier pending.</div>
+      <div style="padding:48px;color:var(--ivory-dim);">${lang === "hi" ? "नक्षत्र विवरण लंबित है।" : "Nakshatra dossier pending."}</div>
       ${pageFoot("astrolife · karmic alignment", "Nakshatra Social Registry")}
     </section>`;
   }
+
+  const isEn = lang === "en";
+  const i18nNak = getNakshatraSocialI18n(lang, dossier.activeNakshatraName, dossier.activeDashaPlanet);
 
   return `<section class="page dense">
     ${pageRail("Nakshatra Social Remedies & Living Archetypes", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--gold);">✦</span>
-        <h2>Nakshatra Archetype &amp; Social Service</h2>
+        <h2>${isEn ? "Nakshatra Archetype & Social Service" : "नक्षत्र स्वरूप एवं सामाजिक सेवा"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:12px;max-width:680px;color:var(--ivory-dim);">
-        Each Nakshatra carries an evolutionary psychological archetype and a specific social service (Karmic Debt release). 
-        Active Dasha Lord Star: <strong style="color:var(--gold-bright);">${esc(dossier.activeNakshatraName)}</strong> (${esc(dossier.activeDashaPlanet)}).
+        ${isEn
+          ? `Each Nakshatra carries an evolutionary psychological archetype and a specific social service (Karmic Debt release). Active Dasha Lord Star: <strong style="color:var(--gold-bright);">${esc(dossier.activeNakshatraName)}</strong> (${esc(dossier.activeDashaPlanet)}).`
+          : `प्रत्येक नक्षत्र एक विशिष्ट मनोवैज्ञानिक स्वरूप और पितृ/सामाजिक ऋण मुक्ति की सेवा का वाहक है। दशा स्वामी नक्षत्र: <strong style="color:var(--gold-bright);">${esc(dossier.activeNakshatraName)}</strong> (${esc(dossier.activeDashaPlanet)})।`}
       </div>
 
       <!-- Archetype Story & Personality -->
       <div class="card" style="padding:14px;border-left:3px solid var(--gold);margin-bottom:10px;">
-        <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">Living Archetype &amp; Psychological Temperament</div>
+        <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">${isEn ? "Living Archetype & Psychological Temperament" : "जीवंत स्वरूप व मनोवैज्ञानिक स्वभाव"}</div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;margin-bottom:6px;">
-          ${esc(dossier.section1_InnerStateAndPersonality)}
+          ${esc(isEn ? i18nNak.innerState : dossier.section1_InnerStateAndPersonality)}
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.5;">
-          ${esc(dossier.section2_LivingArchetypeStory)}
+          ${esc(isEn ? i18nNak.livingArchetype : dossier.section2_LivingArchetypeStory)}
         </div>
       </div>
 
       <!-- Karmic Trap Warning & Daily Conduct -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--crimson);">
-          <div class="kicker" style="color:var(--crimson);margin-bottom:4px;">Karmic Trap &amp; Anger Warning</div>
+          <div class="kicker" style="color:var(--crimson);margin-bottom:4px;">${isEn ? "Karmic Trap & Warning" : "कर्मिक भटकाव व क्रोध चेतावनी"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(dossier.section3_KarmicTrapAndAngerWarning)}
+            ${esc(isEn ? i18nNak.karmicTrap : dossier.section3_KarmicTrapAndAngerWarning)}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid var(--jade);">
-          <div class="kicker" style="color:var(--jade);margin-bottom:4px;">Daily Conduct Protocol</div>
+          <div class="kicker" style="color:var(--jade);margin-bottom:4px;">${isEn ? "Daily Conduct Protocol" : "दैनिक आचरण व जीवन-नियम"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(dossier.section4_BehavioralConductInDailyLife)}
+            ${esc(isEn ? i18nNak.dailyConduct : dossier.section4_BehavioralConductInDailyLife)}
           </div>
         </div>
       </div>
 
       <!-- Actionable Seva Plan & Checklist -->
       <div class="card" style="padding:12px;background:var(--surface);margin-bottom:10px;">
-        <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">Targeted Social Seva &amp; Action Protocol</div>
-        <div style="font-size:11px;color:var(--ivory);margin-bottom:8px;">${esc(dossier.section5_ActionableRemedyAndSevaPlan)}</div>
+        <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">${isEn ? "Targeted Social Seva & Action Protocol" : "सटीक सामाजिक सेवा व कर्म सुधार"}</div>
+        <div style="font-size:11px;color:var(--ivory);margin-bottom:8px;">${esc(isEn ? i18nNak.primarySeva : dossier.section5_ActionableRemedyAndSevaPlan)}</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
-            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">Primary Seva</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(dossier.primaryActionItem)}</div>
+            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Primary Seva" : "प्रधान सेवा"}</div>
+            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(isEn ? i18nNak.primarySeva.slice(0, 35) + "..." : dossier.primaryActionItem)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
-            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">Pashu/Bird Seva</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(dossier.naturePashuSeva)}</div>
+            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Creature Seva" : "जीव सेवा"}</div>
+            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(isEn ? i18nNak.pashuSeva.slice(0, 35) + "..." : dossier.naturePashuSeva)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
-            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">Auspicious Timing</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(dossier.timingAndMuhurat)}</div>
+            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Auspicious Timing" : "शुभ समय"}</div>
+            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(isEn ? i18nNak.timing : dossier.timingAndMuhurat)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
-            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">Key Substances</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(dossier.materialsNeeded.join(", ") || "Standard offerings")}</div>
+            <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Key Elements" : "पूजन सामग्री"}</div>
+            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(dossier.materialsNeeded.join(", ") || (isEn ? "Standard offerings" : "सामान्य सामग्री"))}</div>
           </div>
         </div>
       </div>
@@ -234,7 +253,7 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS"): s
 }
 
 // ── 3. Page: Speculative Trading & F&O Risk Circuit Breaker ──────────────────
-export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR"): string {
+export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR", lang: ReportLang = "en"): string {
   const activeMD = chart.dashas?.find((d) => d.active) ?? chart.dashas?.[0];
   const fifthLordAfflicted = Boolean(chart.planets.Rahu?.house === 5 || chart.planets.Saturn?.house === 5);
   const rahuIn5812 = Boolean([5, 8, 12].includes(chart.planets.Rahu?.house || 0));
@@ -254,77 +273,82 @@ export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR"):
   });
 
   const isSevere = risk.speculativeRuinRisk === "CRITICAL" || risk.speculativeRuinRisk === "HIGH";
+  const isEn = lang === "en";
+  const i18nRisk = getTradingRiskI18n(lang, risk.isRevengeTradingActive || isSevere);
 
   return `<section class="page dense">
     ${pageRail("Trading Risk Guardrail · F&O Circuit Breaker", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:${isSevere ? "var(--crimson)" : "var(--jade)"};">✦</span>
-        <h2>Trading &amp; Speculative Risk Guardrail</h2>
+        <h2>${isEn ? "Trading & Speculative Risk Guardrail" : "ट्रेडिंग व सट्टा जोखिम गार्डरेल"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:14px;max-width:680px;color:var(--ivory-dim);">
-        Astrological analysis of speculative ruin vectors in Derivatives (F&amp;O), Intraday Trading, and Revenge Trading spirals. 
-        This engine detects the 5th/8th house karmic trap and enforces an immediate capital-protection circuit breaker.
+        ${isEn
+          ? "Astrological analysis of speculative ruin vectors in Derivatives (F&O), Intraday Trading, and Revenge Trading spirals. This engine detects the 5th/8th house karmic trap and enforces an immediate capital-protection circuit breaker."
+          : "डेरिवेटिव्स (F&O) एवं सट्टे में पूंजी विनाश के ज्योतिषीय कारणों का विश्लेषण। यह इंजन 5वें/8वें भाव के कर्मिक भटकाव को पहचानकर तत्काल पूंजी सुरक्षा गार्डरेल लागू करता है।"}
       </div>
 
       <!-- Risk Status Banner -->
       <div class="card" style="padding:14px;border-left:4px solid ${isSevere ? "var(--crimson)" : "var(--jade)"};background:var(--surface);margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
           <div>
-            <div class="kicker" style="color:var(--ivory-mute);">Speculative Ruin Probability</div>
+            <div class="kicker" style="color:var(--ivory-mute);">${isEn ? "Speculative Ruin Probability" : "पूंजी जोखिम स्तर"}</div>
             <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:${isSevere ? "var(--crimson)" : "var(--jade)"};font-weight:700;">
-              ${risk.speculativeRuinRisk} RISK
+              ${risk.speculativeRuinRisk} ${isEn ? "RISK" : "जोखिम"}
             </div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:10px;color:var(--ivory-mute);text-transform:uppercase;">Revenge Trading Loop</div>
+            <div style="font-size:10px;color:var(--ivory-mute);text-transform:uppercase;">${isEn ? "Revenge Trading Loop" : "रिवेंज ट्रेडिंग चक्र"}</div>
             <div style="font-size:13px;font-weight:700;color:${risk.isRevengeTradingActive ? "var(--crimson)" : "var(--jade)"};">
-              ${risk.isRevengeTradingActive ? "ACTIVE SPIRAL" : "CONTROLLED"}
+              ${risk.isRevengeTradingActive ? (isEn ? "ACTIVE SPIRAL" : "सक्रिय जोखिम") : (isEn ? "CONTROLLED" : "नियंत्रित")}
             </div>
           </div>
         </div>
         <div style="font-size:11px;color:var(--ivory);margin-top:6px;line-height:1.5;">
-          ${esc(risk.psychologicalDiagnosisHinglish)}
+          ${esc(isEn ? i18nRisk.psychologicalDiagnosis : risk.psychologicalDiagnosisHinglish)}
         </div>
       </div>
 
       <!-- Astrological Circuit & Action Directive -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--gold);">
-          <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">Astrological Circuit Logic</div>
+          <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">${isEn ? "Astrological Circuit Logic" : "ज्योतिषीय कारक विश्लेषण"}</div>
           <div style="font-size:11px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(risk.astrologicalCircuitHinglish)}
+            ${isEn
+              ? "The 5th and 8th house karmic axis under nodal or malefic stress creates intense greed for rapid capital recovery, precipitating compounding drawdowns."
+              : esc(risk.astrologicalCircuitHinglish)}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid ${isSevere ? "var(--crimson)" : "var(--cyan)"};">
-          <div class="kicker" style="color:${isSevere ? "var(--crimson)" : "var(--cyan)"};margin-bottom:4px;">Circuit Breaker Directive</div>
+          <div class="kicker" style="color:${isSevere ? "var(--crimson)" : "var(--cyan)"};margin-bottom:4px;">${isEn ? "Circuit Breaker Directive" : "सुरक्षात्मक निर्देश"}</div>
           <div style="font-size:11px;color:var(--ivory);font-weight:600;margin-bottom:4px;">
-            ${risk.circuitBreakerAction === "IMMEDIATE_HALT_EMPLOYMENT_PIVOT" ? "🛑 IMMEDIATE F&amp;O HALT REQUIRED" : "STRICT DISCIPLINARY HEDGING"}
+            ${esc(i18nRisk.circuitBreakerActionText)}
           </div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(risk.mandatoryFinancialGuardrailHinglish)}
+            ${esc(isEn ? i18nRisk.mandatoryGuardrail : risk.mandatoryFinancialGuardrailHinglish)}
           </div>
         </div>
       </div>
 
       <!-- Career Pivot Protocol -->
       <div class="card" style="padding:12px;border-left:3px solid var(--jade);margin-bottom:14px;">
-        <div class="kicker" style="color:var(--jade);margin-bottom:4px;">Reconstruction &amp; Career Pivot Directive</div>
+        <div class="kicker" style="color:var(--jade);margin-bottom:4px;">${isEn ? "Reconstruction & Career Pivot Directive" : "पुनर्निर्माण व आजीविका दिशा-निर्देश"}</div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;">
-          ${esc(risk.careerPivotDirectiveHinglish)}
+          ${esc(isEn ? i18nRisk.careerPivotDirective : risk.careerPivotDirectiveHinglish)}
         </div>
       </div>
 
       <!-- Mandatory SEBI Disclaimer -->
       <div style="padding:10px;background:rgba(217,83,79,0.08);border:1px solid rgba(217,83,79,0.3);border-radius:4px;">
         <div style="font-size:9px;color:var(--crimson);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">
-          Mandatory Statutory &amp; Financial Disclaimer
+          ${isEn ? "Mandatory Statutory & Financial Disclaimer" : "वैधानिक एवं वित्तीय अस्वीकरण"}
         </div>
         <div style="font-size:9px;color:var(--ivory-dim);line-height:1.35;">
-          This evaluation is an astrological character and behavioral risk assessment based on classical Jyotish planetary configurations. 
-          AstroLife AI is NOT a SEBI-registered investment advisor or research analyst. No content on this page constitutes financial advice, 
-          trading calls, or buy/sell recommendations. F&amp;O trading carries extreme capital risk. Consult a licensed financial planner.
+          ${isEn
+            ? "This evaluation is an astrological character and behavioral risk assessment based on classical Jyotish planetary configurations. AstroLife AI is NOT a SEBI-registered investment advisor or research analyst. No content on this page constitutes financial advice, trading calls, or buy/sell recommendations. F&O trading carries extreme capital risk. Consult a licensed financial planner."
+            : "यह विश्लेषण पारंपरिक ज्योतिषीय ग्रह विन्यास पर आधारित व्यवहारिक जोखिम मूल्यांकन है। एस्ट्रोलाइफ कोई सेबी-पंजीकृत सलाहकार नहीं है। यह सामग्री वित्तीय या व्यापारिक सलाह नहीं है।"}
         </div>
       </div>
     </div>
