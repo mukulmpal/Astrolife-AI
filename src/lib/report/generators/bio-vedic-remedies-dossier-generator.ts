@@ -686,7 +686,7 @@ body {
           <strong style="color:var(--gold);">House 6 (Aquarius · Disease &amp; Debt):</strong> Governed by Saturn. Rahu transiting here or natal stress can manifest as nervous fatigue or lower leg stiffness. Neutralized by Saturday discipline and copper oiling.
         </div>
         <div>
-          <strong style="color:var(--ruby-bright);">House 8 (Aries · Chronic Obstacles &amp; Surgery):</strong> Occupied by natal <strong>Ketu at 6° 02'</strong>. Governed by Mars (who sits in the 12th). This creates sudden metabolic spikes, acidity, and vulnerability to sharp instruments. Requires strict Ketu cooling upayas.
+          <strong style="color:var(--ruby-bright);">House 8 (Aries · Chronic Obstacles &amp; Surgery):</strong> Occupied by natal <strong>Ketu at 8° 12'</strong>. Governed by Mars (who sits in the 12th). This creates sudden metabolic spikes, acidity, and vulnerability to sharp instruments. Requires strict Ketu cooling upayas.
         </div>
         <div>
           <strong style="color:var(--sapphire-bright);">House 12 (Leo · Sleep, Solitude &amp; Losses):</strong> Occupied by <strong>Moon and Mars</strong>. Governed by Sun (who sits in the 10th). Mars in the 12th creates internal heat and restless sleep, while Moon here causes vivid nocturnal dreams. Requires the pure cow desi ghee navel seal.
@@ -731,7 +731,7 @@ body {
       <tbody>
         <tr>
           <td><strong>Sun (Surya)</strong></td>
-          <td>Gemini 17° 58'</td>
+          <td>Gemini 18° 04'</td>
           <td>10th</td>
           <td>Digbali (Directional)</td>
           <td>12th Lord (Neutral/Mixed)</td>
@@ -739,7 +739,7 @@ body {
         </tr>
         <tr>
           <td><strong>Moon (Chandra)</strong></td>
-          <td>Leo 27° 19'</td>
+          <td>Leo 29° 11'</td>
           <td>12th</td>
           <td>Mitra Rashi</td>
           <td>11th Lord in Vyaya</td>
@@ -747,7 +747,7 @@ body {
         </tr>
         <tr>
           <td><strong>Mars (Mangal)</strong></td>
-          <td>Leo 28° 42'</td>
+          <td>Leo 26° 23'</td>
           <td>12th</td>
           <td>Mitra Rashi</td>
           <td>3rd &amp; 8th Lord (Malefic)</td>
@@ -763,7 +763,7 @@ body {
         </tr>
         <tr>
           <td><strong>Jupiter (Guru)</strong></td>
-          <td>Scorpio 13° 10'</td>
+          <td>Scorpio 13° 01'</td>
           <td>3rd</td>
           <td>Mitra Rashi</td>
           <td>4th &amp; 7th Lord (Badhaka/Maraka)</td>
@@ -771,7 +771,7 @@ body {
         </tr>
         <tr>
           <td><strong>Venus (Shukra)</strong></td>
-          <td>Gemini 5° 00'</td>
+          <td>Gemini 05° 00'</td>
           <td>10th</td>
           <td>Mitra Rashi</td>
           <td>2nd &amp; 9th Lord (Dharmakarmadhipati)</td>
@@ -779,7 +779,7 @@ body {
         </tr>
         <tr>
           <td><strong>Saturn (Shani)</strong></td>
-          <td>Pisces 0° 57'</td>
+          <td>Pisces 00° 57'</td>
           <td>7th</td>
           <td>Mitra Rashi</td>
           <td>5th &amp; 6th Lord (Neutral Benefic)</td>
@@ -787,7 +787,7 @@ body {
         </tr>
         <tr>
           <td><strong>Rahu</strong></td>
-          <td>Libra 6° 02'</td>
+          <td>Libra 08° 12'</td>
           <td>2nd</td>
           <td>Friendly / Swati</td>
           <td>Shadow Node (Treasury Pressure)</td>
@@ -795,7 +795,7 @@ body {
         </tr>
         <tr>
           <td><strong>Ketu</strong></td>
-          <td>Aries 6° 02'</td>
+          <td>Aries 08° 12'</td>
           <td>8th</td>
           <td>Exalted / Ashwini</td>
           <td>Shadow Node (Sudden Friction)</td>
@@ -1274,7 +1274,7 @@ body {
         2. AJNA CHAKRA WHITE SANDALWOOD DOT (चंद्र व मन शांति बिंदु)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Your natal Moon sits at <strong>27° 19' in Leo (12th house)</strong> in Uttara Phalguni nakshatra, conjoined fiery Mars. This placement generates high intellectual ambition combined with occasional nocturnal restlessness and sensory sensory overload.
+        Your natal Moon sits at <strong>29° 11' in Leo (12th house)</strong> in Uttara Phalguni (Pada 1), conjoined fiery Mars (at 26° 23'). This placement generates high intellectual ambition combined with occasional nocturnal restlessness and sensory overload.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:8px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Execution Method:</strong>
@@ -1497,7 +1497,7 @@ body {
         ✦ SYMBOLIC GEOMETRY SPECIFICATION
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        The design should feature the classical <strong>Mercury Planetary Sigil</strong> (&x263F;) or a clean geometric polygon (an upward equilateral triangle intersected by an upward arrow) representing mental agility, software syntax mastery, and commercial precision.
+        The design should feature the classical <strong>Mercury Planetary Sigil</strong> (☿) or a clean geometric polygon (an upward equilateral triangle intersected by an upward arrow) representing mental agility, software syntax mastery, and commercial precision.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:6px;">
         ✦ <strong>Temporary Alternative:</strong> If permanent ink is not preferred, use a skin-safe natural green herbal marker or natural henna to draw a 5mm micro-symbol on the right inner forearm on Wednesday morning during high-stakes pitch days.
@@ -1635,7 +1635,7 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;">
         <div>
-          <strong style="color:var(--ruby-bright);">1. NEVER DONATE PENS, NOTEBOOKS, OR SOFTWARE ON WEDNESDAYS:</strong> Mercury is your Lagna lord and 10th lord seated in the 9th. Donating green stationary or educational tools on Wednesday dissipates your own intellectual leverage. (Gift them with affection on other days, but never as sacrificial charity on Wednesday).
+          <strong style="color:var(--ruby-bright);">1. NEVER DONATE PENS, NOTEBOOKS, OR SOFTWARE ON WEDNESDAYS:</strong> Mercury is your Lagna lord and 10th lord seated in the 9th. Donating green stationery or educational tools on Wednesday dissipates your own intellectual leverage. (Gift them with affection on other days, but never as sacrificial charity on Wednesday).
         </div>
         <div>
           <strong style="color:var(--ruby-bright);">2. NEVER DONATE MUSTARD OIL ON YOUR DOORSTEP ON SATURDAY:</strong> Giving mustard oil to wandering beggars at your main threshold invites Saturnian debt inside. Always make Saturnian donations outside, at a Shani temple or community kitchen.
@@ -1976,7 +1976,7 @@ body {
       </div>
       <div class="grid-3" style="font-size:11px;margin-top:6px;gap:8px;">
         <div style="background:var(--surface);padding:8px;border-radius:4px;border-left:2px solid var(--emerald);">
-          <strong style="color:var(--emerald-bright);">Wednesday (Budha):</strong> Wear green, chant Budha mantra 108&times;, feed green grass/spinach to cows, zero stationary donations.
+          <strong style="color:var(--emerald-bright);">Wednesday (Budha):</strong> Wear green, chant Budha mantra 108&times;, feed green grass/spinach to cows, zero stationery donations.
         </div>
         <div style="background:var(--surface);padding:8px;border-radius:4px;border-left:2px solid var(--sapphire);">
           <strong style="color:var(--sapphire-bright);">Saturday (Shani):</strong> Apply right knee kajal dot, feed stray dogs sweet rotis, avoid mustard oil on doorstep.
@@ -2010,7 +2010,7 @@ body {
           VERIFIED IMMUTABLE SHASTRA RECORD &middot; CERTIFICATE ID: ${paymentId}
         </div>
         <div style="font-size:10px;color:var(--ivory-dim);margin-top:4px;">
-          Certified for: ${subjectName} &middot; Archive Ref: ${orderId} &middot; www.astrolife.io
+          Certified for: ${subjectName} &nbsp;&middot;&nbsp; Archive Ref: ${orderId} &nbsp;&middot;&nbsp; www.astrolife.io
         </div>
       </div>
 
