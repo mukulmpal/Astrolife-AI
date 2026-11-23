@@ -24,6 +24,7 @@ import { calculateKarakas } from "../astro-engine/jaimini";
 import { generateSacredUnionDossierHTML } from "./generators/sacred-union-dossier-generator";
 import { generateRajaYogaWealthDossierHTML } from "./generators/raja-yoga-wealth-dossier-generator";
 import { generateBioVedicRemediesDossierHTML } from "./generators/bio-vedic-remedies-dossier-generator";
+import { generateSpaceDestinyDossierHTML } from "./generators/space-destiny-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -169,6 +170,18 @@ export function generatePackageDossierHTML(
     reportId.includes("gemstone")
   ) {
     return generateBioVedicRemediesDossierHTML(chart, options);
+  }
+
+  if (
+    reportId.includes("space") ||
+    reportId.includes("destiny") ||
+    reportId.includes("vastu") ||
+    reportId.includes("palmistry") ||
+    reportId.includes("btr") ||
+    reportId.includes("pkg_space_destiny") ||
+    reportId.includes("calibration")
+  ) {
+    return generateSpaceDestinyDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");

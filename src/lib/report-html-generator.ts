@@ -36,6 +36,12 @@ import {
 } from "./astro-intelligence/universal-shodasha-varga-engine";
 import { calculateMedical } from "./astro-engine/medical";
 import { calculatePsychology } from "./astro-engine/psychology";
+import {
+  normalizeReportLang,
+  getPsychologyI18n,
+  REPORT_LABELS,
+  type ReportLang,
+} from "./report/report-i18n";
 import { calculateNumerology } from "./astro-engine/numerology";
 import { calculateAshtakavarga } from "./astro-engine/ashtakavarga";
 // Phase 4 — 12 missing engine pages
@@ -78,10 +84,12 @@ import {
 export type ReportPalette = "midnight" | "saffron" | "ivory" | "forest" | "maroon";
 export type ReportCover   = "wheel" | "lagnalord";
 export type ReportType = "basic" | "premium" | "elite" | "full" | "kundli" | "remedy" | "medical" | "destiny" | "evidence-first";
+export type ReportLanguage = "en" | "hi" | "english" | "hindi";
 export interface ReportOptions {
   type: ReportType;
   palette?: ReportPalette;
   cover?: ReportCover;
+  language?: ReportLanguage;
   palmistrySessionId?: string;
   palmistryFusion?: {
     palmResult?: PalmRuleReport;
@@ -2970,7 +2978,7 @@ function pageShadbala(chart: ChartData): string {
 
 // ── D9 Navamsa + D10 Dashamsha ────────────────────────────────────────────
 
-function pageDivisional(chart: ChartData): string {
+function pageDivisional(chart: ChartData, lang: ReportLang = "en"): string {
   const divResult = calculateDivisional(
     chart.planets as Parameters<typeof calculateDivisional>[0],
     chart.lagnaNum,
@@ -2981,7 +2989,7 @@ function pageDivisional(chart: ChartData): string {
   const d9Notes = d9 ? getNavamshaAnalysis(d9) : [];
   const d10Notes = d10 ? getDashamshaAnalysis(d10) : [];
   const universal = analyzeUniversalShodashaVarga({
-    language: "hinglish",
+    language: lang === "hi" ? "hindi" : "english",
     birthTimeConfidence: 86,
     charts: divResult,
     dasha: extractDashaInput(chart),
@@ -3100,47 +3108,76 @@ function pageHealth(chart: ChartData): string {
 
 // ── Psychology Profile ────────────────────────────────────────────────────
 
-function pagePsychology(chart: ChartData): string {
+function pagePsychology(chart: ChartData, lang: ReportLang = "en"): string {
   const p = calculatePsychology(chart.planets as Parameters<typeof calculatePsychology>[0]);
+  const isEn = lang === "en";
+  const moonHouse = chart.planets.Moon?.house || 1;
+  const mercHouse = chart.planets.Mercury?.house || 1;
+  const isNightOwl = moonHouse === 12 || chart.planets.Mars?.house === 12;
+  const i18nPsych = getPsychologyI18n(lang, isNightOwl, moonHouse, mercHouse);
 
-  const cards = p.planets.slice(0, 6).map(pl => `
+  const cards = p.planets.slice(0, 6).map(pl => {
+    let funcLabel = pl.func;
+    if (isEn && funcLabel.includes("(")) {
+      const match = funcLabel.match(/\(([^)]+)\)/);
+      if (match) funcLabel = match[1];
+    }
+    return `
     <div class="card" style="padding:12px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
         <div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ivory);">${esc(pl.planet)}</div>
-          <div class="kicker" style="font-size:9px;margin-top:1px;">${esc(pl.func)}</div>
+          <div class="kicker" style="font-size:9px;margin-top:1px;">${esc(funcLabel)}</div>
         </div>
         <div class="mono" style="font-size:11px;color:var(--gold);">${pl.strength}/10</div>
       </div>
       <div class="body-s" style="margin-bottom:4px;color:${pl.strength >= 6 ? "var(--jade)" : "var(--saffron)"};">
         ${pl.strength >= 6 ? esc(pl.strong) : esc(pl.weak)}
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
+
+  const domDesc = isEn ? i18nPsych.dominantDesc : p.pattern.desc;
+  const shadowDesc = isEn ? i18nPsych.shadowSide : p.pattern.shadow;
+  const stabilizers = isEn
+    ? [
+        "Structured daily deep-work routines without digital notifications",
+        "Grounding nature walks or breathwork (Pranayama) before major decisions",
+        "Physical conditioning to discharge residual somatic tension",
+      ]
+    : p.stabilizers.slice(0, 3);
+  const growthPlan = isEn
+    ? [
+        "Delegate operational micro-management to trusted systems",
+        "Cultivate compassionate detachment during interpersonal conflicts",
+        "Schedule mandatory restorative retreats every quarter",
+      ]
+    : p.growthPlan.slice(0, 3);
 
   return `<section class="page dense">
     ${pageRail("Psychological Profile", "17")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">10</span>
-        <h2>Psychology</h2>
+        <h2>${isEn ? "Psychological Profile" : "मनोवैज्ञानिक विश्लेषण"}</h2>
       </div>
       <div class="card gold-edge" style="margin-bottom:14px;">
-        <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Dominant Pattern</div>
+        <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">${isEn ? "Dominant Pattern" : "प्रमुख मनोवैज्ञानिक स्वरूप"}</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);margin-bottom:6px;">${esc(p.pattern.name)}</div>
-        <div class="body-s" style="margin-bottom:6px;">${esc(p.pattern.desc)}</div>
-        <div class="body-s" style="color:var(--violet);"><strong>Shadow side:</strong> ${esc(p.pattern.shadow)}</div>
+        <div class="body-s" style="margin-bottom:6px;">${esc(domDesc)}</div>
+        <div class="body-s" style="color:var(--violet);"><strong>${isEn ? "Shadow side:" : "छाया पक्ष:"}</strong> ${esc(shadowDesc)}</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
         ${cards}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
-          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Stabilizers</div>
-          ${p.stabilizers.slice(0, 3).map(s => `<div class="body-s" style="margin-bottom:3px;">• ${esc(s)}</div>`).join("")}
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">${isEn ? "Stabilizers" : "स्थिरता कारक"}</div>
+          ${stabilizers.map(s => `<div class="body-s" style="margin-bottom:3px;">• ${esc(s)}</div>`).join("")}
         </div>
         <div>
-          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Growth Plan</div>
-          ${p.growthPlan.slice(0, 3).map(g => `<div class="body-s" style="margin-bottom:3px;">• ${esc(g)}</div>`).join("")}
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">${isEn ? "Growth Plan" : "विकास योजना"}</div>
+          ${growthPlan.map(g => `<div class="body-s" style="margin-bottom:3px;">• ${esc(g)}</div>`).join("")}
         </div>
       </div>
     </div>

@@ -359,7 +359,7 @@ export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR", 
 // ── 4. Page: 12th House Sacred Currency (Sampada) & Incubation ───────────────
 const RASHI_LORDS_12H = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
 
-export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H"): string {
+export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H", lang: ReportLang = "en"): string {
   const lagna = chart.lagnaRashi || "Aries";
   const lagnaNum = chart.lagnaNum ?? 0;
   const activeMD = chart.dashas?.find((d) => d.active)?.planet || "Jupiter";
@@ -385,72 +385,75 @@ export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H"):
   );
 
   const sampada = result.sampadaProfile;
+  const isEn = lang === "en";
+  const i18n12H = getTwelfthHouseI18n(lang, lagna);
 
   return `<section class="page dense">
     ${pageRail("12th House Intelligence · Sacred Currency (Sampada)", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--gold);">✦</span>
-        <h2>12th House Sacred Currency (Sampada)</h2>
+        <h2>${isEn ? "12th House Sacred Currency (Sampada)" : "12वां भाव · गुप्त संपदा व विश्राम साधना"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:14px;max-width:680px;color:var(--ivory-dim);">
-        The 12th House is not merely expenditure (Vyaya); it represents the Native's secret reservoir of power, unmanifested 
-        wealth (Sampada), and deep spiritual resilience. When kept sacred and private, this house becomes an infinite fountain of renewal.
+        ${isEn
+          ? "The 12th House is not merely expenditure (Vyaya); it represents the Native's secret reservoir of power, unmanifested wealth (Sampada), and deep spiritual resilience. When kept sacred and private, this house becomes an infinite fountain of renewal."
+          : "12वां भाव केवल व्यय नहीं, बल्कि जातक की गुप्त शक्ति, अप्रकट संपदा और आध्यात्मिक सहनशीलता का अक्षय भंडार है। इसे निजी और पवित्र रखने पर यह अनंत ऊर्जा का स्रोत बनता है।"}
       </div>
 
       <!-- Archetype Profile Card -->
       <div class="card" style="padding:14px;border-left:3px solid var(--gold);margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div class="kicker" style="color:var(--gold-bright);">${esc(lagna)} Lagna ➔ 12th House in ${esc(sampada.twelfthSign)}</div>
+          <div class="kicker" style="color:var(--gold-bright);">${esc(lagna)} ${isEn ? "Lagna ➔ 12th House in" : "लग्न ➔ 12वां भाव:"} ${esc(sampada.twelfthSign)}</div>
           <span style="font-size:10px;padding:2px 8px;border-radius:3px;background:var(--surface);color:var(--gold);border:1px solid var(--gold-dim);">
-            Sacred Currency Archetype
+            ${isEn ? "Sacred Currency Archetype" : "गुप्त संपदा स्वरूप"}
           </span>
         </div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-bright);margin-bottom:6px;">
-          ${esc(sampada.archetypeTitleHinglish)}
+          ${esc(isEn ? i18n12H.archetypeTitle : sampada.archetypeTitleHinglish)}
         </div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;margin-bottom:8px;">
-          <strong>Hidden Currency:</strong> ${esc(sampada.hiddenCurrencyHinglish)}
+          <strong>${isEn ? "Hidden Currency:" : "गुप्त संपदा:"}</strong> ${esc(isEn ? i18n12H.hiddenCurrency : sampada.hiddenCurrencyHinglish)}
         </div>
         <div style="font-size:11px;color:var(--crimson);line-height:1.4;margin-bottom:8px;">
-          <strong>The Curse of Public Exhaustion:</strong> ${esc(sampada.theCurseOfExhaustionHinglish)}
+          <strong>${isEn ? "The Curse of Public Exhaustion:" : "सार्वजनिक प्रकटीकरण की हानि:"}</strong> ${esc(isEn ? i18n12H.curseOfExhaustion : sampada.theCurseOfExhaustionHinglish)}
         </div>
         <div style="font-size:11px;color:var(--jade);line-height:1.4;">
-          <strong>Preservation Guidance:</strong> ${esc(sampada.sacredPreservationGuidanceHinglish)}
+          <strong>${isEn ? "Preservation Guidance:" : "संरक्षण निर्देश:"}</strong> ${esc(isEn ? i18n12H.preservationGuidance : sampada.sacredPreservationGuidanceHinglish)}
         </div>
       </div>
 
       <!-- 4th Lord in 12th & Viparita Raja Yoga Grid -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--cyan);">
-          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${result.fourthLordAlienationInsight ? "4th Lord in 12th House Insight" : "4th Lord Griha &amp; Root Stability"}</div>
+          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${result.fourthLordAlienationInsight ? (isEn ? "4th Lord in 12th House Insight" : "चतुर्थेश 12वें भाव में") : (isEn ? "4th Lord Griha & Root Stability" : "चतुर्थेश गृह एवं भूमि स्थिरता")}</div>
           <div style="font-size:11px;color:var(--ivory-dim);line-height:1.4;">
             ${result.fourthLordAlienationInsight 
               ? esc(result.fourthLordAlienationInsight) 
-              : "The 4th Lord is preserved outside the 12th house: ancestral land, domestic stability and property retention in native place remain secure without sudden displacement."}
+              : (isEn 
+                  ? "The 4th Lord is preserved outside the 12th house: ancestral land, domestic stability and property retention in native place remain secure without sudden displacement."
+                  : "चतुर्थेश 12वें भाव से बाहर सुरक्षित है: पैतृक भूमि, घरेलू स्थिरता और संपत्ति जातक के पास सुरक्षित बनी रहती है।")}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid ${result.viparitaRajaYoga.hasVRY ? "var(--gold)" : "var(--surface)"};">
-          <div class="kicker" style="color:var(--gold);margin-bottom:4px;">Viparita Raja Yoga (Ground-Zero Power)</div>
+          <div class="kicker" style="color:var(--gold);margin-bottom:4px;">${isEn ? "Viparita Raja Yoga (Ground-Zero Power)" : "विपरीत राजयोग (संकट में अभ्युदय)"}</div>
           <div style="font-size:11px;color:var(--ivory);font-weight:600;margin-bottom:2px;">
-            ${result.viparitaRajaYoga.hasVRY ? `Type: ${result.viparitaRajaYoga.type} Yoga` : "Standard Trikona Flow"}
+            ${result.viparitaRajaYoga.hasVRY ? `Type: ${result.viparitaRajaYoga.type} Yoga` : (isEn ? "Standard Trikona Flow" : "सामान्य त्रिकोण प्रवाह")}
           </div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
             ${result.viparitaRajaYoga.groundZeroWillpowerHinglish 
               ? esc(result.viparitaRajaYoga.groundZeroWillpowerHinglish) 
-              : "No extreme dusthana inversion active. Trik houses operate within regular parameters."}
+              : (isEn ? "No extreme dusthana inversion active. Trik houses operate within regular parameters." : "कोई विपरीत राजयोग सक्रिय नहीं। त्रिक भाव सामान्य हैं।")}
           </div>
         </div>
       </div>
 
       <!-- Sabbatical Protocol -->
       <div class="card" style="padding:12px;background:var(--surface);">
-        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">The Sabbatical &amp; Dream Incubation Protocol</div>
+        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">${isEn ? "The Sabbatical & Dream Incubation Protocol" : "सैबैटिकल व ध्यान साधना विधान"}</div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;">
-          ${result.sabbaticalProtocol 
-            ? `${esc(result.sabbaticalProtocol.recommendationTitleHinglish)} — ${esc(result.sabbaticalProtocol.actionProtocolHinglish)}`
-            : "जब भी 12वें भाव या उसके स्वामी की दशा सक्रिय हो, दौड़भाग छोड़कर 1-3 माह का एकांत सैबैटिकल लें। नींद, ध्यान और अवचेतन मन की प्रेरणा से जीवन का सबसे बड़ा साम्राज्य खड़ा होता है।"}
+          ${esc(i18n12H.sabbaticalProtocol)}
         </div>
       </div>
     </div>
@@ -459,65 +462,70 @@ export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H"):
 }
 
 // ── 5. Page: D10 Dashamsha Career Niche Specifier ────────────────────────────
-export function pageCareerSpecifierD10(chart: ChartData, pageNum = "D10"): string {
+export function pageCareerSpecifierD10(chart: ChartData, pageNum = "D10", lang: ReportLang = "en"): string {
+  const hasKetuLagna = Boolean(chart.planets.Ketu?.house === 10 || chart.planets.Ketu?.house === 1);
   const spec = evaluateCareerSpecifier({
     d10SixthLordInLagna: false,
     d10TenthLordWithRahu: false,
     d10FourthLordDashaActive: false,
-    d10LagnaHasKetu: Boolean(chart.planets.Ketu?.house === 10 || chart.planets.Ketu?.house === 1),
+    d10LagnaHasKetu: hasKetuLagna,
     mercuryKetuConjunction: Boolean(chart.planets.Mercury?.house === chart.planets.Ketu?.house),
     risingNakshatra: chart.planets.Sun?.nakshatra,
     moonNakshatra: chart.planets.Moon?.nakshatra,
   });
+
+  const isEn = lang === "en";
+  const i18nD10 = getCareerSpecifierI18n(lang, { hasKetuLagna });
 
   return `<section class="page dense">
     ${pageRail("D10 Dashamsha Career Specifier · Micro-Niche", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--gold);">✦</span>
-        <h2>D10 Career Specifier &amp; Mobility</h2>
+        <h2>${isEn ? "D10 Career Specifier & Mobility" : "दशमांश (D10) करियर व आजीविका निर्देशक"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:14px;max-width:680px;color:var(--ivory-dim);">
-        Standard astrology limits career reading to generic labels like 'Business' or 'Job'. 
-        The D10 Specifier decodes your precise institutional niche, deep-tech signatures, and desk mobility patterns.
+        ${isEn
+          ? "Standard astrology limits career reading to generic labels like 'Business' or 'Job'. The D10 Specifier decodes your precise institutional niche, deep-tech signatures, and desk mobility patterns."
+          : "पारंपरिक ज्योतिष करियर को केवल 'नौकरी' या 'व्यापार' तक सीमित रखता है। दशमांश विश्लेषक आपके सटीक आजीविका क्षेत्र, तकनीकी कौशल और कार्यस्थल गतिशीलता को स्पष्ट करता है।"}
       </div>
 
       <!-- Primary Title & Sub-Domain Card -->
       <div class="card" style="padding:14px;border-left:3px solid var(--gold);margin-bottom:12px;">
-        <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">Primary Professional Archetype</div>
+        <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">${isEn ? "Primary Professional Archetype" : "मुख्य आजीविका स्वरूप"}</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);margin-bottom:6px;">
-          ${esc(spec.primaryTitleHinglish)}
+          ${esc(isEn ? i18nD10.primaryTitle : spec.primaryTitleHinglish)}
         </div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;margin-bottom:6px;">
-          <strong>Target Micro-Niche:</strong> ${esc(spec.subDomainNicheHinglish)}
+          <strong>${isEn ? "Target Micro-Niche:" : "लक्षित कार्य-क्षेत्र:"}</strong> ${esc(isEn ? i18nD10.subDomainNiche : spec.subDomainNicheHinglish)}
         </div>
         <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-          <strong>D10 Circuit Architecture:</strong> ${esc(spec.d10CircuitLogicHinglish)}
+          <strong>${isEn ? "D10 Circuit Architecture:" : "दशमांश संरचना:"}</strong> ${esc(isEn ? i18nD10.circuitLogic : spec.d10CircuitLogicHinglish)}
         </div>
       </div>
 
       <!-- Workplace Mobility & Deep Tech Grid -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--cyan);">
-          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">Workplace Mobility (4th Lord in D10)</div>
+          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${isEn ? "Workplace Mobility (4th Lord in D10)" : "कार्यस्थल गतिशीलता"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(spec.officeMobilityStatusHinglish)}
+            ${esc(isEn ? i18nD10.officeMobilityStatus : spec.officeMobilityStatusHinglish)}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid var(--jade);">
-          <div class="kicker" style="color:var(--jade);margin-bottom:4px;">Deep-Tech &amp; Algorithmic Signature</div>
+          <div class="kicker" style="color:var(--jade);margin-bottom:4px;">${isEn ? "Deep-Tech & Quantitative Signature" : "तकनीकी एवं विश्लेषणात्मक क्षमता"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${spec.deepTechSignature ? esc(spec.deepTechSignature) : "सामान्य तकनीकी क्षमता; नेतृत्व और संबंध प्रबंधन में अधिक सहज प्रवाह।"}
+            ${esc(isEn ? (spec.deepTechSignature || i18nD10.deepTechSignature) : (spec.deepTechSignature || "सामान्य तकनीकी क्षमता; नेतृत्व और संबंध प्रबंधन में अधिक सहज प्रवाह।"))}
           </div>
         </div>
       </div>
 
       <!-- Leadership Archetype -->
       <div class="card" style="padding:12px;background:var(--surface);">
-        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">Leadership Archetype &amp; Executive Style</div>
+        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">${isEn ? "Leadership Archetype & Executive Style" : "नेतृत्व शैली एवं कार्य-पद्धति"}</div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;">
-          ${spec.leadershipArchetypeHinglish ? esc(spec.leadershipArchetypeHinglish) : "संस्थान-निर्माता (Institution Builder): नियमों, प्रक्रियाओं और टीम के अनुशासन के साथ दीर्घकालिक सफलता प्राप्त करने वाला नेतृत्व।"}
+          ${esc(isEn ? i18nD10.leadershipArchetype : (spec.leadershipArchetypeHinglish || "संस्थान-निर्माता (Institution Builder): नियमों, प्रक्रियाओं और टीम के अनुशासन के साथ दीर्घकालिक सफलता प्राप्त करने वाला नेतृत्व।"))}
         </div>
       </div>
     </div>
@@ -526,7 +534,7 @@ export function pageCareerSpecifierD10(chart: ChartData, pageNum = "D10"): strin
 }
 
 // ── 6. Page: Moon Dispositor Health & Degree Timing ──────────────────────────
-export function pageTransitHealthTiming(chart: ChartData, pageNum = "HT"): string {
+export function pageTransitHealthTiming(chart: ChartData, pageNum = "HT", lang: ReportLang = "en"): string {
   const moonSign = chart.planets.Moon?.sign || "Cancer";
   const healthTiming = evaluateMoonDispositorHealthTiming(
     moonSign,
@@ -538,51 +546,56 @@ export function pageTransitHealthTiming(chart: ChartData, pageNum = "HT"): strin
     Boolean(chart.planets.Mercury?.house === 2 || chart.planets.Saturn?.house === 2)
   );
 
+  const isEn = lang === "en";
+
   return `<section class="page dense">
     ${pageRail("Moon Dispositor Health · Exact Degree Timing", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--jade);">✦</span>
-        <h2>Moon Dispositor Health Timing</h2>
+        <h2>${isEn ? "Moon Dispositor Health Timing" : "चंद्र अधिपति स्वास्थ्य व विश्राम समय"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:14px;max-width:680px;color:var(--ivory-dim);">
-        In classical medical astrology, the dispositor of the Natal Moon governs bodily vitality, neuro-endocrine immunity, 
-        and recovery triggers. Tracking this planet across exact degree boundaries reveals exact treatment windows.
+        ${isEn
+          ? "In classical medical astrology, the dispositor of the Natal Moon governs bodily vitality, neuro-endocrine immunity, and recovery triggers. Tracking this planet across exact degree boundaries reveals exact treatment windows."
+          : "पारंपरिक चिकित्सा ज्योतिष में जन्म चंद्र का अधिपति ग्रह शारीरिक ऊर्जा, अंतःस्रावी प्रतिरक्षा और स्वास्थ्य सुधार की समय-सीमा निर्धारित करता है।"}
       </div>
 
       <!-- Dispositor Card -->
       <div class="card" style="padding:14px;border-left:3px solid var(--jade);margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div class="kicker" style="color:var(--jade);">Natal Moon in ${esc(moonSign)} ➔ Dispositor: ${esc(healthTiming.dispositorPlanet)}</div>
+          <div class="kicker" style="color:var(--jade);">${isEn ? `Natal Moon in ${esc(moonSign)} ➔ Dispositor: ${esc(healthTiming.dispositorPlanet)}` : `जन्म चंद्र: ${esc(moonSign)} ➔ अधिपति: ${esc(healthTiming.dispositorPlanet)}`}</div>
           <span style="font-size:10px;padding:2px 8px;border-radius:3px;background:var(--surface);color:var(--jade);border:1px solid var(--jade);">
-            Vitality Controller
+            ${isEn ? "Vitality Controller" : "ऊर्जा नियंत्रक"}
           </span>
         </div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);margin-bottom:6px;">
-          Exact Degree Threshold Recovery Window
+          ${isEn ? "Exact Degree Threshold Recovery Window" : "सूक्ष्म अंश सीमा व स्वास्थ्य सुधार चक्र"}
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.5;">
-          ${esc(healthTiming.exactDegreeRecoveryWindowHinglish)}
+          ${isEn 
+            ? `Optimal restorative protocol active when transit Moon aligns favorably with ${esc(healthTiming.dispositorPlanet)}. Prioritize rest and circadian rhythm alignment.`
+            : esc(healthTiming.exactDegreeRecoveryWindowHinglish)}
         </div>
       </div>
 
       <!-- Environmental Remediation & Nerve Support -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--gold);">
-          <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">Environmental &amp; Clutter Remediation</div>
+          <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">${isEn ? "Environmental & Clutter Remediation" : "पर्यावरणीय स्वच्छता व ऊर्जा शोधन"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${healthTiming.environmentalClutterRemedyHinglish 
-              ? esc(healthTiming.environmentalClutterRemedyHinglish) 
-              : "घर के प्रवेश द्वार और उत्तर-पूर्व कोने को पूरी तरह स्वच्छ रखें; धूल और बंद घड़ियां हटाएं।"}
+            ${isEn
+              ? "Keep residential entrance and northeast zones impeccably clean; eliminate non-functional clocks, clutter and stale storage."
+              : (healthTiming.environmentalClutterRemedyHinglish || "घर के प्रवेश द्वार और उत्तर-पूर्व कोने को पूरी तरह स्वच्छ रखें; धूल और बंद घड़ियां हटाएं।")}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid var(--cyan);">
-          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">Nerve &amp; 3rd House Burnout Support</div>
+          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${isEn ? "Nerve & Cognitive Burnout Support" : "तंत्रिका व मानसिक तनाव निवारण"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${healthTiming.nerveBurnoutTalismanHinglish 
-              ? esc(healthTiming.nerveBurnoutTalismanHinglish) 
-              : "अश्वगंधा व ब्राह्मी का सेवन करें; रात्रि में स्क्रीन टाइम कम करें।"}
+            ${isEn
+              ? "Incorporate calming herbs like Ashwagandha or Brahmi with warm milk; strictly restrict digital blue-light screen exposure after 9:30 PM."
+              : (healthTiming.nerveBurnoutTalismanHinglish || "अश्वगंधा व ब्राह्मी का सेवन करें; रात्रि में स्क्रीन टाइम कम करें।")}
           </div>
         </div>
       </div>
@@ -590,12 +603,12 @@ export function pageTransitHealthTiming(chart: ChartData, pageNum = "HT"): strin
       <!-- Strict Clinical Disclaimer -->
       <div style="padding:12px;background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.3);border-radius:4px;margin-top:auto;">
         <div style="font-size:10px;color:var(--jade);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">
-          Mandatory Clinical &amp; Medical Guardrail
+          ${isEn ? "Mandatory Clinical & Medical Guardrail" : "वैधानिक एवं चिकित्सीय अस्वीकरण"}
         </div>
         <div style="font-size:9px;color:var(--ivory-dim);line-height:1.4;">
-          Astrological health timing operates strictly at the subtle energetic and lifestyle level. 
-          It is NOT a medical diagnosis, medical prognosis, or prescription for treatment. Never discontinue or delay medical 
-          consultation, surgery, or prescription medications based on astrological charts. Always consult licensed medical doctors.
+          ${isEn
+            ? "Astrological health timing operates strictly at the subtle energetic and lifestyle level. It is NOT a medical diagnosis, medical prognosis, or prescription for treatment. Never discontinue or delay medical consultation, surgery, or prescription medications based on astrological charts. Always consult licensed medical doctors."
+            : "ज्योतिषीय स्वास्थ्य समय-चक्र केवल जीवनशैली व मानसिक ऊर्जा संतुलन के लिए है। यह कोई डॉक्टरी निदान या चिकित्सा परामर्श नहीं है। किसी भी स्वास्थ्य समस्या हेतु योग्य चिकित्सक से परामर्श लें।"}
         </div>
       </div>
     </div>
