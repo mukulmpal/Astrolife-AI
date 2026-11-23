@@ -1087,7 +1087,7 @@ body {
         ✦ HOW BIOMETRIC DOT THERAPY DEFLECTS MALEFIC HIT ENERGIES
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        When moving physical furniture in an apartment or rented office is impossible, external spatial hits (180° or 90° planetary hit lines) create energetic blockages on your body. By applying natural sacred substances (pure cow desi ghee, white sandalwood, saffron, or kajal) on specific reflex points, we alter localized skin conductance and convert a destructive 180° opposition hit into a harmonious 120° trine protector.
+        When moving physical furniture in an apartment or rented office is impossible, external spatial hits (180-degree or 90-degree planetary hit lines) create energetic blockages on your body. By applying natural sacred substances (pure cow desi ghee, white sandalwood, saffron, or kajal) on specific reflex points, we alter localized skin conductance and convert a destructive 180-degree opposition hit into a harmonious 120-degree trine protector.
       </p>
     </div>
 
@@ -1263,7 +1263,7 @@ body {
           On Saturdays, or during periods of acute work pressure, apply a tiny <strong>micro-dot (2mm) of pure natural herbal kajal</strong> (soot of cow ghee lamp) on the lateral side of your <strong>Right Knee joint</strong>.
         </p>
         <p style="color:var(--ivory-dim);margin-top:4px;">
-          <strong>Effect:</strong> Converts heavy 180° Saturnian structural friction into a grounding shield, preventing knee fatigue and stabilizing erratic professional timelines.
+          <strong>Effect:</strong> Converts heavy 180-degree Saturnian structural friction into a grounding shield, preventing knee fatigue and stabilizing erratic professional timelines.
         </p>
       </div>
     </div>
@@ -1497,7 +1497,7 @@ body {
         ✦ SYMBOLIC GEOMETRY SPECIFICATION
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        The design should feature the classical <strong>Mercury Planetary Sigil</strong> (☿) or a clean geometric polygon (an upward equilateral triangle intersected by an upward arrow) representing mental agility, software syntax mastery, and commercial precision.
+        The design should feature the classical <strong>Mercury Planetary Sigil (Budha Yantra)</strong> <span style="display:inline-flex;align-items:center;vertical-align:middle;margin:0 3px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="5"/><path d="M12 16v6M9 19h6M7 4a5 5 0 0 1 10 0"/></svg></span> or a clean geometric polygon (an upward equilateral triangle intersected by an upward arrow) representing mental agility, software syntax mastery, and commercial precision.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:6px;">
         ✦ <strong>Temporary Alternative:</strong> If permanent ink is not preferred, use a skin-safe natural green herbal marker or natural henna to draw a 5mm micro-symbol on the right inner forearm on Wednesday morning during high-stakes pitch days.
