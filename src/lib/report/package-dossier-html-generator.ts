@@ -29,6 +29,7 @@ import { generateStockTradingDossierHTML } from "./generators/stock-trading-doss
 import { generateJaiminiSoulDossierHTML } from "./generators/jaimini-soul-dossier-generator";
 import { generateAyurvedicMedicalDossierHTML } from "./generators/ayurvedic-medical-dossier-generator";
 import { generateGoldenMuhuratDossierHTML } from "./generators/golden-muhurat-dossier-generator";
+import { generateDestinyCurveDossierHTML } from "./generators/destiny-curve-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -279,6 +280,19 @@ export function generatePackageDossierHTML(
     (reportId.includes("timing") && !reportId.includes("yogas") && !reportId.includes("raja"))
   ) {
     return generateGoldenMuhuratDossierHTML(chart, options);
+  }
+
+  // 9. Destiny Curve & 90-Year Life Master (Flagship Suite)
+  if (
+    reportId.includes("destiny") ||
+    reportId.includes("curve") ||
+    rawReportId === "destiny_curve_flagship" ||
+    rawReportId === "navtara_dasha_single" ||
+    rawReportId === "yearly_gochar" ||
+    reportId.includes("navtara") ||
+    reportId.includes("gochar")
+  ) {
+    return generateDestinyCurveDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
