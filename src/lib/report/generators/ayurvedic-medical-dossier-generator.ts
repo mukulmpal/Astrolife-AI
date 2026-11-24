@@ -707,8 +707,8 @@ body {
         <tr>
           <td><strong style="color:var(--gold-bright);">Sun (Surya)</strong></td>
           <td>Gemini &middot; 10th House</td>
-          <td>Libra (Debilitated)</td>
-          <td>Cellular vitality requires deliberate breathwork and morning sun; avoid over-exhaustion</td>
+          <td>Pisces (Friendly / Jupiterian)</td>
+          <td>Navamsha anchors solar prana in Jupiterian waters; grants cardiovascular stability and spiritual vitality</td>
           <td>Asthi (Bones), Eye Vitality</td>
         </tr>
         <tr>
@@ -722,7 +722,7 @@ body {
           <td><strong style="color:var(--ruby-bright);">Mars (Mangala)</strong></td>
           <td>Leo &middot; 12th House</td>
           <td>Scorpio (Swakshetra Own)</td>
-          <td>Massive cellular regeneration; profound immune white-blood-cell defensive force</td>
+          <td>Swakshetra in D-9! Massive cellular regeneration; profound immune white-blood-cell defensive force</td>
           <td>Mamsa (Muscles), Bone Marrow</td>
         </tr>
         <tr>
@@ -735,22 +735,22 @@ body {
         <tr>
           <td><strong style="color:var(--gold);">Jupiter (Guru)</strong></td>
           <td>Scorpio &middot; 3rd House</td>
-          <td>Cancer (Exalted)</td>
-          <td>Exalted in D-9! Divine hepatic protection, healthy bile metabolism, and cellular wisdom</td>
+          <td>Libra (Friendly / Harmonious)</td>
+          <td>Harmonious Venusian placement; balances hepatic metabolism, lipid distribution, and arterial tone</td>
           <td>Meda (Lipid), Liver Reserve</td>
         </tr>
         <tr>
           <td><strong style="color:var(--purple-bright);">Venus (Shukra)</strong></td>
           <td>Gemini &middot; 10th House</td>
           <td>Scorpio (Neutral)</td>
-          <td>Healthy hormonal balance; channel artistic expression to protect reproductive tone</td>
+          <td>Healthy hormonal balance; channel creative expression to protect reproductive and endocrine Ojas</td>
           <td>Shukra (Endocrine Ojas)</td>
         </tr>
         <tr>
           <td><strong style="color:var(--amber);">Saturn (Shani)</strong></td>
           <td>Pisces &middot; 7th House</td>
-          <td>Pisces (Vargottama)</td>
-          <td>Vargottama stability; structural skeletal durability; requires warm oil joint lubrication</td>
+          <td>Cancer (Sensitive / Watery)</td>
+          <td>Saturn in Cancer requires joint warmth, healthy hydration, and avoiding cold, dry environments</td>
           <td>Asthi (Joints), Teeth, Longevity</td>
         </tr>
       </tbody>
@@ -762,8 +762,8 @@ body {
         ✦ 2 SUPREME CELLULAR HEALTH BLESSINGS IN NAVAMSHA
       </div>
       <p class="body-text" style="font-size:11px;margin-top:2px;">
-        1. <strong>Jupiter Exalted in D-9 Navamsha (Cancer):</strong> Devaguru Jupiter acts as the supreme protector of life (<em>Jiva Karaka</em>). His exaltation at the cellular D-9 level protects against chronic cellular mutations and safeguards liver and metabolic vitality.<br/>
-        2. <strong>Saturn Vargottama in Pisces:</strong> Saturn occupies the exact same sign (Pisces) in both D-1 and D-9. In classical medical texts, a Vargottama Saturn confers <em>Purna Ayu</em> (full classical longevity) and exceptional resistance to degenerative bone disease.
+        1. <strong>Mercury Exalted in D-9 Navamsha (Virgo):</strong> Lagnesh Mercury attains sovereign exaltation (Uchcha) in D-9 Virgo, conferring extraordinary neurological durability, swift cognitive processing, and robust immune mucosal integrity.<br/>
+        2. <strong>Mars Swakshetra in D-9 Navamsha (Scorpio):</strong> Mars occupies its own nocturnal water sign Scorpio in D-9, empowering powerful bone marrow regeneration, high cellular phagocytosis, and rapid tissue recuperation.
       </p>
     </div>
   </div>

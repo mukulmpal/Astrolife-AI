@@ -1476,7 +1476,7 @@ body {
           <tr><td><strong>Sun</strong></td><td>6.08</td><td>365</td><td>6.50</td><td>0.94</td><td style="color:var(--gold-bright);">Moderate-High</td><td>10th House Digbala: Public executive leadership</td></tr>
           <tr><td><strong>Venus</strong></td><td>5.10</td><td>306</td><td>5.50</td><td>0.93</td><td style="color:var(--gold);">Moderate</td><td>Dhana Lord: Refined branding &amp; high-ticket offerings</td></tr>
           <tr><td><strong>Mars</strong></td><td>4.62</td><td>277</td><td>5.00</td><td>0.92</td><td style="color:var(--gold);">Moderate</td><td>Chandra-Mangala drive: Fast execution &amp; boldness</td></tr>
-          <tr><td><strong>Jupiter</strong></td><td>5.63</td><td>338</td><td>6.50</td><td>0.87</td><td>Moderate</td><td>Gajakesari wisdom: Advisory &amp; institutional backing</td></tr>
+          <tr><td><strong>Jupiter</strong></td><td>5.63</td><td>338</td><td>6.50</td><td>0.87</td><td>Calibrated (70/100)</td><td>Advisory wisdom &amp; institutional backing (Upachaya/Dharma strength)</td></tr>
           <tr><td><strong>Moon</strong></td><td>4.88</td><td>293</td><td>6.00</td><td>0.81</td><td>Sensitive</td><td>Atmakaraka: Guard against emotional overextension</td></tr>
           <tr><td><strong>Mercury</strong></td><td>4.65</td><td>279</td><td>7.00</td><td>0.66</td><td style="color:var(--amber);">Catalyst Needed</td><td>Amatyakaraka: Requires Emerald/Budha gem activation</td></tr>
         </tbody>

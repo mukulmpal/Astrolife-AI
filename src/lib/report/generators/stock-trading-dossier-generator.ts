@@ -986,16 +986,22 @@ body {
           <td>Psychological calm, emotional stability, freedom from FOMO</td>
         </tr>
         <tr>
-          <td><strong>7. राज्याश्रय (Rajya)</strong></td>
+          <td><strong>7. जाति (Jati)</strong></td>
           <td>Magha</td>
           <td>26th</td>
-          <td>Institutional backing, regulatory compliance, corporate retainers</td>
+          <td>Workforce stability, community networks, institutional retainers</td>
         </tr>
         <tr>
-          <td><strong>8. अभिषेक (Abhishek)</strong></td>
+          <td><strong>8. देश (Desha)</strong></td>
           <td>Purva Phalguni</td>
           <td>27th</td>
-          <td>Peak commercial triumph, annual harvest, milestone liquidations</td>
+          <td>Macro-economic environment, sovereign policy, systemic market trends</td>
+        </tr>
+        <tr>
+          <td><strong>9. अभिषेक (Abhisheka)</strong></td>
+          <td>Uttara Phalguni</td>
+          <td>28th</td>
+          <td>Peak sovereign coronation, apex execution, milestone liquidations</td>
         </tr>
       </tbody>
     </table>

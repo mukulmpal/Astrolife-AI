@@ -623,7 +623,7 @@ body {
         ✦ THE SOUL ESSENCE: HIGH PSYCHIC SENSITIVITY &amp; ABSOLUTE AUTONOMY
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        When the Moon is Atmakaraka, the soul contracted to master <strong>emotional purity, mental detachment, and deep empathy without self-destruction</strong>. Moon at ${akDegreeStr} sits at the very edge of Leo&mdash;the final degree of a royal sign (<em>Gandanta perimeter</em>)&mdash;reflecting a soul that has exhausted mundane worldly vanity and now hungers for authentic spiritual truth.
+        When the Moon is Atmakaraka, the soul contracted to master <strong>emotional purity, mental detachment, and deep empathy without self-destruction</strong>. Moon at ${akDegreeStr} sits at the very edge of Leo&mdash;the final degree of a royal sign (<em>extreme Rashi Sandhi cusp threshold</em>)&mdash;reflecting a soul that has exhausted mundane worldly vanity and now hungers for authentic spiritual truth.
       </p>
       <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;margin-top:6px;font-size:11px;">
         <strong style="color:var(--gold-bright);">The 12th House Paradox:</strong> Placing the Soul King in the 12th house (Vyaya / Moksha Bhava) means your true power emerges when you work in quiet isolation, solitary digital architecture, or behind closed doors. Mundane retail visibility exhausts you; private sovereign creation elevates you.

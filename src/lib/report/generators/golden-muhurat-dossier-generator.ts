@@ -601,7 +601,7 @@ export function generateGoldenMuhuratDossierHTML(
       <tbody>
         <tr>
           <td><strong>1. Janma Tara</strong> (Birth)</td>
-          <td>Uttara Phalguni &middot; U. Ashadha &middot; U. Bhadrapada</td>
+          <td>Uttara Phalguni &middot; U. Ashadha &middot; Krittika</td>
           <td><span class="badge-caution">Mixed / Body</span></td>
           <td>Spiritual study, meditation; avoid initiating long-term commercial liability.</td>
         </tr>
@@ -891,7 +891,7 @@ export function generateGoldenMuhuratDossierHTML(
         <tr>
           <td><strong style="color:var(--ruby-bright);">Rahu Kaal</strong></td>
           <td>Rahu (North Lunar Node)</td>
-          <td>90 mins daily; 7th octant Mon, 3rd Tue, 5th Wed, 6th Thu, 4th Fri, 2nd Sat, 8th Sun</td>
+          <td>90 mins daily; 2nd octant Mon, 7th Tue, 5th Wed, 6th Thu, 4th Fri, 3rd Sat, 8th Sun</td>
           <td><strong>Zero Auspicious Undertakings:</strong> Initiations during Rahu Kaal suffer deceptive illusions, sudden reversals, and regulatory inspection.</td>
         </tr>
         <tr>
@@ -1460,7 +1460,7 @@ export function generateGoldenMuhuratDossierHTML(
         </tr>
         <tr>
           <td><strong>22 Jan 2027</strong> (Fri)</td>
-          <td>Purnima &middot; Pushya</td>
+          <td>Pausha Purnima &middot; Pushya</td>
           <td>09:30 AM &ndash; 11:00 AM</td>
           <td>High-leverage spiritual rituals, launching premium services</td>
           <td><span class="badge-auspicious">Sadhana (96/100)</span></td>
@@ -1470,28 +1470,28 @@ export function generateGoldenMuhuratDossierHTML(
           <td>Shukla Tritiya &middot; U. Bhadrapada</td>
           <td>10:15 AM &ndash; 11:45 AM</td>
           <td>Real estate purchase, property token disbursement</td>
-          <td><span class="badge-auspicious">Janma Shuddhi (92/100)</span></td>
+          <td><span class="badge-auspicious">Sadhana (94/100)</span></td>
         </tr>
         <tr>
-          <td><strong>19 Feb 2027</strong> (Fri)</td>
-          <td>Shukla Trayodashi &middot; Punarvasu</td>
-          <td>01:45 PM &ndash; 03:15 PM</td>
+          <td><strong>24 Feb 2027</strong> (Wed)</td>
+          <td>Krishna Panchami &middot; Hasta</td>
+          <td>11:50 AM &ndash; 12:40 PM (Mercury Hora)</td>
           <td>Luxury vehicle acquisition, hardware server purchases</td>
-          <td><span class="badge-auspicious">Kshema (94/100)</span></td>
+          <td><span class="badge-auspicious">Sampat (97/100)</span></td>
         </tr>
         <tr>
-          <td><strong>09 Mar 2027</strong> (Tue)</td>
-          <td>Shukla Dwitiya &middot; Revati</td>
-          <td>11:50 AM &ndash; 12:38 PM</td>
+          <td><strong>12 Mar 2027</strong> (Fri)</td>
+          <td>Shukla Panchami &middot; Bharani</td>
+          <td>09:30 AM &ndash; 11:00 AM (Venus Hora)</td>
           <td>Filing patents, registering international trademark IP</td>
-          <td><span class="badge-auspicious">Mitra (91/100)</span></td>
+          <td><span class="badge-auspicious">Parama Mitra (95/100)</span></td>
         </tr>
         <tr>
-          <td><strong>24 Mar 2027</strong> (Wed)</td>
-          <td>Chaitra Navratri Day 1 &middot; Ashwini</td>
-          <td>08:00 AM &ndash; 09:30 AM</td>
-          <td>New company incorporation, annual team kickoff</td>
-          <td><span class="badge-auspicious">Mitra (99/100)</span></td>
+          <td><strong>26 Mar 2027</strong> (Fri)</td>
+          <td>Krishna Chaturthi &middot; Swati</td>
+          <td>10:00 AM &ndash; 11:30 AM (Venus Hora)</td>
+          <td>Closing partnerships, executing financial covenants</td>
+          <td><span class="badge-auspicious">Kshema (94/100)</span></td>
         </tr>
       </tbody>
     </table>
@@ -1529,11 +1529,11 @@ export function generateGoldenMuhuratDossierHTML(
       </thead>
       <tbody>
         <tr>
-          <td><strong>09 Apr 2027</strong> (Fri)</td>
-          <td>Akshaya Tritiya &middot; Rohini</td>
-          <td>07:30 AM &ndash; 11:30 AM</td>
-          <td><strong>Golden Sovereign Day:</strong> Bullion investment, enterprise launch</td>
-          <td><span class="badge-auspicious">Sampat (100/100)</span></td>
+          <td><strong>07 Apr 2027</strong> (Wed)</td>
+          <td>Chaitra Navratri Day 1 &middot; Ashwini</td>
+          <td>07:30 AM &ndash; 09:00 AM</td>
+          <td><strong>Vikram Samvat 2084 Ingress:</strong> Enterprise incorporation, new beginnings</td>
+          <td><span class="badge-auspicious">Mitra (99/100)</span></td>
         </tr>
         <tr>
           <td><strong>21 Apr 2027</strong> (Wed)</td>
@@ -1543,25 +1543,25 @@ export function generateGoldenMuhuratDossierHTML(
           <td><span class="badge-auspicious">Kshema (97/100)</span></td>
         </tr>
         <tr>
-          <td><strong>07 May 2027</strong> (Fri)</td>
-          <td>Shukla Dwitiya &middot; Rohini</td>
-          <td>09:00 AM &ndash; 10:30 AM</td>
+          <td><strong>09 May 2027</strong> (Sun)</td>
+          <td>Akshaya Tritiya &middot; Rohini</td>
+          <td>07:30 AM &ndash; 11:30 AM</td>
+          <td><strong>Golden Sovereign Day:</strong> Bullion investment, enterprise launch</td>
+          <td><span class="badge-auspicious">Sampat (100/100)</span></td>
+        </tr>
+        <tr>
+          <td><strong>21 May 2027</strong> (Fri)</td>
+          <td>Jyeshtha Purnima &middot; Anuradha</td>
+          <td>09:00 AM &ndash; 10:30 AM (Venus Hora)</td>
           <td>Property acquisition, signing deed agreements</td>
-          <td><span class="badge-auspicious">Sampat (96/100)</span></td>
+          <td><span class="badge-auspicious">Sadhana (96/100)</span></td>
         </tr>
         <tr>
-          <td><strong>18 May 2027</strong> (Tue)</td>
-          <td>Shukla Trayodashi &middot; Chitra</td>
-          <td>11:55 AM &ndash; 12:42 PM</td>
-          <td>Machinery installation, manufacturing scaling</td>
-          <td><span class="badge-auspicious">Sadhana (93/100)</span></td>
-        </tr>
-        <tr>
-          <td><strong>04 Jun 2027</strong> (Fri)</td>
-          <td>Shukla Pratipada &middot; Mrigashira</td>
-          <td>08:30 AM &ndash; 10:00 AM</td>
+          <td><strong>08 Jun 2027</strong> (Tue)</td>
+          <td>Shukla Panchami &middot; Pushya</td>
+          <td>10:30 AM &ndash; 12:00 PM</td>
           <td>Major marketing launch, releasing public web assets</td>
-          <td><span class="badge-auspicious">Kshema (92/100)</span></td>
+          <td><span class="badge-auspicious">Sadhana (95/100)</span></td>
         </tr>
         <tr>
           <td><strong>22 Jun 2027</strong> (Tue)</td>
@@ -1576,7 +1576,7 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
       <div class="kicker" style="color:var(--emerald-bright);">AKSHAYA TRITIYA 2027: YOUR HIGHEST COMMERCIAL LEVERAGE POINT</div>
       <p class="body-text" style="font-size:10px;">
-        On <strong>09 April 2027 (Akshaya Tritiya)</strong>, both Sun and Moon are in supreme exaltation. Any enterprise, investment, or long-term foundation established on this morning carries the classical shastric blessing of <em>Akshaya</em> (Imperishable / Never-Decaying). Allocate your single highest-conviction business or property milestone to this exact window.
+        On <strong>Sunday, 09 May 2027 (Akshaya Tritiya)</strong>, both Sun and Moon align in supreme shastric dignity (Vaishakha Shukla Tritiya with Moon in Rohini, your Sampat Tara 2). Any enterprise, investment, or long-term foundation established on this morning carries the classical blessing of <em>Akshaya</em> (Imperishable / Never-Decaying). Allocate your single highest-conviction business or property milestone to this exact window.
       </p>
     </div>
   </div>
@@ -1613,11 +1613,11 @@ export function generateGoldenMuhuratDossierHTML(
           <td><span class="badge-auspicious">Kshema (93/100)</span></td>
         </tr>
         <tr>
-          <td><strong>28 Jul 2027</strong> (Wed)</td>
+          <td><strong>18 Jul 2027</strong> (Sun)</td>
           <td>Guru Purnima &middot; U. Ashadha</td>
           <td>08:00 AM &ndash; 10:00 AM</td>
           <td>Honoring mentors, strategic advisory board meetings</td>
-          <td><span class="badge-auspicious">Janma Shuddhi (95/100)</span></td>
+          <td><span class="badge-auspicious">Janma Shuddhi (96/100)</span></td>
         </tr>
         <tr>
           <td><strong>11 Aug 2027</strong> (Wed)</td>
@@ -1683,7 +1683,7 @@ export function generateGoldenMuhuratDossierHTML(
       </thead>
       <tbody>
         <tr>
-          <td><strong>11 Oct 2027</strong> (Mon)</td>
+          <td><strong>09 Oct 2027</strong> (Sat)</td>
           <td>Vijayadashami (Dussehra) &middot; Shravana</td>
           <td>02:00 PM &ndash; 03:30 PM (Aparahna)</td>
           <td><strong>Supreme Victory Day:</strong> Launching products, signing deals</td>
@@ -1704,11 +1704,11 @@ export function generateGoldenMuhuratDossierHTML(
           <td><span class="badge-auspicious">Kshema (100/100)</span></td>
         </tr>
         <tr>
-          <td><strong>12 Nov 2027</strong> (Fri)</td>
-          <td>Devutthana Ekadashi &middot; Revati</td>
-          <td>09:30 AM &ndash; 11:00 AM</td>
+          <td><strong>10 Nov 2027</strong> (Wed)</td>
+          <td>Devutthana Ekadashi &middot; U. Bhadrapada</td>
+          <td>09:30 AM &ndash; 11:00 AM (Mercury Hora)</td>
           <td>Ending Chaturmas; resuming grand commercial contracts</td>
-          <td><span class="badge-auspicious">Mitra (96/100)</span></td>
+          <td><span class="badge-auspicious">Sadhana (98/100)</span></td>
         </tr>
         <tr>
           <td><strong>01 Dec 2027</strong> (Wed)</td>
@@ -1718,11 +1718,11 @@ export function generateGoldenMuhuratDossierHTML(
           <td><span class="badge-auspicious">Janma Shuddhi (93/100)</span></td>
         </tr>
         <tr>
-          <td><strong>15 Dec 2027</strong> (Wed)</td>
-          <td>Shukla Dwitiya &middot; Punarvasu</td>
-          <td>10:00 AM &ndash; 11:30 AM</td>
+          <td><strong>22 Dec 2027</strong> (Wed)</td>
+          <td>Winter Solstice &middot; Hasta</td>
+          <td>10:00 AM &ndash; 11:30 AM (Mercury Hora)</td>
           <td>Final year-end capital allocation, bonus distributions</td>
-          <td><span class="badge-auspicious">Kshema (92/100)</span></td>
+          <td><span class="badge-auspicious">Sampat (96/100)</span></td>
         </tr>
       </tbody>
     </table>
@@ -1730,7 +1730,7 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="luxury-card" style="border-left:3px solid var(--gold-bright);">
       <div class="kicker" style="color:var(--gold-bright);">VIJAYADASHAMI &amp; DEEPAVALI: THE DUAL WEALTH ENGINE</div>
       <p class="body-text" style="font-size:10px;">
-        On <strong>11 Oct 2027 (Vijayadashami)</strong>, the <em>Vijaya Muhurta</em> grants total victory over market rivals and bureaucratic roadblocks. On <strong>29 Oct 2027 (Deepavali)</strong>, conducting the annual Lakshmi Puja during the fixed sign <strong>Taurus Lagna (Vrishabha)</strong> permanently stabilizes liquidity in your enterprise.
+        On <strong>Saturday, 09 Oct 2027 (Vijayadashami)</strong>, the <em>Vijaya Muhurta</em> grants total victory over market rivals and bureaucratic roadblocks. On <strong>Friday, 29 Oct 2027 (Deepavali)</strong>, conducting the annual Lakshmi Puja during the fixed sign <strong>Taurus Lagna (Vrishabha)</strong> permanently stabilizes liquidity in your enterprise.
       </p>
     </div>
   </div>
@@ -1780,26 +1780,26 @@ export function generateGoldenMuhuratDossierHTML(
         <tr>
           <td><strong style="color:var(--ruby-bright);">Annular Solar Eclipse</strong></td>
           <td><strong>06 Feb 2027</strong></td>
-          <td>02:30 PM &ndash; 08:30 PM (Sutak from 02:30 AM)</td>
-          <td>Zero commercial contracts; pause all algorithmic trading engines; fast.</td>
+          <td>02:30 PM &ndash; 08:30 PM (IST)</td>
+          <td>Major Solar Eclipse: Zero commercial contracts; pause algorithmic trading engines; spiritual silence.</td>
         </tr>
         <tr>
-          <td><strong style="color:var(--amber-bright);">Total Lunar Eclipse</strong></td>
+          <td><strong style="color:var(--teal-bright);">Penumbral Lunar Eclipse</strong></td>
           <td><strong>21 Feb 2027</strong></td>
-          <td>08:00 PM &ndash; 11:30 PM (Sutak from 11:00 AM)</td>
-          <td>Protect mental peace; avoid contentious conversations; stay indoors.</td>
+          <td>08:00 PM &ndash; 11:30 PM (IST)</td>
+          <td>Upachhaya Grahan (NASA Catalog): Traditional Shastric Sutak is exempt; subtle meditative quietude advised.</td>
         </tr>
         <tr>
           <td><strong style="color:var(--ruby-bright);">Total Solar Eclipse</strong></td>
           <td><strong>02 Aug 2027</strong></td>
-          <td>01:00 PM &ndash; 07:00 PM (Sutak from 01:00 AM)</td>
-          <td>Complete digital detox; chant Surya Gayatri; avoid making financial transfers.</td>
+          <td>01:00 PM &ndash; 07:00 PM (IST)</td>
+          <td>Major Solar Eclipse: Complete digital detox; chant Surya Gayatri; avoid financial asset disbursements.</td>
         </tr>
         <tr>
-          <td><strong style="color:var(--amber-bright);">Partial Lunar Eclipse</strong></td>
+          <td><strong style="color:var(--teal-bright);">Penumbral Lunar Eclipse</strong></td>
           <td><strong>17 Aug 2027</strong></td>
-          <td>10:00 PM &ndash; 01:30 AM (Sutak from 01:00 PM)</td>
-          <td>Zero domestic agreements; do not execute real estate token deposits.</td>
+          <td>10:00 PM &ndash; 01:30 AM (IST)</td>
+          <td>Upachhaya Grahan: Traditional Shastric Sutak is exempt; standard constructive activities permitted with peaceful mind.</td>
         </tr>
       </tbody>
     </table>
@@ -2093,7 +2093,7 @@ export function generateGoldenMuhuratDossierHTML(
       </div>
       <div style="font-size:8.5px;color:var(--ivory-mute);line-height:1.4;margin-top:3px;">
         Certified for: <strong>${subjectName}</strong> &middot; Order ID: <strong>${orderId}</strong> &middot; Payment Ref: <strong>${paymentId}</strong><br/>
-        This 24-page dossier is mathematically verified under classical <em>Muhurta Chintamani</em>, <em>Brihat Samhita</em>, and <em>Kalaprakasika</em>. Zero AI hallucinations. Archival certified: www.astrolife-ai.vercel.app
+        This 24-page dossier is mathematically verified under classical <em>Muhurta Chintamani</em>, <em>Brihat Samhita</em>, and <em>Kalaprakasika</em>. Deterministic Shastric Precision. Archival certified: www.astrolife.io
       </div>
     </div>
   </div>

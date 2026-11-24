@@ -686,7 +686,7 @@ body {
           <strong style="color:var(--gold);">House 6 (Aquarius · Disease &amp; Debt):</strong> Governed by Saturn. Rahu transiting here or natal stress can manifest as nervous fatigue or lower leg stiffness. Neutralized by Saturday discipline and copper oiling.
         </div>
         <div>
-          <strong style="color:var(--ruby-bright);">House 8 (Aries · Chronic Obstacles &amp; Surgery):</strong> Occupied by natal <strong>Ketu at 8° 12'</strong>. Governed by Mars (who sits in the 12th). This creates sudden metabolic spikes, acidity, and vulnerability to sharp instruments. Requires strict Ketu cooling upayas.
+          <strong style="color:var(--ruby-bright);">House 8 (Aries · Chronic Obstacles &amp; Surgery):</strong> Occupied by natal <strong>Ketu at 8° 12' (exact Mrityu Bhaga zone)</strong>. Governed by Mars (who sits in the 12th). This creates sudden metabolic spikes, acidity, and vulnerability to sharp instruments. Requires strict Ketu pacification (Ganesha worship and multi-colored blanket donation); physical Cat's Eye gemstone is strictly forbidden.
         </div>
         <div>
           <strong style="color:var(--sapphire-bright);">House 12 (Leo · Sleep, Solitude &amp; Losses):</strong> Occupied by <strong>Moon and Mars</strong>. Governed by Sun (who sits in the 10th). Mars in the 12th creates internal heat and restless sleep, while Moon here causes vivid nocturnal dreams. Requires the pure cow desi ghee navel seal.
@@ -1706,7 +1706,7 @@ body {
         ✦ NAVTARA RESILIENCE MAPPING
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        From your natal Moon Nakshatra (Uttara Phalguni), Rahu transits in <strong>Vipat Tara</strong>. While Vipat Tara can present logistical tests, the simultaneous presence of Mercury in <strong>Mitra Tara</strong> provides steady institutional shielding. The Shivling Abhisheka bridges this gap perfectly.
+        From your natal Moon Nakshatra (Uttara Phalguni), Rahu transits in <strong>Vipat Tara</strong>. While Vipat Tara can present logistical tests, the simultaneous presence of Jupiter in <strong>Sadhana Tara</strong> (Cancer / Pushya) and Mercury as exalted Lagnesh in D-9 provides steady institutional shielding. The Shivling Abhisheka bridges this gap perfectly.
       </p>
     </div>
 
