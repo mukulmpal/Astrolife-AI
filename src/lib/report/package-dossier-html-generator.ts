@@ -40,6 +40,7 @@ export interface PackageDossierOptions {
   paymentId?: string;
   fixedTimestamp?: string;
   isSample?: boolean;
+  reportCode?: string;
 }
 
 const SIGN_NAMES = [
@@ -282,7 +283,7 @@ export function generatePackageDossierHTML(
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
   const reportTitle = escapeHtml(options.reportTitle || "AstroLife Sacred Shastra Dossier");
-  const orderId = escapeHtml(options.orderId || `ORD_${Date.now().toString(36).toUpperCase()}`);
+  const orderId = escapeHtml(options.reportCode || options.orderId || `ORD_${Date.now().toString(36).toUpperCase()}`);
   const paymentId = escapeHtml(options.paymentId || `PAY_${Date.now().toString(36).toUpperCase()}`);
   const isSample = Boolean(options.isSample);
 

@@ -18,6 +18,7 @@ import type { PalmRuleReport } from "@/lib/palmistry/types";
 import { runKPEngine } from "@/lib/astro-engine/kp";
 import { buildEvidenceFirstReport } from "@/lib/report/evidence-first-report";
 import { buildEvidenceFirstPdf } from "@/lib/report/evidence-first-pdf";
+import { generateReportCode, trackReportGeneration } from "@/lib/report-tracker";
 
 export const maxDuration = 60; // Vercel Pro: 60s — set in vercel.json too
 export const dynamic = "force-dynamic";
@@ -132,6 +133,9 @@ export async function POST(request: NextRequest) {
     const body = parsed.data;
     const { chart, options } = body;
     const safeOptions = normalizeReportOptions(options ?? {});
+    const startTime = Date.now();
+    const reportCode = generateReportCode();
+    safeOptions.reportCode = reportCode;
     const access = await getServerFeatureAccess(safeOptions.type === "basic" || safeOptions.type === "evidence-first" ? "basic_kundli" : "reports");
     if (!access.allowed && !isAdmin) {
       monitor.warn("premium.blocked", {
@@ -166,12 +170,38 @@ export async function POST(request: NextRequest) {
           reportId: payload.reportId,
         });
 
+        await trackReportGeneration({
+          reportCode,
+          reportType: "evidence-first",
+          reportTitle: "KP Evidence-First Classical Edition",
+          pageCount: "6 pages",
+          userId: authUser?.id ?? null,
+          userEmail: authUser?.email || "Anonymous",
+          isAdminGenerated: isAdmin,
+          isSample: false,
+          nativeName: chart.name || "Subject",
+          nativeDob: chart.dob,
+          nativeTob: chart.tob,
+          nativeCity: chart.city,
+          nativeLat: chart.lat,
+          nativeLon: chart.lon,
+          nativeTz: chart.tz,
+          lagnaRashi: chart.lagnaRashi,
+          moonSign: chart.planets?.Moon?.sign,
+          nakshatra: chart.planets?.Moon?.nakshatra,
+          generatedAt: new Date().toISOString(),
+          generationDurationMs: Date.now() - startTime,
+          pdfEngine: "direct-pdf",
+          status: "success",
+        });
+
         return new NextResponse(Buffer.from(pdfBuffer), {
           status: 200,
           headers: {
             "Content-Type": "application/pdf",
             "Content-Disposition": `attachment; filename="AstroLife-Evidence-Report-${safeName}.pdf"`,
             "Cache-Control": "no-store",
+            "X-AstroLife-Report-Code": reportCode,
             "X-AstroLife-Report-Template": "evidence-first-classical-v1",
           },
         });
@@ -260,12 +290,39 @@ export async function POST(request: NextRequest) {
       cover: safeOptions.cover,
     });
 
+    const durationMs = Date.now() - startTime;
+    await trackReportGeneration({
+      reportCode,
+      reportType: safeOptions.type,
+      reportTitle: `AstroLife ${safeOptions.type.toUpperCase()} Report`,
+      pageCount: safeOptions.type === "elite" ? "94 pages" : safeOptions.type === "basic" ? "13 pages" : "91 pages",
+      userId: authUser?.id ?? null,
+      userEmail: authUser?.email || "Anonymous",
+      isAdminGenerated: isAdmin,
+      isSample: false,
+      nativeName: chart.name || "Subject",
+      nativeDob: chart.dob,
+      nativeTob: chart.tob,
+      nativeCity: chart.city,
+      nativeLat: chart.lat,
+      nativeLon: chart.lon,
+      nativeTz: chart.tz,
+      lagnaRashi: chart.lagnaRashi,
+      moonSign: chart.planets?.Moon?.sign,
+      nakshatra: chart.planets?.Moon?.nakshatra,
+      generatedAt: new Date().toISOString(),
+      generationDurationMs: durationMs,
+      pdfEngine: "chromium",
+      status: "success",
+    });
+
     return new NextResponse(Buffer.from(pdf), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="AstroLife-${safeName}.pdf"`,
         "Cache-Control": "no-store",
+        "X-AstroLife-Report-Code": reportCode,
         "X-AstroLife-Report-Template": "cosmic-blueprint-v2",
         "X-AstroLife-Report-Palette": safeOptions.palette,
         "X-AstroLife-Report-Cover": safeOptions.cover,

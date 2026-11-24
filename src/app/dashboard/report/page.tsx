@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useUserChart } from "@/lib/user-chart";
+import { useUserChart, listSavedCharts, type SavedChartSummary } from "@/lib/user-chart";
 import { useUserTier } from "@/context/ChartContext";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import {
@@ -165,10 +165,15 @@ const REPORT_PLANS: Array<{
   label: string;
   desc: string;
 }> = [
-  { type: "basic", tier: "free", label: "Free Basic PDF", desc: "Starter Kundli snapshot with basic chart intelligence." },
-  { type: "premium", tier: "premium", label: "Premium Full PDF", desc: "Complete astrology intelligence report for serious users." },
-  { type: "elite", tier: "elite", label: "Elite Intelligence PDF", desc: "Luxury dossier with fusion, family and advanced synthesis positioning." },
-  { type: "evidence-first", tier: "free", label: "KP Evidence Edition", desc: "Krishnamurti Paddhati, 5 ruling planets & dasha evidence." },
+  { type: "basic", tier: "free", label: "Free Basic Foundation", desc: "13-page starter Kundli snapshot with basic chart intelligence." },
+  { type: "premium", tier: "premium", label: "Premium Full Life OS", desc: "91-page complete astrology intelligence report for serious users." },
+  { type: "elite", tier: "elite", label: "Elite Luxury Dossier", desc: "94-page luxury dossier with palm fusion, family karma & deep synthesis." },
+  { type: "full", tier: "premium", label: "Full 30-Engine System", desc: "91-page master dossier covering all life areas, dasha & remedies." },
+  { type: "kundli", tier: "premium", label: "Classical Kundli Edition", desc: "43-page pure shastric Kundli with Shadbala, Ashtakavarga & Bhavas." },
+  { type: "destiny", tier: "premium", label: "90-Year Destiny Curve", desc: "47-page multi-decade chronological destiny curve & transit ripple." },
+  { type: "remedy", tier: "premium", label: "Master Shastric Remedies", desc: "20-page consecrated yantras, gemstones, astro-sound & Lal Kitab." },
+  { type: "medical", tier: "premium", label: "Medical Astrology & Health", desc: "22+ page Ayurvedic tridosha balance, organ audit & vitality shield." },
+  { type: "evidence-first", tier: "free", label: "KP Evidence Edition", desc: "6-page Krishnamurti Paddhati, 5 ruling planets & dasha evidence." },
 ];
 
 const TIER_RANK: Record<SubscriptionTier, number> = { free: 0, premium: 1, elite: 2 };
@@ -177,22 +182,27 @@ const REPORT_EDITION_LABEL: Record<ReportOptions["type"], string> = {
   basic: "basic edition",
   premium: "premium edition",
   elite: "elite edition",
-  full: "premium edition",
-  kundli: "kundli edition",
-  remedy: "remedy edition",
-  medical: "health edition",
-  destiny: "destiny edition",
+  full: "full operating system edition",
+  kundli: "classical kundli edition",
+  remedy: "master remedies edition",
+  medical: "medical health edition",
+  destiny: "destiny timeline edition",
   "evidence-first": "evidence-first classical edition",
 };
 
 
 export default function ReportPage() {
-  const { chart, loading, hasUserChart } = useUserChart();
-  const { userTier: cachedTier } = useUserTier();
+  const { chart: contextChart, loading, hasUserChart } = useUserChart();
+  const [savedCharts, setSavedCharts] = useState<SavedChartSummary[]>([]);
+  const { userTier: cachedTier, isAdmin } = useUserTier();
   const fullAccess = isFullAccessEnabled();
   const enforced = isBillingEnforced();
   const [supabase] = useState(() => createClient());
-  const subscriptionTier = fullAccess ? "elite" : (cachedTier ?? "free");
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [customChart, setCustomChart] = useState<ChartData | null>(null);
+  const [selectedSavedId, setSelectedSavedId] = useState<string>("");
+  const [generatingPackageId, setGeneratingPackageId] = useState<string | null>(null);
+
   const [reportType, setReportType]   = useState<ReportOptions["type"]>("basic");
   const [palette, setPalette]         = useState<ReportPalette>("midnight");
   const [cover, setCover]             = useState<ReportCover>("wheel");
@@ -202,11 +212,42 @@ export default function ReportPage() {
   const [latestPalmSessionId, setLatestPalmSessionId] = useState<string | null>(null);
 
   useEffect(() => {
+    supabase.auth.getUser().then((res: { data: { user: { email?: string | null } | null } }) => {
+      if (res?.data?.user?.email) setCurrentUserEmail(res.data.user.email);
+    });
+    listSavedCharts().then((c) => setSavedCharts(c)).catch(() => {});
+  }, [supabase]);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const requested = params.get("type") as ReportOptions["type"] | null;
       if (requested && requested in ENGINE_MAP) {
         setReportType(requested);
+      }
+      const name = params.get("name");
+      const dob = params.get("dob");
+      const tob = params.get("tob");
+      const city = params.get("city");
+      const lat = params.get("lat");
+      const lon = params.get("lon");
+      const tz = params.get("tz");
+
+      if (name && dob && tob) {
+        try {
+          const calculated = calculateChart(
+            name,
+            dob,
+            tob,
+            city || "New Delhi",
+            lat ? parseFloat(lat) : undefined,
+            lon ? parseFloat(lon) : undefined,
+            tz ? parseFloat(tz) : undefined
+          );
+          setCustomChart(calculated);
+        } catch (err) {
+          console.warn("Failed to calculate chart from query params:", err);
+        }
       }
     }
   }, []);
@@ -228,7 +269,12 @@ export default function ReportPage() {
     loadLatestPalmSession().catch(() => setLatestPalmSessionId(null));
   }, [supabase]);
 
-  if (loading || !chart) {
+  const userIsAdmin = Boolean(isAdmin || (currentUserEmail && isAdminUser(currentUserEmail)));
+  const subscriptionTier: SubscriptionTier = userIsAdmin || fullAccess ? "elite" : (cachedTier ?? "free");
+  const chart: ChartData | null = customChart || contextChart;
+  const hasValidChart = Boolean(chart && chart.name && chart.dob);
+
+  if (loading && !chart) {
     return (
       <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "30px 22px 110px", color: "#1A1A1A" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center", paddingTop: "40px" }}>
@@ -238,13 +284,13 @@ export default function ReportPage() {
     );
   }
 
-  if (!hasUserChart) {
+  if (!hasValidChart || !chart) {
     return (
       <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "30px 22px 110px", color: "#1A1A1A" }}>
         <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center", paddingTop: "60px" }}>
           <div style={{ fontSize: 56, opacity: 0.3, marginBottom: 16 }}>📄</div>
           <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "Cormorant Garamond,serif", marginBottom: 10 }}>Your chart is needed</div>
-          <p style={{ color: "#a79fbd", fontSize: 14, marginBottom: 24 }}>Generate your kundli first to build a full integrated report.</p>
+          <p style={{ color: "#a79fbd", fontSize: 14, marginBottom: 24 }}>Generate your kundli first or select a saved chart to build a full integrated report.</p>
           <a href="/dashboard" style={{ background: "#c8a030", color: "#FAF7F2", padding: "12px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>Generate My Kundli</a>
         </div>
       </main>
@@ -276,7 +322,7 @@ export default function ReportPage() {
 
   const handleDownloadPDF = async () => {
     const plan = REPORT_PLANS.find((item) => item.type === reportType);
-    const locked = Boolean(plan && enforced && TIER_RANK[subscriptionTier] < TIER_RANK[plan.tier]);
+    const locked = Boolean(!userIsAdmin && plan && enforced && TIER_RANK[subscriptionTier] < TIER_RANK[plan.tier]);
     if (locked) {
       alert(`${plan?.label ?? "This report"} requires ${plan?.tier.toUpperCase()} access.`);
       return;
@@ -297,6 +343,22 @@ export default function ReportPage() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleDownloadPackage = async (packageId: string, packageTitle: string) => {
+    setGeneratingPackageId(packageId);
+    try {
+      await downloadPackageDossierPDF(chart, packageId, packageTitle);
+    } catch (err) {
+      console.error("Package download error:", err);
+      alert("Failed to download package dossier: " + ((err as Error)?.message || "Server error"));
+    } finally {
+      setGeneratingPackageId(null);
+    }
+  };
+
+  const handlePreviewPackage = (packageId: string, packageTitle: string) => {
+    previewPackageDossierHTML(chart, packageId, packageTitle);
   };
 
   const handleDownloadEvidenceFirstPDF = async () => {
@@ -326,7 +388,7 @@ export default function ReportPage() {
   const totalEngines = ENGINE_COUNT[reportType];
   const pageCount = PAGE_COUNT[reportType];
   const selectedPlan = REPORT_PLANS.find((item) => item.type === reportType) ?? REPORT_PLANS[0];
-  const selectedLocked = enforced && TIER_RANK[subscriptionTier] < TIER_RANK[selectedPlan.tier];
+  const selectedLocked = !userIsAdmin && enforced && TIER_RANK[subscriptionTier] < TIER_RANK[selectedPlan.tier];
 
   return (
     <main style={{ minHeight: "100vh", background: "#FAF7F2", padding: "30px 22px 110px", color: "#1A1A1A", position: "relative" }}>
@@ -360,6 +422,8 @@ export default function ReportPage() {
         .rep-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
         .rep-share-btn { padding:12px 10px; border:1px solid rgba(184,134,11,0.2); border-radius:8px; background:#FFFFFF; color:#1A1A1A; cursor:pointer; font-weight:600; font-size:12px; transition:all 0.2s; text-align:center; }
         .rep-share-btn:hover { border-color:#B8860B; }
+        .pkg-card { background:#FFFFFF; border:1px solid #E2D9CC; border-radius:14px; padding:20px; transition:all 0.2s; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,0.03); }
+        .pkg-card:hover { border-color:#B8860B; transform:translateY(-2px); box-shadow:0 6px 20px rgba(184,134,11,0.12); }
         /* gen-overlay replaced by AstroLoadingScreen component */
         @media(max-width:600px) { .rep-hero { font-size:28px; } .rep-btn.primary { width:100%; } }
       `}</style>
@@ -374,9 +438,137 @@ export default function ReportPage() {
       />
 
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+        {/* Admin Privilege Banner */}
+        {userIsAdmin && (
+          <div style={{
+            background: "linear-gradient(135deg, rgba(184,134,11,0.15), rgba(124,58,237,0.1))",
+            border: "1px solid rgba(184,134,11,0.4)",
+            borderRadius: 14,
+            padding: "14px 20px",
+            marginBottom: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 26 }}>🛡️</span>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 14, color: "#8A6008", letterSpacing: "0.02em" }}>
+                  ADMIN UNRESTRICTED ACCESS ACTIVE
+                </div>
+                <div style={{ fontSize: 12, color: "#5A4E3D" }}>
+                  Bina kisi payment ke har tarah ke dossier, 8 Power Bundles &amp; Flagship PDF reports 100% free unwatermarked download karein.
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, background: "#8A6008", color: "#FFFFFF", padding: "4px 10px", borderRadius: 999 }}>
+                FREE PASS
+              </span>
+              <a
+                href="/dashboard/admin"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#7C3AED",
+                  background: "#FFFFFF",
+                  border: "1px solid #D6CEBE",
+                  padding: "5px 12px",
+                  borderRadius: 8,
+                  textDecoration: "none"
+                }}
+              >
+                Admin Panel ↗
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Chart Selector / Switcher */}
+        <div style={{
+          background: "#FFFFFF",
+          border: "1px solid rgba(184,134,11,0.25)",
+          borderRadius: 14,
+          padding: "14px 20px",
+          marginBottom: 20,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 12
+        }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#B8860B", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+              Active Natal Chart
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", display: "flex", alignItems: "center", gap: 6 }}>
+              <span>🕉️ {chart.name || "Native"}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: "#6B635B" }}>• {chart.dob} ({chart.tob || "12:00"}) • {chart.city}</span>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            {savedCharts && savedCharts.length > 0 && (
+              <select
+                value={selectedSavedId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedSavedId(val);
+                  if (val) {
+                    const sc = savedCharts.find((item: SavedChartSummary) => item.id === val);
+                    if (sc) {
+                      const calculated = calculateChart(sc.name, sc.dob, sc.tob, sc.city);
+                      setCustomChart(calculated);
+                    }
+                  } else {
+                    setCustomChart(null);
+                  }
+                }}
+                style={{
+                  padding: "7px 12px",
+                  borderRadius: 8,
+                  border: "1px solid #D6CEBE",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#3D362E",
+                  background: "#FAF7F2",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="">Switch to Saved Chart...</option>
+                {savedCharts.map((sc: SavedChartSummary) => (
+                  <option key={sc.id} value={sc.id}>
+                    {sc.name} ({sc.dob} - {sc.city})
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {customChart && (
+              <button
+                onClick={() => setCustomChart(null)}
+                style={{
+                  background: "#FAF7F2",
+                  border: "1px solid #D6CEBE",
+                  borderRadius: 8,
+                  padding: "6px 12px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#B8860B",
+                  cursor: "pointer",
+                }}
+              >
+                ↺ Reset to My Chart
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Hero */}
         <div style={{ marginBottom: "28px" }}>
-          <div className="rep-hero">📄 Cosmic Blueprint Report</div>
+          <div className="rep-hero">📄 Cosmic Blueprint Report Studio</div>
           <div style={{ fontSize: "14px", color: "#6B635B", marginBottom: "14px" }}>
             {chart.name && <span style={{ color: "#B8860B", fontWeight: 700 }}>{chart.name} · </span>}
             {chart.lagnaRashi} Lagna · {chart.planets.Moon?.sign} Moon · {chart.planets.Moon?.nakshatra} Nakshatra
@@ -389,7 +581,7 @@ export default function ReportPage() {
               📄 {PAGE_COUNT[reportType]}
             </span>
             <span className="rep-badge" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#059669" }}>
-              ⚡ Server rendered
+              ⚡ Server rendered (Print-Ready)
             </span>
           </div>
         </div>
@@ -587,6 +779,136 @@ export default function ReportPage() {
           </div>
           <div style={{ fontSize: "11px", color: "#6B635B", marginTop: "12px" }}>
             Server-rendered via Puppeteer · downloads automatically · all {totalEngines} engines run fresh for your chart
+          </div>
+        </div>
+
+        {/* ── 8 Specialized Power Bundle Dossiers (24 Pages Each) ── */}
+        <div className="rep-section" style={{ background: "#FFFFFF", border: "1px solid rgba(184,134,11,0.3)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+            <div>
+              <div className="rep-title" style={{ marginBottom: 4 }}>
+                ⚡ 8 Specialized Power Bundle Dossiers (24 Pages Each)
+              </div>
+              <div style={{ fontSize: 13, color: "#6B635B" }}>
+                Deep modular investigative research dossiers. Direct 1-click generation for <strong>{chart.name || "Active Chart"}</strong>.
+              </div>
+            </div>
+            {userIsAdmin && (
+              <span className="rep-badge" style={{ background: "rgba(184,134,11,0.15)", border: "1px solid #B8860B", color: "#8A6008" }}>
+                👑 Admin Unlocked · Zero Payment Required
+              </span>
+            )}
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 14 }}>
+            {POWER_BUNDLE_DOSSIERS.map((pkg) => {
+              const isPkgGenerating = generatingPackageId === pkg.id;
+              return (
+                <div key={pkg.id} className="pkg-card">
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          padding: "3px 8px",
+                          borderRadius: 6,
+                          background: `${pkg.color}18`,
+                          color: pkg.color,
+                          border: `1px solid ${pkg.color}40`,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                        }}
+                      >
+                        {pkg.badge}
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: "#6B635B" }}>
+                        📄 {pkg.pages}
+                      </span>
+                    </div>
+
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A", margin: "0 0 6px" }}>
+                      {pkg.title}
+                    </h3>
+
+                    <p style={{ fontSize: 12, color: "#6B635B", lineHeight: 1.45, margin: "0 0 12px" }}>
+                      {pkg.tagline}
+                    </p>
+
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 16 }}>
+                      {pkg.engines.map((eng) => (
+                        <span
+                          key={eng}
+                          style={{
+                            fontSize: 10,
+                            padding: "2px 7px",
+                            borderRadius: 999,
+                            background: "#FAF7F2",
+                            border: "1px solid #E2D9CC",
+                            color: "#5A4E3D",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {eng}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8, borderTop: "1px solid #F0EAE1", paddingTop: 12 }}>
+                    <button
+                      type="button"
+                      onClick={() => handlePreviewPackage(pkg.id, pkg.title)}
+                      disabled={isPkgGenerating || isGenerating}
+                      style={{
+                        flex: 1,
+                        padding: "9px 12px",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        borderRadius: 8,
+                        background: "#FAF7F2",
+                        border: "1px solid #D6CEBE",
+                        color: "#3D362E",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 5,
+                      }}
+                    >
+                      <span>👁️</span>
+                      <span>HTML Preview</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadPackage(pkg.id, pkg.title)}
+                      disabled={isPkgGenerating || isGenerating}
+                      style={{
+                        flex: 1.3,
+                        padding: "9px 14px",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        borderRadius: 8,
+                        background: isPkgGenerating
+                          ? "#E2D9CC"
+                          : `linear-gradient(135deg, ${pkg.color}, ${pkg.color}CC)`,
+                        border: "none",
+                        color: "#FFFFFF",
+                        cursor: isPkgGenerating ? "wait" : "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 5,
+                        boxShadow: isPkgGenerating ? "none" : `0 2px 8px ${pkg.color}33`,
+                      }}
+                    >
+                      <span>{isPkgGenerating ? "⏳" : "📥"}</span>
+                      <span>{isPkgGenerating ? "Generating..." : "Download PDF"}</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

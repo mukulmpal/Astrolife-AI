@@ -901,6 +901,7 @@ export function useUserChart(): ChartContextValue {
     isDemoChart: true,
     userTier: "free",
     isElite: false,
+    isAdmin: false,
     refreshChart: async () => {},
     setChartData: () => {},
   };

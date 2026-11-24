@@ -65,7 +65,7 @@ function pageFoot(left: string, right: string): string {
 export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU", lang: ReportLang = "en"): string {
   const transitRemedy = evaluateTransitNakshatraRemedy(chart);
   if (!transitRemedy) {
-    return `<section class="page dense${lang === "hi" ? " hindi" : ""}">${pageRail("Transit Shivling Upacharas", pageNum)}
+    return `<section class="page dense">${pageRail("Transit Shivling Upacharas", pageNum)}
       <div style="padding:48px;color:var(--ivory-dim);">${lang === "hi" ? "इस कुंडली के लिए गोचर गणना लंबित है।" : "Transit calculations pending for this chart."}</div>
       ${pageFoot("astrolife · sacred remedies", "Shivling Upachara")}
     </section>`;
@@ -79,7 +79,7 @@ export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU", l
   const i18nShiv = getShivlingUpacharaI18n(lang, transitRemedy.transitNakshatra, shiv.upacharaName, shiv.hindiTitle);
   const isEn = lang === "en";
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail("Transit Nakshatra Shivling Engine · 27 Upacharas", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -168,7 +168,7 @@ export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU", l
 export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", lang: ReportLang = "en"): string {
   const dossier = evaluateNakshatraRemedyDossier(chart);
   if (!dossier) {
-    return `<section class="page dense${lang === "hi" ? " hindi" : ""}">${pageRail("Nakshatra Social Archetypes", pageNum)}
+    return `<section class="page dense">${pageRail("Nakshatra Social Archetypes", pageNum)}
       <div style="padding:48px;color:var(--ivory-dim);">${lang === "hi" ? "नक्षत्र विवरण लंबित है।" : "Nakshatra dossier pending."}</div>
       ${pageFoot("astrolife · karmic alignment", "Nakshatra Social Registry")}
     </section>`;
@@ -177,7 +177,7 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", la
   const isEn = lang === "en";
   const i18nNak = getNakshatraSocialI18n(lang, dossier.activeNakshatraName, dossier.activeDashaPlanet);
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail("Nakshatra Social Remedies & Living Archetypes", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -317,7 +317,7 @@ export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR", 
   const isEn = lang === "en";
   const i18nRisk = getTradingRiskI18n(lang, risk.isRevengeTradingActive || isSevere);
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail("Trading Risk Guardrail · F&O Circuit Breaker", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -429,7 +429,7 @@ export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H", 
   const isEn = lang === "en";
   const i18n12H = getTwelfthHouseI18n(lang, lagna);
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail("12th House Intelligence · Sacred Currency (Sampada)", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -520,7 +520,7 @@ export function pageCareerSpecifierD10(chart: ChartData, pageNum = "D10", lang: 
   const isEn = lang === "en";
   const i18nD10 = getCareerSpecifierI18n(lang, { hasKetuLagna });
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail("D10 Dashamsha Career Specifier · Micro-Niche", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -591,7 +591,7 @@ export function pageTransitHealthTiming(chart: ChartData, pageNum = "HT", lang: 
 
   const isEn = lang === "en";
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail("Moon Dispositor Health · Exact Degree Timing", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -680,7 +680,7 @@ export function pageFunctionalDebilityGuard(chart: ChartData, pageNum = "DG", la
 
   const nadi = evaluateNadiDebilityPeak(chart);
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail(isEn ? "Functional Debility Guard · Gemstone Fallacy" : "नीच ग्रह शक्ति व रत्न निषेध · Guard", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -743,7 +743,7 @@ export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK", lan
   const isEn = lang === "en";
   const lineage = calculateLineageKarma(chart, { nativeName: chart.name || "Seeker", btrConfidence: "High" });
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail(isEn ? "Lineage Karma · Kula Devata & Pitru Intelligence" : "कुल परंपरा · कुलदेवता व पितृ ऋण", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -825,7 +825,7 @@ export function pageJyotirlingaPilgrimage(chart: ChartData, pageNum = "JP", lang
   const pil = resolvePilgrimagePrescription(chart);
   const prime = pil.primaryJyotirlinga;
 
-  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
+  return `<section class="page dense">
     ${pageRail(isEn ? "12 Jyotirlinga Pilgrimage · Sacred Sanctuary" : "द्वादश ज्योतिर्लिंग तीर्थ · आध्यात्मिक शांति", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">

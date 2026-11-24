@@ -5,6 +5,7 @@ import { generatePackageDossierHTML } from "@/lib/report/package-dossier-html-ge
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { isEliteEmail, isAdminUser } from "@/lib/access";
 import { createClient } from "@/lib/supabase/server";
+import { generateReportCode, trackReportGeneration } from "@/lib/report-tracker";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -46,7 +47,7 @@ async function launchBrowser() {
       args: chromium.args,
       defaultViewport: REPORT_VIEWPORT,
       executablePath,
-      headless: chromium.headless ?? true,
+      headless: "shell",
     });
   } else {
     const puppeteer = (await import("puppeteer-core")).default;
@@ -78,13 +79,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing reportId" }, { status: 400 });
     }
 
+    const startTime = Date.now();
+    const reportCode = generateReportCode();
+    let authUser: { id: string; email?: string } | null = null;
+
     // Server-verified access control: Check authenticated session user
     let isEliteOrAdmin = false;
     try {
       const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email && (isEliteEmail(user.email) || isAdminUser(user.email))) {
-        isEliteOrAdmin = true;
+      if (user) {
+        authUser = { id: user.id, email: user.email };
+        if (user.email && (isEliteEmail(user.email) || isAdminUser(user.email))) {
+          isEliteOrAdmin = true;
+        }
       }
     } catch {
       // Unauthenticated / guest
@@ -160,9 +168,10 @@ export async function POST(request: NextRequest) {
       customerName: customer?.name || chart.name || "Sacred Seeker",
       customerEmail: customer?.email,
       customerPhone: customer?.phone,
-      orderId: isSample ? "SAMPLE_PREVIEW" : orderId,
+      orderId: isSample ? "SAMPLE_PREVIEW" : (orderId || reportCode),
       paymentId: isSample ? "SAMPLE_PREVIEW" : paymentId,
       isSample,
+      reportCode,
     };
 
     let pdfBuffer: Buffer;
@@ -223,12 +232,38 @@ export async function POST(request: NextRequest) {
       ? `AstroLife-SAMPLE-${safeTitle}.pdf`
       : `AstroLife-${safeTitle}-${safeSubject}.pdf`;
 
+    await trackReportGeneration({
+      reportCode,
+      reportType: String(reportId),
+      reportTitle: String(reportTitle || "AstroLife Sacred Dossier"),
+      pageCount: "24 pages",
+      userId: authUser?.id ?? null,
+      userEmail: authUser?.email || customer?.email || "Anonymous",
+      isAdminGenerated: isEliteOrAdmin,
+      isSample,
+      nativeName: chart.name || customer?.name || "Subject",
+      nativeDob: chart.dob,
+      nativeTob: chart.tob,
+      nativeCity: chart.city,
+      nativeLat: chart.lat,
+      nativeLon: chart.lon,
+      nativeTz: chart.tz,
+      lagnaRashi: chart.lagnaRashi,
+      moonSign: chart.planets?.Moon?.sign,
+      nakshatra: chart.planets?.Moon?.nakshatra,
+      generatedAt: new Date().toISOString(),
+      generationDurationMs: Date.now() - startTime,
+      pdfEngine: pdfEngineUsed,
+      status: "success",
+    });
+
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${filename}"`,
         "Cache-Control": "no-store, no-cache, must-revalidate",
+        "X-AstroLife-Report-Code": reportCode,
         "X-AstroLife-Report-ID": String(reportId),
         "X-AstroLife-Sample-Mode": isSample ? "true" : "false",
         "X-AstroLife-Template-Tier": "elite-dossier-v1",
