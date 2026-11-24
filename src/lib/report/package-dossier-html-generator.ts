@@ -141,41 +141,65 @@ export function generatePackageDossierHTML(
   chart: ChartData,
   options: PackageDossierOptions
 ): string {
-  const reportId = options.reportId || "";
+  const rawReportId = (options.reportId || "").toLowerCase();
+  const rawReportTitle = (options.reportTitle || "").toLowerCase();
+  const reportId = `${rawReportId} ${rawReportTitle}`;
 
   // ─────────────────────────────────────────────────────────────────────────
   // DEDICATED MASTER DOSSIER GENERATORS (24 Pages Each)
   // ─────────────────────────────────────────────────────────────────────────
+  // 1. Sacred Union & Family Destiny (Dossier I)
   if (
     reportId.includes("union") ||
     reportId.includes("family") ||
     reportId.includes("milan") ||
-    reportId.includes("marriage")
+    reportId.includes("marriage") ||
+    rawReportId === "kundali_milan_single" ||
+    rawReportId === "family_karma_single"
   ) {
     return generateSacredUnionDossierHTML(chart, options);
   }
 
+  // 2. Raja Yoga & Wealth Acceleration (Dossier II)
   if (
     reportId.includes("wealth") ||
     reportId.includes("raja") ||
     reportId.includes("career") ||
     reportId.includes("money") ||
-    reportId.includes("pkg_wealth_yogas")
+    reportId.includes("pkg_wealth_yogas") ||
+    reportId.includes("classical_yogas") ||
+    reportId.includes("yogas") ||
+    rawReportId === "special_lagnas_single" ||
+    rawReportId === "numerology_single" ||
+    rawReportId === "classical_yogas_single" ||
+    reportId.includes("numerology")
   ) {
     return generateRajaYogaWealthDossierHTML(chart, options);
   }
 
+  // 3. Bio-Vedic Protection & Remedial Vault (Dossier III)
   if (
     reportId.includes("remed") ||
     reportId.includes("bio") ||
     reportId.includes("protect") ||
     reportId.includes("vault") ||
     reportId.includes("pkg_bio_remedies") ||
-    reportId.includes("gemstone")
+    reportId.includes("gemstone") ||
+    reportId.includes("rudraksha") ||
+    reportId.includes("dot_therapy") ||
+    reportId.includes("thread") ||
+    reportId.includes("tattoo") ||
+    reportId.includes("yantra") ||
+    reportId.includes("sound") ||
+    rawReportId === "gemstone_rudraksha_single" ||
+    rawReportId === "dot_therapy_thread_single" ||
+    rawReportId === "astro_tattoo_single" ||
+    rawReportId === "astro_sound"
   ) {
     return generateBioVedicRemediesDossierHTML(chart, options);
   }
 
+  // 4. Space Energy, Vastu, Palmistry & BTR (Dossier IV)
   if (
     !reportId.includes("curve") && (
       reportId.includes("space") ||
@@ -183,33 +207,46 @@ export function generatePackageDossierHTML(
       reportId.includes("vastu") ||
       reportId.includes("palmistry") ||
       reportId.includes("btr") ||
-      reportId.includes("calibration")
+      reportId.includes("calibration") ||
+      reportId.includes("samudrika") ||
+      rawReportId === "vastu_radar_single" ||
+      rawReportId === "palmistry_scan" ||
+      rawReportId === "btr_mathematical"
     )
   ) {
     return generateSpaceDestinyDossierHTML(chart, options);
   }
 
+  // 5. Stock Market, Speculation & Sarvatobhadra (Dossier V)
   if (
     reportId.includes("stock") ||
     reportId.includes("trading") ||
     reportId.includes("speculat") ||
     reportId.includes("sarvatobhadra") ||
     reportId.includes("pkg_stock_trading") ||
-    reportId.includes("market")
+    reportId.includes("market") ||
+    reportId.includes("ashtakavarga") ||
+    reportId.includes("bindu") ||
+    rawReportId === "sarvatobhadra_single" ||
+    rawReportId === "ashtakavarga_bindus_single"
   ) {
     return generateStockTradingDossierHTML(chart, options);
   }
 
+  // 6. Jaimini Soul Blueprint & Karakamsa (Dossier VI)
   if (
     reportId.includes("jaimini") ||
     reportId.includes("soul") ||
     reportId.includes("karmic") ||
     reportId.includes("pkg_jaimini_soul") ||
-    reportId.includes("karaka")
+    reportId.includes("karaka") ||
+    reportId.includes("atmakaraka") ||
+    rawReportId === "atmakaraka_soul_single"
   ) {
     return generateJaiminiSoulDossierHTML(chart, options);
   }
 
+  // 7. Ayurvedic Medical & Vitality Shield (Dossier VII)
   if (
     reportId.includes("medical") ||
     reportId.includes("ayurved") ||
@@ -217,11 +254,17 @@ export function generatePackageDossierHTML(
     reportId.includes("health") ||
     reportId.includes("pkg_ayurvedic_medical") ||
     reportId.includes("dosha") ||
-    reportId.includes("tridosha")
+    reportId.includes("tridosha") ||
+    reportId.includes("roga") ||
+    reportId.includes("cognitive") ||
+    reportId.includes("mind") ||
+    rawReportId === "medical_roga_single" ||
+    rawReportId === "cognitive_mind_single"
   ) {
     return generateAyurvedicMedicalDossierHTML(chart, options);
   }
 
+  // 8. Golden Muhurat & Cosmic Decision Matrix (Dossier VIII)
   if (
     reportId.includes("muhurat") ||
     reportId.includes("panchang") ||
@@ -229,7 +272,10 @@ export function generatePackageDossierHTML(
     reportId.includes("electional") ||
     reportId.includes("auspicious") ||
     reportId.includes("pkg_muhurat_panchang") ||
-    reportId.includes("timing")
+    reportId.includes("prashna") ||
+    rawReportId === "prashna_instant" ||
+    rawReportId === "transit_purchase" ||
+    (reportId.includes("timing") && !reportId.includes("yogas") && !reportId.includes("raja"))
   ) {
     return generateGoldenMuhuratDossierHTML(chart, options);
   }
