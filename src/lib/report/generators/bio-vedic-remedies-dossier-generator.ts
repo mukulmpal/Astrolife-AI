@@ -26,6 +26,14 @@ import { calculateLalKitab } from "../../astro-engine/lalkitab";
 import { generateAstroTattooAudit } from "../../astro-engine/astro-tattoo-engine";
 import { evaluateTransitNakshatraRemedy } from "../../astro-engine/transit-nakshatra-remedies";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import {
+  ALL_RASHIS,
+  ALL_NAKSHATRAS,
+  RASHI_LORDS,
+  getGenderLateralization,
+  getDynamicGemstonePrescription,
+  renderHumanImpactCardHtml
+} from "../../astro/human-translator";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -167,28 +175,61 @@ function renderNorthIndianSvg(
 </svg>`;
 }
 
+function getOrdinalSuffix(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
+}
+
+function getPlanetRemedyRecommendation(planet: string): string {
+  switch (planet) {
+    case "Sun": return "Surya Arghya with copper vessel at sunrise";
+    case "Moon": return "Cooling sandalwood dot & pure water offering";
+    case "Mars": return "Hanuman Chalisa & copper vessel hydration";
+    case "Mercury": return "Tulsi leaves offering & green clothing on Wed";
+    case "Jupiter": return "Kesar / chandan tilak on Ajna chakra";
+    case "Venus": return "White sandalwood fragrance & respect feminine principle";
+    case "Saturn": return "Saturday evening canine seva & mustard oil lamp";
+    case "Rahu": return "Clean electronic clutter & feed birds";
+    case "Ketu": return "Ganesha worship & two-colored blanket donation";
+    default: return "Daily meditation & satvik lifestyle";
+  }
+}
+
+function getRemedyFunctionalStatus(planet: string, lagnaRashi: string, house: number): string {
+  if (planet === SIGN_LORDS[lagnaRashi]) return "Lagna Lord (Primary Benefic)";
+  if ([1, 5, 9].includes(house)) return "Trine Lord / Placement (Auspicious)";
+  if ([6, 8, 12].includes(house)) return "Dusthana Sthana (Requires Pacification)";
+  if ([4, 7, 10].includes(house)) return "Kendra Placement (Potent Action)";
+  return "Functional Neutral / Growth Engine";
+}
+
 export function generateBioVedicRemediesDossierHTML(
   chart: ChartData,
   options: PackageDossierOptions
 ): string {
-  const subjectName = escapeHtml(options.customerName || chart.name || "Mukul Mohan Pal");
-  const orderId = escapeHtml(options.orderId || "AL-ORD-MUKUL-REMEDIES-2026");
+  const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
+  const orderId = escapeHtml(options.orderId || `AL-ORD-${Date.now().toString(36).toUpperCase()}`);
   const paymentId = escapeHtml(options.paymentId || "AL-VERIFIED-SHASTRA-CERT-REMEDIES");
   const isSample = Boolean(options.isSample);
 
-  const birthDate = chart.dob || "1995-07-04";
-  const birthTime = chart.tob || "12:30";
+  const birthDate = chart.dob || "Recorded";
+  const birthTime = chart.tob || "12:00";
   const birthCity = escapeHtml(chart.city || "Delhi");
   const lat = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
   const lon = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
 
-  const lagnaNum = chart.lagnaNum !== undefined ? chart.lagnaNum : 5; // Virgo
-  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Virgo";
-  const lagnaLord = SIGN_LORDS[lagnaRashi] || "Mercury";
+  const lagnaNum = chart.lagnaNum !== undefined ? chart.lagnaNum : 0;
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Aries";
+  const lagnaLord = SIGN_LORDS[lagnaRashi] || "Mars";
 
   const moonPlanet = chart.planets?.["Moon"];
   const moonRashi = moonPlanet?.sign || "Leo";
-  const moonNakshatra = moonPlanet?.nakshatra || "Uttara Phalguni";
+  const moonNakshatra = moonPlanet?.nakshatra || "Ashwini";
+
+  const subjectGender = (options.gender || (chart as any).gender || "male").toLowerCase();
+  const latGender = getGenderLateralization(subjectGender);
+  const gemPrescription = getDynamicGemstonePrescription(lagnaRashi, subjectGender);
 
   // Engines execution
   let gemReport: ReturnType<typeof generateGemstoneReportFromChart>;
@@ -202,14 +243,14 @@ export function generateBioVedicRemediesDossierHTML(
   try {
     lkReport = calculateLalKitab(chart.planets as any, lagnaNum);
   } catch {
-    lkReport = { planets: [], rins: [], homeOmens: [], kismat: { planet: "Mercury" } } as any;
+    lkReport = { planets: [], rins: [], homeOmens: [], kismat: { planet: lagnaLord } } as any;
   }
 
   let tattooAudit: ReturnType<typeof generateAstroTattooAudit>;
   try {
-    tattooAudit = generateAstroTattooAudit(chart, "male", "wealth", "permanent_ink");
+    tattooAudit = generateAstroTattooAudit(chart, subjectGender, "wealth", "permanent_ink");
   } catch {
-    tattooAudit = { activatingPlanet: "Mercury", recommendedColorName: "Turquoise Green" } as any;
+    tattooAudit = { activatingPlanet: lagnaLord, recommendedColorName: "Turquoise Green" } as any;
   }
 
   let transitRemedy: ReturnType<typeof evaluateTransitNakshatraRemedy>;
@@ -220,7 +261,30 @@ export function generateBioVedicRemediesDossierHTML(
   }
 
   const activeDasha = chart.dashas?.find((d) => d.active)?.planet || "Rahu";
-  const activeAntar = "Mercury";
+  const activeAntar = chart.antardasha?.planet || lagnaLord;
+
+  const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+  const tableRowsHtml = PLANET_ORDER.map(p => {
+    const pd = chart.planets?.[p];
+    const pRashi = pd?.sign || "Aries";
+    const degVal = pd?.degree !== undefined ? pd.degree : 0;
+    const degInt = Math.floor(degVal);
+    const minInt = Math.floor((degVal - degInt) * 60);
+    const pDeg = `${pRashi} ${degInt}° ${minInt.toString().padStart(2, "0")}'`;
+    const houseNum = pd?.house || 1;
+    const pHouse = `${houseNum}${getOrdinalSuffix(houseNum)}`;
+    const pDignity = computeClassicalDignity(p, pRashi, pd?.longitude || (degVal + (SIGN_NAMES.indexOf(pRashi) * 30)));
+    const funcStatus = getRemedyFunctionalStatus(p, lagnaRashi, houseNum);
+    const remedy = getPlanetRemedyRecommendation(p);
+    return `<tr>
+      <td><strong>${p}</strong></td>
+      <td>${pDeg}</td>
+      <td>${pHouse}</td>
+      <td>${pDignity}</td>
+      <td>${funcStatus}</td>
+      <td>${remedy}</td>
+    </tr>`;
+  }).join("\n");
 
   const totalPages = 24;
   const sampleWatermark = isSample
@@ -562,11 +626,11 @@ body {
       </div>
       <div>
         <span class="kicker">Primary Life Catalyst</span>
-        <div style="color:var(--emerald-bright);font-weight:700;">Colombian Emerald (Gold · Little Finger)</div>
+        <div style="color:var(--emerald-bright);font-weight:700;">${gemPrescription.primaryGem} (${gemPrescription.metal} · ${gemPrescription.finger})</div>
       </div>
       <div>
         <span class="kicker">Active Operating Dasha</span>
-        <div style="color:var(--gold-bright);font-weight:700;">${activeDasha} &mdash; ${activeAntar} (Budha)</div>
+        <div style="color:var(--gold-bright);font-weight:700;">${activeDasha} &mdash; ${activeAntar}</div>
       </div>
       <div>
         <span class="kicker">Core Somatotopic Seal</span>
@@ -659,20 +723,20 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Planetary Stress &amp; Vulnerability Audit</h2>
     <p class="body-text" style="margin-bottom:12px;">
-      For a <strong>Virgo (Kanya) Ascendant</strong>, classical Jyotish designates specific planets as functional benefics and others as severe functional malefics. Knowing your personal vulnerability zones prevents spiritual missteps and ineffective remedies.
+      For a <strong>${lagnaRashi} Ascendant</strong>, classical Jyotish designates specific planets as functional benefics and others as functional malefics. Knowing your personal vulnerability zones prevents spiritual missteps and ineffective remedies.
     </p>
 
     <div class="grid-2" style="margin-bottom:12px;">
       <div class="luxury-card">
         <div class="kicker" style="color:var(--emerald-bright);">FUNCTIONAL BENEFACTOR AXIS</div>
         <div style="font-size:12px;color:var(--ivory);margin-top:4px;line-height:1.5;">
-          <strong>Mercury (Lagna &amp; 10th Lord):</strong> Your chief vitality engine. Seated in the 9th house of fortune (Taurus), it forms an auspicious Maha Parivartana Yoga with 10th lord Venus. Strengthening Mercury fortifies mental focus and shields the entire physical aura.
+          <strong>Lagna Lord (${lagnaLord}):</strong> Your chief vitality engine and sovereign anchor. Strengthening ${lagnaLord} fortifies personal presence, mental stamina, and shields the somatic aura.
         </div>
       </div>
       <div class="luxury-card">
-        <div class="kicker" style="color:var(--ruby-bright);">MARAKA &amp; BADHAKA VULNERABILITY</div>
+        <div class="kicker" style="color:var(--ruby-bright);">MARAKA &amp; DUSTHANA VULNERABILITY</div>
         <div style="font-size:12px;color:var(--ivory);margin-top:4px;line-height:1.5;">
-          <strong>Jupiter (4th &amp; 7th Lord):</strong> For dual signs like Virgo, the 7th house acts as the <em>Badhaka</em> (obstruction) and <em>Maraka</em> (death-inflicting) house. Jupiter seated in the 3rd house can trigger excessive liver heat, digestive inertia, and marital friction if amplified.
+          <strong>Dusthana &amp; Obstruction Axis:</strong> Houses 6, 8, and 12 govern acute obstacles, metabolic friction, and depletion. Amplifying these lords through gemstones is strictly forbidden in authentic Parashari shastra.
         </div>
       </div>
     </div>
@@ -683,23 +747,23 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.8px;">
         <div>
-          <strong style="color:var(--gold);">House 6 (Aquarius · Disease &amp; Debt):</strong> Governed by Saturn. Rahu transiting here or natal stress can manifest as nervous fatigue or lower leg stiffness. Neutralized by Saturday discipline and copper oiling.
+          <strong style="color:var(--gold);">House 6 (${SIGN_NAMES[(lagnaNum + 5) % 12]} · Resistance &amp; Vitality):</strong> Governs daily discipline, competitive immunity, and somatic workload. Fortified through routine and disciplined physical regimens.
         </div>
         <div>
-          <strong style="color:var(--ruby-bright);">House 8 (Aries · Chronic Obstacles &amp; Surgery):</strong> Occupied by natal <strong>Ketu at 8° 12' (exact Mrityu Bhaga zone)</strong>. Governed by Mars (who sits in the 12th). This creates sudden metabolic spikes, acidity, and vulnerability to sharp instruments. Requires strict Ketu pacification (Ganesha worship and multi-colored blanket donation); physical Cat's Eye gemstone is strictly forbidden.
+          <strong style="color:var(--ruby-bright);">House 8 (${SIGN_NAMES[(lagnaNum + 7) % 12]} · Transformation &amp; Deep Karma):</strong> The arena of sudden structural shifts and deep reserves. Neutralized through Satvik charity, meditation, and steady breathwork.
         </div>
         <div>
-          <strong style="color:var(--sapphire-bright);">House 12 (Leo · Sleep, Solitude &amp; Losses):</strong> Occupied by <strong>Moon and Mars</strong>. Governed by Sun (who sits in the 10th). Mars in the 12th creates internal heat and restless sleep, while Moon here causes vivid nocturnal dreams. Requires the pure cow desi ghee navel seal.
+          <strong style="color:var(--sapphire-bright);">House 12 (${SIGN_NAMES[(lagnaNum + 11) % 12]} · Rest, Subconscious &amp; Realignment):</strong> Governs sleep cycles and nervous regeneration. Protected through grounding somatic oiling and the pure cow desi ghee navel seal.
         </div>
       </div>
     </div>
 
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <div style="font-weight:700;color:var(--emerald-bright);font-size:11px;text-transform:uppercase;margin-bottom:3px;">
-        ✦ The Fundamental Remedial Law for Mukul Mohan Pal
+        ✦ The Fundamental Remedial Law for ${subjectName}
       </div>
       <p class="body-text" style="font-size:11.5px;">
-        <em>"Strengthen the Lagna Lord (Mercury) and Yogakaraka Venus through Bio-Wearables; Pacify the Dusthana Lords (Mars, Ketu, Rahu) exclusively through Satvik Dana, Water Offerings, and Desi Ghee &mdash; Never wear stones for 6th, 8th, or 12th lords."</em>
+        <em>"Strengthen the Lagna Lord (${lagnaLord}) through Bio-Wearables; Pacify Dusthana influences exclusively through Satvik Dana, Water Offerings, and Desi Ghee &mdash; Never wear stones for 6th, 8th, or 12th lords."</em>
       </p>
     </div>
   </div>
@@ -729,99 +793,28 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>Sun (Surya)</strong></td>
-          <td>Gemini 18° 04'</td>
-          <td>10th</td>
-          <td>Digbali (Directional)</td>
-          <td>12th Lord (Neutral/Mixed)</td>
-          <td>Surya Arghya at sunrise</td>
-        </tr>
-        <tr>
-          <td><strong>Moon (Chandra)</strong></td>
-          <td>Leo 29° 11'</td>
-          <td>12th</td>
-          <td>Mitra Rashi</td>
-          <td>11th Lord in Vyaya</td>
-          <td>Cooling sandalwood dot on forehead</td>
-        </tr>
-        <tr>
-          <td><strong>Mars (Mangal)</strong></td>
-          <td>Leo 26° 23'</td>
-          <td>12th</td>
-          <td>Mitra Rashi</td>
-          <td>3rd &amp; 8th Lord (Malefic)</td>
-          <td><strong>STRICTLY NO RED CORAL</strong> · Blood donation</td>
-        </tr>
-        <tr>
-          <td><strong>Mercury (Budha)</strong></td>
-          <td>Taurus 26° 54'</td>
-          <td>9th</td>
-          <td>Mitra Rashi</td>
-          <td>Lagna &amp; 10th Lord (Prime Benefic)</td>
-          <td><strong>NATURAL COLOMBIAN EMERALD</strong></td>
-        </tr>
-        <tr>
-          <td><strong>Jupiter (Guru)</strong></td>
-          <td>Scorpio 13° 01'</td>
-          <td>3rd</td>
-          <td>Mitra Rashi</td>
-          <td>4th &amp; 7th Lord (Badhaka/Maraka)</td>
-          <td><strong>STRICTLY NO YELLOW SAPPHIRE</strong> · Banana seva</td>
-        </tr>
-        <tr>
-          <td><strong>Venus (Shukra)</strong></td>
-          <td>Gemini 05° 00'</td>
-          <td>10th</td>
-          <td>Mitra Rashi</td>
-          <td>2nd &amp; 9th Lord (Dharmakarmadhipati)</td>
-          <td>Diamond / White Zircon · Mahalakshmi Japa</td>
-        </tr>
-        <tr>
-          <td><strong>Saturn (Shani)</strong></td>
-          <td>Pisces 00° 57'</td>
-          <td>7th</td>
-          <td>Mitra Rashi</td>
-          <td>5th &amp; 6th Lord (Neutral Benefic)</td>
-          <td>Blue Sapphire (Trial) / Shani Challa</td>
-        </tr>
-        <tr>
-          <td><strong>Rahu</strong></td>
-          <td>Libra 08° 12'</td>
-          <td>2nd</td>
-          <td>Friendly / Swati</td>
-          <td>Shadow Node (Treasury Pressure)</td>
-          <td>Solid silver ball in pocket / wallet</td>
-        </tr>
-        <tr>
-          <td><strong>Ketu</strong></td>
-          <td>Aries 08° 12'</td>
-          <td>8th</td>
-          <td>Exalted / Ashwini</td>
-          <td>Shadow Node (Sudden Friction)</td>
-          <td>Feed street dogs sweet roasted roti</td>
-        </tr>
+${tableRowsHtml}
       </tbody>
     </table>
   </div>
   ${footerRail("D-1 Natal Shield & Vulnerability Matrix", 4)}
 </section>
 
-<!-- PAGE 5: PILLAR I — PRIMARY LIFE GEMSTONE: NATURAL COLOMBIAN EMERALD -->
+<!-- PAGE 5: PILLAR I — PRIMARY LIFE GEMSTONE: ${gemPrescription.primaryGem.toUpperCase()} -->
 <section class="page">
   ${headerRail("PILLAR I: PRIMARY GEMSTONE ALCHEMY")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Primary Life Gemstone: Colombian Emerald</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Primary Life Gemstone: ${gemPrescription.primaryGem}</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      For a Virgo Ascendant, <strong>Mercury (Budha)</strong> is the supreme ruler of your physical body, life force, intellect, and career status. Seated in the auspicious 9th house of fortune (Bhagya Bhava), it is your single most important bio-wearable catalyst.
+      For a ${lagnaRashi} Ascendant, <strong>${lagnaLord}</strong> is the supreme ruler of your physical body, life force, and status. ${gemPrescription.rationale}
     </p>
 
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:10px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ NATURAL UNTREATED COLOMBIAN / ZAMBIAN EMERALD (पन्ना)
+        ✦ NATURAL UNTREATED ${gemPrescription.primaryGem.toUpperCase()}
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Emerald functions as an optical green filter that concentrates the high-frequency electromagnetic spectrum of Mercury into your nervous system. It accelerates software architecture comprehension, speech precision, commercial negotiations, and stabilizes autonomic anxiety.
+        Functions as a bio-resonant optical catalyst that concentrates beneficial planetary frequencies into your nervous system. Accelerates decision precision, commercial discernment, and somatic equilibrium.
       </p>
     </div>
 
@@ -837,22 +830,22 @@ body {
         <tr>
           <td><strong>Carat Weight</strong></td>
           <td>5.25 to 6.25 Ratti (approx. 4.8 &ndash; 5.7 Carats)</td>
-          <td>Must be untreated, eye-clean with natural jardin (silk inclusions).</td>
+          <td>Must be untreated, natural, unheated, eye-clean stone.</td>
         </tr>
         <tr>
           <td><strong>Mounting Metal</strong></td>
-          <td>18k / 22k Yellow Gold or Panchdhatu</td>
-          <td>Bottom of the setting must remain open so the pavilion touches skin.</td>
+          <td>${gemPrescription.metal}</td>
+          <td>Bottom of setting remains open so pavilion touches skin.</td>
         </tr>
         <tr>
           <td><strong>Finger &amp; Hand</strong></td>
-          <td>Little Finger (Kanishtha) of Active Right Hand</td>
-          <td>Direct meridian link to the Mercury energetic pathway.</td>
+          <td>${gemPrescription.finger}</td>
+          <td>Direct meridian link to active nervous pathways.</td>
         </tr>
         <tr>
           <td><strong>Activation Day &amp; Time</strong></td>
-          <td>Wednesday Morning during Budha Hora</td>
-          <td>Between 6:15 AM and 7:30 AM (Sukla Paksha preferred).</td>
+          <td>${gemPrescription.day}</td>
+          <td>Perform during Shukla Paksha morning hours.</td>
         </tr>
         <tr>
           <td><strong>Purification Medium</strong></td>
@@ -863,20 +856,18 @@ body {
     </table>
 
     <div class="mantra-block">
-      <div class="kicker" style="color:var(--emerald-bright);margin-bottom:3px;">BUDHA CONSECRATION &amp; PRANA PRATISHTHA MANTRA (108 RECITATIONS)</div>
-      <div class="mantra-devanagari">ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः ॥</div>
-      <div class="mantra-iast">Oṁ Brāṁ Brīṁ Brauṁ Saḥ Budhāya Namaḥ ॥</div>
-      <div class="mantra-phonetic">Om Braam Breem Broum Sah Budhaya Namah</div>
+      <div class="kicker" style="color:var(--emerald-bright);margin-bottom:3px;">CONSECRATION &amp; PRANA PRATISHTHA MANTRA (108 RECITATIONS)</div>
+      <div class="mantra-devanagari devanagari-safe">${gemPrescription.mantra}</div>
     </div>
 
     <div class="luxury-card" style="background:var(--surface-elevated);margin-top:6px;">
-      <span class="kicker" style="color:var(--gold-bright);">Affordable Vedic Alternative (Upratna):</span>
+      <span class="kicker" style="color:var(--gold-bright);">Affordable Vedic Alternative (Uparatna):</span>
       <span style="font-size:11.5px;color:var(--ivory-dim);margin-left:6px;">
-        If untreated Colombian emerald is cost-prohibitive, wear a natural <strong>Green Tourmaline (Verdelite)</strong> or <strong>Peridot (6.5&ndash;7.5 Ratti)</strong> mounted in silver/panchdhatu on Wednesday morning.
+        If untreated primary gemstone is cost-prohibitive, wear a natural <strong>${gemPrescription.uparatna}</strong> mounted in suitable metal on ${gemPrescription.day}.
       </span>
     </div>
   </div>
-  ${footerRail("Pillar I: Primary Life Gemstone (Emerald)", 5)}
+  ${footerRail("Pillar I: Primary Life Gemstone", 5)}
 </section>
 
 <!-- PAGE 6: PILLAR I — SECONDARY GEMSTONE: BLUE SAPPHIRE TRIAL & DIAMOND -->

@@ -24,6 +24,28 @@
 import type { ChartData } from "../../astro-engine/calculations";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
 import { calculateMedical, type MedicalResult } from "../../astro-engine/medical";
+import {
+  ALL_RASHIS,
+  ALL_NAKSHATRAS,
+  getGenderLateralization,
+  getDynamicGemstonePrescription,
+  renderHumanImpactCardHtml
+} from "../../astro/human-translator";
+
+const RASHI_ANATOMY: Record<string, { organ: string; desc: string }> = {
+  Aries: { organ: "Cranium, Brain & Head Circulation", desc: "Aries governs the cranial nerves, cerebral cortex, and arterial blood flow to the head. Ruled by Mars, your constitution is dynamic, fiery, and responsive to physical movement." },
+  Taurus: { organ: "Vocal Cords, Throat, Thyroid & Cervical Spine", desc: "Taurus governs the throat, vocal mechanism, thyroid metabolism, and neck vertebrae. Ruled by Venus, your constitution thrives on steady rhythm, calm nourishment, and vocal harmony." },
+  Gemini: { organ: "Bronchial Tubes, Shoulders, Arms & Nervous Synapses", desc: "Gemini governs the respiratory branches, shoulders, motor hands, and fast peripheral nervous signaling. Ruled by Mercury, your constitution is agile, intellectually active, and sensitive to air quality." },
+  Cancer: { organ: "Chest, Thoracic Cavity, Stomach & Lymphatic Fluid", desc: "Cancer governs the gastric mucosa, lymphatic circulation, chest, and protective fluids. Ruled by the Moon, your physical vitality mirrors your emotional serenity and digestive hydration." },
+  Leo: { organ: "Cardiovascular System, Heart & Spinal Architecture", desc: "Leo governs the cardiac muscle, coronary circulation, and the upper dorsal spine. Ruled by the Sun, your physical vessel embodies vital solar heat, strong posture, and natural leadership stamina." },
+  Virgo: { organ: "Enteric Nervous System, Small Intestine & Abdomen", desc: "Virgo governs the abdominal cavity, small intestine, digestive enzyme synthesis, and the cellular enteric nervous system. Ruled by Mercury, your constitution is highly discerning and sensitive to bio-chemical purity." },
+  Libra: { organ: "Kidneys, Adrenal Balance, Lumbar Spine & Skin", desc: "Libra governs renal filtration, fluid-electrolyte balance, and the lumbar spine. Ruled by Venus, your physical resilience requires harmonious hydration, low stress, and aesthetic balance." },
+  Scorpio: { organ: "Pelvic Organs, Reproductive Vitality & Elimination", desc: "Scorpio governs reproductive vitality, prostate/uterine stamina, and deep cellular cleansing. Ruled by Mars, your vessel possesses profound regenerative phagocytosis and endurance." },
+  Sagittarius: { organ: "Hepatic Reserve, Arteries, Hips & Thigh Muscles", desc: "Sagittarius governs liver glycogen synthesis, arterial elasticity, and locomotor strength. Ruled by Jupiter, your constitution benefits from spacious outdoor exercise and clean dietary intake." },
+  Capricorn: { organ: "Skeletal Framework, Joints, Knees & Bone Mineralization", desc: "Capricorn governs the structural skeleton, knee joints, and calcium mineralization. Ruled by Saturn, your bodily vessel gains greater stamina and bone density through disciplined longevity regimens." },
+  Aquarius: { organ: "Circulation, Calves, Ankles & Central Bio-Electricity", desc: "Aquarius governs central nervous system bio-electricity, calf muscles, and lower leg circulation. Ruled by Saturn, your body operates with high intellectual drive and needs regular circulatory pacing." },
+  Pisces: { organ: "Lymphatic Drainage, Pineal Rhythm & Feet", desc: "Pisces governs lymphatic filtration, pineal melatonin synchronization, and the feet. Ruled by Jupiter, your vessel is deeply intuitive, highly receptive to sound therapy, and restorative sleep." },
+};
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -124,8 +146,12 @@ export function generateAyurvedicMedicalDossierHTML(
   const lat = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
   const lon = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
 
-  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Virgo";
-  const lagnaLord = SIGN_LORDS[lagnaRashi] || "Mercury";
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Aries";
+  const lagnaLord = SIGN_LORDS[lagnaRashi] || "Mars";
+  const lagnaIndex = chart.lagnaNum !== undefined ? chart.lagnaNum : SIGN_NAMES.indexOf(lagnaRashi);
+  const anatomy = RASHI_ANATOMY[lagnaRashi] || RASHI_ANATOMY["Aries"];
+  const fifthSign = SIGN_NAMES[(lagnaIndex + 4) % 12];
+  const eleventhSign = SIGN_NAMES[(lagnaIndex + 10) % 12];
 
   const moonPlanet = chart.planets?.["Moon"];
   const moonRashi = moonPlanet?.sign || "Leo";
@@ -156,6 +182,29 @@ export function generateAyurvedicMedicalDossierHTML(
   const ojasRating = med.ojasRating || "Robust Resilience";
   const agniTitle = med.agniProfile?.title || "Samagni (Balanced Agni)";
   const agniSanskrit = med.agniProfile?.sanskrit || "समाग्नि (Balanced Digestive Metabolism)";
+
+  const d9Rows = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"].map(p => {
+    const pd = chart.planets?.[p];
+    const sign = pd?.sign || "Aries";
+    const house = pd?.house || 1;
+    const d9 = pd?.navamsha?.sign || pd?.navamsha || sign;
+    const tissueMap: Record<string, string> = {
+      Sun: "Asthi (Bones), Eye Vitality",
+      Moon: "Rasa (Lymph), Pineal Cycle",
+      Mars: "Mamsa (Muscles), Bone Marrow",
+      Mercury: "Majja (Nerves), Skin Boundary",
+      Jupiter: "Meda (Lipid), Liver Reserve",
+      Venus: "Shukra (Endocrine Ojas)",
+      Saturn: "Asthi (Joints), Teeth, Longevity"
+    };
+    return `<tr>
+      <td><strong style="color:var(--gold-bright);">${p}</strong></td>
+      <td>${sign} &middot; House ${house}</td>
+      <td>${d9}</td>
+      <td>Cellular synthesis anchored in ${d9}; harmonizes tissue regeneration</td>
+      <td>${tissueMap[p] || "Somatic Equilibrium"}</td>
+    </tr>`;
+  }).join("\n");
 
   const headerRail = (sectionTitle: string) => `
     <div class="page-rail">
@@ -375,7 +424,7 @@ body {
   padding: 6px;
 }
 
-.mantra-devanagari {
+.mantra-devanagari, .devanagari-safe {
   font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif;
   font-weight: 600;
   font-size: 14.5px;
@@ -383,6 +432,7 @@ body {
   text-align: center;
   margin: 4px 0;
   line-height: 1.6;
+  letter-spacing: 0 !important;
 }
 
 .progress-bar-wrap {
@@ -536,9 +586,9 @@ body {
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);">
       <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">✦ 3 CARDINAL CLINICAL-VEDIC MANDATES</div>
       <div style="font-size:10.5px;color:var(--ivory-dim);line-height:1.5;">
-        1. <strong>Protect the Enteric Nervous System:</strong> As a Virgo native, emotional anxiety bypasses the brain and attacks gut motility. Never consume food while stressed.<br/>
+        1. <strong>Protect Somatic Equilibrium:</strong> As a ${lagnaRashi} native, mental and emotional stress directly impacts your ${anatomy.organ.toLowerCase()}. Never consume food while rushed or anxious.<br/>
         2. <strong>Synchronize with Midday Agni:</strong> Consume your heaviest nutritious meal between 12:00 PM and 1:30 PM when the Solar plexus is at its peak metabolic intensity.<br/>
-        3. <strong>Guard 12th House Lunar Rest:</strong> With Moon in the 12th house (Leo), nocturnal sleep is your sacred recharge portal. Maintain strict digital darkness 2 hours before bed.
+        3. <strong>Guard ${moonPlanet?.house || 12}th House Lunar Rest:</strong> With Moon in ${moonRashi} (${moonPlanet?.house || 12}th house), nocturnal sleep is your sacred recharge portal. Maintain strict digital darkness 2 hours before bed.
       </div>
     </div>
   </div>
@@ -560,10 +610,10 @@ body {
         ${renderNorthIndianChart(chart, 220)}
       </div>
       <div class="luxury-card" style="height:100%;display:flex;flex-direction:column;justify-content:center;">
-        <div class="kicker" style="color:var(--teal-bright);">KANYA LAGNA (VIRGO ASCENDANT)</div>
-        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">Anatomical Sphere: Enteric Nervous System &amp; Abdomen</div>
+        <div class="kicker" style="color:var(--teal-bright);">${lagnaRashi.toUpperCase()} ASCENDANT</div>
+        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">Anatomical Sphere: ${anatomy.organ}</div>
         <p class="body-text" style="font-size:10.8px;margin-top:4px;">
-          Virgo governs the abdominal cavity, small intestine, duodenum, digestive enzyme synthesis, and the cellular enteric nervous system. As a feminine Earth sign ruled by Mercury, your constitution is extraordinarily discerning, analytical, and highly sensitive to bio-chemical purity.
+          ${anatomy.desc}
         </p>
       </div>
     </div>
@@ -571,10 +621,10 @@ body {
     <!-- Lagna Lord Placement -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--emerald-bright);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-        ✦ LAGNA LORD MERCURY IN 9TH HOUSE (TAURUS &middot; 26° 54')
+        ✦ LAGNA LORD ${lagnaLord.toUpperCase()} IN HOUSE ${lagneshData?.house || 1} (${lagneshData?.sign || lagnaRashi})
       </div>
       <p class="body-text" style="font-size:11px;margin-top:2px;">
-        Your vital ruler Mercury occupies fixed Earth (Taurus) in the auspicious 9th house of Dharma. This is an exceptional anatomical blessing: it grounds the nervous flutter of Virgo with the enduring physical stamina and somatic bone density of Taurus. Your physical recuperation operates through steady rhythm, clean hydration, and harmonious environments.
+        Your vital ruler ${lagnaLord} occupies ${lagneshData?.sign || lagnaRashi} in the ${lagneshData?.house || 1}th house. This placement governs constitutional vitality, cellular immunity, and natural recovery rhythm. Your physical recuperation operates through steady rhythm, clean hydration, and harmonious environments.
       </p>
     </div>
 
@@ -591,8 +641,8 @@ body {
       <tbody>
         <tr>
           <td><strong>Physical Stamina (Lagna)</strong></td>
-          <td>Virgo &middot; Mercury</td>
-          <td>High endurance in steady tasks; sensitive to toxic stimulants</td>
+          <td>${lagnaRashi} &middot; ${lagnaLord}</td>
+          <td>Constitutional vitality and cellular recuperative stamina</td>
           <td><span class="tag-badge tag-emerald">85 / 100 &middot; High</span></td>
         </tr>
         <tr>
@@ -668,7 +718,7 @@ body {
     <div class="luxury-card" style="border-top:2px solid var(--teal-bright);margin-bottom:8px;">
       <div class="kicker" style="color:var(--teal-bright);margin-bottom:2px;">✦ THE 1-5-11 RECOVERY TRIAD VS 6-8-12 DUSTHANA AXIS</div>
       <p class="body-text" style="font-size:10.5px;">
-        In AstroLife's classical health matrix, while houses 6, 8, and 12 govern acute, chronic, and hospitalizing friction, <strong>Houses 1, 5, and 11 form the Invincible Recovery Triad</strong>. Your 1st House (Lagna Lord Mercury in 9th) grants innate stamina (<em>Deha Arogya</em>), your 5th House (Capricorn &middot; 30 SAV Bindus) governs swift therapeutic response (<em>Upachaya</em>), and your 11th House (Cancer &middot; receiving benefic trines and fortified by an exalted D-9 Lagna Lord Mercury) guarantees disease recovery (<em>Roga Mukti</em>) and cellular immunity.
+        In AstroLife's classical health matrix, while houses 6, 8, and 12 govern acute, chronic, and hospitalizing friction, <strong>Houses 1, 5, and 11 form the Invincible Recovery Triad</strong>. Your 1st House (Lagna Lord ${lagnaLord} in House ${lagneshData?.house || 1}) grants innate stamina (<em>Deha Arogya</em>), your 5th House (${fifthSign}) governs swift therapeutic response (<em>Upachaya</em>), and your 11th House (${eleventhSign}) guarantees disease recovery (<em>Roga Mukti</em>) and cellular immunity.
       </p>
     </div>
 
@@ -676,7 +726,7 @@ body {
     <div class="luxury-card" style="border-left:3px solid var(--gold-bright);background:var(--surface);">
       <div class="kicker" style="color:var(--gold-bright);margin-bottom:2px;">✦ OCULAR HEALTH: RIGHT EYE (2ND) VS LEFT EYE (12TH) SPATIAL RULE</div>
       <p class="body-text" style="font-size:10.5px;">
-        Under classical medical rules, the 2nd House governs the Right Eye (Solar affinity), while the 12th House governs the Left Eye (Lunar affinity). With Rahu in 2nd (Libra), protect your right eye from multi-screen digital blue glare; with Moon-Mars in 12th (Leo), nourish left-eye hydration and retinal micro-circulation through Triphala eye-wash and unbroken sleep.
+        Under classical medical rules, the 2nd House governs the Right Eye (Solar affinity), while the 12th House governs the Left Eye (Lunar affinity). Protect your ocular hydration and retinal micro-circulation through regular eye-rest, balanced screen habits, and unbroken sleep.
       </p>
     </div>
   </div>
@@ -704,66 +754,18 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong style="color:var(--gold-bright);">Sun (Surya)</strong></td>
-          <td>Gemini &middot; 10th House</td>
-          <td>Pisces (Friendly / Jupiterian)</td>
-          <td>Navamsha anchors solar prana in Jupiterian waters; grants cardiovascular stability and spiritual vitality</td>
-          <td>Asthi (Bones), Eye Vitality</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--teal-bright);">Moon (Chandra)</strong></td>
-          <td>Leo &middot; 12th House</td>
-          <td>Sagittarius (Friendly)</td>
-          <td>Navamsha lifts Moon into spiritual Jupiterian terrain; mental resilience grows with age</td>
-          <td>Rasa (Lymph), Pineal Cycle</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--ruby-bright);">Mars (Mangala)</strong></td>
-          <td>Leo &middot; 12th House</td>
-          <td>Scorpio (Swakshetra Own)</td>
-          <td>Swakshetra in D-9! Massive cellular regeneration; profound immune white-blood-cell defensive force</td>
-          <td>Mamsa (Muscles), Bone Marrow</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--emerald-bright);">Mercury (Budha)</strong></td>
-          <td>Taurus &middot; 9th House</td>
-          <td>Virgo (Exalted / Swakshetra)</td>
-          <td>Exalted in D-9! Sharp, unyielding nervous stamina; robust cognitive processing speed</td>
-          <td>Majja (Nerves), Skin Boundary</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--gold);">Jupiter (Guru)</strong></td>
-          <td>Scorpio &middot; 3rd House</td>
-          <td>Libra (Friendly / Harmonious)</td>
-          <td>Harmonious Venusian placement; balances hepatic metabolism, lipid distribution, and arterial tone</td>
-          <td>Meda (Lipid), Liver Reserve</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--purple-bright);">Venus (Shukra)</strong></td>
-          <td>Gemini &middot; 10th House</td>
-          <td>Scorpio (Neutral)</td>
-          <td>Healthy hormonal balance; channel creative expression to protect reproductive and endocrine Ojas</td>
-          <td>Shukra (Endocrine Ojas)</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--amber);">Saturn (Shani)</strong></td>
-          <td>Pisces &middot; 7th House</td>
-          <td>Cancer (Sensitive / Watery)</td>
-          <td>Saturn in Cancer requires joint warmth, healthy hydration, and avoiding cold, dry environments</td>
-          <td>Asthi (Joints), Teeth, Longevity</td>
-        </tr>
+        ${d9Rows}
       </tbody>
     </table>
 
     <!-- Vargottama & Exaltation Highlighting -->
     <div class="luxury-card" style="border-left:3px solid var(--gold-bright);margin-bottom:8px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">
-        ✦ 2 SUPREME CELLULAR HEALTH BLESSINGS IN NAVAMSHA
+        ✦ CELLULAR HEALTH ANCHORS IN NAVAMSHA (D-9)
       </div>
       <p class="body-text" style="font-size:11px;margin-top:2px;">
-        1. <strong>Mercury Exalted in D-9 Navamsha (Virgo):</strong> Lagnesh Mercury attains sovereign exaltation (Uchcha) in D-9 Virgo, conferring extraordinary neurological durability, swift cognitive processing, and robust immune mucosal integrity.<br/>
-        2. <strong>Mars Swakshetra in D-9 Navamsha (Scorpio):</strong> Mars occupies its own nocturnal water sign Scorpio in D-9, empowering powerful bone marrow regeneration, high cellular phagocytosis, and rapid tissue recuperation.
+        1. <strong>Lagnesh ${lagnaLord} in D-9 (${lagneshData?.navamsha?.sign || lagneshData?.navamsha || 'Navamsha'}):</strong> Confers deep cellular resilience, constitutional longevity, and robust immune mucosal integrity.<br/>
+        2. <strong>Atmakaraka ${moonPlanet?.sign ? 'Moon' : 'Sun'} in D-9:</strong> Anchors spiritual vitality, cellular regeneration, and steady tissue recuperation across mid-life cycles.
       </p>
     </div>
   </div>
@@ -981,7 +983,7 @@ body {
           <span class="tag-badge tag-emerald">GOVERNOR: JUPITER &middot; BALANCED</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Meda supplies lubrication to joints and protects neural sheaths (<em>Snehana</em>). Governed by Jupiter in Scorpio (D-1) and harmonious in Libra (D-9), reinforced by exalted Mercury in D-9, your lipid metabolism is well-regulated and responsive. You naturally metabolize reserves efficiently. <em>Protocol: Maintain pure cold-pressed oils in your cooking routine.</em>
+          Meda supplies lubrication to joints and protects neural sheaths (<em>Snehana</em>). Governed by Jupiter in ${jupiterPlanet?.sign || 'its sign'} (D-1) and ${jupiterPlanet?.navamsha?.sign || jupiterPlanet?.navamsha || 'Navamsha'} (D-9), your lipid metabolism is well-regulated and responsive. You naturally metabolize reserves efficiently. <em>Protocol: Maintain pure cold-pressed oils in your cooking routine.</em>
         </p>
       </div>
     </div>
@@ -1007,7 +1009,7 @@ body {
           <span class="tag-badge tag-emerald">GOVERNORS: SATURN / SUN &middot; RESILIENT</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Asthi gives structural architecture to the frame (<em>Dharana</em>). Governed by Saturn in Pisces (7th house) and the Sun (Gemini 10th house), your skeletal density and teeth possess solid endurance. Ensure consistent dietary calcium and Vitamin D synthesis via morning sunlight to maintain lumbar flexibility and joint warmth.
+          Asthi gives structural architecture to the frame (<em>Dharana</em>). Governed by Saturn in ${saturnPlanet?.sign || 'its sign'} (House ${saturnPlanet?.house || 1}) and the Sun (${sunPlanet?.sign || 'its sign'} House ${sunPlanet?.house || 1}), your skeletal density and teeth possess solid endurance. Ensure consistent dietary calcium and Vitamin D synthesis via morning sunlight to maintain lumbar flexibility and joint warmth.
         </p>
       </div>
 
@@ -1018,7 +1020,7 @@ body {
           <span class="tag-badge tag-emerald">GOVERNORS: MERCURY / MARS &middot; ROBUST</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Majja fills the bone cavities and constitutes the central and peripheral nervous system, neural firing, and intuition (<em>Poorana</em>). With Mercury in Taurus 9th house, your neural processing speed is formidable, with high cognitive stamina for code and systemic abstractions. <em>Protocol: Brahmi tea to soothe neural synapses after intense problem-solving.</em>
+          Majja fills the bone cavities and constitutes the central and peripheral nervous system, neural firing, and intuition (<em>Poorana</em>). With Mercury in ${mercuryPlanet?.sign || 'its sign'} (House ${mercuryPlanet?.house || 1}), your neural processing speed is formidable, with high cognitive stamina for strategic analysis and abstract problem-solving. <em>Protocol: Brahmi tea to soothe neural synapses after intense problem-solving.</em>
         </p>
       </div>
 
@@ -1192,7 +1194,7 @@ body {
         <span class="tag-badge tag-emerald">24 / 100 &middot; LOW-MODERATE</span>
       </div>
       <p class="body-text" style="font-size:10.5px;">
-        Your mind is structurally insulated against acute neurological panic attacks or severe clinical depression due to the protective trine between Mercury (Taurus) and Lagna (Virgo). Maintaining emotional boundaries keeps your cognitive engine invincible.
+        Your mind is structurally insulated against acute neurological panic attacks or severe clinical depression due to the protective configuration of Lagnesh ${lagnaLord} and Lagna (${lagnaRashi}). Maintaining emotional boundaries keeps your cognitive engine invincible.
       </p>
     </div>
   </div>
@@ -1275,14 +1277,14 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Vata Nervous System Grounding &amp; Enteric-Gut Axis</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Modern neuro-gastroenterology confirms what Maharishi Parashara declared millennia ago: the digestive tract contains a dedicated nervous system &mdash; the <strong>Enteric Nervous System (ENS)</strong> &mdash; housing over 500 million neurons and producing 90% of the body's serotonin. In your chart, this axis is ruled directly by Virgo Lagna.
+      Modern neuro-gastroenterology confirms what Maharishi Parashara declared millennia ago: the digestive tract contains a dedicated nervous system &mdash; the <strong>Enteric Nervous System (ENS)</strong> &mdash; housing over 500 million neurons and producing 90% of the body's serotonin. In your chart, this axis is calibrated to your ${lagnaRashi} Lagna.
     </p>
 
     <!-- Gut-Brain Circuit Box -->
     <div class="luxury-card" style="border:1.5px solid var(--border-gold);margin-bottom:10px;background:var(--surface);">
-      <div class="kicker" style="color:var(--gold-bright);margin-bottom:2px;">THE VIRGO LAGNA ENTERIC CIRCUIT</div>
+      <div class="kicker" style="color:var(--gold-bright);margin-bottom:2px;">THE ${lagnaRashi.toUpperCase()} SOMATIC CIRCUIT</div>
       <p class="body-text" style="font-size:10.8px;">
-        For a Virgo Ascendant, unresolved professional tension or mental perfectionism does not remain in the cranium &mdash; it translates into immediate gut motor changes. High stress triggers excessive <em>Samana Vata</em> and <em>Pachaka Pitta</em>, causing gut hyper-motility, abdominal bloating, or intermittent appetite loss.
+        For a ${lagnaRashi} Ascendant, unresolved professional tension or mental perfectionism does not remain in the cranium &mdash; it translates into immediate gut motor changes. High stress triggers excessive metabolic and nervous fluctuations, causing gut hyper-motility, abdominal bloating, or intermittent appetite loss.
       </p>
     </div>
 
@@ -1342,7 +1344,7 @@ body {
         ✦ PROTECTING THE ATMAKARAKA MOON (KING OF THE SOUL)
       </div>
       <p class="body-text" style="font-size:10.8px;">
-        Because your Moon holds the supreme rank of <strong>Atmakaraka (AK &middot; Leo 29° 11' 59")</strong>, your emotional state directly dictates your cellular vitality. When your mind is serene, your immune system is impenetrable; when your mind is troubled by toxic relationships or unexpressed grief, your physical body suffers immediate fatigue. Protecting your peace is not a luxury &mdash; it is biological medicine.
+        Because your Moon holds the supreme rank of <strong>Atmakaraka (AK &middot; ${moonRashi} ${moonPlanet?.degree || 29}&deg;)</strong>, your emotional state directly dictates your cellular vitality. When your mind is serene, your immune system is impenetrable; when your mind is troubled by toxic relationships or unexpressed grief, your physical body suffers immediate fatigue. Protecting your peace is not a luxury &mdash; it is biological medicine.
       </p>
     </div>
 
@@ -1372,7 +1374,7 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--gold-bright);">
         <div class="kicker" style="color:var(--gold-bright);">4. CELEBRATION &amp; ENERGY SHIELD RULE</div>
         <p class="body-text" style="font-size:10.5px;margin-top:2px;">
-          With Saturn casting its direct 7th-aspect on your Virgo Ascendant, observe AstroLife's classical rule: <em>Keep triumphs and milestones private and unadvertised until fully operational</em>. Loud public displays invite subtle psychic resistance (<em>Nazar</em>) and psychological fatigue. Maintain sovereign modesty.
+          Observe AstroLife's classical rule: <em>Keep personal milestones private until fully established</em>. Unnecessary external exposure invites subtle psychic fatigue. Maintain sovereign modesty.
         </p>
       </div>
     </div>
@@ -1604,7 +1606,7 @@ body {
         ✦ STRATEGIC HEALTH FOCUS FOR 2025&ndash;2026 (SATURN IN 7TH OPPOSING LAGNA)
       </div>
       <p class="body-text" style="font-size:10.8px;">
-        When Saturn transits Pisces in the 7th house, it casts a direct 7th-aspect on your Virgo Ascendant. In classical Jyotish, this is known as the <strong>Somatic Reality Check</strong>. Saturn enforces physical discipline: if you have been ignoring postural ergonomics, hydration, or sleep, Saturn manifests temporary joint stiffness or fatigue to force rest. Embracing daily stretching turns this transit into an era of ironclad physical resilience.
+        In classical Jyotish, major Saturn transits enforce physical discipline: if you have been ignoring postural ergonomics, hydration, or sleep, Saturn manifests temporary joint stiffness or fatigue to force rest. Embracing daily stretching turns this transit into an era of ironclad physical resilience.
       </p>
     </div>
   </div>
@@ -1855,7 +1857,7 @@ body {
         ⚠️ CRITICAL SHASTRA WARNING: NEVER WEAR GEMSTONES FOR 6TH/8TH LORDS
       </div>
       <p class="body-text" style="font-size:10.5px;">
-        Commercial astrologers often recklessly prescribe gemstones to 'strengthen' diseased houses. In classical shastra, <strong>wearing a gemstone amplifies that planet's radiation indiscriminately</strong>. Wearing Yellow Sapphire (Pukhraj / Pushparaj) or Red Coral (Moonga) for a Virgo native amplifies Dusthana/Badhaka lords and accelerates inflammatory disease. Use <em>Daan</em>, <em>Snan-Aushadhi</em>, and <em>16-Day Protocols</em> to pacify; never wear physical stones for functional malefics.
+        Commercial astrologers often recklessly prescribe gemstones to 'strengthen' diseased houses. In classical shastra, <strong>wearing a gemstone amplifies that planet's radiation indiscriminately</strong>. Wearing gems for Dusthana or Badhaka lords accelerates inflammatory friction. For a ${lagnaRashi} native, ensure you only wear gemstones suited to your functional benefics. Use <em>Daan</em>, <em>Snan-Aushadhi</em>, and <em>16-Day Protocols</em> to pacify; never wear physical stones for functional malefics.
       </p>
     </div>
   </div>
@@ -1971,7 +1973,7 @@ body {
           <span class="tag-badge tag-emerald">MEDHYA RASAYANA</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          <em>Bacopa monnieri</em> and <em>Convolvulus pluricaulis</em> infused in pure cow ghee. This is the premier classical cognitive tonic for Virgo Lagna natives. It repairs synaptic fatigue, cools cranial Pitta, and enhances memory retention without causing physical drowsiness. <em>Dose: 1/2 teaspoon in warm milk at night.</em>
+          <em>Bacopa monnieri</em> and <em>Convolvulus pluricaulis</em> infused in pure cow ghee. This is the premier classical cognitive tonic for ${lagnaRashi} Lagna natives. It repairs synaptic fatigue, cools cranial heat, and enhances memory retention without causing physical drowsiness. <em>Dose: 1/2 teaspoon in warm milk at night.</em>
         </p>
       </div>
 
@@ -2168,8 +2170,8 @@ body {
       </div>
       <div class="luxury-card" style="border-top:2px solid var(--ruby-bright);padding:8px;">
         <div class="kicker" style="color:var(--ruby-bright);">NEVER DONATE</div>
-        <div style="font-weight:700;font-size:11px;color:var(--gold-bright);">Stationery/Code</div>
-        <div style="font-size:8.5px;color:var(--ivory-dim);">Mercury Lagnesh IP</div>
+        <div style="font-weight:700;font-size:11px;color:var(--gold-bright);">${lagnaLord} Sacred Items</div>
+        <div style="font-size:8.5px;color:var(--ivory-dim);">${lagnaLord} Lagnesh Balance</div>
       </div>
       <div class="luxury-card" style="border-top:2px solid var(--purple-bright);padding:8px;">
         <div class="kicker" style="color:var(--purple-bright);">BEDTIME KEY</div>

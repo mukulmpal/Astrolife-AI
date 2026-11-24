@@ -42,6 +42,7 @@ export interface PackageDossierOptions {
   fixedTimestamp?: string;
   isSample?: boolean;
   reportCode?: string;
+  gender?: "male" | "female" | string;
 }
 
 const SIGN_NAMES = [

@@ -5,6 +5,16 @@ import { buildEvidenceFirstReport } from "../src/lib/report/evidence-first-repor
 import { buildEvidenceFirstPdf } from "../src/lib/report/evidence-first-pdf";
 import { buildPackageDossierPdf } from "../src/lib/report/package-dossier-pdf";
 
+function getPdfPageCount(buffer: Buffer): number {
+  const binary = buffer.toString("binary");
+  const countMatch = binary.match(/\/Count\s+(\d+)/);
+  if (countMatch && countMatch[1]) {
+    return parseInt(countMatch[1], 10);
+  }
+  const pageMatches = binary.match(/\/Type\s*\/Page\b/g);
+  return pageMatches ? pageMatches.length : 0;
+}
+
 async function main() {
   console.log("=== ASTROLIFE REPORT GENERATION ENGINES BENCHMARK ===");
   const subject = {
@@ -46,9 +56,11 @@ async function main() {
   const efPayload = buildEvidenceFirstReport(chart, kp);
   const efPdfBuffer = await buildEvidenceFirstPdf(efPayload, { subjectName: chart.name });
   const t3 = performance.now();
+  const efPages = getPdfPageCount(efPdfBuffer);
   console.log(`\n[Engine 2: Evidence-First Classical Edition PDF]`);
   console.log(`- Payload + Vector PDF Generation Time: ${(t3 - t2).toFixed(2)} ms`);
   console.log(`- Vector PDF Buffer Size: ${(efPdfBuffer.length / 1024).toFixed(1)} KB (${efPdfBuffer.length} bytes)`);
+  console.log(`- Page Count: ${efPages} pages (from PDF binary inspection)`);
   console.log(`- Sections: ${efPayload.sections.length} topic sections`);
 
   // 3. Engine 3: Modular Vector Package Dossier
@@ -59,10 +71,11 @@ async function main() {
     customerName: chart.name,
   });
   const t5 = performance.now();
+  const dossierPages = getPdfPageCount(dossierPdfBuffer);
   console.log(`\n[Engine 3: Modular Vector Package Dossier PDF]`);
   console.log(`- Vector PDF Generation Time: ${(t5 - t4).toFixed(2)} ms`);
   console.log(`- Vector PDF Buffer Size: ${(dossierPdfBuffer.length / 1024).toFixed(1)} KB (${dossierPdfBuffer.length} bytes)`);
-  console.log(`- Pages: 4 pages (strict golden ratio)`);
+  console.log(`- Page Count: ${dossierPages} pages emitted (target: 4 pages golden ratio; current implementation produces 8 pages due to PDFKit footer margin overflow at y=800)`);
 
   console.log("\n=== BENCHMARK COMPLETED SUCCESSFULLY ===");
 }

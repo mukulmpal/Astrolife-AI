@@ -25,6 +25,14 @@ import type { ChartData } from "../../astro-engine/calculations";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
 import { calculatePanchang, type PanchangResult } from "../../astro-engine/panchang";
 import { scanAuspiciousMuhurats, type MuhuratWindow } from "../../astro-engine/muhurat";
+import {
+  ALL_NAKSHATRAS,
+  TARA_NAMES,
+  ALL_RASHIS,
+  RASHI_LORDS,
+  getGenderLateralization,
+  renderHumanImpactCardHtml
+} from "../../astro/human-translator";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -119,10 +127,56 @@ export function generateGoldenMuhuratDossierHTML(
   const lat = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
   const lon = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
 
-  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Virgo";
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Aries";
+  const lagnesh = SIGN_LORDS[lagnaRashi] || "Mars";
   const moonPlanet = chart.planets?.["Moon"];
-  const moonRashi = moonPlanet?.sign || "Leo";
-  const nakshatra = moonPlanet?.nakshatra || "Uttara Phalguni";
+  const moonRashi = moonPlanet?.sign || "Aries";
+  const nakshatra = moonPlanet?.nakshatra || "Ashwini";
+
+  const LAGNESH_SOVEREIGN_DAY: Record<string, { day: string; rahuKaal: string }> = {
+    Sun: { day: "Sunday", rahuKaal: "04:30 PM to 06:00 PM" },
+    Moon: { day: "Monday", rahuKaal: "07:30 AM to 09:00 AM" },
+    Mars: { day: "Tuesday", rahuKaal: "03:00 PM to 04:30 PM" },
+    Mercury: { day: "Wednesday", rahuKaal: "12:00 PM to 01:30 PM" },
+    Jupiter: { day: "Thursday", rahuKaal: "01:30 PM to 03:00 PM" },
+    Venus: { day: "Friday", rahuKaal: "10:30 AM to 12:00 PM" },
+    Saturn: { day: "Saturday", rahuKaal: "09:00 AM to 10:30 AM" },
+  };
+  const sovereignInfo = LAGNESH_SOVEREIGN_DAY[lagnesh] || { day: "Wednesday", rahuKaal: "12:00 PM to 01:30 PM" };
+
+  // Dynamic Tara & Chandra indices
+  const mIdx = Math.max(0, ALL_RASHIS.findIndex(r => r.toLowerCase() === moonRashi.toLowerCase()));
+  const nIdx = Math.max(0, ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === nakshatra.toLowerCase()));
+  const ashtamaSign = ALL_RASHIS[(mIdx + 7) % 12];
+  const twelfthFromMoon = ALL_RASHIS[(mIdx + 11) % 12];
+  const fourthFromMoon = ALL_RASHIS[(mIdx + 3) % 12];
+  const auspSigns = [0, 2, 5, 6, 9, 10].map(h => `${ALL_RASHIS[(mIdx + h) % 12]} (${h + 1}${h === 0 ? "st" : h === 1 ? "nd" : h === 2 ? "rd" : "th"})`).join(", ");
+  const defSigns = `${fourthFromMoon} (4th), ${ashtamaSign} (8th), or ${twelfthFromMoon} (12th)`;
+
+  // Dynamic Tara Bala table rows
+  const taraTableRows = TARA_NAMES.map((t, i) => {
+    const s1 = ALL_NAKSHATRAS[(nIdx + i) % 27];
+    const s2 = ALL_NAKSHATRAS[(nIdx + i + 9) % 27];
+    const s3 = ALL_NAKSHATRAS[(nIdx + i + 18) % 27];
+    const badgeClass = t.supportive ? "badge-auspicious" : (t.num === 1 ? "badge-caution" : "badge-avoid");
+    const guidance = [
+      "Spiritual study, meditation; avoid initiating long-term commercial liability.",
+      "Optimal for financial investments, contracts, fundraising, and banking.",
+      "High risk of sudden disputes, technical glitches, and contractual reversals.",
+      "Property purchases, medical operations, recovery protocols, team onboarding.",
+      "Encountering stubborn bureaucratic delays, regulatory pushback, or denial.",
+      "Mastery of complex coding, legal settlements, strategic product launches.",
+      "Severe risk of total loss or ruin. Zero commercial commitments permitted.",
+      "Signing strategic partnerships, creative collaborations, social networking.",
+      "High-level executive negotiations, major real estate acquisitions, marriage."
+    ][i];
+    return `<tr>
+      <td><strong>${t.num}. ${t.name} Tara</strong></td>
+      <td>${s1} &middot; ${s2} &middot; ${s3}</td>
+      <td><span class="${badgeClass}">${t.status.split(" ")[0]}</span></td>
+      <td>${guidance}</td>
+    </tr>`;
+  }).join("\n");
 
   // Calculate live Panchang anchor
   let panchang: PanchangResult;
@@ -132,7 +186,7 @@ export function generateGoldenMuhuratDossierHTML(
     panchang = {} as any;
   }
 
-  // Scan realistic upcoming auspicious windows for Mukul
+  // Scan realistic upcoming auspicious windows
   let businessWindows: MuhuratWindow[] = [];
   try {
     businessWindows = scanAuspiciousMuhurats({
@@ -220,12 +274,12 @@ export function generateGoldenMuhuratDossierHTML(
     letter-spacing: -0.01em;
   }
 
-  .mantra-devanagari {
-    font-family: 'Noto Serif Devanagari', serif;
+  .mantra-devanagari, .devanagari-safe {
+    font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif;
     font-size: 15px;
     line-height: 1.8;
     color: var(--gold-bright);
-    letter-spacing: normal !important;
+    letter-spacing: 0 !important;
     text-shadow: 0 0 16px rgba(229,201,133,0.35);
     margin: 6px 0;
     text-align: center;
@@ -545,7 +599,7 @@ export function generateGoldenMuhuratDossierHTML(
         <div class="kicker" style="color:var(--ruby-bright);">2. VARA (SOLAR WEEKDAY) &middot; ELEMENT FIRE (AGNI)</div>
         <div style="font-weight:700;font-size:11px;color:var(--ivory);margin:2px 0;">Governs: Longevity, Physical Vitality &amp; Energy</div>
         <p class="body-text" style="font-size:9.5px;">
-          Ruled by the planetary day-lord. Sunday (Sun), Tuesday (Mars), and Saturday (Saturn) carry intense, fierce, or contractual weight. Wednesday (Mercury) and Thursday (Jupiter) are the supreme days for financial contracts, intellectual property, and high-trust alliances for your Virgo constitution.
+          Ruled by the planetary day-lord. Sunday (Sun), Tuesday (Mars), and Saturday (Saturn) carry intense, fierce, or contractual weight. Wednesday (Mercury) and Thursday (Jupiter) are universal days for contracts and alliances, aligning with your ${lagnaRashi} constitution.
         </p>
       </div>
 
@@ -585,7 +639,7 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="kicker">PERSONALIZED STELLAR FILTER</div>
     <h2 class="display-l" style="margin-bottom:6px;">Navtara Chakra: Your Personal Stellar Resonance</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Universal calendar muhurats fail when they contradict the native's birth star (<em>Janma Nakshatra</em>). With your natal Moon anchored in <strong>Uttara Phalguni</strong> (ruled by Sun), the 27 Nakshatras form 9 cosmic Tara Bala zones:
+      Universal calendar muhurats fail when they contradict the native's birth star (<em>Janma Nakshatra</em>). With your natal Moon anchored in <strong>${nakshatra}</strong>, the 27 Nakshatras form 9 cosmic Tara Bala zones:
     </p>
 
     <!-- Tara Bala Matrix Table -->
@@ -593,73 +647,20 @@ export function generateGoldenMuhuratDossierHTML(
       <thead>
         <tr>
           <th>Tara Position &amp; Name</th>
-          <th>Governing Nakshatras from Uttara Phalguni</th>
+          <th>Governing Nakshatras from ${nakshatra}</th>
           <th>Shastric Grade</th>
           <th>Permitted Actions &amp; Tactical Guidance</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>1. Janma Tara</strong> (Birth)</td>
-          <td>Uttara Phalguni &middot; U. Ashadha &middot; Krittika</td>
-          <td><span class="badge-caution">Mixed / Body</span></td>
-          <td>Spiritual study, meditation; avoid initiating long-term commercial liability.</td>
-        </tr>
-        <tr>
-          <td><strong>2. Sampat Tara</strong> (Wealth)</td>
-          <td>Hasta &middot; Shravana &middot; Rohini</td>
-          <td><span class="badge-auspicious">Supreme Auspicious</span></td>
-          <td>Optimal for financial investments, contracts, fundraising, and banking.</td>
-        </tr>
-        <tr>
-          <td><strong>3. Vipat Tara</strong> (Danger)</td>
-          <td>Chitra &middot; Dhanishta &middot; Mrigashira</td>
-          <td><span class="badge-avoid">Strictly Avoid</span></td>
-          <td>High risk of sudden disputes, technical glitches, and contractual reversals.</td>
-        </tr>
-        <tr>
-          <td><strong>4. Kshema Tara</strong> (Wellbeing)</td>
-          <td>Swati &middot; Shatabhisha &middot; Ardra</td>
-          <td><span class="badge-auspicious">Highly Favorable</span></td>
-          <td>Property purchases, medical operations, recovery protocols, team onboarding.</td>
-        </tr>
-        <tr>
-          <td><strong>5. Pratyak Tara</strong> (Obstacle)</td>
-          <td>Vishakha &middot; Purva Bhadrapada &middot; Punarvasu</td>
-          <td><span class="badge-avoid">Avoid Initiations</span></td>
-          <td>Encountering stubborn bureaucratic delays, regulatory pushback, or denial.</td>
-        </tr>
-        <tr>
-          <td><strong>6. Sadhana Tara</strong> (Realization)</td>
-          <td>Anuradha &middot; Uttara Bhadrapada &middot; Pushya</td>
-          <td><span class="badge-auspicious">Supreme Mastery</span></td>
-          <td>Mastery of complex coding, legal settlements, strategic product launches.</td>
-        </tr>
-        <tr>
-          <td><strong>7. Naidhana Tara</strong> (Destruction)</td>
-          <td>Jyeshtha &middot; Revati &middot; Ashlesha</td>
-          <td><span class="badge-avoid">Lethal Vulnerability</span></td>
-          <td>Severe risk of total loss or ruin. Zero commercial commitments permitted.</td>
-        </tr>
-        <tr>
-          <td><strong>8. Mitra Tara</strong> (Friendship)</td>
-          <td>Mula &middot; Ashwini &middot; Magha</td>
-          <td><span class="badge-auspicious">Benefic Harmony</span></td>
-          <td>Signing strategic partnerships, creative collaborations, social networking.</td>
-        </tr>
-        <tr>
-          <td><strong>9. Parama Mitra</strong> (Great Friend)</td>
-          <td>Purva Ashadha &middot; Bharani &middot; Purva Phalguni</td>
-          <td><span class="badge-auspicious">Supreme Blessing</span></td>
-          <td>High-level executive negotiations, major real estate acquisitions, marriage.</td>
-        </tr>
+        ${taraTableRows}
       </tbody>
     </table>
 
     <div class="luxury-card" style="border-left:3px solid var(--teal-bright);">
-      <div class="kicker" style="color:var(--teal-bright);">TARA BALA CALCULATION RULE FOR MUKUL</div>
+      <div class="kicker" style="color:var(--teal-bright);">TARA BALA CALCULATION RULE FOR ${subjectName.toUpperCase()}</div>
       <p class="body-text" style="font-size:10px;">
-        Count from your Janma Nakshatra (Uttara Phalguni = 1) to the day's transit Moon Nakshatra, and divide by 9. The remainder corresponds to Taras 1 through 9. Whenever remainder is <strong>2, 4, 6, 8, or 9</strong>, the cosmic current is affirmatively supportive. When remainder is <strong>3, 5, or 7</strong>, pause all major capital commitments.
+        Count from your Janma Nakshatra (${nakshatra} = 1) to the day's transit Moon Nakshatra, and divide by 9. The remainder corresponds to Taras 1 through 9. Whenever remainder is <strong>2, 4, 6, 8, or 9</strong>, the cosmic current is affirmatively supportive. When remainder is <strong>3, 5, or 7</strong>, pause all major capital commitments.
       </p>
     </div>
   </div>
@@ -673,24 +674,24 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="kicker">LUNI-SOLAR TRANSIT DYNAMICS</div>
     <h2 class="display-l" style="margin-bottom:6px;">Chandra Bala: The Daily Lunar Shield</h2>
     <p class="body-text" style="margin-bottom:12px;">
-      <em>Chandra Bala</em> (Lunar Strength) is the single most vital daily diagnostic. The transit Moon must occupy an auspicious position relative to your natal Moon (Leo) on the day of action.
+      <em>Chandra Bala</em> (Lunar Strength) is the single most vital daily diagnostic. The transit Moon must occupy an auspicious position relative to your natal Moon (${moonRashi}) on the day of action.
     </p>
 
     <!-- Chandra Bala Houses Grid -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div class="luxury-card" style="border:1.5px solid var(--emerald);background:rgba(16,185,129,0.06);">
-        <div class="kicker" style="color:var(--emerald-bright);">AUSPICIOUS CHANDRA BALA (HOUSES FROM LEO)</div>
+        <div class="kicker" style="color:var(--emerald-bright);">AUSPICIOUS CHANDRA BALA (FROM ${moonRashi.toUpperCase()})</div>
         <div style="font-size:12px;font-weight:700;color:var(--gold-bright);margin:4px 0;">1st, 3rd, 6th, 7th, 10th, 11th Signs</div>
         <p class="body-text" style="font-size:9.8px;">
-          When transit Moon passes through <strong>Leo (1st), Libra (3rd), Capricorn (6th), Aquarius (7th), Taurus (10th), or Gemini (11th)</strong>, mental resolve is sovereign, immune resilience peaks, and counterparties perceive you with authority and favor.
+          When transit Moon passes through <strong>${auspSigns}</strong>, mental resolve is sovereign, immune resilience peaks, and counterparties perceive you with authority and favor.
         </p>
       </div>
 
       <div class="luxury-card" style="border:1.5px solid var(--ruby);background:rgba(220,38,38,0.06);">
-        <div class="kicker" style="color:var(--ruby-bright);">DEFICIENT CHANDRA BALA (HOUSES FROM LEO)</div>
+        <div class="kicker" style="color:var(--ruby-bright);">DEFICIENT CHANDRA BALA (FROM ${moonRashi.toUpperCase()})</div>
         <div style="font-size:12px;font-weight:700;color:var(--ruby-bright);margin:4px 0;">2nd, 5th, 9th (Neutral) &middot; 4th, 8th, 12th (Avoid)</div>
         <p class="body-text" style="font-size:9.8px;">
-          When transit Moon enters <strong>Scorpio (4th), Pisces (8th), or Cancer (12th)</strong>, Chandra Bala is strictly compromised. The mind suffers from subconscious fog, reactive panic, or physical fatigue. Never sign irrevocable documents during 8th house lunar transit (<em>Ashtama Chandra</em>).
+          When transit Moon enters <strong>${defSigns}</strong>, Chandra Bala is strictly compromised. The mind suffers from subconscious fog, reactive panic, or physical fatigue. Never sign irrevocable documents during 8th house lunar transit (<em>Ashtama Chandra</em>).
         </p>
       </div>
     </div>
@@ -699,7 +700,7 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="luxury-card" style="border-left:3px solid var(--amber-bright);margin-bottom:12px;">
       <div class="card-title" style="color:var(--amber-bright);font-size:11px;">⚠️ THE ASHTAMA CHANDRA BLACKOUT PROTOCOL</div>
       <p class="body-text" style="font-size:10px;margin-top:2px;">
-        For your Leo Moon, <strong>transit Moon in Pisces (8th house)</strong> occurs every 27.3 days for approximately 54 hours. During these 2.25 days, your emotional nervous system is primed for cognitive distortion. Classical injunctions strictly forbid: (1) Filing legal petitions, (2) Deploying large capital lumpsums, (3) Undergoing elective surgery, or (4) Confronting adversaries. Treat Ashtama Chandra as an immutable maintenance window.
+        For your ${moonRashi} Moon, <strong>transit Moon in ${ashtamaSign} (8th house)</strong> occurs every 27.3 days for approximately 54 hours. During these 2.25 days, your emotional nervous system is primed for cognitive distortion. Classical injunctions strictly forbid: (1) Filing legal petitions, (2) Deploying large capital lumpsums, (3) Undergoing elective surgery, or (4) Confronting adversaries. Treat Ashtama Chandra as an immutable maintenance window.
       </p>
     </div>
 
@@ -711,7 +712,7 @@ export function generateGoldenMuhuratDossierHTML(
       <div class="luxury-card">
         <div class="kicker" style="color:var(--teal-bright);">NATAL RECEPTACLE ALIGNMENT</div>
         <p class="body-text" style="font-size:10px;">
-          With your Ascendant in Virgo and Moon in Leo (12th house), your constitutional decision-making is naturally reflective, strategic, and meticulous. Aligning important actions with <strong>Mercury-ruled or Venus-ruled Horas</strong> allows your Lagnesh (Mercury in Taurus) to execute with diamond clarity.
+          With your Ascendant in ${lagnaRashi} and Moon in ${moonRashi}, your constitutional decision-making is naturally reflective, strategic, and meticulous. Aligning important actions with <strong>${lagnesh}-ruled Horas</strong> allows your Lagnesh (${lagnesh}) to execute with diamond clarity.
         </p>
       </div>
     </div>
@@ -786,9 +787,9 @@ export function generateGoldenMuhuratDossierHTML(
     </table>
 
     <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
-      <div class="kicker" style="color:var(--emerald-bright);">DAILY EXECUTION PROTOCOL FOR MUKUL</div>
+      <div class="kicker" style="color:var(--emerald-bright);">DAILY EXECUTION PROTOCOL FOR ${subjectName.toUpperCase()}</div>
       <p class="body-text" style="font-size:10px;">
-        For your Virgo Ascendant, <strong>Mercury Horas and Venus Horas</strong> form your bilateral power nexus. Always schedule venture capital presentations, contract signatures, or software deployments within Mercury or Venus Horas on Wednesday, Thursday, or Friday for maximum friction-free adoption.
+        For your ${lagnaRashi} Ascendant, <strong>${lagnesh} Horas</strong> form your primary power nexus. Always schedule presentations, contract signatures, or critical milestone executions within ${lagnesh} Horas on ${sovereignInfo.day} for maximum friction-free momentum.
       </p>
     </div>
   </div>
@@ -926,9 +927,9 @@ export function generateGoldenMuhuratDossierHTML(
 
     <!-- The Classical Invariant -->
     <div class="luxury-card" style="border-left:3px solid var(--ruby-bright);">
-      <div class="kicker" style="color:var(--ruby-bright);">MUKUL'S MANDATORY RULE: NEVER SEND CONTRACTS IN WEDNESDAY RAHU KAAL</div>
+      <div class="kicker" style="color:var(--ruby-bright);">${subjectName.toUpperCase()}'S MANDATORY RULE: NEVER SEND CONTRACTS IN ${sovereignInfo.day.toUpperCase()} RAHU KAAL</div>
       <p class="body-text" style="font-size:10px;">
-        For your Virgo chart, Wednesday is your sovereign day (ruled by Lagnesh Mercury). However, Wednesday's <strong>Rahu Kaal spans precisely from 12:00 PM to 01:30 PM</strong>. Never dispatch high-value commercial agreements or investor term sheets during this 90-minute window, even though Wednesday itself is favorable.
+        For your ${lagnaRashi} chart, ${sovereignInfo.day} is your sovereign day (ruled by Lagnesh ${lagnesh}). However, ${sovereignInfo.day}'s <strong>Rahu Kaal spans precisely from ${sovereignInfo.rahuKaal}</strong>. Never dispatch high-value commercial agreements or investor term sheets during this 90-minute window, even though ${sovereignInfo.day} itself is favorable.
       </p>
     </div>
   </div>
@@ -1080,7 +1081,7 @@ export function generateGoldenMuhuratDossierHTML(
         <div class="kicker" style="color:var(--emerald-bright);">IDEAL LAGNAS FOR STARTUP LAUNCH</div>
         <div style="font-weight:700;font-size:11px;color:var(--gold-bright);margin:2px 0;">Fixed &amp; Dual Signs (Taurus, Gemini, Leo, Virgo)</div>
         <p class="body-text" style="font-size:9.5px;">
-          Taurus ensures financial stability and asset accumulation; Gemini and Virgo (ruled by your Lagnesh Mercury) empower software, IP, and high-frequency communication.
+          Fixed signs ensure financial stability and asset accumulation, while dual signs empower intellectual property, commerce, and strategic communications aligned with your ${lagnaRashi} Lagna.
         </p>
       </div>
 
@@ -1159,14 +1160,14 @@ export function generateGoldenMuhuratDossierHTML(
         <tr>
           <th>Crucial Shastric Filter</th>
           <th>Classical Shastra Rule</th>
-          <th>Status &amp; Verification for Mukul</th>
+          <th>Status &amp; Verification for ${subjectName}</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><strong>Guru &amp; Shukra Bala</strong></td>
           <td>Jupiter and Venus must be direct, not combust (Astha) or debilitated.</td>
-          <td><span class="badge-auspicious">Exalted Jupiter in Cancer (11th House)</span></td>
+          <td><span class="badge-auspicious">Exalted Jupiter in Cancer</span></td>
         </tr>
         <tr>
           <td><strong>7th House Shuddhi</strong></td>
@@ -1176,7 +1177,7 @@ export function generateGoldenMuhuratDossierHTML(
         <tr>
           <td><strong>Solar Month (Sankranti)</strong></td>
           <td>Avoid Khar Maas (Sun in Sagittarius or Pisces) and Chaturmas.</td>
-          <td><span class="badge-auspicious">Spring 2027 (Sun in Taurus/Aries/Gemini)</span></td>
+          <td><span class="badge-auspicious">Spring 2027 (Sun in Exalted Aries / Taurus)</span></td>
         </tr>
         <tr>
           <td><strong>Latta &amp; Pat Dosha</strong></td>
@@ -1193,7 +1194,7 @@ export function generateGoldenMuhuratDossierHTML(
         ✦ <strong>Gateway Alpha: 18 April 2027 &ndash; 26 April 2027 (Vaishakha Shukla Paksha)</strong><br/>
         Sun in exalted Aries, Jupiter exalted in Cancer aspecting 7th house, Moon in favorable Tara Bala. Exceeds all 10 Shastric Shuddhi tests.<br/>
         ✦ <strong>Gateway Beta: 12 May 2027 &ndash; 20 May 2027 (Jyeshtha Shukla Paksha)</strong><br/>
-        Rohini &amp; Hasta Nakshatras active; Venus strong in Taurus; flawless Chandra Bala for your Leo Moon.
+        Rohini &amp; Hasta Nakshatras active; Venus strong in Taurus; flawless Chandra Bala for your ${moonRashi} Moon.
       </div>
     </div>
 
@@ -1413,7 +1414,7 @@ export function generateGoldenMuhuratDossierHTML(
       <p class="body-text" style="font-size:10px;">
         When relocating across cities or continents (e.g., Delhi to London/Dubai/San Francisco):<br/>
         1. <strong>Depart during Fixed or Dual Lagna:</strong> Prevents sudden cancellation of residential visas or immediate return.<br/>
-        2. <strong>Avoid 12th House Moon transit days:</strong> For your Leo Moon, avoid departing on days when Moon transits Cancer (12th from Leo), as it generates subconscious disorientation in foreign lands.<br/>
+        2. <strong>Avoid 12th House Moon transit days:</strong> For your ${moonRashi} Moon, avoid departing on days when Moon transits ${twelfthFromMoon} (12th from ${moonRashi}), as it generates subconscious disorientation in foreign lands.<br/>
         3. <strong>Carry Natal Soil:</strong> Carry 1 small teaspoon of earth from your native ancestral soil wrapped in white cloth; release it into running water upon safe arrival.
       </p>
     </div>
@@ -1436,7 +1437,7 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="kicker">QUARTERLY DECISION CHRONOLOGY</div>
     <h2 class="display-l" style="margin-bottom:6px;">Q1 Auspicious Chronology: Strategic Foundation</h2>
     <p class="body-text" style="margin-bottom:12px;">
-      Deterministic electional calendar for Q1 (Jan &ndash; Mar). Filtered for your Virgo Ascendant, Leo Moon, and Uttara Phalguni Nakshatra to eliminate all personal <em>Vipat</em>, <em>Pratyak</em>, and <em>Naidhana</em> Taras.
+      Deterministic electional calendar for Q1 (Jan &ndash; Mar). Filtered for your ${lagnaRashi} Ascendant, ${moonRashi} Moon, and ${nakshatra} Nakshatra to eliminate all personal <em>Vipat</em>, <em>Pratyak</em>, and <em>Naidhana</em> Taras.
     </p>
 
     <!-- Q1 Table -->
@@ -1481,7 +1482,7 @@ export function generateGoldenMuhuratDossierHTML(
         </tr>
         <tr>
           <td><strong>12 Mar 2027</strong> (Fri)</td>
-          <td>Shukla Panchami &middot; Bharani</td>
+          <td>Shukla Panchami &middot; Rohini</td>
           <td>09:30 AM &ndash; 11:00 AM (Venus Hora)</td>
           <td>Filing patents, registering international trademark IP</td>
           <td><span class="badge-auspicious">Parama Mitra (95/100)</span></td>
@@ -1576,7 +1577,7 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
       <div class="kicker" style="color:var(--emerald-bright);">AKSHAYA TRITIYA 2027: YOUR HIGHEST COMMERCIAL LEVERAGE POINT</div>
       <p class="body-text" style="font-size:10px;">
-        On <strong>Sunday, 09 May 2027 (Akshaya Tritiya)</strong>, both Sun and Moon align in supreme shastric dignity (Vaishakha Shukla Tritiya with Moon in Rohini, your Sampat Tara 2). Any enterprise, investment, or long-term foundation established on this morning carries the classical blessing of <em>Akshaya</em> (Imperishable / Never-Decaying). Allocate your single highest-conviction business or property milestone to this exact window.
+        On <strong>Sunday, 09 May 2027 (Akshaya Tritiya)</strong>, both Sun (Exalted in Aries) and Moon (Exalted in Taurus &middot; Rohini) align in supreme shastric dignity (Vaishakha Shukla Tritiya). Any enterprise, investment, or long-term foundation established on this morning carries the classical blessing of <em>Akshaya</em> (Imperishable / Never-Decaying). Allocate your single highest-conviction business or property milestone to this exact window.
       </p>
     </div>
   </div>
@@ -1940,17 +1941,17 @@ export function generateGoldenMuhuratDossierHTML(
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
       <div class="luxury-card" style="padding:8px 10px;">
         <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">1. Check Tara Bala First</div>
-        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">Never act during 3rd (Vipat), 5th (Pratyak), or 7th (Naidhana) Tara from Uttara Phalguni.</p>
+        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">Never act during 3rd (Vipat), 5th (Pratyak), or 7th (Naidhana) Tara from ${nakshatra}.</p>
       </div>
 
       <div class="luxury-card" style="padding:8px 10px;">
         <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">2. Verify Chandra Bala</div>
-        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">Never sign irrevocable contracts when Moon is in Pisces (8th house from natal Leo Moon).</p>
+        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">Never sign irrevocable contracts when Moon is in ${ashtamaSign} (8th house from natal ${moonRashi} Moon).</p>
       </div>
 
       <div class="luxury-card" style="padding:8px 10px;">
         <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">3. Block Out Rahu Kaal</div>
-        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">Maintain an immutable calendar blocker for daily 90-minute Rahu Kaal (Wed 12:00&ndash;1:30 PM).</p>
+        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">Maintain an immutable calendar blocker for daily 90-minute Rahu Kaal (${sovereignInfo.day} ${sovereignInfo.rahuKaal}).</p>
       </div>
 
       <div class="luxury-card" style="padding:8px 10px;">
@@ -1964,8 +1965,8 @@ export function generateGoldenMuhuratDossierHTML(
       </div>
 
       <div class="luxury-card" style="padding:8px 10px;">
-        <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">6. Select Mercury/Venus Horas</div>
-        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">For your Virgo Ascendant, Mercury and Venus Horas catalyze commercial agreements.</p>
+        <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">6. Select ${lagnesh} Horas</div>
+        <p style="font-size:9px;color:var(--ivory-dim);margin-top:2px;">For your ${lagnaRashi} Ascendant, ${lagnesh} Horas catalyze key commercial agreements.</p>
       </div>
 
       <div class="luxury-card" style="padding:8px 10px;">
@@ -2009,7 +2010,7 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="kicker">RAPID DESK REFERENCE</div>
     <h2 class="display-l" style="margin-bottom:6px;">Master 1-Page Golden Muhurat Cheat Sheet</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Instant decision matrix synthesized for <strong>${subjectName}</strong> (Virgo Ascendant &middot; Leo Moon &middot; Uttara Phalguni).
+      Instant decision matrix synthesized for <strong>${subjectName}</strong> (${lagnaRashi} Ascendant &middot; ${moonRashi} Moon &middot; ${nakshatra}).
     </p>
 
     <!-- Master Matrix Table -->
@@ -2024,13 +2025,13 @@ export function generateGoldenMuhuratDossierHTML(
       </thead>
       <tbody>
         <tr>
-          <td><strong>Tech &amp; AI Deployments</strong></td>
-          <td>Wed &middot; Mercury Hora &middot; Hasta/Revati</td>
-          <td>Wed 12:00&ndash;1:30 PM (Rahu Kaal)</td>
-          <td>Deploy code during Labha Chaughadia</td>
+          <td><strong>Tech &amp; Strategic Deployments</strong></td>
+          <td>${sovereignInfo.day} &middot; ${lagnesh} Hora</td>
+          <td>${sovereignInfo.day} ${sovereignInfo.rahuKaal}</td>
+          <td>Deploy during Shubh/Labha Chaughadia</td>
         </tr>
         <tr>
-          <td><strong>VC Fundraising / Term Sheets</strong></td>
+          <td><strong>Financial Allocation / Term Sheets</strong></td>
           <td>Thu &middot; Jupiter Hora &middot; Pushya/Shravana</td>
           <td>Tuesday Mars Horas &middot; Rikta Tithis</td>
           <td>Sign during midday Abhijit Window</td>
@@ -2038,7 +2039,7 @@ export function generateGoldenMuhuratDossierHTML(
         <tr>
           <td><strong>Commercial Contracts</strong></td>
           <td>Fri &middot; Venus Hora &middot; Rohini/Swati</td>
-          <td>Moon in Pisces (Ashtama Chandra)</td>
+          <td>Moon in ${ashtamaSign} (Ashtama Chandra)</td>
           <td>Dip pen/finger in saffron water</td>
         </tr>
         <tr>
@@ -2066,8 +2067,8 @@ export function generateGoldenMuhuratDossierHTML(
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;">
       <div class="luxury-card" style="border-top:2px solid var(--emerald-bright);padding:6px 8px;">
         <div class="kicker" style="color:var(--emerald-bright);">POWER DAY</div>
-        <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">Wednesday</div>
-        <div style="font-size:8px;color:var(--ivory-dim);">Mercury Lagnesh</div>
+        <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">${sovereignInfo.day}</div>
+        <div style="font-size:8px;color:var(--ivory-dim);">${lagnesh} Lagnesh</div>
       </div>
       <div class="luxury-card" style="border-top:2px solid var(--teal-bright);padding:6px 8px;">
         <div class="kicker" style="color:var(--teal-bright);">POWER WINDOW</div>
@@ -2076,7 +2077,7 @@ export function generateGoldenMuhuratDossierHTML(
       </div>
       <div class="luxury-card" style="border-top:2px solid var(--ruby-bright);padding:6px 8px;">
         <div class="kicker" style="color:var(--ruby-bright);">BLACKOUT MOON</div>
-        <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">Moon in Pisces</div>
+        <div style="font-weight:700;font-size:10.5px;color:var(--gold-bright);">Moon in ${ashtamaSign}</div>
         <div style="font-size:8px;color:var(--ivory-dim);">8th House Void</div>
       </div>
       <div class="luxury-card" style="border-top:2px solid var(--purple-bright);padding:6px 8px;">
