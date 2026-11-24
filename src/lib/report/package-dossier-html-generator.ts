@@ -28,6 +28,7 @@ import { generateSpaceDestinyDossierHTML } from "./generators/space-destiny-doss
 import { generateStockTradingDossierHTML } from "./generators/stock-trading-dossier-generator";
 import { generateJaiminiSoulDossierHTML } from "./generators/jaimini-soul-dossier-generator";
 import { generateAyurvedicMedicalDossierHTML } from "./generators/ayurvedic-medical-dossier-generator";
+import { generateGoldenMuhuratDossierHTML } from "./generators/golden-muhurat-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -218,6 +219,18 @@ export function generatePackageDossierHTML(
     reportId.includes("tridosha")
   ) {
     return generateAyurvedicMedicalDossierHTML(chart, options);
+  }
+
+  if (
+    reportId.includes("muhurat") ||
+    reportId.includes("panchang") ||
+    reportId.includes("decision") ||
+    reportId.includes("electional") ||
+    reportId.includes("auspicious") ||
+    reportId.includes("pkg_muhurat_panchang") ||
+    reportId.includes("timing")
+  ) {
+    return generateGoldenMuhuratDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
