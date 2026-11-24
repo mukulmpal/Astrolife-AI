@@ -27,6 +27,7 @@ import { generateBioVedicRemediesDossierHTML } from "./generators/bio-vedic-reme
 import { generateSpaceDestinyDossierHTML } from "./generators/space-destiny-dossier-generator";
 import { generateStockTradingDossierHTML } from "./generators/stock-trading-dossier-generator";
 import { generateJaiminiSoulDossierHTML } from "./generators/jaimini-soul-dossier-generator";
+import { generateAyurvedicMedicalDossierHTML } from "./generators/ayurvedic-medical-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -205,6 +206,18 @@ export function generatePackageDossierHTML(
     reportId.includes("karaka")
   ) {
     return generateJaiminiSoulDossierHTML(chart, options);
+  }
+
+  if (
+    reportId.includes("medical") ||
+    reportId.includes("ayurved") ||
+    reportId.includes("vitality") ||
+    reportId.includes("health") ||
+    reportId.includes("pkg_ayurvedic_medical") ||
+    reportId.includes("dosha") ||
+    reportId.includes("tridosha")
+  ) {
+    return generateAyurvedicMedicalDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");

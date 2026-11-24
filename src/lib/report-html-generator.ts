@@ -782,7 +782,8 @@ function reportEditionLabel(type: ReportType): string {
   return labels[type] ?? "Premium";
 }
 
-function page1Wheel(chart: ChartData, editionLabel: string): string {
+function page1Wheel(chart: ChartData, editionLabel: string, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const sunSign  = chart.planets["Sun"]?.sign  ?? "";
   const moonSign = chart.planets["Moon"]?.sign ?? "";
   const sunGlyph  = SIGN_GLYPH[sunSign]  ?? "";
@@ -840,16 +841,16 @@ function page1Wheel(chart: ChartData, editionLabel: string): string {
       </svg>
       <span class="cover-wordmark">AstroLife</span>
     </div>
-    <div class="kicker" style="color:var(--gold-dim)">Vol. I · MMXXVI</div>
+    <div class="kicker" style="color:var(--gold-dim)">${isHi ? "खण्ड १ · संवत् २०८२" : "Vol. I · MMXXVI"}</div>
   </div>
 
   <!-- Center stage -->
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:3;">
-    <div class="eyebrow" style="margin-bottom:24px;opacity:0.7;">Personalised Vedic Intelligence</div>
+    <div class="eyebrow" style="margin-bottom:24px;opacity:0.7;">${isHi ? "व्यक्तिगत वैदिक प्रज्ञा विश्लेषण" : "Personalised Vedic Intelligence"}</div>
     <div style="text-align:center;">
-      <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:108px;line-height:0.92;letter-spacing:-0.025em;color:var(--ivory);">Your</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:128px;line-height:0.9;letter-spacing:-0.03em;color:var(--gold-bright);margin-top:-6px;">Cosmic</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:108px;line-height:0.92;letter-spacing:-0.025em;color:var(--ivory);">Blueprint</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:108px;line-height:0.92;letter-spacing:-0.025em;color:var(--ivory);">${isHi ? "आपकी" : "Your"}</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:128px;line-height:0.9;letter-spacing:-0.03em;color:var(--gold-bright);margin-top:-6px;">${isHi ? "जन्म कुंडली" : "Cosmic"}</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:108px;line-height:0.92;letter-spacing:-0.025em;color:var(--ivory);">${isHi ? "महा-विश्लेषण" : "Blueprint"}</div>
     </div>
     <div style="display:flex;align-items:center;gap:18px;margin-top:40px;">
       <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold));"></div>
@@ -859,30 +860,30 @@ function page1Wheel(chart: ChartData, editionLabel: string): string {
       </svg>
       <div style="width:80px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);"></div>
     </div>
-    <div class="serif-italic" style="font-size:18px;color:var(--ivory-mute);margin-top:24px;">prepared exclusively for</div>
+    <div class="serif-italic" style="font-size:18px;color:var(--ivory-mute);margin-top:24px;">${isHi ? "विशेष रूप से निर्मित" : "prepared exclusively for"}</div>
     <div style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:46px;color:var(--ivory);margin-top:8px;letter-spacing:0.005em;">${esc(capitalize(chart.name))}</div>
-    <div class="mono" style="font-size:11px;color:var(--gold);letter-spacing:0.24em;text-transform:uppercase;margin-top:8px;">${lagnaGlyph} &nbsp; ${esc(chart.lagnaRashi)} Ascendant &nbsp;·&nbsp; ${sunGlyph} &nbsp; ${esc(sunSign)} Sun &nbsp;·&nbsp; ${moonGlyph} &nbsp; ${esc(moonSign)} Moon</div>
+    <div class="mono" style="font-size:11px;color:var(--gold);letter-spacing:0.24em;text-transform:uppercase;margin-top:8px;">${lagnaGlyph} &nbsp; ${esc(chart.lagnaRashi)} ${isHi ? "लग्न" : "Ascendant"} &nbsp;·&nbsp; ${sunGlyph} &nbsp; ${esc(sunSign)} ${isHi ? "सूर्य" : "Sun"} &nbsp;·&nbsp; ${moonGlyph} &nbsp; ${esc(moonSign)} ${isHi ? "चंद्र" : "Moon"}</div>
   </div>
 
   <!-- Bottom block -->
   <div style="position:relative;z-index:3;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px;padding-top:24px;border-top:1px solid var(--line);">
     <div>
-      <div class="kicker" style="margin-bottom:6px;">Born</div>
+      <div class="kicker" style="margin-bottom:6px;">${isHi ? "जन्म" : "Born"}</div>
       <div class="serif-italic" style="font-size:16px;color:var(--ivory);">${esc(chart.dob)}</div>
       <div class="mono" style="font-size:10.5px;color:var(--ivory-mute);margin-top:2px;">${esc(chart.tob)}</div>
     </div>
     <div>
-      <div class="kicker" style="margin-bottom:6px;">Place</div>
+      <div class="kicker" style="margin-bottom:6px;">${isHi ? "स्थान" : "Place"}</div>
       <div class="serif-italic" style="font-size:16px;color:var(--ivory);">${esc(chart.city)}</div>
       <div class="mono" style="font-size:10.5px;color:var(--ivory-mute);margin-top:2px;">${chart.lat.toFixed(2)}°N · ${chart.lon.toFixed(2)}°E</div>
     </div>
     <div>
-      <div class="kicker" style="margin-bottom:6px;">Issued</div>
+      <div class="kicker" style="margin-bottom:6px;">${isHi ? "निर्गमन" : "Issued"}</div>
       <div class="serif-italic" style="font-size:16px;color:var(--ivory);">${today}</div>
       <div class="mono" style="font-size:10.5px;color:var(--ivory-mute);margin-top:2px;">v2 · AstroLife</div>
     </div>
     <div style="text-align:right;">
-      <div class="kicker" style="margin-bottom:6px;">Edition</div>
+      <div class="kicker" style="margin-bottom:6px;">${isHi ? "संस्करण" : "Edition"}</div>
       <div class="serif-italic" style="font-size:16px;color:var(--gold-bright);">${esc(editionLabel)}</div>
       <div class="mono" style="font-size:10.5px;color:var(--gold);margin-top:2px;">AL · 2026</div>
     </div>
@@ -1074,7 +1075,36 @@ function page1LagnaLord(chart: ChartData, editionLabel: string): string {
 
 // ── Page 2: Welcome Letter ────────────────────────────────────────────────
 
-function page2Welcome(): string {
+function page2Welcome(lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
+  if (isHi) {
+    return `<section class="page cream">
+  ${pageRail("आपके ज्योतिषी का संदेश", "2", true)}
+
+  <div style="flex:1;padding-top:36px;">
+    <div class="eyebrow" style="margin-bottom:14px;">स्वागतम्</div>
+    <div class="display-m" style="color:#1A1F3A;margin-bottom:24px;">एक व्यक्तिगत संदेश</div>
+
+    <div class="foreword-col dropcap body" style="font-size:14px;line-height:1.72;">
+      <p>आपके हाथों में जो यह दस्तावेज प्रस्तुत है, वह कोई अंधविश्वास या कोरी भविष्यवाणी नहीं है। यह एक दर्पण है—उस क्षण की खगोलीय स्थिति का दर्पण जब आपने इस पृथ्वी पर अपनी पहली सांस ली थी।</p>
+      <p>वैदिक ज्योतिष (ज्योतिष शास्त्र) वेदों के छह मुख्य अंगों में से एक है—जिन्हें <em>वेदांग</em> कहा जाता है। इसे वेदों का 'नेत्र' माना गया है। इसका उद्देश्य कभी किसी को डराना या व्यर्थ प्रसन्न करना नहीं रहा; इसका वास्तविक उद्देश्य जीवन के अदृश्य कर्मिक सूत्रों को चेतना के प्रकाश में लाना है, ताकि हम अपने जीवन को समझ सकें और आवश्यकता पड़ने पर सही दिशा में आगे बढ़ सकें।</p>
+      <p>आपकी जन्मपत्रिका पूर्णतः अद्वितीय है। संसार के आठ अरब मनुष्यों में किसी भी दो व्यक्तियों के ग्रह, लग्न और जन्म-संस्कार एक समान नहीं होते। इस रिपोर्ट में आपके दिए गए जन्म विवरण के आधार पर सटीक गणितीय गणनाएं की गई हैं।</p>
+      <p>इस रिपोर्ट के पृष्ठ आपके जीवन को विभिन्न परतों में उजागर करते हैं—आधारभूत लग्न चक्र, ग्रहों की स्थिति, विंशोत्तरी महादशा का समय चक्र, मनोवैज्ञानिक प्रवृत्तियां, पूर्व संचित कर्म ऋण, तथा परंपरा द्वारा बताए गए अत्यंत व्यावहारिक और सात्विक उपाय।</p>
+      <p>ज्योतिष संभावनाओं और प्रवृत्तियों की भाषा है, किसी अपरिवर्तनीय भाग्य की नहीं। ग्रह संकेत देते हैं, बाध्य नहीं करते। आपका विवेक, आपके सचेत निर्णय और आपका पुरुषार्थ ही आपके जीवन की सर्वोच्च शक्ति हैं।</p>
+      <p>इसे शांत मन से पढ़ें। जीवन के विभिन्न पड़ावों पर इसका पुनः अवलोकन करें। समय के साथ इसके सूत्र और भी स्पष्ट होते जाएंगे।</p>
+      <p>वैदिक ऋषियों की इस पवित्र परंपरा के प्रति कृतज्ञता और आपके उज्ज्वल भविष्य की मंगलकामना सहित—</p>
+    </div>
+
+    <div style="margin-top:32px;padding-top:20px;border-top:1px solid rgba(26,31,58,0.15);">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:#1A1F3A;">आपका ज्योतिषी</div>
+      <div class="kicker" style="color:#8C7440;margin-top:6px;">AstroLife · वैदिक प्रज्ञा तंत्र</div>
+    </div>
+  </div>
+
+  ${pageFoot("astrolife · cosmic blueprint", "संदेश")}
+</section>`;
+  }
+
   return `<section class="page cream">
   ${pageRail("A Letter from Your Astrologer", "2", true)}
 
@@ -1104,7 +1134,32 @@ function page2Welcome(): string {
 
 // ── Page 3: Foreword ──────────────────────────────────────────────────────
 
-function page3Foreword(): string {
+function page3Foreword(lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
+  if (isHi) {
+    return `<section class="page cream">
+  ${pageRail("ज्योतिष, कर्म एवं वैदिक उपाय", "3", true)}
+
+  <div style="flex:1;padding-top:36px;">
+    <div class="eyebrow" style="margin-bottom:14px;">प्रस्तावना</div>
+    <div class="display-m" style="color:#1A1F3A;margin-bottom:6px;">ज्योतिष: <span style="font-style:italic;color:#8C7440;">कला</span> एवं <span style="font-style:italic;color:#8C7440;">विज्ञान</span></div>
+    <div class="body" style="font-size:13.5px;color:rgba(26,31,58,0.6);margin-bottom:24px;max-width:480px;">वैदिक ज्योतिष के मूल सिद्धांतों को समझने और रिपोर्ट के सही उपयोग के लिए एक संक्षिप्त दिग्दर्शन।</div>
+
+    <hr style="border:none;height:1px;background:rgba(26,31,58,0.15);margin-bottom:24px;"/>
+
+    <div class="foreword-col body" style="font-size:13.5px;line-height:1.72;">
+      <p><strong>कर्म का सिद्धांत:</strong> 'कर्म' का सीधा अर्थ है क्रिया और उसका अपरिहार्य फल। जन्म कुंडली वस्तुतः <em>प्रारब्ध कर्म</em> का एक मानचित्र है—अर्थात हमारे संचित कर्मों का वह भाग जो इस वर्तमान जीवन में फल देने के लिए सक्रिय हुआ है। यह संपूर्ण कर्म नहीं, बल्कि वर्तमान का अध्याय है।</p>
+      <p><strong>ग्रह सजीव चेतना के प्रतीक:</strong> नवग्रह केवल अंतरिक्ष में चक्कर लगाते पत्थर नहीं हैं। वैदिक दृष्टि में वे चेतन सिद्धांतों के प्रत्यक्ष प्रतीक हैं। सूर्य आत्मा, तेज और पिता का कारक है। चंद्र मन, भावना और माता का कारक है। प्रत्येक ग्रह जीवन की किसी विशिष्ट ऊर्जा का संचालन करता है।</p>
+      <p><strong>वैदिक उपाय (उपचार):</strong> संस्कृत में 'उपाय' का अर्थ है किसी बाधा को पार करने का साधन। वैदिक उपाय सहस्रों वर्षों के सूक्ष्म प्रेक्षणों पर आधारित हैं। विशिष्ट ध्वनि (मंत्र), धातु, रंग, अन्न दान और आचरण में सुधार ग्रहों की सूक्ष्म तरंगों के साथ सकारात्मक सामंजस्य स्थापित करते हैं।</p>
+      <p><strong>लाल किताब का व्यावहारिक पक्ष:</strong> इस रिपोर्ट में शास्त्रीय पराशरी ज्योतिष के साथ लाल किताब के व्यावहारिक सूत्रों को भी जोड़ा गया है। इसके सरल घरेलू उपाय, वास्तु सुधार और नैतिक नियम आम जनजीवन में सहजता से लागू किए जा सकते हैं।</p>
+      <p><strong>रिपोर्ट का सदुपयोग:</strong> इसे निष्क्रिय होकर न पढ़ें, बल्कि एक सजग मित्र की तरह समझें। जो बातें आपके जीवन के अनुभवों से मेल खाती हैं, उन पर गहराई से विचार करें। यह रिपोर्ट किसी भविष्य के अंत का नहीं, बल्कि आत्म-जागृति की नई शुरुआत का प्रतीक है।</p>
+    </div>
+  </div>
+
+  ${pageFoot("astrolife · cosmic blueprint", "प्रस्तावना")}
+</section>`;
+  }
+
   return `<section class="page cream">
   ${pageRail("On Astrology, Karma & Remedies", "3", true)}
 
@@ -1174,9 +1229,19 @@ function page4TOC(type: ReportType, include: {
   functionalDebilityGuard?: boolean;
   lineageKarma?: boolean;
   jyotirlingaPilgrimage?: boolean;
-}): string {
-  const edition = reportEditionLabel(type);
-  const strategicRows = [
+}, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
+  const edition = isHi ? "एलीट संस्करण" : reportEditionLabel(type);
+  const strategicRows = isHi ? [
+    { title: "प्रारब्ध सारांश (Destiny Snapshot)", meta: "कार्यकारी सारांश, मुख्य अंक और जीवन के केंद्रीय सूत्र", show: true },
+    { title: "सार्वभौमिक प्रज्ञा स्कोरबोर्ड", meta: "करियर, संपत्ति, संबंध, स्वास्थ्य और आत्मिक शक्ति का समग्र मूल्यांकन", show: include.intelligenceScoreboardV4 },
+    { title: "जीवन चक्र व प्रतिरूप डिकोडर", meta: "प्रमुख कर्मिक पैटर्न, आत्मविश्वास और व्यावहारिक समाधान", show: include.lifePatternV4 },
+    { title: "जीवन के महत्वपूर्ण अध्याय", meta: "आयु-वार चरण, समय चक्र और व्यावहारिक मार्गदर्शन", show: include.lifeChaptersV4 },
+    { title: "प्रज्ञा डाइजेस्ट्स", meta: "जीवन के मुख्य आयामों के केंद्रित विश्लेषक पृष्ठ", show: include.narrativeDigestsV4 },
+    { title: "जीवन लक्ष्य एवं अवसर", meta: "उद्देश्य, करियर, धन और विदेश यात्रा के योग", show: include.lifeMissionV4 || include.opportunityV4 },
+    { title: "गणना एवं शास्त्रीय साक्ष्य", meta: "विश्वास स्कोर, प्रमाण तर्क और फलित के शास्त्रीय आधार", show: include.confidenceMethodologyV4 },
+    { title: "आगामी 90 दिनों की कार्ययोजना", meta: "सटीक निर्णय योजना, सतर्कता और शुभ समय सारिणी", show: include.next90DaysV4 },
+  ].filter((row) => row.show) : [
     { title: "Destiny Snapshot", meta: "Executive summary, key scores and fused life themes", show: true },
     { title: "Universal Scoreboard", meta: "Career, wealth, relationship, vitality and spiritual scores", show: include.intelligenceScoreboardV4 },
     { title: "Life Pattern Decoder", meta: "Dominant patterns, confidence, reasoning and actions", show: include.lifePatternV4 },
@@ -1186,7 +1251,15 @@ function page4TOC(type: ReportType, include: {
     { title: "Why This Report Says This", meta: "Confidence method, evidence logic and score reasoning", show: include.confidenceMethodologyV4 },
     { title: "Next 90 Days Action Plan", meta: "Decision plan, careful choices and practical timing", show: include.next90DaysV4 },
   ].filter((row) => row.show);
-  const chartRows = [
+
+  const chartRows = isHi ? [
+    { title: "जन्म चक्र विवरण", meta: "आधारभूत लग्न कुंडली, ग्रह स्थिति और गणितीय आधार", show: true },
+    { title: "ग्रह स्थिति डैशबोर्ड", meta: "ग्रह बल, अवस्था, दृष्टि एवं भाव सक्रियता", show: true },
+    { title: "ग्रह व भाव गहन विश्लेषण", meta: "समस्त 9 ग्रहों और 12 भावों का विस्तृत फलकथन", show: include.perPlanet || include.perHouse },
+    { title: "योग, दोष एवं षड्बल", meta: "राजयोग, मांगलिक/दोष विश्लेषण और ग्रहों की शक्ति", show: include.doshas || include.shadbala },
+    { title: "वर्ग कुंडलियां एवं अष्टकवर्ग", meta: "नवमांश (D9), दशमांश (D10) और बिंदु-आधारित शुभता", show: include.divisional || include.ashtakavarga },
+    { title: "विंशोत्तरी महादशा एवं अंतर्दशा", meta: "समय चक्र, वर्तमान दशा और भावी अनुकूल समय", show: include.dasha },
+  ].filter((row) => row.show) : [
     { title: "Birth Snapshot", meta: "Core chart, lagna, planets and calculation base", show: true },
     { title: "Planetary Dashboard", meta: "Graha strength, dignity and house activation", show: true },
     { title: "Planet & House Deep Dive", meta: "Detailed interpretation for grahas and bhavas", show: include.perPlanet || include.perHouse },
@@ -1194,7 +1267,16 @@ function page4TOC(type: ReportType, include: {
     { title: "Divisional & Ashtakavarga", meta: "D9/D10 and bindu-based support signals", show: include.divisional || include.ashtakavarga },
     { title: "Dasha & Antardasha", meta: "Timing periods, current phase and future windows", show: include.dasha },
   ].filter((row) => row.show);
-  const premiumRows = [
+
+  const premiumRows = isHi ? [
+    { title: "लाल किताब एवं वैदिक उपाय", meta: "ग्रह-वार व्यावहारिक उपाय और आचरण सुधार", show: include.lalkitab || include.remedies },
+    { title: "गोचर एवं इवेंट रडार", meta: "चंद्र-आधारित तात्कालिक गोचर और आने वाले महत्वपूर्ण प्रभाव", show: include.transitRadar || include.transitRipple },
+    { title: "जैमिनी, केपी एवं सर्वतोभद्र", meta: "विशिष्ट शास्त्रीय सूत्रों का सरल और स्पष्ट विश्लेषण", show: include.jaimini || include.kp || include.sarvatobhadra },
+    { title: "वास्तु, नाद-स्वर एवं रत्न परामर्श", meta: "पर्यावरण ऊर्जा, राग चिकित्सा और अनुकूल रत्न दिशा-निर्देश", show: include.vastu || include.astroSound || include.gemstone },
+    { title: "विवाह एवं संबंध प्रज्ञा", meta: "विवाह समय, मंगल दोष प्रभाव और भावनात्मक अनुकूलता", show: include.marriageTimingFusion || include.marriageIntel || include.relationshipIntel },
+    { title: "क्लिनिकल एवं प्रेडिक्टिव खंड", meta: "F&O जोखिम, 12वां भाव गुप्त धन, D10 करियर, स्वास्थ्य, शिवलिंग व कुलदेवता", show: Boolean(include.tradingRisk || include.transitShivling || include.lineageKarma) },
+    { title: "एस्ट्रोलाइफ शास्त्रीय परामर्श", meta: "अंतिम निष्कर्ष, अगला कदम और सावधानियां", show: include.advisorV4 },
+  ].filter((row) => row.show) : [
     { title: "Lal Kitab & Remedies", meta: "Planet-wise practical remedies and behavior corrections", show: include.lalkitab || include.remedies },
     { title: "Transit & Event Radar", meta: "Moon-first timing, ripple view and upcoming patterns", show: include.transitRadar || include.transitRipple },
     { title: "Jaimini, KP & Sarvatobhadra", meta: "Technical engines translated into plain guidance", show: include.jaimini || include.kp || include.sarvatobhadra },
@@ -1203,56 +1285,62 @@ function page4TOC(type: ReportType, include: {
     { title: "Clinical & Predictive Dossier", meta: "F&O risk, 12H secret wealth, D10 specifier, health timing, Shivling & Kula Devata", show: Boolean(include.tradingRisk || include.transitShivling || include.lineageKarma) },
     { title: "AstroLife Shastric Advisor", meta: "Final synthesis, next steps and careful guidance", show: include.advisorV4 },
   ].filter((row) => row.show);
-  const eliteRows = [
+
+  const eliteRows = isHi ? [
+    { title: "एलीट शास्त्रीय संश्लेषण", meta: "समस्त प्रणालियों का अंतिम स्कोर और संश्लेषित निष्कर्ष", show: include.eliteSynthesis },
+    { title: "सामुद्रिक शास्त्र व हस्तरेखा समन्वय", meta: "हस्तरेखा + जन्म कुंडली + दशा + अंकशास्त्र का एकीकरण", show: include.palmistryFusion },
+    { title: "विद्वान ज्योतिषी समीक्षा", meta: "वरिष्ठ ज्योतिषी द्वारा सत्यापन एवं व्यक्तिगत परामर्श", show: include.astrologerReview },
+  ].filter((row) => row.show) : [
     { title: "Elite Synthesis", meta: "Premium cross-engine intelligence and final score", show: include.eliteSynthesis },
     { title: "Palmistry Fusion", meta: "Palm + Kundli + Dasha + Numerology alignment", show: include.palmistryFusion },
     { title: "Real Astrologer Review", meta: "Elite handoff page for expert consultation", show: include.astrologerReview },
   ].filter((row) => row.show);
+
   const enginePartName: Record<ReportType, string> = {
-    basic: "Guidance Layer",
-    premium: "Premium Engines",
-    elite: "Premium Engines",
-    full: "Premium Engines",
-    kundli: "Kundli Engines",
-    remedy: "Remedy Guidance",
-    medical: "Health Guidance",
-    destiny: "Timing Engines",
-    "evidence-first": "Classical Evidence Synthesis",
+    basic: isHi ? "मार्गदर्शन खंड" : "Guidance Layer",
+    premium: isHi ? "विशिष्ट विश्लेषक" : "Premium Engines",
+    elite: isHi ? "विशिष्ट विश्लेषक" : "Premium Engines",
+    full: isHi ? "विशिष्ट विश्लेषक" : "Premium Engines",
+    kundli: isHi ? "कुंडली विश्लेषक" : "Kundli Engines",
+    remedy: isHi ? "उपाय मार्गदर्शन" : "Remedy Guidance",
+    medical: isHi ? "स्वास्थ्य मार्गदर्शन" : "Health Guidance",
+    destiny: isHi ? "समय व काल विश्लेषक" : "Timing Engines",
+    "evidence-first": isHi ? "शास्त्रीय प्रमाण संश्लेषण" : "Classical Evidence Synthesis",
   };
   const renderRows = (rows: typeof strategicRows, start: number) =>
-    rows.map((row, index) => `<div class="toc-row"><span class="num">${start + index}</span><div><div class="title">${esc(row.title)}</div><div class="meta">${esc(row.meta)}</div></div><div></div><span class="pg">Section</span></div>`).join("");
+    rows.map((row, index) => `<div class="toc-row"><span class="num">${start + index}</span><div><div class="title">${esc(row.title)}</div><div class="meta">${esc(row.meta)}</div></div><div></div><span class="pg">${isHi ? "खंड" : "Section"}</span></div>`).join("");
 
   return `<section class="page">
   <div class="starfield"></div>
   <div class="glow-br"></div>
-  ${pageRail("Contents", "4")}
+  ${pageRail(isHi ? "विषय सूची" : "Contents", "4")}
 
   <div style="position:relative;z-index:2;padding-top:22px;flex:1;display:flex;flex-direction:column;">
-    <div class="eyebrow" style="margin-bottom:10px;">${esc(edition)} Report Map</div>
-    <div class="display-l" style="line-height:1;color:var(--ivory);">Contents.</div>
+    <div class="eyebrow" style="margin-bottom:10px;">${esc(edition)} ${isHi ? "अनुक्रमणिका" : "Report Map"}</div>
+    <div class="display-l" style="line-height:1;color:var(--ivory);">${isHi ? "विषय सूची." : "Contents."}</div>
     <hr class="hairline gold" style="margin-top:14px;"/>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 30px;margin-top:14px;flex:1;font-size:13px;">
       <div>
-        <div class="toc-part-heading"><span class="part-no">Part 1</span><span class="part-name">Intelligence Layer</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 1</span><span class="part-name">${isHi ? "प्रज्ञा खंड (Intelligence Layer)" : "Intelligence Layer"}</span></div>
         ${renderRows(strategicRows, 1)}
 
-        <div class="toc-part-heading"><span class="part-no">Part 2</span><span class="part-name">Chart Foundation</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 2</span><span class="part-name">${isHi ? "कुंडली आधार (Chart Foundation)" : "Chart Foundation"}</span></div>
         ${renderRows(chartRows, strategicRows.length + 1)}
       </div>
       <div>
-        <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">${esc(enginePartName[type] ?? "Report Engines")}</span></div>
+        <div class="toc-part-heading"><span class="part-no">Part 3</span><span class="part-name">${esc(enginePartName[type] ?? (isHi ? "विशिष्ट विश्लेषक" : "Report Engines"))}</span></div>
         ${renderRows(premiumRows, strategicRows.length + chartRows.length + 1)}
 
-        ${eliteRows.length ? `<div class="toc-part-heading"><span class="part-no">Part 4</span><span class="part-name">Elite Layer</span></div>${renderRows(eliteRows, strategicRows.length + chartRows.length + premiumRows.length + 1)}` : ""}
+        ${eliteRows.length ? `<div class="toc-part-heading"><span class="part-no">Part 4</span><span class="part-name">${isHi ? "एलीट खंड (Elite Layer)" : "Elite Layer"}</span></div>${renderRows(eliteRows, strategicRows.length + chartRows.length + premiumRows.length + 1)}` : ""}
 
-        <div class="toc-part-heading"><span class="part-no">${eliteRows.length ? "Part 5" : "Part 4"}</span><span class="part-name">Closing</span></div>
-        <div class="toc-row"><span class="num">✓</span><div><div class="title">Closing Reflection</div><div class="meta">A final synthesis written for practical use</div></div><div></div><span class="pg">End</span></div>
+        <div class="toc-part-heading"><span class="part-no">${eliteRows.length ? "Part 5" : "Part 4"}</span><span class="part-name">${isHi ? "उपसंहार (Closing)" : "Closing"}</span></div>
+        <div class="toc-row"><span class="num">✓</span><div><div class="title">${isHi ? "अंतिम चिंतन एवं संकल्प" : "Closing Reflection"}</div><div class="meta">${isHi ? "व्यावहारिक जीवन के लिए अंतिम निष्कर्ष" : "A final synthesis written for practical use"}</div></div><div></div><span class="pg">${isHi ? "समाप्त" : "End"}</span></div>
       </div>
     </div>
   </div>
 
-  ${pageFoot("astrolife · cosmic blueprint", "Contents")}
+  ${pageFoot("astrolife · cosmic blueprint", isHi ? "विषय सूची" : "Contents")}
 </section>`;
 }
 
@@ -2053,11 +2141,17 @@ function pageNext90DaysPlanV4(chart: ChartData, intel: ReturnType<typeof buildRe
 
 // ── Page 5: Birth Snapshot ────────────────────────────────────────────────
 
-function page5BirthSnapshot(chart: ChartData): string {
+function page5BirthSnapshot(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const moonPlanet = chart.planets["Moon"];
-  const moonNakshatra = moonPlanet ? `${moonPlanet.nakshatra} · Pada ${moonPlanet.pada}` : "—";
+  const moonNakshatra = moonPlanet ? `${moonPlanet.nakshatra} · ${isHi ? "चरण" : "Pada"} ${moonPlanet.pada}` : "—";
 
-  const pillars = [
+  const pillars = isHi ? [
+    { label: "लग्न राशि", value: chart.lagnaRashi, sub: `${SIGN_GLYPH[chart.lagnaRashi] ?? ""} · प्रथम भाव · Ascendant` },
+    { label: "चंद्र राशि", value: moonPlanet?.sign ?? "—", sub: moonPlanet ? `${SIGN_GLYPH[moonPlanet.sign] ?? ""} · भाव ${moonPlanet.house}` : "" },
+    { label: "सूर्य राशि", value: chart.planets["Sun"]?.sign ?? "—", sub: `${SIGN_GLYPH[chart.planets["Sun"]?.sign ?? ""] ?? ""} · ☉ सूर्य` },
+    { label: "जन्म नक्षत्र", value: moonNakshatra, sub: moonPlanet ? `स्वामी: ${moonPlanet.nakshatraLord}` : "" },
+  ] : [
     { label: "Lagna", value: chart.lagnaRashi, sub: `${SIGN_GLYPH[chart.lagnaRashi] ?? ""} · H1 · Ascendant` },
     { label: "Moon Rashi", value: moonPlanet?.sign ?? "—", sub: moonPlanet ? `${SIGN_GLYPH[moonPlanet.sign] ?? ""} · H${moonPlanet.house}` : "" },
     { label: "Sun Sign", value: chart.planets["Sun"]?.sign ?? "—", sub: `${SIGN_GLYPH[chart.planets["Sun"]?.sign ?? ""] ?? ""} · ☉ Surya` },
@@ -2074,26 +2168,26 @@ function page5BirthSnapshot(chart: ChartData): string {
   return `<section class="page dense">
   <div class="starfield"></div>
   <div class="glow-tl"></div>
-  ${pageRail("Birth Snapshot", "5")}
+  ${pageRail(isHi ? "जन्म चक्र एवं आधार विवरण" : "Birth Snapshot", "5")}
 
   <div style="position:relative;z-index:2;padding-top:24px;flex:1;">
     <div class="section-title" style="margin-bottom:24px;">
       <span class="section-num">04</span>
-      <h2>Birth Snapshot</h2>
+      <h2>${isHi ? "जन्म विवरण व चक्र" : "Birth Snapshot"}</h2>
     </div>
 
     <div style="display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start;">
       <!-- North Indian chart -->
       <div style="flex-shrink:0;">
-        <div class="kicker" style="margin-bottom:10px;">North Indian Chart</div>
+        <div class="kicker" style="margin-bottom:10px;">${isHi ? "उत्तर भारतीय लग्न चक्र" : "North Indian Chart"}</div>
         <div style="background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px;display:inline-block;">
           ${renderNorthIndianChart(chart)}
         </div>
-        <div class="body-s" style="margin-top:8px;text-align:center;color:var(--ivory-mute);">${esc(chart.lagnaRashi)} Ascendant · House 1 at top</div>
+        <div class="body-s" style="margin-top:8px;text-align:center;color:var(--ivory-mute);">${esc(chart.lagnaRashi)} ${isHi ? "लग्न · प्रथम भाव शीर्ष पर" : "Ascendant · House 1 at top"}</div>
 
         <!-- Planet placements legend -->
         <div style="margin-top:14px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;">
-          <div class="kicker" style="font-size:9px;margin-bottom:6px;">Planet Placements</div>
+          <div class="kicker" style="font-size:9px;margin-bottom:6px;">${isHi ? "ग्रह स्थिति तालिका" : "Planet Placements"}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-family:'JetBrains Mono',monospace;font-size:9.5px;line-height:1.55;color:var(--ivory-dim);">
             ${["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"].map(p => {
               const pd = chart.planets[p];
@@ -2107,7 +2201,7 @@ function page5BirthSnapshot(chart: ChartData): string {
 
         <!-- Sign reference legend -->
         <div style="margin-top:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;">
-          <div class="kicker" style="font-size:9px;margin-bottom:4px;">Sign Reference</div>
+          <div class="kicker" style="font-size:9px;margin-bottom:4px;">${isHi ? "राशियों के नाम व अंक" : "Sign Reference"}</div>
           <div style="font-family:'JetBrains Mono',monospace;font-size:9px;line-height:1.6;color:var(--ivory-mute);">
             1 Aries · 2 Taurus · 3 Gemini · 4 Cancer · 5 Leo · 6 Virgo<br/>
             7 Libra · 8 Scorpio · 9 Sagittarius · 10 Capricorn · 11 Aquarius · 12 Pisces
@@ -2125,33 +2219,33 @@ function page5BirthSnapshot(chart: ChartData): string {
 
         <!-- Birth data card -->
         <div class="card gold-edge">
-          <div class="kicker" style="margin-bottom:12px;">Birth Data</div>
+          <div class="kicker" style="margin-bottom:12px;">${isHi ? "जन्म विवरण" : "Birth Data"}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;">
-            <div><div class="body-s">Name</div><div class="body" style="color:var(--ivory);">${esc(capitalize(chart.name))}</div></div>
-            <div><div class="body-s">Date of Birth</div><div class="body" style="color:var(--ivory);">${esc(chart.dob)}</div></div>
-            <div><div class="body-s">Time of Birth</div><div class="body" style="color:var(--ivory);">${esc(chart.tob)}</div></div>
-            <div><div class="body-s">Place</div><div class="body" style="color:var(--ivory);">${esc(chart.city)}</div></div>
-            <div><div class="body-s">Latitude</div><div class="mono" style="font-size:12px;color:var(--gold);">${chart.lat.toFixed(4)}°</div></div>
-            <div><div class="body-s">Longitude</div><div class="mono" style="font-size:12px;color:var(--gold);">${chart.lon.toFixed(4)}°</div></div>
-            <div><div class="body-s">Timezone</div><div class="mono" style="font-size:12px;color:var(--gold);">UTC${chart.tz >= 0 ? "+" : ""}${chart.tz}</div></div>
-            <div><div class="body-s">Ayanamsha</div><div class="body-s" style="color:var(--ivory-dim);">Lahiri (IAU)</div></div>
+            <div><div class="body-s">${isHi ? "नाम" : "Name"}</div><div class="body" style="color:var(--ivory);">${esc(capitalize(chart.name))}</div></div>
+            <div><div class="body-s">${isHi ? "जन्म तिथि" : "Date of Birth"}</div><div class="body" style="color:var(--ivory);">${esc(chart.dob)}</div></div>
+            <div><div class="body-s">${isHi ? "जन्म समय" : "Time of Birth"}</div><div class="body" style="color:var(--ivory);">${esc(chart.tob)}</div></div>
+            <div><div class="body-s">${isHi ? "जन्म स्थान" : "Place"}</div><div class="body" style="color:var(--ivory);">${esc(chart.city)}</div></div>
+            <div><div class="body-s">${isHi ? "अक्षांश" : "Latitude"}</div><div class="mono" style="font-size:12px;color:var(--gold);">${chart.lat.toFixed(4)}°</div></div>
+            <div><div class="body-s">${isHi ? "रेखांश" : "Longitude"}</div><div class="mono" style="font-size:12px;color:var(--gold);">${chart.lon.toFixed(4)}°</div></div>
+            <div><div class="body-s">${isHi ? "समय क्षेत्र" : "Timezone"}</div><div class="mono" style="font-size:12px;color:var(--gold);">UTC${chart.tz >= 0 ? "+" : ""}${chart.tz}</div></div>
+            <div><div class="body-s">${isHi ? "अयनांश" : "Ayanamsha"}</div><div class="body-s" style="color:var(--ivory-dim);">${isHi ? "लाहिड़ी (IAU)" : "Lahiri (IAU)"}</div></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  ${pageFoot("astrolife · cosmic blueprint", "Birth Snapshot")}
+  ${pageFoot("astrolife · cosmic blueprint", isHi ? "जन्म चक्र" : "Birth Snapshot")}
 </section>`;
 }
 
 // ── Page 6: Planetary Dashboard ──────────────────────────────────────────
 
-function page6PlanetaryDashboard(chart: ChartData): string {
+function page6PlanetaryDashboard(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const planets = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
 
-  // Natural nature (well-established classical classification)
-  const NATURE: Record<string, { label: string; cls: string }> = {
+  const NATURE_EN: Record<string, { label: string; cls: string }> = {
     Sun:     { label: "Malefic",      cls: "crimson" },
     Moon:    { label: "Neutral",      cls: "" },
     Mars:    { label: "Malefic",      cls: "crimson" },
@@ -2162,6 +2256,20 @@ function page6PlanetaryDashboard(chart: ChartData): string {
     Rahu:    { label: "Nat. Malefic", cls: "violet" },
     Ketu:    { label: "Nat. Malefic", cls: "violet" },
   };
+
+  const NATURE_HI: Record<string, { label: string; cls: string }> = {
+    Sun:     { label: "क्रूर ग्रह", cls: "crimson" },
+    Moon:    { label: "सौम्य ग्रह", cls: "jade" },
+    Mars:    { label: "पाप ग्रह", cls: "crimson" },
+    Mercury: { label: "शुभ ग्रह", cls: "jade" },
+    Jupiter: { label: "परम शुभ", cls: "jade" },
+    Venus:   { label: "शुभ ग्रह", cls: "jade" },
+    Saturn:  { label: "पाप ग्रह", cls: "crimson" },
+    Rahu:    { label: "छाया पाप", cls: "violet" },
+    Ketu:    { label: "छाया पाप", cls: "violet" },
+  };
+
+  const NATURE = isHi ? NATURE_HI : NATURE_EN;
 
   // Strength 0-10: shadbala for Sun-Saturn, placement proxy for Rahu/Ketu
   let strengthMap: Record<string, number> = {};
@@ -2189,7 +2297,7 @@ function page6PlanetaryDashboard(chart: ChartData): string {
 
   const cards = planets.map(name => {
     const pd = chart.planets[name];
-    if (!pd) return `<div class="card"><div class="kicker">${esc(name)}</div><div class="body-s" style="margin-top:8px;">No data</div></div>`;
+    if (!pd) return `<div class="card"><div class="kicker">${esc(name)}</div><div class="body-s" style="margin-top:8px;">${isHi ? "डाटा अनुपलब्ध" : "No data"}</div></div>`;
     const nat = NATURE[name] ?? { label: pd.dignity, cls: "" };
     const skt = PLANET_SANSKRIT[name] ?? name;
     const abbr = PLANET_ABBR[name] ?? name.slice(0, 2);
@@ -2197,7 +2305,7 @@ function page6PlanetaryDashboard(chart: ChartData): string {
     const score = strengthFor(name, pd);
     const pct = Math.min(100, Math.round((score / 10) * 100));
     const barColor = score >= 6.5 ? "var(--jade)" : score < 4 ? "var(--crimson)" : "var(--gold)";
-    const retro = pd.retrograde ? ' <span style="color:var(--crimson);font-size:10px;font-weight:700;">(R)</span>' : "";
+    const retro = pd.retrograde ? ` <span style="color:var(--crimson);font-size:10px;font-weight:700;">${isHi ? "(वक्री)" : "(R)"}</span>` : "";
 
     return `<div class="card" style="padding:14px 16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -2209,11 +2317,11 @@ function page6PlanetaryDashboard(chart: ChartData): string {
         <span class="badge ${nat.cls}" style="font-size:8.5px;padding:2px 7px;">${esc(nat.label)}</span>
       </div>
       <div style="display:flex;gap:14px;margin-top:10px;">
-        <div><div class="kicker" style="font-size:8.5px;">Sign</div><div class="serif-italic" style="font-size:15px;color:var(--gold-bright);">${esc(pd.sign)}</div></div>
-        <div><div class="kicker" style="font-size:8.5px;">House</div><div class="serif-italic" style="font-size:15px;color:var(--gold-bright);">${pd.house}</div></div>
-        <div><div class="kicker" style="font-size:8.5px;">Degree</div><div class="mono" style="font-size:12px;color:var(--ivory);">${pd.degree}°${String(pd.minutes).padStart(2,"0")}'</div></div>
+        <div><div class="kicker" style="font-size:8.5px;">${isHi ? "राशि" : "Sign"}</div><div class="serif-italic" style="font-size:15px;color:var(--gold-bright);">${esc(pd.sign)}</div></div>
+        <div><div class="kicker" style="font-size:8.5px;">${isHi ? "भाव" : "House"}</div><div class="serif-italic" style="font-size:15px;color:var(--gold-bright);">${pd.house}</div></div>
+        <div><div class="kicker" style="font-size:8.5px;">${isHi ? "अंश" : "Degree"}</div><div class="mono" style="font-size:12px;color:var(--ivory);">${pd.degree}°${String(pd.minutes).padStart(2,"0")}'</div></div>
       </div>
-      <div class="body-s" style="margin-top:6px;">${esc(pd.nakshatra)} · pada ${pd.pada} · ${esc(pd.nakshatraLord)}</div>
+      <div class="body-s" style="margin-top:6px;">${esc(pd.nakshatra)} · ${isHi ? "चरण" : "pada"} ${pd.pada} · ${esc(pd.nakshatraLord)}</div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
         <div style="flex:1;height:4px;background:rgba(201,169,97,0.1);border-radius:1px;"><div style="height:100%;width:${pct}%;background:${barColor};"></div></div>
         <span class="mono" style="font-size:10px;color:${barColor};">${score.toFixed(1)}</span>
@@ -2231,16 +2339,16 @@ function page6PlanetaryDashboard(chart: ChartData): string {
   return `<section class="page dense">
   <div class="starfield"></div>
   <div class="glow-br"></div>
-  ${pageRail("Planetary Dashboard", "6")}
+  ${pageRail(isHi ? "ग्रह स्थिति डैशबोर्ड" : "Planetary Dashboard", "6")}
 
   <div style="position:relative;z-index:2;padding-top:24px;display:flex;flex-direction:column;gap:16px;flex:1;">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;">
       <div>
-        <div class="eyebrow" style="margin-bottom:10px;">All nine grahas · sign, house, strength, status</div>
-        <div class="display-l" style="line-height:1;color:var(--ivory);">The nine <span class="serif-italic" style="color:var(--gold-bright);">witnesses</span>.</div>
+        <div class="eyebrow" style="margin-bottom:10px;">${isHi ? "समस्त नवग्रह · राशि, भाव, बल एवं स्थिति" : "All nine grahas · sign, house, strength, status"}</div>
+        <div class="display-l" style="line-height:1;color:var(--ivory);">${isHi ? "नवग्रह <span class=\"serif-italic\" style=\"color:var(--gold-bright);\">परिदर्शन</span>." : "The nine <span class=\"serif-italic\" style=\"color:var(--gold-bright);\">witnesses</span>."}</div>
       </div>
       <div style="text-align:right;">
-        <div class="kicker">Strongest · Weakest</div>
+        <div class="kicker">${isHi ? "सर्वाधिक बली · न्यूनतम बली" : "Strongest · Weakest"}</div>
         <div class="serif-italic" style="font-size:18px;color:var(--gold-bright);margin-top:2px;">${esc(strongest)} · ${esc(weakest)}</div>
       </div>
     </div>
@@ -2249,12 +2357,12 @@ function page6PlanetaryDashboard(chart: ChartData): string {
       ${cards}
     </div>
     <div class="card" style="padding:12px 16px;margin-top:auto;">
-      <div class="kicker" style="font-size:8.5px;margin-bottom:8px;">Shadbala Summary · sixfold strength of each graha · scale 0–10</div>
+      <div class="kicker" style="font-size:8.5px;margin-bottom:8px;">${isHi ? "षड्बल सारांश · ग्रहों का षड्विध बल · पैमाना 0–10" : "Shadbala Summary · sixfold strength of each graha · scale 0–10"}</div>
       <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:4px;">${summaryStrip}</div>
     </div>
   </div>
 
-  ${pageFoot("astrolife · cosmic blueprint", "Planetary Dashboard")}
+  ${pageFoot("astrolife · cosmic blueprint", isHi ? "ग्रह डैशबोर्ड" : "Planetary Dashboard")}
 </section>`;
 }
 
@@ -2439,58 +2547,70 @@ function page8UpcomingDashas(chart: ChartData, lang: ReportLanguage = "en"): str
 
 // ── Lal Kitab Premium Pages ───────────────────────────────────────────────
 
-function pageLalKitabCoreAccuracy(chart: ChartData): string {
+function pageLalKitabCoreAccuracy(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const lk = calculateLalKitab(chart.planets, chart.dob, chart.lagnaNum ?? 0);
   const benefic = lk.coreAccuracy.filter(row => row.beneficMalefic === "Benefic");
   const malefic = lk.coreAccuracy.filter(row => row.beneficMalefic === "Malefic");
 
   const rows = lk.coreAccuracy.map(row => {
     const badge = row.beneficMalefic === "Benefic" ? "jade" : row.beneficMalefic === "Malefic" ? "crimson" : "saffron";
+    const statusLabel = isHi
+      ? (row.beneficMalefic === "Benefic" ? "शुभ" : row.beneficMalefic === "Malefic" ? "अशुभ" : "सम")
+      : row.beneficMalefic;
     return `<tr>
       <td>${esc(row.planet)}</td>
-      <td>${esc(row.signShort)} · H${row.house}</td>
+      <td>${esc(row.signShort)} · ${isHi ? "भाव" : "H"}${row.house}</td>
       <td>${esc(row.position.replace(/_/g, " "))}</td>
-      <td>${row.soya ? "Yes" : "No"}</td>
-      <td>${row.kismatJaganewala ? "Yes" : "No"}</td>
-      <td><span class="badge ${badge}" style="font-size:8px;">${esc(row.beneficMalefic)}</span></td>
+      <td>${row.soya ? (isHi ? "हाँ" : "Yes") : (isHi ? "नहीं" : "No")}</td>
+      <td>${row.kismatJaganewala ? (isHi ? "हाँ" : "Yes") : (isHi ? "नहीं" : "No")}</td>
+      <td><span class="badge ${badge}" style="font-size:8px;">${esc(statusLabel)}</span></td>
     </tr>`;
   }).join("");
 
-  const headline = malefic.length > benefic.length
-    ? "This chart needs selective correction, not remedy overload."
-    : "This chart has usable planetary support; remedies must protect the helpful planets first.";
+  const headline = isHi
+    ? (malefic.length > benefic.length
+        ? "यह कुंडली संतुलित व चयनात्मक उपायों की मांग करती है, अत्यधिक उपाय भार की नहीं।"
+        : "इस कुंडली में ग्रहों का उपयोगी प्राकृतिक सहयोग है; उपायों द्वारा पहले शुभ ग्रहों की शक्ति का संरक्षण आवश्यक है।")
+    : (malefic.length > benefic.length
+        ? "This chart needs selective correction, not remedy overload."
+        : "This chart has usable planetary support; remedies must protect the helpful planets first.");
+
+  const desc = isHi
+    ? "दान प्रत्येक ग्रह के लिए नहीं किया जाता। यह रिपोर्ट पहले जांचती है कि लाल किताब के अनुसार ग्रह शुभ, मिश्रित या प्रतिकूल है, उसके पश्चात ही सार्थक उपचार का सुझाव देती है।"
+    : "Daan is not shown for every planet. The report first checks whether the natal Lal Kitab condition is supportive, mixed or challenging, then gives guidance only where correction is meaningful.";
 
   return `<section class="page dense">
   <div class="starfield"></div>
   <div class="glow-tl"></div>
-  ${pageRail("Lal Kitab · Core Accuracy", "LK-1")}
+  ${pageRail(isHi ? "लाल किताब · मूल सटीकता एवं ग्रह स्थिति" : "Lal Kitab · Core Accuracy", "LK-1")}
 
   <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
     <div class="section-title" style="margin-bottom:14px;">
       <span class="section-num">LK</span>
-      <h2>Lal Kitab Core Accuracy</h2>
+      <h2>${isHi ? "लाल किताब मूल सटीकता" : "Lal Kitab Core Accuracy"}</h2>
     </div>
 
     <div class="card gold-edge" style="margin-bottom:16px;">
-      <div class="kicker" style="margin-bottom:6px;">Benefic / Malefic Verification</div>
-      <div class="body" style="font-size:14px;line-height:1.7;">${esc(headline)} Daan is not shown for every planet. The report first checks whether the natal Lal Kitab condition is supportive, mixed or challenging, then gives guidance only where correction is meaningful.</div>
+      <div class="kicker" style="margin-bottom:6px;">${isHi ? "शुभ / अशुभ ग्रह सत्यापन" : "Benefic / Malefic Verification"}</div>
+      <div class="body" style="font-size:14px;line-height:1.7;">${esc(headline)} ${desc}</div>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
-      <div class="card"><div class="kicker">Supportive</div><div class="display-s" style="color:var(--jade);">${benefic.length}</div><div class="body-s">${esc(benefic.map(p => p.planet).join(", ") || "None")}</div></div>
-      <div class="card"><div class="kicker">Needs Care</div><div class="display-s" style="color:var(--crimson);">${malefic.length}</div><div class="body-s">${esc(malefic.map(p => p.planet).join(", ") || "None")}</div></div>
-      <div class="card"><div class="kicker">Kismat Trigger</div><div class="display-s" style="color:var(--gold);">${esc(lk.kismat.planet)}</div><div class="body-s">H${lk.kismat.house} · Score ${lk.kismat.score}/95</div></div>
+      <div class="card"><div class="kicker">${isHi ? "शुभ ग्रह" : "Supportive"}</div><div class="display-s" style="color:var(--jade);">${benefic.length}</div><div class="body-s">${esc(benefic.map(p => p.planet).join(", ") || (isHi ? "कोई नहीं" : "None"))}</div></div>
+      <div class="card"><div class="kicker">${isHi ? "सावधानी योग्य" : "Needs Care"}</div><div class="display-s" style="color:var(--crimson);">${malefic.length}</div><div class="body-s">${esc(malefic.map(p => p.planet).join(", ") || (isHi ? "कोई नहीं" : "None"))}</div></div>
+      <div class="card"><div class="kicker">${isHi ? "किस्मत जगाने वाला ग्रह" : "Kismat Trigger"}</div><div class="display-s" style="color:var(--gold);">${esc(lk.kismat.planet)}</div><div class="body-s">${isHi ? "भाव" : "H"}${lk.kismat.house} · ${isHi ? "स्कोर" : "Score"} ${lk.kismat.score}/95</div></div>
     </div>
 
     <table style="width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;font-size:10.5px;">
       <thead>
         <tr style="color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">
-          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Planet</th>
-          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Sign / House</th>
-          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Position</th>
-          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Soya</th>
-          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Jaganewala</th>
-          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">Result</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">${isHi ? "ग्रह" : "Planet"}</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">${isHi ? "राशि / भाव" : "Sign / House"}</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">${isHi ? "अवस्था" : "Position"}</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">${isHi ? "सोया ग्रह" : "Soya"}</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">${isHi ? "जगाने वाला" : "Jaganewala"}</th>
+          <th style="text-align:left;padding:7px;border-bottom:1px solid var(--line);">${isHi ? "फल / स्थिति" : "Result"}</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -2499,7 +2619,7 @@ function pageLalKitabCoreAccuracy(chart: ChartData): string {
     <div class="body-s" style="margin-top:14px;line-height:1.65;">${esc(lk.summary)}</div>
   </div>
 
-  ${pageFoot("astrolife · lal kitab engine", "Core Accuracy")}
+  ${pageFoot("astrolife · lal kitab engine", isHi ? "मूल सटीकता" : "Core Accuracy")}
 </section>`;
 }
 
@@ -2735,12 +2855,13 @@ function page9Remedies(chart: ChartData, lang: ReportLanguage = "en"): string {
 
 // ── Page 10: Closing ──────────────────────────────────────────────────────
 
-function page10Closing(): string {
+function page10Closing(lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi";
   return `<section class="page">
   <div class="starfield"></div>
   <div class="glow-tl"></div>
   <div class="glow-br"></div>
-  <div class="page-watermark">ज्योतिष</div>
+  <div class="page-watermark">${isHi ? "शुभम्" : "ज्योतिष"}</div>
 
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;z-index:2;">
 
@@ -2751,15 +2872,18 @@ function page10Closing(): string {
       <div style="width:120px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);"></div>
     </div>
 
-    <div class="eyebrow" style="margin-bottom:20px;opacity:0.7;">A Final Reflection</div>
+    <div class="eyebrow" style="margin-bottom:20px;opacity:0.7;">${isHi ? "अंतिम चिंतन एवं संदेश" : "A Final Reflection"}</div>
 
     <div class="pullquote" style="max-width:560px;margin:0 auto 32px;">
-      "The stars incline; they do not compel.<br/>
-      The chart is the weather report — you are the navigator."
+      ${isHi
+        ? `"ग्रह केवल संकेत देते हैं, विवश नहीं करते।<br/>कुंडली जीवन का मौसम बताती है — नाविक आप स्वयं हैं।"`
+        : `"The stars incline; they do not compel.<br/>The chart is the weather report — you are the navigator."`}
     </div>
 
     <div class="body" style="max-width:520px;margin-bottom:40px;line-height:1.75;">
-      This blueprint is the beginning of a conversation between awareness and action — not an ending. Carry it lightly. Return to it in different seasons. Let it be a companion, not an oracle. The truest astrology is the one that makes life more conscious.
+      ${isHi
+        ? `यह मार्गदर्शिका आत्म-बोध और कर्म के बीच एक नए संवाद का आरंभ है — कोई विराम नहीं। इसे सहजता से अपनाएं। जीवन के हर महत्वपूर्ण मोड़ पर इसका पुनः अवलोकन करें। इसे अपना सच्चा साथी बनने दें। सच्चा ज्योतिष वही है जो आपके जीवन और निर्णयों को अधिक जागृत और प्रबुद्ध बनाए।`
+        : `This blueprint is the beginning of a conversation between awareness and action — not an ending. Carry it lightly. Return to it in different seasons. Let it be a companion, not an oracle. The truest astrology is the one that makes life more conscious.`}
     </div>
 
     <!-- Ornament divider -->
@@ -2782,13 +2906,13 @@ function page10Closing(): string {
       </svg>
       <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:36px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);">AstroLife</div>
     </div>
-    <div class="body-s" style="letter-spacing:0.2em;text-transform:uppercase;color:var(--ivory-mute);">Vedic Intelligence · Est. 2024</div>
-    <div class="devanagari" style="font-size:18px;color:var(--gold-dim);margin-top:12px;opacity:0.7;">सर्वे भवन्तु सुखिनः</div>
-    <div class="serif-italic" style="font-size:13px;color:var(--ivory-mute);margin-top:4px;">Om Sarve Bhavantu Sukhinah · May all beings be happy.</div>
+    <div class="body-s" style="letter-spacing:0.2em;text-transform:uppercase;color:var(--ivory-mute);">${isHi ? "वैदिक प्रज्ञा संस्थान · स्थापित २०२४" : "Vedic Intelligence · Est. 2024"}</div>
+    <div class="devanagari" style="font-size:18px;color:var(--gold-dim);margin-top:12px;opacity:0.7;">ॐ सर्वे भवन्तु सुखिनः</div>
+    <div class="serif-italic" style="font-size:13px;color:var(--ivory-mute);margin-top:4px;">${isHi ? "ॐ सर्वे भवन्तु सुखिनः · सभी प्राणी सुखी और निरोगी हों।" : "Om Sarve Bhavantu Sukhinah · May all beings be happy."}</div>
   </div>
 
   <div style="position:relative;z-index:2;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
-    <div class="body-s" style="letter-spacing:0.18em;text-transform:uppercase;">Prepared by AstroLife Intelligence</div>
+    <div class="body-s" style="letter-spacing:0.18em;text-transform:uppercase;">${isHi ? "एस्ट्रोलाइफ वैदिक प्रज्ञा द्वारा निर्मित" : "Prepared by AstroLife Intelligence"}</div>
     <div class="mono" style="font-size:10px;color:var(--gold-dim);">astrolife.ai · ${new Date().getFullYear()}</div>
   </div>
 </section>`;
@@ -2885,7 +3009,8 @@ function page11EngineLedger(context: ReportEngineContext): string {
 
 // ── Yogas (combinations & rajayoga) ───────────────────────────────────────
 
-function pageYogas(chart: ChartData): string {
+function pageYogas(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const yogas: YogaResult[] = detectYogas(
     chart.planets as Parameters<typeof detectYogas>[0],
     chart.lagnaNum,
@@ -2898,7 +3023,7 @@ function pageYogas(chart: ChartData): string {
     .slice(0, 6);
 
   const cards = top.length === 0
-    ? `<div class="body" style="padding:20px;text-align:center;color:var(--ivory-mute);">No major yogas detected in this chart. Foundational karma is the primary path.</div>`
+    ? `<div class="body" style="padding:20px;text-align:center;color:var(--ivory-mute);">${isHi ? "इस कुंडली में कोई बड़ा विशिष्ट योग सक्रिय नहीं है। आधारभूत कर्म ही मुख्य पथ है।" : "No major yogas detected in this chart. Foundational karma is the primary path."}</div>`
     : top.map((y, i) => `
       <div class="card${i === 0 ? " gold-edge" : ""}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
@@ -2908,38 +3033,41 @@ function pageYogas(chart: ChartData): string {
           </div>
           <div style="text-align:right;">
             <div class="mono" style="font-size:18px;color:var(--gold);">${y.score}</div>
-            <div class="body-s" style="font-size:9px;">score</div>
+            <div class="body-s" style="font-size:9px;">${isHi ? "अंक" : "score"}</div>
           </div>
         </div>
         <div class="body-s" style="margin-bottom:6px;">${esc(y.description)}</div>
-        <div class="body-s" style="color:var(--jade);"><strong>Impact:</strong> ${esc(y.impact)}</div>
+        <div class="body-s" style="color:var(--jade);"><strong>${isHi ? "प्रभाव:" : "Impact:"}</strong> ${esc(y.impact)}</div>
         ${y.planets.length > 0 ? `<div class="mono" style="font-size:9px;color:var(--gold-dim);margin-top:6px;">${y.planets.map(p => esc(p)).join(" · ")}</div>` : ""}
       </div>`).join("");
 
   return `<section class="page dense">
-    ${pageRail("Yogas · Special Combinations", "8")}
+    ${pageRail(isHi ? "राजयोग एवं विशिष्ट योग" : "Yogas · Special Combinations", "8")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">05</span>
-        <h2>Yogas</h2>
+        <h2>${isHi ? "राजयोग एवं प्रमुख योग" : "Yogas"}</h2>
       </div>
       <div class="body-s" style="margin-bottom:16px;max-width:600px;">
-        Yogas are specific planetary combinations that amplify or shape outcomes. Below are the most significant active yogas in your chart, ranked by strength.
+        ${isHi
+          ? "कुंडली में ग्रहों की विशेष युतियां और दृष्टियां शुभ फलों का निर्माण करती हैं। नीचे आपकी जन्मपत्रिका में सक्रिय प्रमुख योग दिए गए हैं, जो जीवन की उपलब्धियों को गति देते हैं:"
+          : "Yogas are specific planetary combinations that amplify or shape outcomes. Below are the most significant active yogas in your chart, ranked by strength."}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         ${cards}
       </div>
       <div class="body-s" style="margin-top:auto;padding-top:12px;color:var(--ivory-mute);text-align:center;">
-        Total active yogas detected: <strong style="color:var(--gold);">${present.length}</strong> · Showing top ${top.length}
+        ${isHi ? "कुल सक्रिय योग:" : "Total active yogas detected:"} <strong style="color:var(--gold);">${present.length}</strong> · ${isHi ? `शीर्ष ${top.length} प्रदर्शित` : `Showing top ${top.length}`}
       </div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", "Yogas")}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "योग विश्लेषण" : "Yogas")}
   </section>`;
 }
 
 // ── Doshas (manglik, kaal sarp, etc) ──────────────────────────────────────
 
-function pageDoshas(chart: ChartData): string {
+function pageDoshas(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const all: YogaResult[] = detectYogas(
     chart.planets as Parameters<typeof detectYogas>[0],
     chart.lagnaNum,
@@ -2952,20 +3080,20 @@ function pageDoshas(chart: ChartData): string {
   const mangalCard = `<div class="card gold-edge" style="border-color:${mangalTone};">
     <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:10px;">
       <div>
-        <div class="kicker" style="margin-bottom:4px;color:var(--gold);">Mangal Dosha Intelligence</div>
+        <div class="kicker" style="margin-bottom:4px;color:var(--gold);">${isHi ? "मंगल दोष विश्लेषण" : "Mangal Dosha Intelligence"}</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);">${esc(mangalInsight.result.severityLabel)}</div>
       </div>
       <div style="text-align:right;">
         <div class="mono" style="font-size:22px;color:${mangalTone};">${mangalInsight.result.scores.natalSeverity}</div>
-        <div class="body-s" style="font-size:9px;color:var(--ivory-mute);">severity</div>
+        <div class="body-s" style="font-size:9px;color:var(--ivory-mute);">${isHi ? "तीव्रता" : "severity"}</div>
       </div>
     </div>
     <div class="body-s" style="line-height:1.62;color:var(--ivory-dim);margin-bottom:10px;">${esc(mangalInsight.summary)}</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
       ${[
-        ["Protection", mangalInsight.result.scores.protection],
-        ["Activation", mangalInsight.result.scores.activation],
-        ["Constructive", mangalInsight.result.scores.constructivePotential],
+        [isHi ? "संरक्षण" : "Protection", mangalInsight.result.scores.protection],
+        [isHi ? "सक्रियता" : "Activation", mangalInsight.result.scores.activation],
+        [isHi ? "रचनात्मक क्षमता" : "Constructive", mangalInsight.result.scores.constructivePotential],
       ].map(([label, value]) => `<div style="padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,0.025);">
         <div class="kicker" style="font-size:8px;margin-bottom:3px;">${esc(label)}</div>
         <div class="mono" style="font-size:16px;color:${scoreColor(Number(value ?? 0))};">${Number(value ?? 0)}/100</div>
@@ -2973,22 +3101,22 @@ function pageDoshas(chart: ChartData): string {
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
       ${[
-        ["Status", mangalInsight.result.calculationStatus],
-        ["Quality", `${mangalInsight.result.dataQualityScore}/100`],
-        ["Confidence", mangalInsight.result.scoreConfidence],
+        [isHi ? "गणना स्थिति" : "Status", mangalInsight.result.calculationStatus],
+        [isHi ? "गुणवत्ता" : "Quality", `${mangalInsight.result.dataQualityScore}/100`],
+        [isHi ? "विश्वास" : "Confidence", mangalInsight.result.scoreConfidence],
       ].map(([label, value]) => `<div style="padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,0.02);">
         <div class="kicker" style="font-size:8px;margin-bottom:3px;">${esc(label)}</div>
         <div class="body-s" style="font-size:10px;color:var(--ivory);text-transform:capitalize;">${esc(String(value).replace(/_/g, " "))}</div>
       </div>`).join("")}
     </div>
     <div class="body-s" style="line-height:1.52;color:var(--ivory-dim);margin-bottom:8px;">
-      <strong style="color:var(--gold);">Traditional tag:</strong> ${esc(mangalInsight.result.traditionalConcentration.label)}. ${esc(mangalInsight.result.traditionalConcentration.modernInterpretation)}
+      <strong style="color:var(--gold);">${isHi ? "पारंपरिक परिप्रेक्ष्य:" : "Traditional tag:"}</strong> ${esc(mangalInsight.result.traditionalConcentration.label)}. ${esc(mangalInsight.result.traditionalConcentration.modernInterpretation)}
     </div>
     ${mangalCancellation.length ? `<div class="body-s" style="line-height:1.5;color:var(--jade);margin-bottom:8px;">
       ${mangalCancellation.map(item => `<div style="margin-bottom:3px;">• ${esc(item.title)} (${esc(item.confidence)})</div>`).join("")}
     </div>` : ""}
     <div class="body-s" style="line-height:1.52;color:var(--crimson);margin-bottom:8px;">
-      <strong>Gemstone safety:</strong> ${esc(mangalInsight.result.gemstoneSafety.title)} · ${esc(mangalInsight.result.gemstoneSafety.caution)}
+      <strong>${isHi ? "रत्न निषेध निर्देश:" : "Gemstone safety:"}</strong> ${esc(mangalInsight.result.gemstoneSafety.title)} · ${esc(mangalInsight.result.gemstoneSafety.caution)}
     </div>
     <div class="body-s" style="line-height:1.55;color:var(--jade);">
       ${mangalInsight.productGuidance.slice(0, 3).map(item => `<div style="margin-bottom:3px;">• ${esc(item)}</div>`).join("")}
@@ -2997,8 +3125,8 @@ function pageDoshas(chart: ChartData): string {
 
   const cards = doshas.length === 0
     ? `<div class="card jade-edge" style="padding:24px;text-align:center;">
-        <div class="display-s" style="color:var(--jade);margin-bottom:8px;">No Major Doshas</div>
-        <div class="body-s">Your chart shows no significant doshas. This is a favourable foundational marker.</div>
+        <div class="display-s" style="color:var(--jade);margin-bottom:8px;">${isHi ? "कोई गंभीर दोष नहीं" : "No Major Doshas"}</div>
+        <div class="body-s">${isHi ? "आपकी जन्मपत्रिका में कोई बड़ा दोष नहीं पाया गया। यह एक अत्यंत शुभ आधारभूत संकेत है।" : "Your chart shows no significant doshas. This is a favourable foundational marker."}</div>
       </div>`
     : doshas.map(d => `
       <div class="card" style="border-color:rgba(201,85,95,0.3);">
@@ -3007,32 +3135,35 @@ function pageDoshas(chart: ChartData): string {
           <span class="badge crimson" style="font-size:9px;">${esc(d.category)}</span>
         </div>
         <div class="body-s" style="margin-bottom:8px;">${esc(d.description)}</div>
-        <div class="body-s" style="color:var(--saffron);margin-bottom:6px;"><strong>Impact:</strong> ${esc(d.impact)}</div>
-        ${d.remedy ? `<div class="body-s" style="color:var(--jade);"><strong>Remedy:</strong> ${esc(d.remedy)}</div>` : ""}
+        <div class="body-s" style="color:var(--saffron);margin-bottom:6px;"><strong>${isHi ? "प्रभाव:" : "Impact:"}</strong> ${esc(d.impact)}</div>
+        ${d.remedy ? `<div class="body-s" style="color:var(--jade);"><strong>${isHi ? "उपाय:" : "Remedy:"}</strong> ${esc(d.remedy)}</div>` : ""}
       </div>`).join("");
 
   return `<section class="page dense">
-    ${pageRail("Doshas · Karmic Disturbances", "9")}
+    ${pageRail(isHi ? "दोष विश्लेषण एवं शांति उपाय" : "Doshas · Karmic Disturbances", "9")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">06</span>
-        <h2>Doshas</h2>
+        <h2>${isHi ? "दोष एवं कर्मिक संतुलन" : "Doshas"}</h2>
       </div>
       <div class="body-s" style="margin-bottom:16px;max-width:600px;">
-        Doshas indicate specific karmic pressure points. They are not destinies; AstroLife reads them through score, protection, activation and practical correction.
+        ${isHi
+          ? "दोष जीवन में कुछ विशिष्ट कर्मिक दबाव बिंदुओं को दर्शाते हैं। ये अंतिम परिणाम नहीं हैं; संरक्षण और समय पर किए गए उपायों से इन्हें संतुलित किया जा सकता है:"
+          : "Doshas indicate specific karmic pressure points. They are not destinies; AstroLife reads them through score, protection, activation and practical correction."}
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
         ${mangalCard}
         ${cards}
       </div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", "Doshas")}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "दोष विश्लेषण" : "Doshas")}
   </section>`;
 }
 
 // ── Shadbala — Six-fold Strength ──────────────────────────────────────────
 
-function pageShadbala(chart: ChartData): string {
+function pageShadbala(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const result = calculateShadbala(chart.planets as Parameters<typeof calculateShadbala>[0]);
 
   const rows = result.planets.map(p => {
@@ -3051,27 +3182,29 @@ function pageShadbala(chart: ChartData): string {
   }).join("");
 
   return `<section class="page dense">
-    ${pageRail("Shadbala · Six-fold Strength", "10")}
+    ${pageRail(isHi ? "षड्बल · ग्रहों का षड्विध बल" : "Shadbala · Six-fold Strength", "10")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">07</span>
-        <h2>Shadbala</h2>
+        <h2>${isHi ? "षड्बल सामर्थ्य" : "Shadbala"}</h2>
       </div>
       <div class="body-s" style="margin-bottom:14px;max-width:600px;">
-        Six factors determine each planet's strength: Sthana (positional), Dig (directional), Kala (temporal), Cheshta (motional), Naisargika (natural), Drik (aspectual). Total in Rupas — minimum required for full effect: 5.0.
+        ${isHi
+          ? "षड्बल ग्रहों की वास्तविक शक्ति को छह आयामों में मापता है: स्थान बल, दिग् बल, काल बल, चेष्टा बल, नैसर्गिक बल और दृक् बल। पूर्ण प्रभाव के लिए न्यूनतम आवश्यक बल: 5.0 रूपा।"
+          : "Six factors determine each planet's strength: Sthana (positional), Dig (directional), Kala (temporal), Cheshta (motional), Naisargika (natural), Drik (aspectual). Total in Rupas — minimum required for full effect: 5.0."}
       </div>
       <div class="card" style="padding:14px 12px;">
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
           <thead>
             <tr style="border-bottom:1px solid var(--line-strong);">
-              <th style="padding:6px;text-align:left;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Planet</th>
-              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Sthana</th>
-              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Dig</th>
-              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Kala</th>
-              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Cheshta</th>
-              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Nais.</th>
-              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Drik</th>
-              <th style="padding:6px;text-align:right;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">Total</th>
+              <th style="padding:6px;text-align:left;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "ग्रह" : "Planet"}</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "स्थान" : "Sthana"}</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "दिग्" : "Dig"}</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "काल" : "Kala"}</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "चेष्टा" : "Cheshta"}</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "नैसर्गिक" : "Nais."}</th>
+              <th style="padding:6px;text-align:center;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "दृक्" : "Drik"}</th>
+              <th style="padding:6px;text-align:right;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">${isHi ? "कुल" : "Total"}</th>
               <th style="padding:6px;text-align:right;color:var(--gold-dim);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;">%</th>
             </tr>
           </thead>
@@ -3079,12 +3212,12 @@ function pageShadbala(chart: ChartData): string {
         </table>
       </div>
       <div class="body-s" style="margin-top:14px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;">
-        <strong style="color:var(--gold);">Strongest:</strong> ${esc(result.strongest)} ·
-        <strong style="color:var(--crimson);">Weakest:</strong> ${esc(result.weakest)} ·
-        <strong style="color:var(--gold-bright);">Average:</strong> <span class="mono">${result.avgStrength.toFixed(2)} Rupas</span>
+        <strong style="color:var(--gold);">${isHi ? "सर्वाधिक बली:" : "Strongest:"}</strong> ${esc(result.strongest)} ·
+        <strong style="color:var(--crimson);">${isHi ? "न्यूनतम बली:" : "Weakest:"}</strong> ${esc(result.weakest)} ·
+        <strong style="color:var(--gold-bright);">${isHi ? "औसत बल:" : "Average:"}</strong> <span class="mono">${result.avgStrength.toFixed(2)} ${isHi ? "रूपा" : "Rupas"}</span>
       </div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", "Shadbala")}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "षड्बल" : "Shadbala")}
   </section>`;
 }
 
@@ -3345,49 +3478,53 @@ function pageNumerology(chart: ChartData): string {
 
 // ── Nakshatra Deep Dive (birth nakshatra) ─────────────────────────────────
 
-function pageNakshatra(chart: ChartData): string {
+function pageNakshatra(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const moon = chart.planets["Moon"];
-  if (!moon) return `<section class="page dense">${pageRail("Birth Nakshatra","14")}<div class="body" style="padding-top:24px;">No moon data available.</div>${pageFoot("astrolife · cosmic blueprint","Nakshatra")}</section>`;
+  if (!moon) return `<section class="page dense">${pageRail(isHi ? "जन्म नक्षत्र" : "Birth Nakshatra","14")}<div class="body" style="padding-top:24px;">${isHi ? "चंद्र डाटा उपलब्ध नहीं है।" : "No moon data available."}</div>${pageFoot("astrolife · cosmic blueprint", isHi ? "नक्षत्र" : "Nakshatra")}</section>`;
 
   const medical = calculateMedical(chart);
   const nakData = medical.birthNakshatraData;
 
   return `<section class="page dense">
-    ${pageRail("Birth Nakshatra · " + moon.nakshatra, "14")}
+    ${pageRail(isHi ? `जन्म नक्षत्र · ${moon.nakshatra}` : "Birth Nakshatra · " + moon.nakshatra, "14")}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">12</span>
-        <h2>Birth Nakshatra</h2>
+        <h2>${isHi ? "जन्म नक्षत्र विश्लेषण" : "Birth Nakshatra"}</h2>
       </div>
       <div class="card gold-edge" style="margin-bottom:14px;text-align:center;padding:24px;">
-        <div class="kicker" style="margin-bottom:8px;">Janma Nakshatra</div>
+        <div class="kicker" style="margin-bottom:8px;">${isHi ? "जन्म नक्षत्र" : "Janma Nakshatra"}</div>
         <div class="display-l" style="font-size:48px;color:var(--gold-bright);margin-bottom:4px;">${esc(moon.nakshatra)}</div>
-        <div class="body-s">Pada <strong style="color:var(--gold);">${moon.pada}</strong> · Lord <strong style="color:var(--gold);">${esc(moon.nakshatraLord)}</strong> · Moon in ${esc(moon.sign)} · House ${moon.house}</div>
+        <div class="body-s">${isHi ? "चरण" : "Pada"} <strong style="color:var(--gold);">${moon.pada}</strong> · ${isHi ? "स्वामी:" : "Lord"} <strong style="color:var(--gold);">${esc(moon.nakshatraLord)}</strong> · ${isHi ? "चंद्र राशि:" : "Moon in"} ${esc(moon.sign)} · ${isHi ? "भाव" : "House"} ${moon.house}</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
         <div class="card">
-          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Body & Health</div>
+          <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">${isHi ? "शारीरिक स्वास्थ्य एवं संवेदनशीलता" : "Body & Health"}</div>
           ${nakData ? `
-            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">Body zone:</strong> ${esc(nakData.body)}</div>
-            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">Tendency:</strong> ${esc(nakData.disease)}</div>
-            <div class="body-s"><strong style="color:var(--gold);">Note:</strong> ${esc(nakData.note)}</div>
-          ` : `<div class="body-s">Data unavailable.</div>`}
+            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">${isHi ? "शरीर अंग:" : "Body zone:"}</strong> ${esc(nakData.body)}</div>
+            <div class="body-s" style="margin-bottom:4px;"><strong style="color:var(--gold);">${isHi ? "प्रवृत्ति:" : "Tendency:"}</strong> ${esc(nakData.disease)}</div>
+            <div class="body-s"><strong style="color:var(--gold);">${isHi ? "शास्त्रीय निर्देश:" : "Note:"}</strong> ${esc(nakData.note)}</div>
+          ` : `<div class="body-s">${isHi ? "डाटा अनुपलब्ध।" : "Data unavailable."}</div>`}
         </div>
         <div class="card">
-          <div class="kicker" style="margin-bottom:8px;color:var(--jade);">Remedial Practice</div>
+          <div class="kicker" style="margin-bottom:8px;color:var(--jade);">${isHi ? "नक्षत्र शांति व साधना" : "Remedial Practice"}</div>
           <div class="body-s">${esc(medical.birthNakshatraUpay)}</div>
         </div>
       </div>
       <div class="body-s" style="margin-top:auto;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;color:var(--ivory-mute);">
-        The Moon's nakshatra is the most personal marker in Vedic astrology — it shapes emotional temperament, instinctive responses, and dharmic direction. Returning to it ritually each month on the same lunar position is a classical practice for self-attunement.
+        ${isHi
+          ? "वैदिक ज्योतिष में जन्म नक्षत्र जातक के भावनात्मक स्वभाव, अंतर्ज्ञान और मनोदशा का मुख्य निर्धारक है। प्रत्येक माह जब गोचर का चंद्र आपके जन्म नक्षत्र पर आए, तब आत्म-चिंतन और साधना करना अत्यंत शुभ फलदायी माना गया है।"
+          : "The Moon's nakshatra is the most personal marker in Vedic astrology — it shapes emotional temperament, instinctive responses, and dharmic direction. Returning to it ritually each month on the same lunar position is a classical practice for self-attunement."}
       </div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", "Nakshatra")}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "नक्षत्र" : "Nakshatra")}
   </section>`;
 }
 
 // ── Navtara & 27th Support Star Raksha Kavach ─────────────────────────────
-function pageNavtaraAndShield(chart: ChartData): string {
+function pageNavtaraAndShield(chart: ChartData, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   try {
     const intel = runNavtaraIntelligence(chart);
     const shield = intel.supportStarShield;
@@ -3402,42 +3539,42 @@ function pageNavtaraAndShield(chart: ChartData): string {
         : "var(--jade)";
 
     return `<section class="page dense">
-      ${pageRail("Navtara Intelligence & 27th Shield Star", "15")}
+      ${pageRail(isHi ? "नवतारा चक्र एवं 27वां रक्षा नक्षत्र" : "Navtara Intelligence & 27th Shield Star", "15")}
       <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;gap:12px;">
         <div class="section-title" style="margin-bottom:8px;">
           <span class="section-num">13</span>
-          <h2>Navtara Intelligence &amp; 27th Shield Star</h2>
+          <h2>${isHi ? "नवतारा चक्र एवं 27वां रक्षा नक्षत्र कवच" : "Navtara Intelligence &amp; 27th Shield Star"}</h2>
         </div>
 
         <!-- 27th Support Star Raksha Kavach Card -->
         <div class="card gold-edge" style="padding:16px;background:rgba(201,169,97,0.06);">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
             <div>
-              <div class="kicker" style="color:var(--gold);margin-bottom:2px;">Permanent Raksha Kavach (Protector Star)</div>
+              <div class="kicker" style="color:var(--gold);margin-bottom:2px;">${isHi ? "स्थायी रक्षा कवच (परम मित्र नक्षत्र)" : "Permanent Raksha Kavach (Protector Star)"}</div>
               <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold-bright);font-weight:700;">
-                ${esc(shield.nakshatra.name)} Nakshatra · Tara #9 Parama Mitra
+                ${esc(shield.nakshatra.name)} ${isHi ? "नक्षत्र · तारा #९ परम मित्र" : "Nakshatra · Tara #9 Parama Mitra"}
               </div>
             </div>
             <span class="badge" style="background:rgba(34,197,94,0.15);color:var(--jade);border:1px solid rgba(34,197,94,0.4);font-size:10px;padding:3px 8px;">
-              Shield Position #27
+              ${isHi ? "सुरक्षा स्थिति #27" : "Shield Position #27"}
             </span>
           </div>
 
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
             <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
-              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Sacred Flora</div>
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">${isHi ? "पवित्र वृक्ष" : "Sacred Flora"}</div>
               <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.tree)}</div>
             </div>
             <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
-              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Sacred Fauna</div>
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">${isHi ? "पवित्र प्राणी / पक्षी" : "Sacred Fauna"}</div>
               <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.animal)} / ${esc(shield.anchors.bird)}</div>
             </div>
             <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
-              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Deity</div>
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">${isHi ? "अधिष्ठाता देवता" : "Deity"}</div>
               <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.devta)}</div>
             </div>
             <div style="background:var(--surface);padding:8px 10px;border-radius:6px;border:1px solid var(--line);">
-              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">Sacred Symbol</div>
+              <div class="kicker" style="font-size:9px;color:var(--ivory-mute);">${isHi ? "पवित्र प्रतीक" : "Sacred Symbol"}</div>
               <div class="body-s" style="font-weight:600;color:var(--gold);">${esc(shield.anchors.symbol)}</div>
             </div>
           </div>
@@ -3451,12 +3588,12 @@ function pageNavtaraAndShield(chart: ChartData): string {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <!-- Quality Profile -->
           <div class="card" style="padding:14px;">
-            <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">Innate Internal Temperament</div>
+            <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">${isHi ? "मूल आंतरिक स्वभाव" : "Innate Internal Temperament"}</div>
             <div style="font-size:16px;font-weight:700;color:var(--ivory-bright);margin-bottom:6px;">
               ${esc(quality.temperamentTitle)}
             </div>
             <div class="body-s" style="line-height:1.55;color:var(--ivory-mute);margin-bottom:8px;">
-              Channels the foundational energy of preceding star lord <strong>${esc(quality.channellingLord)}</strong>.
+              ${isHi ? `पूर्व तारा स्वामी <strong>${esc(quality.channellingLord)}</strong> की मूलभूत ऊर्जा का संचालन करता है।` : `Channels the foundational energy of preceding star lord <strong>${esc(quality.channellingLord)}</strong>.`}
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:4px;">
               ${quality.coreTraits.map(t => `<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--surface);border:1px solid var(--line);color:var(--gold);">${esc(t)}</span>`).join("")}
@@ -3466,12 +3603,12 @@ function pageNavtaraAndShield(chart: ChartData): string {
           <!-- Active Dasha Qualification Audit -->
           <div class="card" style="padding:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <div class="kicker" style="color:var(--violet);margin-bottom:0;">Dasha Navtara Audit</div>
+              <div class="kicker" style="color:var(--violet);margin-bottom:0;">${isHi ? "दशा नवतारा ऑडिट" : "Dasha Navtara Audit"}</div>
               ${audit ? `<span class="badge" style="font-size:9px;color:${patternBadgeColor};border-color:${patternBadgeColor};">${esc(formatDashaPattern(audit.pattern))}</span>` : ""}
             </div>
             ${audit ? `
               <div style="font-size:14px;font-weight:700;color:var(--ivory-bright);margin-bottom:4px;">
-                ${esc(audit.activeMahadasha)} Mahadasha ${audit.activeAntardasha ? `· ${esc(audit.activeAntardasha)} AD` : ""}
+                ${esc(audit.activeMahadasha)} ${isHi ? "महादशा" : "Mahadasha"} ${audit.activeAntardasha ? `· ${esc(audit.activeAntardasha)} AD` : ""}
               </div>
               <div class="body-s" style="font-size:11px;line-height:1.5;color:var(--ivory-mute);margin-bottom:8px;">
                 ${esc(audit.patternDescription)}
@@ -3479,20 +3616,22 @@ function pageNavtaraAndShield(chart: ChartData): string {
               <div style="display:flex;flex-direction:column;gap:4px;">
                 ${audit.layers.map((l, idx) => `
                   <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;padding:3px 6px;background:var(--surface);border-radius:4px;">
-                    <span>Layer ${idx + 1}: ${esc(l.planet)} in ${esc(l.nakshatra.name)}</span>
+                    <span>${isHi ? "परत" : "Layer"} ${idx + 1}: ${esc(l.planet)} in ${esc(l.nakshatra.name)}</span>
                     <span style="font-weight:700;color:${l.isConcern ? 'var(--crimson)' : 'var(--jade)'};">T${l.tara.taraNum} ${esc(l.tara.name)}</span>
                   </div>
                 `).join("")}
               </div>
-            ` : `<div class="body-s">Active dasha audit unavailable.</div>`}
+            ` : `<div class="body-s">${isHi ? "सक्रिय दशा विश्लेषण अनुपलब्ध।" : "Active dasha audit unavailable."}</div>`}
           </div>
         </div>
 
         <div class="body-s" style="padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:6px;color:var(--ivory-mute);font-size:10.5px;line-height:1.5;">
-          <strong>Navtara Classical Rule:</strong> The 27 nakshatras unfold in 3 evolutionary cycles (Prathama, Dvitiya, Tritiya). In accordance with the Parashari transmission, when Mahadasha planets or transiting grahas activate auspicious Taras (2 Sampat, 4 Kshema, 6 Sadhaka, 8 Mitra, 9 Parama Mitra), life outcomes manifest fruitfully. Protective flora, fauna and deity contemplation neutralize afflicted Tara windows.
+          <strong>${isHi ? "नवतारा शास्त्रीय सिद्धांत:" : "Navtara Classical Rule:"}</strong> ${isHi
+            ? "27 नक्षत्र तीन चक्रों (प्रथम, द्वितीय, तृतीय) में विभाजित हैं। पराशरी सिद्धांत के अनुसार, जब महादशा या गोचर के ग्रह शुभ तारों (२ संपत, ४ क्षेम, ६ साधक, ८ मित्र, ९ परम मित्र) को सक्रिय करते हैं, तो कार्यों में निर्विघ्न सफलता प्राप्त होती है। प्रतिकूल तारा अवधि में पवित्र वृक्ष, पक्षी व ईष्ट साधना से रक्षा होती है।"
+            : "The 27 nakshatras unfold in 3 evolutionary cycles (Prathama, Dvitiya, Tritiya). In accordance with the Parashari transmission, when Mahadasha planets or transiting grahas activate auspicious Taras (2 Sampat, 4 Kshema, 6 Sadhaka, 8 Mitra, 9 Parama Mitra), life outcomes manifest fruitfully. Protective flora, fauna and deity contemplation neutralize afflicted Tara windows."}
         </div>
       </div>
-      ${pageFoot("astrolife · cosmic blueprint", "Navtara")}
+      ${pageFoot("astrolife · cosmic blueprint", isHi ? "नवतारा" : "Navtara")}
     </section>`;
   } catch (err) {
     console.error("Failed to render pageNavtaraAndShield:", err);
@@ -3594,11 +3733,12 @@ const PLANET_PROFILE: Record<string, PlanetProfile> = {
 
 // ── Per-Planet Deep Dive ──────────────────────────────────────────────────
 
-function pagePerPlanet(chart: ChartData, name: string, pageNum: string): string {
+function pagePerPlanet(chart: ChartData, name: string, pageNum: string, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const pd = chart.planets[name];
   const prof = PLANET_PROFILE[name];
   if (!pd || !prof) {
-    return `<section class="page dense">${pageRail(name, pageNum)}<div class="body" style="padding-top:24px;">No data for ${esc(name)}.</div>${pageFoot("astrolife · cosmic blueprint", name)}</section>`;
+    return `<section class="page dense">${pageRail(name, pageNum)}<div class="body" style="padding-top:24px;">${isHi ? `${name} हेतु कोई डाटा उपलब्ध नहीं है।` : `No data for ${esc(name)}.`}</div>${pageFoot("astrolife · cosmic blueprint", name)}</section>`;
   }
 
   const skt = PLANET_SANSKRIT[name] ?? name;
@@ -3613,7 +3753,7 @@ function pagePerPlanet(chart: ChartData, name: string, pageNum: string): string 
   const lkInterp = getMahadashaInterpretation(name, pd.house, pd.dignity);
 
   return `<section class="page dense">
-    ${pageRail(name + " · Graha Analysis", pageNum)}
+    ${pageRail(isHi ? `${skt} · ग्रह विश्लेषण` : name + " · Graha Analysis", pageNum)}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num devanagari">${esc(skt)}</span>
@@ -3623,12 +3763,12 @@ function pagePerPlanet(chart: ChartData, name: string, pageNum: string): string 
       <!-- Placement banner -->
       <div class="card gold-edge" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
         <div>
-          <div class="kicker" style="margin-bottom:4px;">Placement</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-bright);">${esc(pd.sign)} · House ${pd.house}</div>
-          <div class="mono" style="font-size:11px;color:var(--ivory-mute);margin-top:2px;">${pd.degree}°${String(pd.minutes).padStart(2,"0")}' · ${esc(pd.nakshatra)} Pada ${pd.pada}${pd.retrograde ? " · Retrograde (R)" : ""}</div>
+          <div class="kicker" style="margin-bottom:4px;">${isHi ? "ग्रह स्थिति" : "Placement"}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-bright);">${esc(pd.sign)} · ${isHi ? "भाव" : "House"} ${pd.house}</div>
+          <div class="mono" style="font-size:11px;color:var(--ivory-mute);margin-top:2px;">${pd.degree}°${String(pd.minutes).padStart(2,"0")}' · ${esc(pd.nakshatra)} ${isHi ? "चरण" : "Pada"} ${pd.pada}${pd.retrograde ? (isHi ? " · वक्री (R)" : " · Retrograde (R)") : ""}</div>
         </div>
         <div style="text-align:right;">
-          <div class="kicker" style="margin-bottom:4px;">Dignity</div>
+          <div class="kicker" style="margin-bottom:4px;">${isHi ? "ग्रह अवस्था" : "Dignity"}</div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:${dignityColor};">${esc(pd.dignity)}</div>
         </div>
       </div>
@@ -3636,11 +3776,11 @@ function pagePerPlanet(chart: ChartData, name: string, pageNum: string): string 
       <!-- Karaka + domain -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
         <div class="card">
-          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Significations (Karaka)</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">${isHi ? "कारक तत्व (Significations)" : "Significations (Karaka)"}</div>
           <div class="body-s">${esc(prof.karaka)}</div>
         </div>
         <div class="card">
-          <div class="kicker" style="margin-bottom:6px;color:var(--violet);">Life Domains</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--violet);">${isHi ? "जीवन क्षेत्र" : "Life Domains"}</div>
           <div class="body-s">${esc(prof.domain)}</div>
         </div>
       </div>
@@ -3648,33 +3788,33 @@ function pagePerPlanet(chart: ChartData, name: string, pageNum: string): string 
       <!-- Strong / weak -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
         <div class="card" style="border-color:rgba(111,181,138,0.3);">
-          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">When Well-Placed</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">${isHi ? "शुभ स्थिति में फल" : "When Well-Placed"}</div>
           <div class="body-s">${esc(prof.strongTrait)}</div>
         </div>
         <div class="card" style="border-color:rgba(201,85,95,0.25);">
-          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">When Afflicted</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">${isHi ? "पीड़ित / प्रतिकूल होने पर" : "When Afflicted"}</div>
           <div class="body-s">${esc(prof.weakTrait)}</div>
         </div>
       </div>
 
       <!-- Interpretation -->
       <div class="card" style="margin-bottom:14px;">
-        <div class="kicker" style="margin-bottom:8px;color:var(--gold);">In Your Chart — House ${pd.house}</div>
+        <div class="kicker" style="margin-bottom:8px;color:var(--gold);">${isHi ? `आपकी कुंडली में — भाव ${pd.house}` : `In Your Chart — House ${pd.house}`}</div>
         <div class="body-s" style="line-height:1.65;">${esc(houseRule?.core || lkInterp.overview || `${name} in house ${pd.house} channels its energy into ${prof.domain.toLowerCase()}.`)}</div>
-        ${houseRule?.career ? `<div class="body-s" style="line-height:1.6;margin-top:8px;"><strong style="color:var(--gold-dim);">Career:</strong> ${esc(houseRule.career)}</div>` : ""}
-        ${houseRule?.health ? `<div class="body-s" style="line-height:1.6;margin-top:6px;"><strong style="color:var(--gold-dim);">Health:</strong> ${esc(houseRule.health)}</div>` : ""}
+        ${houseRule?.career ? `<div class="body-s" style="line-height:1.6;margin-top:8px;"><strong style="color:var(--gold-dim);">${isHi ? "आजीविका:" : "Career:"}</strong> ${esc(houseRule.career)}</div>` : ""}
+        ${houseRule?.health ? `<div class="body-s" style="line-height:1.6;margin-top:6px;"><strong style="color:var(--gold-dim);">${isHi ? "स्वास्थ्य:" : "Health:"}</strong> ${esc(houseRule.health)}</div>` : ""}
       </div>
 
       <!-- Quick reference strip -->
       <div style="margin-top:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;">
-        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Day</div><div class="body-s">${esc(prof.day)}</div></div>
-        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Colour</div><div class="body-s">${esc(prof.color)}</div></div>
-        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Gem</div><div class="body-s">${esc(prof.gem)}</div></div>
-        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Metal</div><div class="body-s">${esc(prof.metal)}</div></div>
-        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">Body</div><div class="body-s">${esc(prof.body)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">${isHi ? "वार" : "Day"}</div><div class="body-s">${esc(prof.day)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">${isHi ? "रंग" : "Colour"}</div><div class="body-s">${esc(prof.color)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">${isHi ? "रत्न" : "Gem"}</div><div class="body-s">${esc(prof.gem)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">${isHi ? "धातु" : "Metal"}</div><div class="body-s">${esc(prof.metal)}</div></div>
+        <div><div class="kicker" style="font-size:8px;margin-bottom:2px;">${isHi ? "शरीर" : "Body"}</div><div class="body-s">${esc(prof.body)}</div></div>
       </div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", name)}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "ग्रह विश्लेषण" : name)}
   </section>`;
 }
 
@@ -3711,9 +3851,10 @@ const HOUSE_CAT_COLOR: Record<string, string> = {
   Upachaya: "var(--saffron)", Maraka: "var(--violet)",
 };
 
-function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string): string {
+function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const prof = HOUSE_PROFILE[houseNum];
-  if (!prof) return `<section class="page dense">${pageRail("House " + houseNum, pageNum)}<div class="body" style="padding-top:24px;">No data.</div>${pageFoot("astrolife · cosmic blueprint", "House")}</section>`;
+  if (!prof) return `<section class="page dense">${pageRail(isHi ? `भाव ${houseNum}` : "House " + houseNum, pageNum)}<div class="body" style="padding-top:24px;">${isHi ? "डाटा उपलब्ध नहीं है।" : "No data."}</div>${pageFoot("astrolife · cosmic blueprint", isHi ? "भाव विश्लेषण" : "House")}</section>`;
 
   const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
   const SIGN_RULER_MAP: Record<string,string> = {
@@ -3732,8 +3873,16 @@ function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string): stri
 
   const catColor = HOUSE_CAT_COLOR[prof.category] ?? "var(--gold)";
 
+  const CAT_HI: Record<string, string> = {
+    Kendra: "केंद्र भाव",
+    Trikona: "त्रिकोण भाव",
+    Dusthana: "त्रिक / दुस्थान भाव",
+    Upachaya: "उपचय भाव",
+    Maraka: "मारक भाव",
+  };
+
   return `<section class="page dense">
-    ${pageRail(prof.name, pageNum)}
+    ${pageRail(isHi ? `${prof.sanskrit} · ${prof.name.split(" · ")[1] ?? prof.name}` : prof.name, pageNum)}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">${houseNum}</span>
@@ -3744,17 +3893,17 @@ function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string): stri
       <div class="card gold-edge" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
         <div>
           <div class="devanagari" style="font-size:18px;color:var(--gold-dim);margin-bottom:2px;">${esc(prof.sanskrit)}</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);">House ${houseNum} · ${esc(houseSign)}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-bright);">${isHi ? `भाव ${houseNum} · ${esc(houseSign)}` : `House ${houseNum} · ${esc(houseSign)}`}</div>
         </div>
         <div style="text-align:right;">
-          <div class="kicker" style="margin-bottom:4px;">Category</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:${catColor};">${esc(prof.category)}</div>
+          <div class="kicker" style="margin-bottom:4px;">${isHi ? "श्रेणी" : "Category"}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:${catColor};">${esc(isHi ? (CAT_HI[prof.category] ?? prof.category) : prof.category)}</div>
         </div>
       </div>
 
       <!-- Detail -->
       <div class="card" style="margin-bottom:14px;">
-        <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">Significations</div>
+        <div class="kicker" style="margin-bottom:6px;color:var(--saffron);">${isHi ? "भाव के कारक एवं प्रभाव क्षेत्र" : "Significations"}</div>
         <div class="body-s" style="margin-bottom:8px;">${esc(prof.areas)}</div>
         <div class="body-s" style="line-height:1.65;">${esc(prof.detail)}</div>
       </div>
@@ -3762,34 +3911,34 @@ function pagePerHouse(chart: ChartData, houseNum: number, pageNum: string): stri
       <!-- Lord + occupants -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
         <div class="card">
-          <div class="kicker" style="margin-bottom:6px;color:var(--gold);">House Lord · ${esc(houseLord)}</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--gold);">${isHi ? `भाव स्वामी · ${esc(houseLord)}` : `House Lord · ${esc(houseLord)}`}</div>
           ${lordPd
-            ? `<div class="body-s">Placed in <strong style="color:var(--ivory);">${esc(lordPd.sign)}</strong>, House <strong style="color:var(--ivory);">${lordPd.house}</strong> at ${lordPd.degree}°${String(lordPd.minutes).padStart(2,"0")}'.</div>
-               <div class="body-s" style="margin-top:6px;">Dignity: <strong style="color:${(lordPd.dignity || '').toLowerCase().includes('debilit') || (lordPd.dignity || '').toLowerCase().includes('enemy') ? 'var(--crimson)' : (lordPd.dignity || '').toLowerCase().includes('exalt') || (lordPd.dignity || '').toLowerCase().includes('friend') ? 'var(--jade)' : 'var(--gold-bright)'};">${esc(lordPd.dignity || 'Neutral Sign')}</strong></div>`
-            : `<div class="body-s">Lord placement unavailable.</div>`}
+            ? `<div class="body-s">${isHi ? "स्थिति:" : "Placed in"} <strong style="color:var(--ivory);">${esc(lordPd.sign)}</strong>, ${isHi ? "भाव" : "House"} <strong style="color:var(--ivory);">${lordPd.house}</strong> at ${lordPd.degree}°${String(lordPd.minutes).padStart(2,"0")}'.</div>
+               <div class="body-s" style="margin-top:6px;">${isHi ? "अवस्था:" : "Dignity:"} <strong style="color:${(lordPd.dignity || '').toLowerCase().includes('debilit') || (lordPd.dignity || '').toLowerCase().includes('enemy') ? 'var(--crimson)' : (lordPd.dignity || '').toLowerCase().includes('exalt') || (lordPd.dignity || '').toLowerCase().includes('friend') ? 'var(--jade)' : 'var(--gold-bright)'};">${esc(lordPd.dignity || 'Neutral Sign')}</strong></div>`
+            : `<div class="body-s">${isHi ? "भावेश की स्थिति अनुपलब्ध।" : "Lord placement unavailable."}</div>`}
         </div>
         <div class="card">
-          <div class="kicker" style="margin-bottom:6px;color:var(--violet);">Occupants</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--violet);">${isHi ? "भाव में स्थित ग्रह" : "Occupants"}</div>
           ${occupants.length > 0
             ? `<div class="body-s">${occupants.map(o => `<span style="color:var(--gold);">${esc(o)}</span>`).join(", ")}</div>
-               <div class="body-s" style="margin-top:6px;color:var(--ivory-mute);">${occupants.length} planet${occupants.length > 1 ? "s" : ""} activate this house directly.</div>`
-            : `<div class="body-s" style="color:var(--ivory-mute);">No planets occupy this house. It is read primarily through its lord and aspects.</div>`}
+               <div class="body-s" style="margin-top:6px;color:var(--ivory-mute);">${isHi ? `${occupants.length} ग्रह इस भाव को प्रत्यक्ष सक्रिय करते हैं।` : `${occupants.length} planet${occupants.length > 1 ? "s" : ""} activate this house directly.`}</div>`
+            : `<div class="body-s" style="color:var(--ivory-mute);">${isHi ? "कोई ग्रह इस भाव में स्थित नहीं है। इसका फल भावेश एवं दृष्टियों द्वारा निर्धारित होता है।" : "No planets occupy this house. It is read primarily through its lord and aspects."}</div>`}
         </div>
       </div>
 
       <!-- Strong / weak -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:auto;">
         <div class="card" style="border-color:rgba(111,181,138,0.3);">
-          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">When Supported</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">${isHi ? "अनुकूल प्रभाव" : "When Supported"}</div>
           <div class="body-s">${esc(prof.strong)}</div>
         </div>
         <div class="card" style="border-color:rgba(201,85,95,0.25);">
-          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">When Afflicted</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">${isHi ? "प्रतिकूल प्रभाव" : "When Afflicted"}</div>
           <div class="body-s">${esc(prof.weak)}</div>
         </div>
       </div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", prof.name.split(" · ")[1] ?? "House")}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "भाव विश्लेषण" : "House")}
   </section>`;
 }
 
@@ -3812,7 +3961,59 @@ const SIGN_RULER_FULL: Record<string,string> = {
   Libra:"Venus",Scorpio:"Mars",Sagittarius:"Jupiter",Capricorn:"Saturn",Aquarius:"Saturn",Pisces:"Jupiter",
 };
 
-function pageLifeArea(chart: ChartData, cfg: LifeAreaConfig, pageNum: string): string {
+const LIFE_AREAS_HI: Record<string, { title: string; pageLabel: string; intro: string; guidance: string }> = {
+  Career: {
+    title: "आजीविका एवं व्यवसाय",
+    pageLabel: "करियर",
+    intro: "व्यावसायिक जीवन का मुख्य विश्लेषण दशम भाव (कर्म, मान-प्रतिष्ठा) से किया जाता है, जिसे प्रथम भाव (आत्मबल) और षष्ठ भाव (परिश्रम, सेवा) से सहयोग मिलता है। इन भावों के स्वामी और कर्म के कारक ग्रह आपकी आजीविका की दिशा स्पष्ट करते हैं।",
+    guidance: "करियर कुंडली में कोई पत्थर की लकीर नहीं है, बल्कि संभावनाओं का क्षेत्र है। जहाँ कारक ग्रह बलवान हों, वहाँ सरलता से सफलता मिलती है; जहाँ उन्हें संबल की आवश्यकता हो, वहाँ सजग प्रयास और सही दशा काल में उसी स्तर की उपलब्धि संभव होती है।",
+  },
+  Wealth: {
+    title: "धन, संपत्ति एवं आर्थिक समृद्धि",
+    pageLabel: "धन",
+    intro: "आर्थिक स्थिति द्वितीय भाव (संचित धन, बचत), एकादश भाव (आय, लाभ, इच्छा-पूर्ति) और पंचम भाव (बुद्धि-कौशल द्वारा लाभ) से नियंत्रित होती है। देवगुरु बृहस्पति समृद्धि के प्रमुख नैसर्गिक कारक हैं।",
+    guidance: "स्थाई और दीर्घकालिक समृद्धि धर्म और कर्म के समन्वय से ही फलित होती है। द्वितीय और एकादश भाव की सुदृढ़ता धनार्जन की क्षमता दर्शाती है, जबकि विंशोत्तरी दशा चक्र बड़े आर्थिक परिवर्तनों का समय निर्धारित करता है।",
+  },
+  Marriage: {
+    title: "विवाह एवं दांपत्य सम्बंध",
+    pageLabel: "विवाह",
+    intro: "वैवाहिक जीवन का शासन सप्तम भाव (जीवनसाथी, सम्बंध) के अधीन है, जिसमें द्वितीय भाव (कुटुम्ब विस्तार) और एकादश भाव (मनोरथ सिद्धि) सहायक बनते हैं। शुक्र प्रेम, सौहार्द और दांपत्य सुख के प्रमुख कारक हैं।",
+    guidance: "सम्बंधों का कर्म कुंडली में सबसे अधिक सुधारात्मक माना जाता है। अपने स्वभाव और प्रवृत्तियों के प्रति जागरूकता ही सबसे पहला और बड़ा उपचार है। नवांश (D9) चक्र इस सम्बंध को और अधिक सूक्ष्मता से स्पष्ट करता है।",
+  },
+  Family: {
+    title: "परिवार, गृह एवं कुल",
+    pageLabel: "परिवार",
+    intro: "चतुर्थ भाव माता, गृह-सुख और आंतरिक शांति का केंद्र है; द्वितीय भाव निकट परिवार व संस्कारों का संचालन करता है; तथा नवम भाव पिता और कुल परंपरा का प्रतिनिधित्व करता है।",
+    guidance: "घर आंतरिक सुख और मानसिक संतुलन का आधार है। जब चतुर्थ भाव और चंद्रमा को अनुकूल बल प्राप्त होता है, तो पारिवारिक जीवन में शांति और स्थिरता रहती है। किसी तनाव की स्थिति में घर में शांत वातावरण का निर्माण ही सर्वोत्तम साधन है।",
+  },
+  Children: {
+    title: "संतान, मेधा एवं रचनात्मकता",
+    pageLabel: "संतान",
+    intro: "पंचम भाव संतान, रचनात्मक प्रज्ञा और पूर्व-पुण्य का सूचक है; नवम भाव भाग्य और धर्म से सहयोग प्रदान करता है; तथा द्वितीय भाव कुल परंपरा को आगे बढ़ाता है। बृहस्पति संतान के नैसर्गिक कारक ग्रह हैं।",
+    guidance: "पंचम भाव आनंद, मेधा और सृजनात्मकता का भाव है—चाहे वह संतान के रूप में हो या ज्ञान, कला और विचारों के रूप में। इस भाव का सामर्थ्य यह दर्शाता है कि आपकी रचनात्मक ऊर्जा किस क्षेत्र में सबसे अधिक फलदायी होगी।",
+  },
+  Education: {
+    title: "विद्या, प्रज्ञा एवं उच्च ज्ञान",
+    pageLabel: "शिक्षा",
+    intro: "शिक्षा का विचार चतुर्थ भाव (आधारभूत विद्या, उपाधि), पंचम भाव (बुद्धि, विवेक) और नवम भाव (उच्च ज्ञान, तत्व-ज्ञान) से किया जाता है। बुध विश्लेषणात्मक मेधा और गुरु उच्च ज्ञान व विवेक के अधिष्ठाता हैं।",
+    guidance: "वैदिक परंपरा में विद्या आजीवन चलने वाली साधना है। बुध की स्थिति आपकी सीखने और समझने की शैली को दर्शाती है, जबकि गुरु यह निर्धारित करते हैं कि आप ज्ञान को जीवन में कितनी गहराई से उतार पाते हैं।",
+  },
+  Spirituality: {
+    title: "धर्म, साधना एवं मोक्ष पथ",
+    pageLabel: "अध्यात्म",
+    intro: "आध्यात्मिक मार्ग नवम भाव (धर्म, गुरु, उच्च उद्देश्य), द्वादश भाव (मोक्ष, आत्म-समर्पण) और पंचम भाव (मंत्र साधना, पूर्व-पुण्य) से प्रवाहित होता है। देवगुरु बृहस्पति ज्ञान के और केतु मोक्ष के नैसर्गिक कारक हैं।",
+    guidance: "कुंडली में आध्यात्मिकता केवल मत या विश्वास नहीं, बल्कि आत्मा की मोक्ष की ओर यात्रा है। जब नवम-द्वादश अक्ष सशक्त हो, तो साधक की आंतरिक यात्रा अत्यंत फलदायी और जीवन को वास्तविक शांति देने वाली होती है।",
+  },
+  Longevity: {
+    title: "स्वास्थ्य, जीवन ऊर्जा एवं दीर्घायु",
+    pageLabel: "दीर्घायु",
+    intro: "जीवन शक्ति का विचार प्रथम भाव (शरीर, संरचना), दीर्घायु का विचार अष्टम भाव (आयु, सहनशक्ति) और स्वास्थ्य चुनौतियों का विचार षष्ठ भाव (रोग, रोग प्रतिरोधक क्षमता) से किया जाता है। सूर्य प्राण ऊर्जा के तथा शनि सहनशक्ति के कारक हैं।",
+    guidance: "यह ज्योतिषीय दृष्टिकोण है, कोई चिकित्सीय निदान नहीं। कुंडली जीवन शक्ति की प्रवृत्तियों और संवेदनशील समय को इंगित करती है—सजग जीवनशैली, संतुलित दिनचर्या और जागरूक देखभाल ही सबसे बड़ा सुरक्षा कवच हैं।",
+  },
+};
+
+function pageLifeArea(chart: ChartData, cfg: LifeAreaConfig, pageNum: string, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi";
   // Assess each governing house
   const houseRows = cfg.houses.map(h => {
     const signIdx = ((chart.lagnaNum + (h - 1)) % 12 + 12) % 12;
@@ -3823,11 +4024,11 @@ function pageLifeArea(chart: ChartData, cfg: LifeAreaConfig, pageNum: string): s
     const hp = HOUSE_PROFILE[h];
     return `<div class="card" style="padding:12px;margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-bright);">House ${h} · ${esc(sign)}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-bright);">${isHi ? `भाव ${h}` : `House ${h}`} · ${esc(isHi ? (RASHI_HI[sign] || sign) : sign)}</div>
         <div class="kicker" style="font-size:8px;">${esc(hp?.name.split(" · ")[1] ?? "")}</div>
       </div>
-      <div class="body-s">Lord <strong style="color:var(--ivory);">${esc(lord)}</strong>${lordPd ? ` in ${esc(lordPd.sign)} (H${lordPd.house}) · ${esc(lordPd.dignity)}` : ""}.
-      ${occupants.length > 0 ? ` Occupied by <strong style="color:var(--gold);">${occupants.map(esc).join(", ")}</strong>.` : " No occupants."}</div>
+      <div class="body-s">${isHi ? "भावेश" : "Lord"} <strong style="color:var(--ivory);">${esc(isHi ? (PLANET_HI[lord] || lord) : lord)}</strong>${lordPd ? ` ${isHi ? "स्थित" : "in"} ${esc(isHi ? (RASHI_HI[lordPd.sign] || lordPd.sign) : lordPd.sign)} (${isHi ? "भाव" : "H"}${lordPd.house})${lordPd.dignity ? ` · ${esc(lordPd.dignity)}` : ""}` : ""}.
+      ${occupants.length > 0 ? ` ${isHi ? "स्थित ग्रह:" : "Occupied by"} <strong style="color:var(--gold);">${occupants.map(o => isHi ? (PLANET_HI[o] || o) : o).map(esc).join(", ")}</strong>.` : (isHi ? " कोई ग्रह स्थित नहीं।" : " No occupants.")}</div>
     </div>`;
   }).join("");
 
@@ -3837,31 +4038,35 @@ function pageLifeArea(chart: ChartData, cfg: LifeAreaConfig, pageNum: string): s
     const dl = pd.dignity.toLowerCase();
     const dc = dl.includes("exalt") ? "var(--jade)" : dl.includes("debilit") ? "var(--crimson)" : dl.includes("own") || dl.includes("sva") ? "var(--gold)" : "var(--violet)";
     return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line);">
-      <span class="body-s"><strong style="color:var(--ivory);">${esc(k)}</strong> · ${esc(pd.sign)} H${pd.house}</span>
+      <span class="body-s"><strong style="color:var(--ivory);">${esc(isHi ? (PLANET_HI[k] || k) : k)}</strong> · ${esc(isHi ? (RASHI_HI[pd.sign] || pd.sign) : pd.sign)} ${isHi ? "भाव" : "H"}${pd.house}</span>
       <span class="body-s" style="color:${dc};">${esc(pd.dignity)}</span>
     </div>`;
   }).join("");
 
+  const title = isHi ? (LIFE_AREAS_HI[cfg.pageLabel]?.title || cfg.title) : cfg.title;
+  const intro = isHi ? (LIFE_AREAS_HI[cfg.pageLabel]?.intro || cfg.intro) : cfg.intro;
+  const guidance = isHi ? (LIFE_AREAS_HI[cfg.pageLabel]?.guidance || cfg.guidance) : cfg.guidance;
+
   return `<section class="page dense">
-    ${pageRail(cfg.title, pageNum)}
+    ${pageRail(title, pageNum)}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">✦</span>
-        <h2>${esc(cfg.title)}</h2>
+        <h2>${esc(title)}</h2>
       </div>
-      <div class="body-s" style="margin-bottom:16px;max-width:600px;line-height:1.6;">${esc(cfg.intro)}</div>
+      <div class="body-s" style="margin-bottom:16px;max-width:600px;line-height:1.6;">${esc(intro)}</div>
 
-      <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">Governing Houses</div>
+      <div class="kicker" style="margin-bottom:8px;color:var(--saffron);">${isHi ? "शासक एवं नियंत्रक भाव" : "Governing Houses"}</div>
       ${houseRows}
 
       <div class="card gold-edge" style="margin-top:6px;">
-        <div class="kicker" style="margin-bottom:8px;color:var(--gold);">Natural Significators (Karakas)</div>
-        ${karakaRows || `<div class="body-s">Significator data unavailable.</div>`}
+        <div class="kicker" style="margin-bottom:8px;color:var(--gold);">${isHi ? "नैसर्गिक कारक ग्रह" : "Natural Significators (Karakas)"}</div>
+        ${karakaRows || `<div class="body-s">${isHi ? "कारक ग्रह विवरण उपलब्ध नहीं है।" : "Significator data unavailable."}</div>`}
       </div>
 
-      <div class="body-s" style="margin-top:auto;padding-top:12px;color:var(--ivory-mute);font-style:italic;line-height:1.6;">${esc(cfg.guidance)}</div>
+      <div class="body-s" style="margin-top:auto;padding-top:12px;color:var(--ivory-mute);font-style:italic;line-height:1.6;">${esc(guidance)}</div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", cfg.pageLabel)}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? (LIFE_AREAS_HI[cfg.pageLabel]?.pageLabel || cfg.pageLabel) : cfg.pageLabel)}
   </section>`;
 }
 
@@ -3918,7 +4123,8 @@ const LIFE_AREAS: LifeAreaConfig[] = [
 
 // ── Ashtakavarga ──────────────────────────────────────────────────────────
 
-function pageAshtakavarga(chart: ChartData, pageNum: string): string {
+function pageAshtakavarga(chart: ChartData, pageNum: string, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const akv = calculateAshtakavarga(
     chart.planets as Parameters<typeof calculateAshtakavarga>[0],
     chart.lagnaNum
@@ -3927,7 +4133,7 @@ function pageAshtakavarga(chart: ChartData, pageNum: string): string {
   const houseBars = akv.houses.map(h => {
     const pct = Math.min(100, Math.round((h.score / 8) * 100));
     return `<div style="display:grid;grid-template-columns:30px 1fr 36px;align-items:center;gap:8px;padding:3px 0;">
-      <span class="mono body-s" style="color:var(--gold-dim);">H${h.house}</span>
+      <span class="mono body-s" style="color:var(--gold-dim);">${isHi ? "भाव" : "H"}${h.house}</span>
       <div style="height:8px;background:var(--line);border-radius:99px;overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:${h.color};border-radius:99px;"></div>
       </div>
@@ -3936,43 +4142,46 @@ function pageAshtakavarga(chart: ChartData, pageNum: string): string {
   }).join("");
 
   return `<section class="page dense">
-    ${pageRail("Ashtakavarga · Bindu Strength", pageNum)}
+    ${pageRail(isHi ? "अष्टकवर्ग · बिंदु सामर्थ्य" : "Ashtakavarga · Bindu Strength", pageNum)}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">AV</span>
-        <h2>Ashtakavarga</h2>
+        <h2>${isHi ? "अष्टकवर्ग सामर्थ्य" : "Ashtakavarga"}</h2>
       </div>
       <div class="body-s" style="margin-bottom:16px;max-width:620px;line-height:1.6;">
-        Ashtakavarga assigns benefic points (bindus) to each house from the perspective of all seven planets plus the Lagna. The Sarvashtakavarga total per house reveals which life areas carry the most natural support. Total across the chart: <strong style="color:var(--gold);">${akv.sarvaTotal}</strong> bindus (classical average 337).
+        ${isHi
+          ? `अष्टकवर्ग पद्धति में सातों ग्रहों और लग्न द्वारा प्रत्येक भाव को शुभ बिंदु प्रदान किए जाते हैं। 28 से अधिक बिंदु शुभता और प्राकृतिक सहयोग का संकेत देते हैं। कुंडली का कुल सर्वाष्टकवर्ग योग: <strong style="color:var(--gold);">${akv.sarvaTotal}</strong> बिंदु (शास्त्रीय औसत 337).`
+          : `Ashtakavarga assigns benefic points (bindus) to each house from the perspective of all seven planets plus the Lagna. The Sarvashtakavarga total per house reveals which life areas carry the most natural support. Total across the chart: <strong style="color:var(--gold);">${akv.sarvaTotal}</strong> bindus (classical average 337).`}
       </div>
       <div class="card" style="margin-bottom:14px;">
-        <div class="kicker" style="margin-bottom:10px;color:var(--saffron);">House Strength (Sarvashtakavarga)</div>
+        <div class="kicker" style="margin-bottom:10px;color:var(--saffron);">${isHi ? "भाव सामर्थ्य (सर्वाष्टकवर्ग बिंदु)" : "House Strength (Sarvashtakavarga)"}</div>
         ${houseBars}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="card" style="border-color:rgba(111,181,138,0.3);">
-          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">Strongest Life Areas</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--jade);">${isHi ? "सर्वाधिक समर्थित जीवन क्षेत्र" : "Strongest Life Areas"}</div>
           ${akv.topLifeAreas.slice(0, 4).map(a => `<div class="body-s" style="margin-bottom:3px;">• ${esc(a)}</div>`).join("") || `<div class="body-s">—</div>`}
         </div>
         <div class="card" style="border-color:rgba(201,85,95,0.25);">
-          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">Needs Support</div>
+          <div class="kicker" style="margin-bottom:6px;color:var(--crimson);">${isHi ? "सावधानी व सहयोग क्षेत्र" : "Needs Support"}</div>
           ${akv.weakLifeAreas.slice(0, 4).map(a => `<div class="body-s" style="margin-bottom:3px;">• ${esc(a)}</div>`).join("") || `<div class="body-s">—</div>`}
         </div>
       </div>
       <div class="body-s" style="margin-top:auto;padding-top:12px;color:var(--ivory-mute);line-height:1.6;">${esc(akv.lifeSummary)}</div>
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", "Ashtakavarga")}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "अष्टकवर्ग" : "Ashtakavarga")}
   </section>`;
 }
 
 // ── Antardasha Detail (sub-periods of active Mahadasha) ───────────────────
 
-function pageAntardashaDetail(chart: ChartData, pageNum: string): string {
+function pageAntardashaDetail(chart: ChartData, pageNum: string, lang: ReportLanguage = "en"): string {
+  const isHi = lang === "hi" || lang === "hindi";
   const activeMD = chart.dashas.find(d => d.active) ?? chart.dashas[0];
   const ads = chart.antardasha.slice(0, 9); // full antardasha sequence
 
   if (ads.length === 0) {
-    return `<section class="page dense">${pageRail("Antardasha Sequence", pageNum)}<div class="body" style="padding-top:24px;">No antardasha data available.</div>${pageFoot("astrolife · cosmic blueprint", "Antardasha")}</section>`;
+    return `<section class="page dense">${pageRail(isHi ? "अंतर्दशा क्रम" : "Antardasha Sequence", pageNum)}<div class="body" style="padding-top:24px;">${isHi ? "अंतर्दशा डाटा अनुपलब्ध।" : "No antardasha data available."}</div>${pageFoot("astrolife · cosmic blueprint", isHi ? "अंतर्दशा" : "Antardasha")}</section>`;
   }
 
   const rows = ads.map(ad => {
@@ -3982,7 +4191,7 @@ function pageAntardashaDetail(chart: ChartData, pageNum: string): string {
     return `<div class="card${isActive ? " gold-edge" : ""}" style="padding:12px;margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:${isActive ? "var(--gold-bright)" : "var(--ivory)"};">
-          ${esc(activeMD?.planet ?? "")}–${esc(ad.planet)} ${isActive ? "<span class='badge' style='font-size:8px;'>Active</span>" : ""}
+          ${esc(activeMD?.planet ?? "")}–${esc(ad.planet)} ${isActive ? `<span class='badge' style='font-size:8px;'>${isHi ? "सक्रिय" : "Active"}</span>` : ""}
         </div>
         <div class="mono body-s" style="color:var(--ivory-mute);">${formatDateShort(new Date(ad.start))} — ${formatDateShort(new Date(ad.end))}</div>
       </div>
@@ -3991,18 +4200,20 @@ function pageAntardashaDetail(chart: ChartData, pageNum: string): string {
   }).join("");
 
   return `<section class="page dense">
-    ${pageRail("Antardasha Sequence · " + (activeMD?.planet ?? "") + " Mahadasha", pageNum)}
+    ${pageRail(isHi ? `अंतर्दशा क्रम · ${activeMD?.planet ?? ""} महादशा` : "Antardasha Sequence · " + (activeMD?.planet ?? "") + " Mahadasha", pageNum)}
     <div style="position:relative;z-index:2;padding-top:24px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:14px;">
         <span class="section-num">AD</span>
-        <h2>Antardasha Sequence</h2>
+        <h2>${isHi ? "अंतर्दशा क्रम" : "Antardasha Sequence"}</h2>
       </div>
       <div class="body-s" style="margin-bottom:14px;max-width:600px;line-height:1.6;">
-        Within the ${esc(activeMD?.planet ?? "")} Mahadasha, nine sub-periods (antardashas) unfold in sequence — each colouring the larger period with its own planetary flavour. This is the finer texture of your current time-map.
+        ${isHi
+          ? `${esc(activeMD?.planet ?? "")} महादशा के अंतर्गत सभी 9 अंतर्दशाएं क्रमानुसार घटित होती हैं — प्रत्येक अंतर्दशा मुख्य समय काल को अपने विशिष्ट ग्रहीय स्वभाव से रंगती है। यह आपके समय चक्र का सूक्ष्म मानचित्र है:`
+          : `Within the ${esc(activeMD?.planet ?? "")} Mahadasha, nine sub-periods (antardashas) unfold in sequence — each colouring the larger period with its own planetary flavour. This is the finer texture of your current time-map.`}
       </div>
       ${rows}
     </div>
-    ${pageFoot("astrolife · cosmic blueprint", "Antardasha")}
+    ${pageFoot("astrolife · cosmic blueprint", isHi ? "अंतर्दशा" : "Antardasha")}
   </section>`;
 }
 
@@ -5289,7 +5500,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
   const context = buildReportEngineContext(chart, options);
   const { palette, cover } = context.settings;
   const editionLabel = reportEditionLabel(context.settings.type);
-  const coverPage = cover === "lagnalord" ? page1LagnaLord(chart, editionLabel) : page1Wheel(chart, editionLabel);
+  const coverPage = cover === "lagnalord" ? page1LagnaLord(chart, editionLabel) : page1Wheel(chart, editionLabel, lang);
 
   // Wrap every page in try-catch so one data error never blanks the whole report
   function safe(fn: () => string, label: string): string {
@@ -5381,17 +5592,17 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
   // Per-planet deep-dive pages (Phase 2). Page numbers are cosmetic labels.
   const PLANET_ORDER = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
   const perPlanetPages = include.perPlanet
-    ? PLANET_ORDER.map((p, i) => safe(() => pagePerPlanet(chart, p, String(7 + i)), `Planet:${p}`))
+    ? PLANET_ORDER.map((p, i) => safe(() => pagePerPlanet(chart, p, String(7 + i), lang), `Planet:${p}`))
     : [];
 
   // Per-house deep-dive pages (Phase 2) — all 12 bhavas.
   const perHousePages = include.perHouse
-    ? Array.from({ length: 12 }, (_, i) => safe(() => pagePerHouse(chart, i + 1, String(16 + i)), `House:${i + 1}`))
+    ? Array.from({ length: 12 }, (_, i) => safe(() => pagePerHouse(chart, i + 1, String(16 + i), lang), `House:${i + 1}`))
     : [];
 
   // Life-area pages (Phase 3) — 8 areas.
   const lifeAreaPages = include.lifeAreas
-    ? LIFE_AREAS.map((cfg, i) => safe(() => pageLifeArea(chart, cfg, String(40 + i)), `LifeArea:${cfg.pageLabel}`))
+    ? LIFE_AREAS.map((cfg, i) => safe(() => pageLifeArea(chart, cfg, String(40 + i), lang), `LifeArea:${cfg.pageLabel}`))
     : [];
 
   const narrativeDigestPages = include.narrativeDigestsV4
@@ -5403,9 +5614,9 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
 
   const rawPages = [
     safe(() => coverPage,                    "Cover"),
-    safe(() => page2Welcome(),              "Welcome"),
-    safe(() => page3Foreword(),              "Foreword"),
-    safe(() => page4TOC(t, include),         "Contents"),
+    safe(() => page2Welcome(lang),           "Welcome"),
+    safe(() => page3Foreword(lang),          "Foreword"),
+    safe(() => page4TOC(t, include, lang),   "Contents"),
     include.destinySnapshotV4 ? safe(() => pageDestinySnapshotV4(chart, reportIntelligence), "Destiny Snapshot V4") : "",
     include.intelligenceScoreboardV4 ? safe(() => pageIntelligenceScoreboardV4(reportIntelligence), "Universal Scoreboard") : "",
     include.lifePatternV4    ? safe(() => pageReportNarrativeSectionV4(reportIntelligence.lifePatternDecoder, "LP", "Life Pattern Decoder"), "Life Pattern Decoder") : "",
@@ -5419,24 +5630,24 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.opportunityV4    ? safe(() => pageWealthCareerForeignV4(chart, reportIntelligence), "Opportunity Blueprint") : "",
     include.relationshipV4   ? safe(() => pageNarrativeBlock(chart, reportIntelligence.relationship, "RI", "Relationship Intelligence"), "Relationship Intelligence V4") : "",
     include.eventRemedyV4    ? safe(() => pageEventAndRemedyV4(chart, reportIntelligence), "Event Remedy Strategy") : "",
-    safe(() => page5BirthSnapshot(chart),    "Birth Snapshot"),
+    safe(() => page5BirthSnapshot(chart, lang),    "Birth Snapshot"),
     include.starMap    ? safe(() => pageStarMap(chart, "5b"),   "Star Map")        : "",
-    safe(() => page6PlanetaryDashboard(chart),"Planetary Dashboard"),
+    safe(() => page6PlanetaryDashboard(chart, lang),"Planetary Dashboard"),
     ...perPlanetPages,
     ...perHousePages,
-    include.yogas      ? safe(() => pageYogas(chart),       "Yogas")           : "",
-    include.doshas     ? safe(() => pageDoshas(chart),      "Doshas")          : "",
-    include.shadbala   ? safe(() => pageShadbala(chart),    "Shadbala")        : "",
-    include.ashtakavarga ? safe(() => pageAshtakavarga(chart, "Av"), "Ashtakavarga") : "",
+    include.yogas      ? safe(() => pageYogas(chart, lang),       "Yogas")           : "",
+    include.doshas     ? safe(() => pageDoshas(chart, lang),      "Doshas")          : "",
+    include.shadbala   ? safe(() => pageShadbala(chart, lang),    "Shadbala")        : "",
+    include.ashtakavarga ? safe(() => pageAshtakavarga(chart, "Av", lang), "Ashtakavarga") : "",
     include.divisional ? safe(() => pageDivisional(chart, lang), "Divisional") : "",
     include.dasha      ? safe(() => page7CurrentDasha(chart, lang),  "Current Dasha")  : "",
     include.dasha      ? safe(() => page8UpcomingDashas(chart, lang),"Upcoming Dashas"): "",
-    include.antardasha ? safe(() => pageAntardashaDetail(chart, "Ad"), "Antardasha") : "",
-    include.lalkitab   ? safe(() => pageLalKitabCoreAccuracy(chart), "Lal Kitab Core Accuracy") : "",
+    include.antardasha ? safe(() => pageAntardashaDetail(chart, "Ad", lang), "Antardasha") : "",
+    include.lalkitab   ? safe(() => pageLalKitabCoreAccuracy(chart, lang), "Lal Kitab Core Accuracy") : "",
     include.lalkitab   ? safe(() => pageLalKitabTimingAndRemedy(chart, lang), "Lal Kitab Timing & Remedy") : "",
     include.lalkitab   ? safe(() => pageLalKitabPlanetDomains(chart, lang), "Lal Kitab Planet Domains") : "",
-    include.nakshatra  ? safe(() => pageNakshatra(chart),   "Nakshatra")       : "",
-    include.nakshatra  ? safe(() => pageNavtaraAndShield(chart), "Navtara & 27th Shield Star") : "",
+    include.nakshatra  ? safe(() => pageNakshatra(chart, lang),   "Nakshatra")       : "",
+    include.nakshatra  ? safe(() => pageNavtaraAndShield(chart, lang), "Navtara & 27th Shield Star") : "",
     ...lifeAreaPages,
     include.health     ? safe(() => pageHealth(chart),      "Health")          : "",
     include.psychology ? safe(() => pagePsychology(chart, lang), "Psychology") : "",
@@ -5470,7 +5681,7 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.functionalDebilityGuard ? safe(() => pageFunctionalDebilityGuard(chart, "DG", lang), "Functional Debility Guard") : "",
     include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK", lang), "Lineage Karma & Kula Devata") : "",
     include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP", lang), "12 Jyotirlinga Sanctuary") : "",
-    safe(() => page10Closing(),              "Closing"),
+    safe(() => page10Closing(lang),          "Closing"),
   ].filter(Boolean).join("\n\n");
 
   // Re-number pages sequentially (Cover is page 1 without pagenum)

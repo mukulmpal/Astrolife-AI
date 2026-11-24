@@ -195,10 +195,10 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", la
       <div class="card" style="padding:14px;border-left:3px solid var(--gold);margin-bottom:10px;">
         <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">${isEn ? "Living Archetype & Psychological Temperament" : "जीवंत स्वरूप व मनोवैज्ञानिक स्वभाव"}</div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;margin-bottom:6px;">
-          ${esc(isEn ? i18nNak.innerState : dossier.section1_InnerStateAndPersonality)}
+          ${esc(i18nNak.innerState)}
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.5;">
-          ${esc(isEn ? i18nNak.livingArchetype : dossier.section2_LivingArchetypeStory)}
+          ${esc(i18nNak.livingArchetype)}
         </div>
       </div>
 
@@ -207,13 +207,13 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", la
         <div class="card" style="padding:12px;border-left:3px solid var(--crimson);">
           <div class="kicker" style="color:var(--crimson);margin-bottom:4px;">${isEn ? "Karmic Trap & Warning" : "कर्मिक भटकाव व क्रोध चेतावनी"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(isEn ? i18nNak.karmicTrap : dossier.section3_KarmicTrapAndAngerWarning)}
+            ${esc(i18nNak.karmicTrap)}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid var(--jade);">
           <div class="kicker" style="color:var(--jade);margin-bottom:4px;">${isEn ? "Daily Conduct Protocol" : "दैनिक आचरण व जीवन-नियम"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(isEn ? i18nNak.dailyConduct : dossier.section4_BehavioralConductInDailyLife)}
+            ${esc(i18nNak.dailyConduct)}
           </div>
         </div>
       </div>
@@ -221,19 +221,19 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", la
       <!-- Actionable Seva Plan & Checklist -->
       <div class="card" style="padding:12px;background:var(--surface);margin-bottom:10px;">
         <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">${isEn ? "Targeted Social Seva & Action Protocol" : "सटीक सामाजिक सेवा व कर्म सुधार"}</div>
-        <div style="font-size:11px;color:var(--ivory);margin-bottom:8px;">${esc(isEn ? i18nNak.primarySeva : dossier.section5_ActionableRemedyAndSevaPlan)}</div>
+        <div style="font-size:11px;color:var(--ivory);margin-bottom:8px;">${esc(i18nNak.primarySeva)}</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Primary Seva" : "प्रधान सेवा"}</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(isEn ? i18nNak.primarySeva.slice(0, 35) + "..." : dossier.primaryActionItem)}</div>
+            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(i18nNak.primarySeva.slice(0, 35) + "...")}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Creature Seva" : "जीव सेवा"}</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(isEn ? i18nNak.pashuSeva.slice(0, 35) + "..." : dossier.naturePashuSeva)}</div>
+            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(i18nNak.pashuSeva.slice(0, 35) + "...")}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Auspicious Timing" : "शुभ समय"}</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(isEn ? i18nNak.timing : dossier.timingAndMuhurat)}</div>
+            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(i18nNak.timing)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Key Elements" : "पूजन सामग्री"}</div>
@@ -243,10 +243,47 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", la
       </div>
 
       <!-- Elemental Vehicle -->
-      <div class="card" style="padding:10px;border-left:3px solid var(--cyan);">
-        <div class="kicker" style="color:var(--cyan);margin-bottom:2px;">${esc(dossier.elementalVehicleTitle)}</div>
-        <div style="font-size:10px;color:var(--ivory-dim);">${esc(dossier.elementalVehicleExplanation)} — <em>${esc(dossier.elementalVehicleProcedure)}</em></div>
-      </div>
+      ${(() => {
+        const titleLower = (dossier.elementalVehicleTitle || "").toLowerCase();
+        let evTitle = isEn ? "Earth Grounding & Soil Imprint (Prithvi Trikona)" : "भूमि समर्पण एवं मृदा शुद्धि (पृथ्वी त्रिकोण)";
+        let evExp = isEn
+          ? "Because the active dasha planet occupies an earth house (2, 6, or 10), grounding its material vibration into mother earth neutralizes erratic karmic friction."
+          : "क्योंकि संबंधित दशा स्वामी 2, 6 या 10 भाव (पृथ्वी त्रिकोण) में स्थित है, पृथ्वी तत्व आक्रामक ऊर्जा को अवशोषित कर शांत करता है।";
+        let evProc = isEn
+          ? "Offer grain, iron, or natural clay items into clean soil near tree roots on auspicious days."
+          : "संबंधित सामग्री को किसी वृक्ष की जड़ के समीप स्वच्छ मिट्टी में अर्पित करें।";
+
+        if (titleLower.includes("agni") || titleLower.includes("deepak") || titleLower.includes("havan")) {
+          evTitle = isEn ? "Sacred Fire & Flame Archana (Agni Trikona)" : "पवित्र अग्नि एवं दीप अर्चन (अग्नि त्रिकोण)";
+          evExp = isEn
+            ? "Because the active planet occupies a fire house (1, 5, or 9), sacred flame is the primary vibrational vehicle to transmute dense karma into golden clarity."
+            : "क्योंकि संबंधित ग्रह 1, 5 या 9 भाव (अग्नि त्रिकोण) में स्थित है, पवित्र अग्नि समस्त दूषित ऊर्जा को भस्म कर शुद्ध कुंदन बनाती है।";
+          evProc = isEn
+            ? "Light a pure cow-ghee lamp at sunrise facing east with the planet's mantra or Gayatri mantra."
+            : "गाय के शुद्ध घी का दीपक जलाएं अथवा बीज मंत्र से सूक्ष्म हवन करें।";
+        } else if (titleLower.includes("vayu") || titleLower.includes("mantra") || titleLower.includes("dhwani")) {
+          evTitle = isEn ? "Sound Current & Mantra Vibration (Vayu Trikona)" : "मंत्र ध्वनि एवं वायु स्पंदन (वायु त्रिकोण)";
+          evExp = isEn
+            ? "Because the active planet occupies an air house (3, 7, or 11), rhythmic vocal and mental sound vibrations re-align subtle neurological pathways."
+            : "क्योंकि संबंधित ग्रह 3, 7 या 11 भाव (वायु त्रिकोण) में स्थित है, शब्द तरंगों व मंत्र ध्वनि से मानसिक आवरण शुद्ध होता है।";
+          evProc = isEn
+            ? "Recite the planetary beej mantra aloud or silently during conscious morning breathwork in open air."
+            : "खुली हवा में बैठकर प्राणायाम के साथ ग्रह के बीज मंत्र का स्पष्ट जप करें।";
+        } else if (titleLower.includes("jal") || titleLower.includes("water") || titleLower.includes("pravah")) {
+          evTitle = isEn ? "Flowing Water Dissolution (Jala Trikona)" : "जल प्रवाह एवं कर्म विसर्जन (जल त्रिकोण)";
+          evExp = isEn
+            ? "Because the active planet occupies a water house (4, 8, or 12), clean flowing water washes away inherited energetic burdens and stagnant karma."
+            : "क्योंकि संबंधित ग्रह 4, 8 या 12 भाव (जल त्रिकोण) में स्थित है, स्वच्छ बहता जल संचित कर्मों और दूषित ऊर्जा को बहा ले जाता है।";
+          evProc = isEn
+            ? "Float natural offerings into clean running streams or rivers with humble surrender; never in stagnant water."
+            : "संबंधित सामग्री को बहते स्वच्छ जल में श्रद्धापूर्वक विसर्जित करें।";
+        }
+
+        return `<div class="card" style="padding:10px;border-left:3px solid var(--cyan);">
+          <div class="kicker" style="color:var(--cyan);margin-bottom:2px;">${esc(evTitle)}</div>
+          <div style="font-size:10px;color:var(--ivory-dim);">${esc(evExp)} — <em>${esc(evProc)}</em></div>
+        </div>`;
+      })()}
     </div>
     ${pageFoot("astrolife · karmic alignment", "Nakshatra Social Registry")}
   </section>`;
