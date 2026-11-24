@@ -30,6 +30,14 @@ import { calculateAshtakavarga } from "../../astro-engine/ashtakavarga";
 import { calculateShadbala } from "../../astro-engine/shadbala";
 import { detectYogas } from "../../astro-engine/yogas";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import {
+  ALL_RASHIS,
+  ALL_NAKSHATRAS,
+  RASHI_LORDS,
+  getGenderLateralization,
+  getDynamicGemstonePrescription,
+  renderHumanImpactCardHtml
+} from "../../astro/human-translator";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -268,24 +276,29 @@ export function generateRajaYogaWealthDossierHTML(
   chart: ChartData,
   options: PackageDossierOptions
 ): string {
-  const subjectName = escapeHtml(options.customerName || chart.name || "Mukul Mohan Pal");
+  const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
   const orderId = escapeHtml(options.orderId || `AL-ORD-WEALTH-${Date.now().toString(36).toUpperCase()}`);
   const paymentId = escapeHtml(options.paymentId || `PAY-SHASTRA-${Date.now().toString(36).toUpperCase()}`);
   const isSample = Boolean(options.isSample);
 
   // Single Source of Truth Ephemeris Constants
-  const birthDate = chart.dob || "1995-07-04";
-  const birthTime = chart.tob || "12:30";
+  const birthDate = chart.dob || "Recorded";
+  const birthTime = chart.tob || "12:00";
   const birthCity = escapeHtml(chart.city || "Delhi");
   const latStr = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
   const lonStr = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
 
-  const lagnaNum = chart.lagnaNum !== undefined ? chart.lagnaNum : 5; // 5 = Virgo
-  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Virgo";
+  const lagnaNum = chart.lagnaNum !== undefined ? chart.lagnaNum : 0;
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Aries";
+  const lagnaLord = SIGN_LORDS[lagnaRashi] || "Mars";
   const moonP = chart.planets?.["Moon"];
   const moonRashi = moonP?.sign || "Leo";
-  const nakshatra = moonP?.nakshatra || "Uttara Phalguni";
+  const nakshatra = moonP?.nakshatra || "Ashwini";
   const pada = moonP?.pada || 1;
+
+  const subjectGender = (options.gender || (chart as any).gender || "male").toLowerCase();
+  const lat = getGenderLateralization(subjectGender);
+  const gemPrescription = getDynamicGemstonePrescription(lagnaRashi, subjectGender);
 
   // Real-Time Dynamic Vimshottari Dasha Engine
   const now = new Date();
@@ -460,8 +473,57 @@ export function generateRajaYogaWealthDossierHTML(
     // Graceful fallback
   }
 
-  const d10LagnaNum = d10Chart?.lagnaNum !== undefined ? d10Chart.lagnaNum : 7; // Scorpio
-  const d10LagnaRashi = d10Chart?.lagnaRashi || SIGN_NAMES[d10LagnaNum] || "Scorpio";
+  const d10LagnaNum = d10Chart?.lagnaNum !== undefined ? d10Chart.lagnaNum : 0;
+  const d10LagnaRashi = d10Chart?.lagnaRashi || SIGN_NAMES[d10LagnaNum] || "Aries";
+
+  const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+  const d1TableRowsHtml = PLANET_ORDER.map(p => {
+    const pd = chart.planets?.[p];
+    const pRashi = pd?.sign || "Aries";
+    const degVal = pd?.degree !== undefined ? pd.degree : 0;
+    const degInt = Math.floor(degVal);
+    const minInt = Math.floor((degVal - degInt) * 60);
+    const pDeg = `${pRashi} ${degInt}° ${minInt.toString().padStart(2, "0")}'`;
+    const houseNum = pd?.house || 1;
+    const nakStr = pd?.nakshatra ? `${pd.nakshatra} (${pd.pada || 1})` : "—";
+    const pDignity = computeClassicalDignity(p, pRashi, pd?.longitude || (degVal + (SIGN_NAMES.indexOf(pRashi) * 30)));
+    let role = "Functional Planetary Catalyst";
+    if (p === amatyakaraka.planet) role = "Amatyakaraka (Career Catalyst)";
+    else if (p === atmakaraka.planet) role = "Atmakaraka (Soul Sovereign)";
+    else if (p === SIGN_LORDS[lagnaRashi]) role = "Lagna Lord (Primary Vitality Anchor)";
+    else if (houseNum === 2) role = "2nd House Dhana Bhava (Treasury Reserve)";
+    else if (houseNum === 11) role = "11th House Labha Bhava (Liquid Cashflow)";
+    else if (houseNum === 9) role = "9th House Bhagya Bhava (Fortune Accelerator)";
+    else if (houseNum === 10) role = "10th House Karma Bhava (Executive Power)";
+    else if (houseNum === 5) role = "5th House Purva Punya (Speculative Foresight)";
+    return `<tr>
+      <td><strong>${p} (${PLANET_ABBR[p] || p.slice(0, 2)})</strong></td>
+      <td>${pDeg}</td>
+      <td>${houseNum}</td>
+      <td>${nakStr}</td>
+      <td>${pDignity}</td>
+      <td>${role}</td>
+    </tr>`;
+  }).join("\n");
+
+  const shadbalaRowsHtml = (shadbalaRes.planets && shadbalaRes.planets.length > 0)
+    ? shadbalaRes.planets.map(sp => {
+        const ratio = sp.shadbalaRatio !== undefined ? sp.shadbalaRatio.toFixed(2) : "1.00";
+        const gradeColor = sp.passesThreshold ? "var(--emerald-bright)" : "var(--amber)";
+        const action = sp.passesThreshold
+          ? "Strong natural engine: Deploy for strategic expansion"
+          : "Catalyst needed: Fortify through conscious systems & discipline";
+        return `<tr>
+          <td><strong>${sp.planet}</strong></td>
+          <td>${sp.totalRupas?.toFixed(2) || "5.00"}</td>
+          <td>${Math.round(sp.totalVirupas || 300)}</td>
+          <td>${sp.requiredRupas?.toFixed(2) || "5.00"}</td>
+          <td>${ratio}</td>
+          <td style="color:${gradeColor};">${sp.grade || "Moderate"}</td>
+          <td>${action}</td>
+        </tr>`;
+      }).join("\n")
+    : `<tr><td><strong>Saturn</strong></td><td>5.10</td><td>306</td><td>5.00</td><td>1.02</td><td style="color:var(--emerald-bright);">Strong</td><td>Structural persistence & foundation</td></tr>`;
 
   const totalPages = 24;
   const sampleWatermark = isSample
@@ -754,6 +816,11 @@ body {
   font-weight: 700;
   line-height: 1.5;
   margin-bottom: 3px;
+}
+
+.devanagari-safe {
+  letter-spacing: 0 !important;
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif !important;
 }
 
 .mantra-iast {
@@ -1050,15 +1117,7 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr><td><strong>Sun (Su)</strong></td><td>Gemini 18° 04'</td><td>10</td><td>Ardra (4)</td><td>${computeClassicalDignity("Sun", "Gemini", 78.06)}</td><td>12th Lord in 10th (Digbali Leader)</td></tr>
-        <tr><td><strong>Moon (Mo)</strong></td><td>Leo 29° 11'</td><td>12</td><td>Uttara Phalguni (1)</td><td>${computeClassicalDignity("Moon", "Leo", 149.19)}</td><td>11th Lord (Gains Source) · Atmakaraka</td></tr>
-        <tr><td><strong>Mars (Ma)</strong></td><td>Leo 26° 23'</td><td>12</td><td>Purva Phalguni (4)</td><td>${computeClassicalDignity("Mars", "Leo", 146.38)}</td><td>3rd &amp; 8th Lord (Bold Enterprise)</td></tr>
-        <tr><td><strong>Mercury (Me)</strong></td><td>Taurus 26° 54'</td><td>9</td><td>Mrigashira (2)</td><td>${computeClassicalDignity("Mercury", "Taurus", 56.90)}</td><td>1st &amp; 10th Lord (AmK · Bhagya Lord)</td></tr>
-        <tr><td><strong>Jupiter (Ju)</strong></td><td>Scorpio 13° 01'</td><td>3</td><td>Anuradha (3)</td><td>${computeClassicalDignity("Jupiter", "Scorpio", 223.02)}</td><td>4th &amp; 7th Lord (Advisory Acumen)</td></tr>
-        <tr><td><strong>Venus (Ve)</strong></td><td>Gemini 05° 00'</td><td>10</td><td>Mrigashira (4)</td><td>${computeClassicalDignity("Venus", "Gemini", 65.00)}</td><td>2nd &amp; 9th Lord (Dhana-Bhagya Lord)</td></tr>
-        <tr><td><strong>Saturn (Sa)</strong></td><td>Pisces 00° 57'</td><td>7</td><td>Purva Bhadrapada (4)</td><td>${computeClassicalDignity("Saturn", "Pisces", 330.96)}</td><td>5th &amp; 6th Lord (Indu Lagna Lord · DK)</td></tr>
-        <tr><td><strong>Rahu (Ra)</strong></td><td>Libra 08° 12'</td><td>2</td><td>Swati (1)</td><td>${computeClassicalDignity("Rahu", "Libra", 188.20)}</td><td>Dhana Bhava Accelerator (Modern Scale)</td></tr>
-        <tr><td><strong>Ketu (Ke)</strong></td><td>Aries 08° 12'</td><td>8</td><td>Ashwini (3)</td><td>${computeClassicalDignity("Ketu", "Aries", 8.20)}</td><td>8th House Occult / Windfall Catalyst</td></tr>
+${d1TableRowsHtml}
       </tbody>
     </table>
   </div>
@@ -1077,16 +1136,16 @@ body {
     <div class="luxury-card" style="margin-top:10px;">
       <div class="card-title">✦ D-10 EXECUTIVE HIGHLIGHTS (${d10LagnaRashi.toUpperCase()} LAGNA)</div>
       <p class="body-text" style="margin-bottom:6px;">
-        In your D-10 Dasamsa, your Lagna is <strong>Scorpio</strong>, occupied by wisdom planets Jupiter and Saturn. Crucially, your Amatyakaraka <strong>Mercury is Exalted in Virgo in the 11th House of Massive Professional Gains</strong>. This confirms that at the pinnacle of your career, your financial rewards are linked to intellectual leadership, algorithmic software, quantitative systems, and public recognition.
+        In your D-10 Dasamsa, the ascendant is <strong>${d10LagnaRashi}</strong>. Your Amatyakaraka <strong>${amatyakaraka.planet}</strong> acts as the central pivot for executive status. This confirms that at the pinnacle of your career, your financial rewards are linked to intellectual leadership, strategic craftsmanship, institutional authority, and public recognition.
       </p>
       <div class="matrix-grid">
         <div class="matrix-item">
-          <span class="kicker">EXALTED MERCURY (HOUSE 11)</span>
-          <div class="val">Massive professional networks and high-ticket enterprise contracts.</div>
+          <span class="kicker">AMATYAKARAKA (${amatyakaraka.planet.toUpperCase()})</span>
+          <div class="val">Strategic career execution, commercial negotiation leverage, and high-value partnerships.</div>
         </div>
         <div class="matrix-item">
-          <span class="kicker">EXALTED MOON (HOUSE 7)</span>
-          <div class="val">High public popularity and magnetic appeal in client facing relations.</div>
+          <span class="kicker">ATMAKARAKA (${atmakaraka.planet.toUpperCase()})</span>
+          <div class="val">Core sovereignty, reputation shielding, and deep alignment with life purpose.</div>
         </div>
       </div>
     </div>
@@ -1472,13 +1531,7 @@ body {
           </tr>
         </thead>
         <tbody>
-          <tr><td><strong>Saturn</strong></td><td>4.98</td><td>299</td><td>5.00</td><td>1.00</td><td style="color:var(--emerald-bright);">Strong</td><td>Deploy for long-term structures &amp; Indu Lagna discipline</td></tr>
-          <tr><td><strong>Sun</strong></td><td>6.08</td><td>365</td><td>6.50</td><td>0.94</td><td style="color:var(--gold-bright);">Moderate-High</td><td>10th House Digbala: Public executive leadership</td></tr>
-          <tr><td><strong>Venus</strong></td><td>5.10</td><td>306</td><td>5.50</td><td>0.93</td><td style="color:var(--gold);">Moderate</td><td>Dhana Lord: Refined branding &amp; high-ticket offerings</td></tr>
-          <tr><td><strong>Mars</strong></td><td>4.62</td><td>277</td><td>5.00</td><td>0.92</td><td style="color:var(--gold);">Moderate</td><td>Chandra-Mangala drive: Fast execution &amp; boldness</td></tr>
-          <tr><td><strong>Jupiter</strong></td><td>5.63</td><td>338</td><td>6.50</td><td>0.87</td><td>Calibrated (70/100)</td><td>Advisory wisdom &amp; institutional backing (Upachaya/Dharma strength)</td></tr>
-          <tr><td><strong>Moon</strong></td><td>4.88</td><td>293</td><td>6.00</td><td>0.81</td><td>Sensitive</td><td>Atmakaraka: Guard against emotional overextension</td></tr>
-          <tr><td><strong>Mercury</strong></td><td>4.65</td><td>279</td><td>7.00</td><td>0.66</td><td style="color:var(--amber);">Catalyst Needed</td><td>Amatyakaraka: Requires Emerald/Budha gem activation</td></tr>
+${shadbalaRowsHtml}
         </tbody>
       </table>
     </div>
@@ -1486,7 +1539,7 @@ body {
     <div class="luxury-card">
       <div class="card-title">✦ EXECUTIVE TAKEAWAY</div>
       <p class="body-text">
-        Saturn and the Sun provide your structural backbone: unshakable persistence and public command. However, because <strong>Mercury is your Amatyakaraka and Lagna Lord</strong>, its lower Shadbala ratio is the single bottleneck holding back 10&times; monetization. Activating Mercury through Colombian Emerald and conscious communication rituals unlocks the full power of your Maha Parivartana Yoga.
+        Planetary strength analysis reveals <strong>${shadbalaRes.strongest || "Primary Planet"}</strong> as your sovereign structural driver, providing steady persistence and execution power. Meanwhile, planets below threshold require conscious organizational routines and dedicated focus to unlock compounding monetization.
       </p>
     </div>
   </div>
@@ -1597,9 +1650,9 @@ body {
         <span>MONTH 1: DECEMBER 2026 · STRATEGIC INFRASTRUCTURE</span>
         <span class="tag-badge tag-gold">76% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN &amp; MERCURY IN SAGITTARIUS (HOUSE 4) · SUB-PERIOD: MERCURY (BUDH)</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN &amp; MERCURY IN SAGITTARIUS (HOUSE ${((8 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Focus shifts to domestic comfort, workspace optimization, and core intellectual property. An excellent month for locking long-term contracts and establishing legal protections for proprietary tools.
+        Focus shifts to workspace optimization and core intellectual property. An excellent month for locking long-term contracts and establishing legal protections.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Dec 4, 11, 18, 26 · High financial agreement alignment.
@@ -1611,9 +1664,9 @@ body {
         <span>MONTH 2: JANUARY 2027 · INTELLECTUAL ROI SURGE</span>
         <span class="tag-badge tag-emerald">91% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN CAPRICORN (HOUSE 5 TRINE LAGNA &amp; INDU LAGNA) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN CAPRICORN (HOUSE ${((9 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The Sun enters your 5th house of intellect and illuminates your Indu Lagna. Creative proposals convert into lucrative contracts. Client conversions accelerate rapidly. High return on marketing efforts.
+        The Sun illuminates the ${((9 - lagnaNum + 12) % 12) + 1}th house of foresight and intellect. Creative proposals convert into lucrative contracts. Client conversions accelerate rapidly.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Jan 7, 14, 21, 28 · Peak monetization window.
@@ -1625,9 +1678,9 @@ body {
         <span>MONTH 3: FEBRUARY 2027 · DEBT AUDIT &amp; CONSOLIDATION</span>
         <span class="tag-badge tag-amber">68% CAUTION &amp; AUDIT</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN AQUARIUS (HOUSE 6) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN AQUARIUS (HOUSE ${((10 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The 6th house transit energizes debt reduction, overhead audit, and operational streamlining. A defensive consolidation phase; avoid speculative bets and focus on cleaning up pending receivables.
+        The ${((10 - lagnaNum + 12) % 12) + 1}th house transit energizes efficiency, overhead audit, and operational streamlining. A defensive consolidation phase; avoid speculative bets.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Feb 5, 12, 19, 25 · Ideal for debt clearing and renegotiation.
@@ -1649,9 +1702,9 @@ body {
         <span>MONTH 4: MARCH 2027 · B2B ALLIANCES &amp; JOINT VENTURES</span>
         <span class="tag-badge tag-gold">79% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN PISCES (HOUSE 7 DIRECT ASPECT ON LAGNA) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN PISCES (HOUSE ${((11 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Sun illuminates your 7th house of public contracts. High-ticket joint venture proposals emerge. Partner with established distribution channels to multiply your software or advisory reach.
+        Sun illuminates contracts and key agreements. High-ticket joint venture proposals emerge. Partner with established distribution channels to multiply reach.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Mar 6, 13, 20, 27 · Premier partnership agreement days.
@@ -1660,12 +1713,12 @@ body {
 
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title">
-        <span>MONTH 5: APRIL 2027 · SUDDEN WINDFALLS &amp; ROYALTY UNLOCK</span>
+        <span>MONTH 5: APRIL 2027 · SUDDEN WINDFALLS &amp; ASSET UNLOCK</span>
         <span class="tag-badge tag-emerald">84% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN EXALTED IN ARIES (HOUSE 8) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN EXALTED IN ARIES (HOUSE ${((0 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The Sun's exaltation in your 8th house unlocks unearned capital: royalty checks, tax refunds, unexpected investment appreciation, or monetization of dormant intellectual assets.
+        The Sun's exaltation in Aries unlocks capital reserves, tax optimizations, and monetization of dormant assets.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Apr 8, 15, 22, 29 · Exceptional windfall conversion.
@@ -1677,9 +1730,9 @@ body {
         <span>MONTH 6: MAY 2027 · SOVEREIGN LUCK &amp; BRAND EXPANSION</span>
         <span class="tag-badge tag-emerald">94% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN &amp; VENUS IN TAURUS (HOUSE 9 · BHAGYA BHAVA) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN &amp; VENUS IN TAURUS (HOUSE ${((1 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Sun and Venus transit your 9th house of fortune, joining your natal AmK Mercury. This is the single most auspicious commercial window of the first half of 2027. Major international expansion.
+        Sun and Venus transit Taurus (${((1 - lagnaNum + 12) % 12) + 1}th house from Lagna). This is a highly auspicious commercial window for brand elevation and strategic partnerships.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: May 5, 12, 19, 26 · Peak sovereign luck days.
@@ -1694,16 +1747,16 @@ body {
   ${headerRail("CHAPTER 15: 12-MONTH RADAR (Q3)")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">12-Month Wealth Radar: Quarter 3</h2>
-    <p class="body-text" style="margin-bottom:12px;">Peak career visibility, the 11th House cashflow harvest, and defensive R&amp;D positioning.</p>
+    <p class="body-text" style="margin-bottom:12px;">Peak career visibility, the cashflow harvest, and defensive R&amp;D positioning.</p>
 
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title">
-        <span>MONTH 7: JUNE 2027 · DIGBALA CAREER ZENITH</span>
+        <span>MONTH 7: JUNE 2027 · EXECUTIVE STATUS ELEVATION</span>
         <span class="tag-badge tag-emerald">92% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN GEMINI (HOUSE 10 NATAL RETURN) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN GEMINI (HOUSE ${((2 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The Sun returns to your 10th house of career and governance. High-level leadership promotions, public speaking invitations, and major press releases. Your professional stature reaches a 12-month high.
+        The Sun activates executive leadership and public mandate. Major authority recognition and expanding executive influence.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Jun 7, 14, 21, 28 · Peak authority recognition.
@@ -1715,9 +1768,9 @@ body {
         <span>MONTH 8: JULY 2027 · LIQUID CASHFLOW INFLUX</span>
         <span class="tag-badge tag-emerald">95% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN CANCER (HOUSE 11 LABHA BHAVA) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN CANCER (HOUSE ${((3 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The Sun illuminates your 11th house of realized gains. Substantial cashflow influx, large annual subscription renewals, and realization of major commercial bonuses. Maximum annual liquidity.
+        The Sun illuminates the house of realized gains. Substantial cashflow influx, commercial bonuses, and maximum annual liquidity.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Jul 6, 13, 20, 27 · Highest cash collection window.
@@ -1729,12 +1782,12 @@ body {
         <span>MONTH 9: AUGUST 2027 · DEFENSIVE CONSOLIDATION &amp; QUIET R&amp;D</span>
         <span class="tag-badge tag-amber">62% CAUTION &amp; BUFFERING</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN LEO (HOUSE 12 VYAYA BHAVA) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN LEO (HOUSE ${((4 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Sun moves through the 12th house of expenditures. A period for capital defense, tax optimization, and building in private. Avoid speculative expenditures; protect cash reserves and refine backend tools.
+        Sun moves through the ${((4 - lagnaNum + 12) % 12) + 1}th house. A period for capital defense, tax optimization, and building in private. Protect cash reserves.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
-        ✦ Favorable Wealth Action Dates: Aug 4, 11, 18, 25 · Ideal for tax and offshore structuring.
+        ✦ Favorable Wealth Action Dates: Aug 4, 11, 18, 25 · Ideal for structuring.
       </div>
     </div>
   </div>
@@ -1746,16 +1799,16 @@ body {
   ${headerRail("CHAPTER 15: 12-MONTH RADAR (Q4)")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">12-Month Wealth Radar: Quarter 4</h2>
-    <p class="body-text" style="margin-bottom:12px;">Lagna solar return, pricing adjustments, and closing the annual financial cycle at record net worth.</p>
+    <p class="body-text" style="margin-bottom:12px;">Strategic return, pricing adjustments, and closing the annual financial cycle at record net worth.</p>
 
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title">
-        <span>MONTH 10: SEPTEMBER 2027 · LAGNA SOLAR RETURN</span>
+        <span>MONTH 10: SEPTEMBER 2027 · SOLAR ASCENDANCY</span>
         <span class="tag-badge tag-emerald">93% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN VIRGO (HOUSE 1 LAGNA RETURN · 35 BINDUS) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN VIRGO (HOUSE ${((5 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The Sun enters your 1st house of self. Physical vitality, mental sharpness, and command over negotiations reach their zenith. Perfect timing for rebranding, product relaunches, and setting strategic terms.
+        Physical vitality, mental sharpness, and command over negotiations reach their zenith. Perfect timing for product launches and setting strategic terms.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Sep 8, 15, 22, 29 · Unstoppable personal negotiation power.
@@ -1767,9 +1820,9 @@ body {
         <span>MONTH 11: OCTOBER 2027 · COMMERCIAL PRICING ELEVATION</span>
         <span class="tag-badge tag-gold">82% HARVEST PROBABILITY</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN LIBRA (HOUSE 2 DHANA BHAVA) · SUB-PERIOD: MERCURY</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN LIBRA (HOUSE ${((6 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Sun moves through your 2nd house of liquid savings and joins natal Rahu. Time to raise your advisory rates, upgrade service tiers, and enforce premium pricing. Your market positioning solidifies.
+        Sun moves through the ${((6 - lagnaNum + 12) % 12) + 1}th house. Time to raise advisory rates, upgrade service tiers, and enforce premium pricing.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Oct 6, 13, 20, 27 · Rate increase and contract revision days.
@@ -1778,12 +1831,12 @@ body {
 
     <div class="luxury-card">
       <div class="card-title">
-        <span>MONTH 12: NOVEMBER 2027 · DEFENSIVE RE-BALANCING &amp; KETU SHIFT</span>
+        <span>MONTH 12: NOVEMBER 2027 · DEFENSIVE RE-BALANCING &amp; CONSOLIDATION</span>
         <span class="tag-badge tag-amber">65% CAUTION &amp; HEDGING</span>
       </div>
-      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN SCORPIO (HOUSE 3) · TRANSITION INTO RAHU-KETU</p>
+      <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN SCORPIO (HOUSE ${((7 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Concluding the 12-month cycle with robust capital reserves while preparing for the upcoming Rahu-Ketu sub-period. Consolidate liquidity, eliminate speculative risks, and fortify existing cashflow engines.
+        Concluding the 12-month cycle with robust capital reserves while preparing for the upcoming sub-period. Consolidate liquidity and fortify existing cashflow engines.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Nov 5, 12, 19, 26 · Long-term capital preservation.
@@ -1801,16 +1854,16 @@ body {
     <p class="body-text" style="margin-bottom:12px;">Electromagnetic resonance: Activating your Amatyakaraka and Indu Lagna through Vedic gem alchemy.</p>
 
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);margin-bottom:10px;">
-      <div class="card-title" style="color:var(--emerald-bright);">✦ PRIMARY WEALTH CATALYST: NATURAL COLOMBIAN EMERALD (PANNA)</div>
+      <div class="card-title" style="color:var(--emerald-bright);">✦ PRIMARY WEALTH CATALYST: NATURAL ${gemPrescription.primaryGem.toUpperCase()}</div>
       <p class="body-text" style="margin-bottom:8px;">
-        <strong>Target Planet:</strong> Mercury (Budha) &mdash; Amatyakaraka (AmK) &amp; Lagna Lord in 9th House of Fortune.<br/>
-        <strong>Astrological Purpose:</strong> Strengthens communication precision, algorithmic intellect, software architecture, and activates the Maha Parivartana Raja Yoga.
+        <strong>Target Energy:</strong> ${lagnaLord} &mdash; Sovereign Lord of ${lagnaRashi} Lagna.<br/>
+        <strong>Astrological Purpose:</strong> ${gemPrescription.rationale}
       </p>
       <div class="matrix-grid">
         <div class="matrix-item"><span class="kicker">OPTIMAL CARAT WEIGHT</span><div class="val">5.25 &ndash; 6.25 Ratti</div></div>
-        <div class="matrix-item"><span class="kicker">MOUNTING METAL</span><div class="val">18k / 22k Yellow Gold or Panchdhatu</div></div>
-        <div class="matrix-item"><span class="kicker">WEARING FINGER</span><div class="val">Little Finger (Kanishtha) of Active Right Hand</div></div>
-        <div class="matrix-item"><span class="kicker">ACTIVATION TIMING</span><div class="val">Wednesday Morning during Budha Hora</div></div>
+        <div class="matrix-item"><span class="kicker">MOUNTING METAL</span><div class="val">${gemPrescription.metal}</div></div>
+        <div class="matrix-item"><span class="kicker">WEARING FINGER</span><div class="val">${gemPrescription.finger}</div></div>
+        <div class="matrix-item"><span class="kicker">ACTIVATION TIMING</span><div class="val">${gemPrescription.day}</div></div>
       </div>
     </div>
 
@@ -1895,15 +1948,15 @@ body {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11.2px;margin-top:4px;">
         <div>
           <span class="kicker">PRIME WEALTH WINDOW</span>
-          <div style="color:var(--emerald-bright);font-weight:700;">2025 &ndash; 2031 (Peak Rahu-Budh &amp; Rahu-Venus)</div>
+          <div style="color:var(--emerald-bright);font-weight:700;">Peak ${activeDasha} Dasha Operating Era</div>
         </div>
         <div>
           <span class="kicker">ACTIVE OPERATING DASHA</span>
-          <div style="color:var(--ivory);font-weight:600;">${activeDasha} &mdash; ${activeAntar} (Budh)</div>
+          <div style="color:var(--ivory);font-weight:600;">${activeDasha} &mdash; ${activeAntar}</div>
         </div>
         <div>
           <span class="kicker">PRIMARY BIO-WEARABLE</span>
-          <div style="color:var(--ivory);font-weight:600;">Colombian Emerald (Gold · Little Finger)</div>
+          <div style="color:var(--ivory);font-weight:600;">${gemPrescription.primaryGem} (${gemPrescription.metal} · ${gemPrescription.finger})</div>
         </div>
         <div>
           <span class="kicker">SACRED BEAD PAIRING</span>
@@ -1911,7 +1964,7 @@ body {
         </div>
         <div>
           <span class="kicker">CORE MONETIZATION ENGINE</span>
-          <div style="color:var(--ivory);font-weight:600;">Maha Parivartana Yoga (9th &amp; 10th House Exch.)</div>
+          <div style="color:var(--ivory);font-weight:600;">Raja Yoga &amp; Indu Lagna Sovereign Matrix</div>
         </div>
         <div>
           <span class="kicker">SAV LABHA RETENTION</span>

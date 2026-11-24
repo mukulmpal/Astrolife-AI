@@ -25,6 +25,7 @@ import { buildAntarDasha } from "../../astro-engine/calculations";
 import { calculateDivisional, type DivChart } from "../../astro-engine/divisional";
 import { calculateKarakas } from "../../astro-engine/jaimini";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getGenderLateralization } from "../../astro/human-translator";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -242,10 +243,12 @@ export function generateSacredUnionDossierHTML(
   const paymentId = options.paymentId || (isSample ? "SAMPLE_PREVIEW" : `PAY_${Date.now().toString(36).toUpperCase()}`);
 
   const birthDate = chart.dob || "1995-07-04";
-  const birthTime = chart.tob || "12:30";
+  const birthTime = chart.tob || "12:00";
   const birthCity = chart.city || "New Delhi";
   const lat = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
   const lon = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
+
+  const latGender = getGenderLateralization(options.gender);
 
   // Ascendant / Lagna
   const lagnaNum = chart.lagnaNum !== undefined ? chart.lagnaNum : 5;
@@ -374,6 +377,11 @@ export function generateSacredUnionDossierHTML(
   }) || adSeq.find((ad) => ad.active) || adSeq?.[0];
 
   const activeAntar = activeAD?.planet || "Mercury";
+  const PLANET_SANSKRIT: Record<string, string> = {
+    Sun: "Surya", Moon: "Chandra", Mars: "Mangal", Mercury: "Budha",
+    Jupiter: "Guru", Venus: "Shukra", Saturn: "Shani", Rahu: "Rahu", Ketu: "Ketu"
+  };
+  const activeAntarSanskrit = PLANET_SANSKRIT[activeAntar] || activeAntar;
 
   const totalPages = 24;
   const sampleWatermark = isSample
@@ -577,6 +585,10 @@ body {
 .badge-golden { background: rgba(229, 195, 120, 0.18); color: var(--gold-bright); border: 1px solid var(--gold); }
 
 /* Multi-Layer Sacred Sanskrit Styling */
+.devanagari-safe {
+  letter-spacing: 0 !important;
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', 'Mangal', 'Devanagari MT', serif !important;
+}
 .devanagari-verse {
   font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', 'Mangal', 'Devanagari MT', serif;
   font-size: 16px;
@@ -584,7 +596,7 @@ body {
   color: var(--gold-bright);
   text-align: center;
   padding: 6px 0;
-  letter-spacing: 0.02em;
+  letter-spacing: 0 !important;
 }
 .iast-translit {
   font-family: 'Cormorant Garamond', serif;
@@ -637,7 +649,7 @@ body {
         <div><span class="kicker">BIRTH LOCATION</span><div style="font-weight:600;color:var(--ivory);">${escapeHtml(birthCity)} (${lat}°N, ${lon}°E)</div></div>
         <div><span class="kicker">LAGNA & NAKSHATRA</span><div style="font-weight:600;color:var(--ivory);">${lagnaRashi} Lagna · ${nakshatra} (${pada})</div></div>
         <div><span class="kicker">DARAKARAKA (SPOUSE PLANET)</span><div style="font-weight:600;color:var(--gold-bright);">${darakaraka.planet} in ${darakaraka.sign} (${darakaraka.degreeInSign.toFixed(2)}°)</div></div>
-        <div><span class="kicker">CURRENT OPERATING DASHA</span><div style="font-weight:600;color:var(--gold-bright);">${activeDasha} — ${activeAntar} (Budh)</div></div>
+        <div><span class="kicker">CURRENT OPERATING DASHA</span><div style="font-weight:600;color:var(--gold-bright);">${activeDasha} — ${activeAntar} (${activeAntarSanskrit})</div></div>
       </div>
     </div>
   </div>
@@ -697,7 +709,7 @@ body {
         October 2026 — March 2027
       </div>
       <p class="body-text" style="font-size:13.5px;">
-        Transit Jupiter enters Cancer and Leo, casting a direct golden 5th/9th drishti (aspect) upon your natal 7th house (${seventhSign}, ruled by ${seventhLord}). Concurrently, operating in your active <strong>${activeDasha} Mahadasha & ${activeAntar} (Budh) Antardasha</strong>, your dasha dispositors reach harmonious aspect with your D-9 Navamsha lagnesh (${d9LagnaLord}), dissolving prior timing blockages.
+        Transit Jupiter enters Cancer and Leo, casting a direct golden 5th/9th drishti (aspect) upon your natal 7th house (${seventhSign}, ruled by ${seventhLord}). Concurrently, operating in your active <strong>${activeDasha} Mahadasha & ${activeAntar} (${activeAntarSanskrit}) Antardasha</strong>, your dasha dispositors reach harmonious aspect with your D-9 Navamsha lagnesh (${d9LagnaLord}), dissolving prior timing blockages.
       </p>
     </div>
 
@@ -748,7 +760,7 @@ body {
     <div class="luxury-card" style="background:rgba(201, 169, 97, 0.08);border:1px solid var(--border-gold-strong);">
       <div style="color:#34D399;font-weight:700;font-size:12px;margin-bottom:4px;letter-spacing:0.06em;">✦ THE TURNING POINT: CLEARED FOR ALLIANCE</div>
       <p class="body-text" style="font-size:12.5px;">
-        As Saturn and Rahu conclude their restrictive transits and you enter the intellectual, communicative grace of <strong>${activeDasha} &ndash; ${activeAntar} (Budh)</strong>, the celestial friction is fully lifting. The upcoming planetary period acts as an open runway rather than an uphill climb.
+        As Saturn and Rahu conclude their restrictive transits and you enter the intellectual, communicative grace of <strong>${activeDasha} &ndash; ${activeAntar} (${activeAntarSanskrit})</strong>, the celestial friction is fully lifting. The upcoming planetary period acts as an open runway rather than an uphill climb.
       </p>
     </div>
   </div>
@@ -808,7 +820,7 @@ body {
         <div class="luxury-card" style="padding:12px 14px;">
           <span class="kicker">D-9 PLANETARY DIGNITY</span>
           <div style="font-size:15px;font-weight:700;color:var(--ivory);">Fortified Navamsha Dispositors</div>
-          <div class="body-text" style="font-size:12.5px;">Mercury occupies its exaltation/own sign in Virgo within D-9, bestowing extraordinary analytical maturity and transparent communication post-marriage.</div>
+          <div class="body-text" style="font-size:12.5px;">${SIGN_LORDS[SIGN_NAMES[(d9LagnaNum + 6) % 12]] || "7th lord"} as 7th lord of Navamsha occupies ${d9CustomPlanets[SIGN_LORDS[SIGN_NAMES[(d9LagnaNum + 6) % 12]]]?.sign || "a supportive sign"} in D-9, anchoring partnership maturity, emotional reciprocity, and transparent communication post-marriage.</div>
         </div>
         <div class="luxury-card" style="padding:12px 14px;">
           <span class="kicker">7TH HOUSE IN D-9</span>
@@ -993,7 +1005,7 @@ body {
         <span class="badge-tag badge-favorable">HIGH FAVORABLE · 88% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Jupiter in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Jupiter in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Auspicious matrimonial discussions gain sudden momentum. A prospective alliance surfaces through family elders or an intellectual professional circle. If already dating, conversations shift toward formal engagement and long-term commitments.
@@ -1010,7 +1022,7 @@ body {
         <span class="badge-tag badge-golden">GOLDEN ALIGNMENT · 92% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Sun in Capricorn (House ${getHouseFromLagna("Capricorn", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Sun in Capricorn (House ${getHouseFromLagna("Capricorn", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> One of the highest-rated windows of the entire calendar year. Clear matrimonial confirmations, joyful in-person meetings, and mutual alignment on financial and family values. Prior hesitations and ambiguities completely dissolve.
@@ -1037,7 +1049,7 @@ body {
         <span class="badge-tag badge-favorable">FAVORABLE HARMONY · 84% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Venus in Pisces (House ${getHouseFromLagna("Pisces", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Venus in Pisces (House ${getHouseFromLagna("Pisces", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Venus reaching peak dignity in the 7th bhava axis infuses romantic exchanges with tender empathy, shared humor, and creative plans. Both partners feel an instinctual safety and mutual admiration. Ideal for traveling together and deepening intimacy.
@@ -1054,7 +1066,7 @@ body {
         <span class="badge-tag badge-golden">AUSPICIOUS TRANSITION · 86% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Mercury in Aries (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Mercury in Aries (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Practical discussions regarding joint living arrangements, relocation, and career-family balance are resolved smoothly. Transparency regarding finances builds unshakeable mutual trust.
@@ -1081,7 +1093,7 @@ body {
         <span class="badge-tag badge-caution">CAUTION ON EXTENDED FAMILY · 68% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Sun conjunct Rahu (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Sun conjunct Rahu (House ${getHouseFromLagna("Aries", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Outside relatives or well-meaning third parties may attempt to impose unsolicited opinions regarding wedding logistics or dates. Stand united as a team; do not permit third-party interference to seed doubt between you two.
@@ -1098,7 +1110,7 @@ body {
         <span class="badge-tag badge-favorable">RECONCILIATION & HARMONY · 82% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Jupiter Station Direct in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Jupiter Station Direct in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> External friction clears completely. Jupiter stationing direct brings elder blessings, generous gifts, and genuine family unity. Both sides feel honored and eager for upcoming auspicious ceremonies.
@@ -1125,7 +1137,7 @@ body {
         <span class="badge-tag badge-favorable">HIGH SOCIAL ELEVATION · 87% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Mars in Gemini (House ${getHouseFromLagna("Gemini", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Mars in Gemini (House ${getHouseFromLagna("Gemini", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> High social engagement. Attending events as a couple elevates your collective standing. Mutual pride in each other's accomplishments cements confidence in the partnership.
@@ -1142,7 +1154,7 @@ body {
         <span class="badge-tag badge-golden">DOMESTIC SANCTUARY · 89% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Venus in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Venus in Cancer (House ${getHouseFromLagna("Cancer", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Focusing on beautifying the living space and joint investments. Decisions regarding home decor, vehicles, or mutual savings accounts proceed without friction.
@@ -1169,7 +1181,7 @@ body {
         <span class="badge-tag badge-favorable">DOMESTIC ANCHOR · 83% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Venus in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Venus in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Building private sanctuary and establishing quiet emotional boundaries. Minor adjustments to each other's living habits occur naturally and without hostility. Focus on celebrating small domestic victories.
@@ -1186,7 +1198,7 @@ body {
         <span class="badge-tag badge-golden">CLARITY & RENEWAL · 90% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Mercury in Virgo (House ${getHouseFromLagna("Virgo", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Mercury in Virgo (House ${getHouseFromLagna("Virgo", lagnaNum)} — Exalted) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Superb mental clarity and empathetic communication. Any long-standing unresolved issues from earlier months are addressed with compassion, maturity, and laughter.
@@ -1213,7 +1225,7 @@ body {
         <span class="badge-tag badge-favorable">FESTIVE HARMONY · 85% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Sun in Libra (House ${getHouseFromLagna("Libra", lagnaNum)}) · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Sun in Libra (House ${getHouseFromLagna("Libra", lagnaNum)}) · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> Festive celebrations with extended families solidify respect. Gifts are exchanged, family rituals honored, and both sides reaffirm genuine appreciation for the union.
@@ -1230,7 +1242,7 @@ body {
         <span class="badge-tag badge-golden">MASTER CULMINATION · 94% PROBABILITY</span>
       </div>
       <div class="kicker" style="font-size:9.5px;color:var(--ivory-mute);margin-bottom:8px;">
-        Active Transit: Jupiter in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) trine 4th house · Sub-Period: ${activeAntar} (Budh)
+        Active Transit: Jupiter in Leo (House ${getHouseFromLagna("Leo", lagnaNum)}) trine 4th house · Sub-Period: ${activeAntar} (${activeAntarSanskrit})
       </div>
       <p class="body-text" style="font-size:13.5px;margin-bottom:8px;">
         <strong>Relationship Horizon:</strong> The master crescendo of the 12-month journey. Deep spiritual gratitude, emotional invulnerability, and clear shared vision for long-term domestic prosperity.
@@ -1396,7 +1408,7 @@ body {
       <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;margin-top:8px;">
         <div class="matrix-item"><span class="kicker">CARAT WEIGHT</span><div class="val" style="font-size:11px;">5.25 &ndash; 7.25 Ratti</div></div>
         <div class="matrix-item"><span class="kicker">SETTING METAL</span><div class="val" style="font-size:11px;">Pure Silver / Platinum</div></div>
-        <div class="matrix-item"><span class="kicker">WEARING FINGER</span><div class="val" style="font-size:11px;">Middle or Little Finger</div></div>
+        <div class="matrix-item"><span class="kicker">WEARING FINGER</span><div class="val" style="font-size:11px;">Middle or Little Finger (${latGender.hand})</div></div>
         <div class="matrix-item"><span class="kicker">PURIFICATION DAY</span><div class="val" style="font-size:11px;">Friday Sunrise</div></div>
       </div>
     </div>
@@ -1478,7 +1490,7 @@ body {
         </div>
         <div>
           <span class="kicker">ACTIVE OPERATING DASHA</span>
-          <div style="color:var(--ivory);font-weight:600;">${activeDasha} &mdash; ${activeAntar} (Budh)</div>
+          <div style="color:var(--ivory);font-weight:600;">${activeDasha} &mdash; ${activeAntar} (${activeAntarSanskrit})</div>
         </div>
         <div>
           <span class="kicker">PRIMARY BIO-WEARABLE</span>

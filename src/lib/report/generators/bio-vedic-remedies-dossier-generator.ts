@@ -486,6 +486,11 @@ body {
   line-height: 1.6;
 }
 
+.devanagari-safe {
+  letter-spacing: 0 !important;
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif !important;
+}
+
 .mantra-iast {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
@@ -936,55 +941,28 @@ ${tableRowsHtml}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Lethal Gemstone Prohibitions (घातक रत्न निषेध)</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      In classical Jyotish, wearing the wrong gemstone is far more destructive than wearing no gemstone at all. The following stones are <strong>STRICTLY PROHIBITED</strong> for Mukul Mohan Pal's natal chart configuration:
+      In classical Jyotish, wearing the wrong gemstone is far more destructive than wearing no gemstone at all. The following stones are <strong>STRICTLY PROHIBITED</strong> for ${subjectName}'s natal chart configuration:
     </p>
 
-    <!-- Prohibition 1: Yellow Sapphire -->
-    <div class="prohibition-box">
+    ${(gemPrescription.prohibitedGems || ["Yellow Sapphire", "Red Coral"]).map((gem, idx) => `
+    <div class="prohibition-box" style="margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--ruby-bright);">
-          1. YELLOW SAPPHIRE (पुखराज) &mdash; ABSOLUTELY FORBIDDEN
+          ${idx + 1}. ${gem.toUpperCase()} &mdash; ABSOLUTELY FORBIDDEN
         </span>
-        <span class="tag-badge tag-ruby">LETHAL FOR VIRGO</span>
+        <span class="tag-badge tag-ruby">LETHAL FOR ${lagnaRashi.toUpperCase()}</span>
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        <strong>Target Planet:</strong> Jupiter (Guru) &mdash; Rules 4th House (Kendra) &amp; 7th House (Maraka &amp; Badhaka sthana).<br/>
-        <strong>Why It Causes Harm:</strong> For a dual sign ascendant like Virgo, the 7th house lord acts as the supreme obstructionist (Badhaka). Wearing Yellow Sapphire amplifies Badhaka energy, directly causing marital discord, liver enlargement, high cholesterol, delayed payments, and legal complications. Never wear Pukhraj.
+        <strong>Target Energy:</strong> Incompatible frequency for ${lagnaRashi} ascendant.<br/>
+        <strong>Why It Causes Harm:</strong> Wearing an incompatible gemstone amplifies functional malefic or obstructionist (Dusthana/Badhaka) energies, precipitating health friction, erratic expenditures, and relational discord. Never wear stones for non-benefic houses.
       </p>
     </div>
-
-    <!-- Prohibition 2: Red Coral -->
-    <div class="prohibition-box">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--ruby-bright);">
-          2. RED CORAL (लाल मूंगा) &mdash; ABSOLUTELY FORBIDDEN
-        </span>
-        <span class="tag-badge tag-ruby">HIGH ACCIDENT RISK</span>
-      </div>
-      <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        <strong>Target Planet:</strong> Mars (Mangal) &mdash; Rules 3rd House (Effort/Injury) &amp; 8th House (Ayu/Surgery/Sudden Ruin).<br/>
-        <strong>Why It Causes Harm:</strong> Mars is an arch-enemy of your Lagna lord Mercury and sits in the 12th house of hospitalization. Wearing Red Coral immediately superheats your blood, spikes blood pressure, induces reckless impatience, and triggers surgical/accident vulnerability. Red Coral is poison for this chart.
-      </p>
-    </div>
-
-    <!-- Prohibition 3: Pearl -->
-    <div class="prohibition-box" style="margin-bottom:6px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--ruby-bright);">
-          3. NATURAL PEARL (सच्चा मोती) &mdash; PROHIBITED WITHOUT MEDICAL ADVICE
-        </span>
-        <span class="tag-badge tag-ruby">EMOTIONAL DISSOLUTION</span>
-      </div>
-      <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        <strong>Target Planet:</strong> Moon (Chandra) &mdash; Rules 11th House, but seated in 12th House of isolation (Leo).<br/>
-        <strong>Why It Causes Harm:</strong> Moon in the 12th house is prone to subconscious turbulence. Wearing a Pearl pumps water element into the house of sleep and expenditures, causing lethargy, over-emotional vulnerability, and capital drain. Wear sandalwood, not pearl.
-      </p>
-    </div>
+    `).join("\n")}
 
     <div class="luxury-card" style="background:var(--surface-elevated);border:1px solid var(--border-gold);">
       <div class="kicker" style="color:var(--gold-bright);">Shastric Summary of Gemstone Safety:</div>
       <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:3px;">
-        Only Emerald, Diamond, and Blue Sapphire (tested) are permitted. All warm/red/yellow stones (Ruby, Red Coral, Yellow Sapphire) are strictly locked out of your bio-field.
+        Only ${gemPrescription.primaryGem} and tested harmonious secondary gems are permitted. All conflicting stones (${(gemPrescription.prohibitedGems || []).join(", ")}) are strictly locked out of your bio-field.
       </p>
     </div>
   </div>
@@ -1008,7 +986,7 @@ ${tableRowsHtml}
         </div>
         <div class="kicker" style="margin-top:2px;">GOVERNING PLANET: MERCURY · ANAHATA &amp; VISHUDDHA</div>
         <p class="body-text" style="font-size:11.5px;margin-top:6px;">
-          Governed by the creator Brahma and planetary lord Mercury. Its four natural clefts balance the four lobes of the brain, dramatically enhancing memory retention, analytical clarity, public oratory, and coding endurance.
+          Governed by the creator Brahma and planetary lord Mercury. Its four natural clefts balance the four lobes of the brain, dramatically enhancing memory retention, analytical clarity, public oratory, and deep intellectual endurance.
         </p>
         <div style="font-size:11px;color:var(--gold);margin-top:6px;">
           ✦ <strong>Mantra:</strong> <em>Om Hreem Namah</em> (108&times; Wednesday)
@@ -1181,16 +1159,16 @@ ${tableRowsHtml}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">The 2-Inch Navel Desi Ghee Protocol</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Virgo (Kanya) is the 6th sign of the Kalapurusha, governing the core abdominal cavity, intestines, and the <strong>Navel (Nabhi Chakra)</strong>. The navel contains over 72,000 energetic nadis (subtle nerve channels) that branch across the human biological system.
+      The <strong>Navel (Nabhi Chakra)</strong> contains over 72,000 energetic nadis (subtle nerve channels) that branch across the human biological system, anchoring somatic equilibrium and metabolic balance.
     </p>
 
     <!-- The Invariant Box -->
     <div class="luxury-card" style="border:2px solid var(--emerald-bright);margin-bottom:12px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ THE ABSOLUTE NAVEL INVARIANT FOR MUKUL MOHAN PAL (VIRGO LAGNA)
+        ✦ THE ABSOLUTE NAVEL INVARIANT FOR ${subjectName.toUpperCase()} (${lagnaRashi.toUpperCase()} LAGNA)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Because Mercury rules your 1st house (body) and 10th house (career), and Mars sits in your 12th house (heat &amp; insomnia), your internal digestive fire (Jatharagni) easily overheats the nervous system. 
+        Because ${lagnaLord} rules your 1st house (vitality), maintaining balanced somatic equilibrium and cooling internal heat stabilizes your entire autonomic nervous system.
       </p>
       <div class="prohibition-box" style="margin-top:8px;margin-bottom:8px;">
         <strong style="color:var(--ruby-bright);font-size:11px;">CRITICAL PROHIBITION: NEVER APPLY RED VERMILION / SINDOOR TO THE NAVEL!</strong>
@@ -1235,26 +1213,26 @@ ${tableRowsHtml}
 <section class="page">
   ${headerRail("PILLAR II: KNEE & FOREHEAD DOT PROTOCOLS")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Right Knee &amp; Forehead Dot Protocols</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">${latGender.side} Knee &amp; Forehead Dot Protocols</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Targeted somatotopic reflex points to ground Saturnian pressure and pacify 12th-house lunar agitation.
+      Targeted somatotopic reflex points to ground Saturnian pressure and pacify nocturnal lunar agitation.
     </p>
 
-    <!-- Right Knee Protocol -->
+    <!-- Knee Protocol -->
     <div class="luxury-card" style="border:1.5px solid var(--sapphire);margin-bottom:12px;">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;font-family:'Cinzel',serif;">
-        1. RIGHT KNEE KAJAL MICRO-DOT (मकर / शनि देह रक्षक बिंदु)
+        1. ${latGender.side.toUpperCase()} KNEE KAJAL MICRO-DOT (मकर / शनि देह रक्षक बिंदु)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Under Kalapurusha mapping, <strong>Capricorn (Makara)</strong> governs the knee joints. For Mukul, Capricorn is your 5th house of intellect and Indu Lagna, while Saturn sits in the 7th house in Pisces, casting its 10th aspect back onto your 4th house of domestic peace.
+        Under Kalapurusha mapping, <strong>Capricorn (Makara)</strong> governs the knee joints. For your ${lagnaRashi} configuration, targeted somatotopic grounding dissipates structural fatigue and aligns professional endurance.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:8px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Execution Method:</strong>
         <p style="color:var(--ivory-dim);margin-top:2px;">
-          On Saturdays, or during periods of acute work pressure, apply a tiny <strong>micro-dot (2mm) of pure natural herbal kajal</strong> (soot of cow ghee lamp) on the lateral side of your <strong>Right Knee joint</strong>.
+          On Saturdays, or during periods of acute work pressure, apply a tiny <strong>micro-dot (2mm) of pure natural herbal kajal</strong> (soot of cow ghee lamp) on the lateral side of your <strong>${latGender.side} Knee joint</strong>.
         </p>
         <p style="color:var(--ivory-dim);margin-top:4px;">
-          <strong>Effect:</strong> Converts heavy 180-degree Saturnian structural friction into a grounding shield, preventing knee fatigue and stabilizing erratic professional timelines.
+          <strong>Effect:</strong> Converts heavy structural friction into a grounding shield, preventing somatic fatigue and stabilizing erratic professional timelines.
         </p>
       </div>
     </div>
@@ -1265,12 +1243,12 @@ ${tableRowsHtml}
         2. AJNA CHAKRA WHITE SANDALWOOD DOT (चंद्र व मन शांति बिंदु)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Your natal Moon sits at <strong>29° 11' in Leo (12th house)</strong> in Uttara Phalguni (Pada 1), conjoined fiery Mars (at 26° 23'). This placement generates high intellectual ambition combined with occasional nocturnal restlessness and sensory overload.
+        Your natal Moon sits in <strong>${moonRashi} (${moonPlanet?.house || 1}th house)</strong> in ${moonNakshatra}. This placement generates high intellectual ambition combined with periodic sensory overload.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:8px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Execution Method:</strong>
         <p style="color:var(--ivory-dim);margin-top:2px;">
-          Apply a small dot of freshly prepared <strong>Pure White Sandalwood paste (श्वेत चंदन)</strong> with your right ring finger (Anamika) precisely between the eyebrows (Ajna Chakra) on Monday mornings and Full Moon (Purnima) evenings.
+          Apply a small dot of freshly prepared <strong>Pure White Sandalwood paste (श्वेत चंदन)</strong> with your ${latGender.side.toLowerCase()} ring finger (Anamika) precisely between the eyebrows (Ajna Chakra) on Monday mornings and Full Moon (Purnima) evenings.
         </p>
         <p style="color:var(--ivory-dim);margin-top:4px;">
           <strong>Effect:</strong> Instantly cools the prefrontal cortex, dissipates subconscious anxiety, and shields the mind from disruptive astral frequencies.
@@ -1307,14 +1285,14 @@ ${tableRowsHtml}
     <div class="prohibition-box" style="margin-bottom:12px;">
       <strong style="color:var(--ruby-bright);font-size:11.5px;">✦ AVOID THE BLIND "BLACK THREAD" TRAP (काला धागा निषेध)</strong>
       <p class="body-text" style="font-size:11.5px;margin-top:3px;">
-        Many people blindly tie thick black threads around their wrists or ankles assuming it wards off evil. For a Virgo Lagna native with Saturn in the 7th house and Mercury as Lagna lord, wearing black thread on the wrist draws heavy Saturnian lethargy and blocks Mercury's light-footed commercial agility. <strong>Do not wear black thread on your wrist.</strong>
+        Many people blindly tie thick black threads around their wrists or ankles assuming it wards off evil. For a ${lagnaRashi} Lagna native, wearing black thread on the active pulse draws heavy Saturnian lethargy and dampens somatic vitality. <strong>Do not wear black thread on your wrist.</strong>
       </p>
     </div>
 
     <!-- Prescribed Specifications -->
     <div class="luxury-card">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;font-family:'Cinzel',serif;">
-        ✦ THE PRESCRIBED SACRED SPECIFICATIONS FOR MUKUL MOHAN PAL
+        ✦ THE PRESCRIBED SACRED SPECIFICATIONS FOR ${subjectName.toUpperCase()}
       </div>
       <div class="grid-2" style="font-size:11.5px;margin-top:6px;row-gap:8px;">
         <div>
@@ -1331,7 +1309,7 @@ ${tableRowsHtml}
         </div>
         <div>
           <span class="kicker">Target Wrist:</span>
-          <div style="color:var(--emerald-bright);font-weight:600;">Active Right Wrist (Male Meridian)</div>
+          <div style="color:var(--emerald-bright);font-weight:600;">Active ${latGender.wrist} (${subjectGender === "female" ? "Vama Anga · Female Meridian" : "Dakshina Anga · Male Meridian"})</div>
         </div>
       </div>
     </div>
@@ -1361,7 +1339,7 @@ ${tableRowsHtml}
           <strong style="color:var(--emerald-bright);">2. Pre-Purification:</strong> Light a cow ghee lamp facing East. Touch the thread to an image of Lord Vishnu, Shiva, or Hanuman.
         </div>
         <div>
-          <strong style="color:var(--emerald-bright);">3. Tying Tension:</strong> Tie with comfortable snugness on the right wrist (holding a fist while tying). Do not tie too tight to impede capillary circulation.
+          <strong style="color:var(--emerald-bright);">3. Tying Tension:</strong> Tie with comfortable snugness on the ${latGender.wrist.toLowerCase()} (holding a fist while tying). Do not tie too tight to impede capillary circulation.
         </div>
       </div>
     </div>
@@ -1369,7 +1347,7 @@ ${tableRowsHtml}
     <!-- The Classical Shloka -->
     <div class="mantra-block" style="margin-bottom:12px;">
       <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">THE IMMUTABLE VEDIC RAKSHA MANTRA</div>
-      <div class="mantra-devanagari">
+      <div class="mantra-devanagari devanagari-safe">
         येन बद्धो बली राजा दानवेन्द्रो महाबलः ।<br/>
         तेन त्वामनुबध्नामि रक्षे मा चल मा चल ॥
       </div>
@@ -1452,24 +1430,24 @@ ${tableRowsHtml}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Seeker Talismanic Skin Coordinates</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Computational recommendation tailored specifically for Mukul Mohan Pal's chart to unlock sovereign intellectual leverage, technology authority, and wealth compounding.
+      Computational recommendation tailored specifically for ${subjectName}'s chart to unlock sovereign intellectual leverage, authority, and compounding vitality.
     </p>
 
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:12px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ PRESCRIBED SIGIL: SACRED MERCURY YANTRA / MINIMALIST WINGED CADUCEUS
+        ✦ PRESCRIBED SIGIL: SACRED ${lagnaLord.toUpperCase()} YANTRA &middot; HARMONIC SYMBOL
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        <strong>Activating Energy:</strong> Mercury (Budha) &mdash; Lord of Virgo Lagna &amp; 10th House Gemini. Seated in the 9th house of fortune in mutual exchange with Venus.
+        <strong>Activating Energy:</strong> ${lagnaLord} &mdash; Sovereign Lord of ${lagnaRashi} Lagna. Primary life force anchor and vitality driver.
       </p>
       <div class="grid-2" style="font-size:11.5px;margin-top:8px;row-gap:6px;">
         <div>
           <span class="kicker">Anatomical Placement:</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Right Upper Arm or Inner Forearm</div>
+          <div style="color:var(--gold-bright);font-weight:700;">${latGender.side} Upper Arm or Inner Forearm</div>
         </div>
         <div>
           <span class="kicker">Governing Zodiac Zone:</span>
-          <div style="color:var(--ivory);">Gemini (House 10 · Arms &amp; Shoulders)</div>
+          <div style="color:var(--ivory);">${lagnaRashi} / ${SIGN_NAMES[((lagnaNum + 9) % 12)]} (Executive Axis)</div>
         </div>
         <div>
           <span class="kicker">Ink Color Palette:</span>
@@ -1488,17 +1466,17 @@ ${tableRowsHtml}
         ✦ SYMBOLIC GEOMETRY SPECIFICATION
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        The design should feature the classical <strong>Mercury Planetary Sigil (Budha Yantra)</strong> <span style="display:inline-flex;align-items:center;vertical-align:middle;margin:0 3px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="5"/><path d="M12 16v6M9 19h6M7 4a5 5 0 0 1 10 0"/></svg></span> or a clean geometric polygon (an upward equilateral triangle intersected by an upward arrow) representing mental agility, software syntax mastery, and commercial precision.
+        The design features clean geometric harmony (an upward equilateral triangle intersected by a sovereign vertical axis) representing mental agility, strategic discernment, and commercial precision.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:6px;">
-        ✦ <strong>Temporary Alternative:</strong> If permanent ink is not preferred, use a skin-safe natural green herbal marker or natural henna to draw a 5mm micro-symbol on the right inner forearm on Wednesday morning during high-stakes pitch days.
+        ✦ <strong>Temporary Alternative:</strong> If permanent ink is not preferred, use a skin-safe natural herbal marker or natural henna to draw a 5mm micro-symbol on the ${latGender.side.toLowerCase()} inner forearm on auspicious mornings during high-stakes initiatives.
       </div>
     </div>
 
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <span class="kicker" style="color:var(--emerald-bright);">Dermal Activation Mechanism:</span>
       <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-        Inscribing Mercury's geometry on Gemini's anatomical region (arms) continuously reinforces the 10th-house executive status vector, transforming communication from casual conversation into authoritative executive mandate.
+        Inscribing consecrated geometry on the ${latGender.side.toLowerCase()} arm continuously reinforces the executive status vector, transforming communication from casual conversation into authoritative executive mandate.
       </p>
     </div>
   </div>
@@ -1531,20 +1509,20 @@ ${tableRowsHtml}
       </p>
     </div>
 
-    <!-- Diagnostic Scan for Mukul -->
+    <!-- Diagnostic Scan -->
     <div class="luxury-card">
       <div class="card-title" style="color:var(--ruby-bright);font-size:11.5px;font-family:'Cinzel',serif;">
-        ✦ ACTIVE LINEAGE KARMIC AUDIT FOR MUKUL MOHAN PAL
+        ✦ ACTIVE LINEAGE KARMIC AUDIT FOR ${subjectName.toUpperCase()}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;margin-top:6px;">
         <div>
-          <strong style="color:var(--gold);">1. Rahu in 2nd House (Kudrati / Ancestral Treasury Debt):</strong> Rahu occupying the 2nd house of accumulated wealth and lineage oral traditions indicates an ancestral tendency to promise more than delivered. Manifests as sudden expenditure leaks.
+          <strong style="color:var(--gold);">1. Rahu in ${chart.planets?.["Rahu"]?.house || 2}th House (Kudrati / Ancestral Lineage Factor):</strong> Rahu's placement indicates an area requiring strict ethical speech, conscious budgeting, and clear commitments to prevent expenditure leaks.
         </div>
         <div>
-          <strong style="color:var(--gold);">2. Ketu in 8th House (Dharmik Rin):</strong> Ketu in the 8th creates occult friction and unexplained digestive sensitivity. Cleared through the ancient canine feeding protocol.
+          <strong style="color:var(--gold);">2. Ketu in ${chart.planets?.["Ketu"]?.house || 8}th House (Dharmik Balance):</strong> Ketu's house highlights deep intuitive reserves. Harmonized through canine seva, spiritual grounding, and regular meditation.
         </div>
         <div>
-          <strong style="color:var(--gold);">3. Mars in 12th House (Subtle Bhrata Friction):</strong> Overcome by regular blood donation or donating mobility equipment to disabled individuals.
+          <strong style="color:var(--gold);">3. Mars in ${chart.planets?.["Mars"]?.house || 12}th House (Metabolic &amp; Vital Energy):</strong> Supported by mindful hydration, avoidance of emotional impatience, and physical fitness discipline.
         </div>
       </div>
     </div>
@@ -1622,11 +1600,11 @@ ${tableRowsHtml}
     <!-- Never Donate Box -->
     <div class="prohibition-box" style="margin-bottom:12px;">
       <div style="font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--ruby-bright);margin-bottom:6px;">
-        ✦ STRICT "NEVER-DONATE" PROTOCOL FOR MUKUL MOHAN PAL (दान निषेध)
+        ✦ STRICT "NEVER-DONATE" PROTOCOL FOR ${subjectName.toUpperCase()} (दान निषेध)
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;">
         <div>
-          <strong style="color:var(--ruby-bright);">1. NEVER DONATE PENS, NOTEBOOKS, OR SOFTWARE ON WEDNESDAYS:</strong> Mercury is your Lagna lord and 10th lord seated in the 9th. Donating green stationery or educational tools on Wednesday dissipates your own intellectual leverage. (Gift them with affection on other days, but never as sacrificial charity on Wednesday).
+          <strong style="color:var(--ruby-bright);">1. NEVER DONATE ITEMS OF YOUR LAGNA LORD (${lagnaLord.toUpperCase()}) AS SACRIFICIAL CHARITY:</strong> Donating items of your primary functional benefic dissipates your own vitality and intellectual leverage. Honor your Lagna lord through conscious service and respect instead.
         </div>
         <div>
           <strong style="color:var(--ruby-bright);">2. NEVER DONATE MUSTARD OIL ON YOUR DOORSTEP ON SATURDAY:</strong> Giving mustard oil to wandering beggars at your main threshold invites Saturnian debt inside. Always make Saturnian donations outside, at a Shani temple or community kitchen.
@@ -1914,24 +1892,24 @@ ${tableRowsHtml}
     <!-- Consolidated 1-Page Action Cheat Sheet -->
     <div class="luxury-card" style="border:2px solid var(--border-gold-strong);background:var(--surface-elevated);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ SOVEREIGN BIO-VEDIC ARMOR MATRIX · MUKUL MOHAN PAL
+        ✦ SOVEREIGN BIO-VEDIC ARMOR MATRIX · ${subjectName.toUpperCase()}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11.2px;margin-top:6px;">
         <div>
           <span class="kicker">PRIMARY BIO-WEARABLE</span>
-          <div style="color:var(--emerald-bright);font-weight:700;">Colombian Emerald (Gold · Little Finger)</div>
+          <div style="color:var(--emerald-bright);font-weight:700;">${gemPrescription.primaryGem} (${gemPrescription.metal} · ${gemPrescription.finger})</div>
         </div>
         <div>
           <span class="kicker">SECONDARY BIO-SHIELD</span>
-          <div style="color:var(--sapphire-bright);font-weight:700;">Blue Sapphire / Amethyst (Middle · Silver)</div>
+          <div style="color:var(--sapphire-bright);font-weight:700;">Harmonious Trine Gem / Uparatna (${gemPrescription.uparatna})</div>
         </div>
         <div>
           <span class="kicker">STRICTLY PROHIBITED GEMS</span>
-          <div style="color:var(--ruby-bright);font-weight:700;">Yellow Sapphire (Pukhraj), Red Coral, Pearl</div>
+          <div style="color:var(--ruby-bright);font-weight:700;">${(gemPrescription.prohibitedGems || []).join(", ")}</div>
         </div>
         <div>
           <span class="kicker">RUDRAKSHA PAIRING</span>
-          <div style="color:var(--ivory);font-weight:600;">4-Mukhi &amp; 7-Mukhi on raw silk thread</div>
+          <div style="color:var(--ivory);font-weight:600;">Consecrated beads on raw silk thread</div>
         </div>
         <div>
           <span class="kicker">CORE DOT THERAPY PROTOCOL</span>
@@ -1939,11 +1917,11 @@ ${tableRowsHtml}
         </div>
         <div>
           <span class="kicker">GROUNDING REFLEX DOT</span>
-          <div style="color:var(--ivory);font-weight:600;">Micro-Kajal dot on Right Knee on Saturdays</div>
+          <div style="color:var(--ivory);font-weight:600;">Micro-Kajal dot on ${latGender.side} Knee on Saturdays</div>
         </div>
         <div>
           <span class="kicker">SACRED WRIST THREAD</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Red &amp; Yellow Raw Cotton (7 wraps · Right wrist)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">Red &amp; Yellow Raw Cotton (7 wraps · ${latGender.wrist})</div>
         </div>
         <div>
           <span class="kicker">LAL KITAB RAHU ANCHOR</span>
@@ -1955,7 +1933,7 @@ ${tableRowsHtml}
         </div>
         <div>
           <span class="kicker">SHIVLING ABHISHEKA</span>
-          <div style="color:var(--ivory);font-weight:600;">Cold milk + sesame (Mon) · Durva grass (Wed)</div>
+          <div style="color:var(--ivory);font-weight:600;">Pure water / milk offering with conscious mantra japa</div>
         </div>
       </div>
     </div>
@@ -1967,10 +1945,10 @@ ${tableRowsHtml}
       </div>
       <div class="grid-3" style="font-size:11px;margin-top:6px;gap:8px;">
         <div style="background:var(--surface);padding:8px;border-radius:4px;border-left:2px solid var(--emerald);">
-          <strong style="color:var(--emerald-bright);">Wednesday (Budha):</strong> Wear green, chant Budha mantra 108&times;, feed green grass/spinach to cows, zero stationery donations.
+          <strong style="color:var(--emerald-bright);">Weekly Benefic Seva:</strong> Honor the day of ${lagnaLord}, chant ruling mantra 108&times;, practice satvik compassion.
         </div>
         <div style="background:var(--surface);padding:8px;border-radius:4px;border-left:2px solid var(--sapphire);">
-          <strong style="color:var(--sapphire-bright);">Saturday (Shani):</strong> Apply right knee kajal dot, feed stray dogs sweet rotis, avoid mustard oil on doorstep.
+          <strong style="color:var(--sapphire-bright);">Saturday (Shani):</strong> Apply ${latGender.side.toLowerCase()} knee kajal dot, feed stray dogs sweet rotis, avoid mustard oil on doorstep.
         </div>
         <div style="background:var(--surface);padding:8px;border-radius:4px;border-left:2px solid var(--gold);">
           <strong style="color:var(--gold-bright);">Sunday / Tuesday:</strong> Consecrate or check wrist thread tension during Abhijeet Muhurat.

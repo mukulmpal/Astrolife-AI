@@ -94,13 +94,24 @@ export async function buildEvidenceFirstPdf(
         doc.font("Helvetica");
       }
 
+      // ── PDF Outlines / Bookmarks ─────────────────────────────────────────────
+      const outline = doc.outline;
+      outline.addItem("1. KP Executive Overview & Audit Metadata");
+      const sectionsOutline = outline.addItem("2. Evaluated KP Domain Sections");
+      for (const s of reportPayload.sections) {
+        sectionsOutline.addItem(`${s.eventName} (${s.synthesis.state})`);
+      }
+      outline.addItem("3. KP Cuspal Remediation & Harmonization Protocol");
+      outline.addItem("4. Epistemic Safeguards & Ethical Boundaries");
+      outline.addItem("5. System Audit & Classical Provenance Registry");
+
       // ── 1. Document Cover & Header ───────────────────────────────────────────
       renderDocumentHeader(doc, reportPayload, subject, fixedDate);
 
       // ── 2. Topic Sections (Iterate over all structured sections) ─────────────
       for (const section of reportPayload.sections) {
         // Prevent orphaned section headers near page bottom
-        if (doc.y > 660) {
+        if (doc.y > 640) {
           doc.addPage();
         } else {
           doc.moveDown(1.5);
@@ -109,7 +120,15 @@ export async function buildEvidenceFirstPdf(
         renderSection(doc, section);
       }
 
-      // ── 3. Global Ethical & Epistemological Boundaries ───────────────────────
+      // ── 3. Dedicated KP Remedial Protocols ───────────────────────────────────
+      if (doc.y > 580) {
+        doc.addPage();
+      } else {
+        doc.moveDown(1.5);
+      }
+      renderKPRemediesChapter(doc);
+
+      // ── 4. Global Ethical & Epistemological Boundaries ───────────────────────
       if (doc.y > 640) {
         doc.addPage();
       } else {
@@ -117,7 +136,7 @@ export async function buildEvidenceFirstPdf(
       }
       renderGlobalBoundaries(doc, reportPayload.globalBoundaries);
 
-      // ── 4. Audit & Provenance Appendix (Optional/Default true) ────────────────
+      // ── 5. Audit & Provenance Appendix (Optional/Default true) ────────────────
       if (options.includeAuditAppendix !== false) {
         if (doc.y > 600) {
           doc.addPage();
@@ -127,7 +146,7 @@ export async function buildEvidenceFirstPdf(
         renderAuditAppendix(doc, reportPayload);
       }
 
-      // ── 5. Page Headers, Footers & Numbering ─────────────────────────────────
+      // ── 6. Page Headers, Footers & Numbering ─────────────────────────────────
       applyPageNumberingAndFooters(doc, reportPayload.reportId);
 
       doc.end();
@@ -146,49 +165,58 @@ function renderDocumentHeader(
   dateStr: string
 ) {
   doc
-    .fontSize(20)
-    .fillColor("#0f172a")
-    .text("ASTROLIFE KP PREDICTIVE INTELLIGENCE", { align: "left" })
-    .fontSize(11)
-    .fillColor("#0284c7")
-    .text("Evidence-First Classical Synthesis Report", { align: "left" })
-    .moveDown(0.5);
+    .fontSize(9)
+    .fillColor("#8C6508")
+    .text("ASTROLIFE • KRISHNAMURTI PADDHATI (KP) SYSTEM", { align: "left", characterSpacing: 1.5 })
+    .moveDown(0.2);
 
-  // Metadata horizontal block
+  doc
+    .fontSize(18)
+    .fillColor("#1A1A1A")
+    .text("KP PREDICTIVE INTELLIGENCE DOSSIER", { align: "left" })
+    .fontSize(10)
+    .fillColor("#B8860B")
+    .text("Evidence-First Classical Synthesis & Sub-Lord Analysis", { align: "left" })
+    .moveDown(0.4);
+
+  // Metadata horizontal block (Champagne card)
   const startY = doc.y;
   doc
-    .rect(50, startY, 495, 45)
-    .fillAndStroke("#f8fafc", "#cbd5e1");
+    .rect(45, startY, 505, 52)
+    .fillAndStroke("#FAF7F0", "#E0D7C6");
 
   doc
-    .fillColor("#334155")
-    .fontSize(9)
-    .text(`Report ID: ${payload.reportId}`, 60, startY + 10)
-    .text(`Subject: ${subject}`, 60, startY + 25)
-    .text(`Evaluation Moment: ${dateStr}`, 300, startY + 10)
-    .text("Methodology: Classical KP (Readers I–VI)", 300, startY + 25);
+    .fillColor("#4A4238")
+    .fontSize(8.5)
+    .text(`Report ID: ${payload.reportId}`, 55, startY + 10)
+    .text(`Subject: ${subject}`, 55, startY + 24)
+    .text(`Evaluation Moment: ${dateStr}`, 55, startY + 38)
+    .text("Methodology: Classical KP (Readers I–VI)", 300, startY + 10)
+    .text("Epistemic Standard: Zero Speculative Hallucination", 300, startY + 24)
+    .text("Engine Status: Deterministic Verified", 300, startY + 38);
 
-  doc.y = startY + 55;
+  doc.y = startY + 62;
 }
 
 function renderSection(doc: PDFKit.PDFDocument, section: EvidenceFirstSection) {
   const sectionTop = doc.y;
 
-  // Header banner: Topic Name + State Badge
+  // Header banner: Obsidian & Gold
   doc
-    .rect(50, sectionTop, 495, 26)
-    .fillAndStroke("#1e293b", "#0f172a");
+    .rect(45, sectionTop, 505, 26)
+    .fillAndStroke("#11162E", "#B8860B");
 
   doc
-    .fillColor("#ffffff")
-    .fontSize(11)
-    .text(section.eventName.toUpperCase(), 60, sectionTop + 7, { lineBreak: false });
+    .fillColor("#FAF7F0")
+    .fontSize(10.5)
+    .text(section.eventName.toUpperCase(), 55, sectionTop + 7, { lineBreak: false });
 
   // Right-aligned synthesis state chip
+  const stateColor = section.synthesis.state === "Positive" ? "#6FB58A" : (section.synthesis.state === "Negative" ? "#C9555F" : "#D9BE7B");
   doc
-    .fillColor("#38bdf8")
+    .fillColor(stateColor)
     .fontSize(9)
-    .text(`[ ${section.synthesis.state} ]`, 320, sectionTop + 8, {
+    .text(`[ ${section.synthesis.state.toUpperCase()} ]`, 320, sectionTop + 8, {
       align: "right",
       width: 215,
       lineBreak: false,
@@ -196,10 +224,10 @@ function renderSection(doc: PDFKit.PDFDocument, section: EvidenceFirstSection) {
 
   doc.y = sectionTop + 34;
 
-  // Metadata Sub-line (Direct from structured fields)
+  // Metadata Sub-line
   doc
-    .fillColor("#64748b")
-    .fontSize(8.5)
+    .fillColor("#8C6508")
+    .fontSize(8)
     .text(
       `Rule ID: ${section.topicId}  |  Category: ${section.ruleCategory}  |  Timing State: ${section.synthesis.timingState}  |  Manifestation: ${section.synthesis.manifestationType}`
     )
@@ -220,6 +248,31 @@ function renderSection(doc: PDFKit.PDFDocument, section: EvidenceFirstSection) {
 
   // Technical Audit Reference
   renderTechnicalMetadata(doc, section);
+
+  // Seeker Plain-Language Practical Synthesis Box (Translates KP math into human guidance)
+  if (doc.y > 670) doc.addPage();
+  const synTop = doc.y;
+  doc
+    .rect(45, synTop, 505, 46)
+    .fillAndStroke("#FAF7F0", "#B8860B");
+
+  doc
+    .fillColor("#8C6508")
+    .fontSize(8.5)
+    .text("✦ PRACTICAL LIFE IMPLICATION & SEEKER SYNTHESIS", 55, synTop + 7, { underline: true });
+
+  const plainGuidance = section.synthesis.state === "Positive"
+    ? "KP Sub-Lord analysis reveals highly supportive house connectivity (2, 6, 10, 11). This phase strongly favors proactive decisions, expanding commitments, and materializing professional or personal breakthroughs."
+    : (section.synthesis.state === "Negative"
+      ? "KP Sub-Lord analysis highlights 6, 8, 12 friction signatures. Exercise disciplined patience: avoid speculative financial leaps, manage partnership communication with humility, and prioritize stability."
+      : "KP Sub-Lord analysis indicates neutral/mixed house activations. Outcomes depend directly on conscious discernment, systematic effort, and aligning actions with favorable planetary transit windows.");
+
+  doc
+    .fillColor("#2A2520")
+    .fontSize(7.8)
+    .text(plainGuidance, 55, synTop + 20, { width: 485, lineGap: 2 });
+
+  doc.y = synTop + 54;
 }
 
 function renderReferencePendingBanner(doc: PDFKit.PDFDocument, section: EvidenceFirstSection) {
@@ -376,6 +429,40 @@ function renderTechnicalMetadata(doc: PDFKit.PDFDocument, section: EvidenceFirst
     .moveDown(0.5);
 }
 
+function renderKPRemediesChapter(doc: PDFKit.PDFDocument) {
+  if (doc.y > 540) doc.addPage();
+  const top = doc.y;
+
+  doc
+    .rect(45, top, 505, 26)
+    .fillAndStroke("#8C6508", "#B8860B");
+
+  doc
+    .fillColor("#FAF7F0")
+    .fontSize(10.5)
+    .text("KP CUSPAL REMEDIATION & HARMONIZATION PROTOCOL", 55, top + 7);
+
+  doc.y = top + 34;
+
+  const cardY = doc.y;
+  doc
+    .rect(45, cardY, 505, 110)
+    .fillAndStroke("#FAF7F0", "#E0D7C6");
+
+  doc.fontSize(9).fillColor("#8C6508").text("CUSPAL PACIFICATION & SOUND FREQUENCY ALIGNMENT", 55, cardY + 10);
+
+  doc.fontSize(8).fillColor("#3A3530").text(
+    "1. Sub-Lord Energy Pacification: In KP astrology, obstacles precipitate when unfavorable sub-lords (6, 8, 12) activate in your dasha timeline. Pacify these through targeted Friday & Saturday voluntary charity (annadaan for Saturn/Rahu, white sesame/curd for Venus).\n\n" +
+    "2. Acoustic Sound Resonance: Chant the Beej Mantra corresponding to your Lagna Cusp Sub-Lord every morning at sunrise for 108 repetitions to harmonize planetary electromagnetic fields and reinforce physiological vitality.\n\n" +
+    "3. Directional Vastu Discipline: Ensure that high-value transactions and career discussions are initiated facing the East or North-East quadrant to align with beneficial Jupiterian/Mercurial sub-lord vectors.",
+    55,
+    cardY + 26,
+    { width: 485, lineGap: 2.5 }
+  );
+
+  doc.y = cardY + 120;
+}
+
 function renderGlobalBoundaries(doc: PDFKit.PDFDocument, boundaries: string[]) {
   if (doc.y > 600) doc.addPage();
   const top = doc.y;
@@ -433,21 +520,25 @@ function applyPageNumberingAndFooters(doc: PDFKit.PDFDocument, reportId: string)
   for (let i = range.start; i < range.start + range.count; i++) {
     doc.switchToPage(i);
 
+    // Dual Gold Outer Borders on Every Page
+    doc.rect(25, 25, 545, 765).lineWidth(1.2).strokeColor("#B8860B").stroke();
+    doc.rect(28, 28, 539, 759).lineWidth(0.4).strokeColor("#E5C158").stroke();
+
     // Running footer at bottom margin
     doc
       .fontSize(7.5)
-      .fillColor("#94a3b8")
+      .fillColor("#8C6508")
       .text(
-        `AstroLife Evidence-First Report — ${reportId}  |  Confidential & Proprietary`,
-        50,
-        792 - 40,
+        `AstroLife KP Predictive Intelligence | ${reportId} | Shastric Provenance Verified`,
+        45,
+        792 - 38,
         { lineBreak: false }
       )
       .text(
         `Page ${i + 1} of ${range.count}`,
         400,
-        792 - 40,
-        { align: "right", width: 145, lineBreak: false }
+        792 - 38,
+        { align: "right", width: 150, lineBreak: false }
       );
   }
 }

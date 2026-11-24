@@ -25,6 +25,7 @@
 import type { ChartData } from "../../astro-engine/calculations";
 import { calculateSarvatobhadraGrid } from "../../astro-engine/sarvatobhadra-grid";
 import { evaluateTradingRisk } from "../../astro-engine/trading-risk-guardrail";
+import { calculateAshtakavarga } from "../../astro-engine/ashtakavarga";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
 
 const SIGN_NAMES = [
@@ -229,37 +230,126 @@ export function generateStockTradingDossierHTML(
   chart: ChartData,
   options: PackageDossierOptions
 ): string {
-  const subjectName = escapeHtml(options.customerName || chart.name || "Mukul Mohan Pal");
-  const orderId = escapeHtml(options.orderId || "AL-ORD-MUKUL-STOCK-2026");
-  const certificateId = escapeHtml(options.paymentId || "AL-VERIFIED-SHASTRA-CERT-STOCK");
+  const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
+  const orderId = escapeHtml(options.orderId || `ORD_${Date.now().toString(36).toUpperCase()}`);
+  const certificateId = escapeHtml(options.paymentId || `CERT_${Date.now().toString(36).toUpperCase()}`);
 
   const birthDate = chart.dob || "1995-07-04";
-  const birthTime = chart.tob || "12:30";
+  const birthTime = chart.tob || "12:00";
   const birthCity = escapeHtml(chart.city || "Delhi");
   const lat = chart.lat ?? 28.6139;
   const lon = chart.lon ?? 77.2090;
 
-  const lagnaRashi = chart.lagnaRashi || "Virgo";
-  const lagnaNum = chart.lagnaNum ?? 5; // 0-indexed Virgo=5
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum ?? 0] || "Aries";
+  const lagnaNum = chart.lagnaNum ?? 0;
   const moonP = chart.planets?.Moon;
-  const moonNakshatra = moonP?.nakshatra || "Uttara Phalguni";
-  const moonRashi = moonP?.sign || "Leo";
+  const moonNakshatra = moonP?.nakshatra || "Ashwini";
+  const moonRashi = moonP?.sign || "Aries";
 
-  const activeDasha = chart.dasha?.currentMahadasha?.planet || "Rahu";
-  const activeAntar = chart.dasha?.currentAntardasha?.planet || "Mercury";
+  const activeDasha = chart.dasha?.currentMahadasha?.planet || chart.dashas?.[0]?.planet || "Jupiter";
+  const activeAntar = chart.dasha?.currentAntardasha?.planet || "Saturn";
 
   // Compute Sarvatobhadra Grid
   const sbResult = calculateSarvatobhadraGrid(chart);
 
-  // Compute Trading Risk Profile
+  // Compute Ashtakavarga
+  const akv = calculateAshtakavarga(chart);
+  const savHouses = akv.houses;
+  const h11Score = savHouses[10]?.score || 28;
+  const h12Score = savHouses[11]?.score || 25;
+  const netSurplus = h11Score - h12Score;
+  const surplusSign = netSurplus >= 0 ? `+${netSurplus}` : `${netSurplus}`;
+
+  const rahuP = chart.planets?.Rahu;
+  const saturnP = chart.planets?.Saturn;
+  const marsP = chart.planets?.Mars;
+  const venusP = chart.planets?.Venus;
+  const fifthSignNum = (lagnaNum + 4) % 12;
+  const fifthLord = SIGN_LORDS[SIGN_NAMES[fifthSignNum]];
+  const fifthLordP = chart.planets?.[fifthLord];
+  
+  const rahuHouse = rahuP?.house || 1;
+  const moonHouse = moonP?.house || 1;
+  const saturnHouse = saturnP?.house || 1;
+  const marsHouse = marsP?.house || 1;
+
+  const fifthLordAfflicted = [6, 8, 12].includes(fifthLordP?.house || 0);
+  const rahuInRiskHouses = [5, 8, 12].includes(rahuHouse);
+  const moonAfflicted = moonHouse === saturnHouse || moonHouse === marsHouse || moonHouse === rahuHouse;
+  const hasVirgoVenusOrScorpioMoon = venusP?.sign === "Virgo" || moonRashi === "Scorpio";
+
   const tradingRisk = evaluateTradingRisk({
-    fifthLordAfflicted: false,
-    rahuInFifthEighthOrTwelfth: false, // Rahu is in 2nd
-    moonAfflictedBySaturnMarsRahu: true, // Moon with Mars in 12th
-    activeDashaEighthOrTwelfth: false, // Rahu-Mercury
+    fifthLordAfflicted,
+    rahuInFifthEighthOrTwelfth: rahuInRiskHouses,
+    moonAfflictedBySaturnMarsRahu: moonAfflicted,
+    activeDashaEighthOrTwelfth: false,
     hasSubstantialLossesOrDebt: false,
-    hasVirgoVenusOrScorpioMoon: false,
+    hasVirgoVenusOrScorpioMoon,
   });
+
+  const secondSign = SIGN_NAMES[(lagnaNum + 1) % 12];
+  const fifthSign = SIGN_NAMES[(lagnaNum + 4) % 12];
+  const ninthSign = SIGN_NAMES[(lagnaNum + 8) % 12];
+  const eleventhSign = SIGN_NAMES[(lagnaNum + 10) % 12];
+  const twelfthSign = SIGN_NAMES[(lagnaNum + 11) % 12];
+  const secondLord = SIGN_LORDS[secondSign];
+  const eleventhLord = SIGN_LORDS[eleventhSign];
+  const ninthLord = SIGN_LORDS[ninthSign];
+  const twelfthLord = SIGN_LORDS[twelfthSign];
+
+  const DOMAINS: Record<number, string> = {
+    1: "Personal Stamina & Executive Willpower",
+    2: "Accumulated Liquid Treasury & Wealth Retention",
+    3: "Analytical Enterprise & Strategic Action",
+    4: "Fixed Assets, Land & Emotional Grounding",
+    5: "Speculation, Discretionary Trading & Intellect",
+    6: "Competitive Dominance & Problem Solving",
+    7: "Corporate Counterparties & Legal Contracts",
+    8: "Sudden Volatility, Research & Risk Hedging",
+    9: "Long-Term Bhagya, Compounding & Mentorship",
+    10: "Public Career Authority & Market Leadership",
+    11: "Liquid Profit Inflow & Realized Gains",
+    12: "Expenditures, Foreign Outflows & Vyaya",
+  };
+
+  const savTableRowsHtml = Array.from({ length: 12 }, (_, i) => {
+    const h = i + 1;
+    const signIdx = (lagnaNum + i) % 12;
+    const signName = SIGN_NAMES[signIdx];
+    const bindus = savHouses[i]?.score || 28;
+    const rating = bindus >= 30 ? '<span class="tag-badge tag-emerald">Exceptional</span>' : bindus >= 28 ? '<span class="tag-badge tag-emerald">High</span>' : bindus >= 25 ? '<span class="tag-badge tag-gold">Balanced</span>' : '<span class="tag-badge tag-ruby">Throttled</span>';
+    return `<tr><td><strong>${h}${h === 1 ? 'st' : h === 2 ? 'nd' : h === 3 ? 'rd' : 'th'} House</strong></td><td>${signName}</td><td><strong>${bindus}</strong></td><td>${DOMAINS[h]}</td><td>${rating}</td></tr>`;
+  }).join("");
+
+  const highBinduSigns = Array.from({length: 12}, (_, i) => ({ sign: SIGN_NAMES[(lagnaNum + i) % 12], score: savHouses[i]?.score || 28 })).filter(x => x.score >= 30).map(x => `${x.sign} (${x.score})`).join(", ") || "Signs with 30+ Bindus";
+  const lowBinduSigns = Array.from({length: 12}, (_, i) => ({ sign: SIGN_NAMES[(lagnaNum + i) % 12], score: savHouses[i]?.score || 28 })).filter(x => x.score < 26).map(x => `${x.sign} (${x.score})`).join(", ") || "Signs below 26 Bindus";
+
+  const BAV_PLANETS = [
+    { name: "Sun", label: "Sun (Surya)", role: "Institutional reputation & corporate backing" },
+    { name: "Moon", label: "Moon (Chandra)", role: "Intuitive timing & liquid cash reserves" },
+    { name: "Mars", label: "Mars (Mangal)", role: "Execution courage (requires strict risk stops)" },
+    { name: "Mercury", label: "Mercury (Budha)", role: "Analytical data syntax & quantitative precision" },
+    { name: "Jupiter", label: "Jupiter (Guru)", role: "Treasury expansion & macro wealth foresight" },
+    { name: "Venus", label: "Venus (Shukra)", role: "Portfolio aesthetics & high-value enterprise" },
+    { name: "Saturn", label: "Saturn (Shani)", role: "Risk management, discipline & drawdown survival" },
+  ];
+  const bavRowsHtml = BAV_PLANETS.map((bp) => {
+    const h2 = akv.matrix?.[1]?.planetBindus?.[bp.name] ?? 4;
+    const h5 = akv.matrix?.[4]?.planetBindus?.[bp.name] ?? 4;
+    const h9 = akv.matrix?.[8]?.planetBindus?.[bp.name] ?? 4;
+    const h11 = akv.matrix?.[10]?.planetBindus?.[bp.name] ?? 4;
+    return `<tr><td><strong>${bp.label}</strong></td><td>${h2} Bindus</td><td>${h5} Bindus</td><td>${h9} Bindus</td><td>${h11} Bindus</td><td>${bp.role}</td></tr>`;
+  }).join("");
+
+  const sensitiveRowsHtml = (sbResult.sensitiveTargets || []).map((st, idx) => `
+    <tr>
+      <td><strong>${escapeHtml(st.name)}</strong></td>
+      <td>${escapeHtml(st.nakshatra)}</td>
+      <td>${idx === 0 ? "1st (Janma)" : idx === 1 ? "10th (Karma)" : idx === 2 ? "16th (Sanghatika)" : idx === 3 ? "18th (Samudayika)" : idx === 4 ? "23rd (Vinaasha)" : idx === 5 ? "25th (Manasa)" : idx === 6 ? "26th (Rajya/Jati)" : "27th/28th (Abhisheka)"}</td>
+      <td>${escapeHtml(st.shastricSignificance || "Sensitive market trigger point")}</td>
+    </tr>
+  `).join("");
+  const vinaashaNak = sbResult.sensitiveTargets?.[4]?.nakshatra || "Vinaasha";
 
   const headerRail = (kicker: string) => `
     <div class="page-rail">
@@ -489,6 +579,11 @@ body {
   justify-content: center;
   align-items: center;
   padding: 10px;
+}
+
+.devanagari-safe {
+  letter-spacing: 0 !important;
+  font-family: 'Noto Sans Devanagari', 'Noto Serif Devanagari', serif !important;
 }
 </style>
 </head>
@@ -781,7 +876,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Dhana Yogas vs. Speculative Drawdown Audit</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Mathematical audit of wealth-forming combinations (Dhana Yogas) and specific celestial drawdown vulnerabilities for Mukul Mohan Pal.
+      Mathematical audit of wealth-forming combinations (Dhana Yogas) and specific celestial drawdown vulnerabilities for ${subjectName}.
     </p>
 
     <!-- Dhana Yogas Table -->
@@ -796,34 +891,34 @@ body {
       </thead>
       <tbody>
         <tr>
-          <td><strong>Maha Parivartana Yoga</strong></td>
-          <td>10th Lord Mercury in 9th (Taurus) &harr; 9th Lord Venus in 10th (Gemini) (Dharma-Karmadhipati Exchange)</td>
-          <td>Supreme Raja Yoga: High-value IP monetization, proprietary software architecture, institutional consulting</td>
-          <td><span class="tag-badge tag-emerald">Supreme (98%)</span></td>
+          <td><strong>11th House Labha Axis</strong></td>
+          <td>${eleventhLord} rules 11th (${eleventhSign}) · Placed in House ${chart.planets?.[eleventhLord]?.house || 11}</td>
+          <td>Liquid cash inflow, enterprise earnings, network compounding</td>
+          <td><span class="tag-badge tag-emerald">Strong (92%)</span></td>
         </tr>
         <tr>
-          <td><strong>AmK in 9th House</strong></td>
-          <td>Mercury (Amatyakaraka) in Taurus in 9th</td>
-          <td>Massive wealth compounding through advisory &amp; IP</td>
-          <td><span class="tag-badge tag-emerald">Supreme (96%)</span></td>
+          <td><strong>9th House Bhagya Raja Yoga</strong></td>
+          <td>${ninthLord} rules 9th (${ninthSign}) · Placed in House ${chart.planets?.[ninthLord]?.house || 9}</td>
+          <td>Long-term compounding, sovereign fortune, mentor guidance</td>
+          <td><span class="tag-badge tag-emerald">Supreme (95%)</span></td>
         </tr>
         <tr>
-          <td><strong>Digbali Sun in 10th</strong></td>
-          <td>Sun in Gemini at 18° 04' with Venus</td>
-          <td>Executive authority, corporate retainers, institutional trust</td>
-          <td><span class="tag-badge tag-emerald">High (90%)</span></td>
-        </tr>
-        <tr>
-          <td><strong>Indu Lagna Raja Yoga</strong></td>
-          <td>Indu Lagna in Capricorn ruled by Saturn in H7</td>
-          <td>Long-term wealth fortress built on discipline and patience</td>
+          <td><strong>2nd House Treasury Vault</strong></td>
+          <td>${secondLord} rules 2nd (${secondSign}) · Placed in House ${chart.planets?.[secondLord]?.house || 2}</td>
+          <td>Capital accumulation, balance sheet fortification, liquidity reserve</td>
           <td><span class="tag-badge tag-gold">Solid (88%)</span></td>
         </tr>
         <tr>
-          <td><strong>Vyaya Chandra Risk</strong></td>
-          <td>11th Lord Moon conjunct Mars in 12th House</td>
-          <td>Capital drain if engaging in impulsive intraday F&amp;O</td>
-          <td><span class="tag-badge tag-ruby">Caution (78%)</span></td>
+          <td><strong>5th House Speculative Radar</strong></td>
+          <td>${fifthLord} rules 5th (${fifthSign}) · Placed in House ${fifthLordP?.house || 5}</td>
+          <td>Intellectual discernment, analytical hedging, risk control</td>
+          <td><span class="tag-badge ${fifthLordAfflicted ? 'tag-ruby' : 'tag-emerald'}">${fifthLordAfflicted ? 'Caution (75%)' : 'Disciplined (90%)'}</span></td>
+        </tr>
+        <tr>
+          <td><strong>12th House Vyaya / Drawdown Risk</strong></td>
+          <td>${twelfthLord} rules 12th (${twelfthSign}) · Placed in House ${chart.planets?.[twelfthLord]?.house || 12}</td>
+          <td>Capital protection alert: avoid forced leverage and revenge trading</td>
+          <td><span class="tag-badge tag-ruby">Caution (80%)</span></td>
         </tr>
       </tbody>
     </table>
@@ -831,10 +926,10 @@ body {
     <!-- Shastric Synthesis Box -->
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);margin-bottom:8px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">
-        ✦ STRATEGIC TAKEAWAY: INTELLECTUAL CAPITAL &gt; FINANCIAL SPECULATION
+        ✦ STRATEGIC TAKEAWAY: DISCIPLINED CAPITAL &gt; FINANCIAL SPECULATION
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Your chart is engineered as an <strong>Intellectual Capital Engine</strong>, not an intra-day trading pit gambler. Your highest return on investment comes from writing proprietary software, developing quantitative algorithms, and advising institutional clients. Deploying profits earned from software into long-term compounding assets is your sovereign path to multi-generational wealth.
+        Your chart operates on <strong>Disciplined Capital Architecture</strong>, not high-frequency gambling. Your highest return on investment comes from strategic research, patient execution, and systematic long-term compounding. Reinvesting trading surpluses into structured, sovereign assets is your canonical path to generational wealth.
       </p>
     </div>
   </div>
@@ -935,7 +1030,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Your 8 Sensitive Financial Target Nakshatras</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      In Sarvatobhadra Shastra, 8 sensitive nakshatras calculated from your natal Moon (<strong>Uttara Phalguni</strong>) govern your personal market vulnerability.
+      In Sarvatobhadra Shastra, 8 sensitive nakshatras calculated from your natal Moon (<strong>${moonNakshatra}</strong>) govern your personal market vulnerability.
     </p>
 
     <!-- Table of 8 Sensitive Points -->
@@ -949,70 +1044,17 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>1. जन्म (Janma)</strong></td>
-          <td>Uttara Phalguni</td>
-          <td>1st</td>
-          <td>Personal vitality, mental clarity, intuitive trade execution</td>
-        </tr>
-        <tr>
-          <td><strong>2. कर्म (Karma)</strong></td>
-          <td>Uttara Ashadha</td>
-          <td>10th</td>
-          <td>Executive standing, institutional deals, career trading profits</td>
-        </tr>
-        <tr>
-          <td><strong>3. सांघातिक (Sanghatika)</strong></td>
-          <td>Revati</td>
-          <td>16th</td>
-          <td>Partnerships, core bank balance, contracts &amp; treasury</td>
-        </tr>
-        <tr>
-          <td><strong>4. सामुदायिक (Samudayika)</strong></td>
-          <td>Bharani</td>
-          <td>18th</td>
-          <td>Market sentiment, collective liquidity, crowd behavior</td>
-        </tr>
-        <tr>
-          <td><strong>5. वैनाशिक (Vinaasha)</strong></td>
-          <td>Punarvasu</td>
-          <td>23rd</td>
-          <td>Acute vulnerability &mdash; zero leverage zone, risk of liquidation</td>
-        </tr>
-        <tr>
-          <td><strong>6. मानस (Manasa)</strong></td>
-          <td>Ashlesha</td>
-          <td>25th</td>
-          <td>Psychological calm, emotional stability, freedom from FOMO</td>
-        </tr>
-        <tr>
-          <td><strong>7. जाति (Jati)</strong></td>
-          <td>Magha</td>
-          <td>26th</td>
-          <td>Workforce stability, community networks, institutional retainers</td>
-        </tr>
-        <tr>
-          <td><strong>8. देश (Desha)</strong></td>
-          <td>Purva Phalguni</td>
-          <td>27th</td>
-          <td>Macro-economic environment, sovereign policy, systemic market trends</td>
-        </tr>
-        <tr>
-          <td><strong>9. अभिषेक (Abhisheka)</strong></td>
-          <td>Uttara Phalguni</td>
-          <td>28th</td>
-          <td>Peak sovereign coronation, apex execution, milestone liquidations</td>
-        </tr>
+        ${sensitiveRowsHtml}
       </tbody>
     </table>
 
     <!-- Vinaasha Warning Box -->
     <div class="luxury-card" style="border:1.5px solid var(--ruby);background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:11.5px;">
-        ✦ THE VINAASHA PROTOCOL (PUNARVASU AUDIT)
+        ✦ THE VINAASHA PROTOCOL (${vinaashaNak.toUpperCase()} AUDIT)
       </div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Whenever malefic transits (Mars or Rahu) strike <strong>Punarvasu</strong>, do not execute fresh swing positions. Close out leveraged hedges and sit 100% in cash or gold. Protecting capital during Vinaasha strikes guarantees survival in market drawdowns.
+        Whenever malefic transits (Mars or Rahu) strike <strong>${vinaashaNak}</strong>, do not execute fresh swing positions. Close out leveraged hedges and sit 100% in cash or gold. Protecting capital during Vinaasha strikes guarantees survival in market drawdowns.
       </p>
     </div>
   </div>
@@ -1113,25 +1155,14 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr><td><strong>1st House</strong></td><td>Virgo (Kanya)</td><td><strong>35</strong></td><td>Personal Stamina &amp; Executive Willpower</td><td><span class="tag-badge tag-emerald">Exceptional</span></td></tr>
-        <tr><td><strong>2nd House</strong></td><td>Libra (Tula)</td><td><strong>31</strong></td><td>Accumulated Liquid Treasury &amp; Wealth Retention</td><td><span class="tag-badge tag-emerald">Supreme</span></td></tr>
-        <tr><td><strong>3rd House</strong></td><td>Scorpio (Vrishchika)</td><td><strong>26</strong></td><td>Analytical Enterprise &amp; Strategic Action</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
-        <tr><td><strong>4th House</strong></td><td>Sagittarius (Dhanu)</td><td><strong>22</strong></td><td>Fixed Assets, Land &amp; Emotional Grounding</td><td><span class="tag-badge tag-ruby">Throttled</span></td></tr>
-        <tr><td><strong>5th House</strong></td><td>Capricorn (Makara)</td><td><strong>30</strong></td><td>Speculation, Discretionary Trading &amp; Intellect</td><td><span class="tag-badge tag-emerald">Disciplined</span></td></tr>
-        <tr><td><strong>6th House</strong></td><td>Aquarius (Kumbha)</td><td><strong>27</strong></td><td>Competitive Dominance &amp; Problem Solving</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
-        <tr><td><strong>7th House</strong></td><td>Pisces (Meena)</td><td><strong>28</strong></td><td>Corporate Counterparties &amp; Legal Contracts</td><td><span class="tag-badge tag-gold">Balanced</span></td></tr>
-        <tr><td><strong>8th House</strong></td><td>Aries (Mesha)</td><td><strong>30</strong></td><td>Sudden Volatility, Research &amp; Risk Hedging</td><td><span class="tag-badge tag-emerald">High</span></td></tr>
-        <tr><td><strong>9th House</strong></td><td>Taurus (Vrishabha)</td><td><strong>25</strong></td><td>Long-Term Bhagya, Compounding &amp; Mentorship</td><td><span class="tag-badge tag-gold">Selective</span></td></tr>
-        <tr><td><strong>10th House</strong></td><td>Gemini (Mithuna)</td><td><strong>34</strong></td><td>Public Career Authority &amp; Market Leadership</td><td><span class="tag-badge tag-emerald">Supreme</span></td></tr>
-        <tr><td><strong>11th House</strong></td><td>Cancer (Karka)</td><td><strong>27</strong></td><td>Liquid Profit Inflow &amp; Realized Gains</td><td><span class="tag-badge tag-gold">Solid Baseline</span></td></tr>
-        <tr><td><strong>12th House</strong></td><td>Leo (Simha)</td><td><strong>22</strong></td><td>Expenditures, Foreign Outflows &amp; Vyaya</td><td><span class="tag-badge tag-emerald">Low Drain</span></td></tr>
+        ${savTableRowsHtml}
       </tbody>
     </table>
 
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <div class="kicker" style="color:var(--emerald-bright);">The Golden Net Surplus Formula:</div>
       <p style="font-size:11.5px;color:var(--ivory-dim);margin-top:2px;">
-        11th House Bindus (27) &minus; 12th House Bindus (22) = <strong>+5 Net Bindu Surplus</strong>. Total: <strong>337 Bindus</strong> across all 12 houses. In classical Parashari economics, whenever the 11th house exceeds the 12th house, capital retention compounds positively year over year.
+        11th House Bindus (${h11Score}) &minus; 12th House Bindus (${h12Score}) = <strong>${surplusSign} Net Bindu Surplus</strong>. Total: <strong>${akv.sarvaTotal} Bindus</strong> across all 12 houses. In classical Parashari economics, whenever the 11th house exceeds the 12th house, capital retention compounds positively year over year.
       </p>
     </div>
   </div>
@@ -1155,7 +1186,7 @@ body {
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.45;margin-top:4px;">
           <p style="margin-bottom:6px;">
-            <strong>Virgo (35), Gemini (34), Libra (31), Capricorn (30), Aries (30):</strong>
+            <strong>${highBinduSigns}:</strong>
           </p>
           <p>
             When major planets (Jupiter, Sun, Mercury) transit through these signs, market liquidity and your personal negotiation power reach annual zeniths. Deploy capital into swing positions, launch sovereign products, and take calculated growth initiatives.
@@ -1170,10 +1201,10 @@ body {
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.45;margin-top:4px;">
           <p style="margin-bottom:6px;">
-            <strong>Sagittarius (22 Bindus), Leo (22 Bindus), Taurus (25 Bindus):</strong>
+            <strong>${lowBinduSigns}:</strong>
           </p>
           <p>
-            When transits activate Sagittarius (4th house) or Leo (12th house), trading velocity must be throttled down by 80%. These are not periods for aggressive expansion; they are windows for software refactoring, capital preservation, and risk audits.
+            When transits activate these sensitive zones, trading velocity must be throttled down by 80%. These are not periods for aggressive expansion; they are windows for system refinement, capital preservation, and risk audits.
           </p>
         </div>
       </div>
@@ -1185,7 +1216,7 @@ body {
         ✦ THE ASHTAKAVARGA TRADE EXECUTION AXIOM
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Never buy options or enter directional swing positions on days when the transiting Moon traverses a sign containing fewer than 26 Bindus. Wait for Moon to enter Virgo (35), Gemini (34), or Libra (31) for maximum momentum synchronicity.
+        Never buy options or enter directional swing positions on days when the transiting Moon traverses a sign containing fewer than 26 Bindus. Wait for Moon to enter higher-bindu signs (${highBinduSigns}) for maximum momentum synchronicity.
       </p>
     </div>
   </div>
@@ -1214,70 +1245,15 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>Sun (Surya)</strong></td>
-          <td>5 Bindus</td>
-          <td>4 Bindus</td>
-          <td>3 Bindus</td>
-          <td>5 Bindus</td>
-          <td>Institutional reputation &amp; corporate backing</td>
-        </tr>
-        <tr>
-          <td><strong>Moon (Chandra)</strong></td>
-          <td>4 Bindus</td>
-          <td>4 Bindus</td>
-          <td>3 Bindus</td>
-          <td>4 Bindus</td>
-          <td>Intuitive timing &amp; liquid cash reserves</td>
-        </tr>
-        <tr>
-          <td><strong>Mars (Mangal)</strong></td>
-          <td>3 Bindus</td>
-          <td>3 Bindus</td>
-          <td>3 Bindus</td>
-          <td>3 Bindus</td>
-          <td>Execution courage (requires strict risk stops)</td>
-        </tr>
-        <tr>
-          <td><strong>Mercury (Budha)</strong></td>
-          <td>6 Bindus</td>
-          <td>5 Bindus</td>
-          <td>5 Bindus</td>
-          <td>5 Bindus</td>
-          <td>Algorithmic data syntax &amp; quantitative trading</td>
-        </tr>
-        <tr>
-          <td><strong>Jupiter (Guru)</strong></td>
-          <td>5 Bindus</td>
-          <td>5 Bindus</td>
-          <td>4 Bindus</td>
-          <td>4 Bindus</td>
-          <td>Advisory wisdom &amp; long-term compounding</td>
-        </tr>
-        <tr>
-          <td><strong>Venus (Shukra)</strong></td>
-          <td>4 Bindus</td>
-          <td>4 Bindus</td>
-          <td>4 Bindus</td>
-          <td>4 Bindus</td>
-          <td>Commercial luxury &amp; asset aesthetics</td>
-        </tr>
-        <tr>
-          <td><strong>Saturn (Shani)</strong></td>
-          <td>4 Bindus</td>
-          <td>5 Bindus</td>
-          <td>3 Bindus</td>
-          <td>2 Bindus</td>
-          <td>Institutional risk discipline &amp; patience</td>
-        </tr>
+        ${bavRowsHtml}
       </tbody>
       <tfoot>
         <tr style="border-top:1.5px solid var(--border-gold);background:var(--surface-elevated);font-weight:700;">
           <td><strong>SAV Column Total</strong></td>
-          <td style="color:var(--emerald-bright);"><strong>31 Bindus</strong></td>
-          <td style="color:var(--emerald-bright);"><strong>30 Bindus</strong></td>
-          <td style="color:var(--gold-bright);"><strong>25 Bindus</strong></td>
-          <td style="color:var(--gold-bright);"><strong>27 Bindus</strong></td>
+          <td style="color:var(--emerald-bright);"><strong>${savHouses[1]?.score || 28} Bindus</strong></td>
+          <td style="color:var(--emerald-bright);"><strong>${savHouses[4]?.score || 28} Bindus</strong></td>
+          <td style="color:var(--gold-bright);"><strong>${savHouses[8]?.score || 28} Bindus</strong></td>
+          <td style="color:var(--gold-bright);"><strong>${savHouses[10]?.score || 28} Bindus</strong></td>
           <td><span class="tag-badge tag-emerald">100% SAV-337 Synced</span></td>
         </tr>
       </tfoot>
@@ -1285,10 +1261,10 @@ body {
 
     <div class="luxury-card" style="border:1.5px solid var(--emerald);background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-        ✦ MERCURY: YOUR CHIEF FINANCIAL OPERATING OFFICER
+        ✦ SHASTRIC BAV WEALTH SYNTHESIS
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:2px;">
-        Notice that <strong>Mercury contributes 6 Bindus in the 2nd House and 5 Bindus in the 9th &amp; 11th Houses</strong>. Mercury is your highest-scoring wealth architect. Any financial strategy that relies on calculation, code, data analysis, and software tools will systematically outperform manual guessing.
+        Notice how the individual planetary bindu distributions across your 2nd, 5th, 9th, and 11th houses dictate your natural financial rhythms. Any financial strategy that relies on structured planning, systematic risk metrics, and data integrity will systematically outperform emotional guessing.
       </p>
     </div>
   </div>
@@ -1779,7 +1755,7 @@ body {
     <!-- Consolidated 1-Page Summary -->
     <div class="luxury-card" style="border:2px solid var(--border-gold-strong);background:var(--surface-elevated);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ SOVEREIGN TRADER MATRIX &middot; MUKUL MOHAN PAL
+        ✦ SOVEREIGN TRADER MATRIX &middot; ${subjectName.toUpperCase()}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11.2px;margin-top:6px;">
         <div>
@@ -1788,19 +1764,19 @@ body {
         </div>
         <div>
           <span class="kicker">SAV BINDU TOTAL</span>
-          <div style="color:var(--gold-bright);font-weight:700;">337 Bindus (+5 Net Surplus: H11 27 &gt; H12 22)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">${akv.sarvaTotal} Bindus (${surplusSign} Net Surplus: H11 ${h11Score} vs H12 ${h12Score})</div>
         </div>
         <div>
           <span class="kicker">5TH HOUSE DISCRETION</span>
-          <div style="color:var(--ivory);font-weight:600;">Capricorn (30 Bindus · Saturn Restraint)</div>
+          <div style="color:var(--ivory);font-weight:600;">${fifthSign} (${savHouses[4]?.score || 28} Bindus · ${fifthLord} Rules)</div>
         </div>
         <div>
           <span class="kicker">11TH HOUSE REALIZED GAINS</span>
-          <div style="color:var(--emerald-bright);font-weight:700;">Cancer (27 Bindus · Moon in 12th Vyaya)</div>
+          <div style="color:var(--emerald-bright);font-weight:700;">${eleventhSign} (${h11Score} Bindus · ${eleventhLord} Rules)</div>
         </div>
         <div>
           <span class="kicker">TREASURY STRENGTH</span>
-          <div style="color:var(--gold-bright);font-weight:700;">31 Bindus in Libra 2nd House (Supreme)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">${savHouses[1]?.score || 28} Bindus in ${secondSign} 2nd House</div>
         </div>
         <div>
           <span class="kicker">PROHIBITED VEHICLE</span>
@@ -1808,11 +1784,11 @@ body {
         </div>
         <div>
           <span class="kicker">FAVORABLE TRADING DAYS</span>
-          <div style="color:var(--ivory);font-weight:600;">Wednesday (Budha) &middot; Friday (Shukra)</div>
+          <div style="color:var(--ivory);font-weight:600;">Thursday (Guru) &middot; Friday (Shukra)</div>
         </div>
         <div>
           <span class="kicker">FAVORABLE SECTORS</span>
-          <div style="color:var(--emerald-bright);font-weight:700;">Tech, AI, SaaS, FinTech, Green Energy</div>
+          <div style="color:var(--emerald-bright);font-weight:700;">Sovereign Equities, Clean Tech, Capital Goods</div>
         </div>
         <div>
           <span class="kicker">OPTIMAL DESK FACING</span>
@@ -1820,7 +1796,7 @@ body {
         </div>
         <div>
           <span class="kicker">PEAK WEALTH GATE</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Dec 2026 &ndash; Jul 2027 (Jupiter Exalted in 11th H)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">Dec 2026 &ndash; Jul 2027 (Jupiter Exalted in House ${((3 - lagnaNum + 12) % 12) + 1})</div>
         </div>
       </div>
     </div>

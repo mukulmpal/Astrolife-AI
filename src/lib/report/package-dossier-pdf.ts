@@ -11,6 +11,7 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import type { ChartData } from "@/lib/astro-engine/calculations";
+import { renderVectorNorthIndianKundli } from "./vector-chart-renderer";
 
 type PDFDoc = InstanceType<typeof PDFDocument>;
 
@@ -82,6 +83,15 @@ export async function buildPackageDossierPdf(
       } else {
         doc.font("Helvetica");
       }
+
+      // ───────────────────────────────────────────────────────────────────────
+      // PDF DOCUMENT BOOKMARKS / OUTLINES (For instant PDF Reader navigation)
+      // ───────────────────────────────────────────────────────────────────────
+      const outline = doc.outline;
+      outline.addItem("1. Official Seeker Certification & Overview");
+      outline.addItem("2. Natal Graha Sthiti & Kundli Matrix");
+      outline.addItem(`3. Specialized Deep Dive: ${reportTitle}`);
+      outline.addItem("4. Sacred Vedic Remedies & Behavioral Upayas");
 
       // ───────────────────────────────────────────────────────────────────────
       // PAGE 1: LUXURY COVER & CERTIFIED SEEKER PROFILE
@@ -310,31 +320,48 @@ function renderPage2NatalPlacements(doc: PDFDoc, chart: ChartData, subject: stri
     { width: 475, lineGap: 3 }
   );
 
-  // Key Astrological Summary Cards
-  const cardY = dashaBoxTop + 115;
-  const colWidth = 245;
+  // Key Astrological Summary: Native Vector Kundli & Core Synthesis
+  const cardY = dashaBoxTop + 105;
 
-  // Card 1: Lagnesh Vitality
-  doc.rect(45, cardY, colWidth, 120).fillAndStroke("#FFFFFF", "#E0D7C6");
-  doc.fontSize(9.5).fillColor("#8C6508").text("Lagna & Ascendant Vitality", 55, cardY + 12);
+  // Left: Pure Vector North Indian Kundli Chart
+  renderVectorNorthIndianKundli(doc, 45, cardY, 150, chart, {
+    title: "D1 NATAL LAGNA KUNDLI",
+    borderColor: "#8C6508",
+    innerLineColor: "#C9A961",
+    fillColor: "#FAF7F0",
+    signColor: "#8C6508",
+    planetColor: "#1A1A1A",
+  });
+
+  // Right: Lagnesh & Chandra Synthesis Card
+  const rightX = 210;
+  const rightW = 340;
+  doc.rect(rightX, cardY, rightW, 150).fillAndStroke("#FFFFFF", "#E0D7C6");
+
+  doc.fontSize(10).fillColor("#8C6508").text("LAGNA & CHANDRA DYNAMICS", rightX + 14, cardY + 12);
+
   doc.fontSize(8.5).fillColor("#4A4238").text(
-    `Your Ascendant is ${chart.lagnaRashi}, giving you an inherent natural archetype of discernment, resilience, and steady focus. Lagna represents physical stamina, persona, and overarching destiny trajectory.`,
-    55,
-    cardY + 32,
-    { width: 225, lineGap: 2.5 }
+    `• Lagna (${chart.lagnaRashi}): Represents your core life vitality, physical disposition, and outer manifestation. Your soul operates with natural discernment and steadfast resolve.`,
+    rightX + 14,
+    cardY + 30,
+    { width: rightW - 28, lineGap: 2 }
   );
 
-  // Card 2: Chandra Emotional Grounding
   const moonP = chart.planets?.["Moon"];
   const moonRashi = moonP?.sign || "Taurus";
   const moonNak = moonP?.nakshatra || "Rohini";
-  doc.rect(305, cardY, colWidth, 120).fillAndStroke("#FFFFFF", "#E0D7C6");
-  doc.fontSize(9.5).fillColor("#8C6508").text("Chandra & Emotional Mind", 315, cardY + 12);
   doc.fontSize(8.5).fillColor("#4A4238").text(
-    `Moon in ${moonRashi} under Nakshatra ${moonNak} governs your emotional intuition, stress-response, and subconscious memory. Cultivating mental tranquility is vital during transition periods.`,
-    315,
-    cardY + 32,
-    { width: 225, lineGap: 2.5 }
+    `• Chandra (${moonRashi} • ${moonNak}): Governs mental peace, emotional intuition, and subconscious processing. Stabilizing emotional equilibrium is essential during major dasha transitions.`,
+    rightX + 14,
+    cardY + 70,
+    { width: rightW - 28, lineGap: 2 }
+  );
+
+  doc.fontSize(8).fillColor("#8C6508").text(
+    `✦ Shastric Note: All planetary houses shown in the adjacent Kundli chart are computed using exact sidereal longitudes and Chitrapaksha (Lahiri) Ayanamsha.`,
+    rightX + 14,
+    cardY + 115,
+    { width: rightW - 28, lineGap: 2 }
   );
 }
 
