@@ -991,8 +991,8 @@ function lordSignNum(signNum: number, planets: ChartData["planets"]): number {
 }
 
 function calcArudha(houseSign: number, lordSign: number): number {
-  const D = md(lordSign - houseSign, 12) || 12;
-  let a = md(lordSign + D - 1, 12);
+  const D = md(lordSign - houseSign, 12);
+  let a = md(lordSign + D, 12);
   if (a === houseSign)                  a = md(houseSign + 9, 12);
   else if (a === md(houseSign + 6, 12)) a = md(houseSign + 3, 12);
   return a;

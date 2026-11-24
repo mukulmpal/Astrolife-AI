@@ -5353,12 +5353,9 @@ export function generateReportHTML(chart: ChartData, options?: Partial<ReportOpt
     include.twelfthHouse     ? safe(() => pageTwelfthHouseSecretWealth(chart, "12H", lang), "12th House Secret Wealth") : "",
     include.careerD10        ? safe(() => pageCareerSpecifierD10(chart, "D10", lang), "D10 Career Specifier") : "",
     include.transitHealthTiming ? safe(() => pageTransitHealthTiming(chart, "HT", lang), "Moon Dispositor Health Timing") : "",
-    include.functionalDebilityGuard ? safe(() => pageFunctionalDebilityGuard(chart, "DG"), "Functional Debility Guard") : "",
-    include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK"), "Lineage Karma & Kula Devata") : "",
-    include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP"), "12 Jyotirlinga Sanctuary") : "",
-    include.functionalDebilityGuard ? safe(() => pageFunctionalDebilityGuard(chart, "DG"), "Functional Debility Guard") : "",
-    include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK"), "Lineage Karma & Kula Devata") : "",
-    include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP"), "12 Jyotirlinga Sanctuary") : "",
+    include.functionalDebilityGuard ? safe(() => pageFunctionalDebilityGuard(chart, "DG", lang), "Functional Debility Guard") : "",
+    include.lineageKarma     ? safe(() => pageLineageKarmaKulaDevata(chart, "LK", lang), "Lineage Karma & Kula Devata") : "",
+    include.jyotirlingaPilgrimage ? safe(() => pageJyotirlingaPilgrimage(chart, "JP", lang), "12 Jyotirlinga Sanctuary") : "",
     safe(() => page10Closing(),              "Closing"),
   ].filter(Boolean).join("\n\n");
 

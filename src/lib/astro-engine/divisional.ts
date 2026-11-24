@@ -510,6 +510,15 @@ const VARGA_RASHI_LORDS = [
   "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"
 ];
 
+function houseOrdinal(h: number): string {
+  const mod10 = h % 10;
+  const mod100 = h % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${h}st`;
+  if (mod10 === 2 && mod100 !== 12) return `${h}nd`;
+  if (mod10 === 3 && mod100 !== 13) return `${h}rd`;
+  return `${h}th`;
+}
+
 export function getNavamshaAnalysis(d9: DivChart): string[] {
   const insights: string[] = [];
   const lagnaLord = VARGA_RASHI_LORDS[d9.lagnaNum] || "Venus";
@@ -535,7 +544,7 @@ export function getNavamshaAnalysis(d9: DivChart): string[] {
 
   // D-9 7th Lord Placement
   if (seventhLordPlanet) {
-    insights.push(`D-9 7th Lord (${seventhLord}) in ${seventhLordPlanet.house}th house (${seventhLordPlanet.sign}${seventhLordPlanet.dignity !== "—" ? `, ${seventhLordPlanet.dignity}` : ""}) — governs spouse's temperament, post-marriage fortune, and mutual life stability.`);
+    insights.push(`D-9 7th Lord (${seventhLord}) in ${houseOrdinal(seventhLordPlanet.house)} house (${seventhLordPlanet.sign}${seventhLordPlanet.dignity !== "—" ? `, ${seventhLordPlanet.dignity}` : ""}) — governs spouse's temperament, post-marriage fortune, and mutual life stability.`);
   }
 
   // D-9 7th House Occupants
@@ -545,7 +554,7 @@ export function getNavamshaAnalysis(d9: DivChart): string[] {
 
   // D-9 Lagnesh Analysis
   if (lagnaLordPlanet) {
-    insights.push(`D-9 Lagnesh ${lagnaLord} in ${lagnaLordPlanet.house}th house (${d9.lagna} Lagna) — reveals your soul's core values and spiritual growth through union.`);
+    insights.push(`D-9 Lagnesh ${lagnaLord} in ${houseOrdinal(lagnaLordPlanet.house)} house (${d9.lagna} Lagna) — reveals your soul's core values and spiritual growth through union.`);
   }
 
   // Venus in D-9 (Karaka of Marriage & Romance)
@@ -627,7 +636,7 @@ export function getDashamshaAnalysis(d10: DivChart): string[] {
     } else if (lagnaLordPlanet.house === 10) {
       insights.push(`D-10 Lagnesh ${lagnaLord} in 10th House (${tenthSign}) — Natural corporate/public authority. Professional identity directly defines life status.`);
     } else if ([5, 9].includes(lagnaLordPlanet.house)) {
-      insights.push(`D-10 Lagnesh ${lagnaLord} in ${lagnaLordPlanet.house}th Trikona — Deep intellectual authority, mentorship capability, and creative enterprise expansion.`);
+      insights.push(`D-10 Lagnesh ${lagnaLord} in ${houseOrdinal(lagnaLordPlanet.house)} Trikona — Deep intellectual authority, mentorship capability, and creative enterprise expansion.`);
     } else if (lagnaLordPlanet.house === 11) {
       insights.push(`D-10 Lagnesh ${lagnaLord} in 11th House — Direct conversion of professional skill into massive financial gains and expansive elite networks.`);
     }
@@ -635,7 +644,7 @@ export function getDashamshaAnalysis(d10: DivChart): string[] {
 
   // D-10 10th Lord Analysis
   if (tenthLordPlanet) {
-    insights.push(`D-10 Karma Lord (${tenthLord}) placed in ${tenthLordPlanet.house}th house (${tenthLordPlanet.sign}${tenthLordPlanet.dignity !== "—" ? `, ${tenthLordPlanet.dignity}` : ""}) — Determines real-world workplace execution, promotions, and organizational standing.`);
+    insights.push(`D-10 Karma Lord (${tenthLord}) placed in ${houseOrdinal(tenthLordPlanet.house)} house (${tenthLordPlanet.sign}${tenthLordPlanet.dignity !== "—" ? `, ${tenthLordPlanet.dignity}` : ""}) — Determines real-world workplace execution, promotions, and organizational standing.`);
   }
 
   // D-10 10th House Occupants
