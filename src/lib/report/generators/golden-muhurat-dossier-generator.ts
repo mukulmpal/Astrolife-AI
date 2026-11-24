@@ -24,7 +24,7 @@
 import type { ChartData } from "../../astro-engine/calculations";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
 import { calculatePanchang, type PanchangResult } from "../../astro-engine/panchang";
-import { scanMuhuratWindows, type MuhuratWindow } from "../../astro-engine/muhurat";
+import { scanAuspiciousMuhurats, type MuhuratWindow } from "../../astro-engine/muhurat";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -135,7 +135,7 @@ export function generateGoldenMuhuratDossierHTML(
   // Scan realistic upcoming auspicious windows for Mukul
   let businessWindows: MuhuratWindow[] = [];
   try {
-    businessWindows = scanMuhuratWindows({
+    businessWindows = scanAuspiciousMuhurats({
       category: "business",
       startDate: new Date("2026-12-01T00:00:00Z"),
       daysToScan: 60,
