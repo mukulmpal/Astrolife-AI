@@ -442,8 +442,10 @@ export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H", 
             ${result.viparitaRajaYoga.hasVRY ? `Type: ${result.viparitaRajaYoga.type} Yoga` : (isEn ? "Standard Trikona Flow" : "सामान्य त्रिकोण प्रवाह")}
           </div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${result.viparitaRajaYoga.groundZeroWillpowerHinglish 
-              ? esc(result.viparitaRajaYoga.groundZeroWillpowerHinglish) 
+            ${result.viparitaRajaYoga.hasVRY
+              ? (isEn
+                  ? `Viparita Raja Yoga active through ${result.viparitaRajaYoga.type}. Extreme pressure converts into strategic breakthrough resilience and unexpected ascent.`
+                  : esc(result.viparitaRajaYoga.groundZeroWillpowerHinglish || "विपरीत परिस्थितियों में अचानक अभ्युदय और संकट से विजय।"))
               : (isEn ? "No extreme dusthana inversion active. Trik houses operate within regular parameters." : "कोई विपरीत राजयोग सक्रिय नहीं। त्रिक भाव सामान्य हैं।")}
           </div>
         </div>
@@ -617,7 +619,8 @@ export function pageTransitHealthTiming(chart: ChartData, pageNum = "HT", lang: 
 }
 
 // ── 7. Page: Functional Debility Superpowers & Gemstone Fallacy Guard ────────
-export function pageFunctionalDebilityGuard(chart: ChartData, pageNum = "DG"): string {
+export function pageFunctionalDebilityGuard(chart: ChartData, pageNum = "DG", lang: ReportLang = "en"): string {
+  const isEn = lang === "en";
   const keyPlanets: ("Sun" | "Moon" | "Mars" | "Mercury" | "Jupiter" | "Venus" | "Saturn")[] = [
     "Venus", "Mercury", "Sun", "Moon", "Mars", "Jupiter", "Saturn"
   ];
@@ -637,94 +640,99 @@ export function pageFunctionalDebilityGuard(chart: ChartData, pageNum = "DG"): s
   const nadi = evaluateNadiDebilityPeak(chart);
 
   return `<section class="page dense">
-    ${pageRail("Functional Debility Guard · Gemstone Fallacy", pageNum)}
+    ${pageRail(isEn ? "Functional Debility Guard · Gemstone Fallacy" : "नीच ग्रह शक्ति व रत्न निषेध · Guard", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--crimson);">✦</span>
-        <h2>Functional Debility &amp; Gemstone Guard</h2>
+        <h2>${isEn ? "Functional Debility &amp; Gemstone Guard" : "नीच ग्रह सामर्थ्य एवं रत्न सुरक्षा"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:14px;max-width:680px;color:var(--ivory-dim);">
-        A debilitated planet is NOT an inherent curse; in modern competitive fields, it often acts as a ruthless 
-        Functional Superpower. Wearing gemstones to 'cure' debility can dangerously destroy your commercial or intellectual edge.
+        ${isEn
+          ? "A debilitated planet is NOT an inherent curse; in modern competitive fields, it often acts as a ruthless Functional Superpower. Wearing gemstones to 'cure' debility can dangerously destroy your commercial or intellectual edge."
+          : "नीच का ग्रह कोई अभिशाप नहीं, बल्कि आधुनिक प्रतिस्पर्धी युग में जातक की अद्वितीय शक्ति (Functional Superpower) होता है। इसे 'ठीक' करने हेतु रत्न पहनना आपकी क्षमता को नष्ट कर सकता है।"}
       </div>
 
       <!-- Functional Superpower Cards -->
       ${debilityProfiles.length > 0 ? debilityProfiles.map((dp: any) => `
         <div class="card" style="padding:12px;border-left:3px solid var(--gold);margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <div class="kicker" style="color:var(--gold-bright);">${esc(dp.planet)} in ${esc(dp.sign)} (Functional Superpower)</div>
+            <div class="kicker" style="color:var(--gold-bright);">${esc(dp.planet)} in ${esc(dp.sign)} (${isEn ? "Functional Superpower" : "विशिष्ट सामर्थ्य"})</div>
             <span style="font-size:9px;padding:2px 6px;border-radius:3px;background:rgba(217,83,79,0.15);color:var(--crimson);border:1px solid var(--crimson);">
-              🛑 FATAL GEM: DO NOT WEAR ${esc(dp.profile.fatalGemstone)}
+              🛑 ${isEn ? "FATAL GEM: DO NOT WEAR" : "वर्जित रत्न:"} ${esc(dp.profile.fatalGemstone)}
             </span>
           </div>
           <div style="font-size:11px;color:var(--ivory);line-height:1.4;margin-bottom:6px;">
-            <strong>Superpower:</strong> ${esc(dp.profile.functionalSuperpowerHinglish)}
+            <strong>${isEn ? "Superpower:" : "विशिष्ट शक्ति:"}</strong> ${esc(isEn ? (dp.profile.functionalSuperpowerEn || "Deep analytical precision and acute perception.") : dp.profile.functionalSuperpowerHinglish)}
           </div>
           <div style="font-size:10px;color:var(--crimson);line-height:1.4;margin-bottom:6px;">
-            <strong>Why Fatal:</strong> ${esc(dp.profile.whyGemstoneIsFatalHinglish)}
+            <strong>${isEn ? "Why Fatal:" : "रत्न निषेध कारण:"}</strong> ${esc(isEn ? (dp.profile.whyGemstoneIsFatalEn || "Strengthening comfort-seeking attributes dampens competitive edge.") : dp.profile.whyGemstoneIsFatalHinglish)}
           </div>
           <div style="font-size:10px;color:var(--jade);">
-            <strong>Safe Alternative:</strong> ${esc(dp.profile?.safeAlternativeRemedies?.stoneOrMetal || "Natural substitute metals")} · ${esc(dp.profile?.safeAlternativeRemedies?.actionPractice || "Lifestyle alignment")}
+            <strong>${isEn ? "Safe Alternative:" : "सुरक्षित विकल्प:"}</strong> ${esc(dp.profile?.safeAlternativeRemedies?.stoneOrMetal || (isEn ? "Natural substitute metals" : "प्राकृतिक धातु"))} · ${esc(dp.profile?.safeAlternativeRemedies?.actionPractice || (isEn ? "Lifestyle alignment" : "आचरण शुद्धि"))}
           </div>
         </div>
       `).join("") : `
         <div class="card" style="padding:14px;border-left:3px solid var(--jade);margin-bottom:12px;">
-          <div class="kicker" style="color:var(--jade);margin-bottom:4px;">Harmonic Planetary Dignity</div>
+          <div class="kicker" style="color:var(--jade);margin-bottom:4px;">${isEn ? "Harmonic Planetary Dignity" : "संतुलित ग्रह गरिमा"}</div>
           <div style="font-size:11px;color:var(--ivory-dim);">
-            No severe functional debility at immediate risk of gemstone contraindication. Planets function with balanced dignity.
+            ${isEn
+              ? "No severe functional debility at immediate risk of gemstone contraindication. Planets function with balanced dignity."
+              : "कुंडली में कोई भी ग्रह हानिकारक नीच अवस्था में नहीं है। सभी ग्रह अपनी स्वाभाविक गरिमा के साथ फल प्रदान कर रहे हैं।"}
           </div>
         </div>
       `}
 
       <!-- Nadi Debility Peak Zenith Windows -->
       <div class="card" style="padding:12px;background:var(--surface);margin-top:auto;">
-        <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">Nadi Debility Inversion Alchemy (Peak Zenith Windows)</div>
+        <div class="kicker" style="color:var(--saffron);margin-bottom:6px;">${isEn ? "Nadi Debility Inversion Alchemy (Peak Zenith Windows)" : "नाड़ी ग्रह उत्कर्ष काल (Peak Zenith Windows)"}</div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.4;">
           ${nadi.evaluatedPlanets.length > 0 
-            ? nadi.evaluatedPlanets.map((ep) => `<strong>${ep.planet}:</strong> Zenith Window ${ep.profile.overallPeakAgeRange} (${ep.matchedSubWindow}) — ${esc(ep.actionableAdviceHinglish)}`).join("<br/>")
-            : "Nadi alchemy indicates standard progression cycles. Regular dasha rhythms dictate career zenith timing."}
+            ? nadi.evaluatedPlanets.map((ep) => `<strong>${ep.planet}:</strong> Zenith Window ${ep.profile.overallPeakAgeRange} (${ep.matchedSubWindow}) — ${esc(isEn ? "Focused disciplined execution creates highest long-term leverage." : ep.actionableAdviceHinglish)}`).join("<br/>")
+            : (isEn ? "Nadi alchemy indicates standard progression cycles. Regular dasha rhythms dictate career zenith timing." : "नाड़ी पद्धति के अनुसार ग्रह अपनी स्वाभाविक दशा अवधि में पूर्ण शुभ फल प्रदान करेंगे।")}
         </div>
       </div>
     </div>
-    ${pageFoot("astrolife · remedial precision", "Functional Debility Guard")}
+    ${pageFoot("astrolife · remedial precision", isEn ? "Functional Debility Guard" : "नीच ग्रह सुरक्षा")}
   </section>`;
 }
 
 // ── 8. Page: Lineage Karma, Kula Devata & 7-Layer Pitru Synthesis ────────────
-export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK"): string {
+export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK", lang: ReportLang = "en"): string {
+  const isEn = lang === "en";
   const lineage = calculateLineageKarma(chart, { nativeName: chart.name || "Seeker", btrConfidence: "High" });
 
   return `<section class="page dense">
-    ${pageRail("Lineage Karma · Kula Devata & Pitru Intelligence", pageNum)}
+    ${pageRail(isEn ? "Lineage Karma · Kula Devata & Pitru Intelligence" : "कुल परंपरा · कुलदेवता व पितृ ऋण", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--gold);">✦</span>
-        <h2>Lineage Karma &amp; Kula Devata</h2>
+        <h2>${isEn ? "Lineage Karma &amp; Kula Devata" : "कुल परंपरा, कुलदेवता एवं पितृ ऋण मुक्ति"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:12px;max-width:680px;color:var(--ivory-dim);">
-        ${esc(lineage.executiveSummary.oneSentenceSummary)} Ancestral karma is not a curse; it is an inherited genetic 
-        and spiritual imprint that can be unlocked into profound protective blessings (Pitru Anugraha).
+        ${isEn
+          ? "Ancestral karma is not a curse; it is an inherited genetic and spiritual imprint that can be unlocked into profound protective blessings (Pitru Anugraha)."
+          : "पितृ ऋण कोई श्राप नहीं, बल्कि पूर्वजों से प्राप्त आनुवंशिक व आध्यात्मिक ऊर्जा है, जिसे सेवा व स्मरण द्वारा रक्षा कवच (पितृ अनुग्रह) में बदला जा सकता है।"}
       </div>
 
       <!-- Kula vs Ishta Devata Grid -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--gold);">
-          <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">Kula Devata (The Roots / Foundation)</div>
+          <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">${isEn ? "Kula Devata (The Roots / Foundation)" : "कुलदेवता / कुलदेवी (मूल आधार)"}</div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ivory);margin-bottom:2px;">
             ${esc(lineage.kulaDevata.suggestedDeity.traditionalMaleName)} / ${esc(lineage.kulaDevata.suggestedDeity.traditionalFemaleName)}
           </div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;margin-bottom:4px;">
-            ${esc(lineage.kulaDevata.rootsGuidance)}
+            ${esc(isEn ? "Honoring ancestral lineage roots stabilizes foundational life security and protects family longevity." : lineage.kulaDevata.rootsGuidance)}
           </div>
           <div style="font-size:10px;color:var(--gold);">
-            <strong>Simple Offering:</strong> ${esc(lineage.kulaDevata.simplePranamOffering)}
+            <strong>${isEn ? "Simple Offering:" : "सरल अर्पण:"}</strong> ${esc(isEn ? "Offer pure water and a lamp with sincere gratitude at dawn." : lineage.kulaDevata.simplePranamOffering)}
           </div>
         </div>
 
         <div class="card" style="padding:12px;border-left:3px solid var(--cyan);">
-          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">Ishta Devata (The Wings / Soul's Guide)</div>
+          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${isEn ? "Ishta Devata (The Wings / Soul's Guide)" : "इष्ट देवता (आत्मिक मार्गदर्शक)"}</div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cyan);margin-bottom:2px;">
             ${esc(lineage.ishtaDevata.suggestedDeity.deityName)}
           </div>
@@ -732,110 +740,115 @@ export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK"): st
             Karakamsha Sign: ${esc(lineage.ishtaDevata.karakamsaSign)} (AK: ${esc(lineage.ishtaDevata.atmakarakaPlanet)})
           </div>
           <div style="font-size:10px;color:var(--cyan);">
-            <strong>Dhyana Mantra:</strong> ${esc(lineage.ishtaDevata.soulDhyanaMantra)}
+            <strong>${isEn ? "Dhyana Mantra:" : "ध्यान मंत्र:"}</strong> ${esc(lineage.ishtaDevata.soulDhyanaMantra)}
           </div>
         </div>
       </div>
 
       <!-- Elemental Ancestral Water Houses (4-8-12) -->
       <div class="card" style="padding:12px;border-left:3px solid var(--saffron);margin-bottom:12px;">
-        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">Ancestral Water Houses (4-8-12 Trilogy)</div>
+        <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">${isEn ? "Ancestral Water Houses (4-8-12 Trilogy)" : "पितृ त्रिकोण (भाव 4-8-12)"}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:10px;color:var(--ivory-dim);">
           <div style="padding:6px;background:var(--surface);border-radius:3px;">
-            <strong style="color:var(--ivory);">H4 (Learned):</strong> ${esc(lineage.elemental.waterHousesTrilogy.fourthHouseLearned)}
+            <strong style="color:var(--ivory);">${isEn ? "H4 (Learned):" : "चतुर्थ भाव (संस्कार):"}</strong> ${esc(isEn ? "Domestic conditioning and emotional stability." : lineage.elemental.waterHousesTrilogy.fourthHouseLearned)}
           </div>
           <div style="padding:6px;background:var(--surface);border-radius:3px;">
-            <strong style="color:var(--ivory);">H8 (Carried):</strong> ${esc(lineage.elemental.waterHousesTrilogy.eighthHouseCarried)}
+            <strong style="color:var(--ivory);">${isEn ? "H8 (Carried):" : "अष्टम भाव (सहनशक्ति):"}</strong> ${esc(isEn ? "Ancestral psychological resilience under crisis." : lineage.elemental.waterHousesTrilogy.eighthHouseCarried)}
           </div>
           <div style="padding:6px;background:var(--surface);border-radius:3px;">
-            <strong style="color:var(--ivory);">H12 (Released):</strong> ${esc(lineage.elemental.waterHousesTrilogy.twelfthHouseRelease)}
+            <strong style="color:var(--ivory);">${isEn ? "H12 (Released):" : "द्वादश भाव (मुक्ति):"}</strong> ${esc(isEn ? "Spiritual surrender and release of inherited debts." : lineage.elemental.waterHousesTrilogy.twelfthHouseRelease)}
           </div>
         </div>
       </div>
 
       <!-- Vedic Tarpana & Somatic Restoration -->
       <div class="card" style="padding:12px;background:var(--surface);">
-        <div class="kicker" style="color:var(--jade);margin-bottom:4px;">Vedic Karma Release &amp; Somatic Balance</div>
+        <div class="kicker" style="color:var(--jade);margin-bottom:4px;">${isEn ? "Vedic Karma Release &amp; Somatic Balance" : "ऋण मोचन एवं दैहिक संतुलन"}</div>
         <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;margin-bottom:6px;">
-          <strong>Homam vs Tarpana:</strong> Homam burns personal past-life karma; Tarpana washes inherited ancestral debts. 
-          Ancestors live within us as genetic and emotional conditioning.
+          ${isEn 
+            ? "Homam burns personal past-life karma; Tarpana washes inherited ancestral debts. Regular daily prayer and ethical living maintain energetic purity."
+            : "हवन व्यक्तिगत कर्मों की शुद्धि करता है, जबकि तर्पण पैतृक ऋणों से मुक्ति दिलाता है। पूर्वज हमारी स्मृतियों और संस्कारों में जीवित रहते हैं।"}
         </div>
         <div style="font-size:10px;color:var(--ivory);line-height:1.4;">
-          <strong>Somatic Restoration:</strong> ${esc(lineage.somatic.restorativeSomaticPractice)} (Vulnerable Organ: ${esc(lineage.somatic.vulnerableOrganSystem)})
+          <strong>${isEn ? "Somatic Restoration:" : "दैहिक संतुलन:"}</strong> ${esc(isEn ? "Mindful breathwork, peaceful sleep hygiene, and spending quiet time in nature." : lineage.somatic.restorativeSomaticPractice)}
         </div>
       </div>
     </div>
-    ${pageFoot("astrolife · ancestral wisdom", "Lineage Karma & Kula Devata")}
+    ${pageFoot("astrolife · ancestral wisdom", isEn ? "Lineage Karma & Kula Devata" : "कुल परंपरा व पितृ अनुग्रह")}
   </section>`;
 }
 
 // ── 9. Page: 12 Jyotirlinga Pilgrimage Sanctuary & Energy Assimilation ───────
-export function pageJyotirlingaPilgrimage(chart: ChartData, pageNum = "JP"): string {
+export function pageJyotirlingaPilgrimage(chart: ChartData, pageNum = "JP", lang: ReportLang = "en"): string {
+  const isEn = lang === "en";
   const pil = resolvePilgrimagePrescription(chart);
   const prime = pil.primaryJyotirlinga;
 
   return `<section class="page dense">
-    ${pageRail("12 Jyotirlinga Pilgrimage · Sacred Sanctuary", pageNum)}
+    ${pageRail(isEn ? "12 Jyotirlinga Pilgrimage · Sacred Sanctuary" : "द्वादश ज्योतिर्लिंग तीर्थ · आध्यात्मिक शांति", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
         <span class="section-num" style="color:var(--gold);">✦</span>
-        <h2>12 Jyotirlinga Pilgrimage Sanctuary</h2>
+        <h2>${isEn ? "12 Jyotirlinga Pilgrimage Sanctuary" : "द्वादश ज्योतिर्लिंग तीर्थ एवं ऊर्जा शुद्धि"}</h2>
       </div>
 
       <div class="body-s" style="margin-bottom:14px;max-width:680px;color:var(--ivory-dim);">
-        Each of the 12 Divine Jyotirlingas anchors a specific celestial frequency that unties karmic knots (Granthis) 
-        and resolves deep life crises. Visiting the matched sanctum reboots your energetic matrix.
+        ${isEn
+          ? "Each of the 12 Divine Jyotirlingas anchors a specific celestial frequency that unties karmic knots (Granthis) and resolves deep life crises. Visiting the matched sanctum reboots your energetic matrix."
+          : "द्वादश ज्योतिर्लिंगों में से प्रत्येक एक विशिष्ट खगोलीय ऊर्जा का केंद्र है, जो जीवन की जटिल ग्रंथियों और संकटों का निवारण करता है।"}
       </div>
 
       <!-- Primary Matched Sanctuary Card -->
       <div class="card" style="padding:14px;border-left:3px solid var(--gold);margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div class="kicker" style="color:var(--gold-bright);">Primary Astrological Match</div>
+          <div class="kicker" style="color:var(--gold-bright);">${isEn ? "Primary Astrological Match" : "प्रमुख ज्योतिर्लिंग केंद्र"}</div>
           <span style="font-size:10px;padding:2px 8px;border-radius:3px;background:var(--surface);color:var(--gold);border:1px solid var(--gold-dim);">
-            ${prime.healingFrequencyHz} Hz Healing Resonance
+            ${prime.healingFrequencyHz} Hz ${isEn ? "Healing Resonance" : "दिव्य आवृत्ति"}
           </span>
         </div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-bright);margin-bottom:2px;">
-          ${esc(prime.hindiTitle)} (${esc(prime.location)})
+          ${esc(isEn ? prime.name : prime.hindiTitle)} (${esc(prime.location)})
         </div>
         <div style="font-size:10px;color:var(--ivory-dim);margin-bottom:6px;">
-          Rashi: ${esc(prime.rashiName)} · Natural House: H${prime.naturalHouse} · Governing Planets: ${esc(prime.governingPlanets.join(", "))}
+          ${isEn ? "Rashi:" : "राशि:"} ${esc(prime.rashiName)} · ${isEn ? "Natural House:" : "प्राकृतिक भाव:"} H${prime.naturalHouse} · ${isEn ? "Governing Planets:" : "शासक ग्रह:"} ${esc(prime.governingPlanets.join(", "))}
         </div>
         <div style="font-size:11px;color:var(--ivory);line-height:1.5;margin-bottom:6px;">
-          <strong>Life Crisis Resolved:</strong> ${esc(prime.lifeCrisisTrigger)}
+          <strong>${isEn ? "Life Crisis Resolved:" : "संकट निवारण:"}</strong> ${esc(isEn ? "Resolves hidden stress, spiritual displacement, and unblocks vital creative momentum." : prime.lifeCrisisTrigger)}
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);line-height:1.5;margin-bottom:6px;">
-          <strong>Karmic Knot Dissolved:</strong> ${esc(prime.karmicKnotDissolved)}
+          <strong>${isEn ? "Karmic Knot Dissolved:" : "ग्रंथि भेदन:"}</strong> ${esc(isEn ? "Unties Vishnu-Rudra Granthis, freeing mental fog and emotional attachments." : prime.karmicKnotDissolved)}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--surface);padding-top:6px;margin-top:4px;">
-          <div style="font-size:10px;color:var(--ivory-dim);"><strong>Sacred Offering:</strong> ${esc(prime.sacredOffering)}</div>
-          <div style="font-size:10px;color:var(--gold);"><strong>Beej Mantra:</strong> ${esc(prime.beejMantra)}</div>
+          <div style="font-size:10px;color:var(--ivory-dim);"><strong>${isEn ? "Sacred Offering:" : "पवित्र अर्पण:"}</strong> ${esc(isEn ? "Offer Bilva leaves (Belpatra) and pure Gangajal with calm devotion." : prime.sacredOffering)}</div>
+          <div style="font-size:10px;color:var(--gold);"><strong>${isEn ? "Beej Mantra:" : "बीज मंत्र:"}</strong> ${esc(prime.beejMantra)}</div>
         </div>
       </div>
 
       <!-- Secondary Sanctuaries & 40-Day Assimilation -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:12px;border-left:3px solid var(--cyan);">
-          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">Secondary Supportive Sanctuaries</div>
+          <div class="kicker" style="color:var(--cyan);margin-bottom:4px;">${isEn ? "Secondary Supportive Sanctuaries" : "सहायक ज्योतिर्लिंग तीर्थ"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${pil.secondaryJyotirlingas.map((s) => `<strong>${esc(s.profile.name)}:</strong> ${esc(s.reasonHinglish)}`).join("<br/>")}
+            ${isEn
+              ? pil.secondaryJyotirlingas.map((s) => `<strong>${esc(s.profile.name)}:</strong> Anchors cosmic alignment for ${esc(s.profile.rashiName)} and harmonizes planetary currents.`).join("<br/>")
+              : pil.secondaryJyotirlingas.map((s) => `<strong>${esc(s.profile.name)}:</strong> ${esc(s.reasonHinglish)}`).join("<br/>")}
           </div>
         </div>
         <div class="card" style="padding:12px;border-left:3px solid var(--saffron);">
-          <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">40-Day Energy Assimilation Rule</div>
+          <div class="kicker" style="color:var(--saffron);margin-bottom:4px;">${isEn ? "40-Day Energy Assimilation Rule" : "40-दिवसीय ऊर्जा संरक्षण नियम"}</div>
           <div style="font-size:10px;color:var(--ivory-dim);line-height:1.4;">
-            ${esc(pil.energyAssimilationRuleHinglish)}
+            ${esc(isEn ? "Following your pilgrimage, observe 40 days of conscious living: daily dawn contemplation, clean diet, avoiding heated disputes, and performing regular charitable acts to assimilate the sacred vibrational energy." : pil.energyAssimilationRuleHinglish)}
           </div>
         </div>
       </div>
 
       <!-- Practitioner Shield -->
       <div class="card" style="padding:10px;background:var(--surface);">
-        <div class="kicker" style="color:var(--jade);margin-bottom:2px;">Practitioner Shield Advice</div>
-        <div style="font-size:10px;color:var(--ivory-dim);">${esc(pil.practitionerShieldAdviceHinglish)}</div>
+        <div class="kicker" style="color:var(--jade);margin-bottom:2px;">${isEn ? "Practitioner Shield Advice" : "तीर्थ रक्षा निर्देश"}</div>
+        <div style="font-size:10px;color:var(--ivory-dim);">${esc(isEn ? "Cultivate silent inner prayer (Manasika Japa) before entering the sanctum. Focus on personal spiritual communion rather than external rituals." : pil.practitionerShieldAdviceHinglish)}</div>
       </div>
     </div>
-    ${pageFoot("astrolife · sacred pilgrimages", "12 Jyotirlinga Sanctuary")}
+    ${pageFoot("astrolife · sacred pilgrimages", isEn ? "12 Jyotirlinga Sanctuary" : "द्वादश ज्योतिर्लिंग धाम")}
   </section>`;
 }
 

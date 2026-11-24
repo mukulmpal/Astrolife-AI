@@ -175,7 +175,7 @@ export function generateJaiminiSoulDossierHTML(
 <meta charset="UTF-8"/>
 <title>AstroLife — Jaimini Soul Blueprint &amp; Karmic Mission Dossier · ${subjectName}</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Rozha+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Rozha+One&display=swap');
 
 :root {
   --bg-deep: #060B12;
@@ -374,6 +374,16 @@ body {
   justify-content: center;
   align-items: center;
   padding: 8px;
+}
+
+.mantra-devanagari {
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--gold-bright);
+  text-align: center;
+  margin: 4px 0;
+  line-height: 1.6;
 }
 </style>
 </head>
@@ -866,7 +876,7 @@ body {
         ✦ THE REVELATION: SRI HANUMAN &amp; LORD KARTIKEYA
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        In alignment with Page 102 of your master shastric blueprint, your Ishta Devata is <strong>Lord Hanuman and Sri Kartikeya (The Commander of Divine Forces)</strong>. Mars in Scorpio in the 12th from Karakamsha represents the conquest of inner demons, absolute brahmacharya/discipline, and fearless defense of truth. Whenever you chant the Hanuman Chalisa or Kartikeya stotrams, mental fear evaporates and extraordinary physical stamina returns.
+        In alignment with your D-9 Navamsha blueprint, your Ishta Devata is <strong>Lord Hanuman and Sri Kartikeya (The Commander of Divine Forces)</strong>. Mars in Scorpio in the 12th from Karakamsha represents the conquest of inner demons, absolute brahmacharya/discipline, and fearless defense of truth. Whenever you chant the Hanuman Chalisa or Kartikeya stotrams, mental fear evaporates and extraordinary physical stamina returns.
       </p>
     </div>
 
@@ -947,7 +957,7 @@ body {
           <td><strong>Arudha Lagna</strong></td>
           <td><strong>Capricorn (Makara)</strong></td>
           <td>5th House</td>
-          <td>Public image: Disiplined systems architect, quantitative thinker, institutional leader</td>
+          <td>Public image: Disciplined systems architect, quantitative thinker, institutional leader</td>
         </tr>
         <tr>
           <td><strong style="color:var(--emerald-bright);">A2</strong></td>
@@ -1175,9 +1185,9 @@ body {
 
     <!-- Argala Wealth Box -->
     <div class="luxury-card">
-      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ JAIMINI ARGALA INTERLOCK</div>
+      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ JAIMINI WEALTH INTERLOCK</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Mercury in Taurus forms an unobstructed 5th-house Argala on your 1st house A11 in Virgo, ensuring that every piece of software code and shastric analysis you author directly translates into compounding revenue.
+        Mercury in Taurus forms an unobstructed 9th-house Trikona support on your 1st house A11 in Virgo, ensuring that every piece of software code and shastric analysis you author directly translates into compounding revenue.
       </p>
     </div>
   </div>
@@ -1575,7 +1585,7 @@ body {
       <div class="card-title" style="color:var(--ruby-bright);font-size:11.5px;">
         1. HANUMAN ISHTA DEVATA MOOLA MANTRA (12TH FROM KL IN D9)
       </div>
-      <div style="font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;font-size:14px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.04em;">
+      <div class="mantra-devanagari">
         ॐ हं हनुमते रुद्रात्मकाय हुं फट् नमः ॥
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
@@ -1591,7 +1601,7 @@ body {
       <div class="card-title" style="color:var(--purple-bright);font-size:11.5px;">
         2. ATMAKARAKA CHANDRA BEEJA MANTRA (FOR SOUL HEALING)
       </div>
-      <div style="font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;font-size:14px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.04em;">
+      <div class="mantra-devanagari">
         ॐ श्रां श्रीं श्रौं सः चन्द्रमसे नमः ॥
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
@@ -1607,7 +1617,7 @@ body {
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
         3. AMATYAKARAKA BUDHA GAYATRI MANTRA (FOR INTELLECTUAL ACCURACY)
       </div>
-      <div style="font-family:'Noto Sans Devanagari',sans-serif;font-weight:600;font-size:14px;color:var(--gold-bright);text-align:center;margin:4px 0;letter-spacing:0.04em;">
+      <div class="mantra-devanagari">
         ॐ सौम्यरूपाय विद्महे वाणेशाय धीमहि। तन्नो सौम्यः प्रचोदयात्॥
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
