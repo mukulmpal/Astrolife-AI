@@ -1818,7 +1818,7 @@ export default function ReportsStorePage() {
               {/* Viral WhatsApp Share Action */}
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `I just received my official ${purchasedReport.title} from AstroLife! Download your precision Vedic life dossier here: https://astrolife-ai.vercel.app/reports`
+                  `I just received my official ${purchasedReport.title} from AstroLife! Download your precision Vedic life dossier here: https://www.astrolife.io/reports`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

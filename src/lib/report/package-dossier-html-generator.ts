@@ -177,13 +177,14 @@ export function generatePackageDossierHTML(
   }
 
   if (
-    reportId.includes("space") ||
-    reportId.includes("destiny") ||
-    reportId.includes("vastu") ||
-    reportId.includes("palmistry") ||
-    reportId.includes("btr") ||
-    reportId.includes("pkg_space_destiny") ||
-    reportId.includes("calibration")
+    !reportId.includes("curve") && (
+      reportId.includes("space") ||
+      reportId.includes("pkg_space_destiny") ||
+      reportId.includes("vastu") ||
+      reportId.includes("palmistry") ||
+      reportId.includes("btr") ||
+      reportId.includes("calibration")
+    )
   ) {
     return generateSpaceDestinyDossierHTML(chart, options);
   }

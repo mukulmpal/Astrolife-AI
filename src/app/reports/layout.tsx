@@ -15,13 +15,13 @@ export const metadata: Metadata = {
     "AstroLife Reports Store",
   ],
   alternates: {
-    canonical: "https://astrolife-ai.vercel.app/reports",
+    canonical: "https://www.astrolife.io/reports",
   },
   openGraph: {
     title: "Vedic Astrology Reports & Dossiers (From ₹49) | AstroLife",
     description:
       "Get hyper-targeted 24-page mathematical dossiers computed from your exact birth coordinates by 35+ specialized Vedic engines. Instant vector PDF download.",
-    url: "https://astrolife-ai.vercel.app/reports",
+    url: "https://www.astrolife.io/reports",
     siteName: "AstroLife",
     type: "website",
     locale: "en_IN",
@@ -46,7 +46,7 @@ const productSchema = {
   },
   offers: {
     "@type": "AggregateOffer",
-    url: "https://astrolife-ai.vercel.app/reports",
+    url: "https://www.astrolife.io/reports",
     priceCurrency: "INR",
     lowPrice: "49",
     highPrice: "999",

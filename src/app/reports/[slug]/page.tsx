@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const canonicalUrl = `https://astrolife-ai.vercel.app/reports/${slug}`;
+  const canonicalUrl = `https://www.astrolife.io/reports/${slug}`;
 
   return {
     title: pageData.metaTitle,
@@ -71,14 +71,14 @@ export default async function ReportSeoPage({ params }: PageProps) {
     "@type": "Product",
     name: data.h1,
     description: data.metaDescription,
-    image: "https://astrolife-ai.vercel.app/icons/icon-512.png",
+    image: "https://www.astrolife.io/icons/icon-512.png",
     brand: {
       "@type": "Brand",
       name: "AstroLife",
     },
     offers: {
       "@type": "Offer",
-      url: `https://astrolife-ai.vercel.app/reports/${slug}`,
+      url: `https://www.astrolife.io/reports/${slug}`,
       priceCurrency: "INR",
       price: data.price.replace(/[^0-9]/g, ""),
       priceValidUntil: "2027-12-31",
@@ -118,19 +118,19 @@ export default async function ReportSeoPage({ params }: PageProps) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://astrolife-ai.vercel.app",
+        item: "https://www.astrolife.io",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Reports Store",
-        item: "https://astrolife-ai.vercel.app/reports",
+        item: "https://www.astrolife.io/reports",
       },
       {
         "@type": "ListItem",
         position: 3,
         name: data.h1,
-        item: `https://astrolife-ai.vercel.app/reports/${slug}`,
+        item: `https://www.astrolife.io/reports/${slug}`,
       },
     ],
   };
