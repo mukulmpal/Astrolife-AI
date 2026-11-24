@@ -699,7 +699,7 @@ function truncateWords(text: string, maxLen: number): string {
 function truncateSentences(text: string, maxLen: number): string {
   if (!text || text.length <= maxLen) return text || "";
   const sub = text.slice(0, maxLen);
-  const match = sub.match(/.*[.!?](?=\s|$)/s);
+  const match = sub.match(/[\s\S]*[.!?](?=\s|$)/);
   if (match && match[0].length >= 30) {
     return match[0].trim();
   }
@@ -2677,7 +2677,7 @@ function pageLalKitabTimingAndRemedy(chart: ChartData, lang: ReportLanguage = "e
     : annual.headline;
 
   const varshphalBody = isEn
-    ? `The active annual house for this progression cycle is House ${lk.varshphal.activeHouse}. Core career growth is catalyzed by disciplined professional execution and ethical leadership. Financial accumulation remains stable when unhedged speculative trades are avoided. Maintain domestic harmony through active communication and honoring maternal traditions. Prioritize regular rest and avoid donating items ruled by favorable planets.`
+    ? `The active annual progression cycle is led by Varsheshwar ${lk.varshphal.varsheshwar} (Running Age ${lk.varshphal.runningAge}). Core career growth is catalyzed by disciplined professional execution and ethical leadership. Financial accumulation remains stable when unhedged speculative trades are avoided. Maintain domestic harmony through active communication and honoring maternal traditions. Prioritize regular rest and avoid donating items ruled by favorable planets.`
     : `${annual.career} ${annual.money} ${annual.family} ${annual.health} ${annual.remedy}`;
 
   const thirtyFiveChakraText = isEn
@@ -3959,6 +3959,16 @@ const SIGNS_ARR = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Sco
 const SIGN_RULER_FULL: Record<string,string> = {
   Aries:"Mars",Taurus:"Venus",Gemini:"Mercury",Cancer:"Moon",Leo:"Sun",Virgo:"Mercury",
   Libra:"Venus",Scorpio:"Mars",Sagittarius:"Jupiter",Capricorn:"Saturn",Aquarius:"Saturn",Pisces:"Jupiter",
+};
+
+const RASHI_HI: Record<string, string> = {
+  Aries: "मेष", Taurus: "वृषभ", Gemini: "मिथुन", Cancer: "कर्क", Leo: "सिंह", Virgo: "कन्या",
+  Libra: "तुला", Scorpio: "वृश्चिक", Sagittarius: "धनु", Capricorn: "मकर", Aquarius: "कुंभ", Pisces: "मीन"
+};
+
+const PLANET_HI: Record<string, string> = {
+  Sun: "सूर्य", Moon: "चन्द्र", Mars: "मंगल", Mercury: "बुध",
+  Jupiter: "गुरु", Venus: "शुक्र", Saturn: "शनि", Rahu: "राहु", Ketu: "केतु"
 };
 
 const LIFE_AREAS_HI: Record<string, { title: string; pageLabel: string; intro: string; guidance: string }> = {

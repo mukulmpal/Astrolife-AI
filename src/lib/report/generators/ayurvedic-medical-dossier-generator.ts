@@ -67,64 +67,48 @@ function formatDMS(lon: number): string {
 }
 
 function renderNorthIndianChart(
-  lagnaNum: number,
-  planets: Record<string, { sign: string; house: number; isRetrograde?: boolean }>
+  chart: ChartData,
+  size = 220
 ): string {
-  const houseOccupants: Record<number, string[]> = {};
-  for (let h = 1; h <= 12; h++) houseOccupants[h] = [];
+  const houseContents: Record<number, string[]> = {};
+  for (let h = 1; h <= 12; h++) houseContents[h] = [];
+  houseContents[1].push("As");
 
-  for (const [pName, pData] of Object.entries(planets)) {
-    if (!pData || !pData.house) continue;
-    const abbr = PLANET_ABBR[pName] || pName.slice(0, 2);
-    const retro = pData.isRetrograde ? "ᴿ" : "";
-    houseOccupants[pData.house].push(`${abbr}${retro}`);
+  const planetMap = chart.planets || {};
+  for (const [name, pd] of Object.entries(planetMap)) {
+    if (!pd) continue;
+    const abbr = PLANET_ABBR[name] || name.slice(0, 2);
+    const house = pd.house >= 1 && pd.house <= 12 ? pd.house : 1;
+    const isRet = pd.retrograde || (pd as any).isRetrograde;
+    houseContents[house].push(abbr + (isRet ? "(R)" : ""));
   }
 
-  const houseSigns: Record<number, number> = {};
+  const lagnaIndex = chart.lagnaNum !== undefined ? chart.lagnaNum : 5;
+
+  let labels = "";
   for (let h = 1; h <= 12; h++) {
-    houseSigns[h] = ((lagnaNum + h - 1) % 12) + 1;
+    const [cx, cy] = HOUSE_POSITIONS[h];
+    const items = houseContents[h];
+    const signIdx = ((lagnaIndex + (h - 1)) % 12 + 12) % 12;
+    const signNumber = signIdx + 1;
+
+    labels += `<text x="${cx}" y="${cy - 12}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" fill="#8C7440">${signNumber}</text>`;
+
+    items.forEach((item, i) => {
+      const offsetY = (i - (items.length - 1) / 2) * 11;
+      labels += `<text x="${cx}" y="${cy + 6 + offsetY}" text-anchor="middle" dominant-baseline="middle" font-family="'Inter',sans-serif" font-size="8.5" font-weight="700" fill="#C9A961">${escapeHtml(item)}</text>`;
+    });
   }
 
-  return `
-    <svg viewBox="0 0 360 360" width="220" height="220" style="background:#09121E;border:1.5px solid var(--border-teal);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
-      <!-- Diamond Outer Border -->
-      <polygon points="180,10 350,180 180,350 10,180" fill="none" stroke="var(--gold-dim)" stroke-width="1.2"/>
-      <!-- Inner Square -->
-      <rect x="95" y="95" width="170" height="170" fill="none" stroke="var(--border-teal)" stroke-width="1.2"/>
-      <!-- Diagonal Cross Lines -->
-      <line x1="10" y1="10" x2="350" y2="350" stroke="var(--gold-dim)" stroke-width="0.8"/>
-      <line x1="350" y1="10" x2="10" y2="350" stroke="var(--gold-dim)" stroke-width="0.8"/>
-
-      <!-- Highlight 6th, 8th, 12th Dusthana Houses with subtle crimson glow -->
-      <!-- 6th House (approx bottom-left quadrant) -->
-      <polygon points="10,180 95,95 95,265" fill="rgba(220,38,38,0.06)" />
-      <!-- 8th House (approx bottom-right quadrant) -->
-      <polygon points="350,180 265,95 265,265" fill="rgba(220,38,38,0.06)" />
-
-      <!-- House Numbers & Occupants -->
-      ${Object.entries(HOUSE_POSITIONS).map(([hStr, [cx, cy]]) => {
-        const h = Number(hStr);
-        const signVal = houseSigns[h];
-        const occ = houseOccupants[h] || [];
-        const isDusthana = [6, 8, 12].includes(h);
-        return `
-          <g>
-            <text x="${cx}" y="${cy - 12}" fill="${isDusthana ? '#EF4444' : '#C9A961'}" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" text-anchor="middle">
-              ${signVal}${isDusthana ? '✦' : ''}
-            </text>
-            <text x="${cx}" y="${cy + 4}" fill="#F5EFEB" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="600" text-anchor="middle">
-              ${occ.slice(0, 3).join(" ")}
-            </text>
-            ${occ.length > 3 ? `
-              <text x="${cx}" y="${cy + 16}" fill="#9E9689" font-family="'JetBrains Mono', monospace" font-size="7.5" text-anchor="middle">
-                ${occ.slice(3).join(" ")}
-              </text>
-            ` : ""}
-          </g>
-        `;
-      }).join("")}
-    </svg>
-  `;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 360 360" class="kundli-svg" style="background:#09121E;border:1.5px solid var(--border-teal);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+  <g stroke="#C9A961" stroke-width="0.75" fill="none" opacity="0.65">
+    <rect x="10" y="10" width="340" height="340"/>
+    <polygon points="180,10 350,180 180,350 10,180"/>
+    <line x1="10" y1="10" x2="350" y2="350"/>
+    <line x1="350" y1="10" x2="10" y2="350"/>
+  </g>
+  ${labels}
+</svg>`;
 }
 
 export function generateAyurvedicMedicalDossierHTML(
@@ -573,7 +557,7 @@ body {
     <!-- Chart & Anatomy Box -->
     <div style="display:grid;grid-template-columns:230px 1fr;gap:14px;align-items:center;margin-bottom:12px;">
       <div class="kundli-container">
-        ${renderNorthIndianChart(chart.lagnaNum || 5, chart.planets as any)}
+        ${renderNorthIndianChart(chart, 220)}
       </div>
       <div class="luxury-card" style="height:100%;display:flex;flex-direction:column;justify-content:center;">
         <div class="kicker" style="color:var(--teal-bright);">KANYA LAGNA (VIRGO ASCENDANT)</div>
@@ -744,8 +728,8 @@ body {
         <tr>
           <td><strong style="color:var(--emerald-bright);">Mercury (Budha)</strong></td>
           <td>Taurus &middot; 9th House</td>
-          <td>Aquarius (Friendly)</td>
-          <td>Sharp, unyielding nervous stamina; robust cognitive processing speed</td>
+          <td>Virgo (Exalted / Swakshetra)</td>
+          <td>Exalted in D-9! Sharp, unyielding nervous stamina; robust cognitive processing speed</td>
           <td>Majja (Nerves), Skin Boundary</td>
         </tr>
         <tr>
@@ -1132,7 +1116,7 @@ body {
     <!-- Verified Classical Combination & Treatment Modality -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
       <div class="luxury-card" style="border-left:3px solid var(--amber);">
-        <div class="kicker" style="color:var(--amber);">COMB-MARS-MOON-BP-FLUCTUATION</div>
+        <div class="kicker" style="color:var(--amber);">CARDIOVASCULAR &amp; HEMODYNAMIC PRESSURE DYNAMICS</div>
         <p style="font-size:10px;color:var(--ivory-dim);margin-top:2px;">
           Mars (vascular pressure, adrenaline) and Moon (systemic plasma, emotional heartbeat rhythm) reside in the 12th house. Monitor resting blood pressure periodically, avoid excessive dietary table salt, and practice evening Sheetali pranayama.
         </p>
@@ -1861,7 +1845,7 @@ body {
         ✦ ASTROLIFE PROPRIETARY 16-DAY BURN &amp; FLOW PROTOCOL (FOR 12TH HOUSE MOON)
       </div>
       <p class="body-text" style="font-size:10.2px;">
-        Prepare <strong>16 small packets</strong> using pure white cotton cloth. Place <strong>1 teaspoon of whole raw white rice</strong> in each packet. Every night right before retiring to bed, place one packet inside a stainless steel tea strainer and burn it completely over the kitchen gas flame. Take a clean glass tumbler with 2 tablespoons of raw cow milk, mix the burned ash into the milk, and wash it down the kitchen sink with cold running tap water. <em>Mandate: Strictly avoid drinking plain milk at night during this 16-day cycle.</em> Clears psychosomatic anxiety, nocturnal dream static, and restores deep restorative sleep.
+        Prepare <strong>16 small packets</strong> using pure white cotton cloth. Place <strong>1 teaspoon of whole raw white rice</strong> in each packet. Every night right before retiring to bed, place one packet inside a stainless steel tea strainer and burn it completely over the kitchen gas flame (<em>safety mandate: use a long-handled stainless steel tea strainer or metal tongs in a well-ventilated kitchen to avoid burning handles or fingers</em>). Take a clean glass tumbler with 2 tablespoons of raw cow milk, mix the burned ash into the milk, and wash it down the kitchen sink with cold running tap water. <em>Mandate: Strictly avoid drinking plain milk at night during this 16-day cycle.</em> Clears psychosomatic anxiety, nocturnal dream static, and restores deep restorative sleep.
       </p>
     </div>
 
@@ -1871,7 +1855,7 @@ body {
         ⚠️ CRITICAL SHASTRA WARNING: NEVER WEAR GEMSTONES FOR 6TH/8TH LORDS
       </div>
       <p class="body-text" style="font-size:10.5px;">
-        Commercial astrologers often recklessly prescribe gemstones to 'strengthen' diseased houses. In classical shastra, <strong>wearing a gemstone amplifies that planet's radiation indiscriminately</strong>. Wearing Yellow Sapphire (Puzhparaj) or Red Coral (Moonga) for a Virgo native amplifies Dusthana/Badhaka lords and accelerates inflammatory disease. Use <em>Daan</em>, <em>Snan-Aushadhi</em>, and <em>16-Day Protocols</em> to pacify; never wear physical stones for functional malefics.
+        Commercial astrologers often recklessly prescribe gemstones to 'strengthen' diseased houses. In classical shastra, <strong>wearing a gemstone amplifies that planet's radiation indiscriminately</strong>. Wearing Yellow Sapphire (Pukhraj / Pushparaj) or Red Coral (Moonga) for a Virgo native amplifies Dusthana/Badhaka lords and accelerates inflammatory disease. Use <em>Daan</em>, <em>Snan-Aushadhi</em>, and <em>16-Day Protocols</em> to pacify; never wear physical stones for functional malefics.
       </p>
     </div>
   </div>
@@ -2079,7 +2063,7 @@ body {
         2. MAHA MRITYUNJAYA MANTRA (SUPREME VITALITY &amp; DISEASE SHIELD)
       </div>
       <div class="mantra-devanagari">
-        ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् । उर्वारुकमिव बन्धनान्मृत्यschemaोर्मुक्षीय मामृतात् ॥
+        ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् । उर्वारुकमिव बन्धनान्मृत्योर्मुक्षीय मामृतात् ॥
       </div>
       <div style="font-size:9px;color:var(--ivory-dim);text-align:center;font-style:italic;">
         OM TRYAMBAKAM YAJAMAHE SUGANDHIM PUSHTI-VARDHANAM | URVARUKAM-IVA BANDHANAN MRITYOR-MUKSHIYA MA-AMRITAT ||
@@ -2163,7 +2147,7 @@ body {
           </tr>
           <tr>
             <td><strong>09:30 &ndash; 10:30 PM</strong></td>
-            <td>Warm spiced milk with nutmeg/ghee; 2 drops ghee in navel; 432 Hz audio; sleep by 10:30</td>
+            <td>Warm spiced milk with nutmeg/ghee; 2 drops ghee in navel; 432 Hz audio; sleep by 10:30 PM</td>
             <td>Moon &middot; Saturn Delta Rest</td>
           </tr>
         </tbody>
