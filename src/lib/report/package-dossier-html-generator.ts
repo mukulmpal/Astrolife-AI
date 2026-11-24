@@ -26,6 +26,7 @@ import { generateRajaYogaWealthDossierHTML } from "./generators/raja-yoga-wealth
 import { generateBioVedicRemediesDossierHTML } from "./generators/bio-vedic-remedies-dossier-generator";
 import { generateSpaceDestinyDossierHTML } from "./generators/space-destiny-dossier-generator";
 import { generateStockTradingDossierHTML } from "./generators/stock-trading-dossier-generator";
+import { generateJaiminiSoulDossierHTML } from "./generators/jaimini-soul-dossier-generator";
 
 export interface PackageDossierOptions {
   reportId: string;
@@ -194,6 +195,16 @@ export function generatePackageDossierHTML(
     reportId.includes("market")
   ) {
     return generateStockTradingDossierHTML(chart, options);
+  }
+
+  if (
+    reportId.includes("jaimini") ||
+    reportId.includes("soul") ||
+    reportId.includes("karmic") ||
+    reportId.includes("pkg_jaimini_soul") ||
+    reportId.includes("karaka")
+  ) {
+    return generateJaiminiSoulDossierHTML(chart, options);
   }
 
   const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
