@@ -65,7 +65,7 @@ function pageFoot(left: string, right: string): string {
 export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU", lang: ReportLang = "en"): string {
   const transitRemedy = evaluateTransitNakshatraRemedy(chart);
   if (!transitRemedy) {
-    return `<section class="page dense">${pageRail("Transit Shivling Upacharas", pageNum)}
+    return `<section class="page dense${lang === "hi" ? " hindi" : ""}">${pageRail("Transit Shivling Upacharas", pageNum)}
       <div style="padding:48px;color:var(--ivory-dim);">${lang === "hi" ? "इस कुंडली के लिए गोचर गणना लंबित है।" : "Transit calculations pending for this chart."}</div>
       ${pageFoot("astrolife · sacred remedies", "Shivling Upachara")}
     </section>`;
@@ -79,7 +79,7 @@ export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU", l
   const i18nShiv = getShivlingUpacharaI18n(lang, transitRemedy.transitNakshatra, shiv.upacharaName, shiv.hindiTitle);
   const isEn = lang === "en";
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail("Transit Nakshatra Shivling Engine · 27 Upacharas", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -168,7 +168,7 @@ export function pageTransitShivlingUpacharas(chart: ChartData, pageNum = "SU", l
 export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", lang: ReportLang = "en"): string {
   const dossier = evaluateNakshatraRemedyDossier(chart);
   if (!dossier) {
-    return `<section class="page dense">${pageRail("Nakshatra Social Archetypes", pageNum)}
+    return `<section class="page dense${lang === "hi" ? " hindi" : ""}">${pageRail("Nakshatra Social Archetypes", pageNum)}
       <div style="padding:48px;color:var(--ivory-dim);">${lang === "hi" ? "नक्षत्र विवरण लंबित है।" : "Nakshatra dossier pending."}</div>
       ${pageFoot("astrolife · karmic alignment", "Nakshatra Social Registry")}
     </section>`;
@@ -177,7 +177,7 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", la
   const isEn = lang === "en";
   const i18nNak = getNakshatraSocialI18n(lang, dossier.activeNakshatraName, dossier.activeDashaPlanet);
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail("Nakshatra Social Remedies & Living Archetypes", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -225,19 +225,23 @@ export function pageNakshatraSocialRegistry(chart: ChartData, pageNum = "NS", la
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Primary Seva" : "प्रधान सेवा"}</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(i18nNak.primarySeva.slice(0, 35) + "...")}</div>
+            <div style="font-size:9.5px;color:var(--ivory);line-height:1.35;margin-top:2px;">${esc(i18nNak.primarySeva)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Creature Seva" : "जीव सेवा"}</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(i18nNak.pashuSeva.slice(0, 35) + "...")}</div>
+            <div style="font-size:9.5px;color:var(--ivory);line-height:1.35;margin-top:2px;">${esc(i18nNak.pashuSeva)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Auspicious Timing" : "शुभ समय"}</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(i18nNak.timing)}</div>
+            <div style="font-size:9.5px;color:var(--ivory);line-height:1.35;margin-top:2px;">${esc(i18nNak.timing)}</div>
           </div>
           <div style="padding:6px;background:var(--surface-subtle);border-radius:3px;">
             <div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;">${isEn ? "Key Elements" : "पूजन सामग्री"}</div>
-            <div style="font-size:10px;color:var(--ivory);font-weight:600;">${esc(dossier.materialsNeeded.join(", ") || (isEn ? "Standard offerings" : "सामान्य सामग्री"))}</div>
+            <div style="font-size:9.5px;color:var(--ivory);line-height:1.35;margin-top:2px;">${esc(
+              dossier.materialsNeeded
+                .map((m: string) => (isEn ? (m === "Mitti ke bartan" ? "Earthen clay vessel" : m === "Satnaja (7 grains)" ? "Seven sacred grains (Satnaja)" : m === "Shuddh paani" ? "Pure water" : m) : (m === "Mitti ke bartan" ? "मिट्टी के पात्र" : m === "Satnaja (7 grains)" ? "सतनजा (सात धान्य)" : m === "Shuddh paani" ? "शुद्ध जल" : m)))
+                .join(", ") || (isEn ? "Standard sacred offerings" : "सामान्य पूजन सामग्री")
+            )}</div>
           </div>
         </div>
       </div>
@@ -313,7 +317,7 @@ export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR", 
   const isEn = lang === "en";
   const i18nRisk = getTradingRiskI18n(lang, risk.isRevengeTradingActive || isSevere);
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail("Trading Risk Guardrail · F&O Circuit Breaker", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -379,8 +383,8 @@ export function pageTradingRiskCircuitBreaker(chart: ChartData, pageNum = "TR", 
 
       <!-- Mandatory SEBI Disclaimer -->
       <div style="padding:10px;background:rgba(217,83,79,0.08);border:1px solid rgba(217,83,79,0.3);border-radius:4px;">
-        <div style="font-size:9px;color:var(--crimson);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">
-          ${isEn ? "Mandatory Statutory & Financial Disclaimer" : "वैधानिक एवं वित्तीय अस्वीकरण"}
+        <div style="font-size:9px;color:var(--crimson);font-weight:700;margin-bottom:2px;letter-spacing:${isEn ? "0.05em" : "0"};text-transform:${isEn ? "uppercase" : "none"};">
+          ${isEn ? "Mandatory Statutory &amp; Financial Disclaimer" : "वैधानिक एवं वित्तीय अस्वीकरण"}
         </div>
         <div style="font-size:9px;color:var(--ivory-dim);line-height:1.35;">
           ${isEn
@@ -425,7 +429,7 @@ export function pageTwelfthHouseSecretWealth(chart: ChartData, pageNum = "12H", 
   const isEn = lang === "en";
   const i18n12H = getTwelfthHouseI18n(lang, lagna);
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail("12th House Intelligence · Sacred Currency (Sampada)", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -516,7 +520,7 @@ export function pageCareerSpecifierD10(chart: ChartData, pageNum = "D10", lang: 
   const isEn = lang === "en";
   const i18nD10 = getCareerSpecifierI18n(lang, { hasKetuLagna });
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail("D10 Dashamsha Career Specifier · Micro-Niche", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -587,7 +591,7 @@ export function pageTransitHealthTiming(chart: ChartData, pageNum = "HT", lang: 
 
   const isEn = lang === "en";
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail("Moon Dispositor Health · Exact Degree Timing", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -676,7 +680,7 @@ export function pageFunctionalDebilityGuard(chart: ChartData, pageNum = "DG", la
 
   const nadi = evaluateNadiDebilityPeak(chart);
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail(isEn ? "Functional Debility Guard · Gemstone Fallacy" : "नीच ग्रह शक्ति व रत्न निषेध · Guard", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -739,7 +743,7 @@ export function pageLineageKarmaKulaDevata(chart: ChartData, pageNum = "LK", lan
   const isEn = lang === "en";
   const lineage = calculateLineageKarma(chart, { nativeName: chart.name || "Seeker", btrConfidence: "High" });
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail(isEn ? "Lineage Karma · Kula Devata & Pitru Intelligence" : "कुल परंपरा · कुलदेवता व पितृ ऋण", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">
@@ -821,7 +825,7 @@ export function pageJyotirlingaPilgrimage(chart: ChartData, pageNum = "JP", lang
   const pil = resolvePilgrimagePrescription(chart);
   const prime = pil.primaryJyotirlinga;
 
-  return `<section class="page dense">
+  return `<section class="page dense${lang === "hi" ? " hindi" : ""}">
     ${pageRail(isEn ? "12 Jyotirlinga Pilgrimage · Sacred Sanctuary" : "द्वादश ज्योतिर्लिंग तीर्थ · आध्यात्मिक शांति", pageNum)}
     <div style="position:relative;z-index:2;padding-top:20px;flex:1;display:flex;flex-direction:column;">
       <div class="section-title" style="margin-bottom:12px;">

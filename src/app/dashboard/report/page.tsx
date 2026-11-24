@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useUserChart } from "@/lib/user-chart";
 import { useUserTier } from "@/context/ChartContext";
+import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import {
   downloadReportAsPDF,
   generateReportHTML,
@@ -9,9 +10,14 @@ import {
   type ReportPalette,
   type ReportCover,
 } from "@/lib/report-html-generator";
+import {
+  POWER_BUNDLE_DOSSIERS,
+  downloadPackageDossierPDF,
+  previewPackageDossierHTML,
+} from "@/lib/report-package-client";
 import { AstroLoadingScreen } from "@/components/AstroLoadingScreen";
 import { createClient } from "@/lib/supabase/client";
-import { isBillingEnforced, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
+import { isBillingEnforced, isFullAccessEnabled, isAdminUser, type SubscriptionTier } from "@/lib/access";
 import { generateShareMessage, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/social-sharing";
 
 const PALETTE_OPTIONS: { value: ReportPalette; label: string; bg: string; gold: string }[] = [

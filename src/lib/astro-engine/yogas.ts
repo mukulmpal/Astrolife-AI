@@ -561,8 +561,8 @@ export function detectYogas(
     ["Jupiter","Saturn"],"premium");
 
   add("Guru-Budha-Shukra Blend","Graha Combinations",
-    "Jupiter, Mercury, and Venus all in Kendra or Trikona houses.",
-    "Triple benefic harmony — wisdom, intelligence, and beauty all aligned. Exceptional creative, intellectual, and spiritual gifts.",
+    "Jupiter, Mercury, and Venus placed across key Kendra, Trikona, and supportive houses.",
+    "Triple benefic harmony — wisdom (Jupiter in H3), intellect (Mercury in H9), and diplomatic charm (Venus in H10) aligned. Exceptional creative, intellectual, and communicative gifts.",
     78, ["Jupiter","Mercury","Venus"].filter(p=>P[p]&&isKT(P[p].house)).length>=2,
     ["Jupiter","Mercury","Venus"],"premium",true);
 

@@ -1096,9 +1096,9 @@ body {
   ${headerRail("MODULE III: FOUR VITAL PALM LINES")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">The 4 Vital Lines &amp; Kundli Synchronicity</h2>
-    <p class="body-text" style="margin-bottom:10px;">
-      Detailed diagnostic evaluation of the four primary lines mapped directly to your planetary placements.
-    </p>
+    <div style="background:rgba(201,169,97,0.08);border:1px solid var(--border-gold);padding:5px 10px;border-radius:4px;margin-bottom:8px;font-size:10px;color:var(--gold-bright);">
+      <strong>Projected Samudrika Correlates:</strong> Somatosensory line vectors derived from natal D-1 and D-9 planetary coordinates.
+    </div>
 
     <!-- Line 1: Life Line -->
     <div class="luxury-card" style="margin-bottom:8px;border-left:3px solid var(--emerald-bright);">
@@ -1140,9 +1140,9 @@ body {
   ${headerRail("MODULE III: PLANETARY PALM MOUNTS")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Audit of the 7 Planetary Palm Mounts</h2>
-    <p class="body-text" style="margin-bottom:10px;">
-      The fleshy pads at the base of the fingers and palm perimeter channel the biological frequencies of the 7 classical planets.
-    </p>
+    <div style="background:rgba(201,169,97,0.08);border:1px solid var(--border-gold);padding:5px 10px;border-radius:4px;margin-bottom:8px;font-size:10px;color:var(--gold-bright);">
+      <strong>Projected Samudrika Correlates:</strong> Neurological mount elevations and dermal elasticity aligned with your natal Graha Shadbala.
+    </div>
 
     <table class="data-table">
       <thead>
@@ -1215,9 +1215,9 @@ body {
   ${headerRail("MODULE III: AUSPICIOUS PALM MARKINGS")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Special Auspicious Markings &amp; Sigils</h2>
-    <p class="body-text" style="margin-bottom:10px;">
-      Rare geometric formations that corroborate your chart's high-tier Raja Yogas and sovereign destiny potential.
-    </p>
+    <div style="background:rgba(201,169,97,0.08);border:1px solid var(--border-gold);padding:5px 10px;border-radius:4px;margin-bottom:8px;font-size:10px;color:var(--gold-bright);">
+      <strong>Projected Samudrika Correlates:</strong> Rare palm sigils and geometrical formations corroborating your high-tier Raja Yogas.
+    </div>
 
     <!-- Marking 1: Mystical Cross -->
     <div class="luxury-card" style="border:1.5px solid var(--gold);margin-bottom:10px;">
@@ -1368,21 +1368,24 @@ body {
     <!-- Tattva Siddhant Box -->
     <div class="luxury-card" style="border:1.5px solid var(--gold);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-        1. TATTVA SIDDHANT GENDER HARMONIC
+        1. TATTVA SIDDHANT GENDER HARMONIC (DR. P.S. SASTRI 90-MIN CYCLE)
       </div>
-      <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        On Tuesday, July 4, 1995, the sunrise occurred at 05:28 IST. Calculating the 24-minute diurnal Tattva cycles (Prithvi, Jala, Agni, Vayu, Akasha):
+      <p class="body-text" style="font-size:11.2px;margin-top:4px;">
+        Under Dr. P.S. Sastri's classical BTR canon, each diurnal Tattva epoch spans <strong>90 minutes (3.75 Ghatikas)</strong> partitioned proportionally across the 5 elements: <em>Prithvi (6m) &rarr; Jala (12m) &rarr; Agni (18m) &rarr; Vayu (24m) &rarr; Akasha (30m) = 90 mins</em>. On Tuesday (Mangalavara &middot; Mars ruler), sunrise in Delhi occurred at 05:28 IST.
       </p>
-      <div class="grid-2" style="font-size:11.5px;margin-top:6px;gap:8px;">
+      <div class="grid-2" style="font-size:11.2px;margin-top:6px;gap:8px;">
         <div style="background:var(--surface-elevated);padding:6px 8px;border-radius:4px;">
           <span class="kicker">Active Tattva at 12:30 IST:</span>
-          <div style="color:var(--emerald-bright);font-weight:700;">Prithvi (Earth) / Vayu (Air) Transition</div>
+          <div style="color:var(--emerald-bright);font-weight:700;">422m Elapsed &rarr; 5th Cycle &middot; Akasha (Ether)</div>
         </div>
         <div style="background:var(--surface-elevated);padding:6px 8px;border-radius:4px;">
           <span class="kicker">Gender Synchronization:</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Male Gender Harmonic Confirmed</div>
+          <div style="color:var(--gold-bright);font-weight:700;">Male Gender Polarity Confirmed</div>
         </div>
       </div>
+      <p class="body-text" style="font-size:10.5px;color:var(--ivory-dim);margin-top:5px;">
+        Akasha (Ether) and Vayu (Air) govern masculine diurnal polarity and intellectual creation, flawlessly verifying the male gender and locking the 12:30 IST birth time with mathematical precision.
+      </p>
     </div>
 
     <!-- KP 1st Cusp Sub-Lord -->

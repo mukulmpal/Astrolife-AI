@@ -72,7 +72,7 @@ export const VASTU_ZONES_DEF = [
   { dir:"NE",  deg:33.75,  name:"North-East",planet:"Jupiter", element:"Water",       deity:"Isha (Shiva)",domain:"Spirituality, Wisdom, Blessings",    color:"#06b6d4", house:1  },
   { dir:"ENE", deg:56.25,  name:"East-NE",   planet:"Sun",     element:"Air+Fire",    deity:"Parjanya",    domain:"Health, Growth, New Beginnings",     color:"#f59e0b", house:1  },
   { dir:"E",   deg:78.75,  name:"East",      planet:"Sun",     element:"Air",         deity:"Indra",       domain:"Growth, Prosperity, Activity",       color:"#f97316", house:1  },
-  { dir:"ESE", deg:101.25, name:"East-SE",   planet:"Venus",   element:"Fire+Air",    deity:"Vitatha",     domain:"Social Success, Relationships",      color:"#ec4899", house:7  },
+  { dir:"ESE", deg:101.25, name:"East-SE",   planet:"Venus",   element:"Fire+Air",    deity:"Vitatha",     domain:"Anxiety, Churning & Analysis",        color:"#ec4899", house:7  },
   { dir:"SE",  deg:123.75, name:"South-East",planet:"Venus",   element:"Fire",        deity:"Agni",        domain:"Wealth, Fire, Energy, Kitchen",      color:"#ef4444", house:2  },
   { dir:"SSE", deg:146.25, name:"South-SE",  planet:"Mars",    element:"Fire+Earth",  deity:"Grihakshat",  domain:"Confidence, Power, Boldness",        color:"#f87171", house:3  },
   { dir:"S",   deg:168.75, name:"South",     planet:"Mars",    element:"Fire",        deity:"Yama",        domain:"Fame, Discipline, Career Recognition",color:"#dc2626", house:10 },
@@ -80,7 +80,7 @@ export const VASTU_ZONES_DEF = [
   { dir:"SW",  deg:213.75, name:"South-West",planet:"Rahu",    element:"Earth",       deity:"Nairriti",    domain:"Stability, Relationships, Longevity",color:"#7c3aed", house:7  },
   { dir:"WSW", deg:236.25, name:"West-SW",   planet:"Saturn",  element:"Space+Earth", deity:"Varuna",      domain:"Profits, Gains, Legacy",             color:"#60a5fa", house:11 },
   { dir:"W",   deg:258.75, name:"West",      planet:"Saturn",  element:"Space",       deity:"Varuna",      domain:"Networking, Profits, Results",       color:"#3b82f6", house:7  },
-  { dir:"WNW", deg:281.25, name:"West-NW",   planet:"Moon",    element:"Air+Space",   deity:"Shosha",      domain:"Movement, Freshness, Guests",        color:"#c084fc", house:3  },
+  { dir:"WNW", deg:281.25, name:"West-NW",   planet:"Moon",    element:"Air+Space",   deity:"Shosha",      domain:"Depression, Detox & Release",        color:"#c084fc", house:3  },
   { dir:"NW",  deg:303.75, name:"North-West",planet:"Moon",    element:"Air",         deity:"Vayu",        domain:"Travel, Support, Social Connections",color:"#a855f7", house:3  },
   { dir:"NNW", deg:326.25, name:"North-NW",  planet:"Mercury", element:"Water+Air",   deity:"Mukhya",      domain:"Income, Vitality, Savings",          color:"#34d399", house:11 },
 ] as const;
@@ -97,7 +97,7 @@ const ZONE_REMEDIES: Record<string, string> = {
   NE:  "Sacred puja spot. Temple/mandir ideal. Never toilet or kitchen here.",
   ENE: "Ventilation & sunrise light. No heavy furniture blocking morning sun.",
   E:   "Keep East open. Morning light must enter. No bathroom in East.",
-  ESE: "Social area. Pink/white colors. Venus yantra. Flowers here.",
+  ESE: "Keep clutter-free; ideal for churning/mixer; avoid sleeping here to prevent overthinking.",
   SE:  "Kitchen ideal here. Red/orange colors. Agni yantra. Fire element.",
   SSE: "Exercise or gym area. Red/orange tones. Remove obstacles.",
   S:   "Fame wall — display awards, photos, achievements. No main door.",
@@ -105,17 +105,17 @@ const ZONE_REMEDIES: Record<string, string> = {
   SW:  "Master bedroom ideal. Heavy furniture. No toilet/kitchen. Very important zone.",
   WSW: "Savings & study. Keep organized. No clutter.",
   W:   "Living room or dining. Saturn yantra. Iron objects beneficial.",
-  WNW: "Guest room. Keep moving, fresh energy.",
+  WNW: "Ideal for emotional release and journal writing; avoid bedroom to prevent low moods.",
   NW:  "Movement zone — vehicles, social. Moon yantra. Keep active.",
   NNW: "Income corner. Mercury yantra. Keep organized & energized.",
 };
 
 const ZONE_ROOMS: Record<string, string> = {
   N:   "Home Office / Study", NNE:"Meditation / Prayer", NE:"Puja Room / Temple",
-  ENE:"Children's Room",     E:  "Master Bedroom",      ESE:"Living Room",
+  ENE:"Children's Room",     E:  "Master Bedroom",      ESE:"Utility / Churning Space",
   SE: "Kitchen",             SSE:"Gym / Exercise",      S:  "Storage / Study",
   SSW:"Ancestors Corner",    SW: "Master Bedroom",      WSW:"Savings Room",
-  W:  "Dining Room",         WNW:"Guest Bedroom",       NW: "Garage / Vehicles",
+  W:  "Dining Room",         WNW:"Detox Corner / Utility",       NW: "Garage / Vehicles",
   NNW:"Cash / Locker Room",
 };
 

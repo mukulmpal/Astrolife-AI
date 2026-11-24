@@ -27,11 +27,24 @@ function mod(n: number, m: number) {
   return ((n % m) + m) % m;
 }
 
+const RASHI_NAME_MAP: Record<string, number> = {
+  aries: 0, taurus: 1, gemini: 2, cancer: 3, leo: 4, virgo: 5,
+  libra: 6, scorpio: 7, sagittarius: 8, capricorn: 9, aquarius: 10, pisces: 11,
+  mesha: 0, vrishabha: 1, mithuna: 2, karka: 3, simha: 4, kanya: 5,
+  tula: 6, vrishchika: 7, dhanu: 8, makara: 9, kumbha: 10, meena: 11,
+};
+
 export function toRashi(value: unknown): number {
   if (typeof value === "number" && Number.isFinite(value)) {
     if (value >= 0 && value <= 11) return value;
     if (value >= 1 && value <= 12) return value - 1;
     return Math.floor(mod(value, 360) / 30);
+  }
+  if (typeof value === "string") {
+    const key = value.toLowerCase().trim();
+    if (key in RASHI_NAME_MAP) return RASHI_NAME_MAP[key];
+    const parsed = Number.parseFloat(key);
+    if (!Number.isNaN(parsed)) return toRashi(parsed);
   }
   return 0;
 }

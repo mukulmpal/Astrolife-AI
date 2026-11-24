@@ -319,33 +319,37 @@ export interface AKVPlanet {
       };
     });
   
+    const houseScores = Array.from({ length: 12 }, (_, i) => {
+      const h = i + 1;
+      const signIdx = md(lagnaNum + i, 12);
+      return { house: h, signIdx, score: sarva[signIdx] };
+    });
+
     // Build house objects
-    const houses: AKVHouse[] = sarva.map((score, i) => {
-      const h    = i+1;
+    const houses: AKVHouse[] = houseScores.map(({ house: h, signIdx, score }) => {
       const data = HOUSE_DATA[h];
       const grade: "Strong"|"Average"|"Weak" = score>=28?"Strong":score>=25?"Average":"Weak";
       const color = score>=28?"#22c55e":score>=25?"#c8a030":"#ef4444";
       const interp = grade==="Strong"?data.high:grade==="Average"?data.mid:data.low;
-  
+
       // Top contributing planets for this house
       const topPlanets = PLS7
-        .map(p=>({p,b:planetResults[p].bindus[i]}))
+        .map(p=>({p,b:planetResults[p].bindus[signIdx]}))
         .sort((a,b)=>b.b-a.b)
         .slice(0,2)
         .filter(x=>x.b>0)
         .map(x=>`${x.p}(${x.b})`);
-  
+
       return { house:h, score, grade, color, name:data.name, theme:data.theme, interp, topPlanets };
     });
 
-    const matrix: AKVMatrixRow[] = sarva.map((total, i) => {
-      const h = i + 1;
+    const matrix: AKVMatrixRow[] = houseScores.map(({ house: h, signIdx, score: total }) => {
       const grade: "Strong"|"Average"|"Weak" = total>=28?"Strong":total>=25?"Average":"Weak";
       return {
         house: h,
-        sign: RASHIS[md(lagnaNum + i, 12)],
+        sign: RASHIS[signIdx],
         planetBindus: PLS7.reduce<Record<string, number>>((acc, planet) => {
-          acc[planet] = planetResults[planet].bindus[i];
+          acc[planet] = planetResults[planet].bindus[signIdx];
           return acc;
         }, {}),
         total,
@@ -353,12 +357,10 @@ export interface AKVPlanet {
       };
     });
 
-    const sodhyaPinda: SodhyaPindaHouse[] = sarva.map((bindus, i) => {
-      const house = i + 1;
-      const signIdx = md(lagnaNum + i, 12);
+    const sodhyaPinda: SodhyaPindaHouse[] = houseScores.map(({ house, signIdx, score: bindus }) => {
       let score = 0;
       PLS7.forEach((planet) => {
-        score += planetResults[planet].bindus[i] * rashiStrength(planet, signIdx);
+        score += planetResults[planet].bindus[signIdx] * rashiStrength(planet, signIdx);
       });
       const rounded = Math.round(score * 10) / 10;
       const grade: SodhyaPindaHouse["grade"] =
@@ -384,10 +386,10 @@ export interface AKVPlanet {
                 : `Sensitive transit zone. Avoid forcing results; use remedies and practical safeguards.`,
       };
     });
-  
-    const sorted    = [...sarva].map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v);
-    const strongest = sorted.slice(0,3).map(x=>x.i);
-    const weakest   = sorted.slice(-3).reverse().map(x=>x.i);
+
+    const sortedHouses = [...houseScores].sort((a,b)=>b.score-a.score);
+    const strongest = sortedHouses.slice(0,3).map(x=>x.house - 1);
+    const weakest   = sortedHouses.slice(-3).reverse().map(x=>x.house - 1);
     const bestTransitHouses = [...sodhyaPinda].sort((a,b)=>b.score-a.score).slice(0,3);
     const sensitiveTransitHouses = [...sodhyaPinda].sort((a,b)=>a.score-b.score).slice(0,3);
   
@@ -502,8 +504,10 @@ export interface AKVPlanet {
     const topLifeAreas  = strongest.map(i => HOUSE_DATA[i+1].name);
     const weakLifeAreas = weakest.map(i => HOUSE_DATA[i+1].name);
 
-    const lifeSummary = sarvaTotal >= 337
+    const lifeSummary = sarvaTotal > 337
       ? `With ${sarvaTotal} total bindus (above the classical standard of 337), your chart carries strong cosmic momentum. The domains of ${topLifeAreas.join(", ")} are where fate delivers results most readily — invest effort there and the universe cooperates. Even your weaker houses (${weakLifeAreas.join(", ")}) have windows of grace during favourable dashas.`
+      : sarvaTotal === 337
+      ? `With exactly ${sarvaTotal} total bindus (matching the classical standard of 337), your chart carries balanced and resilient cosmic momentum. The domains of ${topLifeAreas.join(", ")} are where fate delivers results most readily — invest effort there and the universe cooperates. Even your weaker houses (${weakLifeAreas.join(", ")}) have windows of grace during favourable dashas.`
       : sarvaTotal >= 300
       ? `Your ${sarvaTotal} bindus are near the standard 337, giving moderate cosmic backing. ${topLifeAreas.join(", ")} are your most reliable zones. In ${weakLifeAreas.join(", ")}, consistent effort must compensate for lighter planetary support — remedies and timing help.`
       : `With ${sarvaTotal} bindus (below the standard 337), this chart calls for conscious effort and remedies. ${topLifeAreas.join(", ")} offer the best return on effort. ${weakLifeAreas.join(", ")} require patience, discipline, and targeted remedies to unlock results — but every planet has strong houses that can still produce wins.`;

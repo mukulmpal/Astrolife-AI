@@ -1,4 +1,4 @@
-import { FEATURE_ACCESS, isBillingEnforced, isEliteEmail, isFullAccessEnabled, normalizeTier, type FeatureKey, type SubscriptionTier } from "@/lib/access";
+import { FEATURE_ACCESS, isAdminUser, isBillingEnforced, isEliteEmail, isFullAccessEnabled, normalizeTier, type FeatureKey, type SubscriptionTier } from "@/lib/access";
 import { createClient } from "@/lib/supabase/server";
 
 export type ServerFeatureAccess = {
@@ -39,7 +39,7 @@ export async function getServerFeatureAccess(feature: FeatureKey): Promise<Serve
       };
     }
 
-    const isElite = (user.email && isEliteEmail(user.email)) ||
+    const isElite = (user.email && (isEliteEmail(user.email) || isAdminUser(user.email))) ||
       user.app_metadata?.subscription_tier === "elite" ||
       user.user_metadata?.subscription_tier === "elite";
 

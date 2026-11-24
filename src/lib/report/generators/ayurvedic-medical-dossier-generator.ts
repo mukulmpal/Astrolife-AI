@@ -668,7 +668,7 @@ body {
     <div class="luxury-card" style="border-top:2px solid var(--teal-bright);margin-bottom:8px;">
       <div class="kicker" style="color:var(--teal-bright);margin-bottom:2px;">✦ THE 1-5-11 RECOVERY TRIAD VS 6-8-12 DUSTHANA AXIS</div>
       <p class="body-text" style="font-size:10.5px;">
-        In AstroLife's classical health matrix, while houses 6, 8, and 12 govern acute, chronic, and hospitalizing friction, <strong>Houses 1, 5, and 11 form the Invincible Recovery Triad</strong>. Your 1st House (Lagna Lord Mercury in 9th) grants innate stamina (<em>Deha Arogya</em>), your 5th House (Capricorn &middot; 30 SAV Bindus) governs swift therapeutic response (<em>Upachaya</em>), and your 11th House (Cancer &middot; Exalted Jupiter in D-9) guarantees total disease recovery (<em>Roga Mukti</em>).
+        In AstroLife's classical health matrix, while houses 6, 8, and 12 govern acute, chronic, and hospitalizing friction, <strong>Houses 1, 5, and 11 form the Invincible Recovery Triad</strong>. Your 1st House (Lagna Lord Mercury in 9th) grants innate stamina (<em>Deha Arogya</em>), your 5th House (Capricorn &middot; 30 SAV Bindus) governs swift therapeutic response (<em>Upachaya</em>), and your 11th House (Cancer &middot; receiving benefic trines and fortified by an exalted D-9 Lagna Lord Mercury) guarantees disease recovery (<em>Roga Mukti</em>) and cellular immunity.
       </p>
     </div>
 
@@ -978,10 +978,10 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--gold-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div class="kicker" style="color:var(--gold-bright);">4. MEDA DHATU &middot; मेद धातु (ADIPOSE &amp; LIPID LUBRICATION)</div>
-          <span class="tag-badge tag-emerald">GOVERNOR: JUPITER &middot; EXCELLENT</span>
+          <span class="tag-badge tag-emerald">GOVERNOR: JUPITER &middot; BALANCED</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Meda supplies lubrication to joints and protects neural sheaths (<em>Snehana</em>). With Jupiter exalted in D-9 Navamsha, your lipid metabolism is exceptionally well-regulated. You naturally burn adipose reserves efficiently, avoiding metabolic sluggishness. <em>Protocol: Maintain pure cold-pressed oils in your cooking routine.</em>
+          Meda supplies lubrication to joints and protects neural sheaths (<em>Snehana</em>). Governed by Jupiter in Scorpio (D-1) and harmonious in Libra (D-9), reinforced by exalted Mercury in D-9, your lipid metabolism is well-regulated and responsive. You naturally metabolize reserves efficiently. <em>Protocol: Maintain pure cold-pressed oils in your cooking routine.</em>
         </p>
       </div>
     </div>
@@ -1004,10 +1004,10 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--purple-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div class="kicker" style="color:var(--purple-bright);">5. ASTHI DHATU &middot; अस्थि धातु (BONE, CARTILAGE &amp; TEETH)</div>
-          <span class="tag-badge tag-emerald">GOVERNORS: SATURN / SUN &middot; VARGOTTAMA</span>
+          <span class="tag-badge tag-emerald">GOVERNORS: SATURN / SUN &middot; RESILIENT</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Asthi gives structural architecture to the frame (<em>Dharana</em>). Governed by Saturn, who is <strong>Vargottama in Pisces</strong> (occupying Pisces in both D-1 and D-9), your skeletal density and teeth are exceptionally resilient. Ensure consistent dietary calcium and Vitamin D synthesis via morning sunlight to avoid late-life lumbar stiffness.
+          Asthi gives structural architecture to the frame (<em>Dharana</em>). Governed by Saturn in Pisces (7th house) and the Sun (Gemini 10th house), your skeletal density and teeth possess solid endurance. Ensure consistent dietary calcium and Vitamin D synthesis via morning sunlight to maintain lumbar flexibility and joint warmth.
         </p>
       </div>
 

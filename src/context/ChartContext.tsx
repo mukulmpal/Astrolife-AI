@@ -16,7 +16,7 @@ import {
   clearCurrentChart,
 } from "@/lib/user-chart";
 import { createClient } from "@/lib/supabase/client";
-import { isEliteEmail, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
+import { isAdminUser, isEliteEmail, isFullAccessEnabled, normalizeTier, type SubscriptionTier } from "@/lib/access";
 
 export interface ChartContextValue {
   birth: BirthDetails;
@@ -26,6 +26,7 @@ export interface ChartContextValue {
   isDemoChart: boolean;
   userTier: SubscriptionTier;
   isElite: boolean;
+  isAdmin: boolean;
   refreshChart: () => Promise<void>;
   setChartData: (newChart: ChartData) => void;
 }
@@ -51,6 +52,7 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(() => !initialChart);
   const [userTier, setUserTier] = useState<SubscriptionTier>(() => (isFullAccessEnabled() ? "elite" : "free"));
   const [isElite, setIsElite] = useState<boolean>(() => isFullAccessEnabled());
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   // ── Reactive synchronizer: Catch instant chart switch events across components ──
   useEffect(() => {
@@ -119,9 +121,13 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
       let resolvedElite = isFullAccessEnabled();
 
       if (user) {
+        const resolvedAdmin = Boolean(user.email && isAdminUser(user.email));
+        setIsAdmin(resolvedAdmin);
+
         const appMetadata = user.app_metadata as Record<string, unknown> | undefined;
         const userMetadata = user.user_metadata as Record<string, unknown> | undefined;
         const userIsElite =
+          resolvedAdmin ||
           Boolean(user.email && isEliteEmail(user.email)) ||
           appMetadata?.subscription_tier === "elite" ||
           userMetadata?.subscription_tier === "elite";
@@ -139,6 +145,8 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
           resolvedTier = normalizeTier(profile?.subscription_tier, user.email);
           resolvedElite = resolvedTier === "elite";
         }
+      } else {
+        setIsAdmin(false);
       }
 
       setUserTier(resolvedTier);
@@ -234,9 +242,10 @@ export function ChartProvider({ children }: { children: React.ReactNode }) {
     isDemoChart: !hasUserChart,
     userTier,
     isElite,
+    isAdmin,
     refreshChart: loadChart,
     setChartData,
-  }), [birth, chart, loading, hasUserChart, userTier, isElite, loadChart, setChartData]);
+  }), [birth, chart, loading, hasUserChart, userTier, isElite, isAdmin, loadChart, setChartData]);
 
   return <ChartContext.Provider value={value}>{children}</ChartContext.Provider>;
 }
@@ -249,11 +258,11 @@ export function useChartEngine(): ChartContextValue {
   return context;
 }
 
-export function useUserTier(): { userTier: SubscriptionTier; isElite: boolean } {
+export function useUserTier(): { userTier: SubscriptionTier; isElite: boolean; isAdmin: boolean } {
   const context = useContext(ChartContext);
   if (!context) {
     const full = isFullAccessEnabled();
-    return { userTier: full ? "elite" : "free", isElite: full };
+    return { userTier: full ? "elite" : "free", isElite: full, isAdmin: false };
   }
-  return { userTier: context.userTier, isElite: context.isElite };
+  return { userTier: context.userTier, isElite: context.isElite, isAdmin: context.isAdmin };
 }

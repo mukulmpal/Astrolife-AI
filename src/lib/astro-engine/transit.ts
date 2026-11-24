@@ -520,14 +520,16 @@ export function analyzeSadeSati(
 export function buildZoneAlerts(
   curPos: RawPlanetPositions,
   natal: NatalChartInput,
+  base: TransitBase = 'lagna',
 ): TransitZoneAlert[] {
   const alerts: TransitZoneAlert[] = [];
   const { lagR, planets } = natal;
   const moonRashi = Math.floor(planets.Moon.lon / 30);
+  const refRashi = base === 'moon' ? moonRashi : lagR;
 
   // Saturn
   const satR    = Math.floor(curPos.Saturn / 30);
-  const satH    = ((satR - lagR + 12) % 12) + 1;
+  const satH    = ((satR - refRashi + 12) % 12) + 1;
   const satFromMoon = ((satR - moonRashi + 12) % 12) + 1;
   const sadeSati = analyzeSadeSati(curPos.Saturn, planets.Moon.lon, lagR);
 
@@ -571,7 +573,7 @@ export function buildZoneAlerts(
 
   // Jupiter
   const jupR    = Math.floor(curPos.Jupiter / 30);
-  const jupH    = ((jupR - lagR + 12) % 12) + 1;
+  const jupH    = ((jupR - refRashi + 12) % 12) + 1;
   const jupFromMoon = ((jupR - moonRashi + 12) % 12) + 1;
   const jupGurubala = [2, 5, 7, 9, 11].includes(jupFromMoon);
 
@@ -591,7 +593,7 @@ export function buildZoneAlerts(
 
   // Rahu-Ketu
   const rahuR     = Math.floor(curPos.Rahu / 30);
-  const rahuH     = ((rahuR - lagR + 12) % 12) + 1;
+  const rahuH     = ((rahuR - refRashi + 12) % 12) + 1;
   const ketuH     = ((rahuH + 5) % 12) + 1;
   const natalRahuH = planets.Rahu.house;
   const rahuReturn = rahuH === natalRahuH;
@@ -790,7 +792,7 @@ export function runTransitEngine(
   });
 
   const sadeSati = analyzeSadeSati(curPos.Saturn, moonLon, natal.lagR);
-  const zoneAlerts = buildZoneAlerts(curPos, natal);
+  const zoneAlerts = buildZoneAlerts(curPos, natal, base);
   // Ingresses only computed when explicitly requested (e.g. detailed report generation)
   const upcomingIngresses = options?.includeIngresses !== false && options?.includeIngresses === true
     ? computeUpcomingIngresses(jdNow, tz, natal.lagR)

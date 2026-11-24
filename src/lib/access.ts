@@ -118,7 +118,7 @@ export function isAdminUser(email?: string | null): boolean {
 
 export function normalizeTier(tier?: string | null, email?: string | null): SubscriptionTier {
   if (isFullAccessEnabled()) return "elite";
-  if (email && isEliteEmail(email)) return "elite";
+  if (email && (isEliteEmail(email) || isAdminUser(email))) return "elite";
   return tier === "premium" || tier === "elite" ? tier : "free";
 }
 
@@ -138,7 +138,7 @@ export function canAccessTier(
   email?: string | null
 ): boolean {
   if (isFullAccessEnabled()) return true;
-  if (email && isEliteEmail(email)) return true;
+  if (email && (isEliteEmail(email) || isAdminUser(email))) return true;
   const normalized = normalizeTier(userTier, email);
   return TIER_RANK[normalized] >= TIER_RANK[requiredTier];
 }
@@ -150,15 +150,17 @@ export function isBillingEnforced() {
 
 export function canAccessFeature(feature: FeatureKey, tier?: string | null, email?: string | null) {
   if (isFullAccessEnabled()) return true;
-  if (email && isEliteEmail(email)) return true;
+  if (email && (isEliteEmail(email) || isAdminUser(email))) return true;
   return FEATURE_ACCESS[feature].includes(normalizeTier(tier, email));
 }
 
 export function shouldSoftGateFeature(feature: FeatureKey, tier?: string | null, email?: string | null) {
+  if (email && (isEliteEmail(email) || isAdminUser(email))) return false;
   return !canAccessFeature(feature, tier, email) && !isBillingEnforced();
 }
 
 export function shouldBlockFeature(feature: FeatureKey, tier?: string | null, email?: string | null) {
+  if (email && (isEliteEmail(email) || isAdminUser(email))) return false;
   return !canAccessFeature(feature, tier, email) && isBillingEnforced();
 }
 

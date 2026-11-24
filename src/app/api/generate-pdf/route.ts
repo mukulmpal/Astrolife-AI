@@ -12,6 +12,7 @@ import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import { fail, isRecord, ok, optionalText, readJsonWithLimit, validationErrorResponse, type ValidationResult } from "@/lib/validation/api";
 import { validateChartData } from "@/lib/validation/chart";
 import { createClient } from "@/lib/supabase/server";
+import { isAdminUser, isEliteEmail } from "@/lib/access";
 import { getPalmistrySession } from "@/lib/palmistry/storage";
 import type { PalmRuleReport } from "@/lib/palmistry/types";
 import { runKPEngine } from "@/lib/astro-engine/kp";
@@ -107,8 +108,23 @@ async function attachPalmistryFusion(options: Partial<ReportOptions>, userId?: s
 export async function POST(request: NextRequest) {
   let browser;
   try {
-    const limit = checkRateLimit(request, { scope: "api-generate-pdf", limit: 8, windowMs: 60 * 60_000 });
-    if (!limit.allowed) return rateLimitResponse(limit.resetAt);
+    let isAdmin = false;
+    let authUser: { id: string; email?: string } | null = null;
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        authUser = { id: user.id, email: user.email };
+        isAdmin = Boolean(user.email && (isAdminUser(user.email) || isEliteEmail(user.email)));
+      }
+    } catch {
+      // Unauthenticated
+    }
+
+    if (!isAdmin) {
+      const limit = checkRateLimit(request, { scope: "api-generate-pdf", limit: 12, windowMs: 60 * 60_000 });
+      if (!limit.allowed) return rateLimitResponse(limit.resetAt);
+    }
 
     const parsed = await readJsonWithLimit(request, validatePdfBody, { maxBytes: 900_000, routeName: "generate-pdf" });
     if (!parsed.ok) return validationErrorResponse(parsed);
@@ -117,7 +133,7 @@ export async function POST(request: NextRequest) {
     const { chart, options } = body;
     const safeOptions = normalizeReportOptions(options ?? {});
     const access = await getServerFeatureAccess(safeOptions.type === "basic" || safeOptions.type === "evidence-first" ? "basic_kundli" : "reports");
-    if (!access.allowed) {
+    if (!access.allowed && !isAdmin) {
       monitor.warn("premium.blocked", {
         feature: access.feature,
         reason: access.reason,
@@ -165,7 +181,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (safeOptions.type === "elite" && access.enforced && access.tier !== "elite") {
+    if (safeOptions.type === "elite" && access.enforced && access.tier !== "elite" && !isAdmin) {
       monitor.warn("premium.blocked", {
         feature: "reports",
         reason: "upgrade_required",
