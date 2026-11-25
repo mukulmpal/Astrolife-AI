@@ -1405,23 +1405,6 @@ export default function Dashboard() {
             </div>
           )}
 
-
-          {dbHealth.length > 0 && !dbReady && (
-            <div className="db-health">
-              <div>
-                <div className="db-health-title">Database setup pending</div>
-                <div className="db-health-text">
-                  Account persistence is in fallback mode. Apply `supabase/schema.sql` and follow `docs/SUPABASE_SETUP.md`.
-                </div>
-              </div>
-              <div className="db-health-tags">
-                {pendingDbTables.slice(0, 4).map((item) => (
-                  <span key={item.table} className="db-health-tag">{item.label}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* STATS */}
           <div className="stats-row">
             {[
